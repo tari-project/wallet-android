@@ -1,0 +1,91 @@
+apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
+apply plugin: 'kotlin-kapt'
+
+android {
+    compileSdkVersion 29
+    buildToolsVersion "29.0.2"
+    defaultConfig {
+        applicationId "com.tari.android.wallet"
+        minSdkVersion 24
+        targetSdkVersion 29
+        versionCode 1
+        versionName "0.0.1"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
+        ndk {
+            abiFilters "armeabi-v7a"
+        }
+        externalNativeBuild {
+            cmake {
+                arguments '-DANDROID_STL=c++_static'
+            }
+        }
+    }
+    buildTypes {
+        debug {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    externalNativeBuild {
+        cmake {
+            path "src/main/cpp/CMakeLists.txt"
+        }
+    }
+
+    compileOptions {
+        targetCompatibility 1.8
+        sourceCompatibility 1.8
+    }
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+
+    // kotlin
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+
+    // android
+    implementation 'androidx.appcompat:appcompat:1.1.0'
+    implementation 'androidx.core:core-ktx:1.1.0'
+    implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
+
+    // support lib
+    implementation 'androidx.legacy:legacy-support-v13:1.0.0'
+
+    // firebase
+    implementation 'com.google.firebase:firebase-messaging:20.0.1'
+
+    // test
+    testImplementation 'junit:junit:4.12'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.1'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
+
+    // spring animation
+    implementation 'androidx.dynamicanimation:dynamicanimation:1.0.0'
+    implementation 'com.daasuu:EasingInterpolator:1.3.0'
+
+    // dart - extras injection
+    implementation 'com.f2prateek.dart:henson:3.1.3'
+    kapt 'com.f2prateek.dart:henson-processor:3.1.3'
+
+    // parceler
+    implementation 'org.parceler:parceler-api:1.1.12'
+    kapt 'org.parceler:parceler:1.1.12'
+
+    // lottie
+    implementation "com.airbnb.android:lottie:3.1.0"
+    // butterknife
+    implementation "com.jakewharton:butterknife:10.2.0"
+    annotationProcessor "com.jakewharton:butterknife-compiler:10.2.0"
+    // logger
+    implementation 'com.orhanobut:logger:2.2.0'
+
+}

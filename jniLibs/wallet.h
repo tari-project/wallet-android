@@ -31,9 +31,12 @@
 //! updates.
 
 // TODO: Improve documentation
-
 #ifndef wallet_ffi_h
 #define wallet_ffi_h
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #include <stdio.h>
 #include <stdbool.h>
@@ -290,10 +293,10 @@ bool wallet_remove_contact(struct TariWallet *wallet, struct TariContact *contac
 unsigned long long wallet_get_available_balance(struct TariWallet *wallet);
 
 // Gets the incoming balance from a TariWallet
-unsigned long long wallet_get_incoming_balance(struct TariWallet *wallet);
+unsigned long long wallet_get_pending_incoming_balance(struct TariWallet *wallet);
 
 // Gets the outgoing balance from a TariWallet
-unsigned long long wallet_get_outgoing_balance(struct TariWallet *wallet);
+unsigned long long wallet_get_pending_outgoing_balance(struct TariWallet *wallet);
 
 // Sends a TariPendingOutboundTransaction
 bool wallet_send_transaction(struct TariWallet *wallet, struct TariPublicKey *destination, unsigned long long amount, unsigned long long fee_per_gram,const char *message);
@@ -349,5 +352,8 @@ bool wallet_callback_register_received_transaction(struct TariWallet *wallet, vo
 // Registers a callback function for when a reply is received for a TariPendingOutboundTransaction
 bool wallet_callback_register_received_transaction_reply(struct TariWallet *wallet, void (*call)(struct TariCompletedTransaction*));
 
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* wallet_ffi_h */

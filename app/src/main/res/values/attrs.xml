@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <attr name="customFont" format="string" />
+
+    <declare-styleable name="CustomFontTextView">
+        <attr name="customFont" />
+    </declare-styleable>
+    <declare-styleable name="CustomFontButton">
+        <attr name="customFont" />
+    </declare-styleable>
+</resources>
