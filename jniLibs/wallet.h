@@ -98,7 +98,7 @@ struct TariPublicKey *public_key_create(struct ByteVector *bytes);
 struct ByteVector *public_key_get_bytes(struct TariPublicKey *public_key);
 
 // Creates a TariPublicKey from a TariPrivateKey
-struct TariPublicKey *public_key_get_from_private_key(struct TariPrivateKey *secret_key);
+struct TariPublicKey *public_key_from_private_key(struct TariPrivateKey *secret_key);
 
 // Creates a TariPublicKey from a const char* filled with hexadecimal characters
 struct TariPublicKey *public_key_from_hex(const char *hex);
@@ -183,7 +183,7 @@ int completed_transaction_get_status(struct TariCompletedTransaction *transactio
 unsigned long long completed_transaction_get_transaction_id(struct TariCompletedTransaction *transaction);
 
 // Gets the timestamp of a TariCompletedTransaction
-unsigned long long completed_transaction_get_transaction_timestamp(struct TariCompletedTransaction *transaction);
+unsigned long long completed_transaction_get_timestamp(struct TariCompletedTransaction *transaction);
 
 // Frees memory for a TariCompletedTransaction
 void completed_transaction_destroy(struct TariCompletedTransaction *transaction);
@@ -217,7 +217,7 @@ const char *pending_outbound_transaction_get_message(struct TariPendingOutboundT
 unsigned long long pending_outbound_transaction_get_timestamp(struct TariPendingOutboundTransaction *transaction);
 
 // Frees memory for a TariPendingOutboundTactions
-void pending_inbound_transaction_destroy(struct TariPendingInboundTransaction *transaction);
+void pending_outbound_transaction_destroy(struct TariPendingOutboundTransaction *transaction);
 
 /// -------------------------------- OutboundTransactions ------------------------------------------------------ ///
 
@@ -245,7 +245,7 @@ const char *pending_inbound_transaction_get_message(struct TariPendingInboundTra
 unsigned long long pending_inbound_transaction_get_amount(struct TariPendingInboundTransaction *transaction);
 
 // Gets the timestamp of a TariPendingInboundTransaction
-unsigned long long pending_inbound_get_timestamp(struct TariPendingInboundTransaction *transaction);
+unsigned long long pending_inbound_transaction_get_timestamp(struct TariPendingInboundTransaction *transaction);
 
 // Frees memory for a TariPendingInboundTransaction
 void pending_inbound_transaction_destroy(struct TariPendingInboundTransaction *transaction);
@@ -278,7 +278,7 @@ void comms_config_destroy(struct TariCommsConfig *wc);
 struct TariWallet *wallet_create(struct TariWalletConfig *config);
 
 /// Generates test data
-bool wallet_generate_test_data(struct TariWallet *wallet);
+bool wallet_test_generate_data(struct TariWallet *wallet);
 
 // Adds a base node peer to the TariWallet
 bool wallet_add_base_node_peer(struct TariWallet *wallet, struct TariPublicKey *public_key, char *address);
