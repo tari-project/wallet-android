@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Tari Wallet</string>
+    <string name="testnet">TESTNET v1.0</string>
 </resources>

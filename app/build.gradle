@@ -6,6 +6,7 @@ apply plugin: 'kotlin-kapt'
 android {
     compileSdkVersion 29
     buildToolsVersion "29.0.2"
+
     defaultConfig {
         applicationId "com.tari.android.wallet"
         minSdkVersion 24
@@ -23,6 +24,7 @@ android {
             }
         }
     }
+
     buildTypes {
         debug {
             minifyEnabled false
