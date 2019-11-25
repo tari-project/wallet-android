@@ -1,4 +1,17 @@
 <resources>
     <string name="app_name">Tari Wallet</string>
     <string name="testnet">TESTNET v1.0</string>
+
+    <string name="proceed">Proceed</string>
+    <string name="exit">Exit</string>
+
+    <string name="auth_title">Authentication</string>
+    <string name="auth_subtitle">Please use your biometrics or your PIN, pattern or password to authenticate Tari Wallet.</string>
+    <string name="auth_description">Authentication secures your Tari Wallet transactions.</string>
+
+    <string name="auth_not_available_or_canceled_title">Authentication Error</string>
+    <string name="auth_not_available_or_canceled_desc">Tari Wallet was not able to authenticate you. Do you still want to proceed?</string>
+
+    <string name="auth_failed_title">Authentication Failed</string>
+    <string name="auth_failed_desc">Tari Wallet was not able to authenticate you.</string>
 </resources>

@@ -31,20 +31,29 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package com.tari.android.wallet.util
+package com.tari.android.wallet.auth
+
+import android.app.KeyguardManager
+import android.content.Context
+import android.os.Build
 
 /**
- * Contains application constant values.
+ * Authentication-related utility functions.
  *
  * @author Kutsal Kaan Bilgin
  */
-object Constants {
+object AuthUtil {
 
     /**
-     * UI constants.
+     * Returns true if lockscreen is enabled. Will return true if a fingerprint defined as well,
+     * which implies the lockscreen is set as well.
      */
-    object UI {
-        const val shortAnimDurationMs = 300L
+    fun isDeviceSecured(context: Context): Boolean {
+        val keyguardManager = context.getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager?
+            ?: return false //api 16+
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            keyguardManager.isDeviceSecure
+        } else keyguardManager.isKeyguardSecure
     }
 
 }

@@ -31,20 +31,34 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package com.tari.android.wallet.util
+package com.tari.android.wallet.ui.activity
+
+import android.content.Intent
+import android.os.Bundle
+import androidx.appcompat.app.AppCompatActivity
+import com.tari.android.wallet.R
 
 /**
- * Contains application constant values.
+ * Splash screen activity.
  *
  * @author Kutsal Kaan Bilgin
  */
-object Constants {
+class SplashActivity : AppCompatActivity() {
 
-    /**
-     * UI constants.
-     */
-    object UI {
-        const val shortAnimDurationMs = 300L
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_splash)
     }
+
+    override fun onStart() {
+        super.onStart()
+        // splash is finished, move on to the main activity
+        val intent = Intent(this@SplashActivity, MainActivity::class.java)
+        intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
+        startActivity(intent)
+        // finish this activity
+        finish()
+    }
+
 
 }
