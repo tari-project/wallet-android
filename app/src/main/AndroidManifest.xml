@@ -2,6 +2,11 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.tari.android.wallet">
 
+    <!-- Step 1: Add the following permission to the app  -->
+    <uses-permission android:name="android.permission.USE_BIOMETRIC" />
+    <!-- Step 1: Add the following permission to the app (pre-28) -->
+    <uses-permission android:name="android.permission.USE_FINGERPRINT" />
+
     <application
         android:name=".application.TariWalletApplication"
         android:allowBackup="true"
@@ -12,13 +17,17 @@
         android:theme="@style/AppTheme">
 
         <activity
-            android:name=".ui.activity.MainActivity"
+            android:name=".ui.activity.SplashActivity"
             android:theme="@style/AppTheme.Splash">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <activity
+            android:name=".ui.activity.MainActivity"
+            android:theme="@style/AppTheme" />
     </application>
 
 </manifest>
