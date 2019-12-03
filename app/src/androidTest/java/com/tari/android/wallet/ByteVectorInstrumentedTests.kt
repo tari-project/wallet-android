@@ -31,29 +31,59 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package com.tari.android.wallet.application
+package com.tari.android.wallet
 
-import android.app.Application
-import com.orhanobut.logger.AndroidLogAdapter
-import com.orhanobut.logger.Logger
+import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.tari.android.wallet.ffi.ByteVector
+import com.tari.android.wallet.ffi.NULL_POINTER
+import org.junit.Assert.*
+import org.junit.Test
+import org.junit.runner.RunWith
 
 /**
- * Main application class.
+ * FFI byte vector tests.
  *
  * @author Kutsal Kaan Bilgin
  */
-@Suppress("unused")
-class TariWalletApplication : Application() {
+@RunWith(AndroidJUnit4::class)
+class ByteVectorInstrumentedTests {
 
-    companion object {
-        init {
-            System.loadLibrary("native-lib")
-        }
+    private val str = "ABCDEF"
+
+    @Test
+    fun testCreateAndDestroyByteVector() {
+        val byteVector = ByteVector.create(str)
+        assertTrue(byteVector.ptr != NULL_POINTER)
+        byteVector.destroy()
+        assertTrue(byteVector.ptr == NULL_POINTER)
     }
 
-    override fun onCreate() {
-        super.onCreate()
-        Logger.addLogAdapter(AndroidLogAdapter())
+    @Test
+    fun testByteVectorGetLength() {
+        val byteVector = ByteVector.create(str)
+        assertTrue(byteVector.length == str.length)
+        // release resource
+        byteVector.destroy()
+    }
+
+    @Test
+    fun testByteVectorGetAt() {
+        val byteVector = ByteVector.create(str)
+        val index = 3
+        assert(byteVector.getAt(index) == str[index])
+        // release resource
+        byteVector.destroy()
+    }
+
+    @Test
+    fun testDestroyedByteVector() {
+        val byteVector = ByteVector.create(str)
+        assert(byteVector.length == str.length)
+        byteVector.destroy()
+        assert(byteVector.length == 0)
+        // ERR :: still returns 'D'
+        val index = 3
+        assert(byteVector.getAt(index) == str[index])
     }
 
 }

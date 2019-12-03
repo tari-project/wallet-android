@@ -31,29 +31,66 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package com.tari.android.wallet.application
-
-import android.app.Application
-import com.orhanobut.logger.AndroidLogAdapter
-import com.orhanobut.logger.Logger
+package com.tari.android.wallet.ffi
 
 /**
- * Main application class.
+ * Wrapper for native private key type.
  *
  * @author Kutsal Kaan Bilgin
  */
-@Suppress("unused")
-class TariWalletApplication : Application() {
+class PrivateKey(ptr: PrivateKeyPtr) {
 
-    companion object {
-        init {
-            System.loadLibrary("native-lib")
-        }
+    /**
+     * JNI functions.
+     */
+    private external fun privateKeyGetBytesJNI(privateKeyPtr: PrivateKeyPtr): ByteVectorPtr
+    private external fun privateKeyDestroyJNI(privateKeyPtr: PrivateKeyPtr)
+
+    var ptr: PrivateKeyPtr
+        private set
+
+    init {
+        this.ptr = ptr
     }
 
-    override fun onCreate() {
-        super.onCreate()
-        Logger.addLogAdapter(AndroidLogAdapter())
+    companion object {
+
+        /**
+         * JNI static functions.
+         */
+        @JvmStatic
+        private external fun privateKeyCreateJNI(byteVectorPtr: ByteVectorPtr): PrivateKeyPtr
+        @JvmStatic
+        private external fun privateKeyGenerateJNI(): PrivateKeyPtr
+        @JvmStatic
+        private external fun privateKeyFromHexJNI(hexStr: String): PrivateKeyPtr
+
+        fun create(byteVector: ByteVector): PrivateKey {
+            return PrivateKey(privateKeyCreateJNI(byteVector.ptr))
+        }
+
+        fun generate(): PrivateKey {
+            return PrivateKey(privateKeyGenerateJNI())
+        }
+
+        fun fromHex(hexStr: String): PrivateKey {
+            return PrivateKey(privateKeyFromHexJNI(hexStr))
+        }
+
+    }
+
+    val bytes: ByteVector
+        get() {
+            return ByteVector(privateKeyGetBytesJNI(ptr))
+        }
+
+    fun destroy() {
+        privateKeyDestroyJNI(ptr)
+        ptr = NULL_POINTER
+    }
+
+    protected fun finalize() {
+        destroy()
     }
 
 }

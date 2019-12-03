@@ -31,29 +31,66 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package com.tari.android.wallet.application
-
-import android.app.Application
-import com.orhanobut.logger.AndroidLogAdapter
-import com.orhanobut.logger.Logger
+package com.tari.android.wallet.ffi
 
 /**
- * Main application class.
+ * Wrapper for native private key type.
  *
  * @author Kutsal Kaan Bilgin
  */
-@Suppress("unused")
-class TariWalletApplication : Application() {
+class PublicKey(ptr: PublicKeyPtr) {
 
-    companion object {
-        init {
-            System.loadLibrary("native-lib")
-        }
+    /**
+     * JNI functions.
+     */
+    private external fun publicKeyGetBytesJNI(privateKeyPtr: PublicKeyPtr): ByteVectorPtr
+    private external fun publicKeyDestroyJNI(privateKeyPtr: PublicKeyPtr)
+
+    var ptr: PublicKeyPtr
+        private set
+
+    init {
+        this.ptr = ptr
     }
 
-    override fun onCreate() {
-        super.onCreate()
-        Logger.addLogAdapter(AndroidLogAdapter())
+    companion object {
+
+        /**
+         * JNI static functions.
+         */
+        @JvmStatic
+        private external fun publicKeyCreateJNI(byteVectorPtr: ByteVectorPtr): PublicKeyPtr
+        @JvmStatic
+        private external fun publicKeyFromHexJNI(hexStr: String): PublicKeyPtr
+        @JvmStatic
+        private external fun publicKeyFromPrivateKeyJNI(privateKeyPtr: PrivateKeyPtr): PublicKeyPtr
+
+        fun create(byteVector: ByteVector): PublicKey {
+            return PublicKey(publicKeyCreateJNI(byteVector.ptr))
+        }
+
+        fun fromHex(hexStr: String): PublicKey {
+            return PublicKey(publicKeyFromHexJNI(hexStr))
+        }
+
+        fun fromPrivateKey(privateKey: PrivateKey): PublicKey {
+            return PublicKey(publicKeyFromPrivateKeyJNI(privateKey.ptr))
+        }
+
+    }
+
+    val bytes: ByteVector
+        get() {
+            return ByteVector(publicKeyGetBytesJNI(ptr))
+        }
+
+    fun destroy() {
+        publicKeyDestroyJNI(ptr)
+        ptr = NULL_POINTER
+    }
+
+    protected fun finalize() {
+        destroy()
     }
 
 }

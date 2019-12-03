@@ -55,23 +55,180 @@
 #define LOGI(...) __android_log_print(ANDROID_LOG_INFO,     LOG_TAG, __VA_ARGS__)
 #define LOGD(...) __android_log_print(ANDROID_LOG_DEBUG,    LOG_TAG, __VA_ARGS__)
 
+//region Byte Vector
+
 extern "C"
-JNIEXPORT jstring JNICALL
-Java_com_tari_android_wallet_ui_activity_MainActivity_privateKeyStringJNI(
-        JNIEnv *pEnv,
-        jobject pThis) {
-    TariPrivateKey *pk = private_key_generate();
-    ByteVector *bytes = private_key_get_bytes(pk);
-    unsigned int bytes_length = byte_vector_get_length(bytes);
-    std::string s = std::string("");
-    for (int i = 0; i <= bytes_length; i++) {
-        unsigned int byte = byte_vector_get_at(bytes, i);
-        s += static_cast<char>(trunc(byte / 2)); //should be converted to hex,
-                                                 // div by 2 to ensure utf8 valid
-    }
-
-    byte_vector_destroy(bytes);
-    private_key_destroy(pk);
-
-    return pEnv->NewStringUTF(s.c_str());
+JNIEXPORT jlong JNICALL
+Java_com_tari_android_wallet_ffi_ByteVector_byteVectorCreateJNI(
+        JNIEnv *jEnv,
+        jclass jClass,
+        jstring jStr) {
+    // get string length
+    const auto strLen = (unsigned int) jEnv->GetStringUTFLength(jStr);
+    // get native string
+    const auto *pStr = jEnv->GetStringUTFChars(jStr, JNI_FALSE);
+    // create byte vector
+    ByteVector *pByteVector = byte_vector_create(
+            reinterpret_cast<const unsigned char *>(pStr),
+            strLen);
+    // release native string
+    jEnv->ReleaseStringUTFChars(jStr, pStr);
+    // return pointer
+    return (jlong) pByteVector;
 }
+
+extern "C"
+JNIEXPORT jint JNICALL
+Java_com_tari_android_wallet_ffi_ByteVector_byteVectorGetLengthJNI(
+        JNIEnv *jEnv,
+        jobject jThis,
+        jlong jpByteVector) {
+    // cast pointer
+    auto *pByteVector = (ByteVector *) jpByteVector;
+    // return length
+    return byte_vector_get_length(pByteVector);
+}
+
+extern "C"
+JNIEXPORT jchar JNICALL
+Java_com_tari_android_wallet_ffi_ByteVector_byteVectorGetAtJNI(
+        JNIEnv *jEnv,
+        jobject jThis,
+        jlong jpByteVector,
+        jint index) {
+    // cast pointer
+    auto *pByteVector = (ByteVector *) jpByteVector;
+    return byte_vector_get_at(pByteVector, (unsigned int) index);
+}
+
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_tari_android_wallet_ffi_ByteVector_byteVectorDestroyJNI(
+        JNIEnv *jEnv,
+        jobject jThis,
+        jlong jpByteVector) {
+    // cast pointer & destroy
+    byte_vector_destroy((ByteVector *) jpByteVector);
+}
+
+//endregion
+
+//region Public Key
+
+extern "C"
+JNIEXPORT jlong JNICALL
+Java_com_tari_android_wallet_ffi_PublicKey_publicKeyCreateJNI(
+        JNIEnv *jEnv,
+        jclass jClass,
+        jlong jpByteVector) {
+    // cast pointer
+    auto *pByteVector = (ByteVector *) jpByteVector;
+    auto *pPublicKey = public_key_create(pByteVector);
+    // return pointer
+    return (jlong) pPublicKey;
+}
+
+extern "C"
+JNIEXPORT jlong JNICALL
+Java_com_tari_android_wallet_ffi_PublicKey_publicKeyFromHexJNI(
+        JNIEnv *jEnv,
+        jclass jClass,
+        jstring jHexStr) {
+    const auto *pStr = jEnv->GetStringUTFChars(jHexStr, JNI_FALSE);
+    TariPublicKey *pPublicKey = public_key_from_hex(pStr);
+    jEnv->ReleaseStringUTFChars(jHexStr, pStr);
+    return (jlong) pPublicKey;
+}
+
+extern "C"
+JNIEXPORT jlong JNICALL
+Java_com_tari_android_wallet_ffi_PublicKey_publicKeyFromPrivateKeyJNI(
+        JNIEnv *jEnv,
+        jclass jClass,
+        jlong jpPrivateKey) {
+    // cast pointer
+    auto *pPrivateKey = (TariPrivateKey *) jpPrivateKey;
+    auto *pPublicKey = public_key_from_private_key(pPrivateKey);
+    return (jlong) pPublicKey;
+}
+
+extern "C"
+JNIEXPORT jlong JNICALL
+Java_com_tari_android_wallet_ffi_PublicKey_publicKeyGetBytesJNI(
+        JNIEnv *jEnv,
+        jobject jThis,
+        jlong jpPublicKey) {
+    // cast pointer
+    auto *pPublicKey = (TariPublicKey *) jpPublicKey;
+    // get byte vector
+    auto *pByteVector = public_key_get_bytes(pPublicKey);
+    return (jlong) pByteVector;
+}
+
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_tari_android_wallet_ffi_PublicKey_publicKeyDestroyJNI(
+        JNIEnv *jEnv,
+        jobject jThis,
+        jlong jpPublicKey) {
+    public_key_destroy((TariPublicKey *) jpPublicKey);
+}
+
+//endregion
+
+//region Private Key
+
+extern "C"
+JNIEXPORT jlong JNICALL
+Java_com_tari_android_wallet_ffi_PrivateKey_privateKeyCreateJNI(
+        JNIEnv *jEnv,
+        jclass jClass,
+        jlong jpByteVector) {
+    // cast pointer
+    auto *pByteVector = (ByteVector *) jpByteVector;
+    auto *pPrivateKey = private_key_create(pByteVector);
+    return (jlong) pPrivateKey;
+}
+
+extern "C"
+JNIEXPORT jlong JNICALL
+Java_com_tari_android_wallet_ffi_PrivateKey_privateKeyGenerateJNI(
+        JNIEnv *jEnv,
+        jclass jClass) {
+    auto *pPrivateKey = private_key_generate();
+    return (jlong) pPrivateKey;
+}
+
+extern "C"
+JNIEXPORT jlong JNICALL
+Java_com_tari_android_wallet_ffi_PrivateKey_privateKeyFromHexJNI(
+        JNIEnv *jEnv,
+        jclass jClass,
+        jstring jHexStr) {
+    const auto *pStr = jEnv->GetStringUTFChars(jHexStr, JNI_FALSE);
+    TariPrivateKey *pPrivateKey = private_key_from_hex(pStr);
+    jEnv->ReleaseStringUTFChars(jHexStr, pStr);
+    return (jlong) pPrivateKey;
+}
+
+extern "C"
+JNIEXPORT jlong JNICALL
+Java_com_tari_android_wallet_ffi_PrivateKey_privateKeyGetBytesJNI(
+        JNIEnv *jEnv,
+        jobject jThis,
+        jlong jpPrivateKey) {
+    auto *pPrivateKey = (TariPrivateKey *) jpPrivateKey;
+    auto *pByteVector = private_key_get_bytes(pPrivateKey);
+    return (jlong) pByteVector;
+}
+
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_tari_android_wallet_ffi_PrivateKey_privateKeyDestroyJNI(
+        JNIEnv *jEnv,
+        jobject jThis,
+        jlong jpPrivateKey) {
+    private_key_destroy((TariPrivateKey *) jpPrivateKey);
+}
+
+//endregion

@@ -31,29 +31,73 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package com.tari.android.wallet.application
+package com.tari.android.wallet.ffi
 
-import android.app.Application
-import com.orhanobut.logger.AndroidLogAdapter
-import com.orhanobut.logger.Logger
+import java.util.*
 
 /**
- * Main application class.
+ * Wrapper for native byte vector type.
  *
  * @author Kutsal Kaan Bilgin
  */
-@Suppress("unused")
-class TariWalletApplication : Application() {
+class ByteVector(ptr: ByteVectorPtr) {
 
-    companion object {
-        init {
-            System.loadLibrary("native-lib")
-        }
+    /**
+     * JNI functions.
+     */
+    private external fun byteVectorGetLengthJNI(pByteVector: ByteVectorPtr): Int
+    private external fun byteVectorGetAtJNI(pByteVector: ByteVectorPtr, index: Int): Char
+    private external fun byteVectorDestroyJNI(pByteVector: ByteVectorPtr)
+
+    var ptr: ByteVectorPtr
+        private set
+
+    init {
+        this.ptr = ptr
     }
 
-    override fun onCreate() {
-        super.onCreate()
-        Logger.addLogAdapter(AndroidLogAdapter())
+    companion object {
+
+        /**
+         * JNI static functions.
+         */
+        @JvmStatic
+        private external fun byteVectorCreateJNI(string: String): ByteVectorPtr
+
+        fun create(string: String): ByteVector {
+            return ByteVector(byteVectorCreateJNI(string))
+        }
+
+    }
+
+    val length: Int
+        get() {
+            return byteVectorGetLengthJNI(ptr)
+        }
+
+    /**
+     * Hex string representation.
+     */
+    val hexString: String
+        get() {
+            var string = ""
+            for (i in 0 until length) {
+                string += String.format("%02X", getAt(i).toUpperCase().toByte())
+            }
+            return string
+        }
+
+    fun getAt(index: Int): Char {
+        return byteVectorGetAtJNI(ptr, index)
+    }
+
+    fun destroy() {
+        byteVectorDestroyJNI(ptr)
+        ptr = NULL_POINTER
+    }
+
+    protected fun finalize() {
+        destroy()
     }
 
 }

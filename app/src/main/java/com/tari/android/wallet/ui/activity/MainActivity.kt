@@ -58,19 +58,6 @@ import java.util.concurrent.Executors
  */
 class MainActivity : AppCompatActivity() {
 
-    companion object {
-
-        // Static initializer: used to load the 'native-lib' library on application startup.
-        init {
-            System.loadLibrary("native-lib")
-        }
-    }
-
-    /**
-     * Native methods.
-     */
-    private external fun privateKeyStringJNI(): String
-
     private lateinit var biometricPrompt: BiometricPrompt
 
     override fun onCreate(savedInstanceState: Bundle?) {
