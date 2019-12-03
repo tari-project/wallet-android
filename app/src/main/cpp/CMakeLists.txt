@@ -41,19 +41,32 @@ set_target_properties(
         IMPORTED_LINK_INTERFACE_LIBRARIES "zmq;sqlite3"
 )
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 ")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 
 add_library(
-        native-lib
-        SHARED
-        native-lib.cpp)
-
+        native-lib SHARED
+        jniCommon.cpp
+        jniByteVector.cpp
+        jniPrivateKey.cpp
+        jniPublicKey.cpp
+        jniContact.cpp
+        jniCommsConfig.cpp
+        jniCompletedTransaction.cpp
+        jniPendingInboundTransaction.cpp
+        jniPendingOutboundTransaction.cpp
+        jniCollections.cpp
+        jniWallet.cpp
+)
 find_library(
         log-lib
-        log)
+        log
+)
 
 # Link libraries.
-target_include_directories(native-lib PRIVATE ${libs_DIR}/)
+target_include_directories(
+        native-lib PRIVATE ${libs_DIR}/
+)
+
 target_link_libraries(
         native-lib
         android
