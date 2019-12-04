@@ -56,7 +56,7 @@ class CommsConfig(ptr: CommsConfigPtr) : FFIObjectWrapper(ptr) {
             databaseName: String,
             datastorePath: String,
             privateKeyPtr: PrivateKeyPtr
-        ): PrivateKeyPtr
+        ): CommsConfigPtr
 
         fun create(
             controlServiceAddress: String,

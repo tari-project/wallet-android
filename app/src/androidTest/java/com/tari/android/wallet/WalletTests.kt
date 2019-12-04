@@ -51,13 +51,12 @@ class WalletTests {
     private val logFileName = "tari_log.txt"
     private val controlServiceAddress = "127.0.0.1:80"
     private val listenerAddress = "0.0.0.0:80"
-    private val filesDir = InstrumentationRegistry.getInstrumentation().context.filesDir
+    private val filesDir = InstrumentationRegistry.getInstrumentation().targetContext.filesDir
     private val datastorePath = filesDir.absolutePath + "/" + dbName
     private val logFilePath = filesDir.absolutePath + "/" + logFileName
 
     @Test
     fun testCreateAndDestroyWallet() {
-
         val privateKey = PrivateKey.fromHex(TestUtil.privateKeyHexString)
         val commsConfig = CommsConfig.create(
             controlServiceAddress,
@@ -66,6 +65,7 @@ class WalletTests {
             datastorePath,
             privateKey
         )
+        assertTrue(commsConfig.ptr != NULL_POINTER)
         val wallet = Wallet.create(commsConfig, logFilePath)
         assertTrue(wallet.ptr != NULL_POINTER)
         wallet.destroy()

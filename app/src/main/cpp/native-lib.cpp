@@ -376,11 +376,8 @@ Java_com_tari_android_wallet_ffi_Wallet_walletCreateJNI(
     auto *pWalletConfig = (TariWalletConfig *) jpWalletConfig;
     auto *pLogPath = (char *) jEnv->GetStringUTFChars(jLogPath, JNI_FALSE);
     const auto *pWallet = wallet_create(pWalletConfig, pLogPath);
-
     jEnv->ReleaseStringUTFChars(jLogPath, pLogPath);
-
     return (jlong) pWallet;
-
 }
 
 extern "C"
