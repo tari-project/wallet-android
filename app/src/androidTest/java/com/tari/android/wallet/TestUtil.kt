@@ -54,7 +54,7 @@ class TestUtil {
         internal const val WALLET_DB_NAME = "tari_test_db"
         internal const val WALLET_CONTROL_SERVICE_ADDRESS = "127.0.0.1:80"
         internal const val WALLET_LISTENER_ADDRESS = "0.0.0.0:0"
-        internal val WALLET_DATASTORE_PATH = "$WALLET_FILES_DIR_PATH/$WALLET_DB_NAME"
+        internal val WALLET_DATASTORE_PATH = "$WALLET_FILES_DIR_PATH"
         internal val WALLET_LOG_FILE_PATH = "$WALLET_FILES_DIR_PATH/$WALLET_LOG_FILE_NAME"
 
         private lateinit var privateKey: PrivateKey

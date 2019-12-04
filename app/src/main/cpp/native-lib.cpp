@@ -394,10 +394,12 @@ JNIEXPORT jboolean JNICALL
 Java_com_tari_android_wallet_ffi_Wallet_walletTestGenerateDataJNI(
         JNIEnv *jEnv,
         jobject jThis,
-        jlong jpWallet) {
-    auto success = wallet_test_generate_data((TariWallet *) jpWallet);
-    LOGE("SUCCESS is %d", success);
-    return (jboolean) wallet_test_generate_data((TariWallet *) jpWallet);
+        jlong jpWallet,
+        jstring jDatastorePath) {
+    auto *pDatastorePath = (char *) jEnv->GetStringUTFChars(jDatastorePath, JNI_FALSE);
+    jboolean success = wallet_test_generate_data((TariWallet *) jpWallet, pDatastorePath);
+    jEnv->ReleaseStringUTFChars(jDatastorePath, pDatastorePath);
+    return success;
 }
 
 //endregion

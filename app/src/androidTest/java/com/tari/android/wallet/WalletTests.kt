@@ -43,11 +43,27 @@ import com.tari.android.wallet.ffi.PrivateKey
 import com.tari.android.wallet.ffi.Wallet
 import org.junit.Assert.*
 import org.junit.Test
+import java.io.File
+
+
 
 class WalletTests {
 
+    fun clearTestFiles(path: String): Boolean
+    {
+        var fileDirectory = File(path)
+        var del = fileDirectory.deleteRecursively()
+        val directory = File(path)
+        if (!directory.exists()) {
+            directory.mkdir()
+        }
+        return del
+    }
+/*
     @Test
     fun testCreateAndDestroyWallet() {
+        var clean = clearTestFiles(TestUtil.WALLET_DATASTORE_PATH)
+        assertTrue(clean == true)
         val privateKey = PrivateKey.fromHex(TestUtil.PRIVATE_KEY_HEX_STRING)
         val commsConfig = CommsConfig.create(
             TestUtil.WALLET_CONTROL_SERVICE_ADDRESS,
@@ -64,9 +80,11 @@ class WalletTests {
         commsConfig.destroy()
         privateKey.destroy()
     }
-
+*/
     @Test
     fun testGenerateTestData() {
+        var clean = clearTestFiles(TestUtil.WALLET_DATASTORE_PATH)
+        assertTrue(clean)
         val privateKey = PrivateKey.fromHex(TestUtil.PRIVATE_KEY_HEX_STRING)
         val commsConfig = CommsConfig.create(
             TestUtil.WALLET_CONTROL_SERVICE_ADDRESS,
@@ -76,15 +94,14 @@ class WalletTests {
             privateKey
         )
         val wallet = Wallet.create(commsConfig, TestUtil.WALLET_LOG_FILE_PATH)
-        TestUtil.printFFILogFile()
+        //TestUtil.printFFILogFile()
         assertTrue(wallet.ptr != NULL_POINTER)
         // should generate test data
-        val success = wallet.generateTestData()
+        val success = wallet.generateTestData(TestUtil.WALLET_DATASTORE_PATH)
         assertTrue(success)
         // free resources
         commsConfig.destroy()
         privateKey.destroy()
         wallet.destroy()
     }
-
 }

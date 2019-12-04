@@ -38,7 +38,7 @@ class Wallet(ptr: WalletPtr) : FFIObjectWrapper(ptr) {
      * JNI functions.
      */
     private external fun walletDestroyJNI(walletPtr: WalletPtr)
-    private external fun walletTestGenerateDataJNI(walletPtr: WalletPtr): Boolean
+    private external fun walletTestGenerateDataJNI(walletPtr: WalletPtr, datastore_path: String): Boolean
 
     companion object {
 
@@ -57,8 +57,8 @@ class Wallet(ptr: WalletPtr) : FFIObjectWrapper(ptr) {
 
     }
 
-    fun generateTestData(): Boolean {
-        return walletTestGenerateDataJNI(ptr)
+    fun generateTestData(datastore_path: String): Boolean {
+        return walletTestGenerateDataJNI(ptr,datastore_path)
     }
 
     public override fun destroy() {

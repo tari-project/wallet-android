@@ -279,7 +279,7 @@ void comms_config_destroy(struct TariCommsConfig *wc);
 struct TariWallet *wallet_create(struct TariWalletConfig *config, char *log_path);
 
 /// Generates test data
-bool wallet_test_generate_data(struct TariWallet *wallet);
+bool wallet_test_generate_data(struct TariWallet *wallet, char *datastore_path);
 
 // Adds a base node peer to the TariWallet
 bool wallet_add_base_node_peer(struct TariWallet *wallet, struct TariPublicKey *public_key, char *address);
