@@ -37,7 +37,6 @@
  */
 package com.tari.android.wallet
 
-import androidx.test.platform.app.InstrumentationRegistry
 import com.tari.android.wallet.ffi.CommsConfig
 import com.tari.android.wallet.ffi.NULL_POINTER
 import com.tari.android.wallet.ffi.PrivateKey
@@ -47,31 +46,45 @@ import org.junit.Test
 
 class WalletTests {
 
-    private val dbName = "tari_test_db"
-    private val logFileName = "tari_log.txt"
-    private val controlServiceAddress = "127.0.0.1:80"
-    private val listenerAddress = "0.0.0.0:80"
-    private val filesDir = InstrumentationRegistry.getInstrumentation().targetContext.filesDir
-    private val datastorePath = filesDir.absolutePath + "/" + dbName
-    private val logFilePath = filesDir.absolutePath + "/" + logFileName
-
     @Test
     fun testCreateAndDestroyWallet() {
-        val privateKey = PrivateKey.fromHex(TestUtil.privateKeyHexString)
+        val privateKey = PrivateKey.fromHex(TestUtil.PRIVATE_KEY_HEX_STRING)
         val commsConfig = CommsConfig.create(
-            controlServiceAddress,
-            listenerAddress,
-            dbName,
-            datastorePath,
+            TestUtil.WALLET_CONTROL_SERVICE_ADDRESS,
+            TestUtil.WALLET_LISTENER_ADDRESS,
+            TestUtil.WALLET_DB_NAME,
+            TestUtil.WALLET_DATASTORE_PATH,
             privateKey
         )
-        assertTrue(commsConfig.ptr != NULL_POINTER)
-        val wallet = Wallet.create(commsConfig, logFilePath)
+        val wallet = Wallet.create(commsConfig, TestUtil.WALLET_LOG_FILE_PATH)
         assertTrue(wallet.ptr != NULL_POINTER)
         wallet.destroy()
         assertTrue(wallet.ptr == NULL_POINTER)
+        // free resources
         commsConfig.destroy()
         privateKey.destroy()
+    }
+
+    @Test
+    fun testGenerateTestData() {
+        val privateKey = PrivateKey.fromHex(TestUtil.PRIVATE_KEY_HEX_STRING)
+        val commsConfig = CommsConfig.create(
+            TestUtil.WALLET_CONTROL_SERVICE_ADDRESS,
+            TestUtil.WALLET_LISTENER_ADDRESS,
+            TestUtil.WALLET_DB_NAME,
+            TestUtil.WALLET_DATASTORE_PATH,
+            privateKey
+        )
+        val wallet = Wallet.create(commsConfig, TestUtil.WALLET_LOG_FILE_PATH)
+        TestUtil.printFFILogFile()
+        assertTrue(wallet.ptr != NULL_POINTER)
+        // should generate test data
+        val success = wallet.generateTestData()
+        assertTrue(success)
+        // free resources
+        commsConfig.destroy()
+        privateKey.destroy()
+        wallet.destroy()
     }
 
 }

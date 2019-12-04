@@ -48,7 +48,7 @@ class ContactTests {
     @Test
     fun testCreateAndDestroyContact() {
         val alias = TestUtil.generateRandomAlphanumericString(16)
-        val publicKey = PublicKey.fromHex(TestUtil.publicKeyHexString)
+        val publicKey = PublicKey.fromHex(TestUtil.PUBLIC_KEY_HEX_STRING)
         val contact = Contact.create(alias, publicKey)
         assertTrue(contact.ptr != NULL_POINTER)
         contact.destroy()
@@ -60,7 +60,7 @@ class ContactTests {
     @Test
     fun testGetContactAlias() {
         val alias = TestUtil.generateRandomAlphanumericString(16)
-        val publicKey = PublicKey.fromHex(TestUtil.publicKeyHexString)
+        val publicKey = PublicKey.fromHex(TestUtil.PUBLIC_KEY_HEX_STRING)
         val contact = Contact.create(alias, publicKey)
         assertEquals(alias, contact.alias)
         // free resources
@@ -71,11 +71,11 @@ class ContactTests {
     @Test
     fun testGetContactPublicKey() {
         val alias = TestUtil.generateRandomAlphanumericString(16)
-        val publicKey = PublicKey.fromHex(TestUtil.publicKeyHexString)
+        val publicKey = PublicKey.fromHex(TestUtil.PUBLIC_KEY_HEX_STRING)
         val contact = Contact.create(alias, publicKey)
         val contactPublicKey = contact.publicKey
         val contactPublicKeyBytes = contactPublicKey.bytes
-        assertEquals(TestUtil.publicKeyHexString, contactPublicKeyBytes.hexString)
+        assertEquals(TestUtil.PUBLIC_KEY_HEX_STRING, contactPublicKeyBytes.hexString)
         // free resources
         contactPublicKeyBytes.destroy()
         contactPublicKey.destroy()
@@ -85,7 +85,7 @@ class ContactTests {
 
     @Test
     fun testCreateContactWithEmptyAlias() {
-        val publicKey = PublicKey.fromHex(TestUtil.publicKeyHexString)
+        val publicKey = PublicKey.fromHex(TestUtil.PUBLIC_KEY_HEX_STRING)
         val contact = Contact.create("", publicKey)
         assertTrue(contact.ptr != NULL_POINTER)
         assertEquals("", contact.alias)

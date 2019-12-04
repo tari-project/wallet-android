@@ -389,4 +389,15 @@ Java_com_tari_android_wallet_ffi_Wallet_walletDestroyJNI(
     wallet_destroy((TariWallet *) jpWallet);
 }
 
+extern "C"
+JNIEXPORT jboolean JNICALL
+Java_com_tari_android_wallet_ffi_Wallet_walletTestGenerateDataJNI(
+        JNIEnv *jEnv,
+        jobject jThis,
+        jlong jpWallet) {
+    auto success = wallet_test_generate_data((TariWallet *) jpWallet);
+    LOGE("SUCCESS is %d", success);
+    return (jboolean) wallet_test_generate_data((TariWallet *) jpWallet);
+}
+
 //endregion

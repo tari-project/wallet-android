@@ -60,7 +60,7 @@ class CommsConfigTests {
     @Test
     fun testCreateAndDestroyCommsConfig() {
 
-        val privateKey = PrivateKey.fromHex(TestUtil.privateKeyHexString)
+        val privateKey = PrivateKey.fromHex(TestUtil.PRIVATE_KEY_HEX_STRING)
         val commsConfig = CommsConfig.create(
             controlServiceAddress,
             listenerAddress,

@@ -63,10 +63,10 @@ class PrivateKeyTests {
 
     @Test
     fun testCreatePrivateKeyFromHexStringAndGetBytes() {
-        val privateKey = PrivateKey.fromHex(TestUtil.privateKeyHexString)
+        val privateKey = PrivateKey.fromHex(TestUtil.PRIVATE_KEY_HEX_STRING)
         assertTrue(privateKey.ptr != NULL_POINTER)
         val privateKeyBytes = privateKey.bytes
-        assertEquals(TestUtil.privateKeyHexString, privateKeyBytes.hexString)
+        assertEquals(TestUtil.PRIVATE_KEY_HEX_STRING, privateKeyBytes.hexString)
         // free resources
         privateKeyBytes.destroy()
         privateKey.destroy()
@@ -75,13 +75,13 @@ class PrivateKeyTests {
     @Test
     fun testCreatePrivateKeyFromBytesAndGetBytes() {
         // generate private key and get bytes
-        val privateKey = PrivateKey.fromHex(TestUtil.privateKeyHexString)
+        val privateKey = PrivateKey.fromHex(TestUtil.PRIVATE_KEY_HEX_STRING)
         val bytes = privateKey.bytes
         val privateKeyFromBytes = PrivateKey.create(bytes)
         assertTrue(privateKeyFromBytes.ptr != NULL_POINTER)
         // test bytes
         val newBytes = privateKeyFromBytes.bytes
-        assertTrue(newBytes.hexString == TestUtil.privateKeyHexString)
+        assertTrue(newBytes.hexString == TestUtil.PRIVATE_KEY_HEX_STRING)
         // free resources
         newBytes.destroy()
         bytes.destroy()

@@ -30,40 +30,21 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.tari.android.wallet.ffi
+package com.tari.android.wallet
 
-class Wallet(ptr: WalletPtr) : FFIObjectWrapper(ptr) {
+import org.junit.Assert.*
+import org.junit.Test
 
-    /**
-     * JNI functions.
-     */
-    private external fun walletDestroyJNI(walletPtr: WalletPtr)
-    private external fun walletTestGenerateDataJNI(walletPtr: WalletPtr): Boolean
+/**
+ * FFI contacts tests.
+ *
+ * @author Kutsal Kaan Bilgin
+ */
+class ContactsTests {
 
-    companion object {
-
-        /**
-         * JNI static functions.
-         */
-        @JvmStatic
-        private external fun walletCreateJNI(
-            walletConfigPtr: WalletConfigPtr,
-            logPath: String
-        ): WalletPtr
-
-        fun create(walletConfig: CommsConfig, logPath: String): Wallet {
-            return Wallet(walletCreateJNI(walletConfig.ptr, logPath))
-        }
-
-    }
-
-    fun generateTestData(): Boolean {
-        return walletTestGenerateDataJNI(ptr)
-    }
-
-    public override fun destroy() {
-        walletDestroyJNI(ptr)
-        super.destroy()
+    @Test
+    fun empty() {
+        assertTrue(4 < 5)
     }
 
 }

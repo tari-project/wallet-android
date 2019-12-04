@@ -64,10 +64,10 @@ class PublicKeyTests {
 
     @Test
     fun testCreatePublicKeyFromHexStringAndGetBytes() {
-        val publicKey = PublicKey.fromHex(TestUtil.publicKeyHexString)
+        val publicKey = PublicKey.fromHex(TestUtil.PUBLIC_KEY_HEX_STRING)
         assertTrue(publicKey.ptr != NULL_POINTER)
         val publicKeyBytes = publicKey.bytes
-        assertEquals(publicKeyBytes.hexString, TestUtil.publicKeyHexString)
+        assertEquals(publicKeyBytes.hexString, TestUtil.PUBLIC_KEY_HEX_STRING)
         // free resources
         publicKeyBytes.destroy()
         publicKey.destroy()

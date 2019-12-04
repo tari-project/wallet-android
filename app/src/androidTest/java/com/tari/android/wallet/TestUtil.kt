@@ -32,6 +32,13 @@
  */
 package com.tari.android.wallet
 
+import androidx.test.platform.app.InstrumentationRegistry
+import com.orhanobut.logger.Logger
+import com.tari.android.wallet.ffi.CommsConfig
+import com.tari.android.wallet.ffi.PrivateKey
+import com.tari.android.wallet.ffi.Wallet
+import java.io.File
+
 /**
  * Test utilities.
  *
@@ -40,16 +47,54 @@ package com.tari.android.wallet
 class TestUtil {
 
     companion object {
+        private const val WALLET_LOG_FILE_NAME = "tari_log.txt"
+        private val WALLET_FILES_DIR_PATH =
+            InstrumentationRegistry.getInstrumentation().targetContext.filesDir.absolutePath
 
-        const val publicKeyHexString =
+        internal const val WALLET_DB_NAME = "tari_test_db"
+        internal const val WALLET_CONTROL_SERVICE_ADDRESS = "127.0.0.1:80"
+        internal const val WALLET_LISTENER_ADDRESS = "0.0.0.0:0"
+        internal val WALLET_DATASTORE_PATH = "$WALLET_FILES_DIR_PATH/$WALLET_DB_NAME"
+        internal val WALLET_LOG_FILE_PATH = "$WALLET_FILES_DIR_PATH/$WALLET_LOG_FILE_NAME"
+
+        private lateinit var privateKey: PrivateKey
+        private lateinit var commsConfig: CommsConfig
+        private lateinit var wallet: Wallet
+
+        const val PUBLIC_KEY_HEX_STRING =
             "30E1DFA197794858BFDBF96CDCE5DC8637D4BD1202DC694991040DDECBF42D40"
 
-        const val privateKeyHexString =
+        const val PRIVATE_KEY_HEX_STRING =
             "6259C39F75E27140A652A5EE8AEFB3CF6C1686EF21D27793338D899380E8C801"
 
         fun generateRandomAlphanumericString(len: Int): String {
             val characters = ('0'..'z').toList().toTypedArray()
             return (1..len).map { characters.random() }.joinToString("")
+        }
+
+        fun createTestWallet(): Wallet {
+            privateKey = PrivateKey.fromHex(PRIVATE_KEY_HEX_STRING)
+            commsConfig = CommsConfig.create(
+                WALLET_CONTROL_SERVICE_ADDRESS,
+                WALLET_LISTENER_ADDRESS,
+                WALLET_DB_NAME,
+                WALLET_DATASTORE_PATH,
+                privateKey
+            )
+            wallet = Wallet.create(commsConfig, WALLET_LOG_FILE_PATH)
+            return wallet
+        }
+
+        fun destroyTestWallet() {
+            wallet.destroy()
+        }
+
+        fun printFFILogFile() {
+            var log = ""
+            File(WALLET_LOG_FILE_PATH).forEachLine {
+                log += "\n" + it
+            }
+            log += "\ndone"
         }
 
     }

@@ -47,6 +47,7 @@ import org.junit.runners.Suite
     PublicKeyTests::class,
     ContactTests::class,
     CommsConfigTests::class,
-    WalletTests::class
+    WalletTests::class,
+    ContactsTests::class
 )
 class TestSuite
