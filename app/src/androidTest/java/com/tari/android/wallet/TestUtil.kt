@@ -30,31 +30,28 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.tari.android.wallet.ui.component
-
-import android.content.Context
-import android.graphics.Typeface
-import java.util.*
+package com.tari.android.wallet
 
 /**
- * Custom font enumeration - used in layout files.
+ * Test utilities.
  *
  * @author Kutsal Kaan Bilgin
  */
-enum class CustomFont(private val fileName: String) {
-
-    // font files
-    AVENIR_LT_STD_HEAVY("fonts/AvenirLTStd-Heavy.otf"),
-    AVENIR_NEXT_LT_PRO_REGULAR("fonts/AvenirNextLTPro-Regular.otf");
+class TestUtil {
 
     companion object {
-        fun fromString(fontName: String): CustomFont {
-            return valueOf(fontName.toUpperCase(Locale.US))
-        }
-    }
 
-    fun asTypeface(context: Context): Typeface {
-        return Typeface.createFromAsset(context.assets, fileName)
+        const val publicKeyHexString =
+            "30E1DFA197794858BFDBF96CDCE5DC8637D4BD1202DC694991040DDECBF42D40"
+
+        const val privateKeyHexString =
+            "6259C39F75E27140A652A5EE8AEFB3CF6C1686EF21D27793338D899380E8C801"
+
+        fun generateRandomAlphanumericString(len: Int): String {
+            val characters = ('0'..'z').toList().toTypedArray()
+            return (1..len).map { characters.random() }.joinToString("")
+        }
+
     }
 
 }

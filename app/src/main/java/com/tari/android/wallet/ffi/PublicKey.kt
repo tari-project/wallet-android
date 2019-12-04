@@ -30,7 +30,6 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-
 package com.tari.android.wallet.ffi
 
 /**
@@ -38,20 +37,13 @@ package com.tari.android.wallet.ffi
  *
  * @author Kutsal Kaan Bilgin
  */
-class PublicKey(ptr: PublicKeyPtr) {
+class PublicKey(ptr: PublicKeyPtr) : FFIObjectWrapper(ptr) {
 
     /**
      * JNI functions.
      */
     private external fun publicKeyGetBytesJNI(privateKeyPtr: PublicKeyPtr): ByteVectorPtr
     private external fun publicKeyDestroyJNI(privateKeyPtr: PublicKeyPtr)
-
-    var ptr: PublicKeyPtr
-        private set
-
-    init {
-        this.ptr = ptr
-    }
 
     companion object {
 
@@ -84,13 +76,9 @@ class PublicKey(ptr: PublicKeyPtr) {
             return ByteVector(publicKeyGetBytesJNI(ptr))
         }
 
-    fun destroy() {
+    public override fun destroy() {
         publicKeyDestroyJNI(ptr)
-        ptr = NULL_POINTER
-    }
-
-    protected fun finalize() {
-        destroy()
+        super.destroy()
     }
 
 }

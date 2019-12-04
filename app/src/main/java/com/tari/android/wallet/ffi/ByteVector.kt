@@ -30,17 +30,14 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-
 package com.tari.android.wallet.ffi
-
-import java.util.*
 
 /**
  * Wrapper for native byte vector type.
  *
  * @author Kutsal Kaan Bilgin
  */
-class ByteVector(ptr: ByteVectorPtr) {
+class ByteVector(ptr: ByteVectorPtr) : FFIObjectWrapper(ptr) {
 
     /**
      * JNI functions.
@@ -48,13 +45,6 @@ class ByteVector(ptr: ByteVectorPtr) {
     private external fun byteVectorGetLengthJNI(pByteVector: ByteVectorPtr): Int
     private external fun byteVectorGetAtJNI(pByteVector: ByteVectorPtr, index: Int): Char
     private external fun byteVectorDestroyJNI(pByteVector: ByteVectorPtr)
-
-    var ptr: ByteVectorPtr
-        private set
-
-    init {
-        this.ptr = ptr
-    }
 
     companion object {
 
@@ -82,7 +72,7 @@ class ByteVector(ptr: ByteVectorPtr) {
         get() {
             var string = ""
             for (i in 0 until length) {
-                string += String.format("%02X", getAt(i).toUpperCase().toByte())
+                string += String.format("%02X", getAt(i).toByte())
             }
             return string
         }
@@ -91,13 +81,9 @@ class ByteVector(ptr: ByteVectorPtr) {
         return byteVectorGetAtJNI(ptr, index)
     }
 
-    fun destroy() {
+    public override fun destroy() {
         byteVectorDestroyJNI(ptr)
-        ptr = NULL_POINTER
-    }
-
-    protected fun finalize() {
-        destroy()
+        super.destroy()
     }
 
 }

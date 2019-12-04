@@ -30,31 +30,49 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.tari.android.wallet.ui.component
-
-import android.content.Context
-import android.graphics.Typeface
-import java.util.*
+package com.tari.android.wallet.ffi
 
 /**
- * Custom font enumeration - used in layout files.
+ * Tari contact wrapper.
  *
  * @author Kutsal Kaan Bilgin
  */
-enum class CustomFont(private val fileName: String) {
+class Contact(ptr: ContactPtr) : FFIObjectWrapper(ptr) {
 
-    // font files
-    AVENIR_LT_STD_HEAVY("fonts/AvenirLTStd-Heavy.otf"),
-    AVENIR_NEXT_LT_PRO_REGULAR("fonts/AvenirNextLTPro-Regular.otf");
+    /**
+     * JNI functions.
+     */
+    private external fun contactGetAliasJNI(contactPtr: ContactPtr): String
+    private external fun contactGetPublicKeyJNI(contactPtr: ContactPtr): PublicKeyPtr
+    private external fun contactDestroyJNI(contactPtr: ContactPtr)
 
     companion object {
-        fun fromString(fontName: String): CustomFont {
-            return valueOf(fontName.toUpperCase(Locale.US))
+
+        /**
+         * JNI static functions.
+         */
+        @JvmStatic
+        private external fun contactCreateJNI(alias: String, publicKeyPtr: PublicKeyPtr): ContactPtr
+
+        fun create(alias: String, publicKey: PublicKey): Contact {
+            return Contact(contactCreateJNI(alias, publicKey.ptr))
         }
+
     }
 
-    fun asTypeface(context: Context): Typeface {
-        return Typeface.createFromAsset(context.assets, fileName)
+    val alias: String
+        get() {
+            return contactGetAliasJNI(ptr)
+        }
+
+    val publicKey: PublicKey
+        get() {
+            return PublicKey(contactGetPublicKeyJNI(ptr))
+        }
+
+    public override fun destroy() {
+        contactDestroyJNI(ptr)
+        super.destroy()
     }
 
 }

@@ -30,31 +30,55 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.tari.android.wallet.ui.component
+package com.tari.android.wallet
 
-import android.content.Context
-import android.graphics.Typeface
-import java.util.*
+import com.tari.android.wallet.ffi.ByteVector
+import com.tari.android.wallet.ffi.NULL_POINTER
+import org.junit.Assert.*
+import org.junit.Test
 
 /**
- * Custom font enumeration - used in layout files.
+ * FFI byte vector tests.
  *
  * @author Kutsal Kaan Bilgin
  */
-enum class CustomFont(private val fileName: String) {
+class ByteVectorTests {
 
-    // font files
-    AVENIR_LT_STD_HEAVY("fonts/AvenirLTStd-Heavy.otf"),
-    AVENIR_NEXT_LT_PRO_REGULAR("fonts/AvenirNextLTPro-Regular.otf");
+    private val str = "ABCDEF"
 
-    companion object {
-        fun fromString(fontName: String): CustomFont {
-            return valueOf(fontName.toUpperCase(Locale.US))
-        }
+    @Test
+    fun testCreateAndDestroyByteVector() {
+        val byteVector = ByteVector.create(str)
+        assertTrue(byteVector.ptr != NULL_POINTER)
+        byteVector.destroy()
+        assertTrue(byteVector.ptr == NULL_POINTER)
     }
 
-    fun asTypeface(context: Context): Typeface {
-        return Typeface.createFromAsset(context.assets, fileName)
+    @Test
+    fun testByteVectorGetLength() {
+        val byteVector = ByteVector.create(str)
+        assertTrue(byteVector.length == str.length)
+        // release resource
+        byteVector.destroy()
+    }
+
+    @Test
+    fun testByteVectorGetAt() {
+        val byteVector = ByteVector.create(str)
+        val index = 3
+        assertTrue(byteVector.getAt(index) == str[index])
+        // release resource
+        byteVector.destroy()
+    }
+
+    @Test
+    fun testDestroyedByteVector() {
+        val byteVector = ByteVector.create(str)
+        assertTrue(byteVector.length == str.length)
+        byteVector.destroy()
+        assertTrue(byteVector.length == 0)
+        val index = 3
+        assertTrue(byteVector.getAt(index) != str[index])
     }
 
 }

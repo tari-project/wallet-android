@@ -30,31 +30,35 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.tari.android.wallet.ui.component
+package com.tari.android.wallet.ffi
 
-import android.content.Context
-import android.graphics.Typeface
-import java.util.*
+class Wallet(ptr: WalletPtr) : FFIObjectWrapper(ptr) {
 
-/**
- * Custom font enumeration - used in layout files.
- *
- * @author Kutsal Kaan Bilgin
- */
-enum class CustomFont(private val fileName: String) {
-
-    // font files
-    AVENIR_LT_STD_HEAVY("fonts/AvenirLTStd-Heavy.otf"),
-    AVENIR_NEXT_LT_PRO_REGULAR("fonts/AvenirNextLTPro-Regular.otf");
+    /**
+     * JNI functions.
+     */
+    private external fun walletDestroyJNI(walletPtr: WalletPtr)
 
     companion object {
-        fun fromString(fontName: String): CustomFont {
-            return valueOf(fontName.toUpperCase(Locale.US))
+
+        /**
+         * JNI static functions.
+         */
+        @JvmStatic
+        private external fun walletCreateJNI(
+            walletConfigPtr: WalletConfigPtr,
+            logPath: String
+        ): WalletPtr
+
+        fun create(walletConfig: CommsConfig, logPath: String): Wallet {
+            return Wallet(walletCreateJNI(walletConfig.ptr, logPath))
         }
+
     }
 
-    fun asTypeface(context: Context): Typeface {
-        return Typeface.createFromAsset(context.assets, fileName)
+    public override fun destroy() {
+        walletDestroyJNI(ptr)
+        super.destroy()
     }
 
 }

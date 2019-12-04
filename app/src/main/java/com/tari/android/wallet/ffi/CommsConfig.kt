@@ -30,60 +30,56 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-
-package com.tari.android.wallet
-
-import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.tari.android.wallet.ffi.ByteVector
-import com.tari.android.wallet.ffi.NULL_POINTER
-import org.junit.Assert.*
-import org.junit.Test
-import org.junit.runner.RunWith
+package com.tari.android.wallet.ffi
 
 /**
- * FFI byte vector tests.
+ * Tari comms config wrapper.
  *
  * @author Kutsal Kaan Bilgin
  */
-@RunWith(AndroidJUnit4::class)
-class ByteVectorInstrumentedTests {
+class CommsConfig(ptr: CommsConfigPtr) : FFIObjectWrapper(ptr) {
 
-    private val str = "ABCDEF"
+    /**
+     * JNI functions.
+     */
+    private external fun commsConfigDestroyJNI(commsConfigPtr: CommsConfigPtr)
 
-    @Test
-    fun testCreateAndDestroyByteVector() {
-        val byteVector = ByteVector.create(str)
-        assertTrue(byteVector.ptr != NULL_POINTER)
-        byteVector.destroy()
-        assertTrue(byteVector.ptr == NULL_POINTER)
+    companion object {
+
+        /**
+         * JNI static functions.
+         */
+        @JvmStatic
+        private external fun commsConfigCreateJNI(
+            controlServiceAddress: String,
+            listenerAddress: String,
+            databaseName: String,
+            datastorePath: String,
+            privateKeyPtr: PrivateKeyPtr
+        ): PrivateKeyPtr
+
+        fun create(
+            controlServiceAddress: String,
+            listenerAddress: String,
+            databaseName: String,
+            datastorePath: String,
+            privateKey: PrivateKey
+        ): CommsConfig {
+            return CommsConfig(
+                commsConfigCreateJNI(
+                    controlServiceAddress,
+                    listenerAddress,
+                    databaseName,
+                    datastorePath,
+                    privateKey.ptr
+                )
+            )
+        }
     }
 
-    @Test
-    fun testByteVectorGetLength() {
-        val byteVector = ByteVector.create(str)
-        assertTrue(byteVector.length == str.length)
-        // release resource
-        byteVector.destroy()
-    }
-
-    @Test
-    fun testByteVectorGetAt() {
-        val byteVector = ByteVector.create(str)
-        val index = 3
-        assert(byteVector.getAt(index) == str[index])
-        // release resource
-        byteVector.destroy()
-    }
-
-    @Test
-    fun testDestroyedByteVector() {
-        val byteVector = ByteVector.create(str)
-        assert(byteVector.length == str.length)
-        byteVector.destroy()
-        assert(byteVector.length == 0)
-        // ERR :: still returns 'D'
-        val index = 3
-        assert(byteVector.getAt(index) == str[index])
+    public override fun destroy() {
+        commsConfigDestroyJNI(ptr)
+        super.destroy()
     }
 
 }

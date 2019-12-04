@@ -30,31 +30,23 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.tari.android.wallet.ui.component
+package com.tari.android.wallet
 
-import android.content.Context
-import android.graphics.Typeface
-import java.util.*
+import org.junit.runner.RunWith
+import org.junit.runners.Suite
 
 /**
- * Custom font enumeration - used in layout files.
+ * Suite of all instrumented tests.
  *
  * @author Kutsal Kaan Bilgin
  */
-enum class CustomFont(private val fileName: String) {
-
-    // font files
-    AVENIR_LT_STD_HEAVY("fonts/AvenirLTStd-Heavy.otf"),
-    AVENIR_NEXT_LT_PRO_REGULAR("fonts/AvenirNextLTPro-Regular.otf");
-
-    companion object {
-        fun fromString(fontName: String): CustomFont {
-            return valueOf(fontName.toUpperCase(Locale.US))
-        }
-    }
-
-    fun asTypeface(context: Context): Typeface {
-        return Typeface.createFromAsset(context.assets, fileName)
-    }
-
-}
+@RunWith(Suite::class)
+@Suite.SuiteClasses(
+    ByteVectorTests::class,
+    PrivateKeyTests::class,
+    PublicKeyTests::class,
+    ContactTests::class,
+    CommsConfigTests::class,
+    WalletTests::class
+)
+class TestSuite

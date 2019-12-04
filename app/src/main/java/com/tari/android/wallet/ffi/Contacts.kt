@@ -4,18 +4,18 @@
  * Redistribution and use in source and binary forms, with or
  * without modification, are permitted provided that the
  * following conditions are met:
-
+ *
  * 1. Redistributions of source code must retain the above copyright notice,
  * this list of conditions and the following disclaimer.
-
+ *
  * 2. Redistributions in binary form must reproduce the above
  * copyright notice, this list of conditions and the following disclaimer in the
  * documentation and/or other materials provided with the distribution.
-
+ *
  * 3. Neither the name of the copyright holder nor the names of
  * its contributors may be used to endorse or promote products
  * derived from this software without specific prior written permission.
-
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND
  * CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES,
  * INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
@@ -30,31 +30,34 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.tari.android.wallet.ui.component
-
-import android.content.Context
-import android.graphics.Typeface
-import java.util.*
+package com.tari.android.wallet.ffi
 
 /**
- * Custom font enumeration - used in layout files.
+ * Tari contacts wrapper.
  *
  * @author Kutsal Kaan Bilgin
  */
-enum class CustomFont(private val fileName: String) {
+class Contacts(ptr: ContactPtr) : FFIObjectWrapper(ptr) {
 
-    // font files
-    AVENIR_LT_STD_HEAVY("fonts/AvenirLTStd-Heavy.otf"),
-    AVENIR_NEXT_LT_PRO_REGULAR("fonts/AvenirNextLTPro-Regular.otf");
+    /**
+     * JNI functions.
+     */
+    private external fun contactsGetLengthJNI(contactsPtr: ContactsPtr): Int
+    private external fun contactsGetAt(contactPtr: ContactPtr, index: Int): ContactPtr
+    private external fun contactsDestroyJNI(contactsPtr: ContactPtr)
 
-    companion object {
-        fun fromString(fontName: String): CustomFont {
-            return valueOf(fontName.toUpperCase(Locale.US))
+    val length: Int
+        get() {
+            return contactsGetLengthJNI(ptr)
         }
+
+    fun getAt(index: Int): Contact {
+        return Contact(contactsGetAt(ptr, index))
     }
 
-    fun asTypeface(context: Context): Typeface {
-        return Typeface.createFromAsset(context.assets, fileName)
+    public override fun destroy() {
+        contactsDestroyJNI(ptr)
+        super.destroy()
     }
 
 }

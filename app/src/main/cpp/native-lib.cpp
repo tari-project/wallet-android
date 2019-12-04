@@ -232,3 +232,164 @@ Java_com_tari_android_wallet_ffi_PrivateKey_privateKeyDestroyJNI(
 }
 
 //endregion
+
+//region Contact
+
+extern "C"
+JNIEXPORT jlong JNICALL
+Java_com_tari_android_wallet_ffi_Contact_contactCreateJNI(
+        JNIEnv *jEnv,
+        jclass jClass,
+        jstring jAlias,
+        jlong jpPublicKey) {
+    // get native string
+    const auto *pAlias = jEnv->GetStringUTFChars(jAlias, JNI_FALSE);
+    auto *pPublicKey = (TariPublicKey *) jpPublicKey;
+    const auto *pContact = contact_create(pAlias, pPublicKey);
+    // release native string
+    jEnv->ReleaseStringUTFChars(jAlias, pAlias);
+    return (jlong) pContact;
+}
+
+extern "C"
+JNIEXPORT jstring JNICALL
+Java_com_tari_android_wallet_ffi_Contact_contactGetAliasJNI(
+        JNIEnv *jEnv,
+        jobject jThis,
+        jlong jpContact) {
+    auto *pContact = (TariContact *) jpContact;
+    const auto *pAlias = contact_get_alias(pContact);
+    return jEnv->NewStringUTF(pAlias);
+}
+
+extern "C"
+JNIEXPORT jlong JNICALL
+Java_com_tari_android_wallet_ffi_Contact_contactGetPublicKeyJNI(
+        JNIEnv *jEnv,
+        jobject jThis,
+        jlong jpContact) {
+    auto *pContact = (TariContact *) jpContact;
+    const auto *pPublicKey = contact_get_public_key(pContact);
+    return (jlong) pPublicKey;
+}
+
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_tari_android_wallet_ffi_Contact_contactDestroyJNI(
+        JNIEnv *jEnv,
+        jobject jThis,
+        jlong jpContact) {
+    contact_destroy((TariContact *) jpContact);
+}
+
+//endregion Contact
+
+//region Contacts
+
+extern "C"
+JNIEXPORT jint JNICALL
+Java_com_tari_android_wallet_ffi_Contacts_contactsGetLengthJNI(
+        JNIEnv *jEnv,
+        jobject jThis,
+        jlong jpContacts) {
+    auto *pContacts = (TariContacts *) jpContacts;
+    return contacts_get_length(pContacts);
+}
+
+extern "C"
+JNIEXPORT jlong JNICALL
+Java_com_tari_android_wallet_ffi_Contacts_contactsGetAtJNI(
+        JNIEnv *jEnv,
+        jobject jThis,
+        jlong jpContacts,
+        jint index) {
+    auto *pContacts = (TariContacts *) jpContacts;
+    TariContact *pContact = contacts_get_at(pContacts, static_cast<unsigned int>(index));
+    return (jlong) pContact;
+}
+
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_tari_android_wallet_ffi_Contacts_contactsDestroyJNI(
+        JNIEnv *jEnv,
+        jobject jThis,
+        jlong jpContacts) {
+    contacts_destroy((TariContacts *) jpContacts);
+}
+
+//endregion
+
+//region CommsConfig
+
+extern "C"
+JNIEXPORT jlong JNICALL
+Java_com_tari_android_wallet_ffi_CommsConfig_commsConfigCreateJNI(
+        JNIEnv *jEnv,
+        jclass jClass,
+        jstring jControlServiceAddress,
+        jstring jListenerAddress,
+        jstring jDatabaseName,
+        jstring jDatastorePath,
+        jlong jpPrivateKey) {
+    auto *pControlServiceAddress = (char *) jEnv->GetStringUTFChars(jControlServiceAddress,
+                                                                    JNI_FALSE);
+    auto *pListenerAddress = (char *) jEnv->GetStringUTFChars(jListenerAddress, JNI_FALSE);
+    auto *pDatabaseName = (char *) jEnv->GetStringUTFChars(jDatabaseName, JNI_FALSE);
+    auto *pDatastorePath = (char *) jEnv->GetStringUTFChars(jDatastorePath, JNI_FALSE);
+    auto *pPrivateKey = (TariPrivateKey *) jpPrivateKey;
+
+    TariCommsConfig *pCommsConfig = comms_config_create(
+            pControlServiceAddress,
+            pListenerAddress,
+            pDatabaseName,
+            pDatastorePath,
+            pPrivateKey);
+
+    jEnv->ReleaseStringUTFChars(jControlServiceAddress, pControlServiceAddress);
+    jEnv->ReleaseStringUTFChars(jListenerAddress, pListenerAddress);
+    jEnv->ReleaseStringUTFChars(jDatabaseName, pDatabaseName);
+    jEnv->ReleaseStringUTFChars(jDatastorePath, pDatastorePath);
+
+    return (jlong) pCommsConfig;
+}
+
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_tari_android_wallet_ffi_CommsConfig_commsConfigDestroyJNI(
+        JNIEnv *jEnv,
+        jobject jThis,
+        jlong jpCommsConfig) {
+    comms_config_destroy((TariCommsConfig *) jpCommsConfig);
+}
+
+//endregion
+
+// region Wallet
+
+extern "C"
+JNIEXPORT jlong JNICALL
+Java_com_tari_android_wallet_ffi_Wallet_walletCreateJNI(
+        JNIEnv *jEnv,
+        jobject jThis,
+        jlong jpWalletConfig,
+        jstring jLogPath) {
+    auto *pWalletConfig = (TariWalletConfig *) jpWalletConfig;
+    auto *pLogPath = (char *) jEnv->GetStringUTFChars(jLogPath, JNI_FALSE);
+    const auto *pWallet = wallet_create(pWalletConfig, pLogPath);
+
+    jEnv->ReleaseStringUTFChars(jLogPath, pLogPath);
+
+    return (jlong) pWallet;
+
+}
+
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_tari_android_wallet_ffi_Wallet_walletDestroyJNI(
+        JNIEnv *jEnv,
+        jobject jThis,
+        jlong jpWallet) {
+    wallet_destroy((TariWallet *) jpWallet);
+}
+
+//endregion

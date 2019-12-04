@@ -30,76 +30,69 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-
 package com.tari.android.wallet
 
-import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.tari.android.wallet.ffi.Contact
 import com.tari.android.wallet.ffi.NULL_POINTER
-import com.tari.android.wallet.ffi.PrivateKey
 import com.tari.android.wallet.ffi.PublicKey
-import org.junit.runner.RunWith
-import org.junit.Assert.*
 import org.junit.Test
+import org.junit.Assert.*
 
 /**
- * FFI private key tests.
+ * FFI byte vector tests.
  *
  * @author Kutsal Kaan Bilgin
  */
-@RunWith(AndroidJUnit4::class)
-class PublicKeyInstrumentedTests {
-
-    private val publicKeyHexString =
-        "30E1DFA197794858BFDBF96CDCE5DC8637D4BD1202DC694991040DDECBF42D40"
+class ContactTests {
 
     @Test
-    fun testCreatePublicKeyFromPrivateKey() {
-        val privateKey = PrivateKey.generate()
-        val publicKey = PublicKey.fromPrivateKey(privateKey)
-        assertTrue(publicKey.ptr != NULL_POINTER)
+    fun testCreateAndDestroyContact() {
+        val alias = TestUtil.generateRandomAlphanumericString(16)
+        val publicKey = PublicKey.fromHex(TestUtil.publicKeyHexString)
+        val contact = Contact.create(alias, publicKey)
+        assertTrue(contact.ptr != NULL_POINTER)
+        contact.destroy()
+        assertTrue(contact.ptr == NULL_POINTER)
         // free resources
         publicKey.destroy()
-        privateKey.destroy()
     }
 
     @Test
-    fun testCreatePublicKeyFromInvalidHexString() {
-        val invalidHexString = "invalid_hex_string"
-        val publicKey = PublicKey.fromHex(invalidHexString)
-        assertTrue(publicKey.ptr == NULL_POINTER)
-    }
-
-    @Test
-    fun testCreatePublicKeyFromHexStringAndGetBytes() {
-        val publicKey = PublicKey.fromHex(publicKeyHexString)
-        assertTrue(publicKey.ptr != NULL_POINTER)
-        val publicKeyBytes = publicKey.bytes
-        val index = 14
-        assertTrue(publicKeyBytes.hexString[index] == publicKeyHexString[index])
+    fun testGetContactAlias() {
+        val alias = TestUtil.generateRandomAlphanumericString(16)
+        val publicKey = PublicKey.fromHex(TestUtil.publicKeyHexString)
+        val contact = Contact.create(alias, publicKey)
+        assertEquals(alias, contact.alias)
         // free resources
-        publicKeyBytes.destroy()
+        contact.destroy()
         publicKey.destroy()
     }
 
     @Test
-    fun testCreatePublicKeyFromBytes() {
-        val privateKey = PrivateKey.generate()
-        val publicKey = PublicKey.fromPrivateKey(privateKey)
-        val publicKeyBytes = publicKey.bytes
-        val newPublicKey = PublicKey.create(publicKeyBytes)
-        assertTrue(newPublicKey.ptr != NULL_POINTER)
-        // check bytes
-        val index = 14
-        val newPublicKeyBytes = newPublicKey.bytes
-        assertTrue(
-            publicKeyBytes.hexString[index] == newPublicKeyBytes.hexString[index]
-        )
+    fun testGetContactPublicKey() {
+        val alias = TestUtil.generateRandomAlphanumericString(16)
+        val publicKey = PublicKey.fromHex(TestUtil.publicKeyHexString)
+        val contact = Contact.create(alias, publicKey)
+        val contactPublicKey = contact.publicKey
+        val contactPublicKeyBytes = contactPublicKey.bytes
+        assertEquals(TestUtil.publicKeyHexString, contactPublicKeyBytes.hexString)
         // free resources
-        newPublicKeyBytes.destroy()
-        newPublicKey.destroy()
-        publicKeyBytes.destroy()
+        contactPublicKeyBytes.destroy()
+        contactPublicKey.destroy()
+        contact.destroy()
         publicKey.destroy()
-        privateKey.destroy()
     }
+
+    @Test
+    fun testCreateContactWithEmptyAlias() {
+        val publicKey = PublicKey.fromHex(TestUtil.publicKeyHexString)
+        val contact = Contact.create("", publicKey)
+        assertTrue(contact.ptr != NULL_POINTER)
+        assertEquals("", contact.alias)
+        // free resources
+        contact.destroy()
+        publicKey.destroy()
+    }
+
 
 }

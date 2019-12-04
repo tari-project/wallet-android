@@ -30,71 +30,67 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-
 package com.tari.android.wallet
 
-import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.tari.android.wallet.ffi.NULL_POINTER
 import com.tari.android.wallet.ffi.PrivateKey
-import org.junit.Test
-
-import org.junit.runner.RunWith
+import com.tari.android.wallet.ffi.PublicKey
 import org.junit.Assert.*
+import org.junit.Test
 
 /**
  * FFI private key tests.
  *
  * @author Kutsal Kaan Bilgin
  */
-@RunWith(AndroidJUnit4::class)
-class PrivateKeyInstrumentedTests {
-
-    private val privateKeyHexString =
-        "6259C39F75E27140A652A5EE8AEFB3CF6C1686EF21D27793338D899380E8C801"
+class PublicKeyTests {
 
     @Test
-    fun testGenerateAndDestroyPrivateKey() {
+    fun testCreatePublicKeyFromPrivateKey() {
         val privateKey = PrivateKey.generate()
-        assertTrue(privateKey.ptr != NULL_POINTER)
+        val publicKey = PublicKey.fromPrivateKey(privateKey)
+        assertTrue(publicKey.ptr != NULL_POINTER)
+        // free resources
+        publicKey.destroy()
         privateKey.destroy()
-        assertTrue(privateKey.ptr == NULL_POINTER)
     }
 
     @Test
-    fun testCreatePrivateKeyFromInvalidHexString() {
+    fun testCreatePublicKeyFromInvalidHexString() {
         val invalidHexString = "invalid_hex_string"
-        val privateKey = PrivateKey.fromHex(invalidHexString)
-        assertTrue(privateKey.ptr == NULL_POINTER)
+        val publicKey = PublicKey.fromHex(invalidHexString)
+        assertTrue(publicKey.ptr == NULL_POINTER)
     }
 
     @Test
-    fun testCreatePrivateKeyFromHexStringAndGetBytes() {
-        val privateKey = PrivateKey.fromHex(privateKeyHexString)
-        assertTrue(privateKey.ptr != NULL_POINTER)
-        val privateKeyBytes = privateKey.bytes
-        val index = 14
-        assertTrue(privateKeyBytes.hexString[index] == privateKeyHexString[index])
+    fun testCreatePublicKeyFromHexStringAndGetBytes() {
+        val publicKey = PublicKey.fromHex(TestUtil.publicKeyHexString)
+        assertTrue(publicKey.ptr != NULL_POINTER)
+        val publicKeyBytes = publicKey.bytes
+        assertEquals(publicKeyBytes.hexString, TestUtil.publicKeyHexString)
         // free resources
-        privateKeyBytes.destroy()
-        privateKey.destroy()
+        publicKeyBytes.destroy()
+        publicKey.destroy()
     }
 
     @Test
-    fun testCreatePrivateKeyFromBytesAndGetBytes() {
-        // generate private key and get bytes
-        val privateKey = PrivateKey.fromHex(privateKeyHexString)
-        val bytes = privateKey.bytes
-        val privateKeyFromBytes = PrivateKey.create(bytes)
-        assertTrue(privateKeyFromBytes.ptr != NULL_POINTER)
-        // test bytes
-        val newBytes = privateKeyFromBytes.bytes
-        val index = 14
-        assertTrue(newBytes.hexString[index] == privateKeyHexString[index])
+    fun testCreatePublicKeyFromBytes() {
+        val privateKey = PrivateKey.generate()
+        val publicKey = PublicKey.fromPrivateKey(privateKey)
+        val publicKeyBytes = publicKey.bytes
+        val newPublicKey = PublicKey.create(publicKeyBytes)
+        assertTrue(newPublicKey.ptr != NULL_POINTER)
+        // check bytes
+        val newPublicKeyBytes = newPublicKey.bytes
+        assertEquals(
+            publicKeyBytes.hexString, newPublicKeyBytes.hexString
+        )
         // free resources
-        newBytes.destroy()
-        bytes.destroy()
+        newPublicKeyBytes.destroy()
+        newPublicKey.destroy()
+        publicKeyBytes.destroy()
+        publicKey.destroy()
         privateKey.destroy()
-        privateKeyFromBytes.destroy()
     }
 
 }
