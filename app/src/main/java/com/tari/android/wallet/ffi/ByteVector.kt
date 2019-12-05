@@ -42,9 +42,9 @@ class ByteVector(ptr: ByteVectorPtr) : FFIObjectWrapper(ptr) {
     /**
      * JNI functions.
      */
-    private external fun byteVectorGetLengthJNI(pByteVector: ByteVectorPtr): Int
-    private external fun byteVectorGetAtJNI(pByteVector: ByteVectorPtr, index: Int): Char
-    private external fun byteVectorDestroyJNI(pByteVector: ByteVectorPtr)
+    private external fun getLengthJNI(pByteVector: ByteVectorPtr): Int
+    private external fun getAtJNI(pByteVector: ByteVectorPtr, index: Int): Char
+    private external fun destroyJNI(pByteVector: ByteVectorPtr)
 
     companion object {
 
@@ -52,17 +52,17 @@ class ByteVector(ptr: ByteVectorPtr) : FFIObjectWrapper(ptr) {
          * JNI static functions.
          */
         @JvmStatic
-        private external fun byteVectorCreateJNI(string: String): ByteVectorPtr
+        private external fun createJNI(string: String): ByteVectorPtr
 
         fun create(string: String): ByteVector {
-            return ByteVector(byteVectorCreateJNI(string))
+            return ByteVector(createJNI(string))
         }
 
     }
 
     val length: Int
         get() {
-            return byteVectorGetLengthJNI(ptr)
+            return getLengthJNI(ptr)
         }
 
     /**
@@ -78,11 +78,11 @@ class ByteVector(ptr: ByteVectorPtr) : FFIObjectWrapper(ptr) {
         }
 
     fun getAt(index: Int): Char {
-        return byteVectorGetAtJNI(ptr, index)
+        return getAtJNI(ptr, index)
     }
 
     public override fun destroy() {
-        byteVectorDestroyJNI(ptr)
+        destroyJNI(ptr)
         super.destroy()
     }
 

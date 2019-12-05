@@ -42,9 +42,9 @@ class Contact(ptr: ContactPtr) : FFIObjectWrapper(ptr) {
     /**
      * JNI functions.
      */
-    private external fun contactGetAliasJNI(contactPtr: ContactPtr): String
-    private external fun contactGetPublicKeyJNI(contactPtr: ContactPtr): PublicKeyPtr
-    private external fun contactDestroyJNI(contactPtr: ContactPtr)
+    private external fun getAliasJNI(contactPtr: ContactPtr): String
+    private external fun getPublicKeyJNI(contactPtr: ContactPtr): PublicKeyPtr
+    private external fun destroyJNI(contactPtr: ContactPtr)
 
     companion object {
 
@@ -52,26 +52,26 @@ class Contact(ptr: ContactPtr) : FFIObjectWrapper(ptr) {
          * JNI static functions.
          */
         @JvmStatic
-        private external fun contactCreateJNI(alias: String, publicKeyPtr: PublicKeyPtr): ContactPtr
+        private external fun createJNI(alias: String, publicKeyPtr: PublicKeyPtr): ContactPtr
 
         fun create(alias: String, publicKey: PublicKey): Contact {
-            return Contact(contactCreateJNI(alias, publicKey.ptr))
+            return Contact(createJNI(alias, publicKey.ptr))
         }
 
     }
 
     val alias: String
         get() {
-            return contactGetAliasJNI(ptr)
+            return getAliasJNI(ptr)
         }
 
     val publicKey: PublicKey
         get() {
-            return PublicKey(contactGetPublicKeyJNI(ptr))
+            return PublicKey(getPublicKeyJNI(ptr))
         }
 
     public override fun destroy() {
-        contactDestroyJNI(ptr)
+        destroyJNI(ptr)
         super.destroy()
     }
 

@@ -42,21 +42,21 @@ class Contacts(ptr: ContactPtr) : FFIObjectWrapper(ptr) {
     /**
      * JNI functions.
      */
-    private external fun contactsGetLengthJNI(contactsPtr: ContactsPtr): Int
-    private external fun contactsGetAtJNI(contactPtr: ContactPtr, index: Int): ContactPtr
-    private external fun contactsDestroyJNI(contactsPtr: ContactPtr)
+    private external fun getLengthJNI(contactsPtr: ContactsPtr): Int
+    private external fun getAtJNI(contactPtr: ContactPtr, index: Int): ContactPtr
+    private external fun destroyJNI(contactsPtr: ContactPtr)
 
     val length: Int
         get() {
-            return contactsGetLengthJNI(ptr)
+            return getLengthJNI(ptr)
         }
 
     fun getAt(index: Int): Contact {
-        return Contact(contactsGetAtJNI(ptr, index))
+        return Contact(getAtJNI(ptr, index))
     }
 
     public override fun destroy() {
-        contactsDestroyJNI(ptr)
+        destroyJNI(ptr)
         super.destroy()
     }
 

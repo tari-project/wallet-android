@@ -42,8 +42,8 @@ class PublicKey(ptr: PublicKeyPtr) : FFIObjectWrapper(ptr) {
     /**
      * JNI functions.
      */
-    private external fun publicKeyGetBytesJNI(privateKeyPtr: PublicKeyPtr): ByteVectorPtr
-    private external fun publicKeyDestroyJNI(privateKeyPtr: PublicKeyPtr)
+    private external fun getBytesJNI(privateKeyPtr: PublicKeyPtr): ByteVectorPtr
+    private external fun destroyJNI(privateKeyPtr: PublicKeyPtr)
 
     companion object {
 
@@ -51,33 +51,33 @@ class PublicKey(ptr: PublicKeyPtr) : FFIObjectWrapper(ptr) {
          * JNI static functions.
          */
         @JvmStatic
-        private external fun publicKeyCreateJNI(byteVectorPtr: ByteVectorPtr): PublicKeyPtr
+        private external fun createJNI(byteVectorPtr: ByteVectorPtr): PublicKeyPtr
         @JvmStatic
-        private external fun publicKeyFromHexJNI(hexStr: String): PublicKeyPtr
+        private external fun fromHexJNI(hexStr: String): PublicKeyPtr
         @JvmStatic
-        private external fun publicKeyFromPrivateKeyJNI(privateKeyPtr: PrivateKeyPtr): PublicKeyPtr
+        private external fun fromPrivateKeyJNI(privateKeyPtr: PrivateKeyPtr): PublicKeyPtr
 
         fun create(byteVector: ByteVector): PublicKey {
-            return PublicKey(publicKeyCreateJNI(byteVector.ptr))
+            return PublicKey(createJNI(byteVector.ptr))
         }
 
         fun fromHex(hexStr: String): PublicKey {
-            return PublicKey(publicKeyFromHexJNI(hexStr))
+            return PublicKey(fromHexJNI(hexStr))
         }
 
         fun fromPrivateKey(privateKey: PrivateKey): PublicKey {
-            return PublicKey(publicKeyFromPrivateKeyJNI(privateKey.ptr))
+            return PublicKey(fromPrivateKeyJNI(privateKey.ptr))
         }
 
     }
 
     val bytes: ByteVector
         get() {
-            return ByteVector(publicKeyGetBytesJNI(ptr))
+            return ByteVector(getBytesJNI(ptr))
         }
 
     public override fun destroy() {
-        publicKeyDestroyJNI(ptr)
+        destroyJNI(ptr)
         super.destroy()
     }
 

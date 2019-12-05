@@ -51,13 +51,6 @@ class WalletBasicTests {
     }
 
     @Test
-    fun testGenerateTestData() {
-        assertTrue(wallet.ptr != NULL_POINTER)
-        val success = wallet.generateTestData(TestUtil.WALLET_DATASTORE_PATH)
-        assertTrue(success)
-    }
-
-    @Test
     fun testGetPublicKey() {
         val publicKey = wallet.getPublicKey()
         val bytes = publicKey.bytes
@@ -65,5 +58,15 @@ class WalletBasicTests {
         bytes.destroy()
         publicKey.destroy()
     }
+
+    /**
+    @Test
+    fun testBalances() {
+        // this returns non-zero after test data generation
+        assertEquals(0, wallet.getAvailableBalance())
+        assertEquals(0, wallet.getPendingIncomingBalance())
+        assertEquals(0, wallet.getPendingOutgoingBalance())
+    }
+    */
 
 }

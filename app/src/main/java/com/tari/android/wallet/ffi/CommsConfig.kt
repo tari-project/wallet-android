@@ -42,7 +42,7 @@ class CommsConfig(ptr: CommsConfigPtr) : FFIObjectWrapper(ptr) {
     /**
      * JNI functions.
      */
-    private external fun commsConfigDestroyJNI(commsConfigPtr: CommsConfigPtr)
+    private external fun destroyJNI(commsConfigPtr: CommsConfigPtr)
 
     companion object {
 
@@ -50,7 +50,7 @@ class CommsConfig(ptr: CommsConfigPtr) : FFIObjectWrapper(ptr) {
          * JNI static functions.
          */
         @JvmStatic
-        private external fun commsConfigCreateJNI(
+        private external fun createJNI(
             controlServiceAddress: String,
             listenerAddress: String,
             databaseName: String,
@@ -66,7 +66,7 @@ class CommsConfig(ptr: CommsConfigPtr) : FFIObjectWrapper(ptr) {
             privateKey: PrivateKey
         ): CommsConfig {
             return CommsConfig(
-                commsConfigCreateJNI(
+                createJNI(
                     controlServiceAddress,
                     listenerAddress,
                     databaseName,
@@ -78,7 +78,7 @@ class CommsConfig(ptr: CommsConfigPtr) : FFIObjectWrapper(ptr) {
     }
 
     public override fun destroy() {
-        commsConfigDestroyJNI(ptr)
+        destroyJNI(ptr)
         super.destroy()
     }
 

@@ -4,18 +4,18 @@
  * Redistribution and use in source and binary forms, with or
  * without modification, are permitted provided that the
  * following conditions are met:
-
+ *
  * 1. Redistributions of source code must retain the above copyright notice,
  * this list of conditions and the following disclaimer.
-
+ *
  * 2. Redistributions in binary form must reproduce the above
  * copyright notice, this list of conditions and the following disclaimer in the
  * documentation and/or other materials provided with the distribution.
-
+ *
  * 3. Neither the name of the copyright holder nor the names of
  * its contributors may be used to endorse or promote products
  * derived from this software without specific prior written permission.
-
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND
  * CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES,
  * INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
@@ -33,48 +33,27 @@
 package com.tari.android.wallet.ffi
 
 /**
- * Wrapper for native private key type.
+ * Tari pending inbound transactions wrapper.
  *
  * @author Kutsal Kaan Bilgin
  */
-class PrivateKey(ptr: PrivateKeyPtr) : FFIObjectWrapper(ptr) {
+class PendingInboundTransactions(ptr: PendingInboundTransactionsPtr) : FFIObjectWrapper(ptr) {
 
     /**
      * JNI functions.
      */
-    private external fun getBytesJNI(privateKeyPtr: PrivateKeyPtr): ByteVectorPtr
-    private external fun destroyJNI(privateKeyPtr: PrivateKeyPtr)
+    private external fun getLengthJNI(ptr: PendingInboundTransactionsPtr): Int
+    private external fun getAtJNI(ptr: PendingInboundTransactionsPtr, index: Int): PendingInboundTransactionPtr
+    private external fun destroyJNI(ptr: PendingInboundTransactionsPtr)
 
-    companion object {
-
-        /**
-         * JNI static functions.
-         */
-        @JvmStatic
-        private external fun createJNI(byteVectorPtr: ByteVectorPtr): PrivateKeyPtr
-        @JvmStatic
-        private external fun generateJNI(): PrivateKeyPtr
-        @JvmStatic
-        private external fun fromHexJNI(hexStr: String): PrivateKeyPtr
-
-        fun create(byteVector: ByteVector): PrivateKey {
-            return PrivateKey(createJNI(byteVector.ptr))
-        }
-
-        fun generate(): PrivateKey {
-            return PrivateKey(generateJNI())
-        }
-
-        fun fromHex(hexStr: String): PrivateKey {
-            return PrivateKey(fromHexJNI(hexStr))
-        }
-
-    }
-
-    val bytes: ByteVector
+    val length: Int
         get() {
-            return ByteVector(getBytesJNI(ptr))
+            return getLengthJNI(ptr)
         }
+
+    fun getAt(index: Int): PendingInboundTransaction {
+        return PendingInboundTransaction(getAtJNI(ptr, index))
+    }
 
     public override fun destroy() {
         destroyJNI(ptr)

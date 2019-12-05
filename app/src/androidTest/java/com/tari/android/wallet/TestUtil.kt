@@ -36,6 +36,7 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.orhanobut.logger.Logger
 import com.tari.android.wallet.ffi.CommsConfig
 import com.tari.android.wallet.ffi.PrivateKey
+import com.tari.android.wallet.ffi.TestWallet
 import com.tari.android.wallet.ffi.Wallet
 import java.io.File
 
@@ -55,10 +56,10 @@ class TestUtil {
         private const val WALLET_DB_NAME = "tari_test_db"
         private const val WALLET_CONTROL_SERVICE_ADDRESS = "127.0.0.1:80"
         private const val WALLET_LISTENER_ADDRESS = "0.0.0.0:0"
-        internal val WALLET_DATASTORE_PATH = WALLET_FILES_DIR_PATH
+        private val WALLET_DATASTORE_PATH = WALLET_FILES_DIR_PATH
         private val WALLET_LOG_FILE_PATH = "$WALLET_FILES_DIR_PATH/$WALLET_LOG_FILE_NAME"
 
-        private var mTestWallet: Wallet? = null
+        private var mTestWallet: TestWallet? = null
 
         /**
          * Matching pair of public & private keys.
@@ -83,7 +84,7 @@ class TestUtil {
             return del
         }
 
-        val testWallet: Wallet
+        val testWallet: TestWallet
             get() {
                 if (mTestWallet == null) {
                     clearTestFiles(WALLET_DATASTORE_PATH)
@@ -95,15 +96,16 @@ class TestUtil {
                         WALLET_DATASTORE_PATH,
                         privateKey
                     )
-                    mTestWallet = Wallet.create(commsConfig, WALLET_LOG_FILE_PATH)
+                    mTestWallet = TestWallet.create(commsConfig, WALLET_LOG_FILE_PATH)
                     privateKey.destroy()
                     commsConfig.destroy()
+                    mTestWallet?.generateTestData(WALLET_DATASTORE_PATH)
                 }
                 return mTestWallet ?: throw AssertionError("Set to null by another thread")
             }
 
         fun destroyTestWallet() {
-            testWallet?.destroy()
+            mTestWallet?.destroy()
         }
 
         fun printFFILogFile() {

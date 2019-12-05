@@ -33,48 +33,41 @@
 package com.tari.android.wallet.ffi
 
 /**
- * Wrapper for native private key type.
+ * Pending outbound transaction wrapper.
  *
  * @author Kutsal Kaan Bilgin
  */
-class PrivateKey(ptr: PrivateKeyPtr) : FFIObjectWrapper(ptr) {
+class PendingOutboundTransaction(ptr: PendingOutboundTransactionPtr) : FFIObjectWrapper(ptr) {
 
     /**
      * JNI functions.
      */
-    private external fun getBytesJNI(privateKeyPtr: PrivateKeyPtr): ByteVectorPtr
-    private external fun destroyJNI(privateKeyPtr: PrivateKeyPtr)
+    private external fun getIdJNI(ptr: PendingOutboundTransactionPtr): Long
+    private external fun getDestinationPublicKeyJNI(ptr: PendingOutboundTransactionPtr): PublicKeyPtr
+    private external fun getAmountJNI(ptr: PendingOutboundTransactionPtr): Long
+    private external fun getTimestampJNI(ptr: PendingOutboundTransactionPtr): Long
+    private external fun getMessageJNI(ptr: PendingOutboundTransactionPtr): String
+    private external fun destroyJNI(ptr: PendingOutboundTransactionPtr)
 
-    companion object {
-
-        /**
-         * JNI static functions.
-         */
-        @JvmStatic
-        private external fun createJNI(byteVectorPtr: ByteVectorPtr): PrivateKeyPtr
-        @JvmStatic
-        private external fun generateJNI(): PrivateKeyPtr
-        @JvmStatic
-        private external fun fromHexJNI(hexStr: String): PrivateKeyPtr
-
-        fun create(byteVector: ByteVector): PrivateKey {
-            return PrivateKey(createJNI(byteVector.ptr))
-        }
-
-        fun generate(): PrivateKey {
-            return PrivateKey(generateJNI())
-        }
-
-        fun fromHex(hexStr: String): PrivateKey {
-            return PrivateKey(fromHexJNI(hexStr))
-        }
-
+    fun getId(): Long {
+        return getIdJNI(ptr)
     }
 
-    val bytes: ByteVector
-        get() {
-            return ByteVector(getBytesJNI(ptr))
-        }
+    fun getDestinationPublicKey(): PublicKey {
+        return PublicKey(getDestinationPublicKeyJNI(ptr))
+    }
+
+    fun getAmount(): Long {
+        return getAmountJNI(ptr)
+    }
+
+    fun getTimestamp(): Long {
+        return getTimestampJNI(ptr)
+    }
+
+    fun getMessage(): String {
+        return getMessageJNI(ptr)
+    }
 
     public override fun destroy() {
         destroyJNI(ptr)

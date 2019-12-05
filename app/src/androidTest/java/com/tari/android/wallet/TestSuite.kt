@@ -48,6 +48,9 @@ import org.junit.runners.Suite
     ContactTests::class,
     CommsConfigTests::class,
     WalletBasicTests::class,
-    WalletContactsTests::class
+    WalletContactsTests::class,
+    WalletCompletedTransactionsTests::class,
+    WalletPendingOutboundTransactionsTests::class,
+    WalletPendingInboundTransactionsTests::class
 )
 class TestSuite

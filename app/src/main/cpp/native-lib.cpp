@@ -55,11 +55,68 @@
 #define LOGI(...) __android_log_print(ANDROID_LOG_INFO,     LOG_TAG, __VA_ARGS__)
 #define LOGD(...) __android_log_print(ANDROID_LOG_DEBUG,    LOG_TAG, __VA_ARGS__)
 
+/**
+ * Java virtual machine pointer for later use in callbacks.
+ */
+JavaVM *g_vm;
+
+/**
+ * Called by the environment on JNI load.
+ */
+JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *) {
+    g_vm = vm;
+    return JNI_VERSION_1_6;
+}
+
+/**
+ * Helper method to get JNI environment attached to the current thread.
+ * Used in callback functions.
+ */
+JNIEnv *getJNIEnv() {
+    JNIEnv *jniEnv;
+    int getEnvStat = g_vm->GetEnv((void **) &jniEnv, JNI_VERSION_1_6);
+    if (getEnvStat == JNI_EDETACHED) {
+        LOGD("GetEnv: not attached, will attach.");
+        if (g_vm->AttachCurrentThread(&jniEnv, nullptr) != 0) {
+            LOGE("VM failed to attach.");
+            return nullptr;
+        } else {
+            LOGD("VM attached.");
+        }
+    } else if (getEnvStat == JNI_OK) {
+        // no-op
+    } else if (getEnvStat == JNI_EVERSION) {
+        LOGE("GetEnv: JNI version not supported.");
+        return nullptr;
+    }
+    return jniEnv;
+}
+
+/**
+ * TX broadcast callback function forward declaration.
+ */
+void onTransactionBroadcast(struct TariCompletedTransaction *);
+
+/**
+ * TX received callback function forward declaration.
+ */
+void onTransactionReceived(struct TariPendingInboundTransaction *);
+
+/**
+ * TX mined callback function forward declaration.
+ */
+void onTransactionMined(struct TariCompletedTransaction *);
+
+/**
+ * TX reply received callback function forward declaration.
+ */
+void onReceivedTransactionReply(struct TariCompletedTransaction *);
+
 //region Byte Vector
 
 extern "C"
 JNIEXPORT jlong JNICALL
-Java_com_tari_android_wallet_ffi_ByteVector_byteVectorCreateJNI(
+Java_com_tari_android_wallet_ffi_ByteVector_createJNI(
         JNIEnv *jEnv,
         jclass jClass,
         jstring jStr) {
@@ -79,7 +136,7 @@ Java_com_tari_android_wallet_ffi_ByteVector_byteVectorCreateJNI(
 
 extern "C"
 JNIEXPORT jint JNICALL
-Java_com_tari_android_wallet_ffi_ByteVector_byteVectorGetLengthJNI(
+Java_com_tari_android_wallet_ffi_ByteVector_getLengthJNI(
         JNIEnv *jEnv,
         jobject jThis,
         jlong jpByteVector) {
@@ -91,7 +148,7 @@ Java_com_tari_android_wallet_ffi_ByteVector_byteVectorGetLengthJNI(
 
 extern "C"
 JNIEXPORT jchar JNICALL
-Java_com_tari_android_wallet_ffi_ByteVector_byteVectorGetAtJNI(
+Java_com_tari_android_wallet_ffi_ByteVector_getAtJNI(
         JNIEnv *jEnv,
         jobject jThis,
         jlong jpByteVector,
@@ -103,7 +160,7 @@ Java_com_tari_android_wallet_ffi_ByteVector_byteVectorGetAtJNI(
 
 extern "C"
 JNIEXPORT void JNICALL
-Java_com_tari_android_wallet_ffi_ByteVector_byteVectorDestroyJNI(
+Java_com_tari_android_wallet_ffi_ByteVector_destroyJNI(
         JNIEnv *jEnv,
         jobject jThis,
         jlong jpByteVector) {
@@ -117,7 +174,7 @@ Java_com_tari_android_wallet_ffi_ByteVector_byteVectorDestroyJNI(
 
 extern "C"
 JNIEXPORT jlong JNICALL
-Java_com_tari_android_wallet_ffi_PublicKey_publicKeyCreateJNI(
+Java_com_tari_android_wallet_ffi_PublicKey_createJNI(
         JNIEnv *jEnv,
         jclass jClass,
         jlong jpByteVector) {
@@ -130,7 +187,7 @@ Java_com_tari_android_wallet_ffi_PublicKey_publicKeyCreateJNI(
 
 extern "C"
 JNIEXPORT jlong JNICALL
-Java_com_tari_android_wallet_ffi_PublicKey_publicKeyFromHexJNI(
+Java_com_tari_android_wallet_ffi_PublicKey_fromHexJNI(
         JNIEnv *jEnv,
         jclass jClass,
         jstring jHexStr) {
@@ -142,7 +199,7 @@ Java_com_tari_android_wallet_ffi_PublicKey_publicKeyFromHexJNI(
 
 extern "C"
 JNIEXPORT jlong JNICALL
-Java_com_tari_android_wallet_ffi_PublicKey_publicKeyFromPrivateKeyJNI(
+Java_com_tari_android_wallet_ffi_PublicKey_fromPrivateKeyJNI(
         JNIEnv *jEnv,
         jclass jClass,
         jlong jpPrivateKey) {
@@ -154,7 +211,7 @@ Java_com_tari_android_wallet_ffi_PublicKey_publicKeyFromPrivateKeyJNI(
 
 extern "C"
 JNIEXPORT jlong JNICALL
-Java_com_tari_android_wallet_ffi_PublicKey_publicKeyGetBytesJNI(
+Java_com_tari_android_wallet_ffi_PublicKey_getBytesJNI(
         JNIEnv *jEnv,
         jobject jThis,
         jlong jpPublicKey) {
@@ -167,7 +224,7 @@ Java_com_tari_android_wallet_ffi_PublicKey_publicKeyGetBytesJNI(
 
 extern "C"
 JNIEXPORT void JNICALL
-Java_com_tari_android_wallet_ffi_PublicKey_publicKeyDestroyJNI(
+Java_com_tari_android_wallet_ffi_PublicKey_destroyJNI(
         JNIEnv *jEnv,
         jobject jThis,
         jlong jpPublicKey) {
@@ -180,7 +237,7 @@ Java_com_tari_android_wallet_ffi_PublicKey_publicKeyDestroyJNI(
 
 extern "C"
 JNIEXPORT jlong JNICALL
-Java_com_tari_android_wallet_ffi_PrivateKey_privateKeyCreateJNI(
+Java_com_tari_android_wallet_ffi_PrivateKey_createJNI(
         JNIEnv *jEnv,
         jclass jClass,
         jlong jpByteVector) {
@@ -192,7 +249,7 @@ Java_com_tari_android_wallet_ffi_PrivateKey_privateKeyCreateJNI(
 
 extern "C"
 JNIEXPORT jlong JNICALL
-Java_com_tari_android_wallet_ffi_PrivateKey_privateKeyGenerateJNI(
+Java_com_tari_android_wallet_ffi_PrivateKey_generateJNI(
         JNIEnv *jEnv,
         jclass jClass) {
     auto *pPrivateKey = private_key_generate();
@@ -201,7 +258,7 @@ Java_com_tari_android_wallet_ffi_PrivateKey_privateKeyGenerateJNI(
 
 extern "C"
 JNIEXPORT jlong JNICALL
-Java_com_tari_android_wallet_ffi_PrivateKey_privateKeyFromHexJNI(
+Java_com_tari_android_wallet_ffi_PrivateKey_fromHexJNI(
         JNIEnv *jEnv,
         jclass jClass,
         jstring jHexStr) {
@@ -213,7 +270,7 @@ Java_com_tari_android_wallet_ffi_PrivateKey_privateKeyFromHexJNI(
 
 extern "C"
 JNIEXPORT jlong JNICALL
-Java_com_tari_android_wallet_ffi_PrivateKey_privateKeyGetBytesJNI(
+Java_com_tari_android_wallet_ffi_PrivateKey_getBytesJNI(
         JNIEnv *jEnv,
         jobject jThis,
         jlong jpPrivateKey) {
@@ -224,7 +281,7 @@ Java_com_tari_android_wallet_ffi_PrivateKey_privateKeyGetBytesJNI(
 
 extern "C"
 JNIEXPORT void JNICALL
-Java_com_tari_android_wallet_ffi_PrivateKey_privateKeyDestroyJNI(
+Java_com_tari_android_wallet_ffi_PrivateKey_destroyJNI(
         JNIEnv *jEnv,
         jobject jThis,
         jlong jpPrivateKey) {
@@ -237,7 +294,7 @@ Java_com_tari_android_wallet_ffi_PrivateKey_privateKeyDestroyJNI(
 
 extern "C"
 JNIEXPORT jlong JNICALL
-Java_com_tari_android_wallet_ffi_Contact_contactCreateJNI(
+Java_com_tari_android_wallet_ffi_Contact_createJNI(
         JNIEnv *jEnv,
         jclass jClass,
         jstring jAlias,
@@ -253,7 +310,7 @@ Java_com_tari_android_wallet_ffi_Contact_contactCreateJNI(
 
 extern "C"
 JNIEXPORT jstring JNICALL
-Java_com_tari_android_wallet_ffi_Contact_contactGetAliasJNI(
+Java_com_tari_android_wallet_ffi_Contact_getAliasJNI(
         JNIEnv *jEnv,
         jobject jThis,
         jlong jpContact) {
@@ -264,7 +321,7 @@ Java_com_tari_android_wallet_ffi_Contact_contactGetAliasJNI(
 
 extern "C"
 JNIEXPORT jlong JNICALL
-Java_com_tari_android_wallet_ffi_Contact_contactGetPublicKeyJNI(
+Java_com_tari_android_wallet_ffi_Contact_getPublicKeyJNI(
         JNIEnv *jEnv,
         jobject jThis,
         jlong jpContact) {
@@ -275,7 +332,7 @@ Java_com_tari_android_wallet_ffi_Contact_contactGetPublicKeyJNI(
 
 extern "C"
 JNIEXPORT void JNICALL
-Java_com_tari_android_wallet_ffi_Contact_contactDestroyJNI(
+Java_com_tari_android_wallet_ffi_Contact_destroyJNI(
         JNIEnv *jEnv,
         jobject jThis,
         jlong jpContact) {
@@ -288,7 +345,7 @@ Java_com_tari_android_wallet_ffi_Contact_contactDestroyJNI(
 
 extern "C"
 JNIEXPORT jint JNICALL
-Java_com_tari_android_wallet_ffi_Contacts_contactsGetLengthJNI(
+Java_com_tari_android_wallet_ffi_Contacts_getLengthJNI(
         JNIEnv *jEnv,
         jobject jThis,
         jlong jpContacts) {
@@ -298,7 +355,7 @@ Java_com_tari_android_wallet_ffi_Contacts_contactsGetLengthJNI(
 
 extern "C"
 JNIEXPORT jlong JNICALL
-Java_com_tari_android_wallet_ffi_Contacts_contactsGetAtJNI(
+Java_com_tari_android_wallet_ffi_Contacts_getAtJNI(
         JNIEnv *jEnv,
         jobject jThis,
         jlong jpContacts,
@@ -310,7 +367,7 @@ Java_com_tari_android_wallet_ffi_Contacts_contactsGetAtJNI(
 
 extern "C"
 JNIEXPORT void JNICALL
-Java_com_tari_android_wallet_ffi_Contacts_contactsDestroyJNI(
+Java_com_tari_android_wallet_ffi_Contacts_destroyJNI(
         JNIEnv *jEnv,
         jobject jThis,
         jlong jpContacts) {
@@ -323,7 +380,7 @@ Java_com_tari_android_wallet_ffi_Contacts_contactsDestroyJNI(
 
 extern "C"
 JNIEXPORT jlong JNICALL
-Java_com_tari_android_wallet_ffi_CommsConfig_commsConfigCreateJNI(
+Java_com_tari_android_wallet_ffi_CommsConfig_createJNI(
         JNIEnv *jEnv,
         jclass jClass,
         jstring jControlServiceAddress,
@@ -355,7 +412,7 @@ Java_com_tari_android_wallet_ffi_CommsConfig_commsConfigCreateJNI(
 
 extern "C"
 JNIEXPORT void JNICALL
-Java_com_tari_android_wallet_ffi_CommsConfig_commsConfigDestroyJNI(
+Java_com_tari_android_wallet_ffi_CommsConfig_destroyJNI(
         JNIEnv *jEnv,
         jobject jThis,
         jlong jpCommsConfig) {
@@ -368,7 +425,7 @@ Java_com_tari_android_wallet_ffi_CommsConfig_commsConfigDestroyJNI(
 
 extern "C"
 JNIEXPORT jlong JNICALL
-Java_com_tari_android_wallet_ffi_Wallet_walletCreateJNI(
+Java_com_tari_android_wallet_ffi_Wallet_createJNI(
         JNIEnv *jEnv,
         jobject jThis,
         jlong jpWalletConfig,
@@ -381,21 +438,8 @@ Java_com_tari_android_wallet_ffi_Wallet_walletCreateJNI(
 }
 
 extern "C"
-JNIEXPORT jboolean JNICALL
-Java_com_tari_android_wallet_ffi_Wallet_walletTestGenerateDataJNI(
-        JNIEnv *jEnv,
-        jobject jThis,
-        jlong jpWallet,
-        jstring jDatastorePath) {
-    auto *pDatastorePath = (char *) jEnv->GetStringUTFChars(jDatastorePath, JNI_FALSE);
-    bool success = wallet_test_generate_data((TariWallet *) jpWallet, pDatastorePath);
-    jEnv->ReleaseStringUTFChars(jDatastorePath, pDatastorePath);
-    return (jboolean) success;
-}
-
-extern "C"
 JNIEXPORT jlong JNICALL
-Java_com_tari_android_wallet_ffi_Wallet_walletGetPublicKeyJNI(
+Java_com_tari_android_wallet_ffi_Wallet_getPublicKeyJNI(
         JNIEnv *jEnv,
         jobject jThis,
         jlong jpWallet) {
@@ -406,7 +450,7 @@ Java_com_tari_android_wallet_ffi_Wallet_walletGetPublicKeyJNI(
 
 extern "C"
 JNIEXPORT jlong JNICALL
-Java_com_tari_android_wallet_ffi_Wallet_walletGetAvailableBalanceJNI(
+Java_com_tari_android_wallet_ffi_Wallet_getAvailableBalanceJNI(
         JNIEnv *jEnv,
         jobject jThis,
         jlong jpWallet) {
@@ -416,7 +460,7 @@ Java_com_tari_android_wallet_ffi_Wallet_walletGetAvailableBalanceJNI(
 
 extern "C"
 JNIEXPORT jlong JNICALL
-Java_com_tari_android_wallet_ffi_Wallet_walletGetPendingIncomingBalanceJNI(
+Java_com_tari_android_wallet_ffi_Wallet_getPendingIncomingBalanceJNI(
         JNIEnv *jEnv,
         jobject jThis,
         jlong jpWallet) {
@@ -426,17 +470,17 @@ Java_com_tari_android_wallet_ffi_Wallet_walletGetPendingIncomingBalanceJNI(
 
 extern "C"
 JNIEXPORT jlong JNICALL
-Java_com_tari_android_wallet_ffi_Wallet_walletGetPendingOutgoingBalanceJNI(
+Java_com_tari_android_wallet_ffi_Wallet_getPendingOutgoingBalanceJNI(
         JNIEnv *jEnv,
         jobject jThis,
         jlong jpWallet) {
     auto *pWallet = (TariWallet *) jpWallet;
-    return (jlong) wallet_get_pending_incoming_balance(pWallet);
+    return (jlong) wallet_get_pending_outgoing_balance(pWallet);
 }
 
 extern "C"
 JNIEXPORT jlong JNICALL
-Java_com_tari_android_wallet_ffi_Wallet_walletGetContactsJNI(
+Java_com_tari_android_wallet_ffi_Wallet_getContactsJNI(
         JNIEnv *jEnv,
         jobject jThis,
         jlong jpWallet) {
@@ -447,7 +491,7 @@ Java_com_tari_android_wallet_ffi_Wallet_walletGetContactsJNI(
 
 extern "C"
 JNIEXPORT jboolean JNICALL
-Java_com_tari_android_wallet_ffi_Wallet_walletAddContactJNI(
+Java_com_tari_android_wallet_ffi_Wallet_addContactJNI(
         JNIEnv *jEnv,
         jobject jThis,
         jlong jpWallet,
@@ -459,7 +503,7 @@ Java_com_tari_android_wallet_ffi_Wallet_walletAddContactJNI(
 
 extern "C"
 JNIEXPORT jboolean JNICALL
-Java_com_tari_android_wallet_ffi_Wallet_walletRemoveContactJNI(
+Java_com_tari_android_wallet_ffi_Wallet_removeContactJNI(
         JNIEnv *jEnv,
         jobject jThis,
         jlong jpWallet,
@@ -470,12 +514,631 @@ Java_com_tari_android_wallet_ffi_Wallet_walletRemoveContactJNI(
 }
 
 extern "C"
+JNIEXPORT jlong JNICALL
+Java_com_tari_android_wallet_ffi_Wallet_getCompletedTransactionsJNI(
+        JNIEnv *jEnv,
+        jobject jThis,
+        jlong jpWallet) {
+    auto *pWallet = (TariWallet *) jpWallet;
+    const auto *pCompletedTransactions = wallet_get_completed_transactions(pWallet);
+    return (jlong) pCompletedTransactions;
+}
+
+extern "C"
+JNIEXPORT jlong JNICALL
+Java_com_tari_android_wallet_ffi_Wallet_getCompletedTransactionByIdJNI(
+        JNIEnv *jEnv,
+        jobject jThis,
+        jlong jpWallet,
+        jlong jTxId) {
+    auto *pWallet = (TariWallet *) jpWallet;
+    const auto *pCompletedTransaction = wallet_get_completed_transaction_by_id(pWallet,
+                                                                               static_cast<unsigned long long>(jTxId));
+    return (jlong) pCompletedTransaction;
+}
+
+extern "C"
+JNIEXPORT jlong JNICALL
+Java_com_tari_android_wallet_ffi_Wallet_getPendingOutboundTransactionsJNI(
+        JNIEnv *jEnv,
+        jobject jThis,
+        jlong jpWallet) {
+    auto *pWallet = (TariWallet *) jpWallet;
+    const auto *pPendingOutboundTransactions = wallet_get_pending_outbound_transactions(pWallet);
+    return (jlong) pPendingOutboundTransactions;
+}
+
+extern "C"
+JNIEXPORT jlong JNICALL
+Java_com_tari_android_wallet_ffi_Wallet_getPendingOutboundTransactionByIdJNI(
+        JNIEnv *jEnv,
+        jobject jThis,
+        jlong jpWallet,
+        jlong jTxId) {
+    auto *pWallet = (TariWallet *) jpWallet;
+    const auto *pPendingOutboundTransaction = wallet_get_pending_outbound_transaction_by_id(pWallet,
+                                                                                            static_cast<unsigned long long>(jTxId));
+    return (jlong) pPendingOutboundTransaction;
+}
+
+extern "C"
+JNIEXPORT jlong JNICALL
+Java_com_tari_android_wallet_ffi_Wallet_getPendingInboundTransactionsJNI(
+        JNIEnv *jEnv,
+        jobject jThis,
+        jlong jpWallet) {
+    auto *pWallet = (TariWallet *) jpWallet;
+    const auto *pPendingInboundTransactions = wallet_get_pending_inbound_transactions(pWallet);
+    return (jlong) pPendingInboundTransactions;
+}
+
+extern "C"
+JNIEXPORT jlong JNICALL
+Java_com_tari_android_wallet_ffi_Wallet_getPendingInboundTransactionByIdJNI(
+        JNIEnv *jEnv,
+        jobject jThis,
+        jlong jpWallet,
+        jlong jTxId) {
+    auto *pWallet = (TariWallet *) jpWallet;
+    const auto *pPendingInboundTransaction = wallet_get_pending_inbound_transaction_by_id(pWallet,
+                                                                                          static_cast<unsigned long long>(jTxId));
+    return (jlong) pPendingInboundTransaction;
+}
+
+extern "C"
 JNIEXPORT void JNICALL
-Java_com_tari_android_wallet_ffi_Wallet_walletDestroyJNI(
+Java_com_tari_android_wallet_ffi_Wallet_destroyJNI(
         JNIEnv *jEnv,
         jobject jThis,
         jlong jpWallet) {
     wallet_destroy((TariWallet *) jpWallet);
+}
+
+//endregion
+
+//region Completed Transaction
+
+extern "C"
+JNIEXPORT jlong JNICALL
+Java_com_tari_android_wallet_ffi_CompletedTransaction_getIdJNI(
+        JNIEnv *jEnv,
+        jobject jThis,
+        jlong jpCompletedTx) {
+    auto *pCompletedTx = (TariCompletedTransaction *) jpCompletedTx;
+    return (jlong) completed_transaction_get_transaction_id(pCompletedTx);
+}
+
+extern "C"
+JNIEXPORT jlong JNICALL
+Java_com_tari_android_wallet_ffi_CompletedTransaction_getDestinationPublicKeyJNI(
+        JNIEnv *jEnv,
+        jobject jThis,
+        jlong jpCompletedTx) {
+    auto *pCompletedTx = (TariCompletedTransaction *) jpCompletedTx;
+    auto *pPublicKey = completed_transaction_get_destination_public_key(pCompletedTx);
+    return (jlong) pPublicKey;
+}
+
+extern "C"
+JNIEXPORT jlong JNICALL
+Java_com_tari_android_wallet_ffi_CompletedTransaction_getSourcePublicKeyJNI(
+        JNIEnv *jEnv,
+        jobject jThis,
+        jlong jpCompletedTx) {
+    auto *pCompletedTx = (TariCompletedTransaction *) jpCompletedTx;
+    auto *pPublicKey = completed_transaction_get_source_public_key(pCompletedTx);
+    return (jlong) pPublicKey;
+}
+
+extern "C"
+JNIEXPORT jlong JNICALL
+Java_com_tari_android_wallet_ffi_CompletedTransaction_getAmountJNI(
+        JNIEnv *jEnv,
+        jobject jThis,
+        jlong jpCompletedTx) {
+    auto *pCompletedTx = (TariCompletedTransaction *) jpCompletedTx;
+    return (jlong) completed_transaction_get_amount(pCompletedTx);
+}
+
+extern "C"
+JNIEXPORT jlong JNICALL
+Java_com_tari_android_wallet_ffi_CompletedTransaction_getFeeJNI(
+        JNIEnv *jEnv,
+        jobject jThis,
+        jlong jpCompletedTx) {
+    auto *pCompletedTx = (TariCompletedTransaction *) jpCompletedTx;
+    return (jlong) completed_transaction_get_fee(pCompletedTx);
+}
+
+extern "C"
+JNIEXPORT jlong JNICALL
+Java_com_tari_android_wallet_ffi_CompletedTransaction_getTimestampJNI(
+        JNIEnv *jEnv,
+        jobject jThis,
+        jlong jpCompletedTx) {
+    auto *pCompletedTx = (TariCompletedTransaction *) jpCompletedTx;
+    return (jlong) completed_transaction_get_timestamp(pCompletedTx);
+}
+
+extern "C"
+JNIEXPORT jstring JNICALL
+Java_com_tari_android_wallet_ffi_CompletedTransaction_getMessageJNI(
+        JNIEnv *jEnv,
+        jobject jThis,
+        jlong jpCompletedTx) {
+    auto *pCompletedTx = (TariCompletedTransaction *) jpCompletedTx;
+    const auto *pMessage = completed_transaction_get_message(pCompletedTx);
+    return jEnv->NewStringUTF(pMessage);
+}
+
+extern "C"
+JNIEXPORT jint JNICALL
+Java_com_tari_android_wallet_ffi_CompletedTransaction_getStatusJNI(
+        JNIEnv *jEnv,
+        jobject jThis,
+        jlong jpCompletedTx) {
+    auto *pCompletedTx = (TariCompletedTransaction *) jpCompletedTx;
+    return (jint) completed_transaction_get_status(pCompletedTx);
+}
+
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_tari_android_wallet_ffi_CompletedTransaction_destroyJNI(
+        JNIEnv *jEnv,
+        jobject jThis,
+        jlong jpCompletedTx) {
+    auto *pCompletedTx = (TariCompletedTransaction *) jpCompletedTx;
+    completed_transaction_destroy(pCompletedTx);
+}
+
+//endregion
+
+//region Completed Transactions
+
+extern "C"
+JNIEXPORT jint JNICALL
+Java_com_tari_android_wallet_ffi_CompletedTransactions_getLengthJNI(
+        JNIEnv *jEnv,
+        jobject jThis,
+        jlong jpCompletedTransactions) {
+    auto *pCompletedTransactions = (TariCompletedTransactions *) jpCompletedTransactions;
+    return completed_transactions_get_length(pCompletedTransactions);
+}
+
+extern "C"
+JNIEXPORT jlong JNICALL
+Java_com_tari_android_wallet_ffi_CompletedTransactions_getAtJNI(
+        JNIEnv *jEnv,
+        jobject jThis,
+        jlong jpCompletedTransactions,
+        jint index) {
+    auto *pCompletedTransactions = (TariCompletedTransactions *) jpCompletedTransactions;
+    TariCompletedTransaction *pTx = completed_transactions_get_at(pCompletedTransactions,
+                                                                  static_cast<unsigned int>(index));
+    return (jlong) pTx;
+}
+
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_tari_android_wallet_ffi_CompletedTransactions_destroyJNI(
+        JNIEnv *jEnv,
+        jobject jThis,
+        jlong jpCompletedTransactions) {
+    completed_transactions_destroy((TariCompletedTransactions *) jpCompletedTransactions);
+}
+
+//endregion
+
+//region Pending Outbound Transaction
+
+extern "C"
+JNIEXPORT jlong JNICALL
+Java_com_tari_android_wallet_ffi_PendingOutboundTransaction_getIdJNI(
+        JNIEnv *jEnv,
+        jobject jThis,
+        jlong jpOutboundTx) {
+    auto *pOutboundTx = (TariPendingOutboundTransaction *) jpOutboundTx;
+    return (jlong) pending_outbound_transaction_get_transaction_id(pOutboundTx);
+}
+
+extern "C"
+JNIEXPORT jlong JNICALL
+Java_com_tari_android_wallet_ffi_PendingOutboundTransaction_getDestinationPublicKeyJNI(
+        JNIEnv *jEnv,
+        jobject jThis,
+        jlong jpOutboundTx) {
+    auto *pOutboundTx = (TariPendingOutboundTransaction *) jpOutboundTx;
+    auto *pPublicKey = pending_outbound_transaction_get_destination_public_key(pOutboundTx);
+    return (jlong) pPublicKey;
+}
+
+extern "C"
+JNIEXPORT jlong JNICALL
+Java_com_tari_android_wallet_ffi_PendingOutboundTransaction_getAmountJNI(
+        JNIEnv *jEnv,
+        jobject jThis,
+        jlong jpOutboundTx) {
+    auto *pOutboundTx = (TariPendingOutboundTransaction *) jpOutboundTx;
+    return (jlong) pending_outbound_transaction_get_amount(pOutboundTx);
+}
+
+extern "C"
+JNIEXPORT jstring JNICALL
+Java_com_tari_android_wallet_ffi_PendingOutboundTransaction_getMessageJNI(
+        JNIEnv *jEnv,
+        jobject jThis,
+        jlong jpOutboundTx) {
+    auto *pOutboundTx = (TariPendingOutboundTransaction *) jpOutboundTx;
+    const auto *pMessage = pending_outbound_transaction_get_message(pOutboundTx);
+    return jEnv->NewStringUTF(pMessage);
+}
+
+extern "C"
+JNIEXPORT jlong JNICALL
+Java_com_tari_android_wallet_ffi_PendingOutboundTransaction_getTimestampJNI(
+        JNIEnv *jEnv,
+        jobject jThis,
+        jlong jpOutboundTx) {
+    auto *pOutboundTx = (TariPendingOutboundTransaction *) jpOutboundTx;
+    return (jlong) pending_outbound_transaction_get_timestamp(pOutboundTx);
+}
+
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_tari_android_wallet_ffi_PendingOutboundTransaction_destroyJNI(
+        JNIEnv *jEnv,
+        jobject jThis,
+        jlong jpOutboundTx) {
+    pending_outbound_transaction_destroy((TariPendingOutboundTransaction *) jpOutboundTx);
+}
+
+//endregion
+
+//region Pending Outbound Transactions
+
+extern "C"
+JNIEXPORT jint JNICALL
+Java_com_tari_android_wallet_ffi_PendingOutboundTransactions_getLengthJNI(
+        JNIEnv *jEnv,
+        jobject jThis,
+        jlong jpOutboundTxs) {
+    auto *pOutboundTxs = (TariPendingOutboundTransactions *) jpOutboundTxs;
+    return pending_outbound_transactions_get_length(pOutboundTxs);
+}
+
+extern "C"
+JNIEXPORT jlong JNICALL
+Java_com_tari_android_wallet_ffi_PendingOutboundTransactions_getAtJNI(
+        JNIEnv *jEnv,
+        jobject jThis,
+        jlong jpOutboundTxs,
+        jint index) {
+    auto *pOutboundTxs = (TariPendingOutboundTransactions *) jpOutboundTxs;
+    return (jlong) pending_outbound_transactions_get_at(pOutboundTxs,
+                                                        static_cast<unsigned int>(index));
+}
+
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_tari_android_wallet_ffi_PendingOutboundTransactions_destroyJNI(
+        JNIEnv *jEnv,
+        jobject jThis,
+        jlong jpOutboundTxs) {
+    pending_outbound_transactions_destroy((TariPendingOutboundTransactions *) jpOutboundTxs);
+}
+
+//endregion
+
+//region Pending Inbound Transaction
+
+extern "C"
+JNIEXPORT jlong JNICALL
+Java_com_tari_android_wallet_ffi_PendingInboundTransaction_getIdJNI(
+        JNIEnv *jEnv,
+        jobject jThis,
+        jlong jpInboundTx) {
+    auto *pInboundTx = (TariPendingInboundTransaction *) jpInboundTx;
+    return (jlong) pending_inbound_transaction_get_transaction_id(pInboundTx);
+}
+
+extern "C"
+JNIEXPORT jlong JNICALL
+Java_com_tari_android_wallet_ffi_PendingInboundTransaction_getSourcePublicKeyJNI(
+        JNIEnv *jEnv,
+        jobject jThis,
+        jlong jpInboundTx) {
+    auto *pInboundTx = (TariPendingInboundTransaction *) jpInboundTx;
+    auto *pPublicKey = pending_inbound_transaction_get_source_public_key(pInboundTx);
+    return (jlong) pPublicKey;
+}
+
+extern "C"
+JNIEXPORT jlong JNICALL
+Java_com_tari_android_wallet_ffi_PendingInboundTransaction_getAmountJNI(
+        JNIEnv *jEnv,
+        jobject jThis,
+        jlong jpInboundTx) {
+    auto *pInboundTx = (TariPendingInboundTransaction *) jpInboundTx;
+    return (jlong) pending_inbound_transaction_get_amount(pInboundTx);
+}
+
+extern "C"
+JNIEXPORT jstring JNICALL
+Java_com_tari_android_wallet_ffi_PendingInboundTransaction_getMessageJNI(
+        JNIEnv *jEnv,
+        jobject jThis,
+        jlong jpInboundTx) {
+    auto *pInboundTx = (TariPendingInboundTransaction *) jpInboundTx;
+    const auto *pMessage = pending_inbound_transaction_get_message(pInboundTx);
+    return jEnv->NewStringUTF(pMessage);
+}
+
+extern "C"
+JNIEXPORT jlong JNICALL
+Java_com_tari_android_wallet_ffi_PendingInboundTransaction_getTimestampJNI(
+        JNIEnv *jEnv,
+        jobject jThis,
+        jlong jpInboundTx) {
+    auto *pInboundTx = (TariPendingInboundTransaction *) jpInboundTx;
+    return (jlong) pending_inbound_transaction_get_timestamp(pInboundTx);
+}
+
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_tari_android_wallet_ffi_PendingInboundTransaction_destroyJNI(
+        JNIEnv *jEnv,
+        jobject jThis,
+        jlong jpInboundTx) {
+    pending_inbound_transaction_destroy((TariPendingInboundTransaction *) jpInboundTx);
+}
+
+//endregion
+
+//region Pending Inbound Transactions
+
+extern "C"
+JNIEXPORT jint JNICALL
+Java_com_tari_android_wallet_ffi_PendingInboundTransactions_getLengthJNI(
+        JNIEnv *jEnv,
+        jobject jThis,
+        jlong jpInboundTxs) {
+    auto *pInboundTxs = (TariPendingInboundTransactions *) jpInboundTxs;
+    return pending_inbound_transactions_get_length(pInboundTxs);
+}
+
+extern "C"
+JNIEXPORT jlong JNICALL
+Java_com_tari_android_wallet_ffi_PendingInboundTransactions_getAtJNI(
+        JNIEnv *jEnv,
+        jobject jThis,
+        jlong jpInboundTxs,
+        jint index) {
+    auto *pInboundTxs = (TariPendingInboundTransactions *) jpInboundTxs;
+    return (jlong) pending_inbound_transactions_get_at(pInboundTxs,
+                                                       static_cast<unsigned int>(index));
+}
+
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_tari_android_wallet_ffi_PendingInboundTransactions_destroyJNI(
+        JNIEnv *jEnv,
+        jobject jThis,
+        jlong jpInboundTxs) {
+    pending_inbound_transactions_destroy((TariPendingInboundTransactions *) jpInboundTxs);
+}
+
+//endregion
+
+//region Callback Registration
+
+jobject txBroadcastCallbackReceiver;
+jmethodID txBroadcastCallbackMethodId;
+
+extern "C"
+JNIEXPORT jboolean JNICALL
+Java_com_tari_android_wallet_ffi_Wallet_registerTransactionBroadcastListenerJNI(
+        JNIEnv *jEnv,
+        jobject jThis,
+        jlong jpWallet,
+        jobject jCallbackObject) {
+    txBroadcastCallbackReceiver = jEnv->NewGlobalRef(jCallbackObject);
+    jclass jClass = jEnv->GetObjectClass(jCallbackObject);
+    if (jClass == nullptr) {
+        return (jboolean) false;
+    }
+    txBroadcastCallbackMethodId = jEnv->GetMethodID(jClass, "onTransactionBroadcast", "(J)V");
+    if (txBroadcastCallbackMethodId == nullptr) {
+        return (jboolean) false;
+    }
+    auto *pWallet = (TariWallet *) jpWallet;
+    return (jboolean) wallet_callback_register_transaction_broadcast(pWallet,
+                                                                     onTransactionBroadcast);
+}
+
+void onTransactionBroadcast(struct TariCompletedTransaction *pCompletedTransaction) {
+    auto *jniEnv = getJNIEnv();
+    if (jniEnv == nullptr) {
+        return;
+    }
+    auto jpCompletedTransaction = (jlong) pCompletedTransaction;
+    jniEnv->CallVoidMethod(
+            txBroadcastCallbackReceiver,
+            txBroadcastCallbackMethodId,
+            jpCompletedTransaction);
+    g_vm->DetachCurrentThread();
+}
+
+jobject txMinedCallbackReceiver;
+jmethodID txMinedCallbackMethodId;
+
+extern "C"
+JNIEXPORT jboolean JNICALL
+Java_com_tari_android_wallet_ffi_Wallet_registerTransactionMinedListenerJNI(
+        JNIEnv *jEnv,
+        jobject jThis,
+        jlong jpWallet,
+        jobject jCallbackObject) {
+    txMinedCallbackReceiver = jEnv->NewGlobalRef(jCallbackObject);
+    jclass jClass = jEnv->GetObjectClass(jCallbackObject);
+    if (jClass == nullptr) {
+        return (jboolean) false;
+    }
+    txMinedCallbackMethodId = jEnv->GetMethodID(jClass, "onTransactionMined", "(J)V");
+    if (txMinedCallbackMethodId == nullptr) {
+        return (jboolean) false;
+    }
+    auto *pWallet = (TariWallet *) jpWallet;
+    return (jboolean) wallet_callback_register_mined(pWallet, onTransactionMined);
+}
+
+void onTransactionMined(struct TariCompletedTransaction *pCompletedTransaction) {
+    auto *jniEnv = getJNIEnv();
+    if (jniEnv == nullptr) {
+        return;
+    }
+    auto jpCompletedTransaction = (jlong) pCompletedTransaction;
+    jniEnv->CallVoidMethod(
+            txMinedCallbackReceiver,
+            txMinedCallbackMethodId,
+            jpCompletedTransaction);
+    g_vm->DetachCurrentThread();
+}
+
+jobject txReceivedCallbackReceiver;
+jmethodID txReceivedCallbackMethodId;
+
+extern "C"
+JNIEXPORT jboolean JNICALL
+Java_com_tari_android_wallet_ffi_Wallet_registerTransactionReceivedListenerJNI(
+        JNIEnv *jEnv,
+        jobject jThis,
+        jlong jpWallet,
+        jobject jCallbackObject) {
+    txReceivedCallbackReceiver = jEnv->NewGlobalRef(jCallbackObject);
+    jclass jClass = jEnv->GetObjectClass(jCallbackObject);
+    if (jClass == nullptr) {
+        return (jboolean) false;
+    }
+    txReceivedCallbackMethodId = jEnv->GetMethodID(jClass, "onTransactionReceived", "(J)V");
+    if (txReceivedCallbackMethodId == nullptr) {
+        return (jboolean) false;
+    }
+    auto *pWallet = (TariWallet *) jpWallet;
+    return (jboolean) wallet_callback_register_received_transaction(pWallet, onTransactionReceived);
+}
+
+void onTransactionReceived(struct TariPendingInboundTransaction *pPendingInboundTransaction) {
+    auto *jniEnv = getJNIEnv();
+    if (jniEnv == nullptr) {
+        return;
+    }
+    auto jpPendingInboundTransaction = (jlong) pPendingInboundTransaction;
+    jniEnv->CallVoidMethod(
+            txReceivedCallbackReceiver,
+            txReceivedCallbackMethodId,
+            jpPendingInboundTransaction);
+    g_vm->DetachCurrentThread();
+}
+
+jobject txReplyReceivedCallbackReceiver;
+jmethodID txReplyReceivedCallbackMethodId;
+
+extern "C"
+JNIEXPORT jboolean JNICALL
+Java_com_tari_android_wallet_ffi_Wallet_registerTransactionReplyReceivedListenerJNI(
+        JNIEnv *jEnv,
+        jobject jThis,
+        jlong jpWallet,
+        jobject jCallbackObject) {
+    txReplyReceivedCallbackReceiver = jEnv->NewGlobalRef(jCallbackObject);
+    jclass jClass = jEnv->GetObjectClass(jCallbackObject);
+    if (jClass == nullptr) {
+        return (jboolean) false;
+    }
+    txReplyReceivedCallbackMethodId = jEnv->GetMethodID(jClass, "onTransactionReplyReceived",
+                                                        "(J)V");
+    if (txReplyReceivedCallbackMethodId == nullptr) {
+        return (jboolean) false;
+    }
+    auto *pWallet = (TariWallet *) jpWallet;
+    return (jboolean) wallet_callback_register_received_transaction_reply(pWallet,
+                                                                          onReceivedTransactionReply);
+}
+
+void onReceivedTransactionReply(struct TariCompletedTransaction *pCompletedTransaction) {
+    auto *jniEnv = getJNIEnv();
+    if (jniEnv == nullptr) {
+        return;
+    }
+    auto jpCompletedTransaction = (jlong) pCompletedTransaction;
+    jniEnv->CallVoidMethod(
+            txReplyReceivedCallbackReceiver,
+            txReplyReceivedCallbackMethodId,
+            jpCompletedTransaction);
+    g_vm->DetachCurrentThread();
+}
+
+//
+
+//region Wallet Test Functions
+
+extern "C"
+JNIEXPORT jboolean JNICALL
+Java_com_tari_android_wallet_ffi_TestWallet_testGenerateDataJNI(
+        JNIEnv *jEnv,
+        jobject jThis,
+        jlong jpWallet,
+        jstring jDatastorePath) {
+    auto *pDatastorePath = (char *) jEnv->GetStringUTFChars(jDatastorePath, JNI_FALSE);
+    bool success = wallet_test_generate_data((TariWallet *) jpWallet, pDatastorePath);
+    jEnv->ReleaseStringUTFChars(jDatastorePath, pDatastorePath);
+    return (jboolean) success;
+}
+
+extern "C"
+JNIEXPORT jboolean JNICALL
+Java_com_tari_android_wallet_ffi_TestWallet_testTransactionBroadcastJNI(
+        JNIEnv *jEnv,
+        jobject jThis,
+        jlong jpWallet,
+        jlong jTxId) {
+    auto *pWallet = (TariWallet *) jpWallet;
+    auto *pTx = (TariPendingInboundTransaction *) jTxId;
+    return (jboolean) wallet_test_transaction_broadcast(pWallet, pTx);
+}
+
+extern "C"
+JNIEXPORT jboolean JNICALL
+Java_com_tari_android_wallet_ffi_TestWallet_testCompleteSentTransactionJNI(
+        JNIEnv *jEnv,
+        jobject jThis,
+        jlong jpWallet,
+        jlong jTxId) {
+    auto *pWallet = (TariWallet *) jpWallet;
+    auto *pTx = (TariPendingOutboundTransaction *) jTxId;
+    return (jboolean) wallet_test_complete_sent_transaction(pWallet, pTx);
+}
+
+extern "C"
+JNIEXPORT jboolean JNICALL
+Java_com_tari_android_wallet_ffi_TestWallet_testMinedJNI(
+        JNIEnv *jEnv,
+        jobject jThis,
+        jlong jpWallet,
+        jlong jTxId) {
+    auto *pWallet = (TariWallet *) jpWallet;
+    auto *pTx = (TariCompletedTransaction *) jTxId;
+    return (jboolean) wallet_test_mined(pWallet, pTx);
+}
+
+extern "C"
+JNIEXPORT jboolean JNICALL
+Java_com_tari_android_wallet_ffi_TestWallet_testReceiveTransactionJNI(
+        JNIEnv *jEnv,
+        jobject jThis,
+        jlong jpWallet) {
+    auto *pWallet = (TariWallet *) jpWallet;
+    return (jboolean) wallet_test_receive_transaction(pWallet);
 }
 
 //endregion

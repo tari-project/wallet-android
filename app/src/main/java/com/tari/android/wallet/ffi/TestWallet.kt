@@ -33,52 +33,55 @@
 package com.tari.android.wallet.ffi
 
 /**
- * Wrapper for native private key type.
+ * Test wallet - separates the test functions.
  *
  * @author Kutsal Kaan Bilgin
  */
-class PrivateKey(ptr: PrivateKeyPtr) : FFIObjectWrapper(ptr) {
+class TestWallet(ptr: WalletPtr): Wallet(ptr) {
 
     /**
-     * JNI functions.
+     * JNI test functions.
      */
-    private external fun getBytesJNI(privateKeyPtr: PrivateKeyPtr): ByteVectorPtr
-    private external fun destroyJNI(privateKeyPtr: PrivateKeyPtr)
+    private external fun testGenerateDataJNI(
+        walletPtr: WalletPtr,
+        datastorePath: String
+    ): Boolean
+    private external fun testTransactionBroadcastJNI(
+        walletPtr: WalletPtr,
+        txId: PendingInboundTransactionPtr
+    ): Boolean
+    private external fun testCompleteSentTransactionJNI(
+        walletPtr: WalletPtr,
+        txId: PendingOutboundTransactionPtr
+    ): Boolean
+    private external fun testMinedJNI(walletPtr: WalletPtr, txId: CompletedTransactionPtr): Boolean
+    private external fun testReceiveTransactionJNI(walletPtr: WalletPtr): Boolean
 
     companion object {
 
-        /**
-         * JNI static functions.
-         */
-        @JvmStatic
-        private external fun createJNI(byteVectorPtr: ByteVectorPtr): PrivateKeyPtr
-        @JvmStatic
-        private external fun generateJNI(): PrivateKeyPtr
-        @JvmStatic
-        private external fun fromHexJNI(hexStr: String): PrivateKeyPtr
-
-        fun create(byteVector: ByteVector): PrivateKey {
-            return PrivateKey(createJNI(byteVector.ptr))
-        }
-
-        fun generate(): PrivateKey {
-            return PrivateKey(generateJNI())
-        }
-
-        fun fromHex(hexStr: String): PrivateKey {
-            return PrivateKey(fromHexJNI(hexStr))
+        internal fun create(walletConfig: CommsConfig, logPath: String): TestWallet {
+            return TestWallet(Wallet.create(walletConfig, logPath).ptr)
         }
 
     }
 
-    val bytes: ByteVector
-        get() {
-            return ByteVector(getBytesJNI(ptr))
-        }
-
-    public override fun destroy() {
-        destroyJNI(ptr)
-        super.destroy()
+    fun generateTestData(datastorePath: String): Boolean {
+        return testGenerateDataJNI(ptr, datastorePath)
     }
 
+    fun testTransactionBroadcast(tx: PendingInboundTransaction): Boolean {
+        return testTransactionBroadcastJNI(ptr, tx.ptr)
+    }
+
+    fun testCompleteSentTransaction(tx: PendingOutboundTransaction): Boolean {
+        return testCompleteSentTransactionJNI(ptr, tx.ptr)
+    }
+
+    fun testMined(tx: CompletedTransaction): Boolean {
+        return testMinedJNI(ptr, tx.ptr)
+    }
+
+    fun testReceiveTransaction(): Boolean {
+        return testReceiveTransactionJNI(ptr)
+    }
 }

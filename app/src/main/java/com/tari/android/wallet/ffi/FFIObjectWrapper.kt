@@ -42,6 +42,12 @@ typealias ContactsPtr = Long
 typealias CommsConfigPtr = Long
 typealias WalletConfigPtr = Long
 typealias WalletPtr = Long
+typealias CompletedTransactionPtr = Long
+typealias CompletedTransactionsPtr = Long
+typealias PendingOutboundTransactionPtr = Long
+typealias PendingOutboundTransactionsPtr = Long
+typealias PendingInboundTransactionPtr = Long
+typealias PendingInboundTransactionsPtr = Long
 
 /**
  * Super class for the FFI wrappers.

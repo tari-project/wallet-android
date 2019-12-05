@@ -33,7 +33,6 @@
 package com.tari.android.wallet
 
 import com.tari.android.wallet.ffi.Contact
-import com.tari.android.wallet.ffi.Contacts
 import com.tari.android.wallet.ffi.NULL_POINTER
 import com.tari.android.wallet.ffi.PublicKey
 import org.junit.Assert.*

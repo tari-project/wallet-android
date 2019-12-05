@@ -32,23 +32,61 @@
  */
 package com.tari.android.wallet.ffi
 
-class Wallet(ptr: WalletPtr) : FFIObjectWrapper(ptr) {
+/**
+ * Wallet wrapper.
+ *
+ * @author Kutsal Kaan Bilgin
+ */
+open class Wallet(ptr: WalletPtr) : FFIObjectWrapper(ptr) {
 
     /**
      * JNI functions.
      */
-    private external fun walletGetContactsJNI(walletPtr: WalletPtr): ContactsPtr
-    private external fun walletGetPublicKeyJNI(walletPtr: WalletPtr): PublicKeyPtr
-    private external fun walletGetAvailableBalanceJNI(walletPtr: WalletPtr): ULong
-    private external fun walletGetPendingIncomingBalanceJNI(walletPtr: WalletPtr): ULong
-    private external fun walletGetPendingOutgoingBalanceJNI(walletPtr: WalletPtr): ULong
-    private external fun walletAddContactJNI(walletPtr: WalletPtr, contactPtr: ContactPtr): Boolean
-    private external fun walletRemoveContactJNI(walletPtr: WalletPtr, contactPtr: ContactPtr): Boolean
-    private external fun walletDestroyJNI(walletPtr: WalletPtr)
-
-    private external fun walletTestGenerateDataJNI(
+    private external fun getPublicKeyJNI(walletPtr: WalletPtr): PublicKeyPtr
+    private external fun getAvailableBalanceJNI(walletPtr: WalletPtr): Long
+    private external fun getPendingIncomingBalanceJNI(walletPtr: WalletPtr): Long
+    private external fun getPendingOutgoingBalanceJNI(walletPtr: WalletPtr): Long
+    private external fun getContactsJNI(walletPtr: WalletPtr): ContactsPtr
+    private external fun addContactJNI(walletPtr: WalletPtr, contactPtr: ContactPtr): Boolean
+    private external fun removeContactJNI(walletPtr: WalletPtr, contactPtr: ContactPtr): Boolean
+    private external fun getCompletedTransactionsJNI(walletPtr: WalletPtr): CompletedTransactionsPtr
+    private external fun getCompletedTransactionByIdJNI(
         walletPtr: WalletPtr,
-        datastorePath: String
+        id: Long
+    ): CompletedTransactionPtr
+
+    private external fun getPendingOutboundTransactionsJNI(walletPtr: WalletPtr): PendingOutboundTransactionsPtr
+    private external fun getPendingOutboundTransactionByIdJNI(
+        walletPtr: WalletPtr,
+        id: Long
+    ): PendingOutboundTransactionPtr
+
+    private external fun getPendingInboundTransactionsJNI(walletPtr: WalletPtr): PendingInboundTransactionsPtr
+    private external fun getPendingInboundTransactionByIdJNI(
+        walletPtr: WalletPtr,
+        id: Long
+    ): PendingInboundTransactionPtr
+
+    private external fun destroyJNI(walletPtr: WalletPtr)
+
+    /**
+     * JNI callback registration functions.
+     */
+    private external fun registerTransactionBroadcastListenerJNI(
+        walletPtr: WalletPtr,
+        listener: OnTransactionBroadcastListener
+    ): Boolean
+    private external fun registerTransactionMinedListenerJNI(
+        walletPtr: WalletPtr,
+        listener: OnTransactionMinedListener
+    ): Boolean
+    private external fun registerTransactionReceivedListenerJNI(
+        walletPtr: WalletPtr,
+        listener: OnTransactionReceivedListener
+    ): Boolean
+    private external fun registerTransactionReplyReceivedListenerJNI(
+        walletPtr: WalletPtr,
+        listener: OnTransactionReplyReceivedListener
     ): Boolean
 
     companion object {
@@ -57,39 +95,87 @@ class Wallet(ptr: WalletPtr) : FFIObjectWrapper(ptr) {
          * JNI static functions.
          */
         @JvmStatic
-        private external fun walletCreateJNI(
+        external fun createJNI(
             walletConfigPtr: WalletConfigPtr,
             logPath: String
         ): WalletPtr
 
-        fun create(walletConfig: CommsConfig, logPath: String): Wallet {
-            return Wallet(walletCreateJNI(walletConfig.ptr, logPath))
+        internal fun create(walletConfig: CommsConfig, logPath: String): Wallet {
+            return Wallet(createJNI(walletConfig.ptr, logPath))
         }
 
     }
 
-    fun generateTestData(datastorePath: String): Boolean {
-        return walletTestGenerateDataJNI(ptr, datastorePath)
+    fun getAvailableBalance(): Long {
+        return getAvailableBalanceJNI(ptr)
+    }
+
+    fun getPendingIncomingBalance(): Long {
+        return getPendingIncomingBalanceJNI(ptr)
+    }
+
+    fun getPendingOutgoingBalance(): Long {
+        return getPendingOutgoingBalanceJNI(ptr)
     }
 
     fun getPublicKey(): PublicKey {
-        return PublicKey(walletGetPublicKeyJNI(ptr))
+        return PublicKey(getPublicKeyJNI(ptr))
     }
 
     fun getContacts(): Contacts {
-        return Contacts(walletGetContactsJNI(ptr))
+        return Contacts(getContactsJNI(ptr))
     }
 
     fun addContact(contact: Contact): Boolean {
-        return walletAddContactJNI(ptr, contact.ptr)
+        return addContactJNI(ptr, contact.ptr)
     }
 
     fun removeContact(contact: Contact): Boolean {
-        return walletRemoveContactJNI(ptr, contact.ptr)
+        return removeContactJNI(ptr, contact.ptr)
+    }
+
+    fun getCompletedTransactions(): CompletedTransactions {
+        return CompletedTransactions(getCompletedTransactionsJNI(ptr))
+    }
+
+    fun getCompletedTransactionById(id: Long): CompletedTransaction {
+        return CompletedTransaction(getCompletedTransactionByIdJNI(ptr, id))
+    }
+
+    fun getPendingOutboundTransactions(): PendingOutboundTransactions {
+        return PendingOutboundTransactions(getPendingOutboundTransactionsJNI(ptr))
+    }
+
+    fun getPendingOutboundTransactionById(id: Long): PendingOutboundTransaction {
+        return PendingOutboundTransaction(getPendingOutboundTransactionByIdJNI(ptr, id))
+    }
+
+    fun getPendingInboundTransactions(): PendingInboundTransactions {
+        return PendingInboundTransactions(getPendingInboundTransactionsJNI(ptr))
+    }
+
+    fun getPendingInboundTransactionById(id: Long): PendingInboundTransaction {
+        return PendingInboundTransaction(getPendingInboundTransactionByIdJNI(ptr, id))
+    }
+
+    fun setOnTransactionBroadcastListener(listener: OnTransactionBroadcastListener): Boolean {
+        return registerTransactionBroadcastListenerJNI(ptr, listener)
+    }
+
+    fun setOnTransactionMinedListener(listener: OnTransactionMinedListener): Boolean {
+        return registerTransactionMinedListenerJNI(ptr, listener)
+    }
+
+    fun setOnTransactionReceivedListener(listener: OnTransactionReceivedListener): Boolean {
+        return registerTransactionReceivedListenerJNI(ptr, listener)
+    }
+
+    fun setOnTransactionReplyReceivedListener(listener: OnTransactionReplyReceivedListener): Boolean {
+        return registerTransactionReplyReceivedListenerJNI(ptr, listener)
     }
 
     public override fun destroy() {
-        walletDestroyJNI(ptr)
+        destroyJNI(ptr)
         super.destroy()
     }
 
