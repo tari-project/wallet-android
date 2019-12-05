@@ -1,21 +1,26 @@
 /**
  * Copyright 2019 The Tari Project
  *
+ *
  * Redistribution and use in source and binary forms, with or
  * without modification, are permitted provided that the
  * following conditions are met:
-
+ *
+ *
  * 1. Redistributions of source code must retain the above copyright notice,
  * this list of conditions and the following disclaimer.
-
+ *
+ *
  * 2. Redistributions in binary form must reproduce the above
  * copyright notice, this list of conditions and the following disclaimer in the
  * documentation and/or other materials provided with the distribution.
-
+ *
+ *
  * 3. Neither the name of the copyright holder nor the names of
  * its contributors may be used to endorse or promote products
  * derived from this software without specific prior written permission.
-
+ *
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND
  * CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES,
  * INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
@@ -32,19 +37,33 @@
  */
 package com.tari.android.wallet
 
+import com.tari.android.wallet.ffi.NULL_POINTER
 import org.junit.Assert.*
 import org.junit.Test
 
-/**
- * FFI contacts tests.
- *
- * @author Kutsal Kaan Bilgin
- */
-class ContactsTests {
+class WalletBasicTests {
+
+    val wallet = TestUtil.testWallet
 
     @Test
-    fun empty() {
-        assertTrue(4 < 5)
+    fun testCreateWallet() {
+        assertTrue(wallet.ptr != NULL_POINTER)
+    }
+
+    @Test
+    fun testGenerateTestData() {
+        assertTrue(wallet.ptr != NULL_POINTER)
+        val success = wallet.generateTestData(TestUtil.WALLET_DATASTORE_PATH)
+        assertTrue(success)
+    }
+
+    @Test
+    fun testGetPublicKey() {
+        val publicKey = wallet.getPublicKey()
+        val bytes = publicKey.bytes
+        assertEquals(TestUtil.PUBLIC_KEY_HEX_STRING, bytes.hexString)
+        bytes.destroy()
+        publicKey.destroy()
     }
 
 }

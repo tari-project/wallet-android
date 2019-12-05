@@ -47,23 +47,24 @@ import java.io.File
 class TestUtil {
 
     companion object {
+
         private const val WALLET_LOG_FILE_NAME = "tari_log.txt"
         private val WALLET_FILES_DIR_PATH =
             InstrumentationRegistry.getInstrumentation().targetContext.filesDir.absolutePath
 
-        internal const val WALLET_DB_NAME = "tari_test_db"
-        internal const val WALLET_CONTROL_SERVICE_ADDRESS = "127.0.0.1:80"
-        internal const val WALLET_LISTENER_ADDRESS = "0.0.0.0:0"
-        internal val WALLET_DATASTORE_PATH = "$WALLET_FILES_DIR_PATH"
-        internal val WALLET_LOG_FILE_PATH = "$WALLET_FILES_DIR_PATH/$WALLET_LOG_FILE_NAME"
+        private const val WALLET_DB_NAME = "tari_test_db"
+        private const val WALLET_CONTROL_SERVICE_ADDRESS = "127.0.0.1:80"
+        private const val WALLET_LISTENER_ADDRESS = "0.0.0.0:0"
+        internal val WALLET_DATASTORE_PATH = WALLET_FILES_DIR_PATH
+        private val WALLET_LOG_FILE_PATH = "$WALLET_FILES_DIR_PATH/$WALLET_LOG_FILE_NAME"
 
-        private lateinit var privateKey: PrivateKey
-        private lateinit var commsConfig: CommsConfig
-        private lateinit var wallet: Wallet
+        private var mTestWallet: Wallet? = null
 
+        /**
+         * Matching pair of public & private keys.
+         */
         const val PUBLIC_KEY_HEX_STRING =
             "30E1DFA197794858BFDBF96CDCE5DC8637D4BD1202DC694991040DDECBF42D40"
-
         const val PRIVATE_KEY_HEX_STRING =
             "6259C39F75E27140A652A5EE8AEFB3CF6C1686EF21D27793338D899380E8C801"
 
@@ -72,21 +73,37 @@ class TestUtil {
             return (1..len).map { characters.random() }.joinToString("")
         }
 
-        fun createTestWallet(): Wallet {
-            privateKey = PrivateKey.fromHex(PRIVATE_KEY_HEX_STRING)
-            commsConfig = CommsConfig.create(
-                WALLET_CONTROL_SERVICE_ADDRESS,
-                WALLET_LISTENER_ADDRESS,
-                WALLET_DB_NAME,
-                WALLET_DATASTORE_PATH,
-                privateKey
-            )
-            wallet = Wallet.create(commsConfig, WALLET_LOG_FILE_PATH)
-            return wallet
+        private fun clearTestFiles(path: String): Boolean {
+            val fileDirectory = File(path)
+            val del = fileDirectory.deleteRecursively()
+            val directory = File(path)
+            if (!directory.exists()) {
+                directory.mkdir()
+            }
+            return del
         }
 
+        val testWallet: Wallet
+            get() {
+                if (mTestWallet == null) {
+                    clearTestFiles(WALLET_DATASTORE_PATH)
+                    val privateKey = PrivateKey.fromHex(PRIVATE_KEY_HEX_STRING)
+                    val commsConfig = CommsConfig.create(
+                        WALLET_CONTROL_SERVICE_ADDRESS,
+                        WALLET_LISTENER_ADDRESS,
+                        WALLET_DB_NAME,
+                        WALLET_DATASTORE_PATH,
+                        privateKey
+                    )
+                    mTestWallet = Wallet.create(commsConfig, WALLET_LOG_FILE_PATH)
+                    privateKey.destroy()
+                    commsConfig.destroy()
+                }
+                return mTestWallet ?: throw AssertionError("Set to null by another thread")
+            }
+
         fun destroyTestWallet() {
-            wallet.destroy()
+            testWallet?.destroy()
         }
 
         fun printFFILogFile() {
@@ -94,7 +111,7 @@ class TestUtil {
             File(WALLET_LOG_FILE_PATH).forEachLine {
                 log += "\n" + it
             }
-            log += "\ndone"
+            Logger.d("FFI log file contents:\n$log")
         }
 
     }

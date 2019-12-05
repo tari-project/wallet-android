@@ -37,8 +37,19 @@ class Wallet(ptr: WalletPtr) : FFIObjectWrapper(ptr) {
     /**
      * JNI functions.
      */
+    private external fun walletGetContactsJNI(walletPtr: WalletPtr): ContactsPtr
+    private external fun walletGetPublicKeyJNI(walletPtr: WalletPtr): PublicKeyPtr
+    private external fun walletGetAvailableBalanceJNI(walletPtr: WalletPtr): ULong
+    private external fun walletGetPendingIncomingBalanceJNI(walletPtr: WalletPtr): ULong
+    private external fun walletGetPendingOutgoingBalanceJNI(walletPtr: WalletPtr): ULong
+    private external fun walletAddContactJNI(walletPtr: WalletPtr, contactPtr: ContactPtr): Boolean
+    private external fun walletRemoveContactJNI(walletPtr: WalletPtr, contactPtr: ContactPtr): Boolean
     private external fun walletDestroyJNI(walletPtr: WalletPtr)
-    private external fun walletTestGenerateDataJNI(walletPtr: WalletPtr, datastore_path: String): Boolean
+
+    private external fun walletTestGenerateDataJNI(
+        walletPtr: WalletPtr,
+        datastorePath: String
+    ): Boolean
 
     companion object {
 
@@ -57,8 +68,24 @@ class Wallet(ptr: WalletPtr) : FFIObjectWrapper(ptr) {
 
     }
 
-    fun generateTestData(datastore_path: String): Boolean {
-        return walletTestGenerateDataJNI(ptr,datastore_path)
+    fun generateTestData(datastorePath: String): Boolean {
+        return walletTestGenerateDataJNI(ptr, datastorePath)
+    }
+
+    fun getPublicKey(): PublicKey {
+        return PublicKey(walletGetPublicKeyJNI(ptr))
+    }
+
+    fun getContacts(): Contacts {
+        return Contacts(walletGetContactsJNI(ptr))
+    }
+
+    fun addContact(contact: Contact): Boolean {
+        return walletAddContactJNI(ptr, contact.ptr)
+    }
+
+    fun removeContact(contact: Contact): Boolean {
+        return walletRemoveContactJNI(ptr, contact.ptr)
     }
 
     public override fun destroy() {
