@@ -39,15 +39,11 @@ import com.orhanobut.logger.Logger
 /**
  * Main application class.
  *
- * @author Kutsal Kaan Bilgin
+ * @author The Tari Development Team
  */
-@Suppress("unused")
 class TariWalletApplication : Application() {
-
-    companion object {
-        init {
-            System.loadLibrary("native-lib")
-        }
+    init {
+        System.loadLibrary("native-lib")
     }
 
     override fun onCreate() {

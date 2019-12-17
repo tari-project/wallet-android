@@ -16,7 +16,7 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
         ndk {
-            abiFilters "armeabi-v7a", "x86_64", "x86", "arm64-v8a"
+            abiFilters "armeabi-v7a", "x86" //, "arm64-v8a", "x86_64" //TODO Put these back for final build
         }
         externalNativeBuild {
             cmake {
@@ -29,6 +29,7 @@ android {
         debug {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            jniDebuggable = true
         }
         release {
             minifyEnabled false
@@ -43,8 +44,8 @@ android {
     }
 
     compileOptions {
-        targetCompatibility 1.8
-        sourceCompatibility 1.8
+        targetCompatibility "1.8"
+        sourceCompatibility "1.8"
     }
 }
 
@@ -52,8 +53,8 @@ dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
     // kotlin
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
+    implementation "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
     // android
     implementation 'androidx.appcompat:appcompat:1.1.0'
     implementation 'androidx.core:core-ktx:1.1.0'
@@ -66,11 +67,12 @@ dependencies {
     implementation 'androidx.legacy:legacy-support-v13:1.0.0'
 
     // firebase
-    implementation 'com.google.firebase:firebase-messaging:20.0.1'
+    implementation 'com.google.firebase:firebase-messaging:20.1.0'
 
     // test
     testImplementation 'junit:junit:4.12'
     testImplementation 'org.mockito:mockito-core:2.19.0'
+    androidTestImplementation 'androidx.test:core:1.2.0'
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
 
@@ -87,7 +89,7 @@ dependencies {
     kapt 'org.parceler:parceler:1.1.12'
 
     // lottie
-    implementation "com.airbnb.android:lottie:3.1.0"
+    implementation 'com.airbnb.android:lottie:3.3.1'
     // butterknife
     implementation "com.jakewharton:butterknife:10.2.0"
     //annotationProcessor "com.jakewharton:butterknife-compiler:10.2.0"

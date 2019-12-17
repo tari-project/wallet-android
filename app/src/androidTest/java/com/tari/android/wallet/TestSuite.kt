@@ -38,7 +38,7 @@ import org.junit.runners.Suite
 /**
  * Suite of all instrumented tests.
  *
- * @author Kutsal Kaan Bilgin
+ * @author The Tari Development Team
  */
 @RunWith(Suite::class)
 @Suite.SuiteClasses(
@@ -47,10 +47,6 @@ import org.junit.runners.Suite
     PublicKeyTests::class,
     ContactTests::class,
     CommsConfigTests::class,
-    WalletBasicTests::class,
-    WalletContactsTests::class,
-    WalletCompletedTransactionsTests::class,
-    WalletPendingOutboundTransactionsTests::class,
-    WalletPendingInboundTransactionsTests::class
+    WalletTests::class
 )
 class TestSuite

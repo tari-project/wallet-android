@@ -31,152 +31,305 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 package com.tari.android.wallet.ffi
+import android.util.Log
+import java.io.InvalidObjectException
+import java.lang.RuntimeException
+import java.math.BigInteger
 
 /**
  * Wallet wrapper.
  *
- * @author Kutsal Kaan Bilgin
+ * @author The Tari Development Team
  */
-open class Wallet(ptr: WalletPtr) : FFIObjectWrapper(ptr) {
 
-    /**
-     * JNI functions.
-     */
-    private external fun getPublicKeyJNI(walletPtr: WalletPtr): PublicKeyPtr
-    private external fun getAvailableBalanceJNI(walletPtr: WalletPtr): Long
-    private external fun getPendingIncomingBalanceJNI(walletPtr: WalletPtr): Long
-    private external fun getPendingOutgoingBalanceJNI(walletPtr: WalletPtr): Long
-    private external fun getContactsJNI(walletPtr: WalletPtr): ContactsPtr
-    private external fun addContactJNI(walletPtr: WalletPtr, contactPtr: ContactPtr): Boolean
-    private external fun removeContactJNI(walletPtr: WalletPtr, contactPtr: ContactPtr): Boolean
-    private external fun getCompletedTransactionsJNI(walletPtr: WalletPtr): CompletedTransactionsPtr
-    private external fun getCompletedTransactionByIdJNI(
-        walletPtr: WalletPtr,
-        id: Long
-    ): CompletedTransactionPtr
+typealias WalletPtr = Long
 
-    private external fun getPendingOutboundTransactionsJNI(walletPtr: WalletPtr): PendingOutboundTransactionsPtr
-    private external fun getPendingOutboundTransactionByIdJNI(
-        walletPtr: WalletPtr,
-        id: Long
-    ): PendingOutboundTransactionPtr
+object Wallet {
 
-    private external fun getPendingInboundTransactionsJNI(walletPtr: WalletPtr): PendingInboundTransactionsPtr
-    private external fun getPendingInboundTransactionByIdJNI(
-        walletPtr: WalletPtr,
-        id: Long
-    ): PendingInboundTransactionPtr
+    private external fun jniCreate(commsConfig: CommsConfigPtr, logPath: String, libError: LibError): WalletPtr
+    private external fun jniGetPublicKey(walletPtr: WalletPtr, libError: LibError): PublicKeyPtr
+    private external fun jniGetAvailableBalance(walletPtr: WalletPtr, libError: LibError): ByteArray
+    private external fun jniGetPendingIncomingBalance(walletPtr: WalletPtr, libError: LibError): ByteArray
+    private external fun jniGetPendingOutgoingBalance(walletPtr: WalletPtr, libError: LibError): ByteArray
+    private external fun jniGetContacts(walletPtr: WalletPtr, libError: LibError): ContactsPtr
+    private external fun jniAddContact(walletPtr: WalletPtr, contactPtr: ContactPtr, libError: LibError): Boolean
+    private external fun jniRemoveContact(walletPtr: WalletPtr, contactPtr: ContactPtr, libError: LibError): Boolean
+    private external fun jniGetCompletedTransactions(walletPtr: WalletPtr ,libError: LibError): CompletedTransactionsPtr
+    private external fun jniGetCompletedTransactionById(walletPtr: WalletPtr, id: Long, libError: LibError): CompletedTransactionPtr
+    private external fun jniGetPendingOutboundTransactions(walletPtr: WalletPtr, libError: LibError): PendingOutboundTransactionsPtr
+    private external fun jniGetPendingOutboundTransactionById(walletPtr: WalletPtr, id: Long, libError: LibError): PendingOutboundTransactionPtr
+    private external fun jniGetPendingInboundTransactions(walletPtr: WalletPtr, libError: LibError): PendingInboundTransactionsPtr
+    private external fun jniGetPendingInboundTransactionById(walletPtr: WalletPtr, id: Long, libError: LibError): PendingInboundTransactionPtr
+    private external fun jniGenerateTestData(walletPtr: WalletPtr, datastorePath: String, libError: LibError): Boolean
+    private external fun jniTransactionBroadcast(walletPtr: WalletPtr, txId: PendingInboundTransactionPtr, libError: LibError): Boolean
+    private external fun jniCompleteSentTransaction(walletPtr: WalletPtr, txId: PendingOutboundTransactionPtr, libError: LibError): Boolean
+    private external fun jniMineCompletedTransaction(walletPtr: WalletPtr, txId: CompletedTransactionPtr, libError: LibError): Boolean
+    private external fun jniReceiveTransaction(walletPtr: WalletPtr, libError: LibError): Boolean
+    private external fun jniDestroy(walletPtr: WalletPtr)
 
-    private external fun destroyJNI(walletPtr: WalletPtr)
-
-    /**
-     * JNI callback registration functions.
-     */
-    private external fun registerTransactionBroadcastListenerJNI(
-        walletPtr: WalletPtr,
-        listener: OnTransactionBroadcastListener
-    ): Boolean
-    private external fun registerTransactionMinedListenerJNI(
-        walletPtr: WalletPtr,
-        listener: OnTransactionMinedListener
-    ): Boolean
-    private external fun registerTransactionReceivedListenerJNI(
-        walletPtr: WalletPtr,
-        listener: OnTransactionReceivedListener
-    ): Boolean
-    private external fun registerTransactionReplyReceivedListenerJNI(
-        walletPtr: WalletPtr,
-        listener: OnTransactionReplyReceivedListener
-    ): Boolean
-
-    companion object {
-
-        /**
-         * JNI static functions.
-         */
-        @JvmStatic
-        external fun createJNI(
-            walletConfigPtr: WalletConfigPtr,
-            logPath: String
-        ): WalletPtr
-
-        internal fun create(walletConfig: CommsConfig, logPath: String): Wallet {
-            return Wallet(createJNI(walletConfig.ptr, logPath))
+    fun generateTestData(datastorePath: String): Boolean {
+        var error = LibError()
+        val result = jniGenerateTestData(getPointer(), datastorePath, error)
+        if (error.code != 0)
+        {
+            throw RuntimeException()
         }
-
+        return result
+    }
+    fun transactionBroadcast(tx: PendingInboundTransaction): Boolean {
+        var error = LibError()
+        val result = jniTransactionBroadcast(getPointer(), tx.getPointer(),error)
+        if (error.code != 0)
+        {
+            throw RuntimeException()
+        }
+        return result
+    }
+    fun completeSentTransaction(tx: PendingOutboundTransaction): Boolean {
+        var error = LibError()
+        val result = jniCompleteSentTransaction(getPointer(), tx.getPointer(),error)
+        if (error.code != 0)
+        {
+            throw RuntimeException()
+        }
+        return result
+    }
+    fun minedCompletedTransaction(tx: CompletedTransaction): Boolean {
+        var error = LibError()
+        val result = jniMineCompletedTransaction(getPointer(), tx.getPointer(),error)
+        if (error.code != 0)
+        {
+            throw RuntimeException()
+        }
+        return result
+    }
+    fun receiveTransaction(): Boolean {
+        var error = LibError()
+        val result = jniReceiveTransaction(getPointer(),error)
+        if (error.code != 0)
+        {
+            throw RuntimeException()
+        }
+        return result
     }
 
-    fun getAvailableBalance(): Long {
-        return getAvailableBalanceJNI(ptr)
+    // TODO Add listeners to wallet
+    private fun onTransactionBroadcast(ptr: CompletedTransactionPtr) {
+        Log.i("onTransactionReceived",ptr.toString())
+        val param = CompletedTransaction(ptr)
+        listenerAdapter?.onTransactionBroadcast(param)
+        param.destroy()
     }
 
-    fun getPendingIncomingBalance(): Long {
-        return getPendingIncomingBalanceJNI(ptr)
+    private fun onTransactionMined(ptr: CompletedTransactionPtr) {
+        Log.i("onTransactionReceived",ptr.toString())
+        val param = CompletedTransaction(ptr)
+        listenerAdapter?.onTransactionMined(param)
+        param.destroy()
     }
 
-    fun getPendingOutgoingBalance(): Long {
-        return getPendingOutgoingBalanceJNI(ptr)
+    private fun onTransactionReceived(ptr: PendingInboundTransactionPtr) {
+        Log.i("onTransactionReceived",ptr.toString())
+        val param = PendingInboundTransaction(ptr)
+        listenerAdapter?.onTransactionReceived(param)
+        param.destroy()
+    }
+
+    private fun onTransactionReplyReceived(ptr: CompletedTransactionPtr) {
+        Log.i("onTransactionReplyReceived",ptr.toString())
+        val param = CompletedTransaction(ptr)
+        listenerAdapter?.onTransactionReplyReceived(param)
+        param.destroy()
+    }
+
+    private fun onTransactionFinalized(ptr: CompletedTransactionPtr) {
+        Log.i("onTransactionFinalized",ptr.toString())
+        val param = CompletedTransaction(ptr)
+        listenerAdapter?.onTransactionFinalized(param)
+        param.destroy()
+    }
+
+    private external fun jniRegisterTransactionBroadcast(walletPtr: WalletPtr,methodName: String,methodSignature: String, libError: LibError): Boolean
+    private external fun jniRegisterTransactionMined(walletPtr: WalletPtr,methodName: String,methodSignature: String, libError: LibError): Boolean
+    private external fun jniRegisterTransactionReceived(walletPtr: WalletPtr,methodName: String,methodSignature: String, libError: LibError): Boolean
+    private external fun jniRegisterTransactionReplyReceived(walletPtr: WalletPtr,methodName: String,methodSignature: String, libError: LibError): Boolean
+    private external fun jniRegisterFinalizedTransaction(walletPtr: WalletPtr,methodName: String,methodSignature: String, libError: LibError): Boolean
+    private fun registerCallbacks(): Boolean {
+        var error = LibError()
+        val result = jniRegisterTransactionBroadcast(ptr,this::onTransactionBroadcast.name,"(J)V",error)
+                && jniRegisterTransactionMined(ptr,this::onTransactionMined.name,"(J)V",error)
+                && jniRegisterTransactionReceived(ptr,this::onTransactionReceived.name,"(J)V",error)
+                && jniRegisterTransactionReplyReceived(ptr,this::onTransactionReplyReceived.name,"(J)V",error)
+                && jniRegisterFinalizedTransaction(ptr,this::onTransactionFinalized.name,"(J)V",error)
+        if (error.code != 0)
+        {
+            throw RuntimeException()
+        }
+        return result
+    }
+
+    private var ptr = nullptr
+    private var listenerAdapter : WalletListenerAdapter? = null
+    // this acts as a constructor would for a normal class since constructors are not allowed for
+    // singletons
+    fun init(commsConfig: CommsConfig, logPath: String, listeners: WalletListenerAdapter) {
+        if (ptr == nullptr)
+        { //so it can only be assigned once for the singleton
+            var error = LibError()
+            ptr = jniCreate(commsConfig.getPointer(), logPath, error)
+            Log.i("Wallet Code", error.code.toString())
+            if (error.code != 0)
+            {
+                throw RuntimeException()
+            }
+            if (ptr != nullptr) {
+                if (!registerCallbacks()) {
+                    throw InvalidObjectException("Failure in Wallet Callbacks")
+                } else
+                {
+                    listenerAdapter = listeners
+                }
+            } else throw InvalidObjectException("Failure to create Wallet")
+        }
+    }
+
+    fun getPointer(): PrivateKeyPtr {
+        return ptr
+    }
+
+    fun getAvailableBalance(): BigInteger {
+        var error = LibError()
+        val bytes = jniGetAvailableBalance(ptr,error)
+        if (error.code != 0)
+        {
+            throw RuntimeException()
+        }
+        return BigInteger(1,bytes)
+    }
+
+    fun getPendingIncomingBalance(): BigInteger {
+        var error = LibError()
+        val bytes = jniGetPendingIncomingBalance(ptr,error)
+        if (error.code != 0)
+        {
+            throw RuntimeException()
+        }
+        return BigInteger(1,bytes)
+    }
+
+    fun getPendingOutgoingBalance(): BigInteger {
+        var error = LibError()
+        val bytes = jniGetPendingOutgoingBalance(ptr, error)
+        if (error.code != 0)
+        {
+            throw RuntimeException()
+        }
+        return BigInteger(1,bytes)
     }
 
     fun getPublicKey(): PublicKey {
-        return PublicKey(getPublicKeyJNI(ptr))
+        var error = LibError()
+        val result = PublicKey(jniGetPublicKey(ptr,error))
+        if (error.code != 0)
+        {
+            throw RuntimeException()
+        }
+        return result
     }
 
     fun getContacts(): Contacts {
-        return Contacts(getContactsJNI(ptr))
+        var error = LibError()
+        val result = Contacts(jniGetContacts(ptr,error))
+        if (error.code != 0)
+        {
+            throw RuntimeException()
+        }
+        return result
     }
 
     fun addContact(contact: Contact): Boolean {
-        return addContactJNI(ptr, contact.ptr)
+        var error = LibError()
+        val result = jniAddContact(ptr, contact.getPointer(),error)
+        if (error.code != 0)
+        {
+            throw RuntimeException()
+        }
+        return result
     }
 
     fun removeContact(contact: Contact): Boolean {
-        return removeContactJNI(ptr, contact.ptr)
+        var error = LibError()
+        val result = jniRemoveContact(ptr, contact.getPointer(),error)
+        if (error.code != 0)
+        {
+            throw RuntimeException()
+        }
+        return result
     }
 
     fun getCompletedTransactions(): CompletedTransactions {
-        return CompletedTransactions(getCompletedTransactionsJNI(ptr))
+        var error = LibError()
+        val result = CompletedTransactions(jniGetCompletedTransactions(ptr,error))
+        if (error.code != 0)
+        {
+            throw RuntimeException()
+        }
+        return result
     }
 
     fun getCompletedTransactionById(id: Long): CompletedTransaction {
-        return CompletedTransaction(getCompletedTransactionByIdJNI(ptr, id))
+        var error = LibError()
+        val result = CompletedTransaction(jniGetCompletedTransactionById(ptr, id, error))
+        if (error.code != 0)
+        {
+            throw RuntimeException()
+        }
+        return result
     }
 
     fun getPendingOutboundTransactions(): PendingOutboundTransactions {
-        return PendingOutboundTransactions(getPendingOutboundTransactionsJNI(ptr))
+        var error = LibError()
+        val result = PendingOutboundTransactions(jniGetPendingOutboundTransactions(ptr,error))
+        if (error.code != 0)
+        {
+            throw RuntimeException()
+        }
+        return result
     }
 
     fun getPendingOutboundTransactionById(id: Long): PendingOutboundTransaction {
-        return PendingOutboundTransaction(getPendingOutboundTransactionByIdJNI(ptr, id))
+        var error = LibError()
+        val result = PendingOutboundTransaction(jniGetPendingOutboundTransactionById(ptr, id,error))
+        if (error.code != 0)
+        {
+            throw RuntimeException()
+        }
+        return result
     }
 
     fun getPendingInboundTransactions(): PendingInboundTransactions {
-        return PendingInboundTransactions(getPendingInboundTransactionsJNI(ptr))
+        var error = LibError()
+        val result = PendingInboundTransactions(jniGetPendingInboundTransactions(ptr, error))
+        if (error.code != 0)
+        {
+            throw RuntimeException()
+        }
+        return result
     }
 
     fun getPendingInboundTransactionById(id: Long): PendingInboundTransaction {
-        return PendingInboundTransaction(getPendingInboundTransactionByIdJNI(ptr, id))
+        var error = LibError()
+        val result = PendingInboundTransaction(jniGetPendingInboundTransactionById(ptr, id, error))
+        if (error.code != 0)
+        {
+            throw RuntimeException()
+        }
+        return result
     }
 
-    fun setOnTransactionBroadcastListener(listener: OnTransactionBroadcastListener): Boolean {
-        return registerTransactionBroadcastListenerJNI(ptr, listener)
-    }
-
-    fun setOnTransactionMinedListener(listener: OnTransactionMinedListener): Boolean {
-        return registerTransactionMinedListenerJNI(ptr, listener)
-    }
-
-    fun setOnTransactionReceivedListener(listener: OnTransactionReceivedListener): Boolean {
-        return registerTransactionReceivedListenerJNI(ptr, listener)
-    }
-
-    fun setOnTransactionReplyReceivedListener(listener: OnTransactionReplyReceivedListener): Boolean {
-        return registerTransactionReplyReceivedListenerJNI(ptr, listener)
-    }
-
-    public override fun destroy() {
-        destroyJNI(ptr)
-        super.destroy()
+    fun destroy() {
+        jniDestroy(ptr)
+        ptr = nullptr
     }
 
 }

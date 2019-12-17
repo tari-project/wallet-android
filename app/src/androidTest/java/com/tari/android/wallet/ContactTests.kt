@@ -32,67 +32,40 @@
  */
 package com.tari.android.wallet
 
+import com.google.android.gms.common.util.Hex
 import com.tari.android.wallet.ffi.Contact
-import com.tari.android.wallet.ffi.NULL_POINTER
+import com.tari.android.wallet.ffi.HexString
+import com.tari.android.wallet.ffi.nullptr
 import com.tari.android.wallet.ffi.PublicKey
 import org.junit.Test
 import org.junit.Assert.*
+import java.security.InvalidParameterException
+import java.util.*
 
 /**
  * FFI byte vector tests.
  *
- * @author Kutsal Kaan Bilgin
+ * @author The Tari Development Team
  */
 class ContactTests {
 
     @Test
-    fun testCreateAndDestroyContact() {
+    fun testContact() {
         val alias = TestUtil.generateRandomAlphanumericString(16)
-        val publicKey = PublicKey.fromHex(TestUtil.PUBLIC_KEY_HEX_STRING)
-        val contact = Contact.create(alias, publicKey)
-        assertTrue(contact.ptr != NULL_POINTER)
-        contact.destroy()
-        assertTrue(contact.ptr == NULL_POINTER)
-        // free resources
-        publicKey.destroy()
-    }
-
-    @Test
-    fun testGetContactAlias() {
-        val alias = TestUtil.generateRandomAlphanumericString(16)
-        val publicKey = PublicKey.fromHex(TestUtil.PUBLIC_KEY_HEX_STRING)
-        val contact = Contact.create(alias, publicKey)
-        assertEquals(alias, contact.alias)
-        // free resources
+        val publicKey = PublicKey(HexString(TestUtil.PUBLIC_KEY_HEX_STRING))
+        val contact = Contact(alias, publicKey)
+        assertTrue(contact.getPointer() != nullptr)
+        assertTrue(contact.getAlias() == alias)
+        assertTrue(contact.getPublicKey().getPointer() != nullptr)
+        assertTrue( contact.getPublicKey().toString() == TestUtil.PUBLIC_KEY_HEX_STRING )
         contact.destroy()
         publicKey.destroy()
     }
 
-    @Test
-    fun testGetContactPublicKey() {
-        val alias = TestUtil.generateRandomAlphanumericString(16)
-        val publicKey = PublicKey.fromHex(TestUtil.PUBLIC_KEY_HEX_STRING)
-        val contact = Contact.create(alias, publicKey)
-        val contactPublicKey = contact.publicKey
-        val contactPublicKeyBytes = contactPublicKey.bytes
-        assertEquals(TestUtil.PUBLIC_KEY_HEX_STRING, contactPublicKeyBytes.hexString)
-        // free resources
-        contactPublicKeyBytes.destroy()
-        contactPublicKey.destroy()
-        contact.destroy()
-        publicKey.destroy()
+    @Test(expected = InvalidParameterException::class)
+    fun testByteVectorException() {
+        val alias = String()
+        val publicKey = PublicKey(HexString(TestUtil.PUBLIC_KEY_HEX_STRING))
+        val contact = Contact(alias, publicKey)
     }
-
-    @Test
-    fun testCreateContactWithEmptyAlias() {
-        val publicKey = PublicKey.fromHex(TestUtil.PUBLIC_KEY_HEX_STRING)
-        val contact = Contact.create("", publicKey)
-        assertTrue(contact.ptr != NULL_POINTER)
-        assertEquals("", contact.alias)
-        // free resources
-        contact.destroy()
-        publicKey.destroy()
-    }
-
-
 }

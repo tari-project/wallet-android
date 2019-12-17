@@ -32,54 +32,82 @@
  */
 package com.tari.android.wallet.ffi
 
+import android.util.Log
+import java.io.File
+import java.lang.RuntimeException
+import java.security.InvalidParameterException
+
+typealias CommsConfigPtr = Long
+
 /**
  * Tari comms config wrapper.
  *
- * @author Kutsal Kaan Bilgin
+ * @author The Tari Development Team
  */
-class CommsConfig(ptr: CommsConfigPtr) : FFIObjectWrapper(ptr) {
+class CommsConfig constructor(pointer: CommsConfigPtr) {
 
-    /**
-     * JNI functions.
-     */
-    private external fun destroyJNI(commsConfigPtr: CommsConfigPtr)
-
-    companion object {
-
-        /**
-         * JNI static functions.
-         */
-        @JvmStatic
-        private external fun createJNI(
+    private external fun jniDestroy(commsConfigPtr: CommsConfigPtr)
+    private external fun jniCreate(
             controlServiceAddress: String,
             listenerAddress: String,
             databaseName: String,
             datastorePath: String,
-            privateKeyPtr: PrivateKeyPtr
+            privateKeyPtr: PrivateKeyPtr,
+            error: LibError
         ): CommsConfigPtr
 
-        fun create(
-            controlServiceAddress: String,
-            listenerAddress: String,
-            databaseName: String,
-            datastorePath: String,
-            privateKey: PrivateKey
-        ): CommsConfig {
-            return CommsConfig(
-                createJNI(
-                    controlServiceAddress,
-                    listenerAddress,
-                    databaseName,
-                    datastorePath,
-                    privateKey.ptr
-                )
+    private var ptr = nullptr
+
+    init {
+        ptr = pointer
+    }
+
+    constructor(controlServiceAddress: NetAddressString,
+                listenerAddress: NetAddressString,
+                databaseName: String,
+                datastorePath: String,
+                privateKey: PrivateKey) : this(nullptr)
+    {
+        if (databaseName.isEmpty())
+        {
+            throw InvalidParameterException("databaseName may not be empty")
+        }
+        val writeableDir = File(datastorePath)
+        if (writeableDir.exists() && writeableDir.isDirectory && writeableDir.canWrite()) {
+            var error = LibError();
+            ptr = jniCreate(
+                controlServiceAddress.toString(),
+                listenerAddress.toString(),
+                databaseName,
+                datastorePath,
+                privateKey.getPointer(),
+                error
             )
+            if (error.code != 0)
+            {
+                throw RuntimeException()
+            }
+        } else
+        {
+            if (!writeableDir.exists()) {
+                Log.i("Directory","Doesn't exist")
+            } else if (!writeableDir.isDirectory) {
+                Log.i("Directory","Isn't a directory")
+            } else if (!writeableDir.canWrite()) {
+                Log.i("Directory","Permission problem")
+            }
+            throw FileSystemException(writeableDir)
         }
     }
 
-    public override fun destroy() {
-        destroyJNI(ptr)
-        super.destroy()
+    fun getPointer() : CommsConfigPtr
+    {
+        return ptr
+    }
+
+    fun destroy() {
+        jniDestroy(ptr)
+        ptr = nullptr
     }
 
 }

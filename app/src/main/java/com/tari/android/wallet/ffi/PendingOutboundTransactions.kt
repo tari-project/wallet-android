@@ -32,32 +32,56 @@
  */
 package com.tari.android.wallet.ffi
 
+import java.lang.RuntimeException
+
 /**
  * Tari pending outbound transactions wrapper.
  *
- * @author Kutsal Kaan Bilgin
+ * @author The Tari Development Team
  */
-class PendingOutboundTransactions(ptr: PendingOutboundTransactionsPtr) : FFIObjectWrapper(ptr) {
 
-    /**
-     * JNI functions.
-     */
-    private external fun getLengthJNI(ptr: PendingOutboundTransactionsPtr): Int
-    private external fun getAtJNI(ptr: PendingOutboundTransactionsPtr, index: Int): PendingOutboundTransactionPtr
-    private external fun destroyJNI(ptr: PendingOutboundTransactionsPtr)
+typealias PendingOutboundTransactionsPtr = Long
 
-    val length: Int
-        get() {
-            return getLengthJNI(ptr)
-        }
+class PendingOutboundTransactions(pointer: PendingOutboundTransactionsPtr) {
 
-    fun getAt(index: Int): PendingOutboundTransaction {
-        return PendingOutboundTransaction(getAtJNI(ptr, index))
+    private external fun jniGetLength(ptr: PendingOutboundTransactionsPtr, libError: LibError): Int
+    private external fun jniGetAt(ptr: PendingOutboundTransactionsPtr, index: Int, libError: LibError): PendingOutboundTransactionPtr
+    private external fun jniDestroy(ptr: PendingOutboundTransactionsPtr)
+
+    private var ptr = nullptr
+
+    init {
+        ptr = pointer
     }
 
-    public override fun destroy() {
-        destroyJNI(ptr)
-        super.destroy()
+    fun getPointer() : PendingOutboundTransactionsPtr
+    {
+        return ptr
+    }
+
+    fun getLength(): Int {
+        var error = LibError()
+        val result = jniGetLength(ptr,error)
+        if (error.code != 0)
+        {
+            throw RuntimeException()
+        }
+        return result
+    }
+
+    fun getAt(index: Int): PendingOutboundTransaction {
+        var error = LibError()
+        val result = PendingOutboundTransaction(jniGetAt(ptr, index, error))
+        if (error.code != 0)
+        {
+            throw RuntimeException()
+        }
+        return result
+    }
+
+    fun destroy() {
+        jniDestroy(ptr)
+        ptr = nullptr
     }
 
 }

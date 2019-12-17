@@ -32,32 +32,56 @@
  */
 package com.tari.android.wallet.ffi
 
+import java.lang.RuntimeException
+
 /**
  * Tari contacts wrapper.
  *
- * @author Kutsal Kaan Bilgin
+ * @author The Tari Development Team
  */
-class Contacts(ptr: ContactPtr) : FFIObjectWrapper(ptr) {
+typealias ContactsPtr = Long
 
-    /**
-     * JNI functions.
-     */
-    private external fun getLengthJNI(contactsPtr: ContactsPtr): Int
-    private external fun getAtJNI(contactPtr: ContactPtr, index: Int): ContactPtr
-    private external fun destroyJNI(contactsPtr: ContactPtr)
+class Contacts constructor(pointer: ContactPtr) {
 
-    val length: Int
-        get() {
-            return getLengthJNI(ptr)
-        }
+    private external fun jniGetLength(contactsPtr: ContactsPtr, libError: LibError): Int
+    private external fun jniGetAt(contactPtr: ContactPtr, index: Int, libError: LibError): ContactPtr
+    private external fun jniDestroy(contactsPtr: ContactPtr)
 
-    fun getAt(index: Int): Contact {
-        return Contact(getAtJNI(ptr, index))
+    private var ptr = nullptr
+
+    init {
+        ptr = pointer
     }
 
-    public override fun destroy() {
-        destroyJNI(ptr)
-        super.destroy()
+    fun getPointer() : ContactsPtr
+    {
+        return ptr
+    }
+
+    fun getLength(): Int
+    {
+        var error = LibError()
+        val result = jniGetLength(ptr, error)
+        if (error.code != 0)
+        {
+            throw RuntimeException()
+        }
+        return result
+    }
+
+    fun getAt(index: Int): Contact {
+        var error = LibError()
+        val result = Contact(jniGetAt(ptr, index,error))
+        if (error.code != 0)
+        {
+            throw RuntimeException()
+        }
+        return result
+    }
+
+    fun destroy() {
+        jniDestroy(ptr)
+        ptr = nullptr
     }
 
 }

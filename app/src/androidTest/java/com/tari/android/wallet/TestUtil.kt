@@ -32,41 +32,39 @@
  */
 package com.tari.android.wallet
 
+import android.content.ContextWrapper
+import android.os.Environment
+import androidx.test.core.app.ApplicationProvider
 import androidx.test.platform.app.InstrumentationRegistry
 import com.orhanobut.logger.Logger
-import com.tari.android.wallet.ffi.CommsConfig
-import com.tari.android.wallet.ffi.PrivateKey
-import com.tari.android.wallet.ffi.TestWallet
-import com.tari.android.wallet.ffi.Wallet
+import com.tari.android.wallet.ffi.*
+import com.tari.android.wallet.ui.activity.MainActivity
 import java.io.File
 
 /**
  * Test utilities.
  *
- * @author Kutsal Kaan Bilgin
+ * @author The Tari Development Team
  */
 class TestUtil {
 
     companion object {
 
-        private const val WALLET_LOG_FILE_NAME = "tari_log.txt"
-        private val WALLET_FILES_DIR_PATH =
-            InstrumentationRegistry.getInstrumentation().targetContext.filesDir.absolutePath
+        private const val WALLET_LOG_FILE_NAME:String = "tari_log.txt"
+        private val WALLET_FILES_DIR_PATH: String = ApplicationProvider
+            .getApplicationContext<com.tari.android.wallet.application.TariWalletApplication>()
+            .filesDir
+            .absolutePath
+        const val WALLET_DB_NAME: String = "tari_test_db"
+        val WALLET_CONTROL_SERVICE_ADDRESS: NetAddressString = NetAddressString("127.0.0.1",80)
+        val WALLET_LISTENER_ADDRESS: NetAddressString = NetAddressString("0.0.0.0",0)
+        val WALLET_DATASTORE_PATH: String = WALLET_FILES_DIR_PATH
+        val WALLET_LOG_FILE_PATH: String = "$WALLET_FILES_DIR_PATH/$WALLET_LOG_FILE_NAME"
 
-        private const val WALLET_DB_NAME = "tari_test_db"
-        private const val WALLET_CONTROL_SERVICE_ADDRESS = "127.0.0.1:80"
-        private const val WALLET_LISTENER_ADDRESS = "0.0.0.0:0"
-        private val WALLET_DATASTORE_PATH = WALLET_FILES_DIR_PATH
-        private val WALLET_LOG_FILE_PATH = "$WALLET_FILES_DIR_PATH/$WALLET_LOG_FILE_NAME"
-
-        private var mTestWallet: TestWallet? = null
-
-        /**
-         * Matching pair of public & private keys.
-         */
-        const val PUBLIC_KEY_HEX_STRING =
+        // Matching pair of keys.
+        const val PUBLIC_KEY_HEX_STRING:String =
             "30E1DFA197794858BFDBF96CDCE5DC8637D4BD1202DC694991040DDECBF42D40"
-        const val PRIVATE_KEY_HEX_STRING =
+        const val PRIVATE_KEY_HEX_STRING:String =
             "6259C39F75E27140A652A5EE8AEFB3CF6C1686EF21D27793338D899380E8C801"
 
         fun generateRandomAlphanumericString(len: Int): String {
@@ -74,38 +72,20 @@ class TestUtil {
             return (1..len).map { characters.random() }.joinToString("")
         }
 
-        private fun clearTestFiles(path: String): Boolean {
+        fun clearTestFiles(path: String): Boolean {
             val fileDirectory = File(path)
             val del = fileDirectory.deleteRecursively()
+            if (!del) {
+                return false
+            }
             val directory = File(path)
             if (!directory.exists()) {
-                directory.mkdir()
+                directory.mkdirs()
             }
-            return del
-        }
-
-        val testWallet: TestWallet
-            get() {
-                if (mTestWallet == null) {
-                    clearTestFiles(WALLET_DATASTORE_PATH)
-                    val privateKey = PrivateKey.fromHex(PRIVATE_KEY_HEX_STRING)
-                    val commsConfig = CommsConfig.create(
-                        WALLET_CONTROL_SERVICE_ADDRESS,
-                        WALLET_LISTENER_ADDRESS,
-                        WALLET_DB_NAME,
-                        WALLET_DATASTORE_PATH,
-                        privateKey
-                    )
-                    mTestWallet = TestWallet.create(commsConfig, WALLET_LOG_FILE_PATH)
-                    privateKey.destroy()
-                    commsConfig.destroy()
-                    mTestWallet?.generateTestData(WALLET_DATASTORE_PATH)
-                }
-                return mTestWallet ?: throw AssertionError("Set to null by another thread")
+            if (directory.exists() && directory.canWrite() && directory.isDirectory) {
+                return true
             }
-
-        fun destroyTestWallet() {
-            mTestWallet?.destroy()
+            return false
         }
 
         fun printFFILogFile() {

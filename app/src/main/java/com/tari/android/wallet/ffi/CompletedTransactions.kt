@@ -32,32 +32,56 @@
  */
 package com.tari.android.wallet.ffi
 
+import java.lang.RuntimeException
+
 /**
  * Tari completed transactions wrapper.
  *
- * @author Kutsal Kaan Bilgin
+ * @author The Tari Development Team
  */
-class CompletedTransactions(ptr: CompletedTransactionsPtr) : FFIObjectWrapper(ptr) {
+typealias CompletedTransactionsPtr = Long
 
-    /**
-     * JNI functions.
-     */
-    private external fun getLengthJNI(ptr: CompletedTransactionsPtr): Int
-    private external fun getAtJNI(ptr: CompletedTransactionsPtr, index: Int): CompletedTransactionPtr
-    private external fun destroyJNI(ptr: CompletedTransactionsPtr)
+class CompletedTransactions constructor(pointer: CompletedTransactionsPtr) {
 
-    val length: Int
-        get() {
-            return getLengthJNI(ptr)
-        }
+    private external fun jniGetLength(ptr: CompletedTransactionsPtr, libError: LibError): Int
+    private external fun jniGetAt(ptr: CompletedTransactionsPtr, index: Int, libError: LibError): CompletedTransactionPtr
+    private external fun jniDestroy(ptr: CompletedTransactionsPtr)
 
-    fun getAt(index: Int): CompletedTransaction {
-        return CompletedTransaction(getAtJNI(ptr, index))
+    private var ptr = nullptr
+
+    init {
+        ptr = pointer
     }
 
-    public override fun destroy() {
-        destroyJNI(ptr)
-        super.destroy()
+    fun getPointer() : CompletedTransactionsPtr
+    {
+        return ptr
+    }
+
+    fun getLength(): Int
+    {
+        var error = LibError()
+        val result = jniGetLength(ptr, error)
+        if (error.code != 0)
+        {
+            throw RuntimeException()
+        }
+        return result
+    }
+
+    fun getAt(index: Int): CompletedTransaction {
+        var error = LibError()
+        val result = CompletedTransaction(jniGetAt(ptr, index,error))
+        if (error.code != 0)
+        {
+            throw RuntimeException()
+        }
+        return result
+    }
+
+    fun destroy() {
+        jniDestroy(ptr)
+        ptr = nullptr
     }
 
 }

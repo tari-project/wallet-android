@@ -32,53 +32,41 @@
  */
 package com.tari.android.wallet
 
+import android.util.Log
 import com.tari.android.wallet.ffi.ByteVector
-import com.tari.android.wallet.ffi.NULL_POINTER
+import com.tari.android.wallet.ffi.HexString
+import com.tari.android.wallet.ffi.nullptr
 import org.junit.Assert.*
 import org.junit.Test
+import org.junit.Rule
+import java.lang.StringBuilder
+import java.util.*
 
 /**
  * FFI byte vector tests.
  *
- * @author Kutsal Kaan Bilgin
+ * @author The Tari Development Team
  */
 class ByteVectorTests {
 
-    private val str = "ABCDEF"
+    private val str = TestUtil.PUBLIC_KEY_HEX_STRING
 
     @Test
-    fun testCreateAndDestroyByteVector() {
-        val byteVector = ByteVector.create(str)
-        assertTrue(byteVector.ptr != NULL_POINTER)
+    fun testByteVector() {
+        val byteVector = ByteVector(HexString(str))
+        assertTrue(byteVector.getPointer() != nullptr)
+        Log.i("TestbyteVector",byteVector.getLength().toString())
+        assertTrue(byteVector.getLength()*2 == str.length)
+        assertTrue(str == byteVector.toString())
+        val byteVector2 = ByteVector(byteVector.getPointer())
+        assertTrue(byteVector.toString() == byteVector2.toString())
         byteVector.destroy()
-        assertTrue(byteVector.ptr == NULL_POINTER)
+        byteVector2.destroy()
     }
 
-    @Test
-    fun testByteVectorGetLength() {
-        val byteVector = ByteVector.create(str)
-        assertTrue(byteVector.length == str.length)
-        // release resource
-        byteVector.destroy()
-    }
-
-    @Test
-    fun testByteVectorGetAt() {
-        val byteVector = ByteVector.create(str)
-        val index = 3
-        assertTrue(byteVector.getAt(index) == str[index])
-        // release resource
-        byteVector.destroy()
-    }
-
-    @Test
-    fun testDestroyedByteVector() {
-        val byteVector = ByteVector.create(str)
-        assertTrue(byteVector.length == str.length)
-        byteVector.destroy()
-        assertTrue(byteVector.length == 0)
-        val index = 3
-        assertTrue(byteVector.getAt(index) != str[index])
+    @Test(expected = InvalidPropertiesFormatException::class)
+    fun testByteVectorException() {
+        var byteVector2 = ByteVector(HexString(str.slice(0..str.length-5)))
     }
 
 }

@@ -32,58 +32,78 @@
  */
 package com.tari.android.wallet.ffi
 
+import java.lang.RuntimeException
+import java.math.BigInteger
+import java.util.*
+
 /**
  * Wrapper for native byte vector type.
  *
- * @author Kutsal Kaan Bilgin
+ * @author The Tari Development Team
  */
-class ByteVector(ptr: ByteVectorPtr) : FFIObjectWrapper(ptr) {
 
-    /**
-     * JNI functions.
-     */
-    private external fun getLengthJNI(pByteVector: ByteVectorPtr): Int
-    private external fun getAtJNI(pByteVector: ByteVectorPtr, index: Int): Char
-    private external fun destroyJNI(pByteVector: ByteVectorPtr)
+typealias ByteVectorPtr = Long
 
-    companion object {
+class ByteVector constructor(pointer:ByteVectorPtr) {
 
-        /**
-         * JNI static functions.
-         */
-        @JvmStatic
-        private external fun createJNI(string: String): ByteVectorPtr
+    private external fun jniGetLength(pByteVector: ByteVectorPtr, error: LibError): Int
+    private external fun jniGetAt(pByteVector: ByteVectorPtr, index: Int, error: LibError): Int
+    private external fun jniDestroy(pByteVector: ByteVectorPtr)
+    private external fun jniCreate(byteArray: ByteArray, error: LibError): ByteVectorPtr
 
-        fun create(string: String): ByteVector {
-            return ByteVector(createJNI(string))
-        }
+    private var ptr = nullptr
 
+    init {
+        ptr = pointer
     }
 
-    val length: Int
-        get() {
-            return getLengthJNI(ptr)
-        }
-
-    /**
-     * Hex string representation.
-     */
-    val hexString: String
-        get() {
-            var string = ""
-            for (i in 0 until length) {
-                string += String.format("%02X", getAt(i).toByte())
+    constructor(hex:HexString) : this(nullptr) {
+        if (hex.toString().length == 64) {
+            val byteArray = BigInteger(hex.toString(),16).toByteArray()
+            var error = LibError()
+            ptr = jniCreate(byteArray, error)
+            if (error.code != 0)
+            {
+                throw RuntimeException()
             }
-            return string
+        } else
+        {
+            throw InvalidPropertiesFormatException("Argument is invalid")
         }
-
-    fun getAt(index: Int): Char {
-        return getAtJNI(ptr, index)
     }
 
-    public override fun destroy() {
-        destroyJNI(ptr)
-        super.destroy()
+    fun getLength(): Int
+    {
+        var error = LibError()
+        val len = jniGetLength(ptr, error)
+        if (error.code != 0)
+        {
+            throw RuntimeException()
+        }
+        return len
+    }
+
+    override fun toString(): String {
+        return HexString(this).toString()
+    }
+
+    fun getPointer() : ByteVectorPtr {
+        return ptr
+    }
+
+    fun getAt(index: Int): Int {
+        var error = LibError()
+        val byte = jniGetAt(ptr, index, error)
+        if (error.code != 0)
+        {
+            throw RuntimeException()
+        }
+        return byte
+    }
+
+    fun destroy() {
+        jniDestroy(ptr)
+        ptr = nullptr
     }
 
 }

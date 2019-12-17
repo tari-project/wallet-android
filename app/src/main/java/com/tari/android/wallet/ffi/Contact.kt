@@ -32,47 +32,79 @@
  */
 package com.tari.android.wallet.ffi
 
+import java.lang.RuntimeException
+import java.security.InvalidParameterException
+
+typealias ContactPtr = Long
+
 /**
  * Tari contact wrapper.
  *
- * @author Kutsal Kaan Bilgin
+ * @author The Tari Development Team
  */
-class Contact(ptr: ContactPtr) : FFIObjectWrapper(ptr) {
+class Contact constructor(pointer: ContactPtr) {
 
-    /**
-     * JNI functions.
-     */
-    private external fun getAliasJNI(contactPtr: ContactPtr): String
-    private external fun getPublicKeyJNI(contactPtr: ContactPtr): PublicKeyPtr
-    private external fun destroyJNI(contactPtr: ContactPtr)
+    private external fun jniGetAlias(contactPtr: ContactPtr, libError: LibError): String
+    private external fun jniGetPublicKey(contactPtr: ContactPtr, libError: LibError): PublicKeyPtr
+    private external fun jniDestroy(contactPtr: ContactPtr)
+    private external fun jniCreate(alias: String, publicKeyPtr: PublicKeyPtr, libError: LibError): ContactPtr
 
-    companion object {
+    private var ptr = nullptr
 
-        /**
-         * JNI static functions.
-         */
-        @JvmStatic
-        private external fun createJNI(alias: String, publicKeyPtr: PublicKeyPtr): ContactPtr
-
-        fun create(alias: String, publicKey: PublicKey): Contact {
-            return Contact(createJNI(alias, publicKey.ptr))
-        }
-
+    init {
+        ptr = pointer
     }
 
-    val alias: String
-        get() {
-            return getAliasJNI(ptr)
+    constructor(alias: String, publicKey: PublicKey) : this(nullptr) {
+        if (alias.isNotEmpty())
+        {
+            var error = LibError()
+            ptr = jniCreate(alias, publicKey.getPointer(),error)
+            if (error.code != 0)
+            {
+                throw RuntimeException()
+            }
         }
-
-    val publicKey: PublicKey
-        get() {
-            return PublicKey(getPublicKeyJNI(ptr))
+        else {
+            throw InvalidParameterException("Alias is an empty String")
         }
+    }
 
-    public override fun destroy() {
-        destroyJNI(ptr)
-        super.destroy()
+    fun getPointer() : ContactPtr {
+        return ptr
+    }
+
+    fun getAlias(): String {
+        var error = LibError()
+        val result = jniGetAlias(ptr,error)
+        if (error.code != 0)
+        {
+            throw RuntimeException()
+        }
+        return result
+    }
+
+    fun getPublicKey(): PublicKey {
+        var error = LibError()
+        val result = PublicKey(jniGetPublicKey(ptr,error))
+        if (error.code != 0)
+        {
+            throw RuntimeException()
+        }
+        return result
+    }
+
+    override fun toString(): String {
+        val result = StringBuilder()
+            .append(getAlias())
+            .append("|")
+            .append(getPublicKey().toString())
+        return result.toString()
+    }
+
+    fun destroy() {
+        jniDestroy(ptr)
+        ptr = nullptr
     }
 
 }

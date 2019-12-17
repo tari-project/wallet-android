@@ -38,40 +38,55 @@
 package com.tari.android.wallet
 
 import androidx.test.platform.app.InstrumentationRegistry
-import com.tari.android.wallet.ffi.CommsConfig
-import com.tari.android.wallet.ffi.NULL_POINTER
-import com.tari.android.wallet.ffi.PrivateKey
+import com.tari.android.wallet.ffi.*
+import java.io.File
 import org.junit.Assert.*
 import org.junit.Test
+import java.lang.StringBuilder
 
 /**
  * FFI comms config tests.
  *
- * @author Kutsal Kaan Bilgin
+ * @author The Tari Development Team
  */
 class CommsConfigTests {
 
     private val dbName = "tari_test_db"
-    private val controlServiceAddress = "127.0.0.1:80"
-    private val listenerAddress = "0.0.0.0:80"
+    private val controlServiceAddress = NetAddressString("127.0.0.1",80)
+    private val listenerAddress = NetAddressString("0.0.0.0",80)
     private val datastorePath =
-        InstrumentationRegistry.getInstrumentation().context.filesDir.absolutePath + "/" + dbName
+        StringBuilder()
+            .append(TestUtil.WALLET_DATASTORE_PATH)
+            .append("/")
+            .append(dbName).toString()
 
     @Test
-    fun testCreateAndDestroyCommsConfig() {
-
-        val privateKey = PrivateKey.fromHex(TestUtil.PRIVATE_KEY_HEX_STRING)
-        val commsConfig = CommsConfig.create(
+    fun testCommsConfig() {
+        TestUtil.clearTestFiles(StringBuilder().append(datastorePath).toString())
+        val privateKey = PrivateKey(HexString(TestUtil.PRIVATE_KEY_HEX_STRING))
+        val commsConfig = CommsConfig(
             controlServiceAddress,
             listenerAddress,
             dbName,
             datastorePath,
             privateKey
         )
-        assertTrue(commsConfig.ptr != NULL_POINTER)
+        assertTrue(commsConfig.getPointer() != nullptr)
         commsConfig.destroy()
-        assertTrue(commsConfig.ptr == NULL_POINTER)
         privateKey.destroy()
+    }
+
+    @Test(expected = FileSystemException::class)
+    fun testByteVectorException() {
+        TestUtil.clearTestFiles(StringBuilder().append(datastorePath).toString())
+        val privateKey = PrivateKey(HexString(TestUtil.PRIVATE_KEY_HEX_STRING))
+        val commsConfig = CommsConfig(
+            controlServiceAddress,
+            listenerAddress,
+            dbName,
+            StringBuilder().append(datastorePath).append("bad_dir").toString(),
+            privateKey
+        )
     }
 
 }

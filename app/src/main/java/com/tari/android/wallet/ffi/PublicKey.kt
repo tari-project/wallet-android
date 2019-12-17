@@ -32,53 +32,91 @@
  */
 package com.tari.android.wallet.ffi
 
+import java.lang.RuntimeException
+import java.util.*
+
+typealias PublicKeyPtr = Long
+
 /**
  * Wrapper for native private key type.
  *
- * @author Kutsal Kaan Bilgin
+ * @author The Tari Development Team
  */
-class PublicKey(ptr: PublicKeyPtr) : FFIObjectWrapper(ptr) {
+class PublicKey constructor(pointer: PublicKeyPtr) {
 
-    /**
-     * JNI functions.
-     */
-    private external fun getBytesJNI(privateKeyPtr: PublicKeyPtr): ByteVectorPtr
-    private external fun destroyJNI(privateKeyPtr: PublicKeyPtr)
+    private external fun jniGetBytes(privateKeyPtr: PublicKeyPtr, libError: LibError): ByteVectorPtr
+    private external fun jniDestroy(privateKeyPtr: PublicKeyPtr)
+    private external fun jniCreate(byteVectorPtr: ByteVectorPtr, libError: LibError): PublicKeyPtr
+    private external fun jniFromHex(hexStr: String, libError: LibError): PublicKeyPtr
+    private external fun jniFromPrivateKey(privateKeyPtr: PrivateKeyPtr, libError: LibError): PublicKeyPtr
 
-    companion object {
+    private var ptr = nullptr
 
-        /**
-         * JNI static functions.
-         */
-        @JvmStatic
-        private external fun createJNI(byteVectorPtr: ByteVectorPtr): PublicKeyPtr
-        @JvmStatic
-        private external fun fromHexJNI(hexStr: String): PublicKeyPtr
-        @JvmStatic
-        private external fun fromPrivateKeyJNI(privateKeyPtr: PrivateKeyPtr): PublicKeyPtr
-
-        fun create(byteVector: ByteVector): PublicKey {
-            return PublicKey(createJNI(byteVector.ptr))
-        }
-
-        fun fromHex(hexStr: String): PublicKey {
-            return PublicKey(fromHexJNI(hexStr))
-        }
-
-        fun fromPrivateKey(privateKey: PrivateKey): PublicKey {
-            return PublicKey(fromPrivateKeyJNI(privateKey.ptr))
-        }
-
+    init {
+        ptr = pointer
     }
 
-    val bytes: ByteVector
-        get() {
-            return ByteVector(getBytesJNI(ptr))
+    constructor(byteVector: ByteVector) : this(nullptr)
+    {
+        var error = LibError()
+        ptr = jniCreate(byteVector.getPointer(),error)
+        if (error.code != 0)
+        {
+            throw RuntimeException()
         }
+    }
 
-    public override fun destroy() {
-        destroyJNI(ptr)
-        super.destroy()
+    constructor(hex:HexString) : this(nullptr)
+    {
+        if (hex.toString().length == 64) {
+            var error = LibError()
+            ptr = jniFromHex(hex.hex,error)
+            if (error.code != 0)
+            {
+                throw RuntimeException()
+            }
+        } else
+        {
+            throw InvalidPropertiesFormatException("HexString is not a valid PublicKey")
+        }
+    }
+
+    constructor(privateKey: PrivateKey) : this(nullptr)
+    {
+        var error = LibError()
+        ptr = jniFromPrivateKey(privateKey.getPointer(),error)
+        if (error.code != 0)
+        {
+            throw RuntimeException()
+        }
+    }
+
+    fun getPointer() : PublicKeyPtr {
+        return ptr
+    }
+
+    fun getBytes(): ByteVector {
+        var error = LibError()
+        val result = ByteVector(jniGetBytes(ptr,error))
+        if (error.code != 0)
+        {
+            throw RuntimeException()
+        }
+        return result
+    }
+
+    override fun toString(): String {
+        var error = LibError()
+        val result = ByteVector(jniGetBytes(ptr,error)).toString()
+        if (error.code != 0)
+        {
+            throw RuntimeException()
+        }
+        return result
+    }
+
+    fun destroy() {
+        jniDestroy(ptr)
     }
 
 }
