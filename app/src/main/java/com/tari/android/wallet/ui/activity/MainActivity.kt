@@ -30,7 +30,6 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-
 package com.tari.android.wallet.ui.activity
 
 import android.animation.Animator
@@ -57,19 +56,6 @@ import java.util.concurrent.Executors
  * @author Kutsal Kaan Bilgin.
  */
 class MainActivity : AppCompatActivity() {
-
-    companion object {
-
-        // Static initializer: used to load the 'native-lib' library on application startup.
-        init {
-            System.loadLibrary("native-lib")
-        }
-    }
-
-    /**
-     * Native methods.
-     */
-    private external fun privateKeyStringJNI(): String
 
     private lateinit var biometricPrompt: BiometricPrompt
 

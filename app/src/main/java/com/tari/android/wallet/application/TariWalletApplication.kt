@@ -30,7 +30,6 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-
 package com.tari.android.wallet.application
 
 import android.app.Application
@@ -40,10 +39,12 @@ import com.orhanobut.logger.Logger
 /**
  * Main application class.
  *
- * @author Kutsal Kaan Bilgin
+ * @author The Tari Development Team
  */
-@Suppress("unused")
 class TariWalletApplication : Application() {
+    init {
+        System.loadLibrary("native-lib")
+    }
 
     override fun onCreate() {
         super.onCreate()
