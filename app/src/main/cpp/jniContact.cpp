@@ -35,26 +35,9 @@
 #include <android/log.h>
 #include <wallet.h>
 #include <string>
-#include <math.h>
+#include <cmath>
 #include <android/log.h>
 #include "jniCommon.cpp"
-
-#define LOG_TAG "Tari Wallet"
-
-/**
- * Log functions. Log example:
- *
- * int count = 5;
- * LOGE("Count is %d", count);
- * char[] name = "asd";
- * LOGI("Name is %s", name);
- */
-#define LOGE(...) __android_log_print(ANDROID_LOG_ERROR,    LOG_TAG, __VA_ARGS__)
-#define LOGW(...) __android_log_print(ANDROID_LOG_WARN,     LOG_TAG, __VA_ARGS__)
-#define LOGI(...) __android_log_print(ANDROID_LOG_INFO,     LOG_TAG, __VA_ARGS__)
-#define LOGD(...) __android_log_print(ANDROID_LOG_DEBUG,    LOG_TAG, __VA_ARGS__)
-
-
 
 extern "C"
 JNIEXPORT jlong JNICALL
@@ -65,11 +48,11 @@ Java_com_tari_android_wallet_ffi_Contact_jniCreate(
         jlong jpPublicKey,
         jobject error) {
     int i = 0;
-    int* r = &i;
+    int *r = &i;
     const char *pAlias = jEnv->GetStringUTFChars(jAlias, JNI_FALSE);
     auto *pPublicKey = reinterpret_cast<TariPublicKey *>(jpPublicKey);
-    TariContact *pContact = contact_create(pAlias, pPublicKey,r);
-    setErrorCode(jEnv,error,i);
+    TariContact *pContact = contact_create(pAlias, pPublicKey, r);
+    setErrorCode(jEnv, error, i);
     jEnv->ReleaseStringUTFChars(jAlias, pAlias);
     return reinterpret_cast<jlong>(pContact);
 }
@@ -82,11 +65,13 @@ Java_com_tari_android_wallet_ffi_Contact_jniGetAlias(
         jlong jpContact,
         jobject error) {
     int i = 0;
-    int* r = &i;
+    int *r = &i;
     TariContact *pContact = reinterpret_cast<TariContact *>(jpContact);
-    const char *pAlias = contact_get_alias(pContact,r);
-    setErrorCode(jEnv,error,i);
-    return jEnv->NewStringUTF(pAlias);
+    const char *pAlias = contact_get_alias(pContact, r);
+    setErrorCode(jEnv, error, i);
+    jstring result = jEnv->NewStringUTF(pAlias);
+    string_destroy(const_cast<char *>(pAlias));
+    return result;
 }
 
 extern "C"
@@ -97,10 +82,10 @@ Java_com_tari_android_wallet_ffi_Contact_jniGetPublicKey(
         jlong jpContact,
         jobject error) {
     int i = 0;
-    int* r = &i;
+    int *r = &i;
     TariContact *pContact = reinterpret_cast<TariContact *>(jpContact);
-    jlong result = reinterpret_cast<jlong>(contact_get_public_key(pContact,r));
-    setErrorCode(jEnv,error,i);
+    jlong result = reinterpret_cast<jlong>(contact_get_public_key(pContact, r));
+    setErrorCode(jEnv, error, i);
     return result;
 }
 
@@ -110,5 +95,5 @@ Java_com_tari_android_wallet_ffi_Contact_jniDestroy(
         JNIEnv *jEnv,
         jobject jThis,
         jlong jpContact) {
-    contact_destroy( reinterpret_cast<TariContact *>(jpContact));
+    contact_destroy(reinterpret_cast<TariContact *>(jpContact));
 }

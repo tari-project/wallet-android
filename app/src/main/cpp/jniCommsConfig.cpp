@@ -35,25 +35,9 @@
 #include <android/log.h>
 #include <wallet.h>
 #include <string>
-#include <math.h>
+#include <cmath>
 #include <android/log.h>
 #include "jniCommon.cpp"
-
-#define LOG_TAG "Tari Wallet"
-
-/**
- * Log functions. Log example:
- *
- * int count = 5;
- * LOGE("Count is %d", count);
- * char[] name = "asd";
- * LOGI("Name is %s", name);
- */
-#define LOGE(...) __android_log_print(ANDROID_LOG_ERROR,    LOG_TAG, __VA_ARGS__)
-#define LOGW(...) __android_log_print(ANDROID_LOG_WARN,     LOG_TAG, __VA_ARGS__)
-#define LOGI(...) __android_log_print(ANDROID_LOG_INFO,     LOG_TAG, __VA_ARGS__)
-#define LOGD(...) __android_log_print(ANDROID_LOG_DEBUG,    LOG_TAG, __VA_ARGS__)
-
 
 extern "C"
 JNIEXPORT jlong JNICALL
@@ -66,25 +50,27 @@ Java_com_tari_android_wallet_ffi_CommsConfig_jniCreate(
         jstring jDatastorePath,
         jlong jpPrivateKey,
         jobject error) {
-    char *pControlServiceAddress = const_cast<char*>(jEnv->GetStringUTFChars(jControlServiceAddress,
-                                                                    JNI_FALSE));
-    char *pListenerAddress = const_cast<char*>(jEnv->GetStringUTFChars(jListenerAddress, JNI_FALSE));
-    char *pDatabaseName = const_cast<char*>(jEnv->GetStringUTFChars(jDatabaseName, JNI_FALSE));
-    char *pDatastorePath = const_cast<char*>(jEnv->GetStringUTFChars(jDatastorePath, JNI_FALSE));
+    char *pControlServiceAddress = const_cast<char *>(jEnv->GetStringUTFChars(
+            jControlServiceAddress,
+            JNI_FALSE));
+    char *pListenerAddress = const_cast<char *>(jEnv->GetStringUTFChars(jListenerAddress,
+                                                                        JNI_FALSE));
+    char *pDatabaseName = const_cast<char *>(jEnv->GetStringUTFChars(jDatabaseName, JNI_FALSE));
+    char *pDatastorePath = const_cast<char *>(jEnv->GetStringUTFChars(jDatastorePath, JNI_FALSE));
     TariPrivateKey *pPrivateKey = reinterpret_cast<TariPrivateKey *>(jpPrivateKey);
     int i = 0;
-    int* r = &i;
+    int *r = &i;
     TariCommsConfig *pCommsConfig = comms_config_create(
             pControlServiceAddress,
             pListenerAddress,
             pDatabaseName,
             pDatastorePath,
-            pPrivateKey,r);
+            pPrivateKey, r);
     jEnv->ReleaseStringUTFChars(jControlServiceAddress, pControlServiceAddress);
     jEnv->ReleaseStringUTFChars(jListenerAddress, pListenerAddress);
     jEnv->ReleaseStringUTFChars(jDatabaseName, pDatabaseName);
     jEnv->ReleaseStringUTFChars(jDatastorePath, pDatastorePath);
-    setErrorCode(jEnv,error,i);
+    setErrorCode(jEnv, error, i);
     return reinterpret_cast<jlong>(pCommsConfig);
 }
 

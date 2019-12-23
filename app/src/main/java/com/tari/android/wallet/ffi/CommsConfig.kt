@@ -34,7 +34,6 @@ package com.tari.android.wallet.ffi
 
 import android.util.Log
 import java.io.File
-import java.lang.RuntimeException
 import java.security.InvalidParameterException
 
 typealias CommsConfigPtr = Long
@@ -44,17 +43,17 @@ typealias CommsConfigPtr = Long
  *
  * @author The Tari Development Team
  */
-class CommsConfig constructor(pointer: CommsConfigPtr) {
+class CommsConfig constructor(pointer: CommsConfigPtr): FinalizerBase() {
 
     private external fun jniDestroy(commsConfigPtr: CommsConfigPtr)
     private external fun jniCreate(
-            controlServiceAddress: String,
-            listenerAddress: String,
-            databaseName: String,
-            datastorePath: String,
-            privateKeyPtr: PrivateKeyPtr,
-            error: LibError
-        ): CommsConfigPtr
+        controlServiceAddress: String,
+        listenerAddress: String,
+        databaseName: String,
+        datastorePath: String,
+        privateKeyPtr: PrivateKeyPtr,
+        error: LibError
+    ): CommsConfigPtr
 
     private var ptr = nullptr
 
@@ -62,19 +61,19 @@ class CommsConfig constructor(pointer: CommsConfigPtr) {
         ptr = pointer
     }
 
-    constructor(controlServiceAddress: NetAddressString,
-                listenerAddress: NetAddressString,
-                databaseName: String,
-                datastorePath: String,
-                privateKey: PrivateKey) : this(nullptr)
-    {
-        if (databaseName.isEmpty())
-        {
+    constructor(
+        controlServiceAddress: NetAddressString,
+        listenerAddress: NetAddressString,
+        databaseName: String,
+        datastorePath: String,
+        privateKey: PrivateKey
+    ) : this(nullptr) {
+        if (databaseName.isEmpty()) {
             throw InvalidParameterException("databaseName may not be empty")
         }
         val writeableDir = File(datastorePath)
         if (writeableDir.exists() && writeableDir.isDirectory && writeableDir.canWrite()) {
-            var error = LibError();
+            val error = LibError()
             ptr = jniCreate(
                 controlServiceAddress.toString(),
                 listenerAddress.toString(),
@@ -83,29 +82,26 @@ class CommsConfig constructor(pointer: CommsConfigPtr) {
                 privateKey.getPointer(),
                 error
             )
-            if (error.code != 0)
-            {
+            if (error.code != 0) {
                 throw RuntimeException()
             }
-        } else
-        {
+        } else {
             if (!writeableDir.exists()) {
-                Log.i("Directory","Doesn't exist")
+                Log.i("Directory", "Doesn't exist")
             } else if (!writeableDir.isDirectory) {
-                Log.i("Directory","Isn't a directory")
+                Log.i("Directory", "Isn't a directory")
             } else if (!writeableDir.canWrite()) {
-                Log.i("Directory","Permission problem")
+                Log.i("Directory", "Permission problem")
             }
             throw FileSystemException(writeableDir)
         }
     }
 
-    fun getPointer() : CommsConfigPtr
-    {
+    fun getPointer(): CommsConfigPtr {
         return ptr
     }
 
-    fun destroy() {
+    override fun destroy() {
         jniDestroy(ptr)
         ptr = nullptr
     }

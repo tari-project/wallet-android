@@ -36,10 +36,8 @@ import android.util.Log
 import com.tari.android.wallet.ffi.ByteVector
 import com.tari.android.wallet.ffi.HexString
 import com.tari.android.wallet.ffi.nullptr
-import org.junit.Assert.*
+import org.junit.Assert.assertTrue
 import org.junit.Test
-import org.junit.Rule
-import java.lang.StringBuilder
 import java.util.*
 
 /**
@@ -55,8 +53,8 @@ class ByteVectorTests {
     fun testByteVector() {
         val byteVector = ByteVector(HexString(str))
         assertTrue(byteVector.getPointer() != nullptr)
-        Log.i("TestbyteVector",byteVector.getLength().toString())
-        assertTrue(byteVector.getLength()*2 == str.length)
+        Log.i("TestbyteVector", byteVector.getLength().toString())
+        assertTrue(byteVector.getLength() * 2 == str.length)
         assertTrue(str == byteVector.toString())
         val byteVector2 = ByteVector(byteVector.getPointer())
         assertTrue(byteVector.toString() == byteVector2.toString())
@@ -66,7 +64,8 @@ class ByteVectorTests {
 
     @Test(expected = InvalidPropertiesFormatException::class)
     fun testByteVectorException() {
-        var byteVector2 = ByteVector(HexString(str.slice(0..str.length-5)))
+        val byteVector2 = ByteVector(HexString(str.slice(0..str.length - 5)))
+        byteVector2.destroy()
     }
 
 }

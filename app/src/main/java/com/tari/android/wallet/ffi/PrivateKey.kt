@@ -32,18 +32,22 @@
  */
 package com.tari.android.wallet.ffi
 
-import java.lang.RuntimeException
 import java.util.*
 
 typealias PrivateKeyPtr = Long
+
 /**
  * Wrapper for native private key type.
  *
  * @author The Tari Development Team
  */
-class PrivateKey constructor(pointer: PrivateKeyPtr) {
+class PrivateKey constructor(pointer: PrivateKeyPtr): FinalizerBase() {
 
-    private external fun jniGetBytes(privateKeyPtr: PrivateKeyPtr, libError: LibError): ByteVectorPtr
+    private external fun jniGetBytes(
+        privateKeyPtr: PrivateKeyPtr,
+        libError: LibError
+    ): ByteVectorPtr
+
     private external fun jniDestroy(privateKeyPtr: PrivateKeyPtr)
     private external fun jniCreate(byteVectorPtr: ByteVectorPtr, libError: LibError): PrivateKeyPtr
     private external fun jniGenerate(): PrivateKeyPtr
@@ -55,30 +59,26 @@ class PrivateKey constructor(pointer: PrivateKeyPtr) {
         ptr = pointer
     }
 
-    constructor(): this(nullptr) {
+    constructor() : this(nullptr) {
         ptr = jniGenerate()
     }
 
     constructor(byteVector: ByteVector) : this(nullptr) {
-        var error = LibError()
-        ptr = jniCreate(byteVector.getPointer(),error)
-        if (error.code != 0)
-        {
+        val error = LibError()
+        ptr = jniCreate(byteVector.getPointer(), error)
+        if (error.code != 0) {
             throw RuntimeException()
         }
     }
 
     constructor(hexString: HexString) : this(nullptr) {
         if (hexString.toString().length == 64) {
-            var error = LibError()
-            ptr = jniFromHex(hexString.hex,error)
-            if (error.code != 0)
-            {
+            val error = LibError()
+            ptr = jniFromHex(hexString.hex, error)
+            if (error.code != 0) {
                 throw RuntimeException()
             }
-        }
-        else
-        {
+        } else {
             throw InvalidPropertiesFormatException("HexString is not a valid PrivateKey")
         }
     }
@@ -87,27 +87,25 @@ class PrivateKey constructor(pointer: PrivateKeyPtr) {
         return ptr
     }
 
-    fun getBytes(): ByteVector{
-        var error = LibError()
-        val result = ByteVector(jniGetBytes(ptr,error))
-        if (error.code != 0)
-        {
+    fun getBytes(): ByteVector {
+        val error = LibError()
+        val result = ByteVector(jniGetBytes(ptr, error))
+        if (error.code != 0) {
             throw RuntimeException()
         }
         return result
     }
 
     override fun toString(): String {
-        var error = LibError()
-        val result = ByteVector(jniGetBytes(ptr,error)).toString()
-        if (error.code != 0)
-        {
+        val error = LibError()
+        val result = ByteVector(jniGetBytes(ptr, error)).toString()
+        if (error.code != 0) {
             throw RuntimeException()
         }
         return result
     }
 
-    fun destroy() {
+    override fun destroy() {
         jniDestroy(ptr)
         ptr = nullptr
     }

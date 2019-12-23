@@ -32,13 +32,8 @@
  */
 package com.tari.android.wallet
 
-import android.content.ContextWrapper
-import android.os.Environment
-import androidx.test.core.app.ApplicationProvider
 import androidx.test.platform.app.InstrumentationRegistry
-import com.orhanobut.logger.Logger
-import com.tari.android.wallet.ffi.*
-import com.tari.android.wallet.ui.activity.MainActivity
+import com.tari.android.wallet.ffi.NetAddressString
 import java.io.File
 
 /**
@@ -50,21 +45,22 @@ class TestUtil {
 
     companion object {
 
-        private const val WALLET_LOG_FILE_NAME:String = "tari_log.txt"
-        private val WALLET_FILES_DIR_PATH: String = ApplicationProvider
-            .getApplicationContext<com.tari.android.wallet.application.TariWalletApplication>()
+        private const val WALLET_LOG_FILE_NAME: String = "tari_log.txt"
+        private val WALLET_FILES_DIR_PATH: String = InstrumentationRegistry
+            .getInstrumentation()
+            .targetContext
             .filesDir
             .absolutePath
         const val WALLET_DB_NAME: String = "tari_test_db"
-        val WALLET_CONTROL_SERVICE_ADDRESS: NetAddressString = NetAddressString("127.0.0.1",80)
-        val WALLET_LISTENER_ADDRESS: NetAddressString = NetAddressString("0.0.0.0",0)
+        val WALLET_CONTROL_SERVICE_ADDRESS: NetAddressString = NetAddressString("127.0.0.1", 80)
+        val WALLET_LISTENER_ADDRESS: NetAddressString = NetAddressString("0.0.0.0", 0)
         val WALLET_DATASTORE_PATH: String = WALLET_FILES_DIR_PATH
         val WALLET_LOG_FILE_PATH: String = "$WALLET_FILES_DIR_PATH/$WALLET_LOG_FILE_NAME"
 
         // Matching pair of keys.
-        const val PUBLIC_KEY_HEX_STRING:String =
+        const val PUBLIC_KEY_HEX_STRING: String =
             "30E1DFA197794858BFDBF96CDCE5DC8637D4BD1202DC694991040DDECBF42D40"
-        const val PRIVATE_KEY_HEX_STRING:String =
+        const val PRIVATE_KEY_HEX_STRING: String =
             "6259C39F75E27140A652A5EE8AEFB3CF6C1686EF21D27793338D899380E8C801"
 
         fun generateRandomAlphanumericString(len: Int): String {
@@ -88,6 +84,7 @@ class TestUtil {
             return false
         }
 
+        /*
         fun printFFILogFile() {
             var log = ""
             File(WALLET_LOG_FILE_PATH).forEachLine {
@@ -95,7 +92,7 @@ class TestUtil {
             }
             Logger.d("FFI log file contents:\n$log")
         }
-
+         */
     }
 
 }
