@@ -11,8 +11,8 @@ android {
         applicationId "com.tari.android.wallet"
         minSdkVersion 24
         targetSdkVersion 29
-        versionCode 3
-        versionName "0.0.3"
+        versionCode 4
+        versionName "0.0.4"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
         ndk {
@@ -50,6 +50,8 @@ android {
 }
 
 dependencies {
+    def lifecycle_version = "2.1.0"
+
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
     // kotlin
@@ -57,11 +59,19 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
     // android
     implementation 'androidx.appcompat:appcompat:1.1.0'
+    // kotlin extensions
     implementation 'androidx.core:core-ktx:1.1.0'
     implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
+    // android jetpack
+    implementation "androidx.lifecycle:lifecycle-extensions:$lifecycle_version"
+    implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycle_version"
+    // recycler view
+    implementation "androidx.recyclerview:recyclerview:1.1.0"
+    // swipe refresh
+    implementation "androidx.swiperefreshlayout:swiperefreshlayout:1.0.0"
 
     // biometric
-    implementation 'androidx.biometric:biometric:1.0.0'
+    implementation 'androidx.biometric:biometric:1.0.1'
 
     // support lib
     implementation 'androidx.legacy:legacy-support-v13:1.0.0'
@@ -80,6 +90,9 @@ dependencies {
     implementation 'androidx.dynamicanimation:dynamicanimation:1.0.0'
     implementation 'com.daasuu:EasingInterpolator:1.3.0'
 
+    // joda
+    implementation "net.danlew:android.joda:2.10.3"
+
     // dart - extras injection
     implementation 'com.f2prateek.dart:henson:3.1.3'
     kapt 'com.f2prateek.dart:henson-processor:3.1.3'
@@ -92,7 +105,6 @@ dependencies {
     implementation 'com.airbnb.android:lottie:3.3.1'
     // butterknife
     implementation "com.jakewharton:butterknife:10.2.0"
-    //annotationProcessor "com.jakewharton:butterknife-compiler:10.2.0"
     kapt "com.jakewharton:butterknife-compiler:10.2.0"
     // logger
     implementation 'com.orhanobut:logger:2.2.0'

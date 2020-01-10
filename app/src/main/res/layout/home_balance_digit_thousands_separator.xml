@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?><!-- thousands separator -->
+<com.tari.android.wallet.ui.component.CustomFontTextView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/home_balance_txt_thousands_separator"
+    android:layout_width="wrap_content"
+    android:layout_height="@dimen/home_balance_digit_height"
+    android:padding="0dp"
+    android:text="@string/digit_thousands_separator"
+    android:textColor="@color/white"
+    android:textSize="@dimen/home_balance_digit_text_size"
+    app:customFont="AVENIR_LT_STD_BLACK" />

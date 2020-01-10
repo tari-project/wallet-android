@@ -52,7 +52,7 @@ class SplashActivity : AppCompatActivity() {
     override fun onStart() {
         super.onStart()
         // splash is finished, move on to the main activity
-        val intent = Intent(this@SplashActivity, MainActivity::class.java)
+        val intent = Intent(this@SplashActivity, AuthActivity::class.java)
         intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
         startActivity(intent)
         // finish this activity
