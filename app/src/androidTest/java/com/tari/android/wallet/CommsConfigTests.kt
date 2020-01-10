@@ -37,12 +37,9 @@
  */
 package com.tari.android.wallet
 
-import androidx.test.platform.app.InstrumentationRegistry
 import com.tari.android.wallet.ffi.*
-import java.io.File
-import org.junit.Assert.*
+import org.junit.Assert.assertTrue
 import org.junit.Test
-import java.lang.StringBuilder
 
 /**
  * FFI comms config tests.
@@ -52,8 +49,8 @@ import java.lang.StringBuilder
 class CommsConfigTests {
 
     private val dbName = "tari_test_db"
-    private val controlServiceAddress = NetAddressString("127.0.0.1",80)
-    private val listenerAddress = NetAddressString("0.0.0.0",80)
+    private val controlServiceAddress = NetAddressString("127.0.0.1", 80)
+    private val listenerAddress = NetAddressString("0.0.0.0", 80)
     private val datastorePath =
         StringBuilder()
             .append(TestUtil.WALLET_DATASTORE_PATH)
@@ -87,6 +84,7 @@ class CommsConfigTests {
             StringBuilder().append(datastorePath).append("bad_dir").toString(),
             privateKey
         )
+        commsConfig.destroy()
     }
 
 }

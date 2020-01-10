@@ -32,15 +32,13 @@
  */
 package com.tari.android.wallet
 
-import com.google.android.gms.common.util.Hex
 import com.tari.android.wallet.ffi.Contact
 import com.tari.android.wallet.ffi.HexString
-import com.tari.android.wallet.ffi.nullptr
 import com.tari.android.wallet.ffi.PublicKey
+import com.tari.android.wallet.ffi.nullptr
+import org.junit.Assert.assertTrue
 import org.junit.Test
-import org.junit.Assert.*
 import java.security.InvalidParameterException
-import java.util.*
 
 /**
  * FFI byte vector tests.
@@ -57,7 +55,7 @@ class ContactTests {
         assertTrue(contact.getPointer() != nullptr)
         assertTrue(contact.getAlias() == alias)
         assertTrue(contact.getPublicKey().getPointer() != nullptr)
-        assertTrue( contact.getPublicKey().toString() == TestUtil.PUBLIC_KEY_HEX_STRING )
+        assertTrue(contact.getPublicKey().toString() == TestUtil.PUBLIC_KEY_HEX_STRING)
         contact.destroy()
         publicKey.destroy()
     }
@@ -67,5 +65,6 @@ class ContactTests {
         val alias = String()
         val publicKey = PublicKey(HexString(TestUtil.PUBLIC_KEY_HEX_STRING))
         val contact = Contact(alias, publicKey)
+        contact.destroy()
     }
 }

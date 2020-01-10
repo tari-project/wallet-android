@@ -32,8 +32,6 @@
  */
 package com.tari.android.wallet.ffi
 
-import java.lang.RuntimeException
-
 /**
  * Tari pending inbound transactions wrapper.
  *
@@ -41,10 +39,15 @@ import java.lang.RuntimeException
  */
 typealias PendingInboundTransactionsPtr = Long
 
-class PendingInboundTransactions constructor(pointer: PendingInboundTransactionsPtr) {
+class PendingInboundTransactions constructor(pointer: PendingInboundTransactionsPtr): FinalizerBase() {
 
     private external fun jniGetLength(ptr: PendingInboundTransactionsPtr, libError: LibError): Int
-    private external fun jniGetAt(ptr: PendingInboundTransactionsPtr, index: Int, libError: LibError): PendingInboundTransactionPtr
+    private external fun jniGetAt(
+        ptr: PendingInboundTransactionsPtr,
+        index: Int,
+        libError: LibError
+    ): PendingInboundTransactionPtr
+
     private external fun jniDestroy(ptr: PendingInboundTransactionsPtr)
 
     private var ptr = nullptr
@@ -54,31 +57,28 @@ class PendingInboundTransactions constructor(pointer: PendingInboundTransactions
     }
 
     fun getLength(): Int {
-        var error = LibError()
-        val result = jniGetLength(ptr,error)
-        if (error.code != 0)
-        {
+        val error = LibError()
+        val result = jniGetLength(ptr, error)
+        if (error.code != 0) {
             throw RuntimeException()
         }
         return result
     }
 
-    fun getPointer() : PendingInboundTransactionsPtr
-    {
+    fun getPointer(): PendingInboundTransactionsPtr {
         return ptr
     }
 
     fun getAt(index: Int): PendingInboundTransaction {
-        var error = LibError()
-        val result = PendingInboundTransaction(jniGetAt(ptr, index,error))
-        if (error.code != 0)
-        {
+        val error = LibError()
+        val result = PendingInboundTransaction(jniGetAt(ptr, index, error))
+        if (error.code != 0) {
             throw RuntimeException()
         }
         return result
     }
 
-    fun destroy() {
+    override fun destroy() {
         jniDestroy(ptr)
         ptr = nullptr
     }

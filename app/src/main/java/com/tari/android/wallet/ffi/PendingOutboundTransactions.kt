@@ -32,8 +32,6 @@
  */
 package com.tari.android.wallet.ffi
 
-import java.lang.RuntimeException
-
 /**
  * Tari pending outbound transactions wrapper.
  *
@@ -42,10 +40,15 @@ import java.lang.RuntimeException
 
 typealias PendingOutboundTransactionsPtr = Long
 
-class PendingOutboundTransactions(pointer: PendingOutboundTransactionsPtr) {
+class PendingOutboundTransactions(pointer: PendingOutboundTransactionsPtr): FinalizerBase() {
 
     private external fun jniGetLength(ptr: PendingOutboundTransactionsPtr, libError: LibError): Int
-    private external fun jniGetAt(ptr: PendingOutboundTransactionsPtr, index: Int, libError: LibError): PendingOutboundTransactionPtr
+    private external fun jniGetAt(
+        ptr: PendingOutboundTransactionsPtr,
+        index: Int,
+        libError: LibError
+    ): PendingOutboundTransactionPtr
+
     private external fun jniDestroy(ptr: PendingOutboundTransactionsPtr)
 
     private var ptr = nullptr
@@ -54,32 +57,29 @@ class PendingOutboundTransactions(pointer: PendingOutboundTransactionsPtr) {
         ptr = pointer
     }
 
-    fun getPointer() : PendingOutboundTransactionsPtr
-    {
+    fun getPointer(): PendingOutboundTransactionsPtr {
         return ptr
     }
 
     fun getLength(): Int {
-        var error = LibError()
-        val result = jniGetLength(ptr,error)
-        if (error.code != 0)
-        {
+        val error = LibError()
+        val result = jniGetLength(ptr, error)
+        if (error.code != 0) {
             throw RuntimeException()
         }
         return result
     }
 
     fun getAt(index: Int): PendingOutboundTransaction {
-        var error = LibError()
+        val error = LibError()
         val result = PendingOutboundTransaction(jniGetAt(ptr, index, error))
-        if (error.code != 0)
-        {
+        if (error.code != 0) {
             throw RuntimeException()
         }
         return result
     }
 
-    fun destroy() {
+    override fun destroy() {
         jniDestroy(ptr)
         ptr = nullptr
     }

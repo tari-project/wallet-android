@@ -14,8 +14,6 @@ class NetAddressString constructor() {
     private var address: String
     private var addressPort: Int
 
-    var hex :String = String()
-
     init {
         address = "0.0.0.0"
         addressPort = 0
@@ -25,24 +23,21 @@ class NetAddressString constructor() {
     constructor(string: String, port: Int) : this() {
         if (pattern.matches(string)) {
             address = string
-        }
-        else
-        {
+        } else {
             throw InvalidPropertiesFormatException("String is not valid Address")
         }
-        if (port >= 0)
-        {
+        if (port >= 0) {
             addressPort = port
-        } else
-        {
+        } else {
             throw InvalidPropertiesFormatException("Port is not valid Port")
         }
     }
 
     override fun toString(): String {
         val result = StringBuilder()
+            .append("/ip4/")
             .append(address)
-            .append(":")
+            .append("/tcp/")
             .append(addressPort)
         return result.toString()
     }

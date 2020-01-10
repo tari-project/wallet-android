@@ -32,7 +32,6 @@
  */
 package com.tari.android.wallet.ffi
 
-import java.lang.RuntimeException
 import java.security.InvalidParameterException
 
 typealias ContactPtr = Long
@@ -42,12 +41,16 @@ typealias ContactPtr = Long
  *
  * @author The Tari Development Team
  */
-class Contact constructor(pointer: ContactPtr) {
+class Contact constructor(pointer: ContactPtr): FinalizerBase() {
 
     private external fun jniGetAlias(contactPtr: ContactPtr, libError: LibError): String
     private external fun jniGetPublicKey(contactPtr: ContactPtr, libError: LibError): PublicKeyPtr
     private external fun jniDestroy(contactPtr: ContactPtr)
-    private external fun jniCreate(alias: String, publicKeyPtr: PublicKeyPtr, libError: LibError): ContactPtr
+    private external fun jniCreate(
+        alias: String,
+        publicKeyPtr: PublicKeyPtr,
+        libError: LibError
+    ): ContactPtr
 
     private var ptr = nullptr
 
@@ -56,39 +59,34 @@ class Contact constructor(pointer: ContactPtr) {
     }
 
     constructor(alias: String, publicKey: PublicKey) : this(nullptr) {
-        if (alias.isNotEmpty())
-        {
-            var error = LibError()
-            ptr = jniCreate(alias, publicKey.getPointer(),error)
-            if (error.code != 0)
-            {
+        if (alias.isNotEmpty()) {
+            val error = LibError()
+            ptr = jniCreate(alias, publicKey.getPointer(), error)
+            if (error.code != 0) {
                 throw RuntimeException()
             }
-        }
-        else {
+        } else {
             throw InvalidParameterException("Alias is an empty String")
         }
     }
 
-    fun getPointer() : ContactPtr {
+    fun getPointer(): ContactPtr {
         return ptr
     }
 
     fun getAlias(): String {
-        var error = LibError()
-        val result = jniGetAlias(ptr,error)
-        if (error.code != 0)
-        {
+        val error = LibError()
+        val result = jniGetAlias(ptr, error)
+        if (error.code != 0) {
             throw RuntimeException()
         }
         return result
     }
 
     fun getPublicKey(): PublicKey {
-        var error = LibError()
-        val result = PublicKey(jniGetPublicKey(ptr,error))
-        if (error.code != 0)
-        {
+        val error = LibError()
+        val result = PublicKey(jniGetPublicKey(ptr, error))
+        if (error.code != 0) {
             throw RuntimeException()
         }
         return result
@@ -102,7 +100,7 @@ class Contact constructor(pointer: ContactPtr) {
         return result.toString()
     }
 
-    fun destroy() {
+    override fun destroy() {
         jniDestroy(ptr)
         ptr = nullptr
     }

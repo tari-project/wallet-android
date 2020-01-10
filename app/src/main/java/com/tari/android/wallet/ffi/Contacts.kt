@@ -32,8 +32,6 @@
  */
 package com.tari.android.wallet.ffi
 
-import java.lang.RuntimeException
-
 /**
  * Tari contacts wrapper.
  *
@@ -41,10 +39,15 @@ import java.lang.RuntimeException
  */
 typealias ContactsPtr = Long
 
-class Contacts constructor(pointer: ContactPtr) {
+class Contacts constructor(pointer: ContactPtr): FinalizerBase() {
 
     private external fun jniGetLength(contactsPtr: ContactsPtr, libError: LibError): Int
-    private external fun jniGetAt(contactPtr: ContactPtr, index: Int, libError: LibError): ContactPtr
+    private external fun jniGetAt(
+        contactPtr: ContactPtr,
+        index: Int,
+        libError: LibError
+    ): ContactPtr
+
     private external fun jniDestroy(contactsPtr: ContactPtr)
 
     private var ptr = nullptr
@@ -53,33 +56,29 @@ class Contacts constructor(pointer: ContactPtr) {
         ptr = pointer
     }
 
-    fun getPointer() : ContactsPtr
-    {
+    fun getPointer(): ContactsPtr {
         return ptr
     }
 
-    fun getLength(): Int
-    {
-        var error = LibError()
+    fun getLength(): Int {
+        val error = LibError()
         val result = jniGetLength(ptr, error)
-        if (error.code != 0)
-        {
+        if (error.code != 0) {
             throw RuntimeException()
         }
         return result
     }
 
     fun getAt(index: Int): Contact {
-        var error = LibError()
-        val result = Contact(jniGetAt(ptr, index,error))
-        if (error.code != 0)
-        {
+        val error = LibError()
+        val result = Contact(jniGetAt(ptr, index, error))
+        if (error.code != 0) {
             throw RuntimeException()
         }
         return result
     }
 
-    fun destroy() {
+    override fun destroy() {
         jniDestroy(ptr)
         ptr = nullptr
     }

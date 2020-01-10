@@ -41,110 +41,108 @@ import android.util.Log
 import com.tari.android.wallet.ffi.*
 import org.junit.Assert.assertTrue
 import org.junit.Test
-import java.lang.RuntimeException
-import java.lang.StringBuilder
 import java.math.BigInteger
 
-
 class WalletTests {
-    class testListener: WalletListenerAdapter
-    {
+    class TestListener : WalletListenerAdapter {
         override fun onTransactionBroadcast(tx: CompletedTransaction) {
-            Log.i("ID",tx.getId().toString())
+            Log.i("ID", tx.getId().toString())
         }
 
         override fun onTransactionReceived(tx: PendingInboundTransaction) {
-            Log.i("ID",tx.getId().toString())
+            Log.i("ID", tx.getId().toString())
         }
 
         override fun onTransactionReplyReceived(tx: CompletedTransaction) {
-            Log.i("ID",tx.getId().toString())
+            Log.i("ID", tx.getId().toString())
         }
 
         override fun onTransactionMined(tx: CompletedTransaction) {
-            Log.i("ID",tx.getId().toString())
+            Log.i("ID", tx.getId().toString())
         }
 
         override fun onTransactionFinalized(tx: CompletedTransaction) {
-            Log.i("ID",tx.getId().toString())
+            Log.i("ID", tx.getId().toString())
+        }
+
+        override fun onDiscoveryComplete(txId: BigInteger, success: Boolean) {
+            val builder = StringBuilder().append(txId).append(":").append(success)
+            Log.i("ID", builder.toString())
         }
     }
 
     @Test
     fun testWallet() {
         TestUtil.clearTestFiles(StringBuilder().append(TestUtil.WALLET_DATASTORE_PATH).toString())
-        Log.i("Datastore_Path",TestUtil.WALLET_DATASTORE_PATH)
         val m = TestUtil.clearTestFiles(TestUtil.WALLET_DATASTORE_PATH)
-        if (!m)
-        {
+        if (!m) {
             throw RuntimeException()
         }
-        val commsConfig = CommsConfig(TestUtil.WALLET_CONTROL_SERVICE_ADDRESS,
+        val commsConfig = CommsConfig(
+            TestUtil.WALLET_CONTROL_SERVICE_ADDRESS,
             TestUtil.WALLET_LISTENER_ADDRESS,
             TestUtil.WALLET_DB_NAME,
             TestUtil.WALLET_DATASTORE_PATH,
             PrivateKey(HexString(TestUtil.PRIVATE_KEY_HEX_STRING))
         )
-        val listeners = testListener()
+        val listeners = TestListener()
         val wallet = Wallet
-        wallet.init(commsConfig,TestUtil.WALLET_LOG_FILE_PATH,listeners)
+        wallet.init(commsConfig, TestUtil.WALLET_LOG_FILE_PATH, listeners)
         assertTrue(wallet.getPointer() != nullptr)
         commsConfig.destroy()
         //test get public key
-        var pk = wallet.getPublicKey()
+        val pk = wallet.getPublicKey()
         assertTrue(pk.getPointer() != nullptr)
         //test data generation
         assertTrue(wallet.generateTestData(TestUtil.WALLET_DATASTORE_PATH))
         //test contacts
-        var contacts = wallet.getContacts()
+        val contacts = wallet.getContacts()
         assertTrue(contacts.getPointer() != nullptr)
-        var length = contacts.getLength()
+        val length = contacts.getLength()
         assertTrue(length > 0)
-        var contact = contacts.getAt(0)
+        val contact = contacts.getAt(0)
         assertTrue(contact.getPointer() != nullptr)
-        var removed = wallet.removeContact(contact)
+        val removed = wallet.removeContact(contact)
         assertTrue(removed)
-        var added = wallet.addContact(contact)
+        val added = wallet.addContact(contact)
         assertTrue(added)
         //test completed transactions
-        var completedTansactions = wallet.getCompletedTransactions()
+        val completedTansactions = wallet.getCompletedTransactions()
         assertTrue(completedTansactions.getPointer() != nullptr)
         assertTrue(completedTansactions.getLength() > 0)
         var completed: CompletedTransaction? = null
-        for ( i in 0..completedTansactions.getLength())
-        {
+        for (i in 0..completedTansactions.getLength()) {
             completed = completedTansactions.getAt(0)
             assertTrue(completed.getPointer() != nullptr)
-            if (completed.getStatus() == CompletedTransaction.Status.MINED)
-            {
+            if (completed.getStatus() == CompletedTransaction.Status.MINED) {
                 completed.destroy()
-            } else
-            {
+            } else {
                 break
             }
         }
         val completedID = completed!!.getId()
-        val completedSource = completed!!.getSourcePublicKey()
+        val completedSource = completed.getSourcePublicKey()
         assertTrue(completedSource.getPointer() != nullptr)
         completedSource.destroy()
-        val completedDestination = completed!!.getDestinationPublicKey()
+        val completedDestination = completed.getDestinationPublicKey()
         assertTrue(completedDestination.getPointer() != nullptr)
         completedDestination.destroy()
-        val completedAmount = completed!!.getAmount()
+        val completedAmount = completed.getAmount()
         assertTrue(completedAmount > BigInteger("0"))
-        val completedFee = completed!!.getFee()
+        val completedFee = completed.getFee()
         assertTrue(completedFee > BigInteger("0"))
-        val completedTimestamp = completed!!.getTimestamp()
-        val completedMessage = completed!!.getMessage()
-        completed?.destroy()
-        completed = wallet.getCompletedTransactionById(completedID!!.toLong())
+        val completedTimestamp = completed.getTimestamp()
+        completedTimestamp.toString()
+        completed.destroy()
+        completed = wallet.getCompletedTransactionById(completedID.toLong())
         assertTrue(completed.getPointer() != nullptr)
+        assertTrue(wallet.transactionBroadcast(completed))
         assertTrue(wallet.minedCompletedTransaction(completed))
         completed.destroy()
         completedTansactions.destroy()
         //test pending inbound transactions
         assertTrue(wallet.receiveTransaction())
-        var pendingInboundTransactions = wallet.getPendingInboundTransactions()
+        val pendingInboundTransactions = wallet.getPendingInboundTransactions()
         assertTrue(pendingInboundTransactions.getPointer() != nullptr)
         assertTrue(pendingInboundTransactions.getLength() > 0)
         var inbound = pendingInboundTransactions.getAt(0)
@@ -155,15 +153,15 @@ class WalletTests {
         val inboundAmount = inbound.getAmount()
         assertTrue(inboundAmount > BigInteger("0"))
         val inboundTimestamp = inbound.getTimestamp()
-        val inboundMessage = inbound.getMessage()
+        inboundTimestamp.toString()
         inbound.destroy()
         inbound = wallet.getPendingInboundTransactionById(inboundID.toLong())
         assertTrue(inbound.getPointer() != nullptr)
-        assertTrue(wallet.transactionBroadcast(inbound))
+        assertTrue(wallet.finalizeCompletedTransaction(inbound))
         inbound.destroy()
         pendingInboundTransactions.destroy()
         //test pending outbound transactions
-        var pendingOutboundTransactions = wallet.getPendingOutboundTransactions()
+        val pendingOutboundTransactions = wallet.getPendingOutboundTransactions()
         assertTrue(pendingOutboundTransactions.getPointer() != nullptr)
         assertTrue(pendingOutboundTransactions.getLength() > 0)
         var outbound = pendingOutboundTransactions.getAt(0)
@@ -174,7 +172,7 @@ class WalletTests {
         val outboundAmount = outbound.getAmount()
         assertTrue(outboundAmount > BigInteger("0"))
         val outboundTimestamp = outbound.getTimestamp()
-        val outboundMessage = outbound.getMessage()
+        outboundTimestamp.toString()
         outbound.destroy()
         outbound = wallet.getPendingOutboundTransactionById(outboundID.toLong())
         assertTrue(outbound.getPointer() != nullptr)
@@ -188,7 +186,7 @@ class WalletTests {
         assertTrue(pendingIn.toString().toBigIntegerOrNull() != null)
         val pendingOut = wallet.getPendingOutgoingBalance()
         assertTrue(pendingOut.toString().toBigIntegerOrNull() != null)
-        assertTrue(wallet.sendTransaction(contact.getPublicKey(),1000,100,"Android Wallet"))
+        assertTrue(wallet.sendTransaction(contact.getPublicKey(), 1000, 100, "Android Wallet"))
         contact.destroy()
         wallet.destroy()
 

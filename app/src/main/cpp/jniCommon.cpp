@@ -33,30 +33,15 @@
 #include <jni.h>
 #include <android/log.h>
 #include <string>
-#include <math.h>
+#include <cmath>
 #include <android/log.h>
-
-
-#define LOG_TAG "Tari Wallet"
-/**
- * Log functions. Log example:
- *
- * int count = 5;
- * LOGE("Count is %d", count);
- * char[] name = "asd";
- * LOGI("Name is %s", name);
- */
-#define LOGE(...) __android_log_print(ANDROID_LOG_ERROR,    LOG_TAG, __VA_ARGS__)
-#define LOGW(...) __android_log_print(ANDROID_LOG_WARN,     LOG_TAG, __VA_ARGS__)
-#define LOGI(...) __android_log_print(ANDROID_LOG_INFO,     LOG_TAG, __VA_ARGS__)
-#define LOGD(...) __android_log_print(ANDROID_LOG_DEBUG,    LOG_TAG, __VA_ARGS__)
 
 // function included in multiple source files must be inline
 inline jbyteArray getBytesFromUnsignedLongLong(JNIEnv *jEnv, unsigned long long value) {
-    const size_t size = sizeof (unsigned long long int);
+    const size_t size = sizeof(unsigned long long int);
     jbyteArray result = jEnv->NewByteArray((jsize) size);
     if (result != NULL) {
-        jbyte * cbytes = jEnv->GetByteArrayElements(result, NULL);
+        jbyte *cbytes = jEnv->GetByteArrayElements(result, NULL);
         if (cbytes != NULL) {
             int i;
             for (i = (int) (size - 1); i >= 0; i--) {
@@ -73,9 +58,9 @@ inline jboolean setErrorCode(JNIEnv *jEnv, jobject error, jint value) {
     jclass errorClass = jEnv->GetObjectClass(error);
     if (errorClass == NULL)
         return false;
-    jfieldID errorField = jEnv->GetFieldID(errorClass,"code","I");
+    jfieldID errorField = jEnv->GetFieldID(errorClass, "code", "I");
     if (errorField == NULL)
         return false;
-    jEnv->SetIntField(error,errorField,value);
+    jEnv->SetIntField(error, errorField, value);
     return true;
 }

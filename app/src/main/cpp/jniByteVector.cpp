@@ -35,24 +35,9 @@
 #include <android/log.h>
 #include <wallet.h>
 #include <string>
-#include <math.h>
+#include <cmath>
 #include <android/log.h>
 #include "jniCommon.cpp"
-
-#define LOG_TAG "Tari Wallet"
-
-/**
- * Log functions. Log example:
- *
- * int count = 5;
- * LOGE("Count is %d", count);
- * char[] name = "asd";
- * LOGI("Name is %s", name);
- */
-#define LOGE(...) __android_log_print(ANDROID_LOG_ERROR,    LOG_TAG, __VA_ARGS__)
-#define LOGW(...) __android_log_print(ANDROID_LOG_WARN,     LOG_TAG, __VA_ARGS__)
-#define LOGI(...) __android_log_print(ANDROID_LOG_INFO,     LOG_TAG, __VA_ARGS__)
-#define LOGD(...) __android_log_print(ANDROID_LOG_DEBUG,    LOG_TAG, __VA_ARGS__)
 
 extern "C"
 JNIEXPORT jlong JNICALL
@@ -61,17 +46,17 @@ Java_com_tari_android_wallet_ffi_ByteVector_jniCreate(
         jclass jClass,
         jbyteArray array,
         jobject error) {
-    unsigned char *buffer = reinterpret_cast<unsigned char*>(jEnv->GetByteArrayElements(array,0));
+    unsigned char *buffer = reinterpret_cast<unsigned char *>(jEnv->GetByteArrayElements(array, 0));
     jsize size = jEnv->GetArrayLength(array);
-    for(int i = 0; i < size; i++) {
+    for (int i = 0; i < size; i++) {
         printf("%hhx", buffer[i]);
     }
     int i = 0;
-    int* r = &i;
-    ByteVector *pByteVector = byte_vector_create(buffer, static_cast<unsigned int>(size),r);
-    setErrorCode(jEnv,error,i);
-    jEnv->ReleaseByteArrayElements(array, reinterpret_cast<jbyte*>(buffer), JNI_ABORT);
-    return  reinterpret_cast<jlong>(pByteVector);
+    int *r = &i;
+    ByteVector *pByteVector = byte_vector_create(buffer, static_cast<unsigned int>(size), r);
+    setErrorCode(jEnv, error, i);
+    jEnv->ReleaseByteArrayElements(array, reinterpret_cast<jbyte *>(buffer), JNI_ABORT);
+    return reinterpret_cast<jlong>(pByteVector);
 }
 
 extern "C"
@@ -82,10 +67,10 @@ Java_com_tari_android_wallet_ffi_ByteVector_jniGetLength(
         jlong jpByteVector,
         jobject error) {
     int i = 0;
-    int* r = &i;
+    int *r = &i;
     ByteVector *pByteVector = reinterpret_cast<ByteVector *>(jpByteVector);
-    jint length = byte_vector_get_length(pByteVector,r);
-    setErrorCode(jEnv,error,i);
+    jint length = byte_vector_get_length(pByteVector, r);
+    setErrorCode(jEnv, error, i);
     return length;
 }
 
@@ -98,10 +83,10 @@ Java_com_tari_android_wallet_ffi_ByteVector_jniGetAt(
         jint index,
         jobject error) {
     int i = 0;
-    int* r = &i;
+    int *r = &i;
     ByteVector *pByteVector = reinterpret_cast<ByteVector *>(jpByteVector);
-    jint byte = byte_vector_get_at(pByteVector, static_cast<unsigned int>(index),r);
-    setErrorCode(jEnv,error,i);
+    jint byte = byte_vector_get_at(pByteVector, static_cast<unsigned int>(index), r);
+    setErrorCode(jEnv, error, i);
     return byte;
 }
 

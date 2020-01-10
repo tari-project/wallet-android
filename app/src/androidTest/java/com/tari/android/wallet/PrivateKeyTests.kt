@@ -33,12 +33,11 @@
 package com.tari.android.wallet
 
 import com.tari.android.wallet.ffi.ByteVector
-import com.tari.android.wallet.ffi.nullptr
-import com.tari.android.wallet.ffi.PrivateKey
 import com.tari.android.wallet.ffi.HexString
+import com.tari.android.wallet.ffi.PrivateKey
+import com.tari.android.wallet.ffi.nullptr
+import org.junit.Assert.assertTrue
 import org.junit.Test
-
-import org.junit.Assert.*
 import java.util.*
 
 /**
@@ -69,5 +68,6 @@ class PrivateKeyTests {
     @Test(expected = InvalidPropertiesFormatException::class)
     fun testHexStringException() {
         val privateKey = PrivateKey(ByteVector(HexString(str2)))
+        privateKey.destroy()
     }
 }

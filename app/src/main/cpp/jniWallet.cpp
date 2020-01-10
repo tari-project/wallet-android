@@ -35,7 +35,7 @@
 #include <android/log.h>
 #include <wallet.h>
 #include <string>
-#include <math.h>
+#include <cmath>
 #include <android/log.h>
 #include "jniCommon.cpp"
 
@@ -87,256 +87,22 @@ JNIEnv *getJNIEnv() {
             LOGE("GetEnv: JNI version not supported.");
             break;
         }
-        default: result = jniEnv;
+        default:
+            result = jniEnv;
     }
     return result;
 }
 
 // region Wallet
-
-extern "C"
-JNIEXPORT jlong JNICALL
-Java_com_tari_android_wallet_ffi_Wallet_jniCreate(
-        JNIEnv *jEnv,
-        jobject jThis,
-        jlong jpWalletConfig,
-        jstring jLogPath,
-        jobject error) {
-    int i = 0;
-    int* r = &i;
-    TariWalletConfig *pWalletConfig = reinterpret_cast<TariWalletConfig *>(jpWalletConfig);
-    char *pLogPath = const_cast<char*>(jEnv->GetStringUTFChars(jLogPath, JNI_FALSE));
-    TariWallet *pWallet = wallet_create(pWalletConfig, pLogPath,r);
-    setErrorCode(jEnv,error,i);
-    jEnv->ReleaseStringUTFChars(jLogPath, pLogPath);
-    return reinterpret_cast<jlong>(pWallet);
-}
-
-extern "C"
-JNIEXPORT jlong JNICALL
-Java_com_tari_android_wallet_ffi_Wallet_jniGetPublicKey(
-        JNIEnv *jEnv,
-        jobject jThis,
-        jlong jpWallet,
-        jobject error) {
-    int i = 0;
-    int* r = &i;
-    TariWallet *pWallet = reinterpret_cast<TariWallet *>(jpWallet);
-    jlong result = reinterpret_cast<jlong>(wallet_get_public_key(pWallet,r));
-    setErrorCode(jEnv,error,i);
-    return result;
-}
-
-extern "C"
-JNIEXPORT jbyteArray JNICALL
-Java_com_tari_android_wallet_ffi_Wallet_jniGetAvailableBalance(
-        JNIEnv *jEnv,
-        jobject jThis,
-        jlong jpWallet,
-        jobject error) {
-    int i = 0;
-    int* r = &i;
-    TariWallet *pWallet = reinterpret_cast<TariWallet *>(jpWallet);
-    jbyteArray result = getBytesFromUnsignedLongLong(jEnv,wallet_get_available_balance(pWallet,r));
-    setErrorCode(jEnv,error,i);
-    return result;
-}
-
-extern "C"
-JNIEXPORT jbyteArray JNICALL
-Java_com_tari_android_wallet_ffi_Wallet_jniGetPendingIncomingBalance(
-        JNIEnv *jEnv,
-        jobject jThis,
-        jlong jpWallet,
-        jobject error) {
-    int i = 0;
-    int* r = &i;
-    TariWallet *pWallet = reinterpret_cast<TariWallet *>(jpWallet);
-    jbyteArray result = getBytesFromUnsignedLongLong(jEnv,wallet_get_pending_incoming_balance(pWallet,r));
-    setErrorCode(jEnv,error,i);
-    return result;
-}
-
-extern "C"
-JNIEXPORT jbyteArray JNICALL
-Java_com_tari_android_wallet_ffi_Wallet_jniGetPendingOutgoingBalance(
-        JNIEnv *jEnv,
-        jobject jThis,
-        jlong jpWallet,
-        jobject error) {
-    int i = 0;
-    int* r = &i;
-    TariWallet *pWallet = reinterpret_cast<TariWallet *>(jpWallet);
-    jbyteArray result = getBytesFromUnsignedLongLong(jEnv,wallet_get_pending_outgoing_balance(pWallet,r));
-    setErrorCode(jEnv,error,i);
-    return result;
-}
-
-extern "C"
-JNIEXPORT jlong JNICALL
-Java_com_tari_android_wallet_ffi_Wallet_jniGetContacts(
-        JNIEnv *jEnv,
-        jobject jThis,
-        jlong jpWallet,
-        jobject error) {
-    int i = 0;
-    int* r = &i;
-    TariWallet *pWallet = reinterpret_cast<TariWallet *>(jpWallet);
-    jlong result = reinterpret_cast<jlong>(wallet_get_contacts(pWallet,r));
-    setErrorCode(jEnv,error,i);
-    return result;
-}
-
-extern "C"
-JNIEXPORT jboolean JNICALL
-Java_com_tari_android_wallet_ffi_Wallet_jniAddContact(
-        JNIEnv *jEnv,
-        jobject jThis,
-        jlong jpWallet,
-        jlong jpContact,
-        jobject error) {
-    int i = 0;
-    int* r = &i;
-    TariWallet *pWallet = reinterpret_cast<TariWallet *>(jpWallet);
-    TariContact *pContact = reinterpret_cast<TariContact *>(jpContact);
-    jboolean result = wallet_add_contact(pWallet, pContact,r)!=0; //this is indirectly a cast from unsigned char to jboolean
-    setErrorCode(jEnv,error,i);
-    return result;
-}
-
-extern "C"
-JNIEXPORT jboolean JNICALL
-Java_com_tari_android_wallet_ffi_Wallet_jniRemoveContact(
-        JNIEnv *jEnv,
-        jobject jThis,
-        jlong jpWallet,
-        jlong jpContact,
-        jobject error) {
-    int i = 0;
-    int* r = &i;
-    TariWallet *pWallet = reinterpret_cast<TariWallet *>(jpWallet);
-    TariContact *pContact = reinterpret_cast<TariContact *>(jpContact);
-    jboolean result = wallet_remove_contact(pWallet, pContact,r)!=0;
-    setErrorCode(jEnv,error,i);
-    return result;
-}
-
-extern "C"
-JNIEXPORT jlong JNICALL
-Java_com_tari_android_wallet_ffi_Wallet_jniGetCompletedTransactions(
-        JNIEnv *jEnv,
-        jobject jThis,
-        jlong jpWallet,
-        jobject error) {
-    int i = 0;
-    int* r = &i;
-    TariWallet *pWallet = (TariWallet *) jpWallet;
-    TariCompletedTransactions *pCompletedTransactions = wallet_get_completed_transactions(pWallet,r);
-    setErrorCode(jEnv,error,i);
-    return reinterpret_cast<jlong>(pCompletedTransactions);
-}
-
-extern "C"
-JNIEXPORT jlong JNICALL
-Java_com_tari_android_wallet_ffi_Wallet_jniGetCompletedTransactionById(
-        JNIEnv *jEnv,
-        jobject jThis,
-        jlong jpWallet,
-        jlong jTxId,
-        jobject error) {
-    int i = 0;
-    int* r = &i;
-    TariWallet *pWallet = reinterpret_cast<TariWallet *>(jpWallet);
-    jlong result = reinterpret_cast<jlong>(wallet_get_completed_transaction_by_id(pWallet,
-                                                                                  static_cast<unsigned long long>(jTxId),r));
-    setErrorCode(jEnv,error,i);
-    return result;
-}
-
-extern "C"
-JNIEXPORT jlong JNICALL
-Java_com_tari_android_wallet_ffi_Wallet_jniGetPendingOutboundTransactions(
-        JNIEnv *jEnv,
-        jobject jThis,
-        jlong jpWallet,
-        jobject error) {
-    int i = 0;
-    int* r = &i;
-    TariWallet *pWallet = reinterpret_cast<TariWallet *>(jpWallet);
-    TariPendingOutboundTransactions *pPendingOutboundTransactions = wallet_get_pending_outbound_transactions(pWallet,r);
-    setErrorCode(jEnv,error,i);
-    return reinterpret_cast<jlong>(pPendingOutboundTransactions);
-}
-
-extern "C"
-JNIEXPORT jlong JNICALL
-Java_com_tari_android_wallet_ffi_Wallet_jniGetPendingOutboundTransactionById(
-        JNIEnv *jEnv,
-        jobject jThis,
-        jlong jpWallet,
-        jlong jTxId,
-        jobject error) {
-    int i = 0;
-    int* r = &i;
-    TariWallet *pWallet = reinterpret_cast<TariWallet *>(jpWallet);
-    jlong result = reinterpret_cast<jlong>(wallet_get_pending_outbound_transaction_by_id(pWallet,
-                                                                                         static_cast<unsigned long long>(jTxId),r));
-    setErrorCode(jEnv,error,i);
-    return result;
-}
-
-extern "C"
-JNIEXPORT jlong JNICALL
-Java_com_tari_android_wallet_ffi_Wallet_jniGetPendingInboundTransactions(
-        JNIEnv *jEnv,
-        jobject jThis,
-        jlong jpWallet,
-        jobject error) {
-    int i = 0;
-    int* r = &i;
-    TariWallet *pWallet = reinterpret_cast<TariWallet *>(jpWallet);
-    jlong result = reinterpret_cast<jlong>(wallet_get_pending_inbound_transactions(pWallet,r));
-    setErrorCode(jEnv,error,i);
-    return result;
-}
-
-extern "C"
-JNIEXPORT jlong JNICALL
-Java_com_tari_android_wallet_ffi_Wallet_jniGetPendingInboundTransactionById(
-        JNIEnv *jEnv,
-        jobject jThis,
-        jlong jpWallet,
-        jlong jTxId,
-        jobject error) {
-    int i = 0;
-    int* r = &i;
-    TariWallet *pWallet = reinterpret_cast<TariWallet *>(jpWallet);
-    jlong result = reinterpret_cast<jlong>(wallet_get_pending_inbound_transaction_by_id(pWallet,
-                                                                                        static_cast<unsigned long long>(jTxId),r));
-    setErrorCode(jEnv,error,i);
-    return result;
-}
-
-extern "C"
-JNIEXPORT void JNICALL
-Java_com_tari_android_wallet_ffi_Wallet_jniDestroy(
-        JNIEnv *jEnv,
-        jobject jThis,
-        jlong jpWallet) {
-    wallet_destroy(reinterpret_cast<TariWallet *>(jpWallet));
-}
-
-//endregion
-
-//region Callback Registration
 // Wallet is a singleton so only one of each is needed, should wallet be a class these would
 // have to be arrays with some means to track which wallet maps to which functions
 jobject callbackHandler = nullptr;
-jmethodID txBroadcastCallbackMethodId;
 jmethodID txReceivedCallbackMethodId;
-jmethodID txMinedCallbackMethodId;
 jmethodID txReplyReceivedCallbackMethodId;
 jmethodID txFinalizedCallbackMethodId;
+jmethodID txBroadcastCallbackMethodId;
+jmethodID txMinedCallbackMethodId;
+jmethodID txDiscoveryCallbackMethodId;
 
 void BroadcastCallback(struct TariCompletedTransaction *pCompletedTransaction) {
     auto *jniEnv = getJNIEnv();
@@ -403,168 +169,346 @@ void FinalizedCallback(struct TariCompletedTransaction *pCompletedTransaction) {
     g_vm->DetachCurrentThread();
 }
 
-extern "C"
-JNIEXPORT jboolean JNICALL
-Java_com_tari_android_wallet_ffi_Wallet_jniRegisterFinalizedTransaction(
-        JNIEnv *jEnv,
-        jobject jThis,
-        jlong jpWallet,
-        jstring jMethodName,
-        jstring jMethodSignature,
-        jobject error
-) {
-    int i = 0;
-    int* r = &i;
-    if (callbackHandler == nullptr) {
-        callbackHandler = jEnv->NewGlobalRef(jThis);
+void DiscoveryCallback(unsigned long long tx_id, bool success) {
+    auto *jniEnv = getJNIEnv();
+    if (jniEnv == nullptr) {
+        return;
     }
-    jclass jClass = jEnv->GetObjectClass(jThis);
-    if (jClass == nullptr) {
-        return (jboolean) false;
-    }
-    const char *pMethod = jEnv->GetStringUTFChars(jMethodName, JNI_FALSE);
-    const char *pSig = jEnv->GetStringUTFChars(jMethodSignature, JNI_FALSE);
-    txFinalizedCallbackMethodId = jEnv->GetMethodID(jClass,pMethod, pSig);
-    jEnv->ReleaseStringUTFChars(jMethodSignature, pSig);
-    jEnv->ReleaseStringUTFChars(jMethodName, pMethod);
-    if (txBroadcastCallbackMethodId == nullptr) {
-        return (jboolean) false;
-    }
-    TariWallet *pWallet = reinterpret_cast<TariWallet *>(jpWallet);
-    jboolean result = wallet_callback_register_received_finalized_transaction(pWallet,FinalizedCallback,r)!=0;
-    setErrorCode(jEnv,error,i);
-    return result;
+    jbyteArray bytes = getBytesFromUnsignedLongLong(jniEnv, tx_id);
+    jniEnv->CallVoidMethod(
+            callbackHandler,
+            txDiscoveryCallbackMethodId, bytes, success);
+    g_vm->DetachCurrentThread();
 }
 
 extern "C"
-JNIEXPORT jboolean JNICALL
-Java_com_tari_android_wallet_ffi_Wallet_jniRegisterTransactionBroadcast(
+JNIEXPORT jlong JNICALL
+Java_com_tari_android_wallet_ffi_Wallet_jniCreate(
         JNIEnv *jEnv,
         jobject jThis,
-        jlong jpWallet,
-        jstring jMethodName,
-        jstring jMethodSignature,
-        jobject error
-        ) {
-    if (callbackHandler == nullptr) {
-        callbackHandler = jEnv->NewGlobalRef(jThis);
-    }
-    jclass jClass = jEnv->GetObjectClass(jThis);
-    if (jClass == nullptr) {
-        return (jboolean) false;
-    }
-    const char* pMethod = jEnv->GetStringUTFChars(jMethodName, JNI_FALSE);
-    const char* pSig = jEnv->GetStringUTFChars(jMethodSignature, JNI_FALSE);
-    txBroadcastCallbackMethodId = jEnv->GetMethodID(jClass, pMethod, pSig);
-    jEnv->ReleaseStringUTFChars(jMethodSignature, pSig);
-    jEnv->ReleaseStringUTFChars(jMethodName, pMethod);
-    if (txBroadcastCallbackMethodId == nullptr) {
-        return (jboolean) false;
-    }
-    int i = 0;
-    int* r = &i;
-    TariWallet *pWallet = reinterpret_cast<TariWallet *>(jpWallet);
-    jboolean result = wallet_callback_register_transaction_broadcast(pWallet,BroadcastCallback,r)!=0;
-    setErrorCode(jEnv,error,i);
-    return result;
-}
-
-extern "C"
-JNIEXPORT jboolean JNICALL
-Java_com_tari_android_wallet_ffi_Wallet_jniRegisterTransactionMined(
-        JNIEnv *jEnv,
-        jobject jThis,
-        jlong jpWallet,
-        jstring jMethodName,
-        jstring jMethodSignature,
-        jobject error
-        ) {
-    if (callbackHandler == nullptr) {
-        callbackHandler = jEnv->NewGlobalRef(jThis);
-    }
-    jclass jClass = jEnv->GetObjectClass(jThis);
-    if (jClass == nullptr) {
-        return (jboolean) false;
-    }
-    const char* pMethod = jEnv->GetStringUTFChars(jMethodName, JNI_FALSE);
-    const char* pSig = jEnv->GetStringUTFChars(jMethodSignature, JNI_FALSE);
-    txMinedCallbackMethodId = jEnv->GetMethodID(jClass, pMethod, pSig);
-    jEnv->ReleaseStringUTFChars(jMethodSignature, pSig);
-    jEnv->ReleaseStringUTFChars(jMethodName, pMethod);
-    if (txMinedCallbackMethodId == nullptr) {
-        return (jboolean) false;
-    }
-    int i = 0;
-    int* r = &i;
-    TariWallet *pWallet = reinterpret_cast<TariWallet *>(jpWallet);
-    jboolean result = wallet_callback_register_mined(pWallet, MinedCallback,r)!=0;
-    setErrorCode(jEnv,error,i);
-    return result;
-}
-
-extern "C"
-JNIEXPORT jboolean JNICALL
-Java_com_tari_android_wallet_ffi_Wallet_jniRegisterTransactionReceived(
-        JNIEnv *jEnv,
-        jobject jThis,
-        jlong jpWallet,
-        jstring jMethodName,
-        jstring jMethodSignature,
-        jobject error
-        ) {
-    if (callbackHandler == nullptr) {
-        callbackHandler = jEnv->NewGlobalRef(jThis);
-    }
-    jclass jClass = jEnv->GetObjectClass(jThis);
-    if (jClass == nullptr) {
-        return (jboolean) false;
-    }
-    const char* pMethod = jEnv->GetStringUTFChars(jMethodName, JNI_FALSE);
-    const char* pSig = jEnv->GetStringUTFChars(jMethodSignature, JNI_FALSE);
-    txReceivedCallbackMethodId = jEnv->GetMethodID(jClass,pMethod, pSig);
-    jEnv->ReleaseStringUTFChars(jMethodSignature, pSig);
-    jEnv->ReleaseStringUTFChars(jMethodName, pMethod);
-    if (txReceivedCallbackMethodId == nullptr) {
-        return (jboolean) false;
-    }
-    int i = 0;
-    int* r = &i;
-    TariWallet *pWallet = reinterpret_cast<TariWallet *>(jpWallet);
-    jboolean result = wallet_callback_register_received_transaction(pWallet, ReceivedCallback,r)!=0;
-    setErrorCode(jEnv,error,i);
-    return result;
-}
-
-extern "C"
-JNIEXPORT jboolean JNICALL
-Java_com_tari_android_wallet_ffi_Wallet_jniRegisterTransactionReplyReceived(
-        JNIEnv *jEnv,
-        jobject jThis,
-        jlong jpWallet,
-        jstring jMethodName,
-        jstring jMethodSignature,
+        jlong jpWalletConfig,
+        jstring jLogPath,
+        jstring callback_received_transaction,
+        jstring callback_received_transaction_sig,
+        jstring callback_received_transaction_reply,
+        jstring callback_received_transaction_reply_sig,
+        jstring callback_received_finalized_transaction,
+        jstring callback_received_finalized_transaction_sig,
+        jstring callback_transaction_broadcast,
+        jstring callback_transaction_broadcast_sig,
+        jstring callback_transaction_mined,
+        jstring callback_transaction_mined_sig,
+        jstring callback_discovery_process_complete,
+        jstring callback_discovery_process_complete_sig,
         jobject error) {
+    int i = 0;
+    int *r = &i;
     if (callbackHandler == nullptr) {
         callbackHandler = jEnv->NewGlobalRef(jThis);
     }
     jclass jClass = jEnv->GetObjectClass(jThis);
     if (jClass == nullptr) {
-        return (jboolean) false;
+        return reinterpret_cast<jlong>(nullptr);
     }
-    const char* pMethod = jEnv->GetStringUTFChars(jMethodName, JNI_FALSE);
-    const char* pSig = jEnv->GetStringUTFChars(jMethodSignature, JNI_FALSE);
-    txReplyReceivedCallbackMethodId = jEnv->GetMethodID(jClass,pMethod, pSig);
-    jEnv->ReleaseStringUTFChars(jMethodSignature, pSig);
-    jEnv->ReleaseStringUTFChars(jMethodName, pMethod);
+
+    const char *pReceivedMethod = jEnv->GetStringUTFChars(callback_received_transaction, JNI_FALSE);
+    const char *pReceivedSig = jEnv->GetStringUTFChars(callback_received_transaction_sig,
+                                                       JNI_FALSE);
+    txReceivedCallbackMethodId = jEnv->GetMethodID(jClass, pReceivedMethod, pReceivedSig);
+    jEnv->ReleaseStringUTFChars(callback_received_transaction_sig, pReceivedSig);
+    jEnv->ReleaseStringUTFChars(callback_received_transaction, pReceivedSig);
+    if (txReceivedCallbackMethodId == nullptr) {
+        return reinterpret_cast<jlong>(nullptr);
+    }
+
+    const char *pReceivedReplyMethod = jEnv->GetStringUTFChars(callback_received_transaction_reply,
+                                                               JNI_FALSE);
+    const char *pReceivedReplySig = jEnv->GetStringUTFChars(callback_received_transaction_reply_sig,
+                                                            JNI_FALSE);
+    txReplyReceivedCallbackMethodId = jEnv->GetMethodID(jClass, pReceivedReplyMethod,
+                                                        pReceivedReplySig);
+    jEnv->ReleaseStringUTFChars(callback_received_transaction_reply_sig, pReceivedReplySig);
+    jEnv->ReleaseStringUTFChars(callback_received_transaction_reply, pReceivedReplyMethod);
     if (txReplyReceivedCallbackMethodId == nullptr) {
-        return (jboolean) false;
+        return reinterpret_cast<jlong>(nullptr);
     }
+
+    const char *pFinalizedMethod = jEnv->GetStringUTFChars(callback_received_finalized_transaction,
+                                                           JNI_FALSE);
+    const char *pFinalizedSig = jEnv->GetStringUTFChars(callback_received_finalized_transaction_sig,
+                                                        JNI_FALSE);
+    txFinalizedCallbackMethodId = jEnv->GetMethodID(jClass, pFinalizedMethod, pFinalizedSig);
+    jEnv->ReleaseStringUTFChars(callback_received_finalized_transaction_sig, pFinalizedSig);
+    jEnv->ReleaseStringUTFChars(callback_received_finalized_transaction, pFinalizedMethod);
+    if (txFinalizedCallbackMethodId == nullptr) {
+        return reinterpret_cast<jlong>(nullptr);
+    }
+
+    const char *pBroadcastMethod = jEnv->GetStringUTFChars(callback_transaction_broadcast,
+                                                           JNI_FALSE);
+    const char *pBroadcastSig = jEnv->GetStringUTFChars(callback_transaction_broadcast_sig,
+                                                        JNI_FALSE);
+    txBroadcastCallbackMethodId = jEnv->GetMethodID(jClass, pBroadcastMethod, pBroadcastSig);
+    jEnv->ReleaseStringUTFChars(callback_transaction_broadcast_sig, pBroadcastSig);
+    jEnv->ReleaseStringUTFChars(callback_transaction_broadcast, pBroadcastMethod);
+    if (txBroadcastCallbackMethodId == nullptr) {
+        return reinterpret_cast<jlong>(nullptr);
+    }
+
+    const char *pMinedMethod = jEnv->GetStringUTFChars(callback_transaction_mined, JNI_FALSE);
+    const char *pMinedSig = jEnv->GetStringUTFChars(callback_transaction_mined_sig, JNI_FALSE);
+    txMinedCallbackMethodId = jEnv->GetMethodID(jClass, pMinedMethod, pMinedSig);
+    jEnv->ReleaseStringUTFChars(callback_transaction_mined_sig, pMinedSig);
+    jEnv->ReleaseStringUTFChars(callback_transaction_mined, pMinedMethod);
+    if (txMinedCallbackMethodId == nullptr) {
+        return reinterpret_cast<jlong>(nullptr);
+    }
+
+    const char *pDiscoveryMethod = jEnv->GetStringUTFChars(callback_discovery_process_complete,
+                                                           JNI_FALSE);
+    const char *pDiscoverySig = jEnv->GetStringUTFChars(callback_discovery_process_complete_sig,
+                                                        JNI_FALSE);
+    txDiscoveryCallbackMethodId = jEnv->GetMethodID(jClass, pDiscoveryMethod, pDiscoverySig);
+    jEnv->ReleaseStringUTFChars(callback_received_transaction_sig, pDiscoverySig);
+    jEnv->ReleaseStringUTFChars(callback_received_transaction, pDiscoveryMethod);
+    if (txDiscoveryCallbackMethodId == nullptr) {
+        return reinterpret_cast<jlong>(nullptr);
+    }
+
+    TariWalletConfig *pWalletConfig = reinterpret_cast<TariWalletConfig *>(jpWalletConfig);
+
+    char *pLogPath = const_cast<char *>(jEnv->GetStringUTFChars(jLogPath, JNI_FALSE));
+    TariWallet *pWallet = wallet_create(pWalletConfig, pLogPath, ReceivedCallback, ReplyCallback,
+                                        FinalizedCallback, BroadcastCallback, MinedCallback,
+                                        DiscoveryCallback, r);
+    setErrorCode(jEnv, error, i);
+    jEnv->ReleaseStringUTFChars(jLogPath, pLogPath);
+    return reinterpret_cast<jlong>(pWallet);
+}
+
+extern "C"
+JNIEXPORT jlong JNICALL
+Java_com_tari_android_wallet_ffi_Wallet_jniGetPublicKey(
+        JNIEnv *jEnv,
+        jobject jThis,
+        jlong jpWallet,
+        jobject error) {
     int i = 0;
-    int* r = &i;
+    int *r = &i;
     TariWallet *pWallet = reinterpret_cast<TariWallet *>(jpWallet);
-    jboolean result = wallet_callback_register_received_transaction_reply(pWallet,ReplyCallback,r)!=0;
-    setErrorCode(jEnv,error,i);
+    jlong result = reinterpret_cast<jlong>(wallet_get_public_key(pWallet, r));
+    setErrorCode(jEnv, error, i);
     return result;
+}
+
+extern "C"
+JNIEXPORT jbyteArray JNICALL
+Java_com_tari_android_wallet_ffi_Wallet_jniGetAvailableBalance(
+        JNIEnv *jEnv,
+        jobject jThis,
+        jlong jpWallet,
+        jobject error) {
+    int i = 0;
+    int *r = &i;
+    TariWallet *pWallet = reinterpret_cast<TariWallet *>(jpWallet);
+    jbyteArray result = getBytesFromUnsignedLongLong(jEnv,
+                                                     wallet_get_available_balance(pWallet, r));
+    setErrorCode(jEnv, error, i);
+    return result;
+}
+
+extern "C"
+JNIEXPORT jbyteArray JNICALL
+Java_com_tari_android_wallet_ffi_Wallet_jniGetPendingIncomingBalance(
+        JNIEnv *jEnv,
+        jobject jThis,
+        jlong jpWallet,
+        jobject error) {
+    int i = 0;
+    int *r = &i;
+    TariWallet *pWallet = reinterpret_cast<TariWallet *>(jpWallet);
+    jbyteArray result = getBytesFromUnsignedLongLong(jEnv,
+                                                     wallet_get_pending_incoming_balance(pWallet,
+                                                                                         r));
+    setErrorCode(jEnv, error, i);
+    return result;
+}
+
+extern "C"
+JNIEXPORT jbyteArray JNICALL
+Java_com_tari_android_wallet_ffi_Wallet_jniGetPendingOutgoingBalance(
+        JNIEnv *jEnv,
+        jobject jThis,
+        jlong jpWallet,
+        jobject error) {
+    int i = 0;
+    int *r = &i;
+    TariWallet *pWallet = reinterpret_cast<TariWallet *>(jpWallet);
+    jbyteArray result = getBytesFromUnsignedLongLong(jEnv,
+                                                     wallet_get_pending_outgoing_balance(pWallet,
+                                                                                         r));
+    setErrorCode(jEnv, error, i);
+    return result;
+}
+
+extern "C"
+JNIEXPORT jlong JNICALL
+Java_com_tari_android_wallet_ffi_Wallet_jniGetContacts(
+        JNIEnv *jEnv,
+        jobject jThis,
+        jlong jpWallet,
+        jobject error) {
+    int i = 0;
+    int *r = &i;
+    TariWallet *pWallet = reinterpret_cast<TariWallet *>(jpWallet);
+    jlong result = reinterpret_cast<jlong>(wallet_get_contacts(pWallet, r));
+    setErrorCode(jEnv, error, i);
+    return result;
+}
+
+extern "C"
+JNIEXPORT jboolean JNICALL
+Java_com_tari_android_wallet_ffi_Wallet_jniAddContact(
+        JNIEnv *jEnv,
+        jobject jThis,
+        jlong jpWallet,
+        jlong jpContact,
+        jobject error) {
+    int i = 0;
+    int *r = &i;
+    TariWallet *pWallet = reinterpret_cast<TariWallet *>(jpWallet);
+    TariContact *pContact = reinterpret_cast<TariContact *>(jpContact);
+    jboolean result = wallet_add_contact(pWallet, pContact, r) !=
+                      0; //this is indirectly a cast from unsigned char to jboolean
+    setErrorCode(jEnv, error, i);
+    return result;
+}
+
+extern "C"
+JNIEXPORT jboolean JNICALL
+Java_com_tari_android_wallet_ffi_Wallet_jniRemoveContact(
+        JNIEnv *jEnv,
+        jobject jThis,
+        jlong jpWallet,
+        jlong jpContact,
+        jobject error) {
+    int i = 0;
+    int *r = &i;
+    TariWallet *pWallet = reinterpret_cast<TariWallet *>(jpWallet);
+    TariContact *pContact = reinterpret_cast<TariContact *>(jpContact);
+    jboolean result = wallet_remove_contact(pWallet, pContact, r) != 0;
+    setErrorCode(jEnv, error, i);
+    return result;
+}
+
+extern "C"
+JNIEXPORT jlong JNICALL
+Java_com_tari_android_wallet_ffi_Wallet_jniGetCompletedTransactions(
+        JNIEnv *jEnv,
+        jobject jThis,
+        jlong jpWallet,
+        jobject error) {
+    int i = 0;
+    int *r = &i;
+    TariWallet *pWallet = (TariWallet *) jpWallet;
+    TariCompletedTransactions *pCompletedTransactions = wallet_get_completed_transactions(pWallet,
+                                                                                          r);
+    setErrorCode(jEnv, error, i);
+    return reinterpret_cast<jlong>(pCompletedTransactions);
+}
+
+extern "C"
+JNIEXPORT jlong JNICALL
+Java_com_tari_android_wallet_ffi_Wallet_jniGetCompletedTransactionById(
+        JNIEnv *jEnv,
+        jobject jThis,
+        jlong jpWallet,
+        jlong jTxId,
+        jobject error) {
+    int i = 0;
+    int *r = &i;
+    TariWallet *pWallet = reinterpret_cast<TariWallet *>(jpWallet);
+    jlong result = reinterpret_cast<jlong>(wallet_get_completed_transaction_by_id(pWallet,
+                                                                                  static_cast<unsigned long long>(jTxId),
+                                                                                  r));
+    setErrorCode(jEnv, error, i);
+    return result;
+}
+
+extern "C"
+JNIEXPORT jlong JNICALL
+Java_com_tari_android_wallet_ffi_Wallet_jniGetPendingOutboundTransactions(
+        JNIEnv *jEnv,
+        jobject jThis,
+        jlong jpWallet,
+        jobject error) {
+    int i = 0;
+    int *r = &i;
+    TariWallet *pWallet = reinterpret_cast<TariWallet *>(jpWallet);
+    TariPendingOutboundTransactions *pPendingOutboundTransactions = wallet_get_pending_outbound_transactions(
+            pWallet, r);
+    setErrorCode(jEnv, error, i);
+    return reinterpret_cast<jlong>(pPendingOutboundTransactions);
+}
+
+extern "C"
+JNIEXPORT jlong JNICALL
+Java_com_tari_android_wallet_ffi_Wallet_jniGetPendingOutboundTransactionById(
+        JNIEnv *jEnv,
+        jobject jThis,
+        jlong jpWallet,
+        jlong jTxId,
+        jobject error) {
+    int i = 0;
+    int *r = &i;
+    TariWallet *pWallet = reinterpret_cast<TariWallet *>(jpWallet);
+    jlong result = reinterpret_cast<jlong>(wallet_get_pending_outbound_transaction_by_id(pWallet,
+                                                                                         static_cast<unsigned long long>(jTxId),
+                                                                                         r));
+    setErrorCode(jEnv, error, i);
+    return result;
+}
+
+extern "C"
+JNIEXPORT jlong JNICALL
+Java_com_tari_android_wallet_ffi_Wallet_jniGetPendingInboundTransactions(
+        JNIEnv *jEnv,
+        jobject jThis,
+        jlong jpWallet,
+        jobject error) {
+    int i = 0;
+    int *r = &i;
+    TariWallet *pWallet = reinterpret_cast<TariWallet *>(jpWallet);
+    jlong result = reinterpret_cast<jlong>(wallet_get_pending_inbound_transactions(pWallet, r));
+    setErrorCode(jEnv, error, i);
+    return result;
+}
+
+extern "C"
+JNIEXPORT jlong JNICALL
+Java_com_tari_android_wallet_ffi_Wallet_jniGetPendingInboundTransactionById(
+        JNIEnv *jEnv,
+        jobject jThis,
+        jlong jpWallet,
+        jlong jTxId,
+        jobject error) {
+    int i = 0;
+    int *r = &i;
+    TariWallet *pWallet = reinterpret_cast<TariWallet *>(jpWallet);
+    jlong result = reinterpret_cast<jlong>(wallet_get_pending_inbound_transaction_by_id(pWallet,
+                                                                                        static_cast<unsigned long long>(jTxId),
+                                                                                        r));
+    setErrorCode(jEnv, error, i);
+    return result;
+}
+
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_tari_android_wallet_ffi_Wallet_jniDestroy(
+        JNIEnv *jEnv,
+        jobject jThis,
+        jlong jpWallet) {
+    wallet_destroy(reinterpret_cast<TariWallet *>(jpWallet));
 }
 
 //endregion
@@ -579,10 +523,12 @@ Java_com_tari_android_wallet_ffi_Wallet_jniGenerateTestData(
         jstring jDatastorePath,
         jobject error) {
     int i = 0;
-    int* r = &i;
-    const char* pDatastorePath = jEnv->GetStringUTFChars(jDatastorePath, JNI_FALSE);
-    jboolean result = wallet_test_generate_data((TariWallet *) jpWallet, const_cast<char *>(pDatastorePath),r) !=0;
-    setErrorCode(jEnv,error,i);
+    int *r = &i;
+    const char *pDatastorePath = jEnv->GetStringUTFChars(jDatastorePath, JNI_FALSE);
+    jboolean result =
+            wallet_test_generate_data((TariWallet *) jpWallet, const_cast<char *>(pDatastorePath),
+                                      r) != 0;
+    setErrorCode(jEnv, error, i);
     jEnv->ReleaseStringUTFChars(jDatastorePath, pDatastorePath);
     return result;
 }
@@ -596,11 +542,28 @@ Java_com_tari_android_wallet_ffi_Wallet_jniTransactionBroadcast(
         jlong jTx,
         jobject error) {
     int i = 0;
-    int* r = &i;
+    int *r = &i;
+    TariWallet *pWallet = reinterpret_cast<TariWallet *>(jpWallet);
+    TariCompletedTransaction *pTx = reinterpret_cast<TariCompletedTransaction *>(jTx);
+    jboolean result = wallet_test_broadcast_transaction(pWallet, pTx, r) != 0;
+    setErrorCode(jEnv, error, i);
+    return result;
+}
+
+extern "C"
+JNIEXPORT jboolean JNICALL
+Java_com_tari_android_wallet_ffi_Wallet_jniFinalizeCompletedTransaction(
+        JNIEnv *jEnv,
+        jobject jThis,
+        jlong jpWallet,
+        jlong jTx,
+        jobject error) {
+    int i = 0;
+    int *r = &i;
     TariWallet *pWallet = reinterpret_cast<TariWallet *>(jpWallet);
     TariPendingInboundTransaction *pTx = reinterpret_cast<TariPendingInboundTransaction *>(jTx);
-    jboolean result = wallet_test_transaction_broadcast(pWallet, pTx,r)!=0;
-    setErrorCode(jEnv,error,i);
+    jboolean result = wallet_test_finalize_received_transaction(pWallet, pTx, r) != 0;
+    setErrorCode(jEnv, error, i);
     return result;
 }
 
@@ -613,11 +576,11 @@ Java_com_tari_android_wallet_ffi_Wallet_jniCompleteSentTransaction(
         jlong jTx,
         jobject error) {
     int i = 0;
-    int* r = &i;
+    int *r = &i;
     TariWallet *pWallet = reinterpret_cast<TariWallet *>(jpWallet);
     TariPendingOutboundTransaction *pTx = reinterpret_cast<TariPendingOutboundTransaction *>(jTx);
-    jboolean result = wallet_test_complete_sent_transaction(pWallet, pTx,r)!=0;
-    setErrorCode(jEnv,error,i);
+    jboolean result = wallet_test_complete_sent_transaction(pWallet, pTx, r) != 0;
+    setErrorCode(jEnv, error, i);
     return result;
 }
 
@@ -630,11 +593,11 @@ Java_com_tari_android_wallet_ffi_Wallet_jniMineCompletedTransaction(
         jlong jTx,
         jobject error) {
     int i = 0;
-    int* r = &i;
+    int *r = &i;
     TariWallet *pWallet = reinterpret_cast<TariWallet *>(jpWallet);
     TariCompletedTransaction *pTx = reinterpret_cast<TariCompletedTransaction *>(jTx);
-    jboolean result = wallet_test_mined(pWallet, pTx,r)!=0;
-    setErrorCode(jEnv,error,i);
+    jboolean result = wallet_test_mine_transaction(pWallet, pTx, r) != 0;
+    setErrorCode(jEnv, error, i);
     return result;
 }
 
@@ -646,10 +609,10 @@ Java_com_tari_android_wallet_ffi_Wallet_jniReceiveTransaction(
         jlong jpWallet,
         jobject error) {
     int i = 0;
-    int* r = &i;
+    int *r = &i;
     TariWallet *pWallet = reinterpret_cast<TariWallet *>(jpWallet);
-    jboolean result = wallet_test_receive_transaction(pWallet,r)!=0;
-    setErrorCode(jEnv,error,i);
+    jboolean result = wallet_test_receive_transaction(pWallet, r) != 0;
+    setErrorCode(jEnv, error, i);
     return result;
 }
 
@@ -665,14 +628,14 @@ Java_com_tari_android_wallet_ffi_Wallet_jniSendTransaction(
         jstring jmessage,
         jobject error) {
     int i = 0;
-    int* r = &i;
+    int *r = &i;
     TariWallet *pWallet = reinterpret_cast<TariWallet *>(jpWallet);
-    TariPublicKey *pDestination = reinterpret_cast<TariPublicKey*>(jdestination);
+    TariPublicKey *pDestination = reinterpret_cast<TariPublicKey *>(jdestination);
     unsigned long long amount = static_cast<unsigned long long>(jamount);
     unsigned long long fee = static_cast<unsigned long long>(jfee);
-    const char* pMessage = jEnv->GetStringUTFChars(jmessage, JNI_FALSE);
-    jboolean result = wallet_send_transaction(pWallet,pDestination,amount,fee,pMessage,r) != 0;
-    setErrorCode(jEnv,error,i);
+    const char *pMessage = jEnv->GetStringUTFChars(jmessage, JNI_FALSE);
+    jboolean result = wallet_send_transaction(pWallet, pDestination, amount, fee, pMessage, r) != 0;
+    setErrorCode(jEnv, error, i);
     jEnv->ReleaseStringUTFChars(jmessage, pMessage);
     return result;
 }

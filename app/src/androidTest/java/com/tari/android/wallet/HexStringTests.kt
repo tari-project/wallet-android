@@ -1,11 +1,9 @@
 package com.tari.android.wallet
 
-import android.util.Log
 import com.tari.android.wallet.ffi.HexString
-import org.junit.Assert.*
+import org.junit.Assert.assertTrue
 import org.junit.Test
 import java.util.*
-
 
 
 class HexStringTests {
@@ -21,6 +19,7 @@ class HexStringTests {
 
     @Test(expected = InvalidPropertiesFormatException::class)
     fun testHexStringException() {
-        var hexString = HexString(str2)
+        val hexString = HexString(str2)
+        hexString.toString()
     }
 }

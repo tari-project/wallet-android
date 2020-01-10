@@ -33,7 +33,6 @@
 package com.tari.android.wallet.ffi
 
 import java.io.InvalidObjectException
-import java.lang.RuntimeException
 import java.math.BigInteger
 
 /**
@@ -43,14 +42,26 @@ import java.math.BigInteger
  */
 typealias CompletedTransactionPtr = Long
 
-class CompletedTransaction constructor(pointer: CompletedTransactionPtr) {
+class CompletedTransaction constructor(pointer: CompletedTransactionPtr): FinalizerBase() {
 
     private external fun jniGetId(ptr: CompletedTransactionPtr, libError: LibError): ByteArray
-    private external fun jniGetDestinationPublicKey(ptr: CompletedTransactionPtr, libError: LibError): PublicKeyPtr
-    private external fun jniGetSourcePublicKey(ptr: CompletedTransactionPtr, libError: LibError): PublicKeyPtr
+    private external fun jniGetDestinationPublicKey(
+        ptr: CompletedTransactionPtr,
+        libError: LibError
+    ): PublicKeyPtr
+
+    private external fun jniGetSourcePublicKey(
+        ptr: CompletedTransactionPtr,
+        libError: LibError
+    ): PublicKeyPtr
+
     private external fun jniGetAmount(ptr: CompletedTransactionPtr, libError: LibError): ByteArray
     private external fun jniGetFee(ptr: CompletedTransactionPtr, libError: LibError): ByteArray
-    private external fun jniGetTimestamp(ptr: CompletedTransactionPtr, libError: LibError): ByteArray
+    private external fun jniGetTimestamp(
+        ptr: CompletedTransactionPtr,
+        libError: LibError
+    ): ByteArray
+
     private external fun jniGetMessage(ptr: CompletedTransactionPtr, libError: LibError): String
     private external fun jniGetStatus(ptr: CompletedTransactionPtr, libError: LibError): Int
     private external fun jniDestroy(ptr: CompletedTransactionPtr)
@@ -68,86 +79,77 @@ class CompletedTransaction constructor(pointer: CompletedTransactionPtr) {
         ptr = pointer
     }
 
-    fun getPointer() : CompletedTransactionPtr
-    {
+    fun getPointer(): CompletedTransactionPtr {
         return ptr
     }
 
     fun getId(): BigInteger {
-        var error = LibError()
-        var bytes = jniGetId(ptr, error)
-        if (error.code != 0)
-        {
+        val error = LibError()
+        val bytes = jniGetId(ptr, error)
+        if (error.code != 0) {
             throw RuntimeException()
         }
-        return BigInteger(1,bytes)
+        return BigInteger(1, bytes)
     }
 
     fun getDestinationPublicKey(): PublicKey {
-        var error = LibError()
-        val result = PublicKey(jniGetDestinationPublicKey(ptr,error))
-        if (error.code != 0)
-        {
+        val error = LibError()
+        val result = PublicKey(jniGetDestinationPublicKey(ptr, error))
+        if (error.code != 0) {
             throw RuntimeException()
         }
         return result
     }
 
     fun getSourcePublicKey(): PublicKey {
-        var error = LibError()
-        val result = PublicKey(jniGetSourcePublicKey(ptr,error))
-        if (error.code != 0)
-        {
+        val error = LibError()
+        val result = PublicKey(jniGetSourcePublicKey(ptr, error))
+        if (error.code != 0) {
             throw RuntimeException()
         }
         return result
     }
 
     fun getAmount(): BigInteger {
-        var error = LibError()
-        val bytes = jniGetAmount(ptr,error)
-        if (error.code != 0)
-        {
+        val error = LibError()
+        val bytes = jniGetAmount(ptr, error)
+        if (error.code != 0) {
             throw RuntimeException()
         }
-        return BigInteger(1,bytes)
+        return BigInteger(1, bytes)
     }
 
     fun getFee(): BigInteger {
-        var error = LibError()
-        val bytes = jniGetFee(ptr,error)
-        if (error.code != 0)
-        {
+        val error = LibError()
+        val bytes = jniGetFee(ptr, error)
+        if (error.code != 0) {
             throw RuntimeException()
         }
-        return BigInteger(1,bytes)
+        return BigInteger(1, bytes)
     }
 
     fun getTimestamp(): BigInteger {
-        var error = LibError()
-        val bytes = jniGetTimestamp(ptr,error)
-        if (error.code != 0)
-        {
+        val error = LibError()
+        val bytes = jniGetTimestamp(ptr, error)
+        if (error.code != 0) {
             throw RuntimeException()
         }
-        return BigInteger(1,bytes)
+        return BigInteger(1, bytes)
     }
 
     fun getMessage(): String {
-        var error = LibError()
-        val result = jniGetMessage(ptr,error)
-        if (error.code != 0)
-        {
+        val error = LibError()
+        val result = jniGetMessage(ptr, error)
+        if (error.code != 0) {
             throw RuntimeException()
         }
         return result
     }
 
     fun getStatus(): Status {
-        var error = LibError()
+        val error = LibError()
         val status = jniGetStatus(ptr, error)
-        if (error.code != 0)
-        {
+        if (error.code != 0) {
             throw RuntimeException()
         }
         return when (status) {
@@ -159,7 +161,7 @@ class CompletedTransaction constructor(pointer: CompletedTransactionPtr) {
         }
     }
 
-    fun destroy() {
+    override fun destroy() {
         jniDestroy(ptr)
         ptr = nullptr
     }

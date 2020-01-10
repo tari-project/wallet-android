@@ -32,7 +32,6 @@
  */
 package com.tari.android.wallet.ffi
 
-import java.lang.RuntimeException
 import java.math.BigInteger
 import java.util.*
 
@@ -44,7 +43,7 @@ import java.util.*
 
 typealias ByteVectorPtr = Long
 
-class ByteVector constructor(pointer:ByteVectorPtr) {
+class ByteVector constructor(pointer: ByteVectorPtr): FinalizerBase() {
 
     private external fun jniGetLength(pByteVector: ByteVectorPtr, error: LibError): Int
     private external fun jniGetAt(pByteVector: ByteVectorPtr, index: Int, error: LibError): Int
@@ -57,27 +56,23 @@ class ByteVector constructor(pointer:ByteVectorPtr) {
         ptr = pointer
     }
 
-    constructor(hex:HexString) : this(nullptr) {
+    constructor(hex: HexString) : this(nullptr) {
         if (hex.toString().length == 64) {
-            val byteArray = BigInteger(hex.toString(),16).toByteArray()
-            var error = LibError()
+            val byteArray = BigInteger(hex.toString(), 16).toByteArray()
+            val error = LibError()
             ptr = jniCreate(byteArray, error)
-            if (error.code != 0)
-            {
+            if (error.code != 0) {
                 throw RuntimeException()
             }
-        } else
-        {
+        } else {
             throw InvalidPropertiesFormatException("Argument is invalid")
         }
     }
 
-    fun getLength(): Int
-    {
-        var error = LibError()
+    fun getLength(): Int {
+        val error = LibError()
         val len = jniGetLength(ptr, error)
-        if (error.code != 0)
-        {
+        if (error.code != 0) {
             throw RuntimeException()
         }
         return len
@@ -87,21 +82,20 @@ class ByteVector constructor(pointer:ByteVectorPtr) {
         return HexString(this).toString()
     }
 
-    fun getPointer() : ByteVectorPtr {
+    fun getPointer(): ByteVectorPtr {
         return ptr
     }
 
     fun getAt(index: Int): Int {
-        var error = LibError()
+        val error = LibError()
         val byte = jniGetAt(ptr, index, error)
-        if (error.code != 0)
-        {
+        if (error.code != 0) {
             throw RuntimeException()
         }
         return byte
     }
 
-    fun destroy() {
+    override fun destroy() {
         jniDestroy(ptr)
         ptr = nullptr
     }
