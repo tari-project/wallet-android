@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/black"
-    tools:context=".ui.activity.MainActivity">
+    tools:context=".ui.activity.AuthActivity">
 
     <!-- Lottie animation for Tari Wallet text -->
     <com.airbnb.lottie.LottieAnimationView

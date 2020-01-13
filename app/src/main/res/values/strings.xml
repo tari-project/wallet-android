@@ -1,17 +1,42 @@
 <resources>
     <string name="app_name">Tari Wallet</string>
-    <string name="testnet">TESTNET v1.0</string>
 
+    <!-- digits -->
+    <string name="digit_0">0</string>
+    <string name="digit_1">1</string>
+    <string name="digit_2">2</string>
+    <string name="digit_3">3</string>
+    <string name="digit_4">4</string>
+    <string name="digit_5">5</string>
+    <string name="digit_6">6</string>
+    <string name="digit_7">7</string>
+    <string name="digit_8">8</string>
+    <string name="digit_9">9</string>
+    <string name="digit_thousands_separator">,</string>
+    <string name="digit_decimal_separator">.</string>
+
+    <!-- dummy values - UI design placeholders -->
+    <string name="dummy_positive_tx_value">+ 152.75</string>
+    <string name="dummy_negative_tx_value">- 63.25</string>
+    <string name="dummy_contact_alias">Sarah_D</string>
+    <string name="dummy_message">Thanks again for helping with my move</string>
+
+    <!-- auth -->
+    <string name="testnet">TESTNET v1.0</string>
     <string name="proceed">Proceed</string>
     <string name="exit">Exit</string>
-
     <string name="auth_title">Authentication</string>
     <string name="auth_subtitle">Please use your biometrics or your PIN, pattern or password to authenticate Tari Wallet.</string>
     <string name="auth_description">Authentication secures your Tari Wallet transactions.</string>
-
     <string name="auth_not_available_or_canceled_title">Authentication Error</string>
     <string name="auth_not_available_or_canceled_desc">Tari Wallet was not able to authenticate you. Do you still want to proceed?</string>
-
     <string name="auth_failed_title">Authentication Failed</string>
     <string name="auth_failed_desc">Tari Wallet was not able to authenticate you.</string>
+
+    <!-- home -->
+    <string name="home_available_balance">Available Balance</string>
+    <string name="home_today">Today</string>
+    <string name="home_yesterday">Yesterday</string>
+    <string name="home_send_tari">Send Tari</string>
+    <string name="home_transactions">Transactions</string>
 </resources>

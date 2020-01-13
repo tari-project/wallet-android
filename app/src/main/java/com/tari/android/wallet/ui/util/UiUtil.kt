@@ -34,36 +34,31 @@ package com.tari.android.wallet.ui.util
 
 import android.app.Activity
 import android.content.Context
-import android.graphics.BlendMode
-import android.graphics.BlendModeColorFilter
 import android.os.Handler
 
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
-import android.widget.ProgressBar
 import androidx.annotation.NonNull
 import java.lang.ref.WeakReference
 
 /**
  * Contains UI utility functions.
  *
- * @author Kutsal Kaan Bilgin
+ * @author The Tari Development Team
  */
-class UiUtil {
+object UiUtil {
 
     // enabled view clickability after a disable
     private val clickEnablingHandler = Handler()
 
-    fun setWidthAndHeight(
+    fun setWidth(
         @NonNull view: View,
-        @NonNull newWidth: Int,
-        @NonNull newHeight: Int
+        @NonNull newWidth: Int
     ) {
         if (view.layoutParams is ViewGroup.MarginLayoutParams) {
             val layoutParams = view.layoutParams as ViewGroup.MarginLayoutParams
             layoutParams.width = newWidth
-            layoutParams.height = newHeight
             view.layoutParams = layoutParams
         }
     }
@@ -79,25 +74,43 @@ class UiUtil {
         }
     }
 
-    fun setLeftMargin(
+    fun getHeight(
+        @NonNull view: View
+    ): Int {
+        val layoutParams = view.layoutParams as ViewGroup.MarginLayoutParams
+        return layoutParams.height
+    }
+
+    fun setTopMargin(
         @NonNull view: View,
-        @NonNull newLeftMargin: Int
+        @NonNull newTopMargin: Int
     ) {
         if (view.layoutParams is ViewGroup.MarginLayoutParams) {
             val layoutParams = view.layoutParams as ViewGroup.MarginLayoutParams
-            layoutParams.leftMargin = newLeftMargin
+            layoutParams.topMargin = newTopMargin
             view.layoutParams = layoutParams
         }
     }
 
-    fun setProgressBarColor(
-        @NonNull progressBar: ProgressBar,
-        @NonNull color: Int
+    fun setBottomMargin(
+        @NonNull view: View,
+        @NonNull newBottomMargin: Int
     ) {
-        val colorFilter = BlendModeColorFilter(color, BlendMode.SRC_ATOP)
-        progressBar.indeterminateDrawable.mutate().colorFilter = colorFilter
+        if (view.layoutParams is ViewGroup.MarginLayoutParams) {
+            val layoutParams = view.layoutParams as ViewGroup.MarginLayoutParams
+            layoutParams.bottomMargin = newBottomMargin
+            view.layoutParams = layoutParams
+        }
     }
 
+    fun getBottomMargin(
+        @NonNull view: View
+    ): Int {
+        val layoutParams = view.layoutParams as ViewGroup.MarginLayoutParams
+        return layoutParams.bottomMargin
+    }
+
+    @Suppress("unused")
     fun hideKeyboard(
         @NonNull activity: Activity
     ) {

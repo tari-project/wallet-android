@@ -44,7 +44,10 @@ import java.util.*
 enum class CustomFont(private val fileName: String) {
 
     // font files
+    AVENIR_LT_STD_BLACK("fonts/AvenirLTStd-Black.otf"),
     AVENIR_LT_STD_HEAVY("fonts/AvenirLTStd-Heavy.otf"),
+    AVENIR_LT_STD_MEDIUM("fonts/AvenirLTStd-Medium.otf"),
+    AVENIR_LT_STD_ROMAN("fonts/AvenirLTStd-Roman.otf"),
     AVENIR_NEXT_LT_PRO_REGULAR("fonts/AvenirNextLTPro-Regular.otf");
 
     companion object {

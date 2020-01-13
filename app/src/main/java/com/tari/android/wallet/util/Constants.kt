@@ -33,9 +33,9 @@
 package com.tari.android.wallet.util
 
 /**
- * Contains application constant values.
+ * Contains application-wide constant values.
  *
- * @author Kutsal Kaan Bilgin
+ * @author The Tari Development Team
  */
 object Constants {
 
@@ -44,6 +44,14 @@ object Constants {
      */
     object UI {
         const val shortAnimDurationMs = 300L
+        const val mediumAnimDurationMs = 600L
+
+        object Home {
+            const val startupAnimDuration = 1500L
+            const val swipeRefreshDummyDuration = 1300L
+            const val digitAnimDurationMs = 700L
+            const val digitShrinkExpandAnimDurationMs = 200L
+        }
     }
 
 }

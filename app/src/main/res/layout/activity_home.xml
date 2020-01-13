@@ -1,0 +1,217 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/home_vw_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/home_bg_gradient"
+    tools:context=".ui.activity.home.HomeActivity">
+
+    <!-- bg image -->
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:contentDescription="@null"
+        android:scaleType="centerCrop"
+        android:src="@drawable/home_bg_pattern" />
+
+    <!-- top content -->
+    <RelativeLayout
+        android:id="@+id/home_vw_top_content_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="25dp"
+        android:layout_marginTop="@dimen/home_top_content_container_view_top_margin"
+        android:layout_marginEnd="25dp">
+
+        <!-- QR button -->
+        <ImageButton
+            android:id="@+id/home_img_btn_qr"
+            android:layout_width="38dp"
+            android:layout_height="38dp"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:background="@drawable/home_qr_btn_bg"
+            android:contentDescription="@null"
+            android:src="@drawable/home_qr" />
+
+        <!-- title -->
+        <com.tari.android.wallet.ui.component.CustomFontTextView
+            android:id="@+id/home_txt_available_balance"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_marginEnd="4dp"
+            android:layout_toStartOf="@+id/home_img_btn_qr"
+            android:text="@string/home_available_balance"
+            android:textColor="@color/white"
+            android:textSize="14sp"
+            app:customFont="AVENIR_LT_STD_MEDIUM" />
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="@dimen/home_balance_digit_height"
+            android:layout_below="@id/home_txt_available_balance"
+            android:layout_alignParentStart="true"
+            android:layout_marginTop="4dp"
+            android:layout_marginEnd="4dp"
+            android:layout_toStartOf="@+id/home_img_btn_qr"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <!-- gem icon -->
+            <ImageView
+                android:id="@+id/home_img_balance_gem"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:contentDescription="@null"
+                android:src="@drawable/home_gem_balance" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/home_balance_digit_height"
+                android:layout_marginStart="8dp"
+                android:orientation="horizontal">
+
+                <LinearLayout
+                    android:id="@+id/home_vw_balance_digit_container"
+                    android:layout_width="wrap_content"
+                    android:layout_height="@dimen/home_balance_digit_height"
+                    android:orientation="horizontal">
+
+                </LinearLayout>
+
+                <!-- decimals -->
+                <LinearLayout
+                    android:id="@+id/home_balance_vw_decimals_digit_container"
+                    android:layout_width="wrap_content"
+                    android:layout_height="@dimen/home_balance_digit_decimal_height"
+                    android:layout_marginTop="6dp"
+                    android:clipChildren="true"
+                    android:gravity="top"
+                    android:orientation="horizontal"
+                    android:padding="0dp">
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </RelativeLayout>
+
+    <View
+        android:id="@+id/home_vw_tx_list_bg_overlay"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/home_black_overlay"
+        android:clickable="false" />
+
+    <com.tari.android.wallet.ui.activity.home.CustomScrollView
+        android:id="@+id/home_scroll_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clickable="false"
+        android:overScrollMode="never">
+
+        <RelativeLayout
+            android:id="@+id/home_vw_scroll_content"
+            android:layout_width="match_parent"
+            android:layout_height="835dp"
+            android:orientation="vertical">
+
+            <View
+                android:id="@+id/home_vw_scroll_bg_enabler"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/home_tx_list_container_minimized_top_margin"
+                android:clickable="false" />
+
+            <!-- fixes a possible UI glitch that happens at the startup animation -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_below="@id/home_vw_grabber_container"
+                android:layout_marginTop="-25dp"
+                android:background="@color/white" />
+
+            <LinearLayout
+                android:id="@+id/home_vw_grabber_container"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/home_grabber_container_height"
+                android:layout_below="@id/home_vw_scroll_bg_enabler"
+                android:background="@drawable/home_grabber_bg"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center">
+
+                <View
+                    android:id="@+id/home_vw_grabber"
+                    android:layout_width="@dimen/home_grabber_width"
+                    android:layout_height="@dimen/home_grabber_height"
+                    android:background="@drawable/home_grabber" />
+            </LinearLayout>
+
+            <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+                android:id="@+id/home_swipe_container"
+                android:layout_width="match_parent"
+                android:layout_height="600dp"
+                android:layout_below="@id/home_vw_grabber_container">
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/home_rv_tx_list"
+                    android:layout_width="match_parent"
+                    android:layout_height="600dp"
+                    android:background="@color/white"
+                    android:overScrollMode="never"
+                    android:scrollbars="none" />
+            </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+        </RelativeLayout>
+
+    </com.tari.android.wallet.ui.activity.home.CustomScrollView>
+
+    <com.tari.android.wallet.ui.component.CustomFontButton
+        android:id="@+id/home_btn_send_tari"
+        android:layout_width="@dimen/home_sen_tari_button_width"
+        android:layout_height="@dimen/home_sen_tari_button_height"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="40dp"
+        android:background="@drawable/home_send_tari_button_bg"
+        android:ellipsize="middle"
+        android:singleLine="true"
+        android:text="@string/home_send_tari"
+        android:textAllCaps="false"
+        android:textColor="@color/white"
+        android:textSize="16sp"
+        app:customFont="AVENIR_LT_STD_HEAVY" />
+
+    <!-- Transactions header -->
+    <RelativeLayout
+        android:id="@+id/home_vw_tx_list_header"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/home_tx_list_header_height"
+        android:layout_marginTop="0dp"
+        android:background="@color/white">
+
+        <ImageButton
+            android:id="@+id/home_btn_close_tx_list"
+            android:layout_width="50dp"
+            android:layout_height="match_parent"
+            android:background="@color/transparent"
+            android:contentDescription="@null"
+            android:src="@drawable/close_icon" />
+
+        <com.tari.android.wallet.ui.component.CustomFontTextView
+            android:id="@+id/home_txt_tx_list_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:text="@string/home_transactions"
+            android:textColor="@color/black"
+            android:textSize="16sp"
+            app:customFont="AVENIR_LT_STD_HEAVY" />
+
+    </RelativeLayout>
+
+</RelativeLayout>

@@ -36,36 +36,53 @@ import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
 import android.animation.AnimatorSet
 import android.animation.ValueAnimator
+import android.content.Intent
 import android.os.Bundle
+import android.widget.ImageView
+import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.biometric.BiometricPrompt
+import butterknife.BindView
+import butterknife.ButterKnife
+import com.airbnb.lottie.LottieAnimationView
 import com.daasuu.ei.Ease
 import com.daasuu.ei.EasingInterpolator
 import com.orhanobut.logger.Logger
 import com.tari.android.wallet.R
 import com.tari.android.wallet.auth.AuthUtil
+import com.tari.android.wallet.ui.activity.home.HomeActivity
 import com.tari.android.wallet.util.Constants
-import kotlinx.android.synthetic.main.activity_main.*
 import java.lang.ref.WeakReference
 import java.util.concurrent.Executors
 
 /**
- * Initial activity class.
+ * Initial activity class - authenticates the user.
  *
- * @author Kutsal Kaan Bilgin.
+ * @author The Tari Development Team
  */
-class MainActivity : AppCompatActivity() {
+class AuthActivity : AppCompatActivity(), Animator.AnimatorListener {
 
     private lateinit var biometricPrompt: BiometricPrompt
+    @BindView(R.id.main_img_big_gem)
+    lateinit var bigGemImageView: ImageView
+    @BindView(R.id.main_anim_tari)
+    lateinit var tariAnimationView: LottieAnimationView
+    @BindView(R.id.main_txt_testnet)
+    lateinit var testnetTextView: TextView
+    @BindView(R.id.main_img_small_gem)
+    lateinit var smallGemImageView: ImageView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        setContentView(R.layout.activity_auth)
+        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
+
+        ButterKnife.bind(this)
 
         // call the animations
-        val wr = WeakReference<MainActivity>(this)
-        main_img_big_gem.post { wr.get()?.showTariText() }
+        val wr = WeakReference<AuthActivity>(this)
+        bigGemImageView.post { wr.get()?.showTariText() }
     }
 
     /**
@@ -73,23 +90,23 @@ class MainActivity : AppCompatActivity() {
      */
     private fun showTariText() {
         // hide features to be shown after animation
-        main_anim_tari.alpha = 0f
-        main_txt_testnet.alpha = 0f
-        main_img_small_gem.alpha = 0f
+        tariAnimationView.alpha = 0f
+        testnetTextView.alpha = 0f
+        smallGemImageView.alpha = 0f
 
         // define animations
         val hideGemAnim = ValueAnimator.ofFloat(1f, 0f)
         val showTariTextAnim = ValueAnimator.ofFloat(0f, 1f)
-        val weakReference: WeakReference<MainActivity> = WeakReference(this)
+        val weakReference: WeakReference<AuthActivity> = WeakReference(this)
         hideGemAnim.addUpdateListener { valueAnimator: ValueAnimator ->
             val alpha = valueAnimator.animatedValue as Float
-            weakReference.get()?.main_img_big_gem?.alpha = alpha
+            weakReference.get()?.bigGemImageView?.alpha = alpha
         }
         showTariTextAnim.addUpdateListener { valueAnimator: ValueAnimator ->
             val alpha = valueAnimator.animatedValue as Float
-            weakReference.get()?.main_anim_tari?.alpha = alpha
-            weakReference.get()?.main_txt_testnet?.alpha = alpha
-            weakReference.get()?.main_img_small_gem?.alpha = alpha
+            weakReference.get()?.tariAnimationView?.alpha = alpha
+            weakReference.get()?.testnetTextView?.alpha = alpha
+            weakReference.get()?.smallGemImageView?.alpha = alpha
         }
 
         // chain animations
@@ -101,7 +118,7 @@ class MainActivity : AppCompatActivity() {
         animSet.interpolator = EasingInterpolator(Ease.QUART_IN)
 
         // authenticate at the end of the animation set
-        val wr = WeakReference<MainActivity>(this)
+        val wr = WeakReference<AuthActivity>(this)
         animSet.addListener(object : AnimatorListenerAdapter() {
             override fun onAnimationEnd(animation: Animator?) {
                 wr.get()?.doAuth()
@@ -117,12 +134,12 @@ class MainActivity : AppCompatActivity() {
      * on passcode if not.
      */
     private fun doAuth() {
-        val wr = WeakReference<MainActivity>(this)
+        val wr = WeakReference<AuthActivity>(this)
 
         // check whether there's at least screen lock
         if (!AuthUtil.isDeviceSecured(this)) {
             // local authentication not available
-            main_anim_tari?.post {
+            tariAnimationView.post {
                 wr.get()?.displayAuthNotAvailableDialog()
             }
             return
@@ -166,8 +183,8 @@ class MainActivity : AppCompatActivity() {
      * Auth was successful.
      */
     private fun authSuccessful() {
-        val wr = WeakReference<MainActivity>(this)
-        wr.get()?.main_anim_tari?.post {
+        val wr = WeakReference<AuthActivity>(this)
+        wr.get()?.tariAnimationView?.post {
             wr.get()?.playTariWalletAnim()
         }
     }
@@ -177,7 +194,7 @@ class MainActivity : AppCompatActivity() {
      */
     private fun authHasFailed() {
         Logger.e("Authentication other error.")
-        val wr = WeakReference<MainActivity>(this)
+        val wr = WeakReference<AuthActivity>(this)
         runOnUiThread { wr.get()?.displayAuthFailedDialog() }
     }
 
@@ -185,13 +202,13 @@ class MainActivity : AppCompatActivity() {
      * Auth not available on device, i.e. lock screen is disabled
      */
     private fun displayAuthNotAvailableDialog() {
-        val wr = WeakReference<MainActivity>(this)
+        val wr = WeakReference<AuthActivity>(this)
         val dialogBuilder = AlertDialog.Builder(this)
         dialogBuilder.setMessage(getString(R.string.auth_not_available_or_canceled_desc))
             .setCancelable(false)
             .setPositiveButton(getString(R.string.proceed)) { dialog, _ ->
                 dialog.cancel()
-                wr.get()?.main_anim_tari?.post {
+                wr.get()?.tariAnimationView?.post {
                     wr.get()?.playTariWalletAnim()
                 }
             }
@@ -225,7 +242,31 @@ class MainActivity : AppCompatActivity() {
      * Plays Tari Wallet text anim.
      */
     private fun playTariWalletAnim() {
-        main_anim_tari.playAnimation()
+        tariAnimationView.addAnimatorListener(this)
+        tariAnimationView.playAnimation()
     }
+
+    //region Animator Listener
+    override fun onAnimationStart(animation: Animator?) {
+        // no-op
+    }
+
+    override fun onAnimationRepeat(animation: Animator?) {
+        // no-op
+    }
+
+    override fun onAnimationCancel(animation: Animator?) {
+        // no-op
+    }
+
+    override fun onAnimationEnd(animation: Animator?) {
+        // go to home activity
+        val intent = Intent(this, HomeActivity::class.java)
+        // intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
+        startActivity(intent)
+        // finish this activity
+        // finish()
+    }
+    //endregion Animator Listener
 
 }
