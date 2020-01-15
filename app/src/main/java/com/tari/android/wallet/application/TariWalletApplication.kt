@@ -33,8 +33,14 @@
 package com.tari.android.wallet.application
 
 import android.app.Application
+import android.content.Intent
+import androidx.core.content.ContextCompat
 import com.orhanobut.logger.AndroidLogAdapter
 import com.orhanobut.logger.Logger
+import com.tari.android.wallet.di.ApplicationComponent
+import com.tari.android.wallet.di.ApplicationModule
+import com.tari.android.wallet.di.DaggerApplicationComponent
+import com.tari.android.wallet.service.WalletService
 
 /**
  * Main application class.
@@ -42,6 +48,9 @@ import com.orhanobut.logger.Logger
  * @author The Tari Development Team
  */
 class TariWalletApplication : Application() {
+
+    lateinit var appComponent: ApplicationComponent
+
     init {
         System.loadLibrary("native-lib")
     }
@@ -49,6 +58,11 @@ class TariWalletApplication : Application() {
     override fun onCreate() {
         super.onCreate()
         Logger.addLogAdapter(AndroidLogAdapter())
+        appComponent = initDagger(this)
     }
 
+    private fun initDagger(app: TariWalletApplication): ApplicationComponent =
+        DaggerApplicationComponent.builder()
+            .applicationModule(ApplicationModule(app))
+            .build()
 }

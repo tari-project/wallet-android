@@ -1,6 +1,9 @@
 <resources>
     <string name="app_name">Tari Wallet</string>
 
+    <!-- foreground service description -->
+    <string name="wallet_service_desc">This service is required to communicate with Tari services. Please keep this service running if you want to be able to communicate with the Tari system.</string>
+
     <!-- digits -->
     <string name="digit_0">0</string>
     <string name="digit_1">1</string>
@@ -21,6 +24,10 @@
     <string name="dummy_contact_alias">Sarah_D</string>
     <string name="dummy_message">Thanks again for helping with my move</string>
 
+    <!-- service -->
+    <string name="service_title">Tari wallet service is running.</string>
+    <string name="service_description">This service carries out wallet operations across applications.</string>
+
     <!-- auth -->
     <string name="testnet">TESTNET v1.0</string>
     <string name="proceed">Proceed</string>
@@ -39,4 +46,7 @@
     <string name="home_yesterday">Yesterday</string>
     <string name="home_send_tari">Send Tari</string>
     <string name="home_transactions">Transactions</string>
+    <!-- test -->
+    <string name="home_test_data_warning">Please wait.\n\nWallet is generating test data.</string>
+
 </resources>

@@ -34,38 +34,49 @@ package com.tari.android.wallet.ui.activity.home
 
 import android.animation.ValueAnimator
 import android.annotation.SuppressLint
+import android.content.ComponentName
+import android.content.Context
+import android.content.Intent
+import android.content.ServiceConnection
 import android.graphics.Rect
 import android.graphics.drawable.GradientDrawable
+import android.os.AsyncTask
 import android.os.Bundle
+import android.os.IBinder
 import android.util.DisplayMetrics
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
-import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+import butterknife.BindColor
 import butterknife.BindView
 import butterknife.BindDimen
 import butterknife.OnClick
-import butterknife.ButterKnife
 import com.daasuu.ei.Ease
 import com.daasuu.ei.EasingInterpolator
+import com.orhanobut.logger.Logger
 import com.tari.android.wallet.R
-import com.tari.android.wallet.ui.extension.makeStatusBarTransparent
+import com.tari.android.wallet.service.TariWalletService
+import com.tari.android.wallet.service.WalletService
+import com.tari.android.wallet.ui.activity.BaseActivity
 import com.tari.android.wallet.ui.util.UiUtil
 import com.tari.android.wallet.util.*
 import java.lang.Float.max
 import java.lang.ref.WeakReference
+import java.math.BigDecimal
 
 /**
  * Home - transaction list.
  *
  * @author The Tari Development Team
  */
-class HomeActivity : AppCompatActivity(),
+class HomeActivity : BaseActivity(),
+    ServiceConnection,
     SwipeRefreshLayout.OnRefreshListener,
     View.OnScrollChangeListener,
     View.OnTouchListener {
@@ -116,6 +127,13 @@ class HomeActivity : AppCompatActivity(),
     @BindView(R.id.home_vw_scroll_content)
     lateinit var scrollContentView: View
 
+    @BindView(R.id.home_vw_test_data_blocker)
+    lateinit var testDataBlockerView: View
+    @BindView(R.id.home_prog_bar_test_data)
+    lateinit var testDataProgressBar: ProgressBar
+    @BindView(R.id.home_txt_test_data_warning)
+    lateinit var testDataWarningTextView: TextView
+
     @BindDimen(R.dimen.home_top_content_container_view_top_margin)
     @JvmField
     var topContentContainerViewTopMargin = 0
@@ -152,32 +170,38 @@ class HomeActivity : AppCompatActivity(),
     @JvmField
     var grabberViewWidth = 0
 
+    @BindColor(R.color.white)
+    @JvmField
+    var whiteColor = 0
+
     // tx list
     private lateinit var recyclerViewAdapter: RecyclerView.Adapter<*>
     private lateinit var recyclerViewLayoutManager: RecyclerView.LayoutManager
-    private val txList: List<DummyTx> = dummyTransactions.toList()
+    private val txList: List<DummyTx> = dummyTxs.toList()
 
     // balance controller
     private lateinit var balanceViewController: BalanceViewController
 
-    //
+    // grabber drag animation constants
     private var grabberViewAlphaScrollAnimCoefficient = 1.2f
     private var grabberViewWidthScrollAnimCoefficient = 1.1f
     private var grabberViewCornerRadiusScrollAnimCoefficient = 1.4f
 
     private var sendTariButtonIsVisible = true
 
+    private var walletService: TariWalletService? = null
+
+    override val contentViewId = R.layout.activity_home
+
     @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_home)
+
         overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
         //makeStatusBarTransparent() -- commented out to fix the UI cutout issue
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.home_vw_root)) { _, insets ->
             insets.consumeSystemWindowInsets()
         }
-
-        ButterKnife.bind(this)
 
         // hide background overlay
         txListBgOverlayView.alpha = 0f
@@ -208,23 +232,58 @@ class HomeActivity : AppCompatActivity(),
         // recycler view is initially disabled
         recyclerView.isClickable = false
 
-        // initialize the balance view controller
-        balanceViewController =
-            BalanceViewController(
-                this,
-                balanceDigitContainerView,
-                balanceDecimalDigitContainerView,
-                dummyWallet.balanceTaris // initial value
-            )
-
         scrollBgEnabler.setOnTouchListener(this)
         scrollView.setOnTouchListener(this)
         recyclerView.setOnTouchListener(this)
 
         scrollView.post {
             setScrollViewContentHeight()
-            runStartupAnimation()
         }
+
+        UiUtil.setProgressBarColor(testDataProgressBar, whiteColor)
+        sendTariButton.visibility = View.INVISIBLE
+    }
+
+    override fun onStart() {
+        super.onStart()
+
+        // start the wallet service
+        ContextCompat.startForegroundService(
+            this,
+            Intent(this, WalletService::class.java)
+        )
+        // bind to service
+        val bindIntent = Intent(this@HomeActivity, WalletService::class.java)
+        //intent.action = TariWalletService::class.java.name
+        bindService(bindIntent, this, Context.BIND_AUTO_CREATE)
+    }
+
+    /**
+     * Wallet service connected.
+     */
+    override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
+        Logger.d("Connected to the wallet service.")
+        walletService = TariWalletService.Stub.asInterface(service)
+        AsyncTask.execute {
+            walletService!!.generateTestData()
+            val balanceInfo = walletService!!.balanceInfo
+            val balance = BigDecimal(balanceInfo.availableBalance)
+                .divide(BigDecimal("1000000"))
+                .toDouble()
+            dummyWallet.balanceTaris = balance
+
+            scrollView.post {
+                runStartupAnimation()
+            }
+        }
+    }
+
+    /**
+     * Wallet service disconnected.
+     */
+    override fun onServiceDisconnected(name: ComponentName?) {
+        Logger.d("Disconnected from the wallet service.")
+        walletService = null
     }
 
     private fun setScrollViewContentHeight() {
@@ -246,6 +305,18 @@ class HomeActivity : AppCompatActivity(),
      * The startup animation - reveals the list, balance and other views.
      */
     private fun runStartupAnimation() {
+        testDataBlockerView.visibility = View.GONE
+        sendTariButton.visibility = View.VISIBLE
+
+        // initialize the balance view controller
+        balanceViewController =
+            BalanceViewController(
+                this,
+                balanceDigitContainerView,
+                balanceDecimalDigitContainerView,
+                dummyWallet.balanceTaris // initial value
+            )
+
         // show digits
         balanceViewController.runStartupAnimation()
 
@@ -299,6 +370,7 @@ class HomeActivity : AppCompatActivity(),
         recyclerView.layoutManager = null
         recyclerView.adapter = null
         recyclerView.setOnTouchListener(null)
+        unbindService(this)
         super.onDestroy()
     }
 
@@ -308,9 +380,11 @@ class HomeActivity : AppCompatActivity(),
     @OnClick(R.id.home_img_btn_qr)
     fun changeBalance(view: View) {
         UiUtil.temporarilyDisableClick(view)
+
         // get next balance
         val balance = nextBalance()
         dummyWallet.balanceTaris = balance
+
         // set balance
         balanceViewController.balance = dummyWallet.balanceTaris
     }

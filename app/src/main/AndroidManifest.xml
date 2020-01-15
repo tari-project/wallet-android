@@ -9,6 +9,7 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
 
     <application
         android:name=".application.TariWalletApplication"
@@ -20,6 +21,22 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
 
+        <!-- Tari foreground service -->
+        <service
+            android:name=".service.WalletService"
+            android:description="@string/wallet_service_desc"
+            android:enabled="true">
+            <intent-filter>
+                <action android:name="com.tari.android.wallet.service.TariWalletService" />
+            </intent-filter>
+        </service>
+        <!-- this receiver restarts the service on destroy & keeps the service running -->
+        <receiver
+            android:name=".service.ServiceRestartBroadcastReceiver"
+            android:enabled="true"
+            android:exported="false" />
+
+        <!-- splash -->
         <activity
             android:name=".ui.activity.SplashActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"

@@ -34,20 +34,25 @@ package com.tari.android.wallet.ui.util
 
 import android.app.Activity
 import android.content.Context
+import android.graphics.BlendMode
+import android.graphics.BlendModeColorFilter
+import android.graphics.PorterDuff
+import android.os.Build
 import android.os.Handler
-
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
+import android.widget.ProgressBar
 import androidx.annotation.NonNull
 import java.lang.ref.WeakReference
+
 
 /**
  * Contains UI utility functions.
  *
  * @author The Tari Development Team
  */
-object UiUtil {
+internal object UiUtil {
 
     // enabled view clickability after a disable
     private val clickEnablingHandler = Handler()
@@ -108,6 +113,15 @@ object UiUtil {
     ): Int {
         val layoutParams = view.layoutParams as ViewGroup.MarginLayoutParams
         return layoutParams.bottomMargin
+    }
+
+    fun setProgressBarColor(
+        progressBar: ProgressBar,
+        color: Int
+    ) {
+        progressBar.indeterminateDrawable
+            .mutate()
+            .setColorFilter(color, PorterDuff.Mode.SRC_IN)
     }
 
     @Suppress("unused")

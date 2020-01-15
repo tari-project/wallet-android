@@ -42,11 +42,11 @@ import org.junit.runners.Suite
  */
 @RunWith(Suite::class)
 @Suite.SuiteClasses(
-    ByteVectorTests::class,
-    PrivateKeyTests::class,
-    PublicKeyTests::class,
-    ContactTests::class,
-    CommsConfigTests::class
+    FFIByteVectorTests::class,
+    FFIPrivateKeyTests::class,
+    FFIPublicKeyTests::class,
+    FFIContactTests::class,
+    FFICommsConfigTests::class
     //WalletTests::class //TODO Investigate why this fails, when it passes individually
 )
 class TestSuite

@@ -41,10 +41,8 @@ import android.os.Bundle
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.app.AppCompatActivity
 import androidx.biometric.BiometricPrompt
 import butterknife.BindView
-import butterknife.ButterKnife
 import com.airbnb.lottie.LottieAnimationView
 import com.daasuu.ei.Ease
 import com.daasuu.ei.EasingInterpolator
@@ -61,7 +59,7 @@ import java.util.concurrent.Executors
  *
  * @author The Tari Development Team
  */
-class AuthActivity : AppCompatActivity(), Animator.AnimatorListener {
+class AuthActivity : BaseActivity(), Animator.AnimatorListener {
 
     private lateinit var biometricPrompt: BiometricPrompt
     @BindView(R.id.main_img_big_gem)
@@ -73,13 +71,12 @@ class AuthActivity : AppCompatActivity(), Animator.AnimatorListener {
     @BindView(R.id.main_img_small_gem)
     lateinit var smallGemImageView: ImageView
 
+    override val contentViewId = R.layout.activity_auth
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_auth)
+
         overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
-
-        ButterKnife.bind(this)
-
         // call the animations
         val wr = WeakReference<AuthActivity>(this)
         bigGemImageView.post { wr.get()?.showTariText() }

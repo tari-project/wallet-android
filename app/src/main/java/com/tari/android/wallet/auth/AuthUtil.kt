@@ -41,7 +41,7 @@ import android.os.Build
  *
  * @author Kutsal Kaan Bilgin
  */
-object AuthUtil {
+internal object AuthUtil {
 
     /**
      * Returns true if lockscreen is enabled. Will return true if a fingerprint defined as well,

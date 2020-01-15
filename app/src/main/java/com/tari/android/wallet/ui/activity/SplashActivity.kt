@@ -42,12 +42,9 @@ import com.tari.android.wallet.R
  *
  * @author Kutsal Kaan Bilgin
  */
-class SplashActivity : AppCompatActivity() {
+class SplashActivity : BaseActivity() {
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_splash)
-    }
+    override val contentViewId = R.layout.activity_splash
 
     override fun onStart() {
         super.onStart()

@@ -41,7 +41,7 @@
 
 extern "C"
 JNIEXPORT jbyteArray JNICALL
-Java_com_tari_android_wallet_ffi_PendingOutboundTransaction_jniGetId(
+Java_com_tari_android_wallet_ffi_FFIPendingOutboundTx_jniGetId(
         JNIEnv *jEnv,
         jobject jThis,
         jlong jpOutboundTx,
@@ -58,7 +58,7 @@ Java_com_tari_android_wallet_ffi_PendingOutboundTransaction_jniGetId(
 
 extern "C"
 JNIEXPORT jlong JNICALL
-Java_com_tari_android_wallet_ffi_PendingOutboundTransaction_jniGetDestinationPublicKey(
+Java_com_tari_android_wallet_ffi_FFIPendingOutboundTx_jniGetDestinationPublicKey(
         JNIEnv *jEnv,
         jobject jThis,
         jlong jpOutboundTx,
@@ -74,7 +74,7 @@ Java_com_tari_android_wallet_ffi_PendingOutboundTransaction_jniGetDestinationPub
 
 extern "C"
 JNIEXPORT jbyteArray JNICALL
-Java_com_tari_android_wallet_ffi_PendingOutboundTransaction_jniGetAmount(
+Java_com_tari_android_wallet_ffi_FFIPendingOutboundTx_jniGetAmount(
         JNIEnv *jEnv,
         jobject jThis,
         jlong jpOutboundTx,
@@ -90,7 +90,7 @@ Java_com_tari_android_wallet_ffi_PendingOutboundTransaction_jniGetAmount(
 
 extern "C"
 JNIEXPORT jstring JNICALL
-Java_com_tari_android_wallet_ffi_PendingOutboundTransaction_jniGetMessage(
+Java_com_tari_android_wallet_ffi_FFIPendingOutboundTx_jniGetMessage(
         JNIEnv *jEnv,
         jobject jThis,
         jlong jpOutboundTx,
@@ -107,7 +107,7 @@ Java_com_tari_android_wallet_ffi_PendingOutboundTransaction_jniGetMessage(
 
 extern "C"
 JNIEXPORT jbyteArray JNICALL
-Java_com_tari_android_wallet_ffi_PendingOutboundTransaction_jniGetTimestamp(
+Java_com_tari_android_wallet_ffi_FFIPendingOutboundTx_jniGetTimestamp(
         JNIEnv *jEnv,
         jobject jThis,
         jlong jpOutboundTx,
@@ -124,7 +124,7 @@ Java_com_tari_android_wallet_ffi_PendingOutboundTransaction_jniGetTimestamp(
 
 extern "C"
 JNIEXPORT void JNICALL
-Java_com_tari_android_wallet_ffi_PendingOutboundTransaction_jniDestroy(
+Java_com_tari_android_wallet_ffi_FFIPendingOutboundTx_jniDestroy(
         JNIEnv *jEnv,
         jobject jThis,
         jlong jpOutboundTx) {

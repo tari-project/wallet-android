@@ -183,21 +183,21 @@ void DiscoveryCallback(unsigned long long tx_id, bool success) {
 
 extern "C"
 JNIEXPORT jlong JNICALL
-Java_com_tari_android_wallet_ffi_Wallet_jniCreate(
+Java_com_tari_android_wallet_ffi_FFIWallet_jniCreate(
         JNIEnv *jEnv,
         jobject jThis,
         jlong jpWalletConfig,
         jstring jLogPath,
-        jstring callback_received_transaction,
-        jstring callback_received_transaction_sig,
-        jstring callback_received_transaction_reply,
-        jstring callback_received_transaction_reply_sig,
-        jstring callback_received_finalized_transaction,
-        jstring callback_received_finalized_transaction_sig,
-        jstring callback_transaction_broadcast,
-        jstring callback_transaction_broadcast_sig,
-        jstring callback_transaction_mined,
-        jstring callback_transaction_mined_sig,
+        jstring callback_received_tx,
+        jstring callback_received_tx_sig,
+        jstring callback_received_tx_reply,
+        jstring callback_received_tx_reply_sig,
+        jstring callback_received_finalized_tx,
+        jstring callback_received_finalized_tx_sig,
+        jstring callback_tx_broadcast,
+        jstring callback_tx_broadcast_sig,
+        jstring callback_tx_mined,
+        jstring callback_tx_mined_sig,
         jstring callback_discovery_process_complete,
         jstring callback_discovery_process_complete_sig,
         jobject error) {
@@ -211,55 +211,55 @@ Java_com_tari_android_wallet_ffi_Wallet_jniCreate(
         return reinterpret_cast<jlong>(nullptr);
     }
 
-    const char *pReceivedMethod = jEnv->GetStringUTFChars(callback_received_transaction, JNI_FALSE);
-    const char *pReceivedSig = jEnv->GetStringUTFChars(callback_received_transaction_sig,
+    const char *pReceivedMethod = jEnv->GetStringUTFChars(callback_received_tx, JNI_FALSE);
+    const char *pReceivedSig = jEnv->GetStringUTFChars(callback_received_tx_sig,
                                                        JNI_FALSE);
     txReceivedCallbackMethodId = jEnv->GetMethodID(jClass, pReceivedMethod, pReceivedSig);
-    jEnv->ReleaseStringUTFChars(callback_received_transaction_sig, pReceivedSig);
-    jEnv->ReleaseStringUTFChars(callback_received_transaction, pReceivedSig);
+    jEnv->ReleaseStringUTFChars(callback_received_tx_sig, pReceivedSig);
+    jEnv->ReleaseStringUTFChars(callback_received_tx, pReceivedSig);
     if (txReceivedCallbackMethodId == nullptr) {
         return reinterpret_cast<jlong>(nullptr);
     }
 
-    const char *pReceivedReplyMethod = jEnv->GetStringUTFChars(callback_received_transaction_reply,
+    const char *pReceivedReplyMethod = jEnv->GetStringUTFChars(callback_received_tx_reply,
                                                                JNI_FALSE);
-    const char *pReceivedReplySig = jEnv->GetStringUTFChars(callback_received_transaction_reply_sig,
+    const char *pReceivedReplySig = jEnv->GetStringUTFChars(callback_received_tx_reply_sig,
                                                             JNI_FALSE);
     txReplyReceivedCallbackMethodId = jEnv->GetMethodID(jClass, pReceivedReplyMethod,
                                                         pReceivedReplySig);
-    jEnv->ReleaseStringUTFChars(callback_received_transaction_reply_sig, pReceivedReplySig);
-    jEnv->ReleaseStringUTFChars(callback_received_transaction_reply, pReceivedReplyMethod);
+    jEnv->ReleaseStringUTFChars(callback_received_tx_reply_sig, pReceivedReplySig);
+    jEnv->ReleaseStringUTFChars(callback_received_tx_reply, pReceivedReplyMethod);
     if (txReplyReceivedCallbackMethodId == nullptr) {
         return reinterpret_cast<jlong>(nullptr);
     }
 
-    const char *pFinalizedMethod = jEnv->GetStringUTFChars(callback_received_finalized_transaction,
+    const char *pFinalizedMethod = jEnv->GetStringUTFChars(callback_received_finalized_tx,
                                                            JNI_FALSE);
-    const char *pFinalizedSig = jEnv->GetStringUTFChars(callback_received_finalized_transaction_sig,
+    const char *pFinalizedSig = jEnv->GetStringUTFChars(callback_received_finalized_tx_sig,
                                                         JNI_FALSE);
     txFinalizedCallbackMethodId = jEnv->GetMethodID(jClass, pFinalizedMethod, pFinalizedSig);
-    jEnv->ReleaseStringUTFChars(callback_received_finalized_transaction_sig, pFinalizedSig);
-    jEnv->ReleaseStringUTFChars(callback_received_finalized_transaction, pFinalizedMethod);
+    jEnv->ReleaseStringUTFChars(callback_received_finalized_tx_sig, pFinalizedSig);
+    jEnv->ReleaseStringUTFChars(callback_received_finalized_tx, pFinalizedMethod);
     if (txFinalizedCallbackMethodId == nullptr) {
         return reinterpret_cast<jlong>(nullptr);
     }
 
-    const char *pBroadcastMethod = jEnv->GetStringUTFChars(callback_transaction_broadcast,
+    const char *pBroadcastMethod = jEnv->GetStringUTFChars(callback_tx_broadcast,
                                                            JNI_FALSE);
-    const char *pBroadcastSig = jEnv->GetStringUTFChars(callback_transaction_broadcast_sig,
+    const char *pBroadcastSig = jEnv->GetStringUTFChars(callback_tx_broadcast_sig,
                                                         JNI_FALSE);
     txBroadcastCallbackMethodId = jEnv->GetMethodID(jClass, pBroadcastMethod, pBroadcastSig);
-    jEnv->ReleaseStringUTFChars(callback_transaction_broadcast_sig, pBroadcastSig);
-    jEnv->ReleaseStringUTFChars(callback_transaction_broadcast, pBroadcastMethod);
+    jEnv->ReleaseStringUTFChars(callback_tx_broadcast_sig, pBroadcastSig);
+    jEnv->ReleaseStringUTFChars(callback_tx_broadcast, pBroadcastMethod);
     if (txBroadcastCallbackMethodId == nullptr) {
         return reinterpret_cast<jlong>(nullptr);
     }
 
-    const char *pMinedMethod = jEnv->GetStringUTFChars(callback_transaction_mined, JNI_FALSE);
-    const char *pMinedSig = jEnv->GetStringUTFChars(callback_transaction_mined_sig, JNI_FALSE);
+    const char *pMinedMethod = jEnv->GetStringUTFChars(callback_tx_mined, JNI_FALSE);
+    const char *pMinedSig = jEnv->GetStringUTFChars(callback_tx_mined_sig, JNI_FALSE);
     txMinedCallbackMethodId = jEnv->GetMethodID(jClass, pMinedMethod, pMinedSig);
-    jEnv->ReleaseStringUTFChars(callback_transaction_mined_sig, pMinedSig);
-    jEnv->ReleaseStringUTFChars(callback_transaction_mined, pMinedMethod);
+    jEnv->ReleaseStringUTFChars(callback_tx_mined_sig, pMinedSig);
+    jEnv->ReleaseStringUTFChars(callback_tx_mined, pMinedMethod);
     if (txMinedCallbackMethodId == nullptr) {
         return reinterpret_cast<jlong>(nullptr);
     }
@@ -269,8 +269,8 @@ Java_com_tari_android_wallet_ffi_Wallet_jniCreate(
     const char *pDiscoverySig = jEnv->GetStringUTFChars(callback_discovery_process_complete_sig,
                                                         JNI_FALSE);
     txDiscoveryCallbackMethodId = jEnv->GetMethodID(jClass, pDiscoveryMethod, pDiscoverySig);
-    jEnv->ReleaseStringUTFChars(callback_received_transaction_sig, pDiscoverySig);
-    jEnv->ReleaseStringUTFChars(callback_received_transaction, pDiscoveryMethod);
+    jEnv->ReleaseStringUTFChars(callback_received_tx_sig, pDiscoverySig);
+    jEnv->ReleaseStringUTFChars(callback_received_tx, pDiscoveryMethod);
     if (txDiscoveryCallbackMethodId == nullptr) {
         return reinterpret_cast<jlong>(nullptr);
     }
@@ -288,7 +288,7 @@ Java_com_tari_android_wallet_ffi_Wallet_jniCreate(
 
 extern "C"
 JNIEXPORT jlong JNICALL
-Java_com_tari_android_wallet_ffi_Wallet_jniGetPublicKey(
+Java_com_tari_android_wallet_ffi_FFIWallet_jniGetPublicKey(
         JNIEnv *jEnv,
         jobject jThis,
         jlong jpWallet,
@@ -303,7 +303,7 @@ Java_com_tari_android_wallet_ffi_Wallet_jniGetPublicKey(
 
 extern "C"
 JNIEXPORT jbyteArray JNICALL
-Java_com_tari_android_wallet_ffi_Wallet_jniGetAvailableBalance(
+Java_com_tari_android_wallet_ffi_FFIWallet_jniGetAvailableBalance(
         JNIEnv *jEnv,
         jobject jThis,
         jlong jpWallet,
@@ -319,7 +319,7 @@ Java_com_tari_android_wallet_ffi_Wallet_jniGetAvailableBalance(
 
 extern "C"
 JNIEXPORT jbyteArray JNICALL
-Java_com_tari_android_wallet_ffi_Wallet_jniGetPendingIncomingBalance(
+Java_com_tari_android_wallet_ffi_FFIWallet_jniGetPendingIncomingBalance(
         JNIEnv *jEnv,
         jobject jThis,
         jlong jpWallet,
@@ -336,7 +336,7 @@ Java_com_tari_android_wallet_ffi_Wallet_jniGetPendingIncomingBalance(
 
 extern "C"
 JNIEXPORT jbyteArray JNICALL
-Java_com_tari_android_wallet_ffi_Wallet_jniGetPendingOutgoingBalance(
+Java_com_tari_android_wallet_ffi_FFIWallet_jniGetPendingOutgoingBalance(
         JNIEnv *jEnv,
         jobject jThis,
         jlong jpWallet,
@@ -353,7 +353,7 @@ Java_com_tari_android_wallet_ffi_Wallet_jniGetPendingOutgoingBalance(
 
 extern "C"
 JNIEXPORT jlong JNICALL
-Java_com_tari_android_wallet_ffi_Wallet_jniGetContacts(
+Java_com_tari_android_wallet_ffi_FFIWallet_jniGetContacts(
         JNIEnv *jEnv,
         jobject jThis,
         jlong jpWallet,
@@ -368,7 +368,7 @@ Java_com_tari_android_wallet_ffi_Wallet_jniGetContacts(
 
 extern "C"
 JNIEXPORT jboolean JNICALL
-Java_com_tari_android_wallet_ffi_Wallet_jniAddContact(
+Java_com_tari_android_wallet_ffi_FFIWallet_jniAddContact(
         JNIEnv *jEnv,
         jobject jThis,
         jlong jpWallet,
@@ -386,7 +386,7 @@ Java_com_tari_android_wallet_ffi_Wallet_jniAddContact(
 
 extern "C"
 JNIEXPORT jboolean JNICALL
-Java_com_tari_android_wallet_ffi_Wallet_jniRemoveContact(
+Java_com_tari_android_wallet_ffi_FFIWallet_jniRemoveContact(
         JNIEnv *jEnv,
         jobject jThis,
         jlong jpWallet,
@@ -403,7 +403,7 @@ Java_com_tari_android_wallet_ffi_Wallet_jniRemoveContact(
 
 extern "C"
 JNIEXPORT jlong JNICALL
-Java_com_tari_android_wallet_ffi_Wallet_jniGetCompletedTransactions(
+Java_com_tari_android_wallet_ffi_FFIWallet_jniGetCompletedTxs(
         JNIEnv *jEnv,
         jobject jThis,
         jlong jpWallet,
@@ -411,15 +411,14 @@ Java_com_tari_android_wallet_ffi_Wallet_jniGetCompletedTransactions(
     int i = 0;
     int *r = &i;
     TariWallet *pWallet = (TariWallet *) jpWallet;
-    TariCompletedTransactions *pCompletedTransactions = wallet_get_completed_transactions(pWallet,
-                                                                                          r);
+    TariCompletedTransactions *pCompletedTxs = wallet_get_completed_transactions(pWallet, r);
     setErrorCode(jEnv, error, i);
-    return reinterpret_cast<jlong>(pCompletedTransactions);
+    return reinterpret_cast<jlong>(pCompletedTxs);
 }
 
 extern "C"
 JNIEXPORT jlong JNICALL
-Java_com_tari_android_wallet_ffi_Wallet_jniGetCompletedTransactionById(
+Java_com_tari_android_wallet_ffi_FFIWallet_jniGetCompletedTxById(
         JNIEnv *jEnv,
         jobject jThis,
         jlong jpWallet,
@@ -437,7 +436,7 @@ Java_com_tari_android_wallet_ffi_Wallet_jniGetCompletedTransactionById(
 
 extern "C"
 JNIEXPORT jlong JNICALL
-Java_com_tari_android_wallet_ffi_Wallet_jniGetPendingOutboundTransactions(
+Java_com_tari_android_wallet_ffi_FFIWallet_jniGetPendingOutboundTxs(
         JNIEnv *jEnv,
         jobject jThis,
         jlong jpWallet,
@@ -453,7 +452,7 @@ Java_com_tari_android_wallet_ffi_Wallet_jniGetPendingOutboundTransactions(
 
 extern "C"
 JNIEXPORT jlong JNICALL
-Java_com_tari_android_wallet_ffi_Wallet_jniGetPendingOutboundTransactionById(
+Java_com_tari_android_wallet_ffi_FFIWallet_jniGetPendingOutboundTxById(
         JNIEnv *jEnv,
         jobject jThis,
         jlong jpWallet,
@@ -471,7 +470,7 @@ Java_com_tari_android_wallet_ffi_Wallet_jniGetPendingOutboundTransactionById(
 
 extern "C"
 JNIEXPORT jlong JNICALL
-Java_com_tari_android_wallet_ffi_Wallet_jniGetPendingInboundTransactions(
+Java_com_tari_android_wallet_ffi_FFIWallet_jniGetPendingInboundTxs(
         JNIEnv *jEnv,
         jobject jThis,
         jlong jpWallet,
@@ -486,7 +485,7 @@ Java_com_tari_android_wallet_ffi_Wallet_jniGetPendingInboundTransactions(
 
 extern "C"
 JNIEXPORT jlong JNICALL
-Java_com_tari_android_wallet_ffi_Wallet_jniGetPendingInboundTransactionById(
+Java_com_tari_android_wallet_ffi_FFIWallet_jniGetPendingInboundTxById(
         JNIEnv *jEnv,
         jobject jThis,
         jlong jpWallet,
@@ -504,7 +503,7 @@ Java_com_tari_android_wallet_ffi_Wallet_jniGetPendingInboundTransactionById(
 
 extern "C"
 JNIEXPORT void JNICALL
-Java_com_tari_android_wallet_ffi_Wallet_jniDestroy(
+Java_com_tari_android_wallet_ffi_FFIWallet_jniDestroy(
         JNIEnv *jEnv,
         jobject jThis,
         jlong jpWallet) {
@@ -516,7 +515,7 @@ Java_com_tari_android_wallet_ffi_Wallet_jniDestroy(
 //region Wallet Test Functions
 extern "C"
 JNIEXPORT jboolean JNICALL
-Java_com_tari_android_wallet_ffi_Wallet_jniGenerateTestData(
+Java_com_tari_android_wallet_ffi_FFITestWallet_jniGenerateTestData(
         JNIEnv *jEnv,
         jobject jThis,
         jlong jpWallet,
@@ -535,7 +534,7 @@ Java_com_tari_android_wallet_ffi_Wallet_jniGenerateTestData(
 
 extern "C"
 JNIEXPORT jboolean JNICALL
-Java_com_tari_android_wallet_ffi_Wallet_jniTransactionBroadcast(
+Java_com_tari_android_wallet_ffi_FFITestWallet_jniTestBroadcastTx(
         JNIEnv *jEnv,
         jobject jThis,
         jlong jpWallet,
@@ -552,7 +551,7 @@ Java_com_tari_android_wallet_ffi_Wallet_jniTransactionBroadcast(
 
 extern "C"
 JNIEXPORT jboolean JNICALL
-Java_com_tari_android_wallet_ffi_Wallet_jniFinalizeCompletedTransaction(
+Java_com_tari_android_wallet_ffi_FFITestWallet_jniTestFinalizeReceivedTx(
         JNIEnv *jEnv,
         jobject jThis,
         jlong jpWallet,
@@ -569,7 +568,7 @@ Java_com_tari_android_wallet_ffi_Wallet_jniFinalizeCompletedTransaction(
 
 extern "C"
 JNIEXPORT jboolean JNICALL
-Java_com_tari_android_wallet_ffi_Wallet_jniCompleteSentTransaction(
+Java_com_tari_android_wallet_ffi_FFITestWallet_jniTestCompleteSentTx(
         JNIEnv *jEnv,
         jobject jThis,
         jlong jpWallet,
@@ -586,7 +585,7 @@ Java_com_tari_android_wallet_ffi_Wallet_jniCompleteSentTransaction(
 
 extern "C"
 JNIEXPORT jboolean JNICALL
-Java_com_tari_android_wallet_ffi_Wallet_jniMineCompletedTransaction(
+Java_com_tari_android_wallet_ffi_FFITestWallet_jniTestMineCompletedTx(
         JNIEnv *jEnv,
         jobject jThis,
         jlong jpWallet,
@@ -603,7 +602,7 @@ Java_com_tari_android_wallet_ffi_Wallet_jniMineCompletedTransaction(
 
 extern "C"
 JNIEXPORT jboolean JNICALL
-Java_com_tari_android_wallet_ffi_Wallet_jniReceiveTransaction(
+Java_com_tari_android_wallet_ffi_FFITestWallet_jniTestReceiveTx(
         JNIEnv *jEnv,
         jobject jThis,
         jlong jpWallet,
@@ -618,7 +617,7 @@ Java_com_tari_android_wallet_ffi_Wallet_jniReceiveTransaction(
 
 extern "C"
 JNIEXPORT jlong JNICALL
-Java_com_tari_android_wallet_ffi_Wallet_jniSendTransaction(
+Java_com_tari_android_wallet_ffi_FFITestWallet_jniTestSendTx(
         JNIEnv *jEnv,
         jobject jThis,
         jlong jpWallet,

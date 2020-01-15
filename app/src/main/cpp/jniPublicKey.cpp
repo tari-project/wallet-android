@@ -41,7 +41,7 @@
 
 extern "C"
 JNIEXPORT jlong JNICALL
-Java_com_tari_android_wallet_ffi_PublicKey_jniCreate(
+Java_com_tari_android_wallet_ffi_FFIPublicKey_jniCreate(
         JNIEnv *jEnv,
         jclass jClass,
         jlong jpByteVector,
@@ -56,7 +56,7 @@ Java_com_tari_android_wallet_ffi_PublicKey_jniCreate(
 
 extern "C"
 JNIEXPORT jlong JNICALL
-Java_com_tari_android_wallet_ffi_PublicKey_jniFromHex(
+Java_com_tari_android_wallet_ffi_FFIPublicKey_jniFromHex(
         JNIEnv *jEnv,
         jclass jClass,
         jstring jHexStr,
@@ -72,7 +72,7 @@ Java_com_tari_android_wallet_ffi_PublicKey_jniFromHex(
 
 extern "C"
 JNIEXPORT jlong JNICALL
-Java_com_tari_android_wallet_ffi_PublicKey_jniFromPrivateKey(
+Java_com_tari_android_wallet_ffi_FFIPublicKey_jniFromPrivateKey(
         JNIEnv *jEnv,
         jclass jClass,
         jlong jpPrivateKey,
@@ -87,7 +87,7 @@ Java_com_tari_android_wallet_ffi_PublicKey_jniFromPrivateKey(
 
 extern "C"
 JNIEXPORT jlong JNICALL
-Java_com_tari_android_wallet_ffi_PublicKey_jniGetBytes(
+Java_com_tari_android_wallet_ffi_FFIPublicKey_jniGetBytes(
         JNIEnv *jEnv,
         jobject jThis,
         jlong jpPublicKey,
@@ -102,7 +102,7 @@ Java_com_tari_android_wallet_ffi_PublicKey_jniGetBytes(
 
 extern "C"
 JNIEXPORT void JNICALL
-Java_com_tari_android_wallet_ffi_PublicKey_jniDestroy(
+Java_com_tari_android_wallet_ffi_FFIPublicKey_jniDestroy(
         JNIEnv *jEnv,
         jobject jThis,
         jlong jpPublicKey) {

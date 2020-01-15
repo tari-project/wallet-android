@@ -32,12 +32,14 @@
  */
 package com.tari.android.wallet.util
 
+import com.tari.android.wallet.ffi.NetAddressString
+
 /**
  * Contains application-wide constant values.
  *
  * @author The Tari Development Team
  */
-object Constants {
+internal object Constants {
 
     /**
      * UI constants.
@@ -52,6 +54,15 @@ object Constants {
             const val digitAnimDurationMs = 700L
             const val digitShrinkExpandAnimDurationMs = 200L
         }
+    }
+
+    /**
+     * Wallet constants.
+     */
+    object Wallet {
+        const val WALLET_DB_NAME: String = "tari_wallet_db"
+        internal val WALLET_CONTROL_SERVICE_ADDRESS: NetAddressString = NetAddressString("127.0.0.1", 80)
+        internal val WALLET_LISTENER_ADDRESS: NetAddressString = NetAddressString("0.0.0.0", 0)
     }
 
 }
