@@ -172,7 +172,7 @@ class HomeActivity : AppCompatActivity(),
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home)
         overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
-        makeStatusBarTransparent()
+        //makeStatusBarTransparent() -- commented out to fix the UI cutout issue
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.home_vw_root)) { _, insets ->
             insets.consumeSystemWindowInsets()
         }
@@ -387,7 +387,7 @@ class HomeActivity : AppCompatActivity(),
             // QR code button - handle touch
             val rect = Rect()
             qrCodeButton.getGlobalVisibleRect(rect)
-            if (rect.contains(event.x.toInt(), event.y.toInt())) {
+            if (rect.contains(event.rawX.toInt(), event.rawY.toInt())) {
                 qrCodeButton.dispatchTouchEvent(event)
             }
             // event consumed

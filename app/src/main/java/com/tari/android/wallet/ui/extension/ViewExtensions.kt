@@ -37,8 +37,9 @@ import android.app.Activity
 import android.graphics.Color
 import android.os.Build
 import android.view.View
-import android.view.ViewGroup
 import android.view.WindowManager
+import android.widget.TextView
+import com.tari.android.wallet.ui.util.UiUtil
 
 @SuppressLint("ObsoleteSdkInt")
 fun Activity.makeStatusBarTransparent() {
@@ -56,4 +57,12 @@ fun Activity.makeStatusBarTransparent() {
             statusBarColor = Color.TRANSPARENT
         }
     }
+}
+
+fun TextView.setWidthToMeasured() {
+    this.measure(0, 0)
+    UiUtil.setWidth(
+        this,
+        this.measuredWidth
+    )
 }
