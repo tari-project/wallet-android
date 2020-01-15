@@ -172,8 +172,8 @@
 
     <com.tari.android.wallet.ui.component.CustomFontButton
         android:id="@+id/home_btn_send_tari"
-        android:layout_width="@dimen/home_sen_tari_button_width"
-        android:layout_height="@dimen/home_sen_tari_button_height"
+        android:layout_width="@dimen/home_send_tari_button_width"
+        android:layout_height="@dimen/home_send_tari_button_height"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="40dp"

@@ -10,13 +10,11 @@
     <dimen name="home_grabber_width">64dp</dimen>
     <dimen name="home_balance_digit_text_size">40sp</dimen>
     <dimen name="home_balance_digit_height">45dp</dimen>
-    <dimen name="home_balance_digit_width">23dp</dimen>
-    <dimen name="home_balance_digit_separator_width">12dp</dimen>
     <dimen name="home_balance_digit_decimal_text_size">16sp</dimen>
     <dimen name="home_balance_digit_decimal_height">20dp</dimen>
     <dimen name="home_tx_list_header_height">64dp</dimen>
-    <dimen name="home_sen_tari_button_height">54dp</dimen>
-    <dimen name="home_sen_tari_button_width">164dp</dimen>
+    <dimen name="home_send_tari_button_height">54dp</dimen>
+    <dimen name="home_send_tari_button_width">164dp</dimen>
     <dimen name="home_send_tari_button_visible_bottom_margin">40dp</dimen>
     <dimen name="home_send_tari_button_hidden_bottom_margin">-100dp</dimen>
     <dimen name="home_send_tari_button_initial_bottom_margin">-150dp</dimen>

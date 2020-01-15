@@ -47,6 +47,7 @@ import butterknife.ButterKnife
 import com.daasuu.ei.Ease
 import com.daasuu.ei.EasingInterpolator
 import com.tari.android.wallet.R
+import com.tari.android.wallet.ui.extension.setWidthToMeasured
 import com.tari.android.wallet.ui.util.UiUtil
 import com.tari.android.wallet.util.Constants
 import java.lang.ref.WeakReference
@@ -266,16 +267,15 @@ class BalanceViewController(
         @BindDimen(R.dimen.home_balance_digit_height)
         @JvmField
         var balanceDigitHeight: Int = 0
-        @BindDimen(R.dimen.home_balance_digit_separator_width)
-        @JvmField
-        var width: Int = 0
 
         init {
             ButterKnife.bind(this, view)
             separatorTextView.text = separator
+            separatorTextView.setWidthToMeasured()
         }
 
         override fun expand(delayMs: Long, animatorListener: Animator.AnimatorListener?) {
+            val width = separatorTextView.measuredWidth
             val anim = ValueAnimator.ofFloat(0f, 1f)
             anim.addUpdateListener { valueAnimator: ValueAnimator ->
                 val animValue = valueAnimator.animatedValue as Float
@@ -292,6 +292,7 @@ class BalanceViewController(
 
         override fun reveal(delayMs: Long) {
             UiUtil.setTopMargin(separatorTextView, balanceDigitHeight)
+            separatorTextView.setWidthToMeasured()
             val anim = ValueAnimator.ofInt(balanceDigitHeight, 0)
             anim.addUpdateListener { valueAnimator: ValueAnimator ->
                 val topMargin = valueAnimator.animatedValue as Int
@@ -336,19 +337,18 @@ class BalanceViewController(
         @BindDimen(R.dimen.home_balance_digit_height)
         @JvmField
         var balanceDigitHeight: Int = 0
-        @BindDimen(R.dimen.home_balance_digit_width)
-        @JvmField
-        var width: Int = 0
 
         private var changed = false
 
         init {
             ButterKnife.bind(this, view)
             topDigitTextView.text = value.toString()
+            topDigitTextView.setWidthToMeasured()
         }
 
         override fun expand(delayMs: Long, animatorListener: Animator.AnimatorListener?) {
             val anim = ValueAnimator.ofFloat(0f, 1f)
+            val width = topDigitTextView.measuredWidth
             anim.addUpdateListener { valueAnimator: ValueAnimator ->
                 val animValue = valueAnimator.animatedValue as Float
                 UiUtil.setWidth(view, (width * animValue).toInt())
@@ -385,6 +385,7 @@ class BalanceViewController(
             if (changed) {
                 // reset
                 topDigitTextView.text = value.toString()
+                topDigitTextView.setWidthToMeasured()
                 topDigitTextView.alpha = 1f
                 bottomDigitTextView.alpha = 0f
                 UiUtil.setTopMargin(topDigitTextView, 0)
@@ -394,6 +395,7 @@ class BalanceViewController(
             // update
             value = newValue
             bottomDigitTextView.text = value.toString()
+            bottomDigitTextView.setWidthToMeasured()
 
             val anim = ValueAnimator.ofInt(0, -balanceDigitHeight - 1)
             anim.addUpdateListener { valueAnimator: ValueAnimator ->
@@ -414,6 +416,7 @@ class BalanceViewController(
             if (changed) {
                 // reset
                 topDigitTextView.text = value.toString()
+                topDigitTextView.setWidthToMeasured()
                 topDigitTextView.alpha = 1f
                 bottomDigitTextView.alpha = 0f
                 UiUtil.setTopMargin(topDigitTextView, 0)
@@ -453,10 +456,12 @@ class BalanceViewController(
         init {
             ButterKnife.bind(this, view)
             separatorTextView.text = separator
+            separatorTextView.setWidthToMeasured()
         }
 
         override fun reveal(delayMs: Long) {
             UiUtil.setTopMargin(separatorTextView, balanceDecimalDigitHeight)
+            separatorTextView.setWidthToMeasured()
             val anim = ValueAnimator.ofInt(balanceDecimalDigitHeight, 0)
             anim.addUpdateListener { valueAnimator: ValueAnimator ->
                 val topMargin = valueAnimator.animatedValue as Int
@@ -491,6 +496,7 @@ class BalanceViewController(
         init {
             ButterKnife.bind(this, view)
             topDecimalDigitTextView.text = value.toString()
+            topDecimalDigitTextView.setWidthToMeasured()
         }
 
         override fun reveal(delayMs: Long) {
@@ -516,6 +522,7 @@ class BalanceViewController(
             if (changed) {
                 // reset
                 topDecimalDigitTextView.text = value.toString()
+                topDecimalDigitTextView.setWidthToMeasured()
                 topDecimalDigitTextView.alpha = 1f
                 bottomDecimalDigitTextView.alpha = 0f
                 UiUtil.setTopMargin(topDecimalDigitTextView, 0)
@@ -525,7 +532,7 @@ class BalanceViewController(
             // update
             value = newValue
             bottomDecimalDigitTextView.text = value.toString()
-
+            bottomDecimalDigitTextView.setWidthToMeasured()
             val anim = ValueAnimator.ofInt(0, -balanceDecimalDigitHeight - 1)
             anim.addUpdateListener { valueAnimator: ValueAnimator ->
                 val topMargin = valueAnimator.animatedValue as Int
