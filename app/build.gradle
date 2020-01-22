@@ -47,6 +47,7 @@ android {
         targetCompatibility "1.8"
         sourceCompatibility "1.8"
     }
+
 }
 
 dependencies {
@@ -100,6 +101,10 @@ dependencies {
     // parceler
     implementation 'org.parceler:parceler-api:1.1.12'
     kapt 'org.parceler:parceler:1.1.12'
+
+    // dagger - DI
+    implementation 'com.google.dagger:dagger:2.25.4'
+    kapt 'com.google.dagger:dagger-compiler:2.25.4'
 
     // lottie
     implementation 'com.airbnb.android:lottie:3.3.1'

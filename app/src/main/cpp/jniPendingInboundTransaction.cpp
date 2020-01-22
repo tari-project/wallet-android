@@ -41,7 +41,7 @@
 
 extern "C"
 JNIEXPORT jbyteArray JNICALL
-Java_com_tari_android_wallet_ffi_PendingInboundTransaction_jniGetId(
+Java_com_tari_android_wallet_ffi_FFIPendingInboundTx_jniGetId(
         JNIEnv *jEnv,
         jobject jThis,
         jlong jpInboundTx,
@@ -58,7 +58,7 @@ Java_com_tari_android_wallet_ffi_PendingInboundTransaction_jniGetId(
 
 extern "C"
 JNIEXPORT jlong JNICALL
-Java_com_tari_android_wallet_ffi_PendingInboundTransaction_jniGetSourcePublicKey(
+Java_com_tari_android_wallet_ffi_FFIPendingInboundTx_jniGetSourcePublicKey(
         JNIEnv *jEnv,
         jobject jThis,
         jlong jpInboundTx,
@@ -74,7 +74,7 @@ Java_com_tari_android_wallet_ffi_PendingInboundTransaction_jniGetSourcePublicKey
 
 extern "C"
 JNIEXPORT jbyteArray JNICALL
-Java_com_tari_android_wallet_ffi_PendingInboundTransaction_jniGetAmount(
+Java_com_tari_android_wallet_ffi_FFIPendingInboundTx_jniGetAmount(
         JNIEnv *jEnv,
         jobject jThis,
         jlong jpInboundTx,
@@ -90,7 +90,7 @@ Java_com_tari_android_wallet_ffi_PendingInboundTransaction_jniGetAmount(
 
 extern "C"
 JNIEXPORT jstring JNICALL
-Java_com_tari_android_wallet_ffi_PendingInboundTransaction_jniGetMessage(
+Java_com_tari_android_wallet_ffi_FFIPendingInboundTx_jniGetMessage(
         JNIEnv *jEnv,
         jobject jThis,
         jlong jpInboundTx,
@@ -107,7 +107,7 @@ Java_com_tari_android_wallet_ffi_PendingInboundTransaction_jniGetMessage(
 
 extern "C"
 JNIEXPORT jbyteArray JNICALL
-Java_com_tari_android_wallet_ffi_PendingInboundTransaction_jniGetTimestamp(
+Java_com_tari_android_wallet_ffi_FFIPendingInboundTx_jniGetTimestamp(
         JNIEnv *jEnv,
         jobject jThis,
         jlong jpInboundTx,
@@ -124,7 +124,7 @@ Java_com_tari_android_wallet_ffi_PendingInboundTransaction_jniGetTimestamp(
 
 extern "C"
 JNIEXPORT void JNICALL
-Java_com_tari_android_wallet_ffi_PendingInboundTransaction_jniDestroy(
+Java_com_tari_android_wallet_ffi_FFIPendingInboundTx_jniDestroy(
         JNIEnv *jEnv,
         jobject jThis,
         jlong jpInboundTx) {

@@ -37,7 +37,7 @@ import java.util.*
 /**
  * @author The Tari Development Team
  */
-class NetAddressString constructor() {
+internal class NetAddressString constructor() {
 
     private val pattern = StringBuilder()
         .append("^([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.")

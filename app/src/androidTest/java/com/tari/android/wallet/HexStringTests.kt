@@ -8,13 +8,13 @@ import java.util.*
 
 class HexStringTests {
 
-    private val str = TestUtil.PUBLIC_KEY_HEX_STRING
+    private val str = FFITestUtil.PUBLIC_KEY_HEX_STRING
     private val str2 = "Invalid Hex String"
 
     @Test
     fun testHexString() {
         val hex = HexString(str)
-        assertTrue(hex.toString() == TestUtil.PUBLIC_KEY_HEX_STRING)
+        assertTrue(hex.toString() == FFITestUtil.PUBLIC_KEY_HEX_STRING)
     }
 
     @Test(expected = InvalidPropertiesFormatException::class)

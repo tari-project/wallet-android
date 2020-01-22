@@ -41,7 +41,7 @@
 
 extern "C"
 JNIEXPORT jint JNICALL
-Java_com_tari_android_wallet_ffi_Contacts_jniGetLength(
+Java_com_tari_android_wallet_ffi_FFIContacts_jniGetLength(
         JNIEnv *jEnv,
         jobject jThis,
         jlong jpContacts,
@@ -56,7 +56,7 @@ Java_com_tari_android_wallet_ffi_Contacts_jniGetLength(
 
 extern "C"
 JNIEXPORT jlong JNICALL
-Java_com_tari_android_wallet_ffi_Contacts_jniGetAt(
+Java_com_tari_android_wallet_ffi_FFIContacts_jniGetAt(
         JNIEnv *jEnv,
         jobject jThis,
         jlong jpContacts,
@@ -73,7 +73,7 @@ Java_com_tari_android_wallet_ffi_Contacts_jniGetAt(
 
 extern "C"
 JNIEXPORT void JNICALL
-Java_com_tari_android_wallet_ffi_Contacts_jniDestroy(
+Java_com_tari_android_wallet_ffi_FFIContacts_jniDestroy(
         JNIEnv *jEnv,
         jobject jThis,
         jlong jpContacts) {
@@ -82,7 +82,7 @@ Java_com_tari_android_wallet_ffi_Contacts_jniDestroy(
 
 extern "C"
 JNIEXPORT jint JNICALL
-Java_com_tari_android_wallet_ffi_CompletedTransactions_jniGetLength(
+Java_com_tari_android_wallet_ffi_FFICompletedTxs_jniGetLength(
         JNIEnv *jEnv,
         jobject jThis,
         jlong jpCompletedTransactions,
@@ -97,7 +97,7 @@ Java_com_tari_android_wallet_ffi_CompletedTransactions_jniGetLength(
 
 extern "C"
 JNIEXPORT jlong JNICALL
-Java_com_tari_android_wallet_ffi_CompletedTransactions_jniGetAt(
+Java_com_tari_android_wallet_ffi_FFICompletedTxs_jniGetAt(
         JNIEnv *jEnv,
         jobject jThis,
         jlong jpCompletedTransactions,
@@ -115,7 +115,7 @@ Java_com_tari_android_wallet_ffi_CompletedTransactions_jniGetAt(
 
 extern "C"
 JNIEXPORT void JNICALL
-Java_com_tari_android_wallet_ffi_CompletedTransactions_jniDestroy(
+Java_com_tari_android_wallet_ffi_FFICompletedTxs_jniDestroy(
         JNIEnv *jEnv,
         jobject jThis,
         jlong jpCompletedTransactions) {
@@ -125,7 +125,7 @@ Java_com_tari_android_wallet_ffi_CompletedTransactions_jniDestroy(
 
 extern "C"
 JNIEXPORT jint JNICALL
-Java_com_tari_android_wallet_ffi_PendingInboundTransactions_jniGetLength(
+Java_com_tari_android_wallet_ffi_FFIPendingInboundTxs_jniGetLength(
         JNIEnv *jEnv,
         jobject jThis,
         jlong jpInboundTxs,
@@ -140,7 +140,7 @@ Java_com_tari_android_wallet_ffi_PendingInboundTransactions_jniGetLength(
 
 extern "C"
 JNIEXPORT jlong JNICALL
-Java_com_tari_android_wallet_ffi_PendingInboundTransactions_jniGetAt(
+Java_com_tari_android_wallet_ffi_FFIPendingInboundTxs_jniGetAt(
         JNIEnv *jEnv,
         jobject jThis,
         jlong jpInboundTxs,
@@ -158,7 +158,7 @@ Java_com_tari_android_wallet_ffi_PendingInboundTransactions_jniGetAt(
 
 extern "C"
 JNIEXPORT void JNICALL
-Java_com_tari_android_wallet_ffi_PendingInboundTransactions_jniDestroy(
+Java_com_tari_android_wallet_ffi_FFIPendingInboundTxs_jniDestroy(
         JNIEnv *jEnv,
         jobject jThis,
         jlong jpInboundTxs) {
@@ -169,7 +169,7 @@ Java_com_tari_android_wallet_ffi_PendingInboundTransactions_jniDestroy(
 
 extern "C"
 JNIEXPORT jint JNICALL
-Java_com_tari_android_wallet_ffi_PendingOutboundTransactions_jniGetLength(
+Java_com_tari_android_wallet_ffi_FFIPendingOutboundTxs_jniGetLength(
         JNIEnv *jEnv,
         jobject jThis,
         jlong jpOutboundTxs,
@@ -184,7 +184,7 @@ Java_com_tari_android_wallet_ffi_PendingOutboundTransactions_jniGetLength(
 
 extern "C"
 JNIEXPORT jlong JNICALL
-Java_com_tari_android_wallet_ffi_PendingOutboundTransactions_jniGetAt(
+Java_com_tari_android_wallet_ffi_FFIPendingOutboundTxs_jniGetAt(
         JNIEnv *jEnv,
         jobject jThis,
         jlong jpOutboundTxs,
@@ -202,7 +202,7 @@ Java_com_tari_android_wallet_ffi_PendingOutboundTransactions_jniGetAt(
 
 extern "C"
 JNIEXPORT void JNICALL
-Java_com_tari_android_wallet_ffi_PendingOutboundTransactions_jniDestroy(
+Java_com_tari_android_wallet_ffi_FFIPendingOutboundTxs_jniDestroy(
         JNIEnv *jEnv,
         jobject jThis,
         jlong jpInboundTxs) {

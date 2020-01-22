@@ -41,7 +41,7 @@
 
 extern "C"
 JNIEXPORT jbyteArray JNICALL
-Java_com_tari_android_wallet_ffi_CompletedTransaction_jniGetId(
+Java_com_tari_android_wallet_ffi_FFICompletedTx_jniGetId(
         JNIEnv *jEnv,
         jobject jThis,
         jlong jpCompletedTx,
@@ -49,15 +49,15 @@ Java_com_tari_android_wallet_ffi_CompletedTransaction_jniGetId(
     int i = 0;
     int *r = &i;
     TariCompletedTransaction *pCompletedTx = reinterpret_cast<TariCompletedTransaction *>(jpCompletedTx);
-    jbyteArray result = getBytesFromUnsignedLongLong(jEnv, completed_transaction_get_transaction_id(
-            pCompletedTx, r));
+    jbyteArray result = getBytesFromUnsignedLongLong(
+            jEnv, completed_transaction_get_transaction_id(pCompletedTx, r));
     setErrorCode(jEnv, error, i);
     return result;
 }
 
 extern "C"
 JNIEXPORT jlong JNICALL
-Java_com_tari_android_wallet_ffi_CompletedTransaction_jniGetDestinationPublicKey(
+Java_com_tari_android_wallet_ffi_FFICompletedTx_jniGetDestinationPublicKey(
         JNIEnv *jEnv,
         jobject jThis,
         jlong jpCompletedTx,
@@ -73,7 +73,7 @@ Java_com_tari_android_wallet_ffi_CompletedTransaction_jniGetDestinationPublicKey
 
 extern "C"
 JNIEXPORT jlong JNICALL
-Java_com_tari_android_wallet_ffi_CompletedTransaction_jniGetSourcePublicKey(
+Java_com_tari_android_wallet_ffi_FFICompletedTx_jniGetSourcePublicKey(
         JNIEnv *jEnv,
         jobject jThis,
         jlong jpCompletedTx,
@@ -89,7 +89,7 @@ Java_com_tari_android_wallet_ffi_CompletedTransaction_jniGetSourcePublicKey(
 
 extern "C"
 JNIEXPORT jbyteArray JNICALL
-Java_com_tari_android_wallet_ffi_CompletedTransaction_jniGetAmount(
+Java_com_tari_android_wallet_ffi_FFICompletedTx_jniGetAmount(
         JNIEnv *jEnv,
         jobject jThis,
         jlong jpCompletedTx,
@@ -106,7 +106,7 @@ Java_com_tari_android_wallet_ffi_CompletedTransaction_jniGetAmount(
 
 extern "C"
 JNIEXPORT jbyteArray JNICALL
-Java_com_tari_android_wallet_ffi_CompletedTransaction_jniGetFee(
+Java_com_tari_android_wallet_ffi_FFICompletedTx_jniGetFee(
         JNIEnv *jEnv,
         jobject jThis,
         jlong jpCompletedTx,
@@ -123,7 +123,7 @@ Java_com_tari_android_wallet_ffi_CompletedTransaction_jniGetFee(
 
 extern "C"
 JNIEXPORT jbyteArray JNICALL
-Java_com_tari_android_wallet_ffi_CompletedTransaction_jniGetTimestamp(
+Java_com_tari_android_wallet_ffi_FFICompletedTx_jniGetTimestamp(
         JNIEnv *jEnv,
         jobject jThis,
         jlong jpCompletedTx,
@@ -139,7 +139,7 @@ Java_com_tari_android_wallet_ffi_CompletedTransaction_jniGetTimestamp(
 
 extern "C"
 JNIEXPORT jstring JNICALL
-Java_com_tari_android_wallet_ffi_CompletedTransaction_jniGetMessage(
+Java_com_tari_android_wallet_ffi_FFICompletedTx_jniGetMessage(
         JNIEnv *jEnv,
         jobject jThis,
         jlong jpCompletedTx,
@@ -156,7 +156,7 @@ Java_com_tari_android_wallet_ffi_CompletedTransaction_jniGetMessage(
 
 extern "C"
 JNIEXPORT jint JNICALL
-Java_com_tari_android_wallet_ffi_CompletedTransaction_jniGetStatus(
+Java_com_tari_android_wallet_ffi_FFICompletedTx_jniGetStatus(
         JNIEnv *jEnv,
         jobject jThis,
         jlong jpCompletedTx,
@@ -171,7 +171,7 @@ Java_com_tari_android_wallet_ffi_CompletedTransaction_jniGetStatus(
 
 extern "C"
 JNIEXPORT void JNICALL
-Java_com_tari_android_wallet_ffi_CompletedTransaction_jniDestroy(
+Java_com_tari_android_wallet_ffi_FFICompletedTx_jniDestroy(
         JNIEnv *jEnv,
         jobject jThis,
         jlong jpCompletedTx) {

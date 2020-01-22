@@ -38,7 +38,7 @@ import java.util.*
 /**
  * @author The Tari Development Team
  */
-class HexString constructor(bytes: ByteVector) {
+internal class HexString constructor(bytes: FFIByteVector) {
 
     private val pattern = "\\p{XDigit}+".toRegex()
 
@@ -63,7 +63,7 @@ class HexString constructor(bytes: ByteVector) {
         }
     }
 
-    constructor(string: String) : this(ByteVector(nullptr)) {
+    constructor(string: String) : this(FFIByteVector(nullptr)) {
         if (pattern.matches(string) && string.length % 2 == 0) {
             hex = string
         } else {

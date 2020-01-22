@@ -53,11 +53,11 @@ import java.lang.ref.WeakReference
  *
  * @author The Tari Development Team
  */
-class TxListRecyclerViewAdapter(transactions: List<DummyTx>) :
+internal class TxListRecyclerViewAdapter(txs: List<DummyTx>) :
     RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     private val headerViewType = 0
-    private val transactionViewType = 1
+    private val txViewType = 1
 
     // items (headers and txs)
     private val items: ArrayList<Any> = ArrayList()
@@ -65,13 +65,13 @@ class TxListRecyclerViewAdapter(transactions: List<DummyTx>) :
     init {
         // sort array & prepare item list
         var currentDate: LocalDate? = null
-        for (transaction in transactions.sortedByDescending { it.timestamp }) {
-            val transactionDate = DateTime(transaction.timestamp * 1000L).toLocalDate()
-            if (currentDate == null || !transactionDate.isEqual(currentDate)) {
-                currentDate = transactionDate
+        for (tx in txs.sortedByDescending { it.timestamp }) {
+            val txDate = DateTime(tx.timestamp * 1000L).toLocalDate()
+            if (currentDate == null || !txDate.isEqual(currentDate)) {
+                currentDate = txDate
                 items.add(currentDate)
             }
-            items.add(transaction)
+            items.add(tx)
         }
     }
 
@@ -80,7 +80,7 @@ class TxListRecyclerViewAdapter(transactions: List<DummyTx>) :
      */
     override fun getItemViewType(position: Int): Int {
         return if (items[position] is DummyTx) {
-            transactionViewType
+            txViewType
         } else {
             headerViewType
         }
@@ -102,7 +102,7 @@ class TxListRecyclerViewAdapter(transactions: List<DummyTx>) :
         } else {
             val view = LayoutInflater.from(parent.context)
                 .inflate(R.layout.home_tx_list_item, parent, false)
-            TransactionViewHolder(
+            TxViewHolder(
                 view
             )
         }
@@ -112,7 +112,7 @@ class TxListRecyclerViewAdapter(transactions: List<DummyTx>) :
      * Bind & display header or transaction.
      */
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-        if (holder is TransactionViewHolder) {
+        if (holder is TxViewHolder) {
             holder.bind(items[position] as DummyTx)
         } else {
             (holder as HeaderViewHolder).bind(items[position] as LocalDate, position)
@@ -122,7 +122,7 @@ class TxListRecyclerViewAdapter(transactions: List<DummyTx>) :
     /**
      * Item count.
      */
-    override fun getItemCount() = items.size //transactions.size
+    override fun getItemCount() = items.size
 
     /**
      * Section header view holder.
@@ -176,7 +176,7 @@ class TxListRecyclerViewAdapter(transactions: List<DummyTx>) :
      *
      * @author The Tari Development Team
      */
-    class TransactionViewHolder(view: View) :
+    class TxViewHolder(view: View) :
         RecyclerView.ViewHolder(view),
         View.OnClickListener {
 
@@ -199,7 +199,7 @@ class TxListRecyclerViewAdapter(transactions: List<DummyTx>) :
         @JvmField
         var negativeColor: Int = 0
 
-        private lateinit var transactionWR: WeakReference<DummyTx>
+        private lateinit var txWR: WeakReference<DummyTx>
 
         init {
             ButterKnife.bind(this, view)
@@ -211,20 +211,20 @@ class TxListRecyclerViewAdapter(transactions: List<DummyTx>) :
             Logger.d("Tx clicked.")
         }
 
-        fun bind(transaction: DummyTx) {
-            transactionWR = WeakReference(transaction)
+        fun bind(tx: DummyTx) {
+            txWR = WeakReference(tx)
             // display contact alias
-            contactAliasTextView.text = transaction.contactAlias
+            contactAliasTextView.text = tx.contactAlias
             // display message
-            messageTextView.text = transaction.message
+            messageTextView.text = tx.message
             // display value
-            if (transaction.value > 0) {
-                val formattedValue = "+%1$,.2f".format(transaction.value)
+            if (tx.value > 0) {
+                val formattedValue = "+%1$,.2f".format(tx.value)
                 valueTextView.text = formattedValue
                 valueTextView.setTextColor(positiveColor)
                 valueTextView.background = positiveBgDrawable
             } else {
-                val formattedValue = "%1$,.2f".format(transaction.value)
+                val formattedValue = "%1$,.2f".format(tx.value)
                 valueTextView.text = formattedValue
                 valueTextView.setTextColor(negativeColor)
                 valueTextView.background = negativeBgDrawable

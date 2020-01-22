@@ -1,17 +1,17 @@
 package com.tari.android.wallet.util
 
-data class DummyWallet(
+internal data class DummyWallet(
     var balanceTaris: Double
 )
 
-data class DummyTx(
+internal data class DummyTx(
     val timestamp: Long,
     val contactAlias: String,
     val message: String,
     val value: Double
 )
 
-val dummyWalletBalances = doubleArrayOf(
+internal val dummyWalletBalances = doubleArrayOf(
     55721.536,
     158904.24,
     58723.03,
@@ -23,14 +23,14 @@ val dummyWalletBalances = doubleArrayOf(
 
 private var currentBalanceIndex = 0
 
-fun nextBalance(): Double {
+internal fun nextBalance(): Double {
     return dummyWalletBalances[(currentBalanceIndex++) % dummyWalletBalances.size]
 }
 
-val dummyWallet = DummyWallet(balanceTaris = nextBalance())
+internal val dummyWallet = DummyWallet(balanceTaris = nextBalance())
 //val dummyWallet = DummyWallet(balanceTaris = 0.536)
 
-val dummyTransactions = arrayOf(
+internal val dummyTxs = arrayOf(
     DummyTx(
         1576158338,
         "Sarah_D",

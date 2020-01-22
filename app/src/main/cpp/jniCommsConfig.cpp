@@ -41,7 +41,7 @@
 
 extern "C"
 JNIEXPORT jlong JNICALL
-Java_com_tari_android_wallet_ffi_CommsConfig_jniCreate(
+Java_com_tari_android_wallet_ffi_FFICommsConfig_jniCreate(
         JNIEnv *jEnv,
         jclass jClass,
         jstring jControlServiceAddress,
@@ -76,7 +76,7 @@ Java_com_tari_android_wallet_ffi_CommsConfig_jniCreate(
 
 extern "C"
 JNIEXPORT void JNICALL
-Java_com_tari_android_wallet_ffi_CommsConfig_jniDestroy(
+Java_com_tari_android_wallet_ffi_FFICommsConfig_jniDestroy(
         JNIEnv *jEnv,
         jobject jThis,
         jlong jpCommsConfig) {

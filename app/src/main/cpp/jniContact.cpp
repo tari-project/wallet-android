@@ -41,7 +41,7 @@
 
 extern "C"
 JNIEXPORT jlong JNICALL
-Java_com_tari_android_wallet_ffi_Contact_jniCreate(
+Java_com_tari_android_wallet_ffi_FFIContact_jniCreate(
         JNIEnv *jEnv,
         jclass jClass,
         jstring jAlias,
@@ -59,7 +59,7 @@ Java_com_tari_android_wallet_ffi_Contact_jniCreate(
 
 extern "C"
 JNIEXPORT jstring JNICALL
-Java_com_tari_android_wallet_ffi_Contact_jniGetAlias(
+Java_com_tari_android_wallet_ffi_FFIContact_jniGetAlias(
         JNIEnv *jEnv,
         jobject jThis,
         jlong jpContact,
@@ -76,7 +76,7 @@ Java_com_tari_android_wallet_ffi_Contact_jniGetAlias(
 
 extern "C"
 JNIEXPORT jlong JNICALL
-Java_com_tari_android_wallet_ffi_Contact_jniGetPublicKey(
+Java_com_tari_android_wallet_ffi_FFIContact_jniGetPublicKey(
         JNIEnv *jEnv,
         jobject jThis,
         jlong jpContact,
@@ -91,7 +91,7 @@ Java_com_tari_android_wallet_ffi_Contact_jniGetPublicKey(
 
 extern "C"
 JNIEXPORT void JNICALL
-Java_com_tari_android_wallet_ffi_Contact_jniDestroy(
+Java_com_tari_android_wallet_ffi_FFIContact_jniDestroy(
         JNIEnv *jEnv,
         jobject jThis,
         jlong jpContact) {

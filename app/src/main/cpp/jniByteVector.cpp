@@ -41,7 +41,7 @@
 
 extern "C"
 JNIEXPORT jlong JNICALL
-Java_com_tari_android_wallet_ffi_ByteVector_jniCreate(
+Java_com_tari_android_wallet_ffi_FFIByteVector_jniCreate(
         JNIEnv *jEnv,
         jclass jClass,
         jbyteArray array,
@@ -61,7 +61,7 @@ Java_com_tari_android_wallet_ffi_ByteVector_jniCreate(
 
 extern "C"
 JNIEXPORT jint JNICALL
-Java_com_tari_android_wallet_ffi_ByteVector_jniGetLength(
+Java_com_tari_android_wallet_ffi_FFIByteVector_jniGetLength(
         JNIEnv *jEnv,
         jobject jThis,
         jlong jpByteVector,
@@ -76,7 +76,7 @@ Java_com_tari_android_wallet_ffi_ByteVector_jniGetLength(
 
 extern "C"
 JNIEXPORT jint JNICALL
-Java_com_tari_android_wallet_ffi_ByteVector_jniGetAt(
+Java_com_tari_android_wallet_ffi_FFIByteVector_jniGetAt(
         JNIEnv *jEnv,
         jobject jThis,
         jlong jpByteVector,
@@ -92,7 +92,7 @@ Java_com_tari_android_wallet_ffi_ByteVector_jniGetAt(
 
 extern "C"
 JNIEXPORT void JNICALL
-Java_com_tari_android_wallet_ffi_ByteVector_jniDestroy(
+Java_com_tari_android_wallet_ffi_FFIByteVector_jniDestroy(
         JNIEnv *jEnv,
         jobject jThis,
         jlong jpByteVector) {
