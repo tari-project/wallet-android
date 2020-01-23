@@ -113,5 +113,7 @@ dependencies {
     kapt "com.jakewharton:butterknife-compiler:10.2.0"
     // logger
     implementation 'com.orhanobut:logger:2.2.0'
+    //QR scanner
+    implementation 'com.budiyev.android:code-scanner:2.1.0'
 
 }

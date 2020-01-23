@@ -34,6 +34,7 @@ package com.tari.android.wallet.ui.activity.home
 
 import android.animation.ValueAnimator
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
@@ -53,10 +54,7 @@ import androidx.core.view.ViewCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-import butterknife.BindColor
-import butterknife.BindView
-import butterknife.BindDimen
-import butterknife.OnClick
+import butterknife.*
 import com.daasuu.ei.Ease
 import com.daasuu.ei.EasingInterpolator
 import com.orhanobut.logger.Logger
@@ -64,6 +62,8 @@ import com.tari.android.wallet.R
 import com.tari.android.wallet.service.TariWalletService
 import com.tari.android.wallet.service.WalletService
 import com.tari.android.wallet.ui.activity.BaseActivity
+import com.tari.android.wallet.ui.activity.EXTRA_QR_DATA
+import com.tari.android.wallet.ui.activity.QRScannerActivity
 import com.tari.android.wallet.ui.util.UiUtil
 import com.tari.android.wallet.util.*
 import java.lang.Float.max
@@ -75,6 +75,9 @@ import java.math.BigDecimal
  *
  * @author The Tari Development Team
  */
+
+const val REQUEST_QR_SCANNER = 101
+
 class HomeActivity : BaseActivity(),
     ServiceConnection,
     SwipeRefreshLayout.OnRefreshListener,
@@ -378,15 +381,11 @@ class HomeActivity : BaseActivity(),
      * For test purposes only - update balance when the QR code button is clicked.
      */
     @OnClick(R.id.home_img_btn_qr)
-    fun changeBalance(view: View) {
+    fun onQRCodeScanClick(view: View) {
         UiUtil.temporarilyDisableClick(view)
-
-        // get next balance
-        val balance = nextBalance()
-        dummyWallet.balanceTaris = balance
-
-        // set balance
-        balanceViewController.balance = dummyWallet.balanceTaris
+        val intent = Intent(this, QRScannerActivity::class.java)
+        startActivityForResult(intent, REQUEST_QR_SCANNER)
+        overridePendingTransition(R.anim.slide_up, 0)
     }
 
     @OnClick(R.id.home_btn_close_tx_list)
@@ -403,6 +402,15 @@ class HomeActivity : BaseActivity(),
             0,
             scrollContentView.height - scrollView.height
         )
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        if (requestCode == REQUEST_QR_SCANNER && resultCode == Activity.RESULT_OK && data != null) {
+            val text = data.getStringExtra(EXTRA_QR_DATA)
+            Toast.makeText(this, "Scan result: $text", Toast.LENGTH_LONG).show()
+        }
     }
 
     /**
