@@ -95,7 +95,6 @@ class QRScannerActivity : BaseActivity() {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (requestCode == REQUEST_CAMERA_PERMISSION) {
             if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                Toast.makeText(this, "Camera permission granted", Toast.LENGTH_LONG).show()
                 startScanning()
             } else {
                 Toast.makeText(this, "Camera permission denied", Toast.LENGTH_LONG).show()
