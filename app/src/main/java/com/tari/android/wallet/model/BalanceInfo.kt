@@ -1,5 +1,5 @@
 /**
- * Copyright 2019 The Tari Project
+ * Copyright 2020 The Tari Project
  *
  * Redistribution and use in source and binary forms, with or
  * without modification, are permitted provided that the
@@ -43,14 +43,14 @@ import java.math.BigInteger
  */
 class BalanceInfo() : Parcelable {
 
-    var availableBalance = BigInteger("0")
-    var pendingIncomingBalance = BigInteger("0")
-    var pendingOutgoingBalance = BigInteger("0")
+    var availableBalance = MicroTari(BigInteger("0"))
+    var pendingIncomingBalance = MicroTari(BigInteger("0"))
+    var pendingOutgoingBalance = MicroTari(BigInteger("0"))
 
     constructor(
-        availableBalance: BigInteger,
-        pendingIncomingBalance: BigInteger,
-        pendingOutgoingBalance: BigInteger
+        availableBalance: MicroTari,
+        pendingIncomingBalance: MicroTari,
+        pendingOutgoingBalance: MicroTari
     ) : this() {
         this.availableBalance = availableBalance
         this.pendingIncomingBalance = pendingIncomingBalance
@@ -76,15 +76,15 @@ class BalanceInfo() : Parcelable {
     }
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {
-        parcel.writeSerializable(availableBalance)
-        parcel.writeSerializable(pendingIncomingBalance)
-        parcel.writeSerializable(pendingOutgoingBalance)
+        parcel.writeParcelable(availableBalance, flags)
+        parcel.writeParcelable(pendingIncomingBalance, flags)
+        parcel.writeParcelable(pendingOutgoingBalance, flags)
     }
 
     private fun readFromParcel(inParcel: Parcel) {
-        availableBalance = inParcel.readSerializable() as BigInteger
-        pendingIncomingBalance = inParcel.readSerializable() as BigInteger
-        pendingOutgoingBalance = inParcel.readSerializable() as BigInteger
+        availableBalance = inParcel.readParcelable(MicroTari::class.java.classLoader)!!
+        pendingIncomingBalance = inParcel.readParcelable(MicroTari::class.java.classLoader)!!
+        pendingOutgoingBalance = inParcel.readParcelable(MicroTari::class.java.classLoader)!!
     }
 
     override fun describeContents(): Int {

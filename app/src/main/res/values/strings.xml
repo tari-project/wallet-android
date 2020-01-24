@@ -45,7 +45,8 @@
     <string name="home_today">Today</string>
     <string name="home_yesterday">Yesterday</string>
     <string name="home_send_tari">Send Tari</string>
-    <string name="home_transactions">Transactions</string>
+    <string name="home_txs">Transactions</string>
+    <string name="home_pending_txs">Pending Transactions</string>
     <!-- test -->
     <string name="home_test_data_warning">Please wait.\n\nWallet is generating test data.</string>
     <string name="scan_qr_description">Scan Tari QR code in the box below to send a Tari to recipient.</string>

@@ -30,15 +30,62 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.tari.android.wallet.model;
+package com.tari.android.wallet.model
+
+import android.os.Parcel
+import android.os.Parcelable
+import java.math.BigDecimal
+import java.math.BigInteger
 
 /**
- * Declare model classes in this file.
+ * This wrapper is needed for amount parameters in AIDL methods.
+ *
+ * @author The Tari Development Team
  */
-parcelable TxId;
-parcelable MicroTari;
-parcelable BalanceInfo;
-parcelable Contact;
-parcelable CompletedTx;
-parcelable PendingInboundTx;
-parcelable PendingOutboundTx;
+class MicroTari() : Parcelable {
+
+    var value = BigInteger("0")
+
+    private val million = BigDecimal(1e6)
+    val tariValue: BigDecimal
+        get() = value.toBigDecimal().divide(million)
+
+    constructor(
+        value: BigInteger
+    ) : this() {
+        this.value = value
+    }
+
+    // region Parcelable
+
+    constructor(parcel: Parcel) : this() {
+        readFromParcel(parcel)
+    }
+
+    companion object CREATOR : Parcelable.Creator<MicroTari> {
+
+        override fun createFromParcel(parcel: Parcel): MicroTari {
+            return MicroTari(parcel)
+        }
+
+        override fun newArray(size: Int): Array<MicroTari> {
+            return Array(size) { MicroTari() }
+        }
+
+    }
+
+    override fun writeToParcel(parcel: Parcel, flags: Int) {
+        parcel.writeSerializable(value)
+    }
+
+    private fun readFromParcel(inParcel: Parcel) {
+        value = inParcel.readSerializable() as BigInteger
+    }
+
+    override fun describeContents(): Int {
+        return 0
+    }
+
+    // endregion
+
+}

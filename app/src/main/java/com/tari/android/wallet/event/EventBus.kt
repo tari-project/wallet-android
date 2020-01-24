@@ -1,5 +1,5 @@
 /**
- * Copyright 2019 The Tari Project
+ * Copyright 2020 The Tari Project
  *
  * Redistribution and use in source and binary forms, with or
  * without modification, are permitted provided that the
@@ -30,57 +30,30 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.tari.android.wallet.model
+package com.tari.android.wallet.event
 
-import android.os.Parcel
-import android.os.Parcelable
-import java.math.BigInteger
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.subjects.PublishSubject
 
 /**
- * This wrapper is needed for amount parameters in AIDL methods.
- *
- * @author The Tari Development Team
+ * Created by adrielcafe on 20/12/17.
  */
-class Amount() : Parcelable {
+object EventBus {
 
-    var value = BigInteger("0")
+    val disposables = mutableMapOf<Any, CompositeDisposable>()
+    val publishSubject = PublishSubject.create<Any>()
 
-    constructor(
-        value: BigInteger
-    ) : this() {
-        this.value = value
+    inline fun <reified T : Any> subscribe(subscriber: Any, noinline consumer: (T) -> Unit) {
+        val observer = publishSubject.ofType(T::class.java).subscribe(consumer)
+        val disposable = disposables[subscriber]
+            ?: CompositeDisposable().apply { disposables[subscriber] = this }
+        disposable.add(observer)
     }
 
-    // region Parcelable
-
-    constructor(parcel: Parcel) : this() {
-        readFromParcel(parcel)
+    fun unsubscribe(subscriber: Any) = disposables.apply {
+        get(subscriber)?.clear()
+        remove(subscriber)
     }
 
-    companion object CREATOR : Parcelable.Creator<Amount> {
-
-        override fun createFromParcel(parcel: Parcel): Amount {
-            return Amount(parcel)
-        }
-
-        override fun newArray(size: Int): Array<Amount> {
-            return Array(size) { Amount() }
-        }
-
-    }
-
-    override fun writeToParcel(parcel: Parcel, flags: Int) {
-        parcel.writeSerializable(value)
-    }
-
-    private fun readFromParcel(inParcel: Parcel) {
-        value = inParcel.readSerializable() as BigInteger
-    }
-
-    override fun describeContents(): Int {
-        return 0
-    }
-
-    // endregion
-
+    fun post(event: Any) = publishSubject.onNext(event)
 }

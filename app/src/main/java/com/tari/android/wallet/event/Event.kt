@@ -30,15 +30,20 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.tari.android.wallet.model;
+package com.tari.android.wallet.event
+
+import com.tari.android.wallet.model.Tx
 
 /**
- * Declare model classes in this file.
+ * App-wide events.
  */
-parcelable TxId;
-parcelable MicroTari;
-parcelable BalanceInfo;
-parcelable Contact;
-parcelable CompletedTx;
-parcelable PendingInboundTx;
-parcelable PendingOutboundTx;
+internal interface Event {
+
+    /**
+     * Home (tx list) events.
+     */
+    interface Home {
+        data class TxClicked(val tx: Tx)
+    }
+
+}
