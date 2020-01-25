@@ -48,6 +48,8 @@
     <string name="home_transactions">Transactions</string>
     <!-- test -->
     <string name="home_test_data_warning">Please wait.\n\nWallet is generating test data.</string>
-    <string name="scanne_qr_description">Scan Tari QR code in the box below to send a Tari to receipient.</string>
+    <string name="scan_qr_description">Scan Tari QR code in the box below to send a Tari to recipient.</string>
+    <string name="failed_init_camera_message">Failed to initialize Camera</string>
+    <string name="camera_permission_denied_message">Camera permission denied</string>
 
 </resources>

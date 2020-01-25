@@ -64,6 +64,7 @@ import com.tari.android.wallet.service.WalletService
 import com.tari.android.wallet.ui.activity.BaseActivity
 import com.tari.android.wallet.ui.activity.EXTRA_QR_DATA
 import com.tari.android.wallet.ui.activity.QRScannerActivity
+import com.tari.android.wallet.ui.activity.REQUEST_QR_SCANNER
 import com.tari.android.wallet.ui.util.UiUtil
 import com.tari.android.wallet.util.*
 import java.lang.Float.max
@@ -75,9 +76,6 @@ import java.math.BigDecimal
  *
  * @author The Tari Development Team
  */
-
-const val REQUEST_QR_SCANNER = 101
-
 class HomeActivity : BaseActivity(),
     ServiceConnection,
     SwipeRefreshLayout.OnRefreshListener,
@@ -377,9 +375,6 @@ class HomeActivity : BaseActivity(),
         super.onDestroy()
     }
 
-    /**
-     * For test purposes only - update balance when the QR code button is clicked.
-     */
     @OnClick(R.id.home_img_btn_qr)
     fun onQRCodeScanClick(view: View) {
         UiUtil.temporarilyDisableClick(view)

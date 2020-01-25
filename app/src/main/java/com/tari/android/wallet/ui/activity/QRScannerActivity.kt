@@ -16,14 +16,14 @@ import com.google.zxing.BarcodeFormat
 import com.tari.android.wallet.R
 
 
-const val REQUEST_CAMERA_PERMISSION = 101
-const val EXTRA_QR_DATA="extra_qr_text"
+const val REQUEST_QR_SCANNER = 101
+const val REQUEST_CAMERA_PERMISSION = 102
+const val EXTRA_QR_DATA = "extra_qr_text"
 
 class QRScannerActivity : BaseActivity() {
 
     override val contentViewId = R.layout.activity_qr_scanner
     private lateinit var codeScanner: CodeScanner
-
 
     @BindView(R.id.scanner_view)
     lateinit var scannerView: CodeScannerView
@@ -45,7 +45,6 @@ class QRScannerActivity : BaseActivity() {
         } else {
             startScanning()
         }
-
     }
 
     @OnClick(R.id.qr_close)
@@ -56,26 +55,25 @@ class QRScannerActivity : BaseActivity() {
 
     private fun startScanning() {
         codeScanner = CodeScanner(this, scannerView)
-
         codeScanner.camera = CodeScanner.CAMERA_BACK
         codeScanner.formats = listOf(BarcodeFormat.QR_CODE)
-
         codeScanner.autoFocusMode = AutoFocusMode.SAFE
         codeScanner.scanMode = ScanMode.SINGLE
         codeScanner.isAutoFocusEnabled = true
         codeScanner.isFlashEnabled = false
 
         codeScanner.decodeCallback = DecodeCallback {
-            val intent=Intent()
-            intent.putExtra(EXTRA_QR_DATA,it.text)
-            setResult(Activity.RESULT_OK,intent)
+            val intent = Intent()
+            intent.putExtra(EXTRA_QR_DATA, it.text)
+            setResult(Activity.RESULT_OK, intent)
             finish()
             overridePendingTransition(0, R.anim.slide_down)
         }
+
         codeScanner.errorCallback = ErrorCallback {
             runOnUiThread {
                 Toast.makeText(
-                    this, "Failed to initialize Camera",
+                    this, getString(R.string.failed_init_camera_message),
                     Toast.LENGTH_LONG
                 ).show()
             }
@@ -85,7 +83,6 @@ class QRScannerActivity : BaseActivity() {
             codeScanner.startPreview()
         }
     }
-
 
     override fun onRequestPermissionsResult(
         requestCode: Int,
@@ -97,7 +94,11 @@ class QRScannerActivity : BaseActivity() {
             if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 startScanning()
             } else {
-                Toast.makeText(this, "Camera permission denied", Toast.LENGTH_LONG).show()
+                Toast.makeText(
+                    this,
+                    getString(R.string.camera_permission_denied_message),
+                    Toast.LENGTH_LONG
+                ).show()
             }
         }
     }
