@@ -9,6 +9,7 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import butterknife.BindString
 import butterknife.BindView
 import butterknife.OnClick
 import com.budiyev.android.codescanner.*
@@ -16,17 +17,17 @@ import com.google.zxing.BarcodeFormat
 import com.tari.android.wallet.R
 
 
-const val REQUEST_QR_SCANNER = 101
-const val REQUEST_CAMERA_PERMISSION = 102
+private const val REQUEST_CAMERA_PERMISSION = 102
 const val EXTRA_QR_DATA = "extra_qr_text"
 
 class QRScannerActivity : BaseActivity() {
 
-    override val contentViewId = R.layout.activity_qr_scanner
-    private lateinit var codeScanner: CodeScanner
-
     @BindView(R.id.scanner_view)
     lateinit var scannerView: CodeScannerView
+
+    private lateinit var codeScanner: CodeScanner
+
+    override val contentViewId = R.layout.activity_qr_scanner
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -73,7 +74,7 @@ class QRScannerActivity : BaseActivity() {
         codeScanner.errorCallback = ErrorCallback {
             runOnUiThread {
                 Toast.makeText(
-                    this, getString(R.string.failed_init_camera_message),
+                    this, R.string.failed_init_camera_message,
                     Toast.LENGTH_LONG
                 ).show()
             }
@@ -96,7 +97,7 @@ class QRScannerActivity : BaseActivity() {
             } else {
                 Toast.makeText(
                     this,
-                    getString(R.string.camera_permission_denied_message),
+                    R.string.camera_permission_denied_message,
                     Toast.LENGTH_LONG
                 ).show()
             }
