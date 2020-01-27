@@ -1,5 +1,5 @@
 /**
- * Copyright 2019 The Tari Project
+ * Copyright 2020 The Tari Project
  *
  * Redistribution and use in source and binary forms, with or
  * without modification, are permitted provided that the
@@ -37,15 +37,21 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import butterknife.*
-import com.orhanobut.logger.Logger
 import com.tari.android.wallet.R
+import com.tari.android.wallet.event.Event
+import com.tari.android.wallet.event.EventBus
+import com.tari.android.wallet.model.CompletedTx
+import com.tari.android.wallet.model.PendingInboundTx
+import com.tari.android.wallet.model.PendingOutboundTx
+import com.tari.android.wallet.model.Tx
 import com.tari.android.wallet.ui.util.UiUtil
-import com.tari.android.wallet.util.DummyTx
 import org.joda.time.DateTime
 import org.joda.time.LocalDate
+import java.lang.RuntimeException
 import java.lang.ref.WeakReference
 
 /**
@@ -53,33 +59,63 @@ import java.lang.ref.WeakReference
  *
  * @author The Tari Development Team
  */
-internal class TxListRecyclerViewAdapter(txs: List<DummyTx>) :
+internal class TxListRecyclerViewAdapter(
+    private val completedTxs: List<CompletedTx>,
+    private val pendingInboundTxs: List<PendingInboundTx>,
+    private val pendingOutboundTxs: List<PendingOutboundTx>
+) :
     RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
-    private val headerViewType = 0
-    private val txViewType = 1
+    private val pendingHeaderViewType = 0
+    private val headerViewType = 1
+    private val txViewType = 2
 
     // items (headers and txs)
-    private val items: ArrayList<Any> = ArrayList()
+    private val items = ArrayList<Any>()
+    private val pendingTxs = ArrayList<Tx>()
 
-    init {
-        // sort array & prepare item list
+    fun notifyDataChanged() {
+        items.clear()
+        pendingTxs.clear()
+        pendingTxs.addAll(pendingInboundTxs)
+        pendingTxs.addAll(pendingOutboundTxs)
+
         var currentDate: LocalDate? = null
-        for (tx in txs.sortedByDescending { it.timestamp }) {
-            val txDate = DateTime(tx.timestamp * 1000L).toLocalDate()
+        // add pending txs
+        if (pendingTxs.size > 0) {
+            items.add(LocalDate.now())
+            val sortedPendingTxs = ArrayList(pendingTxs)
+                .sortedWith(compareByDescending<Tx> { it.timestamp }
+                    .thenBy { it.contact.alias })
+            items.addAll(sortedPendingTxs)
+        }
+        val sortedCompleteTxs = ArrayList(completedTxs)
+            .sortedWith(compareByDescending<Tx> { it.timestamp }
+                .thenBy { it.contact.alias })
+        // completed txs
+        for (tx in sortedCompleteTxs) {
+            val txDate = DateTime(tx.timestamp.toLong() * 1000L).toLocalDate()
             if (currentDate == null || !txDate.isEqual(currentDate)) {
                 currentDate = txDate
                 items.add(currentDate)
             }
             items.add(tx)
         }
+        notifyDataSetChanged()
     }
+
+    /**
+     * Item count.
+     */
+    override fun getItemCount() = items.size
 
     /**
      * Defines the view type - header or transaction.
      */
     override fun getItemViewType(position: Int): Int {
-        return if (items[position] is DummyTx) {
+        return if (pendingTxs.size > 0 && position == 0) {
+            pendingHeaderViewType
+        } else if (items[position] is Tx) {
             txViewType
         } else {
             headerViewType
@@ -93,18 +129,33 @@ internal class TxListRecyclerViewAdapter(txs: List<DummyTx>) :
         parent: ViewGroup,
         viewType: Int
     ): RecyclerView.ViewHolder {
-        return if (viewType == headerViewType) {
-            val view = LayoutInflater.from(parent.context)
-                .inflate(R.layout.home_tx_list_header, parent, false)
-            HeaderViewHolder(
-                view
-            )
-        } else {
-            val view = LayoutInflater.from(parent.context)
-                .inflate(R.layout.home_tx_list_item, parent, false)
-            TxViewHolder(
-                view
-            )
+        return when (viewType) {
+            pendingHeaderViewType -> {
+                val view = LayoutInflater.from(parent.context)
+                    .inflate(R.layout.home_tx_list_header, parent, false)
+                HeaderViewHolder(
+                    view,
+                    HeaderViewHolder.Type.PENDING_TXS
+                )
+            }
+            headerViewType -> {
+                val view = LayoutInflater.from(parent.context)
+                    .inflate(R.layout.home_tx_list_header, parent, false)
+                HeaderViewHolder(
+                    view,
+                    HeaderViewHolder.Type.DATE
+                )
+            }
+            txViewType -> {
+                val view = LayoutInflater.from(parent.context)
+                    .inflate(R.layout.home_tx_list_item, parent, false)
+                TxViewHolder(
+                    view
+                )
+            }
+            else -> {
+                throw RuntimeException("Unexpected view type $viewType.")
+            }
         }
     }
 
@@ -112,23 +163,29 @@ internal class TxListRecyclerViewAdapter(txs: List<DummyTx>) :
      * Bind & display header or transaction.
      */
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-        if (holder is TxViewHolder) {
-            holder.bind(items[position] as DummyTx)
-        } else {
-            (holder as HeaderViewHolder).bind(items[position] as LocalDate, position)
+        when {
+            holder is TxViewHolder -> {
+                holder.bind(items[position] as Tx)
+            }
+            getItemViewType(position) == headerViewType -> {
+                (holder as HeaderViewHolder).bind(items[position] as LocalDate, position)
+            }
+            getItemViewType(position) == pendingHeaderViewType -> {
+                (holder as HeaderViewHolder).bind(null, position)
+            }
         }
     }
 
     /**
-     * Item count.
-     */
-    override fun getItemCount() = items.size
-
-    /**
      * Section header view holder.
      */
-    class HeaderViewHolder(view: View) :
+    class HeaderViewHolder(view: View, private val type: Type) :
         RecyclerView.ViewHolder(view) {
+
+        enum class Type {
+            PENDING_TXS,
+            DATE
+        }
 
         private val dateFormat = "MMMM dd, yyyy"
 
@@ -136,35 +193,50 @@ internal class TxListRecyclerViewAdapter(txs: List<DummyTx>) :
         lateinit var separatorView: View
         @BindView(R.id.home_tx_list_header_txt_title)
         lateinit var titleTextView: TextView
+        @BindView(R.id.home_tx_list_pending_prog_bar)
+        lateinit var progressBar: ProgressBar
+
+
         @BindString(R.string.home_today)
         lateinit var todayString: String
         @BindString(R.string.home_yesterday)
         lateinit var yesterdayString: String
+        @BindString(R.string.home_pending_txs)
+        lateinit var pendingTxsString: String
 
-        private lateinit var date: LocalDate
+        private var date: LocalDate? = null
 
         init {
             ButterKnife.bind(this, view)
         }
 
-        fun bind(date: LocalDate, position: Int) {
+        fun bind(date: LocalDate?, position: Int) {
             if (position == 0) {
                 separatorView.visibility = View.GONE
             } else {
                 separatorView.visibility = View.VISIBLE
             }
-            this.date = date
-            val todayDate = LocalDate.now()
-            val yesterdayDate = todayDate.minusDays(1)
-            when {
-                date.isEqual(todayDate) -> {
-                    titleTextView.text = todayString
+            when (type) {
+                Type.PENDING_TXS -> {
+                    progressBar.visibility = View.VISIBLE
+                    titleTextView.text = pendingTxsString
                 }
-                date.isEqual(yesterdayDate) -> {
-                    titleTextView.text = yesterdayString
-                }
-                else -> {
-                    titleTextView.text = date.toString(dateFormat)
+                Type.DATE -> {
+                    progressBar.visibility = View.GONE
+                    this.date = date!!
+                    val todayDate = LocalDate.now()
+                    val yesterdayDate = todayDate.minusDays(1)
+                    when {
+                        date.isEqual(todayDate) -> {
+                            titleTextView.text = todayString
+                        }
+                        date.isEqual(yesterdayDate) -> {
+                            titleTextView.text = yesterdayString
+                        }
+                        else -> {
+                            titleTextView.text = date.toString(dateFormat)
+                        }
+                    }
                 }
             }
 
@@ -199,7 +271,7 @@ internal class TxListRecyclerViewAdapter(txs: List<DummyTx>) :
         @JvmField
         var negativeColor: Int = 0
 
-        private lateinit var txWR: WeakReference<DummyTx>
+        private lateinit var txWR: WeakReference<Tx>
 
         init {
             ButterKnife.bind(this, view)
@@ -208,28 +280,29 @@ internal class TxListRecyclerViewAdapter(txs: List<DummyTx>) :
         @OnClick(R.id.home_tx_list_item_vw_root)
         override fun onClick(view: View) {
             UiUtil.temporarilyDisableClick(view)
-            Logger.d("Tx clicked.")
+            EventBus.post(Event.Home.TxClicked(txWR.get()!!))
         }
 
-        fun bind(tx: DummyTx) {
+        fun bind(tx: Tx) {
             txWR = WeakReference(tx)
             // display contact alias
-            contactAliasTextView.text = tx.contactAlias
+            contactAliasTextView.text = tx.contact.alias
             // display message
             messageTextView.text = tx.message
             // display value
-            if (tx.value > 0) {
-                val formattedValue = "+%1$,.2f".format(tx.value)
+            if (tx.direction == Tx.Direction.INBOUND) {
+                val formattedValue = "+%1$,.2f".format(tx.amount.tariValue.toDouble())
                 valueTextView.text = formattedValue
                 valueTextView.setTextColor(positiveColor)
                 valueTextView.background = positiveBgDrawable
             } else {
-                val formattedValue = "%1$,.2f".format(tx.value)
+                val formattedValue = "-%1$,.2f".format(tx.amount.tariValue.toDouble())
                 valueTextView.text = formattedValue
                 valueTextView.setTextColor(negativeColor)
                 valueTextView.background = negativeBgDrawable
             }
         }
+
     }
 
 }

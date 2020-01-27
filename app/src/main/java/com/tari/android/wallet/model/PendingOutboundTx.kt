@@ -9,23 +9,18 @@ import java.math.BigInteger
  *
  * @author The Tari Development Team
  */
-class PendingOutboundTx() : Parcelable {
-
-    var id = BigInteger("0")
-    var destinationPublicKeyHexString = ""
-    var amount = BigInteger("0")
-    var timestamp = BigInteger("0")
-    var message = ""
+class PendingOutboundTx() : Tx(), Parcelable {
 
     constructor(
         id: BigInteger,
-        destinationPublicKeyHexString: String,
-        amount: BigInteger,
+        contact: Contact,
+        amount: MicroTari,
         timestamp: BigInteger,
         message: String
     ) : this() {
         this.id = id
-        this.destinationPublicKeyHexString = destinationPublicKeyHexString
+        this.direction = Direction.OUTBOUND
+        this.contact = contact
         this.amount = amount
         this.timestamp = timestamp
         this.message = message
@@ -51,16 +46,18 @@ class PendingOutboundTx() : Parcelable {
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {
         parcel.writeSerializable(id)
-        parcel.writeString(destinationPublicKeyHexString)
-        parcel.writeSerializable(amount)
+        parcel.writeSerializable(direction)
+        parcel.writeParcelable(contact, flags)
+        parcel.writeParcelable(amount, flags)
         parcel.writeSerializable(timestamp)
         parcel.writeString(message)
     }
 
     private fun readFromParcel(inParcel: Parcel) {
         id = inParcel.readSerializable() as BigInteger
-        destinationPublicKeyHexString = inParcel.readString() ?: ""
-        amount = inParcel.readSerializable() as BigInteger
+        direction = inParcel.readSerializable() as Direction
+        contact = inParcel.readParcelable(Contact::class.java.classLoader)!!
+        amount = inParcel.readParcelable(MicroTari::class.java.classLoader)!!
         timestamp = inParcel.readSerializable() as BigInteger
         message = inParcel.readString() ?: ""
     }

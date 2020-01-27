@@ -1,5 +1,5 @@
 /**
- * Copyright 2019 The Tari Project
+ * Copyright 2020 The Tari Project
  *
  * Redistribution and use in source and binary forms, with or
  * without modification, are permitted provided that the
@@ -41,6 +41,7 @@ import com.tari.android.wallet.di.ApplicationComponent
 import com.tari.android.wallet.di.ApplicationModule
 import com.tari.android.wallet.di.DaggerApplicationComponent
 import com.tari.android.wallet.service.WalletService
+import net.danlew.android.joda.JodaTimeAndroid
 
 /**
  * Main application class.
@@ -58,6 +59,7 @@ class TariWalletApplication : Application() {
     override fun onCreate() {
         super.onCreate()
         Logger.addLogAdapter(AndroidLogAdapter())
+        JodaTimeAndroid.init(this)
         appComponent = initDagger(this)
     }
 

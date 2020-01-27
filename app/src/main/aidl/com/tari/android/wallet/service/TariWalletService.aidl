@@ -1,5 +1,5 @@
 /**
- * Copyright 2019 The Tari Project
+ * Copyright 2020 The Tari Project
  *
  * Redistribution and use in source and binary forms, with or
  * without modification, are permitted provided that the
@@ -68,10 +68,12 @@ interface TariWalletService {
     PendingOutboundTx getPendingOutboundTxById(in TxId id);
 
     boolean send(
-        String destinationPublicKeyHexString,
-        in Amount amount,
-        in Amount fee,
+        in Contact contact,
+        in MicroTari amount,
+        in MicroTari fee,
         String message
     );
+
+    boolean testComplete(in PendingOutboundTx tx);
 
 }

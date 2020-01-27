@@ -1,5 +1,5 @@
 /**
- * Copyright 2019 The Tari Project
+ * Copyright 2020 The Tari Project
  *
  * Redistribution and use in source and binary forms, with or
  * without modification, are permitted provided that the
@@ -194,6 +194,18 @@ class WalletService : Service(), FFIWalletListenerAdapter {
      */
     inner class TariWalletServiceImpl : TariWalletService.Stub() {
 
+        private fun getContactFromPublicKeyHexString(
+            contacts: List<Contact>,
+            hexString: String
+        ): Contact {
+            contacts.iterator().forEach {
+                if (it.publicKeyHexString == hexString) {
+                    return it
+                }
+            }
+            throw RuntimeException("Contact not found.")
+        }
+
         override fun registerListener(listener: TariWalletServiceListener): Boolean {
             listeners.add(listener)
             listener.asBinder().linkToDeath({
@@ -214,12 +226,12 @@ class WalletService : Service(), FFIWalletListenerAdapter {
         override fun getPublicKeyHexString() = wallet.getPublicKey().toString()
 
         override fun getBalanceInfo() = BalanceInfo(
-            wallet.getAvailableBalance(),
-            wallet.getPendingIncomingBalance(),
-            wallet.getPendingOutgoingBalance()
+            MicroTari(wallet.getAvailableBalance()),
+            MicroTari(wallet.getPendingIncomingBalance()),
+            MicroTari(wallet.getPendingOutgoingBalance())
         )
 
-        override fun getContacts(): List<Contact>? {
+        override fun getContacts(): List<Contact> {
             val contactsFFI = wallet.getContacts()
             val contacts = mutableListOf<Contact>()
             for (i in 0 until contactsFFI.getLength()) {
@@ -237,25 +249,39 @@ class WalletService : Service(), FFIWalletListenerAdapter {
             return contacts
         }
 
-        override fun getCompletedTxs(): List<CompletedTx>? {
+        override fun getCompletedTxs(): List<CompletedTx> {
+            val contacts = contacts
             val completedTxsFFI = wallet.getCompletedTxs()
             val completedTxs = mutableListOf<CompletedTx>()
             for (i in 0 until completedTxsFFI.getLength()) {
                 val completedTxFFI = completedTxsFFI.getAt(i)
                 val sourcePublicKeyFFI = completedTxFFI.getSourcePublicKey()
                 val destinationPublicKeyFFI = completedTxFFI.getDestinationPublicKey()
-                val status = when(completedTxFFI.getStatus()) {
+                val status = when (completedTxFFI.getStatus()) {
                     FFICompletedTx.Status.TX_NULL_ERROR -> CompletedTx.Status.TX_NULL_ERROR
                     FFICompletedTx.Status.BROADCAST -> CompletedTx.Status.BROADCAST
                     FFICompletedTx.Status.COMPLETED -> CompletedTx.Status.COMPLETED
                     FFICompletedTx.Status.MINED -> CompletedTx.Status.MINED
                 }
+                val contact: Contact
+                val direction: Tx.Direction
+                if (publicKeyHexString == destinationPublicKeyFFI.toString()) {
+                    direction = Tx.Direction.INBOUND
+                    contact =
+                        getContactFromPublicKeyHexString(contacts, sourcePublicKeyFFI.toString())
+                } else {
+                    direction = Tx.Direction.OUTBOUND
+                    contact = getContactFromPublicKeyHexString(
+                        contacts,
+                        destinationPublicKeyFFI.toString()
+                    )
+                }
                 completedTxs.add(
                     CompletedTx(
                         completedTxFFI.getId(),
-                        sourcePublicKeyFFI.toString(),
-                        destinationPublicKeyFFI.toString(),
-                        completedTxFFI.getAmount(),
+                        direction,
+                        contact,
+                        MicroTari(completedTxFFI.getAmount()),
                         completedTxFFI.getFee(),
                         completedTxFFI.getTimestamp(),
                         completedTxFFI.getMessage(),
@@ -272,21 +298,34 @@ class WalletService : Service(), FFIWalletListenerAdapter {
             return completedTxs
         }
 
-        override fun getCompletedTxById(id: TxId): CompletedTx? {
+        override fun getCompletedTxById(id: TxId): CompletedTx {
             val completedTxFFI = wallet.getCompletedTxById(id.value.toLong())
             val sourcePublicKeyFFI = completedTxFFI.getSourcePublicKey()
             val destinationPublicKeyFFI = completedTxFFI.getDestinationPublicKey()
-            val status = when(completedTxFFI.getStatus()) {
+            val status = when (completedTxFFI.getStatus()) {
                 FFICompletedTx.Status.TX_NULL_ERROR -> CompletedTx.Status.TX_NULL_ERROR
                 FFICompletedTx.Status.BROADCAST -> CompletedTx.Status.BROADCAST
                 FFICompletedTx.Status.COMPLETED -> CompletedTx.Status.COMPLETED
                 FFICompletedTx.Status.MINED -> CompletedTx.Status.MINED
             }
+            val contact: Contact
+            val direction: Tx.Direction
+            if (publicKeyHexString == destinationPublicKeyFFI.toString()) {
+                direction = Tx.Direction.INBOUND
+                contact =
+                    getContactFromPublicKeyHexString(contacts, sourcePublicKeyFFI.toString())
+            } else {
+                direction = Tx.Direction.OUTBOUND
+                contact = getContactFromPublicKeyHexString(
+                    contacts,
+                    destinationPublicKeyFFI.toString()
+                )
+            }
             val completedTx = CompletedTx(
                 completedTxFFI.getId(),
-                sourcePublicKeyFFI.toString(),
-                destinationPublicKeyFFI.toString(),
-                completedTxFFI.getAmount(),
+                direction,
+                contact,
+                MicroTari(completedTxFFI.getAmount()),
                 completedTxFFI.getFee(),
                 completedTxFFI.getTimestamp(),
                 completedTxFFI.getMessage(),
@@ -298,7 +337,7 @@ class WalletService : Service(), FFIWalletListenerAdapter {
             return completedTx
         }
 
-        override fun getPendingInboundTxs(): List<PendingInboundTx>? {
+        override fun getPendingInboundTxs(): List<PendingInboundTx> {
             val pendingInboundTxsFFI = wallet.getPendingInboundTxs()
             val pendingInboundTxs = mutableListOf<PendingInboundTx>()
             for (i in 0 until pendingInboundTxsFFI.getLength()) {
@@ -307,8 +346,8 @@ class WalletService : Service(), FFIWalletListenerAdapter {
                 pendingInboundTxs.add(
                     PendingInboundTx(
                         pendingInboundTxFFI.getId(),
-                        sourcePublicKeyFFI.toString(),
-                        pendingInboundTxFFI.getAmount(),
+                        getContactFromPublicKeyHexString(contacts, sourcePublicKeyFFI.toString()),
+                        MicroTari(pendingInboundTxFFI.getAmount()),
                         pendingInboundTxFFI.getTimestamp(),
                         pendingInboundTxFFI.getMessage()
                     )
@@ -322,13 +361,13 @@ class WalletService : Service(), FFIWalletListenerAdapter {
             return pendingInboundTxs
         }
 
-        override fun getPendingInboundTxById(id: TxId): PendingInboundTx? {
+        override fun getPendingInboundTxById(id: TxId): PendingInboundTx {
             val pendingInboundTxFFI = wallet.getPendingInboundTxById(id.value.toLong())
             val sourcePublicKeyFFI = pendingInboundTxFFI.getSourcePublicKey()
             val pendingInboundTx = PendingInboundTx(
                 pendingInboundTxFFI.getId(),
-                sourcePublicKeyFFI.toString(),
-                pendingInboundTxFFI.getAmount(),
+                getContactFromPublicKeyHexString(contacts, sourcePublicKeyFFI.toString()),
+                MicroTari(pendingInboundTxFFI.getAmount()),
                 pendingInboundTxFFI.getTimestamp(),
                 pendingInboundTxFFI.getMessage()
             )
@@ -338,7 +377,7 @@ class WalletService : Service(), FFIWalletListenerAdapter {
             return pendingInboundTx
         }
 
-        override fun getPendingOutboundTxs(): List<PendingOutboundTx>? {
+        override fun getPendingOutboundTxs(): List<PendingOutboundTx> {
             val pendingOutboundTxsFFI = wallet.getPendingOutboundTxs()
             val pendingOutboundTxs = mutableListOf<PendingOutboundTx>()
             for (i in 0 until pendingOutboundTxsFFI.getLength()) {
@@ -347,8 +386,11 @@ class WalletService : Service(), FFIWalletListenerAdapter {
                 pendingOutboundTxs.add(
                     PendingOutboundTx(
                         pendingOutboundTxFFI.getId(),
-                        destinationPublicKeyFFI.toString(),
-                        pendingOutboundTxFFI.getAmount(),
+                        getContactFromPublicKeyHexString(
+                            contacts,
+                            destinationPublicKeyFFI.toString()
+                        ),
+                        MicroTari(pendingOutboundTxFFI.getAmount()),
                         pendingOutboundTxFFI.getTimestamp(),
                         pendingOutboundTxFFI.getMessage()
                     )
@@ -362,13 +404,13 @@ class WalletService : Service(), FFIWalletListenerAdapter {
             return pendingOutboundTxs
         }
 
-        override fun getPendingOutboundTxById(id: TxId): PendingOutboundTx? {
+        override fun getPendingOutboundTxById(id: TxId): PendingOutboundTx {
             val pendingOutboundTxFFI = wallet.getPendingOutboundTxById(id.value.toLong())
             val destinationPublicKeyFFI = pendingOutboundTxFFI.getDestinationPublicKey()
             val pendingOutboundTx = PendingOutboundTx(
                 pendingOutboundTxFFI.getId(),
-                destinationPublicKeyFFI.toString(),
-                pendingOutboundTxFFI.getAmount(),
+                getContactFromPublicKeyHexString(contacts, destinationPublicKeyFFI.toString()),
+                MicroTari(pendingOutboundTxFFI.getAmount()),
                 pendingOutboundTxFFI.getTimestamp(),
                 pendingOutboundTxFFI.getMessage()
             )
@@ -379,18 +421,24 @@ class WalletService : Service(), FFIWalletListenerAdapter {
         }
 
         override fun send(
-            destinationPublicKeyHexString: String,
-            amount: Amount,
-            fee: Amount,
+            contact: Contact,
+            amount: MicroTari,
+            fee: MicroTari,
             message: String
         ): Boolean {
-            val destinationPublicKey = FFIPublicKey(HexString(destinationPublicKeyHexString))
             return wallet.testSendTx(
-                destinationPublicKey,
+                FFIPublicKey(HexString(contact.publicKeyHexString)),
                 amount.value.toLong(),
                 fee.value.toLong(),
                 message
             )
+        }
+
+        override fun testComplete(tx: PendingOutboundTx): Boolean {
+            val txFFI = wallet.getPendingOutboundTxById(tx.id.toLong())
+            val success = wallet.testCompleteSentTx(txFFI)
+            txFFI.destroy()
+            return success
         }
 
     }

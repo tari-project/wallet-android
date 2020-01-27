@@ -1,5 +1,5 @@
 /**
- * Copyright 2019 The Tari Project
+ * Copyright 2020 The Tari Project
  *
  * Redistribution and use in source and binary forms, with or
  * without modification, are permitted provided that the
@@ -41,7 +41,7 @@ import java.math.BigInteger
  *
  * @author The Tari Development Team
  */
-class CompletedTx() : Parcelable {
+class CompletedTx() : Tx(), Parcelable {
 
     enum class Status {
         TX_NULL_ERROR,
@@ -50,28 +50,22 @@ class CompletedTx() : Parcelable {
         MINED
     }
 
-    var id = BigInteger("0")
-    var sourcePublicKeyHexString = ""
-    var destinationPublicKeyHexString = ""
-    var amount = BigInteger("0")
     var fee = BigInteger("0")
-    var timestamp = BigInteger("0")
-    var message = ""
     var status = Status.COMPLETED
 
     constructor(
         id: BigInteger,
-        sourcePublicKeyHexString: String,
-        destinationPublicKeyHexString: String,
-        amount: BigInteger,
+        direction: Direction,
+        contact: Contact,
+        amount: MicroTari,
         fee: BigInteger,
         timestamp: BigInteger,
         message: String,
         status: Status
     ) : this() {
         this.id = id
-        this.sourcePublicKeyHexString = sourcePublicKeyHexString
-        this.destinationPublicKeyHexString = destinationPublicKeyHexString
+        this.direction = direction
+        this.contact = contact
         this.amount = amount
         this.fee = fee
         this.timestamp = timestamp
@@ -99,9 +93,9 @@ class CompletedTx() : Parcelable {
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {
         parcel.writeSerializable(id)
-        parcel.writeString(sourcePublicKeyHexString)
-        parcel.writeString(destinationPublicKeyHexString)
-        parcel.writeSerializable(amount)
+        parcel.writeSerializable(direction)
+        parcel.writeParcelable(contact, flags)
+        parcel.writeParcelable(amount, flags)
         parcel.writeSerializable(fee)
         parcel.writeSerializable(timestamp)
         parcel.writeString(message)
@@ -110,9 +104,9 @@ class CompletedTx() : Parcelable {
 
     private fun readFromParcel(inParcel: Parcel) {
         id = inParcel.readSerializable() as BigInteger
-        sourcePublicKeyHexString = inParcel.readString() ?: ""
-        destinationPublicKeyHexString = inParcel.readString() ?: ""
-        amount = inParcel.readSerializable() as BigInteger
+        direction = inParcel.readSerializable() as Direction
+        contact = inParcel.readParcelable(Contact::class.java.classLoader)!!
+        amount = inParcel.readParcelable(MicroTari::class.java.classLoader)!!
         fee = inParcel.readSerializable() as BigInteger
         timestamp = inParcel.readSerializable() as BigInteger
         message = inParcel.readString() ?: ""

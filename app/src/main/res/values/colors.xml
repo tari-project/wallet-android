@@ -10,6 +10,7 @@
     <color name="black">#000000</color>
     <color name="white">#FFFFFF</color>
     <color name="transparent">#00000000</color>
+    <color name="purple">#8931FF</color>
 
     <!-- home -->
     <color name="home_bg_gradient_start">#8931FF</color>
