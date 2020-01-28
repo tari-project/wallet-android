@@ -108,7 +108,7 @@ internal abstract class FFIWallet(commsConfig: FFICommsConfig, logPath: String) 
 
     private external fun jniGetCompletedTxById(
         walletPtr: FFIWalletPtr,
-        id: Long,
+        id: String,
         libError: FFIError
     ): FFICompletedTxPtr
 
@@ -119,7 +119,7 @@ internal abstract class FFIWallet(commsConfig: FFICommsConfig, logPath: String) 
 
     private external fun jniGetPendingOutboundTxById(
         walletPtr: FFIWalletPtr,
-        id: Long,
+        id: String,
         libError: FFIError
     ): FFIPendingOutboundTxPtr
 
@@ -130,9 +130,24 @@ internal abstract class FFIWallet(commsConfig: FFICommsConfig, logPath: String) 
 
     private external fun jniGetPendingInboundTxById(
         walletPtr: FFIWalletPtr,
-        id: Long,
+        id: String,
         libError: FFIError
     ): FFIPendingInboundTxPtr
+
+    private external fun jniIsCompletedTxOutbound(
+        walletPtr: FFIWalletPtr,
+        completedTx: FFICompletedTxPtr,
+        libError: FFIError
+    ): Boolean
+
+    private external fun jniSendTx(
+        walletPtr: FFIWalletPtr,
+        publicKeyPtr: FFIPublicKeyPtr,
+        amount: String,
+        fee: String,
+        message: String,
+        libError: FFIError
+    ): Boolean
 
     private external fun jniDestroy(walletPtr: FFIWalletPtr)
 
@@ -230,6 +245,15 @@ internal abstract class FFIWallet(commsConfig: FFICommsConfig, logPath: String) 
         return result
     }
 
+    fun isCompletedTxOutbound(completedTx: FFICompletedTx): Boolean {
+        val error = FFIError()
+        val result = jniIsCompletedTxOutbound(ptr,completedTx.getPointer(), error)
+        if (error.code != 0) {
+            throw RuntimeException()
+        }
+        return result
+    }
+
     fun getCompletedTxs(): FFICompletedTxs {
         val error = FFIError()
         val result = FFICompletedTxs(jniGetCompletedTxs(ptr, error))
@@ -239,9 +263,9 @@ internal abstract class FFIWallet(commsConfig: FFICommsConfig, logPath: String) 
         return result
     }
 
-    fun getCompletedTxById(id: Long): FFICompletedTx {
+    fun getCompletedTxById(id: BigInteger): FFICompletedTx {
         val error = FFIError()
-        val result = FFICompletedTx(jniGetCompletedTxById(ptr, id, error))
+        val result = FFICompletedTx(jniGetCompletedTxById(ptr, id.toString(), error))
         if (error.code != 0) {
             throw RuntimeException()
         }
@@ -257,10 +281,10 @@ internal abstract class FFIWallet(commsConfig: FFICommsConfig, logPath: String) 
         return result
     }
 
-    fun getPendingOutboundTxById(id: Long): FFIPendingOutboundTx {
+    fun getPendingOutboundTxById(id: BigInteger): FFIPendingOutboundTx {
         val error = FFIError()
         val result =
-            FFIPendingOutboundTx(jniGetPendingOutboundTxById(ptr, id, error))
+            FFIPendingOutboundTx(jniGetPendingOutboundTxById(ptr, id.toString(), error))
         if (error.code != 0) {
             throw RuntimeException()
         }
@@ -276,9 +300,9 @@ internal abstract class FFIWallet(commsConfig: FFICommsConfig, logPath: String) 
         return result
     }
 
-    fun getPendingInboundTxById(id: Long): FFIPendingInboundTx {
+    fun getPendingInboundTxById(id: BigInteger): FFIPendingInboundTx {
         val error = FFIError()
-        val result = FFIPendingInboundTx(jniGetPendingInboundTxById(ptr, id, error))
+        val result = FFIPendingInboundTx(jniGetPendingInboundTxById(ptr, id.toString(), error))
         if (error.code != 0) {
             throw RuntimeException()
         }
@@ -324,6 +348,30 @@ internal abstract class FFIWallet(commsConfig: FFICommsConfig, logPath: String) 
         Logger.i("Tx discovery complete. Success: $success")
         val txId = BigInteger(1, bytes)
         listenerAdapter?.onDiscoveryComplete(txId, success)
+    }
+
+    fun sendTx(
+        destination: FFIPublicKey,
+        amount: BigInteger,
+        fee: BigInteger,
+        message: String
+    ): Boolean {
+        val minimumLibFee = 100L
+        if (fee < BigInteger.valueOf(minimumLibFee)) {
+            throw RuntimeException("Fee is less than the minimum of $minimumLibFee taris.")
+        }
+        if (amount < BigInteger.valueOf(0L)) {
+            throw RuntimeException("Amount is less than 0.")
+        }
+        if (destination == getPublicKey()) {
+            throw RuntimeException("Tx source and destination are the same.")
+        }
+        val error = FFIError()
+        val result = jniSendTx(ptr, destination.getPointer(), amount.toString(), fee.toString(), message, error)
+        if (error.code != 0) {
+            throw RuntimeException()
+        }
+        return result
     }
 
     override fun destroy() {

@@ -88,6 +88,23 @@ Java_com_tari_android_wallet_ffi_FFIPendingOutboundTx_jniGetAmount(
     return result;
 }
 
+
+extern "C"
+JNIEXPORT jbyteArray JNICALL
+Java_com_tari_android_wallet_ffi_FFIPendingOutboundTx_jniGetFee(
+        JNIEnv *jEnv,
+        jobject jThis,
+        jlong jpOutboundTx,
+        jobject error) {
+    int i = 0;
+    int *r = &i;
+    TariPendingOutboundTransaction *pOutboundTx = reinterpret_cast<TariPendingOutboundTransaction *>(jpOutboundTx);
+    jbyteArray result = getBytesFromUnsignedLongLong(jEnv, pending_outbound_transaction_get_fee(
+            pOutboundTx, r));
+    setErrorCode(jEnv, error, i);
+    return result;
+}
+
 extern "C"
 JNIEXPORT jstring JNICALL
 Java_com_tari_android_wallet_ffi_FFIPendingOutboundTx_jniGetMessage(

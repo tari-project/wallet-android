@@ -56,6 +56,11 @@ internal class FFIPendingOutboundTx(pointer: FFIPendingOutboundTxPtr): FFIBase()
         libError: FFIError
     ): ByteArray
 
+    private external fun jniGetFee(
+        ptr: FFIPendingOutboundTxPtr,
+        libError: FFIError
+    ): ByteArray
+
     private external fun jniGetTimestamp(
         ptr: FFIPendingOutboundTxPtr,
         libError: FFIError
@@ -101,6 +106,15 @@ internal class FFIPendingOutboundTx(pointer: FFIPendingOutboundTxPtr): FFIBase()
     fun getAmount(): BigInteger {
         val error = FFIError()
         val bytes = jniGetAmount(ptr, error)
+        if (error.code != 0) {
+            throw RuntimeException()
+        }
+        return BigInteger(1, bytes)
+    }
+
+    fun getFee(): BigInteger {
+        val error = FFIError()
+        val bytes = jniGetFee(ptr, error)
         if (error.code != 0) {
             throw RuntimeException()
         }
