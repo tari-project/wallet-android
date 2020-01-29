@@ -32,6 +32,8 @@
  */
 package com.tari.android.wallet.ffi
 
+import java.math.BigInteger
+
 /**
  * Test wallet implementation. Contains only the test functions to separate concerns with
  * the actual wallet implementation.
@@ -75,15 +77,6 @@ internal class FFITestWallet(commsConfig: FFICommsConfig, logPath: String) :
 
     private external fun jniTestReceiveTx(walletPtr: FFIWalletPtr, libError: FFIError): Boolean
 
-    private external fun jniTestSendTx(
-        walletPtr: FFIWalletPtr,
-        publicKeyPtr: FFIPublicKeyPtr,
-        amount: Long,
-        fee: Long,
-        message: String,
-        libError: FFIError
-    ): Boolean
-
     // endregion
 
 
@@ -92,30 +85,6 @@ internal class FFITestWallet(commsConfig: FFICommsConfig, logPath: String) :
     fun generateTestData(datastorePath: String): Boolean {
         val error = FFIError()
         val result = jniGenerateTestData(getPointer(), datastorePath, error)
-        if (error.code != 0) {
-            throw RuntimeException()
-        }
-        return result
-    }
-
-    fun testSendTx(
-        destination: FFIPublicKey,
-        amount: Long,
-        fee: Long,
-        message: String
-    ): Boolean {
-        val minimumLibFee = 100
-        if (fee < minimumLibFee) {
-            throw RuntimeException("Fee is less than the minimum of $minimumLibFee taris.")
-        }
-        if (amount < 0) {
-            throw RuntimeException("Amount is less than 0.")
-        }
-        if (destination == getPublicKey()) {
-            throw RuntimeException("Tx source and destination are the same.")
-        }
-        val error = FFIError()
-        val result = jniTestSendTx(ptr, destination.getPointer(), amount, fee, message, error)
         if (error.code != 0) {
             throw RuntimeException()
         }

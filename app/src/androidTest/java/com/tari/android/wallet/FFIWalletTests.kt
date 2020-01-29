@@ -39,6 +39,7 @@ package com.tari.android.wallet
 
 import com.orhanobut.logger.Logger
 import com.tari.android.wallet.ffi.*
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import java.math.BigInteger
@@ -137,8 +138,17 @@ class FFIWalletTests {
         assertTrue(completedTxFee > BigInteger("0"))
         val completedTxTimestamp = completedTx.getTimestamp()
         completedTxTimestamp.toString()
+        val completedTxIsOutbound = wallet.isCompletedTxOutbound(completedTx)
+        if (wallet.getPublicKey().toString() == completedTx.getSourcePublicKey().toString())
+        {
+            assertTrue(completedTxIsOutbound)
+        } else
+        {
+            assertFalse(completedTxIsOutbound)
+        }
+
         completedTx.destroy()
-        completedTx = wallet.getCompletedTxById(completedID.toLong())
+        completedTx = wallet.getCompletedTxById(completedID)
         assertTrue(completedTx.getPointer() != nullptr)
         assertTrue(wallet.testBroadcastTx(completedTx))
         assertTrue(wallet.testMineCompletedTx(completedTx))
@@ -160,7 +170,7 @@ class FFIWalletTests {
         val inboundTxTimestamp = inbound.getTimestamp()
         inboundTxTimestamp.toString()
         inbound.destroy()
-        inbound = wallet.getPendingInboundTxById(inboundTxID.toLong())
+        inbound = wallet.getPendingInboundTxById(inboundTxID)
         assertTrue(inbound.getPointer() != nullptr)
         assertTrue(wallet.testFinalizeReceivedTx(inbound))
         inbound.destroy()
@@ -177,10 +187,12 @@ class FFIWalletTests {
         assertTrue(outboundTxSource.getPointer() != nullptr)
         val outboundTxAmount = outboundTx.getAmount()
         assertTrue(outboundTxAmount > BigInteger("0"))
+        val outboundTxFee = outboundTx.getFee()
+        assertTrue(outboundTxFee > BigInteger("0"))
         val outboundTxTimestamp = outboundTx.getTimestamp()
         outboundTxTimestamp.toString()
         outboundTx.destroy()
-        outboundTx = wallet.getPendingOutboundTxById(outboundTxID.toLong())
+        outboundTx = wallet.getPendingOutboundTxById(outboundTxID)
         assertTrue(outboundTx.getPointer() != nullptr)
         assertTrue(wallet.testCompleteSentTx(outboundTx))
         outboundTx.destroy()
@@ -196,10 +208,10 @@ class FFIWalletTests {
 
         // test send tari
         assertTrue(
-            wallet.testSendTx(
+            wallet.sendTx(
                 contact.getPublicKey(),
-                1000000,
-                100,
+                BigInteger.valueOf(1000000L),
+                BigInteger.valueOf(100L),
                 "Android Wallet"
             )
         )

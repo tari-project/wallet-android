@@ -299,7 +299,7 @@ class WalletService : Service(), FFIWalletListenerAdapter {
         }
 
         override fun getCompletedTxById(id: TxId): CompletedTx {
-            val completedTxFFI = wallet.getCompletedTxById(id.value.toLong())
+            val completedTxFFI = wallet.getCompletedTxById(id.value)
             val sourcePublicKeyFFI = completedTxFFI.getSourcePublicKey()
             val destinationPublicKeyFFI = completedTxFFI.getDestinationPublicKey()
             val status = when (completedTxFFI.getStatus()) {
@@ -362,7 +362,7 @@ class WalletService : Service(), FFIWalletListenerAdapter {
         }
 
         override fun getPendingInboundTxById(id: TxId): PendingInboundTx {
-            val pendingInboundTxFFI = wallet.getPendingInboundTxById(id.value.toLong())
+            val pendingInboundTxFFI = wallet.getPendingInboundTxById(id.value)
             val sourcePublicKeyFFI = pendingInboundTxFFI.getSourcePublicKey()
             val pendingInboundTx = PendingInboundTx(
                 pendingInboundTxFFI.getId(),
@@ -405,7 +405,7 @@ class WalletService : Service(), FFIWalletListenerAdapter {
         }
 
         override fun getPendingOutboundTxById(id: TxId): PendingOutboundTx {
-            val pendingOutboundTxFFI = wallet.getPendingOutboundTxById(id.value.toLong())
+            val pendingOutboundTxFFI = wallet.getPendingOutboundTxById(id.value)
             val destinationPublicKeyFFI = pendingOutboundTxFFI.getDestinationPublicKey()
             val pendingOutboundTx = PendingOutboundTx(
                 pendingOutboundTxFFI.getId(),
@@ -426,16 +426,16 @@ class WalletService : Service(), FFIWalletListenerAdapter {
             fee: MicroTari,
             message: String
         ): Boolean {
-            return wallet.testSendTx(
+            return wallet.sendTx(
                 FFIPublicKey(HexString(contact.publicKeyHexString)),
-                amount.value.toLong(),
-                fee.value.toLong(),
+                amount.value,
+                fee.value,
                 message
             )
         }
 
         override fun testComplete(tx: PendingOutboundTx): Boolean {
-            val txFFI = wallet.getPendingOutboundTxById(tx.id.toLong())
+            val txFFI = wallet.getPendingOutboundTxById(tx.id)
             val success = wallet.testCompleteSentTx(txFFI)
             txFFI.destroy()
             return success
