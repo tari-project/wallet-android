@@ -108,7 +108,7 @@ class FFIWalletTests {
         assertTrue(contact.getPointer() != nullptr)
         val removed = wallet.removeContact(contact)
         assertTrue(removed)
-        val added = wallet.addContact(contact)
+        val added = wallet.addUpdateContact(contact)
         assertTrue(added)
 
         // test completed transactions

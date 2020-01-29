@@ -368,7 +368,7 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniGetContacts(
 
 extern "C"
 JNIEXPORT jboolean JNICALL
-Java_com_tari_android_wallet_ffi_FFIWallet_jniAddContact(
+Java_com_tari_android_wallet_ffi_FFIWallet_jniAddUpdateContact(
         JNIEnv *jEnv,
         jobject jThis,
         jlong jpWallet,
@@ -378,7 +378,7 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniAddContact(
     int *r = &i;
     TariWallet *pWallet = reinterpret_cast<TariWallet *>(jpWallet);
     TariContact *pContact = reinterpret_cast<TariContact *>(jpContact);
-    jboolean result = wallet_add_contact(pWallet, pContact, r) !=
+    jboolean result = wallet_upsert_contact(pWallet, pContact, r) !=
                       0; //this is indirectly a cast from unsigned char to jboolean
     setErrorCode(jEnv, error, i);
     return result;
