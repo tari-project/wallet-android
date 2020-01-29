@@ -89,7 +89,7 @@ internal abstract class FFIWallet(commsConfig: FFICommsConfig, logPath: String) 
 
     private external fun jniGetContacts(walletPtr: FFIWalletPtr, libError: FFIError): FFIContactsPtr
 
-    private external fun jniAddContact(
+    private external fun jniAddUpdateContact(
         walletPtr: FFIWalletPtr,
         contactPtr: FFIContactPtr,
         libError: FFIError
@@ -212,9 +212,9 @@ internal abstract class FFIWallet(commsConfig: FFICommsConfig, logPath: String) 
         return result
     }
 
-    fun addContact(contact: FFIContact): Boolean {
+    fun addUpdateContact(contact: FFIContact): Boolean {
         val error = FFIError()
-        val result = jniAddContact(ptr, contact.getPointer(), error)
+        val result = jniAddUpdateContact(ptr, contact.getPointer(), error)
         if (error.code != 0) {
             throw RuntimeException()
         }
