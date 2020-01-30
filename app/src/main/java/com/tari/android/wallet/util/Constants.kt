@@ -54,6 +54,17 @@ internal object Constants {
             const val digitAnimDurationMs = 700L
             const val digitShrinkExpandAnimDurationMs = 200L
         }
+
+        object CreateWallet {
+            const val tariTextAnimViewDurationMs = 2000L
+            const val startUpAnimDuration = 1000L
+            const val cryptoTitleTextAnimDelayDurationMs = 30L
+            const val tariTextAnimViewScaleDurationMs = 1000L
+        }
+
+        object Splash {
+            const val createWalletStartUpDelayMs = 3000L
+        }
     }
 
     /**
@@ -61,7 +72,8 @@ internal object Constants {
      */
     object Wallet {
         const val WALLET_DB_NAME: String = "tari_wallet_db"
-        internal val WALLET_CONTROL_SERVICE_ADDRESS: NetAddressString = NetAddressString("127.0.0.1", 80)
+        internal val WALLET_CONTROL_SERVICE_ADDRESS: NetAddressString =
+            NetAddressString("127.0.0.1", 80)
         internal val WALLET_LISTENER_ADDRESS: NetAddressString = NetAddressString("0.0.0.0", 0)
     }
 

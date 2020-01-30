@@ -53,4 +53,10 @@
     <string name="failed_init_camera_message">Failed to initialize Camera</string>
     <string name="camera_permission_denied_message">Camera permission denied</string>
 
+    <!-- create wallet -->
+    <string name="crypto_wallet_title_text_line_1">A crypto wallet</string>
+    <string name="crypto_wallet_title_text_line_2">that’s easy to use.</string>
+    <string name="crypto_wallet_desc">Tari wallet puts you and your privacy at the core of everything and is still easy to use.</string>
+    <string name="create_wallet">Create a Wallet</string>
+
 </resources>
