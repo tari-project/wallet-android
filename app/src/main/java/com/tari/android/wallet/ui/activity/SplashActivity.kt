@@ -34,8 +34,10 @@ package com.tari.android.wallet.ui.activity
 
 import android.content.Intent
 import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
+import android.os.Handler
 import com.tari.android.wallet.R
+import com.tari.android.wallet.util.Constants
+import com.tari.android.wallet.util.Constants.UI.Splash
 
 /**
  * Splash screen activity.
@@ -46,15 +48,25 @@ class SplashActivity : BaseActivity() {
 
     override val contentViewId = R.layout.activity_splash
 
-    override fun onStart() {
-        super.onStart()
-        // splash is finished, move on to the main activity
-        val intent = Intent(this@SplashActivity, AuthActivity::class.java)
+    private val uiHandler = Handler()
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        uiHandler.postDelayed({
+            startCreateWalletActivity()
+        }, Splash.createWalletStartUpDelayMs)
+    }
+
+    private fun startCreateWalletActivity() {
+        val intent = Intent(this@SplashActivity, CreateWalletActivity::class.java)
         intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
         startActivity(intent)
-        // finish this activity
         finish()
     }
 
-
+    override fun onDestroy() {
+        super.onDestroy()
+        uiHandler.removeCallbacksAndMessages(null)
+    }
 }

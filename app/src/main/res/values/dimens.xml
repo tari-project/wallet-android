@@ -18,4 +18,6 @@
     <dimen name="home_send_tari_button_visible_bottom_margin">40dp</dimen>
     <dimen name="home_send_tari_button_hidden_bottom_margin">-100dp</dimen>
     <dimen name="home_send_tari_button_initial_bottom_margin">-150dp</dimen>
+    <dimen name="splash_screen_title_bottom_margin">34dp</dimen>
+
 </resources>

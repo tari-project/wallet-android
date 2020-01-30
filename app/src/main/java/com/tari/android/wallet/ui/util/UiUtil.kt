@@ -33,16 +33,19 @@
 package com.tari.android.wallet.ui.util
 
 import android.app.Activity
+import android.content.ContentResolver
 import android.content.Context
 import android.graphics.BlendMode
 import android.graphics.BlendModeColorFilter
 import android.graphics.PorterDuff
+import android.net.Uri
 import android.os.Build
 import android.os.Handler
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import android.widget.ProgressBar
+import androidx.annotation.AnyRes
 import androidx.annotation.NonNull
 import java.lang.ref.WeakReference
 
@@ -170,4 +173,13 @@ internal object UiUtil {
 
     }
 
+    /**
+     * @param resourceId identifies an application resource
+     * @return the Uri by which the application resource is accessed
+     */
+     fun Context.getResourceUri(resourceId: Int): Uri = Uri.Builder()
+        .scheme(ContentResolver.SCHEME_ANDROID_RESOURCE)
+        .authority(packageName)
+        .path(resourceId.toString())
+        .build()
 }

@@ -27,5 +27,6 @@
     <color name="home_send_tari_btn_gradient_center">#8E31FF</color>
     <color name="home_send_tari_btn_gradient_end">#AE2BE8</color>
     <color name="home_black_overlay">#FF000000</color>
+    <color name="wallet_splash_desc_text">#80FFFFFF</color>
 
 </resources>
