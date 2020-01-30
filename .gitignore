@@ -72,3 +72,5 @@ fastlane/readme.md
 # cmake
 CMakeFiles/
 CMakeCache.txt
+
+jniLibs/
