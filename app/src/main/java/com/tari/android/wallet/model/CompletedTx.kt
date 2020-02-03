@@ -4,18 +4,18 @@
  * Redistribution and use in source and binary forms, with or
  * without modification, are permitted provided that the
  * following conditions are met:
-
+ *
  * 1. Redistributions of source code must retain the above copyright notice,
  * this list of conditions and the following disclaimer.
-
+ *
  * 2. Redistributions in binary form must reproduce the above
  * copyright notice, this list of conditions and the following disclaimer in the
  * documentation and/or other materials provided with the distribution.
-
+ *
  * 3. Neither the name of the copyright holder nor the names of
  * its contributors may be used to endorse or promote products
  * derived from this software without specific prior written permission.
-
+ * 
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND
  * CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES,
  * INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
@@ -56,7 +56,7 @@ class CompletedTx() : Tx(), Parcelable {
     constructor(
         id: BigInteger,
         direction: Direction,
-        contact: Contact,
+        user: User,
         amount: MicroTari,
         fee: BigInteger,
         timestamp: BigInteger,
@@ -65,7 +65,7 @@ class CompletedTx() : Tx(), Parcelable {
     ) : this() {
         this.id = id
         this.direction = direction
-        this.contact = contact
+        this.user = user
         this.amount = amount
         this.fee = fee
         this.timestamp = timestamp
@@ -94,7 +94,8 @@ class CompletedTx() : Tx(), Parcelable {
     override fun writeToParcel(parcel: Parcel, flags: Int) {
         parcel.writeSerializable(id)
         parcel.writeSerializable(direction)
-        parcel.writeParcelable(contact, flags)
+        parcel.writeSerializable(user.javaClass)
+        parcel.writeParcelable(user, flags)
         parcel.writeParcelable(amount, flags)
         parcel.writeSerializable(fee)
         parcel.writeSerializable(timestamp)
@@ -105,7 +106,12 @@ class CompletedTx() : Tx(), Parcelable {
     private fun readFromParcel(inParcel: Parcel) {
         id = inParcel.readSerializable() as BigInteger
         direction = inParcel.readSerializable() as Direction
-        contact = inParcel.readParcelable(Contact::class.java.classLoader)!!
+        val userIsContact = inParcel.readSerializable() == Contact::class.java
+        user = if (userIsContact) {
+            inParcel.readParcelable(Contact::class.java.classLoader)!!
+        } else {
+            inParcel.readParcelable(User::class.java.classLoader)!!
+        }
         amount = inParcel.readParcelable(MicroTari::class.java.classLoader)!!
         fee = inParcel.readSerializable() as BigInteger
         timestamp = inParcel.readSerializable() as BigInteger

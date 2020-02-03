@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white">
+
+    <!-- Transactions header -->
+    <RelativeLayout
+        android:id="@+id/add_recipient_vw_tx_list_header"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/common_header_height"
+        android:layout_marginTop="0dp"
+        android:background="@color/white">
+
+        <!-- back -->
+        <ImageButton
+            android:id="@+id/add_recipient_btn_back"
+            android:layout_width="50dp"
+            android:layout_height="match_parent"
+            android:background="@color/white"
+            android:contentDescription="@null"
+            android:src="@drawable/back_icon" />
+
+        <com.tari.android.wallet.ui.component.CustomFontTextView
+            android:id="@+id/add_recipient_txt_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:text="@string/add_recipient_title"
+            android:textColor="@color/black"
+            android:textSize="16sp"
+            app:customFont="AVENIR_LT_STD_HEAVY" />
+
+        <View
+            android:id="@+id/add_recipinet_vw_top_dimmer"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:alpha="0.6"
+            android:background="@color/black"
+            android:clickable="true"
+            android:focusable="true" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/add_recipient_vw_search_container"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/add_recipient_search_bar_container_height"
+        android:layout_below="@id/add_recipient_vw_tx_list_header"
+        android:background="@color/white"
+        android:gravity="center"
+        android:orientation="horizontal">
+
+        <!-- shadow -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_margin="3dp"
+            android:alpha="0.4"
+            android:background="@drawable/add_recipient_txt_shadow" />
+
+        <View
+            android:id="@+id/add_recipinet_vw_middle_dimmer"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:alpha="0.6"
+            android:background="@color/black"
+            android:clickable="true"
+            android:focusable="true" />
+
+        <!-- search container -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:layout_marginStart="25dp"
+            android:layout_marginEnd="25dp"
+            android:background="@drawable/add_recipient_search_bg"
+            android:orientation="horizontal">
+
+            <!-- search text -->
+            <com.tari.android.wallet.ui.component.CustomFontEditText
+                android:id="@+id/add_recipient_txt_search"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/add_recipient_search_text_view_height"
+                android:layout_weight="1"
+                android:background="@color/transparent"
+                android:hint="@string/add_recipient_hint"
+                android:imeOptions="actionDone"
+                android:inputType="textNoSuggestions"
+                android:letterSpacing="0.02"
+                android:paddingStart="20dp"
+                android:paddingTop="15dp"
+                android:paddingEnd="20dp"
+                android:paddingBottom="15dp"
+                android:singleLine="true"
+                android:textColor="@color/black"
+                android:textColorHint="@color/add_recipient_hint"
+                android:textSize="14sp"
+                app:customFont="AVENIR_LT_STD_ROMAN" />
+
+            <!-- QR code button -->
+            <ImageButton
+                android:id="@+id/add_recipient_btn_qr_code"
+                android:layout_width="@dimen/add_recipient_search_text_view_height"
+                android:layout_height="@dimen/add_recipient_search_text_view_height"
+                android:background="@color/transparent"
+                android:contentDescription="@null"
+                android:src="@drawable/home_qr" />
+        </LinearLayout>
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/add_recipient_vw_search_container">
+
+        <!-- list -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/send_tari_add_recipient_rv_contact_list"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/white"
+            android:overScrollMode="never"
+            android:scrollbars="none" />
+
+        <!-- depth gradient -->
+        <View
+            android:id="@+id/add_recipient_rv_scroll_depth_gradient"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/common_scroll_height_gradient_height"
+            android:alpha="0.5"
+            android:background="@drawable/scroll_height_gradient" />
+
+        <ProgressBar
+            android:id="@+id/add_recipient_prog_bar"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="40dp"
+            android:indeterminate="true"
+            android:visibility="visible" />
+
+        <View
+            android:id="@+id/add_recipinet_vw_bottom_dimmer"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:alpha="0.6"
+            android:background="@color/black"
+            android:clickable="true"
+            android:focusable="true" />
+
+        <!-- emoji id banner container -->
+        <LinearLayout
+            android:id="@+id/add_recipient_vw_paste_emoji_id_banner"
+            android:layout_width="match_parent"
+            android:layout_height="78dp"
+            android:layout_alignParentBottom="true"
+            android:background="@color/white"
+            android:clickable="true"
+            android:focusable="true"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <!-- paste emoji info -->
+            <com.tari.android.wallet.ui.component.CustomFontTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/add_recipient_paste_emoji_id"
+                android:textColor="#9330ff"
+                android:textSize="12sp"
+                app:customFont="AVENIR_LT_STD_MEDIUM" />
+            <!-- emoji id -->
+            <TextView
+                android:id="@+id/add_recipient_txt_clipboard_emoji_id"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="25dp"
+                android:layout_marginTop="7dp"
+                android:layout_marginEnd="25dp"
+                android:ellipsize="middle"
+                android:letterSpacing="0.3"
+                android:singleLine="true"
+                android:textAlignment="center"
+                android:textColor="@color/black"
+                android:textSize="14sp"
+                android:typeface="monospace" />
+        </LinearLayout>
+    </RelativeLayout>
+
+    <com.tari.android.wallet.ui.component.CustomFontTextView
+        android:id="@+id/add_recipient_txt_invalid_emoji_id"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/add_recipient_search_text_view_height"
+        android:layout_below="@id/add_recipient_vw_search_container"
+        android:layout_marginStart="25dp"
+        android:layout_marginEnd="25dp"
+        android:background="@drawable/add_recipient_invalid_emoji_id_txt_bg"
+        android:gravity="center"
+        android:text="@string/add_recipient_invalid_emoji_id"
+        android:textColor="@color/common_error"
+        android:textSize="14sp"
+        app:customFont="AVENIR_LT_STD_HEAVY" />
+
+    <com.tari.android.wallet.ui.component.CustomFontButton
+        android:id="@+id/add_recipient_btn_continue"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/common_action_button_height"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginStart="25dp"
+        android:layout_marginEnd="25dp"
+        android:layout_marginBottom="40dp"
+        android:background="@drawable/gradient_button_bg"
+        android:ellipsize="middle"
+        android:singleLine="true"
+        android:text="@string/common_continue"
+        android:textAllCaps="false"
+        android:textColor="@color/white"
+        android:textSize="16sp"
+        app:customFont="AVENIR_LT_STD_HEAVY" />
+
+</RelativeLayout>

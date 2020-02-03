@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:alpha="1"
+    android:gravity="center_vertical"
+    android:orientation="horizontal">
+
+    <!-- emoji 1 -->
+    <TextView
+        android:id="@+id/emoji_id_summary_txt_emoji_1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:alpha="1"
+        android:text="@string/dummy_emoji"
+        android:textColor="@color/black"
+        android:textSize="13sp" />
+    <!-- emoji 2 -->
+    <TextView
+        android:id="@+id/emoji_id_summary_txt_emoji_2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="2dp"
+        android:alpha="0.6"
+        android:text="@string/dummy_emoji"
+        android:textColor="@color/black"
+        android:textSize="13sp" />
+    <!-- emoji 3 -->
+    <TextView
+        android:id="@+id/emoji_id_summary_txt_emoji_3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="2dp"
+        android:alpha="0.3"
+        android:text="@string/dummy_emoji"
+        android:textColor="@color/black"
+        android:textSize="13sp" />
+    <!-- separator -->
+    <TextView
+        android:id="@+id/emoji_id_summary_txt_emoji_separator"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="2dp"
+        android:text="@string/emoji_id_bullet_separator"
+        android:textColor="#E3E3E3"
+        android:textSize="13sp"
+        android:typeface="monospace" />
+    <!-- emoji 4 -->
+    <TextView
+        android:id="@+id/emoji_id_summary_txt_emoji_4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="2dp"
+        android:alpha="0.3"
+        android:text="@string/dummy_emoji"
+        android:textColor="@color/black"
+        android:textSize="13sp" />
+    <!-- emoji 5 -->
+    <TextView
+        android:id="@+id/emoji_id_summary_txt_emoji_5"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="2dp"
+        android:alpha="0.6"
+        android:text="@string/dummy_emoji"
+        android:textColor="@color/black"
+        android:textSize="13sp" />
+    <!-- emoji 6 -->
+    <TextView
+        android:id="@+id/emoji_id_summary_txt_emoji_6"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="2dp"
+        android:alpha="1"
+        android:text="@string/dummy_emoji"
+        android:textColor="@color/black"
+        android:textSize="13sp" />
+</LinearLayout>

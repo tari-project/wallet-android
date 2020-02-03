@@ -6,6 +6,9 @@
     <declare-styleable name="CustomFontTextView">
         <attr name="customFont" />
     </declare-styleable>
+    <declare-styleable name="CustomFontEditText">
+        <attr name="customFont" />
+    </declare-styleable>
     <declare-styleable name="CustomFontButton">
         <attr name="customFont" />
     </declare-styleable>

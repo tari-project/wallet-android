@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/transparent"
+    android:orientation="vertical"
+    android:paddingStart="25dp"
+    android:paddingEnd="25dp">
+
+    <!-- separator -->
+    <View
+        android:id="@+id/add_recipient_list_header_vw_separator"
+        android:layout_width="match_parent"
+        android:layout_height="35dp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="4dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <!-- title -->
+        <com.tari.android.wallet.ui.component.CustomFontTextView
+            android:id="@+id/add_recipient_list_header_txt_title"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:ellipsize="end"
+            android:singleLine="true"
+            android:text="@string/add_recipient_recent_tx_contacts"
+            android:textColor="@color/add_recipient_contact_list_section_header_title"
+            android:textSize="12sp"
+            app:customFont="AVENIR_LT_STD_MEDIUM" />
+    </LinearLayout>
+
+
+</LinearLayout>

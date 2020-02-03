@@ -16,17 +16,17 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:orientation="horizontal"
-        android:gravity="center_vertical"
+        android:layout_height="wrap_content"
         android:layout_marginBottom="4dp"
-        android:layout_height="wrap_content">
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
 
         <!-- title -->
         <com.tari.android.wallet.ui.component.CustomFontTextView
             android:id="@+id/home_tx_list_header_txt_title"
             android:layout_width="0dp"
-            android:layout_weight="1"
             android:layout_height="wrap_content"
+            android:layout_weight="1"
             android:ellipsize="end"
             android:singleLine="true"
             android:text="@string/home_today"
@@ -34,15 +34,26 @@
             android:textSize="12sp"
             app:customFont="AVENIR_LT_STD_MEDIUM" />
 
-        <ProgressBar
+        <!--ProgressBar
             android:id="@+id/home_tx_list_pending_prog_bar"
             style="?android:attr/progressBarStyleHorizontal"
             android:layout_width="30dp"
-            android:progressBackgroundTint="#777777"
-            android:indeterminateTint="@color/purple"
             android:layout_height="wrap_content"
             android:indeterminateOnly="true"
-            android:visibility="visible" />
+            android:indeterminateTint="@color/purple"
+            android:progressBackgroundTint="#777777"
+            android:visibility="visible" /-->
+
+        <!-- Lottie animation for Tari Wallet text -->
+        <com.airbnb.lottie.LottieAnimationView
+            android:id="@+id/home_tx_list_anim_pending"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@color/white"
+            app:lottie_autoPlay="true"
+            app:lottie_enableMergePathsForKitKatAndAbove="true"
+            app:lottie_loop="true"
+            app:lottie_rawRes="@raw/tx_list_pending_txs_anim" />
     </LinearLayout>
 
 
