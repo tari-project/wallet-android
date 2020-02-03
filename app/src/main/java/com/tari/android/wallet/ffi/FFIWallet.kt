@@ -149,6 +149,19 @@ internal abstract class FFIWallet(commsConfig: FFICommsConfig, logPath: String) 
         libError: FFIError
     ): Boolean
 
+    private external fun jniSignMessage(
+        walletPtr: FFIWalletPtr,
+        message: String,
+        libError: FFIError
+    ): String
+
+    private external fun jniVerifyMessageSignature(
+        publicKeyPtr: FFIPublicKeyPtr,
+        message: String,
+        signature: String,
+        libError: FFIError
+    ): Boolean
+
     private external fun jniDestroy(walletPtr: FFIWalletPtr)
 
     // endregion
@@ -375,6 +388,24 @@ internal abstract class FFIWallet(commsConfig: FFICommsConfig, logPath: String) 
         return result
     }
 
+    fun signMessage(message: String): String {
+        val error = FFIError()
+        val result = jniSignMessage(ptr,message,error);
+        if (error.code != 0) {
+            throw RuntimeException()
+        }
+        return result
+    }
+
+    fun verifyMessageSignature(contactPublicKey: FFIPublicKey, message: String, signature: String): Boolean
+    {
+        val error = FFIError()
+        val result = jniVerifyMessageSignature(contactPublicKey.getPointer(),message,signature,error)
+        if (error.code != 0) {
+            throw RuntimeException()
+        }
+        return result
+    }
     override fun destroy() {
         jniDestroy(ptr)
         ptr = nullptr

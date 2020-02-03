@@ -96,8 +96,15 @@ class FFIWalletTests {
         val pk = wallet.getPublicKey()
         assertTrue(pk.getPointer() != nullptr)
 
+        //test sign and verify message
+        val message = "Hello"
+        val signature = wallet.signMessage(message)
+        val verified = wallet.verifyMessageSignature(pk,message,signature)
+        assertTrue(verified)
+
         // test data generation
         assertTrue(wallet.generateTestData(FFITestUtil.WALLET_DATASTORE_PATH))
+
 
         // test contacts
         val contacts = wallet.getContacts()
