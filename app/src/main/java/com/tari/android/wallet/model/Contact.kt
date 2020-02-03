@@ -4,18 +4,18 @@
  * Redistribution and use in source and binary forms, with or
  * without modification, are permitted provided that the
  * following conditions are met:
-
+ *
  * 1. Redistributions of source code must retain the above copyright notice,
  * this list of conditions and the following disclaimer.
-
+ *
  * 2. Redistributions in binary form must reproduce the above
  * copyright notice, this list of conditions and the following disclaimer in the
  * documentation and/or other materials provided with the distribution.
-
+ *
  * 3. Neither the name of the copyright holder nor the names of
  * its contributors may be used to endorse or promote products
  * derived from this software without specific prior written permission.
-
+ * 
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND
  * CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES,
  * INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
@@ -36,13 +36,12 @@ import android.os.Parcel
 import android.os.Parcelable
 
 /**
- * Contact model class.
+ * Contact is a user with an alias.
  *
  * @author The Tari Development Team
  */
-class Contact() : Parcelable {
+class Contact() : User(), Parcelable {
 
-    var publicKeyHexString = ""
     var alias: String = ""
 
     constructor(
@@ -52,6 +51,10 @@ class Contact() : Parcelable {
         this.publicKeyHexString = publicKeyHexString
         this.alias = alias
     }
+
+    override fun equals(other: Any?): Boolean = super.equals(other)
+
+    override fun hashCode(): Int = publicKeyHexString.hashCode() * alias.hashCode()
 
     // region Parcelable
 

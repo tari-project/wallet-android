@@ -4,18 +4,18 @@
  * Redistribution and use in source and binary forms, with or
  * without modification, are permitted provided that the
  * following conditions are met:
-
+ *
  * 1. Redistributions of source code must retain the above copyright notice,
  * this list of conditions and the following disclaimer.
-
+ *
  * 2. Redistributions in binary form must reproduce the above
  * copyright notice, this list of conditions and the following disclaimer in the
  * documentation and/or other materials provided with the distribution.
-
+ *
  * 3. Neither the name of the copyright holder nor the names of
  * its contributors may be used to endorse or promote products
  * derived from this software without specific prior written permission.
-
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND
  * CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES,
  * INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
@@ -35,20 +35,16 @@ package com.tari.android.wallet.ui.util
 import android.app.Activity
 import android.content.ContentResolver
 import android.content.Context
-import android.graphics.BlendMode
-import android.graphics.BlendModeColorFilter
-import android.graphics.PorterDuff
 import android.net.Uri
-import android.os.Build
 import android.os.Handler
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import android.widget.ProgressBar
-import androidx.annotation.AnyRes
 import androidx.annotation.NonNull
+import androidx.core.graphics.BlendModeColorFilterCompat
+import androidx.core.graphics.BlendModeCompat
 import java.lang.ref.WeakReference
-
 
 /**
  * Contains UI utility functions.
@@ -123,8 +119,10 @@ internal object UiUtil {
         color: Int
     ) {
         progressBar.indeterminateDrawable
-            .mutate()
-            .setColorFilter(color, PorterDuff.Mode.SRC_IN)
+            .mutate().colorFilter = BlendModeColorFilterCompat.createBlendModeColorFilterCompat(
+            color,
+            BlendModeCompat.SRC_IN
+        )
     }
 
     @Suppress("unused")
@@ -177,7 +175,7 @@ internal object UiUtil {
      * @param resourceId identifies an application resource
      * @return the Uri by which the application resource is accessed
      */
-     fun Context.getResourceUri(resourceId: Int): Uri = Uri.Builder()
+    fun Context.getResourceUri(resourceId: Int): Uri = Uri.Builder()
         .scheme(ContentResolver.SCHEME_ANDROID_RESOURCE)
         .authority(packageName)
         .path(resourceId.toString())

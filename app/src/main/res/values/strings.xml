@@ -18,11 +18,20 @@
     <string name="digit_thousands_separator">,</string>
     <string name="digit_decimal_separator">.</string>
 
+    <!-- common -->
+    <string name="common_continue">Continue</string>
+
     <!-- dummy values - UI design placeholders -->
     <string name="dummy_positive_tx_value">+ 152.75</string>
     <string name="dummy_negative_tx_value">- 63.25</string>
     <string name="dummy_contact_alias">Sarah_D</string>
+    <string name="dummy_contact_initial">S</string>
     <string name="dummy_message">Thanks again for helping with my move</string>
+    <string name="dummy_emoji">🍀</string>
+
+    <!-- emoji-id-related -->
+    <string name="emoji_id_bullet_separator">•••</string>
+    <string name="emoji_id_chunk_separator_char">|</string>
 
     <!-- service -->
     <string name="service_title">Tari wallet service is running.</string>
@@ -58,5 +67,16 @@
     <string name="crypto_wallet_title_text_line_2">that’s easy to use.</string>
     <string name="crypto_wallet_desc">Tari wallet puts you and your privacy at the core of everything and is still easy to use.</string>
     <string name="create_wallet">Create a Wallet</string>
+
+    <!-- send tari - add recipient -->
+    <string name="add_recipient_title">Send To</string>
+    <string name="add_recipient_hint">Enter Emoji ID or Contact Name</string>
+    <string name="add_recipient_recent_tx_contacts">Recent</string>
+    <string name="add_recipient_my_contacts">My Contacts</string>
+    <string name="add_recipient_paste_emoji_id">Paste copied Emoji ID</string>
+    <string name="add_recipient_invalid_emoji_id">Invalid Emoji ID</string>
+
+    <!-- send tari - amount -->
+    <string name="amount_under_construction">Under Construction</string>
 
 </resources>

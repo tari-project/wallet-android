@@ -4,18 +4,18 @@
  * Redistribution and use in source and binary forms, with or
  * without modification, are permitted provided that the
  * following conditions are met:
-
+ *
  * 1. Redistributions of source code must retain the above copyright notice,
  * this list of conditions and the following disclaimer.
-
+ *
  * 2. Redistributions in binary form must reproduce the above
  * copyright notice, this list of conditions and the following disclaimer in the
  * documentation and/or other materials provided with the distribution.
-
+ *
  * 3. Neither the name of the copyright holder nor the names of
  * its contributors may be used to endorse or promote products
  * derived from this software without specific prior written permission.
-
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND
  * CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES,
  * INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
@@ -40,6 +40,8 @@ import com.orhanobut.logger.Logger
 import com.tari.android.wallet.R
 import com.tari.android.wallet.application.TariWalletApplication
 import com.tari.android.wallet.di.WalletModule
+import com.tari.android.wallet.event.Event
+import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.ffi.*
 import com.tari.android.wallet.model.*
 import com.tari.android.wallet.ui.activity.home.HomeActivity
@@ -73,6 +75,8 @@ class WalletService : Service(), FFIWalletListenerAdapter {
      * Registered listeners.
      */
     private var listeners = mutableListOf<TariWalletServiceListener>()
+
+    private var oneSecondMs = 1000L
 
     override fun onCreate() {
         Logger.d("Tari wallet service created.")
@@ -149,41 +153,64 @@ class WalletService : Service(), FFIWalletListenerAdapter {
 
     override fun onTxBroadcast(completedTxId: BigInteger) {
         Logger.d("Tx $completedTxId broadcast.")
+        val txId = TxId(completedTxId)
+        // post event to bus
+        EventBus.post(Event.Wallet.TxBroadcast(txId))
+        // notify listeners
         listeners.iterator().forEach {
-            it.onTxBroadcast(TxId(completedTxId))
+            it.onTxBroadcast(txId)
         }
     }
 
     override fun onTxMined(completedTxId: BigInteger) {
         Logger.d("Tx $completedTxId mined.")
+        val txId = TxId(completedTxId)
+        // post event to bus
+        EventBus.post(Event.Wallet.TxMined(txId))
+        // notify listeners
         listeners.iterator().forEach {
-            it.onTxMined(TxId(completedTxId))
+            it.onTxMined(txId)
         }
     }
 
     override fun onTxReceived(pendingInboundTxId: BigInteger) {
         Logger.d("Tx $pendingInboundTxId received.")
+        val txId = TxId(pendingInboundTxId)
+        // post event to bus
+        EventBus.post(Event.Wallet.TxReceived(txId))
+        // notify listeners
         listeners.iterator().forEach {
-            it.onTxReceived(TxId(pendingInboundTxId))
+            it.onTxReceived(txId)
         }
     }
 
     override fun onTxReplyReceived(completedTxId: BigInteger) {
         Logger.d("Tx $completedTxId reply received.")
+        val txId = TxId(completedTxId)
+        // post event to bus
+        EventBus.post(Event.Wallet.TxReplyReceived(txId))
+        // notify listeners
         listeners.iterator().forEach {
-            it.onTxReplyReceived(TxId(completedTxId))
+            it.onTxReplyReceived(txId)
         }
     }
 
     override fun onTxFinalized(completedTxId: BigInteger) {
         Logger.d("Tx $completedTxId finalized.")
+        val txId = TxId(completedTxId)
+        // post event to bus
+        EventBus.post(Event.Wallet.TxFinalized(txId))
+        // notify listeners
         listeners.iterator().forEach {
-            it.onTxFinalized(TxId(completedTxId))
+            it.onTxFinalized(txId)
         }
     }
 
     override fun onDiscoveryComplete(txId: BigInteger, success: Boolean) {
         Logger.d("Tx $txId discovery completed. Success: $success")
+        // post event to bus
+        EventBus.post(Event.Wallet.DiscoveryComplete(TxId(txId), success))
+        // notify listeners
         listeners.iterator().forEach {
             it.onDiscoveryComplete(TxId(txId), success)
         }
@@ -197,13 +224,13 @@ class WalletService : Service(), FFIWalletListenerAdapter {
         private fun getContactFromPublicKeyHexString(
             contacts: List<Contact>,
             hexString: String
-        ): Contact {
+        ): Contact? {
             contacts.iterator().forEach {
                 if (it.publicKeyHexString == hexString) {
                     return it
                 }
             }
-            throw RuntimeException("Contact not found.")
+            return null
         }
 
         override fun registerListener(listener: TariWalletServiceListener): Boolean {
@@ -220,7 +247,14 @@ class WalletService : Service(), FFIWalletListenerAdapter {
         }
 
         override fun generateTestData(): Boolean {
-            return wallet.generateTestData(datastorePath)
+            var success = true
+            success = success && wallet.testReceiveTx()
+            Thread.sleep(oneSecondMs)
+            success = success && wallet.testReceiveTx()
+            Thread.sleep(oneSecondMs)
+            success = success && wallet.testReceiveTx()
+            success = success && wallet.generateTestData(datastorePath)
+            return success
         }
 
         override fun getPublicKeyHexString() = wallet.getPublicKey().toString()
@@ -238,7 +272,10 @@ class WalletService : Service(), FFIWalletListenerAdapter {
                 val contactFFI = contactsFFI.getAt(i)
                 val publicKeyFFI = contactFFI.getPublicKey()
                 contacts.add(
-                    Contact(publicKeyFFI.toString(), contactFFI.getAlias())
+                    Contact(
+                        publicKeyFFI.toString(),
+                        contactFFI.getAlias()
+                    )
                 )
                 // destroy native objects
                 publicKeyFFI.destroy()
@@ -246,52 +283,40 @@ class WalletService : Service(), FFIWalletListenerAdapter {
             }
             // destroy native collection
             contactsFFI.destroy()
-            return contacts
+            return contacts.sortedWith(compareBy { it.alias })
+        }
+
+        override fun getRecentTxUsers(maxCount: Int): MutableList<User> {
+            val txs = ArrayList<Tx>()
+            txs.addAll(pendingInboundTxs)
+            txs.addAll(pendingOutboundTxs)
+            txs.addAll(completedTxs)
+            val allContacts = contacts
+            val sortedTxs = txs.sortedWith(compareByDescending { it.timestamp })
+            val recentTxUsers = mutableListOf<User>()
+            for (tx in sortedTxs) {
+                if (recentTxUsers.size >= maxCount) { // comes first for the case of (maxCount <= 0)
+                    break
+                }
+                if (!recentTxUsers.contains(tx.user)) {
+                    val txUser = getContactFromPublicKeyHexString(
+                        allContacts,
+                        tx.user.publicKeyHexString
+                    ) ?: tx.user
+                    recentTxUsers.add(txUser)
+                }
+            }
+            return recentTxUsers
         }
 
         override fun getCompletedTxs(): List<CompletedTx> {
-            val contacts = contacts
             val completedTxsFFI = wallet.getCompletedTxs()
             val completedTxs = mutableListOf<CompletedTx>()
             for (i in 0 until completedTxsFFI.getLength()) {
                 val completedTxFFI = completedTxsFFI.getAt(i)
-                val sourcePublicKeyFFI = completedTxFFI.getSourcePublicKey()
-                val destinationPublicKeyFFI = completedTxFFI.getDestinationPublicKey()
-                val status = when (completedTxFFI.getStatus()) {
-                    FFICompletedTx.Status.TX_NULL_ERROR -> CompletedTx.Status.TX_NULL_ERROR
-                    FFICompletedTx.Status.BROADCAST -> CompletedTx.Status.BROADCAST
-                    FFICompletedTx.Status.COMPLETED -> CompletedTx.Status.COMPLETED
-                    FFICompletedTx.Status.MINED -> CompletedTx.Status.MINED
-                }
-                val contact: Contact
-                val direction: Tx.Direction
-                if (publicKeyHexString == destinationPublicKeyFFI.toString()) {
-                    direction = Tx.Direction.INBOUND
-                    contact =
-                        getContactFromPublicKeyHexString(contacts, sourcePublicKeyFFI.toString())
-                } else {
-                    direction = Tx.Direction.OUTBOUND
-                    contact = getContactFromPublicKeyHexString(
-                        contacts,
-                        destinationPublicKeyFFI.toString()
-                    )
-                }
-                completedTxs.add(
-                    CompletedTx(
-                        completedTxFFI.getId(),
-                        direction,
-                        contact,
-                        MicroTari(completedTxFFI.getAmount()),
-                        completedTxFFI.getFee(),
-                        completedTxFFI.getTimestamp(),
-                        completedTxFFI.getMessage(),
-                        status
-                    )
-                )
-                // destroy native objects
-                sourcePublicKeyFFI.destroy()
-                destinationPublicKeyFFI.destroy()
+                val txId = TxId(completedTxFFI.getId())
                 completedTxFFI.destroy()
+                completedTxs.add(getCompletedTxById(txId))
             }
             // destroy native collection
             completedTxsFFI.destroy()
@@ -299,6 +324,7 @@ class WalletService : Service(), FFIWalletListenerAdapter {
         }
 
         override fun getCompletedTxById(id: TxId): CompletedTx {
+            val allContacts = contacts
             val completedTxFFI = wallet.getCompletedTxById(id.value)
             val sourcePublicKeyFFI = completedTxFFI.getSourcePublicKey()
             val destinationPublicKeyFFI = completedTxFFI.getDestinationPublicKey()
@@ -308,29 +334,32 @@ class WalletService : Service(), FFIWalletListenerAdapter {
                 FFICompletedTx.Status.COMPLETED -> CompletedTx.Status.COMPLETED
                 FFICompletedTx.Status.MINED -> CompletedTx.Status.MINED
             }
-            val contact: Contact
+            val user: User
             val direction: Tx.Direction
             if (publicKeyHexString == destinationPublicKeyFFI.toString()) {
                 direction = Tx.Direction.INBOUND
-                contact =
-                    getContactFromPublicKeyHexString(contacts, sourcePublicKeyFFI.toString())
+                user = getContactFromPublicKeyHexString(
+                    allContacts,
+                    sourcePublicKeyFFI.toString()
+                ) ?: User(sourcePublicKeyFFI.toString())
             } else {
                 direction = Tx.Direction.OUTBOUND
-                contact = getContactFromPublicKeyHexString(
-                    contacts,
+                user = getContactFromPublicKeyHexString(
+                    allContacts,
                     destinationPublicKeyFFI.toString()
-                )
+                ) ?: User(sourcePublicKeyFFI.toString())
             }
             val completedTx = CompletedTx(
                 completedTxFFI.getId(),
                 direction,
-                contact,
+                user,
                 MicroTari(completedTxFFI.getAmount()),
                 completedTxFFI.getFee(),
                 completedTxFFI.getTimestamp(),
                 completedTxFFI.getMessage(),
                 status
             )
+            // destroy native objects
             sourcePublicKeyFFI.destroy()
             destinationPublicKeyFFI.destroy()
             completedTxFFI.destroy()
@@ -342,19 +371,10 @@ class WalletService : Service(), FFIWalletListenerAdapter {
             val pendingInboundTxs = mutableListOf<PendingInboundTx>()
             for (i in 0 until pendingInboundTxsFFI.getLength()) {
                 val pendingInboundTxFFI = pendingInboundTxsFFI.getAt(i)
-                val sourcePublicKeyFFI = pendingInboundTxFFI.getSourcePublicKey()
-                pendingInboundTxs.add(
-                    PendingInboundTx(
-                        pendingInboundTxFFI.getId(),
-                        getContactFromPublicKeyHexString(contacts, sourcePublicKeyFFI.toString()),
-                        MicroTari(pendingInboundTxFFI.getAmount()),
-                        pendingInboundTxFFI.getTimestamp(),
-                        pendingInboundTxFFI.getMessage()
-                    )
-                )
-                // destroy native objects
-                sourcePublicKeyFFI.destroy()
+                val txId = TxId(pendingInboundTxFFI.getId())
+                // destroy native object
                 pendingInboundTxFFI.destroy()
+                pendingInboundTxs.add(getPendingInboundTxById(txId))
             }
             // destroy native collection
             pendingInboundTxsFFI.destroy()
@@ -364,9 +384,13 @@ class WalletService : Service(), FFIWalletListenerAdapter {
         override fun getPendingInboundTxById(id: TxId): PendingInboundTx {
             val pendingInboundTxFFI = wallet.getPendingInboundTxById(id.value)
             val sourcePublicKeyFFI = pendingInboundTxFFI.getSourcePublicKey()
+            val user = getContactFromPublicKeyHexString(
+                contacts,
+                sourcePublicKeyFFI.toString()
+            ) ?: User(sourcePublicKeyFFI.toString())
             val pendingInboundTx = PendingInboundTx(
                 pendingInboundTxFFI.getId(),
-                getContactFromPublicKeyHexString(contacts, sourcePublicKeyFFI.toString()),
+                user,
                 MicroTari(pendingInboundTxFFI.getAmount()),
                 pendingInboundTxFFI.getTimestamp(),
                 pendingInboundTxFFI.getMessage()
@@ -382,22 +406,10 @@ class WalletService : Service(), FFIWalletListenerAdapter {
             val pendingOutboundTxs = mutableListOf<PendingOutboundTx>()
             for (i in 0 until pendingOutboundTxsFFI.getLength()) {
                 val pendingOutboundTxFFI = pendingOutboundTxsFFI.getAt(i)
-                val destinationPublicKeyFFI = pendingOutboundTxFFI.getDestinationPublicKey()
-                pendingOutboundTxs.add(
-                    PendingOutboundTx(
-                        pendingOutboundTxFFI.getId(),
-                        getContactFromPublicKeyHexString(
-                            contacts,
-                            destinationPublicKeyFFI.toString()
-                        ),
-                        MicroTari(pendingOutboundTxFFI.getAmount()),
-                        pendingOutboundTxFFI.getTimestamp(),
-                        pendingOutboundTxFFI.getMessage()
-                    )
-                )
-                // destroy native objects
-                destinationPublicKeyFFI.destroy()
+                val txId = TxId(pendingOutboundTxFFI.getId())
+                // destroy native object
                 pendingOutboundTxFFI.destroy()
+                pendingOutboundTxs.add(getPendingOutboundTxById(txId))
             }
             // destroy native collection
             pendingOutboundTxsFFI.destroy()
@@ -407,9 +419,13 @@ class WalletService : Service(), FFIWalletListenerAdapter {
         override fun getPendingOutboundTxById(id: TxId): PendingOutboundTx {
             val pendingOutboundTxFFI = wallet.getPendingOutboundTxById(id.value)
             val destinationPublicKeyFFI = pendingOutboundTxFFI.getDestinationPublicKey()
+            val user = getContactFromPublicKeyHexString(
+                contacts,
+                destinationPublicKeyFFI.toString()
+            ) ?: User(destinationPublicKeyFFI.toString())
             val pendingOutboundTx = PendingOutboundTx(
                 pendingOutboundTxFFI.getId(),
-                getContactFromPublicKeyHexString(contacts, destinationPublicKeyFFI.toString()),
+                user,
                 MicroTari(pendingOutboundTxFFI.getAmount()),
                 pendingOutboundTxFFI.getTimestamp(),
                 pendingOutboundTxFFI.getMessage()
@@ -421,13 +437,13 @@ class WalletService : Service(), FFIWalletListenerAdapter {
         }
 
         override fun send(
-            contact: Contact,
+            user: User,
             amount: MicroTari,
             fee: MicroTari,
             message: String
         ): Boolean {
             return wallet.sendTx(
-                FFIPublicKey(HexString(contact.publicKeyHexString)),
+                FFIPublicKey(HexString(user.publicKeyHexString)),
                 amount.value,
                 fee.value,
                 message

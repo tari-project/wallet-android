@@ -183,11 +183,11 @@
     <com.tari.android.wallet.ui.component.CustomFontButton
         android:id="@+id/home_btn_send_tari"
         android:layout_width="@dimen/home_send_tari_button_width"
-        android:layout_height="@dimen/home_send_tari_button_height"
+        android:layout_height="@dimen/common_action_button_height"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="40dp"
-        android:background="@drawable/home_send_tari_button_bg"
+        android:background="@drawable/gradient_button_bg"
         android:ellipsize="middle"
         android:singleLine="true"
         android:text="@string/home_send_tari"
@@ -200,7 +200,7 @@
     <RelativeLayout
         android:id="@+id/home_vw_tx_list_header"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/home_tx_list_header_height"
+        android:layout_height="@dimen/common_header_height"
         android:layout_marginTop="0dp"
         android:background="@color/white">
 
@@ -223,6 +223,15 @@
             app:customFont="AVENIR_LT_STD_HEAVY" />
 
     </RelativeLayout>
+
+    <!-- depth gradient -->
+    <View
+        android:id="@+id/home_v_scroll_depth_gradient"
+        android:layout_below="@id/home_vw_tx_list_header"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/common_scroll_height_gradient_height"
+        android:alpha="0.8"
+        android:background="@drawable/scroll_height_gradient" />
 
     <LinearLayout
         android:id="@+id/home_vw_test_data_blocker"

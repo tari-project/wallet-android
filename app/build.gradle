@@ -16,7 +16,7 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
         ndk {
-            abiFilters "armeabi-v7a", "arm64-v8a", "x86_64" // fetch missing binaries from  https://tari.com/downloads
+            abiFilters /*"armeabi-v7a",*/ "arm64-v8a", "x86_64" // fetch missing binaries from  https://tari.com/downloads
         }
         externalNativeBuild {
             cmake {
@@ -44,8 +44,12 @@ android {
     }
 
     compileOptions {
-        targetCompatibility "1.8"
-        sourceCompatibility "1.8"
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    kotlinOptions {
+        jvmTarget = JavaVersion.VERSION_1_8.toString()
     }
 
 }
@@ -61,7 +65,7 @@ dependencies {
     // android
     implementation 'androidx.appcompat:appcompat:1.1.0'
     // kotlin extensions
-    implementation 'androidx.core:core-ktx:1.1.0'
+    implementation 'androidx.core:core-ktx:1.2.0-rc01'
     implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
     // android jetpack
     implementation "androidx.lifecycle:lifecycle-extensions:$lifecycle_version"
@@ -95,6 +99,8 @@ dependencies {
     implementation "net.danlew:android.joda:2.10.3"
 
     // dart - extras injection
+    implementation 'com.f2prateek.dart:dart:3.1.3'
+    kapt 'com.f2prateek.dart:dart-processor:3.1.3'
     implementation 'com.f2prateek.dart:henson:3.1.3'
     kapt 'com.f2prateek.dart:henson-processor:3.1.3'
 
@@ -109,6 +115,9 @@ dependencies {
     // rx
     implementation 'io.reactivex.rxjava2:rxandroid:2.1.1'
     implementation 'io.reactivex.rxjava2:rxjava:2.2.17'
+
+    // unicode library - for emoji processing
+    implementation 'com.ibm.icu:icu4j:65.1'
 
     // lottie
     implementation 'com.airbnb.android:lottie:3.3.1'

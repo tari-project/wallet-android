@@ -4,18 +4,18 @@
  * Redistribution and use in source and binary forms, with or
  * without modification, are permitted provided that the
  * following conditions are met:
-
+ *
  * 1. Redistributions of source code must retain the above copyright notice,
  * this list of conditions and the following disclaimer.
-
+ *
  * 2. Redistributions in binary form must reproduce the above
  * copyright notice, this list of conditions and the following disclaimer in the
  * documentation and/or other materials provided with the distribution.
-
+ *
  * 3. Neither the name of the copyright holder nor the names of
  * its contributors may be used to endorse or promote products
  * derived from this software without specific prior written permission.
-
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND
  * CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES,
  * INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
@@ -47,18 +47,24 @@ import android.os.IBinder
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.AccelerateInterpolator
+import android.view.animation.Animation
+import android.view.animation.DecelerateInterpolator
+import android.view.animation.ScaleAnimation
 import android.widget.*
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-import butterknife.*
+import butterknife.BindColor
+import butterknife.BindDimen
+import butterknife.BindView
+import butterknife.OnClick
 import com.daasuu.ei.Ease
 import com.daasuu.ei.EasingInterpolator
 import com.orhanobut.logger.Logger
 import com.tari.android.wallet.R
-import com.tari.android.wallet.event.Event
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.model.*
 import com.tari.android.wallet.service.TariWalletService
@@ -66,13 +72,16 @@ import com.tari.android.wallet.service.WalletService
 import com.tari.android.wallet.ui.activity.BaseActivity
 import com.tari.android.wallet.ui.activity.EXTRA_QR_DATA
 import com.tari.android.wallet.ui.activity.QRScannerActivity
+import com.tari.android.wallet.ui.activity.home.adapter.TxListAdapter
+import com.tari.android.wallet.ui.activity.send.SendTariActivity
 import com.tari.android.wallet.ui.util.UiUtil
-import com.tari.android.wallet.util.*
-import java.lang.Float.max
+import com.tari.android.wallet.util.Constants
 import java.lang.ref.WeakReference
+import kotlin.math.min
+import kotlin.math.max
 
 /**
- * Home - transaction list.
+ * Home activity - transaction list.
  *
  * @author The Tari Development Team
  */
@@ -83,7 +92,9 @@ class HomeActivity : BaseActivity(),
     ServiceConnection,
     SwipeRefreshLayout.OnRefreshListener,
     View.OnScrollChangeListener,
-    View.OnTouchListener {
+    View.OnTouchListener,
+    Animation.AnimationListener,
+    TxListAdapter.Listener {
 
     @BindView(R.id.home_vw_top_content_container)
     lateinit var topContentContainerView: View
@@ -106,6 +117,8 @@ class HomeActivity : BaseActivity(),
     lateinit var grabberView: View
     @BindView(R.id.home_vw_tx_list_bg_overlay)
     lateinit var txListBgOverlayView: View
+    @BindView(R.id.home_v_scroll_depth_gradient)
+    lateinit var scrollDepthView: View
 
     @BindView(R.id.home_btn_send_tari)
     lateinit var sendTariButton: Button
@@ -147,7 +160,7 @@ class HomeActivity : BaseActivity(),
     @JvmField
     var topContentContainerViewScrollVerticalShift = 0
 
-    @BindDimen(R.dimen.home_tx_list_header_height)
+    @BindDimen(R.dimen.common_header_height)
     @JvmField
     var txListHeaderHeight = 0
     @BindDimen(R.dimen.home_send_tari_button_initial_bottom_margin)
@@ -175,13 +188,16 @@ class HomeActivity : BaseActivity(),
     @BindDimen(R.dimen.home_grabber_width)
     @JvmField
     var grabberViewWidth = 0
+    @BindDimen(R.dimen.home_tx_list_item_height)
+    @JvmField
+    var listItemHeight = 0
 
     @BindColor(R.color.white)
     @JvmField
     var whiteColor = 0
 
     // tx list
-    private lateinit var recyclerViewAdapter: TxListRecyclerViewAdapter
+    private lateinit var recyclerViewAdapter: TxListAdapter
     private lateinit var recyclerViewLayoutManager: RecyclerView.LayoutManager
     private val completedTxs = mutableListOf<CompletedTx>()
     private val pendingInboundTxs = mutableListOf<PendingInboundTx>()
@@ -202,12 +218,17 @@ class HomeActivity : BaseActivity(),
 
     override val contentViewId = R.layout.activity_home
 
+    /**
+     * This listener is used only to animate the visibility of the scroll depth gradient view.
+     */
+    private var scrollListener = ScrollListener(this)
+
     @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
-        //makeStatusBarTransparent() -- commented out to fix the UI cutout issue
+        // makeStatusBarTransparent() -- commented out to fix the UI cutout issue
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.home_vw_root)) { _, insets ->
             insets.consumeSystemWindowInsets()
         }
@@ -233,11 +254,13 @@ class HomeActivity : BaseActivity(),
         // initialize recycler view
         recyclerViewLayoutManager = LinearLayoutManager(this)
         recyclerView.layoutManager = recyclerViewLayoutManager
-        recyclerViewAdapter = TxListRecyclerViewAdapter(
-            completedTxs,
-            pendingInboundTxs,
-            pendingOutboundTxs
-        )
+        recyclerViewAdapter =
+            TxListAdapter(
+                completedTxs,
+                pendingInboundTxs,
+                pendingOutboundTxs,
+                this
+            )
         recyclerView.adapter = recyclerViewAdapter
         // recycler view is initially disabled
         recyclerView.isClickable = false
@@ -249,6 +272,8 @@ class HomeActivity : BaseActivity(),
         scrollView.post {
             wr.get()?.setScrollViewContentHeight()
         }
+
+        scrollDepthView.alpha = 0f
 
         UiUtil.setProgressBarColor(testDataProgressBar, whiteColor)
         sendTariButton.visibility = View.INVISIBLE
@@ -268,11 +293,6 @@ class HomeActivity : BaseActivity(),
             val bindIntent = Intent(this@HomeActivity, WalletService::class.java)
             //intent.action = TariWalletService::class.java.name
             bindService(bindIntent, this, Context.BIND_AUTO_CREATE)
-        }
-
-        EventBus.subscribe<Event.Home.TxClicked>(this) {
-            Logger.e("HM HM")
-            wr.get()?.onTxClicked(it.tx)
         }
     }
 
@@ -306,6 +326,7 @@ class HomeActivity : BaseActivity(),
 
         scrollView.setOnScrollChangeListener(this)
         recyclerView.setOnScrollChangeListener(this)
+        recyclerView.addOnScrollListener(scrollListener)
     }
 
     /**
@@ -346,6 +367,7 @@ class HomeActivity : BaseActivity(),
             wr.get()?.recyclerViewAdapter?.notifyDataChanged()
             wr.get()?.swipeRefreshLayout?.isRefreshing = false
             wr.get()?.recyclerView?.isNestedScrollingEnabled = true
+            wr.get()?.scrollListener?.reset()
         }
     }
 
@@ -393,7 +415,7 @@ class HomeActivity : BaseActivity(),
             qrCodeButton.alpha = value
             balanceGemImageView.alpha = value
         }
-        listAnim.duration = Constants.UI.Home.startupAnimDuration
+        listAnim.duration = Constants.UI.Home.startupAnimDurationMs
         listAnim.interpolator = EasingInterpolator(Ease.EASE_IN_OUT_EXPO)
         listAnim.start()
     }
@@ -427,6 +449,45 @@ class HomeActivity : BaseActivity(),
         val intent = Intent(this, QRScannerActivity::class.java)
         startActivityForResult(intent, REQUEST_QR_SCANNER)
         overridePendingTransition(R.anim.slide_up, 0)
+    }
+
+    @OnClick(R.id.home_btn_send_tari)
+    fun sendTariButtonClicked(view: View) {
+        UiUtil.temporarilyDisableClick(view)
+        animateSendTariButtonClick(
+            Constants.UI.Button.clickScaleAnimFullScale,
+            Constants.UI.Button.clickScaleAnimSmallScale
+        )
+    }
+
+    /**
+     * Called when a tx gets clicked.
+     */
+    override fun onTxSelected(tx: Tx) {
+        Logger.i("Transaction with id ${tx.id} selected.")
+    }
+
+    override fun onAnimationStart(animation: Animation?) {
+        // no-op
+    }
+
+    override fun onAnimationRepeat(animation: Animation?) {
+        // no-op
+    }
+
+    override fun onAnimationEnd(animation: Animation?) {
+        if (sendTariButtonClickAnimIsRunning) { // bounce back the button
+            animateSendTariButtonClick(
+                Constants.UI.Button.clickScaleAnimSmallScale,
+                Constants.UI.Button.clickScaleAnimFullScale
+            )
+            sendTariButtonClickAnimIsRunning = false
+        } else { // animation is over, go to send activity
+            // go to fragment
+            val intent = Intent(this@HomeActivity, SendTariActivity::class.java)
+            startActivity(intent)
+            overridePendingTransition(R.anim.enter_from_right, R.anim.exit_to_left)
+        }
     }
 
     @OnClick(R.id.home_btn_close_tx_list)
@@ -508,12 +569,28 @@ class HomeActivity : BaseActivity(),
         sendTariButtonIsVisible = false
     }
 
-    /**
-     * Called when a tx gets clicked.
-     */
-    private fun onTxClicked(tx: Tx) {
-        // no-op yet
-        Logger.d("Tx clicked. Id: %s", tx.id)
+    private var sendTariButtonClickAnimIsRunning = false
+
+    private fun animateSendTariButtonClick(startScale: Float, endScale: Float) {
+        val anim: Animation = ScaleAnimation(
+            startScale, endScale,  // start and end values for the X axis scaling
+            startScale, endScale,  // start and end values for the Y axis scaling
+            Animation.RELATIVE_TO_SELF, 0.5f,  // pivot point of X scaling
+            Animation.RELATIVE_TO_SELF, 0.5f // pivot point of Y scaling
+        )
+        anim.fillAfter = true // keeps the result of the animation
+        if (!sendTariButtonClickAnimIsRunning) {
+            anim.interpolator = DecelerateInterpolator()
+            sendTariButtonClickAnimIsRunning = true
+            anim.duration = Constants.UI.Button.clickScaleAnimDurationMs
+            anim.startOffset = Constants.UI.Button.clickScaleAnimStartOffset
+        } else {
+            anim.interpolator = AccelerateInterpolator()
+            anim.duration = Constants.UI.Button.clickScaleAnimReturnDurationMs
+            anim.startOffset = Constants.UI.Button.clickScaleAnimReturnStartOffset
+        }
+        anim.setAnimationListener(this)
+        sendTariButton.startAnimation(anim)
     }
 
     @SuppressLint("ClickableViewAccessibility")
@@ -596,5 +673,33 @@ class HomeActivity : BaseActivity(),
             showSendTariButton()
         }
     }
+
+    // region scroll depth gradient view controls
+
+    fun onRecyclerViewScrolled(totalDeltaY: Int) {
+        scrollDepthView.alpha = min(
+            Constants.UI.scrollDepthShadowViewMaxOpacity,
+            totalDeltaY / listItemHeight.toFloat()
+        )
+    }
+
+    class ScrollListener(activity: HomeActivity) : RecyclerView.OnScrollListener() {
+
+        private val activityWR = WeakReference(activity)
+        private var totalDeltaY = 0
+
+        fun reset() {
+            totalDeltaY = 0
+        }
+
+        override fun onScrolled(recyclerView: RecyclerView, dX: Int, dY: Int) {
+            super.onScrolled(recyclerView, dX, dY)
+            totalDeltaY += dY
+            activityWR.get()?.onRecyclerViewScrolled(totalDeltaY)
+        }
+
+    }
+
+    // endregion
 
 }

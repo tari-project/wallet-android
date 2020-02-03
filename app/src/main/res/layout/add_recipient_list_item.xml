@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/add_recipient_list_item_vw_root"
+    android:layout_width="match_parent"
+    android:layout_height="@dimen/add_recipient_contact_list_item_height"
+    android:clickable="true"
+    android:focusable="true"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    android:paddingStart="25dp"
+    android:paddingEnd="25dp">
+
+    <RelativeLayout
+        android:layout_width="44dp"
+        android:layout_height="44dp"
+        android:background="@drawable/add_recipient_contact_list_item_initial_bg">
+
+        <com.tari.android.wallet.ui.component.CustomFontTextView
+            android:id="@+id/add_recipient_list_item_txt_initial"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="@string/dummy_contact_initial"
+            android:layout_centerInParent="true"
+            android:textColor="#B2B2B2"
+            android:textSize="22sp"
+            app:customFont="AVENIR_LT_STD_ROMAN" />
+
+        <ImageView
+            android:id="@+id/add_recipient_list_item_img_profile_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:contentDescription="@null"
+            android:layout_centerInParent="true"
+            android:src="@drawable/profile_icon" />
+
+    </RelativeLayout>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="20dp"
+        android:layout_marginStart="12dp">
+
+        <!-- contact alias -->
+        <com.tari.android.wallet.ui.component.CustomFontTextView
+            android:id="@+id/add_recipient_list_item_txt_alias"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ellipsize="middle"
+            android:singleLine="true"
+            android:text="@string/dummy_contact_alias"
+            android:textColor="#423986"
+            android:textSize="15sp"
+            app:customFont="AVENIR_LT_STD_HEAVY" />
+
+        <!-- emoji id summary -->
+        <include
+            android:id="@+id/add_recipient_list_item_vw_emoji_summary"
+            layout="@layout/emoji_id_summary"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+    </FrameLayout>
+
+</LinearLayout>
