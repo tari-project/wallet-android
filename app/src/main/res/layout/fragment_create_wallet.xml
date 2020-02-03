@@ -149,19 +149,12 @@
 
     </FrameLayout>
 
-    <com.airbnb.lottie.LottieAnimationView
-        android:id="@+id/main_anim_tari"
+    <ImageView
+        android:id="@+id/tari_wallet"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:layout_marginTop="30dp"
         android:alpha="0"
-        android:background="@color/black"
-        android:scaleX="0.8"
-        android:scaleY="0.8"
-        app:lottie_autoPlay="false"
-        app:lottie_enableMergePathsForKitKatAndAbove="true"
-        app:lottie_loop="false"
-        app:lottie_rawRes="@raw/splash_anim" />
-
+        android:src="@drawable/tari_wallet" />
 </FrameLayout>

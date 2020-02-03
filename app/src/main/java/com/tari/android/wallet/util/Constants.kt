@@ -67,7 +67,22 @@ internal object Constants {
 
         }
 
+        object CreateEmojiId {
+            const val helloTextAnimDurationMs = 800L
+            const val whiteBgAnimDurationMs = 1000L
+            const val whiteBgAnimDelayMs = 200L
+            const val titleShortAnimDelayMs = 40L
+            const val createEmojiButtonAnimDelayMs = 300L
+            const val awesomeTextAnimDurationMs = 600L
+            const val shortAlphaAnimDuration = 300L
+            const val viewChangeAnimDelayMs = 3000L
+            const val viewOverlapDelayMs = 150L
+            const val createEmojiViewAnimDurationMs = 1200L
+        }
+
         object CreateWallet {
+            const val showCreateEmojiIdWhiteBgDelayMs = 1500L
+            const val finishActivityDelayDuration = 1200L
             const val tariTextAnimViewDurationMs = 2000L
             const val startUpAnimDuration = 1000L
             const val cryptoTitleTextAnimDelayDurationMs = 30L

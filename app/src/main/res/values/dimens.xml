@@ -23,9 +23,13 @@
     <dimen name="home_send_tari_button_visible_bottom_margin">40dp</dimen>
     <dimen name="home_send_tari_button_hidden_bottom_margin">-100dp</dimen>
     <dimen name="home_send_tari_button_initial_bottom_margin">-150dp</dimen>
+    <dimen name="home_tx_list_header_height">64dp</dimen>
+    <dimen name="home_send_tari_button_height">54dp</dimen>
+
+    <dimen name="create_emoji_id_button_bottom_margin">20dp</dimen>
+    <dimen name="create_emoji_id_nerd_face_bottom_margin">24dp</dimen>
     <dimen name="splash_screen_title_bottom_margin">34dp</dimen>
     <dimen name="home_tx_list_item_height">75dp</dimen>
-
 
     <!-- send tari - add recipient -->
     <dimen name="add_recipient_search_bar_container_height">96dp</dimen>

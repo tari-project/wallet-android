@@ -30,44 +30,25 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.tari.android.wallet.ui.activity
+package com.tari.android.wallet.ui.activity.onboarding
 
-import android.content.Intent
+
 import android.os.Bundle
-import android.os.Handler
 import com.tari.android.wallet.R
-import com.tari.android.wallet.ui.activity.onboarding.OnBoardingFlowActivity
-import com.tari.android.wallet.util.Constants.UI.Splash
+import com.tari.android.wallet.ui.activity.BaseActivity
+import com.tari.android.wallet.ui.fragment.onboarding.CreateWalletFragment
 
-/**
- * Splash screen activity.
- *
- * @author Kutsal Kaan Bilgin
- */
-class SplashActivity : BaseActivity() {
 
-    override val contentViewId = R.layout.activity_splash
+class OnBoardingFlowActivity : BaseActivity() {
 
-    private val uiHandler = Handler()
+    override val contentViewId = R.layout.activity_onboarding_flow
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        uiHandler.postDelayed({
-            startCreateWalletActivity()
-        }, Splash.createWalletStartUpDelayMs)
-    }
-
-    private fun startCreateWalletActivity() {
-        val intent = Intent(this@SplashActivity, OnBoardingFlowActivity::class.java)
-        intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
-        startActivity(intent)
-        // finish this activity
-        finish()
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        uiHandler.removeCallbacksAndMessages(null)
+        supportFragmentManager.beginTransaction()
+            .replace(R.id.frame_container,
+                CreateWalletFragment()
+            ).commit()
     }
 }
