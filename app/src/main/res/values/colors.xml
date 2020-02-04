@@ -32,6 +32,8 @@
     <color name="home_send_tari_btn_gradient_center">#8E31FF</color>
     <color name="home_send_tari_btn_gradient_end">#AE2BE8</color>
     <color name="home_black_overlay">#FF000000</color>
+    <color name="dark_gray">#7F8599</color>
+    <color name="create_emoji_id_bg">#f6f6f6</color>
     <color name="wallet_splash_desc_text">#80FFFFFF</color>
 
     <!-- send tari - add recipient -->

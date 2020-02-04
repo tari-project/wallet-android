@@ -50,9 +50,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <!-- create wallet -->
+        <!-- onboarding flow -->
         <activity
-            android:name=".ui.activity.CreateWalletActivity"
+            android:name=".ui.activity.onboarding.OnBoardingFlowActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme" />
