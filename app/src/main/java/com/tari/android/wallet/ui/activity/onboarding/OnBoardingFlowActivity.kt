@@ -32,13 +32,16 @@
  */
 package com.tari.android.wallet.ui.activity.onboarding
 
-
 import android.os.Bundle
 import com.tari.android.wallet.R
 import com.tari.android.wallet.ui.activity.BaseActivity
 import com.tari.android.wallet.ui.fragment.onboarding.CreateWalletFragment
 
-
+/**
+ * onBoarding activity class : contain  splash screen and loading sequence
+ *
+ * @author The Tari Development Team
+ */
 class OnBoardingFlowActivity : BaseActivity() {
 
     override val contentViewId = R.layout.activity_onboarding_flow

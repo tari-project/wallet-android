@@ -38,7 +38,8 @@ import android.os.Bundle
 import android.os.Handler
 import android.view.View
 import android.view.ViewTreeObserver
-import android.widget.*
+import android.widget.Button
+import android.widget.TextView
 import butterknife.BindDimen
 import butterknife.BindView
 import butterknife.OnClick
@@ -48,9 +49,13 @@ import com.daasuu.ei.EasingInterpolator
 import com.tari.android.wallet.R
 import com.tari.android.wallet.ui.activity.AuthActivity
 import com.tari.android.wallet.ui.fragment.BaseFragment
-import com.tari.android.wallet.ui.util.UiUtil
 import com.tari.android.wallet.util.Constants
 
+/**
+ * onBoarding flow : wallet creation sequence
+ *
+ * @author The Tari Development Team
+ */
 class CreateEmojiIdFragment : BaseFragment() {
 
     @BindView(R.id.create_emoji_id_txt_hello)
@@ -109,7 +114,6 @@ class CreateEmojiIdFragment : BaseFragment() {
                     playStartupWhiteBgAnimation()
                 }
             })
-
 
         checkMarkAnim.addAnimatorListener(object : AnimatorListenerAdapter() {
             override fun onAnimationEnd(animation: Animator?) {
@@ -238,7 +242,7 @@ class CreateEmojiIdFragment : BaseFragment() {
                 uiHandler.postDelayed(
                     { startCheckMarkAnimation() },
                     Constants.UI.CreateEmojiId.viewChangeAnimDelayMs
-                );
+                )
             }
         })
         animSet.start()

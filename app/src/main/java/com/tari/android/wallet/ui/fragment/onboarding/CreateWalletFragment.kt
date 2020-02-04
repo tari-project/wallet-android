@@ -52,6 +52,11 @@ import com.tari.android.wallet.ui.util.UiUtil
 import com.tari.android.wallet.ui.util.UiUtil.getResourceUri
 import com.tari.android.wallet.util.Constants
 
+/**
+ * onBoarding flow : wallet creation splash screen
+ *
+ * @author The Tari Development Team
+ */
 class CreateWalletFragment : BaseFragment() {
 
     @BindView(R.id.create_wallet_tari_wallet)
