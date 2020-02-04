@@ -37,8 +37,8 @@ import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.view.View
+import android.view.ViewTreeObserver
 import android.widget.*
-import androidx.core.view.marginTop
 import butterknife.BindDimen
 import butterknife.BindView
 import butterknife.OnClick
@@ -48,56 +48,51 @@ import com.daasuu.ei.EasingInterpolator
 import com.tari.android.wallet.R
 import com.tari.android.wallet.ui.activity.AuthActivity
 import com.tari.android.wallet.ui.fragment.BaseFragment
+import com.tari.android.wallet.ui.util.UiUtil
 import com.tari.android.wallet.util.Constants
 
 class CreateEmojiIdFragment : BaseFragment() {
 
-    @BindView(R.id.tari_wallet_anim)
-    lateinit var tariAnimationView: LottieAnimationView
-    @BindView(R.id.rootView)
-    lateinit var rootView: FrameLayout
-    @BindView(R.id.txt_hello)
+    @BindView(R.id.create_emoji_id_txt_hello)
     lateinit var helloText: TextView
-    @BindView(R.id.txt_just_sec_desc)
+    @BindView(R.id.create_emoji_id_txt_just_sec_desc)
     lateinit var justSecDescText: TextView
-    @BindView(R.id.txt_just_sec_title)
+    @BindView(R.id.create_emoji_id_txt_just_sec_title)
     lateinit var justSecTitle: TextView
-    @BindView(R.id.hello_text_back_view)
+    @BindView(R.id.create_emoji_id_hello_text_back_view)
     lateinit var helloTextBackView: View
-    @BindView(R.id.checkmark_anim)
+    @BindView(R.id.create_emoji_id_checkmark_anim)
     lateinit var checkMarkAnim: LottieAnimationView
-    @BindView(R.id.txt_wallet_address_des)
+    @BindView(R.id.create_emoji_id_txt_wallet_address_des)
     lateinit var walletAddressDescText: TextView
-    @BindView(R.id.creat_emoji_btn)
+    @BindView(R.id.create_emoji_id_continue_btn)
     lateinit var createEmojiIdButton: Button
-    @BindView(R.id.just_sec_back_view)
+    @BindView(R.id.create_emoji_id_just_sec_back_view)
     lateinit var justSecBackView: View
-    @BindView(R.id.nerd_face_emoji)
+    @BindView(R.id.create_emoji_id_nerd_face_emoji)
     lateinit var nerdFaceEmoji: LottieAnimationView
-    @BindView(R.id.txt_create_your_emoji_id)
+    @BindView(R.id.create_emoji_id_txt_create_your_emoji_id)
     lateinit var createYourEmojiIdText: TextView
     @BindView(R.id.create_emoji_id_text_back_view)
     lateinit var createEmojiIdTextBackView: View
-    @BindView(R.id.txt_awesome)
+    @BindView(R.id.create_emoji_id_txt_awesome)
     lateinit var awesomeText: TextView
-    @BindView(R.id.white_bg_view)
+    @BindView(R.id.create_emoji_id_white_bg_view)
     lateinit var whiteBgView: View
-    @BindView(R.id.awesome_text_back_view)
+    @BindView(R.id.create_emoji_id_awesome_text_back_view)
     lateinit var awesomeTextBackView: View
-    @BindView(R.id.main_img_small_gem)
-    lateinit var smallGem: ImageView
 
     @BindDimen(R.dimen.create_emoji_id_button_bottom_margin)
     @JvmField
     var createEmojiButtonBottomMargin = 0
 
-    val uiHandler = Handler()
+    private val uiHandler = Handler()
 
     override val contentViewId = R.layout.fragment_create_emoji_id
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        init()
+        setupUi()
     }
 
     override fun onDestroy() {
@@ -105,10 +100,16 @@ class CreateEmojiIdFragment : BaseFragment() {
         uiHandler.removeCallbacksAndMessages(null)
     }
 
-    private fun init() {
-        whiteBgView.translationY = -whiteBgView.height.toFloat()
+    private fun setupUi() {
+        whiteBgView.viewTreeObserver.addOnGlobalLayoutListener(
+            object : ViewTreeObserver.OnGlobalLayoutListener {
+                override fun onGlobalLayout() {
+                    whiteBgView.viewTreeObserver.removeOnGlobalLayoutListener(this)
+                    whiteBgView.translationY = -whiteBgView.height.toFloat()
+                    playStartupWhiteBgAnimation()
+                }
+            })
 
-        rootView.post { startTariViewAnimation() }
 
         checkMarkAnim.addAnimatorListener(object : AnimatorListenerAdapter() {
             override fun onAnimationEnd(animation: Animator?) {
@@ -126,7 +127,7 @@ class CreateEmojiIdFragment : BaseFragment() {
         })
     }
 
-    @OnClick(R.id.creat_emoji_btn)
+    @OnClick(R.id.create_emoji_id_continue_btn)
     fun openAuthActivity() {
         val intent = Intent(activity, AuthActivity::class.java)
         intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
@@ -263,7 +264,7 @@ class CreateEmojiIdFragment : BaseFragment() {
         checkMarkAnim.playAnimation()
     }
 
-    private fun startWhiteBackGroundAnimation() {
+    private fun playStartupWhiteBgAnimation() {
         val whiteBgViewAnim: ObjectAnimator =
             ObjectAnimator.ofFloat(
                 whiteBgView,
@@ -283,7 +284,6 @@ class CreateEmojiIdFragment : BaseFragment() {
 
             override fun onAnimationStart(animation: Animator?) {
                 super.onAnimationStart(animation)
-                smallGem.visibility = View.VISIBLE
                 whiteBgView.visibility = View.VISIBLE
             }
         })
@@ -314,34 +314,5 @@ class CreateEmojiIdFragment : BaseFragment() {
             }
         })
         helloTextAnim.start()
-    }
-
-    private fun startTariViewAnimation() {
-        val metrics = resources.displayMetrics
-        val offset =
-            (metrics.heightPixels / 2 - tariAnimationView.top).toFloat()
-        val tariViewTranslateAnim =
-            ObjectAnimator.ofFloat(tariAnimationView, View.TRANSLATION_Y, offset)
-        tariViewTranslateAnim.interpolator = EasingInterpolator(Ease.CIRC_IN_OUT)
-
-        tariViewTranslateAnim.addListener(object : AnimatorListenerAdapter() {
-            override fun onAnimationEnd(animation: Animator?) {
-                tariAnimationView.playAnimation()
-                uiHandler.postDelayed(
-                    { startWhiteBackGroundAnimation() },
-                    tariAnimationView.duration - Constants.UI.CreateWallet.showCreateEmojiIdWhiteBgDelayMs
-                )
-            }
-
-            override fun onAnimationStart(animation: Animator?) {
-                tariAnimationView.animate()
-                    .scaleX(1f).scaleY(1f)
-                    .setDuration(Constants.UI.CreateWallet.tariTextAnimViewScaleDurationMs)
-                    .start()
-            }
-        })
-
-        tariViewTranslateAnim.duration = Constants.UI.CreateWallet.tariTextAnimViewDurationMs
-        tariViewTranslateAnim.start()
     }
 }

@@ -82,11 +82,11 @@ internal object Constants {
 
         object CreateWallet {
             const val showCreateEmojiIdWhiteBgDelayMs = 1500L
-            const val finishActivityDelayDuration = 1200L
-            const val tariTextAnimViewDurationMs = 2000L
+            const val removeFragmentDelayDuration = 1200L
+            const val tariTextAnimViewDurationMs = 1600L
             const val startUpAnimDuration = 1000L
-            const val cryptoTitleTextAnimDelayDurationMs = 30L
-            const val tariTextAnimViewScaleDurationMs = 1000L
+            const val titleTextAnimDelayDurationMs = 30L
+            const val viewContainerFadeOutDurationMs = 800L
         }
 
         object Splash {

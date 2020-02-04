@@ -47,7 +47,7 @@ class OnBoardingFlowActivity : BaseActivity() {
         super.onCreate(savedInstanceState)
 
         supportFragmentManager.beginTransaction()
-            .replace(R.id.frame_container,
+            .replace(R.id.onboarding_frame_container,
                 CreateWalletFragment()
             ).commit()
     }
