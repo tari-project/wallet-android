@@ -41,7 +41,7 @@ import java.math.BigInteger
  *
  * @author The Tari Development Team
  */
-class CompletedTx() : Tx(), Parcelable {
+class CompletedTx() : Tx() {
 
     enum class Status {
         TX_NULL_ERROR,

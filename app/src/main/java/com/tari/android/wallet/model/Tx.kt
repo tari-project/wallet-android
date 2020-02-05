@@ -32,12 +32,13 @@
  */
 package com.tari.android.wallet.model
 
+import android.os.Parcelable
 import java.math.BigInteger
 
 /**
  * Base transaction class.
  */
-abstract class Tx {
+abstract class Tx: Parcelable {
 
     enum class Direction {
         INBOUND,

@@ -41,7 +41,7 @@ import java.math.BigInteger
  *
  * @author The Tari Development Team
  */
-class PendingInboundTx() : Tx(), Parcelable {
+class PendingInboundTx() : Tx() {
 
     constructor(
         id: BigInteger,
