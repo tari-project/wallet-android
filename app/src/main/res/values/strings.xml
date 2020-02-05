@@ -79,4 +79,7 @@
     <!-- send tari - amount -->
     <string name="amount_under_construction">Under Construction</string>
 
+<!--    Transaction Details-->
+    <string name="payment_received">Payment Received</string>
+
 </resources>

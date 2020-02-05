@@ -4,6 +4,58 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/gray_background"
     tools:context=".ui.activity.transactiondetails.TransactionDetailActivity">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:background="@color/white"
+        android:elevation="5dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <ImageView
+            android:id="@+id/back"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:layout_marginTop="24dp"
+            android:layout_marginStart="8dp"
+            android:padding="8dp"
+            android:src="@drawable/back_icon"/>
+        
+        <com.tari.android.wallet.ui.component.CustomFontTextView
+            android:id="@+id/payment_state"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/payment_received"
+            app:layout_constraintTop_toTopOf="@id/back"
+            android:textStyle="bold"
+            android:textColor="@color/black"
+            app:layout_constraintBottom_toBottomOf="@id/back"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"/>
+
+        <com.tari.android.wallet.ui.component.CustomFontTextView
+            android:id="@+id/date"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:text="November 1st 2019 at 2:39 PM"
+            android:textColor="@color/transaction_date"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="24dp"
+            app:layout_constraintTop_toBottomOf="@id/payment_state"
+            app:layout_constraintStart_toStartOf="@id/payment_state"
+            app:layout_constraintEnd_toEndOf="@id/payment_state"
+            app:layout_constraintBottom_toBottomOf="parent"/>
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

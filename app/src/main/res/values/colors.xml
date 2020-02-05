@@ -39,4 +39,7 @@
     <color name="add_recipient_contact_list_section_header_title">#B2B2B2</color>
     <color name="add_recipient_prog_bar">#CCCCCC</color>
 
+    <color name="transaction_date">#B2B2B2</color>
+    <color name="gray_background">#f6f6f6</color>
+
 </resources>

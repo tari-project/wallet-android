@@ -74,6 +74,7 @@ import com.tari.android.wallet.ui.activity.EXTRA_QR_DATA
 import com.tari.android.wallet.ui.activity.QRScannerActivity
 import com.tari.android.wallet.ui.activity.home.adapter.TxListAdapter
 import com.tari.android.wallet.ui.activity.send.SendTariActivity
+import com.tari.android.wallet.ui.activity.transactiondetails.TransactionDetailActivity
 import com.tari.android.wallet.ui.util.UiUtil
 import com.tari.android.wallet.util.Constants
 import java.lang.ref.WeakReference
@@ -465,6 +466,7 @@ class HomeActivity : BaseActivity(),
      */
     override fun onTxSelected(tx: Tx) {
         Logger.i("Transaction with id ${tx.id} selected.")
+        startActivity(TransactionDetailActivity.createIntent(this, tx))
     }
 
     override fun onAnimationStart(animation: Animation?) {
