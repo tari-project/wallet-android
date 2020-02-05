@@ -1,0 +1,3773 @@
+{
+  "v": "5.6.1",
+  "fr": 60,
+  "ip": 0,
+  "op": 260,
+  "w": 1123,
+  "h": 974,
+  "nm": "emoji wheel - lottie",
+  "ddd": 0,
+  "assets": [
+    {
+      "id": "image_3",
+      "w": 140,
+      "h": 136,
+      "u": "images/",
+      "p": "img_3.png",
+      "e": 0
+    },
+    {
+      "id": "image_1",
+      "w": 140,
+      "h": 140,
+      "u": "images/",
+      "p": "img_1.png",
+      "e": 0
+    },
+    {
+      "id": "image_2",
+      "w": 132,
+      "h": 140,
+      "u": "images/",
+      "p": "img_2.png",
+      "e": 0
+    },
+    {
+      "id": "image_0",
+      "w": 140,
+      "h": 140,
+      "u": "images/",
+      "p": "img_0.png",
+      "e": 0
+    },
+    {
+      "id": "image_4",
+      "w": 140,
+      "h": 140,
+      "u": "images/",
+      "p": "img_4.png",
+      "e": 0
+    },
+    {
+      "id": "image_5",
+      "w": 140,
+      "h": 140,
+      "u": "images/",
+      "p": "img_5.png",
+      "e": 0
+    },
+    {
+      "id": "image_6",
+      "w": 112,
+      "h": 140,
+      "u": "images/",
+      "p": "img_6.png",
+      "e": 0
+    }
+  ],
+  "layers": [
+    {
+      "ddd": 0,
+      "ind": 1,
+      "ty": 3,
+      "nm": "Main Controller",
+      "sr": 1,
+      "ks": {
+        "o": {
+          "a": 0,
+          "k": 0,
+          "ix": 11
+        },
+        "r": {
+          "a": 1,
+          "k": [
+            {
+              "i": {
+                "x": [
+                  0.833
+                ],
+                "y": [
+                  0.833
+                ]
+              },
+              "o": {
+                "x": [
+                  0.796
+                ],
+                "y": [
+                  0
+                ]
+              },
+              "t": -57,
+              "s": [
+                0
+              ]
+            },
+            {
+              "t": 151,
+              "s": [
+                1080
+              ]
+            }
+          ],
+          "ix": 10,
+          "x": "var $bm_rt;\nvar enable, amp, freq, decay, n, t, v;\ntry {\n    $bm_rt = enable = effect('Excite - Rotation')('Pseudo/BNCA2506f0b33-0001');\n    if (enable == 0) {\n        $bm_rt = value;\n    } else {\n        amp = $bm_div(effect('Excite - Rotation')('Pseudo/BNCA2506f0b33-0003'), 2.5);\n        freq = $bm_div(effect('Excite - Rotation')('Pseudo/BNCA2506f0b33-0004'), 20);\n        decay = $bm_div(effect('Excite - Rotation')('Pseudo/BNCA2506f0b33-0005'), 20);\n        n = 0, 0 < numKeys && (n = nearestKey(time).index, key(n).time > time && n--), t = 0 === n ? 0 : $bm_sub(time, key(n).time), $bm_rt = 0 < n ? (v = velocityAtTime($bm_sub(key(n).time, $bm_div(thisComp.frameDuration, 10))), $bm_sum(value, $bm_div($bm_mul($bm_mul($bm_div(v, 100), amp), Math.sin($bm_mul($bm_mul($bm_mul(freq, t), 2), Math.PI))), Math.exp($bm_mul(decay, t))))) : value;\n    }\n} catch (err) {\n    $bm_rt = value = value;\n}"
+        },
+        "p": {
+          "a": 1,
+          "k": [
+            {
+              "i": {
+                "x": 0.833,
+                "y": 0.833
+              },
+              "o": {
+                "x": 0.167,
+                "y": 0.167
+              },
+              "t": 162,
+              "s": [
+                563.5,
+                472,
+                0
+              ],
+              "to": [
+                -1.333,
+                5.667,
+                0
+              ],
+              "ti": [
+                1.333,
+                -5.667,
+                0
+              ]
+            },
+            {
+              "t": 367,
+              "s": [
+                555.5,
+                506,
+                0
+              ]
+            }
+          ],
+          "ix": 2
+        },
+        "a": {
+          "a": 0,
+          "k": [
+            50,
+            50,
+            0
+          ],
+          "ix": 1
+        },
+        "s": {
+          "a": 1,
+          "k": [
+            {
+              "i": {
+                "x": [
+                  0.197,
+                  0.197,
+                  0.197
+                ],
+                "y": [
+                  1,
+                  1,
+                  1
+                ]
+              },
+              "o": {
+                "x": [
+                  0.803,
+                  0.803,
+                  0.803
+                ],
+                "y": [
+                  0,
+                  0,
+                  0
+                ]
+              },
+              "t": 18,
+              "s": [
+                0,
+                0,
+                100
+              ]
+            },
+            {
+              "i": {
+                "x": [
+                  0.197,
+                  0.197,
+                  0.197
+                ],
+                "y": [
+                  1,
+                  1,
+                  1
+                ]
+              },
+              "o": {
+                "x": [
+                  0.803,
+                  0.803,
+                  0.803
+                ],
+                "y": [
+                  0,
+                  0,
+                  0
+                ]
+              },
+              "t": 166,
+              "s": [
+                100,
+                100,
+                100
+              ]
+            },
+            {
+              "i": {
+                "x": [
+                  0.197,
+                  0.197,
+                  0.197
+                ],
+                "y": [
+                  1,
+                  1,
+                  1
+                ]
+              },
+              "o": {
+                "x": [
+                  0.803,
+                  0.803,
+                  0.803
+                ],
+                "y": [
+                  0,
+                  0,
+                  0
+                ]
+              },
+              "t": 190,
+              "s": [
+                100,
+                100,
+                100
+              ]
+            },
+            {
+              "i": {
+                "x": [
+                  0.197,
+                  0.197,
+                  0.197
+                ],
+                "y": [
+                  1,
+                  1,
+                  1
+                ]
+              },
+              "o": {
+                "x": [
+                  0.803,
+                  0.803,
+                  0.803
+                ],
+                "y": [
+                  0,
+                  0,
+                  0
+                ]
+              },
+              "t": 219,
+              "s": [
+                250,
+                250,
+                100
+              ]
+            },
+            {
+              "t": 259,
+              "s": [
+                0,
+                0,
+                100
+              ]
+            }
+          ],
+          "ix": 6,
+          "x": "var $bm_rt;\nvar enable, amp, freq, decay, n, t, v;\ntry {\n    $bm_rt = enable = effect('Excite - Scale')('Pseudo/BNCA2506f0b33-0001');\n    if (enable == 0) {\n        $bm_rt = value;\n    } else {\n        amp = $bm_div(effect('Excite - Scale')('Pseudo/BNCA2506f0b33-0003'), 2.5);\n        freq = $bm_div(effect('Excite - Scale')('Pseudo/BNCA2506f0b33-0004'), 20);\n        decay = $bm_div(effect('Excite - Scale')('Pseudo/BNCA2506f0b33-0005'), 20);\n        n = 0, 0 < numKeys && (n = nearestKey(time).index, key(n).time > time && n--), t = 0 === n ? 0 : $bm_sub(time, key(n).time), $bm_rt = 0 < n ? (v = velocityAtTime($bm_sub(key(n).time, $bm_div(thisComp.frameDuration, 10))), $bm_sum(value, $bm_div($bm_mul($bm_mul($bm_div(v, 100), amp), Math.sin($bm_mul($bm_mul($bm_mul(freq, t), 2), Math.PI))), Math.exp($bm_mul(decay, t))))) : value;\n    }\n} catch (err) {\n    $bm_rt = value = value;\n}"
+        }
+      },
+      "ao": 0,
+      "ef": [
+        {
+          "ty": 5,
+          "nm": "Excite - Rotation",
+          "np": 8,
+          "mn": "Pseudo/BNCA2506f0b33",
+          "ix": 1,
+          "en": 1,
+          "ef": [
+            {
+              "ty": 7,
+              "nm": "Enable",
+              "mn": "Pseudo/BNCA2506f0b33-0001",
+              "ix": 1,
+              "v": {
+                "a": 0,
+                "k": 1,
+                "ix": 1
+              }
+            },
+            {
+              "ty": 6,
+              "nm": "Properties",
+              "mn": "Pseudo/BNCA2506f0b33-0002",
+              "ix": 2,
+              "v": 0
+            },
+            {
+              "ty": 0,
+              "nm": "Overshoot",
+              "mn": "Pseudo/BNCA2506f0b33-0003",
+              "ix": 3,
+              "v": {
+                "a": 0,
+                "k": 8,
+                "ix": 3,
+                "x": "var $bm_rt;\n$bm_rt = clamp(value, 0, 100);"
+              }
+            },
+            {
+              "ty": 0,
+              "nm": "Bounce",
+              "mn": "Pseudo/BNCA2506f0b33-0004",
+              "ix": 4,
+              "v": {
+                "a": 0,
+                "k": 20,
+                "ix": 4,
+                "x": "var $bm_rt;\n$bm_rt = clamp(value, 0, 100);"
+              }
+            },
+            {
+              "ty": 0,
+              "nm": "Friction",
+              "mn": "Pseudo/BNCA2506f0b33-0005",
+              "ix": 5,
+              "v": {
+                "a": 0,
+                "k": 20,
+                "ix": 5,
+                "x": "var $bm_rt;\n$bm_rt = clamp(value, 0, 100);"
+              }
+            },
+            {
+              "ty": 6,
+              "nm": "",
+              "mn": "Pseudo/BNCA2506f0b33-0006",
+              "ix": 6,
+              "v": 0
+            }
+          ]
+        },
+        {
+          "ty": 5,
+          "nm": "Excite - Scale",
+          "np": 8,
+          "mn": "Pseudo/BNCA2506f0b33",
+          "ix": 2,
+          "en": 1,
+          "ef": [
+            {
+              "ty": 7,
+              "nm": "Enable",
+              "mn": "Pseudo/BNCA2506f0b33-0001",
+              "ix": 1,
+              "v": {
+                "a": 0,
+                "k": 1,
+                "ix": 1
+              }
+            },
+            {
+              "ty": 6,
+              "nm": "Properties",
+              "mn": "Pseudo/BNCA2506f0b33-0002",
+              "ix": 2,
+              "v": 0
+            },
+            {
+              "ty": 0,
+              "nm": "Overshoot",
+              "mn": "Pseudo/BNCA2506f0b33-0003",
+              "ix": 3,
+              "v": {
+                "a": 0,
+                "k": 20,
+                "ix": 3,
+                "x": "var $bm_rt;\n$bm_rt = clamp(value, 0, 100);"
+              }
+            },
+            {
+              "ty": 0,
+              "nm": "Bounce",
+              "mn": "Pseudo/BNCA2506f0b33-0004",
+              "ix": 4,
+              "v": {
+                "a": 0,
+                "k": 40,
+                "ix": 4,
+                "x": "var $bm_rt;\n$bm_rt = clamp(value, 0, 100);"
+              }
+            },
+            {
+              "ty": 0,
+              "nm": "Friction",
+              "mn": "Pseudo/BNCA2506f0b33-0005",
+              "ix": 5,
+              "v": {
+                "a": 0,
+                "k": 40,
+                "ix": 5,
+                "x": "var $bm_rt;\n$bm_rt = clamp(value, 0, 100);"
+              }
+            },
+            {
+              "ty": 6,
+              "nm": "",
+              "mn": "Pseudo/BNCA2506f0b33-0006",
+              "ix": 6,
+              "v": 0
+            }
+          ]
+        }
+      ],
+      "ip": 47,
+      "op": 3647,
+      "st": 47,
+      "bm": 0
+    },
+    {
+      "ddd": 0,
+      "ind": 2,
+      "ty": 2,
+      "nm": "wave.png",
+      "cl": "png",
+      "parent": 3,
+      "refId": "image_3",
+      "sr": 1,
+      "ks": {
+        "o": {
+          "a": 0,
+          "k": 100,
+          "ix": 11
+        },
+        "r": {
+          "a": 0,
+          "k": 0,
+          "ix": 10
+        },
+        "p": {
+          "a": 0,
+          "k": [
+            -2.74,
+            32.14,
+            0
+          ],
+          "ix": 2
+        },
+        "a": {
+          "a": 0,
+          "k": [
+            70,
+            136,
+            0
+          ],
+          "ix": 1
+        },
+        "s": {
+          "a": 0,
+          "k": [
+            50,
+            50,
+            100
+          ],
+          "ix": 6
+        }
+      },
+      "ao": 0,
+      "ip": 47,
+      "op": 3647,
+      "st": 47,
+      "bm": 0
+    },
+    {
+      "ddd": 0,
+      "ind": 3,
+      "ty": 4,
+      "nm": "finger",
+      "parent": 1,
+      "sr": 1,
+      "ks": {
+        "o": {
+          "a": 0,
+          "k": 100,
+          "ix": 11
+        },
+        "r": {
+          "a": 0,
+          "k": 0,
+          "ix": 10
+        },
+        "p": {
+          "a": 0,
+          "k": [
+            49.74,
+            49.86,
+            0
+          ],
+          "ix": 2
+        },
+        "a": {
+          "a": 0,
+          "k": [
+            0,
+            0,
+            0
+          ],
+          "ix": 1
+        },
+        "s": {
+          "a": 0,
+          "k": [
+            100,
+            100,
+            100
+          ],
+          "ix": 6
+        }
+      },
+      "ao": 0,
+      "ef": [
+        {
+          "ty": 25,
+          "nm": "Drop Shadow",
+          "np": 8,
+          "mn": "ADBE Drop Shadow",
+          "ix": 1,
+          "en": 1,
+          "ef": [
+            {
+              "ty": 2,
+              "nm": "Shadow Color",
+              "mn": "ADBE Drop Shadow-0001",
+              "ix": 1,
+              "v": {
+                "a": 0,
+                "k": [
+                  0,
+                  0,
+                  0,
+                  0.031305000186
+                ],
+                "ix": 1
+              }
+            },
+            {
+              "ty": 0,
+              "nm": "Opacity",
+              "mn": "ADBE Drop Shadow-0002",
+              "ix": 2,
+              "v": {
+                "a": 0,
+                "k": 7.983,
+                "ix": 2
+              }
+            },
+            {
+              "ty": 0,
+              "nm": "Direction",
+              "mn": "ADBE Drop Shadow-0003",
+              "ix": 3,
+              "v": {
+                "a": 0,
+                "k": 180,
+                "ix": 3
+              }
+            },
+            {
+              "ty": 0,
+              "nm": "Distance",
+              "mn": "ADBE Drop Shadow-0004",
+              "ix": 4,
+              "v": {
+                "a": 0,
+                "k": 45,
+                "ix": 4
+              }
+            },
+            {
+              "ty": 0,
+              "nm": "Softness",
+              "mn": "ADBE Drop Shadow-0005",
+              "ix": 5,
+              "v": {
+                "a": 0,
+                "k": 223,
+                "ix": 5
+              }
+            },
+            {
+              "ty": 7,
+              "nm": "Shadow Only",
+              "mn": "ADBE Drop Shadow-0006",
+              "ix": 6,
+              "v": {
+                "a": 0,
+                "k": 0,
+                "ix": 6
+              }
+            }
+          ]
+        },
+        {
+          "ty": 25,
+          "nm": "Drop Shadow 2",
+          "np": 8,
+          "mn": "ADBE Drop Shadow",
+          "ix": 2,
+          "en": 1,
+          "ef": [
+            {
+              "ty": 2,
+              "nm": "Shadow Color",
+              "mn": "ADBE Drop Shadow-0001",
+              "ix": 1,
+              "v": {
+                "a": 0,
+                "k": [
+                  0.716955006123,
+                  0.819083988667,
+                  0.988235294819,
+                  1
+                ],
+                "ix": 1
+              }
+            },
+            {
+              "ty": 0,
+              "nm": "Opacity",
+              "mn": "ADBE Drop Shadow-0002",
+              "ix": 2,
+              "v": {
+                "a": 0,
+                "k": 127.5,
+                "ix": 2
+              }
+            },
+            {
+              "ty": 0,
+              "nm": "Direction",
+              "mn": "ADBE Drop Shadow-0003",
+              "ix": 3,
+              "v": {
+                "a": 0,
+                "k": 135,
+                "ix": 3
+              }
+            },
+            {
+              "ty": 0,
+              "nm": "Distance",
+              "mn": "ADBE Drop Shadow-0004",
+              "ix": 4,
+              "v": {
+                "a": 0,
+                "k": 0,
+                "ix": 4
+              }
+            },
+            {
+              "ty": 0,
+              "nm": "Softness",
+              "mn": "ADBE Drop Shadow-0005",
+              "ix": 5,
+              "v": {
+                "a": 0,
+                "k": 515,
+                "ix": 5
+              }
+            },
+            {
+              "ty": 7,
+              "nm": "Shadow Only",
+              "mn": "ADBE Drop Shadow-0006",
+              "ix": 6,
+              "v": {
+                "a": 0,
+                "k": 0,
+                "ix": 6
+              }
+            }
+          ]
+        }
+      ],
+      "shapes": [
+        {
+          "ty": "gr",
+          "it": [
+            {
+              "d": 1,
+              "ty": "el",
+              "s": {
+                "a": 0,
+                "k": [
+                  57.46,
+                  57.46
+                ],
+                "ix": 2
+              },
+              "p": {
+                "a": 0,
+                "k": [
+                  0,
+                  0
+                ],
+                "ix": 3
+              },
+              "nm": "Ellipse Path 1",
+              "mn": "ADBE Vector Shape - Ellipse",
+              "hd": false
+            },
+            {
+              "ty": "fl",
+              "c": {
+                "a": 0,
+                "k": [
+                  1,
+                  1,
+                  1,
+                  1
+                ],
+                "ix": 4
+              },
+              "o": {
+                "a": 0,
+                "k": 100,
+                "ix": 5
+              },
+              "r": 1,
+              "bm": 0,
+              "nm": "Fill 1",
+              "mn": "ADBE Vector Graphic - Fill",
+              "hd": false
+            },
+            {
+              "ty": "tr",
+              "p": {
+                "a": 0,
+                "k": [
+                  0,
+                  0
+                ],
+                "ix": 2
+              },
+              "a": {
+                "a": 0,
+                "k": [
+                  0,
+                  0
+                ],
+                "ix": 1
+              },
+              "s": {
+                "a": 0,
+                "k": [
+                  200,
+                  200
+                ],
+                "ix": 3
+              },
+              "r": {
+                "a": 0,
+                "k": 0,
+                "ix": 6
+              },
+              "o": {
+                "a": 0,
+                "k": 100,
+                "ix": 7
+              },
+              "sk": {
+                "a": 0,
+                "k": 0,
+                "ix": 4
+              },
+              "sa": {
+                "a": 0,
+                "k": 0,
+                "ix": 5
+              },
+              "nm": "Transform"
+            }
+          ],
+          "nm": "Oval Copy 4",
+          "np": 2,
+          "cix": 2,
+          "bm": 0,
+          "ix": 1,
+          "mn": "ADBE Vector Group",
+          "hd": false
+        }
+      ],
+      "ip": 47,
+      "op": 3647,
+      "st": 47,
+      "bm": 0
+    },
+    {
+      "ddd": 0,
+      "ind": 4,
+      "ty": 2,
+      "nm": "pumpkin.png",
+      "cl": "png",
+      "parent": 5,
+      "refId": "image_1",
+      "sr": 1,
+      "ks": {
+        "o": {
+          "a": 0,
+          "k": 100,
+          "ix": 11
+        },
+        "r": {
+          "a": 0,
+          "k": 0,
+          "ix": 10
+        },
+        "p": {
+          "a": 0,
+          "k": [
+            -0.06,
+            -5.46,
+            0
+          ],
+          "ix": 2
+        },
+        "a": {
+          "a": 0,
+          "k": [
+            70,
+            70,
+            0
+          ],
+          "ix": 1
+        },
+        "s": {
+          "a": 0,
+          "k": [
+            50,
+            50,
+            100
+          ],
+          "ix": 6
+        }
+      },
+      "ao": 0,
+      "ip": 50,
+      "op": 3650,
+      "st": 50,
+      "bm": 0
+    },
+    {
+      "ddd": 0,
+      "ind": 5,
+      "ty": 4,
+      "nm": "pumpkin",
+      "parent": 1,
+      "sr": 1,
+      "ks": {
+        "o": {
+          "a": 0,
+          "k": 100,
+          "ix": 11
+        },
+        "r": {
+          "a": 0,
+          "k": 0,
+          "ix": 10
+        },
+        "p": {
+          "a": 1,
+          "k": [
+            {
+              "i": {
+                "x": 0.833,
+                "y": 0.833
+              },
+              "o": {
+                "x": 1,
+                "y": 0
+              },
+              "t": 50,
+              "s": [
+                52.427,
+                50.727,
+                0
+              ],
+              "to": [
+                -14.228,
+                -23.544,
+                0
+              ],
+              "ti": [
+                14.228,
+                23.544,
+                0
+              ]
+            },
+            {
+              "i": {
+                "x": 0.291,
+                "y": 0.291
+              },
+              "o": {
+                "x": 0.167,
+                "y": 0.167
+              },
+              "t": 127,
+              "s": [
+                -32.94,
+                -90.54,
+                0
+              ],
+              "to": [
+                0,
+                0,
+                0
+              ],
+              "ti": [
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "i": {
+                "x": 0.291,
+                "y": 1
+              },
+              "o": {
+                "x": 0.709,
+                "y": 0
+              },
+              "t": 190,
+              "s": [
+                -32.94,
+                -90.54,
+                0
+              ],
+              "to": [
+                13.61,
+                23.361,
+                0
+              ],
+              "ti": [
+                -13.61,
+                -23.361,
+                0
+              ]
+            },
+            {
+              "t": 234,
+              "s": [
+                48.719,
+                49.625,
+                0
+              ]
+            }
+          ],
+          "ix": 2,
+          "x": "var $bm_rt;\nvar enable, amp, freq, decay, n, t, v;\ntry {\n    $bm_rt = enable = effect('Excite - Position')('Pseudo/BNCA2506f0b33-0001');\n    if (enable == 0) {\n        $bm_rt = value;\n    } else {\n        amp = $bm_div(effect('Excite - Position')('Pseudo/BNCA2506f0b33-0003'), 2.5);\n        freq = $bm_div(effect('Excite - Position')('Pseudo/BNCA2506f0b33-0004'), 20);\n        decay = $bm_div(effect('Excite - Position')('Pseudo/BNCA2506f0b33-0005'), 20);\n        n = 0, 0 < numKeys && (n = nearestKey(time).index, key(n).time > time && n--), t = 0 === n ? 0 : $bm_sub(time, key(n).time), $bm_rt = 0 < n ? (v = velocityAtTime($bm_sub(key(n).time, $bm_div(thisComp.frameDuration, 10))), $bm_sum(value, $bm_div($bm_mul($bm_mul($bm_div(v, 100), amp), Math.sin($bm_mul($bm_mul($bm_mul(freq, t), 2), Math.PI))), Math.exp($bm_mul(decay, t))))) : value;\n    }\n} catch (err) {\n    $bm_rt = value = value;\n}"
+        },
+        "a": {
+          "a": 0,
+          "k": [
+            0,
+            0,
+            0
+          ],
+          "ix": 1
+        },
+        "s": {
+          "a": 1,
+          "k": [
+            {
+              "i": {
+                "x": [
+                  0.2,
+                  0.2,
+                  0.2
+                ],
+                "y": [
+                  1,
+                  1,
+                  1
+                ]
+              },
+              "o": {
+                "x": [
+                  0.8,
+                  0.8,
+                  0.8
+                ],
+                "y": [
+                  0,
+                  0,
+                  0
+                ]
+              },
+              "t": 190,
+              "s": [
+                100,
+                100,
+                100
+              ]
+            },
+            {
+              "t": 234,
+              "s": [
+                70,
+                70,
+                100
+              ]
+            }
+          ],
+          "ix": 6
+        }
+      },
+      "ao": 0,
+      "ef": [
+        {
+          "ty": 25,
+          "nm": "Drop Shadow",
+          "np": 8,
+          "mn": "ADBE Drop Shadow",
+          "ix": 1,
+          "en": 1,
+          "ef": [
+            {
+              "ty": 2,
+              "nm": "Shadow Color",
+              "mn": "ADBE Drop Shadow-0001",
+              "ix": 1,
+              "v": {
+                "a": 0,
+                "k": [
+                  0,
+                  0,
+                  0,
+                  0.031305000186
+                ],
+                "ix": 1
+              }
+            },
+            {
+              "ty": 0,
+              "nm": "Opacity",
+              "mn": "ADBE Drop Shadow-0002",
+              "ix": 2,
+              "v": {
+                "a": 0,
+                "k": 7.983,
+                "ix": 2
+              }
+            },
+            {
+              "ty": 0,
+              "nm": "Direction",
+              "mn": "ADBE Drop Shadow-0003",
+              "ix": 3,
+              "v": {
+                "a": 0,
+                "k": 180,
+                "ix": 3
+              }
+            },
+            {
+              "ty": 0,
+              "nm": "Distance",
+              "mn": "ADBE Drop Shadow-0004",
+              "ix": 4,
+              "v": {
+                "a": 0,
+                "k": 0,
+                "ix": 4
+              }
+            },
+            {
+              "ty": 0,
+              "nm": "Softness",
+              "mn": "ADBE Drop Shadow-0005",
+              "ix": 5,
+              "v": {
+                "a": 0,
+                "k": 26,
+                "ix": 5
+              }
+            },
+            {
+              "ty": 7,
+              "nm": "Shadow Only",
+              "mn": "ADBE Drop Shadow-0006",
+              "ix": 6,
+              "v": {
+                "a": 0,
+                "k": 0,
+                "ix": 6
+              }
+            }
+          ]
+        },
+        {
+          "ty": 5,
+          "nm": "Excite - Position",
+          "np": 8,
+          "mn": "Pseudo/BNCA2506f0b33",
+          "ix": 2,
+          "en": 1,
+          "ef": [
+            {
+              "ty": 7,
+              "nm": "Enable",
+              "mn": "Pseudo/BNCA2506f0b33-0001",
+              "ix": 1,
+              "v": {
+                "a": 0,
+                "k": 1,
+                "ix": 1
+              }
+            },
+            {
+              "ty": 6,
+              "nm": "Properties",
+              "mn": "Pseudo/BNCA2506f0b33-0002",
+              "ix": 2,
+              "v": 0
+            },
+            {
+              "ty": 0,
+              "nm": "Overshoot",
+              "mn": "Pseudo/BNCA2506f0b33-0003",
+              "ix": 3,
+              "v": {
+                "a": 0,
+                "k": 8,
+                "ix": 3,
+                "x": "var $bm_rt;\n$bm_rt = clamp(value, 0, 100);"
+              }
+            },
+            {
+              "ty": 0,
+              "nm": "Bounce",
+              "mn": "Pseudo/BNCA2506f0b33-0004",
+              "ix": 4,
+              "v": {
+                "a": 0,
+                "k": 10,
+                "ix": 4,
+                "x": "var $bm_rt;\n$bm_rt = clamp(value, 0, 100);"
+              }
+            },
+            {
+              "ty": 0,
+              "nm": "Friction",
+              "mn": "Pseudo/BNCA2506f0b33-0005",
+              "ix": 5,
+              "v": {
+                "a": 0,
+                "k": 10,
+                "ix": 5,
+                "x": "var $bm_rt;\n$bm_rt = clamp(value, 0, 100);"
+              }
+            },
+            {
+              "ty": 6,
+              "nm": "",
+              "mn": "Pseudo/BNCA2506f0b33-0006",
+              "ix": 6,
+              "v": 0
+            }
+          ]
+        }
+      ],
+      "shapes": [
+        {
+          "ty": "gr",
+          "it": [
+            {
+              "d": 1,
+              "ty": "el",
+              "s": {
+                "a": 0,
+                "k": [
+                  57.46,
+                  57.46
+                ],
+                "ix": 2
+              },
+              "p": {
+                "a": 0,
+                "k": [
+                  0,
+                  0
+                ],
+                "ix": 3
+              },
+              "nm": "Ellipse Path 1",
+              "mn": "ADBE Vector Shape - Ellipse",
+              "hd": false
+            },
+            {
+              "ty": "fl",
+              "c": {
+                "a": 0,
+                "k": [
+                  1,
+                  1,
+                  1,
+                  1
+                ],
+                "ix": 4
+              },
+              "o": {
+                "a": 0,
+                "k": 100,
+                "ix": 5
+              },
+              "r": 1,
+              "bm": 0,
+              "nm": "Fill 1",
+              "mn": "ADBE Vector Graphic - Fill",
+              "hd": false
+            },
+            {
+              "ty": "tr",
+              "p": {
+                "a": 0,
+                "k": [
+                  0,
+                  0
+                ],
+                "ix": 2
+              },
+              "a": {
+                "a": 0,
+                "k": [
+                  0,
+                  0
+                ],
+                "ix": 1
+              },
+              "s": {
+                "a": 0,
+                "k": [
+                  200,
+                  200
+                ],
+                "ix": 3
+              },
+              "r": {
+                "a": 0,
+                "k": 0,
+                "ix": 6
+              },
+              "o": {
+                "a": 0,
+                "k": 100,
+                "ix": 7
+              },
+              "sk": {
+                "a": 0,
+                "k": 0,
+                "ix": 4
+              },
+              "sa": {
+                "a": 0,
+                "k": 0,
+                "ix": 5
+              },
+              "nm": "Transform"
+            }
+          ],
+          "nm": "Oval Copy 8",
+          "np": 2,
+          "cix": 2,
+          "bm": 0,
+          "ix": 1,
+          "mn": "ADBE Vector Group",
+          "hd": false
+        }
+      ],
+      "ip": 50,
+      "op": 3650,
+      "st": 50,
+      "bm": 0
+    },
+    {
+      "ddd": 0,
+      "ind": 6,
+      "ty": 2,
+      "nm": "cake.png",
+      "cl": "png",
+      "parent": 7,
+      "refId": "image_2",
+      "sr": 1,
+      "ks": {
+        "o": {
+          "a": 0,
+          "k": 100,
+          "ix": 11
+        },
+        "r": {
+          "a": 0,
+          "k": 0,
+          "ix": 10
+        },
+        "p": {
+          "a": 0,
+          "k": [
+            -0.26,
+            -3.46,
+            0
+          ],
+          "ix": 2
+        },
+        "a": {
+          "a": 0,
+          "k": [
+            66,
+            70,
+            0
+          ],
+          "ix": 1
+        },
+        "s": {
+          "a": 0,
+          "k": [
+            50,
+            50,
+            100
+          ],
+          "ix": 6
+        }
+      },
+      "ao": 0,
+      "ip": 53,
+      "op": 3653,
+      "st": 53,
+      "bm": 0
+    },
+    {
+      "ddd": 0,
+      "ind": 7,
+      "ty": 4,
+      "nm": "cake",
+      "parent": 1,
+      "sr": 1,
+      "ks": {
+        "o": {
+          "a": 0,
+          "k": 100,
+          "ix": 11
+        },
+        "r": {
+          "a": 0,
+          "k": 0,
+          "ix": 10
+        },
+        "p": {
+          "a": 1,
+          "k": [
+            {
+              "i": {
+                "x": 0.833,
+                "y": 0.833
+              },
+              "o": {
+                "x": 1,
+                "y": 0
+              },
+              "t": 53,
+              "s": [
+                52.427,
+                50.727,
+                0
+              ],
+              "to": [
+                14.806,
+                -23.544,
+                0
+              ],
+              "ti": [
+                -14.806,
+                23.544,
+                0
+              ]
+            },
+            {
+              "i": {
+                "x": 0.291,
+                "y": 0.291
+              },
+              "o": {
+                "x": 0.167,
+                "y": 0.167
+              },
+              "t": 130,
+              "s": [
+                141.26,
+                -90.54,
+                0
+              ],
+              "to": [
+                0,
+                0,
+                0
+              ],
+              "ti": [
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "i": {
+                "x": 0.291,
+                "y": 1
+              },
+              "o": {
+                "x": 0.709,
+                "y": 0
+              },
+              "t": 192,
+              "s": [
+                141.26,
+                -90.54,
+                0
+              ],
+              "to": [
+                -15.361,
+                23.433,
+                0
+              ],
+              "ti": [
+                15.361,
+                -23.433,
+                0
+              ]
+            },
+            {
+              "t": 236,
+              "s": [
+                49.092,
+                50.059,
+                0
+              ]
+            }
+          ],
+          "ix": 2,
+          "x": "var $bm_rt;\nvar enable, amp, freq, decay, n, t, v;\ntry {\n    $bm_rt = enable = effect('Excite - Position')('Pseudo/BNCA2506f0b33-0001');\n    if (enable == 0) {\n        $bm_rt = value;\n    } else {\n        amp = $bm_div(effect('Excite - Position')('Pseudo/BNCA2506f0b33-0003'), 2.5);\n        freq = $bm_div(effect('Excite - Position')('Pseudo/BNCA2506f0b33-0004'), 20);\n        decay = $bm_div(effect('Excite - Position')('Pseudo/BNCA2506f0b33-0005'), 20);\n        n = 0, 0 < numKeys && (n = nearestKey(time).index, key(n).time > time && n--), t = 0 === n ? 0 : $bm_sub(time, key(n).time), $bm_rt = 0 < n ? (v = velocityAtTime($bm_sub(key(n).time, $bm_div(thisComp.frameDuration, 10))), $bm_sum(value, $bm_div($bm_mul($bm_mul($bm_div(v, 100), amp), Math.sin($bm_mul($bm_mul($bm_mul(freq, t), 2), Math.PI))), Math.exp($bm_mul(decay, t))))) : value;\n    }\n} catch (err) {\n    $bm_rt = value = value;\n}"
+        },
+        "a": {
+          "a": 0,
+          "k": [
+            0,
+            0,
+            0
+          ],
+          "ix": 1
+        },
+        "s": {
+          "a": 1,
+          "k": [
+            {
+              "i": {
+                "x": [
+                  0.2,
+                  0.2,
+                  0.2
+                ],
+                "y": [
+                  1,
+                  1,
+                  1
+                ]
+              },
+              "o": {
+                "x": [
+                  0.8,
+                  0.8,
+                  0.8
+                ],
+                "y": [
+                  0,
+                  0,
+                  0
+                ]
+              },
+              "t": 190,
+              "s": [
+                100,
+                100,
+                100
+              ]
+            },
+            {
+              "t": 234,
+              "s": [
+                70,
+                70,
+                100
+              ]
+            }
+          ],
+          "ix": 6
+        }
+      },
+      "ao": 0,
+      "ef": [
+        {
+          "ty": 25,
+          "nm": "Drop Shadow",
+          "np": 8,
+          "mn": "ADBE Drop Shadow",
+          "ix": 1,
+          "en": 1,
+          "ef": [
+            {
+              "ty": 2,
+              "nm": "Shadow Color",
+              "mn": "ADBE Drop Shadow-0001",
+              "ix": 1,
+              "v": {
+                "a": 0,
+                "k": [
+                  0,
+                  0,
+                  0,
+                  0.031305000186
+                ],
+                "ix": 1
+              }
+            },
+            {
+              "ty": 0,
+              "nm": "Opacity",
+              "mn": "ADBE Drop Shadow-0002",
+              "ix": 2,
+              "v": {
+                "a": 0,
+                "k": 7.983,
+                "ix": 2
+              }
+            },
+            {
+              "ty": 0,
+              "nm": "Direction",
+              "mn": "ADBE Drop Shadow-0003",
+              "ix": 3,
+              "v": {
+                "a": 0,
+                "k": 180,
+                "ix": 3
+              }
+            },
+            {
+              "ty": 0,
+              "nm": "Distance",
+              "mn": "ADBE Drop Shadow-0004",
+              "ix": 4,
+              "v": {
+                "a": 0,
+                "k": 0,
+                "ix": 4
+              }
+            },
+            {
+              "ty": 0,
+              "nm": "Softness",
+              "mn": "ADBE Drop Shadow-0005",
+              "ix": 5,
+              "v": {
+                "a": 0,
+                "k": 26,
+                "ix": 5
+              }
+            },
+            {
+              "ty": 7,
+              "nm": "Shadow Only",
+              "mn": "ADBE Drop Shadow-0006",
+              "ix": 6,
+              "v": {
+                "a": 0,
+                "k": 0,
+                "ix": 6
+              }
+            }
+          ]
+        },
+        {
+          "ty": 5,
+          "nm": "Excite - Position",
+          "np": 8,
+          "mn": "Pseudo/BNCA2506f0b33",
+          "ix": 2,
+          "en": 1,
+          "ef": [
+            {
+              "ty": 7,
+              "nm": "Enable",
+              "mn": "Pseudo/BNCA2506f0b33-0001",
+              "ix": 1,
+              "v": {
+                "a": 0,
+                "k": 1,
+                "ix": 1
+              }
+            },
+            {
+              "ty": 6,
+              "nm": "Properties",
+              "mn": "Pseudo/BNCA2506f0b33-0002",
+              "ix": 2,
+              "v": 0
+            },
+            {
+              "ty": 0,
+              "nm": "Overshoot",
+              "mn": "Pseudo/BNCA2506f0b33-0003",
+              "ix": 3,
+              "v": {
+                "a": 0,
+                "k": 20,
+                "ix": 3,
+                "x": "var $bm_rt;\n$bm_rt = clamp(value, 0, 100);"
+              }
+            },
+            {
+              "ty": 0,
+              "nm": "Bounce",
+              "mn": "Pseudo/BNCA2506f0b33-0004",
+              "ix": 4,
+              "v": {
+                "a": 0,
+                "k": 40,
+                "ix": 4,
+                "x": "var $bm_rt;\n$bm_rt = clamp(value, 0, 100);"
+              }
+            },
+            {
+              "ty": 0,
+              "nm": "Friction",
+              "mn": "Pseudo/BNCA2506f0b33-0005",
+              "ix": 5,
+              "v": {
+                "a": 0,
+                "k": 40,
+                "ix": 5,
+                "x": "var $bm_rt;\n$bm_rt = clamp(value, 0, 100);"
+              }
+            },
+            {
+              "ty": 6,
+              "nm": "",
+              "mn": "Pseudo/BNCA2506f0b33-0006",
+              "ix": 6,
+              "v": 0
+            }
+          ]
+        }
+      ],
+      "shapes": [
+        {
+          "ty": "gr",
+          "it": [
+            {
+              "d": 1,
+              "ty": "el",
+              "s": {
+                "a": 0,
+                "k": [
+                  57.46,
+                  57.46
+                ],
+                "ix": 2
+              },
+              "p": {
+                "a": 0,
+                "k": [
+                  0,
+                  0
+                ],
+                "ix": 3
+              },
+              "nm": "Ellipse Path 1",
+              "mn": "ADBE Vector Shape - Ellipse",
+              "hd": false
+            },
+            {
+              "ty": "fl",
+              "c": {
+                "a": 0,
+                "k": [
+                  1,
+                  1,
+                  1,
+                  1
+                ],
+                "ix": 4
+              },
+              "o": {
+                "a": 0,
+                "k": 100,
+                "ix": 5
+              },
+              "r": 1,
+              "bm": 0,
+              "nm": "Fill 1",
+              "mn": "ADBE Vector Graphic - Fill",
+              "hd": false
+            },
+            {
+              "ty": "tr",
+              "p": {
+                "a": 0,
+                "k": [
+                  0,
+                  0
+                ],
+                "ix": 2
+              },
+              "a": {
+                "a": 0,
+                "k": [
+                  0,
+                  0
+                ],
+                "ix": 1
+              },
+              "s": {
+                "a": 0,
+                "k": [
+                  200,
+                  200
+                ],
+                "ix": 3
+              },
+              "r": {
+                "a": 0,
+                "k": 0,
+                "ix": 6
+              },
+              "o": {
+                "a": 0,
+                "k": 100,
+                "ix": 7
+              },
+              "sk": {
+                "a": 0,
+                "k": 0,
+                "ix": 4
+              },
+              "sa": {
+                "a": 0,
+                "k": 0,
+                "ix": 5
+              },
+              "nm": "Transform"
+            }
+          ],
+          "nm": "Oval Copy 8",
+          "np": 2,
+          "cix": 2,
+          "bm": 0,
+          "ix": 1,
+          "mn": "ADBE Vector Group",
+          "hd": false
+        }
+      ],
+      "ip": 53,
+      "op": 3653,
+      "st": 53,
+      "bm": 0
+    },
+    {
+      "ddd": 0,
+      "ind": 8,
+      "ty": 2,
+      "nm": "nerd.png",
+      "cl": "png",
+      "parent": 9,
+      "refId": "image_0",
+      "sr": 1,
+      "ks": {
+        "o": {
+          "a": 0,
+          "k": 100,
+          "ix": 11
+        },
+        "r": {
+          "a": 0,
+          "k": 0,
+          "ix": 10
+        },
+        "p": {
+          "a": 0,
+          "k": [
+            -1.06,
+            0.14,
+            0
+          ],
+          "ix": 2
+        },
+        "a": {
+          "a": 0,
+          "k": [
+            70,
+            70,
+            0
+          ],
+          "ix": 1
+        },
+        "s": {
+          "a": 0,
+          "k": [
+            50,
+            50,
+            100
+          ],
+          "ix": 6
+        }
+      },
+      "ao": 0,
+      "ip": 56,
+      "op": 3656,
+      "st": 56,
+      "bm": 0
+    },
+    {
+      "ddd": 0,
+      "ind": 9,
+      "ty": 4,
+      "nm": "nerd",
+      "parent": 1,
+      "sr": 1,
+      "ks": {
+        "o": {
+          "a": 0,
+          "k": 100,
+          "ix": 11
+        },
+        "r": {
+          "a": 0,
+          "k": 0,
+          "ix": 10
+        },
+        "p": {
+          "a": 1,
+          "k": [
+            {
+              "i": {
+                "x": 0.833,
+                "y": 0.833
+              },
+              "o": {
+                "x": 1,
+                "y": 0
+              },
+              "t": 56,
+              "s": [
+                52.427,
+                50.727,
+                0
+              ],
+              "to": [
+                26.939,
+                -0.144,
+                0
+              ],
+              "ti": [
+                -26.939,
+                0.144,
+                0
+              ]
+            },
+            {
+              "i": {
+                "x": 0.291,
+                "y": 0.291
+              },
+              "o": {
+                "x": 0.167,
+                "y": 0.167
+              },
+              "t": 133,
+              "s": [
+                214.06,
+                49.86,
+                0
+              ],
+              "to": [
+                0,
+                0,
+                0
+              ],
+              "ti": [
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "i": {
+                "x": 0.291,
+                "y": 1
+              },
+              "o": {
+                "x": 0.709,
+                "y": 0
+              },
+              "t": 194,
+              "s": [
+                214.06,
+                49.86,
+                0
+              ],
+              "to": [
+                -27.498,
+                -0.012,
+                0
+              ],
+              "ti": [
+                27.498,
+                0.012,
+                0
+              ]
+            },
+            {
+              "t": 238,
+              "s": [
+                49.074,
+                49.788,
+                0
+              ]
+            }
+          ],
+          "ix": 2,
+          "x": "var $bm_rt;\nvar enable, amp, freq, decay, n, t, v;\ntry {\n    $bm_rt = enable = effect('Excite - Position')('Pseudo/BNCA2506f0b33-0001');\n    if (enable == 0) {\n        $bm_rt = value;\n    } else {\n        amp = $bm_div(effect('Excite - Position')('Pseudo/BNCA2506f0b33-0003'), 2.5);\n        freq = $bm_div(effect('Excite - Position')('Pseudo/BNCA2506f0b33-0004'), 20);\n        decay = $bm_div(effect('Excite - Position')('Pseudo/BNCA2506f0b33-0005'), 20);\n        n = 0, 0 < numKeys && (n = nearestKey(time).index, key(n).time > time && n--), t = 0 === n ? 0 : $bm_sub(time, key(n).time), $bm_rt = 0 < n ? (v = velocityAtTime($bm_sub(key(n).time, $bm_div(thisComp.frameDuration, 10))), $bm_sum(value, $bm_div($bm_mul($bm_mul($bm_div(v, 100), amp), Math.sin($bm_mul($bm_mul($bm_mul(freq, t), 2), Math.PI))), Math.exp($bm_mul(decay, t))))) : value;\n    }\n} catch (err) {\n    $bm_rt = value = value;\n}"
+        },
+        "a": {
+          "a": 0,
+          "k": [
+            0,
+            0,
+            0
+          ],
+          "ix": 1
+        },
+        "s": {
+          "a": 1,
+          "k": [
+            {
+              "i": {
+                "x": [
+                  0.2,
+                  0.2,
+                  0.2
+                ],
+                "y": [
+                  1,
+                  1,
+                  1
+                ]
+              },
+              "o": {
+                "x": [
+                  0.8,
+                  0.8,
+                  0.8
+                ],
+                "y": [
+                  0,
+                  0,
+                  0
+                ]
+              },
+              "t": 190,
+              "s": [
+                100,
+                100,
+                100
+              ]
+            },
+            {
+              "t": 234,
+              "s": [
+                70,
+                70,
+                100
+              ]
+            }
+          ],
+          "ix": 6
+        }
+      },
+      "ao": 0,
+      "ef": [
+        {
+          "ty": 25,
+          "nm": "Drop Shadow",
+          "np": 8,
+          "mn": "ADBE Drop Shadow",
+          "ix": 1,
+          "en": 1,
+          "ef": [
+            {
+              "ty": 2,
+              "nm": "Shadow Color",
+              "mn": "ADBE Drop Shadow-0001",
+              "ix": 1,
+              "v": {
+                "a": 0,
+                "k": [
+                  0,
+                  0,
+                  0,
+                  0.031305000186
+                ],
+                "ix": 1
+              }
+            },
+            {
+              "ty": 0,
+              "nm": "Opacity",
+              "mn": "ADBE Drop Shadow-0002",
+              "ix": 2,
+              "v": {
+                "a": 0,
+                "k": 7.983,
+                "ix": 2
+              }
+            },
+            {
+              "ty": 0,
+              "nm": "Direction",
+              "mn": "ADBE Drop Shadow-0003",
+              "ix": 3,
+              "v": {
+                "a": 0,
+                "k": 180,
+                "ix": 3
+              }
+            },
+            {
+              "ty": 0,
+              "nm": "Distance",
+              "mn": "ADBE Drop Shadow-0004",
+              "ix": 4,
+              "v": {
+                "a": 0,
+                "k": 0,
+                "ix": 4
+              }
+            },
+            {
+              "ty": 0,
+              "nm": "Softness",
+              "mn": "ADBE Drop Shadow-0005",
+              "ix": 5,
+              "v": {
+                "a": 0,
+                "k": 26,
+                "ix": 5
+              }
+            },
+            {
+              "ty": 7,
+              "nm": "Shadow Only",
+              "mn": "ADBE Drop Shadow-0006",
+              "ix": 6,
+              "v": {
+                "a": 0,
+                "k": 0,
+                "ix": 6
+              }
+            }
+          ]
+        },
+        {
+          "ty": 5,
+          "nm": "Excite - Position",
+          "np": 8,
+          "mn": "Pseudo/BNCA2506f0b33",
+          "ix": 2,
+          "en": 1,
+          "ef": [
+            {
+              "ty": 7,
+              "nm": "Enable",
+              "mn": "Pseudo/BNCA2506f0b33-0001",
+              "ix": 1,
+              "v": {
+                "a": 0,
+                "k": 1,
+                "ix": 1
+              }
+            },
+            {
+              "ty": 6,
+              "nm": "Properties",
+              "mn": "Pseudo/BNCA2506f0b33-0002",
+              "ix": 2,
+              "v": 0
+            },
+            {
+              "ty": 0,
+              "nm": "Overshoot",
+              "mn": "Pseudo/BNCA2506f0b33-0003",
+              "ix": 3,
+              "v": {
+                "a": 0,
+                "k": 20,
+                "ix": 3,
+                "x": "var $bm_rt;\n$bm_rt = clamp(value, 0, 100);"
+              }
+            },
+            {
+              "ty": 0,
+              "nm": "Bounce",
+              "mn": "Pseudo/BNCA2506f0b33-0004",
+              "ix": 4,
+              "v": {
+                "a": 0,
+                "k": 40,
+                "ix": 4,
+                "x": "var $bm_rt;\n$bm_rt = clamp(value, 0, 100);"
+              }
+            },
+            {
+              "ty": 0,
+              "nm": "Friction",
+              "mn": "Pseudo/BNCA2506f0b33-0005",
+              "ix": 5,
+              "v": {
+                "a": 0,
+                "k": 40,
+                "ix": 5,
+                "x": "var $bm_rt;\n$bm_rt = clamp(value, 0, 100);"
+              }
+            },
+            {
+              "ty": 6,
+              "nm": "",
+              "mn": "Pseudo/BNCA2506f0b33-0006",
+              "ix": 6,
+              "v": 0
+            }
+          ]
+        }
+      ],
+      "shapes": [
+        {
+          "ty": "gr",
+          "it": [
+            {
+              "d": 1,
+              "ty": "el",
+              "s": {
+                "a": 0,
+                "k": [
+                  57.46,
+                  57.46
+                ],
+                "ix": 2
+              },
+              "p": {
+                "a": 0,
+                "k": [
+                  0,
+                  0
+                ],
+                "ix": 3
+              },
+              "nm": "Ellipse Path 1",
+              "mn": "ADBE Vector Shape - Ellipse",
+              "hd": false
+            },
+            {
+              "ty": "fl",
+              "c": {
+                "a": 0,
+                "k": [
+                  1,
+                  1,
+                  1,
+                  1
+                ],
+                "ix": 4
+              },
+              "o": {
+                "a": 0,
+                "k": 100,
+                "ix": 5
+              },
+              "r": 1,
+              "bm": 0,
+              "nm": "Fill 1",
+              "mn": "ADBE Vector Graphic - Fill",
+              "hd": false
+            },
+            {
+              "ty": "tr",
+              "p": {
+                "a": 0,
+                "k": [
+                  0,
+                  0
+                ],
+                "ix": 2
+              },
+              "a": {
+                "a": 0,
+                "k": [
+                  0,
+                  0
+                ],
+                "ix": 1
+              },
+              "s": {
+                "a": 0,
+                "k": [
+                  200,
+                  200
+                ],
+                "ix": 3
+              },
+              "r": {
+                "a": 0,
+                "k": 0,
+                "ix": 6
+              },
+              "o": {
+                "a": 0,
+                "k": 100,
+                "ix": 7
+              },
+              "sk": {
+                "a": 0,
+                "k": 0,
+                "ix": 4
+              },
+              "sa": {
+                "a": 0,
+                "k": 0,
+                "ix": 5
+              },
+              "nm": "Transform"
+            }
+          ],
+          "nm": "Oval Copy 8",
+          "np": 2,
+          "cix": 2,
+          "bm": 0,
+          "ix": 1,
+          "mn": "ADBE Vector Group",
+          "hd": false
+        }
+      ],
+      "ip": 56,
+      "op": 3656,
+      "st": 56,
+      "bm": 0
+    },
+    {
+      "ddd": 0,
+      "ind": 10,
+      "ty": 2,
+      "nm": "love.png",
+      "cl": "png",
+      "parent": 11,
+      "refId": "image_4",
+      "sr": 1,
+      "ks": {
+        "o": {
+          "a": 0,
+          "k": 100,
+          "ix": 11
+        },
+        "r": {
+          "a": 0,
+          "k": 0,
+          "ix": 10
+        },
+        "p": {
+          "a": 0,
+          "k": [
+            -0.34,
+            -0.86,
+            0
+          ],
+          "ix": 2
+        },
+        "a": {
+          "a": 0,
+          "k": [
+            70,
+            70,
+            0
+          ],
+          "ix": 1
+        },
+        "s": {
+          "a": 0,
+          "k": [
+            -50,
+            50,
+            100
+          ],
+          "ix": 6
+        }
+      },
+      "ao": 0,
+      "ip": 59,
+      "op": 3659,
+      "st": 59,
+      "bm": 0
+    },
+    {
+      "ddd": 0,
+      "ind": 11,
+      "ty": 4,
+      "nm": "love",
+      "parent": 1,
+      "sr": 1,
+      "ks": {
+        "o": {
+          "a": 0,
+          "k": 100,
+          "ix": 11
+        },
+        "r": {
+          "a": 0,
+          "k": 0,
+          "ix": 10
+        },
+        "p": {
+          "a": 1,
+          "k": [
+            {
+              "i": {
+                "x": 0.833,
+                "y": 0.833
+              },
+              "o": {
+                "x": 1,
+                "y": 0
+              },
+              "t": 59,
+              "s": [
+                52.427,
+                50.727,
+                0
+              ],
+              "to": [
+                14.372,
+                23.689,
+                0
+              ],
+              "ti": [
+                -14.372,
+                -23.689,
+                0
+              ]
+            },
+            {
+              "i": {
+                "x": 0.291,
+                "y": 0.291
+              },
+              "o": {
+                "x": 0.167,
+                "y": 0.167
+              },
+              "t": 136,
+              "s": [
+                138.66,
+                192.86,
+                0
+              ],
+              "to": [
+                0,
+                0,
+                0
+              ],
+              "ti": [
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "i": {
+                "x": 0.291,
+                "y": 1
+              },
+              "o": {
+                "x": 0.709,
+                "y": 0
+              },
+              "t": 196,
+              "s": [
+                138.66,
+                192.86,
+                0
+              ],
+              "to": [
+                -15.04,
+                -23.802,
+                0
+              ],
+              "ti": [
+                15.04,
+                23.802,
+                0
+              ]
+            },
+            {
+              "t": 240,
+              "s": [
+                48.422,
+                50.049,
+                0
+              ]
+            }
+          ],
+          "ix": 2,
+          "x": "var $bm_rt;\nvar enable, amp, freq, decay, n, t, v;\ntry {\n    $bm_rt = enable = effect('Excite - Position')('Pseudo/BNCA2506f0b33-0001');\n    if (enable == 0) {\n        $bm_rt = value;\n    } else {\n        amp = $bm_div(effect('Excite - Position')('Pseudo/BNCA2506f0b33-0003'), 2.5);\n        freq = $bm_div(effect('Excite - Position')('Pseudo/BNCA2506f0b33-0004'), 20);\n        decay = $bm_div(effect('Excite - Position')('Pseudo/BNCA2506f0b33-0005'), 20);\n        n = 0, 0 < numKeys && (n = nearestKey(time).index, key(n).time > time && n--), t = 0 === n ? 0 : $bm_sub(time, key(n).time), $bm_rt = 0 < n ? (v = velocityAtTime($bm_sub(key(n).time, $bm_div(thisComp.frameDuration, 10))), $bm_sum(value, $bm_div($bm_mul($bm_mul($bm_div(v, 100), amp), Math.sin($bm_mul($bm_mul($bm_mul(freq, t), 2), Math.PI))), Math.exp($bm_mul(decay, t))))) : value;\n    }\n} catch (err) {\n    $bm_rt = value = value;\n}"
+        },
+        "a": {
+          "a": 0,
+          "k": [
+            0,
+            0,
+            0
+          ],
+          "ix": 1
+        },
+        "s": {
+          "a": 1,
+          "k": [
+            {
+              "i": {
+                "x": [
+                  0.2,
+                  0.2,
+                  0.2
+                ],
+                "y": [
+                  1,
+                  1,
+                  1
+                ]
+              },
+              "o": {
+                "x": [
+                  0.8,
+                  0.8,
+                  0.8
+                ],
+                "y": [
+                  0,
+                  0,
+                  0
+                ]
+              },
+              "t": 190,
+              "s": [
+                100,
+                100,
+                100
+              ]
+            },
+            {
+              "t": 234,
+              "s": [
+                70,
+                70,
+                100
+              ]
+            }
+          ],
+          "ix": 6
+        }
+      },
+      "ao": 0,
+      "ef": [
+        {
+          "ty": 25,
+          "nm": "Drop Shadow",
+          "np": 8,
+          "mn": "ADBE Drop Shadow",
+          "ix": 1,
+          "en": 1,
+          "ef": [
+            {
+              "ty": 2,
+              "nm": "Shadow Color",
+              "mn": "ADBE Drop Shadow-0001",
+              "ix": 1,
+              "v": {
+                "a": 0,
+                "k": [
+                  0,
+                  0,
+                  0,
+                  0.031305000186
+                ],
+                "ix": 1
+              }
+            },
+            {
+              "ty": 0,
+              "nm": "Opacity",
+              "mn": "ADBE Drop Shadow-0002",
+              "ix": 2,
+              "v": {
+                "a": 0,
+                "k": 7.983,
+                "ix": 2
+              }
+            },
+            {
+              "ty": 0,
+              "nm": "Direction",
+              "mn": "ADBE Drop Shadow-0003",
+              "ix": 3,
+              "v": {
+                "a": 0,
+                "k": 180,
+                "ix": 3
+              }
+            },
+            {
+              "ty": 0,
+              "nm": "Distance",
+              "mn": "ADBE Drop Shadow-0004",
+              "ix": 4,
+              "v": {
+                "a": 0,
+                "k": 0,
+                "ix": 4
+              }
+            },
+            {
+              "ty": 0,
+              "nm": "Softness",
+              "mn": "ADBE Drop Shadow-0005",
+              "ix": 5,
+              "v": {
+                "a": 0,
+                "k": 26,
+                "ix": 5
+              }
+            },
+            {
+              "ty": 7,
+              "nm": "Shadow Only",
+              "mn": "ADBE Drop Shadow-0006",
+              "ix": 6,
+              "v": {
+                "a": 0,
+                "k": 0,
+                "ix": 6
+              }
+            }
+          ]
+        },
+        {
+          "ty": 5,
+          "nm": "Excite - Position",
+          "np": 8,
+          "mn": "Pseudo/BNCA2506f0b33",
+          "ix": 2,
+          "en": 1,
+          "ef": [
+            {
+              "ty": 7,
+              "nm": "Enable",
+              "mn": "Pseudo/BNCA2506f0b33-0001",
+              "ix": 1,
+              "v": {
+                "a": 0,
+                "k": 1,
+                "ix": 1
+              }
+            },
+            {
+              "ty": 6,
+              "nm": "Properties",
+              "mn": "Pseudo/BNCA2506f0b33-0002",
+              "ix": 2,
+              "v": 0
+            },
+            {
+              "ty": 0,
+              "nm": "Overshoot",
+              "mn": "Pseudo/BNCA2506f0b33-0003",
+              "ix": 3,
+              "v": {
+                "a": 0,
+                "k": 20,
+                "ix": 3,
+                "x": "var $bm_rt;\n$bm_rt = clamp(value, 0, 100);"
+              }
+            },
+            {
+              "ty": 0,
+              "nm": "Bounce",
+              "mn": "Pseudo/BNCA2506f0b33-0004",
+              "ix": 4,
+              "v": {
+                "a": 0,
+                "k": 40,
+                "ix": 4,
+                "x": "var $bm_rt;\n$bm_rt = clamp(value, 0, 100);"
+              }
+            },
+            {
+              "ty": 0,
+              "nm": "Friction",
+              "mn": "Pseudo/BNCA2506f0b33-0005",
+              "ix": 5,
+              "v": {
+                "a": 0,
+                "k": 40,
+                "ix": 5,
+                "x": "var $bm_rt;\n$bm_rt = clamp(value, 0, 100);"
+              }
+            },
+            {
+              "ty": 6,
+              "nm": "",
+              "mn": "Pseudo/BNCA2506f0b33-0006",
+              "ix": 6,
+              "v": 0
+            }
+          ]
+        }
+      ],
+      "shapes": [
+        {
+          "ty": "gr",
+          "it": [
+            {
+              "d": 1,
+              "ty": "el",
+              "s": {
+                "a": 0,
+                "k": [
+                  57.46,
+                  57.46
+                ],
+                "ix": 2
+              },
+              "p": {
+                "a": 0,
+                "k": [
+                  0,
+                  0
+                ],
+                "ix": 3
+              },
+              "nm": "Ellipse Path 1",
+              "mn": "ADBE Vector Shape - Ellipse",
+              "hd": false
+            },
+            {
+              "ty": "fl",
+              "c": {
+                "a": 0,
+                "k": [
+                  1,
+                  1,
+                  1,
+                  1
+                ],
+                "ix": 4
+              },
+              "o": {
+                "a": 0,
+                "k": 100,
+                "ix": 5
+              },
+              "r": 1,
+              "bm": 0,
+              "nm": "Fill 1",
+              "mn": "ADBE Vector Graphic - Fill",
+              "hd": false
+            },
+            {
+              "ty": "tr",
+              "p": {
+                "a": 0,
+                "k": [
+                  0,
+                  0
+                ],
+                "ix": 2
+              },
+              "a": {
+                "a": 0,
+                "k": [
+                  0,
+                  0
+                ],
+                "ix": 1
+              },
+              "s": {
+                "a": 0,
+                "k": [
+                  200,
+                  200
+                ],
+                "ix": 3
+              },
+              "r": {
+                "a": 0,
+                "k": 180,
+                "ix": 6
+              },
+              "o": {
+                "a": 0,
+                "k": 100,
+                "ix": 7
+              },
+              "sk": {
+                "a": 0,
+                "k": 0,
+                "ix": 4
+              },
+              "sa": {
+                "a": 0,
+                "k": 0,
+                "ix": 5
+              },
+              "nm": "Transform"
+            }
+          ],
+          "nm": "Oval Copy 5",
+          "np": 2,
+          "cix": 2,
+          "bm": 0,
+          "ix": 1,
+          "mn": "ADBE Vector Group",
+          "hd": false
+        }
+      ],
+      "ip": 59,
+      "op": 3659,
+      "st": 59,
+      "bm": 0
+    },
+    {
+      "ddd": 0,
+      "ind": 12,
+      "ty": 2,
+      "nm": "wink.png",
+      "cl": "png",
+      "parent": 13,
+      "refId": "image_5",
+      "sr": 1,
+      "ks": {
+        "o": {
+          "a": 0,
+          "k": 100,
+          "ix": 11
+        },
+        "r": {
+          "a": 0,
+          "k": 0,
+          "ix": 10
+        },
+        "p": {
+          "a": 0,
+          "k": [
+            -1.94,
+            1.14,
+            0
+          ],
+          "ix": 2
+        },
+        "a": {
+          "a": 0,
+          "k": [
+            70,
+            70,
+            0
+          ],
+          "ix": 1
+        },
+        "s": {
+          "a": 0,
+          "k": [
+            -50,
+            50,
+            100
+          ],
+          "ix": 6
+        }
+      },
+      "ao": 0,
+      "ip": 62,
+      "op": 3662,
+      "st": 62,
+      "bm": 0
+    },
+    {
+      "ddd": 0,
+      "ind": 13,
+      "ty": 4,
+      "nm": "wink",
+      "parent": 1,
+      "sr": 1,
+      "ks": {
+        "o": {
+          "a": 0,
+          "k": 100,
+          "ix": 11
+        },
+        "r": {
+          "a": 0,
+          "k": 0,
+          "ix": 10
+        },
+        "p": {
+          "a": 1,
+          "k": [
+            {
+              "i": {
+                "x": 0.833,
+                "y": 0.833
+              },
+              "o": {
+                "x": 1,
+                "y": 0
+              },
+              "t": 62,
+              "s": [
+                52.427,
+                50.727,
+                0
+              ],
+              "to": [
+                -14.228,
+                23.689,
+                0
+              ],
+              "ti": [
+                14.228,
+                -23.689,
+                0
+              ]
+            },
+            {
+              "i": {
+                "x": 0.291,
+                "y": 0.291
+              },
+              "o": {
+                "x": 0.167,
+                "y": 0.167
+              },
+              "t": 139,
+              "s": [
+                -32.94,
+                192.86,
+                0
+              ],
+              "to": [
+                0,
+                0,
+                0
+              ],
+              "ti": [
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "i": {
+                "x": 0.291,
+                "y": 1
+              },
+              "o": {
+                "x": 0.709,
+                "y": 0
+              },
+              "t": 198,
+              "s": [
+                -32.94,
+                192.86,
+                0
+              ],
+              "to": [
+                13.629,
+                -23.913,
+                0
+              ],
+              "ti": [
+                -13.629,
+                23.913,
+                0
+              ]
+            },
+            {
+              "t": 242,
+              "s": [
+                48.835,
+                49.379,
+                0
+              ]
+            }
+          ],
+          "ix": 2,
+          "x": "var $bm_rt;\nvar enable, amp, freq, decay, n, t, v;\ntry {\n    $bm_rt = enable = effect('Excite - Position')('Pseudo/BNCA2506f0b33-0001');\n    if (enable == 0) {\n        $bm_rt = value;\n    } else {\n        amp = $bm_div(effect('Excite - Position')('Pseudo/BNCA2506f0b33-0003'), 2.5);\n        freq = $bm_div(effect('Excite - Position')('Pseudo/BNCA2506f0b33-0004'), 20);\n        decay = $bm_div(effect('Excite - Position')('Pseudo/BNCA2506f0b33-0005'), 20);\n        n = 0, 0 < numKeys && (n = nearestKey(time).index, key(n).time > time && n--), t = 0 === n ? 0 : $bm_sub(time, key(n).time), $bm_rt = 0 < n ? (v = velocityAtTime($bm_sub(key(n).time, $bm_div(thisComp.frameDuration, 10))), $bm_sum(value, $bm_div($bm_mul($bm_mul($bm_div(v, 100), amp), Math.sin($bm_mul($bm_mul($bm_mul(freq, t), 2), Math.PI))), Math.exp($bm_mul(decay, t))))) : value;\n    }\n} catch (err) {\n    $bm_rt = value = value;\n}"
+        },
+        "a": {
+          "a": 0,
+          "k": [
+            0,
+            0,
+            0
+          ],
+          "ix": 1
+        },
+        "s": {
+          "a": 1,
+          "k": [
+            {
+              "i": {
+                "x": [
+                  0.2,
+                  0.2,
+                  0.2
+                ],
+                "y": [
+                  1,
+                  1,
+                  1
+                ]
+              },
+              "o": {
+                "x": [
+                  0.8,
+                  0.8,
+                  0.8
+                ],
+                "y": [
+                  0,
+                  0,
+                  0
+                ]
+              },
+              "t": 190,
+              "s": [
+                100,
+                100,
+                100
+              ]
+            },
+            {
+              "t": 234,
+              "s": [
+                70,
+                70,
+                100
+              ]
+            }
+          ],
+          "ix": 6
+        }
+      },
+      "ao": 0,
+      "ef": [
+        {
+          "ty": 25,
+          "nm": "Drop Shadow",
+          "np": 8,
+          "mn": "ADBE Drop Shadow",
+          "ix": 1,
+          "en": 1,
+          "ef": [
+            {
+              "ty": 2,
+              "nm": "Shadow Color",
+              "mn": "ADBE Drop Shadow-0001",
+              "ix": 1,
+              "v": {
+                "a": 0,
+                "k": [
+                  0,
+                  0,
+                  0,
+                  0.031305000186
+                ],
+                "ix": 1
+              }
+            },
+            {
+              "ty": 0,
+              "nm": "Opacity",
+              "mn": "ADBE Drop Shadow-0002",
+              "ix": 2,
+              "v": {
+                "a": 0,
+                "k": 7.983,
+                "ix": 2
+              }
+            },
+            {
+              "ty": 0,
+              "nm": "Direction",
+              "mn": "ADBE Drop Shadow-0003",
+              "ix": 3,
+              "v": {
+                "a": 0,
+                "k": 180,
+                "ix": 3
+              }
+            },
+            {
+              "ty": 0,
+              "nm": "Distance",
+              "mn": "ADBE Drop Shadow-0004",
+              "ix": 4,
+              "v": {
+                "a": 0,
+                "k": 0,
+                "ix": 4
+              }
+            },
+            {
+              "ty": 0,
+              "nm": "Softness",
+              "mn": "ADBE Drop Shadow-0005",
+              "ix": 5,
+              "v": {
+                "a": 0,
+                "k": 26,
+                "ix": 5
+              }
+            },
+            {
+              "ty": 7,
+              "nm": "Shadow Only",
+              "mn": "ADBE Drop Shadow-0006",
+              "ix": 6,
+              "v": {
+                "a": 0,
+                "k": 0,
+                "ix": 6
+              }
+            }
+          ]
+        },
+        {
+          "ty": 5,
+          "nm": "Excite - Position",
+          "np": 8,
+          "mn": "Pseudo/BNCA2506f0b33",
+          "ix": 2,
+          "en": 1,
+          "ef": [
+            {
+              "ty": 7,
+              "nm": "Enable",
+              "mn": "Pseudo/BNCA2506f0b33-0001",
+              "ix": 1,
+              "v": {
+                "a": 0,
+                "k": 1,
+                "ix": 1
+              }
+            },
+            {
+              "ty": 6,
+              "nm": "Properties",
+              "mn": "Pseudo/BNCA2506f0b33-0002",
+              "ix": 2,
+              "v": 0
+            },
+            {
+              "ty": 0,
+              "nm": "Overshoot",
+              "mn": "Pseudo/BNCA2506f0b33-0003",
+              "ix": 3,
+              "v": {
+                "a": 0,
+                "k": 20,
+                "ix": 3,
+                "x": "var $bm_rt;\n$bm_rt = clamp(value, 0, 100);"
+              }
+            },
+            {
+              "ty": 0,
+              "nm": "Bounce",
+              "mn": "Pseudo/BNCA2506f0b33-0004",
+              "ix": 4,
+              "v": {
+                "a": 0,
+                "k": 40,
+                "ix": 4,
+                "x": "var $bm_rt;\n$bm_rt = clamp(value, 0, 100);"
+              }
+            },
+            {
+              "ty": 0,
+              "nm": "Friction",
+              "mn": "Pseudo/BNCA2506f0b33-0005",
+              "ix": 5,
+              "v": {
+                "a": 0,
+                "k": 40,
+                "ix": 5,
+                "x": "var $bm_rt;\n$bm_rt = clamp(value, 0, 100);"
+              }
+            },
+            {
+              "ty": 6,
+              "nm": "",
+              "mn": "Pseudo/BNCA2506f0b33-0006",
+              "ix": 6,
+              "v": 0
+            }
+          ]
+        }
+      ],
+      "shapes": [
+        {
+          "ty": "gr",
+          "it": [
+            {
+              "d": 1,
+              "ty": "el",
+              "s": {
+                "a": 0,
+                "k": [
+                  57.46,
+                  57.46
+                ],
+                "ix": 2
+              },
+              "p": {
+                "a": 0,
+                "k": [
+                  0,
+                  0
+                ],
+                "ix": 3
+              },
+              "nm": "Ellipse Path 1",
+              "mn": "ADBE Vector Shape - Ellipse",
+              "hd": false
+            },
+            {
+              "ty": "fl",
+              "c": {
+                "a": 0,
+                "k": [
+                  1,
+                  1,
+                  1,
+                  1
+                ],
+                "ix": 4
+              },
+              "o": {
+                "a": 0,
+                "k": 100,
+                "ix": 5
+              },
+              "r": 1,
+              "bm": 0,
+              "nm": "Fill 1",
+              "mn": "ADBE Vector Graphic - Fill",
+              "hd": false
+            },
+            {
+              "ty": "tr",
+              "p": {
+                "a": 0,
+                "k": [
+                  0,
+                  0
+                ],
+                "ix": 2
+              },
+              "a": {
+                "a": 0,
+                "k": [
+                  0,
+                  0
+                ],
+                "ix": 1
+              },
+              "s": {
+                "a": 0,
+                "k": [
+                  200,
+                  200
+                ],
+                "ix": 3
+              },
+              "r": {
+                "a": 0,
+                "k": 180,
+                "ix": 6
+              },
+              "o": {
+                "a": 0,
+                "k": 100,
+                "ix": 7
+              },
+              "sk": {
+                "a": 0,
+                "k": 0,
+                "ix": 4
+              },
+              "sa": {
+                "a": 0,
+                "k": 0,
+                "ix": 5
+              },
+              "nm": "Transform"
+            }
+          ],
+          "nm": "Oval Copy 4",
+          "np": 2,
+          "cix": 2,
+          "bm": 0,
+          "ix": 1,
+          "mn": "ADBE Vector Group",
+          "hd": false
+        }
+      ],
+      "ip": 62,
+      "op": 3662,
+      "st": 62,
+      "bm": 0
+    },
+    {
+      "ddd": 0,
+      "ind": 14,
+      "ty": 2,
+      "nm": "fire.png",
+      "cl": "png",
+      "parent": 15,
+      "refId": "image_6",
+      "sr": 1,
+      "ks": {
+        "o": {
+          "a": 0,
+          "k": 100,
+          "ix": 11
+        },
+        "r": {
+          "a": 0,
+          "k": 0,
+          "ix": 10
+        },
+        "p": {
+          "a": 0,
+          "k": [
+            -0.54,
+            -1.86,
+            0
+          ],
+          "ix": 2
+        },
+        "a": {
+          "a": 0,
+          "k": [
+            56,
+            70,
+            0
+          ],
+          "ix": 1
+        },
+        "s": {
+          "a": 0,
+          "k": [
+            -50,
+            50,
+            100
+          ],
+          "ix": 6
+        }
+      },
+      "ao": 0,
+      "ip": 65,
+      "op": 3665,
+      "st": 65,
+      "bm": 0
+    },
+    {
+      "ddd": 0,
+      "ind": 15,
+      "ty": 4,
+      "nm": "fire",
+      "parent": 1,
+      "sr": 1,
+      "ks": {
+        "o": {
+          "a": 0,
+          "k": 100,
+          "ix": 11
+        },
+        "r": {
+          "a": 0,
+          "k": 0,
+          "ix": 10
+        },
+        "p": {
+          "a": 1,
+          "k": [
+            {
+              "i": {
+                "x": 0.833,
+                "y": 0.833
+              },
+              "o": {
+                "x": 1,
+                "y": 0
+              },
+              "t": 65,
+              "s": [
+                52.427,
+                50.727,
+                0
+              ],
+              "to": [
+                -27.661,
+                -0.144,
+                0
+              ],
+              "ti": [
+                27.661,
+                0.144,
+                0
+              ]
+            },
+            {
+              "i": {
+                "x": 0.291,
+                "y": 0.291
+              },
+              "o": {
+                "x": 0.167,
+                "y": 0.167
+              },
+              "t": 142,
+              "s": [
+                -113.54,
+                49.86,
+                0
+              ],
+              "to": [
+                0,
+                0,
+                0
+              ],
+              "ti": [
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "i": {
+                "x": 0.291,
+                "y": 1
+              },
+              "o": {
+                "x": 0.709,
+                "y": 0
+              },
+              "t": 200,
+              "s": [
+                -113.54,
+                49.86,
+                0
+              ],
+              "to": [
+                27.001,
+                -0.09,
+                0
+              ],
+              "ti": [
+                -27.001,
+                0.09,
+                0
+              ]
+            },
+            {
+              "t": 244,
+              "s": [
+                48.469,
+                49.322,
+                0
+              ]
+            }
+          ],
+          "ix": 2,
+          "x": "var $bm_rt;\nvar enable, amp, freq, decay, n, t, v;\ntry {\n    $bm_rt = enable = effect('Excite - Position')('Pseudo/BNCA2506f0b33-0001');\n    if (enable == 0) {\n        $bm_rt = value;\n    } else {\n        amp = $bm_div(effect('Excite - Position')('Pseudo/BNCA2506f0b33-0003'), 2.5);\n        freq = $bm_div(effect('Excite - Position')('Pseudo/BNCA2506f0b33-0004'), 20);\n        decay = $bm_div(effect('Excite - Position')('Pseudo/BNCA2506f0b33-0005'), 20);\n        n = 0, 0 < numKeys && (n = nearestKey(time).index, key(n).time > time && n--), t = 0 === n ? 0 : $bm_sub(time, key(n).time), $bm_rt = 0 < n ? (v = velocityAtTime($bm_sub(key(n).time, $bm_div(thisComp.frameDuration, 10))), $bm_sum(value, $bm_div($bm_mul($bm_mul($bm_div(v, 100), amp), Math.sin($bm_mul($bm_mul($bm_mul(freq, t), 2), Math.PI))), Math.exp($bm_mul(decay, t))))) : value;\n    }\n} catch (err) {\n    $bm_rt = value = value;\n}"
+        },
+        "a": {
+          "a": 0,
+          "k": [
+            0,
+            0,
+            0
+          ],
+          "ix": 1
+        },
+        "s": {
+          "a": 1,
+          "k": [
+            {
+              "i": {
+                "x": [
+                  0.2,
+                  0.2,
+                  0.2
+                ],
+                "y": [
+                  1,
+                  1,
+                  1
+                ]
+              },
+              "o": {
+                "x": [
+                  0.8,
+                  0.8,
+                  0.8
+                ],
+                "y": [
+                  0,
+                  0,
+                  0
+                ]
+              },
+              "t": 190,
+              "s": [
+                100,
+                100,
+                100
+              ]
+            },
+            {
+              "t": 234,
+              "s": [
+                70,
+                70,
+                100
+              ]
+            }
+          ],
+          "ix": 6
+        }
+      },
+      "ao": 0,
+      "ef": [
+        {
+          "ty": 25,
+          "nm": "Drop Shadow",
+          "np": 8,
+          "mn": "ADBE Drop Shadow",
+          "ix": 1,
+          "en": 1,
+          "ef": [
+            {
+              "ty": 2,
+              "nm": "Shadow Color",
+              "mn": "ADBE Drop Shadow-0001",
+              "ix": 1,
+              "v": {
+                "a": 0,
+                "k": [
+                  0,
+                  0,
+                  0,
+                  0.031305000186
+                ],
+                "ix": 1
+              }
+            },
+            {
+              "ty": 0,
+              "nm": "Opacity",
+              "mn": "ADBE Drop Shadow-0002",
+              "ix": 2,
+              "v": {
+                "a": 0,
+                "k": 7.983,
+                "ix": 2
+              }
+            },
+            {
+              "ty": 0,
+              "nm": "Direction",
+              "mn": "ADBE Drop Shadow-0003",
+              "ix": 3,
+              "v": {
+                "a": 0,
+                "k": 180,
+                "ix": 3
+              }
+            },
+            {
+              "ty": 0,
+              "nm": "Distance",
+              "mn": "ADBE Drop Shadow-0004",
+              "ix": 4,
+              "v": {
+                "a": 0,
+                "k": 0,
+                "ix": 4
+              }
+            },
+            {
+              "ty": 0,
+              "nm": "Softness",
+              "mn": "ADBE Drop Shadow-0005",
+              "ix": 5,
+              "v": {
+                "a": 0,
+                "k": 26,
+                "ix": 5
+              }
+            },
+            {
+              "ty": 7,
+              "nm": "Shadow Only",
+              "mn": "ADBE Drop Shadow-0006",
+              "ix": 6,
+              "v": {
+                "a": 0,
+                "k": 0,
+                "ix": 6
+              }
+            }
+          ]
+        },
+        {
+          "ty": 5,
+          "nm": "Excite - Position",
+          "np": 8,
+          "mn": "Pseudo/BNCA2506f0b33",
+          "ix": 2,
+          "en": 1,
+          "ef": [
+            {
+              "ty": 7,
+              "nm": "Enable",
+              "mn": "Pseudo/BNCA2506f0b33-0001",
+              "ix": 1,
+              "v": {
+                "a": 0,
+                "k": 1,
+                "ix": 1
+              }
+            },
+            {
+              "ty": 6,
+              "nm": "Properties",
+              "mn": "Pseudo/BNCA2506f0b33-0002",
+              "ix": 2,
+              "v": 0
+            },
+            {
+              "ty": 0,
+              "nm": "Overshoot",
+              "mn": "Pseudo/BNCA2506f0b33-0003",
+              "ix": 3,
+              "v": {
+                "a": 0,
+                "k": 20,
+                "ix": 3,
+                "x": "var $bm_rt;\n$bm_rt = clamp(value, 0, 100);"
+              }
+            },
+            {
+              "ty": 0,
+              "nm": "Bounce",
+              "mn": "Pseudo/BNCA2506f0b33-0004",
+              "ix": 4,
+              "v": {
+                "a": 0,
+                "k": 40,
+                "ix": 4,
+                "x": "var $bm_rt;\n$bm_rt = clamp(value, 0, 100);"
+              }
+            },
+            {
+              "ty": 0,
+              "nm": "Friction",
+              "mn": "Pseudo/BNCA2506f0b33-0005",
+              "ix": 5,
+              "v": {
+                "a": 0,
+                "k": 40,
+                "ix": 5,
+                "x": "var $bm_rt;\n$bm_rt = clamp(value, 0, 100);"
+              }
+            },
+            {
+              "ty": 6,
+              "nm": "",
+              "mn": "Pseudo/BNCA2506f0b33-0006",
+              "ix": 6,
+              "v": 0
+            }
+          ]
+        }
+      ],
+      "shapes": [
+        {
+          "ty": "gr",
+          "it": [
+            {
+              "d": 1,
+              "ty": "el",
+              "s": {
+                "a": 0,
+                "k": [
+                  57.46,
+                  57.46
+                ],
+                "ix": 2
+              },
+              "p": {
+                "a": 0,
+                "k": [
+                  0,
+                  0
+                ],
+                "ix": 3
+              },
+              "nm": "Ellipse Path 1",
+              "mn": "ADBE Vector Shape - Ellipse",
+              "hd": false
+            },
+            {
+              "ty": "fl",
+              "c": {
+                "a": 0,
+                "k": [
+                  1,
+                  1,
+                  1,
+                  1
+                ],
+                "ix": 4
+              },
+              "o": {
+                "a": 0,
+                "k": 100,
+                "ix": 5
+              },
+              "r": 1,
+              "bm": 0,
+              "nm": "Fill 1",
+              "mn": "ADBE Vector Graphic - Fill",
+              "hd": false
+            },
+            {
+              "ty": "tr",
+              "p": {
+                "a": 0,
+                "k": [
+                  0,
+                  0
+                ],
+                "ix": 2
+              },
+              "a": {
+                "a": 0,
+                "k": [
+                  0,
+                  0
+                ],
+                "ix": 1
+              },
+              "s": {
+                "a": 0,
+                "k": [
+                  200,
+                  200
+                ],
+                "ix": 3
+              },
+              "r": {
+                "a": 0,
+                "k": 180,
+                "ix": 6
+              },
+              "o": {
+                "a": 0,
+                "k": 100,
+                "ix": 7
+              },
+              "sk": {
+                "a": 0,
+                "k": 0,
+                "ix": 4
+              },
+              "sa": {
+                "a": 0,
+                "k": 0,
+                "ix": 5
+              },
+              "nm": "Transform"
+            }
+          ],
+          "nm": "Oval Copy 5",
+          "np": 2,
+          "cix": 2,
+          "bm": 0,
+          "ix": 1,
+          "mn": "ADBE Vector Group",
+          "hd": false
+        }
+      ],
+      "ip": 65,
+      "op": 3665,
+      "st": 65,
+      "bm": 0
+    }
+  ],
+  "markers": []
+}

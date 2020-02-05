@@ -244,4 +244,5 @@ class CreateWalletFragment : BaseFragment() {
         animSet.playTogether(tariViewTranslateAnim, tariViewScaleAnim, fadeOutViewAnim)
         animSet.start()
     }
+
 }

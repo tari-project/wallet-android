@@ -15,7 +15,7 @@
  * 3. Neither the name of the copyright holder nor the names of
  * its contributors may be used to endorse or promote products
  * derived from this software without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND
  * CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES,
  * INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
@@ -49,7 +49,8 @@ enum class CustomFont(private val fileName: String) {
     AVENIR_LT_STD_MEDIUM("fonts/AvenirLTStd-Medium.otf"),
     AVENIR_LT_STD_ROMAN("fonts/AvenirLTStd-Roman.otf"),
     AVENIR_NEXT_LT_PRO_REGULAR("fonts/AvenirNextLTPro-Regular.otf"),
-    AVENIR_NEXT_LT_PRO_BOLD("fonts/AvenirNextLTPro-Bold.otf");
+    AVENIR_NEXT_LT_PRO_BOLD("fonts/AvenirNextLTPro-Bold.otf"),
+    AVENIR_LT_STD_LIGHT("fonts/AvenirLTStd-Light.otf");
 
     companion object {
         fun fromString(fontName: String): CustomFont {
