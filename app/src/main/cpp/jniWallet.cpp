@@ -687,7 +687,7 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniSignMessage(
     int *r = &i;
     TariWallet *pWallet = reinterpret_cast<TariWallet *>(jpWallet);
     const char* pMessage = jEnv->GetStringUTFChars(jmessage, JNI_FALSE);
-    char* pSignature = wallet_sign_message(pWallet,const_cast<char*>(pMessage),r);
+    char* pSignature = wallet_sign_message(pWallet,pMessage,r);
     setErrorCode(jEnv, error, i);
     jEnv->ReleaseStringUTFChars(jmessage, pMessage);
     jstring result = jEnv->NewStringUTF(pSignature);
@@ -709,8 +709,7 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniVerifyMessageSignature(
     TariPublicKey *pContactPublicKey = reinterpret_cast<TariPublicKey *>(jpPublicKey);
     const char* pHexSignatureNonce = jEnv->GetStringUTFChars(jhexSignatureNonce, JNI_FALSE);
     const char* pMessage = jEnv->GetStringUTFChars(jmessage, JNI_FALSE);
-    jboolean result = wallet_verify_message_signature(pContactPublicKey, const_cast<char*>(pHexSignatureNonce),
-                                                      const_cast<char*>(pMessage),r) != 0;
+    jboolean result = wallet_verify_message_signature(pContactPublicKey, pHexSignatureNonce, pMessage,r) != 0;
     setErrorCode(jEnv, error, i);
     jEnv->ReleaseStringUTFChars(jhexSignatureNonce, pHexSignatureNonce);
     jEnv->ReleaseStringUTFChars(jmessage, pMessage);
