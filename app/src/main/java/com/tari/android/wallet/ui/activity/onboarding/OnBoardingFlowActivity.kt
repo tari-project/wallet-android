@@ -33,25 +33,53 @@
 package com.tari.android.wallet.ui.activity.onboarding
 
 import android.os.Bundle
+import android.os.Handler
 import com.tari.android.wallet.R
 import com.tari.android.wallet.ui.activity.BaseActivity
+import com.tari.android.wallet.ui.fragment.onboarding.CreateEmojiIdFragment
 import com.tari.android.wallet.ui.fragment.onboarding.CreateWalletFragment
+import com.tari.android.wallet.util.Constants
 
 /**
  * onBoarding activity class : contain  splash screen and loading sequence
  *
  * @author The Tari Development Team
  */
-class OnBoardingFlowActivity : BaseActivity() {
+class OnBoardingFlowActivity : BaseActivity(), CreateWalletFragment.Listener {
 
     override val contentViewId = R.layout.activity_onboarding_flow
+
+    private val uiHandler = Handler()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         supportFragmentManager.beginTransaction()
-            .replace(R.id.onboarding_frame_container,
+            .replace(
+                R.id.onboarding_frame_container,
                 CreateWalletFragment()
             ).commit()
     }
+
+    override fun onCreateEmojiIdButtonClick() {
+        supportFragmentManager.beginTransaction()
+            .replace(R.id.onboarding_create_emoji_id_container, CreateEmojiIdFragment()).commit()
+
+        removeCurrentFragment()
+    }
+
+    private fun removeCurrentFragment() {
+        uiHandler.postDelayed({
+            val fragment = supportFragmentManager.findFragmentById(R.id.onboarding_frame_container)
+            fragment?.let {
+                supportFragmentManager.beginTransaction().remove(fragment).commit()
+            }
+        }, Constants.UI.CreateWallet.removeFragmentDelayDuration)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        uiHandler.removeCallbacksAndMessages(null)
+    }
+
 }

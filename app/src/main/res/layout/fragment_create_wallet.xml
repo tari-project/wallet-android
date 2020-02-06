@@ -60,7 +60,7 @@
                 android:background="@color/black" />
 
             <com.tari.android.wallet.ui.component.CustomFontTextView
-                android:id="@+id/create_wallet_des_txt"
+                android:id="@+id/create_wallet_desc_txt"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_above="@id/create_wallet_btn_layout"

@@ -42,6 +42,7 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import butterknife.BindDimen
+import butterknife.BindString
 import butterknife.BindView
 import butterknife.OnClick
 import com.airbnb.lottie.LottieAnimationView
@@ -68,7 +69,7 @@ class CreateEmojiIdFragment : BaseFragment() {
     lateinit var helloTextBackView: View
     @BindView(R.id.create_emoji_id_checkmark_anim)
     lateinit var checkMarkAnim: LottieAnimationView
-    @BindView(R.id.create_emoji_id_txt_wallet_address_des)
+    @BindView(R.id.create_emoji_id_txt_wallet_address_desc)
     lateinit var walletAddressDescText: TextView
     @BindView(R.id.create_emoji_id_btn)
     lateinit var createEmojiIdButton: View
@@ -86,20 +87,25 @@ class CreateEmojiIdFragment : BaseFragment() {
     lateinit var whiteBgView: View
     @BindView(R.id.create_emoji_id_awesome_text_back_view)
     lateinit var awesomeTextBackView: View
-    @BindView(R.id.emoji_wheel_anim)
+    @BindView(R.id.create_emoji_id_emoji_wheel_anim)
     lateinit var emojiWheelAnimView: LottieAnimationView
-    @BindView(R.id.emoji_container)
+    @BindView(R.id.create_emoji_id_emoji_container)
     lateinit var emojiContainerImage: ImageView
-    @BindView(R.id.your_emoji_id_title_container)
+    @BindView(R.id.create_emoji_id_your_emoji_id_title_container)
     lateinit var yourEmojiTitleText: LinearLayout
-    @BindView(R.id.your_emoji_title_back_view)
+    @BindView(R.id.create_emoji_id_your_emoji_title_back_view)
     lateinit var yourEmojiTitleBackView: View
-    @BindView(R.id.continue_btn)
+    @BindView(R.id.create_emoji_id_continue_btn)
     lateinit var continueButton: Button
 
     @BindDimen(R.dimen.create_emoji_id_button_bottom_margin)
     @JvmField
     var createEmojiButtonBottomMargin = 0
+
+
+    @BindString(R.string.create_emoji_id_set_of_emoji_your_wallet_address_desc)
+    @JvmField
+    var yourWalletAddressDescString = ""
 
     private val uiHandler = Handler()
 
@@ -149,8 +155,8 @@ class CreateEmojiIdFragment : BaseFragment() {
     private fun showEmojiWheelAnimation() {
         emojiWheelAnimView.playAnimation()
 
-        val fadeOutAnimnAnim = ValueAnimator.ofFloat(1f, 0f)
-        fadeOutAnimnAnim.addUpdateListener { valueAnimator: ValueAnimator ->
+        val fadeOutAnim = ValueAnimator.ofFloat(1f, 0f)
+        fadeOutAnim.addUpdateListener { valueAnimator: ValueAnimator ->
             val alpha = valueAnimator.animatedValue as Float
             nerdFaceEmoji.alpha = alpha
             awesomeText.alpha = alpha
@@ -158,7 +164,7 @@ class CreateEmojiIdFragment : BaseFragment() {
             walletAddressDescText.alpha = alpha
             createEmojiIdButton.alpha = alpha
         }
-        fadeOutAnimnAnim.addListener(object : AnimatorListenerAdapter() {
+        fadeOutAnim.addListener(object : AnimatorListenerAdapter() {
             override fun onAnimationEnd(animation: Animator?) {
                 super.onAnimationEnd(animation)
                 createEmojiIdButton.visibility = View.GONE
@@ -168,19 +174,18 @@ class CreateEmojiIdFragment : BaseFragment() {
             }
         })
 
-        fadeOutAnimnAnim.startDelay = CreateEmojiId.walletCreationFadeOutAnimDelayMs
-        fadeOutAnimnAnim.duration = CreateEmojiId.walletCreationFadeOutAnimDurationMs
-        fadeOutAnimnAnim.start()
+        fadeOutAnim.startDelay = CreateEmojiId.walletCreationFadeOutAnimDelayMs
+        fadeOutAnim.duration = CreateEmojiId.walletCreationFadeOutAnimDurationMs
+        fadeOutAnim.start()
 
         uiHandler.postDelayed(
-            { startYourEmojiIDViewAnimation() },
+            { startYourEmojiIdViewAnimation() },
             emojiWheelAnimView.duration - CreateEmojiId.awesomeTextAnimDurationMs
         )
     }
 
-    private fun startYourEmojiIDViewAnimation() {
-        walletAddressDescText.text =
-            getString(R.string.create_emoji_id_set_of_emoji_your_wallet_address_desc)
+    private fun startYourEmojiIdViewAnimation() {
+        walletAddressDescText.text = yourWalletAddressDescString
         val buttonOffset = -(continueButton.height + createEmojiButtonBottomMargin).toFloat()
         val buttonTransAnim: ObjectAnimator =
             ObjectAnimator.ofFloat(continueButton, View.TRANSLATION_Y, 0f, buttonOffset)
@@ -195,20 +200,20 @@ class CreateEmojiIdFragment : BaseFragment() {
         buttonAnimSet.playTogether(buttonTransAnim, buttonFadeInAnim)
         buttonAnimSet.duration = CreateEmojiId.continueButtonAnimDurationMs
 
-        val emojiTransAnim = ValueAnimator.ofFloat(2f, 1.5f)
-        emojiTransAnim.addUpdateListener { animation ->
+        val emojiContainerImageScaleAnim = ValueAnimator.ofFloat(2f, 1.5f)
+        emojiContainerImageScaleAnim.addUpdateListener { animation ->
             val scale = animation.animatedValue.toString().toFloat()
             emojiContainerImage.scaleX = scale
             emojiContainerImage.scaleY = scale
         }
-        emojiTransAnim.startDelay = CreateEmojiId.emojiIdImageViewAnimDelayMs
+        emojiContainerImageScaleAnim.startDelay = CreateEmojiId.emojiIdImageViewAnimDelayMs
 
         val titleOffset = -(yourEmojiTitleText.height).toFloat()
-        val yourEmojiIdTitleAnim =
+        val yourEmojiTitleAnim =
             ObjectAnimator.ofFloat(yourEmojiTitleText, View.TRANSLATION_Y, 0f, titleOffset)
-        yourEmojiIdTitleAnim.startDelay = CreateEmojiId.yourEmojiIdTextAnimDelayMs
-        yourEmojiIdTitleAnim.duration = CreateEmojiId.yourEmojiIdTextAnimDurationMs
-        yourEmojiIdTitleAnim.addListener(object : AnimatorListenerAdapter() {
+        yourEmojiTitleAnim.startDelay = CreateEmojiId.yourEmojiIdTextAnimDelayMs
+        yourEmojiTitleAnim.duration = CreateEmojiId.yourEmojiIdTextAnimDurationMs
+        yourEmojiTitleAnim.addListener(object : AnimatorListenerAdapter() {
             override fun onAnimationStart(animation: Animator?) {
                 super.onAnimationStart(animation)
                 yourEmojiTitleBackView.visibility = View.VISIBLE
@@ -227,7 +232,12 @@ class CreateEmojiIdFragment : BaseFragment() {
         fadeInAnim.duration = CreateEmojiId.continueButtonAnimDurationMs
 
         val animSet = AnimatorSet()
-        animSet.playTogether(buttonAnimSet, emojiTransAnim, fadeInAnim, yourEmojiIdTitleAnim)
+        animSet.playTogether(
+            buttonAnimSet,
+            emojiContainerImageScaleAnim,
+            fadeInAnim,
+            yourEmojiTitleAnim
+        )
         animSet.duration = CreateEmojiId.emojiIdCreationViewAnimDurationMs
         animSet.interpolator = EasingInterpolator(Ease.QUINT_IN)
         animSet.start()

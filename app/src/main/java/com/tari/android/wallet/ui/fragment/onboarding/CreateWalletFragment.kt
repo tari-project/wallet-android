@@ -33,6 +33,7 @@
 package com.tari.android.wallet.ui.fragment.onboarding
 
 import android.animation.*
+import android.content.Context
 import android.os.Bundle
 import android.os.Handler
 import android.view.View
@@ -67,8 +68,8 @@ class CreateWalletFragment : BaseFragment() {
     lateinit var titleTextLine1: TextView
     @BindView(R.id.create_wallet_title_txt_line_2)
     lateinit var titleTextLine2: TextView
-    @BindView(R.id.create_wallet_des_txt)
-    lateinit var walletDesText: TextView
+    @BindView(R.id.create_wallet_desc_txt)
+    lateinit var walletDescText: TextView
     @BindView(R.id.create_wallet_btn)
     lateinit var createWalletButton: TextView
     @BindView(R.id.create_wallet_btn_layout)
@@ -94,6 +95,8 @@ class CreateWalletFragment : BaseFragment() {
     @JvmField
     var whiteColor = 0
 
+    private var listener: Listener? = null
+
     private val uiHandler = Handler()
 
     override val contentViewId = R.layout.fragment_create_wallet
@@ -105,17 +108,14 @@ class CreateWalletFragment : BaseFragment() {
     }
 
     private fun showCreateEmojiIdFragment() {
-        activity?.supportFragmentManager?.beginTransaction()
-            ?.replace(R.id.onboarding_create_emoji_id_container, CreateEmojiIdFragment())?.commit()
-
-        removeCurrentFragment()
+        listener?.onCreateEmojiIdButtonClick()
     }
 
-    private fun removeCurrentFragment() {
-        uiHandler.postDelayed({
-            activity?.supportFragmentManager?.beginTransaction()
-                ?.remove(this)?.commit()
-        }, Constants.UI.CreateWallet.removeFragmentDelayDuration)
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        if (activity is Listener) {
+            listener = activity as Listener
+        }
     }
 
     override fun onStart() {
@@ -172,7 +172,7 @@ class CreateWalletFragment : BaseFragment() {
             testnetTextView.alpha = alpha
             smallGemImageView.alpha = alpha
             walletBtnLayout.alpha = alpha
-            walletDesText.alpha = alpha
+            walletDescText.alpha = alpha
             titleTextLine1.alpha = alpha
             titleTextLine2.alpha = alpha
         }
@@ -245,4 +245,7 @@ class CreateWalletFragment : BaseFragment() {
         animSet.start()
     }
 
+    interface Listener {
+        fun onCreateEmojiIdButtonClick()
+    }
 }

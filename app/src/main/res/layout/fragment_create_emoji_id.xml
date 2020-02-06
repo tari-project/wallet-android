@@ -19,7 +19,7 @@
         android:gravity="center">
 
         <ImageView
-            android:id="@+id/emoji_container"
+            android:id="@+id/create_emoji_id_emoji_container"
             android:layout_width="match_parent"
             android:layout_height="40dp"
             android:layout_marginTop="-100dp"
@@ -30,7 +30,7 @@
             android:src="@drawable/emoji_address" />
 
         <LinearLayout
-            android:id="@+id/your_emoji_id_title_container"
+            android:id="@+id/create_emoji_id_your_emoji_id_title_container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
@@ -61,7 +61,7 @@
         </LinearLayout>
 
         <View
-            android:id="@+id/your_emoji_title_back_view"
+            android:id="@+id/create_emoji_id_your_emoji_title_back_view"
             android:layout_width="match_parent"
             android:layout_height="25dp"
             android:background="@color/create_emoji_id_bg"
@@ -87,7 +87,7 @@
             android:visibility="gone" />
 
         <com.airbnb.lottie.LottieAnimationView
-            android:id="@+id/emoji_wheel_anim"
+            android:id="@+id/create_emoji_id_emoji_wheel_anim"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
@@ -100,7 +100,7 @@
             app:lottie_rawRes="@raw/emoji_wheel" />
 
         <RelativeLayout
-            android:id="@+id/wallet_creation_view_container"
+            android:id="@+id/create_emoji_id_wallet_creation_view_container"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:gravity="center"
@@ -164,7 +164,7 @@
                 android:visibility="invisible" />
 
             <com.tari.android.wallet.ui.component.CustomFontTextView
-                android:id="@+id/create_emoji_id_txt_wallet_address_des"
+                android:id="@+id/create_emoji_id_txt_wallet_address_desc"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/create_emoji_id_txt_create_your_emoji_id"
@@ -238,7 +238,7 @@
         </RelativeLayout>
 
         <Button
-            android:id="@+id/continue_btn"
+            android:id="@+id/create_emoji_id_continue_btn"
             android:layout_width="match_parent"
             android:layout_height="@dimen/home_send_tari_button_height"
             android:layout_alignParentBottom="true"
