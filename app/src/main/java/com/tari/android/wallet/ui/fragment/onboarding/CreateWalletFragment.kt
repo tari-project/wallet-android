@@ -118,6 +118,11 @@ class CreateWalletFragment : BaseFragment() {
         }
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        listener = null
+    }
+
     override fun onStart() {
         super.onStart()
         videoView.setVideoURI(context!!.getResourceUri(R.raw.splash_video_loop_1))
