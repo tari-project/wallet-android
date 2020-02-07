@@ -30,54 +30,51 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.tari.android.wallet.service;
+package com.tari.android.wallet.ui.activity.log
 
-// import model classes
-import com.tari.android.wallet.model.Model;
-import com.tari.android.wallet.service.TariWalletServiceListener;
+import com.tari.android.wallet.ui.activity.BaseActivity
+import android.os.Bundle
+import android.text.method.ScrollingMovementMethod
+import android.view.View
+import android.widget.EditText
+import butterknife.BindView
+import butterknife.OnClick
+import com.tari.android.wallet.R
+import java.io.File
+import java.io.InputStream
 
-interface TariWalletService {
 
-    /**
-    * Registers new wallet listener.
-    * Registered listener will be unregistered on death.
-    */
-    boolean registerListener(TariWalletServiceListener listener);
+/**
+ * Debug screen activity.
+ *
+ * @author The Tari Development Team
+ */
+class DebugLogActivity() : BaseActivity() {
 
-    /**
-    * Unregisters wallet listener.
-    */
-    boolean unregisterListener(TariWalletServiceListener listener);
+    override val contentViewId = R.layout.debug_log
 
-    boolean generateTestData();
+    @OnClick(R.id.debug_log_btn_back)
+    fun onBackButtonPressed(view: View) {
+        super.onBackPressed()
+    }
 
-    String getPublicKeyHexString();
+    @BindView(R.id.debug_log_multiline_edit)
+    lateinit var multilineEdit : EditText
 
-    String getLogFile();
-
-    BalanceInfo getBalanceInfo();
-
-    List<Contact> getContacts();
-
-    List<User> getRecentTxUsers(int maxCount);
-
-    List<CompletedTx> getCompletedTxs();
-
-    CompletedTx getCompletedTxById(in TxId id);
-
-    List<PendingInboundTx> getPendingInboundTxs();
-    PendingInboundTx getPendingInboundTxById(in TxId id);
-
-    List<PendingOutboundTx> getPendingOutboundTxs();
-    PendingOutboundTx getPendingOutboundTxById(in TxId id);
-
-    boolean send(
-        in User contact,
-        in MicroTari amount,
-        in MicroTari fee,
-        String message
-    );
-
-    boolean testComplete(in PendingOutboundTx tx);
-
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        multilineEdit.text.clear()
+        multilineEdit.setHorizontallyScrolling(true)
+        multilineEdit.movementMethod = ScrollingMovementMethod()
+        val log = intent.getStringExtra("log")
+        var lineList = mutableListOf<String>()
+        if (File(log).exists()) {
+            val inputStream: InputStream = File(log).inputStream()
+            inputStream.bufferedReader().useLines { lines -> lines.forEach { lineList.add(it)} }
+        } else
+        {
+            lineList.add("No log available")
+        }
+        lineList.forEach{multilineEdit.append(it+"\n")}
+    }
 }

@@ -87,4 +87,7 @@
     <!-- send tari - amount -->
     <string name="amount_under_construction">Under Construction</string>
 
+    <!-- debug log - title -->
+    <string name="debug_log_title">Log</string>
+
 </resources>

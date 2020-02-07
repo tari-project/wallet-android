@@ -11,6 +11,7 @@
     <color name="white">#FFFFFF</color>
     <color name="transparent">#00000000</color>
     <color name="purple">#8931FF</color>
+
     <!-- common function -->
     <color name="scroll_height_gradient_start_gray">#30000000</color>
     <color name="scroll_height_gradient_mid_gray">#10000000</color>
@@ -40,5 +41,8 @@
     <color name="add_recipient_hint">#B2B2B2</color>
     <color name="add_recipient_contact_list_section_header_title">#B2B2B2</color>
     <color name="add_recipient_prog_bar">#CCCCCC</color>
+
+    <!-- Debug Log -->
+    <color name="terminal_green">#4AF626</color>
 
 </resources>

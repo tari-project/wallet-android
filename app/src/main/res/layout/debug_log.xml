@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/black"
+    android:orientation="vertical">
+
+    <!-- Log header -->
+    <RelativeLayout
+        android:id="@+id/debug_log_vw_header"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/common_header_height"
+        android:layout_marginTop="0dp"
+        android:background="@color/white">
+
+        <!-- back -->
+        <ImageButton
+            android:id="@+id/debug_log_btn_back"
+            android:layout_width="50dp"
+            android:layout_height="match_parent"
+            android:background="@color/white"
+            android:contentDescription="@null"
+            android:src="@drawable/back_icon" />
+
+        <com.tari.android.wallet.ui.component.CustomFontTextView
+            android:id="@+id/debug_log_txt_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:text="@string/debug_log_title"
+            android:textColor="@color/black"
+            android:textSize="16sp"
+            app:customFont="AVENIR_LT_STD_HEAVY" />
+    </RelativeLayout>
+        <EditText
+            android:id="@+id/debug_log_multiline_edit"
+            android:textColor="@color/terminal_green"
+            android:textSize="12sp"
+            android:background="@color/black"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:gravity="start|top"
+            android:inputType="textMultiLine"
+            android:importantForAutofill="no"
+            android:hint="@string/debug_log_title"
+            android:labelFor="@id/debug_log_txt_title"
+            android:focusable="false"
+            android:clickable="false"
+            />
+</LinearLayout>
