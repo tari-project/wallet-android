@@ -35,5 +35,11 @@
     <dimen name="add_recipient_search_bar_container_height">96dp</dimen>
     <dimen name="add_recipient_search_text_view_height">46dp</dimen>
     <dimen name="add_recipient_contact_list_item_height">68dp</dimen>
+    <!-- send tari - add amount -->
+    <dimen name="add_amount_element_container_translation_y">12dp</dimen>
+    <dimen name="add_amount_element_text_size">90sp</dimen>
+    <dimen name="add_amount_gem_size">21dp</dimen>
+    <dimen name="add_amount_leftmost_digit_margin_start">10dp</dimen>
+    <dimen name="add_amount_available_balance_error_amount_nudge_distance">40dp</dimen>
 
 </resources>

@@ -46,6 +46,7 @@ internal object Constants {
      */
     object UI {
 
+        const val keyboardHideWaitMs = 100L
         const val shortAnimDurationMs = 300L
         const val mediumAnimDurationMs = 600L
 
@@ -87,6 +88,10 @@ internal object Constants {
             const val startUpAnimDuration = 1000L
             const val titleTextAnimDelayDurationMs = 30L
             const val viewContainerFadeOutDurationMs = 800L
+        }
+
+        object AddAmount {
+            const val numPadDigitEnterAnimDurationMs = 200L
         }
 
         object Splash {

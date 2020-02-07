@@ -78,6 +78,19 @@ internal object UiUtil {
         }
     }
 
+    fun setWidthAndHeight(
+        @NonNull view: View,
+        @NonNull newWidth: Int,
+        @NonNull newHeight: Int
+    ) {
+        if (view.layoutParams is ViewGroup.MarginLayoutParams) {
+            val layoutParams = view.layoutParams as ViewGroup.MarginLayoutParams
+            layoutParams.width = newWidth
+            layoutParams.height = newHeight
+            view.layoutParams = layoutParams
+        }
+    }
+
     fun getHeight(
         @NonNull view: View
     ): Int {
@@ -112,6 +125,17 @@ internal object UiUtil {
     ): Int {
         val layoutParams = view.layoutParams as ViewGroup.MarginLayoutParams
         return layoutParams.bottomMargin
+    }
+
+    fun setStartMargin(
+        @NonNull view: View,
+        @NonNull newMargin: Int
+    ) {
+        if (view.layoutParams is ViewGroup.MarginLayoutParams) {
+            val layoutParams = view.layoutParams as ViewGroup.MarginLayoutParams
+            layoutParams.marginStart = newMargin
+            view.layoutParams = layoutParams
+        }
     }
 
     fun setProgressBarColor(

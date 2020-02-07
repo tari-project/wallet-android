@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
+    android:id="@+id/send_tari_vw_root"
     android:layout_height="match_parent"
-    android:background="@color/black"
+    android:background="@color/white"
     tools:context=".ui.activity.send.SendTariActivity">
 
     <!-- fragment container -->
@@ -13,4 +14,4 @@
         android:layout_height="match_parent"
         android:orientation="vertical" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+</RelativeLayout>

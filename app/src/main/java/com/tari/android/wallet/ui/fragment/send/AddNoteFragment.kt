@@ -32,65 +32,33 @@
  */
 package com.tari.android.wallet.ui.fragment.send
 
-import android.os.Bundle
 import android.view.View
-import android.widget.TextView
-import butterknife.BindView
 import butterknife.OnClick
 import com.tari.android.wallet.R
-import com.tari.android.wallet.model.Contact
-import com.tari.android.wallet.model.User
 import com.tari.android.wallet.ui.fragment.BaseFragment
 import com.tari.android.wallet.ui.util.UiUtil
-import com.tari.android.wallet.util.EmojiUtil
 
 /**
- * Placeholder amount entry fragment.
+ * Note entry fragment.
  *
  * @author The Tari Development Team
  */
-class AmountFragment : BaseFragment() {
+class AddNoteFragment : BaseFragment() {
 
-    @BindView(R.id.amount_txt_title)
-    lateinit var titleTextView: TextView
-
-    override val contentViewId: Int = R.layout.fragment_amount
+    override val contentViewId: Int = R.layout.fragment_add_note
 
     companion object {
 
-        fun newInstance(): AmountFragment {
-            return AmountFragment()
+        fun newInstance(): AddNoteFragment {
+            return AddNoteFragment()
         }
 
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
-        val bundle = arguments
-        if (bundle != null) {
-            val emojiId = bundle.getString("emojiId")
-            val user = bundle.getParcelable<User>("user")
-            if (emojiId != null) {
-                val shortEmojiId = emojiId.take(6) + "..." + emojiId.takeLast(6)
-                titleTextView.text = shortEmojiId
-            } else if (user != null) {
-                if (user is Contact) {
-                    titleTextView.text = user.alias
-                } else {
-                    val userEmojiId = EmojiUtil.getEmojiIdForPublicKeyHexString(user.publicKeyHexString)
-                    val shortEmojiId = userEmojiId.take(6) + "..." + userEmojiId.takeLast(6)
-                    titleTextView.text = shortEmojiId
-                }
-            }
-        }
-    }
-
-    @OnClick(R.id.amount_btn_back)
+    @OnClick(R.id.add_note_btn_back)
     fun onBackButtonClicked(view: View) {
         UiUtil.temporarilyDisableClick(view)
         val mActivity = activity ?: return
-        UiUtil.hideKeyboard(mActivity)
         mActivity.onBackPressed()
     }
 

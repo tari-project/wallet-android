@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.tari.android.wallet.ui.component.CustomFontTextView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/add_amount_txt_amount_element_0"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:text="@string/digit_0"
+    android:textColor="@color/black"
+    android:textSize="@dimen/add_amount_element_text_size"
+    app:customFont="AVENIR_LT_STD_BLACK" />

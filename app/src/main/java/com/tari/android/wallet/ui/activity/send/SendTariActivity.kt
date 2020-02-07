@@ -39,18 +39,24 @@ import android.content.ServiceConnection
 import android.os.Bundle
 import android.os.IBinder
 import android.view.View
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
+import butterknife.BindColor
 import butterknife.BindView
 import com.orhanobut.logger.Logger
 import com.tari.android.wallet.R
+import com.tari.android.wallet.model.MicroTari
 import com.tari.android.wallet.model.User
 import com.tari.android.wallet.service.TariWalletService
 import com.tari.android.wallet.service.WalletService
 import com.tari.android.wallet.ui.activity.BaseActivity
 import com.tari.android.wallet.ui.fragment.BaseFragment
 import com.tari.android.wallet.ui.fragment.send.AddRecipientFragment
-import com.tari.android.wallet.ui.fragment.send.AmountFragment
+import com.tari.android.wallet.ui.fragment.send.AddAmountFragment
+import com.tari.android.wallet.ui.fragment.send.AddNoteFragment
 import com.tari.android.wallet.ui.util.UiUtil
+import com.tari.android.wallet.util.Constants
+import java.lang.ref.WeakReference
 
 /**
  * The host activity for all send-related fragments.
@@ -58,17 +64,27 @@ import com.tari.android.wallet.ui.util.UiUtil
  * @author The Tari Development Team
  */
 class SendTariActivity : BaseActivity(),
-    ServiceConnection, AddRecipientFragment.Listener {
+    ServiceConnection,
+    AddRecipientFragment.Listener,
+    AddAmountFragment.Listener {
 
+    @BindView(R.id.send_tari_vw_root)
+    lateinit var rootView: View
     @BindView(R.id.send_tari_vw_fragment_container)
     lateinit var fragmentContainerView: View
+
+    @BindColor(R.color.black)
+    @JvmField
+    var blackColor = 0
 
     override val contentViewId = R.layout.activity_send_tari
 
     private lateinit var mFragmentManager: FragmentManager
-    private lateinit var addRecipientFragment: AddRecipientFragment
+    private var currentFragmentWR: WeakReference<Fragment>? = null
 
     private var walletService: TariWalletService? = null
+
+    private val wr = WeakReference(this)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -90,15 +106,25 @@ class SendTariActivity : BaseActivity(),
      * Loads initial fragment.
      */
     private fun loadAddRecipientFragment() {
-        addRecipientFragment = AddRecipientFragment.newInstance(walletService!!)
+        val addRecipientFragment = AddRecipientFragment.newInstance(walletService!!)
         val fragmentTx = mFragmentManager.beginTransaction()
-        fragmentTx.replace(R.id.send_tari_vw_fragment_container, addRecipientFragment)
+        fragmentTx.add(R.id.send_tari_vw_fragment_container, addRecipientFragment)
         fragmentTx.commit()
+        currentFragmentWR = WeakReference(addRecipientFragment)
+        rootView.postDelayed({
+            wr.get()?.rootView?.setBackgroundColor(blackColor)
+        }, 1000)
     }
 
     override fun onBackPressed() {
+        if (currentFragmentWR?.get() is AddAmountFragment
+            && supportFragmentManager.fragments[0] is AddRecipientFragment
+        ) {
+            (supportFragmentManager.fragments[0] as AddRecipientFragment).reset()
+        }
         super.onBackPressed()
         overridePendingTransition(R.anim.enter_from_left, R.anim.exit_to_right)
+        currentFragmentWR = WeakReference(supportFragmentManager.fragments.last())
     }
 
     override fun onDestroy() {
@@ -124,42 +150,91 @@ class SendTariActivity : BaseActivity(),
         walletService = null
     }
 
+    // region AddRecipientFragment.Listener implementation - comments in the interface definition
+
     override fun continueToAmount(
-        addRecipientFragment: AddRecipientFragment,
+        sourceFragment: AddRecipientFragment,
         emojiId: String
     ) {
+        UiUtil.hideKeyboard(this)
         val bundle = Bundle()
-        bundle.putString("emojiId", emojiId)
-        goToAmountFragment(addRecipientFragment, bundle)
-
+        bundle.putString("recipientEmojiId", emojiId)
+        rootView.postDelayed({
+            wr.get()?.goToAddAmountFragment(sourceFragment, bundle)
+        }, Constants.UI.keyboardHideWaitMs)
     }
 
     override fun continueToAmount(
-        addRecipientFragment: AddRecipientFragment,
+        sourceFragment: AddRecipientFragment,
         user: User
     ) {
+        UiUtil.hideKeyboard(this)
         val bundle = Bundle()
-        bundle.putParcelable("user", user)
-        goToAmountFragment(addRecipientFragment, bundle)
+        bundle.putParcelable("recipientUser", user)
+        rootView.postDelayed({
+            wr.get()?.goToAddAmountFragment(sourceFragment, bundle)
+        }, Constants.UI.keyboardHideWaitMs)
     }
 
-    private fun goToAmountFragment(source: BaseFragment, bundle: Bundle) {
-        val amountFragment = AmountFragment.newInstance()
-        amountFragment.arguments = bundle
+    private fun goToAddAmountFragment(sourceFragment: BaseFragment, bundle: Bundle) {
+        val fragment = AddAmountFragment.newInstance(walletService!!)
+        fragment.arguments = bundle
         supportFragmentManager
             .beginTransaction()
             .setCustomAnimations(
                 R.anim.enter_from_right, R.anim.exit_to_left,
                 R.anim.enter_from_left, R.anim.exit_to_right
             )
-            .hide(source)
+            .hide(sourceFragment)
             .add(
                 R.id.send_tari_vw_fragment_container,
-                amountFragment,
-                AmountFragment::class.java.simpleName
+                fragment,
+                AddAmountFragment::class.java.simpleName
             )
-            .addToBackStack(AmountFragment::class.java.simpleName)
+            .addToBackStack(AddAmountFragment::class.java.simpleName)
             .commit()
+        currentFragmentWR = WeakReference(fragment)
     }
+
+    // endregion
+
+    // region AddNoteFragment.Listener implementation
+
+    override fun continueToNote(
+        sourceFragment: AddAmountFragment,
+        recipientEmojiId: String,
+        amount: MicroTari
+    ) {
+        goToAddNoteFragment(sourceFragment)
+    }
+
+    override fun continueToNote(
+        sourceFragment: AddAmountFragment,
+        recipientUser: User,
+        amount: MicroTari
+    ) {
+        goToAddNoteFragment(sourceFragment)
+    }
+
+    private fun goToAddNoteFragment(sourceFragment: BaseFragment) {
+        val fragment = AddNoteFragment.newInstance()
+        supportFragmentManager
+            .beginTransaction()
+            .setCustomAnimations(
+                R.anim.enter_from_right, R.anim.exit_to_left,
+                R.anim.enter_from_left, R.anim.exit_to_right
+            )
+            .hide(sourceFragment)
+            .add(
+                R.id.send_tari_vw_fragment_container,
+                fragment,
+                fragment::class.java.simpleName
+            )
+            .addToBackStack(AddAmountFragment::class.java.simpleName)
+            .commit()
+        currentFragmentWR = WeakReference(fragment)
+    }
+
+    // endregion
 
 }
