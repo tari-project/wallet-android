@@ -237,15 +237,23 @@
 
         </RelativeLayout>
 
-        <Button
-            android:id="@+id/create_emoji_id_continue_btn"
+        <com.tari.android.wallet.ui.component.CustomFontButton
+            android:id="@+id/create_emoji_id_btn_continue"
             android:layout_width="match_parent"
-            android:layout_height="@dimen/home_send_tari_button_height"
+            android:layout_height="@dimen/common_action_button_height"
             android:layout_alignParentBottom="true"
             android:layout_marginLeft="38dp"
             android:layout_marginRight="38dp"
             android:layout_marginBottom="-54dp"
-            android:background="@drawable/continue_button" />
+            android:background="@drawable/gradient_button_bg"
+            android:ellipsize="middle"
+            android:singleLine="true"
+            android:text="@string/common_continue"
+            android:textAllCaps="false"
+            android:textColor="@color/white"
+            android:textSize="16sp"
+            app:customFont="AVENIR_LT_STD_HEAVY" />
+
 
         <com.airbnb.lottie.LottieAnimationView
             android:id="@+id/create_emoji_id_checkmark_anim"
@@ -261,16 +269,22 @@
             app:lottie_loop="false"
             app:lottie_rawRes="@raw/check_mark" />
 
-        <com.tari.android.wallet.ui.component.TouchAnimateView
-            android:id="@+id/create_emoji_id_btn"
+        <com.tari.android.wallet.ui.component.CustomFontButton
+            android:id="@+id/create_emoji_id_btn_create_emoji_id"
             android:layout_width="match_parent"
-            android:layout_height="@dimen/home_send_tari_button_height"
+            android:layout_height="@dimen/common_action_button_height"
             android:layout_alignParentBottom="true"
             android:layout_marginLeft="38dp"
             android:layout_marginRight="38dp"
             android:layout_marginBottom="-54dp"
-            android:alpha="0"
-            android:background="@drawable/create_emoji_id_button" />
+            android:background="@drawable/gradient_button_bg"
+            android:ellipsize="middle"
+            android:singleLine="true"
+            android:text="@string/create_emoji_id_continue_and_create_emoji_id"
+            android:textAllCaps="false"
+            android:textColor="@color/white"
+            android:textSize="16sp"
+            app:customFont="AVENIR_LT_STD_HEAVY" />
 
     </RelativeLayout>
 </FrameLayout>

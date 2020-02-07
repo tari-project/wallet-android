@@ -37,6 +37,8 @@ import android.os.Bundle
 import android.os.Handler
 import android.view.View
 import android.view.ViewTreeObserver
+import android.view.animation.AccelerateInterpolator
+import android.view.animation.DecelerateInterpolator
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.LinearLayout
@@ -50,6 +52,8 @@ import com.daasuu.ei.Ease
 import com.daasuu.ei.EasingInterpolator
 import com.tari.android.wallet.R
 import com.tari.android.wallet.ui.fragment.BaseFragment
+import com.tari.android.wallet.ui.util.UiUtil
+import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.Constants.UI.CreateEmojiId
 
 /**
@@ -71,8 +75,8 @@ class CreateEmojiIdFragment : BaseFragment() {
     lateinit var checkMarkAnim: LottieAnimationView
     @BindView(R.id.create_emoji_id_txt_wallet_address_desc)
     lateinit var walletAddressDescText: TextView
-    @BindView(R.id.create_emoji_id_btn)
-    lateinit var createEmojiIdButton: View
+    @BindView(R.id.create_emoji_id_btn_create_emoji_id)
+    lateinit var createEmojiIdButton: Button
     @BindView(R.id.create_emoji_id_just_sec_back_view)
     lateinit var justSecBackView: View
     @BindView(R.id.create_emoji_id_nerd_face_emoji)
@@ -95,7 +99,7 @@ class CreateEmojiIdFragment : BaseFragment() {
     lateinit var yourEmojiTitleText: LinearLayout
     @BindView(R.id.create_emoji_id_your_emoji_title_back_view)
     lateinit var yourEmojiTitleBackView: View
-    @BindView(R.id.create_emoji_id_continue_btn)
+    @BindView(R.id.create_emoji_id_btn_continue)
     lateinit var continueButton: Button
 
     @BindDimen(R.dimen.create_emoji_id_button_bottom_margin)
@@ -147,10 +151,59 @@ class CreateEmojiIdFragment : BaseFragment() {
         })
     }
 
-    @OnClick(R.id.create_emoji_id_btn)
-    fun onCreateEmojiIdButtonClick() {
-        showEmojiWheelAnimation()
+    @OnClick(R.id.create_emoji_id_btn_continue)
+    fun onContinueButtonClick() {
+        UiUtil.temporarilyDisableClick(continueButton)
+        animateButtonClick(continueButton)
     }
+
+
+    @OnClick(R.id.create_emoji_id_btn_create_emoji_id)
+    fun onCreateEmojiIdButtonClick() {
+        UiUtil.temporarilyDisableClick(createEmojiIdButton)
+        val animatorSet = animateButtonClick(createEmojiIdButton)
+        animatorSet.addListener(object : AnimatorListenerAdapter() {
+            override fun onAnimationEnd(animation: Animator?) {
+                super.onAnimationEnd(animation)
+                showEmojiWheelAnimation()
+            }
+        })
+
+    }
+
+    private fun animateButtonClick(button: Button): AnimatorSet {
+        val scaleDownBtnAnim = ValueAnimator.ofFloat(
+            Constants.UI.Button.clickScaleAnimFullScale,
+            Constants.UI.Button.clickScaleAnimSmallScale
+        )
+        scaleDownBtnAnim.addUpdateListener { valueAnimator: ValueAnimator ->
+            val scale = valueAnimator.animatedValue as Float
+            button.scaleX = scale
+            button.scaleY = scale
+        }
+        scaleDownBtnAnim.duration = Constants.UI.Button.clickScaleAnimDurationMs
+        scaleDownBtnAnim.startDelay = Constants.UI.Button.clickScaleAnimStartOffset
+        scaleDownBtnAnim.interpolator = DecelerateInterpolator()
+
+        val scaleUpBtnAnim = ValueAnimator.ofFloat(
+            Constants.UI.Button.clickScaleAnimSmallScale,
+            Constants.UI.Button.clickScaleAnimFullScale
+        )
+        scaleUpBtnAnim.addUpdateListener { valueAnimator: ValueAnimator ->
+            val scale = valueAnimator.animatedValue as Float
+            button.scaleX = scale
+            button.scaleY = scale
+        }
+        scaleUpBtnAnim.duration = Constants.UI.Button.clickScaleAnimReturnDurationMs
+        scaleUpBtnAnim.startDelay = Constants.UI.Button.clickScaleAnimReturnStartOffset
+        scaleUpBtnAnim.interpolator = AccelerateInterpolator()
+
+        val animSet = AnimatorSet()
+        animSet.playSequentially(scaleDownBtnAnim, scaleUpBtnAnim)
+        animSet.start()
+        return animSet
+    }
+
 
     private fun showEmojiWheelAnimation() {
         emojiWheelAnimView.playAnimation()
