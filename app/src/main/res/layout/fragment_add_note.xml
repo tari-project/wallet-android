@@ -3,12 +3,11 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white"
-    android:orientation="vertical">
+    android:background="@color/white">
 
-    <!-- Transactions header -->
+    <!-- header -->
     <RelativeLayout
-        android:id="@+id/amount_vw_tx_list_header"
+        android:id="@+id/add_note_vw_header"
         android:layout_width="match_parent"
         android:layout_height="@dimen/common_header_height"
         android:layout_marginTop="0dp"
@@ -16,22 +15,21 @@
 
         <!-- back -->
         <ImageButton
-            android:id="@+id/amount_btn_back"
+            android:id="@+id/add_note_btn_back"
             android:layout_width="50dp"
             android:layout_height="match_parent"
             android:background="@color/white"
             android:contentDescription="@null"
             android:src="@drawable/back_icon" />
-
+        <!-- title -->
         <com.tari.android.wallet.ui.component.CustomFontTextView
-            android:id="@+id/amount_txt_title"
+            android:id="@+id/add_note_txt_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
-            android:text="@string/amount_under_construction"
+            android:text="@string/add_amount_under_construction"
             android:textColor="@color/black"
             android:textSize="16sp"
             app:customFont="AVENIR_LT_STD_HEAVY" />
     </RelativeLayout>
-
 </RelativeLayout>

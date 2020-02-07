@@ -77,6 +77,8 @@ class AddRecipientFragment(private val walletService: TariWalletService) : BaseF
     RecyclerView.OnItemTouchListener,
     TextWatcher {
 
+    @BindView(R.id.add_recipient_vw_root)
+    lateinit var rootView: View
     @BindView(R.id.send_tari_add_recipient_rv_contact_list)
     lateinit var recyclerView: RecyclerView
     @BindView(R.id.add_recipient_rv_scroll_depth_gradient)
@@ -84,7 +86,7 @@ class AddRecipientFragment(private val walletService: TariWalletService) : BaseF
     @BindView(R.id.add_recipient_prog_bar)
     lateinit var progressBar: ProgressBar
     @BindView(R.id.add_recipient_txt_search)
-    lateinit var editText: EditText
+    lateinit var searchEditText: EditText
     @BindView(R.id.add_recipient_txt_title)
     lateinit var titleTextView: TextView
     @BindView(R.id.add_recipient_btn_continue)
@@ -168,10 +170,18 @@ class AddRecipientFragment(private val walletService: TariWalletService) : BaseF
 
         continueButton.visibility = View.GONE
         invalidEmojiIdTextView.visibility = View.GONE
-        editText.addTextChangedListener(this)
+        searchEditText.addTextChangedListener(this)
 
         AsyncTask.execute {
             wr.get()?.fetchRecentTxUsers()
+        }
+    }
+
+    fun reset() {
+        // state is not initial if there's some character in the search input
+        if (searchEditText.text.toString().isNotEmpty()) {
+            searchEditText.setText("")
+            continueButton.visibility = View.GONE
         }
     }
 
@@ -259,7 +269,7 @@ class AddRecipientFragment(private val walletService: TariWalletService) : BaseF
 
     private fun focusEditTextAndShowKeyboard() {
         val mActivity = activity ?: return
-        editText.requestFocus()
+        searchEditText.requestFocus()
         val imm = mActivity.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         imm.toggleSoftInput(
             InputMethodManager.SHOW_FORCED,
@@ -288,7 +298,9 @@ class AddRecipientFragment(private val walletService: TariWalletService) : BaseF
         UiUtil.temporarilyDisableClick(view)
         val mActivity = activity ?: return
         UiUtil.hideKeyboard(mActivity)
-        mActivity.onBackPressed()
+        rootView.postDelayed({
+            mActivity.onBackPressed()
+        }, 200L)
     }
 
     /**
@@ -338,7 +350,7 @@ class AddRecipientFragment(private val walletService: TariWalletService) : BaseF
         UiUtil.temporarilyDisableClick(view)
         listenerWR.get()?.continueToAmount(
             this,
-            editText.text.toString().replace(emojiIdChunkSeparator, "")
+            searchEditText.text.toString().replace(emojiIdChunkSeparator, "")
         )
     }
 
@@ -354,7 +366,7 @@ class AddRecipientFragment(private val walletService: TariWalletService) : BaseF
         hidePasteEmojiIdViews()
         val mActivity = activity ?: return
         UiUtil.hideKeyboard(mActivity)
-        editText.clearFocus()
+        searchEditText.clearFocus()
     }
 
     /**
@@ -363,13 +375,13 @@ class AddRecipientFragment(private val walletService: TariWalletService) : BaseF
     @OnClick(R.id.add_recipient_vw_paste_emoji_id_banner)
     fun onEmojiIdBannerClicked() {
         pasteEmojiBannerView.visibility = View.GONE
-        editText.setText(pasteEmojiClipboardTextView.text, TextView.BufferType.EDITABLE)
+        searchEditText.setText(pasteEmojiClipboardTextView.text, TextView.BufferType.EDITABLE)
         dimmerViews.forEach {
             it.visibility = View.GONE
         }
         val mActivity = activity ?: return
         UiUtil.hideKeyboard(mActivity)
-        editText.clearFocus()
+        searchEditText.clearFocus()
     }
 
     // region recycler view item touch listener
@@ -384,7 +396,7 @@ class AddRecipientFragment(private val walletService: TariWalletService) : BaseF
     override fun onInterceptTouchEvent(rv: RecyclerView, e: MotionEvent): Boolean {
         val mActivity = activity ?: return false
         UiUtil.hideKeyboard(mActivity)
-        editText.clearFocus()
+        searchEditText.clearFocus()
         return false
     }
 
@@ -439,8 +451,8 @@ class AddRecipientFragment(private val walletService: TariWalletService) : BaseF
 
         val textWithoutSeparators = editable.toString()
         if (textWithoutSeparators.firstNCharactersAreEmojis(emojiFormatterChunkSize)) {
-            editText.textAlignment = View.TEXT_ALIGNMENT_CENTER
-            editText.letterSpacing = inputEmojiIdLetterSpacing
+            searchEditText.textAlignment = View.TEXT_ALIGNMENT_CENTER
+            searchEditText.letterSpacing = inputEmojiIdLetterSpacing
             // add separators
             for ((offset, index) in EmojiUtil.getNewChunkSeparatorIndices(textWithoutSeparators).withIndex()) {
                 val target = index + (offset * emojiIdChunkSeparator.length)
@@ -458,7 +470,7 @@ class AddRecipientFragment(private val walletService: TariWalletService) : BaseF
                 val mActivity = activity
                 if (mActivity != null) {
                     UiUtil.hideKeyboard(mActivity)
-                    editText.clearFocus()
+                    searchEditText.clearFocus()
                 }
                 displaySearchResult(ArrayList())
             } else {
@@ -466,8 +478,8 @@ class AddRecipientFragment(private val walletService: TariWalletService) : BaseF
                 onSearchTextChanged(textWithoutSeparators)
             }
         } else {
-            editText.textAlignment = View.TEXT_ALIGNMENT_TEXT_START
-            editText.letterSpacing = inputNormalLetterSpacing
+            searchEditText.textAlignment = View.TEXT_ALIGNMENT_TEXT_START
+            searchEditText.letterSpacing = inputNormalLetterSpacing
             onSearchTextChanged(textWithoutSeparators)
         }
         textWatcherIsRunning = false
@@ -505,10 +517,20 @@ class AddRecipientFragment(private val walletService: TariWalletService) : BaseF
 
     // region listener interface
 
+    /**
+     * Listener interface - to be implemented by the host activity.
+     */
     interface Listener {
 
-        fun continueToAmount(addRecipientFragment: AddRecipientFragment, emojiId: String)
-        fun continueToAmount(addRecipientFragment: AddRecipientFragment, user: User)
+        /**
+         * Send to the emoji id in the clipboard.
+         */
+        fun continueToAmount(sourceFragment: AddRecipientFragment, emojiId: String)
+
+        /**
+         * Send to a user from the list.
+         */
+        fun continueToAmount(sourceFragment: AddRecipientFragment, user: User)
 
     }
 

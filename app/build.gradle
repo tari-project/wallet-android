@@ -16,7 +16,7 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
         ndk {
-            abiFilters /*"armeabi-v7a",*/ "arm64-v8a", "x86_64" // fetch missing binaries from  https://tari.com/downloads
+            abiFilters "armeabi-v7a", "arm64-v8a", "x86_64" // fetch missing binaries from  https://tari.com/downloads
         }
         externalNativeBuild {
             cmake {
@@ -97,12 +97,6 @@ dependencies {
 
     // joda
     implementation "net.danlew:android.joda:2.10.3"
-
-    // dart - extras injection
-    implementation 'com.f2prateek.dart:dart:3.1.3'
-    kapt 'com.f2prateek.dart:dart-processor:3.1.3'
-    implementation 'com.f2prateek.dart:henson:3.1.3'
-    kapt 'com.f2prateek.dart:henson-processor:3.1.3'
 
     // parceler
     implementation 'org.parceler:parceler-api:1.1.12'

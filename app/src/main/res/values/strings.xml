@@ -15,6 +15,7 @@
     <string name="digit_7">7</string>
     <string name="digit_8">8</string>
     <string name="digit_9">9</string>
+    <string name="digit_decimal_separator_bullet_char">.</string>
     <string name="digit_thousands_separator">,</string>
     <string name="digit_decimal_separator">.</string>
 
@@ -28,6 +29,7 @@
     <string name="dummy_contact_initial">S</string>
     <string name="dummy_message">Thanks again for helping with my move</string>
     <string name="dummy_emoji">🍀</string>
+    <string name="dummy_balance">124.56</string>
 
     <!-- emoji-id-related -->
     <string name="emoji_id_bullet_separator">•••</string>
@@ -85,7 +87,9 @@
     <string name="add_recipient_invalid_emoji_id">Invalid Emoji ID</string>
 
     <!-- send tari - amount -->
-    <string name="amount_under_construction">Under Construction</string>
+    <string name="add_amount_under_construction">Under Construction</string>
+    <string name="add_amount_not_enough_available_balance">Not enough Tari in your available balance</string>
+    <string name="add_amount_tx_fee">Transaction Fee</string>
 
     <!-- debug log - title -->
     <string name="debug_log_title">Log</string>

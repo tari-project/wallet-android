@@ -365,7 +365,7 @@ class HomeActivity : BaseActivity(),
         pendingOutboundTxs.addAll(walletService!!.pendingOutboundTxs)
         val wr = WeakReference<HomeActivity>(this)
         scrollView.post {
-            balanceViewController.balance = balanceInfo.availableBalance.tariValue.toDouble()
+            balanceViewController.balance = balanceInfo.availableBalance.tariValue
             wr.get()?.recyclerViewAdapter?.notifyDataChanged()
             wr.get()?.swipeRefreshLayout?.isRefreshing = false
             wr.get()?.recyclerView?.isNestedScrollingEnabled = true
@@ -386,7 +386,7 @@ class HomeActivity : BaseActivity(),
                 this,
                 balanceDigitContainerView,
                 balanceDecimalDigitContainerView,
-                balanceInfo.availableBalance.tariValue.toDouble() // initial value
+                balanceInfo.availableBalance.tariValue // initial value
             )
 
         // show digits

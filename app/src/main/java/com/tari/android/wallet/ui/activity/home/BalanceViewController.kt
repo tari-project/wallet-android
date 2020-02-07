@@ -51,6 +51,7 @@ import com.tari.android.wallet.ui.extension.setWidthToMeasured
 import com.tari.android.wallet.ui.util.UiUtil
 import com.tari.android.wallet.util.Constants
 import java.lang.ref.WeakReference
+import java.math.BigDecimal
 import java.math.RoundingMode
 import java.text.DecimalFormat
 
@@ -63,7 +64,7 @@ class BalanceViewController(
     private val context: Context,
     private val digitContainerView: ViewGroup,
     decimalDigitContainerView: ViewGroup,
-    private var _balance: Double
+    private var _balance: BigDecimal
 ) {
 
     private val viewHolders: ArrayList<BalanceDigitViewHolder> = ArrayList()
@@ -132,7 +133,7 @@ class BalanceViewController(
         }
     }
 
-    var balance: Double
+    var balance: BigDecimal
         get() = _balance
         set(value) {
             /* execute setter logic */
