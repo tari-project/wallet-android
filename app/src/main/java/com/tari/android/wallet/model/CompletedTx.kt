@@ -91,6 +91,10 @@ class CompletedTx() : Tx() {
 
     }
 
+    fun calculateFee(): BigInteger {
+        return fee.divide(BigInteger("1000"))
+    }
+
     override fun writeToParcel(parcel: Parcel, flags: Int) {
         parcel.writeSerializable(id)
         parcel.writeSerializable(direction)

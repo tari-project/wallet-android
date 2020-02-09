@@ -81,5 +81,14 @@
 
 <!--    Transaction Details-->
     <string name="payment_received">Payment Received</string>
+    <string name="from">From</string>
+    <string name="contact_name">Contact Name</string>
+    <string name="create_contact_hint">Create a Contact Name</string>
+    <string name="note">Note</string>
+    <string name="edit">Edit</string>
+    <string name="add_contact">Add Contact Name</string>
+    <string name="transaction_fee">Transaction Fee</string>
+    <string name="payment_sent">Payment Sent</string>
+    <string name="transaction_id">Transaction Id</string>
 
 </resources>
