@@ -23,13 +23,23 @@
     <dimen name="home_send_tari_button_visible_bottom_margin">40dp</dimen>
     <dimen name="home_send_tari_button_hidden_bottom_margin">-100dp</dimen>
     <dimen name="home_send_tari_button_initial_bottom_margin">-150dp</dimen>
+    <dimen name="home_tx_list_header_height">64dp</dimen>
+    <dimen name="home_send_tari_button_height">54dp</dimen>
+
+    <dimen name="create_emoji_id_button_bottom_margin">20dp</dimen>
+    <dimen name="create_emoji_id_nerd_face_bottom_margin">24dp</dimen>
     <dimen name="splash_screen_title_bottom_margin">34dp</dimen>
     <dimen name="home_tx_list_item_height">75dp</dimen>
-
 
     <!-- send tari - add recipient -->
     <dimen name="add_recipient_search_bar_container_height">96dp</dimen>
     <dimen name="add_recipient_search_text_view_height">46dp</dimen>
     <dimen name="add_recipient_contact_list_item_height">68dp</dimen>
+    <!-- send tari - add amount -->
+    <dimen name="add_amount_element_container_translation_y">12dp</dimen>
+    <dimen name="add_amount_element_text_size">90sp</dimen>
+    <dimen name="add_amount_gem_size">21dp</dimen>
+    <dimen name="add_amount_leftmost_digit_margin_start">10dp</dimen>
+    <dimen name="add_amount_available_balance_error_amount_nudge_distance">40dp</dimen>
 
 </resources>

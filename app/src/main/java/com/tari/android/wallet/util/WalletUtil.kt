@@ -30,54 +30,30 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.tari.android.wallet.service;
+package com.tari.android.wallet.util
 
-// import model classes
-import com.tari.android.wallet.model.Model;
-import com.tari.android.wallet.service.TariWalletServiceListener;
+import com.tari.android.wallet.model.MicroTari
+import java.math.BigInteger
 
-interface TariWalletService {
-
-    /**
-    * Registers new wallet listener.
-    * Registered listener will be unregistered on death.
-    */
-    boolean registerListener(TariWalletServiceListener listener);
+/**
+ * Wallet utility functions.
+ *
+ * @author The Tari Development Team
+ */
+internal object WalletUtil {
 
     /**
-    * Unregisters wallet listener.
-    */
-    boolean unregisterListener(TariWalletServiceListener listener);
-
-    boolean generateTestData();
-
-    String getPublicKeyHexString();
-
-    String getLogFile();
-
-    BalanceInfo getBalanceInfo();
-
-    List<Contact> getContacts();
-
-    List<User> getRecentTxUsers(int maxCount);
-
-    List<CompletedTx> getCompletedTxs();
-
-    CompletedTx getCompletedTxById(in TxId id);
-
-    List<PendingInboundTx> getPendingInboundTxs();
-    PendingInboundTx getPendingInboundTxById(in TxId id);
-
-    List<PendingOutboundTx> getPendingOutboundTxs();
-    PendingOutboundTx getPendingOutboundTxById(in TxId id);
-
-    boolean send(
-        in User contact,
-        in MicroTari amount,
-        in MicroTari fee,
-        String message
-    );
-
-    boolean testComplete(in PendingOutboundTx tx);
+     * Calculates transaction fee.
+     * See https://github.com/tari-project/tari/issues/1058.
+     */
+    fun calculateTxFee(
+        baseCost: Int = 500,
+        numInputs: Int = 1,
+        numOutputs: Int = 2,
+        r: Int = 250
+    ): MicroTari {
+        val fee = baseCost + (numInputs + 4 * numOutputs) * r
+        return MicroTari(BigInteger.valueOf(fee.toLong()))
+    }
 
 }

@@ -66,7 +66,9 @@ class WalletService : Service(), FFIWalletListenerAdapter {
     @Inject
     @Named(WalletModule.NAME_WALLET_FILES_DIR_PATH)
     internal lateinit var datastorePath: String
-
+    @Inject
+    @Named(WalletModule.NAME_WALLET_LOG_FILE_PATH)
+    internal lateinit var logFilePath: String
     /**
      * Service stub implementation.
      */
@@ -255,6 +257,10 @@ class WalletService : Service(), FFIWalletListenerAdapter {
             success = success && wallet.testReceiveTx()
             success = success && wallet.generateTestData(datastorePath)
             return success
+        }
+
+        override fun getLogFile(): String {
+            return logFilePath
         }
 
         override fun getPublicKeyHexString() = wallet.getPublicKey().toString()

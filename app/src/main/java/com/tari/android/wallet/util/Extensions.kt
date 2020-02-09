@@ -30,54 +30,13 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.tari.android.wallet.service;
+package com.tari.android.wallet.util
 
-// import model classes
-import com.tari.android.wallet.model.Model;
-import com.tari.android.wallet.service.TariWalletServiceListener;
-
-interface TariWalletService {
-
-    /**
-    * Registers new wallet listener.
-    * Registered listener will be unregistered on death.
-    */
-    boolean registerListener(TariWalletServiceListener listener);
-
-    /**
-    * Unregisters wallet listener.
-    */
-    boolean unregisterListener(TariWalletServiceListener listener);
-
-    boolean generateTestData();
-
-    String getPublicKeyHexString();
-
-    String getLogFile();
-
-    BalanceInfo getBalanceInfo();
-
-    List<Contact> getContacts();
-
-    List<User> getRecentTxUsers(int maxCount);
-
-    List<CompletedTx> getCompletedTxs();
-
-    CompletedTx getCompletedTxById(in TxId id);
-
-    List<PendingInboundTx> getPendingInboundTxs();
-    PendingInboundTx getPendingInboundTxById(in TxId id);
-
-    List<PendingOutboundTx> getPendingOutboundTxs();
-    PendingOutboundTx getPendingOutboundTxById(in TxId id);
-
-    boolean send(
-        in User contact,
-        in MicroTari amount,
-        in MicroTari fee,
-        String message
-    );
-
-    boolean testComplete(in PendingOutboundTx tx);
-
+/**
+ * Maps float from one range to another.
+ *
+ * @return mapped float
+ */
+fun Float.remap(from1: Float, to1: Float, from2: Float, to2: Float): Float {
+    return (this - from1) / (to1 - from1) * (to2 - from2) + from2
 }

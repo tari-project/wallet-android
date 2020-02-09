@@ -61,6 +61,7 @@ import butterknife.BindColor
 import butterknife.BindDimen
 import butterknife.BindView
 import butterknife.OnClick
+import butterknife.OnLongClick
 import com.daasuu.ei.Ease
 import com.daasuu.ei.EasingInterpolator
 import com.orhanobut.logger.Logger
@@ -73,6 +74,7 @@ import com.tari.android.wallet.ui.activity.BaseActivity
 import com.tari.android.wallet.ui.activity.EXTRA_QR_DATA
 import com.tari.android.wallet.ui.activity.QRScannerActivity
 import com.tari.android.wallet.ui.activity.home.adapter.TxListAdapter
+import com.tari.android.wallet.ui.activity.log.DebugLogActivity
 import com.tari.android.wallet.ui.activity.send.SendTariActivity
 import com.tari.android.wallet.ui.activity.transactiondetails.TransactionDetailActivity
 import com.tari.android.wallet.ui.util.UiUtil
@@ -364,7 +366,7 @@ class HomeActivity : BaseActivity(),
         pendingOutboundTxs.addAll(walletService!!.pendingOutboundTxs)
         val wr = WeakReference<HomeActivity>(this)
         scrollView.post {
-            balanceViewController.balance = balanceInfo.availableBalance.tariValue.toDouble()
+            balanceViewController.balance = balanceInfo.availableBalance.tariValue
             wr.get()?.recyclerViewAdapter?.notifyDataChanged()
             wr.get()?.swipeRefreshLayout?.isRefreshing = false
             wr.get()?.recyclerView?.isNestedScrollingEnabled = true
@@ -385,7 +387,7 @@ class HomeActivity : BaseActivity(),
                 this,
                 balanceDigitContainerView,
                 balanceDecimalDigitContainerView,
-                balanceInfo.availableBalance.tariValue.toDouble() // initial value
+                balanceInfo.availableBalance.tariValue // initial value
             )
 
         // show digits
@@ -506,6 +508,15 @@ class HomeActivity : BaseActivity(),
             0,
             scrollContentView.height - scrollView.height
         )
+    }
+
+    @OnLongClick(R.id.home_vw_grabber_container)
+    fun grabberContainerViewLongClicked()
+    {
+        val intent = Intent(this@HomeActivity, DebugLogActivity::class.java)
+        intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
+        intent.putExtra("log", wr?.get()?.walletService?.logFile);
+        startActivity(intent)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

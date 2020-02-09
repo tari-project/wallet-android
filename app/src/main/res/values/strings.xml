@@ -15,6 +15,7 @@
     <string name="digit_7">7</string>
     <string name="digit_8">8</string>
     <string name="digit_9">9</string>
+    <string name="digit_decimal_separator_bullet_char">.</string>
     <string name="digit_thousands_separator">,</string>
     <string name="digit_decimal_separator">.</string>
 
@@ -28,6 +29,7 @@
     <string name="dummy_contact_initial">S</string>
     <string name="dummy_message">Thanks again for helping with my move</string>
     <string name="dummy_emoji">🍀</string>
+    <string name="dummy_balance">124.56</string>
 
     <!-- emoji-id-related -->
     <string name="emoji_id_bullet_separator">•••</string>
@@ -58,6 +60,14 @@
     <string name="home_pending_txs">Pending Transactions</string>
     <!-- test -->
     <string name="home_test_data_warning">Please wait.\n\nWallet is generating test data.</string>
+    <!-- create emoji id-->
+    <string name="create_emoji_id_hello_friend_label">Hello Friend</string>
+    <string name="create_emoji_id_just_a_sec_label">Just a sec...</string>
+    <string name="create_emoji_id_just_sec_desc_text">Your wallet is being created</string>
+    <string name="create_emoji_id_wallet_address_desc">Your Emoji ID is your wallet address. \n It’s how your friends can find you and send you Tari.</string>
+    <string name="create_emoji_id_now_text">Now create your Emoji ID</string>
+    <string name="create_emoji_id_awesome">Awesome!</string>
+
     <string name="scan_qr_description">Scan Tari QR code in the box below to send a Tari to recipient.</string>
     <string name="failed_init_camera_message">Failed to initialize Camera</string>
     <string name="camera_permission_denied_message">Camera permission denied</string>
@@ -77,7 +87,12 @@
     <string name="add_recipient_invalid_emoji_id">Invalid Emoji ID</string>
 
     <!-- send tari - amount -->
-    <string name="amount_under_construction">Under Construction</string>
+    <string name="add_amount_under_construction">Under Construction</string>
+    <string name="add_amount_not_enough_available_balance">Not enough Tari in your available balance</string>
+    <string name="add_amount_tx_fee">Transaction Fee</string>
+
+    <!-- debug log - title -->
+    <string name="debug_log_title">Log</string>
 
 <!--    Transaction Details-->
     <string name="payment_received">Payment Received</string>

@@ -36,7 +36,9 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.graphics.Color
 import android.os.Build
+import android.util.TypedValue
 import android.view.View
+import android.view.ViewGroup
 import android.view.WindowManager
 import android.widget.TextView
 import com.tari.android.wallet.ui.util.UiUtil
@@ -63,7 +65,7 @@ fun Activity.makeStatusBarTransparent() {
 }
 
 /**
- * Sets the width of a TextView to the measued width of its contents
+ * Sets the width of a TextView to the measured width of its contents
  * taking into account the text size and the typeface.
  */
 fun TextView.setWidthToMeasured() {
@@ -72,4 +74,52 @@ fun TextView.setWidthToMeasured() {
         this,
         this.measuredWidth
     )
+}
+
+/**
+ * Sets the size of a TextView to the measured size of its contents
+ * taking into account the text size and the typeface.
+ */
+fun TextView.setWidthAndHeightToMeasured() {
+    this.measure(0, 0)
+    UiUtil.setWidth(
+        this,
+        this.measuredWidth
+    )
+    UiUtil.setHeight(
+        this,
+        this.measuredHeight
+    )
+}
+
+/**
+ * Sets text size in pixel units.
+ */
+fun TextView.setTextSizePx(sizePx: Float) {
+    setTextSize(
+        TypedValue.COMPLEX_UNIT_PX,
+        sizePx
+    )
+}
+
+/**
+ * @return first child of the view group, null if no children
+ */
+fun ViewGroup.getFirstChild(): View? {
+    return if (childCount > 0) {
+        this.getChildAt(0)
+    } else {
+        null
+    }
+}
+
+/**
+ * @return last child of the view group, null if no children
+ */
+fun ViewGroup.getLastChild(): View? {
+    return if (childCount > 0) {
+        this.getChildAt(childCount - 1)
+    } else {
+        null
+    }
 }

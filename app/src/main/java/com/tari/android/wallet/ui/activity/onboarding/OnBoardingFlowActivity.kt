@@ -30,54 +30,28 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.tari.android.wallet.service;
+package com.tari.android.wallet.ui.activity.onboarding
 
-// import model classes
-import com.tari.android.wallet.model.Model;
-import com.tari.android.wallet.service.TariWalletServiceListener;
+import android.os.Bundle
+import com.tari.android.wallet.R
+import com.tari.android.wallet.ui.activity.BaseActivity
+import com.tari.android.wallet.ui.fragment.onboarding.CreateWalletFragment
 
-interface TariWalletService {
+/**
+ * onBoarding activity class : contain  splash screen and loading sequence
+ *
+ * @author The Tari Development Team
+ */
+class OnBoardingFlowActivity : BaseActivity() {
 
-    /**
-    * Registers new wallet listener.
-    * Registered listener will be unregistered on death.
-    */
-    boolean registerListener(TariWalletServiceListener listener);
+    override val contentViewId = R.layout.activity_onboarding_flow
 
-    /**
-    * Unregisters wallet listener.
-    */
-    boolean unregisterListener(TariWalletServiceListener listener);
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
 
-    boolean generateTestData();
-
-    String getPublicKeyHexString();
-
-    String getLogFile();
-
-    BalanceInfo getBalanceInfo();
-
-    List<Contact> getContacts();
-
-    List<User> getRecentTxUsers(int maxCount);
-
-    List<CompletedTx> getCompletedTxs();
-
-    CompletedTx getCompletedTxById(in TxId id);
-
-    List<PendingInboundTx> getPendingInboundTxs();
-    PendingInboundTx getPendingInboundTxById(in TxId id);
-
-    List<PendingOutboundTx> getPendingOutboundTxs();
-    PendingOutboundTx getPendingOutboundTxById(in TxId id);
-
-    boolean send(
-        in User contact,
-        in MicroTari amount,
-        in MicroTari fee,
-        String message
-    );
-
-    boolean testComplete(in PendingOutboundTx tx);
-
+        supportFragmentManager.beginTransaction()
+            .replace(R.id.onboarding_frame_container,
+                CreateWalletFragment()
+            ).commit()
+    }
 }
