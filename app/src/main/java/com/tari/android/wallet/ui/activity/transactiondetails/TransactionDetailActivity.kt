@@ -21,6 +21,7 @@ import com.tari.android.wallet.ui.component.EmojiIdSummaryViewController
 import com.tari.android.wallet.util.EmojiUtil
 import java.util.*
 
+
 class TransactionDetailActivity : BaseActivity() {
 
     override val contentViewId: Int = R.layout.activity_transaction_detail
@@ -138,15 +139,36 @@ class TransactionDetailActivity : BaseActivity() {
         }
 
         val calendar = Calendar.getInstance()
-        calendar.timeInMillis = transaction!!.timestamp.toLong()
+        calendar.timeInMillis = transaction!!.timestamp.toLong() * 1000
+        formatDate(calendar)
 
     }
 
     private fun formatDate(cal: Calendar) {
         val month = cal.getDisplayName(Calendar.MONTH, Calendar.LONG, Locale.getDefault())
         val day = cal.get(Calendar.DAY_OF_MONTH)
+        val dayStr = "$day${getDayNumberSuffix(day)}"
         val year = cal.get(Calendar.YEAR)
-        transactionDateTv.text = "$month $day $year at "
+        val amPm = cal.getDisplayName(Calendar.AM_PM, Calendar.SHORT, Locale.getDefault())
+        val hour = cal.get(Calendar.HOUR)
+        val min = cal.get(Calendar.MINUTE)
+        var minStr = "$min"
+        var hourStr = "$hour"
+        if (min < 10) minStr = "0$min"
+        if (hour < 10) hourStr = "0$hour"
+
+        transactionDateTv.text = "$month $dayStr $year at $hourStr:$minStr $amPm"
+    }
+
+    private fun getDayNumberSuffix(day: Int): String? {
+        return if (day in 11..13) {
+            "th"
+        } else when (day % 10) {
+            1 -> "st"
+            2 -> "nd"
+            3 -> "rd"
+            else -> "th"
+        }
     }
 
     override fun onBackPressed() {
@@ -155,6 +177,7 @@ class TransactionDetailActivity : BaseActivity() {
     }
 
     private fun setAlias(alias: String) {
+        contactNameTv.visibility = View.VISIBLE
         createContactEt.visibility = View.INVISIBLE
         contactNameTv.text = alias
         editContactBtn.visibility = View.VISIBLE
@@ -174,6 +197,6 @@ class TransactionDetailActivity : BaseActivity() {
         editContactBtn.visibility = View.INVISIBLE
         createContactEt.visibility = View.VISIBLE
         createContactEt.setText((transaction!!.user as Contact).alias)
-        contactNameTv.visibility = View.VISIBLE
+        contactNameTv.visibility = View.INVISIBLE
     }
 }
