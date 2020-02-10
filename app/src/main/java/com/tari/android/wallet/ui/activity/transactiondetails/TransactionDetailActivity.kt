@@ -3,7 +3,6 @@ package com.tari.android.wallet.ui.activity.transactiondetails
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.KeyEvent
 import android.view.View
@@ -20,7 +19,7 @@ import com.tari.android.wallet.ui.component.CustomFontEditText
 import com.tari.android.wallet.ui.component.CustomFontTextView
 import com.tari.android.wallet.ui.component.EmojiIdSummaryViewController
 import com.tari.android.wallet.util.EmojiUtil
-import java.math.BigInteger
+import java.util.*
 
 class TransactionDetailActivity : BaseActivity() {
 
@@ -75,6 +74,9 @@ class TransactionDetailActivity : BaseActivity() {
     @BindView(R.id.transaction_detail_separator)
     lateinit var contactSeparator: View
 
+    @BindView(R.id.note_label)
+    lateinit var noteLabel: View
+
     @BindView(R.id.tx_detail_tx_fee_group)
     lateinit var transactionFeeGroup: Group
 
@@ -105,6 +107,9 @@ class TransactionDetailActivity : BaseActivity() {
         val emojiId = EmojiUtil.getEmojiIdForPublicKeyHexString(transaction!!.user.publicKeyHexString)
         emojiIdSummaryController.display(emojiId)
         transactionIdTv.text = "${getString(R.string.transaction_id)}:${transaction!!.id}"
+        if (transaction!!.message.isBlank()) {
+            noteLabel.visibility = View.INVISIBLE
+        }
         transactionNoteTv.text = transaction!!.message
         backBtn.setOnClickListener { onBackPressed() }
         val user = transaction!!.user
@@ -131,6 +136,17 @@ class TransactionDetailActivity : BaseActivity() {
             }
             return@setOnKeyListener false
         }
+
+        val calendar = Calendar.getInstance()
+        calendar.timeInMillis = transaction!!.timestamp.toLong()
+
+    }
+
+    private fun formatDate(cal: Calendar) {
+        val month = cal.getDisplayName(Calendar.MONTH, Calendar.LONG, Locale.getDefault())
+        val day = cal.get(Calendar.DAY_OF_MONTH)
+        val year = cal.get(Calendar.YEAR)
+        transactionDateTv.text = "$month $day $year at "
     }
 
     override fun onBackPressed() {
