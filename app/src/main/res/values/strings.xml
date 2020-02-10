@@ -96,6 +96,9 @@
 
 <!--    Transaction Details-->
     <string name="payment_received">Payment Received</string>
+    <string name="payment_sent">Payment Sent</string>
+    <string name="pending_payment_sent">Pending Payment Sent</string>
+    <string name="pending_payment_received">Pending Payment Sent</string>
     <string name="from">From</string>
     <string name="contact_name">Contact Name</string>
     <string name="create_contact_hint">Create a Contact Name</string>
@@ -103,7 +106,6 @@
     <string name="edit">Edit</string>
     <string name="add_contact">Add Contact Name</string>
     <string name="transaction_fee">Transaction Fee</string>
-    <string name="payment_sent">Payment Sent</string>
     <string name="transaction_id">Transaction Id</string>
 
 </resources>

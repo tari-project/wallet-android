@@ -11,9 +11,7 @@ import androidx.constraintlayout.widget.Group
 import butterknife.BindView
 import butterknife.OnClick
 import com.tari.android.wallet.R
-import com.tari.android.wallet.model.CompletedTx
-import com.tari.android.wallet.model.Contact
-import com.tari.android.wallet.model.Tx
+import com.tari.android.wallet.model.*
 import com.tari.android.wallet.ui.activity.BaseActivity
 import com.tari.android.wallet.ui.component.CustomFontEditText
 import com.tari.android.wallet.ui.component.CustomFontTextView
@@ -25,10 +23,11 @@ import java.util.*
 class TransactionDetailActivity : BaseActivity() {
 
     override val contentViewId: Int = R.layout.activity_transaction_detail
+
     companion object {
         val TRANSACTION_EXTRA_KEY = "TRANSACTION_EXTRA_KEY"
 
-        fun createIntent(context: Context, transaction: Tx): Intent{
+        fun createIntent(context: Context, transaction: Tx): Intent {
             return Intent(context, TransactionDetailActivity::class.java)
                 .apply {
                     putExtra(TRANSACTION_EXTRA_KEY, transaction)
@@ -95,17 +94,24 @@ class TransactionDetailActivity : BaseActivity() {
 
     @SuppressLint("SetTextI18n")
     private fun setupUI() {
-        when(transaction!!.direction) {
-            Tx.Direction.INBOUND -> {
-                transactionTypeTv.text = getString(R.string.payment_received)
+        when (transaction) {
+            is CompletedTx -> {
+                when (transaction!!.direction) {
+                    Tx.Direction.INBOUND -> transactionTypeTv.text =
+                        getString(R.string.payment_received)
+                    Tx.Direction.OUTBOUND -> transactionTypeTv.text =
+                        getString(R.string.payment_sent)
+                }
             }
-            Tx.Direction.OUTBOUND -> {
-                transactionTypeTv.text = getString(R.string.payment_sent)
-            }
+            is PendingInboundTx -> transactionTypeTv.text =
+                getString(R.string.pending_payment_received)
+            is PendingOutboundTx -> transactionTypeTv.text =
+                getString(R.string.pending_payment_sent)
         }
         transactionAmountTv.text = "%1$,.2f".format(transaction!!.amount.tariValue.toDouble())
 
-        val emojiId = EmojiUtil.getEmojiIdForPublicKeyHexString(transaction!!.user.publicKeyHexString)
+        val emojiId =
+            EmojiUtil.getEmojiIdForPublicKeyHexString(transaction!!.user.publicKeyHexString)
         emojiIdSummaryController.display(emojiId)
         transactionIdTv.text = "${getString(R.string.transaction_id)}:${transaction!!.id}"
         if (transaction!!.message.isBlank()) {
@@ -127,7 +133,7 @@ class TransactionDetailActivity : BaseActivity() {
         } else {
             transactionFeeGroup.visibility = View.GONE
         }
-        createContactEt.setOnKeyListener { _, keyCode, event ->
+        createContactEt.setOnKeyListener{ _, keyCode, event ->
             if (event.action == KeyEvent.ACTION_DOWN && keyCode == KeyEvent.KEYCODE_ENTER) {
                 val name = createContactEt.text?.toString()
                 if (name != null) {
@@ -145,7 +151,8 @@ class TransactionDetailActivity : BaseActivity() {
     }
 
     private fun formatDate(cal: Calendar) {
-        val month = cal.getDisplayName(Calendar.MONTH, Calendar.LONG, Locale.getDefault())
+        val dayOfWeek = cal.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.SHORT, Locale.getDefault())
+        val month = cal.getDisplayName(Calendar.MONTH, Calendar.SHORT, Locale.getDefault())
         val day = cal.get(Calendar.DAY_OF_MONTH)
         val dayStr = "$day${getDayNumberSuffix(day)}"
         val year = cal.get(Calendar.YEAR)
@@ -157,7 +164,7 @@ class TransactionDetailActivity : BaseActivity() {
         if (min < 10) minStr = "0$min"
         if (hour < 10) hourStr = "0$hour"
 
-        transactionDateTv.text = "$month $dayStr $year at $hourStr:$minStr $amPm"
+        transactionDateTv.text = "$dayOfWeek, $month $dayStr $year at $hourStr:$minStr $amPm"
     }
 
     private fun getDayNumberSuffix(day: Int): String? {
