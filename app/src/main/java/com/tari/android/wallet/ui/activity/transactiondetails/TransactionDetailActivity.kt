@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.KeyEvent
 import android.view.View
 import android.widget.ImageView
 import androidx.constraintlayout.widget.Group
@@ -66,6 +67,9 @@ class TransactionDetailActivity : BaseActivity() {
     @BindView(R.id.tx_detail_tx_id)
     lateinit var transactionIdTv: CustomFontTextView
 
+    @BindView(R.id.tx_detail_contact_container)
+    lateinit var contactContainer: View
+
     @BindView(R.id.transaction_detail_emoji_summary)
     lateinit var emojiSummaryView: View
     @BindView(R.id.transaction_detail_separator)
@@ -79,7 +83,7 @@ class TransactionDetailActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        overridePendingTransition(android.R.anim.slide_in_left, android.R.anim.slide_out_right)
+        overridePendingTransition(R.anim.enter_from_right, android.R.anim.fade_out)
         emojiIdSummaryController = EmojiIdSummaryViewController(emojiSummaryView)
         transaction = intent.getParcelableExtra(TRANSACTION_EXTRA_KEY)
         if (transaction == null) finish()
@@ -105,15 +109,11 @@ class TransactionDetailActivity : BaseActivity() {
         backBtn.setOnClickListener { onBackPressed() }
         val user = transaction!!.user
         if (user is Contact) {
-            contactNameTv.visibility = View.VISIBLE
-            contactNameTv.text = user.alias
-            contactLabel.visibility = View.VISIBLE
-            addContactBtn.visibility = View.INVISIBLE
-            contactSeparator.visibility = View.VISIBLE
-            editContactBtn.visibility = View.VISIBLE
-
+            contactContainer.visibility = View.VISIBLE
+            setAlias(user.alias)
         } else {
             addContactBtn.visibility = View.VISIBLE
+            contactContainer.visibility = View.GONE
         }
         if (transaction is CompletedTx) {
             transactionFeeGroup.visibility = View.VISIBLE
@@ -121,14 +121,43 @@ class TransactionDetailActivity : BaseActivity() {
         } else {
             transactionFeeGroup.visibility = View.GONE
         }
+        createContactEt.setOnKeyListener { _, keyCode, event ->
+            if (event.action == KeyEvent.ACTION_DOWN && keyCode == KeyEvent.KEYCODE_ENTER) {
+                val name = createContactEt.text?.toString()
+                if (name != null) {
+                    setAlias(name)
+                }
+                return@setOnKeyListener true
+            }
+            return@setOnKeyListener false
+        }
+    }
+
+    override fun onBackPressed() {
+        super.onBackPressed()
+        overridePendingTransition(R.anim.enter_from_left, R.anim.exit_to_right)
+    }
+
+    private fun setAlias(alias: String) {
+        createContactEt.visibility = View.INVISIBLE
+        contactNameTv.text = alias
+        editContactBtn.visibility = View.VISIBLE
+        addContactBtn.visibility = View.INVISIBLE
     }
 
     @OnClick(R.id.tx_detail_add_contact)
     fun addContact() {
+        contactContainer.visibility = View.VISIBLE
         addContactBtn.visibility = View.INVISIBLE
-        editContactBtn.visibility = View.VISIBLE
         createContactEt.visibility = View.VISIBLE
         contactLabel.visibility = View.VISIBLE
-        contactSeparator.visibility = View.VISIBLE
+    }
+
+    @OnClick(R.id.tx_detail_edit_name)
+    fun editContact() {
+        editContactBtn.visibility = View.INVISIBLE
+        createContactEt.visibility = View.VISIBLE
+        createContactEt.setText((transaction!!.user as Contact).alias)
+        contactNameTv.visibility = View.VISIBLE
     }
 }

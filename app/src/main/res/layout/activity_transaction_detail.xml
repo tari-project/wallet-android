@@ -93,174 +93,179 @@
         android:textColor="@color/light_gray"
         android:textSize="14sp"
         app:customFont="AVENIR_LT_STD_ROMAN"
-        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tx_detail_tx_fee" />
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/transasaction_detail_body"
+    <RelativeLayout
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:background="@color/white"
-        android:elevation="5dp"
         android:layout_marginTop="32dp"
+        android:elevation="5dp"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tx_fee_label">
 
-        <com.tari.android.wallet.ui.component.CustomFontTextView
-            android:id="@+id/from_label"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:id="@+id/transaction_detail_body"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="24dp"
-            android:layout_marginTop="32dp"
-            android:text="@string/from"
-            android:textColor="@color/light_gray"
-            android:textSize="14sp"
-            app:customFont="AVENIR_LT_STD_MEDIUM"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            android:orientation="vertical"
+            android:paddingStart="24dp">
 
-        <include
-            android:id="@+id/transaction_detail_emoji_summary"
-            layout="@layout/emoji_id_summary"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            app:layout_constraintStart_toStartOf="@id/from_label"
-            app:layout_constraintTop_toBottomOf="@id/from_label" />
+            <com.tari.android.wallet.ui.component.CustomFontTextView
+                android:id="@+id/from_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="32dp"
+                android:text="@string/from"
+                android:textColor="@color/light_gray"
+                android:textSize="14sp"
+                app:customFont="AVENIR_LT_STD_MEDIUM" />
 
-        <com.tari.android.wallet.ui.component.CustomFontTextView
-            android:id="@+id/tx_detail_add_contact"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/add_contact"
-            android:layout_marginEnd="24dp"
-            app:customFont="AVENIR_LT_STD_MEDIUM"
-            android:textColor="@color/home_bg_gradient_center"
-            app:layout_constraintTop_toTopOf="@id/transaction_detail_emoji_summary"
-            app:layout_constraintBottom_toBottomOf="@id/transaction_detail_emoji_summary"
-            app:layout_constraintEnd_toEndOf="parent"/>
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp">
 
+                <include
+                    android:id="@+id/transaction_detail_emoji_summary"
+                    layout="@layout/emoji_id_summary"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
 
-        <com.tari.android.wallet.ui.component.CustomFontTextView
-            android:id="@+id/contact_label"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="32dp"
-            android:text="@string/contact_name"
-            android:visibility="invisible"
-            android:textColor="@color/black"
-            app:customFont="AVENIR_LT_STD_MEDIUM"
-            android:textSize="14sp"
-            app:layout_constraintStart_toStartOf="@id/transaction_detail_emoji_summary"
-            app:layout_constraintTop_toBottomOf="@id/transaction_detail_emoji_summary" />
-
-        <com.tari.android.wallet.ui.component.CustomFontEditText
-            android:id="@+id/transaction_detail_create_contact"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:background="#00000000"
-            android:hint="@string/create_contact_hint"
-            android:textColor="@color/light_gray"
-            app:customFont="AVENIR_LT_STD_ROMAN"
-            android:visibility="invisible"
-            android:textSize="14sp"
-            app:layout_constraintStart_toStartOf="@id/contact_label"
-            app:layout_constraintTop_toBottomOf="@id/contact_label" />
-
-        <com.tari.android.wallet.ui.component.CustomFontTextView
-            android:id="@+id/transaction_detail_contact_name"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            tools:text="James Walker"
-            android:visibility="invisible"
-            android:textColor="@color/black"
-            android:textSize="14sp"
-            app:customFont="AVENIR_LT_STD_ROMAN"
-            app:layout_constraintStart_toStartOf="@id/contact_label"
-            app:layout_constraintTop_toBottomOf="@id/contact_label" />
-
-        <com.tari.android.wallet.ui.component.CustomFontTextView
-            android:id="@+id/tx_detail_edit_name"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/edit"
-            android:visibility="invisible"
-            android:layout_marginEnd="24dp"
-            app:customFont="AVENIR_LT_STD_MEDIUM"
-            android:textColor="@color/home_bg_gradient_center"
-            app:layout_constraintTop_toTopOf="@id/transaction_detail_contact_name"
-            app:layout_constraintBottom_toBottomOf="@id/transaction_detail_contact_name"
-            app:layout_constraintEnd_toEndOf="parent"/>
-
-        <View
-            android:id="@+id/transaction_detail_separator"
-            android:layout_width="0dp"
-            android:layout_height="1dp"
-            android:layout_marginTop="16dp"
-            android:layout_marginEnd="24dp"
-            android:background="@color/light_white"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="@id/transaction_detail_create_contact"
-            app:layout_constraintTop_toBottomOf="@id/transaction_detail_create_contact" />
-
-        <com.tari.android.wallet.ui.component.CustomFontTextView
-            android:id="@+id/note_label"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="32dp"
-            android:text="@string/note"
-            android:textColor="@color/light_gray"
-            app:customFont="AVENIR_LT_STD_MEDIUM"
-            android:textSize="14sp"
-            app:layout_constraintTop_toBottomOf="@id/transaction_detail_separator"
-            app:layout_constraintStart_toStartOf="@id/transaction_detail_separator"/>
+                <com.tari.android.wallet.ui.component.CustomFontTextView
+                    android:id="@+id/tx_detail_add_contact"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:layout_marginEnd="24dp"
+                    android:text="@string/add_contact"
+                    android:textColor="@color/home_bg_gradient_center"
+                    app:customFont="AVENIR_LT_STD_MEDIUM" />
+            </RelativeLayout>
 
 
-        <com.tari.android.wallet.ui.component.CustomFontTextView
-            android:id="@+id/transaction_detail_note"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            tools:text="Thanks for the Skywalker skin!"
-            android:textColor="@color/black"
-            app:customFont="AVENIR_LT_STD_ROMAN"
-            android:textSize="14sp"
-            app:layout_constraintStart_toStartOf="@id/note_label"
-            app:layout_constraintTop_toBottomOf="@id/note_label" />
+            <LinearLayout
+                android:id="@+id/tx_detail_contact_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="32dp"
+                android:orientation="vertical"
+                android:visibility="gone"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="@id/transaction_detail_emoji_summary"
+                app:layout_constraintTop_toBottomOf="@id/transaction_detail_emoji_summary">
 
+                <com.tari.android.wallet.ui.component.CustomFontTextView
+                    android:id="@+id/contact_label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/contact_name"
+                    android:textColor="@color/black"
+                    android:textSize="14sp"
+                    app:customFont="AVENIR_LT_STD_MEDIUM" />
+
+                <FrameLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp">
+
+                    <com.tari.android.wallet.ui.component.CustomFontEditText
+                        android:id="@+id/transaction_detail_create_contact"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:imeOptions="actionDone"
+                        android:inputType="text"
+                        android:background="#00000000"
+                        android:hint="@string/create_contact_hint"
+                        android:textSize="14sp"
+                        app:customFont="AVENIR_LT_STD_ROMAN" />
+
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                        <com.tari.android.wallet.ui.component.CustomFontTextView
+                            android:id="@+id/transaction_detail_contact_name"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="@color/black"
+                            android:textSize="14sp"
+                            app:customFont="AVENIR_LT_STD_ROMAN"
+                            tools:text="James Walker" />
+
+                        <com.tari.android.wallet.ui.component.CustomFontTextView
+                            android:id="@+id/tx_detail_edit_name"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentEnd="true"
+                            android:layout_marginEnd="24dp"
+                            android:text="@string/edit"
+                            android:textColor="@color/home_bg_gradient_center"
+                            app:customFont="AVENIR_LT_STD_MEDIUM" />
+                    </RelativeLayout>
+                </FrameLayout>
+
+                <View
+                    android:id="@+id/transaction_detail_separator"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginEnd="24dp"
+                    android:background="@color/light_white"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="@id/transaction_detail_create_contact"
+                    app:layout_constraintTop_toBottomOf="@id/transaction_detail_create_contact" />
+            </LinearLayout>
+
+            <com.tari.android.wallet.ui.component.CustomFontTextView
+                android:id="@+id/note_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="32dp"
+                android:text="@string/note"
+                android:textColor="@color/light_gray"
+                android:textSize="14sp"
+                app:customFont="AVENIR_LT_STD_MEDIUM"
+                app:layout_constraintStart_toStartOf="@id/tx_detail_contact_container"
+                app:layout_constraintTop_toBottomOf="@id/tx_detail_contact_container" />
+
+
+            <com.tari.android.wallet.ui.component.CustomFontTextView
+                android:id="@+id/transaction_detail_note"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:textColor="@color/black"
+                android:textSize="14sp"
+                app:customFont="AVENIR_LT_STD_ROMAN"
+                app:layout_constraintStart_toStartOf="@id/note_label"
+                app:layout_constraintTop_toBottomOf="@id/note_label"
+                tools:text="Thanks for the Skywalker skin!" />
+        </LinearLayout>
 
         <com.tari.android.wallet.ui.component.CustomFontTextView
             android:id="@+id/tx_detail_tx_id"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
             android:layout_marginTop="32dp"
+            android:layout_marginBottom="16dp"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
             android:text="@string/note"
             android:textColor="@color/light_gray"
-            tools:text="Transaction ID: 8G438GM39"
             android:textSize="14sp"
             app:customFont="AVENIR_LT_STD_ROMAN"
-            android:layout_marginBottom="16dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"/>
-
-<!--        <androidx.constraintlayout.widget.Group-->
-<!--            android:id="@+id/tx_detail_contact_group"-->
-<!--            android:layout_width="wrap_content"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            app:constraint_referenced_ids="contact_label,transaction_detail_create_contact,tx_detail_edit_name"/>-->
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
+            tools:text="Transaction ID: 8G438GM39" />
+    </RelativeLayout>
 
     <androidx.constraintlayout.widget.Group
         android:id="@+id/tx_detail_tx_fee_group"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:constraint_referenced_ids="tx_detail_tx_fee,tx_fee_label"/>
-
 </androidx.constraintlayout.widget.ConstraintLayout>
