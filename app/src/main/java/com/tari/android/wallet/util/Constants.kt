@@ -65,7 +65,12 @@ internal object Constants {
             const val startupAnimDurationMs = 1500L
             const val digitAnimDurationMs = 700L
             const val digitShrinkExpandAnimDurationMs = 200L
-
+            const val mainContentViewTransAnimDurationMs = 800L
+            const val blackBgFadeAnimDelayMs = 200L
+            const val welcomeTextTransAnimDurationMs = 600L
+            const val emptyWalletTxtFadeAnimDelayMs = 100L
+            const val showEmptyWalletFadeAnimDurationMs = 400L
+            const val showTariBotDialogDelayMs = 2000L
         }
 
         object CreateEmojiId {
