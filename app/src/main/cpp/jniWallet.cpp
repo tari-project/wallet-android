@@ -700,20 +700,52 @@ JNIEXPORT jboolean JNICALL
 Java_com_tari_android_wallet_ffi_FFIWallet_jniVerifyMessageSignature(
         JNIEnv *jEnv,
         jobject jThis,
+        jlong jpWallet,
         jlong jpPublicKey,
         jstring jmessage,
         jstring jhexSignatureNonce,
         jobject error) {
     int i = 0;
     int *r = &i;
+    TariWallet *pWallet = reinterpret_cast<TariWallet *>(jpWallet);
     TariPublicKey *pContactPublicKey = reinterpret_cast<TariPublicKey *>(jpPublicKey);
     const char* pHexSignatureNonce = jEnv->GetStringUTFChars(jhexSignatureNonce, JNI_FALSE);
     const char* pMessage = jEnv->GetStringUTFChars(jmessage, JNI_FALSE);
-    jboolean result = wallet_verify_message_signature(pContactPublicKey, pHexSignatureNonce, pMessage,r) != 0;
+    jboolean result = wallet_verify_message_signature(pWallet,pContactPublicKey, pHexSignatureNonce, pMessage,r) != 0;
     setErrorCode(jEnv, error, i);
     jEnv->ReleaseStringUTFChars(jhexSignatureNonce, pHexSignatureNonce);
     jEnv->ReleaseStringUTFChars(jmessage, pMessage);
     return result;
 }
+
+extern "C"
+JNIEXPORT jbyteArray JNICALL
+Java_com_tari_android_wallet_ffi_FFIWallet_jniImportUTXO(
+        JNIEnv *jEnv,
+        jobject jThis,
+        jlong jpWallet,
+        jlong jpSpendingKey,
+        jlong jpSourcePublicKey,
+        jstring jAmount,
+        jstring jMessage,
+        jobject error) {
+    int i = 0;
+    int *r = &i;
+    TariWallet *pWallet = reinterpret_cast<TariWallet *>(jpWallet);
+    TariPrivateKey *pSpendingKey = reinterpret_cast<TariPrivateKey *>(jpSpendingKey);
+    TariPublicKey *pSourcePublicKey = reinterpret_cast<TariPublicKey *>(jpSourcePublicKey);
+    char* pAmountEnd;
+    const char* nativeAmount = jEnv->GetStringUTFChars(jAmount, JNI_FALSE);
+    const char* pMessage = jEnv->GetStringUTFChars(jMessage, JNI_FALSE);
+    unsigned long long amount = strtoull(nativeAmount, &pAmountEnd,10);
+    jbyteArray result = getBytesFromUnsignedLongLong(jEnv,
+    wallet_import_utxo(pWallet, amount, pSpendingKey, pSourcePublicKey, pMessage, r)
+    );
+    setErrorCode(jEnv, error, i);
+    jEnv->ReleaseStringUTFChars(jAmount,nativeAmount);
+    jEnv->ReleaseStringUTFChars(jMessage,pMessage);
+    return result;
+}
+
 
 //endregion
