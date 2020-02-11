@@ -199,7 +199,7 @@
                         app:lottie_rawRes="@raw/nerd_emoji" />
 
                     <LinearLayout
-                        android:id="@+id/home_vw_welcome_title_container"
+                        android:id="@+id/home_vw_tx_welcome_title_container"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="50dp"

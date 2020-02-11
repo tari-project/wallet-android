@@ -64,7 +64,7 @@
     <!--home tari bot dialog-->
     <string name="home_tari_bot_you_got_tari_label_1">You got some</string>
     <string name="home_tari_bot_you_got_tari_label_2">Tari!</string>
-    <string name="home_tari_bot_dialog_desc">TariBot has just sent you some Tari. To give the wallet a quick test, try sending TariBot back some Tari to see how it works.</string>
+    <string name="home_tari_bot_sent_tari_desc">TariBot has just sent you some Tari. To give the wallet a quick test, try sending TariBot back some Tari to see how it works.</string>
     <string name="home_tari_bot_try_later">I’ll try it later</string>
     <string name="home_swipe_down_to_show_wallet">Swipe down and I’ll  show you around your wallet</string>
 

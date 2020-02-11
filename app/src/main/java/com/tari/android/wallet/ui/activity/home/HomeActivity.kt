@@ -160,12 +160,12 @@ class HomeActivity : BaseActivity(),
     // Wallet welcome views.
     @BindView(R.id.home_vw_welcome_content)
     lateinit var welcomeContentView: RelativeLayout
-    @BindView(R.id.home_vw_welcome_title_container)
-    lateinit var welcomeTitleContainerView: LinearLayout
+    @BindView(R.id.home_vw_tx_welcome_title_container)
+    lateinit var welcomeTitleTextContainerView: LinearLayout
     @BindView(R.id.home_txt_swipe_down_desc)
     lateinit var swipeDownDescTextView: TextView
     @BindView(R.id.home_anim_wave_hand)
-    lateinit var waveAndAnimationView: LottieAnimationView
+    lateinit var waveHandAnimationView: LottieAnimationView
     @BindView(R.id.home_img_swipe_down_arrow)
     lateinit var swipeDownArrowImageView: ImageView
 
@@ -355,10 +355,10 @@ class HomeActivity : BaseActivity(),
 
         val welcomeTextTransAnim =
             ObjectAnimator.ofFloat(
-                welcomeTitleContainerView,
+                welcomeTitleTextContainerView,
                 View.TRANSLATION_Y,
                 0f,
-                -welcomeTitleContainerView.height.toFloat()
+                -welcomeTitleTextContainerView.height.toFloat()
             )
         welcomeTextTransAnim.duration = Constants.UI.Home.welcomeTextTransAnimDurationMs
 
@@ -387,16 +387,16 @@ class HomeActivity : BaseActivity(),
         val welcomeViewFadeoutAnim = ValueAnimator.ofFloat(1f, 0f)
         welcomeViewFadeoutAnim.addUpdateListener { valueAnimator: ValueAnimator ->
             val value = valueAnimator.animatedValue as Float
-            waveAndAnimationView.alpha = value
+            waveHandAnimationView.alpha = value
             swipeDownDescTextView.alpha = value
-            welcomeTitleContainerView.alpha = value
+            welcomeTitleTextContainerView.alpha = value
             swipeDownArrowImageView.alpha = value
         }
 
-        val transOffset = welcomeTitleContainerView.height.toFloat()
+        val transOffset = welcomeTitleTextContainerView.height.toFloat()
         val welComeTitleContainerTransAnim =
             ObjectAnimator.ofFloat(
-                welcomeTitleContainerView,
+                welcomeTitleTextContainerView,
                 View.TRANSLATION_Y,
                 -transOffset,
                 transOffset
@@ -427,17 +427,17 @@ class HomeActivity : BaseActivity(),
         animSet.start()
     }
 
-    private fun showTariBotSentSomeTariDialog() {
+    private fun showTariBotSentTariDialog() {
         val mBottomSheetDialog = Dialog(this, R.style.Theme_AppCompat_Dialog)
 
         mBottomSheetDialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-        mBottomSheetDialog.setContentView(R.layout.home_dialog_tari_from_tari_bot)
+        mBottomSheetDialog.setContentView(R.layout.home_dialog_tari_bot_sent_tari)
         mBottomSheetDialog.setCancelable(false)
         mBottomSheetDialog.window!!.setLayout(
             LinearLayout.LayoutParams.MATCH_PARENT,
             LinearLayout.LayoutParams.WRAP_CONTENT
         )
-        mBottomSheetDialog.findViewById<TextView>(R.id.home_txt_try_later)
+        mBottomSheetDialog.findViewById<TextView>(R.id.home_tari_bot_dialog_txt_try_later)
             .setOnClickListener { mBottomSheetDialog.dismiss() }
 
         mBottomSheetDialog.window!!.setGravity(Gravity.BOTTOM)
@@ -475,7 +475,7 @@ class HomeActivity : BaseActivity(),
             wr.get()?.walletService?.generateTestData()
             wr.get()?.initializeData()
             uiHandler.postDelayed({
-                showTariBotSentSomeTariDialog()
+                showTariBotSentTariDialog()
             }, Constants.UI.Home.showTariBotDialogDelayMs)
         }
     }
