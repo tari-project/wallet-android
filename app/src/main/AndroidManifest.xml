@@ -55,8 +55,7 @@
             android:name=".ui.activity.log.DebugLogActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme">
-        </activity>
+            android:theme="@style/AppTheme"></activity>
         <!-- onboarding flow -->
         <activity
             android:name=".ui.activity.onboarding.OnBoardingFlowActivity"
@@ -74,7 +73,8 @@
             android:name=".ui.activity.home.HomeActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme" />
+            android:theme="@style/AppTheme"
+            android:windowSoftInputMode="adjustNothing" />
         <!-- recipient QR scanner -->
         <activity
             android:name=".ui.activity.QRScannerActivity"

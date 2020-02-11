@@ -15,7 +15,7 @@
  * 3. Neither the name of the copyright holder nor the names of
  * its contributors may be used to endorse or promote products
  * derived from this software without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND
  * CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES,
  * INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
@@ -156,11 +156,21 @@ internal abstract class FFIWallet(commsConfig: FFICommsConfig, logPath: String) 
     ): String
 
     private external fun jniVerifyMessageSignature(
+        walletPtr: FFIWalletPtr,
         publicKeyPtr: FFIPublicKeyPtr,
         message: String,
         signature: String,
         libError: FFIError
     ): Boolean
+
+    private external fun jniImportUTXO(
+        walletPtr: FFIWalletPtr,
+        spendingKey: FFIPrivateKeyPtr,
+        sourcePublicKey: FFIPublicKeyPtr,
+        amount: String,
+        message: String,
+        libError: FFIError
+    ): ByteArray
 
     private external fun jniDestroy(walletPtr: FFIWalletPtr)
 
@@ -260,7 +270,7 @@ internal abstract class FFIWallet(commsConfig: FFICommsConfig, logPath: String) 
 
     fun isCompletedTxOutbound(completedTx: FFICompletedTx): Boolean {
         val error = FFIError()
-        val result = jniIsCompletedTxOutbound(ptr,completedTx.getPointer(), error)
+        val result = jniIsCompletedTxOutbound(ptr, completedTx.getPointer(), error)
         if (error.code != 0) {
             throw RuntimeException()
         }
@@ -381,7 +391,14 @@ internal abstract class FFIWallet(commsConfig: FFICommsConfig, logPath: String) 
             throw RuntimeException("Tx source and destination are the same.")
         }
         val error = FFIError()
-        val result = jniSendTx(ptr, destination.getPointer(), amount.toString(), fee.toString(), message, error)
+        val result = jniSendTx(
+            ptr,
+            destination.getPointer(),
+            amount.toString(),
+            fee.toString(),
+            message,
+            error
+        )
         if (error.code != 0) {
             throw RuntimeException()
         }
@@ -390,22 +407,36 @@ internal abstract class FFIWallet(commsConfig: FFICommsConfig, logPath: String) 
 
     fun signMessage(message: String): String {
         val error = FFIError()
-        val result = jniSignMessage(ptr,message,error);
+        val result = jniSignMessage(ptr, message, error)
         if (error.code != 0) {
             throw RuntimeException()
         }
         return result
     }
 
-    fun verifyMessageSignature(contactPublicKey: FFIPublicKey, message: String, signature: String): Boolean
-    {
+    fun verifyMessageSignature(
+        contactPublicKey: FFIPublicKey,
+        message: String,
+        signature: String
+    ): Boolean {
         val error = FFIError()
-        val result = jniVerifyMessageSignature(contactPublicKey.getPointer(),message,signature,error)
+        val result = jniVerifyMessageSignature(ptr,contactPublicKey.getPointer(),message,signature,error)
         if (error.code != 0) {
             throw RuntimeException()
         }
         return result
     }
+
+    fun importUTXO(amount: BigInteger, message: String, spendingKey: FFIPrivateKey, sourcePublicKey: FFIPublicKey): BigInteger
+    {
+        val error = FFIError()
+        val bytes = jniImportUTXO(ptr,spendingKey.getPointer(),sourcePublicKey.getPointer(),amount.toString(),message,error)
+        if (error.code != 0) {
+            throw RuntimeException()
+        }
+        return BigInteger(1, bytes)
+    }
+
     override fun destroy() {
         jniDestroy(ptr)
         ptr = nullptr

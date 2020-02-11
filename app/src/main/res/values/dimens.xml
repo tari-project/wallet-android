@@ -27,8 +27,7 @@
     <dimen name="home_send_tari_button_height">54dp</dimen>
     <dimen name="home_main_content_top_margin">12dp</dimen>
 
-    <dimen name="create_emoji_id_button_bottom_margin">20dp</dimen>
-    <dimen name="create_emoji_id_nerd_face_bottom_margin">24dp</dimen>
+    <dimen name="create_emoji_id_button_bottom_margin">25dp</dimen>
     <dimen name="splash_screen_title_bottom_margin">34dp</dimen>
     <dimen name="home_tx_list_item_height">75dp</dimen>
 

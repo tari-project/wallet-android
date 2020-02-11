@@ -84,6 +84,13 @@ internal object Constants {
             const val viewChangeAnimDelayMs = 3000L
             const val viewOverlapDelayMs = 150L
             const val createEmojiViewAnimDurationMs = 1200L
+            const val walletCreationFadeOutAnimDurationMs = 1000L
+            const val walletCreationFadeOutAnimDelayMs = 300L
+            const val continueButtonAnimDurationMs = 800L
+            const val emojiIdCreationViewAnimDurationMs = 1000L
+            const val emojiIdImageViewAnimDelayMs = 200L
+            const val yourEmojiIdTextAnimDelayMs = 300L
+            const val yourEmojiIdTextAnimDurationMs = 300L
         }
 
         object CreateWallet {
