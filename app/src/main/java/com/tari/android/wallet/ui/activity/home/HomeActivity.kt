@@ -235,6 +235,8 @@ class HomeActivity : BaseActivity(),
 
     private var sendTariButtonIsVisible = true
     private var showWelcomeWalletViews = true
+    private var isServiceConnected = false
+    private var isTariBotDialogShown = false
 
     private var walletService: TariWalletService? = null
     private val wr = WeakReference(this)
@@ -332,13 +334,10 @@ class HomeActivity : BaseActivity(),
 
     //welcome view translate up animation
     private fun playWelcomeAnim() {
-
         val scrollViewTransAnim =
             ObjectAnimator.ofFloat(scrollView, View.TRANSLATION_Y, scrollView.height.toFloat(), 0f)
 
-        val maxScrollY = UiUtil.getHeight(scrollView.getChildAt(0)) - scrollView.height
-
-        scrollView.smoothScrollTo(0, maxScrollY)
+        scrollView.smoothScrollTo(0, scrollView.height)
 
         val gradientBgViewFadeAnim = ValueAnimator.ofFloat(0.2f, 1f)
         gradientBgViewFadeAnim.addUpdateListener { valueAnimator: ValueAnimator ->
@@ -351,6 +350,12 @@ class HomeActivity : BaseActivity(),
             val value = valueAnimator.animatedValue as Float
             blackBgView.alpha = value
         }
+        blackBgViewFadeAnim.addListener(object : AnimatorListenerAdapter() {
+            override fun onAnimationStart(animation: Animator?) {
+                super.onAnimationStart(animation)
+                blackBgView.visibility = View.VISIBLE
+            }
+        })
         blackBgViewFadeAnim.startDelay = Constants.UI.Home.blackBgFadeAnimDelayMs
 
         val welcomeTextTransAnim =
@@ -412,15 +417,17 @@ class HomeActivity : BaseActivity(),
         animSet.addListener(object : AnimatorListenerAdapter() {
             override fun onAnimationStart(animation: Animator?) {
                 super.onAnimationStart(animation)
-                blackBgView.visibility = View.GONE
                 topContentContainerView.visibility = View.VISIBLE
             }
 
             override fun onAnimationEnd(animation: Animator?) {
                 super.onAnimationEnd(animation)
-                swipeRefreshLayout.isEnabled = true
                 showWelcomeWalletViews = false
+                blackBgView.visibility = View.GONE
+                swipeRefreshLayout.isEnabled = true
                 welcomeContentView.visibility = View.GONE
+
+                if (isServiceConnected) initializeData()
             }
         })
 
@@ -469,14 +476,12 @@ class HomeActivity : BaseActivity(),
      * Wallet service connected.
      */
     override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
+        isServiceConnected = true
         Logger.d("Connected to the wallet service.")
         walletService = TariWalletService.Stub.asInterface(service)
         AsyncTask.execute {
             wr.get()?.walletService?.generateTestData()
             wr.get()?.initializeData()
-            uiHandler.postDelayed({
-                showTariBotSentTariDialog()
-            }, Constants.UI.Home.showTariBotDialogDelayMs)
         }
     }
 
@@ -486,6 +491,7 @@ class HomeActivity : BaseActivity(),
     override fun onServiceDisconnected(name: ComponentName?) {
         Logger.d("Disconnected from the wallet service.")
         walletService = null
+        isServiceConnected = false
     }
 
     private fun setScrollViewContentHeight() {
@@ -505,18 +511,24 @@ class HomeActivity : BaseActivity(),
      * Called after the service is connected.
      */
     private fun initializeData() {
-        // display txs
-        completedTxs.clear()
-        completedTxs.addAll(walletService!!.completedTxs)
-        pendingInboundTxs.clear()
-        pendingInboundTxs.addAll(walletService!!.pendingInboundTxs)
-        pendingOutboundTxs.clear()
-        pendingOutboundTxs.addAll(walletService!!.pendingOutboundTxs)
-        val balanceInfo = walletService!!.balanceInfo
-        val wr = WeakReference<HomeActivity>(this)
-        scrollView.post {
-            notifyAdapter()
-            wr.get()?.runStartupAnimation(balanceInfo)
+        if (!showWelcomeWalletViews) {
+            // display txs
+            completedTxs.clear()
+            completedTxs.addAll(walletService!!.completedTxs)
+            pendingInboundTxs.clear()
+            pendingInboundTxs.addAll(walletService!!.pendingInboundTxs)
+            pendingOutboundTxs.clear()
+            pendingOutboundTxs.addAll(walletService!!.pendingOutboundTxs)
+            val balanceInfo = walletService!!.balanceInfo
+            val wr = WeakReference<HomeActivity>(this)
+            scrollView.post {
+                notifyAdapter()
+                wr.get()?.runStartupAnimation(balanceInfo)
+            }
+            uiHandler.removeCallbacksAndMessages(null)
+            uiHandler.postDelayed({
+                showTariBotSentTariDialog()
+            }, Constants.UI.Home.showTariBotDialogDelayMs)
         }
     }
 
@@ -577,7 +589,7 @@ class HomeActivity : BaseActivity(),
             // value will run from 0.0 to 1.0
             val value = valueAnimator.animatedValue as Float
             // animate the list (will move upwards)
-            scrollView.y = scrollViewStartupAnimHeight * (1 - value)
+            //  scrollView.y = scrollViewStartupAnimHeight * (1 - value)
             // animate the send tari button (will move upwards)
             UiUtil.setBottomMargin(
                 sendTariButton,
@@ -678,8 +690,7 @@ class HomeActivity : BaseActivity(),
     }
 
     @OnLongClick(R.id.home_vw_grabber_container)
-    fun grabberContainerViewLongClicked()
-    {
+    fun grabberContainerViewLongClicked() {
         val intent = Intent(this@HomeActivity, DebugLogActivity::class.java)
         intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
         intent.putExtra("log", wr.get()?.walletService?.logFile)
@@ -789,18 +800,7 @@ class HomeActivity : BaseActivity(),
             // event consumed
             return true
         }
-        if (view === scrollView) {
-            if (event.action == MotionEvent.ACTION_UP) {
-                if (showWelcomeWalletViews) {
-                    showEmptyWallet()
-                    return false
-                }
-                scrollView.flingIsRunning = false
-                scrollView.postDelayed({ scrollView.completeScroll() }, 50L)
-            }
-            return false
-        }
-        if (view === recyclerView) {
+        if (view === scrollView || view === recyclerView) {
             if (event.action == MotionEvent.ACTION_UP) {
                 if (showWelcomeWalletViews) {
                     showEmptyWallet()
@@ -834,6 +834,7 @@ class HomeActivity : BaseActivity(),
                     ((ratio - 1) * txListHeaderHeight).toInt()
                 )
                 grabberView.alpha = max(0f, 1f - ratio * grabberViewAlphaScrollAnimCoefficient)
+
                 UiUtil.setWidth(
                     grabberView,
                     (max(
@@ -846,6 +847,8 @@ class HomeActivity : BaseActivity(),
                     0f,
                     1f - ratio * grabberViewCornerRadiusScrollAnimCoefficient
                 ) * grabberCornerRadius
+            } else {
+                blackBgView.alpha = ratio
             }
             UiUtil.setTopMargin(
                 topContentContainerView,

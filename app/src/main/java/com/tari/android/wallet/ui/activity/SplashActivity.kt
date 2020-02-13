@@ -36,6 +36,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import com.tari.android.wallet.R
+import com.tari.android.wallet.ui.activity.onboarding.OnBoardingFlowActivity
 import com.tari.android.wallet.util.Constants.UI.Splash
 
 /**
@@ -58,7 +59,7 @@ class SplashActivity : BaseActivity() {
     }
 
     private fun startCreateWalletActivity() {
-        val intent = Intent(this@SplashActivity, AuthActivity::class.java)
+        val intent = Intent(this@SplashActivity, OnBoardingFlowActivity::class.java)
         intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
         startActivity(intent)
         // finish this activity

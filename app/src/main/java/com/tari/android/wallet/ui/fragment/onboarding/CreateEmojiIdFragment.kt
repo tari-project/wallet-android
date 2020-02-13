@@ -33,6 +33,7 @@
 package com.tari.android.wallet.ui.fragment.onboarding
 
 import android.animation.*
+import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.view.View
@@ -51,6 +52,7 @@ import com.airbnb.lottie.LottieAnimationView
 import com.daasuu.ei.Ease
 import com.daasuu.ei.EasingInterpolator
 import com.tari.android.wallet.R
+import com.tari.android.wallet.ui.activity.AuthActivity
 import com.tari.android.wallet.ui.fragment.BaseFragment
 import com.tari.android.wallet.ui.util.UiUtil
 import com.tari.android.wallet.util.Constants
@@ -154,9 +156,23 @@ class CreateEmojiIdFragment : BaseFragment() {
     @OnClick(R.id.create_emoji_id_btn_continue)
     fun onContinueButtonClick() {
         UiUtil.temporarilyDisableClick(continueButton)
-        animateButtonClick(continueButton)
+        val animatorSet = animateButtonClick(continueButton)
+        animatorSet.addListener(object : AnimatorListenerAdapter() {
+            override fun onAnimationEnd(animation: Animator?) {
+                super.onAnimationEnd(animation)
+                showAuthActivity()
+            }
+        })
     }
 
+    private fun showAuthActivity() {
+        activity?.let {
+            val intent = Intent(it, AuthActivity::class.java)
+            intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
+            startActivity(intent)
+            it.finish()
+        }
+    }
 
     @OnClick(R.id.create_emoji_id_btn_create_emoji_id)
     fun onCreateEmojiIdButtonClick() {
