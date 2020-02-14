@@ -914,7 +914,7 @@ class HomeActivity : BaseActivity(),
         Toast.makeText(this, error, Toast.LENGTH_SHORT).show()
     }
 
-    override fun onTestnetTariRequestSuccess(success: Boolean) {
+    override fun onTestnetTariRequestSuccess() {
         refreshTransaction()
         uiHandler.postDelayed({
             showTariBotSentSomeTariDialog()

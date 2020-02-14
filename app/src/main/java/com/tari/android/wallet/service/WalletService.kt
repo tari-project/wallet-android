@@ -609,7 +609,7 @@ class WalletService : Service(), FFIWalletListenerAdapter {
             val response = tariService.getTransaction(publicKeyHexString, requestBody)
             response.enqueue(object : Callback<TestnetTariAllocateResponse> {
                 override fun onFailure(call: Call<TestnetTariAllocateResponse>, t: Throwable) {
-                    notifyFreeTariAllocationFailed(getString(R.string.service_error_no_internet_connection))
+                    notifyTestnetTariRequestFailed(getString(R.string.service_error_no_internet_connection))
                 }
 
                 override fun onResponse(
@@ -619,7 +619,7 @@ class WalletService : Service(), FFIWalletListenerAdapter {
                     when (response.code()) {
                         in 200..209 -> {
                             response.body()?.let {
-                                val publicKey = FFIPublicKey(HexString(it.return_wallet_id))
+                                val publicKey = FFIPublicKey(HexString(it.returnWalletId))
                                 val privateKey = FFIPrivateKey(HexString(it.key))
                                 val value = BigInteger(it.value)
                                 val ffiContact = FFIContact("TariBot", publicKey)
@@ -632,17 +632,17 @@ class WalletService : Service(), FFIWalletListenerAdapter {
                                     publicKey
                                 )
                                 listeners.iterator().forEach {
-                                    it.onTestnetTariRequestSuccess(true)
+                                    it.onTestnetTariRequestSuccess()
                                 }
                             }
                         }
-                        else -> notifyFreeTariAllocationFailed(getString(R.string.service_error_wallet_could_not_allocate_free_tari))
+                        else -> notifyTestnetTariRequestFailed(getString(R.string.service_error_wallet_could_not_allocate_free_tari))
                     }
                 }
             })
         }
 
-        private fun notifyFreeTariAllocationFailed(error: String) {
+        private fun notifyTestnetTariRequestFailed(error: String) {
             listeners.iterator().forEach {
                 it.onTestnetTariRequestError(error)
             }

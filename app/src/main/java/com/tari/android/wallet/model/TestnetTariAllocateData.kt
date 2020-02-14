@@ -32,13 +32,16 @@
  */
 package com.tari.android.wallet.model
 
+import com.google.gson.annotations.SerializedName
+
 /**
  * Allocate testnet tari request and response class.
  */
-data class TestnetTariAllocateRequest constructor(val signature: String, val public_nonce: String)
+data class TestnetTariAllocateRequest constructor(val signature: String, @SerializedName("public_nonce") val public_nonce: String)
 
 data class TestnetTariAllocateResponse constructor(
     val key: String,
     val value: String,
-    val return_wallet_id: String
+    @SerializedName("return_wallet_id")
+    val returnWalletId: String
 )
