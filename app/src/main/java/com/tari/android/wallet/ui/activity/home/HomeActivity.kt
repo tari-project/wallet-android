@@ -68,6 +68,7 @@ import com.tari.android.wallet.R
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.model.*
 import com.tari.android.wallet.service.TariWalletService
+import com.tari.android.wallet.service.TariWalletServiceListener
 import com.tari.android.wallet.service.WalletService
 import com.tari.android.wallet.ui.activity.BaseActivity
 import com.tari.android.wallet.ui.activity.EXTRA_QR_DATA
@@ -95,7 +96,7 @@ class HomeActivity : BaseActivity(),
     View.OnScrollChangeListener,
     View.OnTouchListener,
     Animation.AnimationListener,
-    TxListAdapter.Listener {
+    TxListAdapter.Listener, TariWalletServiceListener {
 
     @BindView(R.id.home_vw_top_content_container)
     lateinit var topContentContainerView: View
@@ -218,6 +219,14 @@ class HomeActivity : BaseActivity(),
     @JvmField
     var whiteColor = 0
 
+    @BindString(R.string.service_error_wallet_could_not_allocate_free_tari)
+    @JvmField
+    var homeFailToLoadTransaction = ""
+
+    @BindString(R.string.service_error_no_internet_connection)
+    @JvmField
+    var homeNoInternetConnection = ""
+
     // tx list
     private lateinit var recyclerViewAdapter: TxListAdapter
     private lateinit var recyclerViewLayoutManager: RecyclerView.LayoutManager
@@ -236,7 +245,6 @@ class HomeActivity : BaseActivity(),
     private var sendTariButtonIsVisible = true
     private var showWelcomeWalletViews = true
     private var isServiceConnected = false
-    private var isTariBotDialogShown = false
 
     private var walletService: TariWalletService? = null
     private val wr = WeakReference(this)
@@ -330,6 +338,13 @@ class HomeActivity : BaseActivity(),
                 BigDecimal.ZERO // initial value
             )
 
+    }
+
+    private fun refreshTransaction() {
+        val tx = walletService?.completedTxs ?: return
+        completedTxs.clear()
+        completedTxs.addAll(tx)
+        notifyAdapter()
     }
 
     //welcome view translate up animation
@@ -426,15 +441,14 @@ class HomeActivity : BaseActivity(),
                 blackBgView.visibility = View.GONE
                 swipeRefreshLayout.isEnabled = true
                 welcomeContentView.visibility = View.GONE
-
-                if (isServiceConnected) initializeData()
+                wr.get()?.walletService?.requestTestnetTari()
             }
         })
 
         animSet.start()
     }
 
-    private fun showTariBotSentTariDialog() {
+    private fun showTariBotSentSomeTariDialog() {
         val mBottomSheetDialog = Dialog(this, R.style.Theme_AppCompat_Dialog)
 
         mBottomSheetDialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
@@ -479,9 +493,11 @@ class HomeActivity : BaseActivity(),
         isServiceConnected = true
         Logger.d("Connected to the wallet service.")
         walletService = TariWalletService.Stub.asInterface(service)
-        AsyncTask.execute {
-            wr.get()?.walletService?.generateTestData()
-            wr.get()?.initializeData()
+        walletService?.registerListener(this)
+        if (!showWelcomeWalletViews) {
+            AsyncTask.execute {
+                wr.get()?.initializeData()
+            }
         }
     }
 
@@ -490,6 +506,7 @@ class HomeActivity : BaseActivity(),
      */
     override fun onServiceDisconnected(name: ComponentName?) {
         Logger.d("Disconnected from the wallet service.")
+        walletService?.unregisterListener(this)
         walletService = null
         isServiceConnected = false
     }
@@ -513,22 +530,12 @@ class HomeActivity : BaseActivity(),
     private fun initializeData() {
         if (!showWelcomeWalletViews) {
             // display txs
-            completedTxs.clear()
-            completedTxs.addAll(walletService!!.completedTxs)
-            pendingInboundTxs.clear()
-            pendingInboundTxs.addAll(walletService!!.pendingInboundTxs)
-            pendingOutboundTxs.clear()
-            pendingOutboundTxs.addAll(walletService!!.pendingOutboundTxs)
             val balanceInfo = walletService!!.balanceInfo
             val wr = WeakReference<HomeActivity>(this)
             scrollView.post {
                 notifyAdapter()
                 wr.get()?.runStartupAnimation(balanceInfo)
             }
-            uiHandler.removeCallbacksAndMessages(null)
-            uiHandler.postDelayed({
-                showTariBotSentTariDialog()
-            }, Constants.UI.Home.showTariBotDialogDelayMs)
         }
     }
 
@@ -538,13 +545,6 @@ class HomeActivity : BaseActivity(),
     private fun updateData() {
         // balance
         val balanceInfo = walletService!!.balanceInfo
-        // txs
-        completedTxs.clear()
-        completedTxs.addAll(walletService!!.completedTxs)
-        pendingInboundTxs.clear()
-        pendingInboundTxs.addAll(walletService!!.pendingInboundTxs)
-        pendingOutboundTxs.clear()
-        pendingOutboundTxs.addAll(walletService!!.pendingOutboundTxs)
         val wr = WeakReference<HomeActivity>(this)
         scrollView.post {
             balanceViewController.balance = balanceInfo.availableBalance.tariValue
@@ -892,6 +892,42 @@ class HomeActivity : BaseActivity(),
 
     }
 
-    // endregion
+    override fun onTxBroadcast(completedTxId: TxId?) {
+    }
 
+    override fun onDiscoveryComplete(completedTxId: TxId?, success: Boolean) {
+    }
+
+    override fun onTxReplyReceived(pendingInboundTxId: TxId?) {
+    }
+
+    override fun onTxFinalized(completedTxId: TxId?) {
+    }
+
+    override fun onTxMined(completedTxId: TxId?) {
+    }
+
+    override fun onTxReceived(pendingInboundTxId: TxId?) {
+    }
+
+    override fun onTestnetTariRequestError(error: String) {
+        Toast.makeText(this, error, Toast.LENGTH_SHORT).show()
+    }
+
+    override fun onTestnetTariRequestSuccess() {
+        refreshTransaction()
+        uiHandler.postDelayed({
+            showTariBotSentSomeTariDialog()
+            sendTariButton.visibility = View.VISIBLE
+        }, Constants.UI.Home.showTariBotDialogDelayMs)
+        walletService?.balanceInfo?.let {
+            balanceViewController.balance = it.availableBalance.tariValue
+        }
+    }
+
+    override fun asBinder(): IBinder {
+        return walletService!!.asBinder()
+    }
+
+    // endregion
 }

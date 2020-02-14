@@ -80,4 +80,5 @@ interface TariWalletService {
 
     boolean testComplete(in PendingOutboundTx tx);
 
+    void requestTestnetTari();
 }

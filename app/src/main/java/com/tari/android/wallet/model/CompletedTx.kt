@@ -47,7 +47,8 @@ class CompletedTx() : Tx(), Parcelable {
         TX_NULL_ERROR,
         COMPLETED,
         BROADCAST,
-        MINED
+        MINED,
+        UNKNOWN
     }
 
     var fee = BigInteger("0")

@@ -64,9 +64,13 @@
     <!--home tari bot dialog-->
     <string name="home_tari_bot_you_got_tari_label_1">You got some</string>
     <string name="home_tari_bot_you_got_tari_label_2">Tari!</string>
-    <string name="home_tari_bot_sent_tari_desc">TariBot has just sent you some Tari. To give the wallet a quick test, try sending TariBot back some Tari to see how it works.</string>
+    <string name="home_tari_bot_dialog_desc">TariBot has just sent you some Tari. To give the wallet a quick test, try sending TariBot back some Tari to see how it works.</string>
     <string name="home_tari_bot_try_later">I’ll try it later</string>
     <string name="home_swipe_down_to_show_wallet">Swipe down and I’ll  show you around your wallet</string>
+    <string name="home_tari_bot_some_tari_to_get_started">Some Tari to get you started.</string>
+
+    <string name="service_error_wallet_could_not_allocate_free_tari">Could not allocate free Tari.</string>
+    <string name="service_error_no_internet_connection">No internet connection!</string>
 
     <!-- test -->
     <string name="home_test_data_warning">Please wait.\n\nWallet is generating test data.</string>

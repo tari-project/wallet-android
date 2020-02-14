@@ -30,27 +30,21 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.tari.android.wallet.di
+package com.tari.android.wallet.rest
 
-import com.tari.android.wallet.service.WalletService
-import com.tari.android.wallet.ui.activity.BaseActivity
-import com.tari.android.wallet.ui.fragment.BaseFragment
-import dagger.Component
-import javax.inject.Singleton
+import com.tari.android.wallet.model.TestnetTariAllocateRequest
+import com.tari.android.wallet.model.TestnetTariAllocateResponse
+import retrofit2.Call
+import retrofit2.http.Body
+import retrofit2.http.POST
+import retrofit2.http.Path
 
 /**
- * Dagger component that injects objects through modules.
- *
- * @author The Tari Development Team
+ *  Rest API service
  */
-@Singleton
-@Component(modules = [ApplicationModule::class, WalletModule::class, RestModule::class])
-interface ApplicationComponent {
+interface TariService {
 
-    fun inject(activity: BaseActivity)
-
-    fun inject(fragment: BaseFragment)
-
-    fun inject(service: WalletService)
+    @POST("/free_tari/allocate/{publicKeyHex}")
+    fun getTransaction(@Path("publicKeyHex") publicKey: String, @Body requestBody: TestnetTariAllocateRequest): Call<TestnetTariAllocateResponse>
 
 }
