@@ -122,5 +122,7 @@ dependencies {
     implementation 'com.orhanobut:logger:2.2.0'
     //QR scanner
     implementation 'com.budiyev.android:code-scanner:2.1.0'
-
+    //retrofit
+    implementation "com.squareup.retrofit2:retrofit:2.6.2"
+    implementation "com.squareup.retrofit2:converter-gson:2.6.2"
 }

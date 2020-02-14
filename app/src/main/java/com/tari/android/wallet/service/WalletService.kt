@@ -34,7 +34,8 @@ package com.tari.android.wallet.service
 
 import android.app.*
 import android.content.Intent
-import android.os.*
+import android.os.Build
+import android.os.IBinder
 import androidx.core.app.NotificationCompat
 import com.orhanobut.logger.Logger
 import com.tari.android.wallet.R
@@ -44,7 +45,11 @@ import com.tari.android.wallet.event.Event
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.ffi.*
 import com.tari.android.wallet.model.*
+import com.tari.android.wallet.rest.TariService
 import com.tari.android.wallet.ui.activity.home.HomeActivity
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 import java.math.BigInteger
 import javax.inject.Inject
 import javax.inject.Named
@@ -59,6 +64,7 @@ class WalletService : Service(), FFIWalletListenerAdapter {
     companion object {
         // notification channel id
         const val notifChannelId = "TariWalletServiceNotifChannel"
+        const val MESSAGE_PREFIX = "Hello Tari from"
     }
 
     @Inject
@@ -69,6 +75,8 @@ class WalletService : Service(), FFIWalletListenerAdapter {
     @Inject
     @Named(WalletModule.NAME_WALLET_LOG_FILE_PATH)
     internal lateinit var logFilePath: String
+    @Inject
+    internal lateinit var tariService: TariService
     /**
      * Service stub implementation.
      */
@@ -518,6 +526,7 @@ class WalletService : Service(), FFIWalletListenerAdapter {
                 FFICompletedTx.Status.BROADCAST -> CompletedTx.Status.BROADCAST
                 FFICompletedTx.Status.COMPLETED -> CompletedTx.Status.COMPLETED
                 FFICompletedTx.Status.MINED -> CompletedTx.Status.MINED
+                FFICompletedTx.Status.UNKNOWN -> CompletedTx.Status.UNKNOWN
             }
             val user: User
             val direction: Tx.Direction
@@ -592,8 +601,52 @@ class WalletService : Service(), FFIWalletListenerAdapter {
             return pendingOutboundTx
         }
 
+        override fun requestTestnetTari() {
+            val message = "$MESSAGE_PREFIX $publicKeyHexString"
+            val signature = wallet.signMessage(message)
+            val requestBody = TestnetTariAllocateRequest(signature, publicKeyHexString)
+
+            val response = tariService.getTransaction(publicKeyHexString, requestBody)
+            response.enqueue(object : Callback<TestnetTariAllocateResponse> {
+                override fun onFailure(call: Call<TestnetTariAllocateResponse>, t: Throwable) {
+                    notifyFreeTariAllocationFailed(getString(R.string.service_error_no_internet_connection))
+                }
+
+                override fun onResponse(
+                    call: Call<TestnetTariAllocateResponse>,
+                    response: Response<TestnetTariAllocateResponse>
+                ) {
+                    when (response.code()) {
+                        in 200..209 -> {
+                            response.body()?.let {
+                                val publicKey = FFIPublicKey(HexString(it.return_wallet_id))
+                                val privateKey = FFIPrivateKey(HexString(it.key))
+                                val value = BigInteger(it.value)
+                                val ffiContact = FFIContact("TariBot", publicKey)
+
+                                wallet.addUpdateContact(ffiContact)
+                                wallet.importUTXO(
+                                    value,
+                                    getString(R.string.home_tari_bot_some_tari_to_get_started),
+                                    privateKey,
+                                    publicKey
+                                )
+                                listeners.iterator().forEach {
+                                    it.onTestnetTariRequestSuccess(true)
+                                }
+                            }
+                        }
+                        else -> notifyFreeTariAllocationFailed(getString(R.string.service_error_wallet_could_not_allocate_free_tari))
+                    }
+                }
+            })
+        }
+
+        private fun notifyFreeTariAllocationFailed(error: String) {
+            listeners.iterator().forEach {
+                it.onTestnetTariRequestError(error)
+            }
+        }
         // endregion
-
     }
-
 }

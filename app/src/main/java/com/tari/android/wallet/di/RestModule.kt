@@ -32,25 +32,50 @@
  */
 package com.tari.android.wallet.di
 
-import com.tari.android.wallet.service.WalletService
-import com.tari.android.wallet.ui.activity.BaseActivity
-import com.tari.android.wallet.ui.fragment.BaseFragment
-import dagger.Component
+import com.tari.android.wallet.rest.TariService
+import com.tari.android.wallet.util.Constants
+import dagger.Module
+import dagger.Provides
+import okhttp3.OkHttpClient
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
+import javax.inject.Named
 import javax.inject.Singleton
 
 /**
- * Dagger component that injects objects through modules.
+ * Dagger module to inject rest service dependencies.
  *
  * @author The Tari Development Team
  */
-@Singleton
-@Component(modules = [ApplicationModule::class, WalletModule::class, RestModule::class])
-interface ApplicationComponent {
+@Module
+class RestModule {
 
-    fun inject(activity: BaseActivity)
+    @Provides
+    @Named("ServerUrl")
+    @Singleton
+    fun providerServerUrl(): String {
+        return Constants.Wallet.WALLET_SERVER_URL
+    }
 
-    fun inject(fragment: BaseFragment)
+    @Provides
+    @Singleton
+    fun provideSocketClient(): OkHttpClient {
+        return OkHttpClient.Builder().build()
+    }
 
-    fun inject(service: WalletService)
+    @Provides
+    @Singleton
+    fun provideRetrofit(
+        okHttpClient: OkHttpClient, @Named("ServerUrl") apiUrl: String
+    ): Retrofit {
+        return Retrofit.Builder().baseUrl(apiUrl).client(okHttpClient)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+    }
 
+    @Provides
+    @Singleton
+    fun provideTariServices(retrofit: Retrofit): TariService {
+        return retrofit.create(TariService::class.java)
+    }
 }

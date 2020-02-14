@@ -48,7 +48,8 @@ internal class FFICompletedTx constructor(pointer: FFICompletedTxPtr): FFIBase()
         TX_NULL_ERROR,
         COMPLETED,
         BROADCAST,
-        MINED
+        MINED,
+        UNKNOWN
     }
 
     // region JNI
@@ -161,6 +162,7 @@ internal class FFICompletedTx constructor(pointer: FFICompletedTxPtr): FFIBase()
             0 -> Status.COMPLETED
             1 -> Status.BROADCAST
             2 -> Status.MINED
+            3 -> Status.UNKNOWN
             else -> throw InvalidObjectException("Unexpected status")
         }
     }

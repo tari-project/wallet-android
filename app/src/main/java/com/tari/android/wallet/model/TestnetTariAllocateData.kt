@@ -30,27 +30,15 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.tari.android.wallet.di
-
-import com.tari.android.wallet.service.WalletService
-import com.tari.android.wallet.ui.activity.BaseActivity
-import com.tari.android.wallet.ui.fragment.BaseFragment
-import dagger.Component
-import javax.inject.Singleton
+package com.tari.android.wallet.model
 
 /**
- * Dagger component that injects objects through modules.
- *
- * @author The Tari Development Team
+ * Allocate testnet tari request and response class.
  */
-@Singleton
-@Component(modules = [ApplicationModule::class, WalletModule::class, RestModule::class])
-interface ApplicationComponent {
+data class TestnetTariAllocateRequest constructor(val signature: String, val public_nonce: String)
 
-    fun inject(activity: BaseActivity)
-
-    fun inject(fragment: BaseFragment)
-
-    fun inject(service: WalletService)
-
-}
+data class TestnetTariAllocateResponse constructor(
+    val key: String,
+    val value: String,
+    val return_wallet_id: String
+)
