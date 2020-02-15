@@ -45,7 +45,6 @@ import com.tari.android.wallet.event.Event
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.ffi.*
 import com.tari.android.wallet.model.*
-import com.tari.android.wallet.rest.TariService
 import com.tari.android.wallet.ui.activity.home.HomeActivity
 import retrofit2.Call
 import retrofit2.Callback
@@ -70,13 +69,10 @@ class WalletService : Service(), FFIWalletListenerAdapter {
     @Inject
     internal lateinit var wallet: FFITestWallet
     @Inject
-    @Named(WalletModule.NAME_WALLET_FILES_DIR_PATH)
-    internal lateinit var datastorePath: String
+    @Named(WalletModule.FieldName.walletLogFilePath)
+    internal lateinit var mLogFilePath: String
     @Inject
-    @Named(WalletModule.NAME_WALLET_LOG_FILE_PATH)
-    internal lateinit var logFilePath: String
-    @Inject
-    internal lateinit var tariService: TariService
+    internal lateinit var tariRESTService: TariRESTService
     /**
      * Service stub implementation.
      */
@@ -85,8 +81,6 @@ class WalletService : Service(), FFIWalletListenerAdapter {
      * Registered listeners.
      */
     private var listeners = mutableListOf<TariWalletServiceListener>()
-
-    private var oneSecondMs = 1000L
 
     override fun onCreate() {
         Logger.d("Tari wallet service created.")
@@ -164,9 +158,9 @@ class WalletService : Service(), FFIWalletListenerAdapter {
     override fun onTxBroadcast(completedTxId: BigInteger) {
         Logger.d("Tx $completedTxId broadcast.")
         val txId = TxId(completedTxId)
-        // post event to bus
+        // post event to bus for the internal listeners
         EventBus.post(Event.Wallet.TxBroadcast(txId))
-        // notify listeners
+        // notify external listeners
         listeners.iterator().forEach {
             it.onTxBroadcast(txId)
         }
@@ -175,9 +169,9 @@ class WalletService : Service(), FFIWalletListenerAdapter {
     override fun onTxMined(completedTxId: BigInteger) {
         Logger.d("Tx $completedTxId mined.")
         val txId = TxId(completedTxId)
-        // post event to bus
+        // post event to bus for the internal listeners
         EventBus.post(Event.Wallet.TxMined(txId))
-        // notify listeners
+        // notify external listeners
         listeners.iterator().forEach {
             it.onTxMined(txId)
         }
@@ -186,7 +180,7 @@ class WalletService : Service(), FFIWalletListenerAdapter {
     override fun onTxReceived(pendingInboundTxId: BigInteger) {
         Logger.d("Tx $pendingInboundTxId received.")
         val txId = TxId(pendingInboundTxId)
-        // post event to bus
+        // post event to bus for the internal listeners
         EventBus.post(Event.Wallet.TxReceived(txId))
         // notify listeners
         listeners.iterator().forEach {
@@ -197,9 +191,9 @@ class WalletService : Service(), FFIWalletListenerAdapter {
     override fun onTxReplyReceived(completedTxId: BigInteger) {
         Logger.d("Tx $completedTxId reply received.")
         val txId = TxId(completedTxId)
-        // post event to bus
+        // post event to bus for the internal listeners
         EventBus.post(Event.Wallet.TxReplyReceived(txId))
-        // notify listeners
+        // notify external listeners
         listeners.iterator().forEach {
             it.onTxReplyReceived(txId)
         }
@@ -208,9 +202,9 @@ class WalletService : Service(), FFIWalletListenerAdapter {
     override fun onTxFinalized(completedTxId: BigInteger) {
         Logger.d("Tx $completedTxId finalized.")
         val txId = TxId(completedTxId)
-        // post event to bus
+        // post event to bus for the internal listeners
         EventBus.post(Event.Wallet.TxFinalized(txId))
-        // notify listeners
+        // notify external listeners
         listeners.iterator().forEach {
             it.onTxFinalized(txId)
         }
@@ -220,7 +214,7 @@ class WalletService : Service(), FFIWalletListenerAdapter {
         Logger.d("Tx $txId discovery completed. Success: $success")
         // post event to bus
         EventBus.post(Event.Wallet.DiscoveryComplete(TxId(txId), success))
-        // notify listeners
+        // notify external listeners
         listeners.iterator().forEach {
             it.onDiscoveryComplete(TxId(txId), success)
         }
@@ -236,7 +230,7 @@ class WalletService : Service(), FFIWalletListenerAdapter {
             hexString: String
         ): Contact? {
             allContacts.iterator().forEach {
-                if (it.publicKeyHexString == hexString) {
+                if (it.publicKey.hexString == hexString) {
                     return it
                 }
             }
@@ -256,19 +250,22 @@ class WalletService : Service(), FFIWalletListenerAdapter {
             return listeners.remove(listener)
         }
 
-        override fun generateTestData(): Boolean {
-            var success = true
-            success = success && wallet.testReceiveTx()
-            Thread.sleep(oneSecondMs)
-            success = success && wallet.testReceiveTx()
-            Thread.sleep(oneSecondMs)
-            success = success && wallet.testReceiveTx()
-            success = success && wallet.generateTestData(datastorePath)
-            return success
+        override fun getPublicKeyForEmojiId(emojiId: String?): PublicKey? {
+            if (emojiId == null || emojiId.isEmpty()) {
+                return null
+            }
+            return try {
+                val publicKeyFFI = FFIPublicKey(emojiId)
+                val publicKey = publicKeyFromFFI(publicKeyFFI)
+                publicKeyFFI.destroy()
+                publicKey
+            } catch (ignored: Throwable) {
+                null
+            }
         }
 
-        override fun getLogFile(): String {
-            return logFilePath
+        override fun getLogFilePath(): String {
+            return mLogFilePath
         }
 
         override fun getPublicKeyHexString() = wallet.getPublicKey().toString()
@@ -293,7 +290,7 @@ class WalletService : Service(), FFIWalletListenerAdapter {
                 val publicKeyFFI = contactFFI.getPublicKey()
                 contacts.add(
                     Contact(
-                        publicKeyFFI.toString(),
+                        publicKeyFromFFI(publicKeyFFI),
                         contactFFI.getAlias()
                     )
                 )
@@ -328,7 +325,7 @@ class WalletService : Service(), FFIWalletListenerAdapter {
                 if (!recentTxUsers.contains(tx.user)) {
                     val txUser = getContactFromPublicKeyHexString(
                         allContacts,
-                        tx.user.publicKeyHexString
+                        tx.user.publicKey.hexString
                     ) ?: tx.user
                     recentTxUsers.add(txUser)
                 }
@@ -492,28 +489,33 @@ class WalletService : Service(), FFIWalletListenerAdapter {
             return getPendingOutboundTxById(id, contacts)
         }
 
-        override fun send(
+        override fun sendTari(
             user: User,
             amount: MicroTari,
             fee: MicroTari,
             message: String
         ): Boolean {
-            return wallet.sendTx(
-                FFIPublicKey(HexString(user.publicKeyHexString)),
+            val publicKeyFFI = FFIPublicKey(HexString(user.publicKey.hexString))
+            val success = wallet.sendTx(
+                publicKeyFFI,
                 amount.value,
                 fee.value,
                 message
             )
-        }
-
-        override fun testComplete(tx: PendingOutboundTx): Boolean {
-            val txFFI = wallet.getPendingOutboundTxById(tx.id)
-            val success = wallet.testCompleteSentTx(txFFI)
-            txFFI.destroy()
+            publicKeyFFI.destroy()
             return success
         }
 
         // region FFI to model extraction functions
+
+        private fun publicKeyFromFFI(
+            publicKeyFFI: FFIPublicKey
+        ): PublicKey {
+            return PublicKey(
+                publicKeyFFI.toString(),
+                publicKeyFFI.getEmoji()
+            )
+        }
 
         private fun completedTxFromFFI(
             completedTxFFI: FFICompletedTx,
@@ -532,16 +534,24 @@ class WalletService : Service(), FFIWalletListenerAdapter {
             val direction: Tx.Direction
             if (publicKeyHexString == destinationPublicKeyFFI.toString()) {
                 direction = Tx.Direction.INBOUND
+                val userPublicKey = PublicKey(
+                    sourcePublicKeyFFI.toString(),
+                    sourcePublicKeyFFI.getEmoji()
+                )
                 user = getContactFromPublicKeyHexString(
                     allContacts,
                     sourcePublicKeyFFI.toString()
-                ) ?: User(sourcePublicKeyFFI.toString())
+                ) ?: User(userPublicKey)
             } else {
                 direction = Tx.Direction.OUTBOUND
+                val userPublicKey = PublicKey(
+                    destinationPublicKeyFFI.toString(),
+                    destinationPublicKeyFFI.getEmoji()
+                )
                 user = getContactFromPublicKeyHexString(
                     allContacts,
                     destinationPublicKeyFFI.toString()
-                ) ?: User(sourcePublicKeyFFI.toString())
+                ) ?: User(userPublicKey)
             }
             val completedTx = CompletedTx(
                 completedTxFFI.getId(),
@@ -564,10 +574,14 @@ class WalletService : Service(), FFIWalletListenerAdapter {
             allContacts: List<Contact>
         ): PendingInboundTx {
             val sourcePublicKeyFFI = pendingInboundTxFFI.getSourcePublicKey()
+            val userPublicKey = PublicKey(
+                sourcePublicKeyFFI.toString(),
+                sourcePublicKeyFFI.getEmoji()
+            )
             val user = getContactFromPublicKeyHexString(
                 allContacts,
                 sourcePublicKeyFFI.toString()
-            ) ?: User(sourcePublicKeyFFI.toString())
+            ) ?: User(userPublicKey)
             val pendingInboundTx = PendingInboundTx(
                 pendingInboundTxFFI.getId(),
                 user,
@@ -585,10 +599,14 @@ class WalletService : Service(), FFIWalletListenerAdapter {
             allContacts: List<Contact>
         ): PendingOutboundTx {
             val destinationPublicKeyFFI = pendingOutboundTxFFI.getDestinationPublicKey()
+            val userPublicKey = PublicKey(
+                destinationPublicKeyFFI.toString(),
+                destinationPublicKeyFFI.getEmoji()
+            )
             val user = getContactFromPublicKeyHexString(
                 allContacts,
                 destinationPublicKeyFFI.toString()
-            ) ?: User(destinationPublicKeyFFI.toString())
+            ) ?: User(userPublicKey)
             val pendingOutboundTx = PendingOutboundTx(
                 pendingOutboundTxFFI.getId(),
                 user,
@@ -606,7 +624,7 @@ class WalletService : Service(), FFIWalletListenerAdapter {
             val signature = wallet.signMessage(message)
             val requestBody = TestnetTariAllocateRequest(signature, publicKeyHexString)
 
-            val response = tariService.getTransaction(publicKeyHexString, requestBody)
+            val response = tariRESTService.requestTestnetTari(publicKeyHexString, requestBody)
             response.enqueue(object : Callback<TestnetTariAllocateResponse> {
                 override fun onFailure(call: Call<TestnetTariAllocateResponse>, t: Throwable) {
                     notifyTestnetTariRequestFailed(getString(R.string.service_error_no_internet_connection))
@@ -618,33 +636,49 @@ class WalletService : Service(), FFIWalletListenerAdapter {
                 ) {
                     when (response.code()) {
                         in 200..209 -> {
-                            response.body()?.let {
-                                val publicKey = FFIPublicKey(HexString(it.returnWalletId))
-                                val privateKey = FFIPrivateKey(HexString(it.key))
-                                val value = BigInteger(it.value)
-                                val ffiContact = FFIContact("TariBot", publicKey)
-
-                                wallet.addUpdateContact(ffiContact)
+                            response.body()?.let { responseBody ->
+                                val publicKeyFFI =
+                                    FFIPublicKey(HexString(responseBody.returnWalletId))
+                                val privateKeyFFI = FFIPrivateKey(HexString(responseBody.key))
+                                val value = BigInteger(responseBody.value)
+                                val contactFFI = FFIContact("TariBot", publicKeyFFI)
+                                wallet.addUpdateContact(contactFFI)
                                 wallet.importUTXO(
                                     value,
                                     getString(R.string.home_tari_bot_some_tari_to_get_started),
-                                    privateKey,
-                                    publicKey
+                                    privateKeyFFI,
+                                    publicKeyFFI
                                 )
-                                listeners.iterator().forEach {
-                                    it.onTestnetTariRequestSuccess()
-                                }
+                                // destroy native objects
+                                publicKeyFFI.destroy()
+                                privateKeyFFI.destroy()
+                                contactFFI.destroy()
+                            }
+                            // post event to bus for the internal listeners
+                            EventBus.post(Event.Testnet.TestnetTariRequestSuccessful())
+                            // notify external listeners
+                            listeners.iterator().forEach { listener ->
+                                listener.onTestnetTariRequestSuccess()
                             }
                         }
-                        else -> notifyTestnetTariRequestFailed(getString(R.string.service_error_wallet_could_not_allocate_free_tari))
+                        else -> {
+                            val errorMessage =
+                                getString(R.string.service_error_testnet_tari_request) +
+                                        " " +
+                                        response.errorBody()?.string()
+                            notifyTestnetTariRequestFailed(errorMessage)
+                        }
                     }
                 }
             })
         }
 
         private fun notifyTestnetTariRequestFailed(error: String) {
-            listeners.iterator().forEach {
-                it.onTestnetTariRequestError(error)
+            // post event to bus for the internal listeners
+            EventBus.post(Event.Testnet.TestnetTariRequestError(error))
+            // notify external listeners
+            listeners.iterator().forEach { listener ->
+                listener.onTestnetTariRequestError(error)
             }
         }
         // endregion

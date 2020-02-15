@@ -41,6 +41,10 @@ package com.tari.android.wallet.ffi
 internal class FFITestWallet(commsConfig: FFICommsConfig, logPath: String) :
     FFIWallet(commsConfig, logPath) {
 
+    companion object {
+        var instance: FFITestWallet? = null
+    }
+
     // region JNI
 
     private external fun jniGenerateTestData(

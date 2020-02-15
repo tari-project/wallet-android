@@ -35,7 +35,6 @@ package com.tari.android.wallet.util
 import com.ibm.icu.lang.UCharacter
 import com.ibm.icu.lang.UProperty
 import com.ibm.icu.text.BreakIterator
-import kotlin.random.Random
 
 /**
  * String code points as list.
@@ -146,36 +145,47 @@ internal class EmojiUtil {
 
     companion object {
 
-        private val emojis = listOf(
-            "😉", "☝️", "🔥", "🤓", "🎃", "🤯", "🍺", "🏀", "🎂", "😍", "👍", "🔥",
-            "🐰", "🤯", "🍺", "🏀", "🎂", "😉", "☝️", "🔥", "🤓", "😉", "☝️", "🔥", "🤓",
-            "👹", "🌸", "🥝", "⭐", "🍀"
-        )
-        private val publicKeyToEmojiIdMap = mutableMapOf<String, String>()
-
         /**
-         * This is for test purposes: if there's an emoji id for the public key, then return it.
-         * Otherwise generate a new one, store it and return it.
+         * @return a shortened 12-character emoji id, consisting
+         * of the first, middle and last 4 characters concatenated.
+         * Null if the input is not an emoji id.
          */
-        fun getEmojiIdForPublicKeyHexString(publicKeyHexString: String): String {
-            var emojiId = publicKeyToEmojiIdMap[publicKeyHexString]
-            if (emojiId == null) {
-                emojiId = generateRandomEmojiId()
-                publicKeyToEmojiIdMap[publicKeyHexString] = emojiId
+        fun getShortenedEmojiId(emojiId: String): String? {
+            if (emojiId.numberOfEmojis() < Constants.Wallet.emojiIdLength
+                || emojiId.containsNonEmoji()
+            ) {
+                return null
             }
-            return emojiId
-        }
-
-        /**
-         * @return random emoji id of standard length
-         */
-        fun generateRandomEmojiId(): String {
-            val builder = StringBuilder()
-            for (i in 0 until Constants.Wallet.emojiIdLength) {
-                val index = Random.nextInt(0, emojis.size)
-                builder.append(emojis[index])
+            val emojiIds = ArrayList<String>()
+            var currentIndex = 0
+            // prep the iterator
+            val it: BreakIterator = BreakIterator.getCharacterInstance()
+            it.setText(emojiId)
+            var previous = 0
+            while (it.next() != BreakIterator.DONE) {
+                val builder = StringBuilder()
+                for (i in previous until it.current()) {
+                    builder.append(emojiId[i])
+                    currentIndex++
+                }
+                emojiIds.add(builder.toString())
+                previous = it.current()
             }
-            return builder.toString()
+            val startChunk = emojiIds.subList(
+                0,
+                Constants.Wallet.emojiFormatterChunkSize
+            ).joinToString("")
+            val middleChunkStartIndex =
+                Constants.Wallet.emojiIdLength / 2 - Constants.Wallet.emojiFormatterChunkSize / 2
+            val middleChunk = emojiIds.subList(
+                middleChunkStartIndex,
+                middleChunkStartIndex + Constants.Wallet.emojiFormatterChunkSize
+            ).joinToString("")
+            val endChunk = emojiIds.subList(
+                Constants.Wallet.emojiFormatterChunkSize - Constants.Wallet.emojiFormatterChunkSize,
+                Constants.Wallet.emojiFormatterChunkSize
+            ).joinToString("")
+            return startChunk + middleChunk + endChunk
         }
 
         /**
@@ -251,6 +261,16 @@ internal class EmojiUtil {
                 previous = it.current()
             }
             return -1
+        }
+
+        fun getChunkedEmojiId(emojiId: String, separator: String): String {
+            // make chunks
+            val separatorIndices = getNewChunkSeparatorIndices(emojiId)
+            val builder = java.lang.StringBuilder(emojiId)
+            for ((i, index) in separatorIndices.iterator().withIndex()) {
+                builder.insert((index + i), separator)
+            }
+            return builder.toString()
         }
 
     }

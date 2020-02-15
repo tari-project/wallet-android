@@ -45,6 +45,8 @@ import butterknife.BindColor
 import butterknife.BindView
 import com.orhanobut.logger.Logger
 import com.tari.android.wallet.R
+import com.tari.android.wallet.event.Event
+import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.model.MicroTari
 import com.tari.android.wallet.model.User
 import com.tari.android.wallet.service.TariWalletService
@@ -53,7 +55,8 @@ import com.tari.android.wallet.ui.activity.BaseActivity
 import com.tari.android.wallet.ui.fragment.BaseFragment
 import com.tari.android.wallet.ui.fragment.send.AddRecipientFragment
 import com.tari.android.wallet.ui.fragment.send.AddAmountFragment
-import com.tari.android.wallet.ui.fragment.send.AddNoteFragment
+import com.tari.android.wallet.ui.fragment.send.AddNoteAndSendFragment
+import com.tari.android.wallet.ui.fragment.send.SendTxSuccessfulFragment
 import com.tari.android.wallet.ui.util.UiUtil
 import com.tari.android.wallet.util.Constants
 import java.lang.ref.WeakReference
@@ -66,13 +69,18 @@ import java.lang.ref.WeakReference
 class SendTariActivity : BaseActivity(),
     ServiceConnection,
     AddRecipientFragment.Listener,
-    AddAmountFragment.Listener {
+    AddAmountFragment.Listener,
+    AddNoteAndSendFragment.Listener,
+    SendTxSuccessfulFragment.Listener {
 
     @BindView(R.id.send_tari_vw_root)
     lateinit var rootView: View
     @BindView(R.id.send_tari_vw_fragment_container)
     lateinit var fragmentContainerView: View
 
+    @BindColor(R.color.white)
+    @JvmField
+    var whiteColor = 0
     @BindColor(R.color.black)
     @JvmField
     var blackColor = 0
@@ -85,6 +93,8 @@ class SendTariActivity : BaseActivity(),
     private var walletService: TariWalletService? = null
 
     private val wr = WeakReference(this)
+
+    private var sendTxIsInProgress = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -117,6 +127,9 @@ class SendTariActivity : BaseActivity(),
     }
 
     override fun onBackPressed() {
+        if (sendTxIsInProgress) {
+            return
+        }
         if (currentFragmentWR?.get() is AddAmountFragment
             && supportFragmentManager.fragments[0] is AddRecipientFragment
         ) {
@@ -154,23 +167,12 @@ class SendTariActivity : BaseActivity(),
 
     override fun continueToAmount(
         sourceFragment: AddRecipientFragment,
-        emojiId: String
-    ) {
-        UiUtil.hideKeyboard(this)
-        val bundle = Bundle()
-        bundle.putString("recipientEmojiId", emojiId)
-        rootView.postDelayed({
-            wr.get()?.goToAddAmountFragment(sourceFragment, bundle)
-        }, Constants.UI.keyboardHideWaitMs)
-    }
-
-    override fun continueToAmount(
-        sourceFragment: AddRecipientFragment,
         user: User
     ) {
         UiUtil.hideKeyboard(this)
-        val bundle = Bundle()
-        bundle.putParcelable("recipientUser", user)
+        val bundle = Bundle().apply {
+            putParcelable("recipientUser", user)
+        }
         rootView.postDelayed({
             wr.get()?.goToAddAmountFragment(sourceFragment, bundle)
         }, Constants.UI.keyboardHideWaitMs)
@@ -198,26 +200,25 @@ class SendTariActivity : BaseActivity(),
 
     // endregion
 
-    // region AddNoteFragment.Listener implementation
-
-    override fun continueToNote(
-        sourceFragment: AddAmountFragment,
-        recipientEmojiId: String,
-        amount: MicroTari
-    ) {
-        goToAddNoteFragment(sourceFragment)
-    }
+    // region AddAmountFragment.Listener implementation
 
     override fun continueToNote(
         sourceFragment: AddAmountFragment,
         recipientUser: User,
-        amount: MicroTari
+        amount: MicroTari,
+        fee: MicroTari
     ) {
-        goToAddNoteFragment(sourceFragment)
+        val bundle = Bundle().apply {
+            putParcelable("recipientUser", recipientUser)
+            putParcelable("amount", amount)
+            putParcelable("fee", fee)
+        }
+        goToAddNoteFragment(sourceFragment, bundle)
     }
 
-    private fun goToAddNoteFragment(sourceFragment: BaseFragment) {
-        val fragment = AddNoteFragment.newInstance()
+    private fun goToAddNoteFragment(sourceFragment: BaseFragment, bundle: Bundle) {
+        val fragment = AddNoteAndSendFragment.newInstance(walletService!!)
+        fragment.arguments = bundle
         supportFragmentManager
             .beginTransaction()
             .setCustomAnimations(
@@ -233,6 +234,67 @@ class SendTariActivity : BaseActivity(),
             .addToBackStack(AddAmountFragment::class.java.simpleName)
             .commit()
         currentFragmentWR = WeakReference(fragment)
+    }
+
+    // endregion
+
+    // region AddNoteFragment.Listener implementation
+
+    override fun sendTxStarted(sourceFragment: AddNoteAndSendFragment) {
+        sendTxIsInProgress = true
+    }
+
+    override fun sendTxFailed(sourceFragment: AddNoteAndSendFragment) {
+        sendTxIsInProgress = false
+    }
+
+    override fun sendTxSuccessful(
+        sourceFragment: AddNoteAndSendFragment,
+        recipientUser: User,
+        amount: MicroTari,
+        fee: MicroTari,
+        note: String
+    ) {
+        val fragment = SendTxSuccessfulFragment().apply {
+            arguments = Bundle().apply {
+                putParcelable("recipientUser", recipientUser)
+                putParcelable("amount", amount)
+                putParcelable("fee", fee)
+                putString("note", note)
+            }
+        }
+        rootView.post {
+            wr.get()?.rootView?.setBackgroundColor(whiteColor)
+        }
+        supportFragmentManager
+            .beginTransaction()
+            .setCustomAnimations(R.anim.fade_in, R.anim.fade_out)
+            .hide(sourceFragment)
+            .add(
+                R.id.send_tari_vw_fragment_container,
+                fragment,
+                fragment::class.java.simpleName
+            )
+            .addToBackStack(AddAmountFragment::class.java.simpleName)
+            .commit()
+        currentFragmentWR = WeakReference(fragment)
+    }
+
+    // endregion
+
+    // region SendTxSuccessfulFragment.Listener implementation
+
+    override fun sendTxCompleted(
+        sourceFragment: SendTxSuccessfulFragment,
+        recipientUser: User,
+        amount: MicroTari,
+        fee: MicroTari,
+        note: String
+    ) {
+        sendTxIsInProgress = false
+        EventBus.post(Event.Tx.TxSendSuccessful())
+        finish()
+        overridePendingTransition(R.anim.fade_in, R.anim.fade_out)
     }
 
     // endregion

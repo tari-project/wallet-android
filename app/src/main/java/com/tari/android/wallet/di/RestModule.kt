@@ -32,7 +32,7 @@
  */
 package com.tari.android.wallet.di
 
-import com.tari.android.wallet.rest.TariService
+import com.tari.android.wallet.service.TariRESTService
 import com.tari.android.wallet.util.Constants
 import dagger.Module
 import dagger.Provides
@@ -75,7 +75,8 @@ class RestModule {
 
     @Provides
     @Singleton
-    fun provideTariServices(retrofit: Retrofit): TariService {
-        return retrofit.create(TariService::class.java)
+    fun provideTariServices(retrofit: Retrofit): TariRESTService {
+        return retrofit.create(TariRESTService::class.java)
     }
+
 }

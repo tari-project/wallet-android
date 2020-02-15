@@ -15,7 +15,7 @@
  * 3. Neither the name of the copyright holder nor the names of
  * its contributors may be used to endorse or promote products
  * derived from this software without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND
  * CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES,
  * INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
@@ -60,9 +60,9 @@ class CustomScrollView @JvmOverloads constructor(
         }
         val maxScrollY = UiUtil.getHeight(getChildAt(0)) - height
         val scrollRatio = scrollY.toFloat() / maxScrollY.toFloat()
-        if (scrollRatio == 0f || scrollRatio == 1f) {
-            return
-        }
+        //if (scrollRatio == 0f || scrollRatio == 1f) {
+        //    return
+        //}
         if (scrollRatio > 0.5) {
             smoothScrollTo(0, maxScrollY)
         } else {
@@ -105,20 +105,29 @@ class CustomScrollView @JvmOverloads constructor(
     }
 
     override fun onNestedPreFling(target: View?, velocityX: Float, velocityY: Float): Boolean {
-        if (target is SwipeRefreshLayout
-            && canScrollVertically(velocityY.toInt())
-            && isRvScrolledToTop(target.getChildAt(0) as RecyclerView)
-        ) {
-            flingScroll(velocityY.toInt())
-            return true
+        if (target is SwipeRefreshLayout) {
+            if (canScrollVertically(velocityY.toInt())) {
+                if (isRvScrolledToTop(target.getChildAt(0) as RecyclerView)) {
+                    flingScroll(velocityY.toInt())
+                    return true
+                }
+            }
+        } else if (target is RecyclerView) {
+            if (canScrollVertically(velocityY.toInt())) {
+                if (isRvScrolledToTop(target)) {
+                    flingScroll(velocityY.toInt())
+                    return true
+                }
+            }
         }
         return super.onNestedPreFling(target, velocityX, velocityY)
     }
 
     private fun isRvScrolledToTop(rv: RecyclerView): Boolean {
         val lm = rv.layoutManager as LinearLayoutManager
+        if (lm.childCount == 0) return true
         return (lm.findFirstVisibleItemPosition() == 0
-                && lm.findViewByPosition(0)!!.top == 0)
+                && lm.findViewByPosition(0)?.top == 0)
     }
 
 }

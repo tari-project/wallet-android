@@ -54,4 +54,5 @@ oneway interface TariWalletServiceListener {
     void onTestnetTariRequestError(in String error);
 
     void onTestnetTariRequestSuccess();
+
 }

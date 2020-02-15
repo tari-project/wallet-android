@@ -35,10 +35,11 @@ package com.tari.android.wallet.application
 import android.app.Application
 import com.orhanobut.logger.AndroidLogAdapter
 import com.orhanobut.logger.Logger
-import com.tari.android.wallet.di.ApplicationComponent
-import com.tari.android.wallet.di.ApplicationModule
-import com.tari.android.wallet.di.DaggerApplicationComponent
+import com.tari.android.wallet.di.*
+import com.tari.android.wallet.util.WalletUtil
 import net.danlew.android.joda.JodaTimeAndroid
+import javax.inject.Inject
+import javax.inject.Named
 
 /**
  * Main application class.
@@ -46,6 +47,13 @@ import net.danlew.android.joda.JodaTimeAndroid
  * @author The Tari Development Team
  */
 class TariWalletApplication : Application() {
+
+    @JvmField
+    @field:[Inject Named(ConfigModule.FieldName.deleteExistingWallet)]
+    var deleteExistingWallet: Boolean = false
+    @Inject
+    @Named(WalletModule.FieldName.walletFilesDirPath)
+    lateinit var walletFilesDirPath: String
 
     lateinit var appComponent: ApplicationComponent
 
@@ -58,6 +66,10 @@ class TariWalletApplication : Application() {
         Logger.addLogAdapter(AndroidLogAdapter())
         JodaTimeAndroid.init(this)
         appComponent = initDagger(this)
+        appComponent.inject(this)
+        if (deleteExistingWallet) {
+            WalletUtil.clearWalletFiles(walletFilesDirPath)
+        }
     }
 
     private fun initDagger(app: TariWalletApplication): ApplicationComponent =

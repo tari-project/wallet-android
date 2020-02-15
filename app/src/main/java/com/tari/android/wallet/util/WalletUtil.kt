@@ -33,7 +33,10 @@
 package com.tari.android.wallet.util
 
 import com.tari.android.wallet.model.MicroTari
+import java.io.File
 import java.math.BigInteger
+import java.math.RoundingMode
+import java.text.DecimalFormat
 
 /**
  * Wallet utility functions.
@@ -41,6 +44,14 @@ import java.math.BigInteger
  * @author The Tari Development Team
  */
 internal object WalletUtil {
+
+    val amountFormatter = DecimalFormat("#,##0.00").apply {
+        roundingMode = RoundingMode.FLOOR
+    }
+
+    val feeFormatter = DecimalFormat("#,##0.0000").apply {
+        roundingMode = RoundingMode.CEILING
+    }
 
     /**
      * Calculates transaction fee.
@@ -54,6 +65,25 @@ internal object WalletUtil {
     ): MicroTari {
         val fee = baseCost + (numInputs + 4 * numOutputs) * r
         return MicroTari(BigInteger.valueOf(fee.toLong()))
+    }
+
+    /**
+     * Utility function to clear all previous wallet files.
+     */
+    fun clearWalletFiles(path: String): Boolean {
+        val fileDirectory = File(path)
+        val del = fileDirectory.deleteRecursively()
+        if (!del) {
+            return false
+        }
+        val directory = File(path)
+        if (!directory.exists()) {
+            directory.mkdirs()
+        }
+        if (directory.exists() && directory.canWrite() && directory.isDirectory) {
+            return true
+        }
+        return false
     }
 
 }

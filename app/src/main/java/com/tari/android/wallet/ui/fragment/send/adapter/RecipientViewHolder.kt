@@ -98,8 +98,9 @@ class RecipientViewHolder(view: View, listener: Listener) :
             profileIconImageView.visibility = View.VISIBLE
             initialTextView.visibility = View.GONE
 
-            val emojiId = EmojiUtil.getEmojiIdForPublicKeyHexString(user.publicKeyHexString)
-            emojiIdSummaryController.display(emojiId)
+            emojiIdSummaryController.display(
+                user.publicKey.emojiId
+            )
         }
     }
 

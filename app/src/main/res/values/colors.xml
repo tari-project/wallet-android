@@ -43,6 +43,10 @@
     <color name="add_recipient_contact_list_section_header_title">#B2B2B2</color>
     <color name="add_recipient_prog_bar">#CCCCCC</color>
 
+    <!-- send tari - add note -->
+    <color name="add_note_slide_btton_bg_gradient_start">#8931FF</color>
+    <color name="add_note_slide_btton_bg_gradient_end">#A72bE9</color>
+
     <!-- Debug Log -->
     <color name="terminal_green">#4AF626</color>
 

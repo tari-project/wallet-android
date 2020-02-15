@@ -15,7 +15,7 @@
  * 3. Neither the name of the copyright holder nor the names of
  * its contributors may be used to endorse or promote products
  * derived from this software without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND
  * CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES,
  * INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
@@ -50,10 +50,9 @@ import com.tari.android.wallet.R
 import com.tari.android.wallet.ui.extension.setWidthToMeasured
 import com.tari.android.wallet.ui.util.UiUtil
 import com.tari.android.wallet.util.Constants
+import com.tari.android.wallet.util.WalletUtil
 import java.lang.ref.WeakReference
 import java.math.BigDecimal
-import java.math.RoundingMode
-import java.text.DecimalFormat
 
 /**
  * Controls the balance digit representation.
@@ -68,14 +67,12 @@ class BalanceViewController(
 ) {
 
     private val viewHolders: ArrayList<BalanceDigitViewHolder> = ArrayList()
-    private val formatter = DecimalFormat("#,##0.00")
     private var formattedBalance: String
 
     private val delayByIndex: Long = 80L
 
     init {
-        formatter.roundingMode = RoundingMode.FLOOR
-        formattedBalance = formatter.format(balance)
+        formattedBalance = WalletUtil.amountFormatter.format(balance)
         // decimal tens
         viewHolders.add(
             DecimalDigitViewHolder(
@@ -138,7 +135,7 @@ class BalanceViewController(
         set(value) {
             /* execute setter logic */
             _balance = value
-            formattedBalance = formatter.format(_balance)
+            formattedBalance = WalletUtil.amountFormatter.format(_balance)
             val sizeDiff = formattedBalance.length - viewHolders.size
             if (sizeDiff <= 0) {
                 // delete items

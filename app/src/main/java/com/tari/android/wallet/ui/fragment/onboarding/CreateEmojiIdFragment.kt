@@ -41,7 +41,6 @@ import android.view.ViewTreeObserver
 import android.view.animation.AccelerateInterpolator
 import android.view.animation.DecelerateInterpolator
 import android.widget.Button
-import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import butterknife.BindDimen
@@ -52,11 +51,15 @@ import com.airbnb.lottie.LottieAnimationView
 import com.daasuu.ei.Ease
 import com.daasuu.ei.EasingInterpolator
 import com.tari.android.wallet.R
+import com.tari.android.wallet.di.WalletModule
 import com.tari.android.wallet.ui.activity.AuthActivity
 import com.tari.android.wallet.ui.fragment.BaseFragment
 import com.tari.android.wallet.ui.util.UiUtil
 import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.Constants.UI.CreateEmojiId
+import com.tari.android.wallet.util.EmojiUtil
+import javax.inject.Inject
+import javax.inject.Named
 
 /**
  * onBoarding flow : wallet creation sequence
@@ -95,8 +98,8 @@ class CreateEmojiIdFragment : BaseFragment() {
     lateinit var awesomeTextBackView: View
     @BindView(R.id.create_emoji_id_emoji_wheel_anim)
     lateinit var emojiWheelAnimView: LottieAnimationView
-    @BindView(R.id.create_emoji_id_emoji_container)
-    lateinit var emojiContainerImage: ImageView
+    @BindView(R.id.create_emoji_id_txt_emoji_id)
+    lateinit var emojiIdTextView: TextView
     @BindView(R.id.create_emoji_id_your_emoji_id_title_container)
     lateinit var yourEmojiTitleText: LinearLayout
     @BindView(R.id.create_emoji_id_your_emoji_title_back_view)
@@ -113,12 +116,28 @@ class CreateEmojiIdFragment : BaseFragment() {
     @JvmField
     var yourWalletAddressDescString = ""
 
+    /**
+     * Emoji id chunk separator char.
+     */
+    @BindString(R.string.emoji_id_chunk_separator_char)
+    lateinit var emojiIdChunkSeparator: String
+
+    @Inject
+    @Named(WalletModule.FieldName.emojiId)
+    lateinit var emojiId: String
+
     private val uiHandler = Handler()
 
     override val contentViewId = R.layout.fragment_create_emoji_id
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        val shortEmojiId = EmojiUtil.getShortenedEmojiId(emojiId)!!
+        val chunkedEmojiId = EmojiUtil.getChunkedEmojiId(
+            shortEmojiId,
+            emojiIdChunkSeparator
+        )
+        emojiIdTextView.text = chunkedEmojiId
         setupUi()
     }
 
@@ -220,7 +239,6 @@ class CreateEmojiIdFragment : BaseFragment() {
         return animSet
     }
 
-
     private fun showEmojiWheelAnimation() {
         emojiWheelAnimView.playAnimation()
 
@@ -272,8 +290,8 @@ class CreateEmojiIdFragment : BaseFragment() {
         val emojiContainerImageScaleAnim = ValueAnimator.ofFloat(2f, 1.5f)
         emojiContainerImageScaleAnim.addUpdateListener { animation ->
             val scale = animation.animatedValue.toString().toFloat()
-            emojiContainerImage.scaleX = scale
-            emojiContainerImage.scaleY = scale
+            emojiIdTextView.scaleX = scale
+            emojiIdTextView.scaleY = scale
         }
         emojiContainerImageScaleAnim.startDelay = CreateEmojiId.emojiIdImageViewAnimDelayMs
 
@@ -294,7 +312,7 @@ class CreateEmojiIdFragment : BaseFragment() {
         val fadeInAnim = ValueAnimator.ofFloat(0f, 1f)
         fadeInAnim.addUpdateListener { valueAnimator: ValueAnimator ->
             val alpha = valueAnimator.animatedValue as Float
-            emojiContainerImage.alpha = alpha
+            emojiIdTextView.alpha = alpha
             walletAddressDescText.alpha = alpha
         }
         fadeInAnim.startDelay = CreateEmojiId.emojiIdImageViewAnimDelayMs

@@ -30,36 +30,68 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.tari.android.wallet.ui.fragment.send
+package com.tari.android.wallet.model
 
-import android.view.View
-import butterknife.OnClick
-import com.tari.android.wallet.R
-import com.tari.android.wallet.ui.fragment.BaseFragment
-import com.tari.android.wallet.ui.util.UiUtil
+import android.os.Parcel
+import android.os.Parcelable
 
 /**
- * Note entry fragment.
+ * This wrapper is needed for id parameters in AIDL methods.
  *
  * @author The Tari Development Team
  */
-class AddNoteFragment : BaseFragment() {
+class PublicKey() : Parcelable {
 
-    override val contentViewId: Int = R.layout.fragment_add_note
+    var hexString = ""
+    var emojiId = ""
 
-    companion object {
+    constructor(
+        hexString: String,
+        emojiId: String
+    ) : this() {
+        this.hexString = hexString
+        this.emojiId = emojiId
+    }
 
-        fun newInstance(): AddNoteFragment {
-            return AddNoteFragment()
+    override fun equals(other: Any?): Boolean = (other is PublicKey)
+            && hexString == other.hexString
+
+    override fun hashCode(): Int {
+        return hexString.hashCode()
+    }
+
+    // region Parcelable
+
+    constructor(parcel: Parcel) : this() {
+        readFromParcel(parcel)
+    }
+
+    companion object CREATOR : Parcelable.Creator<PublicKey> {
+
+        override fun createFromParcel(parcel: Parcel): PublicKey {
+            return PublicKey(parcel)
+        }
+
+        override fun newArray(size: Int): Array<PublicKey> {
+            return Array(size) { PublicKey() }
         }
 
     }
 
-    @OnClick(R.id.add_note_btn_back)
-    fun onBackButtonClicked(view: View) {
-        UiUtil.temporarilyDisableClick(view)
-        val mActivity = activity ?: return
-        mActivity.onBackPressed()
+    override fun writeToParcel(parcel: Parcel, flags: Int) {
+        parcel.writeSerializable(hexString)
+        parcel.writeSerializable(emojiId)
     }
+
+    private fun readFromParcel(inParcel: Parcel) {
+        hexString = inParcel.readString() ?: ""
+        emojiId = inParcel.readString() ?: ""
+    }
+
+    override fun describeContents(): Int {
+        return 0
+    }
+
+    // endregion
 
 }

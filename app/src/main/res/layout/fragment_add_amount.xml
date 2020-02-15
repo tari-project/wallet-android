@@ -41,7 +41,7 @@
 
             <!-- shadow -->
             <View
-                android:layout_width="195dp"
+                android:layout_width="190dp"
                 android:layout_height="match_parent"
                 android:layout_centerInParent="true"
                 android:alpha="0.6"

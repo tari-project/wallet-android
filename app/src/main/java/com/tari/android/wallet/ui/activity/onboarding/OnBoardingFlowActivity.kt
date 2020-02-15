@@ -61,9 +61,18 @@ class OnBoardingFlowActivity : BaseActivity(), CreateWalletFragment.Listener {
             ).commit()
     }
 
+    /**
+     * Back button should not be functional during onboarding
+     */
+    override fun onBackPressed() {
+        return
+    }
+
     override fun onCreateEmojiIdButtonClick() {
-        supportFragmentManager.beginTransaction()
-            .replace(R.id.onboarding_create_emoji_id_container, CreateEmojiIdFragment()).commit()
+        supportFragmentManager
+            .beginTransaction()
+            .replace(R.id.onboarding_create_emoji_id_container, CreateEmojiIdFragment())
+            .commit()
 
         removeCurrentFragment()
     }

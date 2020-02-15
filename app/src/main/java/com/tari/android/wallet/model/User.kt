@@ -42,18 +42,18 @@ import android.os.Parcelable
  */
 open class User() : Parcelable {
 
-    var publicKeyHexString = ""
+    var publicKey = PublicKey()
 
     constructor(
-        publicKeyHexString: String
+        publicKey: PublicKey
     ) : this() {
-        this.publicKeyHexString = publicKeyHexString
+        this.publicKey = publicKey
     }
 
     override fun equals(other: Any?): Boolean = (other is User)
-            && publicKeyHexString == other.publicKeyHexString
+            && publicKey == other.publicKey
 
-    override fun hashCode(): Int = publicKeyHexString.hashCode()
+    override fun hashCode(): Int = publicKey.hashCode()
 
     // region Parcelable
 
@@ -74,11 +74,11 @@ open class User() : Parcelable {
     }
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {
-        parcel.writeString(publicKeyHexString)
+        parcel.writeParcelable(publicKey, flags)
     }
 
     private fun readFromParcel(inParcel: Parcel) {
-        publicKeyHexString = inParcel.readString() ?: ""
+        publicKey = inParcel.readParcelable(PublicKey::class.java.classLoader)!!
     }
 
     override fun describeContents(): Int {

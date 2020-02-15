@@ -43,3 +43,4 @@ parcelable Contact;
 parcelable CompletedTx;
 parcelable PendingInboundTx;
 parcelable PendingOutboundTx;
+parcelable PublicKey;

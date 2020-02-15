@@ -36,7 +36,12 @@ import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import com.tari.android.wallet.R
+import com.tari.android.wallet.di.WalletModule
+import com.tari.android.wallet.ui.activity.onboarding.OnBoardingFlowActivity
 import com.tari.android.wallet.util.Constants.UI.Splash
+import java.io.File
+import javax.inject.Inject
+import javax.inject.Named
 
 /**
  * Splash screen activity.
@@ -49,16 +54,38 @@ class SplashActivity : BaseActivity() {
 
     private val uiHandler = Handler()
 
+    @Inject
+    @Named(WalletModule.FieldName.walletFilesDirPath)
+    lateinit var walletFilesDirPath: String
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        // delete existing wallet if the flag is set
 
-        uiHandler.postDelayed({
-            startCreateWalletActivity()
-        }, Splash.createWalletStartUpDelayMs)
+
+        // check whether there's an existing wallet
+        val walletExists = File(walletFilesDirPath).list()!!.isNotEmpty()
+        if (walletExists) {
+            uiHandler.postDelayed({
+                startAuthActivity()
+            }, Splash.createWalletStartUpDelayMs)
+        } else {
+            uiHandler.postDelayed({
+                startOnboardingActivity()
+            }, Splash.createWalletStartUpDelayMs)
+        }
     }
 
-    private fun startCreateWalletActivity() {
-        val intent = Intent(this@SplashActivity, AuthActivity::class.java)
+    private fun startOnboardingActivity() {
+        val intent = Intent(this, OnBoardingFlowActivity::class.java)
+        intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
+        startActivity(intent)
+        // finish this activity
+        finish()
+    }
+
+    private fun startAuthActivity() {
+        val intent = Intent(this, AuthActivity::class.java)
         intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
         startActivity(intent)
         // finish this activity

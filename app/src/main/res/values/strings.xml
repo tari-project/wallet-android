@@ -38,6 +38,8 @@
     <!-- service -->
     <string name="service_title">Tari wallet service is running.</string>
     <string name="service_description">This service carries out wallet operations across applications.</string>
+    <string name="service_error_testnet_tari_request">Could not allocate free Tari.</string>
+    <string name="service_error_no_internet_connection">No internet connection!</string>
 
     <!-- auth -->
     <string name="testnet">TESTNET v1.0</string>
@@ -68,9 +70,6 @@
     <string name="home_tari_bot_try_later">I’ll try it later</string>
     <string name="home_swipe_down_to_show_wallet">Swipe down and I’ll  show you around your wallet</string>
     <string name="home_tari_bot_some_tari_to_get_started">Some Tari to get you started.</string>
-
-    <string name="service_error_wallet_could_not_allocate_free_tari">Could not allocate free Tari.</string>
-    <string name="service_error_no_internet_connection">No internet connection!</string>
 
     <!-- test -->
     <string name="home_test_data_warning">Please wait.\n\nWallet is generating test data.</string>
@@ -108,6 +107,16 @@
     <string name="add_amount_under_construction">Under Construction</string>
     <string name="add_amount_not_enough_available_balance">Not enough Tari in your available balance</string>
     <string name="add_amount_tx_fee">Transaction Fee</string>
+
+    <!-- send tari - note -->
+    <string name="add_note_and_send_prompt">What\'s it for?</string>
+    <string name="add_note_and_send_hint">You\’ll have to live with this note forever. No pressure.</string>
+    <string name="add_note_and_send_slide_to_send">Slide to Send</string>
+
+    <!-- send tari - successful -->
+    <!-- Tari amount should be formatted and passed as a string to this format -->
+    <string name="send_tx_sucessful_info_format">You just sent %1$s Tari</string>
+    <string name="send_tx_sucessful_info_format_bold_part">%1$s Tari</string>
 
     <!-- debug log - title -->
     <string name="debug_log_title">Log</string>

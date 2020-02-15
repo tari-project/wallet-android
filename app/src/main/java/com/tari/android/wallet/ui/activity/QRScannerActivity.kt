@@ -9,16 +9,25 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import butterknife.BindString
 import butterknife.BindView
 import butterknife.OnClick
 import com.budiyev.android.codescanner.*
 import com.google.zxing.BarcodeFormat
 import com.tari.android.wallet.R
 
-
 private const val REQUEST_CAMERA_PERMISSION = 102
 const val EXTRA_QR_DATA = "extra_qr_text"
+
+/**
+ * override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+super.onActivityResult(requestCode, resultCode, data)
+
+if (requestCode == REQUEST_QR_SCANNER && resultCode == Activity.RESULT_OK && data != null) {
+val text = data.getStringExtra(EXTRA_QR_DATA)
+Toast.makeText(this, "Scan result: $text", Toast.LENGTH_LONG).show()
+}
+}
+ */
 
 class QRScannerActivity : BaseActivity() {
 

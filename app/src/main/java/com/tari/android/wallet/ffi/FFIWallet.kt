@@ -399,6 +399,7 @@ internal abstract class FFIWallet(commsConfig: FFICommsConfig, logPath: String) 
             message,
             error
         )
+        // TODO ignore error#210 until the base node is ready
         if (error.code != 0) {
             throw RuntimeException()
         }
@@ -420,17 +421,29 @@ internal abstract class FFIWallet(commsConfig: FFICommsConfig, logPath: String) 
         signature: String
     ): Boolean {
         val error = FFIError()
-        val result = jniVerifyMessageSignature(ptr,contactPublicKey.getPointer(),message,signature,error)
+        val result =
+            jniVerifyMessageSignature(ptr, contactPublicKey.getPointer(), message, signature, error)
         if (error.code != 0) {
             throw RuntimeException()
         }
         return result
     }
 
-    fun importUTXO(amount: BigInteger, message: String, spendingKey: FFIPrivateKey, sourcePublicKey: FFIPublicKey): BigInteger
-    {
+    fun importUTXO(
+        amount: BigInteger,
+        message: String,
+        spendingKey: FFIPrivateKey,
+        sourcePublicKey: FFIPublicKey
+    ): BigInteger {
         val error = FFIError()
-        val bytes = jniImportUTXO(ptr,spendingKey.getPointer(),sourcePublicKey.getPointer(),amount.toString(),message,error)
+        val bytes = jniImportUTXO(
+            ptr,
+            spendingKey.getPointer(),
+            sourcePublicKey.getPointer(),
+            amount.toString(),
+            message,
+            error
+        )
         if (error.code != 0) {
             throw RuntimeException()
         }
