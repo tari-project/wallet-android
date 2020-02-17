@@ -40,6 +40,7 @@ import android.widget.EditText
 import butterknife.BindView
 import butterknife.OnClick
 import com.tari.android.wallet.R
+import com.tari.android.wallet.ui.util.UiUtil
 import java.io.File
 import java.io.InputStream
 
@@ -55,26 +56,26 @@ class DebugLogActivity() : BaseActivity() {
 
     @OnClick(R.id.debug_log_btn_back)
     fun onBackButtonPressed(view: View) {
+        UiUtil.temporarilyDisableClick(view)
         super.onBackPressed()
     }
 
     @BindView(R.id.debug_log_multiline_edit)
-    lateinit var multilineEdit : EditText
+    lateinit var multilineEdit: EditText
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         multilineEdit.text.clear()
         multilineEdit.setHorizontallyScrolling(true)
         multilineEdit.movementMethod = ScrollingMovementMethod()
-        val log = intent.getStringExtra("log")
-        var lineList = mutableListOf<String>()
+        val log = intent.getStringExtra("log")!!
+        val lineList = mutableListOf<String>()
         if (File(log).exists()) {
             val inputStream: InputStream = File(log).inputStream()
-            inputStream.bufferedReader().useLines { lines -> lines.forEach { lineList.add(it)} }
-        } else
-        {
+            inputStream.bufferedReader().useLines { lines -> lines.forEach { lineList.add(it) } }
+        } else {
             lineList.add("No log available")
         }
-        lineList.forEach{multilineEdit.append(it+"\n")}
+        lineList.forEach { multilineEdit.append(it + "\n") }
     }
 }

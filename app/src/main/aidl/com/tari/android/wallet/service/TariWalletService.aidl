@@ -49,11 +49,9 @@ interface TariWalletService {
     */
     boolean unregisterListener(TariWalletServiceListener listener);
 
-    boolean generateTestData();
-
     String getPublicKeyHexString();
 
-    String getLogFile();
+    String getLogFilePath();
 
     BalanceInfo getBalanceInfo();
 
@@ -71,14 +69,15 @@ interface TariWalletService {
     List<PendingOutboundTx> getPendingOutboundTxs();
     PendingOutboundTx getPendingOutboundTxById(in TxId id);
 
-    boolean send(
+    PublicKey getPublicKeyForEmojiId(String emojiId);
+
+    boolean sendTari(
         in User contact,
         in MicroTari amount,
         in MicroTari fee,
         String message
     );
 
-    boolean testComplete(in PendingOutboundTx tx);
-
     void requestTestnetTari();
+
 }

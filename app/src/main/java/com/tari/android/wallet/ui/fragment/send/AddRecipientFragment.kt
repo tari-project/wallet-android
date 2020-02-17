@@ -51,6 +51,7 @@ import androidx.recyclerview.widget.RecyclerView
 import butterknife.*
 import com.tari.android.wallet.R
 import com.tari.android.wallet.model.Contact
+import com.tari.android.wallet.model.PublicKey
 import com.tari.android.wallet.model.Tx
 import com.tari.android.wallet.model.User
 import com.tari.android.wallet.service.TariWalletService
@@ -134,6 +135,11 @@ class AddRecipientFragment(private val walletService: TariWalletService) : BaseF
     private lateinit var listenerWR: WeakReference<Listener>
 
     /**
+     * Will be non-null if there's a valid emoji id in the clipboard
+     */
+    private var emojiIdPublicKey: PublicKey? = null
+
+    /**
      * Fields related to emoji id input masking.
      */
     private var isDeletingSeparatorAtIndex: Int? = null
@@ -200,7 +206,6 @@ class AddRecipientFragment(private val walletService: TariWalletService) : BaseF
     /**
      * Checks whether an emoji id is in the clipboard data.
      * Currently checks for a single emoji.
-     * TODO will be changed to emoji id checksum.
      */
     private fun checkClipboardForValidEmojiId(): Boolean {
         val clipboardManager =
@@ -208,17 +213,21 @@ class AddRecipientFragment(private val walletService: TariWalletService) : BaseF
         val clipboardString =
             clipboardManager.primaryClip?.getItemAt(0)?.text?.toString() ?: return false
         // if clipboard contains at least 1 emoji, then display paste emoji banner
-        return if (clipboardString.numberOfEmojis() > 0) {
-            recyclerView.post {
-                wr.get()?.displayPasteEmojiIdViews()
-                wr.get()?.focusEditTextAndShowKeyboard()
+        if (clipboardString.numberOfEmojis() > 0) {
+            emojiIdPublicKey = walletService.getPublicKeyForEmojiId(clipboardString)
+            if (emojiIdPublicKey != null) {
+                recyclerView.post {
+                    wr.get()?.displayPasteEmojiIdViews()
+                    wr.get()?.focusEditTextAndShowKeyboard()
+                }
+                return true
             }
-            true
+            return false
         } else {
             recyclerView.post {
                 wr.get()?.hidePasteEmojiIdViews()
             }
-            false
+            return false
         }
     }
 
@@ -236,7 +245,9 @@ class AddRecipientFragment(private val walletService: TariWalletService) : BaseF
      * Displays paste-emoji-id-related views.
      */
     private fun displayPasteEmojiIdViews() {
-        pasteEmojiClipboardTextView.text = EmojiUtil.generateRandomEmojiId()
+        // TODO this will change once emoji id display spec is clear
+        val shortenedEmojiId = EmojiUtil.getShortenedEmojiId(emojiIdPublicKey!!.emojiId)
+        pasteEmojiClipboardTextView.text = shortenedEmojiId
         pasteEmojiBannerView.visibility = View.VISIBLE
         dimmerViews.forEach {
             it.visibility = View.VISIBLE
@@ -305,14 +316,12 @@ class AddRecipientFragment(private val walletService: TariWalletService) : BaseF
 
     /**
      * Makes a search by the input.
-     * TODO emoji id's are randomly generated per user - will be changed.
      */
     private fun searchRecipients(query: String) {
         val users = ArrayList<User>()
         // get all contacts and filter by alias and emoji id
         val filteredContacts = walletService.contacts.filter {
-            it.alias.contains(query, ignoreCase = true) ||
-                    EmojiUtil.getEmojiIdForPublicKeyHexString(it.publicKeyHexString).contains(query)
+            it.alias.contains(query, ignoreCase = true) || it.publicKey.emojiId.contains(query)
         }
         users.addAll(filteredContacts)
         val allTxs = ArrayList<Tx>()
@@ -320,7 +329,7 @@ class AddRecipientFragment(private val walletService: TariWalletService) : BaseF
         allTxs.addAll(walletService.pendingInboundTxs)
         allTxs.addAll(walletService.pendingOutboundTxs)
         for (tx in allTxs) {
-            if (EmojiUtil.getEmojiIdForPublicKeyHexString(tx.user.publicKeyHexString).contains(query)) {
+            if (tx.user.publicKey.emojiId.contains(query)) {
                 if (!users.contains(tx.user)) {
                     users.add(tx.user)
                 }
@@ -350,7 +359,7 @@ class AddRecipientFragment(private val walletService: TariWalletService) : BaseF
         UiUtil.temporarilyDisableClick(view)
         listenerWR.get()?.continueToAmount(
             this,
-            searchEditText.text.toString().replace(emojiIdChunkSeparator, "")
+            User(emojiIdPublicKey!!)
         )
     }
 
@@ -375,7 +384,7 @@ class AddRecipientFragment(private val walletService: TariWalletService) : BaseF
     @OnClick(R.id.add_recipient_vw_paste_emoji_id_banner)
     fun onEmojiIdBannerClicked() {
         pasteEmojiBannerView.visibility = View.GONE
-        searchEditText.setText(pasteEmojiClipboardTextView.text, TextView.BufferType.EDITABLE)
+        searchEditText.setText(emojiIdPublicKey!!.emojiId, TextView.BufferType.EDITABLE)
         dimmerViews.forEach {
             it.visibility = View.GONE
         }
@@ -521,11 +530,6 @@ class AddRecipientFragment(private val walletService: TariWalletService) : BaseF
      * Listener interface - to be implemented by the host activity.
      */
     interface Listener {
-
-        /**
-         * Send to the emoji id in the clipboard.
-         */
-        fun continueToAmount(sourceFragment: AddRecipientFragment, emojiId: String)
 
         /**
          * Send to a user from the list.

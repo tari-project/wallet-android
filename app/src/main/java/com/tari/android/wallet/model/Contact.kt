@@ -40,21 +40,17 @@ import android.os.Parcelable
  *
  * @author The Tari Development Team
  */
-class Contact() : User(), Parcelable {
+class Contact() : User() {
 
     var alias: String = ""
 
     constructor(
-        publicKeyHexString: String,
+        publicKey: PublicKey,
         alias: String
     ) : this() {
-        this.publicKeyHexString = publicKeyHexString
+        this.publicKey = publicKey
         this.alias = alias
     }
-
-    override fun equals(other: Any?): Boolean = super.equals(other)
-
-    override fun hashCode(): Int = publicKeyHexString.hashCode() * alias.hashCode()
 
     // region Parcelable
 
@@ -75,12 +71,12 @@ class Contact() : User(), Parcelable {
     }
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {
-        parcel.writeString(publicKeyHexString)
+        parcel.writeParcelable(publicKey, flags)
         parcel.writeString(alias)
     }
 
     private fun readFromParcel(inParcel: Parcel) {
-        publicKeyHexString = inParcel.readString() ?: ""
+        publicKey = inParcel.readParcelable(PublicKey::class.java.classLoader)!!
         alias = inParcel.readString() ?: ""
     }
 

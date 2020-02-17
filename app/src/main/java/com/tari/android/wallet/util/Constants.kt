@@ -49,6 +49,7 @@ internal object Constants {
         const val keyboardHideWaitMs = 100L
         const val shortAnimDurationMs = 300L
         const val mediumAnimDurationMs = 600L
+        const val longAnimDurationMs = 1000L
 
         const val scrollDepthShadowViewMaxOpacity = 0.8f
 
@@ -65,9 +66,7 @@ internal object Constants {
             const val startupAnimDurationMs = 1500L
             const val digitAnimDurationMs = 700L
             const val digitShrinkExpandAnimDurationMs = 200L
-            const val mainContentViewTransAnimDurationMs = 800L
-            const val blackBgFadeAnimDelayMs = 200L
-            const val welcomeTextTransAnimDurationMs = 600L
+            const val welcomeAnimationDurationMs = 800L
             const val emptyWalletTxtFadeAnimDelayMs = 100L
             const val showEmptyWalletFadeAnimDurationMs = 400L
             const val showTariBotDialogDelayMs = 3000L
@@ -106,6 +105,18 @@ internal object Constants {
             const val numPadDigitEnterAnimDurationMs = 200L
         }
 
+        object AddNoteAndSend {
+            const val preKeyboardHideWaitMs = 500L
+            const val postSendDelayMs = 3000L
+
+        }
+
+        object SendTxSuccessful {
+            const val lottieAnimStartDelayMs = 400L
+            const val textAppearAnimStartDelayMs = 500L
+            const val textFadeOutAnimStartDelayMs = 4750L
+        }
+
         object Splash {
             const val createWalletStartUpDelayMs = 3000L
         }
@@ -115,7 +126,8 @@ internal object Constants {
      * Wallet constants.
      */
     object Wallet {
-        internal const val emojiIdLength = 12
+        internal const val emojiIdLength = 32
+        internal const val emojiIdShortenedLength = 12
         internal const val emojiFormatterChunkSize = 4
         const val WALLET_DB_NAME: String = "tari_wallet_db"
         internal val WALLET_CONTROL_SERVICE_ADDRESS: NetAddressString =

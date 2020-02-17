@@ -69,7 +69,10 @@ fun Activity.makeStatusBarTransparent() {
  * taking into account the text size and the typeface.
  */
 fun TextView.setWidthToMeasured() {
-    this.measure(0, 0)
+    this.measure(
+        View.MeasureSpec.UNSPECIFIED,
+        View.MeasureSpec.UNSPECIFIED
+    )
     UiUtil.setWidth(
         this,
         this.measuredWidth
@@ -81,7 +84,10 @@ fun TextView.setWidthToMeasured() {
  * taking into account the text size and the typeface.
  */
 fun TextView.setWidthAndHeightToMeasured() {
-    this.measure(0, 0)
+    this.measure(
+        View.MeasureSpec.UNSPECIFIED,
+        View.MeasureSpec.UNSPECIFIED
+    )
     UiUtil.setWidth(
         this,
         this.measuredWidth

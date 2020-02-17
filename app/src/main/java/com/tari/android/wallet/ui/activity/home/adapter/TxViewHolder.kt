@@ -43,7 +43,7 @@ import com.tari.android.wallet.model.Contact
 import com.tari.android.wallet.model.Tx
 import com.tari.android.wallet.ui.component.EmojiIdSummaryViewController
 import com.tari.android.wallet.ui.util.UiUtil
-import com.tari.android.wallet.util.EmojiUtil
+import com.tari.android.wallet.util.WalletUtil
 import java.lang.ref.WeakReference
 
 /**
@@ -103,23 +103,27 @@ class TxViewHolder(view: View, listener: Listener) :
         } else {
             aliasTextView.visibility = View.GONE
             emojiIdSummaryView.visibility = View.VISIBLE
-            val emojiId = EmojiUtil.getEmojiIdForPublicKeyHexString(txUser.publicKeyHexString)
-            emojiIdSummaryController.display(emojiId)
+            emojiIdSummaryController.display(
+                txUser.publicKey.emojiId
+            )
         }
         // display message
         messageTextView.text = tx.message
         // display value
         if (tx.direction == Tx.Direction.INBOUND) {
-            val formattedValue = "+%1$,.2f".format(tx.amount.tariValue.toDouble())
+            val formattedValue = "+" + WalletUtil.amountFormatter.format(tx.amount.tariValue)
             amountTextView.text = formattedValue
             amountTextView.setTextColor(positiveColor)
             amountTextView.background = positiveBgDrawable
         } else {
-            val formattedValue = "-%1$,.2f".format(tx.amount.tariValue.toDouble())
+            val formattedValue = "-" + WalletUtil.amountFormatter.format(tx.amount.tariValue)
             amountTextView.text = formattedValue
             amountTextView.setTextColor(negativeColor)
             amountTextView.background = negativeBgDrawable
         }
+        val measure = amountTextView.paint.measureText("0".repeat(amountTextView.text.length))
+        val totalPadding = amountTextView.paddingStart + amountTextView.paddingEnd
+        amountTextView.width = totalPadding + measure.toInt()
     }
 
     interface Listener {

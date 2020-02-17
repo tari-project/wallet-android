@@ -66,8 +66,6 @@ import com.tari.android.wallet.util.remap
 import java.lang.StringBuilder
 import java.lang.ref.WeakReference
 import java.math.BigInteger
-import java.math.RoundingMode
-import java.text.DecimalFormat
 import kotlin.math.min
 
 /**
@@ -174,13 +172,10 @@ class AddAmountFragment(private val walletService: TariWalletService) : BaseFrag
      */
     private val actionWaitLengthMs = 500L
 
-    private val amountDecimalFormat = DecimalFormat("#,##0.00")
-    private val feeDecimalFormat = DecimalFormat("#,##0.0000")
-
     private val decimalSeparator =
-        amountDecimalFormat.decimalFormatSymbols.decimalSeparator.toString()
+        WalletUtil.amountFormatter.decimalFormatSymbols.decimalSeparator.toString()
     private val thousandsSeparator =
-        amountDecimalFormat.decimalFormatSymbols.groupingSeparator.toString()
+        WalletUtil.amountFormatter.decimalFormatSymbols.groupingSeparator.toString()
 
     /**
      * Below two are related to amount check and validation.
@@ -194,8 +189,7 @@ class AddAmountFragment(private val walletService: TariWalletService) : BaseFrag
     /**
      * Recipient is either an emoji id or a user from contacts or recent txs.
      */
-    private var recipientUser: User? = null
-    private var recipientEmojiId: String? = null
+    private lateinit var recipientUser: User
 
     /**
      * Formats the summarized emoji id.
@@ -215,8 +209,7 @@ class AddAmountFragment(private val walletService: TariWalletService) : BaseFrag
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        amountDecimalFormat.roundingMode = RoundingMode.FLOOR
-        feeDecimalFormat.roundingMode = RoundingMode.CEILING
+        recipientUser = arguments!!.getParcelable("recipientUser")!!
 
         decimalSeparatorButton.text = decimalSeparator
 
@@ -257,22 +250,15 @@ class AddAmountFragment(private val walletService: TariWalletService) : BaseFrag
     }
 
     private fun displayAliasOrEmojiId() {
-        val bundle = arguments ?: return
-        val user = bundle.getParcelable<User>("recipientUser")
-        if (user != null) {
-            recipientUser = user
-            if (user is Contact) {
-                emojiIdContainerView.visibility = View.GONE
-                titleTextView.visibility = View.VISIBLE
-                titleTextView.text = user.alias
-            } else {
-                val emojiId = EmojiUtil.getEmojiIdForPublicKeyHexString(user.publicKeyHexString)
-                displayEmojiId(emojiId)
-            }
+        if (recipientUser is Contact) {
+            emojiIdContainerView.visibility = View.GONE
+            titleTextView.visibility = View.VISIBLE
+            titleTextView.text = (recipientUser as Contact).alias
         } else {
-            val emojiId = bundle.getString("recipientEmojiId")!!
-            recipientEmojiId = emojiId
-            displayEmojiId(emojiId)
+            // TODO to be changed once the emoji id graphic design spec is clear
+            val shortenedEmojiId = EmojiUtil.getShortenedEmojiId(recipientUser.publicKey.emojiId)
+                ?: throw RuntimeException("Invalid emoji id: " + recipientUser.publicKey.emojiId)
+            displayEmojiId(shortenedEmojiId)
         }
     }
 
@@ -454,7 +440,7 @@ class AddAmountFragment(private val walletService: TariWalletService) : BaseFrag
             }
         }
         // exit if entering decimal point when a decimal point exists
-        val enteringDecimalPoint = (digit == ".")
+        val enteringDecimalPoint = (digit == decimalSeparator)
         if (enteringDecimalPoint && decimalSeparatorIndex > 0) {
             return
         }
@@ -473,7 +459,10 @@ class AddAmountFragment(private val walletService: TariWalletService) : BaseFrag
             digit
         )
         // measure it
-        textView.measure(0, 0)
+        textView.measure(
+            View.MeasureSpec.UNSPECIFIED,
+            View.MeasureSpec.UNSPECIFIED
+        )
         val measuredWidth = textView.measuredWidth
 
         // update thousands separators & get delta width
@@ -690,7 +679,7 @@ class AddAmountFragment(private val walletService: TariWalletService) : BaseFrag
     }
 
     @OnClick(R.id.add_amount_btn_delete)
-    fun deleteButtonClicked(view: View) {
+    fun deleteButtonClicked() {
         amountCheckHandler.removeCallbacks(amountCheckRunnable)
         if (elements.size == 1) { // single digit
             elements[0] = elements[0].copy(first = "0")
@@ -809,19 +798,13 @@ class AddAmountFragment(private val walletService: TariWalletService) : BaseFrag
     @OnClick(R.id.add_amount_btn_continue)
     fun continueButtonClicked(view: View) {
         UiUtil.temporarilyDisableClick(view)
-        if (recipientUser != null) {
-            listenerWR.get()?.continueToNote(
-                this,
-                recipientUser!!,
-                currentAmount
-            )
-        } else {
-            listenerWR.get()?.continueToNote(
-                this,
-                recipientEmojiId!!,
-                currentAmount
-            )
-        }
+        val fee = WalletUtil.calculateTxFee()
+        listenerWR.get()?.continueToNote(
+            this,
+            recipientUser,
+            currentAmount,
+            fee
+        )
     }
 
     /**
@@ -831,12 +814,13 @@ class AddAmountFragment(private val walletService: TariWalletService) : BaseFrag
 
         override fun run() {
             // update fee
-            txFeeTextView.text = feeDecimalFormat.format(WalletUtil.calculateTxFee().tariValue)
+            txFeeTextView.text =
+                WalletUtil.feeFormatter.format(WalletUtil.calculateTxFee().tariValue)
             // check balance
             val availableBalance = walletService.balanceInfo.availableBalance
-            if (currentAmount.value > availableBalance.value) {
+            if ((currentAmount.value + WalletUtil.calculateTxFee().value) > availableBalance.value) {
                 availableBalanceTextView.text =
-                    amountDecimalFormat.format(availableBalance.tariValue)
+                    WalletUtil.amountFormatter.format(availableBalance.tariValue)
                 wr.get()?.displayAvailableBalanceError()
             } else {
                 var showsTxFee = false
@@ -902,21 +886,13 @@ class AddAmountFragment(private val walletService: TariWalletService) : BaseFrag
     interface Listener {
 
         /**
-         * Recipient is emoji id.
-         */
-        fun continueToNote(
-            sourceFragment: AddAmountFragment,
-            recipientEmojiId: String,
-            amount: MicroTari
-        )
-
-        /**
          * Recipient is user.
          */
         fun continueToNote(
             sourceFragment: AddAmountFragment,
             recipientUser: User,
-            amount: MicroTari
+            amount: MicroTari,
+            fee: MicroTari
         )
 
     }

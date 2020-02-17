@@ -33,12 +33,11 @@
 package com.tari.android.wallet.di
 
 import android.content.Context
-import com.orhanobut.logger.Logger
 import com.tari.android.wallet.ffi.*
 import com.tari.android.wallet.util.Constants
 import dagger.Module
 import dagger.Provides
-import java.io.File
+import java.lang.RuntimeException
 import javax.inject.Named
 import javax.inject.Singleton
 
@@ -50,50 +49,40 @@ import javax.inject.Singleton
 @Module
 class WalletModule {
 
-    companion object {
-        const val NAME_WALLET_FILES_DIR_PATH = "WALLET_FILES_DIR_PATH"
-        const val NAME_WALLET_LOG_FILE_PATH = "WALLET_LOG_FILE_PATH"
-        private const val LOG_FILE_NAME = "tari_wallet.log"
-        private const val PRIVATE_KEY_HEX_STRING: String =
-            "6259C39F75E27140A652A5EE8AEFB3CF6C1686EF21D27793338D899380E8C801"
+    object FieldName {
+        const val walletFilesDirPath = "wallet_files_dir_path"
+        const val walletLogFilePath = "wallet_log_file_path"
+        const val emojiId = "wallet_emoji_id"
     }
 
+    private val logFileName = "tari_wallet.log"
+    private val privateKeyHexString: String =
+        "6259C39F75E27140A652A5EE8AEFB3CF6C1686EF21D27793338D899380E8C801"
+
     @Provides
-    @Named(NAME_WALLET_FILES_DIR_PATH)
+    @Named(FieldName.walletFilesDirPath)
     internal fun provideWalletFilesDirPath(context: Context): String = context.filesDir.absolutePath
 
     @Provides
-    @Named(NAME_WALLET_LOG_FILE_PATH)
-    internal fun provideWalletLogFilePath(@Named(NAME_WALLET_FILES_DIR_PATH) walletFilesDirPath: String): String {
-        val logFilePath = "$walletFilesDirPath/$LOG_FILE_NAME"
-
-        // print last log
-        var log = ""
-        val logFile = File(logFilePath)
-        if (logFile.exists()) {
-            File(logFilePath).forEachLine {
-                log += "\n" + it
-            }
-            Logger.d("FFI log file contents:\n$log")
-        }
-
-        return logFilePath
+    @Named(FieldName.walletLogFilePath)
+    internal fun provideWalletLogFilePath(@Named(FieldName.walletFilesDirPath) walletFilesDirPath: String): String {
+        return "$walletFilesDirPath/$logFileName"
     }
-
 
     /**
      * Provides CommsConfig object for wallet configuration.
      */
     @Provides
     @Singleton
-    internal fun provideCommsConfig(@Named(NAME_WALLET_FILES_DIR_PATH) path: String): FFICommsConfig {
-        clearWalletFiles(path)
+    internal fun provideCommsConfig(
+        @Named(FieldName.walletFilesDirPath) walletFilesDirPath: String
+    ): FFICommsConfig {
         return FFICommsConfig(
             Constants.Wallet.WALLET_CONTROL_SERVICE_ADDRESS,
             Constants.Wallet.WALLET_LISTENER_ADDRESS,
             Constants.Wallet.WALLET_DB_NAME,
-            path,
-            FFIPrivateKey(HexString(PRIVATE_KEY_HEX_STRING))
+            walletFilesDirPath,
+            FFIPrivateKey(HexString(privateKeyHexString))
         )
     }
 
@@ -104,28 +93,23 @@ class WalletModule {
     @Singleton
     internal fun provideTestWallet(
         commsConfig: FFICommsConfig,
-        @Named(NAME_WALLET_LOG_FILE_PATH) logFilePath: String
+        @Named(FieldName.walletLogFilePath) logFilePath: String
     ): FFITestWallet {
-        return FFITestWallet(commsConfig, logFilePath)
+        if (FFITestWallet.instance == null) {
+            FFITestWallet.instance = FFITestWallet(commsConfig, logFilePath)
+        }
+        return FFITestWallet.instance!!
     }
 
     /**
-     * Utility function to clear all previous wallet files.
+     * Provides the emoji id of the wallet.
      */
-    private fun clearWalletFiles(path: String): Boolean {
-        val fileDirectory = File(path)
-        val del = fileDirectory.deleteRecursively()
-        if (!del) {
-            return false
-        }
-        val directory = File(path)
-        if (!directory.exists()) {
-            directory.mkdirs()
-        }
-        if (directory.exists() && directory.canWrite() && directory.isDirectory) {
-            return true
-        }
-        return false
+    @Provides
+    @Named(FieldName.emojiId)
+    internal fun provideWalletEmojiId(): String {
+        val wallet = FFITestWallet.instance
+            ?: throw RuntimeException("Wallet has not been initialized yet.")
+        return wallet.getPublicKey().getEmoji()
     }
 
 }

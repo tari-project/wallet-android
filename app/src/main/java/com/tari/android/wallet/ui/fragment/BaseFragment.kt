@@ -39,6 +39,12 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import butterknife.ButterKnife
 import com.tari.android.wallet.application.TariWalletApplication
+import com.tari.android.wallet.ui.fragment.onboarding.CreateEmojiIdFragment
+import com.tari.android.wallet.ui.fragment.onboarding.CreateWalletFragment
+import com.tari.android.wallet.ui.fragment.send.AddAmountFragment
+import com.tari.android.wallet.ui.fragment.send.AddNoteAndSendFragment
+import com.tari.android.wallet.ui.fragment.send.AddRecipientFragment
+import com.tari.android.wallet.ui.fragment.send.SendTxSuccessfulFragment
 
 /**
  * Base for all fragment classes.
@@ -54,10 +60,18 @@ abstract class BaseFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // inject the dependencies
-        (activity!!.application as TariWalletApplication).appComponent.inject(this)
+        // DI inject
+        val component = (activity!!.application as TariWalletApplication).appComponent
+        when (this) {
+            is CreateWalletFragment -> component.inject(this)
+            is CreateEmojiIdFragment -> component.inject(this)
+            is AddRecipientFragment -> component.inject(this)
+            is AddAmountFragment -> component.inject(this)
+            is AddNoteAndSendFragment -> component.inject(this)
+            is SendTxSuccessfulFragment -> component.inject(this)
+        }
+        // bind views
         val view = inflater.inflate(contentViewId, container, false)
-        // bind views and others
         ButterKnife.bind(this, view)
         return view
     }

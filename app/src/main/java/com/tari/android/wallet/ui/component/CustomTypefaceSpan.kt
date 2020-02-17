@@ -30,21 +30,44 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.tari.android.wallet.rest
+package com.tari.android.wallet.ui.component
 
-import com.tari.android.wallet.model.TestnetTariAllocateRequest
-import com.tari.android.wallet.model.TestnetTariAllocateResponse
-import retrofit2.Call
-import retrofit2.http.Body
-import retrofit2.http.POST
-import retrofit2.http.Path
+import android.graphics.Paint
+import android.graphics.Typeface
+import android.text.TextPaint
+import android.text.style.TypefaceSpan
 
 /**
- *  Rest API service
+ * This class is used when creating spannables (partial bold strings).
+ *
+ * @author The Tari Development Team
  */
-interface TariService {
+class CustomTypefaceSpan(family: String, private val newType: Typeface) : TypefaceSpan(family) {
 
-    @POST("/free_tari/allocate/{publicKeyHex}")
-    fun getTransaction(@Path("publicKeyHex") publicKey: String, @Body requestBody: TestnetTariAllocateRequest): Call<TestnetTariAllocateResponse>
+    override fun updateDrawState(ds: TextPaint) {
+        applyCustomTypeFace(ds, newType)
+    }
+
+    override fun updateMeasureState(paint: TextPaint) {
+        applyCustomTypeFace(paint, newType)
+    }
+
+    companion object {
+
+        private fun applyCustomTypeFace(paint: Paint, tf: Typeface) {
+            val oldStyle: Int
+            val old = paint.typeface
+            oldStyle = old?.style ?: 0
+            val fake = oldStyle and tf.style.inv()
+            if (fake and Typeface.BOLD != 0) {
+                paint.isFakeBoldText = true
+            }
+            if (fake and Typeface.ITALIC != 0) {
+                paint.textSkewX = -0.25f
+            }
+            paint.typeface = tf
+        }
+        
+    }
 
 }
