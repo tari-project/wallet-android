@@ -32,7 +32,9 @@
  */
 package com.tari.android.wallet.ui.activity.home
 
-import android.animation.*
+import android.animation.AnimatorSet
+import android.animation.ObjectAnimator
+import android.animation.ValueAnimator
 import android.annotation.SuppressLint
 import android.app.Dialog
 import android.content.ComponentName
@@ -47,7 +49,10 @@ import android.os.AsyncTask
 import android.os.Bundle
 import android.os.Handler
 import android.os.IBinder
-import android.view.*
+import android.view.Gravity
+import android.view.MotionEvent
+import android.view.View
+import android.view.ViewGroup
 import android.view.animation.AccelerateInterpolator
 import android.view.animation.Animation
 import android.view.animation.DecelerateInterpolator
@@ -66,13 +71,17 @@ import com.orhanobut.logger.Logger
 import com.tari.android.wallet.R
 import com.tari.android.wallet.event.Event
 import com.tari.android.wallet.event.EventBus
-import com.tari.android.wallet.model.*
+import com.tari.android.wallet.model.CompletedTx
+import com.tari.android.wallet.model.PendingInboundTx
+import com.tari.android.wallet.model.PendingOutboundTx
+import com.tari.android.wallet.model.Tx
 import com.tari.android.wallet.service.TariWalletService
 import com.tari.android.wallet.service.WalletService
 import com.tari.android.wallet.ui.activity.BaseActivity
 import com.tari.android.wallet.ui.activity.home.adapter.TxListAdapter
 import com.tari.android.wallet.ui.activity.log.DebugLogActivity
 import com.tari.android.wallet.ui.activity.send.SendTariActivity
+import com.tari.android.wallet.ui.activity.walletinfo.WalletInfoActivity
 import com.tari.android.wallet.ui.util.UiUtil
 import com.tari.android.wallet.util.Constants
 import java.lang.ref.WeakReference
@@ -131,8 +140,8 @@ class HomeActivity : BaseActivity(),
     lateinit var balanceTitleTextView: TextView
     @BindView(R.id.home_img_balance_gem)
     lateinit var balanceGemImageView: ImageView
-    @BindView(R.id.home_img_btn_profile)
-    lateinit var userProfileButton: ImageButton
+    @BindView(R.id.home_img_wallet_info)
+    lateinit var userWalletInfoButton: ImageView
 
     // Balance digit containers.
     @BindView(R.id.home_vw_balance_digit_container)
@@ -301,7 +310,7 @@ class HomeActivity : BaseActivity(),
         sendTariButtonBgGradientView.alpha = 0f
 
         balanceTitleTextView.alpha = 0f
-        userProfileButton.alpha = 0f
+        userWalletInfoButton.alpha = 0f
         balanceGemImageView.alpha = 0f
         noTxsInfoTextView.visibility = View.GONE
 
@@ -521,7 +530,7 @@ class HomeActivity : BaseActivity(),
             onEnd = {
                 wr.get()?.topContentContainerView?.visibility = View.VISIBLE
                 wr.get()?.balanceTitleTextView?.alpha = 1f
-                wr.get()?.userProfileButton?.alpha = 1f
+                wr.get()?.userWalletInfoButton?.alpha = 1f
                 wr.get()?.balanceGemImageView?.alpha = 1f
             }
         )
@@ -582,7 +591,7 @@ class HomeActivity : BaseActivity(),
             sendTariButtonBgGradientView.alpha = value
             // reveal balance title, QR code button and balance gem image
             balanceTitleTextView.alpha = value
-            userProfileButton.alpha = value
+            userWalletInfoButton.alpha = value
             balanceGemImageView.alpha = value
         }
         listAnim.duration = Constants.UI.Home.startupAnimDurationMs
@@ -605,11 +614,13 @@ class HomeActivity : BaseActivity(),
     }
 
     /**
-     * Opens user profile on button click.
+     * Opens user wallet info on button click.
      */
-    @OnClick(R.id.home_img_btn_profile)
-    fun profileImageButtonClicked(view: View) {
+    @OnClick(R.id.home_img_wallet_info)
+    fun walletInfoImageClicked(view: View) {
         UiUtil.temporarilyDisableClick(view)
+        val intent = Intent(this@HomeActivity, WalletInfoActivity::class.java)
+        startActivity(intent)
     }
 
     @OnClick(R.id.home_btn_send_tari)
@@ -824,9 +835,9 @@ class HomeActivity : BaseActivity(),
             scrollView.requestDisallowInterceptTouchEvent(true)
             // profile button - handle touch
             val rect = Rect()
-            userProfileButton.getGlobalVisibleRect(rect)
+            userWalletInfoButton.getGlobalVisibleRect(rect)
             if (rect.contains(event.rawX.toInt(), event.rawY.toInt())) {
-                userProfileButton.dispatchTouchEvent(event)
+                userWalletInfoButton.dispatchTouchEvent(event)
             }
             // event consumed
             return true
@@ -930,5 +941,4 @@ class HomeActivity : BaseActivity(),
     }
 
     // endregion
-
 }

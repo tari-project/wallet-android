@@ -24,15 +24,14 @@
         android:layout_marginTop="@dimen/home_top_content_container_view_top_margin"
         android:layout_marginEnd="25dp">
 
-        <!-- QR button -->
-        <ImageButton
-            android:id="@+id/home_img_btn_profile"
-            android:layout_width="38dp"
-            android:layout_height="38dp"
+        <!-- profile button -->
+        <ImageView
+            android:id="@+id/home_img_wallet_info"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:padding="6dp"
             android:layout_alignParentEnd="true"
-            android:background="@drawable/home_profile_ring"
-            android:contentDescription="@null"
-            android:src="@drawable/profile_icon"
+            android:src="@drawable/home_profile_icon"
             android:tint="@color/white" />
 
         <!-- title -->
@@ -43,7 +42,7 @@
             android:layout_alignParentStart="true"
             android:layout_marginTop="10dp"
             android:layout_marginEnd="4dp"
-            android:layout_toStartOf="@+id/home_img_btn_profile"
+            android:layout_toStartOf="@+id/home_img_wallet_info"
             android:text="@string/home_available_balance"
             android:textColor="@color/white"
             android:textSize="14sp"
@@ -56,7 +55,7 @@
             android:layout_alignParentStart="true"
             android:layout_marginTop="4dp"
             android:layout_marginEnd="4dp"
-            android:layout_toStartOf="@+id/home_img_btn_profile"
+            android:layout_toStartOf="@+id/home_img_wallet_info"
             android:gravity="center_vertical"
             android:orientation="horizontal">
 

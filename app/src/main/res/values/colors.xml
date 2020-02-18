@@ -50,4 +50,7 @@
     <!-- Debug Log -->
     <color name="terminal_green">#4AF626</color>
 
+    <!-- Wallet info -->
+    <color name="wallet_info_qr_code_desc">#7f8599</color>
+    <color name="wallet_info_emoji_id_summary_divider">#979797</color>
 </resources>

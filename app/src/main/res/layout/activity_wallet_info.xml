@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <ImageButton
+        android:id="@+id/wallet_info_btn_close"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="16dp"
+        android:background="@color/transparent"
+        android:contentDescription="@null"
+        android:src="@drawable/close_icon"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <LinearLayout
+        android:id="@+id/wallet_info_vw_title_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:gravity="center"
+        android:orientation="horizontal"
+        app:layout_constraintLeft_toRightOf="@id/wallet_info_btn_close"
+        app:layout_constraintTop_toBottomOf="@id/wallet_info_btn_close">
+
+        <com.tari.android.wallet.ui.component.CustomFontTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/wallet_info_title_label_1"
+            android:textColor="@color/black"
+            android:textSize="18sp"
+            app:customFont="AVENIR_LT_STD_LIGHT" />
+
+        <com.tari.android.wallet.ui.component.CustomFontTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingLeft="4dp"
+            android:text="@string/wallet_info_title_label_2"
+            android:textColor="@color/black"
+            android:textSize="18sp"
+            app:customFont="AVENIR_LT_STD_BLACK" />
+
+        <com.tari.android.wallet.ui.component.CustomFontTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingLeft="4dp"
+            android:text="@string/wallet_info_title_label_3"
+            android:textColor="@color/black"
+            android:textSize="18sp"
+            app:customFont="AVENIR_LT_STD_LIGHT" />
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/wallet_info_txt_emoji_container"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="20dp"
+        android:background="@drawable/wallet_info_bg_emoji_id_summary"
+        android:elevation="5dp"
+        android:letterSpacing="0.27"
+        android:padding="10dp"
+        android:textAlignment="center"
+        android:textColor="@color/wallet_info_emoji_id_summary_divider"
+        android:textSize="16sp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/wallet_info_vw_title_container" />
+
+    <com.tari.android.wallet.ui.component.CustomFontTextView
+        android:id="@+id/wallet_info_txt_copy_emoji_id"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:gravity="center"
+        android:padding="10dp"
+        android:paddingLeft="4dp"
+        android:text="@string/wallet_info_copy_emoji_id"
+        android:textColor="@color/purple"
+        android:textSize="12sp"
+        app:customFont="AVENIR_LT_STD_MEDIUM"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/wallet_info_txt_emoji_container" />
+
+    <View
+        android:id="@+id/wallet_info_vw_divider"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginLeft="32dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginRight="32dp"
+        android:background="#20000000"
+        app:layout_constraintTop_toBottomOf="@id/wallet_info_txt_copy_emoji_id" />
+
+    <com.tari.android.wallet.ui.component.CustomFontTextView
+        android:id="@+id/wallet_info_txt_qr_code_desc"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="32dp"
+        android:layout_marginTop="30dp"
+        android:layout_marginRight="32dp"
+        android:gravity="center"
+        android:lineSpacingExtra="12dp"
+        android:text="@string/wallet_info_qr_code_desc"
+        android:textColor="@color/wallet_info_qr_code_desc"
+        android:textSize="14sp"
+        app:customFont="AVENIR_LT_STD_MEDIUM"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/wallet_info_vw_divider" />
+
+    <ImageView
+        android:id="@+id/wallet_info_img_qr"
+        android:layout_width="@dimen/wallet_info_img_qr_code_size"
+        android:layout_height="@dimen/wallet_info_img_qr_code_size"
+        android:layout_marginTop="20dp"
+        android:background="@drawable/wallet_info_bg_qr_code_image"
+        android:elevation="10dp"
+        android:outlineProvider="paddedBounds"
+        android:padding="2dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/wallet_info_txt_qr_code_desc" />
+</androidx.constraintlayout.widget.ConstraintLayout>

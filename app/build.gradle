@@ -125,4 +125,5 @@ dependencies {
     //retrofit
     implementation "com.squareup.retrofit2:retrofit:2.6.2"
     implementation "com.squareup.retrofit2:converter-gson:2.6.2"
+    implementation 'com.journeyapps:zxing-android-embedded:4.1.0'
 }
