@@ -43,8 +43,6 @@ import butterknife.BindDimen
 import butterknife.BindString
 import butterknife.BindView
 import butterknife.OnClick
-import com.google.zxing.BarcodeFormat
-import com.journeyapps.barcodescanner.BarcodeEncoder
 import com.tari.android.wallet.R
 import com.tari.android.wallet.di.WalletModule
 import com.tari.android.wallet.ui.activity.BaseActivity
@@ -91,17 +89,8 @@ class WalletInfoActivity : BaseActivity() {
         val chunkedEmojiId = EmojiUtil.getChunkedEmojiId(shortEmojiId, emojiIdChunkSeparator)
         emojiContainerView.text = chunkedEmojiId
 
-        try {
-            val barcodeEncoder = BarcodeEncoder()
-            val bitmap =
-                barcodeEncoder.encodeBitmap(
-                    emojiId,
-                    BarcodeFormat.QR_CODE,
-                    qrCodeImageSize,
-                    qrCodeImageSize
-                )
-            qrCodeImageView.setImageBitmap(bitmap)
-        } catch (e: Exception) {
+        UiUtil.getQREncodedBitmap(emojiId, qrCodeImageSize)?.let {
+            qrCodeImageView.setImageBitmap(it)
         }
     }
 
