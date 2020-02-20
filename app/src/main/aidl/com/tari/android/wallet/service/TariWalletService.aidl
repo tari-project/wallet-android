@@ -69,8 +69,6 @@ interface TariWalletService {
     List<PendingOutboundTx> getPendingOutboundTxs();
     PendingOutboundTx getPendingOutboundTxById(in TxId id);
 
-    PublicKey getPublicKeyForEmojiId(String emojiId);
-
     boolean sendTari(
         in User contact,
         in MicroTari amount,

@@ -53,5 +53,5 @@ fun Date.txFormattedDate(): String {
         else -> "th"
     }
     return SimpleDateFormat("MMMM d'$indicator' yyyy 'at' h:mm a", Locale.getDefault())
-        .format(date)
+        .format(cal.time)
 }

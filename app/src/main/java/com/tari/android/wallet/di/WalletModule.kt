@@ -109,7 +109,7 @@ class WalletModule {
     internal fun provideWalletEmojiId(): String {
         val wallet = FFITestWallet.instance
             ?: throw RuntimeException("Wallet has not been initialized yet.")
-        return wallet.getPublicKey().getEmoji()
+        return wallet.getPublicKey().getEmojiNodeId()
     }
 
 }

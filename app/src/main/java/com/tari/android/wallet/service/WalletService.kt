@@ -250,20 +250,6 @@ class WalletService : Service(), FFIWalletListenerAdapter {
             return listeners.remove(listener)
         }
 
-        override fun getPublicKeyForEmojiId(emojiId: String?): PublicKey? {
-            if (emojiId == null || emojiId.isEmpty()) {
-                return null
-            }
-            return try {
-                val publicKeyFFI = FFIPublicKey(emojiId)
-                val publicKey = publicKeyFromFFI(publicKeyFFI)
-                publicKeyFFI.destroy()
-                publicKey
-            } catch (ignored: Throwable) {
-                null
-            }
-        }
-
         override fun getLogFilePath(): String {
             return mLogFilePath
         }
@@ -507,13 +493,12 @@ class WalletService : Service(), FFIWalletListenerAdapter {
         }
 
         // region FFI to model extraction functions
-
         private fun publicKeyFromFFI(
             publicKeyFFI: FFIPublicKey
         ): PublicKey {
             return PublicKey(
                 publicKeyFFI.toString(),
-                publicKeyFFI.getEmoji()
+                publicKeyFFI.getEmojiNodeId()
             )
         }
 
@@ -536,7 +521,7 @@ class WalletService : Service(), FFIWalletListenerAdapter {
                 direction = Tx.Direction.INBOUND
                 val userPublicKey = PublicKey(
                     sourcePublicKeyFFI.toString(),
-                    sourcePublicKeyFFI.getEmoji()
+                    sourcePublicKeyFFI.getEmojiNodeId()
                 )
                 user = getContactFromPublicKeyHexString(
                     allContacts,
@@ -546,7 +531,7 @@ class WalletService : Service(), FFIWalletListenerAdapter {
                 direction = Tx.Direction.OUTBOUND
                 val userPublicKey = PublicKey(
                     destinationPublicKeyFFI.toString(),
-                    destinationPublicKeyFFI.getEmoji()
+                    destinationPublicKeyFFI.getEmojiNodeId()
                 )
                 user = getContactFromPublicKeyHexString(
                     allContacts,
@@ -576,7 +561,7 @@ class WalletService : Service(), FFIWalletListenerAdapter {
             val sourcePublicKeyFFI = pendingInboundTxFFI.getSourcePublicKey()
             val userPublicKey = PublicKey(
                 sourcePublicKeyFFI.toString(),
-                sourcePublicKeyFFI.getEmoji()
+                sourcePublicKeyFFI.getEmojiNodeId()
             )
             val user = getContactFromPublicKeyHexString(
                 allContacts,
@@ -601,7 +586,7 @@ class WalletService : Service(), FFIWalletListenerAdapter {
             val destinationPublicKeyFFI = pendingOutboundTxFFI.getDestinationPublicKey()
             val userPublicKey = PublicKey(
                 destinationPublicKeyFFI.toString(),
-                destinationPublicKeyFFI.getEmoji()
+                destinationPublicKeyFFI.getEmojiNodeId()
             )
             val user = getContactFromPublicKeyHexString(
                 allContacts,
@@ -683,7 +668,8 @@ class WalletService : Service(), FFIWalletListenerAdapter {
         }
 
         override fun updateTxContactName(publicKey: String, contactName: String) {
-            wallet.addUpdateContact(FFIContact(contactName, FFIPublicKey(publicKey)))
+            val key = FFIPublicKey(HexString(publicKey))
+            wallet.addUpdateContact(FFIContact(contactName, key))
         }
         // endregion
     }

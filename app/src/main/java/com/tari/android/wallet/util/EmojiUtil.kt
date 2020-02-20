@@ -175,6 +175,7 @@ internal class EmojiUtil {
                 0,
                 Constants.Wallet.emojiFormatterChunkSize
             ).joinToString("")
+
             val middleChunkStartIndex =
                 Constants.Wallet.emojiIdLength / 2 - Constants.Wallet.emojiFormatterChunkSize / 2
             val middleChunk = emojiIds.subList(
