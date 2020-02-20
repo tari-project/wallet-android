@@ -30,29 +30,28 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.tari.android.wallet.model
+package com.tari.android.wallet.util
 
-import android.os.Parcelable
-import java.math.BigInteger
+import java.text.SimpleDateFormat
+import java.util.*
 
 /**
- * Base transaction class.
+ * Contains Date functions.
+ *
+ * @author The Tari Development Team
  */
-abstract class Tx : Parcelable {
 
-    enum class Direction {
-        INBOUND,
-        OUTBOUND
+fun Date.txFormattedDate(): String {
+    val cal: Calendar = Calendar.getInstance()
+    cal.time = this
+    val day: Int = cal.get(Calendar.DATE)
+    var indicator = "th"
+    if (day !in 11..18) indicator = when (day % 10) {
+        1 -> "st"
+        2 -> "nd"
+        3 -> "rd"
+        else -> "th"
     }
-
-    var id = BigInteger("0")
-    var direction = Direction.INBOUND
-    var amount = MicroTari(BigInteger("0"))
-    var timestamp = BigInteger("0")
-    var message = ""
-    /**
-     * This is the receiver for an outbound tx and sender for an inbound tx.
-     */
-    var user = User()
-
+    return SimpleDateFormat("MMMM d'$indicator' yyyy 'at' h:mm a", Locale.getDefault())
+        .format(date)
 }

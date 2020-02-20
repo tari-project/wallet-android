@@ -32,7 +32,9 @@
  */
 package com.tari.android.wallet.ui.activity.home
 
-import android.animation.*
+import android.animation.AnimatorSet
+import android.animation.ObjectAnimator
+import android.animation.ValueAnimator
 import android.annotation.SuppressLint
 import android.app.Dialog
 import android.content.ComponentName
@@ -47,7 +49,10 @@ import android.os.AsyncTask
 import android.os.Bundle
 import android.os.Handler
 import android.os.IBinder
-import android.view.*
+import android.view.Gravity
+import android.view.MotionEvent
+import android.view.View
+import android.view.ViewGroup
 import android.view.animation.AccelerateInterpolator
 import android.view.animation.Animation
 import android.view.animation.DecelerateInterpolator
@@ -66,13 +71,17 @@ import com.orhanobut.logger.Logger
 import com.tari.android.wallet.R
 import com.tari.android.wallet.event.Event
 import com.tari.android.wallet.event.EventBus
-import com.tari.android.wallet.model.*
+import com.tari.android.wallet.model.CompletedTx
+import com.tari.android.wallet.model.PendingInboundTx
+import com.tari.android.wallet.model.PendingOutboundTx
+import com.tari.android.wallet.model.Tx
 import com.tari.android.wallet.service.TariWalletService
 import com.tari.android.wallet.service.WalletService
 import com.tari.android.wallet.ui.activity.BaseActivity
 import com.tari.android.wallet.ui.activity.home.adapter.TxListAdapter
 import com.tari.android.wallet.ui.activity.log.DebugLogActivity
 import com.tari.android.wallet.ui.activity.send.SendTariActivity
+import com.tari.android.wallet.ui.activity.tx.TxDetailActivity
 import com.tari.android.wallet.ui.util.UiUtil
 import com.tari.android.wallet.util.Constants
 import java.lang.ref.WeakReference
@@ -325,6 +334,12 @@ class HomeActivity : BaseActivity(),
         EventBus.subscribe<Event.Testnet.TestnetTariRequestError>(this) {
             wr.get()?.rootView?.post {
                 wr.get()?.testnetTariRequestError(it.errorMessage)
+            }
+        }
+        EventBus.subscribe<Event.Wallet.TxUpdated>(this) {
+            wr.get()?.rootView?.post {
+                walletService?.updateTxContactName(it.publicKey, it.contactName)
+                updateData(restartBalanceViewController = false)
             }
         }
     }
@@ -686,6 +701,7 @@ class HomeActivity : BaseActivity(),
      */
     override fun onTxSelected(tx: Tx) {
         Logger.i("Transaction with id ${tx.id} selected.")
+        startActivity(TxDetailActivity.createIntent(this, tx))
     }
 
     // region send tari button animation listener

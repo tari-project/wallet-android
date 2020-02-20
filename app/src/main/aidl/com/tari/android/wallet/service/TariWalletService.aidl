@@ -80,4 +80,5 @@ interface TariWalletService {
 
     void requestTestnetTari();
 
+    void updateTxContactName(in String publicKey, in String contactName);
 }

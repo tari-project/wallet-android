@@ -681,6 +681,10 @@ class WalletService : Service(), FFIWalletListenerAdapter {
                 listener.onTestnetTariRequestError(error)
             }
         }
+
+        override fun updateTxContactName(publicKey: String, contactName: String) {
+            wallet.addUpdateContact(FFIContact(contactName, FFIPublicKey(publicKey)))
+        }
         // endregion
     }
 }

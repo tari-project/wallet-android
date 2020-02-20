@@ -5,6 +5,8 @@
     <color name="primary">#FFFFFF</color>
     <color name="primary_dark">#AAAAAA</color>
     <color name="accent">#D81B60</color>
+    <color name="gray_background">#f6f6f6</color>
+
 
     <!-- common -->
     <color name="black">#000000</color>
@@ -49,5 +51,10 @@
 
     <!-- Debug Log -->
     <color name="terminal_green">#4AF626</color>
+
+    <!-- transaction detail -->
+    <color name="tx_detail_contact_name_label_text">#B2B2B2</color>
+    <color name="tx_detail_contact_view_divider">#f1f1f1</color>
+    <color name="tx_detail_header_shadow_gradient_start">#80B2B2B2</color>
 
 </resources>
