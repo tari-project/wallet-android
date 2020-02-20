@@ -79,8 +79,8 @@ class PublicKey() : Parcelable {
     }
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {
-        parcel.writeSerializable(hexString)
-        parcel.writeSerializable(emojiId)
+        parcel.writeString(hexString)
+        parcel.writeString(emojiId)
     }
 
     private fun readFromParcel(inParcel: Parcel) {

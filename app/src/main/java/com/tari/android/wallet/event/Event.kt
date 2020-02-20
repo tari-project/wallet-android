@@ -31,6 +31,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 package com.tari.android.wallet.event
+
 import com.tari.android.wallet.model.TxId
 
 /**
@@ -48,6 +49,7 @@ object Event {
         data class TxReplyReceived(val completedTxId: TxId)
         data class TxFinalized(val completedTxId: TxId)
         data class DiscoveryComplete(val txId: TxId, val success: Boolean)
+        data class TxUpdated(val publicKey: String, val contactName: String)
     }
 
     /**

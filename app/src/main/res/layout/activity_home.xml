@@ -321,6 +321,6 @@
         android:layout_height="@dimen/common_scroll_height_gradient_height"
         android:layout_below="@id/home_vw_tx_list_header"
         android:alpha="0.8"
-        android:background="@drawable/scroll_height_gradient" />
+        android:background="@drawable/view_elevation_gradient" />
 
 </RelativeLayout>
