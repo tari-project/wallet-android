@@ -86,4 +86,7 @@ internal object WalletUtil {
         return false
     }
 
+    fun getQRContent(publicKey: String, emojiId: String): String {
+        return Constants.Wallet.QR_DEEP_LINK_URL + "/$publicKey?emoji_id=$emojiId"
+    }
 }

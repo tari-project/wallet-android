@@ -134,6 +134,7 @@ internal object Constants {
             NetAddressString("127.0.0.1", 80)
         internal val WALLET_LISTENER_ADDRESS: NetAddressString = NetAddressString("0.0.0.0", 0)
         internal const val WALLET_SERVER_URL = "https://dropper.free.beeceptor.com"
+        internal const val QR_DEEP_LINK_URL = "tari://testnet"
     }
 
 }
