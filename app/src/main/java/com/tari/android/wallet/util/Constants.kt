@@ -126,7 +126,7 @@ internal object Constants {
      * Wallet constants.
      */
     object Wallet {
-        internal const val emojiIdLength = 32
+        internal const val emojiIdLength = 13
         internal const val emojiIdShortenedLength = 12
         internal const val emojiFormatterChunkSize = 4
         const val WALLET_DB_NAME: String = "tari_wallet_db"

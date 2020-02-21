@@ -194,7 +194,7 @@ class AddRecipientFragment(private val walletService: TariWalletService) : BaseF
     override fun onStart() {
         super.onStart()
         AsyncTask.execute {
-            wr.get()?.checkClipboardForValidEmojiId()
+            //wr.get()?.checkClipboardForValidEmojiId()
         }
     }
 
@@ -203,10 +203,12 @@ class AddRecipientFragment(private val walletService: TariWalletService) : BaseF
         listenerWR = WeakReference(context as Listener)
     }
 
+
     /**
      * Checks whether an emoji id is in the clipboard data.
      * Currently checks for a single emoji.
      */
+    /*
     private fun checkClipboardForValidEmojiId(): Boolean {
         val clipboardManager =
             (activity?.getSystemService(CLIPBOARD_SERVICE) as? ClipboardManager) ?: return false
@@ -230,6 +232,7 @@ class AddRecipientFragment(private val walletService: TariWalletService) : BaseF
             return false
         }
     }
+    */
 
     /**
      * Hides paste-emoji-id-related views.
@@ -244,6 +247,7 @@ class AddRecipientFragment(private val walletService: TariWalletService) : BaseF
     /**
      * Displays paste-emoji-id-related views.
      */
+    /*
     private fun displayPasteEmojiIdViews() {
         // TODO this will change once emoji id display spec is clear
         val shortenedEmojiId = EmojiUtil.getShortenedEmojiId(emojiIdPublicKey!!.emojiId)
@@ -253,6 +257,7 @@ class AddRecipientFragment(private val walletService: TariWalletService) : BaseF
             it.visibility = View.VISIBLE
         }
     }
+    */
 
     /**
      * Fetches users with whom this wallet had recent transactions.
@@ -371,8 +376,9 @@ class AddRecipientFragment(private val walletService: TariWalletService) : BaseF
         R.id.add_recipinet_vw_middle_dimmer,
         R.id.add_recipinet_vw_bottom_dimmer
     )
+
     fun onEmojiIdDimmerClicked() {
-        hidePasteEmojiIdViews()
+        //hidePasteEmojiIdViews()
         val mActivity = activity ?: return
         UiUtil.hideKeyboard(mActivity)
         searchEditText.clearFocus()
