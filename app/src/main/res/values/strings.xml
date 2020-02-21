@@ -21,6 +21,7 @@
 
     <!-- common -->
     <string name="common_continue">Continue</string>
+    <string name="common_from">From</string>
 
     <!-- dummy values - UI design placeholders -->
     <string name="dummy_positive_tx_value">+ 152.75</string>
@@ -127,5 +128,18 @@
     <string name="wallet_info_copy_emoji_id">Copy my emoji ID</string>
     <string name="wallet_info_qr_code_desc">Transacting in person? Your sender can get your \n emoji ID by scanning this QR code in their Tari app</string>
     <string name="wallet_info_emoji_id_copied">Your emoji ID is copied.</string>
+
+    <!--    Transaction Details-->
+    <string name="tx_detail_payment_received">Payment Received</string>
+    <string name="tx_detail_payment_sent">Payment Sent</string>
+    <string name="tx_detail_pending_payment_sent">Pending Payment Sent</string>
+    <string name="tx_detail_pending_payment_received">Pending Payment Received</string>
+    <string name="tx_detail_contact_name">Contact Name</string>
+    <string name="tx_detail_create_contact_hint">Create a Contact Name</string>
+    <string name="tx_detail_note">Note</string>
+    <string name="tx_detail_edit">Edit</string>
+    <string name="tx_detail_add_contact">Add Contact Name</string>
+    <string name="tx_detail_transaction_fee">Transaction Fee</string>
+    <string name="tx_detail_transaction_id">Transaction ID</string>
 
 </resources>

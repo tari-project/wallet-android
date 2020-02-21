@@ -155,7 +155,8 @@ class CreateWalletFragment : BaseFragment() {
 
     override fun onStart() {
         super.onStart()
-        videoView.setVideoURI(context!!.getResourceUri(R.raw.splash_video_loop_1))
+        videoView.setVideoURI(context!!.getResourceUri(R.raw.purple_orb))
+        videoView.setOnPreparedListener { mp -> mp.isLooping = true }
         videoView.start()
     }
 

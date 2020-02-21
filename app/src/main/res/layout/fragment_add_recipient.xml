@@ -131,7 +131,7 @@
             android:layout_width="match_parent"
             android:layout_height="@dimen/common_scroll_height_gradient_height"
             android:alpha="0.5"
-            android:background="@drawable/scroll_height_gradient" />
+            android:background="@drawable/view_elevation_gradient" />
 
         <ProgressBar
             android:id="@+id/add_recipient_prog_bar"

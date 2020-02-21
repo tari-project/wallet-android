@@ -82,6 +82,7 @@ import com.tari.android.wallet.ui.activity.home.adapter.TxListAdapter
 import com.tari.android.wallet.ui.activity.log.DebugLogActivity
 import com.tari.android.wallet.ui.activity.send.SendTariActivity
 import com.tari.android.wallet.ui.activity.walletinfo.WalletInfoActivity
+import com.tari.android.wallet.ui.activity.tx.TxDetailActivity
 import com.tari.android.wallet.ui.util.UiUtil
 import com.tari.android.wallet.util.Constants
 import java.lang.ref.WeakReference
@@ -334,6 +335,12 @@ class HomeActivity : BaseActivity(),
         EventBus.subscribe<Event.Testnet.TestnetTariRequestError>(this) {
             wr.get()?.rootView?.post {
                 wr.get()?.testnetTariRequestError(it.errorMessage)
+            }
+        }
+        EventBus.subscribe<Event.Wallet.TxUpdated>(this) {
+            wr.get()?.rootView?.post {
+                walletService?.updateTxContactName(it.publicKey, it.contactName)
+                updateData(restartBalanceViewController = false)
             }
         }
     }
@@ -697,6 +704,7 @@ class HomeActivity : BaseActivity(),
      */
     override fun onTxSelected(tx: Tx) {
         Logger.i("Transaction with id ${tx.id} selected.")
+        startActivity(TxDetailActivity.createIntent(this, tx))
     }
 
     // region send tari button animation listener

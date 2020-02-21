@@ -164,6 +164,15 @@ internal object UiUtil {
         imm.hideSoftInputFromWindow(view.windowToken, 0)
     }
 
+    fun showKeyboard(@NonNull activity: Activity) {
+        var view = activity.currentFocus
+        if (view == null) {
+            view = View(activity)
+        }
+        val imm = activity.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        imm.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT)
+    }
+
     /**
      * Makes the view unclickable for a second, then makes it
      * clickable again.
