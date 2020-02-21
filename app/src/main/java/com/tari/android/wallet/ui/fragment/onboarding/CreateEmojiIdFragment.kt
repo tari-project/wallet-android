@@ -449,12 +449,12 @@ class CreateEmojiIdFragment : BaseFragment() {
         }
 
         fadeOut.addListener(object : AnimatorListenerAdapter() {
-            override fun onAnimationEnd(animation: Animator?, isReverse: Boolean) {
-                super.onAnimationEnd(animation, isReverse)
+            override fun onAnimationEnd(animation: Animator?) {
+                super.onAnimationEnd(animation)
                 checkMarkAnim.visibility = View.VISIBLE
-
             }
         })
+
         fadeOut.start()
         checkMarkAnim.playAnimation()
     }
