@@ -34,6 +34,7 @@ package com.tari.android.wallet.di
 
 import android.content.Context
 import com.tari.android.wallet.application.TariWalletApplication
+import com.tari.android.wallet.util.SharedPrefsWrapper
 import dagger.Module
 import dagger.Provides
 import javax.inject.Singleton
@@ -44,10 +45,15 @@ import javax.inject.Singleton
  * @author The Tari Development Team
  */
 @Module
-class ApplicationModule(private val app: TariWalletApplication) {
+class ApplicationModule(private val app: TariWalletApplication,
+                        private val sharedPrefsWrapper: SharedPrefsWrapper) {
 
     @Provides
     @Singleton
     fun provideContext(): Context = app
+
+    @Provides
+    @Singleton
+    fun provideSharedPrefsWrapper(): SharedPrefsWrapper = sharedPrefsWrapper
 
 }

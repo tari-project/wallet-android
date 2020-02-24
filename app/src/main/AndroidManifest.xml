@@ -60,7 +60,7 @@
             android:windowSoftInputMode="adjustNothing|stateAlwaysHidden" />
         <!-- onboarding flow -->
         <activity
-            android:name=".ui.activity.onboarding.OnBoardingFlowActivity"
+            android:name=".ui.activity.onboarding.OnboardingFlowActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme"

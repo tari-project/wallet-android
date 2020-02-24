@@ -35,30 +35,53 @@ package com.tari.android.wallet.ui.activity.onboarding
 import android.os.Bundle
 import android.os.Handler
 import com.tari.android.wallet.R
+import com.tari.android.wallet.di.WalletModule
 import com.tari.android.wallet.ui.activity.BaseActivity
-import com.tari.android.wallet.ui.fragment.onboarding.CreateEmojiIdFragment
 import com.tari.android.wallet.ui.fragment.onboarding.CreateWalletFragment
+import com.tari.android.wallet.ui.fragment.onboarding.IntroductionFragment
 import com.tari.android.wallet.util.Constants
+import com.tari.android.wallet.util.SharedPrefsWrapper
+import com.tari.android.wallet.util.WalletUtil
+import javax.inject.Inject
+import javax.inject.Named
 
 /**
  * onBoarding activity class : contain  splash screen and loading sequence
  *
  * @author The Tari Development Team
  */
-class OnBoardingFlowActivity : BaseActivity(), CreateWalletFragment.Listener {
+class OnboardingFlowActivity : BaseActivity(), IntroductionFragment.Listener {
 
     override val contentViewId = R.layout.activity_onboarding_flow
 
     private val uiHandler = Handler()
 
+    @Inject
+    @Named(WalletModule.FieldName.walletFilesDirPath)
+    lateinit var walletFilesDirPath: String
+    @Inject
+    internal lateinit var sharedPrefsWrapper: SharedPrefsWrapper
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        supportFragmentManager.beginTransaction()
-            .replace(
-                R.id.onboarding_frame_container,
-                CreateWalletFragment()
-            ).commit()
+        if (sharedPrefsWrapper.getOnboardingStarted()) {
+            // clean existing files & restart onboarding
+            WalletUtil.clearWalletFiles(walletFilesDirPath)
+            supportFragmentManager
+                .beginTransaction()
+                .replace(
+                    R.id.onboarding_create_emoji_id_container,
+                    CreateWalletFragment()
+                )
+                .commit()
+        } else {
+            supportFragmentManager.beginTransaction()
+                .replace(
+                    R.id.onboarding_frame_container,
+                    IntroductionFragment()
+                ).commit()
+        }
     }
 
     /**
@@ -68,12 +91,14 @@ class OnBoardingFlowActivity : BaseActivity(), CreateWalletFragment.Listener {
         return
     }
 
-    override fun onCreateEmojiIdButtonClick() {
+    override fun continueToCreateWallet() {
         supportFragmentManager
             .beginTransaction()
-            .replace(R.id.onboarding_create_emoji_id_container, CreateEmojiIdFragment())
+            .replace(
+                R.id.onboarding_create_emoji_id_container,
+                CreateWalletFragment()
+            )
             .commit()
-
         removeCurrentFragment()
     }
 

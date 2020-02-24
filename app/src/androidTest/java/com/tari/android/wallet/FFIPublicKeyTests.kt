@@ -35,7 +35,6 @@ package com.tari.android.wallet
 import com.tari.android.wallet.ffi.*
 import org.junit.Assert.assertTrue
 import org.junit.Test
-import java.util.*
 
 /**
  * FFI private key tests.
@@ -61,13 +60,13 @@ class FFIPublicKeyTests {
         val publicKey3 = FFIPublicKey(HexString(str))
         assertTrue(publicKey3.getPointer() != nullptr)
         assertTrue(publicKey3.toString() == str)
-        val publicKey4 = FFIPublicKey(publicKey3.getEmoji())
+        val publicKey4 = FFIPublicKey(publicKey3.getEmojiId())
         assertTrue(publicKey3.toString() == publicKey4.toString())
         publicKey3.destroy()
         publicKey4.destroy()
     }
 
-    @Test(expected = InvalidPropertiesFormatException::class)
+    @Test(expected = FFIException::class)
     fun testHexStringException() {
         val publickey = FFIPublicKey(FFIByteVector(HexString(str2)))
         publickey.destroy()

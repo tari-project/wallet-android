@@ -39,8 +39,8 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import butterknife.ButterKnife
 import com.tari.android.wallet.application.TariWalletApplication
-import com.tari.android.wallet.ui.fragment.onboarding.CreateEmojiIdFragment
 import com.tari.android.wallet.ui.fragment.onboarding.CreateWalletFragment
+import com.tari.android.wallet.ui.fragment.onboarding.IntroductionFragment
 import com.tari.android.wallet.ui.fragment.send.AddAmountFragment
 import com.tari.android.wallet.ui.fragment.send.AddNoteAndSendFragment
 import com.tari.android.wallet.ui.fragment.send.AddRecipientFragment
@@ -63,8 +63,8 @@ abstract class BaseFragment : Fragment() {
         // DI inject
         val component = (activity!!.application as TariWalletApplication).appComponent
         when (this) {
+            is IntroductionFragment -> component.inject(this)
             is CreateWalletFragment -> component.inject(this)
-            is CreateEmojiIdFragment -> component.inject(this)
             is AddRecipientFragment -> component.inject(this)
             is AddAmountFragment -> component.inject(this)
             is AddNoteAndSendFragment -> component.inject(this)

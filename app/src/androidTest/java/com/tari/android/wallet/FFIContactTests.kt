@@ -32,10 +32,7 @@
  */
 package com.tari.android.wallet
 
-import com.tari.android.wallet.ffi.FFIContact
-import com.tari.android.wallet.ffi.HexString
-import com.tari.android.wallet.ffi.FFIPublicKey
-import com.tari.android.wallet.ffi.nullptr
+import com.tari.android.wallet.ffi.*
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import java.security.InvalidParameterException
@@ -60,7 +57,7 @@ class FFIContactTests {
         publicKey.destroy()
     }
 
-    @Test(expected = InvalidParameterException::class)
+    @Test(expected = FFIException::class)
     fun testByteVectorException() {
         val alias = String()
         val publicKey = FFIPublicKey(HexString(FFITestUtil.PUBLIC_KEY_HEX_STRING))

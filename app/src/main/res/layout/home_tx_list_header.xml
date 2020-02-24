@@ -48,9 +48,10 @@
         <com.airbnb.lottie.LottieAnimationView
             android:id="@+id/home_tx_list_anim_pending"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
             android:background="@color/white"
+            android:layout_height="wrap_content"
             app:lottie_autoPlay="true"
+            app:lottie_renderMode="automatic"
             app:lottie_enableMergePathsForKitKatAndAbove="true"
             app:lottie_loop="true"
             app:lottie_rawRes="@raw/tx_list_pending_txs_anim" />

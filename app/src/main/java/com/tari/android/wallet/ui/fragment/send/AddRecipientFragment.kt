@@ -32,9 +32,7 @@
  */
 package com.tari.android.wallet.ui.fragment.send
 
-import android.content.ClipboardManager
 import android.content.Context
-import android.content.Context.CLIPBOARD_SERVICE
 import android.os.AsyncTask
 import android.os.Bundle
 import android.text.Editable
@@ -50,10 +48,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import butterknife.*
 import com.tari.android.wallet.R
-import com.tari.android.wallet.model.Contact
-import com.tari.android.wallet.model.PublicKey
-import com.tari.android.wallet.model.Tx
-import com.tari.android.wallet.model.User
+import com.tari.android.wallet.model.*
 import com.tari.android.wallet.service.TariWalletService
 import com.tari.android.wallet.ui.fragment.BaseFragment
 import com.tari.android.wallet.ui.fragment.send.adapter.RecipientListAdapter
@@ -216,7 +211,12 @@ class AddRecipientFragment(private val walletService: TariWalletService) : BaseF
             clipboardManager.primaryClip?.getItemAt(0)?.text?.toString() ?: return false
         // if clipboard contains at least 1 emoji, then display paste emoji banner
         if (clipboardString.numberOfEmojis() > 0) {
-            emojiIdPublicKey = walletService.getPublicKeyForEmojiId(clipboardString)
+            val error = WalletError()
+            emojiIdPublicKey = walletService.getPublicKeyForEmojiId(clipboardString, error)
+            if (error.code != WalletErrorCode.NO_ERROR) {
+                // TODO handle error
+                return false
+            }
             if (emojiIdPublicKey != null) {
                 recyclerView.post {
                     wr.get()?.displayPasteEmojiIdViews()
@@ -263,8 +263,12 @@ class AddRecipientFragment(private val walletService: TariWalletService) : BaseF
      * Fetches users with whom this wallet had recent transactions.
      */
     private fun fetchRecentTxUsers() {
-        val users = walletService.getRecentTxUsers(recentTxContactsLimit)
-        val contacts = walletService.contacts
+        val error = WalletError()
+        val users = walletService.getRecentTxUsers(recentTxContactsLimit, error)
+        val contacts = walletService.getContacts(error)
+        if (error.code != WalletErrorCode.NO_ERROR) {
+            TODO("Unhandled wallet error: ${error.code}")
+        }
         recyclerView.post {
             wr.get()?.displayList(users, contacts)
         }
@@ -323,16 +327,26 @@ class AddRecipientFragment(private val walletService: TariWalletService) : BaseF
      * Makes a search by the input.
      */
     private fun searchRecipients(query: String) {
+        val error = WalletError()
+        val contacts = walletService.getContacts(error)
+        val completedTxs = walletService.getCompletedTxs(error)
+        val pendingInboundTxs = walletService.getPendingInboundTxs(error)
+        val pendingOutboundTxs = walletService.getPendingOutboundTxs(error)
+        if (error.code != WalletErrorCode.NO_ERROR) {
+            TODO("Unhandled wallet error: ${error.code}")
+        }
+
+
         val users = ArrayList<User>()
         // get all contacts and filter by alias and emoji id
-        val filteredContacts = walletService.contacts.filter {
+        val filteredContacts = contacts.filter {
             it.alias.contains(query, ignoreCase = true) || it.publicKey.emojiId.contains(query)
         }
         users.addAll(filteredContacts)
         val allTxs = ArrayList<Tx>()
-        allTxs.addAll(walletService.completedTxs)
-        allTxs.addAll(walletService.pendingInboundTxs)
-        allTxs.addAll(walletService.pendingOutboundTxs)
+        allTxs.addAll(completedTxs)
+        allTxs.addAll(pendingInboundTxs)
+        allTxs.addAll(pendingOutboundTxs)
         for (tx in allTxs) {
             if (tx.user.publicKey.emojiId.contains(query)) {
                 if (!users.contains(tx.user)) {

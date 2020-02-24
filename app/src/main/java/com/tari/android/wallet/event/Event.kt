@@ -32,6 +32,7 @@
  */
 package com.tari.android.wallet.event
 
+import com.tari.android.wallet.model.PublicKey
 import com.tari.android.wallet.model.TxId
 
 /**
@@ -49,18 +50,24 @@ object Event {
         data class TxReplyReceived(val completedTxId: TxId)
         data class TxFinalized(val completedTxId: TxId)
         data class DiscoveryComplete(val txId: TxId, val success: Boolean)
-        data class TxUpdated(val publicKey: String, val contactName: String)
     }
 
     /**
-     * Tx events.
+     * Contact events.
+     */
+    object Contact {
+        data class ContactAddedOrUpdated(val contactPublicKey: PublicKey, val contactAlias: String)
+    }
+
+    /**
+     * Transaction events.
      */
     object Tx {
         class TxSendSuccessful
     }
 
     object Testnet {
-        class TestnetTariRequestSuccessful
+        class TestnetTariRequestSuccessful(val senderPublicKey: PublicKey)
         data class TestnetTariRequestError(val errorMessage: String)
     }
 

@@ -40,9 +40,12 @@ import android.widget.EditText
 import butterknife.BindView
 import butterknife.OnClick
 import com.tari.android.wallet.R
+import com.tari.android.wallet.di.WalletModule
 import com.tari.android.wallet.ui.util.UiUtil
 import java.io.File
 import java.io.InputStream
+import javax.inject.Inject
+import javax.inject.Named
 
 
 /**
@@ -50,14 +53,19 @@ import java.io.InputStream
  *
  * @author The Tari Development Team
  */
-class DebugLogActivity() : BaseActivity() {
+class DebugLogActivity : BaseActivity() {
 
     override val contentViewId = R.layout.debug_log
+
+    @Inject
+    @Named(WalletModule.FieldName.walletLogFilePath)
+    internal lateinit var logFilePath: String
 
     @OnClick(R.id.debug_log_btn_back)
     fun onBackButtonPressed(view: View) {
         UiUtil.temporarilyDisableClick(view)
         super.onBackPressed()
+        overridePendingTransition(R.anim.enter_from_left, R.anim.exit_to_right)
     }
 
     @BindView(R.id.debug_log_multiline_edit)
@@ -65,13 +73,15 @@ class DebugLogActivity() : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        overridePendingTransition(R.anim.enter_from_right, R.anim.exit_to_left)
+
         multilineEdit.text.clear()
         multilineEdit.setHorizontallyScrolling(true)
         multilineEdit.movementMethod = ScrollingMovementMethod()
-        val log = intent.getStringExtra("log")!!
         val lineList = mutableListOf<String>()
-        if (File(log).exists()) {
-            val inputStream: InputStream = File(log).inputStream()
+        val logFile = File(logFilePath)
+        if (logFile.exists()) {
+            val inputStream: InputStream = logFile.inputStream()
             inputStream.bufferedReader().useLines { lines -> lines.forEach { lineList.add(it) } }
         } else {
             lineList.add("No log available")

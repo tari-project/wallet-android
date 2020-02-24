@@ -33,7 +33,6 @@
 package com.tari.android.wallet.ffi
 
 import java.math.BigInteger
-import java.util.*
 
 /**
  * Wrapper for native byte vector type.
@@ -43,7 +42,7 @@ import java.util.*
 
 internal typealias FFIByteVectorPtr = Long
 
-internal class FFIByteVector constructor(pointer: FFIByteVectorPtr): FFIBase() {
+internal class FFIByteVector constructor(pointer: FFIByteVectorPtr) : FFIBase() {
 
     // region JNI
 
@@ -65,20 +64,16 @@ internal class FFIByteVector constructor(pointer: FFIByteVectorPtr): FFIBase() {
             val byteArray = BigInteger(hex.toString(), 16).toByteArray()
             val error = FFIError()
             ptr = jniCreate(byteArray, error)
-            if (error.code != 0) {
-                throw RuntimeException()
-            }
+            throwIf(error)
         } else {
-            throw InvalidPropertiesFormatException("Argument is invalid")
+            throw FFIException(message = "Argument is invalid")
         }
     }
 
     fun getLength(): Int {
         val error = FFIError()
         val len = jniGetLength(ptr, error)
-        if (error.code != 0) {
-            throw RuntimeException()
-        }
+        throwIf(error)
         return len
     }
 
@@ -93,9 +88,7 @@ internal class FFIByteVector constructor(pointer: FFIByteVectorPtr): FFIBase() {
     fun getAt(index: Int): Int {
         val error = FFIError()
         val byte = jniGetAt(ptr, index, error)
-        if (error.code != 0) {
-            throw RuntimeException()
-        }
+        throwIf(error)
         return byte
     }
 

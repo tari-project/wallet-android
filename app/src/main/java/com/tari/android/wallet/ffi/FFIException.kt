@@ -32,55 +32,22 @@
  */
 package com.tari.android.wallet.ffi
 
+import com.tari.android.wallet.model.WalletErrorCode.*
+import java.lang.RuntimeException
+
 /**
- * Tari completed transactions wrapper.
- *
+ * Throws FFIException if
+ */
+internal fun throwIf(error: FFIError) {
+    if (error.code != NO_ERROR.code) {
+        throw FFIException(error)
+    }
+}
+
+/**
  * @author The Tari Development Team
  */
-internal typealias FFICompletedTxsPtr = Long
-
-internal class FFICompletedTxs constructor(pointer: FFICompletedTxsPtr): FFIBase() {
-
-    // region JNI
-
-    private external fun jniGetLength(ptr: FFICompletedTxsPtr, libError: FFIError): Int
-    private external fun jniGetAt(
-        ptr: FFICompletedTxsPtr,
-        index: Int,
-        libError: FFIError
-    ): FFICompletedTxPtr
-
-    private external fun jniDestroy(ptr: FFICompletedTxsPtr)
-
-    // endregion
-
-    private var ptr = nullptr
-
-    init {
-        ptr = pointer
-    }
-
-    fun getPointer(): FFICompletedTxsPtr {
-        return ptr
-    }
-
-    fun getLength(): Int {
-        val error = FFIError()
-        val result = jniGetLength(ptr, error)
-        throwIf(error)
-        return result
-    }
-
-    fun getAt(index: Int): FFICompletedTx {
-        val error = FFIError()
-        val result = FFICompletedTx(jniGetAt(ptr, index, error))
-        throwIf(error)
-        return result
-    }
-
-    override fun destroy() {
-        jniDestroy(ptr)
-        ptr = nullptr
-    }
-
-}
+internal class FFIException(
+    val error: FFIError? = null,
+    override val message: String? = null
+) : RuntimeException()

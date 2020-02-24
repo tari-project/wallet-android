@@ -40,7 +40,6 @@ import androidx.core.app.NotificationCompat
 import com.orhanobut.logger.Logger
 import com.tari.android.wallet.R
 import com.tari.android.wallet.application.TariWalletApplication
-import com.tari.android.wallet.di.WalletModule
 import com.tari.android.wallet.event.Event
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.ffi.*
@@ -51,7 +50,6 @@ import retrofit2.Callback
 import retrofit2.Response
 import java.math.BigInteger
 import javax.inject.Inject
-import javax.inject.Named
 
 /**
  * Foreground wallet service.
@@ -69,9 +67,6 @@ class WalletService : Service(), FFIWalletListenerAdapter {
     @Inject
     internal lateinit var wallet: FFITestWallet
     @Inject
-    @Named(WalletModule.FieldName.walletLogFilePath)
-    internal lateinit var mLogFilePath: String
-    @Inject
     internal lateinit var tariRESTService: TariRESTService
     /**
      * Service stub implementation.
@@ -83,10 +78,10 @@ class WalletService : Service(), FFIWalletListenerAdapter {
     private var listeners = mutableListOf<TariWalletServiceListener>()
 
     override fun onCreate() {
-        Logger.d("Tari wallet service created.")
+        Logger.d("Tari wallet service created #1.")
         super.onCreate()
         (application as TariWalletApplication).appComponent.inject(this)
-
+        Logger.d("Tari wallet service created #2.")
         // set wallet listener
         wallet.listenerAdapter = this
     }
@@ -111,7 +106,6 @@ class WalletService : Service(), FFIWalletListenerAdapter {
      * Called on service start-up.
      */
     override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
-        Logger.d("Tari wallet service started.")
         createNotificationChannel()
         val notificationIntent = Intent(this, HomeActivity::class.java)
         val pendingIntent = PendingIntent.getActivity(
@@ -128,6 +122,7 @@ class WalletService : Service(), FFIWalletListenerAdapter {
             .build()
 
         startForeground(1, notification)
+        Logger.d("Tari wallet service started.")
         return START_NOT_STICKY
     }
 
@@ -225,7 +220,20 @@ class WalletService : Service(), FFIWalletListenerAdapter {
      */
     inner class TariWalletServiceImpl : TariWalletService.Stub() {
 
-        private fun getContactFromPublicKeyHexString(
+        /**
+         * Maps the throwable into the error out parameter.
+         */
+        private fun mapThrowableIntoError(throwable: Throwable, error: WalletError) {
+            error.code = WalletErrorCode.UNKNOWN_ERROR
+            error.message = throwable.message
+            if (throwable is FFIException) {
+                if (throwable.error != null) {
+                    error.code = WalletErrorCode.fromCode(throwable.error.code)
+                }
+            }
+        }
+
+        private fun getContactByPublicKeyHexString(
             allContacts: List<Contact>,
             hexString: String
         ): Contact? {
@@ -250,52 +258,76 @@ class WalletService : Service(), FFIWalletListenerAdapter {
             return listeners.remove(listener)
         }
 
-        override fun getLogFilePath(): String {
-            return mLogFilePath
+        override fun getPublicKeyHexString(error: WalletError): String? {
+            return try {
+                wallet.getPublicKey().toString()
+            } catch (throwable: Throwable) {
+                mapThrowableIntoError(throwable, error)
+                null
+            }
         }
-
-        override fun getPublicKeyHexString() = wallet.getPublicKey().toString()
 
         /**
          * Wallet balance info.
          */
-        override fun getBalanceInfo() = BalanceInfo(
-            MicroTari(wallet.getAvailableBalance()),
-            MicroTari(wallet.getPendingIncomingBalance()),
-            MicroTari(wallet.getPendingOutgoingBalance())
-        )
+        override fun getBalanceInfo(error: WalletError): BalanceInfo? {
+            return try {
+                BalanceInfo(
+                    MicroTari(wallet.getAvailableBalance()),
+                    MicroTari(wallet.getPendingIncomingBalance()),
+                    MicroTari(wallet.getPendingOutgoingBalance())
+                )
+            } catch (throwable: Throwable) {
+                mapThrowableIntoError(throwable, error)
+                null
+            }
+        }
 
         /**
          * Get all contacts.
          */
-        override fun getContacts(): List<Contact> {
-            val contactsFFI = wallet.getContacts()
-            val contacts = mutableListOf<Contact>()
-            for (i in 0 until contactsFFI.getLength()) {
-                val contactFFI = contactsFFI.getAt(i)
-                val publicKeyFFI = contactFFI.getPublicKey()
-                contacts.add(
-                    Contact(
-                        publicKeyFromFFI(publicKeyFFI),
-                        contactFFI.getAlias()
+        override fun getContacts(error: WalletError): List<Contact>? {
+            try {
+                val contactsFFI = wallet.getContacts()
+                val contacts = mutableListOf<Contact>()
+                for (i in 0 until contactsFFI.getLength()) {
+                    val contactFFI = contactsFFI.getAt(i)
+                    val publicKeyFFI = contactFFI.getPublicKey()
+                    contacts.add(
+                        Contact(
+                            publicKeyFromFFI(publicKeyFFI),
+                            contactFFI.getAlias()
+                        )
                     )
-                )
-                // destroy native objects
-                publicKeyFFI.destroy()
-                contactFFI.destroy()
+                    // destroy native objects
+                    publicKeyFFI.destroy()
+                    contactFFI.destroy()
+                }
+                // destroy native collection
+                contactsFFI.destroy()
+                return contacts.sortedWith(compareBy { it.alias })
+            } catch (throwable: Throwable) {
+                error.code = WalletErrorCode.UNKNOWN_ERROR
+                error.message = throwable.message
+                if (throwable is FFIException) {
+                    if (throwable.error != null) {
+                        error.code = WalletErrorCode.fromCode(throwable.error.code)
+                    }
+                }
+                return null
             }
-            // destroy native collection
-            contactsFFI.destroy()
-            return contacts.sortedWith(compareBy { it.alias })
         }
 
         /**
          * Gets all users that this wallet had a transaction with, and returns a list
          * of most recent ones, limited by the limit parameter.
          */
-        override fun getRecentTxUsers(maxCount: Int): MutableList<User> {
+        override fun getRecentTxUsers(maxCount: Int, error: WalletError): MutableList<User>? {
             // pre-fetch contacs
-            val allContacts = contacts
+            val allContacts = getContacts(error)
+            if (error.code != WalletErrorCode.NO_ERROR || allContacts == null) {
+                return null
+            }
             val txs = ArrayList<Tx>()
             // collect all transactions
             txs.addAll(getPendingInboundTxs(allContacts))
@@ -304,12 +336,13 @@ class WalletService : Service(), FFIWalletListenerAdapter {
             // sort them by descending timestamp
             val sortedTxs = txs.sortedWith(compareByDescending { it.timestamp })
             val recentTxUsers = mutableListOf<User>()
+
             for (tx in sortedTxs) {
                 if (recentTxUsers.size >= maxCount) { // comes first for the case of (maxCount <= 0)
                     break
                 }
                 if (!recentTxUsers.contains(tx.user)) {
-                    val txUser = getContactFromPublicKeyHexString(
+                    val txUser = getContactByPublicKeyHexString(
                         allContacts,
                         tx.user.publicKey.hexString
                     ) ?: tx.user
@@ -343,9 +376,17 @@ class WalletService : Service(), FFIWalletListenerAdapter {
          * Get all completed transactions.
          * Client-facing function.
          */
-        override fun getCompletedTxs(): List<CompletedTx> {
-            // call the corresponding function with fresh contacts list
-            return getCompletedTxs(contacts)
+        override fun getCompletedTxs(error: WalletError): List<CompletedTx>? {
+            val contacts = getContacts(error)
+            if (error.code != WalletErrorCode.NO_ERROR || contacts == null) {
+                return null
+            }
+            return try {
+                getCompletedTxs(contacts)
+            } catch (throwable: Throwable) {
+                mapThrowableIntoError(throwable, error)
+                null
+            }
         }
 
         /**
@@ -365,8 +406,17 @@ class WalletService : Service(), FFIWalletListenerAdapter {
          * Get completed transaction by id.
          * Client-facing function.
          */
-        override fun getCompletedTxById(id: TxId): CompletedTx {
-            return getCompletedTxById(id, contacts)
+        override fun getCompletedTxById(id: TxId, error: WalletError): CompletedTx? {
+            val contacts = getContacts(error)
+            if (error.code != WalletErrorCode.NO_ERROR || contacts == null) {
+                return null
+            }
+            return try {
+                getCompletedTxById(id, contacts)
+            } catch (throwable: Throwable) {
+                mapThrowableIntoError(throwable, error)
+                null
+            }
         }
 
         /**
@@ -392,9 +442,17 @@ class WalletService : Service(), FFIWalletListenerAdapter {
          * Get all pending inbound transactions.
          * Client-facing function.
          */
-        override fun getPendingInboundTxs(): List<PendingInboundTx> {
-            // call the corresponding function with fresh contacts list
-            return getPendingInboundTxs(contacts)
+        override fun getPendingInboundTxs(error: WalletError): List<PendingInboundTx>? {
+            val contacts = getContacts(error)
+            if (error.code != WalletErrorCode.NO_ERROR || contacts == null) {
+                return null
+            }
+            return try {
+                getPendingInboundTxs(contacts)
+            } catch (throwable: Throwable) {
+                mapThrowableIntoError(throwable, error)
+                null
+            }
         }
 
         /**
@@ -417,9 +475,18 @@ class WalletService : Service(), FFIWalletListenerAdapter {
          * Get pending inbound transaction by id.
          * Client-facing function.
          */
-        override fun getPendingInboundTxById(id: TxId): PendingInboundTx {
+        override fun getPendingInboundTxById(id: TxId, error: WalletError): PendingInboundTx? {
             // call the corresponding function with fresh contacts list
-            return getPendingInboundTxById(id, contacts)
+            val contacts = getContacts(error)
+            if (error.code != WalletErrorCode.NO_ERROR || contacts == null) {
+                return null
+            }
+            return try {
+                getPendingInboundTxById(id, contacts)
+            } catch (throwable: Throwable) {
+                mapThrowableIntoError(throwable, error)
+                null
+            }
         }
 
         /**
@@ -445,9 +512,18 @@ class WalletService : Service(), FFIWalletListenerAdapter {
          * Get all pending outbound transactions.
          * Client-facing function.
          */
-        override fun getPendingOutboundTxs(): List<PendingOutboundTx> {
+        override fun getPendingOutboundTxs(error: WalletError): List<PendingOutboundTx>? {
             // call the corresponding function with fresh contacts list
-            return getPendingOutboundTxs(contacts)
+            val contacts = getContacts(error)
+            if (error.code != WalletErrorCode.NO_ERROR || contacts == null) {
+                return null
+            }
+            return try {
+                getPendingOutboundTxs(contacts)
+            } catch (throwable: Throwable) {
+                mapThrowableIntoError(throwable, error)
+                null
+            }
         }
 
         /**
@@ -470,26 +546,41 @@ class WalletService : Service(), FFIWalletListenerAdapter {
          * Get pending outbound transaction by id.
          * Client-facing function.
          */
-        override fun getPendingOutboundTxById(id: TxId): PendingOutboundTx {
+        override fun getPendingOutboundTxById(id: TxId, error: WalletError): PendingOutboundTx? {
             // call the corresponding function with fresh contacts list
-            return getPendingOutboundTxById(id, contacts)
+            val contacts = getContacts(error)
+            if (error.code != WalletErrorCode.NO_ERROR || contacts == null) {
+                return null
+            }
+            return try {
+                getPendingOutboundTxById(id, contacts)
+            } catch (throwable: Throwable) {
+                mapThrowableIntoError(throwable, error)
+                null
+            }
         }
 
         override fun sendTari(
             user: User,
             amount: MicroTari,
             fee: MicroTari,
-            message: String
+            message: String,
+            error: WalletError
         ): Boolean {
-            val publicKeyFFI = FFIPublicKey(HexString(user.publicKey.hexString))
-            val success = wallet.sendTx(
-                publicKeyFFI,
-                amount.value,
-                fee.value,
-                message
-            )
-            publicKeyFFI.destroy()
-            return success
+            return try {
+                val publicKeyFFI = FFIPublicKey(HexString(user.publicKey.hexString))
+                val success = wallet.sendTx(
+                    publicKeyFFI,
+                    amount.value,
+                    fee.value,
+                    message
+                )
+                publicKeyFFI.destroy()
+                success
+            } catch (throwable: Throwable) {
+                mapThrowableIntoError(throwable, error)
+                false
+            }
         }
 
         // region FFI to model extraction functions
@@ -517,13 +608,21 @@ class WalletService : Service(), FFIWalletListenerAdapter {
             }
             val user: User
             val direction: Tx.Direction
+
+            // get public key
+            val error = WalletError()
+            val publicKeyHexString = getPublicKeyHexString(error)
+            if (error.code != WalletErrorCode.NO_ERROR) {
+                throw FFIException(message = error.message)
+            }
+
             if (publicKeyHexString == destinationPublicKeyFFI.toString()) {
                 direction = Tx.Direction.INBOUND
                 val userPublicKey = PublicKey(
                     sourcePublicKeyFFI.toString(),
                     sourcePublicKeyFFI.getEmojiNodeId()
                 )
-                user = getContactFromPublicKeyHexString(
+                user = getContactByPublicKeyHexString(
                     allContacts,
                     sourcePublicKeyFFI.toString()
                 ) ?: User(userPublicKey)
@@ -533,7 +632,7 @@ class WalletService : Service(), FFIWalletListenerAdapter {
                     destinationPublicKeyFFI.toString(),
                     destinationPublicKeyFFI.getEmojiNodeId()
                 )
-                user = getContactFromPublicKeyHexString(
+                user = getContactByPublicKeyHexString(
                     allContacts,
                     destinationPublicKeyFFI.toString()
                 ) ?: User(userPublicKey)
@@ -563,7 +662,7 @@ class WalletService : Service(), FFIWalletListenerAdapter {
                 sourcePublicKeyFFI.toString(),
                 sourcePublicKeyFFI.getEmojiNodeId()
             )
-            val user = getContactFromPublicKeyHexString(
+            val user = getContactByPublicKeyHexString(
                 allContacts,
                 sourcePublicKeyFFI.toString()
             ) ?: User(userPublicKey)
@@ -588,7 +687,7 @@ class WalletService : Service(), FFIWalletListenerAdapter {
                 destinationPublicKeyFFI.toString(),
                 destinationPublicKeyFFI.getEmojiNodeId()
             )
-            val user = getContactFromPublicKeyHexString(
+            val user = getContactByPublicKeyHexString(
                 allContacts,
                 destinationPublicKeyFFI.toString()
             ) ?: User(userPublicKey)
@@ -604,7 +703,14 @@ class WalletService : Service(), FFIWalletListenerAdapter {
             return pendingOutboundTx
         }
 
-        override fun requestTestnetTari() {
+        override fun requestTestnetTari(error: WalletError) {
+            // get public key
+            val publicKeyHexString = getPublicKeyHexString(error)
+            if (error.code != WalletErrorCode.NO_ERROR || publicKeyHexString == null) {
+                notifyTestnetTariRequestFailed("Service error.")
+                return
+            }
+
             val message = "$MESSAGE_PREFIX $publicKeyHexString"
             val signature = wallet.signMessage(message)
             val requestBody = TestnetTariAllocateRequest(signature, publicKeyHexString)
@@ -612,6 +718,7 @@ class WalletService : Service(), FFIWalletListenerAdapter {
             val response = tariRESTService.requestTestnetTari(publicKeyHexString, requestBody)
             response.enqueue(object : Callback<TestnetTariAllocateResponse> {
                 override fun onFailure(call: Call<TestnetTariAllocateResponse>, t: Throwable) {
+                    error.code = WalletErrorCode.UNKNOWN_ERROR
                     notifyTestnetTariRequestFailed(getString(R.string.service_error_no_internet_connection))
                 }
 
@@ -634,23 +741,30 @@ class WalletService : Service(), FFIWalletListenerAdapter {
                                     privateKeyFFI,
                                     publicKeyFFI
                                 )
+
+                                // post event to bus for the internal listeners
+                                EventBus.post(
+                                    Event.Testnet.TestnetTariRequestSuccessful(
+                                        publicKeyFromFFI(publicKeyFFI)
+                                    )
+                                )
                                 // destroy native objects
                                 publicKeyFFI.destroy()
                                 privateKeyFFI.destroy()
                                 contactFFI.destroy()
                             }
-                            // post event to bus for the internal listeners
-                            EventBus.post(Event.Testnet.TestnetTariRequestSuccessful())
                             // notify external listeners
                             listeners.iterator().forEach { listener ->
                                 listener.onTestnetTariRequestSuccess()
                             }
                         }
                         else -> {
+                            error.code = WalletErrorCode.UNKNOWN_ERROR
                             val errorMessage =
                                 getString(R.string.service_error_testnet_tari_request) +
                                         " " +
                                         response.errorBody()?.string()
+                            error.message = errorMessage
                             notifyTestnetTariRequestFailed(errorMessage)
                         }
                     }
@@ -667,9 +781,20 @@ class WalletService : Service(), FFIWalletListenerAdapter {
             }
         }
 
-        override fun updateTxContactName(publicKey: String, contactName: String) {
-            val key = FFIPublicKey(HexString(publicKey))
-            wallet.addUpdateContact(FFIContact(contactName, key))
+        override fun updateContactAlias(
+            publicKey: PublicKey,
+            contactName: String,
+            error: WalletError
+        ) {
+            try {
+                val publicKeyFFI = FFIPublicKey(HexString(publicKey.hexString))
+                val contact = FFIContact(contactName, publicKeyFFI)
+                wallet.addUpdateContact(contact)
+                publicKeyFFI.destroy()
+                contact.destroy()
+            } catch (throwable: Throwable) {
+                mapThrowableIntoError(throwable, error)
+            }
         }
         // endregion
     }

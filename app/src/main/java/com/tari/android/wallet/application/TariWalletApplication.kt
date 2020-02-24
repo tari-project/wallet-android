@@ -33,9 +33,11 @@
 package com.tari.android.wallet.application
 
 import android.app.Application
+import android.content.Context
 import com.orhanobut.logger.AndroidLogAdapter
 import com.orhanobut.logger.Logger
 import com.tari.android.wallet.di.*
+import com.tari.android.wallet.util.SharedPrefsWrapper
 import com.tari.android.wallet.util.WalletUtil
 import net.danlew.android.joda.JodaTimeAndroid
 import javax.inject.Inject
@@ -56,6 +58,9 @@ class TariWalletApplication : Application() {
     lateinit var walletFilesDirPath: String
 
     lateinit var appComponent: ApplicationComponent
+    private lateinit var sharedPrefsWrapper: SharedPrefsWrapper
+
+    private val sharedPrefsFileName = "tari_wallet_shared_prefs"
 
     init {
         System.loadLibrary("native-lib")
@@ -65,15 +70,22 @@ class TariWalletApplication : Application() {
         super.onCreate()
         Logger.addLogAdapter(AndroidLogAdapter())
         JodaTimeAndroid.init(this)
+        sharedPrefsWrapper = SharedPrefsWrapper(
+            getSharedPreferences(
+                sharedPrefsFileName,
+                Context.MODE_PRIVATE
+            )
+        )
         appComponent = initDagger(this)
         appComponent.inject(this)
         if (deleteExistingWallet) {
             WalletUtil.clearWalletFiles(walletFilesDirPath)
+            sharedPrefsWrapper.clean()
         }
     }
 
     private fun initDagger(app: TariWalletApplication): ApplicationComponent =
         DaggerApplicationComponent.builder()
-            .applicationModule(ApplicationModule(app))
+            .applicationModule(ApplicationModule(app, sharedPrefsWrapper))
             .build()
 }

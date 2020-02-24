@@ -84,45 +84,35 @@ internal class FFIPendingInboundTx constructor(pointer: FFIPendingInboundTxPtr):
     fun getId(): BigInteger {
         val error = FFIError()
         val bytes = jniGetId(ptr, error)
-        if (error.code != 0) {
-            throw RuntimeException()
-        }
+        throwIf(error)
         return BigInteger(1, bytes)
     }
 
     fun getSourcePublicKey(): FFIPublicKey {
         val error = FFIError()
         val result = FFIPublicKey(jniGetSourcePublicKey(ptr, error))
-        if (error.code != 0) {
-            throw RuntimeException()
-        }
+        throwIf(error)
         return result
     }
 
     fun getAmount(): BigInteger {
         val error = FFIError()
         val bytes = jniGetAmount(ptr, error)
-        if (error.code != 0) {
-            throw RuntimeException()
-        }
+        throwIf(error)
         return BigInteger(1, bytes)
     }
 
     fun getTimestamp(): BigInteger {
         val error = FFIError()
         val bytes = jniGetTimestamp(ptr, error)
-        if (error.code != 0) {
-            throw RuntimeException()
-        }
+        throwIf(error)
         return BigInteger(1, bytes)
     }
 
     fun getMessage(): String {
         val error = FFIError()
         val result = jniGetMessage(ptr, error)
-        if (error.code != 0) {
-            throw RuntimeException()
-        }
+        throwIf(error)
         return result
     }
 

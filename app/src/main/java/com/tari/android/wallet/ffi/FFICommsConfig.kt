@@ -15,7 +15,7 @@
  * 3. Neither the name of the copyright holder nor the names of
  * its contributors may be used to endorse or promote products
  * derived from this software without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND
  * CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES,
  * INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
@@ -34,7 +34,6 @@ package com.tari.android.wallet.ffi
 
 import android.util.Log
 import java.io.File
-import java.security.InvalidParameterException
 
 internal typealias FFICommsConfigPtr = Long
 
@@ -43,7 +42,7 @@ internal typealias FFICommsConfigPtr = Long
  *
  * @author The Tari Development Team
  */
-internal class FFICommsConfig constructor(pointer: FFICommsConfigPtr): FFIBase() {
+internal class FFICommsConfig constructor(pointer: FFICommsConfigPtr) : FFIBase() {
 
     // region JNI
 
@@ -73,7 +72,7 @@ internal class FFICommsConfig constructor(pointer: FFICommsConfigPtr): FFIBase()
         privateKey: FFIPrivateKey
     ) : this(nullptr) {
         if (databaseName.isEmpty()) {
-            throw InvalidParameterException("databaseName may not be empty")
+            throw FFIException(message = "databaseName may not be empty")
         }
         val writeableDir = File(datastorePath)
         if (writeableDir.exists() && writeableDir.isDirectory && writeableDir.canWrite()) {
@@ -86,18 +85,18 @@ internal class FFICommsConfig constructor(pointer: FFICommsConfigPtr): FFIBase()
                 privateKey.getPointer(),
                 error
             )
-            if (error.code != 0) {
-                throw RuntimeException()
-            }
+            throwIf(error)
         } else {
+            val messageBuilder = StringBuilder()
             if (!writeableDir.exists()) {
-                Log.i("Directory", "Doesn't exist")
+                messageBuilder.append("Directory doesn't exist.")
             } else if (!writeableDir.isDirectory) {
-                Log.i("Directory", "Isn't a directory")
-            } else if (!writeableDir.canWrite()) {
-                Log.i("Directory", "Permission problem")
+                messageBuilder.append("Path is not a directory.")
+            } else {
+                messageBuilder.append("Permission problem.")
             }
-            throw FileSystemException(writeableDir)
+            Log.e("Directory", messageBuilder.toString())
+            throw FFIException(message = messageBuilder.toString())
         }
     }
 

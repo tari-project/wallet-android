@@ -37,8 +37,9 @@ import android.os.Bundle
 import android.os.Handler
 import com.tari.android.wallet.R
 import com.tari.android.wallet.di.WalletModule
-import com.tari.android.wallet.ui.activity.onboarding.OnBoardingFlowActivity
+import com.tari.android.wallet.ui.activity.onboarding.OnboardingFlowActivity
 import com.tari.android.wallet.util.Constants.UI.Splash
+import com.tari.android.wallet.util.SharedPrefsWrapper
 import java.io.File
 import javax.inject.Inject
 import javax.inject.Named
@@ -46,7 +47,7 @@ import javax.inject.Named
 /**
  * Splash screen activity.
  *
- * @author Kutsal Kaan Bilgin
+ * @author The Tari Development Team
  */
 class SplashActivity : BaseActivity() {
 
@@ -57,15 +58,14 @@ class SplashActivity : BaseActivity() {
     @Inject
     @Named(WalletModule.FieldName.walletFilesDirPath)
     lateinit var walletFilesDirPath: String
+    @Inject
+    internal lateinit var sharedPrefsWrapper: SharedPrefsWrapper
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        // delete existing wallet if the flag is set
-
-
         // check whether there's an existing wallet
         val walletExists = File(walletFilesDirPath).list()!!.isNotEmpty()
-        if (walletExists) {
+        if (walletExists && sharedPrefsWrapper.getOnboardingCompleted()) {
             uiHandler.postDelayed({
                 startAuthActivity()
             }, Splash.createWalletStartUpDelayMs)
@@ -77,7 +77,7 @@ class SplashActivity : BaseActivity() {
     }
 
     private fun startOnboardingActivity() {
-        val intent = Intent(this, OnBoardingFlowActivity::class.java)
+        val intent = Intent(this, OnboardingFlowActivity::class.java)
         intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
         startActivity(intent)
         // finish this activity

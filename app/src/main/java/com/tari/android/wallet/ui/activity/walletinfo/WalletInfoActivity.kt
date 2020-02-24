@@ -45,7 +45,6 @@ import butterknife.BindView
 import butterknife.OnClick
 import com.tari.android.wallet.R
 import com.tari.android.wallet.di.WalletModule
-import com.tari.android.wallet.ffi.FFIPublicKey
 import com.tari.android.wallet.ui.activity.BaseActivity
 import com.tari.android.wallet.ui.util.UiUtil
 import com.tari.android.wallet.util.EmojiUtil
@@ -76,6 +75,9 @@ class WalletInfoActivity : BaseActivity() {
     var qrCodeImageSize = 0
 
     @Inject
+    @Named(WalletModule.FieldName.publicKeyHexString)
+    lateinit var publicKeyHexString: String
+    @Inject
     @Named(WalletModule.FieldName.emojiId)
     lateinit var emojiId: String
 
@@ -91,7 +93,7 @@ class WalletInfoActivity : BaseActivity() {
         val chunkedEmojiId = EmojiUtil.getChunkedEmojiId(shortEmojiId, emojiIdChunkSeparator)
         emojiContainerView.text = chunkedEmojiId
 
-        val content = WalletUtil.getQRContent(FFIPublicKey(emojiId).toString(), emojiId)
+        val content = WalletUtil.getQRContent(publicKeyHexString, emojiId)
         UiUtil.getQREncodedBitmap(content, qrCodeImageSize)?.let {
             qrCodeImageView.setImageBitmap(it)
         }

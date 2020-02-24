@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/create_wallet_vw_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/black"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <RelativeLayout
+            android:id="@+id/introduction_vw_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="bottom">
+
+            <com.tari.android.wallet.ui.component.CustomFontTextView
+                android:id="@+id/introduction_txt_title_line_1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_above="@id/introduction_txt_title_line_2"
+                android:layout_centerHorizontal="true"
+                android:background="@color/black"
+                android:gravity="center"
+                android:lineSpacingExtra="6dp"
+                android:paddingLeft="32dp"
+                android:paddingRight="32dp"
+                android:text="@string/introduction_crypto_wallet_title_text_line_1"
+                android:textColor="@color/white"
+                android:textSize="30sp"
+                app:customFont="AVENIR_LT_STD_BLACK" />
+
+            <com.tari.android.wallet.ui.component.CustomFontTextView
+                android:id="@+id/introduction_txt_title_line_2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_above="@id/introduction_btn_layout"
+                android:layout_centerHorizontal="true"
+                android:layout_marginBottom="10dp"
+                android:background="@color/black"
+                android:gravity="center"
+                android:lineSpacingExtra="6dp"
+                android:paddingLeft="32dp"
+                android:paddingRight="32dp"
+                android:text="@string/introduction_crypto_wallet_title_text_line_2"
+                android:textColor="@color/white"
+                android:textSize="30sp"
+                app:customFont="AVENIR_LT_STD_BLACK" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="75dp"
+                android:layout_above="@id/introduction_btn_layout"
+                android:layout_marginBottom="5dp"
+                android:background="@color/black" />
+
+            <com.tari.android.wallet.ui.component.CustomFontTextView
+                android:id="@+id/introduction_txt_desc"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_above="@id/introduction_btn_layout"
+                android:layout_centerHorizontal="true"
+                android:layout_marginBottom="30dp"
+                android:alpha="0"
+                android:background="@color/black"
+                android:gravity="center"
+                android:lineSpacingExtra="6dp"
+                android:paddingLeft="32dp"
+                android:paddingRight="32dp"
+                android:text="@string/introduction_wallet_desc"
+                android:textColor="@color/wallet_splash_desc_text"
+                android:textSize="14sp"
+                app:customFont="AVENIR_LT_STD_MEDIUM" />
+
+            <FrameLayout
+                android:id="@+id/introduction_btn_layout"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/common_action_button_height"
+                android:layout_marginLeft="32dp"
+                android:layout_marginRight="32dp"
+                android:layout_marginBottom="30dp"
+                android:alpha="0"
+                android:background="@drawable/gradient_button_bg">
+
+                <com.tari.android.wallet.ui.component.CustomFontTextView
+                    android:id="@+id/introduction_btn_create_wallet"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/common_action_button_height"
+                    android:gravity="center"
+                    android:text="@string/introduction_create_wallet"
+                    android:textAllCaps="false"
+                    android:textColor="@color/white"
+                    android:textSize="16sp"
+                    app:customFont="AVENIR_LT_STD_HEAVY" />
+
+                <ProgressBar
+                    android:id="@+id/introduction_prog_create_wallet"
+                    android:layout_width="35dp"
+                    android:layout_height="35dp"
+                    android:layout_gravity="center"
+                    android:visibility="gone" />
+            </FrameLayout>
+
+        </RelativeLayout>
+
+        <ImageView
+            android:id="@+id/introduction_img_small_gem"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginBottom="18dp"
+            android:alpha="0"
+            android:background="@color/black"
+            android:contentDescription="@null"
+            android:src="@drawable/splash_gem_small" />
+
+        <com.tari.android.wallet.ui.component.CustomFontTextView
+            android:id="@+id/introduction_txt_testnet"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginBottom="22dp"
+            android:alpha="0"
+            android:background="@color/black"
+            android:text="@string/testnet"
+            android:textColor="#50FFFFFF"
+            android:textSize="9sp"
+            app:customFont="AVENIR_LT_STD_HEAVY" />
+
+    </LinearLayout>
+
+    <FrameLayout
+        android:id="@+id/introduction_vw_video_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="30dp">
+
+        <VideoView
+            android:id="@+id/introduction_video_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center" />
+
+    </FrameLayout>
+
+    <com.airbnb.lottie.LottieAnimationView
+        android:id="@+id/introduction_anim_tari"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="30dp"
+        android:alpha="0"
+        android:background="@color/black"
+        android:scaleX="0.8"
+        android:scaleY="0.8"
+        app:lottie_autoPlay="false"
+        app:lottie_enableMergePathsForKitKatAndAbove="true"
+        app:lottie_loop="false"
+        app:lottie_rawRes="@raw/splash_anim"
+        app:lottie_renderMode="automatic" />
+
+</FrameLayout>

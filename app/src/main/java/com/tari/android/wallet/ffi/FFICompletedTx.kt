@@ -32,7 +32,6 @@
  */
 package com.tari.android.wallet.ffi
 
-import java.io.InvalidObjectException
 import java.math.BigInteger
 
 /**
@@ -91,79 +90,63 @@ internal class FFICompletedTx constructor(pointer: FFICompletedTxPtr): FFIBase()
     fun getId(): BigInteger {
         val error = FFIError()
         val bytes = jniGetId(ptr, error)
-        if (error.code != 0) {
-            throw RuntimeException()
-        }
+        throwIf(error)
         return BigInteger(1, bytes)
     }
 
     fun getDestinationPublicKey(): FFIPublicKey {
         val error = FFIError()
         val result = FFIPublicKey(jniGetDestinationPublicKey(ptr, error))
-        if (error.code != 0) {
-            throw RuntimeException()
-        }
+        throwIf(error)
         return result
     }
 
     fun getSourcePublicKey(): FFIPublicKey {
         val error = FFIError()
         val result = FFIPublicKey(jniGetSourcePublicKey(ptr, error))
-        if (error.code != 0) {
-            throw RuntimeException()
-        }
+        throwIf(error)
         return result
     }
 
     fun getAmount(): BigInteger {
         val error = FFIError()
         val bytes = jniGetAmount(ptr, error)
-        if (error.code != 0) {
-            throw RuntimeException()
-        }
+        throwIf(error)
         return BigInteger(1, bytes)
     }
 
     fun getFee(): BigInteger {
         val error = FFIError()
         val bytes = jniGetFee(ptr, error)
-        if (error.code != 0) {
-            throw RuntimeException()
-        }
+        throwIf(error)
         return BigInteger(1, bytes)
     }
 
     fun getTimestamp(): BigInteger {
         val error = FFIError()
         val bytes = jniGetTimestamp(ptr, error)
-        if (error.code != 0) {
-            throw RuntimeException()
-        }
+        throwIf(error)
         return BigInteger(1, bytes)
     }
 
     fun getMessage(): String {
         val error = FFIError()
         val result = jniGetMessage(ptr, error)
-        if (error.code != 0) {
-            throw RuntimeException()
-        }
+        throwIf(error)
         return result
     }
 
     fun getStatus(): Status {
         val error = FFIError()
         val status = jniGetStatus(ptr, error)
-        if (error.code != 0) {
-            throw RuntimeException()
-        }
+        throwIf(error)
         return when (status) {
             -1 -> Status.TX_NULL_ERROR
             0 -> Status.COMPLETED
             1 -> Status.BROADCAST
             2 -> Status.MINED
             3 -> Status.UNKNOWN
-            else -> throw InvalidObjectException("Unexpected status")
+            else -> throw FFIException(message = "Unexpected status: $status")
         }
     }
 

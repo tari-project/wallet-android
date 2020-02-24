@@ -15,7 +15,7 @@
  * 3. Neither the name of the copyright holder nor the names of
  * its contributors may be used to endorse or promote products
  * derived from this software without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND
  * CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES,
  * INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
@@ -31,8 +31,6 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 package com.tari.android.wallet.ffi
-
-import java.util.*
 
 /**
  * @author The Tari Development Team
@@ -59,12 +57,12 @@ internal class NetAddressString constructor() {
         if (pattern.matches(string)) {
             address = string
         } else {
-            throw InvalidPropertiesFormatException("String is not valid Address")
+            throw FFIException(message = "String is not valid Address")
         }
         if (port >= 0) {
             addressPort = port
         } else {
-            throw InvalidPropertiesFormatException("Port is not valid Port")
+            throw FFIException(message = "Port is not valid Port")
         }
     }
 

@@ -81,9 +81,6 @@ dependencies {
     // support lib
     implementation 'androidx.legacy:legacy-support-v13:1.0.0'
 
-    // firebase
-    implementation 'com.google.firebase:firebase-messaging:20.1.0'
-
     // test
     testImplementation 'junit:junit:4.12'
     testImplementation 'org.mockito:mockito-core:2.19.0'
@@ -120,9 +117,9 @@ dependencies {
     kapt "com.jakewharton:butterknife-compiler:10.2.0"
     // logger
     implementation 'com.orhanobut:logger:2.2.0'
-    //QR scanner
+    // QR scanner
     implementation 'com.budiyev.android:code-scanner:2.1.0'
-    //retrofit
+    // retrofit
     implementation "com.squareup.retrofit2:retrofit:2.6.2"
     implementation "com.squareup.retrofit2:converter-gson:2.6.2"
     implementation 'com.journeyapps:zxing-android-embedded:4.1.0'

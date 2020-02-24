@@ -33,19 +33,25 @@
 package com.tari.android.wallet.ui.activity.tx
 
 import android.annotation.SuppressLint
+import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
+import android.content.ServiceConnection
 import android.os.Bundle
+import android.os.IBinder
 import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.widget.ImageView
 import android.widget.LinearLayout
 import androidx.constraintlayout.widget.Group
 import butterknife.*
+import com.orhanobut.logger.Logger
 import com.tari.android.wallet.R
-import com.tari.android.wallet.event.Event.Wallet.TxUpdated
+import com.tari.android.wallet.event.Event
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.model.*
+import com.tari.android.wallet.service.TariWalletService
+import com.tari.android.wallet.service.WalletService
 import com.tari.android.wallet.ui.activity.BaseActivity
 import com.tari.android.wallet.ui.component.CustomFontButton
 import com.tari.android.wallet.ui.component.CustomFontEditText
@@ -64,7 +70,9 @@ import java.util.*
  *
  * @author The Tari Development Team
  */
-class TxDetailActivity : BaseActivity() {
+class TxDetailActivity :
+    BaseActivity(),
+    ServiceConnection {
 
     override val contentViewId = R.layout.activity_tx_detail
 
@@ -146,6 +154,8 @@ class TxDetailActivity : BaseActivity() {
     @JvmField
     var firstElementMarginStart = 0
 
+    private var walletService: TariWalletService? = null
+
     /**
      * Values below are used for scaling up/down of the text size.
      */
@@ -158,11 +168,42 @@ class TxDetailActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        overridePendingTransition(R.anim.enter_from_right, android.R.anim.fade_out)
+        overridePendingTransition(R.anim.enter_from_right, R.anim.exit_to_left)
         emojiIdSummaryController = EmojiIdSummaryViewController(emojiSummaryView)
         tx = intent.getParcelableExtra(TX_DETAIL_EXTRA_KEY)
         if (tx == null) finish()
         setupUI()
+    }
+
+    override fun onStart() {
+        super.onStart()
+        // start service if not started yet
+        if (walletService == null) {
+            // bind to service
+            val bindIntent = Intent(this, WalletService::class.java)
+            bindService(bindIntent, this, Context.BIND_AUTO_CREATE)
+        }
+    }
+
+    override fun onDestroy() {
+        unbindService(this)
+        super.onDestroy()
+    }
+
+    /**
+     * Wallet service connected.
+     */
+    override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
+        Logger.d("Connected to the wallet service.")
+        walletService = TariWalletService.Stub.asInterface(service)
+    }
+
+    /**
+     * Wallet service disconnected.
+     */
+    override fun onServiceDisconnected(name: ComponentName?) {
+        Logger.d("Disconnected from the wallet service.")
+        walletService = null
     }
 
     override fun onBackPressed() {
@@ -172,7 +213,6 @@ class TxDetailActivity : BaseActivity() {
 
     @SuppressLint("SetTextI18n")
     private fun setupUI() {
-
         currentTextSize = elementTextSize
         currentAmountGemSize = amountGemSize
         elementMarginStart = firstElementMarginStart
@@ -204,12 +244,12 @@ class TxDetailActivity : BaseActivity() {
         val user = tx!!.user
         if (user is Contact) {
             contactContainerView.visibility = View.VISIBLE
-            setAlias(user.alias)
+            setUIAlias(user.alias)
         } else {
             addContactButton.visibility = View.VISIBLE
             contactContainerView.visibility = View.GONE
         }
-        if (tx is CompletedTx) {
+        if ((tx as? CompletedTx)?.direction == Tx.Direction.OUTBOUND) {
             txFeeGroup.visibility = View.VISIBLE
             val fee = MicroTari((tx as CompletedTx).fee)
             txFeeTextView.text = "+${WalletUtil.feeFormatter.format(fee.tariValue)}"
@@ -248,10 +288,10 @@ class TxDetailActivity : BaseActivity() {
     @OnEditorAction(R.id.tx_detail_edit_create_contact)
     fun onContactEditTextEditAction(actionId: Int): Boolean {
         if (actionId == EditorInfo.IME_ACTION_DONE) {
-            val name = contactEditText.text?.toString()
-            if (!name.isNullOrEmpty()) {
-                setAlias(name)
-                EventBus.post(TxUpdated(tx!!.user.publicKey.emojiId, name))
+            val alias = contactEditText.text?.toString()
+            if (!alias.isNullOrEmpty()) {
+                updateContactAlias(alias)
+                setUIAlias(alias)
             }
             contactLabelTextView.setTextColor(contactLabelTxtGrayColor)
             return false
@@ -259,7 +299,29 @@ class TxDetailActivity : BaseActivity() {
         return true
     }
 
-    private fun setAlias(alias: String) {
+    private fun updateContactAlias(newAlias: String) {
+        if (walletService == null) {
+            return
+        }
+        val error = WalletError()
+        walletService?.updateContactAlias(
+            tx!!.user.publicKey,
+            newAlias,
+            error
+        )
+        if (error.code == WalletErrorCode.NO_ERROR) {
+            EventBus.post(
+                Event.Contact.ContactAddedOrUpdated(
+                    tx!!.user.publicKey,
+                    newAlias
+                )
+            )
+        } else {
+            TODO("Unhandled wallet error: ${error.code}")
+        }
+    }
+
+    private fun setUIAlias(alias: String) {
         contactNameTextView.visibility = View.VISIBLE
         contactEditText.visibility = View.INVISIBLE
         contactNameTextView.text = alias
@@ -267,9 +329,9 @@ class TxDetailActivity : BaseActivity() {
         addContactButton.visibility = View.INVISIBLE
     }
 
-    /*
-    * add contact name
-    * */
+    /**
+     * Add contact alias.
+     */
     @OnClick(R.id.tx_detail_btn_add_contact)
     fun onAddContactClick() {
         contactContainerView.visibility = View.VISIBLE
@@ -284,14 +346,15 @@ class TxDetailActivity : BaseActivity() {
     private fun focusContactEditText() {
         contactEditText.post {
             contactEditText.requestFocus()
+            contactEditText.setSelection(contactEditText.text?.length ?: 0)
             UiUtil.showKeyboard(this)
         }
         contactLabelTextView.setTextColor(contactLabelTxtBlackColor)
     }
 
-    /*
-    *  edit contact name
-    * */
+    /**
+     * Edit contact alias.
+     */
     @OnClick(R.id.tx_detail_txt_edit_label)
     fun onEditContactClick() {
         editContactLabelTextView.visibility = View.INVISIBLE

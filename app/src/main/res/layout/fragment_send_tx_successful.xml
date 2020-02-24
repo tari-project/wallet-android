@@ -15,7 +15,8 @@
         app:lottie_autoPlay="false"
         app:lottie_enableMergePathsForKitKatAndAbove="true"
         app:lottie_loop="false"
-        app:lottie_rawRes="@raw/sending_tari" />
+        app:lottie_rawRes="@raw/sending_tari"
+        app:lottie_renderMode="automatic" />
 
     <LinearLayout
         android:id="@+id/send_tx_successful_vw_info_container"
