@@ -63,9 +63,7 @@ internal class FFIPendingInboundTxs constructor(pointer: FFIPendingInboundTxsPtr
     fun getLength(): Int {
         val error = FFIError()
         val result = jniGetLength(ptr, error)
-        if (error.code != 0) {
-            throw RuntimeException()
-        }
+        throwIf(error)
         return result
     }
 
@@ -76,9 +74,7 @@ internal class FFIPendingInboundTxs constructor(pointer: FFIPendingInboundTxsPtr
     fun getAt(index: Int): FFIPendingInboundTx {
         val error = FFIError()
         val result = FFIPendingInboundTx(jniGetAt(ptr, index, error))
-        if (error.code != 0) {
-            throw RuntimeException()
-        }
+        throwIf(error)
         return result
     }
 

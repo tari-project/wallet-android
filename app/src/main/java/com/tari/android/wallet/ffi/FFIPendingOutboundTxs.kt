@@ -67,18 +67,14 @@ internal class FFIPendingOutboundTxs(pointer: FFIPendingOutboundTxsPtr): FFIBase
     fun getLength(): Int {
         val error = FFIError()
         val result = jniGetLength(ptr, error)
-        if (error.code != 0) {
-            throw RuntimeException()
-        }
+        throwIf(error)
         return result
     }
 
     fun getAt(index: Int): FFIPendingOutboundTx {
         val error = FFIError()
         val result = FFIPendingOutboundTx(jniGetAt(ptr, index, error))
-        if (error.code != 0) {
-            throw RuntimeException()
-        }
+        throwIf(error)
         return result
     }
 

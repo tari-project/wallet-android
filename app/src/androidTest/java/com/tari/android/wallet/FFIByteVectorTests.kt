@@ -34,11 +34,11 @@ package com.tari.android.wallet
 
 import android.util.Log
 import com.tari.android.wallet.ffi.FFIByteVector
+import com.tari.android.wallet.ffi.FFIException
 import com.tari.android.wallet.ffi.HexString
 import com.tari.android.wallet.ffi.nullptr
 import org.junit.Assert.assertTrue
 import org.junit.Test
-import java.util.*
 
 /**
  * FFI byte vector tests.
@@ -62,7 +62,7 @@ class FFIByteVectorTests {
         byteVector2.destroy()
     }
 
-    @Test(expected = InvalidPropertiesFormatException::class)
+    @Test(expected = FFIException::class)
     fun testByteVectorException() {
         val byteVector = FFIByteVector(HexString(str.slice(0..str.length - 5)))
         byteVector.destroy()

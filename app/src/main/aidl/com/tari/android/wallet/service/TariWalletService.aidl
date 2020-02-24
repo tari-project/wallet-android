@@ -49,34 +49,33 @@ interface TariWalletService {
     */
     boolean unregisterListener(TariWalletServiceListener listener);
 
-    String getPublicKeyHexString();
+    String getPublicKeyHexString(out WalletError error);
 
-    String getLogFilePath();
+    BalanceInfo getBalanceInfo(out WalletError error);
 
-    BalanceInfo getBalanceInfo();
+    List<Contact> getContacts(out WalletError error);
 
-    List<Contact> getContacts();
+    List<User> getRecentTxUsers(int maxCount, out WalletError error);
 
-    List<User> getRecentTxUsers(int maxCount);
+    List<CompletedTx> getCompletedTxs(out WalletError error);
+    CompletedTx getCompletedTxById(in TxId id, out WalletError error);
 
-    List<CompletedTx> getCompletedTxs();
+    List<PendingInboundTx> getPendingInboundTxs(out WalletError error);
+    PendingInboundTx getPendingInboundTxById(in TxId id, out WalletError error);
 
-    CompletedTx getCompletedTxById(in TxId id);
-
-    List<PendingInboundTx> getPendingInboundTxs();
-    PendingInboundTx getPendingInboundTxById(in TxId id);
-
-    List<PendingOutboundTx> getPendingOutboundTxs();
-    PendingOutboundTx getPendingOutboundTxById(in TxId id);
+    List<PendingOutboundTx> getPendingOutboundTxs(out WalletError error);
+    PendingOutboundTx getPendingOutboundTxById(in TxId id, out WalletError error);
 
     boolean sendTari(
         in User contact,
         in MicroTari amount,
         in MicroTari fee,
-        String message
+        String message,
+        out WalletError error
     );
 
-    void requestTestnetTari();
+    void requestTestnetTari(out WalletError error);
 
-    void updateTxContactName(in String publicKey, in String contactName);
+    void updateContactAlias(in PublicKey contactPublicKey, in String contactAlias, out WalletError error);
+
 }

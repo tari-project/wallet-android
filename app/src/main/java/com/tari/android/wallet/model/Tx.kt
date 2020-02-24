@@ -37,6 +37,8 @@ import java.math.BigInteger
 
 /**
  * Base transaction class.
+ *
+ * @author The Tari Development Team
  */
 abstract class Tx : Parcelable {
 

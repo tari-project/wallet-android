@@ -30,57 +30,54 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.tari.android.wallet.ffi
+package com.tari.android.wallet.model
+
+import android.os.Parcel
+import android.os.Parcelable
 
 /**
- * Tari completed transactions wrapper.
+ * Wallet error.
  *
  * @author The Tari Development Team
  */
-internal typealias FFICompletedTxsPtr = Long
+class WalletError(
+    var code: WalletErrorCode = WalletErrorCode.NO_ERROR,
+    var message: String? = null
+) : Parcelable {
 
-internal class FFICompletedTxs constructor(pointer: FFICompletedTxsPtr): FFIBase() {
+    // region Parcelable
 
-    // region JNI
+    constructor(parcel: Parcel) : this(
+        parcel.readSerializable() as WalletErrorCode,
+        parcel.readString()
+    )
 
-    private external fun jniGetLength(ptr: FFICompletedTxsPtr, libError: FFIError): Int
-    private external fun jniGetAt(
-        ptr: FFICompletedTxsPtr,
-        index: Int,
-        libError: FFIError
-    ): FFICompletedTxPtr
+    companion object CREATOR : Parcelable.Creator<WalletError> {
 
-    private external fun jniDestroy(ptr: FFICompletedTxsPtr)
+        override fun createFromParcel(parcel: Parcel): WalletError {
+            return WalletError(parcel)
+        }
+
+        override fun newArray(size: Int): Array<WalletError?> {
+            return arrayOfNulls(size)
+        }
+
+    }
+
+    override fun writeToParcel(parcel: Parcel, flags: Int) {
+        parcel.writeSerializable(code)
+        parcel.writeString(message)
+    }
+
+    fun readFromParcel(inParcel: Parcel) {
+        code = inParcel.readSerializable() as WalletErrorCode
+        message = inParcel.readString()
+    }
+
+    override fun describeContents(): Int {
+        return 0
+    }
 
     // endregion
-
-    private var ptr = nullptr
-
-    init {
-        ptr = pointer
-    }
-
-    fun getPointer(): FFICompletedTxsPtr {
-        return ptr
-    }
-
-    fun getLength(): Int {
-        val error = FFIError()
-        val result = jniGetLength(ptr, error)
-        throwIf(error)
-        return result
-    }
-
-    fun getAt(index: Int): FFICompletedTx {
-        val error = FFIError()
-        val result = FFICompletedTx(jniGetAt(ptr, index, error))
-        throwIf(error)
-        return result
-    }
-
-    override fun destroy() {
-        jniDestroy(ptr)
-        ptr = nullptr
-    }
 
 }

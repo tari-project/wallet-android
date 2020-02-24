@@ -15,7 +15,7 @@
  * 3. Neither the name of the copyright holder nor the names of
  * its contributors may be used to endorse or promote products
  * derived from this software without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND
  * CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES,
  * INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
@@ -53,8 +53,8 @@ internal class HexString constructor(bytes: FFIByteVector) {
                     byteArray[i] = m.toByte()
                 }
                 hex = BigInteger(1, byteArray) //
-                    .toString(16) //a-f,0-9
-                    .toUpperCase(Locale.getDefault()) //A-F are in lowercase in the final string before this call
+                    .toString(16) // a-f,0-9
+                    .toUpperCase(Locale.getDefault()) // A-F are in lowercase in the final string before this call
             } else {
                 hex = String()
             }
@@ -67,7 +67,7 @@ internal class HexString constructor(bytes: FFIByteVector) {
         if (pattern.matches(string) && string.length % 2 == 0) {
             hex = string
         } else {
-            throw InvalidPropertiesFormatException("String is not valid Hex of even length")
+            throw FFIException(message = "String is not valid Hex of even length.")
         }
     }
 

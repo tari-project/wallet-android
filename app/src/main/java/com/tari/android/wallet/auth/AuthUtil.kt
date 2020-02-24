@@ -39,7 +39,7 @@ import android.os.Build
 /**
  * Authentication-related utility functions.
  *
- * @author Kutsal Kaan Bilgin
+ * @author The Tari Development Team
  */
 internal object AuthUtil {
 

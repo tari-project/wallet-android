@@ -32,9 +32,7 @@
  */
 package com.tari.android.wallet.ui.fragment.send
 
-import android.animation.Animator
-import android.animation.AnimatorListenerAdapter
-import android.animation.ValueAnimator
+import android.animation.*
 import android.annotation.SuppressLint
 import android.content.Context
 import android.os.AsyncTask
@@ -51,9 +49,7 @@ import butterknife.*
 import com.daasuu.ei.Ease
 import com.daasuu.ei.EasingInterpolator
 import com.tari.android.wallet.R
-import com.tari.android.wallet.model.Contact
-import com.tari.android.wallet.model.MicroTari
-import com.tari.android.wallet.model.User
+import com.tari.android.wallet.model.*
 import com.tari.android.wallet.service.TariWalletService
 import com.tari.android.wallet.ui.component.EmojiIdSummaryViewController
 import com.tari.android.wallet.ui.fragment.BaseFragment
@@ -270,16 +266,34 @@ class AddNoteAndSendFragment(private val walletService: TariWalletService) : Bas
     }
 
     private fun enableCallToAction() {
-        slideBgEnabledView.visibility = View.VISIBLE
-        slideToSendDisabledTextView.visibility = View.GONE
-        slideToSendEnabledTextView.visibility = View.VISIBLE
-        slideArrowIconEnabledImageView.visibility = View.VISIBLE
+        if (slideBgEnabledView.visibility == View.VISIBLE) {
+            return
+        }
         slideView.setOnTouchListener(this)
+
+        slideToSendDisabledTextView.visibility = View.INVISIBLE
+
+        slideToSendEnabledTextView.alpha = 0f
+        slideToSendEnabledTextView.visibility = View.VISIBLE
+        slideArrowIconEnabledImageView.alpha = 0f
+        slideArrowIconEnabledImageView.visibility = View.VISIBLE
+        slideBgEnabledView.alpha = 0f
+        slideBgEnabledView.visibility = View.VISIBLE
+
+        val textViewAnim = ObjectAnimator.ofFloat(slideToSendEnabledTextView, "alpha", 0f, 1f)
+        val arrowAnim = ObjectAnimator.ofFloat(slideArrowIconEnabledImageView, "alpha", 0f, 1f)
+        val bgViewAnim = ObjectAnimator.ofFloat(slideBgEnabledView, "alpha", 0f, 1f)
+
+        // the animation set
+        val animSet = AnimatorSet()
+        animSet.playTogether(textViewAnim, arrowAnim, bgViewAnim)
+        animSet.duration = Constants.UI.shortAnimDurationMs
+        animSet.start()
     }
 
     private fun disableCallToAction() {
-        slideBgEnabledView.visibility = View.GONE
         slideToSendDisabledTextView.visibility = View.VISIBLE
+        slideBgEnabledView.visibility = View.GONE
         slideToSendEnabledTextView.visibility = View.GONE
         slideArrowIconEnabledImageView.visibility = View.GONE
         slideView.setOnTouchListener(null)
@@ -335,8 +349,10 @@ class AddNoteAndSendFragment(private val walletService: TariWalletService) : Bas
                     }
                 }
                 layoutParams.marginStart = slideButtonLastMarginStart
-                slideToSendEnabledTextView.alpha =
-                    1f - slideButtonLastMarginStart.toFloat() / (slideButtonContainerWidth - slideViewMarginStart - slideViewWidth)
+                val alpha = 1f - slideButtonLastMarginStart.toFloat() / (slideButtonContainerWidth - slideViewMarginStart - slideViewWidth)
+                slideToSendEnabledTextView.alpha = alpha
+                slideToSendDisabledTextView.alpha = alpha
+
                 view.layoutParams = layoutParams
             }
             MotionEvent.ACTION_UP -> if (slideButtonLastMarginStart < slideButtonContainerWidth / 2) {
@@ -423,14 +439,15 @@ class AddNoteAndSendFragment(private val walletService: TariWalletService) : Bas
     private fun sendTari() {
         val note = noteEditText.text.toString()
         val timeStartMs = System.currentTimeMillis()
-        val success = walletService.sendTari(recipientUser, amount, fee, note)
+        val error = WalletError()
+        val success = walletService.sendTari(recipientUser, amount, fee, note, error)
         val timeElapsed = System.currentTimeMillis() - timeStartMs
         val waitMs = max(
             0,
             Constants.UI.AddNoteAndSend.postSendDelayMs - timeElapsed
         )
         rootView.postDelayed({
-            if (success) {
+            if (success && error.code == WalletErrorCode.NO_ERROR) {
                 wr.get()?.sendTariSuccessful()
             } else {
                 wr.get()?.sendTariError()

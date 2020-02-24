@@ -73,7 +73,7 @@ class FFICommsConfigTests {
         privateKey.destroy()
     }
 
-    @Test(expected = FileSystemException::class)
+    @Test(expected = FFIException::class)
     fun testByteVectorException() {
         FFITestUtil.clearTestFiles(StringBuilder().append(datastorePath).toString())
         val privateKey = FFIPrivateKey(HexString(FFITestUtil.PRIVATE_KEY_HEX_STRING))

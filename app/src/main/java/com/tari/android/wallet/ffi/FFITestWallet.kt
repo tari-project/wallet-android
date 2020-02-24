@@ -87,54 +87,42 @@ internal class FFITestWallet(commsConfig: FFICommsConfig, logPath: String) :
     fun generateTestData(datastorePath: String): Boolean {
         val error = FFIError()
         val result = jniGenerateTestData(getPointer(), datastorePath, error)
-        if (error.code != 0) {
-            throw RuntimeException()
-        }
+        throwIf(error)
         return result
     }
 
     fun testBroadcastTx(tx: FFICompletedTx): Boolean {
         val error = FFIError()
         val result = jniTestBroadcastTx(getPointer(), tx.getPointer(), error)
-        if (error.code != 0) {
-            throw RuntimeException()
-        }
+        throwIf(error)
         return result
     }
 
     fun testCompleteSentTx(tx: FFIPendingOutboundTx): Boolean {
         val error = FFIError()
         val result = jniTestCompleteSentTx(getPointer(), tx.getPointer(), error)
-        if (error.code != 0) {
-            throw RuntimeException()
-        }
+        throwIf(error)
         return result
     }
 
     fun testMineCompletedTx(tx: FFICompletedTx): Boolean {
         val error = FFIError()
         val result = jniTestMineCompletedTx(getPointer(), tx.getPointer(), error)
-        if (error.code != 0) {
-            throw RuntimeException()
-        }
+        throwIf(error)
         return result
     }
 
     fun testFinalizeReceivedTx(tx: FFIPendingInboundTx): Boolean {
         val error = FFIError()
         val result = jniTestFinalizeReceivedTx(getPointer(), tx.getPointer(), error)
-        if (error.code != 0) {
-            throw RuntimeException()
-        }
+        throwIf(error)
         return result
     }
 
     fun testReceiveTx(): Boolean {
         val error = FFIError()
         val result = jniTestReceiveTx(getPointer(), error)
-        if (error.code != 0) {
-            throw RuntimeException()
-        }
+        throwIf(error)
         return result
     }
 

@@ -201,6 +201,7 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniCreate(
         jstring callback_discovery_process_complete,
         jstring callback_discovery_process_complete_sig,
         jobject error) {
+
     int i = 0;
     int *r = &i;
     if (callbackHandler == nullptr) {
@@ -278,9 +279,11 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniCreate(
     TariWalletConfig *pWalletConfig = reinterpret_cast<TariWalletConfig *>(jpWalletConfig);
 
     char *pLogPath = const_cast<char *>(jEnv->GetStringUTFChars(jLogPath, JNI_FALSE));
+
     TariWallet *pWallet = wallet_create(pWalletConfig, pLogPath, ReceivedCallback, ReplyCallback,
                                         FinalizedCallback, BroadcastCallback, MinedCallback,
                                         DiscoveryCallback, r);
+
     setErrorCode(jEnv, error, i);
     jEnv->ReleaseStringUTFChars(jLogPath, pLogPath);
     return reinterpret_cast<jlong>(pWallet);

@@ -67,18 +67,14 @@ internal class FFIContacts constructor(pointer: FFIContactPtr): FFIBase() {
     fun getLength(): Int {
         val error = FFIError()
         val result = jniGetLength(ptr, error)
-        if (error.code != 0) {
-            throw RuntimeException()
-        }
+        throwIf(error)
         return result
     }
 
     fun getAt(index: Int): FFIContact {
         val error = FFIError()
         val result = FFIContact(jniGetAt(ptr, index, error))
-        if (error.code != 0) {
-            throw RuntimeException()
-        }
+        throwIf(error)
         return result
     }
 

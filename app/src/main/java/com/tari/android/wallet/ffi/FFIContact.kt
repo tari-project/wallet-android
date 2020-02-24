@@ -15,7 +15,7 @@
  * 3. Neither the name of the copyright holder nor the names of
  * its contributors may be used to endorse or promote products
  * derived from this software without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND
  * CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES,
  * INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
@@ -32,8 +32,6 @@
  */
 package com.tari.android.wallet.ffi
 
-import java.security.InvalidParameterException
-
 internal typealias FFIContactPtr = Long
 
 /**
@@ -41,12 +39,16 @@ internal typealias FFIContactPtr = Long
  *
  * @author The Tari Development Team
  */
-internal class FFIContact constructor(pointer: FFIContactPtr): FFIBase() {
+internal class FFIContact constructor(pointer: FFIContactPtr) : FFIBase() {
 
     // region JNI
 
     private external fun jniGetAlias(contactPtr: FFIContactPtr, libError: FFIError): String
-    private external fun jniGetPublicKey(contactPtr: FFIContactPtr, libError: FFIError): FFIPublicKeyPtr
+    private external fun jniGetPublicKey(
+        contactPtr: FFIContactPtr,
+        libError: FFIError
+    ): FFIPublicKeyPtr
+
     private external fun jniDestroy(contactPtr: FFIContactPtr)
     private external fun jniCreate(
         alias: String,
@@ -66,11 +68,9 @@ internal class FFIContact constructor(pointer: FFIContactPtr): FFIBase() {
         if (alias.isNotEmpty()) {
             val error = FFIError()
             ptr = jniCreate(alias, FFIPublicKey.getPointer(), error)
-            if (error.code != 0) {
-                throw RuntimeException()
-            }
+            throwIf(error)
         } else {
-            throw InvalidParameterException("Alias is an empty String")
+            throw FFIException(message = "Alias is an empty String.")
         }
     }
 
@@ -81,18 +81,14 @@ internal class FFIContact constructor(pointer: FFIContactPtr): FFIBase() {
     fun getAlias(): String {
         val error = FFIError()
         val result = jniGetAlias(ptr, error)
-        if (error.code != 0) {
-            throw RuntimeException()
-        }
+        throwIf(error)
         return result
     }
 
     fun getPublicKey(): FFIPublicKey {
         val error = FFIError()
         val result = FFIPublicKey(jniGetPublicKey(ptr, error))
-        if (error.code != 0) {
-            throw RuntimeException()
-        }
+        throwIf(error)
         return result
     }
 

@@ -36,8 +36,9 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import butterknife.ButterKnife
 import com.tari.android.wallet.application.TariWalletApplication
+import com.tari.android.wallet.ui.activity.home.HomeActivity
 import com.tari.android.wallet.ui.activity.log.DebugLogActivity
-import com.tari.android.wallet.ui.activity.onboarding.OnBoardingFlowActivity
+import com.tari.android.wallet.ui.activity.onboarding.OnboardingFlowActivity
 import com.tari.android.wallet.ui.activity.send.SendTariActivity
 import com.tari.android.wallet.ui.activity.walletinfo.WalletInfoActivity
 import com.tari.android.wallet.ui.activity.tx.TxDetailActivity
@@ -57,8 +58,9 @@ abstract class BaseActivity : AppCompatActivity() {
         val component = (application as TariWalletApplication).appComponent
         when (this) {
             is SplashActivity -> component.inject(this)
-            is OnBoardingFlowActivity -> component.inject(this)
+            is OnboardingFlowActivity -> component.inject(this)
             is AuthActivity -> component.inject(this)
+            is HomeActivity -> component.inject(this)
             is QRScannerActivity -> component.inject(this)
             is DebugLogActivity -> component.inject(this)
             is SendTariActivity -> component.inject(this)

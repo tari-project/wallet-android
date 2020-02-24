@@ -43,7 +43,7 @@ import javax.inject.Named
 import javax.inject.Singleton
 
 /**
- * Dagger module to inject rest service dependencies.
+ * Dagger module to inject REST service dependencies.
  *
  * @author The Tari Development Team
  */

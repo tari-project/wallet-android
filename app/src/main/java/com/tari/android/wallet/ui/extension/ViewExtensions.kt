@@ -40,6 +40,7 @@ import android.util.TypedValue
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
+import android.widget.ScrollView
 import android.widget.TextView
 import com.tari.android.wallet.ui.util.UiUtil
 
@@ -128,4 +129,18 @@ fun ViewGroup.getLastChild(): View? {
     } else {
         null
     }
+}
+
+/**
+ * Scroll to the top of the scroll view.
+ */
+fun ScrollView.scrollToTop() {
+    scrollTo(0, 0)
+}
+
+/**
+ * Scroll to the bottom of the scroll view.
+ */
+fun ScrollView.scrollToBottom() {
+    scrollTo(0, height)
 }

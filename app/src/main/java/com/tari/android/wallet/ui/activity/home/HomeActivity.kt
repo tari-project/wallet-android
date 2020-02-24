@@ -45,14 +45,8 @@ import android.graphics.Color
 import android.graphics.Rect
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.GradientDrawable
-import android.os.AsyncTask
-import android.os.Bundle
-import android.os.Handler
-import android.os.IBinder
-import android.view.Gravity
-import android.view.MotionEvent
-import android.view.View
-import android.view.ViewGroup
+import android.os.*
+import android.view.*
 import android.view.animation.AccelerateInterpolator
 import android.view.animation.Animation
 import android.view.animation.DecelerateInterpolator
@@ -60,7 +54,6 @@ import android.view.animation.ScaleAnimation
 import android.widget.*
 import androidx.core.animation.addListener
 import androidx.core.content.ContextCompat
-import androidx.core.view.ViewCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
@@ -71,10 +64,7 @@ import com.orhanobut.logger.Logger
 import com.tari.android.wallet.R
 import com.tari.android.wallet.event.Event
 import com.tari.android.wallet.event.EventBus
-import com.tari.android.wallet.model.CompletedTx
-import com.tari.android.wallet.model.PendingInboundTx
-import com.tari.android.wallet.model.PendingOutboundTx
-import com.tari.android.wallet.model.Tx
+import com.tari.android.wallet.model.*
 import com.tari.android.wallet.service.TariWalletService
 import com.tari.android.wallet.service.WalletService
 import com.tari.android.wallet.ui.activity.BaseActivity
@@ -83,9 +73,12 @@ import com.tari.android.wallet.ui.activity.log.DebugLogActivity
 import com.tari.android.wallet.ui.activity.send.SendTariActivity
 import com.tari.android.wallet.ui.activity.walletinfo.WalletInfoActivity
 import com.tari.android.wallet.ui.activity.tx.TxDetailActivity
+import com.tari.android.wallet.ui.extension.scrollToTop
 import com.tari.android.wallet.ui.util.UiUtil
 import com.tari.android.wallet.util.Constants
+import com.tari.android.wallet.util.SharedPrefsWrapper
 import java.lang.ref.WeakReference
+import javax.inject.Inject
 import kotlin.math.max
 import kotlin.math.min
 
@@ -128,8 +121,8 @@ class HomeActivity : BaseActivity(),
     lateinit var grabberView: View
     @BindView(R.id.home_vw_tx_list_bg_overlay)
     lateinit var txListBgOverlayView: View
-    @BindView(R.id.home_v_scroll_depth_gradient)
-    lateinit var scrollDepthView: View
+    @BindView(R.id.home_vw_header_elevation)
+    lateinit var headerElevationView: View
 
     @BindView(R.id.home_btn_send_tari)
     lateinit var sendTariButton: Button
@@ -218,12 +211,17 @@ class HomeActivity : BaseActivity(),
     @JvmField
     var homeNoInternetConnection = ""
 
+    @Inject
+    lateinit var sharedPrefsWrapper: SharedPrefsWrapper
+
     // tx list
     private lateinit var recyclerViewAdapter: TxListAdapter
     private lateinit var recyclerViewLayoutManager: RecyclerView.LayoutManager
     private val completedTxs = mutableListOf<CompletedTx>()
     private val pendingInboundTxs = mutableListOf<PendingInboundTx>()
     private val pendingOutboundTxs = mutableListOf<PendingOutboundTx>()
+    // balance
+    private lateinit var balanceInfo: BalanceInfo
 
     // balance controller
     private lateinit var balanceViewController: BalanceViewController
@@ -234,13 +232,14 @@ class HomeActivity : BaseActivity(),
     private var grabberViewCornerRadiusScrollAnimCoefficient = 1.4f
 
     private var isOnboarding = false
+    private var testnetTariRequestIsInProgress = false
 
     private var sendTariButtonIsVisible = true
     private var isServiceConnected = false
 
     private var walletService: TariWalletService? = null
     private val wr = WeakReference(this)
-    private val uiHandler = Handler()
+    private val uiHandler = Handler(Looper.getMainLooper())
 
     /**
      * Whether the user is currently dragging the list view.
@@ -256,25 +255,72 @@ class HomeActivity : BaseActivity(),
 
     override val contentViewId = R.layout.activity_home
 
-    @SuppressLint("ClickableViewAccessibility")
+    // region lifecycle functions
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         overridePendingTransition(0, 0)
 
-        // makeStatusBarTransparent() -- commented out to fix the UI cutout issue
+        /* commented out to fix the UI cutout issue
+        makeStatusBarTransparent() --
         ViewCompat.setOnApplyWindowInsetsListener(rootView) { _, insets ->
             insets.consumeSystemWindowInsets()
         }
-
-        // hide background overlay
-        txListBgOverlayView.alpha = 0f
+         */
 
         // hide tx list header
-        UiUtil.setTopMargin(
-            txListHeaderView,
-            -txListHeaderHeight
-        )
+        UiUtil.setTopMargin(txListHeaderView, -txListHeaderHeight)
 
+        setupSwipeRefreshLayout()
+        setupRecyclerView()
+        setTouchListeners()
+
+        headerElevationView.alpha = 0f
+        sendTariButton.alpha = 0f
+        sendTariButtonBgGradientView.alpha = 0f
+
+        balanceTitleTextView.alpha = 0f
+        userWalletInfoButton.alpha = 0f
+        balanceGemImageView.alpha = 0f
+        noTxsInfoTextView.visibility = View.GONE
+
+        scrollContentView.alpha = 0f
+        topContentContainerView.visibility = View.INVISIBLE
+
+        onboardingContentView.visibility = View.GONE
+
+        scrollView.post {
+            wr.get()?.setupScrollView()
+        }
+
+        subscribeToEventBus()
+    }
+
+    override fun onStart() {
+        super.onStart()
+        bindToWalletService()
+    }
+
+    override fun onStop() {
+        uiHandler.removeCallbacksAndMessages(null)
+        super.onStop()
+    }
+
+    @SuppressLint("ClickableViewAccessibility")
+    override fun onDestroy() {
+        recyclerView.layoutManager = null
+        recyclerView.adapter = null
+        unsetTouchListeners()
+        unbindService(this)
+        EventBus.unsubscribe(this)
+        super.onDestroy()
+    }
+
+    // endregion
+
+    // region initial setup (UI and else)
+
+    private fun setupSwipeRefreshLayout() {
         // initialize pull-to-refresh
         swipeRefreshLayout.setOnRefreshListener(this)
         // configure the refreshing colors
@@ -283,7 +329,9 @@ class HomeActivity : BaseActivity(),
             R.color.home_bg_gradient_center,
             R.color.home_bg_gradient_end
         )
+    }
 
+    private fun setupRecyclerView() {
         // initialize recycler view
         recyclerViewLayoutManager = LinearLayoutManager(this)
         recyclerView.layoutManager = recyclerViewLayoutManager
@@ -297,75 +345,65 @@ class HomeActivity : BaseActivity(),
         recyclerView.adapter = recyclerViewAdapter
         // recycler view is initially disabled
         recyclerView.isClickable = false
+    }
 
+    @SuppressLint("ClickableViewAccessibility")
+    private fun setTouchListeners() {
         scrollBgEnabler.setOnTouchListener(this)
         scrollView.setOnTouchListener(this)
         recyclerView.setOnTouchListener(this)
-
-        scrollView.post {
-            wr.get()?.setScrollViewContentHeight()
-        }
-
-        scrollDepthView.alpha = 0f
-        sendTariButton.visibility = View.INVISIBLE
-        sendTariButtonBgGradientView.alpha = 0f
-
-        balanceTitleTextView.alpha = 0f
-        userWalletInfoButton.alpha = 0f
-        balanceGemImageView.alpha = 0f
-        noTxsInfoTextView.visibility = View.GONE
-
-        scrollView.y = scrollViewStartupAnimHeight.toFloat()
-        scrollView.visibility = View.INVISIBLE
-        topContentContainerView.visibility = View.INVISIBLE
-
-        onboardingContentView.visibility = View.GONE
-
-        // event bus subscriptions
-        EventBus.subscribe<Event.Tx.TxSendSuccessful>(this) {
-            wr.get()?.rootView?.post {
-                wr.get()?.onSendTxSuccessful()
-            }
-        }
-        EventBus.subscribe<Event.Testnet.TestnetTariRequestSuccessful>(this) {
-            wr.get()?.rootView?.post {
-                wr.get()?.testnetTariRequestSuccessful()
-            }
-        }
-        EventBus.subscribe<Event.Testnet.TestnetTariRequestError>(this) {
-            wr.get()?.rootView?.post {
-                wr.get()?.testnetTariRequestError(it.errorMessage)
-            }
-        }
-        EventBus.subscribe<Event.Wallet.TxUpdated>(this) {
-            wr.get()?.rootView?.post {
-                walletService?.updateTxContactName(it.publicKey, it.contactName)
-                updateData(restartBalanceViewController = false)
-            }
-        }
     }
 
-    private fun setScrollViewContentHeight() {
+    @SuppressLint("ClickableViewAccessibility")
+    private fun unsetTouchListeners() {
+        scrollBgEnabler.setOnTouchListener(null)
+        scrollView.setOnTouchListener(null)
+        recyclerView.setOnTouchListener(null)
+    }
+
+    private fun setupScrollView() {
         val recyclerViewHeight = rootView.height - txListHeaderHeight
         val contentHeight =
             txListContainerMinimizedTopMargin + grabberContainerHeight + recyclerViewHeight
         UiUtil.setHeight(swipeRefreshLayout, recyclerViewHeight)
         UiUtil.setHeight(onboardingContentView, recyclerViewHeight)
         UiUtil.setHeight(scrollContentView, contentHeight)
-        scrollView.scrollTo(0, 0)
+        scrollView.scrollToTop()
 
         scrollView.setOnScrollChangeListener(this)
         recyclerView.setOnScrollChangeListener(this)
         recyclerView.addOnScrollListener(scrollListener)
     }
 
-    override fun onStop() {
-        uiHandler.removeCallbacksAndMessages(null)
-        super.onStop()
+    private fun subscribeToEventBus() {
+        // event bus subscriptions
+        EventBus.subscribe<Event.Tx.TxSendSuccessful>(this) {
+            wr.get()?.rootView?.post {
+                wr.get()?.onSendTxSuccessful()
+            }
+        }
+        EventBus.subscribe<Event.Testnet.TestnetTariRequestSuccessful>(this) { event ->
+            wr.get()?.rootView?.post {
+                wr.get()?.testnetTariRequestSuccessful(event.senderPublicKey)
+            }
+        }
+        EventBus.subscribe<Event.Testnet.TestnetTariRequestError>(this) { event ->
+            wr.get()?.rootView?.post {
+                wr.get()?.testnetTariRequestError(event.errorMessage)
+            }
+        }
+        EventBus.subscribe<Event.Contact.ContactAddedOrUpdated>(this) {
+            wr.get()?.rootView?.post {
+                updateAllDataAndUI(restartBalanceUI = false)
+            }
+        }
     }
 
-    override fun onStart() {
-        super.onStart()
+    // endregion
+
+    // region service connection
+
+    private fun bindToWalletService() {
         // start service if not started yet
         if (walletService == null) {
             // start the wallet service
@@ -387,7 +425,17 @@ class HomeActivity : BaseActivity(),
         Logger.d("Connected to the wallet service.")
         isServiceConnected = true
         walletService = TariWalletService.Stub.asInterface(service)
-        initializeData()
+
+        AsyncTask.execute {
+            // update data
+            updateTxListData()
+            // balance info
+            updateBalanceInfoData()
+            // init list
+            wr.get()?.rootView?.post {
+                wr.get()?.initializeTxListUI()
+            }
+        }
     }
 
     /**
@@ -399,94 +447,165 @@ class HomeActivity : BaseActivity(),
         isServiceConnected = false
     }
 
+    // endregion
+
     /**
      * Called on swipe refresh.
      */
     override fun onRefresh() {
         recyclerView.isNestedScrollingEnabled = false
         AsyncTask.execute {
-            wr.get()?.updateData(restartBalanceViewController = false)
+            wr.get()?.updateAllDataAndUI(restartBalanceUI = false)
         }
     }
 
-    @SuppressLint("ClickableViewAccessibility")
-    override fun onDestroy() {
-        recyclerView.layoutManager = null
-        recyclerView.adapter = null
-        recyclerView.setOnTouchListener(null)
-        unbindService(this)
-        EventBus.unsubscribe(this)
-        super.onDestroy()
+    private val txListIsEmpty: Boolean
+        get() {
+            return completedTxs.isEmpty()
+                    && pendingInboundTxs.isEmpty()
+                    && pendingOutboundTxs.isEmpty()
+        }
+
+    /**
+     * Fetches transactions from the service & updates the lists.
+     */
+    private fun updateTxListData(): Boolean {
+        val error = WalletError()
+        val walletCompletedTxs = walletService!!.getCompletedTxs(error)
+        val walletPendingInboundTxs = walletService!!.getPendingInboundTxs(error)
+        val walletPendingOutboundTxs = walletService!!.getPendingOutboundTxs(error)
+        if (error.code != WalletErrorCode.NO_ERROR) {
+            TODO("Unhandled wallet error: ${error.code}")
+        }
+
+        completedTxs.clear()
+        completedTxs.addAll(walletCompletedTxs)
+        pendingInboundTxs.clear()
+        pendingInboundTxs.addAll(walletPendingInboundTxs)
+        pendingOutboundTxs.clear()
+        pendingOutboundTxs.addAll(walletPendingOutboundTxs)
+        return true
     }
 
     /**
-     * Called once and only after the service is connected.
+     * Prepares the
      */
-    private fun initializeData() {
-        completedTxs.clear()
-        completedTxs.addAll(walletService!!.completedTxs)
-        pendingInboundTxs.clear()
-        pendingInboundTxs.addAll(walletService!!.pendingInboundTxs)
-        pendingOutboundTxs.clear()
-        pendingOutboundTxs.addAll(walletService!!.pendingOutboundTxs)
-
-        if (completedTxs.isEmpty()
-            && pendingInboundTxs.isEmpty()
-            && pendingOutboundTxs.isEmpty()
-        ) {
-            rootView.post {
-                wr.get()?.playOnboardingAnim()
-            }
+    private fun initializeTxListUI() {
+        if (txListIsEmpty && !sharedPrefsWrapper.getOnboardingDisplayedAtHome()) {
+            isOnboarding = true
+            playOnboardingAnim()
+            sharedPrefsWrapper.setOnboardingDisplayedAtHome(true)
         } else {
             // display txs
-            val wr = WeakReference<HomeActivity>(this)
-            rootView.post {
-                wr.get()?.recyclerViewAdapter?.notifyDataChanged()
-                wr.get()?.runStartupAnimation()
+            recyclerViewAdapter.notifyDataChanged()
+            playNonOnboardingStartupAnim()
+            if (txListIsEmpty) {
+                showNoTxsTextView()
+                AsyncTask.execute {
+                    wr.get()?.requestTestnetTari()
+                }
+
+            }
+        }
+    }
+
+    private fun updateTxListUI() {
+        recyclerViewAdapter.notifyDataChanged()
+        swipeRefreshLayout.isRefreshing = false
+        recyclerView.isNestedScrollingEnabled = true
+        scrollListener.reset()
+        if (txListIsEmpty) {
+            showNoTxsTextView()
+        } else {
+            noTxsInfoTextView.visibility = View.GONE
+        }
+    }
+
+    private fun updateBalanceInfoData(): Boolean {
+        val error = WalletError()
+        // get balance
+        balanceInfo = walletService!!.getBalanceInfo(error)
+        if (error.code != WalletErrorCode.NO_ERROR) {
+            TODO("Unhandled wallet error: ${error.code}")
+        }
+        return true
+    }
+
+    private fun updateBalanceInfoUI(restart: Boolean) {
+        if (restart) {
+            balanceDigitContainerView.removeAllViews()
+            balanceDecimalDigitContainerView.removeAllViews()
+            balanceViewController =
+                BalanceViewController(
+                    this,
+                    balanceDigitContainerView,
+                    balanceDecimalDigitContainerView,
+                    balanceInfo.availableBalance.tariValue // initial value
+                )
+            // show digits
+            balanceViewController.runStartupAnimation()
+        } else {
+            balanceViewController.balance = balanceInfo.availableBalance.tariValue
+        }
+    }
+
+    /**
+     * Updates all displayed data & UI.
+     *
+     * @param restartBalanceUI plays the balance animation anew
+     */
+    private fun updateAllDataAndUI(restartBalanceUI: Boolean) {
+        AsyncTask.execute {
+            updateTxListData()
+            updateBalanceInfoData()
+            wr.get()?.rootView?.post {
+                wr.get()?.updateBalanceInfoUI(restartBalanceUI)
+                wr.get()?.updateTxListUI()
             }
         }
     }
 
     /**
-     * Updates displayed data.
-     *
-     * @param restartBalanceViewController plays the balance animation anew
+     * The startup animation - reveals the list, balance and other views.
      */
-    private fun updateData(restartBalanceViewController: Boolean) {
-        // txs
-        completedTxs.clear()
-        completedTxs.addAll(walletService!!.completedTxs)
-        pendingInboundTxs.clear()
-        pendingInboundTxs.addAll(walletService!!.pendingInboundTxs)
-        pendingOutboundTxs.clear()
-        pendingOutboundTxs.addAll(walletService!!.pendingOutboundTxs)
-        val totalNoOfTxs = completedTxs.size + pendingInboundTxs.size + pendingOutboundTxs.size
+    private fun playNonOnboardingStartupAnim() {
+        topContentContainerView.visibility = View.VISIBLE
 
-        // balance
-        val balanceInfo = walletService!!.balanceInfo
-        rootView.post {
-            if (restartBalanceViewController) {
-                wr.get()?.resetBalanceViewController()
-            } else {
-                wr.get()?.balanceViewController?.balance = balanceInfo.availableBalance.tariValue
-            }
-            wr.get()?.recyclerViewAdapter?.notifyDataChanged()
-            wr.get()?.swipeRefreshLayout?.isRefreshing = false
-            wr.get()?.recyclerView?.isNestedScrollingEnabled = true
-            wr.get()?.scrollListener?.reset()
-            if (totalNoOfTxs == 0) {
-                wr.get()?.showNoTxsTextView()
-            } else {
-                wr.get()?.noTxsInfoTextView?.visibility = View.GONE
-            }
+        // initialize the balance view controller
+        updateBalanceInfoUI(true)
+
+        // show button and list
+        val sendTariButtonMarginDelta =
+            sendTariButtonVisibleBottomMargin - sendTariButtonInitialBottomMargin
+        val anim = ValueAnimator.ofFloat(
+            0.0f,
+            1.0f
+        )
+
+        scrollView.scrollToTop()
+        anim.addUpdateListener { valueAnimator: ValueAnimator ->
+            // value will run from 0.0 to 1.0
+            val value = valueAnimator.animatedValue as Float
+
+            // animate the list (will move upwards)
+            scrollContentView.y = scrollViewStartupAnimHeight * (1 - value)
+            scrollContentView.alpha = value
+            sendTariButton.alpha = value
+
+            // animate the send tari button (will move upwards)
+            UiUtil.setBottomMargin(
+                sendTariButton,
+                (sendTariButtonInitialBottomMargin + value * sendTariButtonMarginDelta).toInt()
+            )
+            sendTariButtonBgGradientView.alpha = value
+            // reveal balance title, QR code button and balance gem image
+            balanceTitleTextView.alpha = value
+            userWalletInfoButton.alpha = value
+            balanceGemImageView.alpha = value
         }
-    }
-
-    private fun showNoTxsTextView() {
-        noTxsInfoTextView.alpha = 0f
-        noTxsInfoTextView.visibility = View.VISIBLE
-        val anim = ObjectAnimator.ofFloat(noTxsInfoTextView, "alpha", 0f, 1f)
-        anim.duration = Constants.UI.mediumAnimDurationMs
+        sendTariButtonIsVisible = true
+        anim.duration = Constants.UI.Home.startupAnimDurationMs
+        anim.interpolator = EasingInterpolator(Ease.EASE_IN_OUT_EXPO)
         anim.start()
     }
 
@@ -494,13 +613,13 @@ class HomeActivity : BaseActivity(),
      * Play onboarding animation.
      */
     private fun playOnboardingAnim() {
-        isOnboarding = true
         onboardingContentView.visibility = View.VISIBLE
         scrollView.translationY = scrollView.height.toFloat()
         swipeRefreshLayout.isEnabled = false
+        hideSendTariButtonAnimated()
 
+        updateBalanceInfoData()
         // initialize the balance view controller
-        val balanceInfo = walletService!!.balanceInfo
         balanceViewController =
             BalanceViewController(
                 this,
@@ -511,8 +630,8 @@ class HomeActivity : BaseActivity(),
 
         scrollView.scrollTo(0, scrollView.height)
         scrollView.translationY = scrollView.height.toFloat()
-        scrollView.visibility = View.VISIBLE
-
+        scrollContentView.alpha = 1f
+        // scroll view translation animation
         val scrollViewTransAnim =
             ObjectAnimator.ofFloat(
                 scrollView,
@@ -520,13 +639,13 @@ class HomeActivity : BaseActivity(),
                 scrollView.height.toFloat(),
                 0f
             )
-
+        // background fade animation
         val blackBgViewFadeAnim = ValueAnimator.ofFloat(0f, 1f)
         blackBgViewFadeAnim.addUpdateListener { valueAnimator: ValueAnimator ->
             val value = valueAnimator.animatedValue as Float
             txListBgOverlayView.alpha = value
         }
-
+        // the animation set
         val animSet = AnimatorSet()
         animSet.playTogether(
             scrollViewTransAnim,
@@ -544,80 +663,85 @@ class HomeActivity : BaseActivity(),
         animSet.start()
     }
 
-    private fun showTariBotSentSomeTariDialog() {
-        val mBottomSheetDialog = Dialog(this, R.style.Theme_AppCompat_Dialog)
-
-        mBottomSheetDialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-        mBottomSheetDialog.setContentView(R.layout.home_dialog_tari_bot_sent_tari)
-        mBottomSheetDialog.setCancelable(false)
-        mBottomSheetDialog.window!!.setLayout(
-            LinearLayout.LayoutParams.MATCH_PARENT,
-            LinearLayout.LayoutParams.WRAP_CONTENT
-        )
-        mBottomSheetDialog.findViewById<TextView>(R.id.home_tari_bot_dialog_txt_try_later)
-            .setOnClickListener { mBottomSheetDialog.dismiss() }
-
-        mBottomSheetDialog.window!!.setGravity(Gravity.BOTTOM)
-        mBottomSheetDialog.show()
+    private fun showNoTxsTextView() {
+        noTxsInfoTextView.alpha = 0f
+        noTxsInfoTextView.visibility = View.VISIBLE
+        val anim = ObjectAnimator.ofFloat(noTxsInfoTextView, "alpha", 0f, 1f)
+        anim.duration = Constants.UI.mediumAnimDurationMs
+        anim.start()
     }
 
-    /**
-     * The startup animation - reveals the list, balance and other views.
-     */
-    private fun runStartupAnimation() {
-        sendTariButton.visibility = View.VISIBLE
-        topContentContainerView.visibility = View.VISIBLE
-        scrollView.visibility = View.VISIBLE
-
-        // initialize the balance view controller
-        resetBalanceViewController()
-
-        // show digits
-        balanceViewController.runStartupAnimation()
-
-        // show button and list
-        val sendTariButtonMarginDelta =
-            sendTariButtonVisibleBottomMargin - sendTariButtonInitialBottomMargin
-        // animator runs from 0.0 (begin) to 1.0 (completion)
-
-        val listAnim = ValueAnimator.ofFloat(
-            0.0f,
-            1.0f
-        )
-        listAnim.addUpdateListener { valueAnimator: ValueAnimator ->
-            // value will run from 0.0 to 1.0
-            val value = valueAnimator.animatedValue as Float
-            // animate the list (will move upwards)
-            scrollView.y = scrollViewStartupAnimHeight * (1 - value)
-            scrollView.alpha = value
-            // animate the send tari button (will move upwards)
-            UiUtil.setBottomMargin(
-                sendTariButton,
-                (sendTariButtonInitialBottomMargin + value * sendTariButtonMarginDelta).toInt()
-            )
-            sendTariButtonBgGradientView.alpha = value
-            // reveal balance title, QR code button and balance gem image
-            balanceTitleTextView.alpha = value
-            userWalletInfoButton.alpha = value
-            balanceGemImageView.alpha = value
+    private fun requestTestnetTari() {
+        testnetTariRequestIsInProgress = true
+        val error = WalletError()
+        walletService!!.requestTestnetTari(error)
+        if (error.code != WalletErrorCode.NO_ERROR) {
+            TODO("Unhandled wallet error: ${error.code}")
         }
-        listAnim.duration = Constants.UI.Home.startupAnimDurationMs
-        listAnim.interpolator = EasingInterpolator(Ease.EASE_IN_OUT_EXPO)
-        listAnim.start()
     }
 
-    private fun resetBalanceViewController() {
-        balanceDigitContainerView.removeAllViews()
-        balanceDecimalDigitContainerView.removeAllViews()
-        balanceViewController =
-            BalanceViewController(
-                this,
-                balanceDigitContainerView,
-                balanceDecimalDigitContainerView,
-                walletService!!.balanceInfo.availableBalance.tariValue // initial value
+    private fun testnetTariRequestSuccessful(senderPublicKey: PublicKey) {
+        updateAllDataAndUI(restartBalanceUI = false)
+        // display dialog
+        uiHandler.postDelayed({
+            showTestnetTariReceivedDialog(senderPublicKey)
+        }, Constants.UI.Home.showTariBotDialogDelayMs)
+        testnetTariRequestIsInProgress = false
+    }
+
+    private fun testnetTariRequestError(errorMessage: String) {
+        Toast.makeText(this, errorMessage, Toast.LENGTH_LONG).show()
+        testnetTariRequestIsInProgress = false
+        showSendTariButtonAnimated()
+    }
+
+    private fun showTestnetTariReceivedDialog(senderPublicKey: PublicKey) {
+        Dialog(this, R.style.Theme_AppCompat_Dialog).apply {
+            window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+            setContentView(R.layout.home_dialog_testnet_tari_received)
+            setCancelable(false)
+            window!!.setLayout(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
             )
-        // show digits
-        balanceViewController.runStartupAnimation()
+            findViewById<TextView>(R.id.home_tari_bot_dialog_txt_try_later)
+                .setOnClickListener {
+                    dismiss()
+                    rootView.postDelayed({
+                        showSendTariButtonAnimated()
+                    }, Constants.UI.shortAnimDurationMs)
+                }
+            findViewById<TextView>(R.id.home_tari_bot_dialog_btn_send_tari)
+                .setOnClickListener {
+                    dismiss()
+                    sendTariToTestnetSender(senderPublicKey)
+                    rootView.postDelayed({
+                        showSendTariButtonAnimated()
+                    }, Constants.UI.longAnimDurationMs)
+
+                }
+            window!!.setGravity(Gravity.BOTTOM)
+            show()
+        }
+    }
+
+    private fun sendTariToTestnetSender(senderPublicKey: PublicKey) {
+        val intent = Intent(this@HomeActivity, SendTariActivity::class.java)
+        // attach contact
+        val error = WalletError()
+        val contacts = walletService!!.getContacts(error)
+        if (error.code != WalletErrorCode.NO_ERROR) {
+            TODO("Unhandled wallet error: ${error.code}")
+        }
+        for (contact in contacts) {
+            if (senderPublicKey.hexString == contact.publicKey.hexString) {
+                intent.putExtra("recipientUser", contact)
+                break
+            }
+        }
+
+        startActivity(intent)
+        overridePendingTransition(R.anim.enter_from_right, R.anim.exit_to_left)
     }
 
     /**
@@ -633,37 +757,10 @@ class HomeActivity : BaseActivity(),
     @OnClick(R.id.home_btn_send_tari)
     fun sendTariButtonClicked(view: View) {
         UiUtil.temporarilyDisableClick(view)
-        animateSendTariButtonClick(
+        animateSendTariButtonOnClick(
             Constants.UI.Button.clickScaleAnimFullScale,
             Constants.UI.Button.clickScaleAnimSmallScale
         )
-    }
-
-    /**
-     * Called when a tx is sent successfully.
-     */
-    private fun onSendTxSuccessful() {
-        scrollView.scrollTo(0, 0)
-        recyclerView.scrollToPosition(0)
-        val topMargin = rootView.height - txListContainerMinimizedTopMargin
-        UiUtil.setTopMargin(scrollView, topMargin)
-        val anim = ValueAnimator.ofInt(
-            topMargin,
-            0
-        )
-        anim.addUpdateListener { valueAnimator: ValueAnimator ->
-            val value = valueAnimator.animatedValue as Int
-            UiUtil.setTopMargin(
-                scrollView,
-                value
-            )
-        }
-        anim.duration = Constants.UI.longAnimDurationMs
-        anim.interpolator = EasingInterpolator(Ease.EASE_OUT_EXPO)
-        anim.start()
-
-        // update data
-        updateData(restartBalanceViewController = true)
     }
 
     private fun endOnboarding() {
@@ -671,32 +768,39 @@ class HomeActivity : BaseActivity(),
         onboardingContentView.visibility = View.GONE
         txListHeaderView.visibility = View.VISIBLE
         swipeRefreshLayout.isEnabled = true
-        updateData(restartBalanceViewController = false)
+        updateAllDataAndUI(restartBalanceUI = false)
         // request Testnet Tari if no txs
-        if (completedTxs.isEmpty()
-            && pendingInboundTxs.isEmpty()
-            && pendingOutboundTxs.isEmpty()
-        ) {
+        if (txListIsEmpty) {
             wr.get()?.requestTestnetTari()
+        } else {
+            showSendTariButtonAnimated()
         }
     }
 
-    private fun requestTestnetTari() {
+    /**
+     * Called when a tx is sent successfully.
+     */
+    private fun onSendTxSuccessful() {
+        scrollView.scrollToTop()
+        recyclerView.scrollToPosition(0)
+        val topMargin = rootView.height - txListContainerMinimizedTopMargin
+        scrollContentView.y = topMargin.toFloat()
+        val anim = ValueAnimator.ofInt(
+            topMargin,
+            0
+        )
+        anim.addUpdateListener { valueAnimator: ValueAnimator ->
+            val value = valueAnimator.animatedValue as Int
+            scrollContentView.y = value.toFloat()
+        }
+        anim.duration = Constants.UI.longAnimDurationMs
+        anim.interpolator = EasingInterpolator(Ease.EASE_OUT_EXPO)
+        anim.start()
+
+        // update data
         AsyncTask.execute {
-            walletService!!.requestTestnetTari()
+            updateAllDataAndUI(restartBalanceUI = true)
         }
-    }
-
-    private fun testnetTariRequestSuccessful() {
-        updateData(restartBalanceViewController = false)
-        uiHandler.postDelayed({
-            showTariBotSentSomeTariDialog()
-            sendTariButton.visibility = View.VISIBLE
-        }, Constants.UI.Home.showTariBotDialogDelayMs)
-    }
-
-    private fun testnetTariRequestError(errorMessage: String) {
-        Toast.makeText(this, errorMessage, Toast.LENGTH_LONG).show()
     }
 
     /**
@@ -719,7 +823,7 @@ class HomeActivity : BaseActivity(),
 
     override fun onAnimationEnd(animation: Animation?) {
         if (sendTariButtonClickAnimIsRunning) { // bounce back the button
-            animateSendTariButtonClick(
+            animateSendTariButtonOnClick(
                 Constants.UI.Button.clickScaleAnimSmallScale,
                 Constants.UI.Button.clickScaleAnimFullScale
             )
@@ -753,18 +857,17 @@ class HomeActivity : BaseActivity(),
     @OnLongClick(R.id.home_vw_grabber_container)
     fun grabberContainerViewLongClicked() {
         val intent = Intent(this, DebugLogActivity::class.java)
-        intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
-        intent.putExtra("log", wr.get()?.walletService?.logFilePath)
         startActivity(intent)
     }
 
     /**
      * Reveals the send tari button with animation after a specified delay time in ms.
      */
-    private fun showSendTariButton() {
+    private fun showSendTariButtonAnimated() {
         if (sendTariButtonIsVisible) {
             return
         }
+        sendTariButton.alpha = 1f
         val initialMargin = UiUtil.getBottomMargin(sendTariButton)
         val marginDelta = sendTariButtonVisibleBottomMargin - UiUtil.getBottomMargin(sendTariButton)
         val anim = ValueAnimator.ofFloat(
@@ -788,7 +891,7 @@ class HomeActivity : BaseActivity(),
     /**
      * Hides the send tari button with animation after a specified delay time in ms.
      */
-    private fun hideSendTariButton() {
+    private fun hideSendTariButtonAnimated() {
         if (!sendTariButtonIsVisible) {
             return
         }
@@ -812,7 +915,7 @@ class HomeActivity : BaseActivity(),
         sendTariButtonIsVisible = false
     }
 
-    private fun animateSendTariButtonClick(startScale: Float, endScale: Float) {
+    private fun animateSendTariButtonOnClick(startScale: Float, endScale: Float) {
         val anim: Animation = ScaleAnimation(
             startScale, endScale,  // start and end values for the X axis scaling
             startScale, endScale,  // start and end values for the Y axis scaling
@@ -869,6 +972,7 @@ class HomeActivity : BaseActivity(),
         return false
     }
 
+
     /**
      * Scroll-related UI changes.
      */
@@ -915,17 +1019,23 @@ class HomeActivity : BaseActivity(),
                 endOnboarding()
             }
         }
-        if (scrollY > oldScrollY) {
-            hideSendTariButton()
-        } else if (scrollY < oldScrollY) {
-            showSendTariButton()
+        if (scrollY > oldScrollY
+            && !isOnboarding
+            && !testnetTariRequestIsInProgress
+        ) {
+            hideSendTariButtonAnimated()
+        } else if (scrollY < oldScrollY
+            && !isOnboarding
+            && !testnetTariRequestIsInProgress
+        ) {
+            showSendTariButtonAnimated()
         }
     }
 
     // region scroll depth gradient view controls
 
     fun onRecyclerViewScrolled(totalDeltaY: Int) {
-        scrollDepthView.alpha = min(
+        headerElevationView.alpha = min(
             Constants.UI.scrollDepthShadowViewMaxOpacity,
             totalDeltaY / listItemHeight.toFloat()
         )

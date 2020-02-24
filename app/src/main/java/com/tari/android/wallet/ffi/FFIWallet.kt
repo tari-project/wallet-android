@@ -34,7 +34,7 @@ package com.tari.android.wallet.ffi
 
 import android.util.Log
 import com.orhanobut.logger.Logger
-import java.io.InvalidObjectException
+import com.tari.android.wallet.model.WalletErrorCode.*
 import java.math.BigInteger
 
 /**
@@ -184,6 +184,7 @@ internal abstract class FFIWallet(commsConfig: FFICommsConfig, logPath: String) 
     init {
         if (ptr == nullptr) { // so it can only be assigned once for the singleton
             val error = FFIError()
+            Logger.e("Pre jniCreate.")
             ptr = jniCreate(
                 commsConfig.getPointer(), logPath,
                 this::onTxReceived.name, "(J)V",
@@ -194,10 +195,9 @@ internal abstract class FFIWallet(commsConfig: FFICommsConfig, logPath: String) 
                 this::onDiscoveryComplete.name, "([BZ)V",
                 error
             )
+            Logger.e("Post jniCreate.")
             Log.i("Wallet Code", error.code.toString())
-            if (error.code != 0) {
-                throw InvalidObjectException("Failure to create Wallet")
-            }
+            throwIf(error)
         }
     }
 
@@ -208,99 +208,77 @@ internal abstract class FFIWallet(commsConfig: FFICommsConfig, logPath: String) 
     fun getAvailableBalance(): BigInteger {
         val error = FFIError()
         val bytes = jniGetAvailableBalance(ptr, error)
-        if (error.code != 0) {
-            throw RuntimeException()
-        }
+        throwIf(error)
         return BigInteger(1, bytes)
     }
 
     fun getPendingIncomingBalance(): BigInteger {
         val error = FFIError()
         val bytes = jniGetPendingIncomingBalance(ptr, error)
-        if (error.code != 0) {
-            throw RuntimeException()
-        }
+        throwIf(error)
         return BigInteger(1, bytes)
     }
 
     fun getPendingOutgoingBalance(): BigInteger {
         val error = FFIError()
         val bytes = jniGetPendingOutgoingBalance(ptr, error)
-        if (error.code != 0) {
-            throw RuntimeException()
-        }
+        throwIf(error)
         return BigInteger(1, bytes)
     }
 
     fun getPublicKey(): FFIPublicKey {
         val error = FFIError()
         val result = FFIPublicKey(jniGetPublicKey(ptr, error))
-        if (error.code != 0) {
-            throw RuntimeException()
-        }
+        throwIf(error)
         return result
     }
 
     fun getContacts(): FFIContacts {
         val error = FFIError()
         val result = FFIContacts(jniGetContacts(ptr, error))
-        if (error.code != 0) {
-            throw RuntimeException()
-        }
+        throwIf(error)
         return result
     }
 
     fun addUpdateContact(contact: FFIContact): Boolean {
         val error = FFIError()
         val result = jniAddUpdateContact(ptr, contact.getPointer(), error)
-        if (error.code != 0) {
-            throw RuntimeException()
-        }
+        throwIf(error)
         return result
     }
 
     fun removeContact(contact: FFIContact): Boolean {
         val error = FFIError()
         val result = jniRemoveContact(ptr, contact.getPointer(), error)
-        if (error.code != 0) {
-            throw RuntimeException()
-        }
+        throwIf(error)
         return result
     }
 
     fun isCompletedTxOutbound(completedTx: FFICompletedTx): Boolean {
         val error = FFIError()
         val result = jniIsCompletedTxOutbound(ptr, completedTx.getPointer(), error)
-        if (error.code != 0) {
-            throw RuntimeException()
-        }
+        throwIf(error)
         return result
     }
 
     fun getCompletedTxs(): FFICompletedTxs {
         val error = FFIError()
         val result = FFICompletedTxs(jniGetCompletedTxs(ptr, error))
-        if (error.code != 0) {
-            throw RuntimeException()
-        }
+        throwIf(error)
         return result
     }
 
     fun getCompletedTxById(id: BigInteger): FFICompletedTx {
         val error = FFIError()
         val result = FFICompletedTx(jniGetCompletedTxById(ptr, id.toString(), error))
-        if (error.code != 0) {
-            throw RuntimeException()
-        }
+        throwIf(error)
         return result
     }
 
     fun getPendingOutboundTxs(): FFIPendingOutboundTxs {
         val error = FFIError()
         val result = FFIPendingOutboundTxs(jniGetPendingOutboundTxs(ptr, error))
-        if (error.code != 0) {
-            throw RuntimeException()
-        }
+        throwIf(error)
         return result
     }
 
@@ -308,31 +286,25 @@ internal abstract class FFIWallet(commsConfig: FFICommsConfig, logPath: String) 
         val error = FFIError()
         val result =
             FFIPendingOutboundTx(jniGetPendingOutboundTxById(ptr, id.toString(), error))
-        if (error.code != 0) {
-            throw RuntimeException()
-        }
+        throwIf(error)
         return result
     }
 
     fun getPendingInboundTxs(): FFIPendingInboundTxs {
         val error = FFIError()
         val result = FFIPendingInboundTxs(jniGetPendingInboundTxs(ptr, error))
-        if (error.code != 0) {
-            throw RuntimeException()
-        }
+        throwIf(error)
         return result
     }
 
     fun getPendingInboundTxById(id: BigInteger): FFIPendingInboundTx {
         val error = FFIError()
         val result = FFIPendingInboundTx(jniGetPendingInboundTxById(ptr, id.toString(), error))
-        if (error.code != 0) {
-            throw RuntimeException()
-        }
+        throwIf(error)
         return result
     }
 
-    private fun onTxBroadcast(ptr: FFICompletedTxPtr) {
+    protected fun onTxBroadcast(ptr: FFICompletedTxPtr) {
         Logger.i("Tx completed. Pointer: %s", ptr.toString())
         val tx = FFICompletedTx(ptr)
         val id = tx.getId()
@@ -340,35 +312,35 @@ internal abstract class FFIWallet(commsConfig: FFICommsConfig, logPath: String) 
         listenerAdapter?.onTxBroadcast(id)
     }
 
-    private fun onTxMined(ptr: FFICompletedTxPtr) {
+    protected fun onTxMined(ptr: FFICompletedTxPtr) {
         Logger.i("Tx mined. Pointer: %s", ptr.toString())
         val tx = FFICompletedTx(ptr)
         listenerAdapter?.onTxMined(tx.getId())
         tx.destroy()
     }
 
-    private fun onTxReceived(ptr: FFIPendingInboundTxPtr) {
+    protected fun onTxReceived(ptr: FFIPendingInboundTxPtr) {
         Logger.i("Tx received. Pointer: %s", ptr.toString())
         val tx = FFIPendingInboundTx(ptr)
         listenerAdapter?.onTxReceived(tx.getId())
         tx.destroy()
     }
 
-    private fun onTxReplyReceived(ptr: FFICompletedTxPtr) {
+    protected fun onTxReplyReceived(ptr: FFICompletedTxPtr) {
         Logger.i("Tx reply received. Pointer: %s", ptr.toString())
         val tx = FFICompletedTx(ptr)
         listenerAdapter?.onTxReplyReceived(tx.getId())
         tx.destroy()
     }
 
-    private fun onTxFinalized(ptr: FFICompletedTxPtr) {
+    protected fun onTxFinalized(ptr: FFICompletedTxPtr) {
         Logger.i("Tx finalized. Pointer: %s", ptr.toString())
         val tx = FFICompletedTx(ptr)
         listenerAdapter?.onTxFinalized(tx.getId())
         tx.destroy()
     }
 
-    private fun onDiscoveryComplete(bytes: ByteArray, success: Boolean) {
+    protected fun onDiscoveryComplete(bytes: ByteArray, success: Boolean) {
         Logger.i("Tx discovery complete. Success: $success")
         val txId = BigInteger(1, bytes)
         listenerAdapter?.onDiscoveryComplete(txId, success)
@@ -382,13 +354,13 @@ internal abstract class FFIWallet(commsConfig: FFICommsConfig, logPath: String) 
     ): Boolean {
         val minimumLibFee = 100L
         if (fee < BigInteger.valueOf(minimumLibFee)) {
-            throw RuntimeException("Fee is less than the minimum of $minimumLibFee taris.")
+            throw FFIException(message = "Fee is less than the minimum of $minimumLibFee taris.")
         }
         if (amount < BigInteger.valueOf(0L)) {
-            throw RuntimeException("Amount is less than 0.")
+            throw FFIException(message = "Amount is less than 0.")
         }
         if (destination == getPublicKey()) {
-            throw RuntimeException("Tx source and destination are the same.")
+            throw FFIException(message = "Tx source and destination are the same.")
         }
         val error = FFIError()
         val result = jniSendTx(
@@ -399,19 +371,18 @@ internal abstract class FFIWallet(commsConfig: FFICommsConfig, logPath: String) 
             message,
             error
         )
-        // TODO ignore error#210 until the base node is ready
-        if (error.code != 0) {
-            throw RuntimeException()
+        if (error.code == OUTBOUND_SEND_DISCOVERY_IN_PROGRESS.code) {
+            // TODO store the placeholder transaction in local storage until the discovery is complete
+            return true
         }
+        throwIf(error)
         return result
     }
 
     fun signMessage(message: String): String {
         val error = FFIError()
         val result = jniSignMessage(ptr, message, error)
-        if (error.code != 0) {
-            throw RuntimeException()
-        }
+        throwIf(error)
         return result
     }
 
@@ -423,9 +394,7 @@ internal abstract class FFIWallet(commsConfig: FFICommsConfig, logPath: String) 
         val error = FFIError()
         val result =
             jniVerifyMessageSignature(ptr, contactPublicKey.getPointer(), message, signature, error)
-        if (error.code != 0) {
-            throw RuntimeException()
-        }
+        throwIf(error)
         return result
     }
 
@@ -444,9 +413,7 @@ internal abstract class FFIWallet(commsConfig: FFICommsConfig, logPath: String) 
             message,
             error
         )
-        if (error.code != 0) {
-            throw RuntimeException()
-        }
+        throwIf(error)
         return BigInteger(1, bytes)
     }
 

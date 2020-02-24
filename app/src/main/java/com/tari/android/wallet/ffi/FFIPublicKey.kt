@@ -32,8 +32,6 @@
  */
 package com.tari.android.wallet.ffi
 
-import java.util.*
-
 internal typealias FFIPublicKeyPtr = Long
 
 /**
@@ -66,29 +64,23 @@ internal class FFIPublicKey constructor(pointer: FFIPublicKeyPtr): FFIBase() {
     constructor(byteVector: FFIByteVector) : this(nullptr) {
         val error = FFIError()
         ptr = jniCreate(byteVector.getPointer(), error)
-        if (error.code != 0) {
-            throw RuntimeException()
-        }
+        throwIf(error)
     }
 
     constructor(hex: HexString) : this(nullptr) {
         if (hex.toString().length == 64) {
             val error = FFIError()
             ptr = jniFromHex(hex.hex, error)
-            if (error.code != 0) {
-                throw RuntimeException()
-            }
+            throwIf(error)
         } else {
-            throw InvalidPropertiesFormatException("HexString is not a valid PublicKey")
+            throw FFIException(message = "HexString is not a valid PublicKey")
         }
     }
 
     constructor(privateKey: FFIPrivateKey) : this(nullptr) {
         val error = FFIError()
         ptr = jniFromPrivateKey(privateKey.getPointer(), error)
-        if (error.code != 0) {
-            throw RuntimeException()
-        }
+        throwIf(error)
     }
 
     fun getPointer(): FFIPublicKeyPtr {
@@ -98,27 +90,21 @@ internal class FFIPublicKey constructor(pointer: FFIPublicKeyPtr): FFIBase() {
     fun getBytes(): FFIByteVector {
         val error = FFIError()
         val result = FFIByteVector(jniGetBytes(ptr, error))
-        if (error.code != 0) {
-            throw RuntimeException()
-        }
+        throwIf(error)
         return result
     }
 
     fun getEmojiNodeId(): String {
         val error = FFIError()
         val result = jniGetEmojiNodeId(ptr, error)
-        if (error.code != 0) {
-            throw RuntimeException()
-        }
+        throwIf(error)
         return result
     }
 
     override fun toString(): String {
         val error = FFIError()
         val result = FFIByteVector(jniGetBytes(ptr, error)).toString()
-        if (error.code != 0) {
-            throw RuntimeException()
-        }
+        throwIf(error)
         return result
     }
 

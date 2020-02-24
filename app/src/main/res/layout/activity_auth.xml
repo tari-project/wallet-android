@@ -17,7 +17,8 @@
         app:lottie_autoPlay="false"
         app:lottie_enableMergePathsForKitKatAndAbove="true"
         app:lottie_loop="false"
-        app:lottie_rawRes="@raw/splash_anim" />
+        app:lottie_rawRes="@raw/splash_anim"
+        app:lottie_renderMode="automatic" />
 
     <!-- the big gem to disappear -->
     <ImageView

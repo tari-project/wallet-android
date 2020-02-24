@@ -56,7 +56,7 @@ internal object Constants {
         object Button {
             const val clickScaleAnimFullScale = 1f
             const val clickScaleAnimSmallScale = .88f
-            const val clickScaleAnimDurationMs = 170L
+            const val clickScaleAnimDurationMs = 140L
             const val clickScaleAnimReturnDurationMs = 170L
             const val clickScaleAnimStartOffset = 0L
             const val clickScaleAnimReturnStartOffset = 120L
@@ -67,9 +67,7 @@ internal object Constants {
             const val digitAnimDurationMs = 700L
             const val digitShrinkExpandAnimDurationMs = 200L
             const val welcomeAnimationDurationMs = 800L
-            const val emptyWalletTxtFadeAnimDelayMs = 100L
-            const val showEmptyWalletFadeAnimDurationMs = 400L
-            const val showTariBotDialogDelayMs = 3000L
+            const val showTariBotDialogDelayMs = 2000L
         }
 
         object CreateEmojiId {
@@ -127,7 +125,6 @@ internal object Constants {
      */
     object Wallet {
         internal const val emojiIdLength = 13
-        internal const val emojiIdShortenedLength = 12
         internal const val emojiFormatterChunkSize = 4
         const val WALLET_DB_NAME: String = "tari_wallet_db"
         internal val WALLET_CONTROL_SERVICE_ADDRESS: NetAddressString =
