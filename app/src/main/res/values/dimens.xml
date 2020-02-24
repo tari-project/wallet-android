@@ -45,4 +45,6 @@
     <dimen name="add_note_slide_button_left_margin">5dp</dimen>
     <dimen name="add_note_slide_button_width">43dp</dimen>
 
+    <!-- wallet info -->
+    <dimen name="wallet_info_img_qr_code_size">300dp</dimen>
 </resources>

@@ -7,7 +7,6 @@
     <color name="accent">#D81B60</color>
     <color name="gray_background">#f6f6f6</color>
 
-
     <!-- common -->
     <color name="black">#000000</color>
     <color name="white">#FFFFFF</color>
@@ -51,6 +50,10 @@
 
     <!-- Debug Log -->
     <color name="terminal_green">#4AF626</color>
+
+    <!-- Wallet info -->
+    <color name="wallet_info_qr_code_desc">#7f8599</color>
+    <color name="wallet_info_emoji_id_summary_divider">#979797</color>
 
     <!-- transaction detail -->
     <color name="tx_detail_contact_name_label_text">#B2B2B2</color>

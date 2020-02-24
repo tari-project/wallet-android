@@ -39,6 +39,7 @@ import com.tari.android.wallet.application.TariWalletApplication
 import com.tari.android.wallet.ui.activity.log.DebugLogActivity
 import com.tari.android.wallet.ui.activity.onboarding.OnBoardingFlowActivity
 import com.tari.android.wallet.ui.activity.send.SendTariActivity
+import com.tari.android.wallet.ui.activity.walletinfo.WalletInfoActivity
 import com.tari.android.wallet.ui.activity.tx.TxDetailActivity
 
 /**
@@ -62,6 +63,7 @@ abstract class BaseActivity : AppCompatActivity() {
             is DebugLogActivity -> component.inject(this)
             is SendTariActivity -> component.inject(this)
             is TxDetailActivity -> component.inject(this)
+            is WalletInfoActivity -> component.inject(this)
         }
         // bind views
         setContentView(contentViewId)

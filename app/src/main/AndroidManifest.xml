@@ -94,6 +94,13 @@
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme"
             android:windowSoftInputMode="adjustResize" />
+        <!-- wallet info -->
+        <activity
+            android:name=".ui.activity.walletinfo.WalletInfoActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme"
+            android:windowSoftInputMode="adjustResize" />
         <!-- transaction detail -->
         <activity
             android:name=".ui.activity.tx.TxDetailActivity"

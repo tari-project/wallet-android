@@ -81,6 +81,7 @@ import com.tari.android.wallet.ui.activity.BaseActivity
 import com.tari.android.wallet.ui.activity.home.adapter.TxListAdapter
 import com.tari.android.wallet.ui.activity.log.DebugLogActivity
 import com.tari.android.wallet.ui.activity.send.SendTariActivity
+import com.tari.android.wallet.ui.activity.walletinfo.WalletInfoActivity
 import com.tari.android.wallet.ui.activity.tx.TxDetailActivity
 import com.tari.android.wallet.ui.util.UiUtil
 import com.tari.android.wallet.util.Constants
@@ -140,8 +141,8 @@ class HomeActivity : BaseActivity(),
     lateinit var balanceTitleTextView: TextView
     @BindView(R.id.home_img_balance_gem)
     lateinit var balanceGemImageView: ImageView
-    @BindView(R.id.home_img_btn_profile)
-    lateinit var userProfileButton: ImageButton
+    @BindView(R.id.home_img_wallet_info)
+    lateinit var userWalletInfoButton: ImageView
 
     // Balance digit containers.
     @BindView(R.id.home_vw_balance_digit_container)
@@ -310,7 +311,7 @@ class HomeActivity : BaseActivity(),
         sendTariButtonBgGradientView.alpha = 0f
 
         balanceTitleTextView.alpha = 0f
-        userProfileButton.alpha = 0f
+        userWalletInfoButton.alpha = 0f
         balanceGemImageView.alpha = 0f
         noTxsInfoTextView.visibility = View.GONE
 
@@ -536,7 +537,7 @@ class HomeActivity : BaseActivity(),
             onEnd = {
                 wr.get()?.topContentContainerView?.visibility = View.VISIBLE
                 wr.get()?.balanceTitleTextView?.alpha = 1f
-                wr.get()?.userProfileButton?.alpha = 1f
+                wr.get()?.userWalletInfoButton?.alpha = 1f
                 wr.get()?.balanceGemImageView?.alpha = 1f
             }
         )
@@ -597,7 +598,7 @@ class HomeActivity : BaseActivity(),
             sendTariButtonBgGradientView.alpha = value
             // reveal balance title, QR code button and balance gem image
             balanceTitleTextView.alpha = value
-            userProfileButton.alpha = value
+            userWalletInfoButton.alpha = value
             balanceGemImageView.alpha = value
         }
         listAnim.duration = Constants.UI.Home.startupAnimDurationMs
@@ -620,11 +621,13 @@ class HomeActivity : BaseActivity(),
     }
 
     /**
-     * Opens user profile on button click.
+     * Opens user wallet info on button click.
      */
-    @OnClick(R.id.home_img_btn_profile)
-    fun profileImageButtonClicked(view: View) {
+    @OnClick(R.id.home_img_wallet_info)
+    fun walletInfoImageClicked(view: View) {
         UiUtil.temporarilyDisableClick(view)
+        val intent = Intent(this@HomeActivity, WalletInfoActivity::class.java)
+        startActivity(intent)
     }
 
     @OnClick(R.id.home_btn_send_tari)
@@ -840,9 +843,9 @@ class HomeActivity : BaseActivity(),
             scrollView.requestDisallowInterceptTouchEvent(true)
             // profile button - handle touch
             val rect = Rect()
-            userProfileButton.getGlobalVisibleRect(rect)
+            userWalletInfoButton.getGlobalVisibleRect(rect)
             if (rect.contains(event.rawX.toInt(), event.rawY.toInt())) {
-                userProfileButton.dispatchTouchEvent(event)
+                userWalletInfoButton.dispatchTouchEvent(event)
             }
             // event consumed
             return true
@@ -946,5 +949,4 @@ class HomeActivity : BaseActivity(),
     }
 
     // endregion
-
 }

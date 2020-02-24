@@ -41,6 +41,7 @@ import com.tari.android.wallet.ui.activity.home.HomeActivity
 import com.tari.android.wallet.ui.activity.log.DebugLogActivity
 import com.tari.android.wallet.ui.activity.onboarding.OnBoardingFlowActivity
 import com.tari.android.wallet.ui.activity.send.SendTariActivity
+import com.tari.android.wallet.ui.activity.walletinfo.WalletInfoActivity
 import com.tari.android.wallet.ui.activity.tx.TxDetailActivity
 import com.tari.android.wallet.ui.fragment.onboarding.CreateEmojiIdFragment
 import com.tari.android.wallet.ui.fragment.onboarding.CreateWalletFragment
@@ -82,6 +83,7 @@ interface ApplicationComponent {
     fun inject(activity: QRScannerActivity)
     fun inject(activity: DebugLogActivity)
     fun inject(activity: SendTariActivity)
+    fun inject(activity: WalletInfoActivity)
     fun inject(activity: TxDetailActivity)
 
     /**
