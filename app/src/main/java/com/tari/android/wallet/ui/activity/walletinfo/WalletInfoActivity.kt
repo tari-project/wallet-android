@@ -32,9 +32,9 @@
  */
 package com.tari.android.wallet.ui.activity.walletinfo
 
-import android.content.ClipData
-import android.content.ClipboardManager
+import android.content.*
 import android.os.Bundle
+import android.os.IBinder
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
@@ -45,7 +45,8 @@ import butterknife.BindView
 import butterknife.OnClick
 import com.tari.android.wallet.R
 import com.tari.android.wallet.di.WalletModule
-import com.tari.android.wallet.ffi.FFIPublicKey
+import com.tari.android.wallet.service.TariWalletService
+import com.tari.android.wallet.service.WalletService
 import com.tari.android.wallet.ui.activity.BaseActivity
 import com.tari.android.wallet.ui.util.UiUtil
 import com.tari.android.wallet.util.EmojiUtil
@@ -58,7 +59,7 @@ import javax.inject.Named
  *
  * @author The Tari Development Team
  */
-class WalletInfoActivity : BaseActivity() {
+class WalletInfoActivity : BaseActivity(), ServiceConnection {
 
     @BindView(R.id.wallet_info_txt_emoji_container)
     lateinit var emojiContainerView: TextView
@@ -79,6 +80,8 @@ class WalletInfoActivity : BaseActivity() {
     @Named(WalletModule.FieldName.emojiId)
     lateinit var emojiId: String
 
+    private var walletService: TariWalletService? = null
+
     override val contentViewId = R.layout.activity_wallet_info
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -86,15 +89,20 @@ class WalletInfoActivity : BaseActivity() {
         setUpUi()
     }
 
+    override fun onStart() {
+        super.onStart()
+        // start service if not started yet
+        if (walletService == null) {
+            // bind to service
+            val bindIntent = Intent(this, WalletService::class.java)
+            bindService(bindIntent, this, Context.BIND_AUTO_CREATE)
+        }
+    }
+
     private fun setUpUi() {
         val shortEmojiId = EmojiUtil.getShortenedEmojiId(emojiId)!!
         val chunkedEmojiId = EmojiUtil.getChunkedEmojiId(shortEmojiId, emojiIdChunkSeparator)
         emojiContainerView.text = chunkedEmojiId
-
-        val content = WalletUtil.getQRContent(FFIPublicKey(emojiId).toString(), emojiId)
-        UiUtil.getQREncodedBitmap(content, qrCodeImageSize)?.let {
-            qrCodeImageView.setImageBitmap(it)
-        }
     }
 
     @OnClick(R.id.wallet_info_btn_close)
@@ -112,5 +120,29 @@ class WalletInfoActivity : BaseActivity() {
         val clip = ClipData.newPlainText("EmojiId", emojiId)
         clipBoard?.setPrimaryClip(clip)
         Toast.makeText(this, emojiIdCopiedToastMessage, Toast.LENGTH_SHORT).show()
+    }
+
+    override fun onDestroy() {
+        unbindService(this)
+        super.onDestroy()
+    }
+
+    override fun onServiceDisconnected(p0: ComponentName?) {
+        walletService = null
+    }
+
+    override fun onServiceConnected(p0: ComponentName?, service: IBinder?) {
+        walletService = TariWalletService.Stub.asInterface(service)
+        loadQrContentImage()
+    }
+
+    private fun loadQrContentImage() {
+        walletService?.publicKeyHexString?.let {
+            val content = WalletUtil.getQRContent(it, emojiId)
+            UiUtil.getQREncodedBitmap(content, qrCodeImageSize)?.let {
+                qrCodeImageView.setImageBitmap(it)
+            }
+        }
+
     }
 }
