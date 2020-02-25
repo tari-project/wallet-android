@@ -32,7 +32,9 @@
  */
 package com.tari.android.wallet.ui.fragment.send
 
+import android.app.Activity
 import android.content.Context
+import android.content.Intent
 import android.os.AsyncTask
 import android.os.Bundle
 import android.text.Editable
@@ -50,16 +52,14 @@ import butterknife.*
 import com.tari.android.wallet.R
 import com.tari.android.wallet.model.*
 import com.tari.android.wallet.service.TariWalletService
+import com.tari.android.wallet.ui.activity.EXTRA_QR_DATA
+import com.tari.android.wallet.ui.activity.QRScannerActivity
 import com.tari.android.wallet.ui.fragment.BaseFragment
 import com.tari.android.wallet.ui.fragment.send.adapter.RecipientListAdapter
 import com.tari.android.wallet.ui.util.UiUtil
 import com.tari.android.wallet.util.*
-import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.Constants.Wallet.emojiFormatterChunkSize
 import com.tari.android.wallet.util.Constants.Wallet.emojiIdLength
-import com.tari.android.wallet.util.EmojiUtil
-import com.tari.android.wallet.util.numberOfEmojis
-import com.tari.android.wallet.util.firstNCharactersAreEmojis
 import java.lang.ref.WeakReference
 import kotlin.math.min
 
@@ -68,6 +68,9 @@ import kotlin.math.min
  *
  * @author The Tari Development Team
  */
+
+private const val REQUEST_QR_SCANNER = 101
+
 class AddRecipientFragment(private val walletService: TariWalletService) : BaseFragment(),
     RecipientListAdapter.Listener,
     RecyclerView.OnItemTouchListener,
@@ -198,6 +201,15 @@ class AddRecipientFragment(private val walletService: TariWalletService) : BaseF
         listenerWR = WeakReference(context as Listener)
     }
 
+    /**
+     * Open QR code scanner on button click.
+     */
+    @OnClick(R.id.add_recipient_btn_qr_code)
+    fun onQrButtonClick() {
+        val intent = Intent(activity, QRScannerActivity::class.java)
+        startActivityForResult(intent, REQUEST_QR_SCANNER)
+        activity?.overridePendingTransition(R.anim.slide_up, 0)
+    }
 
     /**
      * Checks whether an emoji id is in the clipboard data.
@@ -542,6 +554,19 @@ class AddRecipientFragment(private val walletService: TariWalletService) : BaseF
 
     }
 
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        if (requestCode == REQUEST_QR_SCANNER && resultCode == Activity.RESULT_OK && data != null) {
+            data.getStringExtra(EXTRA_QR_DATA)?.let {
+                val qrData = WalletUtil.getQrScanData(it)
+                searchEditText.setText(
+                    qrData.emojiId,
+                    TextView.BufferType.EDITABLE
+                )
+            }
+        }
+    }
     // end region
 
     // region listener interface

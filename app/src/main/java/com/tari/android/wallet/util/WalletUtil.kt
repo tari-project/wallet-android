@@ -32,7 +32,9 @@
  */
 package com.tari.android.wallet.util
 
+import android.net.Uri
 import com.tari.android.wallet.model.MicroTari
+import com.tari.android.wallet.model.QRScanData
 import java.io.File
 import java.math.BigInteger
 import java.math.RoundingMode
@@ -88,5 +90,20 @@ internal object WalletUtil {
 
     fun getQRContent(publicKey: String, emojiId: String): String {
         return Constants.Wallet.QR_DEEP_LINK_URL + "/$publicKey?emoji_id=$emojiId"
+    }
+
+    /*
+    *  PublicKey and emojiId data from qr scan result
+    * */
+    fun getQrScanData(content: String): QRScanData {
+        val url = Uri.parse(content)
+        val pathSegment = url.pathSegments
+        var publickKey = ""
+        if (pathSegment.isNotEmpty()) {
+            publickKey = pathSegment[0]
+        }
+        val emojiId = url.getQueryParameter("emoji_id") ?: ""
+
+        return QRScanData(publickKey, emojiId)
     }
 }
