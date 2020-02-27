@@ -5,6 +5,16 @@
     <dimen name="common_header_height">64dp</dimen>
     <dimen name="common_scroll_height_gradient_height">10dp</dimen>
     <dimen name="common_action_button_height">54dp</dimen>
+    <dimen name="common_view_elevation">4dp</dimen>
+
+    <!-- emoji id summary -->
+    <dimen name="emoji_id_container_horizontal_padding">8dp</dimen>
+    <dimen name="emoji_id_container_vertical_padding">6dp</dimen>
+    <dimen name="emoji_id_summary_letter_spacing">4dp</dimen>
+
+    <!-- bottom dialog -->
+    <dimen name="bottom_dialog_margin">15dp</dimen>
+    <dimen name="bottom_dialog_horizontal_padding">10dp</dimen>
 
     <!-- home -->
     <dimen name="home_top_content_container_view_top_margin">80dp</dimen>

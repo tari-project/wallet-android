@@ -73,9 +73,9 @@ class AddNoteAndSendFragment(private val walletService: TariWalletService) : Bas
     lateinit var titleTextView: TextView
     @BindView(R.id.add_note_and_send_btn_back)
     lateinit var backButton: ImageButton
-    @BindView(R.id.add_note_and_send_vw_emoji_container)
+    @BindView(R.id.add_note_and_send_vw_emoji_id_summary_container)
     lateinit var emojiIdContainerView: View
-    @BindView(R.id.add_note_and_send_vw_emoji_summary)
+    @BindView(R.id.add_note_and_send_vw_emoji_id_summary)
     lateinit var emojiIdSummaryView: View
     @BindView(R.id.add_note_and_send_vw_full_emoji_container)
     lateinit var fullEmojiIdContainerView: View
@@ -231,8 +231,9 @@ class AddNoteAndSendFragment(private val walletService: TariWalletService) : Bas
     /**
      * Display full emoji id and dim out all other views.
      */
-    @OnClick(R.id.add_note_and_send_vw_emoji_summary_outer)
+    @OnClick(R.id.add_note_and_send_vw_emoji_id_summary_container)
     fun emojiIdClicked() {
+        emojiIdContainerView.visibility = View.GONE
         fullEmojiIdContainerView.visibility = View.VISIBLE
         backButton.visibility = View.INVISIBLE
         dimmerViews.forEach {
@@ -248,6 +249,7 @@ class AddNoteAndSendFragment(private val walletService: TariWalletService) : Bas
         R.id.add_note_and_send_vw_bottom_dimmer
     )
     fun onEmojiIdDimmerClicked() {
+        emojiIdContainerView.visibility = View.VISIBLE
         fullEmojiIdContainerView.visibility = View.GONE
         backButton.visibility = View.VISIBLE
         dimmerViews.forEach {

@@ -52,8 +52,6 @@ class WalletModule {
     object FieldName {
         const val walletFilesDirPath = "wallet_files_dir_path"
         const val walletLogFilePath = "wallet_log_file_path"
-        const val emojiId = "wallet_emoji_id"
-        const val publicKeyHexString = "wallet_public_key_hex_string"
     }
 
     private val logFileName = "tari_wallet.log"
@@ -78,12 +76,12 @@ class WalletModule {
      * Creates a new private key & stores if it doesn't exist.
      */
     private fun getPrivateKeyHexString(sharedPrefsWrapper: SharedPrefsWrapper): HexString {
-        var hexString = sharedPrefsWrapper.getPrivateKeyHexString()
+        var hexString = sharedPrefsWrapper.privateKeyHexString
         if (hexString == null) {
             val privateKeyFFI = FFIPrivateKey()
             hexString = privateKeyFFI.toString()
-            sharedPrefsWrapper.setPrivateKeyHexString(hexString)
             privateKeyFFI.destroy()
+            sharedPrefsWrapper.privateKeyHexString = hexString
         }
         return HexString(hexString)
     }
@@ -115,35 +113,20 @@ class WalletModule {
     @Singleton
     internal fun provideTestWallet(
         commsConfig: FFICommsConfig,
-        @Named(FieldName.walletLogFilePath) logFilePath: String
+        @Named(FieldName.walletLogFilePath) logFilePath: String,
+        sharedPrefsWrapper: SharedPrefsWrapper
     ): FFITestWallet {
         if (FFITestWallet.instance == null) {
-            FFITestWallet.instance = FFITestWallet(commsConfig, logFilePath)
+            val wallet = FFITestWallet(commsConfig, logFilePath)
+            FFITestWallet.instance = wallet
+            // set shared preferences values after instantiation
+            val publicKeyFFI = wallet.getPublicKey()
+            sharedPrefsWrapper.publicKeyHexString = publicKeyFFI.toString()
+            sharedPrefsWrapper.emojiId = publicKeyFFI.getEmojiNodeId()
+            publicKeyFFI.destroy()
+
         }
         return FFITestWallet.instance!!
-    }
-
-
-    /**
-     * Provides the emoji id of the wallet.
-     */
-    @Provides
-    @Named(FieldName.emojiId)
-    internal fun provideWalletEmojiId(wallet: FFITestWallet): String {
-        val publicKeyFFI = wallet.getPublicKey()
-        val emojiId = publicKeyFFI.getEmojiNodeId()
-        publicKeyFFI.destroy()
-        return emojiId
-    }
-
-    @Provides
-    @Singleton
-    @Named(FieldName.publicKeyHexString)
-    internal fun provideWalletPublicKeyHexString(wallet: FFITestWallet): String {
-        val publicKeyFFI = wallet.getPublicKey()
-        val hexString = publicKeyFFI.toString()
-        publicKeyFFI.destroy()
-        return hexString
     }
 
 }

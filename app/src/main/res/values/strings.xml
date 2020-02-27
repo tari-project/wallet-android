@@ -22,6 +22,7 @@
     <!-- common -->
     <string name="common_continue">Continue</string>
     <string name="common_from">From</string>
+    <string name="common_close">Close</string>
 
     <!-- dummy values - UI design placeholders -->
     <string name="dummy_positive_tx_value">+ 152.75</string>
@@ -106,6 +107,8 @@
     <string name="add_amount_under_construction">Under Construction</string>
     <string name="add_amount_not_enough_available_balance">Not enough Tari in your available balance</string>
     <string name="add_amount_tx_fee">Transaction Fee</string>
+    <string name="add_amount_balance_exceeded_dialog_title">Hold your horses! 🐴</string>
+    <string name="add_amount_balance_exceeded_dialog_description">Sorry, you can\’t send this much Tari at once. Please wait for your other transaction to be completed and then try again.</string>
 
     <!-- send tari - note -->
     <string name="add_note_and_send_prompt">What\'s it for?</string>

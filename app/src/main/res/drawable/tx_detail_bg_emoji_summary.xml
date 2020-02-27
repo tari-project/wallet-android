@@ -1,9 +1,0 @@
-<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:drawable="@drawable/tx_detail_emoji_summary_img_shadow" />
-    <item>
-        <shape>
-            <corners android:radius="10dp" />
-            <solid android:color="@color/white" />
-        </shape>
-    </item>
-</layer-list>

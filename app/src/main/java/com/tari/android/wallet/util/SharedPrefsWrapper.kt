@@ -33,6 +33,7 @@
 package com.tari.android.wallet.util
 
 import android.content.SharedPreferences
+import de.adorsys.android.securestoragelibrary.SecurePreferences
 
 /**
  * Provides easy access to the shared preferences.
@@ -41,59 +42,91 @@ import android.content.SharedPreferences
  */
 class SharedPrefsWrapper(private val sharedPrefs: SharedPreferences) {
 
-    private val privateKeyHexStringKey = "tari_wallet_private_key_hex_string"
-    private val onboardingStartedKey = "tari_wallet_onboarding_started"
-    private val onboardingCompletedKey = "tari_wallet_onboarding_completed"
-    private val onboardingDisplayedAtHome = "tari_wallet_onboarding_displayed_at_home"
-
-    fun getPrivateKeyHexString(): String? {
-        return sharedPrefs.getString(privateKeyHexStringKey, null)
+    private object Key {
+        const val privateKeyHexStringKey = "tari_wallet_private_key_hex_string"
+        const val publicKeyHexStringKey = "tari_wallet_public_key_hex_string"
+        const val emojiIdKey = "tari_wallet_emoji_id_"
+        const val onboardingStartedKey = "tari_wallet_onboarding_started"
+        const val onboardingCompletedKey = "tari_wallet_onboarding_completed"
+        const val onboardingDisplayedAtHomeKey = "tari_wallet_onboarding_displayed_at_home"
     }
 
-    fun setPrivateKeyHexString(privateKeyHexString: String?) {
-        sharedPrefs.edit().apply {
-            putString(privateKeyHexStringKey, privateKeyHexString)
-            apply()
+    var privateKeyHexString: String?
+        get() {
+            return SecurePreferences.getStringValue(Key.privateKeyHexStringKey, null)
         }
-    }
-
-    fun getOnboardingStarted(): Boolean {
-        return sharedPrefs.getBoolean(onboardingStartedKey, false)
-    }
-
-    fun setOnboardingStarted(onboardingStarted: Boolean) {
-        sharedPrefs.edit().apply {
-            putBoolean(onboardingStartedKey, onboardingStarted)
-            apply()
+        set(value) {
+            if (value != null) {
+                SecurePreferences.setValue(Key.privateKeyHexStringKey, value)
+            }
         }
-    }
 
-    fun getOnboardingCompleted(): Boolean {
-        return sharedPrefs.getBoolean(onboardingCompletedKey, false)
-    }
-
-    fun setOnboardingCompleted(onboardingCompleted: Boolean) {
-        sharedPrefs.edit().apply {
-            putBoolean(onboardingCompletedKey, onboardingCompleted)
-            apply()
+    var publicKeyHexString: String?
+        get() {
+            return sharedPrefs.getString(Key.publicKeyHexStringKey, null)
         }
-    }
-
-    fun getOnboardingDisplayedAtHome(): Boolean {
-        return sharedPrefs.getBoolean(onboardingDisplayedAtHome, false)
-    }
-
-    fun setOnboardingDisplayedAtHome(onboardingCompleted: Boolean) {
-        sharedPrefs.edit().apply {
-            putBoolean(onboardingDisplayedAtHome, onboardingCompleted)
-            apply()
+        set(value) {
+            sharedPrefs.edit().apply {
+                putString(Key.publicKeyHexStringKey, value)
+                apply()
+            }
         }
-    }
+
+    var emojiId: String?
+        get() {
+            return sharedPrefs.getString(Key.emojiIdKey, null)
+        }
+        set(value) {
+            sharedPrefs.edit().apply {
+                putString(Key.emojiIdKey, value)
+                apply()
+            }
+        }
+
+    var onboardingStarted: Boolean
+        get() {
+            return sharedPrefs.getBoolean(Key.onboardingStartedKey, false)
+        }
+        set(value) {
+            sharedPrefs.edit().apply {
+                putBoolean(Key.onboardingStartedKey, value)
+                apply()
+            }
+        }
+
+    var onboardingCompleted: Boolean
+        get() {
+            return sharedPrefs.getBoolean(Key.onboardingCompletedKey, false)
+        }
+        set(value) {
+            sharedPrefs.edit().apply {
+                putBoolean(Key.onboardingCompletedKey, value)
+                apply()
+            }
+        }
+
+    val onboardingWasInterrupted: Boolean
+        get() {
+            return onboardingStarted && !onboardingCompleted
+        }
+
+    var onboardingDisplayedAtHome: Boolean
+        get() {
+            return sharedPrefs.getBoolean(Key.onboardingDisplayedAtHomeKey, false)
+        }
+        set(value) {
+            sharedPrefs.edit().apply {
+                putBoolean(Key.onboardingDisplayedAtHomeKey, value)
+                apply()
+            }
+        }
 
     fun clean() {
-        setPrivateKeyHexString(null)
-        setOnboardingStarted(false)
-        setOnboardingCompleted(false)
+        publicKeyHexString = ""
+        emojiId = ""
+        onboardingStarted = false
+        onboardingCompleted = false
+        onboardingDisplayedAtHome = false
     }
 
 }

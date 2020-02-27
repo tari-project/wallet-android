@@ -35,10 +35,7 @@ package com.tari.android.wallet.ui.fragment.send
 import android.animation.Animator
 import android.animation.ObjectAnimator
 import android.content.Context
-import android.graphics.Typeface
 import android.os.Bundle
-import android.text.SpannableString
-import android.text.Spanned
 import android.view.View
 import android.widget.TextView
 import butterknife.BindString
@@ -47,10 +44,10 @@ import com.airbnb.lottie.LottieAnimationView
 import com.daasuu.ei.Ease
 import com.daasuu.ei.EasingInterpolator
 import com.tari.android.wallet.R
+import com.tari.android.wallet.extension.applyFontStyle
 import com.tari.android.wallet.model.MicroTari
 import com.tari.android.wallet.model.User
 import com.tari.android.wallet.ui.component.CustomFont
-import com.tari.android.wallet.ui.component.CustomTypefaceSpan
 import com.tari.android.wallet.ui.fragment.BaseFragment
 import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.WalletUtil
@@ -93,8 +90,6 @@ class SendTxSuccessfulFragment : BaseFragment(), Animator.AnimatorListener {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         // prepare fonts for partial bold text
         val mActivity = activity ?: return
-        val lightFont: Typeface = CustomFont.AVENIR_LT_STD_LIGHT.asTypeface(mActivity)
-        val boldFont: Typeface = CustomFont.AVENIR_LT_STD_BLACK.asTypeface(mActivity)
 
         // get tx properties
         recipientUser = arguments!!.getParcelable("recipientUser")!!
@@ -110,20 +105,14 @@ class SendTxSuccessfulFragment : BaseFragment(), Animator.AnimatorListener {
         }
         val info = String.format(infoFormat, formattedAmount)
         val infoBoldPart = String.format(infoFormatBoldPart, formattedAmount)
-        val spannableString = SpannableString(info)
-        spannableString.setSpan(
-            CustomTypefaceSpan("", lightFont),
-            0,
-            info.length - 1,
-            Spanned.SPAN_EXCLUSIVE_INCLUSIVE
+
+        infoTextView.text = info.applyFontStyle(
+            mActivity,
+            CustomFont.AVENIR_LT_STD_LIGHT,
+            infoBoldPart,
+            CustomFont.AVENIR_LT_STD_BLACK,
+            applyToOnlyFirstOccurence = true
         )
-        spannableString.setSpan(
-            CustomTypefaceSpan("", boldFont),
-            info.indexOf(infoBoldPart),
-            info.indexOf(infoBoldPart) + infoBoldPart.length,
-            Spanned.SPAN_EXCLUSIVE_INCLUSIVE
-        )
-        infoTextView.text = spannableString
         infoTextView.measure(
             View.MeasureSpec.UNSPECIFIED,
             View.MeasureSpec.UNSPECIFIED

@@ -15,7 +15,7 @@
  * 3. Neither the name of the copyright holder nor the names of
  * its contributors may be used to endorse or promote products
  * derived from this software without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND
  * CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES,
  * INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
@@ -34,6 +34,7 @@ package com.tari.android.wallet.model
 
 import android.os.Parcel
 import android.os.Parcelable
+import com.tari.android.wallet.extension.toMicroTari
 import java.math.BigDecimal
 import java.math.BigInteger
 
@@ -42,7 +43,7 @@ import java.math.BigInteger
  *
  * @author The Tari Development Team
  */
-class MicroTari() : Parcelable {
+class MicroTari() : Parcelable, Comparable<MicroTari> {
 
     var value = BigInteger("0")
 
@@ -55,6 +56,42 @@ class MicroTari() : Parcelable {
     ) : this() {
         this.value = value
     }
+
+    // region operator overloadings
+
+    operator fun plusAssign(increment: MicroTari) {
+        this.value += increment.value
+    }
+
+    operator fun plus(increment: MicroTari): MicroTari {
+        return MicroTari(this.value + increment.value)
+    }
+
+    operator fun plus(increment: Int): MicroTari {
+        return this + increment.toMicroTari()
+    }
+
+    operator fun plus(increment: Long): MicroTari {
+        return this + increment.toMicroTari()
+    }
+
+    operator fun minusAssign(decrement: MicroTari) {
+        this.value -= decrement.value
+    }
+
+    operator fun minus(decrement: MicroTari): MicroTari {
+        return MicroTari(this.value - decrement.value)
+    }
+
+    operator fun minus(decrement: Int): MicroTari {
+        return this - decrement.toMicroTari()
+    }
+
+    operator fun minus(decrement: Long): MicroTari {
+        return this - decrement.toMicroTari()
+    }
+
+    // endregion
 
     // region Parcelable
 
@@ -84,6 +121,10 @@ class MicroTari() : Parcelable {
 
     override fun describeContents(): Int {
         return 0
+    }
+
+    override fun compareTo(other: MicroTari): Int {
+        return this.value.compareTo(other.value)
     }
 
     // endregion

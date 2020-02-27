@@ -25,7 +25,7 @@
             android:layout_centerHorizontal="true"
             android:layout_marginTop="-100dp"
             android:alpha="0"
-            android:background="@drawable/create_wallet_emoji_id_bg"
+            android:background="@drawable/emoji_id_bg"
             android:gravity="center"
             android:letterSpacing="0.13"
             android:paddingStart="10dp"
@@ -99,14 +99,14 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
-            app:lottie_renderMode="automatic"
             android:scaleX="1.5"
             android:scaleY="1.5"
             app:lottie_autoPlay="false"
             app:lottie_enableMergePathsForKitKatAndAbove="true"
             app:lottie_imageAssetsFolder="create_emoji_id/images/"
             app:lottie_loop="false"
-            app:lottie_rawRes="@raw/emoji_wheel" />
+            app:lottie_rawRes="@raw/emoji_wheel"
+            app:lottie_renderMode="automatic" />
 
         <RelativeLayout
             android:id="@+id/create_wallet_vw_wallet_creation_container"
@@ -193,13 +193,13 @@
                 android:layout_height="wrap_content"
                 android:layout_centerHorizontal="true"
                 android:layout_marginTop="10dp"
-                app:lottie_renderMode="automatic"
                 android:alpha="0"
                 app:lottie_autoPlay="false"
                 app:lottie_enableMergePathsForKitKatAndAbove="true"
                 app:lottie_imageAssetsFolder="nerd_emoji/images/"
                 app:lottie_loop="false"
-                app:lottie_rawRes="@raw/nerd_emoji" />
+                app:lottie_rawRes="@raw/nerd_emoji"
+                app:lottie_renderMode="automatic" />
 
             <com.tari.android.wallet.ui.component.CustomFontTextView
                 android:id="@+id/create_wallet_txt_awesome"

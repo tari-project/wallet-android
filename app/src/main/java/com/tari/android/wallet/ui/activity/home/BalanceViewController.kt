@@ -47,12 +47,12 @@ import butterknife.ButterKnife
 import com.daasuu.ei.Ease
 import com.daasuu.ei.EasingInterpolator
 import com.tari.android.wallet.R
+import com.tari.android.wallet.model.BalanceInfo
 import com.tari.android.wallet.ui.extension.setWidthToMeasured
 import com.tari.android.wallet.ui.util.UiUtil
 import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.WalletUtil
 import java.lang.ref.WeakReference
-import java.math.BigDecimal
 
 /**
  * Controls the balance digit representation.
@@ -63,7 +63,7 @@ class BalanceViewController(
     private val context: Context,
     private val digitContainerView: ViewGroup,
     decimalDigitContainerView: ViewGroup,
-    private var _balance: BigDecimal
+    private var _balanceInfo: BalanceInfo
 ) {
 
     private val viewHolders: ArrayList<BalanceDigitViewHolder> = ArrayList()
@@ -72,7 +72,8 @@ class BalanceViewController(
     private val delayByIndex: Long = 80L
 
     init {
-        formattedBalance = WalletUtil.amountFormatter.format(balance)
+        val balance = _balanceInfo.availableBalance + _balanceInfo.pendingIncomingBalance
+        formattedBalance = WalletUtil.amountFormatter.format(balance.tariValue)
         // decimal tens
         viewHolders.add(
             DecimalDigitViewHolder(
@@ -130,12 +131,13 @@ class BalanceViewController(
         }
     }
 
-    var balance: BigDecimal
-        get() = _balance
+    var balanceInfo: BalanceInfo
+        get() = _balanceInfo
         set(value) {
             /* execute setter logic */
-            _balance = value
-            formattedBalance = WalletUtil.amountFormatter.format(_balance)
+            _balanceInfo = value
+            val balance = _balanceInfo.availableBalance + _balanceInfo.pendingIncomingBalance
+            formattedBalance = WalletUtil.amountFormatter.format(balance.tariValue)
             val sizeDiff = formattedBalance.length - viewHolders.size
             if (sizeDiff <= 0) {
                 // delete items

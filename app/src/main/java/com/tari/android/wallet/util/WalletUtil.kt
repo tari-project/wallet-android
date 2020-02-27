@@ -33,6 +33,7 @@
 package com.tari.android.wallet.util
 
 import android.net.Uri
+import com.tari.android.wallet.extension.toMicroTari
 import com.tari.android.wallet.model.MicroTari
 import com.tari.android.wallet.model.QRScanData
 import java.io.File
@@ -66,7 +67,7 @@ internal object WalletUtil {
         r: Int = 250
     ): MicroTari {
         val fee = baseCost + (numInputs + 4 * numOutputs) * r
-        return MicroTari(BigInteger.valueOf(fee.toLong()))
+        return fee.toMicroTari()
     }
 
     /**

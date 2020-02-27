@@ -65,7 +65,7 @@ class OnboardingFlowActivity : BaseActivity(), IntroductionFragment.Listener {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        if (sharedPrefsWrapper.getOnboardingStarted()) {
+        if (sharedPrefsWrapper.onboardingWasInterrupted) {
             // clean existing files & restart onboarding
             WalletUtil.clearWalletFiles(walletFilesDirPath)
             supportFragmentManager

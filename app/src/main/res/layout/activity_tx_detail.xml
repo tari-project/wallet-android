@@ -123,8 +123,8 @@
             android:id="@+id/tx_detail_txt_fee_label"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:drawableEnd="@drawable/tx_detail_ic_help_24dp"
-            android:drawablePadding="2dp"
+            android:drawableEnd="@drawable/help_icon_24dp"
+            android:drawablePadding="4dp"
             android:gravity="center"
             android:text="@string/tx_detail_transaction_fee"
             android:textColor="@color/tx_detail_contact_name_label_text"
@@ -149,7 +149,8 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_marginTop="32dp"
-            android:elevation="5dp"
+            android:elevation="@dimen/common_view_elevation"
+            android:clipChildren="false"
             android:orientation="vertical"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tx_detail_txt_fee_label">
@@ -158,23 +159,33 @@
                 android:id="@+id/tx_detail_txt_from"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="24dp"
+                android:layout_marginStart="25dp"
                 android:layout_marginTop="32dp"
                 android:text="@string/common_from"
                 android:textColor="@color/tx_detail_contact_name_label_text"
                 android:textSize="13sp"
                 app:customFont="AVENIR_LT_STD_MEDIUM" />
 
-            <RelativeLayout
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="10dp"
-                android:layout_marginTop="4dp">
+                android:layout_marginStart="25dp"
+                android:layout_marginTop="4dp"
+                android:layout_marginEnd="25dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
 
                 <FrameLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:background="@drawable/tx_detail_bg_emoji_summary">
+                    android:background="@drawable/emoji_id_bg"
+                    android:clickable="true"
+                    android:elevation="@dimen/common_view_elevation"
+                    android:focusable="true"
+                    android:paddingStart="@dimen/emoji_id_container_horizontal_padding"
+                    android:paddingTop="@dimen/emoji_id_container_vertical_padding"
+                    android:paddingEnd="@dimen/emoji_id_container_horizontal_padding"
+                    android:paddingBottom="@dimen/emoji_id_container_vertical_padding">
 
                     <include
                         android:id="@+id/tx_detail_vw_emoji_summary"
@@ -186,27 +197,30 @@
                         android:layout_marginEnd="8dp" />
                 </FrameLayout>
 
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="10dp"
+                    android:layout_weight="1" />
+
                 <com.tari.android.wallet.ui.component.CustomFontButton
                     android:id="@+id/tx_detail_btn_add_contact"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_alignParentEnd="true"
-                    android:layout_centerVertical="true"
-                    android:layout_marginEnd="20dp"
                     android:background="@color/transparent"
                     android:text="@string/tx_detail_add_contact"
                     android:textAllCaps="false"
                     android:textColor="@color/purple"
                     android:textSize="14sp"
                     app:customFont="AVENIR_LT_STD_MEDIUM" />
-            </RelativeLayout>
+            </LinearLayout>
 
             <RelativeLayout
                 android:id="@+id/tx_detail_vw_contact_container"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="24dp"
+                android:layout_marginStart="25dp"
                 android:layout_marginTop="20dp"
+                android:layout_marginEnd="24dp"
                 android:orientation="vertical"
                 android:visibility="visible"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -228,7 +242,6 @@
                     android:layout_height="wrap_content"
                     android:layout_below="@id/tx_detail_txt_contact_label"
                     android:layout_alignParentEnd="true"
-                    android:layout_marginEnd="24dp"
                     android:gravity="center"
                     android:padding="12dp"
                     android:text="@string/tx_detail_edit"
@@ -279,7 +292,7 @@
                 android:id="@+id/tx_detail_txt_note_label"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="24dp"
+                android:layout_marginStart="25dp"
                 android:layout_marginTop="32dp"
                 android:text="@string/tx_detail_note"
                 android:textColor="@color/tx_detail_contact_name_label_text"
@@ -292,7 +305,7 @@
                 android:id="@+id/tx_detail_txt_tx_note"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="24dp"
+                android:layout_marginStart="25dp"
                 android:layout_marginTop="8dp"
                 android:textColor="@color/black"
                 android:textSize="14sp"

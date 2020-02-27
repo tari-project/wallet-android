@@ -62,7 +62,7 @@ import com.tari.android.wallet.ui.extension.getLastChild
 import com.tari.android.wallet.ui.extension.setTextSizePx
 import com.tari.android.wallet.ui.util.UiUtil
 import com.tari.android.wallet.util.WalletUtil
-import com.tari.android.wallet.util.txFormattedDate
+import com.tari.android.wallet.extension.txFormattedDate
 import java.util.*
 
 /**
@@ -229,8 +229,8 @@ class TxDetailActivity :
             else -> ""
         }
 
-        val timeStamp = tx!!.timestamp.toLong() * 1000
-        txDateTextView.text = Date(timeStamp).txFormattedDate()
+        val timestamp = tx!!.timestamp.toLong() * 1000
+        txDateTextView.text = Date(timestamp).txFormattedDate()
         txAmountTextView.text = WalletUtil.amountFormatter.format(tx!!.amount.tariValue)
 
         emojiIdSummaryController.display(tx!!.user.publicKey.emojiId)
@@ -366,4 +366,5 @@ class TxDetailActivity :
         }
         contactNameTextView.visibility = View.INVISIBLE
     }
+
 }

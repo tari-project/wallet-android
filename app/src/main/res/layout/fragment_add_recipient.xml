@@ -52,14 +52,6 @@
         android:gravity="center"
         android:orientation="horizontal">
 
-        <!-- shadow -->
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_margin="3dp"
-            android:alpha="0.4"
-            android:background="@drawable/add_recipient_txt_shadow" />
-
         <View
             android:id="@+id/add_recipinet_vw_middle_dimmer"
             android:layout_width="match_parent"
@@ -77,6 +69,7 @@
             android:layout_marginStart="25dp"
             android:layout_marginEnd="25dp"
             android:background="@drawable/add_recipient_search_bg"
+            android:elevation="@dimen/common_view_elevation"
             android:orientation="horizontal">
 
             <!-- search text -->

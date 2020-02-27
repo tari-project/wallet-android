@@ -69,8 +69,6 @@ import kotlin.math.min
  * @author The Tari Development Team
  */
 
-private const val REQUEST_QR_SCANNER = 101
-
 class AddRecipientFragment(private val walletService: TariWalletService) : BaseFragment(),
     RecipientListAdapter.Listener,
     RecyclerView.OnItemTouchListener,
@@ -201,13 +199,9 @@ class AddRecipientFragment(private val walletService: TariWalletService) : BaseF
         listenerWR = WeakReference(context as Listener)
     }
 
-    /**
-     * Open QR code scanner on button click.
-     */
-    @OnClick(R.id.add_recipient_btn_qr_code)
-    fun onQrButtonClick() {
+    private fun startQRCodeActivity() {
         val intent = Intent(activity, QRScannerActivity::class.java)
-        startActivityForResult(intent, REQUEST_QR_SCANNER)
+        startActivityForResult(intent, QRScannerActivity.REQUEST_QR_SCANNER)
         activity?.overridePendingTransition(R.anim.slide_up, 0)
     }
 
@@ -385,6 +379,33 @@ class AddRecipientFragment(private val walletService: TariWalletService) : BaseF
         listenerWR.get()?.continueToAmount(this, recipient)
     }
 
+    /**
+     * Open QR code scanner on button click.
+     */
+    @OnClick(R.id.add_recipient_btn_qr_code)
+    fun onQRButtonClick() {
+        val mActivity = activity ?: return
+        UiUtil.hideKeyboard(mActivity)
+        rootView.postDelayed({
+            wr.get()?.startQRCodeActivity()
+        }, Constants.UI.keyboardHideWaitMs)
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        if (requestCode == QRScannerActivity.REQUEST_QR_SCANNER
+            && resultCode == Activity.RESULT_OK
+            && data != null
+        ) {
+            data.getStringExtra(EXTRA_QR_DATA)?.let {
+                val qrData = WalletUtil.getQrScanData(it)
+                searchEditText.setText(
+                    qrData.emojiId,
+                    TextView.BufferType.EDITABLE
+                )
+            }
+        }
+    }
+
     @OnClick(R.id.add_recipient_btn_continue)
     fun onContinueButtonClicked(view: View) {
         UiUtil.temporarilyDisableClick(view)
@@ -554,19 +575,6 @@ class AddRecipientFragment(private val walletService: TariWalletService) : BaseF
 
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-
-        if (requestCode == REQUEST_QR_SCANNER && resultCode == Activity.RESULT_OK && data != null) {
-            data.getStringExtra(EXTRA_QR_DATA)?.let {
-                val qrData = WalletUtil.getQrScanData(it)
-                searchEditText.setText(
-                    qrData.emojiId,
-                    TextView.BufferType.EDITABLE
-                )
-            }
-        }
-    }
     // end region
 
     // region listener interface
