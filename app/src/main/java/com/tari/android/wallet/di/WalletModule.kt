@@ -97,9 +97,11 @@ class WalletModule {
         sharedPrefsWrapper: SharedPrefsWrapper,
         @Named(FieldName.walletFilesDirPath) walletFilesDirPath: String
     ): FFICommsConfig {
+        //TODO: Change to tor
+        val transport = FFITransportType()
         return FFICommsConfig(
-            Constants.Wallet.WALLET_CONTROL_SERVICE_ADDRESS,
             Constants.Wallet.WALLET_LISTENER_ADDRESS,
+            transport,
             Constants.Wallet.WALLET_DB_NAME,
             walletFilesDirPath,
             FFIPrivateKey((getPrivateKeyHexString(sharedPrefsWrapper)))
