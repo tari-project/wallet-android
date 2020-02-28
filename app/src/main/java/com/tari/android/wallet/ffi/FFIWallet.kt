@@ -172,6 +172,23 @@ internal abstract class FFIWallet(commsConfig: FFICommsConfig, logPath: String) 
         libError: FFIError
     ): ByteArray
 
+    private external fun jniAddBaseNodePeer(
+        walletPtr: FFIWalletPtr,
+        publicKeyPtr: FFIPublicKeyPtr,
+        address:String,
+        libError: FFIError
+    ) : Boolean
+
+    private external fun jniSyncBaseNode(
+        walletPtr: FFIWalletPtr,
+        libError: FFIError
+    ) : Boolean
+
+    private external fun  jniGetTorPrivateKey(
+        walletPtr: FFIWalletPtr,
+        libError: FFIError
+    ) : FFIByteVectorPtr
+
     private external fun jniDestroy(walletPtr: FFIWalletPtr)
 
     // endregion
@@ -415,6 +432,33 @@ internal abstract class FFIWallet(commsConfig: FFICommsConfig, logPath: String) 
         )
         throwIf(error)
         return BigInteger(1, bytes)
+    }
+
+    fun syncBaseNode() : Boolean
+    {
+        val error = FFIError()
+        val result = jniSyncBaseNode(ptr,error)
+        throwIf(error)
+        return result
+    }
+
+    fun getTorPrivateKey() : String
+    {
+        val error = FFIError()
+        val resultPtr = jniGetTorPrivateKey(ptr,error)
+        throwIf(error)
+        val bytes = FFIByteVector(resultPtr)
+        throwIf(error)
+        return bytes.toString()
+    }
+
+    fun addBaseNodePeer(baseNodePublicKey: FFIPublicKey,
+                        baseNodeAddress: String) : Boolean
+    {
+        val error = FFIError()
+        val result = jniAddBaseNodePeer(ptr,baseNodePublicKey.getPointer(),baseNodeAddress,error)
+        throwIf(error)
+        return result
     }
 
     override fun destroy() {

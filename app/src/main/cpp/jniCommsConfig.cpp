@@ -44,30 +44,28 @@ JNIEXPORT jlong JNICALL
 Java_com_tari_android_wallet_ffi_FFICommsConfig_jniCreate(
         JNIEnv *jEnv,
         jclass jClass,
-        jstring jControlServiceAddress,
-        jstring jListenerAddress,
+        jstring jPublicAddress,
+        jlong jpTransport,
         jstring jDatabaseName,
         jstring jDatastorePath,
         jlong jpPrivateKey,
         jobject error) {
     char *pControlServiceAddress = const_cast<char *>(jEnv->GetStringUTFChars(
-            jControlServiceAddress,
+            jPublicAddress,
             JNI_FALSE));
-    char *pListenerAddress = const_cast<char *>(jEnv->GetStringUTFChars(jListenerAddress,
-                                                                        JNI_FALSE));
     char *pDatabaseName = const_cast<char *>(jEnv->GetStringUTFChars(jDatabaseName, JNI_FALSE));
     char *pDatastorePath = const_cast<char *>(jEnv->GetStringUTFChars(jDatastorePath, JNI_FALSE));
     TariPrivateKey *pPrivateKey = reinterpret_cast<TariPrivateKey *>(jpPrivateKey);
+    TariTransportType *pTransport = reinterpret_cast<TariTransportType *>(jpTransport);
     int i = 0;
     int *r = &i;
     TariCommsConfig *pCommsConfig = comms_config_create(
             pControlServiceAddress,
-            pListenerAddress,
+            pTransport,
             pDatabaseName,
             pDatastorePath,
             pPrivateKey, r);
-    jEnv->ReleaseStringUTFChars(jControlServiceAddress, pControlServiceAddress);
-    jEnv->ReleaseStringUTFChars(jListenerAddress, pListenerAddress);
+    jEnv->ReleaseStringUTFChars(jPublicAddress, pControlServiceAddress);
     jEnv->ReleaseStringUTFChars(jDatabaseName, pDatabaseName);
     jEnv->ReleaseStringUTFChars(jDatastorePath, pDatastorePath);
     setErrorCode(jEnv, error, i);

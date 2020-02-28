@@ -8,17 +8,6 @@ cmake_minimum_required(VERSION 3.4.1)
 set(libs_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../../../../jniLibs)
 
 add_library(
-        zmq
-        STATIC
-        IMPORTED
-)
-set_target_properties(
-        zmq
-        PROPERTIES
-        IMPORTED_LOCATION ${libs_DIR}/${ANDROID_ABI}/libzmq.a
-)
-
-add_library(
         sqlite3
         STATIC
         IMPORTED
@@ -38,7 +27,7 @@ set_target_properties(
         wallet
         PROPERTIES
         IMPORTED_LOCATION ${libs_DIR}/${ANDROID_ABI}/libtari_wallet_ffi.a
-        IMPORTED_LINK_INTERFACE_LIBRARIES "zmq;sqlite3"
+        IMPORTED_LINK_INTERFACE_LIBRARIES "sqlite3"
 )
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
@@ -47,6 +36,7 @@ add_library(
         native-lib SHARED
         jniCommon.cpp
         jniByteVector.cpp
+        jniTransportType.cpp
         jniPrivateKey.cpp
         jniPublicKey.cpp
         jniContact.cpp
@@ -62,7 +52,6 @@ find_library(
         log
 )
 
-# Link libraries.
 target_include_directories(
         native-lib PRIVATE ${libs_DIR}/
 )

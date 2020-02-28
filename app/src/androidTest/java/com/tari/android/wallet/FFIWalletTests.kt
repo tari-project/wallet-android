@@ -79,9 +79,10 @@ class FFIWalletTests {
             throw RuntimeException("Test files could not cleared.")
         }
 
+        val transport = FFITransportType()
         val commsConfig = FFICommsConfig(
             FFITestUtil.WALLET_CONTROL_SERVICE_ADDRESS,
-            FFITestUtil.WALLET_LISTENER_ADDRESS,
+            transport,
             FFITestUtil.WALLET_DB_NAME,
             FFITestUtil.WALLET_DATASTORE_PATH,
             FFIPrivateKey(HexString(FFITestUtil.PRIVATE_KEY_HEX_STRING))

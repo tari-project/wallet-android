@@ -48,8 +48,8 @@ internal class FFICommsConfig constructor(pointer: FFICommsConfigPtr) : FFIBase(
 
     private external fun jniDestroy(commsConfigPtr: FFICommsConfigPtr)
     private external fun jniCreate(
-        controlServiceAddress: String,
-        listenerAddress: String,
+        publicAddress: String,
+        transport: FFITransportTypePtr,
         databaseName: String,
         datastorePath: String,
         privateKeyPtr: FFIPrivateKeyPtr,
@@ -65,8 +65,8 @@ internal class FFICommsConfig constructor(pointer: FFICommsConfigPtr) : FFIBase(
     }
 
     constructor(
-        controlServiceAddress: NetAddressString,
-        listenerAddress: NetAddressString,
+        publicAddress: NetAddressString,
+        transport: FFITransportType,
         databaseName: String,
         datastorePath: String,
         privateKey: FFIPrivateKey
@@ -78,8 +78,8 @@ internal class FFICommsConfig constructor(pointer: FFICommsConfigPtr) : FFIBase(
         if (writeableDir.exists() && writeableDir.isDirectory && writeableDir.canWrite()) {
             val error = FFIError()
             ptr = jniCreate(
-                controlServiceAddress.toString(),
-                listenerAddress.toString(),
+                publicAddress.toString(),
+                transport.getPointer(),
                 databaseName,
                 datastorePath,
                 privateKey.getPointer(),
