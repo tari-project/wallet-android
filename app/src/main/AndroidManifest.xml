@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="com.tari.android.wallet">
 
     <uses-permission android:name="android.permission.USE_BIOMETRIC" />
@@ -20,7 +21,8 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme">
+        android:theme="@style/AppTheme"
+        tools:replace="android:allowBackup">
 
         <!-- Tari foreground service -->
         <service
@@ -78,8 +80,7 @@
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme"
-            android:windowSoftInputMode="adjustNothing|stateAlwaysHidden">
-        </activity>
+            android:windowSoftInputMode="adjustNothing|stateAlwaysHidden"></activity>
         <!-- recipient QR scanner -->
         <activity
             android:name=".ui.activity.QRScannerActivity"
@@ -96,7 +97,7 @@
             android:windowSoftInputMode="adjustResize" />
         <!-- wallet info -->
         <activity
-            android:name=".ui.activity.walletinfo.WalletInfoActivity"
+            android:name=".ui.activity.profile.WalletInfoActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme"

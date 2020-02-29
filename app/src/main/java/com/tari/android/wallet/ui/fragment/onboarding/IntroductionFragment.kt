@@ -119,7 +119,7 @@ class IntroductionFragment : BaseFragment() {
     }
 
     private fun showCreateWalletFragment() {
-        sharedPrefsWrapper.setOnboardingStarted(true)
+        sharedPrefsWrapper.onboardingStarted = true
         listener?.continueToCreateWallet()
     }
 

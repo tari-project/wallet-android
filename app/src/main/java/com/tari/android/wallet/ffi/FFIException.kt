@@ -36,7 +36,7 @@ import com.tari.android.wallet.model.WalletErrorCode.*
 import java.lang.RuntimeException
 
 /**
- * Throws FFIException if
+ * Throws FFIException if error code indicates a problem.
  */
 internal fun throwIf(error: FFIError) {
     if (error.code != NO_ERROR.code) {

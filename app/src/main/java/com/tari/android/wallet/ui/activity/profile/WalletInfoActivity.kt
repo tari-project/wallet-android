@@ -30,7 +30,7 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.tari.android.wallet.ui.activity.walletinfo
+package com.tari.android.wallet.ui.activity.profile
 
 import android.content.ClipData
 import android.content.ClipboardManager
@@ -39,18 +39,14 @@ import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.core.content.ContextCompat
-import butterknife.BindDimen
-import butterknife.BindString
-import butterknife.BindView
-import butterknife.OnClick
+import butterknife.*
 import com.tari.android.wallet.R
-import com.tari.android.wallet.di.WalletModule
 import com.tari.android.wallet.ui.activity.BaseActivity
 import com.tari.android.wallet.ui.util.UiUtil
 import com.tari.android.wallet.util.EmojiUtil
+import com.tari.android.wallet.util.SharedPrefsWrapper
 import com.tari.android.wallet.util.WalletUtil
 import javax.inject.Inject
-import javax.inject.Named
 
 /**
  * Wallet info activity - show user emoji id and QR code view to share emoji ID.
@@ -75,11 +71,7 @@ class WalletInfoActivity : BaseActivity() {
     var qrCodeImageSize = 0
 
     @Inject
-    @Named(WalletModule.FieldName.publicKeyHexString)
-    lateinit var publicKeyHexString: String
-    @Inject
-    @Named(WalletModule.FieldName.emojiId)
-    lateinit var emojiId: String
+    internal lateinit var sharedPrefsWrapper: SharedPrefsWrapper
 
     override val contentViewId = R.layout.activity_wallet_info
 
@@ -89,11 +81,14 @@ class WalletInfoActivity : BaseActivity() {
     }
 
     private fun setUpUi() {
-        val shortEmojiId = EmojiUtil.getShortenedEmojiId(emojiId)!!
+        val shortEmojiId = EmojiUtil.getShortenedEmojiId(sharedPrefsWrapper.emojiId!!)!!
         val chunkedEmojiId = EmojiUtil.getChunkedEmojiId(shortEmojiId, emojiIdChunkSeparator)
         emojiContainerView.text = chunkedEmojiId
 
-        val content = WalletUtil.getQRContent(publicKeyHexString, emojiId)
+        val content = WalletUtil.getQRContent(
+            sharedPrefsWrapper.publicKeyHexString!!,
+            sharedPrefsWrapper.emojiId!!
+        )
         UiUtil.getQREncodedBitmap(content, qrCodeImageSize)?.let {
             qrCodeImageView.setImageBitmap(it)
         }
@@ -111,7 +106,10 @@ class WalletInfoActivity : BaseActivity() {
     fun onCopyEmojiIdClick() {
         UiUtil.temporarilyDisableClick(copyEmojiIdTextView)
         val clipBoard = ContextCompat.getSystemService(this, ClipboardManager::class.java)
-        val clip = ClipData.newPlainText("EmojiId", emojiId)
+        val clip = ClipData.newPlainText(
+            "EmojiId",
+            sharedPrefsWrapper.emojiId
+        )
         clipBoard?.setPrimaryClip(clip)
         Toast.makeText(this, emojiIdCopiedToastMessage, Toast.LENGTH_SHORT).show()
     }

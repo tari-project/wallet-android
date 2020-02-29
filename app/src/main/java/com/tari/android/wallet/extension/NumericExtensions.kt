@@ -30,28 +30,30 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.tari.android.wallet.util
+package com.tari.android.wallet.extension
 
-import java.text.SimpleDateFormat
-import java.util.*
+import com.tari.android.wallet.model.MicroTari
+import java.math.BigInteger
 
 /**
- * Contains Date functions.
+ * Maps float from one range to another.
  *
- * @author The Tari Development Team
+ * @return mapped float
  */
+internal fun Float.remap(from1: Float, to1: Float, from2: Float, to2: Float): Float {
+    return (this - from1) / (to1 - from1) * (to2 - from2) + from2
+}
 
-fun Date.txFormattedDate(): String {
-    val cal: Calendar = Calendar.getInstance()
-    cal.time = this
-    val day: Int = cal.get(Calendar.DATE)
-    var indicator = "th"
-    if (day !in 11..18) indicator = when (day % 10) {
-        1 -> "st"
-        2 -> "nd"
-        3 -> "rd"
-        else -> "th"
-    }
-    return SimpleDateFormat("MMMM d'$indicator' yyyy 'at' h:mm a", Locale.getDefault())
-        .format(this)
+/**
+ * Int to MicroTari.
+ */
+internal fun Int.toMicroTari(): MicroTari {
+    return MicroTari(BigInteger.valueOf(this.toLong()))
+}
+
+/**
+ * Int to MicroTari.
+ */
+internal fun Long.toMicroTari(): MicroTari {
+    return MicroTari(BigInteger.valueOf(this))
 }

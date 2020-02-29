@@ -71,7 +71,7 @@ import com.tari.android.wallet.ui.activity.BaseActivity
 import com.tari.android.wallet.ui.activity.home.adapter.TxListAdapter
 import com.tari.android.wallet.ui.activity.log.DebugLogActivity
 import com.tari.android.wallet.ui.activity.send.SendTariActivity
-import com.tari.android.wallet.ui.activity.walletinfo.WalletInfoActivity
+import com.tari.android.wallet.ui.activity.profile.WalletInfoActivity
 import com.tari.android.wallet.ui.activity.tx.TxDetailActivity
 import com.tari.android.wallet.ui.extension.scrollToTop
 import com.tari.android.wallet.ui.util.UiUtil
@@ -488,13 +488,14 @@ class HomeActivity : BaseActivity(),
     }
 
     /**
+     * TODO
      * Prepares the
      */
     private fun initializeTxListUI() {
-        if (txListIsEmpty && !sharedPrefsWrapper.getOnboardingDisplayedAtHome()) {
+        if (txListIsEmpty && !sharedPrefsWrapper.onboardingDisplayedAtHome) {
             isOnboarding = true
             playOnboardingAnim()
-            sharedPrefsWrapper.setOnboardingDisplayedAtHome(true)
+            sharedPrefsWrapper.onboardingDisplayedAtHome = true
         } else {
             // display txs
             recyclerViewAdapter.notifyDataChanged()
@@ -540,12 +541,12 @@ class HomeActivity : BaseActivity(),
                     this,
                     balanceDigitContainerView,
                     balanceDecimalDigitContainerView,
-                    balanceInfo.availableBalance.tariValue // initial value
+                    balanceInfo
                 )
             // show digits
             balanceViewController.runStartupAnimation()
         } else {
-            balanceViewController.balance = balanceInfo.availableBalance.tariValue
+            balanceViewController.balanceInfo = balanceInfo
         }
     }
 
@@ -625,7 +626,7 @@ class HomeActivity : BaseActivity(),
                 this,
                 balanceDigitContainerView,
                 balanceDecimalDigitContainerView,
-                balanceInfo.availableBalance.tariValue // initial value
+                balanceInfo // initial value
             )
 
         scrollView.scrollTo(0, scrollView.height)
@@ -700,7 +701,7 @@ class HomeActivity : BaseActivity(),
             window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
             setContentView(R.layout.home_dialog_testnet_tari_received)
             setCancelable(false)
-            window!!.setLayout(
+            window?.setLayout(
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
             )
@@ -720,7 +721,7 @@ class HomeActivity : BaseActivity(),
                     }, Constants.UI.longAnimDurationMs)
 
                 }
-            window!!.setGravity(Gravity.BOTTOM)
+            window?.setGravity(Gravity.BOTTOM)
             show()
         }
     }

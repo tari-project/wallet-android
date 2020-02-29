@@ -18,6 +18,9 @@
     <color name="scroll_height_gradient_mid_gray">#10000000</color>
     <color name="common_error">#D32C44</color>
 
+    <!-- dialog -->
+    <color name="dialog_cancel_action">#9430ff</color>
+
     <!-- home -->
     <color name="home_bg_gradient_start">#6239FF</color>
     <color name="home_bg_gradient_center">#8E31FF</color>
@@ -34,7 +37,6 @@
     <color name="home_send_tari_btn_gradient_center">#8E31FF</color>
     <color name="home_send_tari_btn_gradient_end">#AE2BE8</color>
     <color name="home_black_overlay">#FF000000</color>
-    <color name="home_tx_tari_bot_try_later">#9430ff</color>
     <color name="dark_gray">#7F8599</color>
     <color name="create_emoji_id_bg">#f6f6f6</color>
     <color name="wallet_splash_desc_text">#80FFFFFF</color>

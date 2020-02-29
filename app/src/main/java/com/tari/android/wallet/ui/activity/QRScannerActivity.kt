@@ -1,3 +1,35 @@
+/**
+ * Copyright 2020 The Tari Project
+ *
+ * Redistribution and use in source and binary forms, with or
+ * without modification, are permitted provided that the
+ * following conditions are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright notice,
+ * this list of conditions and the following disclaimer.
+ *
+ * 2. Redistributions in binary form must reproduce the above
+ * copyright notice, this list of conditions and the following disclaimer in the
+ * documentation and/or other materials provided with the distribution.
+ *
+ * 3. Neither the name of the copyright holder nor the names of
+ * its contributors may be used to endorse or promote products
+ * derived from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND
+ * CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES,
+ * INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+ * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR
+ * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+ * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
+ * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
 package com.tari.android.wallet.ui.activity
 
 import android.Manifest
@@ -13,23 +45,25 @@ import butterknife.BindView
 import butterknife.OnClick
 import com.budiyev.android.codescanner.*
 import com.google.zxing.BarcodeFormat
+import com.orhanobut.logger.Logger
 import com.tari.android.wallet.R
 
 private const val REQUEST_CAMERA_PERMISSION = 102
 const val EXTRA_QR_DATA = "extra_qr_text"
 
 /**
- * override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-super.onActivityResult(requestCode, resultCode, data)
-
-if (requestCode == REQUEST_QR_SCANNER && resultCode == Activity.RESULT_OK && data != null) {
-val text = data.getStringExtra(EXTRA_QR_DATA)
-Toast.makeText(this, "Scan result: $text", Toast.LENGTH_LONG).show()
-}
-}
+ * QR code scanner activity - used to add a recipient by QR code.
+ *
+ * @author The Tari Development Team
  */
-
 class QRScannerActivity : BaseActivity() {
+
+    companion object {
+        /**
+         * Activity result code.
+         */
+        const val REQUEST_QR_SCANNER = 101
+    }
 
     @BindView(R.id.scanner_view)
     lateinit var scannerView: CodeScannerView
@@ -64,13 +98,14 @@ class QRScannerActivity : BaseActivity() {
     }
 
     private fun startScanning() {
-        codeScanner = CodeScanner(this, scannerView)
-        codeScanner.camera = CodeScanner.CAMERA_BACK
-        codeScanner.formats = listOf(BarcodeFormat.QR_CODE)
-        codeScanner.autoFocusMode = AutoFocusMode.SAFE
-        codeScanner.scanMode = ScanMode.SINGLE
-        codeScanner.isAutoFocusEnabled = true
-        codeScanner.isFlashEnabled = false
+        codeScanner = CodeScanner(this, scannerView).apply {
+            camera = CodeScanner.CAMERA_BACK
+            formats = listOf(BarcodeFormat.QR_CODE)
+            autoFocusMode = AutoFocusMode.SAFE
+            scanMode = ScanMode.SINGLE
+            isAutoFocusEnabled = true
+            isFlashEnabled = false
+        }
 
         codeScanner.decodeCallback = DecodeCallback {
             val intent = Intent()
@@ -83,7 +118,8 @@ class QRScannerActivity : BaseActivity() {
         codeScanner.errorCallback = ErrorCallback {
             runOnUiThread {
                 Toast.makeText(
-                    this, R.string.failed_init_camera_message,
+                    this,
+                    R.string.failed_init_camera_message,
                     Toast.LENGTH_LONG
                 ).show()
             }

@@ -118,7 +118,6 @@ class CreateWalletFragment : BaseFragment() {
     @JvmField
     var createEmojiButtonBottomMargin = 0
 
-
     @BindString(R.string.create_wallet_set_of_emoji_your_wallet_address_desc)
     @JvmField
     var yourWalletAddressDescString = ""
@@ -142,9 +141,6 @@ class CreateWalletFragment : BaseFragment() {
     @JvmField
     @field:[Inject Named(ConfigModule.FieldName.generateTestData)]
     var createNewWalletGenerateTestData: Boolean = false
-    @Inject
-    @Named(WalletModule.FieldName.emojiId)
-    lateinit var emojiId: String
 
     private val uiHandler = Handler()
     private val halfSecondMs = 500L
@@ -154,7 +150,7 @@ class CreateWalletFragment : BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val shortEmojiId = EmojiUtil.getShortenedEmojiId(emojiId)!!
+        val shortEmojiId = EmojiUtil.getShortenedEmojiId(sharedPrefsWrapper.emojiId!!)!!
         val chunkedEmojiId = EmojiUtil.getChunkedEmojiId(
             shortEmojiId,
             emojiIdChunkSeparator
@@ -207,7 +203,7 @@ class CreateWalletFragment : BaseFragment() {
     @OnClick(R.id.create_wallet_btn_continue)
     fun onContinueButtonClick() {
         UiUtil.temporarilyDisableClick(continueButton)
-        sharedPrefsWrapper.setOnboardingCompleted(true)
+        sharedPrefsWrapper.onboardingCompleted = true
         val animatorSet = animateButtonClick(continueButton)
         animatorSet.addListener(object : AnimatorListenerAdapter() {
             override fun onAnimationEnd(animation: Animator?) {
@@ -328,9 +324,10 @@ class CreateWalletFragment : BaseFragment() {
         buttonAnimSet.playTogether(buttonTranslationAnim, buttonFadeInAnim)
         buttonAnimSet.duration = CreateEmojiId.continueButtonAnimDurationMs
 
-        val emojiContainerImageScaleAnim = ValueAnimator.ofFloat(2f, 1.5f)
+        val emojiContainerImageScaleAnim = ValueAnimator.ofFloat(0f, 1f)
         emojiContainerImageScaleAnim.addUpdateListener { animation ->
-            val scale = animation.animatedValue.toString().toFloat()
+            val value = animation.animatedValue.toString().toFloat()
+            val scale = 1.5f + (1f - value) * 0.5f
             emojiIdTextView.scaleX = scale
             emojiIdTextView.scaleY = scale
         }
