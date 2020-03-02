@@ -81,7 +81,7 @@ class FFIWalletTests {
 
         val transport = FFITransportType()
         val commsConfig = FFICommsConfig(
-            FFITestUtil.WALLET_CONTROL_SERVICE_ADDRESS,
+            transport.getAddress(),
             transport,
             FFITestUtil.WALLET_DB_NAME,
             FFITestUtil.WALLET_DATASTORE_PATH,
@@ -184,6 +184,24 @@ class FFIWalletTests {
         inbound.destroy()
         pendingInboundTxs.destroy()
 
+        // test balances
+        val available = wallet.getAvailableBalance()
+        assertTrue(available.toString().toBigIntegerOrNull() != null)
+        val pendingIn = wallet.getPendingIncomingBalance()
+        assertTrue(pendingIn.toString().toBigIntegerOrNull() != null)
+        val pendingOut = wallet.getPendingOutgoingBalance()
+        assertTrue(pendingOut.toString().toBigIntegerOrNull() != null)
+
+        // test send tari
+        assertTrue(
+            wallet.sendTx(
+                contact.getPublicKey(),
+                BigInteger.valueOf(1000000L),
+                BigInteger.valueOf(100L),
+                "Android Wallet"
+            )
+        )
+
         // test pending outbound transactions
         val pendingOutboundTxs = wallet.getPendingOutboundTxs()
         assertTrue(pendingOutboundTxs.getPointer() != nullptr)
@@ -206,25 +224,8 @@ class FFIWalletTests {
         outboundTx.destroy()
         pendingOutboundTxs.destroy()
 
-        // test balances
-        val available = wallet.getAvailableBalance()
-        assertTrue(available.toString().toBigIntegerOrNull() != null)
-        val pendingIn = wallet.getPendingIncomingBalance()
-        assertTrue(pendingIn.toString().toBigIntegerOrNull() != null)
-        val pendingOut = wallet.getPendingOutgoingBalance()
-        assertTrue(pendingOut.toString().toBigIntegerOrNull() != null)
-
-        // test send tari
-        assertTrue(
-            wallet.sendTx(
-                contact.getPublicKey(),
-                BigInteger.valueOf(1000000L),
-                BigInteger.valueOf(100L),
-                "Android Wallet"
-            )
-        )
-
         // destroy objects
+        transport.destroy()
         contact.destroy()
         wallet.destroy()
 

@@ -70,14 +70,14 @@ internal class FFITransportType constructor(pointer: FFITransportTypePtr): FFIBa
         ptr = jniMemoryTransport()
     }
 
-    constructor(listenerAddress: String) : this(nullptr) {
+    constructor(listenerAddress: NetAddressString) : this(nullptr) {
         val error = FFIError()
-        ptr = jniTCPTransport(listenerAddress,error)
+        ptr = jniTCPTransport(listenerAddress.toString(),error)
         throwIf(error)
     }
 
     constructor(
-        controlAddress: String,
+        controlAddress: NetAddressString,
         torPort: Int,
         torPassword: String,
         torKey: FFIByteVector,
@@ -85,7 +85,7 @@ internal class FFITransportType constructor(pointer: FFITransportTypePtr): FFIBa
         socksPassword: String
     ) : this(nullptr) {
         val error = FFIError()
-        ptr = jniTorTransport(controlAddress,torPort,torPassword,torKey.getPointer(),socksUsername,socksPassword,error)
+        ptr = jniTorTransport(controlAddress.toString(),torPort,torPassword,torKey.getPointer(),socksUsername,socksPassword,error)
         throwIf(error)
     }
 

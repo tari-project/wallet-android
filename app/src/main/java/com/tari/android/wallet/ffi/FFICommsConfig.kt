@@ -65,7 +65,7 @@ internal class FFICommsConfig constructor(pointer: FFICommsConfigPtr) : FFIBase(
     }
 
     constructor(
-        publicAddress: NetAddressString,
+        publicAddress: String,
         transport: FFITransportType,
         databaseName: String,
         datastorePath: String,
@@ -78,7 +78,7 @@ internal class FFICommsConfig constructor(pointer: FFICommsConfigPtr) : FFIBase(
         if (writeableDir.exists() && writeableDir.isDirectory && writeableDir.canWrite()) {
             val error = FFIError()
             ptr = jniCreate(
-                publicAddress.toString(),
+                publicAddress,
                 transport.getPointer(),
                 databaseName,
                 datastorePath,
