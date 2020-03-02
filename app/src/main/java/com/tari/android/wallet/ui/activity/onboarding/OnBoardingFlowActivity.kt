@@ -32,14 +32,18 @@
  */
 package com.tari.android.wallet.ui.activity.onboarding
 
+import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import com.tari.android.wallet.R
 import com.tari.android.wallet.di.WalletModule
 import com.tari.android.wallet.ui.activity.BaseActivity
+import com.tari.android.wallet.ui.activity.home.HomeActivity
 import com.tari.android.wallet.ui.fragment.onboarding.CreateWalletFragment
 import com.tari.android.wallet.ui.fragment.onboarding.IntroductionFragment
-import com.tari.android.wallet.util.Constants
+import com.tari.android.wallet.ui.fragment.onboarding.LocalAuthFragment
+import com.tari.android.wallet.util.Constants.UI.Auth
+import com.tari.android.wallet.util.Constants.UI.CreateWallet
 import com.tari.android.wallet.util.SharedPrefsWrapper
 import com.tari.android.wallet.util.WalletUtil
 import javax.inject.Inject
@@ -50,7 +54,8 @@ import javax.inject.Named
  *
  * @author The Tari Development Team
  */
-class OnboardingFlowActivity : BaseActivity(), IntroductionFragment.Listener {
+class OnboardingFlowActivity : BaseActivity(), IntroductionFragment.Listener,
+    CreateWalletFragment.Listener, LocalAuthFragment.Listener {
 
     override val contentViewId = R.layout.activity_onboarding_flow
 
@@ -65,22 +70,31 @@ class OnboardingFlowActivity : BaseActivity(), IntroductionFragment.Listener {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        if (sharedPrefsWrapper.onboardingWasInterrupted) {
-            // clean existing files & restart onboarding
-            WalletUtil.clearWalletFiles(walletFilesDirPath)
-            supportFragmentManager
-                .beginTransaction()
-                .replace(
-                    R.id.onboarding_create_emoji_id_container,
-                    CreateWalletFragment()
-                )
-                .commit()
-        } else {
-            supportFragmentManager.beginTransaction()
-                .replace(
-                    R.id.onboarding_frame_container,
-                    IntroductionFragment()
-                ).commit()
+        when {
+            sharedPrefsWrapper.onboardingAuthWasInterrupted -> {
+                supportFragmentManager
+                    .beginTransaction()
+                    .replace(R.id.onboarding_frame_container1, LocalAuthFragment())
+                    .commit()
+            }
+            sharedPrefsWrapper.onboardingWasInterrupted -> {
+                // clean existing files & restart onboarding
+                WalletUtil.clearWalletFiles(walletFilesDirPath)
+                supportFragmentManager
+                    .beginTransaction()
+                    .replace(
+                        R.id.onboarding_frame_container2,
+                        CreateWalletFragment()
+                    )
+                    .commit()
+            }
+            else -> {
+                supportFragmentManager.beginTransaction()
+                    .replace(
+                        R.id.onboarding_frame_container1,
+                        IntroductionFragment()
+                    ).commit()
+            }
         }
     }
 
@@ -95,20 +109,22 @@ class OnboardingFlowActivity : BaseActivity(), IntroductionFragment.Listener {
         supportFragmentManager
             .beginTransaction()
             .replace(
-                R.id.onboarding_create_emoji_id_container,
+                R.id.onboarding_frame_container2,
                 CreateWalletFragment()
             )
             .commit()
-        removeCurrentFragment()
+
+        removeContainer1Fragment()
     }
 
-    private fun removeCurrentFragment() {
+
+    private fun removeContainer1Fragment() {
         uiHandler.postDelayed({
-            val fragment = supportFragmentManager.findFragmentById(R.id.onboarding_frame_container)
+            val fragment = supportFragmentManager.findFragmentById(R.id.onboarding_frame_container1)
             fragment?.let {
                 supportFragmentManager.beginTransaction().remove(fragment).commit()
             }
-        }, Constants.UI.CreateWallet.removeFragmentDelayDuration)
+        }, CreateWallet.removeFragmentDelayDuration)
     }
 
     override fun onDestroy() {
@@ -116,4 +132,35 @@ class OnboardingFlowActivity : BaseActivity(), IntroductionFragment.Listener {
         uiHandler.removeCallbacksAndMessages(null)
     }
 
+    override fun continueToEnableAuth() {
+        val fragment =
+            supportFragmentManager.findFragmentById(R.id.onboarding_frame_container2)
+        if (fragment is CreateWalletFragment) {
+            fragment.fadeOutAllViewAnimation()
+        }
+
+        supportFragmentManager
+            .beginTransaction()
+            .setCustomAnimations(R.anim.fade_in, R.anim.fade_out)
+            .replace(R.id.onboarding_frame_container1, LocalAuthFragment())
+            .commit()
+
+        removeContainer2Fragment()
+    }
+
+    private fun removeContainer2Fragment() {
+        uiHandler.postDelayed({
+            val fragment = supportFragmentManager.findFragmentById(R.id.onboarding_frame_container2)
+            fragment?.let {
+                supportFragmentManager.beginTransaction().remove(fragment).commit()
+            }
+        }, Auth.removeFragmentDelayDuration)
+    }
+
+    override fun onAuthSuccess() {
+        val intent = Intent(this, HomeActivity::class.java)
+        intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
+        startActivity(intent)
+        finish()
+    }
 }

@@ -5,14 +5,14 @@
     android:orientation="vertical">
 
     <FrameLayout
-        android:id="@+id/onboarding_frame_container"
+        android:id="@+id/onboarding_frame_container1"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/black"
         android:orientation="vertical" />
 
     <FrameLayout
-        android:id="@+id/onboarding_create_emoji_id_container"
+        android:id="@+id/onboarding_frame_container2"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/transparent"

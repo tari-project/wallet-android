@@ -41,6 +41,7 @@ import butterknife.ButterKnife
 import com.tari.android.wallet.application.TariWalletApplication
 import com.tari.android.wallet.ui.fragment.onboarding.CreateWalletFragment
 import com.tari.android.wallet.ui.fragment.onboarding.IntroductionFragment
+import com.tari.android.wallet.ui.fragment.onboarding.LocalAuthFragment
 import com.tari.android.wallet.ui.fragment.send.AddAmountFragment
 import com.tari.android.wallet.ui.fragment.send.AddNoteAndSendFragment
 import com.tari.android.wallet.ui.fragment.send.AddRecipientFragment
@@ -69,6 +70,7 @@ abstract class BaseFragment : Fragment() {
             is AddAmountFragment -> component.inject(this)
             is AddNoteAndSendFragment -> component.inject(this)
             is SendTxSuccessfulFragment -> component.inject(this)
+            is LocalAuthFragment -> component.inject(this)
         }
         // bind views
         val view = inflater.inflate(contentViewId, container, false)
