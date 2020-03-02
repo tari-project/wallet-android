@@ -63,7 +63,7 @@ class FFICommsConfigTests {
         val privateKey = FFIPrivateKey(HexString(FFITestUtil.PRIVATE_KEY_HEX_STRING))
         val transport = FFITransportType()
         val commsConfig = FFICommsConfig(
-            controlServiceAddress,
+            transport.getAddress(),
             transport,
             dbName,
             datastorePath,
@@ -71,6 +71,7 @@ class FFICommsConfigTests {
         )
         assertTrue(commsConfig.getPointer() != nullptr)
         commsConfig.destroy()
+        transport.destroy()
         privateKey.destroy()
     }
 
@@ -80,13 +81,14 @@ class FFICommsConfigTests {
         val privateKey = FFIPrivateKey(HexString(FFITestUtil.PRIVATE_KEY_HEX_STRING))
         val transport = FFITransportType()
         val commsConfig = FFICommsConfig(
-            controlServiceAddress,
+            transport.getAddress(),
             transport,
             dbName,
             StringBuilder().append(datastorePath).append("bad_dir").toString(),
             privateKey
         )
         commsConfig.destroy()
+        transport.destroy()
     }
 
 }

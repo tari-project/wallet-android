@@ -100,7 +100,7 @@ class WalletModule {
         //TODO: Change to tor
         val transport = FFITransportType()
         return FFICommsConfig(
-            Constants.Wallet.WALLET_LISTENER_ADDRESS,
+            transport.getAddress(),
             transport,
             Constants.Wallet.WALLET_DB_NAME,
             walletFilesDirPath,

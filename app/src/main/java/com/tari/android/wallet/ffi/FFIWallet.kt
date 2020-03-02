@@ -201,7 +201,7 @@ internal abstract class FFIWallet(commsConfig: FFICommsConfig, logPath: String) 
     init {
         if (ptr == nullptr) { // so it can only be assigned once for the singleton
             val error = FFIError()
-            Logger.e("Pre jniCreate.")
+            Logger.i("Pre jniCreate.")
             ptr = jniCreate(
                 commsConfig.getPointer(), logPath,
                 this::onTxReceived.name, "(J)V",
@@ -212,7 +212,7 @@ internal abstract class FFIWallet(commsConfig: FFICommsConfig, logPath: String) 
                 this::onDiscoveryComplete.name, "([BZ)V",
                 error
             )
-            Logger.e("Post jniCreate.")
+            Logger.i("Post jniCreate.")
             Log.i("Wallet Code", error.code.toString())
             throwIf(error)
         }
