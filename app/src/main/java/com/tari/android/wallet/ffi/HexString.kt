@@ -52,9 +52,7 @@ internal class HexString constructor(bytes: FFIByteVector) {
                     val m = bytes.getAt(i)
                     byteArray[i] = m.toByte()
                 }
-                hex = BigInteger(1, byteArray) //
-                    .toString(16) // a-f,0-9
-                    .toUpperCase(Locale.getDefault()) // A-F are in lowercase in the final string before this call
+                hex = String.format("%064X",BigInteger(1, byteArray))
             } else {
                 hex = String()
             }
@@ -67,7 +65,7 @@ internal class HexString constructor(bytes: FFIByteVector) {
         if (pattern.matches(string) && string.length % 2 == 0) {
             hex = string
         } else {
-            throw FFIException(message = "String is not valid Hex of even length.")
+            throw FFIException(message = string+" is not valid Hex of even length.")
         }
     }
 
