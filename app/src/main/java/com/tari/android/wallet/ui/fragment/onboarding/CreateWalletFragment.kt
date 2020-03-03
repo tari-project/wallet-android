@@ -33,14 +33,12 @@
 package com.tari.android.wallet.ui.fragment.onboarding
 
 import android.animation.*
-import android.content.Intent
+import android.content.Context
 import android.os.AsyncTask
 import android.os.Bundle
 import android.os.Handler
 import android.view.View
 import android.view.ViewTreeObserver
-import android.view.animation.AccelerateInterpolator
-import android.view.animation.DecelerateInterpolator
 import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -55,10 +53,8 @@ import com.tari.android.wallet.R
 import com.tari.android.wallet.di.ConfigModule
 import com.tari.android.wallet.di.WalletModule
 import com.tari.android.wallet.ffi.FFITestWallet
-import com.tari.android.wallet.ui.activity.AuthActivity
 import com.tari.android.wallet.ui.fragment.BaseFragment
 import com.tari.android.wallet.ui.util.UiUtil
-import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.Constants.UI.CreateEmojiId
 import com.tari.android.wallet.util.EmojiUtil
 import com.tari.android.wallet.util.SharedPrefsWrapper
@@ -145,6 +141,8 @@ class CreateWalletFragment : BaseFragment() {
     private val uiHandler = Handler()
     private val halfSecondMs = 500L
 
+    private var listener: Listener? = null
+
     override val contentViewId = R.layout.fragment_create_wallet
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -162,6 +160,18 @@ class CreateWalletFragment : BaseFragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         uiHandler.removeCallbacksAndMessages(null)
+    }
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        if (activity is Listener) {
+            listener = activity as Listener
+        }
+    }
+
+    override fun onDetach() {
+        super.onDetach()
+        listener = null
     }
 
     private fun setupUi() {
@@ -204,68 +214,26 @@ class CreateWalletFragment : BaseFragment() {
     fun onContinueButtonClick() {
         UiUtil.temporarilyDisableClick(continueButton)
         sharedPrefsWrapper.onboardingCompleted = true
-        val animatorSet = animateButtonClick(continueButton)
+        val animatorSet = UiUtil.animateButtonClick(continueButton)
         animatorSet.addListener(object : AnimatorListenerAdapter() {
             override fun onAnimationEnd(animation: Animator?) {
                 super.onAnimationEnd(animation)
-                showAuthActivity()
+                sharedPrefsWrapper.onboardingAuthSetupStarted = true
+                listener?.continueToEnableAuth()
             }
         })
-    }
-
-    private fun showAuthActivity() {
-        activity?.let {
-            val intent = Intent(it, AuthActivity::class.java)
-            intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
-            startActivity(intent)
-            it.finish()
-        }
     }
 
     @OnClick(R.id.create_wallet_btn_create_emoji_id)
     fun onCreateEmojiIdButtonClick() {
         UiUtil.temporarilyDisableClick(createEmojiIdButton)
-        val animatorSet = animateButtonClick(createEmojiIdButton)
+        val animatorSet = UiUtil.animateButtonClick(createEmojiIdButton)
         animatorSet.addListener(object : AnimatorListenerAdapter() {
             override fun onAnimationEnd(animation: Animator?) {
                 super.onAnimationEnd(animation)
                 showEmojiWheelAnimation()
             }
         })
-
-    }
-
-    private fun animateButtonClick(button: Button): AnimatorSet {
-        val scaleDownBtnAnim = ValueAnimator.ofFloat(
-            Constants.UI.Button.clickScaleAnimFullScale,
-            Constants.UI.Button.clickScaleAnimSmallScale
-        )
-        scaleDownBtnAnim.addUpdateListener { valueAnimator: ValueAnimator ->
-            val scale = valueAnimator.animatedValue as Float
-            button.scaleX = scale
-            button.scaleY = scale
-        }
-        scaleDownBtnAnim.duration = Constants.UI.Button.clickScaleAnimDurationMs
-        scaleDownBtnAnim.startDelay = Constants.UI.Button.clickScaleAnimStartOffset
-        scaleDownBtnAnim.interpolator = DecelerateInterpolator()
-
-        val scaleUpBtnAnim = ValueAnimator.ofFloat(
-            Constants.UI.Button.clickScaleAnimSmallScale,
-            Constants.UI.Button.clickScaleAnimFullScale
-        )
-        scaleUpBtnAnim.addUpdateListener { valueAnimator: ValueAnimator ->
-            val scale = valueAnimator.animatedValue as Float
-            button.scaleX = scale
-            button.scaleY = scale
-        }
-        scaleUpBtnAnim.duration = Constants.UI.Button.clickScaleAnimReturnDurationMs
-        scaleUpBtnAnim.startDelay = Constants.UI.Button.clickScaleAnimReturnStartOffset
-        scaleUpBtnAnim.interpolator = AccelerateInterpolator()
-
-        val animSet = AnimatorSet()
-        animSet.playSequentially(scaleDownBtnAnim, scaleUpBtnAnim)
-        animSet.start()
-        return animSet
     }
 
     private fun showEmojiWheelAnimation() {
@@ -586,4 +554,20 @@ class CreateWalletFragment : BaseFragment() {
         helloTextAnim.start()
     }
 
+    fun fadeOutAllViewAnimation() {
+        val fadeOutAnim = ValueAnimator.ofFloat(1f, 0f)
+        fadeOutAnim.addUpdateListener { valueAnimator: ValueAnimator ->
+            val alpha = valueAnimator.animatedValue as Float
+            continueButton.alpha = alpha
+            walletAddressDescText.alpha = alpha
+            emojiIdTextView.alpha = alpha
+            yourEmojiTitleText.alpha = alpha
+        }
+        fadeOutAnim.duration = CreateEmojiId.fadeOutAnimDurationMs
+        fadeOutAnim.start()
+    }
+
+    interface Listener {
+        fun continueToEnableAuth()
+    }
 }

@@ -47,6 +47,8 @@ class SharedPrefsWrapper(private val sharedPrefs: SharedPreferences) {
         const val publicKeyHexStringKey = "tari_wallet_public_key_hex_string"
         const val emojiIdKey = "tari_wallet_emoji_id_"
         const val onboardingStartedKey = "tari_wallet_onboarding_started"
+        const val onboardingAuthSetupCompletedKey = "tari_wallet_onboarding_auth_setup_completed"
+        const val onboardingAuthSetupStartedKey = "tari_wallet_onboarding_auth_setup_started"
         const val onboardingCompletedKey = "tari_wallet_onboarding_completed"
         const val onboardingDisplayedAtHomeKey = "tari_wallet_onboarding_displayed_at_home"
     }
@@ -103,6 +105,35 @@ class SharedPrefsWrapper(private val sharedPrefs: SharedPreferences) {
                 putBoolean(Key.onboardingCompletedKey, value)
                 apply()
             }
+        }
+
+    var onboardingAuthSetupStarted: Boolean
+        get() {
+            return sharedPrefs.getBoolean(Key.onboardingAuthSetupStartedKey, false)
+        }
+        set(value) {
+            sharedPrefs.edit().apply {
+                putBoolean(Key.onboardingAuthSetupStartedKey, value)
+                apply()
+            }
+        }
+
+
+    var onboardingAuthSetupCompleted: Boolean
+        get() {
+            return sharedPrefs.getBoolean(Key.onboardingAuthSetupCompletedKey, false)
+        }
+        set(value) {
+            sharedPrefs.edit().apply {
+                putBoolean(Key.onboardingAuthSetupCompletedKey, value)
+                apply()
+            }
+        }
+
+
+    val onboardingAuthWasInterrupted: Boolean
+        get() {
+            return onboardingAuthSetupStarted && !onboardingAuthSetupCompleted
         }
 
     val onboardingWasInterrupted: Boolean

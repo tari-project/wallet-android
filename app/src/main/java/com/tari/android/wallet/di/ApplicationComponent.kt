@@ -40,11 +40,12 @@ import com.tari.android.wallet.ui.activity.SplashActivity
 import com.tari.android.wallet.ui.activity.home.HomeActivity
 import com.tari.android.wallet.ui.activity.log.DebugLogActivity
 import com.tari.android.wallet.ui.activity.onboarding.OnboardingFlowActivity
-import com.tari.android.wallet.ui.activity.send.SendTariActivity
 import com.tari.android.wallet.ui.activity.profile.WalletInfoActivity
+import com.tari.android.wallet.ui.activity.send.SendTariActivity
 import com.tari.android.wallet.ui.activity.tx.TxDetailActivity
 import com.tari.android.wallet.ui.fragment.onboarding.CreateWalletFragment
 import com.tari.android.wallet.ui.fragment.onboarding.IntroductionFragment
+import com.tari.android.wallet.ui.fragment.onboarding.LocalAuthFragment
 import com.tari.android.wallet.ui.fragment.send.AddAmountFragment
 import com.tari.android.wallet.ui.fragment.send.AddNoteAndSendFragment
 import com.tari.android.wallet.ui.fragment.send.AddRecipientFragment
@@ -95,6 +96,7 @@ interface ApplicationComponent {
     fun inject(fragment: AddAmountFragment)
     fun inject(fragment: AddNoteAndSendFragment)
     fun inject(fragment: SendTxSuccessfulFragment)
+    fun inject(fragment: LocalAuthFragment)
 
     /**
      * Service(s).

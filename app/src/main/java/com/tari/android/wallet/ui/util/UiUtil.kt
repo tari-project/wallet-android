@@ -32,6 +32,8 @@
  */
 package com.tari.android.wallet.ui.util
 
+import android.animation.AnimatorSet
+import android.animation.ValueAnimator
 import android.app.Activity
 import android.content.ContentResolver
 import android.content.Context
@@ -40,13 +42,17 @@ import android.net.Uri
 import android.os.Handler
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.AccelerateInterpolator
+import android.view.animation.DecelerateInterpolator
 import android.view.inputmethod.InputMethodManager
+import android.widget.Button
 import android.widget.ProgressBar
 import androidx.annotation.NonNull
 import androidx.core.graphics.BlendModeColorFilterCompat
 import androidx.core.graphics.BlendModeCompat
 import com.google.zxing.BarcodeFormat
 import com.journeyapps.barcodescanner.BarcodeEncoder
+import com.tari.android.wallet.util.Constants
 import java.lang.ref.WeakReference
 
 /**
@@ -217,6 +223,41 @@ internal object UiUtil {
         .path(resourceId.toString())
         .build()
 
+    /*
+    * Animation for button click
+    * */
+    fun animateButtonClick(button: Button): AnimatorSet {
+        val scaleDownBtnAnim = ValueAnimator.ofFloat(
+            Constants.UI.Button.clickScaleAnimFullScale,
+            Constants.UI.Button.clickScaleAnimSmallScale
+        )
+        scaleDownBtnAnim.addUpdateListener { valueAnimator: ValueAnimator ->
+            val scale = valueAnimator.animatedValue as Float
+            button.scaleX = scale
+            button.scaleY = scale
+        }
+        scaleDownBtnAnim.duration = Constants.UI.Button.clickScaleAnimDurationMs
+        scaleDownBtnAnim.startDelay = Constants.UI.Button.clickScaleAnimStartOffset
+        scaleDownBtnAnim.interpolator = DecelerateInterpolator()
+
+        val scaleUpBtnAnim = ValueAnimator.ofFloat(
+            Constants.UI.Button.clickScaleAnimSmallScale,
+            Constants.UI.Button.clickScaleAnimFullScale
+        )
+        scaleUpBtnAnim.addUpdateListener { valueAnimator: ValueAnimator ->
+            val scale = valueAnimator.animatedValue as Float
+            button.scaleX = scale
+            button.scaleY = scale
+        }
+        scaleUpBtnAnim.duration = Constants.UI.Button.clickScaleAnimReturnDurationMs
+        scaleUpBtnAnim.startDelay = Constants.UI.Button.clickScaleAnimReturnStartOffset
+        scaleUpBtnAnim.interpolator = AccelerateInterpolator()
+
+        val animSet = AnimatorSet()
+        animSet.playSequentially(scaleDownBtnAnim, scaleUpBtnAnim)
+        animSet.start()
+        return animSet
+    }
     /**
      * @param content content to encode
      * @param size bitmap size
