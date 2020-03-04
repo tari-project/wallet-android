@@ -27,11 +27,14 @@
         <!-- profile button -->
         <ImageView
             android:id="@+id/home_img_wallet_info"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:padding="6dp"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:scaleType="center"
             android:layout_alignParentEnd="true"
-            android:src="@drawable/home_profile_icon"
+            android:contentDescription="@null"
+            android:background="@drawable/home_profile_icon_bg"
+            android:padding="6dp"
+            android:src="@drawable/profile_icon"
             android:tint="@color/white" />
 
         <!-- title -->
@@ -103,8 +106,8 @@
     <View
         android:id="@+id/home_vw_tx_list_bg_overlay"
         android:layout_width="match_parent"
-        android:alpha="0"
         android:layout_height="match_parent"
+        android:alpha="0"
         android:background="@color/home_black_overlay"
         android:clickable="false" />
 

@@ -34,9 +34,7 @@ package com.tari.android.wallet.service
 
 import android.app.*
 import android.content.Intent
-import android.os.Build
 import android.os.IBinder
-import androidx.core.app.NotificationCompat
 import com.orhanobut.logger.Logger
 import com.tari.android.wallet.R
 import com.tari.android.wallet.application.TariWalletApplication
@@ -44,12 +42,14 @@ import com.tari.android.wallet.event.Event
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.ffi.*
 import com.tari.android.wallet.model.*
+import com.tari.android.wallet.notification.NotificationHelper
 import com.tari.android.wallet.ui.activity.home.HomeActivity
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import java.math.BigInteger
 import javax.inject.Inject
+import com.tari.android.wallet.model.Tx.Direction.*
 
 /**
  * Foreground wallet service.
@@ -59,15 +59,20 @@ import javax.inject.Inject
 class WalletService : Service(), FFIWalletListenerAdapter {
 
     companion object {
-        // notification channel id
-        const val notifChannelId = "TariWalletServiceNotifChannel"
-        const val MESSAGE_PREFIX = "Hello Tari from"
+        // notification id
+        private const val NOTIFICATION_ID = 1
+        private const val MESSAGE_PREFIX = "Hello Tari from"
     }
 
+    @Inject
+    internal lateinit var app: TariWalletApplication
     @Inject
     internal lateinit var wallet: FFITestWallet
     @Inject
     internal lateinit var tariRESTService: TariRESTService
+    @Inject
+    internal lateinit var notificationHelper: NotificationHelper
+
     /**
      * Service stub implementation.
      */
@@ -78,50 +83,17 @@ class WalletService : Service(), FFIWalletListenerAdapter {
     private var listeners = mutableListOf<TariWalletServiceListener>()
 
     override fun onCreate() {
-        Logger.d("Tari wallet service created #1.")
         super.onCreate()
         (application as TariWalletApplication).appComponent.inject(this)
-        Logger.d("Tari wallet service created #2.")
-        // set wallet listener
         wallet.listenerAdapter = this
-    }
-
-    private fun createNotificationChannel() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val serviceChannel = NotificationChannel(
-                notifChannelId,
-                "Tari Wallet Service Notification Channel",
-                NotificationManager.IMPORTANCE_DEFAULT
-            )
-            serviceChannel.setSound(null, null)
-            serviceChannel.setShowBadge(false)
-            val manager = getSystemService(
-                NotificationManager::class.java
-            )
-            manager?.createNotificationChannel(serviceChannel)
-        }
     }
 
     /**
      * Called on service start-up.
      */
     override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
-        createNotificationChannel()
-        val notificationIntent = Intent(this, HomeActivity::class.java)
-        val pendingIntent = PendingIntent.getActivity(
-            this,
-            0, notificationIntent, 0
-        )
-        // post foreground service notification
-        val notification: Notification = NotificationCompat.Builder(this, notifChannelId)
-            .setContentTitle(applicationContext.resources.getString(R.string.service_title))
-            .setContentText(applicationContext.resources.getString(R.string.service_description))
-            .setSound(null)
-            .setSmallIcon(R.drawable.wallet_service_notification_icon)
-            .setContentIntent(pendingIntent)
-            .build()
-
-        startForeground(1, notification)
+        val notification = notificationHelper.buildForegroundServiceNotification()
+        startForeground(NOTIFICATION_ID, notification)
         Logger.d("Tari wallet service started.")
         return START_NOT_STICKY
     }
@@ -174,10 +146,18 @@ class WalletService : Service(), FFIWalletListenerAdapter {
 
     override fun onTxReceived(pendingInboundTxId: BigInteger) {
         Logger.d("Tx $pendingInboundTxId received.")
-        val txId = TxId(pendingInboundTxId)
         // post event to bus for the internal listeners
-        EventBus.post(Event.Wallet.TxReceived(txId))
+        val tx = serviceImpl.getPendingInboundTxById(
+            TxId(pendingInboundTxId),
+            WalletError()
+        )
+        if (tx != null) {
+            EventBus.post(Event.Wallet.TxReceived(tx))
+            // manage notifications
+            postTxNotification(tx)
+        }
         // notify listeners
+        val txId = TxId(pendingInboundTxId)
         listeners.iterator().forEach {
             it.onTxReceived(txId)
         }
@@ -212,6 +192,13 @@ class WalletService : Service(), FFIWalletListenerAdapter {
         // notify external listeners
         listeners.iterator().forEach {
             it.onDiscoveryComplete(TxId(txId), success)
+        }
+    }
+
+    private fun postTxNotification(tx: Tx) {
+        // if app is backgrounded, display heads-up notification
+        if (!app.isInForeground || app.currentActivity !is HomeActivity) {
+            notificationHelper.postCustomLayoutTxNotification(tx)
         }
     }
 
@@ -617,7 +604,7 @@ class WalletService : Service(), FFIWalletListenerAdapter {
             }
 
             if (publicKeyHexString == destinationPublicKeyFFI.toString()) {
-                direction = Tx.Direction.INBOUND
+                direction = INBOUND
                 val userPublicKey = PublicKey(
                     sourcePublicKeyFFI.toString(),
                     sourcePublicKeyFFI.getEmojiNodeId()
@@ -627,7 +614,7 @@ class WalletService : Service(), FFIWalletListenerAdapter {
                     sourcePublicKeyFFI.toString()
                 ) ?: User(userPublicKey)
             } else {
-                direction = Tx.Direction.OUTBOUND
+                direction = OUTBOUND
                 val userPublicKey = PublicKey(
                     destinationPublicKeyFFI.toString(),
                     destinationPublicKeyFFI.getEmojiNodeId()
@@ -719,54 +706,53 @@ class WalletService : Service(), FFIWalletListenerAdapter {
             response.enqueue(object : Callback<TestnetTariAllocateResponse> {
                 override fun onFailure(call: Call<TestnetTariAllocateResponse>, t: Throwable) {
                     error.code = WalletErrorCode.UNKNOWN_ERROR
-                    notifyTestnetTariRequestFailed(getString(R.string.service_error_no_internet_connection))
+                    notifyTestnetTariRequestFailed(getString(R.string.wallet_service_error_no_internet_connection))
                 }
 
                 override fun onResponse(
                     call: Call<TestnetTariAllocateResponse>,
                     response: Response<TestnetTariAllocateResponse>
                 ) {
-                    when (response.code()) {
-                        in 200..209 -> {
-                            response.body()?.let { responseBody ->
-                                val publicKeyFFI =
-                                    FFIPublicKey(HexString(responseBody.returnWalletId))
-                                val privateKeyFFI = FFIPrivateKey(HexString(responseBody.key))
-                                val value = BigInteger(responseBody.value)
-                                val contactFFI = FFIContact("TariBot", publicKeyFFI)
-                                wallet.addUpdateContact(contactFFI)
-                                wallet.importUTXO(
-                                    value,
-                                    getString(R.string.home_tari_bot_some_tari_to_get_started),
-                                    privateKeyFFI,
-                                    publicKeyFFI
-                                )
+                    val body = response.body()
+                    if (response.code() in 200..209 && body != null) {
+                        val publicKeyFFI =
+                            FFIPublicKey(HexString(body.returnWalletId))
+                        val privateKeyFFI = FFIPrivateKey(HexString(body.key))
+                        val value = BigInteger(body.value)
+                        val contactFFI = FFIContact("TariBot", publicKeyFFI)
+                        wallet.addUpdateContact(contactFFI)
+                        wallet.importUTXO(
+                            value,
+                            getString(R.string.home_tari_bot_some_tari_to_get_started),
+                            privateKeyFFI,
+                            publicKeyFFI
+                        )
+                        val publicKey = publicKeyFromFFI(publicKeyFFI)
+                        // destroy native objects
+                        publicKeyFFI.destroy()
+                        privateKeyFFI.destroy()
+                        contactFFI.destroy()
 
-                                // post event to bus for the internal listeners
-                                EventBus.post(
-                                    Event.Testnet.TestnetTariRequestSuccessful(
-                                        publicKeyFromFFI(publicKeyFFI)
-                                    )
-                                )
-                                // destroy native objects
-                                publicKeyFFI.destroy()
-                                privateKeyFFI.destroy()
-                                contactFFI.destroy()
-                            }
-                            // notify external listeners
-                            listeners.iterator().forEach { listener ->
-                                listener.onTestnetTariRequestSuccess()
-                            }
+                        // post event to bus for the internal listeners
+                        EventBus.post(Event.Testnet.TestnetTariRequestSuccessful(publicKey))
+                        // notify external listeners
+                        listeners.iterator().forEach { listener ->
+                            listener.onTestnetTariRequestSuccess()
                         }
-                        else -> {
-                            error.code = WalletErrorCode.UNKNOWN_ERROR
-                            val errorMessage =
-                                getString(R.string.service_error_testnet_tari_request) +
-                                        " " +
-                                        response.errorBody()?.string()
-                            error.message = errorMessage
-                            notifyTestnetTariRequestFailed(errorMessage)
-                        }
+                        // post notification
+                        getCompletedTxs(WalletError())
+                            ?.filter { it.direction == INBOUND && it.user.publicKey == publicKey }
+                            ?.forEach { tx ->
+                                postTxNotification(tx)
+                            }
+                    } else {
+                        error.code = WalletErrorCode.UNKNOWN_ERROR
+                        val errorMessage =
+                            getString(R.string.wallet_service_error_testnet_tari_request) +
+                                    " " +
+                                    response.errorBody()?.string()
+                        error.message = errorMessage
+                        notifyTestnetTariRequestFailed(errorMessage)
                     }
                 }
             })

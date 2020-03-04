@@ -258,6 +258,7 @@ internal object UiUtil {
         animSet.start()
         return animSet
     }
+
     /**
      * @param content content to encode
      * @param size bitmap size

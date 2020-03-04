@@ -33,7 +33,6 @@
 package com.tari.android.wallet.ffi
 
 import java.math.BigInteger
-import java.util.*
 
 /**
  * @author The Tari Development Team
@@ -52,7 +51,7 @@ internal class HexString constructor(bytes: FFIByteVector) {
                     val m = bytes.getAt(i)
                     byteArray[i] = m.toByte()
                 }
-                hex = String.format("%064X",BigInteger(1, byteArray))
+                hex = String.format("%064X", BigInteger(1, byteArray))
             } else {
                 hex = String()
             }
@@ -65,7 +64,7 @@ internal class HexString constructor(bytes: FFIByteVector) {
         if (pattern.matches(string) && string.length % 2 == 0) {
             hex = string
         } else {
-            throw FFIException(message = string+" is not valid Hex of even length.")
+            throw FFIException(message = string + " is not valid Hex of even length.")
         }
     }
 

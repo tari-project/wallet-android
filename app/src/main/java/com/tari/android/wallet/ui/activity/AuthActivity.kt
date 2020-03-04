@@ -15,7 +15,7 @@
  * 3. Neither the name of the copyright holder nor the names of
  * its contributors may be used to endorse or promote products
  * derived from this software without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND
  * CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES,
  * INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
@@ -82,6 +82,10 @@ class AuthActivity : BaseActivity(), Animator.AnimatorListener {
         bigGemImageView.post { wr.get()?.showTariText() }
     }
 
+    override fun onBackPressed() {
+        // no-op
+    }
+
     /**
      * Hides the gem and displays Tari logo.
      */
@@ -108,9 +112,9 @@ class AuthActivity : BaseActivity(), Animator.AnimatorListener {
 
         // chain animations
         val animSet = AnimatorSet()
-        animSet.startDelay = Constants.UI.shortAnimDurationMs
+        animSet.startDelay = Constants.UI.shortDurationMs
         animSet.play(showTariTextAnim).after(hideGemAnim)
-        animSet.duration = Constants.UI.shortAnimDurationMs
+        animSet.duration = Constants.UI.shortDurationMs
         // define interpolator
         animSet.interpolator = EasingInterpolator(Ease.QUART_IN)
 

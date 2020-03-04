@@ -39,7 +39,7 @@ package com.tari.android.wallet.ffi
  */
 internal typealias FFIContactsPtr = Long
 
-internal class FFIContacts constructor(pointer: FFIContactPtr): FFIBase() {
+internal class FFIContacts constructor(pointer: FFIContactPtr) : FFIBase() {
 
     // region JNI
 

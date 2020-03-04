@@ -149,7 +149,7 @@ class SendTxSuccessfulFragment : BaseFragment(), Animator.AnimatorListener {
             infoTextView.height.toFloat(),
             0f
         ).apply {
-            duration = Constants.UI.longAnimDurationMs
+            duration = Constants.UI.longDurationMs
             interpolator = EasingInterpolator(Ease.QUART_IN_OUT)
             startDelay = Constants.UI.SendTxSuccessful.textAppearAnimStartDelayMs
             start()
@@ -161,7 +161,7 @@ class SendTxSuccessfulFragment : BaseFragment(), Animator.AnimatorListener {
             1f,
             0f
         ).apply {
-            duration = Constants.UI.longAnimDurationMs
+            duration = Constants.UI.longDurationMs
             interpolator = EasingInterpolator(Ease.QUART_IN_OUT)
             startDelay = Constants.UI.SendTxSuccessful.textFadeOutAnimStartDelayMs
             start()

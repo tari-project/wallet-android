@@ -39,7 +39,7 @@ package com.tari.android.wallet.ffi
  */
 internal typealias FFICompletedTxsPtr = Long
 
-internal class FFICompletedTxs constructor(pointer: FFICompletedTxsPtr): FFIBase() {
+internal class FFICompletedTxs constructor(pointer: FFICompletedTxsPtr) : FFIBase() {
 
     // region JNI
 

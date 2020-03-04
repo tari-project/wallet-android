@@ -45,7 +45,7 @@
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.Splash"
-            android:windowSoftInputMode="adjustNothing|stateAlwaysHidden">
+            android:windowSoftInputMode="stateAlwaysHidden">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <action android:name="android.intent.action.MAIN" />
@@ -57,58 +57,64 @@
         <activity
             android:name=".ui.activity.log.DebugLogActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
+            android:parentActivityName=".ui.activity.home.HomeActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme"
-            android:windowSoftInputMode="adjustNothing|stateAlwaysHidden" />
+            android:windowSoftInputMode="stateAlwaysHidden" />
         <!-- onboarding flow -->
         <activity
             android:name=".ui.activity.onboarding.OnboardingFlowActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme"
-            android:windowSoftInputMode="adjustNothing|stateAlwaysHidden" />
+            android:windowSoftInputMode="stateAlwaysHidden" />
         <!-- local authentication -->
         <activity
             android:name=".ui.activity.AuthActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme"
-            android:windowSoftInputMode="adjustNothing|stateAlwaysHidden" />
+            android:windowSoftInputMode="stateAlwaysHidden" />
         <!-- home (transaction list) -->
         <activity
             android:name=".ui.activity.home.HomeActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
+            android:launchMode="singleTop"
+            android:parentActivityName=".ui.activity.home.HomeActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme"
-            android:windowSoftInputMode="adjustNothing|stateAlwaysHidden"></activity>
+            android:windowSoftInputMode="stateAlwaysHidden" />
         <!-- recipient QR scanner -->
         <activity
             android:name=".ui.activity.QRScannerActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme"
-            android:windowSoftInputMode="adjustNothing|stateAlwaysHidden" />
+            android:windowSoftInputMode="stateAlwaysHidden" />
         <!-- send tari -->
         <activity
             android:name=".ui.activity.send.SendTariActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
+            android:parentActivityName=".ui.activity.home.HomeActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme"
-            android:windowSoftInputMode="adjustResize" />
+            android:windowSoftInputMode="adjustResize|stateAlwaysHidden" />
         <!-- wallet info -->
         <activity
             android:name=".ui.activity.profile.WalletInfoActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
+            android:parentActivityName=".ui.activity.home.HomeActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme"
-            android:windowSoftInputMode="adjustResize" />
+            android:windowSoftInputMode="adjustResize|stateAlwaysHidden" />
         <!-- transaction detail -->
         <activity
             android:name=".ui.activity.tx.TxDetailActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
+            android:parentActivityName=".ui.activity.home.HomeActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme"
-            android:windowSoftInputMode="adjustPan" />
+            android:windowSoftInputMode="adjustPan|stateAlwaysHidden" />
     </application>
 
 </manifest>

@@ -71,8 +71,10 @@ internal class RecipientListAdapter(
      */
     private var listenerWR: WeakReference<Listener> = WeakReference(listener)
 
-    fun displayList(recentTxUsers: List<User>,
-                    allContacts: List<Contact>) {
+    fun displayList(
+        recentTxUsers: List<User>,
+        allContacts: List<Contact>
+    ) {
         mode = Mode.LIST
         items.clear()
         // recent tx contacts

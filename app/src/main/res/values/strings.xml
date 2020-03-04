@@ -23,6 +23,8 @@
     <string name="common_continue">Continue</string>
     <string name="common_from">From</string>
     <string name="common_close">Close</string>
+    <string name="common_new">New</string>
+    <string name="common_new_uppercase">NEW</string>
 
     <!-- dummy values - UI design placeholders -->
     <string name="dummy_positive_tx_value">+ 152.75</string>
@@ -37,11 +39,17 @@
     <string name="emoji_id_bullet_separator">•••</string>
     <string name="emoji_id_chunk_separator_char">|</string>
 
+    <!-- notifications -->
+    <string name="wallet_service_notification_channel_name">Tari Wallet Service Notification Channel</string>
+    <string name="app_notification_channel_name">Tari Wallet Notification Channel</string>
+    <string name="notification_tx_received_title">You\'ve got Tari!</string>
+    <string name="notification_tx_received_description_format">Someone just sent you %1$s Tari.</string>
+
     <!-- service -->
-    <string name="service_title">Tari wallet service is running.</string>
-    <string name="service_description">This service carries out wallet operations across applications.</string>
-    <string name="service_error_testnet_tari_request">Could not allocate free Tari.</string>
-    <string name="service_error_no_internet_connection">No internet connection!</string>
+    <string name="wallet_service_title">Tari wallet service is running.</string>
+    <string name="wallet_service_description">This service carries out wallet operations across applications.</string>
+    <string name="wallet_service_error_testnet_tari_request">Could not allocate free Tari.</string>
+    <string name="wallet_service_error_no_internet_connection">No internet connection!</string>
 
     <!-- auth -->
     <string name="testnet">TESTNET v1.0</string>

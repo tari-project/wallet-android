@@ -48,7 +48,7 @@ import javax.inject.Singleton
  * @author The Tari Development Team
  */
 @Module
-class RestModule {
+internal class RestModule {
 
     @Provides
     @Named("ServerUrl")

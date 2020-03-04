@@ -39,7 +39,7 @@ internal typealias FFIPendingInboundTxsPtr = Long
  *
  * @author The Tari Development Team
  */
-internal class FFIPendingInboundTxs constructor(pointer: FFIPendingInboundTxsPtr): FFIBase() {
+internal class FFIPendingInboundTxs constructor(pointer: FFIPendingInboundTxsPtr) : FFIBase() {
 
     // region JNI
 
