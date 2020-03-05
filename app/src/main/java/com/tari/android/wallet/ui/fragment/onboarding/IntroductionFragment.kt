@@ -210,7 +210,7 @@ class IntroductionFragment : BaseFragment() {
         mainTextAnimSet.interpolator = EasingInterpolator(Ease.SINE_OUT)
 
         val animSet = AnimatorSet()
-        animSet.startDelay = Constants.UI.shortAnimDurationMs
+        animSet.startDelay = Constants.UI.shortDurationMs
         animSet.playTogether(showTariTextFadeInAnim, mainTextAnimSet)
         animSet.duration = Constants.UI.CreateWallet.startUpAnimDuration
         animSet.start()

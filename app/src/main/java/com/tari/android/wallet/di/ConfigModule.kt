@@ -46,7 +46,7 @@ import javax.inject.Singleton
  * @author The Tari Development Team
  */
 @Module
-class ConfigModule {
+internal class ConfigModule {
 
     object FieldName {
         const val deleteExistingWallet = "config_delete_existing_wallet"

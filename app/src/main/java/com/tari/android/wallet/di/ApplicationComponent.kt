@@ -67,7 +67,7 @@ import javax.inject.Singleton
         ConfigModule::class
     ]
 )
-interface ApplicationComponent {
+internal interface ApplicationComponent {
 
     /**
      * Application.

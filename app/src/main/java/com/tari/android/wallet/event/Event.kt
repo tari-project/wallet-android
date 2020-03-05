@@ -32,6 +32,7 @@
  */
 package com.tari.android.wallet.event
 
+import com.tari.android.wallet.model.PendingInboundTx
 import com.tari.android.wallet.model.PublicKey
 import com.tari.android.wallet.model.TxId
 
@@ -46,7 +47,7 @@ object Event {
     object Wallet {
         data class TxBroadcast(val completedTxId: TxId)
         data class TxMined(val completedTxId: TxId)
-        data class TxReceived(val pendingInboundTxId: TxId)
+        data class TxReceived(val pendingInboundTx: PendingInboundTx)
         data class TxReplyReceived(val completedTxId: TxId)
         data class TxFinalized(val completedTxId: TxId)
         data class DiscoveryComplete(val txId: TxId, val success: Boolean)

@@ -792,7 +792,7 @@ class AddAmountFragment(private val walletService: TariWalletService) : BaseFrag
                 digitAnimIsRunning = false
             }
         }
-        viewAnim.duration = Constants.UI.shortAnimDurationMs
+        viewAnim.duration = Constants.UI.shortDurationMs
         // define interpolator
         viewAnim.interpolator = EasingInterpolator(Ease.CIRC_OUT)
         viewAnim.start()
@@ -850,7 +850,7 @@ class AddAmountFragment(private val walletService: TariWalletService) : BaseFrag
         continueButton.alpha = 0f
         continueButton.visibility = View.VISIBLE
         val anim = ObjectAnimator.ofFloat(continueButton, "alpha", 0f, 1f)
-        anim.duration = Constants.UI.shortAnimDurationMs
+        anim.duration = Constants.UI.shortDurationMs
         anim.start()
     }
 
@@ -885,7 +885,7 @@ class AddAmountFragment(private val walletService: TariWalletService) : BaseFrag
                         wr.get()?.txFeeContainerView?.translationY = (1f - value) * 100
                         wr.get()?.txFeeContainerView?.alpha = value
                     }
-                    viewAnim.duration = Constants.UI.shortAnimDurationMs
+                    viewAnim.duration = Constants.UI.shortDurationMs
                     // define interpolator
                     viewAnim.interpolator = EasingInterpolator(Ease.CIRC_OUT)
                     viewAnim.start()
@@ -936,7 +936,7 @@ class AddAmountFragment(private val walletService: TariWalletService) : BaseFrag
                         wr.get()?.txFeeContainerView?.visibility = View.INVISIBLE
                     }
                 }
-                viewAnim.duration = Constants.UI.shortAnimDurationMs
+                viewAnim.duration = Constants.UI.shortDurationMs
                 // define interpolator
                 viewAnim.interpolator = EasingInterpolator(Ease.CIRC_OUT)
                 viewAnim.start()

@@ -34,6 +34,7 @@ package com.tari.android.wallet.di
 
 import android.content.Context
 import com.tari.android.wallet.application.TariWalletApplication
+import com.tari.android.wallet.notification.NotificationHelper
 import com.tari.android.wallet.util.SharedPrefsWrapper
 import dagger.Module
 import dagger.Provides
@@ -45,8 +46,14 @@ import javax.inject.Singleton
  * @author The Tari Development Team
  */
 @Module
-class ApplicationModule(private val app: TariWalletApplication,
-                        private val sharedPrefsWrapper: SharedPrefsWrapper) {
+internal class ApplicationModule(
+    private val app: TariWalletApplication,
+    private val sharedPrefsWrapper: SharedPrefsWrapper
+) {
+
+    @Provides
+    @Singleton
+    fun provideApplication(): TariWalletApplication = app
 
     @Provides
     @Singleton
@@ -55,5 +62,9 @@ class ApplicationModule(private val app: TariWalletApplication,
     @Provides
     @Singleton
     fun provideSharedPrefsWrapper(): SharedPrefsWrapper = sharedPrefsWrapper
+
+    @Provides
+    @Singleton
+    fun provideNotificationHelper(context: Context) = NotificationHelper(context)
 
 }

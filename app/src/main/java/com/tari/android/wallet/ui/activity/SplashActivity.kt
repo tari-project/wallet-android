@@ -76,6 +76,10 @@ class SplashActivity : BaseActivity() {
         }
     }
 
+    override fun onBackPressed() {
+        // no-op
+    }
+
     private fun startOnboardingActivity() {
         val intent = Intent(this, OnboardingFlowActivity::class.java)
         intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK

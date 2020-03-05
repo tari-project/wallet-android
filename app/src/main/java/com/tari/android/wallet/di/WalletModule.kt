@@ -47,7 +47,7 @@ import javax.inject.Singleton
  * @author The Tari Development Team
  */
 @Module
-class WalletModule {
+internal class WalletModule {
 
     object FieldName {
         const val walletFilesDirPath = "wallet_files_dir_path"

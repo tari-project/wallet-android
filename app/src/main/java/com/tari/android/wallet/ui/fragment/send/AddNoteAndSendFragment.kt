@@ -225,7 +225,7 @@ class AddNoteAndSendFragment(private val walletService: TariWalletService) : Bas
         UiUtil.hideKeyboard(mActivity)
         rootView.postDelayed({
             mActivity.onBackPressed()
-        }, Constants.UI.shortAnimDurationMs)
+        }, Constants.UI.shortDurationMs)
     }
 
     /**
@@ -289,7 +289,7 @@ class AddNoteAndSendFragment(private val walletService: TariWalletService) : Bas
         // the animation set
         val animSet = AnimatorSet()
         animSet.playTogether(textViewAnim, arrowAnim, bgViewAnim)
-        animSet.duration = Constants.UI.shortAnimDurationMs
+        animSet.duration = Constants.UI.shortDurationMs
         animSet.start()
     }
 
@@ -351,7 +351,8 @@ class AddNoteAndSendFragment(private val walletService: TariWalletService) : Bas
                     }
                 }
                 layoutParams.marginStart = slideButtonLastMarginStart
-                val alpha = 1f - slideButtonLastMarginStart.toFloat() / (slideButtonContainerWidth - slideViewMarginStart - slideViewWidth)
+                val alpha =
+                    1f - slideButtonLastMarginStart.toFloat() / (slideButtonContainerWidth - slideViewMarginStart - slideViewWidth)
                 slideToSendEnabledTextView.alpha = alpha
                 slideToSendDisabledTextView.alpha = alpha
 
@@ -369,7 +370,7 @@ class AddNoteAndSendFragment(private val walletService: TariWalletService) : Bas
                     fragment.slideToSendEnabledTextView.alpha =
                         1f - margin.toFloat() / (fragment.slideButtonContainerWidth - fragment.slideViewMarginStart - fragment.slideViewWidth)
                 }
-                anim.duration = Constants.UI.shortAnimDurationMs
+                anim.duration = Constants.UI.shortDurationMs
                 anim.interpolator = EasingInterpolator(Ease.QUART_IN_OUT)
                 anim.startDelay = 0
                 anim.start()
@@ -390,7 +391,7 @@ class AddNoteAndSendFragment(private val walletService: TariWalletService) : Bas
                     slideToSendEnabledTextView.alpha =
                         1f - margin.toFloat() / (fragment.slideButtonContainerWidth - fragment.slideViewMarginStart - fragment.slideViewWidth)
                 }
-                anim.duration = Constants.UI.shortAnimDurationMs
+                anim.duration = Constants.UI.shortDurationMs
                 anim.interpolator = EasingInterpolator(Ease.QUART_IN_OUT)
                 anim.startDelay = 0
                 anim.addListener(object : AnimatorListenerAdapter() {
@@ -414,7 +415,7 @@ class AddNoteAndSendFragment(private val walletService: TariWalletService) : Bas
             val fragment = wr.get() ?: return@addUpdateListener
             fragment.slideView.alpha = valueAnimator.animatedValue as Float
         }
-        anim.duration = Constants.UI.shortAnimDurationMs
+        anim.duration = Constants.UI.shortDurationMs
         anim.interpolator = EasingInterpolator(Ease.QUART_IN_OUT)
         anim.startDelay = 0
         anim.addListener(object : AnimatorListenerAdapter() {

@@ -171,10 +171,7 @@ internal class EmojiUtil {
                 emojiIds.add(builder.toString())
                 previous = it.current()
             }
-            val startChunk = emojiIds.subList(
-                0,
-                Constants.Wallet.emojiFormatterChunkSize
-            ).joinToString("")
+            val startChunk = emojiIds.take(Constants.Wallet.emojiFormatterChunkSize).joinToString("")
 
             val middleChunkStartIndex =
                 Constants.Wallet.emojiIdLength / 2 - Constants.Wallet.emojiFormatterChunkSize / 2
@@ -182,10 +179,9 @@ internal class EmojiUtil {
                 middleChunkStartIndex,
                 middleChunkStartIndex + Constants.Wallet.emojiFormatterChunkSize
             ).joinToString("")
-            val endChunk = emojiIds.subList(
-                Constants.Wallet.emojiFormatterChunkSize - Constants.Wallet.emojiFormatterChunkSize,
-                Constants.Wallet.emojiFormatterChunkSize
-            ).joinToString("")
+
+            val endChunk = emojiIds.takeLast(Constants.Wallet.emojiFormatterChunkSize).joinToString("")
+
             return startChunk + middleChunk + endChunk
         }
 

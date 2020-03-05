@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/notification_tx_received_vw_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/transparent"
+    android:gravity="center_vertical"
+    android:orientation="horizontal">
+
+    <!-- icon -->
+    <ImageView
+        android:id="@+id/notification_tx_received_img_icon"
+        android:layout_width="38dp"
+        android:layout_height="38dp"
+        android:background="@drawable/home_tx_icon_bg"
+        android:contentDescription="@null"
+        android:scaleType="center"
+        android:src="@drawable/home_tx_icon" />
+
+    <!-- contact alias & message-->
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="20dp">
+
+            <!-- contact alias -->
+            <TextView
+                android:id="@+id/notification_tx_received_txt_contact_alias"
+                style="@style/TextAppearance.Compat.Notification.Title"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/transparent"
+                android:ellipsize="end"
+                android:gravity="center_vertical"
+                android:singleLine="true"
+                android:text="@string/dummy_contact_alias"
+                android:textColor="@color/home_tx_contact_alias"
+                android:textSize="13sp" />
+
+            <!-- emoji id summary -->
+            <include
+                android:id="@+id/notification_tx_received_vw_emoji_summary"
+                layout="@layout/emoji_id_summary"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+        </FrameLayout>
+
+        <TextView
+            android:id="@+id/notification_tx_received_txt_message"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:background="@color/transparent"
+            android:ellipsize="end"
+            android:singleLine="true"
+            android:text="@string/dummy_message"
+            android:textColor="@color/home_tx_message"
+            android:textSize="12sp" />
+    </LinearLayout>
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+        <!-- positive value -->
+        <TextView
+            android:id="@+id/notification_tx_received_txt_positive_amount"
+            android:layout_width="wrap_content"
+            android:layout_height="23dp"
+            android:background="@drawable/home_tx_value_positive_bg"
+            android:gravity="center"
+            android:paddingStart="6dp"
+            android:paddingEnd="6dp"
+            android:text="@string/dummy_positive_tx_value"
+            android:textColor="@color/home_tx_value_positive"
+            android:textSize="12sp" />
+
+        <!-- negative value -->
+        <TextView
+            android:id="@+id/notification_tx_received_txt_negative_amount"
+            android:layout_width="wrap_content"
+            android:layout_height="23dp"
+            android:background="@drawable/home_tx_value_negative_bg"
+            android:gravity="center"
+            android:paddingStart="6dp"
+            android:paddingEnd="6dp"
+            android:text="@string/dummy_negative_tx_value"
+            android:textColor="@color/home_tx_value_negative"
+            android:textSize="12sp" />
+    </RelativeLayout>
+
+</LinearLayout>

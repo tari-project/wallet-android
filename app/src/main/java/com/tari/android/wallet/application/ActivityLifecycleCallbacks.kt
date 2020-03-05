@@ -30,60 +30,47 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.tari.android.wallet.model
+package com.tari.android.wallet.application
 
-import android.os.Parcel
-import android.os.Parcelable
+import android.app.Activity
+import android.app.Application
+import android.os.Bundle
 
 /**
- * Contact is a user with an alias.
+ * An instance of this class is utilized to observe activity lifecycle.
  *
  * @author The Tari Development Team
  */
-class Contact() : User() {
+class ActivityLifecycleCallbacks: Application.ActivityLifecycleCallbacks {
 
-    var alias: String = ""
+    var currentActivity: Activity? = null
 
-    constructor(
-        publicKey: PublicKey,
-        alias: String
-    ) : this() {
-        this.publicKey = publicKey
-        this.alias = alias
+    override fun onActivityPaused(activity: Activity) {
+        currentActivity = activity
     }
 
-    // region Parcelable
-
-    constructor(parcel: Parcel) : this() {
-        readFromParcel(parcel)
+    override fun onActivityStarted(activity: Activity) {
+        currentActivity = activity
     }
 
-    companion object CREATOR : Parcelable.Creator<Contact> {
+    override fun onActivityResumed(activity: Activity) {
+        currentActivity = activity
+    }
 
-        override fun createFromParcel(parcel: Parcel): Contact {
-            return Contact(parcel)
-        }
+    override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {
+        currentActivity = activity
+    }
 
-        override fun newArray(size: Int): Array<Contact> {
-            return Array(size) { Contact() }
-        }
+    override fun onActivityDestroyed(activity: Activity) {
 
     }
 
-    override fun writeToParcel(parcel: Parcel, flags: Int) {
-        parcel.writeParcelable(publicKey, flags)
-        parcel.writeString(alias)
+    override fun onActivitySaveInstanceState(activity: Activity, outState: Bundle) {
+
     }
 
-    private fun readFromParcel(inParcel: Parcel) {
-        publicKey = inParcel.readParcelable(PublicKey::class.java.classLoader)!!
-        alias = inParcel.readString() ?: ""
-    }
+    override fun onActivityStopped(activity: Activity) {
 
-    override fun describeContents(): Int {
-        return 0
     }
-
-    // endregion
 
 }

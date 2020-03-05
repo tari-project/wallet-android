@@ -35,7 +35,6 @@ package com.tari.android.wallet
 import com.tari.android.wallet.ffi.*
 import org.junit.Assert.assertTrue
 import org.junit.Test
-import java.util.*
 
 /**
  * FFI private key tests.

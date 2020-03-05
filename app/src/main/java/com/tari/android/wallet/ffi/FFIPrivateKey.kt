@@ -15,7 +15,7 @@
  * 3. Neither the name of the copyright holder nor the names of
  * its contributors may be used to endorse or promote products
  * derived from this software without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND
  * CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES,
  * INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
@@ -39,7 +39,7 @@ internal typealias FFIPrivateKeyPtr = Long
  *
  * @author The Tari Development Team
  */
-internal class FFIPrivateKey constructor(pointer: FFIPrivateKeyPtr): FFIBase() {
+internal class FFIPrivateKey constructor(pointer: FFIPrivateKeyPtr) : FFIBase() {
 
     // region JNI
 
@@ -49,7 +49,11 @@ internal class FFIPrivateKey constructor(pointer: FFIPrivateKeyPtr): FFIBase() {
     ): FFIByteVectorPtr
 
     private external fun jniDestroy(privateKeyPtr: FFIPrivateKeyPtr)
-    private external fun jniCreate(byteVectorPtr: FFIByteVectorPtr, libError: FFIError): FFIPrivateKeyPtr
+    private external fun jniCreate(
+        byteVectorPtr: FFIByteVectorPtr,
+        libError: FFIError
+    ): FFIPrivateKeyPtr
+
     private external fun jniGenerate(): FFIPrivateKeyPtr
     private external fun jniFromHex(hexStr: String, libError: FFIError): FFIPrivateKeyPtr
 
