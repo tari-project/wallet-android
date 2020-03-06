@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <!-- Log header -->
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/common_header_height"
+        android:layout_marginTop="0dp"
+        android:background="@color/white">
+
+        <!-- back -->
+        <ImageButton
+            android:id="@+id/log_file_btn_back"
+            android:layout_width="50dp"
+            android:layout_height="match_parent"
+            android:background="@color/white"
+            android:contentDescription="@null"
+            android:src="@drawable/back_icon" />
+
+        <com.tari.android.wallet.ui.component.CustomFontTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:text="@string/debug_log_file_list_log_title"
+            android:textColor="@color/black"
+            android:textSize="16sp"
+            app:customFont="AVENIR_LT_STD_HEAVY" />
+    </RelativeLayout>
+
+    <!-- listview -->
+    <ListView
+        android:layout_width="match_parent"
+        android:id="@+id/log_file_vw_files_listview"
+        android:layout_height="match_parent" />
+</LinearLayout>

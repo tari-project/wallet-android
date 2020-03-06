@@ -32,21 +32,31 @@
             android:textColor="@color/black"
             android:textSize="16sp"
             app:customFont="AVENIR_LT_STD_HEAVY" />
+
+        <!-- more -->
+        <ImageView
+            android:id="@+id/debug_log_img_btn_more_file_list"
+            android:layout_width="50dp"
+            android:padding="12dp"
+            android:layout_height="match_parent"
+            android:layout_alignParentRight="true"
+            android:contentDescription="@null"
+            android:src="@drawable/ic_more_vert_black_24dp" />
     </RelativeLayout>
-        <EditText
-            android:id="@+id/debug_log_multiline_edit"
-            android:textColor="@color/terminal_green"
-            android:textSize="12sp"
-            android:background="@color/black"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:ems="10"
-            android:gravity="start|top"
-            android:inputType="textMultiLine"
-            android:importantForAutofill="no"
-            android:hint="@string/debug_log_title"
-            android:labelFor="@id/debug_log_txt_title"
-            android:focusable="false"
-            android:clickable="false"
-            />
+
+    <EditText
+        android:id="@+id/debug_log_multiline_edit"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/black"
+        android:clickable="false"
+        android:ems="10"
+        android:focusable="false"
+        android:gravity="start|top"
+        android:hint="@string/debug_log_title"
+        android:importantForAutofill="no"
+        android:inputType="textMultiLine"
+        android:labelFor="@id/debug_log_txt_title"
+        android:textColor="@color/terminal_green"
+        android:textSize="12sp" />
 </LinearLayout>

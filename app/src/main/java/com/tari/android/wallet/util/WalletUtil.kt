@@ -37,9 +37,9 @@ import com.tari.android.wallet.extension.toMicroTari
 import com.tari.android.wallet.model.MicroTari
 import com.tari.android.wallet.model.QRScanData
 import java.io.File
-import java.math.BigInteger
 import java.math.RoundingMode
 import java.text.DecimalFormat
+import java.util.*
 
 /**
  * Wallet utility functions.
@@ -106,5 +106,13 @@ internal object WalletUtil {
         val emojiId = url.getQueryParameter("emoji_id") ?: ""
 
         return QRScanData(publickKey, emojiId)
+    }
+
+    fun getLogFilesFromDirectory(dirPath: String): List<File> {
+        val root = File(dirPath)
+        val files: MutableList<File>? = root.listFiles()?.toMutableList()
+        val filteredFile = files?.filter { it.extension == "log" }?.toMutableList()
+        filteredFile?.sortByDescending { it.lastModified() }
+        return filteredFile ?: Collections.emptyList()
     }
 }
