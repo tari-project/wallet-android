@@ -159,5 +159,6 @@
     <string name="auth_prompt_button_text">Enable your %1s</string>
     <string name="auth_prompt_touch_id_desc">We recommend using Touch ID to access your\nTari wallet for security and ease of use.</string>
     <string name="auth_prompt_pin_desc">We recommend using your device PIN to access your\nTari wallet for security and ease of use.</string>
+    <string name="debug_log_file_list_log_title">Log Files</string>
 
 </resources>

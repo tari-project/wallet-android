@@ -39,6 +39,8 @@ import com.tari.android.wallet.util.SharedPrefsWrapper
 import dagger.Module
 import dagger.Provides
 import java.io.File
+import java.text.SimpleDateFormat
+import java.util.*
 import javax.inject.Named
 import javax.inject.Singleton
 
@@ -55,7 +57,7 @@ internal class WalletModule {
         const val walletLogFilePath = "wallet_log_file_path"
     }
 
-    private val logFileName = "tari_wallet.log"
+    private val logFilePrefix = "tari_wallet_"
 
     /**
      * The directory in which the wallet files reside.
@@ -70,7 +72,10 @@ internal class WalletModule {
     @Provides
     @Named(FieldName.walletLogFilePath)
     internal fun provideWalletLogFilePath(@Named(FieldName.walletFilesDirPath) walletFilesDirPath: String): String {
-        return "$walletFilesDirPath/$logFileName"
+        val timeStamp = SimpleDateFormat("YYYYMMdd", Locale.getDefault()).format(Date()) +
+                "_${System.currentTimeMillis()}"
+
+        return "$walletFilesDirPath/$logFilePrefix$timeStamp.log"
     }
 
     /**

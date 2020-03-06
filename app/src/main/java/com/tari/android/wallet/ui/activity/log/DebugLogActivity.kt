@@ -32,60 +32,45 @@
  */
 package com.tari.android.wallet.ui.activity.log
 
-import com.tari.android.wallet.ui.activity.BaseActivity
 import android.os.Bundle
-import android.text.method.ScrollingMovementMethod
-import android.view.View
-import android.widget.EditText
-import butterknife.BindView
-import butterknife.OnClick
 import com.tari.android.wallet.R
-import com.tari.android.wallet.di.WalletModule
-import com.tari.android.wallet.ui.util.UiUtil
-import java.io.File
-import java.io.InputStream
-import javax.inject.Inject
-import javax.inject.Named
-
+import com.tari.android.wallet.ui.activity.BaseActivity
+import com.tari.android.wallet.ui.fragment.log.DebugLogFilePickerFragment
+import com.tari.android.wallet.ui.fragment.log.DebugLogFragment
 
 /**
  * Debug screen activity.
  *
  * @author The Tari Development Team
  */
-class DebugLogActivity : BaseActivity() {
+class DebugLogActivity : BaseActivity(), DebugLogFragment.DebugListener,
+    DebugLogFilePickerFragment.Listener {
 
-    override val contentViewId = R.layout.debug_log
-
-    @Inject
-    @Named(WalletModule.FieldName.walletLogFilePath)
-    internal lateinit var logFilePath: String
-
-    @OnClick(R.id.debug_log_btn_back)
-    fun onBackButtonPressed(view: View) {
-        UiUtil.temporarilyDisableClick(view)
-        super.onBackPressed()
-        overridePendingTransition(R.anim.enter_from_left, R.anim.exit_to_right)
-    }
-
-    @BindView(R.id.debug_log_multiline_edit)
-    lateinit var multilineEdit: EditText
+    override val contentViewId = R.layout.activity_debug_log
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         overridePendingTransition(R.anim.enter_from_right, R.anim.exit_to_left)
+        supportFragmentManager.beginTransaction()
+            .replace(
+                R.id.debug_frame_container,
+                DebugLogFragment()
+            ).commit()
+    }
 
-        multilineEdit.text.clear()
-        multilineEdit.setHorizontallyScrolling(true)
-        multilineEdit.movementMethod = ScrollingMovementMethod()
-        val lineList = mutableListOf<String>()
-        val logFile = File(logFilePath)
-        if (logFile.exists()) {
-            val inputStream: InputStream = logFile.inputStream()
-            inputStream.bufferedReader().useLines { lines -> lines.forEach { lineList.add(it) } }
-        } else {
-            lineList.add("No log available")
+    override fun onFilePickerClick() {
+        supportFragmentManager.beginTransaction()
+            .replace(
+                R.id.debug_frame_container,
+                DebugLogFilePickerFragment()
+            ).addToBackStack(null).commit()
+    }
+
+    override fun onLogFileSelected(position: Int) {
+        supportFragmentManager.popBackStackImmediate()
+        val fragment = supportFragmentManager.findFragmentById(R.id.debug_frame_container)
+        if (fragment is DebugLogFragment) {
+            fragment.refreshLogs(position)
         }
-        lineList.forEach { multilineEdit.append(it + "\n") }
     }
 }
