@@ -59,9 +59,12 @@ import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.EmojiUtil
 import com.tari.android.wallet.util.WalletUtil
 import com.tari.android.wallet.extension.remap
+import org.matomo.sdk.Tracker
+import org.matomo.sdk.extra.TrackHelper
 import java.lang.StringBuilder
 import java.lang.ref.WeakReference
 import java.math.BigInteger
+import javax.inject.Inject
 import kotlin.math.min
 
 /**
@@ -143,6 +146,9 @@ class AddAmountFragment(private val walletService: TariWalletService) : BaseFrag
      */
     @BindString(R.string.emoji_id_chunk_separator_char)
     lateinit var emojiIdChunkSeparator: String
+
+    @Inject
+    lateinit var tracker: Tracker
 
     /**
      * Maps all the elements (digits & separators) displayed in the amount text to their
@@ -244,6 +250,11 @@ class AddAmountFragment(private val walletService: TariWalletService) : BaseFrag
                     )
                 }
             })
+
+        TrackHelper.track()
+            .screen("/home/send_tari/add_amount")
+            .title("Send Tari - Add Amount")
+            .with(tracker)
     }
 
     override fun onAttach(context: Context) {

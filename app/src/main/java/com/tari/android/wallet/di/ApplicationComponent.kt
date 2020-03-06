@@ -67,7 +67,8 @@ import javax.inject.Singleton
         WalletModule::class,
         RestModule::class,
         ConfigModule::class,
-        TorModule::class
+        TorModule::class,
+        TrackerModule::class
     ]
 )
 internal interface ApplicationComponent {

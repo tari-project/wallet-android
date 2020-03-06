@@ -56,6 +56,8 @@ import com.tari.android.wallet.ui.fragment.BaseFragment
 import com.tari.android.wallet.ui.util.UiUtil
 import com.tari.android.wallet.util.Constants.UI.Auth
 import com.tari.android.wallet.util.SharedPrefsWrapper
+import org.matomo.sdk.Tracker
+import org.matomo.sdk.extra.TrackHelper
 import javax.inject.Inject
 
 /**
@@ -63,7 +65,7 @@ import javax.inject.Inject
  *
  * @author The Tari Development Team
  */
-class LocalAuthFragment : BaseFragment() {
+internal class LocalAuthFragment : BaseFragment() {
 
     @BindView(R.id.local_auth_vw_root)
     lateinit var rootView: FrameLayout
@@ -106,7 +108,9 @@ class LocalAuthFragment : BaseFragment() {
     lateinit var authPinDesc: String
 
     @Inject
-    internal lateinit var sharedPrefsWrapper: SharedPrefsWrapper
+    lateinit var sharedPrefsWrapper: SharedPrefsWrapper
+    @Inject
+    lateinit var tracker: Tracker
 
     private var authType: AuthType = AuthType.None
 
@@ -126,6 +130,11 @@ class LocalAuthFragment : BaseFragment() {
                     playStartUpAnim()
                 }
             })
+
+        TrackHelper.track()
+            .screen("/onboarding/enable_local_auth")
+            .title("Onboarding - Enable Local Authentication")
+            .with(tracker)
     }
 
     override fun onAttach(context: Context) {

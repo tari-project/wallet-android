@@ -46,6 +46,8 @@ import com.tari.android.wallet.ui.util.UiUtil
 import com.tari.android.wallet.util.EmojiUtil
 import com.tari.android.wallet.util.SharedPrefsWrapper
 import com.tari.android.wallet.util.WalletUtil
+import org.matomo.sdk.Tracker
+import org.matomo.sdk.extra.TrackHelper
 import javax.inject.Inject
 
 /**
@@ -53,7 +55,7 @@ import javax.inject.Inject
  *
  * @author The Tari Development Team
  */
-class WalletInfoActivity : BaseActivity() {
+internal class WalletInfoActivity : BaseActivity() {
 
     @BindView(R.id.wallet_info_txt_emoji_container)
     lateinit var emojiContainerView: TextView
@@ -71,13 +73,20 @@ class WalletInfoActivity : BaseActivity() {
     var qrCodeImageSize = 0
 
     @Inject
-    internal lateinit var sharedPrefsWrapper: SharedPrefsWrapper
+    lateinit var sharedPrefsWrapper: SharedPrefsWrapper
+    @Inject
+    lateinit var tracker: Tracker
 
     override val contentViewId = R.layout.activity_wallet_info
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setUpUi()
+
+        TrackHelper.track()
+            .screen("/home/profile")
+            .title("Profile - Wallet Info")
+            .with(tracker)
     }
 
     private fun setUpUi() {

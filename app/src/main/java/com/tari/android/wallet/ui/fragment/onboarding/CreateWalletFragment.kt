@@ -58,6 +58,8 @@ import com.tari.android.wallet.ui.util.UiUtil
 import com.tari.android.wallet.util.Constants.UI.CreateEmojiId
 import com.tari.android.wallet.util.EmojiUtil
 import com.tari.android.wallet.util.SharedPrefsWrapper
+import org.matomo.sdk.Tracker
+import org.matomo.sdk.extra.TrackHelper
 import java.lang.Long.max
 import javax.inject.Inject
 import javax.inject.Named
@@ -138,6 +140,9 @@ class CreateWalletFragment : BaseFragment() {
     @field:[Inject Named(ConfigModule.FieldName.generateTestData)]
     var createNewWalletGenerateTestData: Boolean = false
 
+    @Inject
+    lateinit var tracker: Tracker
+
     private val uiHandler = Handler()
     private val halfSecondMs = 500L
 
@@ -155,6 +160,11 @@ class CreateWalletFragment : BaseFragment() {
         )
         emojiIdTextView.text = chunkedEmojiId
         setupUi()
+
+        TrackHelper.track()
+            .screen("/onboarding/create_wallet")
+            .title("Onboarding - Create Wallet")
+            .with(tracker)
     }
 
     override fun onDestroyView() {

@@ -51,7 +51,10 @@ import com.tari.android.wallet.ui.component.CustomFont
 import com.tari.android.wallet.ui.fragment.BaseFragment
 import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.WalletUtil
+import org.matomo.sdk.Tracker
+import org.matomo.sdk.extra.TrackHelper
 import java.lang.ref.WeakReference
+import javax.inject.Inject
 
 /**
  * Displays the successful outgoing transaction animation.
@@ -62,17 +65,24 @@ class SendTxSuccessfulFragment : BaseFragment(), Animator.AnimatorListener {
 
     @BindView(R.id.send_tx_successful_vw_root)
     lateinit var rootView: View
+
     @BindView(R.id.send_tx_successful_anim)
     lateinit var lottieAnimationView: LottieAnimationView
+
     @BindView(R.id.send_tx_successful_txt_info)
     lateinit var infoTextView: TextView
+
     @BindView(R.id.send_tx_successful_vw_info_container)
     lateinit var infoContainerView: View
 
     @BindString(R.string.send_tx_sucessful_info_format)
     lateinit var infoFormat: String
+
     @BindString(R.string.send_tx_sucessful_info_format_bold_part)
     lateinit var infoFormatBoldPart: String
+
+    @Inject
+    lateinit var tracker: Tracker
 
     /**
      * Tx properties.
@@ -127,6 +137,11 @@ class SendTxSuccessfulFragment : BaseFragment(), Animator.AnimatorListener {
             },
             Constants.UI.SendTxSuccessful.lottieAnimStartDelayMs
         )
+
+        TrackHelper.track()
+            .screen("/home/send_tari/successful")
+            .title("Send Tari - Successful")
+            .with(tracker)
     }
 
     override fun onAttach(context: Context) {

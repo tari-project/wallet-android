@@ -77,6 +77,8 @@ import com.tari.android.wallet.ui.extension.scrollToTop
 import com.tari.android.wallet.ui.util.UiUtil
 import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.SharedPrefsWrapper
+import org.matomo.sdk.Tracker
+import org.matomo.sdk.extra.TrackHelper
 import java.lang.ref.WeakReference
 import javax.inject.Inject
 import kotlin.math.max
@@ -88,7 +90,7 @@ import kotlin.math.min
  * @author The Tari Development Team
  */
 
-class HomeActivity : BaseActivity(),
+internal class HomeActivity : BaseActivity(),
     ServiceConnection,
     SwipeRefreshLayout.OnRefreshListener,
     View.OnScrollChangeListener,
@@ -213,6 +215,8 @@ class HomeActivity : BaseActivity(),
 
     @Inject
     lateinit var sharedPrefsWrapper: SharedPrefsWrapper
+    @Inject
+    lateinit var tracker: Tracker
 
     // tx list
     private lateinit var recyclerViewAdapter: TxListAdapter
@@ -295,6 +299,10 @@ class HomeActivity : BaseActivity(),
         }
 
         subscribeToEventBus()
+        TrackHelper.track()
+            .screen("/home")
+            .title("Home - Transaction List")
+            .with(tracker)
     }
 
     override fun onStart() {

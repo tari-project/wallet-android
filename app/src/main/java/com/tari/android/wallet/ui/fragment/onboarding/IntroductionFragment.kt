@@ -53,6 +53,8 @@ import com.tari.android.wallet.ui.util.UiUtil
 import com.tari.android.wallet.ui.util.UiUtil.getResourceUri
 import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.SharedPrefsWrapper
+import org.matomo.sdk.Tracker
+import org.matomo.sdk.extra.TrackHelper
 import java.lang.ref.WeakReference
 import javax.inject.Inject
 
@@ -63,7 +65,7 @@ import javax.inject.Inject
  *
  * @author The Tari Development Team
  */
-class IntroductionFragment : BaseFragment() {
+internal class IntroductionFragment : BaseFragment() {
 
     @BindView(R.id.introduction_anim_tari)
     lateinit var tariWalletView: LottieAnimationView
@@ -101,7 +103,9 @@ class IntroductionFragment : BaseFragment() {
     var whiteColor = 0
 
     @Inject
-    internal lateinit var sharedPrefsWrapper: SharedPrefsWrapper
+    lateinit var sharedPrefsWrapper: SharedPrefsWrapper
+    @Inject
+    lateinit var tracker: Tracker
 
     private var listener: Listener? = null
 
@@ -116,6 +120,11 @@ class IntroductionFragment : BaseFragment() {
         super.onViewCreated(view, savedInstanceState)
         setupUi()
         UiUtil.setProgressBarColor(progressBar, whiteColor)
+
+        TrackHelper.track()
+            .screen("/onboarding/introduction")
+            .title("Onboarding - Introduction")
+            .with(tracker)
     }
 
     private fun showCreateWalletFragment() {

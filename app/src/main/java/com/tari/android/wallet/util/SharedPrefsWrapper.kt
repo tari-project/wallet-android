@@ -32,6 +32,7 @@
  */
 package com.tari.android.wallet.util
 
+import android.content.Context
 import android.content.SharedPreferences
 import de.adorsys.android.securestoragelibrary.SecurePreferences
 
@@ -40,7 +41,10 @@ import de.adorsys.android.securestoragelibrary.SecurePreferences
  *
  * @author The Tari Development Team
  */
-class SharedPrefsWrapper(private val sharedPrefs: SharedPreferences) {
+class SharedPrefsWrapper(
+    private val context: Context,
+    private val sharedPrefs: SharedPreferences
+) {
 
     private object Key {
         const val privateKeyHexStringKey = "tari_wallet_private_key_hex_string"
@@ -55,11 +59,19 @@ class SharedPrefsWrapper(private val sharedPrefs: SharedPreferences) {
 
     var privateKeyHexString: String?
         get() {
-            return SecurePreferences.getStringValue(Key.privateKeyHexStringKey, null)
+            return SecurePreferences.getStringValue(
+                context,
+                Key.privateKeyHexStringKey,
+                null
+            )
         }
         set(value) {
             if (value != null) {
-                SecurePreferences.setValue(Key.privateKeyHexStringKey, value)
+                SecurePreferences.setValue(
+                    context,
+                    Key.privateKeyHexStringKey,
+                    value
+                )
             }
         }
 

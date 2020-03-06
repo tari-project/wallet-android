@@ -63,7 +63,10 @@ import com.tari.android.wallet.ui.extension.setTextSizePx
 import com.tari.android.wallet.ui.util.UiUtil
 import com.tari.android.wallet.util.WalletUtil
 import com.tari.android.wallet.extension.txFormattedDate
+import org.matomo.sdk.Tracker
+import org.matomo.sdk.extra.TrackHelper
 import java.util.*
+import javax.inject.Inject
 
 /**
  *  Activity class - Transaction detail.
@@ -154,6 +157,9 @@ class TxDetailActivity :
     @JvmField
     var firstElementMarginStart = 0
 
+    @Inject
+    lateinit var tracker: Tracker
+
     private var walletService: TariWalletService? = null
 
     /**
@@ -173,6 +179,11 @@ class TxDetailActivity :
         tx = intent.getParcelableExtra(TX_DETAIL_EXTRA_KEY)
         if (tx == null) finish()
         setupUI()
+
+        TrackHelper.track()
+            .screen("/home/tx_details")
+            .title("Transaction Details")
+            .with(tracker)
     }
 
     override fun onStart() {

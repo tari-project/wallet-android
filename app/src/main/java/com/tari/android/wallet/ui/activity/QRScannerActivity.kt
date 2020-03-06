@@ -47,6 +47,9 @@ import com.budiyev.android.codescanner.*
 import com.google.zxing.BarcodeFormat
 import com.orhanobut.logger.Logger
 import com.tari.android.wallet.R
+import org.matomo.sdk.Tracker
+import org.matomo.sdk.extra.TrackHelper
+import javax.inject.Inject
 
 private const val REQUEST_CAMERA_PERMISSION = 102
 const val EXTRA_QR_DATA = "extra_qr_text"
@@ -68,6 +71,9 @@ class QRScannerActivity : BaseActivity() {
     @BindView(R.id.scanner_view)
     lateinit var scannerView: CodeScannerView
 
+    @Inject
+    lateinit var tracker: Tracker
+
     private lateinit var codeScanner: CodeScanner
 
     override val contentViewId = R.layout.activity_qr_scanner
@@ -88,6 +94,11 @@ class QRScannerActivity : BaseActivity() {
             )
         } else {
             startScanning()
+
+            TrackHelper.track()
+                .screen("/home/send_tari/add_recipient/qr_scan")
+                .title("Send Tari - Add Recipient - Scan QR Code")
+                .with(tracker)
         }
     }
 
