@@ -60,7 +60,10 @@ import com.tari.android.wallet.ui.util.UiUtil
 import com.tari.android.wallet.util.*
 import com.tari.android.wallet.util.Constants.Wallet.emojiFormatterChunkSize
 import com.tari.android.wallet.util.Constants.Wallet.emojiIdLength
+import org.matomo.sdk.Tracker
+import org.matomo.sdk.extra.TrackHelper
 import java.lang.ref.WeakReference
+import javax.inject.Inject
 import kotlin.math.min
 
 /**
@@ -116,6 +119,9 @@ class AddRecipientFragment(private val walletService: TariWalletService) : BaseF
     @BindColor(R.color.add_recipient_prog_bar)
     @JvmField
     var progressBarColor = 0
+
+    @Inject
+    lateinit var tracker: Tracker
 
     /**
      * List, adapter & layout manager.
@@ -177,6 +183,11 @@ class AddRecipientFragment(private val walletService: TariWalletService) : BaseF
         AsyncTask.execute {
             wr.get()?.fetchRecentTxUsers()
         }
+
+        TrackHelper.track()
+            .screen("/home/send_tari/add_recipient")
+            .title("Send Tari - Add Recipient")
+            .with(tracker)
     }
 
     fun reset() {

@@ -56,8 +56,11 @@ import com.tari.android.wallet.ui.fragment.BaseFragment
 import com.tari.android.wallet.ui.util.UiUtil
 import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.EmojiUtil
+import org.matomo.sdk.Tracker
+import org.matomo.sdk.extra.TrackHelper
 import java.lang.Long.max
 import java.lang.ref.WeakReference
+import javax.inject.Inject
 
 /**
  * Add a note to the transaction & send it through this fragment.
@@ -126,6 +129,9 @@ class AddNoteAndSendFragment(private val walletService: TariWalletService) : Bas
     @JvmField
     var whiteColor = 0
 
+    @Inject
+    lateinit var tracker: Tracker
+
     private val wr = WeakReference(this)
     private lateinit var listenerWR: WeakReference<Listener>
 
@@ -178,6 +184,11 @@ class AddNoteAndSendFragment(private val walletService: TariWalletService) : Bas
 
         noteEditText.imeOptions = EditorInfo.IME_ACTION_DONE
         noteEditText.setRawInputType(InputType.TYPE_CLASS_TEXT)
+
+        TrackHelper.track()
+            .screen("/home/send_tari/add_note")
+            .title("Send Tari - Add Note")
+            .with(tracker)
     }
 
     override fun onAttach(context: Context) {

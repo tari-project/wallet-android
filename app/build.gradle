@@ -125,8 +125,11 @@ dependencies {
     implementation 'com.journeyapps:zxing-android-embedded:4.1.0'
 
     // encryption
-    implementation "de.adorsys.android:securestoragelibrary:1.0.0"
+    implementation "de.adorsys.android:securestoragelibrary:1.2.4"
 
     // Tor binary
     implementation 'org.torproject:tor-android-binary:0.4.2.5'
+
+    // matomo - tracking
+    implementation 'org.matomo.sdk:tracker:4.1.2'
 }

@@ -54,6 +54,9 @@ import com.tari.android.wallet.util.SharedPrefsWrapper
 import com.tari.android.wallet.util.WalletUtil
 import com.tari.android.wallet.util.getProcessNameCompat
 import net.danlew.android.joda.JodaTimeAndroid
+import org.matomo.sdk.Tracker
+import org.matomo.sdk.extra.DownloadTracker
+import org.matomo.sdk.extra.TrackHelper
 import javax.inject.Inject
 import javax.inject.Named
 
@@ -72,6 +75,8 @@ internal class TariWalletApplication : Application(), LifecycleObserver {
     lateinit var walletFilesDirPath: String
     @Inject
     lateinit var notificationHelper: NotificationHelper
+    @Inject
+    lateinit var tracker: Tracker
 
     @Inject
     lateinit var torConfig: TorConfig
@@ -103,6 +108,7 @@ internal class TariWalletApplication : Application(), LifecycleObserver {
         Logger.addLogAdapter(AndroidLogAdapter())
         JodaTimeAndroid.init(this)
         sharedPrefsWrapper = SharedPrefsWrapper(
+            this,
             getSharedPreferences(
                 sharedPrefsFileName,
                 Context.MODE_PRIVATE
@@ -120,6 +126,10 @@ internal class TariWalletApplication : Application(), LifecycleObserver {
         ProcessLifecycleOwner.get().lifecycle.addObserver(this)
 
         initTorProxy()
+		
+        TrackHelper.track().download().identifier(
+            DownloadTracker.Extra.ApkChecksum(this)
+        ).with(tracker)
     }
 
     private fun initDagger(app: TariWalletApplication): ApplicationComponent =

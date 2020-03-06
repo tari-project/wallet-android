@@ -33,37 +33,35 @@
 package com.tari.android.wallet.di
 
 import android.content.Context
-import com.tari.android.wallet.application.TariWalletApplication
-import com.tari.android.wallet.notification.NotificationHelper
-import com.tari.android.wallet.util.SharedPrefsWrapper
 import dagger.Module
 import dagger.Provides
+import org.matomo.sdk.Matomo
+import org.matomo.sdk.Tracker
+import org.matomo.sdk.TrackerBuilder
 import javax.inject.Singleton
 
 /**
- * Dagger basic application module for DI.
+ * Satisfies tracker dependencies.
  *
  * @author The Tari Development Team
  */
 @Module
-internal class ApplicationModule(
-    private val app: TariWalletApplication,
-    private val sharedPrefsWrapper: SharedPrefsWrapper
-) {
-    @Provides
-    @Singleton
-    fun provideApplication(): TariWalletApplication = app
+internal class TrackerModule {
+
+    companion object {
+
+        private const val matomoUrl = "https://matomo.tari.com/matomo.php"
+        private const val matomoSiteId = 2
+
+    }
 
     @Provides
     @Singleton
-    fun provideContext(): Context = app
-
-    @Provides
-    @Singleton
-    fun provideSharedPrefsWrapper(): SharedPrefsWrapper = sharedPrefsWrapper
-
-    @Provides
-    @Singleton
-    fun provideNotificationHelper(context: Context) = NotificationHelper(context)
+    fun provideTracker(context: Context): Tracker {
+        val matomo = Matomo.getInstance(context)
+        val tracker = TrackerBuilder.createDefault(matomoUrl, matomoSiteId).build(matomo)
+        tracker.dispatchInterval = 0
+        return tracker
+    }
 
 }
