@@ -132,4 +132,7 @@ dependencies {
 
     // matomo - tracking
     implementation 'org.matomo.sdk:tracker:4.1.2'
+
+    // used to read log files
+    implementation "commons-io:commons-io:2.6"
 }

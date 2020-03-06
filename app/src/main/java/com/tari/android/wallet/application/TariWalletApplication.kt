@@ -46,6 +46,7 @@ import androidx.lifecycle.ProcessLifecycleOwner
 import com.orhanobut.logger.AndroidLogAdapter
 import com.orhanobut.logger.Logger
 import com.tari.android.wallet.di.*
+import com.tari.android.wallet.ffi.LogFileObserver
 import com.tari.android.wallet.notification.NotificationHelper
 import com.tari.android.wallet.service.TariTorService
 import com.tari.android.wallet.service.TariTorServiceListener
@@ -70,11 +71,18 @@ internal class TariWalletApplication : Application(), LifecycleObserver {
     @JvmField
     @field:[Inject Named(ConfigModule.FieldName.deleteExistingWallet)]
     var deleteExistingWallet: Boolean = false
+
+    @Inject
+    @Named(WalletModule.FieldName.walletLogFilePath)
+    lateinit var walletLogFilePath: String
+
     @Inject
     @Named(WalletModule.FieldName.walletFilesDirPath)
     lateinit var walletFilesDirPath: String
+
     @Inject
     lateinit var notificationHelper: NotificationHelper
+
     @Inject
     lateinit var tracker: Tracker
 
@@ -87,6 +95,11 @@ internal class TariWalletApplication : Application(), LifecycleObserver {
     private val activityLifecycleCallbacks = ActivityLifecycleCallbacks()
     var isInForeground = false
         private set
+
+    /**
+     * Forwards FFI logs to Android Logcat.
+     */
+    private lateinit var logFileObserver: LogFileObserver
 
     init {
         System.loadLibrary("native-lib")
@@ -121,12 +134,14 @@ internal class TariWalletApplication : Application(), LifecycleObserver {
             sharedPrefsWrapper.clean()
         }
 
+        logFileObserver = LogFileObserver(walletLogFilePath)
+        logFileObserver.startWatching()
         notificationHelper.createNotificationChannels()
 
         ProcessLifecycleOwner.get().lifecycle.addObserver(this)
 
         initTorProxy()
-		
+
         TrackHelper.track().download().identifier(
             DownloadTracker.Extra.ApkChecksum(this)
         ).with(tracker)
