@@ -70,6 +70,12 @@ internal class FFIByteVector constructor(pointer: FFIByteVectorPtr) : FFIBase() 
         }
     }
 
+    constructor(bytes: ByteArray) : this(nullptr) {
+        val error = FFIError()
+        ptr = jniCreate(bytes, error)
+        throwIf(error)
+    }
+
     fun getLength(): Int {
         val error = FFIError()
         val len = jniGetLength(ptr, error)

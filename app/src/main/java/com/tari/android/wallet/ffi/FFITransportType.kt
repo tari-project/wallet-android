@@ -57,8 +57,8 @@ internal class FFITransportType constructor(pointer: FFITransportTypePtr) : FFIB
     private external fun jniTorTransport(
         control_server_address: String,
         tor_port: Int,
-        tor_password: String,
-        tor_private_key: FFIByteVectorPtr,
+        tor_cookie: FFIByteVectorPtr,
+        tor_identity: FFIByteVectorPtr,
         socks_username: String,
         socks_password: String,
         libError: FFIError
@@ -86,8 +86,8 @@ internal class FFITransportType constructor(pointer: FFITransportTypePtr) : FFIB
     constructor(
         controlAddress: NetAddressString,
         torPort: Int,
-        torPassword: String,
-        torKey: FFIByteVector,
+        torCookie: FFIByteVector,
+        torIdentity: FFIByteVector,
         socksUsername: String,
         socksPassword: String
     ) : this(nullptr) {
@@ -95,15 +95,14 @@ internal class FFITransportType constructor(pointer: FFITransportTypePtr) : FFIB
         ptr = jniTorTransport(
             controlAddress.toString(),
             torPort,
-            torPassword,
-            torKey.getPointer(),
+            torCookie.getPointer(),
+            torIdentity.getPointer(),
             socksUsername,
             socksPassword,
             error
         )
         throwIf(error)
     }
-
     fun getPointer(): FFIPrivateKeyPtr {
         return ptr
     }

@@ -126,4 +126,7 @@ dependencies {
 
     // encryption
     implementation "de.adorsys.android:securestoragelibrary:1.0.0"
+
+    // Tor binary
+    implementation 'org.torproject:tor-android-binary:0.4.2.5'
 }

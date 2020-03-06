@@ -72,21 +72,22 @@ Java_com_tari_android_wallet_ffi_FFITransportType_jniTorTransport(
         jobject jThis,
         jstring jpControl,
         jint jPort,
-        jstring jpTorPassword,
-        jlong jpTorKey,
+        jlong jpTorCookie,
+        jlong jpTorIdentity,
         jstring jpSocksUser,
         jstring jpSocksPass,
         jobject error) {
     int i = 0;
     int *r = &i;
     char *pControl = const_cast<char *>(jEnv->GetStringUTFChars(jpControl, JNI_FALSE));
-    char *pTorPassword = const_cast<char *>(jEnv->GetStringUTFChars(jpTorPassword, JNI_FALSE));
+    ByteVector *pTorCookie = reinterpret_cast<ByteVector *>(jpTorCookie);
+    ByteVector *pTorIdentity = reinterpret_cast<ByteVector *>(jpTorIdentity);
     char *pSocksUsername = const_cast<char *>(jEnv->GetStringUTFChars(jpSocksUser, JNI_FALSE));
     char *pSocksPassword = const_cast<char *>(jEnv->GetStringUTFChars(jpSocksPass, JNI_FALSE));
-    ByteVector *pByteVector = reinterpret_cast<ByteVector *>(jpTorKey);
-    TariTransportType *transport = transport_tor_create(pControl,pTorPassword,pByteVector,static_cast<unsigned short>(jPort),pSocksUsername,pSocksPassword,r);
+    TariTransportType *transport = transport_tor_create(pControl, pTorCookie, pTorIdentity,
+                                                        static_cast<unsigned short>(jPort),
+                                                        pSocksUsername, pSocksPassword, r);
     jEnv->ReleaseStringUTFChars(jpControl, pControl);
-    jEnv->ReleaseStringUTFChars(jpTorPassword, pTorPassword);
     jEnv->ReleaseStringUTFChars(jpSocksUser, pSocksUsername);
     jEnv->ReleaseStringUTFChars(jpSocksPass, pSocksPassword);
     setErrorCode(jEnv, error, i);
