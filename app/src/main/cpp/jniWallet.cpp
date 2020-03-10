@@ -80,6 +80,9 @@ JNIEnv *getJNIEnv() {
         case JNI_EDETACHED: {
             if (g_vm->AttachCurrentThread(&jniEnv, nullptr) != 0) {
                 LOGE("VM failed to attach.");
+            } else
+            {
+                result = jniEnv;
             }
             break;
         }
