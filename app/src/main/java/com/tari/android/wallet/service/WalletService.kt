@@ -699,8 +699,11 @@ class WalletService : Service(), FFIWalletListenerAdapter {
             }
 
             val message = "$MESSAGE_PREFIX $publicKeyHexString"
-            val signature = wallet.signMessage(message)
-            val requestBody = TestnetTariAllocateRequest(signature, publicKeyHexString)
+            val signing = wallet.signMessage(message)
+            val signature = signing.split("|")[0]
+            val nonce = signing.split("|")[1]
+
+            val requestBody = TestnetTariAllocateRequest(signature, nonce)
 
             val response = tariRESTService.requestTestnetTari(publicKeyHexString, requestBody)
             response.enqueue(object : Callback<TestnetTariAllocateResponse> {
