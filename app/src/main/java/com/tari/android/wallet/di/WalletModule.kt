@@ -64,6 +64,7 @@ internal class WalletModule {
      */
     @Provides
     @Named(FieldName.walletFilesDirPath)
+    @Singleton
     internal fun provideWalletFilesDirPath(context: Context): String = context.filesDir.absolutePath
 
     /**
@@ -71,11 +72,16 @@ internal class WalletModule {
      */
     @Provides
     @Named(FieldName.walletLogFilePath)
+    @Singleton
     internal fun provideWalletLogFilePath(@Named(FieldName.walletFilesDirPath) walletFilesDirPath: String): String {
         val timeStamp = SimpleDateFormat("YYYYMMdd", Locale.getDefault()).format(Date()) +
                 "_${System.currentTimeMillis()}"
-
-        return "$walletFilesDirPath/$logFilePrefix$timeStamp.log"
+        val logFilePath = "$walletFilesDirPath/$logFilePrefix$timeStamp.log"
+        val logFile = File(logFilePath)
+        if (!logFile.exists()) {
+            logFile.createNewFile()
+        }
+        return logFilePath
     }
 
     /**
@@ -168,8 +174,8 @@ internal class WalletModule {
             sharedPrefsWrapper.publicKeyHexString = publicKeyFFI.toString()
             sharedPrefsWrapper.emojiId = publicKeyFFI.getEmojiNodeId()
             publicKeyFFI.destroy()
-            //Todo: Below needs to be run once on first run
 
+            // TODO: Below needs to be run once on first run
             val baseNodeKeyFFI =
                 FFIPublicKey(HexString("90d8fe54c377ecabff383f7d8f0ba708c5b5d2a60590f326fbf1a2e74ea2441f"))
             val baseNodeAddress =
@@ -177,8 +183,6 @@ internal class WalletModule {
             wallet.addBaseNodePeer(baseNodeKeyFFI, baseNodeAddress)
 
             baseNodeKeyFFI.destroy()
-
-
         }
         return FFITestWallet.instance!!
     }
