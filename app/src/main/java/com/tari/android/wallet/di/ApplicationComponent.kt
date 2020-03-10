@@ -33,6 +33,7 @@
 package com.tari.android.wallet.di
 
 import com.tari.android.wallet.application.TariWalletApplication
+import com.tari.android.wallet.service.BootDeviceReceiver
 import com.tari.android.wallet.service.WalletService
 import com.tari.android.wallet.ui.activity.AuthActivity
 import com.tari.android.wallet.ui.activity.QRScannerActivity
@@ -106,10 +107,14 @@ internal interface ApplicationComponent {
     fun inject(fragment: DebugLogFragment)
     fun inject(fragment: DebugLogFilePickerFragment)
 
-
     /**
      * Service(s).
      */
     fun inject(service: WalletService)
+
+    /*
+    * Broadcast receiver
+    * */
+    fun inject(receiver: BootDeviceReceiver)
 
 }
