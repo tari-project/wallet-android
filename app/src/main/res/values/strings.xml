@@ -25,6 +25,7 @@
     <string name="common_close">Close</string>
     <string name="common_new">New</string>
     <string name="common_new_uppercase">NEW</string>
+    <string name="common_save">Save</string>
 
     <!-- dummy values - UI design placeholders -->
     <string name="dummy_positive_tx_value">+ 152.75</string>
@@ -159,6 +160,19 @@
     <string name="auth_prompt_button_text">Enable your %1s</string>
     <string name="auth_prompt_touch_id_desc">We recommend using Touch ID to access your\nTari wallet for security and ease of use.</string>
     <string name="auth_prompt_pin_desc">We recommend using your device PIN to access your\nTari wallet for security and ease of use.</string>
-    <string name="debug_log_file_list_log_title">Log Files</string>
+
+    <!-- debug -->
+    <string name="debug_log_files_title">Logs</string>
+    <string name="debug_base_node_title">Base Node</string>
+    <string name="debug_current_base_node">Current Base Node</string>
+    <string name="debug_current_base_node_public_key">Public Key:</string>
+    <string name="debug_current_base_node_address">Address:</string>
+    <string name="debug_edit_base_node">Edit Base Node</string>
+    <string name="debug_edit_base_node_public_key_hint">Public Key HEX</string>
+    <string name="debug_edit_base_node_address_hint">Address</string>
+    <string name="debug_edit_base_node_invalid_public_key">Invalid public key hex.</string>
+    <string name="debug_edit_base_node_invalid_address">Invalid address.</string>
+    <string name="debug_edit_base_node_successful">Base node peer added successfully.</string>
+    <string name="debug_edit_base_node_failed">Couldn\'t add base node peer.</string>
 
 </resources>

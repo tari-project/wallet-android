@@ -36,11 +36,6 @@
             </intent-filter>
         </service>
 
-        <!-- Tor background service -->
-        <service
-            android:name=".service.TorService"
-            android:process=":torservice" />
-
         <!-- this receiver restarts the service on destroy & keeps the service running -->
         <receiver
             android:name=".service.ServiceRestartBroadcastReceiver"
@@ -61,14 +56,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <!-- log -->
-        <activity
-            android:name=".ui.activity.log.DebugLogActivity"
-            android:configChanges="keyboardHidden|orientation|screenSize"
-            android:parentActivityName=".ui.activity.home.HomeActivity"
-            android:screenOrientation="portrait"
-            android:theme="@style/AppTheme"
-            android:windowSoftInputMode="stateAlwaysHidden" />
         <!-- onboarding flow -->
         <activity
             android:name=".ui.activity.onboarding.OnboardingFlowActivity"
@@ -118,6 +105,14 @@
         <!-- transaction detail -->
         <activity
             android:name=".ui.activity.tx.TxDetailActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:parentActivityName=".ui.activity.home.HomeActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme"
+            android:windowSoftInputMode="adjustPan|stateAlwaysHidden" />
+        <!-- debug -->
+        <activity
+            android:name=".ui.activity.debug.DebugActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:parentActivityName=".ui.activity.home.HomeActivity"
             android:screenOrientation="portrait"

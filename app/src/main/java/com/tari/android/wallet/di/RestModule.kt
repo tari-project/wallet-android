@@ -54,7 +54,7 @@ internal class RestModule {
     @Named("ServerUrl")
     @Singleton
     fun providerServerUrl(): String {
-        return Constants.Wallet.WALLET_SERVER_URL
+        return Constants.Wallet.faucetServerUrl
     }
 
     @Provides

@@ -55,6 +55,9 @@ class SharedPrefsWrapper(
         const val onboardingAuthSetupStartedKey = "tari_wallet_onboarding_auth_setup_started"
         const val onboardingCompletedKey = "tari_wallet_onboarding_completed"
         const val onboardingDisplayedAtHomeKey = "tari_wallet_onboarding_displayed_at_home"
+        const val torBinPathKey = "tari_wallet_tor_bin_path"
+        const val baseNodePublicKeyHexKey = "tari_wallet_base_node_public_key_hex"
+        const val baseNodeAddressKey = "tari_wallet_base_node_address"
     }
 
     var privateKeyHexString: String?
@@ -164,12 +167,60 @@ class SharedPrefsWrapper(
             }
         }
 
+    var torBinPath: String?
+        get() {
+            return sharedPrefs.getString(Key.torBinPathKey, null)
+        }
+        set(value) {
+            sharedPrefs.edit().apply {
+                putString(Key.torBinPathKey, value)
+                apply()
+            }
+        }
+
+    var baseNodePublicKeyHex: String?
+        get() {
+            return SecurePreferences.getStringValue(
+                context,
+                Key.baseNodePublicKeyHexKey,
+                null
+            )
+        }
+        set(value) {
+            if (value != null) {
+                SecurePreferences.setValue(
+                    context,
+                    Key.baseNodePublicKeyHexKey,
+                    value
+                )
+            }
+        }
+
+    var baseNodeAddress: String?
+        get() {
+            return SecurePreferences.getStringValue(
+                context,
+                Key.baseNodeAddressKey,
+                null
+            )
+        }
+        set(value) {
+            if (value != null) {
+                SecurePreferences.setValue(
+                    context,
+                    Key.baseNodeAddressKey,
+                    value
+                )
+            }
+        }
+
     fun clean() {
         publicKeyHexString = ""
         emojiId = ""
         onboardingStarted = false
         onboardingCompleted = false
         onboardingDisplayedAtHome = false
+        torBinPath = null
     }
 
 }

@@ -62,7 +62,7 @@ import javax.inject.Inject
  *
  * @author The Tari Development Team
  */
-class AuthActivity : BaseActivity(), Animator.AnimatorListener {
+internal class AuthActivity : BaseActivity(), Animator.AnimatorListener {
 
     private lateinit var biometricPrompt: BiometricPrompt
     @BindView(R.id.main_img_big_gem)

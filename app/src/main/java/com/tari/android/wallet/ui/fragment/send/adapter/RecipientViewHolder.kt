@@ -44,7 +44,6 @@ import com.tari.android.wallet.model.Contact
 import com.tari.android.wallet.model.User
 import com.tari.android.wallet.ui.component.EmojiIdSummaryViewController
 import com.tari.android.wallet.ui.util.UiUtil
-import com.tari.android.wallet.util.EmojiUtil
 import java.lang.ref.WeakReference
 import java.util.*
 

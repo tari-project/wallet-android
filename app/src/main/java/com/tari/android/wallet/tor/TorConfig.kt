@@ -30,28 +30,18 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.tari.android.wallet.service;
+package com.tari.android.wallet.tor
 
-// import listener class
-import com.tari.android.wallet.service.TariTorServiceListener;
-
-interface TariTorService {
-
-    /**
-    * Registers new Tor service listener.
-    * Registered listener will be unregistered on death.
-    */
-    void registerListener(TariTorServiceListener listener);
-
-    /**
-    * Unregisters Tor service listener.
-    */
-    void unregisterListener(TariTorServiceListener listener);
-
-    /**
-    * Starts TOR with given config, it's a non-blocking function. Callers should use listener
-    * for error notifications
-    */
-    void start(int socksPort, String controlHost, int controlPort, String sock5Username, String sock5Password);
-
-}
+/**
+ * Tor proxy configuration.
+ */
+data class TorConfig(
+    val proxyPort: Int,
+    val controlHost: String,
+    val controlPort: Int,
+    val connectionPort: Int,
+    val cookieFilePath: String,
+    val identity: ByteArray,
+    val sock5Username: String,
+    val sock5Password: String
+)

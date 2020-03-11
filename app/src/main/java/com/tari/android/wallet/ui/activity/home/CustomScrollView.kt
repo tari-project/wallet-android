@@ -46,7 +46,7 @@ import com.tari.android.wallet.ui.util.UiUtil
  *
  * @author The Tari Development Team
  */
-class CustomScrollView @JvmOverloads constructor(
+internal class CustomScrollView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0

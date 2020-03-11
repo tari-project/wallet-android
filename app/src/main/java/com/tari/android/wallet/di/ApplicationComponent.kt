@@ -38,14 +38,14 @@ import com.tari.android.wallet.service.WalletService
 import com.tari.android.wallet.ui.activity.AuthActivity
 import com.tari.android.wallet.ui.activity.QRScannerActivity
 import com.tari.android.wallet.ui.activity.SplashActivity
+import com.tari.android.wallet.ui.activity.debug.DebugActivity
 import com.tari.android.wallet.ui.activity.home.HomeActivity
-import com.tari.android.wallet.ui.activity.log.DebugLogActivity
 import com.tari.android.wallet.ui.activity.onboarding.OnboardingFlowActivity
 import com.tari.android.wallet.ui.activity.profile.WalletInfoActivity
 import com.tari.android.wallet.ui.activity.send.SendTariActivity
 import com.tari.android.wallet.ui.activity.tx.TxDetailActivity
-import com.tari.android.wallet.ui.fragment.log.DebugLogFilePickerFragment
-import com.tari.android.wallet.ui.fragment.log.DebugLogFragment
+import com.tari.android.wallet.ui.fragment.debug.BaseNodeConfigFragment
+import com.tari.android.wallet.ui.fragment.debug.DebugLogFragment
 import com.tari.android.wallet.ui.fragment.onboarding.CreateWalletFragment
 import com.tari.android.wallet.ui.fragment.onboarding.IntroductionFragment
 import com.tari.android.wallet.ui.fragment.onboarding.LocalAuthFragment
@@ -88,10 +88,10 @@ internal interface ApplicationComponent {
     fun inject(activity: AuthActivity)
     fun inject(activity: HomeActivity)
     fun inject(activity: QRScannerActivity)
-    fun inject(activity: DebugLogActivity)
     fun inject(activity: SendTariActivity)
     fun inject(activity: WalletInfoActivity)
     fun inject(activity: TxDetailActivity)
+    fun inject(activity: DebugActivity)
 
     /**
      * Fragments.
@@ -105,7 +105,7 @@ internal interface ApplicationComponent {
     fun inject(fragment: SendTxSuccessfulFragment)
     fun inject(fragment: LocalAuthFragment)
     fun inject(fragment: DebugLogFragment)
-    fun inject(fragment: DebugLogFilePickerFragment)
+    fun inject(fragment: BaseNodeConfigFragment)
 
     /**
      * Service(s).

@@ -68,8 +68,8 @@ import com.tari.android.wallet.model.*
 import com.tari.android.wallet.service.TariWalletService
 import com.tari.android.wallet.service.WalletService
 import com.tari.android.wallet.ui.activity.BaseActivity
+import com.tari.android.wallet.ui.activity.debug.DebugActivity
 import com.tari.android.wallet.ui.activity.home.adapter.TxListAdapter
-import com.tari.android.wallet.ui.activity.log.DebugLogActivity
 import com.tari.android.wallet.ui.activity.profile.WalletInfoActivity
 import com.tari.android.wallet.ui.activity.send.SendTariActivity
 import com.tari.android.wallet.ui.activity.tx.TxDetailActivity
@@ -880,8 +880,9 @@ internal class HomeActivity : BaseActivity(),
 
     @OnLongClick(R.id.home_vw_grabber_container)
     fun grabberContainerViewLongClicked() {
-        val intent = Intent(this, DebugLogActivity::class.java)
+        val intent = Intent(this, DebugActivity::class.java)
         startActivity(intent)
+        overridePendingTransition(R.anim.enter_from_right, R.anim.exit_to_left)
     }
 
     /**

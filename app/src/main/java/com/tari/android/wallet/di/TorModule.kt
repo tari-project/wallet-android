@@ -33,7 +33,13 @@
 package com.tari.android.wallet.di
 
 import android.content.Context
-import com.tari.android.wallet.service.DIRECTORY_TOR_DATA
+import com.tari.android.wallet.ffi.FFIByteVector
+import com.tari.android.wallet.ffi.FFITransportType
+import com.tari.android.wallet.ffi.NetAddressString
+import com.tari.android.wallet.ffi.nullptr
+import com.tari.android.wallet.tor.TorConfig
+import com.tari.android.wallet.tor.TorProxyManager
+import com.tari.android.wallet.util.SharedPrefsWrapper
 import dagger.Module
 import dagger.Provides
 import java.io.File
@@ -117,7 +123,7 @@ class TorModule {
     @Singleton
     internal fun provideTorControlPassword(context: Context): String {
         return File(
-            context.getDir(DIRECTORY_TOR_DATA, Context.MODE_PRIVATE),
+            context.getDir(TorProxyManager.torDataDirectoryName, Context.MODE_PRIVATE),
             "control_auth_cookie"
         ).canonicalPath
     }
@@ -178,15 +184,51 @@ class TorModule {
             sock5Password = sock5Passsword
         )
     }
-}
 
-data class TorConfig(
-    val proxyPort: Int,
-    val controlHost: String,
-    val controlPort: Int,
-    val connectionPort: Int,
-    val cookieFilePath: String,
-    val identity: ByteArray,
-    val sock5Username: String,
-    val sock5Password: String
-)
+    @Provides
+    @Singleton
+    internal fun provideTorProxyManager(
+        context: Context,
+        sharedPrefsWrapper: SharedPrefsWrapper,
+        torConfig: TorConfig
+    ): TorProxyManager {
+        return TorProxyManager(
+            context,
+            sharedPrefsWrapper,
+            torConfig
+        )
+    }
+
+    /**
+     * Provides transport for wallet to use
+     */
+    @Provides
+    @Singleton
+    internal fun provideTorTransport(torConfig: TorConfig): FFITransportType {
+        // provide Tor transport
+        val cookieFile = File(torConfig.cookieFilePath)
+        var cookieString = ByteArray(0)
+        if (cookieFile.exists()) {
+            cookieString = cookieFile.readBytes()
+        }
+
+        val torCookie = FFIByteVector(cookieString)
+        var torIdentity = FFIByteVector(nullptr)
+        if (torConfig.identity.isNotEmpty()) {
+            torIdentity.destroy()
+            torIdentity = FFIByteVector(torConfig.identity)
+        }
+        return FFITransportType(
+            NetAddressString(
+                torConfig.controlHost,
+                torConfig.controlPort
+            ),
+            torConfig.connectionPort,
+            torCookie,
+            torIdentity,
+            torConfig.sock5Username,
+            torConfig.sock5Password
+        )
+    }
+
+}

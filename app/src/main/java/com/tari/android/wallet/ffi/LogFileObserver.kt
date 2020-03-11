@@ -82,9 +82,6 @@ internal class LogFileObserver(logFilePath: String) : FileObserver(logFilePath) 
     }
 
     override fun onEvent(event: Int, path: String?) {
-        if (event != MODIFY) {
-            return
-        }
         logNewLines()
     }
 

@@ -34,11 +34,7 @@ package com.tari.android.wallet.application
 
 import android.app.Activity
 import android.app.Application
-import android.content.ComponentName
 import android.content.Context
-import android.content.Intent
-import android.content.ServiceConnection
-import android.os.IBinder
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.OnLifecycleEvent
@@ -48,12 +44,9 @@ import com.orhanobut.logger.Logger
 import com.tari.android.wallet.di.*
 import com.tari.android.wallet.ffi.LogFileObserver
 import com.tari.android.wallet.notification.NotificationHelper
-import com.tari.android.wallet.service.TariTorService
-import com.tari.android.wallet.service.TariTorServiceListener
-import com.tari.android.wallet.service.TorService
+import com.tari.android.wallet.tor.TorProxyManager
 import com.tari.android.wallet.util.SharedPrefsWrapper
 import com.tari.android.wallet.util.WalletUtil
-import com.tari.android.wallet.util.getProcessNameCompat
 import net.danlew.android.joda.JodaTimeAndroid
 import org.matomo.sdk.Tracker
 import org.matomo.sdk.extra.DownloadTracker
@@ -75,19 +68,16 @@ internal class TariWalletApplication : Application(), LifecycleObserver {
     @Inject
     @Named(WalletModule.FieldName.walletLogFilePath)
     lateinit var walletLogFilePath: String
-
     @Inject
     @Named(WalletModule.FieldName.walletFilesDirPath)
     lateinit var walletFilesDirPath: String
 
     @Inject
+    lateinit var torProxyManager: TorProxyManager
+    @Inject
     lateinit var notificationHelper: NotificationHelper
-
     @Inject
     lateinit var tracker: Tracker
-
-    @Inject
-    lateinit var torConfig: TorConfig
 
     lateinit var appComponent: ApplicationComponent
     private lateinit var sharedPrefsWrapper: SharedPrefsWrapper
@@ -112,11 +102,6 @@ internal class TariWalletApplication : Application(), LifecycleObserver {
 
     override fun onCreate() {
         super.onCreate()
-        if (getProcessNameCompat(this)?.contains("torservice") == true) {
-            // Process is from TOR service, don't do anything
-            return
-        }
-
         registerActivityLifecycleCallbacks(activityLifecycleCallbacks)
         Logger.addLogAdapter(AndroidLogAdapter())
         JodaTimeAndroid.init(this)
@@ -140,7 +125,12 @@ internal class TariWalletApplication : Application(), LifecycleObserver {
 
         ProcessLifecycleOwner.get().lifecycle.addObserver(this)
 
-        initTorProxy()
+        /**
+         * Run tor.
+         */
+        Thread {
+            torProxyManager.runTorProxy()
+        }.start()
 
         TrackHelper.track().download().identifier(
             DownloadTracker.Extra.ApkChecksum(this)
@@ -164,35 +154,4 @@ internal class TariWalletApplication : Application(), LifecycleObserver {
         isInForeground = true
     }
 
-
-    private fun initTorProxy() {
-        val bindIntent = Intent(this, TorService::class.java)
-        bindService(bindIntent, torProxyConnection, Context.BIND_AUTO_CREATE)
-    }
-
-    private val torProxyConnection = object : ServiceConnection {
-        override fun onServiceDisconnected(name: ComponentName?) {
-            Logger.d("TOR service disconnected")
-        }
-
-        override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
-            Logger.d("TOR service connected")
-            val torService = TariTorService.Stub.asInterface(service)
-            torService.registerListener(torProxyListener)
-
-            torService.start(
-                torConfig.proxyPort,
-                torConfig.controlHost,
-                torConfig.controlPort,
-                torConfig.sock5Username,
-                torConfig.sock5Password
-            )
-        }
-    }
-
-    private val torProxyListener = object : TariTorServiceListener.Stub() {
-        override fun onTorServiceError(error: String?) {
-            Logger.e("Tor service error $error")
-        }
-    }
 }
