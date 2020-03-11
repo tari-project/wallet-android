@@ -32,8 +32,6 @@
  */
 package com.tari.android.wallet.util
 
-import com.tari.android.wallet.ffi.NetAddressString
-
 /**
  * Contains application-wide constant values.
  *
@@ -137,14 +135,14 @@ internal object Constants {
      * Wallet constants.
      */
     object Wallet {
-        internal const val emojiIdLength = 13
-        internal const val emojiFormatterChunkSize = 4
-        const val WALLET_DB_NAME: String = "tari_wallet_db"
-        internal val WALLET_CONTROL_SERVICE_ADDRESS: NetAddressString =
-            NetAddressString("127.0.0.1", 80)
-        internal val WALLET_LISTENER_ADDRESS: NetAddressString = NetAddressString("0.0.0.0", 0)
-        internal const val WALLET_SERVER_URL = "https://faucet.tari.com"
-        internal const val QR_DEEP_LINK_URL = "tari://testnet"
+        const val emojiIdLength = 13
+        const val emojiFormatterChunkSize = 4
+        const val walletDBName: String = "tari_wallet_db"
+        const val faucetServerUrl = "https://faucet.tari.com"
+        const val QRDeepLinkURL = "tari://testnet"
+        // base node
+        const val baseNodePublicKeyHex = "2e93c460df49d8cfbbf7a06dd9004c25a84f92584f7d0ac5e30bd8e0beee9a43"
+        const val baseNodeAddress = "/onion3/nuuq3e2olck22rudimovhmrdwkmjncxvwdgbvfxhz6myzcnx2j4rssyd:18141"
     }
 
 }

@@ -30,17 +30,31 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.tari.android.wallet.util
+package com.tari.android.wallet.ui.activity.debug.adapter
 
-import android.app.ActivityManager
-import android.content.Context
-import android.os.Process
+import androidx.fragment.app.Fragment
+import androidx.viewpager2.adapter.FragmentStateAdapter
+import com.tari.android.wallet.ui.activity.BaseActivity
+import com.tari.android.wallet.ui.fragment.debug.BaseNodeConfigFragment
+import com.tari.android.wallet.ui.fragment.debug.DebugLogFragment
 
-/**
- * Provides name of the process this context is running in
- */
-fun getProcessNameCompat(context: Context): String? {
-    val pid = Process.myPid()
-    val manager = context.getSystemService(Context.ACTIVITY_SERVICE) as? ActivityManager
-    return manager?.runningAppProcesses?.filterNotNull()?.firstOrNull { it.pid == pid }?.processName
+internal class DebugViewPagerAdapter(activity: BaseActivity) : FragmentStateAdapter(activity) {
+
+    /**
+     * Logs and base node configuration.
+     */
+    private val numberOfItems = 2
+
+    override fun getItemCount(): Int {
+        return numberOfItems
+    }
+
+    override fun createFragment(position: Int): Fragment {
+        return when (position) {
+            0 -> DebugLogFragment()
+            1 -> BaseNodeConfigFragment()
+            else -> throw RuntimeException("Unexpected page position: $position")
+        }
+    }
+
 }

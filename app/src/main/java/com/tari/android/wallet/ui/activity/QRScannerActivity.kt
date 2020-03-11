@@ -45,7 +45,6 @@ import butterknife.BindView
 import butterknife.OnClick
 import com.budiyev.android.codescanner.*
 import com.google.zxing.BarcodeFormat
-import com.orhanobut.logger.Logger
 import com.tari.android.wallet.R
 import org.matomo.sdk.Tracker
 import org.matomo.sdk.extra.TrackHelper
@@ -59,7 +58,7 @@ const val EXTRA_QR_DATA = "extra_qr_text"
  *
  * @author The Tari Development Team
  */
-class QRScannerActivity : BaseActivity() {
+internal class QRScannerActivity : BaseActivity() {
 
     companion object {
         /**

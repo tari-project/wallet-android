@@ -39,8 +39,8 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import butterknife.ButterKnife
 import com.tari.android.wallet.application.TariWalletApplication
-import com.tari.android.wallet.ui.fragment.log.DebugLogFilePickerFragment
-import com.tari.android.wallet.ui.fragment.log.DebugLogFragment
+import com.tari.android.wallet.ui.fragment.debug.BaseNodeConfigFragment
+import com.tari.android.wallet.ui.fragment.debug.DebugLogFragment
 import com.tari.android.wallet.ui.fragment.onboarding.CreateWalletFragment
 import com.tari.android.wallet.ui.fragment.onboarding.IntroductionFragment
 import com.tari.android.wallet.ui.fragment.onboarding.LocalAuthFragment
@@ -74,7 +74,7 @@ abstract class BaseFragment : Fragment() {
             is SendTxSuccessfulFragment -> component.inject(this)
             is LocalAuthFragment -> component.inject(this)
             is DebugLogFragment -> component.inject(this)
-            is DebugLogFilePickerFragment -> component.inject(this)
+            is BaseNodeConfigFragment -> component.inject(this)
 
         }
         // bind views

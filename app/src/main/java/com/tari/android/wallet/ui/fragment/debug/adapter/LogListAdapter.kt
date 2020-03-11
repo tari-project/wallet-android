@@ -30,47 +30,54 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.tari.android.wallet.ui.activity.log
+package com.tari.android.wallet.ui.fragment.debug.adapter
 
-import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.ViewGroup
+import androidx.recyclerview.widget.RecyclerView
 import com.tari.android.wallet.R
-import com.tari.android.wallet.ui.activity.BaseActivity
-import com.tari.android.wallet.ui.fragment.log.DebugLogFilePickerFragment
-import com.tari.android.wallet.ui.fragment.log.DebugLogFragment
 
 /**
- * Debug screen activity.
+ * Log list recycler view adapter.
  *
  * @author The Tari Development Team
  */
-class DebugLogActivity : BaseActivity(), DebugLogFragment.DebugListener,
-    DebugLogFilePickerFragment.Listener {
+internal class LogListAdapter(private val logLines: List<String>) :
+    RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
-    override val contentViewId = R.layout.activity_debug_log
+    private val regex =
+        Regex("(\\d{4}-\\d{2}-\\d{2}\\s\\d{2}:\\d{2}:\\d{2}\\.\\d+)\\s(\\[[^]]+])\\s(\\[[^]]+]\\s)?([A-Z]+)\\s(.+)")
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        overridePendingTransition(R.anim.enter_from_right, R.anim.exit_to_left)
-        supportFragmentManager.beginTransaction()
-            .replace(
-                R.id.debug_frame_container,
-                DebugLogFragment()
-            ).commit()
+    /**
+     * Item count.
+     */
+    override fun getItemCount() = logLines.size
+
+    /**
+     * Create the view holder instance.
+     */
+    override fun onCreateViewHolder(
+        parent: ViewGroup,
+        viewType: Int
+    ): RecyclerView.ViewHolder {
+        val view = LayoutInflater.from(parent.context).inflate(R.layout.log_item, parent, false)
+        return LogViewHolder(view)
     }
 
-    override fun onFilePickerClick() {
-        supportFragmentManager.beginTransaction()
-            .replace(
-                R.id.debug_frame_container,
-                DebugLogFilePickerFragment()
-            ).addToBackStack(null).commit()
+    /**
+     * Bind & display header or transaction.
+     */
+    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+        val matchResult = regex.find(logLines[position])
+        val (timestamp, source1, source2, level, log) = matchResult!!.destructured
+        (holder as LogViewHolder).bind(
+            timestamp,
+            source1,
+            source2,
+            level,
+            log,
+            position == (logLines.size - 1)
+        )
     }
 
-    override fun onLogFileSelected(position: Int) {
-        supportFragmentManager.popBackStackImmediate()
-        val fragment = supportFragmentManager.findFragmentById(R.id.debug_frame_container)
-        if (fragment is DebugLogFragment) {
-            fragment.refreshLogs(position)
-        }
-    }
 }

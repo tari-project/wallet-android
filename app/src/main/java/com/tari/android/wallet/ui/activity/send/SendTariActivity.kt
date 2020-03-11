@@ -72,7 +72,7 @@ import java.lang.ref.WeakReference
  *
  * @author The Tari Development Team
  */
-class SendTariActivity : BaseActivity(),
+internal class SendTariActivity : BaseActivity(),
     ServiceConnection,
     AddRecipientFragment.Listener,
     AddAmountFragment.Listener,

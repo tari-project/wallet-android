@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="30dp">
+
+    <View
+        android:id="@+id/log_file_spinner_item_vw_gray_bg"
+        android:layout_width="match_parent"
+        android:background="#EEEEEE"
+        android:layout_height="30dp"/>
+
+    <com.tari.android.wallet.ui.component.CustomFontTextView
+        android:id="@+id/log_file_spinner_item_txt_file_name"
+        android:layout_width="match_parent"
+        android:layout_height="30dp"
+        android:ellipsize="middle"
+        android:gravity="center_vertical|start"
+        android:paddingHorizontal="8dp"
+        android:textColor="@color/black"
+        android:textSize="14sp"
+        app:customFont="AVENIR_NEXT_LT_PRO_REGULAR" />
+
+</FrameLayout>

@@ -49,7 +49,7 @@ import javax.inject.Named
  *
  * @author The Tari Development Team
  */
-class SplashActivity : BaseActivity() {
+internal class SplashActivity : BaseActivity() {
 
     override val contentViewId = R.layout.activity_splash
 

@@ -32,6 +32,7 @@
  */
 package com.tari.android.wallet.auth
 
+import android.annotation.SuppressLint
 import android.app.KeyguardManager
 import android.content.Context
 import android.os.Build
@@ -47,6 +48,7 @@ internal object AuthUtil {
      * Returns true if lockscreen is enabled. Will return true if a fingerprint defined as well,
      * which implies the lockscreen is set as well.
      */
+    @SuppressLint("ObsoleteSdkInt")
     fun isDeviceSecured(context: Context): Boolean {
         val keyguardManager = context.getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager?
             ?: return false //api 16+

@@ -54,7 +54,7 @@ import javax.inject.Named
  *
  * @author The Tari Development Team
  */
-class OnboardingFlowActivity : BaseActivity(), IntroductionFragment.Listener,
+internal class OnboardingFlowActivity : BaseActivity(), IntroductionFragment.Listener,
     CreateWalletFragment.Listener, LocalAuthFragment.Listener {
 
     override val contentViewId = R.layout.activity_onboarding_flow

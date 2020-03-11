@@ -36,8 +36,8 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import butterknife.ButterKnife
 import com.tari.android.wallet.application.TariWalletApplication
+import com.tari.android.wallet.ui.activity.debug.DebugActivity
 import com.tari.android.wallet.ui.activity.home.HomeActivity
-import com.tari.android.wallet.ui.activity.log.DebugLogActivity
 import com.tari.android.wallet.ui.activity.onboarding.OnboardingFlowActivity
 import com.tari.android.wallet.ui.activity.send.SendTariActivity
 import com.tari.android.wallet.ui.activity.profile.WalletInfoActivity
@@ -48,24 +48,25 @@ import com.tari.android.wallet.ui.activity.tx.TxDetailActivity
  *
  * @author The Tari Development Team
  */
-abstract class BaseActivity : AppCompatActivity() {
+internal abstract class BaseActivity : AppCompatActivity() {
 
     abstract val contentViewId: Int
 
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        // DI inject
         val component = (application as TariWalletApplication).appComponent
+        // DI inject
         when (this) {
             is SplashActivity -> component.inject(this)
             is OnboardingFlowActivity -> component.inject(this)
             is AuthActivity -> component.inject(this)
             is HomeActivity -> component.inject(this)
             is QRScannerActivity -> component.inject(this)
-            is DebugLogActivity -> component.inject(this)
             is SendTariActivity -> component.inject(this)
             is TxDetailActivity -> component.inject(this)
             is WalletInfoActivity -> component.inject(this)
+            is DebugActivity -> component.inject(this)
         }
         // bind views
         setContentView(contentViewId)

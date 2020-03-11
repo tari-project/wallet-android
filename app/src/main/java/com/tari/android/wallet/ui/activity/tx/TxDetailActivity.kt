@@ -73,7 +73,7 @@ import javax.inject.Inject
  *
  * @author The Tari Development Team
  */
-class TxDetailActivity :
+internal class TxDetailActivity :
     BaseActivity(),
     ServiceConnection {
 
