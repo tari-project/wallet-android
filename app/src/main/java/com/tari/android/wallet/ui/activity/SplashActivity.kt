@@ -32,9 +32,14 @@
  */
 package com.tari.android.wallet.ui.activity
 
+import android.Manifest
 import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
+import android.widget.Toast
+import com.romellfudi.permission.PermisionInterface
+import com.romellfudi.permission.PermisionServiceInterface
+import com.romellfudi.permission.PermissionService
 import com.tari.android.wallet.R
 import com.tari.android.wallet.di.WalletModule
 import com.tari.android.wallet.ui.activity.onboarding.OnboardingFlowActivity
@@ -61,8 +66,32 @@ internal class SplashActivity : BaseActivity() {
     @Inject
     internal lateinit var sharedPrefsWrapper: SharedPrefsWrapper
 
+    override fun onRequestPermissionsResult(requestCode: Int,
+                                            permissions: Array<String>, grantResults: IntArray) {
+        PermissionService.handler(callback,grantResults,permissions)
+        init()
+    }
+
+    private val callback = object : PermissionService.Callback() {
+        override fun onResponse(refusePermissions: java.util.ArrayList<String>?) {
+            if (refusePermissions!=null) {
+                Toast.makeText(baseContext,
+                    "Have to allow all permissions",
+                    Toast.LENGTH_SHORT).show()
+                Handler().postDelayed({ finish() }, 2000)
+            } else
+            {
+                init()
+            }
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        PermissionService(this).request(callback)
+    }
+
+    private fun init() {
         // check whether there's an existing wallet
         val walletExists = File(walletFilesDirPath).list()!!.isNotEmpty()
         if (walletExists && sharedPrefsWrapper.onboardingAuthSetupCompleted) {

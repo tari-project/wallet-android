@@ -140,4 +140,6 @@ dependencies {
     implementation "androidx.viewpager2:viewpager2:1.0.0"
     // for tab layout
     implementation 'com.google.android.material:material:1.1.0'
+
+    implementation "com.romellfudi.permission:kotlin-fudi-permission:2.0.a"
 }
