@@ -11,8 +11,8 @@ android {
         applicationId "com.tari.android.wallet"
         minSdkVersion 24
         targetSdkVersion 29
-        versionCode 9
-        versionName "0.0.9"
+        versionCode 10
+        versionName "0.0.10"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
         ndk {
@@ -141,3 +141,4 @@ dependencies {
     // for tab layout
     implementation 'com.google.android.material:material:1.1.0'
 }
+B54888CE31CCF47267D94C4E6A3C4DA3012CD7D5916CFED311AEDCF9CE28108
