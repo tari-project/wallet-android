@@ -134,6 +134,11 @@ internal class WalletModule {
         if (FFITestWallet.instance == null) {
             val wallet = FFITestWallet(commsConfig, logFilePath)
             FFITestWallet.instance = wallet
+
+            // start log file observer
+            LogFileObserver.instance = LogFileObserver(logFilePath)
+            LogFileObserver.instance?.startWatching()
+
             // set shared preferences values after instantiation
             val publicKeyFFI = wallet.getPublicKey()
             sharedPrefsWrapper.publicKeyHexString = publicKeyFFI.toString()

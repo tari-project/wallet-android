@@ -34,6 +34,7 @@ package com.tari.android.wallet.ui.fragment.onboarding
 
 import android.animation.*
 import android.content.Context
+import android.graphics.drawable.ColorDrawable
 import android.os.AsyncTask
 import android.os.Bundle
 import android.os.Handler
@@ -42,10 +43,9 @@ import android.view.ViewTreeObserver
 import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.TextView
-import butterknife.BindDimen
-import butterknife.BindString
-import butterknife.BindView
-import butterknife.OnClick
+import android.widget.VideoView
+import androidx.core.graphics.ColorUtils
+import butterknife.*
 import com.airbnb.lottie.LottieAnimationView
 import com.daasuu.ei.Ease
 import com.daasuu.ei.EasingInterpolator
@@ -55,6 +55,8 @@ import com.tari.android.wallet.di.WalletModule
 import com.tari.android.wallet.ffi.FFITestWallet
 import com.tari.android.wallet.ui.fragment.BaseFragment
 import com.tari.android.wallet.ui.util.UiUtil
+import com.tari.android.wallet.ui.util.UiUtil.getResourceUri
+import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.Constants.UI.CreateEmojiId
 import com.tari.android.wallet.util.EmojiUtil
 import com.tari.android.wallet.util.SharedPrefsWrapper
@@ -111,7 +113,15 @@ class CreateWalletFragment : BaseFragment() {
     lateinit var yourEmojiTitleBackView: View
     @BindView(R.id.create_wallet_btn_continue)
     lateinit var continueButton: Button
+    @BindView(R.id.create_wallet_loader_video_view)
+    lateinit var loaderVideoView: VideoView
 
+    @BindColor(R.color.create_wallet_loader_video_visible_bg)
+    @JvmField
+    var loaderVideoVisibleBgColor = 0
+    @BindColor(R.color.create_wallet_loader_video_invisible_bg)
+    @JvmField
+    var loaderVideoInvisibleBgColor = 0
     @BindDimen(R.dimen.create_wallet_button_bottom_margin)
     @JvmField
     var createEmojiButtonBottomMargin = 0
@@ -119,7 +129,6 @@ class CreateWalletFragment : BaseFragment() {
     @BindString(R.string.create_wallet_set_of_emoji_your_wallet_address_desc)
     @JvmField
     var yourWalletAddressDescString = ""
-
     /**
      * Emoji id chunk separator char.
      */
@@ -139,7 +148,6 @@ class CreateWalletFragment : BaseFragment() {
     @JvmField
     @field:[Inject Named(ConfigModule.FieldName.generateTestData)]
     var createNewWalletGenerateTestData: Boolean = false
-
     @Inject
     lateinit var tracker: Tracker
 
@@ -161,10 +169,21 @@ class CreateWalletFragment : BaseFragment() {
         emojiIdTextView.text = chunkedEmojiId
         setupUi()
 
+        loaderVideoView.background = ColorDrawable(loaderVideoVisibleBgColor)
+        loaderVideoView.setVideoURI(context!!.getResourceUri(R.raw.wallet_creation_loader))
+        loaderVideoView.setOnPreparedListener { mp -> mp.isLooping = true }
+        loaderVideoView.scaleX = 0f
+        loaderVideoView.scaleY = 0f
+
         TrackHelper.track()
             .screen("/onboarding/create_wallet")
             .title("Onboarding - Create Wallet")
             .with(tracker)
+    }
+
+    override fun onStop() {
+        loaderVideoView.stopPlayback()
+        super.onStop()
     }
 
     override fun onDestroyView() {
@@ -321,7 +340,6 @@ class CreateWalletFragment : BaseFragment() {
                 super.onAnimationStart(animation)
                 yourEmojiTitleBackView.visibility = View.VISIBLE
                 yourEmojiTitleText.visibility = View.VISIBLE
-
             }
         })
 
@@ -485,7 +503,10 @@ class CreateWalletFragment : BaseFragment() {
             // silent fail
         }
         uiHandler.postDelayed(
-            { startCheckMarkAnimation() },
+            {
+                startCheckMarkAnimation()
+                hideLoaderVideo()
+            },
             max(0L, (CreateEmojiId.viewChangeAnimDelayMs - elapsedTime))
 
         )
@@ -527,6 +548,7 @@ class CreateWalletFragment : BaseFragment() {
         whiteBgViewAnim.addListener(object : AnimatorListenerAdapter() {
             override fun onAnimationEnd(animation: Animator?) {
                 super.onAnimationEnd(animation)
+                showLoaderVideo()
                 startInitHelloTextAnimation()
             }
 
@@ -562,6 +584,52 @@ class CreateWalletFragment : BaseFragment() {
             }
         })
         helloTextAnim.start()
+    }
+
+    private fun showLoaderVideo() {
+        val initialScale = 3f
+        val targetScale = 1f
+        val anim = ValueAnimator.ofFloat(
+            0.0f,
+            1.0f
+        )
+        anim.addUpdateListener { valueAnimator: ValueAnimator ->
+            // value will run from 0.0 to 1.0
+            val value = valueAnimator.animatedValue as Float
+            loaderVideoView.background = ColorDrawable(
+                ColorUtils.blendARGB(loaderVideoInvisibleBgColor, loaderVideoVisibleBgColor, value)
+            )
+            val scale = initialScale - (initialScale - targetScale) * value
+            loaderVideoView.scaleX = scale
+            loaderVideoView.scaleY = scale
+        }
+        anim.duration = Constants.UI.xLongDurationMs
+        anim.interpolator = EasingInterpolator(Ease.LINEAR)
+        loaderVideoView.start()
+        anim.startDelay = Constants.UI.xShortDurationMs
+        anim.start()
+    }
+
+    private fun hideLoaderVideo() {
+        val anim = ValueAnimator.ofFloat(
+            0.0f,
+            1.0f
+        )
+        anim.addUpdateListener { valueAnimator: ValueAnimator ->
+            // value will run from 0.0 to 1.0
+            val value = valueAnimator.animatedValue as Float
+            loaderVideoView.background = ColorDrawable(
+                ColorUtils.blendARGB(loaderVideoVisibleBgColor, loaderVideoInvisibleBgColor, value)
+            )
+        }
+        anim.addListener(object: AnimatorListenerAdapter() {
+            override fun onAnimationEnd(animation: Animator?) {
+                loaderVideoView.alpha = 0f
+            }
+        })
+        anim.duration = CreateEmojiId.shortAlphaAnimDuration
+        anim.interpolator = EasingInterpolator(Ease.LINEAR)
+        anim.start()
     }
 
     fun fadeOutAllViewAnimation() {

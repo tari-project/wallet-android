@@ -49,8 +49,13 @@ import java.nio.charset.StandardCharsets
 @Suppress("DEPRECATION")
 internal class LogFileObserver(logFilePath: String) : FileObserver(logFilePath) {
 
+    companion object {
+        var instance: LogFileObserver? = null
+    }
+
     private val logTag = "FFI"
     private val logFile = File(logFilePath)
+
     /**
      * Remember the last number of lines to be able to log any new lines.
      */

@@ -38,6 +38,7 @@ import com.orhanobut.logger.Logger
 import com.tari.android.wallet.util.SharedPrefsWrapper
 import org.torproject.android.binary.TorResourceInstaller
 import java.io.BufferedReader
+import java.io.File
 import java.io.InputStreamReader
 import java.lang.RuntimeException
 
@@ -57,8 +58,11 @@ internal class TorProxyManager(
     }
 
     private fun installTorResources() {
-        if (sharedPrefsWrapper.torBinPath != null) {
-            return
+        val torBinPath = sharedPrefsWrapper.torBinPath
+        if (torBinPath != null) {
+            if (File(torBinPath).exists()) {
+                return
+            }
         }
         try {
             val torResourceInstaller = TorResourceInstaller(context, context.filesDir)
