@@ -43,7 +43,7 @@ extern "C"
 JNIEXPORT jlong JNICALL
 Java_com_tari_android_wallet_ffi_FFIPublicKey_jniCreate(
         JNIEnv *jEnv,
-        jclass jClass,
+        jobject jThis,
         jlong jpByteVector,
         jobject error) {
     int i = 0;
@@ -58,7 +58,7 @@ extern "C"
 JNIEXPORT jlong JNICALL
 Java_com_tari_android_wallet_ffi_FFIPublicKey_jniFromHex(
         JNIEnv *jEnv,
-        jclass jClass,
+        jobject jThis,
         jstring jHexStr,
         jobject error) {
     int i = 0;
@@ -74,7 +74,7 @@ extern "C"
 JNIEXPORT jlong JNICALL
 Java_com_tari_android_wallet_ffi_FFIPublicKey_jniFromPrivateKey(
         JNIEnv *jEnv,
-        jclass jClass,
+        jobject jThis,
         jlong jpPrivateKey,
         jobject error) {
     int i = 0;
@@ -87,7 +87,7 @@ Java_com_tari_android_wallet_ffi_FFIPublicKey_jniFromPrivateKey(
 
 extern "C"
 JNIEXPORT jstring JNICALL
-Java_com_tari_android_wallet_ffi_FFIPublicKey_jniGetEmojiNodeId(
+Java_com_tari_android_wallet_ffi_FFIPublicKey_jniGetEmojiId(
         JNIEnv *jEnv,
         jobject jThis,
         jlong jpPublicKey,
@@ -95,10 +95,26 @@ Java_com_tari_android_wallet_ffi_FFIPublicKey_jniGetEmojiNodeId(
     int i = 0;
     int *r = &i;
     TariPublicKey *pPublicKey = reinterpret_cast<TariPublicKey *>(jpPublicKey);
-    const char *pEmoji = public_key_to_emoji_node_id(pPublicKey, r);
+    const char *pEmoji = public_key_to_emoji_id(pPublicKey, r);
     setErrorCode(jEnv, error, i);
     jstring result = jEnv->NewStringUTF(pEmoji);
     string_destroy(const_cast<char *>(pEmoji));
+    return result;
+}
+
+extern "C"
+JNIEXPORT jlong JNICALL
+Java_com_tari_android_wallet_ffi_FFIPublicKey_jniGetEmojiPublicKey(
+        JNIEnv *jEnv,
+        jobject jThis,
+        jstring jpEmoji,
+        jobject error) {
+    int i = 0;
+    int *r = &i;
+    const char *pStr = jEnv->GetStringUTFChars(jpEmoji, JNI_FALSE);
+    jlong result = reinterpret_cast<jlong>(emoji_id_to_public_key(pStr, r));
+    jEnv->ReleaseStringUTFChars(jpEmoji, pStr);
+    setErrorCode(jEnv, error, i);
     return result;
 }
 

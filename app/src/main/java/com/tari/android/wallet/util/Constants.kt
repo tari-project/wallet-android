@@ -135,7 +135,7 @@ internal object Constants {
      * Wallet constants.
      */
     object Wallet {
-        const val emojiIdLength = 13
+        const val emojiIdLength = 33
         const val emojiFormatterChunkSize = 4
         const val walletDBName: String = "tari_wallet_db"
         const val faucetServerUrl = "https://faucet.tari.com"
