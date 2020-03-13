@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/create_wallet_vw_root"
     android:layout_width="match_parent"
@@ -37,6 +37,7 @@
             android:textColor="@color/black"
             android:textSize="12sp" />
 
+        <!-- text :: This is your Emoji ID -->
         <LinearLayout
             android:id="@+id/create_wallet_vw_your_emoji_id_title_container"
             android:layout_width="match_parent"
@@ -298,4 +299,14 @@
             app:customFont="AVENIR_LT_STD_HEAVY" />
 
     </RelativeLayout>
-</FrameLayout>
+
+    <VideoView
+        android:id="@+id/create_wallet_loader_video_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="40dp"
+        android:background="#00F6F6F6" />
+
+</RelativeLayout>

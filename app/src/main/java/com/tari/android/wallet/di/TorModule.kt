@@ -125,7 +125,7 @@ class TorModule {
         return File(
             context.getDir(TorProxyManager.torDataDirectoryName, Context.MODE_PRIVATE),
             "control_auth_cookie"
-        ).canonicalPath
+        ).absolutePath
     }
 
     /**
