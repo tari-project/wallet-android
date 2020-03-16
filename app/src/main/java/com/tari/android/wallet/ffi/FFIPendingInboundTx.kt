@@ -67,6 +67,11 @@ internal class FFIPendingInboundTx constructor(pointer: FFIPendingInboundTxPtr) 
         libError: FFIError
     ): String
 
+    private external fun jniGetStatus(
+        ptr: FFIPendingOutboundTxPtr,
+        libError: FFIError
+    ) : Int
+
     private external fun jniDestroy(ptr: FFIPendingInboundTxPtr)
 
     // endregion
@@ -114,6 +119,22 @@ internal class FFIPendingInboundTx constructor(pointer: FFIPendingInboundTxPtr) 
         val result = jniGetMessage(ptr, error)
         throwIf(error)
         return result
+    }
+
+    fun getStatus(): FFIStatus {
+        val error = FFIError()
+        val status = jniGetStatus(ptr, error)
+        throwIf(error)
+        return when (status) {
+            -1 -> FFIStatus.TX_NULL_ERROR
+            0 -> FFIStatus.COMPLETED
+            1 -> FFIStatus.BROADCAST
+            2 -> FFIStatus.MINED
+            3 -> FFIStatus.IMPORTED
+            4 -> FFIStatus.PENDING
+            5 -> FFIStatus.UNKNOWN
+            else -> throw FFIException(message = "Unexpected status: $status")
+        }
     }
 
     override fun destroy() {

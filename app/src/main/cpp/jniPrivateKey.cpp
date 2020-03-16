@@ -43,7 +43,7 @@ extern "C"
 JNIEXPORT jlong JNICALL
 Java_com_tari_android_wallet_ffi_FFIPrivateKey_jniCreate(
         JNIEnv *jEnv,
-        jclass jClass,
+        jobject jThis,
         jlong jpByteVector,
         jobject error) {
     int i = 0;
@@ -58,7 +58,7 @@ extern "C"
 JNIEXPORT jlong JNICALL
 Java_com_tari_android_wallet_ffi_FFIPrivateKey_jniGenerate(
         JNIEnv *jEnv,
-        jclass jClass) {
+        jobject jClass) {
     return reinterpret_cast<jlong>(private_key_generate());
 }
 
@@ -66,7 +66,7 @@ extern "C"
 JNIEXPORT jlong JNICALL
 Java_com_tari_android_wallet_ffi_FFIPrivateKey_jniFromHex(
         JNIEnv *jEnv,
-        jclass jClass,
+        jobject jThis,
         jstring jHexStr,
         jobject error) {
     int i = 0;

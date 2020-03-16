@@ -57,10 +57,10 @@ inline jbyteArray getBytesFromUnsignedLongLong(JNIEnv *jEnv, unsigned long long 
 inline jboolean setErrorCode(JNIEnv *jEnv, jobject error, jint value) {
     jclass errorClass = jEnv->GetObjectClass(error);
     if (errorClass == NULL)
-        return false;
+        return static_cast<jboolean>(false);
     jfieldID errorField = jEnv->GetFieldID(errorClass, "code", "I");
     if (errorField == NULL)
-        return false;
+        return static_cast<jboolean>(false);
     jEnv->SetIntField(error, errorField, value);
-    return true;
+    return static_cast<jboolean>(true);
 }

@@ -32,6 +32,8 @@
  */
 package com.tari.android.wallet.ffi
 
+import java.math.BigInteger
+
 /**
  * Test wallet implementation. Contains only the test functions to separate concerns with
  * the actual wallet implementation.
@@ -55,7 +57,7 @@ internal class FFITestWallet(commsConfig: FFICommsConfig, logPath: String) :
 
     private external fun jniTestBroadcastTx(
         walletPtr: FFIWalletPtr,
-        txPtr: FFIPendingInboundTxPtr,
+        txPtr: String,
         libError: FFIError
     ): Boolean
 
@@ -71,9 +73,9 @@ internal class FFITestWallet(commsConfig: FFICommsConfig, logPath: String) :
         libError: FFIError
     ): Boolean
 
-    private external fun jniTestMineCompletedTx(
+    private external fun jniTestMineTx(
         walletPtr: FFIWalletPtr,
-        txPtr: FFICompletedTxPtr,
+        txId: String,
         libError: FFIError
     ): Boolean
 
@@ -91,9 +93,9 @@ internal class FFITestWallet(commsConfig: FFICommsConfig, logPath: String) :
         return result
     }
 
-    fun testBroadcastTx(tx: FFICompletedTx): Boolean {
+    fun testBroadcastTx(tx: BigInteger): Boolean {
         val error = FFIError()
-        val result = jniTestBroadcastTx(getPointer(), tx.getPointer(), error)
+        val result = jniTestBroadcastTx(getPointer(), tx.toString(), error)
         throwIf(error)
         return result
     }
@@ -105,9 +107,9 @@ internal class FFITestWallet(commsConfig: FFICommsConfig, logPath: String) :
         return result
     }
 
-    fun testMineCompletedTx(tx: FFICompletedTx): Boolean {
+    fun testMineTx(tx: BigInteger): Boolean {
         val error = FFIError()
-        val result = jniTestMineCompletedTx(getPointer(), tx.getPointer(), error)
+        val result = jniTestMineTx(getPointer(), tx.toString(), error)
         throwIf(error)
         return result
     }

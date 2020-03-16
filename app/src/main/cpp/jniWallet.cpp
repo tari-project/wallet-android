@@ -384,8 +384,8 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniAddUpdateContact(
     int *r = &i;
     TariWallet *pWallet = reinterpret_cast<TariWallet *>(jpWallet);
     TariContact *pContact = reinterpret_cast<TariContact *>(jpContact);
-    jboolean result = wallet_upsert_contact(pWallet, pContact, r) !=
-                      0; //this is indirectly a cast from unsigned char to jboolean
+    jboolean result = static_cast<jboolean>(wallet_upsert_contact(pWallet, pContact, r) !=
+                                            0); //this is indirectly a cast from unsigned char to jboolean
     setErrorCode(jEnv, error, i);
     return result;
 }
@@ -402,7 +402,7 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniRemoveContact(
     int *r = &i;
     TariWallet *pWallet = reinterpret_cast<TariWallet *>(jpWallet);
     TariContact *pContact = reinterpret_cast<TariContact *>(jpContact);
-    jboolean result = wallet_remove_contact(pWallet, pContact, r) != 0;
+    jboolean result = static_cast<jboolean>(wallet_remove_contact(pWallet, pContact, r) != 0);
     setErrorCode(jEnv, error, i);
     return result;
 }
@@ -419,7 +419,8 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniIsCompletedTxOutbound(
     int *r = &i;
     TariWallet *pWallet = (TariWallet *) jpWallet;
     TariCompletedTransaction *pTransaction = (TariCompletedTransaction*) jpCompletedTx;
-    jboolean result = wallet_is_completed_transaction_outbound(pWallet,pTransaction,r) != 0;
+    jboolean result = static_cast<jboolean>(
+            wallet_is_completed_transaction_outbound(pWallet, pTransaction, r) != 0);
     setErrorCode(jEnv, error, i);
     return result;
 }
@@ -560,8 +561,9 @@ Java_com_tari_android_wallet_ffi_FFITestWallet_jniGenerateTestData(
     int *r = &i;
     const char *pDatastorePath = jEnv->GetStringUTFChars(jDatastorePath, JNI_FALSE);
     jboolean result =
-            wallet_test_generate_data((TariWallet *) jpWallet, const_cast<char *>(pDatastorePath),
-                                      r) != 0;
+            static_cast<jboolean>(wallet_test_generate_data((TariWallet *) jpWallet,
+                                                            const_cast<char *>(pDatastorePath),
+                                                            r) != 0);
     setErrorCode(jEnv, error, i);
     jEnv->ReleaseStringUTFChars(jDatastorePath, pDatastorePath);
     return result;
@@ -573,13 +575,16 @@ Java_com_tari_android_wallet_ffi_FFITestWallet_jniTestBroadcastTx(
         JNIEnv *jEnv,
         jobject jThis,
         jlong jpWallet,
-        jlong jTx,
+        jstring jTxID,
         jobject error) {
     int i = 0;
     int *r = &i;
     TariWallet *pWallet = reinterpret_cast<TariWallet *>(jpWallet);
-    TariCompletedTransaction *pTx = reinterpret_cast<TariCompletedTransaction *>(jTx);
-    jboolean result = wallet_test_broadcast_transaction(pWallet, pTx, r) != 0;
+    const char* pTxId = jEnv->GetStringUTFChars(jTxID, JNI_FALSE);
+    char* pEnd;
+    unsigned long long tx = strtoull(pTxId, &pEnd,10);
+    jEnv->ReleaseStringUTFChars(jTxID, pTxId);
+    jboolean result = static_cast<jboolean>(wallet_test_broadcast_transaction(pWallet, tx, r) != 0);
     setErrorCode(jEnv, error, i);
     return result;
 }
@@ -596,7 +601,8 @@ Java_com_tari_android_wallet_ffi_FFITestWallet_jniTestFinalizeReceivedTx(
     int *r = &i;
     TariWallet *pWallet = reinterpret_cast<TariWallet *>(jpWallet);
     TariPendingInboundTransaction *pTx = reinterpret_cast<TariPendingInboundTransaction *>(jTx);
-    jboolean result = wallet_test_finalize_received_transaction(pWallet, pTx, r) != 0;
+    jboolean result = static_cast<jboolean>(
+            wallet_test_finalize_received_transaction(pWallet, pTx, r) != 0);
     setErrorCode(jEnv, error, i);
     return result;
 }
@@ -613,24 +619,28 @@ Java_com_tari_android_wallet_ffi_FFITestWallet_jniTestCompleteSentTx(
     int *r = &i;
     TariWallet *pWallet = reinterpret_cast<TariWallet *>(jpWallet);
     TariPendingOutboundTransaction *pTx = reinterpret_cast<TariPendingOutboundTransaction *>(jTx);
-    jboolean result = wallet_test_complete_sent_transaction(pWallet, pTx, r) != 0;
+    jboolean result = static_cast<jboolean>(
+            wallet_test_complete_sent_transaction(pWallet, pTx, r) != 0);
     setErrorCode(jEnv, error, i);
     return result;
 }
 
 extern "C"
 JNIEXPORT jboolean JNICALL
-Java_com_tari_android_wallet_ffi_FFITestWallet_jniTestMineCompletedTx(
+Java_com_tari_android_wallet_ffi_FFITestWallet_jniTestMineTx(
         JNIEnv *jEnv,
         jobject jThis,
         jlong jpWallet,
-        jlong jTx,
+        jstring jTxID,
         jobject error) {
     int i = 0;
     int *r = &i;
     TariWallet *pWallet = reinterpret_cast<TariWallet *>(jpWallet);
-    TariCompletedTransaction *pTx = reinterpret_cast<TariCompletedTransaction *>(jTx);
-    jboolean result = wallet_test_mine_transaction(pWallet, pTx, r) != 0;
+    const char* pTxId = jEnv->GetStringUTFChars(jTxID, JNI_FALSE);
+    char* pEnd;
+    unsigned long long tx = strtoull(pTxId, &pEnd,10);
+    jEnv->ReleaseStringUTFChars(jTxID, pTxId);
+    jboolean result = static_cast<jboolean>(wallet_test_mine_transaction(pWallet, tx, r) != 0);
     setErrorCode(jEnv, error, i);
     return result;
 }
@@ -645,13 +655,13 @@ Java_com_tari_android_wallet_ffi_FFITestWallet_jniTestReceiveTx(
     int i = 0;
     int *r = &i;
     TariWallet *pWallet = reinterpret_cast<TariWallet *>(jpWallet);
-    jboolean result = wallet_test_receive_transaction(pWallet, r) != 0;
+    jboolean result = static_cast<jboolean>(wallet_test_receive_transaction(pWallet, r) != 0);
     setErrorCode(jEnv, error, i);
     return result;
 }
 
 extern "C"
-JNIEXPORT jlong JNICALL
+JNIEXPORT jboolean JNICALL
 Java_com_tari_android_wallet_ffi_FFIWallet_jniSendTx(
         JNIEnv *jEnv,
         jobject jThis,
@@ -673,7 +683,8 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniSendTx(
     unsigned long long fee = strtoull(nativeFee, &pFeeEnd,10);
     unsigned long long amount = strtoull(nativeAmount, &pAmountEnd,10);
 
-    jboolean result = wallet_send_transaction(pWallet, pDestination, amount, fee, pMessage, r) != 0;
+    jboolean result = static_cast<jboolean>(
+            wallet_send_transaction(pWallet, pDestination, amount, fee, pMessage, r) != 0);
     setErrorCode(jEnv, error, i);
     jEnv->ReleaseStringUTFChars(jamount,nativeAmount);
     jEnv->ReleaseStringUTFChars(jfee,nativeFee);
@@ -717,7 +728,9 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniVerifyMessageSignature(
     TariPublicKey *pContactPublicKey = reinterpret_cast<TariPublicKey *>(jpPublicKey);
     const char* pHexSignatureNonce = jEnv->GetStringUTFChars(jhexSignatureNonce, JNI_FALSE);
     const char* pMessage = jEnv->GetStringUTFChars(jmessage, JNI_FALSE);
-    jboolean result = wallet_verify_message_signature(pWallet,pContactPublicKey, pHexSignatureNonce, pMessage,r) != 0;
+    jboolean result = static_cast<jboolean>(
+            wallet_verify_message_signature(pWallet, pContactPublicKey, pHexSignatureNonce,
+                                            pMessage, r) != 0);
     setErrorCode(jEnv, error, i);
     jEnv->ReleaseStringUTFChars(jhexSignatureNonce, pHexSignatureNonce);
     jEnv->ReleaseStringUTFChars(jmessage, pMessage);
@@ -767,7 +780,8 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniAddBaseNodePeer(
     TariWallet *pWallet = reinterpret_cast<TariWallet *>(jpWallet);
     TariPublicKey *pPublicKey = reinterpret_cast<TariPublicKey *>(jpPublicKey);
     char *pAddress = const_cast<char *>(jEnv->GetStringUTFChars(jAddress, JNI_FALSE));
-    jboolean result = wallet_add_base_node_peer(pWallet,pPublicKey,pAddress,r) != 0;
+    jboolean result = static_cast<jboolean>(
+            wallet_add_base_node_peer(pWallet, pPublicKey, pAddress, r) != 0);
     jEnv->ReleaseStringUTFChars(jAddress, pAddress);
     setErrorCode(jEnv, error, i);
     return result;
@@ -783,7 +797,7 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniSyncBaseNode(
     int i = 0;
     int *r = &i;
     TariWallet *pWallet = reinterpret_cast<TariWallet *>(jpWallet);
-    jboolean result = wallet_sync_with_base_node(pWallet,r) != 0;
+    jboolean result = static_cast<jboolean>(wallet_sync_with_base_node(pWallet, r) != 0);
     setErrorCode(jEnv, error, i);
     return result;
 }

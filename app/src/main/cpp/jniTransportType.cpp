@@ -43,7 +43,7 @@ extern "C"
 JNIEXPORT jlong JNICALL
 Java_com_tari_android_wallet_ffi_FFITransportType_jniMemoryTransport(
         JNIEnv *jEnv,
-        jclass jClass) {
+        jobject jClass) {
     TariTransportType *pTransport = transport_memory_create();
     return reinterpret_cast<jlong>(pTransport);
 }

@@ -43,7 +43,7 @@ extern "C"
 JNIEXPORT jlong JNICALL
 Java_com_tari_android_wallet_ffi_FFIContact_jniCreate(
         JNIEnv *jEnv,
-        jclass jClass,
+        jobject jThis,
         jstring jAlias,
         jlong jpPublicKey,
         jobject error) {

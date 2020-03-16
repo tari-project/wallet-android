@@ -34,6 +34,7 @@ package com.tari.android.wallet.model
 
 import android.os.Parcel
 import android.os.Parcelable
+import com.tari.android.wallet.ffi.FFIPendingInboundTx
 import java.math.BigInteger
 
 /**
@@ -43,12 +44,14 @@ import java.math.BigInteger
  */
 class PendingInboundTx() : Tx(), Parcelable {
 
+    var status = Status.PENDING
     constructor(
         id: BigInteger,
         user: User,
         amount: MicroTari,
         timestamp: BigInteger,
-        message: String
+        message: String,
+        status: Status
     ) : this() {
         this.id = id
         this.direction = Direction.INBOUND
@@ -56,6 +59,7 @@ class PendingInboundTx() : Tx(), Parcelable {
         this.amount = amount
         this.timestamp = timestamp
         this.message = message
+        this.status = status
     }
 
     // region Parcelable
@@ -84,6 +88,7 @@ class PendingInboundTx() : Tx(), Parcelable {
         parcel.writeParcelable(amount, flags)
         parcel.writeSerializable(timestamp)
         parcel.writeString(message)
+        parcel.writeSerializable(status)
     }
 
     private fun readFromParcel(inParcel: Parcel) {
@@ -98,6 +103,7 @@ class PendingInboundTx() : Tx(), Parcelable {
         amount = inParcel.readParcelable(MicroTari::class.java.classLoader)!!
         timestamp = inParcel.readSerializable() as BigInteger
         message = inParcel.readString() ?: ""
+        status = inParcel.readSerializable() as Status
     }
 
     override fun describeContents(): Int {

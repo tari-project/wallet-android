@@ -123,6 +123,21 @@ Java_com_tari_android_wallet_ffi_FFIPendingInboundTx_jniGetTimestamp(
 }
 
 extern "C"
+JNIEXPORT jint JNICALL
+Java_com_tari_android_wallet_ffi_FFIPendingInboundTx_jniGetStatus(
+        JNIEnv *jEnv,
+        jobject jThis,
+        jlong jpInboundTx,
+        jobject error) {
+    int i = 0;
+    int *r = &i;
+    TariPendingInboundTransaction *pInboundTx = reinterpret_cast<TariPendingInboundTransaction *>(jpInboundTx);
+    jint result = reinterpret_cast<jint>(pending_inbound_transaction_get_status(pInboundTx, r));
+    setErrorCode(jEnv, error, i);
+    return result;
+}
+
+extern "C"
 JNIEXPORT void JNICALL
 Java_com_tari_android_wallet_ffi_FFIPendingInboundTx_jniDestroy(
         JNIEnv *jEnv,
