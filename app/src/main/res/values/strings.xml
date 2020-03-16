@@ -53,7 +53,7 @@
     <string name="wallet_service_error_no_internet_connection">No internet connection!</string>
 
     <!-- auth -->
-    <string name="testnet">TESTNET v1.0</string>
+    <string name="testnet">TESTNET V1.0</string>
     <string name="proceed">Proceed</string>
     <string name="exit">Exit</string>
     <string name="auth_title">Authentication</string>
@@ -85,7 +85,7 @@
     <!-- introduction -->
     <string name="introduction_crypto_wallet_title_text_line_1">A crypto wallet</string>
     <string name="introduction_crypto_wallet_title_text_line_2">that’s easy to use.</string>
-    <string name="introduction_wallet_desc">Tari wallet puts you and your privacy at the core of everything and is still easy to use.</string>
+    <string name="introduction_wallet_desc">Tari wallet puts you and your privacy at the core\nof everything and is still easy to use.</string>
     <string name="introduction_create_wallet">Create a Wallet</string>
 
     <!-- create wallet -->

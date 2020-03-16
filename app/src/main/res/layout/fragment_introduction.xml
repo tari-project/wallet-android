@@ -25,8 +25,10 @@
                 android:layout_height="wrap_content"
                 android:layout_above="@id/introduction_txt_title_line_2"
                 android:layout_centerHorizontal="true"
+                android:layout_marginBottom="4dp"
                 android:background="@color/black"
                 android:gravity="center"
+                android:letterSpacing="-0.02"
                 android:lineSpacingExtra="6dp"
                 android:paddingLeft="32dp"
                 android:paddingRight="32dp"
@@ -41,9 +43,10 @@
                 android:layout_height="wrap_content"
                 android:layout_above="@id/introduction_btn_layout"
                 android:layout_centerHorizontal="true"
-                android:layout_marginBottom="10dp"
+                android:layout_marginBottom="24dp"
                 android:background="@color/black"
                 android:gravity="center"
+                android:letterSpacing="-0.02"
                 android:lineSpacingExtra="6dp"
                 android:paddingLeft="32dp"
                 android:paddingRight="32dp"
@@ -54,9 +57,9 @@
 
             <View
                 android:layout_width="match_parent"
-                android:layout_height="75dp"
+                android:layout_height="78dp"
                 android:layout_above="@id/introduction_btn_layout"
-                android:layout_marginBottom="5dp"
+                android:layout_marginBottom="25dp"
                 android:background="@color/black" />
 
             <com.tari.android.wallet.ui.component.CustomFontTextView
@@ -65,13 +68,14 @@
                 android:layout_height="wrap_content"
                 android:layout_above="@id/introduction_btn_layout"
                 android:layout_centerHorizontal="true"
-                android:layout_marginBottom="30dp"
+                android:layout_marginBottom="42dp"
                 android:alpha="0"
                 android:background="@color/black"
                 android:gravity="center"
+                android:letterSpacing="-0.02"
                 android:lineSpacingExtra="6dp"
-                android:paddingLeft="32dp"
-                android:paddingRight="32dp"
+                android:paddingLeft="24dp"
+                android:paddingRight="24dp"
                 android:text="@string/introduction_wallet_desc"
                 android:textColor="@color/wallet_splash_desc_text"
                 android:textSize="14sp"
@@ -81,9 +85,9 @@
                 android:id="@+id/introduction_btn_layout"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/common_action_button_height"
-                android:layout_marginLeft="32dp"
-                android:layout_marginRight="32dp"
-                android:layout_marginBottom="30dp"
+                android:layout_marginLeft="24dp"
+                android:layout_marginRight="24dp"
+                android:layout_marginBottom="36dp"
                 android:alpha="0"
                 android:background="@drawable/gradient_button_bg">
 
@@ -124,9 +128,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
-            android:layout_marginBottom="22dp"
+            android:layout_marginBottom="26dp"
             android:alpha="0"
             android:background="@color/black"
+            android:letterSpacing="0.16"
             android:text="@string/testnet"
             android:textColor="#50FFFFFF"
             android:textSize="9sp"
@@ -139,7 +144,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
-        android:layout_marginTop="30dp">
+        android:layout_marginTop="50dp">
 
         <VideoView
             android:id="@+id/introduction_video_view"
@@ -154,7 +159,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
-        android:layout_marginTop="30dp"
+        android:layout_marginTop="42dp"
         android:alpha="0"
         android:background="@color/black"
         android:scaleX="0.8"
