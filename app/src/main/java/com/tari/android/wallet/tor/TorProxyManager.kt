@@ -40,7 +40,6 @@ import org.torproject.android.binary.TorResourceInstaller
 import java.io.BufferedReader
 import java.io.File
 import java.io.InputStreamReader
-import java.lang.RuntimeException
 
 /**
  * Manages the installation and the running of the Tor proxy.
@@ -76,10 +75,10 @@ internal class TorProxyManager(
                 )
                 sharedPrefsWrapper.torBinPath = fileTorBin.absolutePath
             } else {
-                throw RuntimeException("Tor resources install error.")
+                throw RuntimeException("Tor resources install failed.")
             }
         } catch (t: Throwable) {
-            throw RuntimeException("Tor resources install error: " + t.message)
+            throw RuntimeException("Tor resources install exception", t)
         }
     }
 
