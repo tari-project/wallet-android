@@ -3,9 +3,10 @@
     android:shape="rectangle">
     <gradient
         android:angle="315"
-        android:centerColor="@color/home_send_tari_btn_gradient_center"
-        android:endColor="@color/home_send_tari_btn_gradient_end"
-        android:startColor="@color/home_send_tari_btn_gradient_start"
+
+        android:endColor="@color/gradient_btn_end"
+        android:centerColor="@color/gradient_btn_center"
+        android:startColor="@color/gradient_btn_start"
         android:type="linear" />
-    <corners android:radius="8dp" />
+    <corners android:radius="4dp" />
 </shape>

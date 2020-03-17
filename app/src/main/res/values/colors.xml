@@ -13,6 +13,11 @@
     <color name="transparent">#00000000</color>
     <color name="purple">#8931FF</color>
 
+    <!-- common gradient button -->
+    <color name="gradient_btn_start">#7300ff</color>
+    <color name="gradient_btn_center">#8E31FF</color>
+    <color name="gradient_btn_end">#9800ea</color>
+
     <!-- common function -->
     <color name="scroll_height_gradient_start_gray">#30000000</color>
     <color name="scroll_height_gradient_mid_gray">#10000000</color>
@@ -33,9 +38,6 @@
     <color name="home_tx_contact_alias">#40388A</color>
     <color name="home_tx_message">#A9AFC4</color>
     <color name="home_tx_section_header_title">#B2B2B2</color>
-    <color name="home_send_tari_btn_gradient_start">#6239FF</color>
-    <color name="home_send_tari_btn_gradient_center">#8E31FF</color>
-    <color name="home_send_tari_btn_gradient_end">#AE2BE8</color>
     <color name="home_black_overlay">#FF000000</color>
     <color name="dark_gray">#7F8599</color>
     <color name="create_emoji_id_bg">#f6f6f6</color>
