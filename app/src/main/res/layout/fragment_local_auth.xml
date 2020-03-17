@@ -20,8 +20,7 @@
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
             android:layout_gravity="center_horizontal"
-            android:layout_marginTop="32dp"
-            android:layout_marginBottom="18dp"
+            android:layout_marginTop="46dp"
             android:alpha="0"
             android:contentDescription="@null"
             android:src="@drawable/splash_gem_small"
@@ -34,11 +33,11 @@
             android:layout_height="wrap_content"
             android:layout_below="@id/local_auth_img_small_gem"
             android:layout_centerHorizontal="true"
-            android:layout_marginTop="100dp"
+            android:layout_marginTop="130dp"
             android:alpha="0"
             android:contentDescription="@null"
-            android:scaleX="1.5"
-            android:scaleY="1.5"
+            android:scaleX="2"
+            android:scaleY="2"
             android:src="@drawable/fingerprint" />
 
         <LinearLayout
@@ -46,17 +45,19 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@id/local_auth_img_auth"
-            android:layout_marginTop="30dp"
+            android:layout_marginTop="100dp"
             android:gravity="center"
             android:orientation="horizontal"
             android:visibility="visible">
 
             <com.tari.android.wallet.ui.component.CustomFontTextView
+                android:id="@+id/auth_prompt_title_text_label_1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_marginEnd="4dp"
                 android:gravity="center"
+                android:letterSpacing="-0.014"
                 android:text="@string/auth_prompt_touch_id_title_text_label_1"
                 android:textColor="@color/black"
                 android:textSize="18sp"
@@ -80,7 +81,7 @@
             android:layout_height="30dp"
             android:layout_below="@id/local_auth_img_auth"
             android:layout_gravity="center"
-            android:layout_marginTop="30dp"
+            android:layout_marginTop="100dp"
             android:background="@color/create_emoji_id_bg"
             android:visibility="visible" />
 
@@ -92,7 +93,8 @@
             android:layout_gravity="center"
             android:alpha="0"
             android:gravity="center"
-            android:lineSpacingExtra="12dp"
+            android:letterSpacing="-0.02"
+            android:lineSpacingExtra="10dp"
             android:text="@string/auth_prompt_touch_id_desc"
             android:textColor="@color/dark_gray"
             android:textSize="14sp"
@@ -102,12 +104,12 @@
         <com.tari.android.wallet.ui.component.CustomFontButton
             android:id="@+id/local_auth_btn_enable_auth"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="@dimen/common_action_button_height"
             android:layout_alignParentBottom="true"
             android:layout_gravity="bottom"
-            android:layout_marginLeft="38dp"
-            android:layout_marginRight="38dp"
-            android:layout_marginBottom="-54dp"
+            android:layout_marginLeft="25dp"
+            android:layout_marginRight="25dp"
+            android:layout_marginBottom="-40dp"
             android:alpha="0"
             android:background="@drawable/gradient_button_bg"
             android:ellipsize="middle"
@@ -134,10 +136,11 @@
 
         <RelativeLayout
             android:id="@+id/local_auth_vw_auth_success"
-            android:layout_width="150dp"
-            android:layout_height="150dp"
+            android:layout_width="155dp"
+            android:layout_height="155dp"
             android:layout_gravity="center"
             android:alpha="0"
+            android:layout_marginTop="-10dp"
             android:background="@drawable/local_auth_face_id_anim_bg"
             android:gravity="center">
 
