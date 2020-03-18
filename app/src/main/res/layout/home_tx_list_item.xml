@@ -46,7 +46,7 @@
                 android:singleLine="true"
                 android:text="@string/dummy_contact_alias"
                 android:textColor="@color/home_tx_contact_alias"
-                android:textSize="13sp"
+                android:textSize="15sp"
                 app:customFont="AVENIR_LT_STD_HEAVY" />
 
             <!-- emoji id summary -->
@@ -81,6 +81,7 @@
         android:paddingStart="6dp"
         android:paddingEnd="6dp"
         android:text="@string/dummy_positive_tx_value"
+        android:layout_marginTop="-6dp"
         android:textColor="@color/home_tx_value_positive"
         android:textSize="12sp"
         app:customFont="AVENIR_LT_STD_BLACK" />

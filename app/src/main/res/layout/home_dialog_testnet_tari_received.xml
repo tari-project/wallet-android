@@ -3,17 +3,17 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="@dimen/bottom_dialog_margin"
+    android:layout_marginLeft="@dimen/home_dialog_testnet_tari_dialog_margin"
+    android:layout_marginRight="@dimen/home_dialog_testnet_tari_dialog_margin"
+    android:layout_marginBottom="23dp"
     android:background="@drawable/bottom_dialog_bg"
-    android:orientation="vertical"
-    android:paddingStart="@dimen/bottom_dialog_horizontal_padding"
-    android:paddingEnd="@dimen/bottom_dialog_horizontal_padding">
+    android:orientation="vertical">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="30dp"
-        android:layout_marginBottom="10dp"
+        android:layout_marginTop="32dp"
+        android:layout_marginBottom="14dp"
         android:gravity="center"
         android:orientation="horizontal"
         android:visibility="visible">
@@ -43,8 +43,9 @@
     <com.tari.android.wallet.ui.component.CustomFontTextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="8dp"
         android:gravity="center"
+        android:letterSpacing="0.01"
         android:lineSpacingExtra="10dp"
         android:paddingLeft="32dp"
         android:paddingRight="32dp"
@@ -59,6 +60,7 @@
         android:layout_height="@dimen/common_action_button_height"
         android:layout_gravity="center_horizontal"
         android:layout_marginTop="30dp"
+        android:layout_marginBottom="14dp"
         android:background="@drawable/gradient_button_bg"
         android:ellipsize="middle"
         android:singleLine="true"
@@ -73,8 +75,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:layout_marginTop="15dp"
-        android:layout_marginBottom="15dp"
+        android:layout_marginBottom="20dp"
         android:gravity="center"
         android:padding="10dp"
         android:text="@string/home_tari_bot_try_later"

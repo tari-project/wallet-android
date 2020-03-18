@@ -46,7 +46,10 @@ import android.graphics.Rect
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.GradientDrawable
 import android.os.*
-import android.view.*
+import android.view.Gravity
+import android.view.MotionEvent
+import android.view.View
+import android.view.ViewGroup
 import android.view.animation.AccelerateInterpolator
 import android.view.animation.Animation
 import android.view.animation.DecelerateInterpolator
@@ -635,7 +638,6 @@ internal class HomeActivity : BaseActivity(),
      */
     private fun playOnboardingAnim() {
         onboardingContentView.visibility = View.VISIBLE
-        scrollView.translationY = scrollView.height.toFloat()
         swipeRefreshLayout.isEnabled = false
         hideSendTariButtonAnimated()
 
@@ -650,7 +652,6 @@ internal class HomeActivity : BaseActivity(),
             )
 
         scrollView.scrollTo(0, scrollView.height)
-        scrollView.translationY = scrollView.height.toFloat()
         scrollContentView.alpha = 1f
         // scroll view translation animation
         val scrollViewTransAnim =
@@ -658,7 +659,7 @@ internal class HomeActivity : BaseActivity(),
                 scrollView,
                 View.TRANSLATION_Y,
                 scrollView.height.toFloat(),
-                0f
+                homeMainContentTopMargin.toFloat()
             )
         // background fade animation
         val blackBgViewFadeAnim = ValueAnimator.ofFloat(0f, 1f)
