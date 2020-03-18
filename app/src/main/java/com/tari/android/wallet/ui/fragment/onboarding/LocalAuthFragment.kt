@@ -73,6 +73,8 @@ internal class LocalAuthFragment : BaseFragment() {
     lateinit var enableAuthButton: CustomFontButton
     @BindView(R.id.local_auth_img_auth)
     lateinit var authTypeImageView: ImageView
+    @BindView(R.id.auth_prompt_title_text_label_1)
+    lateinit var titleLabel1TextView: TextView
     @BindView(R.id.local_auth_title_container)
     lateinit var authTitleTextContainer: LinearLayout
     @BindView(R.id.local_auth_txt_auth_desc)
@@ -96,8 +98,14 @@ internal class LocalAuthFragment : BaseFragment() {
     @JvmField
     var useAuthButtonBottomMargin = 0
 
+    @BindString(R.string.auth_prompt_button_touch_id_text)
+    lateinit var buttonTouchIdAuthFormat: String
     @BindString(R.string.auth_prompt_button_text)
-    lateinit var buttonAuthFormat: String
+    lateinit var buttonPinAuthFormat: String
+    @BindString(R.string.auth_prompt_touch_id_title_text_label_1)
+    lateinit var touchIdTitleTextLabel: String
+    @BindString(R.string.auth_prompt_pin_title_text_label_1)
+    lateinit var pinTitleTextLabel: String
     @BindString(R.string.auth_prompt_touch_id)
     lateinit var authTouchId: String
     @BindString(R.string.auth_prompt_pin)
@@ -184,16 +192,18 @@ internal class LocalAuthFragment : BaseFragment() {
     private fun setupUi() {
         if (authType == AuthType.Biometric) {
             //setup ui for fingerprint auth
+            titleLabel1TextView.text = touchIdTitleTextLabel
             titleAuthTypeTextView.text = authTouchId
-            enableAuthButton.text = String.format(buttonAuthFormat, authTouchId)
+            enableAuthButton.text = buttonTouchIdAuthFormat
             authDescTextView.text = authTouchIdDesc
             authTypeImageView.setImageResource(R.drawable.fingerprint)
             authSuccessAuthTypeImageView.setImageResource(R.drawable.fingerprint)
             authSuccessAuthTypeTitleTextView.text = authTouchId
         } else {
             //setup ui for pin or password auth
+            titleLabel1TextView.text = pinTitleTextLabel
             titleAuthTypeTextView.text = authPin
-            enableAuthButton.text = String.format(buttonAuthFormat, authPin)
+            enableAuthButton.text = buttonPinAuthFormat
             authDescTextView.text = authPinDesc
             authTypeImageView.setImageResource(R.drawable.numpad)
             authSuccessAuthTypeImageView.setImageResource(R.drawable.numpad)
