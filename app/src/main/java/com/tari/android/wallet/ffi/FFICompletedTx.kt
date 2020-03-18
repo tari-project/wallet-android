@@ -43,14 +43,6 @@ internal typealias FFICompletedTxPtr = Long
 
 internal class FFICompletedTx constructor(pointer: FFICompletedTxPtr) : FFIBase() {
 
-    enum class Status {
-        TX_NULL_ERROR,
-        COMPLETED,
-        BROADCAST,
-        MINED,
-        UNKNOWN
-    }
-
     // region JNI
 
     private external fun jniGetId(ptr: FFICompletedTxPtr, libError: FFIError): ByteArray
@@ -136,16 +128,18 @@ internal class FFICompletedTx constructor(pointer: FFICompletedTxPtr) : FFIBase(
         return result
     }
 
-    fun getStatus(): Status {
+    fun getStatus(): FFIStatus {
         val error = FFIError()
         val status = jniGetStatus(ptr, error)
         throwIf(error)
         return when (status) {
-            -1 -> Status.TX_NULL_ERROR
-            0 -> Status.COMPLETED
-            1 -> Status.BROADCAST
-            2 -> Status.MINED
-            3 -> Status.UNKNOWN
+            -1 -> FFIStatus.TX_NULL_ERROR
+            0 -> FFIStatus.COMPLETED
+            1 -> FFIStatus.BROADCAST
+            2 -> FFIStatus.MINED
+            3 -> FFIStatus.IMPORTED
+            4 -> FFIStatus.PENDING
+            5 -> FFIStatus.UNKNOWN
             else -> throw FFIException(message = "Unexpected status: $status")
         }
     }

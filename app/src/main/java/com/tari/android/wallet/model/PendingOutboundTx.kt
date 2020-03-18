@@ -43,12 +43,15 @@ import java.math.BigInteger
  */
 class PendingOutboundTx() : Tx(), Parcelable {
 
+    var status = Status.PENDING
+
     constructor(
         id: BigInteger,
         user: User,
         amount: MicroTari,
         timestamp: BigInteger,
-        message: String
+        message: String,
+        status: Status
     ) : this() {
         this.id = id
         this.direction = Direction.OUTBOUND
@@ -56,6 +59,7 @@ class PendingOutboundTx() : Tx(), Parcelable {
         this.amount = amount
         this.timestamp = timestamp
         this.message = message
+        this.status = status
     }
 
     // region Parcelable
@@ -84,6 +88,7 @@ class PendingOutboundTx() : Tx(), Parcelable {
         parcel.writeParcelable(amount, flags)
         parcel.writeSerializable(timestamp)
         parcel.writeString(message)
+        parcel.writeSerializable(status)
     }
 
     private fun readFromParcel(inParcel: Parcel) {
@@ -98,6 +103,7 @@ class PendingOutboundTx() : Tx(), Parcelable {
         amount = inParcel.readParcelable(MicroTari::class.java.classLoader)!!
         timestamp = inParcel.readSerializable() as BigInteger
         message = inParcel.readString() ?: ""
+        status = inParcel.readSerializable() as Status
     }
 
     override fun describeContents(): Int {

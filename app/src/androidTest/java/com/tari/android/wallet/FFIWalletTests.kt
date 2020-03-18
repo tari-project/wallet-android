@@ -106,7 +106,6 @@ class FFIWalletTests {
         // test data generation
         assertTrue(wallet.generateTestData(FFITestUtil.WALLET_DATASTORE_PATH))
 
-
         // test contacts
         val contacts = wallet.getContacts()
         assertTrue(contacts.getPointer() != nullptr)
@@ -127,7 +126,7 @@ class FFIWalletTests {
         for (i in 0..completedTxs.getLength()) {
             completedTx = completedTxs.getAt(0)
             assertTrue(completedTx.getPointer() != nullptr)
-            if (completedTx.getStatus() == FFICompletedTx.Status.MINED) {
+            if (completedTx.getStatus() != FFICompletedTx.Status.MINED) {
                 completedTx.destroy()
             } else {
                 break
@@ -154,22 +153,28 @@ class FFIWalletTests {
         {
             assertFalse(completedTxIsOutbound)
         }
-
         completedTx.destroy()
-        completedTx = wallet.getCompletedTxById(completedID)
-        assertTrue(completedTx.getPointer() != nullptr)
-        assertTrue(wallet.testBroadcastTx(completedTx))
-        assertTrue(wallet.testMineCompletedTx(completedTx))
-        completedTx.destroy()
-        completedTxs.destroy()
 
         // test pending inbound transactions
         assertTrue(wallet.testReceiveTx())
         val pendingInboundTxs = wallet.getPendingInboundTxs()
         assertTrue(pendingInboundTxs.getPointer() != nullptr)
-        assertTrue(pendingInboundTxs.getLength() > 0)
-        var inbound = pendingInboundTxs.getAt(0)
-        assertTrue(inbound.getPointer() != nullptr)
+        val totalInbound = pendingInboundTxs.getLength()
+        assertTrue(totalInbound > 0)
+        var index = 0
+        var inbound: FFIPendingInboundTx? = null
+        while (index <= totalInbound)
+        {
+            inbound = pendingInboundTxs.getAt(index)
+            if (inbound.getStatus() == FFIPendingInboundTx.Status.PENDING)
+            {
+                break
+            } else {
+                inbound.destroy()
+            }
+            index += 1
+        }
+        assertTrue(inbound!!.getPointer() != nullptr)
         val inboundTxID = inbound.getId()
         val inboundTxSource = inbound.getSourcePublicKey()
         assertTrue(inboundTxSource.getPointer() != nullptr)
@@ -181,6 +186,9 @@ class FFIWalletTests {
         inbound = wallet.getPendingInboundTxById(inboundTxID)
         assertTrue(inbound.getPointer() != nullptr)
         assertTrue(wallet.testFinalizeReceivedTx(inbound))
+        assertTrue(wallet.testBroadcastTx(inbound.getId()))
+        assertTrue(wallet.testMineTx(inbound.getId()))
+
         inbound.destroy()
         pendingInboundTxs.destroy()
 

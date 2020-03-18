@@ -43,14 +43,6 @@ import java.math.BigInteger
  */
 class CompletedTx() : Tx(), Parcelable {
 
-    enum class Status {
-        TX_NULL_ERROR,
-        COMPLETED,
-        BROADCAST,
-        MINED,
-        UNKNOWN
-    }
-
     var fee = BigInteger("0")
     var status = Status.COMPLETED
 

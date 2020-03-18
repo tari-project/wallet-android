@@ -43,7 +43,7 @@ extern "C"
 JNIEXPORT jlong JNICALL
 Java_com_tari_android_wallet_ffi_FFIByteVector_jniCreate(
         JNIEnv *jEnv,
-        jclass jClass,
+        jobject jThis,
         jbyteArray array,
         jobject error) {
     unsigned char *buffer = reinterpret_cast<unsigned char *>(jEnv->GetByteArrayElements(array, 0));
