@@ -40,10 +40,7 @@ import android.os.Bundle
 import android.os.Handler
 import android.view.View
 import android.view.ViewTreeObserver
-import android.widget.Button
-import android.widget.LinearLayout
-import android.widget.TextView
-import android.widget.VideoView
+import android.widget.*
 import androidx.core.graphics.ColorUtils
 import butterknife.*
 import com.airbnb.lottie.LottieAnimationView
@@ -89,8 +86,10 @@ class CreateWalletFragment : BaseFragment() {
     lateinit var walletAddressDescText: TextView
     @BindView(R.id.create_wallet_btn_create_emoji_id)
     lateinit var createEmojiIdButton: Button
-    @BindView(R.id.create_wallet_just_sec_back_view)
-    lateinit var justSecBackView: View
+    @BindView(R.id.create_wallet_just_sec_title_back_view)
+    lateinit var justSecTitleBackView: View
+    @BindView(R.id.create_wallet_just_sec_desc_back_view)
+    lateinit var justSecDescBackView: View
     @BindView(R.id.create_wallet_nerd_face_emoji)
     lateinit var nerdFaceEmoji: LottieAnimationView
     @BindView(R.id.create_wallet_txt_create_your_emoji_id)
@@ -115,6 +114,8 @@ class CreateWalletFragment : BaseFragment() {
     lateinit var continueButton: Button
     @BindView(R.id.create_wallet_loader_video_view)
     lateinit var loaderVideoView: VideoView
+    @BindView(R.id.create_wallet_img_small_gem)
+    lateinit var smallGemsImageView: ImageView
 
     @BindColor(R.color.create_wallet_loader_video_visible_bg)
     @JvmField
@@ -282,7 +283,8 @@ class CreateWalletFragment : BaseFragment() {
                 super.onAnimationEnd(animation)
                 createEmojiIdButton.visibility = View.GONE
                 awesomeTextBackView.visibility = View.GONE
-                justSecBackView.visibility = View.GONE
+                justSecTitleBackView.visibility = View.GONE
+                justSecDescBackView.visibility = View.GONE
                 createEmojiIdTextBackView.visibility = View.GONE
             }
         })
@@ -421,7 +423,8 @@ class CreateWalletFragment : BaseFragment() {
                 awesomeText.visibility = View.VISIBLE
                 createYourEmojiIdText.visibility = View.VISIBLE
                 helloTextBackView.visibility = View.GONE
-                justSecBackView.visibility = View.GONE
+                justSecDescBackView.visibility = View.GONE
+                justSecTitleBackView.visibility = View.GONE
             }
         })
         animSet.start()
@@ -554,6 +557,7 @@ class CreateWalletFragment : BaseFragment() {
 
             override fun onAnimationStart(animation: Animator?) {
                 super.onAnimationStart(animation)
+                smallGemsImageView.visibility = View.VISIBLE
                 whiteBgView.visibility = View.VISIBLE
             }
         })
@@ -573,12 +577,14 @@ class CreateWalletFragment : BaseFragment() {
                 super.onAnimationStart(animation)
                 helloTextBackView.visibility = View.VISIBLE
                 helloText.visibility = View.VISIBLE
-                justSecBackView.visibility = View.VISIBLE
             }
 
             override fun onAnimationEnd(animation: Animator?) {
                 super.onAnimationEnd(animation)
                 uiHandler.postDelayed({
+                    helloTextBackView.visibility = View.GONE
+                    justSecDescBackView.visibility = View.VISIBLE
+                    justSecTitleBackView.visibility = View.VISIBLE
                     startSecondViewTextAnimation()
                 }, CreateEmojiId.viewChangeAnimDelayMs)
             }
@@ -622,7 +628,7 @@ class CreateWalletFragment : BaseFragment() {
                 ColorUtils.blendARGB(loaderVideoVisibleBgColor, loaderVideoInvisibleBgColor, value)
             )
         }
-        anim.addListener(object: AnimatorListenerAdapter() {
+        anim.addListener(object : AnimatorListenerAdapter() {
             override fun onAnimationEnd(animation: Animator?) {
                 loaderVideoView.alpha = 0f
             }
