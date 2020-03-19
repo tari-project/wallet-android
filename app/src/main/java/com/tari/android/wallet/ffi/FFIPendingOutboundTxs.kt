@@ -43,14 +43,13 @@ internal class FFIPendingOutboundTxs(pointer: FFIPendingOutboundTxsPtr) : FFIBas
 
     // region JNI
 
-    private external fun jniGetLength(ptr: FFIPendingOutboundTxsPtr, libError: FFIError): Int
+    private external fun jniGetLength(libError: FFIError): Int
     private external fun jniGetAt(
-        ptr: FFIPendingOutboundTxsPtr,
         index: Int,
         libError: FFIError
     ): FFIPendingOutboundTxPtr
 
-    private external fun jniDestroy(ptr: FFIPendingOutboundTxsPtr)
+    private external fun jniDestroy()
 
     // endregion
 
@@ -66,21 +65,20 @@ internal class FFIPendingOutboundTxs(pointer: FFIPendingOutboundTxsPtr) : FFIBas
 
     fun getLength(): Int {
         val error = FFIError()
-        val result = jniGetLength(ptr, error)
+        val result = jniGetLength(error)
         throwIf(error)
         return result
     }
 
     fun getAt(index: Int): FFIPendingOutboundTx {
         val error = FFIError()
-        val result = FFIPendingOutboundTx(jniGetAt(ptr, index, error))
+        val result = FFIPendingOutboundTx(jniGetAt(index, error))
         throwIf(error)
         return result
     }
 
     override fun destroy() {
-        jniDestroy(ptr)
-        ptr = nullptr
+        jniDestroy()
     }
 
 }

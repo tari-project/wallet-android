@@ -44,11 +44,11 @@ JNIEXPORT jbyteArray JNICALL
 Java_com_tari_android_wallet_ffi_FFICompletedTx_jniGetId(
         JNIEnv *jEnv,
         jobject jThis,
-        jlong jpCompletedTx,
         jobject error) {
     int i = 0;
     int *r = &i;
-    TariCompletedTransaction *pCompletedTx = reinterpret_cast<TariCompletedTransaction *>(jpCompletedTx);
+    jlong lCompletedTx = GetPointerField(jEnv,jThis);
+    TariCompletedTransaction *pCompletedTx = reinterpret_cast<TariCompletedTransaction *>(lCompletedTx);
     jbyteArray result = getBytesFromUnsignedLongLong(
             jEnv, completed_transaction_get_transaction_id(pCompletedTx, r));
     setErrorCode(jEnv, error, i);
@@ -60,11 +60,11 @@ JNIEXPORT jlong JNICALL
 Java_com_tari_android_wallet_ffi_FFICompletedTx_jniGetDestinationPublicKey(
         JNIEnv *jEnv,
         jobject jThis,
-        jlong jpCompletedTx,
         jobject error) {
     int i = 0;
     int *r = &i;
-    TariCompletedTransaction *pCompletedTx = reinterpret_cast<TariCompletedTransaction *>(jpCompletedTx);
+    jlong lCompletedTx = GetPointerField(jEnv,jThis);
+    TariCompletedTransaction *pCompletedTx = reinterpret_cast<TariCompletedTransaction *>(lCompletedTx);
     jlong result = reinterpret_cast<jlong>(completed_transaction_get_destination_public_key(
             pCompletedTx, r));
     setErrorCode(jEnv, error, i);
@@ -76,11 +76,11 @@ JNIEXPORT jlong JNICALL
 Java_com_tari_android_wallet_ffi_FFICompletedTx_jniGetSourcePublicKey(
         JNIEnv *jEnv,
         jobject jThis,
-        jlong jpCompletedTx,
         jobject error) {
     int i = 0;
     int *r = &i;
-    TariCompletedTransaction *pCompletedTx = reinterpret_cast<TariCompletedTransaction *>(jpCompletedTx);
+    jlong lCompletedTx = GetPointerField(jEnv,jThis);
+    TariCompletedTransaction *pCompletedTx = reinterpret_cast<TariCompletedTransaction *>(lCompletedTx);
     jlong result = reinterpret_cast<jlong>(completed_transaction_get_source_public_key(pCompletedTx,
                                                                                        r));
     setErrorCode(jEnv, error, i);
@@ -92,11 +92,11 @@ JNIEXPORT jbyteArray JNICALL
 Java_com_tari_android_wallet_ffi_FFICompletedTx_jniGetAmount(
         JNIEnv *jEnv,
         jobject jThis,
-        jlong jpCompletedTx,
         jobject error) {
     int i = 0;
     int *r = &i;
-    TariCompletedTransaction *pCompletedTx = reinterpret_cast<TariCompletedTransaction *>(jpCompletedTx);
+    jlong lCompletedTx = GetPointerField(jEnv,jThis);
+    TariCompletedTransaction *pCompletedTx = reinterpret_cast<TariCompletedTransaction *>(lCompletedTx);
     jbyteArray result = getBytesFromUnsignedLongLong(jEnv,
                                                      completed_transaction_get_amount(pCompletedTx,
                                                                                       r));
@@ -109,11 +109,11 @@ JNIEXPORT jbyteArray JNICALL
 Java_com_tari_android_wallet_ffi_FFICompletedTx_jniGetFee(
         JNIEnv *jEnv,
         jobject jThis,
-        jlong jpCompletedTx,
         jobject error) {
     int i = 0;
     int *r = &i;
-    TariCompletedTransaction *pCompletedTx = reinterpret_cast<TariCompletedTransaction *>(jpCompletedTx);
+    jlong lCompletedTx = GetPointerField(jEnv,jThis);
+    TariCompletedTransaction *pCompletedTx = reinterpret_cast<TariCompletedTransaction *>(lCompletedTx);
     jbyteArray result = getBytesFromUnsignedLongLong(jEnv,
                                                      completed_transaction_get_fee(pCompletedTx,
                                                                                    r));
@@ -126,11 +126,11 @@ JNIEXPORT jbyteArray JNICALL
 Java_com_tari_android_wallet_ffi_FFICompletedTx_jniGetTimestamp(
         JNIEnv *jEnv,
         jobject jThis,
-        jlong jpCompletedTx,
         jobject error) {
     int i = 0;
     int *r = &i;
-    TariCompletedTransaction *pCompletedTx = reinterpret_cast<TariCompletedTransaction *>(jpCompletedTx);
+    jlong lCompletedTx = GetPointerField(jEnv,jThis);
+    TariCompletedTransaction *pCompletedTx = reinterpret_cast<TariCompletedTransaction *>(lCompletedTx);
     jbyteArray result = getBytesFromUnsignedLongLong(jEnv, completed_transaction_get_timestamp(
             pCompletedTx, r));
     setErrorCode(jEnv, error, i);
@@ -142,11 +142,11 @@ JNIEXPORT jstring JNICALL
 Java_com_tari_android_wallet_ffi_FFICompletedTx_jniGetMessage(
         JNIEnv *jEnv,
         jobject jThis,
-        jlong jpCompletedTx,
         jobject error) {
     int i = 0;
     int *r = &i;
-    TariCompletedTransaction *pCompletedTx = reinterpret_cast<TariCompletedTransaction *>(jpCompletedTx);
+    jlong lCompletedTx = GetPointerField(jEnv,jThis);
+    TariCompletedTransaction *pCompletedTx = reinterpret_cast<TariCompletedTransaction *>(lCompletedTx);
     const char *pMessage = completed_transaction_get_message(pCompletedTx, r);
     setErrorCode(jEnv, error, i);
     jstring result = jEnv->NewStringUTF(pMessage);
@@ -159,11 +159,11 @@ JNIEXPORT jint JNICALL
 Java_com_tari_android_wallet_ffi_FFICompletedTx_jniGetStatus(
         JNIEnv *jEnv,
         jobject jThis,
-        jlong jpCompletedTx,
         jobject error) {
     int i = 0;
     int *r = &i;
-    TariCompletedTransaction *pCompletedTx = reinterpret_cast<TariCompletedTransaction *>(jpCompletedTx);
+    jlong lCompletedTx = GetPointerField(jEnv,jThis);
+    TariCompletedTransaction *pCompletedTx = reinterpret_cast<TariCompletedTransaction *>(lCompletedTx);
     jint result = reinterpret_cast<jint>(completed_transaction_get_status(pCompletedTx, r));
     setErrorCode(jEnv, error, i);
     return result;
@@ -173,8 +173,9 @@ extern "C"
 JNIEXPORT void JNICALL
 Java_com_tari_android_wallet_ffi_FFICompletedTx_jniDestroy(
         JNIEnv *jEnv,
-        jobject jThis,
-        jlong jpCompletedTx) {
-    TariCompletedTransaction *pCompletedTx = reinterpret_cast<TariCompletedTransaction *>(jpCompletedTx);
+        jobject jThis) {
+    jlong lCompletedTx = GetPointerField(jEnv,jThis);
+    TariCompletedTransaction *pCompletedTx = reinterpret_cast<TariCompletedTransaction *>(lCompletedTx);
     completed_transaction_destroy(pCompletedTx);
+    SetPointerField(jEnv,jThis, reinterpret_cast<jlong>(nullptr));
 }

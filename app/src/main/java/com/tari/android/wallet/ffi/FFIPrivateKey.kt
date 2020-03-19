@@ -44,18 +44,17 @@ internal class FFIPrivateKey constructor(pointer: FFIPrivateKeyPtr) : FFIBase() 
     // region JNI
 
     private external fun jniGetBytes(
-        privateKeyPtr: FFIPrivateKeyPtr,
         libError: FFIError
     ): FFIByteVectorPtr
 
-    private external fun jniDestroy(privateKeyPtr: FFIPrivateKeyPtr)
+    private external fun jniDestroy()
     private external fun jniCreate(
-        byteVectorPtr: FFIByteVectorPtr,
+        byteVectorPtr: FFIByteVector,
         libError: FFIError
-    ): FFIPrivateKeyPtr
+    )
 
-    private external fun jniGenerate(): FFIPrivateKeyPtr
-    private external fun jniFromHex(hexStr: String, libError: FFIError): FFIPrivateKeyPtr
+    private external fun jniGenerate()
+    private external fun jniFromHex(hexStr: String, libError: FFIError)
 
     // endregion
 
@@ -66,19 +65,19 @@ internal class FFIPrivateKey constructor(pointer: FFIPrivateKeyPtr) : FFIBase() 
     }
 
     constructor() : this(nullptr) {
-        ptr = jniGenerate()
+        jniGenerate()
     }
 
     constructor(byteVector: FFIByteVector) : this(nullptr) {
         val error = FFIError()
-        ptr = jniCreate(byteVector.getPointer(), error)
+        jniCreate(byteVector, error)
         throwIf(error)
     }
 
     constructor(hexString: HexString) : this(nullptr) {
         if (hexString.toString().length == 64) {
             val error = FFIError()
-            ptr = jniFromHex(hexString.hex, error)
+            jniFromHex(hexString.hex, error)
             throwIf(error)
         } else {
             throw FFIException(message = "HexString is not a valid PrivateKey")
@@ -91,21 +90,20 @@ internal class FFIPrivateKey constructor(pointer: FFIPrivateKeyPtr) : FFIBase() 
 
     fun getBytes(): FFIByteVector {
         val error = FFIError()
-        val result = FFIByteVector(jniGetBytes(ptr, error))
+        val result = FFIByteVector(jniGetBytes(error))
         throwIf(error)
         return result
     }
 
     override fun toString(): String {
         val error = FFIError()
-        val result = FFIByteVector(jniGetBytes(ptr, error)).toString()
+        val result = FFIByteVector(jniGetBytes(error)).toString()
         throwIf(error)
         return result
     }
 
     override fun destroy() {
-        jniDestroy(ptr)
-        ptr = nullptr
+        jniDestroy()
     }
 
 }

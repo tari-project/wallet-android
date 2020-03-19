@@ -44,11 +44,11 @@ JNIEXPORT jint JNICALL
 Java_com_tari_android_wallet_ffi_FFIContacts_jniGetLength(
         JNIEnv *jEnv,
         jobject jThis,
-        jlong jpContacts,
         jobject error) {
     int i = 0;
     int *r = &i;
-    TariContacts *pContacts = reinterpret_cast<TariContacts *>(jpContacts);
+    jlong lContacts = GetPointerField(jEnv,jThis);
+    TariContacts *pContacts = reinterpret_cast<TariContacts *>(lContacts);
     jint result = contacts_get_length(pContacts, r);
     setErrorCode(jEnv, error, i);
     return result;
@@ -59,12 +59,12 @@ JNIEXPORT jlong JNICALL
 Java_com_tari_android_wallet_ffi_FFIContacts_jniGetAt(
         JNIEnv *jEnv,
         jobject jThis,
-        jlong jpContacts,
         jint index,
         jobject error) {
     int i = 0;
     int *r = &i;
-    auto *pContacts = reinterpret_cast<TariContacts *>(jpContacts);
+    jlong lContacts = GetPointerField(jEnv,jThis);
+    auto *pContacts = reinterpret_cast<TariContacts *>(lContacts);
     jlong result = reinterpret_cast<jlong>(contacts_get_at(pContacts,
                                                            static_cast<unsigned int>(index), r));
     setErrorCode(jEnv, error, i);
@@ -75,9 +75,10 @@ extern "C"
 JNIEXPORT void JNICALL
 Java_com_tari_android_wallet_ffi_FFIContacts_jniDestroy(
         JNIEnv *jEnv,
-        jobject jThis,
-        jlong jpContacts) {
-    contacts_destroy(reinterpret_cast<TariContacts *>(jpContacts));
+        jobject jThis) {
+    jlong lContacts = GetPointerField(jEnv,jThis);
+    contacts_destroy(reinterpret_cast<TariContacts *>(lContacts));
+    SetPointerField(jEnv,jThis, reinterpret_cast<jlong>(nullptr));
 }
 
 extern "C"
@@ -85,11 +86,11 @@ JNIEXPORT jint JNICALL
 Java_com_tari_android_wallet_ffi_FFICompletedTxs_jniGetLength(
         JNIEnv *jEnv,
         jobject jThis,
-        jlong jpCompletedTransactions,
         jobject error) {
     int i = 0;
     int *r = &i;
-    TariCompletedTransactions *pCompletedTransactions = reinterpret_cast<TariCompletedTransactions *>(jpCompletedTransactions);
+    jlong lCompletedTransactions = GetPointerField(jEnv,jThis);
+    TariCompletedTransactions *pCompletedTransactions = reinterpret_cast<TariCompletedTransactions *>(lCompletedTransactions);
     jint result = completed_transactions_get_length(pCompletedTransactions, r);
     setErrorCode(jEnv, error, i);
     return result;
@@ -100,12 +101,12 @@ JNIEXPORT jlong JNICALL
 Java_com_tari_android_wallet_ffi_FFICompletedTxs_jniGetAt(
         JNIEnv *jEnv,
         jobject jThis,
-        jlong jpCompletedTransactions,
         jint index,
         jobject error) {
     int i = 0;
     int *r = &i;
-    auto *pCompletedTransactions = reinterpret_cast<TariCompletedTransactions *>(jpCompletedTransactions);
+    jlong lCompletedTransactions = GetPointerField(jEnv,jThis);
+    auto *pCompletedTransactions = reinterpret_cast<TariCompletedTransactions *>(lCompletedTransactions);
     jlong result = reinterpret_cast<jlong>(completed_transactions_get_at(pCompletedTransactions,
                                                                          static_cast<unsigned int>(index),
                                                                          r));
@@ -117,10 +118,11 @@ extern "C"
 JNIEXPORT void JNICALL
 Java_com_tari_android_wallet_ffi_FFICompletedTxs_jniDestroy(
         JNIEnv *jEnv,
-        jobject jThis,
-        jlong jpCompletedTransactions) {
+        jobject jThis) {
+    jlong lCompletedTransactions = GetPointerField(jEnv,jThis);
     completed_transactions_destroy(
-            reinterpret_cast<TariCompletedTransactions *>(jpCompletedTransactions));
+            reinterpret_cast<TariCompletedTransactions *>(lCompletedTransactions));
+    SetPointerField(jEnv,jThis, reinterpret_cast<jlong>(nullptr));
 }
 
 extern "C"
@@ -128,11 +130,11 @@ JNIEXPORT jint JNICALL
 Java_com_tari_android_wallet_ffi_FFIPendingInboundTxs_jniGetLength(
         JNIEnv *jEnv,
         jobject jThis,
-        jlong jpInboundTxs,
         jobject error) {
     int i = 0;
     int *r = &i;
-    TariPendingInboundTransactions *pInboundTxs = reinterpret_cast<TariPendingInboundTransactions *>(jpInboundTxs);
+    jlong lInboundTransactions = GetPointerField(jEnv,jThis);
+    TariPendingInboundTransactions *pInboundTxs = reinterpret_cast<TariPendingInboundTransactions *>(lInboundTransactions);
     jint result = pending_inbound_transactions_get_length(pInboundTxs, r);
     setErrorCode(jEnv, error, i);
     return result;
@@ -143,12 +145,12 @@ JNIEXPORT jlong JNICALL
 Java_com_tari_android_wallet_ffi_FFIPendingInboundTxs_jniGetAt(
         JNIEnv *jEnv,
         jobject jThis,
-        jlong jpInboundTxs,
         jint index,
         jobject error) {
     int i = 0;
     int *r = &i;
-    TariPendingInboundTransactions *pInboundTxs = reinterpret_cast<TariPendingInboundTransactions *>(jpInboundTxs);
+    jlong lInboundTransactions = GetPointerField(jEnv,jThis);
+    TariPendingInboundTransactions *pInboundTxs = reinterpret_cast<TariPendingInboundTransactions *>(lInboundTransactions);
     jlong result = reinterpret_cast<jlong>(pending_inbound_transactions_get_at(pInboundTxs,
                                                                                static_cast<unsigned int>(index),
                                                                                r));
@@ -160,10 +162,11 @@ extern "C"
 JNIEXPORT void JNICALL
 Java_com_tari_android_wallet_ffi_FFIPendingInboundTxs_jniDestroy(
         JNIEnv *jEnv,
-        jobject jThis,
-        jlong jpInboundTxs) {
+        jobject jThis) {
+    jlong lInboundTransactions = GetPointerField(jEnv,jThis);
     pending_inbound_transactions_destroy(
-            reinterpret_cast<TariPendingInboundTransactions *>(jpInboundTxs));
+            reinterpret_cast<TariPendingInboundTransactions *>(lInboundTransactions));
+    SetPointerField(jEnv,jThis, reinterpret_cast<jlong>(nullptr));
 }
 
 
@@ -172,11 +175,11 @@ JNIEXPORT jint JNICALL
 Java_com_tari_android_wallet_ffi_FFIPendingOutboundTxs_jniGetLength(
         JNIEnv *jEnv,
         jobject jThis,
-        jlong jpOutboundTxs,
         jobject error) {
     int i = 0;
     int *r = &i;
-    TariPendingOutboundTransactions *pOutboundTxs = reinterpret_cast<TariPendingOutboundTransactions *>(jpOutboundTxs);
+    jlong lOutboundTransactions = GetPointerField(jEnv,jThis);
+    TariPendingOutboundTransactions *pOutboundTxs = reinterpret_cast<TariPendingOutboundTransactions *>(lOutboundTransactions);
     jint result = pending_outbound_transactions_get_length(pOutboundTxs, r);
     setErrorCode(jEnv, error, i);
     return result;
@@ -187,12 +190,12 @@ JNIEXPORT jlong JNICALL
 Java_com_tari_android_wallet_ffi_FFIPendingOutboundTxs_jniGetAt(
         JNIEnv *jEnv,
         jobject jThis,
-        jlong jpOutboundTxs,
         jint index,
         jobject error) {
     int i = 0;
     int *r = &i;
-    TariPendingOutboundTransactions *pOutboundTxs = reinterpret_cast<TariPendingOutboundTransactions *>(jpOutboundTxs);
+    jlong lOutboundTransactions = GetPointerField(jEnv,jThis);
+    TariPendingOutboundTransactions *pOutboundTxs = reinterpret_cast<TariPendingOutboundTransactions *>(lOutboundTransactions);
     jlong result = reinterpret_cast<jlong>(pending_outbound_transactions_get_at(pOutboundTxs,
                                                                                 static_cast<unsigned int>(index),
                                                                                 r));
@@ -204,8 +207,9 @@ extern "C"
 JNIEXPORT void JNICALL
 Java_com_tari_android_wallet_ffi_FFIPendingOutboundTxs_jniDestroy(
         JNIEnv *jEnv,
-        jobject jThis,
-        jlong jpInboundTxs) {
+        jobject jThis) {
+    jlong lOutboundTransactions = GetPointerField(jEnv,jThis);
     pending_outbound_transactions_destroy(
-            reinterpret_cast<TariPendingOutboundTransactions *>(jpInboundTxs));
+            reinterpret_cast<TariPendingOutboundTransactions *>(lOutboundTransactions));
+    SetPointerField(jEnv,jThis, reinterpret_cast<jlong>(nullptr));
 }

@@ -43,28 +43,27 @@ internal typealias FFITransportTypePtr = Long
 internal class FFITransportType constructor(pointer: FFITransportTypePtr) : FFIBase() {
 
     // region JNI
-    private external fun jniMemoryTransport(): FFITransportTypePtr
+    private external fun jniMemoryTransport()
 
     private external fun jniGetMemoryAddress(
-        pointer: FFITransportTypePtr,
         libError: FFIError
     ): String
 
     private external fun jniTCPTransport(
         listenerAddress: String, libError: FFIError
-    ): FFITransportTypePtr
+    )
 
     private external fun jniTorTransport(
         control_server_address: String,
         tor_port: Int,
-        tor_cookie: FFIByteVectorPtr,
-        tor_identity: FFIByteVectorPtr,
+        tor_cookie: FFIByteVector,
+        tor_identity: FFIByteVector,
         socks_username: String,
         socks_password: String,
         libError: FFIError
-    ): FFITransportTypePtr
+    )
 
-    private external fun jniDestroy(pointer: FFITransportTypePtr)
+    private external fun jniDestroy()
     // endregion
 
     private var ptr = nullptr
@@ -74,12 +73,12 @@ internal class FFITransportType constructor(pointer: FFITransportTypePtr) : FFIB
     }
 
     constructor() : this(nullptr) {
-        ptr = jniMemoryTransport()
+        jniMemoryTransport()
     }
 
     constructor(listenerAddress: NetAddressString) : this(nullptr) {
         val error = FFIError()
-        ptr = jniTCPTransport(listenerAddress.toString(), error)
+        jniTCPTransport(listenerAddress.toString(), error)
         throwIf(error)
     }
 
@@ -92,11 +91,11 @@ internal class FFITransportType constructor(pointer: FFITransportTypePtr) : FFIB
         socksPassword: String
     ) : this(nullptr) {
         val error = FFIError()
-        ptr = jniTorTransport(
+        jniTorTransport(
             controlAddress.toString(),
             torPort,
-            torCookie.getPointer(),
-            torIdentity.getPointer(),
+            torCookie,
+            torIdentity,
             socksUsername,
             socksPassword,
             error
@@ -109,14 +108,13 @@ internal class FFITransportType constructor(pointer: FFITransportTypePtr) : FFIB
 
     fun getAddress(): String {
         val error = FFIError()
-        val result = jniGetMemoryAddress(ptr, error)
+        val result = jniGetMemoryAddress(error)
         throwIf(error)
         return result
     }
 
     override fun destroy() {
-        jniDestroy(ptr)
-        ptr = nullptr
+        jniDestroy()
     }
 
 }

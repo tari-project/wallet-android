@@ -46,15 +46,15 @@ internal class FFICommsConfig constructor(pointer: FFICommsConfigPtr) : FFIBase(
 
     // region JNI
 
-    private external fun jniDestroy(commsConfigPtr: FFICommsConfigPtr)
+    private external fun jniDestroy()
     private external fun jniCreate(
         publicAddress: String,
-        transport: FFITransportTypePtr,
+        transport: FFITransportType,
         databaseName: String,
         datastorePath: String,
-        privateKeyPtr: FFIPrivateKeyPtr,
+        privateKeyPtr: FFIPrivateKey,
         error: FFIError
-    ): FFICommsConfigPtr
+    )
 
     // endregion
 
@@ -77,12 +77,12 @@ internal class FFICommsConfig constructor(pointer: FFICommsConfigPtr) : FFIBase(
         val writeableDir = File(datastorePath)
         if (writeableDir.exists() && writeableDir.isDirectory && writeableDir.canWrite()) {
             val error = FFIError()
-            ptr = jniCreate(
+            jniCreate(
                 publicAddress,
-                transport.getPointer(),
+                transport,
                 databaseName,
                 datastorePath,
-                privateKey.getPointer(),
+                privateKey,
                 error
             )
             throwIf(error)
@@ -105,8 +105,7 @@ internal class FFICommsConfig constructor(pointer: FFICommsConfigPtr) : FFIBase(
     }
 
     override fun destroy() {
-        jniDestroy(ptr)
-        ptr = nullptr
+        jniDestroy()
     }
 
 }
