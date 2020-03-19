@@ -100,7 +100,7 @@
     <string name="create_wallet_set_of_emoji_your_wallet_address_desc">This set of emojis is your wallet address. \n It’s how your friends can find you and send you Tari.</string>
     <string name="create_wallet_continue_and_create_emoji_id">Continue &amp; Create Emoji ID</string>
 
-    <string name="scan_qr_description">Scan Tari QR code in the box below to send a Tari to recipient.</string>
+    <string name="scan_qr_description">Scan Tari QR code in the box\nbelow to send a Tari to recipient.</string>
     <string name="failed_init_camera_message">Failed to initialize Camera</string>
     <string name="camera_permission_denied_message">Camera permission denied</string>
 
