@@ -69,6 +69,6 @@
     <dimen name="auth_button_bottom_margin">22dp</dimen>
 
     <!-- wallet info -->
-    <dimen name="wallet_info_img_qr_code_size">300dp</dimen>
-
+    <dimen name="wallet_info_container_qr_code_size">278dp</dimen>
+    <dimen name="wallet_info_img_qr_code_size">400dp</dimen>
 </resources>
