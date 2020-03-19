@@ -70,7 +70,7 @@ internal class FFIPendingInboundTx constructor(pointer: FFIPendingInboundTxPtr) 
     private external fun jniGetStatus(
         ptr: FFIPendingOutboundTxPtr,
         libError: FFIError
-    ) : Int
+    ): Int
 
     private external fun jniDestroy(ptr: FFIPendingInboundTxPtr)
 

@@ -75,7 +75,6 @@ abstract class BaseFragment : Fragment() {
             is LocalAuthFragment -> component.inject(this)
             is DebugLogFragment -> component.inject(this)
             is BaseNodeConfigFragment -> component.inject(this)
-
         }
         // bind views
         val view = inflater.inflate(contentViewId, container, false)

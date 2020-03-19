@@ -5,17 +5,15 @@
     android:orientation="vertical">
 
     <FrameLayout
-        android:id="@+id/onboarding_frame_container1"
+        android:id="@+id/onboarding_fragment_container_1"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/black"
-        android:orientation="vertical" />
+        android:background="@color/black" />
 
     <FrameLayout
-        android:id="@+id/onboarding_frame_container2"
+        android:id="@+id/onboarding_fragment_container_2"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/transparent"
-        android:orientation="vertical" />
+        android:background="@color/transparent" />
 
 </FrameLayout>

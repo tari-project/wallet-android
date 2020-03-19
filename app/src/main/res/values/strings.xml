@@ -26,6 +26,7 @@
     <string name="common_new">New</string>
     <string name="common_new_uppercase">NEW</string>
     <string name="common_save">Save</string>
+    <string name="common_cancel">Cancel</string>
 
     <!-- dummy values - UI design placeholders -->
     <string name="dummy_positive_tx_value">+ 152.75</string>
@@ -39,6 +40,9 @@
     <!-- emoji-id-related -->
     <string name="emoji_id_bullet_separator">•••</string>
     <string name="emoji_id_chunk_separator_char">|</string>
+    <string name="copy_emoji_id">Copy Emoji ID</string>
+    <string name="paste_emoji_id">Paste Emoji ID</string>
+    <string name="tap_to_see_full_emoji_id">Tap to see full Emoji ID</string>
 
     <!-- notifications -->
     <string name="wallet_service_notification_channel_name">Tari Wallet Service Notification Channel</string>
@@ -92,12 +96,12 @@
     <string name="create_wallet_hello_friend_label">Hello Friend</string>
     <string name="create_wallet_just_a_sec_label">Just a sec...</string>
     <string name="create_wallet_just_sec_desc_text">Your wallet is being created</string>
-    <string name="create_wallet_address_desc">Your Emoji ID is your wallet address. \n It’s how your friends can find you and send you Tari.</string>
+    <string name="create_wallet_address_desc">Your Emoji ID is your wallet address.\nIt’s how your friends can find you and send you Tari.</string>
     <string name="create_wallet_now_text">Now create your Emoji ID</string>
     <string name="create_wallet_awesome">Awesome!</string>
     <string name="create_wallet_your_emoji_id_text_label_1">This is your</string>
     <string name="create_wallet_your_emoji_id_text_label_2"> Emoji ID</string>
-    <string name="create_wallet_set_of_emoji_your_wallet_address_desc">This set of emojis is your wallet address. \n It’s how your friends can find you and send you Tari.</string>
+    <string name="create_wallet_set_of_emoji_your_wallet_address_desc">This set of emojis is your wallet address.\nIt’s how your friends can find you and send you Tari.</string>
     <string name="create_wallet_continue_and_create_emoji_id">Continue &amp; Create Emoji ID</string>
 
     <string name="scan_qr_description">Scan Tari QR code in the box below to send a Tari to recipient.</string>
@@ -109,7 +113,6 @@
     <string name="add_recipient_hint">Enter Emoji ID or Contact Name</string>
     <string name="add_recipient_recent_tx_contacts">Recent</string>
     <string name="add_recipient_my_contacts">My Contacts</string>
-    <string name="add_recipient_paste_emoji_id">Paste copied Emoji ID</string>
     <string name="add_recipient_invalid_emoji_id">Invalid Emoji ID</string>
 
     <!-- send tari - amount -->
@@ -132,9 +135,8 @@
     <!-- debug log - title -->
     <string name="debug_log_title">Log</string>
     <!-- wallet info -->
-    <string name="wallet_info_title_label_1">Share your</string>
-    <string name="wallet_info_title_label_2">Emoji ID</string>
-    <string name="wallet_info_title_label_3">to receive Tari</string>
+    <string name="wallet_info_share_your_emoji_id">Share your Emoji ID to receive Tari</string>
+    <string name="wallet_info_share_your_emoji_id_bold_part">Emoji ID</string>
     <string name="wallet_info_copy_emoji_id">Copy my emoji ID</string>
     <string name="wallet_info_qr_code_desc">Transacting in person? Your sender can get your \n emoji ID by scanning this QR code in their Tari app</string>
     <string name="wallet_info_emoji_id_copied">Your emoji ID is copied.</string>
@@ -153,15 +155,14 @@
     <string name="tx_detail_transaction_id">Transaction ID</string>
 
     <!-- local auth -->
-    <string name="auth_prompt_cancel">Cancel</string>
-    <string name="auth_prompt_touch_id_title_text_label_1">Protect your wallet with</string>
-    <string name="auth_prompt_pin_title_text_label_1">Protect your wallet with your device</string>
-    <string name="auth_prompt_touch_id">Touch ID</string>
-    <string name="auth_prompt_pin">PIN</string>
-    <string name="auth_prompt_button_text">Enable your PIN</string>
-    <string name="auth_prompt_button_touch_id_text">Enable Touch ID</string>
-    <string name="auth_prompt_touch_id_desc">We recommend using Touch ID to access your Tari\nwallet for security and ease of use.</string>
-    <string name="auth_prompt_pin_desc">We recommend using your device PIN to access your\nTari wallet for security and ease of use.</string>
+    <string name="auth_prompt_device_lock_code">Protect your wallet with your\nDevice Lock Code</string>
+    <string name="auth_prompt_device_lock_code_bold_part">Device Lock Code</string>
+    <string name="auth_prompt_biometrics">Protect your wallet with your Biometrics</string>
+    <string name="auth_prompt_biometrics_bold_part">Biometrics</string>
+    <string name="auth_prompt_button_text">Enable your Device Lock Code</string>
+    <string name="auth_prompt_button_touch_id_text">Enable Biometrics</string>
+    <string name="auth_prompt_touch_id_desc">We recommend using biometrics to access your Tari wallet for security and ease of use.</string>
+    <string name="auth_prompt_pin_desc">We recommend using your device lock code to access your Tari wallet for security and ease of use.</string>
 
     <!-- debug -->
     <string name="debug_log_files_title">Logs</string>

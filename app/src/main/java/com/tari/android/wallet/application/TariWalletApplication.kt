@@ -63,11 +63,9 @@ internal class TariWalletApplication : Application(), LifecycleObserver {
     @JvmField
     @field:[Inject Named(ConfigModule.FieldName.deleteExistingWallet)]
     var deleteExistingWallet: Boolean = false
-
     @Inject
     @Named(WalletModule.FieldName.walletFilesDirPath)
     lateinit var walletFilesDirPath: String
-
     @Inject
     lateinit var torProxyManager: TorProxyManager
     @Inject

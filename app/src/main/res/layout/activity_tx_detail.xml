@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -15,13 +15,6 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <View
-            android:layout_width="match_parent"
-            android:layout_height="25dp"
-            android:layout_marginTop="10dp"
-            android:background="@drawable/view_elevation_gradient"
-            app:layout_constraintTop_toBottomOf="@id/tx_detail_txt_date" />
-
-        <View
             android:id="@+id/tx_detail_vw_payment_state_bg"
             android:layout_width="match_parent"
             android:layout_height="100dp"
@@ -29,6 +22,12 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/common_scroll_height_gradient_height"
+            android:background="@drawable/view_elevation_gradient"
+            app:layout_constraintTop_toBottomOf="@id/tx_detail_vw_payment_state_bg" />
 
         <ImageButton
             android:id="@+id/tx_detail_img_back_arrow"
@@ -135,21 +134,22 @@
             app:layout_constraintTop_toBottomOf="@id/tx_detail_txt_tx_fee" />
 
         <View
+            android:id="@+id/tx_detail_vw_top_dimmer"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_marginTop="32dp"
-            android:background="@color/white"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tx_detail_txt_fee_label" />
+            android:alpha="0.6"
+            android:background="@color/black"
+            android:clickable="true"
+            android:focusable="true"
+            app:layout_constraintBottom_toTopOf="@id/tx_detail_vw_detail_container"
+            app:layout_constraintTop_toTopOf="parent" />
 
-        <LinearLayout
+        <RelativeLayout
             android:id="@+id/tx_detail_vw_detail_container"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_marginTop="32dp"
-            android:elevation="@dimen/common_view_elevation"
+            android:background="@color/white"
             android:clipChildren="false"
             android:orientation="vertical"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -166,66 +166,17 @@
                 android:textSize="13sp"
                 app:customFont="AVENIR_LT_STD_MEDIUM" />
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="25dp"
-                android:layout_marginTop="4dp"
-                android:layout_marginEnd="25dp"
-                android:gravity="center_vertical"
-                android:orientation="horizontal">
-
-                <FrameLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/emoji_id_bg"
-                    android:clickable="true"
-                    android:elevation="@dimen/common_view_elevation"
-                    android:focusable="true"
-                    android:paddingStart="@dimen/emoji_id_container_horizontal_padding"
-                    android:paddingTop="@dimen/emoji_id_container_vertical_padding"
-                    android:paddingEnd="@dimen/emoji_id_container_horizontal_padding"
-                    android:paddingBottom="@dimen/emoji_id_container_vertical_padding">
-
-                    <include
-                        android:id="@+id/tx_detail_vw_emoji_summary"
-                        layout="@layout/emoji_id_summary"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:layout_marginStart="8dp"
-                        android:layout_marginEnd="8dp" />
-                </FrameLayout>
-
-                <View
-                    android:layout_width="0dp"
-                    android:layout_height="10dp"
-                    android:layout_weight="1" />
-
-                <com.tari.android.wallet.ui.component.CustomFontButton
-                    android:id="@+id/tx_detail_btn_add_contact"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:background="@color/transparent"
-                    android:text="@string/tx_detail_add_contact"
-                    android:textAllCaps="false"
-                    android:textColor="@color/purple"
-                    android:textSize="14sp"
-                    app:customFont="AVENIR_LT_STD_MEDIUM" />
-            </LinearLayout>
-
             <RelativeLayout
                 android:id="@+id/tx_detail_vw_contact_container"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_below="@id/tx_detail_vw_emoji_id_container"
                 android:layout_marginStart="25dp"
                 android:layout_marginTop="20dp"
                 android:layout_marginEnd="24dp"
                 android:orientation="vertical"
                 android:visibility="visible"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="@id/tx_detail_vw_emoji_summary"
-                app:layout_constraintTop_toBottomOf="@id/tx_detail_vw_emoji_summary">
+                app:layout_constraintEnd_toEndOf="parent">
 
                 <com.tari.android.wallet.ui.component.CustomFontTextView
                     android:id="@+id/tx_detail_txt_contact_label"
@@ -292,6 +243,7 @@
                 android:id="@+id/tx_detail_txt_note_label"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_below="@id/tx_detail_vw_contact_container"
                 android:layout_marginStart="25dp"
                 android:layout_marginTop="32dp"
                 android:text="@string/tx_detail_note"
@@ -305,6 +257,7 @@
                 android:id="@+id/tx_detail_txt_tx_note"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_below="@id/tx_detail_txt_note_label"
                 android:layout_marginStart="25dp"
                 android:layout_marginTop="8dp"
                 android:textColor="@color/black"
@@ -313,23 +266,159 @@
                 app:layout_constraintStart_toStartOf="@id/tx_detail_txt_note_label"
                 app:layout_constraintTop_toBottomOf="@id/tx_detail_txt_note_label" />
 
-        </LinearLayout>
+            <com.tari.android.wallet.ui.component.CustomFontTextView
+                android:id="@+id/tx_detail_txt_tx_id"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:layout_centerHorizontal="true"
+                android:layout_gravity="bottom"
+                android:layout_marginBottom="16dp"
+                android:ellipsize="middle"
+                android:gravity="center"
+                android:text="@string/tx_detail_note"
+                android:textColor="@color/tx_detail_contact_name_label_text"
+                android:textSize="13sp"
+                app:customFont="AVENIR_LT_STD_ROMAN"
+                tools:text="Transaction ID: 8G438GM39" />
 
-        <com.tari.android.wallet.ui.component.CustomFontTextView
-            android:id="@+id/tx_detail_txt_tx_id"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom"
-            android:layout_marginTop="32dp"
-            android:layout_marginBottom="16dp"
-            android:text="@string/tx_detail_note"
-            android:textColor="@color/tx_detail_contact_name_label_text"
-            android:textSize="13sp"
-            app:customFont="AVENIR_LT_STD_ROMAN"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            tools:text="Transaction ID: 8G438GM39" />
+            <View
+                android:id="@+id/tx_detail_vw_bottom_dimmer"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:alpha="0.6"
+                android:background="@color/black"
+                android:clickable="true"
+                android:focusable="true" />
+
+            <!-- copy emoji id button -->
+            <RelativeLayout
+                android:id="@+id/tx_detail_vw_copy_emoji_id_container"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignBottom="@id/tx_detail_vw_emoji_id_container"
+                android:layout_centerHorizontal="true"
+                android:layout_marginBottom="0dp">
+
+                <ImageView
+                    android:id="@+id/tx_detail_img_copy_emoji_id_notch"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerHorizontal="true"
+                    android:contentDescription="@null"
+                    android:src="@drawable/speech_notch_up" />
+                <com.tari.android.wallet.ui.component.CustomFontTextView
+                    android:id="@+id/tx_detail_txt_copy_emoji_id"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/tx_detail_img_copy_emoji_id_notch"
+                    android:background="@drawable/copy_paste_emoji_id_button_bg"
+                    android:paddingHorizontal="20dp"
+                    android:paddingVertical="10dp"
+                    android:text="@string/copy_emoji_id"
+                    android:textColor="#9834F6"
+                    android:textSize="14sp"
+                    app:customFont="AVENIR_LT_STD_HEAVY" />
+                <Button
+                    android:id="@+id/tx_detail_btn_copy_emoji_id"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_alignStart="@id/tx_detail_txt_copy_emoji_id"
+                    android:layout_alignTop="@id/tx_detail_txt_copy_emoji_id"
+                    android:layout_alignEnd="@id/tx_detail_txt_copy_emoji_id"
+                    android:layout_alignBottom="@id/tx_detail_txt_copy_emoji_id"
+                    android:background="@color/transparent" />
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/tx_detail_vw_emoji_id_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/tx_detail_txt_from"
+                android:layout_marginStart="25dp"
+                android:layout_marginTop="4dp"
+                android:layout_marginEnd="25dp"
+                android:orientation="horizontal">
+
+                <FrameLayout
+                    android:id="@+id/tx_detail_vw_emoji_id_summary_container"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/emoji_id_bg"
+                    android:clickable="true"
+                    android:elevation="@dimen/common_view_elevation"
+                    android:focusable="true"
+                    android:paddingStart="@dimen/emoji_id_container_horizontal_padding"
+                    android:paddingTop="@dimen/emoji_id_container_vertical_padding"
+                    android:paddingEnd="@dimen/emoji_id_container_horizontal_padding"
+                    android:paddingBottom="@dimen/emoji_id_container_vertical_padding">
+
+                    <include
+                        android:id="@+id/tx_detail_vw_emoji_id_summary"
+                        layout="@layout/emoji_id_summary"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center" />
+                </FrameLayout>
+
+                <com.tari.android.wallet.ui.component.CustomFontButton
+                    android:id="@+id/tx_detail_btn_add_contact"
+                    android:layout_width="wrap_content"
+                    android:layout_height="0dp"
+                    android:layout_alignTop="@id/tx_detail_vw_emoji_id_summary_container"
+                    android:layout_alignBottom="@id/tx_detail_vw_emoji_id_summary_container"
+                    android:layout_alignParentEnd="true"
+                    android:layout_toEndOf="@id/tx_detail_vw_emoji_id_summary_container"
+                    android:background="@color/transparent"
+                    android:ellipsize="middle"
+                    android:gravity="center_vertical|end"
+                    android:singleLine="true"
+                    android:text="@string/tx_detail_add_contact"
+                    android:textAllCaps="false"
+                    android:textColor="@color/purple"
+                    android:textSize="14sp"
+                    app:customFont="AVENIR_LT_STD_MEDIUM" />
+
+                <RelativeLayout
+                    android:id="@+id/tx_detail_vw_full_emoji_id_container"
+                    android:layout_width="300dp"
+                    android:layout_height="0dp"
+                    android:layout_alignTop="@id/tx_detail_vw_emoji_id_summary_container"
+                    android:layout_alignBottom="@id/tx_detail_vw_emoji_id_summary_container"
+                    android:background="@drawable/emoji_id_bg"
+                    android:elevation="@dimen/common_view_elevation">
+
+                    <HorizontalScrollView
+                        android:id="@+id/tx_detail_scroll_full_emoji_id"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:scrollbars="none"
+                        tools:ignore="UselessParent">
+
+                        <TextView
+                            android:id="@+id/tx_detail_txt_full_emoji_id"
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:gravity="center_vertical"
+                            android:letterSpacing="0.27"
+                            android:paddingHorizontal="12dp"
+                            android:textColor="@color/black"
+                            android:textSize="14sp" />
+                    </HorizontalScrollView>
+
+                    <!-- white fader for emoji-id -->
+                    <View
+                        android:id="@+id/tx_detail_vw_full_emoji_id_fader"
+                        android:layout_width="26dp"
+                        android:layout_height="24dp"
+                        android:layout_alignParentEnd="true"
+                        android:layout_centerVertical="true"
+                        android:background="@drawable/emoji_id_end_fader"
+                        android:translationZ="6dp" />
+                </RelativeLayout>
+            </RelativeLayout>
+
+        </RelativeLayout>
 
         <androidx.constraintlayout.widget.Group
             android:id="@+id/tx_detail_vw_tx_fee_group"
@@ -337,4 +426,5 @@
             android:layout_height="wrap_content"
             app:constraint_referenced_ids="tx_detail_txt_tx_fee,tx_detail_txt_fee_label" />
     </androidx.constraintlayout.widget.ConstraintLayout>
-</androidx.core.widget.NestedScrollView>
+
+</RelativeLayout>

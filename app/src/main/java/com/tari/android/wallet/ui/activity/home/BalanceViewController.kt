@@ -257,13 +257,16 @@ internal class BalanceViewController(
 
     class DigitSeparatorViewHolder(context: Context, separator: String) :
         BalanceDigitViewHolder() {
+
         @SuppressLint("InflateParams")
         override var view: View = LayoutInflater.from(context).inflate(
             R.layout.home_balance_digit_thousands_separator,
             null
         )
+
         @BindView(R.id.home_balance_txt_thousands_separator)
         lateinit var separatorTextView: TextView
+
         @BindDimen(R.dimen.home_balance_digit_height)
         @JvmField
         var balanceDigitHeight: Int = 0
@@ -325,15 +328,18 @@ internal class BalanceViewController(
     }
 
     class DigitViewHolder(context: Context, private var value: Int) : BalanceDigitViewHolder() {
+
         @SuppressLint("InflateParams")
         override var view: View = LayoutInflater.from(context).inflate(
             R.layout.home_balance_digit,
             null
         )
+
         @BindView(R.id.home_balance_txt_digit_top)
         lateinit var topDigitTextView: TextView
         @BindView(R.id.home_balance_txt_digit_bottom)
         lateinit var bottomDigitTextView: TextView
+
         @BindDimen(R.dimen.home_balance_digit_height)
         @JvmField
         var balanceDigitHeight: Int = 0
@@ -442,13 +448,16 @@ internal class BalanceViewController(
 
     class DecimalDigitSeparatorViewHolder(context: Context, separator: String) :
         BalanceDigitViewHolder() {
+
         @SuppressLint("InflateParams")
         override var view: View = LayoutInflater.from(context).inflate(
             R.layout.home_balance_decimal_separator,
             null
         )
+
         @BindView(R.id.home_balance_txt_decimal_separator)
         lateinit var separatorTextView: TextView
+
         @BindDimen(R.dimen.home_balance_digit_decimal_height)
         @JvmField
         var balanceDecimalDigitHeight: Int = 0
@@ -478,15 +487,18 @@ internal class BalanceViewController(
 
     class DecimalDigitViewHolder(context: Context, private var value: Int) :
         BalanceDigitViewHolder() {
+
         @SuppressLint("InflateParams")
         override var view: View = LayoutInflater.from(context).inflate(
             R.layout.home_balance_decimal_digit,
             null
         )
+
         @BindView(R.id.home_balance_txt_decimal_digit_top)
         lateinit var topDecimalDigitTextView: TextView
         @BindView(R.id.home_balance_txt_decimal_digit_bottom)
         lateinit var bottomDecimalDigitTextView: TextView
+
         @BindDimen(R.dimen.home_balance_digit_decimal_height)
         @JvmField
         var balanceDecimalDigitHeight = 0

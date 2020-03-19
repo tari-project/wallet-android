@@ -38,7 +38,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.tari.android.wallet.R
 
 /**
- * Log list recycler view adapter.
+ * Log view list recycler view adapter.
  *
  * @author The Tari Development Team
  */
@@ -68,16 +68,23 @@ internal class LogListAdapter(private val logLines: List<String>) :
      * Bind & display header or transaction.
      */
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-        val matchResult = regex.find(logLines[position])
-        val (timestamp, source1, source2, level, log) = matchResult!!.destructured
-        (holder as LogViewHolder).bind(
-            timestamp,
-            source1,
-            source2,
-            level,
-            log,
-            position == (logLines.size - 1)
-        )
+        if (regex.matches(logLines[position])) {
+            val matchResult = regex.find(logLines[position])
+            val (timestamp, source1, source2, level, log) = matchResult!!.destructured
+            (holder as LogViewHolder).bind(
+                timestamp,
+                source1,
+                source2,
+                level,
+                log,
+                position == (logLines.size - 1)
+            )
+        } else {
+            (holder as LogViewHolder).bind(
+                logLines[position],
+                position == (logLines.size - 1)
+            )
+        }
     }
 
 }

@@ -40,7 +40,7 @@ import butterknife.ButterKnife
 import com.tari.android.wallet.R
 
 /**
- * Log view holder class.
+ * Displays individual logs.
  *
  * @author The Tari Development Team
  */
@@ -48,24 +48,35 @@ class LogViewHolder(view: View) : RecyclerView.ViewHolder(view) {
 
     @BindView(R.id.log_item_txt_timestamp)
     lateinit var timestampTextView: TextView
-
     @BindView(R.id.log_item_txt_source_1)
     lateinit var source1TextView: TextView
-
     @BindView(R.id.log_item_txt_source_2)
     lateinit var source2TextView: TextView
-
     @BindView(R.id.log_item_txt_level)
     lateinit var levelTextView: TextView
-
     @BindView(R.id.log_item_txt_log)
     lateinit var logTextView: TextView
-
     @BindView(R.id.log_item_vw_bottom_spacer)
     lateinit var bottomSpacer: View
 
     init {
         ButterKnife.bind(this, view)
+    }
+
+    fun bind(
+        log: String,
+        isLast: Boolean = false
+    ) {
+        timestampTextView.visibility = View.GONE
+        source1TextView.visibility = View.GONE
+        source2TextView.visibility = View.GONE
+        levelTextView.visibility = View.GONE
+        logTextView.text = log.trim()
+        // bottom spacer
+        bottomSpacer.visibility = when (isLast) {
+            true -> View.VISIBLE
+            else -> View.GONE
+        }
     }
 
     fun bind(

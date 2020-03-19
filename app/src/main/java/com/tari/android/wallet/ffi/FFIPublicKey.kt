@@ -60,7 +60,7 @@ internal class FFIPublicKey constructor(pointer: FFIPublicKeyPtr) : FFIBase() {
         libError: FFIError
     ): String
 
-    private external fun jniGetEmojiPublicKey(emoji: String,libError: FFIError): FFIPublicKeyPtr
+    private external fun jniGetEmojiPublicKey(emoji: String, libError: FFIError): FFIPublicKeyPtr
 
     private external fun jniFromPrivateKey(
         privateKeyPtr: FFIPrivateKeyPtr,
@@ -91,10 +91,9 @@ internal class FFIPublicKey constructor(pointer: FFIPublicKeyPtr) : FFIBase() {
         }
     }
 
-    constructor(emoji: String) : this(nullptr)
-    {
+    constructor(emoji: String) : this(nullptr) {
         val error = FFIError()
-        ptr = jniGetEmojiPublicKey(emoji,error)
+        ptr = jniGetEmojiPublicKey(emoji, error)
         throwIf(error)
     }
 

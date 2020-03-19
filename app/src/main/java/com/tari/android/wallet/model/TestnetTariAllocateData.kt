@@ -36,6 +36,8 @@ import com.google.gson.annotations.SerializedName
 
 /**
  * Allocate testnet tari request and response class.
+ *
+ * @author The Tari Development Team
  */
 data class TestnetTariAllocateRequest constructor(val signature: String, @SerializedName("public_nonce") val public_nonce: String)
 

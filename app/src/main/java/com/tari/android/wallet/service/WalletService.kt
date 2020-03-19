@@ -77,6 +77,7 @@ class WalletService : Service(), FFIWalletListenerAdapter {
      * Service stub implementation.
      */
     private val serviceImpl = TariWalletServiceImpl()
+
     /**
      * Registered listeners.
      */
@@ -807,6 +808,39 @@ class WalletService : Service(), FFIWalletListenerAdapter {
                 mapThrowableIntoError(throwable, error)
             }
         }
+
+        /**
+         * @return public key constructed from input emoji id. Null if the emoji id is invalid
+         * or it does not correspond to a public key.
+         */
+        override fun getPublicKeyFromEmojiId(emojiId: String?): PublicKey? {
+            try {
+                FFIPublicKey(emojiId ?: "").run {
+                    val publicKey = publicKeyFromFFI(this)
+                    destroy()
+                    return publicKey
+                }
+            } catch (ignored: Throwable) {
+                return null
+            }
+        }
+
+        /**
+         * @return public key constructed from input public key hex string id. Null if the emoji id
+         * is invalid or it does not correspond to a public key.
+         */
+        override fun getPublicKeyFromHexString(publicKeyHex: String?): PublicKey? {
+            try {
+                FFIPublicKey(HexString(publicKeyHex ?: "")).run {
+                    val publicKey = publicKeyFromFFI(this)
+                    destroy()
+                    return publicKey
+                }
+            } catch (ignored: Throwable) {
+                return null
+            }
+        }
+
         // endregion
     }
 }

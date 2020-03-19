@@ -32,19 +32,25 @@
  */
 package com.tari.android.wallet.ui.activity.tx
 
+import android.animation.Animator
+import android.animation.AnimatorListenerAdapter
+import android.animation.AnimatorSet
+import android.animation.ValueAnimator
 import android.annotation.SuppressLint
-import android.content.ComponentName
-import android.content.Context
-import android.content.Intent
-import android.content.ServiceConnection
+import android.content.*
 import android.os.Bundle
 import android.os.IBinder
 import android.view.View
 import android.view.inputmethod.EditorInfo
+import android.widget.HorizontalScrollView
 import android.widget.ImageView
 import android.widget.LinearLayout
+import android.widget.TextView
 import androidx.constraintlayout.widget.Group
+import androidx.core.content.ContextCompat
 import butterknife.*
+import com.daasuu.ei.Ease
+import com.daasuu.ei.EasingInterpolator
 import com.orhanobut.logger.Logger
 import com.tari.android.wallet.R
 import com.tari.android.wallet.event.Event
@@ -63,6 +69,10 @@ import com.tari.android.wallet.ui.extension.setTextSizePx
 import com.tari.android.wallet.ui.util.UiUtil
 import com.tari.android.wallet.util.WalletUtil
 import com.tari.android.wallet.extension.txFormattedDate
+import com.tari.android.wallet.util.Constants
+import com.tari.android.wallet.util.EmojiUtil
+import com.tari.android.wallet.util.SharedPrefsWrapper
+import me.everything.android.ui.overscroll.OverScrollDecoratorHelper
 import org.matomo.sdk.Tracker
 import org.matomo.sdk.extra.TrackHelper
 import java.util.*
@@ -120,13 +130,38 @@ internal class TxDetailActivity :
     lateinit var txIdTextView: CustomFontTextView
     @BindView(R.id.tx_detail_vw_contact_container)
     lateinit var contactContainerView: View
-    @BindView(R.id.tx_detail_vw_emoji_summary)
-    lateinit var emojiSummaryView: View
+    @BindView(R.id.tx_detail_vw_emoji_id_summary_container)
+    lateinit var emojiIdSummaryContainerView: View
+    @BindView(R.id.tx_detail_vw_emoji_id_summary)
+    lateinit var emojiIdSummaryView: View
     @BindView(R.id.tx_detail_txt_note_label)
     lateinit var noteLabelView: View
     @BindView(R.id.tx_detail_vw_tx_fee_group)
     lateinit var txFeeGroup: Group
+    /**
+     * Dimmers.
+     */
+    @BindViews(
+        R.id.tx_detail_vw_top_dimmer,
+        R.id.tx_detail_vw_bottom_dimmer
+    )
+    lateinit var dimmerViews: List<@JvmSuppressWildcards View>
+    @BindView(R.id.tx_detail_vw_emoji_id_container)
+    lateinit var emojiIdContainerView: View
+    @BindView(R.id.tx_detail_vw_full_emoji_id_container)
+    lateinit var fullEmojiIdContainerView: View
+    @BindView(R.id.tx_detail_scroll_full_emoji_id)
+    lateinit var fullEmojiIdScrollView: HorizontalScrollView
+    @BindView(R.id.tx_detail_txt_full_emoji_id)
+    lateinit var fullEmojiIdTextView: TextView
+    @BindView(R.id.tx_detail_vw_copy_emoji_id_container)
+    lateinit var copyEmojiIdButtonContainerView: View
 
+    /**
+     * Emoji id chunk separator char.
+     */
+    @BindString(R.string.emoji_id_chunk_separator_char)
+    lateinit var emojiIdChunkSeparator: String
     @JvmField
     @BindString(R.string.tx_detail_payment_received)
     var paymentReceived = ""
@@ -156,9 +191,15 @@ internal class TxDetailActivity :
     @BindDimen(R.dimen.add_amount_leftmost_digit_margin_start)
     @JvmField
     var firstElementMarginStart = 0
+    @BindDimen(R.dimen.common_copy_emoji_id_button_visible_bottom_margin)
+    @JvmField
+    var copyEmojiIdButtonVisibleBottomMargin = 0
 
     @Inject
     lateinit var tracker: Tracker
+
+    @Inject
+    lateinit var sharedPrefsWrapper: SharedPrefsWrapper
 
     private var walletService: TariWalletService? = null
 
@@ -169,15 +210,14 @@ internal class TxDetailActivity :
     private var currentAmountGemSize = 0f
     private var elementMarginStart = 0
 
-    private var tx: Tx? = null
+    private lateinit var tx: Tx
     private lateinit var emojiIdSummaryController: EmojiIdSummaryViewController
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         overridePendingTransition(R.anim.enter_from_right, R.anim.exit_to_left)
-        emojiIdSummaryController = EmojiIdSummaryViewController(emojiSummaryView)
-        tx = intent.getParcelableExtra(TX_DETAIL_EXTRA_KEY)
-        if (tx == null) finish()
+        emojiIdSummaryController = EmojiIdSummaryViewController(emojiIdSummaryView)
+        tx = intent.getParcelableExtra(TX_DETAIL_EXTRA_KEY) as Tx
         setupUI()
 
         TrackHelper.track()
@@ -230,29 +270,29 @@ internal class TxDetailActivity :
 
         txPaymentStateTextView.text = when (tx) {
             is CompletedTx -> {
-                when (tx!!.direction) {
+                when (tx.direction) {
                     Tx.Direction.INBOUND -> paymentReceived
                     Tx.Direction.OUTBOUND -> paymentSent
                 }
             }
             is PendingInboundTx -> pendingPaymentReceived
             is PendingOutboundTx -> pendingPaymentSent
-            else -> ""
+            else -> throw RuntimeException("Unexpected transaction type for transaction: " + tx.id)
         }
 
-        val timestamp = tx!!.timestamp.toLong() * 1000
+        val timestamp = tx.timestamp.toLong() * 1000
         txDateTextView.text = Date(timestamp).txFormattedDate()
-        txAmountTextView.text = WalletUtil.amountFormatter.format(tx!!.amount.tariValue)
+        txAmountTextView.text = WalletUtil.amountFormatter.format(tx.amount.tariValue)
 
-        emojiIdSummaryController.display(tx!!.user.publicKey.emojiId)
+        emojiIdSummaryController.display(tx.user.publicKey.emojiId)
 
-        txIdTextView.text = "${getString(R.string.tx_detail_transaction_id)}:${tx!!.id}"
-        if (tx!!.message.isBlank()) {
+        txIdTextView.text = "${getString(R.string.tx_detail_transaction_id)}:${tx.id}"
+        if (tx.message.isBlank()) {
             noteLabelView.visibility = View.INVISIBLE
         }
-        txNoteTv.text = tx!!.message
+        txNoteTv.text = tx.message
         backArrowImageView.setOnClickListener { onBackPressed() }
-        val user = tx!!.user
+        val user = tx.user
         if (user is Contact) {
             contactContainerView.visibility = View.VISIBLE
             setUIAlias(user.alias)
@@ -268,6 +308,17 @@ internal class TxDetailActivity :
             txFeeGroup.visibility = View.GONE
         }
         amountContainer.post { scaleDownAmountTextViewIfRequired() }
+
+        OverScrollDecoratorHelper.setUpOverScroll(fullEmojiIdScrollView)
+        fullEmojiIdTextView.text = EmojiUtil.getChunkedEmojiId(
+            tx.user.publicKey.emojiId,
+            emojiIdChunkSeparator
+        )
+        fullEmojiIdContainerView.visibility = View.GONE
+        dimmerViews.forEach { dimmerView ->
+            dimmerView.visibility = View.GONE
+        }
+        copyEmojiIdButtonContainerView.visibility = View.GONE
     }
 
     /**
@@ -296,6 +347,149 @@ internal class TxDetailActivity :
         txAmountTextView.setTextSizePx(currentTextSize)
     }
 
+    @OnClick(R.id.tx_detail_vw_emoji_id_summary_container)
+    fun onEmojiSummaryClicked(view: View) {
+        UiUtil.temporarilyDisableClick(view)
+        showFullEmojiId()
+    }
+
+    private fun showFullEmojiId() {
+        // prepare views
+        emojiIdSummaryContainerView.visibility = View.INVISIBLE
+        dimmerViews.forEach { dimmerView ->
+            dimmerView.alpha = 0f
+            dimmerView.visibility = View.VISIBLE
+        }
+        val fullEmojiIdInitialWidth = emojiIdSummaryContainerView.width
+        val fullEmojiIdDeltaWidth = emojiIdContainerView.width - fullEmojiIdInitialWidth
+        UiUtil.setWidth(
+            fullEmojiIdContainerView,
+            fullEmojiIdInitialWidth
+        )
+        fullEmojiIdContainerView.alpha = 0f
+        fullEmojiIdContainerView.visibility = View.VISIBLE
+        // scroll to end
+        fullEmojiIdScrollView.post {
+            fullEmojiIdScrollView.scrollTo(
+                fullEmojiIdTextView.width - fullEmojiIdScrollView.width,
+                0
+            )
+        }
+        copyEmojiIdButtonContainerView.alpha = 0f
+        copyEmojiIdButtonContainerView.visibility = View.VISIBLE
+        UiUtil.setBottomMargin(
+            copyEmojiIdButtonContainerView,
+            0
+        )
+        // animate full emoji id view
+        val emojiIdAnim = ValueAnimator.ofFloat(0f, 1f)
+        emojiIdAnim.addUpdateListener { valueAnimator: ValueAnimator ->
+            val value = valueAnimator.animatedValue as Float
+            // display overlay dimmers
+            dimmerViews.forEach { dimmerView ->
+                dimmerView.alpha = value * 0.6f
+            }
+            // container alpha & scale
+            fullEmojiIdContainerView.alpha = value
+            fullEmojiIdContainerView.scaleX = 1f + 0.2f * (1f - value)
+            fullEmojiIdContainerView.scaleY = 1f + 0.2f * (1f - value)
+            UiUtil.setWidth(
+                fullEmojiIdContainerView,
+                (fullEmojiIdInitialWidth + fullEmojiIdDeltaWidth * value).toInt()
+            )
+        }
+        emojiIdAnim.duration = Constants.UI.shortDurationMs
+        // copy emoji id button anim
+        val copyEmojiIdButtonAnim = ValueAnimator.ofFloat(0f, 1f)
+        copyEmojiIdButtonAnim.addUpdateListener { valueAnimator: ValueAnimator ->
+            val value = valueAnimator.animatedValue as Float
+            copyEmojiIdButtonContainerView.alpha = value
+            UiUtil.setBottomMargin(
+                copyEmojiIdButtonContainerView,
+                (copyEmojiIdButtonVisibleBottomMargin * value).toInt()
+            )
+        }
+        copyEmojiIdButtonAnim.duration = Constants.UI.shortDurationMs
+        copyEmojiIdButtonAnim.interpolator = EasingInterpolator(Ease.BACK_OUT)
+
+        // chain anim.s and start
+        val animSet = AnimatorSet()
+        animSet.playSequentially(emojiIdAnim, copyEmojiIdButtonAnim)
+        animSet.start()
+        // scroll animation
+        fullEmojiIdScrollView.postDelayed({
+            fullEmojiIdScrollView.smoothScrollTo(0, 0)
+        }, Constants.UI.shortDurationMs + 20)
+    }
+
+    private fun hideFullEmojiId() {
+        fullEmojiIdScrollView.smoothScrollTo(0, 0)
+        emojiIdSummaryContainerView.visibility = View.VISIBLE
+        // copy emoji id button anim
+        val copyEmojiIdButtonAnim = ValueAnimator.ofFloat(1f, 0f)
+        copyEmojiIdButtonAnim.addUpdateListener { valueAnimator: ValueAnimator ->
+            val value = valueAnimator.animatedValue as Float
+            copyEmojiIdButtonContainerView.alpha = value
+            UiUtil.setBottomMargin(
+                copyEmojiIdButtonContainerView,
+                (copyEmojiIdButtonVisibleBottomMargin * value).toInt()
+            )
+        }
+        // emoji id anim
+        val fullEmojiIdInitialWidth = emojiIdContainerView.width
+        val fullEmojiIdDeltaWidth = emojiIdSummaryContainerView.width - emojiIdContainerView.width
+        val emojiIdAnim = ValueAnimator.ofFloat(0f, 1f)
+        emojiIdAnim.addUpdateListener { valueAnimator: ValueAnimator ->
+            val value = valueAnimator.animatedValue as Float
+            // hide overlay dimmers
+            dimmerViews.forEach { dimmerView ->
+                dimmerView.alpha = (1 - value) * 0.6f
+            }
+            // container alpha & scale
+            fullEmojiIdContainerView.alpha = (1 - value)
+            UiUtil.setWidth(
+                fullEmojiIdContainerView,
+                (fullEmojiIdInitialWidth + fullEmojiIdDeltaWidth * value).toInt()
+            )
+        }
+        // chain anim.s and start
+        val animSet = AnimatorSet()
+        animSet.playSequentially(copyEmojiIdButtonAnim, emojiIdAnim)
+        animSet.start()
+        animSet.addListener(object : AnimatorListenerAdapter() {
+            override fun onAnimationEnd(animation: Animator?) {
+                dimmerViews.forEach { dimmerView ->
+                    dimmerView.visibility = View.GONE
+                }
+                fullEmojiIdContainerView.visibility = View.GONE
+                copyEmojiIdButtonContainerView.visibility = View.GONE
+            }
+        })
+    }
+
+    @OnClick(R.id.tx_detail_btn_copy_emoji_id)
+    fun onCopyEmojiIdButtonClicked(view: View) {
+        val deepLink = WalletUtil.getDeepLink(tx.user.publicKey.emojiId)
+        val clipBoard = ContextCompat.getSystemService(this, ClipboardManager::class.java)
+        val deepLinkClipboardData = ClipData.newPlainText(
+            "Tari Wallet Deep Link",
+            deepLink
+        )
+        clipBoard?.setPrimaryClip(deepLinkClipboardData)
+        hideFullEmojiId()
+    }
+
+    /**
+     * Dimmer clicked - hide dimmers.
+     */
+    @OnClick(
+        R.id.tx_detail_vw_top_dimmer,
+        R.id.tx_detail_vw_bottom_dimmer
+    )
+    fun onDimmerViewsClicked() {
+        hideFullEmojiId()
+    }
+
     @OnEditorAction(R.id.tx_detail_edit_create_contact)
     fun onContactEditTextEditAction(actionId: Int): Boolean {
         if (actionId == EditorInfo.IME_ACTION_DONE) {
@@ -316,14 +510,14 @@ internal class TxDetailActivity :
         }
         val error = WalletError()
         walletService?.updateContactAlias(
-            tx!!.user.publicKey,
+            tx.user.publicKey,
             newAlias,
             error
         )
         if (error.code == WalletErrorCode.NO_ERROR) {
             EventBus.post(
                 Event.Contact.ContactAddedOrUpdated(
-                    tx!!.user.publicKey,
+                    tx.user.publicKey,
                     newAlias
                 )
             )
@@ -371,7 +565,7 @@ internal class TxDetailActivity :
         editContactLabelTextView.visibility = View.INVISIBLE
         contactEditText.visibility = View.VISIBLE
         focusContactEditText()
-        val user = tx!!.user
+        val user = tx.user
         if (user is Contact) {
             contactEditText.setText(user.alias)
         }
