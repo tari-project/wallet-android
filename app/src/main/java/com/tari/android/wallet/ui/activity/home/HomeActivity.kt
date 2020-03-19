@@ -92,7 +92,6 @@ import kotlin.math.min
  *
  * @author The Tari Development Team
  */
-
 internal class HomeActivity : BaseActivity(),
     ServiceConnection,
     SwipeRefreshLayout.OnRefreshListener,
@@ -400,6 +399,11 @@ internal class HomeActivity : BaseActivity(),
                 wr.get()?.onSendTxSuccessful()
             }
         }
+        EventBus.subscribe<Event.Wallet.DiscoveryComplete>(this) {
+            wr.get()?.rootView?.post {
+                updateAllDataAndUI(restartBalanceUI = false)
+            }
+        }
         EventBus.subscribe<Event.Testnet.TestnetTariRequestSuccessful>(this) { event ->
             wr.get()?.rootView?.post {
                 wr.get()?.testnetTariRequestSuccessful(event.senderPublicKey)
@@ -455,7 +459,7 @@ internal class HomeActivity : BaseActivity(),
             // balance info
             updateBalanceInfoData()
             // init list
-            wr.get()?.rootView?.post {
+            rootView.post {
                 wr.get()?.initializeTxListUI()
             }
         }
@@ -510,10 +514,6 @@ internal class HomeActivity : BaseActivity(),
         return true
     }
 
-    /**
-     * TODO
-     * Prepares the
-     */
     private fun initializeTxListUI() {
         if (txListIsEmpty && !sharedPrefsWrapper.onboardingDisplayedAtHome) {
             isOnboarding = true
@@ -525,10 +525,6 @@ internal class HomeActivity : BaseActivity(),
             playNonOnboardingStartupAnim()
             if (txListIsEmpty) {
                 showNoTxsTextView()
-                AsyncTask.execute {
-                    wr.get()?.requestTestnetTari()
-                }
-
             }
         }
     }

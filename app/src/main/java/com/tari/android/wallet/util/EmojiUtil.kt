@@ -61,6 +61,14 @@ private fun codePointHasEmojiProperty(codePoint: Int): Boolean {
 }
 
 /**
+ * @return true if the string is emoji-only and the length is equal to the emoji-id length
+ */
+internal fun String.isPossiblyEmojiId(): Boolean {
+    return !this.containsNonEmoji()
+            && this.numberOfEmojis() == Constants.Wallet.emojiIdLength
+}
+
+/**
  * Number of emojis in a string.
  */
 internal fun String.numberOfEmojis(): Int {
@@ -171,7 +179,8 @@ internal class EmojiUtil {
                 emojiIds.add(builder.toString())
                 previous = it.current()
             }
-            val startChunk = emojiIds.take(Constants.Wallet.emojiFormatterChunkSize).joinToString("")
+            val startChunk =
+                emojiIds.take(Constants.Wallet.emojiFormatterChunkSize).joinToString("")
 
             val middleChunkStartIndex =
                 Constants.Wallet.emojiIdLength / 2 - Constants.Wallet.emojiFormatterChunkSize / 2
@@ -180,7 +189,8 @@ internal class EmojiUtil {
                 middleChunkStartIndex + Constants.Wallet.emojiFormatterChunkSize
             ).joinToString("")
 
-            val endChunk = emojiIds.takeLast(Constants.Wallet.emojiFormatterChunkSize).joinToString("")
+            val endChunk =
+                emojiIds.takeLast(Constants.Wallet.emojiFormatterChunkSize).joinToString("")
 
             return startChunk + middleChunk + endChunk
         }
@@ -245,6 +255,24 @@ internal class EmojiUtil {
                 previous = it.current()
             }
             return newIndices
+        }
+
+        fun removeChunkSeparatorsFromEmojiId(
+            emojiId: String,
+            emojiIdChunkSeparator: String
+        ): String {
+            val cleanEmojiIdBuilder = StringBuilder(emojiId)
+            for ((offset, index) in getExistingChunkSeparatorIndices(
+                emojiId,
+                emojiIdChunkSeparator
+            ).withIndex()) {
+                val target = index - (offset * emojiIdChunkSeparator.length)
+                cleanEmojiIdBuilder.delete(
+                    target,
+                    target + emojiIdChunkSeparator.length
+                )
+            }
+            return cleanEmojiIdBuilder.toString()
         }
 
         fun getStartIndexOfItemEndingAtIndex(string: String, endIndex: Int): Int {

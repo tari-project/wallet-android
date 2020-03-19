@@ -43,6 +43,11 @@ import android.widget.TextView
 import com.tari.android.wallet.R
 import java.io.File
 
+/**
+ * Log file selector adapter - used in the debug log fragment.
+ *
+ * @author The Tari Development Team
+ */
 internal class LogFileSpinnerAdapter(context: Context, files: List<File>) :
     BaseAdapter(), SpinnerAdapter {
 

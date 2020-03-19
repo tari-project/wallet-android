@@ -45,6 +45,7 @@ import java.math.BigInteger
 class PendingInboundTx() : Tx(), Parcelable {
 
     var status = Status.PENDING
+
     constructor(
         id: BigInteger,
         user: User,

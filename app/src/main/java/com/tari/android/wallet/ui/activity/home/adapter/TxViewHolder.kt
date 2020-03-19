@@ -107,6 +107,7 @@ class TxViewHolder(view: View, listener: Listener) :
                 txUser.publicKey.emojiId
             )
         }
+
         // display message
         messageTextView.text = tx.message
         // display value

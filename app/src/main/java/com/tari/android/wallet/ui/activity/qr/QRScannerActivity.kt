@@ -30,7 +30,7 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.tari.android.wallet.ui.activity
+package com.tari.android.wallet.ui.activity.qr
 
 import android.Manifest
 import android.annotation.SuppressLint
@@ -46,6 +46,7 @@ import butterknife.OnClick
 import com.budiyev.android.codescanner.*
 import com.google.zxing.BarcodeFormat
 import com.tari.android.wallet.R
+import com.tari.android.wallet.ui.activity.BaseActivity
 import org.matomo.sdk.Tracker
 import org.matomo.sdk.extra.TrackHelper
 import javax.inject.Inject

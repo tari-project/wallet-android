@@ -136,6 +136,13 @@ internal object UiUtil {
         return layoutParams.bottomMargin
     }
 
+    fun getStartMargin(
+        @NonNull view: View
+    ): Int {
+        val layoutParams = view.layoutParams as ViewGroup.MarginLayoutParams
+        return layoutParams.marginStart
+    }
+
     fun setStartMargin(
         @NonNull view: View,
         @NonNull newMargin: Int

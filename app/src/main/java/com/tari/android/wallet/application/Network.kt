@@ -30,11 +30,22 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.tari.android.wallet.model
+package com.tari.android.wallet.application
 
 /**
- * QR scan result model class.
- *
- * @author The Tari Development Team
+ * Tari network.
  */
-data class QRScanData(val publicKey: String, val emojiId: String)
+enum class Network(val uriComponent: String) {
+    MAINNET("mainnet"),
+    TESTNET_1("rincewind");
+
+    companion object {
+        fun from(uriComponent: String): Network {
+            return when (uriComponent) {
+                MAINNET.uriComponent -> MAINNET
+                TESTNET_1.uriComponent -> TESTNET_1
+                else -> throw RuntimeException("Unknown network: $uriComponent")
+            }
+        }
+    }
+}

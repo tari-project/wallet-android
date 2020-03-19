@@ -65,19 +65,14 @@ class SendTxSuccessfulFragment : BaseFragment(), Animator.AnimatorListener {
 
     @BindView(R.id.send_tx_successful_vw_root)
     lateinit var rootView: View
-
     @BindView(R.id.send_tx_successful_anim)
     lateinit var lottieAnimationView: LottieAnimationView
-
     @BindView(R.id.send_tx_successful_txt_info)
     lateinit var infoTextView: TextView
-
     @BindView(R.id.send_tx_successful_vw_info_container)
     lateinit var infoContainerView: View
-
     @BindString(R.string.send_tx_sucessful_info_format)
     lateinit var infoFormat: String
-
     @BindString(R.string.send_tx_sucessful_info_format_bold_part)
     lateinit var infoFormatBoldPart: String
 

@@ -78,4 +78,12 @@ interface TariWalletService {
 
     void updateContactAlias(in PublicKey contactPublicKey, in String contactAlias, out WalletError error);
 
+    /**
+    * Two functions below to get the public key from emoji id and public key hex string
+    * do not accept out error parameters - they will just return null if a public key
+    * cannot be constructed from input parameters.
+    */
+    PublicKey getPublicKeyFromEmojiId(in String emojiId);
+    PublicKey getPublicKeyFromHexString(in String publicKeyHex);
+
 }

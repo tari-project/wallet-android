@@ -32,6 +32,8 @@
  */
 package com.tari.android.wallet.util
 
+import com.tari.android.wallet.application.Network
+
 /**
  * Contains application-wide constant values.
  *
@@ -74,7 +76,6 @@ internal object Constants {
         object CreateEmojiId {
             const val helloTextAnimDurationMs = 800L
             const val whiteBgAnimDurationMs = 1000L
-            const val whiteBgAnimDelayMs = 200L
             const val titleShortAnimDelayMs = 40L
             const val createEmojiButtonAnimDelayMs = 300L
             const val awesomeTextAnimDurationMs = 600L
@@ -136,11 +137,12 @@ internal object Constants {
      * Wallet constants.
      */
     object Wallet {
+        val network = Network.TESTNET_1
         const val emojiIdLength = 33
-        const val emojiFormatterChunkSize = 4
+        const val emojiFormatterChunkSize = 3
         const val walletDBName: String = "tari_wallet_db"
         const val faucetServerUrl = "https://faucet.tari.com"
-        const val QRDeepLinkURL = "tari://testnet"
+        const val deepLinkURLPrefix = "tari://"
         // base node
         const val baseNodePublicKeyHex = "2e93c460df49d8cfbbf7a06dd9004c25a84f92584f7d0ac5e30bd8e0beee9a43"
         const val baseNodeAddress = "/onion3/nuuq3e2olck22rudimovhmrdwkmjncxvwdgbvfxhz6myzcnx2j4rssyd:18141"

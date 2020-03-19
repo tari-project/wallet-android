@@ -50,6 +50,8 @@ import butterknife.OnClick
 import com.orhanobut.logger.Logger
 import com.tari.android.wallet.R
 import com.tari.android.wallet.auth.AuthUtil
+import com.tari.android.wallet.extension.applyFontStyle
+import com.tari.android.wallet.ui.component.CustomFont
 import com.tari.android.wallet.ui.component.CustomFontButton
 import com.tari.android.wallet.ui.component.CustomFontTextView
 import com.tari.android.wallet.ui.fragment.BaseFragment
@@ -67,32 +69,24 @@ import javax.inject.Inject
  */
 internal class LocalAuthFragment : BaseFragment() {
 
+    enum class AuthType {
+        BIOMETRIC,
+        PIN,
+        NONE
+    }
+
     @BindView(R.id.local_auth_vw_root)
     lateinit var rootView: FrameLayout
     @BindView(R.id.local_auth_btn_enable_auth)
     lateinit var enableAuthButton: CustomFontButton
     @BindView(R.id.local_auth_img_auth)
     lateinit var authTypeImageView: ImageView
-    @BindView(R.id.auth_prompt_title_text_label_1)
-    lateinit var titleLabel1TextView: TextView
-    @BindView(R.id.local_auth_title_container)
-    lateinit var authTitleTextContainer: LinearLayout
+    @BindView(R.id.local_auth_prompt_text)
+    lateinit var promptTextView: TextView
     @BindView(R.id.local_auth_txt_auth_desc)
     lateinit var authDescTextView: CustomFontTextView
     @BindView(R.id.local_auth_img_small_gem)
     lateinit var smallGemImageView: ImageView
-    @BindView(R.id.local_auth_vw_auth_success_anim_container)
-    lateinit var touchIdPromptContainer: FrameLayout
-    @BindView(R.id.local_auth_vw_auth_success_bg)
-    lateinit var authVerifyPromptBg: View
-    @BindView(R.id.local_auth_vw_auth_success)
-    lateinit var authVerifyPrompt: RelativeLayout
-    @BindView(R.id.local_auth_txt_title_auth_type)
-    lateinit var titleAuthTypeTextView: TextView
-    @BindView(R.id.local_auth_img_auth_success_auth_type_image)
-    lateinit var authSuccessAuthTypeImageView: ImageView
-    @BindView(R.id.local_auth_prompt_auth_type_title)
-    lateinit var authSuccessAuthTypeTitleTextView: TextView
 
     @BindDimen(R.dimen.auth_button_bottom_margin)
     @JvmField
@@ -102,32 +96,32 @@ internal class LocalAuthFragment : BaseFragment() {
     lateinit var buttonTouchIdAuthFormat: String
     @BindString(R.string.auth_prompt_button_text)
     lateinit var buttonPinAuthFormat: String
-    @BindString(R.string.auth_prompt_touch_id_title_text_label_1)
-    lateinit var touchIdTitleTextLabel: String
-    @BindString(R.string.auth_prompt_pin_title_text_label_1)
-    lateinit var pinTitleTextLabel: String
-    @BindString(R.string.auth_prompt_touch_id)
-    lateinit var authTouchId: String
-    @BindString(R.string.auth_prompt_pin)
-    lateinit var authPin: String
     @BindString(R.string.auth_prompt_touch_id_desc)
     lateinit var authTouchIdDesc: String
     @BindString(R.string.auth_prompt_pin_desc)
     lateinit var authPinDesc: String
+    @BindString(R.string.auth_prompt_device_lock_code)
+    lateinit var deviceLockCodePrompt: String
+    @BindString(R.string.auth_prompt_device_lock_code_bold_part)
+    lateinit var deviceLockCodePromptBoldPart: String
+    @BindString(R.string.auth_prompt_biometrics)
+    lateinit var biometricsPrompt: String
+    @BindString(R.string.auth_prompt_biometrics_bold_part)
+    lateinit var biometricsPromptBoldPart: String
 
     @Inject
     lateinit var sharedPrefsWrapper: SharedPrefsWrapper
     @Inject
     lateinit var tracker: Tracker
 
-    private var authType: AuthType = AuthType.None
-
+    private var authType: AuthType = AuthType.NONE
     private var listener: Listener? = null
 
     override val contentViewId = R.layout.fragment_local_auth
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
         setDeviceAuthType()
         setupUi()
 
@@ -162,13 +156,13 @@ internal class LocalAuthFragment : BaseFragment() {
     private fun setDeviceAuthType() {
         authType = when {
             BiometricManager.from(context!!).canAuthenticate() == BIOMETRIC_SUCCESS -> {
-                AuthType.Biometric
+                AuthType.BIOMETRIC
             }
             AuthUtil.isDeviceSecured(context!!) -> {
-                AuthType.Pin
+                AuthType.PIN
             }
             else -> {
-                AuthType.None
+                AuthType.NONE
             }
         }
     }
@@ -180,34 +174,41 @@ internal class LocalAuthFragment : BaseFragment() {
         animatorSet.addListener(object : AnimatorListenerAdapter() {
             override fun onAnimationEnd(animation: Animator?) {
                 super.onAnimationEnd(animation)
-                if (authType == AuthType.None) {
+                if (authType == AuthType.NONE) {
                     displayAuthNotAvailableDialog()
                     return
                 }
-                startAuthVerifyAnim(true)
+                doAuth()
             }
         })
     }
 
     private fun setupUi() {
-        if (authType == AuthType.Biometric) {
+        val mActivity = activity ?: return
+        if (authType == AuthType.BIOMETRIC) {
             //setup ui for fingerprint auth
-            titleLabel1TextView.text = touchIdTitleTextLabel
-            titleAuthTypeTextView.text = authTouchId
+            promptTextView.text = biometricsPrompt.applyFontStyle(
+                mActivity,
+                CustomFont.AVENIR_LT_STD_LIGHT,
+                biometricsPromptBoldPart,
+                CustomFont.AVENIR_LT_STD_BLACK,
+                applyToOnlyFirstOccurence = true
+            )
             enableAuthButton.text = buttonTouchIdAuthFormat
             authDescTextView.text = authTouchIdDesc
             authTypeImageView.setImageResource(R.drawable.fingerprint)
-            authSuccessAuthTypeImageView.setImageResource(R.drawable.fingerprint)
-            authSuccessAuthTypeTitleTextView.text = authTouchId
         } else {
             //setup ui for pin or password auth
-            titleLabel1TextView.text = pinTitleTextLabel
-            titleAuthTypeTextView.text = authPin
+            promptTextView.text = deviceLockCodePrompt.applyFontStyle(
+                mActivity,
+                CustomFont.AVENIR_LT_STD_LIGHT,
+                deviceLockCodePromptBoldPart,
+                CustomFont.AVENIR_LT_STD_BLACK,
+                applyToOnlyFirstOccurence = true
+            )
             enableAuthButton.text = buttonPinAuthFormat
             authDescTextView.text = authPinDesc
             authTypeImageView.setImageResource(R.drawable.numpad)
-            authSuccessAuthTypeImageView.setImageResource(R.drawable.numpad)
-            authSuccessAuthTypeTitleTextView.text = authPin
         }
     }
 
@@ -217,10 +218,10 @@ internal class LocalAuthFragment : BaseFragment() {
         val buttonAnim: ObjectAnimator =
             ObjectAnimator.ofFloat(enableAuthButton, View.TRANSLATION_Y, 0f, offset)
 
-        val titleOffset = -(authTitleTextContainer.height).toFloat()
+        val titleOffset = -(promptTextView.height).toFloat()
         val titleTextAnim =
             ObjectAnimator.ofFloat(
-                authTitleTextContainer,
+                promptTextView,
                 View.TRANSLATION_Y,
                 0f,
                 titleOffset
@@ -243,78 +244,6 @@ internal class LocalAuthFragment : BaseFragment() {
         anim.start()
     }
 
-    private fun startAuthVerifyAnim(showAuthVerifyView: Boolean) {
-        touchIdPromptContainer.visibility = View.VISIBLE
-        val touchIdBgFadeInAnim = ValueAnimator.ofFloat(0f, 1f)
-        touchIdBgFadeInAnim.addUpdateListener { valueAnimator: ValueAnimator ->
-            val alpha = valueAnimator.animatedValue as Float
-            authVerifyPromptBg.alpha = alpha
-        }
-        touchIdBgFadeInAnim.duration = Auth.touchIdPromptDurationMs
-
-        val touchIdPromptFadeInAnim = ValueAnimator.ofFloat(0f, 1f)
-        touchIdPromptFadeInAnim.addUpdateListener { valueAnimator: ValueAnimator ->
-            val alpha = valueAnimator.animatedValue as Float
-            authVerifyPrompt.alpha = alpha
-        }
-
-        touchIdPromptFadeInAnim.startDelay = Auth.touchIdPromptFadeInAnimDelayDuration
-        touchIdPromptFadeInAnim.duration = Auth.touchIdPromptDurationMs
-
-        val touchIdPromptFadeOutAnim = ValueAnimator.ofFloat(1f, 0f)
-        touchIdPromptFadeOutAnim.addUpdateListener { valueAnimator: ValueAnimator ->
-            val alpha = valueAnimator.animatedValue as Float
-            authVerifyPrompt.alpha = alpha
-        }
-
-        touchIdPromptFadeOutAnim.startDelay = Auth.touchIdPromptFadeOutAnimDelayDuration
-        touchIdPromptFadeOutAnim.duration = Auth.touchIdPromptDurationMs
-
-
-        val touchIdBgFadeOutAnim = ValueAnimator.ofFloat(1f, 0f)
-        touchIdBgFadeOutAnim.addUpdateListener { valueAnimator: ValueAnimator ->
-            val alpha = valueAnimator.animatedValue as Float
-            authVerifyPromptBg.alpha = alpha
-        }
-        touchIdBgFadeOutAnim.duration = Auth.touchIdPromptDurationMs
-
-        val fadeoutAnim = ValueAnimator.ofFloat(1f, 0f)
-        fadeoutAnim.addUpdateListener { valueAnimator: ValueAnimator ->
-            val alpha = valueAnimator.animatedValue as Float
-            authDescTextView.alpha = alpha
-            enableAuthButton.alpha = alpha
-            authTypeImageView.alpha = alpha
-            authTitleTextContainer.alpha = alpha
-            authTypeImageView.alpha = alpha
-            smallGemImageView.alpha = alpha
-        }
-
-        fadeoutAnim.startDelay = Auth.viewFadeAnimDelayMs
-        fadeoutAnim.duration = Auth.touchIdPromptDurationMs
-
-        val animatorSet = AnimatorSet()
-        if (showAuthVerifyView)
-            animatorSet.playSequentially(touchIdBgFadeInAnim, touchIdPromptFadeInAnim)
-        else {
-            authVerifyPrompt.alpha = 1f
-            authVerifyPromptBg.alpha = 1f
-            val fadeOutViews = AnimatorSet()
-            fadeOutViews.playTogether(touchIdBgFadeOutAnim, fadeoutAnim)
-            animatorSet.playSequentially(touchIdPromptFadeOutAnim, fadeOutViews)
-        }
-        animatorSet.addListener(object : AnimatorListenerAdapter() {
-            override fun onAnimationEnd(animation: Animator?) {
-                super.onAnimationEnd(animation)
-                if (showAuthVerifyView) {
-                    doAuth()
-                } else {
-                    authSuccess()
-                }
-            }
-        })
-        animatorSet.start()
-    }
-
     private fun doAuth() {
         // display authentication dialog
         val executor = ContextCompat.getMainExecutor(context)
@@ -331,7 +260,7 @@ internal class LocalAuthFragment : BaseFragment() {
                         BiometricPrompt.ERROR_USER_CANCELED -> authFailed()
                         BiometricPrompt.ERROR_CANCELED -> authFailed()
                         else -> {
-                            Logger.e("Other biometric error. Code: %d", errorCode)
+                            Logger.e("Other auth error. Code: %d", errorCode)
                             authFailed()
                         }
                     }
@@ -339,7 +268,8 @@ internal class LocalAuthFragment : BaseFragment() {
 
                 override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
                     super.onAuthenticationSucceeded(result)
-                    startAuthVerifyAnim(false)
+                    // startAuthVerifyAnim(false)
+                    authSuccess()
                 }
             })
         val promptInfo = BiometricPrompt.PromptInfo.Builder()
@@ -349,31 +279,13 @@ internal class LocalAuthFragment : BaseFragment() {
             .setDeviceCredentialAllowed(true)
             .build()
         biometricPrompt.authenticate(promptInfo)
-
-        hideAuthVerifyAnim()
-    }
-
-    /**
-     * Hide
-     */
-    private fun hideAuthVerifyAnim() {
-        val fadeoutAnim = ValueAnimator.ofFloat(1f, 0f)
-        fadeoutAnim.addUpdateListener { valueAnimator: ValueAnimator ->
-            val alpha = valueAnimator.animatedValue as Float
-            authVerifyPrompt.alpha = alpha
-            authVerifyPromptBg.alpha = alpha
-        }
-
-        fadeoutAnim.startDelay = Auth.viewFadeAnimDelayMs
-        fadeoutAnim.duration = Auth.viewFadeoutAnimMs
-        fadeoutAnim.start()
+        // hideAuthVerifyAnim()
     }
 
     /**
      * Auth has failed.
      */
     private fun authFailed() {
-
         // TODO decide what do if there's no auth at all.
         //  For now let's display an alert dialog indicating the error
         Logger.e("Authentication other error.")
@@ -382,7 +294,7 @@ internal class LocalAuthFragment : BaseFragment() {
         dialogBuilder.setMessage(getString(R.string.auth_failed_desc))
             .setCancelable(false)
             // negative button text and action
-            .setNegativeButton(getString(R.string.auth_prompt_cancel), null)
+            .setNegativeButton(getString(R.string.common_cancel), null)
 
         val alert = dialogBuilder.create()
         alert.setTitle(getString(R.string.auth_failed_title))
@@ -400,7 +312,7 @@ internal class LocalAuthFragment : BaseFragment() {
                 dialog.cancel()
                 authSuccess()
             }
-            .setNegativeButton(getString(R.string.auth_prompt_cancel), null)
+            .setNegativeButton(getString(R.string.common_cancel), null)
 
 
         val alert = dialogBuilder.create()
@@ -416,10 +328,4 @@ internal class LocalAuthFragment : BaseFragment() {
     interface Listener {
         fun onAuthSuccess()
     }
-}
-
-enum class AuthType {
-    Biometric,
-    Pin,
-    None
 }

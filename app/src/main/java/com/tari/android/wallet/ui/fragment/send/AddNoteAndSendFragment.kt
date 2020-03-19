@@ -34,6 +34,8 @@ package com.tari.android.wallet.ui.fragment.send
 
 import android.animation.*
 import android.annotation.SuppressLint
+import android.content.ClipData
+import android.content.ClipboardManager
 import android.content.Context
 import android.os.AsyncTask
 import android.os.Bundle
@@ -42,9 +44,11 @@ import android.text.InputType
 import android.text.TextWatcher
 import android.view.MotionEvent
 import android.view.View
+import android.view.ViewTreeObserver
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.*
+import androidx.core.content.ContextCompat
 import butterknife.*
 import com.daasuu.ei.Ease
 import com.daasuu.ei.EasingInterpolator
@@ -56,6 +60,8 @@ import com.tari.android.wallet.ui.fragment.BaseFragment
 import com.tari.android.wallet.ui.util.UiUtil
 import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.EmojiUtil
+import com.tari.android.wallet.util.WalletUtil
+import me.everything.android.ui.overscroll.OverScrollDecoratorHelper
 import org.matomo.sdk.Tracker
 import org.matomo.sdk.extra.TrackHelper
 import java.lang.Long.max
@@ -77,17 +83,19 @@ class AddNoteAndSendFragment(private val walletService: TariWalletService) : Bas
     @BindView(R.id.add_note_and_send_btn_back)
     lateinit var backButton: ImageButton
     @BindView(R.id.add_note_and_send_vw_emoji_id_summary_container)
-    lateinit var emojiIdContainerView: View
+    lateinit var emojiIdSummaryContainerView: View
     @BindView(R.id.add_note_and_send_vw_emoji_id_summary)
     lateinit var emojiIdSummaryView: View
-    @BindView(R.id.add_note_and_send_vw_full_emoji_container)
+    @BindView(R.id.add_note_and_send_vw_full_emoji_id_container)
     lateinit var fullEmojiIdContainerView: View
+    @BindView(R.id.add_note_and_send_scroll_full_emoji_id)
+    lateinit var fullEmojiIdScrollView: HorizontalScrollView
     @BindView(R.id.add_note_and_send_txt_full_emoji_id)
     lateinit var fullEmojiIdTextView: TextView
-
+    @BindView(R.id.add_note_and_send_vw_copy_emoji_id_container)
+    lateinit var copyEmojiIdButtonContainerView: View
     @BindView(R.id.add_note_and_send_edit_note)
     lateinit var noteEditText: EditText
-
     @BindView(R.id.add_note_and_send_vw_slide_button_container)
     lateinit var slideButtonContainerView: View
     @BindView(R.id.add_note_and_send_vw_slide_enabled_bg)
@@ -108,15 +116,11 @@ class AddNoteAndSendFragment(private val walletService: TariWalletService) : Bas
      */
     @BindString(R.string.emoji_id_chunk_separator_char)
     lateinit var emojiIdChunkSeparator: String
-
     /**
-     * Dimmers.
+     * Dimmer view.
      */
-    @BindViews(
-        R.id.add_note_and_send_vw_top_dimmer,
-        R.id.add_note_and_send_vw_bottom_dimmer
-    )
-    lateinit var dimmerViews: List<@JvmSuppressWildcards View>
+    @BindView(R.id.add_note_and_send_vw_dimmer)
+    lateinit var dimmerView: View
 
     @BindDimen(R.dimen.add_note_slide_button_left_margin)
     @JvmField
@@ -124,6 +128,12 @@ class AddNoteAndSendFragment(private val walletService: TariWalletService) : Bas
     @BindDimen(R.dimen.add_note_slide_button_width)
     @JvmField
     var slideViewWidth = 0
+    @BindDimen(R.dimen.common_horizontal_margin)
+    @JvmField
+    var horizontalMargin = 0
+    @BindDimen(R.dimen.common_copy_emoji_id_button_visible_bottom_margin)
+    @JvmField
+    var copyEmojiIdButtonVisibleBottomMargin = 0
 
     @BindColor(R.color.white)
     @JvmField
@@ -172,9 +182,8 @@ class AddNoteAndSendFragment(private val walletService: TariWalletService) : Bas
         fullEmojiIdContainerView.visibility = View.GONE
         displayAliasOrEmojiId()
         UiUtil.setProgressBarColor(progressBar, whiteColor)
-        dimmerViews.forEach {
-            it.visibility = View.GONE
-        }
+        hideFullEmojiId(animated = false)
+        OverScrollDecoratorHelper.setUpOverScroll(fullEmojiIdScrollView)
         noteEditText.addTextChangedListener(this)
         slideView.setOnTouchListener(this)
 
@@ -184,6 +193,25 @@ class AddNoteAndSendFragment(private val walletService: TariWalletService) : Bas
 
         noteEditText.imeOptions = EditorInfo.IME_ACTION_DONE
         noteEditText.setRawInputType(InputType.TYPE_CLASS_TEXT)
+
+        rootView.viewTreeObserver.addOnGlobalLayoutListener(
+            object : ViewTreeObserver.OnGlobalLayoutListener {
+                override fun onGlobalLayout() {
+                    rootView.viewTreeObserver.removeOnGlobalLayoutListener(this)
+                    UiUtil.setTopMargin(
+                        fullEmojiIdContainerView,
+                        emojiIdSummaryContainerView.top
+                    )
+                    UiUtil.setHeight(
+                        fullEmojiIdContainerView,
+                        emojiIdSummaryContainerView.height
+                    )
+                    UiUtil.setWidth(
+                        fullEmojiIdContainerView,
+                        emojiIdSummaryContainerView.width
+                    )
+                }
+            })
 
         TrackHelper.track()
             .screen("/home/send_tari/add_note")
@@ -203,7 +231,7 @@ class AddNoteAndSendFragment(private val walletService: TariWalletService) : Bas
 
     private fun displayAliasOrEmojiId() {
         if (recipientUser is Contact) {
-            emojiIdContainerView.visibility = View.GONE
+            emojiIdSummaryContainerView.visibility = View.GONE
             titleTextView.visibility = View.VISIBLE
             titleTextView.text = (recipientUser as Contact).alias
         } else {
@@ -215,7 +243,7 @@ class AddNoteAndSendFragment(private val walletService: TariWalletService) : Bas
     }
 
     private fun displayEmojiId(emojiId: String) {
-        emojiIdContainerView.visibility = View.VISIBLE
+        emojiIdSummaryContainerView.visibility = View.VISIBLE
         emojiIdSummaryController.display(emojiId)
         titleTextView.visibility = View.GONE
         // make chunks
@@ -244,28 +272,133 @@ class AddNoteAndSendFragment(private val walletService: TariWalletService) : Bas
      */
     @OnClick(R.id.add_note_and_send_vw_emoji_id_summary_container)
     fun emojiIdClicked() {
-        emojiIdContainerView.visibility = View.GONE
+        showFullEmojiId()
+    }
+
+    private fun showFullEmojiId() {
+        // prepare views
+        emojiIdSummaryContainerView.visibility = View.INVISIBLE
+        dimmerView.alpha = 0f
+        dimmerView.visibility = View.VISIBLE
+        val fullEmojiIdInitialWidth = emojiIdSummaryContainerView.width
+        val fullEmojiIdDeltaWidth = (rootView.width - horizontalMargin * 2) - fullEmojiIdInitialWidth
+        UiUtil.setWidth(
+            fullEmojiIdContainerView,
+            fullEmojiIdInitialWidth
+        )
+        fullEmojiIdContainerView.alpha = 0f
         fullEmojiIdContainerView.visibility = View.VISIBLE
-        backButton.visibility = View.INVISIBLE
-        dimmerViews.forEach {
-            it.visibility = View.VISIBLE
+        // scroll to end
+        fullEmojiIdScrollView.post {
+            fullEmojiIdScrollView.scrollTo(
+                fullEmojiIdTextView.width - fullEmojiIdScrollView.width,
+                0
+            )
         }
+        copyEmojiIdButtonContainerView.alpha = 0f
+        copyEmojiIdButtonContainerView.visibility = View.VISIBLE
+        UiUtil.setBottomMargin(
+            copyEmojiIdButtonContainerView,
+            0
+        )
+        // animate full emoji id view
+        val emojiIdAnim = ValueAnimator.ofFloat(0f, 1f)
+        emojiIdAnim.addUpdateListener { valueAnimator: ValueAnimator ->
+            val value = valueAnimator.animatedValue as Float
+            dimmerView.alpha = value * 0.6f
+            // container alpha & scale
+            fullEmojiIdContainerView.alpha = value
+            fullEmojiIdContainerView.scaleX = 1f + 0.2f * (1f - value)
+            fullEmojiIdContainerView.scaleY = 1f + 0.2f * (1f - value)
+            UiUtil.setWidth(
+                fullEmojiIdContainerView,
+                (fullEmojiIdInitialWidth + fullEmojiIdDeltaWidth * value).toInt()
+            )
+            backButton.alpha = 1 - value
+        }
+        emojiIdAnim.duration = Constants.UI.shortDurationMs
+        // copy emoji id button anim
+        val copyEmojiIdButtonAnim = ValueAnimator.ofFloat(0f, 1f)
+        copyEmojiIdButtonAnim.addUpdateListener { valueAnimator: ValueAnimator ->
+            val value = valueAnimator.animatedValue as Float
+            copyEmojiIdButtonContainerView.alpha = value
+            UiUtil.setBottomMargin(
+                copyEmojiIdButtonContainerView,
+                (copyEmojiIdButtonVisibleBottomMargin * value).toInt()
+            )
+        }
+        copyEmojiIdButtonAnim.duration = Constants.UI.shortDurationMs
+        copyEmojiIdButtonAnim.interpolator = EasingInterpolator(Ease.BACK_OUT)
+
+        // chain anim.s and start
+        val animSet = AnimatorSet()
+        animSet.playSequentially(emojiIdAnim, copyEmojiIdButtonAnim)
+        animSet.start()
+        // scroll animation
+        fullEmojiIdScrollView.postDelayed({
+            fullEmojiIdScrollView.smoothScrollTo(0, 0)
+        }, Constants.UI.shortDurationMs + 20)
+    }
+
+    private fun hideFullEmojiId(animated: Boolean) {
+        if (!animated) {
+            fullEmojiIdContainerView.visibility = View.GONE
+            fullEmojiIdTextView.text = EmojiUtil.getChunkedEmojiId(
+                recipientUser.publicKey.emojiId,
+                emojiIdChunkSeparator
+            )
+            dimmerView.visibility = View.GONE
+            copyEmojiIdButtonContainerView.visibility = View.GONE
+            return
+        }
+        fullEmojiIdScrollView.smoothScrollTo(0, 0)
+        emojiIdSummaryContainerView.visibility = View.VISIBLE
+        emojiIdSummaryContainerView.alpha = 0f
+        // copy emoji id button anim
+        val copyEmojiIdButtonAnim = ValueAnimator.ofFloat(1f, 0f)
+        copyEmojiIdButtonAnim.addUpdateListener { valueAnimator: ValueAnimator ->
+            val value = valueAnimator.animatedValue as Float
+            copyEmojiIdButtonContainerView.alpha = value
+            UiUtil.setBottomMargin(
+                copyEmojiIdButtonContainerView,
+                (copyEmojiIdButtonVisibleBottomMargin * value).toInt()
+            )
+        }
+        // emoji id anim
+        val fullEmojiIdInitialWidth = fullEmojiIdContainerView.width
+        val fullEmojiIdDeltaWidth = emojiIdSummaryContainerView.width - fullEmojiIdContainerView.width
+        val emojiIdAnim = ValueAnimator.ofFloat(0f, 1f)
+        emojiIdAnim.addUpdateListener { valueAnimator: ValueAnimator ->
+            val value = valueAnimator.animatedValue as Float
+            dimmerView.alpha = (1 - value) * 0.6f
+            // container alpha & scale
+            fullEmojiIdContainerView.alpha = (1 - value)
+            UiUtil.setWidth(
+                fullEmojiIdContainerView,
+                (fullEmojiIdInitialWidth + fullEmojiIdDeltaWidth * value).toInt()
+            )
+            emojiIdSummaryContainerView.alpha = value
+            backButton.alpha = value
+        }
+        // chain anim.s and start
+        val animSet = AnimatorSet()
+        animSet.playSequentially(copyEmojiIdButtonAnim, emojiIdAnim)
+        animSet.start()
+        animSet.addListener(object : AnimatorListenerAdapter() {
+            override fun onAnimationEnd(animation: Animator?) {
+                dimmerView.visibility = View.GONE
+                fullEmojiIdContainerView.visibility = View.GONE
+                copyEmojiIdButtonContainerView.visibility = View.GONE
+            }
+        })
     }
 
     /**
      * Dimmer clicked - hide dimmers.
      */
-    @OnClick(
-        R.id.add_note_and_send_vw_top_dimmer,
-        R.id.add_note_and_send_vw_bottom_dimmer
-    )
+    @OnClick(R.id.add_note_and_send_vw_dimmer)
     fun onEmojiIdDimmerClicked() {
-        emojiIdContainerView.visibility = View.VISIBLE
-        fullEmojiIdContainerView.visibility = View.GONE
-        backButton.visibility = View.VISIBLE
-        dimmerViews.forEach {
-            it.visibility = View.GONE
-        }
+        hideFullEmojiId(animated = true)
     }
 
     private fun focusEditTextAndShowKeyboard() {
@@ -276,6 +409,19 @@ class AddNoteAndSendFragment(private val walletService: TariWalletService) : Bas
             InputMethodManager.SHOW_FORCED,
             InputMethodManager.HIDE_IMPLICIT_ONLY
         )
+    }
+
+    @OnClick(R.id.add_note_and_send_btn_copy_emoji_id)
+    fun onCopyEmojiIdButtonClicked(view: View) {
+        val mActivity = activity ?: return
+        val deepLink = WalletUtil.getDeepLink(recipientUser.publicKey.emojiId)
+        val clipBoard = ContextCompat.getSystemService(mActivity, ClipboardManager::class.java)
+        val deepLinkClipboardData = ClipData.newPlainText(
+            "Tari Wallet Deep Link",
+            deepLink
+        )
+        clipBoard?.setPrimaryClip(deepLinkClipboardData)
+        hideFullEmojiId(animated = true)
     }
 
     private fun enableCallToAction() {

@@ -62,46 +62,73 @@
             android:focusable="true" />
 
         <!-- search container -->
-        <LinearLayout
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="@dimen/add_recipient_search_text_view_height"
             android:layout_centerInParent="true"
             android:layout_marginStart="25dp"
             android:layout_marginEnd="25dp"
             android:background="@drawable/add_recipient_search_bg"
-            android:elevation="@dimen/common_view_elevation"
-            android:orientation="horizontal">
+            android:elevation="@dimen/common_view_elevation">
 
-            <!-- search text -->
-            <com.tari.android.wallet.ui.component.CustomFontEditText
-                android:id="@+id/add_recipient_txt_search"
-                android:layout_width="0dp"
-                android:layout_height="@dimen/add_recipient_search_text_view_height"
-                android:layout_weight="1"
-                android:background="@color/transparent"
-                android:hint="@string/add_recipient_hint"
-                android:imeOptions="actionDone"
-                android:inputType="textNoSuggestions"
-                android:letterSpacing="0.02"
-                android:paddingStart="20dp"
-                android:paddingTop="15dp"
-                android:paddingEnd="20dp"
-                android:paddingBottom="15dp"
-                android:singleLine="true"
-                android:textColor="@color/black"
-                android:textColorHint="@color/add_recipient_hint"
-                android:textSize="14sp"
-                app:customFont="AVENIR_LT_STD_ROMAN" />
+            <!-- search -->
+            <HorizontalScrollView
+                android:id="@+id/add_recipient_scroll_search_edit_text"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_toStartOf="@id/add_recipient_btn_qr_code"
+                android:scrollbars="none">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal">
+                    <!-- start spacer -->
+                    <View
+                        android:layout_width="15dp"
+                        android:layout_height="match_parent" />
+                    <!-- search text -->
+                    <com.tari.android.wallet.ui.component.CustomFontEditText
+                        android:id="@+id/add_recipient_edit_search"
+                        android:layout_width="wrap_content"
+                        android:layout_height="@dimen/add_recipient_search_text_view_height"
+                        android:background="@color/transparent"
+                        android:hint="@string/add_recipient_hint"
+                        android:imeOptions="actionDone"
+                        android:inputType="textNoSuggestions"
+                        android:letterSpacing="0.02"
+                        android:scrollHorizontally="false"
+                        android:singleLine="true"
+                        android:textColor="@color/black"
+                        android:textColorHint="@color/add_recipient_hint"
+                        android:textSize="14sp"
+                        app:customFont="AVENIR_LT_STD_ROMAN" />
+                    <!-- end spacer -->
+                    <View
+                        android:layout_width="15dp"
+                        android:layout_height="match_parent" />
+                </LinearLayout>
+
+            </HorizontalScrollView>
+
+            <!-- white fader for emoji-id input -->
+            <View
+                android:layout_width="30dp"
+                android:layout_height="32dp"
+                android:layout_centerVertical="true"
+                android:layout_alignParentEnd="true"
+                android:background="@drawable/emoji_id_end_fader" />
 
             <!-- QR code button -->
             <ImageButton
                 android:id="@+id/add_recipient_btn_qr_code"
                 android:layout_width="@dimen/add_recipient_search_text_view_height"
                 android:layout_height="@dimen/add_recipient_search_text_view_height"
+                android:layout_alignParentEnd="true"
                 android:background="@color/transparent"
                 android:contentDescription="@null"
                 android:src="@drawable/home_qr" />
-        </LinearLayout>
+        </RelativeLayout>
     </RelativeLayout>
 
     <RelativeLayout
@@ -144,42 +171,83 @@
             android:clickable="true"
             android:focusable="true" />
 
-        <!-- emoji id banner container -->
-        <LinearLayout
-            android:id="@+id/add_recipient_vw_paste_emoji_id_banner"
-            android:layout_width="match_parent"
-            android:layout_height="78dp"
-            android:layout_alignParentBottom="true"
-            android:background="@color/white"
-            android:clickable="true"
-            android:focusable="true"
-            android:gravity="center"
-            android:orientation="vertical">
+        <RelativeLayout
+            android:id="@+id/add_recipient_vw_paste_emoji_id_container"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignTop="@id/add_recipient_vw_clipboard_emoji_id_container"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="0dp">
 
-            <!-- paste emoji info -->
             <com.tari.android.wallet.ui.component.CustomFontTextView
+                android:id="@+id/add_recipient_txt_paste_emoji_id"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/add_recipient_paste_emoji_id"
-                android:textColor="#9330ff"
-                android:textSize="12sp"
-                app:customFont="AVENIR_LT_STD_MEDIUM" />
-            <!-- emoji id -->
-            <TextView
-                android:id="@+id/add_recipient_txt_clipboard_emoji_id"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="25dp"
-                android:layout_marginTop="7dp"
-                android:layout_marginEnd="25dp"
-                android:ellipsize="middle"
-                android:letterSpacing="0.3"
-                android:singleLine="true"
-                android:textAlignment="center"
-                android:textColor="@color/black"
+                android:background="@drawable/copy_paste_emoji_id_button_bg"
+                android:paddingHorizontal="20dp"
+                android:paddingVertical="10dp"
+                android:text="@string/paste_emoji_id"
+                android:textColor="#9834F6"
                 android:textSize="14sp"
-                android:typeface="monospace" />
-        </LinearLayout>
+                app:customFont="AVENIR_LT_STD_HEAVY" />
+
+            <Button
+                android:id="@+id/add_recipient_btn_paste_emoji_id"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_alignStart="@id/add_recipient_txt_paste_emoji_id"
+                android:layout_alignTop="@id/add_recipient_txt_paste_emoji_id"
+                android:layout_alignEnd="@id/add_recipient_txt_paste_emoji_id"
+                android:layout_alignBottom="@id/add_recipient_txt_paste_emoji_id"
+                android:background="@color/transparent" />
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/add_recipient_btn_paste_emoji_id"
+                android:layout_centerHorizontal="true"
+                android:contentDescription="@null"
+                android:src="@drawable/speech_notch_down" />
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/add_recipient_vw_clipboard_emoji_id_container"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/add_recipient_clipboard_emoji_id_container_height"
+            android:layout_alignParentBottom="true">
+
+            <!-- white background -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/white" />
+
+            <!-- emoji id container -->
+            <HorizontalScrollView
+                android:id="@+id/add_recipient_scroll_clipboard_emoji_id"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:paddingHorizontal="0dp"
+                android:paddingVertical="20dp"
+                android:scrollbars="none">
+
+                <!-- emoji id -->
+                <TextView
+                    android:id="@+id/add_recipient_txt_clipboard_emoji_id"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:gravity="center_vertical"
+                    android:letterSpacing="0.4"
+                    android:paddingHorizontal="16dp"
+                    android:singleLine="true"
+                    android:textColor="@color/black"
+                    android:textSize="14sp" />
+            </HorizontalScrollView>
+        </RelativeLayout>
+
     </RelativeLayout>
 
     <com.tari.android.wallet.ui.component.CustomFontTextView

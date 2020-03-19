@@ -63,14 +63,12 @@ class DebugLogFragment : BaseFragment(), AdapterView.OnItemSelectedListener {
 
     @BindView(R.id.debug_log_file_spinner)
     lateinit var spinner: Spinner
-
     @BindView(R.id.debug_log_recycler_view)
     lateinit var recyclerView: RecyclerView
 
     @Inject
     @Named(WalletModule.FieldName.walletFilesDirPath)
     lateinit var walletFilesDirPath: String
-
     @Inject
     @Named(WalletModule.FieldName.walletLogFilePath)
     internal lateinit var logFilePath: String

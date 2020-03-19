@@ -35,17 +35,21 @@ package com.tari.android.wallet.ui.activity.profile
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.os.Bundle
+import android.widget.HorizontalScrollView
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import butterknife.*
 import com.tari.android.wallet.R
+import com.tari.android.wallet.extension.applyFontStyle
 import com.tari.android.wallet.ui.activity.BaseActivity
+import com.tari.android.wallet.ui.component.CustomFont
 import com.tari.android.wallet.ui.util.UiUtil
 import com.tari.android.wallet.util.EmojiUtil
 import com.tari.android.wallet.util.SharedPrefsWrapper
 import com.tari.android.wallet.util.WalletUtil
+import me.everything.android.ui.overscroll.OverScrollDecoratorHelper
 import org.matomo.sdk.Tracker
 import org.matomo.sdk.extra.TrackHelper
 import javax.inject.Inject
@@ -57,17 +61,26 @@ import javax.inject.Inject
  */
 internal class WalletInfoActivity : BaseActivity() {
 
-    @BindView(R.id.wallet_info_txt_emoji_container)
-    lateinit var emojiContainerView: TextView
+    @BindView(R.id.wallet_info_scroll_emoji_id)
+    lateinit var emojiIdScrollView: HorizontalScrollView
+    @BindView(R.id.wallet_info_txt_share_emoji_id)
+    lateinit var shareEmojiIdTextView: TextView
+    @BindView(R.id.wallet_info_txt_emoji_id)
+    lateinit var emojiIdTextView: TextView
     @BindView(R.id.wallet_info_img_qr)
     lateinit var qrCodeImageView: ImageView
     @BindView(R.id.wallet_info_txt_copy_emoji_id)
     lateinit var copyEmojiIdTextView: TextView
 
+    @BindString(R.string.wallet_info_share_your_emoji_id)
+    lateinit var shareEmojiIdTitle: String
+    @BindString(R.string.wallet_info_share_your_emoji_id_bold_part)
+    lateinit var shareEmojiIdTitleBoldPart: String
     @BindString(R.string.emoji_id_chunk_separator_char)
     lateinit var emojiIdChunkSeparator: String
     @BindString(R.string.wallet_info_emoji_id_copied)
     lateinit var emojiIdCopiedToastMessage: String
+
     @BindDimen(R.dimen.wallet_info_img_qr_code_size)
     @JvmField
     var qrCodeImageSize = 0
@@ -90,17 +103,26 @@ internal class WalletInfoActivity : BaseActivity() {
     }
 
     private fun setUpUi() {
-        val shortEmojiId = EmojiUtil.getShortenedEmojiId(sharedPrefsWrapper.emojiId!!)!!
-        val chunkedEmojiId = EmojiUtil.getChunkedEmojiId(shortEmojiId, emojiIdChunkSeparator)
-        emojiContainerView.text = chunkedEmojiId
-
-        val content = WalletUtil.getQRContent(
-            sharedPrefsWrapper.publicKeyHexString!!,
-            sharedPrefsWrapper.emojiId!!
+        // title
+        val styledTitle = shareEmojiIdTitle.applyFontStyle(
+            this,
+            CustomFont.AVENIR_LT_STD_LIGHT,
+            shareEmojiIdTitleBoldPart,
+            CustomFont.AVENIR_LT_STD_BLACK,
+            applyToOnlyFirstOccurence = true
         )
+        shareEmojiIdTextView.text = styledTitle
+
+        val chunkedEmojiId =
+            EmojiUtil.getChunkedEmojiId(sharedPrefsWrapper.emojiId!!, emojiIdChunkSeparator)
+        emojiIdTextView.text = chunkedEmojiId
+
+        val content = WalletUtil.getDeepLink(sharedPrefsWrapper.emojiId!!)
         UiUtil.getQREncodedBitmap(content, qrCodeImageSize)?.let {
             qrCodeImageView.setImageBitmap(it)
         }
+
+        OverScrollDecoratorHelper.setUpOverScroll(emojiIdScrollView)
     }
 
     @OnClick(R.id.wallet_info_btn_close)
@@ -114,12 +136,14 @@ internal class WalletInfoActivity : BaseActivity() {
     @OnClick(R.id.wallet_info_txt_copy_emoji_id)
     fun onCopyEmojiIdClick() {
         UiUtil.temporarilyDisableClick(copyEmojiIdTextView)
+        val deepLink = WalletUtil.getDeepLink(sharedPrefsWrapper.emojiId!!)
         val clipBoard = ContextCompat.getSystemService(this, ClipboardManager::class.java)
-        val clip = ClipData.newPlainText(
-            "EmojiId",
-            sharedPrefsWrapper.emojiId
+        val deepLinkClipboardData = ClipData.newPlainText(
+            "Tari Wallet Deep Link",
+            deepLink
         )
-        clipBoard?.setPrimaryClip(clip)
+        clipBoard?.setPrimaryClip(deepLinkClipboardData)
         Toast.makeText(this, emojiIdCopiedToastMessage, Toast.LENGTH_SHORT).show()
     }
+
 }
