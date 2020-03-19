@@ -46,10 +46,10 @@ internal class FFIByteVector constructor(pointer: FFIByteVectorPtr) : FFIBase() 
 
     // region JNI
 
-    private external fun jniGetLength(pByteVector: FFIByteVectorPtr, error: FFIError): Int
-    private external fun jniGetAt(pByteVector: FFIByteVectorPtr, index: Int, error: FFIError): Int
-    private external fun jniDestroy(pByteVector: FFIByteVectorPtr)
-    private external fun jniCreate(byteArray: ByteArray, error: FFIError): FFIByteVectorPtr
+    private external fun jniGetLength(error: FFIError): Int
+    private external fun jniGetAt(index: Int, error: FFIError): Int
+    private external fun jniDestroy()
+    private external fun jniCreate(byteArray: ByteArray, error: FFIError)
 
     // endregion
 
@@ -63,7 +63,7 @@ internal class FFIByteVector constructor(pointer: FFIByteVectorPtr) : FFIBase() 
         if (hex.toString().length == 64) {
             val byteArray = BigInteger(hex.toString(), 16).toByteArray()
             val error = FFIError()
-            ptr = jniCreate(byteArray, error)
+            jniCreate(byteArray, error)
             throwIf(error)
         } else {
             throw FFIException(message = "Argument is invalid")
@@ -72,13 +72,13 @@ internal class FFIByteVector constructor(pointer: FFIByteVectorPtr) : FFIBase() 
 
     constructor(bytes: ByteArray) : this(nullptr) {
         val error = FFIError()
-        ptr = jniCreate(bytes, error)
+        jniCreate(bytes, error)
         throwIf(error)
     }
 
     fun getLength(): Int {
         val error = FFIError()
-        val len = jniGetLength(ptr, error)
+        val len = jniGetLength(error)
         throwIf(error)
         return len
     }
@@ -93,14 +93,13 @@ internal class FFIByteVector constructor(pointer: FFIByteVectorPtr) : FFIBase() 
 
     fun getAt(index: Int): Int {
         val error = FFIError()
-        val byte = jniGetAt(ptr, index, error)
+        val byte = jniGetAt(index, error)
         throwIf(error)
         return byte
     }
 
     override fun destroy() {
-        jniDestroy(ptr)
-        ptr = nullptr
+        jniDestroy()
     }
 
 }

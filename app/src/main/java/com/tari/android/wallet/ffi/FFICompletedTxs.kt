@@ -43,14 +43,13 @@ internal class FFICompletedTxs constructor(pointer: FFICompletedTxsPtr) : FFIBas
 
     // region JNI
 
-    private external fun jniGetLength(ptr: FFICompletedTxsPtr, libError: FFIError): Int
+    private external fun jniGetLength(libError: FFIError): Int
     private external fun jniGetAt(
-        ptr: FFICompletedTxsPtr,
         index: Int,
         libError: FFIError
     ): FFICompletedTxPtr
 
-    private external fun jniDestroy(ptr: FFICompletedTxsPtr)
+    private external fun jniDestroy()
 
     // endregion
 
@@ -66,21 +65,20 @@ internal class FFICompletedTxs constructor(pointer: FFICompletedTxsPtr) : FFIBas
 
     fun getLength(): Int {
         val error = FFIError()
-        val result = jniGetLength(ptr, error)
+        val result = jniGetLength(error)
         throwIf(error)
         return result
     }
 
     fun getAt(index: Int): FFICompletedTx {
         val error = FFIError()
-        val result = FFICompletedTx(jniGetAt(ptr, index, error))
+        val result = FFICompletedTx(jniGetAt(index, error))
         throwIf(error)
         return result
     }
 
     override fun destroy() {
-        jniDestroy(ptr)
-        ptr = nullptr
+        jniDestroy()
     }
 
 }

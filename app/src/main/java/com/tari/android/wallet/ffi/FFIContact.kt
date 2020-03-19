@@ -43,18 +43,17 @@ internal class FFIContact constructor(pointer: FFIContactPtr) : FFIBase() {
 
     // region JNI
 
-    private external fun jniGetAlias(contactPtr: FFIContactPtr, libError: FFIError): String
+    private external fun jniGetAlias(libError: FFIError): String
     private external fun jniGetPublicKey(
-        contactPtr: FFIContactPtr,
         libError: FFIError
     ): FFIPublicKeyPtr
 
-    private external fun jniDestroy(contactPtr: FFIContactPtr)
+    private external fun jniDestroy()
     private external fun jniCreate(
         alias: String,
-        publicKeyPtr: FFIPublicKeyPtr,
+        publicKeyPtr: FFIPublicKey,
         libError: FFIError
-    ): FFIContactPtr
+    )
 
     // endregion
 
@@ -67,7 +66,7 @@ internal class FFIContact constructor(pointer: FFIContactPtr) : FFIBase() {
     constructor(alias: String, FFIPublicKey: FFIPublicKey) : this(nullptr) {
         if (alias.isNotEmpty()) {
             val error = FFIError()
-            ptr = jniCreate(alias, FFIPublicKey.getPointer(), error)
+            jniCreate(alias, FFIPublicKey, error)
             throwIf(error)
         } else {
             throw FFIException(message = "Alias is an empty String.")
@@ -80,14 +79,14 @@ internal class FFIContact constructor(pointer: FFIContactPtr) : FFIBase() {
 
     fun getAlias(): String {
         val error = FFIError()
-        val result = jniGetAlias(ptr, error)
+        val result = jniGetAlias(error)
         throwIf(error)
         return result
     }
 
     fun getPublicKey(): FFIPublicKey {
         val error = FFIError()
-        val result = FFIPublicKey(jniGetPublicKey(ptr, error))
+        val result = FFIPublicKey(jniGetPublicKey(error))
         throwIf(error)
         return result
     }
@@ -101,8 +100,7 @@ internal class FFIContact constructor(pointer: FFIContactPtr) : FFIBase() {
     }
 
     override fun destroy() {
-        jniDestroy(ptr)
-        ptr = nullptr
+        jniDestroy()
     }
 
 }

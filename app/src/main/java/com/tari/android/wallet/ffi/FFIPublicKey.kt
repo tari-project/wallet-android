@@ -44,28 +44,26 @@ internal class FFIPublicKey constructor(pointer: FFIPublicKeyPtr) : FFIBase() {
     // region JNI
 
     private external fun jniGetBytes(
-        publicKeyPtr: FFIPublicKeyPtr,
         libError: FFIError
     ): FFIByteVectorPtr
 
-    private external fun jniDestroy(publicKeyPtr: FFIPublicKeyPtr)
+    private external fun jniDestroy()
     private external fun jniCreate(
-        byteVectorPtr: FFIByteVectorPtr,
+        byteVectorPtr: FFIByteVector,
         libError: FFIError
-    ): FFIPublicKeyPtr
+    )
 
-    private external fun jniFromHex(hexStr: String, libError: FFIError): FFIPublicKeyPtr
+    private external fun jniFromHex(hexStr: String, libError: FFIError)
     private external fun jniGetEmojiId(
-        publicKeyPtr: FFIPublicKeyPtr,
         libError: FFIError
     ): String
 
-    private external fun jniGetEmojiPublicKey(emoji: String, libError: FFIError): FFIPublicKeyPtr
+    private external fun jniGetEmojiPublicKey(emoji: String,libError: FFIError)
 
     private external fun jniFromPrivateKey(
-        privateKeyPtr: FFIPrivateKeyPtr,
+        privateKeyPtr: FFIPrivateKey,
         libError: FFIError
-    ): FFIPublicKeyPtr
+    )
 
     // endregion
 
@@ -77,29 +75,30 @@ internal class FFIPublicKey constructor(pointer: FFIPublicKeyPtr) : FFIBase() {
 
     constructor(byteVector: FFIByteVector) : this(nullptr) {
         val error = FFIError()
-        ptr = jniCreate(byteVector.getPointer(), error)
+        jniCreate(byteVector, error)
         throwIf(error)
     }
 
     constructor(hex: HexString) : this(nullptr) {
         if (hex.toString().length == 64) {
             val error = FFIError()
-            ptr = jniFromHex(hex.hex, error)
+            jniFromHex(hex.hex, error)
             throwIf(error)
         } else {
             throw FFIException(message = "HexString is not a valid PublicKey")
         }
     }
 
-    constructor(emoji: String) : this(nullptr) {
+    constructor(emoji: String) : this(nullptr)
+    {
         val error = FFIError()
-        ptr = jniGetEmojiPublicKey(emoji, error)
+        jniGetEmojiPublicKey(emoji,error)
         throwIf(error)
     }
 
     constructor(privateKey: FFIPrivateKey) : this(nullptr) {
         val error = FFIError()
-        ptr = jniFromPrivateKey(privateKey.getPointer(), error)
+        jniFromPrivateKey(privateKey, error)
         throwIf(error)
     }
 
@@ -109,28 +108,27 @@ internal class FFIPublicKey constructor(pointer: FFIPublicKeyPtr) : FFIBase() {
 
     fun getBytes(): FFIByteVector {
         val error = FFIError()
-        val result = FFIByteVector(jniGetBytes(ptr, error))
+        val result = FFIByteVector(jniGetBytes(error))
         throwIf(error)
         return result
     }
 
     fun getEmojiNodeId(): String {
         val error = FFIError()
-        val result = jniGetEmojiId(ptr, error)
+        val result = jniGetEmojiId(error)
         throwIf(error)
         return result
     }
 
     override fun toString(): String {
         val error = FFIError()
-        val result = FFIByteVector(jniGetBytes(ptr, error)).toString()
+        val result = FFIByteVector(jniGetBytes(error)).toString()
         throwIf(error)
         return result
     }
 
     override fun destroy() {
-        jniDestroy(ptr)
-        ptr = nullptr
+        jniDestroy()
     }
 
 }

@@ -45,27 +45,24 @@ internal class FFICompletedTx constructor(pointer: FFICompletedTxPtr) : FFIBase(
 
     // region JNI
 
-    private external fun jniGetId(ptr: FFICompletedTxPtr, libError: FFIError): ByteArray
+    private external fun jniGetId(libError: FFIError): ByteArray
     private external fun jniGetDestinationPublicKey(
-        ptr: FFICompletedTxPtr,
         libError: FFIError
     ): FFIPublicKeyPtr
 
     private external fun jniGetSourcePublicKey(
-        ptr: FFICompletedTxPtr,
         libError: FFIError
     ): FFIPublicKeyPtr
 
-    private external fun jniGetAmount(ptr: FFICompletedTxPtr, libError: FFIError): ByteArray
-    private external fun jniGetFee(ptr: FFICompletedTxPtr, libError: FFIError): ByteArray
+    private external fun jniGetAmount(libError: FFIError): ByteArray
+    private external fun jniGetFee(libError: FFIError): ByteArray
     private external fun jniGetTimestamp(
-        ptr: FFICompletedTxPtr,
         libError: FFIError
     ): ByteArray
 
-    private external fun jniGetMessage(ptr: FFICompletedTxPtr, libError: FFIError): String
-    private external fun jniGetStatus(ptr: FFICompletedTxPtr, libError: FFIError): Int
-    private external fun jniDestroy(ptr: FFICompletedTxPtr)
+    private external fun jniGetMessage(libError: FFIError): String
+    private external fun jniGetStatus(libError: FFIError): Int
+    private external fun jniDestroy()
 
     // endregion
 
@@ -81,56 +78,56 @@ internal class FFICompletedTx constructor(pointer: FFICompletedTxPtr) : FFIBase(
 
     fun getId(): BigInteger {
         val error = FFIError()
-        val bytes = jniGetId(ptr, error)
+        val bytes = jniGetId(error)
         throwIf(error)
         return BigInteger(1, bytes)
     }
 
     fun getDestinationPublicKey(): FFIPublicKey {
         val error = FFIError()
-        val result = FFIPublicKey(jniGetDestinationPublicKey(ptr, error))
+        val result = FFIPublicKey(jniGetDestinationPublicKey(error))
         throwIf(error)
         return result
     }
 
     fun getSourcePublicKey(): FFIPublicKey {
         val error = FFIError()
-        val result = FFIPublicKey(jniGetSourcePublicKey(ptr, error))
+        val result = FFIPublicKey(jniGetSourcePublicKey(error))
         throwIf(error)
         return result
     }
 
     fun getAmount(): BigInteger {
         val error = FFIError()
-        val bytes = jniGetAmount(ptr, error)
+        val bytes = jniGetAmount(error)
         throwIf(error)
         return BigInteger(1, bytes)
     }
 
     fun getFee(): BigInteger {
         val error = FFIError()
-        val bytes = jniGetFee(ptr, error)
+        val bytes = jniGetFee(error)
         throwIf(error)
         return BigInteger(1, bytes)
     }
 
     fun getTimestamp(): BigInteger {
         val error = FFIError()
-        val bytes = jniGetTimestamp(ptr, error)
+        val bytes = jniGetTimestamp(error)
         throwIf(error)
         return BigInteger(1, bytes)
     }
 
     fun getMessage(): String {
         val error = FFIError()
-        val result = jniGetMessage(ptr, error)
+        val result = jniGetMessage(error)
         throwIf(error)
         return result
     }
 
     fun getStatus(): FFIStatus {
         val error = FFIError()
-        val status = jniGetStatus(ptr, error)
+        val status = jniGetStatus(error)
         throwIf(error)
         return when (status) {
             -1 -> FFIStatus.TX_NULL_ERROR
@@ -145,8 +142,7 @@ internal class FFICompletedTx constructor(pointer: FFICompletedTxPtr) : FFIBase(
     }
 
     override fun destroy() {
-        jniDestroy(ptr)
-        ptr = nullptr
+        jniDestroy()
     }
 
 }

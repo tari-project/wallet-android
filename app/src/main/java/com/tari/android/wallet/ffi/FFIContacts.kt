@@ -43,14 +43,13 @@ internal class FFIContacts constructor(pointer: FFIContactPtr) : FFIBase() {
 
     // region JNI
 
-    private external fun jniGetLength(contactsPtr: FFIContactsPtr, libError: FFIError): Int
+    private external fun jniGetLength(libError: FFIError): Int
     private external fun jniGetAt(
-        contactPtr: FFIContactPtr,
         index: Int,
         libError: FFIError
     ): FFIContactPtr
 
-    private external fun jniDestroy(contactsPtr: FFIContactPtr)
+    private external fun jniDestroy()
 
     // endregion
 
@@ -66,21 +65,20 @@ internal class FFIContacts constructor(pointer: FFIContactPtr) : FFIBase() {
 
     fun getLength(): Int {
         val error = FFIError()
-        val result = jniGetLength(ptr, error)
+        val result = jniGetLength(error)
         throwIf(error)
         return result
     }
 
     fun getAt(index: Int): FFIContact {
         val error = FFIError()
-        val result = FFIContact(jniGetAt(ptr, index, error))
+        val result = FFIContact(jniGetAt(index, error))
         throwIf(error)
         return result
     }
 
     override fun destroy() {
-        jniDestroy(ptr)
-        ptr = nullptr
+        jniDestroy()
     }
 
 }

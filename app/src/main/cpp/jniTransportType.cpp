@@ -40,16 +40,16 @@
 #include "jniCommon.cpp"
 
 extern "C"
-JNIEXPORT jlong JNICALL
+JNIEXPORT void JNICALL
 Java_com_tari_android_wallet_ffi_FFITransportType_jniMemoryTransport(
         JNIEnv *jEnv,
-        jobject jClass) {
+        jobject jThis) {
     TariTransportType *pTransport = transport_memory_create();
-    return reinterpret_cast<jlong>(pTransport);
+    SetPointerField(jEnv,jThis,reinterpret_cast<jlong>(pTransport));
 }
 
 extern "C"
-JNIEXPORT jlong JNICALL
+JNIEXPORT void JNICALL
 Java_com_tari_android_wallet_ffi_FFITransportType_jniTCPTransport(
         JNIEnv *jEnv,
         jobject jThis,
@@ -62,26 +62,28 @@ Java_com_tari_android_wallet_ffi_FFITransportType_jniTCPTransport(
     TariTransportType *pTransport = transport_tcp_create(pAddress,r);
     jEnv->ReleaseStringUTFChars(jpAddress, pAddress);
     setErrorCode(jEnv, error, i);
-    return reinterpret_cast<jlong>(pTransport);
+    SetPointerField(jEnv,jThis,reinterpret_cast<jlong>(pTransport));
 }
 
 extern "C"
-JNIEXPORT jlong JNICALL
+JNIEXPORT void JNICALL
 Java_com_tari_android_wallet_ffi_FFITransportType_jniTorTransport(
         JNIEnv *jEnv,
         jobject jThis,
         jstring jpControl,
         jint jPort,
-        jlong jpTorCookie,
-        jlong jpTorIdentity,
+        jobject jpTorCookie,
+        jobject jpTorIdentity,
         jstring jpSocksUser,
         jstring jpSocksPass,
         jobject error) {
     int i = 0;
     int *r = &i;
     char *pControl = const_cast<char *>(jEnv->GetStringUTFChars(jpControl, JNI_FALSE));
-    ByteVector *pTorCookie = reinterpret_cast<ByteVector *>(jpTorCookie);
-    ByteVector *pTorIdentity = reinterpret_cast<ByteVector *>(jpTorIdentity);
+    jlong lTorCookie = GetPointerField(jEnv,jpTorCookie);
+    ByteVector *pTorCookie = reinterpret_cast<ByteVector *>(lTorCookie);
+    jlong lTorIdentity = GetPointerField(jEnv,jpTorIdentity);
+    ByteVector *pTorIdentity = reinterpret_cast<ByteVector *>(lTorIdentity);
     char *pSocksUsername = const_cast<char *>(jEnv->GetStringUTFChars(jpSocksUser, JNI_FALSE));
     char *pSocksPassword = const_cast<char *>(jEnv->GetStringUTFChars(jpSocksPass, JNI_FALSE));
     TariTransportType *transport = transport_tor_create(pControl, pTorCookie, pTorIdentity,
@@ -91,7 +93,7 @@ Java_com_tari_android_wallet_ffi_FFITransportType_jniTorTransport(
     jEnv->ReleaseStringUTFChars(jpSocksUser, pSocksUsername);
     jEnv->ReleaseStringUTFChars(jpSocksPass, pSocksPassword);
     setErrorCode(jEnv, error, i);
-    return reinterpret_cast<jlong>(transport);
+    SetPointerField(jEnv,jThis,reinterpret_cast<jlong>(transport));
 }
 
 extern "C"
@@ -99,11 +101,11 @@ JNIEXPORT jstring JNICALL
 Java_com_tari_android_wallet_ffi_FFITransportType_jniGetMemoryAddress(
         JNIEnv *jEnv,
         jobject jThis,
-        jlong jpTransport,
         jobject error) {
     int i = 0;
     int *r = &i;
-    TariTransportType *pTransport = reinterpret_cast<TariTransportType *>(jpTransport);
+    jlong lTransport = GetPointerField(jEnv,jThis);
+    TariTransportType *pTransport = reinterpret_cast<TariTransportType *>(lTransport);
     const char *pAddress = transport_memory_get_address(pTransport,r);
     setErrorCode(jEnv, error, i);
     jstring result = jEnv->NewStringUTF(pAddress);
@@ -115,7 +117,8 @@ extern "C"
 JNIEXPORT void JNICALL
 Java_com_tari_android_wallet_ffi_FFITransportType_jniDestroy(
         JNIEnv *jEnv,
-        jobject jThis,
-        jlong jpTransport) {
-    transport_type_destroy(reinterpret_cast<TariTransportType *>(jpTransport));
+        jobject jThis) {
+    jlong lTransport = GetPointerField(jEnv,jThis);
+    transport_type_destroy(reinterpret_cast<TariTransportType *>(lTransport));
+    SetPointerField(jEnv,jThis, reinterpret_cast<jlong>(nullptr));
 }
