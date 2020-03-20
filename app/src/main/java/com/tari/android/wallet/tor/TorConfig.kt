@@ -34,6 +34,8 @@ package com.tari.android.wallet.tor
 
 /**
  * Tor proxy configuration.
+ *
+ * @author The Tari Development Team
  */
 data class TorConfig(
     val proxyPort: Int,

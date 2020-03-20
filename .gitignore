@@ -74,3 +74,4 @@ CMakeFiles/
 CMakeCache.txt
 
 jniLibs/
+!app/src/main/jniLibs/
