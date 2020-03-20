@@ -64,6 +64,8 @@ internal abstract class FFIWallet(commsConfig: FFICommsConfig, logPath: String) 
         callbackTxMinedSig: String,
         callbackDiscoveryProcessComplete: String,
         callbackDiscoveryProcessCompleteSig: String,
+        callbackBaseNodeSync:String,
+        callbackBaseNodeSyncSig:String,
         libError: FFIError
     )
 
@@ -190,6 +192,7 @@ internal abstract class FFIWallet(commsConfig: FFICommsConfig, logPath: String) 
                 this::onTxBroadcast.name, "(J)V",
                 this::onTxMined.name, "(J)V",
                 this::onDiscoveryComplete.name, "([BZ)V",
+                this::onBaseNodeSyncComplete.name, "([BZ)V",
                 error
             )
             Logger.i("Post jniCreate.")
@@ -341,6 +344,12 @@ internal abstract class FFIWallet(commsConfig: FFICommsConfig, logPath: String) 
         Logger.i("Tx discovery complete. Success: $success")
         val txId = BigInteger(1, bytes)
         listenerAdapter?.onDiscoveryComplete(txId, success)
+    }
+
+    protected fun onBaseNodeSyncComplete(bytes: ByteArray, success: Boolean) {
+        Logger.i("Base node sync complete. Success: $success")
+        val requestId = BigInteger(1, bytes)
+        listenerAdapter?.onBaseNodeSyncComplete(requestId, success)
     }
 
     fun sendTx(
