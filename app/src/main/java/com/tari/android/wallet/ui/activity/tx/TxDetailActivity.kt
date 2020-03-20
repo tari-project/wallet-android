@@ -44,7 +44,7 @@ import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.widget.HorizontalScrollView
 import android.widget.ImageView
-import android.widget.LinearLayout
+import android.widget.RelativeLayout
 import android.widget.TextView
 import androidx.constraintlayout.widget.Group
 import androidx.core.content.ContextCompat
@@ -55,6 +55,7 @@ import com.orhanobut.logger.Logger
 import com.tari.android.wallet.R
 import com.tari.android.wallet.event.Event
 import com.tari.android.wallet.event.EventBus
+import com.tari.android.wallet.extension.txFormattedDate
 import com.tari.android.wallet.model.*
 import com.tari.android.wallet.service.TariWalletService
 import com.tari.android.wallet.service.WalletService
@@ -67,11 +68,10 @@ import com.tari.android.wallet.ui.extension.getFirstChild
 import com.tari.android.wallet.ui.extension.getLastChild
 import com.tari.android.wallet.ui.extension.setTextSizePx
 import com.tari.android.wallet.ui.util.UiUtil
-import com.tari.android.wallet.util.WalletUtil
-import com.tari.android.wallet.extension.txFormattedDate
 import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.EmojiUtil
 import com.tari.android.wallet.util.SharedPrefsWrapper
+import com.tari.android.wallet.util.WalletUtil
 import me.everything.android.ui.overscroll.OverScrollDecoratorHelper
 import org.matomo.sdk.Tracker
 import org.matomo.sdk.extra.TrackHelper
@@ -109,7 +109,7 @@ internal class TxDetailActivity :
     @BindView(R.id.tx_detail_txt_amount)
     lateinit var txAmountTextView: CustomFontTextView
     @BindView(R.id.tx_detail_vw_amount_container)
-    lateinit var amountContainer: LinearLayout
+    lateinit var amountContainer: RelativeLayout
     @BindView(R.id.tx_detail_img_amount_gem)
     lateinit var amountGemImageView: ImageView
     @BindView(R.id.tx_detail_txt_tx_fee)
@@ -208,7 +208,6 @@ internal class TxDetailActivity :
      */
     private var currentTextSize = 0f
     private var currentAmountGemSize = 0f
-    private var elementMarginStart = 0
 
     private lateinit var tx: Tx
     private lateinit var emojiIdSummaryController: EmojiIdSummaryViewController
@@ -266,7 +265,6 @@ internal class TxDetailActivity :
     private fun setupUI() {
         currentTextSize = elementTextSize
         currentAmountGemSize = amountGemSize
-        elementMarginStart = firstElementMarginStart
 
         txPaymentStateTextView.text = when (tx) {
             is CompletedTx -> {
@@ -335,8 +333,6 @@ internal class TxDetailActivity :
         }
         currentTextSize *= scaleFactor
         currentAmountGemSize *= scaleFactor
-        elementMarginStart =
-            (elementMarginStart * scaleFactor).toInt()
 
         // adjust gem size
         UiUtil.setWidthAndHeight(
