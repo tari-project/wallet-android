@@ -11,8 +11,8 @@ android {
         applicationId "com.tari.android.wallet"
         minSdkVersion 24
         targetSdkVersion 29
-        versionCode 13
-        versionName "0.0.13-jniLibs-0.2.3"
+        versionCode 14
+        versionName "0.0.14-jniLibs-0.3.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
         ndk {
