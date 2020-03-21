@@ -42,7 +42,6 @@ import java.math.BigInteger
  *
  * @author The Tari Development Team
  */
-
 internal typealias FFIWalletPtr = Long
 
 internal abstract class FFIWallet(commsConfig: FFICommsConfig, logPath: String) : FFIBase() {

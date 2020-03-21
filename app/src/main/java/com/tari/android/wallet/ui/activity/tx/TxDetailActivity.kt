@@ -465,7 +465,7 @@ internal class TxDetailActivity :
 
     @OnClick(R.id.tx_detail_btn_copy_emoji_id)
     fun onCopyEmojiIdButtonClicked(view: View) {
-        val deepLink = WalletUtil.getDeepLink(tx.user.publicKey.emojiId)
+        val deepLink = WalletUtil.getEmojiIdDeepLink(tx.user.publicKey.emojiId)
         val clipBoard = ContextCompat.getSystemService(this, ClipboardManager::class.java)
         val deepLinkClipboardData = ClipData.newPlainText(
             "Tari Wallet Deep Link",

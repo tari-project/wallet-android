@@ -51,6 +51,7 @@ object Event {
         data class TxReplyReceived(val completedTxId: TxId)
         data class TxFinalized(val completedTxId: TxId)
         data class DiscoveryComplete(val txId: TxId, val success: Boolean)
+        data class BaseNodeSyncComplete(val txId: TxId, val success: Boolean)
     }
 
     /**

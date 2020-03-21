@@ -117,7 +117,7 @@ internal class WalletInfoActivity : BaseActivity() {
             EmojiUtil.getChunkedEmojiId(sharedPrefsWrapper.emojiId!!, emojiIdChunkSeparator)
         emojiIdTextView.text = chunkedEmojiId
 
-        val content = WalletUtil.getDeepLink(sharedPrefsWrapper.emojiId!!)
+        val content = WalletUtil.getEmojiIdDeepLink(sharedPrefsWrapper.emojiId!!)
         UiUtil.getQREncodedBitmap(content, qrCodeImageSize)?.let {
             qrCodeImageView.setImageBitmap(it)
         }
@@ -136,7 +136,7 @@ internal class WalletInfoActivity : BaseActivity() {
     @OnClick(R.id.wallet_info_txt_copy_emoji_id)
     fun onCopyEmojiIdClick() {
         UiUtil.temporarilyDisableClick(copyEmojiIdTextView)
-        val deepLink = WalletUtil.getDeepLink(sharedPrefsWrapper.emojiId!!)
+        val deepLink = WalletUtil.getEmojiIdDeepLink(sharedPrefsWrapper.emojiId!!)
         val clipBoard = ContextCompat.getSystemService(this, ClipboardManager::class.java)
         val deepLinkClipboardData = ClipData.newPlainText(
             "Tari Wallet Deep Link",

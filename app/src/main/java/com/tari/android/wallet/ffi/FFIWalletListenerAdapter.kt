@@ -39,11 +39,11 @@ import java.math.BigInteger
  */
 internal interface FFIWalletListenerAdapter {
 
-    fun onTxBroadcast(completedTxId: BigInteger) = Unit
-    fun onTxMined(completedTxId: BigInteger) = Unit
-    fun onTxReceived(pendingInboundTxId: BigInteger) = Unit
-    fun onTxReplyReceived(completedTxId: BigInteger) = Unit
-    fun onTxFinalized(completedTxId: BigInteger) = Unit
-    fun onDiscoveryComplete(txId: BigInteger, success: Boolean) = Unit
-    fun onBaseNodeSyncComplete(txId: BigInteger, success: Boolean) = Unit
+    fun onTxBroadcast(completedTxId: BigInteger)
+    fun onTxMined(completedTxId: BigInteger)
+    fun onTxReceived(pendingInboundTxId: BigInteger)
+    fun onTxReplyReceived(completedTxId: BigInteger)
+    fun onTxFinalized(completedTxId: BigInteger)
+    fun onDiscoveryComplete(txId: BigInteger, success: Boolean)
+    fun onBaseNodeSyncComplete(txId: BigInteger, success: Boolean)
 }

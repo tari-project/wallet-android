@@ -393,17 +393,19 @@ internal class HomeActivity : BaseActivity(),
     }
 
     private fun subscribeToEventBus() {
-        // event bus subscriptions
-        EventBus.subscribe<Event.Tx.TxSendSuccessful>(this) {
-            wr.get()?.rootView?.post {
-                wr.get()?.onSendTxSuccessful()
-            }
-        }
-        EventBus.subscribe<Event.Wallet.DiscoveryComplete>(this) {
+        // wallet events
+        EventBus.subscribe<Event.Wallet.TxMined>(this) {
             wr.get()?.rootView?.post {
                 updateAllDataAndUI(restartBalanceUI = false)
             }
         }
+        EventBus.subscribe<Event.Wallet.TxReceived>(this) {
+            wr.get()?.rootView?.post {
+                updateAllDataAndUI(restartBalanceUI = false)
+            }
+        }
+
+        // Testnet Tari events
         EventBus.subscribe<Event.Testnet.TestnetTariRequestSuccessful>(this) { event ->
             wr.get()?.rootView?.post {
                 wr.get()?.testnetTariRequestSuccessful(event.senderPublicKey)
@@ -414,12 +416,9 @@ internal class HomeActivity : BaseActivity(),
                 wr.get()?.testnetTariRequestError(event.errorMessage)
             }
         }
+
+        // app-specific events
         EventBus.subscribe<Event.Contact.ContactAddedOrUpdated>(this) {
-            wr.get()?.rootView?.post {
-                updateAllDataAndUI(restartBalanceUI = false)
-            }
-        }
-        EventBus.subscribe<Event.Wallet.TxReceived>(this) {
             wr.get()?.rootView?.post {
                 updateAllDataAndUI(restartBalanceUI = false)
             }
@@ -969,7 +968,13 @@ internal class HomeActivity : BaseActivity(),
             // profile button - handle touch
             val rect = Rect()
             userWalletInfoButton.getGlobalVisibleRect(rect)
-            if (rect.contains(event.rawX.toInt(), event.rawY.toInt())) {
+            val quadRect = Rect(
+                rect.right - rect.width() * 2,
+                rect.bottom - rect.height() * 2,
+                rect.left + rect.width() * 2,
+                rect.top + rect.height() * 2
+            )
+            if (quadRect.contains(event.rawX.toInt(), event.rawY.toInt())) {
                 userWalletInfoButton.dispatchTouchEvent(event)
             }
             // event consumed

@@ -352,7 +352,7 @@
                 <FrameLayout
                     android:id="@+id/tx_detail_vw_emoji_id_summary_container"
                     android:layout_width="wrap_content"
-                    android:layout_height="32dp"
+                    android:layout_height="38dp"
                     android:background="@drawable/emoji_id_bg"
                     android:clickable="true"
                     android:elevation="@dimen/common_view_elevation"
@@ -417,7 +417,7 @@
                     <View
                         android:id="@+id/tx_detail_vw_full_emoji_id_fader"
                         android:layout_width="26dp"
-                        android:layout_height="24dp"
+                        android:layout_height="21dp"
                         android:layout_alignParentEnd="true"
                         android:layout_centerVertical="true"
                         android:background="@drawable/emoji_id_end_fader"
