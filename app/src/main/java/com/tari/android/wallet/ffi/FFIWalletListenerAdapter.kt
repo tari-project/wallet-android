@@ -45,5 +45,5 @@ internal interface FFIWalletListenerAdapter {
     fun onTxReplyReceived(completedTxId: BigInteger) = Unit
     fun onTxFinalized(completedTxId: BigInteger) = Unit
     fun onDiscoveryComplete(txId: BigInteger, success: Boolean) = Unit
-
+    fun onBaseNodeSyncComplete(txId: BigInteger, success: Boolean) = Unit
 }

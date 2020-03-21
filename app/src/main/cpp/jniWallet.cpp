@@ -106,6 +106,7 @@ jmethodID txFinalizedCallbackMethodId;
 jmethodID txBroadcastCallbackMethodId;
 jmethodID txMinedCallbackMethodId;
 jmethodID txDiscoveryCallbackMethodId;
+jmethodID syncBaseNodeId;
 
 void BroadcastCallback(struct TariCompletedTransaction *pCompletedTransaction) {
     auto *jniEnv = getJNIEnv();
@@ -184,6 +185,19 @@ void DiscoveryCallback(unsigned long long tx_id, bool success) {
     g_vm->DetachCurrentThread();
 }
 
+void BaseNodeSyncCallback (unsigned long long request_id, bool success) {
+    auto *jniEnv = getJNIEnv();
+    if (jniEnv == nullptr) {
+        return;
+    }
+    jbyteArray bytes = getBytesFromUnsignedLongLong(jniEnv, request_id);
+
+    jniEnv->CallVoidMethod(
+            callbackHandler,
+            syncBaseNodeId, bytes, success);
+    g_vm->DetachCurrentThread();
+}
+
 extern "C"
 JNIEXPORT void JNICALL
 Java_com_tari_android_wallet_ffi_FFIWallet_jniCreate(
@@ -203,6 +217,8 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniCreate(
         jstring callback_tx_mined_sig,
         jstring callback_discovery_process_complete,
         jstring callback_discovery_process_complete_sig,
+        jstring callback_base_node_sync,
+        jstring callback_base_node_sync_sig,
         jobject error) {
 
     int i = 0;
@@ -279,6 +295,17 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniCreate(
         SetPointerField(jEnv,jThis,reinterpret_cast<jlong>(nullptr));
     }
 
+    const char *pBaseNodeSync = jEnv->GetStringUTFChars(callback_base_node_sync,
+                                                           JNI_FALSE);
+    const char *pBaseNodeSyncSig = jEnv->GetStringUTFChars(callback_base_node_sync_sig,
+                                                        JNI_FALSE);
+    syncBaseNodeId = jEnv->GetMethodID(jClass, pBaseNodeSync, pBaseNodeSyncSig);
+    jEnv->ReleaseStringUTFChars(callback_base_node_sync_sig, pBaseNodeSyncSig);
+    jEnv->ReleaseStringUTFChars(callback_base_node_sync, pBaseNodeSync);
+    if (syncBaseNodeId == nullptr) {
+        SetPointerField(jEnv,jThis,reinterpret_cast<jlong>(nullptr));
+    }
+
     jlong lWalletConfig = GetPointerField(jEnv,jpWalletConfig);
     TariWalletConfig *pWalletConfig = reinterpret_cast<TariWalletConfig *>(lWalletConfig);
 
@@ -286,7 +313,7 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniCreate(
 
     TariWallet *pWallet = wallet_create(pWalletConfig, pLogPath, ReceivedCallback, ReplyCallback,
                                         FinalizedCallback, BroadcastCallback, MinedCallback,
-                                        DiscoveryCallback, r);
+                                        DiscoveryCallback,BaseNodeSyncCallback, r);
 
     setErrorCode(jEnv, error, i);
     jEnv->ReleaseStringUTFChars(jLogPath, pLogPath);
