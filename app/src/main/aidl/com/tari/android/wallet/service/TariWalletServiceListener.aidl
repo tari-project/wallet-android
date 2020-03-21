@@ -51,6 +51,8 @@ oneway interface TariWalletServiceListener {
 
     void onDiscoveryComplete(in TxId completedTxId, in boolean success);
 
+    void onBaseNodeSyncComplete(in TxId completedTxId, in boolean success);
+
     void onTestnetTariRequestError(in String error);
 
     void onTestnetTariRequestSuccess();

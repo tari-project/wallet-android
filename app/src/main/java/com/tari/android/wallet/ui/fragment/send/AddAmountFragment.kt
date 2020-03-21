@@ -286,7 +286,6 @@ class AddAmountFragment(private val walletService: TariWalletService) : BaseFrag
             titleTextView.visibility = View.VISIBLE
             titleTextView.text = (recipientUser as Contact).alias
         } else {
-            // TODO to be changed once the emoji id graphic design spec is clear
             val shortenedEmojiId = EmojiUtil.getShortenedEmojiId(recipientUser.publicKey.emojiId)
                 ?: throw RuntimeException("Invalid emoji id: " + recipientUser.publicKey.emojiId)
             displayEmojiId(shortenedEmojiId)
@@ -455,7 +454,7 @@ class AddAmountFragment(private val walletService: TariWalletService) : BaseFrag
     @OnClick(R.id.add_amount_btn_copy_emoji_id)
     fun onCopyEmojiIdButtonClicked(view: View) {
         val mActivity = activity ?: return
-        val deepLink = WalletUtil.getDeepLink(recipientUser.publicKey.emojiId)
+        val deepLink = WalletUtil.getEmojiIdDeepLink(recipientUser.publicKey.emojiId)
         val clipBoard = ContextCompat.getSystemService(mActivity, ClipboardManager::class.java)
         val deepLinkClipboardData = ClipData.newPlainText(
             "Tari Wallet Deep Link",

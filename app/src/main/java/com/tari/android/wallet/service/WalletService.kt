@@ -196,6 +196,16 @@ class WalletService : Service(), FFIWalletListenerAdapter {
         }
     }
 
+    override fun onBaseNodeSyncComplete(txId: BigInteger, success: Boolean) {
+        Logger.d("Tx $txId base node sync complete. Success: $success")
+        // post event to bus
+        EventBus.post(Event.Wallet.BaseNodeSyncComplete(TxId(txId), success))
+        // notify external listeners
+        listeners.iterator().forEach {
+            it.onBaseNodeSyncComplete(TxId(txId), success)
+        }
+    }
+
     private fun postTxNotification(tx: Tx) {
         // if app is backgrounded, display heads-up notification
         if (!app.isInForeground || app.currentActivity !is HomeActivity) {
