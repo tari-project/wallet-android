@@ -557,10 +557,13 @@ class AddRecipientFragment(private val walletService: TariWalletService) : BaseF
             val qrData = data.getStringExtra(EXTRA_QR_DATA) ?: return
             val deepLink = DeepLink.from(qrData) ?: return
             when (deepLink.type) {
-                EMOJI_ID -> searchEditText.setText(
-                    deepLink.type.value,
-                    TextView.BufferType.EDITABLE
-                )
+                EMOJI_ID -> {
+                    searchEditText.setText(
+                        deepLink.type.value,
+                        TextView.BufferType.EDITABLE
+                    )
+                    emojiIdPublicKey = walletService.getPublicKeyFromEmojiId(deepLink.type.value)
+                }
                 // no-op in the base of public key
                 // TODO - get emoji id from public key
                 else -> return
@@ -603,7 +606,9 @@ class AddRecipientFragment(private val walletService: TariWalletService) : BaseF
         hidePasteEmojiIdViews(animate = true) {
             searchEditText.scaleX = 0f
             searchEditText.scaleY = 0f
-            searchEditText.setText(emojiIdPublicKey!!.emojiId, TextView.BufferType.EDITABLE)
+            val emojid = emojiIdPublicKey!!.emojiId
+            emojiIdPublicKey = walletService.getPublicKeyFromEmojiId(emojid)
+            searchEditText.setText(emojid, TextView.BufferType.EDITABLE)
             searchEditText.setSelection(searchEditText.text?.length ?: 0)
 
             rootView.postDelayed({
