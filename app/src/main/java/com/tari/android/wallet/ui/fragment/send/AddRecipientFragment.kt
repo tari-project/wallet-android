@@ -554,6 +554,9 @@ class AddRecipientFragment(private val walletService: TariWalletService) : BaseF
             && resultCode == Activity.RESULT_OK
             && data != null
         ) {
+            hidePasteEmojiIdViews(false)
+            emojiIdPublicKey = null
+
             val qrData = data.getStringExtra(EXTRA_QR_DATA) ?: return
             val deepLink = DeepLink.from(qrData) ?: return
             when (deepLink.type) {
@@ -584,6 +587,11 @@ class AddRecipientFragment(private val walletService: TariWalletService) : BaseF
                     }
                 }
             }
+        }
+        else
+        {
+            hidePasteEmojiIdViews(false)
+            checkClipboardForValidEmojiId()
         }
     }
 
