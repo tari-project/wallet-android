@@ -102,55 +102,70 @@ internal class HomeActivity : BaseActivity(),
 
     @BindView(R.id.home_vw_root)
     lateinit var rootView: View
+
     @BindView(R.id.home_vw_top_content_container)
     lateinit var topContentContainerView: View
+
     @BindView(R.id.home_vw_gradient_bg)
     lateinit var gradientBgView: View
 
     @BindView(R.id.home_swipe_container)
     lateinit var swipeRefreshLayout: SwipeRefreshLayout
+
     @BindView(R.id.home_rv_tx_list)
     lateinit var recyclerView: RecyclerView
 
     // transaction list
     @BindView(R.id.home_vw_tx_list_header)
     lateinit var txListHeaderView: View
+
     @BindView(R.id.home_btn_close_tx_list)
     lateinit var minimizeTxListButton: ImageButton
+
     @BindView(R.id.home_txt_tx_list_title)
     lateinit var txListTitleTextView: TextView
+
     @BindView(R.id.home_vw_grabber_container)
     lateinit var grabberContainerView: View
+
     @BindView(R.id.home_vw_grabber)
     lateinit var grabberView: View
+
     @BindView(R.id.home_vw_tx_list_bg_overlay)
     lateinit var txListBgOverlayView: View
+
     @BindView(R.id.home_vw_header_elevation)
     lateinit var headerElevationView: View
 
     @BindView(R.id.home_btn_send_tari)
     lateinit var sendTariButton: Button
+
     @BindView(R.id.home_vw_send_tari_btn_bg_gradient)
     lateinit var sendTariButtonBgGradientView: View
 
     // Balance views.
     @BindView(R.id.home_txt_available_balance)
     lateinit var balanceTitleTextView: TextView
+
     @BindView(R.id.home_img_balance_gem)
     lateinit var balanceGemImageView: ImageView
+
     @BindView(R.id.home_img_wallet_info)
     lateinit var userWalletInfoButton: ImageView
 
     // Balance digit containers.
     @BindView(R.id.home_vw_balance_digit_container)
     lateinit var balanceDigitContainerView: ViewGroup
+
     @BindView(R.id.home_balance_vw_decimals_digit_container)
     lateinit var balanceDecimalDigitContainerView: ViewGroup
 
     @BindView(R.id.home_scroll_view)
     lateinit var scrollView: CustomScrollView
+
     @BindView(R.id.home_vw_scroll_bg_enabler)
     lateinit var scrollBgEnabler: View
+
     @BindView(R.id.home_vw_scroll_content)
     lateinit var scrollContentView: View
 
@@ -164,6 +179,7 @@ internal class HomeActivity : BaseActivity(),
     @BindDimen(R.dimen.home_top_content_container_view_top_margin)
     @JvmField
     var topContentContainerViewTopMargin = 0
+
     @BindDimen(R.dimen.home_top_content_container_scroll_vertical_shift)
     @JvmField
     var topContentContainerViewScrollVerticalShift = 0
@@ -171,15 +187,19 @@ internal class HomeActivity : BaseActivity(),
     @BindDimen(R.dimen.common_header_height)
     @JvmField
     var txListHeaderHeight = 0
+
     @BindDimen(R.dimen.home_send_tari_button_initial_bottom_margin)
     @JvmField
     var sendTariButtonInitialBottomMargin = 0
+
     @BindDimen(R.dimen.home_send_tari_button_visible_bottom_margin)
     @JvmField
     var sendTariButtonVisibleBottomMargin = 0
+
     @BindDimen(R.dimen.home_tx_list_container_minimized_top_margin)
     @JvmField
     var txListContainerMinimizedTopMargin = 0
+
     @BindDimen(R.dimen.home_scroll_view_startup_anim_height)
     @JvmField
     var scrollViewStartupAnimHeight = 0
@@ -187,18 +207,23 @@ internal class HomeActivity : BaseActivity(),
     @BindDimen(R.dimen.home_grabber_container_height)
     @JvmField
     var grabberContainerHeight = 0
+
     @BindDimen(R.dimen.home_grabber_corner_radius)
     @JvmField
     var grabberCornerRadius = 0
+
     @BindDimen(R.dimen.home_send_tari_button_hidden_bottom_margin)
     @JvmField
     var sendTariButtonHiddenBottomMargin = 0
+
     @BindDimen(R.dimen.home_grabber_width)
     @JvmField
     var grabberViewWidth = 0
+
     @BindDimen(R.dimen.home_tx_list_item_height)
     @JvmField
     var listItemHeight = 0
+
     @BindDimen(R.dimen.home_main_content_top_margin)
     @JvmField
     var homeMainContentTopMargin = 0
@@ -217,6 +242,7 @@ internal class HomeActivity : BaseActivity(),
 
     @Inject
     lateinit var sharedPrefsWrapper: SharedPrefsWrapper
+
     @Inject
     lateinit var tracker: Tracker
 
@@ -226,6 +252,7 @@ internal class HomeActivity : BaseActivity(),
     private val completedTxs = mutableListOf<CompletedTx>()
     private val pendingInboundTxs = mutableListOf<PendingInboundTx>()
     private val pendingOutboundTxs = mutableListOf<PendingOutboundTx>()
+
     // balance
     private lateinit var balanceInfo: BalanceInfo
 
@@ -960,6 +987,7 @@ internal class HomeActivity : BaseActivity(),
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onTouch(view: View?, event: MotionEvent?): Boolean {
+
         if (view == null || event == null) {
             return false
         }
@@ -975,7 +1003,9 @@ internal class HomeActivity : BaseActivity(),
                 rect.top + rect.height() * 2
             )
             if (quadRect.contains(event.rawX.toInt(), event.rawY.toInt())) {
-                userWalletInfoButton.dispatchTouchEvent(event)
+                if (event.action == MotionEvent.ACTION_DOWN) {
+                    walletInfoImageClicked(view)
+                }
             }
             // event consumed
             return true

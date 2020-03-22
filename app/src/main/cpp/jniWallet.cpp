@@ -809,14 +809,15 @@ JNIEXPORT jboolean JNICALL
 Java_com_tari_android_wallet_ffi_FFIWallet_jniAddBaseNodePeer(
         JNIEnv *jEnv,
         jobject jThis,
-        jlong jpPublicKey,
+        jobject jPublicKey,
         jstring jAddress,
         jobject error) {
     int i = 0;
     int *r = &i;
     jlong lWallet = GetPointerField(jEnv,jThis);
     TariWallet *pWallet = reinterpret_cast<TariWallet *>(lWallet);
-    TariPublicKey *pPublicKey = reinterpret_cast<TariPublicKey *>(jpPublicKey);
+    jlong lPublicKey = GetPointerField(jEnv,jPublicKey);
+    TariPublicKey *pPublicKey = reinterpret_cast<TariPublicKey *>(lPublicKey);
     char *pAddress = const_cast<char *>(jEnv->GetStringUTFChars(jAddress, JNI_FALSE));
     jboolean result = static_cast<jboolean>(
             wallet_add_base_node_peer(pWallet, pPublicKey, pAddress, r) != 0);

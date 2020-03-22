@@ -157,7 +157,7 @@ internal abstract class FFIWallet(commsConfig: FFICommsConfig, logPath: String) 
     ): ByteArray
 
     private external fun jniAddBaseNodePeer(
-        publicKeyPtr: FFIPublicKeyPtr,
+        publicKey: FFIPublicKey,
         address: String,
         libError: FFIError
     ): Boolean
@@ -441,7 +441,7 @@ internal abstract class FFIWallet(commsConfig: FFICommsConfig, logPath: String) 
         baseNodeAddress: String
     ): Boolean {
         val error = FFIError()
-        val result = jniAddBaseNodePeer(baseNodePublicKey.getPointer(), baseNodeAddress, error)
+        val result = jniAddBaseNodePeer(baseNodePublicKey, baseNodeAddress, error)
         throwIf(error)
         return result
     }
