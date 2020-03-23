@@ -35,6 +35,7 @@ package com.tari.android.wallet.event
 import com.tari.android.wallet.model.PendingInboundTx
 import com.tari.android.wallet.model.PublicKey
 import com.tari.android.wallet.model.TxId
+import com.tari.android.wallet.model.RxId
 
 /**
  * App-wide events.
@@ -51,7 +52,7 @@ object Event {
         data class TxReplyReceived(val completedTxId: TxId)
         data class TxFinalized(val completedTxId: TxId)
         data class DiscoveryComplete(val txId: TxId, val success: Boolean)
-        data class BaseNodeSyncComplete(val txId: TxId, val success: Boolean)
+        data class BaseNodeSyncComplete(val rxId: RxId, val success: Boolean)
     }
 
     /**

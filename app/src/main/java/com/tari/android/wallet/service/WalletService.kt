@@ -196,13 +196,13 @@ class WalletService : Service(), FFIWalletListenerAdapter {
         }
     }
 
-    override fun onBaseNodeSyncComplete(txId: BigInteger, success: Boolean) {
-        Logger.d("Tx $txId base node sync complete. Success: $success")
+    override fun onBaseNodeSyncComplete(rxId: BigInteger, success: Boolean) {
+        Logger.d("Request $rxId base node sync complete. Success: $success")
         // post event to bus
-        EventBus.post(Event.Wallet.BaseNodeSyncComplete(TxId(txId), success))
+        EventBus.post(Event.Wallet.BaseNodeSyncComplete(RxId(rxId), success))
         // notify external listeners
         listeners.iterator().forEach {
-            it.onBaseNodeSyncComplete(TxId(txId), success)
+            it.onBaseNodeSyncComplete(RxId(rxId), success)
         }
     }
 

@@ -37,6 +37,7 @@ package com.tari.android.wallet.model;
  */
 parcelable WalletError;
 parcelable TxId;
+parcelable RxId;
 parcelable MicroTari;
 parcelable BalanceInfo;
 parcelable User;

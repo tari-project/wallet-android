@@ -30,20 +30,57 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.tari.android.wallet.ffi
+package com.tari.android.wallet.model
 
+import android.os.Parcel
+import android.os.Parcelable
 import java.math.BigInteger
 
 /**
+ * This wrapper is needed for id parameters in AIDL methods.
+ *
  * @author The Tari Development Team
  */
-internal interface FFIWalletListenerAdapter {
+class RxId() : Parcelable {
 
-    fun onTxBroadcast(completedTxId: BigInteger)
-    fun onTxMined(completedTxId: BigInteger)
-    fun onTxReceived(pendingInboundTxId: BigInteger)
-    fun onTxReplyReceived(completedTxId: BigInteger)
-    fun onTxFinalized(completedTxId: BigInteger)
-    fun onDiscoveryComplete(txId: BigInteger, success: Boolean)
-    fun onBaseNodeSyncComplete(rxId: BigInteger, success: Boolean)
+    var value = BigInteger("0")
+
+    constructor(
+        value: BigInteger
+    ) : this() {
+        this.value = value
+    }
+
+    // region Parcelable
+
+    constructor(parcel: Parcel) : this() {
+        readFromParcel(parcel)
+    }
+
+    companion object CREATOR : Parcelable.Creator<RxId> {
+
+        override fun createFromParcel(parcel: Parcel): RxId {
+            return RxId(parcel)
+        }
+
+        override fun newArray(size: Int): Array<RxId> {
+            return Array(size) { RxId() }
+        }
+
+    }
+
+    override fun writeToParcel(parcel: Parcel, flags: Int) {
+        parcel.writeSerializable(value)
+    }
+
+    private fun readFromParcel(inParcel: Parcel) {
+        value = inParcel.readSerializable() as BigInteger
+    }
+
+    override fun describeContents(): Int {
+        return 0
+    }
+
+    // endregion
+
 }
