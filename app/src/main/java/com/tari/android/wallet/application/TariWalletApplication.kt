@@ -114,7 +114,7 @@ internal class TariWalletApplication : Application(), LifecycleObserver {
         ProcessLifecycleOwner.get().lifecycle.addObserver(this)
 
         // Run tor.
-        torProxyManager.start(15 * 1000, object : TorProxyListener {
+        torProxyManager.start(15, object : TorProxyListener {
             override fun onTorProxyInitResult(success: Boolean) {
                 Logger.d("TorProxyInitResult %s", success)
             }
