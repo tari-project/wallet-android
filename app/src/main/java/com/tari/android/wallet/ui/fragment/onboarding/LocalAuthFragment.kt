@@ -309,6 +309,8 @@ internal class LocalAuthFragment : BaseFragment() {
         dialogBuilder.setMessage(getString(R.string.auth_not_available_or_canceled_desc))
             .setCancelable(false)
             .setPositiveButton(getString(R.string.proceed)) { dialog, _ ->
+                // user has chosen to proceed without authentication
+                sharedPrefsWrapper.isAuthenticated = true
                 dialog.cancel()
                 authSuccess()
             }
@@ -321,6 +323,7 @@ internal class LocalAuthFragment : BaseFragment() {
     }
 
     private fun authSuccess() {
+        sharedPrefsWrapper.isAuthenticated = true
         sharedPrefsWrapper.onboardingAuthSetupCompleted = true
         listener?.onAuthSuccess()
     }

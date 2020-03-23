@@ -157,8 +157,8 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_marginTop="32dp"
-            android:clipChildren="false"
             android:background="@color/white"
+            android:clipChildren="false"
             android:orientation="vertical"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tx_detail_txt_fee_label">
@@ -198,10 +198,10 @@
                 <com.tari.android.wallet.ui.component.CustomFontTextView
                     android:id="@+id/tx_detail_txt_edit_label"
                     android:layout_width="wrap_content"
-                    android:layout_marginTop="2dp"
                     android:layout_height="wrap_content"
                     android:layout_below="@id/tx_detail_txt_contact_label"
                     android:layout_alignParentEnd="true"
+                    android:layout_marginTop="2dp"
                     android:gravity="center"
                     android:padding="12dp"
                     android:text="@string/tx_detail_edit"
@@ -316,6 +316,7 @@
                     android:layout_centerHorizontal="true"
                     android:contentDescription="@null"
                     android:src="@drawable/speech_notch_up" />
+
                 <com.tari.android.wallet.ui.component.CustomFontTextView
                     android:id="@+id/tx_detail_txt_copy_emoji_id"
                     android:layout_width="wrap_content"
@@ -328,6 +329,7 @@
                     android:textColor="#9834F6"
                     android:textSize="14sp"
                     app:customFont="AVENIR_LT_STD_HEAVY" />
+
                 <Button
                     android:id="@+id/tx_detail_btn_copy_emoji_id"
                     android:layout_width="0dp"
@@ -352,13 +354,15 @@
                 <FrameLayout
                     android:id="@+id/tx_detail_vw_emoji_id_summary_container"
                     android:layout_width="wrap_content"
-                    android:layout_height="38dp"
+                    android:layout_height="wrap_content"
                     android:background="@drawable/emoji_id_bg"
                     android:clickable="true"
                     android:elevation="@dimen/common_view_elevation"
                     android:focusable="true"
                     android:paddingStart="@dimen/emoji_id_container_horizontal_padding"
-                    android:paddingEnd="@dimen/emoji_id_container_horizontal_padding">
+                    android:paddingTop="@dimen/emoji_id_container_vertical_padding"
+                    android:paddingEnd="@dimen/emoji_id_container_horizontal_padding"
+                    android:paddingBottom="@dimen/emoji_id_container_vertical_padding">
 
                     <include
                         android:id="@+id/tx_detail_vw_emoji_id_summary"

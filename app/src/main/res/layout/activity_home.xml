@@ -20,9 +20,9 @@
         android:id="@+id/home_vw_top_content_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="25dp"
+        android:layout_marginStart="@dimen/common_horizontal_margin"
         android:layout_marginTop="@dimen/home_top_content_container_view_top_margin"
-        android:layout_marginEnd="25dp">
+        android:layout_marginEnd="@dimen/common_horizontal_margin">
 
         <!-- profile button -->
         <ImageView
@@ -126,11 +126,24 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <View
+            <RelativeLayout
                 android:id="@+id/home_vw_scroll_bg_enabler"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/home_tx_list_container_minimized_top_margin"
-                android:clickable="false" />
+                android:clipChildren="true">
+
+                <!-- wallet info (profile) button -->
+                <!-- actual action button on top of the background image-only view -->
+                <Button
+                    android:id="@+id/home_btn_wallet_info"
+                    android:layout_width="@dimen/home_wallet_info_button_size"
+                    android:layout_alignParentEnd="true"
+                    android:layout_marginEnd="15dp"
+                    android:layout_marginTop="@dimen/home_wallet_info_button_initial_top_margin"
+                    android:background="@color/transparent"
+                    android:layout_height="@dimen/home_wallet_info_button_size"/>
+
+            </RelativeLayout>
 
             <!-- fixes a possible UI glitch that happens at the startup animation -->
             <View

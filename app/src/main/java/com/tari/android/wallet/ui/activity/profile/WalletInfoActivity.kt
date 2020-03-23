@@ -136,11 +136,10 @@ internal class WalletInfoActivity : BaseActivity() {
     @OnClick(R.id.wallet_info_txt_copy_emoji_id)
     fun onCopyEmojiIdClick() {
         UiUtil.temporarilyDisableClick(copyEmojiIdTextView)
-        val deepLink = WalletUtil.getEmojiIdDeepLink(sharedPrefsWrapper.emojiId!!)
         val clipBoard = ContextCompat.getSystemService(this, ClipboardManager::class.java)
         val deepLinkClipboardData = ClipData.newPlainText(
-            "Tari Wallet Deep Link",
-            deepLink
+            "Tari Wallet Emoji Id",
+            EmojiUtil.getChunkedEmojiId(sharedPrefsWrapper.emojiId!!, emojiIdChunkSeparator)
         )
         clipBoard?.setPrimaryClip(deepLinkClipboardData)
         Toast.makeText(this, emojiIdCopiedToastMessage, Toast.LENGTH_SHORT).show()

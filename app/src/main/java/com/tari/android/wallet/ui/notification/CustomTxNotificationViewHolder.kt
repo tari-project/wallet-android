@@ -84,6 +84,10 @@ class CustomTxNotificationViewHolder(val context: Context, tx: Tx) :
     }
 
     private fun displayTxUserEmojiId(user: User) {
+        setTextViewText(
+            R.id.notification_tx_received_txt_contact_alias,
+            ""
+        )
         setViewVisibility(
             R.id.notification_tx_received_txt_contact_alias,
             View.INVISIBLE

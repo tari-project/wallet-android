@@ -51,6 +51,7 @@ import com.tari.android.wallet.R
 import com.tari.android.wallet.auth.AuthUtil
 import com.tari.android.wallet.ui.activity.home.HomeActivity
 import com.tari.android.wallet.util.Constants
+import com.tari.android.wallet.util.SharedPrefsWrapper
 import org.matomo.sdk.Tracker
 import org.matomo.sdk.extra.TrackHelper
 import java.lang.ref.WeakReference
@@ -76,6 +77,8 @@ internal class AuthActivity : BaseActivity(), Animator.AnimatorListener {
 
     @Inject
     lateinit var tracker: Tracker
+    @Inject
+    lateinit var sharedPrefsWrapper: SharedPrefsWrapper
 
     override val contentViewId = R.layout.activity_auth
 
@@ -195,6 +198,7 @@ internal class AuthActivity : BaseActivity(), Animator.AnimatorListener {
      * Auth was successful.
      */
     private fun authSuccessful() {
+        sharedPrefsWrapper.isAuthenticated = true
         val wr = WeakReference<AuthActivity>(this)
         wr.get()?.tariAnimationView?.post {
             wr.get()?.playTariWalletAnim()
@@ -220,6 +224,8 @@ internal class AuthActivity : BaseActivity(), Animator.AnimatorListener {
             .setCancelable(false)
             .setPositiveButton(getString(R.string.proceed)) { dialog, _ ->
                 dialog.cancel()
+                // user has chosen to proceed without authentication
+                sharedPrefsWrapper.isAuthenticated = true
                 wr.get()?.tariAnimationView?.post {
                     wr.get()?.playTariWalletAnim()
                 }

@@ -1,4 +1,4 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_name">Tari Wallet</string>
 
     <!-- foreground service description -->
@@ -86,23 +86,33 @@
     <string name="home_swipe_down_to_show_wallet">Swipe down and I’ll  show you around your wallet</string>
     <string name="home_tari_bot_some_tari_to_get_started">Some Tari to get you started.</string>
 
-    <!-- introduction -->
-    <string name="introduction_crypto_wallet_title_text_line_1">A crypto wallet</string>
-    <string name="introduction_crypto_wallet_title_text_line_2">that’s easy to use.</string>
-    <string name="introduction_wallet_desc">Tari wallet puts you and your privacy at the core\nof everything and is still easy to use.</string>
-    <string name="introduction_create_wallet">Create a Wallet</string>
+    <!-- onboarding - introduction -->
+    <string name="introduction_crypto_wallet_title_text_line_1">Welcome to</string>
+    <string name="introduction_crypto_wallet_title_text_line_2">Tari Aurora</string>
+    <string name="introduction_wallet_desc">Get ready to send and receive Testnet Tari with an easy-to-use crypto wallet that puts privacy first.</string>
+    <string name="introduction_create_wallet">Create Your Wallet</string>
 
-    <!-- create wallet -->
-    <string name="create_wallet_hello_friend_label">Hello Friend</string>
-    <string name="create_wallet_just_a_sec_label">Just a sec...</string>
-    <string name="create_wallet_just_sec_desc_text">Your wallet is being created</string>
-    <string name="create_wallet_address_desc">Your Emoji ID is your wallet address.\nIt’s how your friends can find you and send you Tari.</string>
+    <!-- onboarding - create wallet -->
+    <string name="create_wallet_hello_friend_label">Hello, Friend.</string>
+    <string name="create_wallet_just_a_sec_label" tools:ignore="TypographyEllipsis">Hold on a sec...</string>
+    <string name="create_wallet_just_sec_desc_text">We’re creating your wallet.</string>
+    <string name="create_wallet_address_desc">Your Emoji ID is your wallet address.\n It’s how people can find you and send you Tari.</string>
     <string name="create_wallet_now_text">Now create your Emoji ID</string>
     <string name="create_wallet_awesome">Awesome!</string>
     <string name="create_wallet_your_emoji_id_text_label_1">This is your</string>
     <string name="create_wallet_your_emoji_id_text_label_2"> Emoji ID</string>
-    <string name="create_wallet_set_of_emoji_your_wallet_address_desc">This set of emojis is your wallet address.\nIt’s how your friends can find you and send you Tari.</string>
+    <string name="create_wallet_set_of_emoji_your_wallet_address_desc">Your Emoji ID is your wallet’s address,\nand how others can find you and send you Tari.</string>
     <string name="create_wallet_continue_and_create_emoji_id">Continue &amp; Create Emoji ID</string>
+
+    <!-- onboarding - local auth -->
+    <string name="auth_prompt_device_lock_code">Protect your wallet with your\nDevice Lock Code</string>
+    <string name="auth_prompt_device_lock_code_bold_part">Device Lock Code</string>
+    <string name="auth_prompt_biometrics">Protect your wallet with your Biometrics</string>
+    <string name="auth_prompt_biometrics_bold_part">Biometrics</string>
+    <string name="auth_prompt_button_text">Enable your Device Lock Code</string>
+    <string name="auth_prompt_button_touch_id_text">Enable Biometrics</string>
+    <string name="auth_prompt_touch_id_desc">We recommend using biometrics to access your Tari wallet for security and ease of use.</string>
+    <string name="auth_prompt_pin_desc">We recommend using your device lock code to access your Tari wallet for security and ease of use.</string>
 
     <string name="scan_qr_description">Scan Tari QR code in the box\nbelow to send a Tari to recipient.</string>
     <string name="failed_init_camera_message">Failed to initialize Camera</string>
@@ -153,16 +163,6 @@
     <string name="tx_detail_add_contact">Add Contact Name</string>
     <string name="tx_detail_transaction_fee">Transaction Fee</string>
     <string name="tx_detail_transaction_id">Transaction ID</string>
-
-    <!-- local auth -->
-    <string name="auth_prompt_device_lock_code">Protect your wallet with your\nDevice Lock Code</string>
-    <string name="auth_prompt_device_lock_code_bold_part">Device Lock Code</string>
-    <string name="auth_prompt_biometrics">Protect your wallet with your Biometrics</string>
-    <string name="auth_prompt_biometrics_bold_part">Biometrics</string>
-    <string name="auth_prompt_button_text">Enable your Device Lock Code</string>
-    <string name="auth_prompt_button_touch_id_text">Enable Biometrics</string>
-    <string name="auth_prompt_touch_id_desc">We recommend using biometrics to access your Tari wallet for security and ease of use.</string>
-    <string name="auth_prompt_pin_desc">We recommend using your device lock code to access your Tari wallet for security and ease of use.</string>
 
     <!-- debug -->
     <string name="debug_log_files_title">Logs</string>

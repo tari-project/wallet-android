@@ -52,6 +52,7 @@ import androidx.core.content.ContextCompat
 import butterknife.*
 import com.daasuu.ei.Ease
 import com.daasuu.ei.EasingInterpolator
+import com.orhanobut.logger.Logger
 import com.tari.android.wallet.R
 import com.tari.android.wallet.model.*
 import com.tari.android.wallet.service.TariWalletService
@@ -60,7 +61,6 @@ import com.tari.android.wallet.ui.fragment.BaseFragment
 import com.tari.android.wallet.ui.util.UiUtil
 import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.EmojiUtil
-import com.tari.android.wallet.util.WalletUtil
 import me.everything.android.ui.overscroll.OverScrollDecoratorHelper
 import org.matomo.sdk.Tracker
 import org.matomo.sdk.extra.TrackHelper
@@ -235,9 +235,7 @@ class AddNoteAndSendFragment(private val walletService: TariWalletService) : Bas
             titleTextView.visibility = View.VISIBLE
             titleTextView.text = (recipientUser as Contact).alias
         } else {
-            val shortenedEmojiId = EmojiUtil.getShortenedEmojiId(recipientUser.publicKey.emojiId)
-                ?: throw RuntimeException("Invalid emoji id: " + recipientUser.publicKey.emojiId)
-            displayEmojiId(shortenedEmojiId)
+            displayEmojiId(recipientUser.publicKey.emojiId)
         }
     }
 
@@ -245,13 +243,7 @@ class AddNoteAndSendFragment(private val walletService: TariWalletService) : Bas
         emojiIdSummaryContainerView.visibility = View.VISIBLE
         emojiIdSummaryController.display(emojiId)
         titleTextView.visibility = View.GONE
-        // make chunks
-        val separatorIndices = EmojiUtil.getNewChunkSeparatorIndices(emojiId)
-        val builder = StringBuilder(emojiId)
-        for ((i, index) in separatorIndices.iterator().withIndex()) {
-            builder.insert((index + i), emojiIdChunkSeparator)
-        }
-        fullEmojiIdTextView.text = builder.toString()
+        fullEmojiIdTextView.text = EmojiUtil.getChunkedEmojiId(emojiId, emojiIdChunkSeparator)
     }
 
     @OnClick(R.id.add_note_and_send_btn_back)
@@ -413,11 +405,10 @@ class AddNoteAndSendFragment(private val walletService: TariWalletService) : Bas
     @OnClick(R.id.add_note_and_send_btn_copy_emoji_id)
     fun onCopyEmojiIdButtonClicked(view: View) {
         val mActivity = activity ?: return
-        val deepLink = WalletUtil.getEmojiIdDeepLink(recipientUser.publicKey.emojiId)
         val clipBoard = ContextCompat.getSystemService(mActivity, ClipboardManager::class.java)
         val deepLinkClipboardData = ClipData.newPlainText(
-            "Tari Wallet Deep Link",
-            deepLink
+            "Tari Wallet Emoji Id",
+            EmojiUtil.getChunkedEmojiId(recipientUser.publicKey.emojiId, emojiIdChunkSeparator)
         )
         clipBoard?.setPrimaryClip(deepLinkClipboardData)
         hideFullEmojiId(animated = true)
