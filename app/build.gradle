@@ -130,6 +130,7 @@ dependencies {
 
     // Tor binary
     implementation 'org.torproject:tor-android-binary:0.4.2.5'
+    implementation 'net.freehaven.tor.control:jtorctl:0.2'
 
     // matomo - tracking
     implementation 'org.matomo.sdk:tracker:4.1.2'

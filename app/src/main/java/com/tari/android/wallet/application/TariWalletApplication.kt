@@ -43,6 +43,7 @@ import com.orhanobut.logger.AndroidLogAdapter
 import com.orhanobut.logger.Logger
 import com.tari.android.wallet.di.*
 import com.tari.android.wallet.notification.NotificationHelper
+import com.tari.android.wallet.tor.TorProxyListener
 import com.tari.android.wallet.tor.TorProxyManager
 import com.tari.android.wallet.util.SharedPrefsWrapper
 import com.tari.android.wallet.util.WalletUtil
@@ -112,12 +113,12 @@ internal class TariWalletApplication : Application(), LifecycleObserver {
 
         ProcessLifecycleOwner.get().lifecycle.addObserver(this)
 
-        /**
-         * Run tor.
-         */
-        Thread {
-            torProxyManager.runTorProxy()
-        }.start()
+        // Run tor.
+        torProxyManager.start(15 * 1000, object : TorProxyListener {
+            override fun onTorProxyInitResult(success: Boolean) {
+                Logger.d("TorProxyInitResult %s", success)
+            }
+        })
 
         TrackHelper.track().download().identifier(
             DownloadTracker.Extra.ApkChecksum(this)
