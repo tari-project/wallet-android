@@ -49,6 +49,7 @@ class SharedPrefsWrapper(
     private object Key {
         const val privateKeyHexStringKey = "tari_wallet_private_key_hex_string"
         const val publicKeyHexStringKey = "tari_wallet_public_key_hex_string"
+        const val isAuthenticatedKey = "tari_wallet_is_authenticated"
         const val emojiIdKey = "tari_wallet_emoji_id_"
         const val onboardingStartedKey = "tari_wallet_onboarding_started"
         const val onboardingAuthSetupCompletedKey = "tari_wallet_onboarding_auth_setup_completed"
@@ -87,6 +88,22 @@ class SharedPrefsWrapper(
                 putString(Key.publicKeyHexStringKey, value)
                 apply()
             }
+        }
+
+    var isAuthenticated: Boolean
+        get() {
+            return SecurePreferences.getBooleanValue(
+                context,
+                Key.isAuthenticatedKey,
+                false
+            )
+        }
+        set(value) {
+            SecurePreferences.setValue(
+                context,
+                Key.isAuthenticatedKey,
+                value
+            )
         }
 
     var emojiId: String?

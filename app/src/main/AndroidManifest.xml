@@ -72,11 +72,19 @@
         <activity
             android:name=".ui.activity.home.HomeActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
-            android:launchMode="singleTop"
+            android:launchMode="singleTask"
             android:parentActivityName=".ui.activity.home.HomeActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme"
-            android:windowSoftInputMode="stateAlwaysHidden" />
+            android:windowSoftInputMode="stateAlwaysHidden">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="tari" android:host="mainnet" />
+                <data android:scheme="tari" android:host="rincewind" />
+            </intent-filter>
+        </activity>
         <!-- recipient QR scanner -->
         <activity
             android:name=".ui.activity.qr.QRScannerActivity"

@@ -42,7 +42,6 @@ import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
 import android.graphics.Color
-import android.graphics.Rect
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.GradientDrawable
 import android.os.*
@@ -65,12 +64,14 @@ import com.daasuu.ei.Ease
 import com.daasuu.ei.EasingInterpolator
 import com.orhanobut.logger.Logger
 import com.tari.android.wallet.R
+import com.tari.android.wallet.application.DeepLink
 import com.tari.android.wallet.event.Event
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.model.*
 import com.tari.android.wallet.service.TariWalletService
 import com.tari.android.wallet.service.WalletService
 import com.tari.android.wallet.ui.activity.BaseActivity
+import com.tari.android.wallet.ui.activity.SplashActivity
 import com.tari.android.wallet.ui.activity.debug.DebugActivity
 import com.tari.android.wallet.ui.activity.home.adapter.TxListAdapter
 import com.tari.android.wallet.ui.activity.profile.WalletInfoActivity
@@ -102,131 +103,105 @@ internal class HomeActivity : BaseActivity(),
 
     @BindView(R.id.home_vw_root)
     lateinit var rootView: View
-
     @BindView(R.id.home_vw_top_content_container)
     lateinit var topContentContainerView: View
-
     @BindView(R.id.home_vw_gradient_bg)
     lateinit var gradientBgView: View
-
     @BindView(R.id.home_swipe_container)
     lateinit var swipeRefreshLayout: SwipeRefreshLayout
-
     @BindView(R.id.home_rv_tx_list)
     lateinit var recyclerView: RecyclerView
 
     // transaction list
     @BindView(R.id.home_vw_tx_list_header)
     lateinit var txListHeaderView: View
-
     @BindView(R.id.home_btn_close_tx_list)
     lateinit var minimizeTxListButton: ImageButton
-
     @BindView(R.id.home_txt_tx_list_title)
     lateinit var txListTitleTextView: TextView
-
     @BindView(R.id.home_vw_grabber_container)
     lateinit var grabberContainerView: View
-
     @BindView(R.id.home_vw_grabber)
     lateinit var grabberView: View
-
     @BindView(R.id.home_vw_tx_list_bg_overlay)
     lateinit var txListBgOverlayView: View
-
     @BindView(R.id.home_vw_header_elevation)
     lateinit var headerElevationView: View
-
     @BindView(R.id.home_btn_send_tari)
     lateinit var sendTariButton: Button
-
     @BindView(R.id.home_vw_send_tari_btn_bg_gradient)
     lateinit var sendTariButtonBgGradientView: View
 
     // Balance views.
     @BindView(R.id.home_txt_available_balance)
     lateinit var balanceTitleTextView: TextView
-
     @BindView(R.id.home_img_balance_gem)
     lateinit var balanceGemImageView: ImageView
-
     @BindView(R.id.home_img_wallet_info)
-    lateinit var userWalletInfoButton: ImageView
+    lateinit var userWalletInfoImageView: ImageView
+    @BindView(R.id.home_btn_wallet_info)
+    lateinit var userWalletInfoButton: Button
 
     // Balance digit containers.
     @BindView(R.id.home_vw_balance_digit_container)
     lateinit var balanceDigitContainerView: ViewGroup
-
     @BindView(R.id.home_balance_vw_decimals_digit_container)
     lateinit var balanceDecimalDigitContainerView: ViewGroup
-
     @BindView(R.id.home_scroll_view)
     lateinit var scrollView: CustomScrollView
-
     @BindView(R.id.home_vw_scroll_bg_enabler)
     lateinit var scrollBgEnabler: View
-
     @BindView(R.id.home_vw_scroll_content)
     lateinit var scrollContentView: View
 
     // onboarding content
     @BindView(R.id.home_vw_onboarding_content)
     lateinit var onboardingContentView: ViewGroup
-
     @BindView(R.id.home_txt_no_txs_info)
     lateinit var noTxsInfoTextView: TextView
 
     @BindDimen(R.dimen.home_top_content_container_view_top_margin)
     @JvmField
     var topContentContainerViewTopMargin = 0
-
     @BindDimen(R.dimen.home_top_content_container_scroll_vertical_shift)
     @JvmField
     var topContentContainerViewScrollVerticalShift = 0
-
     @BindDimen(R.dimen.common_header_height)
     @JvmField
     var txListHeaderHeight = 0
-
     @BindDimen(R.dimen.home_send_tari_button_initial_bottom_margin)
     @JvmField
     var sendTariButtonInitialBottomMargin = 0
-
     @BindDimen(R.dimen.home_send_tari_button_visible_bottom_margin)
     @JvmField
     var sendTariButtonVisibleBottomMargin = 0
-
     @BindDimen(R.dimen.home_tx_list_container_minimized_top_margin)
     @JvmField
     var txListContainerMinimizedTopMargin = 0
-
     @BindDimen(R.dimen.home_scroll_view_startup_anim_height)
     @JvmField
     var scrollViewStartupAnimHeight = 0
-
     @BindDimen(R.dimen.home_grabber_container_height)
     @JvmField
     var grabberContainerHeight = 0
-
     @BindDimen(R.dimen.home_grabber_corner_radius)
     @JvmField
     var grabberCornerRadius = 0
-
     @BindDimen(R.dimen.home_send_tari_button_hidden_bottom_margin)
     @JvmField
     var sendTariButtonHiddenBottomMargin = 0
-
     @BindDimen(R.dimen.home_grabber_width)
     @JvmField
     var grabberViewWidth = 0
-
     @BindDimen(R.dimen.home_tx_list_item_height)
     @JvmField
     var listItemHeight = 0
-
     @BindDimen(R.dimen.home_main_content_top_margin)
     @JvmField
     var homeMainContentTopMargin = 0
+    @BindDimen(R.dimen.home_wallet_info_button_initial_top_margin)
+    @JvmField
+    var walletInfoButtonInitialTopMargin = 0
 
     @BindColor(R.color.white)
     @JvmField
@@ -235,14 +210,12 @@ internal class HomeActivity : BaseActivity(),
     @BindString(R.string.wallet_service_error_testnet_tari_request)
     @JvmField
     var homeFailToLoadTransaction = ""
-
     @BindString(R.string.wallet_service_error_no_internet_connection)
     @JvmField
     var homeNoInternetConnection = ""
 
     @Inject
     lateinit var sharedPrefsWrapper: SharedPrefsWrapper
-
     @Inject
     lateinit var tracker: Tracker
 
@@ -295,6 +268,18 @@ internal class HomeActivity : BaseActivity(),
         super.onCreate(savedInstanceState)
         overridePendingTransition(0, 0)
 
+        // the code below will send the user back to the very startup of the app
+        // if the app is opened through a deep link, but the user has not
+        // authenticated yet - this also includes the case of no wallet
+        if (!sharedPrefsWrapper.isAuthenticated) {
+            val intent = Intent(this, SplashActivity::class.java)
+            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+            startActivity(intent)
+            // finish this activity
+            finish()
+            return
+        }
+
         /* commented out to fix the UI cutout issue
         makeStatusBarTransparent() --
         ViewCompat.setOnApplyWindowInsetsListener(rootView) { _, insets ->
@@ -314,7 +299,7 @@ internal class HomeActivity : BaseActivity(),
         sendTariButtonBgGradientView.alpha = 0f
 
         balanceTitleTextView.alpha = 0f
-        userWalletInfoButton.alpha = 0f
+        userWalletInfoImageView.alpha = 0f
         balanceGemImageView.alpha = 0f
         noTxsInfoTextView.visibility = View.GONE
 
@@ -334,6 +319,28 @@ internal class HomeActivity : BaseActivity(),
             .with(tracker)
     }
 
+    override fun onNewIntent(intent: Intent?) {
+        super.onNewIntent(intent)
+        intent?.let {
+            uiHandler.postDelayed({
+                wr.get()?.processIntentDeepLink(it)
+            }, Constants.UI.mediumDurationMs)
+        }
+    }
+
+    private fun processIntentDeepLink(intent: Intent) {
+        // go to appropriate activity/fragment if the deep link in the intent
+        // corresponds to a public key
+        DeepLink.from(intent.data?.toString() ?: "")?.let { deepLink ->
+            when(deepLink.type) {
+                DeepLink.Type.EMOJI_ID -> walletService?.getPublicKeyFromEmojiId(deepLink.type.value)
+                DeepLink.Type.PUBLIC_KEY_HEX -> walletService?.getPublicKeyFromHexString(deepLink.type.value)
+            }?.let { publicKey ->
+                sendTariToUser(publicKey)
+            }
+        }
+    }
+
     override fun onStart() {
         super.onStart()
         bindToWalletService()
@@ -344,13 +351,14 @@ internal class HomeActivity : BaseActivity(),
         super.onStop()
     }
 
-
     @SuppressLint("ClickableViewAccessibility")
     override fun onDestroy() {
         recyclerView.layoutManager = null
         recyclerView.adapter = null
         unsetTouchListeners()
-        unbindService(this)
+        if (walletService != null) {
+            unbindService(this)
+        }
         EventBus.unsubscribe(this)
         super.onDestroy()
     }
@@ -444,7 +452,14 @@ internal class HomeActivity : BaseActivity(),
             }
         }
 
-        // app-specific events
+        // tx-related app events
+        EventBus.subscribe<Event.Tx.TxSendSuccessful>(this) {
+            wr.get()?.rootView?.post {
+                onSendTxSuccessful()
+            }
+        }
+
+        // other app-specific events
         EventBus.subscribe<Event.Contact.ContactAddedOrUpdated>(this) {
             wr.get()?.rootView?.post {
                 updateAllDataAndUI(restartBalanceUI = false)
@@ -489,6 +504,11 @@ internal class HomeActivity : BaseActivity(),
                 wr.get()?.initializeTxListUI()
             }
         }
+        // check the start-up intent for a deep link
+        uiHandler.postDelayed({
+            wr.get()?.processIntentDeepLink(intent)
+        }, Constants.UI.xLongDurationMs)
+
     }
 
     /**
@@ -646,7 +666,7 @@ internal class HomeActivity : BaseActivity(),
             sendTariButtonBgGradientView.alpha = value
             // reveal balance title, QR code button and balance gem image
             balanceTitleTextView.alpha = value
-            userWalletInfoButton.alpha = value
+            userWalletInfoImageView.alpha = value
             balanceGemImageView.alpha = value
         }
         sendTariButtonIsVisible = true
@@ -700,7 +720,7 @@ internal class HomeActivity : BaseActivity(),
             onEnd = {
                 wr.get()?.topContentContainerView?.visibility = View.VISIBLE
                 wr.get()?.balanceTitleTextView?.alpha = 1f
-                wr.get()?.userWalletInfoButton?.alpha = 1f
+                wr.get()?.userWalletInfoImageView?.alpha = 1f
                 wr.get()?.balanceGemImageView?.alpha = 1f
             }
         )
@@ -739,7 +759,7 @@ internal class HomeActivity : BaseActivity(),
         showSendTariButtonAnimated()
     }
 
-    private fun showTestnetTariReceivedDialog(senderPublicKey: PublicKey) {
+    private fun showTestnetTariReceivedDialog(testnetSenderPublicKey: PublicKey) {
         Dialog(this, R.style.Theme_AppCompat_Dialog).apply {
             window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
             setContentView(R.layout.home_dialog_testnet_tari_received)
@@ -758,7 +778,7 @@ internal class HomeActivity : BaseActivity(),
             findViewById<TextView>(R.id.home_tari_bot_dialog_btn_send_tari)
                 .setOnClickListener {
                     dismiss()
-                    sendTariToTestnetSender(senderPublicKey)
+                    sendTariToUser(testnetSenderPublicKey)
                     rootView.postDelayed({
                         showSendTariButtonAnimated()
                     }, Constants.UI.longDurationMs)
@@ -769,21 +789,19 @@ internal class HomeActivity : BaseActivity(),
         }
     }
 
-    private fun sendTariToTestnetSender(senderPublicKey: PublicKey) {
-        val intent = Intent(this@HomeActivity, SendTariActivity::class.java)
-        // attach contact
+    private fun sendTariToUser(recipientPublicKey: PublicKey) {
+        // get contact or just user
         val error = WalletError()
         val contacts = walletService!!.getContacts(error)
-        if (error.code != WalletErrorCode.NO_ERROR) {
-            TODO("Unhandled wallet error: ${error.code}")
-        }
-        for (contact in contacts) {
-            if (senderPublicKey.hexString == contact.publicKey.hexString) {
-                intent.putExtra("recipientUser", contact)
-                break
+        val recipientUser = when(error.code) {
+            WalletErrorCode.NO_ERROR -> {
+                contacts.firstOrNull { it.publicKey == recipientPublicKey } ?: User(recipientPublicKey)
             }
+            else -> User(recipientPublicKey)
         }
-
+        // prepare intent
+        val intent = Intent(this, SendTariActivity::class.java)
+        intent.putExtra("recipientUser", recipientUser)
         startActivity(intent)
         overridePendingTransition(R.anim.enter_from_right, R.anim.exit_to_left)
     }
@@ -791,8 +809,8 @@ internal class HomeActivity : BaseActivity(),
     /**
      * Opens user wallet info on button click.
      */
-    @OnClick(R.id.home_img_wallet_info)
-    fun walletInfoImageClicked(view: View) {
+    @OnClick(R.id.home_btn_wallet_info)
+    fun walletInfoButtonClicked(view: View) {
         UiUtil.temporarilyDisableClick(view)
         val intent = Intent(this@HomeActivity, WalletInfoActivity::class.java)
         startActivity(intent)
@@ -857,33 +875,6 @@ internal class HomeActivity : BaseActivity(),
         Logger.i("Transaction with id ${tx.id} selected.")
         startActivity(TxDetailActivity.createIntent(this, tx))
     }
-
-    // region send tari button animation listener
-
-    override fun onAnimationStart(animation: Animation?) {
-        // no-op
-    }
-
-    override fun onAnimationRepeat(animation: Animation?) {
-        // no-op
-    }
-
-    override fun onAnimationEnd(animation: Animation?) {
-        if (sendTariButtonClickAnimIsRunning) { // bounce back the button
-            animateSendTariButtonOnClick(
-                Constants.UI.Button.clickScaleAnimSmallScale,
-                Constants.UI.Button.clickScaleAnimFullScale
-            )
-            sendTariButtonClickAnimIsRunning = false
-        } else { // animation is over, go to send activity
-            // go to fragment
-            val intent = Intent(this@HomeActivity, SendTariActivity::class.java)
-            startActivity(intent)
-            overridePendingTransition(R.anim.enter_from_right, R.anim.exit_to_left)
-        }
-    }
-
-    // endregion
 
     @OnClick(R.id.home_btn_close_tx_list)
     fun minimizeListButtonClicked(view: View) {
@@ -985,30 +976,41 @@ internal class HomeActivity : BaseActivity(),
         sendTariButton.startAnimation(anim)
     }
 
+    // region send tari button animation listener
+
+    override fun onAnimationStart(animation: Animation?) {
+        // no-op
+    }
+
+    override fun onAnimationRepeat(animation: Animation?) {
+        // no-op
+    }
+
+    /**
+     * Send Tari button click animation has completed half or full cycle.
+     */
+    override fun onAnimationEnd(animation: Animation?) {
+        if (sendTariButtonClickAnimIsRunning) { // bounce back the button
+            animateSendTariButtonOnClick(
+                Constants.UI.Button.clickScaleAnimSmallScale,
+                Constants.UI.Button.clickScaleAnimFullScale
+            )
+            sendTariButtonClickAnimIsRunning = false
+        } else { // animation is over, go to send activity
+            // go to fragment
+            val intent = Intent(this@HomeActivity, SendTariActivity::class.java)
+            startActivity(intent)
+            overridePendingTransition(R.anim.enter_from_right, R.anim.exit_to_left)
+        }
+    }
+
+    // endregion
+
     @SuppressLint("ClickableViewAccessibility")
     override fun onTouch(view: View?, event: MotionEvent?): Boolean {
 
         if (view == null || event == null) {
             return false
-        }
-        if (view === scrollBgEnabler) {
-            scrollView.requestDisallowInterceptTouchEvent(true)
-            // profile button - handle touch
-            val rect = Rect()
-            userWalletInfoButton.getGlobalVisibleRect(rect)
-            val quadRect = Rect(
-                rect.right - rect.width() * 2,
-                rect.bottom - rect.height() * 2,
-                rect.left + rect.width() * 2,
-                rect.top + rect.height() * 2
-            )
-            if (quadRect.contains(event.rawX.toInt(), event.rawY.toInt())) {
-                if (event.action == MotionEvent.ACTION_DOWN) {
-                    walletInfoImageClicked(view)
-                }
-            }
-            // event consumed
-            return true
         }
         if (view === scrollView || view === recyclerView) {
             when (event.action) {
@@ -1045,10 +1047,11 @@ internal class HomeActivity : BaseActivity(),
             val ratio = scrollView.scrollY.toFloat() / maxScroll.toFloat()
             onboardingContentView.alpha = ratio
             txListBgOverlayView.alpha = ratio
+            val topContentMarginTopExtra = (ratio * topContentContainerViewScrollVerticalShift).toInt()
             UiUtil.setTopMargin(
                 topContentContainerView,
                 topContentContainerViewTopMargin
-                        + (ratio * topContentContainerViewScrollVerticalShift).toInt()
+                        + topContentMarginTopExtra
             )
             txListTitleTextView.alpha = ratio
             minimizeTxListButton.alpha = ratio
@@ -1075,6 +1078,11 @@ internal class HomeActivity : BaseActivity(),
             } else if (ratio == 0f && !isDragging) {
                 endOnboarding()
             }
+
+            UiUtil.setTopMargin(
+                userWalletInfoButton,
+                walletInfoButtonInitialTopMargin + scrollView.scrollY + topContentMarginTopExtra
+            )
         }
         if (scrollY > oldScrollY
             && !isOnboarding

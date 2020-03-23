@@ -286,9 +286,7 @@ class AddAmountFragment(private val walletService: TariWalletService) : BaseFrag
             titleTextView.visibility = View.VISIBLE
             titleTextView.text = (recipientUser as Contact).alias
         } else {
-            val shortenedEmojiId = EmojiUtil.getShortenedEmojiId(recipientUser.publicKey.emojiId)
-                ?: throw RuntimeException("Invalid emoji id: " + recipientUser.publicKey.emojiId)
-            displayEmojiId(shortenedEmojiId)
+            displayEmojiId(recipientUser.publicKey.emojiId)
         }
     }
 
@@ -296,13 +294,7 @@ class AddAmountFragment(private val walletService: TariWalletService) : BaseFrag
         emojiIdSummaryContainerView.visibility = View.VISIBLE
         emojiIdSummaryController.display(emojiId)
         titleTextView.visibility = View.GONE
-        // make chunks
-        val separatorIndices = EmojiUtil.getNewChunkSeparatorIndices(emojiId)
-        val builder = StringBuilder(emojiId)
-        for ((i, index) in separatorIndices.iterator().withIndex()) {
-            builder.insert((index + i), emojiIdChunkSeparator)
-        }
-        fullEmojiIdTextView.text = builder.toString()
+        fullEmojiIdTextView.text = EmojiUtil.getChunkedEmojiId(emojiId, emojiIdChunkSeparator)
     }
 
     override fun onDetach() {
@@ -454,11 +446,10 @@ class AddAmountFragment(private val walletService: TariWalletService) : BaseFrag
     @OnClick(R.id.add_amount_btn_copy_emoji_id)
     fun onCopyEmojiIdButtonClicked(view: View) {
         val mActivity = activity ?: return
-        val deepLink = WalletUtil.getEmojiIdDeepLink(recipientUser.publicKey.emojiId)
         val clipBoard = ContextCompat.getSystemService(mActivity, ClipboardManager::class.java)
         val deepLinkClipboardData = ClipData.newPlainText(
-            "Tari Wallet Deep Link",
-            deepLink
+            "Tari Wallet Emoji Id",
+            EmojiUtil.getChunkedEmojiId(recipientUser.publicKey.emojiId, emojiIdChunkSeparator)
         )
         clipBoard?.setPrimaryClip(deepLinkClipboardData)
         hideFullEmojiId(animated = true)

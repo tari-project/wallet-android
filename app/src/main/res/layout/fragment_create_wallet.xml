@@ -92,6 +92,7 @@
             android:layout_centerHorizontal="true"
             android:layout_marginStart="@dimen/common_horizontal_margin"
             android:layout_marginTop="-80dp"
+            android:visibility="invisible"
             android:elevation="@dimen/common_view_elevation"
             android:layout_marginEnd="@dimen/common_horizontal_margin"
             android:layout_marginBottom="20dp"
@@ -431,14 +432,18 @@
 
     </RelativeLayout>
 
-    <VideoView
-        android:id="@+id/create_wallet_loader_video_view"
+    <!-- Lottie animation for Tari Wallet text -->
+    <com.airbnb.lottie.LottieAnimationView
+        android:id="@+id/create_wallet_anim_bottom_spinner"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:background="@color/transparent"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginBottom="40dp"
-        android:background="#00F6F6F6"
-        android:visibility="visible" />
+        android:layout_height="wrap_content"
+        app:lottie_autoPlay="true"
+        app:lottie_renderMode="automatic"
+        app:lottie_enableMergePathsForKitKatAndAbove="true"
+        app:lottie_loop="true"
+        app:lottie_rawRes="@raw/onboarding_bottom_spinner" />
 
 </RelativeLayout>

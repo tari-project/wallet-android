@@ -28,14 +28,14 @@
 
         <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="20dp">
+            android:layout_height="wrap_content">
 
             <!-- contact alias -->
             <TextView
                 android:id="@+id/notification_tx_received_txt_contact_alias"
                 style="@style/TextAppearance.Compat.Notification.Title"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:background="@color/transparent"
                 android:ellipsize="end"
                 android:gravity="center_vertical"
