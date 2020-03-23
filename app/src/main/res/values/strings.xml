@@ -57,7 +57,7 @@
     <string name="wallet_service_error_no_internet_connection">No internet connection!</string>
 
     <!-- auth -->
-    <string name="testnet">TESTNET V1.0</string>
+    <string name="testnet">TESTNET V0.16-jniLib-0.3.3</string>
     <string name="proceed">Proceed</string>
     <string name="exit">Exit</string>
     <string name="auth_title">Authentication</string>
