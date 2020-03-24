@@ -36,6 +36,9 @@ import android.app.Service
 import android.content.Context
 import com.orhanobut.logger.Logger
 import com.tari.android.wallet.util.SharedPrefsWrapper
+import java.io.BufferedReader
+import java.io.File
+import java.io.InputStreamReader
 import net.freehaven.tor.control.TorControlConnection
 import org.torproject.android.binary.TorResourceInstaller
 import java.io.*
@@ -60,27 +63,15 @@ internal class TorProxyManager(
     private fun installTorResources() {
         val torBinPath = sharedPrefsWrapper.torBinPath
         if (torBinPath != null) {
-            if (File(torBinPath).exists()) {
+            val torBinFile = File(torBinPath)
+            if (torBinFile.exists() && torBinFile.canExecute()) {
                 return
             }
         }
-        try {
-            val torResourceInstaller = TorResourceInstaller(context, context.filesDir)
-            val fileTorBin = torResourceInstaller.installResources()
-            val installSuccess = fileTorBin != null && fileTorBin.canExecute()
-
-            if (installSuccess) {
-                Logger.d(
-                    "Tor resources installed successfully. Tor binary path: %s",
-                    fileTorBin.absolutePath
-                )
-                sharedPrefsWrapper.torBinPath = fileTorBin.absolutePath
-            } else {
-                throw RuntimeException("Tor resources install failed.")
-            }
-        } catch (t: Throwable) {
-            throw RuntimeException("Tor resources install exception", t)
-        }
+        val torResourceInstaller = TorResourceInstaller(context, context.filesDir)
+        torResourceInstaller.installGeoIPResources()
+        val torBinary = torResourceInstaller.getTorBinaryFile()
+        sharedPrefsWrapper.torBinPath = torBinary.absolutePath
     }
 
     /**

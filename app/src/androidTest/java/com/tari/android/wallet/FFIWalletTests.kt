@@ -70,6 +70,10 @@ class FFIWalletTests {
         override fun onDiscoveryComplete(txId: BigInteger, success: Boolean) {
             Logger.i("Discovery Complete :: tx id %s success %s", txId.toString(), success.toString())
         }
+
+        override fun onBaseNodeSyncComplete(requestId: BigInteger, success: Boolean) {
+            Logger.i("Base Node Sync Complete :: request id %s success %s", requestId.toString(), success.toString())
+        }
     }
 
     @Test
@@ -126,7 +130,7 @@ class FFIWalletTests {
         for (i in 0..completedTxs.getLength()) {
             completedTx = completedTxs.getAt(0)
             assertTrue(completedTx.getPointer() != nullptr)
-            if (completedTx.getStatus() != FFICompletedTx.Status.MINED) {
+            if (completedTx.getStatus() != FFIStatus.MINED) {
                 completedTx.destroy()
             } else {
                 break
@@ -166,7 +170,7 @@ class FFIWalletTests {
         while (index <= totalInbound)
         {
             inbound = pendingInboundTxs.getAt(index)
-            if (inbound.getStatus() == FFIPendingInboundTx.Status.PENDING)
+            if (inbound.getStatus() == FFIStatus.PENDING)
             {
                 break
             } else {

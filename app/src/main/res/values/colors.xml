@@ -68,8 +68,4 @@
     <color name="auth_touch_id_prompt_anim_bg">#979797</color>
     <color name="auth_touch_id_prompt_black_bg">#E6000000</color>
 
-    <!-- onboarding - create wallet -->
-    <color name="create_wallet_loader_video_visible_bg">#00F6F6F6</color>
-    <color name="create_wallet_loader_video_invisible_bg">#FFF6F6F6</color>
-
 </resources>

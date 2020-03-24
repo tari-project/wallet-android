@@ -120,6 +120,9 @@ internal class TariWalletApplication : Application(), LifecycleObserver {
             }
         })
 
+        // user should authenticate every time the app starts up
+        sharedPrefsWrapper.isAuthenticated = false
+
         TrackHelper.track().download().identifier(
             DownloadTracker.Extra.ApkChecksum(this)
         ).with(tracker)

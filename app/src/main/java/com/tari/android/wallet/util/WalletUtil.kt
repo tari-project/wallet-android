@@ -88,8 +88,12 @@ internal object WalletUtil {
         return false
     }
 
-    fun getDeepLink(emojiId: String): String {
+    fun getEmojiIdDeepLink(emojiId: String): String {
         return "${Constants.Wallet.deepLinkURLPrefix}${Constants.Wallet.network.uriComponent}/${DeepLink.Type.EMOJI_ID.uriComponent}/$emojiId"
+    }
+
+    fun getPublicKeyHexLink(publicKeyHex: String): String {
+        return "${Constants.Wallet.deepLinkURLPrefix}${Constants.Wallet.network.uriComponent}/${DeepLink.Type.PUBLIC_KEY_HEX.uriComponent}/$publicKeyHex"
     }
 
     fun getLogFilesFromDirectory(dirPath: String): List<File> {

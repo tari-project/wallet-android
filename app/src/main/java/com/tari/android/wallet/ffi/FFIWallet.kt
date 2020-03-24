@@ -42,7 +42,6 @@ import java.math.BigInteger
  *
  * @author The Tari Development Team
  */
-
 internal typealias FFIWalletPtr = Long
 
 internal abstract class FFIWallet(commsConfig: FFICommsConfig, logPath: String) : FFIBase() {
@@ -64,6 +63,8 @@ internal abstract class FFIWallet(commsConfig: FFICommsConfig, logPath: String) 
         callbackTxMinedSig: String,
         callbackDiscoveryProcessComplete: String,
         callbackDiscoveryProcessCompleteSig: String,
+        callbackBaseNodeSync:String,
+        callbackBaseNodeSyncSig:String,
         libError: FFIError
     )
 
@@ -156,7 +157,7 @@ internal abstract class FFIWallet(commsConfig: FFICommsConfig, logPath: String) 
     ): ByteArray
 
     private external fun jniAddBaseNodePeer(
-        publicKeyPtr: FFIPublicKeyPtr,
+        publicKey: FFIPublicKey,
         address: String,
         libError: FFIError
     ): Boolean
@@ -190,6 +191,7 @@ internal abstract class FFIWallet(commsConfig: FFICommsConfig, logPath: String) 
                 this::onTxBroadcast.name, "(J)V",
                 this::onTxMined.name, "(J)V",
                 this::onDiscoveryComplete.name, "([BZ)V",
+                this::onBaseNodeSyncComplete.name, "([BZ)V",
                 error
             )
             Logger.i("Post jniCreate.")
@@ -343,6 +345,12 @@ internal abstract class FFIWallet(commsConfig: FFICommsConfig, logPath: String) 
         listenerAdapter?.onDiscoveryComplete(txId, success)
     }
 
+    protected fun onBaseNodeSyncComplete(bytes: ByteArray, success: Boolean) {
+        Logger.i("Base node sync complete. Success: $success")
+        val requestId = BigInteger(1, bytes)
+        listenerAdapter?.onBaseNodeSyncComplete(requestId, success)
+    }
+
     fun sendTx(
         destination: FFIPublicKey,
         amount: BigInteger,
@@ -433,7 +441,7 @@ internal abstract class FFIWallet(commsConfig: FFICommsConfig, logPath: String) 
         baseNodeAddress: String
     ): Boolean {
         val error = FFIError()
-        val result = jniAddBaseNodePeer(baseNodePublicKey.getPointer(), baseNodeAddress, error)
+        val result = jniAddBaseNodePeer(baseNodePublicKey, baseNodeAddress, error)
         throwIf(error)
         return result
     }

@@ -215,32 +215,29 @@ class AddRecipientFragment(private val walletService: TariWalletService) : BaseF
 
         hidePasteEmojiIdViews(animate = false)
 
+        OverScrollDecoratorHelper.setUpOverScroll(emojiIdScrollView)
+        OverScrollDecoratorHelper.setUpOverScroll(searchEditTextScrollView)
+
         AsyncTask.execute {
             wr.get()?.fetchRecentTxUsers()
+        }
+
+        AsyncTask.execute {
+            wr.get()?.checkClipboardForValidEmojiId()
         }
 
         TrackHelper.track()
             .screen("/home/send_tari/add_recipient")
             .title("Send Tari - Add Recipient")
             .with(tracker)
-
-        OverScrollDecoratorHelper.setUpOverScroll(emojiIdScrollView)
-        OverScrollDecoratorHelper.setUpOverScroll(searchEditTextScrollView)
-
     }
 
     fun reset() {
         // state is not initial if there's some character in the search input
         if (searchEditText.text.toString().isNotEmpty()) {
             searchEditText.setText("")
+            searchEditText.isEnabled = true
             continueButton.visibility = View.GONE
-        }
-    }
-
-    override fun onStart() {
-        super.onStart()
-        AsyncTask.execute {
-            wr.get()?.checkClipboardForValidEmojiId()
         }
     }
 
@@ -364,6 +361,7 @@ class AddRecipientFragment(private val walletService: TariWalletService) : BaseF
             dimmerViews.forEach {
                 it.visibility = View.GONE
             }
+            onEnd?.let { it() }
             return
         }
         // animate and hide paste emoji id button
@@ -544,9 +542,11 @@ class AddRecipientFragment(private val walletService: TariWalletService) : BaseF
     fun onQRButtonClick() {
         val mActivity = activity ?: return
         UiUtil.hideKeyboard(mActivity)
-        rootView.postDelayed({
-            wr.get()?.startQRCodeActivity()
-        }, Constants.UI.keyboardHideWaitMs)
+        hidePasteEmojiIdViews(animate = true) {
+            rootView.postDelayed({
+                wr.get()?.startQRCodeActivity()
+            }, Constants.UI.keyboardHideWaitMs)
+        }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -557,13 +557,32 @@ class AddRecipientFragment(private val walletService: TariWalletService) : BaseF
             val qrData = data.getStringExtra(EXTRA_QR_DATA) ?: return
             val deepLink = DeepLink.from(qrData) ?: return
             when (deepLink.type) {
-                EMOJI_ID -> searchEditText.setText(
-                    deepLink.type.value,
-                    TextView.BufferType.EDITABLE
-                )
-                // no-op in the base of public key
-                // TODO - get emoji id from public key
-                else -> return
+                EMOJI_ID -> {
+                    searchEditText.setText(
+                        deepLink.type.value,
+                        TextView.BufferType.EDITABLE
+                    )
+                    searchEditText.postDelayed({
+                        searchEditTextScrollView.smoothScrollTo(0, 0)
+                    }, Constants.UI.mediumDurationMs)
+                }
+                PUBLIC_KEY_HEX -> {
+                    AsyncTask.execute {
+                        val publicKeyHex = deepLink.type.value
+                        val publicKey = walletService.getPublicKeyFromHexString(publicKeyHex)
+                        if (publicKey != null) {
+                            searchEditText.post {
+                                wr.get()?.searchEditText?.setText(
+                                    publicKey.emojiId,
+                                    TextView.BufferType.EDITABLE
+                                )
+                            }
+                            searchEditText.postDelayed({
+                                wr.get()?.searchEditTextScrollView?.smoothScrollTo(0, 0)
+                            }, Constants.UI.mediumDurationMs)
+                        }
+                    }
+                }
             }
         }
     }
@@ -571,10 +590,20 @@ class AddRecipientFragment(private val walletService: TariWalletService) : BaseF
     @OnClick(R.id.add_recipient_btn_continue)
     fun onContinueButtonClicked(view: View) {
         UiUtil.temporarilyDisableClick(view)
-        listenerWR.get()?.continueToAmount(
-            this,
-            User(emojiIdPublicKey!!)
-        )
+        AsyncTask.execute {
+            val error = WalletError()
+            val contacts = walletService.getContacts(error)
+            val recipientContact: Contact? = when (error.code) {
+                WalletErrorCode.NO_ERROR -> contacts.firstOrNull { it.publicKey == emojiIdPublicKey }
+                else -> null
+            }
+            rootView.post {
+                listenerWR.get()?.continueToAmount(
+                    this,
+                    recipientContact ?: User(emojiIdPublicKey!!)
+                )
+            }
+        }
     }
 
     /**
@@ -603,7 +632,10 @@ class AddRecipientFragment(private val walletService: TariWalletService) : BaseF
         hidePasteEmojiIdViews(animate = true) {
             searchEditText.scaleX = 0f
             searchEditText.scaleY = 0f
-            searchEditText.setText(emojiIdPublicKey!!.emojiId, TextView.BufferType.EDITABLE)
+            searchEditText.setText(
+                emojiIdPublicKey!!.emojiId,
+                TextView.BufferType.EDITABLE
+            )
             searchEditText.setSelection(searchEditText.text?.length ?: 0)
 
             rootView.postDelayed({
@@ -717,6 +749,7 @@ class AddRecipientFragment(private val walletService: TariWalletService) : BaseF
             // check if valid emoji - don't search if not
             val numberofEmojis = textWithoutSeparators.numberOfEmojis()
             if (textWithoutSeparators.containsNonEmoji() || numberofEmojis > emojiIdLength) {
+                emojiIdPublicKey = null
                 // invalid emoji-id : clear list and display error
                 invalidEmojiIdTextView.visibility = View.VISIBLE
                 qrCodeButton.visibility = View.VISIBLE
@@ -724,15 +757,17 @@ class AddRecipientFragment(private val walletService: TariWalletService) : BaseF
             } else {
                 if (numberofEmojis == emojiIdLength) {
                     if (textWithoutSeparators == sharedPrefsWrapper.emojiId!!) {
+                        emojiIdPublicKey = null
                         invalidEmojiIdTextView.visibility = View.VISIBLE
                         qrCodeButton.visibility = View.VISIBLE
                     } else {
                         qrCodeButton.visibility = View.GONE
                         // valid emoji id length - clear list, no search, display continue button
                         AsyncTask.execute {
-                            val publicKey = walletService.getPublicKeyFromEmojiId(textWithoutSeparators)
+                            emojiIdPublicKey =
+                                walletService.getPublicKeyFromEmojiId(textWithoutSeparators)
                             rootView.post {
-                                if (publicKey == null) {
+                                if (emojiIdPublicKey == null) {
                                     invalidEmojiIdTextView.visibility = View.VISIBLE
                                     clearSearchResult()
                                 } else {
@@ -750,11 +785,13 @@ class AddRecipientFragment(private val walletService: TariWalletService) : BaseF
                         }
                     }
                 } else {
+                    emojiIdPublicKey = null
                     qrCodeButton.visibility = View.VISIBLE
                     onSearchTextChanged(textWithoutSeparators)
                 }
             }
         } else {
+            emojiIdPublicKey = null
             qrCodeButton.visibility = View.VISIBLE
             searchEditText.textAlignment = View.TEXT_ALIGNMENT_TEXT_START
             searchEditText.letterSpacing = inputNormalLetterSpacing

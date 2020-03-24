@@ -197,7 +197,7 @@ internal object UiUtil {
         view.isClickable = false
         clickEnablingHandler.postDelayed(
             ClickEnablingRunnable(view),
-            1000
+            Constants.UI.xLongDurationMs
         )
     }
 

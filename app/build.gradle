@@ -11,8 +11,8 @@ android {
         applicationId "com.tari.android.wallet"
         minSdkVersion 24
         targetSdkVersion 29
-        versionCode 11
-        versionName "0.0.11"
+        versionCode 16
+        versionName "0.0.16-jniLibs-0.3.3"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
         ndk {
@@ -29,11 +29,10 @@ android {
         debug {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-            jniDebuggable = true
+            jniDebuggable true
         }
         release {
             minifyEnabled false
-            debuggable true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
@@ -128,8 +127,7 @@ dependencies {
     // encryption
     implementation "de.adorsys.android:securestoragelibrary:1.2.4"
 
-    // Tor binary
-    implementation 'org.torproject:tor-android-binary:0.4.2.5'
+    // Tor control
     implementation 'net.freehaven.tor.control:jtorctl:0.2'
 
     // matomo - tracking
