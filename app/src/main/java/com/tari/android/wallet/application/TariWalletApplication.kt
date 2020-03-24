@@ -42,6 +42,7 @@ import androidx.lifecycle.ProcessLifecycleOwner
 import com.orhanobut.logger.AndroidLogAdapter
 import com.orhanobut.logger.Logger
 import com.tari.android.wallet.di.*
+import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.notification.NotificationHelper
 import com.tari.android.wallet.tor.TorProxyListener
 import com.tari.android.wallet.tor.TorProxyManager
@@ -92,6 +93,8 @@ internal class TariWalletApplication : Application(), LifecycleObserver {
 
     override fun onCreate() {
         super.onCreate()
+        EventBus.postSticky(AppState.Initializing)
+
         registerActivityLifecycleCallbacks(activityLifecycleCallbacks)
         Logger.addLogAdapter(AndroidLogAdapter())
         JodaTimeAndroid.init(this)
@@ -117,6 +120,11 @@ internal class TariWalletApplication : Application(), LifecycleObserver {
         torProxyManager.start(15, object : TorProxyListener {
             override fun onTorProxyInitResult(success: Boolean) {
                 Logger.d("TorProxyInitResult %s", success)
+                if (success) {
+                    EventBus.postSticky(AppState.Ready)
+                } else {
+                    EventBus.postSticky(AppState.Failed)
+                }
             }
         })
 

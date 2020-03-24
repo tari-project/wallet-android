@@ -35,13 +35,15 @@ package com.tari.android.wallet.ui.activity
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import butterknife.ButterKnife
+import com.tari.android.wallet.application.AppState
 import com.tari.android.wallet.application.TariWalletApplication
+import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.ui.activity.debug.DebugActivity
 import com.tari.android.wallet.ui.activity.home.HomeActivity
 import com.tari.android.wallet.ui.activity.onboarding.OnboardingFlowActivity
-import com.tari.android.wallet.ui.activity.send.SendTariActivity
 import com.tari.android.wallet.ui.activity.profile.WalletInfoActivity
 import com.tari.android.wallet.ui.activity.qr.QRScannerActivity
+import com.tari.android.wallet.ui.activity.send.SendTariActivity
 import com.tari.android.wallet.ui.activity.tx.TxDetailActivity
 
 /**
@@ -52,10 +54,32 @@ import com.tari.android.wallet.ui.activity.tx.TxDetailActivity
 internal abstract class BaseActivity : AppCompatActivity() {
 
     abstract val contentViewId: Int
-
+    open val injectOnAppStateReady: Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        subscribeAppStates()
+
+        if (!injectOnAppStateReady) {
+            injectDependencies()
+        }
+
+        // bind views
+        setContentView(contentViewId)
+        ButterKnife.bind(this)
+    }
+
+    private fun subscribeAppStates() {
+        EventBus.subscribeSticky<AppState>(this, consumer = {
+            if (it == AppState.Ready) {
+                onAppStateReady()
+            } else if (it == AppState.Failed) {
+                onAppStateFailed()
+            }
+        })
+    }
+
+    private fun injectDependencies() {
         val component = (application as TariWalletApplication).appComponent
         // DI inject
         when (this) {
@@ -69,9 +93,14 @@ internal abstract class BaseActivity : AppCompatActivity() {
             is WalletInfoActivity -> component.inject(this)
             is DebugActivity -> component.inject(this)
         }
-        // bind views
-        setContentView(contentViewId)
-        ButterKnife.bind(this)
     }
 
+    open fun onAppStateReady() {
+        if (injectOnAppStateReady) {
+            injectDependencies()
+        }
+    }
+
+    open fun onAppStateFailed() {
+    }
 }

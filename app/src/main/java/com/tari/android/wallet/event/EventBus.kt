@@ -33,7 +33,9 @@
 package com.tari.android.wallet.event
 
 import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.subjects.BehaviorSubject
 import io.reactivex.subjects.PublishSubject
+
 
 /**
  * Event bus for the pub/sub model.
@@ -48,9 +50,17 @@ object EventBus {
 
     val disposables = mutableMapOf<Any, CompositeDisposable>()
     val publishSubject = PublishSubject.create<Any>()
+    var stickyEventsSubject = BehaviorSubject.create<Any>()
 
     inline fun <reified T : Any> subscribe(subscriber: Any, noinline consumer: (T) -> Unit) {
         val observer = publishSubject.ofType(T::class.java).subscribe(consumer)
+        val disposable = disposables[subscriber]
+            ?: CompositeDisposable().apply { disposables[subscriber] = this }
+        disposable.add(observer)
+    }
+
+    inline fun <reified T : Any> subscribeSticky(subscriber: Any, noinline consumer: (T) -> Unit) {
+        val observer = stickyEventsSubject.ofType(T::class.java).subscribe(consumer)
         val disposable = disposables[subscriber]
             ?: CompositeDisposable().apply { disposables[subscriber] = this }
         disposable.add(observer)
@@ -62,4 +72,6 @@ object EventBus {
     }
 
     fun post(event: Any) = publishSubject.onNext(event)
+
+    fun postSticky(event: Any) = stickyEventsSubject.onNext(event)
 }

@@ -33,7 +33,6 @@
 package com.tari.android.wallet.ui.activity
 
 import android.content.Intent
-import android.os.Bundle
 import android.os.Handler
 import com.tari.android.wallet.R
 import com.tari.android.wallet.di.WalletModule
@@ -43,6 +42,7 @@ import com.tari.android.wallet.util.SharedPrefsWrapper
 import java.io.File
 import javax.inject.Inject
 import javax.inject.Named
+import kotlin.math.max
 
 /**
  * Splash screen activity.
@@ -52,8 +52,10 @@ import javax.inject.Named
 internal class SplashActivity : BaseActivity() {
 
     override val contentViewId = R.layout.activity_splash
+    override val injectOnAppStateReady: Boolean = true
 
     private val uiHandler = Handler()
+    private val activityCreateTime = System.currentTimeMillis()
 
     @Inject
     @Named(WalletModule.FieldName.walletFilesDirPath)
@@ -61,23 +63,28 @@ internal class SplashActivity : BaseActivity() {
     @Inject
     internal lateinit var sharedPrefsWrapper: SharedPrefsWrapper
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
+    override fun onAppStateReady() {
+        super.onAppStateReady()
         // check whether there's an existing wallet
         val walletExists = File(walletFilesDirPath).list()!!.isNotEmpty()
         if (walletExists && sharedPrefsWrapper.onboardingAuthSetupCompleted) {
             uiHandler.postDelayed({
                 startAuthActivity()
-            }, Splash.createWalletStartUpDelayMs)
+            }, getRemainingSplashTime())
         } else {
             uiHandler.postDelayed({
                 startOnboardingActivity()
-            }, Splash.createWalletStartUpDelayMs)
+            }, getRemainingSplashTime())
         }
     }
 
     override fun onBackPressed() {
         // no-op
+    }
+
+    private fun getRemainingSplashTime(): Long {
+        val timeSpent = System.currentTimeMillis() - activityCreateTime
+        return max(0, Splash.createWalletStartUpDelayMs - timeSpent)
     }
 
     private fun startOnboardingActivity() {
