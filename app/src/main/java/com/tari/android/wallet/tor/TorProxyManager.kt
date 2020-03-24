@@ -36,12 +36,9 @@ import android.app.Service
 import android.content.Context
 import com.orhanobut.logger.Logger
 import com.tari.android.wallet.util.SharedPrefsWrapper
-import java.io.BufferedReader
-import java.io.File
-import java.io.InputStreamReader
 import net.freehaven.tor.control.TorControlConnection
-import org.torproject.android.binary.TorResourceInstaller
 import java.io.*
+import java.io.BufferedReader
 import java.lang.Thread.sleep
 import java.net.Socket
 
