@@ -318,7 +318,9 @@ internal class TxDetailActivity :
             addContactButton.visibility = View.VISIBLE
             contactContainerView.visibility = View.GONE
         }
-        if ((tx as? CompletedTx)?.direction == Tx.Direction.OUTBOUND) {
+        if ((tx as? CompletedTx)?.direction == Tx.Direction.OUTBOUND ||
+            (tx as? PendingOutboundTx)?.direction == Tx.Direction.OUTBOUND
+        ) {
             txFeeGroup.visibility = View.VISIBLE
             val fee = MicroTari((tx as CompletedTx).fee)
             txFeeTextView.text = "+${WalletUtil.feeFormatter.format(fee.tariValue)}"
