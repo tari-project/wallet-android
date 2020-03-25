@@ -39,17 +39,17 @@ import com.tari.android.wallet.model.Model;
 
 oneway interface TariWalletServiceListener {
 
-    void onTxBroadcast(in TxId completedTxId);
+    void onTxBroadcast(in CompletedTx completed);
 
-    void onTxMined(in TxId completedTxId);
+    void onTxMined(in CompletedTx completed);
 
-    void onTxReceived(in TxId pendingInboundTxId);
+    void onTxReceived(in PendingInboundTx pendingInbound);
 
-    void onTxReplyReceived(in TxId pendingInboundTxId);
+    void onTxReplyReceived(in CompletedTx completed);
 
-    void onTxFinalized(in TxId completedTxId);
+    void onTxFinalized(in CompletedTx completed);
 
-    void onDiscoveryComplete(in TxId completedTxId, in boolean success);
+    void onDiscoveryComplete(in TxId txId, in boolean success);
 
     void onBaseNodeSyncComplete(in RxId requestId, in boolean success);
 
