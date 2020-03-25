@@ -52,10 +52,10 @@ import androidx.core.content.ContextCompat
 import butterknife.*
 import com.daasuu.ei.Ease
 import com.daasuu.ei.EasingInterpolator
-import com.orhanobut.logger.Logger
 import com.tari.android.wallet.R
 import com.tari.android.wallet.model.*
 import com.tari.android.wallet.service.TariWalletService
+import com.tari.android.wallet.ui.component.EmojiIdCopiedViewController
 import com.tari.android.wallet.ui.component.EmojiIdSummaryViewController
 import com.tari.android.wallet.ui.fragment.BaseFragment
 import com.tari.android.wallet.ui.util.UiUtil
@@ -94,6 +94,10 @@ class AddNoteAndSendFragment(private val walletService: TariWalletService) : Bas
     lateinit var fullEmojiIdTextView: TextView
     @BindView(R.id.add_note_and_send_vw_copy_emoji_id_container)
     lateinit var copyEmojiIdButtonContainerView: View
+    @BindView(R.id.add_note_and_send_vw_emoji_id_copied)
+    lateinit var emojiIdCopiedAnimView: View
+    @BindView(R.id.add_note_txt_prompt)
+    lateinit var promptTextView: TextView
     @BindView(R.id.add_note_and_send_edit_note)
     lateinit var noteEditText: EditText
     @BindView(R.id.add_note_and_send_vw_slide_button_container)
@@ -117,10 +121,13 @@ class AddNoteAndSendFragment(private val walletService: TariWalletService) : Bas
     @BindString(R.string.emoji_id_chunk_separator_char)
     lateinit var emojiIdChunkSeparator: String
     /**
-     * Dimmer view.
+     * Dimmer and click blocker views.
      */
     @BindView(R.id.add_note_and_send_vw_dimmer)
     lateinit var dimmerView: View
+    @BindView(R.id.add_note_and_send_vw_full_emoji_id_bg_click_blocker)
+    lateinit var fullEmojiIdBgClickBlockerView: View
+
 
     @BindDimen(R.dimen.add_note_slide_button_left_margin)
     @JvmField
@@ -138,6 +145,12 @@ class AddNoteAndSendFragment(private val walletService: TariWalletService) : Bas
     @BindColor(R.color.white)
     @JvmField
     var whiteColor = 0
+    @BindColor(R.color.black)
+    @JvmField
+    var promptActiveColor = 0
+    @BindColor(R.color.add_note_prompt_passive_color)
+    @JvmField
+    var promptPassiveColor = 0
 
     @Inject
     lateinit var tracker: Tracker
@@ -154,6 +167,10 @@ class AddNoteAndSendFragment(private val walletService: TariWalletService) : Bas
      * Formats the summarized emoji id.
      */
     private lateinit var emojiIdSummaryController: EmojiIdSummaryViewController
+    /**
+     * Animates the emoji id "copied" text.
+     */
+    private lateinit var emojiIdCopiedViewController: EmojiIdCopiedViewController
 
     /**
      * Tx properties.
@@ -179,11 +196,15 @@ class AddNoteAndSendFragment(private val walletService: TariWalletService) : Bas
         amount = arguments!!.getParcelable("amount")!!
         fee = arguments!!.getParcelable("fee")!!
         emojiIdSummaryController = EmojiIdSummaryViewController(emojiIdSummaryView)
+        fullEmojiIdBgClickBlockerView.isClickable = false
         fullEmojiIdContainerView.visibility = View.GONE
         displayAliasOrEmojiId()
-        UiUtil.setProgressBarColor(progressBar, whiteColor)
+        emojiIdCopiedViewController = EmojiIdCopiedViewController(emojiIdCopiedAnimView)
         hideFullEmojiId(animated = false)
         OverScrollDecoratorHelper.setUpOverScroll(fullEmojiIdScrollView)
+
+        UiUtil.setProgressBarColor(progressBar, whiteColor)
+
         noteEditText.addTextChangedListener(this)
         slideView.setOnTouchListener(this)
 
@@ -191,6 +212,7 @@ class AddNoteAndSendFragment(private val walletService: TariWalletService) : Bas
         disableCallToAction()
         focusEditTextAndShowKeyboard()
 
+        promptTextView.setTextColor(promptActiveColor)
         noteEditText.imeOptions = EditorInfo.IME_ACTION_DONE
         noteEditText.setRawInputType(InputType.TYPE_CLASS_TEXT)
 
@@ -267,6 +289,9 @@ class AddNoteAndSendFragment(private val walletService: TariWalletService) : Bas
     }
 
     private fun showFullEmojiId() {
+        fullEmojiIdBgClickBlockerView.isClickable = true
+        // make dimmers non-clickable until the anim is over
+        dimmerView.isClickable = false
         // prepare views
         emojiIdSummaryContainerView.visibility = View.INVISIBLE
         dimmerView.alpha = 0f
@@ -325,13 +350,18 @@ class AddNoteAndSendFragment(private val walletService: TariWalletService) : Bas
         val animSet = AnimatorSet()
         animSet.playSequentially(emojiIdAnim, copyEmojiIdButtonAnim)
         animSet.start()
+        animSet.addListener(object : AnimatorListenerAdapter() {
+            override fun onAnimationEnd(animation: Animator?) {
+                dimmerView.isClickable = true
+            }
+        })
         // scroll animation
         fullEmojiIdScrollView.postDelayed({
             fullEmojiIdScrollView.smoothScrollTo(0, 0)
         }, Constants.UI.shortDurationMs + 20)
     }
 
-    private fun hideFullEmojiId(animated: Boolean) {
+    private fun hideFullEmojiId(animateCopyEmojiIdButton: Boolean = true, animated: Boolean) {
         if (!animated) {
             fullEmojiIdContainerView.visibility = View.GONE
             fullEmojiIdTextView.text = EmojiUtil.getChunkedEmojiId(
@@ -355,6 +385,7 @@ class AddNoteAndSendFragment(private val walletService: TariWalletService) : Bas
                 (copyEmojiIdButtonVisibleBottomMargin * value).toInt()
             )
         }
+        copyEmojiIdButtonAnim.duration = Constants.UI.shortDurationMs
         // emoji id anim
         val fullEmojiIdInitialWidth = fullEmojiIdContainerView.width
         val fullEmojiIdDeltaWidth = emojiIdSummaryContainerView.width - fullEmojiIdContainerView.width
@@ -371,13 +402,19 @@ class AddNoteAndSendFragment(private val walletService: TariWalletService) : Bas
             emojiIdSummaryContainerView.alpha = value
             backButton.alpha = value
         }
+        emojiIdAnim.duration = Constants.UI.shortDurationMs
         // chain anim.s and start
         val animSet = AnimatorSet()
-        animSet.playSequentially(copyEmojiIdButtonAnim, emojiIdAnim)
+        if (animateCopyEmojiIdButton) {
+            animSet.playSequentially(copyEmojiIdButtonAnim, emojiIdAnim)
+        } else {
+            animSet.play(emojiIdAnim)
+        }
         animSet.start()
         animSet.addListener(object : AnimatorListenerAdapter() {
             override fun onAnimationEnd(animation: Animator?) {
                 dimmerView.visibility = View.GONE
+                fullEmojiIdBgClickBlockerView.isClickable = false
                 fullEmojiIdContainerView.visibility = View.GONE
                 copyEmojiIdButtonContainerView.visibility = View.GONE
             }
@@ -404,6 +441,8 @@ class AddNoteAndSendFragment(private val walletService: TariWalletService) : Bas
 
     @OnClick(R.id.add_note_and_send_btn_copy_emoji_id)
     fun onCopyEmojiIdButtonClicked(view: View) {
+        UiUtil.temporarilyDisableClick(view)
+        dimmerView.isClickable = false
         val mActivity = activity ?: return
         val clipBoard = ContextCompat.getSystemService(mActivity, ClipboardManager::class.java)
         val deepLinkClipboardData = ClipData.newPlainText(
@@ -411,7 +450,13 @@ class AddNoteAndSendFragment(private val walletService: TariWalletService) : Bas
             EmojiUtil.getChunkedEmojiId(recipientUser.publicKey.emojiId, emojiIdChunkSeparator)
         )
         clipBoard?.setPrimaryClip(deepLinkClipboardData)
-        hideFullEmojiId(animated = true)
+        emojiIdCopiedViewController.showEmojiIdCopiedAnim(fadeOutOnEnd = true) {
+            hideFullEmojiId(animateCopyEmojiIdButton = false, animated = true)
+        }
+        // hide copy emoji id button
+        val copyEmojiIdButtonAnim = copyEmojiIdButtonContainerView.animate().alpha(0f)
+        copyEmojiIdButtonAnim.duration = Constants.UI.xShortDurationMs
+        copyEmojiIdButtonAnim.start()
     }
 
     private fun enableCallToAction() {
@@ -460,8 +505,10 @@ class AddNoteAndSendFragment(private val walletService: TariWalletService) : Bas
 
     override fun afterTextChanged(s: Editable) {
         if (s.toString().isNotEmpty()) {
+            promptTextView.setTextColor(promptPassiveColor)
             enableCallToAction()
         } else {
+            promptTextView.setTextColor(promptActiveColor)
             disableCallToAction()
         }
     }

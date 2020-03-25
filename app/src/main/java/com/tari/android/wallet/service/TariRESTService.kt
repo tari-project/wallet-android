@@ -32,6 +32,7 @@
  */
 package com.tari.android.wallet.service
 
+import com.tari.android.wallet.model.TestnetTariAllocateMaxResponse
 import com.tari.android.wallet.model.TestnetTariAllocateRequest
 import com.tari.android.wallet.model.TestnetTariAllocateResponse
 import retrofit2.Call
@@ -51,5 +52,11 @@ interface TariRESTService {
         @Path("publicKeyHex") publicKey: String,
         @Body requestBody: TestnetTariAllocateRequest
     ): Call<TestnetTariAllocateResponse>
+
+    @POST("/free_tari/allocate_max/{publicKeyHex}")
+    fun requestMaxTestnetTari(
+        @Path("publicKeyHex") publicKey: String,
+        @Body requestBody: TestnetTariAllocateRequest
+    ): Call<TestnetTariAllocateMaxResponse>
 
 }

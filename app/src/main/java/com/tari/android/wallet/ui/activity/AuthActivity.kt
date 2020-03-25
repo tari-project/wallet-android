@@ -36,12 +36,15 @@ import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
 import android.animation.AnimatorSet
 import android.animation.ValueAnimator
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
+import androidx.biometric.BiometricManager
 import androidx.biometric.BiometricPrompt
+import butterknife.BindString
 import butterknife.BindView
 import com.airbnb.lottie.LottieAnimationView
 import com.daasuu.ei.Ease
@@ -76,9 +79,16 @@ internal class AuthActivity : BaseActivity(), Animator.AnimatorListener {
     lateinit var smallGemImageView: ImageView
 
     @Inject
+    lateinit var context: Context
+    @Inject
     lateinit var tracker: Tracker
     @Inject
     lateinit var sharedPrefsWrapper: SharedPrefsWrapper
+
+    @BindString(R.string.auth_biometric_prompt)
+    lateinit var biometricAuthPrompt: String
+    @BindString(R.string.auth_device_lock_code_prompt)
+    lateinit var deviceLockCodePrompt: String
 
     override val contentViewId = R.layout.activity_auth
 
@@ -87,7 +97,7 @@ internal class AuthActivity : BaseActivity(), Animator.AnimatorListener {
 
         overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
         // call the animations
-        val wr = WeakReference<AuthActivity>(this)
+        val wr = WeakReference(this)
         bigGemImageView.post { wr.get()?.showTariText() }
 
         TrackHelper.track()
@@ -133,7 +143,7 @@ internal class AuthActivity : BaseActivity(), Animator.AnimatorListener {
         animSet.interpolator = EasingInterpolator(Ease.QUART_IN)
 
         // authenticate at the end of the animation set
-        val wr = WeakReference<AuthActivity>(this)
+        val wr = WeakReference(this)
         animSet.addListener(object : AnimatorListenerAdapter() {
             override fun onAnimationEnd(animation: Animator?) {
                 wr.get()?.doAuth()
@@ -149,7 +159,7 @@ internal class AuthActivity : BaseActivity(), Animator.AnimatorListener {
      * on passcode if not.
      */
     private fun doAuth() {
-        val wr = WeakReference<AuthActivity>(this)
+        val wr = WeakReference(this)
 
         // check whether there's at least screen lock
         if (!AuthUtil.isDeviceSecured(this)) {
@@ -185,9 +195,13 @@ internal class AuthActivity : BaseActivity(), Animator.AnimatorListener {
                 }
 
             })
+
+        val biometricAuthAvailable =
+            BiometricManager.from(context).canAuthenticate() == BiometricManager.BIOMETRIC_SUCCESS
+        val prompt = if (biometricAuthAvailable) biometricAuthPrompt else deviceLockCodePrompt
         val promptInfo = BiometricPrompt.PromptInfo.Builder()
             .setTitle(getString(R.string.auth_title))
-            .setSubtitle(getString(R.string.auth_subtitle))
+            .setSubtitle(prompt)
             .setDescription(getString(R.string.auth_description))
             .setDeviceCredentialAllowed(true) // enable passcode (i.e. screenlock)
             .build()
@@ -199,7 +213,7 @@ internal class AuthActivity : BaseActivity(), Animator.AnimatorListener {
      */
     private fun authSuccessful() {
         sharedPrefsWrapper.isAuthenticated = true
-        val wr = WeakReference<AuthActivity>(this)
+        val wr = WeakReference(this)
         wr.get()?.tariAnimationView?.post {
             wr.get()?.playTariWalletAnim()
         }
@@ -210,7 +224,7 @@ internal class AuthActivity : BaseActivity(), Animator.AnimatorListener {
      */
     private fun authHasFailed() {
         Logger.e("Authentication other error.")
-        val wr = WeakReference<AuthActivity>(this)
+        val wr = WeakReference(this)
         runOnUiThread { wr.get()?.displayAuthFailedDialog() }
     }
 
@@ -218,7 +232,7 @@ internal class AuthActivity : BaseActivity(), Animator.AnimatorListener {
      * Auth not available on device, i.e. lock screen is disabled
      */
     private fun displayAuthNotAvailableDialog() {
-        val wr = WeakReference<AuthActivity>(this)
+        val wr = WeakReference(this)
         val dialogBuilder = AlertDialog.Builder(this)
         dialogBuilder.setMessage(getString(R.string.auth_not_available_or_canceled_desc))
             .setCancelable(false)

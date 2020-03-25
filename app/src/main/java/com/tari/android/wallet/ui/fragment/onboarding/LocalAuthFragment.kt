@@ -108,6 +108,10 @@ internal class LocalAuthFragment : BaseFragment() {
     lateinit var biometricsPrompt: String
     @BindString(R.string.auth_prompt_biometrics_bold_part)
     lateinit var biometricsPromptBoldPart: String
+    @BindString(R.string.auth_biometric_prompt)
+    lateinit var biometricAuthPrompt: String
+    @BindString(R.string.auth_device_lock_code_prompt)
+    lateinit var biometricDeviceLockCodePrompt: String
 
     @Inject
     lateinit var sharedPrefsWrapper: SharedPrefsWrapper
@@ -272,9 +276,12 @@ internal class LocalAuthFragment : BaseFragment() {
                     authSuccess()
                 }
             })
+
+        val biometricAuthAvailable = BiometricManager.from(context!!).canAuthenticate() == BIOMETRIC_SUCCESS
+        val prompt = if (biometricAuthAvailable) biometricAuthPrompt else biometricDeviceLockCodePrompt
         val promptInfo = BiometricPrompt.PromptInfo.Builder()
             .setTitle(getString(R.string.auth_title))
-            .setSubtitle(getString(R.string.auth_subtitle))
+            .setSubtitle(prompt)
             .setDescription(getString(R.string.auth_description))
             .setDeviceCredentialAllowed(true)
             .build()
@@ -294,7 +301,7 @@ internal class LocalAuthFragment : BaseFragment() {
         dialogBuilder.setMessage(getString(R.string.auth_failed_desc))
             .setCancelable(false)
             // negative button text and action
-            .setNegativeButton(getString(R.string.common_cancel), null)
+            .setNegativeButton(getString(R.string.common_ok), null)
 
         val alert = dialogBuilder.create()
         alert.setTitle(getString(R.string.auth_failed_title))

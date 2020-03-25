@@ -42,8 +42,19 @@ import com.google.gson.annotations.SerializedName
 data class TestnetTariAllocateRequest constructor(val signature: String, @SerializedName("public_nonce") val public_nonce: String)
 
 data class TestnetTariAllocateResponse constructor(
-    val key: String,
-    val value: String,
     @SerializedName("return_wallet_id")
-    val returnWalletId: String
+    val returnWalletId: String,
+    val key: String,
+    val value: String
+)
+
+data class TestnetTariKey constructor(
+    val key: String,
+    val value: String
+)
+
+data class TestnetTariAllocateMaxResponse constructor(
+    @SerializedName("return_wallet_id")
+    val returnWalletId: String,
+    val keys: List<TestnetTariKey>
 )

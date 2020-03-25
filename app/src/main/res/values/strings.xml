@@ -28,6 +28,10 @@
     <string name="common_new_uppercase">NEW</string>
     <string name="common_save">Save</string>
     <string name="common_cancel">Cancel</string>
+    <string name="common_ok">OK</string>
+
+    <!-- emoji id copied view -->
+    <string name="emoji_id_copied">Copied</string>
 
     <!-- dummy values - UI design placeholders -->
     <string name="dummy_positive_tx_value">+ 152.75</string>
@@ -62,8 +66,9 @@
     <string name="proceed">Proceed</string>
     <string name="exit">Exit</string>
     <string name="auth_title">Authentication</string>
-    <string name="auth_subtitle">Please use your biometrics or your PIN, pattern or password to authenticate Tari Wallet.</string>
-    <string name="auth_description">Authentication secures your Tari Wallet transactions.</string>
+    <string name="auth_biometric_prompt">Please use your biometrics to authenticate Tari Wallet.</string>
+    <string name="auth_device_lock_code_prompt">Please use your device lock code to authenticate Tari Wallet.</string>
+    <string name="auth_description">Authentication secures your Tari Wallet.</string>
     <string name="auth_not_available_or_canceled_title">Authentication Error</string>
     <string name="auth_not_available_or_canceled_desc">Tari Wallet was not able to authenticate you. Do you still want to proceed?</string>
     <string name="auth_failed_title">Authentication Failed</string>
@@ -97,7 +102,7 @@
     <string name="create_wallet_hello_friend_label">Hello, Friend.</string>
     <string name="create_wallet_just_a_sec_label" tools:ignore="TypographyEllipsis">Hold on a sec...</string>
     <string name="create_wallet_just_sec_desc_text">We’re creating your wallet.</string>
-    <string name="create_wallet_address_desc">Your Emoji ID is your wallet address.\n It’s how people can find you and send you Tari.</string>
+    <string name="create_wallet_address_desc">Your Emoji ID is your wallet address.\nIt’s how people can find you and send you Tari.</string>
     <string name="create_wallet_now_text">Now create your Emoji ID</string>
     <string name="create_wallet_awesome">Awesome!</string>
     <string name="create_wallet_your_emoji_id_text_label_1">This is your</string>
@@ -125,6 +130,7 @@
     <string name="add_recipient_recent_tx_contacts">Recent</string>
     <string name="add_recipient_my_contacts">My Contacts</string>
     <string name="add_recipient_invalid_emoji_id">Invalid Emoji ID</string>
+    <string name="add_recipient_own_emoji_id">This is Your Own Emoji Id</string>
 
     <!-- send tari - amount -->
     <string name="add_amount_under_construction">Under Construction</string>

@@ -426,6 +426,19 @@
                         android:layout_centerVertical="true"
                         android:background="@drawable/emoji_id_end_fader"
                         android:translationZ="6dp" />
+
+                    <FrameLayout
+                        android:layout_width="match_parent"
+                        android:translationZ="7dp"
+                        android:layout_height="match_parent">
+
+                        <include
+                            android:id="@+id/tx_detail_vw_emoji_id_copied"
+                            layout="@layout/emoji_id_copied_anim_view"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:visibility="visible" />
+                    </FrameLayout>
                 </RelativeLayout>
             </RelativeLayout>
 
