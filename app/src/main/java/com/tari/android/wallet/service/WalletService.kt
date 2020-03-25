@@ -123,66 +123,56 @@ class WalletService : Service(), FFIWalletListenerAdapter {
         super.onDestroy()
     }
 
-    override fun onTxBroadcast(completedTxId: BigInteger) {
-        Logger.d("Tx $completedTxId broadcast.")
-        val txId = TxId(completedTxId)
+    override fun onTxBroadcast(completed: CompletedTx) {
+        Logger.d("Tx ${completed.id} broadcast.")
         // post event to bus for the internal listeners
-        EventBus.post(Event.Wallet.TxBroadcast(txId))
+        EventBus.post(Event.Wallet.TxBroadcast(completed))
         // notify external listeners
         listeners.iterator().forEach {
-            it.onTxBroadcast(txId)
+            it.onTxBroadcast(completed)
         }
     }
 
-    override fun onTxMined(completedTxId: BigInteger) {
-        Logger.d("Tx $completedTxId mined.")
-        val txId = TxId(completedTxId)
+    override fun onTxMined(completed: CompletedTx) {
+        Logger.d("Tx ${completed.id} mined.")
         // post event to bus for the internal listeners
-        EventBus.post(Event.Wallet.TxMined(txId))
+        EventBus.post(Event.Wallet.TxMined(completed))
         // notify external listeners
         listeners.iterator().forEach {
-            it.onTxMined(txId)
+            it.onTxMined(completed)
         }
     }
 
-    override fun onTxReceived(pendingInboundTxId: BigInteger) {
-        Logger.d("Tx $pendingInboundTxId received.")
+    override fun onTxReceived(pendingInbound: PendingInboundTx) {
+        Logger.d("Tx ${pendingInbound.id} received.")
         // post event to bus for the internal listeners
-        val tx = serviceImpl.getPendingInboundTxById(
-            TxId(pendingInboundTxId),
-            WalletError()
-        )
-        if (tx != null) {
-            EventBus.post(Event.Wallet.TxReceived(tx))
-            // manage notifications
-            postTxNotification(tx)
-        }
+
+        EventBus.post(Event.Wallet.TxReceived(pendingInbound))
+        // manage notifications
+        postTxNotification(pendingInbound)
         // notify listeners
-        val txId = TxId(pendingInboundTxId)
         listeners.iterator().forEach {
-            it.onTxReceived(txId)
+            it.onTxReceived(pendingInbound)
         }
     }
 
-    override fun onTxReplyReceived(completedTxId: BigInteger) {
-        Logger.d("Tx $completedTxId reply received.")
-        val txId = TxId(completedTxId)
+    override fun onTxReplyReceived(completed: CompletedTx) {
+        Logger.d("Tx ${completed.id} reply received.")
         // post event to bus for the internal listeners
-        EventBus.post(Event.Wallet.TxReplyReceived(txId))
+        EventBus.post(Event.Wallet.TxReplyReceived(completed))
         // notify external listeners
         listeners.iterator().forEach {
-            it.onTxReplyReceived(txId)
+            it.onTxReplyReceived(completed)
         }
     }
 
-    override fun onTxFinalized(completedTxId: BigInteger) {
-        Logger.d("Tx $completedTxId finalized.")
-        val txId = TxId(completedTxId)
+    override fun onTxFinalized(completed: CompletedTx) {
+        Logger.d("Tx ${completed.id} finalized.")
         // post event to bus for the internal listeners
-        EventBus.post(Event.Wallet.TxFinalized(txId))
+        EventBus.post(Event.Wallet.TxFinalized(completed))
         // notify external listeners
         listeners.iterator().forEach {
-            it.onTxFinalized(txId)
+            it.onTxFinalized(completed)
         }
     }
 

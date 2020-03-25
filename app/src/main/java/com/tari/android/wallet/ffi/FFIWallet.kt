@@ -32,9 +32,12 @@
  */
 package com.tari.android.wallet.ffi
 
+import android.content.SharedPreferences
 import android.util.Log
 import com.orhanobut.logger.Logger
+import com.tari.android.wallet.model.*
 import com.tari.android.wallet.model.WalletErrorCode.*
+import com.tari.android.wallet.util.SharedPrefsWrapper
 import java.math.BigInteger
 
 /**
@@ -298,44 +301,196 @@ internal abstract class FFIWallet(commsConfig: FFICommsConfig, logPath: String) 
 
     fun getPendingInboundTxById(id: BigInteger): FFIPendingInboundTx {
         val error = FFIError()
-        val result = FFIPendingInboundTx(jniGetPendingInboundTxById(id.toString(), error))
+        val result = FFIPendingInboundTx(jniGetPendingInboundTxById(id.toByteArray().toString(), error))
         throwIf(error)
         return result
     }
 
-    protected fun onTxBroadcast(ptr: FFICompletedTxPtr) {
-        Logger.i("Tx completed. Pointer: %s", ptr.toString())
-        val tx = FFICompletedTx(ptr)
+    protected fun onTxBroadcast(completedTx: FFICompletedTxPtr) {
+        Logger.i("Tx completed. Pointer: %s", completedTx.toString())
+        val walletKey = getPublicKey()
+        val walletHex = walletKey.toString()
+        walletKey.destroy()
+        val tx = FFICompletedTx(completedTx)
         val id = tx.getId()
+        val destination = tx.getDestinationPublicKey()
+        val destinationHex = destination.toString()
+        val destinationEmoji = destination.getEmojiNodeId()
+        destination.destroy()
+        val amount = tx.getAmount()
+        val fee = tx.getFee()
+        val timestamp = tx.getTimestamp()
+        val message = tx.getMessage()
+        var status = when(tx.getStatus()) {
+            FFIStatus.BROADCAST -> Status.BROADCAST
+            FFIStatus.COMPLETED -> Status.COMPLETED
+            FFIStatus.IMPORTED -> Status.IMPORTED
+            FFIStatus.MINED -> Status.MINED
+            FFIStatus.PENDING -> Status.PENDING
+            FFIStatus.TX_NULL_ERROR -> Status.TX_NULL_ERROR
+            else -> Status.UNKNOWN
+        }
         tx.destroy()
-        listenerAdapter?.onTxBroadcast(id)
+
+        var direction = Tx.Direction.INBOUND
+        if (destinationHex != walletHex)
+        {
+            direction = Tx.Direction.OUTBOUND
+        }
+        val destinationPk = PublicKey(destinationHex,destinationEmoji)
+        val user = User(destinationPk)
+
+        val completed = CompletedTx(id,direction,user,MicroTari(amount),fee,timestamp,message,status)
+
+        listenerAdapter?.onTxBroadcast(completed)
     }
 
-    protected fun onTxMined(ptr: FFICompletedTxPtr) {
-        Logger.i("Tx mined. Pointer: %s", ptr.toString())
-        val tx = FFICompletedTx(ptr)
-        listenerAdapter?.onTxMined(tx.getId())
+    protected fun onTxMined(completedTx: FFICompletedTxPtr) {
+        Logger.i("Tx mined. Pointer: %s", completedTx.toString())
+        val walletKey = getPublicKey()
+        val walletHex = walletKey.toString()
+        walletKey.destroy()
+        val tx = FFICompletedTx(completedTx)
+        val id = tx.getId()
+        val destination = tx.getDestinationPublicKey()
+        val destinationHex = destination.toString()
+        val destinationEmoji = destination.getEmojiNodeId()
+        destination.destroy()
+        val amount = tx.getAmount()
+        val fee = tx.getFee()
+        val timestamp = tx.getTimestamp()
+        val message = tx.getMessage()
+        var status = when(tx.getStatus()) {
+            FFIStatus.BROADCAST -> Status.BROADCAST
+            FFIStatus.COMPLETED -> Status.COMPLETED
+            FFIStatus.IMPORTED -> Status.IMPORTED
+            FFIStatus.MINED -> Status.MINED
+            FFIStatus.PENDING -> Status.PENDING
+            FFIStatus.TX_NULL_ERROR -> Status.TX_NULL_ERROR
+            else -> Status.UNKNOWN
+        }
+        tx.destroy()
+
+        var direction = Tx.Direction.INBOUND
+        if (destinationHex != walletHex)
+        {
+            direction = Tx.Direction.OUTBOUND
+        }
+        val destinationPk = PublicKey(destinationHex,destinationEmoji)
+        val user = User(destinationPk)
+
+        val completed = CompletedTx(id,direction,user,MicroTari(amount),fee,timestamp,message,status)
+
+        listenerAdapter?.onTxMined(completed)
         tx.destroy()
     }
 
-    protected fun onTxReceived(ptr: FFIPendingInboundTxPtr) {
-        Logger.i("Tx received. Pointer: %s", ptr.toString())
-        val tx = FFIPendingInboundTx(ptr)
-        listenerAdapter?.onTxReceived(tx.getId())
+    protected fun onTxReceived(inboundTx: FFIPendingInboundTxPtr) {
+        Logger.i("Tx received. Pointer: %s", inboundTx.toString())
+        val tx = FFIPendingInboundTx(inboundTx)
+        val id = tx.getId()
+        val source = tx.getSourcePublicKey()
+        val sourceHex = source.toString()
+        val sourceEmoji = source.getEmojiNodeId()
+        source.destroy()
+        val amount = tx.getAmount()
+        val timestamp = tx.getTimestamp()
+        val message = tx.getMessage()
+        var status = when(tx.getStatus()) {
+            FFIStatus.BROADCAST -> Status.BROADCAST
+            FFIStatus.COMPLETED -> Status.COMPLETED
+            FFIStatus.IMPORTED -> Status.IMPORTED
+            FFIStatus.MINED -> Status.MINED
+            FFIStatus.PENDING -> Status.PENDING
+            FFIStatus.TX_NULL_ERROR -> Status.TX_NULL_ERROR
+            else -> Status.UNKNOWN
+        }
+        tx.destroy()
+
+        val pk = PublicKey(sourceHex,sourceEmoji)
+        val user = User(pk)
+        val pendingTx = PendingInboundTx(id,user,MicroTari(amount),timestamp,message,status)
+
+        listenerAdapter?.onTxReceived(pendingTx)
+    }
+
+    protected fun onTxReplyReceived(completedTx: FFICompletedTxPtr) {
+        Logger.i("Tx reply received. Pointer: %s", completedTx.toString())
+        val walletKey = getPublicKey()
+        val walletHex = walletKey.toString()
+        walletKey.destroy()
+        val tx = FFICompletedTx(completedTx)
+        val id = tx.getId()
+        val destination = tx.getDestinationPublicKey()
+        val destinationHex = destination.toString()
+        val destinationEmoji = destination.getEmojiNodeId()
+        destination.destroy()
+        val amount = tx.getAmount()
+        val fee = tx.getFee()
+        val timestamp = tx.getTimestamp()
+        val message = tx.getMessage()
+        var status = when(tx.getStatus()) {
+            FFIStatus.BROADCAST -> Status.BROADCAST
+            FFIStatus.COMPLETED -> Status.COMPLETED
+            FFIStatus.IMPORTED -> Status.IMPORTED
+            FFIStatus.MINED -> Status.MINED
+            FFIStatus.PENDING -> Status.PENDING
+            FFIStatus.TX_NULL_ERROR -> Status.TX_NULL_ERROR
+            else -> Status.UNKNOWN
+        }
+        tx.destroy()
+
+        var direction = Tx.Direction.INBOUND
+        if (destinationHex != walletHex)
+        {
+            direction = Tx.Direction.OUTBOUND
+        }
+        val destinationPk = PublicKey(destinationHex,destinationEmoji)
+        val user = User(destinationPk)
+
+        val completed = CompletedTx(id,direction,user,MicroTari(amount),fee,timestamp,message,status)
+
+        listenerAdapter?.onTxReplyReceived(completed)
         tx.destroy()
     }
 
-    protected fun onTxReplyReceived(ptr: FFICompletedTxPtr) {
-        Logger.i("Tx reply received. Pointer: %s", ptr.toString())
-        val tx = FFICompletedTx(ptr)
-        listenerAdapter?.onTxReplyReceived(tx.getId())
+    protected fun onTxFinalized(completedTx: FFICompletedTxPtr) {
+        Logger.i("Tx finalized. Pointer: %s", completedTx.toString())
+        val walletKey = getPublicKey()
+        val walletHex = walletKey.toString()
+        walletKey.destroy()
+        val tx = FFICompletedTx(completedTx)
+        val id = tx.getId()
+        val destination = tx.getDestinationPublicKey()
+        val destinationHex = destination.toString()
+        val destinationEmoji = destination.getEmojiNodeId()
+        destination.destroy()
+        val amount = tx.getAmount()
+        val fee = tx.getFee()
+        val timestamp = tx.getTimestamp()
+        val message = tx.getMessage()
+        var status = when(tx.getStatus()) {
+            FFIStatus.BROADCAST -> Status.BROADCAST
+            FFIStatus.COMPLETED -> Status.COMPLETED
+            FFIStatus.IMPORTED -> Status.IMPORTED
+            FFIStatus.MINED -> Status.MINED
+            FFIStatus.PENDING -> Status.PENDING
+            FFIStatus.TX_NULL_ERROR -> Status.TX_NULL_ERROR
+            else -> Status.UNKNOWN
+        }
         tx.destroy()
-    }
 
-    protected fun onTxFinalized(ptr: FFICompletedTxPtr) {
-        Logger.i("Tx finalized. Pointer: %s", ptr.toString())
-        val tx = FFICompletedTx(ptr)
-        listenerAdapter?.onTxFinalized(tx.getId())
+        var direction = Tx.Direction.INBOUND
+        if (destinationHex != walletHex)
+        {
+            direction = Tx.Direction.OUTBOUND
+        }
+        val destinationPk = PublicKey(destinationHex,destinationEmoji)
+        val user = User(destinationPk)
+
+        val completed = CompletedTx(id,direction,user,MicroTari(amount),fee,timestamp,message,status)
+
+        listenerAdapter?.onTxFinalized(completed)
         tx.destroy()
     }
 
