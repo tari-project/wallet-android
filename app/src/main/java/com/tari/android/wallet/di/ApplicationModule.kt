@@ -32,6 +32,7 @@
  */
 package com.tari.android.wallet.di
 
+import android.content.ClipboardManager
 import android.content.Context
 import com.tari.android.wallet.application.TariWalletApplication
 import com.tari.android.wallet.notification.NotificationHelper
@@ -66,4 +67,9 @@ internal class ApplicationModule(
     @Singleton
     fun provideNotificationHelper(context: Context) = NotificationHelper(context)
 
+    @Provides
+    @Singleton
+    fun provideClipboardManager(context: Context): ClipboardManager {
+        return context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+    }
 }

@@ -39,7 +39,6 @@ import android.animation.ValueAnimator
 import android.app.Activity
 import android.content.ClipboardManager
 import android.content.Context
-import android.content.Context.CLIPBOARD_SERVICE
 import android.content.Intent
 import android.os.AsyncTask
 import android.os.Bundle
@@ -59,6 +58,8 @@ import com.daasuu.ei.EasingInterpolator
 import com.orhanobut.logger.Logger
 import com.tari.android.wallet.R
 import com.tari.android.wallet.application.DeepLink
+import com.tari.android.wallet.application.DeepLink.Type.EMOJI_ID
+import com.tari.android.wallet.application.DeepLink.Type.PUBLIC_KEY_HEX
 import com.tari.android.wallet.model.*
 import com.tari.android.wallet.service.TariWalletService
 import com.tari.android.wallet.ui.activity.qr.EXTRA_QR_DATA
@@ -69,13 +70,12 @@ import com.tari.android.wallet.ui.util.UiUtil
 import com.tari.android.wallet.util.*
 import com.tari.android.wallet.util.Constants.Wallet.emojiFormatterChunkSize
 import com.tari.android.wallet.util.Constants.Wallet.emojiIdLength
+import me.everything.android.ui.overscroll.OverScrollDecoratorHelper
 import org.matomo.sdk.Tracker
 import org.matomo.sdk.extra.TrackHelper
 import java.lang.ref.WeakReference
 import javax.inject.Inject
 import kotlin.math.min
-import com.tari.android.wallet.application.DeepLink.Type.*
-import me.everything.android.ui.overscroll.OverScrollDecoratorHelper
 
 /**
  * Fragment that manages the adding of a recipient to an outgoing transaction.
@@ -150,6 +150,8 @@ class AddRecipientFragment(private val walletService: TariWalletService) : BaseF
     lateinit var tracker: Tracker
     @Inject
     lateinit var sharedPrefsWrapper: SharedPrefsWrapper
+    @Inject
+    lateinit var clipboardManager: ClipboardManager
 
     /**
      * List, adapter & layout manager.
@@ -256,8 +258,6 @@ class AddRecipientFragment(private val walletService: TariWalletService) : BaseF
      * Checks whether a valid deep link or an emoji id is in the clipboard data.
      */
     private fun checkClipboardForValidEmojiId() {
-        val clipboardManager = (activity?.getSystemService(CLIPBOARD_SERVICE) as? ClipboardManager)
-            ?: return
         val clipboardString = clipboardManager.primaryClip?.getItemAt(0)?.text?.toString()
             ?: return
         val deepLink = DeepLink.from(clipboardString)
