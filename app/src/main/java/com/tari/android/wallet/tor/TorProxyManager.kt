@@ -36,9 +36,11 @@ import android.app.Service
 import android.content.Context
 import com.orhanobut.logger.Logger
 import com.tari.android.wallet.util.SharedPrefsWrapper
+import net.freehaven.tor.control.TorControlConnection
+import java.io.*
 import java.io.BufferedReader
-import java.io.File
-import java.io.InputStreamReader
+import java.lang.Thread.sleep
+import java.net.Socket
 
 /**
  * Manages the installation and the running of the Tor proxy.
@@ -90,7 +92,9 @@ internal class TorProxyManager(
     }
 
     fun runTorProxy() {
+        Logger.d("Starting Tor")
         installTorResources()
+
         val appCacheHome = context.getDir(torDataDirectoryName, Service.MODE_PRIVATE)
         val torCmdString =
             "${sharedPrefsWrapper.torBinPath} DataDirectory ${appCacheHome.absolutePath} " +
@@ -105,4 +109,96 @@ internal class TorProxyManager(
         exec(torCmdString)
     }
 
+    fun start(timeout: Long, listener: TorProxyListener) {
+        // Run Tor
+        Thread { runTorProxy() }.start()
+
+        // Start checking for Tor proxy on a different thread
+        Thread {
+            val success = verifyTorIsRunning(timeout)
+            listener.onTorProxyInitResult(success)
+        }.start()
+    }
+
+    private fun verifyTorIsRunning(timeout: Long): Boolean {
+        var controlConnection: TorControlConnection? = null
+        var socket: Socket? = null
+        try {
+            // We will check every second to see if boot strapping has finally finished
+            for (secondsWaited in 0 until timeout) {
+                try {
+                    if (controlConnection == null) {
+                        socket = Socket(torConfig.controlHost, torConfig.controlPort)
+                        controlConnection = connectToTorControlSocket(socket)
+                    }
+                } catch (ex: Exception) {
+                    Logger.d("Tor control connection failed with error %s", ex.message)
+                }
+
+                if (isTorRunning(controlConnection)) {
+                    Logger.d("Tor start success")
+                    return true
+                }
+                sleep(1000)
+            }
+            return false
+        } finally {
+            try {
+                socket?.close()
+            } catch (ignore: Exception) {
+            }
+        }
+    }
+
+    /**
+     * Finds Tor control connection by trying to connect.
+     */
+    private fun connectToTorControlSocket(socket: Socket): TorControlConnection? {
+        val connection: TorControlConnection
+        try {
+            connection =
+                TorControlConnection(socket)
+            val file = File(torConfig.cookieFilePath)
+            connection.authenticate(read(file))
+        } catch (e: IOException) {
+            throw e
+        } catch (e: ArrayIndexOutOfBoundsException) {
+            throw IOException("Failed to read control port:  ${torConfig.controlPort}")
+        }
+        return connection
+    }
+
+    private fun isTorRunning(controlConnection: TorControlConnection?): Boolean {
+        if (controlConnection == null) {
+            return false
+        }
+        try {
+            val phase = controlConnection.getInfo("status/bootstrap-phase")
+            if (phase != null && phase.contains("PROGRESS=100")) {
+                Logger.d("Tor has already bootstrapped")
+                return true
+            }
+        } catch (e: IOException) {
+            Logger.d("Control connection is not responding properly to getInfo", e)
+        }
+        return false
+    }
+
+    private fun read(file: File): ByteArray? {
+        val bytes = ByteArray(file.length().toInt())
+        val inputStream = FileInputStream(file)
+        return inputStream.use { inputStream ->
+            var offset = 0
+            while (offset < bytes.size) {
+                val read = inputStream.read(bytes, offset, bytes.size - offset)
+                if (read == -1) throw EOFException()
+                offset += read
+            }
+            bytes
+        }
+    }
+}
+
+interface TorProxyListener {
+    fun onTorProxyInitResult(success: Boolean)
 }

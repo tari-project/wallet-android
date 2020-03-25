@@ -30,48 +30,10 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.tari.android.wallet.event
+package com.tari.android.wallet.application
 
-import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.subjects.BehaviorSubject
-import io.reactivex.subjects.PublishSubject
-
-
-/**
- * Event bus for the pub/sub model.
- *
- * Subscription example:
- *
- * EventBus.subscribe<EventClass>(this) {
- *      // op.s
- * }
- */
-object EventBus {
-
-    val disposables = mutableMapOf<Any, CompositeDisposable>()
-    val publishSubject = PublishSubject.create<Any>()
-    var stickyEventsSubject = BehaviorSubject.create<Any>()
-
-    inline fun <reified T : Any> subscribe(subscriber: Any, noinline consumer: (T) -> Unit) {
-        val observer = publishSubject.ofType(T::class.java).subscribe(consumer)
-        val disposable = disposables[subscriber]
-            ?: CompositeDisposable().apply { disposables[subscriber] = this }
-        disposable.add(observer)
-    }
-
-    inline fun <reified T : Any> subscribeSticky(subscriber: Any, noinline consumer: (T) -> Unit) {
-        val observer = stickyEventsSubject.ofType(T::class.java).subscribe(consumer)
-        val disposable = disposables[subscriber]
-            ?: CompositeDisposable().apply { disposables[subscriber] = this }
-        disposable.add(observer)
-    }
-
-    fun unsubscribe(subscriber: Any) = disposables.apply {
-        get(subscriber)?.clear()
-        remove(subscriber)
-    }
-
-    fun post(event: Any) = publishSubject.onNext(event)
-
-    fun postSticky(event: Any) = stickyEventsSubject.onNext(event)
+enum class AppState {
+    Initializing,       // App is initializing, UIs and other services should not resume yet
+    Ready,              // App is ready to be used
+    Failed              // App initialized failed, it's not usable. User should be advised to contact support.
 }
