@@ -22,6 +22,7 @@
     <!-- common -->
     <string name="common_continue">Continue</string>
     <string name="common_from">From</string>
+    <string name="common_to">To</string>
     <string name="common_close">Close</string>
     <string name="common_new">New</string>
     <string name="common_new_uppercase">NEW</string>

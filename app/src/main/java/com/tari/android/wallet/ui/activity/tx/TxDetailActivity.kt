@@ -138,6 +138,8 @@ internal class TxDetailActivity :
     lateinit var noteLabelView: View
     @BindView(R.id.tx_detail_vw_tx_fee_group)
     lateinit var txFeeGroup: Group
+    @BindView(R.id.tx_detail_txt_from)
+    lateinit var fromTextView: CustomFontTextView
     /**
      * Dimmers.
      */
@@ -174,6 +176,12 @@ internal class TxDetailActivity :
     @JvmField
     @BindString(R.string.tx_detail_pending_payment_sent)
     var pendingPaymentSent = ""
+    @JvmField
+    @BindString(R.string.common_from)
+    var paymentFrom = ""
+    @JvmField
+    @BindString(R.string.common_to)
+    var paymentTo = ""
 
     @JvmField
     @BindColor(R.color.tx_detail_contact_name_label_text)
@@ -275,6 +283,18 @@ internal class TxDetailActivity :
             }
             is PendingInboundTx -> pendingPaymentReceived
             is PendingOutboundTx -> pendingPaymentSent
+            else -> throw RuntimeException("Unexpected transaction type for transaction: " + tx.id)
+        }
+
+        fromTextView.text == when (tx) {
+            is CompletedTx -> {
+                when (tx.direction) {
+                    Tx.Direction.INBOUND -> paymentFrom
+                    Tx.Direction.OUTBOUND -> paymentTo
+                }
+            }
+            is PendingInboundTx -> paymentFrom
+            is PendingOutboundTx -> paymentTo
             else -> throw RuntimeException("Unexpected transaction type for transaction: " + tx.id)
         }
 
