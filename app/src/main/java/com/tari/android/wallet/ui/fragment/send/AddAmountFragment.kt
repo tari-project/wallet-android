@@ -61,6 +61,7 @@ import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.EmojiUtil
 import com.tari.android.wallet.util.WalletUtil
 import com.tari.android.wallet.extension.remap
+import com.tari.android.wallet.ui.component.EmojiIdCopiedViewController
 import me.everything.android.ui.overscroll.OverScrollDecoratorHelper
 import org.matomo.sdk.Tracker
 import org.matomo.sdk.extra.TrackHelper
@@ -95,6 +96,8 @@ class AddAmountFragment(private val walletService: TariWalletService) : BaseFrag
     lateinit var fullEmojiIdTextView: TextView
     @BindView(R.id.add_amount_vw_copy_emoji_id_container)
     lateinit var copyEmojiIdButtonContainerView: View
+    @BindView(R.id.add_amount_vw_emoji_id_copied)
+    lateinit var emojiIdCopiedAnimView: View
     @BindView(R.id.add_amount_vw_not_enough_balance)
     lateinit var notEnoughBalanceView: View
     @BindView(R.id.add_amount_vw_amount_outer_container)
@@ -124,6 +127,8 @@ class AddAmountFragment(private val walletService: TariWalletService) : BaseFrag
      */
     @BindView(R.id.add_amount_vw_dimmer)
     lateinit var dimmerView: View
+    @BindView(R.id.add_amount_vw_full_emoji_id_bg_click_blocker)
+    lateinit var fullEmojiIdBgClickBlockerView: View
 
     /**
      * An element can be a digit or a decimal/thousands separator.
@@ -208,6 +213,10 @@ class AddAmountFragment(private val walletService: TariWalletService) : BaseFrag
      * Formats the summarized emoji id.
      */
     private lateinit var emojiIdSummaryController: EmojiIdSummaryViewController
+    /**
+     * Animates the emoji id "copied" text.
+     */
+    private lateinit var emojiIdCopiedViewController: EmojiIdCopiedViewController
 
     override val contentViewId: Int = R.layout.fragment_add_amount
 
@@ -240,9 +249,10 @@ class AddAmountFragment(private val walletService: TariWalletService) : BaseFrag
         // add first digit to the element list
         elements.add(Pair("0", element0TextView))
 
+        fullEmojiIdBgClickBlockerView.isClickable = false
         emojiIdSummaryController = EmojiIdSummaryViewController(emojiIdSummaryView)
         displayAliasOrEmojiId()
-
+        emojiIdCopiedViewController = EmojiIdCopiedViewController(emojiIdCopiedAnimView)
         hideFullEmojiId(animated = false)
         OverScrollDecoratorHelper.setUpOverScroll(fullEmojiIdScrollView)
 
@@ -318,6 +328,9 @@ class AddAmountFragment(private val walletService: TariWalletService) : BaseFrag
     }
 
     private fun showFullEmojiId() {
+        fullEmojiIdBgClickBlockerView.isClickable = true
+        // make dimmers non-clickable until the anim is over
+        dimmerView.isClickable = false
         // prepare views
         emojiIdSummaryContainerView.visibility = View.INVISIBLE
         dimmerView.alpha = 0f
@@ -376,13 +389,18 @@ class AddAmountFragment(private val walletService: TariWalletService) : BaseFrag
         val animSet = AnimatorSet()
         animSet.playSequentially(emojiIdAnim, copyEmojiIdButtonAnim)
         animSet.start()
+        animSet.addListener(object : AnimatorListenerAdapter() {
+            override fun onAnimationEnd(animation: Animator?) {
+                dimmerView.isClickable = true
+            }
+        })
         // scroll animation
         fullEmojiIdScrollView.postDelayed({
             fullEmojiIdScrollView.smoothScrollTo(0, 0)
         }, Constants.UI.shortDurationMs + 20)
     }
 
-    private fun hideFullEmojiId(animated: Boolean) {
+    private fun hideFullEmojiId(animateCopyEmojiIdButton: Boolean = true, animated: Boolean) {
         if (!animated) {
             fullEmojiIdContainerView.visibility = View.GONE
             fullEmojiIdTextView.text = EmojiUtil.getChunkedEmojiId(
@@ -424,11 +442,16 @@ class AddAmountFragment(private val walletService: TariWalletService) : BaseFrag
         }
         // chain anim.s and start
         val animSet = AnimatorSet()
-        animSet.playSequentially(copyEmojiIdButtonAnim, emojiIdAnim)
+        if (animateCopyEmojiIdButton) {
+            animSet.playSequentially(copyEmojiIdButtonAnim, emojiIdAnim)
+        } else {
+            animSet.play(emojiIdAnim)
+        }
         animSet.start()
         animSet.addListener(object : AnimatorListenerAdapter() {
             override fun onAnimationEnd(animation: Animator?) {
                 dimmerView.visibility = View.GONE
+                fullEmojiIdBgClickBlockerView.isClickable = false
                 fullEmojiIdContainerView.visibility = View.GONE
                 copyEmojiIdButtonContainerView.visibility = View.GONE
             }
@@ -445,6 +468,8 @@ class AddAmountFragment(private val walletService: TariWalletService) : BaseFrag
 
     @OnClick(R.id.add_amount_btn_copy_emoji_id)
     fun onCopyEmojiIdButtonClicked(view: View) {
+        UiUtil.temporarilyDisableClick(view)
+        dimmerView.isClickable = false
         val mActivity = activity ?: return
         val clipBoard = ContextCompat.getSystemService(mActivity, ClipboardManager::class.java)
         val deepLinkClipboardData = ClipData.newPlainText(
@@ -452,7 +477,13 @@ class AddAmountFragment(private val walletService: TariWalletService) : BaseFrag
             EmojiUtil.getChunkedEmojiId(recipientUser.publicKey.emojiId, emojiIdChunkSeparator)
         )
         clipBoard?.setPrimaryClip(deepLinkClipboardData)
-        hideFullEmojiId(animated = true)
+        emojiIdCopiedViewController.showEmojiIdCopiedAnim(fadeOutOnEnd = true) {
+            hideFullEmojiId(animateCopyEmojiIdButton = false, animated = true)
+        }
+        // hide copy emoji id button
+        val copyEmojiIdButtonAnim = copyEmojiIdButtonContainerView.animate().alpha(0f)
+        copyEmojiIdButtonAnim.duration = Constants.UI.xShortDurationMs
+        copyEmojiIdButtonAnim.start()
     }
 
     /**

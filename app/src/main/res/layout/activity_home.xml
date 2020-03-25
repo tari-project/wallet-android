@@ -24,18 +24,15 @@
         android:layout_marginTop="@dimen/home_top_content_container_view_top_margin"
         android:layout_marginEnd="@dimen/common_horizontal_margin">
 
-        <!-- profile button -->
+        <!-- profile icon (image only) -->
         <ImageView
             android:id="@+id/home_img_wallet_info"
             android:layout_width="30dp"
             android:layout_height="30dp"
             android:layout_alignParentEnd="true"
-            android:background="@drawable/home_profile_icon_bg"
             android:contentDescription="@null"
-            android:padding="6dp"
             android:scaleType="center"
-            android:src="@drawable/profile_icon"
-            android:tint="@color/white" />
+            android:src="@drawable/profile_icon" />
 
         <!-- title -->
         <com.tari.android.wallet.ui.component.CustomFontTextView

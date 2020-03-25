@@ -67,6 +67,21 @@
             android:layout_alignParentEnd="true"
             android:layout_centerVertical="true"
             android:background="@drawable/emoji_id_end_fader" />
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_alignTop="@id/wallet_info_scroll_emoji_id"
+            android:layout_alignBottom="@id/wallet_info_scroll_emoji_id">
+
+            <include
+                android:id="@+id/wallet_info_vw_emoji_id_copied"
+                layout="@layout/emoji_id_copied_anim_view"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:visibility="visible" />
+        </FrameLayout>
+
     </RelativeLayout>
 
     <com.tari.android.wallet.ui.component.CustomFontTextView
@@ -115,18 +130,25 @@
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@id/wallet_info_vw_divider" />
 
-    <ImageView
-        android:id="@+id/wallet_info_img_qr"
-        android:layout_width="@dimen/wallet_info_container_qr_code_size"
-        android:layout_height="@dimen/wallet_info_container_qr_code_size"
+    <FrameLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_marginTop="18dp"
+        android:padding="5dp"
         android:background="@drawable/wallet_info_bg_qr_code_image"
-        android:contentDescription="@null"
-        android:elevation="@dimen/common_view_elevation"
-        android:outlineProvider="paddedBounds"
-        android:padding="2dp"
         app:layout_constraintLeft_toLeftOf="parent"
+        android:elevation="@dimen/common_view_elevation"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/wallet_info_txt_qr_code_desc" />
+        app:layout_constraintTop_toBottomOf="@id/wallet_info_txt_qr_code_desc">
+        <ImageView
+            android:id="@+id/wallet_info_img_qr"
+            android:layout_width="@dimen/wallet_info_container_qr_code_size"
+            android:layout_height="@dimen/wallet_info_container_qr_code_size"
+            android:background="@color/white"
+            android:contentDescription="@null"
+            android:outlineProvider="paddedBounds"
+            android:padding="2dp" />
+    </FrameLayout>
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

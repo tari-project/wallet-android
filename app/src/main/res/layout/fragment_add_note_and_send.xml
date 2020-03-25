@@ -69,6 +69,7 @@
         android:orientation="vertical">
 
         <com.tari.android.wallet.ui.component.CustomFontTextView
+            android:id="@+id/add_note_txt_prompt"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:singleLine="true"
@@ -84,6 +85,7 @@
             android:layout_marginTop="12dp"
             android:layout_weight="1"
             android:background="@color/transparent"
+            android:lineSpacingExtra="10dp"
             android:gravity="top"
             android:hint="@string/add_note_and_send_hint"
             android:inputType="textMultiLine"
@@ -180,6 +182,15 @@
         android:layout_height="match_parent">
 
         <View
+            android:id="@+id/add_note_and_send_vw_full_emoji_id_bg_click_blocker"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:alpha="0.6"
+            android:background="@color/transparent"
+            android:clickable="true"
+            android:focusable="true" />
+
+        <View
             android:id="@+id/add_note_and_send_vw_dimmer"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -268,6 +279,19 @@
                 android:layout_centerVertical="true"
                 android:background="@drawable/emoji_id_end_fader"
                 android:translationZ="6dp" />
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:translationZ="7dp"
+                android:layout_height="match_parent">
+
+                <include
+                    android:id="@+id/add_note_and_send_vw_emoji_id_copied"
+                    layout="@layout/emoji_id_copied_anim_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:visibility="visible" />
+            </FrameLayout>
         </RelativeLayout>
     </RelativeLayout>
 

@@ -25,6 +25,11 @@
 
     <!-- dialog -->
     <color name="dialog_cancel_action">#9430ff</color>
+    
+    <!-- emoji id copied view -->
+    <color name="emoji_id_copied_white_bg">#E5FFFFFF</color>
+    <color name="emoji_id_copied_green_bg">#3323BE90</color>
+    <color name="emoji_id_copied_green_border">#FF23BE90</color>
 
     <!-- home -->
     <color name="home_bg_gradient_start">#6239FF</color>
@@ -50,7 +55,8 @@
 
     <!-- send tari - add note -->
     <color name="add_note_slide_btton_bg_gradient_start">#8931FF</color>
-    <color name="add_note_slide_btton_bg_gradient_end">#A72bE9</color>
+    <color name="add_note_slide_btton_bg_gradient_end">#A72BE9</color>
+    <color name="add_note_prompt_passive_color">#B2B2B2</color>
 
     <!-- Debug Log -->
     <color name="terminal_green">#4AF626</color>

@@ -35,16 +35,17 @@ package com.tari.android.wallet.ui.activity.profile
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.os.Bundle
+import android.view.View
 import android.widget.HorizontalScrollView
 import android.widget.ImageView
 import android.widget.TextView
-import android.widget.Toast
 import androidx.core.content.ContextCompat
 import butterknife.*
 import com.tari.android.wallet.R
 import com.tari.android.wallet.extension.applyFontStyle
 import com.tari.android.wallet.ui.activity.BaseActivity
 import com.tari.android.wallet.ui.component.CustomFont
+import com.tari.android.wallet.ui.component.EmojiIdCopiedViewController
 import com.tari.android.wallet.ui.util.UiUtil
 import com.tari.android.wallet.util.EmojiUtil
 import com.tari.android.wallet.util.SharedPrefsWrapper
@@ -71,6 +72,8 @@ internal class WalletInfoActivity : BaseActivity() {
     lateinit var qrCodeImageView: ImageView
     @BindView(R.id.wallet_info_txt_copy_emoji_id)
     lateinit var copyEmojiIdTextView: TextView
+    @BindView(R.id.wallet_info_vw_emoji_id_copied)
+    lateinit var emojiIdCopiedAnimView: View
 
     @BindString(R.string.wallet_info_share_your_emoji_id)
     lateinit var shareEmojiIdTitle: String
@@ -78,8 +81,6 @@ internal class WalletInfoActivity : BaseActivity() {
     lateinit var shareEmojiIdTitleBoldPart: String
     @BindString(R.string.emoji_id_chunk_separator_char)
     lateinit var emojiIdChunkSeparator: String
-    @BindString(R.string.wallet_info_emoji_id_copied)
-    lateinit var emojiIdCopiedToastMessage: String
 
     @BindDimen(R.dimen.wallet_info_img_qr_code_size)
     @JvmField
@@ -89,6 +90,11 @@ internal class WalletInfoActivity : BaseActivity() {
     lateinit var sharedPrefsWrapper: SharedPrefsWrapper
     @Inject
     lateinit var tracker: Tracker
+
+    /**
+     * Animates the emoji id "copied" text.
+     */
+    private lateinit var emojiIdCopiedViewController: EmojiIdCopiedViewController
 
     override val contentViewId = R.layout.activity_wallet_info
 
@@ -123,6 +129,8 @@ internal class WalletInfoActivity : BaseActivity() {
         }
 
         OverScrollDecoratorHelper.setUpOverScroll(emojiIdScrollView)
+
+        emojiIdCopiedViewController = EmojiIdCopiedViewController(emojiIdCopiedAnimView)
     }
 
     @OnClick(R.id.wallet_info_btn_close)
@@ -142,7 +150,7 @@ internal class WalletInfoActivity : BaseActivity() {
             EmojiUtil.getChunkedEmojiId(sharedPrefsWrapper.emojiId!!, emojiIdChunkSeparator)
         )
         clipBoard?.setPrimaryClip(deepLinkClipboardData)
-        Toast.makeText(this, emojiIdCopiedToastMessage, Toast.LENGTH_SHORT).show()
+        emojiIdCopiedViewController.showEmojiIdCopiedAnim(fadeOutOnEnd = true)
     }
 
 }

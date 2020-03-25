@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <View
+        android:id="@+id/emoji_id_copied_vw_white_bg"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/emoji_id_copied_white_bg" />
+
+    <View
+        android:id="@+id/emoji_id_copied_vw_green_bg"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/emoji_id_copied_green_bg" />
+
+    <com.tari.android.wallet.ui.component.CustomFontTextView
+        android:id="@+id/emoji_id_copied_txt_copied"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:text="@string/emoji_id_copied"
+        android:textColor="#9834F6"
+        android:textSize="13sp"
+        app:customFont="AVENIR_LT_STD_BLACK" />
+</RelativeLayout>
