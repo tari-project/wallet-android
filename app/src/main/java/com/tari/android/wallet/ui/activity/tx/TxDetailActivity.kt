@@ -286,7 +286,7 @@ internal class TxDetailActivity :
             else -> throw RuntimeException("Unexpected transaction type for transaction: " + tx.id)
         }
 
-        fromTextView.text == when (tx) {
+        fromTextView.text = when (tx) {
             is CompletedTx -> {
                 when (tx.direction) {
                     Tx.Direction.INBOUND -> paymentFrom
