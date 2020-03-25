@@ -42,9 +42,7 @@ import androidx.lifecycle.ProcessLifecycleOwner
 import com.orhanobut.logger.AndroidLogAdapter
 import com.orhanobut.logger.Logger
 import com.tari.android.wallet.di.*
-import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.notification.NotificationHelper
-import com.tari.android.wallet.tor.TorProxyListener
 import com.tari.android.wallet.tor.TorProxyManager
 import com.tari.android.wallet.util.SharedPrefsWrapper
 import com.tari.android.wallet.util.WalletUtil
@@ -93,8 +91,6 @@ internal class TariWalletApplication : Application(), LifecycleObserver {
 
     override fun onCreate() {
         super.onCreate()
-        EventBus.postSticky(AppState.Initializing)
-
         registerActivityLifecycleCallbacks(activityLifecycleCallbacks)
         Logger.addLogAdapter(AndroidLogAdapter())
         JodaTimeAndroid.init(this)
@@ -116,17 +112,12 @@ internal class TariWalletApplication : Application(), LifecycleObserver {
 
         ProcessLifecycleOwner.get().lifecycle.addObserver(this)
 
-        // Run tor.
-        torProxyManager.start(15, object : TorProxyListener {
-            override fun onTorProxyInitResult(success: Boolean) {
-                Logger.d("TorProxyInitResult %s", success)
-                if (success) {
-                    EventBus.postSticky(AppState.Ready)
-                } else {
-                    EventBus.postSticky(AppState.Failed)
-                }
-            }
-        })
+        /**
+         * Run tor.
+         */
+        Thread {
+            torProxyManager.runTorProxy()
+        }.start()
 
         // user should authenticate every time the app starts up
         sharedPrefsWrapper.isAuthenticated = false
