@@ -177,6 +177,8 @@ internal class TorProxyManager(
             if (phase != null && phase.contains("PROGRESS=100")) {
                 Logger.d("Tor has already bootstrapped")
                 return true
+            } else {
+                Logger.d("Tor in phase $phase")
             }
         } catch (e: IOException) {
             Logger.d("Control connection is not responding properly to getInfo", e)
