@@ -32,12 +32,10 @@
  */
 package com.tari.android.wallet.ffi
 
-import android.content.SharedPreferences
 import android.util.Log
 import com.orhanobut.logger.Logger
 import com.tari.android.wallet.model.*
 import com.tari.android.wallet.model.WalletErrorCode.*
-import com.tari.android.wallet.util.SharedPrefsWrapper
 import java.math.BigInteger
 
 /**
@@ -66,8 +64,8 @@ internal abstract class FFIWallet(commsConfig: FFICommsConfig, logPath: String) 
         callbackTxMinedSig: String,
         callbackDiscoveryProcessComplete: String,
         callbackDiscoveryProcessCompleteSig: String,
-        callbackBaseNodeSync:String,
-        callbackBaseNodeSyncSig:String,
+        callbackBaseNodeSync: String,
+        callbackBaseNodeSyncSig: String,
         libError: FFIError
     )
 
@@ -301,7 +299,8 @@ internal abstract class FFIWallet(commsConfig: FFICommsConfig, logPath: String) 
 
     fun getPendingInboundTxById(id: BigInteger): FFIPendingInboundTx {
         val error = FFIError()
-        val result = FFIPendingInboundTx(jniGetPendingInboundTxById(id.toByteArray().toString(), error))
+        val result =
+            FFIPendingInboundTx(jniGetPendingInboundTxById(id.toByteArray().toString(), error))
         throwIf(error)
         return result
     }
@@ -321,7 +320,7 @@ internal abstract class FFIWallet(commsConfig: FFICommsConfig, logPath: String) 
         val fee = tx.getFee()
         val timestamp = tx.getTimestamp()
         val message = tx.getMessage()
-        var status = when(tx.getStatus()) {
+        val status = when (tx.getStatus()) {
             FFIStatus.BROADCAST -> Status.BROADCAST
             FFIStatus.COMPLETED -> Status.COMPLETED
             FFIStatus.IMPORTED -> Status.IMPORTED
@@ -333,14 +332,22 @@ internal abstract class FFIWallet(commsConfig: FFICommsConfig, logPath: String) 
         tx.destroy()
 
         var direction = Tx.Direction.INBOUND
-        if (destinationHex != walletHex)
-        {
+        if (destinationHex != walletHex) {
             direction = Tx.Direction.OUTBOUND
         }
-        val destinationPk = PublicKey(destinationHex,destinationEmoji)
+        val destinationPk = PublicKey(destinationHex, destinationEmoji)
         val user = User(destinationPk)
 
-        val completed = CompletedTx(id,direction,user,MicroTari(amount),fee,timestamp,message,status)
+        val completed = CompletedTx(
+            id,
+            direction,
+            user,
+            MicroTari(amount),
+            MicroTari(fee),
+            timestamp,
+            message,
+            status
+        )
 
         listenerAdapter?.onTxBroadcast(completed)
     }
@@ -360,7 +367,7 @@ internal abstract class FFIWallet(commsConfig: FFICommsConfig, logPath: String) 
         val fee = tx.getFee()
         val timestamp = tx.getTimestamp()
         val message = tx.getMessage()
-        var status = when(tx.getStatus()) {
+        val status = when (tx.getStatus()) {
             FFIStatus.BROADCAST -> Status.BROADCAST
             FFIStatus.COMPLETED -> Status.COMPLETED
             FFIStatus.IMPORTED -> Status.IMPORTED
@@ -372,14 +379,22 @@ internal abstract class FFIWallet(commsConfig: FFICommsConfig, logPath: String) 
         tx.destroy()
 
         var direction = Tx.Direction.INBOUND
-        if (destinationHex != walletHex)
-        {
+        if (destinationHex != walletHex) {
             direction = Tx.Direction.OUTBOUND
         }
-        val destinationPk = PublicKey(destinationHex,destinationEmoji)
+        val destinationPk = PublicKey(destinationHex, destinationEmoji)
         val user = User(destinationPk)
 
-        val completed = CompletedTx(id,direction,user,MicroTari(amount),fee,timestamp,message,status)
+        val completed = CompletedTx(
+            id,
+            direction,
+            user,
+            MicroTari(amount),
+            MicroTari(fee),
+            timestamp,
+            message,
+            status
+        )
 
         listenerAdapter?.onTxMined(completed)
         tx.destroy()
@@ -396,7 +411,7 @@ internal abstract class FFIWallet(commsConfig: FFICommsConfig, logPath: String) 
         val amount = tx.getAmount()
         val timestamp = tx.getTimestamp()
         val message = tx.getMessage()
-        var status = when(tx.getStatus()) {
+        val status = when (tx.getStatus()) {
             FFIStatus.BROADCAST -> Status.BROADCAST
             FFIStatus.COMPLETED -> Status.COMPLETED
             FFIStatus.IMPORTED -> Status.IMPORTED
@@ -407,9 +422,9 @@ internal abstract class FFIWallet(commsConfig: FFICommsConfig, logPath: String) 
         }
         tx.destroy()
 
-        val pk = PublicKey(sourceHex,sourceEmoji)
+        val pk = PublicKey(sourceHex, sourceEmoji)
         val user = User(pk)
-        val pendingTx = PendingInboundTx(id,user,MicroTari(amount),timestamp,message,status)
+        val pendingTx = PendingInboundTx(id, user, MicroTari(amount), timestamp, message, status)
 
         listenerAdapter?.onTxReceived(pendingTx)
     }
@@ -429,7 +444,7 @@ internal abstract class FFIWallet(commsConfig: FFICommsConfig, logPath: String) 
         val fee = tx.getFee()
         val timestamp = tx.getTimestamp()
         val message = tx.getMessage()
-        var status = when(tx.getStatus()) {
+        val status = when (tx.getStatus()) {
             FFIStatus.BROADCAST -> Status.BROADCAST
             FFIStatus.COMPLETED -> Status.COMPLETED
             FFIStatus.IMPORTED -> Status.IMPORTED
@@ -441,14 +456,23 @@ internal abstract class FFIWallet(commsConfig: FFICommsConfig, logPath: String) 
         tx.destroy()
 
         var direction = Tx.Direction.INBOUND
-        if (destinationHex != walletHex)
-        {
+        if (destinationHex != walletHex) {
             direction = Tx.Direction.OUTBOUND
         }
-        val destinationPk = PublicKey(destinationHex,destinationEmoji)
+        val destinationPk = PublicKey(destinationHex, destinationEmoji)
         val user = User(destinationPk)
 
-        val completed = CompletedTx(id,direction,user,MicroTari(amount),fee,timestamp,message,status)
+        val completed =
+            CompletedTx(
+                id,
+                direction,
+                user,
+                MicroTari(amount),
+                MicroTari(fee),
+                timestamp,
+                message,
+                status
+            )
 
         listenerAdapter?.onTxReplyReceived(completed)
         tx.destroy()
@@ -469,7 +493,7 @@ internal abstract class FFIWallet(commsConfig: FFICommsConfig, logPath: String) 
         val fee = tx.getFee()
         val timestamp = tx.getTimestamp()
         val message = tx.getMessage()
-        var status = when(tx.getStatus()) {
+        val status = when (tx.getStatus()) {
             FFIStatus.BROADCAST -> Status.BROADCAST
             FFIStatus.COMPLETED -> Status.COMPLETED
             FFIStatus.IMPORTED -> Status.IMPORTED
@@ -481,14 +505,22 @@ internal abstract class FFIWallet(commsConfig: FFICommsConfig, logPath: String) 
         tx.destroy()
 
         var direction = Tx.Direction.INBOUND
-        if (destinationHex != walletHex)
-        {
+        if (destinationHex != walletHex) {
             direction = Tx.Direction.OUTBOUND
         }
-        val destinationPk = PublicKey(destinationHex,destinationEmoji)
+        val destinationPk = PublicKey(destinationHex, destinationEmoji)
         val user = User(destinationPk)
 
-        val completed = CompletedTx(id,direction,user,MicroTari(amount),fee,timestamp,message,status)
+        val completed = CompletedTx(
+            id,
+            direction,
+            user,
+            MicroTari(amount),
+            MicroTari(fee),
+            timestamp,
+            message,
+            status
+        )
 
         listenerAdapter?.onTxFinalized(completed)
         tx.destroy()

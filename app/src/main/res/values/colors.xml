@@ -25,6 +25,9 @@
 
     <!-- dialog -->
     <color name="dialog_cancel_action">#9430ff</color>
+
+    <!-- introduction terms & agreement links text color -->
+    <color name="introduction_user_agreement_and_privacy_policy">#B2FFFFFF</color>
     
     <!-- emoji id copied view -->
     <color name="emoji_id_copied_white_bg">#E5FFFFFF</color>
@@ -46,7 +49,7 @@
     <color name="home_black_overlay">#FF000000</color>
     <color name="dark_gray">#7F8599</color>
     <color name="create_emoji_id_bg">#f6f6f6</color>
-    <color name="wallet_splash_desc_text">#80FFFFFF</color>
+    <color name="wallet_splash_desc_text">#CCFFFFFF</color>
 
     <!-- send tari - add recipient -->
     <color name="add_recipient_hint">#B2B2B2</color>

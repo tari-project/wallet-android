@@ -38,6 +38,7 @@ import android.content.Context
 import android.os.Bundle
 import android.view.View
 import android.widget.TextView
+import android.widget.VideoView
 import butterknife.BindString
 import butterknife.BindView
 import com.airbnb.lottie.LottieAnimationView
@@ -49,6 +50,7 @@ import com.tari.android.wallet.model.MicroTari
 import com.tari.android.wallet.model.User
 import com.tari.android.wallet.ui.component.CustomFont
 import com.tari.android.wallet.ui.fragment.BaseFragment
+import com.tari.android.wallet.ui.util.UiUtil.getResourceUri
 import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.WalletUtil
 import org.matomo.sdk.Tracker
@@ -65,6 +67,8 @@ class SendTxSuccessfulFragment : BaseFragment(), Animator.AnimatorListener {
 
     @BindView(R.id.send_tx_successful_vw_root)
     lateinit var rootView: View
+    @BindView(R.id.send_tx_successful_video_bg)
+    lateinit var videoView: VideoView
     @BindView(R.id.send_tx_successful_anim)
     lateinit var lottieAnimationView: LottieAnimationView
     @BindView(R.id.send_tx_successful_txt_info)
@@ -142,6 +146,19 @@ class SendTxSuccessfulFragment : BaseFragment(), Animator.AnimatorListener {
     override fun onAttach(context: Context) {
         super.onAttach(context)
         listenerWR = WeakReference(context as Listener)
+    }
+
+    override fun onStart() {
+        super.onStart()
+        val mActivity = activity ?: return
+        videoView.setVideoURI(mActivity.getResourceUri(R.raw.sending_background))
+        videoView.setOnPreparedListener { mp -> mp.isLooping = true }
+        videoView.start()
+    }
+
+    override fun onStop() {
+        videoView.stopPlayback()
+        super.onStop()
     }
 
     override fun onDestroy() {

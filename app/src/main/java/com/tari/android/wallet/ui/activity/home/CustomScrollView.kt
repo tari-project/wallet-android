@@ -32,8 +32,10 @@
  */
 package com.tari.android.wallet.ui.activity.home
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.util.AttributeSet
+import android.view.MotionEvent
 import android.view.View
 import android.widget.ScrollView
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -53,6 +55,7 @@ internal class CustomScrollView @JvmOverloads constructor(
 ) : ScrollView(context, attrs, defStyleAttr) {
 
     var flingIsRunning = false
+    var isScrollable = true
 
     fun completeScroll() {
         if (flingIsRunning) {
@@ -71,6 +74,10 @@ internal class CustomScrollView @JvmOverloads constructor(
     }
 
     override fun onNestedPreScroll(target: View, dx: Int, dy: Int, consumed: IntArray) {
+        if (!isScrollable) {
+            consumed[1] = dy
+            return
+        }
         if (dy > 0) {
             if (canScrollVertically(dy)) {
                 scrollBy(0, dy)
@@ -128,6 +135,14 @@ internal class CustomScrollView @JvmOverloads constructor(
         if (lm.childCount == 0) return true
         return (lm.findFirstVisibleItemPosition() == 0
                 && lm.findViewByPosition(0)?.top == 0)
+    }
+
+    @SuppressLint("ClickableViewAccessibility")
+    override fun onTouchEvent(ev: MotionEvent?): Boolean {
+        if (!isScrollable) {
+            return true
+        }
+        return super.onTouchEvent(ev)
     }
 
 }

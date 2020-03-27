@@ -47,16 +47,16 @@
             android:layout_below="@id/local_auth_img_auth"
             android:layout_gravity="center"
             android:layout_marginHorizontal="@dimen/common_horizontal_margin"
-            android:layout_marginTop="100dp"
+            android:layout_marginTop="80dp"
             android:gravity="center"
             android:letterSpacing="-0.014"
+            android:text="@string/auth_prompt_title"
             android:lineSpacingExtra="10dp"
             android:textColor="@color/black"
             android:textSize="18sp"
             app:customFont="AVENIR_LT_STD_LIGHT" />
 
         <View
-            android:id="@+id/create_emoji_id_awesome_text_back_view"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_below="@id/local_auth_img_auth"
@@ -77,7 +77,7 @@
             android:gravity="center"
             android:letterSpacing="-0.02"
             android:lineSpacingExtra="10dp"
-            android:text="@string/auth_prompt_touch_id_desc"
+            android:text="@string/auth_prompt_desc"
             android:textColor="@color/dark_gray"
             android:textSize="14sp"
             android:visibility="visible"

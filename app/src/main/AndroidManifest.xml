@@ -11,6 +11,8 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <!-- remove billing support in case it gets included by a 3rd party lib -->
+    <uses-permission android:name="com.android.vending.BILLING" tools:node="remove" />
 
     <application
         android:name=".application.TariWalletApplication"

@@ -43,7 +43,7 @@ import java.math.BigInteger
  */
 class CompletedTx() : Tx(), Parcelable {
 
-    var fee = BigInteger("0")
+    var fee = MicroTari(BigInteger("0"))
     var status = Status.COMPLETED
 
     constructor(
@@ -51,7 +51,7 @@ class CompletedTx() : Tx(), Parcelable {
         direction: Direction,
         user: User,
         amount: MicroTari,
-        fee: BigInteger,
+        fee: MicroTari,
         timestamp: BigInteger,
         message: String,
         status: Status
@@ -90,7 +90,7 @@ class CompletedTx() : Tx(), Parcelable {
         parcel.writeSerializable(user.javaClass)
         parcel.writeParcelable(user, flags)
         parcel.writeParcelable(amount, flags)
-        parcel.writeSerializable(fee)
+        parcel.writeParcelable(fee, flags)
         parcel.writeSerializable(timestamp)
         parcel.writeString(message)
         parcel.writeSerializable(status)
@@ -106,7 +106,7 @@ class CompletedTx() : Tx(), Parcelable {
             inParcel.readParcelable(User::class.java.classLoader)!!
         }
         amount = inParcel.readParcelable(MicroTari::class.java.classLoader)!!
-        fee = inParcel.readSerializable() as BigInteger
+        fee = inParcel.readParcelable(MicroTari::class.java.classLoader)!!
         timestamp = inParcel.readSerializable() as BigInteger
         message = inParcel.readString() ?: ""
         status = inParcel.readSerializable() as Status

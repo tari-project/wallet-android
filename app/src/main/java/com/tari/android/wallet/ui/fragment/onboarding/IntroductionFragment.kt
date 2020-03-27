@@ -36,18 +36,18 @@ import android.animation.*
 import android.content.Context
 import android.os.Bundle
 import android.os.Handler
+import android.text.SpannableString
+import android.text.method.LinkMovementMethod
 import android.view.View
 import android.view.ViewTreeObserver
 import android.widget.*
 import androidx.core.view.marginTop
-import butterknife.BindColor
-import butterknife.BindDimen
-import butterknife.BindView
-import butterknife.OnClick
+import butterknife.*
 import com.airbnb.lottie.LottieAnimationView
 import com.daasuu.ei.Ease
 import com.daasuu.ei.EasingInterpolator
 import com.tari.android.wallet.R
+import com.tari.android.wallet.extension.applyURLStyle
 import com.tari.android.wallet.ui.fragment.BaseFragment
 import com.tari.android.wallet.ui.util.UiUtil
 import com.tari.android.wallet.ui.util.UiUtil.getResourceUri
@@ -93,6 +93,8 @@ internal class IntroductionFragment : BaseFragment() {
     lateinit var videoView: VideoView
     @BindView(R.id.introduction_vw_video_container)
     lateinit var videoContainer: FrameLayout
+    @BindView(R.id.introduction_txt_user_agreement_and_privacy_policy)
+    lateinit var userAgreementAndPrivacyPolicyTextView: TextView
 
     @BindDimen(R.dimen.splash_screen_title_bottom_margin)
     @JvmField
@@ -102,9 +104,19 @@ internal class IntroductionFragment : BaseFragment() {
     @JvmField
     var whiteColor = 0
 
+    @BindString(R.string.create_wallet_user_agreement_and_privacy_policy)
+    lateinit var userAgreementAnPrivacyPolicyDesc: String
+    @BindString(R.string.create_wallet_user_agreement)
+    lateinit var userAgreement: String
+    @BindString(R.string.create_wallet_user_agreement_url)
+    lateinit var userAgreementURL: String
+    @BindString(R.string.create_wallet_privacy_policy)
+    lateinit var privacyPolicy: String
+    @BindString(R.string.create_wallet_privacy_policy_url)
+    lateinit var privacyPolicyURL: String
+
     @Inject
     lateinit var sharedPrefsWrapper: SharedPrefsWrapper
-
     @Inject
     lateinit var tracker: Tracker
 
@@ -161,6 +173,22 @@ internal class IntroductionFragment : BaseFragment() {
         walletDescText.alpha = 0f
         titleTextLine1.alpha = 0f
         titleTextLine2.alpha = 0f
+        userAgreementAndPrivacyPolicyTextView.alpha = 0f
+
+        // highlight links
+        userAgreementAndPrivacyPolicyTextView.text =
+            SpannableString(userAgreementAnPrivacyPolicyDesc).apply {
+                applyURLStyle(
+                    userAgreement,
+                    userAgreementURL
+                )
+                applyURLStyle(
+                    privacyPolicy,
+                    privacyPolicyURL
+                )
+            }
+        // make the links clickable
+        userAgreementAndPrivacyPolicyTextView.movementMethod = LinkMovementMethod.getInstance()
 
         rootView.viewTreeObserver.addOnGlobalLayoutListener(
             object : ViewTreeObserver.OnGlobalLayoutListener {
@@ -207,6 +235,7 @@ internal class IntroductionFragment : BaseFragment() {
             walletDescText.alpha = alpha
             titleTextLine1.alpha = alpha
             titleTextLine2.alpha = alpha
+            userAgreementAndPrivacyPolicyTextView.alpha = alpha
         }
 
         val offset =
@@ -246,7 +275,7 @@ internal class IntroductionFragment : BaseFragment() {
                 tariWalletLottieAnimationView.playAnimation()
                 handler.postDelayed(
                     { listener?.continueToCreateWallet() },
-                    tariWalletLottieAnimationView.duration - Constants.UI.CreateWallet.showCreateEmojiIdWhiteBgDelayMs
+                    tariWalletLottieAnimationView.duration  // - Constants.UI.CreateWallet.showCreateEmojiIdWhiteBgDelayMs
                 )
             }
         })

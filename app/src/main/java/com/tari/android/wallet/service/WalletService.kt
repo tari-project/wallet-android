@@ -632,7 +632,7 @@ class WalletService : Service(), FFIWalletListenerAdapter {
                 direction,
                 user,
                 MicroTari(completedTxFFI.getAmount()),
-                completedTxFFI.getFee(),
+                MicroTari(completedTxFFI.getFee()),
                 completedTxFFI.getTimestamp(),
                 completedTxFFI.getMessage(),
                 status
@@ -704,6 +704,7 @@ class WalletService : Service(), FFIWalletListenerAdapter {
                 pendingOutboundTxFFI.getId(),
                 user,
                 MicroTari(pendingOutboundTxFFI.getAmount()),
+                MicroTari(pendingOutboundTxFFI.getFee()),
                 pendingOutboundTxFFI.getTimestamp(),
                 pendingOutboundTxFFI.getMessage(),
                 status
@@ -754,7 +755,7 @@ class WalletService : Service(), FFIWalletListenerAdapter {
                                 val amount = BigInteger(key.value)
                                 wallet.importUTXO(
                                     amount,
-                                    getString(R.string.home_tari_bot_some_tari_to_get_started),
+                                    getString(R.string.home_tari_bot_testnet_tari_tx_message),
                                     spendingPrivateKeyFFI,
                                     senderPublicKeyFFI
                                 )
