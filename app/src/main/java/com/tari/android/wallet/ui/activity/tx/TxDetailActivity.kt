@@ -37,15 +37,16 @@ import android.animation.AnimatorListenerAdapter
 import android.animation.AnimatorSet
 import android.animation.ValueAnimator
 import android.annotation.SuppressLint
+import android.app.Dialog
 import android.content.*
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.os.IBinder
+import android.view.Gravity
 import android.view.View
 import android.view.inputmethod.EditorInfo
-import android.widget.HorizontalScrollView
-import android.widget.ImageView
-import android.widget.RelativeLayout
-import android.widget.TextView
+import android.widget.*
 import androidx.constraintlayout.widget.Group
 import androidx.core.content.ContextCompat
 import butterknife.*
@@ -61,8 +62,6 @@ import com.tari.android.wallet.service.TariWalletService
 import com.tari.android.wallet.service.WalletService
 import com.tari.android.wallet.ui.activity.BaseActivity
 import com.tari.android.wallet.ui.component.*
-import com.tari.android.wallet.ui.component.EmojiIdCopiedViewController
-import com.tari.android.wallet.ui.component.EmojiIdSummaryViewController
 import com.tari.android.wallet.ui.extension.getFirstChild
 import com.tari.android.wallet.ui.extension.getLastChild
 import com.tari.android.wallet.ui.extension.setTextSizePx
@@ -573,6 +572,15 @@ internal class TxDetailActivity :
         addContactButton.visibility = View.INVISIBLE
     }
 
+    @OnClick(
+        R.id.tx_detail_txt_tx_fee,
+        R.id.tx_detail_txt_fee_label,
+        R.id.tx_detail_txt_fee_label_help_icon
+    )
+    fun onFeeViewClick() {
+        showTxFeeToolTip()
+    }
+
     /**
      * Add contact alias.
      */
@@ -609,6 +617,25 @@ internal class TxDetailActivity :
             contactEditText.setText(user.alias)
         }
         contactNameTextView.visibility = View.INVISIBLE
+    }
+
+    private fun showTxFeeToolTip() {
+        Dialog(this, R.style.Theme_AppCompat_Dialog).apply {
+            window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+            setContentView(R.layout.tx_detail_fee_tooltip)
+            setCancelable(true)
+            setCanceledOnTouchOutside(true)
+            window?.setLayout(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            )
+            findViewById<TextView>(R.id.tx_detail_fee_tooltip_txt_close)
+                .setOnClickListener {
+                    dismiss()
+                }
+
+            window?.setGravity(Gravity.BOTTOM)
+        }.show()
     }
 
 }
