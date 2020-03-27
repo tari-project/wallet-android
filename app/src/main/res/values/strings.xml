@@ -190,6 +190,9 @@
     <string name="tx_detail_add_contact">Add Contact Name</string>
     <string name="tx_detail_transaction_fee">Transaction Fee</string>
     <string name="tx_detail_transaction_id">Transaction ID</string>
+    <!-- Fee tooltip -->
+    <string name="tx_detail_fee_tooltip_transaction_fee">Transaction Fee</string>
+    <string name="tx_detail_fee_tooltip_desc">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas consequat risus sit amet laoreet mollis. </string>
 
     <!-- debug screens -->
     <string name="debug_log_files_title">Logs</string>
