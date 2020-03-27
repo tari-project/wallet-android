@@ -43,12 +43,14 @@ import java.math.BigInteger
  */
 class PendingOutboundTx() : Tx(), Parcelable {
 
+    var fee = MicroTari(BigInteger("0"))
     var status = Status.PENDING
 
     constructor(
         id: BigInteger,
         user: User,
         amount: MicroTari,
+        fee: MicroTari,
         timestamp: BigInteger,
         message: String,
         status: Status
@@ -57,6 +59,7 @@ class PendingOutboundTx() : Tx(), Parcelable {
         this.direction = Direction.OUTBOUND
         this.user = user
         this.amount = amount
+        this.fee = fee
         this.timestamp = timestamp
         this.message = message
         this.status = status
@@ -86,6 +89,7 @@ class PendingOutboundTx() : Tx(), Parcelable {
         parcel.writeSerializable(user.javaClass)
         parcel.writeParcelable(user, flags)
         parcel.writeParcelable(amount, flags)
+        parcel.writeParcelable(fee, flags)
         parcel.writeSerializable(timestamp)
         parcel.writeString(message)
         parcel.writeSerializable(status)
@@ -101,6 +105,7 @@ class PendingOutboundTx() : Tx(), Parcelable {
             inParcel.readParcelable(User::class.java.classLoader)!!
         }
         amount = inParcel.readParcelable(MicroTari::class.java.classLoader)!!
+        fee = inParcel.readParcelable(MicroTari::class.java.classLoader)!!
         timestamp = inParcel.readSerializable() as BigInteger
         message = inParcel.readString() ?: ""
         status = inParcel.readSerializable() as Status

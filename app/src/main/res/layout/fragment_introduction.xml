@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/create_wallet_vw_root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -15,7 +16,7 @@
         <RelativeLayout
             android:id="@+id/introduction_vw_container"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="0dp"
             android:layout_weight="1"
             android:gravity="bottom">
 
@@ -28,10 +29,7 @@
                 android:layout_marginBottom="4dp"
                 android:background="@color/black"
                 android:gravity="center"
-                android:letterSpacing="-0.02"
-                android:lineSpacingExtra="6dp"
-                android:paddingLeft="32dp"
-                android:paddingRight="32dp"
+                android:letterSpacing="0.02"
                 android:text="@string/introduction_crypto_wallet_title_text_line_1"
                 android:textColor="@color/white"
                 android:textSize="30sp"
@@ -43,13 +41,10 @@
                 android:layout_height="wrap_content"
                 android:layout_above="@id/introduction_btn_layout"
                 android:layout_centerHorizontal="true"
-                android:layout_marginBottom="24dp"
+                android:layout_marginBottom="18dp"
                 android:background="@color/black"
                 android:gravity="center"
-                android:letterSpacing="-0.02"
-                android:lineSpacingExtra="6dp"
-                android:paddingLeft="32dp"
-                android:paddingRight="32dp"
+                android:letterSpacing="0.02"
                 android:text="@string/introduction_crypto_wallet_title_text_line_2"
                 android:textColor="@color/white"
                 android:textSize="30sp"
@@ -57,9 +52,10 @@
 
             <View
                 android:layout_width="match_parent"
-                android:layout_height="78dp"
-                android:layout_above="@id/introduction_btn_layout"
-                android:layout_marginBottom="25dp"
+                android:layout_height="0dp"
+                android:layout_alignTop="@id/introduction_txt_title_line_1"
+                android:layout_alignBottom="@id/introduction_txt_title_line_2"
+                android:layout_marginBottom="18dp"
                 android:background="@color/black" />
 
             <com.tari.android.wallet.ui.component.CustomFontTextView
@@ -68,12 +64,12 @@
                 android:layout_height="wrap_content"
                 android:layout_above="@id/introduction_btn_layout"
                 android:layout_centerHorizontal="true"
-                android:layout_marginBottom="42dp"
+                android:layout_marginBottom="38dp"
                 android:alpha="0"
                 android:background="@color/black"
                 android:gravity="center"
                 android:letterSpacing="-0.02"
-                android:lineSpacingExtra="6dp"
+                android:lineSpacingExtra="8dp"
                 android:paddingLeft="24dp"
                 android:paddingRight="24dp"
                 android:text="@string/introduction_wallet_desc"
@@ -87,7 +83,6 @@
                 android:layout_height="@dimen/common_action_button_height"
                 android:layout_marginLeft="24dp"
                 android:layout_marginRight="24dp"
-                android:layout_marginBottom="36dp"
                 android:alpha="0"
                 android:background="@drawable/gradient_button_bg">
 
@@ -110,6 +105,25 @@
                     android:visibility="gone" />
             </FrameLayout>
 
+            <com.tari.android.wallet.ui.component.CustomFontTextView
+                android:id="@+id/introduction_txt_user_agreement_and_privacy_policy"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/introduction_btn_layout"
+                android:layout_centerHorizontal="true"
+                android:layout_marginHorizontal="@dimen/common_horizontal_margin"
+                android:layout_marginTop="24dp"
+                android:gravity="center"
+                android:letterSpacing="-0.01"
+                android:lineSpacingExtra="7dp"
+                android:singleLine="false"
+                android:text="@string/create_wallet_user_agreement_and_privacy_policy"
+                android:textColor="@color/introduction_user_agreement_and_privacy_policy"
+                android:textColorHighlight="#33FFFFFF"
+                android:textColorLink="@color/introduction_user_agreement_and_privacy_policy"
+                android:textSize="12sp"
+                app:customFont="AVENIR_LT_STD_MEDIUM" />
+
         </RelativeLayout>
 
         <ImageView
@@ -117,7 +131,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
-            android:layout_marginBottom="18dp"
+            android:layout_marginTop="36dp"
             android:alpha="0"
             android:background="@color/black"
             android:contentDescription="@null"
@@ -128,15 +142,16 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
-            android:layout_marginBottom="26dp"
+            android:layout_marginTop="18dp"
+            android:layout_marginBottom="22dp"
             android:alpha="0"
             android:background="@color/black"
-            android:letterSpacing="0.16"
+            android:letterSpacing="0.1"
             android:text="@string/testnet"
             android:textColor="#50FFFFFF"
             android:textSize="9sp"
-            app:customFont="AVENIR_LT_STD_HEAVY" />
-
+            app:customFont="AVENIR_LT_STD_HEAVY"
+            tools:ignore="SmallSp" />
     </LinearLayout>
 
     <FrameLayout
@@ -162,11 +177,11 @@
         android:layout_marginTop="42dp"
         android:alpha="0"
         android:background="@color/black"
-        app:lottie_scale="0.8"
         app:lottie_autoPlay="false"
         app:lottie_enableMergePathsForKitKatAndAbove="true"
         app:lottie_loop="false"
         app:lottie_rawRes="@raw/splash_anim"
-        app:lottie_renderMode="automatic" />
+        app:lottie_renderMode="automatic"
+        app:lottie_scale="0.8" />
 
 </FrameLayout>

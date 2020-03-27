@@ -323,14 +323,20 @@ internal class TxDetailActivity :
             addContactButton.visibility = View.VISIBLE
             contactContainerView.visibility = View.GONE
         }
-        if ((tx as? CompletedTx)?.direction == Tx.Direction.OUTBOUND ||
-            (tx as? PendingOutboundTx)?.direction == Tx.Direction.OUTBOUND
-        ) {
-            txFeeGroup.visibility = View.VISIBLE
-            val fee = MicroTari((tx as CompletedTx).fee)
-            txFeeTextView.text = "+${WalletUtil.feeFormatter.format(fee.tariValue)}"
-        } else {
-            txFeeGroup.visibility = View.GONE
+        when {
+            (tx as? CompletedTx)?.direction == Tx.Direction.OUTBOUND -> {
+                txFeeGroup.visibility = View.VISIBLE
+                val fee = (tx as CompletedTx).fee
+                txFeeTextView.text = "+${WalletUtil.amountFormatter.format(fee.tariValue)}"
+            }
+            tx is PendingOutboundTx -> {
+                txFeeGroup.visibility = View.VISIBLE
+                val fee = (tx as PendingOutboundTx).fee
+                txFeeTextView.text = "+${WalletUtil.amountFormatter.format(fee.tariValue)}"
+            }
+            else -> {
+                txFeeGroup.visibility = View.GONE
+            }
         }
         amountContainer.post { scaleDownAmountTextViewIfRequired() }
 

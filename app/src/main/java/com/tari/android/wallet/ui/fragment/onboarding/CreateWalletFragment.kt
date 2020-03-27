@@ -48,7 +48,9 @@ import com.daasuu.ei.EasingInterpolator
 import com.tari.android.wallet.R
 import com.tari.android.wallet.di.ConfigModule
 import com.tari.android.wallet.di.WalletModule
+import com.tari.android.wallet.extension.applyFontStyle
 import com.tari.android.wallet.ffi.FFITestWallet
+import com.tari.android.wallet.ui.component.CustomFont
 import com.tari.android.wallet.ui.component.EmojiIdSummaryViewController
 import com.tari.android.wallet.ui.fragment.BaseFragment
 import com.tari.android.wallet.ui.util.UiUtil
@@ -115,7 +117,9 @@ internal class CreateWalletFragment : BaseFragment() {
     @BindView(R.id.create_wallet_txt_emoji_id)
     lateinit var emojiIdTextView: TextView
     @BindView(R.id.create_wallet_vw_your_emoji_id_title_container)
-    lateinit var yourEmojiTitleText: LinearLayout
+    lateinit var yourEmojiIdTitleContainerView: LinearLayout
+    @BindView(R.id.create_wallet_txt_your_emoji_id_title)
+    lateinit var yourEmojiIdTitleTextView: TextView
     @BindView(R.id.create_wallet_your_emoji_title_back_view)
     lateinit var yourEmojiTitleBackView: View
     @BindView(R.id.create_wallet_txt_emoji_id_desc)
@@ -150,6 +154,10 @@ internal class CreateWalletFragment : BaseFragment() {
      */
     @BindString(R.string.emoji_id_chunk_separator_char)
     lateinit var emojiIdChunkSeparator: String
+    @BindString(R.string.create_wallet_your_emoji_id_text_label)
+    lateinit var thisIsYourEmojiIdTitle: String
+    @BindString(R.string.create_wallet_your_emoji_id_text_label_bold_part)
+    lateinit var thisIsYourEmojiIdTitleBoldPart: String
 
     @Inject
     lateinit var wallet: FFITestWallet
@@ -203,6 +211,14 @@ internal class CreateWalletFragment : BaseFragment() {
     }
 
     private fun setupUi() {
+        val mActivity = activity ?: return
+        yourEmojiIdTitleTextView.text = thisIsYourEmojiIdTitle.applyFontStyle(
+            mActivity,
+            CustomFont.AVENIR_LT_STD_LIGHT,
+            thisIsYourEmojiIdTitleBoldPart,
+            CustomFont.AVENIR_LT_STD_BLACK
+        )
+
         bottomSpinnerLottieAnim.alpha = 0f
         val emojiId = sharedPrefsWrapper.emojiId!!
         emojiIdTextView.text = EmojiUtil.getChunkedEmojiId(
@@ -406,16 +422,16 @@ internal class CreateWalletFragment : BaseFragment() {
         }
         emojiContainerImageScaleAnim.startDelay = CreateEmojiId.emojiIdImageViewAnimDelayMs
 
-        val titleOffset = -(yourEmojiTitleText.height).toFloat()
+        val titleOffset = -(yourEmojiIdTitleContainerView.height).toFloat()
         val yourEmojiTitleAnim =
-            ObjectAnimator.ofFloat(yourEmojiTitleText, View.TRANSLATION_Y, 0f, titleOffset)
+            ObjectAnimator.ofFloat(yourEmojiIdTitleContainerView, View.TRANSLATION_Y, 0f, titleOffset)
         yourEmojiTitleAnim.startDelay = CreateEmojiId.yourEmojiIdTextAnimDelayMs
         yourEmojiTitleAnim.duration = CreateEmojiId.yourEmojiIdTextAnimDurationMs
         yourEmojiTitleAnim.addListener(object : AnimatorListenerAdapter() {
             override fun onAnimationStart(animation: Animator?) {
                 super.onAnimationStart(animation)
                 yourEmojiTitleBackView.visibility = View.VISIBLE
-                yourEmojiTitleText.visibility = View.VISIBLE
+                yourEmojiIdTitleContainerView.visibility = View.VISIBLE
             }
         })
 
@@ -696,7 +712,7 @@ internal class CreateWalletFragment : BaseFragment() {
             seeFullEmojiIdButtonContainerView.alpha = alpha
             emojiIdViewToFadeOut.alpha = alpha
 
-            yourEmojiTitleText.alpha = alpha
+            yourEmojiIdTitleContainerView.alpha = alpha
         }
         fadeOutAnim.duration = CreateEmojiId.fadeOutAnimDurationMs
         fadeOutAnim.start()

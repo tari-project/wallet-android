@@ -67,6 +67,7 @@ import com.tari.android.wallet.R
 import com.tari.android.wallet.application.DeepLink
 import com.tari.android.wallet.event.Event
 import com.tari.android.wallet.event.EventBus
+import com.tari.android.wallet.extension.applyFontStyle
 import com.tari.android.wallet.model.*
 import com.tari.android.wallet.service.TariWalletService
 import com.tari.android.wallet.service.WalletService
@@ -77,6 +78,7 @@ import com.tari.android.wallet.ui.activity.home.adapter.TxListAdapter
 import com.tari.android.wallet.ui.activity.profile.WalletInfoActivity
 import com.tari.android.wallet.ui.activity.send.SendTariActivity
 import com.tari.android.wallet.ui.activity.tx.TxDetailActivity
+import com.tari.android.wallet.ui.component.CustomFont
 import com.tari.android.wallet.ui.extension.scrollToTop
 import com.tari.android.wallet.ui.util.UiUtil
 import com.tari.android.wallet.util.Constants
@@ -208,11 +210,13 @@ internal class HomeActivity : BaseActivity(),
     var whiteColor = 0
 
     @BindString(R.string.wallet_service_error_testnet_tari_request)
-    @JvmField
-    var homeFailToLoadTransaction = ""
+    lateinit var homeFailToLoadTransaction: String
     @BindString(R.string.wallet_service_error_no_internet_connection)
-    @JvmField
-    var homeNoInternetConnection = ""
+    lateinit var homeNoInternetConnection: String
+    @BindString(R.string.home_tari_bot_you_got_tari_dlg_title)
+    lateinit var testnetTariReceivedDialogTitle: String
+    @BindString(R.string.home_tari_bot_you_got_tari_dlg_title_bold_part)
+    lateinit var testnetTariReceivedDialogTitleBoldPart: String
 
     @Inject
     lateinit var sharedPrefsWrapper: SharedPrefsWrapper
@@ -252,8 +256,8 @@ internal class HomeActivity : BaseActivity(),
      * Whether the user is currently dragging the list view.
      */
     private var isDragging = false
-
     private var sendTariButtonClickAnimIsRunning = false
+    private val onboardingInterstitialTimeMs = 2000L
 
     /**
      * This listener is used only to animate the visibility of the scroll depth gradient view.
@@ -725,6 +729,13 @@ internal class HomeActivity : BaseActivity(),
             }
         )
         animSet.start()
+
+        // show interstitial & finish after delay
+        scrollView.isScrollable = false
+        scrollView.postDelayed({
+            scrollView.smoothScrollTo(0, 0)
+        }, onboardingInterstitialTimeMs)
+
     }
 
     private fun showNoTxsTextView() {
@@ -768,6 +779,13 @@ internal class HomeActivity : BaseActivity(),
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
             )
+            val titleTextView = findViewById<TextView>(R.id.home_testnet_tari_received_dlg_txt_title)
+            titleTextView.text = testnetTariReceivedDialogTitle.applyFontStyle(
+                this@HomeActivity,
+                CustomFont.AVENIR_LT_STD_LIGHT,
+                testnetTariReceivedDialogTitleBoldPart,
+                CustomFont.AVENIR_LT_STD_BLACK
+            )
             findViewById<TextView>(R.id.home_tari_bot_dialog_txt_try_later)
                 .setOnClickListener {
                     dismiss()
@@ -784,6 +802,7 @@ internal class HomeActivity : BaseActivity(),
                     }, Constants.UI.longDurationMs)
 
                 }
+
             window?.setGravity(Gravity.BOTTOM)
             show()
         }
@@ -1076,6 +1095,7 @@ internal class HomeActivity : BaseActivity(),
                     1f - ratio * grabberViewCornerRadiusScrollAnimCoefficient
                 ) * grabberCornerRadius
             } else if (ratio == 0f && !isDragging) {
+                scrollView.isScrollable = true
                 endOnboarding()
             }
 

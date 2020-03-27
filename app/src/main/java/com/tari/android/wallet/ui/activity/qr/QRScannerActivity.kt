@@ -130,7 +130,7 @@ internal class QRScannerActivity : BaseActivity() {
             runOnUiThread {
                 Toast.makeText(
                     this,
-                    R.string.failed_init_camera_message,
+                    R.string.add_recipient_failed_init_camera_message,
                     Toast.LENGTH_LONG
                 ).show()
             }
@@ -153,7 +153,7 @@ internal class QRScannerActivity : BaseActivity() {
             } else {
                 Toast.makeText(
                     this,
-                    R.string.camera_permission_denied_message,
+                    R.string.add_recipient_camera_permission_denied_message,
                     Toast.LENGTH_LONG
                 ).show()
             }

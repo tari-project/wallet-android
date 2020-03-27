@@ -37,8 +37,38 @@ import android.text.SpannableString
 import android.text.Spanned
 import android.text.style.CharacterStyle
 import android.text.style.ForegroundColorSpan
+import android.text.style.URLSpan
 import com.tari.android.wallet.ui.component.CustomFont
 import com.tari.android.wallet.ui.component.CustomTypefaceSpan
+
+/**
+ * Process the URLs in the given spannable string.
+ *
+ * @param search substring to be marked as a link
+ * @param url locator
+ * @param applyToOnlyFirstOccurence whether the span should be applied only to the first occurence
+ */
+internal fun SpannableString.applyURLStyle(
+    search: String,
+    url: String,
+    applyToOnlyFirstOccurence: Boolean = false
+): SpannableString {
+    var index = this.indexOf(search)
+    val span = URLSpan(url)
+    while (index >= 0) {
+        setSpan(
+            span,
+            index,
+            index + search.length,
+            Spanned.SPAN_EXCLUSIVE_INCLUSIVE
+        )
+        if (applyToOnlyFirstOccurence) {
+            break
+        }
+        index = this.indexOf(search, index + 1)
+    }
+    return this
+}
 
 /**
  * Used to apply partial font styles to a string.

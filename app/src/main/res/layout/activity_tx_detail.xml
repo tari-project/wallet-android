@@ -121,8 +121,8 @@
             android:layout_height="wrap_content"
             android:drawablePadding="4dp"
             android:gravity="center"
+            android:layout_marginTop="8dp"
             android:letterSpacing="-0.024"
-            android:paddingStart="4dp"
             android:text="@string/tx_detail_transaction_fee"
             android:textColor="@color/tx_detail_contact_name_label_text"
             android:textSize="13sp"
@@ -139,7 +139,8 @@
             android:src="@drawable/help_icon_24dp"
             app:layout_constraintBottom_toBottomOf="@id/tx_detail_txt_fee_label"
             app:layout_constraintLeft_toRightOf="@id/tx_detail_txt_fee_label"
-            app:layout_constraintTop_toTopOf="@id/tx_detail_txt_fee_label" />
+            app:layout_constraintTop_toTopOf="@id/tx_detail_txt_fee_label"
+            android:contentDescription="@null" />
 
         <View
             android:id="@+id/tx_detail_vw_top_dimmer"

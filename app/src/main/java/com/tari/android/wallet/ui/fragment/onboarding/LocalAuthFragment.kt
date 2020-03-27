@@ -50,8 +50,6 @@ import butterknife.OnClick
 import com.orhanobut.logger.Logger
 import com.tari.android.wallet.R
 import com.tari.android.wallet.auth.AuthUtil
-import com.tari.android.wallet.extension.applyFontStyle
-import com.tari.android.wallet.ui.component.CustomFont
 import com.tari.android.wallet.ui.component.CustomFontButton
 import com.tari.android.wallet.ui.component.CustomFontTextView
 import com.tari.android.wallet.ui.fragment.BaseFragment
@@ -96,22 +94,10 @@ internal class LocalAuthFragment : BaseFragment() {
     lateinit var buttonTouchIdAuthFormat: String
     @BindString(R.string.auth_prompt_button_text)
     lateinit var buttonPinAuthFormat: String
-    @BindString(R.string.auth_prompt_touch_id_desc)
-    lateinit var authTouchIdDesc: String
-    @BindString(R.string.auth_prompt_pin_desc)
-    lateinit var authPinDesc: String
-    @BindString(R.string.auth_prompt_device_lock_code)
-    lateinit var deviceLockCodePrompt: String
-    @BindString(R.string.auth_prompt_device_lock_code_bold_part)
-    lateinit var deviceLockCodePromptBoldPart: String
-    @BindString(R.string.auth_prompt_biometrics)
-    lateinit var biometricsPrompt: String
-    @BindString(R.string.auth_prompt_biometrics_bold_part)
-    lateinit var biometricsPromptBoldPart: String
     @BindString(R.string.auth_biometric_prompt)
     lateinit var biometricAuthPrompt: String
     @BindString(R.string.auth_device_lock_code_prompt)
-    lateinit var biometricDeviceLockCodePrompt: String
+    lateinit var deviceLockCodePrompt: String
 
     @Inject
     lateinit var sharedPrefsWrapper: SharedPrefsWrapper
@@ -188,31 +174,14 @@ internal class LocalAuthFragment : BaseFragment() {
     }
 
     private fun setupUi() {
-        val mActivity = activity ?: return
         if (authType == AuthType.BIOMETRIC) {
-            //setup ui for fingerprint auth
-            promptTextView.text = biometricsPrompt.applyFontStyle(
-                mActivity,
-                CustomFont.AVENIR_LT_STD_LIGHT,
-                biometricsPromptBoldPart,
-                CustomFont.AVENIR_LT_STD_BLACK,
-                applyToOnlyFirstOccurence = true
-            )
-            enableAuthButton.text = buttonTouchIdAuthFormat
-            authDescTextView.text = authTouchIdDesc
+            //setup ui for biometric auth
             authTypeImageView.setImageResource(R.drawable.fingerprint)
+            enableAuthButton.text = buttonTouchIdAuthFormat
         } else {
-            //setup ui for pin or password auth
-            promptTextView.text = deviceLockCodePrompt.applyFontStyle(
-                mActivity,
-                CustomFont.AVENIR_LT_STD_LIGHT,
-                deviceLockCodePromptBoldPart,
-                CustomFont.AVENIR_LT_STD_BLACK,
-                applyToOnlyFirstOccurence = true
-            )
-            enableAuthButton.text = buttonPinAuthFormat
-            authDescTextView.text = authPinDesc
+            //setup ui for device lock code auth
             authTypeImageView.setImageResource(R.drawable.numpad)
+            enableAuthButton.text = buttonPinAuthFormat
         }
     }
 
@@ -278,7 +247,7 @@ internal class LocalAuthFragment : BaseFragment() {
             })
 
         val biometricAuthAvailable = BiometricManager.from(context!!).canAuthenticate() == BIOMETRIC_SUCCESS
-        val prompt = if (biometricAuthAvailable) biometricAuthPrompt else biometricDeviceLockCodePrompt
+        val prompt = if (biometricAuthAvailable) biometricAuthPrompt else deviceLockCodePrompt
         val promptInfo = BiometricPrompt.PromptInfo.Builder()
             .setTitle(getString(R.string.auth_title))
             .setSubtitle(prompt)

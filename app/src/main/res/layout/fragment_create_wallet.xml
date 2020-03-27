@@ -139,28 +139,17 @@
             android:visibility="invisible">
 
             <com.tari.android.wallet.ui.component.CustomFontTextView
+                android:id="@+id/create_wallet_txt_your_emoji_id_title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_marginEnd="4dp"
                 android:gravity="center"
                 android:letterSpacing="0.01"
-                android:text="@string/create_wallet_your_emoji_id_text_label_1"
+                android:text="@string/create_wallet_your_emoji_id_text_label"
                 android:textColor="@color/black"
                 android:textSize="18sp"
                 app:customFont="AVENIR_LT_STD_LIGHT" />
-
-            <com.tari.android.wallet.ui.component.CustomFontTextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:gravity="center"
-                android:letterSpacing="0.01"
-                android:text="@string/create_wallet_your_emoji_id_text_label_2"
-                android:textColor="@color/black"
-                android:textSize="18sp"
-                app:customFont="AVENIR_LT_STD_BLACK" />
-
         </LinearLayout>
 
         <View

@@ -47,7 +47,7 @@
             android:lineSpacingExtra="12dp"
             android:paddingLeft="32dp"
             android:paddingRight="32dp"
-            android:text="@string/scan_qr_description"
+            android:text="@string/add_recipient_scan_qr_description"
             android:textAlignment="center"
             android:textColor="@color/white"
             android:textSize="16sp"

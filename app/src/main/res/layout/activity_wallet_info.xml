@@ -1,154 +1,173 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/white"
     android:orientation="vertical">
 
     <ImageButton
         android:id="@+id/wallet_info_btn_close"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
-        android:layout_marginStart="4dp"
-        android:layout_marginTop="24dp"
+        android:layout_width="@dimen/common_header_height"
+        android:layout_height="@dimen/common_header_height"
         android:background="@color/transparent"
         android:contentDescription="@null"
         android:src="@drawable/close_icon"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <com.tari.android.wallet.ui.component.CustomFontTextView
-        android:id="@+id/wallet_info_txt_share_emoji_id"
+    <ScrollView
         android:layout_width="match_parent"
-        android:gravity="center"
-        android:layout_height="wrap_content"
-        android:text="@string/wallet_info_share_your_emoji_id"
-        android:textColor="@color/black"
-        android:textSize="18sp"
-        android:layout_marginTop="16dp"
-        android:letterSpacing="-0.015"
-        app:customFont="AVENIR_LT_STD_LIGHT"
-        app:layout_constraintLeft_toRightOf="@id/wallet_info_btn_close"
-        app:layout_constraintTop_toBottomOf="@id/wallet_info_btn_close"/>
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:overScrollMode="never"
+        android:scrollbars="vertical">
 
-    <RelativeLayout
-        android:id="@+id/wallet_info_vw_emoji_id_container"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="22dp"
-        android:background="@drawable/emoji_id_bg"
-        android:elevation="@dimen/common_view_elevation"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/wallet_info_txt_share_emoji_id">
-
-        <HorizontalScrollView
-            android:id="@+id/wallet_info_scroll_emoji_id"
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:scrollbars="none">
+            android:orientation="vertical">
 
-            <TextView
-                android:id="@+id/wallet_info_txt_emoji_id"
+            <com.tari.android.wallet.ui.component.CustomFontTextView
+                android:id="@+id/wallet_info_txt_share_emoji_id"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/common_horizontal_margin"
+                android:layout_marginTop="14dp"
+                android:gravity="center"
+                android:letterSpacing="-0.015"
+                android:lineSpacingExtra="9dp"
+                android:text="@string/wallet_info_share_your_emoji_id"
+                android:textColor="@color/black"
+                android:textSize="18sp"
+                app:customFont="AVENIR_LT_STD_LIGHT"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <RelativeLayout
+                android:id="@+id/wallet_info_vw_emoji_id_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/common_horizontal_margin"
+                android:layout_marginTop="20dp"
+                android:background="@drawable/emoji_id_bg"
+                android:elevation="@dimen/common_view_elevation"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/wallet_info_txt_share_emoji_id">
+
+                <HorizontalScrollView
+                    android:id="@+id/wallet_info_scroll_emoji_id"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:scrollbars="none">
+
+                    <TextView
+                        android:id="@+id/wallet_info_txt_emoji_id"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:letterSpacing="0.27"
+                        android:paddingHorizontal="14dp"
+                        android:paddingVertical="12dp"
+                        android:textAlignment="center"
+                        android:textColor="@color/black"
+                        android:textSize="16sp" />
+                </HorizontalScrollView>
+
+                <!-- white fader for emoji-id input -->
+                <View
+                    android:layout_width="30dp"
+                    android:layout_height="24dp"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true"
+                    android:background="@drawable/emoji_id_end_fader" />
+
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_alignTop="@id/wallet_info_scroll_emoji_id"
+                    android:layout_alignBottom="@id/wallet_info_scroll_emoji_id">
+
+                    <include
+                        android:id="@+id/wallet_info_vw_emoji_id_copied"
+                        layout="@layout/emoji_id_copied_anim_view"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:visibility="visible" />
+                </FrameLayout>
+
+            </RelativeLayout>
+
+            <com.tari.android.wallet.ui.component.CustomFontTextView
+                android:id="@+id/wallet_info_txt_copy_emoji_id"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:gravity="center"
+                android:letterSpacing="0.02"
+                android:padding="10dp"
+                android:paddingStart="4dp"
+                android:paddingEnd="0dp"
+                android:text="@string/wallet_info_copy_emoji_id"
+                android:textColor="@color/purple"
+                android:textSize="12sp"
+                app:customFont="AVENIR_LT_STD_MEDIUM"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/wallet_info_vw_emoji_id_container" />
+
+            <View
+                android:id="@+id/wallet_info_vw_divider"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginHorizontal="@dimen/common_horizontal_margin"
+                android:layout_marginTop="10dp"
+                android:background="#20000000"
+                app:layout_constraintTop_toBottomOf="@id/wallet_info_txt_copy_emoji_id" />
+
+            <com.tari.android.wallet.ui.component.CustomFontTextView
+                android:id="@+id/wallet_info_txt_qr_code_desc"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/common_horizontal_margin"
+                android:layout_marginTop="25dp"
+                android:gravity="center"
+                android:letterSpacing="-0.018"
+                android:lineSpacingExtra="10dp"
+                android:text="@string/wallet_info_qr_code_desc"
+                android:textColor="@color/wallet_info_qr_code_desc"
+                android:textSize="14sp"
+                app:customFont="AVENIR_LT_STD_MEDIUM"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/wallet_info_vw_divider" />
+
+            <FrameLayout
+                android:id="@+id/wallet_info_vw_qr_container"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:letterSpacing="0.27"
-                android:paddingHorizontal="14dp"
-                android:paddingVertical="12dp"
-                android:textAlignment="center"
-                android:textColor="@color/black"
-                android:textSize="16sp" />
-        </HorizontalScrollView>
+                android:layout_marginTop="18dp"
+                android:background="@drawable/wallet_info_bg_qr_code_image"
+                android:elevation="@dimen/common_view_elevation"
+                android:padding="5dp"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/wallet_info_txt_qr_code_desc">
 
-        <!-- white fader for emoji-id input -->
-        <View
-            android:layout_width="30dp"
-            android:layout_height="24dp"
-            android:layout_alignParentEnd="true"
-            android:layout_centerVertical="true"
-            android:background="@drawable/emoji_id_end_fader" />
+                <ImageView
+                    android:id="@+id/wallet_info_img_qr"
+                    android:layout_width="@dimen/wallet_info_container_qr_code_size"
+                    android:layout_height="@dimen/wallet_info_container_qr_code_size"
+                    android:background="@color/white"
+                    android:contentDescription="@null"
+                    android:outlineProvider="paddedBounds"
+                    android:padding="2dp" />
+            </FrameLayout>
 
-        <FrameLayout
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_alignTop="@id/wallet_info_scroll_emoji_id"
-            android:layout_alignBottom="@id/wallet_info_scroll_emoji_id">
-
-            <include
-                android:id="@+id/wallet_info_vw_emoji_id_copied"
-                layout="@layout/emoji_id_copied_anim_view"
+            <!-- bottom margin -->
+            <View
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:visibility="visible" />
-        </FrameLayout>
-
-    </RelativeLayout>
-
-    <com.tari.android.wallet.ui.component.CustomFontTextView
-        android:id="@+id/wallet_info_txt_copy_emoji_id"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="6dp"
-        android:gravity="center"
-        android:padding="10dp"
-        android:paddingStart="4dp"
-        android:paddingEnd="0dp"
-        android:letterSpacing="0.02"
-        android:text="@string/wallet_info_copy_emoji_id"
-        android:textColor="@color/purple"
-        android:textSize="12sp"
-        app:customFont="AVENIR_LT_STD_MEDIUM"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/wallet_info_vw_emoji_id_container" />
-
-    <View
-        android:id="@+id/wallet_info_vw_divider"
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:layout_marginLeft="32dp"
-        android:layout_marginTop="14dp"
-        android:layout_marginRight="32dp"
-        android:background="#20000000"
-        app:layout_constraintTop_toBottomOf="@id/wallet_info_txt_copy_emoji_id" />
-
-    <com.tari.android.wallet.ui.component.CustomFontTextView
-        android:id="@+id/wallet_info_txt_qr_code_desc"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="32dp"
-        android:layout_marginTop="25dp"
-        android:layout_marginRight="32dp"
-        android:gravity="center"
-        android:letterSpacing="-0.018"
-        android:lineSpacingExtra="10dp"
-        android:text="@string/wallet_info_qr_code_desc"
-        android:textColor="@color/wallet_info_qr_code_desc"
-        android:textSize="14sp"
-        app:customFont="AVENIR_LT_STD_MEDIUM"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/wallet_info_vw_divider" />
-
-    <FrameLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="18dp"
-        android:padding="5dp"
-        android:background="@drawable/wallet_info_bg_qr_code_image"
-        app:layout_constraintLeft_toLeftOf="parent"
-        android:elevation="@dimen/common_view_elevation"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/wallet_info_txt_qr_code_desc">
-        <ImageView
-            android:id="@+id/wallet_info_img_qr"
-            android:layout_width="@dimen/wallet_info_container_qr_code_size"
-            android:layout_height="@dimen/wallet_info_container_qr_code_size"
-            android:background="@color/white"
-            android:contentDescription="@null"
-            android:outlineProvider="paddedBounds"
-            android:padding="2dp" />
-    </FrameLayout>
-
-
-</androidx.constraintlayout.widget.ConstraintLayout>
+                android:layout_height="40dp"
+                app:layout_constraintTop_toBottomOf="@id/wallet_info_vw_qr_container" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </ScrollView>
+</LinearLayout>
