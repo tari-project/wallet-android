@@ -34,7 +34,11 @@ package com.tari.android.wallet.util
 
 import android.content.Context
 import android.content.SharedPreferences
+import com.google.gson.GsonBuilder
+import com.google.gson.reflect.TypeToken
+import com.tari.android.wallet.model.TestnetTariUTXOKey
 import de.adorsys.android.securestoragelibrary.SecurePreferences
+import java.math.BigInteger
 
 /**
  * Provides easy access to the shared preferences.
@@ -59,6 +63,9 @@ class SharedPrefsWrapper(
         const val torBinPathKey = "tari_wallet_tor_bin_path"
         const val baseNodePublicKeyHexKey = "tari_wallet_base_node_public_key_hex"
         const val baseNodeAddressKey = "tari_wallet_base_node_address"
+        const val testnetTariUTXOListKey = "tari_wallet_testnet_tari_utxo_key_list"
+        const val firstTestnetUTXOTxId = "tari_wallet_first_testnet_utxo_tx_id"
+        const val secondTestnetUTXOTxId = "tari_wallet_second_testnet_utxo_tx_id"
     }
 
     var privateKeyHexString: String?
@@ -228,6 +235,54 @@ class SharedPrefsWrapper(
                     Key.baseNodeAddressKey,
                     value
                 )
+            }
+        }
+
+    var testnetTariUTXOKeyList: List<TestnetTariUTXOKey>
+        get() {
+            val json = sharedPrefs.getString(Key.testnetTariUTXOListKey, "[]")
+            val listType = object : TypeToken<List<TestnetTariUTXOKey>>() {}.type
+            return GsonBuilder().create().fromJson(json, listType)
+        }
+        set(value) {
+            val json = GsonBuilder().create().toJson(value)
+            sharedPrefs.edit().apply {
+                putString(Key.testnetTariUTXOListKey, json)
+                apply()
+            }
+        }
+
+    var firstTestnetUTXOTxId: BigInteger?
+        get() {
+            val stringValue = sharedPrefs.getString(
+                Key.firstTestnetUTXOTxId,
+                null
+            ) ?: return null
+            return BigInteger(stringValue)
+        }
+        set(value) {
+            if (value != null) {
+                sharedPrefs.edit().apply {
+                    putString(Key.firstTestnetUTXOTxId, value.toString())
+                    apply()
+                }
+            }
+        }
+
+    var secondTestnetUTXOTxId: BigInteger?
+        get() {
+            val stringValue = sharedPrefs.getString(
+                Key.secondTestnetUTXOTxId,
+                null
+            ) ?: return null
+            return BigInteger(stringValue)
+        }
+        set(value) {
+            if (value != null) {
+                sharedPrefs.edit().apply {
+                    putString(Key.secondTestnetUTXOTxId, value.toString())
+                    apply()
+                }
             }
         }
 

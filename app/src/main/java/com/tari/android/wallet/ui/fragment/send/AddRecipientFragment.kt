@@ -55,7 +55,6 @@ import androidx.recyclerview.widget.RecyclerView
 import butterknife.*
 import com.daasuu.ei.Ease
 import com.daasuu.ei.EasingInterpolator
-import com.orhanobut.logger.Logger
 import com.tari.android.wallet.R
 import com.tari.android.wallet.application.DeepLink
 import com.tari.android.wallet.application.DeepLink.Type.EMOJI_ID
@@ -490,7 +489,6 @@ class AddRecipientFragment(private val walletService: TariWalletService) : BaseF
      * Makes a search by the input.
      */
     private fun searchRecipients(query: String) {
-        Logger.e("SEARCH :: %s", query)
         val error = WalletError()
         val contacts = walletService.getContacts(error)
         val completedTxs = walletService.getCompletedTxs(error)

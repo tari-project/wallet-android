@@ -74,7 +74,17 @@ interface TariWalletService {
         out WalletError error
     );
 
+    /**
+    * Requests testnet Tari and stores the returned UTXO keys in shared preferences.
+    */
     void requestTestnetTari(out WalletError error);
+    /**
+    * Reads stored testnet UTXO keys from the shared preferences and imports ONLY ONE OF THEM,
+    * posts a transaction received notification, and removes the imported key from
+    * shared preferences, returns the completed transaction for the imported UTXO. Will
+    * return null if there's no UTXO keys to import in shared preferences.
+    */
+    CompletedTx importTestnetUTXO(out WalletError error);
 
     void updateContactAlias(in PublicKey contactPublicKey, in String contactAlias, out WalletError error);
 

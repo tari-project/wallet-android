@@ -5,7 +5,7 @@ apply plugin: 'kotlin-kapt'
 
 android {
     compileSdkVersion 29
-    buildToolsVersion "29.0.2"
+    buildToolsVersion "29.0.3"
 
     defaultConfig {
         applicationId "com.tari.android.wallet"
@@ -100,18 +100,18 @@ dependencies {
     kapt 'org.parceler:parceler:1.1.13'
 
     // dagger - DI
-    implementation 'com.google.dagger:dagger:2.26'
-    kapt 'com.google.dagger:dagger-compiler:2.26'
+    implementation 'com.google.dagger:dagger:2.27'
+    kapt 'com.google.dagger:dagger-compiler:2.27'
 
     // rx
     implementation 'io.reactivex.rxjava2:rxandroid:2.1.1'
     implementation 'io.reactivex.rxjava2:rxjava:2.2.17'
 
     // unicode library - for emoji processing
-    implementation 'com.ibm.icu:icu4j:65.1'
+    implementation 'com.ibm.icu:icu4j:66.1'
 
     // lottie
-    implementation 'com.airbnb.android:lottie:3.3.1'
+    implementation 'com.airbnb.android:lottie:3.4.0'
     // butterknife
     implementation 'com.jakewharton:butterknife:10.2.1'
     kapt 'com.jakewharton:butterknife-compiler:10.2.1'
@@ -120,8 +120,8 @@ dependencies {
     // QR scanner
     implementation 'com.budiyev.android:code-scanner:2.1.0'
     // retrofit
-    implementation 'com.squareup.retrofit2:retrofit:2.7.1'
-    implementation 'com.squareup.retrofit2:converter-gson:2.7.1'
+    implementation 'com.squareup.retrofit2:retrofit:2.8.1'
+    implementation 'com.squareup.retrofit2:converter-gson:2.8.1'
     implementation 'com.journeyapps:zxing-android-embedded:4.1.0'
 
     // encryption
@@ -131,7 +131,8 @@ dependencies {
     implementation 'org.matomo.sdk:tracker:4.1.2'
 
     // used to read log files
-    implementation "commons-io:commons-io:2.6"
+    //noinspection GradleDependency
+    implementation 'commons-io:commons-io:2.6'
 
     // the new view pager
     implementation "androidx.viewpager2:viewpager2:1.0.0"

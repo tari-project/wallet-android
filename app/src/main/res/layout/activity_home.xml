@@ -24,6 +24,17 @@
         android:layout_marginTop="@dimen/home_top_content_container_view_top_margin"
         android:layout_marginEnd="@dimen/common_horizontal_margin">
 
+        <!-- store icon (image only) -->
+        <ImageView
+            android:id="@+id/home_img_store_icon"
+            android:layout_toStartOf="@id/home_img_wallet_info"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_marginEnd="10dp"
+            android:contentDescription="@null"
+            android:scaleType="center"
+            android:src="@drawable/store_icon" />
+
         <!-- profile icon (image only) -->
         <ImageView
             android:id="@+id/home_img_wallet_info"
@@ -129,15 +140,26 @@
                 android:layout_height="@dimen/home_tx_list_container_minimized_top_margin"
                 android:clipChildren="true">
 
+                <!-- store button -->
+                <!-- actual action button on top of the background image-only view -->
+                <Button
+                    android:id="@+id/home_btn_store"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_toStartOf="@id/home_btn_wallet_info"
+                    android:layout_marginTop="@dimen/home_wallet_info_button_initial_top_margin"
+                    android:layout_marginEnd="0dp"
+                    android:background="@color/transparent" />
+
                 <!-- wallet info (profile) button -->
                 <!-- actual action button on top of the background image-only view -->
                 <Button
                     android:id="@+id/home_btn_wallet_info"
-                    android:layout_width="@dimen/home_wallet_info_button_size"
-                    android:layout_height="@dimen/home_wallet_info_button_size"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
                     android:layout_alignParentEnd="true"
                     android:layout_marginTop="@dimen/home_wallet_info_button_initial_top_margin"
-                    android:layout_marginEnd="15dp"
+                    android:layout_marginEnd="20dp"
                     android:background="@color/transparent" />
 
             </RelativeLayout>

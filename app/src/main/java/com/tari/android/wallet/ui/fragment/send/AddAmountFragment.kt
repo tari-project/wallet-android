@@ -34,9 +34,12 @@ package com.tari.android.wallet.ui.fragment.send
 
 import android.animation.*
 import android.annotation.SuppressLint
+import android.app.Dialog
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.os.AsyncTask
 import android.os.Bundle
 import android.os.Handler
@@ -486,6 +489,31 @@ class AddAmountFragment(private val walletService: TariWalletService) : BaseFrag
         copyEmojiIdButtonAnim.start()
     }
 
+    @OnClick(R.id.add_amount_txt_tx_fee_desc)
+    fun onFeeViewClick() {
+        showTxFeeToolTip()
+    }
+
+    private fun showTxFeeToolTip() {
+        val mActivity = activity ?: return
+        Dialog(mActivity, R.style.Theme_AppCompat_Dialog).apply {
+            window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+            setContentView(R.layout.tx_fee_tooltip_dialog)
+            setCancelable(true)
+            setCanceledOnTouchOutside(true)
+            window?.setLayout(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            )
+            findViewById<TextView>(R.id.tx_fee_tooltip_dialog_txt_close)
+                .setOnClickListener {
+                    dismiss()
+                }
+
+            window?.setGravity(Gravity.BOTTOM)
+        }.show()
+    }
+
     /**
      * -1 if no decimal separator, index otherwise.
      */
@@ -845,7 +873,7 @@ class AddAmountFragment(private val walletService: TariWalletService) : BaseFrag
 
         }
         anim.duration = Constants.UI.AddAmount.numPadDigitEnterAnimDurationMs
-        anim.interpolator = EasingInterpolator(Ease.SINE_IN)
+        anim.interpolator = EasingInterpolator(Ease.SINE_OUT)
         anim.start()
 
     }

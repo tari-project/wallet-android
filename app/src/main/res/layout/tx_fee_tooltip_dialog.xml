@@ -36,7 +36,7 @@
         app:customFont="AVENIR_LT_STD_MEDIUM" />
 
     <com.tari.android.wallet.ui.component.CustomFontTextView
-        android:id="@+id/tx_detail_fee_tooltip_txt_close"
+        android:id="@+id/tx_fee_tooltip_dialog_txt_close"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"

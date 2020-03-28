@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginLeft="@dimen/home_dialog_testnet_tari_dialog_margin"
+    android:layout_marginRight="@dimen/home_dialog_testnet_tari_dialog_margin"
+    android:layout_marginBottom="23dp"
+    android:orientation="vertical">
+
+    <View
+        android:id="@+id/home_ttl_store_dialog_vw_top_spacer"
+        android:layout_width="match_parent"
+        android:clickable="true"
+        android:focusable="true"
+        android:layout_height="65dp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/home_ttl_store_dialog_vw_top_spacer"
+        android:background="@drawable/bottom_dialog_bg"
+        android:gravity="center_horizontal"
+        android:orientation="vertical"
+        android:paddingHorizontal="@dimen/common_horizontal_margin">
+
+        <com.tari.android.wallet.ui.component.CustomFontTextView
+            android:id="@+id/home_ttl_store_dialog_txt_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:lineSpacingExtra="10dp"
+            android:layout_marginTop="136dp"
+            android:gravity="center"
+            android:text="@string/home_ttl_store_dlg_title"
+            android:textColor="@color/black"
+            android:textSize="18sp"
+            app:customFont="AVENIR_LT_STD_LIGHT" />
+
+        <com.tari.android.wallet.ui.component.CustomFontTextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="22dp"
+            android:gravity="center"
+            android:letterSpacing="0.01"
+            android:lineSpacingExtra="10dp"
+            android:text="@string/home_ttl_store_dlg_desciption"
+            android:textColor="@color/dark_gray"
+            android:textSize="14sp"
+            app:customFont="AVENIR_LT_STD_MEDIUM" />
+
+        <LinearLayout
+            android:id="@+id/home_ttl_store_dialog_vw_store_button"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/common_action_button_height"
+            android:layout_marginTop="30dp"
+            android:background="@drawable/gradient_button_bg"
+            android:clickable="true"
+            android:focusable="true"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:paddingHorizontal="33dp">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:contentDescription="@null"
+                android:src="@drawable/store_button_icon" />
+
+            <com.tari.android.wallet.ui.component.CustomFontTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:ellipsize="middle"
+                android:singleLine="true"
+                android:text="@string/home_ttl_store_positive_btn"
+                android:textColor="@color/white"
+                android:textSize="16sp"
+                app:customFont="AVENIR_LT_STD_HEAVY" />
+        </LinearLayout>
+
+        <com.tari.android.wallet.ui.component.CustomFontButton
+            android:id="@+id/home_ttl_store_dialog_btn_later"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="14dp"
+            android:layout_marginBottom="16dp"
+            android:background="@color/transparent"
+            android:gravity="center"
+            android:paddingHorizontal="10dp"
+            android:text="@string/home_ttl_store_negative_btn"
+            android:textAllCaps="false"
+            android:textColor="@color/dialog_cancel_action"
+            android:textSize="13sp"
+            app:customFont="AVENIR_LT_STD_HEAVY" />
+    </LinearLayout>
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:clickable="true"
+        android:focusable="true"
+        android:layout_centerHorizontal="true"
+        android:contentDescription="@null"
+        android:src="@drawable/store_modal" />
+
+</RelativeLayout>

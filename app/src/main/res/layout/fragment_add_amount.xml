@@ -509,8 +509,8 @@
 
             <FrameLayout
                 android:layout_width="match_parent"
-                android:translationZ="7dp"
-                android:layout_height="match_parent">
+                android:layout_height="match_parent"
+                android:translationZ="7dp">
 
                 <include
                     android:id="@+id/add_amount_vw_emoji_id_copied"

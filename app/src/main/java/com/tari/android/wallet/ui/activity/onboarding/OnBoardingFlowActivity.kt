@@ -35,8 +35,6 @@ package com.tari.android.wallet.ui.activity.onboarding
 import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
-import android.view.View
-import butterknife.BindView
 import com.tari.android.wallet.R
 import com.tari.android.wallet.di.WalletModule
 import com.tari.android.wallet.ui.activity.BaseActivity
@@ -58,9 +56,6 @@ import javax.inject.Named
  */
 internal class OnboardingFlowActivity : BaseActivity(), IntroductionFragment.Listener,
     CreateWalletFragment.Listener, LocalAuthFragment.Listener {
-
-    @BindView(R.id.onboarding_fragment_container_2)
-    lateinit var fragmentContainerView2: View
 
     @Inject
     @Named(WalletModule.FieldName.walletFilesDirPath)

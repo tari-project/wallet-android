@@ -53,8 +53,8 @@ oneway interface TariWalletServiceListener {
 
     void onBaseNodeSyncComplete(in RxId requestId, in boolean success);
 
-    void onTestnetTariRequestError(in String error);
-
     void onTestnetTariRequestSuccess();
+
+    void onTestnetTariRequestError(in String error);
 
 }

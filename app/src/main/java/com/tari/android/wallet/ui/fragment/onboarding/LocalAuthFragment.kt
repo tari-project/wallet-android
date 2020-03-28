@@ -272,9 +272,9 @@ internal class LocalAuthFragment : BaseFragment() {
             // negative button text and action
             .setNegativeButton(getString(R.string.common_ok), null)
 
-        val alert = dialogBuilder.create()
-        alert.setTitle(getString(R.string.auth_failed_title))
-        alert.show()
+        val dialog = dialogBuilder.create()
+        dialog.setTitle(getString(R.string.auth_failed_title))
+        dialog.show()
     }
 
     /**

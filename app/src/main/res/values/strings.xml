@@ -4,6 +4,9 @@
     <!-- foreground service description -->
     <string name="wallet_service_desc">This service is required to communicate with Tari services. Please keep this service running if you want to be able to communicate with the Tari system.</string>
 
+    <!-- URLs, etc -->
+    <string name="ttl_store_url" translatable="false">https://tarilabs.com/store</string>
+
     <!-- digits -->
     <string name="digit_0">0</string>
     <string name="digit_1">1</string>
@@ -75,6 +78,10 @@
     <string name="wallet_service_error_testnet_tari_request">Could not allocate free Tari.</string>
     <string name="wallet_service_error_no_internet_connection">No internet connection!</string>
 
+    <!-- testnet UTXO messages -->
+    <string name="first_testnet_utxo_tx_message">💸 Here’s some testnet Tari!</string>
+    <string name="second_testnet_utxo_tx_message">Nice work! Here\'s more Tari to fill your coffers. Be sure to hit the Store icon to see real, exclusive items you can redeem with your "hard-earned" testnet Tari.</string>
+
     <!-- onboarding - introduction -->
     <string name="introduction_crypto_wallet_title_text_line_1">Welcome to</string>
     <string name="introduction_crypto_wallet_title_text_line_2">Tari Aurora</string>
@@ -135,9 +142,9 @@
     <string name="home_tari_bot_you_got_tari_dlg_title_bold_part">testnet Tari!</string>
     <string name="home_tari_bot_dialog_desc">Try sending a bit of testnet Tari back to Tari Bot. It’s always better to give than to receive (and you’ll see how the wallet works too).</string>
     <string name="home_tari_bot_try_later">Try it later</string>
-    <string name="home_tari_bot_testnet_tari_tx_message">💸 Here’s some testnet Tari!</string>
     <!-- home TTL store dialog -->
-    <string name="home_ttl_store_dlg_title">Spend testnet Tari on real (exclusive) stuff</string>
+    <string name="home_ttl_store_dlg_title">Spend testnet Tari on\nreal (exclusive) stuff</string>
+    <string name="home_ttl_store_dlg_title_bold_part">(exclusive) stuff</string>
     <string name="home_ttl_store_dlg_desciption">Check out Testnet Tari Limited (TTL) to spend your "hard-earned" testnet Tari on exclusive, one-of-a-kind stuff produced by the team at Tari Labs. Enjoy!</string>
     <string name="home_ttl_store_positive_btn">Visit the TTL Store</string>
     <string name="home_ttl_store_negative_btn">I\'ll check it out later</string>
@@ -192,7 +199,7 @@
     <string name="tx_detail_transaction_id">Transaction ID</string>
     <!-- Fee tooltip -->
     <string name="tx_detail_fee_tooltip_transaction_fee">Transaction Fee</string>
-    <string name="tx_detail_fee_tooltip_desc">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas consequat risus sit amet laoreet mollis. </string>
+    <string name="tx_detail_fee_tooltip_desc">The transaction fee is distributed to the thousands of computers who ensure that your Tari transactions are fast and secure.</string>
 
     <!-- debug screens -->
     <string name="debug_log_files_title">Logs</string>

@@ -67,7 +67,7 @@ object Event {
     }
 
     object Testnet {
-        class TestnetTariRequestSuccessful(val senderPublicKey: PublicKey)
+        class TestnetTariRequestSuccessful
         data class TestnetTariRequestError(val errorMessage: String)
     }
 

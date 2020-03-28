@@ -249,9 +249,9 @@ internal class AuthActivity : BaseActivity(), Animator.AnimatorListener {
                 finish()
             }
 
-        val alert = dialogBuilder.create()
-        alert.setTitle(getString(R.string.auth_not_available_or_canceled_title))
-        alert.show()
+        val dialog = dialogBuilder.create()
+        dialog.setTitle(getString(R.string.auth_not_available_or_canceled_title))
+        dialog.show()
     }
 
     private fun displayAuthFailedDialog() {

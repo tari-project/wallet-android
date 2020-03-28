@@ -94,7 +94,6 @@ internal object Constants {
         }
 
         object CreateWallet {
-            const val showCreateEmojiIdWhiteBgDelayMs = 1500L
             const val removeFragmentDelayDuration = 1200L
             const val tariTextAnimViewDurationMs = 1600L
             const val startUpAnimDuration = 1000L
@@ -103,7 +102,7 @@ internal object Constants {
         }
 
         object AddAmount {
-            const val numPadDigitEnterAnimDurationMs = 200L
+            const val numPadDigitEnterAnimDurationMs = 120L
         }
 
         object AddNoteAndSend {
@@ -123,13 +122,9 @@ internal object Constants {
         }
 
         object Auth {
-            const val viewFadeoutAnimMs = 100L
             const val viewFadeAnimDelayMs = 200L
             const val localAuthAnimDurationMs = 800L
-            const val removeFragmentDelayDuration = 800L
-            const val touchIdPromptFadeInAnimDelayDuration = 300L
-            const val touchIdPromptDurationMs = 800L
-            const val touchIdPromptFadeOutAnimDelayDuration = 2000L
+            const val removeFragmentDelayDuration = 1000L
         }
     }
 
