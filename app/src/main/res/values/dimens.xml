@@ -43,8 +43,8 @@
     <dimen name="home_main_content_top_margin">6dp</dimen>
     <dimen name="home_dialog_testnet_tari_width">289</dimen>
     <dimen name="home_dialog_testnet_tari_dialog_margin">14dp</dimen>
-    <dimen name="home_wallet_info_button_size">50dp</dimen>
-    <dimen name="home_wallet_info_button_initial_top_margin">35dp</dimen>
+    <dimen name="home_top_content_action_button_size">30dp</dimen>
+    <dimen name="home_wallet_info_button_initial_top_margin">40dp</dimen>
 
     <dimen name="create_wallet_button_bottom_margin">36dp</dimen>
     <dimen name="splash_screen_title_bottom_margin">48dp</dimen>

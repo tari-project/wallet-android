@@ -27,7 +27,6 @@
             android:layout_alignTop="@id/create_wallet_vw_emoji_id_summary_container"
             android:layout_centerHorizontal="true"
             android:elevation="4dp"
-            android:alpha="0"
             android:layout_marginTop="0dp">
 
             <com.tari.android.wallet.ui.component.CustomFontTextView
@@ -62,7 +61,7 @@
                 android:src="@drawable/speech_notch_down" />
         </RelativeLayout>
 
-        <FrameLayout
+        <RelativeLayout
             android:id="@+id/create_wallet_vw_emoji_id_summary_container"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -83,7 +82,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:visibility="visible" />
-        </FrameLayout>
+        </RelativeLayout>
 
         <RelativeLayout
             android:id="@+id/create_wallet_vw_emoji_id_container"
@@ -305,7 +304,7 @@
                 app:lottie_renderMode="automatic" />
 
             <com.tari.android.wallet.ui.component.CustomFontTextView
-                android:id="@+id/create_wallet_txt_awesome"
+                android:id="@+id/create_wallet_txt_create_your_emoji_id_line_1"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_above="@id/create_wallet_txt_wallet_address_desc"
@@ -318,7 +317,7 @@
                 app:customFont="AVENIR_LT_STD_BLACK" />
 
             <View
-                android:id="@+id/create_wallet_awesome_text_back_view"
+                android:id="@+id/create_wallet_vw_create_your_emoji_id_line_1_blocker"
                 android:layout_width="match_parent"
                 android:layout_height="18dp"
                 android:layout_above="@id/create_wallet_txt_wallet_address_desc"
@@ -328,7 +327,7 @@
                 android:visibility="invisible" />
 
             <com.tari.android.wallet.ui.component.CustomFontTextView
-                android:id="@+id/create_wallet_txt_create_your_emoji_id"
+                android:id="@+id/create_wallet_txt_create_your_emoji_id_line_2"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_above="@id/create_wallet_txt_wallet_address_desc"
@@ -343,7 +342,7 @@
                 app:customFont="AVENIR_LT_STD_ROMAN" />
 
             <View
-                android:id="@+id/create_wallet_text_back_view"
+                android:id="@+id/create_wallet_vw_create_your_emoji_id_line_2_blocker"
                 android:layout_width="match_parent"
                 android:layout_height="20dp"
                 android:layout_above="@id/create_wallet_txt_wallet_address_desc"
@@ -356,15 +355,15 @@
                 android:id="@+id/create_wallet_nerd_face_emoji"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_centerHorizontal="true"
                 android:layout_marginTop="42dp"
+                android:layout_centerHorizontal="true"
                 android:alpha="0"
-                android:scaleX="0.9"
-                android:scaleY="0.9"
+                android:paddingBottom="6dp"
+                app:lottie_scale="0.9"
                 app:lottie_autoPlay="false"
                 app:lottie_enableMergePathsForKitKatAndAbove="true"
                 app:lottie_imageAssetsFolder="nerd_emoji/images/"
-                app:lottie_loop="false"
+                app:lottie_loop="true"
                 app:lottie_rawRes="@raw/nerd_emoji"
                 app:lottie_renderMode="automatic" />
 

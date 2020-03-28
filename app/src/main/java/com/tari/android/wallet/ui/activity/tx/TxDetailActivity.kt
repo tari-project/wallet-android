@@ -578,11 +578,7 @@ internal class TxDetailActivity :
         addContactButton.visibility = View.INVISIBLE
     }
 
-    @OnClick(
-        R.id.tx_detail_txt_tx_fee,
-        R.id.tx_detail_txt_fee_label,
-        R.id.tx_detail_txt_fee_label_help_icon
-    )
+    @OnClick(R.id.tx_detail_txt_fee_label)
     fun onFeeViewClick() {
         showTxFeeToolTip()
     }
@@ -628,14 +624,14 @@ internal class TxDetailActivity :
     private fun showTxFeeToolTip() {
         Dialog(this, R.style.Theme_AppCompat_Dialog).apply {
             window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-            setContentView(R.layout.tx_detail_fee_tooltip)
+            setContentView(R.layout.tx_fee_tooltip_dialog)
             setCancelable(true)
             setCanceledOnTouchOutside(true)
             window?.setLayout(
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
             )
-            findViewById<TextView>(R.id.tx_detail_fee_tooltip_txt_close)
+            findViewById<TextView>(R.id.tx_fee_tooltip_dialog_txt_close)
                 .setOnClickListener {
                     dismiss()
                 }

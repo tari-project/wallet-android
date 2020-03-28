@@ -48,7 +48,10 @@ data class TestnetTariAllocateResponse constructor(
     val value: String
 )
 
-data class TestnetTariKey constructor(
+data class TestnetTariUTXOKey constructor(
+    // this field is not going to be sent to us by the server,
+    // but we fill it before we store the UTXO key in the shared preferences
+    var senderPublicKeyHex: String?,
     val key: String,
     val value: String
 )
@@ -56,5 +59,5 @@ data class TestnetTariKey constructor(
 data class TestnetTariAllocateMaxResponse constructor(
     @SerializedName("return_wallet_id")
     val returnWalletId: String,
-    val keys: List<TestnetTariKey>
+    val keys: List<TestnetTariUTXOKey>
 )

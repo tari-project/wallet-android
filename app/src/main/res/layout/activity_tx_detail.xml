@@ -119,28 +119,16 @@
             android:id="@+id/tx_detail_txt_fee_label"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:drawableEnd="@drawable/help_icon_24dp"
             android:drawablePadding="4dp"
-            android:gravity="center"
-            android:layout_marginTop="8dp"
-            android:letterSpacing="-0.024"
             android:text="@string/tx_detail_transaction_fee"
-            android:textColor="@color/tx_detail_contact_name_label_text"
-            android:textSize="13sp"
-            app:customFont="AVENIR_LT_STD_ROMAN"
+            android:textColor="#A9AFC4"
+            android:textSize="14sp"
+            app:customFont="AVENIR_LT_STD_HEAVY"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tx_detail_txt_tx_fee" />
-
-        <ImageView
-            android:id="@+id/tx_detail_txt_fee_label_help_icon"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:padding="4dp"
-            android:src="@drawable/help_icon_24dp"
-            app:layout_constraintBottom_toBottomOf="@id/tx_detail_txt_fee_label"
-            app:layout_constraintLeft_toRightOf="@id/tx_detail_txt_fee_label"
-            app:layout_constraintTop_toTopOf="@id/tx_detail_txt_fee_label"
-            android:contentDescription="@null" />
 
         <View
             android:id="@+id/tx_detail_vw_top_dimmer"
@@ -254,7 +242,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/tx_detail_vw_contact_container"
-                android:layout_marginStart="25dp"
+                android:layout_marginHorizontal="@dimen/common_horizontal_margin"
                 android:layout_marginTop="28dp"
                 android:text="@string/tx_detail_note"
                 android:textColor="@color/tx_detail_contact_name_label_text"
@@ -266,10 +254,13 @@
             <com.tari.android.wallet.ui.component.CustomFontTextView
                 android:id="@+id/tx_detail_txt_tx_note"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="0dp"
+                android:layout_above="@id/tx_detail_txt_tx_id"
                 android:layout_below="@id/tx_detail_txt_note_label"
-                android:layout_marginStart="25dp"
+                android:layout_marginHorizontal="@dimen/common_horizontal_margin"
                 android:layout_marginTop="12dp"
+                android:lineSpacingExtra="8dp"
+                android:scrollbars="vertical"
                 android:textColor="@color/black"
                 android:textSize="14sp"
                 app:customFont="AVENIR_LT_STD_ROMAN"
@@ -283,6 +274,7 @@
                 android:layout_alignParentBottom="true"
                 android:layout_centerHorizontal="true"
                 android:layout_gravity="bottom"
+                android:layout_marginTop="4dp"
                 android:layout_marginBottom="32dp"
                 android:ellipsize="middle"
                 android:gravity="center"
@@ -430,8 +422,8 @@
 
                     <FrameLayout
                         android:layout_width="match_parent"
-                        android:translationZ="7dp"
-                        android:layout_height="match_parent">
+                        android:layout_height="match_parent"
+                        android:translationZ="7dp">
 
                         <include
                             android:id="@+id/tx_detail_vw_emoji_id_copied"
@@ -449,7 +441,7 @@
             android:id="@+id/tx_detail_vw_tx_fee_group"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:constraint_referenced_ids="tx_detail_txt_tx_fee,tx_detail_txt_fee_label,tx_detail_txt_fee_label_help_icon" />
+            app:constraint_referenced_ids="tx_detail_txt_tx_fee,tx_detail_txt_fee_label" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </RelativeLayout>

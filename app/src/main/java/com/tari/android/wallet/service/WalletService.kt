@@ -50,6 +50,7 @@ import retrofit2.Response
 import java.math.BigInteger
 import javax.inject.Inject
 import com.tari.android.wallet.model.Tx.Direction.*
+import com.tari.android.wallet.util.SharedPrefsWrapper
 
 /**
  * Foreground wallet service.
@@ -72,6 +73,8 @@ class WalletService : Service(), FFIWalletListenerAdapter {
     internal lateinit var tariRESTService: TariRESTService
     @Inject
     internal lateinit var notificationHelper: NotificationHelper
+    @Inject
+    internal lateinit var sharedPrefsWrapper: SharedPrefsWrapper
 
     /**
      * Service stub implementation.
@@ -743,42 +746,23 @@ class WalletService : Service(), FFIWalletListenerAdapter {
                     val body = response.body()
                     if (response.code() in 200..209 && body != null) {
                         val senderPublicKeyFFI = FFIPublicKey(HexString(body.returnWalletId))
-                        val senderPublicKey = publicKeyFromFFI(senderPublicKeyFFI)
                         // add contact
                         FFIContact("TariBot", senderPublicKeyFFI).also {
                             wallet.addUpdateContact(it)
                             it.destroy()
                         }
-                        // import UTXOs
-                        for (key in body.keys) {
-                            FFIPrivateKey(HexString(key.key)).also { spendingPrivateKeyFFI ->
-                                val amount = BigInteger(key.value)
-                                wallet.importUTXO(
-                                    amount,
-                                    getString(R.string.home_tari_bot_testnet_tari_tx_message),
-                                    spendingPrivateKeyFFI,
-                                    senderPublicKeyFFI
-                                )
-                                spendingPrivateKeyFFI.destroy()
-                            }
-                        }
-                        // destroy native objects
                         senderPublicKeyFFI.destroy()
+                        // update the keys with sender public key hex
+                        body.keys.forEach { key -> key.senderPublicKeyHex =  body.returnWalletId }
+                        // store the UTXO keys
+                        sharedPrefsWrapper.testnetTariUTXOKeyList = body.keys
 
                         // post event to bus for the internal listeners
-                        EventBus.post(Event.Testnet.TestnetTariRequestSuccessful(senderPublicKey))
+                        EventBus.post(Event.Testnet.TestnetTariRequestSuccessful())
                         // notify external listeners
                         listeners.iterator().forEach { listener ->
                             listener.onTestnetTariRequestSuccess()
                         }
-                        // post notification
-                        getCompletedTxs(WalletError())
-                            ?.filter {
-                                it.direction == INBOUND && it.user.publicKey == senderPublicKey
-                            }
-                            ?.forEach { tx ->
-                                postTxNotification(tx)
-                            }
                     } else {
                         error.code = WalletErrorCode.UNKNOWN_ERROR
                         val errorMessage =
@@ -790,6 +774,38 @@ class WalletService : Service(), FFIWalletListenerAdapter {
                     }
                 }
             })
+        }
+
+        override fun importTestnetUTXO(error: WalletError): CompletedTx? {
+            val keys = sharedPrefsWrapper.testnetTariUTXOKeyList.toMutableList()
+            if (keys.isEmpty()) {
+                return null
+            }
+            keys.toMutableList()
+            val firstUTXOKey = keys.first()
+            val senderPublicKeyFFI = FFIPublicKey(HexString(firstUTXOKey.senderPublicKeyHex!!))
+            val txId: BigInteger
+            FFIPrivateKey(HexString(firstUTXOKey.key)).also { spendingPrivateKeyFFI ->
+                val amount = BigInteger(firstUTXOKey.value)
+                txId = wallet.importUTXO(
+                    amount,
+                    getString(R.string.first_testnet_utxo_tx_message),
+                    spendingPrivateKeyFFI,
+                    senderPublicKeyFFI
+                )
+                spendingPrivateKeyFFI.destroy()
+            }
+            senderPublicKeyFFI.destroy()
+            // remove the used key
+            keys.remove(firstUTXOKey)
+            sharedPrefsWrapper.testnetTariUTXOKeyList = keys
+            // get transaction and post notification
+            val tx = getCompletedTxById(TxId(txId), error)
+            if (error.code != WalletErrorCode.NO_ERROR || tx == null) {
+                return null
+            }
+            postTxNotification(tx)
+            return tx
         }
 
         private fun notifyTestnetTariRequestFailed(error: String) {

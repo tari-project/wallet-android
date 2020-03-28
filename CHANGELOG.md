@@ -1,6 +1,14 @@
 # Tari Aurora Changelog
 
-## [0.0.17-jniLibs-0.3.3] - xxxx-xx-xx
+## [0.0.19-jniLibs-0.3.4] - xxxx-xx-xx
+- [#71](https://github.com/tari-project/wallet-android/issues/71) - Transaction fee tooltip in transaction details and add amount screens.
+- [#160](https://github.com/tari-project/wallet-android/issues/160) - Store icon & modal.
+- [#161](https://github.com/tari-project/wallet-android/issues/161) - Pop store modal after first send.
+- [#227](https://github.com/tari-project/wallet-android/issues/227) - Testnet UTXOs imported separately.
+- [#231](https://github.com/tari-project/wallet-android/issues/231) - Improve numeric pad responsiveness.
+- [#237](https://github.com/tari-project/wallet-android/issues/237) - Adaptive app icon.
+
+## [0.0.18-jniLibs-0.3.4] - 2020-03-27
 - [#159](https://github.com/tari-project/wallet-android/issues/159) - User agreement & privacy policy links.
 - [#174](https://github.com/tari-project/wallet-android/issues/174) - Wallet setup interstitial @ home screen.
 - [#176](https://github.com/tari-project/wallet-android/issues/176) - Final copy changes.
@@ -13,7 +21,7 @@
 - [#230](https://github.com/tari-project/wallet-android/issues/230) - Tari spinning logo freeze fixed.
 - [#233](https://github.com/tari-project/wallet-android/issues/233) - Duplicate of [#226](https://github.com/tari-project/wallet-android/issues/226).
 
-## [0.0.16-jniLibs-0.3.3] - 2020-03-25
+## [0.0.17-jniLibs-0.3.3] - 2020-03-25
 - [#184](https://github.com/tari-project/wallet-android/issues/184) - Received tx callback crash fixed.
 - A fix for a crash in the add recipient screen on older Android versions.
 - [#194](https://github.com/tari-project/wallet-android/issues/194) - Turned off app backup.

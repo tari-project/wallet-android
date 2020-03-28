@@ -93,19 +93,21 @@ internal class CreateWalletFragment : BaseFragment() {
     @BindView(R.id.create_wallet_just_sec_desc_back_view)
     lateinit var justSecDescBackView: View
     @BindView(R.id.create_wallet_nerd_face_emoji)
-    lateinit var nerdFaceEmoji: LottieAnimationView
-    @BindView(R.id.create_wallet_txt_create_your_emoji_id)
-    lateinit var createYourEmojiIdText: TextView
-    @BindView(R.id.create_wallet_text_back_view)
+    lateinit var nerdFaceEmojiLottieAnim: LottieAnimationView
+    @BindView(R.id.create_wallet_txt_create_your_emoji_id_line_2)
+    lateinit var createYourEmojiIdLine2TextView: TextView
+    @BindView(R.id.create_wallet_vw_create_your_emoji_id_line_2_blocker)
     lateinit var createEmojiIdTextBackView: View
-    @BindView(R.id.create_wallet_txt_awesome)
-    lateinit var awesomeText: TextView
+    @BindView(R.id.create_wallet_txt_create_your_emoji_id_line_1)
+    lateinit var createYourEmojiIdLine1TextView: TextView
     @BindView(R.id.create_wallet_white_bg_view)
     lateinit var whiteBgView: View
-    @BindView(R.id.create_wallet_awesome_text_back_view)
+    @BindView(R.id.create_wallet_vw_create_your_emoji_id_line_1_blocker)
     lateinit var awesomeTextBackView: View
     @BindView(R.id.create_wallet_emoji_wheel_anim)
     lateinit var emojiWheelAnimView: LottieAnimationView
+    @BindView(R.id.create_wallet_btn_see_full_emoji_id)
+    lateinit var tapToSeeFullEmojiIdButton: Button
     @BindView(R.id.create_wallet_vw_emoji_id_summary_container)
     lateinit var emojiIdSummaryContainerView: View
     @BindView(R.id.create_wallet_vw_emoji_id_summary)
@@ -129,7 +131,7 @@ internal class CreateWalletFragment : BaseFragment() {
     @BindView(R.id.create_wallet_anim_bottom_spinner)
     lateinit var bottomSpinnerLottieAnim: LottieAnimationView
     @BindView(R.id.create_wallet_img_small_gem)
-    lateinit var smallGemsImageView: ImageView
+    lateinit var smallGemImageView: ImageView
     @BindView(R.id.create_wallet_vw_see_full_emoji_id_container)
     lateinit var seeFullEmojiIdButtonContainerView: View
 
@@ -229,6 +231,11 @@ internal class CreateWalletFragment : BaseFragment() {
         emojiIdSummaryController = EmojiIdSummaryViewController(emojiIdSummaryView)
         emojiIdSummaryController.display(emojiId)
 
+        seeFullEmojiIdButtonContainerView.visibility = View.INVISIBLE
+        emojiIdSummaryContainerView.visibility = View.INVISIBLE
+        emojiIdContainerView.visibility = View.INVISIBLE
+        tapToSeeFullEmojiIdButton.isEnabled = false
+
         continueButton.alpha = 0f
         createEmojiIdButton.alpha = 0f
         rootView.viewTreeObserver.addOnGlobalLayoutListener(
@@ -254,14 +261,6 @@ internal class CreateWalletFragment : BaseFragment() {
                 startCreateEmojiAnimation()
             }
         })
-
-        nerdFaceEmoji.addAnimatorListener(object : AnimatorListenerAdapter() {
-            override fun onAnimationEnd(animation: Animator?) {
-                super.onAnimationEnd(animation)
-                nerdFaceEmoji.playAnimation()
-                nerdFaceEmoji.progress = 0.10f
-            }
-        })
     }
 
     private fun playStartupWhiteBgAnimation() {
@@ -283,7 +282,7 @@ internal class CreateWalletFragment : BaseFragment() {
 
             override fun onAnimationStart(animation: Animator?) {
                 super.onAnimationStart(animation)
-                smallGemsImageView.visibility = View.VISIBLE
+                smallGemImageView.visibility = View.VISIBLE
                 whiteBgView.visibility = View.VISIBLE
             }
         })
@@ -364,9 +363,9 @@ internal class CreateWalletFragment : BaseFragment() {
         val fadeOutAnim = ValueAnimator.ofFloat(1f, 0f)
         fadeOutAnim.addUpdateListener { valueAnimator: ValueAnimator ->
             val alpha = valueAnimator.animatedValue as Float
-            nerdFaceEmoji.alpha = alpha
-            awesomeText.alpha = alpha
-            createYourEmojiIdText.alpha = alpha
+            nerdFaceEmojiLottieAnim.alpha = alpha
+            createYourEmojiIdLine1TextView.alpha = alpha
+            createYourEmojiIdLine2TextView.alpha = alpha
             walletAddressDescText.alpha = alpha
             createEmojiIdButton.alpha = alpha
         }
@@ -453,6 +452,10 @@ internal class CreateWalletFragment : BaseFragment() {
         )
         animSet.duration = CreateEmojiId.emojiIdCreationViewAnimDurationMs
         animSet.interpolator = EasingInterpolator(Ease.QUINT_IN)
+
+        seeFullEmojiIdButtonContainerView.alpha = 0f
+        seeFullEmojiIdButtonContainerView.visibility = View.VISIBLE
+        emojiIdSummaryContainerView.visibility = View.VISIBLE
         animSet.start()
         animSet.addListener(object: AnimatorListenerAdapter() {
             override fun onAnimationEnd(animation: Animator?) {
@@ -474,6 +477,11 @@ internal class CreateWalletFragment : BaseFragment() {
         }
         anim.duration = Constants.UI.mediumDurationMs
         anim.interpolator = EasingInterpolator(Ease.BACK_OUT)
+        anim.addListener(object: AnimatorListenerAdapter() {
+            override fun onAnimationEnd(animation: Animator?) {
+                tapToSeeFullEmojiIdButton.isEnabled = true
+            }
+        })
         anim.start()
     }
 
@@ -530,32 +538,36 @@ internal class CreateWalletFragment : BaseFragment() {
     }
 
     private fun startCreateEmojiAnimation() {
-        nerdFaceEmoji.translationY = -(nerdFaceEmoji.height).toFloat()
-        nerdFaceEmoji.alpha = 1f
-        nerdFaceEmoji.playAnimation()
+        // animation is looping, so we have to skip the fade-in and scale-up anims
+        // that happen at the beginning of the animation
+        nerdFaceEmojiLottieAnim.setMinFrame(50)
+        nerdFaceEmojiLottieAnim.translationY = -(nerdFaceEmojiLottieAnim.height).toFloat()
+        nerdFaceEmojiLottieAnim.playAnimation()
 
         val fadeInAnim = ValueAnimator.ofFloat(0f, 1f)
         fadeInAnim.addUpdateListener { valueAnimator: ValueAnimator ->
             val alpha = valueAnimator.animatedValue as Float
             walletAddressDescText.alpha = alpha
             createEmojiIdButton.alpha = alpha
+            nerdFaceEmojiLottieAnim.alpha = alpha
+            nerdFaceEmojiLottieAnim.alpha = alpha
         }
 
         val createNowAnim: ObjectAnimator =
             ObjectAnimator.ofFloat(
-                createYourEmojiIdText,
+                createYourEmojiIdLine2TextView,
                 View.TRANSLATION_Y,
                 0f,
-                -createYourEmojiIdText.height.toFloat()
+                -createYourEmojiIdLine2TextView.height.toFloat()
             )
         createNowAnim.duration = CreateEmojiId.awesomeTextAnimDurationMs
 
         val awesomeAnim: ObjectAnimator =
             ObjectAnimator.ofFloat(
-                awesomeText,
+                createYourEmojiIdLine1TextView,
                 View.TRANSLATION_Y,
                 0f,
-                -awesomeText.height.toFloat()
+                -createYourEmojiIdLine1TextView.height.toFloat()
             )
         awesomeAnim.duration = CreateEmojiId.awesomeTextAnimDurationMs
 
@@ -583,8 +595,8 @@ internal class CreateWalletFragment : BaseFragment() {
                 super.onAnimationStart(animation)
                 createEmojiIdTextBackView.visibility = View.VISIBLE
                 awesomeTextBackView.visibility = View.VISIBLE
-                awesomeText.visibility = View.VISIBLE
-                createYourEmojiIdText.visibility = View.VISIBLE
+                createYourEmojiIdLine1TextView.visibility = View.VISIBLE
+                createYourEmojiIdLine2TextView.visibility = View.VISIBLE
                 helloTextBackView.visibility = View.GONE
                 justSecDescBackView.visibility = View.GONE
                 justSecTitleBackView.visibility = View.GONE

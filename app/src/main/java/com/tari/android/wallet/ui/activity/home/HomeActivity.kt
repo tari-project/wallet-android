@@ -44,6 +44,7 @@ import android.content.ServiceConnection
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.GradientDrawable
+import android.net.Uri
 import android.os.*
 import android.view.Gravity
 import android.view.MotionEvent
@@ -139,8 +140,12 @@ internal class HomeActivity : BaseActivity(),
     lateinit var balanceTitleTextView: TextView
     @BindView(R.id.home_img_balance_gem)
     lateinit var balanceGemImageView: ImageView
+    @BindView(R.id.home_img_store_icon)
+    lateinit var storeIconImageView: ImageView
     @BindView(R.id.home_img_wallet_info)
     lateinit var userWalletInfoImageView: ImageView
+    @BindView(R.id.home_btn_store)
+    lateinit var storeButton: Button
     @BindView(R.id.home_btn_wallet_info)
     lateinit var userWalletInfoButton: Button
 
@@ -217,6 +222,16 @@ internal class HomeActivity : BaseActivity(),
     lateinit var testnetTariReceivedDialogTitle: String
     @BindString(R.string.home_tari_bot_you_got_tari_dlg_title_bold_part)
     lateinit var testnetTariReceivedDialogTitleBoldPart: String
+    @BindString(R.string.home_ttl_store_dlg_title)
+    lateinit var ttlStoreDialogTitle: String
+    @BindString(R.string.home_ttl_store_dlg_title_bold_part)
+    lateinit var ttlStoreDialogTitleBoldPart: String
+    @BindString(R.string.ttl_store_url)
+    lateinit var ttlStoreUrl: String
+    @BindString(R.string.first_testnet_utxo_tx_message)
+    lateinit var firstTestnetUTXOMessage: String
+    @BindString(R.string.second_testnet_utxo_tx_message)
+    lateinit var secondTestnetUTXOMessage: String
 
     @Inject
     lateinit var sharedPrefsWrapper: SharedPrefsWrapper
@@ -249,8 +264,7 @@ internal class HomeActivity : BaseActivity(),
 
     private var walletService: TariWalletService? = null
     private val wr = WeakReference(this)
-    private val uiHandler = Handler(Looper.getMainLooper())
-    private val handler = Handler()
+    private val handler = Handler(Looper.getMainLooper())
 
     /**
      * Whether the user is currently dragging the list view.
@@ -258,6 +272,8 @@ internal class HomeActivity : BaseActivity(),
     private var isDragging = false
     private var sendTariButtonClickAnimIsRunning = false
     private val onboardingInterstitialTimeMs = 2000L
+    private val secondUTXOImportDelayTimeMs = 1500L
+    private val secondUTXOStoreModalDelayTimeMs = 1000L
 
     /**
      * This listener is used only to animate the visibility of the scroll depth gradient view.
@@ -303,6 +319,7 @@ internal class HomeActivity : BaseActivity(),
         sendTariButtonBgGradientView.alpha = 0f
 
         balanceTitleTextView.alpha = 0f
+        storeIconImageView.alpha = 0f
         userWalletInfoImageView.alpha = 0f
         balanceGemImageView.alpha = 0f
         noTxsInfoTextView.visibility = View.GONE
@@ -326,7 +343,7 @@ internal class HomeActivity : BaseActivity(),
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
         intent?.let {
-            uiHandler.postDelayed({
+            handler.postDelayed({
                 wr.get()?.processIntentDeepLink(it)
             }, Constants.UI.mediumDurationMs)
         }
@@ -351,7 +368,7 @@ internal class HomeActivity : BaseActivity(),
     }
 
     override fun onStop() {
-        uiHandler.removeCallbacksAndMessages(null)
+        handler.removeCallbacksAndMessages(null)
         super.onStop()
     }
 
@@ -443,11 +460,16 @@ internal class HomeActivity : BaseActivity(),
                 updateAllDataAndUI(restartBalanceUI = false)
             }
         }
+        EventBus.subscribe<Event.Wallet.DiscoveryComplete>(this) {
+            wr.get()?.rootView?.post {
+                updateAllDataAndUI(restartBalanceUI = false)
+            }
+        }
 
         // Testnet Tari events
-        EventBus.subscribe<Event.Testnet.TestnetTariRequestSuccessful>(this) { event ->
+        EventBus.subscribe<Event.Testnet.TestnetTariRequestSuccessful>(this) {
             wr.get()?.rootView?.post {
-                wr.get()?.testnetTariRequestSuccessful(event.senderPublicKey)
+                wr.get()?.testnetTariRequestSuccessful()
             }
         }
         EventBus.subscribe<Event.Testnet.TestnetTariRequestError>(this) { event ->
@@ -509,7 +531,7 @@ internal class HomeActivity : BaseActivity(),
             }
         }
         // check the start-up intent for a deep link
-        uiHandler.postDelayed({
+        handler.postDelayed({
             wr.get()?.processIntentDeepLink(intent)
         }, Constants.UI.xLongDurationMs)
 
@@ -549,6 +571,16 @@ internal class HomeActivity : BaseActivity(),
     private fun updateTxListData(): Boolean {
         val error = WalletError()
         val walletCompletedTxs = walletService!!.getCompletedTxs(error)
+        walletCompletedTxs.filter { completedTx ->
+            completedTx.id == sharedPrefsWrapper.firstTestnetUTXOTxId
+                    || completedTx.id == sharedPrefsWrapper.secondTestnetUTXOTxId
+        }.forEach { completedTx ->
+            completedTx.message = when(completedTx.id) {
+                sharedPrefsWrapper.firstTestnetUTXOTxId -> firstTestnetUTXOMessage
+                sharedPrefsWrapper.secondTestnetUTXOTxId -> secondTestnetUTXOMessage
+                else -> completedTx.message
+            }
+        }
         val walletPendingInboundTxs = walletService!!.getPendingInboundTxs(error)
         val walletPendingOutboundTxs = walletService!!.getPendingOutboundTxs(error)
         if (error.code != WalletErrorCode.NO_ERROR) {
@@ -670,6 +702,7 @@ internal class HomeActivity : BaseActivity(),
             sendTariButtonBgGradientView.alpha = value
             // reveal balance title, QR code button and balance gem image
             balanceTitleTextView.alpha = value
+            storeIconImageView.alpha = value
             userWalletInfoImageView.alpha = value
             balanceGemImageView.alpha = value
         }
@@ -724,6 +757,7 @@ internal class HomeActivity : BaseActivity(),
             onEnd = {
                 wr.get()?.topContentContainerView?.visibility = View.VISIBLE
                 wr.get()?.balanceTitleTextView?.alpha = 1f
+                wr.get()?.storeIconImageView?.alpha = 1f
                 wr.get()?.userWalletInfoImageView?.alpha = 1f
                 wr.get()?.balanceGemImageView?.alpha = 1f
             }
@@ -755,11 +789,17 @@ internal class HomeActivity : BaseActivity(),
         }
     }
 
-    private fun testnetTariRequestSuccessful(senderPublicKey: PublicKey) {
+    private fun testnetTariRequestSuccessful() {
+        val error = WalletError()
+        val importedTx = walletService!!.importTestnetUTXO(error)
+        if (error.code != WalletErrorCode.NO_ERROR) {
+            TODO("Unhandled wallet error: ${error.code}")
+        }
+        sharedPrefsWrapper.firstTestnetUTXOTxId = importedTx.id
         updateAllDataAndUI(restartBalanceUI = false)
         // display dialog
-        uiHandler.postDelayed({
-            showTestnetTariReceivedDialog(senderPublicKey)
+        handler.postDelayed({
+            showTestnetTariReceivedDialog(importedTx.user.publicKey)
         }, Constants.UI.Home.showTariBotDialogDelayMs)
         testnetTariRequestIsInProgress = false
     }
@@ -774,7 +814,7 @@ internal class HomeActivity : BaseActivity(),
         Dialog(this, R.style.Theme_AppCompat_Dialog).apply {
             window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
             setContentView(R.layout.home_dialog_testnet_tari_received)
-            setCancelable(false)
+            setCancelable(true)
             window?.setLayout(
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
@@ -808,6 +848,52 @@ internal class HomeActivity : BaseActivity(),
         }
     }
 
+    private fun showTTLStoreDialog() {
+        Dialog(this, R.style.Theme_AppCompat_Dialog).apply {
+            window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+            setContentView(R.layout.home_dialog_ttl_store)
+            setCancelable(true)
+            window?.setLayout(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            )
+            val titleTextView = findViewById<TextView>(R.id.home_ttl_store_dialog_txt_title)
+            titleTextView.text = ttlStoreDialogTitle.applyFontStyle(
+                this@HomeActivity,
+                CustomFont.AVENIR_LT_STD_LIGHT,
+                ttlStoreDialogTitleBoldPart,
+                CustomFont.AVENIR_LT_STD_BLACK
+            )
+            findViewById<View>(R.id.home_ttl_store_dialog_btn_later)
+                .setOnClickListener {
+                    dismiss()
+                }
+            findViewById<View>(R.id.home_ttl_store_dialog_vw_store_button)
+                .setOnClickListener {
+                    visitTTLStore()
+                    handler.postDelayed({
+                        dismiss()
+                    }, Constants.UI.mediumDurationMs)
+                }
+            findViewById<View>(R.id.home_ttl_store_dialog_vw_top_spacer)
+                .setOnClickListener {
+                    dismiss()
+                }
+
+            window?.setGravity(Gravity.BOTTOM)
+            show()
+        }
+    }
+
+    private fun visitTTLStore() {
+        startActivity(
+            Intent(
+                Intent.ACTION_VIEW,
+                Uri.parse(ttlStoreUrl)
+            )
+        )
+    }
+
     private fun sendTariToUser(recipientPublicKey: PublicKey) {
         // get contact or just user
         val error = WalletError()
@@ -826,10 +912,19 @@ internal class HomeActivity : BaseActivity(),
     }
 
     /**
+     * Displays the store modal on store button click.
+     */
+    @OnClick(R.id.home_btn_store)
+    fun onStoreButtonClicked(view: View) {
+        UiUtil.temporarilyDisableClick(view)
+        showTTLStoreDialog()
+    }
+
+    /**
      * Opens user wallet info on button click.
      */
     @OnClick(R.id.home_btn_wallet_info)
-    fun walletInfoButtonClicked(view: View) {
+    fun onWalletInfoButtonClicked(view: View) {
         UiUtil.temporarilyDisableClick(view)
         val intent = Intent(this@HomeActivity, WalletInfoActivity::class.java)
         startActivity(intent)
@@ -853,7 +948,9 @@ internal class HomeActivity : BaseActivity(),
         // request Testnet Tari if no txs
         if (txListIsEmpty) {
             handler.postDelayed({
-                wr.get()?.requestTestnetTari()
+                Thread {
+                    wr.get()?.requestTestnetTari()
+                }.start()
             }, Constants.UI.xxLongDurationMs)
 
         } else {
@@ -882,9 +979,30 @@ internal class HomeActivity : BaseActivity(),
         anim.start()
 
         // update data
-        AsyncTask.execute {
+        Thread {
             updateAllDataAndUI(restartBalanceUI = true)
+        }.start()
+
+        // import second testnet UTXO if it hasn't been imported yet
+        if (sharedPrefsWrapper.testnetTariUTXOKeyList.isNotEmpty()) {
+            Thread {
+                Thread.sleep(secondUTXOImportDelayTimeMs)
+                wr.get()?.importSecondUTXO()
+            }.start()
         }
+    }
+
+    private fun importSecondUTXO() {
+        val error = WalletError()
+        val importedTx = walletService!!.importTestnetUTXO(error)
+        if (error.code != WalletErrorCode.NO_ERROR) {
+            TODO("Unhandled wallet error: ${error.code}")
+        }
+        sharedPrefsWrapper.secondTestnetUTXOTxId = importedTx.id
+        updateAllDataAndUI(restartBalanceUI = false)
+        handler.postDelayed({
+            showTTLStoreDialog()
+        }, secondUTXOStoreModalDelayTimeMs)
     }
 
     /**
@@ -1099,6 +1217,10 @@ internal class HomeActivity : BaseActivity(),
                 endOnboarding()
             }
 
+            UiUtil.setTopMargin(
+                storeButton,
+                walletInfoButtonInitialTopMargin + scrollView.scrollY + topContentMarginTopExtra
+            )
             UiUtil.setTopMargin(
                 userWalletInfoButton,
                 walletInfoButtonInitialTopMargin + scrollView.scrollY + topContentMarginTopExtra
