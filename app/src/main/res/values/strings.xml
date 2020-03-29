@@ -5,7 +5,7 @@
     <string name="wallet_service_desc">This service is required to communicate with Tari services. Please keep this service running if you want to be able to communicate with the Tari system.</string>
 
     <!-- URLs, etc -->
-    <string name="ttl_store_url" translatable="false">https://tarilabs.com/store</string>
+    <string name="ttl_store_url" translatable="false">https://store.tarilabs.com</string>
 
     <!-- digits -->
     <string name="digit_0">0</string>
