@@ -1,5 +1,8 @@
 # Tari Aurora Changelog
 
+## [0.0.21-jniLibs-0.4.1] - 2020-03-29
+- FFI fixes
+
 ## [v0.0.20-jniLibs-0.4.0] - 2020-03-29
 - jniLibs updated to 0.4.0. This is a breaking change and old wallets won't be able to connect to
   the network.
