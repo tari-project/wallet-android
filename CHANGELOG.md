@@ -1,6 +1,10 @@
 # Tari Aurora Changelog
 
-## [0.0.19-jniLibs-0.3.5] - xxxx-xx-xx
+## [v0.0.20-jniLibs-0.4.0] - 2020-03-29
+- jniLibs updated to 0.4.0. This is a breaking change and old wallets won't be able to connect to
+  the network.
+
+## [0.0.19-jniLibs-0.3.5] - 2020-03-29
 - [#71](https://github.com/tari-project/wallet-android/issues/71) - Transaction fee tooltip in transaction details and add amount screens.
 - [#160](https://github.com/tari-project/wallet-android/issues/160) - Store icon & modal.
 - [#161](https://github.com/tari-project/wallet-android/issues/161) - Pop store modal after first send.
