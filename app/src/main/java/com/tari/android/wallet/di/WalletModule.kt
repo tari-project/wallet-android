@@ -54,10 +54,13 @@ internal class WalletModule {
 
     object FieldName {
         const val walletFilesDirPath = "wallet_files_dir_path"
+        const val walletLogFilesDirPath = "wallet_log_file_dir_path"
         const val walletLogFilePath = "wallet_log_file_path"
     }
 
     private val logFilePrefix = "tari_wallet_"
+    private val logFileExtension = ".log"
+    private val logFilesDirName = "tari_logs"
 
     /**
      * The directory in which the wallet files reside.
@@ -68,20 +71,36 @@ internal class WalletModule {
     internal fun provideWalletFilesDirPath(context: Context): String = context.filesDir.absolutePath
 
     /**
+     * The directory in which the wallet log files reside.
+     */
+    @Provides
+    @Named(FieldName.walletLogFilesDirPath)
+    @Singleton
+    internal fun provideLogFilesDirPath(
+        @Named(FieldName.walletFilesDirPath) walletFilesDirPath: String
+    ): String {
+        val logFilesDir = File(walletFilesDirPath, logFilesDirName)
+        if (!logFilesDir.exists()) {
+            logFilesDir.mkdir()
+        }
+        return logFilesDir.absolutePath
+    }
+
+    /**
      * FFI log file path.
      */
     @Provides
     @Named(FieldName.walletLogFilePath)
     @Singleton
-    internal fun provideWalletLogFilePath(@Named(FieldName.walletFilesDirPath) walletFilesDirPath: String): String {
+    internal fun provideWalletLogFilePath(@Named(FieldName.walletLogFilesDirPath) logFilesDirPath: String): String {
         val timeStamp = SimpleDateFormat("YYYYMMdd", Locale.getDefault()).format(Date()) +
                 "_${System.currentTimeMillis()}"
-        val logFilePath = "$walletFilesDirPath/$logFilePrefix$timeStamp.log"
-        val logFile = File(logFilePath)
+        val logFileName = "$logFilePrefix$timeStamp$logFileExtension"
+        val logFile = File(logFilesDirPath, logFileName)
         if (!logFile.exists()) {
             logFile.createNewFile()
         }
-        return logFilePath
+        return logFile.absolutePath
     }
 
     /**

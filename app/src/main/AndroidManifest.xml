@@ -35,6 +35,17 @@
             </intent-filter>
         </service>
 
+        <!-- file provider to share log files with other applications (i.e. email clients) -->
+        <provider
+            android:authorities="com.tari.android.wallet.files"
+            android:name="androidx.core.content.FileProvider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_provider" />
+        </provider>
+
         <!-- this receiver restarts the service on destroy & keeps the service running -->
         <receiver
             android:name=".service.ServiceRestartBroadcastReceiver"
@@ -80,6 +91,7 @@
             android:windowSoftInputMode="stateAlwaysHidden">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
+
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
                 <data android:scheme="tari" android:host="mainnet" />

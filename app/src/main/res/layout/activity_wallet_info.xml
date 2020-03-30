@@ -65,7 +65,7 @@
                         android:id="@+id/wallet_info_txt_emoji_id"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:letterSpacing="0.27"
+                        android:letterSpacing="0.22"
                         android:paddingHorizontal="14dp"
                         android:paddingVertical="12dp"
                         android:textAlignment="center"

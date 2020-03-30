@@ -74,14 +74,10 @@ internal class CreateWalletFragment : BaseFragment() {
 
     @BindView(R.id.create_wallet_vw_root)
     lateinit var rootView: View
-    @BindView(R.id.create_wallet_txt_hello)
-    lateinit var helloText: TextView
     @BindView(R.id.create_wallet_txt_just_sec_desc)
     lateinit var justSecDescText: TextView
     @BindView(R.id.create_wallet_txt_just_sec_title)
     lateinit var justSecTitle: TextView
-    @BindView(R.id.create_wallet_vw_hello_text_back)
-    lateinit var helloTextBackView: View
     @BindView(R.id.create_wallet_checkmark_anim)
     lateinit var checkMarkAnim: LottieAnimationView
     @BindView(R.id.create_wallet_txt_wallet_address_desc)
@@ -154,12 +150,19 @@ internal class CreateWalletFragment : BaseFragment() {
     /**
      * Emoji id chunk separator char.
      */
-    @BindString(R.string.emoji_id_chunk_separator_char)
+    @BindString(R.string.emoji_id_chunk_separator)
     lateinit var emojiIdChunkSeparator: String
     @BindString(R.string.create_wallet_your_emoji_id_text_label)
     lateinit var thisIsYourEmojiIdTitle: String
     @BindString(R.string.create_wallet_your_emoji_id_text_label_bold_part)
     lateinit var thisIsYourEmojiIdTitleBoldPart: String
+
+    @BindColor(R.color.black)
+    @JvmField
+    var blackColor = 0
+    @BindColor(R.color.light_gray)
+    @JvmField
+    var lightGrayColor = 0
 
     @Inject
     lateinit var wallet: FFITestWallet
@@ -222,10 +225,13 @@ internal class CreateWalletFragment : BaseFragment() {
         )
 
         bottomSpinnerLottieAnim.alpha = 0f
+
         val emojiId = sharedPrefsWrapper.emojiId!!
-        emojiIdTextView.text = EmojiUtil.getChunkedEmojiId(
+        emojiIdTextView.text = EmojiUtil.getFullEmojiIdSpannable(
             emojiId,
-            emojiIdChunkSeparator
+            emojiIdChunkSeparator,
+            blackColor,
+            lightGrayColor
         )
         OverScrollDecoratorHelper.setUpOverScroll(emojiIdScrollView)
         emojiIdSummaryController = EmojiIdSummaryViewController(emojiIdSummaryView)
@@ -277,7 +283,9 @@ internal class CreateWalletFragment : BaseFragment() {
             override fun onAnimationEnd(animation: Animator?) {
                 super.onAnimationEnd(animation)
                 showBottomSpinner()
-                startInitHelloTextAnimation()
+                justSecDescBackView.visibility = View.VISIBLE
+                justSecTitleBackView.visibility = View.VISIBLE
+                showSecondViewByAnim()
             }
 
             override fun onAnimationStart(animation: Animator?) {
@@ -287,34 +295,6 @@ internal class CreateWalletFragment : BaseFragment() {
             }
         })
         whiteBgViewAnim.start()
-    }
-
-    private fun startInitHelloTextAnimation() {
-        val offset = -helloText.height.toFloat()
-        val helloTextAnim: ObjectAnimator =
-            ObjectAnimator.ofFloat(helloText, View.TRANSLATION_Y, 0f, offset)
-
-        helloTextAnim.duration = CreateEmojiId.helloTextAnimDurationMs
-        helloTextAnim.interpolator = EasingInterpolator(Ease.QUINT_OUT)
-
-        helloTextAnim.addListener(object : AnimatorListenerAdapter() {
-            override fun onAnimationStart(animation: Animator?) {
-                super.onAnimationStart(animation)
-                helloTextBackView.visibility = View.VISIBLE
-                helloText.visibility = View.VISIBLE
-            }
-
-            override fun onAnimationEnd(animation: Animator?) {
-                super.onAnimationEnd(animation)
-                uiHandler.postDelayed({
-                    helloTextBackView.visibility = View.GONE
-                    justSecDescBackView.visibility = View.VISIBLE
-                    justSecTitleBackView.visibility = View.VISIBLE
-                    startSecondViewTextAnimation()
-                }, CreateEmojiId.viewChangeAnimDelayMs)
-            }
-        })
-        helloTextAnim.start()
     }
 
     private fun showBottomSpinner() {
@@ -597,35 +577,11 @@ internal class CreateWalletFragment : BaseFragment() {
                 awesomeTextBackView.visibility = View.VISIBLE
                 createYourEmojiIdLine1TextView.visibility = View.VISIBLE
                 createYourEmojiIdLine2TextView.visibility = View.VISIBLE
-                helloTextBackView.visibility = View.GONE
                 justSecDescBackView.visibility = View.GONE
                 justSecTitleBackView.visibility = View.GONE
             }
         })
         animSet.start()
-    }
-
-    private fun startSecondViewTextAnimation() {
-        val helloTextFadeOutAnim = ValueAnimator.ofFloat(1f, 0f)
-        helloTextFadeOutAnim.duration = CreateEmojiId.shortAlphaAnimDuration
-
-
-
-        helloTextFadeOutAnim.addUpdateListener { valueAnimator: ValueAnimator ->
-            val alpha = valueAnimator.animatedValue as Float
-            helloText.alpha = alpha
-        }
-
-        helloTextFadeOutAnim.addListener(object : AnimatorListenerAdapter() {
-            override fun onAnimationEnd(animation: Animator?) {
-                helloText.visibility = View.GONE
-            }
-        })
-        helloTextFadeOutAnim.start()
-        uiHandler.postDelayed(
-            { showSecondViewByAnim() },
-            CreateEmojiId.viewOverlapDelayMs
-        )
     }
 
     private fun showSecondViewByAnim() {

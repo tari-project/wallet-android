@@ -32,9 +32,15 @@
  */
 package com.tari.android.wallet.util
 
+import android.text.SpannableString
+import android.text.Spanned
+import android.text.style.ForegroundColorSpan
 import com.ibm.icu.lang.UCharacter
 import com.ibm.icu.lang.UProperty
 import com.ibm.icu.text.BreakIterator
+import com.tari.android.wallet.extension.applyColorStyle
+import com.tari.android.wallet.extension.applyLetterSpacingStyle
+import com.tari.android.wallet.extension.applyRelativeTextSizeStyle
 
 /**
  * String code points as list.
@@ -154,48 +160,6 @@ internal class EmojiUtil {
     companion object {
 
         /**
-         * @return a shortened 12-character emoji id, consisting
-         * of the first, middle and last 4 characters concatenated.
-         * Null if the input is not an emoji id.
-         */
-        fun getShortenedEmojiId(emojiId: String): String? {
-            if (emojiId.numberOfEmojis() < Constants.Wallet.emojiIdLength
-                || emojiId.containsNonEmoji()
-            ) {
-                return null
-            }
-            val emojiIds = ArrayList<String>()
-            var currentIndex = 0
-            // prep the iterator
-            val it: BreakIterator = BreakIterator.getCharacterInstance()
-            it.setText(emojiId)
-            var previous = 0
-            while (it.next() != BreakIterator.DONE) {
-                val builder = StringBuilder()
-                for (i in previous until it.current()) {
-                    builder.append(emojiId[i])
-                    currentIndex++
-                }
-                emojiIds.add(builder.toString())
-                previous = it.current()
-            }
-            val startChunk =
-                emojiIds.take(Constants.Wallet.emojiFormatterChunkSize).joinToString("")
-
-            val middleChunkStartIndex =
-                Constants.Wallet.emojiIdLength / 2 - Constants.Wallet.emojiFormatterChunkSize / 2
-            val middleChunk = emojiIds.subList(
-                middleChunkStartIndex,
-                middleChunkStartIndex + Constants.Wallet.emojiFormatterChunkSize
-            ).joinToString("")
-
-            val endChunk =
-                emojiIds.takeLast(Constants.Wallet.emojiFormatterChunkSize).joinToString("")
-
-            return startChunk + middleChunk + endChunk
-        }
-
-        /**
          * Masking-related: get the indices of current chunk separators.
          *
          * @param string possibly chunked string
@@ -288,14 +252,63 @@ internal class EmojiUtil {
             return -1
         }
 
-        fun getChunkedEmojiId(emojiId: String, separator: String): String {
+        private fun getChunkedEmojiId(emojiId: String, separator: String): String {
             // make chunks
             val separatorIndices = getNewChunkSeparatorIndices(emojiId)
             val builder = java.lang.StringBuilder(emojiId)
             for ((i, index) in separatorIndices.iterator().withIndex()) {
-                builder.insert((index + i), separator)
+                builder.insert((index + i * separator.length), separator)
             }
             return builder.toString()
+        }
+
+        fun getChunkSeparatorSpannable(
+            separator: String,
+            color: Int
+        ): SpannableString {
+            val spannable = SpannableString(separator)
+            spannable.setSpan(
+                ForegroundColorSpan(color),
+                0,
+                separator.length,
+                Spanned.SPAN_INTERMEDIATE
+            )
+            spannable.applyRelativeTextSizeStyle(
+                separator,
+                Constants.UI.emojiIdChunkSeparatorRelativeScale
+            )
+            spannable.applyLetterSpacingStyle(
+                separator,
+                Constants.UI.emojiIdChunkSeparatorLetterSpacing
+            )
+            return spannable
+        }
+
+        fun getFullEmojiIdSpannable(
+            emojiId: String,
+            separator: String,
+            darkColor: Int,
+            lightColor: Int
+        ): SpannableString {
+            val spannable = getChunkedEmojiId(
+                emojiId,
+                separator
+            ).applyColorStyle(
+                darkColor,
+                separator,
+                lightColor,
+                applyToOnlyFirstOccurence = false
+            )
+            spannable.applyLetterSpacingStyle(
+                separator,
+                Constants.UI.emojiIdChunkSeparatorLetterSpacing
+            )
+            spannable.applyRelativeTextSizeStyle(
+                separator,
+                Constants.UI.emojiIdChunkSeparatorRelativeScale,
+                applyToOnlyFirstOccurence = false
+            )
+            return spannable
         }
 
     }

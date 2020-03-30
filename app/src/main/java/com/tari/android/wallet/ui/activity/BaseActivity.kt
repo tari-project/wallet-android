@@ -53,7 +53,6 @@ internal abstract class BaseActivity : AppCompatActivity() {
 
     abstract val contentViewId: Int
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val component = (application as TariWalletApplication).appComponent

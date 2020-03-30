@@ -101,6 +101,13 @@ internal object UiUtil {
         }
     }
 
+    fun getWidth(
+        @NonNull view: View
+    ): Int {
+        val layoutParams = view.layoutParams as ViewGroup.MarginLayoutParams
+        return layoutParams.width
+    }
+
     fun getHeight(
         @NonNull view: View
     ): Int {

@@ -160,8 +160,9 @@ internal class TxDetailActivity :
     /**
      * Emoji id chunk separator char.
      */
-    @BindString(R.string.emoji_id_chunk_separator_char)
+    @BindString(R.string.emoji_id_chunk_separator)
     lateinit var emojiIdChunkSeparator: String
+
     @JvmField
     @BindString(R.string.tx_detail_payment_received)
     var paymentReceived = ""
@@ -187,6 +188,12 @@ internal class TxDetailActivity :
     @JvmField
     @BindColor(R.color.black)
     var contactLabelTxtBlackColor = 0
+    @BindColor(R.color.black)
+    @JvmField
+    var blackColor = 0
+    @BindColor(R.color.light_gray)
+    @JvmField
+    var lightGrayColor = 0
 
     @BindDimen(R.dimen.add_amount_element_text_size)
     @JvmField
@@ -340,9 +347,11 @@ internal class TxDetailActivity :
         amountContainer.post { scaleDownAmountTextViewIfRequired() }
 
         OverScrollDecoratorHelper.setUpOverScroll(fullEmojiIdScrollView)
-        fullEmojiIdTextView.text = EmojiUtil.getChunkedEmojiId(
+        fullEmojiIdTextView.text = EmojiUtil.getFullEmojiIdSpannable(
             tx.user.publicKey.emojiId,
-            emojiIdChunkSeparator
+            emojiIdChunkSeparator,
+            blackColor,
+            lightGrayColor
         )
         fullEmojiIdContainerView.visibility = View.GONE
         dimmerViews.forEach { dimmerView -> dimmerView.visibility = View.GONE }
@@ -510,11 +519,11 @@ internal class TxDetailActivity :
         UiUtil.temporarilyDisableClick(view)
         dimmerViews.forEach { dimmerView -> dimmerView.isClickable = false }
         val clipBoard = ContextCompat.getSystemService(this, ClipboardManager::class.java)
-        val deepLinkClipboardData = ClipData.newPlainText(
+        val clipboardData = ClipData.newPlainText(
             "Tari Wallet Emoji Id",
-            EmojiUtil.getChunkedEmojiId(tx.user.publicKey.emojiId, emojiIdChunkSeparator)
+            tx.user.publicKey.emojiId
         )
-        clipBoard?.setPrimaryClip(deepLinkClipboardData)
+        clipBoard?.setPrimaryClip(clipboardData)
         emojiIdCopiedViewController.showEmojiIdCopiedAnim(fadeOutOnEnd = true) {
             hideFullEmojiId(animateCopyEmojiIdButton = false)
         }

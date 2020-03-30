@@ -56,6 +56,9 @@ internal object Constants {
 
         const val scrollDepthShadowViewMaxOpacity = 0.8f
 
+        const val emojiIdChunkSeparatorRelativeScale = 0.9f
+        const val emojiIdChunkSeparatorLetterSpacing = 1f
+
         object Button {
             const val clickScaleAnimFullScale = 1f
             const val clickScaleAnimSmallScale = .88f
@@ -96,8 +99,6 @@ internal object Constants {
         object CreateWallet {
             const val removeFragmentDelayDuration = 1200L
             const val tariTextAnimViewDurationMs = 1600L
-            const val startUpAnimDuration = 1000L
-            const val titleTextAnimDelayDurationMs = 30L
             const val viewContainerFadeOutDurationMs = 800L
         }
 
