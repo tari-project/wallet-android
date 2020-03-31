@@ -33,22 +33,32 @@
 package com.tari.android.wallet.ui.fragment.debug
 
 import android.animation.ObjectAnimator
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
+import android.os.Handler
 import android.view.View
 import android.widget.AdapterView
 import android.widget.Spinner
+import androidx.appcompat.app.AlertDialog
+import androidx.core.content.FileProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import butterknife.BindString
 import butterknife.BindView
+import butterknife.OnClick
 import com.tari.android.wallet.R
 import com.tari.android.wallet.di.WalletModule
-import com.tari.android.wallet.ui.fragment.debug.adapter.LogFileSpinnerAdapter
 import com.tari.android.wallet.ui.fragment.BaseFragment
+import com.tari.android.wallet.ui.fragment.debug.adapter.LogFileSpinnerAdapter
 import com.tari.android.wallet.ui.fragment.debug.adapter.LogListAdapter
+import com.tari.android.wallet.ui.util.UiUtil
 import com.tari.android.wallet.util.Constants
+import com.tari.android.wallet.util.SharedPrefsWrapper
 import com.tari.android.wallet.util.WalletUtil
-import java.io.File
-import java.io.InputStream
+import java.io.*
+import java.util.zip.ZipEntry
+import java.util.zip.ZipOutputStream
 import javax.inject.Inject
 import javax.inject.Named
 
@@ -57,7 +67,7 @@ import javax.inject.Named
  *
  * @author The Tari Development Team
  */
-class DebugLogFragment : BaseFragment(), AdapterView.OnItemSelectedListener {
+internal class DebugLogFragment : BaseFragment(), AdapterView.OnItemSelectedListener {
 
     override val contentViewId = R.layout.fragment_debug_log
 
@@ -66,12 +76,24 @@ class DebugLogFragment : BaseFragment(), AdapterView.OnItemSelectedListener {
     @BindView(R.id.debug_log_recycler_view)
     lateinit var recyclerView: RecyclerView
 
+    @BindString(R.string.ffi_admin_email_address)
+    lateinit var ffiAdminEmailAddress: String
+    @BindString(R.string.common_share)
+    lateinit var sharePrompt: String
+    @BindString(R.string.debug_log_file_size_limit_exceeded_dialog_title)
+    lateinit var fileSizeExceededDialogTitle: String
+    @BindString(R.string.debug_log_file_size_limit_exceeded_dialog_content)
+    lateinit var fileSizeExceededDialogContent: String
+
     @Inject
-    @Named(WalletModule.FieldName.walletFilesDirPath)
-    lateinit var walletFilesDirPath: String
+    @Named(WalletModule.FieldName.walletLogFilesDirPath)
+    lateinit var logFilesDirPath: String
     @Inject
     @Named(WalletModule.FieldName.walletLogFilePath)
-    internal lateinit var logFilePath: String
+    lateinit var logFilePath: String
+
+    @Inject
+    lateinit var sharedPrefsWrapper: SharedPrefsWrapper
 
     /**
      * Log file related vars.
@@ -87,11 +109,14 @@ class DebugLogFragment : BaseFragment(), AdapterView.OnItemSelectedListener {
     private lateinit var recyclerViewAdapter: LogListAdapter
     private lateinit var recyclerViewLayoutManager: RecyclerView.LayoutManager
 
+    private val numberOfLogsFilesToShare = 2
+    private val maxLogZipFileSizeBytes = 25 * 1024 * 1024
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         // read log files
-        logFiles = WalletUtil.getLogFilesFromDirectory(walletFilesDirPath)
+        logFiles = WalletUtil.getLogFilesFromDirectory(logFilesDirPath)
 
         // initialize recycler view
         recyclerViewLayoutManager = LinearLayoutManager(activity)
@@ -130,6 +155,114 @@ class DebugLogFragment : BaseFragment(), AdapterView.OnItemSelectedListener {
         anim.duration = Constants.UI.mediumDurationMs
         anim.startDelay = Constants.UI.shortDurationMs
         anim.start()
+    }
+
+    @OnClick(R.id.debug_log_btn_share)
+    fun showShareLogFilesDialog(view: View) {
+        UiUtil.temporarilyDisableClick(view)
+        val dialogBuilder = AlertDialog.Builder(context ?: return)
+        val dialog = dialogBuilder.setMessage(getString(R.string.debug_log_share_dialog_content))
+            .setCancelable(false)
+            .setPositiveButton(getString(R.string.common_confirm)) { dialog, _ ->
+                dialog.cancel()
+                Thread {
+                    zipAndEmailLogFiles()
+                }.start()
+            }
+            // negative button text and action
+            .setNegativeButton(getString(R.string.exit)) { dialog, _ ->
+                dialog.cancel()
+            }
+            .setTitle(getString(R.string.debug_log_share_dialog_title))
+            .create()
+        dialog.show()
+    }
+
+    private fun zipAndEmailLogFiles() {
+        // delete if zipped file exists
+        val publicKeyHex = sharedPrefsWrapper.publicKeyHexString
+        val zipFile = File(
+            logFilesDirPath,
+            "ffi_logs_${publicKeyHex}.zip"
+        )
+        if (zipFile.exists()) {
+            zipFile.delete()
+        }
+        val fileOut = FileOutputStream(zipFile)
+        // zip!
+        val allLogFiles = WalletUtil.getLogFilesFromDirectory(logFilesDirPath)
+        val logFilesToShare = allLogFiles.take(numberOfLogsFilesToShare)
+        ZipOutputStream(BufferedOutputStream(fileOut)).use { out ->
+            for (file in logFilesToShare) {
+                FileInputStream(file).use { fi ->
+                    BufferedInputStream(fi).use { origin ->
+                        val entry = ZipEntry(file.name)
+                        out.putNextEntry(entry)
+                        origin.copyTo(out, 1024)
+                        origin.close()
+                    }
+                    fi.close()
+                }
+            }
+            out.closeEntry()
+            out.close()
+        }
+        // check zip file size
+        if (zipFile.length() > maxLogZipFileSizeBytes) {
+            zipFile.delete()
+            Handler().post {
+                showFileSizeExceededDialog()
+            }
+        } else {
+            shareLogZipFile(zipFile)
+        }
+    }
+
+    private fun showFileSizeExceededDialog() {
+        val dialogBuilder = AlertDialog.Builder(context ?: return)
+        val dialog = dialogBuilder.setMessage(fileSizeExceededDialogContent)
+            .setCancelable(false)
+            .setPositiveButton(getString(R.string.common_ok)) { dialog, _ ->
+                dialog.cancel()
+            }
+            .setTitle(fileSizeExceededDialogTitle)
+            .create()
+        dialog.show()
+    }
+
+    private fun shareLogZipFile(zipFile: File) {
+        val mContext = context ?: return
+        // file is zipped, create the intent
+        val emailIntent = Intent(Intent.ACTION_SENDTO)
+        val intent = Intent(Intent.ACTION_SEND)
+        emailIntent.data = Uri.parse("mailto:")
+        val zipFileUri = FileProvider.getUriForFile(
+            mContext,
+            "com.tari.android.wallet.files",
+            zipFile
+        )
+        intent.putExtra(Intent.EXTRA_STREAM, zipFileUri)
+        intent.putExtra(
+            Intent.EXTRA_TEXT,
+            "Public Key:\n" + sharedPrefsWrapper.publicKeyHexString + "\n\n"
+                    + "Emoji Id:\n" + sharedPrefsWrapper.emojiId
+        )
+        intent.putExtra(
+            Intent.EXTRA_EMAIL,
+            arrayOf(ffiAdminEmailAddress)
+        )
+        intent.putExtra(
+            Intent.EXTRA_SUBJECT,
+            "FFI Log Files"
+        )
+        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        intent.selector = emailIntent
+        mContext.startActivity(
+            Intent.createChooser(
+                intent,
+                sharePrompt
+            )
+        )
     }
 
 }

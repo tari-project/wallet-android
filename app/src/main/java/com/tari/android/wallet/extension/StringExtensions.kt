@@ -33,13 +33,15 @@
 package com.tari.android.wallet.extension
 
 import android.content.Context
+import android.graphics.Typeface
 import android.text.SpannableString
 import android.text.Spanned
-import android.text.style.CharacterStyle
 import android.text.style.ForegroundColorSpan
+import android.text.style.RelativeSizeSpan
 import android.text.style.URLSpan
 import com.tari.android.wallet.ui.component.CustomFont
 import com.tari.android.wallet.ui.component.CustomTypefaceSpan
+import com.tari.android.wallet.ui.component.LetterSpacingSpan
 
 /**
  * Process the URLs in the given spannable string.
@@ -91,19 +93,19 @@ internal fun String.applyFontStyle(
     spannableString.setSpan(
         CustomTypefaceSpan("", defaultTypeface),
         0,
-        length - 1,
+        length,
         Spanned.SPAN_EXCLUSIVE_INCLUSIVE
     )
-    spannableString.applyStyle(
+    spannableString.applyTypefaceStyle(
         search,
-        CustomTypefaceSpan("", customFont.asTypeface(context)),
+        customFont.asTypeface(context),
         applyToOnlyFirstOccurence
     )
     return spannableString
 }
 
 /**
- * Similar to applyFontStyle above, but applied color instead.
+ * Similar to applyFontStyle above, but applied to color instead.
  */
 internal fun String.applyColorStyle(
     defaultColor: Int,
@@ -115,33 +117,101 @@ internal fun String.applyColorStyle(
     spannableString.setSpan(
         ForegroundColorSpan(defaultColor),
         0,
-        length - 1,
-        Spanned.SPAN_EXCLUSIVE_INCLUSIVE
+        length,
+        Spanned.SPAN_INTERMEDIATE
     )
-    spannableString.applyStyle(
+    spannableString.applyColorStyle(
         search,
-        ForegroundColorSpan(styleColor),
+        styleColor,
         applyToOnlyFirstOccurence
     )
     return spannableString
 }
 
 /**
- * Helper function to apply styles. Please see applyFontStyle and applyColorStyle above
- * for description.
+ * Helper function to apply color style to a spannable string.
  */
-private fun SpannableString.applyStyle(
+private fun SpannableString.applyColorStyle(
     search: String,
-    style: CharacterStyle,
+    color: Int,
     applyToOnlyFirstOccurence: Boolean = false
 ) {
     var index = this.indexOf(search)
     while (index >= 0) {
         setSpan(
-            style,
+            ForegroundColorSpan(color),
             index,
             index + search.length,
-            Spanned.SPAN_EXCLUSIVE_INCLUSIVE
+            Spanned.SPAN_INTERMEDIATE
+        )
+        if (applyToOnlyFirstOccurence) {
+            break
+        }
+        index = this.indexOf(search, index + 1)
+    }
+}
+
+/**
+ * Helper function to apply typeface style to a spannable string.
+ */
+private fun SpannableString.applyTypefaceStyle(
+    search: String,
+    typeface: Typeface,
+    applyToOnlyFirstOccurence: Boolean = false
+) {
+    var index = this.indexOf(search)
+    while (index >= 0) {
+        setSpan(
+            CustomTypefaceSpan("", typeface),
+            index,
+            index + search.length,
+            Spanned.SPAN_INTERMEDIATE
+        )
+        if (applyToOnlyFirstOccurence) {
+            break
+        }
+        index = this.indexOf(search, index + 1)
+    }
+}
+
+/**
+ * Helper function to apply relative text size style to a spannable string.
+ */
+internal fun SpannableString.applyRelativeTextSizeStyle(
+    search: String,
+    relativeTextSize: Float,
+    applyToOnlyFirstOccurence: Boolean = false
+) {
+    var index = this.indexOf(search)
+    while (index >= 0) {
+        setSpan(
+            RelativeSizeSpan(relativeTextSize),
+            index,
+            index + search.length,
+            Spanned.SPAN_INTERMEDIATE
+        )
+        if (applyToOnlyFirstOccurence) {
+            break
+        }
+        index = this.indexOf(search, index + 1)
+    }
+}
+
+/**
+ * Helper function to apply letter spacing to a spannable string.
+ */
+internal fun SpannableString.applyLetterSpacingStyle(
+    search: String,
+    letterSpacing: Float,
+    applyToOnlyFirstOccurence: Boolean = false
+) {
+    var index = this.indexOf(search)
+    while (index >= 0) {
+        setSpan(
+            LetterSpacingSpan(letterSpacing),
+            index,
+            index + search.length,
+            Spanned.SPAN_INTERMEDIATE
         )
         if (applyToOnlyFirstOccurence) {
             break

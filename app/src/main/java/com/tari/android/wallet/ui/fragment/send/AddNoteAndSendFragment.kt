@@ -118,7 +118,7 @@ class AddNoteAndSendFragment(private val walletService: TariWalletService) : Bas
     /**
      * Emoji id chunk separator char.
      */
-    @BindString(R.string.emoji_id_chunk_separator_char)
+    @BindString(R.string.emoji_id_chunk_separator)
     lateinit var emojiIdChunkSeparator: String
     /**
      * Dimmer and click blocker views.
@@ -151,6 +151,12 @@ class AddNoteAndSendFragment(private val walletService: TariWalletService) : Bas
     @BindColor(R.color.add_note_prompt_passive_color)
     @JvmField
     var promptPassiveColor = 0
+    @BindColor(R.color.black)
+    @JvmField
+    var blackColor = 0
+    @BindColor(R.color.light_gray)
+    @JvmField
+    var lightGrayColor = 0
 
     @Inject
     lateinit var tracker: Tracker
@@ -265,7 +271,12 @@ class AddNoteAndSendFragment(private val walletService: TariWalletService) : Bas
         emojiIdSummaryContainerView.visibility = View.VISIBLE
         emojiIdSummaryController.display(emojiId)
         titleTextView.visibility = View.GONE
-        fullEmojiIdTextView.text = EmojiUtil.getChunkedEmojiId(emojiId, emojiIdChunkSeparator)
+        fullEmojiIdTextView.text = EmojiUtil.getFullEmojiIdSpannable(
+            emojiId,
+            emojiIdChunkSeparator,
+            blackColor,
+            lightGrayColor
+        )
     }
 
     @OnClick(R.id.add_note_and_send_btn_back)
@@ -364,10 +375,6 @@ class AddNoteAndSendFragment(private val walletService: TariWalletService) : Bas
     private fun hideFullEmojiId(animateCopyEmojiIdButton: Boolean = true, animated: Boolean) {
         if (!animated) {
             fullEmojiIdContainerView.visibility = View.GONE
-            fullEmojiIdTextView.text = EmojiUtil.getChunkedEmojiId(
-                recipientUser.publicKey.emojiId,
-                emojiIdChunkSeparator
-            )
             dimmerView.visibility = View.GONE
             copyEmojiIdButtonContainerView.visibility = View.GONE
             return
@@ -445,11 +452,11 @@ class AddNoteAndSendFragment(private val walletService: TariWalletService) : Bas
         dimmerView.isClickable = false
         val mActivity = activity ?: return
         val clipBoard = ContextCompat.getSystemService(mActivity, ClipboardManager::class.java)
-        val deepLinkClipboardData = ClipData.newPlainText(
+        val clipboardData = ClipData.newPlainText(
             "Tari Wallet Emoji Id",
-            EmojiUtil.getChunkedEmojiId(recipientUser.publicKey.emojiId, emojiIdChunkSeparator)
+            recipientUser.publicKey.emojiId
         )
-        clipBoard?.setPrimaryClip(deepLinkClipboardData)
+        clipBoard?.setPrimaryClip(clipboardData)
         emojiIdCopiedViewController.showEmojiIdCopiedAnim(fadeOutOnEnd = true) {
             hideFullEmojiId(animateCopyEmojiIdButton = false, animated = true)
         }

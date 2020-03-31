@@ -9,7 +9,9 @@
     <dimen name="common_horizontal_margin">25dp</dimen>
     <dimen name="common_copy_emoji_id_button_visible_bottom_margin">-56dp</dimen>
 
-    <!-- emoji id summary -->
+    <!-- emoji id & emoji id summary -->
+    <dimen name="onboarding_emoji_id_container_horizontal_padding">12dp</dimen>
+    <dimen name="onboarding_emoji_id_container_vertical_padding">14dp</dimen>
     <dimen name="emoji_id_container_horizontal_padding">14dp</dimen>
     <dimen name="emoji_id_container_vertical_padding">10dp</dimen>
     <dimen name="emoji_id_summary_letter_spacing">3dp</dimen>
@@ -17,9 +19,18 @@
     <!-- bottom dialog -->
     <dimen name="bottom_dialog_margin">15dp</dimen>
     <dimen name="bottom_dialog_horizontal_padding">10dp</dimen>
+    
+    <!-- debug -->
+    <dimen name="log_item_height">42dp</dimen>
 
     <!-- onboarding -->
     <dimen name="onboarding_see_full_emoji_id_button_visible_top_margin">-56dp</dimen>
+    <!-- introduction -->
+    <dimen name="introduction_tari_logo_initial_margin_top">40dp</dimen>
+    <dimen name="introduction_create_wallet_button_margin_top">30dp</dimen>
+    <dimen name="introduction_user_agreement_and_privacy_policy_margin_top">20dp</dimen>
+    <dimen name="introduction_small_gem_margin_top">20dp</dimen>
+    <dimen name="introduction_network_margin_bottom">30dp</dimen>
 
     <!-- home -->
     <dimen name="home_top_content_container_view_top_margin">45dp</dimen>

@@ -12,6 +12,8 @@
     <color name="white">#FFFFFF</color>
     <color name="transparent">#00000000</color>
     <color name="purple">#8931FF</color>
+    <color name="dark_gray">#7F8599</color>
+    <color name="light_gray">#3A000000</color>
 
     <!-- common gradient button -->
     <color name="gradient_btn_start">#7300ff</color>
@@ -47,7 +49,6 @@
     <color name="home_tx_message">#A9AFC4</color>
     <color name="home_tx_section_header_title">#B2B2B2</color>
     <color name="home_black_overlay">#FF000000</color>
-    <color name="dark_gray">#7F8599</color>
     <color name="create_emoji_id_bg">#f6f6f6</color>
     <color name="wallet_splash_desc_text">#CCFFFFFF</color>
 

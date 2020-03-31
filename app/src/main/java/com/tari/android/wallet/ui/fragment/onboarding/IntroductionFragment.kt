@@ -41,7 +41,6 @@ import android.text.method.LinkMovementMethod
 import android.view.View
 import android.view.ViewTreeObserver
 import android.widget.*
-import androidx.core.view.marginTop
 import butterknife.*
 import com.airbnb.lottie.LottieAnimationView
 import com.daasuu.ei.Ease
@@ -57,6 +56,7 @@ import org.matomo.sdk.Tracker
 import org.matomo.sdk.extra.TrackHelper
 import java.lang.ref.WeakReference
 import javax.inject.Inject
+import kotlin.math.min
 
 /**
  * onBoarding flow : wallet introduction screen.
@@ -70,29 +70,25 @@ internal class IntroductionFragment : BaseFragment() {
     @BindView(R.id.introduction_anim_tari)
     lateinit var tariWalletLottieAnimationView: LottieAnimationView
     @BindView(R.id.create_wallet_vw_root)
-    lateinit var rootView: FrameLayout
-    @BindView(R.id.introduction_txt_title_line_1)
-    lateinit var titleTextLine1: TextView
-    @BindView(R.id.introduction_txt_title_line_2)
-    lateinit var titleTextLine2: TextView
-    @BindView(R.id.introduction_txt_desc)
-    lateinit var walletDescText: TextView
+    lateinit var rootView: View
+    @BindView(R.id.introduction_txt_header)
+    lateinit var headerTextView: TextView
     @BindView(R.id.introduction_btn_create_wallet)
     lateinit var createWalletButton: TextView
     @BindView(R.id.introduction_btn_layout)
     lateinit var walletBtnLayout: FrameLayout
-    @BindView(R.id.introduction_vw_container)
-    lateinit var viewContainer: RelativeLayout
     @BindView(R.id.introduction_txt_testnet)
     lateinit var testnetTextView: TextView
     @BindView(R.id.introduction_img_small_gem)
     lateinit var smallGemImageView: ImageView
     @BindView(R.id.introduction_prog_create_wallet)
     lateinit var progressBar: ProgressBar
+    @BindView(R.id.introduction_vw_video_outer_container)
+    lateinit var videoOuterContainer: View
+    @BindView(R.id.introduction_vw_video_inner_container)
+    lateinit var videoInnerContainer: View
     @BindView(R.id.introduction_video_view)
     lateinit var videoView: VideoView
-    @BindView(R.id.introduction_vw_video_container)
-    lateinit var videoContainer: FrameLayout
     @BindView(R.id.introduction_txt_user_agreement_and_privacy_policy)
     lateinit var userAgreementAndPrivacyPolicyTextView: TextView
 
@@ -132,8 +128,6 @@ internal class IntroductionFragment : BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setupUi()
-        UiUtil.setProgressBarColor(progressBar, whiteColor)
-
         TrackHelper.track()
             .screen("/onboarding/introduction")
             .title("Onboarding - Introduction")
@@ -152,27 +146,35 @@ internal class IntroductionFragment : BaseFragment() {
         listener = null
     }
 
-    override fun onStart() {
-        super.onStart()
-        videoView.setVideoURI(context!!.getResourceUri(R.raw.purple_orb))
-        videoView.setOnPreparedListener { mp -> mp.isLooping = true }
-        videoView.start()
-    }
-
     override fun onStop() {
         super.onStop()
-        videoView.stopPlayback()
         handler.removeCallbacksAndMessages(null)
     }
 
+    private var videoViewHasBeenSetup = false
+    private var videoViewLastPosition = 0
+
+    override fun onStart() {
+        super.onStart()
+        if (videoViewHasBeenSetup) {
+            startVideo()
+        }
+    }
+
+    override fun onPause() {
+        videoViewLastPosition = videoView.currentPosition
+        videoView.stopPlayback()
+        super.onPause()
+    }
+
     private fun setupUi() {
+        UiUtil.setProgressBarColor(progressBar, whiteColor)
+
         tariWalletLottieAnimationView.alpha = 0f
         testnetTextView.alpha = 0f
         smallGemImageView.alpha = 0f
         walletBtnLayout.alpha = 0f
-        walletDescText.alpha = 0f
-        titleTextLine1.alpha = 0f
-        titleTextLine2.alpha = 0f
+        headerTextView.alpha = 0f
         userAgreementAndPrivacyPolicyTextView.alpha = 0f
 
         // highlight links
@@ -194,23 +196,52 @@ internal class IntroductionFragment : BaseFragment() {
             object : ViewTreeObserver.OnGlobalLayoutListener {
                 override fun onGlobalLayout() {
                     rootView.viewTreeObserver.removeOnGlobalLayoutListener(this)
-                    setVideoDimension()
                     runStartupAnimation()
+                    setupAndStartVideo()
                 }
             })
     }
 
-    private fun setVideoDimension() {
-        val rootWidth = rootView.width
-        val viewHeight =
-            titleTextLine1.top - titleTextLine1.height - cryptoTitleTextLine1BottomMargin
-        val viewWidth = rootWidth.coerceAtMost(viewHeight) - tariWalletLottieAnimationView.top
-        val lp: FrameLayout.LayoutParams =
-            videoContainer.layoutParams as FrameLayout.LayoutParams
+    private fun setupAndStartVideo() {
+        val size = min(
+            videoOuterContainer.width,
+            videoOuterContainer.height
+        )
+        UiUtil.setWidthAndHeight(
+            videoInnerContainer,
+            size, size
+        )
+        videoView.setVideoURI(context!!.getResourceUri(R.raw.purple_orb))
+        startVideo()
+        videoViewHasBeenSetup = true
+    }
 
-        lp.width = viewWidth
-        lp.height = viewHeight - videoContainer.marginTop
-        videoContainer.layoutParams = lp
+    private fun startVideo() {
+        videoView.setOnPreparedListener { mp ->
+            mp.isLooping = true
+            videoView.start()
+            videoView.seekTo(videoViewLastPosition)
+        }
+    }
+
+    private fun runStartupAnimation() {
+        val headerHeight = headerTextView.measuredHeight
+        val anim = ValueAnimator.ofFloat(0f, 1f)
+        anim.addUpdateListener { valueAnimator: ValueAnimator ->
+            val value = valueAnimator.animatedValue as Float
+            tariWalletLottieAnimationView.alpha = value
+            testnetTextView.alpha = value
+            smallGemImageView.alpha = value
+            walletBtnLayout.alpha = value
+            headerTextView.alpha = value
+            userAgreementAndPrivacyPolicyTextView.alpha = value
+            headerTextView.translationY = (1f - value) * headerHeight
+        }
+
+        anim.startDelay = Constants.UI.shortDurationMs
+        anim.duration = Constants.UI.longDurationMs
+        anim.interpolator = EasingInterpolator(Ease.SINE_IN_OUT)
+        anim.start()
     }
 
     @OnClick(R.id.introduction_btn_create_wallet)
@@ -222,40 +253,6 @@ internal class IntroductionFragment : BaseFragment() {
             { wr.get()?.startTariWalletViewAnimation() },
             createWalletArtificalDelay
         )
-    }
-
-    private fun runStartupAnimation() {
-        val showTariTextFadeInAnim = ValueAnimator.ofFloat(0f, 1f)
-        showTariTextFadeInAnim.addUpdateListener { valueAnimator: ValueAnimator ->
-            val alpha = valueAnimator.animatedValue as Float
-            tariWalletLottieAnimationView.alpha = alpha
-            testnetTextView.alpha = alpha
-            smallGemImageView.alpha = alpha
-            walletBtnLayout.alpha = alpha
-            walletDescText.alpha = alpha
-            titleTextLine1.alpha = alpha
-            titleTextLine2.alpha = alpha
-            userAgreementAndPrivacyPolicyTextView.alpha = alpha
-        }
-
-        val offset =
-            -(titleTextLine1.height.toFloat() + cryptoTitleTextLine1BottomMargin)
-        val mainTextAnim1: ObjectAnimator =
-            ObjectAnimator.ofFloat(titleTextLine1, View.TRANSLATION_Y, 0f, offset)
-        val mainTextAnim2: ObjectAnimator =
-            ObjectAnimator.ofFloat(titleTextLine2, View.TRANSLATION_Y, 0f, offset)
-
-        mainTextAnim2.startDelay = Constants.UI.CreateWallet.titleTextAnimDelayDurationMs
-
-        val mainTextAnimSet = AnimatorSet()
-        mainTextAnimSet.playTogether(mainTextAnim1, mainTextAnim2)
-        mainTextAnimSet.interpolator = EasingInterpolator(Ease.SINE_OUT)
-
-        val animSet = AnimatorSet()
-        animSet.startDelay = Constants.UI.shortDurationMs
-        animSet.playTogether(showTariTextFadeInAnim, mainTextAnimSet)
-        animSet.duration = Constants.UI.CreateWallet.startUpAnimDuration
-        animSet.start()
     }
 
     private fun startTariWalletViewAnimation() {
@@ -290,21 +287,26 @@ internal class IntroductionFragment : BaseFragment() {
             tariWalletLottieAnimationView.scale = scale
         }
 
-        val fadeOutViewAnim = ValueAnimator.ofFloat(1f, 0f)
-        fadeOutViewAnim.duration = Constants.UI.CreateWallet.viewContainerFadeOutDurationMs
-        fadeOutViewAnim.addUpdateListener { valueAnimator: ValueAnimator ->
+        val fadeOutAnim = ValueAnimator.ofFloat(1f, 0f)
+        fadeOutAnim.duration = Constants.UI.CreateWallet.viewContainerFadeOutDurationMs
+        fadeOutAnim.addUpdateListener { valueAnimator: ValueAnimator ->
             val alpha = valueAnimator.animatedValue as Float
-            viewContainer.alpha = alpha
-            videoContainer.alpha = alpha
+            videoOuterContainer.alpha = alpha
+            headerTextView.alpha = alpha
+            walletBtnLayout.alpha = alpha
+            userAgreementAndPrivacyPolicyTextView.alpha = alpha
         }
-        fadeOutViewAnim.addListener(object : AnimatorListenerAdapter() {
+        fadeOutAnim.addListener(object : AnimatorListenerAdapter() {
             override fun onAnimationEnd(animation: Animator?) {
-                viewContainer.visibility = View.INVISIBLE
+                videoOuterContainer.visibility = View.INVISIBLE
+                headerTextView.visibility = View.INVISIBLE
+                walletBtnLayout.visibility = View.INVISIBLE
+                userAgreementAndPrivacyPolicyTextView.visibility = View.INVISIBLE
             }
         })
 
         val animSet = AnimatorSet()
-        animSet.playTogether(tariViewTranslateAnim, tariViewScaleAnim, fadeOutViewAnim)
+        animSet.playTogether(tariViewTranslateAnim, tariViewScaleAnim, fadeOutAnim)
         animSet.start()
     }
 

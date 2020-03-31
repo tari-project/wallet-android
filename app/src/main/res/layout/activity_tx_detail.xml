@@ -404,7 +404,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="match_parent"
                             android:gravity="center_vertical"
-                            android:letterSpacing="0.27"
+                            android:letterSpacing="0.22"
                             android:paddingHorizontal="12dp"
                             android:textColor="@color/black"
                             android:textSize="14sp" />

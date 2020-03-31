@@ -79,8 +79,15 @@ internal class WalletInfoActivity : BaseActivity() {
     lateinit var shareEmojiIdTitle: String
     @BindString(R.string.wallet_info_share_your_emoji_id_bold_part)
     lateinit var shareEmojiIdTitleBoldPart: String
-    @BindString(R.string.emoji_id_chunk_separator_char)
+    @BindString(R.string.emoji_id_chunk_separator)
     lateinit var emojiIdChunkSeparator: String
+
+    @BindColor(R.color.black)
+    @JvmField
+    var blackColor = 0
+    @BindColor(R.color.light_gray)
+    @JvmField
+    var lightGrayColor = 0
 
     @BindDimen(R.dimen.wallet_info_img_qr_code_size)
     @JvmField
@@ -119,9 +126,12 @@ internal class WalletInfoActivity : BaseActivity() {
         )
         shareEmojiIdTextView.text = styledTitle
 
-        val chunkedEmojiId =
-            EmojiUtil.getChunkedEmojiId(sharedPrefsWrapper.emojiId!!, emojiIdChunkSeparator)
-        emojiIdTextView.text = chunkedEmojiId
+        emojiIdTextView.text = EmojiUtil.getFullEmojiIdSpannable(
+            sharedPrefsWrapper.emojiId!!,
+            emojiIdChunkSeparator,
+            blackColor,
+            lightGrayColor
+        )
 
         val content = WalletUtil.getEmojiIdDeepLink(sharedPrefsWrapper.emojiId!!)
         UiUtil.getQREncodedBitmap(content, qrCodeImageSize)?.let {
@@ -145,11 +155,11 @@ internal class WalletInfoActivity : BaseActivity() {
     fun onCopyEmojiIdClick() {
         UiUtil.temporarilyDisableClick(copyEmojiIdTextView)
         val clipBoard = ContextCompat.getSystemService(this, ClipboardManager::class.java)
-        val deepLinkClipboardData = ClipData.newPlainText(
+        val clipboardData = ClipData.newPlainText(
             "Tari Wallet Emoji Id",
-            EmojiUtil.getChunkedEmojiId(sharedPrefsWrapper.emojiId!!, emojiIdChunkSeparator)
+            sharedPrefsWrapper.emojiId!!
         )
-        clipBoard?.setPrimaryClip(deepLinkClipboardData)
+        clipBoard?.setPrimaryClip(clipboardData)
         emojiIdCopiedViewController.showEmojiIdCopiedAnim(fadeOutOnEnd = true)
     }
 

@@ -73,8 +73,8 @@
             android:background="@drawable/emoji_id_bg"
             android:clickable="true"
             android:focusable="true"
-            android:paddingHorizontal="16dp"
-            android:paddingVertical="12dp">
+            android:paddingHorizontal="@dimen/onboarding_emoji_id_container_horizontal_padding"
+            android:paddingVertical="@dimen/onboarding_emoji_id_container_vertical_padding">
 
             <include
                 android:id="@+id/create_wallet_vw_emoji_id_summary"
@@ -109,9 +109,9 @@
                     android:id="@+id/create_wallet_txt_emoji_id"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:letterSpacing="0.27"
-                    android:paddingHorizontal="16dp"
-                    android:paddingVertical="12dp"
+                    android:letterSpacing="0.22"
+                    android:paddingHorizontal="@dimen/onboarding_emoji_id_container_horizontal_padding"
+                    android:paddingVertical="@dimen/onboarding_emoji_id_container_vertical_padding"
                     android:textColor="@color/black"
                     android:textSize="17sp" />
             </HorizontalScrollView>
@@ -261,30 +261,6 @@
                 android:layout_below="@id/create_wallet_txt_just_sec_title"
                 android:layout_gravity="center"
                 android:layout_marginTop="4dp"
-                android:background="@color/create_emoji_id_bg"
-                android:visibility="invisible" />
-
-            <com.tari.android.wallet.ui.component.CustomFontTextView
-                android:id="@+id/create_wallet_txt_hello"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginTop="68dp"
-                android:background="@color/create_emoji_id_bg"
-                android:gravity="center"
-                android:letterSpacing="0.01"
-                android:text="@string/create_wallet_hello_friend_label"
-                android:textColor="@color/black"
-                android:textSize="18sp"
-                android:visibility="invisible"
-                app:customFont="AVENIR_LT_STD_BLACK" />
-
-            <View
-                android:id="@+id/create_wallet_vw_hello_text_back"
-                android:layout_width="match_parent"
-                android:layout_height="30dp"
-                android:layout_gravity="center"
-                android:layout_marginTop="68dp"
                 android:background="@color/create_emoji_id_bg"
                 android:visibility="invisible" />
 

@@ -6,6 +6,7 @@
 
     <!-- URLs, etc -->
     <string name="ttl_store_url" translatable="false">https://store.tarilabs.com</string>
+    <string name="ffi_admin_email_address" translatable="false">simian@tari.com</string>
 
     <!-- digits -->
     <string name="digit_0">0</string>
@@ -61,13 +62,15 @@
     <string name="common_save">Save</string>
     <string name="common_cancel">Cancel</string>
     <string name="common_ok">OK</string>
+    <string name="common_confirm">Confirm</string>
+    <string name="common_share">Share</string>
 
     <!-- emoji id copied view -->
     <string name="emoji_id_copied">Copied</string>
 
     <!-- emoji-id-related -->
     <string name="emoji_id_bullet_separator">•••</string>
-    <string name="emoji_id_chunk_separator_char">|</string>
+    <string name="emoji_id_chunk_separator">l</string>
     <string name="copy_emoji_id">Copy Emoji ID</string>
     <string name="paste_emoji_id">Paste copied Emoji ID</string>
     <string name="tap_to_see_full_emoji_id">Tap to see full Emoji ID</string>
@@ -83,14 +86,11 @@
     <string name="second_testnet_utxo_tx_message">Nice work! Here\'s more Tari to fill your coffers. Be sure to hit the Store icon to see real, exclusive items you can redeem with your "hard-earned" testnet Tari.</string>
 
     <!-- onboarding - introduction -->
-    <string name="introduction_crypto_wallet_title_text_line_1">Welcome to</string>
-    <string name="introduction_crypto_wallet_title_text_line_2">Tari Aurora</string>
-    <string name="introduction_wallet_desc">Get ready to send and receive testnet Tari with an easy-to-use crypto wallet that puts privacy first.</string>
+    <string name="introduction_crypto_wallet_title_text_line_1">The future of digital assets starts here.</string>
     <string name="introduction_create_wallet">Create Your Wallet</string>
 
     <!-- onboarding - create wallet -->
     <!-- screen #1 -->
-    <string name="create_wallet_hello_friend_label">Hello, friend.</string>
     <string name="create_wallet_just_a_sec_label" tools:ignore="TypographyEllipsis">Hold on a sec...</string>
     <string name="create_wallet_just_sec_desc_text">We’re creating your wallet.</string>
     <string name="create_wallet_user_agreement_and_privacy_policy">By creating a wallet, you agree to the terms\nof the User Agreement and Privacy Policy</string>
@@ -202,7 +202,13 @@
     <string name="tx_detail_fee_tooltip_desc">The transaction fee is distributed to the thousands of computers who ensure that your Tari transactions are fast and secure.</string>
 
     <!-- debug screens -->
+    <!-- logs -->
     <string name="debug_log_files_title">Logs</string>
+    <string name="debug_log_share_dialog_title">Share</string>
+    <string name="debug_log_share_dialog_content">Please confirm to compress and e-mail your last two FFI log files.</string>
+    <string name="debug_log_file_size_limit_exceeded_dialog_title">File Size Error</string>
+    <string name="debug_log_file_size_limit_exceeded_dialog_content">Cannot send: zipped file is over 25MB.</string>
+    <!-- base node config -->
     <string name="debug_base_node_title">Base Node</string>
     <string name="debug_current_base_node">Current Base Node</string>
     <string name="debug_current_base_node_public_key">Public Key:</string>

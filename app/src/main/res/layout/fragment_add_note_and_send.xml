@@ -85,10 +85,10 @@
             android:layout_marginTop="12dp"
             android:layout_weight="1"
             android:background="@color/transparent"
-            android:lineSpacingExtra="10dp"
             android:gravity="top"
             android:hint="@string/add_note_and_send_hint"
             android:inputType="textMultiLine"
+            android:lineSpacingExtra="10dp"
             android:scrollHorizontally="false"
             android:singleLine="false"
             android:textSize="20sp"
@@ -264,7 +264,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:gravity="center_vertical"
-                    android:letterSpacing="0.27"
+                    android:letterSpacing="0.22"
                     android:paddingHorizontal="12dp"
                     android:textColor="@color/black"
                     android:textSize="14sp" />
@@ -282,8 +282,8 @@
 
             <FrameLayout
                 android:layout_width="match_parent"
-                android:translationZ="7dp"
-                android:layout_height="match_parent">
+                android:layout_height="match_parent"
+                android:translationZ="7dp">
 
                 <include
                     android:id="@+id/add_note_and_send_vw_emoji_id_copied"

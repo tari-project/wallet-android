@@ -128,7 +128,7 @@ class AddRecipientFragment(private val walletService: TariWalletService) : BaseF
     /**
      * Emoji id chunk separator char.
      */
-    @BindString(R.string.emoji_id_chunk_separator_char)
+    @BindString(R.string.emoji_id_chunk_separator)
     lateinit var emojiIdChunkSeparator: String
     @BindString(R.string.add_recipient_invalid_emoji_id)
     lateinit var invalidEmojiIdMessage: String
@@ -148,6 +148,12 @@ class AddRecipientFragment(private val walletService: TariWalletService) : BaseF
     @BindColor(R.color.add_recipient_prog_bar)
     @JvmField
     var progressBarColor = 0
+    @BindColor(R.color.black)
+    @JvmField
+    var blackColor = 0
+    @BindColor(R.color.light_gray)
+    @JvmField
+    var lightGrayColor = 0
 
     @Inject
     lateinit var tracker: Tracker
@@ -301,9 +307,11 @@ class AddRecipientFragment(private val walletService: TariWalletService) : BaseF
      * Displays paste-emoji-id-related views.
      */
     private fun showPasteEmojiIdViews(publicKey: PublicKey) {
-        emojiIdTextView.text = EmojiUtil.getChunkedEmojiId(
+        emojiIdTextView.text = EmojiUtil.getFullEmojiIdSpannable(
             publicKey.emojiId,
-            emojiIdChunkSeparator
+            emojiIdChunkSeparator,
+            blackColor,
+            lightGrayColor
         )
         UiUtil.setBottomMargin(
             emojiIdContainerView,
@@ -753,8 +761,12 @@ class AddRecipientFragment(private val walletService: TariWalletService) : BaseF
             // add separators
             for ((offset, index) in EmojiUtil.getNewChunkSeparatorIndices(textWithoutSeparators)
                 .withIndex()) {
+                val chunkSeparatorSpannable = EmojiUtil.getChunkSeparatorSpannable(
+                    emojiIdChunkSeparator,
+                    lightGrayColor
+                )
                 val target = index + (offset * emojiIdChunkSeparator.length)
-                editable.insert(target, emojiIdChunkSeparator)
+                editable.insert(target, chunkSeparatorSpannable)
             }
             // check if valid emoji - don't search if not
             val numberofEmojis = textWithoutSeparators.numberOfEmojis()
