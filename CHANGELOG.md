@@ -1,5 +1,8 @@
 # Tari Aurora Changelog
 
+## [0.0.23-jniLibs-0.5.0] - 2020-04-01
+- Update JNIlibs to 0.5.0
+
 ## [0.0.22-jniLibs-0.4.1] - 2020-03-31
 * Emoji Id clipboard handling and visual improvements - [#242](https://github.com/tari-project/wallet-android/issues/242), [#206](https://github.com/tari-project/wallet-android/issues/206)
 * UI tweaks - [#241](https://github.com/tari-project/wallet-android/issues/241), [#240](https://github.com/tari-project/wallet-android/issues/240)
