@@ -1,15 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/white"
     android:orientation="vertical">
 
     <LinearLayout
+        android:id="@+id/debug_vw_spinner_container"
         android:layout_width="match_parent"
         android:layout_height="@dimen/log_item_height"
         android:layout_marginHorizontal="@dimen/common_horizontal_margin"
-        android:layout_marginTop="25dp"
+        android:layout_marginTop="@dimen/common_horizontal_margin"
         android:gravity="center_vertical"
         android:orientation="horizontal">
 
@@ -35,8 +36,35 @@
         android:id="@+id/debug_log_recycler_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_below="@id/debug_vw_spinner_container"
         android:background="@color/white"
         android:overScrollMode="never"
         android:scrollbars="vertical" />
 
-</LinearLayout>
+    <ImageButton
+        android:id="@+id/debug_log_btn_scroll_to_top"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_above="@id/debug_log_btn_scroll_to_bottom"
+        android:layout_alignParentEnd="true"
+        android:layout_marginEnd="15dp"
+        android:layout_marginBottom="25dp"
+        android:alpha="0.65"
+        android:background="@drawable/debug_log_arrow_button_bg"
+        android:contentDescription="@null"
+        android:src="@drawable/ic_arrow_up_dark_gray_24dp" />
+
+    <ImageButton
+        android:id="@+id/debug_log_btn_scroll_to_bottom"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginEnd="15dp"
+        android:layout_marginBottom="25dp"
+        android:alpha="0.65"
+        android:background="@drawable/debug_log_arrow_button_bg"
+        android:contentDescription="@null"
+        android:src="@drawable/ic_arrow_down_dark_gray_24dp" />
+
+</RelativeLayout>

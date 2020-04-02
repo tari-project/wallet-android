@@ -43,7 +43,6 @@ import com.orhanobut.logger.AndroidLogAdapter
 import com.orhanobut.logger.Logger
 import com.tari.android.wallet.di.*
 import com.tari.android.wallet.notification.NotificationHelper
-import com.tari.android.wallet.tor.TorProxyManager
 import com.tari.android.wallet.util.SharedPrefsWrapper
 import com.tari.android.wallet.util.WalletUtil
 import net.danlew.android.joda.JodaTimeAndroid
@@ -67,11 +66,11 @@ internal class TariWalletApplication : Application(), LifecycleObserver {
     @Named(WalletModule.FieldName.walletFilesDirPath)
     lateinit var walletFilesDirPath: String
     @Inject
-    lateinit var torProxyManager: TorProxyManager
-    @Inject
     lateinit var notificationHelper: NotificationHelper
     @Inject
     lateinit var tracker: Tracker
+    @Inject
+    lateinit var walletManager: WalletManager
 
     lateinit var appComponent: ApplicationComponent
     private lateinit var sharedPrefsWrapper: SharedPrefsWrapper
@@ -112,15 +111,10 @@ internal class TariWalletApplication : Application(), LifecycleObserver {
 
         ProcessLifecycleOwner.get().lifecycle.addObserver(this)
 
-        /**
-         * Run tor.
-         */
-        Thread {
-            torProxyManager.runTorProxy()
-        }.start()
-
         // user should authenticate every time the app starts up
         sharedPrefsWrapper.isAuthenticated = false
+
+        walletManager.start()
 
         TrackHelper.track().download().identifier(
             DownloadTracker.Extra.ApkChecksum(this)

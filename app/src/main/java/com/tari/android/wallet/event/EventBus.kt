@@ -32,7 +32,10 @@
  */
 package com.tari.android.wallet.event
 
+import com.tari.android.wallet.application.WalletState
+import com.tari.android.wallet.tor.TorProxyState
 import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.subjects.BehaviorSubject
 import io.reactivex.subjects.PublishSubject
 
 /**
@@ -44,10 +47,16 @@ import io.reactivex.subjects.PublishSubject
  *      // op.s
  * }
  */
-object EventBus {
+internal object EventBus {
 
-    val disposables = mutableMapOf<Any, CompositeDisposable>()
+    private val disposables = mutableMapOf<Any, CompositeDisposable>()
     val publishSubject = PublishSubject.create<Any>()
+
+    private val torProxyStateDisposables = mutableMapOf<Any, CompositeDisposable>()
+    var torProxyStateSubject = BehaviorSubject.create<TorProxyState>()
+
+    private val walletStateDisposables = mutableMapOf<Any, CompositeDisposable>()
+    var walletStateSubject = BehaviorSubject.create<WalletState>()
 
     inline fun <reified T : Any> subscribe(subscriber: Any, noinline consumer: (T) -> Unit) {
         val observer = publishSubject.ofType(T::class.java).subscribe(consumer)
@@ -62,4 +71,33 @@ object EventBus {
     }
 
     fun post(event: Any) = publishSubject.onNext(event)
+
+    fun subscribeToTorProxyState(subscriber: Any, consumer: (TorProxyState) -> Unit) {
+        val observer = torProxyStateSubject.ofType(TorProxyState::class.java).subscribe(consumer)
+        val disposable = torProxyStateDisposables[subscriber]
+            ?: CompositeDisposable().apply { torProxyStateDisposables[subscriber] = this }
+        disposable.add(observer)
+    }
+
+    fun unsubscribeFromTorProxyState(subscriber: Any) = torProxyStateDisposables.apply {
+        get(subscriber)?.clear()
+        remove(subscriber)
+    }
+
+    fun postTorProxyState(event: TorProxyState) = torProxyStateSubject.onNext(event)
+
+    fun subscribeToWalletState(subscriber: Any, consumer: (WalletState) -> Unit) {
+        val observer = walletStateSubject.ofType(WalletState::class.java).subscribe(consumer)
+        val disposable = walletStateDisposables[subscriber]
+            ?: CompositeDisposable().apply { walletStateDisposables[subscriber] = this }
+        disposable.add(observer)
+    }
+
+    fun unsubscribeFromWalletState(subscriber: Any) = walletStateDisposables.apply {
+        get(subscriber)?.clear()
+        remove(subscriber)
+    }
+
+    fun postWalletState(event: WalletState) = walletStateSubject.onNext(event)
+
 }

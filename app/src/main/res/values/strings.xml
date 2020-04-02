@@ -6,7 +6,7 @@
 
     <!-- URLs, etc -->
     <string name="ttl_store_url" translatable="false">https://store.tarilabs.com</string>
-    <string name="ffi_admin_email_address" translatable="false">simian@tari.com</string>
+    <string name="ffi_admin_email_address" translatable="false">bug_reports@tari.com</string>
 
     <!-- digits -->
     <string name="digit_0">0</string>
@@ -117,9 +117,13 @@
     <string name="testnet">TESTNET v0.0.23-jniLibs-0.5.0</string>
     <string name="proceed">Proceed</string>
     <string name="exit">Exit</string>
-    <string name="auth_title">Authentication</string>
-    <string name="auth_biometric_prompt">Please use your biometrics to authenticate Tari Wallet.</string>
-    <string name="auth_device_lock_code_prompt">Please use your device lock code to authenticate Tari Wallet.</string>
+    <!-- begin :: dialog -->
+    <string name="onboarding_auth_title">Secure your wallet</string>
+    <string name="onboarding_auth_biometric_prompt">Please enter your biometrics. Tari Aurora will require it each time you open the app.</string>
+    <string name="onboarding_auth_device_lock_code_prompt">Please enter your smartphone\'s screen lock PIN, passcode, or pattern. Tari Aurora will require it each time you open the app.</string>
+    <string name="auth_title">Unlock your wallet</string>
+    <string name="auth_biometric_prompt">Please enter your biometrics to unlock your wallet.</string>
+    <string name="auth_device_lock_code_prompt">Please enter your smartphone\'s screen lock PIN, passcode, or pattern to unlock your wallet.</string>
     <string name="auth_description">Authentication secures your Tari Wallet.</string>
     <string name="auth_not_available_or_canceled_title">Authentication Error</string>
     <string name="auth_not_available_or_canceled_desc">Tari Wallet was not able to authenticate you. Do you still want to proceed?</string>
@@ -132,7 +136,7 @@
     <string name="home_yesterday">Yesterday</string>
     <string name="home_send_tari">Send Tari</string>
     <string name="home_txs">Transactions</string>
-    <string name="home_pending_txs">Pending Transactions</string>
+    <string name="home_pending_txs">In Progress</string>
     <string name="home_hello">Hello!</string>
     <string name="home_setup_is_complete">Your wallet setup is complete.</string>
     <string name="home_you_are_ready_to_explore">You’re ready to start exploring</string>
@@ -173,6 +177,8 @@
 
     <!-- send tari - successful -->
     <!-- Tari amount should be formatted and passed as a string to this format -->
+    <string name="send_tx_sending_info_format" tools:ignore="TypographyEllipsis">Sending %1$s Tari...</string>
+    <string name="send_tx_sending_info_format_bold_part" tools:ignore="TypographyEllipsis">%1$s Tari...</string>
     <string name="send_tx_sucessful_info_format">You just sent %1$s Tari</string>
     <string name="send_tx_sucessful_info_format_bold_part">%1$s Tari</string>
 
@@ -185,11 +191,15 @@
     <string name="wallet_info_qr_code_desc">Transacting in person? Others can scan this QR code from the Tari Aurora App to send you Tari.</string>
     <string name="wallet_info_emoji_id_copied">Your emoji ID is copied.</string>
 
+    <!-- tx failed dialog -->
+    <string name="tx_failed_title">Sorry, you can\'t send Tari to offline users</string>
+    <string name="tx_failed_description">Please make sure your recipient has a reliable internet connection and has the Aurora app open on their device, and then try again. If that doesn\'t work, please verify you have the correct Emoji ID.</string>
+
     <!-- transaction detail -->
     <string name="tx_detail_payment_received">Payment Received</string>
     <string name="tx_detail_payment_sent">Payment Sent</string>
-    <string name="tx_detail_pending_payment_sent">Pending Payment Sent</string>
-    <string name="tx_detail_pending_payment_received">Pending Payment Received</string>
+    <string name="tx_detail_pending_payment_sent">Outgoing Payment In Progress</string>
+    <string name="tx_detail_pending_payment_received">Incoming Payment In Progress</string>
     <string name="tx_detail_contact_name">Contact Name</string>
     <string name="tx_detail_create_contact_hint">Add Contact Name</string>
     <string name="tx_detail_note">Note</string>

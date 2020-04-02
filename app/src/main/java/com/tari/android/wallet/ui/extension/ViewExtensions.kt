@@ -142,5 +142,8 @@ fun ScrollView.scrollToTop() {
  * Scroll to the bottom of the scroll view.
  */
 fun ScrollView.scrollToBottom() {
-    scrollTo(0, height)
+    val lastChild = getChildAt(childCount - 1)
+    val bottom = lastChild.bottom + paddingBottom
+    val delta = bottom - (scrollY+ height)
+    smoothScrollBy(0, delta)
 }

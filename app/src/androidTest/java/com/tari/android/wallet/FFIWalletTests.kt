@@ -39,6 +39,8 @@ package com.tari.android.wallet
 
 import com.orhanobut.logger.Logger
 import com.tari.android.wallet.ffi.*
+import com.tari.android.wallet.model.CompletedTx
+import com.tari.android.wallet.model.PendingInboundTx
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -47,32 +49,32 @@ import java.math.BigInteger
 class FFIWalletTests {
 
     class TestListener : FFIWalletListenerAdapter {
-        override fun onTxBroadcast(completedTxId: BigInteger) {
-            Logger.i("Tx Broadcast :: completed tx id %s", completedTxId.toString())
+        override fun onTxBroadcast(completedTx: CompletedTx) {
+            Logger.i("Tx Broadcast :: completed tx id %s", completedTx.id.toString())
         }
 
-        override fun onTxReceived(pendingInboundTxId: BigInteger) {
-            Logger.i("Tx Received :: pending inbound tx id %s", pendingInboundTxId.toString())
+        override fun onTxReceived(pendingInboundTx: PendingInboundTx) {
+            Logger.i("Tx Received :: pending inbound tx id %s", pendingInboundTx.id.toString())
         }
 
-        override fun onTxReplyReceived(completedTxId: BigInteger) {
-            Logger.i("Tx Reply Received :: completed tx id %s", completedTxId.toString())
+        override fun onTxReplyReceived(completedTx: CompletedTx) {
+            Logger.i("Tx Reply Received :: completed tx id %s", completedTx.id.toString())
         }
 
-        override fun onTxMined(completedTxId: BigInteger) {
-            Logger.i("Tx Mined :: completed tx id: %s", completedTxId.toString())
+        override fun onTxMined(completedTx: CompletedTx) {
+            Logger.i("Tx Mined :: completed tx id: %s", completedTx.id.toString())
         }
 
-        override fun onTxFinalized(completedTxId: BigInteger) {
-            Logger.i("Tx Finalized :: completed tx id: %s", completedTxId.toString())
+        override fun onTxFinalized(completedTx: CompletedTx) {
+            Logger.i("Tx Finalized :: completed tx id: %s", completedTx.id.toString())
         }
 
         override fun onDiscoveryComplete(txId: BigInteger, success: Boolean) {
             Logger.i("Discovery Complete :: tx id %s success %s", txId.toString(), success.toString())
         }
 
-        override fun onBaseNodeSyncComplete(requestId: BigInteger, success: Boolean) {
-            Logger.i("Base Node Sync Complete :: request id %s success %s", requestId.toString(), success.toString())
+        override fun onBaseNodeSyncComplete(rxId: BigInteger, success: Boolean) {
+            Logger.i("Base Node Sync Complete :: request id %s success %s", rxId.toString(), success.toString())
         }
     }
 

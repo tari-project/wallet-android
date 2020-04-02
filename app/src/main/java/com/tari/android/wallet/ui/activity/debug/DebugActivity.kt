@@ -68,6 +68,7 @@ internal class DebugActivity : BaseActivity() {
         super.onCreate(savedInstanceState)
         pagerAdapter = DebugViewPagerAdapter(this)
         viewPager.adapter = pagerAdapter
+        viewPager.offscreenPageLimit = 1
 
         TabLayoutMediator(tabLayout, viewPager) { tab, position ->
 

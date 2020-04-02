@@ -32,18 +32,18 @@
  */
 package com.tari.android.wallet.ui.activity
 
-import android.animation.Animator
-import android.animation.AnimatorListenerAdapter
-import android.animation.AnimatorSet
-import android.animation.ValueAnimator
+import android.animation.*
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.view.View
 import android.widget.ImageView
+import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.biometric.BiometricManager
 import androidx.biometric.BiometricPrompt
+import butterknife.BindColor
 import butterknife.BindString
 import butterknife.BindView
 import com.airbnb.lottie.LottieAnimationView
@@ -51,8 +51,11 @@ import com.daasuu.ei.Ease
 import com.daasuu.ei.EasingInterpolator
 import com.orhanobut.logger.Logger
 import com.tari.android.wallet.R
+import com.tari.android.wallet.application.WalletState
 import com.tari.android.wallet.auth.AuthUtil
+import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.ui.activity.home.HomeActivity
+import com.tari.android.wallet.ui.util.UiUtil
 import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.SharedPrefsWrapper
 import org.matomo.sdk.Tracker
@@ -69,14 +72,19 @@ import javax.inject.Inject
 internal class AuthActivity : BaseActivity(), Animator.AnimatorListener {
 
     private lateinit var biometricPrompt: BiometricPrompt
-    @BindView(R.id.main_img_big_gem)
+
+    @BindView(R.id.auth_vw_root)
+    lateinit var rootView: View
+    @BindView(R.id.auth_img_big_gem)
     lateinit var bigGemImageView: ImageView
-    @BindView(R.id.main_anim_tari)
+    @BindView(R.id.auth_anim_tari)
     lateinit var tariAnimationView: LottieAnimationView
-    @BindView(R.id.main_txt_testnet)
-    lateinit var testnetTextView: TextView
-    @BindView(R.id.main_img_small_gem)
+    @BindView(R.id.auth_txt_network_info)
+    lateinit var networkInfoTextView: TextView
+    @BindView(R.id.auth_img_small_gem)
     lateinit var smallGemImageView: ImageView
+    @BindView(R.id.auth_progress_bar)
+    lateinit var progressBar: ProgressBar
 
     @Inject
     lateinit var context: Context
@@ -90,12 +98,25 @@ internal class AuthActivity : BaseActivity(), Animator.AnimatorListener {
     @BindString(R.string.auth_device_lock_code_prompt)
     lateinit var deviceLockCodePrompt: String
 
+    @BindColor(R.color.white)
+    @JvmField
+    var white = 0
+
+    private var continueIsPendingOnWalletState = false
+
     override val contentViewId = R.layout.activity_auth
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
+
+        EventBus.subscribeToWalletState(this) { walletState ->
+            onWalletStateChanged(walletState)
+        }
+
+        UiUtil.setProgressBarColor(progressBar, white)
+        progressBar.visibility = View.INVISIBLE
+
         // call the animations
         val wr = WeakReference(this)
         bigGemImageView.post { wr.get()?.showTariText() }
@@ -106,8 +127,22 @@ internal class AuthActivity : BaseActivity(), Animator.AnimatorListener {
             .with(tracker)
     }
 
+    override fun onDestroy() {
+        EventBus.unsubscribeFromWalletState(this)
+        super.onDestroy()
+    }
+
     override fun onBackPressed() {
         // no-op
+    }
+
+    private fun onWalletStateChanged(walletState: WalletState) {
+        if (walletState == WalletState.RUNNING && continueIsPendingOnWalletState) {
+            continueIsPendingOnWalletState = false
+            rootView.post {
+                continueToHomeActivity()
+            }
+        }
     }
 
     /**
@@ -116,7 +151,7 @@ internal class AuthActivity : BaseActivity(), Animator.AnimatorListener {
     private fun showTariText() {
         // hide features to be shown after animation
         tariAnimationView.alpha = 0f
-        testnetTextView.alpha = 0f
+        networkInfoTextView.alpha = 0f
         smallGemImageView.alpha = 0f
 
         // define animations
@@ -130,7 +165,7 @@ internal class AuthActivity : BaseActivity(), Animator.AnimatorListener {
         showTariTextAnim.addUpdateListener { valueAnimator: ValueAnimator ->
             val alpha = valueAnimator.animatedValue as Float
             weakReference.get()?.tariAnimationView?.alpha = alpha
-            weakReference.get()?.testnetTextView?.alpha = alpha
+            weakReference.get()?.networkInfoTextView?.alpha = alpha
             weakReference.get()?.smallGemImageView?.alpha = alpha
         }
 
@@ -202,7 +237,6 @@ internal class AuthActivity : BaseActivity(), Animator.AnimatorListener {
         val promptInfo = BiometricPrompt.PromptInfo.Builder()
             .setTitle(getString(R.string.auth_title))
             .setSubtitle(prompt)
-            .setDescription(getString(R.string.auth_description))
             .setDeviceCredentialAllowed(true) // enable passcode (i.e. screenlock)
             .build()
         biometricPrompt.authenticate(promptInfo)
@@ -276,6 +310,16 @@ internal class AuthActivity : BaseActivity(), Animator.AnimatorListener {
     private fun playTariWalletAnim() {
         tariAnimationView.addAnimatorListener(this)
         tariAnimationView.playAnimation()
+
+        val fadeOutAnim = ValueAnimator.ofFloat(1f, 0f)
+        fadeOutAnim.duration = Constants.UI.mediumDurationMs
+        fadeOutAnim.addUpdateListener { valueAnimator: ValueAnimator ->
+            val alpha = valueAnimator.animatedValue as Float
+            smallGemImageView.alpha = alpha
+            networkInfoTextView.alpha = alpha
+        }
+        fadeOutAnim.startDelay = Constants.UI.CreateWallet.introductionBottomViewsFadeOutDelay
+        fadeOutAnim.start()
     }
 
     //region Animator Listener
@@ -292,6 +336,23 @@ internal class AuthActivity : BaseActivity(), Animator.AnimatorListener {
     }
 
     override fun onAnimationEnd(animation: Animator?) {
+        if (EventBus.walletStateSubject.value != WalletState.RUNNING) {
+            continueIsPendingOnWalletState = true
+            progressBar.alpha = 0f
+            progressBar.visibility = View.VISIBLE
+            val alphaAnim = ObjectAnimator.ofFloat(progressBar, View.ALPHA, 0f, 1f)
+            alphaAnim.duration = Constants.UI.mediumDurationMs
+            alphaAnim.start()
+        } else {
+            continueToHomeActivity()
+        }
+    }
+    //endregion Animator Listener
+
+    private fun continueToHomeActivity() {
+        val alphaAnim = ObjectAnimator.ofFloat(progressBar, View.ALPHA, 1f, 0f)
+        alphaAnim.duration = Constants.UI.shortDurationMs
+        alphaAnim.start()
         // go to home activity
         val intent = Intent(this, HomeActivity::class.java)
         intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
@@ -299,6 +360,5 @@ internal class AuthActivity : BaseActivity(), Animator.AnimatorListener {
         // finish this activity
         finish()
     }
-    //endregion Animator Listener
 
 }

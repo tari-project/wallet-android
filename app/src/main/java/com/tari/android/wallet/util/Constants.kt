@@ -100,10 +100,11 @@ internal object Constants {
             const val removeFragmentDelayDuration = 1200L
             const val tariTextAnimViewDurationMs = 1600L
             const val viewContainerFadeOutDurationMs = 800L
+            const val introductionBottomViewsFadeOutDelay = 2900L
         }
 
         object AddAmount {
-            const val numPadDigitEnterAnimDurationMs = 120L
+            const val numPadDigitEnterAnimDurationMs = 90L
         }
 
         object AddNoteAndSend {
@@ -115,7 +116,7 @@ internal object Constants {
         object SendTxSuccessful {
             const val lottieAnimStartDelayMs = 400L
             const val textAppearAnimStartDelayMs = 500L
-            const val textFadeOutAnimStartDelayMs = 4750L
+            const val successfulInfoFadeOutAnimStartDelayMs = 3130L
         }
 
         object Splash {
@@ -126,6 +127,7 @@ internal object Constants {
             const val viewFadeAnimDelayMs = 200L
             const val localAuthAnimDurationMs = 800L
             const val removeFragmentDelayDuration = 1000L
+            const val bottomViewsFadeOutDelay = 2900L
         }
     }
 

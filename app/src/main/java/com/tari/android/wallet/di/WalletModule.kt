@@ -33,8 +33,10 @@
 package com.tari.android.wallet.di
 
 import android.content.Context
-import com.tari.android.wallet.ffi.*
-import com.tari.android.wallet.util.Constants
+import com.tari.android.wallet.application.WalletManager
+import com.tari.android.wallet.tor.TorConfig
+import com.tari.android.wallet.tor.TorProxyManager
+import com.tari.android.wallet.tor.TorProxyMonitor
 import com.tari.android.wallet.util.SharedPrefsWrapper
 import dagger.Module
 import dagger.Provides
@@ -68,7 +70,7 @@ internal class WalletModule {
     @Provides
     @Named(FieldName.walletFilesDirPath)
     @Singleton
-    internal fun provideWalletFilesDirPath(context: Context): String = context.filesDir.absolutePath
+    fun provideWalletFilesDirPath(context: Context): String = context.filesDir.absolutePath
 
     /**
      * The directory in which the wallet log files reside.
@@ -76,7 +78,7 @@ internal class WalletModule {
     @Provides
     @Named(FieldName.walletLogFilesDirPath)
     @Singleton
-    internal fun provideLogFilesDirPath(
+    fun provideLogFilesDirPath(
         @Named(FieldName.walletFilesDirPath) walletFilesDirPath: String
     ): String {
         val logFilesDir = File(walletFilesDirPath, logFilesDirName)
@@ -92,7 +94,7 @@ internal class WalletModule {
     @Provides
     @Named(FieldName.walletLogFilePath)
     @Singleton
-    internal fun provideWalletLogFilePath(@Named(FieldName.walletLogFilesDirPath) logFilesDirPath: String): String {
+    fun provideWalletLogFilePath(@Named(FieldName.walletLogFilesDirPath) logFilesDirPath: String): String {
         val timeStamp = SimpleDateFormat("YYYYMMdd", Locale.getDefault()).format(Date()) +
                 "_${System.currentTimeMillis()}"
         val logFileName = "$logFilePrefix$timeStamp$logFileExtension"
@@ -103,79 +105,24 @@ internal class WalletModule {
         return logFile.absolutePath
     }
 
-    /**
-     * Creates a new private key & stores if it doesn't exist.
-     */
-    private fun getPrivateKeyHexString(sharedPrefsWrapper: SharedPrefsWrapper): HexString {
-        var hexString = sharedPrefsWrapper.privateKeyHexString
-        if (hexString == null) {
-            val privateKeyFFI = FFIPrivateKey()
-            hexString = privateKeyFFI.toString()
-            privateKeyFFI.destroy()
-            sharedPrefsWrapper.privateKeyHexString = hexString
-        }
-        return HexString(hexString)
-    }
-
-    /**
-     * Provides CommsConfig object for wallet configuration.
-     */
     @Provides
     @Singleton
-    internal fun provideCommsConfig(
-        sharedPrefsWrapper: SharedPrefsWrapper,
+    internal fun provideWalletManager(
         @Named(FieldName.walletFilesDirPath) walletFilesDirPath: String,
-        transport: FFITransportType
-    ): FFICommsConfig {
-        return FFICommsConfig(
-            NetAddressString(
-                "127.0.0.1",
-                39069
-            ).toString(),
-            //transport.getAddress(),
-            transport,
-            Constants.Wallet.walletDBName,
-            walletFilesDirPath,
-            FFIPrivateKey((getPrivateKeyHexString(sharedPrefsWrapper)))
-        )
-    }
-
-    /**
-     * Provides wallet object.
-     */
-    @Provides
-    @Singleton
-    internal fun provideTestWallet(
-        commsConfig: FFICommsConfig,
-        @Named(FieldName.walletLogFilePath) logFilePath: String,
+        @Named(FieldName.walletLogFilePath) walletLogFilePath: String,
+        torConfig: TorConfig,
+        torProxyManager: TorProxyManager,
+        torProxyMonitor: TorProxyMonitor,
         sharedPrefsWrapper: SharedPrefsWrapper
-    ): FFITestWallet {
-        if (FFITestWallet.instance == null) {
-            val wallet = FFITestWallet(commsConfig, logFilePath)
-            FFITestWallet.instance = wallet
-
-            // start log file observer
-            LogFileObserver.instance = LogFileObserver(logFilePath)
-            LogFileObserver.instance?.startWatching()
-
-            // set shared preferences values after instantiation
-            val publicKeyFFI = wallet.getPublicKey()
-            sharedPrefsWrapper.publicKeyHexString = publicKeyFFI.toString()
-            sharedPrefsWrapper.emojiId = publicKeyFFI.getEmojiNodeId()
-            publicKeyFFI.destroy()
-
-            // add base node
-            if (sharedPrefsWrapper.baseNodePublicKeyHex == null) {
-                sharedPrefsWrapper.baseNodePublicKeyHex = Constants.Wallet.baseNodePublicKeyHex
-                sharedPrefsWrapper.baseNodeAddress = Constants.Wallet.baseNodeAddress
-
-                val baseNodeKeyFFI = FFIPublicKey(HexString(Constants.Wallet.baseNodePublicKeyHex))
-                val baseNodeAddress = Constants.Wallet.baseNodeAddress
-                wallet.addBaseNodePeer(baseNodeKeyFFI, baseNodeAddress)
-                baseNodeKeyFFI.destroy()
-            }
-        }
-        return FFITestWallet.instance!!
+    ): WalletManager {
+        return WalletManager(
+            walletFilesDirPath,
+            walletLogFilePath,
+            torProxyManager,
+            torProxyMonitor,
+            sharedPrefsWrapper,
+            torConfig
+        )
     }
 
 }

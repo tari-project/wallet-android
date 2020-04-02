@@ -35,6 +35,7 @@ package com.tari.android.wallet.tor
 import android.app.Service
 import android.content.Context
 import com.orhanobut.logger.Logger
+import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.util.SharedPrefsWrapper
 import java.io.BufferedReader
 import java.io.File
@@ -55,6 +56,12 @@ internal class TorProxyManager(
         const val torDataDirectoryName = "tor_data"
     }
 
+    private val appCacheHome = context.getDir(torDataDirectoryName, Service.MODE_PRIVATE)
+
+    init {
+        EventBus.postTorProxyState(TorProxyState.NotReady)
+    }
+
     private fun installTorResources() {
         val torBinPath = sharedPrefsWrapper.torBinPath
         if (torBinPath != null) {
@@ -73,36 +80,49 @@ internal class TorProxyManager(
      * Executes shell command.
      */
     private fun exec(command: String) {
-        try {
-            // execute the command
-            val process = Runtime.getRuntime().exec(command)
-            Logger.d("Tor command executed: %s", command)
-            val response = BufferedReader(
-                InputStreamReader(process.inputStream)
-            ).use(BufferedReader::readText)
-            Logger.d("Tor proxy response: %s", response)
-            process.waitFor()
-            // Tor proxy is down
-            throw RuntimeException("Tor proxy is down.")
-        } catch (e: Throwable) {
-            throw RuntimeException(e)
-        }
+        // execute the command
+        val process = Runtime.getRuntime().exec(command)
+        Logger.d("Tor command executed: %s", command)
+        EventBus.postTorProxyState(TorProxyState.Initializing)
+        val response = BufferedReader(
+            InputStreamReader(process.inputStream)
+        ).use(BufferedReader::readText)
+        Logger.d("Tor proxy response: %s", response)
+        process.waitFor()
+        // Tor proxy is down
+        EventBus.postTorProxyState(TorProxyState.Failed)
     }
 
+    private fun getHashedPassword(password: String): String {
+        val cmd1 = "${sharedPrefsWrapper.torBinPath} DataDirectory ${appCacheHome.absolutePath}" +
+                " --hash-password my-secret"
+        Logger.d("Tor HASH CMD %s", cmd1)
+        val process = Runtime.getRuntime().exec(cmd1)
+        return BufferedReader(
+            InputStreamReader(process.inputStream)
+        ).use(BufferedReader::readText)
+    }
+
+    @Synchronized
     fun runTorProxy() {
-        installTorResources()
-        val appCacheHome = context.getDir(torDataDirectoryName, Service.MODE_PRIVATE)
-        val torCmdString =
-            "${sharedPrefsWrapper.torBinPath} DataDirectory ${appCacheHome.absolutePath} " +
-                    "--allow-missing-torrc --ignore-missing-torrc " +
-                    "--clientonly 1 " +
-                    "--socksport ${torConfig.proxyPort} " +
-                    "--controlport ${torConfig.controlHost}:${torConfig.controlPort} " +
-                    "--CookieAuthentication 1 " +
-                    "--Socks5ProxyUsername ${torConfig.sock5Username} " +
-                    "--Socks5ProxyPassword ${torConfig.sock5Password} " +
-                    "--clientuseipv6 1"
-        exec(torCmdString)
+        try {
+            installTorResources()
+            val torCmdString =
+                "${sharedPrefsWrapper.torBinPath} DataDirectory ${appCacheHome.absolutePath} " +
+                        "--allow-missing-torrc --ignore-missing-torrc " +
+                        "--clientonly 1 " +
+                        "--socksport ${torConfig.proxyPort} " +
+                        "--controlport ${torConfig.controlHost}:${torConfig.controlPort} " +
+                        "--CookieAuthentication 1 " +
+                        "--Socks5ProxyUsername ${torConfig.sock5Username} " +
+                        "--Socks5ProxyPassword ${torConfig.sock5Password} " +
+                        "--clientuseipv6 1 " /* +
+                        "--ClientTransportPlugin \"obfs4 Socks5Proxy ${torConfig.controlHost}:47351\" " +
+                        "--ClientTransportPlugin \"meek_lite Socks5Proxy ${torConfig.controlHost}:47352\"" */
+            exec(torCmdString)
+        } catch (throwable: Throwable) {
+            EventBus.postTorProxyState(TorProxyState.Failed)
+        }
     }
 
 }

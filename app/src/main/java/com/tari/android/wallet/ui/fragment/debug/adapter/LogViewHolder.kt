@@ -38,6 +38,7 @@ import androidx.recyclerview.widget.RecyclerView
 import butterknife.BindView
 import butterknife.ButterKnife
 import com.tari.android.wallet.R
+import com.tari.android.wallet.ffi.LogLevel
 
 /**
  * Displays individual logs.
@@ -110,8 +111,12 @@ class LogViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         }
         // level
         if (level != null && level.isNotEmpty()) {
+            val logLevel = level.trim()
             levelTextView.visibility = View.VISIBLE
-            levelTextView.text = level.trim()
+            levelTextView.text = logLevel
+            levelTextView.setTextColor(
+                LogLevel.from(logLevel).color
+            )
         } else {
             levelTextView.visibility = View.GONE
         }

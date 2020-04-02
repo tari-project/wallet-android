@@ -38,11 +38,11 @@ package com.tari.android.wallet.model
  * @author The Tari Development Team
  */
 enum class Status {
-        TX_NULL_ERROR,
-        COMPLETED,
-        BROADCAST,
-        MINED,
-        IMPORTED,
-        PENDING,
-        UNKNOWN
+    TX_NULL_ERROR,
+    COMPLETED,
+    BROADCAST,
+    MINED,
+    IMPORTED,
+    PENDING,
+    UNKNOWN
 }

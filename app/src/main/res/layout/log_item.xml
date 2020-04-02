@@ -15,9 +15,10 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="#DFDFDF"
+        android:background="@drawable/log_item_bg"
         android:orientation="vertical"
-        android:padding="8dp">
+        android:paddingVertical="14dp"
+        android:paddingHorizontal="10dp">
 
         <com.tari.android.wallet.ui.component.CustomFontTextView
             android:id="@+id/log_item_txt_timestamp"

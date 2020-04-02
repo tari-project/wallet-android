@@ -57,7 +57,7 @@ import com.tari.android.wallet.util.SharedPrefsWrapper
  *
  * @author The Tari Development Team
  */
-class WalletService : Service(), FFIWalletListenerAdapter {
+internal class WalletService : Service(), FFIWalletListenerAdapter {
 
     companion object {
         // notification id
@@ -66,15 +66,15 @@ class WalletService : Service(), FFIWalletListenerAdapter {
     }
 
     @Inject
-    internal lateinit var app: TariWalletApplication
+    lateinit var app: TariWalletApplication
     @Inject
-    internal lateinit var wallet: FFITestWallet
+    lateinit var tariRESTService: TariRESTService
     @Inject
-    internal lateinit var tariRESTService: TariRESTService
+    lateinit var notificationHelper: NotificationHelper
     @Inject
-    internal lateinit var notificationHelper: NotificationHelper
-    @Inject
-    internal lateinit var sharedPrefsWrapper: SharedPrefsWrapper
+    lateinit var sharedPrefsWrapper: SharedPrefsWrapper
+
+    private val wallet = FFIWallet.instance!!
 
     /**
      * Service stub implementation.
@@ -126,56 +126,56 @@ class WalletService : Service(), FFIWalletListenerAdapter {
         super.onDestroy()
     }
 
-    override fun onTxBroadcast(completed: CompletedTx) {
-        Logger.d("Tx ${completed.id} broadcast.")
+    override fun onTxBroadcast(completedTx: CompletedTx) {
+        Logger.d("Tx ${completedTx.id} broadcast.")
         // post event to bus for the internal listeners
-        EventBus.post(Event.Wallet.TxBroadcast(completed))
+        EventBus.post(Event.Wallet.TxBroadcast(completedTx))
         // notify external listeners
         listeners.iterator().forEach {
-            it.onTxBroadcast(completed)
+            it.onTxBroadcast(completedTx)
         }
     }
 
-    override fun onTxMined(completed: CompletedTx) {
-        Logger.d("Tx ${completed.id} mined.")
+    override fun onTxMined(completedTx: CompletedTx) {
+        Logger.d("Tx ${completedTx.id} mined.")
         // post event to bus for the internal listeners
-        EventBus.post(Event.Wallet.TxMined(completed))
+        EventBus.post(Event.Wallet.TxMined(completedTx))
         // notify external listeners
         listeners.iterator().forEach {
-            it.onTxMined(completed)
+            it.onTxMined(completedTx)
         }
     }
 
-    override fun onTxReceived(pendingInbound: PendingInboundTx) {
-        Logger.d("Tx ${pendingInbound.id} received.")
+    override fun onTxReceived(pendingInboundTx: PendingInboundTx) {
+        Logger.d("Tx ${pendingInboundTx.id} received.")
         // post event to bus for the internal listeners
 
-        EventBus.post(Event.Wallet.TxReceived(pendingInbound))
+        EventBus.post(Event.Wallet.TxReceived(pendingInboundTx))
         // manage notifications
-        postTxNotification(pendingInbound)
+        postTxNotification(pendingInboundTx)
         // notify listeners
         listeners.iterator().forEach {
-            it.onTxReceived(pendingInbound)
+            it.onTxReceived(pendingInboundTx)
         }
     }
 
-    override fun onTxReplyReceived(completed: CompletedTx) {
-        Logger.d("Tx ${completed.id} reply received.")
+    override fun onTxReplyReceived(completedTx: CompletedTx) {
+        Logger.d("Tx ${completedTx.id} reply received.")
         // post event to bus for the internal listeners
-        EventBus.post(Event.Wallet.TxReplyReceived(completed))
+        EventBus.post(Event.Wallet.TxReplyReceived(completedTx))
         // notify external listeners
         listeners.iterator().forEach {
-            it.onTxReplyReceived(completed)
+            it.onTxReplyReceived(completedTx)
         }
     }
 
-    override fun onTxFinalized(completed: CompletedTx) {
-        Logger.d("Tx ${completed.id} finalized.")
+    override fun onTxFinalized(completedTx: CompletedTx) {
+        Logger.d("Tx ${completedTx.id} finalized.")
         // post event to bus for the internal listeners
-        EventBus.post(Event.Wallet.TxFinalized(completed))
+        EventBus.post(Event.Wallet.TxFinalized(completedTx))
         // notify external listeners
         listeners.iterator().forEach {
-            it.onTxFinalized(completed)
+            it.onTxFinalized(completedTx)
         }
     }
 

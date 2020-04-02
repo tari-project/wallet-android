@@ -112,9 +112,9 @@ internal interface ApplicationComponent {
      */
     fun inject(service: WalletService)
 
-    /*
+    /**
     * Broadcast receiver
-    * */
+    */
     fun inject(receiver: BootDeviceReceiver)
 
 }

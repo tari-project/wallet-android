@@ -46,6 +46,8 @@ import com.airbnb.lottie.LottieAnimationView
 import com.daasuu.ei.Ease
 import com.daasuu.ei.EasingInterpolator
 import com.tari.android.wallet.R
+import com.tari.android.wallet.application.WalletState
+import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.extension.applyURLStyle
 import com.tari.android.wallet.ui.fragment.BaseFragment
 import com.tari.android.wallet.ui.util.UiUtil
@@ -77,8 +79,8 @@ internal class IntroductionFragment : BaseFragment() {
     lateinit var createWalletButton: TextView
     @BindView(R.id.introduction_btn_layout)
     lateinit var walletBtnLayout: FrameLayout
-    @BindView(R.id.introduction_txt_testnet)
-    lateinit var testnetTextView: TextView
+    @BindView(R.id.introduction_txt_network_info)
+    lateinit var networkInfoTextView: TextView
     @BindView(R.id.introduction_img_small_gem)
     lateinit var smallGemImageView: ImageView
     @BindView(R.id.introduction_prog_create_wallet)
@@ -121,6 +123,9 @@ internal class IntroductionFragment : BaseFragment() {
     private val handler = Handler()
     private val wr = WeakReference(this)
 
+    private var videoViewHasBeenSetup = false
+    private var videoViewLastPosition = 0
+
     private val createWalletArtificalDelay = Constants.UI.CreateWallet.tariTextAnimViewDurationMs
 
     override val contentViewId = R.layout.fragment_introduction
@@ -142,17 +147,15 @@ internal class IntroductionFragment : BaseFragment() {
     }
 
     override fun onDestroy() {
-        super.onDestroy()
+        EventBus.unsubscribeFromWalletState(this)
         listener = null
+        super.onDestroy()
     }
 
     override fun onStop() {
         super.onStop()
         handler.removeCallbacksAndMessages(null)
     }
-
-    private var videoViewHasBeenSetup = false
-    private var videoViewLastPosition = 0
 
     override fun onStart() {
         super.onStart()
@@ -170,8 +173,9 @@ internal class IntroductionFragment : BaseFragment() {
     private fun setupUi() {
         UiUtil.setProgressBarColor(progressBar, whiteColor)
 
+        tariWalletLottieAnimationView.setMaxFrame(205)
         tariWalletLottieAnimationView.alpha = 0f
-        testnetTextView.alpha = 0f
+        networkInfoTextView.alpha = 0f
         smallGemImageView.alpha = 0f
         walletBtnLayout.alpha = 0f
         headerTextView.alpha = 0f
@@ -230,7 +234,7 @@ internal class IntroductionFragment : BaseFragment() {
         anim.addUpdateListener { valueAnimator: ValueAnimator ->
             val value = valueAnimator.animatedValue as Float
             tariWalletLottieAnimationView.alpha = value
-            testnetTextView.alpha = value
+            networkInfoTextView.alpha = value
             smallGemImageView.alpha = value
             walletBtnLayout.alpha = value
             headerTextView.alpha = value
@@ -269,11 +273,12 @@ internal class IntroductionFragment : BaseFragment() {
 
         tariViewTranslateAnim.addListener(object : AnimatorListenerAdapter() {
             override fun onAnimationEnd(animation: Animator?) {
-                tariWalletLottieAnimationView.playAnimation()
-                handler.postDelayed(
-                    { listener?.continueToCreateWallet() },
-                    tariWalletLottieAnimationView.duration  // - Constants.UI.CreateWallet.showCreateEmojiIdWhiteBgDelayMs
-                )
+                playTariWalletLottieAnimation()
+            }
+        })
+        tariWalletLottieAnimationView.addAnimatorListener(object : AnimatorListenerAdapter() {
+            override fun onAnimationEnd(animation: Animator?) {
+                listener?.continueToCreateWallet()
             }
         })
 
@@ -308,6 +313,19 @@ internal class IntroductionFragment : BaseFragment() {
         val animSet = AnimatorSet()
         animSet.playTogether(tariViewTranslateAnim, tariViewScaleAnim, fadeOutAnim)
         animSet.start()
+    }
+
+    private fun playTariWalletLottieAnimation() {
+        tariWalletLottieAnimationView.playAnimation()
+        val fadeOutAnim = ValueAnimator.ofFloat(1f, 0f)
+        fadeOutAnim.duration = Constants.UI.mediumDurationMs
+        fadeOutAnim.addUpdateListener { valueAnimator: ValueAnimator ->
+            val alpha = valueAnimator.animatedValue as Float
+            smallGemImageView.alpha = alpha
+            networkInfoTextView.alpha = alpha
+        }
+        fadeOutAnim.startDelay = Constants.UI.Auth.bottomViewsFadeOutDelay
+        fadeOutAnim.start()
     }
 
     interface Listener {

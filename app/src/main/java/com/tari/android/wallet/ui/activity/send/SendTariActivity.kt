@@ -318,7 +318,7 @@ internal class SendTariActivity : BaseActivity(),
                 fragment,
                 fragment::class.java.simpleName
             )
-            .addToBackStack(AddAmountFragment::class.java.simpleName)
+            .addToBackStack(SendTxSuccessfulFragment::class.java.simpleName)
             .commit()
         currentFragmentWR = WeakReference(fragment)
     }
@@ -332,10 +332,15 @@ internal class SendTariActivity : BaseActivity(),
         recipientUser: User,
         amount: MicroTari,
         fee: MicroTari,
-        note: String
+        note: String,
+        success: Boolean
     ) {
         sendTxIsInProgress = false
-        EventBus.post(Event.Tx.TxSendSuccessful())
+        if (success) {
+            EventBus.post(Event.Tx.TxSendSuccessful())
+        } else {
+            EventBus.post(Event.Tx.TxSendFailed())
+        }
         finish()
         overridePendingTransition(R.anim.fade_in, R.anim.fade_out)
     }

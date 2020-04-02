@@ -32,11 +32,17 @@
  */
 package com.tari.android.wallet.ui.activity.onboarding
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
+import com.orhanobut.logger.Logger
 import com.tari.android.wallet.R
+import com.tari.android.wallet.application.WalletState
 import com.tari.android.wallet.di.WalletModule
+import com.tari.android.wallet.event.EventBus
+import com.tari.android.wallet.ffi.FFIWallet
+import com.tari.android.wallet.tor.TorProxyState
 import com.tari.android.wallet.ui.activity.BaseActivity
 import com.tari.android.wallet.ui.activity.home.HomeActivity
 import com.tari.android.wallet.ui.fragment.onboarding.CreateWalletFragment
@@ -46,6 +52,8 @@ import com.tari.android.wallet.util.Constants.UI.Auth
 import com.tari.android.wallet.util.Constants.UI.CreateWallet
 import com.tari.android.wallet.util.SharedPrefsWrapper
 import com.tari.android.wallet.util.WalletUtil
+import io.reactivex.Observable
+import io.reactivex.schedulers.Schedulers
 import javax.inject.Inject
 import javax.inject.Named
 
@@ -104,12 +112,10 @@ internal class OnboardingFlowActivity : BaseActivity(), IntroductionFragment.Lis
     override fun continueToCreateWallet() {
         sharedPrefsWrapper.onboardingStarted = true
         val createWalletFragment = CreateWalletFragment()
-        runOnUiThread {
-            supportFragmentManager.beginTransaction()
-                .add(R.id.onboarding_fragment_container_2, createWalletFragment)
-                .commitNow()
-            removeContainer1Fragment()
-        }
+        supportFragmentManager.beginTransaction()
+            .add(R.id.onboarding_fragment_container_2, createWalletFragment)
+            .commit()
+        removeContainer1Fragment()
     }
 
     private fun removeContainer1Fragment() {

@@ -5,11 +5,12 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/black"
+    android:id="@+id/auth_vw_root"
     tools:context=".ui.activity.AuthActivity">
 
     <!-- Lottie animation for Tari Wallet text -->
     <com.airbnb.lottie.LottieAnimationView
-        android:id="@+id/main_anim_tari"
+        android:id="@+id/auth_anim_tari"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
@@ -22,7 +23,7 @@
 
     <!-- the big gem to disappear -->
     <ImageView
-        android:id="@+id/main_img_big_gem"
+        android:id="@+id/auth_img_big_gem"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
@@ -32,7 +33,7 @@
 
     <!-- subtitle -->
     <com.tari.android.wallet.ui.component.CustomFontTextView
-        android:id="@+id/main_txt_testnet"
+        android:id="@+id/auth_txt_network_info"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
@@ -42,19 +43,27 @@
         android:text="@string/testnet"
         android:textColor="#c9c9c9"
         android:textSize="9sp"
-        app:customFont="AVENIR_LT_STD_HEAVY" />
+        app:customFont="AVENIR_LT_STD_HEAVY"
+        tools:ignore="SmallSp" />
 
     <!-- small gem -->
     <ImageView
-        android:id="@+id/main_img_small_gem"
+        android:id="@+id/auth_img_small_gem"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_above="@id/main_txt_testnet"
+        android:layout_above="@id/auth_txt_network_info"
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="18dp"
         android:background="@color/black"
         android:contentDescription="@null"
         android:src="@drawable/splash_gem_small" />
 
+    <ProgressBar
+        android:id="@+id/auth_progress_bar"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_centerInParent="true"
+        android:indeterminate="true"
+        android:visibility="visible" />
 
 </RelativeLayout>
