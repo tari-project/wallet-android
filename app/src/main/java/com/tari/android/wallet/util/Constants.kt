@@ -141,9 +141,6 @@ internal object Constants {
         const val walletDBName: String = "tari_wallet_db"
         const val faucetServerUrl = "https://faucet.tari.com"
         const val deepLinkURLPrefix = "tari://"
-        // base node
-        const val baseNodePublicKeyHex = "2e93c460df49d8cfbbf7a06dd9004c25a84f92584f7d0ac5e30bd8e0beee9a43"
-        const val baseNodeAddress = "/onion3/nuuq3e2olck22rudimovhmrdwkmjncxvwdgbvfxhz6myzcnx2j4rssyd:18141"
     }
 
 }

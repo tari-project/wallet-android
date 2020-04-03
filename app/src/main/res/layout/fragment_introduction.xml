@@ -53,14 +53,31 @@
         android:layout_height="wrap_content">
 
         <com.tari.android.wallet.ui.component.CustomFontTextView
-            android:id="@+id/introduction_txt_header"
-            android:layout_width="wrap_content"
+            android:id="@+id/introduction_txt_header_line_top"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@color/black"
             android:gravity="center"
-            android:lineSpacingExtra="10dp"
             android:letterSpacing="0.02"
             android:text="@string/introduction_crypto_wallet_title_text_line_1"
+            android:textColor="@color/white"
+            android:textSize="30sp"
+            app:customFont="AVENIR_LT_STD_BLACK" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_marginHorizontal="@dimen/common_horizontal_margin"
+        android:layout_height="wrap_content">
+
+        <com.tari.android.wallet.ui.component.CustomFontTextView
+            android:id="@+id/introduction_txt_header_line_bottom"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/black"
+            android:gravity="center"
+            android:letterSpacing="0.02"
+            android:text="@string/introduction_crypto_wallet_title_text_line_2"
             android:textColor="@color/white"
             android:textSize="30sp"
             app:customFont="AVENIR_LT_STD_BLACK" />

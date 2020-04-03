@@ -86,7 +86,8 @@
     <string name="second_testnet_utxo_tx_message">Nice work! Here\'s more Tari to fill your coffers. Be sure to hit the Store icon to see real, exclusive items you can redeem with your "hard-earned" testnet Tari.</string>
 
     <!-- onboarding - introduction -->
-    <string name="introduction_crypto_wallet_title_text_line_1">The future of digital assets starts here.</string>
+    <string name="introduction_crypto_wallet_title_text_line_1">Private by default.</string>
+    <string name="introduction_crypto_wallet_title_text_line_2">Useful by design.</string>
     <string name="introduction_create_wallet">Create Your Wallet</string>
 
     <!-- onboarding - create wallet -->
@@ -136,7 +137,7 @@
     <string name="home_yesterday">Yesterday</string>
     <string name="home_send_tari">Send Tari</string>
     <string name="home_txs">Transactions</string>
-    <string name="home_pending_txs">In Progress</string>
+    <string name="home_pending_txs">In Progress Transactions</string>
     <string name="home_hello">Hello!</string>
     <string name="home_setup_is_complete">Your wallet setup is complete.</string>
     <string name="home_you_are_ready_to_explore">You’re ready to start exploring</string>
@@ -198,8 +199,8 @@
     <!-- transaction detail -->
     <string name="tx_detail_payment_received">Payment Received</string>
     <string name="tx_detail_payment_sent">Payment Sent</string>
-    <string name="tx_detail_pending_payment_sent">Outgoing Payment In Progress</string>
-    <string name="tx_detail_pending_payment_received">Incoming Payment In Progress</string>
+    <string name="tx_detail_pending_payment_sent">Payment In Progress</string>
+    <string name="tx_detail_pending_payment_received">Payment In Progress</string>
     <string name="tx_detail_contact_name">Contact Name</string>
     <string name="tx_detail_create_contact_hint">Add Contact Name</string>
     <string name="tx_detail_note">Note</string>
