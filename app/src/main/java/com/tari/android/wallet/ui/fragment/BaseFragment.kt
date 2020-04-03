@@ -45,9 +45,9 @@ import com.tari.android.wallet.ui.fragment.onboarding.CreateWalletFragment
 import com.tari.android.wallet.ui.fragment.onboarding.IntroductionFragment
 import com.tari.android.wallet.ui.fragment.onboarding.LocalAuthFragment
 import com.tari.android.wallet.ui.fragment.send.AddAmountFragment
-import com.tari.android.wallet.ui.fragment.send.AddNoteAndSendFragment
+import com.tari.android.wallet.ui.fragment.send.AddNoteFragment
 import com.tari.android.wallet.ui.fragment.send.AddRecipientFragment
-import com.tari.android.wallet.ui.fragment.send.SendTxSuccessfulFragment
+import com.tari.android.wallet.ui.fragment.send.FinalizeSendTxFragment
 
 /**
  * Base for all fragment classes.
@@ -70,8 +70,8 @@ abstract class BaseFragment : Fragment() {
             is CreateWalletFragment -> component.inject(this)
             is AddRecipientFragment -> component.inject(this)
             is AddAmountFragment -> component.inject(this)
-            is AddNoteAndSendFragment -> component.inject(this)
-            is SendTxSuccessfulFragment -> component.inject(this)
+            is AddNoteFragment -> component.inject(this)
+            is FinalizeSendTxFragment -> component.inject(this)
             is LocalAuthFragment -> component.inject(this)
             is DebugLogFragment -> component.inject(this)
             is BaseNodeConfigFragment -> component.inject(this)

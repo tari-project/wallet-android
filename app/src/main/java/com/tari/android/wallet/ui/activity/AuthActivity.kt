@@ -78,7 +78,7 @@ internal class AuthActivity : BaseActivity(), Animator.AnimatorListener {
     @BindView(R.id.auth_img_big_gem)
     lateinit var bigGemImageView: ImageView
     @BindView(R.id.auth_anim_tari)
-    lateinit var tariAnimationView: LottieAnimationView
+    lateinit var tariWalletLottieAnimationView: LottieAnimationView
     @BindView(R.id.auth_txt_network_info)
     lateinit var networkInfoTextView: TextView
     @BindView(R.id.auth_img_small_gem)
@@ -150,7 +150,7 @@ internal class AuthActivity : BaseActivity(), Animator.AnimatorListener {
      */
     private fun showTariText() {
         // hide features to be shown after animation
-        tariAnimationView.alpha = 0f
+        tariWalletLottieAnimationView.alpha = 0f
         networkInfoTextView.alpha = 0f
         smallGemImageView.alpha = 0f
 
@@ -164,7 +164,7 @@ internal class AuthActivity : BaseActivity(), Animator.AnimatorListener {
         }
         showTariTextAnim.addUpdateListener { valueAnimator: ValueAnimator ->
             val alpha = valueAnimator.animatedValue as Float
-            weakReference.get()?.tariAnimationView?.alpha = alpha
+            weakReference.get()?.tariWalletLottieAnimationView?.alpha = alpha
             weakReference.get()?.networkInfoTextView?.alpha = alpha
             weakReference.get()?.smallGemImageView?.alpha = alpha
         }
@@ -199,7 +199,7 @@ internal class AuthActivity : BaseActivity(), Animator.AnimatorListener {
         // check whether there's at least screen lock
         if (!AuthUtil.isDeviceSecured(this)) {
             // local authentication not available
-            tariAnimationView.post {
+            tariWalletLottieAnimationView.post {
                 wr.get()?.displayAuthNotAvailableDialog()
             }
             return
@@ -248,7 +248,7 @@ internal class AuthActivity : BaseActivity(), Animator.AnimatorListener {
     private fun authSuccessful() {
         sharedPrefsWrapper.isAuthenticated = true
         val wr = WeakReference(this)
-        wr.get()?.tariAnimationView?.post {
+        wr.get()?.tariWalletLottieAnimationView?.post {
             wr.get()?.playTariWalletAnim()
         }
     }
@@ -274,7 +274,7 @@ internal class AuthActivity : BaseActivity(), Animator.AnimatorListener {
                 dialog.cancel()
                 // user has chosen to proceed without authentication
                 sharedPrefsWrapper.isAuthenticated = true
-                wr.get()?.tariAnimationView?.post {
+                wr.get()?.tariWalletLottieAnimationView?.post {
                     wr.get()?.playTariWalletAnim()
                 }
             }
@@ -308,8 +308,8 @@ internal class AuthActivity : BaseActivity(), Animator.AnimatorListener {
      * Plays Tari Wallet text anim.
      */
     private fun playTariWalletAnim() {
-        tariAnimationView.addAnimatorListener(this)
-        tariAnimationView.playAnimation()
+        tariWalletLottieAnimationView.addAnimatorListener(this)
+        tariWalletLottieAnimationView.playAnimation()
 
         val fadeOutAnim = ValueAnimator.ofFloat(1f, 0f)
         fadeOutAnim.duration = Constants.UI.mediumDurationMs

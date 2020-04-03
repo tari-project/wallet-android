@@ -61,8 +61,8 @@ import com.tari.android.wallet.ui.activity.BaseActivity
 import com.tari.android.wallet.ui.fragment.BaseFragment
 import com.tari.android.wallet.ui.fragment.send.AddRecipientFragment
 import com.tari.android.wallet.ui.fragment.send.AddAmountFragment
-import com.tari.android.wallet.ui.fragment.send.AddNoteAndSendFragment
-import com.tari.android.wallet.ui.fragment.send.SendTxSuccessfulFragment
+import com.tari.android.wallet.ui.fragment.send.AddNoteFragment
+import com.tari.android.wallet.ui.fragment.send.FinalizeSendTxFragment
 import com.tari.android.wallet.ui.util.UiUtil
 import com.tari.android.wallet.util.Constants
 import java.lang.ref.WeakReference
@@ -76,8 +76,8 @@ internal class SendTariActivity : BaseActivity(),
     ServiceConnection,
     AddRecipientFragment.Listener,
     AddAmountFragment.Listener,
-    AddNoteAndSendFragment.Listener,
-    SendTxSuccessfulFragment.Listener {
+    AddNoteFragment.Listener,
+    FinalizeSendTxFragment.Listener {
 
     @BindView(R.id.send_tari_vw_root)
     lateinit var rootView: View
@@ -260,7 +260,7 @@ internal class SendTariActivity : BaseActivity(),
     }
 
     private fun goToAddNoteFragment(sourceFragment: BaseFragment, bundle: Bundle) {
-        val fragment = AddNoteAndSendFragment.newInstance(walletService!!)
+        val fragment = AddNoteFragment()
         fragment.arguments = bundle
         supportFragmentManager
             .beginTransaction()
@@ -283,22 +283,14 @@ internal class SendTariActivity : BaseActivity(),
 
     // region AddNoteFragment.Listener implementation
 
-    override fun sendTxStarted(sourceFragment: AddNoteAndSendFragment) {
-        sendTxIsInProgress = true
-    }
-
-    override fun sendTxFailed(sourceFragment: AddNoteAndSendFragment) {
-        sendTxIsInProgress = false
-    }
-
-    override fun sendTxSuccessful(
-        sourceFragment: AddNoteAndSendFragment,
+    override fun continueToFinalizeSendTx(
+        sourceFragment: AddNoteFragment,
         recipientUser: User,
         amount: MicroTari,
         fee: MicroTari,
         note: String
     ) {
-        val fragment = SendTxSuccessfulFragment().apply {
+        val fragment = FinalizeSendTxFragment(walletService!!).apply {
             arguments = Bundle().apply {
                 putParcelable("recipientUser", recipientUser)
                 putParcelable("amount", amount)
@@ -318,7 +310,7 @@ internal class SendTariActivity : BaseActivity(),
                 fragment,
                 fragment::class.java.simpleName
             )
-            .addToBackStack(SendTxSuccessfulFragment::class.java.simpleName)
+            .addToBackStack(FinalizeSendTxFragment::class.java.simpleName)
             .commit()
         currentFragmentWR = WeakReference(fragment)
     }
@@ -327,8 +319,12 @@ internal class SendTariActivity : BaseActivity(),
 
     // region SendTxSuccessfulFragment.Listener implementation
 
+    override fun sendTxStarted(sourceFragment: FinalizeSendTxFragment) {
+        sendTxIsInProgress = true
+    }
+
     override fun sendTxCompleted(
-        sourceFragment: SendTxSuccessfulFragment,
+        sourceFragment: FinalizeSendTxFragment,
         recipientUser: User,
         amount: MicroTari,
         fee: MicroTari,

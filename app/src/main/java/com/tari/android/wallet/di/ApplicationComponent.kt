@@ -50,9 +50,9 @@ import com.tari.android.wallet.ui.fragment.onboarding.CreateWalletFragment
 import com.tari.android.wallet.ui.fragment.onboarding.IntroductionFragment
 import com.tari.android.wallet.ui.fragment.onboarding.LocalAuthFragment
 import com.tari.android.wallet.ui.fragment.send.AddAmountFragment
-import com.tari.android.wallet.ui.fragment.send.AddNoteAndSendFragment
+import com.tari.android.wallet.ui.fragment.send.AddNoteFragment
 import com.tari.android.wallet.ui.fragment.send.AddRecipientFragment
-import com.tari.android.wallet.ui.fragment.send.SendTxSuccessfulFragment
+import com.tari.android.wallet.ui.fragment.send.FinalizeSendTxFragment
 import dagger.Component
 import javax.inject.Singleton
 
@@ -101,8 +101,8 @@ internal interface ApplicationComponent {
     fun inject(fragment: CreateWalletFragment)
     fun inject(fragment: AddRecipientFragment)
     fun inject(fragment: AddAmountFragment)
-    fun inject(fragment: AddNoteAndSendFragment)
-    fun inject(fragment: SendTxSuccessfulFragment)
+    fun inject(fragment: AddNoteFragment)
+    fun inject(fragment: FinalizeSendTxFragment)
     fun inject(fragment: LocalAuthFragment)
     fun inject(fragment: DebugLogFragment)
     fun inject(fragment: BaseNodeConfigFragment)
