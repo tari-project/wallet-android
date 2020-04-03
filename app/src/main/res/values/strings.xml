@@ -172,16 +172,16 @@
     <string name="add_amount_tx_fee">Transaction Fee</string>
 
     <!-- send tari - note -->
-    <string name="add_note_and_send_prompt">Transaction Note</string>
-    <string name="add_note_and_send_hint">Let the recipient know what the payment is for</string>
-    <string name="add_note_and_send_slide_to_send">Slide to Send</string>
+    <string name="add_note_prompt">Transaction Note</string>
+    <string name="add_note_hint">Let the recipient know what the payment is for</string>
+    <string name="add_note_slide_to_send">Slide to Send</string>
 
     <!-- send tari - successful -->
     <!-- Tari amount should be formatted and passed as a string to this format -->
-    <string name="send_tx_sending_info_format" tools:ignore="TypographyEllipsis">Sending %1$s Tari...</string>
-    <string name="send_tx_sending_info_format_bold_part" tools:ignore="TypographyEllipsis">%1$s Tari...</string>
-    <string name="send_tx_sucessful_info_format">You just sent %1$s Tari</string>
-    <string name="send_tx_sucessful_info_format_bold_part">%1$s Tari</string>
+    <string name="finalize_send_tx_sending_info_format" tools:ignore="TypographyEllipsis">Sending %1$s Tari...</string>
+    <string name="finalize_send_tx_sending_info_format_bold_part" tools:ignore="TypographyEllipsis">%1$s Tari...</string>
+    <string name="finalize_send_tx_sucessful_info_format">You just sent %1$s Tari</string>
+    <string name="finalize_send_tx_sucessful_info_format_bold_part">%1$s Tari</string>
 
     <!-- debug log - title -->
     <string name="debug_log_title">Log</string>

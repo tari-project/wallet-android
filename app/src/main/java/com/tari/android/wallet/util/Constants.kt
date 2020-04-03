@@ -100,7 +100,7 @@ internal object Constants {
             const val removeFragmentDelayDuration = 1200L
             const val tariTextAnimViewDurationMs = 1600L
             const val viewContainerFadeOutDurationMs = 800L
-            const val introductionBottomViewsFadeOutDelay = 2900L
+            const val introductionBottomViewsFadeOutDelay = 1000L
         }
 
         object AddAmount {
@@ -109,7 +109,7 @@ internal object Constants {
 
         object AddNoteAndSend {
             const val preKeyboardHideWaitMs = 500L
-            const val postSendDelayMs = 3000L
+            const val continueToFinalizeSendTxDelayMs = 2000L
 
         }
 
@@ -127,7 +127,7 @@ internal object Constants {
             const val viewFadeAnimDelayMs = 200L
             const val localAuthAnimDurationMs = 800L
             const val removeFragmentDelayDuration = 1000L
-            const val bottomViewsFadeOutDelay = 2900L
+            const val bottomViewsFadeOutDelay = 1000L
         }
     }
 

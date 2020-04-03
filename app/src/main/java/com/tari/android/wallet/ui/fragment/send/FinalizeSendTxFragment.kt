@@ -52,6 +52,9 @@ import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.extension.applyFontStyle
 import com.tari.android.wallet.model.MicroTari
 import com.tari.android.wallet.model.User
+import com.tari.android.wallet.model.WalletError
+import com.tari.android.wallet.model.WalletErrorCode
+import com.tari.android.wallet.service.TariWalletService
 import com.tari.android.wallet.ui.component.CustomFont
 import com.tari.android.wallet.ui.fragment.BaseFragment
 import com.tari.android.wallet.ui.util.UiUtil.getResourceUri
@@ -67,25 +70,26 @@ import javax.inject.Inject
  *
  * @author The Tari Development Team
  */
-class SendTxSuccessfulFragment : BaseFragment(), Animator.AnimatorListener {
+class FinalizeSendTxFragment(private val walletService: TariWalletService)
+    : BaseFragment(), Animator.AnimatorListener {
 
-    @BindView(R.id.send_tx_successful_vw_root)
+    @BindView(R.id.finalize_send_tx_vw_root)
     lateinit var rootView: View
-    @BindView(R.id.send_tx_successful_video_bg)
+    @BindView(R.id.finalize_send_tx_video_bg)
     lateinit var videoView: VideoView
-    @BindView(R.id.send_tx_successful_anim)
+    @BindView(R.id.finalize_send_tx_anim)
     lateinit var lottieAnimationView: LottieAnimationView
-    @BindView(R.id.send_tx_successful_txt_info)
+    @BindView(R.id.finalize_send_tx_txt_info)
     lateinit var infoTextView: TextView
-    @BindView(R.id.send_tx_successful_vw_info_container)
+    @BindView(R.id.finalize_send_tx_vw_info_container)
     lateinit var infoContainerView: View
-    @BindString(R.string.send_tx_sending_info_format)
+    @BindString(R.string.finalize_send_tx_sending_info_format)
     lateinit var sendingInfoFormat: String
-    @BindString(R.string.send_tx_sending_info_format_bold_part)
+    @BindString(R.string.finalize_send_tx_sending_info_format_bold_part)
     lateinit var sendingInfoFormatBoldPart: String
-    @BindString(R.string.send_tx_sucessful_info_format)
+    @BindString(R.string.finalize_send_tx_sucessful_info_format)
     lateinit var successfulInfoFormat: String
-    @BindString(R.string.send_tx_sucessful_info_format_bold_part)
+    @BindString(R.string.finalize_send_tx_sucessful_info_format_bold_part)
     lateinit var successfulInfoFormatBoldPart: String
 
     @Inject
@@ -105,8 +109,9 @@ class SendTxSuccessfulFragment : BaseFragment(), Animator.AnimatorListener {
     private val lottieAnimationPauseProgress = 0.3f
 
     private var successful = false
+    private var sendingIsInProgress = false
 
-    override val contentViewId: Int = R.layout.fragment_send_tx_successful
+    override val contentViewId: Int = R.layout.fragment_finalize_send_tx
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         // prepare fonts for partial bold text
@@ -149,6 +154,7 @@ class SendTxSuccessfulFragment : BaseFragment(), Animator.AnimatorListener {
         )
 
         lottieAnimationView.setMaxProgress(lottieAnimationPauseProgress)
+        lottieAnimationView.addAnimatorListener(this)
 
         rootView.postDelayed(
             {
@@ -160,8 +166,8 @@ class SendTxSuccessfulFragment : BaseFragment(), Animator.AnimatorListener {
 
         subscribeToEventBus()
         TrackHelper.track()
-            .screen("/home/send_tari/successful")
-            .title("Send Tari - Successful")
+            .screen("/home/send_tari/finalize")
+            .title("Send Tari - Finalize")
             .with(tracker)
     }
 
@@ -215,6 +221,20 @@ class SendTxSuccessfulFragment : BaseFragment(), Animator.AnimatorListener {
         }
     }
 
+    private fun sendTari() {
+        listenerWR.get()?.sendTxStarted(this)
+        sendingIsInProgress = true
+        val error = WalletError()
+        val success = walletService.sendTari(recipientUser, amount, fee, note, error)
+        // if success, just wait for the callback to happen
+        // if failed, just show the failed info & return
+        if (!success || error.code != WalletErrorCode.NO_ERROR) {
+            rootView.post {
+                onFailure()
+            }
+        }
+    }
+
     private fun onDiscoveryComplete(success: Boolean) {
         Logger.d("Discovery completed with result: $success.")
         if (success) {
@@ -228,7 +248,6 @@ class SendTxSuccessfulFragment : BaseFragment(), Animator.AnimatorListener {
         successful = true
         infoTextView.text = successfulInfoSpannable
         lottieAnimationView.setMaxProgress(1.0f)
-        lottieAnimationView.addAnimatorListener(this)
         lottieAnimationView.playAnimation()
         lottieAnimationView.progress = lottieAnimationPauseProgress
         ObjectAnimator.ofFloat(
@@ -276,6 +295,12 @@ class SendTxSuccessfulFragment : BaseFragment(), Animator.AnimatorListener {
     }
 
     override fun onAnimationEnd(animation: Animator?) {
+        if (!sendingIsInProgress) {
+            Thread {
+                sendTari()
+            }.start()
+            return
+        }
         lottieAnimationView.alpha = 0f
         listenerWR.get()?.sendTxCompleted(
             this,
@@ -293,11 +318,13 @@ class SendTxSuccessfulFragment : BaseFragment(), Animator.AnimatorListener {
      */
     interface Listener {
 
+        fun sendTxStarted(sourceFragment: FinalizeSendTxFragment)
+
         /**
          * Recipient is user.
          */
         fun sendTxCompleted(
-            sourceFragment: SendTxSuccessfulFragment,
+            sourceFragment: FinalizeSendTxFragment,
             recipientUser: User,
             amount: MicroTari,
             fee: MicroTari,

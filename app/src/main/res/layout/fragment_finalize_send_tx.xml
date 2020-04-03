@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/send_tx_successful_vw_root"
+    android:id="@+id/finalize_send_tx_vw_root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/white"
     android:orientation="vertical">
 
     <VideoView
-        android:id="@+id/send_tx_successful_video_bg"
+        android:id="@+id/finalize_send_tx_video_bg"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_alignParentStart="true"
@@ -24,7 +24,7 @@
         android:orientation="vertical">
 
         <com.airbnb.lottie.LottieAnimationView
-            android:id="@+id/send_tx_successful_anim"
+            android:id="@+id/finalize_send_tx_anim"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:lottie_autoPlay="false"
@@ -34,17 +34,17 @@
             app:lottie_renderMode="automatic" />
 
         <LinearLayout
-            android:id="@+id/send_tx_successful_vw_info_container"
+            android:id="@+id/finalize_send_tx_vw_info_container"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="14dp"
             android:gravity="bottom">
 
             <com.tari.android.wallet.ui.component.CustomFontTextView
-                android:id="@+id/send_tx_successful_txt_info"
+                android:id="@+id/finalize_send_tx_txt_info"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/send_tx_sucessful_info_format"
+                android:text="@string/finalize_send_tx_sucessful_info_format"
                 android:textColor="@color/black"
                 android:textSize="18sp"
                 app:customFont="AVENIR_LT_STD_LIGHT" />

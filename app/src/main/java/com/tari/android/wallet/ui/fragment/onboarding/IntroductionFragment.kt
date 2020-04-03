@@ -174,7 +174,6 @@ internal class IntroductionFragment : BaseFragment() {
     private fun setupUi() {
         UiUtil.setProgressBarColor(progressBar, whiteColor)
 
-        tariWalletLottieAnimationView.setMaxFrame(205)
         tariWalletLottieAnimationView.alpha = 0f
         networkInfoTextView.alpha = 0f
         smallGemImageView.alpha = 0f

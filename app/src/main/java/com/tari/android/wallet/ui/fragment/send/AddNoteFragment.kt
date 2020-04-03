@@ -37,7 +37,6 @@ import android.annotation.SuppressLint
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
-import android.os.AsyncTask
 import android.os.Bundle
 import android.text.Editable
 import android.text.InputType
@@ -54,7 +53,6 @@ import com.daasuu.ei.Ease
 import com.daasuu.ei.EasingInterpolator
 import com.tari.android.wallet.R
 import com.tari.android.wallet.model.*
-import com.tari.android.wallet.service.TariWalletService
 import com.tari.android.wallet.ui.component.EmojiIdCopiedViewController
 import com.tari.android.wallet.ui.component.EmojiIdSummaryViewController
 import com.tari.android.wallet.ui.fragment.BaseFragment
@@ -64,7 +62,6 @@ import com.tari.android.wallet.util.EmojiUtil
 import me.everything.android.ui.overscroll.OverScrollDecoratorHelper
 import org.matomo.sdk.Tracker
 import org.matomo.sdk.extra.TrackHelper
-import java.lang.Long.max
 import java.lang.ref.WeakReference
 import javax.inject.Inject
 
@@ -73,46 +70,46 @@ import javax.inject.Inject
  *
  * @author The Tari Development Team
  */
-class AddNoteAndSendFragment(private val walletService: TariWalletService) : BaseFragment(),
+class AddNoteFragment : BaseFragment(),
     TextWatcher, View.OnTouchListener {
 
     @BindView(R.id.add_note_and_send_vw_root)
     lateinit var rootView: View
-    @BindView(R.id.add_note_and_send_txt_title)
+    @BindView(R.id.add_note_txt_title)
     lateinit var titleTextView: TextView
-    @BindView(R.id.add_note_and_send_btn_back)
+    @BindView(R.id.add_note_btn_back)
     lateinit var backButton: ImageButton
-    @BindView(R.id.add_note_and_send_vw_emoji_id_summary_container)
+    @BindView(R.id.add_note_vw_emoji_id_summary_container)
     lateinit var emojiIdSummaryContainerView: View
-    @BindView(R.id.add_note_and_send_vw_emoji_id_summary)
+    @BindView(R.id.add_note_vw_emoji_id_summary)
     lateinit var emojiIdSummaryView: View
-    @BindView(R.id.add_note_and_send_vw_full_emoji_id_container)
+    @BindView(R.id.add_note_vw_full_emoji_id_container)
     lateinit var fullEmojiIdContainerView: View
-    @BindView(R.id.add_note_and_send_scroll_full_emoji_id)
+    @BindView(R.id.add_note_scroll_full_emoji_id)
     lateinit var fullEmojiIdScrollView: HorizontalScrollView
-    @BindView(R.id.add_note_and_send_txt_full_emoji_id)
+    @BindView(R.id.add_note_txt_full_emoji_id)
     lateinit var fullEmojiIdTextView: TextView
-    @BindView(R.id.add_note_and_send_vw_copy_emoji_id_container)
+    @BindView(R.id.add_note_vw_copy_emoji_id_container)
     lateinit var copyEmojiIdButtonContainerView: View
-    @BindView(R.id.add_note_and_send_vw_emoji_id_copied)
+    @BindView(R.id.add_note_vw_emoji_id_copied)
     lateinit var emojiIdCopiedAnimView: View
     @BindView(R.id.add_note_txt_prompt)
     lateinit var promptTextView: TextView
-    @BindView(R.id.add_note_and_send_edit_note)
+    @BindView(R.id.add_note_edit_note)
     lateinit var noteEditText: EditText
-    @BindView(R.id.add_note_and_send_vw_slide_button_container)
+    @BindView(R.id.add_note_vw_slide_button_container)
     lateinit var slideButtonContainerView: View
-    @BindView(R.id.add_note_and_send_vw_slide_enabled_bg)
+    @BindView(R.id.add_note_vw_slide_enabled_bg)
     lateinit var slideBgEnabledView: View
-    @BindView(R.id.add_note_and_send_txt_slide_to_send_disabled)
+    @BindView(R.id.add_note_txt_slide_to_send_disabled)
     lateinit var slideToSendDisabledTextView: TextView
-    @BindView(R.id.add_note_and_send_txt_slide_to_send_enabled)
+    @BindView(R.id.add_note_txt_slide_to_send_enabled)
     lateinit var slideToSendEnabledTextView: TextView
-    @BindView(R.id.add_note_and_send_img_slide_to_send_arrow_enabled)
+    @BindView(R.id.add_note_img_slide_to_send_arrow_enabled)
     lateinit var slideArrowIconEnabledImageView: ImageView
-    @BindView(R.id.add_note_and_send_vw_slide)
+    @BindView(R.id.add_note_vw_slide)
     lateinit var slideView: View
-    @BindView(R.id.add_note_and_send_prog_bar)
+    @BindView(R.id.add_note_prog_bar)
     lateinit var progressBar: ProgressBar
 
     /**
@@ -123,11 +120,10 @@ class AddNoteAndSendFragment(private val walletService: TariWalletService) : Bas
     /**
      * Dimmer and click blocker views.
      */
-    @BindView(R.id.add_note_and_send_vw_dimmer)
+    @BindView(R.id.add_note_vw_dimmer)
     lateinit var dimmerView: View
-    @BindView(R.id.add_note_and_send_vw_full_emoji_id_bg_click_blocker)
+    @BindView(R.id.add_note_vw_full_emoji_id_bg_click_blocker)
     lateinit var fullEmojiIdBgClickBlockerView: View
-
 
     @BindDimen(R.dimen.add_note_slide_button_left_margin)
     @JvmField
@@ -185,15 +181,7 @@ class AddNoteAndSendFragment(private val walletService: TariWalletService) : Bas
     private lateinit var amount: MicroTari
     private lateinit var fee: MicroTari
 
-    override val contentViewId: Int = R.layout.fragment_add_note_and_send
-
-    companion object {
-
-        fun newInstance(walletService: TariWalletService): AddNoteAndSendFragment {
-            return AddNoteAndSendFragment(walletService)
-        }
-
-    }
+    override val contentViewId: Int = R.layout.fragment_add_note
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -279,7 +267,7 @@ class AddNoteAndSendFragment(private val walletService: TariWalletService) : Bas
         )
     }
 
-    @OnClick(R.id.add_note_and_send_btn_back)
+    @OnClick(R.id.add_note_btn_back)
     fun onBackButtonClicked(view: View) {
         UiUtil.temporarilyDisableClick(view)
         // going back before hiding keyboard causes a blank white area on the screen
@@ -294,7 +282,7 @@ class AddNoteAndSendFragment(private val walletService: TariWalletService) : Bas
     /**
      * Display full emoji id and dim out all other views.
      */
-    @OnClick(R.id.add_note_and_send_vw_emoji_id_summary_container)
+    @OnClick(R.id.add_note_vw_emoji_id_summary_container)
     fun emojiIdClicked() {
         showFullEmojiId()
     }
@@ -431,7 +419,7 @@ class AddNoteAndSendFragment(private val walletService: TariWalletService) : Bas
     /**
      * Dimmer clicked - hide dimmers.
      */
-    @OnClick(R.id.add_note_and_send_vw_dimmer)
+    @OnClick(R.id.add_note_vw_dimmer)
     fun onEmojiIdDimmerClicked() {
         hideFullEmojiId(animated = true)
     }
@@ -446,7 +434,7 @@ class AddNoteAndSendFragment(private val walletService: TariWalletService) : Bas
         )
     }
 
-    @OnClick(R.id.add_note_and_send_btn_copy_emoji_id)
+    @OnClick(R.id.add_note_btn_copy_emoji_id)
     fun onCopyEmojiIdButtonClicked(view: View) {
         UiUtil.temporarilyDisableClick(view)
         dimmerView.isClickable = false
@@ -579,7 +567,6 @@ class AddNoteAndSendFragment(private val walletService: TariWalletService) : Bas
                 val fragment = wr.get() ?: return false
                 // disable input
                 noteEditText.inputType = InputType.TYPE_NULL
-                fragment.listenerWR.get()?.sendTxStarted(this@AddNoteAndSendFragment)
                 // complete slide animation
                 val anim = ValueAnimator.ofInt(
                     slideButtonLastMarginStart,
@@ -622,71 +609,38 @@ class AddNoteAndSendFragment(private val walletService: TariWalletService) : Bas
         anim.addListener(object : AnimatorListenerAdapter() {
             override fun onAnimationEnd(animation: Animator) { // done
                 val fragment = wr.get() ?: return
-                fragment.progressBar.visibility = View.VISIBLE
-                fragment.rootView.postDelayed({
-                    wr.get()?.hideKeyboard()
-                }, Constants.UI.AddNoteAndSend.preKeyboardHideWaitMs)
+                fragment.onSlideAnimationEnd()
             }
         })
         anim.start()
+    }
+
+    private fun onSlideAnimationEnd() {
+        progressBar.visibility = View.VISIBLE
+        rootView.postDelayed({
+            hideKeyboard()
+        }, Constants.UI.AddNoteAndSend.preKeyboardHideWaitMs)
+        rootView.postDelayed({
+            continueToFinalizeSendTx()
+        }, Constants.UI.AddNoteAndSend.preKeyboardHideWaitMs
+                + Constants.UI.AddNoteAndSend.continueToFinalizeSendTxDelayMs
+        )
     }
 
     private fun hideKeyboard() {
         val mActivity = activity ?: return
         UiUtil.hideKeyboard(mActivity)
         noteEditText.clearFocus()
-        AsyncTask.execute {
-            wr.get()?.sendTari()
-        }
     }
 
-    private fun sendTari() {
-        val note = noteEditText.text.toString()
-        val timeStartMs = System.currentTimeMillis()
-        val error = WalletError()
-        val success = walletService.sendTari(recipientUser, amount, fee, note, error)
-        val timeElapsed = System.currentTimeMillis() - timeStartMs
-        val waitMs = max(
-            0,
-            Constants.UI.AddNoteAndSend.postSendDelayMs - timeElapsed
-        )
-        rootView.postDelayed({
-            if (success && error.code == WalletErrorCode.NO_ERROR) {
-                wr.get()?.sendTariSuccessful()
-            } else {
-                wr.get()?.sendTariError()
-            }
-        }, waitMs)
-    }
-
-    private fun sendTariSuccessful() {
-        val note = noteEditText.text.toString()
-        progressBar.visibility = View.INVISIBLE
-        listenerWR.get()?.sendTxSuccessful(
+    private fun continueToFinalizeSendTx() {
+        listenerWR.get()?.continueToFinalizeSendTx(
             this,
             recipientUser,
             amount,
             fee,
-            note
+            noteEditText.editableText.toString()
         )
-    }
-
-    private fun sendTariError() {
-        // enable input
-        noteEditText.inputType =
-            (InputType.TYPE_TEXT_VARIATION_FILTER
-                    or InputType.TYPE_TEXT_FLAG_MULTI_LINE
-                    or InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS
-                    or InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD)
-
-        slideToSendEnabledTextView.alpha = 1f
-        slideToSendEnabledTextView.visibility = View.VISIBLE
-        // move slider back to its original position
-        UiUtil.setStartMargin(slideView, slideViewMarginStart)
-        progressBar.visibility = View.INVISIBLE
-        slideView.alpha = 1f
-        // notify listener
-        listenerWR.get()?.sendTxFailed(this)
     }
 
     /**
@@ -694,21 +648,8 @@ class AddNoteAndSendFragment(private val walletService: TariWalletService) : Bas
      */
     interface Listener {
 
-        /**
-         * Notify the listener that send is in progress.
-         */
-        fun sendTxStarted(sourceFragment: AddNoteAndSendFragment)
-
-        /**
-         * Notify the listener that the send process has failed.
-         */
-        fun sendTxFailed(sourceFragment: AddNoteAndSendFragment)
-
-        /**
-         * Notify the listener that the transaction has been sent successfully.
-         */
-        fun sendTxSuccessful(
-            sourceFragment: AddNoteAndSendFragment,
+        fun continueToFinalizeSendTx(
+            sourceFragment: AddNoteFragment,
             recipientUser: User,
             amount: MicroTari,
             fee: MicroTari,
