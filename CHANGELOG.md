@@ -1,5 +1,9 @@
 # Tari Aurora Changelog
 
+## [0.1.1-jniLibs-0.5.1] - 2020-04-03
+- Fix frozen "Sending Tari" screen oon some transactions
+- New Aurora logo
+
 ## [0.1.0-jniLibs-0.5.1] - 2020-04-03
 - Sets base node to a random pick from a list of base nodes.
 - Applies splash copy updates.
