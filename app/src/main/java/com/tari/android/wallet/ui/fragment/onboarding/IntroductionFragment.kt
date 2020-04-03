@@ -46,7 +46,6 @@ import com.airbnb.lottie.LottieAnimationView
 import com.daasuu.ei.Ease
 import com.daasuu.ei.EasingInterpolator
 import com.tari.android.wallet.R
-import com.tari.android.wallet.application.WalletState
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.extension.applyURLStyle
 import com.tari.android.wallet.ui.fragment.BaseFragment
@@ -73,8 +72,10 @@ internal class IntroductionFragment : BaseFragment() {
     lateinit var tariWalletLottieAnimationView: LottieAnimationView
     @BindView(R.id.create_wallet_vw_root)
     lateinit var rootView: View
-    @BindView(R.id.introduction_txt_header)
-    lateinit var headerTextView: TextView
+    @BindView(R.id.introduction_txt_header_line_top)
+    lateinit var headerTopLineTextView: TextView
+    @BindView(R.id.introduction_txt_header_line_bottom)
+    lateinit var headerBottomLineTextView: TextView
     @BindView(R.id.introduction_btn_create_wallet)
     lateinit var createWalletButton: TextView
     @BindView(R.id.introduction_btn_layout)
@@ -178,7 +179,8 @@ internal class IntroductionFragment : BaseFragment() {
         networkInfoTextView.alpha = 0f
         smallGemImageView.alpha = 0f
         walletBtnLayout.alpha = 0f
-        headerTextView.alpha = 0f
+        headerTopLineTextView.alpha = 0f
+        headerBottomLineTextView.alpha = 0f
         userAgreementAndPrivacyPolicyTextView.alpha = 0f
 
         // highlight links
@@ -228,8 +230,30 @@ internal class IntroductionFragment : BaseFragment() {
         }
     }
 
+    private fun animateHeaderLineTextView(textView: TextView, startDelay: Long) {
+        val height = textView.measuredHeight.toFloat()
+        val anim = ValueAnimator.ofFloat(0f, 1f)
+        anim.addUpdateListener { valueAnimator: ValueAnimator ->
+            val value = valueAnimator.animatedValue as Float
+            textView.alpha = value
+            textView.translationY = (1 - value) * height
+        }
+        anim.startDelay = startDelay
+        anim.duration = Constants.UI.mediumDurationMs
+        anim.interpolator = EasingInterpolator(Ease.SINE_OUT)
+        anim.start()
+    }
+
     private fun runStartupAnimation() {
-        val headerHeight = headerTextView.measuredHeight
+        animateHeaderLineTextView(
+            headerTopLineTextView,
+            Constants.UI.mediumDurationMs
+        )
+        animateHeaderLineTextView(
+            headerBottomLineTextView,
+            Constants.UI.mediumDurationMs + Constants.UI.xShortDurationMs * 2
+        )
+
         val anim = ValueAnimator.ofFloat(0f, 1f)
         anim.addUpdateListener { valueAnimator: ValueAnimator ->
             val value = valueAnimator.animatedValue as Float
@@ -237,14 +261,11 @@ internal class IntroductionFragment : BaseFragment() {
             networkInfoTextView.alpha = value
             smallGemImageView.alpha = value
             walletBtnLayout.alpha = value
-            headerTextView.alpha = value
             userAgreementAndPrivacyPolicyTextView.alpha = value
-            headerTextView.translationY = (1f - value) * headerHeight
         }
-
-        anim.startDelay = Constants.UI.shortDurationMs
+        anim.startDelay = Constants.UI.mediumDurationMs
         anim.duration = Constants.UI.longDurationMs
-        anim.interpolator = EasingInterpolator(Ease.SINE_IN_OUT)
+        anim.interpolator = EasingInterpolator(Ease.SINE_OUT)
         anim.start()
     }
 
@@ -297,14 +318,16 @@ internal class IntroductionFragment : BaseFragment() {
         fadeOutAnim.addUpdateListener { valueAnimator: ValueAnimator ->
             val alpha = valueAnimator.animatedValue as Float
             videoOuterContainer.alpha = alpha
-            headerTextView.alpha = alpha
+            headerTopLineTextView.alpha = alpha
+            headerBottomLineTextView.alpha = alpha
             walletBtnLayout.alpha = alpha
             userAgreementAndPrivacyPolicyTextView.alpha = alpha
         }
         fadeOutAnim.addListener(object : AnimatorListenerAdapter() {
             override fun onAnimationEnd(animation: Animator?) {
                 videoOuterContainer.visibility = View.INVISIBLE
-                headerTextView.visibility = View.INVISIBLE
+                headerTopLineTextView.visibility = View.INVISIBLE
+                headerBottomLineTextView.visibility = View.INVISIBLE
                 walletBtnLayout.visibility = View.INVISIBLE
                 userAgreementAndPrivacyPolicyTextView.visibility = View.INVISIBLE
             }

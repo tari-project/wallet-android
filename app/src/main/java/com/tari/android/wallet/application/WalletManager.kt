@@ -33,8 +33,10 @@
 package com.tari.android.wallet.application
 
 import android.annotation.SuppressLint
+import android.content.Context
 import com.orhanobut.logger.Logger
 import com.tari.android.wallet.BuildConfig
+import com.tari.android.wallet.R
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.ffi.*
 import com.tari.android.wallet.ffi.FFIByteVector
@@ -52,6 +54,7 @@ import com.tari.android.wallet.tor.TorProxyMonitor
 import com.tari.android.wallet.tor.TorProxyState
 import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.SharedPrefsWrapper
+import org.apache.commons.io.IOUtils
 import java.io.File
 
 /**
@@ -61,6 +64,7 @@ import java.io.File
  * @author The Tari Development Team
  */
 internal class WalletManager(
+    private val context: Context,
     private val walletFilesDirPath: String,
     private val walletLogFilePath: String,
     private val torProxyManager: TorProxyManager,
@@ -174,20 +178,42 @@ internal class WalletManager(
     }
 
     /**
-     * Adds the default base node and saves the base node config values into the shared prefs.
-     * Will only run once when the wallet is created for the first time.
+     * Returns the list of base nodes in the resource file base_nodes.txt as pairs of
+     * ({public_key_hex}, {public_address}).
      */
-    private fun addBaseNode() {
-        // add base node
-        if (sharedPrefsWrapper.baseNodePublicKeyHex == null) {
-            sharedPrefsWrapper.baseNodePublicKeyHex = Constants.Wallet.baseNodePublicKeyHex
-            sharedPrefsWrapper.baseNodeAddress = Constants.Wallet.baseNodeAddress
-
-            val baseNodeKeyFFI = FFIPublicKey(HexString(Constants.Wallet.baseNodePublicKeyHex))
-            val baseNodeAddress = Constants.Wallet.baseNodeAddress
-            FFIWallet.instance?.addBaseNodePeer(baseNodeKeyFFI, baseNodeAddress)
-            baseNodeKeyFFI.destroy()
+    private fun getBaseNodeList(): List<Pair<String, String>> {
+        val fileContent = IOUtils.toString(
+            context.resources.openRawResource(R.raw.base_nodes),
+            "UTF-8"
+        )
+        val baseNodes = mutableListOf<Pair<String, String>>()
+        val regex = Regex("([A-Za-z0-9]{64}::/onion3/[A-Za-z0-9]+:[\\d]+)")
+        regex.findAll(fileContent).forEach { matchResult ->
+            val pairString = matchResult.value.split("::")
+            baseNodes.add(
+                Pair(
+                    pairString[0],
+                    pairString[1]
+                )
+            )
         }
+        return baseNodes
+    }
+
+    /**
+     * Select a base node randomly from the list of base nodes in base_nodes.tx, and sets
+     * the wallet and stored the values in shared prefs.
+     */
+    private fun setBaseNode() {
+        val randomBaseNode = getBaseNodeList().random()
+        val publicKeyHex = randomBaseNode.first
+        val address = randomBaseNode.second
+        sharedPrefsWrapper.baseNodePublicKeyHex = publicKeyHex
+        sharedPrefsWrapper.baseNodeAddress = address
+
+        val baseNodeKeyFFI = FFIPublicKey(HexString(publicKeyHex))
+        FFIWallet.instance?.addBaseNodePeer(baseNodeKeyFFI, address)
+        baseNodeKeyFFI.destroy()
     }
 
     /**
@@ -225,7 +251,7 @@ internal class WalletManager(
             )
             FFIWallet.instance = wallet
             startLogFileObserver()
-            addBaseNode()
+            setBaseNode()
             saveWalletPublicKeyHexToSharedPrefs()
         }
     }
