@@ -30,22 +30,15 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.tari.android.wallet.ffi
-
-import com.tari.android.wallet.model.CompletedTx
-import com.tari.android.wallet.model.PendingInboundTx
-import java.math.BigInteger
+package com.tari.android.wallet.application
 
 /**
+ * Used for async observation of the wallet state.
+ *
  * @author The Tari Development Team
  */
-internal interface FFIWalletListenerAdapter {
-
-    fun onTxBroadcast(completedTx: CompletedTx)
-    fun onTxMined(completedTx: CompletedTx)
-    fun onTxReceived(pendingInboundTx: PendingInboundTx)
-    fun onTxReplyReceived(completedTx: CompletedTx)
-    fun onTxFinalized(completedTx: CompletedTx)
-    fun onDiscoveryComplete(txId: BigInteger, success: Boolean)
-    fun onBaseNodeSyncComplete(rxId: BigInteger, success: Boolean)
+enum class WalletState {
+    NOT_READY,
+    INITIALIZING,
+    RUNNING
 }

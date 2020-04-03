@@ -43,13 +43,12 @@ import androidx.biometric.BiometricManager
 import androidx.biometric.BiometricManager.BIOMETRIC_SUCCESS
 import androidx.biometric.BiometricPrompt
 import androidx.core.content.ContextCompat
-import butterknife.BindDimen
-import butterknife.BindString
-import butterknife.BindView
-import butterknife.OnClick
+import butterknife.*
 import com.orhanobut.logger.Logger
 import com.tari.android.wallet.R
+import com.tari.android.wallet.application.WalletState
 import com.tari.android.wallet.auth.AuthUtil
+import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.ui.component.CustomFontButton
 import com.tari.android.wallet.ui.component.CustomFontTextView
 import com.tari.android.wallet.ui.fragment.BaseFragment
@@ -74,17 +73,23 @@ internal class LocalAuthFragment : BaseFragment() {
     }
 
     @BindView(R.id.local_auth_vw_root)
-    lateinit var rootView: FrameLayout
-    @BindView(R.id.local_auth_btn_enable_auth)
-    lateinit var enableAuthButton: CustomFontButton
+    lateinit var rootView: View
+    @BindView(R.id.local_auth_img_small_gem)
+    lateinit var smallGemImageView: ImageView
     @BindView(R.id.local_auth_img_auth)
     lateinit var authTypeImageView: ImageView
     @BindView(R.id.local_auth_prompt_text)
     lateinit var promptTextView: TextView
     @BindView(R.id.local_auth_txt_auth_desc)
     lateinit var authDescTextView: CustomFontTextView
-    @BindView(R.id.local_auth_img_small_gem)
-    lateinit var smallGemImageView: ImageView
+    @BindView(R.id.local_auth_vw_enable_auth_button_container)
+    lateinit var enableAuthButtonContainerView: View
+    @BindView(R.id.local_auth_btn_enable_auth)
+    lateinit var enableAuthButton: CustomFontButton
+    @BindView(R.id.local_auth_vw_prog_bar_container)
+    lateinit var progressBarContainerView: View
+    @BindView(R.id.local_auth_prog_bar_enable_auth)
+    lateinit var progressBar: ProgressBar
 
     @BindDimen(R.dimen.auth_button_bottom_margin)
     @JvmField
@@ -94,10 +99,14 @@ internal class LocalAuthFragment : BaseFragment() {
     lateinit var buttonTouchIdAuthFormat: String
     @BindString(R.string.auth_prompt_button_text)
     lateinit var buttonPinAuthFormat: String
-    @BindString(R.string.auth_biometric_prompt)
+    @BindString(R.string.onboarding_auth_biometric_prompt)
     lateinit var biometricAuthPrompt: String
-    @BindString(R.string.auth_device_lock_code_prompt)
+    @BindString(R.string.onboarding_auth_device_lock_code_prompt)
     lateinit var deviceLockCodePrompt: String
+
+    @BindColor(R.color.white)
+    @JvmField
+    var whiteColor = 0
 
     @Inject
     lateinit var sharedPrefsWrapper: SharedPrefsWrapper
@@ -106,6 +115,7 @@ internal class LocalAuthFragment : BaseFragment() {
 
     private var authType: AuthType = AuthType.NONE
     private var listener: Listener? = null
+    private var continueIsPendingOnWalletState = false
 
     override val contentViewId = R.layout.fragment_local_auth
 
@@ -157,23 +167,9 @@ internal class LocalAuthFragment : BaseFragment() {
         }
     }
 
-    @OnClick(R.id.local_auth_btn_enable_auth)
-    fun onEnableAuthButtonClick() {
-        UiUtil.temporarilyDisableClick(enableAuthButton)
-        val animatorSet = UiUtil.animateButtonClick(enableAuthButton)
-        animatorSet.addListener(object : AnimatorListenerAdapter() {
-            override fun onAnimationEnd(animation: Animator?) {
-                super.onAnimationEnd(animation)
-                if (authType == AuthType.NONE) {
-                    displayAuthNotAvailableDialog()
-                    return
-                }
-                doAuth()
-            }
-        })
-    }
-
     private fun setupUi() {
+        progressBarContainerView.visibility = View.INVISIBLE
+        UiUtil.setProgressBarColor(progressBar, whiteColor)
         if (authType == AuthType.BIOMETRIC) {
             //setup ui for biometric auth
             authTypeImageView.setImageResource(R.drawable.fingerprint)
@@ -186,10 +182,10 @@ internal class LocalAuthFragment : BaseFragment() {
     }
 
     private fun playStartUpAnim() {
-        val offset = -(enableAuthButton.height + useAuthButtonBottomMargin).toFloat()
+        val offset = (enableAuthButtonContainerView.height + useAuthButtonBottomMargin).toFloat()
 
-        val buttonAnim: ObjectAnimator =
-            ObjectAnimator.ofFloat(enableAuthButton, View.TRANSLATION_Y, 0f, offset)
+        val buttonContainerViewAnim: ObjectAnimator =
+            ObjectAnimator.ofFloat(enableAuthButtonContainerView, View.TRANSLATION_Y, offset, 0f)
 
         val titleOffset = -(promptTextView.height).toFloat()
         val titleTextAnim =
@@ -203,18 +199,33 @@ internal class LocalAuthFragment : BaseFragment() {
         val fadeInAnim = ValueAnimator.ofFloat(0f, 1f)
         fadeInAnim.addUpdateListener { valueAnimator: ValueAnimator ->
             val alpha = valueAnimator.animatedValue as Float
-            authDescTextView.alpha = alpha
-            enableAuthButton.alpha = alpha
-            authTypeImageView.alpha = alpha
             smallGemImageView.alpha = alpha
+            authTypeImageView.alpha = alpha
+            authDescTextView.alpha = alpha
+            enableAuthButtonContainerView.alpha = alpha
         }
         fadeInAnim.startDelay = Auth.viewFadeAnimDelayMs
 
         val anim = AnimatorSet()
-        anim.playTogether(buttonAnim, titleTextAnim, fadeInAnim)
+        anim.playTogether(titleTextAnim, buttonContainerViewAnim, fadeInAnim)
         anim.startDelay = Auth.localAuthAnimDurationMs
         anim.duration = Auth.localAuthAnimDurationMs
         anim.start()
+    }
+
+    @OnClick(R.id.local_auth_btn_enable_auth)
+    fun onEnableAuthButtonClick(view: View) {
+        UiUtil.temporarilyDisableClick(view)
+        val animatorSet = UiUtil.animateButtonClick(enableAuthButton)
+        animatorSet.addListener(object : AnimatorListenerAdapter() {
+            override fun onAnimationEnd(animation: Animator?) {
+                if (authType == AuthType.NONE) {
+                    displayAuthNotAvailableDialog()
+                    return
+                }
+                doAuth()
+            }
+        })
     }
 
     private fun doAuth() {
@@ -249,9 +260,8 @@ internal class LocalAuthFragment : BaseFragment() {
         val biometricAuthAvailable = BiometricManager.from(context!!).canAuthenticate() == BIOMETRIC_SUCCESS
         val prompt = if (biometricAuthAvailable) biometricAuthPrompt else deviceLockCodePrompt
         val promptInfo = BiometricPrompt.PromptInfo.Builder()
-            .setTitle(getString(R.string.auth_title))
+            .setTitle(getString(R.string.onboarding_auth_title))
             .setSubtitle(prompt)
-            .setDescription(getString(R.string.auth_description))
             .setDeviceCredentialAllowed(true)
             .build()
         biometricPrompt.authenticate(promptInfo)
@@ -292,16 +302,34 @@ internal class LocalAuthFragment : BaseFragment() {
             }
             .setNegativeButton(getString(R.string.common_cancel), null)
 
-
         val alert = dialogBuilder.create()
         alert.setTitle(getString(R.string.auth_not_available_or_canceled_title))
         alert.show()
     }
 
     private fun authSuccess() {
-        sharedPrefsWrapper.isAuthenticated = true
-        sharedPrefsWrapper.onboardingAuthSetupCompleted = true
-        listener?.onAuthSuccess()
+        // check if the wallet is ready & switch to wait mode if not & start listening
+        if (EventBus.walletStateSubject.value != WalletState.RUNNING) {
+            progressBarContainerView.visibility = View.VISIBLE
+            enableAuthButton.visibility = View.INVISIBLE
+            continueIsPendingOnWalletState = true
+            EventBus.subscribeToWalletState(this) { walletState ->
+                onWalletStateChanged(walletState)
+            }
+        } else {
+            sharedPrefsWrapper.isAuthenticated = true
+            sharedPrefsWrapper.onboardingAuthSetupCompleted = true
+            listener?.onAuthSuccess()
+        }
+    }
+
+    private fun onWalletStateChanged(walletState: WalletState) {
+        if (walletState == WalletState.RUNNING && continueIsPendingOnWalletState) {
+            continueIsPendingOnWalletState = false
+            rootView.post {
+                authSuccess()
+            }
+        }
     }
 
     interface Listener {

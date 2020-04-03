@@ -62,8 +62,13 @@
     <color name="add_note_slide_btton_bg_gradient_end">#A72BE9</color>
     <color name="add_note_prompt_passive_color">#B2B2B2</color>
 
-    <!-- Debug Log -->
-    <color name="terminal_green">#4AF626</color>
+    <!-- log levels -->
+    <color name="log_level_trace">#000000</color>
+    <color name="log_level_debug">#000000</color>
+    <color name="log_level_log">#000000</color>
+    <color name="log_level_info">#000000</color>
+    <color name="log_level_warn">#000000</color>
+    <color name="log_level_error">#000000</color>
 
     <!-- Wallet info -->
     <color name="wallet_info_qr_code_desc">#7f8599</color>

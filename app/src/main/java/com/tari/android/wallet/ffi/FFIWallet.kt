@@ -45,7 +45,11 @@ import java.math.BigInteger
  */
 internal typealias FFIWalletPtr = Long
 
-internal abstract class FFIWallet(commsConfig: FFICommsConfig, logPath: String) : FFIBase() {
+internal open class FFIWallet(commsConfig: FFICommsConfig, logPath: String) : FFIBase() {
+
+    companion object {
+        var instance: FFIWallet? = null
+    }
 
     // region JNI
 
@@ -195,8 +199,7 @@ internal abstract class FFIWallet(commsConfig: FFICommsConfig, logPath: String) 
                 this::onBaseNodeSyncComplete.name, "([BZ)V",
                 error
             )
-            Logger.i("Post jniCreate.")
-            Log.i("Wallet Code", error.code.toString())
+            Logger.i("Post jniCreate with code: %d.", error.code)
             throwIf(error)
         }
     }

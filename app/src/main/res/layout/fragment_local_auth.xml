@@ -1,98 +1,108 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/local_auth_vw_root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/gray_background"
-    android:gravity="center"
-    android:orientation="vertical">
+    android:background="@color/gray_background">
+
+    <ImageView
+        android:id="@+id/local_auth_img_small_gem"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="46dp"
+        android:alpha="0"
+        android:contentDescription="@null"
+        android:src="@drawable/splash_gem_small"
+        android:tint="@color/black"
+        android:visibility="visible" />
+
+    <ImageView
+        android:id="@+id/local_auth_img_auth"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/local_auth_img_small_gem"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="130dp"
+        android:alpha="0"
+        android:contentDescription="@null"
+        android:scaleX="2"
+        android:scaleY="2"
+        android:src="@drawable/fingerprint" />
+
+    <com.tari.android.wallet.ui.component.CustomFontTextView
+        android:id="@+id/local_auth_prompt_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/local_auth_img_auth"
+        android:layout_gravity="center"
+        android:layout_marginHorizontal="@dimen/common_horizontal_margin"
+        android:layout_marginTop="80dp"
+        android:gravity="center"
+        android:letterSpacing="-0.014"
+        android:lineSpacingExtra="10dp"
+        android:text="@string/auth_prompt_title"
+        android:textColor="@color/black"
+        android:textSize="18sp"
+        app:customFont="AVENIR_LT_STD_LIGHT" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_below="@id/local_auth_img_auth"
+        android:layout_alignTop="@id/local_auth_prompt_text"
+        android:layout_alignBottom="@id/local_auth_prompt_text"
+        android:layout_gravity="center"
+        android:background="@color/create_emoji_id_bg"
+        android:visibility="visible" />
+
+    <com.tari.android.wallet.ui.component.CustomFontTextView
+        android:id="@+id/local_auth_txt_auth_desc"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/local_auth_prompt_text"
+        android:layout_gravity="center"
+        android:layout_marginHorizontal="@dimen/common_horizontal_margin"
+        android:alpha="0"
+        android:gravity="center"
+        android:letterSpacing="-0.02"
+        android:lineSpacingExtra="10dp"
+        android:text="@string/auth_prompt_desc"
+        android:textColor="@color/dark_gray"
+        android:textSize="14sp"
+        android:visibility="visible"
+        app:customFont="AVENIR_LT_STD_MEDIUM" />
 
     <RelativeLayout
-        android:id="@+id/local_auth_vw_container"
+        android:id="@+id/local_auth_vw_enable_auth_button_container"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:visibility="visible">
+        android:layout_height="104dp"
+        android:layout_alignParentBottom="true"
+        android:alpha="0">
 
-        <ImageView
-            android:id="@+id/local_auth_img_small_gem"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginTop="46dp"
-            android:alpha="0"
-            android:contentDescription="@null"
-            android:src="@drawable/splash_gem_small"
-            android:tint="@color/black"
-            android:visibility="visible" />
-
-        <ImageView
-            android:id="@+id/local_auth_img_auth"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/local_auth_img_small_gem"
-            android:layout_centerHorizontal="true"
-            android:layout_marginTop="130dp"
-            android:alpha="0"
-            android:contentDescription="@null"
-            android:scaleX="2"
-            android:scaleY="2"
-            android:src="@drawable/fingerprint" />
-
-        <com.tari.android.wallet.ui.component.CustomFontTextView
-            android:id="@+id/local_auth_prompt_text"
+        <FrameLayout
+            android:id="@+id/local_auth_vw_prog_bar_container"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/local_auth_img_auth"
-            android:layout_gravity="center"
+            android:layout_height="@dimen/common_action_button_height"
+            android:layout_centerInParent="true"
             android:layout_marginHorizontal="@dimen/common_horizontal_margin"
-            android:layout_marginTop="80dp"
-            android:gravity="center"
-            android:letterSpacing="-0.014"
-            android:text="@string/auth_prompt_title"
-            android:lineSpacingExtra="10dp"
-            android:textColor="@color/black"
-            android:textSize="18sp"
-            app:customFont="AVENIR_LT_STD_LIGHT" />
+            android:background="@drawable/gradient_button_bg">
 
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_below="@id/local_auth_img_auth"
-            android:layout_alignTop="@id/local_auth_prompt_text"
-            android:layout_alignBottom="@id/local_auth_prompt_text"
-            android:layout_gravity="center"
-            android:background="@color/create_emoji_id_bg"
-            android:visibility="visible" />
-
-        <com.tari.android.wallet.ui.component.CustomFontTextView
-            android:id="@+id/local_auth_txt_auth_desc"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/local_auth_prompt_text"
-            android:layout_gravity="center"
-            android:layout_marginHorizontal="@dimen/common_horizontal_margin"
-            android:alpha="0"
-            android:gravity="center"
-            android:letterSpacing="-0.02"
-            android:lineSpacingExtra="10dp"
-            android:text="@string/auth_prompt_desc"
-            android:textColor="@color/dark_gray"
-            android:textSize="14sp"
-            android:visibility="visible"
-            app:customFont="AVENIR_LT_STD_MEDIUM" />
+            <ProgressBar
+                android:id="@+id/local_auth_prog_bar_enable_auth"
+                android:layout_width="35dp"
+                android:layout_height="35dp"
+                android:layout_gravity="center" />
+        </FrameLayout>
 
         <com.tari.android.wallet.ui.component.CustomFontButton
             android:id="@+id/local_auth_btn_enable_auth"
             android:layout_width="match_parent"
             android:layout_height="@dimen/common_action_button_height"
-            android:layout_alignParentBottom="true"
-            android:layout_gravity="bottom"
-            android:layout_marginLeft="25dp"
-            android:layout_marginRight="25dp"
-            android:layout_marginBottom="-40dp"
-            android:alpha="0"
+            android:layout_centerInParent="true"
+            android:layout_marginHorizontal="@dimen/common_horizontal_margin"
             android:background="@drawable/gradient_button_bg"
             android:ellipsize="middle"
             android:singleLine="true"
@@ -101,5 +111,6 @@
             android:textColor="@color/white"
             android:textSize="16sp"
             app:customFont="AVENIR_LT_STD_HEAVY" />
+
     </RelativeLayout>
-</FrameLayout>
+</RelativeLayout>

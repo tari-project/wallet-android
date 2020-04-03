@@ -33,12 +33,9 @@
 package com.tari.android.wallet.di
 
 import android.content.Context
-import com.tari.android.wallet.ffi.FFIByteVector
-import com.tari.android.wallet.ffi.FFITransportType
-import com.tari.android.wallet.ffi.NetAddressString
-import com.tari.android.wallet.ffi.nullptr
 import com.tari.android.wallet.tor.TorConfig
 import com.tari.android.wallet.tor.TorProxyManager
+import com.tari.android.wallet.tor.TorProxyMonitor
 import com.tari.android.wallet.util.SharedPrefsWrapper
 import dagger.Module
 import dagger.Provides
@@ -67,7 +64,7 @@ class TorModule {
     }
 
     /**
-     * Provides a port for TOR connection
+     * Provides a port for Tor connection.
      */
     @Provides
     @Named(FieldName.torConnectionPort)
@@ -80,7 +77,7 @@ class TorModule {
     }
 
     /**
-     * Provides a port for TOR proxy
+     * Provides a port for Tor proxy.
      */
     @Provides
     @Named(FieldName.torProxyPort)
@@ -93,7 +90,7 @@ class TorModule {
     }
 
     /**
-     * Provides a port for TOR control
+     * Provides a port for Tor control.
      */
     @Provides
     @Named(FieldName.torControlPort)
@@ -106,7 +103,7 @@ class TorModule {
     }
 
     /**
-     * Provides host for TOR control
+     * Provides host for Tor control.
      */
     @Provides
     @Named(FieldName.torControlHost)
@@ -116,12 +113,12 @@ class TorModule {
     }
 
     /**
-     * Provides cookie file path for TOR
+     * Provides cookie file path for Tor.
      */
     @Provides
     @Named(FieldName.torCookieFilePath)
     @Singleton
-    internal fun provideTorControlPassword(context: Context): String {
+    internal fun provideTorCookieFilePath(context: Context): String {
         return File(
             context.getDir(TorProxyManager.torDataDirectoryName, Context.MODE_PRIVATE),
             "control_auth_cookie"
@@ -129,7 +126,7 @@ class TorModule {
     }
 
     /**
-     * Provides cookie file path for TOR
+     * Provides identity for Tor.
      */
     @Provides
     @Named(FieldName.torIdentity)
@@ -139,7 +136,7 @@ class TorModule {
     }
 
     /**
-     * Provides sock5 username for TOR
+     * Provides sock5 username for Tor.
      */
     @Provides
     @Named(FieldName.torSock5Username)
@@ -149,7 +146,7 @@ class TorModule {
     }
 
     /**
-     * Provides sock5 password for TOR
+     * Provides sock5 password for Tor.
      */
     @Provides
     @Named(FieldName.torSock5Password)
@@ -159,7 +156,7 @@ class TorModule {
     }
 
     /**
-     * Provides config for TOR
+     * Provides config for Tor.
      */
     @Provides
     @Singleton
@@ -199,36 +196,12 @@ class TorModule {
         )
     }
 
-    /**
-     * Provides transport for wallet to use
-     */
     @Provides
     @Singleton
-    internal fun provideTorTransport(torConfig: TorConfig): FFITransportType {
-        // provide Tor transport
-        val cookieFile = File(torConfig.cookieFilePath)
-        var cookieString = ByteArray(0)
-        if (cookieFile.exists()) {
-            cookieString = cookieFile.readBytes()
-        }
-
-        val torCookie = FFIByteVector(cookieString)
-        var torIdentity = FFIByteVector(nullptr)
-        if (torConfig.identity.isNotEmpty()) {
-            torIdentity.destroy()
-            torIdentity = FFIByteVector(torConfig.identity)
-        }
-        return FFITransportType(
-            NetAddressString(
-                torConfig.controlHost,
-                torConfig.controlPort
-            ),
-            torConfig.connectionPort,
-            torCookie,
-            torIdentity,
-            torConfig.sock5Username,
-            torConfig.sock5Password
-        )
+    internal fun provideTorProxyMonitor(
+        torConfig: TorConfig
+    ): TorProxyMonitor {
+        return TorProxyMonitor(torConfig)
     }
 
 }

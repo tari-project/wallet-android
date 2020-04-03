@@ -231,13 +231,13 @@ class AddRecipientFragment(private val walletService: TariWalletService) : BaseF
         OverScrollDecoratorHelper.setUpOverScroll(emojiIdScrollView)
         OverScrollDecoratorHelper.setUpOverScroll(searchEditTextScrollView)
 
-        AsyncTask.execute {
+        Thread {
             wr.get()?.fetchRecentTxUsers()
-        }
+        }.start()
 
-        AsyncTask.execute {
+        Thread {
             wr.get()?.checkClipboardForValidEmojiId()
-        }
+        }.start()
 
         TrackHelper.track()
             .screen("/home/send_tari/add_recipient")

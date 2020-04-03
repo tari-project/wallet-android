@@ -39,6 +39,7 @@ import android.os.Bundle
 import android.os.Handler
 import android.view.View
 import android.widget.AdapterView
+import android.widget.ImageButton
 import android.widget.Spinner
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.FileProvider
@@ -140,6 +141,7 @@ internal class DebugLogFragment : BaseFragment(), AdapterView.OnItemSelectedList
     }
 
     override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+        recyclerView.scrollToPosition(0)
         selectedLogFile = logFiles[position]
         updateLogLines()
     }
@@ -155,6 +157,20 @@ internal class DebugLogFragment : BaseFragment(), AdapterView.OnItemSelectedList
         anim.duration = Constants.UI.mediumDurationMs
         anim.startDelay = Constants.UI.shortDurationMs
         anim.start()
+    }
+
+    @OnClick(R.id.debug_log_btn_scroll_to_top)
+    fun onScrollToTopButtonClicked(button: ImageButton) {
+        UiUtil.temporarilyDisableClick(button)
+        recyclerView.scrollToPosition(0)
+    }
+
+    @OnClick(R.id.debug_log_btn_scroll_to_bottom)
+    fun onScrollToTopBottomClicked(button: ImageButton) {
+        UiUtil.temporarilyDisableClick(button)
+        recyclerView.scrollToPosition(
+            selectedLogFileLines.size - 1
+        )
     }
 
     @OnClick(R.id.debug_log_btn_share)

@@ -271,9 +271,9 @@ internal class HomeActivity : BaseActivity(),
      */
     private var isDragging = false
     private var sendTariButtonClickAnimIsRunning = false
-    private val onboardingInterstitialTimeMs = 2000L
+    private val onboardingInterstitialTimeMs = 4500L
     private val secondUTXOImportDelayTimeMs = 1500L
-    private val secondUTXOStoreModalDelayTimeMs = 1000L
+    private val secondUTXOStoreModalDelayTimeMs = 3000L
 
     /**
      * This listener is used only to animate the visibility of the scroll depth gradient view.
@@ -460,11 +460,6 @@ internal class HomeActivity : BaseActivity(),
                 updateAllDataAndUI(restartBalanceUI = false)
             }
         }
-        EventBus.subscribe<Event.Wallet.DiscoveryComplete>(this) {
-            wr.get()?.rootView?.post {
-                updateAllDataAndUI(restartBalanceUI = false)
-            }
-        }
 
         // Testnet Tari events
         EventBus.subscribe<Event.Testnet.TestnetTariRequestSuccessful>(this) {
@@ -481,7 +476,12 @@ internal class HomeActivity : BaseActivity(),
         // tx-related app events
         EventBus.subscribe<Event.Tx.TxSendSuccessful>(this) {
             wr.get()?.rootView?.post {
-                onSendTxSuccessful()
+                onTxSendSuccessful()
+            }
+        }
+        EventBus.subscribe<Event.Tx.TxSendFailed>(this) {
+            wr.get()?.rootView?.post {
+                onTxSendFailed()
             }
         }
 
@@ -959,9 +959,9 @@ internal class HomeActivity : BaseActivity(),
     }
 
     /**
-     * Called when a tx is sent successfully.
+     * Called when an outgoing transaction has been successful.
      */
-    private fun onSendTxSuccessful() {
+    private fun onTxSendSuccessful() {
         scrollView.scrollToTop()
         recyclerView.scrollToPosition(0)
         val topMargin = rootView.height - txListContainerMinimizedTopMargin
@@ -990,6 +990,28 @@ internal class HomeActivity : BaseActivity(),
                 wr.get()?.importSecondUTXO()
             }.start()
         }
+    }
+
+    /**
+     * Called when an outgoing transaction has failed.
+     */
+    private fun onTxSendFailed() {
+        Dialog(this, R.style.Theme_AppCompat_Dialog).apply {
+            window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+            setContentView(R.layout.tx_failed_dialog)
+            setCancelable(true)
+            setCanceledOnTouchOutside(true)
+            window?.setLayout(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            )
+            findViewById<TextView>(R.id.tx_failed_dialog_txt_close)
+                .setOnClickListener {
+                    dismiss()
+                }
+
+            window?.setGravity(Gravity.BOTTOM)
+        }.show()
     }
 
     private fun importSecondUTXO() {

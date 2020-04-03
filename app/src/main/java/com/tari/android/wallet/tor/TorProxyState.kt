@@ -30,22 +30,50 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.tari.android.wallet.ffi
-
-import com.tari.android.wallet.model.CompletedTx
-import com.tari.android.wallet.model.PendingInboundTx
-import java.math.BigInteger
+package com.tari.android.wallet.tor
 
 /**
+ * Tor proxy state - is deduced from connection state and bootstrap logs.
+ *
  * @author The Tari Development Team
  */
-internal interface FFIWalletListenerAdapter {
+sealed class TorProxyState {
+    object NotReady : TorProxyState()
+    object Initializing : TorProxyState()
+    data class Running(val bootstrapStatus: TorBootstrapStatus) : TorProxyState()
+    object Failed : TorProxyState()
+}
 
-    fun onTxBroadcast(completedTx: CompletedTx)
-    fun onTxMined(completedTx: CompletedTx)
-    fun onTxReceived(pendingInboundTx: PendingInboundTx)
-    fun onTxReplyReceived(completedTx: CompletedTx)
-    fun onTxFinalized(completedTx: CompletedTx)
-    fun onDiscoveryComplete(txId: BigInteger, success: Boolean)
-    fun onBaseNodeSyncComplete(rxId: BigInteger, success: Boolean)
+data class TorBootstrapStatus(val progress: Int, val summary: String, val warning: String? = null) {
+
+    companion object {
+
+        private val warningLogRegex = Regex(".*PROGRESS=(\\d+).*SUMMARY=\"([^\"]*)\".*WARNING=\"([^\"]*)\".*")
+        private val logRegex = Regex(".*PROGRESS=(\\d+).*SUMMARY=\"([^\"]*)\".*")
+
+        fun from(logLine: String): TorBootstrapStatus {
+            if (warningLogRegex.matches(logLine)) {
+                val matchResult = warningLogRegex.find(logLine)
+                val (progress, summary, warning) = matchResult!!.destructured
+                return TorBootstrapStatus(
+                    progress = progress.toInt(),
+                    summary = summary,
+                    warning = warning
+                )
+            } else if (logRegex.matches(logLine)) {
+                val matchResult = logRegex.find(logLine)
+                val (progress, summary) = matchResult!!.destructured
+                return TorBootstrapStatus(
+                    progress = progress.toInt(),
+                    summary = summary
+                )
+            }
+            return TorBootstrapStatus(
+                progress = 0,
+                summary = "",
+                warning = null
+            )
+        }
+    }
+
 }

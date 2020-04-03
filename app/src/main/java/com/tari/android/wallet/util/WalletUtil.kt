@@ -92,7 +92,7 @@ internal object WalletUtil {
         return "${Constants.Wallet.deepLinkURLPrefix}${Constants.Wallet.network.uriComponent}/${DeepLink.Type.EMOJI_ID.uriComponent}/$emojiId"
     }
 
-    fun getPublicKeyHexLink(publicKeyHex: String): String {
+    fun getPublicKeyHexDeepLink(publicKeyHex: String): String {
         return "${Constants.Wallet.deepLinkURLPrefix}${Constants.Wallet.network.uriComponent}/${DeepLink.Type.PUBLIC_KEY_HEX.uriComponent}/$publicKeyHex"
     }
 

@@ -64,6 +64,7 @@ object Event {
      */
     object Tx {
         class TxSendSuccessful
+        class TxSendFailed
     }
 
     object Testnet {

@@ -45,7 +45,7 @@ import android.widget.Toast
 import butterknife.*
 import com.tari.android.wallet.R
 import com.tari.android.wallet.ffi.FFIPublicKey
-import com.tari.android.wallet.ffi.FFITestWallet
+import com.tari.android.wallet.ffi.FFIWallet
 import com.tari.android.wallet.ffi.HexString
 import com.tari.android.wallet.ui.fragment.BaseFragment
 import com.tari.android.wallet.ui.util.UiUtil
@@ -64,34 +64,25 @@ internal class BaseNodeConfigFragment : BaseFragment() {
 
     @BindView(R.id.base_node_config_vw_root)
     lateinit var rootView: View
-
     @BindView(R.id.base_node_config_txt_public_key_hex)
     lateinit var publicKeyHexTextView: TextView
-
     @BindView(R.id.base_node_config_txt_address)
     lateinit var addressTextView: TextView
-
     @BindView(R.id.base_node_config_edit_public_key)
     lateinit var publicKeyHexEditText: TextView
-
     @BindView(R.id.base_node_config_txt_invalid_public_key)
     lateinit var invalidPublicKeyHexTextView: TextView
-
     @BindView(R.id.base_node_config_edit_address)
     lateinit var addressEditText: TextView
-
     @BindView(R.id.base_node_config_txt_invalid_address)
     lateinit var invalidAddressTextView: TextView
-
     @BindView(R.id.base_node_config_btn_save)
     lateinit var saveButton: Button
-
     @BindView(R.id.base_node_config_progress_bar)
     lateinit var progressBar: ProgressBar
 
     @BindDrawable(R.drawable.base_node_config_edit_text_bg)
     lateinit var editTextBgDrawable: Drawable
-
     @BindDrawable(R.drawable.base_node_config_edit_text_invalid_bg)
     lateinit var editTextInvalidBgDrawable: Drawable
 
@@ -101,9 +92,6 @@ internal class BaseNodeConfigFragment : BaseFragment() {
 
     @Inject
     lateinit var sharedPrefsWrapper: SharedPrefsWrapper
-
-    @Inject
-    lateinit var wallet: FFITestWallet
 
     private val clipboardRegex = Regex("[a-zA-Z0-9]{64}::/onion[2-3]/[a-zA-Z2-7]{56}(:[0-9]+)?")
     private val publicKeyRegex = Regex("[a-zA-Z0-9]{64}")
@@ -198,7 +186,7 @@ internal class BaseNodeConfigFragment : BaseFragment() {
 
     private fun addBaseNodePeer(publicKeyHex: String, address: String) {
         val baseNodeKeyFFI = FFIPublicKey(HexString(publicKeyHex))
-        val success = wallet.addBaseNodePeer(baseNodeKeyFFI, address)
+        val success = FFIWallet.instance!!.addBaseNodePeer(baseNodeKeyFFI, address)
         baseNodeKeyFFI.destroy()
         rootView.post {
             if (success) {

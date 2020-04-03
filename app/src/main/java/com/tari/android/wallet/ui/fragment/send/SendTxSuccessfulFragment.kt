@@ -36,6 +36,7 @@ import android.animation.Animator
 import android.animation.ObjectAnimator
 import android.content.Context
 import android.os.Bundle
+import android.text.SpannableString
 import android.view.View
 import android.widget.TextView
 import android.widget.VideoView
@@ -44,7 +45,10 @@ import butterknife.BindView
 import com.airbnb.lottie.LottieAnimationView
 import com.daasuu.ei.Ease
 import com.daasuu.ei.EasingInterpolator
+import com.orhanobut.logger.Logger
 import com.tari.android.wallet.R
+import com.tari.android.wallet.event.Event
+import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.extension.applyFontStyle
 import com.tari.android.wallet.model.MicroTari
 import com.tari.android.wallet.model.User
@@ -75,10 +79,14 @@ class SendTxSuccessfulFragment : BaseFragment(), Animator.AnimatorListener {
     lateinit var infoTextView: TextView
     @BindView(R.id.send_tx_successful_vw_info_container)
     lateinit var infoContainerView: View
+    @BindString(R.string.send_tx_sending_info_format)
+    lateinit var sendingInfoFormat: String
+    @BindString(R.string.send_tx_sending_info_format_bold_part)
+    lateinit var sendingInfoFormatBoldPart: String
     @BindString(R.string.send_tx_sucessful_info_format)
-    lateinit var infoFormat: String
+    lateinit var successfulInfoFormat: String
     @BindString(R.string.send_tx_sucessful_info_format_bold_part)
-    lateinit var infoFormatBoldPart: String
+    lateinit var successfulInfoFormatBoldPart: String
 
     @Inject
     lateinit var tracker: Tracker
@@ -93,6 +101,10 @@ class SendTxSuccessfulFragment : BaseFragment(), Animator.AnimatorListener {
 
     private lateinit var listenerWR: WeakReference<Listener>
     private val wr = WeakReference(this)
+    private lateinit var successfulInfoSpannable: SpannableString
+    private val lottieAnimationPauseProgress = 0.3f
+
+    private var successful = false
 
     override val contentViewId: Int = R.layout.fragment_send_tx_successful
 
@@ -112,22 +124,31 @@ class SendTxSuccessfulFragment : BaseFragment(), Animator.AnimatorListener {
         } else {
             WalletUtil.amountFormatter.format(amount.tariValue)
         }
-        val info = String.format(infoFormat, formattedAmount)
-        val infoBoldPart = String.format(infoFormatBoldPart, formattedAmount)
 
-        infoTextView.text = info.applyFontStyle(
+        val sendingInfo = String.format(sendingInfoFormat, formattedAmount)
+        val sendingInfoBoldPart = String.format(sendingInfoFormatBoldPart, formattedAmount)
+        infoTextView.text = sendingInfo.applyFontStyle(
             mActivity,
             CustomFont.AVENIR_LT_STD_LIGHT,
-            infoBoldPart,
-            CustomFont.AVENIR_LT_STD_BLACK,
-            applyToOnlyFirstOccurence = true
+            sendingInfoBoldPart,
+            CustomFont.AVENIR_LT_STD_BLACK
         )
         infoTextView.measure(
             View.MeasureSpec.UNSPECIFIED,
             View.MeasureSpec.UNSPECIFIED
         )
         infoTextView.visibility = View.INVISIBLE
-        lottieAnimationView.addAnimatorListener(this)
+
+        val successfulInfo = String.format(successfulInfoFormat, formattedAmount)
+        val successfulInfoBoldPart = String.format(successfulInfoFormatBoldPart, formattedAmount)
+        successfulInfoSpannable = successfulInfo.applyFontStyle(
+            mActivity,
+            CustomFont.AVENIR_LT_STD_LIGHT,
+            successfulInfoBoldPart,
+            CustomFont.AVENIR_LT_STD_BLACK
+        )
+
+        lottieAnimationView.setMaxProgress(lottieAnimationPauseProgress)
 
         rootView.postDelayed(
             {
@@ -137,6 +158,7 @@ class SendTxSuccessfulFragment : BaseFragment(), Animator.AnimatorListener {
             Constants.UI.SendTxSuccessful.lottieAnimStartDelayMs
         )
 
+        subscribeToEventBus()
         TrackHelper.track()
             .screen("/home/send_tari/successful")
             .title("Send Tari - Successful")
@@ -162,8 +184,18 @@ class SendTxSuccessfulFragment : BaseFragment(), Animator.AnimatorListener {
     }
 
     override fun onDestroy() {
+        lottieAnimationView.duration
         lottieAnimationView.removeAllAnimatorListeners()
+        EventBus.unsubscribe(this)
         super.onDestroy()
+    }
+
+    private fun subscribeToEventBus() {
+        EventBus.subscribe<Event.Wallet.DiscoveryComplete>(this) { event ->
+            wr.get()?.rootView?.post {
+                wr.get()?.onDiscoveryComplete(event.success)
+            }
+        }
     }
 
     private fun playTextAppearAnimation() {
@@ -181,7 +213,24 @@ class SendTxSuccessfulFragment : BaseFragment(), Animator.AnimatorListener {
             startDelay = Constants.UI.SendTxSuccessful.textAppearAnimStartDelayMs
             start()
         }
+    }
 
+    private fun onDiscoveryComplete(success: Boolean) {
+        Logger.d("Discovery completed with result: $success.")
+        if (success) {
+            onSuccess()
+        } else {
+            onFailure()
+        }
+    }
+
+    private fun onSuccess() {
+        successful = true
+        infoTextView.text = successfulInfoSpannable
+        lottieAnimationView.setMaxProgress(1.0f)
+        lottieAnimationView.addAnimatorListener(this)
+        lottieAnimationView.playAnimation()
+        lottieAnimationView.progress = lottieAnimationPauseProgress
         ObjectAnimator.ofFloat(
             infoTextView,
             "alpha",
@@ -190,7 +239,25 @@ class SendTxSuccessfulFragment : BaseFragment(), Animator.AnimatorListener {
         ).apply {
             duration = Constants.UI.longDurationMs
             interpolator = EasingInterpolator(Ease.QUART_IN_OUT)
-            startDelay = Constants.UI.SendTxSuccessful.textFadeOutAnimStartDelayMs
+            startDelay = Constants.UI.SendTxSuccessful.successfulInfoFadeOutAnimStartDelayMs
+            start()
+        }
+    }
+
+    private fun onFailure() {
+        successful = false
+        lottieAnimationView.speed = -1f
+        lottieAnimationView.addAnimatorListener(this)
+        lottieAnimationView.playAnimation()
+        lottieAnimationView.progress = lottieAnimationPauseProgress
+        ObjectAnimator.ofFloat(
+            infoTextView,
+            "alpha",
+            1f,
+            0f
+        ).apply {
+            duration = Constants.UI.xLongDurationMs
+            interpolator = EasingInterpolator(Ease.QUART_IN_OUT)
             start()
         }
     }
@@ -215,7 +282,8 @@ class SendTxSuccessfulFragment : BaseFragment(), Animator.AnimatorListener {
             recipientUser,
             amount,
             fee,
-            note
+            note,
+            success = successful
         )
     }
     //endregion Animator Listener
@@ -233,7 +301,8 @@ class SendTxSuccessfulFragment : BaseFragment(), Animator.AnimatorListener {
             recipientUser: User,
             amount: MicroTari,
             fee: MicroTari,
-            note: String
+            note: String,
+            success: Boolean
         )
 
     }

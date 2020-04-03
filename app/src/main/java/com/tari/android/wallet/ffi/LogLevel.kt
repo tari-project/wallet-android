@@ -32,20 +32,25 @@
  */
 package com.tari.android.wallet.ffi
 
-import com.tari.android.wallet.model.CompletedTx
-import com.tari.android.wallet.model.PendingInboundTx
-import java.math.BigInteger
+import android.graphics.Color
 
 /**
- * @author The Tari Development Team
+ * FFI log levels.
  */
-internal interface FFIWalletListenerAdapter {
+enum class LogLevel(val color: Int) {
+    TRACE(Color.BLACK),
+    DEBUG(Color.BLACK),
+    LOG(Color.BLACK),
+    INFO(Color.BLUE),
+    WARN(Color.RED),
+    ERROR(Color.RED);
 
-    fun onTxBroadcast(completedTx: CompletedTx)
-    fun onTxMined(completedTx: CompletedTx)
-    fun onTxReceived(pendingInboundTx: PendingInboundTx)
-    fun onTxReplyReceived(completedTx: CompletedTx)
-    fun onTxFinalized(completedTx: CompletedTx)
-    fun onDiscoveryComplete(txId: BigInteger, success: Boolean)
-    fun onBaseNodeSyncComplete(rxId: BigInteger, success: Boolean)
+    companion object {
+
+        fun from(string: String): LogLevel {
+            return values().firstOrNull { value -> string == value.name } ?: LOG
+        }
+
+    }
+
 }

@@ -34,7 +34,6 @@ package com.tari.android.wallet.ui.fragment.onboarding
 
 import android.animation.*
 import android.content.Context
-import android.os.AsyncTask
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -45,11 +44,13 @@ import butterknife.*
 import com.airbnb.lottie.LottieAnimationView
 import com.daasuu.ei.Ease
 import com.daasuu.ei.EasingInterpolator
+import com.orhanobut.logger.Logger
 import com.tari.android.wallet.R
+import com.tari.android.wallet.application.WalletState
 import com.tari.android.wallet.di.ConfigModule
 import com.tari.android.wallet.di.WalletModule
+import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.extension.applyFontStyle
-import com.tari.android.wallet.ffi.FFITestWallet
 import com.tari.android.wallet.ui.component.CustomFont
 import com.tari.android.wallet.ui.component.EmojiIdSummaryViewController
 import com.tari.android.wallet.ui.fragment.BaseFragment
@@ -61,7 +62,6 @@ import com.tari.android.wallet.util.SharedPrefsWrapper
 import me.everything.android.ui.overscroll.OverScrollDecoratorHelper
 import org.matomo.sdk.Tracker
 import org.matomo.sdk.extra.TrackHelper
-import java.lang.Long.max
 import javax.inject.Inject
 import javax.inject.Named
 
@@ -165,8 +165,6 @@ internal class CreateWalletFragment : BaseFragment() {
     var lightGrayColor = 0
 
     @Inject
-    lateinit var wallet: FFITestWallet
-    @Inject
     lateinit var sharedPrefsWrapper: SharedPrefsWrapper
     @Inject
     @Named(WalletModule.FieldName.walletFilesDirPath)
@@ -182,16 +180,15 @@ internal class CreateWalletFragment : BaseFragment() {
 
     private lateinit var emojiIdSummaryController: EmojiIdSummaryViewController
     private val uiHandler = Handler(Looper.getMainLooper())
-    private val halfSecondMs = 500L
     private var listener: Listener? = null
+
+    private var isWaitingOnWalletState = false
 
     override val contentViewId = R.layout.fragment_create_wallet
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
         setupUi()
-
         TrackHelper.track()
             .screen("/onboarding/create_wallet")
             .title("Onboarding - Create Wallet")
@@ -215,6 +212,15 @@ internal class CreateWalletFragment : BaseFragment() {
         listener = null
     }
 
+    private fun onWalletStateChanged(walletState: WalletState) {
+        if (walletState == WalletState.RUNNING && isWaitingOnWalletState) {
+            isWaitingOnWalletState = false
+            rootView.post {
+                startCheckMarkAnimation()
+            }
+        }
+    }
+
     private fun setupUi() {
         val mActivity = activity ?: return
         yourEmojiIdTitleTextView.text = thisIsYourEmojiIdTitle.applyFontStyle(
@@ -226,17 +232,8 @@ internal class CreateWalletFragment : BaseFragment() {
 
         bottomSpinnerLottieAnim.alpha = 0f
 
-        val emojiId = sharedPrefsWrapper.emojiId!!
-        emojiIdTextView.text = EmojiUtil.getFullEmojiIdSpannable(
-            emojiId,
-            emojiIdChunkSeparator,
-            blackColor,
-            lightGrayColor
-        )
         OverScrollDecoratorHelper.setUpOverScroll(emojiIdScrollView)
         emojiIdSummaryController = EmojiIdSummaryViewController(emojiIdSummaryView)
-        emojiIdSummaryController.display(emojiId)
-
         seeFullEmojiIdButtonContainerView.visibility = View.INVISIBLE
         emojiIdSummaryContainerView.visibility = View.INVISIBLE
         emojiIdContainerView.visibility = View.INVISIBLE
@@ -304,13 +301,6 @@ internal class CreateWalletFragment : BaseFragment() {
         }
     }
 
-    private fun hideLoaderVideo() {
-        ObjectAnimator.ofFloat(bottomSpinnerLottieAnim, "alpha", 1f, 0f).run {
-            duration = CreateEmojiId.shortAlphaAnimDuration
-            start()
-        }
-    }
-
     @OnClick(R.id.create_wallet_btn_continue)
     fun onContinueButtonClick() {
         UiUtil.temporarilyDisableClick(continueButton)
@@ -371,6 +361,7 @@ internal class CreateWalletFragment : BaseFragment() {
     }
 
     private fun startYourEmojiIdViewAnimation() {
+        // do animations
         val buttonInitialBottomMargin = UiUtil.getBottomMargin(continueButton)
         val buttonBottomMarginDelta = createEmojiButtonBottomMargin - buttonInitialBottomMargin
         val buttonTranslationAnim = ValueAnimator.ofFloat(0f, 1f)
@@ -439,12 +430,12 @@ internal class CreateWalletFragment : BaseFragment() {
         animSet.start()
         animSet.addListener(object: AnimatorListenerAdapter() {
             override fun onAnimationEnd(animation: Animator?) {
-                elevateEmojiIdSummaryAndShowSeeFulEmojiIdButton()
+                elevateEmojiIdSummaryAndShowSeeFullEmojiIdButton()
             }
         })
     }
 
-    private fun elevateEmojiIdSummaryAndShowSeeFulEmojiIdButton() {
+    private fun elevateEmojiIdSummaryAndShowSeeFullEmojiIdButton() {
         val anim = ValueAnimator.ofFloat(0f, 1f)
         anim.addUpdateListener { valueAnimator: ValueAnimator ->
             val value = valueAnimator.animatedValue as Float
@@ -465,12 +456,18 @@ internal class CreateWalletFragment : BaseFragment() {
         anim.start()
     }
 
-    @OnClick(R.id.create_wallet_btn_see_full_emoji_id)
+    @OnClick(
+        R.id.create_wallet_btn_see_full_emoji_id,
+        R.id.create_wallet_vw_emoji_id_summary_container
+    )
     fun onSeeFullEmojiIdButtonClicked(view: View) {
         UiUtil.temporarilyDisableClick(view)
         showFullEmojiId()
     }
 
+    /**
+     * Maximize the emoji id view.
+     */
     private fun showFullEmojiId() {
         // prepare views
         emojiIdSummaryContainerView.visibility = View.INVISIBLE
@@ -515,6 +512,46 @@ internal class CreateWalletFragment : BaseFragment() {
                 }, Constants.UI.shortDurationMs + 20)
             }
         })
+    }
+
+    /**
+     * Minimize the emoji id view.
+     */
+    @OnClick(R.id.create_wallet_txt_emoji_id)
+    fun fullEmojiIdTextViewClicked(view: View) {
+        UiUtil.temporarilyDisableClick(view)
+
+        emojiIdSummaryContainerView.visibility = View.VISIBLE
+        seeFullEmojiIdButtonContainerView.visibility = View.VISIBLE
+
+        emojiIdScrollView.smoothScrollTo(0, 0)
+
+        val fullEmojiIdInitialWidth = emojiIdContainerView.width
+        val fullEmojiIdDeltaWidth = (rootView.width - horizontalMargin * 2) - fullEmojiIdInitialWidth
+
+        // animate full emoji id view
+        val emojiIdAnim = ValueAnimator.ofFloat(0f, 1f)
+        emojiIdAnim.addUpdateListener { valueAnimator: ValueAnimator ->
+            val value = valueAnimator.animatedValue as Float
+            // container alpha & scale
+            emojiIdContainerView.alpha = (1f - value)
+            UiUtil.setWidth(
+                emojiIdContainerView,
+                (fullEmojiIdInitialWidth + fullEmojiIdDeltaWidth * value).toInt()
+            )
+            UiUtil.setTopMargin(
+                seeFullEmojiIdButtonContainerView,
+                (seeFullEmojiIdButtonVisibleTopMargin * value).toInt()
+            )
+            seeFullEmojiIdButtonContainerView.alpha = value
+        }
+        emojiIdAnim.addListener(object: AnimatorListenerAdapter() {
+            override fun onAnimationEnd(animation: Animator?) {
+                emojiIdContainerView.visibility = View.INVISIBLE
+            }
+        })
+        emojiIdAnim.duration = Constants.UI.shortDurationMs
+        emojiIdAnim.start()
     }
 
     private fun startCreateEmojiAnimation() {
@@ -607,46 +644,29 @@ internal class CreateWalletFragment : BaseFragment() {
 
             override fun onAnimationEnd(animation: Animator?) {
                 super.onAnimationEnd(animation)
-                AsyncTask.execute {
-                    generateTestData()
-                }
+                // if the wallet is not ready wait until it gets ready,
+                // otherwise display the checkmark anim & move on
+                uiHandler.postDelayed({
+                    if (EventBus.walletStateSubject.value != WalletState.RUNNING) {
+                        isWaitingOnWalletState = true
+                        EventBus.subscribeToWalletState(this) { walletState ->
+                            onWalletStateChanged(walletState)
+                        }
+                    } else {
+                        startCheckMarkAnimation()
+                    }
+                }, CreateEmojiId.viewChangeAnimDelayMs)
             }
         })
         animSet.start()
     }
 
-    private fun generateTestData() {
-        var elapsedTime = 0L
-        try {
-            val startTime = System.currentTimeMillis()
-            if (createNewWalletReceiveFromAnonymous) {
-                for (i in 0 until 3) {
-                    if (!wallet.testReceiveTx()) {
-                        throw RuntimeException()
-                    }
-                    Thread.sleep(halfSecondMs)
-                }
-            }
-            if (createNewWalletGenerateTestData) {
-                if (!wallet.generateTestData(walletFilesDirPath)) {
-                    throw RuntimeException()
-                }
-            }
-            elapsedTime = System.currentTimeMillis() - startTime
-        } catch (throwable: Throwable) {
-            // silent fail
-        }
-        uiHandler.postDelayed(
-            {
-                startCheckMarkAnimation()
-                hideLoaderVideo()
-            },
-            max(0L, (CreateEmojiId.viewChangeAnimDelayMs - elapsedTime))
-
-        )
-    }
-
     private fun startCheckMarkAnimation() {
+        ObjectAnimator.ofFloat(bottomSpinnerLottieAnim, "alpha", 1f, 0f).run {
+            duration = CreateEmojiId.shortAlphaAnimDuration
+            start()
+        }
+
         val fadeOut = ValueAnimator.ofFloat(1f, 0f)
         fadeOut.duration = CreateEmojiId.shortAlphaAnimDuration
         fadeOut.addUpdateListener { valueAnimator: ValueAnimator ->
@@ -658,13 +678,20 @@ internal class CreateWalletFragment : BaseFragment() {
         fadeOut.addListener(object : AnimatorListenerAdapter() {
             override fun onAnimationEnd(animation: Animator?) {
                 super.onAnimationEnd(animation)
-                checkMarkAnim.visibility = View.VISIBLE
+                val emojiId = sharedPrefsWrapper.emojiId!!
+                emojiIdTextView.text = EmojiUtil.getFullEmojiIdSpannable(
+                    emojiId,
+                    emojiIdChunkSeparator,
+                    blackColor,
+                    lightGrayColor
+                )
+                emojiIdSummaryController.display(emojiId)
 
+                checkMarkAnim.visibility = View.VISIBLE
+                checkMarkAnim.playAnimation()
             }
         })
-
         fadeOut.start()
-        checkMarkAnim.playAnimation()
     }
 
     fun fadeOutAllViewAnimation() {

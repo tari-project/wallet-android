@@ -33,7 +33,7 @@
             android:layout_height="wrap_content"
             android:contentDescription="@null"
             android:layout_centerInParent="true"
-            android:src="@drawable/profile_icon" />
+            android:src="@drawable/recipient_profile_icon" />
 
     </RelativeLayout>
 
