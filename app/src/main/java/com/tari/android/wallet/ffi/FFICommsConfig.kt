@@ -53,6 +53,7 @@ internal class FFICommsConfig constructor(pointer: FFICommsConfigPtr) : FFIBase(
         databaseName: String,
         datastorePath: String,
         privateKeyPtr: FFIPrivateKey,
+        discoveryTimeoutSec: Long,
         error: FFIError
     )
 
@@ -69,7 +70,8 @@ internal class FFICommsConfig constructor(pointer: FFICommsConfigPtr) : FFIBase(
         transport: FFITransportType,
         databaseName: String,
         datastorePath: String,
-        privateKey: FFIPrivateKey
+        privateKey: FFIPrivateKey,
+        discoveryTimeoutSec: Long
     ) : this(nullptr) {
         if (databaseName.isEmpty()) {
             throw FFIException(message = "databaseName may not be empty")
@@ -83,6 +85,7 @@ internal class FFICommsConfig constructor(pointer: FFICommsConfigPtr) : FFIBase(
                 databaseName,
                 datastorePath,
                 privateKey,
+                discoveryTimeoutSec,
                 error
             )
             throwIf(error)

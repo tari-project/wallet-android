@@ -38,6 +38,7 @@
 package com.tari.android.wallet
 
 import com.tari.android.wallet.ffi.*
+import com.tari.android.wallet.util.Constants
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
@@ -67,7 +68,8 @@ class FFICommsConfigTests {
             transport,
             dbName,
             datastorePath,
-            privateKey
+            privateKey,
+            Constants.Wallet.discoveryTimeoutSec
         )
         assertTrue(commsConfig.getPointer() != nullptr)
         commsConfig.destroy()
@@ -85,7 +87,8 @@ class FFICommsConfigTests {
             transport,
             dbName,
             StringBuilder().append(datastorePath).append("bad_dir").toString(),
-            privateKey
+            privateKey,
+            Constants.Wallet.discoveryTimeoutSec
         )
         commsConfig.destroy()
         transport.destroy()
