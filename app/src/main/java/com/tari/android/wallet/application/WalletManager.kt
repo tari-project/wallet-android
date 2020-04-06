@@ -158,7 +158,8 @@ internal class WalletManager(
             getTorTransport(),
             Constants.Wallet.walletDBName,
             walletFilesDirPath,
-            FFIPrivateKey((getWalletPrivateKeyHexString(sharedPrefsWrapper)))
+            FFIPrivateKey((getWalletPrivateKeyHexString(sharedPrefsWrapper))),
+            Constants.Wallet.discoveryTimeoutSec
         )
     }
 

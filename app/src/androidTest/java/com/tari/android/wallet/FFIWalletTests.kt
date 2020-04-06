@@ -41,6 +41,7 @@ import com.orhanobut.logger.Logger
 import com.tari.android.wallet.ffi.*
 import com.tari.android.wallet.model.CompletedTx
 import com.tari.android.wallet.model.PendingInboundTx
+import com.tari.android.wallet.util.Constants
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -91,7 +92,8 @@ class FFIWalletTests {
             transport,
             FFITestUtil.WALLET_DB_NAME,
             FFITestUtil.WALLET_DATASTORE_PATH,
-            FFIPrivateKey(HexString(FFITestUtil.PRIVATE_KEY_HEX_STRING))
+            FFIPrivateKey(HexString(FFITestUtil.PRIVATE_KEY_HEX_STRING)),
+            Constants.Wallet.discoveryTimeoutSec
         )
         val listener = TestListener()
         val wallet = FFITestWallet(commsConfig, FFITestUtil.WALLET_LOG_FILE_PATH)
