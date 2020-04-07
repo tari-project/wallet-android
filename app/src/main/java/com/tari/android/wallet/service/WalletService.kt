@@ -735,6 +735,7 @@ internal class WalletService : Service(), FFIWalletListenerAdapter {
             val response = tariRESTService.requestMaxTestnetTari(publicKeyHexString, requestBody)
             response.enqueue(object : Callback<TestnetTariAllocateMaxResponse> {
                 override fun onFailure(call: Call<TestnetTariAllocateMaxResponse>, t: Throwable) {
+                    Logger.e("1")
                     error.code = WalletErrorCode.UNKNOWN_ERROR
                     notifyTestnetTariRequestFailed(getString(R.string.wallet_service_error_no_internet_connection))
                 }
@@ -776,7 +777,7 @@ internal class WalletService : Service(), FFIWalletListenerAdapter {
             })
         }
 
-        override fun importTestnetUTXO(error: WalletError): CompletedTx? {
+        override fun importTestnetUTXO(txMessage: String, error: WalletError): CompletedTx? {
             val keys = sharedPrefsWrapper.testnetTariUTXOKeyList.toMutableList()
             if (keys.isEmpty()) {
                 return null
@@ -789,7 +790,7 @@ internal class WalletService : Service(), FFIWalletListenerAdapter {
                 val amount = BigInteger(firstUTXOKey.value)
                 txId = wallet.importUTXO(
                     amount,
-                    getString(R.string.first_testnet_utxo_tx_message),
+                    txMessage,
                     spendingPrivateKeyFFI,
                     senderPublicKeyFFI
                 )

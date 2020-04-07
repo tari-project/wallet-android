@@ -40,6 +40,8 @@ import butterknife.BindView
 import butterknife.ButterKnife
 import com.airbnb.lottie.LottieAnimationView
 import com.tari.android.wallet.R
+import com.tari.android.wallet.ui.extension.gone
+import com.tari.android.wallet.ui.extension.visible
 import org.joda.time.LocalDate
 
 /**
@@ -80,17 +82,17 @@ class TxHeaderViewHolder(view: View, private val type: Type) :
 
     fun bind(date: LocalDate?, position: Int) {
         if (position == 0) {
-            separatorView.visibility = View.GONE
+            separatorView.gone()
         } else {
-            separatorView.visibility = View.VISIBLE
+            separatorView.visible()
         }
         when (type) {
             Type.PENDING_TXS -> {
-                lottieAnimView.visibility = View.VISIBLE
+                lottieAnimView.visible()
                 titleTextView.text = pendingTxsString
             }
             Type.DATE -> {
-                lottieAnimView.visibility = View.GONE
+                lottieAnimView.gone()
                 this.date = date!!
                 val todayDate = LocalDate.now()
                 val yesterdayDate = todayDate.minusDays(1)

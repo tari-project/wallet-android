@@ -52,9 +52,15 @@ import butterknife.*
 import com.daasuu.ei.Ease
 import com.daasuu.ei.EasingInterpolator
 import com.tari.android.wallet.R
+import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.model.*
+import com.tari.android.wallet.network.NetworkConnectionState
 import com.tari.android.wallet.ui.component.EmojiIdCopiedViewController
 import com.tari.android.wallet.ui.component.EmojiIdSummaryViewController
+import com.tari.android.wallet.ui.extension.gone
+import com.tari.android.wallet.ui.extension.invisible
+import com.tari.android.wallet.ui.extension.showInternetConnectionErrorDialog
+import com.tari.android.wallet.ui.extension.visible
 import com.tari.android.wallet.ui.fragment.BaseFragment
 import com.tari.android.wallet.ui.util.UiUtil
 import com.tari.android.wallet.util.Constants
@@ -191,7 +197,7 @@ class AddNoteFragment : BaseFragment(),
         fee = arguments!!.getParcelable("fee")!!
         emojiIdSummaryController = EmojiIdSummaryViewController(emojiIdSummaryView)
         fullEmojiIdBgClickBlockerView.isClickable = false
-        fullEmojiIdContainerView.visibility = View.GONE
+        fullEmojiIdContainerView.gone()
         displayAliasOrEmojiId()
         emojiIdCopiedViewController = EmojiIdCopiedViewController(emojiIdCopiedAnimView)
         hideFullEmojiId(animated = false)
@@ -247,8 +253,8 @@ class AddNoteFragment : BaseFragment(),
 
     private fun displayAliasOrEmojiId() {
         if (recipientUser is Contact) {
-            emojiIdSummaryContainerView.visibility = View.GONE
-            titleTextView.visibility = View.VISIBLE
+            emojiIdSummaryContainerView.gone()
+            titleTextView.visible()
             titleTextView.text = (recipientUser as Contact).alias
         } else {
             displayEmojiId(recipientUser.publicKey.emojiId)
@@ -256,9 +262,9 @@ class AddNoteFragment : BaseFragment(),
     }
 
     private fun displayEmojiId(emojiId: String) {
-        emojiIdSummaryContainerView.visibility = View.VISIBLE
+        emojiIdSummaryContainerView.visible()
         emojiIdSummaryController.display(emojiId)
-        titleTextView.visibility = View.GONE
+        titleTextView.gone()
         fullEmojiIdTextView.text = EmojiUtil.getFullEmojiIdSpannable(
             emojiId,
             emojiIdChunkSeparator,
@@ -292,9 +298,9 @@ class AddNoteFragment : BaseFragment(),
         // make dimmers non-clickable until the anim is over
         dimmerView.isClickable = false
         // prepare views
-        emojiIdSummaryContainerView.visibility = View.INVISIBLE
+        emojiIdSummaryContainerView.invisible()
         dimmerView.alpha = 0f
-        dimmerView.visibility = View.VISIBLE
+        dimmerView.visible()
         val fullEmojiIdInitialWidth = emojiIdSummaryContainerView.width
         val fullEmojiIdDeltaWidth = (rootView.width - horizontalMargin * 2) - fullEmojiIdInitialWidth
         UiUtil.setWidth(
@@ -302,7 +308,7 @@ class AddNoteFragment : BaseFragment(),
             fullEmojiIdInitialWidth
         )
         fullEmojiIdContainerView.alpha = 0f
-        fullEmojiIdContainerView.visibility = View.VISIBLE
+        fullEmojiIdContainerView.visible()
         // scroll to end
         fullEmojiIdScrollView.post {
             fullEmojiIdScrollView.scrollTo(
@@ -311,7 +317,7 @@ class AddNoteFragment : BaseFragment(),
             )
         }
         copyEmojiIdButtonContainerView.alpha = 0f
-        copyEmojiIdButtonContainerView.visibility = View.VISIBLE
+        copyEmojiIdButtonContainerView.visible()
         UiUtil.setBottomMargin(
             copyEmojiIdButtonContainerView,
             0
@@ -362,13 +368,13 @@ class AddNoteFragment : BaseFragment(),
 
     private fun hideFullEmojiId(animateCopyEmojiIdButton: Boolean = true, animated: Boolean) {
         if (!animated) {
-            fullEmojiIdContainerView.visibility = View.GONE
-            dimmerView.visibility = View.GONE
-            copyEmojiIdButtonContainerView.visibility = View.GONE
+            fullEmojiIdContainerView.gone()
+            dimmerView.gone()
+            copyEmojiIdButtonContainerView.gone()
             return
         }
         fullEmojiIdScrollView.smoothScrollTo(0, 0)
-        emojiIdSummaryContainerView.visibility = View.VISIBLE
+        emojiIdSummaryContainerView.visible()
         emojiIdSummaryContainerView.alpha = 0f
         // copy emoji id button anim
         val copyEmojiIdButtonAnim = ValueAnimator.ofFloat(1f, 0f)
@@ -408,10 +414,10 @@ class AddNoteFragment : BaseFragment(),
         animSet.start()
         animSet.addListener(object : AnimatorListenerAdapter() {
             override fun onAnimationEnd(animation: Animator?) {
-                dimmerView.visibility = View.GONE
+                dimmerView.gone()
                 fullEmojiIdBgClickBlockerView.isClickable = false
-                fullEmojiIdContainerView.visibility = View.GONE
-                copyEmojiIdButtonContainerView.visibility = View.GONE
+                fullEmojiIdContainerView.gone()
+                copyEmojiIdButtonContainerView.gone()
             }
         })
     }
@@ -460,14 +466,14 @@ class AddNoteFragment : BaseFragment(),
         }
         slideView.setOnTouchListener(this)
 
-        slideToSendDisabledTextView.visibility = View.INVISIBLE
+        slideToSendDisabledTextView.invisible()
 
         slideToSendEnabledTextView.alpha = 0f
-        slideToSendEnabledTextView.visibility = View.VISIBLE
+        slideToSendEnabledTextView.visible()
         slideArrowIconEnabledImageView.alpha = 0f
-        slideArrowIconEnabledImageView.visibility = View.VISIBLE
+        slideArrowIconEnabledImageView.visible()
         slideBgEnabledView.alpha = 0f
-        slideBgEnabledView.visibility = View.VISIBLE
+        slideBgEnabledView.visible()
 
         val textViewAnim = ObjectAnimator.ofFloat(slideToSendEnabledTextView, "alpha", 0f, 1f)
         val arrowAnim = ObjectAnimator.ofFloat(slideArrowIconEnabledImageView, "alpha", 0f, 1f)
@@ -481,10 +487,10 @@ class AddNoteFragment : BaseFragment(),
     }
 
     private fun disableCallToAction() {
-        slideToSendDisabledTextView.visibility = View.VISIBLE
-        slideBgEnabledView.visibility = View.GONE
-        slideToSendEnabledTextView.visibility = View.GONE
-        slideArrowIconEnabledImageView.visibility = View.GONE
+        slideToSendDisabledTextView.visible()
+        slideBgEnabledView.gone()
+        slideToSendEnabledTextView.gone()
+        slideArrowIconEnabledImageView.gone()
         slideView.setOnTouchListener(null)
     }
 
@@ -610,13 +616,26 @@ class AddNoteFragment : BaseFragment(),
             override fun onAnimationEnd(animation: Animator) { // done
                 val fragment = wr.get() ?: return
                 fragment.onSlideAnimationEnd()
+                anim.removeAllListeners()
             }
         })
         anim.start()
     }
 
     private fun onSlideAnimationEnd() {
-        progressBar.visibility = View.VISIBLE
+        if (EventBus.networkConnectionStateSubject.value != NetworkConnectionState.CONNECTED) {
+            rootView.postDelayed({
+                hideKeyboard()
+            }, Constants.UI.AddNoteAndSend.preKeyboardHideWaitMs)
+            rootView.postDelayed({
+                restoreSlider()
+                noteEditText.setRawInputType(InputType.TYPE_CLASS_TEXT)
+                showInternetConnectionErrorDialog(activity!!)
+            }, Constants.UI.AddNoteAndSend.preKeyboardHideWaitMs + Constants.UI.keyboardHideWaitMs)
+            return
+        }
+        progressBar.visible()
+        slideView.gone()
         rootView.postDelayed({
             hideKeyboard()
         }, Constants.UI.AddNoteAndSend.preKeyboardHideWaitMs)
@@ -641,6 +660,29 @@ class AddNoteFragment : BaseFragment(),
             fee,
             noteEditText.editableText.toString()
         )
+    }
+
+    private fun restoreSlider() {
+        // hide slide view
+        val slideViewInitialMargin = UiUtil.getStartMargin(slideView)
+        val slideViewMarginDelta = slideViewMarginStart - slideViewInitialMargin
+        val anim = ValueAnimator.ofFloat(
+            1f,
+            0f
+        )
+        anim.addUpdateListener { valueAnimator: ValueAnimator ->
+            val fragment = wr.get() ?: return@addUpdateListener
+            val value = valueAnimator.animatedValue as Float
+            fragment.slideView.alpha = 1f - value
+            slideToSendEnabledTextView.alpha = 1f - value
+            UiUtil.setStartMargin(
+                fragment.slideView,
+                (slideViewInitialMargin + slideViewMarginDelta * (1 - value)).toInt()
+            )
+        }
+        anim.duration = Constants.UI.shortDurationMs
+        anim.interpolator = EasingInterpolator(Ease.QUART_IN_OUT)
+        anim.start()
     }
 
     /**

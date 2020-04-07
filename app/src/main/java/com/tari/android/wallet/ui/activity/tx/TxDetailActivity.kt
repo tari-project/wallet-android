@@ -62,8 +62,10 @@ import com.tari.android.wallet.service.TariWalletService
 import com.tari.android.wallet.service.WalletService
 import com.tari.android.wallet.ui.activity.BaseActivity
 import com.tari.android.wallet.ui.component.*
+import com.tari.android.wallet.ui.extension.*
 import com.tari.android.wallet.ui.extension.getFirstChild
 import com.tari.android.wallet.ui.extension.getLastChild
+import com.tari.android.wallet.ui.extension.gone
 import com.tari.android.wallet.ui.extension.setTextSizePx
 import com.tari.android.wallet.ui.util.UiUtil
 import com.tari.android.wallet.util.Constants
@@ -317,31 +319,31 @@ internal class TxDetailActivity :
 
         txIdTextView.text = "${getString(R.string.tx_detail_transaction_id)}:${tx.id}"
         if (tx.message.isBlank()) {
-            noteLabelView.visibility = View.INVISIBLE
+            noteLabelView.invisible()
         }
         txNoteTv.text = tx.message
         backArrowImageView.setOnClickListener { onBackPressed() }
         val user = tx.user
         if (user is Contact) {
-            contactContainerView.visibility = View.VISIBLE
+            contactContainerView.visible()
             setUIAlias(user.alias)
         } else {
-            addContactButton.visibility = View.VISIBLE
-            contactContainerView.visibility = View.GONE
+            addContactButton.visible()
+            contactContainerView.gone()
         }
         when {
             (tx as? CompletedTx)?.direction == Tx.Direction.OUTBOUND -> {
-                txFeeGroup.visibility = View.VISIBLE
+                txFeeGroup.visible()
                 val fee = (tx as CompletedTx).fee
                 txFeeTextView.text = "+${WalletUtil.amountFormatter.format(fee.tariValue)}"
             }
             tx is PendingOutboundTx -> {
-                txFeeGroup.visibility = View.VISIBLE
+                txFeeGroup.visible()
                 val fee = (tx as PendingOutboundTx).fee
                 txFeeTextView.text = "+${WalletUtil.amountFormatter.format(fee.tariValue)}"
             }
             else -> {
-                txFeeGroup.visibility = View.GONE
+                txFeeGroup.gone()
             }
         }
         amountContainer.post { scaleDownAmountTextViewIfRequired() }
@@ -353,9 +355,9 @@ internal class TxDetailActivity :
             blackColor,
             lightGrayColor
         )
-        fullEmojiIdContainerView.visibility = View.GONE
-        dimmerViews.forEach { dimmerView -> dimmerView.visibility = View.GONE }
-        copyEmojiIdButtonContainerView.visibility = View.GONE
+        fullEmojiIdContainerView.gone()
+        dimmerViews.forEach { dimmerView -> dimmerView.gone() }
+        copyEmojiIdButtonContainerView.gone()
         emojiIdCopiedViewController = EmojiIdCopiedViewController(emojiIdCopiedAnimView)
     }
 
@@ -393,10 +395,10 @@ internal class TxDetailActivity :
         // make dimmers non-clickable until the anim is over
         dimmerViews.forEach { dimmerView -> dimmerView.isClickable = false }
         // prepare views
-        emojiIdSummaryContainerView.visibility = View.INVISIBLE
+        emojiIdSummaryContainerView.invisible()
         dimmerViews.forEach { dimmerView ->
             dimmerView.alpha = 0f
-            dimmerView.visibility = View.VISIBLE
+            dimmerView.visible()
         }
         val fullEmojiIdInitialWidth = emojiIdSummaryContainerView.width
         val fullEmojiIdDeltaWidth = emojiIdContainerView.width - fullEmojiIdInitialWidth
@@ -405,7 +407,7 @@ internal class TxDetailActivity :
             fullEmojiIdInitialWidth
         )
         fullEmojiIdContainerView.alpha = 0f
-        fullEmojiIdContainerView.visibility = View.VISIBLE
+        fullEmojiIdContainerView.visible()
         // scroll to end
         fullEmojiIdScrollView.post {
             fullEmojiIdScrollView.scrollTo(
@@ -414,7 +416,7 @@ internal class TxDetailActivity :
             )
         }
         copyEmojiIdButtonContainerView.alpha = 0f
-        copyEmojiIdButtonContainerView.visibility = View.VISIBLE
+        copyEmojiIdButtonContainerView.visible()
         UiUtil.setBottomMargin(
             copyEmojiIdButtonContainerView,
             0
@@ -467,7 +469,7 @@ internal class TxDetailActivity :
 
     private fun hideFullEmojiId(animateCopyEmojiIdButton: Boolean = true) {
         fullEmojiIdScrollView.smoothScrollTo(0, 0)
-        emojiIdSummaryContainerView.visibility = View.VISIBLE
+        emojiIdSummaryContainerView.visible()
         // copy emoji id button anim
         val copyEmojiIdButtonAnim = ValueAnimator.ofFloat(1f, 0f)
         copyEmojiIdButtonAnim.addUpdateListener { valueAnimator: ValueAnimator ->
@@ -506,10 +508,10 @@ internal class TxDetailActivity :
         animSet.addListener(object : AnimatorListenerAdapter() {
             override fun onAnimationEnd(animation: Animator?) {
                 dimmerViews.forEach { dimmerView ->
-                    dimmerView.visibility = View.GONE
+                    dimmerView.gone()
                 }
-                fullEmojiIdContainerView.visibility = View.GONE
-                copyEmojiIdButtonContainerView.visibility = View.GONE
+                fullEmojiIdContainerView.gone()
+                copyEmojiIdButtonContainerView.gone()
             }
         })
     }
@@ -580,11 +582,11 @@ internal class TxDetailActivity :
     }
 
     private fun setUIAlias(alias: String) {
-        contactNameTextView.visibility = View.VISIBLE
-        contactEditText.visibility = View.INVISIBLE
+        contactNameTextView.visible()
+        contactEditText.invisible()
         contactNameTextView.text = alias
-        editContactLabelTextView.visibility = View.VISIBLE
-        addContactButton.visibility = View.INVISIBLE
+        editContactLabelTextView.visible()
+        addContactButton.invisible()
     }
 
     @OnClick(R.id.tx_detail_txt_fee_label)
@@ -597,11 +599,11 @@ internal class TxDetailActivity :
      */
     @OnClick(R.id.tx_detail_btn_add_contact)
     fun onAddContactClick() {
-        contactContainerView.visibility = View.VISIBLE
-        addContactButton.visibility = View.INVISIBLE
-        contactEditText.visibility = View.VISIBLE
-        contactLabelTextView.visibility = View.VISIBLE
-        editContactLabelTextView.visibility = View.INVISIBLE
+        contactContainerView.visible()
+        addContactButton.invisible()
+        contactEditText.visible()
+        contactLabelTextView.visible()
+        editContactLabelTextView.invisible()
 
         focusContactEditText()
     }
@@ -620,14 +622,14 @@ internal class TxDetailActivity :
      */
     @OnClick(R.id.tx_detail_txt_edit_label)
     fun onEditContactClick() {
-        editContactLabelTextView.visibility = View.INVISIBLE
-        contactEditText.visibility = View.VISIBLE
+        editContactLabelTextView.invisible()
+        contactEditText.visible()
         focusContactEditText()
         val user = tx.user
         if (user is Contact) {
             contactEditText.setText(user.alias)
         }
-        contactNameTextView.visibility = View.INVISIBLE
+        contactNameTextView.invisible()
     }
 
     private fun showTxFeeToolTip() {

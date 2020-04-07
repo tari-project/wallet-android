@@ -34,21 +34,81 @@ package com.tari.android.wallet.ui.extension
 
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.app.Dialog
+import android.content.Context
 import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.os.Build
 import android.util.TypedValue
+import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
+import android.widget.LinearLayout
 import android.widget.ScrollView
 import android.widget.TextView
+import com.tari.android.wallet.R
 import com.tari.android.wallet.ui.util.UiUtil
+
+internal fun View.visible() {
+    this.visibility = View.VISIBLE
+}
+
+internal fun View.invisible() {
+    this.visibility = View.INVISIBLE
+}
+
+internal fun View.gone() {
+    this.visibility = View.GONE
+}
+
+/**
+ * Given the context, displays the standard "no internet connection" dialog.
+ */
+internal fun showInternetConnectionErrorDialog(context: Context) {
+    Dialog(context, R.style.Theme_AppCompat_Dialog).apply {
+        window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        setContentView(R.layout.internet_connection_error_dialog)
+        setCancelable(true)
+        setCanceledOnTouchOutside(true)
+        window?.setLayout(
+            LinearLayout.LayoutParams.MATCH_PARENT,
+            LinearLayout.LayoutParams.WRAP_CONTENT
+        )
+        findViewById<TextView>(R.id.internet_connection_error_dialog_txt_close)
+            .setOnClickListener {
+                dismiss()
+            }
+        window?.setGravity(Gravity.BOTTOM)
+    }.show()
+}
+
+/**
+ * Given the context, displays the standard "it's not you, it's the network" dialog.
+ */
+internal fun showTariNetworkConnectionErrorDialog(context: Context) {
+    Dialog(context, R.style.Theme_AppCompat_Dialog).apply {
+        window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        setContentView(R.layout.tari_network_connection_error_dialog)
+        setCancelable(true)
+        setCanceledOnTouchOutside(true)
+        window?.setLayout(
+            LinearLayout.LayoutParams.MATCH_PARENT,
+            LinearLayout.LayoutParams.WRAP_CONTENT
+        )
+        findViewById<TextView>(R.id.tari_network_connection_error_dialog_txt_close)
+            .setOnClickListener {
+                dismiss()
+            }
+        window?.setGravity(Gravity.BOTTOM)
+    }.show()
+}
 
 /**
  * Used for full-screen views.
  */
 @SuppressLint("ObsoleteSdkInt")
-fun Activity.makeStatusBarTransparent() {
+internal fun Activity.makeStatusBarTransparent() {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
         window.apply {
             clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS)
@@ -69,7 +129,7 @@ fun Activity.makeStatusBarTransparent() {
  * Sets the width of a TextView to the measured width of its contents
  * taking into account the text size and the typeface.
  */
-fun TextView.setWidthToMeasured() {
+internal fun TextView.setWidthToMeasured() {
     this.measure(
         View.MeasureSpec.UNSPECIFIED,
         View.MeasureSpec.UNSPECIFIED
@@ -84,7 +144,7 @@ fun TextView.setWidthToMeasured() {
  * Sets the size of a TextView to the measured size of its contents
  * taking into account the text size and the typeface.
  */
-fun TextView.setWidthAndHeightToMeasured() {
+internal fun TextView.setWidthAndHeightToMeasured() {
     this.measure(
         View.MeasureSpec.UNSPECIFIED,
         View.MeasureSpec.UNSPECIFIED
@@ -102,7 +162,7 @@ fun TextView.setWidthAndHeightToMeasured() {
 /**
  * Sets text size in pixel units.
  */
-fun TextView.setTextSizePx(sizePx: Float) {
+internal fun TextView.setTextSizePx(sizePx: Float) {
     setTextSize(
         TypedValue.COMPLEX_UNIT_PX,
         sizePx
@@ -112,7 +172,7 @@ fun TextView.setTextSizePx(sizePx: Float) {
 /**
  * @return first child of the view group, null if no children
  */
-fun ViewGroup.getFirstChild(): View? {
+internal fun ViewGroup.getFirstChild(): View? {
     return if (childCount > 0) {
         this.getChildAt(0)
     } else {
@@ -123,7 +183,7 @@ fun ViewGroup.getFirstChild(): View? {
 /**
  * @return last child of the view group, null if no children
  */
-fun ViewGroup.getLastChild(): View? {
+internal fun ViewGroup.getLastChild(): View? {
     return if (childCount > 0) {
         this.getChildAt(childCount - 1)
     } else {
@@ -134,14 +194,14 @@ fun ViewGroup.getLastChild(): View? {
 /**
  * Scroll to the top of the scroll view.
  */
-fun ScrollView.scrollToTop() {
+internal fun ScrollView.scrollToTop() {
     scrollTo(0, 0)
 }
 
 /**
  * Scroll to the bottom of the scroll view.
  */
-fun ScrollView.scrollToBottom() {
+internal fun ScrollView.scrollToBottom() {
     val lastChild = getChildAt(childCount - 1)
     val bottom = lastChild.bottom + paddingBottom
     val delta = bottom - (scrollY+ height)

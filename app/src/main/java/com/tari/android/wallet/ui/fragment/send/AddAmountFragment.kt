@@ -54,10 +54,6 @@ import com.tari.android.wallet.R
 import com.tari.android.wallet.model.*
 import com.tari.android.wallet.service.TariWalletService
 import com.tari.android.wallet.ui.component.EmojiIdSummaryViewController
-import com.tari.android.wallet.ui.extension.getFirstChild
-import com.tari.android.wallet.ui.extension.getLastChild
-import com.tari.android.wallet.ui.extension.setTextSizePx
-import com.tari.android.wallet.ui.extension.setWidthAndHeightToMeasured
 import com.tari.android.wallet.ui.fragment.BaseFragment
 import com.tari.android.wallet.ui.util.UiUtil
 import com.tari.android.wallet.util.Constants
@@ -65,6 +61,7 @@ import com.tari.android.wallet.util.EmojiUtil
 import com.tari.android.wallet.util.WalletUtil
 import com.tari.android.wallet.extension.remap
 import com.tari.android.wallet.ui.component.EmojiIdCopiedViewController
+import com.tari.android.wallet.ui.extension.*
 import me.everything.android.ui.overscroll.OverScrollDecoratorHelper
 import org.matomo.sdk.Tracker
 import org.matomo.sdk.extra.TrackHelper
@@ -250,12 +247,12 @@ class AddAmountFragment(private val walletService: TariWalletService) : BaseFrag
         currentFirstElementMarginStart = firstElementMarginStart
 
         // hide validation
-        notEnoughBalanceView.visibility = View.INVISIBLE
+        notEnoughBalanceView.invisible()
         // hide tx fee
-        txFeeContainerView.visibility = View.INVISIBLE
+        txFeeContainerView.invisible()
         // hide/disable continue button
-        continueButton.visibility = View.INVISIBLE
-        disabledContinueButton.visibility = View.VISIBLE
+        continueButton.invisible()
+        disabledContinueButton.visible()
         // add first digit to the element list
         elements.add(Pair("0", element0TextView))
 
@@ -302,8 +299,8 @@ class AddAmountFragment(private val walletService: TariWalletService) : BaseFrag
 
     private fun displayAliasOrEmojiId() {
         if (recipientUser is Contact) {
-            emojiIdSummaryContainerView.visibility = View.GONE
-            titleTextView.visibility = View.VISIBLE
+            emojiIdSummaryContainerView.gone()
+            titleTextView.visible()
             titleTextView.text = (recipientUser as Contact).alias
         } else {
             displayEmojiId(recipientUser.publicKey.emojiId)
@@ -311,9 +308,9 @@ class AddAmountFragment(private val walletService: TariWalletService) : BaseFrag
     }
 
     private fun displayEmojiId(emojiId: String) {
-        emojiIdSummaryContainerView.visibility = View.VISIBLE
+        emojiIdSummaryContainerView.visible()
         emojiIdSummaryController.display(emojiId)
-        titleTextView.visibility = View.GONE
+        titleTextView.gone()
         fullEmojiIdTextView.text = EmojiUtil.getFullEmojiIdSpannable(
             emojiId,
             emojiIdChunkSeparator,
@@ -347,9 +344,9 @@ class AddAmountFragment(private val walletService: TariWalletService) : BaseFrag
         // make dimmers non-clickable until the anim is over
         dimmerView.isClickable = false
         // prepare views
-        emojiIdSummaryContainerView.visibility = View.INVISIBLE
+        emojiIdSummaryContainerView.invisible()
         dimmerView.alpha = 0f
-        dimmerView.visibility = View.VISIBLE
+        dimmerView.visible()
         val fullEmojiIdInitialWidth = emojiIdSummaryContainerView.width
         val fullEmojiIdDeltaWidth = (rootView.width - horizontalMargin * 2) - fullEmojiIdInitialWidth
         UiUtil.setWidth(
@@ -357,7 +354,7 @@ class AddAmountFragment(private val walletService: TariWalletService) : BaseFrag
             fullEmojiIdInitialWidth
         )
         fullEmojiIdContainerView.alpha = 0f
-        fullEmojiIdContainerView.visibility = View.VISIBLE
+        fullEmojiIdContainerView.visible()
         // scroll to end
         fullEmojiIdScrollView.post {
             fullEmojiIdScrollView.scrollTo(
@@ -366,7 +363,7 @@ class AddAmountFragment(private val walletService: TariWalletService) : BaseFrag
             )
         }
         copyEmojiIdButtonContainerView.alpha = 0f
-        copyEmojiIdButtonContainerView.visibility = View.VISIBLE
+        copyEmojiIdButtonContainerView.visible()
         UiUtil.setBottomMargin(
             copyEmojiIdButtonContainerView,
             0
@@ -417,13 +414,13 @@ class AddAmountFragment(private val walletService: TariWalletService) : BaseFrag
 
     private fun hideFullEmojiId(animateCopyEmojiIdButton: Boolean = true, animated: Boolean) {
         if (!animated) {
-            fullEmojiIdContainerView.visibility = View.GONE
-            dimmerView.visibility = View.GONE
-            copyEmojiIdButtonContainerView.visibility = View.GONE
+            fullEmojiIdContainerView.gone()
+            dimmerView.gone()
+            copyEmojiIdButtonContainerView.gone()
             return
         }
         fullEmojiIdScrollView.smoothScrollTo(0, 0)
-        emojiIdSummaryContainerView.visibility = View.VISIBLE
+        emojiIdSummaryContainerView.visible()
         emojiIdSummaryContainerView.alpha = 0f
         // copy emoji id button anim
         val copyEmojiIdButtonAnim = ValueAnimator.ofFloat(1f, 0f)
@@ -461,10 +458,10 @@ class AddAmountFragment(private val walletService: TariWalletService) : BaseFrag
         animSet.start()
         animSet.addListener(object : AnimatorListenerAdapter() {
             override fun onAnimationEnd(animation: Animator?) {
-                dimmerView.visibility = View.GONE
+                dimmerView.gone()
                 fullEmojiIdBgClickBlockerView.isClickable = false
-                fullEmojiIdContainerView.visibility = View.GONE
-                copyEmojiIdButtonContainerView.visibility = View.GONE
+                fullEmojiIdContainerView.gone()
+                copyEmojiIdButtonContainerView.gone()
             }
         })
     }
@@ -968,7 +965,7 @@ class AddAmountFragment(private val walletService: TariWalletService) : BaseFrag
 
     private fun displayAvailableBalanceError() {
         // hide continue button
-        continueButton.visibility = View.INVISIBLE
+        continueButton.invisible()
 
         // show validation message box
         if (notEnoughBalanceView.visibility == View.VISIBLE) {
@@ -978,7 +975,7 @@ class AddAmountFragment(private val walletService: TariWalletService) : BaseFrag
         // don't allow digit entry during this animation
         digitAnimIsRunning = true
         notEnoughBalanceView.alpha = 0f
-        notEnoughBalanceView.visibility = View.VISIBLE
+        notEnoughBalanceView.visible()
         val viewAnim = ValueAnimator.ofFloat(0f, 1f)
         viewAnim.addUpdateListener { valueAnimator: ValueAnimator ->
             val value = valueAnimator.animatedValue as Float
@@ -1039,7 +1036,7 @@ class AddAmountFragment(private val walletService: TariWalletService) : BaseFrag
 
     private fun continueToNote() {
         val fee = WalletUtil.calculateTxFee()
-        listenerWR.get()?.continueToNote(
+        listenerWR.get()?.continueToAddNote(
             this,
             recipientUser,
             currentAmount,
@@ -1052,7 +1049,7 @@ class AddAmountFragment(private val walletService: TariWalletService) : BaseFrag
             return
         }
         continueButton.alpha = 0f
-        continueButton.visibility = View.VISIBLE
+        continueButton.visible()
         val anim = ObjectAnimator.ofFloat(continueButton, "alpha", 0f, 1f)
         anim.duration = Constants.UI.shortDurationMs
         anim.start()
@@ -1082,7 +1079,7 @@ class AddAmountFragment(private val walletService: TariWalletService) : BaseFrag
                 wr.get()?.displayAvailableBalanceError()
                 if (txFeeContainerView.visibility == View.INVISIBLE) {
                     txFeeContainerView.alpha = 0f
-                    txFeeContainerView.visibility = View.VISIBLE
+                    txFeeContainerView.visible()
                     val viewAnim = ValueAnimator.ofFloat(0f, 1f)
                     viewAnim.addUpdateListener { valueAnimator: ValueAnimator ->
                         val value = valueAnimator.animatedValue as Float
@@ -1099,7 +1096,7 @@ class AddAmountFragment(private val walletService: TariWalletService) : BaseFrag
                 var hidesTxFee = false
                 // show/hide continue button
                 if (currentAmount.value.toInt() == 0) {
-                    continueButton.visibility = View.INVISIBLE
+                    continueButton.invisible()
                     // hide fee
                     if (txFeeContainerView.visibility != View.INVISIBLE) {
                         hidesTxFee = true
@@ -1110,7 +1107,7 @@ class AddAmountFragment(private val walletService: TariWalletService) : BaseFrag
                     if (txFeeContainerView.visibility != View.VISIBLE) {
                         showsTxFee = true
                         txFeeContainerView.alpha = 0f
-                        txFeeContainerView.visibility = View.VISIBLE
+                        txFeeContainerView.visible()
                     }
                 }
 
@@ -1124,7 +1121,7 @@ class AddAmountFragment(private val walletService: TariWalletService) : BaseFrag
                         wr.get()?.notEnoughBalanceView?.scaleX = scale
                         wr.get()?.notEnoughBalanceView?.scaleY = scale
                         if (value == 1f) {
-                            wr.get()?.notEnoughBalanceView?.visibility = View.INVISIBLE
+                            wr.get()?.notEnoughBalanceView?.invisible()
                         }
                     }
 
@@ -1137,7 +1134,7 @@ class AddAmountFragment(private val walletService: TariWalletService) : BaseFrag
                         wr.get()?.txFeeContainerView?.alpha = (1f - value)
                     }
                     if (value == 1f && hidesTxFee) {
-                        wr.get()?.txFeeContainerView?.visibility = View.INVISIBLE
+                        wr.get()?.txFeeContainerView?.invisible()
                     }
                 }
                 viewAnim.duration = Constants.UI.shortDurationMs
@@ -1159,7 +1156,7 @@ class AddAmountFragment(private val walletService: TariWalletService) : BaseFrag
         /**
          * Recipient is user.
          */
-        fun continueToNote(
+        fun continueToAddNote(
             sourceFragment: AddAmountFragment,
             recipientUser: User,
             amount: MicroTari,

@@ -7,6 +7,8 @@
     <dimen name="common_action_button_height">54dp</dimen>
     <dimen name="common_view_elevation">4dp</dimen>
     <dimen name="common_horizontal_margin">25dp</dimen>
+    <dimen name="common_dialog_horizontal_margin">14dp</dimen>
+    <dimen name="common_dialog_bottom_margin">24dp</dimen>
     <dimen name="common_copy_emoji_id_button_visible_bottom_margin">-56dp</dimen>
 
     <!-- emoji id & emoji id summary -->

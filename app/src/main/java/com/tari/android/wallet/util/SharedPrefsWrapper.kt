@@ -63,6 +63,7 @@ class SharedPrefsWrapper(
         const val torBinPathKey = "tari_wallet_tor_bin_path"
         const val baseNodePublicKeyHexKey = "tari_wallet_base_node_public_key_hex"
         const val baseNodeAddressKey = "tari_wallet_base_node_address"
+        const val faucetTestnetTariRequestCompleted = "tari_wallet_faucet_testnet_tari_request_completed"
         const val testnetTariUTXOListKey = "tari_wallet_testnet_tari_utxo_key_list"
         const val firstTestnetUTXOTxId = "tari_wallet_first_testnet_utxo_tx_id"
         const val secondTestnetUTXOTxId = "tari_wallet_second_testnet_utxo_tx_id"
@@ -238,6 +239,17 @@ class SharedPrefsWrapper(
             }
         }
 
+    var faucetTestnetTariRequestCompleted: Boolean
+        get() {
+            return sharedPrefs.getBoolean(Key.faucetTestnetTariRequestCompleted, false)
+        }
+        set(value) {
+            sharedPrefs.edit().apply {
+                putBoolean(Key.faucetTestnetTariRequestCompleted, value)
+                apply()
+            }
+        }
+
     var testnetTariUTXOKeyList: List<TestnetTariUTXOKey>
         get() {
             val json = sharedPrefs.getString(Key.testnetTariUTXOListKey, "[]")
@@ -286,13 +298,32 @@ class SharedPrefsWrapper(
             }
         }
 
+    init {
+        // for migration purposes, to avoid a second redundant faucet call:
+        // faucetTestnetTariRequestCompleted was introduced  after firstTestnetUTXOTxId and
+        // secondTestnetUTXOTxId properties
+        if (firstTestnetUTXOTxId != null && secondTestnetUTXOTxId != null) {
+            faucetTestnetTariRequestCompleted = true
+        }
+    }
+
     fun clean() {
-        publicKeyHexString = ""
-        emojiId = ""
+        privateKeyHexString = null
+        publicKeyHexString = null
+        isAuthenticated = false
+        emojiId = null
         onboardingStarted = false
         onboardingCompleted = false
+        onboardingAuthSetupStarted = false
+        onboardingAuthSetupCompleted = false
         onboardingDisplayedAtHome = false
         torBinPath = null
+        baseNodePublicKeyHex = null
+        baseNodeAddress = null
+        faucetTestnetTariRequestCompleted = false
+        testnetTariUTXOKeyList = mutableListOf()
+        firstTestnetUTXOTxId = null
+        secondTestnetUTXOTxId = null
     }
 
 }

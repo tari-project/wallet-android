@@ -100,7 +100,7 @@ internal object Constants {
             const val removeFragmentDelayDuration = 1200L
             const val tariTextAnimViewDurationMs = 1600L
             const val viewContainerFadeOutDurationMs = 800L
-            const val introductionBottomViewsFadeOutDelay = 1000L
+            const val introductionBottomViewsFadeOutDelay = 1100L
         }
 
         object AddAmount {
@@ -127,7 +127,7 @@ internal object Constants {
             const val viewFadeAnimDelayMs = 200L
             const val localAuthAnimDurationMs = 800L
             const val removeFragmentDelayDuration = 1000L
-            const val bottomViewsFadeOutDelay = 1000L
+            const val bottomViewsFadeOutDelay = 1200L
         }
     }
 
@@ -136,7 +136,7 @@ internal object Constants {
      */
     object Wallet {
         val network = Network.TESTNET_1
-        val discoveryTimeoutSec = 20L
+        const val discoveryTimeoutSec = 20L
         const val emojiIdLength = 33
         const val emojiFormatterChunkSize = 3
         const val walletDBName: String = "tari_wallet_db"

@@ -75,6 +75,12 @@
     <string name="paste_emoji_id">Paste copied Emoji ID</string>
     <string name="tap_to_see_full_emoji_id">Tap to see full Emoji ID</string>
 
+    <!-- dialog -->
+    <string name="internet_connection_error_dialog_title">Can\'t connect to the interwebs</string>
+    <string name="internet_connection_error_dialog_description">Your phone is either offline or has a poor connection at the moment. We\'ll wait here until you find some stronger signal.</string>
+    <string name="tari_network_connection_error_dialog_title">It\'s not you, it\' the network.</string>
+    <string name="tari_network_connection_error_dialog_description">Looks like there\'s a connectivity issue on our end. Can you give us a few min, then come back and try again?</string>
+
     <!-- service -->
     <string name="wallet_service_title">Tari wallet service is running.</string>
     <string name="wallet_service_description">This service carries out wallet operations across applications.</string>
@@ -137,7 +143,7 @@
     <string name="home_yesterday">Yesterday</string>
     <string name="home_send_tari">Send Tari</string>
     <string name="home_txs">Transactions</string>
-    <string name="home_pending_txs">In Progress Transactions</string>
+    <string name="home_pending_txs">In Progress</string>
     <string name="home_hello">Hello!</string>
     <string name="home_setup_is_complete">Your wallet setup is complete.</string>
     <string name="home_you_are_ready_to_explore">You’re ready to start exploring</string>

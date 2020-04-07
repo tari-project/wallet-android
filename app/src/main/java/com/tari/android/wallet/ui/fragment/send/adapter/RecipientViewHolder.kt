@@ -43,6 +43,8 @@ import com.tari.android.wallet.R
 import com.tari.android.wallet.model.Contact
 import com.tari.android.wallet.model.User
 import com.tari.android.wallet.ui.component.EmojiIdSummaryViewController
+import com.tari.android.wallet.ui.extension.gone
+import com.tari.android.wallet.ui.extension.visible
 import com.tari.android.wallet.ui.util.UiUtil
 import java.lang.ref.WeakReference
 import java.util.*
@@ -84,18 +86,18 @@ class RecipientViewHolder(view: View, listener: Listener) :
     fun bind(user: User) {
         userWR = WeakReference(user)
         if (user is Contact) {
-            aliasTextView.visibility = View.VISIBLE
-            emojiIdSummaryView.visibility = View.GONE
-            profileIconImageView.visibility = View.GONE
-            initialTextView.visibility = View.VISIBLE
+            aliasTextView.visible()
+            emojiIdSummaryView.gone()
+            profileIconImageView.gone()
+            initialTextView.visible()
 
             initialTextView.text = user.alias.take(1).toUpperCase(Locale.getDefault())
             aliasTextView.text = user.alias
         } else {
-            aliasTextView.visibility = View.GONE
-            emojiIdSummaryView.visibility = View.VISIBLE
-            profileIconImageView.visibility = View.VISIBLE
-            initialTextView.visibility = View.GONE
+            aliasTextView.gone()
+            emojiIdSummaryView.visible()
+            profileIconImageView.visible()
+            initialTextView.gone()
 
             emojiIdSummaryController.display(
                 user.publicKey.emojiId

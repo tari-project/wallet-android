@@ -42,6 +42,8 @@ import com.tari.android.wallet.R
 import com.tari.android.wallet.model.Contact
 import com.tari.android.wallet.model.Tx
 import com.tari.android.wallet.ui.component.EmojiIdSummaryViewController
+import com.tari.android.wallet.ui.extension.gone
+import com.tari.android.wallet.ui.extension.visible
 import com.tari.android.wallet.ui.util.UiUtil
 import com.tari.android.wallet.util.WalletUtil
 import java.lang.ref.WeakReference
@@ -97,12 +99,12 @@ class TxViewHolder(view: View, listener: Listener) :
         // display contact alias or user emoji id
         val txUser = tx.user
         if (txUser is Contact) {
-            aliasTextView.visibility = View.VISIBLE
+            aliasTextView.visible()
             aliasTextView.text = txUser.alias
-            emojiIdSummaryView.visibility = View.GONE
+            emojiIdSummaryView.gone()
         } else {
-            aliasTextView.visibility = View.GONE
-            emojiIdSummaryView.visibility = View.VISIBLE
+            aliasTextView.gone()
+            emojiIdSummaryView.visible()
             emojiIdSummaryController.display(
                 txUser.publicKey.emojiId
             )
