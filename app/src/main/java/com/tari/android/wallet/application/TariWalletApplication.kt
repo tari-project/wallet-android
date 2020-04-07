@@ -42,6 +42,7 @@ import androidx.lifecycle.ProcessLifecycleOwner
 import com.orhanobut.logger.AndroidLogAdapter
 import com.orhanobut.logger.Logger
 import com.tari.android.wallet.di.*
+import com.tari.android.wallet.network.NetworkConnectionStateReceiver
 import com.tari.android.wallet.notification.NotificationHelper
 import com.tari.android.wallet.util.SharedPrefsWrapper
 import com.tari.android.wallet.util.WalletUtil
@@ -71,6 +72,8 @@ internal class TariWalletApplication : Application(), LifecycleObserver {
     lateinit var tracker: Tracker
     @Inject
     lateinit var walletManager: WalletManager
+    @Inject
+    lateinit var connectionStateReceiver: NetworkConnectionStateReceiver
 
     lateinit var appComponent: ApplicationComponent
     private lateinit var sharedPrefsWrapper: SharedPrefsWrapper
@@ -115,6 +118,8 @@ internal class TariWalletApplication : Application(), LifecycleObserver {
         sharedPrefsWrapper.isAuthenticated = false
 
         walletManager.start()
+
+        registerReceiver(connectionStateReceiver, connectionStateReceiver.intentFilter)
 
         TrackHelper.track().download().identifier(
             DownloadTracker.Extra.ApkChecksum(this)

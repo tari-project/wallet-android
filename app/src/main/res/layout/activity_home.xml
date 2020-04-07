@@ -27,10 +27,10 @@
         <!-- store icon (image only) -->
         <ImageView
             android:id="@+id/home_img_store_icon"
-            android:layout_toStartOf="@id/home_img_wallet_info"
             android:layout_width="30dp"
             android:layout_height="30dp"
             android:layout_marginEnd="10dp"
+            android:layout_toStartOf="@id/home_img_wallet_info"
             android:contentDescription="@null"
             android:scaleType="center"
             android:src="@drawable/store_icon" />
@@ -146,9 +146,9 @@
                     android:id="@+id/home_btn_store"
                     android:layout_width="40dp"
                     android:layout_height="40dp"
-                    android:layout_toStartOf="@id/home_btn_wallet_info"
                     android:layout_marginTop="@dimen/home_wallet_info_button_initial_top_margin"
                     android:layout_marginEnd="0dp"
+                    android:layout_toStartOf="@id/home_btn_wallet_info"
                     android:background="@color/transparent" />
 
                 <!-- wallet info (profile) button -->
@@ -263,10 +263,10 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:layout_marginTop="-85dp"
-                    android:lineSpacingExtra="10dp"
                     android:alpha="0"
                     android:gravity="center"
                     android:letterSpacing="-0.018"
+                    android:lineSpacingExtra="10dp"
                     android:text="@string/home_empty_wallet"
                     android:textColor="@color/dark_gray"
                     android:textSize="14sp"
@@ -337,5 +337,13 @@
         android:layout_below="@id/home_vw_tx_list_header"
         android:alpha="0.8"
         android:background="@drawable/view_elevation_gradient" />
+
+    <!-- utilized to disable user interaction during the start-up animations -->
+    <View
+        android:id="@+id/home_vw_blocker"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clickable="true"
+        android:focusable="true" />
 
 </RelativeLayout>

@@ -51,6 +51,8 @@ import com.tari.android.wallet.auth.AuthUtil
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.ui.component.CustomFontButton
 import com.tari.android.wallet.ui.component.CustomFontTextView
+import com.tari.android.wallet.ui.extension.invisible
+import com.tari.android.wallet.ui.extension.visible
 import com.tari.android.wallet.ui.fragment.BaseFragment
 import com.tari.android.wallet.ui.util.UiUtil
 import com.tari.android.wallet.util.Constants.UI.Auth
@@ -168,7 +170,7 @@ internal class LocalAuthFragment : BaseFragment() {
     }
 
     private fun setupUi() {
-        progressBarContainerView.visibility = View.INVISIBLE
+        progressBarContainerView.invisible()
         UiUtil.setProgressBarColor(progressBar, whiteColor)
         if (authType == AuthType.BIOMETRIC) {
             //setup ui for biometric auth
@@ -223,6 +225,7 @@ internal class LocalAuthFragment : BaseFragment() {
                     displayAuthNotAvailableDialog()
                     return
                 }
+                enableAuthButton.isEnabled = false
                 doAuth()
             }
         })
@@ -285,6 +288,7 @@ internal class LocalAuthFragment : BaseFragment() {
         val dialog = dialogBuilder.create()
         dialog.setTitle(getString(R.string.auth_failed_title))
         dialog.show()
+        enableAuthButton.isEnabled = true
     }
 
     /**
@@ -310,8 +314,8 @@ internal class LocalAuthFragment : BaseFragment() {
     private fun authSuccess() {
         // check if the wallet is ready & switch to wait mode if not & start listening
         if (EventBus.walletStateSubject.value != WalletState.RUNNING) {
-            progressBarContainerView.visibility = View.VISIBLE
-            enableAuthButton.visibility = View.INVISIBLE
+            progressBarContainerView.visible()
+            enableAuthButton.invisible()
             continueIsPendingOnWalletState = true
             EventBus.subscribeToWalletState(this) { walletState ->
                 onWalletStateChanged(walletState)

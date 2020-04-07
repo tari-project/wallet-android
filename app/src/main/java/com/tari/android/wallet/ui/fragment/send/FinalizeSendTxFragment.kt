@@ -56,6 +56,8 @@ import com.tari.android.wallet.model.WalletError
 import com.tari.android.wallet.model.WalletErrorCode
 import com.tari.android.wallet.service.TariWalletService
 import com.tari.android.wallet.ui.component.CustomFont
+import com.tari.android.wallet.ui.extension.invisible
+import com.tari.android.wallet.ui.extension.visible
 import com.tari.android.wallet.ui.fragment.BaseFragment
 import com.tari.android.wallet.ui.util.UiUtil.getResourceUri
 import com.tari.android.wallet.util.Constants
@@ -142,7 +144,7 @@ class FinalizeSendTxFragment(private val walletService: TariWalletService)
             View.MeasureSpec.UNSPECIFIED,
             View.MeasureSpec.UNSPECIFIED
         )
-        infoTextView.visibility = View.INVISIBLE
+        infoTextView.invisible()
 
         val successfulInfo = String.format(successfulInfoFormat, formattedAmount)
         val successfulInfoBoldPart = String.format(successfulInfoFormatBoldPart, formattedAmount)
@@ -206,7 +208,7 @@ class FinalizeSendTxFragment(private val walletService: TariWalletService)
 
     private fun playTextAppearAnimation() {
         infoTextView.translationY = infoTextView.height.toFloat()
-        infoTextView.visibility = View.VISIBLE
+        infoTextView.visible()
 
         ObjectAnimator.ofFloat(
             infoTextView,

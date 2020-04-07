@@ -47,6 +47,9 @@ import com.tari.android.wallet.R
 import com.tari.android.wallet.ffi.FFIPublicKey
 import com.tari.android.wallet.ffi.FFIWallet
 import com.tari.android.wallet.ffi.HexString
+import com.tari.android.wallet.ui.extension.gone
+import com.tari.android.wallet.ui.extension.invisible
+import com.tari.android.wallet.ui.extension.visible
 import com.tari.android.wallet.ui.fragment.BaseFragment
 import com.tari.android.wallet.ui.util.UiUtil
 import com.tari.android.wallet.util.SharedPrefsWrapper
@@ -105,9 +108,9 @@ internal class BaseNodeConfigFragment : BaseFragment() {
         publicKeyHexTextView.text = sharedPrefsWrapper.baseNodePublicKeyHex
         addressTextView.text = sharedPrefsWrapper.baseNodeAddress
         UiUtil.setProgressBarColor(progressBar, whiteColor)
-        progressBar.visibility = View.GONE
-        invalidPublicKeyHexTextView.visibility = View.INVISIBLE
-        invalidAddressTextView.visibility = View.INVISIBLE
+        progressBar.gone()
+        invalidPublicKeyHexTextView.invisible()
+        invalidAddressTextView.invisible()
     }
 
     override fun onStart() {
@@ -118,13 +121,13 @@ internal class BaseNodeConfigFragment : BaseFragment() {
     @OnTextChanged(R.id.base_node_config_edit_public_key)
     fun onPublicKeyHexChanged() {
         publicKeyHexEditText.background = editTextBgDrawable
-        invalidPublicKeyHexTextView.visibility = View.INVISIBLE
+        invalidPublicKeyHexTextView.invisible()
     }
 
     @OnTextChanged(R.id.base_node_config_edit_address)
     fun onAddressChanged() {
         addressEditText.background = editTextBgDrawable
-        invalidAddressTextView.visibility = View.INVISIBLE
+        invalidAddressTextView.invisible()
     }
 
     /**
@@ -150,20 +153,20 @@ internal class BaseNodeConfigFragment : BaseFragment() {
         if (!publicKeyRegex.matches(publicKeyHex)) {
             isValid = false
             publicKeyHexEditText.background = editTextInvalidBgDrawable
-            invalidPublicKeyHexTextView.visibility = View.VISIBLE
+            invalidPublicKeyHexTextView.visible()
         } else {
             publicKeyHexEditText.background = editTextBgDrawable
-            invalidPublicKeyHexTextView.visibility = View.INVISIBLE
+            invalidPublicKeyHexTextView.invisible()
         }
         // validate address
         val address = addressEditText.editableText.toString()
         if (!addressRegex.matches(address)) {
             isValid = false
             addressEditText.background = editTextInvalidBgDrawable
-            invalidAddressTextView.visibility = View.VISIBLE
+            invalidAddressTextView.visible()
         } else {
             addressEditText.background = editTextBgDrawable
-            invalidAddressTextView.visibility = View.INVISIBLE
+            invalidAddressTextView.invisible()
         }
         return isValid
     }
@@ -177,8 +180,8 @@ internal class BaseNodeConfigFragment : BaseFragment() {
         }
         val publicKeyHex = publicKeyHexEditText.editableText.toString()
         val address = addressEditText.editableText.toString()
-        saveButton.visibility = View.INVISIBLE
-        progressBar.visibility = View.VISIBLE
+        saveButton.invisible()
+        progressBar.visible()
         AsyncTask.execute {
             addBaseNodePeer(publicKeyHex, address)
         }
@@ -210,8 +213,8 @@ internal class BaseNodeConfigFragment : BaseFragment() {
         sharedPrefsWrapper.baseNodePublicKeyHex = publicKeyHex
         sharedPrefsWrapper.baseNodeAddress = address
         // UI
-        saveButton.visibility = View.VISIBLE
-        progressBar.visibility = View.GONE
+        saveButton.visible()
+        progressBar.gone()
         // show toast
         Toast.makeText(
             mActivity,
@@ -223,8 +226,8 @@ internal class BaseNodeConfigFragment : BaseFragment() {
     private fun addBaseNodePeerFailed() {
         val mActivity = activity ?: return
         // UI update
-        saveButton.visibility = View.VISIBLE
-        progressBar.visibility = View.GONE
+        saveButton.visible()
+        progressBar.gone()
         // show toast
         Toast.makeText(
             mActivity,

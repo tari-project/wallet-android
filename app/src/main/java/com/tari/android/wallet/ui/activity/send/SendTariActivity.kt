@@ -55,9 +55,11 @@ import com.tari.android.wallet.event.Event
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.model.MicroTari
 import com.tari.android.wallet.model.User
+import com.tari.android.wallet.network.NetworkConnectionState
 import com.tari.android.wallet.service.TariWalletService
 import com.tari.android.wallet.service.WalletService
 import com.tari.android.wallet.ui.activity.BaseActivity
+import com.tari.android.wallet.ui.extension.showInternetConnectionErrorDialog
 import com.tari.android.wallet.ui.fragment.BaseFragment
 import com.tari.android.wallet.ui.fragment.send.AddRecipientFragment
 import com.tari.android.wallet.ui.fragment.send.AddAmountFragment
@@ -191,6 +193,10 @@ internal class SendTariActivity : BaseActivity(),
         sourceFragment: AddRecipientFragment,
         user: User
     ) {
+        if (EventBus.networkConnectionStateSubject.value != NetworkConnectionState.CONNECTED) {
+            showInternetConnectionErrorDialog(this)
+            return
+        }
         UiUtil.hideKeyboard(this)
         val bundle = Bundle().apply {
             putParcelable("recipientUser", user)
@@ -245,12 +251,16 @@ internal class SendTariActivity : BaseActivity(),
 
     // region AddAmountFragment.Listener implementation
 
-    override fun continueToNote(
+    override fun continueToAddNote(
         sourceFragment: AddAmountFragment,
         recipientUser: User,
         amount: MicroTari,
         fee: MicroTari
     ) {
+        if (EventBus.networkConnectionStateSubject.value != NetworkConnectionState.CONNECTED) {
+            showInternetConnectionErrorDialog(this)
+            return
+        }
         val bundle = Bundle().apply {
             putParcelable("recipientUser", recipientUser)
             putParcelable("amount", amount)

@@ -48,6 +48,9 @@ import com.daasuu.ei.EasingInterpolator
 import com.tari.android.wallet.R
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.extension.applyURLStyle
+import com.tari.android.wallet.ui.extension.gone
+import com.tari.android.wallet.ui.extension.invisible
+import com.tari.android.wallet.ui.extension.visible
 import com.tari.android.wallet.ui.fragment.BaseFragment
 import com.tari.android.wallet.ui.util.UiUtil
 import com.tari.android.wallet.ui.util.UiUtil.getResourceUri
@@ -271,8 +274,8 @@ internal class IntroductionFragment : BaseFragment() {
     @OnClick(R.id.introduction_btn_create_wallet)
     fun onCreateWalletClick() {
         UiUtil.temporarilyDisableClick(createWalletButton)
-        createWalletButton.visibility = View.GONE
-        progressBar.visibility = View.VISIBLE
+        createWalletButton.gone()
+        progressBar.visible()
         rootView.postDelayed(
             { wr.get()?.startTariWalletViewAnimation() },
             createWalletArtificalDelay
@@ -324,11 +327,11 @@ internal class IntroductionFragment : BaseFragment() {
         }
         fadeOutAnim.addListener(object : AnimatorListenerAdapter() {
             override fun onAnimationEnd(animation: Animator?) {
-                videoOuterContainer.visibility = View.INVISIBLE
-                headerTopLineTextView.visibility = View.INVISIBLE
-                headerBottomLineTextView.visibility = View.INVISIBLE
-                walletBtnLayout.visibility = View.INVISIBLE
-                userAgreementAndPrivacyPolicyTextView.visibility = View.INVISIBLE
+                videoOuterContainer.invisible()
+                headerTopLineTextView.invisible()
+                headerBottomLineTextView.invisible()
+                walletBtnLayout.invisible()
+                userAgreementAndPrivacyPolicyTextView.invisible()
             }
         })
 

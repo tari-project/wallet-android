@@ -41,6 +41,7 @@ import android.widget.BaseAdapter
 import android.widget.SpinnerAdapter
 import android.widget.TextView
 import com.tari.android.wallet.R
+import com.tari.android.wallet.ui.extension.gone
 import java.io.File
 
 /**
@@ -71,7 +72,7 @@ internal class LogFileSpinnerAdapter(context: Context, files: List<File>) :
         val view: View = convertView ?: inflater.inflate(R.layout.log_file_spinner_item, null)
         val textView = view.findViewById<TextView>(R.id.log_file_spinner_item_txt_file_name)
         textView.text = fileNames[position]
-        view.findViewById<View>(R.id.log_file_spinner_item_vw_gray_bg).visibility = View.GONE
+        view.findViewById<View>(R.id.log_file_spinner_item_vw_gray_bg).gone()
         return view
     }
 

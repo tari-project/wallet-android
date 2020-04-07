@@ -33,6 +33,7 @@
 package com.tari.android.wallet.event
 
 import com.tari.android.wallet.application.WalletState
+import com.tari.android.wallet.network.NetworkConnectionState
 import com.tari.android.wallet.tor.TorProxyState
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.subjects.BehaviorSubject
@@ -57,6 +58,9 @@ internal object EventBus {
 
     private val walletStateDisposables = mutableMapOf<Any, CompositeDisposable>()
     var walletStateSubject = BehaviorSubject.create<WalletState>()
+
+    private val networkConnectionStateDisposables = mutableMapOf<Any, CompositeDisposable>()
+    var networkConnectionStateSubject = BehaviorSubject.create<NetworkConnectionState>()
 
     inline fun <reified T : Any> subscribe(subscriber: Any, noinline consumer: (T) -> Unit) {
         val observer = publishSubject.ofType(T::class.java).subscribe(consumer)
@@ -99,5 +103,19 @@ internal object EventBus {
     }
 
     fun postWalletState(event: WalletState) = walletStateSubject.onNext(event)
+
+    fun subscribeToNetworkConnectionState(subscriber: Any, consumer: (NetworkConnectionState) -> Unit) {
+        val observer = networkConnectionStateSubject.ofType(NetworkConnectionState::class.java).subscribe(consumer)
+        val disposable = networkConnectionStateDisposables[subscriber]
+            ?: CompositeDisposable().apply { networkConnectionStateDisposables[subscriber] = this }
+        disposable.add(observer)
+    }
+
+    fun unsubscribeFromNetworkConnectionState(subscriber: Any) = networkConnectionStateDisposables.apply {
+        get(subscriber)?.clear()
+        remove(subscriber)
+    }
+
+    fun postNetworkConnectionState(event: NetworkConnectionState) = networkConnectionStateSubject.onNext(event)
 
 }

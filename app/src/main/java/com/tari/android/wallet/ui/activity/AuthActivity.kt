@@ -55,6 +55,8 @@ import com.tari.android.wallet.application.WalletState
 import com.tari.android.wallet.auth.AuthUtil
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.ui.activity.home.HomeActivity
+import com.tari.android.wallet.ui.extension.invisible
+import com.tari.android.wallet.ui.extension.visible
 import com.tari.android.wallet.ui.util.UiUtil
 import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.SharedPrefsWrapper
@@ -115,7 +117,7 @@ internal class AuthActivity : BaseActivity(), Animator.AnimatorListener {
         }
 
         UiUtil.setProgressBarColor(progressBar, white)
-        progressBar.visibility = View.INVISIBLE
+        progressBar.invisible()
 
         // call the animations
         val wr = WeakReference(this)
@@ -339,7 +341,7 @@ internal class AuthActivity : BaseActivity(), Animator.AnimatorListener {
         if (EventBus.walletStateSubject.value != WalletState.RUNNING) {
             continueIsPendingOnWalletState = true
             progressBar.alpha = 0f
-            progressBar.visibility = View.VISIBLE
+            progressBar.visible()
             val alphaAnim = ObjectAnimator.ofFloat(progressBar, View.ALPHA, 0f, 1f)
             alphaAnim.duration = Constants.UI.mediumDurationMs
             alphaAnim.start()

@@ -39,6 +39,8 @@ import butterknife.BindView
 import butterknife.ButterKnife
 import com.tari.android.wallet.R
 import com.tari.android.wallet.ffi.LogLevel
+import com.tari.android.wallet.ui.extension.gone
+import com.tari.android.wallet.ui.extension.visible
 
 /**
  * Displays individual logs.
@@ -68,10 +70,10 @@ class LogViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         log: String,
         isLast: Boolean = false
     ) {
-        timestampTextView.visibility = View.GONE
-        source1TextView.visibility = View.GONE
-        source2TextView.visibility = View.GONE
-        levelTextView.visibility = View.GONE
+        timestampTextView.gone()
+        source1TextView.gone()
+        source2TextView.gone()
+        levelTextView.gone()
         logTextView.text = log.trim()
         // bottom spacer
         bottomSpacer.visibility = when (isLast) {
@@ -90,42 +92,42 @@ class LogViewHolder(view: View) : RecyclerView.ViewHolder(view) {
     ) {
         // timestamp
         if (timestamp != null && timestamp.isNotEmpty()) {
-            timestampTextView.visibility = View.VISIBLE
+            timestampTextView.visible()
             timestampTextView.text = timestamp.trim()
         } else {
-            timestampTextView.visibility = View.GONE
+            timestampTextView.gone()
         }
         // source#1
         if (source1 != null && source1.isNotEmpty()) {
-            source1TextView.visibility = View.VISIBLE
+            source1TextView.visible()
             source1TextView.text = source1.trim()
         } else {
-            source1TextView.visibility = View.GONE
+            source1TextView.gone()
         }
         // source#2
         if (source2 != null && source2.isNotEmpty()) {
-            source2TextView.visibility = View.VISIBLE
+            source2TextView.visible()
             source2TextView.text = source2.trim()
         } else {
-            source2TextView.visibility = View.GONE
+            source2TextView.gone()
         }
         // level
         if (level != null && level.isNotEmpty()) {
             val logLevel = level.trim()
-            levelTextView.visibility = View.VISIBLE
+            levelTextView.visible()
             levelTextView.text = logLevel
             levelTextView.setTextColor(
                 LogLevel.from(logLevel).color
             )
         } else {
-            levelTextView.visibility = View.GONE
+            levelTextView.gone()
         }
         // log
         if (log != null && log.isNotEmpty()) {
-            logTextView.visibility = View.VISIBLE
+            logTextView.visible()
             logTextView.text = log.trim()
         } else {
-            logTextView.visibility = View.GONE
+            logTextView.gone()
         }
         // bottom spacer
         bottomSpacer.visibility = when (isLast) {

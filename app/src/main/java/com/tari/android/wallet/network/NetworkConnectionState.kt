@@ -30,57 +30,17 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.tari.android.wallet.ui.fragment.send.adapter
-
-import android.view.View
-import android.widget.TextView
-import androidx.recyclerview.widget.RecyclerView
-import butterknife.BindString
-import butterknife.BindView
-import butterknife.ButterKnife
-import com.tari.android.wallet.R
-import com.tari.android.wallet.ui.extension.gone
-import com.tari.android.wallet.ui.extension.visible
+package com.tari.android.wallet.network
 
 /**
- * Section header view holder.
+ * A very simple representation of connection state.
+ * Can be enriched with additional states (Tor connectivity, base node connection status, etc.)
+ * in the future.
+ *
+ * @author The Tari Development Team
  */
-class RecipientHeaderViewHolder(view: View, private val type: Type) :
-    RecyclerView.ViewHolder(view) {
-
-    enum class Type {
-        RECENT_CONTACTS,
-        MY_CONTACTS
-    }
-
-    @BindView(R.id.add_recipient_list_header_vw_separator)
-    lateinit var separatorView: View
-    @BindView(R.id.add_recipient_list_header_txt_title)
-    lateinit var titleTextView: TextView
-
-    @BindString(R.string.add_recipient_recent_tx_contacts)
-    lateinit var recentContactsString: String
-    @BindString(R.string.add_recipient_my_contacts)
-    lateinit var myContactsString: String
-
-    init {
-        ButterKnife.bind(this, view)
-    }
-
-    fun bind(position: Int) {
-        if (position == 0) {
-            separatorView.gone()
-        } else {
-            separatorView.visible()
-        }
-        when (type) {
-            Type.RECENT_CONTACTS -> {
-                titleTextView.text = recentContactsString
-            }
-            Type.MY_CONTACTS -> {
-                titleTextView.text = myContactsString
-            }
-        }
-
-    }
+internal enum class NetworkConnectionState {
+    UNKNOWN,
+    CONNECTED,
+    DISCONNECTED;
 }

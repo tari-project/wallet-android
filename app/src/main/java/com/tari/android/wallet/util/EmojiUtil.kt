@@ -123,6 +123,29 @@ internal fun String.containsNonEmoji(): Boolean {
 }
 
 /**
+ * @return false if there is at least 1 non-emoji character in the string.
+ */
+internal fun String.extractEmojis(): String {
+    val codePoints = this.codePointsAsList()
+    // iterate through the string
+    val it: BreakIterator = BreakIterator.getCharacterInstance()
+    it.setText(this)
+    var previous = 0
+    val stringBuilder = StringBuilder()
+    while (it.next() != BreakIterator.DONE) {
+        for (i in previous until it.current()) {
+            val codePoint = codePoints[i]
+            // append if has emoji id property
+            if (codePointHasEmojiProperty(codePoint)) {
+                stringBuilder.append(this[i])
+            }
+        }
+        previous = it.current()
+    }
+    return stringBuilder.toString()
+}
+
+/**
  * Checks whether a given number of first characters of the string are emojis.
  */
 internal fun String.firstNCharactersAreEmojis(n: Int): Boolean {
@@ -219,24 +242,6 @@ internal class EmojiUtil {
                 previous = it.current()
             }
             return newIndices
-        }
-
-        fun removeChunkSeparatorsFromEmojiId(
-            emojiId: String,
-            emojiIdChunkSeparator: String
-        ): String {
-            val cleanEmojiIdBuilder = StringBuilder(emojiId)
-            for ((offset, index) in getExistingChunkSeparatorIndices(
-                emojiId,
-                emojiIdChunkSeparator
-            ).withIndex()) {
-                val target = index - (offset * emojiIdChunkSeparator.length)
-                cleanEmojiIdBuilder.delete(
-                    target,
-                    target + emojiIdChunkSeparator.length
-                )
-            }
-            return cleanEmojiIdBuilder.toString()
         }
 
         fun getStartIndexOfItemEndingAtIndex(string: String, endIndex: Int): Int {

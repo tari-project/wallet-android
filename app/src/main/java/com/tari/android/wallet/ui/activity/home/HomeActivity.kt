@@ -32,9 +32,7 @@
  */
 package com.tari.android.wallet.ui.activity.home
 
-import android.animation.AnimatorSet
-import android.animation.ObjectAnimator
-import android.animation.ValueAnimator
+import android.animation.*
 import android.annotation.SuppressLint
 import android.app.Dialog
 import android.content.ComponentName
@@ -70,6 +68,7 @@ import com.tari.android.wallet.event.Event
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.extension.applyFontStyle
 import com.tari.android.wallet.model.*
+import com.tari.android.wallet.network.NetworkConnectionState
 import com.tari.android.wallet.service.TariWalletService
 import com.tari.android.wallet.service.WalletService
 import com.tari.android.wallet.ui.activity.BaseActivity
@@ -80,7 +79,11 @@ import com.tari.android.wallet.ui.activity.profile.WalletInfoActivity
 import com.tari.android.wallet.ui.activity.send.SendTariActivity
 import com.tari.android.wallet.ui.activity.tx.TxDetailActivity
 import com.tari.android.wallet.ui.component.CustomFont
+import com.tari.android.wallet.ui.extension.*
+import com.tari.android.wallet.ui.extension.gone
+import com.tari.android.wallet.ui.extension.invisible
 import com.tari.android.wallet.ui.extension.scrollToTop
+import com.tari.android.wallet.ui.extension.showInternetConnectionErrorDialog
 import com.tari.android.wallet.ui.util.UiUtil
 import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.SharedPrefsWrapper
@@ -106,6 +109,8 @@ internal class HomeActivity : BaseActivity(),
 
     @BindView(R.id.home_vw_root)
     lateinit var rootView: View
+    @BindView(R.id.home_vw_blocker)
+    lateinit var blockerView: View
     @BindView(R.id.home_vw_top_content_container)
     lateinit var topContentContainerView: View
     @BindView(R.id.home_vw_gradient_bg)
@@ -266,14 +271,14 @@ internal class HomeActivity : BaseActivity(),
     private val wr = WeakReference(this)
     private val handler = Handler(Looper.getMainLooper())
 
-    /**
-     * Whether the user is currently dragging the list view.
-     */
+    // whether the user is currently dragging the list view.
     private var isDragging = false
     private var sendTariButtonClickAnimIsRunning = false
     private val onboardingInterstitialTimeMs = 4500L
     private val secondUTXOImportDelayTimeMs = 1500L
     private val secondUTXOStoreModalDelayTimeMs = 3000L
+    // this flag is set if the testnet
+    private var testnetTariRequestIsWaitingOnConnection = false
 
     /**
      * This listener is used only to animate the visibility of the scroll depth gradient view.
@@ -322,18 +327,19 @@ internal class HomeActivity : BaseActivity(),
         storeIconImageView.alpha = 0f
         userWalletInfoImageView.alpha = 0f
         balanceGemImageView.alpha = 0f
-        noTxsInfoTextView.visibility = View.GONE
+        noTxsInfoTextView.gone()
 
         scrollContentView.alpha = 0f
-        topContentContainerView.visibility = View.INVISIBLE
+        topContentContainerView.invisible()
 
-        onboardingContentView.visibility = View.GONE
+        onboardingContentView.gone()
 
         scrollView.post {
             wr.get()?.setupScrollView()
         }
 
         subscribeToEventBus()
+
         TrackHelper.track()
             .screen("/home")
             .title("Home - Transaction List")
@@ -381,6 +387,7 @@ internal class HomeActivity : BaseActivity(),
             unbindService(this)
         }
         EventBus.unsubscribe(this)
+        EventBus.unsubscribeFromNetworkConnectionState(this)
         super.onDestroy()
     }
 
@@ -485,6 +492,14 @@ internal class HomeActivity : BaseActivity(),
             }
         }
 
+        // network connection event
+        EventBus.subscribeToNetworkConnectionState(this) { networkConnectionState ->
+            if (testnetTariRequestIsWaitingOnConnection
+                && networkConnectionState == NetworkConnectionState.CONNECTED) {
+                requestTestnetTari()
+            }
+        }
+
         // other app-specific events
         EventBus.subscribe<Event.Contact.ContactAddedOrUpdated>(this) {
             wr.get()?.rootView?.post {
@@ -571,16 +586,6 @@ internal class HomeActivity : BaseActivity(),
     private fun updateTxListData(): Boolean {
         val error = WalletError()
         val walletCompletedTxs = walletService!!.getCompletedTxs(error)
-        walletCompletedTxs.filter { completedTx ->
-            completedTx.id == sharedPrefsWrapper.firstTestnetUTXOTxId
-                    || completedTx.id == sharedPrefsWrapper.secondTestnetUTXOTxId
-        }.forEach { completedTx ->
-            completedTx.message = when(completedTx.id) {
-                sharedPrefsWrapper.firstTestnetUTXOTxId -> firstTestnetUTXOMessage
-                sharedPrefsWrapper.secondTestnetUTXOTxId -> secondTestnetUTXOMessage
-                else -> completedTx.message
-            }
-        }
         val walletPendingInboundTxs = walletService!!.getPendingInboundTxs(error)
         val walletPendingOutboundTxs = walletService!!.getPendingOutboundTxs(error)
         if (error.code != WalletErrorCode.NO_ERROR) {
@@ -601,12 +606,15 @@ internal class HomeActivity : BaseActivity(),
             isOnboarding = true
             playOnboardingAnim()
             sharedPrefsWrapper.onboardingDisplayedAtHome = true
-        } else {
+        } else { // past onboarding
             // display txs
             recyclerViewAdapter.notifyDataChanged()
             playNonOnboardingStartupAnim()
             if (txListIsEmpty) {
                 showNoTxsTextView()
+            }
+            if (!sharedPrefsWrapper.faucetTestnetTariRequestCompleted) {
+                requestTestnetTari()
             }
         }
     }
@@ -619,7 +627,7 @@ internal class HomeActivity : BaseActivity(),
         if (txListIsEmpty) {
             showNoTxsTextView()
         } else {
-            noTxsInfoTextView.visibility = View.GONE
+            noTxsInfoTextView.gone()
         }
     }
 
@@ -671,7 +679,7 @@ internal class HomeActivity : BaseActivity(),
      * The startup animation - reveals the list, balance and other views.
      */
     private fun playNonOnboardingStartupAnim() {
-        topContentContainerView.visibility = View.VISIBLE
+        topContentContainerView.visible()
 
         // initialize the balance view controller
         updateBalanceInfoUI(true)
@@ -709,6 +717,9 @@ internal class HomeActivity : BaseActivity(),
         sendTariButtonIsVisible = true
         anim.duration = Constants.UI.Home.startupAnimDurationMs
         anim.interpolator = EasingInterpolator(Ease.EASE_IN_OUT_EXPO)
+        blockerView.postDelayed({
+            blockerView.gone()
+        }, Constants.UI.Home.startupAnimDurationMs)
         anim.start()
     }
 
@@ -716,7 +727,7 @@ internal class HomeActivity : BaseActivity(),
      * Play onboarding animation.
      */
     private fun playOnboardingAnim() {
-        onboardingContentView.visibility = View.VISIBLE
+        onboardingContentView.visible()
         swipeRefreshLayout.isEnabled = false
         hideSendTariButtonAnimated()
 
@@ -755,7 +766,7 @@ internal class HomeActivity : BaseActivity(),
         animSet.duration = Constants.UI.Home.welcomeAnimationDurationMs
         animSet.addListener(
             onEnd = {
-                wr.get()?.topContentContainerView?.visibility = View.VISIBLE
+                wr.get()?.topContentContainerView?.visible()
                 wr.get()?.balanceTitleTextView?.alpha = 1f
                 wr.get()?.storeIconImageView?.alpha = 1f
                 wr.get()?.userWalletInfoImageView?.alpha = 1f
@@ -768,19 +779,28 @@ internal class HomeActivity : BaseActivity(),
         scrollView.isScrollable = false
         scrollView.postDelayed({
             scrollView.smoothScrollTo(0, 0)
+            blockerView.gone()
         }, onboardingInterstitialTimeMs)
 
     }
 
     private fun showNoTxsTextView() {
         noTxsInfoTextView.alpha = 0f
-        noTxsInfoTextView.visibility = View.VISIBLE
+        noTxsInfoTextView.visible()
         val anim = ObjectAnimator.ofFloat(noTxsInfoTextView, "alpha", 0f, 1f)
         anim.duration = Constants.UI.mediumDurationMs
         anim.start()
     }
 
     private fun requestTestnetTari() {
+        if (testnetTariRequestIsInProgress) {
+            return
+        }
+        if (EventBus.networkConnectionStateSubject.value != NetworkConnectionState.CONNECTED) {
+            testnetTariRequestIsWaitingOnConnection = true
+            return
+        }
+        testnetTariRequestIsWaitingOnConnection = false
         testnetTariRequestIsInProgress = true
         val error = WalletError()
         walletService!!.requestTestnetTari(error)
@@ -791,10 +811,11 @@ internal class HomeActivity : BaseActivity(),
 
     private fun testnetTariRequestSuccessful() {
         val error = WalletError()
-        val importedTx = walletService!!.importTestnetUTXO(error)
+        val importedTx = walletService!!.importTestnetUTXO(firstTestnetUTXOMessage, error)
         if (error.code != WalletErrorCode.NO_ERROR) {
             TODO("Unhandled wallet error: ${error.code}")
         }
+        sharedPrefsWrapper.faucetTestnetTariRequestCompleted = true
         sharedPrefsWrapper.firstTestnetUTXOTxId = importedTx.id
         updateAllDataAndUI(restartBalanceUI = false)
         // display dialog
@@ -932,6 +953,10 @@ internal class HomeActivity : BaseActivity(),
 
     @OnClick(R.id.home_btn_send_tari)
     fun sendTariButtonClicked(view: View) {
+        if (EventBus.networkConnectionStateSubject.value != NetworkConnectionState.CONNECTED) {
+            showInternetConnectionErrorDialog(this)
+            return
+        }
         UiUtil.temporarilyDisableClick(view)
         animateSendTariButtonOnClick(
             Constants.UI.Button.clickScaleAnimFullScale,
@@ -941,8 +966,8 @@ internal class HomeActivity : BaseActivity(),
 
     private fun endOnboarding() {
         isOnboarding = false
-        onboardingContentView.visibility = View.GONE
-        txListHeaderView.visibility = View.VISIBLE
+        onboardingContentView.gone()
+        txListHeaderView.visible()
         swipeRefreshLayout.isEnabled = true
         updateAllDataAndUI(restartBalanceUI = false)
         // request Testnet Tari if no txs
@@ -952,7 +977,6 @@ internal class HomeActivity : BaseActivity(),
                     wr.get()?.requestTestnetTari()
                 }.start()
             }, Constants.UI.xxLongDurationMs)
-
         } else {
             showSendTariButtonAnimated()
         }
@@ -1016,7 +1040,7 @@ internal class HomeActivity : BaseActivity(),
 
     private fun importSecondUTXO() {
         val error = WalletError()
-        val importedTx = walletService!!.importTestnetUTXO(error)
+        val importedTx = walletService!!.importTestnetUTXO(secondTestnetUTXOMessage, error)
         if (error.code != WalletErrorCode.NO_ERROR) {
             TODO("Unhandled wallet error: ${error.code}")
         }
@@ -1234,7 +1258,7 @@ internal class HomeActivity : BaseActivity(),
                     0f,
                     1f - ratio * grabberViewCornerRadiusScrollAnimCoefficient
                 ) * grabberCornerRadius
-            } else if (ratio == 0f && !isDragging) {
+            } else if (ratio == 0f && !isDragging) { // is onboarding
                 scrollView.isScrollable = true
                 endOnboarding()
             }

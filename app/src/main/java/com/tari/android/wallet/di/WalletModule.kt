@@ -34,6 +34,7 @@ package com.tari.android.wallet.di
 
 import android.content.Context
 import com.tari.android.wallet.application.WalletManager
+import com.tari.android.wallet.network.NetworkConnectionStateReceiver
 import com.tari.android.wallet.tor.TorConfig
 import com.tari.android.wallet.tor.TorProxyManager
 import com.tari.android.wallet.tor.TorProxyMonitor
@@ -107,7 +108,7 @@ internal class WalletModule {
 
     @Provides
     @Singleton
-    internal fun provideWalletManager(
+    fun provideWalletManager(
         context: Context,
         @Named(FieldName.walletFilesDirPath) walletFilesDirPath: String,
         @Named(FieldName.walletLogFilePath) walletLogFilePath: String,
@@ -125,6 +126,12 @@ internal class WalletModule {
             sharedPrefsWrapper,
             torConfig
         )
+    }
+
+    @Provides
+    @Singleton
+    fun provideNetworkConnectionStatusReceiver(): NetworkConnectionStateReceiver {
+        return NetworkConnectionStateReceiver()
     }
 
 }
