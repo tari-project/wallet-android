@@ -1,5 +1,5 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <string name="app_name">Tari Wallet</string>
+    <string name="app_name">Tari Aurora</string>
 
     <!-- foreground service description -->
     <string name="wallet_service_desc">This service is required to communicate with Tari services. Please keep this service running if you want to be able to communicate with the Tari system.</string>
