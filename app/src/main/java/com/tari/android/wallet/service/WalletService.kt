@@ -735,7 +735,6 @@ internal class WalletService : Service(), FFIWalletListenerAdapter {
             val response = tariRESTService.requestMaxTestnetTari(publicKeyHexString, requestBody)
             response.enqueue(object : Callback<TestnetTariAllocateMaxResponse> {
                 override fun onFailure(call: Call<TestnetTariAllocateMaxResponse>, t: Throwable) {
-                    Logger.e("1")
                     error.code = WalletErrorCode.UNKNOWN_ERROR
                     notifyTestnetTariRequestFailed(getString(R.string.wallet_service_error_no_internet_connection))
                 }
