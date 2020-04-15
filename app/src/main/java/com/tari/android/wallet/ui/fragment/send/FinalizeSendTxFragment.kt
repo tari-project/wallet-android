@@ -50,10 +50,7 @@ import com.tari.android.wallet.R
 import com.tari.android.wallet.event.Event
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.extension.applyFontStyle
-import com.tari.android.wallet.model.MicroTari
-import com.tari.android.wallet.model.User
-import com.tari.android.wallet.model.WalletError
-import com.tari.android.wallet.model.WalletErrorCode
+import com.tari.android.wallet.model.*
 import com.tari.android.wallet.service.TariWalletService
 import com.tari.android.wallet.ui.component.CustomFont
 import com.tari.android.wallet.ui.extension.invisible
@@ -112,6 +109,7 @@ class FinalizeSendTxFragment(private val walletService: TariWalletService)
 
     private var successful = false
     private var sendingIsInProgress = false
+    private var sentTxId: TxId? = null
 
     override val contentViewId: Int = R.layout.fragment_finalize_send_tx
 
@@ -199,9 +197,14 @@ class FinalizeSendTxFragment(private val walletService: TariWalletService)
     }
 
     private fun subscribeToEventBus() {
-        EventBus.subscribe<Event.Wallet.DiscoveryComplete>(this) { event ->
+        EventBus.subscribe<Event.Wallet.DirectSendResult>(this) { event ->
             wr.get()?.rootView?.post {
-                wr.get()?.onDiscoveryComplete(event.success)
+                wr.get()?.onSendResult(event.txId, event.success)
+            }
+        }
+        EventBus.subscribe<Event.Wallet.StoreAndForwardSendResult>(this) { event ->
+            wr.get()?.rootView?.post {
+                wr.get()?.onSendResult(event.txId, event.success)
             }
         }
     }
@@ -227,18 +230,24 @@ class FinalizeSendTxFragment(private val walletService: TariWalletService)
         listenerWR.get()?.sendTxStarted(this)
         sendingIsInProgress = true
         val error = WalletError()
-        val success = walletService.sendTari(recipientUser, amount, fee, note, error)
+        val txId = walletService.sendTari(recipientUser, amount, fee, note, error)
         // if success, just wait for the callback to happen
         // if failed, just show the failed info & return
-        if (!success || error.code != WalletErrorCode.NO_ERROR) {
+        if (txId == null || error.code != WalletErrorCode.NO_ERROR) {
             rootView.post {
                 onFailure()
             }
+        } else {
+            sentTxId = txId
         }
     }
 
-    private fun onDiscoveryComplete(success: Boolean) {
-        Logger.d("Discovery completed with result: $success.")
+    private fun onSendResult(txId: TxId, success: Boolean) {
+        if (sentTxId != txId) {
+            Logger.d("Response received for another tx with id: ${txId.value}.")
+            return
+        }
+        Logger.d("Send completed with result: $success.")
         if (success) {
             onSuccess()
         } else {

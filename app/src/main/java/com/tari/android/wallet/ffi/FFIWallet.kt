@@ -65,8 +65,12 @@ internal open class FFIWallet(commsConfig: FFICommsConfig, logPath: String) : FF
         callbackTxBroadcastSig: String,
         callbackTxMined: String,
         callbackTxMinedSig: String,
-        callbackDiscoveryProcessComplete: String,
-        callbackDiscoveryProcessCompleteSig: String,
+        callbackDirectSendResult: String,
+        callbackDirectSendResultSig: String,
+        callbackStoreAndForwardSendResult: String,
+        callbackStoreAndForwardSendResultSig: String,
+        callbackTxCancellation: String,
+        callbackTxCancellationSig: String,
         callbackBaseNodeSync: String,
         callbackBaseNodeSyncSig: String,
         libError: FFIError
@@ -127,6 +131,11 @@ internal open class FFIWallet(commsConfig: FFICommsConfig, logPath: String) : FF
         libError: FFIError
     ): FFIPendingInboundTxPtr
 
+    private external fun jniCancelPendingTx(
+        id: String,
+        libError: FFIError
+    ): Boolean
+
     private external fun jniIsCompletedTxOutbound(
         completedTx: FFICompletedTx,
         libError: FFIError
@@ -138,7 +147,7 @@ internal open class FFIWallet(commsConfig: FFICommsConfig, logPath: String) : FF
         fee: String,
         message: String,
         libError: FFIError
-    ): Boolean
+    ): ByteArray
 
     private external fun jniSignMessage(
         message: String,
@@ -194,7 +203,9 @@ internal open class FFIWallet(commsConfig: FFICommsConfig, logPath: String) : FF
                 this::onTxFinalized.name, "(J)V",
                 this::onTxBroadcast.name, "(J)V",
                 this::onTxMined.name, "(J)V",
-                this::onDiscoveryComplete.name, "([BZ)V",
+                this::onDirectSendResult.name, "([BZ)V",
+                this::onStoreAndForwardSendResult.name, "([BZ)V",
+                this::onTxCancellation.name, "([B)V",
                 this::onBaseNodeSyncComplete.name, "([BZ)V",
                 error
             )
@@ -303,6 +314,13 @@ internal open class FFIWallet(commsConfig: FFICommsConfig, logPath: String) : FF
         val error = FFIError()
         val result =
             FFIPendingInboundTx(jniGetPendingInboundTxById(id.toByteArray().toString(), error))
+        throwIf(error)
+        return result
+    }
+
+    fun cancelPendingTx(id: BigInteger): Boolean {
+        val error = FFIError()
+        val result = jniCancelPendingTx(id.toString(), error)
         throwIf(error)
         return result
     }
@@ -528,11 +546,25 @@ internal open class FFIWallet(commsConfig: FFICommsConfig, logPath: String) : FF
         tx.destroy()
     }
 
-    protected fun onDiscoveryComplete(bytes: ByteArray, success: Boolean) {
-        Logger.i("Tx discovery complete. Success: $success")
+    protected fun onDirectSendResult(bytes: ByteArray, success: Boolean) {
+        Logger.i("Direct send result received. Success: $success")
         val txId = BigInteger(1, bytes)
-        listenerAdapter?.onDiscoveryComplete(txId, success)
+        listenerAdapter?.onDirectSendResult(txId, success)
     }
+
+    protected fun onStoreAndForwardSendResult(bytes: ByteArray, success: Boolean) {
+        Logger.i("Store and forward send result received. Success: $success")
+        val txId = BigInteger(1, bytes)
+        listenerAdapter?.onStoreAndForwardSendResult(txId, success)
+    }
+
+    protected fun onTxCancellation(bytes: ByteArray) {
+        Logger.i("Transaction cancelled.")
+        val txId = BigInteger(1, bytes)
+        listenerAdapter?.onTxCancellation(txId)
+    }
+
+
 
     protected fun onBaseNodeSyncComplete(bytes: ByteArray, success: Boolean) {
         Logger.i("Base node sync complete. Success: $success")
@@ -545,7 +577,7 @@ internal open class FFIWallet(commsConfig: FFICommsConfig, logPath: String) : FF
         amount: BigInteger,
         fee: BigInteger,
         message: String
-    ): Boolean {
+    ): BigInteger {
         val minimumLibFee = 100L
         if (fee < BigInteger.valueOf(minimumLibFee)) {
             throw FFIException(message = "Fee is less than the minimum of $minimumLibFee taris.")
@@ -557,19 +589,16 @@ internal open class FFIWallet(commsConfig: FFICommsConfig, logPath: String) : FF
             throw FFIException(message = "Tx source and destination are the same.")
         }
         val error = FFIError()
-        val result = jniSendTx(
+        val bytes = jniSendTx(
             destination,
             amount.toString(),
             fee.toString(),
             message,
             error
         )
-        if (error.code == OUTBOUND_SEND_DISCOVERY_IN_PROGRESS.code) {
-            // TODO store the placeholder transaction in local storage until the discovery is complete
-            return true
-        }
+        Logger.d("Send status code (0 means ok): %d", error.code)
         throwIf(error)
-        return result
+        return BigInteger(1, bytes)
     }
 
     fun signMessage(message: String): String {

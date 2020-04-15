@@ -66,7 +66,9 @@ interface TariWalletService {
     List<PendingOutboundTx> getPendingOutboundTxs(out WalletError error);
     PendingOutboundTx getPendingOutboundTxById(in TxId id, out WalletError error);
 
-    boolean sendTari(
+    boolean cancelPendingTx(in TxId id, out WalletError error);
+
+    TxId sendTari(
         in User contact,
         in MicroTari amount,
         in MicroTari fee,

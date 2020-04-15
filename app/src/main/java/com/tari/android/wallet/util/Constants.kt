@@ -33,6 +33,7 @@
 package com.tari.android.wallet.util
 
 import com.tari.android.wallet.application.Network
+import java.util.concurrent.TimeUnit
 
 /**
  * Contains application-wide constant values.
@@ -142,6 +143,7 @@ internal object Constants {
         const val walletDBName: String = "tari_wallet_db"
         const val faucetServerUrl = "https://faucet.tari.com"
         const val deepLinkURLPrefix = "tari://"
+        const val pendingTxExpirationPeriodHours = 3 * 24
     }
 
 }
