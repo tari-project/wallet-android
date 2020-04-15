@@ -1,5 +1,9 @@
 # Tari Aurora Changelog
 
+## [0.1.2-jniLibs-0.6.0] - 2020-04-15
+- Add Store and forward functionality
+- Update to jniLibs 0.6.0. This is a network-breaking change. Older wallets will no longer be able to communicate with the Tari network.
+
 ## [0.1.1-jniLibs-0.5.1] - 2020-04-03
 - Fix frozen "Sending Tari" screen oon some transactions
 - New Aurora logo
