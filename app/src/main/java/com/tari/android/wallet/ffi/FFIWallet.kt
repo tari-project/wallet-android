@@ -32,7 +32,6 @@
  */
 package com.tari.android.wallet.ffi
 
-import android.util.Log
 import com.orhanobut.logger.Logger
 import com.tari.android.wallet.model.*
 import com.tari.android.wallet.model.WalletErrorCode.*
@@ -171,7 +170,7 @@ internal open class FFIWallet(commsConfig: FFICommsConfig, logPath: String) : FF
         libError: FFIError
     ): Boolean
 
-    private external fun jniGetTorPrivateKey(
+    private external fun jniGetTorIdentity(
         libError: FFIError
     ): FFIByteVectorPtr
 
@@ -617,13 +616,11 @@ internal open class FFIWallet(commsConfig: FFICommsConfig, logPath: String) : FF
         return result
     }
 
-    fun getTorPrivateKey(): String {
+    fun getTorIdentity(): ByteArray {
         val error = FFIError()
-        val resultPtr = jniGetTorPrivateKey(error)
+        val resultPtr = jniGetTorIdentity(error)
         throwIf(error)
-        val bytes = FFIByteVector(resultPtr)
-        throwIf(error)
-        return bytes.toString()
+        return FFIByteVector(resultPtr).getBytes()
     }
 
     fun addBaseNodePeer(

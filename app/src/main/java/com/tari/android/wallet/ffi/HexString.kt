@@ -61,10 +61,10 @@ internal class HexString constructor(bytes: FFIByteVector) {
     }
 
     constructor(string: String) : this(FFIByteVector(nullptr)) {
-        if (pattern.matches(string) && string.length % 2 == 0) {
+        if (pattern.matches(string)) {
             hex = string
         } else {
-            throw FFIException(message = string + " is not valid Hex of even length.")
+            throw FFIException(message = "$string is not valid Hex.")
         }
     }
 

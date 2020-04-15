@@ -60,14 +60,13 @@ internal class FFIByteVector constructor(pointer: FFIByteVectorPtr) : FFIBase() 
     }
 
     constructor(hex: HexString) : this(nullptr) {
-        if (hex.toString().length == 64) {
-            val byteArray = BigInteger(hex.toString(), 16).toByteArray()
-            val error = FFIError()
-            jniCreate(byteArray, error)
-            throwIf(error)
-        } else {
+        if (hex.toString().length < 64) {
             throw FFIException(message = "Argument is invalid")
         }
+        val byteArray = BigInteger(hex.toString(), 16).toByteArray()
+        val error = FFIError()
+        jniCreate(byteArray, error)
+        throwIf(error)
     }
 
     constructor(bytes: ByteArray) : this(nullptr) {
@@ -81,6 +80,16 @@ internal class FFIByteVector constructor(pointer: FFIByteVectorPtr) : FFIBase() 
         val len = jniGetLength(error)
         throwIf(error)
         return len
+    }
+
+    fun getBytes(): ByteArray {
+        val length = getLength()
+        val byteArray = ByteArray(length)
+        for (i in 0 until length) {
+            val m = getAt(i)
+            byteArray[i] = m.toByte()
+        }
+        return byteArray
     }
 
     override fun toString(): String {

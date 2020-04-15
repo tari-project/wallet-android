@@ -43,7 +43,8 @@ data class TorConfig(
     val controlPort: Int,
     val connectionPort: Int,
     val cookieFilePath: String,
-    val identity: ByteArray,
+    // Tor identity is empty when you first run the app
+    val identity: ByteArray?,
     val sock5Username: String,
     val sock5Password: String
 )

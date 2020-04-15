@@ -40,6 +40,16 @@ import com.tari.android.wallet.model.TestnetTariUTXOKey
 import de.adorsys.android.securestoragelibrary.SecurePreferences
 import java.math.BigInteger
 
+private val String.toPreservedByteArray: ByteArray
+    get() {
+        return this.toByteArray(Charsets.ISO_8859_1)
+    }
+
+private val ByteArray.toPreservedString: String
+    get() {
+        return String(this, Charsets.ISO_8859_1)
+    }
+
 /**
  * Provides easy access to the shared preferences.
  *
@@ -61,6 +71,7 @@ class SharedPrefsWrapper(
         const val onboardingCompletedKey = "tari_wallet_onboarding_completed"
         const val onboardingDisplayedAtHomeKey = "tari_wallet_onboarding_displayed_at_home"
         const val torBinPathKey = "tari_wallet_tor_bin_path"
+        const val torIdentityKey = "tari_wallet_tor_identity"
         const val baseNodePublicKeyHexKey = "tari_wallet_base_node_public_key_hex"
         const val baseNodeAddressKey = "tari_wallet_base_node_address"
         const val faucetTestnetTariRequestCompleted = "tari_wallet_faucet_testnet_tari_request_completed"
@@ -199,6 +210,18 @@ class SharedPrefsWrapper(
         set(value) {
             sharedPrefs.edit().apply {
                 putString(Key.torBinPathKey, value)
+                apply()
+            }
+        }
+
+    var torIdentity: ByteArray?
+        get() {
+            val identityString = sharedPrefs.getString(Key.torIdentityKey, null)
+            return identityString?.toPreservedByteArray
+        }
+        set(value) {
+            sharedPrefs.edit().apply {
+                putString(Key.torIdentityKey, value?.toPreservedString)
                 apply()
             }
         }

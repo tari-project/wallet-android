@@ -131,8 +131,8 @@ class TorModule {
     @Provides
     @Named(FieldName.torIdentity)
     @Singleton
-    internal fun provideTorIdentity(): ByteArray {
-        return ByteArray(0)
+    internal fun provideTorIdentity(sharedPrefsWrapper: SharedPrefsWrapper): ByteArray? {
+        return sharedPrefsWrapper.torIdentity
     }
 
     /**
@@ -166,7 +166,7 @@ class TorModule {
         @Named(FieldName.torProxyPort) proxyPort: Int,
         @Named(FieldName.torConnectionPort) connectionPort: Int,
         @Named(FieldName.torCookieFilePath) cookieFilePath: String,
-        @Named(FieldName.torIdentity) torIdentity: ByteArray,
+        @Named(FieldName.torIdentity) torIdentity: ByteArray?,
         @Named(FieldName.torSock5Username) sock5Username: String,
         @Named(FieldName.torSock5Password) sock5Passsword: String
     ): TorConfig {
