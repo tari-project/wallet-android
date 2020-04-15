@@ -128,10 +128,10 @@ internal class WalletManager(
         val cookieFile = File(torConfig.cookieFilePath)
         val cookieString = cookieFile.readBytes()
         val torCookie = FFIByteVector(cookieString)
-        var torIdentity = FFIByteVector(nullptr)
-        if (torConfig.identity.isNotEmpty()) {
-            torIdentity.destroy()
-            torIdentity = FFIByteVector(torConfig.identity)
+        val torIdentity = if (torConfig.identity != null) {
+            FFIByteVector(torConfig.identity)
+        } else {
+            FFIByteVector(nullptr)
         }
         return FFITransportType(
             NetAddressString(
@@ -251,6 +251,7 @@ internal class WalletManager(
                 walletLogFilePath
             )
             FFIWallet.instance = wallet
+            sharedPrefsWrapper.torIdentity = wallet.getTorIdentity()
             startLogFileObserver()
             setBaseNode()
             saveWalletPublicKeyHexToSharedPrefs()
