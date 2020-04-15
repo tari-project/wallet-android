@@ -81,6 +81,10 @@ class TxId() : Parcelable {
         return 0
     }
 
+    override fun equals(other: Any?): Boolean {
+        return value == (other as? TxId)?.value
+    }
+
     // endregion
 
 }

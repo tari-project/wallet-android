@@ -48,7 +48,9 @@ object Event {
         data class TxReceived(val pendingInboundTx: PendingInboundTx)
         data class TxReplyReceived(val completedTx: CompletedTx)
         data class TxFinalized(val completedTx: CompletedTx)
-        data class DiscoveryComplete(val txId: TxId, val success: Boolean)
+        data class DirectSendResult(val txId: TxId, val success: Boolean)
+        data class StoreAndForwardSendResult(val txId: TxId, val success: Boolean)
+        data class TxCancellation(val txId: TxId)
         data class BaseNodeSyncComplete(val rxId: RxId, val success: Boolean)
     }
 

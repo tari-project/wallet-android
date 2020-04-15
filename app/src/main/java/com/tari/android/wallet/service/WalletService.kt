@@ -50,7 +50,15 @@ import retrofit2.Response
 import java.math.BigInteger
 import javax.inject.Inject
 import com.tari.android.wallet.model.Tx.Direction.*
+import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.SharedPrefsWrapper
+import io.reactivex.Observable
+import io.reactivex.schedulers.Schedulers
+import org.joda.time.DateTime
+import org.joda.time.Hours
+import org.joda.time.Minutes
+import org.joda.time.Seconds
+import java.util.concurrent.TimeUnit
 
 /**
  * Foreground wallet service.
@@ -86,6 +94,67 @@ internal class WalletService : Service(), FFIWalletListenerAdapter {
      */
     private var listeners = mutableListOf<TariWalletServiceListener>()
 
+    /**
+     * Check for expired txs every 30 minutes.
+     */
+    private val expirationCheckPeriodMinutes = Minutes.minutes(30)
+    /**
+     * Timer to trigger the expiration checks.
+     */
+    private val txExpirationCheckSubscription =
+        Observable
+            .timer(expirationCheckPeriodMinutes.minutes.toLong(), TimeUnit.MINUTES)
+            .repeat()
+            .subscribeOn(Schedulers.io())
+            .observeOn(Schedulers.io())
+            .subscribe {
+                cancelExpiredPendingInboundTxs()
+                cancelExpiredPendingOutboundTxs()
+            }
+
+    /**
+     * Cancels expired pending inbound transactions.
+     * Expiration period is defined by Constants.Wallet.pendingTxExpirationPeriodHours
+     */
+    private fun cancelExpiredPendingInboundTxs() {
+        val pendingInboundTxs = wallet.getPendingInboundTxs()
+        val pendingInboundTxsLength = pendingInboundTxs.getLength()
+        val now = DateTime.now().toLocalDateTime()
+        for (i in 0 until pendingInboundTxsLength) {
+            val tx = pendingInboundTxs.getAt(i)
+            val txDate = DateTime(tx.getTimestamp().toLong() * 1000L).toLocalDateTime()
+            val hoursPassed = Hours.hoursBetween(txDate, now).hours
+            if (hoursPassed >= Constants.Wallet.pendingTxExpirationPeriodHours) {
+                val success = wallet.cancelPendingTx(tx.getId())
+                Logger.d("Expired pending inbound tx ${tx.getId()}. Success: $success.")
+            }
+            tx.destroy()
+        }
+        pendingInboundTxs.destroy()
+    }
+
+    /**
+     * Cancels expired pending outbound transactions.
+     * Expiration period is defined by Constants.Wallet.pendingTxExpirationPeriodHours
+     */
+    private fun cancelExpiredPendingOutboundTxs() {
+        val pendingOutboundTxs = wallet.getPendingOutboundTxs()
+        val pendingOutboundTxsLength = wallet.getPendingOutboundTxs().getLength()
+        val now = DateTime.now().toLocalDateTime()
+        for (i in 0 until pendingOutboundTxsLength) {
+            val tx = pendingOutboundTxs.getAt(i)
+            val txDate = DateTime(tx.getTimestamp().toLong() * 1000L).toLocalDateTime()
+            val hoursPassed = Hours.hoursBetween(txDate, now).hours
+            if (hoursPassed >= Constants.Wallet.pendingTxExpirationPeriodHours) {
+                val success = wallet.cancelPendingTx(tx.getId())
+                Logger.d("Expired pending outbound tx ${tx.getId()}. Success: $success")
+            }
+            tx.destroy()
+        }
+
+        pendingOutboundTxs.destroy()
+    }
+
     override fun onCreate() {
         super.onCreate()
         (application as TariWalletApplication).appComponent.inject(this)
@@ -120,6 +189,7 @@ internal class WalletService : Service(), FFIWalletListenerAdapter {
      */
     override fun onDestroy() {
         Logger.d("Service destroyed.")
+        txExpirationCheckSubscription.dispose()
         sendBroadcast(
             Intent(this, ServiceRestartBroadcastReceiver::class.java)
         )
@@ -179,13 +249,33 @@ internal class WalletService : Service(), FFIWalletListenerAdapter {
         }
     }
 
-    override fun onDiscoveryComplete(txId: BigInteger, success: Boolean) {
-        Logger.d("Tx $txId discovery completed. Success: $success")
+    override fun onDirectSendResult(txId: BigInteger, success: Boolean) {
+        Logger.d("Tx $txId direct send completed. Success: $success")
         // post event to bus
-        EventBus.post(Event.Wallet.DiscoveryComplete(TxId(txId), success))
+        EventBus.post(Event.Wallet.DirectSendResult(TxId(txId), success))
         // notify external listeners
         listeners.iterator().forEach {
-            it.onDiscoveryComplete(TxId(txId), success)
+            it.onDirectSendResult(TxId(txId), success)
+        }
+    }
+
+    override fun onStoreAndForwardSendResult(txId: BigInteger, success: Boolean) {
+        Logger.d("Tx $txId store and forward send completed. Success: $success")
+        // post event to bus
+        EventBus.post(Event.Wallet.StoreAndForwardSendResult(TxId(txId), success))
+        // notify external listeners
+        listeners.iterator().forEach {
+            it.onStoreAndForwardSendResult(TxId(txId), success)
+        }
+    }
+
+    override fun onTxCancellation(txId: BigInteger) {
+        Logger.d("Tx $txId cancelled.")
+        // post event to bus
+        EventBus.post(Event.Wallet.TxCancellation(TxId(txId)))
+        // notify external listeners
+        listeners.iterator().forEach {
+            it.onTxCancellation(TxId(txId))
         }
     }
 
@@ -551,26 +641,35 @@ internal class WalletService : Service(), FFIWalletListenerAdapter {
             }
         }
 
+        override fun cancelPendingTx(id: TxId, error: WalletError): Boolean {
+            return try {
+                wallet.cancelPendingTx(id.value)
+            } catch (throwable: Throwable) {
+                mapThrowableIntoError(throwable, error)
+                false
+            }
+        }
+
         override fun sendTari(
             user: User,
             amount: MicroTari,
             fee: MicroTari,
             message: String,
             error: WalletError
-        ): Boolean {
+        ): TxId? {
             return try {
                 val publicKeyFFI = FFIPublicKey(HexString(user.publicKey.hexString))
-                val success = wallet.sendTx(
+                val txId = wallet.sendTx(
                     publicKeyFFI,
                     amount.value,
                     fee.value,
                     message
                 )
                 publicKeyFFI.destroy()
-                success
+                TxId(txId)
             } catch (throwable: Throwable) {
                 mapThrowableIntoError(throwable, error)
-                false
+                null
             }
         }
 

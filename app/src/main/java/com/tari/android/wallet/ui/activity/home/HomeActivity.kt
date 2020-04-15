@@ -457,6 +457,11 @@ internal class HomeActivity : BaseActivity(),
 
     private fun subscribeToEventBus() {
         // wallet events
+        EventBus.subscribe<Event.Wallet.TxCancellation>(this) {
+            wr.get()?.rootView?.post {
+                updateAllDataAndUI(restartBalanceUI = false)
+            }
+        }
         EventBus.subscribe<Event.Wallet.TxMined>(this) {
             wr.get()?.rootView?.post {
                 updateAllDataAndUI(restartBalanceUI = false)
