@@ -1,5 +1,6 @@
 package com.tari.android.wallet
 
+import com.tari.android.wallet.ffi.FFIException
 import com.tari.android.wallet.ffi.NetAddressString
 import org.junit.Assert
 import org.junit.Test
@@ -19,13 +20,13 @@ class NetAddressStringTests {
         Assert.assertTrue(netaddress.toString().length > 4)
     }
 
-    @Test(expected = InvalidPropertiesFormatException::class)
+    @Test(expected = FFIException::class)
     fun testHexStringArg1Exception() {
         val netAddressString = NetAddressString(str2, port)
         netAddressString.toString()
     }
 
-    @Test(expected = InvalidPropertiesFormatException::class)
+    @Test(expected = FFIException::class)
     fun testHexStringArg2Exception() {
         val netAddressString = NetAddressString(str, port2)
         netAddressString.toString()

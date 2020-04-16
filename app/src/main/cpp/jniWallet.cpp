@@ -395,7 +395,7 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniCreate(
     jlong lWalletConfig = GetPointerField(jEnv, jpWalletConfig);
     TariWalletConfig *pWalletConfig = reinterpret_cast<TariWalletConfig *>(lWalletConfig);
 
-    char *pLogPath = const_cast<char *>(jEnv->GetStringUTFChars(jLogPath, JNI_FALSE));
+    const char *pLogPath = jEnv->GetStringUTFChars(jLogPath, JNI_FALSE);
 
     TariWallet *pWallet = wallet_create(
             pWalletConfig,
