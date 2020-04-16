@@ -70,8 +70,16 @@ class FFIWalletTests {
             Logger.i("Tx Finalized :: completed tx id: %s", completedTx.id.toString())
         }
 
-        override fun onDiscoveryComplete(txId: BigInteger, success: Boolean) {
-            Logger.i("Discovery Complete :: tx id %s success %s", txId.toString(), success.toString())
+        override fun onDirectSendResult(txId: BigInteger, success: Boolean) {
+            Logger.i("Direct send :: tx id %s success %s", txId.toString(), success.toString())
+        }
+
+        override fun onStoreAndForwardSendResult(txId: BigInteger, success: Boolean) {
+            Logger.i("Store and forward :: tx id %s success %s", txId.toString(), success.toString())
+        }
+
+        override fun onTxCancellation(txId: BigInteger) {
+            Logger.i("Tx cancellation :: tx id %s", txId.toString())
         }
 
         override fun onBaseNodeSyncComplete(rxId: BigInteger, success: Boolean) {
@@ -209,14 +217,13 @@ class FFIWalletTests {
         assertTrue(pendingOut.toString().toBigIntegerOrNull() != null)
 
         // test send tari
-        assertTrue(
-            wallet.sendTx(
-                contact.getPublicKey(),
-                BigInteger.valueOf(1000000L),
-                BigInteger.valueOf(100L),
-                "Android Wallet"
-            )
+        val tx_id = wallet.sendTx(
+            contact.getPublicKey(),
+            BigInteger.valueOf(1000000L),
+            BigInteger.valueOf(100L),
+            "Android Wallet"
         )
+        assertTrue(tx_id > BigInteger("0"))
 
         // test pending outbound transactions
         val pendingOutboundTxs = wallet.getPendingOutboundTxs()
