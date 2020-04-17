@@ -1,5 +1,6 @@
 package com.tari.android.wallet
 
+import com.tari.android.wallet.ffi.FFIException
 import com.tari.android.wallet.ffi.HexString
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -17,7 +18,7 @@ class HexStringTests {
         assertTrue(hex.toString() == FFITestUtil.PUBLIC_KEY_HEX_STRING)
     }
 
-    @Test(expected = InvalidPropertiesFormatException::class)
+    @Test(expected = FFIException::class)
     fun testHexStringException() {
         val hexString = HexString(str2)
         hexString.toString()
