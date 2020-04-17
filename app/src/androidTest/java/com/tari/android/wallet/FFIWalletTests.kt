@@ -37,7 +37,10 @@
  */
 package com.tari.android.wallet
 
+import android.content.Context
+import androidx.test.core.app.ApplicationProvider
 import com.orhanobut.logger.Logger
+import com.tari.android.wallet.di.WalletModule
 import com.tari.android.wallet.ffi.*
 import com.tari.android.wallet.model.CompletedTx
 import com.tari.android.wallet.model.PendingInboundTx
@@ -89,8 +92,10 @@ class FFIWalletTests {
 
     @Test
     fun testWallet() {
-        val m = FFITestUtil.clearTestFiles(FFITestUtil.WALLET_DATASTORE_PATH)
-        if (!m) {
+        val context = ApplicationProvider.getApplicationContext<Context>()
+        val walletMod = WalletModule()
+        val clean = FFITestUtil.clearTestFiles(walletMod.provideWalletFilesDirPath(context))
+        if (!clean) {
             throw RuntimeException("Test files could not cleared.")
         }
 
@@ -99,12 +104,12 @@ class FFIWalletTests {
             transport.getAddress(),
             transport,
             FFITestUtil.WALLET_DB_NAME,
-            FFITestUtil.WALLET_DATASTORE_PATH,
+            walletMod.provideWalletFilesDirPath(context),
             FFIPrivateKey(HexString(FFITestUtil.PRIVATE_KEY_HEX_STRING)),
             Constants.Wallet.discoveryTimeoutSec
         )
         val listener = TestListener()
-        val wallet = FFITestWallet(commsConfig, FFITestUtil.WALLET_LOG_FILE_PATH)
+        val wallet = FFIWallet(commsConfig, "")
         wallet.listenerAdapter = listener
         assertTrue(wallet.getPointer() != nullptr)
         commsConfig.destroy()
@@ -120,7 +125,7 @@ class FFIWalletTests {
         assertTrue(verified)
 
         // test data generation
-        assertTrue(wallet.generateTestData(FFITestUtil.WALLET_DATASTORE_PATH))
+        assertTrue(wallet.generateTestData(walletMod.provideWalletFilesDirPath(context)))
 
         // test contacts
         val contacts = wallet.getContacts()
@@ -252,7 +257,7 @@ class FFIWalletTests {
         contact.destroy()
         wallet.destroy()
 
-        FFITestUtil.printFFILogFile()
+        FFITestUtil.printFFILogFile(walletMod.provideWalletLogFilePath(walletMod.provideLogFilesDirPath(walletMod.provideWalletFilesDirPath(context))))
 
         // TODO test listeners
     }
