@@ -44,7 +44,7 @@ import java.math.BigInteger
  */
 internal typealias FFIWalletPtr = Long
 
-internal open class FFIWallet(commsConfig: FFICommsConfig, logPath: String) : FFIBase() {
+internal class FFIWallet(commsConfig: FFICommsConfig, logPath: String) : FFIBase() {
 
     companion object {
         var instance: FFIWallet? = null
@@ -187,7 +187,7 @@ internal open class FFIWallet(commsConfig: FFICommsConfig, logPath: String) : FF
 
     // endregion
 
-    protected var ptr = nullptr
+    var ptr = nullptr
     var listenerAdapter: FFIWalletListenerAdapter? = null
 
     // this acts as a constructor would for a normal class since constructors are not allowed for
@@ -313,7 +313,7 @@ internal open class FFIWallet(commsConfig: FFICommsConfig, logPath: String) : FF
     fun getPendingInboundTxById(id: BigInteger): FFIPendingInboundTx {
         val error = FFIError()
         val result =
-            FFIPendingInboundTx(jniGetPendingInboundTxById(id.toByteArray().toString(), error))
+            FFIPendingInboundTx(jniGetPendingInboundTxById(id.toString(), error))
         throwIf(error)
         return result
     }
@@ -325,7 +325,7 @@ internal open class FFIWallet(commsConfig: FFICommsConfig, logPath: String) : FF
         return result
     }
 
-    protected fun onTxBroadcast(completedTx: FFICompletedTxPtr) {
+    fun onTxBroadcast(completedTx: FFICompletedTxPtr) {
         Logger.i("Tx completed. Pointer: %s", completedTx.toString())
         val walletKey = getPublicKey()
         val walletHex = walletKey.toString()
@@ -372,7 +372,7 @@ internal open class FFIWallet(commsConfig: FFICommsConfig, logPath: String) : FF
         listenerAdapter?.onTxBroadcast(completed)
     }
 
-    protected fun onTxMined(completedTx: FFICompletedTxPtr) {
+    fun onTxMined(completedTx: FFICompletedTxPtr) {
         Logger.i("Tx mined. Pointer: %s", completedTx.toString())
         val walletKey = getPublicKey()
         val walletHex = walletKey.toString()
@@ -420,7 +420,7 @@ internal open class FFIWallet(commsConfig: FFICommsConfig, logPath: String) : FF
         tx.destroy()
     }
 
-    protected fun onTxReceived(inboundTx: FFIPendingInboundTxPtr) {
+    fun onTxReceived(inboundTx: FFIPendingInboundTxPtr) {
         Logger.i("Tx received. Pointer: %s", inboundTx.toString())
         val tx = FFIPendingInboundTx(inboundTx)
         val id = tx.getId()
@@ -449,7 +449,7 @@ internal open class FFIWallet(commsConfig: FFICommsConfig, logPath: String) : FF
         listenerAdapter?.onTxReceived(pendingTx)
     }
 
-    protected fun onTxReplyReceived(completedTx: FFICompletedTxPtr) {
+    fun onTxReplyReceived(completedTx: FFICompletedTxPtr) {
         Logger.i("Tx reply received. Pointer: %s", completedTx.toString())
         val walletKey = getPublicKey()
         val walletHex = walletKey.toString()
@@ -498,7 +498,7 @@ internal open class FFIWallet(commsConfig: FFICommsConfig, logPath: String) : FF
         tx.destroy()
     }
 
-    protected fun onTxFinalized(completedTx: FFICompletedTxPtr) {
+    fun onTxFinalized(completedTx: FFICompletedTxPtr) {
         Logger.i("Tx finalized. Pointer: %s", completedTx.toString())
         val walletKey = getPublicKey()
         val walletHex = walletKey.toString()
@@ -546,19 +546,19 @@ internal open class FFIWallet(commsConfig: FFICommsConfig, logPath: String) : FF
         tx.destroy()
     }
 
-    protected fun onDirectSendResult(bytes: ByteArray, success: Boolean) {
+    fun onDirectSendResult(bytes: ByteArray, success: Boolean) {
         Logger.i("Direct send result received. Success: $success")
         val txId = BigInteger(1, bytes)
         listenerAdapter?.onDirectSendResult(txId, success)
     }
 
-    protected fun onStoreAndForwardSendResult(bytes: ByteArray, success: Boolean) {
+    fun onStoreAndForwardSendResult(bytes: ByteArray, success: Boolean) {
         Logger.i("Store and forward send result received. Success: $success")
         val txId = BigInteger(1, bytes)
         listenerAdapter?.onStoreAndForwardSendResult(txId, success)
     }
 
-    protected fun onTxCancellation(bytes: ByteArray) {
+    fun onTxCancellation(bytes: ByteArray) {
         Logger.i("Transaction cancelled.")
         val txId = BigInteger(1, bytes)
         listenerAdapter?.onTxCancellation(txId)
@@ -566,7 +566,7 @@ internal open class FFIWallet(commsConfig: FFICommsConfig, logPath: String) : FF
 
 
 
-    protected fun onBaseNodeSyncComplete(bytes: ByteArray, success: Boolean) {
+    fun onBaseNodeSyncComplete(bytes: ByteArray, success: Boolean) {
         Logger.i("Base node sync complete. Success: $success")
         val requestId = BigInteger(1, bytes)
         listenerAdapter?.onBaseNodeSyncComplete(requestId, success)
@@ -666,4 +666,76 @@ internal open class FFIWallet(commsConfig: FFICommsConfig, logPath: String) : FF
         jniDestroy()
     }
 
+    // region JNI
+
+    private external fun jniGenerateTestData(
+        datastorePath: String,
+        libError: FFIError
+    ): Boolean
+
+    private external fun jniTestBroadcastTx(
+        txPtr: String,
+        libError: FFIError
+    ): Boolean
+
+    private external fun jniTestFinalizeReceivedTx(
+        txPtr: FFIPendingInboundTx,
+        libError: FFIError
+    ): Boolean
+
+    private external fun jniTestCompleteSentTx(
+        txPtr: FFIPendingOutboundTx,
+        libError: FFIError
+    ): Boolean
+
+    private external fun jniTestMineTx(
+        txId: String,
+        libError: FFIError
+    ): Boolean
+
+    private external fun jniTestReceiveTx(libError: FFIError): Boolean
+
+    // endregion
+
+    fun generateTestData(datastorePath: String): Boolean {
+        val error = FFIError()
+        val result = jniGenerateTestData(datastorePath, error)
+        throwIf(error)
+        return result
+    }
+
+    fun testBroadcastTx(tx: BigInteger): Boolean {
+        val error = FFIError()
+        val result = jniTestBroadcastTx(tx.toString(), error)
+        throwIf(error)
+        return result
+    }
+
+    fun testCompleteSentTx(tx: FFIPendingOutboundTx): Boolean {
+        val error = FFIError()
+        val result = jniTestCompleteSentTx(tx, error)
+        throwIf(error)
+        return result
+    }
+
+    fun testMineTx(tx: BigInteger): Boolean {
+        val error = FFIError()
+        val result = jniTestMineTx(tx.toString(), error)
+        throwIf(error)
+        return result
+    }
+
+    fun testFinalizeReceivedTx(tx: FFIPendingInboundTx): Boolean {
+        val error = FFIError()
+        val result = jniTestFinalizeReceivedTx(tx, error)
+        throwIf(error)
+        return result
+    }
+
+    fun testReceiveTx(): Boolean {
+        val error = FFIError()
+        val result = jniTestReceiveTx(error)
+        throwIf(error)
+        return result
+    }
 }

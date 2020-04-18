@@ -51,11 +51,11 @@ Java_com_tari_android_wallet_ffi_FFICommsConfig_jniCreate(
         jobject jPrivateKey,
         jlong jDiscoveryTimeoutSec,
         jobject error) {
-    char *pControlServiceAddress = const_cast<char *>(jEnv->GetStringUTFChars(
+    const char *pControlServiceAddress = jEnv->GetStringUTFChars(
             jPublicAddress,
-            JNI_FALSE));
-    char *pDatabaseName = const_cast<char *>(jEnv->GetStringUTFChars(jDatabaseName, JNI_FALSE));
-    char *pDatastorePath = const_cast<char *>(jEnv->GetStringUTFChars(jDatastorePath, JNI_FALSE));
+            JNI_FALSE);
+    const char *pDatabaseName = jEnv->GetStringUTFChars(jDatabaseName, JNI_FALSE);
+    const char *pDatastorePath = jEnv->GetStringUTFChars(jDatastorePath, JNI_FALSE);
     jlong lPrivateKey = GetPointerField(jEnv, jPrivateKey);
     TariPrivateKey *pPrivateKey = reinterpret_cast<TariPrivateKey *>(lPrivateKey);
     jlong lTransport = GetPointerField(jEnv, jTransport);
