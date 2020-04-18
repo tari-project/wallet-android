@@ -60,10 +60,10 @@ class FFIPublicKeyTests {
         val publicKey3 = FFIPublicKey(HexString(str))
         assertTrue(publicKey3.getPointer() != nullptr)
         assertTrue(publicKey3.toString() == str)
-        //val publicKey4 = FFIPublicKey(publicKey3.getEmojiId())
-        //assertTrue(publicKey3.toString() == publicKey4.toString())
+        val publicKey4 = FFIPublicKey(publicKey3.getEmojiNodeId())
+        assertTrue(publicKey3.toString() == publicKey4.toString())
         publicKey3.destroy()
-        //publicKey4.destroy()
+        publicKey4.destroy()
     }
 
     @Test(expected = FFIException::class)

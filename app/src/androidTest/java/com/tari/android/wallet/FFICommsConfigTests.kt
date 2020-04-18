@@ -37,10 +37,15 @@
  */
 package com.tari.android.wallet
 
+import android.content.Context
+import androidx.test.core.app.ApplicationProvider
+import com.tari.android.wallet.di.TorModule
+import com.tari.android.wallet.di.WalletModule
 import com.tari.android.wallet.ffi.*
 import com.tari.android.wallet.util.Constants
 import org.junit.Assert.assertTrue
 import org.junit.Test
+import java.io.File
 
 /**
  * FFI comms config tests.
@@ -50,24 +55,57 @@ import org.junit.Test
 class FFICommsConfigTests {
 
     private val dbName = "tari_test_db"
-    private val controlServiceAddress = NetAddressString("127.0.0.1", 80)
-    private val listenerAddress = NetAddressString("0.0.0.0", 80)
-    private val datastorePath =
-        StringBuilder()
-            .append(FFITestUtil.WALLET_DATASTORE_PATH)
-            .append("/")
-            .append(dbName).toString()
+
+    @Test
+    fun testMemoryTransport()
+    {
+        val transport = FFITransportType()
+        assertTrue(transport.getPointer() != nullptr)
+        assertTrue(transport.getAddress().isNotEmpty())
+        transport.destroy()
+    }
+
+    @Test
+    fun testTCPTransport()
+    {
+        val transport = FFITransportType(FFITestUtil.address)
+        assertTrue(transport.getPointer() != nullptr)
+        transport.destroy()
+    }
+
+    @Test
+    fun testTorTransport()
+    {
+        val torMod = TorModule()
+        val context = ApplicationProvider.getApplicationContext<Context>()
+        val cookieFile = File(torMod.provideTorCookieFilePath(context))
+        val cookie = if (cookieFile.exists()) {
+            FFIByteVector(cookieFile.readBytes())
+        } else
+        {
+            FFIByteVector(nullptr)
+        }
+        val addressString = NetAddressString(torMod.provideTorControlAddress(),torMod.provideTorControlPort())
+        // TODO Extend to test identity as well
+        val transport = FFITransportType(addressString,torMod.provideConnectionPort(), cookie,
+            FFIByteVector(nullptr),
+            torMod.provideTorSock5Username(), torMod.provideTorSock5Password())
+        assertTrue(transport.getPointer() != nullptr)
+        transport.destroy()
+    }
 
     @Test
     fun testCommsConfig() {
-        FFITestUtil.clearTestFiles(StringBuilder().append(datastorePath).toString())
+        val context = ApplicationProvider.getApplicationContext<Context>()
+        val walletMod = WalletModule()
+        FFITestUtil.clearTestFiles(walletMod.provideWalletFilesDirPath(context))
         val privateKey = FFIPrivateKey(HexString(FFITestUtil.PRIVATE_KEY_HEX_STRING))
         val transport = FFITransportType()
         val commsConfig = FFICommsConfig(
             transport.getAddress(),
             transport,
             dbName,
-            datastorePath,
+            walletMod.provideWalletFilesDirPath(context),
             privateKey,
             Constants.Wallet.discoveryTimeoutSec
         )
@@ -79,14 +117,16 @@ class FFICommsConfigTests {
 
     @Test(expected = FFIException::class)
     fun testByteVectorException() {
-        FFITestUtil.clearTestFiles(StringBuilder().append(datastorePath).toString())
+        val context = ApplicationProvider.getApplicationContext<Context>()
+        val walletMod = WalletModule()
+        FFITestUtil.clearTestFiles(StringBuilder().append(walletMod.provideWalletFilesDirPath(context)).toString())
         val privateKey = FFIPrivateKey(HexString(FFITestUtil.PRIVATE_KEY_HEX_STRING))
         val transport = FFITransportType()
         val commsConfig = FFICommsConfig(
             transport.getAddress(),
             transport,
             dbName,
-            StringBuilder().append(datastorePath).append("bad_dir").toString(),
+            StringBuilder().append(walletMod.provideWalletFilesDirPath(context)).append("bad_dir").toString(),
             privateKey,
             Constants.Wallet.discoveryTimeoutSec
         )

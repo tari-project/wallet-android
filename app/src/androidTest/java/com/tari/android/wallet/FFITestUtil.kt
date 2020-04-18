@@ -32,7 +32,6 @@
  */
 package com.tari.android.wallet
 
-import androidx.test.platform.app.InstrumentationRegistry
 import com.orhanobut.logger.Logger
 import com.tari.android.wallet.ffi.NetAddressString
 import java.io.File
@@ -45,24 +44,13 @@ import java.io.File
 class FFITestUtil {
 
     companion object {
-
-        private const val WALLET_LOG_FILE_NAME: String = "tari_log.txt"
-        private val WALLET_FILES_DIR_PATH: String = InstrumentationRegistry
-            .getInstrumentation()
-            .targetContext
-            .filesDir
-            .absolutePath
         internal const val WALLET_DB_NAME: String = "tari_test_db"
-        internal val WALLET_CONTROL_SERVICE_ADDRESS: NetAddressString = NetAddressString("127.0.0.1", 80)
-        internal val WALLET_LISTENER_ADDRESS: NetAddressString = NetAddressString("0.0.0.0", 0)
-        internal val WALLET_DATASTORE_PATH: String = WALLET_FILES_DIR_PATH
-        internal val WALLET_LOG_FILE_PATH: String = "$WALLET_FILES_DIR_PATH/$WALLET_LOG_FILE_NAME"
-
         // Matching pair of keys.
         internal const val PUBLIC_KEY_HEX_STRING: String =
             "30E1DFA197794858BFDBF96CDCE5DC8637D4BD1202DC694991040DDECBF42D40"
         internal const val PRIVATE_KEY_HEX_STRING: String =
             "6259C39F75E27140A652A5EE8AEFB3CF6C1686EF21D27793338D899380E8C801"
+        internal val address = NetAddressString("127.0.0.1",80)
 
         fun generateRandomAlphanumericString(len: Int): String {
             val characters = ('0'..'z').toList().toTypedArray()
@@ -79,15 +67,16 @@ class FFITestUtil {
             if (!directory.exists()) {
                 directory.mkdirs()
             }
+
             if (directory.exists() && directory.canWrite() && directory.isDirectory) {
                 return true
             }
             return false
         }
 
-        fun printFFILogFile() {
+        fun printFFILogFile(path: String) {
             var log = ""
-            File(WALLET_LOG_FILE_PATH).forEachLine {
+            File(path).forEachLine {
                 log += "\n" + it
             }
             Logger.d("FFI log file contents:\n$log")

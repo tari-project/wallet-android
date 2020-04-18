@@ -37,6 +37,7 @@ import com.tari.android.wallet.ffi.FFIByteVector
 import com.tari.android.wallet.ffi.FFIException
 import com.tari.android.wallet.ffi.HexString
 import com.tari.android.wallet.ffi.nullptr
+import okio.Utf8
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
@@ -51,15 +52,23 @@ class FFIByteVectorTests {
 
     @Test
     fun testByteVector() {
-        val byteVector = FFIByteVector(HexString(str))
+        val key = HexString(str)
+        val byteVector = FFIByteVector(key)
         assertTrue(byteVector.getPointer() != nullptr)
         Log.i("TestbyteVector", byteVector.getLength().toString())
         assertTrue(byteVector.getLength() * 2 == str.length)
         assertTrue(str == byteVector.toString())
         val byteVector2 = FFIByteVector(byteVector.getPointer())
         assertTrue(byteVector.toString() == byteVector2.toString())
+        assertTrue(byteVector.getBytes().contentEquals(byteVector2.getBytes()))
+
+        val byteArray = "Test".toByteArray()
+        val byteVector3 = FFIByteVector(byteArray)
+        var s = byteVector3.getBytes()
+        assertTrue(byteArray.contentEquals(s))
         byteVector.destroy()
         byteVector2.destroy()
+        byteVector3.destroy()
     }
 
     @Test(expected = FFIException::class)
