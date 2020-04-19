@@ -1,5 +1,5 @@
 # Tari Aurora Changelog
-## [0.1.3-jniLibs-0.7.0] - 2020-04-19
+## [0.1.4-jniLibs-0.7.1] - 2020-04-19
 - Updated FFI libraries with improved Store and forward handling
 
 ## [0.1.2-jniLibs-0.6.0] - 2020-04-15
