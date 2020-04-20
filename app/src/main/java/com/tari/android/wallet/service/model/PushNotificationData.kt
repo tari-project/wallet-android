@@ -30,33 +30,23 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.tari.android.wallet.service
+package com.tari.android.wallet.service.model
 
-import com.tari.android.wallet.model.TestnetTariAllocateMaxResponse
-import com.tari.android.wallet.model.TestnetTariAllocateRequest
-import com.tari.android.wallet.model.TestnetTariAllocateResponse
-import retrofit2.Call
-import retrofit2.http.Body
-import retrofit2.http.POST
-import retrofit2.http.Path
+import com.google.gson.annotations.SerializedName
 
 /**
- *  Rest API service.
- *
- *  @author The Tari Development Team
+ * Push notification request body.
  */
-interface TariRESTService {
+data class PushNotificationRequestBody constructor(
+    @SerializedName("from_pub_key") val senderPublicKeyHex: String,
+    val signature: String,
+    @SerializedName("public_nonce") val publicNonce: String
+)
 
-    @POST("/free_tari/allocate/{publicKeyHex}")
-    fun requestTestnetTari(
-        @Path("publicKeyHex") publicKey: String,
-        @Body requestBody: TestnetTariAllocateRequest
-    ): Call<TestnetTariAllocateResponse>
-
-    @POST("/free_tari/allocate_max/{publicKeyHex}")
-    fun requestMaxTestnetTari(
-        @Path("publicKeyHex") publicKey: String,
-        @Body requestBody: TestnetTariAllocateRequest
-    ): Call<TestnetTariAllocateMaxResponse>
-
-}
+/**
+ * Push notification response body.
+ */
+data class PushNotificationResponseBody constructor(
+    @SerializedName("sent")
+    val sent: Boolean
+)

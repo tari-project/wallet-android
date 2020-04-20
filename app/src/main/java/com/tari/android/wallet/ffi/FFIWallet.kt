@@ -175,7 +175,7 @@ internal class FFIWallet(commsConfig: FFICommsConfig, logPath: String) : FFIBase
         libError: FFIError
     ): Boolean
 
-    private external fun jniSyncBaseNode(
+    private external fun jniSyncWithBaseNode(
         libError: FFIError
     ): Boolean
 
@@ -564,8 +564,6 @@ internal class FFIWallet(commsConfig: FFICommsConfig, logPath: String) : FFIBase
         listenerAdapter?.onTxCancellation(txId)
     }
 
-
-
     fun onBaseNodeSyncComplete(bytes: ByteArray, success: Boolean) {
         Logger.i("Base node sync complete. Success: $success")
         val requestId = BigInteger(1, bytes)
@@ -638,9 +636,9 @@ internal class FFIWallet(commsConfig: FFICommsConfig, logPath: String) : FFIBase
         return BigInteger(1, bytes)
     }
 
-    fun syncBaseNode(): Boolean {
+    fun syncWithBaseNode(): Boolean {
         val error = FFIError()
-        val result = jniSyncBaseNode(error)
+        val result = jniSyncWithBaseNode(error)
         throwIf(error)
         return result
     }

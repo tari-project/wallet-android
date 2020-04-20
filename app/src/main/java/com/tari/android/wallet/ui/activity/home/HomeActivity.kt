@@ -84,6 +84,7 @@ import com.tari.android.wallet.ui.extension.gone
 import com.tari.android.wallet.ui.extension.invisible
 import com.tari.android.wallet.ui.extension.scrollToTop
 import com.tari.android.wallet.ui.extension.showInternetConnectionErrorDialog
+import com.tari.android.wallet.ui.fragment.send.FinalizeSendTxFragment
 import com.tari.android.wallet.ui.util.UiUtil
 import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.SharedPrefsWrapper
@@ -93,6 +94,7 @@ import java.lang.ref.WeakReference
 import javax.inject.Inject
 import kotlin.math.max
 import kotlin.math.min
+import com.tari.android.wallet.ui.fragment.send.FinalizeSendTxFragment.FailureReason.*
 
 /**
  * Home activity - transaction list.
@@ -237,6 +239,15 @@ internal class HomeActivity : BaseActivity(),
     lateinit var firstTestnetUTXOMessage: String
     @BindString(R.string.second_testnet_utxo_tx_message)
     lateinit var secondTestnetUTXOMessage: String
+
+    @BindString(R.string.error_no_connection_title)
+    lateinit var sendErrorNetworkConnectionTitle: String
+    @BindString(R.string.error_no_connection_description)
+    lateinit var sendErrorNetworkConnectionDescription: String
+    @BindString(R.string.error_node_unreachable_title)
+    lateinit var sendErrorNodeUnreachableTitle: String
+    @BindString(R.string.error_node_unreachable_description)
+    lateinit var sendErrorNodeUnreachableDescription: String
 
     @Inject
     lateinit var sharedPrefsWrapper: SharedPrefsWrapper
@@ -491,9 +502,9 @@ internal class HomeActivity : BaseActivity(),
                 onTxSendSuccessful()
             }
         }
-        EventBus.subscribe<Event.Tx.TxSendFailed>(this) {
+        EventBus.subscribe<Event.Tx.TxSendFailed>(this) { event ->
             wr.get()?.rootView?.post {
-                onTxSendFailed()
+                onTxSendFailed(event.failureReason)
             }
         }
 
@@ -1024,7 +1035,7 @@ internal class HomeActivity : BaseActivity(),
     /**
      * Called when an outgoing transaction has failed.
      */
-    private fun onTxSendFailed() {
+    private fun onTxSendFailed(failureReason: FinalizeSendTxFragment.FailureReason) {
         Dialog(this, R.style.Theme_AppCompat_Dialog).apply {
             window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
             setContentView(R.layout.tx_failed_dialog)
@@ -1034,10 +1045,21 @@ internal class HomeActivity : BaseActivity(),
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
             )
-            findViewById<TextView>(R.id.tx_failed_dialog_txt_close)
-                .setOnClickListener {
-                    dismiss()
-                }
+            val closeButtonTextView = findViewById<TextView>(R.id.tx_failed_dialog_txt_close)
+            closeButtonTextView.setOnClickListener { dismiss() }
+            val titleTextView = findViewById<TextView>(R.id.tx_failed_dialog_txt_title)
+            titleTextView.text = when (failureReason) {
+                NETWORK_CONNECTION_ERROR -> sendErrorNetworkConnectionTitle
+                BASE_NODE_CONNECTION_ERROR -> sendErrorNodeUnreachableTitle
+                SEND_ERROR -> sendErrorNodeUnreachableTitle
+            }
+            val descriptionTextView = findViewById<TextView>(R.id.tx_failed_dialog_txt_description)
+            descriptionTextView.text = when (failureReason) {
+                NETWORK_CONNECTION_ERROR -> sendErrorNetworkConnectionDescription
+                BASE_NODE_CONNECTION_ERROR -> sendErrorNodeUnreachableDescription
+                SEND_ERROR -> sendErrorNodeUnreachableDescription
+            }
+            // set text
 
             window?.setGravity(Gravity.BOTTOM)
         }.show()
@@ -1060,6 +1082,7 @@ internal class HomeActivity : BaseActivity(),
      * Called when a tx gets clicked.
      */
     override fun onTxSelected(tx: Tx) {
+        val error = WalletError()
         Logger.i("Transaction with id ${tx.id} selected.")
         startActivity(TxDetailActivity.createIntent(this, tx))
     }

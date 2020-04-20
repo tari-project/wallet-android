@@ -30,34 +30,26 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.tari.android.wallet.model
+package com.tari.android.wallet.service
 
-import com.google.gson.annotations.SerializedName
+import com.tari.android.wallet.service.model.PushNotificationRequestBody
+import com.tari.android.wallet.service.model.PushNotificationResponseBody
+import retrofit2.Call
+import retrofit2.http.Body
+import retrofit2.http.POST
+import retrofit2.http.Path
 
 /**
- * Allocate testnet tari request and response class.
+ *  Push notification REST API service.
  *
- * @author The Tari Development Team
+ *  @author The Tari Development Team
  */
-data class TestnetTariAllocateRequest constructor(val signature: String, @SerializedName("public_nonce") val public_nonce: String)
+interface PushNotificationRESTService {
 
-data class TestnetTariAllocateResponse constructor(
-    @SerializedName("return_wallet_id")
-    val returnWalletId: String,
-    val key: String,
-    val value: String
-)
+    @POST("/send/{recipientPublicKeyHex}")
+    fun sendPushNotificationToRecipient(
+        @Path("recipientPublicKeyHex") recipientPublicKeyHex: String,
+        @Body requestBody: PushNotificationRequestBody
+    ): Call<PushNotificationResponseBody>
 
-data class TestnetTariUTXOKey constructor(
-    // this field is not going to be sent to us by the server,
-    // but we fill it before we store the UTXO key in the shared preferences
-    var senderPublicKeyHex: String?,
-    val key: String,
-    val value: String
-)
-
-data class TestnetTariAllocateMaxResponse constructor(
-    @SerializedName("return_wallet_id")
-    val returnWalletId: String,
-    val keys: List<TestnetTariUTXOKey>
-)
+}

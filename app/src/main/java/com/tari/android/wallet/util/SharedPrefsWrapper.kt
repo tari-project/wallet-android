@@ -36,7 +36,7 @@ import android.content.Context
 import android.content.SharedPreferences
 import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
-import com.tari.android.wallet.model.TestnetTariUTXOKey
+import com.tari.android.wallet.service.model.TestnetTariUTXOKey
 import de.adorsys.android.securestoragelibrary.SecurePreferences
 import java.math.BigInteger
 

@@ -972,7 +972,7 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniAddBaseNodePeer(
 
 extern "C"
 JNIEXPORT jboolean JNICALL
-Java_com_tari_android_wallet_ffi_FFIWallet_jniSyncBaseNode(
+Java_com_tari_android_wallet_ffi_FFIWallet_jniSyncWithBaseNode(
         JNIEnv *jEnv,
         jobject jThis,
         jobject error) {

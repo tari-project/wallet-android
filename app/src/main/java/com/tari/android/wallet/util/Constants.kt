@@ -114,9 +114,9 @@ internal object Constants {
 
         }
 
-        object SendTxSuccessful {
+        object FinalizeSendTx {
             const val lottieAnimStartDelayMs = 400L
-            const val textAppearAnimStartDelayMs = 500L
+            const val textAppearAnimStartDelayMs = 200L
             const val successfulInfoFadeOutAnimStartDelayMs = 3130L
         }
 
@@ -142,6 +142,7 @@ internal object Constants {
         const val emojiFormatterChunkSize = 3
         const val walletDBName: String = "tari_wallet_db"
         const val faucetServerUrl = "https://faucet.tari.com"
+        const val pushNotificationServerUrl = "https://push.tari.com"
         const val deepLinkURLPrefix = "tari://"
         const val pendingTxExpirationPeriodHours = 3 * 24
     }

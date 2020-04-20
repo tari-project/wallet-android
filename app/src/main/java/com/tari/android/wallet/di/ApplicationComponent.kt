@@ -66,7 +66,7 @@ import javax.inject.Singleton
     modules = [
         ApplicationModule::class,
         WalletModule::class,
-        RestModule::class,
+        RESTModule::class,
         ConfigModule::class,
         TorModule::class,
         TrackerModule::class

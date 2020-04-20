@@ -68,6 +68,8 @@ interface TariWalletService {
 
     boolean cancelPendingTx(in TxId id, out WalletError error);
 
+    boolean syncWithBaseNode(out WalletError error);
+
     TxId sendTari(
         in User contact,
         in MicroTari amount,
