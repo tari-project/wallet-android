@@ -30,49 +30,34 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.tari.android.wallet.event
+package com.tari.android.wallet.service.model
 
-import com.tari.android.wallet.model.*
-import com.tari.android.wallet.ui.fragment.send.FinalizeSendTxFragment
+import com.google.gson.annotations.SerializedName
 
 /**
- * App-wide events.
+ * Allocate testnet tari request and response class.
+ *
+ * @author The Tari Development Team
  */
-object Event {
+data class TestnetTariAllocateRequest constructor(val signature: String, @SerializedName("public_nonce") val public_nonce: String)
 
-    /**
-     * Wallet events.
-     */
-    object Wallet {
-        data class TxBroadcast(val completedTx: CompletedTx)
-        data class TxMined(val completedTx: CompletedTx)
-        data class TxReceived(val pendingInboundTx: PendingInboundTx)
-        data class TxReplyReceived(val completedTx: CompletedTx)
-        data class TxFinalized(val completedTx: CompletedTx)
-        data class DirectSendResult(val txId: TxId, val success: Boolean)
-        data class StoreAndForwardSendResult(val txId: TxId, val success: Boolean)
-        data class TxCancellation(val txId: TxId)
-        data class BaseNodeSyncComplete(val rxId: RxId, val success: Boolean)
-    }
+data class TestnetTariAllocateResponse constructor(
+    @SerializedName("return_wallet_id")
+    val returnWalletId: String,
+    val key: String,
+    val value: String
+)
 
-    /**
-     * Contact events.
-     */
-    object Contact {
-        data class ContactAddedOrUpdated(val contactPublicKey: PublicKey, val contactAlias: String)
-    }
+data class TestnetTariUTXOKey constructor(
+    // this field is not going to be sent to us by the server,
+    // but we fill it before we store the UTXO key in the shared preferences
+    var senderPublicKeyHex: String?,
+    val key: String,
+    val value: String
+)
 
-    /**
-     * Transaction events.
-     */
-    object Tx {
-        class TxSendSuccessful
-        data class TxSendFailed(val failureReason: FinalizeSendTxFragment.FailureReason)
-    }
-
-    object Testnet {
-        class TestnetTariRequestSuccessful
-        data class TestnetTariRequestError(val errorMessage: String)
-    }
-
-}
+data class TestnetTariAllocateMaxResponse constructor(
+    @SerializedName("return_wallet_id")
+    val returnWalletId: String,
+    val keys: List<TestnetTariUTXOKey>
+)

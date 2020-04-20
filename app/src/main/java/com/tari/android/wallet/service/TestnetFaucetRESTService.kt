@@ -30,53 +30,33 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.tari.android.wallet.di
+package com.tari.android.wallet.service
 
-import com.tari.android.wallet.service.TariRESTService
-import com.tari.android.wallet.util.Constants
-import dagger.Module
-import dagger.Provides
-import okhttp3.OkHttpClient
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
-import javax.inject.Named
-import javax.inject.Singleton
+import com.tari.android.wallet.service.model.TestnetTariAllocateMaxResponse
+import com.tari.android.wallet.service.model.TestnetTariAllocateRequest
+import com.tari.android.wallet.service.model.TestnetTariAllocateResponse
+import retrofit2.Call
+import retrofit2.http.Body
+import retrofit2.http.POST
+import retrofit2.http.Path
 
 /**
- * Dagger module to inject REST service dependencies.
+ *  Testnet faucet REST API service.
  *
- * @author The Tari Development Team
+ *  @author The Tari Development Team
  */
-@Module
-internal class RestModule {
+internal interface TestnetFaucetRESTService {
 
-    @Provides
-    @Named("ServerUrl")
-    @Singleton
-    fun providerServerUrl(): String {
-        return Constants.Wallet.faucetServerUrl
-    }
+    @POST("/free_tari/allocate/{publicKeyHex}")
+    fun requestTestnetTari(
+        @Path("publicKeyHex") publicKey: String,
+        @Body requestBody: TestnetTariAllocateRequest
+    ): Call<TestnetTariAllocateResponse>
 
-    @Provides
-    @Singleton
-    fun provideSocketClient(): OkHttpClient {
-        return OkHttpClient.Builder().build()
-    }
-
-    @Provides
-    @Singleton
-    fun provideRetrofit(
-        okHttpClient: OkHttpClient, @Named("ServerUrl") apiUrl: String
-    ): Retrofit {
-        return Retrofit.Builder().baseUrl(apiUrl).client(okHttpClient)
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
-    }
-
-    @Provides
-    @Singleton
-    fun provideTariServices(retrofit: Retrofit): TariRESTService {
-        return retrofit.create(TariRESTService::class.java)
-    }
+    @POST("/free_tari/allocate_max/{publicKeyHex}")
+    fun requestMaxTestnetTari(
+        @Path("publicKeyHex") publicKey: String,
+        @Body requestBody: TestnetTariAllocateRequest
+    ): Call<TestnetTariAllocateMaxResponse>
 
 }

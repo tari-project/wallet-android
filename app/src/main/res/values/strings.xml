@@ -40,7 +40,7 @@
 
     <!-- errors -->
     <!-- node unreachable -->
-    <string name="error_node_unreachable_title">It\'s not you, it\'s us.</string>
+    <string name="error_node_unreachable_title">It\'s not you, it\'s the network.</string>
     <string name="error_node_unreachable_description">Looks like there\'s a connectivity issue on our end. Can you give us a bit, then come back and try again?</string>
     <!-- no connection -->
     <string name="error_no_connection_title">Can\'t connect to the internet</string>
@@ -66,7 +66,7 @@
     <string name="common_share">Share</string>
 
     <!-- emoji id copied view -->
-    <string name="emoji_id_copied">Copied</string>
+    <string name="emoji_id_copied">COPIED</string>
 
     <!-- emoji-id-related -->
     <string name="emoji_id_bullet_separator">•••</string>
@@ -183,11 +183,12 @@
     <string name="add_note_slide_to_send">Slide to Send</string>
 
     <!-- send tari - successful -->
-    <!-- Tari amount should be formatted and passed as a string to this format -->
-    <string name="finalize_send_tx_sending_info_format" tools:ignore="TypographyEllipsis">Sending %1$s Tari...</string>
-    <string name="finalize_send_tx_sending_info_format_bold_part" tools:ignore="TypographyEllipsis">%1$s Tari...</string>
-    <string name="finalize_send_tx_sucessful_info_format">You just sent %1$s Tari</string>
-    <string name="finalize_send_tx_sucessful_info_format_bold_part">%1$s Tari</string>
+    <string name="finalize_send_tx_sending_step_1_desc_line_1">Connecting to the</string>
+    <string name="finalize_send_tx_sending_step_1_desc_line_2" tools:ignore="TypographyEllipsis">Tari Network...</string>
+    <string name="finalize_send_tx_sending_step_2_desc_line_1">Searching for the</string>
+    <string name="finalize_send_tx_sending_step_2_desc_line_2" tools:ignore="TypographyEllipsis">recipient on the Tari Network...</string>
+    <string name="finalize_send_tx_sending_step_3_desc_line_1">Good to go!</string>
+    <string name="finalize_send_tx_sending_step_3_desc_line_2" tools:ignore="TypographyEllipsis">Your transaction is on its way...</string>
 
     <!-- debug log - title -->
     <string name="debug_log_title">Log</string>

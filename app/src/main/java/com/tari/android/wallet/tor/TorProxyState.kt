@@ -50,6 +50,7 @@ data class TorBootstrapStatus(val progress: Int, val summary: String, val warnin
 
         private val warningLogRegex = Regex(".*PROGRESS=(\\d+).*SUMMARY=\"([^\"]*)\".*WARNING=\"([^\"]*)\".*")
         private val logRegex = Regex(".*PROGRESS=(\\d+).*SUMMARY=\"([^\"]*)\".*")
+        const val maxProgress = 100
 
         fun from(logLine: String): TorBootstrapStatus {
             if (warningLogRegex.matches(logLine)) {

@@ -50,6 +50,10 @@ import retrofit2.Response
 import java.math.BigInteger
 import javax.inject.Inject
 import com.tari.android.wallet.model.Tx.Direction.*
+import com.tari.android.wallet.service.model.PushNotificationRequestBody
+import com.tari.android.wallet.service.model.PushNotificationResponseBody
+import com.tari.android.wallet.service.model.TestnetTariAllocateMaxResponse
+import com.tari.android.wallet.service.model.TestnetTariAllocateRequest
 import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.SharedPrefsWrapper
 import io.reactivex.Observable
@@ -57,8 +61,9 @@ import io.reactivex.schedulers.Schedulers
 import org.joda.time.DateTime
 import org.joda.time.Hours
 import org.joda.time.Minutes
-import org.joda.time.Seconds
+import java.util.*
 import java.util.concurrent.TimeUnit
+import kotlin.collections.ArrayList
 
 /**
  * Foreground wallet service.
@@ -76,13 +81,20 @@ internal class WalletService : Service(), FFIWalletListenerAdapter {
     @Inject
     lateinit var app: TariWalletApplication
     @Inject
-    lateinit var tariRESTService: TariRESTService
+    lateinit var testnetFaucetRESTService: TestnetFaucetRESTService
+    @Inject
+    lateinit var pushNotificationRESTService: PushNotificationRESTService
     @Inject
     lateinit var notificationHelper: NotificationHelper
     @Inject
     lateinit var sharedPrefsWrapper: SharedPrefsWrapper
 
     private val wallet = FFIWallet.instance!!
+
+    /**
+     * Pairs of <tx id, recipient public key hex>.
+     */
+    private val outboundTxIdsToBePushNotified = mutableSetOf<Pair<BigInteger, String>>()
 
     /**
      * Service stub implementation.
@@ -253,6 +265,15 @@ internal class WalletService : Service(), FFIWalletListenerAdapter {
         Logger.d("Tx $txId direct send completed. Success: $success")
         // post event to bus
         EventBus.post(Event.Wallet.DirectSendResult(TxId(txId), success))
+        if (success) {
+            val txIdPublicKeyPair = outboundTxIdsToBePushNotified.firstOrNull { it.first == txId }
+            if (txIdPublicKeyPair != null) {
+                outboundTxIdsToBePushNotified.removeIf {
+                    it.first == txId
+                }
+                sendPushNotificationToTxRecipient(txIdPublicKeyPair.second)
+            }
+        }
         // notify external listeners
         listeners.iterator().forEach {
             it.onDirectSendResult(TxId(txId), success)
@@ -263,6 +284,15 @@ internal class WalletService : Service(), FFIWalletListenerAdapter {
         Logger.d("Tx $txId store and forward send completed. Success: $success")
         // post event to bus
         EventBus.post(Event.Wallet.StoreAndForwardSendResult(TxId(txId), success))
+        if (success) {
+            val txIdPublicKeyPair = outboundTxIdsToBePushNotified.firstOrNull { it.first == txId }
+            if (txIdPublicKeyPair != null) {
+                outboundTxIdsToBePushNotified.removeIf {
+                    it.first == txId
+                }
+                sendPushNotificationToTxRecipient(txIdPublicKeyPair.second)
+            }
+        }
         // notify external listeners
         listeners.iterator().forEach {
             it.onStoreAndForwardSendResult(TxId(txId), success)
@@ -294,6 +324,48 @@ internal class WalletService : Service(), FFIWalletListenerAdapter {
         if (!app.isInForeground || app.currentActivity !is HomeActivity) {
             notificationHelper.postCustomLayoutTxNotification(tx)
         }
+    }
+
+    private fun sendPushNotificationToTxRecipient(recipientPublicKeyHex: String) {
+        // the push notification server accepts lower-case hex strings as of now
+        val fromPublicKeyHex = wallet.getPublicKey().toString().toLowerCase(Locale.ENGLISH)
+        Logger.d(
+            "Will send push notification to recipient %s from %s.",
+            recipientPublicKeyHex,
+            fromPublicKeyHex
+        )
+        val signing = wallet.signMessage(fromPublicKeyHex + recipientPublicKeyHex)
+        val signature = signing.split("|")[0]
+        val nonce = signing.split("|")[1]
+        val requestBody = PushNotificationRequestBody(
+            fromPublicKeyHex,
+            signature,
+            nonce
+        )
+        val response = pushNotificationRESTService.sendPushNotificationToRecipient(
+            recipientPublicKeyHex,
+            requestBody
+        )
+        response.enqueue(object : Callback<PushNotificationResponseBody> {
+            override fun onFailure(call: Call<PushNotificationResponseBody>, t: Throwable) {
+                Logger.e("Push notification failed with exception: ${t.message}.")
+            }
+
+            override fun onResponse(
+                call: Call<PushNotificationResponseBody>,
+                response: Response<PushNotificationResponseBody>
+            ) {
+                val body = response.body()
+                if (response.code() in 200..299
+                    && body != null
+                    && body.sent) {
+                    Logger.i("Push notification successfully sent to recipient.")
+                } else {
+                    val errorBody = response.errorBody()?.string()
+                    Logger.e("Push notification failed with response: $errorBody.")
+                }
+            }
+        })
     }
 
     /**
@@ -650,6 +722,15 @@ internal class WalletService : Service(), FFIWalletListenerAdapter {
             }
         }
 
+        override fun syncWithBaseNode(error: WalletError): Boolean {
+            return try {
+                wallet.syncWithBaseNode()
+            } catch (throwable: Throwable) {
+                mapThrowableIntoError(throwable, error)
+                false
+            }
+        }
+
         override fun sendTari(
             user: User,
             amount: MicroTari,
@@ -658,7 +739,8 @@ internal class WalletService : Service(), FFIWalletListenerAdapter {
             error: WalletError
         ): TxId? {
             return try {
-                val publicKeyFFI = FFIPublicKey(HexString(user.publicKey.hexString))
+                val recipientPublicKeyHex = user.publicKey.hexString
+                val publicKeyFFI = FFIPublicKey(HexString(recipientPublicKeyHex))
                 val txId = wallet.sendTx(
                     publicKeyFFI,
                     amount.value,
@@ -666,6 +748,9 @@ internal class WalletService : Service(), FFIWalletListenerAdapter {
                     message
                 )
                 publicKeyFFI.destroy()
+                outboundTxIdsToBePushNotified.add(
+                    Pair(txId, recipientPublicKeyHex.toLowerCase(Locale.ENGLISH))
+                )
                 TxId(txId)
             } catch (throwable: Throwable) {
                 mapThrowableIntoError(throwable, error)
@@ -829,9 +914,13 @@ internal class WalletService : Service(), FFIWalletListenerAdapter {
             val signature = signing.split("|")[0]
             val nonce = signing.split("|")[1]
 
-            val requestBody = TestnetTariAllocateRequest(signature, nonce)
+            val requestBody =
+                TestnetTariAllocateRequest(
+                    signature,
+                    nonce
+                )
 
-            val response = tariRESTService.requestMaxTestnetTari(publicKeyHexString, requestBody)
+            val response = testnetFaucetRESTService.requestMaxTestnetTari(publicKeyHexString, requestBody)
             response.enqueue(object : Callback<TestnetTariAllocateMaxResponse> {
                 override fun onFailure(call: Call<TestnetTariAllocateMaxResponse>, t: Throwable) {
                     error.code = WalletErrorCode.UNKNOWN_ERROR

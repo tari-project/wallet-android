@@ -329,24 +329,33 @@ internal class SendTariActivity : BaseActivity(),
 
     // region SendTxSuccessfulFragment.Listener implementation
 
-    override fun sendTxStarted(sourceFragment: FinalizeSendTxFragment) {
+    override fun onSendTxStarted(sourceFragment: FinalizeSendTxFragment) {
         sendTxIsInProgress = true
     }
 
-    override fun sendTxCompleted(
+    override fun onSendTxFailure(
         sourceFragment: FinalizeSendTxFragment,
         recipientUser: User,
         amount: MicroTari,
         fee: MicroTari,
         note: String,
-        success: Boolean
+        failureReason: FinalizeSendTxFragment.FailureReason
     ) {
         sendTxIsInProgress = false
-        if (success) {
-            EventBus.post(Event.Tx.TxSendSuccessful())
-        } else {
-            EventBus.post(Event.Tx.TxSendFailed())
-        }
+        EventBus.post(Event.Tx.TxSendFailed(failureReason))
+        finish()
+        overridePendingTransition(R.anim.fade_in, R.anim.fade_out)
+    }
+
+    override fun onSendTxSuccessful(
+        sourceFragment: FinalizeSendTxFragment,
+        recipientUser: User,
+        amount: MicroTari,
+        fee: MicroTari,
+        note: String
+    ) {
+        sendTxIsInProgress = false
+        EventBus.post(Event.Tx.TxSendSuccessful())
         finish()
         overridePendingTransition(R.anim.fade_in, R.anim.fade_out)
     }

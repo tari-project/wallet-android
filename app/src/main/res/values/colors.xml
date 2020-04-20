@@ -83,4 +83,8 @@
     <color name="auth_touch_id_prompt_anim_bg">#979797</color>
     <color name="auth_touch_id_prompt_black_bg">#E6000000</color>
 
+    <!-- finalize send -->
+    <color name="finalize_send_progress_bar_passive_bg">#E1E1E1</color>
+    <color name="finalize_send_progress_bar_active_bg">#888931FF</color>
+
 </resources>
