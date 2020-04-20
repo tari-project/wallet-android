@@ -127,6 +127,7 @@ class FFIWalletTests {
         // test data generation
         assertTrue(wallet.generateTestData(walletMod.provideWalletFilesDirPath(context)))
 
+
         // test contacts
         val contacts = wallet.getContacts()
         assertTrue(contacts.getPointer() != nullptr)
@@ -145,7 +146,7 @@ class FFIWalletTests {
         assertTrue(completedTxs.getLength() > 0)
         var completedTx: FFICompletedTx? = null
         for (i in 0..completedTxs.getLength()) {
-            completedTx = completedTxs.getAt(0)
+            completedTx = completedTxs.getAt(i)
             assertTrue(completedTx.getPointer() != nullptr)
             if (completedTx.getStatus() != FFIStatus.MINED) {
                 completedTx.destroy()
@@ -234,9 +235,15 @@ class FFIWalletTests {
         val pendingOutboundTxs = wallet.getPendingOutboundTxs()
         assertTrue(pendingOutboundTxs.getPointer() != nullptr)
         assertTrue(pendingOutboundTxs.getLength() > 0)
-        var outboundTx = pendingOutboundTxs.getAt(0)
-        assertTrue(outboundTx.getPointer() != nullptr)
+        val pendingOutboundTx = pendingOutboundTxs.getAt(0)
+        assertTrue(pendingOutboundTx.getPointer() != nullptr)
+        pendingOutboundTx.destroy()
+
+        // Test outbound transaction that was sent
+        var outboundTx = wallet.getPendingOutboundTxById(tx_id)
+        assertTrue(outboundTx!!.getPointer() != nullptr)
         val outboundTxID = outboundTx.getId()
+        outboundTxID.toString()
         val outboundTxSource = outboundTx.getDestinationPublicKey()
         assertTrue(outboundTxSource.getPointer() != nullptr)
         val outboundTxAmount = outboundTx.getAmount()
@@ -245,9 +252,8 @@ class FFIWalletTests {
         assertTrue(outboundTxFee > BigInteger("0"))
         val outboundTxTimestamp = outboundTx.getTimestamp()
         outboundTxTimestamp.toString()
-        outboundTx.destroy()
-        outboundTx = wallet.getPendingOutboundTxById(outboundTxID)
-        assertTrue(outboundTx.getPointer() != nullptr)
+        val outboundTxStatus = outboundTx.getStatus()
+        outboundTxStatus.toString()
         assertTrue(wallet.testCompleteSentTx(outboundTx))
         outboundTx.destroy()
         pendingOutboundTxs.destroy()
