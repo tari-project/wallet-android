@@ -362,6 +362,7 @@
 
         <com.tari.android.wallet.ui.component.CustomFontButton
             android:id="@+id/create_wallet_btn_continue"
+            style="?android:attr/borderlessButtonStyle"
             android:layout_width="match_parent"
             android:layout_height="@dimen/common_action_button_height"
             android:layout_alignParentBottom="true"
@@ -379,6 +380,7 @@
 
         <com.tari.android.wallet.ui.component.CustomFontButton
             android:id="@+id/create_wallet_btn_create_emoji_id"
+            style="?android:attr/borderlessButtonStyle"
             android:layout_width="match_parent"
             android:layout_height="@dimen/common_action_button_height"
             android:layout_alignParentBottom="true"

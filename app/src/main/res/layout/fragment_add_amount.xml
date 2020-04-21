@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/add_amount_vw_root"
@@ -7,61 +7,71 @@
     android:layout_height="match_parent"
     android:background="@color/white">
 
-    <!-- header -->
-    <RelativeLayout
-        android:id="@+id/add_amount_vw_header"
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/common_header_height"
-        android:layout_marginTop="0dp"
+    <!-- back -->
+    <ImageButton
+        android:id="@+id/add_amount_btn_back"
+        android:layout_width="@dimen/back_button_size"
+        android:layout_height="@dimen/back_button_size"
+        android:layout_marginTop="@dimen/header_top_inset"
         android:background="@color/white"
-        android:clipChildren="false">
+        android:contentDescription="@null"
+        android:src="@drawable/back_icon"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
-        <!-- back -->
-        <ImageButton
-            android:id="@+id/add_amount_btn_back"
-            android:layout_width="50dp"
-            android:layout_height="match_parent"
-            android:background="@color/white"
-            android:contentDescription="@null"
-            android:src="@drawable/back_icon" />
-        <!-- contact alias -->
-        <com.tari.android.wallet.ui.component.CustomFontTextView
-            android:id="@+id/add_amount_txt_title"
+    <!-- contact alias -->
+    <com.tari.android.wallet.ui.component.CustomFontTextView
+        android:id="@+id/add_amount_txt_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/add_amount_under_construction"
+        android:textColor="@color/black"
+        android:textSize="16sp"
+        app:customFont="AVENIR_LT_STD_HEAVY"
+        app:layout_constraintBottom_toBottomOf="@id/add_amount_btn_back"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/add_amount_btn_back" />
+
+    <!-- Recipient Emojix ID -->
+    <FrameLayout
+        android:id="@+id/add_amount_vw_emoji_id_summary_container"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/emoji_id_bg"
+        android:clickable="true"
+        android:focusable="true"
+        android:paddingStart="@dimen/emoji_id_container_horizontal_padding"
+        android:paddingTop="@dimen/emoji_id_container_vertical_padding"
+        android:paddingEnd="@dimen/emoji_id_container_horizontal_padding"
+        android:paddingBottom="@dimen/emoji_id_container_vertical_padding"
+        app:layout_constraintBottom_toBottomOf="@id/add_amount_btn_back"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/add_amount_btn_back">
+
+        <include
+            android:id="@+id/add_amount_vw_emoji_id_summary"
+            layout="@layout/emoji_id_summary"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
-            android:text="@string/add_amount_under_construction"
-            android:textColor="@color/black"
-            android:textSize="16sp"
-            app:customFont="AVENIR_LT_STD_HEAVY" />
+            android:visibility="visible" />
+    </FrameLayout>
 
-        <FrameLayout
-            android:id="@+id/add_amount_vw_emoji_id_summary_container"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
-            android:background="@drawable/emoji_id_bg"
-            android:clickable="true"
-            android:elevation="@dimen/common_view_elevation"
-            android:focusable="true"
-            android:paddingStart="@dimen/emoji_id_container_horizontal_padding"
-            android:paddingTop="@dimen/emoji_id_container_vertical_padding"
-            android:paddingEnd="@dimen/emoji_id_container_horizontal_padding"
-            android:paddingBottom="@dimen/emoji_id_container_vertical_padding">
-
-            <include
-                android:id="@+id/add_amount_vw_emoji_id_summary"
-                layout="@layout/emoji_id_summary"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:visibility="visible" />
-        </FrameLayout>
-    </RelativeLayout>
+    <androidx.constraintlayout.widget.Barrier
+        android:id="@+id/add_amount_header_barrier"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:barrierDirection="bottom"
+        app:constraint_referenced_ids="add_amount_btn_back,add_amount_txt_title,add_amount_vw_emoji_id_summary_container"/>
 
     <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@id/add_amount_vw_header"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintTop_toBottomOf="@id/add_amount_header_barrier"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         android:orientation="vertical">
 
         <!-- amount container -->
@@ -405,8 +415,13 @@
 
     <!-- full emoji id outer container -->
     <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        tools:visibility="gone">
 
         <View
             android:id="@+id/add_amount_vw_full_emoji_id_bg_click_blocker"
@@ -522,4 +537,4 @@
         </RelativeLayout>
     </RelativeLayout>
 
-</RelativeLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

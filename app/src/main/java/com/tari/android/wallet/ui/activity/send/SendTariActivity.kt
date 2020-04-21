@@ -32,19 +32,13 @@
  */
 package com.tari.android.wallet.ui.activity.send
 
-import android.app.Dialog
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
-import android.graphics.Color
-import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.os.IBinder
-import android.view.Gravity
 import android.view.View
-import android.widget.LinearLayout
-import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import butterknife.BindColor
@@ -59,11 +53,12 @@ import com.tari.android.wallet.network.NetworkConnectionState
 import com.tari.android.wallet.service.TariWalletService
 import com.tari.android.wallet.service.WalletService
 import com.tari.android.wallet.ui.activity.BaseActivity
+import com.tari.android.wallet.ui.dialog.BottomSlideDialog
 import com.tari.android.wallet.ui.extension.showInternetConnectionErrorDialog
 import com.tari.android.wallet.ui.fragment.BaseFragment
-import com.tari.android.wallet.ui.fragment.send.AddRecipientFragment
 import com.tari.android.wallet.ui.fragment.send.AddAmountFragment
 import com.tari.android.wallet.ui.fragment.send.AddNoteFragment
+import com.tari.android.wallet.ui.fragment.send.AddRecipientFragment
 import com.tari.android.wallet.ui.fragment.send.FinalizeSendTxFragment
 import com.tari.android.wallet.ui.util.UiUtil
 import com.tari.android.wallet.util.Constants
@@ -83,12 +78,14 @@ internal class SendTariActivity : BaseActivity(),
 
     @BindView(R.id.send_tari_vw_root)
     lateinit var rootView: View
+
     @BindView(R.id.send_tari_vw_fragment_container)
     lateinit var fragmentContainerView: View
 
     @BindColor(R.color.white)
     @JvmField
     var whiteColor = 0
+
     @BindColor(R.color.black)
     @JvmField
     var blackColor = 0
@@ -230,21 +227,11 @@ internal class SendTariActivity : BaseActivity(),
      * Display "hold your horses" dialog.
      */
     override fun onAmountExceedsActualAvailableBalance(fragment: AddAmountFragment) {
-        Dialog(this, R.style.Theme_AppCompat_Dialog).apply {
-            window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-            setContentView(R.layout.add_amount_dialog_actual_balance_exceeded)
-            setCancelable(true)
-            window?.setLayout(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT
-            )
-            findViewById<TextView>(R.id.add_amount_dialog_btn_close)
-                .setOnClickListener {
-                    dismiss()
-                }
-            window?.setGravity(Gravity.BOTTOM)
-            show()
-        }
+        BottomSlideDialog(
+            context = this,
+            layoutId = R.layout.add_amount_dialog_actual_balance_exceeded,
+            dismissViewId = R.id.add_amount_dialog_btn_close
+        ).show()
     }
 
     // endregion

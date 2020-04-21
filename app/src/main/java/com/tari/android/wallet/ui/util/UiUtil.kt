@@ -241,15 +241,20 @@ internal object UiUtil {
     /*
     * Animation for button click
     * */
-    fun animateButtonClick(button: Button): AnimatorSet {
+    fun animateButtonClick(button: Button): AnimatorSet = animateViewClick(button)
+
+    /*
+    * Animation for button click
+    * */
+    fun animateViewClick(view: View): AnimatorSet {
         val scaleDownBtnAnim = ValueAnimator.ofFloat(
             Constants.UI.Button.clickScaleAnimFullScale,
             Constants.UI.Button.clickScaleAnimSmallScale
         )
         scaleDownBtnAnim.addUpdateListener { valueAnimator: ValueAnimator ->
             val scale = valueAnimator.animatedValue as Float
-            button.scaleX = scale
-            button.scaleY = scale
+            view.scaleX = scale
+            view.scaleY = scale
         }
         scaleDownBtnAnim.duration = Constants.UI.Button.clickScaleAnimDurationMs
         scaleDownBtnAnim.startDelay = Constants.UI.Button.clickScaleAnimStartOffset
@@ -261,8 +266,8 @@ internal object UiUtil {
         )
         scaleUpBtnAnim.addUpdateListener { valueAnimator: ValueAnimator ->
             val scale = valueAnimator.animatedValue as Float
-            button.scaleX = scale
-            button.scaleY = scale
+            view.scaleX = scale
+            view.scaleY = scale
         }
         scaleUpBtnAnim.duration = Constants.UI.Button.clickScaleAnimReturnDurationMs
         scaleUpBtnAnim.startDelay = Constants.UI.Button.clickScaleAnimReturnStartOffset

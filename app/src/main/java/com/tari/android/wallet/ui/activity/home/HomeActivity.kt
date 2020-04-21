@@ -34,17 +34,13 @@ package com.tari.android.wallet.ui.activity.home
 
 import android.animation.*
 import android.annotation.SuppressLint
-import android.app.Dialog
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
-import android.graphics.Color
-import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.GradientDrawable
 import android.net.Uri
 import android.os.*
-import android.view.Gravity
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
@@ -79,6 +75,7 @@ import com.tari.android.wallet.ui.activity.profile.WalletInfoActivity
 import com.tari.android.wallet.ui.activity.send.SendTariActivity
 import com.tari.android.wallet.ui.activity.tx.TxDetailActivity
 import com.tari.android.wallet.ui.component.CustomFont
+import com.tari.android.wallet.ui.dialog.BottomSlideDialog
 import com.tari.android.wallet.ui.extension.*
 import com.tari.android.wallet.ui.extension.gone
 import com.tari.android.wallet.ui.extension.invisible
@@ -370,7 +367,7 @@ internal class HomeActivity : BaseActivity(),
         // go to appropriate activity/fragment if the deep link in the intent
         // corresponds to a public key
         DeepLink.from(intent.data?.toString() ?: "")?.let { deepLink ->
-            when(deepLink.type) {
+            when (deepLink.type) {
                 DeepLink.Type.EMOJI_ID -> walletService?.getPublicKeyFromEmojiId(deepLink.type.value)
                 DeepLink.Type.PUBLIC_KEY_HEX -> walletService?.getPublicKeyFromHexString(deepLink.type.value)
             }?.let { publicKey ->
@@ -511,7 +508,8 @@ internal class HomeActivity : BaseActivity(),
         // network connection event
         EventBus.subscribeToNetworkConnectionState(this) { networkConnectionState ->
             if (testnetTariRequestIsWaitingOnConnection
-                && networkConnectionState == NetworkConnectionState.CONNECTED) {
+                && networkConnectionState == NetworkConnectionState.CONNECTED
+            ) {
                 requestTestnetTari()
             }
         }
@@ -767,6 +765,7 @@ internal class HomeActivity : BaseActivity(),
                 scrollView.height.toFloat(),
                 homeMainContentTopMargin.toFloat()
             )
+        scrollViewTransAnim.interpolator = EasingInterpolator(Ease.CIRC_IN_OUT)
         // background fade animation
         val blackBgViewFadeAnim = ValueAnimator.ofFloat(0f, 1f)
         blackBgViewFadeAnim.addUpdateListener { valueAnimator: ValueAnimator ->
@@ -848,21 +847,18 @@ internal class HomeActivity : BaseActivity(),
     }
 
     private fun showTestnetTariReceivedDialog(testnetSenderPublicKey: PublicKey) {
-        Dialog(this, R.style.Theme_AppCompat_Dialog).apply {
-            window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-            setContentView(R.layout.home_dialog_testnet_tari_received)
-            setCancelable(true)
-            window?.setLayout(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT
-            )
-            val titleTextView = findViewById<TextView>(R.id.home_testnet_tari_received_dlg_txt_title)
-            titleTextView.text = testnetTariReceivedDialogTitle.applyFontStyle(
-                this@HomeActivity,
-                CustomFont.AVENIR_LT_STD_LIGHT,
-                testnetTariReceivedDialogTitleBoldPart,
-                CustomFont.AVENIR_LT_STD_BLACK
-            )
+        BottomSlideDialog(
+            context = this,
+            layoutId = R.layout.home_dialog_testnet_tari_received,
+            canceledOnTouchOutside = false
+        ).apply {
+            findViewById<TextView>(R.id.home_testnet_tari_received_dlg_txt_title).text =
+                testnetTariReceivedDialogTitle.applyFontStyle(
+                    this@HomeActivity,
+                    CustomFont.AVENIR_LT_STD_LIGHT,
+                    testnetTariReceivedDialogTitleBoldPart,
+                    CustomFont.AVENIR_LT_STD_BLACK
+                )
             findViewById<TextView>(R.id.home_tari_bot_dialog_txt_try_later)
                 .setOnClickListener {
                     dismiss()
@@ -879,28 +875,21 @@ internal class HomeActivity : BaseActivity(),
                     }, Constants.UI.longDurationMs)
 
                 }
-
-            window?.setGravity(Gravity.BOTTOM)
-            show()
-        }
+        }.show()
     }
 
     private fun showTTLStoreDialog() {
-        Dialog(this, R.style.Theme_AppCompat_Dialog).apply {
-            window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-            setContentView(R.layout.home_dialog_ttl_store)
-            setCancelable(true)
-            window?.setLayout(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT
-            )
-            val titleTextView = findViewById<TextView>(R.id.home_ttl_store_dialog_txt_title)
-            titleTextView.text = ttlStoreDialogTitle.applyFontStyle(
-                this@HomeActivity,
-                CustomFont.AVENIR_LT_STD_LIGHT,
-                ttlStoreDialogTitleBoldPart,
-                CustomFont.AVENIR_LT_STD_BLACK
-            )
+        BottomSlideDialog(
+            context = this,
+            layoutId = R.layout.home_dialog_ttl_store
+        ).apply {
+            findViewById<TextView>(R.id.home_ttl_store_dialog_txt_title).text =
+                ttlStoreDialogTitle.applyFontStyle(
+                    this@HomeActivity,
+                    CustomFont.AVENIR_LT_STD_LIGHT,
+                    ttlStoreDialogTitleBoldPart,
+                    CustomFont.AVENIR_LT_STD_BLACK
+                )
             findViewById<View>(R.id.home_ttl_store_dialog_btn_later)
                 .setOnClickListener {
                     dismiss()
@@ -912,14 +901,8 @@ internal class HomeActivity : BaseActivity(),
                         dismiss()
                     }, Constants.UI.mediumDurationMs)
                 }
-            findViewById<View>(R.id.home_ttl_store_dialog_vw_top_spacer)
-                .setOnClickListener {
-                    dismiss()
-                }
-
-            window?.setGravity(Gravity.BOTTOM)
-            show()
-        }
+            findViewById<View>(R.id.home_ttl_store_dialog_vw_top_spacer).setOnClickListener { dismiss() }
+        }.show()
     }
 
     private fun visitTTLStore() {
@@ -935,9 +918,11 @@ internal class HomeActivity : BaseActivity(),
         // get contact or just user
         val error = WalletError()
         val contacts = walletService!!.getContacts(error)
-        val recipientUser = when(error.code) {
+        val recipientUser = when (error.code) {
             WalletErrorCode.NO_ERROR -> {
-                contacts.firstOrNull { it.publicKey == recipientPublicKey } ?: User(recipientPublicKey)
+                contacts.firstOrNull { it.publicKey == recipientPublicKey } ?: User(
+                    recipientPublicKey
+                )
             }
             else -> User(recipientPublicKey)
         }
@@ -1036,17 +1021,11 @@ internal class HomeActivity : BaseActivity(),
      * Called when an outgoing transaction has failed.
      */
     private fun onTxSendFailed(failureReason: FinalizeSendTxFragment.FailureReason) {
-        Dialog(this, R.style.Theme_AppCompat_Dialog).apply {
-            window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-            setContentView(R.layout.tx_failed_dialog)
-            setCancelable(true)
-            setCanceledOnTouchOutside(true)
-            window?.setLayout(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT
-            )
-            val closeButtonTextView = findViewById<TextView>(R.id.tx_failed_dialog_txt_close)
-            closeButtonTextView.setOnClickListener { dismiss() }
+        BottomSlideDialog(
+            context = this,
+            layoutId = R.layout.tx_failed_dialog,
+            dismissViewId = R.id.tx_failed_dialog_txt_close
+        ).apply {
             val titleTextView = findViewById<TextView>(R.id.tx_failed_dialog_txt_title)
             titleTextView.text = when (failureReason) {
                 NETWORK_CONNECTION_ERROR -> sendErrorNetworkConnectionTitle
@@ -1060,8 +1039,6 @@ internal class HomeActivity : BaseActivity(),
                 SEND_ERROR -> sendErrorNodeUnreachableDescription
             }
             // set text
-
-            window?.setGravity(Gravity.BOTTOM)
         }.show()
     }
 
@@ -1082,7 +1059,6 @@ internal class HomeActivity : BaseActivity(),
      * Called when a tx gets clicked.
      */
     override fun onTxSelected(tx: Tx) {
-        val error = WalletError()
         Logger.i("Transaction with id ${tx.id} selected.")
         startActivity(TxDetailActivity.createIntent(this, tx))
     }
@@ -1258,7 +1234,8 @@ internal class HomeActivity : BaseActivity(),
             val ratio = scrollView.scrollY.toFloat() / maxScroll.toFloat()
             onboardingContentView.alpha = ratio
             txListBgOverlayView.alpha = ratio
-            val topContentMarginTopExtra = (ratio * topContentContainerViewScrollVerticalShift).toInt()
+            val topContentMarginTopExtra =
+                (ratio * topContentContainerViewScrollVerticalShift).toInt()
             UiUtil.setTopMargin(
                 topContentContainerView,
                 topContentContainerViewTopMargin

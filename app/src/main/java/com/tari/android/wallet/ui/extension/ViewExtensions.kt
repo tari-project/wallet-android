@@ -34,20 +34,17 @@ package com.tari.android.wallet.ui.extension
 
 import android.annotation.SuppressLint
 import android.app.Activity
-import android.app.Dialog
 import android.content.Context
 import android.graphics.Color
-import android.graphics.drawable.ColorDrawable
 import android.os.Build
 import android.util.TypedValue
-import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
-import android.widget.LinearLayout
 import android.widget.ScrollView
 import android.widget.TextView
 import com.tari.android.wallet.R
+import com.tari.android.wallet.ui.dialog.BottomSlideDialog
 import com.tari.android.wallet.ui.util.UiUtil
 
 internal fun View.visible() {
@@ -66,42 +63,23 @@ internal fun View.gone() {
  * Given the context, displays the standard "no internet connection" dialog.
  */
 internal fun showInternetConnectionErrorDialog(context: Context) {
-    Dialog(context, R.style.Theme_AppCompat_Dialog).apply {
-        window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-        setContentView(R.layout.internet_connection_error_dialog)
-        setCancelable(true)
-        setCanceledOnTouchOutside(true)
-        window?.setLayout(
-            LinearLayout.LayoutParams.MATCH_PARENT,
-            LinearLayout.LayoutParams.WRAP_CONTENT
-        )
-        findViewById<TextView>(R.id.internet_connection_error_dialog_txt_close)
-            .setOnClickListener {
-                dismiss()
-            }
-        window?.setGravity(Gravity.BOTTOM)
-    }.show()
+    BottomSlideDialog(
+        context = context,
+        layoutId = R.layout.internet_connection_error_dialog,
+        dismissViewId = R.id.internet_connection_error_dialog_txt_close
+    ).show()
 }
 
 /**
  * Given the context, displays the standard "it's not you, it's the network" dialog.
  */
+// TODO seems to be unused; should be removed?
 internal fun showTariNetworkConnectionErrorDialog(context: Context) {
-    Dialog(context, R.style.Theme_AppCompat_Dialog).apply {
-        window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-        setContentView(R.layout.tari_network_connection_error_dialog)
-        setCancelable(true)
-        setCanceledOnTouchOutside(true)
-        window?.setLayout(
-            LinearLayout.LayoutParams.MATCH_PARENT,
-            LinearLayout.LayoutParams.WRAP_CONTENT
-        )
-        findViewById<TextView>(R.id.tari_network_connection_error_dialog_txt_close)
-            .setOnClickListener {
-                dismiss()
-            }
-        window?.setGravity(Gravity.BOTTOM)
-    }.show()
+    BottomSlideDialog(
+        context = context,
+        layoutId = R.layout.tari_network_connection_error_dialog,
+        dismissViewId = R.id.tari_network_connection_error_dialog_txt_close
+    ).show()
 }
 
 /**
@@ -204,6 +182,6 @@ internal fun ScrollView.scrollToTop() {
 internal fun ScrollView.scrollToBottom() {
     val lastChild = getChildAt(childCount - 1)
     val bottom = lastChild.bottom + paddingBottom
-    val delta = bottom - (scrollY+ height)
+    val delta = bottom - (scrollY + height)
     smoothScrollBy(0, delta)
 }

@@ -277,7 +277,7 @@ internal class CreateWalletFragment : BaseFragment() {
                 0f
             )
         whiteBgViewAnim.duration = CreateEmojiId.whiteBgAnimDurationMs
-        whiteBgViewAnim.interpolator = EasingInterpolator(Ease.SINE_OUT)
+        whiteBgViewAnim.interpolator = EasingInterpolator(Ease.CIRC_IN_OUT)
         whiteBgViewAnim.addListener(object : AnimatorListenerAdapter() {
             override fun onAnimationEnd(animation: Animator?) {
                 super.onAnimationEnd(animation)

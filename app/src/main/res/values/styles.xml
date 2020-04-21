@@ -21,4 +21,17 @@
         <item name="android:navigationBarColor">@android:color/black</item>
     </style>
 
+<!--
+  Style that makes a dialog placed to the bottom slide from bottom on show and to bottom on hide.
+  Simply put - like on iOS.
+-->
+    <style name="BottomSlideDialog" parent="Theme.AppCompat.Dialog">
+        <item name="android:windowAnimationStyle">@style/BottomSlideDialogAnimation</item>
+    </style>
+
+    <style name="BottomSlideDialogAnimation">
+        <item name="android:windowEnterAnimation">@anim/dialog_slide_from_bottom</item>
+        <item name="android:windowExitAnimation">@anim/dialog_slide_to_bottom</item>
+    </style>
+
 </resources>

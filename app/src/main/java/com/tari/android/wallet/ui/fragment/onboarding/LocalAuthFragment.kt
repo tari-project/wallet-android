@@ -44,6 +44,8 @@ import androidx.biometric.BiometricManager.BIOMETRIC_SUCCESS
 import androidx.biometric.BiometricPrompt
 import androidx.core.content.ContextCompat
 import butterknife.*
+import com.daasuu.ei.Ease
+import com.daasuu.ei.EasingInterpolator
 import com.orhanobut.logger.Logger
 import com.tari.android.wallet.R
 import com.tari.android.wallet.application.WalletState
@@ -210,6 +212,7 @@ internal class LocalAuthFragment : BaseFragment() {
 
         val anim = AnimatorSet()
         anim.playTogether(titleTextAnim, buttonContainerViewAnim, fadeInAnim)
+        anim.interpolator = EasingInterpolator(Ease.QUINT_IN)
         anim.startDelay = Auth.localAuthAnimDurationMs
         anim.duration = Auth.localAuthAnimDurationMs
         anim.start()
