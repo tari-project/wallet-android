@@ -102,9 +102,9 @@
     <string name="create_wallet_just_sec_desc_text">We’re creating your wallet.</string>
     <string name="create_wallet_user_agreement_and_privacy_policy">By creating a wallet, you agree to the terms\nof the User Agreement and Privacy Policy</string>
     <string name="create_wallet_user_agreement">User Agreement</string>
-    <string name="create_wallet_user_agreement_url">https://tarilabs.com/user_agreement/</string>
+    <string name="create_wallet_user_agreement_url">https://www.tari.com/user_agreement/</string>
     <string name="create_wallet_privacy_policy">Privacy Policy</string>
-    <string name="create_wallet_privacy_policy_url">https://tarilabs.com/privacy_policy/</string>
+    <string name="create_wallet_privacy_policy_url">https://www.tari.com/privacy_policy/</string>
     <!-- screen #2 -->
     <string name="create_wallet_awesome">We’re off to a great start!</string>
     <string name="create_wallet_now_text">Now, let’s create your Emoji ID.</string>
