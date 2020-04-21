@@ -37,16 +37,15 @@ import android.animation.AnimatorListenerAdapter
 import android.animation.AnimatorSet
 import android.animation.ValueAnimator
 import android.annotation.SuppressLint
-import android.app.Dialog
 import android.content.*
-import android.graphics.Color
-import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.os.IBinder
-import android.view.Gravity
 import android.view.View
 import android.view.inputmethod.EditorInfo
-import android.widget.*
+import android.widget.HorizontalScrollView
+import android.widget.ImageView
+import android.widget.RelativeLayout
+import android.widget.TextView
 import androidx.constraintlayout.widget.Group
 import androidx.core.content.ContextCompat
 import butterknife.*
@@ -62,11 +61,8 @@ import com.tari.android.wallet.service.TariWalletService
 import com.tari.android.wallet.service.WalletService
 import com.tari.android.wallet.ui.activity.BaseActivity
 import com.tari.android.wallet.ui.component.*
+import com.tari.android.wallet.ui.dialog.BottomSlideDialog
 import com.tari.android.wallet.ui.extension.*
-import com.tari.android.wallet.ui.extension.getFirstChild
-import com.tari.android.wallet.ui.extension.getLastChild
-import com.tari.android.wallet.ui.extension.gone
-import com.tari.android.wallet.ui.extension.setTextSizePx
 import com.tari.android.wallet.ui.util.UiUtil
 import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.EmojiUtil
@@ -100,44 +96,64 @@ internal class TxDetailActivity :
 
     @BindView(R.id.tx_detail_txt_payment_state)
     lateinit var txPaymentStateTextView: CustomFontTextView
+
     @BindView(R.id.tx_detail_img_back_arrow)
     lateinit var backArrowImageView: ImageView
+
     @BindView(R.id.tx_detail_txt_date)
     lateinit var txDateTextView: CustomFontTextView
+
     @BindView(R.id.tx_detail_txt_amount)
     lateinit var txAmountTextView: CustomFontTextView
+
     @BindView(R.id.tx_detail_vw_amount_container)
     lateinit var amountContainer: RelativeLayout
+
     @BindView(R.id.tx_detail_img_amount_gem)
     lateinit var amountGemImageView: ImageView
+
     @BindView(R.id.tx_detail_txt_tx_fee)
     lateinit var txFeeTextView: CustomFontTextView
+
     @BindView(R.id.tx_detail_btn_add_contact)
     lateinit var addContactButton: CustomFontButton
+
     @BindView(R.id.tx_detail_txt_contact_name)
     lateinit var contactNameTextView: CustomFontTextView
+
     @BindView(R.id.tx_detail_edit_create_contact)
     lateinit var contactEditText: CustomFontEditText
+
     @BindView(R.id.tx_detail_txt_contact_label)
     lateinit var contactLabelTextView: CustomFontTextView
+
     @BindView(R.id.tx_detail_txt_edit_label)
     lateinit var editContactLabelTextView: CustomFontTextView
+
     @BindView(R.id.tx_detail_txt_tx_note)
     lateinit var txNoteTv: CustomFontTextView
+
     @BindView(R.id.tx_detail_txt_tx_id)
     lateinit var txIdTextView: CustomFontTextView
+
     @BindView(R.id.tx_detail_vw_contact_container)
     lateinit var contactContainerView: View
+
     @BindView(R.id.tx_detail_vw_emoji_id_summary_container)
     lateinit var emojiIdSummaryContainerView: View
+
     @BindView(R.id.tx_detail_vw_emoji_id_summary)
     lateinit var emojiIdSummaryView: View
+
     @BindView(R.id.tx_detail_txt_note_label)
     lateinit var noteLabelView: View
+
     @BindView(R.id.tx_detail_vw_tx_fee_group)
     lateinit var txFeeGroup: Group
+
     @BindView(R.id.tx_detail_txt_from)
     lateinit var fromTextView: CustomFontTextView
+
     /**
      * Dimmers.
      */
@@ -146,16 +162,22 @@ internal class TxDetailActivity :
         R.id.tx_detail_vw_bottom_dimmer
     )
     lateinit var dimmerViews: List<@JvmSuppressWildcards View>
+
     @BindView(R.id.tx_detail_vw_emoji_id_container)
     lateinit var emojiIdContainerView: View
+
     @BindView(R.id.tx_detail_vw_full_emoji_id_container)
     lateinit var fullEmojiIdContainerView: View
+
     @BindView(R.id.tx_detail_scroll_full_emoji_id)
     lateinit var fullEmojiIdScrollView: HorizontalScrollView
+
     @BindView(R.id.tx_detail_txt_full_emoji_id)
     lateinit var fullEmojiIdTextView: TextView
+
     @BindView(R.id.tx_detail_vw_copy_emoji_id_container)
     lateinit var copyEmojiIdButtonContainerView: View
+
     @BindView(R.id.tx_detail_vw_emoji_id_copied)
     lateinit var emojiIdCopiedAnimView: View
 
@@ -168,18 +190,23 @@ internal class TxDetailActivity :
     @JvmField
     @BindString(R.string.tx_detail_payment_received)
     var paymentReceived = ""
+
     @JvmField
     @BindString(R.string.tx_detail_payment_sent)
     var paymentSent = ""
+
     @JvmField
     @BindString(R.string.tx_detail_pending_payment_received)
     var pendingPaymentReceived = ""
+
     @JvmField
     @BindString(R.string.tx_detail_pending_payment_sent)
     var pendingPaymentSent = ""
+
     @JvmField
     @BindString(R.string.common_from)
     var paymentFrom = ""
+
     @JvmField
     @BindString(R.string.common_to)
     var paymentTo = ""
@@ -187,12 +214,15 @@ internal class TxDetailActivity :
     @JvmField
     @BindColor(R.color.tx_detail_contact_name_label_text)
     var contactLabelTxtGrayColor = 0
+
     @JvmField
     @BindColor(R.color.black)
     var contactLabelTxtBlackColor = 0
+
     @BindColor(R.color.black)
     @JvmField
     var blackColor = 0
+
     @BindColor(R.color.light_gray)
     @JvmField
     var lightGrayColor = 0
@@ -200,18 +230,22 @@ internal class TxDetailActivity :
     @BindDimen(R.dimen.add_amount_element_text_size)
     @JvmField
     var elementTextSize = 0f
+
     @BindDimen(R.dimen.add_amount_gem_size)
     @JvmField
     var amountGemSize = 0f
+
     @BindDimen(R.dimen.add_amount_leftmost_digit_margin_start)
     @JvmField
     var firstElementMarginStart = 0
+
     @BindDimen(R.dimen.common_copy_emoji_id_button_visible_bottom_margin)
     @JvmField
     var copyEmojiIdButtonVisibleBottomMargin = 0
 
     @Inject
     lateinit var tracker: Tracker
+
     @Inject
     lateinit var sharedPrefsWrapper: SharedPrefsWrapper
 
@@ -633,22 +667,11 @@ internal class TxDetailActivity :
     }
 
     private fun showTxFeeToolTip() {
-        Dialog(this, R.style.Theme_AppCompat_Dialog).apply {
-            window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-            setContentView(R.layout.tx_fee_tooltip_dialog)
-            setCancelable(true)
-            setCanceledOnTouchOutside(true)
-            window?.setLayout(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT
-            )
-            findViewById<TextView>(R.id.tx_fee_tooltip_dialog_txt_close)
-                .setOnClickListener {
-                    dismiss()
-                }
-
-            window?.setGravity(Gravity.BOTTOM)
-        }.show()
+        BottomSlideDialog(
+            context = this,
+            layoutId = R.layout.tx_fee_tooltip_dialog,
+            dismissViewId = R.id.tx_fee_tooltip_dialog_txt_close
+        ).show()
     }
 
 }

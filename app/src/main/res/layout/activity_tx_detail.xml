@@ -44,10 +44,10 @@
             android:id="@+id/tx_detail_txt_payment_state"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:ellipsize="middle"
+            android:paddingHorizontal="50dp"
             android:text="@string/tx_detail_payment_received"
             android:textColor="@color/black"
-            android:paddingHorizontal="50dp"
-            android:ellipsize="middle"
             android:textSize="16sp"
             app:customFont="AVENIR_LT_STD_HEAVY"
             app:layout_constraintBottom_toBottomOf="@id/tx_detail_img_back_arrow"
@@ -141,7 +141,8 @@
             android:clickable="true"
             android:focusable="true"
             app:layout_constraintBottom_toTopOf="@id/tx_detail_vw_detail_container"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            tools:visibility="gone" />
 
         <RelativeLayout
             android:id="@+id/tx_detail_vw_detail_container"
@@ -293,7 +294,8 @@
                 android:alpha="0.6"
                 android:background="@color/black"
                 android:clickable="true"
-                android:focusable="true" />
+                android:focusable="true"
+                tools:visibility="gone" />
 
             <!-- copy emoji id button -->
             <RelativeLayout
@@ -336,6 +338,7 @@
                     android:background="@color/transparent" />
             </RelativeLayout>
 
+            <!--Emoji ID View-->
             <RelativeLayout
                 android:id="@+id/tx_detail_vw_emoji_id_container"
                 android:layout_width="match_parent"

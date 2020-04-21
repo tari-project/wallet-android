@@ -276,10 +276,16 @@ internal class IntroductionFragment : BaseFragment() {
         UiUtil.temporarilyDisableClick(createWalletButton)
         createWalletButton.gone()
         progressBar.visible()
-        rootView.postDelayed(
-            { wr.get()?.startTariWalletViewAnimation() },
-            createWalletArtificalDelay
-        )
+        val animatorSet = UiUtil.animateViewClick(walletBtnLayout)
+        animatorSet.addListener(object : AnimatorListenerAdapter() {
+            override fun onAnimationEnd(animation: Animator?) {
+                super.onAnimationEnd(animation)
+                rootView.postDelayed(
+                    { wr.get()?.startTariWalletViewAnimation() },
+                    createWalletArtificalDelay
+                )
+            }
+        })
     }
 
     private fun startTariWalletViewAnimation() {

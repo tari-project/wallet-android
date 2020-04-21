@@ -99,6 +99,7 @@
 
         <com.tari.android.wallet.ui.component.CustomFontButton
             android:id="@+id/local_auth_btn_enable_auth"
+            style="?android:attr/borderlessButtonStyle"
             android:layout_width="match_parent"
             android:layout_height="@dimen/common_action_button_height"
             android:layout_centerInParent="true"

@@ -33,7 +33,6 @@
 package com.tari.android.wallet.util
 
 import com.tari.android.wallet.application.Network
-import java.util.concurrent.TimeUnit
 
 /**
  * Contains application-wide constant values.

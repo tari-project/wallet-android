@@ -22,7 +22,7 @@
         app:lottie_loop="false"
         app:lottie_rawRes="@raw/aurora_splash_anim"
         app:lottie_renderMode="automatic"
-        app:lottie_scale="0.8" />
+        app:lottie_scale="0.84" />
 
     <RelativeLayout
         android:id="@+id/introduction_vw_video_outer_container"

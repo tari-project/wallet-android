@@ -34,12 +34,9 @@ package com.tari.android.wallet.ui.fragment.send
 
 import android.animation.*
 import android.annotation.SuppressLint
-import android.app.Dialog
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
-import android.graphics.Color
-import android.graphics.drawable.ColorDrawable
 import android.os.AsyncTask
 import android.os.Bundle
 import android.os.Handler
@@ -51,21 +48,21 @@ import butterknife.*
 import com.daasuu.ei.Ease
 import com.daasuu.ei.EasingInterpolator
 import com.tari.android.wallet.R
+import com.tari.android.wallet.extension.remap
 import com.tari.android.wallet.model.*
 import com.tari.android.wallet.service.TariWalletService
+import com.tari.android.wallet.ui.component.EmojiIdCopiedViewController
 import com.tari.android.wallet.ui.component.EmojiIdSummaryViewController
+import com.tari.android.wallet.ui.dialog.BottomSlideDialog
+import com.tari.android.wallet.ui.extension.*
 import com.tari.android.wallet.ui.fragment.BaseFragment
 import com.tari.android.wallet.ui.util.UiUtil
 import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.EmojiUtil
 import com.tari.android.wallet.util.WalletUtil
-import com.tari.android.wallet.extension.remap
-import com.tari.android.wallet.ui.component.EmojiIdCopiedViewController
-import com.tari.android.wallet.ui.extension.*
 import me.everything.android.ui.overscroll.OverScrollDecoratorHelper
 import org.matomo.sdk.Tracker
 import org.matomo.sdk.extra.TrackHelper
-import java.lang.StringBuilder
 import java.lang.ref.WeakReference
 import java.math.BigInteger
 import javax.inject.Inject
@@ -80,53 +77,76 @@ class AddAmountFragment(private val walletService: TariWalletService) : BaseFrag
 
     @BindView(R.id.add_amount_vw_root)
     lateinit var rootView: View
+
     @BindView(R.id.add_amount_txt_title)
     lateinit var titleTextView: TextView
+
     @BindView(R.id.add_amount_btn_back)
     lateinit var backButton: ImageButton
+
     @BindView(R.id.add_amount_vw_emoji_id_summary_container)
     lateinit var emojiIdSummaryContainerView: View
+
     @BindView(R.id.add_amount_vw_emoji_id_summary)
     lateinit var emojiIdSummaryView: View
+
     @BindView(R.id.add_amount_vw_full_emoji_id_container)
     lateinit var fullEmojiIdContainerView: View
+
     @BindView(R.id.add_amount_scroll_full_emoji_id)
     lateinit var fullEmojiIdScrollView: HorizontalScrollView
+
     @BindView(R.id.add_amount_txt_full_emoji_id)
     lateinit var fullEmojiIdTextView: TextView
+
     @BindView(R.id.add_amount_vw_copy_emoji_id_container)
     lateinit var copyEmojiIdButtonContainerView: View
+
     @BindView(R.id.add_amount_vw_emoji_id_copied)
     lateinit var emojiIdCopiedAnimView: View
+
     @BindView(R.id.add_amount_vw_not_enough_balance)
     lateinit var notEnoughBalanceView: View
+
     @BindView(R.id.add_amount_vw_amount_outer_container)
     lateinit var elementOuterContainerView: ViewGroup
+
     @BindView(R.id.add_amount_vw_amount_element_container)
     lateinit var elementContainerView: ViewGroup
+
     @BindView(R.id.add_amount_txt_amount_element_0)
     lateinit var element0TextView: TextView
+
     @BindView(R.id.add_amount_img_amount_gem)
     lateinit var amountGemImageView: ImageView
+
     @BindView(R.id.add_amount_vw_amount_center_correction)
     lateinit var amountCenterCorrectionView: View
+
     @BindView(R.id.add_amount_txt_available_balance)
     lateinit var availableBalanceTextView: TextView
+
     @BindView(R.id.add_amount_vw_tx_fee_container)
     lateinit var txFeeContainerView: View
+
     @BindView(R.id.add_amount_txt_tx_fee)
     lateinit var txFeeTextView: TextView
+
     @BindView(R.id.add_amount_btn_continue_disabled)
     lateinit var disabledContinueButton: Button
+
     @BindView(R.id.add_amount_btn_continue)
     lateinit var continueButton: Button
+
     @BindView(R.id.add_amount_btn_decimal_point)
     lateinit var decimalSeparatorButton: Button
+
     /**
      * Overlay dimmer.
      */
     @BindView(R.id.add_amount_vw_dimmer)
     lateinit var dimmerView: View
+
     @BindView(R.id.add_amount_vw_full_emoji_id_bg_click_blocker)
     lateinit var fullEmojiIdBgClickBlockerView: View
 
@@ -136,21 +156,27 @@ class AddAmountFragment(private val walletService: TariWalletService) : BaseFrag
     @BindDimen(R.dimen.add_amount_element_text_size)
     @JvmField
     var elementTextSize = 0f
+
     @BindDimen(R.dimen.add_amount_element_container_translation_y)
     @JvmField
     var amountElementContainerTranslationY = 0
+
     @BindDimen(R.dimen.add_amount_gem_size)
     @JvmField
     var amountGemSize = 0f
+
     @BindDimen(R.dimen.add_amount_leftmost_digit_margin_start)
     @JvmField
     var firstElementMarginStart = 0
+
     @BindDimen(R.dimen.add_amount_available_balance_error_amount_nudge_distance)
     @JvmField
     var validationErrorNudgeDistance = 0
+
     @BindDimen(R.dimen.common_horizontal_margin)
     @JvmField
     var horizontalMargin = 0
+
     @BindDimen(R.dimen.common_copy_emoji_id_button_visible_bottom_margin)
     @JvmField
     var copyEmojiIdButtonVisibleBottomMargin = 0
@@ -158,6 +184,7 @@ class AddAmountFragment(private val walletService: TariWalletService) : BaseFrag
     @BindColor(R.color.black)
     @JvmField
     var blackColor = 0
+
     @BindColor(R.color.light_gray)
     @JvmField
     var lightGrayColor = 0
@@ -176,6 +203,7 @@ class AddAmountFragment(private val walletService: TariWalletService) : BaseFrag
      * corresponding TextViews.
      */
     private val elements = mutableListOf<Pair<String, TextView>>()
+
     /**
      * Values below are used for scaling up/down of the text size.
      */
@@ -187,11 +215,13 @@ class AddAmountFragment(private val walletService: TariWalletService) : BaseFrag
      * Whether digit entry animation is running.
      */
     private var digitAnimIsRunning = false
+
     /**
      * Minimum amount is micro Tari.
      */
     private val maxNoOfDecimalPlaces = 6
     private val thousandsGroupSize = 3
+
     /**
      * Wait this long before taking action (validation etc.) on the entered amount.
      */
@@ -220,6 +250,7 @@ class AddAmountFragment(private val walletService: TariWalletService) : BaseFrag
      * Formats the summarized emoji id.
      */
     private lateinit var emojiIdSummaryController: EmojiIdSummaryViewController
+
     /**
      * Animates the emoji id "copied" text.
      */
@@ -348,7 +379,8 @@ class AddAmountFragment(private val walletService: TariWalletService) : BaseFrag
         dimmerView.alpha = 0f
         dimmerView.visible()
         val fullEmojiIdInitialWidth = emojiIdSummaryContainerView.width
-        val fullEmojiIdDeltaWidth = (rootView.width - horizontalMargin * 2) - fullEmojiIdInitialWidth
+        val fullEmojiIdDeltaWidth =
+            (rootView.width - horizontalMargin * 2) - fullEmojiIdInitialWidth
         UiUtil.setWidth(
             fullEmojiIdContainerView,
             fullEmojiIdInitialWidth
@@ -434,7 +466,8 @@ class AddAmountFragment(private val walletService: TariWalletService) : BaseFrag
         }
         // emoji id anim
         val fullEmojiIdInitialWidth = fullEmojiIdContainerView.width
-        val fullEmojiIdDeltaWidth = emojiIdSummaryContainerView.width - fullEmojiIdContainerView.width
+        val fullEmojiIdDeltaWidth =
+            emojiIdSummaryContainerView.width - fullEmojiIdContainerView.width
         val emojiIdAnim = ValueAnimator.ofFloat(0f, 1f)
         emojiIdAnim.addUpdateListener { valueAnimator: ValueAnimator ->
             val value = valueAnimator.animatedValue as Float
@@ -500,23 +533,11 @@ class AddAmountFragment(private val walletService: TariWalletService) : BaseFrag
     }
 
     private fun showTxFeeToolTip() {
-        val mActivity = activity ?: return
-        Dialog(mActivity, R.style.Theme_AppCompat_Dialog).apply {
-            window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-            setContentView(R.layout.tx_fee_tooltip_dialog)
-            setCancelable(true)
-            setCanceledOnTouchOutside(true)
-            window?.setLayout(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT
-            )
-            findViewById<TextView>(R.id.tx_fee_tooltip_dialog_txt_close)
-                .setOnClickListener {
-                    dismiss()
-                }
-
-            window?.setGravity(Gravity.BOTTOM)
-        }.show()
+        BottomSlideDialog(
+            context = activity ?: return,
+            layoutId = R.layout.tx_fee_tooltip_dialog,
+            dismissViewId = R.id.tx_fee_tooltip_dialog_txt_close
+        ).show()
     }
 
     /**
@@ -1153,6 +1174,7 @@ class AddAmountFragment(private val walletService: TariWalletService) : BaseFrag
     interface Listener {
 
         fun onAmountExceedsActualAvailableBalance(fragment: AddAmountFragment)
+
         /**
          * Recipient is user.
          */
