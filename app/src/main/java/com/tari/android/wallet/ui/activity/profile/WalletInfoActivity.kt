@@ -32,24 +32,22 @@
  */
 package com.tari.android.wallet.ui.activity.profile
 
-import android.animation.Animator
-import android.animation.AnimatorListenerAdapter
 import android.animation.AnimatorSet
 import android.animation.ValueAnimator
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.os.Bundle
 import android.view.View
-import android.widget.HorizontalScrollView
-import android.widget.ImageView
-import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.animation.addListener
 import androidx.core.content.ContextCompat
 import butterknife.*
 import com.daasuu.ei.Ease
 import com.daasuu.ei.EasingInterpolator
+import com.tari.android.wallet.application.TariWalletApplication
+import com.tari.android.wallet.databinding.ActivityWalletInfoBinding
 import com.tari.android.wallet.R
 import com.tari.android.wallet.extension.applyFontStyle
-import com.tari.android.wallet.ui.activity.BaseActivity
 import com.tari.android.wallet.ui.component.CustomFont
 import com.tari.android.wallet.ui.component.EmojiIdCopiedViewController
 import com.tari.android.wallet.ui.component.EmojiIdSummaryViewController
@@ -70,83 +68,49 @@ import javax.inject.Inject
  *
  * @author The Tari Development Team
  */
-internal class WalletInfoActivity : BaseActivity() {
-
-    @BindView(R.id.wallet_info_txt_share_emoji_id)
-    lateinit var shareEmojiIdTextView: TextView
-    @BindView(R.id.wallet_info_img_qr)
-    lateinit var qrCodeImageView: ImageView
-
-    @BindString(R.string.wallet_info_share_your_emoji_id)
-    lateinit var shareEmojiIdTitle: String
-    @BindString(R.string.wallet_info_share_your_emoji_id_bold_part)
-    lateinit var shareEmojiIdTitleBoldPart: String
-    @BindString(R.string.emoji_id_chunk_separator)
-    lateinit var emojiIdChunkSeparator: String
-
-    @BindView(R.id.wallet_info_emoji_id_container)
-    lateinit var emojiIdContainerView: View
-
-    @BindView(R.id.wallet_info_emoji_id_summary)
-    lateinit var emojiIdSummaryView: View
-
-    @BindView(R.id.wallet_info_emoji_id_copied)
-    lateinit var emojiIdCopiedAnimView: View
-
-    @BindView(R.id.wallet_info_full_emoji_id_container)
-    lateinit var fullEmojiIdContainerView: View
-
-    @BindView(R.id.wallet_info_scroll_full_emoji_id)
-    lateinit var fullEmojiIdScrollView: HorizontalScrollView
-
-    @BindView(R.id.wallet_info_txt_full_emoji_id)
-    lateinit var fullEmojiIdTextView: TextView
-
-    @BindView(R.id.wallet_info_emoji_id_summary_container)
-    lateinit var emojiIdSummaryContainerView: View
-
-    @BindView(R.id.wallet_info_copy_emoji_id_container)
-    lateinit var copyEmojiIdButtonContainerView: View
-
-    /**
-     * Dimmers.
-     */
-    @BindViews(
-        R.id.wallet_info_header_dimmer,
-        R.id.wallet_info_scroll_dimmer,
-        R.id.wallet_info_underscroll_dimmer,
-        R.id.wallet_info_qr_code_dimmer
-    )
-    lateinit var dimmerViews: List<@JvmSuppressWildcards View>
-
-    @BindColor(R.color.black)
-    @JvmField
-    var blackColor = 0
-    @BindColor(R.color.light_gray)
-    @JvmField
-    var lightGrayColor = 0
-
-    @BindDimen(R.dimen.wallet_info_img_qr_code_size)
-    @JvmField
-    var qrCodeImageSize = 0
-
-    @BindDimen(R.dimen.common_copy_emoji_id_button_visible_bottom_margin)
-    @JvmField
-    var copyEmojiIdButtonVisibleBottomMargin = 0
+internal class WalletInfoActivity : AppCompatActivity() {
 
     @Inject
     lateinit var sharedPrefsWrapper: SharedPrefsWrapper
+
     @Inject
     lateinit var tracker: Tracker
 
+    private lateinit var ui: ActivityWalletInfoBinding
+    private lateinit var dimmerViews: List<View>
     private lateinit var emojiIdSummaryController: EmojiIdSummaryViewController
     private lateinit var emojiIdCopiedViewController: EmojiIdCopiedViewController
 
-    override val contentViewId = R.layout.activity_wallet_info
+    @BindString(R.string.wallet_info_share_your_emoji_id)
+    lateinit var shareEmojiIdTitle: String
+
+    @BindString(R.string.wallet_info_share_your_emoji_id_bold_part)
+    lateinit var shareEmojiIdTitleBoldPart: String
+
+    @BindString(R.string.emoji_id_chunk_separator)
+    lateinit var emojiIdChunkSeparator: String
+
+    @BindColor(R.color.black)
+    @JvmField
+    var blackColor: Int = 0
+
+    @BindColor(R.color.light_gray)
+    @JvmField
+    var lightGrayColor: Int = 0
+
+    @BindDimen(R.dimen.wallet_info_img_qr_code_size)
+    @JvmField
+    var qrCodeImageSize: Int = 0
+
+    @BindDimen(R.dimen.common_copy_emoji_id_button_visible_bottom_margin)
+    @JvmField
+    var copyEmojiIdButtonVisibleBottomMargin: Int = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setUpUi()
+        ui = ActivityWalletInfoBinding.inflate(layoutInflater).apply { setContentView(root) }
+        WalletInfoActivityVisitor.visit(this)
+        setupUi()
 
         TrackHelper.track()
             .screen("/home/profile")
@@ -154,11 +118,13 @@ internal class WalletInfoActivity : BaseActivity() {
             .with(tracker)
     }
 
-    private fun setUpUi() {
+    private fun setupUi() {
+        dimmerViews =
+            listOf(ui.headerDimmerView, ui.scrollDimmerView, ui.qrDimmerView, ui.bottomDimmerView)
+        emojiIdSummaryController = EmojiIdSummaryViewController(ui.emojiIdSummaryView)
         val emojiId = sharedPrefsWrapper.emojiId!!
-        emojiIdSummaryController = EmojiIdSummaryViewController(emojiIdSummaryView)
         emojiIdSummaryController.display(emojiId)
-        emojiIdCopiedViewController = EmojiIdCopiedViewController(emojiIdCopiedAnimView)
+        emojiIdCopiedViewController = EmojiIdCopiedViewController(ui.emojiIdCopiedView)
         // title
         val styledTitle = shareEmojiIdTitle.applyFontStyle(
             this,
@@ -167,23 +133,27 @@ internal class WalletInfoActivity : BaseActivity() {
             CustomFont.AVENIR_LT_STD_BLACK,
             applyToOnlyFirstOccurence = true
         )
-        shareEmojiIdTextView.text = styledTitle
+        ui.shareEmojiIdTextView.text = styledTitle
 
         val content = WalletUtil.getEmojiIdDeepLink(emojiId)
         UiUtil.getQREncodedBitmap(content, qrCodeImageSize)?.let {
-            qrCodeImageView.setImageBitmap(it)
+            ui.qrImageView.setImageBitmap(it)
         }
 
-        fullEmojiIdTextView.text = EmojiUtil.getFullEmojiIdSpannable(
+        ui.fullEmojiIdTextView.text = EmojiUtil.getFullEmojiIdSpannable(
             emojiId,
             emojiIdChunkSeparator,
             blackColor,
             lightGrayColor
         )
+
+        ui.emojiIdSummaryContainerView.setOnClickListener(this::onEmojiSummaryClicked)
+        ui.copyEmojiIdButton.setOnClickListener(this::onCopyEmojiIdButtonClicked)
+        ui.closeButton.setOnClickListener { this.onCloseButtonClick() }
+        dimmerViews.forEach { it.setOnClickListener { this.onDimmerViewsClicked() } }
     }
 
-    @OnClick(R.id.wallet_info_emoji_id_summary_container)
-    fun onEmojiSummaryClicked(view: View) {
+    private fun onEmojiSummaryClicked(view: View) {
         UiUtil.temporarilyDisableClick(view)
         showFullEmojiId()
     }
@@ -192,135 +162,118 @@ internal class WalletInfoActivity : BaseActivity() {
 //         make dimmers non-clickable until the anim is over
         dimmerViews.forEach { dimmerView -> dimmerView.isClickable = false }
         // prepare views
-        emojiIdSummaryContainerView.invisible()
+        ui.emojiIdSummaryContainerView.invisible()
         dimmerViews.forEach { dimmerView ->
             dimmerView.alpha = 0f
             dimmerView.visible()
         }
-        val fullEmojiIdInitialWidth = emojiIdSummaryContainerView.width
-        val fullEmojiIdDeltaWidth = emojiIdContainerView.width - fullEmojiIdInitialWidth
+        val fullEmojiIdInitialWidth = ui.emojiIdSummaryContainerView.width
+        val fullEmojiIdDeltaWidth = ui.emojiIdContainerView.width - fullEmojiIdInitialWidth
         UiUtil.setWidth(
-            fullEmojiIdContainerView,
+            ui.fullEmojiIdContainerView,
             fullEmojiIdInitialWidth
         )
-        fullEmojiIdContainerView.alpha = 0f
-        fullEmojiIdContainerView.visible()
+        ui.fullEmojiIdContainerView.alpha = 0f
+        ui.fullEmojiIdContainerView.visible()
         // scroll to end
-        fullEmojiIdScrollView.post {
-            fullEmojiIdScrollView.scrollTo(
-                fullEmojiIdTextView.width - fullEmojiIdScrollView.width,
+        ui.fullEmojiIdScrollView.post {
+            ui.fullEmojiIdScrollView.scrollTo(
+                ui.fullEmojiIdTextView.width - ui.fullEmojiIdScrollView.width,
                 0
             )
         }
-        // TODO
-        copyEmojiIdButtonContainerView.alpha = 0f
-        copyEmojiIdButtonContainerView.visible()
-        copyEmojiIdButtonContainerView.translationY = 0F
+        ui.copyEmojiIdContainerView.alpha = 0f
+        ui.copyEmojiIdContainerView.visible()
+        ui.copyEmojiIdContainerView.translationY = 0F
         // animate full emoji id view
         val emojiIdAnim = ValueAnimator.ofFloat(0f, 1f)
         emojiIdAnim.addUpdateListener { valueAnimator: ValueAnimator ->
             val value = valueAnimator.animatedValue as Float
             // display overlay dimmers
-            dimmerViews.forEach { dimmerView ->
-                dimmerView.alpha = value * 0.6f
-            }
+            dimmerViews.forEach { it.alpha = value * 0.6f }
 //             container alpha & scale
-            fullEmojiIdContainerView.alpha = value
-            fullEmojiIdContainerView.scaleX = 1f + 0.2f * (1f - value)
-            fullEmojiIdContainerView.scaleY = 1f + 0.2f * (1f - value)
+            ui.fullEmojiIdContainerView.alpha = value
+            ui.fullEmojiIdContainerView.scaleX = 1f + 0.2f * (1f - value)
+            ui.fullEmojiIdContainerView.scaleY = 1f + 0.2f * (1f - value)
             UiUtil.setWidth(
-                fullEmojiIdContainerView,
+                ui.fullEmojiIdContainerView,
                 (fullEmojiIdInitialWidth + fullEmojiIdDeltaWidth * value).toInt()
             )
         }
         emojiIdAnim.duration = Constants.UI.shortDurationMs
         // copy emoji id button anim
-        //TODO
         val copyEmojiIdButtonAnim = ValueAnimator.ofFloat(0f, 1f)
         copyEmojiIdButtonAnim.addUpdateListener { valueAnimator: ValueAnimator ->
             val value = valueAnimator.animatedValue as Float
-            copyEmojiIdButtonContainerView.alpha = value
-            copyEmojiIdButtonContainerView.translationY = -copyEmojiIdButtonVisibleBottomMargin * value
+            ui.copyEmojiIdContainerView.alpha = value
+            ui.copyEmojiIdContainerView.translationY =
+                -copyEmojiIdButtonVisibleBottomMargin * value
         }
         copyEmojiIdButtonAnim.duration = Constants.UI.shortDurationMs
         copyEmojiIdButtonAnim.interpolator = EasingInterpolator(Ease.BACK_OUT)
 
         // chain anim.s and start
         val animSet = AnimatorSet()
-        animSet.playSequentially(emojiIdAnim , copyEmojiIdButtonAnim)
+        animSet.playSequentially(emojiIdAnim, copyEmojiIdButtonAnim)
         animSet.start()
-        animSet.addListener(object : AnimatorListenerAdapter() {
-            override fun onAnimationEnd(animation: Animator?) {
-                dimmerViews.forEach { dimmerView -> dimmerView.isClickable = true }
-            }
-        })
+        animSet.addListener(onEnd = { dimmerViews.forEach { it.isClickable = true } })
         // scroll animation
-        fullEmojiIdScrollView.postDelayed({
-            fullEmojiIdScrollView.smoothScrollTo(0, 0)
+        ui.fullEmojiIdScrollView.postDelayed({
+            ui.fullEmojiIdScrollView.smoothScrollTo(0, 0)
         }, Constants.UI.shortDurationMs + 20)
     }
 
     private fun hideFullEmojiId(animateCopyEmojiIdButton: Boolean = true) {
-        fullEmojiIdScrollView.smoothScrollTo(0, 0)
-        emojiIdSummaryContainerView.visible()
+        ui.fullEmojiIdScrollView.smoothScrollTo(0, 0)
+        ui.emojiIdSummaryContainerView.visible()
         // copy emoji id button anim
-        val copyEmojiIdButtonAnim = ValueAnimator.ofFloat(1f, 0f)
-        copyEmojiIdButtonAnim.addUpdateListener { valueAnimator: ValueAnimator ->
-            val value = valueAnimator.animatedValue as Float
-            copyEmojiIdButtonContainerView.alpha = value
-            copyEmojiIdButtonContainerView.translationY = -copyEmojiIdButtonVisibleBottomMargin * value
-        }
         // emoji id anim
-        val fullEmojiIdInitialWidth = emojiIdContainerView.width
-        val fullEmojiIdDeltaWidth = emojiIdSummaryContainerView.width - emojiIdContainerView.width
+        val fullEmojiIdInitialWidth = ui.emojiIdContainerView.width
+        val fullEmojiIdDeltaWidth =
+            ui.emojiIdSummaryContainerView.width - ui.emojiIdContainerView.width
         val emojiIdAnim = ValueAnimator.ofFloat(0f, 1f)
         emojiIdAnim.addUpdateListener { valueAnimator: ValueAnimator ->
             val value = valueAnimator.animatedValue as Float
             // hide overlay dimmers
-            dimmerViews.forEach { dimmerView ->
-                dimmerView.alpha = (1 - value) * 0.6f
-            }
+            dimmerViews.forEach { it.alpha = (1 - value) * 0.6f }
             // container alpha & scale
-            fullEmojiIdContainerView.alpha = (1 - value)
+            ui.fullEmojiIdContainerView.alpha = 1 - value
             UiUtil.setWidth(
-                fullEmojiIdContainerView,
+                ui.fullEmojiIdContainerView,
                 (fullEmojiIdInitialWidth + fullEmojiIdDeltaWidth * value).toInt()
             )
         }
         // chain anim.s and start
         val animSet = AnimatorSet()
         if (animateCopyEmojiIdButton) {
+            val copyEmojiIdButtonAnim = ValueAnimator.ofFloat(1f, 0f).apply {
+                addUpdateListener {
+                    val value = it.animatedValue as Float
+                    ui.copyEmojiIdContainerView.alpha = value
+                    ui.copyEmojiIdContainerView.translationY =
+                        -copyEmojiIdButtonVisibleBottomMargin * value
+                }
+            }
             animSet.playSequentially(copyEmojiIdButtonAnim, emojiIdAnim)
         } else {
             animSet.play(emojiIdAnim)
         }
         animSet.start()
-        animSet.addListener(object : AnimatorListenerAdapter() {
-            override fun onAnimationEnd(animation: Animator?) {
-                dimmerViews.forEach { dimmerView ->
-                    dimmerView.gone()
-                }
-                fullEmojiIdContainerView.gone()
-                copyEmojiIdButtonContainerView.gone()
-            }
+        animSet.addListener(onEnd = {
+            dimmerViews.forEach(View::gone)
+            ui.fullEmojiIdContainerView.gone()
+            ui.copyEmojiIdContainerView.gone()
         })
     }
 
     /**
      * Dimmer clicked - hide dimmers.
      */
-    @OnClick(
-        R.id.wallet_info_header_dimmer,
-        R.id.wallet_info_scroll_dimmer,
-        R.id.wallet_info_underscroll_dimmer,
-        R.id.wallet_info_qr_code_dimmer
-    )
-    fun onDimmerViewsClicked() {
+    private fun onDimmerViewsClicked() {
         hideFullEmojiId()
     }
 
-    @OnClick(R.id.wallet_info_btn_copy_emoji_id)
-    fun onCopyEmojiIdButtonClicked(view: View) {
+    private fun onCopyEmojiIdButtonClicked(view: View) {
         UiUtil.temporarilyDisableClick(view)
         dimmerViews.forEach { dimmerView -> dimmerView.isClickable = false }
         val clipBoard = ContextCompat.getSystemService(this, ClipboardManager::class.java)
@@ -332,14 +285,23 @@ internal class WalletInfoActivity : BaseActivity() {
         emojiIdCopiedViewController.showEmojiIdCopiedAnim(fadeOutOnEnd = true) {
             hideFullEmojiId(animateCopyEmojiIdButton = false)
         }
-        val copyEmojiIdButtonAnim = copyEmojiIdButtonContainerView.animate().alpha(0f)
+        val copyEmojiIdButtonAnim = ui.copyEmojiIdContainerView.animate().alpha(0f)
         copyEmojiIdButtonAnim.duration = Constants.UI.xShortDurationMs
         copyEmojiIdButtonAnim.start()
     }
 
-    @OnClick(R.id.wallet_info_btn_close)
-    fun onCloseButtonClick() {
+    private fun onCloseButtonClick() {
         finish()
     }
+
+    private object WalletInfoActivityVisitor {
+
+        internal fun visit(activity: WalletInfoActivity) {
+            (activity.application as TariWalletApplication).appComponent.inject(activity)
+            ButterKnife.bind(activity)
+        }
+
+    }
+
 
 }

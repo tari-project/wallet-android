@@ -2,14 +2,14 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/add_note_and_send_vw_root"
+    android:id="@+id/root_view"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/white">
 
     <!-- back -->
     <ImageButton
-        android:id="@+id/add_note_btn_back"
+        android:id="@+id/back_button"
         android:layout_width="@dimen/back_button_size"
         android:layout_height="@dimen/back_button_size"
         android:layout_marginTop="@dimen/header_top_inset"
@@ -21,20 +21,20 @@
 
     <!-- contact alias -->
     <com.tari.android.wallet.ui.component.CustomFontTextView
-        android:id="@+id/add_note_txt_title"
+        android:id="@+id/title_text_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/add_amount_under_construction"
         android:textColor="@color/black"
         android:textSize="16sp"
         app:customFont="AVENIR_LT_STD_HEAVY"
-        app:layout_constraintBottom_toBottomOf="@id/add_note_btn_back"
+        app:layout_constraintBottom_toBottomOf="@id/back_button"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@id/add_note_btn_back" />
+        app:layout_constraintTop_toTopOf="@id/back_button" />
 
     <FrameLayout
-        android:id="@+id/add_note_vw_emoji_id_summary_container"
+        android:id="@+id/emoji_id_summary_container_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
@@ -46,13 +46,13 @@
         android:paddingTop="@dimen/emoji_id_container_vertical_padding"
         android:paddingEnd="@dimen/emoji_id_container_horizontal_padding"
         android:paddingBottom="@dimen/emoji_id_container_vertical_padding"
-        app:layout_constraintBottom_toBottomOf="@id/add_note_btn_back"
+        app:layout_constraintBottom_toBottomOf="@id/back_button"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@id/add_note_btn_back">
+        app:layout_constraintTop_toTopOf="@id/back_button">
 
         <include
-            android:id="@+id/add_note_vw_emoji_id_summary"
+            android:id="@+id/emoji_id_summary_view"
             layout="@layout/emoji_id_summary"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -64,7 +64,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:barrierDirection="bottom"
-        app:constraint_referenced_ids="add_note_btn_back,add_note_txt_title,add_note_vw_emoji_id_summary_container"/>
+        app:constraint_referenced_ids="back_button,title_text_view,emoji_id_summary_container_view"/>
 
     <LinearLayout
         android:layout_width="0dp"
@@ -80,7 +80,7 @@
         android:orientation="vertical">
 
         <com.tari.android.wallet.ui.component.CustomFontTextView
-            android:id="@+id/add_note_txt_prompt"
+            android:id="@+id/prompt_text_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:singleLine="true"
@@ -90,7 +90,7 @@
             app:customFont="AVENIR_LT_STD_HEAVY" />
 
         <com.tari.android.wallet.ui.component.CustomFontEditText
-            android:id="@+id/add_note_edit_note"
+            android:id="@+id/note_edit_text"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_marginTop="12dp"
@@ -107,7 +107,7 @@
 
         <!-- slide button container -->
         <RelativeLayout
-            android:id="@+id/add_note_vw_slide_button_container"
+            android:id="@+id/slide_button_container_view"
             android:layout_width="match_parent"
             android:layout_height="53dp"
             android:layout_marginTop="25dp"
@@ -121,13 +121,13 @@
                 android:background="@drawable/add_note_and_send_slide_button_disabled_bg" />
 
             <View
-                android:id="@+id/add_note_vw_slide_enabled_bg"
+                android:id="@+id/slide_enabled_bg_view"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:background="@drawable/add_note_and_send_slide_button_enabled_bg" />
 
             <ProgressBar
-                android:id="@+id/add_note_prog_bar"
+                android:id="@+id/progress_bar"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:layout_centerInParent="true"
@@ -136,7 +136,7 @@
                 android:visibility="invisible" />
 
             <com.tari.android.wallet.ui.component.CustomFontTextView
-                android:id="@+id/add_note_txt_slide_to_send_disabled"
+                android:id="@+id/slide_to_send_disabled_text_view"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerInParent="true"
@@ -146,7 +146,7 @@
                 app:customFont="AVENIR_LT_STD_HEAVY" />
 
             <com.tari.android.wallet.ui.component.CustomFontTextView
-                android:id="@+id/add_note_txt_slide_to_send_enabled"
+                android:id="@+id/slide_to_send_enabled_text_view"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerInParent="true"
@@ -156,7 +156,7 @@
                 app:customFont="AVENIR_LT_STD_HEAVY" />
 
             <RelativeLayout
-                android:id="@+id/add_note_vw_slide"
+                android:id="@+id/slide_view"
                 android:layout_width="@dimen/add_note_slide_button_width"
                 android:layout_height="@dimen/add_note_slide_button_width"
                 android:layout_marginStart="@dimen/add_note_slide_button_left_margin"
@@ -175,7 +175,7 @@
                     android:src="@drawable/slide_to_send_arrow_disabled" />
 
                 <ImageView
-                    android:id="@+id/add_note_img_slide_to_send_arrow_enabled"
+                    android:id="@+id/slide_to_send_arrow_enabled_image_view"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_centerInParent="true"
@@ -198,7 +198,7 @@
         tools:visibility="gone">
 
         <View
-            android:id="@+id/add_note_vw_full_emoji_id_bg_click_blocker"
+            android:id="@+id/full_emoji_id_bg_click_blocker_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:alpha="0.6"
@@ -207,7 +207,7 @@
             android:focusable="true" />
 
         <View
-            android:id="@+id/add_note_vw_dimmer"
+            android:id="@+id/dimmer_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:alpha="0.6"
@@ -217,10 +217,10 @@
 
         <!-- copy emoji id button -->
         <RelativeLayout
-            android:id="@+id/add_note_vw_copy_emoji_id_container"
+            android:id="@+id/copy_emoji_id_button_container_view"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignBottom="@id/add_note_vw_full_emoji_id_container"
+            android:layout_alignBottom="@id/full_emoji_id_container_view"
             android:layout_centerHorizontal="true"
             android:layout_marginBottom="0dp">
 
@@ -246,7 +246,7 @@
                 app:customFont="AVENIR_LT_STD_HEAVY" />
 
             <Button
-                android:id="@+id/add_note_btn_copy_emoji_id"
+                android:id="@+id/copy_emoji_id_button"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
                 android:layout_alignStart="@id/add_note_txt_copy_emoji_id"
@@ -258,7 +258,7 @@
 
         <!-- height and width of this view will be set dynamically at runtime -->
         <RelativeLayout
-            android:id="@+id/add_note_vw_full_emoji_id_container"
+            android:id="@+id/full_emoji_id_container_view"
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:layout_alignParentTop="true"
@@ -269,14 +269,14 @@
             android:focusable="true">
 
             <HorizontalScrollView
-                android:id="@+id/add_note_scroll_full_emoji_id"
+                android:id="@+id/full_emoji_id_scroll_view"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:scrollbars="none"
                 tools:ignore="UselessParent">
 
                 <TextView
-                    android:id="@+id/add_note_txt_full_emoji_id"
+                    android:id="@+id/full_emoji_id_text_view"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:gravity="center_vertical"
@@ -302,7 +302,7 @@
                 android:translationZ="7dp">
 
                 <include
-                    android:id="@+id/add_note_vw_emoji_id_copied"
+                    android:id="@+id/emoji_id_copied_view"
                     layout="@layout/emoji_id_copied_anim_view"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"

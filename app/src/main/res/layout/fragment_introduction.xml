@@ -2,7 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/create_wallet_vw_root"
+    android:id="@+id/root_view"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/black"
@@ -10,7 +10,7 @@
     android:orientation="vertical">
 
     <com.airbnb.lottie.LottieAnimationView
-        android:id="@+id/introduction_anim_tari"
+        android:id="@+id/tari_logo_lottie_animation_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
@@ -25,19 +25,19 @@
         app:lottie_scale="0.84" />
 
     <RelativeLayout
-        android:id="@+id/introduction_vw_video_outer_container"
+        android:id="@+id/video_outer_container_view"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1">
 
         <RelativeLayout
-            android:id="@+id/introduction_vw_video_inner_container"
+            android:id="@+id/video_inner_container_view"
             android:layout_width="20dp"
             android:layout_height="20dp"
             android:layout_centerInParent="true">
 
             <VideoView
-                android:id="@+id/introduction_video_view"
+                android:id="@+id/rain_animation_video_view"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_alignParentStart="true"
@@ -53,7 +53,7 @@
         android:layout_height="wrap_content">
 
         <com.tari.android.wallet.ui.component.CustomFontTextView
-            android:id="@+id/introduction_txt_header_line_top"
+            android:id="@+id/header_line_top_text_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@color/black"
@@ -71,7 +71,7 @@
         android:layout_height="wrap_content">
 
         <com.tari.android.wallet.ui.component.CustomFontTextView
-            android:id="@+id/introduction_txt_header_line_bottom"
+            android:id="@+id/header_line_bottom_text_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@color/black"
@@ -84,7 +84,7 @@
     </RelativeLayout>
 
     <FrameLayout
-        android:id="@+id/introduction_btn_layout"
+        android:id="@+id/create_wallet_container_view"
         android:layout_width="match_parent"
         android:layout_height="@dimen/common_action_button_height"
         android:layout_marginLeft="@dimen/common_horizontal_margin"
@@ -93,7 +93,7 @@
         android:background="@drawable/gradient_button_bg">
 
         <com.tari.android.wallet.ui.component.CustomFontTextView
-            android:id="@+id/introduction_btn_create_wallet"
+            android:id="@+id/create_wallet_button"
             android:layout_width="match_parent"
             android:layout_height="@dimen/common_action_button_height"
             android:gravity="center"
@@ -104,7 +104,7 @@
             app:customFont="AVENIR_LT_STD_HEAVY" />
 
         <ProgressBar
-            android:id="@+id/introduction_prog_create_wallet"
+            android:id="@+id/create_wallet_progress_bar"
             android:layout_width="35dp"
             android:layout_height="35dp"
             android:layout_gravity="center"
@@ -112,7 +112,7 @@
     </FrameLayout>
 
     <com.tari.android.wallet.ui.component.CustomFontTextView
-        android:id="@+id/introduction_txt_user_agreement_and_privacy_policy"
+        android:id="@+id/user_agreement_and_privacy_policy_text_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="@dimen/common_horizontal_margin"
@@ -129,7 +129,7 @@
         app:customFont="AVENIR_LT_STD_MEDIUM" />
 
     <ImageView
-        android:id="@+id/introduction_img_small_gem"
+        android:id="@+id/small_gem_image_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
@@ -140,7 +140,7 @@
         android:src="@drawable/splash_gem_small" />
 
     <com.tari.android.wallet.ui.component.CustomFontTextView
-        android:id="@+id/introduction_txt_network_info"
+        android:id="@+id/network_info_text_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"

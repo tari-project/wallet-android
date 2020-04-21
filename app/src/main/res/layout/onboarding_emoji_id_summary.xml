@@ -8,7 +8,7 @@
 
     <!-- emoji 1 -->
     <TextView
-        android:id="@+id/emoji_id_summary_txt_emoji_1"
+        android:id="@+id/emoji_id_summary_emoji_1_text_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/dummy_emoji"
@@ -16,7 +16,7 @@
         android:textSize="17sp" />
     <!-- emoji 2 -->
     <TextView
-        android:id="@+id/emoji_id_summary_txt_emoji_2"
+        android:id="@+id/emoji_id_summary_emoji_2_text_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/emoji_id_summary_letter_spacing"
@@ -25,7 +25,7 @@
         android:textSize="17sp" />
     <!-- emoji 3 -->
     <TextView
-        android:id="@+id/emoji_id_summary_txt_emoji_3"
+        android:id="@+id/emoji_id_summary_emoji_3_text_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/emoji_id_summary_letter_spacing"
@@ -44,7 +44,7 @@
         android:typeface="monospace" />
     <!-- emoji 4 -->
     <TextView
-        android:id="@+id/emoji_id_summary_txt_emoji_4"
+        android:id="@+id/emoji_id_summary_emoji_4_text_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/emoji_id_summary_letter_spacing"
@@ -53,7 +53,7 @@
         android:textSize="17sp" />
     <!-- emoji 5 -->
     <TextView
-        android:id="@+id/emoji_id_summary_txt_emoji_5"
+        android:id="@+id/emoji_id_summary_emoji_5_text_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/emoji_id_summary_letter_spacing"
@@ -62,7 +62,7 @@
         android:textSize="17sp" />
     <!-- emoji 6 -->
     <TextView
-        android:id="@+id/emoji_id_summary_txt_emoji_6"
+        android:id="@+id/emoji_id_summary_emoji_6_text_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/emoji_id_summary_letter_spacing"

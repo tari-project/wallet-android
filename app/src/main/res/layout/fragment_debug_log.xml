@@ -6,7 +6,7 @@
     android:orientation="vertical">
 
     <LinearLayout
-        android:id="@+id/debug_vw_spinner_container"
+        android:id="@+id/file_spinner_container"
         android:layout_width="match_parent"
         android:layout_height="@dimen/log_item_height"
         android:layout_marginHorizontal="@dimen/common_horizontal_margin"
@@ -15,13 +15,13 @@
         android:orientation="horizontal">
 
         <Spinner
-            android:id="@+id/debug_log_file_spinner"
+            android:id="@+id/file_spinner"
             android:layout_width="0dp"
             android:layout_height="@dimen/log_item_height"
             android:layout_weight="1" />
 
         <ImageButton
-            android:id="@+id/debug_log_btn_share"
+            android:id="@+id/share_button"
             android:layout_width="34dp"
             android:layout_height="34dp"
             android:layout_marginStart="4dp"
@@ -33,19 +33,19 @@
 
     <!-- list -->
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/debug_log_recycler_view"
+        android:id="@+id/recycler_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/debug_vw_spinner_container"
+        android:layout_below="@id/file_spinner_container"
         android:background="@color/white"
         android:overScrollMode="never"
         android:scrollbars="vertical" />
 
     <ImageButton
-        android:id="@+id/debug_log_btn_scroll_to_top"
+        android:id="@+id/scroll_to_top_button"
         android:layout_width="40dp"
         android:layout_height="40dp"
-        android:layout_above="@id/debug_log_btn_scroll_to_bottom"
+        android:layout_above="@id/scroll_to_bottom_button"
         android:layout_alignParentEnd="true"
         android:layout_marginEnd="15dp"
         android:layout_marginBottom="25dp"
@@ -55,7 +55,7 @@
         android:src="@drawable/ic_arrow_up_dark_gray_24dp" />
 
     <ImageButton
-        android:id="@+id/debug_log_btn_scroll_to_bottom"
+        android:id="@+id/scroll_to_bottom_button"
         android:layout_width="40dp"
         android:layout_height="40dp"
         android:layout_alignParentEnd="true"

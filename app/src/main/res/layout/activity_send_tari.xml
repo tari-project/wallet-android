@@ -2,16 +2,15 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:id="@+id/send_tari_vw_root"
+    android:id="@+id/root_view"
     android:layout_height="match_parent"
     android:background="@color/white"
     tools:context=".ui.activity.send.SendTariActivity">
 
     <!-- fragment container -->
-    <LinearLayout
-        android:id="@+id/send_tari_vw_fragment_container"
+    <FrameLayout
+        android:id="@+id/send_tari_fragment_container_view"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical" />
+        android:layout_height="match_parent" />
 
 </RelativeLayout>

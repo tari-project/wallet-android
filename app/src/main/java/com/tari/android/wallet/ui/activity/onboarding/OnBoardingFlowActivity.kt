@@ -32,18 +32,13 @@
  */
 package com.tari.android.wallet.ui.activity.onboarding
 
-import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
-import com.orhanobut.logger.Logger
+import androidx.appcompat.app.AppCompatActivity
 import com.tari.android.wallet.R
-import com.tari.android.wallet.application.WalletState
+import com.tari.android.wallet.application.TariWalletApplication
 import com.tari.android.wallet.di.WalletModule
-import com.tari.android.wallet.event.EventBus
-import com.tari.android.wallet.ffi.FFIWallet
-import com.tari.android.wallet.tor.TorProxyState
-import com.tari.android.wallet.ui.activity.BaseActivity
 import com.tari.android.wallet.ui.activity.home.HomeActivity
 import com.tari.android.wallet.ui.fragment.onboarding.CreateWalletFragment
 import com.tari.android.wallet.ui.fragment.onboarding.IntroductionFragment
@@ -52,8 +47,6 @@ import com.tari.android.wallet.util.Constants.UI.Auth
 import com.tari.android.wallet.util.Constants.UI.CreateWallet
 import com.tari.android.wallet.util.SharedPrefsWrapper
 import com.tari.android.wallet.util.WalletUtil
-import io.reactivex.Observable
-import io.reactivex.schedulers.Schedulers
 import javax.inject.Inject
 import javax.inject.Named
 
@@ -62,7 +55,7 @@ import javax.inject.Named
  *
  * @author The Tari Development Team
  */
-internal class OnboardingFlowActivity : BaseActivity(), IntroductionFragment.Listener,
+internal class OnboardingFlowActivity : AppCompatActivity(), IntroductionFragment.Listener,
     CreateWalletFragment.Listener, LocalAuthFragment.Listener {
 
     @Inject
@@ -71,12 +64,12 @@ internal class OnboardingFlowActivity : BaseActivity(), IntroductionFragment.Lis
     @Inject
     internal lateinit var sharedPrefsWrapper: SharedPrefsWrapper
 
-    override val contentViewId = R.layout.activity_onboarding_flow
-
     private val uiHandler = Handler()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_onboarding_flow)
+        OnBoardingFlowActivityVisitor.visit(this)
 
         when {
             sharedPrefsWrapper.onboardingAuthWasInterrupted -> {
@@ -162,5 +155,11 @@ internal class OnboardingFlowActivity : BaseActivity(), IntroductionFragment.Lis
         intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
         startActivity(intent)
         finish()
+    }
+
+    private object OnBoardingFlowActivityVisitor {
+        internal fun visit(activity: OnboardingFlowActivity) {
+            (activity.application as TariWalletApplication).appComponent.inject(activity)
+        }
     }
 }

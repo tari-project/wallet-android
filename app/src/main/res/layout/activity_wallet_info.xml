@@ -12,7 +12,7 @@
         android:layout_height="@dimen/common_header_height">
 
         <ImageButton
-            android:id="@+id/wallet_info_btn_close"
+            android:id="@+id/close_button"
             android:layout_width="@dimen/common_header_height"
             android:layout_height="@dimen/common_header_height"
             android:background="@color/transparent"
@@ -22,7 +22,7 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <View
-            android:id="@+id/wallet_info_header_dimmer"
+            android:id="@+id/header_dimmer_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:alpha="0.6"
@@ -45,7 +45,7 @@
             android:clipChildren="false">
 
             <com.tari.android.wallet.ui.component.CustomFontTextView
-                android:id="@+id/wallet_info_txt_share_emoji_id"
+                android:id="@+id/share_emoji_id_text_view"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="@dimen/common_horizontal_margin"
@@ -62,16 +62,16 @@
                 app:layout_constraintTop_toTopOf="parent" />
 
             <View
-                android:id="@+id/wallet_info_vw_divider"
+                android:id="@+id/divider_view"
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:layout_marginHorizontal="@dimen/common_horizontal_margin"
                 android:layout_marginTop="23dp"
                 android:background="#20000000"
-                app:layout_constraintTop_toBottomOf="@id/wallet_info_emoji_id_container" />
+                app:layout_constraintTop_toBottomOf="@id/emoji_id_container_view" />
 
             <com.tari.android.wallet.ui.component.CustomFontTextView
-                android:id="@+id/wallet_info_txt_qr_code_desc"
+                android:id="@+id/qr_code_desc_text_view"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="@dimen/common_horizontal_margin"
@@ -85,10 +85,10 @@
                 app:customFont="AVENIR_LT_STD_MEDIUM"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/wallet_info_vw_divider" />
+                app:layout_constraintTop_toBottomOf="@id/divider_view" />
 
             <FrameLayout
-                android:id="@+id/wallet_info_vw_qr_container"
+                android:id="@+id/qr_container_view"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
@@ -98,10 +98,10 @@
                 android:padding="5dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/wallet_info_txt_qr_code_desc">
+                app:layout_constraintTop_toBottomOf="@id/qr_code_desc_text_view">
 
                 <ImageView
-                    android:id="@+id/wallet_info_img_qr"
+                    android:id="@+id/qr_image_view"
                     android:layout_width="@dimen/wallet_info_container_qr_code_size"
                     android:layout_height="@dimen/wallet_info_container_qr_code_size"
                     android:background="@color/white"
@@ -111,7 +111,7 @@
             </FrameLayout>
 
             <View
-                android:id="@+id/wallet_info_qr_code_dimmer"
+                android:id="@+id/qr_dimmer_view"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
                 android:alpha="0.6"
@@ -119,10 +119,10 @@
                 android:clickable="true"
                 android:focusable="true"
                 android:elevation="@dimen/common_view_elevation"
-                app:layout_constraintTop_toTopOf="@id/wallet_info_vw_qr_container"
-                app:layout_constraintStart_toStartOf="@id/wallet_info_vw_qr_container"
-                app:layout_constraintEnd_toEndOf="@id/wallet_info_vw_qr_container"
-                app:layout_constraintBottom_toBottomOf="@id/wallet_info_vw_qr_container"
+                app:layout_constraintTop_toTopOf="@id/qr_container_view"
+                app:layout_constraintStart_toStartOf="@id/qr_container_view"
+                app:layout_constraintEnd_toEndOf="@id/qr_container_view"
+                app:layout_constraintBottom_toBottomOf="@id/qr_container_view"
                 android:visibility="gone"
                 tools:visibility="visible"/>
 
@@ -132,10 +132,10 @@
                 android:layout_height="40dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/wallet_info_vw_qr_container" />
+                app:layout_constraintTop_toBottomOf="@id/qr_container_view" />
 
             <View
-                android:id="@+id/wallet_info_scroll_dimmer"
+                android:id="@+id/scroll_dimmer_view"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
                 android:alpha="0.6"
@@ -150,7 +150,7 @@
 
             <!--Emoji ID Copy Button-->
             <RelativeLayout
-                android:id="@+id/wallet_info_copy_emoji_id_container"
+                android:id="@+id/copy_emoji_id_container_view"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="0dp"
@@ -158,11 +158,11 @@
                 android:elevation="@dimen/common_view_elevation"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="@id/wallet_info_emoji_id_container"
+                app:layout_constraintTop_toTopOf="@id/emoji_id_container_view"
                 tools:visibility="visible">
 
                 <ImageView
-                    android:id="@+id/wallet_info_img_copy_emoji_id_notch"
+                    android:id="@+id/copy_emoji_id_notch_image_view"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_centerHorizontal="true"
@@ -170,10 +170,10 @@
                     android:src="@drawable/speech_notch_up" />
 
                 <com.tari.android.wallet.ui.component.CustomFontTextView
-                    android:id="@+id/wallet_info_txt_copy_emoji_id"
+                    android:id="@+id/copy_emoji_id_text_view"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_below="@id/wallet_info_img_copy_emoji_id_notch"
+                    android:layout_below="@id/copy_emoji_id_notch_image_view"
                     android:background="@drawable/copy_paste_emoji_id_button_bg"
                     android:paddingHorizontal="20dp"
                     android:paddingVertical="10dp"
@@ -183,19 +183,19 @@
                     app:customFont="AVENIR_LT_STD_HEAVY" />
 
                 <Button
-                    android:id="@+id/wallet_info_btn_copy_emoji_id"
+                    android:id="@+id/copy_emoji_id_button"
                     android:layout_width="0dp"
                     android:layout_height="0dp"
-                    android:layout_alignStart="@id/wallet_info_txt_copy_emoji_id"
-                    android:layout_alignTop="@id/wallet_info_txt_copy_emoji_id"
-                    android:layout_alignEnd="@id/wallet_info_txt_copy_emoji_id"
-                    android:layout_alignBottom="@id/wallet_info_txt_copy_emoji_id"
+                    android:layout_alignStart="@id/copy_emoji_id_text_view"
+                    android:layout_alignTop="@id/copy_emoji_id_text_view"
+                    android:layout_alignEnd="@id/copy_emoji_id_text_view"
+                    android:layout_alignBottom="@id/copy_emoji_id_text_view"
                     android:background="@color/transparent" />
             </RelativeLayout>
 
             <!--Emoji ID-->
             <RelativeLayout
-                android:id="@+id/wallet_info_emoji_id_container"
+                android:id="@+id/emoji_id_container_view"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="25dp"
@@ -203,10 +203,10 @@
                 android:elevation="@dimen/common_view_elevation"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/wallet_info_txt_share_emoji_id">
+                app:layout_constraintTop_toBottomOf="@id/share_emoji_id_text_view">
 
                 <FrameLayout
-                    android:id="@+id/wallet_info_emoji_id_summary_container"
+                    android:id="@+id/emoji_id_summary_container_view"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_centerInParent="true"
@@ -218,7 +218,7 @@
                     android:paddingVertical="@dimen/emoji_id_container_vertical_padding">
 
                     <include
-                        android:id="@+id/wallet_info_emoji_id_summary"
+                        android:id="@+id/emoji_id_summary_view"
                         layout="@layout/emoji_id_summary"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -226,25 +226,25 @@
                 </FrameLayout>
 
                 <RelativeLayout
-                    android:id="@+id/wallet_info_full_emoji_id_container"
+                    android:id="@+id/full_emoji_id_container_view"
                     android:layout_width="300dp"
                     android:layout_height="0dp"
-                    android:layout_alignTop="@id/wallet_info_emoji_id_summary_container"
-                    android:layout_alignBottom="@id/wallet_info_emoji_id_summary_container"
+                    android:layout_alignTop="@id/emoji_id_summary_container_view"
+                    android:layout_alignBottom="@id/emoji_id_summary_container_view"
                     android:layout_centerHorizontal="true"
                     android:background="@drawable/emoji_id_bg"
                     android:elevation="@dimen/common_view_elevation"
                     android:visibility="gone">
 
                     <HorizontalScrollView
-                        android:id="@+id/wallet_info_scroll_full_emoji_id"
+                        android:id="@+id/full_emoji_id_scroll_view"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:scrollbars="none"
                         tools:ignore="UselessParent">
 
                         <TextView
-                            android:id="@+id/wallet_info_txt_full_emoji_id"
+                            android:id="@+id/full_emoji_id_text_view"
                             android:layout_width="wrap_content"
                             android:layout_height="match_parent"
                             android:gravity="center_vertical"
@@ -256,7 +256,7 @@
 
                     <!-- white fader for emoji-id -->
                     <View
-                        android:id="@+id/wallet_info_full_emoji_id_fader"
+                        android:id="@+id/full_emoji_id_fader_view"
                         android:layout_width="26dp"
                         android:layout_height="21dp"
                         android:layout_alignParentEnd="true"
@@ -270,7 +270,7 @@
                         android:translationZ="7dp">
 
                         <include
-                            android:id="@+id/wallet_info_emoji_id_copied"
+                            android:id="@+id/emoji_id_copied_view"
                             layout="@layout/emoji_id_copied_anim_view"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
@@ -283,7 +283,7 @@
     </ScrollView>
 
     <View
-        android:id="@+id/wallet_info_underscroll_dimmer"
+        android:id="@+id/bottom_dimmer_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:alpha="0.6"

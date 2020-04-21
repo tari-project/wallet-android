@@ -34,11 +34,10 @@ package com.tari.android.wallet.ui.activity.home.adapter
 
 import android.graphics.drawable.Drawable
 import android.view.View
-import android.widget.ImageView
-import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import butterknife.*
 import com.tari.android.wallet.R
+import com.tari.android.wallet.databinding.HomeTxListItemBinding
 import com.tari.android.wallet.model.Contact
 import com.tari.android.wallet.model.Tx
 import com.tari.android.wallet.ui.component.EmojiIdSummaryViewController
@@ -57,23 +56,16 @@ class TxViewHolder(view: View, listener: Listener) :
     RecyclerView.ViewHolder(view),
     View.OnClickListener {
 
-    @BindView(R.id.home_tx_list_item_img_icon)
-    lateinit var iconImageView: ImageView
-    @BindView(R.id.home_tx_list_item_txt_contact_alias)
-    lateinit var aliasTextView: TextView
-    @BindView(R.id.home_tx_list_item_vw_emoji_summary)
-    lateinit var emojiIdSummaryView: View
-    @BindView(R.id.home_tx_list_item_txt_message)
-    lateinit var messageTextView: TextView
-    @BindView(R.id.home_tx_list_item_txt_amount)
-    lateinit var amountTextView: TextView
     @BindDrawable(R.drawable.home_tx_value_positive_bg)
     lateinit var positiveBgDrawable: Drawable
+
+    @BindDrawable(R.drawable.home_tx_value_negative_bg)
+    lateinit var negativeBgDrawable: Drawable
+
     @BindColor(R.color.home_tx_value_positive)
     @JvmField
     var positiveColor: Int = 0
-    @BindDrawable(R.drawable.home_tx_value_negative_bg)
-    lateinit var negativeBgDrawable: Drawable
+
     @BindColor(R.color.home_tx_value_negative)
     @JvmField
     var negativeColor: Int = 0
@@ -82,13 +74,15 @@ class TxViewHolder(view: View, listener: Listener) :
     private var emojiIdSummaryController: EmojiIdSummaryViewController
     private var listenerWR: WeakReference<Listener>
 
+    private val ui = HomeTxListItemBinding.bind(view)
+
     init {
         ButterKnife.bind(this, view)
-        emojiIdSummaryController = EmojiIdSummaryViewController(emojiIdSummaryView)
+        emojiIdSummaryController = EmojiIdSummaryViewController(ui.txItemEmojiSummaryView)
         listenerWR = WeakReference(listener)
+        ui.txItemRootView.setOnClickListener(this)
     }
 
-    @OnClick(R.id.home_tx_list_item_vw_root)
     override fun onClick(view: View) {
         UiUtil.temporarilyDisableClick(view)
         listenerWR.get()?.onTxSelected(txWR.get()!!)
@@ -99,34 +93,35 @@ class TxViewHolder(view: View, listener: Listener) :
         // display contact alias or user emoji id
         val txUser = tx.user
         if (txUser is Contact) {
-            aliasTextView.visible()
-            aliasTextView.text = txUser.alias
-            emojiIdSummaryView.gone()
+            ui.txItemContactAliasTextView.visible()
+            ui.txItemContactAliasTextView.text = txUser.alias
+            ui.txItemEmojiSummaryView.root.gone()
         } else {
-            aliasTextView.gone()
-            emojiIdSummaryView.visible()
+            ui.txItemContactAliasTextView.gone()
+            ui.txItemEmojiSummaryView.root.visible()
             emojiIdSummaryController.display(
                 txUser.publicKey.emojiId
             )
         }
 
         // display message
-        messageTextView.text = tx.message
+        ui.txItemMessageTextView.text = tx.message
         // display value
         if (tx.direction == Tx.Direction.INBOUND) {
             val formattedValue = "+" + WalletUtil.amountFormatter.format(tx.amount.tariValue)
-            amountTextView.text = formattedValue
-            amountTextView.setTextColor(positiveColor)
-            amountTextView.background = positiveBgDrawable
+            ui.txItemAmountTextView.text = formattedValue
+            ui.txItemAmountTextView.setTextColor(positiveColor)
+            ui.txItemAmountTextView.background = positiveBgDrawable
         } else {
             val formattedValue = "-" + WalletUtil.amountFormatter.format(tx.amount.tariValue)
-            amountTextView.text = formattedValue
-            amountTextView.setTextColor(negativeColor)
-            amountTextView.background = negativeBgDrawable
+            ui.txItemAmountTextView.text = formattedValue
+            ui.txItemAmountTextView.setTextColor(negativeColor)
+            ui.txItemAmountTextView.background = negativeBgDrawable
         }
-        val measure = amountTextView.paint.measureText("0".repeat(amountTextView.text.length))
-        val totalPadding = amountTextView.paddingStart + amountTextView.paddingEnd
-        amountTextView.width = totalPadding + measure.toInt()
+        val measure =
+            ui.txItemAmountTextView.paint.measureText("0".repeat(ui.txItemAmountTextView.text.length))
+        val totalPadding = ui.txItemAmountTextView.paddingStart + ui.txItemAmountTextView.paddingEnd
+        ui.txItemAmountTextView.width = totalPadding + measure.toInt()
     }
 
     interface Listener {

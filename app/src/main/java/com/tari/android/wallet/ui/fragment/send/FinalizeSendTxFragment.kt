@@ -38,18 +38,20 @@ import android.animation.ObjectAnimator
 import android.animation.ValueAnimator
 import android.annotation.SuppressLint
 import android.content.Context
+import android.media.AudioManager
+import android.os.Build
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
-import android.widget.ProgressBar
-import android.widget.TextView
-import android.widget.VideoView
+import android.view.ViewGroup
+import androidx.fragment.app.Fragment
 import butterknife.BindString
-import butterknife.BindView
-import com.airbnb.lottie.LottieAnimationView
+import butterknife.ButterKnife
 import com.daasuu.ei.Ease
 import com.daasuu.ei.EasingInterpolator
 import com.orhanobut.logger.Logger
 import com.tari.android.wallet.R
+import com.tari.android.wallet.databinding.FragmentFinalizeSendTxBinding
 import com.tari.android.wallet.event.Event
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.model.*
@@ -57,9 +59,9 @@ import com.tari.android.wallet.network.NetworkConnectionState
 import com.tari.android.wallet.service.TariWalletService
 import com.tari.android.wallet.tor.TorBootstrapStatus
 import com.tari.android.wallet.tor.TorProxyState
+import com.tari.android.wallet.ui.extension.appComponent
 import com.tari.android.wallet.ui.extension.invisible
 import com.tari.android.wallet.ui.extension.visible
-import com.tari.android.wallet.ui.fragment.BaseFragment
 import com.tari.android.wallet.ui.util.UiUtil.getResourceUri
 import com.tari.android.wallet.util.Constants
 import org.joda.time.DateTime
@@ -74,7 +76,7 @@ import javax.inject.Inject
  *
  * @author The Tari Development Team
  */
-class FinalizeSendTxFragment(private val walletService: TariWalletService) : BaseFragment() {
+class FinalizeSendTxFragment(private val walletService: TariWalletService) : Fragment() {
 
     enum class FailureReason {
         NETWORK_CONNECTION_ERROR,
@@ -97,38 +99,21 @@ class FinalizeSendTxFragment(private val walletService: TariWalletService) : Bas
         var progressAnimationToggleCount = 0
     }
 
-    @BindView(R.id.finalize_send_tx_vw_root)
-    lateinit var rootView: View
-    @BindView(R.id.finalize_send_tx_video_bg)
-    lateinit var videoView: VideoView
-    @BindView(R.id.finalize_send_tx_anim)
-    lateinit var lottieAnimationView: LottieAnimationView
-    @BindView(R.id.finalize_send_tx_txt_info_line_1)
-    lateinit var infoLine1TextView: TextView
-    @BindView(R.id.finalize_send_tx_txt_info_line_2)
-    lateinit var infoLine2TextView: TextView
-    @BindView(R.id.finalize_send_tx_vw_prog_bar_step_1_container)
-    lateinit var step1ProgressBarContainerView: View
-    @BindView(R.id.finalize_send_tx_prog_bar_step_1)
-    lateinit var step1ProgressBar: ProgressBar
-    @BindView(R.id.finalize_send_tx_vw_prog_bar_step_2_container)
-    lateinit var step2ProgressBarContainerView: View
-    @BindView(R.id.finalize_send_tx_prog_bar_step_2)
-    lateinit var step2ProgressBar: ProgressBar
-    @BindView(R.id.finalize_send_tx_vw_prog_bar_step_3_container)
-    lateinit var step3ProgressBarContainerView: View
-    @BindView(R.id.finalize_send_tx_prog_bar_step_3)
-    lateinit var step3ProgressBar: ProgressBar
     @BindString(R.string.finalize_send_tx_sending_step_1_desc_line_1)
     lateinit var step1DescriptionLine1: String
+
     @BindString(R.string.finalize_send_tx_sending_step_1_desc_line_2)
     lateinit var step1DescriptionLine2: String
+
     @BindString(R.string.finalize_send_tx_sending_step_2_desc_line_1)
     lateinit var step2DescriptionLine1: String
+
     @BindString(R.string.finalize_send_tx_sending_step_2_desc_line_2)
     lateinit var step2DescriptionLine2: String
+
     @BindString(R.string.finalize_send_tx_sending_step_3_desc_line_1)
     lateinit var step3DescriptionLine1: String
+
     @BindString(R.string.finalize_send_tx_sending_step_3_desc_line_2)
     lateinit var step3DescriptionLine2: String
 
@@ -167,16 +152,32 @@ class FinalizeSendTxFragment(private val walletService: TariWalletService) : Bas
     private var directSendHasFailed = false
     private var storeAndForwardHasFailed = false
 
-    override val contentViewId: Int = R.layout.fragment_finalize_send_tx
+    private var _ui: FragmentFinalizeSendTxBinding? = null
+    private val ui get() = _ui!!
+
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? =
+        FragmentFinalizeSendTxBinding.inflate(inflater, container, false).also { _ui = it }.root
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        ui.lottieAnimationView.removeAllAnimatorListeners()
+        _ui = null
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        FinalizeSendTxFragmentVisitor.visit(this, view)
         // get tx properties
         recipientUser = arguments!!.getParcelable("recipientUser")!!
         amount = arguments!!.getParcelable("amount")!!
         fee = arguments!!.getParcelable("fee")!!
         note = arguments!!.getString("note")!!
 
-        lottieAnimationView.setMaxProgress(lottieAnimationPauseProgress)
+        ui.lottieAnimationView.setMaxProgress(lottieAnimationPauseProgress)
 
         Step.CONNECTION_CHECK.descLine1 = step1DescriptionLine1
         Step.CONNECTION_CHECK.descLine2 = step1DescriptionLine2
@@ -185,25 +186,25 @@ class FinalizeSendTxFragment(private val walletService: TariWalletService) : Bas
         Step.SENT.descLine1 = step3DescriptionLine1
         Step.SENT.descLine2 = step3DescriptionLine2
 
-        infoLine1TextView.invisible()
-        infoLine2TextView.invisible()
+        ui.infoLine1TextView.invisible()
+        ui.infoLine2TextView.invisible()
         currentStep = Step.CONNECTION_CHECK
-        step1ProgressBarContainerView.alpha = 0f
-        step1ProgressBar.visible()
-        step1ProgressBar.progress = 0
-        step1ProgressBar.max = maxProgress
-        step2ProgressBarContainerView.alpha = 0f
-        step2ProgressBar.invisible()
-        step2ProgressBar.progress = 0
-        step2ProgressBar.max = maxProgress
-        step3ProgressBarContainerView.alpha = 0f
-        step3ProgressBar.invisible()
-        step2ProgressBar.progress = 0
-        step2ProgressBar.max = maxProgress
-        rootView.postDelayed(
+        ui.step1ProgressBarContainerView.alpha = 0f
+        ui.step1ProgressBar.visible()
+        ui.step1ProgressBar.progress = 0
+        ui.step1ProgressBar.max = maxProgress
+        ui.step2ProgressBarContainerView.alpha = 0f
+        ui.step2ProgressBar.invisible()
+        ui.step2ProgressBar.progress = 0
+        ui.step2ProgressBar.max = maxProgress
+        ui.step3ProgressBarContainerView.alpha = 0f
+        ui.step3ProgressBar.invisible()
+        ui.step2ProgressBar.progress = 0
+        ui.step2ProgressBar.max = maxProgress
+        ui.rootView.postDelayed(
             {
                 wr.get()?.fadeInProgressBarContainers()
-                wr.get()?.lottieAnimationView?.playAnimation()
+                wr.get()?.ui?.lottieAnimationView?.playAnimation()
                 wr.get()?.playCurrentStepTextAppearAnimation()
             },
             Constants.UI.FinalizeSendTx.lottieAnimStartDelayMs
@@ -230,31 +231,32 @@ class FinalizeSendTxFragment(private val walletService: TariWalletService) : Bas
     override fun onStart() {
         super.onStart()
         val mActivity = activity ?: return
-        videoView.setVideoURI(mActivity.getResourceUri(R.raw.sending_background))
-        videoView.setOnPreparedListener { mp -> mp.isLooping = true }
-        videoView.start()
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            ui.backgroundAnimationVideoView.setAudioFocusRequest(AudioManager.AUDIOFOCUS_NONE)
+        }
+        ui.backgroundAnimationVideoView.setVideoURI(mActivity.getResourceUri(R.raw.sending_background))
+        ui.backgroundAnimationVideoView.setOnPreparedListener { mp -> mp.isLooping = true }
+        ui.backgroundAnimationVideoView.start()
     }
 
     override fun onStop() {
-        videoView.stopPlayback()
+        ui.backgroundAnimationVideoView.stopPlayback()
         super.onStop()
     }
 
     override fun onDestroy() {
-        lottieAnimationView.duration
-        lottieAnimationView.removeAllAnimatorListeners()
         EventBus.unsubscribe(this)
         super.onDestroy()
     }
 
     private fun subscribeToEventBus() {
         EventBus.subscribe<Event.Wallet.DirectSendResult>(this) { event ->
-            wr.get()?.rootView?.post {
+            wr.get()?.ui?.rootView?.post {
                 wr.get()?.onDirectSendResult(event.txId, event.success)
             }
         }
         EventBus.subscribe<Event.Wallet.StoreAndForwardSendResult>(this) { event ->
-            wr.get()?.rootView?.post {
+            wr.get()?.ui?.rootView?.post {
                 wr.get()?.onStoreAndForwardSendResult(event.txId, event.success)
             }
         }
@@ -262,19 +264,19 @@ class FinalizeSendTxFragment(private val walletService: TariWalletService) : Bas
 
     private fun playCurrentStepTextAppearAnimation() {
         // line 1
-        infoLine1TextView.text = currentStep.descLine1
-        infoLine1TextView.measure(
+        ui.infoLine1TextView.text = currentStep.descLine1
+        ui.infoLine1TextView.measure(
             View.MeasureSpec.UNSPECIFIED,
             View.MeasureSpec.UNSPECIFIED
         )
-        infoLine1TextView.invisible()
-        infoLine1TextView.translationY = infoLine1TextView.height.toFloat()
-        infoLine1TextView.alpha = 1f
-        infoLine1TextView.visible()
+        ui.infoLine1TextView.invisible()
+        ui.infoLine1TextView.translationY = ui.infoLine1TextView.height.toFloat()
+        ui.infoLine1TextView.alpha = 1f
+        ui.infoLine1TextView.visible()
         ObjectAnimator.ofFloat(
-            infoLine1TextView,
+            ui.infoLine1TextView,
             "translationY",
-            infoLine1TextView.height.toFloat(),
+            ui.infoLine1TextView.height.toFloat(),
             0f
         ).apply {
             duration = Constants.UI.mediumDurationMs
@@ -284,24 +286,25 @@ class FinalizeSendTxFragment(private val walletService: TariWalletService) : Bas
         }
 
         // line 2
-        infoLine2TextView.text = currentStep.descLine2
-        infoLine2TextView.measure(
+        ui.infoLine2TextView.text = currentStep.descLine2
+        ui.infoLine2TextView.measure(
             View.MeasureSpec.UNSPECIFIED,
             View.MeasureSpec.UNSPECIFIED
         )
-        infoLine2TextView.invisible()
-        infoLine2TextView.translationY = infoLine2TextView.height.toFloat()
-        infoLine2TextView.alpha = 1f
-        infoLine2TextView.visible()
+        ui.infoLine2TextView.invisible()
+        ui.infoLine2TextView.translationY = ui.infoLine2TextView.height.toFloat()
+        ui.infoLine2TextView.alpha = 1f
+        ui.infoLine2TextView.visible()
         ObjectAnimator.ofFloat(
-            infoLine2TextView,
+            ui.infoLine2TextView,
             "translationY",
-            infoLine2TextView.height.toFloat(),
+            ui.infoLine2TextView.height.toFloat(),
             0f
         ).apply {
             duration = Constants.UI.mediumDurationMs
             interpolator = EasingInterpolator(Ease.QUART_IN_OUT)
-            startDelay = Constants.UI.FinalizeSendTx.textAppearAnimStartDelayMs + Constants.UI.xShortDurationMs
+            startDelay =
+                Constants.UI.FinalizeSendTx.textAppearAnimStartDelayMs + Constants.UI.xShortDurationMs
             start()
         }
     }
@@ -310,9 +313,9 @@ class FinalizeSendTxFragment(private val walletService: TariWalletService) : Bas
         val fadeAnim = ValueAnimator.ofFloat(0f, 1f)
         fadeAnim.addUpdateListener { valueAnimator: ValueAnimator ->
             val alpha = valueAnimator.animatedValue as Float
-            step1ProgressBarContainerView.alpha = alpha
-            step2ProgressBarContainerView.alpha = alpha
-            step3ProgressBarContainerView.alpha = alpha
+            ui.step1ProgressBarContainerView.alpha = alpha
+            ui.step2ProgressBarContainerView.alpha = alpha
+            ui.step3ProgressBarContainerView.alpha = alpha
         }
         fadeAnim.duration = Constants.UI.longDurationMs
         fadeAnim.startDelay = Constants.UI.FinalizeSendTx.textAppearAnimStartDelayMs
@@ -326,9 +329,9 @@ class FinalizeSendTxFragment(private val walletService: TariWalletService) : Bas
 
     private fun animateCurrentStepProgress(isReverse: Boolean) {
         val progressBar = when (currentStep) {
-            Step.CONNECTION_CHECK -> step1ProgressBar
-            Step.DISCOVERY -> step2ProgressBar
-            else -> step3ProgressBar
+            Step.CONNECTION_CHECK -> ui.step1ProgressBar
+            Step.DISCOVERY -> ui.step2ProgressBar
+            else -> ui.step3ProgressBar
         }
         progressBar.visible()
         progressAnim = if (isReverse) {
@@ -452,7 +455,7 @@ class FinalizeSendTxFragment(private val walletService: TariWalletService) : Bas
         }
         // start waiting on base node sync status
         EventBus.subscribe<Event.Wallet.BaseNodeSyncComplete>(this) { event ->
-            wr.get()?.rootView?.post {
+            wr.get()?.ui?.rootView?.post {
                 wr.get()?.onBaseNodeSyncCompleted(event)
             }
         }
@@ -475,8 +478,8 @@ class FinalizeSendTxFragment(private val walletService: TariWalletService) : Bas
         val alphaAnim = ValueAnimator.ofFloat(1f, 0f)
         alphaAnim.addUpdateListener { valueAnimator: ValueAnimator ->
             val alpha = valueAnimator.animatedValue as Float
-            infoLine1TextView.alpha = alpha
-            infoLine2TextView.alpha = alpha
+            ui.infoLine1TextView.alpha = alpha
+            ui.infoLine2TextView.alpha = alpha
         }
         alphaAnim.duration = Constants.UI.mediumDurationMs
         alphaAnim.addListener(object : AnimatorListenerAdapter() {
@@ -562,26 +565,26 @@ class FinalizeSendTxFragment(private val walletService: TariWalletService) : Bas
 
     private fun onFailure(failureReason: FailureReason) {
         progressAnim?.removeAllListeners()
-        lottieAnimationView.speed = -1f
-        lottieAnimationView.playAnimation()
-        lottieAnimationView.progress = lottieAnimationPauseProgress
+        ui.lottieAnimationView.speed = -1f
+        ui.lottieAnimationView.playAnimation()
+        ui.lottieAnimationView.progress = lottieAnimationPauseProgress
 
         // fade out text and progress
         val fadeOutAnim = ValueAnimator.ofFloat(1f, 0f)
         fadeOutAnim.addUpdateListener { valueAnimator: ValueAnimator ->
             val alpha = valueAnimator.animatedValue as Float
-            infoLine1TextView.alpha = alpha
-            infoLine2TextView.alpha = alpha
-            step1ProgressBarContainerView.alpha = alpha
-            step2ProgressBarContainerView.alpha = alpha
-            step3ProgressBarContainerView.alpha = alpha
+            ui.infoLine1TextView.alpha = alpha
+            ui.infoLine2TextView.alpha = alpha
+            ui.step1ProgressBarContainerView.alpha = alpha
+            ui.step2ProgressBarContainerView.alpha = alpha
+            ui.step3ProgressBarContainerView.alpha = alpha
         }
         fadeOutAnim.duration = Constants.UI.xLongDurationMs
         fadeOutAnim.interpolator = EasingInterpolator(Ease.QUART_IN_OUT)
         fadeOutAnim.addListener(object : AnimatorListenerAdapter() {
             override fun onAnimationEnd(animation: Animator?) {
                 fadeOutAnim.removeAllListeners()
-                lottieAnimationView.alpha = 0f
+                ui.lottieAnimationView.alpha = 0f
                 listenerWR.get()?.onSendTxFailure(
                     this@FinalizeSendTxFragment,
                     recipientUser,
@@ -596,18 +599,18 @@ class FinalizeSendTxFragment(private val walletService: TariWalletService) : Bas
     }
 
     private fun onSuccess() {
-        lottieAnimationView.setMaxProgress(1.0f)
-        lottieAnimationView.playAnimation()
-        lottieAnimationView.progress = lottieAnimationPauseProgress
+        ui.lottieAnimationView.setMaxProgress(1.0f)
+        ui.lottieAnimationView.playAnimation()
+        ui.lottieAnimationView.progress = lottieAnimationPauseProgress
         // fade out text and progress
         val fadeOutAnim = ValueAnimator.ofFloat(1f, 0f)
         fadeOutAnim.addUpdateListener { valueAnimator: ValueAnimator ->
             val alpha = valueAnimator.animatedValue as Float
-            infoLine1TextView.alpha = alpha
-            infoLine2TextView.alpha = alpha
-            step1ProgressBarContainerView.alpha = alpha
-            step2ProgressBarContainerView.alpha = alpha
-            step3ProgressBarContainerView.alpha = alpha
+            ui.infoLine1TextView.alpha = alpha
+            ui.infoLine2TextView.alpha = alpha
+            ui.step1ProgressBarContainerView.alpha = alpha
+            ui.step2ProgressBarContainerView.alpha = alpha
+            ui.step3ProgressBarContainerView.alpha = alpha
         }
         fadeOutAnim.duration = Constants.UI.longDurationMs
         fadeOutAnim.interpolator = EasingInterpolator(Ease.QUART_IN_OUT)
@@ -615,7 +618,7 @@ class FinalizeSendTxFragment(private val walletService: TariWalletService) : Bas
         fadeOutAnim.addListener(object : AnimatorListenerAdapter() {
             override fun onAnimationEnd(animation: Animator?) {
                 fadeOutAnim.removeAllListeners()
-                lottieAnimationView.alpha = 0f
+                ui.lottieAnimationView.alpha = 0f
                 listenerWR.get()?.onSendTxSuccessful(
                     this@FinalizeSendTxFragment,
                     recipientUser,
@@ -658,6 +661,13 @@ class FinalizeSendTxFragment(private val walletService: TariWalletService) : Bas
             note: String
         )
 
+    }
+
+    private object FinalizeSendTxFragmentVisitor {
+        internal fun visit(fragment: FinalizeSendTxFragment, view: View) {
+            fragment.requireActivity().appComponent.inject(fragment)
+            ButterKnife.bind(fragment, view)
+        }
     }
 
 }

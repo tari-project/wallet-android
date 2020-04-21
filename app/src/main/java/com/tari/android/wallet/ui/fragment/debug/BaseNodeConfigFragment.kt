@@ -37,20 +37,22 @@ import android.content.Context.CLIPBOARD_SERVICE
 import android.graphics.drawable.Drawable
 import android.os.AsyncTask
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
-import android.widget.Button
-import android.widget.ProgressBar
-import android.widget.TextView
+import android.view.ViewGroup
 import android.widget.Toast
+import androidx.core.widget.addTextChangedListener
+import androidx.fragment.app.Fragment
 import butterknife.*
 import com.tari.android.wallet.R
+import com.tari.android.wallet.databinding.FragmentBaseNodeConfigBinding
 import com.tari.android.wallet.ffi.FFIPublicKey
 import com.tari.android.wallet.ffi.FFIWallet
 import com.tari.android.wallet.ffi.HexString
+import com.tari.android.wallet.ui.extension.appComponent
 import com.tari.android.wallet.ui.extension.gone
 import com.tari.android.wallet.ui.extension.invisible
 import com.tari.android.wallet.ui.extension.visible
-import com.tari.android.wallet.ui.fragment.BaseFragment
 import com.tari.android.wallet.ui.util.UiUtil
 import com.tari.android.wallet.util.SharedPrefsWrapper
 import javax.inject.Inject
@@ -63,29 +65,11 @@ import javax.inject.Inject
  *
  * @author The Tari Development Team
  */
-internal class BaseNodeConfigFragment : BaseFragment() {
-
-    @BindView(R.id.base_node_config_vw_root)
-    lateinit var rootView: View
-    @BindView(R.id.base_node_config_txt_public_key_hex)
-    lateinit var publicKeyHexTextView: TextView
-    @BindView(R.id.base_node_config_txt_address)
-    lateinit var addressTextView: TextView
-    @BindView(R.id.base_node_config_edit_public_key)
-    lateinit var publicKeyHexEditText: TextView
-    @BindView(R.id.base_node_config_txt_invalid_public_key)
-    lateinit var invalidPublicKeyHexTextView: TextView
-    @BindView(R.id.base_node_config_edit_address)
-    lateinit var addressEditText: TextView
-    @BindView(R.id.base_node_config_txt_invalid_address)
-    lateinit var invalidAddressTextView: TextView
-    @BindView(R.id.base_node_config_btn_save)
-    lateinit var saveButton: Button
-    @BindView(R.id.base_node_config_progress_bar)
-    lateinit var progressBar: ProgressBar
+internal class BaseNodeConfigFragment : Fragment() {
 
     @BindDrawable(R.drawable.base_node_config_edit_text_bg)
     lateinit var editTextBgDrawable: Drawable
+
     @BindDrawable(R.drawable.base_node_config_edit_text_invalid_bg)
     lateinit var editTextInvalidBgDrawable: Drawable
 
@@ -100,17 +84,27 @@ internal class BaseNodeConfigFragment : BaseFragment() {
     private val publicKeyRegex = Regex("[a-zA-Z0-9]{64}")
     private val addressRegex = Regex("/onion[2-3]/[a-zA-Z2-7]{56}(:[0-9]+)?")
 
-    override val contentViewId = R.layout.fragment_base_node_config
+    private var _ui: FragmentBaseNodeConfigBinding? = null
+    private val ui get() = _ui!!
+
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? =
+        FragmentBaseNodeConfigBinding.inflate(inflater, container, false)
+            .also { _ui = it }
+            .root
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _ui = null
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        publicKeyHexTextView.text = sharedPrefsWrapper.baseNodePublicKeyHex
-        addressTextView.text = sharedPrefsWrapper.baseNodeAddress
-        UiUtil.setProgressBarColor(progressBar, whiteColor)
-        progressBar.gone()
-        invalidPublicKeyHexTextView.invisible()
-        invalidAddressTextView.invisible()
+        BaseNodeConfigFragmentVisitor.visit(this, view)
+        setupUi()
     }
 
     override fun onStart() {
@@ -118,16 +112,32 @@ internal class BaseNodeConfigFragment : BaseFragment() {
         checkClipboardForValidInput()
     }
 
-    @OnTextChanged(R.id.base_node_config_edit_public_key)
-    fun onPublicKeyHexChanged() {
-        publicKeyHexEditText.background = editTextBgDrawable
-        invalidPublicKeyHexTextView.invisible()
+    private fun setupUi() {
+        UiUtil.setProgressBarColor(ui.progressBar, whiteColor)
+        ui.apply {
+            publicKeyHexTextView.text = sharedPrefsWrapper.baseNodePublicKeyHex
+            addressTextView.text = sharedPrefsWrapper.baseNodeAddress
+            progressBar.gone()
+            invalidPublicKeyHexTextView.invisible()
+            invalidAddressTextView.invisible()
+            saveButton.setOnClickListener { saveButtonClicked(it) }
+            publicKeyHexEditText.addTextChangedListener(
+                onTextChanged = { _, _, _, _ -> onPublicKeyHexChanged() }
+            )
+            addressEditText.addTextChangedListener(
+                onTextChanged = { _, _, _, _ -> onAddressChanged() }
+            )
+        }
     }
 
-    @OnTextChanged(R.id.base_node_config_edit_address)
-    fun onAddressChanged() {
-        addressEditText.background = editTextBgDrawable
-        invalidAddressTextView.invisible()
+    private fun onPublicKeyHexChanged() {
+        ui.publicKeyHexEditText.background = editTextBgDrawable
+        ui.invalidPublicKeyHexTextView.invisible()
+    }
+
+    private fun onAddressChanged() {
+        ui.addressEditText.background = editTextBgDrawable
+        ui.invalidAddressTextView.invisible()
     }
 
     /**
@@ -141,47 +151,46 @@ internal class BaseNodeConfigFragment : BaseFragment() {
         // if clipboard contains at least 1 emoji, then display paste emoji banner
         if (clipboardRegex.matches(clipboardString)) {
             val input = clipboardString.split("::")
-            publicKeyHexEditText.text = input[0]
-            addressEditText.text = input[1]
+            ui.publicKeyHexEditText.setText(input[0])
+            ui.addressEditText.setText(input[1])
         }
     }
 
     private fun validate(): Boolean {
         var isValid = true
         // validate public key
-        val publicKeyHex = publicKeyHexEditText.editableText.toString()
+        val publicKeyHex = ui.publicKeyHexEditText.editableText.toString()
         if (!publicKeyRegex.matches(publicKeyHex)) {
             isValid = false
-            publicKeyHexEditText.background = editTextInvalidBgDrawable
-            invalidPublicKeyHexTextView.visible()
+            ui.publicKeyHexEditText.background = editTextInvalidBgDrawable
+            ui.invalidPublicKeyHexTextView.visible()
         } else {
-            publicKeyHexEditText.background = editTextBgDrawable
-            invalidPublicKeyHexTextView.invisible()
+            ui.publicKeyHexEditText.background = editTextBgDrawable
+            ui.invalidPublicKeyHexTextView.invisible()
         }
         // validate address
-        val address = addressEditText.editableText.toString()
+        val address = ui.addressEditText.editableText.toString()
         if (!addressRegex.matches(address)) {
             isValid = false
-            addressEditText.background = editTextInvalidBgDrawable
-            invalidAddressTextView.visible()
+            ui.addressEditText.background = editTextInvalidBgDrawable
+            ui.invalidAddressTextView.visible()
         } else {
-            addressEditText.background = editTextBgDrawable
-            invalidAddressTextView.invisible()
+            ui.addressEditText.background = editTextBgDrawable
+            ui.invalidAddressTextView.invisible()
         }
         return isValid
     }
 
-    @OnClick(R.id.base_node_config_btn_save)
-    fun saveButtonClicked(view: View) {
+    private fun saveButtonClicked(view: View) {
         UiUtil.temporarilyDisableClick(view)
         // validate
         if (!validate()) {
             return
         }
-        val publicKeyHex = publicKeyHexEditText.editableText.toString()
-        val address = addressEditText.editableText.toString()
-        saveButton.invisible()
-        progressBar.visible()
+        val publicKeyHex = ui.publicKeyHexEditText.editableText.toString()
+        val address = ui.addressEditText.editableText.toString()
+        ui.saveButton.invisible()
+        ui.progressBar.visible()
         AsyncTask.execute {
             addBaseNodePeer(publicKeyHex, address)
         }
@@ -191,7 +200,7 @@ internal class BaseNodeConfigFragment : BaseFragment() {
         val baseNodeKeyFFI = FFIPublicKey(HexString(publicKeyHex))
         val success = FFIWallet.instance!!.addBaseNodePeer(baseNodeKeyFFI, address)
         baseNodeKeyFFI.destroy()
-        rootView.post {
+        ui.rootView.post {
             if (success) {
                 addBaseNodePeerSuccessful(publicKeyHex, address)
                 // show toast
@@ -204,17 +213,17 @@ internal class BaseNodeConfigFragment : BaseFragment() {
     private fun addBaseNodePeerSuccessful(publicKeyHex: String, address: String) {
         val mActivity = activity ?: return
         // clear input
-        publicKeyHexEditText.text = ""
-        addressEditText.text = ""
+        ui.publicKeyHexEditText.setText("")
+        ui.addressEditText.setText("")
         // update UI
-        publicKeyHexTextView.text = publicKeyHex
-        addressTextView.text = address
+        ui.publicKeyHexTextView.text = publicKeyHex
+        ui.addressTextView.text = address
         // update app-wide variables
         sharedPrefsWrapper.baseNodePublicKeyHex = publicKeyHex
         sharedPrefsWrapper.baseNodeAddress = address
         // UI
-        saveButton.visible()
-        progressBar.gone()
+        ui.saveButton.visible()
+        ui.progressBar.gone()
         // show toast
         Toast.makeText(
             mActivity,
@@ -226,14 +235,21 @@ internal class BaseNodeConfigFragment : BaseFragment() {
     private fun addBaseNodePeerFailed() {
         val mActivity = activity ?: return
         // UI update
-        saveButton.visible()
-        progressBar.gone()
+        ui.saveButton.visible()
+        ui.progressBar.gone()
         // show toast
         Toast.makeText(
             mActivity,
             R.string.debug_edit_base_node_failed,
             Toast.LENGTH_LONG
         ).show()
+    }
+
+    private object BaseNodeConfigFragmentVisitor {
+        internal fun visit(fragment: BaseNodeConfigFragment, view: View) {
+            fragment.requireActivity().appComponent.inject(fragment)
+            ButterKnife.bind(fragment, view)
+        }
     }
 
 }

@@ -2,14 +2,14 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/home_vw_root"
+    android:id="@+id/root_view"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/white"
     tools:context=".ui.activity.home.HomeActivity">
 
     <View
-        android:id="@+id/home_vw_gradient_bg"
+        android:id="@+id/gradient_background_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:alpha="1"
@@ -17,7 +17,7 @@
 
     <!-- top content -->
     <RelativeLayout
-        android:id="@+id/home_vw_top_content_container"
+        android:id="@+id/top_content_container_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/common_horizontal_margin"
@@ -26,18 +26,18 @@
 
         <!-- store icon (image only) -->
         <ImageView
-            android:id="@+id/home_img_store_icon"
+            android:id="@+id/store_image_view"
             android:layout_width="30dp"
             android:layout_height="30dp"
             android:layout_marginEnd="10dp"
-            android:layout_toStartOf="@id/home_img_wallet_info"
+            android:layout_toStartOf="@id/wallet_info_image_view"
             android:contentDescription="@null"
             android:scaleType="center"
             android:src="@drawable/store_icon" />
 
         <!-- profile icon (image only) -->
         <ImageView
-            android:id="@+id/home_img_wallet_info"
+            android:id="@+id/wallet_info_image_view"
             android:layout_width="30dp"
             android:layout_height="30dp"
             android:layout_alignParentEnd="true"
@@ -47,13 +47,13 @@
 
         <!-- title -->
         <com.tari.android.wallet.ui.component.CustomFontTextView
-            android:id="@+id/home_txt_available_balance"
+            android:id="@+id/available_balance_text_view"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentStart="true"
             android:layout_marginTop="12dp"
             android:layout_marginEnd="4dp"
-            android:layout_toStartOf="@+id/home_img_wallet_info"
+            android:layout_toStartOf="@+id/wallet_info_image_view"
             android:letterSpacing="-0.018"
             android:text="@string/home_available_balance"
             android:textColor="@color/white"
@@ -63,17 +63,17 @@
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="@dimen/home_balance_digit_height"
-            android:layout_below="@id/home_txt_available_balance"
+            android:layout_below="@id/available_balance_text_view"
             android:layout_alignParentStart="true"
             android:layout_marginTop="4dp"
             android:layout_marginEnd="4dp"
-            android:layout_toStartOf="@+id/home_img_wallet_info"
+            android:layout_toStartOf="@+id/wallet_info_image_view"
             android:gravity="center_vertical"
             android:orientation="horizontal">
 
             <!-- gem icon -->
             <ImageView
-                android:id="@+id/home_img_balance_gem"
+                android:id="@+id/balance_gem_image_view"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:contentDescription="@null"
@@ -86,7 +86,7 @@
                 android:orientation="horizontal">
 
                 <LinearLayout
-                    android:id="@+id/home_vw_balance_digit_container"
+                    android:id="@+id/balance_digit_container_view"
                     android:layout_width="wrap_content"
                     android:layout_height="@dimen/home_balance_digit_height"
                     android:layout_marginTop="-4dp"
@@ -96,7 +96,7 @@
 
                 <!-- decimals -->
                 <LinearLayout
-                    android:id="@+id/home_balance_vw_decimals_digit_container"
+                    android:id="@+id/balance_decimals_digit_container_view"
                     android:layout_width="wrap_content"
                     android:layout_height="@dimen/home_balance_digit_decimal_height"
                     android:layout_marginTop="6dp"
@@ -114,7 +114,7 @@
     </RelativeLayout>
 
     <View
-        android:id="@+id/home_vw_tx_list_bg_overlay"
+        android:id="@+id/tx_list_overlay_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:alpha="0"
@@ -122,20 +122,20 @@
         android:clickable="false" />
 
     <com.tari.android.wallet.ui.activity.home.CustomScrollView
-        android:id="@+id/home_scroll_view"
+        android:id="@+id/scroll_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:clickable="false"
         android:overScrollMode="never">
 
         <RelativeLayout
-            android:id="@+id/home_vw_scroll_content"
+            android:id="@+id/scroll_content_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
             <RelativeLayout
-                android:id="@+id/home_vw_scroll_bg_enabler"
+                android:id="@+id/scroll_bg_enabler_view"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/home_tx_list_container_minimized_top_margin"
                 android:clipChildren="true">
@@ -143,18 +143,18 @@
                 <!-- store button -->
                 <!-- actual action button on top of the background image-only view -->
                 <Button
-                    android:id="@+id/home_btn_store"
+                    android:id="@+id/store_button"
                     android:layout_width="40dp"
                     android:layout_height="40dp"
                     android:layout_marginTop="@dimen/home_wallet_info_button_initial_top_margin"
                     android:layout_marginEnd="0dp"
-                    android:layout_toStartOf="@id/home_btn_wallet_info"
+                    android:layout_toStartOf="@id/wallet_info_button"
                     android:background="@color/transparent" />
 
                 <!-- wallet info (profile) button -->
                 <!-- actual action button on top of the background image-only view -->
                 <Button
-                    android:id="@+id/home_btn_wallet_info"
+                    android:id="@+id/wallet_info_button"
                     android:layout_width="40dp"
                     android:layout_height="40dp"
                     android:layout_alignParentEnd="true"
@@ -168,22 +168,22 @@
             <View
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
-                android:layout_below="@id/home_vw_grabber_container"
+                android:layout_below="@id/grabber_container_view"
                 android:layout_marginTop="-25dp"
                 android:background="@color/white" />
 
             <LinearLayout
-                android:id="@+id/home_vw_grabber_container"
+                android:id="@+id/grabber_container_view"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/home_grabber_container_height"
-                android:layout_below="@+id/home_vw_scroll_bg_enabler"
+                android:layout_below="@+id/scroll_bg_enabler_view"
                 android:background="@drawable/home_grabber_bg"
                 android:clickable="true"
                 android:focusable="true"
                 android:gravity="center">
 
                 <View
-                    android:id="@+id/home_vw_grabber"
+                    android:id="@+id/grabber_view"
                     android:layout_width="@dimen/home_grabber_width"
                     android:layout_height="@dimen/home_grabber_height"
                     android:background="@drawable/home_grabber" />
@@ -192,15 +192,15 @@
             <FrameLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/home_vw_grabber_container">
+                android:layout_below="@id/grabber_container_view">
 
                 <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-                    android:id="@+id/home_swipe_container"
+                    android:id="@+id/swipe_refresh_layout"
                     android:layout_width="match_parent"
                     android:layout_height="600dp">
 
                     <androidx.recyclerview.widget.RecyclerView
-                        android:id="@+id/home_rv_tx_list"
+                        android:id="@+id/tx_recycler_view"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:background="@color/white"
@@ -209,7 +209,7 @@
                 </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
                 <LinearLayout
-                    android:id="@+id/home_vw_onboarding_content"
+                    android:id="@+id/onboarding_content_view"
                     android:layout_width="match_parent"
                     android:layout_height="600dp"
                     android:background="@color/white"
@@ -258,7 +258,7 @@
                 </LinearLayout>
 
                 <com.tari.android.wallet.ui.component.CustomFontTextView
-                    android:id="@+id/home_txt_no_txs_info"
+                    android:id="@+id/no_txs_info_text_view"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
@@ -276,7 +276,7 @@
     </com.tari.android.wallet.ui.activity.home.CustomScrollView>
 
     <View
-        android:id="@+id/home_vw_send_tari_btn_bg_gradient"
+        android:id="@+id/send_tari_button_gradient_view"
         android:layout_width="match_parent"
         android:layout_height="100dp"
         android:layout_alignParentBottom="true"
@@ -286,7 +286,7 @@
         android:focusable="false" />
 
     <com.tari.android.wallet.ui.component.CustomFontButton
-        android:id="@+id/home_btn_send_tari"
+        android:id="@+id/send_tari_button"
         android:layout_width="@dimen/home_send_tari_button_width"
         android:layout_height="@dimen/common_action_button_height"
         android:layout_alignParentBottom="true"
@@ -303,14 +303,14 @@
 
     <!-- Transactions header -->
     <RelativeLayout
-        android:id="@+id/home_vw_tx_list_header"
+        android:id="@+id/tx_list_header_view"
         android:layout_width="match_parent"
         android:layout_height="@dimen/common_header_height"
         android:layout_marginTop="0dp"
         android:background="@color/white">
 
         <ImageButton
-            android:id="@+id/home_btn_close_tx_list"
+            android:id="@+id/close_tx_list_button"
             android:layout_width="50dp"
             android:layout_height="match_parent"
             android:background="@color/transparent"
@@ -318,7 +318,7 @@
             android:src="@drawable/close_icon" />
 
         <com.tari.android.wallet.ui.component.CustomFontTextView
-            android:id="@+id/home_txt_tx_list_title"
+            android:id="@+id/tx_list_title_text_view"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
@@ -331,16 +331,16 @@
 
     <!-- depth gradient -->
     <View
-        android:id="@+id/home_vw_header_elevation"
+        android:id="@+id/header_elevation_view"
         android:layout_width="match_parent"
         android:layout_height="@dimen/common_scroll_height_gradient_height"
-        android:layout_below="@id/home_vw_tx_list_header"
+        android:layout_below="@id/tx_list_header_view"
         android:alpha="0.8"
         android:background="@drawable/view_elevation_gradient" />
 
     <!-- utilized to disable user interaction during the start-up animations -->
     <View
-        android:id="@+id/home_vw_blocker"
+        android:id="@+id/blocker_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:clickable="true"

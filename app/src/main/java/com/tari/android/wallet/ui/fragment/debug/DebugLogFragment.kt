@@ -37,20 +37,21 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.widget.AdapterView
-import android.widget.ImageButton
-import android.widget.Spinner
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.FileProvider
+import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import butterknife.BindString
-import butterknife.BindView
-import butterknife.OnClick
+import butterknife.ButterKnife
 import com.tari.android.wallet.R
+import com.tari.android.wallet.databinding.FragmentDebugLogBinding
 import com.tari.android.wallet.di.WalletModule
-import com.tari.android.wallet.ui.fragment.BaseFragment
+import com.tari.android.wallet.ui.extension.appComponent
 import com.tari.android.wallet.ui.fragment.debug.adapter.LogFileSpinnerAdapter
 import com.tari.android.wallet.ui.fragment.debug.adapter.LogListAdapter
 import com.tari.android.wallet.ui.util.UiUtil
@@ -68,14 +69,7 @@ import javax.inject.Named
  *
  * @author The Tari Development Team
  */
-internal class DebugLogFragment : BaseFragment(), AdapterView.OnItemSelectedListener {
-
-    override val contentViewId = R.layout.fragment_debug_log
-
-    @BindView(R.id.debug_log_file_spinner)
-    lateinit var spinner: Spinner
-    @BindView(R.id.debug_log_recycler_view)
-    lateinit var recyclerView: RecyclerView
+internal class DebugLogFragment : Fragment(), AdapterView.OnItemSelectedListener {
 
     @BindString(R.string.ffi_admin_email_address)
     lateinit var ffiAdminEmailAddress: String
@@ -110,30 +104,74 @@ internal class DebugLogFragment : BaseFragment(), AdapterView.OnItemSelectedList
     private lateinit var recyclerViewAdapter: LogListAdapter
     private lateinit var recyclerViewLayoutManager: RecyclerView.LayoutManager
 
+    private var _ui: FragmentDebugLogBinding? = null
+    private val ui get() = _ui!!
+
     private val numberOfLogsFilesToShare = 2
     private val maxLogZipFileSizeBytes = 25 * 1024 * 1024
 
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? = FragmentDebugLogBinding.inflate(inflater, container, false).also { _ui = it }.root
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        ui.recyclerView.layoutManager = null
+        ui.recyclerView.adapter = null
+        _ui = null
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        DebugLogFragmentVisitor.visit(this, view)
+        setupUi()
+    }
 
+    private fun setupUi() {
         // read log files
         logFiles = WalletUtil.getLogFilesFromDirectory(logFilesDirPath)
 
         // initialize recycler view
         recyclerViewLayoutManager = LinearLayoutManager(activity)
-        recyclerView.layoutManager = recyclerViewLayoutManager
         recyclerViewAdapter = LogListAdapter(selectedLogFileLines)
-        recyclerView.adapter = recyclerViewAdapter
-        spinner.onItemSelectedListener = this
-
         spinnerAdapter = LogFileSpinnerAdapter(context!!, logFiles)
-        spinner.adapter = spinnerAdapter
+        ui.apply {
+            recyclerView.layoutManager = recyclerViewLayoutManager
+            recyclerView.adapter = recyclerViewAdapter
+            fileSpinner.onItemSelectedListener = this@DebugLogFragment
+            fileSpinner.adapter = spinnerAdapter
+            scrollToTopButton.setOnClickListener { onScrollToTopButtonClicked() }
+            scrollToBottomButton.setOnClickListener { onScrollToBottomButtonClicked() }
+            shareButton.setOnClickListener { showShareLogFilesDialog() }
+        }
     }
 
-    override fun onDestroyView() {
-        recyclerView.layoutManager = null
-        recyclerView.adapter = null
-        super.onDestroyView()
+    private fun onScrollToTopButtonClicked() {
+        UiUtil.temporarilyDisableClick(ui.scrollToTopButton)
+        ui.recyclerView.scrollToPosition(0)
+    }
+
+    private fun onScrollToBottomButtonClicked() {
+        UiUtil.temporarilyDisableClick(ui.scrollToBottomButton)
+        ui.recyclerView.scrollToPosition(selectedLogFileLines.lastIndex)
+    }
+
+    private fun showShareLogFilesDialog() {
+        UiUtil.temporarilyDisableClick(ui.shareButton)
+        AlertDialog.Builder(context ?: return)
+            .setMessage(getString(R.string.debug_log_share_dialog_content))
+            .setCancelable(false)
+            .setPositiveButton(getString(R.string.common_confirm)) { dialog, _ ->
+                dialog.cancel()
+                Thread(this::zipAndEmailLogFiles).start()
+            }
+            // negative button text and action
+            .setNegativeButton(getString(R.string.exit)) { dialog, _ -> dialog.cancel() }
+            .setTitle(getString(R.string.debug_log_share_dialog_title))
+            .create()
+            .show()
     }
 
     override fun onNothingSelected(parent: AdapterView<*>?) {
@@ -141,57 +179,22 @@ internal class DebugLogFragment : BaseFragment(), AdapterView.OnItemSelectedList
     }
 
     override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-        recyclerView.scrollToPosition(0)
+        ui.recyclerView.scrollToPosition(0)
         selectedLogFile = logFiles[position]
         updateLogLines()
     }
 
     private fun updateLogLines() {
-        recyclerView.alpha = 0f
+        ui.recyclerView.alpha = 0f
         selectedLogFileLines.clear()
         val inputStream: InputStream = selectedLogFile.inputStream()
         inputStream.bufferedReader()
             .useLines { lines -> lines.forEach { selectedLogFileLines.add(it) } }
         recyclerViewAdapter.notifyDataSetChanged()
-        val anim = ObjectAnimator.ofFloat(recyclerView, "alpha", 0f, 1f)
+        val anim = ObjectAnimator.ofFloat(ui.recyclerView, "alpha", 0f, 1f)
         anim.duration = Constants.UI.mediumDurationMs
         anim.startDelay = Constants.UI.shortDurationMs
         anim.start()
-    }
-
-    @OnClick(R.id.debug_log_btn_scroll_to_top)
-    fun onScrollToTopButtonClicked(button: ImageButton) {
-        UiUtil.temporarilyDisableClick(button)
-        recyclerView.scrollToPosition(0)
-    }
-
-    @OnClick(R.id.debug_log_btn_scroll_to_bottom)
-    fun onScrollToTopBottomClicked(button: ImageButton) {
-        UiUtil.temporarilyDisableClick(button)
-        recyclerView.scrollToPosition(
-            selectedLogFileLines.size - 1
-        )
-    }
-
-    @OnClick(R.id.debug_log_btn_share)
-    fun showShareLogFilesDialog(view: View) {
-        UiUtil.temporarilyDisableClick(view)
-        val dialogBuilder = AlertDialog.Builder(context ?: return)
-        val dialog = dialogBuilder.setMessage(getString(R.string.debug_log_share_dialog_content))
-            .setCancelable(false)
-            .setPositiveButton(getString(R.string.common_confirm)) { dialog, _ ->
-                dialog.cancel()
-                Thread {
-                    zipAndEmailLogFiles()
-                }.start()
-            }
-            // negative button text and action
-            .setNegativeButton(getString(R.string.exit)) { dialog, _ ->
-                dialog.cancel()
-            }
-            .setTitle(getString(R.string.debug_log_share_dialog_title))
-            .create()
-        dialog.show()
     }
 
     private fun zipAndEmailLogFiles() {
@@ -279,6 +282,13 @@ internal class DebugLogFragment : BaseFragment(), AdapterView.OnItemSelectedList
                 sharePrompt
             )
         )
+    }
+
+    private object DebugLogFragmentVisitor {
+        internal fun visit(fragment: DebugLogFragment, view: View) {
+            fragment.requireActivity().appComponent.inject(fragment)
+            ButterKnife.bind(fragment, view)
+        }
     }
 
 }

@@ -33,13 +33,8 @@
 package com.tari.android.wallet.ui.fragment.send.adapter
 
 import android.view.View
-import android.widget.ImageView
-import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import butterknife.BindView
-import butterknife.ButterKnife
-import butterknife.OnClick
-import com.tari.android.wallet.R
+import com.tari.android.wallet.databinding.AddRecipientListItemBinding
 import com.tari.android.wallet.model.Contact
 import com.tari.android.wallet.model.User
 import com.tari.android.wallet.ui.component.EmojiIdSummaryViewController
@@ -55,29 +50,17 @@ import java.util.*
  * @author The Tari Development Team
  */
 class RecipientViewHolder(view: View, listener: Listener) :
-    RecyclerView.ViewHolder(view),
-    View.OnClickListener {
+    RecyclerView.ViewHolder(view), View.OnClickListener {
 
-    @BindView(R.id.add_recipient_list_item_txt_initial)
-    lateinit var initialTextView: TextView
-    @BindView(R.id.add_recipient_list_item_img_profile_icon)
-    lateinit var profileIconImageView: ImageView
-    @BindView(R.id.add_recipient_list_item_txt_alias)
-    lateinit var aliasTextView: TextView
-    @BindView(R.id.add_recipient_list_item_vw_emoji_summary)
-    lateinit var emojiIdSummaryView: View
-
+    private val ui = AddRecipientListItemBinding.bind(view)
+    private val listenerWR: WeakReference<Listener> = WeakReference(listener)
+    private var emojiIdSummaryController = EmojiIdSummaryViewController(ui.emojiSummaryView)
     private lateinit var userWR: WeakReference<User>
-    private var listenerWR: WeakReference<Listener>
-    private var emojiIdSummaryController: EmojiIdSummaryViewController
 
     init {
-        ButterKnife.bind(this, view)
-        listenerWR = WeakReference(listener)
-        emojiIdSummaryController = EmojiIdSummaryViewController(emojiIdSummaryView)
+        ui.rootView.setOnClickListener(this)
     }
 
-    @OnClick(R.id.add_recipient_list_item_vw_root)
     override fun onClick(view: View) {
         UiUtil.temporarilyDisableClick(view)
         listenerWR.get()?.onRecipientSelected(userWR.get()!!)
@@ -86,18 +69,18 @@ class RecipientViewHolder(view: View, listener: Listener) :
     fun bind(user: User) {
         userWR = WeakReference(user)
         if (user is Contact) {
-            aliasTextView.visible()
-            emojiIdSummaryView.gone()
-            profileIconImageView.gone()
-            initialTextView.visible()
+            ui.aliasTextView.visible()
+            ui.emojiSummaryView.root.gone()
+            ui.profileIconImageView.gone()
+            ui.initialTextView.visible()
 
-            initialTextView.text = user.alias.take(1).toUpperCase(Locale.getDefault())
-            aliasTextView.text = user.alias
+            ui.initialTextView.text = user.alias.take(1).toUpperCase(Locale.getDefault())
+            ui.aliasTextView.text = user.alias
         } else {
-            aliasTextView.gone()
-            emojiIdSummaryView.visible()
-            profileIconImageView.visible()
-            initialTextView.gone()
+            ui.aliasTextView.gone()
+            ui.emojiSummaryView.root.visible()
+            ui.profileIconImageView.visible()
+            ui.initialTextView.gone()
 
             emojiIdSummaryController.display(
                 user.publicKey.emojiId

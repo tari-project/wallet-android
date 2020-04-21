@@ -32,7 +32,9 @@
  */
 package com.tari.android.wallet.ui.activity.home
 
-import android.animation.*
+import android.animation.AnimatorSet
+import android.animation.ObjectAnimator
+import android.animation.ValueAnimator
 import android.annotation.SuppressLint
 import android.content.ComponentName
 import android.content.Context
@@ -43,12 +45,13 @@ import android.net.Uri
 import android.os.*
 import android.view.MotionEvent
 import android.view.View
-import android.view.ViewGroup
 import android.view.animation.AccelerateInterpolator
 import android.view.animation.Animation
 import android.view.animation.DecelerateInterpolator
 import android.view.animation.ScaleAnimation
-import android.widget.*
+import android.widget.TextView
+import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.animation.addListener
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -60,6 +63,8 @@ import com.daasuu.ei.EasingInterpolator
 import com.orhanobut.logger.Logger
 import com.tari.android.wallet.R
 import com.tari.android.wallet.application.DeepLink
+import com.tari.android.wallet.application.TariWalletApplication
+import com.tari.android.wallet.databinding.ActivityHomeBinding
 import com.tari.android.wallet.event.Event
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.extension.applyFontStyle
@@ -67,7 +72,6 @@ import com.tari.android.wallet.model.*
 import com.tari.android.wallet.network.NetworkConnectionState
 import com.tari.android.wallet.service.TariWalletService
 import com.tari.android.wallet.service.WalletService
-import com.tari.android.wallet.ui.activity.BaseActivity
 import com.tari.android.wallet.ui.activity.SplashActivity
 import com.tari.android.wallet.ui.activity.debug.DebugActivity
 import com.tari.android.wallet.ui.activity.home.adapter.TxListAdapter
@@ -77,11 +81,8 @@ import com.tari.android.wallet.ui.activity.tx.TxDetailActivity
 import com.tari.android.wallet.ui.component.CustomFont
 import com.tari.android.wallet.ui.dialog.BottomSlideDialog
 import com.tari.android.wallet.ui.extension.*
-import com.tari.android.wallet.ui.extension.gone
-import com.tari.android.wallet.ui.extension.invisible
-import com.tari.android.wallet.ui.extension.scrollToTop
-import com.tari.android.wallet.ui.extension.showInternetConnectionErrorDialog
 import com.tari.android.wallet.ui.fragment.send.FinalizeSendTxFragment
+import com.tari.android.wallet.ui.fragment.send.FinalizeSendTxFragment.FailureReason.*
 import com.tari.android.wallet.ui.util.UiUtil
 import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.SharedPrefsWrapper
@@ -91,85 +92,19 @@ import java.lang.ref.WeakReference
 import javax.inject.Inject
 import kotlin.math.max
 import kotlin.math.min
-import com.tari.android.wallet.ui.fragment.send.FinalizeSendTxFragment.FailureReason.*
 
 /**
  * Home activity - transaction list.
  *
  * @author The Tari Development Team
  */
-internal class HomeActivity : BaseActivity(),
+internal class HomeActivity : AppCompatActivity(),
     ServiceConnection,
     SwipeRefreshLayout.OnRefreshListener,
     View.OnScrollChangeListener,
     View.OnTouchListener,
     Animation.AnimationListener,
     TxListAdapter.Listener {
-
-    @BindView(R.id.home_vw_root)
-    lateinit var rootView: View
-    @BindView(R.id.home_vw_blocker)
-    lateinit var blockerView: View
-    @BindView(R.id.home_vw_top_content_container)
-    lateinit var topContentContainerView: View
-    @BindView(R.id.home_vw_gradient_bg)
-    lateinit var gradientBgView: View
-    @BindView(R.id.home_swipe_container)
-    lateinit var swipeRefreshLayout: SwipeRefreshLayout
-    @BindView(R.id.home_rv_tx_list)
-    lateinit var recyclerView: RecyclerView
-
-    // transaction list
-    @BindView(R.id.home_vw_tx_list_header)
-    lateinit var txListHeaderView: View
-    @BindView(R.id.home_btn_close_tx_list)
-    lateinit var minimizeTxListButton: ImageButton
-    @BindView(R.id.home_txt_tx_list_title)
-    lateinit var txListTitleTextView: TextView
-    @BindView(R.id.home_vw_grabber_container)
-    lateinit var grabberContainerView: View
-    @BindView(R.id.home_vw_grabber)
-    lateinit var grabberView: View
-    @BindView(R.id.home_vw_tx_list_bg_overlay)
-    lateinit var txListBgOverlayView: View
-    @BindView(R.id.home_vw_header_elevation)
-    lateinit var headerElevationView: View
-    @BindView(R.id.home_btn_send_tari)
-    lateinit var sendTariButton: Button
-    @BindView(R.id.home_vw_send_tari_btn_bg_gradient)
-    lateinit var sendTariButtonBgGradientView: View
-
-    // Balance views.
-    @BindView(R.id.home_txt_available_balance)
-    lateinit var balanceTitleTextView: TextView
-    @BindView(R.id.home_img_balance_gem)
-    lateinit var balanceGemImageView: ImageView
-    @BindView(R.id.home_img_store_icon)
-    lateinit var storeIconImageView: ImageView
-    @BindView(R.id.home_img_wallet_info)
-    lateinit var userWalletInfoImageView: ImageView
-    @BindView(R.id.home_btn_store)
-    lateinit var storeButton: Button
-    @BindView(R.id.home_btn_wallet_info)
-    lateinit var userWalletInfoButton: Button
-
-    // Balance digit containers.
-    @BindView(R.id.home_vw_balance_digit_container)
-    lateinit var balanceDigitContainerView: ViewGroup
-    @BindView(R.id.home_balance_vw_decimals_digit_container)
-    lateinit var balanceDecimalDigitContainerView: ViewGroup
-    @BindView(R.id.home_scroll_view)
-    lateinit var scrollView: CustomScrollView
-    @BindView(R.id.home_vw_scroll_bg_enabler)
-    lateinit var scrollBgEnabler: View
-    @BindView(R.id.home_vw_scroll_content)
-    lateinit var scrollContentView: View
-
-    // onboarding content
-    @BindView(R.id.home_vw_onboarding_content)
-    lateinit var onboardingContentView: ViewGroup
-    @BindView(R.id.home_txt_no_txs_info)
-    lateinit var noTxsInfoTextView: TextView
 
     @BindDimen(R.dimen.home_top_content_container_view_top_margin)
     @JvmField
@@ -213,7 +148,6 @@ internal class HomeActivity : BaseActivity(),
     @BindDimen(R.dimen.home_wallet_info_button_initial_top_margin)
     @JvmField
     var walletInfoButtonInitialTopMargin = 0
-
     @BindColor(R.color.white)
     @JvmField
     var whiteColor = 0
@@ -236,7 +170,6 @@ internal class HomeActivity : BaseActivity(),
     lateinit var firstTestnetUTXOMessage: String
     @BindString(R.string.second_testnet_utxo_tx_message)
     lateinit var secondTestnetUTXOMessage: String
-
     @BindString(R.string.error_no_connection_title)
     lateinit var sendErrorNetworkConnectionTitle: String
     @BindString(R.string.error_no_connection_description)
@@ -248,8 +181,11 @@ internal class HomeActivity : BaseActivity(),
 
     @Inject
     lateinit var sharedPrefsWrapper: SharedPrefsWrapper
+
     @Inject
     lateinit var tracker: Tracker
+
+    private lateinit var ui: ActivityHomeBinding
 
     // tx list
     private lateinit var recyclerViewAdapter: TxListAdapter
@@ -285,6 +221,7 @@ internal class HomeActivity : BaseActivity(),
     private val onboardingInterstitialTimeMs = 4500L
     private val secondUTXOImportDelayTimeMs = 1500L
     private val secondUTXOStoreModalDelayTimeMs = 3000L
+
     // this flag is set if the testnet
     private var testnetTariRequestIsWaitingOnConnection = false
 
@@ -293,12 +230,12 @@ internal class HomeActivity : BaseActivity(),
      */
     private var scrollListener = ScrollListener(this)
 
-    override val contentViewId = R.layout.activity_home
-
     // region lifecycle functions
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        ui = ActivityHomeBinding.inflate(layoutInflater).apply { setContentView(root) }
+        HomeActivityVisitor.visit(this)
         overridePendingTransition(0, 0)
 
         // the code below will send the user back to the very startup of the app
@@ -312,46 +249,60 @@ internal class HomeActivity : BaseActivity(),
             finish()
             return
         }
+        setupUi()
+        subscribeToEventBus()
+        TrackHelper.track()
+            .screen("/home")
+            .title("Home - Transaction List")
+            .with(tracker)
+    }
 
+    private fun setupUi() {
         /* commented out to fix the UI cutout issue
         makeStatusBarTransparent() --
-        ViewCompat.setOnApplyWindowInsetsListener(rootView) { _, insets ->
+        ViewCompat.setOnApplyWindowInsetsListener(ui.rootView) { _, insets ->
             insets.consumeSystemWindowInsets()
         }
          */
 
         // hide tx list header
-        UiUtil.setTopMargin(txListHeaderView, -txListHeaderHeight)
+        UiUtil.setTopMargin(ui.txListHeaderView, -txListHeaderHeight)
 
         setupSwipeRefreshLayout()
         setupRecyclerView()
         setTouchListeners()
 
-        headerElevationView.alpha = 0f
-        sendTariButton.alpha = 0f
-        sendTariButtonBgGradientView.alpha = 0f
+        ui.apply {
 
-        balanceTitleTextView.alpha = 0f
-        storeIconImageView.alpha = 0f
-        userWalletInfoImageView.alpha = 0f
-        balanceGemImageView.alpha = 0f
-        noTxsInfoTextView.gone()
+            headerElevationView.alpha = 0f
+            sendTariButton.alpha = 0f
+            sendTariButtonGradientView.alpha = 0f
 
-        scrollContentView.alpha = 0f
-        topContentContainerView.invisible()
+            availableBalanceTextView.alpha = 0f
+            storeImageView.alpha = 0f
+            walletInfoImageView.alpha = 0f
+            balanceGemImageView.alpha = 0f
+            noTxsInfoTextView.gone()
 
-        onboardingContentView.gone()
+            scrollContentView.alpha = 0f
+            topContentContainerView.invisible()
 
-        scrollView.post {
-            wr.get()?.setupScrollView()
+            onboardingContentView.gone()
+
+            scrollView.post {
+                wr.get()?.setupScrollView()
+            }
+
+            storeButton.setOnClickListener(this@HomeActivity::onStoreButtonClicked)
+            walletInfoButton.setOnClickListener(this@HomeActivity::onWalletInfoButtonClicked)
+            sendTariButton.setOnClickListener(this@HomeActivity::sendTariButtonClicked)
+            closeTxListButton.setOnClickListener(this@HomeActivity::minimizeListButtonClicked)
+            grabberContainerView.setOnClickListener(this@HomeActivity::grabberContainerViewClicked)
+            grabberContainerView.setOnLongClickListener {
+                grabberContainerViewLongClicked()
+                true
+            }
         }
-
-        subscribeToEventBus()
-
-        TrackHelper.track()
-            .screen("/home")
-            .title("Home - Transaction List")
-            .with(tracker)
     }
 
     override fun onNewIntent(intent: Intent?) {
@@ -388,8 +339,8 @@ internal class HomeActivity : BaseActivity(),
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onDestroy() {
-        recyclerView.layoutManager = null
-        recyclerView.adapter = null
+        ui.txRecyclerView.layoutManager = null
+        ui.txRecyclerView.adapter = null
         unsetTouchListeners()
         if (walletService != null) {
             unbindService(this)
@@ -410,9 +361,9 @@ internal class HomeActivity : BaseActivity(),
 
     private fun setupSwipeRefreshLayout() {
         // initialize pull-to-refresh
-        swipeRefreshLayout.setOnRefreshListener(this)
+        ui.swipeRefreshLayout.setOnRefreshListener(this)
         // configure the refreshing colors
-        swipeRefreshLayout.setColorSchemeResources(
+        ui.swipeRefreshLayout.setColorSchemeResources(
             R.color.home_bg_gradient_start,
             R.color.home_bg_gradient_center,
             R.color.home_bg_gradient_end
@@ -422,7 +373,7 @@ internal class HomeActivity : BaseActivity(),
     private fun setupRecyclerView() {
         // initialize recycler view
         recyclerViewLayoutManager = LinearLayoutManager(this)
-        recyclerView.layoutManager = recyclerViewLayoutManager
+        ui.txRecyclerView.layoutManager = recyclerViewLayoutManager
         recyclerViewAdapter =
             TxListAdapter(
                 completedTxs,
@@ -430,77 +381,77 @@ internal class HomeActivity : BaseActivity(),
                 pendingOutboundTxs,
                 this
             )
-        recyclerView.adapter = recyclerViewAdapter
+        ui.txRecyclerView.adapter = recyclerViewAdapter
         // recycler view is initially disabled
-        recyclerView.isClickable = false
+        ui.txRecyclerView.isClickable = false
     }
 
     @SuppressLint("ClickableViewAccessibility")
     private fun setTouchListeners() {
-        scrollBgEnabler.setOnTouchListener(this)
-        scrollView.setOnTouchListener(this)
-        recyclerView.setOnTouchListener(this)
+        ui.scrollBgEnablerView.setOnTouchListener(this)
+        ui.scrollView.setOnTouchListener(this)
+        ui.txRecyclerView.setOnTouchListener(this)
     }
 
     @SuppressLint("ClickableViewAccessibility")
     private fun unsetTouchListeners() {
-        scrollBgEnabler.setOnTouchListener(null)
-        scrollView.setOnTouchListener(null)
-        recyclerView.setOnTouchListener(null)
+        ui.scrollBgEnablerView.setOnTouchListener(null)
+        ui.scrollView.setOnTouchListener(null)
+        ui.txRecyclerView.setOnTouchListener(null)
     }
 
     private fun setupScrollView() {
-        val recyclerViewHeight = rootView.height - txListHeaderHeight
+        val recyclerViewHeight = ui.rootView.height - txListHeaderHeight
         val contentHeight =
             txListContainerMinimizedTopMargin + grabberContainerHeight + recyclerViewHeight
-        UiUtil.setHeight(swipeRefreshLayout, recyclerViewHeight)
-        UiUtil.setHeight(onboardingContentView, recyclerViewHeight)
-        UiUtil.setHeight(scrollContentView, contentHeight)
-        scrollView.scrollToTop()
+        UiUtil.setHeight(ui.swipeRefreshLayout, recyclerViewHeight)
+        UiUtil.setHeight(ui.onboardingContentView, recyclerViewHeight)
+        UiUtil.setHeight(ui.scrollContentView, contentHeight)
+        ui.scrollView.scrollToTop()
 
-        scrollView.setOnScrollChangeListener(this)
-        recyclerView.setOnScrollChangeListener(this)
-        recyclerView.addOnScrollListener(scrollListener)
+        ui.scrollView.setOnScrollChangeListener(this)
+        ui.txRecyclerView.setOnScrollChangeListener(this)
+        ui.txRecyclerView.addOnScrollListener(scrollListener)
     }
 
     private fun subscribeToEventBus() {
         // wallet events
         EventBus.subscribe<Event.Wallet.TxCancellation>(this) {
-            wr.get()?.rootView?.post {
+            wr.get()?.ui?.rootView?.post {
                 updateAllDataAndUI(restartBalanceUI = false)
             }
         }
         EventBus.subscribe<Event.Wallet.TxMined>(this) {
-            wr.get()?.rootView?.post {
+            wr.get()?.ui?.rootView?.post {
                 updateAllDataAndUI(restartBalanceUI = false)
             }
         }
         EventBus.subscribe<Event.Wallet.TxReceived>(this) {
-            wr.get()?.rootView?.post {
+            wr.get()?.ui?.rootView?.post {
                 updateAllDataAndUI(restartBalanceUI = false)
             }
         }
 
         // Testnet Tari events
         EventBus.subscribe<Event.Testnet.TestnetTariRequestSuccessful>(this) {
-            wr.get()?.rootView?.post {
+            wr.get()?.ui?.rootView?.post {
                 wr.get()?.testnetTariRequestSuccessful()
             }
         }
         EventBus.subscribe<Event.Testnet.TestnetTariRequestError>(this) { event ->
-            wr.get()?.rootView?.post {
+            wr.get()?.ui?.rootView?.post {
                 wr.get()?.testnetTariRequestError(event.errorMessage)
             }
         }
 
         // tx-related app events
         EventBus.subscribe<Event.Tx.TxSendSuccessful>(this) {
-            wr.get()?.rootView?.post {
+            wr.get()?.ui?.rootView?.post {
                 onTxSendSuccessful()
             }
         }
         EventBus.subscribe<Event.Tx.TxSendFailed>(this) { event ->
-            wr.get()?.rootView?.post {
+            wr.get()?.ui?.rootView?.post {
                 onTxSendFailed(event.failureReason)
             }
         }
@@ -516,7 +467,7 @@ internal class HomeActivity : BaseActivity(),
 
         // other app-specific events
         EventBus.subscribe<Event.Contact.ContactAddedOrUpdated>(this) {
-            wr.get()?.rootView?.post {
+            wr.get()?.ui?.rootView?.post {
                 updateAllDataAndUI(restartBalanceUI = false)
             }
         }
@@ -555,7 +506,7 @@ internal class HomeActivity : BaseActivity(),
             // balance info
             updateBalanceInfoData()
             // init list
-            rootView.post {
+            ui.rootView.post {
                 wr.get()?.initializeTxListUI()
             }
         }
@@ -581,7 +532,7 @@ internal class HomeActivity : BaseActivity(),
      * Called on swipe refresh.
      */
     override fun onRefresh() {
-        recyclerView.isNestedScrollingEnabled = false
+        ui.txRecyclerView.isNestedScrollingEnabled = false
         AsyncTask.execute {
             wr.get()?.updateAllDataAndUI(restartBalanceUI = false)
         }
@@ -635,13 +586,13 @@ internal class HomeActivity : BaseActivity(),
 
     private fun updateTxListUI() {
         recyclerViewAdapter.notifyDataChanged()
-        swipeRefreshLayout.isRefreshing = false
-        recyclerView.isNestedScrollingEnabled = true
+        ui.swipeRefreshLayout.isRefreshing = false
+        ui.txRecyclerView.isNestedScrollingEnabled = true
         scrollListener.reset()
         if (txListIsEmpty) {
             showNoTxsTextView()
         } else {
-            noTxsInfoTextView.gone()
+            ui.noTxsInfoTextView.gone()
         }
     }
 
@@ -657,13 +608,13 @@ internal class HomeActivity : BaseActivity(),
 
     private fun updateBalanceInfoUI(restart: Boolean) {
         if (restart) {
-            balanceDigitContainerView.removeAllViews()
-            balanceDecimalDigitContainerView.removeAllViews()
+            ui.balanceDigitContainerView.removeAllViews()
+            ui.balanceDecimalsDigitContainerView.removeAllViews()
             balanceViewController =
                 BalanceViewController(
                     this,
-                    balanceDigitContainerView,
-                    balanceDecimalDigitContainerView,
+                    ui.balanceDigitContainerView,
+                    ui.balanceDecimalsDigitContainerView,
                     balanceInfo
                 )
             // show digits
@@ -682,7 +633,7 @@ internal class HomeActivity : BaseActivity(),
         AsyncTask.execute {
             updateTxListData()
             updateBalanceInfoData()
-            wr.get()?.rootView?.post {
+            wr.get()?.ui?.rootView?.post {
                 wr.get()?.updateBalanceInfoUI(restartBalanceUI)
                 wr.get()?.updateTxListUI()
             }
@@ -693,7 +644,7 @@ internal class HomeActivity : BaseActivity(),
      * The startup animation - reveals the list, balance and other views.
      */
     private fun playNonOnboardingStartupAnim() {
-        topContentContainerView.visible()
+        ui.topContentContainerView.visible()
 
         // initialize the balance view controller
         updateBalanceInfoUI(true)
@@ -706,33 +657,33 @@ internal class HomeActivity : BaseActivity(),
             1.0f
         )
 
-        scrollView.scrollToTop()
+        ui.scrollView.scrollToTop()
         anim.addUpdateListener { valueAnimator: ValueAnimator ->
             // value will run from 0.0 to 1.0
             val value = valueAnimator.animatedValue as Float
 
             // animate the list (will move upwards)
-            scrollContentView.y = scrollViewStartupAnimHeight * (1 - value)
-            scrollContentView.alpha = value
-            sendTariButton.alpha = value
+            ui.scrollContentView.y = scrollViewStartupAnimHeight * (1 - value)
+            ui.scrollContentView.alpha = value
+            ui.sendTariButton.alpha = value
 
             // animate the send tari button (will move upwards)
             UiUtil.setBottomMargin(
-                sendTariButton,
+                ui.sendTariButton,
                 (sendTariButtonInitialBottomMargin + value * sendTariButtonMarginDelta).toInt()
             )
-            sendTariButtonBgGradientView.alpha = value
+            ui.sendTariButtonGradientView.alpha = value
             // reveal balance title, QR code button and balance gem image
-            balanceTitleTextView.alpha = value
-            storeIconImageView.alpha = value
-            userWalletInfoImageView.alpha = value
-            balanceGemImageView.alpha = value
+            ui.availableBalanceTextView.alpha = value
+            ui.storeImageView.alpha = value
+            ui.walletInfoImageView.alpha = value
+            ui.balanceGemImageView.alpha = value
         }
         sendTariButtonIsVisible = true
         anim.duration = Constants.UI.Home.startupAnimDurationMs
         anim.interpolator = EasingInterpolator(Ease.EASE_IN_OUT_EXPO)
-        blockerView.postDelayed({
-            blockerView.gone()
+        ui.blockerView.postDelayed({
+            ui.blockerView.gone()
         }, Constants.UI.Home.startupAnimDurationMs)
         anim.start()
     }
@@ -741,8 +692,8 @@ internal class HomeActivity : BaseActivity(),
      * Play onboarding animation.
      */
     private fun playOnboardingAnim() {
-        onboardingContentView.visible()
-        swipeRefreshLayout.isEnabled = false
+        ui.onboardingContentView.visible()
+        ui.swipeRefreshLayout.isEnabled = false
         hideSendTariButtonAnimated()
 
         updateBalanceInfoData()
@@ -750,19 +701,19 @@ internal class HomeActivity : BaseActivity(),
         balanceViewController =
             BalanceViewController(
                 this,
-                balanceDigitContainerView,
-                balanceDecimalDigitContainerView,
+                ui.balanceDigitContainerView,
+                ui.balanceDecimalsDigitContainerView,
                 balanceInfo // initial value
             )
 
-        scrollView.scrollTo(0, scrollView.height)
-        scrollContentView.alpha = 1f
+        ui.scrollView.scrollTo(0, ui.scrollView.height)
+        ui.scrollContentView.alpha = 1f
         // scroll view translation animation
         val scrollViewTransAnim =
             ObjectAnimator.ofFloat(
-                scrollView,
+                ui.scrollView,
                 View.TRANSLATION_Y,
-                scrollView.height.toFloat(),
+                ui.scrollView.height.toFloat(),
                 homeMainContentTopMargin.toFloat()
             )
         scrollViewTransAnim.interpolator = EasingInterpolator(Ease.CIRC_IN_OUT)
@@ -770,7 +721,7 @@ internal class HomeActivity : BaseActivity(),
         val blackBgViewFadeAnim = ValueAnimator.ofFloat(0f, 1f)
         blackBgViewFadeAnim.addUpdateListener { valueAnimator: ValueAnimator ->
             val value = valueAnimator.animatedValue as Float
-            txListBgOverlayView.alpha = value
+            ui.txListOverlayView.alpha = value
         }
         // the animation set
         val animSet = AnimatorSet()
@@ -781,28 +732,30 @@ internal class HomeActivity : BaseActivity(),
         animSet.duration = Constants.UI.Home.welcomeAnimationDurationMs
         animSet.addListener(
             onEnd = {
-                wr.get()?.topContentContainerView?.visible()
-                wr.get()?.balanceTitleTextView?.alpha = 1f
-                wr.get()?.storeIconImageView?.alpha = 1f
-                wr.get()?.userWalletInfoImageView?.alpha = 1f
-                wr.get()?.balanceGemImageView?.alpha = 1f
+                wr.get()?.run {
+                    ui.topContentContainerView.visible()
+                    ui.availableBalanceTextView.alpha = 1f
+                    ui.storeImageView.alpha = 1f
+                    ui.walletInfoImageView.alpha = 1f
+                    ui.balanceGemImageView.alpha = 1f
+                }
             }
         )
         animSet.start()
 
         // show interstitial & finish after delay
-        scrollView.isScrollable = false
-        scrollView.postDelayed({
-            scrollView.smoothScrollTo(0, 0)
-            blockerView.gone()
+        ui.scrollView.isScrollable = false
+        ui.scrollView.postDelayed({
+            ui.scrollView.smoothScrollTo(0, 0)
+            ui.blockerView.gone()
         }, onboardingInterstitialTimeMs)
 
     }
 
     private fun showNoTxsTextView() {
-        noTxsInfoTextView.alpha = 0f
-        noTxsInfoTextView.visible()
-        val anim = ObjectAnimator.ofFloat(noTxsInfoTextView, "alpha", 0f, 1f)
+        ui.noTxsInfoTextView.alpha = 0f
+        ui.noTxsInfoTextView.visible()
+        val anim = ObjectAnimator.ofFloat(ui.noTxsInfoTextView, "alpha", 0f, 1f)
         anim.duration = Constants.UI.mediumDurationMs
         anim.start()
     }
@@ -862,7 +815,7 @@ internal class HomeActivity : BaseActivity(),
             findViewById<TextView>(R.id.home_tari_bot_dialog_txt_try_later)
                 .setOnClickListener {
                     dismiss()
-                    rootView.postDelayed({
+                    ui.rootView.postDelayed({
                         showSendTariButtonAnimated()
                     }, Constants.UI.shortDurationMs)
                 }
@@ -870,7 +823,7 @@ internal class HomeActivity : BaseActivity(),
                 .setOnClickListener {
                     dismiss()
                     sendTariToUser(testnetSenderPublicKey)
-                    rootView.postDelayed({
+                    ui.rootView.postDelayed({
                         showSendTariButtonAnimated()
                     }, Constants.UI.longDurationMs)
 
@@ -936,8 +889,7 @@ internal class HomeActivity : BaseActivity(),
     /**
      * Displays the store modal on store button click.
      */
-    @OnClick(R.id.home_btn_store)
-    fun onStoreButtonClicked(view: View) {
+    private fun onStoreButtonClicked(view: View) {
         UiUtil.temporarilyDisableClick(view)
         showTTLStoreDialog()
     }
@@ -945,15 +897,13 @@ internal class HomeActivity : BaseActivity(),
     /**
      * Opens user wallet info on button click.
      */
-    @OnClick(R.id.home_btn_wallet_info)
-    fun onWalletInfoButtonClicked(view: View) {
+    private fun onWalletInfoButtonClicked(view: View) {
         UiUtil.temporarilyDisableClick(view)
         val intent = Intent(this@HomeActivity, WalletInfoActivity::class.java)
         startActivity(intent)
     }
 
-    @OnClick(R.id.home_btn_send_tari)
-    fun sendTariButtonClicked(view: View) {
+    private fun sendTariButtonClicked(view: View) {
         if (EventBus.networkConnectionStateSubject.value != NetworkConnectionState.CONNECTED) {
             showInternetConnectionErrorDialog(this)
             return
@@ -967,9 +917,9 @@ internal class HomeActivity : BaseActivity(),
 
     private fun endOnboarding() {
         isOnboarding = false
-        onboardingContentView.gone()
-        txListHeaderView.visible()
-        swipeRefreshLayout.isEnabled = true
+        ui.onboardingContentView.gone()
+        ui.txListHeaderView.visible()
+        ui.swipeRefreshLayout.isEnabled = true
         updateAllDataAndUI(restartBalanceUI = false)
         // request Testnet Tari if no txs
         if (txListIsEmpty) {
@@ -987,17 +937,17 @@ internal class HomeActivity : BaseActivity(),
      * Called when an outgoing transaction has been successful.
      */
     private fun onTxSendSuccessful() {
-        scrollView.scrollToTop()
-        recyclerView.scrollToPosition(0)
-        val topMargin = rootView.height - txListContainerMinimizedTopMargin
-        scrollContentView.y = topMargin.toFloat()
+        ui.scrollView.scrollToTop()
+        ui.txRecyclerView.scrollToPosition(0)
+        val topMargin = ui.rootView.height - txListContainerMinimizedTopMargin
+        ui.scrollContentView.y = topMargin.toFloat()
         val anim = ValueAnimator.ofInt(
             topMargin,
             0
         )
         anim.addUpdateListener { valueAnimator: ValueAnimator ->
             val value = valueAnimator.animatedValue as Int
-            scrollContentView.y = value.toFloat()
+            ui.scrollContentView.y = value.toFloat()
         }
         anim.duration = Constants.UI.longDurationMs
         anim.interpolator = EasingInterpolator(Ease.EASE_OUT_EXPO)
@@ -1063,24 +1013,21 @@ internal class HomeActivity : BaseActivity(),
         startActivity(TxDetailActivity.createIntent(this, tx))
     }
 
-    @OnClick(R.id.home_btn_close_tx_list)
-    fun minimizeListButtonClicked(view: View) {
+    private fun minimizeListButtonClicked(view: View) {
         UiUtil.temporarilyDisableClick(view)
-        scrollView.smoothScrollTo(0, 0)
-        recyclerView.smoothScrollToPosition(0)
+        ui.scrollView.smoothScrollTo(0, 0)
+        ui.txRecyclerView.smoothScrollToPosition(0)
     }
 
-    @OnClick(R.id.home_vw_grabber_container)
-    fun grabberContainerViewClicked(view: View) {
+    private fun grabberContainerViewClicked(view: View) {
         UiUtil.temporarilyDisableClick(view)
-        scrollView.smoothScrollTo(
+        ui.scrollView.smoothScrollTo(
             0,
-            scrollContentView.height - scrollView.height
+            ui.scrollContentView.height - ui.scrollView.height
         )
     }
 
-    @OnLongClick(R.id.home_vw_grabber_container)
-    fun grabberContainerViewLongClicked() {
+    private fun grabberContainerViewLongClicked() {
         val intent = Intent(this, DebugActivity::class.java)
         startActivity(intent)
         overridePendingTransition(R.anim.enter_from_right, R.anim.exit_to_left)
@@ -1093,9 +1040,10 @@ internal class HomeActivity : BaseActivity(),
         if (sendTariButtonIsVisible) {
             return
         }
-        sendTariButton.alpha = 1f
-        val initialMargin = UiUtil.getBottomMargin(sendTariButton)
-        val marginDelta = sendTariButtonVisibleBottomMargin - UiUtil.getBottomMargin(sendTariButton)
+        ui.sendTariButton.alpha = 1f
+        val initialMargin = UiUtil.getBottomMargin(ui.sendTariButton)
+        val marginDelta =
+            sendTariButtonVisibleBottomMargin - UiUtil.getBottomMargin(ui.sendTariButton)
         val anim = ValueAnimator.ofFloat(
             0f,
             1f
@@ -1103,10 +1051,10 @@ internal class HomeActivity : BaseActivity(),
         anim.addUpdateListener { valueAnimator: ValueAnimator ->
             val value = valueAnimator.animatedValue as Float
             UiUtil.setBottomMargin(
-                sendTariButton,
+                ui.sendTariButton,
                 (initialMargin + marginDelta * value).toInt()
             )
-            sendTariButtonBgGradientView.alpha = value
+            ui.sendTariButtonGradientView.alpha = value
         }
         anim.duration = Constants.UI.mediumDurationMs
         anim.interpolator = EasingInterpolator(Ease.EASE_OUT_EXPO)
@@ -1121,8 +1069,9 @@ internal class HomeActivity : BaseActivity(),
         if (!sendTariButtonIsVisible) {
             return
         }
-        val initialMargin = UiUtil.getBottomMargin(sendTariButton)
-        val marginDelta = sendTariButtonHiddenBottomMargin - UiUtil.getBottomMargin(sendTariButton)
+        val initialMargin = UiUtil.getBottomMargin(ui.sendTariButton)
+        val marginDelta =
+            sendTariButtonHiddenBottomMargin - UiUtil.getBottomMargin(ui.sendTariButton)
         val anim = ValueAnimator.ofFloat(
             0f,
             1f
@@ -1130,10 +1079,10 @@ internal class HomeActivity : BaseActivity(),
         anim.addUpdateListener { valueAnimator: ValueAnimator ->
             val value = valueAnimator.animatedValue as Float
             UiUtil.setBottomMargin(
-                sendTariButton,
+                ui.sendTariButton,
                 (initialMargin + marginDelta * value).toInt()
             )
-            sendTariButtonBgGradientView.alpha = 1f - value
+            ui.sendTariButtonGradientView.alpha = 1f - value
         }
         anim.duration = Constants.UI.mediumDurationMs
         anim.interpolator = EasingInterpolator(Ease.EASE_OUT_EXPO)
@@ -1160,7 +1109,7 @@ internal class HomeActivity : BaseActivity(),
             anim.startOffset = Constants.UI.Button.clickScaleAnimReturnStartOffset
         }
         anim.setAnimationListener(this)
-        sendTariButton.startAnimation(anim)
+        ui.sendTariButton.startAnimation(anim)
     }
 
     // region send tari button animation listener
@@ -1199,17 +1148,17 @@ internal class HomeActivity : BaseActivity(),
         if (view == null || event == null) {
             return false
         }
-        if (view === scrollView || view === recyclerView) {
+        if (view === ui.scrollView || view === ui.txRecyclerView) {
             when (event.action) {
                 MotionEvent.ACTION_DOWN -> {
                     isDragging = true
                 }
                 MotionEvent.ACTION_UP -> {
-                    if (isOnboarding && scrollView.scrollY == 0) {
+                    if (isOnboarding && ui.scrollView.scrollY == 0) {
                         endOnboarding()
                     }
-                    scrollView.flingIsRunning = false
-                    scrollView.postDelayed({ scrollView.completeScroll() }, 50L)
+                    ui.scrollView.flingIsRunning = false
+                    ui.scrollView.postDelayed({ ui.scrollView.completeScroll() }, 50L)
                     isDragging = false
                 }
             }
@@ -1230,51 +1179,51 @@ internal class HomeActivity : BaseActivity(),
         oldScrollY: Int
     ) {
         if (view is CustomScrollView) {
-            val maxScroll = scrollView.getChildAt(0).height - scrollView.height
-            val ratio = scrollView.scrollY.toFloat() / maxScroll.toFloat()
-            onboardingContentView.alpha = ratio
-            txListBgOverlayView.alpha = ratio
+            val maxScroll = ui.scrollView.getChildAt(0).height - ui.scrollView.height
+            val ratio = ui.scrollView.scrollY.toFloat() / maxScroll.toFloat()
+            ui.onboardingContentView.alpha = ratio
+            ui.txListOverlayView.alpha = ratio
             val topContentMarginTopExtra =
                 (ratio * topContentContainerViewScrollVerticalShift).toInt()
             UiUtil.setTopMargin(
-                topContentContainerView,
+                ui.topContentContainerView,
                 topContentContainerViewTopMargin
                         + topContentMarginTopExtra
             )
-            txListTitleTextView.alpha = ratio
-            minimizeTxListButton.alpha = ratio
+            ui.txListTitleTextView.alpha = ratio
+            ui.closeTxListButton.alpha = ratio
 
             if (!isOnboarding) {
                 UiUtil.setTopMargin(
-                    txListHeaderView,
+                    ui.txListHeaderView,
                     ((ratio - 1) * txListHeaderHeight).toInt()
                 )
-                grabberView.alpha = max(0f, 1f - ratio * grabberViewAlphaScrollAnimCoefficient)
+                ui.grabberView.alpha = max(0f, 1f - ratio * grabberViewAlphaScrollAnimCoefficient)
 
                 UiUtil.setWidth(
-                    grabberView,
+                    ui.grabberView,
                     (max(
                         0f,
                         1f - ratio * grabberViewWidthScrollAnimCoefficient
                     ) * grabberViewWidth).toInt()
                 )
-                val grabberBgDrawable = grabberContainerView.background as GradientDrawable
+                val grabberBgDrawable = ui.grabberContainerView.background as GradientDrawable
                 grabberBgDrawable.cornerRadius = max(
                     0f,
                     1f - ratio * grabberViewCornerRadiusScrollAnimCoefficient
                 ) * grabberCornerRadius
             } else if (ratio == 0f && !isDragging) { // is onboarding
-                scrollView.isScrollable = true
+                ui.scrollView.isScrollable = true
                 endOnboarding()
             }
 
             UiUtil.setTopMargin(
-                storeButton,
-                walletInfoButtonInitialTopMargin + scrollView.scrollY + topContentMarginTopExtra
+                ui.storeButton,
+                walletInfoButtonInitialTopMargin + ui.scrollView.scrollY + topContentMarginTopExtra
             )
             UiUtil.setTopMargin(
-                userWalletInfoButton,
-                walletInfoButtonInitialTopMargin + scrollView.scrollY + topContentMarginTopExtra
+                ui.walletInfoButton,
+                walletInfoButtonInitialTopMargin + ui.scrollView.scrollY + topContentMarginTopExtra
             )
         }
         if (scrollY > oldScrollY
@@ -1293,7 +1242,7 @@ internal class HomeActivity : BaseActivity(),
     // region scroll depth gradient view controls
 
     fun onRecyclerViewScrolled(totalDeltaY: Int) {
-        headerElevationView.alpha = min(
+        ui.headerElevationView.alpha = min(
             Constants.UI.scrollDepthShadowViewMaxOpacity,
             totalDeltaY / listItemHeight.toFloat()
         )
@@ -1317,4 +1266,11 @@ internal class HomeActivity : BaseActivity(),
     }
 
     // endregion
+
+    private object HomeActivityVisitor {
+        fun visit(activity: HomeActivity) {
+            (activity.application as TariWalletApplication).appComponent.inject(activity)
+            ButterKnife.bind(activity)
+        }
+    }
 }

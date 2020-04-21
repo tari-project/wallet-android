@@ -33,13 +33,11 @@
 package com.tari.android.wallet.ui.activity.home.adapter
 
 import android.view.View
-import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import butterknife.BindString
-import butterknife.BindView
 import butterknife.ButterKnife
-import com.airbnb.lottie.LottieAnimationView
 import com.tari.android.wallet.R
+import com.tari.android.wallet.databinding.HomeTxListHeaderBinding
 import com.tari.android.wallet.ui.extension.gone
 import com.tari.android.wallet.ui.extension.visible
 import org.joda.time.LocalDate
@@ -59,53 +57,39 @@ class TxHeaderViewHolder(view: View, private val type: Type) :
 
     private val dateFormat = "MMMM dd, yyyy"
 
-    @BindView(R.id.home_tx_list_header_vw_separator)
-    lateinit var separatorView: View
-    @BindView(R.id.home_tx_list_header_txt_title)
-    lateinit var titleTextView: TextView
-    @BindView(R.id.home_tx_list_anim_pending)
-    lateinit var lottieAnimView: LottieAnimationView
-
-
     @BindString(R.string.home_today)
     lateinit var todayString: String
+
     @BindString(R.string.home_yesterday)
     lateinit var yesterdayString: String
+
     @BindString(R.string.home_pending_txs)
     lateinit var pendingTxsString: String
 
     private var date: LocalDate? = null
+
+    private val ui = HomeTxListHeaderBinding.bind(view)
 
     init {
         ButterKnife.bind(this, view)
     }
 
     fun bind(date: LocalDate?, position: Int) {
-        if (position == 0) {
-            separatorView.gone()
-        } else {
-            separatorView.visible()
-        }
+        ui.txListHeaderSeparatorView.visibility = if (position == 0) View.GONE else View.VISIBLE
         when (type) {
             Type.PENDING_TXS -> {
-                lottieAnimView.visible()
-                titleTextView.text = pendingTxsString
+                ui.txListHeaderPendingAnimationView.visible()
+                ui.txListHeaderTitleTextView.text = pendingTxsString
             }
             Type.DATE -> {
-                lottieAnimView.gone()
+                ui.txListHeaderPendingAnimationView.gone()
                 this.date = date!!
                 val todayDate = LocalDate.now()
                 val yesterdayDate = todayDate.minusDays(1)
-                when {
-                    date.isEqual(todayDate) -> {
-                        titleTextView.text = todayString
-                    }
-                    date.isEqual(yesterdayDate) -> {
-                        titleTextView.text = yesterdayString
-                    }
-                    else -> {
-                        titleTextView.text = date.toString(dateFormat)
-                    }
+                ui.txListHeaderTitleTextView.text = when {
+                    date.isEqual(todayDate) -> todayString
+                    date.isEqual(yesterdayDate) -> yesterdayString
+                    else -> date.toString(dateFormat)
                 }
             }
         }

@@ -40,6 +40,7 @@ import android.os.Build
 import android.util.TypedValue
 import android.view.View
 import android.view.ViewGroup
+import android.view.ViewTreeObserver
 import android.view.WindowManager
 import android.widget.ScrollView
 import android.widget.TextView
@@ -184,4 +185,14 @@ internal fun ScrollView.scrollToBottom() {
     val bottom = lastChild.bottom + paddingBottom
     val delta = bottom - (scrollY + height)
     smoothScrollBy(0, delta)
+}
+
+internal fun View.doOnGlobalLayout(block: () -> Unit) {
+    this.viewTreeObserver.addOnGlobalLayoutListener(
+        object : ViewTreeObserver.OnGlobalLayoutListener {
+            override fun onGlobalLayout() {
+                this@doOnGlobalLayout.viewTreeObserver.removeOnGlobalLayoutListener(this)
+                block()
+            }
+        })
 }

@@ -33,11 +33,8 @@
 package com.tari.android.wallet.ui.fragment.debug.adapter
 
 import android.view.View
-import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import butterknife.BindView
-import butterknife.ButterKnife
-import com.tari.android.wallet.R
+import com.tari.android.wallet.databinding.LogItemBinding
 import com.tari.android.wallet.ffi.LogLevel
 import com.tari.android.wallet.ui.extension.gone
 import com.tari.android.wallet.ui.extension.visible
@@ -49,34 +46,19 @@ import com.tari.android.wallet.ui.extension.visible
  */
 class LogViewHolder(view: View) : RecyclerView.ViewHolder(view) {
 
-    @BindView(R.id.log_item_txt_timestamp)
-    lateinit var timestampTextView: TextView
-    @BindView(R.id.log_item_txt_source_1)
-    lateinit var source1TextView: TextView
-    @BindView(R.id.log_item_txt_source_2)
-    lateinit var source2TextView: TextView
-    @BindView(R.id.log_item_txt_level)
-    lateinit var levelTextView: TextView
-    @BindView(R.id.log_item_txt_log)
-    lateinit var logTextView: TextView
-    @BindView(R.id.log_item_vw_bottom_spacer)
-    lateinit var bottomSpacer: View
-
-    init {
-        ButterKnife.bind(this, view)
-    }
+    private val ui = LogItemBinding.bind(view)
 
     fun bind(
         log: String,
         isLast: Boolean = false
     ) {
-        timestampTextView.gone()
-        source1TextView.gone()
-        source2TextView.gone()
-        levelTextView.gone()
-        logTextView.text = log.trim()
+        ui.timestampTextView.gone()
+        ui.source1TextView.gone()
+        ui.source2TextView.gone()
+        ui.levelTextView.gone()
+        ui.logTextView.text = log.trim()
         // bottom spacer
-        bottomSpacer.visibility = when (isLast) {
+        ui.bottomSpacerView.visibility = when (isLast) {
             true -> View.VISIBLE
             else -> View.GONE
         }
@@ -92,45 +74,45 @@ class LogViewHolder(view: View) : RecyclerView.ViewHolder(view) {
     ) {
         // timestamp
         if (timestamp != null && timestamp.isNotEmpty()) {
-            timestampTextView.visible()
-            timestampTextView.text = timestamp.trim()
+            ui.timestampTextView.visible()
+            ui.timestampTextView.text = timestamp.trim()
         } else {
-            timestampTextView.gone()
+            ui.timestampTextView.gone()
         }
         // source#1
         if (source1 != null && source1.isNotEmpty()) {
-            source1TextView.visible()
-            source1TextView.text = source1.trim()
+            ui.source1TextView.visible()
+            ui.source1TextView.text = source1.trim()
         } else {
-            source1TextView.gone()
+            ui.source1TextView.gone()
         }
         // source#2
         if (source2 != null && source2.isNotEmpty()) {
-            source2TextView.visible()
-            source2TextView.text = source2.trim()
+            ui.source2TextView.visible()
+            ui.source2TextView.text = source2.trim()
         } else {
-            source2TextView.gone()
+            ui.source2TextView.gone()
         }
         // level
         if (level != null && level.isNotEmpty()) {
             val logLevel = level.trim()
-            levelTextView.visible()
-            levelTextView.text = logLevel
-            levelTextView.setTextColor(
+            ui.levelTextView.visible()
+            ui.levelTextView.text = logLevel
+            ui.levelTextView.setTextColor(
                 LogLevel.from(logLevel).color
             )
         } else {
-            levelTextView.gone()
+            ui.levelTextView.gone()
         }
         // log
         if (log != null && log.isNotEmpty()) {
-            logTextView.visible()
-            logTextView.text = log.trim()
+            ui.logTextView.visible()
+            ui.logTextView.text = log.trim()
         } else {
-            logTextView.gone()
+            ui.logTextView.gone()
         }
         // bottom spacer
-        bottomSpacer.visibility = when (isLast) {
+        ui.bottomSpacerView.visibility = when (isLast) {
             true -> View.VISIBLE
             else -> View.GONE
         }

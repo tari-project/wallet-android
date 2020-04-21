@@ -2,14 +2,14 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/add_amount_vw_root"
+    android:id="@+id/root_view"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/white">
 
     <!-- back -->
     <ImageButton
-        android:id="@+id/add_amount_btn_back"
+        android:id="@+id/back_button"
         android:layout_width="@dimen/back_button_size"
         android:layout_height="@dimen/back_button_size"
         android:layout_marginTop="@dimen/header_top_inset"
@@ -21,21 +21,21 @@
 
     <!-- contact alias -->
     <com.tari.android.wallet.ui.component.CustomFontTextView
-        android:id="@+id/add_amount_txt_title"
+        android:id="@+id/title_text_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/add_amount_under_construction"
         android:textColor="@color/black"
         android:textSize="16sp"
         app:customFont="AVENIR_LT_STD_HEAVY"
-        app:layout_constraintBottom_toBottomOf="@id/add_amount_btn_back"
+        app:layout_constraintBottom_toBottomOf="@id/back_button"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@id/add_amount_btn_back" />
+        app:layout_constraintTop_toTopOf="@id/back_button" />
 
     <!-- Recipient Emojix ID -->
     <FrameLayout
-        android:id="@+id/add_amount_vw_emoji_id_summary_container"
+        android:id="@+id/emoji_id_summary_container_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:background="@drawable/emoji_id_bg"
@@ -45,13 +45,13 @@
         android:paddingTop="@dimen/emoji_id_container_vertical_padding"
         android:paddingEnd="@dimen/emoji_id_container_horizontal_padding"
         android:paddingBottom="@dimen/emoji_id_container_vertical_padding"
-        app:layout_constraintBottom_toBottomOf="@id/add_amount_btn_back"
+        app:layout_constraintBottom_toBottomOf="@id/back_button"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@id/add_amount_btn_back">
+        app:layout_constraintTop_toTopOf="@id/back_button">
 
         <include
-            android:id="@+id/add_amount_vw_emoji_id_summary"
+            android:id="@+id/emoji_id_summary_view"
             layout="@layout/emoji_id_summary"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -63,7 +63,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:barrierDirection="bottom"
-        app:constraint_referenced_ids="add_amount_btn_back,add_amount_txt_title,add_amount_vw_emoji_id_summary_container"/>
+        app:constraint_referenced_ids="back_button,title_text_view,emoji_id_summary_container_view"/>
 
     <LinearLayout
         android:layout_width="0dp"
@@ -76,13 +76,13 @@
 
         <!-- amount container -->
         <RelativeLayout
-            android:id="@+id/add_amount_vw_amount_outer_container"
+            android:id="@+id/element_outer_container_view"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1">
 
             <LinearLayout
-                android:id="@+id/add_amount_vw_not_enough_balance"
+                android:id="@+id/not_enough_balance_view"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="25dp"
@@ -107,7 +107,7 @@
                         android:src="@drawable/gem_not_enough_balance" />
 
                     <com.tari.android.wallet.ui.component.CustomFontTextView
-                        android:id="@+id/add_amount_txt_available_balance"
+                        android:id="@+id/available_balance_text_view"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="4dp"
@@ -134,7 +134,7 @@
 
             <!-- amount -->
             <LinearLayout
-                android:id="@+id/add_amount_vw_amount_element_container"
+                android:id="@+id/element_container_view"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
@@ -148,14 +148,14 @@
 
                 <!-- gem -->
                 <ImageView
-                    android:id="@+id/add_amount_img_amount_gem"
+                    android:id="@+id/amount_gem_image_view"
                     android:layout_width="@dimen/add_amount_gem_size"
                     android:layout_height="@dimen/add_amount_gem_size"
                     android:contentDescription="@null"
                     android:src="@drawable/gem_amount" />
                 <!-- first digit (never disappears) -->
                 <com.tari.android.wallet.ui.component.CustomFontTextView
-                    android:id="@+id/add_amount_txt_amount_element_0"
+                    android:id="@+id/amount_element_0_text_view"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="@dimen/add_amount_leftmost_digit_margin_start"
@@ -165,13 +165,13 @@
                     app:customFont="AVENIR_LT_STD_BLACK" />
 
                 <View
-                    android:id="@+id/add_amount_vw_amount_center_correction"
+                    android:id="@+id/amount_center_correction_view"
                     android:layout_width="31dp"
                     android:layout_height="2dp" />
             </LinearLayout>
 
             <LinearLayout
-                android:id="@+id/add_amount_vw_tx_fee_container"
+                android:id="@+id/tx_fee_container_view"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerHorizontal="true"
@@ -179,7 +179,7 @@
                 android:orientation="vertical">
                 <!-- fee amount -->
                 <com.tari.android.wallet.ui.component.CustomFontTextView
-                    android:id="@+id/add_amount_txt_tx_fee"
+                    android:id="@+id/tx_fee_text_view"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
@@ -189,7 +189,7 @@
                     app:customFont="AVENIR_LT_STD_HEAVY" />
                 <!-- description -->
                 <com.tari.android.wallet.ui.component.CustomFontTextView
-                    android:id="@+id/add_amount_txt_tx_fee_desc"
+                    android:id="@+id/tx_fee_desc_text_view"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="2dp"
@@ -217,7 +217,7 @@
                 android:orientation="horizontal">
                 <!-- digit 1 -->
                 <com.tari.android.wallet.ui.component.CustomFontButton
-                    android:id="@+id/add_amount_btn_1"
+                    android:id="@+id/pad_1_button"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
@@ -228,7 +228,7 @@
                     app:customFont="AVENIR_LT_STD_HEAVY" />
                 <!-- digit 2 -->
                 <com.tari.android.wallet.ui.component.CustomFontButton
-                    android:id="@+id/add_amount_btn_2"
+                    android:id="@+id/pad_2_button"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
@@ -239,7 +239,7 @@
                     app:customFont="AVENIR_LT_STD_HEAVY" />
                 <!-- digit 3 -->
                 <com.tari.android.wallet.ui.component.CustomFontButton
-                    android:id="@+id/add_amount_btn_3"
+                    android:id="@+id/pad_3_button"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
@@ -257,7 +257,7 @@
                 android:orientation="horizontal">
                 <!-- digit 4 -->
                 <com.tari.android.wallet.ui.component.CustomFontButton
-                    android:id="@+id/add_amount_btn_4"
+                    android:id="@+id/pad_4_button"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
@@ -268,7 +268,7 @@
                     app:customFont="AVENIR_LT_STD_HEAVY" />
                 <!-- digit 5 -->
                 <com.tari.android.wallet.ui.component.CustomFontButton
-                    android:id="@+id/add_amount_btn_5"
+                    android:id="@+id/pad_5_button"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
@@ -279,7 +279,7 @@
                     app:customFont="AVENIR_LT_STD_HEAVY" />
                 <!-- digit 6 -->
                 <com.tari.android.wallet.ui.component.CustomFontButton
-                    android:id="@+id/add_amount_btn_6"
+                    android:id="@+id/pad_6_button"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
@@ -297,7 +297,7 @@
                 android:orientation="horizontal">
                 <!-- digit 7 -->
                 <com.tari.android.wallet.ui.component.CustomFontButton
-                    android:id="@+id/add_amount_btn_7"
+                    android:id="@+id/pad_7_button"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
@@ -308,7 +308,7 @@
                     app:customFont="AVENIR_LT_STD_HEAVY" />
                 <!-- digit 8 -->
                 <com.tari.android.wallet.ui.component.CustomFontButton
-                    android:id="@+id/add_amount_btn_8"
+                    android:id="@+id/pad_8_button"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
@@ -319,7 +319,7 @@
                     app:customFont="AVENIR_LT_STD_HEAVY" />
                 <!-- digit 9 -->
                 <com.tari.android.wallet.ui.component.CustomFontButton
-                    android:id="@+id/add_amount_btn_9"
+                    android:id="@+id/pad_9_button"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
@@ -337,7 +337,7 @@
                 android:orientation="horizontal">
                 <!-- decimal separator -->
                 <com.tari.android.wallet.ui.component.CustomFontButton
-                    android:id="@+id/add_amount_btn_decimal_point"
+                    android:id="@+id/decimal_point_button"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
@@ -348,7 +348,7 @@
                     app:customFont="AVENIR_LT_STD_HEAVY" />
                 <!-- digit 0 -->
                 <com.tari.android.wallet.ui.component.CustomFontButton
-                    android:id="@+id/add_amount_btn_0"
+                    android:id="@+id/pad_0_button"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
@@ -359,7 +359,7 @@
                     app:customFont="AVENIR_LT_STD_HEAVY" />
                 <!-- delete -->
                 <ImageButton
-                    android:id="@+id/add_amount_btn_delete"
+                    android:id="@+id/delete_button"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
@@ -379,7 +379,7 @@
 
             <!-- disabled -->
             <com.tari.android.wallet.ui.component.CustomFontButton
-                android:id="@+id/add_amount_btn_continue_disabled"
+                android:id="@+id/disabled_continue_button"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/common_action_button_height"
                 android:layout_centerVertical="true"
@@ -396,7 +396,7 @@
                 app:customFont="AVENIR_LT_STD_HEAVY" />
             <!-- actual button -->
             <com.tari.android.wallet.ui.component.CustomFontButton
-                android:id="@+id/add_amount_btn_continue"
+                android:id="@+id/continue_button"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/common_action_button_height"
                 android:layout_centerVertical="true"
@@ -424,7 +424,7 @@
         tools:visibility="gone">
 
         <View
-            android:id="@+id/add_amount_vw_full_emoji_id_bg_click_blocker"
+            android:id="@+id/full_emoji_id_bg_click_blocker_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:alpha="0.6"
@@ -433,7 +433,7 @@
             android:focusable="true" />
 
         <View
-            android:id="@+id/add_amount_vw_dimmer"
+            android:id="@+id/dimmer_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:alpha="0.6"
@@ -443,15 +443,15 @@
 
         <!-- copy emoji id button -->
         <RelativeLayout
-            android:id="@+id/add_amount_vw_copy_emoji_id_container"
+            android:id="@+id/copy_emoji_id_button_container_view"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignBottom="@id/add_amount_vw_full_emoji_id_container"
+            android:layout_alignBottom="@id/full_emoji_id_container_view"
             android:layout_centerHorizontal="true"
             android:layout_marginBottom="0dp">
 
             <ImageView
-                android:id="@+id/add_amount_img_copy_emoji_id_notch"
+                android:id="@+id/copy_emoji_id_notch_image_view"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerHorizontal="true"
@@ -459,10 +459,10 @@
                 android:src="@drawable/speech_notch_up" />
 
             <com.tari.android.wallet.ui.component.CustomFontTextView
-                android:id="@+id/add_amount_txt_copy_emoji_id"
+                android:id="@+id/copy_emoji_id_text_view"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/add_amount_img_copy_emoji_id_notch"
+                android:layout_below="@id/copy_emoji_id_notch_image_view"
                 android:background="@drawable/copy_paste_emoji_id_button_bg"
                 android:paddingHorizontal="20dp"
                 android:paddingVertical="10dp"
@@ -472,19 +472,19 @@
                 app:customFont="AVENIR_LT_STD_HEAVY" />
 
             <Button
-                android:id="@+id/add_amount_btn_copy_emoji_id"
+                android:id="@+id/copy_emoji_id_button"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
-                android:layout_alignStart="@id/add_amount_txt_copy_emoji_id"
-                android:layout_alignTop="@id/add_amount_txt_copy_emoji_id"
-                android:layout_alignEnd="@id/add_amount_txt_copy_emoji_id"
-                android:layout_alignBottom="@id/add_amount_txt_copy_emoji_id"
+                android:layout_alignStart="@id/copy_emoji_id_text_view"
+                android:layout_alignTop="@id/copy_emoji_id_text_view"
+                android:layout_alignEnd="@id/copy_emoji_id_text_view"
+                android:layout_alignBottom="@id/copy_emoji_id_text_view"
                 android:background="@color/transparent" />
         </RelativeLayout>
 
         <!-- height and width of this view will be set dynamically at runtime -->
         <RelativeLayout
-            android:id="@+id/add_amount_vw_full_emoji_id_container"
+            android:id="@+id/full_emoji_id_container_view"
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:layout_alignParentTop="true"
@@ -495,14 +495,14 @@
             android:focusable="true">
 
             <HorizontalScrollView
-                android:id="@+id/add_amount_scroll_full_emoji_id"
+                android:id="@+id/full_emoji_id_scroll_view"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:scrollbars="none"
                 tools:ignore="UselessParent">
 
                 <TextView
-                    android:id="@+id/add_amount_txt_full_emoji_id"
+                    android:id="@+id/full_emoji_id_text_view"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:gravity="center_vertical"
@@ -514,7 +514,7 @@
 
             <!-- white fader for emoji-id -->
             <View
-                android:id="@+id/add_amount_vw_full_emoji_id_fader"
+                android:id="@+id/full_emoji_id_fader_view"
                 android:layout_width="26dp"
                 android:layout_height="24dp"
                 android:layout_alignParentEnd="true"
@@ -528,7 +528,7 @@
                 android:translationZ="7dp">
 
                 <include
-                    android:id="@+id/add_amount_vw_emoji_id_copied"
+                    android:id="@+id/emoji_id_copied_view"
                     layout="@layout/emoji_id_copied_anim_view"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
