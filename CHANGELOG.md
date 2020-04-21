@@ -1,4 +1,10 @@
 # Tari Aurora Changelog
+
+## [0.1.5-jniLibs-0.7.2] - 2020-04-21
+- Send Tari Flow service layer and UI updates for store and forward support.
+- More and improved tests
+- Update jniLibs to 0.7.2
+
 ## [0.1.4-jniLibs-0.7.1] - 2020-04-19
 - Updated FFI libraries with improved Store and forward handling
 
