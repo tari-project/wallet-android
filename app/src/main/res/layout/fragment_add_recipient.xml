@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/add_recipient_vw_root"
+    android:id="@+id/root_view"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/white">
 
     <!-- back -->
     <ImageButton
-        android:id="@+id/add_recipient_btn_back"
+        android:id="@+id/back_button"
         android:layout_width="@dimen/back_button_size"
         android:layout_height="@dimen/back_button_size"
         android:layout_marginTop="@dimen/header_top_inset"
@@ -19,16 +19,16 @@
         android:src="@drawable/back_icon" />
 
     <com.tari.android.wallet.ui.component.CustomFontTextView
-        android:id="@+id/add_recipient_txt_title"
+        android:id="@+id/title_text_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/add_recipient_title"
         android:textColor="@color/black"
         android:textSize="16sp"
-        app:layout_constraintBottom_toBottomOf="@id/add_recipient_btn_back"
+        app:layout_constraintBottom_toBottomOf="@id/back_button"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@id/add_recipient_btn_back"
+        app:layout_constraintTop_toTopOf="@id/back_button"
         app:customFont="AVENIR_LT_STD_HEAVY" />
 
     <androidx.constraintlayout.widget.Barrier
@@ -36,10 +36,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:barrierDirection="bottom"
-        app:constraint_referenced_ids="add_recipient_btn_back,add_recipient_txt_title"/>
+        app:constraint_referenced_ids="back_button,title_text_view"/>
 
     <View
-        android:id="@+id/add_recipinet_vw_top_dimmer"
+        android:id="@+id/top_dimmer_view"
         android:layout_width="0dp"
         android:layout_height="0dp"
         app:layout_constraintTop_toTopOf="parent"
@@ -63,7 +63,7 @@
         android:orientation="horizontal">
 
         <View
-            android:id="@+id/add_recipinet_vw_middle_dimmer"
+            android:id="@+id/middle_dimmer_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:alpha="0.6"
@@ -83,10 +83,10 @@
 
             <!-- search -->
             <HorizontalScrollView
-                android:id="@+id/add_recipient_scroll_search_edit_text"
+                android:id="@+id/search_edit_text_scroll_view"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_toStartOf="@id/add_recipient_btn_qr_code"
+                android:layout_toStartOf="@id/qr_code_button"
                 android:scrollbars="none">
 
                 <LinearLayout
@@ -99,7 +99,7 @@
                         android:layout_height="match_parent" />
                     <!-- search text -->
                     <com.tari.android.wallet.ui.component.CustomFontEditText
-                        android:id="@+id/add_recipient_edit_search"
+                        android:id="@+id/search_edit_text"
                         android:layout_width="wrap_content"
                         android:layout_height="@dimen/add_recipient_search_text_view_height"
                         android:background="@color/transparent"
@@ -131,7 +131,7 @@
 
             <!-- QR code button -->
             <ImageButton
-                android:id="@+id/add_recipient_btn_qr_code"
+                android:id="@+id/qr_code_button"
                 android:layout_width="@dimen/add_recipient_search_text_view_height"
                 android:layout_height="@dimen/add_recipient_search_text_view_height"
                 android:layout_alignParentEnd="true"
@@ -151,7 +151,7 @@
 
         <!-- list -->
         <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/send_tari_add_recipient_rv_contact_list"
+            android:id="@+id/contacts_list_recycler_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:background="@color/white"
@@ -160,14 +160,14 @@
 
         <!-- depth gradient -->
         <View
-            android:id="@+id/add_recipient_rv_scroll_depth_gradient"
+            android:id="@+id/scroll_depth_gradient_view"
             android:layout_width="match_parent"
             android:layout_height="@dimen/common_scroll_height_gradient_height"
             android:alpha="0.5"
             android:background="@drawable/view_elevation_gradient" />
 
         <ProgressBar
-            android:id="@+id/add_recipient_prog_bar"
+            android:id="@+id/progress_bar"
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:layout_centerHorizontal="true"
@@ -176,7 +176,7 @@
             android:visibility="visible" />
 
         <View
-            android:id="@+id/add_recipinet_vw_bottom_dimmer"
+            android:id="@+id/bottom_dimmer_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:alpha="0.6"
@@ -185,10 +185,10 @@
             android:focusable="true" />
 
         <RelativeLayout
-            android:id="@+id/add_recipient_vw_paste_emoji_id_container"
+            android:id="@+id/paste_emoji_id_container_view"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignTop="@id/add_recipient_vw_clipboard_emoji_id_container"
+            android:layout_alignTop="@id/emoji_id_container_view"
             android:layout_centerHorizontal="true"
             android:layout_marginTop="0dp">
 
@@ -205,7 +205,7 @@
                 app:customFont="AVENIR_LT_STD_HEAVY" />
 
             <Button
-                android:id="@+id/add_recipient_btn_paste_emoji_id"
+                android:id="@+id/paste_emoji_id_button"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
                 android:layout_alignStart="@id/add_recipient_txt_paste_emoji_id"
@@ -217,7 +217,7 @@
             <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/add_recipient_btn_paste_emoji_id"
+                android:layout_below="@id/paste_emoji_id_button"
                 android:layout_centerHorizontal="true"
                 android:contentDescription="@null"
                 android:src="@drawable/speech_notch_down" />
@@ -225,7 +225,7 @@
         </RelativeLayout>
 
         <RelativeLayout
-            android:id="@+id/add_recipient_vw_clipboard_emoji_id_container"
+            android:id="@+id/emoji_id_container_view"
             android:layout_width="match_parent"
             android:layout_height="@dimen/add_recipient_clipboard_emoji_id_container_height"
             android:layout_alignParentBottom="true">
@@ -238,7 +238,7 @@
 
             <!-- emoji id container -->
             <HorizontalScrollView
-                android:id="@+id/add_recipient_scroll_clipboard_emoji_id"
+                android:id="@+id/emoji_id_scroll_view"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:paddingHorizontal="0dp"
@@ -246,7 +246,7 @@
 
                 <!-- emoji id -->
                 <TextView
-                    android:id="@+id/add_recipient_txt_clipboard_emoji_id"
+                    android:id="@+id/emoji_id_text_view"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:clickable="true"
@@ -263,7 +263,7 @@
     </RelativeLayout>
 
     <com.tari.android.wallet.ui.component.CustomFontTextView
-        android:id="@+id/add_recipient_txt_invalid_emoji_id"
+        android:id="@+id/invalid_emoji_id_text_view"
         android:layout_width="0dp"
         android:layout_height="@dimen/add_recipient_search_text_view_height"
         android:layout_marginStart="25dp"
@@ -279,7 +279,7 @@
         app:customFont="AVENIR_LT_STD_HEAVY" />
 
     <com.tari.android.wallet.ui.component.CustomFontButton
-        android:id="@+id/add_recipient_btn_continue"
+        android:id="@+id/continue_button"
         android:layout_width="0dp"
         android:layout_height="@dimen/common_action_button_height"
         android:layout_alignParentBottom="true"

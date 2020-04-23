@@ -35,14 +35,15 @@ package com.tari.android.wallet.ui.fragment.onboarding
 import android.animation.*
 import android.content.Context
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewTreeObserver
-import android.widget.*
+import android.view.ViewGroup
 import androidx.appcompat.app.AlertDialog
 import androidx.biometric.BiometricManager
 import androidx.biometric.BiometricManager.BIOMETRIC_SUCCESS
 import androidx.biometric.BiometricPrompt
 import androidx.core.content.ContextCompat
+import androidx.fragment.app.Fragment
 import butterknife.*
 import com.daasuu.ei.Ease
 import com.daasuu.ei.EasingInterpolator
@@ -50,12 +51,12 @@ import com.orhanobut.logger.Logger
 import com.tari.android.wallet.R
 import com.tari.android.wallet.application.WalletState
 import com.tari.android.wallet.auth.AuthUtil
+import com.tari.android.wallet.databinding.FragmentLocalAuthBinding
 import com.tari.android.wallet.event.EventBus
-import com.tari.android.wallet.ui.component.CustomFontButton
-import com.tari.android.wallet.ui.component.CustomFontTextView
+import com.tari.android.wallet.ui.extension.appComponent
+import com.tari.android.wallet.ui.extension.doOnGlobalLayout
 import com.tari.android.wallet.ui.extension.invisible
 import com.tari.android.wallet.ui.extension.visible
-import com.tari.android.wallet.ui.fragment.BaseFragment
 import com.tari.android.wallet.ui.util.UiUtil
 import com.tari.android.wallet.util.Constants.UI.Auth
 import com.tari.android.wallet.util.SharedPrefsWrapper
@@ -68,7 +69,7 @@ import javax.inject.Inject
  *
  * @author The Tari Development Team
  */
-internal class LocalAuthFragment : BaseFragment() {
+internal class LocalAuthFragment : Fragment() {
 
     enum class AuthType {
         BIOMETRIC,
@@ -76,35 +77,19 @@ internal class LocalAuthFragment : BaseFragment() {
         NONE
     }
 
-    @BindView(R.id.local_auth_vw_root)
-    lateinit var rootView: View
-    @BindView(R.id.local_auth_img_small_gem)
-    lateinit var smallGemImageView: ImageView
-    @BindView(R.id.local_auth_img_auth)
-    lateinit var authTypeImageView: ImageView
-    @BindView(R.id.local_auth_prompt_text)
-    lateinit var promptTextView: TextView
-    @BindView(R.id.local_auth_txt_auth_desc)
-    lateinit var authDescTextView: CustomFontTextView
-    @BindView(R.id.local_auth_vw_enable_auth_button_container)
-    lateinit var enableAuthButtonContainerView: View
-    @BindView(R.id.local_auth_btn_enable_auth)
-    lateinit var enableAuthButton: CustomFontButton
-    @BindView(R.id.local_auth_vw_prog_bar_container)
-    lateinit var progressBarContainerView: View
-    @BindView(R.id.local_auth_prog_bar_enable_auth)
-    lateinit var progressBar: ProgressBar
-
     @BindDimen(R.dimen.auth_button_bottom_margin)
     @JvmField
     var useAuthButtonBottomMargin = 0
 
     @BindString(R.string.auth_prompt_button_touch_id_text)
     lateinit var buttonTouchIdAuthFormat: String
+
     @BindString(R.string.auth_prompt_button_text)
     lateinit var buttonPinAuthFormat: String
+
     @BindString(R.string.onboarding_auth_biometric_prompt)
     lateinit var biometricAuthPrompt: String
+
     @BindString(R.string.onboarding_auth_device_lock_code_prompt)
     lateinit var deviceLockCodePrompt: String
 
@@ -114,29 +99,33 @@ internal class LocalAuthFragment : BaseFragment() {
 
     @Inject
     lateinit var sharedPrefsWrapper: SharedPrefsWrapper
+
     @Inject
     lateinit var tracker: Tracker
 
     private var authType: AuthType = AuthType.NONE
     private var listener: Listener? = null
     private var continueIsPendingOnWalletState = false
+    private var _ui: FragmentLocalAuthBinding? = null
+    private val ui get() = _ui!!
 
-    override val contentViewId = R.layout.fragment_local_auth
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? = FragmentLocalAuthBinding.inflate(inflater, container, false).also { _ui = it }.root
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _ui = null
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
+        LocalAuthFragmentVisitor.visit(this, view)
         setDeviceAuthType()
         setupUi()
-
-        rootView.viewTreeObserver.addOnGlobalLayoutListener(
-            object : ViewTreeObserver.OnGlobalLayoutListener {
-                override fun onGlobalLayout() {
-                    rootView.viewTreeObserver.removeOnGlobalLayoutListener(this)
-                    playStartUpAnim()
-                }
-            })
-
+        ui.rootView.doOnGlobalLayout(this::playStartUpAnim)
         TrackHelper.track()
             .screen("/onboarding/enable_local_auth")
             .title("Onboarding - Enable Local Authentication")
@@ -159,42 +148,38 @@ internal class LocalAuthFragment : BaseFragment() {
 
     private fun setDeviceAuthType() {
         authType = when {
-            BiometricManager.from(context!!).canAuthenticate() == BIOMETRIC_SUCCESS -> {
-                AuthType.BIOMETRIC
-            }
-            AuthUtil.isDeviceSecured(context!!) -> {
-                AuthType.PIN
-            }
-            else -> {
-                AuthType.NONE
-            }
+            BiometricManager.from(context!!)
+                .canAuthenticate() == BIOMETRIC_SUCCESS -> AuthType.BIOMETRIC
+            AuthUtil.isDeviceSecured(context!!) -> AuthType.PIN
+            else -> AuthType.NONE
         }
     }
 
     private fun setupUi() {
-        progressBarContainerView.invisible()
-        UiUtil.setProgressBarColor(progressBar, whiteColor)
+        ui.progressBarContainerView.invisible()
+        UiUtil.setProgressBarColor(ui.progressBar, whiteColor)
         if (authType == AuthType.BIOMETRIC) {
             //setup ui for biometric auth
-            authTypeImageView.setImageResource(R.drawable.fingerprint)
-            enableAuthButton.text = buttonTouchIdAuthFormat
+            ui.authTypeImageView.setImageResource(R.drawable.fingerprint)
+            ui.enableAuthButton.text = buttonTouchIdAuthFormat
         } else {
             //setup ui for device lock code auth
-            authTypeImageView.setImageResource(R.drawable.numpad)
-            enableAuthButton.text = buttonPinAuthFormat
+            ui.authTypeImageView.setImageResource(R.drawable.numpad)
+            ui.enableAuthButton.text = buttonPinAuthFormat
         }
+        ui.enableAuthButton.setOnClickListener { onEnableAuthButtonClick(it) }
     }
 
     private fun playStartUpAnim() {
-        val offset = (enableAuthButtonContainerView.height + useAuthButtonBottomMargin).toFloat()
+        val offset = (ui.enableAuthButtonContainerView.height + useAuthButtonBottomMargin).toFloat()
 
         val buttonContainerViewAnim: ObjectAnimator =
-            ObjectAnimator.ofFloat(enableAuthButtonContainerView, View.TRANSLATION_Y, offset, 0f)
+            ObjectAnimator.ofFloat(ui.enableAuthButtonContainerView, View.TRANSLATION_Y, offset, 0f)
 
-        val titleOffset = -(promptTextView.height).toFloat()
+        val titleOffset = -(ui.promptTextView.height).toFloat()
         val titleTextAnim =
             ObjectAnimator.ofFloat(
-                promptTextView,
+                ui.promptTextView,
                 View.TRANSLATION_Y,
                 0f,
                 titleOffset
@@ -203,10 +188,10 @@ internal class LocalAuthFragment : BaseFragment() {
         val fadeInAnim = ValueAnimator.ofFloat(0f, 1f)
         fadeInAnim.addUpdateListener { valueAnimator: ValueAnimator ->
             val alpha = valueAnimator.animatedValue as Float
-            smallGemImageView.alpha = alpha
-            authTypeImageView.alpha = alpha
-            authDescTextView.alpha = alpha
-            enableAuthButtonContainerView.alpha = alpha
+            ui.smallGemImageView.alpha = alpha
+            ui.authTypeImageView.alpha = alpha
+            ui.authDescTextView.alpha = alpha
+            ui.enableAuthButtonContainerView.alpha = alpha
         }
         fadeInAnim.startDelay = Auth.viewFadeAnimDelayMs
 
@@ -218,17 +203,16 @@ internal class LocalAuthFragment : BaseFragment() {
         anim.start()
     }
 
-    @OnClick(R.id.local_auth_btn_enable_auth)
-    fun onEnableAuthButtonClick(view: View) {
+    private fun onEnableAuthButtonClick(view: View) {
         UiUtil.temporarilyDisableClick(view)
-        val animatorSet = UiUtil.animateButtonClick(enableAuthButton)
+        val animatorSet = UiUtil.animateButtonClick(ui.enableAuthButton)
         animatorSet.addListener(object : AnimatorListenerAdapter() {
             override fun onAnimationEnd(animation: Animator?) {
                 if (authType == AuthType.NONE) {
                     displayAuthNotAvailableDialog()
                     return
                 }
-                enableAuthButton.isEnabled = false
+                ui.enableAuthButton.isEnabled = false
                 doAuth()
             }
         })
@@ -263,7 +247,8 @@ internal class LocalAuthFragment : BaseFragment() {
                 }
             })
 
-        val biometricAuthAvailable = BiometricManager.from(context!!).canAuthenticate() == BIOMETRIC_SUCCESS
+        val biometricAuthAvailable =
+            BiometricManager.from(context!!).canAuthenticate() == BIOMETRIC_SUCCESS
         val prompt = if (biometricAuthAvailable) biometricAuthPrompt else deviceLockCodePrompt
         val promptInfo = BiometricPrompt.PromptInfo.Builder()
             .setTitle(getString(R.string.onboarding_auth_title))
@@ -291,7 +276,7 @@ internal class LocalAuthFragment : BaseFragment() {
         val dialog = dialogBuilder.create()
         dialog.setTitle(getString(R.string.auth_failed_title))
         dialog.show()
-        enableAuthButton.isEnabled = true
+        ui.enableAuthButton.isEnabled = true
     }
 
     /**
@@ -317,8 +302,8 @@ internal class LocalAuthFragment : BaseFragment() {
     private fun authSuccess() {
         // check if the wallet is ready & switch to wait mode if not & start listening
         if (EventBus.walletStateSubject.value != WalletState.RUNNING) {
-            progressBarContainerView.visible()
-            enableAuthButton.invisible()
+            ui.progressBarContainerView.visible()
+            ui.enableAuthButton.invisible()
             continueIsPendingOnWalletState = true
             EventBus.subscribeToWalletState(this) { walletState ->
                 onWalletStateChanged(walletState)
@@ -333,13 +318,18 @@ internal class LocalAuthFragment : BaseFragment() {
     private fun onWalletStateChanged(walletState: WalletState) {
         if (walletState == WalletState.RUNNING && continueIsPendingOnWalletState) {
             continueIsPendingOnWalletState = false
-            rootView.post {
-                authSuccess()
-            }
+            ui.rootView.post { authSuccess() }
         }
     }
 
     interface Listener {
         fun onAuthSuccess()
+    }
+
+    private object LocalAuthFragmentVisitor {
+        internal fun visit(fragment: LocalAuthFragment, view: View) {
+            fragment.requireActivity().appComponent.inject(fragment)
+            ButterKnife.bind(fragment, view)
+        }
     }
 }

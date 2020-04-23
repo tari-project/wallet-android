@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/finalize_send_tx_vw_root"
+    android:id="@+id/root_view"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/white"
     android:orientation="vertical">
 
     <VideoView
-        android:id="@+id/finalize_send_tx_video_bg"
+        android:id="@+id/background_animation_video_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_alignParentStart="true"
@@ -24,7 +24,7 @@
         android:orientation="vertical">
 
         <com.airbnb.lottie.LottieAnimationView
-            android:id="@+id/finalize_send_tx_anim"
+            android:id="@+id/lottie_animation_view"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:lottie_autoPlay="false"
@@ -41,7 +41,7 @@
             android:gravity="bottom">
 
             <com.tari.android.wallet.ui.component.CustomFontTextView
-                android:id="@+id/finalize_send_tx_txt_info_line_1"
+                android:id="@+id/info_line_1_text_view"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/finalize_send_tx_sending_step_1_desc_line_1"
@@ -58,7 +58,7 @@
             android:gravity="bottom">
 
             <com.tari.android.wallet.ui.component.CustomFontTextView
-                android:id="@+id/finalize_send_tx_txt_info_line_2"
+                android:id="@+id/info_line_2_text_view"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/finalize_send_tx_sending_step_1_desc_line_2"
@@ -73,13 +73,13 @@
             android:layout_marginTop="40dp">
 
             <FrameLayout
-                android:id="@+id/finalize_send_tx_vw_prog_bar_step_1_container"
+                android:id="@+id/step_1_progress_bar_container_view"
                 android:layout_width="55dp"
                 android:background="@color/finalize_send_progress_bar_passive_bg"
                 android:layout_height="match_parent">
 
                 <ProgressBar
-                    android:id="@+id/finalize_send_tx_prog_bar_step_1"
+                    android:id="@+id/step_1_progress_bar"
                     style="?android:attr/progressBarStyleHorizontal"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
@@ -90,14 +90,14 @@
             </FrameLayout>
 
             <FrameLayout
-                android:id="@+id/finalize_send_tx_vw_prog_bar_step_2_container"
+                android:id="@+id/step_2_progress_bar_container_view"
                 android:layout_marginStart="6dp"
                 android:layout_width="55dp"
                 android:background="@color/finalize_send_progress_bar_passive_bg"
                 android:layout_height="match_parent">
 
                 <ProgressBar
-                    android:id="@+id/finalize_send_tx_prog_bar_step_2"
+                    android:id="@+id/step_2_progress_bar"
                     style="?android:attr/progressBarStyleHorizontal"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
@@ -108,14 +108,14 @@
             </FrameLayout>
 
             <FrameLayout
-                android:id="@+id/finalize_send_tx_vw_prog_bar_step_3_container"
+                android:id="@+id/step_3_progress_bar_container_view"
                 android:layout_width="55dp"
                 android:layout_marginStart="6dp"
                 android:background="@color/finalize_send_progress_bar_passive_bg"
                 android:layout_height="match_parent">
 
                 <ProgressBar
-                    android:id="@+id/finalize_send_tx_prog_bar_step_3"
+                    android:id="@+id/step_3_progress_bar"
                     style="?android:attr/progressBarStyleHorizontal"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"

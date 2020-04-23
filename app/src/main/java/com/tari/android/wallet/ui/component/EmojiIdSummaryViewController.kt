@@ -33,35 +33,17 @@
 package com.tari.android.wallet.ui.component
 
 import android.view.View
-import android.widget.TextView
-import butterknife.BindView
-import butterknife.ButterKnife
 import com.ibm.icu.text.BreakIterator
-import com.tari.android.wallet.R
+import com.tari.android.wallet.databinding.EmojiIdSummaryBinding
 
 /**
  * Display a summary of the emoji id - with pipes.
  *
  * @author The Tari Development Team
  */
-internal class EmojiIdSummaryViewController(view: View) {
+internal class EmojiIdSummaryViewController(private val ui: EmojiIdSummaryBinding) {
 
-    @BindView(R.id.emoji_id_summary_txt_emoji_1)
-    lateinit var emoji1TextView: TextView
-    @BindView(R.id.emoji_id_summary_txt_emoji_2)
-    lateinit var emoji2TextView: TextView
-    @BindView(R.id.emoji_id_summary_txt_emoji_3)
-    lateinit var emoji3TextView: TextView
-    @BindView(R.id.emoji_id_summary_txt_emoji_4)
-    lateinit var emoji4TextView: TextView
-    @BindView(R.id.emoji_id_summary_txt_emoji_5)
-    lateinit var emoji5TextView: TextView
-    @BindView(R.id.emoji_id_summary_txt_emoji_6)
-    lateinit var emoji6TextView: TextView
-
-    init {
-        ButterKnife.bind(this, view)
-    }
+    constructor(view: View) : this(EmojiIdSummaryBinding.bind(view))
 
     fun display(emojiId: String) {
         val emojis = ArrayList<String>()
@@ -77,12 +59,12 @@ internal class EmojiIdSummaryViewController(view: View) {
             previous = it.current()
         }
 
-        emoji1TextView.text = emojis[0]
-        emoji2TextView.text = emojis[1]
-        emoji3TextView.text = emojis[2]
-        emoji4TextView.text = emojis.takeLast(3)[0]
-        emoji5TextView.text = emojis.takeLast(2)[0]
-        emoji6TextView.text = emojis.takeLast(1)[0]
+        ui.emojiIdSummaryEmoji1TextView.text = emojis[0]
+        ui.emojiIdSummaryEmoji2TextView.text = emojis[1]
+        ui.emojiIdSummaryEmoji3TextView.text = emojis[2]
+        ui.emojiIdSummaryEmoji4TextView.text = emojis.takeLast(3)[0]
+        ui.emojiIdSummaryEmoji5TextView.text = emojis.takeLast(2)[0]
+        ui.emojiIdSummaryEmoji6TextView.text = emojis.takeLast(1)[0]
     }
 
 

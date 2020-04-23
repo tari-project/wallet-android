@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/base_node_config_vw_root"
+    android:id="@+id/root_view"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/white"
@@ -35,7 +35,7 @@
         app:customFont="AVENIR_LT_STD_HEAVY" />
 
     <com.tari.android.wallet.ui.component.CustomFontTextView
-        android:id="@+id/base_node_config_txt_public_key_hex"
+        android:id="@+id/public_key_hex_text_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="12dp"
@@ -60,7 +60,7 @@
         app:customFont="AVENIR_LT_STD_HEAVY" />
 
     <com.tari.android.wallet.ui.component.CustomFontTextView
-        android:id="@+id/base_node_config_txt_address"
+        android:id="@+id/address_text_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="12dp"
@@ -86,7 +86,7 @@
         app:textAllCaps="true" />
 
     <com.tari.android.wallet.ui.component.CustomFontEditText
-        android:id="@+id/base_node_config_edit_public_key"
+        android:id="@+id/public_key_hex_edit_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="24dp"
@@ -101,7 +101,7 @@
         app:customFont="AVENIR_NEXT_LT_PRO_REGULAR" />
 
     <com.tari.android.wallet.ui.component.CustomFontTextView
-        android:id="@+id/base_node_config_txt_invalid_public_key"
+        android:id="@+id/invalid_public_key_hex_text_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:ellipsize="end"
@@ -113,7 +113,7 @@
 
 
     <com.tari.android.wallet.ui.component.CustomFontEditText
-        android:id="@+id/base_node_config_edit_address"
+        android:id="@+id/address_edit_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="24dp"
@@ -128,7 +128,7 @@
         app:customFont="AVENIR_NEXT_LT_PRO_REGULAR" />
 
     <com.tari.android.wallet.ui.component.CustomFontTextView
-        android:id="@+id/base_node_config_txt_invalid_address"
+        android:id="@+id/invalid_address_text_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:ellipsize="end"
@@ -146,7 +146,7 @@
         android:background="@drawable/gradient_button_bg">
 
         <com.tari.android.wallet.ui.component.CustomFontButton
-            android:id="@+id/base_node_config_btn_save"
+            android:id="@+id/save_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@color/transparent"
@@ -157,7 +157,7 @@
             app:customFont="AVENIR_LT_STD_HEAVY" />
 
         <ProgressBar
-            android:id="@+id/base_node_config_progress_bar"
+            android:id="@+id/progress_bar"
             android:layout_width="35dp"
             android:layout_height="35dp"
             android:layout_centerInParent="true"

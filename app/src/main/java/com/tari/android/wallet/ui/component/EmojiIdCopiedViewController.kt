@@ -36,13 +36,10 @@ import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
 import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
-import android.view.View
-import android.widget.TextView
-import butterknife.BindView
-import butterknife.ButterKnife
+import androidx.core.animation.addListener
 import com.daasuu.ei.Ease
 import com.daasuu.ei.EasingInterpolator
-import com.tari.android.wallet.R
+import com.tari.android.wallet.databinding.EmojiIdCopiedAnimViewBinding
 import com.tari.android.wallet.util.Constants
 
 /**
@@ -50,23 +47,22 @@ import com.tari.android.wallet.util.Constants
  *
  * @author The Tari Development Team
  */
-internal class EmojiIdCopiedViewController(view: View) {
-
-    @BindView(R.id.emoji_id_copied_vw_white_bg)
-    lateinit var whiteBgView: View
-    @BindView(R.id.emoji_id_copied_vw_green_bg)
-    lateinit var greenBgView: View
-    @BindView(R.id.emoji_id_copied_txt_copied)
-    lateinit var textView: TextView
+internal class EmojiIdCopiedViewController(private val ui: EmojiIdCopiedAnimViewBinding) {
 
     init {
-        ButterKnife.bind(this, view)
         whiteBgView.post {
             whiteBgView.alpha = 0f
             greenBgView.alpha = 0f
             textView.alpha = 0f
         }
     }
+
+    private val whiteBgView
+        get() = ui.emojiIdCopiedWhiteBgView
+    private val greenBgView
+        get() = ui.emojiIdCopiedGreenBgView
+    private val textView
+        get() = ui.emojiIdCopiedCopiedTextView
 
     fun showEmojiIdCopiedAnim(fadeOutOnEnd: Boolean = false, then: (() -> Unit)? = null) {
         // fade in white bg
@@ -129,18 +125,18 @@ internal class EmojiIdCopiedViewController(view: View) {
             greenBgFadeOutAnim
         )
         animSet.start()
-        animSet.addListener(object : AnimatorListenerAdapter() {
-            override fun onAnimationEnd(animation: Animator?) {
+        animSet.addListener(
+            onEnd = {
                 if (fadeOutOnEnd) {
                     fadeOut(then = then)
-                    return
+                } else {
+                    whiteBgView.alpha = 0f
+                    greenBgView.alpha = 0f
+                    textView.alpha = 0f
+                    then?.let { it() }
                 }
-                whiteBgView.alpha = 0f
-                greenBgView.alpha = 0f
-                textView.alpha = 0f
-                then?.let { it() }
             }
-        })
+        )
     }
 
     private fun fadeOut(then: (() -> Unit)? = null) {

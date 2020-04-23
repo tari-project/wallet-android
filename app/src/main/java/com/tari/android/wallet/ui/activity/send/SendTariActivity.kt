@@ -38,13 +38,14 @@ import android.content.Intent
 import android.content.ServiceConnection
 import android.os.Bundle
 import android.os.IBinder
-import android.view.View
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentManager
 import butterknife.BindColor
-import butterknife.BindView
+import butterknife.ButterKnife
 import com.orhanobut.logger.Logger
 import com.tari.android.wallet.R
+import com.tari.android.wallet.application.TariWalletApplication
+import com.tari.android.wallet.databinding.ActivitySendTariBinding
 import com.tari.android.wallet.event.Event
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.model.MicroTari
@@ -52,10 +53,8 @@ import com.tari.android.wallet.model.User
 import com.tari.android.wallet.network.NetworkConnectionState
 import com.tari.android.wallet.service.TariWalletService
 import com.tari.android.wallet.service.WalletService
-import com.tari.android.wallet.ui.activity.BaseActivity
 import com.tari.android.wallet.ui.dialog.BottomSlideDialog
 import com.tari.android.wallet.ui.extension.showInternetConnectionErrorDialog
-import com.tari.android.wallet.ui.fragment.BaseFragment
 import com.tari.android.wallet.ui.fragment.send.AddAmountFragment
 import com.tari.android.wallet.ui.fragment.send.AddNoteFragment
 import com.tari.android.wallet.ui.fragment.send.AddRecipientFragment
@@ -69,18 +68,12 @@ import java.lang.ref.WeakReference
  *
  * @author The Tari Development Team
  */
-internal class SendTariActivity : BaseActivity(),
+internal class SendTariActivity : AppCompatActivity(),
     ServiceConnection,
     AddRecipientFragment.Listener,
     AddAmountFragment.Listener,
     AddNoteFragment.Listener,
     FinalizeSendTxFragment.Listener {
-
-    @BindView(R.id.send_tari_vw_root)
-    lateinit var rootView: View
-
-    @BindView(R.id.send_tari_vw_fragment_container)
-    lateinit var fragmentContainerView: View
 
     @BindColor(R.color.white)
     @JvmField
@@ -90,9 +83,8 @@ internal class SendTariActivity : BaseActivity(),
     @JvmField
     var blackColor = 0
 
-    override val contentViewId = R.layout.activity_send_tari
+    private lateinit var ui: ActivitySendTariBinding
 
-    private lateinit var mFragmentManager: FragmentManager
     private var currentFragmentWR: WeakReference<Fragment>? = null
 
     private var walletService: TariWalletService? = null
@@ -103,8 +95,8 @@ internal class SendTariActivity : BaseActivity(),
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        mFragmentManager = supportFragmentManager
+        ui = ActivitySendTariBinding.inflate(layoutInflater).apply { setContentView(root) }
+        SendTariActivityVisitor.visit(this)
     }
 
     override fun onStart() {
@@ -128,21 +120,21 @@ internal class SendTariActivity : BaseActivity(),
             }
             val addAmountFragment = AddAmountFragment.newInstance(walletService!!)
             addAmountFragment.arguments = bundle
-            val fragmentTx = mFragmentManager.beginTransaction()
-            fragmentTx.add(R.id.send_tari_vw_fragment_container, addAmountFragment)
+            val fragmentTx = supportFragmentManager.beginTransaction()
+            fragmentTx.add(R.id.send_tari_fragment_container_view, addAmountFragment)
             fragmentTx.commit()
             currentFragmentWR = WeakReference(addAmountFragment)
-            rootView.postDelayed({
-                wr.get()?.rootView?.setBackgroundColor(blackColor)
+            ui.rootView.postDelayed({
+                wr.get()?.ui?.rootView?.setBackgroundColor(blackColor)
             }, 1000)
         } else {
             val addRecipientFragment = AddRecipientFragment.newInstance(walletService!!)
-            val fragmentTx = mFragmentManager.beginTransaction()
-            fragmentTx.add(R.id.send_tari_vw_fragment_container, addRecipientFragment)
+            val fragmentTx = supportFragmentManager.beginTransaction()
+            fragmentTx.add(R.id.send_tari_fragment_container_view, addRecipientFragment)
             fragmentTx.commit()
             currentFragmentWR = WeakReference(addRecipientFragment)
-            rootView.postDelayed({
-                wr.get()?.rootView?.setBackgroundColor(blackColor)
+            ui.rootView.postDelayed({
+                wr.get()?.ui?.rootView?.setBackgroundColor(blackColor)
             }, 1000)
         }
     }
@@ -198,12 +190,12 @@ internal class SendTariActivity : BaseActivity(),
         val bundle = Bundle().apply {
             putParcelable("recipientUser", user)
         }
-        rootView.postDelayed({
+        ui.rootView.postDelayed({
             wr.get()?.goToAddAmountFragment(sourceFragment, bundle)
         }, Constants.UI.keyboardHideWaitMs)
     }
 
-    private fun goToAddAmountFragment(sourceFragment: BaseFragment, bundle: Bundle) {
+    private fun goToAddAmountFragment(sourceFragment: Fragment, bundle: Bundle) {
         val fragment = AddAmountFragment.newInstance(walletService!!)
         fragment.arguments = bundle
         supportFragmentManager
@@ -214,7 +206,7 @@ internal class SendTariActivity : BaseActivity(),
             )
             .hide(sourceFragment)
             .add(
-                R.id.send_tari_vw_fragment_container,
+                R.id.send_tari_fragment_container_view,
                 fragment,
                 AddAmountFragment::class.java.simpleName
             )
@@ -256,7 +248,7 @@ internal class SendTariActivity : BaseActivity(),
         goToAddNoteFragment(sourceFragment, bundle)
     }
 
-    private fun goToAddNoteFragment(sourceFragment: BaseFragment, bundle: Bundle) {
+    private fun goToAddNoteFragment(sourceFragment: Fragment, bundle: Bundle) {
         val fragment = AddNoteFragment()
         fragment.arguments = bundle
         supportFragmentManager
@@ -267,7 +259,7 @@ internal class SendTariActivity : BaseActivity(),
             )
             .hide(sourceFragment)
             .add(
-                R.id.send_tari_vw_fragment_container,
+                R.id.send_tari_fragment_container_view,
                 fragment,
                 fragment::class.java.simpleName
             )
@@ -295,15 +287,15 @@ internal class SendTariActivity : BaseActivity(),
                 putString("note", note)
             }
         }
-        rootView.post {
-            wr.get()?.rootView?.setBackgroundColor(whiteColor)
+        ui.rootView.post {
+            wr.get()?.ui?.rootView?.setBackgroundColor(whiteColor)
         }
         supportFragmentManager
             .beginTransaction()
             .setCustomAnimations(R.anim.fade_in, R.anim.fade_out)
             .hide(sourceFragment)
             .add(
-                R.id.send_tari_vw_fragment_container,
+                R.id.send_tari_fragment_container_view,
                 fragment,
                 fragment::class.java.simpleName
             )
@@ -348,5 +340,12 @@ internal class SendTariActivity : BaseActivity(),
     }
 
     // endregion
+
+    private object SendTariActivityVisitor {
+        internal fun visit(activity: SendTariActivity) {
+            (activity.application as TariWalletApplication).appComponent.inject(activity)
+            ButterKnife.bind(activity)
+        }
+    }
 
 }

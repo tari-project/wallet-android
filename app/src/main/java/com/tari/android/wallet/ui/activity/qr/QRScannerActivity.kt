@@ -33,20 +33,19 @@
 package com.tari.android.wallet.ui.activity.qr
 
 import android.Manifest
-import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import butterknife.BindView
-import butterknife.OnClick
 import com.budiyev.android.codescanner.*
 import com.google.zxing.BarcodeFormat
 import com.tari.android.wallet.R
-import com.tari.android.wallet.ui.activity.BaseActivity
+import com.tari.android.wallet.application.TariWalletApplication
+import com.tari.android.wallet.databinding.ActivityQrScannerBinding
 import org.matomo.sdk.Tracker
 import org.matomo.sdk.extra.TrackHelper
 import javax.inject.Inject
@@ -59,7 +58,7 @@ const val EXTRA_QR_DATA = "extra_qr_text"
  *
  * @author The Tari Development Team
  */
-internal class QRScannerActivity : BaseActivity() {
+internal class QRScannerActivity : AppCompatActivity() {
 
     companion object {
         /**
@@ -68,24 +67,20 @@ internal class QRScannerActivity : BaseActivity() {
         const val REQUEST_QR_SCANNER = 101
     }
 
-    @BindView(R.id.scanner_view)
-    lateinit var scannerView: CodeScannerView
-
     @Inject
     lateinit var tracker: Tracker
 
     private lateinit var codeScanner: CodeScanner
 
-    override val contentViewId = R.layout.activity_qr_scanner
+    private lateinit var ui: ActivityQrScannerBinding
 
-    @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        if (ContextCompat.checkSelfPermission(
-                this,
-                Manifest.permission.CAMERA
-            ) == PackageManager.PERMISSION_DENIED
+        ui = ActivityQrScannerBinding.inflate(layoutInflater).apply { setContentView(root) }
+        QRScannerActivityVisitor.visit(this)
+        setupUi()
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
+            == PackageManager.PERMISSION_DENIED
         ) {
             ActivityCompat.requestPermissions(
                 this,
@@ -94,7 +89,6 @@ internal class QRScannerActivity : BaseActivity() {
             )
         } else {
             startScanning()
-
             TrackHelper.track()
                 .screen("/home/send_tari/add_recipient/qr_scan")
                 .title("Send Tari - Add Recipient - Scan QR Code")
@@ -102,14 +96,15 @@ internal class QRScannerActivity : BaseActivity() {
         }
     }
 
-    @OnClick(R.id.qr_close)
-    fun onCloseQrScannerClick() {
-        finish()
-        overridePendingTransition(0, R.anim.slide_down)
+    private fun setupUi() {
+        ui.qrCloseView.setOnClickListener {
+            finish()
+            overridePendingTransition(0, R.anim.slide_down)
+        }
     }
 
     private fun startScanning() {
-        codeScanner = CodeScanner(this, scannerView).apply {
+        codeScanner = CodeScanner(this, ui.scannerView).apply {
             camera = CodeScanner.CAMERA_BACK
             formats = listOf(BarcodeFormat.QR_CODE)
             autoFocusMode = AutoFocusMode.SAFE
@@ -136,7 +131,7 @@ internal class QRScannerActivity : BaseActivity() {
             }
         }
 
-        scannerView.setOnClickListener {
+        ui.scannerView.setOnClickListener {
             codeScanner.startPreview()
         }
     }
@@ -172,6 +167,12 @@ internal class QRScannerActivity : BaseActivity() {
             codeScanner.releaseResources()
         }
         super.onPause()
+    }
+
+    private object QRScannerActivityVisitor {
+        internal fun visit(activity: QRScannerActivity) {
+            (activity.application as TariWalletApplication).appComponent.inject(activity)
+        }
     }
 
 }

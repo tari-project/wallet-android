@@ -33,14 +33,13 @@
 package com.tari.android.wallet.ui.activity.debug
 
 import android.os.Bundle
-import androidx.viewpager2.widget.ViewPager2
+import androidx.appcompat.app.AppCompatActivity
 import butterknife.BindString
-import butterknife.BindView
-import butterknife.OnClick
-import com.google.android.material.tabs.TabLayout
+import butterknife.ButterKnife
 import com.google.android.material.tabs.TabLayoutMediator
 import com.tari.android.wallet.R
-import com.tari.android.wallet.ui.activity.BaseActivity
+import com.tari.android.wallet.application.TariWalletApplication
+import com.tari.android.wallet.databinding.ActivityDebugBinding
 import com.tari.android.wallet.ui.activity.debug.adapter.DebugViewPagerAdapter
 
 /**
@@ -48,12 +47,7 @@ import com.tari.android.wallet.ui.activity.debug.adapter.DebugViewPagerAdapter
  *
  * @author The Tari Development Team
  */
-internal class DebugActivity : BaseActivity() {
-
-    @BindView(R.id.debug_tab_layout)
-    lateinit var tabLayout: TabLayout
-    @BindView(R.id.debug_view_pager)
-    lateinit var viewPager: ViewPager2
+internal class DebugActivity : AppCompatActivity() {
 
     @BindString(R.string.debug_log_files_title)
     lateinit var logFilesTitle: String
@@ -62,28 +56,35 @@ internal class DebugActivity : BaseActivity() {
 
     private lateinit var pagerAdapter: DebugViewPagerAdapter
 
-    override val contentViewId = R.layout.activity_debug
+    private lateinit var ui: ActivityDebugBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        ui = ActivityDebugBinding.inflate(layoutInflater).apply { setContentView(root) }
+        DebugActivityVisitor.visit(this)
         pagerAdapter = DebugViewPagerAdapter(this)
-        viewPager.adapter = pagerAdapter
-        viewPager.offscreenPageLimit = 1
-
-        TabLayoutMediator(tabLayout, viewPager) { tab, position ->
-
+        ui.viewPager.adapter = pagerAdapter
+        ui.viewPager.offscreenPageLimit = 1
+        TabLayoutMediator(ui.tabLayout, ui.viewPager) { tab, position ->
             tab.text = when (position) {
                 0 -> logFilesTitle
                 1 -> baseNodeTitle
                 else -> throw RuntimeException("Unexpected position: $position")
             }
         }.attach()
+        ui.backButton.setOnClickListener { onBackPressed() }
     }
 
-    @OnClick(R.id.debug_btn_back)
     override fun onBackPressed() {
         super.onBackPressed()
         overridePendingTransition(R.anim.enter_from_left, R.anim.exit_to_right)
+    }
+
+    private object DebugActivityVisitor {
+        internal fun visit(activity: DebugActivity) {
+            (activity.application as TariWalletApplication).appComponent.inject(activity)
+            ButterKnife.bind(activity)
+        }
     }
 
 }

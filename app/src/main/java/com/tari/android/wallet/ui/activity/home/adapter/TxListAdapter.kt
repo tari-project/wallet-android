@@ -105,14 +105,10 @@ internal class TxListAdapter(
     /**
      * Defines the view type - header or transaction.
      */
-    override fun getItemViewType(position: Int): Int {
-        return if (pendingTxs.size > 0 && position == 0) {
-            pendingHeaderViewType
-        } else if (items[position] is Tx) {
-            txViewType
-        } else {
-            headerViewType
-        }
+    override fun getItemViewType(position: Int): Int = when {
+        pendingTxs.size > 0 && position == 0 -> pendingHeaderViewType
+        items[position] is Tx -> txViewType
+        else -> headerViewType
     }
 
     /**
@@ -126,26 +122,17 @@ internal class TxListAdapter(
             pendingHeaderViewType -> {
                 val view = LayoutInflater.from(parent.context)
                     .inflate(R.layout.home_tx_list_header, parent, false)
-                TxHeaderViewHolder(
-                    view,
-                    TxHeaderViewHolder.Type.PENDING_TXS
-                )
+                TxHeaderViewHolder(view, TxHeaderViewHolder.Type.PENDING_TXS)
             }
             headerViewType -> {
                 val view = LayoutInflater.from(parent.context)
                     .inflate(R.layout.home_tx_list_header, parent, false)
-                TxHeaderViewHolder(
-                    view,
-                    TxHeaderViewHolder.Type.DATE
-                )
+                TxHeaderViewHolder(view, TxHeaderViewHolder.Type.DATE)
             }
             txViewType -> {
                 val view = LayoutInflater.from(parent.context)
                     .inflate(R.layout.home_tx_list_item, parent, false)
-                TxViewHolder(
-                    view,
-                    this
-                )
+                TxViewHolder(view, this)
             }
             else -> {
                 throw RuntimeException("Unexpected view type $viewType.")

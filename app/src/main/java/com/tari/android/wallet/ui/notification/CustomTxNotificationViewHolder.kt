@@ -105,27 +105,27 @@ class CustomTxNotificationViewHolder(val context: Context, tx: Tx) :
             previous = it.current()
         }
         setTextViewText(
-            R.id.emoji_id_summary_txt_emoji_1,
+            R.id.emoji_id_summary_emoji_1_text_view,
             emojis[0]
         )
         setTextViewText(
-            R.id.emoji_id_summary_txt_emoji_2,
+            R.id.emoji_id_summary_emoji_2_text_view,
             emojis[1]
         )
         setTextViewText(
-            R.id.emoji_id_summary_txt_emoji_3,
+            R.id.emoji_id_summary_emoji_3_text_view,
             emojis[2]
         )
         setTextViewText(
-            R.id.emoji_id_summary_txt_emoji_4,
+            R.id.emoji_id_summary_emoji_4_text_view,
             emojis.takeLast(3)[0]
         )
         setTextViewText(
-            R.id.emoji_id_summary_txt_emoji_5,
+            R.id.emoji_id_summary_emoji_5_text_view,
             emojis.takeLast(2)[0]
         )
         setTextViewText(
-            R.id.emoji_id_summary_txt_emoji_6,
+            R.id.emoji_id_summary_emoji_6_text_view,
             emojis.takeLast(1)[0]
         )
     }

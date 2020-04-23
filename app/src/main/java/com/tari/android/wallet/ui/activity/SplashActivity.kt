@@ -35,7 +35,9 @@ package com.tari.android.wallet.ui.activity
 import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
+import androidx.appcompat.app.AppCompatActivity
 import com.tari.android.wallet.R
+import com.tari.android.wallet.application.TariWalletApplication
 import com.tari.android.wallet.di.WalletModule
 import com.tari.android.wallet.ui.activity.onboarding.OnboardingFlowActivity
 import com.tari.android.wallet.util.Constants.UI.Splash
@@ -49,9 +51,7 @@ import javax.inject.Named
  *
  * @author The Tari Development Team
  */
-internal class SplashActivity : BaseActivity() {
-
-    override val contentViewId = R.layout.activity_splash
+internal class SplashActivity : AppCompatActivity() {
 
     private val uiHandler = Handler()
 
@@ -64,6 +64,8 @@ internal class SplashActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         // check whether there's an existing wallet
+        setContentView(R.layout.activity_splash)
+        SplashActivityVisitor.visit(this)
         val walletExists = File(walletFilesDirPath).list()!!.isNotEmpty()
         if (walletExists && sharedPrefsWrapper.onboardingAuthSetupCompleted) {
             uiHandler.postDelayed({
@@ -99,5 +101,11 @@ internal class SplashActivity : BaseActivity() {
     override fun onDestroy() {
         super.onDestroy()
         uiHandler.removeCallbacksAndMessages(null)
+    }
+
+    private object SplashActivityVisitor {
+        internal fun visit(activity: SplashActivity) {
+            (activity.application as TariWalletApplication).appComponent.inject(activity)
+        }
     }
 }

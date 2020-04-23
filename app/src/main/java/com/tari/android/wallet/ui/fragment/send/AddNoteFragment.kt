@@ -41,27 +41,25 @@ import android.os.Bundle
 import android.text.Editable
 import android.text.InputType
 import android.text.TextWatcher
-import android.view.MotionEvent
-import android.view.View
-import android.view.ViewTreeObserver
+import android.view.*
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.*
 import androidx.core.content.ContextCompat
+import androidx.fragment.app.Fragment
 import butterknife.*
 import com.daasuu.ei.Ease
 import com.daasuu.ei.EasingInterpolator
 import com.tari.android.wallet.R
+import com.tari.android.wallet.databinding.FragmentAddNoteBinding
 import com.tari.android.wallet.event.EventBus
-import com.tari.android.wallet.model.*
+import com.tari.android.wallet.model.Contact
+import com.tari.android.wallet.model.MicroTari
+import com.tari.android.wallet.model.User
 import com.tari.android.wallet.network.NetworkConnectionState
 import com.tari.android.wallet.ui.component.EmojiIdCopiedViewController
 import com.tari.android.wallet.ui.component.EmojiIdSummaryViewController
-import com.tari.android.wallet.ui.extension.gone
-import com.tari.android.wallet.ui.extension.invisible
-import com.tari.android.wallet.ui.extension.showInternetConnectionErrorDialog
-import com.tari.android.wallet.ui.extension.visible
-import com.tari.android.wallet.ui.fragment.BaseFragment
+import com.tari.android.wallet.ui.extension.*
 import com.tari.android.wallet.ui.util.UiUtil
 import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.EmojiUtil
@@ -76,70 +74,26 @@ import javax.inject.Inject
  *
  * @author The Tari Development Team
  */
-class AddNoteFragment : BaseFragment(),
-    TextWatcher, View.OnTouchListener {
-
-    @BindView(R.id.add_note_and_send_vw_root)
-    lateinit var rootView: View
-    @BindView(R.id.add_note_txt_title)
-    lateinit var titleTextView: TextView
-    @BindView(R.id.add_note_btn_back)
-    lateinit var backButton: ImageButton
-    @BindView(R.id.add_note_vw_emoji_id_summary_container)
-    lateinit var emojiIdSummaryContainerView: View
-    @BindView(R.id.add_note_vw_emoji_id_summary)
-    lateinit var emojiIdSummaryView: View
-    @BindView(R.id.add_note_vw_full_emoji_id_container)
-    lateinit var fullEmojiIdContainerView: View
-    @BindView(R.id.add_note_scroll_full_emoji_id)
-    lateinit var fullEmojiIdScrollView: HorizontalScrollView
-    @BindView(R.id.add_note_txt_full_emoji_id)
-    lateinit var fullEmojiIdTextView: TextView
-    @BindView(R.id.add_note_vw_copy_emoji_id_container)
-    lateinit var copyEmojiIdButtonContainerView: View
-    @BindView(R.id.add_note_vw_emoji_id_copied)
-    lateinit var emojiIdCopiedAnimView: View
-    @BindView(R.id.add_note_txt_prompt)
-    lateinit var promptTextView: TextView
-    @BindView(R.id.add_note_edit_note)
-    lateinit var noteEditText: EditText
-    @BindView(R.id.add_note_vw_slide_button_container)
-    lateinit var slideButtonContainerView: View
-    @BindView(R.id.add_note_vw_slide_enabled_bg)
-    lateinit var slideBgEnabledView: View
-    @BindView(R.id.add_note_txt_slide_to_send_disabled)
-    lateinit var slideToSendDisabledTextView: TextView
-    @BindView(R.id.add_note_txt_slide_to_send_enabled)
-    lateinit var slideToSendEnabledTextView: TextView
-    @BindView(R.id.add_note_img_slide_to_send_arrow_enabled)
-    lateinit var slideArrowIconEnabledImageView: ImageView
-    @BindView(R.id.add_note_vw_slide)
-    lateinit var slideView: View
-    @BindView(R.id.add_note_prog_bar)
-    lateinit var progressBar: ProgressBar
+class AddNoteFragment : Fragment(), TextWatcher, View.OnTouchListener {
 
     /**
      * Emoji id chunk separator char.
      */
     @BindString(R.string.emoji_id_chunk_separator)
     lateinit var emojiIdChunkSeparator: String
-    /**
-     * Dimmer and click blocker views.
-     */
-    @BindView(R.id.add_note_vw_dimmer)
-    lateinit var dimmerView: View
-    @BindView(R.id.add_note_vw_full_emoji_id_bg_click_blocker)
-    lateinit var fullEmojiIdBgClickBlockerView: View
 
     @BindDimen(R.dimen.add_note_slide_button_left_margin)
     @JvmField
     var slideViewMarginStart = 0
+
     @BindDimen(R.dimen.add_note_slide_button_width)
     @JvmField
     var slideViewWidth = 0
+
     @BindDimen(R.dimen.common_horizontal_margin)
     @JvmField
     var horizontalMargin = 0
+
     @BindDimen(R.dimen.common_copy_emoji_id_button_visible_bottom_margin)
     @JvmField
     var copyEmojiIdButtonVisibleBottomMargin = 0
@@ -147,15 +101,19 @@ class AddNoteFragment : BaseFragment(),
     @BindColor(R.color.white)
     @JvmField
     var whiteColor = 0
+
     @BindColor(R.color.black)
     @JvmField
     var promptActiveColor = 0
+
     @BindColor(R.color.add_note_prompt_passive_color)
     @JvmField
     var promptPassiveColor = 0
+
     @BindColor(R.color.black)
     @JvmField
     var blackColor = 0
+
     @BindColor(R.color.light_gray)
     @JvmField
     var lightGrayColor = 0
@@ -175,6 +133,7 @@ class AddNoteFragment : BaseFragment(),
      * Formats the summarized emoji id.
      */
     private lateinit var emojiIdSummaryController: EmojiIdSummaryViewController
+
     /**
      * Animates the emoji id "copied" text.
      */
@@ -187,53 +146,72 @@ class AddNoteFragment : BaseFragment(),
     private lateinit var amount: MicroTari
     private lateinit var fee: MicroTari
 
-    override val contentViewId: Int = R.layout.fragment_add_note
+    private var _ui: FragmentAddNoteBinding? = null
+    private val ui get() = _ui!!
+
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? = FragmentAddNoteBinding.inflate(inflater, container, false).also { _ui = it }.root
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        ui.noteEditText.removeTextChangedListener(this)
+        _ui = null
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        AddNoteFragmentVisitor.visit(this, view)
         // get tx properties
         recipientUser = arguments!!.getParcelable("recipientUser")!!
         amount = arguments!!.getParcelable("amount")!!
         fee = arguments!!.getParcelable("fee")!!
-        emojiIdSummaryController = EmojiIdSummaryViewController(emojiIdSummaryView)
-        fullEmojiIdBgClickBlockerView.isClickable = false
-        fullEmojiIdContainerView.gone()
+        emojiIdSummaryController = EmojiIdSummaryViewController(ui.emojiIdSummaryView)
+        ui.fullEmojiIdBgClickBlockerView.isClickable = false
+        ui.fullEmojiIdContainerView.gone()
         displayAliasOrEmojiId()
-        emojiIdCopiedViewController = EmojiIdCopiedViewController(emojiIdCopiedAnimView)
+        emojiIdCopiedViewController = EmojiIdCopiedViewController(ui.emojiIdCopiedView)
         hideFullEmojiId(animated = false)
-        OverScrollDecoratorHelper.setUpOverScroll(fullEmojiIdScrollView)
+        OverScrollDecoratorHelper.setUpOverScroll(ui.fullEmojiIdScrollView)
 
-        UiUtil.setProgressBarColor(progressBar, whiteColor)
+        UiUtil.setProgressBarColor(ui.progressBar, whiteColor)
 
-        noteEditText.addTextChangedListener(this)
-        slideView.setOnTouchListener(this)
+        ui.noteEditText.addTextChangedListener(this)
+        ui.slideView.setOnTouchListener(this)
 
         // disable "send" slider
         disableCallToAction()
         focusEditTextAndShowKeyboard()
 
-        promptTextView.setTextColor(promptActiveColor)
-        noteEditText.imeOptions = EditorInfo.IME_ACTION_DONE
-        noteEditText.setRawInputType(InputType.TYPE_CLASS_TEXT)
+        ui.promptTextView.setTextColor(promptActiveColor)
+        ui.noteEditText.imeOptions = EditorInfo.IME_ACTION_DONE
+        ui.noteEditText.setRawInputType(InputType.TYPE_CLASS_TEXT)
 
-        rootView.viewTreeObserver.addOnGlobalLayoutListener(
+        ui.rootView.viewTreeObserver.addOnGlobalLayoutListener(
             object : ViewTreeObserver.OnGlobalLayoutListener {
                 override fun onGlobalLayout() {
-                    rootView.viewTreeObserver.removeOnGlobalLayoutListener(this)
+                    ui.rootView.viewTreeObserver.removeOnGlobalLayoutListener(this)
                     UiUtil.setTopMargin(
-                        fullEmojiIdContainerView,
-                        emojiIdSummaryContainerView.top
+                        ui.fullEmojiIdContainerView,
+                        ui.emojiIdSummaryContainerView.top
                     )
                     UiUtil.setHeight(
-                        fullEmojiIdContainerView,
-                        emojiIdSummaryContainerView.height
+                        ui.fullEmojiIdContainerView,
+                        ui.emojiIdSummaryContainerView.height
                     )
                     UiUtil.setWidth(
-                        fullEmojiIdContainerView,
-                        emojiIdSummaryContainerView.width
+                        ui.fullEmojiIdContainerView,
+                        ui.emojiIdSummaryContainerView.width
                     )
                 }
             })
+
+        ui.backButton.setOnClickListener { onBackButtonClicked(it) }
+        ui.emojiIdSummaryContainerView.setOnClickListener { emojiIdClicked() }
+        ui.dimmerView.setOnClickListener { onEmojiIdDimmerClicked() }
+        ui.copyEmojiIdButton.setOnClickListener { onCopyEmojiIdButtonClicked(it) }
 
         TrackHelper.track()
             .screen("/home/send_tari/add_note")
@@ -246,26 +224,21 @@ class AddNoteFragment : BaseFragment(),
         listenerWR = WeakReference(context as Listener)
     }
 
-    override fun onDestroy() {
-        noteEditText.removeTextChangedListener(this)
-        super.onDestroy()
-    }
-
     private fun displayAliasOrEmojiId() {
         if (recipientUser is Contact) {
-            emojiIdSummaryContainerView.gone()
-            titleTextView.visible()
-            titleTextView.text = (recipientUser as Contact).alias
+            ui.emojiIdSummaryContainerView.gone()
+            ui.titleTextView.visible()
+            ui.titleTextView.text = (recipientUser as Contact).alias
         } else {
             displayEmojiId(recipientUser.publicKey.emojiId)
         }
     }
 
     private fun displayEmojiId(emojiId: String) {
-        emojiIdSummaryContainerView.visible()
+        ui.emojiIdSummaryContainerView.visible()
         emojiIdSummaryController.display(emojiId)
-        titleTextView.gone()
-        fullEmojiIdTextView.text = EmojiUtil.getFullEmojiIdSpannable(
+        ui.titleTextView.gone()
+        ui.fullEmojiIdTextView.text = EmojiUtil.getFullEmojiIdSpannable(
             emojiId,
             emojiIdChunkSeparator,
             blackColor,
@@ -273,14 +246,13 @@ class AddNoteFragment : BaseFragment(),
         )
     }
 
-    @OnClick(R.id.add_note_btn_back)
-    fun onBackButtonClicked(view: View) {
+    private fun onBackButtonClicked(view: View) {
         UiUtil.temporarilyDisableClick(view)
         // going back before hiding keyboard causes a blank white area on the screen
         // wait a while, then forward the back action to the host activity
         val mActivity = activity ?: return
         UiUtil.hideKeyboard(mActivity)
-        rootView.postDelayed({
+        ui.rootView.postDelayed({
             mActivity.onBackPressed()
         }, Constants.UI.shortDurationMs)
     }
@@ -288,63 +260,63 @@ class AddNoteFragment : BaseFragment(),
     /**
      * Display full emoji id and dim out all other views.
      */
-    @OnClick(R.id.add_note_vw_emoji_id_summary_container)
-    fun emojiIdClicked() {
+    private fun emojiIdClicked() {
         showFullEmojiId()
     }
 
     private fun showFullEmojiId() {
-        fullEmojiIdBgClickBlockerView.isClickable = true
+        ui.fullEmojiIdBgClickBlockerView.isClickable = true
         // make dimmers non-clickable until the anim is over
-        dimmerView.isClickable = false
+        ui.dimmerView.isClickable = false
         // prepare views
-        emojiIdSummaryContainerView.invisible()
-        dimmerView.alpha = 0f
-        dimmerView.visible()
-        val fullEmojiIdInitialWidth = emojiIdSummaryContainerView.width
-        val fullEmojiIdDeltaWidth = (rootView.width - horizontalMargin * 2) - fullEmojiIdInitialWidth
+        ui.emojiIdSummaryContainerView.invisible()
+        ui.dimmerView.alpha = 0f
+        ui.dimmerView.visible()
+        val fullEmojiIdInitialWidth = ui.emojiIdSummaryContainerView.width
+        val fullEmojiIdDeltaWidth =
+            (ui.rootView.width - horizontalMargin * 2) - fullEmojiIdInitialWidth
         UiUtil.setWidth(
-            fullEmojiIdContainerView,
+            ui.fullEmojiIdContainerView,
             fullEmojiIdInitialWidth
         )
-        fullEmojiIdContainerView.alpha = 0f
-        fullEmojiIdContainerView.visible()
+        ui.fullEmojiIdContainerView.alpha = 0f
+        ui.fullEmojiIdContainerView.visible()
         // scroll to end
-        fullEmojiIdScrollView.post {
-            fullEmojiIdScrollView.scrollTo(
-                fullEmojiIdTextView.width - fullEmojiIdScrollView.width,
+        ui.fullEmojiIdScrollView.post {
+            ui.fullEmojiIdScrollView.scrollTo(
+                ui.fullEmojiIdTextView.width - ui.fullEmojiIdScrollView.width,
                 0
             )
         }
-        copyEmojiIdButtonContainerView.alpha = 0f
-        copyEmojiIdButtonContainerView.visible()
+        ui.copyEmojiIdButtonContainerView.alpha = 0f
+        ui.copyEmojiIdButtonContainerView.visible()
         UiUtil.setBottomMargin(
-            copyEmojiIdButtonContainerView,
+            ui.copyEmojiIdButtonContainerView,
             0
         )
         // animate full emoji id view
         val emojiIdAnim = ValueAnimator.ofFloat(0f, 1f)
         emojiIdAnim.addUpdateListener { valueAnimator: ValueAnimator ->
             val value = valueAnimator.animatedValue as Float
-            dimmerView.alpha = value * 0.6f
+            ui.dimmerView.alpha = value * 0.6f
             // container alpha & scale
-            fullEmojiIdContainerView.alpha = value
-            fullEmojiIdContainerView.scaleX = 1f + 0.2f * (1f - value)
-            fullEmojiIdContainerView.scaleY = 1f + 0.2f * (1f - value)
+            ui.fullEmojiIdContainerView.alpha = value
+            ui.fullEmojiIdContainerView.scaleX = 1f + 0.2f * (1f - value)
+            ui.fullEmojiIdContainerView.scaleY = 1f + 0.2f * (1f - value)
             UiUtil.setWidth(
-                fullEmojiIdContainerView,
+                ui.fullEmojiIdContainerView,
                 (fullEmojiIdInitialWidth + fullEmojiIdDeltaWidth * value).toInt()
             )
-            backButton.alpha = 1 - value
+            ui.backButton.alpha = 1 - value
         }
         emojiIdAnim.duration = Constants.UI.shortDurationMs
         // copy emoji id button anim
         val copyEmojiIdButtonAnim = ValueAnimator.ofFloat(0f, 1f)
         copyEmojiIdButtonAnim.addUpdateListener { valueAnimator: ValueAnimator ->
             val value = valueAnimator.animatedValue as Float
-            copyEmojiIdButtonContainerView.alpha = value
+            ui.copyEmojiIdButtonContainerView.alpha = value
             UiUtil.setBottomMargin(
-                copyEmojiIdButtonContainerView,
+                ui.copyEmojiIdButtonContainerView,
                 (copyEmojiIdButtonVisibleBottomMargin * value).toInt()
             )
         }
@@ -357,51 +329,52 @@ class AddNoteFragment : BaseFragment(),
         animSet.start()
         animSet.addListener(object : AnimatorListenerAdapter() {
             override fun onAnimationEnd(animation: Animator?) {
-                dimmerView.isClickable = true
+                ui.dimmerView.isClickable = true
             }
         })
         // scroll animation
-        fullEmojiIdScrollView.postDelayed({
-            fullEmojiIdScrollView.smoothScrollTo(0, 0)
+        ui.fullEmojiIdScrollView.postDelayed({
+            ui.fullEmojiIdScrollView.smoothScrollTo(0, 0)
         }, Constants.UI.shortDurationMs + 20)
     }
 
     private fun hideFullEmojiId(animateCopyEmojiIdButton: Boolean = true, animated: Boolean) {
         if (!animated) {
-            fullEmojiIdContainerView.gone()
-            dimmerView.gone()
-            copyEmojiIdButtonContainerView.gone()
+            ui.fullEmojiIdContainerView.gone()
+            ui.dimmerView.gone()
+            ui.copyEmojiIdButtonContainerView.gone()
             return
         }
-        fullEmojiIdScrollView.smoothScrollTo(0, 0)
-        emojiIdSummaryContainerView.visible()
-        emojiIdSummaryContainerView.alpha = 0f
+        ui.fullEmojiIdScrollView.smoothScrollTo(0, 0)
+        ui.emojiIdSummaryContainerView.visible()
+        ui.emojiIdSummaryContainerView.alpha = 0f
         // copy emoji id button anim
         val copyEmojiIdButtonAnim = ValueAnimator.ofFloat(1f, 0f)
         copyEmojiIdButtonAnim.addUpdateListener { valueAnimator: ValueAnimator ->
             val value = valueAnimator.animatedValue as Float
-            copyEmojiIdButtonContainerView.alpha = value
+            ui.copyEmojiIdButtonContainerView.alpha = value
             UiUtil.setBottomMargin(
-                copyEmojiIdButtonContainerView,
+                ui.copyEmojiIdButtonContainerView,
                 (copyEmojiIdButtonVisibleBottomMargin * value).toInt()
             )
         }
         copyEmojiIdButtonAnim.duration = Constants.UI.shortDurationMs
         // emoji id anim
-        val fullEmojiIdInitialWidth = fullEmojiIdContainerView.width
-        val fullEmojiIdDeltaWidth = emojiIdSummaryContainerView.width - fullEmojiIdContainerView.width
+        val fullEmojiIdInitialWidth = ui.fullEmojiIdContainerView.width
+        val fullEmojiIdDeltaWidth =
+            ui.emojiIdSummaryContainerView.width - ui.fullEmojiIdContainerView.width
         val emojiIdAnim = ValueAnimator.ofFloat(0f, 1f)
         emojiIdAnim.addUpdateListener { valueAnimator: ValueAnimator ->
             val value = valueAnimator.animatedValue as Float
-            dimmerView.alpha = (1 - value) * 0.6f
+            ui.dimmerView.alpha = (1 - value) * 0.6f
             // container alpha & scale
-            fullEmojiIdContainerView.alpha = (1 - value)
+            ui.fullEmojiIdContainerView.alpha = (1 - value)
             UiUtil.setWidth(
-                fullEmojiIdContainerView,
+                ui.fullEmojiIdContainerView,
                 (fullEmojiIdInitialWidth + fullEmojiIdDeltaWidth * value).toInt()
             )
-            emojiIdSummaryContainerView.alpha = value
-            backButton.alpha = value
+            ui.emojiIdSummaryContainerView.alpha = value
+            ui.backButton.alpha = value
         }
         emojiIdAnim.duration = Constants.UI.shortDurationMs
         // chain anim.s and start
@@ -414,10 +387,10 @@ class AddNoteFragment : BaseFragment(),
         animSet.start()
         animSet.addListener(object : AnimatorListenerAdapter() {
             override fun onAnimationEnd(animation: Animator?) {
-                dimmerView.gone()
-                fullEmojiIdBgClickBlockerView.isClickable = false
-                fullEmojiIdContainerView.gone()
-                copyEmojiIdButtonContainerView.gone()
+                ui.dimmerView.gone()
+                ui.fullEmojiIdBgClickBlockerView.isClickable = false
+                ui.fullEmojiIdContainerView.gone()
+                ui.copyEmojiIdButtonContainerView.gone()
             }
         })
     }
@@ -425,14 +398,13 @@ class AddNoteFragment : BaseFragment(),
     /**
      * Dimmer clicked - hide dimmers.
      */
-    @OnClick(R.id.add_note_vw_dimmer)
-    fun onEmojiIdDimmerClicked() {
+    private fun onEmojiIdDimmerClicked() {
         hideFullEmojiId(animated = true)
     }
 
     private fun focusEditTextAndShowKeyboard() {
         val mActivity = activity ?: return
-        noteEditText.requestFocus()
+        ui.noteEditText.requestFocus()
         val imm = mActivity.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         imm.toggleSoftInput(
             InputMethodManager.SHOW_FORCED,
@@ -440,10 +412,9 @@ class AddNoteFragment : BaseFragment(),
         )
     }
 
-    @OnClick(R.id.add_note_btn_copy_emoji_id)
-    fun onCopyEmojiIdButtonClicked(view: View) {
+    private fun onCopyEmojiIdButtonClicked(view: View) {
         UiUtil.temporarilyDisableClick(view)
-        dimmerView.isClickable = false
+        ui.dimmerView.isClickable = false
         val mActivity = activity ?: return
         val clipBoard = ContextCompat.getSystemService(mActivity, ClipboardManager::class.java)
         val clipboardData = ClipData.newPlainText(
@@ -455,29 +426,29 @@ class AddNoteFragment : BaseFragment(),
             hideFullEmojiId(animateCopyEmojiIdButton = false, animated = true)
         }
         // hide copy emoji id button
-        val copyEmojiIdButtonAnim = copyEmojiIdButtonContainerView.animate().alpha(0f)
+        val copyEmojiIdButtonAnim = ui.copyEmojiIdButtonContainerView.animate().alpha(0f)
         copyEmojiIdButtonAnim.duration = Constants.UI.xShortDurationMs
         copyEmojiIdButtonAnim.start()
     }
 
     private fun enableCallToAction() {
-        if (slideBgEnabledView.visibility == View.VISIBLE) {
+        if (ui.slideEnabledBgView.visibility == View.VISIBLE) {
             return
         }
-        slideView.setOnTouchListener(this)
+        ui.slideView.setOnTouchListener(this)
 
-        slideToSendDisabledTextView.invisible()
+        ui.slideToSendDisabledTextView.invisible()
 
-        slideToSendEnabledTextView.alpha = 0f
-        slideToSendEnabledTextView.visible()
-        slideArrowIconEnabledImageView.alpha = 0f
-        slideArrowIconEnabledImageView.visible()
-        slideBgEnabledView.alpha = 0f
-        slideBgEnabledView.visible()
+        ui.slideToSendEnabledTextView.alpha = 0f
+        ui.slideToSendEnabledTextView.visible()
+        ui.slideToSendArrowEnabledImageView.alpha = 0f
+        ui.slideToSendArrowEnabledImageView.visible()
+        ui.slideEnabledBgView.alpha = 0f
+        ui.slideEnabledBgView.visible()
 
-        val textViewAnim = ObjectAnimator.ofFloat(slideToSendEnabledTextView, "alpha", 0f, 1f)
-        val arrowAnim = ObjectAnimator.ofFloat(slideArrowIconEnabledImageView, "alpha", 0f, 1f)
-        val bgViewAnim = ObjectAnimator.ofFloat(slideBgEnabledView, "alpha", 0f, 1f)
+        val textViewAnim = ObjectAnimator.ofFloat(ui.slideToSendEnabledTextView, "alpha", 0f, 1f)
+        val arrowAnim = ObjectAnimator.ofFloat(ui.slideToSendArrowEnabledImageView, "alpha", 0f, 1f)
+        val bgViewAnim = ObjectAnimator.ofFloat(ui.slideEnabledBgView, "alpha", 0f, 1f)
 
         // the animation set
         val animSet = AnimatorSet()
@@ -487,11 +458,11 @@ class AddNoteFragment : BaseFragment(),
     }
 
     private fun disableCallToAction() {
-        slideToSendDisabledTextView.visible()
-        slideBgEnabledView.gone()
-        slideToSendEnabledTextView.gone()
-        slideArrowIconEnabledImageView.gone()
-        slideView.setOnTouchListener(null)
+        ui.slideToSendDisabledTextView.visible()
+        ui.slideEnabledBgView.gone()
+        ui.slideToSendEnabledTextView.gone()
+        ui.slideToSendArrowEnabledImageView.gone()
+        ui.slideView.setOnTouchListener(null)
     }
 
     // region text change listener
@@ -506,10 +477,10 @@ class AddNoteFragment : BaseFragment(),
 
     override fun afterTextChanged(s: Editable) {
         if (s.toString().isNotEmpty()) {
-            promptTextView.setTextColor(promptPassiveColor)
+            ui.promptTextView.setTextColor(promptPassiveColor)
             enableCallToAction()
         } else {
-            promptTextView.setTextColor(promptActiveColor)
+            ui.promptTextView.setTextColor(promptActiveColor)
             disableCallToAction()
         }
     }
@@ -527,7 +498,7 @@ class AddNoteFragment : BaseFragment(),
         val x = event.rawX.toInt()
         when (event.action and MotionEvent.ACTION_MASK) {
             MotionEvent.ACTION_DOWN -> {
-                slideButtonContainerWidth = slideButtonContainerView.width
+                slideButtonContainerWidth = ui.slideButtonContainerView.width
                 val layoutParams = view.layoutParams as RelativeLayout.LayoutParams
                 slideButtonXDelta = x - layoutParams.marginStart
             }
@@ -548,8 +519,8 @@ class AddNoteFragment : BaseFragment(),
                 layoutParams.marginStart = slideButtonLastMarginStart
                 val alpha =
                     1f - slideButtonLastMarginStart.toFloat() / (slideButtonContainerWidth - slideViewMarginStart - slideViewWidth)
-                slideToSendEnabledTextView.alpha = alpha
-                slideToSendDisabledTextView.alpha = alpha
+                ui.slideToSendEnabledTextView.alpha = alpha
+                ui.slideToSendDisabledTextView.alpha = alpha
 
                 view.layoutParams = layoutParams
             }
@@ -561,8 +532,8 @@ class AddNoteFragment : BaseFragment(),
                 anim.addUpdateListener { valueAnimator: ValueAnimator ->
                     val fragment = wr.get() ?: return@addUpdateListener
                     val margin = valueAnimator.animatedValue as Int
-                    UiUtil.setStartMargin(fragment.slideView, margin)
-                    fragment.slideToSendEnabledTextView.alpha =
+                    UiUtil.setStartMargin(fragment.ui.slideView, margin)
+                    fragment.ui.slideToSendEnabledTextView.alpha =
                         1f - margin.toFloat() / (fragment.slideButtonContainerWidth - fragment.slideViewMarginStart - fragment.slideViewWidth)
                 }
                 anim.duration = Constants.UI.shortDurationMs
@@ -572,7 +543,7 @@ class AddNoteFragment : BaseFragment(),
             } else {
                 val fragment = wr.get() ?: return false
                 // disable input
-                noteEditText.inputType = InputType.TYPE_NULL
+                ui.noteEditText.inputType = InputType.TYPE_NULL
                 // complete slide animation
                 val anim = ValueAnimator.ofInt(
                     slideButtonLastMarginStart,
@@ -581,8 +552,8 @@ class AddNoteFragment : BaseFragment(),
                 anim.addUpdateListener { valueAnimator: ValueAnimator ->
 
                     val margin = valueAnimator.animatedValue as Int
-                    UiUtil.setStartMargin(fragment.slideView, margin)
-                    slideToSendEnabledTextView.alpha =
+                    UiUtil.setStartMargin(fragment.ui.slideView, margin)
+                    ui.slideToSendEnabledTextView.alpha =
                         1f - margin.toFloat() / (fragment.slideButtonContainerWidth - fragment.slideViewMarginStart - fragment.slideViewWidth)
                 }
                 anim.duration = Constants.UI.shortDurationMs
@@ -607,7 +578,7 @@ class AddNoteFragment : BaseFragment(),
         )
         anim.addUpdateListener { valueAnimator: ValueAnimator ->
             val fragment = wr.get() ?: return@addUpdateListener
-            fragment.slideView.alpha = valueAnimator.animatedValue as Float
+            fragment.ui.slideView.alpha = valueAnimator.animatedValue as Float
         }
         anim.duration = Constants.UI.shortDurationMs
         anim.interpolator = EasingInterpolator(Ease.QUART_IN_OUT)
@@ -624,32 +595,33 @@ class AddNoteFragment : BaseFragment(),
 
     private fun onSlideAnimationEnd() {
         if (EventBus.networkConnectionStateSubject.value != NetworkConnectionState.CONNECTED) {
-            rootView.postDelayed({
+            ui.rootView.postDelayed({
                 hideKeyboard()
             }, Constants.UI.AddNoteAndSend.preKeyboardHideWaitMs)
-            rootView.postDelayed({
+            ui.rootView.postDelayed({
                 restoreSlider()
-                noteEditText.setRawInputType(InputType.TYPE_CLASS_TEXT)
+                ui.noteEditText.setRawInputType(InputType.TYPE_CLASS_TEXT)
                 showInternetConnectionErrorDialog(activity!!)
             }, Constants.UI.AddNoteAndSend.preKeyboardHideWaitMs + Constants.UI.keyboardHideWaitMs)
             return
         }
-        progressBar.visible()
-        slideView.gone()
-        rootView.postDelayed({
+        ui.progressBar.visible()
+        ui.slideView.gone()
+        ui.rootView.postDelayed({
             hideKeyboard()
         }, Constants.UI.AddNoteAndSend.preKeyboardHideWaitMs)
-        rootView.postDelayed({
-            continueToFinalizeSendTx()
-        }, Constants.UI.AddNoteAndSend.preKeyboardHideWaitMs
-                + Constants.UI.AddNoteAndSend.continueToFinalizeSendTxDelayMs
+        ui.rootView.postDelayed(
+            {
+                continueToFinalizeSendTx()
+            }, Constants.UI.AddNoteAndSend.preKeyboardHideWaitMs
+                    + Constants.UI.AddNoteAndSend.continueToFinalizeSendTxDelayMs
         )
     }
 
     private fun hideKeyboard() {
         val mActivity = activity ?: return
         UiUtil.hideKeyboard(mActivity)
-        noteEditText.clearFocus()
+        ui.noteEditText.clearFocus()
     }
 
     private fun continueToFinalizeSendTx() {
@@ -658,13 +630,13 @@ class AddNoteFragment : BaseFragment(),
             recipientUser,
             amount,
             fee,
-            noteEditText.editableText.toString()
+            ui.noteEditText.editableText.toString()
         )
     }
 
     private fun restoreSlider() {
         // hide slide view
-        val slideViewInitialMargin = UiUtil.getStartMargin(slideView)
+        val slideViewInitialMargin = UiUtil.getStartMargin(ui.slideView)
         val slideViewMarginDelta = slideViewMarginStart - slideViewInitialMargin
         val anim = ValueAnimator.ofFloat(
             1f,
@@ -673,10 +645,10 @@ class AddNoteFragment : BaseFragment(),
         anim.addUpdateListener { valueAnimator: ValueAnimator ->
             val fragment = wr.get() ?: return@addUpdateListener
             val value = valueAnimator.animatedValue as Float
-            fragment.slideView.alpha = 1f - value
-            slideToSendEnabledTextView.alpha = 1f - value
+            fragment.ui.slideView.alpha = 1f - value
+            ui.slideToSendEnabledTextView.alpha = 1f - value
             UiUtil.setStartMargin(
-                fragment.slideView,
+                fragment.ui.slideView,
                 (slideViewInitialMargin + slideViewMarginDelta * (1 - value)).toInt()
             )
         }
@@ -698,6 +670,13 @@ class AddNoteFragment : BaseFragment(),
             note: String
         )
 
+    }
+
+    private object AddNoteFragmentVisitor {
+        internal fun visit(fragment: AddNoteFragment, view: View) {
+            fragment.requireActivity().appComponent.inject(fragment)
+            ButterKnife.bind(fragment, view)
+        }
     }
 
 }

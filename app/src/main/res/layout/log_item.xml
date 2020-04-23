@@ -8,7 +8,7 @@
     android:orientation="vertical">
 
     <View
-        android:id="@+id/log_item_vw_top_spacer"
+        android:id="@+id/top_spacer_view"
         android:layout_width="match_parent"
         android:layout_height="16dp" />
 
@@ -21,7 +21,7 @@
         android:paddingHorizontal="10dp">
 
         <com.tari.android.wallet.ui.component.CustomFontTextView
-            android:id="@+id/log_item_txt_timestamp"
+            android:id="@+id/timestamp_text_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ellipsize="middle"
@@ -32,19 +32,7 @@
             app:customFont="AVENIR_NEXT_LT_PRO_REGULAR" />
 
         <com.tari.android.wallet.ui.component.CustomFontTextView
-            android:id="@+id/log_item_txt_source_1"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:ellipsize="middle"
-            android:singleLine="true"
-            android:text="@string/dummy_message"
-            android:textColor="@color/black"
-            android:textSize="13sp"
-            app:customFont="AVENIR_NEXT_LT_PRO_REGULAR" />
-
-        <com.tari.android.wallet.ui.component.CustomFontTextView
-            android:id="@+id/log_item_txt_source_2"
+            android:id="@+id/source_1_text_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
@@ -56,7 +44,19 @@
             app:customFont="AVENIR_NEXT_LT_PRO_REGULAR" />
 
         <com.tari.android.wallet.ui.component.CustomFontTextView
-            android:id="@+id/log_item_txt_level"
+            android:id="@+id/source_2_text_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:ellipsize="middle"
+            android:singleLine="true"
+            android:text="@string/dummy_message"
+            android:textColor="@color/black"
+            android:textSize="13sp"
+            app:customFont="AVENIR_NEXT_LT_PRO_REGULAR" />
+
+        <com.tari.android.wallet.ui.component.CustomFontTextView
+            android:id="@+id/level_text_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
@@ -68,7 +68,7 @@
             app:customFont="AVENIR_NEXT_LT_PRO_REGULAR" />
 
         <TextView
-            android:id="@+id/log_item_txt_log"
+            android:id="@+id/log_text_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
@@ -81,7 +81,7 @@
     </LinearLayout>
 
     <View
-        android:id="@+id/log_item_vw_bottom_spacer"
+        android:id="@+id/bottom_spacer_view"
         android:layout_width="match_parent"
         android:layout_height="16dp" />
 

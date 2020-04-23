@@ -10,7 +10,7 @@
 
     <!-- separator -->
     <View
-        android:id="@+id/home_tx_list_header_vw_separator"
+        android:id="@+id/tx_list_header_separator_view"
         android:layout_width="match_parent"
         android:layout_height="35dp" />
 
@@ -22,7 +22,7 @@
 
         <!-- title -->
         <com.tari.android.wallet.ui.component.CustomFontTextView
-            android:id="@+id/home_tx_list_header_txt_title"
+            android:id="@+id/tx_list_header_title_text_view"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -33,19 +33,9 @@
             android:textSize="12sp"
             app:customFont="AVENIR_LT_STD_MEDIUM" />
 
-        <!--ProgressBar
-            android:id="@+id/home_tx_list_pending_prog_bar"
-            style="?android:attr/progressBarStyleHorizontal"
-            android:layout_width="30dp"
-            android:layout_height="wrap_content"
-            android:indeterminateOnly="true"
-            android:indeterminateTint="@color/purple"
-            android:progressBackgroundTint="#777777"
-            android:visibility="visible" /-->
-
         <!-- Lottie animation for Tari Wallet text -->
         <com.airbnb.lottie.LottieAnimationView
-            android:id="@+id/home_tx_list_anim_pending"
+            android:id="@+id/tx_list_header_pending_animation_view"
             android:layout_width="wrap_content"
             android:background="@color/white"
             android:layout_height="wrap_content"
