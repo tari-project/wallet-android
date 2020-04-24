@@ -319,27 +319,12 @@ internal class CreateWalletFragment : Fragment() {
     }
 
     private fun startYourEmojiIdViewAnimation() {
-        // do animations
-        val buttonInitialBottomMargin = UiUtil.getBottomMargin(ui.continueButton)
-        val buttonBottomMarginDelta = createEmojiButtonBottomMargin - buttonInitialBottomMargin
-        val buttonTranslationAnim = ValueAnimator.ofFloat(0f, 1f)
-        buttonTranslationAnim.addUpdateListener { valueAnimator: ValueAnimator ->
-            val value = valueAnimator.animatedValue as Float
-            UiUtil.setBottomMargin(
-                ui.continueButton,
-                (buttonInitialBottomMargin + buttonBottomMarginDelta * value).toInt()
-            )
-        }
-
         val buttonFadeInAnim = ValueAnimator.ofFloat(0f, 1f)
         buttonFadeInAnim.addUpdateListener { valueAnimator: ValueAnimator ->
             val alpha = valueAnimator.animatedValue as Float
             ui.continueButton.alpha = alpha
         }
-
-        val buttonAnimSet = AnimatorSet()
-        buttonAnimSet.playTogether(buttonTranslationAnim, buttonFadeInAnim)
-        buttonAnimSet.duration = CreateEmojiId.continueButtonAnimDurationMs
+        buttonFadeInAnim.duration = CreateEmojiId.continueButtonAnimDurationMs
 
         ui.emojiIdTextView.isEnabled = false
         ui.emojiIdScrollView.scrollTo(
@@ -384,7 +369,7 @@ internal class CreateWalletFragment : Fragment() {
 
         val animSet = AnimatorSet()
         animSet.playTogether(
-            buttonAnimSet,
+            buttonFadeInAnim,
             emojiIdContainerViewScaleAnim,
             fadeInAnim,
             yourEmojiTitleAnim
@@ -417,10 +402,26 @@ internal class CreateWalletFragment : Fragment() {
                 ui.seeFullEmojiIdButton.isEnabled = true
                 uiHandler.postDelayed({
                     hideFullEmojiId()
+                    showEmojiIdContinueButton()
                 }, Constants.UI.mediumDurationMs)
             }
         })
         anim.start()
+    }
+
+    private fun showEmojiIdContinueButton() {
+        val buttonInitialBottomMargin = UiUtil.getBottomMargin(ui.continueButton)
+        val buttonBottomMarginDelta = createEmojiButtonBottomMargin - buttonInitialBottomMargin
+        val buttonTranslationAnim = ValueAnimator.ofFloat(0f, 1f)
+        buttonTranslationAnim.addUpdateListener { valueAnimator: ValueAnimator ->
+            val value = valueAnimator.animatedValue as Float
+            UiUtil.setBottomMargin(
+                ui.continueButton,
+                (buttonInitialBottomMargin + buttonBottomMarginDelta * value).toInt()
+            )
+        }
+        buttonTranslationAnim.duration = CreateEmojiId.continueButtonAnimDurationMs
+        buttonTranslationAnim.start()
     }
 
     private fun onSeeFullEmojiIdButtonClicked(view: View) {

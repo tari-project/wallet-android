@@ -59,6 +59,12 @@
     <dimen name="home_top_content_action_button_size">30dp</dimen>
     <dimen name="home_wallet_info_button_initial_top_margin">40dp</dimen>
 
+    <dimen name="home_swipe_refresh_max_scroll_y">180dp</dimen>
+    <dimen name="home_swipe_refresh_progress_view_height">48dp</dimen>
+    <dimen name="home_swipe_refresh_progress_view_container_height">88dp</dimen>
+    <dimen name="home_swipe_refresh_progress_view_content_invisible_top_margin">-48dp</dimen>
+    <dimen name="home_swipe_refresh_progress_view_content_visible_top_margin">20dp</dimen>
+
     <dimen name="create_wallet_button_bottom_margin">36dp</dimen>
     <dimen name="splash_screen_title_bottom_margin">48dp</dimen>
     <dimen name="splash_screen_purple_orb_margin">40dp</dimen>
@@ -72,8 +78,8 @@
     <dimen name="add_recipient_paste_emoji_id_button_visible_top_margin">-56dp</dimen>
     <dimen name="add_recipient_edit_text_size">14sp</dimen>
     <!-- send tari - add amount -->
-    <dimen name="add_amount_element_container_translation_y">12dp</dimen>
-    <dimen name="add_amount_element_text_size">90sp</dimen>
+    <dimen name="add_amount_element_container_translation_y">9dp</dimen>
+    <dimen name="add_amount_element_text_size">70sp</dimen>
     <dimen name="add_amount_gem_size">21dp</dimen>
     <dimen name="add_amount_leftmost_digit_margin_start">10dp</dimen>
     <dimen name="add_amount_available_balance_error_amount_nudge_distance">40dp</dimen>

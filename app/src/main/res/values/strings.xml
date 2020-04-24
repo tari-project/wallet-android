@@ -23,6 +23,10 @@
     <string name="digit_thousands_separator">,</string>
     <string name="digit_decimal_separator">.</string>
 
+    <!-- emojis -->
+    <string name="emoji_hourglass">⏳</string>
+    <string name="emoji_handshake">🤝</string>
+
     <!-- dummy values - UI design placeholders -->
     <string name="dummy_positive_tx_value">+ 152.75</string>
     <string name="dummy_negative_tx_value">- 63.25</string>
@@ -33,10 +37,10 @@
     <string name="dummy_balance">124.56</string>
 
     <!-- notifications -->
-    <string name="wallet_service_notification_channel_name">Tari Wallet Service Notification Channel</string>
-    <string name="app_notification_channel_name">Tari Wallet Notification Channel</string>
-    <string name="notification_tx_received_title">You\'ve got Tari!</string>
-    <string name="notification_tx_received_description_format">Someone just sent you %1$s Tari.</string>
+    <string name="wallet_service_notification_channel_name">Tari Aurora Service Notification Channel</string>
+    <string name="app_notification_channel_name">Tari Aurora Notification Channel</string>
+    <string name="notification_tx_received_title">You\'ve got XTR!</string>
+    <string name="notification_tx_received_description_format">Someone just sent you %1$s XTR.</string>
 
     <!-- errors -->
     <!-- node unreachable -->
@@ -46,11 +50,11 @@
     <string name="error_no_connection_title">Can\'t connect to the internet</string>
     <string name="error_no_connection_description">Your phone appears to be offline or has a poor connection at the moment. Please try again when you\'ve found a stronger signal.</string>
     <!-- recipient offline -->
-    <string name="error_recipient_offline_title">Sorry, you can\'t send Tari to offline users</string>
+    <string name="error_recipient_offline_title">Sorry, you can\'t send XTR to offline users</string>
     <string name="error_recipient_offline_description">Please make sure your recipient has a reliable internet connection and try again. Also be sure you are sending to the correct Emoji ID.</string>
     <!-- balance exceeded -->
-    <string name="error_balance_exceeded_title">Hold on, we\'re processing another transaction for you!</string>
-    <string name="error_balance_exceeded_description">Sorry, you can’t send this much Tari until your previous transaction is complete. Please wait for your other transaction(s) to complete and then try again.</string>
+    <string name="error_balance_exceeded_title">Hold your horses! 🐴</string>
+    <string name="error_balance_exceeded_description">Sorry, you can’t send this much XTR until your previous transaction(s) are complete. Please wait for at least one transaction to complete and then try again.</string>
 
     <!-- common -->
     <string name="common_continue">Continue</string>
@@ -82,14 +86,14 @@
     <string name="tari_network_connection_error_dialog_description">Looks like there\'s a connectivity issue on our end. Can you give us a few min, then come back and try again?</string>
 
     <!-- service -->
-    <string name="wallet_service_title">Tari wallet service is running.</string>
+    <string name="wallet_service_title">XTR wallet service is running.</string>
     <string name="wallet_service_description">This service carries out wallet operations across applications.</string>
-    <string name="wallet_service_error_testnet_tari_request">Could not allocate free Tari.</string>
+    <string name="wallet_service_error_testnet_tari_request">Could not allocate free XTR.</string>
     <string name="wallet_service_error_no_internet_connection">No internet connection!</string>
 
     <!-- testnet UTXO messages -->
-    <string name="first_testnet_utxo_tx_message">💸 Here’s some testnet Tari!</string>
-    <string name="second_testnet_utxo_tx_message">Nice work! Here\'s more Tari to fill your coffers. Be sure to hit the Store icon to see real, exclusive items you can redeem with your "hard-earned" testnet Tari.</string>
+    <string name="first_testnet_utxo_tx_message">💸 Here’s some testnet XTR!</string>
+    <string name="second_testnet_utxo_tx_message">Nice work! Here\'s more tXTR to fill your coffers. Be sure to hit the Store icon to see real, exclusive items you can redeem with your "hard-earned" testnet XTR.</string>
 
     <!-- onboarding - introduction -->
     <string name="introduction_crypto_wallet_title_text_line_1">Private by default.</string>
@@ -108,15 +112,15 @@
     <!-- screen #2 -->
     <string name="create_wallet_awesome">We’re off to a great start!</string>
     <string name="create_wallet_now_text">Now, let’s create your Emoji ID.</string>
-    <string name="create_wallet_address_desc">Your Emoji ID is your wallet address.\nIt’s how people can find you and send you Tari.</string>
+    <string name="create_wallet_address_desc">Your Emoji ID is your wallet address.\nIt’s how people can find you and send you testnet XTR.</string>
     <string name="create_wallet_continue_and_create_emoji_id">Create Your Emoji ID</string>
     <!-- screen #3 -->
     <string name="create_wallet_your_emoji_id_text_label">This is your Emoji ID</string>
     <string name="create_wallet_your_emoji_id_text_label_bold_part">Emoji ID</string>
-    <string name="create_wallet_set_of_emoji_your_wallet_address_desc">Your Emoji ID is your wallet’s address,\nand how others can find you and send you Tari.</string>
+    <string name="create_wallet_set_of_emoji_your_wallet_address_desc">Your Emoji ID is your wallet’s address,\nand how others can find you and send you tXTR.</string>
     <!-- onboarding - local auth -->
     <string name="auth_prompt_title">🔑 Let’s secure your wallet. 🔑</string>
-    <string name="auth_prompt_desc">Sleep well at night knowing you’ve taken precautions to keep your Tari wallet safe and sound.</string>
+    <string name="auth_prompt_desc">Sleep well at night knowing you’ve taken precautions to keep your XTR wallet safe and sound.</string>
     <string name="auth_prompt_button_text">Secure with Device Lock Code</string>
     <string name="auth_prompt_button_touch_id_text">Secure with Biometrics</string>
 
@@ -131,17 +135,17 @@
     <string name="auth_title">Unlock your wallet</string>
     <string name="auth_biometric_prompt">Please enter your biometrics to unlock your wallet.</string>
     <string name="auth_device_lock_code_prompt">Please enter your smartphone\'s screen lock PIN, passcode, or pattern to unlock your wallet.</string>
-    <string name="auth_description">Authentication secures your Tari Wallet.</string>
+    <string name="auth_description">Authentication secures your XTR Wallet.</string>
     <string name="auth_not_available_or_canceled_title">Authentication Error</string>
-    <string name="auth_not_available_or_canceled_desc">Tari Wallet was not able to authenticate you. Do you still want to proceed?</string>
+    <string name="auth_not_available_or_canceled_desc">Tari Aurora was not able to authenticate you. Do you still want to proceed?</string>
     <string name="auth_failed_title">Authentication Failed</string>
-    <string name="auth_failed_desc">Tari Wallet was not able to authenticate you.</string>
+    <string name="auth_failed_desc">Tari Aurora was not able to authenticate you.</string>
 
     <!-- home -->
     <string name="home_available_balance">Available Balance</string>
     <string name="home_today">Today</string>
     <string name="home_yesterday">Yesterday</string>
-    <string name="home_send_tari">Send Tari</string>
+    <string name="home_send_tari">Send tXTR</string>
     <string name="home_txs">Transactions</string>
     <string name="home_pending_txs">In Progress</string>
     <string name="home_hello">Hello!</string>
@@ -149,16 +153,22 @@
     <string name="home_you_are_ready_to_explore">You’re ready to start exploring</string>
     <string name="home_empty_wallet">We don’t see any transactions yet.\nHopefully something happens soon…🤞</string>
     <!--home tari bot dialog-->
-    <string name="home_tari_bot_you_got_tari_dlg_title">You got some testnet Tari!</string>
-    <string name="home_tari_bot_you_got_tari_dlg_title_bold_part">testnet Tari!</string>
-    <string name="home_tari_bot_dialog_desc">Try sending a bit of testnet Tari back to Tari Bot. It’s always better to give than to receive (and you’ll see how the wallet works too).</string>
+    <string name="home_tari_bot_you_got_tari_dlg_title">You just got some testnet XTR!</string>
+    <string name="home_tari_bot_you_got_tari_dlg_title_bold_part">testnet XTR!</string>
+    <string name="home_tari_bot_dialog_desc">Try sending a bit of testnet XTR back to Tari Bot. It’s always better to give than to receive (and you’ll see how the wallet works too).</string>
     <string name="home_tari_bot_try_later">Try it later</string>
     <!-- home TTL store dialog -->
-    <string name="home_ttl_store_dlg_title">Spend testnet Tari on\nreal (exclusive) stuff</string>
+    <string name="home_ttl_store_dlg_title">Spend testnet XTR on\nreal (exclusive) stuff</string>
     <string name="home_ttl_store_dlg_title_bold_part">(exclusive) stuff</string>
-    <string name="home_ttl_store_dlg_desciption">Check out Testnet Tari Limited (TTL) to spend your "hard-earned" testnet Tari on exclusive, one-of-a-kind stuff produced by the team at Tari Labs. Enjoy!</string>
+    <string name="home_ttl_store_dlg_desciption">Check out Testnet Tari Limited (TTL) to spend your "hard-earned" testnet XTR on exclusive, one-of-a-kind stuff produced by the team at Tari Labs. Enjoy!</string>
     <string name="home_ttl_store_positive_btn">Visit the TTL Store</string>
     <string name="home_ttl_store_negative_btn">I\'ll check it out later</string>
+    <!-- store and forward update progress -->
+    <string name="home_store_and_forward_progress_checking_for_updates">Checking for updates</string>
+    <string name="home_store_and_forward_progress_receiving_txs">Receiving new transactions</string>
+    <string name="home_store_and_forward_progress_completing_txs">Completing your transactions</string>
+    <string name="home_store_and_forward_progress_updating_txs">Updating your transactions</string>
+    <string name="home_store_and_forward_progress_up_to_date">You are up to date!</string>
 
     <!-- send tari - add recipient -->
     <string name="add_recipient_title">Send To</string>
@@ -166,15 +176,15 @@
     <string name="add_recipient_recent_tx_contacts">Recent</string>
     <string name="add_recipient_my_contacts">My Contacts</string>
     <string name="add_recipient_invalid_emoji_id">Not a valid Emoji ID</string>
-    <string name="add_recipient_own_emoji_id">Sorry, you cannot send Tari to yourself.</string>
+    <string name="add_recipient_own_emoji_id">Sorry, you cannot send XTR to yourself.</string>
     <!-- QR-scanner -->
-    <string name="add_recipient_scan_qr_description">Scan a Tari QR code\nto send Tari to the recipient.</string>
+    <string name="add_recipient_scan_qr_description">Scan a Tari QR code\nto send XTR to the recipient.</string>
     <string name="add_recipient_failed_init_camera_message">Failed to initialize Camera</string>
     <string name="add_recipient_camera_permission_denied_message">Camera permission denied</string>
 
     <!-- send tari - amount -->
     <string name="add_amount_under_construction">Under Construction</string>
-    <string name="add_amount_not_enough_available_balance">Not enough Tari in your available balance</string>
+    <string name="add_amount_not_enough_available_balance">Not enough XTR in your available balance</string>
     <string name="add_amount_tx_fee">Transaction Fee</string>
 
     <!-- send tari - note -->
@@ -193,14 +203,14 @@
     <!-- debug log - title -->
     <string name="debug_log_title">Log</string>
     <!-- wallet info -->
-    <string name="wallet_info_share_your_emoji_id">Your Emoji ID is your wallet address. Share it with others to receive Tari.</string>
+    <string name="wallet_info_share_your_emoji_id">Your Emoji ID is your wallet address. Share it with others to receive tXTR.</string>
     <string name="wallet_info_share_your_emoji_id_bold_part">Emoji ID</string>
     <string name="wallet_info_copy_emoji_id">Copy my emoji ID</string>
-    <string name="wallet_info_qr_code_desc">Transacting in person? Others can scan this QR code from the Tari Aurora App to send you Tari.</string>
+    <string name="wallet_info_qr_code_desc">Transacting in person? Others can scan this QR code from the Tari Aurora App to send you tXTR.</string>
     <string name="wallet_info_emoji_id_copied">Your emoji ID is copied.</string>
 
     <!-- tx failed dialog -->
-    <string name="tx_failed_title">Sorry, you can\'t send Tari to offline users</string>
+    <string name="tx_failed_title">Sorry, you can\'t send XTR to offline users</string>
     <string name="tx_failed_description">Please make sure your recipient has a reliable internet connection and has the Aurora app open on their device, and then try again. If that doesn\'t work, please verify you have the correct Emoji ID.</string>
 
     <!-- transaction detail -->
@@ -217,7 +227,7 @@
     <string name="tx_detail_transaction_id">Transaction ID</string>
     <!-- Fee tooltip -->
     <string name="tx_detail_fee_tooltip_transaction_fee">Transaction Fee</string>
-    <string name="tx_detail_fee_tooltip_desc">The transaction fee is distributed to the thousands of computers who ensure that your Tari transactions are fast and secure.</string>
+    <string name="tx_detail_fee_tooltip_desc">The transaction fee is distributed to the thousands of computers (also known as \"miners\") who ensure that your XTR transactions are fast and secure.</string>
 
     <!-- debug screens -->
     <!-- logs -->

@@ -42,6 +42,8 @@ import androidx.lifecycle.ProcessLifecycleOwner
 import com.orhanobut.logger.AndroidLogAdapter
 import com.orhanobut.logger.Logger
 import com.tari.android.wallet.di.*
+import com.tari.android.wallet.event.Event
+import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.network.NetworkConnectionStateReceiver
 import com.tari.android.wallet.notification.NotificationHelper
 import com.tari.android.wallet.util.SharedPrefsWrapper
@@ -135,12 +137,14 @@ internal class TariWalletApplication : Application(), LifecycleObserver {
     fun onAppBackgrounded() {
         Logger.d("App in background.")
         isInForeground = false
+        EventBus.post(Event.App.AppBackgrounded())
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_START)
     fun onAppForegrounded() {
         Logger.d("App in foreground.")
         isInForeground = true
+        EventBus.post(Event.App.AppForegrounded())
     }
 
 }

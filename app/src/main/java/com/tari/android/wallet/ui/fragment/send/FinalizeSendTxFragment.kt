@@ -94,9 +94,6 @@ class FinalizeSendTxFragment(private val walletService: TariWalletService) : Fra
          */
         lateinit var descLine1: String
         lateinit var descLine2: String
-
-        // progress from 0-to-max and otherwise both increment this field
-        var progressAnimationToggleCount = 0
     }
 
     @BindString(R.string.finalize_send_tx_sending_step_1_desc_line_1)
@@ -136,6 +133,8 @@ class FinalizeSendTxFragment(private val walletService: TariWalletService) : Fra
 
     private var currentStep = Step.CONNECTION_CHECK
     private val maxProgress = 100
+    // progress from 0-to-max and otherwise both increment this field
+    private var progressAnimationToggleCount = 0
     private val progressBarFillDurationMs = 850L
     private var switchToNextProgressStateOnProgressAnimComplete = false
     private var baseNodeSyncCurrentRetryCount = 0
@@ -166,6 +165,7 @@ class FinalizeSendTxFragment(private val walletService: TariWalletService) : Fra
         super.onDestroyView()
         ui.lottieAnimationView.removeAllAnimatorListeners()
         _ui = null
+        EventBus.unsubscribe(this)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -349,9 +349,9 @@ class FinalizeSendTxFragment(private val walletService: TariWalletService) : Fra
         progressAnim!!.startDelay = Constants.UI.xShortDurationMs
         progressAnim!!.addListener(object : AnimatorListenerAdapter() {
             override fun onAnimationEnd(animation: Animator?) {
-                currentStep.progressAnimationToggleCount++
+                progressAnimationToggleCount++
                 progressAnim!!.removeAllListeners()
-                if (currentStep.progressAnimationToggleCount >= 3 && !isReverse) {
+                if (progressAnimationToggleCount >= 3 && !isReverse) {
                     tryToProceedToTheNextStepOnProgressAnimCompletion()
                 } else {
                     animateCurrentStepProgress(!isReverse)
@@ -495,6 +495,7 @@ class FinalizeSendTxFragment(private val walletService: TariWalletService) : Fra
         when (currentStep) {
             Step.CONNECTION_CHECK -> {
                 fadeOutTextViews {
+                    progressAnimationToggleCount = 0
                     currentStep = Step.DISCOVERY
                     playCurrentStepTextAppearAnimation()
                     animateCurrentStepProgress(isReverse = false)
@@ -503,6 +504,7 @@ class FinalizeSendTxFragment(private val walletService: TariWalletService) : Fra
             }
             Step.DISCOVERY -> {
                 fadeOutTextViews {
+                    progressAnimationToggleCount = 0
                     currentStep = Step.SENT
                     playCurrentStepTextAppearAnimation()
                     animateCurrentStepProgress(isReverse = false)

@@ -417,6 +417,7 @@ internal class TxDetailActivity : AppCompatActivity(), ServiceConnection {
     }
 
     private fun hideFullEmojiId(animateCopyEmojiIdButton: Boolean = true) {
+        dimmerViews.forEach { UiUtil.temporarilyDisableClick(it) }
         ui.fullEmojiIdScrollView.smoothScrollTo(0, 0)
         ui.emojiIdSummaryContainerView.visible()
         // copy emoji id button anim
@@ -507,6 +508,7 @@ internal class TxDetailActivity : AppCompatActivity(), ServiceConnection {
             error
         )
         if (error.code == WalletErrorCode.NO_ERROR) {
+            (tx.user as? Contact)?.alias = newAlias
             EventBus.post(
                 Event.Contact.ContactAddedOrUpdated(
                     tx.user.publicKey,

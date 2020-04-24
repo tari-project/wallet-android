@@ -117,7 +117,7 @@ internal class TorProxyManager(
                         "--Socks5ProxyUsername ${torConfig.sock5Username} " +
                         "--Socks5ProxyPassword ${torConfig.sock5Password} " +
                         "--clientuseipv6 1 " /* +
-                        "--ClientTransportPlugin \"obfs4 Socks5Proxy ${torConfig.controlHost}:47351\" " +
+                        "--ClientTransportPlugin obfs4 socks5 ${torConfig.controlHost}:47351 " +
                         "--ClientTransportPlugin \"meek_lite Socks5Proxy ${torConfig.controlHost}:47352\"" */
             exec(torCmdString)
         } catch (throwable: Throwable) {
