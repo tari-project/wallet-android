@@ -437,6 +437,17 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniCreate(
 }
 
 extern "C"
+JNIEXPORT void JNICALL
+Java_com_tari_android_wallet_ffi_FFIWallet_jniLogMessage(
+        JNIEnv *jEnv,
+        jobject jThis,
+        jstring jMessage) {
+    const char *pMessage = jEnv->GetStringUTFChars(jMessage, JNI_FALSE);
+    log_debug_message(pMessage);
+    jEnv->ReleaseStringUTFChars(jMessage, pMessage);
+}
+
+extern "C"
 JNIEXPORT jlong JNICALL
 Java_com_tari_android_wallet_ffi_FFIWallet_jniGetPublicKey(
         JNIEnv *jEnv,
