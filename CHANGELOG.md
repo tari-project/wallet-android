@@ -1,5 +1,13 @@
 # Tari Aurora Changelog
 
+## [0.1.6-jniLibs-0.7.4] - 2020-04-24
+- Updated jniLibs to 0.7.4
+- Give better user feedback on store and forwarded messages
+- TThe transaction status page now gives more detail about what your transaction state is.
+- Pull-to-refresh updates
+- Updated app icons
+- Various smaller UI fixes.
+
 ## [0.1.5-jniLibs-0.7.2] - 2020-04-21
 - Send Tari Flow service layer and UI updates for store and forward support.
 - More and improved tests
