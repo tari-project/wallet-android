@@ -76,6 +76,10 @@ internal class FFIWallet(commsConfig: FFICommsConfig, logPath: String) : FFIBase
         libError: FFIError
     )
 
+    private external fun jniLogMessage(
+        message: String
+    )
+
     private external fun jniGetPublicKey(
         libError: FFIError
     ): FFIPublicKeyPtr
