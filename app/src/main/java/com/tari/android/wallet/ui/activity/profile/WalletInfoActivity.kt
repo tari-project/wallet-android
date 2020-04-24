@@ -150,7 +150,7 @@ internal class WalletInfoActivity : AppCompatActivity() {
         ui.emojiIdSummaryContainerView.setOnClickListener(this::onEmojiSummaryClicked)
         ui.copyEmojiIdButton.setOnClickListener(this::onCopyEmojiIdButtonClicked)
         ui.closeButton.setOnClickListener { this.onCloseButtonClick() }
-        dimmerViews.forEach { it.setOnClickListener { this.onDimmerViewsClicked() } }
+        dimmerViews.forEach { it.setOnClickListener { this.hideFullEmojiId() } }
     }
 
     private fun onEmojiSummaryClicked(view: View) {
@@ -159,7 +159,7 @@ internal class WalletInfoActivity : AppCompatActivity() {
     }
 
     private fun showFullEmojiId() {
-//         make dimmers non-clickable until the anim is over
+        // make dimmers non-clickable until the anim is over
         dimmerViews.forEach { dimmerView -> dimmerView.isClickable = false }
         // prepare views
         ui.emojiIdSummaryContainerView.invisible()
@@ -224,6 +224,7 @@ internal class WalletInfoActivity : AppCompatActivity() {
     }
 
     private fun hideFullEmojiId(animateCopyEmojiIdButton: Boolean = true) {
+        dimmerViews.forEach { UiUtil.temporarilyDisableClick(it) }
         ui.fullEmojiIdScrollView.smoothScrollTo(0, 0)
         ui.emojiIdSummaryContainerView.visible()
         // copy emoji id button anim
@@ -264,13 +265,6 @@ internal class WalletInfoActivity : AppCompatActivity() {
             ui.fullEmojiIdContainerView.gone()
             ui.copyEmojiIdContainerView.gone()
         })
-    }
-
-    /**
-     * Dimmer clicked - hide dimmers.
-     */
-    private fun onDimmerViewsClicked() {
-        hideFullEmojiId()
     }
 
     private fun onCopyEmojiIdButtonClicked(view: View) {

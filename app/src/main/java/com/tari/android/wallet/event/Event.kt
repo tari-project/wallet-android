@@ -40,6 +40,11 @@ import com.tari.android.wallet.ui.fragment.send.FinalizeSendTxFragment
  */
 object Event {
 
+    object App {
+        class AppBackgrounded
+        class AppForegrounded
+    }
+
     /**
      * Wallet events.
      */

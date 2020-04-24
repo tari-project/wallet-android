@@ -56,7 +56,6 @@ import androidx.core.animation.addListener
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import butterknife.*
 import com.daasuu.ei.Ease
 import com.daasuu.ei.EasingInterpolator
@@ -100,11 +99,12 @@ import kotlin.math.min
  */
 internal class HomeActivity : AppCompatActivity(),
     ServiceConnection,
-    SwipeRefreshLayout.OnRefreshListener,
     View.OnScrollChangeListener,
     View.OnTouchListener,
     Animation.AnimationListener,
-    TxListAdapter.Listener {
+    TxListAdapter.Listener,
+    CustomScrollView.Listener,
+    UpdateProgressViewController.Listener {
 
     @BindDimen(R.dimen.home_top_content_container_view_top_margin)
     @JvmField
@@ -171,13 +171,13 @@ internal class HomeActivity : AppCompatActivity(),
     @BindString(R.string.second_testnet_utxo_tx_message)
     lateinit var secondTestnetUTXOMessage: String
     @BindString(R.string.error_no_connection_title)
-    lateinit var sendErrorNetworkConnectionTitle: String
+    lateinit var networkConnectionErrorTitle: String
     @BindString(R.string.error_no_connection_description)
-    lateinit var sendErrorNetworkConnectionDescription: String
+    lateinit var networkConnectionErrorDescription: String
     @BindString(R.string.error_node_unreachable_title)
-    lateinit var sendErrorNodeUnreachableTitle: String
+    lateinit var nodeUnreachableErrorTitle: String
     @BindString(R.string.error_node_unreachable_description)
-    lateinit var sendErrorNodeUnreachableDescription: String
+    lateinit var nodeUnreachableErrorDescription: String
 
     @Inject
     lateinit var sharedPrefsWrapper: SharedPrefsWrapper
@@ -230,6 +230,7 @@ internal class HomeActivity : AppCompatActivity(),
      */
     private var scrollListener = ScrollListener(this)
 
+    private lateinit var updateProgressViewController: UpdateProgressViewController
     // region lifecycle functions
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -268,7 +269,13 @@ internal class HomeActivity : AppCompatActivity(),
         // hide tx list header
         UiUtil.setTopMargin(ui.txListHeaderView, -txListHeaderHeight)
 
-        setupSwipeRefreshLayout()
+        updateProgressViewController = UpdateProgressViewController(
+            ui.updateProgressContentView,
+            this
+        )
+        ui.scrollView.bindUI()
+        ui.scrollView.listenerWeakReference = WeakReference(this)
+        ui.scrollView.updateProgressViewController = updateProgressViewController
         setupRecyclerView()
         setTouchListeners()
 
@@ -358,18 +365,6 @@ internal class HomeActivity : AppCompatActivity(),
     // endregion
 
     // region initial setup (UI and else)
-
-    private fun setupSwipeRefreshLayout() {
-        // initialize pull-to-refresh
-        ui.swipeRefreshLayout.setOnRefreshListener(this)
-        // configure the refreshing colors
-        ui.swipeRefreshLayout.setColorSchemeResources(
-            R.color.home_bg_gradient_start,
-            R.color.home_bg_gradient_center,
-            R.color.home_bg_gradient_end
-        )
-    }
-
     private fun setupRecyclerView() {
         // initialize recycler view
         recyclerViewLayoutManager = LinearLayoutManager(this)
@@ -404,9 +399,10 @@ internal class HomeActivity : AppCompatActivity(),
         val recyclerViewHeight = ui.rootView.height - txListHeaderHeight
         val contentHeight =
             txListContainerMinimizedTopMargin + grabberContainerHeight + recyclerViewHeight
-        UiUtil.setHeight(ui.swipeRefreshLayout, recyclerViewHeight)
-        UiUtil.setHeight(ui.onboardingContentView, recyclerViewHeight)
+        UiUtil.setHeight(ui.recyclerViewContainerView, recyclerViewHeight)
+        // UiUtil.setHeight(onboardingContentView, recyclerViewHeight)
         UiUtil.setHeight(ui.scrollContentView, contentHeight)
+        ui.scrollView.recyclerViewContainerInitialHeight = recyclerViewHeight
         ui.scrollView.scrollToTop()
 
         ui.scrollView.setOnScrollChangeListener(this)
@@ -415,10 +411,25 @@ internal class HomeActivity : AppCompatActivity(),
     }
 
     private fun subscribeToEventBus() {
+        // app events
+        EventBus.subscribe<Event.App.AppForegrounded>(this) {
+            wr.get()?.let {
+                if (it.walletService != null
+                    && it.updateProgressViewController.state == UpdateProgressViewController.State.IDLE) {
+                    it.updateProgressViewController.reset()
+                    it.updateProgressViewController.start(it.walletService!!)
+                    it.ui.scrollView.beginUpdate()
+                }
+            }
+        }
+
         // wallet events
         EventBus.subscribe<Event.Wallet.TxCancellation>(this) {
-            wr.get()?.ui?.rootView?.post {
-                updateAllDataAndUI(restartBalanceUI = false)
+            if (wr.get()?.updateProgressViewController?.state
+                == UpdateProgressViewController.State.IDLE) {
+                wr.get()?.ui?.rootView?.post {
+                    updateAllDataAndUI(restartBalanceUI = false)
+                }
             }
         }
         EventBus.subscribe<Event.Wallet.TxMined>(this) {
@@ -427,8 +438,11 @@ internal class HomeActivity : AppCompatActivity(),
             }
         }
         EventBus.subscribe<Event.Wallet.TxReceived>(this) {
-            wr.get()?.ui?.rootView?.post {
-                updateAllDataAndUI(restartBalanceUI = false)
+            if (wr.get()?.updateProgressViewController?.state
+                == UpdateProgressViewController.State.IDLE) {
+                wr.get()?.ui?.rootView?.post {
+                    updateAllDataAndUI(restartBalanceUI = false)
+                }
             }
         }
 
@@ -528,16 +542,6 @@ internal class HomeActivity : AppCompatActivity(),
 
     // endregion
 
-    /**
-     * Called on swipe refresh.
-     */
-    override fun onRefresh() {
-        ui.txRecyclerView.isNestedScrollingEnabled = false
-        AsyncTask.execute {
-            wr.get()?.updateAllDataAndUI(restartBalanceUI = false)
-        }
-    }
-
     private val txListIsEmpty: Boolean
         get() {
             return completedTxs.isEmpty()
@@ -580,14 +584,18 @@ internal class HomeActivity : AppCompatActivity(),
             }
             if (!sharedPrefsWrapper.faucetTestnetTariRequestCompleted) {
                 requestTestnetTari()
+            } else { // update
+                updateProgressViewController.reset()
+                ui.rootView.postDelayed({
+                    ui.scrollView.beginUpdate()
+                    updateProgressViewController.start(walletService!!)
+                }, Constants.UI.xLongDurationMs)
             }
         }
     }
 
     private fun updateTxListUI() {
         recyclerViewAdapter.notifyDataChanged()
-        ui.swipeRefreshLayout.isRefreshing = false
-        ui.txRecyclerView.isNestedScrollingEnabled = true
         scrollListener.reset()
         if (txListIsEmpty) {
             showNoTxsTextView()
@@ -693,7 +701,6 @@ internal class HomeActivity : AppCompatActivity(),
      */
     private fun playOnboardingAnim() {
         ui.onboardingContentView.visible()
-        ui.swipeRefreshLayout.isEnabled = false
         hideSendTariButtonAnimated()
 
         updateBalanceInfoData()
@@ -919,7 +926,6 @@ internal class HomeActivity : AppCompatActivity(),
         isOnboarding = false
         ui.onboardingContentView.gone()
         ui.txListHeaderView.visible()
-        ui.swipeRefreshLayout.isEnabled = true
         updateAllDataAndUI(restartBalanceUI = false)
         // request Testnet Tari if no txs
         if (txListIsEmpty) {
@@ -971,25 +977,14 @@ internal class HomeActivity : AppCompatActivity(),
      * Called when an outgoing transaction has failed.
      */
     private fun onTxSendFailed(failureReason: FinalizeSendTxFragment.FailureReason) {
-        BottomSlideDialog(
-            context = this,
-            layoutId = R.layout.tx_failed_dialog,
-            dismissViewId = R.id.tx_failed_dialog_txt_close
-        ).apply {
-            val titleTextView = findViewById<TextView>(R.id.tx_failed_dialog_txt_title)
-            titleTextView.text = when (failureReason) {
-                NETWORK_CONNECTION_ERROR -> sendErrorNetworkConnectionTitle
-                BASE_NODE_CONNECTION_ERROR -> sendErrorNodeUnreachableTitle
-                SEND_ERROR -> sendErrorNodeUnreachableTitle
+        when (failureReason) {
+            NETWORK_CONNECTION_ERROR -> {
+                displayNetworkConnectionErrorDialog()
             }
-            val descriptionTextView = findViewById<TextView>(R.id.tx_failed_dialog_txt_description)
-            descriptionTextView.text = when (failureReason) {
-                NETWORK_CONNECTION_ERROR -> sendErrorNetworkConnectionDescription
-                BASE_NODE_CONNECTION_ERROR -> sendErrorNodeUnreachableDescription
-                SEND_ERROR -> sendErrorNodeUnreachableDescription
+            BASE_NODE_CONNECTION_ERROR, SEND_ERROR -> {
+                displayBaseNodeConnectionErrorDialog()
             }
-            // set text
-        }.show()
+        }
     }
 
     private fun importSecondUTXO() {
@@ -1110,6 +1105,60 @@ internal class HomeActivity : AppCompatActivity(),
         }
         anim.setAnimationListener(this)
         ui.sendTariButton.startAnimation(anim)
+    }
+
+    override fun onSwipeRefresh(source: CustomScrollView) {
+        ui.rootView.post {
+            updateProgressViewController.start(walletService!!)
+        }
+    }
+
+    override fun updateHasFailed(source: UpdateProgressViewController,
+                                 failureReason: UpdateProgressViewController.FailureReason) {
+        ui.scrollView.finishUpdate()
+        when (failureReason) {
+            UpdateProgressViewController.FailureReason.NETWORK_CONNECTION_ERROR -> {
+                displayNetworkConnectionErrorDialog()
+            }
+            UpdateProgressViewController.FailureReason.BASE_NODE_CONNECTION_ERROR -> {
+                displayBaseNodeConnectionErrorDialog()
+            }
+        }
+    }
+
+    override fun updateHasCompleted(source: UpdateProgressViewController) {
+        ui.scrollView.finishUpdate {
+            wr.get()?.updateAllDataAndUI(restartBalanceUI = false)
+        }
+
+    }
+
+    private fun displayNetworkConnectionErrorDialog() {
+        BottomSlideDialog(
+            context = this,
+            layoutId = R.layout.tx_failed_dialog,
+            dismissViewId = R.id.tx_failed_dialog_txt_close
+        ).apply {
+            val titleTextView = findViewById<TextView>(R.id.tx_failed_dialog_txt_title)
+            titleTextView.text = networkConnectionErrorTitle
+            val descriptionTextView = findViewById<TextView>(R.id.tx_failed_dialog_txt_description)
+            descriptionTextView.text = networkConnectionErrorDescription
+            // set text
+        }.show()
+    }
+
+    private fun displayBaseNodeConnectionErrorDialog() {
+        BottomSlideDialog(
+            context = this,
+            layoutId = R.layout.tx_failed_dialog,
+            dismissViewId = R.id.tx_failed_dialog_txt_close
+        ).apply {
+            val titleTextView = findViewById<TextView>(R.id.tx_failed_dialog_txt_title)
+            titleTextView.text = nodeUnreachableErrorTitle
+            val descriptionTextView = findViewById<TextView>(R.id.tx_failed_dialog_txt_description)
+            descriptionTextView.text = nodeUnreachableErrorDescription
+            // set text
+        }.show()
     }
 
     // region send tari button animation listener
@@ -1273,4 +1322,5 @@ internal class HomeActivity : AppCompatActivity(),
             ButterKnife.bind(activity)
         }
     }
+
 }
