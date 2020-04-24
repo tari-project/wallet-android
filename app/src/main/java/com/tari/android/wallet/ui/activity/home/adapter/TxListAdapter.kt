@@ -122,6 +122,8 @@ internal class TxListAdapter(
             pendingHeaderViewType -> {
                 val view = LayoutInflater.from(parent.context)
                     .inflate(R.layout.home_tx_list_header, parent, false)
+                    // TODO [DISCUSS] adjust margin at the point of instantiation and have a
+                    // single textview in the xml?
                 TxHeaderViewHolder(view, TxHeaderViewHolder.Type.PENDING_TXS)
             }
             headerViewType -> {
