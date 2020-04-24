@@ -14,37 +14,17 @@
         android:layout_width="match_parent"
         android:layout_height="35dp" />
 
-    <LinearLayout
-        android:layout_width="match_parent"
+    <!-- title -->
+    <com.tari.android.wallet.ui.component.CustomFontTextView
+        android:id="@+id/tx_list_header_title_text_view"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:gravity="center_vertical"
-        android:orientation="horizontal">
-
-        <!-- title -->
-        <com.tari.android.wallet.ui.component.CustomFontTextView
-            android:id="@+id/tx_list_header_title_text_view"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:ellipsize="end"
-            android:singleLine="true"
-            android:text="@string/home_today"
-            android:textColor="@color/home_tx_section_header_title"
-            android:textSize="12sp"
-            app:customFont="AVENIR_LT_STD_MEDIUM" />
-
-        <!-- Lottie animation for Tari Wallet text -->
-        <com.airbnb.lottie.LottieAnimationView
-            android:id="@+id/tx_list_header_pending_animation_view"
-            android:layout_width="wrap_content"
-            android:background="@color/white"
-            android:layout_height="wrap_content"
-            app:lottie_autoPlay="true"
-            app:lottie_renderMode="automatic"
-            app:lottie_enableMergePathsForKitKatAndAbove="true"
-            app:lottie_loop="true"
-            app:lottie_rawRes="@raw/tx_list_pending_txs_anim" />
-    </LinearLayout>
+        android:ellipsize="end"
+        android:singleLine="true"
+        android:text="@string/home_today"
+        android:textColor="@color/home_tx_section_header_title"
+        android:textSize="12sp"
+        app:customFont="AVENIR_LT_STD_MEDIUM" />
 
 
 </LinearLayout>

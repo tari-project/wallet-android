@@ -225,6 +225,9 @@
     <string name="tx_detail_add_contact">Add Contact Name</string>
     <string name="tx_detail_transaction_fee">Transaction Fee</string>
     <string name="tx_detail_transaction_id">Transaction ID</string>
+    <string name="tx_detail_waiting_for_recipient">Waiting for recipient to accept transaction</string>
+    <string name="tx_detail_waiting_for_sender_to_complete">Waiting for sender to complete transaction</string>
+    <string name="tx_detail_broadcasting">Completing final processing…</string>
     <!-- Fee tooltip -->
     <string name="tx_detail_fee_tooltip_transaction_fee">Transaction Fee</string>
     <string name="tx_detail_fee_tooltip_desc">The transaction fee is distributed to the thousands of computers (also known as \"miners\") who ensure that your XTR transactions are fast and secure.</string>

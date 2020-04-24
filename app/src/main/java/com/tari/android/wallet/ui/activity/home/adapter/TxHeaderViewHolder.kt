@@ -38,8 +38,6 @@ import butterknife.BindString
 import butterknife.ButterKnife
 import com.tari.android.wallet.R
 import com.tari.android.wallet.databinding.HomeTxListHeaderBinding
-import com.tari.android.wallet.ui.extension.gone
-import com.tari.android.wallet.ui.extension.visible
 import org.joda.time.LocalDate
 
 /**
@@ -76,21 +74,16 @@ class TxHeaderViewHolder(view: View, private val type: Type) :
 
     fun bind(date: LocalDate?, position: Int) {
         ui.txListHeaderSeparatorView.visibility = if (position == 0) View.GONE else View.VISIBLE
-        when (type) {
-            Type.PENDING_TXS -> {
-                ui.txListHeaderPendingAnimationView.visible()
-                ui.txListHeaderTitleTextView.text = pendingTxsString
-            }
-            Type.DATE -> {
-                ui.txListHeaderPendingAnimationView.gone()
-                this.date = date!!
-                val todayDate = LocalDate.now()
-                val yesterdayDate = todayDate.minusDays(1)
-                ui.txListHeaderTitleTextView.text = when {
-                    date.isEqual(todayDate) -> todayString
-                    date.isEqual(yesterdayDate) -> yesterdayString
-                    else -> date.toString(dateFormat)
-                }
+        if (type == Type.PENDING_TXS) {
+            ui.txListHeaderTitleTextView.text = pendingTxsString
+        } else if (type == Type.DATE) {
+            this.date = date!!
+            val todayDate = LocalDate.now()
+            val yesterdayDate = todayDate.minusDays(1)
+            ui.txListHeaderTitleTextView.text = when {
+                date.isEqual(todayDate) -> todayString
+                date.isEqual(yesterdayDate) -> yesterdayString
+                else -> date.toString(dateFormat)
             }
         }
 

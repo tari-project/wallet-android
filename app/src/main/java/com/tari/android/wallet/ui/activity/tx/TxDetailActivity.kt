@@ -120,6 +120,18 @@ internal class TxDetailActivity : AppCompatActivity(), ServiceConnection {
     var paymentTo = ""
 
     @JvmField
+    @BindString(R.string.tx_detail_waiting_for_recipient)
+    var waitingForRecipient = ""
+
+    @JvmField
+    @BindString(R.string.tx_detail_waiting_for_sender_to_complete)
+    var waitingForSenderToComplete = ""
+
+    @JvmField
+    @BindString(R.string.tx_detail_broadcasting)
+    var txBroadcasting = ""
+
+    @JvmField
     @BindColor(R.color.tx_detail_contact_name_label_text)
     var contactLabelTxtGrayColor = 0
 
@@ -147,6 +159,10 @@ internal class TxDetailActivity : AppCompatActivity(), ServiceConnection {
     @JvmField
     var copyEmojiIdButtonVisibleBottomMargin = 0
 
+    @BindDimen(R.dimen.tx_details_no_status_header_height)
+    @JvmField
+    var headerHeightNoStatus = 0
+
     @Inject
     lateinit var tracker: Tracker
 
@@ -170,7 +186,7 @@ internal class TxDetailActivity : AppCompatActivity(), ServiceConnection {
     private lateinit var emojiIdCopiedViewController: EmojiIdCopiedViewController
 
     private lateinit var ui: ActivityTxDetailBinding
-    private val dimmerViews get() = arrayOf(ui.topDimmerView, ui.bottomDimmerView)
+    private lateinit var dimmerViews: MutableList<View>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -224,6 +240,8 @@ internal class TxDetailActivity : AppCompatActivity(), ServiceConnection {
 
     @SuppressLint("SetTextI18n")
     private fun setupUi() {
+        dimmerViews = mutableListOf(ui.topDimmerView, ui.statusDimmerView, ui.bottomDimmerView)
+        defineStatusHeaderState()
         currentTextSize = elementTextSize
         currentAmountGemSize = amountGemSize
 
@@ -250,7 +268,6 @@ internal class TxDetailActivity : AppCompatActivity(), ServiceConnection {
             is PendingOutboundTx -> paymentTo
             else -> throw RuntimeException("Unexpected transaction type for transaction: " + tx.id)
         }
-
         val timestamp = tx.timestamp.toLong() * 1000
         ui.dateTextView.text = Date(timestamp).txFormattedDate()
         ui.amountTextView.text = WalletUtil.amountFormatter.format(tx.amount.tariValue)
@@ -308,6 +325,28 @@ internal class TxDetailActivity : AppCompatActivity(), ServiceConnection {
         ui.editContactLabelTextView.setOnClickListener { onEditContactClick() }
         ui.createContactEditText.setOnEditorActionListener { _, actionId, _ ->
             onContactEditTextEditAction(actionId)
+        }
+    }
+
+    private fun defineStatusHeaderState() {
+        tx.apply {
+            ui.statusTextView.text = when {
+                this is PendingOutboundTx && status == Status.PENDING -> waitingForRecipient
+                this is PendingOutboundTx &&
+                        (status == Status.COMPLETED ||
+                                status == Status.BROADCAST) -> txBroadcasting
+                this is PendingInboundTx && status == Status.COMPLETED -> waitingForSenderToComplete
+                this is PendingInboundTx -> txBroadcasting
+                else -> "".also {
+                    ui.statusContainerView.gone()
+                    ui.statusDimmerView.gone()
+                    dimmerViews.remove(ui.statusDimmerView)
+                    ui.paymentStateBgView.layoutParams =
+                        ui.paymentStateBgView.layoutParams.also { params ->
+                            params.height = headerHeightNoStatus
+                        }
+                }
+            }
         }
     }
 

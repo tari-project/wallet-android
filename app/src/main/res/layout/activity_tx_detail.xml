@@ -16,8 +16,8 @@
 
         <View
             android:id="@+id/payment_state_bg_view"
-            android:layout_width="match_parent"
-            android:layout_height="114dp"
+            android:layout_height="@dimen/tx_details_with_status_header_height"
+            android:layout_width="0dp"
             android:background="@color/white"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -68,6 +68,50 @@
             app:layout_constraintStart_toStartOf="@id/payment_state_text_view"
             app:layout_constraintTop_toBottomOf="@id/payment_state_text_view"
             tools:text="November 1st 2019 at 2:39 PM" />
+
+        <FrameLayout
+            android:id="@+id/status_container_view"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="20dp"
+            android:layout_marginTop="12dp"
+            android:background="@drawable/background_transaction_state"
+            android:elevation="16dp"
+            android:paddingTop="18dp"
+            android:paddingBottom="14dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/date_text_view">
+
+            <com.tari.android.wallet.ui.component.CustomFontTextView
+                android:id="@+id/status_text_view"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:paddingHorizontal="10dp"
+                android:textColor="#9330FF"
+                android:textSize="12sp"
+                app:customFont="AVENIR_LT_STD_HEAVY"
+                tools:text="Hello world" />
+
+        </FrameLayout>
+
+        <View
+            android:id="@+id/status_dimmer_view"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:alpha="0.6"
+            android:background="@drawable/background_transaction_state_dimmer"
+            android:clickable="true"
+            android:focusable="true"
+            android:elevation="16dp"
+            app:layout_constraintTop_toTopOf="@id/status_container_view"
+            app:layout_constraintStart_toStartOf="@id/status_container_view"
+            app:layout_constraintEnd_toEndOf="@id/status_container_view"
+            app:layout_constraintBottom_toBottomOf="@id/status_container_view"
+            tools:visibility="gone"/>
 
         <RelativeLayout
             android:id="@+id/amount_container_view"
