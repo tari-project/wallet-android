@@ -1,5 +1,8 @@
 # Tari Aurora Changelog
+## [v0.1.7-jniLibs-0.8.0] - 2020-04-25
 
+Upgrade jniLibs to v0.8.0.
+The app is now in sync with v0.1.0; Rincewind release
 ## [0.1.6-jniLibs-0.7.4] - 2020-04-24
 - Updated jniLibs to 0.7.4
 - Give better user feedback on store and forwarded messages
