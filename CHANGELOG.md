@@ -1,5 +1,10 @@
 # Tari Aurora Changelog
+## [v0.1.8-jniLibs-0.9.0] - 2020-04-26
 ## [v0.1.7-jniLibs-0.8.0] - 2020-04-25
+An issue with nodes not deduping messages properly has been fixed.
+This is a network-breaking change. Older versions will no longer be able to
+communicate with the network.
+
 
 Upgrade jniLibs to v0.8.0.
 The app is now in sync with v0.1.0; Rincewind release
