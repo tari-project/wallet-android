@@ -36,7 +36,6 @@ import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
 import android.animation.AnimatorSet
 import android.animation.ValueAnimator
-import android.annotation.SuppressLint
 import android.content.*
 import android.os.Bundle
 import android.os.IBinder
@@ -68,6 +67,7 @@ import com.tari.android.wallet.util.WalletUtil
 import me.everything.android.ui.overscroll.OverScrollDecoratorHelper
 import org.matomo.sdk.Tracker
 import org.matomo.sdk.extra.TrackHelper
+import java.lang.IllegalArgumentException
 import java.util.*
 import javax.inject.Inject
 
@@ -163,6 +163,10 @@ internal class TxDetailActivity : AppCompatActivity(), ServiceConnection {
     @JvmField
     var headerHeightNoStatus = 0
 
+    @BindDimen(R.dimen.tx_details_with_status_header_height)
+    @JvmField
+    var headerHeightWithStatus = 0
+
     @Inject
     lateinit var tracker: Tracker
 
@@ -193,8 +197,9 @@ internal class TxDetailActivity : AppCompatActivity(), ServiceConnection {
         ui = ActivityTxDetailBinding.inflate(layoutInflater).apply { setContentView(root) }
         TxDetailActivityVisitor.visit(this)
         overridePendingTransition(R.anim.enter_from_right, R.anim.exit_to_left)
-        emojiIdSummaryController = EmojiIdSummaryViewController(ui.emojiIdSummaryView)
-        tx = intent.getParcelableExtra(TX_DETAIL_EXTRA_KEY) as Tx
+        tx =
+            if (savedInstanceState == null) intent.getParcelableExtra(TX_DETAIL_EXTRA_KEY) as Tx
+            else savedInstanceState.getParcelable(TX_DETAIL_EXTRA_KEY)!!
         setupUi()
         TrackHelper.track()
             .screen("/home/tx_details")
@@ -214,7 +219,13 @@ internal class TxDetailActivity : AppCompatActivity(), ServiceConnection {
 
     override fun onDestroy() {
         unbindService(this)
+        EventBus.unsubscribe(this)
         super.onDestroy()
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putParcelable(TX_DETAIL_EXTRA_KEY, this.tx)
     }
 
     /**
@@ -238,48 +249,77 @@ internal class TxDetailActivity : AppCompatActivity(), ServiceConnection {
         overridePendingTransition(R.anim.enter_from_left, R.anim.exit_to_right)
     }
 
-    @SuppressLint("SetTextI18n")
     private fun setupUi() {
+        bindViews()
+        setUiCommands()
+        bindTxData()
+        observeTxUpdates()
+    }
+
+    private fun bindViews() {
         dimmerViews = mutableListOf(ui.topDimmerView, ui.statusDimmerView, ui.bottomDimmerView)
-        defineStatusHeaderState()
         currentTextSize = elementTextSize
         currentAmountGemSize = amountGemSize
+        OverScrollDecoratorHelper.setUpOverScroll(ui.fullEmojiIdScrollView)
+        emojiIdCopiedViewController = EmojiIdCopiedViewController(ui.emojiIdCopiedView)
+        emojiIdSummaryController = EmojiIdSummaryViewController(ui.emojiIdSummaryView)
+    }
 
+    private fun setUiCommands() {
+        ui.backView.setOnClickListener { onBackPressed() }
+        ui.emojiIdSummaryContainerView.setOnClickListener { onEmojiSummaryClicked(it) }
+        ui.copyEmojiIdButton.setOnClickListener { onCopyEmojiIdButtonClicked(it) }
+        ui.feeLabelTextView.setOnClickListener { showTxFeeToolTip() }
+        ui.addContactButton.setOnClickListener { onAddContactClick() }
+        ui.editContactLabelTextView.setOnClickListener { onEditContactClick() }
+        dimmerViews.forEach { it.setOnClickListener { hideFullEmojiId() } }
+        ui.createContactEditText.setOnEditorActionListener { _, actionId, _ ->
+            onContactEditTextEditAction(actionId)
+        }
+    }
+
+    private fun bindTxData() {
+        val tx = this.tx
+        setTxStatusData(tx)
+        setTxMetaData(tx)
+        setTxAddresseeData(tx)
+        setTxPaymentData(tx)
+    }
+
+    private fun setTxPaymentData(tx: Tx) {
+        ui.amountTextView.text = WalletUtil.amountFormatter.format(tx.amount.tariValue)
         ui.paymentStateTextView.text = when (tx) {
-            is CompletedTx -> {
-                when (tx.direction) {
-                    Tx.Direction.INBOUND -> paymentReceived
-                    Tx.Direction.OUTBOUND -> paymentSent
-                }
-            }
+            is CompletedTx ->
+                if (tx.direction == Tx.Direction.INBOUND) paymentReceived else paymentSent
             is PendingInboundTx -> pendingPaymentReceived
             is PendingOutboundTx -> pendingPaymentSent
-            else -> throw RuntimeException("Unexpected transaction type for transaction: " + tx.id)
+            else ->
+                throw IllegalArgumentException("Unexpected transaction type for transaction: ${tx.id}")
         }
-
-        ui.fromTextView.text = when (tx) {
-            is CompletedTx -> {
-                when (tx.direction) {
-                    Tx.Direction.INBOUND -> paymentFrom
-                    Tx.Direction.OUTBOUND -> paymentTo
-                }
-            }
-            is PendingInboundTx -> paymentFrom
-            is PendingOutboundTx -> paymentTo
-            else -> throw RuntimeException("Unexpected transaction type for transaction: " + tx.id)
+        when {
+            tx is CompletedTx && tx.direction == Tx.Direction.OUTBOUND -> setFeeData(tx.fee)
+            tx is PendingOutboundTx -> setFeeData(tx.fee)
+            else -> ui.txFeeGroup.gone()
         }
-        val timestamp = tx.timestamp.toLong() * 1000
-        ui.dateTextView.text = Date(timestamp).txFormattedDate()
-        ui.amountTextView.text = WalletUtil.amountFormatter.format(tx.amount.tariValue)
+        ui.amountContainerView.post { scaleDownAmountTextViewIfRequired() }
+    }
 
-        emojiIdSummaryController.display(tx.user.publicKey.emojiId)
+    private fun setFeeData(fee: MicroTari) {
+        ui.txFeeGroup.visible()
+        ui.txFeeTextView.text = getString(
+            R.string.tx_details_fee_value,
+            WalletUtil.amountFormatter.format(fee.tariValue)
+        )
+    }
 
-        ui.txIdTextView.text = "${getString(R.string.tx_detail_transaction_id)}:${tx.id}"
-        if (tx.message.isBlank()) {
-            ui.noteLabelTextView.invisible()
-        }
+    private fun setTxMetaData(tx: Tx) {
+        ui.dateTextView.text = Date(tx.timestamp.toLong() * 1000).txFormattedDate()
+        ui.txIdTextView.text = getString(R.string.tx_detail_transaction_id, tx.id)
         ui.txNoteTextView.text = tx.message
-        ui.backView.setOnClickListener { onBackPressed() }
+        if (tx.message.isBlank()) ui.noteLabelTextView.invisible()
+    }
+
+    private fun setTxAddresseeData(tx: Tx) {
         val user = tx.user
         if (user is Contact) {
             ui.contactContainerView.visible()
@@ -288,65 +328,38 @@ internal class TxDetailActivity : AppCompatActivity(), ServiceConnection {
             ui.addContactButton.visible()
             ui.contactContainerView.gone()
         }
-        when {
-            (tx as? CompletedTx)?.direction == Tx.Direction.OUTBOUND -> {
-                ui.txFeeGroup.visible()
-                val fee = (tx as CompletedTx).fee
-                ui.txFeeTextView.text = "+${WalletUtil.amountFormatter.format(fee.tariValue)}"
-            }
-            tx is PendingOutboundTx -> {
-                ui.txFeeGroup.visible()
-                val fee = (tx as PendingOutboundTx).fee
-                ui.txFeeTextView.text = "+${WalletUtil.amountFormatter.format(fee.tariValue)}"
-            }
-            else -> {
-                ui.txFeeGroup.gone()
-            }
+        ui.fromTextView.text = when (tx) {
+            is CompletedTx -> if (tx.direction == Tx.Direction.INBOUND) paymentFrom else paymentTo
+            is PendingInboundTx -> paymentFrom
+            is PendingOutboundTx -> paymentTo
+            else ->
+                throw IllegalArgumentException("Unexpected transaction type for transaction: ${tx.id}")
         }
-        ui.amountContainerView.post { scaleDownAmountTextViewIfRequired() }
-
-        OverScrollDecoratorHelper.setUpOverScroll(ui.fullEmojiIdScrollView)
         ui.fullEmojiIdTextView.text = EmojiUtil.getFullEmojiIdSpannable(
             tx.user.publicKey.emojiId,
-            emojiIdChunkSeparator,
-            blackColor,
-            lightGrayColor
+            emojiIdChunkSeparator, blackColor, lightGrayColor
         )
-        ui.fullEmojiIdContainerView.gone()
-        dimmerViews.forEach { dimmerView -> dimmerView.gone() }
-        ui.copyEmojiIdContainerView.gone()
-        emojiIdCopiedViewController = EmojiIdCopiedViewController(ui.emojiIdCopiedView)
-
-        ui.emojiIdSummaryContainerView.setOnClickListener { onEmojiSummaryClicked(it) }
-        ui.copyEmojiIdButton.setOnClickListener { onCopyEmojiIdButtonClicked(it) }
-        dimmerViews.forEach { it.setOnClickListener { hideFullEmojiId() } }
-        ui.feeLabelTextView.setOnClickListener { showTxFeeToolTip() }
-        ui.addContactButton.setOnClickListener { onAddContactClick() }
-        ui.editContactLabelTextView.setOnClickListener { onEditContactClick() }
-        ui.createContactEditText.setOnEditorActionListener { _, actionId, _ ->
-            onContactEditTextEditAction(actionId)
-        }
+        emojiIdSummaryController.display(tx.user.publicKey.emojiId)
     }
 
-    private fun defineStatusHeaderState() {
-        tx.apply {
-            ui.statusTextView.text = when {
-                this is PendingOutboundTx && status == Status.PENDING -> waitingForRecipient
-                this is PendingOutboundTx &&
-                        (status == Status.COMPLETED ||
-                                status == Status.BROADCAST) -> txBroadcasting
-                this is PendingInboundTx && status == Status.COMPLETED -> waitingForSenderToComplete
-                this is PendingInboundTx -> txBroadcasting
-                else -> "".also {
-                    ui.statusContainerView.gone()
-                    ui.statusDimmerView.gone()
-                    dimmerViews.remove(ui.statusDimmerView)
-                    ui.paymentStateBgView.layoutParams =
-                        ui.paymentStateBgView.layoutParams.also { params ->
-                            params.height = headerHeightNoStatus
-                        }
-                }
-            }
+    private fun setTxStatusData(tx: Tx) {
+        val statusText = when {
+            tx is PendingOutboundTx && tx.status == Status.PENDING -> waitingForRecipient
+            tx is PendingOutboundTx && (tx.status == Status.COMPLETED ||
+                    tx.status == Status.BROADCAST) -> txBroadcasting
+            tx is PendingInboundTx && tx.status == Status.COMPLETED -> waitingForSenderToComplete
+            tx is PendingInboundTx -> txBroadcasting
+            else -> ""
+        }
+        ui.statusTextView.text = statusText
+        if (statusText.isEmpty()) {
+            ui.statusContainerView.gone()
+            dimmerViews.remove(ui.statusDimmerView)
+            ui.paymentStateBgView.setHeight(headerHeightNoStatus)
+        } else {
+            ui.statusContainerView.visible()
+            if (!dimmerViews.contains(ui.statusDimmerView)) dimmerViews.add(ui.statusDimmerView)
+            ui.paymentStateBgView.setHeight(headerHeightWithStatus)
         }
     }
 
@@ -372,6 +385,22 @@ internal class TxDetailActivity : AppCompatActivity(), ServiceConnection {
             currentAmountGemSize.toInt()
         )
         ui.amountTextView.setTextSizePx(currentTextSize)
+    }
+
+    private fun observeTxUpdates() {
+        EventBus.subscribe<Event.Wallet.TxBroadcast>(this) { updateTxData(it.completedTx) }
+        EventBus.subscribe<Event.Wallet.TxFinalized>(this) { updateTxData(it.completedTx) }
+        EventBus.subscribe<Event.Wallet.TxMined>(this) { updateTxData(it.completedTx) }
+        EventBus.subscribe<Event.Wallet.TxReplyReceived>(this) { updateTxData(it.completedTx) }
+    }
+
+    private fun updateTxData(tx: Tx) {
+        ui.rootView.post {
+            if (tx.id == this.tx.id) {
+                this.tx = tx
+                bindTxData()
+            }
+        }
     }
 
     private fun onEmojiSummaryClicked(view: View) {

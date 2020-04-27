@@ -94,6 +94,8 @@
     <dimen name="wallet_info_img_qr_code_size">400dp</dimen>
     <dimen name="back_button_size">50dp</dimen>
     <dimen name="header_top_inset">24dp</dimen>
+
+    <!-- Tx details -->
     <dimen name="tx_details_no_status_header_height">114dp</dimen>
     <dimen name="tx_details_with_status_header_height">167dp</dimen>
 </resources>
