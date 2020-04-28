@@ -196,3 +196,7 @@ internal fun View.doOnGlobalLayout(block: () -> Unit) {
             }
         })
 }
+
+internal fun View.setHeight(value: Int) {
+    this.layoutParams = this.layoutParams.also { it.height = value }
+}
