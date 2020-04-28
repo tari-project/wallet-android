@@ -92,8 +92,8 @@
     <string name="wallet_service_error_no_internet_connection">No internet connection!</string>
 
     <!-- testnet UTXO messages -->
-    <string name="first_testnet_utxo_tx_message">💸 Here’s some testnet XTR!</string>
-    <string name="second_testnet_utxo_tx_message">Nice work! Here\'s more tXTR to fill your coffers. Be sure to hit the Store icon to see real, exclusive items you can redeem with your "hard-earned" testnet XTR.</string>
+    <string name="first_testnet_utxo_tx_message">💸 Here’s some tXTR!</string>
+    <string name="second_testnet_utxo_tx_message">Nice work! Here\'s more tXTR to fill your coffers. Be sure to hit the Store icon to see real, exclusive items you can redeem with your "hard-earned" tXTR.</string>
 
     <!-- onboarding - introduction -->
     <string name="introduction_crypto_wallet_title_text_line_1">Private by default.</string>
@@ -112,7 +112,7 @@
     <!-- screen #2 -->
     <string name="create_wallet_awesome">We’re off to a great start!</string>
     <string name="create_wallet_now_text">Now, let’s create your Emoji ID.</string>
-    <string name="create_wallet_address_desc">Your Emoji ID is your wallet address.\nIt’s how people can find you and send you testnet XTR.</string>
+    <string name="create_wallet_address_desc">Your Emoji ID is your wallet address.\nIt’s how people can find you and send you tXTR.</string>
     <string name="create_wallet_continue_and_create_emoji_id">Create Your Emoji ID</string>
     <!-- screen #3 -->
     <string name="create_wallet_your_emoji_id_text_label">This is your Emoji ID</string>
@@ -120,7 +120,7 @@
     <string name="create_wallet_set_of_emoji_your_wallet_address_desc">Your Emoji ID is your wallet’s address,\nand how others can find you and send you tXTR.</string>
     <!-- onboarding - local auth -->
     <string name="auth_prompt_title">🔑 Let’s secure your wallet. 🔑</string>
-    <string name="auth_prompt_desc">Sleep well at night knowing you’ve taken precautions to keep your XTR wallet safe and sound.</string>
+    <string name="auth_prompt_desc">Sleep well at night knowing you’ve taken precautions to keep your tXTR wallet safe and sound.</string>
     <string name="auth_prompt_button_text">Secure with Device Lock Code</string>
     <string name="auth_prompt_button_touch_id_text">Secure with Biometrics</string>
 
@@ -153,14 +153,14 @@
     <string name="home_you_are_ready_to_explore">You’re ready to start exploring</string>
     <string name="home_empty_wallet">We don’t see any transactions yet.\nHopefully something happens soon…🤞</string>
     <!--home tari bot dialog-->
-    <string name="home_tari_bot_you_got_tari_dlg_title">You just got some testnet XTR!</string>
-    <string name="home_tari_bot_you_got_tari_dlg_title_bold_part">testnet XTR!</string>
-    <string name="home_tari_bot_dialog_desc">Try sending a bit of testnet XTR back to Tari Bot. It’s always better to give than to receive (and you’ll see how the wallet works too).</string>
+    <string name="home_tari_bot_you_got_tari_dlg_title">You just got some tXTR!</string>
+    <string name="home_tari_bot_you_got_tari_dlg_title_bold_part">tXTR!</string>
+    <string name="home_tari_bot_dialog_desc">Try sending a bit of tXTR back to Tari Bot. It’s always better to give than to receive (and you’ll see how the wallet works too).</string>
     <string name="home_tari_bot_try_later">Try it later</string>
     <!-- home TTL store dialog -->
-    <string name="home_ttl_store_dlg_title">Spend testnet XTR on\nreal (exclusive) stuff</string>
+    <string name="home_ttl_store_dlg_title">Spend tXTR on\nreal (exclusive) stuff</string>
     <string name="home_ttl_store_dlg_title_bold_part">(exclusive) stuff</string>
-    <string name="home_ttl_store_dlg_desciption">Check out Testnet Tari Limited (TTL) to spend your "hard-earned" testnet XTR on exclusive, one-of-a-kind stuff produced by the team at Tari Labs. Enjoy!</string>
+    <string name="home_ttl_store_dlg_desciption">Check out TTL to spend your "hard-earned" tXTR on exclusive, one-of-a-kind stuff produced by the team at Tari Labs. Enjoy!</string>
     <string name="home_ttl_store_positive_btn">Visit the TTL Store</string>
     <string name="home_ttl_store_negative_btn">I\'ll check it out later</string>
     <!-- store and forward update progress -->
