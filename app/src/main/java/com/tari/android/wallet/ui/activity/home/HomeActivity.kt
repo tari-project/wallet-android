@@ -354,6 +354,7 @@ internal class HomeActivity : AppCompatActivity(),
         }
         EventBus.unsubscribe(this)
         EventBus.unsubscribeFromNetworkConnectionState(this)
+        updateProgressViewController.destroy()
         super.onDestroy()
     }
 
