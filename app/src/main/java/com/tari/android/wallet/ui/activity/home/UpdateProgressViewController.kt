@@ -395,6 +395,11 @@ internal class UpdateProgressViewController(
         }
     }
 
+    fun destroy() {
+        EventBus.unsubscribe(this)
+        baseNodeSyncTimeoutSubscription?.dispose()
+    }
+
     interface Listener {
 
         fun updateHasFailed(source: UpdateProgressViewController, failureReason: FailureReason)
