@@ -43,6 +43,7 @@ import com.tari.android.wallet.ui.activity.home.HomeActivity
 import com.tari.android.wallet.ui.fragment.onboarding.CreateWalletFragment
 import com.tari.android.wallet.ui.fragment.onboarding.IntroductionFragment
 import com.tari.android.wallet.ui.fragment.onboarding.LocalAuthFragment
+import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.Constants.UI.Auth
 import com.tari.android.wallet.util.Constants.UI.CreateWallet
 import com.tari.android.wallet.util.SharedPrefsWrapper
@@ -131,11 +132,10 @@ internal class OnboardingFlowActivity : AppCompatActivity(), IntroductionFragmen
         if (fragment is CreateWalletFragment) {
             fragment.fadeOutAllViewAnimation()
         }
-
         supportFragmentManager
             .beginTransaction()
             .setCustomAnimations(R.anim.fade_in, R.anim.fade_out)
-            .replace(R.id.onboarding_fragment_container_1, LocalAuthFragment())
+            .add(R.id.onboarding_fragment_container_1, LocalAuthFragment())
             .commit()
 
         removeContainer2Fragment()
@@ -143,11 +143,13 @@ internal class OnboardingFlowActivity : AppCompatActivity(), IntroductionFragmen
 
     private fun removeContainer2Fragment() {
         uiHandler.postDelayed({
-            val fragment = supportFragmentManager.findFragmentById(R.id.onboarding_fragment_container_2)
+            val fragment = supportFragmentManager.findFragmentById(
+                R.id.onboarding_fragment_container_2
+            )
             fragment?.let {
-                supportFragmentManager.beginTransaction().remove(fragment).commit()
+                supportFragmentManager.beginTransaction().remove(it).commit()
             }
-        }, Auth.removeFragmentDelayDuration)
+        }, Constants.UI.longDurationMs)
     }
 
     override fun onAuthSuccess() {

@@ -99,6 +99,7 @@ internal class CustomScrollView @JvmOverloads constructor(
     private var swipeRefreshYOffset = 0
     private var lastDeltaY = 0
     private var isUpdating = false
+    private val updateProgressViewRevealDurationMs = 400L
     var recyclerViewContainerInitialHeight = 0
 
     var listenerWeakReference: WeakReference<Listener>? = null
@@ -275,8 +276,7 @@ internal class CustomScrollView @JvmOverloads constructor(
             swipeRefreshYOffset = it.animatedValue as Int
             requestLayout()
         }
-        anim.duration = Constants.UI.mediumDurationMs
-        anim.interpolator = EasingInterpolator(Ease.SINE_OUT)
+        anim.duration = updateProgressViewRevealDurationMs
         anim.addListener(onEnd = {
             isUpdating = true
             anim.removeAllListeners()
@@ -291,8 +291,7 @@ internal class CustomScrollView @JvmOverloads constructor(
             swipeRefreshYOffset = it.animatedValue as Int
             requestLayout()
         }
-        anim.duration = Constants.UI.mediumDurationMs
-        anim.interpolator = EasingInterpolator(Ease.SINE_OUT)
+        anim.duration = updateProgressViewRevealDurationMs
         anim.addListener(onEnd = {
             onComplete?.let { callback -> callback() }
         })

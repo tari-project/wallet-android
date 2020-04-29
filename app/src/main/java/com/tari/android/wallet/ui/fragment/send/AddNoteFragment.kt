@@ -161,6 +161,7 @@ class AddNoteFragment : Fragment(), TextWatcher, View.OnTouchListener {
         _ui = null
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         AddNoteFragmentVisitor.visit(this, view)
@@ -431,6 +432,7 @@ class AddNoteFragment : Fragment(), TextWatcher, View.OnTouchListener {
         copyEmojiIdButtonAnim.start()
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     private fun enableCallToAction() {
         if (ui.slideEnabledBgView.visibility == View.VISIBLE) {
             return
@@ -457,6 +459,7 @@ class AddNoteFragment : Fragment(), TextWatcher, View.OnTouchListener {
         animSet.start()
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     private fun disableCallToAction() {
         ui.slideToSendDisabledTextView.visible()
         ui.slideEnabledBgView.gone()
@@ -625,6 +628,11 @@ class AddNoteFragment : Fragment(), TextWatcher, View.OnTouchListener {
     }
 
     private fun continueToFinalizeSendTx() {
+        // track event
+        TrackHelper.track()
+            .event("Transaction", "Transaction Initiated")
+            .with(tracker)
+        // notify listener (i.e. activity)
         listenerWR.get()?.continueToFinalizeSendTx(
             this,
             recipientUser,

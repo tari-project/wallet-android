@@ -536,6 +536,11 @@ class FinalizeSendTxFragment(private val walletService: TariWalletService) : Fra
         }
         Logger.d("Direct Send completed with result: $success.")
         if (success) {
+            // track event
+            TrackHelper.track()
+                .event("Transaction", "Transaction Accepted - Synchronous")
+                .with(tracker)
+            // progress state
             switchToNextProgressStateOnProgressAnimComplete = true
             EventBus.unsubscribe(this)
         } else {
@@ -551,6 +556,11 @@ class FinalizeSendTxFragment(private val walletService: TariWalletService) : Fra
         }
         Logger.d("Store and forward send completed with result: $success.")
         if (success) {
+            // track event
+            TrackHelper.track()
+                .event("Transaction", "Transaction Stored")
+                .with(tracker)
+            // progress state
             switchToNextProgressStateOnProgressAnimComplete = true
             EventBus.unsubscribe(this)
         } else {
@@ -570,6 +580,16 @@ class FinalizeSendTxFragment(private val walletService: TariWalletService) : Fra
         ui.lottieAnimationView.speed = -1f
         ui.lottieAnimationView.playAnimation()
         ui.lottieAnimationView.progress = lottieAnimationPauseProgress
+
+        // track event
+        val trackerEvent = when(failureReason) {
+            FailureReason.NETWORK_CONNECTION_ERROR -> "Transaction Failed - Tor Issue"
+            FailureReason.BASE_NODE_CONNECTION_ERROR -> "Transaction Failed - Node Issue"
+            FailureReason.SEND_ERROR -> "Transaction Failed - Node Issue"
+        }
+        TrackHelper.track()
+            .event("Transaction", trackerEvent)
+            .with(tracker)
 
         // fade out text and progress
         val fadeOutAnim = ValueAnimator.ofFloat(1f, 0f)
