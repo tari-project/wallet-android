@@ -32,9 +32,10 @@
  */
 package com.tari.android.wallet.ffi
 
+import android.os.Handler
+import android.os.Looper
 import com.orhanobut.logger.Logger
 import com.tari.android.wallet.model.*
-import com.tari.android.wallet.model.WalletErrorCode.*
 import java.math.BigInteger
 
 /**
@@ -44,7 +45,10 @@ import java.math.BigInteger
  */
 internal typealias FFIWalletPtr = Long
 
-internal class FFIWallet(commsConfig: FFICommsConfig, logPath: String) : FFIBase() {
+internal class FFIWallet(
+    commsConfig: FFICommsConfig,
+    logPath: String
+) : FFIBase() {
 
     companion object {
         var instance: FFIWallet? = null
@@ -372,8 +376,7 @@ internal class FFIWallet(commsConfig: FFICommsConfig, logPath: String) : FFIBase
             message,
             status
         )
-
-        listenerAdapter?.onTxBroadcast(completed)
+        listenerAdapter?.run { Handler(Looper.getMainLooper()).post { onTxBroadcast(completed) } }
     }
 
     fun onTxMined(completedTx: FFICompletedTxPtr) {

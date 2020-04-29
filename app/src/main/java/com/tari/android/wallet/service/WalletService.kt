@@ -32,7 +32,7 @@
  */
 package com.tari.android.wallet.service
 
-import android.app.*
+import android.app.Service
 import android.content.Intent
 import android.os.IBinder
 import com.orhanobut.logger.Logger
@@ -42,18 +42,14 @@ import com.tari.android.wallet.event.Event
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.ffi.*
 import com.tari.android.wallet.model.*
+import com.tari.android.wallet.model.Tx.Direction.INBOUND
+import com.tari.android.wallet.model.Tx.Direction.OUTBOUND
 import com.tari.android.wallet.notification.NotificationHelper
-import com.tari.android.wallet.ui.activity.home.HomeActivity
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
-import java.math.BigInteger
-import javax.inject.Inject
-import com.tari.android.wallet.model.Tx.Direction.*
 import com.tari.android.wallet.service.model.PushNotificationRequestBody
 import com.tari.android.wallet.service.model.PushNotificationResponseBody
 import com.tari.android.wallet.service.model.TestnetTariAllocateMaxResponse
 import com.tari.android.wallet.service.model.TestnetTariAllocateRequest
+import com.tari.android.wallet.ui.activity.home.HomeActivity
 import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.SharedPrefsWrapper
 import io.reactivex.Observable
@@ -61,8 +57,14 @@ import io.reactivex.schedulers.Schedulers
 import org.joda.time.DateTime
 import org.joda.time.Hours
 import org.joda.time.Minutes
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
+import java.math.BigInteger
 import java.util.*
+import java.util.concurrent.CopyOnWriteArrayList
 import java.util.concurrent.TimeUnit
+import javax.inject.Inject
 import kotlin.collections.ArrayList
 
 /**
@@ -80,12 +82,16 @@ internal class WalletService : Service(), FFIWalletListenerAdapter {
 
     @Inject
     lateinit var app: TariWalletApplication
+
     @Inject
     lateinit var testnetFaucetRESTService: TestnetFaucetRESTService
+
     @Inject
     lateinit var pushNotificationRESTService: PushNotificationRESTService
+
     @Inject
     lateinit var notificationHelper: NotificationHelper
+
     @Inject
     lateinit var sharedPrefsWrapper: SharedPrefsWrapper
 
@@ -104,12 +110,13 @@ internal class WalletService : Service(), FFIWalletListenerAdapter {
     /**
      * Registered listeners.
      */
-    private var listeners = mutableListOf<TariWalletServiceListener>()
+    private var listeners = CopyOnWriteArrayList<TariWalletServiceListener>()
 
     /**
      * Check for expired txs every 30 minutes.
      */
     private val expirationCheckPeriodMinutes = Minutes.minutes(30)
+
     /**
      * Timer to trigger the expiration checks.
      */
@@ -230,15 +237,14 @@ internal class WalletService : Service(), FFIWalletListenerAdapter {
 
     override fun onTxReceived(pendingInboundTx: PendingInboundTx) {
         Logger.d("Tx ${pendingInboundTx.id} received.")
+        pendingInboundTx.user = (serviceImpl.getContacts(WalletError()) ?: emptyList())
+            .firstOrNull { it.publicKey == pendingInboundTx.user.publicKey }
+            ?: pendingInboundTx.user
         // post event to bus for the internal listeners
-
         EventBus.post(Event.Wallet.TxReceived(pendingInboundTx))
         // manage notifications
         postTxNotification(pendingInboundTx)
-        // notify listeners
-        listeners.iterator().forEach {
-            it.onTxReceived(pendingInboundTx)
-        }
+        listeners.forEach { it.onTxReceived(pendingInboundTx) }
     }
 
     override fun onTxReplyReceived(completedTx: CompletedTx) {
@@ -358,7 +364,8 @@ internal class WalletService : Service(), FFIWalletListenerAdapter {
                 val body = response.body()
                 if (response.code() in 200..299
                     && body != null
-                    && body.sent) {
+                    && body.sent
+                ) {
                     Logger.i("Push notification successfully sent to recipient.")
                 } else {
                     val errorBody = response.errorBody()?.string()
@@ -920,7 +927,8 @@ internal class WalletService : Service(), FFIWalletListenerAdapter {
                     nonce
                 )
 
-            val response = testnetFaucetRESTService.requestMaxTestnetTari(publicKeyHexString, requestBody)
+            val response =
+                testnetFaucetRESTService.requestMaxTestnetTari(publicKeyHexString, requestBody)
             response.enqueue(object : Callback<TestnetTariAllocateMaxResponse> {
                 override fun onFailure(call: Call<TestnetTariAllocateMaxResponse>, t: Throwable) {
                     error.code = WalletErrorCode.UNKNOWN_ERROR
@@ -941,7 +949,7 @@ internal class WalletService : Service(), FFIWalletListenerAdapter {
                         }
                         senderPublicKeyFFI.destroy()
                         // update the keys with sender public key hex
-                        body.keys.forEach { key -> key.senderPublicKeyHex =  body.returnWalletId }
+                        body.keys.forEach { key -> key.senderPublicKeyHex = body.returnWalletId }
                         // store the UTXO keys
                         sharedPrefsWrapper.testnetTariUTXOKeyList = body.keys
 
