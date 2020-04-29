@@ -93,7 +93,6 @@ internal object Constants {
             const val emojiIdImageViewAnimDelayMs = 200L
             const val yourEmojiIdTextAnimDelayMs = 300L
             const val yourEmojiIdTextAnimDurationMs = 300L
-            const val fadeOutAnimDurationMs = 800L
         }
 
         object CreateWallet {
@@ -126,7 +125,6 @@ internal object Constants {
         object Auth {
             const val viewFadeAnimDelayMs = 200L
             const val localAuthAnimDurationMs = 800L
-            const val removeFragmentDelayDuration = 1000L
             const val bottomViewsFadeOutDelay = 1200L
         }
     }

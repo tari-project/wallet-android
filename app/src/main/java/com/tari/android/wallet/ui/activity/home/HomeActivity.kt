@@ -228,7 +228,7 @@ internal class HomeActivity : AppCompatActivity(),
     /**
      * This listener is used only to animate the visibility of the scroll depth gradient view.
      */
-    private var scrollListener = ScrollListener(this)
+    private var recyclerViewScrollListener = RecyclerViewScrollListener(this)
 
     private lateinit var updateProgressViewController: UpdateProgressViewController
     // region lifecycle functions
@@ -403,14 +403,13 @@ internal class HomeActivity : AppCompatActivity(),
         val contentHeight =
             txListContainerMinimizedTopMargin + grabberContainerHeight + recyclerViewHeight
         UiUtil.setHeight(ui.recyclerViewContainerView, recyclerViewHeight)
-        // UiUtil.setHeight(onboardingContentView, recyclerViewHeight)
         UiUtil.setHeight(ui.scrollContentView, contentHeight)
         ui.scrollView.recyclerViewContainerInitialHeight = recyclerViewHeight
         ui.scrollView.scrollToTop()
 
         ui.scrollView.setOnScrollChangeListener(this)
         ui.txRecyclerView.setOnScrollChangeListener(this)
-        ui.txRecyclerView.addOnScrollListener(scrollListener)
+        ui.txRecyclerView.addOnScrollListener(recyclerViewScrollListener)
     }
 
     private fun subscribeToEventBus() {
@@ -599,7 +598,6 @@ internal class HomeActivity : AppCompatActivity(),
 
     private fun updateTxListUI() {
         recyclerViewAdapter.notifyDataChanged()
-        scrollListener.reset()
         if (txListIsEmpty) {
             showNoTxsTextView()
         } else {
@@ -765,7 +763,11 @@ internal class HomeActivity : AppCompatActivity(),
     private fun showNoTxsTextView() {
         ui.noTxsInfoTextView.alpha = 0f
         ui.noTxsInfoTextView.visible()
-        val anim = ObjectAnimator.ofFloat(ui.noTxsInfoTextView, "alpha", 0f, 1f)
+        val anim = ObjectAnimator.ofFloat(
+            ui.noTxsInfoTextView,
+            "alpha",
+            0f, 1f
+        )
         anim.duration = Constants.UI.mediumDurationMs
         anim.start()
     }
@@ -864,7 +866,8 @@ internal class HomeActivity : AppCompatActivity(),
                         dismiss()
                     }, Constants.UI.mediumDurationMs)
                 }
-            findViewById<View>(R.id.home_ttl_store_dialog_vw_top_spacer).setOnClickListener { dismiss() }
+            findViewById<View>(R.id.home_ttl_store_dialog_vw_top_spacer)
+                .setOnClickListener { dismiss() }
         }.show()
     }
 
@@ -1210,7 +1213,9 @@ internal class HomeActivity : AppCompatActivity(),
                         endOnboarding()
                     }
                     ui.scrollView.flingIsRunning = false
-                    ui.scrollView.postDelayed({ ui.scrollView.completeScroll() }, 50L)
+                    ui.scrollView.postDelayed({
+                        ui.scrollView.completeScroll()
+                    }, 50L)
                     isDragging = false
                 }
             }
@@ -1250,7 +1255,10 @@ internal class HomeActivity : AppCompatActivity(),
                     ui.txListHeaderView,
                     ((ratio - 1) * txListHeaderHeight).toInt()
                 )
-                ui.grabberView.alpha = max(0f, 1f - ratio * grabberViewAlphaScrollAnimCoefficient)
+                ui.grabberView.alpha = max(
+                    0f,
+                    1f - ratio * grabberViewAlphaScrollAnimCoefficient
+                )
 
                 UiUtil.setWidth(
                     ui.grabberView,
@@ -1300,7 +1308,7 @@ internal class HomeActivity : AppCompatActivity(),
         )
     }
 
-    class ScrollListener(activity: HomeActivity) : RecyclerView.OnScrollListener() {
+    class RecyclerViewScrollListener(activity: HomeActivity) : RecyclerView.OnScrollListener() {
 
         private val activityWR = WeakReference(activity)
         private var totalDeltaY = 0

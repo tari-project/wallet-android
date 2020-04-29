@@ -391,6 +391,14 @@
                     android:textSize="14sp"
                     app:customFont="AVENIR_LT_STD_MEDIUM" />
             </RelativeLayout>
+
+            <View
+                android:id="@+id/header_elevation_view"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/common_scroll_height_gradient_height"
+                android:layout_below="@id/update_progress_content_container_view"
+                android:alpha="0.8"
+                android:background="@drawable/view_elevation_gradient" />
         </RelativeLayout>
     </com.tari.android.wallet.ui.activity.home.CustomScrollView>
 
@@ -446,14 +454,6 @@
             app:customFont="AVENIR_LT_STD_HEAVY" />
 
     </RelativeLayout>
-
-    <View
-        android:id="@+id/header_elevation_view"
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/common_scroll_height_gradient_height"
-        android:layout_below="@id/tx_list_header_view"
-        android:alpha="0.8"
-        android:background="@drawable/view_elevation_gradient" />
 
     <View
         android:id="@+id/blocker_view"
