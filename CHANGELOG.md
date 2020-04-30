@@ -1,4 +1,16 @@
+## [v0.1.9-jniLibs-0.9.1] - 2020-04-30
 ## [v0.1.8-jniLibs-0.9.0] - 2020-04-30
+* In push notification titles, if the sender is in your address list, you'll see their alias instead of the emoji ID
+* Now you can shake device to go to the debug screen.
+* Fixes foreground service notification click behavior. If you tap on the notification, you'll be taken directly to the app.
+* Implement a less strict internet connectivity check and fix the copy for one of the connection error dialogs.
+* The timing on the onboarding continue button is tightened up
+* New Matomo events (tari-project/wallet-android#271).
+* Transaction list minor UI fixes.
+* Fix a crash on "not authenticated state" on home activity creation
+* Fix a home activity memory leak
+
+
 # Tari Aurora Changelog
 An issue with nodes not deduping messages properly has been fixed.
 This is a network-breaking change. Older versions will no longer be able to

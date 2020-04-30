@@ -125,7 +125,7 @@
     <string name="auth_prompt_button_touch_id_text">Secure with Biometrics</string>
 
     <!-- auth -->
-    <string name="testnet">TESTNET v0.1.8-jniLibs-0.9.0</string>
+    <string name="testnet">TESTNET v0.1.9-jniLibs-0.9.1</string>
     <string name="proceed">Proceed</string>
     <string name="exit">Exit</string>
     <!-- begin :: dialog -->
