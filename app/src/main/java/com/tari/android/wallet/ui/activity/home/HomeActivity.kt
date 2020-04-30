@@ -41,6 +41,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
 import android.graphics.drawable.GradientDrawable
+import android.hardware.SensorManager
 import android.net.Uri
 import android.os.*
 import android.view.MotionEvent
@@ -60,6 +61,7 @@ import butterknife.*
 import com.daasuu.ei.Ease
 import com.daasuu.ei.EasingInterpolator
 import com.orhanobut.logger.Logger
+import com.squareup.seismic.ShakeDetector
 import com.tari.android.wallet.R
 import com.tari.android.wallet.application.DeepLink
 import com.tari.android.wallet.application.TariWalletApplication
@@ -104,7 +106,8 @@ internal class HomeActivity : AppCompatActivity(),
     Animation.AnimationListener,
     TxListAdapter.Listener,
     CustomScrollView.Listener,
-    UpdateProgressViewController.Listener {
+    UpdateProgressViewController.Listener,
+    ShakeDetector.Listener {
 
     @BindDimen(R.dimen.home_top_content_container_view_top_margin)
     @JvmField
@@ -252,10 +255,22 @@ internal class HomeActivity : AppCompatActivity(),
         }
         setupUi()
         subscribeToEventBus()
+        setupShakeDetector()
         TrackHelper.track()
             .screen("/home")
             .title("Home - Transaction List")
             .with(tracker)
+    }
+
+    /**
+     * Shaking the device should take the user to the debug screen.
+     */
+    private fun setupShakeDetector() {
+        val sensorManager = getSystemService(SENSOR_SERVICE) as? SensorManager
+        sensorManager?.let {
+            val shakeDetector = ShakeDetector(this)
+            shakeDetector.start(sensorManager)
+        }
     }
 
     private fun setupUi() {
@@ -1026,6 +1041,15 @@ internal class HomeActivity : AppCompatActivity(),
             0,
             ui.scrollContentView.height - ui.scrollView.height
         )
+    }
+
+    /**
+     * A shake will take the user to the debug screen.
+     */
+    override fun hearShake() {
+        val intent = Intent(this, DebugActivity::class.java)
+        startActivity(intent)
+        overridePendingTransition(R.anim.enter_from_right, R.anim.exit_to_left)
     }
 
     private fun grabberContainerViewLongClicked() {

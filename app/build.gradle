@@ -150,4 +150,7 @@ dependencies {
     implementation 'com.google.android.material:material:1.1.0'
     // overscroll
     implementation 'me.everything:overscroll-decor-android:1.0.4'
+
+    // seismic
+    implementation 'com.squareup:seismic:1.0.2'
 }
