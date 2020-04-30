@@ -1,4 +1,9 @@
+## [v0.1.8-jniLibs-0.9.0] - 2020-04-30
 # Tari Aurora Changelog
+An issue with nodes not deduping messages properly has been fixed.
+This is a network-breaking change. Older versions will no longer be able to
+communicate with the network.
+
 ## [v0.1.8-jniLibs-0.9.0] - 2020-04-26
 An issue with nodes not deduping messages properly has been fixed.
 This is a network-breaking change. Older versions will no longer be able to
