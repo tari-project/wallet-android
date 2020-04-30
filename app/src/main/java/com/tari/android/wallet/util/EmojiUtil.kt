@@ -219,7 +219,7 @@ internal class EmojiUtil {
          *
          * @param string non-chunked string
          */
-        fun getNewChunkSeparatorIndices(string: String): ArrayList<Int> {
+        fun getNewChunkSeparatorIndices(string: CharSequence): ArrayList<Int> {
             val newIndices = ArrayList<Int>()
             var currentIndex = 0
             // prep the iterator
@@ -257,10 +257,10 @@ internal class EmojiUtil {
             return -1
         }
 
-        private fun getChunkedEmojiId(emojiId: String, separator: String): String {
+        private fun getChunkedEmojiId(emojiId: CharSequence, separator: String): String {
             // make chunks
             val separatorIndices = getNewChunkSeparatorIndices(emojiId)
-            val builder = java.lang.StringBuilder(emojiId)
+            val builder = StringBuilder(emojiId)
             for ((i, index) in separatorIndices.iterator().withIndex()) {
                 builder.insert((index + i * separator.length), separator)
             }

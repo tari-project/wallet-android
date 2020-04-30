@@ -43,7 +43,10 @@ import android.view.View
 import android.view.inputmethod.EditorInfo
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
-import butterknife.*
+import butterknife.BindColor
+import butterknife.BindDimen
+import butterknife.BindString
+import butterknife.ButterKnife
 import com.daasuu.ei.Ease
 import com.daasuu.ei.EasingInterpolator
 import com.orhanobut.logger.Logger
@@ -56,7 +59,8 @@ import com.tari.android.wallet.extension.txFormattedDate
 import com.tari.android.wallet.model.*
 import com.tari.android.wallet.service.TariWalletService
 import com.tari.android.wallet.service.WalletService
-import com.tari.android.wallet.ui.component.*
+import com.tari.android.wallet.ui.component.EmojiIdCopiedViewController
+import com.tari.android.wallet.ui.component.EmojiIdSummaryViewController
 import com.tari.android.wallet.ui.dialog.BottomSlideDialog
 import com.tari.android.wallet.ui.extension.*
 import com.tari.android.wallet.ui.util.UiUtil
@@ -67,7 +71,6 @@ import com.tari.android.wallet.util.WalletUtil
 import me.everything.android.ui.overscroll.OverScrollDecoratorHelper
 import org.matomo.sdk.Tracker
 import org.matomo.sdk.extra.TrackHelper
-import java.lang.IllegalArgumentException
 import java.util.*
 import javax.inject.Inject
 

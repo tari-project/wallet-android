@@ -107,7 +107,7 @@ internal fun String.applyFontStyle(
 /**
  * Similar to applyFontStyle above, but applied to color instead.
  */
-internal fun String.applyColorStyle(
+internal fun CharSequence.applyColorStyle(
     defaultColor: Int,
     search: String,
     styleColor: Int,

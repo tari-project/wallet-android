@@ -38,6 +38,7 @@ import android.app.Activity
 import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
+import android.graphics.Typeface
 import android.os.AsyncTask
 import android.os.Bundle
 import android.os.Handler
@@ -50,12 +51,16 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
-import android.widget.*
+import android.widget.TextView
 import androidx.core.animation.addListener
+import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import butterknife.*
+import butterknife.BindColor
+import butterknife.BindDimen
+import butterknife.BindString
+import butterknife.ButterKnife
 import com.daasuu.ei.Ease
 import com.daasuu.ei.EasingInterpolator
 import com.tari.android.wallet.R
@@ -67,6 +72,7 @@ import com.tari.android.wallet.model.*
 import com.tari.android.wallet.service.TariWalletService
 import com.tari.android.wallet.ui.activity.qr.EXTRA_QR_DATA
 import com.tari.android.wallet.ui.activity.qr.QRScannerActivity
+import com.tari.android.wallet.ui.component.CustomFont
 import com.tari.android.wallet.ui.extension.appComponent
 import com.tari.android.wallet.ui.extension.gone
 import com.tari.android.wallet.ui.extension.invisible
@@ -129,6 +135,9 @@ class AddRecipientFragment(private val walletService: TariWalletService) : Fragm
     @JvmField
     var lightGrayColor = 0
 
+    private lateinit var regularFont: Typeface
+    private lateinit var emojiFont: Typeface
+
     @Inject
     lateinit var tracker: Tracker
 
@@ -177,6 +186,8 @@ class AddRecipientFragment(private val walletService: TariWalletService) : Fragm
     private var hidePasteEmojiIdViewsOnTextChanged = false
 
     companion object {
+
+        private const val REGULAR_FONT_NAME = "AVENIR_LT_STD_ROMAN"
 
         // TODO [CRASH]
         fun newInstance(walletService: TariWalletService): AddRecipientFragment {
@@ -235,6 +246,8 @@ class AddRecipientFragment(private val walletService: TariWalletService) : Fragm
     }
 
     private fun setupUi() {
+        regularFont = CustomFont.fromString(REGULAR_FONT_NAME).asTypeface(requireContext())
+        emojiFont = ResourcesCompat.getFont(requireContext(), R.font.noto_color_emoji)!!
         recyclerViewLayoutManager = LinearLayoutManager(activity)
         ui.contactsListRecyclerView.layoutManager = recyclerViewLayoutManager
         recyclerViewAdapter = RecipientListAdapter(this)
@@ -731,6 +744,7 @@ class AddRecipientFragment(private val walletService: TariWalletService) : Fragm
 
         val textWithoutSeparators = editable.toString()
         if (textWithoutSeparators.firstNCharactersAreEmojis(emojiFormatterChunkSize)) {
+            ui.searchEditText.typeface = emojiFont
             ui.searchEditText.textAlignment = View.TEXT_ALIGNMENT_CENTER
             ui.searchEditText.letterSpacing = inputEmojiIdLetterSpacing
             // add separators
@@ -792,6 +806,7 @@ class AddRecipientFragment(private val walletService: TariWalletService) : Fragm
                 }
             }
         } else {
+            ui.searchEditText.typeface = regularFont
             emojiIdPublicKey = null
             ui.qrCodeButton.visible()
             ui.searchEditText.textAlignment = View.TEXT_ALIGNMENT_TEXT_START

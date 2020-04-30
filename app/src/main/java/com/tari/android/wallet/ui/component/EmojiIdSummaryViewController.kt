@@ -45,8 +45,8 @@ internal class EmojiIdSummaryViewController(private val ui: EmojiIdSummaryBindin
 
     constructor(view: View) : this(EmojiIdSummaryBinding.bind(view))
 
-    fun display(emojiId: String) {
-        val emojis = ArrayList<String>()
+    fun display(emojiId: CharSequence) {    
+        val emojis = ArrayList<CharSequence>()
         val it: BreakIterator = BreakIterator.getCharacterInstance()
         it.setText(emojiId)
         var previous = 0

@@ -72,4 +72,5 @@ internal class ApplicationModule(
     fun provideClipboardManager(context: Context): ClipboardManager {
         return context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
     }
+
 }

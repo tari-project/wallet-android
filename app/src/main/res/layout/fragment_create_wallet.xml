@@ -112,7 +112,8 @@
                     android:paddingHorizontal="@dimen/onboarding_emoji_id_container_horizontal_padding"
                     android:paddingVertical="@dimen/onboarding_emoji_id_container_vertical_padding"
                     android:textColor="@color/black"
-                    android:textSize="17sp" />
+                    android:textSize="17sp"
+                    android:fontFamily="@font/noto_color_emoji" />
             </HorizontalScrollView>
 
             <!-- white fader for emoji-id -->

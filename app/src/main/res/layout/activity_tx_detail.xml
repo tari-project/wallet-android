@@ -464,7 +464,8 @@
                             android:letterSpacing="0.22"
                             android:paddingHorizontal="12dp"
                             android:textColor="@color/black"
-                            android:textSize="14sp" />
+                            android:textSize="14sp"
+                            android:fontFamily="@font/noto_color_emoji"/>
                     </HorizontalScrollView>
 
                     <!-- white fader for emoji-id -->

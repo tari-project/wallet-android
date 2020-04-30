@@ -13,7 +13,8 @@
         android:layout_height="wrap_content"
         android:text="@string/dummy_emoji"
         android:textColor="@color/black"
-        android:textSize="17sp" />
+        android:textSize="17sp"
+        android:fontFamily="@font/noto_color_emoji" />
     <!-- emoji 2 -->
     <TextView
         android:id="@+id/emoji_id_summary_emoji_2_text_view"
@@ -22,7 +23,8 @@
         android:layout_marginStart="@dimen/emoji_id_summary_letter_spacing"
         android:text="@string/dummy_emoji"
         android:textColor="@color/black"
-        android:textSize="17sp" />
+        android:textSize="17sp"
+        android:fontFamily="@font/noto_color_emoji" />
     <!-- emoji 3 -->
     <TextView
         android:id="@+id/emoji_id_summary_emoji_3_text_view"
@@ -31,7 +33,8 @@
         android:layout_marginStart="@dimen/emoji_id_summary_letter_spacing"
         android:text="@string/dummy_emoji"
         android:textColor="@color/black"
-        android:textSize="17sp" />
+        android:textSize="17sp"
+        android:fontFamily="@font/noto_color_emoji" />
     <!-- separator -->
     <TextView
         android:id="@+id/emoji_id_summary_txt_emoji_separator"
@@ -50,7 +53,8 @@
         android:layout_marginStart="@dimen/emoji_id_summary_letter_spacing"
         android:text="@string/dummy_emoji"
         android:textColor="@color/black"
-        android:textSize="17sp" />
+        android:textSize="17sp"
+        android:fontFamily="@font/noto_color_emoji" />
     <!-- emoji 5 -->
     <TextView
         android:id="@+id/emoji_id_summary_emoji_5_text_view"
@@ -59,7 +63,8 @@
         android:layout_marginStart="@dimen/emoji_id_summary_letter_spacing"
         android:text="@string/dummy_emoji"
         android:textColor="@color/black"
-        android:textSize="17sp" />
+        android:textSize="17sp"
+        android:fontFamily="@font/noto_color_emoji" />
     <!-- emoji 6 -->
     <TextView
         android:id="@+id/emoji_id_summary_emoji_6_text_view"
@@ -68,5 +73,6 @@
         android:layout_marginStart="@dimen/emoji_id_summary_letter_spacing"
         android:text="@string/dummy_emoji"
         android:textColor="@color/black"
-        android:textSize="17sp" />
+        android:textSize="17sp"
+        android:fontFamily="@font/noto_color_emoji" />
 </LinearLayout>
