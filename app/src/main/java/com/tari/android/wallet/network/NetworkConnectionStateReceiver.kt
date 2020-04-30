@@ -52,8 +52,9 @@ internal class NetworkConnectionStateReceiver : BroadcastReceiver() {
     private val action = "android.net.conn.CONNECTIVITY_CHANGE"
     val intentFilter = IntentFilter(action)
     private var pingCurrentRetry = 0
-    private val pingMaxRetryCount = 3
-    private val pingTimeOutMs = TimeUnit.SECONDS.toMillis(5)
+    private val pingMaxRetryCount = 10
+    private val pingRetryPeriodMs = TimeUnit.SECONDS.toMillis(2)
+    private val pingTimeOutMs = TimeUnit.SECONDS.toMillis(30)
 
     init {
         EventBus.postNetworkConnectionState(NetworkConnectionState.UNKNOWN)
@@ -86,10 +87,10 @@ internal class NetworkConnectionStateReceiver : BroadcastReceiver() {
         pingCurrentRetry = 1
         while (pingCurrentRetry <= pingMaxRetryCount) {
             val runtime = Runtime.getRuntime()
-            val process = runtime.exec("/system/bin/ping -c 1 tari.com")
+            val process = runtime.exec("/system/bin/ping -c 1 8.8.8.8")
             val timeoutMillis = System.currentTimeMillis() + pingTimeOutMs
             while (isAlive(process) && System.currentTimeMillis() < timeoutMillis) {
-                Thread.sleep(TimeUnit.SECONDS.toMillis(1))
+                Thread.sleep(pingRetryPeriodMs)
             }
             if (isAlive(process)) {
                 process.destroy()

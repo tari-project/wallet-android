@@ -45,7 +45,7 @@
     <!-- errors -->
     <!-- node unreachable -->
     <string name="error_node_unreachable_title">It\'s not you, it\'s the network.</string>
-    <string name="error_node_unreachable_description">Looks like there\'s a connectivity issue on our end. Can you give us a bit, then come back and try again?</string>
+    <string name="error_node_unreachable_description">Looks like there\'s a connectivity issue on our end. Can you give us a few min, then come back and try again?</string>
     <!-- no connection -->
     <string name="error_no_connection_title">Can\'t connect to the internet</string>
     <string name="error_no_connection_description">Your phone appears to be offline or has a poor connection at the moment. Please try again when you\'ve found a stronger signal.</string>
