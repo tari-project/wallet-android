@@ -38,12 +38,14 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
+import android.content.Intent
 import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.app.TaskStackBuilder
 import com.tari.android.wallet.R
 import com.tari.android.wallet.model.*
+import com.tari.android.wallet.ui.activity.home.HomeActivity
 import com.tari.android.wallet.ui.activity.tx.TxDetailActivity
 import com.tari.android.wallet.ui.notification.CustomTxNotificationViewHolder
 import com.tari.android.wallet.util.WalletUtil
@@ -96,6 +98,8 @@ internal class NotificationHelper(private val context: Context) {
     }
 
     fun buildForegroundServiceNotification(): Notification {
+        val intent = Intent(context, HomeActivity::class.java)
+        val pendingIntent = PendingIntent.getActivity(context, 0, intent, 0)
         // prepare foreground service notification
         return NotificationCompat.Builder(
             context,
@@ -103,6 +107,7 @@ internal class NotificationHelper(private val context: Context) {
         ).run {
             setContentTitle(context.getString(R.string.wallet_service_title))
             setContentText(context.getString(R.string.wallet_service_description))
+            setContentIntent(pendingIntent)
             setSound(null)
             setSmallIcon(R.drawable.notification_icon)
             build()
