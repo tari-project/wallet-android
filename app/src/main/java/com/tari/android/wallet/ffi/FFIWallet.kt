@@ -453,7 +453,7 @@ internal class FFIWallet(
         val user = User(pk)
         val pendingTx = PendingInboundTx(id, user, MicroTari(amount), timestamp, message, status)
 
-        listenerAdapter?.onTxReceived(pendingTx)
+        listenerAdapter?.run { Handler(Looper.getMainLooper()).post { onTxReceived(pendingTx) } }
     }
 
     fun onTxReplyReceived(completedTx: FFICompletedTxPtr) {
