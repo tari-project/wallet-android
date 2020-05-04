@@ -40,7 +40,6 @@ import android.view.MotionEvent
 import android.view.View
 import android.widget.ScrollView
 import androidx.core.animation.addListener
-import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import butterknife.BindDimen
 import butterknife.BindView
@@ -48,6 +47,7 @@ import butterknife.ButterKnife
 import com.daasuu.ei.Ease
 import com.daasuu.ei.EasingInterpolator
 import com.tari.android.wallet.R
+import com.tari.android.wallet.ui.extension.isScrolledToTop
 import com.tari.android.wallet.ui.util.UiUtil
 import com.tari.android.wallet.util.Constants
 import java.lang.ref.WeakReference
@@ -179,7 +179,7 @@ internal class CustomScrollView @JvmOverloads constructor(
                 }
             }
         } else if (deltaY < 0) {
-            if (target is RecyclerView && !isRvScrolledToTop(target)) {
+            if (target is RecyclerView && !target.isScrolledToTop()) {
                 lastDeltaY = deltaY
                 return
             } else if (canScrollVertically(deltaY)) {
@@ -253,7 +253,7 @@ internal class CustomScrollView @JvmOverloads constructor(
         }
         if (target is RecyclerView) {
             if (canScrollVertically(velocityY.toInt())) {
-                if (isRvScrolledToTop(target)) {
+                if (target.isScrolledToTop()) {
                     flingScroll(velocityY.toInt())
                     return true
                 }
@@ -262,12 +262,7 @@ internal class CustomScrollView @JvmOverloads constructor(
         return super.onNestedPreFling(target, velocityX, velocityY)
     }
 
-    private fun isRvScrolledToTop(recyclerView: RecyclerView): Boolean {
-        val layoutManager = recyclerView.layoutManager as LinearLayoutManager
-        if (layoutManager.childCount == 0) return true
-        return (layoutManager.findFirstVisibleItemPosition() == 0
-                && layoutManager.findViewByPosition(0)?.top == 0)
-    }
+
 
     fun beginUpdate() {
         if (isUpdating) return

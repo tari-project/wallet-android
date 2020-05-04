@@ -1233,8 +1233,12 @@ internal class HomeActivity : AppCompatActivity(),
                     isDragging = true
                 }
                 MotionEvent.ACTION_UP -> {
-                    if (isOnboarding && ui.scrollView.scrollY == 0) {
-                        endOnboarding()
+                    if (ui.scrollView.scrollY == 0 && !ui.txRecyclerView.isScrolledToTop()) {
+                        ui.txRecyclerView.smoothScrollToPosition(0)
+                        handler.postDelayed({
+                            recyclerViewScrollListener.reset()
+                            ui.headerElevationView.alpha = 0f
+                        }, Constants.UI.mediumDurationMs)
                     }
                     ui.scrollView.flingIsRunning = false
                     ui.scrollView.postDelayed({
@@ -1296,6 +1300,14 @@ internal class HomeActivity : AppCompatActivity(),
                     0f,
                     1f - ratio * grabberViewCornerRadiusScrollAnimCoefficient
                 ) * grabberCornerRadius
+
+                if (ratio == 0f && !isDragging && !ui.txRecyclerView.isScrolledToTop()) {
+                    ui.txRecyclerView.smoothScrollToPosition(0)
+                    handler.postDelayed({
+                        recyclerViewScrollListener.reset()
+                        ui.headerElevationView.alpha = 0f
+                    }, Constants.UI.mediumDurationMs)
+                }
             } else if (ratio == 0f && !isDragging) { // is onboarding
                 ui.scrollView.isScrollable = true
                 endOnboarding()

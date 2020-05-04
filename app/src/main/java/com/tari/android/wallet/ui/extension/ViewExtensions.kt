@@ -44,9 +44,18 @@ import android.view.ViewTreeObserver
 import android.view.WindowManager
 import android.widget.ScrollView
 import android.widget.TextView
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.tari.android.wallet.R
 import com.tari.android.wallet.ui.dialog.BottomSlideDialog
 import com.tari.android.wallet.ui.util.UiUtil
+
+internal fun RecyclerView.isScrolledToTop(): Boolean {
+    val layoutManager = (layoutManager as? LinearLayoutManager) ?: return false
+    if (layoutManager.childCount == 0) return true
+    return (layoutManager.findFirstVisibleItemPosition() == 0
+            && layoutManager.findViewByPosition(0)?.top == 0)
+}
 
 internal fun View.visible() {
     this.visibility = View.VISIBLE
@@ -68,18 +77,6 @@ internal fun showInternetConnectionErrorDialog(context: Context) {
         context = context,
         layoutId = R.layout.internet_connection_error_dialog,
         dismissViewId = R.id.internet_connection_error_dialog_txt_close
-    ).show()
-}
-
-/**
- * Given the context, displays the standard "it's not you, it's the network" dialog.
- */
-// TODO seems to be unused; should be removed?
-internal fun showTariNetworkConnectionErrorDialog(context: Context) {
-    BottomSlideDialog(
-        context = context,
-        layoutId = R.layout.tari_network_connection_error_dialog,
-        dismissViewId = R.id.tari_network_connection_error_dialog_txt_close
     ).show()
 }
 
