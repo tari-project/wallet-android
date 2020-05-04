@@ -57,7 +57,10 @@ import androidx.core.animation.addListener
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import butterknife.*
+import butterknife.BindColor
+import butterknife.BindDimen
+import butterknife.BindString
+import butterknife.ButterKnife
 import com.daasuu.ei.Ease
 import com.daasuu.ei.EasingInterpolator
 import com.orhanobut.logger.Logger
@@ -373,11 +376,6 @@ internal class HomeActivity : AppCompatActivity(),
             updateProgressViewController.destroy()
         }
         super.onDestroy()
-    }
-
-    override fun onBackPressed() {
-        // we're at the root activity,
-        // do nothing when back is pressed
     }
 
     // endregion
