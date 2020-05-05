@@ -423,8 +423,7 @@ internal class FFIWallet(
             status
         )
 
-        listenerAdapter?.onTxMined(completed)
-        tx.destroy()
+        listenerAdapter?.run { Handler(Looper.getMainLooper()).post { onTxMined(completed) } }
     }
 
     fun onTxReceived(inboundTx: FFIPendingInboundTxPtr) {
@@ -501,8 +500,7 @@ internal class FFIWallet(
                 status
             )
 
-        listenerAdapter?.onTxReplyReceived(completed)
-        tx.destroy()
+        listenerAdapter?.run { Handler(Looper.getMainLooper()).post { onTxReplyReceived(completed) } }
     }
 
     fun onTxFinalized(completedTx: FFICompletedTxPtr) {
@@ -549,32 +547,31 @@ internal class FFIWallet(
             status
         )
 
-        listenerAdapter?.onTxFinalized(completed)
-        tx.destroy()
+        listenerAdapter?.run { Handler(Looper.getMainLooper()).post { onTxFinalized(completed) } }
     }
 
     fun onDirectSendResult(bytes: ByteArray, success: Boolean) {
         Logger.i("Direct send result received. Success: $success")
         val txId = BigInteger(1, bytes)
-        listenerAdapter?.onDirectSendResult(txId, success)
+        listenerAdapter?.run { Handler(Looper.getMainLooper()).post { onDirectSendResult(txId, success) } }
     }
 
     fun onStoreAndForwardSendResult(bytes: ByteArray, success: Boolean) {
         Logger.i("Store and forward send result received. Success: $success")
         val txId = BigInteger(1, bytes)
-        listenerAdapter?.onStoreAndForwardSendResult(txId, success)
+        listenerAdapter?.run { Handler(Looper.getMainLooper()).post { onStoreAndForwardSendResult(txId, success) } }
     }
 
     fun onTxCancellation(bytes: ByteArray) {
         Logger.i("Transaction cancelled.")
         val txId = BigInteger(1, bytes)
-        listenerAdapter?.onTxCancellation(txId)
+        listenerAdapter?.run { Handler(Looper.getMainLooper()).post { onTxCancellation(txId) } }
     }
 
     fun onBaseNodeSyncComplete(bytes: ByteArray, success: Boolean) {
         Logger.i("Base node sync complete. Success: $success")
         val requestId = BigInteger(1, bytes)
-        listenerAdapter?.onBaseNodeSyncComplete(requestId, success)
+        listenerAdapter?.run { Handler(Looper.getMainLooper()).post { onBaseNodeSyncComplete(requestId, success) } }
     }
 
     fun sendTx(
