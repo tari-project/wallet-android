@@ -40,15 +40,17 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.os.Build
+import android.widget.RemoteViews
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.app.TaskStackBuilder
 import com.tari.android.wallet.R
-import com.tari.android.wallet.model.*
+import com.tari.android.wallet.model.Tx
 import com.tari.android.wallet.ui.activity.home.HomeActivity
 import com.tari.android.wallet.ui.activity.tx.TxDetailActivity
 import com.tari.android.wallet.ui.notification.CustomTxNotificationViewHolder
 import com.tari.android.wallet.util.WalletUtil
+import java.math.BigInteger
 
 /**
  * Contains helper functions for building and posting notifications.
@@ -242,6 +244,35 @@ internal class NotificationHelper(private val context: Context) {
             tx.id.toInt(),
             notification
         )
+    }
+
+    fun postTxCanceledNotification(id: BigInteger) {
+        val title = context.getString(R.string.notification_tx_canceled_title)
+        val description = context.getString(R.string.notification_tx_canceled_description)
+        val layout = RemoteViews(context.packageName, R.layout.tx_canceled_notification)
+        val intent = Intent(context, HomeActivity::class.java)
+        val pendingIntent = PendingIntent.getActivity(context, 0, intent, 0)
+        val notification: Notification = NotificationCompat.Builder(
+            context,
+            APP_NOTIFICATION_CHANNEL_ID
+        ).run {
+            setContentTitle(title)
+            setContentText(description)
+            setSmallIcon(R.drawable.tx_notification_icon)
+            setDefaults(DEFAULT_ALL)
+            setContentIntent(pendingIntent)
+            setStyle(NotificationCompat.DecoratedCustomViewStyle())
+            setCustomContentView(layout)
+            setAutoCancel(true)
+            setGroup(APP_NOTIFICATION_GROUP_NAME)
+            setCategory(NotificationCompat.CATEGORY_EVENT)
+            priority = NotificationCompat.PRIORITY_MAX
+            build()
+        }
+        // send group notification
+        notificationManager.notify(APP_NOTIFICATION_GROUP_ID, getTxGroupNotification)
+        // send actual notification
+        notificationManager.notify(id.toInt(), notification)
     }
 
 }

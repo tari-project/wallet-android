@@ -14,6 +14,7 @@
     <color name="purple">#8931FF</color>
     <color name="dark_gray">#7F8599</color>
     <color name="light_gray">#3A000000</color>
+    <color name="disabled_cta">@color/dark_gray</color>
 
     <!-- common gradient button -->
     <color name="gradient_btn_start">#7300ff</color>
@@ -45,6 +46,8 @@
     <color name="home_tx_value_negative">#d32c44</color>
     <color name="home_tx_value_positive_bg">#C8F5E4</color>
     <color name="home_tx_value_positive">#23BE90</color>
+    <color name="home_tx_value_canceled_bg">#F1F2F4</color>
+    <color name="home_tx_value_canceled">#B3B9CB</color>
     <color name="home_tx_contact_alias">#40388A</color>
     <color name="home_tx_message">#A9AFC4</color>
     <color name="home_tx_section_header_title">#B2B2B2</color>
@@ -78,6 +81,7 @@
     <color name="tx_detail_contact_name_label_text">#B2B2B2</color>
     <color name="tx_detail_contact_view_divider">#f1f1f1</color>
     <color name="tx_detail_header_shadow_gradient_start">#80B2B2B2</color>
+    <color name="tx_detail_cancel_tx">#D32C44</color>
 
     <!-- local auth -->
     <color name="auth_touch_id_prompt_anim_bg">#979797</color>

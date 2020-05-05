@@ -72,6 +72,10 @@ class CompletedTx() : Tx(), Parcelable {
         readFromParcel(parcel)
     }
 
+    override fun toString(): String {
+        return "CompletedTx(fee=$fee, status=$status) ${super.toString()}"
+    }
+
     companion object CREATOR : Parcelable.Creator<CompletedTx> {
 
         override fun createFromParcel(parcel: Parcel): CompletedTx {

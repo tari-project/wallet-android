@@ -45,6 +45,10 @@ class WalletError(
     var message: String? = null
 ) : Parcelable {
 
+    override fun toString(): String {
+        return "WalletError(code=$code, message=$message)"
+    }
+
     // region Parcelable
 
     constructor(parcel: Parcel) : this(

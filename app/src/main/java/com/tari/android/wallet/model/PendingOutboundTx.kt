@@ -65,6 +65,10 @@ class PendingOutboundTx() : Tx(), Parcelable {
         this.status = status
     }
 
+    override fun toString(): String {
+        return "PendingOutboundTx(fee=$fee, status=$status) ${super.toString()}"
+    }
+
     // region Parcelable
 
     constructor(parcel: Parcel) : this() {

@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginHorizontal="14dp"
+    android:layout_marginBottom="23dp"
+    android:background="@drawable/bottom_dialog_bg"
+    android:orientation="vertical">
+
+    <com.tari.android.wallet.ui.component.CustomFontTextView
+        android:id="@+id/cancel_tx_dialog_title_text_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginHorizontal="32dp"
+        android:layout_marginTop="30dp"
+        android:layout_marginBottom="16dp"
+        android:gravity="center"
+        android:lineSpacingExtra="8dp"
+        android:text="@string/tx_details_cancel_dialog_title"
+        android:textColor="@color/black"
+        android:textSize="18sp"
+        app:customFont="AVENIR_LT_STD_LIGHT" />
+
+    <com.tari.android.wallet.ui.component.CustomFontTextView
+        android:id="@+id/cancel_tx_dialog_description_text_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="32dp"
+        android:layout_marginTop="8dp"
+        android:gravity="center"
+        android:letterSpacing="0.01"
+        android:lineSpacingExtra="10dp"
+        android:text="@string/tx_details_cancel_dialog_description"
+        android:textColor="@color/dark_gray"
+        android:textSize="14sp"
+        app:customFont="AVENIR_LT_STD_MEDIUM" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:layout_marginBottom="16dp"
+        android:orientation="horizontal">
+
+        <com.tari.android.wallet.ui.component.CustomFontButton
+            android:id="@+id/cancel_tx_dialog_not_cancel_button"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="8dp"
+            android:layout_weight="1"
+            android:background="@color/transparent"
+            android:paddingHorizontal="10dp"
+            android:text="@string/tx_details_cancel_dialog_not_cancel"
+            android:textAllCaps="false"
+            android:textColor="@color/dialog_cancel_action"
+            android:textSize="16sp"
+            app:customFont="AVENIR_LT_STD_HEAVY" />
+
+        <com.tari.android.wallet.ui.component.CustomFontButton
+            android:id="@+id/cancel_tx_dialog_cancel_button"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="16dp"
+            android:layout_weight="1"
+            android:background="@drawable/gradient_button_bg"
+            android:paddingHorizontal="10dp"
+            android:text="@string/tx_details_cancel_dialog_cancel"
+            android:textAllCaps="false"
+            android:textColor="@color/white"
+            android:textSize="16sp"
+            app:customFont="AVENIR_LT_STD_HEAVY" />
+
+    </LinearLayout>
+
+</LinearLayout>
