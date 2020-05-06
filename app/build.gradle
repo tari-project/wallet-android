@@ -3,6 +3,10 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
 
+Properties properties = new Properties()
+properties.load(project.rootProject.file("secret.properties").newDataInputStream())
+def sentryPublicDSN = properties.getProperty('sentry.public_dsn')
+
 android {
     compileSdkVersion 29
     buildToolsVersion "29.0.3"
@@ -54,6 +58,10 @@ android {
 
     viewBinding {
         enabled = true
+    }
+
+    defaultConfig {
+        manifestPlaceholders = [sentryPublicDSN:sentryPublicDSN]
     }
 
 }
@@ -151,6 +159,9 @@ dependencies {
     // overscroll
     implementation 'me.everything:overscroll-decor-android:1.0.4'
 
-    // seismic
+    // seismic - device shake detector
     implementation 'com.squareup:seismic:1.0.2'
+
+    // sentry - crash analytics
+    implementation 'io.sentry:sentry-android:2.0.0'
 }
