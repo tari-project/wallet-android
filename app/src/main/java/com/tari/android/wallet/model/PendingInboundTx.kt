@@ -34,7 +34,6 @@ package com.tari.android.wallet.model
 
 import android.os.Parcel
 import android.os.Parcelable
-import com.tari.android.wallet.ffi.FFIPendingInboundTx
 import java.math.BigInteger
 
 /**
@@ -61,6 +60,10 @@ class PendingInboundTx() : Tx(), Parcelable {
         this.timestamp = timestamp
         this.message = message
         this.status = status
+    }
+
+    override fun toString(): String {
+        return "PendingInboundTx(status=$status) ${super.toString()}"
     }
 
     // region Parcelable

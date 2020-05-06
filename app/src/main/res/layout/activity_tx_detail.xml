@@ -8,110 +8,124 @@
     tools:context=".ui.activity.tx.TxDetailActivity">
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/root_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/gray_background"
-        app:layout_constraintTop_toTopOf="parent">
+        android:background="@color/gray_background">
 
-        <View
-            android:id="@+id/payment_state_bg_view"
+        <LinearLayout
+            android:id="@+id/payment_header_view"
             android:layout_width="0dp"
-            android:layout_height="@dimen/tx_details_with_status_header_height"
-            android:background="@color/white"
+            android:layout_height="wrap_content"
+            android:background="@android:color/white"
+            android:clipToPadding="false"
+            android:orientation="vertical"
+            android:paddingBottom="13dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            tools:viewBindingIgnore="true">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp">
+
+                <ImageButton
+                    android:id="@+id/back_view"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:layout_marginTop="24dp"
+                    android:background="@color/transparent"
+                    android:contentDescription="@null"
+                    android:src="@drawable/back_icon"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <com.tari.android.wallet.ui.component.CustomFontTextView
+                    android:id="@+id/payment_state_text_view"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:ellipsize="middle"
+                    android:paddingHorizontal="50dp"
+                    android:text="@string/tx_detail_payment_received"
+                    android:textColor="@color/black"
+                    android:textSize="16sp"
+                    app:customFont="AVENIR_LT_STD_HEAVY"
+                    app:layout_constraintBottom_toBottomOf="@id/back_view"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="@id/back_view" />
+
+                <com.tari.android.wallet.ui.component.CustomFontTextView
+                    android:id="@+id/date_text_view"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginTop="12dp"
+                    android:layout_marginBottom="24dp"
+                    android:textColor="@color/tx_detail_contact_name_label_text"
+                    android:textSize="13sp"
+                    app:customFont="AVENIR_LT_STD_MEDIUM"
+                    app:layout_constraintEnd_toEndOf="@id/payment_state_text_view"
+                    app:layout_constraintStart_toStartOf="@id/payment_state_text_view"
+                    app:layout_constraintTop_toBottomOf="@id/payment_state_text_view"
+                    tools:text="November 1st 2019 at 2:39 PM" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <FrameLayout
+                android:id="@+id/status_container_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="20dp"
+                android:layout_marginBottom="3dp"
+                android:background="@drawable/background_transaction_state"
+                android:elevation="16dp"
+                android:paddingTop="18dp"
+                android:paddingBottom="14dp">
+
+                <com.tari.android.wallet.ui.component.CustomFontTextView
+                    android:id="@+id/status_text_view"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    android:paddingHorizontal="10dp"
+                    android:textColor="#9330FF"
+                    android:textSize="12sp"
+                    app:customFont="AVENIR_LT_STD_HEAVY"
+                    tools:text="Hello world" />
+
+            </FrameLayout>
+
+            <FrameLayout
+                android:id="@+id/cancel_tx_container_view"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:visibility="gone">
+
+                <com.tari.android.wallet.ui.component.CustomFontTextView
+                    android:id="@+id/cancel_tx_view"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginBottom="4dp"
+                    android:letterSpacing="-0.02"
+                    android:text="@string/tx_detail_cancel_tx"
+                    android:textColor="@color/tx_detail_cancel_tx"
+                    android:textSize="12sp"
+                    app:customFont="AVENIR_LT_STD_MEDIUM" />
+            </FrameLayout>
+
+        </LinearLayout>
 
         <View
             android:layout_width="match_parent"
             android:layout_height="@dimen/common_scroll_height_gradient_height"
             android:background="@drawable/view_elevation_gradient"
-            app:layout_constraintTop_toBottomOf="@id/payment_state_bg_view" />
-
-        <ImageButton
-            android:id="@+id/back_view"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:layout_marginTop="24dp"
-            android:background="@color/transparent"
-            android:contentDescription="@null"
-            android:src="@drawable/back_icon"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <com.tari.android.wallet.ui.component.CustomFontTextView
-            android:id="@+id/payment_state_text_view"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:ellipsize="middle"
-            android:paddingHorizontal="50dp"
-            android:text="@string/tx_detail_payment_received"
-            android:textColor="@color/black"
-            android:textSize="16sp"
-            app:customFont="AVENIR_LT_STD_HEAVY"
-            app:layout_constraintBottom_toBottomOf="@id/back_view"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@id/back_view" />
-
-        <com.tari.android.wallet.ui.component.CustomFontTextView
-            android:id="@+id/date_text_view"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:layout_marginBottom="24dp"
-            android:textColor="@color/tx_detail_contact_name_label_text"
-            android:textSize="13sp"
-            app:customFont="AVENIR_LT_STD_MEDIUM"
-            app:layout_constraintEnd_toEndOf="@id/payment_state_text_view"
-            app:layout_constraintStart_toStartOf="@id/payment_state_text_view"
-            app:layout_constraintTop_toBottomOf="@id/payment_state_text_view"
-            tools:text="November 1st 2019 at 2:39 PM" />
-
-        <FrameLayout
-            android:id="@+id/status_container_view"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="20dp"
-            android:layout_marginTop="12dp"
-            android:background="@drawable/background_transaction_state"
-            android:elevation="16dp"
-            android:paddingTop="18dp"
-            android:paddingBottom="14dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/date_text_view">
-
-            <com.tari.android.wallet.ui.component.CustomFontTextView
-                android:id="@+id/status_text_view"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:ellipsize="end"
-                android:maxLines="1"
-                android:paddingHorizontal="10dp"
-                android:textColor="#9330FF"
-                android:textSize="12sp"
-                app:customFont="AVENIR_LT_STD_HEAVY"
-                tools:text="Hello world" />
-
-        </FrameLayout>
-
-        <View
-            android:id="@+id/status_dimmer_view"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:alpha="0.6"
-            android:background="@drawable/background_transaction_state_dimmer"
-            android:clickable="true"
-            android:elevation="16dp"
-            android:focusable="true"
-            android:visibility="gone"
-            app:layout_constraintBottom_toBottomOf="@id/status_container_view"
-            app:layout_constraintEnd_toEndOf="@id/status_container_view"
-            app:layout_constraintStart_toStartOf="@id/status_container_view"
-            app:layout_constraintTop_toTopOf="@id/status_container_view" />
+            app:layout_constraintTop_toBottomOf="@id/payment_header_view" />
 
         <RelativeLayout
             android:id="@+id/amount_container_view"
@@ -123,7 +137,7 @@
             android:paddingHorizontal="12dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/payment_state_bg_view">
+            app:layout_constraintTop_toBottomOf="@id/payment_header_view">
 
             <ImageView
                 android:id="@+id/amount_gem_image_view"

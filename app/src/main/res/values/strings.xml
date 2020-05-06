@@ -41,6 +41,9 @@
     <string name="app_notification_channel_name">Tari Aurora Notification Channel</string>
     <string name="notification_tx_received_title">You\'ve got XTR!</string>
     <string name="notification_tx_received_description_format">Someone just sent you %1$s XTR.</string>
+<!--    <string name="notification_tx_canceled_title">Your transaction was cancelled by&#032;</string>-->
+    <string name="notification_tx_canceled_title">Your transaction was cancelled</string>
+    <string name="notification_tx_canceled_description">The sender cancelled the transaction before it was finalized, so the tXTR was returned to them</string>
 
     <!-- errors -->
     <!-- node unreachable -->
@@ -228,6 +231,14 @@
     <string name="tx_detail_waiting_for_recipient">Waiting for recipient to accept transaction</string>
     <string name="tx_detail_waiting_for_sender_to_complete">Waiting for sender to complete transaction</string>
     <string name="tx_detail_broadcasting">Completing final processing…</string>
+    <string name="tx_detail_cancel_tx">Cancel transaction</string>
+    <string name="tx_detail_cancellation_error_title">Oops…</string>
+    <string name="tx_detail_cancellation_error_description">Error occurred during TX cancellation.</string>
+    <string name="tx_details_cancel_dialog_title">Are you sure?</string>
+    <string name="tx_details_cancel_dialog_description">Your recipient will be notified of the cancellation.</string>
+    <string name="tx_details_cancel_dialog_cancel">Yes, cancel</string>
+    <string name="tx_details_cancel_dialog_not_cancel">Not now</string>
+
     <!-- Fee tooltip -->
     <string name="tx_detail_fee_tooltip_transaction_fee">Transaction Fee</string>
     <string name="tx_detail_fee_tooltip_desc">The transaction fee is distributed to the thousands of computers (also known as \"miners\") who ensure that your XTR transactions are fast and secure.</string>

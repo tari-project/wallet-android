@@ -38,9 +38,14 @@ import android.animation.AnimatorSet
 import android.animation.ValueAnimator
 import android.content.*
 import android.os.Bundle
+import android.os.Handler
 import android.os.IBinder
+import android.os.Looper
+import android.util.Log
 import android.view.View
 import android.view.inputmethod.EditorInfo
+import android.widget.Button
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import butterknife.BindColor
@@ -59,9 +64,11 @@ import com.tari.android.wallet.extension.txFormattedDate
 import com.tari.android.wallet.model.*
 import com.tari.android.wallet.service.TariWalletService
 import com.tari.android.wallet.service.WalletService
+import com.tari.android.wallet.ui.animation.collapseAndHideAnimation
 import com.tari.android.wallet.ui.component.EmojiIdCopiedViewController
 import com.tari.android.wallet.ui.component.EmojiIdSummaryViewController
 import com.tari.android.wallet.ui.dialog.BottomSlideDialog
+import com.tari.android.wallet.ui.dialog.ErrorDialog
 import com.tari.android.wallet.ui.extension.*
 import com.tari.android.wallet.ui.util.UiUtil
 import com.tari.android.wallet.util.Constants
@@ -135,6 +142,14 @@ internal class TxDetailActivity : AppCompatActivity(), ServiceConnection {
     var txBroadcasting = ""
 
     @JvmField
+    @BindString(R.string.tx_detail_cancellation_error_title)
+    var txCancellationErrorTitle = ""
+
+    @JvmField
+    @BindString(R.string.tx_detail_cancellation_error_description)
+    var txCancellationErrorDescription = ""
+
+    @JvmField
     @BindColor(R.color.tx_detail_contact_name_label_text)
     var contactLabelTxtGrayColor = 0
 
@@ -150,6 +165,18 @@ internal class TxDetailActivity : AppCompatActivity(), ServiceConnection {
     @JvmField
     var lightGrayColor = 0
 
+    @BindColor(R.color.purple)
+    @JvmField
+    var purpleColor = 0
+
+    @BindColor(R.color.tx_detail_cancel_tx)
+    @JvmField
+    var activeCancelColor = 0
+
+    @BindColor(R.color.disabled_cta)
+    @JvmField
+    var disabledCTAColor = 0
+
     @BindDimen(R.dimen.add_amount_element_text_size)
     @JvmField
     var elementTextSize = 0f
@@ -161,14 +188,6 @@ internal class TxDetailActivity : AppCompatActivity(), ServiceConnection {
     @BindDimen(R.dimen.common_copy_emoji_id_button_visible_bottom_margin)
     @JvmField
     var copyEmojiIdButtonVisibleBottomMargin = 0
-
-    @BindDimen(R.dimen.tx_details_no_status_header_height)
-    @JvmField
-    var headerHeightNoStatus = 0
-
-    @BindDimen(R.dimen.tx_details_with_status_header_height)
-    @JvmField
-    var headerHeightWithStatus = 0
 
     @Inject
     lateinit var tracker: Tracker
@@ -216,6 +235,7 @@ internal class TxDetailActivity : AppCompatActivity(), ServiceConnection {
         if (walletService == null) {
             // bind to service
             val bindIntent = Intent(this, WalletService::class.java)
+            Log.i("Debug", "Issuing bindService (${System.currentTimeMillis()})")
             bindService(bindIntent, this, Context.BIND_AUTO_CREATE)
         }
     }
@@ -236,6 +256,11 @@ internal class TxDetailActivity : AppCompatActivity(), ServiceConnection {
      */
     override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
         Logger.d("Connected to the wallet service.")
+        Log.i(
+            "Debug",
+            "Service connected (${System.currentTimeMillis()})"
+        )
+        enableCTAs()
         walletService = TariWalletService.Stub.asInterface(service)
     }
 
@@ -244,6 +269,7 @@ internal class TxDetailActivity : AppCompatActivity(), ServiceConnection {
      */
     override fun onServiceDisconnected(name: ComponentName?) {
         Logger.d("Disconnected from the wallet service.")
+        disableCTAs()
         walletService = null
     }
 
@@ -260,7 +286,10 @@ internal class TxDetailActivity : AppCompatActivity(), ServiceConnection {
     }
 
     private fun bindViews() {
-        dimmerViews = mutableListOf(ui.topDimmerView, ui.statusDimmerView, ui.bottomDimmerView)
+        if (this.walletService == null) {
+            disableCTAs()
+        }
+        dimmerViews = mutableListOf(ui.topDimmerView, ui.bottomDimmerView)
         currentTextSize = elementTextSize
         currentAmountGemSize = amountGemSize
         OverScrollDecoratorHelper.setUpOverScroll(ui.fullEmojiIdScrollView)
@@ -268,20 +297,41 @@ internal class TxDetailActivity : AppCompatActivity(), ServiceConnection {
         emojiIdSummaryController = EmojiIdSummaryViewController(ui.emojiIdSummaryView)
     }
 
+    private fun disableCTAs() {
+        arrayOf<TextView>(
+            ui.addContactButton,
+            ui.cancelTxView,
+            ui.editContactLabelTextView
+        ).forEach {
+            it.isEnabled = false
+            it.setTextColor(disabledCTAColor)
+        }
+    }
+
+    private fun enableCTAs() {
+        arrayOf<TextView>(ui.addContactButton, ui.cancelTxView, ui.editContactLabelTextView)
+            .forEach { it.isEnabled = true }
+        ui.addContactButton.setTextColor(purpleColor)
+        ui.editContactLabelTextView.setTextColor(purpleColor)
+        ui.cancelTxView.setTextColor(activeCancelColor)
+    }
+
     private fun setUiCommands() {
         ui.backView.setOnClickListener { onBackPressed() }
         ui.emojiIdSummaryContainerView.setOnClickListener { onEmojiSummaryClicked(it) }
         ui.copyEmojiIdButton.setOnClickListener { onCopyEmojiIdButtonClicked(it) }
+        dimmerViews.forEach { it.setOnClickListener { hideFullEmojiId() } }
         ui.feeLabelTextView.setOnClickListener { showTxFeeToolTip() }
         ui.addContactButton.setOnClickListener { onAddContactClick() }
         ui.editContactLabelTextView.setOnClickListener { onEditContactClick() }
-        dimmerViews.forEach { it.setOnClickListener { hideFullEmojiId() } }
         ui.createContactEditText.setOnEditorActionListener { _, actionId, _ ->
             onContactEditTextEditAction(actionId)
         }
+        ui.cancelTxView.setOnClickListener { onTransactionCancel() }
     }
 
     private fun bindTxData() {
+        Log.i("Debug", "Current TX: $tx")
         val tx = this.tx
         setTxStatusData(tx)
         setTxMetaData(tx)
@@ -358,12 +408,15 @@ internal class TxDetailActivity : AppCompatActivity(), ServiceConnection {
         ui.statusTextView.text = statusText
         if (statusText.isEmpty()) {
             ui.statusContainerView.gone()
-            dimmerViews.remove(ui.statusDimmerView)
-            ui.paymentStateBgView.setHeight(headerHeightNoStatus)
         } else {
             ui.statusContainerView.visible()
-            if (!dimmerViews.contains(ui.statusDimmerView)) dimmerViews.add(ui.statusDimmerView)
-            ui.paymentStateBgView.setHeight(headerHeightWithStatus)
+        }
+        if (tx is PendingOutboundTx && tx.status == Status.PENDING) {
+            ui.cancelTxContainerView.setOnClickListener { onTransactionCancel() }
+            ui.cancelTxContainerView.visible()
+        } else if (ui.cancelTxContainerView.visibility == View.VISIBLE) {
+            ui.cancelTxContainerView.setOnClickListener(null)
+            collapseAndHideAnimation(ui.cancelTxContainerView).start()
         }
     }
 
@@ -396,10 +449,19 @@ internal class TxDetailActivity : AppCompatActivity(), ServiceConnection {
         EventBus.subscribe<Event.Wallet.TxFinalized>(this) { updateTxData(it.completedTx) }
         EventBus.subscribe<Event.Wallet.TxMined>(this) { updateTxData(it.completedTx) }
         EventBus.subscribe<Event.Wallet.TxReplyReceived>(this) { updateTxData(it.completedTx) }
+        EventBus.subscribe<Event.Wallet.TxCancellation>(this) {
+            //  Main thread invocation is necessary due to happens-before relationship guarantee
+            Handler(Looper.getMainLooper()).post {
+                if (it.txId.value == this.tx.id) {
+                    // TODO handle cancellation
+                }
+            }
+        }
     }
 
     private fun updateTxData(tx: Tx) {
-        ui.rootView.post {
+        //  Main thread invocation is necessary due to happens-before relationship guarantee
+        Handler(Looper.getMainLooper()).post {
             if (tx.id == this.tx.id) {
                 this.tx = tx
                 bindTxData()
@@ -567,6 +629,49 @@ internal class TxDetailActivity : AppCompatActivity(), ServiceConnection {
             return false
         }
         return true
+    }
+
+    private fun onTransactionCancel() {
+        val service = this.walletService ?: return
+        val tx = this.tx
+        if (tx is PendingOutboundTx && tx.direction == Tx.Direction.OUTBOUND && tx.status == Status.PENDING) {
+            showTxCancelDialog(service)
+        } else {
+            Logger.e(
+                "cancelTransaction was issued, but current transaction is not pending " +
+                        "outbound, but rather $tx"
+            )
+        }
+    }
+
+    private fun showTxCancelDialog(service: TariWalletService) {
+        BottomSlideDialog(
+            this,
+            R.layout.dialog_cancel_tx,
+            dismissViewId = R.id.cancel_tx_dialog_not_cancel_button
+        ).apply {
+            findViewById<Button>(R.id.cancel_tx_dialog_cancel_button)
+                .setOnClickListener {
+                    cancelTransaction(service)
+                    dismiss()
+                }
+        }.show()
+    }
+
+    private fun cancelTransaction(service: TariWalletService) {
+        val error = WalletError()
+        val isCancelled = service.cancelPendingTx(TxId(this.tx.id), error)
+        if (isCancelled || error.code == WalletErrorCode.NO_ERROR) {
+            this.ui.cancelTxView.setOnClickListener(null)
+            finish()
+            overridePendingTransition(R.anim.enter_from_left, R.anim.exit_to_right)
+        } else {
+            ErrorDialog(this, txCancellationErrorTitle, txCancellationErrorDescription).show()
+            Logger.e(
+                "Error occurred during TX cancellation.\nCancelled? $isCancelled" +
+                        "\nError: $error"
+            )
+        }
     }
 
     private fun updateContactAlias(newAlias: String) {
