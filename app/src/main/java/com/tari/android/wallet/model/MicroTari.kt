@@ -37,6 +37,7 @@ import android.os.Parcelable
 import com.tari.android.wallet.extension.toMicroTari
 import java.math.BigDecimal
 import java.math.BigInteger
+import java.math.RoundingMode
 
 /**
  * This wrapper is needed for amount parameters in AIDL methods.
@@ -49,7 +50,8 @@ class MicroTari() : Parcelable, Comparable<MicroTari> {
 
     private val million = BigDecimal(1e6)
     val tariValue: BigDecimal
-        get() = value.toBigDecimal().divide(million)
+        // Note: BigDecimal keeps track of both precision and scale, 1e6 != 1_000_000 in this case (scale 6, scale 0)
+        get() = value.toBigDecimal().divide(million,6,RoundingMode.HALF_UP)
 
     constructor(
         value: BigInteger
