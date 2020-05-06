@@ -44,23 +44,18 @@ import androidx.biometric.BiometricManager.BIOMETRIC_SUCCESS
 import androidx.biometric.BiometricPrompt
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-import butterknife.BindColor
-import butterknife.BindDimen
-import butterknife.BindString
-import butterknife.ButterKnife
 import com.daasuu.ei.Ease
 import com.daasuu.ei.EasingInterpolator
 import com.orhanobut.logger.Logger
 import com.tari.android.wallet.R
+import com.tari.android.wallet.R.dimen.auth_button_bottom_margin
+import com.tari.android.wallet.R.string.*
 import com.tari.android.wallet.application.WalletState
 import com.tari.android.wallet.auth.AuthUtil
 import com.tari.android.wallet.databinding.FragmentLocalAuthBinding
 import com.tari.android.wallet.event.EventBus
+import com.tari.android.wallet.ui.extension.*
 import com.tari.android.wallet.infrastructure.Tracker
-import com.tari.android.wallet.ui.extension.appComponent
-import com.tari.android.wallet.ui.extension.doOnGlobalLayout
-import com.tari.android.wallet.ui.extension.invisible
-import com.tari.android.wallet.ui.extension.visible
 import com.tari.android.wallet.ui.util.UiUtil
 import com.tari.android.wallet.util.Constants.UI.Auth
 import com.tari.android.wallet.util.SharedPrefsWrapper
@@ -78,26 +73,6 @@ internal class LocalAuthFragment : Fragment() {
         PIN,
         NONE
     }
-
-    @BindDimen(R.dimen.auth_button_bottom_margin)
-    @JvmField
-    var useAuthButtonBottomMargin = 0
-
-    @BindString(R.string.auth_prompt_button_touch_id_text)
-    lateinit var buttonTouchIdAuthFormat: String
-
-    @BindString(R.string.auth_prompt_button_text)
-    lateinit var buttonPinAuthFormat: String
-
-    @BindString(R.string.onboarding_auth_biometric_prompt)
-    lateinit var biometricAuthPrompt: String
-
-    @BindString(R.string.onboarding_auth_device_lock_code_prompt)
-    lateinit var deviceLockCodePrompt: String
-
-    @BindColor(R.color.white)
-    @JvmField
-    var whiteColor = 0
 
     @Inject
     lateinit var sharedPrefsWrapper: SharedPrefsWrapper
@@ -124,7 +99,7 @@ internal class LocalAuthFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        LocalAuthFragmentVisitor.visit(this, view)
+        LocalAuthFragmentVisitor.visit(this)
         setDeviceAuthType()
         setupUi()
         ui.rootView.doOnGlobalLayout(this::playStartUpAnim)
@@ -159,22 +134,22 @@ internal class LocalAuthFragment : Fragment() {
 
     private fun setupUi() {
         ui.progressBarContainerView.invisible()
-        UiUtil.setProgressBarColor(ui.progressBar, whiteColor)
+        UiUtil.setProgressBarColor(ui.progressBar, color(R.color.white))
         if (authType == AuthType.BIOMETRIC) {
             //setup ui for biometric auth
             ui.authTypeImageView.setImageResource(R.drawable.fingerprint)
-            ui.enableAuthButton.text = buttonTouchIdAuthFormat
+            ui.enableAuthButton.text = string(auth_prompt_button_touch_id_text)
         } else {
             //setup ui for device lock code auth
             ui.authTypeImageView.setImageResource(R.drawable.numpad)
-            ui.enableAuthButton.text = buttonPinAuthFormat
+            ui.enableAuthButton.text = string(auth_prompt_button_text)
         }
         ui.enableAuthButton.setOnClickListener { onEnableAuthButtonClick(it) }
     }
 
     private fun playStartUpAnim() {
-        val offset = (ui.enableAuthButtonContainerView.height + useAuthButtonBottomMargin).toFloat()
-
+        val offset =
+            (ui.enableAuthButtonContainerView.height + dimenPx(auth_button_bottom_margin)).toFloat()
         val buttonContainerViewAnim: ObjectAnimator =
             ObjectAnimator.ofFloat(ui.enableAuthButtonContainerView, View.TRANSLATION_Y, offset, 0f)
 
@@ -251,9 +226,11 @@ internal class LocalAuthFragment : Fragment() {
 
         val biometricAuthAvailable =
             BiometricManager.from(context!!).canAuthenticate() == BIOMETRIC_SUCCESS
-        val prompt = if (biometricAuthAvailable) biometricAuthPrompt else deviceLockCodePrompt
+        val prompt =
+            if (biometricAuthAvailable) string(onboarding_auth_biometric_prompt)
+            else string(onboarding_auth_device_lock_code_prompt)
         val promptInfo = BiometricPrompt.PromptInfo.Builder()
-            .setTitle(getString(R.string.onboarding_auth_title))
+            .setTitle(string(onboarding_auth_title))
             .setSubtitle(prompt)
             .setDeviceCredentialAllowed(true)
             .build()
@@ -270,13 +247,13 @@ internal class LocalAuthFragment : Fragment() {
         Logger.e("Authentication other error.")
 
         val dialogBuilder = AlertDialog.Builder(context!!)
-        dialogBuilder.setMessage(getString(R.string.auth_failed_desc))
+        dialogBuilder.setMessage(string(auth_failed_desc))
             .setCancelable(false)
             // negative button text and action
-            .setNegativeButton(getString(R.string.common_ok), null)
+            .setNegativeButton(string(common_ok), null)
 
         val dialog = dialogBuilder.create()
-        dialog.setTitle(getString(R.string.auth_failed_title))
+        dialog.setTitle(string(auth_failed_title))
         dialog.show()
         ui.enableAuthButton.isEnabled = true
     }
@@ -286,18 +263,18 @@ internal class LocalAuthFragment : Fragment() {
      */
     private fun displayAuthNotAvailableDialog() {
         val dialogBuilder = AlertDialog.Builder(context!!)
-        dialogBuilder.setMessage(getString(R.string.auth_not_available_or_canceled_desc))
+        dialogBuilder.setMessage(string(auth_not_available_or_canceled_desc))
             .setCancelable(false)
-            .setPositiveButton(getString(R.string.proceed)) { dialog, _ ->
+            .setPositiveButton(string(proceed)) { dialog, _ ->
                 // user has chosen to proceed without authentication
                 sharedPrefsWrapper.isAuthenticated = true
                 dialog.cancel()
                 authSuccess()
             }
-            .setNegativeButton(getString(R.string.common_cancel), null)
+            .setNegativeButton(string(common_cancel), null)
 
         val alert = dialogBuilder.create()
-        alert.setTitle(getString(R.string.auth_not_available_or_canceled_title))
+        alert.setTitle(string(auth_not_available_or_canceled_title))
         alert.show()
     }
 
@@ -329,9 +306,8 @@ internal class LocalAuthFragment : Fragment() {
     }
 
     private object LocalAuthFragmentVisitor {
-        internal fun visit(fragment: LocalAuthFragment, view: View) {
+        internal fun visit(fragment: LocalAuthFragment) {
             fragment.requireActivity().appComponent.inject(fragment)
-            ButterKnife.bind(fragment, view)
         }
     }
 }

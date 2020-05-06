@@ -30,48 +30,26 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.tari.android.wallet.ui.activity.home.adapter
+package com.tari.android.wallet.ui.extension
 
-import android.view.View
-import androidx.recyclerview.widget.RecyclerView
-import com.tari.android.wallet.R.string.*
-import com.tari.android.wallet.databinding.HomeTxListHeaderBinding
-import com.tari.android.wallet.ui.extension.string
-import org.joda.time.LocalDate
+import android.content.Context
+import android.graphics.drawable.Drawable
+import androidx.annotation.ColorRes
+import androidx.annotation.DimenRes
+import androidx.annotation.DrawableRes
+import androidx.annotation.StringRes
+import androidx.core.content.ContextCompat
 
-/**
- * Transaction list section header view holder.
- *
- * @author The Tari Development Team
- */
-class TxHeaderViewHolder(view: View, private val type: Type) :
-    RecyclerView.ViewHolder(view) {
+internal fun Context.string(@StringRes id: Int): String = resources.getString(id)
 
-    enum class Type {
-        PENDING_TXS,
-        DATE
-    }
+internal fun Context.string(@StringRes id: Int, vararg formatArgs: Any): String =
+    resources.getString(id, *formatArgs)
 
-    private val dateFormat = "MMMM dd, yyyy"
+internal fun Context.color(@ColorRes id: Int): Int = ContextCompat.getColor(this, id)
 
-    private var date: LocalDate? = null
+internal fun Context.dimenPx(@DimenRes id: Int): Int = resources.getDimensionPixelSize(id)
 
-    private val ui = HomeTxListHeaderBinding.bind(view)
+internal fun Context.dimen(@DimenRes id: Int): Float = resources.getDimension(id)
 
-    fun bind(date: LocalDate?, position: Int) {
-        ui.txListHeaderSeparatorView.visibility = if (position == 0) View.GONE else View.VISIBLE
-        if (type == Type.PENDING_TXS) {
-            ui.txListHeaderTitleTextView.text = string(home_tx_list_header_pending_txs)
-        } else if (type == Type.DATE) {
-            this.date = date!!
-            val todayDate = LocalDate.now()
-            val yesterdayDate = todayDate.minusDays(1)
-            ui.txListHeaderTitleTextView.text = when {
-                date.isEqual(todayDate) -> string(home_tx_list_header_today)
-                date.isEqual(yesterdayDate) -> string(home_tx_list_header_yesterday)
-                else -> date.toString(dateFormat)
-            }
-        }
-
-    }
-}
+internal fun Context.drawable(@DrawableRes id: Int): Drawable? =
+    ContextCompat.getDrawable(this, id)

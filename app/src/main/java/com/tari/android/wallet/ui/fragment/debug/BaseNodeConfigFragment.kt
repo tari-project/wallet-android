@@ -34,7 +34,6 @@ package com.tari.android.wallet.ui.fragment.debug
 
 import android.content.ClipboardManager
 import android.content.Context.CLIPBOARD_SERVICE
-import android.graphics.drawable.Drawable
 import android.os.AsyncTask
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -43,16 +42,15 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
-import butterknife.*
 import com.tari.android.wallet.R
+import com.tari.android.wallet.R.color.white
+import com.tari.android.wallet.R.drawable.base_node_config_edit_text_bg
+import com.tari.android.wallet.R.drawable.base_node_config_edit_text_invalid_bg
 import com.tari.android.wallet.databinding.FragmentBaseNodeConfigBinding
 import com.tari.android.wallet.ffi.FFIPublicKey
 import com.tari.android.wallet.ffi.FFIWallet
 import com.tari.android.wallet.ffi.HexString
-import com.tari.android.wallet.ui.extension.appComponent
-import com.tari.android.wallet.ui.extension.gone
-import com.tari.android.wallet.ui.extension.invisible
-import com.tari.android.wallet.ui.extension.visible
+import com.tari.android.wallet.ui.extension.*
 import com.tari.android.wallet.ui.util.UiUtil
 import com.tari.android.wallet.util.SharedPrefsWrapper
 import javax.inject.Inject
@@ -66,16 +64,6 @@ import javax.inject.Inject
  * @author The Tari Development Team
  */
 internal class BaseNodeConfigFragment : Fragment() {
-
-    @BindDrawable(R.drawable.base_node_config_edit_text_bg)
-    lateinit var editTextBgDrawable: Drawable
-
-    @BindDrawable(R.drawable.base_node_config_edit_text_invalid_bg)
-    lateinit var editTextInvalidBgDrawable: Drawable
-
-    @BindColor(R.color.white)
-    @JvmField
-    var whiteColor: Int = 0
 
     @Inject
     lateinit var sharedPrefsWrapper: SharedPrefsWrapper
@@ -103,7 +91,7 @@ internal class BaseNodeConfigFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        BaseNodeConfigFragmentVisitor.visit(this, view)
+        BaseNodeConfigFragmentVisitor.visit(this)
         setupUi()
     }
 
@@ -113,7 +101,7 @@ internal class BaseNodeConfigFragment : Fragment() {
     }
 
     private fun setupUi() {
-        UiUtil.setProgressBarColor(ui.progressBar, whiteColor)
+        UiUtil.setProgressBarColor(ui.progressBar, color(white))
         ui.apply {
             publicKeyHexTextView.text = sharedPrefsWrapper.baseNodePublicKeyHex
             addressTextView.text = sharedPrefsWrapper.baseNodeAddress
@@ -131,12 +119,12 @@ internal class BaseNodeConfigFragment : Fragment() {
     }
 
     private fun onPublicKeyHexChanged() {
-        ui.publicKeyHexEditText.background = editTextBgDrawable
+        ui.publicKeyHexEditText.background = drawable(base_node_config_edit_text_bg)
         ui.invalidPublicKeyHexTextView.invisible()
     }
 
     private fun onAddressChanged() {
-        ui.addressEditText.background = editTextBgDrawable
+        ui.addressEditText.background = drawable(base_node_config_edit_text_bg)
         ui.invalidAddressTextView.invisible()
     }
 
@@ -162,20 +150,20 @@ internal class BaseNodeConfigFragment : Fragment() {
         val publicKeyHex = ui.publicKeyHexEditText.editableText.toString()
         if (!publicKeyRegex.matches(publicKeyHex)) {
             isValid = false
-            ui.publicKeyHexEditText.background = editTextInvalidBgDrawable
+            ui.publicKeyHexEditText.background = drawable(base_node_config_edit_text_invalid_bg)
             ui.invalidPublicKeyHexTextView.visible()
         } else {
-            ui.publicKeyHexEditText.background = editTextBgDrawable
+            ui.publicKeyHexEditText.background = drawable(base_node_config_edit_text_bg)
             ui.invalidPublicKeyHexTextView.invisible()
         }
         // validate address
         val address = ui.addressEditText.editableText.toString()
         if (!addressRegex.matches(address)) {
             isValid = false
-            ui.addressEditText.background = editTextInvalidBgDrawable
+            ui.addressEditText.background = drawable(base_node_config_edit_text_invalid_bg)
             ui.invalidAddressTextView.visible()
         } else {
-            ui.addressEditText.background = editTextBgDrawable
+            ui.addressEditText.background = drawable(base_node_config_edit_text_bg)
             ui.invalidAddressTextView.invisible()
         }
         return isValid
@@ -246,9 +234,8 @@ internal class BaseNodeConfigFragment : Fragment() {
     }
 
     private object BaseNodeConfigFragmentVisitor {
-        internal fun visit(fragment: BaseNodeConfigFragment, view: View) {
+        internal fun visit(fragment: BaseNodeConfigFragment) {
             fragment.requireActivity().appComponent.inject(fragment)
-            ButterKnife.bind(fragment, view)
         }
     }
 

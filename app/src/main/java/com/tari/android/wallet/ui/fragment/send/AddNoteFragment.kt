@@ -47,13 +47,11 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.RelativeLayout
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-import butterknife.BindColor
-import butterknife.BindDimen
-import butterknife.BindString
-import butterknife.ButterKnife
 import com.daasuu.ei.Ease
 import com.daasuu.ei.EasingInterpolator
-import com.tari.android.wallet.R
+import com.tari.android.wallet.R.color.*
+import com.tari.android.wallet.R.dimen.*
+import com.tari.android.wallet.R.string.emoji_id_chunk_separator
 import com.tari.android.wallet.databinding.FragmentAddNoteBinding
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.infrastructure.Tracker
@@ -77,48 +75,6 @@ import javax.inject.Inject
  * @author The Tari Development Team
  */
 class AddNoteFragment : Fragment(), TextWatcher, View.OnTouchListener {
-
-    /**
-     * Emoji id chunk separator char.
-     */
-    @BindString(R.string.emoji_id_chunk_separator)
-    lateinit var emojiIdChunkSeparator: String
-
-    @BindDimen(R.dimen.add_note_slide_button_left_margin)
-    @JvmField
-    var slideViewMarginStart = 0
-
-    @BindDimen(R.dimen.add_note_slide_button_width)
-    @JvmField
-    var slideViewWidth = 0
-
-    @BindDimen(R.dimen.common_horizontal_margin)
-    @JvmField
-    var horizontalMargin = 0
-
-    @BindDimen(R.dimen.common_copy_emoji_id_button_visible_bottom_margin)
-    @JvmField
-    var copyEmojiIdButtonVisibleBottomMargin = 0
-
-    @BindColor(R.color.white)
-    @JvmField
-    var whiteColor = 0
-
-    @BindColor(R.color.black)
-    @JvmField
-    var promptActiveColor = 0
-
-    @BindColor(R.color.add_note_prompt_passive_color)
-    @JvmField
-    var promptPassiveColor = 0
-
-    @BindColor(R.color.black)
-    @JvmField
-    var blackColor = 0
-
-    @BindColor(R.color.light_gray)
-    @JvmField
-    var lightGrayColor = 0
 
     @Inject
     lateinit var tracker: Tracker
@@ -166,7 +122,7 @@ class AddNoteFragment : Fragment(), TextWatcher, View.OnTouchListener {
     @SuppressLint("ClickableViewAccessibility")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        AddNoteFragmentVisitor.visit(this, view)
+        AddNoteFragmentVisitor.visit(this)
         // get tx properties
         recipientUser = arguments!!.getParcelable("recipientUser")!!
         amount = arguments!!.getParcelable("amount")!!
@@ -179,7 +135,7 @@ class AddNoteFragment : Fragment(), TextWatcher, View.OnTouchListener {
         hideFullEmojiId(animated = false)
         OverScrollDecoratorHelper.setUpOverScroll(ui.fullEmojiIdScrollView)
 
-        UiUtil.setProgressBarColor(ui.progressBar, whiteColor)
+        UiUtil.setProgressBarColor(ui.progressBar, color(white))
 
         ui.noteEditText.addTextChangedListener(this)
         ui.slideView.setOnTouchListener(this)
@@ -188,7 +144,7 @@ class AddNoteFragment : Fragment(), TextWatcher, View.OnTouchListener {
         disableCallToAction()
         focusEditTextAndShowKeyboard()
 
-        ui.promptTextView.setTextColor(promptActiveColor)
+        ui.promptTextView.setTextColor(color(black))
         ui.noteEditText.imeOptions = EditorInfo.IME_ACTION_DONE
         ui.noteEditText.setRawInputType(InputType.TYPE_CLASS_TEXT)
 
@@ -240,9 +196,9 @@ class AddNoteFragment : Fragment(), TextWatcher, View.OnTouchListener {
         ui.titleTextView.gone()
         ui.fullEmojiIdTextView.text = EmojiUtil.getFullEmojiIdSpannable(
             emojiId,
-            emojiIdChunkSeparator,
-            blackColor,
-            lightGrayColor
+            string(emoji_id_chunk_separator),
+            color(black),
+            color(light_gray)
         )
     }
 
@@ -274,7 +230,7 @@ class AddNoteFragment : Fragment(), TextWatcher, View.OnTouchListener {
         ui.dimmerView.visible()
         val fullEmojiIdInitialWidth = ui.emojiIdSummaryContainerView.width
         val fullEmojiIdDeltaWidth =
-            (ui.rootView.width - horizontalMargin * 2) - fullEmojiIdInitialWidth
+            (ui.rootView.width - dimenPx(common_horizontal_margin) * 2) - fullEmojiIdInitialWidth
         UiUtil.setWidth(
             ui.fullEmojiIdContainerView,
             fullEmojiIdInitialWidth
@@ -317,7 +273,7 @@ class AddNoteFragment : Fragment(), TextWatcher, View.OnTouchListener {
             ui.copyEmojiIdButtonContainerView.alpha = value
             UiUtil.setBottomMargin(
                 ui.copyEmojiIdButtonContainerView,
-                (copyEmojiIdButtonVisibleBottomMargin * value).toInt()
+                (dimenPx(common_copy_emoji_id_button_visible_bottom_margin) * value).toInt()
             )
         }
         copyEmojiIdButtonAnim.duration = Constants.UI.shortDurationMs
@@ -355,7 +311,7 @@ class AddNoteFragment : Fragment(), TextWatcher, View.OnTouchListener {
             ui.copyEmojiIdButtonContainerView.alpha = value
             UiUtil.setBottomMargin(
                 ui.copyEmojiIdButtonContainerView,
-                (copyEmojiIdButtonVisibleBottomMargin * value).toInt()
+                (dimenPx(common_copy_emoji_id_button_visible_bottom_margin) * value).toInt()
             )
         }
         copyEmojiIdButtonAnim.duration = Constants.UI.shortDurationMs
@@ -479,10 +435,10 @@ class AddNoteFragment : Fragment(), TextWatcher, View.OnTouchListener {
 
     override fun afterTextChanged(s: Editable) {
         if (s.toString().isNotEmpty()) {
-            ui.promptTextView.setTextColor(promptPassiveColor)
+            ui.promptTextView.setTextColor(color(add_note_prompt_passive_color))
             enableCallToAction()
         } else {
-            ui.promptTextView.setTextColor(promptActiveColor)
+            ui.promptTextView.setTextColor(color(black))
             disableCallToAction()
         }
     }
@@ -509,18 +465,29 @@ class AddNoteFragment : Fragment(), TextWatcher, View.OnTouchListener {
             MotionEvent.ACTION_MOVE -> {
                 val layoutParams = view.layoutParams as RelativeLayout.LayoutParams
                 val newLeftMargin = x - slideButtonXDelta
-                slideButtonLastMarginStart = if (newLeftMargin < slideViewMarginStart) {
-                    slideViewMarginStart
+                slideButtonLastMarginStart = if (newLeftMargin < dimenPx(
+                        add_note_slide_button_left_margin
+                    )
+                ) {
+                    dimenPx(add_note_slide_button_left_margin)
                 } else {
-                    if (newLeftMargin + slideViewWidth + slideViewMarginStart >= slideButtonContainerWidth) {
-                        slideButtonContainerWidth - slideViewWidth - slideViewMarginStart
+                    if (newLeftMargin + dimenPx(add_note_slide_button_width) + dimenPx(
+                            add_note_slide_button_left_margin
+                        ) >= slideButtonContainerWidth
+                    ) {
+                        slideButtonContainerWidth - dimenPx(add_note_slide_button_width) - dimenPx(
+                            add_note_slide_button_left_margin
+                        )
                     } else {
                         x - slideButtonXDelta
                     }
                 }
                 layoutParams.marginStart = slideButtonLastMarginStart
                 val alpha =
-                    1f - slideButtonLastMarginStart.toFloat() / (slideButtonContainerWidth - slideViewMarginStart - slideViewWidth)
+                    1f - slideButtonLastMarginStart.toFloat() /
+                            (slideButtonContainerWidth -
+                                    dimenPx(add_note_slide_button_left_margin) -
+                                    dimenPx(add_note_slide_button_width))
                 ui.slideToSendEnabledTextView.alpha = alpha
                 ui.slideToSendDisabledTextView.alpha = alpha
 
@@ -529,14 +496,16 @@ class AddNoteFragment : Fragment(), TextWatcher, View.OnTouchListener {
             MotionEvent.ACTION_UP -> if (slideButtonLastMarginStart < slideButtonContainerWidth / 2) {
                 val anim = ValueAnimator.ofInt(
                     slideButtonLastMarginStart,
-                    slideViewMarginStart
+                    dimenPx(add_note_slide_button_left_margin)
                 )
                 anim.addUpdateListener { valueAnimator: ValueAnimator ->
                     val fragment = wr.get() ?: return@addUpdateListener
                     val margin = valueAnimator.animatedValue as Int
                     UiUtil.setStartMargin(fragment.ui.slideView, margin)
                     fragment.ui.slideToSendEnabledTextView.alpha =
-                        1f - margin.toFloat() / (fragment.slideButtonContainerWidth - fragment.slideViewMarginStart - fragment.slideViewWidth)
+                        1f - margin.toFloat() / (fragment.slideButtonContainerWidth - fragment.dimenPx(
+                            add_note_slide_button_left_margin
+                        ) - fragment.dimenPx(add_note_slide_button_width))
                 }
                 anim.duration = Constants.UI.shortDurationMs
                 anim.interpolator = EasingInterpolator(Ease.QUART_IN_OUT)
@@ -549,14 +518,18 @@ class AddNoteFragment : Fragment(), TextWatcher, View.OnTouchListener {
                 // complete slide animation
                 val anim = ValueAnimator.ofInt(
                     slideButtonLastMarginStart,
-                    slideButtonContainerWidth - slideViewMarginStart - slideViewWidth
+                    slideButtonContainerWidth - dimenPx(add_note_slide_button_left_margin) - dimenPx(
+                        add_note_slide_button_width
+                    )
                 )
                 anim.addUpdateListener { valueAnimator: ValueAnimator ->
 
                     val margin = valueAnimator.animatedValue as Int
                     UiUtil.setStartMargin(fragment.ui.slideView, margin)
                     ui.slideToSendEnabledTextView.alpha =
-                        1f - margin.toFloat() / (fragment.slideButtonContainerWidth - fragment.slideViewMarginStart - fragment.slideViewWidth)
+                        1f - margin.toFloat() / (fragment.slideButtonContainerWidth -
+                                fragment.dimenPx(add_note_slide_button_left_margin) -
+                                fragment.dimenPx(add_note_slide_button_width))
                 }
                 anim.duration = Constants.UI.shortDurationMs
                 anim.interpolator = EasingInterpolator(Ease.QUART_IN_OUT)
@@ -642,7 +615,8 @@ class AddNoteFragment : Fragment(), TextWatcher, View.OnTouchListener {
     private fun restoreSlider() {
         // hide slide view
         val slideViewInitialMargin = UiUtil.getStartMargin(ui.slideView)
-        val slideViewMarginDelta = slideViewMarginStart - slideViewInitialMargin
+        val slideViewMarginDelta =
+            dimenPx(add_note_slide_button_left_margin) - slideViewInitialMargin
         val anim = ValueAnimator.ofFloat(
             1f,
             0f
@@ -678,9 +652,8 @@ class AddNoteFragment : Fragment(), TextWatcher, View.OnTouchListener {
     }
 
     private object AddNoteFragmentVisitor {
-        internal fun visit(fragment: AddNoteFragment, view: View) {
+        internal fun visit(fragment: AddNoteFragment) {
             fragment.requireActivity().appComponent.inject(fragment)
-            ButterKnife.bind(fragment, view)
         }
     }
 

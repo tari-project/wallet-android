@@ -44,13 +44,13 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.biometric.BiometricManager
 import androidx.biometric.BiometricPrompt
 import androidx.core.animation.addListener
-import butterknife.BindColor
-import butterknife.BindString
-import butterknife.ButterKnife
 import com.daasuu.ei.Ease
 import com.daasuu.ei.EasingInterpolator
 import com.orhanobut.logger.Logger
 import com.tari.android.wallet.R
+import com.tari.android.wallet.R.color.white
+import com.tari.android.wallet.R.string.auth_biometric_prompt
+import com.tari.android.wallet.R.string.auth_device_lock_code_prompt
 import com.tari.android.wallet.application.TariWalletApplication
 import com.tari.android.wallet.application.WalletState
 import com.tari.android.wallet.auth.AuthUtil
@@ -58,7 +58,9 @@ import com.tari.android.wallet.databinding.ActivityAuthBinding
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.infrastructure.Tracker
 import com.tari.android.wallet.ui.activity.home.HomeActivity
+import com.tari.android.wallet.ui.extension.color
 import com.tari.android.wallet.ui.extension.invisible
+import com.tari.android.wallet.ui.extension.string
 import com.tari.android.wallet.ui.extension.visible
 import com.tari.android.wallet.ui.util.UiUtil
 import com.tari.android.wallet.util.Constants
@@ -82,16 +84,6 @@ internal class AuthActivity : AppCompatActivity(), Animator.AnimatorListener {
     @Inject
     lateinit var sharedPrefsWrapper: SharedPrefsWrapper
 
-    @BindString(R.string.auth_biometric_prompt)
-    lateinit var biometricAuthPrompt: String
-
-    @BindString(R.string.auth_device_lock_code_prompt)
-    lateinit var deviceLockCodePrompt: String
-
-    @BindColor(R.color.white)
-    @JvmField
-    var white = 0
-
     private var continueIsPendingOnWalletState = false
 
     private lateinit var ui: ActivityAuthBinding
@@ -107,7 +99,7 @@ internal class AuthActivity : AppCompatActivity(), Animator.AnimatorListener {
     }
 
     private fun setupUi() {
-        UiUtil.setProgressBarColor(ui.progressBar, white)
+        UiUtil.setProgressBarColor(ui.progressBar, color(white))
         ui.progressBar.invisible()
         // call the animations
         val wr = WeakReference(this)
@@ -215,7 +207,9 @@ internal class AuthActivity : AppCompatActivity(), Animator.AnimatorListener {
         val biometricAuthAvailable =
             BiometricManager.from(applicationContext)
                 .canAuthenticate() == BiometricManager.BIOMETRIC_SUCCESS
-        val prompt = if (biometricAuthAvailable) biometricAuthPrompt else deviceLockCodePrompt
+        val prompt =
+            if (biometricAuthAvailable) string(auth_biometric_prompt)
+            else string(auth_device_lock_code_prompt)
         val promptInfo = BiometricPrompt.PromptInfo.Builder()
             .setTitle(getString(R.string.auth_title))
             .setSubtitle(prompt)
@@ -347,7 +341,6 @@ internal class AuthActivity : AppCompatActivity(), Animator.AnimatorListener {
 
         fun visit(activity: AuthActivity) {
             (activity.application as TariWalletApplication).appComponent.inject(activity)
-            ButterKnife.bind(activity)
         }
 
     }

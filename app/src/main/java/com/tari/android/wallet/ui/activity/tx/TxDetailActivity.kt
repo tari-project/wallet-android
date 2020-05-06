@@ -48,14 +48,13 @@ import android.widget.Button
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
-import butterknife.BindColor
-import butterknife.BindDimen
-import butterknife.BindString
-import butterknife.ButterKnife
 import com.daasuu.ei.Ease
 import com.daasuu.ei.EasingInterpolator
 import com.orhanobut.logger.Logger
 import com.tari.android.wallet.R
+import com.tari.android.wallet.R.color.*
+import com.tari.android.wallet.R.dimen.*
+import com.tari.android.wallet.R.string.*
 import com.tari.android.wallet.application.TariWalletApplication
 import com.tari.android.wallet.databinding.ActivityTxDetailBinding
 import com.tari.android.wallet.event.Event
@@ -63,6 +62,7 @@ import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.extension.txFormattedDate
 import com.tari.android.wallet.infrastructure.Tracker
 import com.tari.android.wallet.model.*
+import com.tari.android.wallet.model.Status.*
 import com.tari.android.wallet.service.TariWalletService
 import com.tari.android.wallet.service.WalletService
 import com.tari.android.wallet.ui.animation.collapseAndHideAnimation
@@ -97,96 +97,6 @@ internal class TxDetailActivity : AppCompatActivity(), ServiceConnection {
                 }
         }
     }
-
-    /**
-     * Emoji id chunk separator char.
-     */
-    @BindString(R.string.emoji_id_chunk_separator)
-    lateinit var emojiIdChunkSeparator: String
-
-    @JvmField
-    @BindString(R.string.tx_detail_payment_received)
-    var paymentReceived = ""
-
-    @JvmField
-    @BindString(R.string.tx_detail_payment_sent)
-    var paymentSent = ""
-
-    @JvmField
-    @BindString(R.string.tx_detail_pending_payment_received)
-    var pendingPaymentReceived = ""
-
-    @JvmField
-    @BindString(R.string.tx_detail_pending_payment_sent)
-    var pendingPaymentSent = ""
-
-    @JvmField
-    @BindString(R.string.common_from)
-    var paymentFrom = ""
-
-    @JvmField
-    @BindString(R.string.common_to)
-    var paymentTo = ""
-
-    @JvmField
-    @BindString(R.string.tx_detail_waiting_for_recipient)
-    var waitingForRecipient = ""
-
-    @JvmField
-    @BindString(R.string.tx_detail_waiting_for_sender_to_complete)
-    var waitingForSenderToComplete = ""
-
-    @JvmField
-    @BindString(R.string.tx_detail_broadcasting)
-    var txBroadcasting = ""
-
-    @JvmField
-    @BindString(R.string.tx_detail_cancellation_error_title)
-    var txCancellationErrorTitle = ""
-
-    @JvmField
-    @BindString(R.string.tx_detail_cancellation_error_description)
-    var txCancellationErrorDescription = ""
-
-    @JvmField
-    @BindColor(R.color.tx_detail_contact_name_label_text)
-    var contactLabelTxtGrayColor = 0
-
-    @JvmField
-    @BindColor(R.color.black)
-    var contactLabelTxtBlackColor = 0
-
-    @BindColor(R.color.black)
-    @JvmField
-    var blackColor = 0
-
-    @BindColor(R.color.light_gray)
-    @JvmField
-    var lightGrayColor = 0
-
-    @BindColor(R.color.purple)
-    @JvmField
-    var purpleColor = 0
-
-    @BindColor(R.color.tx_detail_cancel_tx)
-    @JvmField
-    var activeCancelColor = 0
-
-    @BindColor(R.color.disabled_cta)
-    @JvmField
-    var disabledCTAColor = 0
-
-    @BindDimen(R.dimen.add_amount_element_text_size)
-    @JvmField
-    var elementTextSize = 0f
-
-    @BindDimen(R.dimen.add_amount_gem_size)
-    @JvmField
-    var amountGemSize = 0f
-
-    @BindDimen(R.dimen.common_copy_emoji_id_button_visible_bottom_margin)
-    @JvmField
-    var copyEmojiIdButtonVisibleBottomMargin = 0
 
     @Inject
     lateinit var tracker: Tracker
@@ -286,8 +196,8 @@ internal class TxDetailActivity : AppCompatActivity(), ServiceConnection {
             disableCTAs()
         }
         dimmerViews = mutableListOf(ui.topDimmerView, ui.bottomDimmerView)
-        currentTextSize = elementTextSize
-        currentAmountGemSize = amountGemSize
+        currentTextSize = dimen(add_amount_element_text_size)
+        currentAmountGemSize = dimen(add_amount_gem_size)
         OverScrollDecoratorHelper.setUpOverScroll(ui.fullEmojiIdScrollView)
         emojiIdCopiedViewController = EmojiIdCopiedViewController(ui.emojiIdCopiedView)
         emojiIdSummaryController = EmojiIdSummaryViewController(ui.emojiIdSummaryView)
@@ -300,16 +210,16 @@ internal class TxDetailActivity : AppCompatActivity(), ServiceConnection {
             ui.editContactLabelTextView
         ).forEach {
             it.isEnabled = false
-            it.setTextColor(disabledCTAColor)
+            it.setTextColor(color(disabled_cta))
         }
     }
 
     private fun enableCTAs() {
         arrayOf<TextView>(ui.addContactButton, ui.cancelTxView, ui.editContactLabelTextView)
             .forEach { it.isEnabled = true }
-        ui.addContactButton.setTextColor(purpleColor)
-        ui.editContactLabelTextView.setTextColor(purpleColor)
-        ui.cancelTxView.setTextColor(activeCancelColor)
+        ui.addContactButton.setTextColor(color(purple))
+        ui.editContactLabelTextView.setTextColor(color(purple))
+        ui.cancelTxView.setTextColor(color(tx_detail_cancel_tx_cta))
     }
 
     private fun setUiCommands() {
@@ -339,9 +249,10 @@ internal class TxDetailActivity : AppCompatActivity(), ServiceConnection {
         ui.amountTextView.text = WalletUtil.amountFormatter.format(tx.amount.tariValue)
         ui.paymentStateTextView.text = when (tx) {
             is CompletedTx ->
-                if (tx.direction == Tx.Direction.INBOUND) paymentReceived else paymentSent
-            is PendingInboundTx -> pendingPaymentReceived
-            is PendingOutboundTx -> pendingPaymentSent
+                if (tx.direction == Tx.Direction.INBOUND) string(tx_detail_payment_received)
+                else string(tx_detail_payment_sent)
+            is PendingInboundTx -> string(tx_detail_pending_payment_received)
+            is PendingOutboundTx -> string(tx_detail_pending_payment_sent)
             else ->
                 throw IllegalArgumentException("Unexpected transaction type for transaction: ${tx.id}")
         }
@@ -355,15 +266,15 @@ internal class TxDetailActivity : AppCompatActivity(), ServiceConnection {
 
     private fun setFeeData(fee: MicroTari) {
         ui.txFeeGroup.visible()
-        ui.txFeeTextView.text = getString(
-            R.string.tx_details_fee_value,
+        ui.txFeeTextView.text = string(
+            tx_details_fee_value,
             WalletUtil.amountFormatter.format(fee.tariValue)
         )
     }
 
     private fun setTxMetaData(tx: Tx) {
         ui.dateTextView.text = Date(tx.timestamp.toLong() * 1000).txFormattedDate()
-        ui.txIdTextView.text = getString(R.string.tx_detail_transaction_id, tx.id)
+        ui.txIdTextView.text = string(tx_detail_transaction_id, tx.id)
         ui.txNoteTextView.text = tx.message
         if (tx.message.isBlank()) ui.noteLabelTextView.invisible()
     }
@@ -378,27 +289,30 @@ internal class TxDetailActivity : AppCompatActivity(), ServiceConnection {
             ui.contactContainerView.gone()
         }
         ui.fromTextView.text = when (tx) {
-            is CompletedTx -> if (tx.direction == Tx.Direction.INBOUND) paymentFrom else paymentTo
-            is PendingInboundTx -> paymentFrom
-            is PendingOutboundTx -> paymentTo
+            is CompletedTx ->
+                if (tx.direction == Tx.Direction.INBOUND) string(common_from)
+                else string(common_to)
+            is PendingInboundTx -> string(common_from)
+            is PendingOutboundTx -> string(common_to)
             else ->
                 throw IllegalArgumentException("Unexpected transaction type for transaction: ${tx.id}")
         }
         ui.fullEmojiIdTextView.text = EmojiUtil.getFullEmojiIdSpannable(
             tx.user.publicKey.emojiId,
-            emojiIdChunkSeparator, blackColor, lightGrayColor
+            string(emoji_id_chunk_separator), color(black), color(light_gray)
         )
         emojiIdSummaryController.display(tx.user.publicKey.emojiId)
     }
 
     private fun setTxStatusData(tx: Tx) {
         val statusText = when {
-            tx is PendingOutboundTx && tx.status == Status.PENDING -> waitingForRecipient
-            tx is PendingOutboundTx && (tx.status == Status.COMPLETED ||
-                    tx.status == Status.BROADCAST) -> txBroadcasting
-            tx is PendingInboundTx && (tx.status == Status.PENDING
-                    || tx.status == Status.COMPLETED) -> waitingForSenderToComplete
-            tx is PendingInboundTx -> txBroadcasting
+            tx is PendingOutboundTx && tx.status == PENDING ->
+                string(tx_detail_waiting_for_recipient)
+            tx is PendingOutboundTx && (tx.status == COMPLETED ||
+                    tx.status == BROADCAST) -> string(tx_detail_broadcasting)
+            tx is PendingInboundTx && (tx.status == PENDING ||
+                    tx.status == COMPLETED) -> string(tx_detail_waiting_for_sender_to_complete)
+            tx is PendingInboundTx -> string(tx_detail_broadcasting)
             else -> ""
         }
         ui.statusTextView.text = statusText
@@ -407,7 +321,7 @@ internal class TxDetailActivity : AppCompatActivity(), ServiceConnection {
         } else {
             ui.statusContainerView.visible()
         }
-        if (tx is PendingOutboundTx && tx.status == Status.PENDING) {
+        if (tx is PendingOutboundTx && tx.status == PENDING) {
             ui.cancelTxContainerView.setOnClickListener { onTransactionCancel() }
             ui.cancelTxContainerView.visible()
         } else if (ui.cancelTxContainerView.visibility == View.VISIBLE) {
@@ -525,7 +439,7 @@ internal class TxDetailActivity : AppCompatActivity(), ServiceConnection {
             ui.copyEmojiIdContainerView.alpha = value
             UiUtil.setBottomMargin(
                 ui.copyEmojiIdContainerView,
-                (copyEmojiIdButtonVisibleBottomMargin * value).toInt()
+                (dimenPx(common_copy_emoji_id_button_visible_bottom_margin) * value).toInt()
             )
         }
         copyEmojiIdButtonAnim.duration = Constants.UI.shortDurationMs
@@ -557,7 +471,7 @@ internal class TxDetailActivity : AppCompatActivity(), ServiceConnection {
             ui.copyEmojiIdContainerView.alpha = value
             UiUtil.setBottomMargin(
                 ui.copyEmojiIdContainerView,
-                (copyEmojiIdButtonVisibleBottomMargin * value).toInt()
+                (dimenPx(common_copy_emoji_id_button_visible_bottom_margin) * value).toInt()
             )
         }
         // emoji id anim
@@ -621,7 +535,7 @@ internal class TxDetailActivity : AppCompatActivity(), ServiceConnection {
                 updateContactAlias(alias)
                 setUIAlias(alias)
             }
-            ui.contactLabelTextView.setTextColor(contactLabelTxtGrayColor)
+            ui.contactLabelTextView.setTextColor(color(tx_detail_contact_name_label_text))
             return false
         }
         return true
@@ -630,7 +544,7 @@ internal class TxDetailActivity : AppCompatActivity(), ServiceConnection {
     private fun onTransactionCancel() {
         val service = this.walletService ?: return
         val tx = this.tx
-        if (tx is PendingOutboundTx && tx.direction == Tx.Direction.OUTBOUND && tx.status == Status.PENDING) {
+        if (tx is PendingOutboundTx && tx.direction == Tx.Direction.OUTBOUND && tx.status == PENDING) {
             showTxCancelDialog(service)
         } else {
             Logger.e(
@@ -662,7 +576,10 @@ internal class TxDetailActivity : AppCompatActivity(), ServiceConnection {
             finish()
             overridePendingTransition(R.anim.enter_from_left, R.anim.exit_to_right)
         } else {
-            ErrorDialog(this, txCancellationErrorTitle, txCancellationErrorDescription).show()
+            ErrorDialog(
+                this, string(tx_detail_cancellation_error_title),
+                string(tx_detail_cancellation_error_description)
+            ).show()
             Logger.e(
                 "Error occurred during TX cancellation.\nCancelled? $isCancelled" +
                         "\nError: $error"
@@ -720,7 +637,7 @@ internal class TxDetailActivity : AppCompatActivity(), ServiceConnection {
             ui.createContactEditText.setSelection(ui.createContactEditText.text?.length ?: 0)
             UiUtil.showKeyboard(this)
         }
-        ui.contactLabelTextView.setTextColor(contactLabelTxtBlackColor)
+        ui.contactLabelTextView.setTextColor(color(black))
     }
 
     /**
@@ -748,7 +665,6 @@ internal class TxDetailActivity : AppCompatActivity(), ServiceConnection {
     private object TxDetailActivityVisitor {
         internal fun visit(activity: TxDetailActivity) {
             (activity.application as TariWalletApplication).appComponent.inject(activity)
-            ButterKnife.bind(activity)
         }
     }
 

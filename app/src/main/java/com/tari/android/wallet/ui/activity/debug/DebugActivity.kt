@@ -34,13 +34,12 @@ package com.tari.android.wallet.ui.activity.debug
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import butterknife.BindString
-import butterknife.ButterKnife
 import com.google.android.material.tabs.TabLayoutMediator
 import com.tari.android.wallet.R
 import com.tari.android.wallet.application.TariWalletApplication
 import com.tari.android.wallet.databinding.ActivityDebugBinding
 import com.tari.android.wallet.ui.activity.debug.adapter.DebugViewPagerAdapter
+import com.tari.android.wallet.ui.extension.string
 
 /**
  * Contains debug fragments.
@@ -48,11 +47,6 @@ import com.tari.android.wallet.ui.activity.debug.adapter.DebugViewPagerAdapter
  * @author The Tari Development Team
  */
 internal class DebugActivity : AppCompatActivity() {
-
-    @BindString(R.string.debug_log_files_title)
-    lateinit var logFilesTitle: String
-    @BindString(R.string.debug_base_node_title)
-    lateinit var baseNodeTitle: String
 
     private lateinit var pagerAdapter: DebugViewPagerAdapter
 
@@ -67,8 +61,8 @@ internal class DebugActivity : AppCompatActivity() {
         ui.viewPager.offscreenPageLimit = 1
         TabLayoutMediator(ui.tabLayout, ui.viewPager) { tab, position ->
             tab.text = when (position) {
-                0 -> logFilesTitle
-                1 -> baseNodeTitle
+                0 -> string(R.string.debug_log_files_title)
+                1 -> string(R.string.debug_base_node_title)
                 else -> throw RuntimeException("Unexpected position: $position")
             }
         }.attach()
@@ -83,7 +77,6 @@ internal class DebugActivity : AppCompatActivity() {
     private object DebugActivityVisitor {
         internal fun visit(activity: DebugActivity) {
             (activity.application as TariWalletApplication).appComponent.inject(activity)
-            ButterKnife.bind(activity)
         }
     }
 
