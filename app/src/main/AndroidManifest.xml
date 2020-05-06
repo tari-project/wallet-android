@@ -25,6 +25,11 @@
         android:theme="@style/AppTheme"
         tools:replace="android:supportsRtl,android:allowBackup">
 
+        <!-- sentry -->
+        <meta-data
+            android:name="io.sentry.dsn"
+            android:value="${sentryPublicDSN}" />
+
         <!-- Tari foreground service -->
         <service
             android:name=".service.WalletService"
