@@ -50,12 +50,15 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
-import android.widget.*
+import android.widget.TextView
 import androidx.core.animation.addListener
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import butterknife.*
+import butterknife.BindColor
+import butterknife.BindDimen
+import butterknife.BindString
+import butterknife.ButterKnife
 import com.daasuu.ei.Ease
 import com.daasuu.ei.EasingInterpolator
 import com.tari.android.wallet.R
@@ -63,6 +66,7 @@ import com.tari.android.wallet.application.DeepLink
 import com.tari.android.wallet.application.DeepLink.Type.EMOJI_ID
 import com.tari.android.wallet.application.DeepLink.Type.PUBLIC_KEY_HEX
 import com.tari.android.wallet.databinding.FragmentAddRecipientBinding
+import com.tari.android.wallet.infrastructure.Tracker
 import com.tari.android.wallet.model.*
 import com.tari.android.wallet.service.TariWalletService
 import com.tari.android.wallet.ui.activity.qr.EXTRA_QR_DATA
@@ -77,8 +81,6 @@ import com.tari.android.wallet.util.*
 import com.tari.android.wallet.util.Constants.Wallet.emojiFormatterChunkSize
 import com.tari.android.wallet.util.Constants.Wallet.emojiIdLength
 import me.everything.android.ui.overscroll.OverScrollDecoratorHelper
-import org.matomo.sdk.Tracker
-import org.matomo.sdk.extra.TrackHelper
 import java.lang.ref.WeakReference
 import javax.inject.Inject
 import kotlin.math.min
@@ -228,10 +230,7 @@ class AddRecipientFragment(private val walletService: TariWalletService) : Fragm
             }
         }.start()
 
-        TrackHelper.track()
-            .screen("/home/send_tari/add_recipient")
-            .title("Send Tari - Add Recipient")
-            .with(tracker)
+        tracker.screen(path = "/home/send_tari/add_recipient", title = "Send Tari - Add Recipient")
     }
 
     private fun setupUi() {

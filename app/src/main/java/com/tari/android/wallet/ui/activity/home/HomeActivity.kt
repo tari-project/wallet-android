@@ -72,6 +72,7 @@ import com.tari.android.wallet.databinding.ActivityHomeBinding
 import com.tari.android.wallet.event.Event
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.extension.applyFontStyle
+import com.tari.android.wallet.infrastructure.Tracker
 import com.tari.android.wallet.model.*
 import com.tari.android.wallet.network.NetworkConnectionState
 import com.tari.android.wallet.service.TariWalletService
@@ -90,8 +91,6 @@ import com.tari.android.wallet.ui.fragment.send.FinalizeSendTxFragment.FailureRe
 import com.tari.android.wallet.ui.util.UiUtil
 import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.SharedPrefsWrapper
-import org.matomo.sdk.Tracker
-import org.matomo.sdk.extra.TrackHelper
 import java.lang.ref.WeakReference
 import javax.inject.Inject
 import kotlin.math.max
@@ -259,10 +258,7 @@ internal class HomeActivity : AppCompatActivity(),
         setupUi()
         subscribeToEventBus()
         setupShakeDetector()
-        TrackHelper.track()
-            .screen("/home")
-            .title("Home - Transaction List")
-            .with(tracker)
+        tracker.screen("/home", "Home - Transaction List")
     }
 
     /**

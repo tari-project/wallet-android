@@ -33,10 +33,13 @@
 package com.tari.android.wallet.di
 
 import android.content.Context
+import com.tari.android.wallet.BuildConfig
+import com.tari.android.wallet.infrastructure.ConsoleLogTracker
+import com.tari.android.wallet.infrastructure.MatomoTracker
+import com.tari.android.wallet.infrastructure.Tracker
 import dagger.Module
 import dagger.Provides
 import org.matomo.sdk.Matomo
-import org.matomo.sdk.Tracker
 import org.matomo.sdk.TrackerBuilder
 import javax.inject.Singleton
 
@@ -57,11 +60,11 @@ internal class TrackerModule {
 
     @Provides
     @Singleton
-    fun provideTracker(context: Context): Tracker {
-        val matomo = Matomo.getInstance(context)
-        val tracker = TrackerBuilder.createDefault(matomoUrl, matomoSiteId).build(matomo)
-        tracker.dispatchInterval = 0
-        return tracker
-    }
-
+    fun provideTracker(context: Context): Tracker =
+        if (BuildConfig.DEBUG) ConsoleLogTracker()
+        else MatomoTracker(
+            TrackerBuilder.createDefault(matomoUrl, matomoSiteId)
+                .build(Matomo.getInstance(context))
+                .apply { dispatchInterval = 0 }
+        )
 }

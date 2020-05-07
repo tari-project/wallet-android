@@ -42,7 +42,10 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.animation.addListener
 import androidx.fragment.app.Fragment
-import butterknife.*
+import butterknife.BindColor
+import butterknife.BindDimen
+import butterknife.BindString
+import butterknife.ButterKnife
 import com.daasuu.ei.Ease
 import com.daasuu.ei.EasingInterpolator
 import com.tari.android.wallet.R
@@ -52,21 +55,16 @@ import com.tari.android.wallet.di.ConfigModule
 import com.tari.android.wallet.di.WalletModule
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.extension.applyFontStyle
+import com.tari.android.wallet.infrastructure.Tracker
 import com.tari.android.wallet.ui.component.CustomFont
 import com.tari.android.wallet.ui.component.EmojiIdSummaryViewController
 import com.tari.android.wallet.ui.extension.*
-import com.tari.android.wallet.ui.extension.appComponent
-import com.tari.android.wallet.ui.extension.gone
-import com.tari.android.wallet.ui.extension.invisible
-import com.tari.android.wallet.ui.extension.visible
 import com.tari.android.wallet.ui.util.UiUtil
 import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.Constants.UI.CreateEmojiId
 import com.tari.android.wallet.util.EmojiUtil
 import com.tari.android.wallet.util.SharedPrefsWrapper
 import me.everything.android.ui.overscroll.OverScrollDecoratorHelper
-import org.matomo.sdk.Tracker
-import org.matomo.sdk.extra.TrackHelper
 import java.lang.ref.WeakReference
 import javax.inject.Inject
 import javax.inject.Named
@@ -157,10 +155,7 @@ internal class CreateWalletFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         CreateWalletFragmentVisitor.visit(this, view)
         setupUi()
-        TrackHelper.track()
-            .screen("/onboarding/create_wallet")
-            .title("Onboarding - Create Wallet")
-            .with(tracker)
+        tracker.screen(path = "/onboarding/create_wallet", title = "Onboarding - Create Wallet")
     }
 
     override fun onDestroyView() {

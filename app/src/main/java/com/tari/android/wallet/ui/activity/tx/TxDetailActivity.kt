@@ -61,6 +61,7 @@ import com.tari.android.wallet.databinding.ActivityTxDetailBinding
 import com.tari.android.wallet.event.Event
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.extension.txFormattedDate
+import com.tari.android.wallet.infrastructure.Tracker
 import com.tari.android.wallet.model.*
 import com.tari.android.wallet.service.TariWalletService
 import com.tari.android.wallet.service.WalletService
@@ -76,8 +77,6 @@ import com.tari.android.wallet.util.EmojiUtil
 import com.tari.android.wallet.util.SharedPrefsWrapper
 import com.tari.android.wallet.util.WalletUtil
 import me.everything.android.ui.overscroll.OverScrollDecoratorHelper
-import org.matomo.sdk.Tracker
-import org.matomo.sdk.extra.TrackHelper
 import java.util.*
 import javax.inject.Inject
 
@@ -223,10 +222,7 @@ internal class TxDetailActivity : AppCompatActivity(), ServiceConnection {
             if (savedInstanceState == null) intent.getParcelableExtra(TX_DETAIL_EXTRA_KEY) as Tx
             else savedInstanceState.getParcelable(TX_DETAIL_EXTRA_KEY)!!
         setupUi()
-        TrackHelper.track()
-            .screen("/home/tx_details")
-            .title("Transaction Details")
-            .with(tracker)
+        tracker.screen(path = "/home/tx_details", title = "Transaction Details")
     }
 
     override fun onStart() {

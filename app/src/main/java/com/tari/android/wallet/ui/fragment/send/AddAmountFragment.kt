@@ -41,16 +41,22 @@ import android.os.AsyncTask
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.view.*
-import android.widget.*
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-import butterknife.*
+import butterknife.BindColor
+import butterknife.BindDimen
+import butterknife.BindString
+import butterknife.ButterKnife
 import com.daasuu.ei.Ease
 import com.daasuu.ei.EasingInterpolator
 import com.tari.android.wallet.R
 import com.tari.android.wallet.databinding.FragmentAddAmountBinding
 import com.tari.android.wallet.extension.remap
+import com.tari.android.wallet.infrastructure.Tracker
 import com.tari.android.wallet.model.*
 import com.tari.android.wallet.service.TariWalletService
 import com.tari.android.wallet.ui.component.EmojiIdCopiedViewController
@@ -62,8 +68,6 @@ import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.EmojiUtil
 import com.tari.android.wallet.util.WalletUtil
 import me.everything.android.ui.overscroll.OverScrollDecoratorHelper
-import org.matomo.sdk.Tracker
-import org.matomo.sdk.extra.TrackHelper
 import java.lang.ref.WeakReference
 import java.math.BigInteger
 import javax.inject.Inject
@@ -209,11 +213,7 @@ class AddAmountFragment(private val walletService: TariWalletService) : Fragment
         super.onViewCreated(view, savedInstanceState)
         AddAmountFragmentVisitor.visit(this, view)
         setupUi()
-
-        TrackHelper.track()
-            .screen("/home/send_tari/add_amount")
-            .title("Send Tari - Add Amount")
-            .with(tracker)
+        tracker.screen(path = "/home/send_tari/add_amount", title = "Send Tari - Add Amount")
     }
 
     private fun setupUi() {
