@@ -1,5 +1,12 @@
-## [v0.1.9-jniLibs-0.9.1] - 2020-04-30
+# Tari Aurora Changelog
+
+## [v0.1.11-jniLibs-0.9.2] - 2020-05-07
 * In push notification titles, if the sender is in your address list, you'll see their alias instead of the emoji ID
+
+* Implement "Cancel transaction" CTA (TX list updates, push notifications and TX details statuses is yet to come)
+* Add sentry crash reporting
+* Fix BigDecimal rounding bug, making it look like receivers were paying fees.
+* Other miscellaneous bug fixes
 * Now you can shake device to go to the debug screen.
 * Fixes foreground service notification click behavior. If you tap on the notification, you'll be taken directly to the app.
 * Implement a less strict internet connectivity check and fix the copy for one of the connection error dialogs.
@@ -9,8 +16,7 @@
 * Fix a crash on "not authenticated state" on home activity creation
 * Fix a home activity memory leak
 
-## [v0.1.8-jniLibs-0.9.0] - 2020-04-30
-# Tari Aurora Changelog
+## [v0.1.9-jniLibs-0.9.1] - 2020-04-30
 An issue with nodes not deduping messages properly has been fixed.
 This is a network-breaking change. Older versions will no longer be able to
 communicate with the network.
