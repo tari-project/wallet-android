@@ -44,15 +44,19 @@ import android.text.TextWatcher
 import android.view.*
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
-import android.widget.*
+import android.widget.RelativeLayout
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-import butterknife.*
+import butterknife.BindColor
+import butterknife.BindDimen
+import butterknife.BindString
+import butterknife.ButterKnife
 import com.daasuu.ei.Ease
 import com.daasuu.ei.EasingInterpolator
 import com.tari.android.wallet.R
 import com.tari.android.wallet.databinding.FragmentAddNoteBinding
 import com.tari.android.wallet.event.EventBus
+import com.tari.android.wallet.infrastructure.Tracker
 import com.tari.android.wallet.model.Contact
 import com.tari.android.wallet.model.MicroTari
 import com.tari.android.wallet.model.User
@@ -64,8 +68,6 @@ import com.tari.android.wallet.ui.util.UiUtil
 import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.EmojiUtil
 import me.everything.android.ui.overscroll.OverScrollDecoratorHelper
-import org.matomo.sdk.Tracker
-import org.matomo.sdk.extra.TrackHelper
 import java.lang.ref.WeakReference
 import javax.inject.Inject
 
@@ -214,10 +216,7 @@ class AddNoteFragment : Fragment(), TextWatcher, View.OnTouchListener {
         ui.dimmerView.setOnClickListener { onEmojiIdDimmerClicked() }
         ui.copyEmojiIdButton.setOnClickListener { onCopyEmojiIdButtonClicked(it) }
 
-        TrackHelper.track()
-            .screen("/home/send_tari/add_note")
-            .title("Send Tari - Add Note")
-            .with(tracker)
+        tracker.screen(path = "/home/send_tari/add_note", title = "Send Tari - Add Note")
     }
 
     override fun onAttach(context: Context) {
@@ -629,9 +628,7 @@ class AddNoteFragment : Fragment(), TextWatcher, View.OnTouchListener {
 
     private fun continueToFinalizeSendTx() {
         // track event
-        TrackHelper.track()
-            .event("Transaction", "Transaction Initiated")
-            .with(tracker)
+        tracker.event(category = "Transaction", action = "Transaction Initiated")
         // notify listener (i.e. activity)
         listenerWR.get()?.continueToFinalizeSendTx(
             this,

@@ -44,14 +44,12 @@ import com.orhanobut.logger.Logger
 import com.tari.android.wallet.di.*
 import com.tari.android.wallet.event.Event
 import com.tari.android.wallet.event.EventBus
+import com.tari.android.wallet.infrastructure.Tracker
 import com.tari.android.wallet.network.NetworkConnectionStateReceiver
 import com.tari.android.wallet.notification.NotificationHelper
 import com.tari.android.wallet.util.SharedPrefsWrapper
 import com.tari.android.wallet.util.WalletUtil
 import net.danlew.android.joda.JodaTimeAndroid
-import org.matomo.sdk.Tracker
-import org.matomo.sdk.extra.DownloadTracker
-import org.matomo.sdk.extra.TrackHelper
 import javax.inject.Inject
 import javax.inject.Named
 
@@ -123,9 +121,7 @@ internal class TariWalletApplication : Application(), LifecycleObserver {
 
         registerReceiver(connectionStateReceiver, connectionStateReceiver.intentFilter)
 
-        TrackHelper.track().download().identifier(
-            DownloadTracker.Extra.ApkChecksum(this)
-        ).with(tracker)
+        tracker.download(this)
     }
 
     private fun initDagger(app: TariWalletApplication): ApplicationComponent =

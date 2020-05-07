@@ -54,6 +54,7 @@ import com.tari.android.wallet.R
 import com.tari.android.wallet.databinding.FragmentFinalizeSendTxBinding
 import com.tari.android.wallet.event.Event
 import com.tari.android.wallet.event.EventBus
+import com.tari.android.wallet.infrastructure.Tracker
 import com.tari.android.wallet.model.*
 import com.tari.android.wallet.network.NetworkConnectionState
 import com.tari.android.wallet.service.TariWalletService
@@ -66,8 +67,6 @@ import com.tari.android.wallet.ui.util.UiUtil.getResourceUri
 import com.tari.android.wallet.util.Constants
 import org.joda.time.DateTime
 import org.joda.time.Seconds
-import org.matomo.sdk.Tracker
-import org.matomo.sdk.extra.TrackHelper
 import java.lang.ref.WeakReference
 import javax.inject.Inject
 
@@ -217,10 +216,7 @@ class FinalizeSendTxFragment(private val walletService: TariWalletService) : Fra
         checkConnectionStatus()
 
         subscribeToEventBus()
-        TrackHelper.track()
-            .screen("/home/send_tari/finalize")
-            .title("Send Tari - Finalize")
-            .with(tracker)
+        tracker.screen(path = "/home/send_tari/finalize", title = "Send Tari - Finalize")
     }
 
     override fun onAttach(context: Context) {
@@ -537,9 +533,7 @@ class FinalizeSendTxFragment(private val walletService: TariWalletService) : Fra
         Logger.d("Direct Send completed with result: $success.")
         if (success) {
             // track event
-            TrackHelper.track()
-                .event("Transaction", "Transaction Accepted - Synchronous")
-                .with(tracker)
+            tracker.event(category = "Transaction", action = "Transaction Accepted - Synchronous")
             // progress state
             switchToNextProgressStateOnProgressAnimComplete = true
             EventBus.unsubscribe(this)
@@ -557,9 +551,7 @@ class FinalizeSendTxFragment(private val walletService: TariWalletService) : Fra
         Logger.d("Store and forward send completed with result: $success.")
         if (success) {
             // track event
-            TrackHelper.track()
-                .event("Transaction", "Transaction Stored")
-                .with(tracker)
+            tracker.event(category = "Transaction", action = "Transaction Stored")
             // progress state
             switchToNextProgressStateOnProgressAnimComplete = true
             EventBus.unsubscribe(this)
@@ -587,9 +579,7 @@ class FinalizeSendTxFragment(private val walletService: TariWalletService) : Fra
             FailureReason.BASE_NODE_CONNECTION_ERROR -> "Transaction Failed - Node Issue"
             FailureReason.SEND_ERROR -> "Transaction Failed - Node Issue"
         }
-        TrackHelper.track()
-            .event("Transaction", trackerEvent)
-            .with(tracker)
+        tracker.event(category = "Transaction", action = trackerEvent)
 
         // fade out text and progress
         val fadeOutAnim = ValueAnimator.ofFloat(1f, 0f)

@@ -41,13 +41,17 @@ import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.animation.addListener
 import androidx.core.content.ContextCompat
-import butterknife.*
+import butterknife.BindColor
+import butterknife.BindDimen
+import butterknife.BindString
+import butterknife.ButterKnife
 import com.daasuu.ei.Ease
 import com.daasuu.ei.EasingInterpolator
+import com.tari.android.wallet.R
 import com.tari.android.wallet.application.TariWalletApplication
 import com.tari.android.wallet.databinding.ActivityWalletInfoBinding
-import com.tari.android.wallet.R
 import com.tari.android.wallet.extension.applyFontStyle
+import com.tari.android.wallet.infrastructure.Tracker
 import com.tari.android.wallet.ui.component.CustomFont
 import com.tari.android.wallet.ui.component.EmojiIdCopiedViewController
 import com.tari.android.wallet.ui.component.EmojiIdSummaryViewController
@@ -59,8 +63,6 @@ import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.EmojiUtil
 import com.tari.android.wallet.util.SharedPrefsWrapper
 import com.tari.android.wallet.util.WalletUtil
-import org.matomo.sdk.Tracker
-import org.matomo.sdk.extra.TrackHelper
 import javax.inject.Inject
 
 /**
@@ -111,11 +113,7 @@ internal class WalletInfoActivity : AppCompatActivity() {
         ui = ActivityWalletInfoBinding.inflate(layoutInflater).apply { setContentView(root) }
         WalletInfoActivityVisitor.visit(this)
         setupUi()
-
-        TrackHelper.track()
-            .screen("/home/profile")
-            .title("Profile - Wallet Info")
-            .with(tracker)
+        tracker.screen(path = "/home/profile", title = "Profile - Wallet Info")
     }
 
     private fun setupUi() {

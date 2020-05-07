@@ -44,7 +44,10 @@ import androidx.biometric.BiometricManager.BIOMETRIC_SUCCESS
 import androidx.biometric.BiometricPrompt
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-import butterknife.*
+import butterknife.BindColor
+import butterknife.BindDimen
+import butterknife.BindString
+import butterknife.ButterKnife
 import com.daasuu.ei.Ease
 import com.daasuu.ei.EasingInterpolator
 import com.orhanobut.logger.Logger
@@ -53,6 +56,7 @@ import com.tari.android.wallet.application.WalletState
 import com.tari.android.wallet.auth.AuthUtil
 import com.tari.android.wallet.databinding.FragmentLocalAuthBinding
 import com.tari.android.wallet.event.EventBus
+import com.tari.android.wallet.infrastructure.Tracker
 import com.tari.android.wallet.ui.extension.appComponent
 import com.tari.android.wallet.ui.extension.doOnGlobalLayout
 import com.tari.android.wallet.ui.extension.invisible
@@ -60,8 +64,6 @@ import com.tari.android.wallet.ui.extension.visible
 import com.tari.android.wallet.ui.util.UiUtil
 import com.tari.android.wallet.util.Constants.UI.Auth
 import com.tari.android.wallet.util.SharedPrefsWrapper
-import org.matomo.sdk.Tracker
-import org.matomo.sdk.extra.TrackHelper
 import javax.inject.Inject
 
 /**
@@ -126,10 +128,10 @@ internal class LocalAuthFragment : Fragment() {
         setDeviceAuthType()
         setupUi()
         ui.rootView.doOnGlobalLayout(this::playStartUpAnim)
-        TrackHelper.track()
-            .screen("/onboarding/enable_local_auth")
-            .title("Onboarding - Enable Local Authentication")
-            .with(tracker)
+        tracker.screen(
+            path = "/onboarding/enable_local_auth",
+            title = "Onboarding - Enable Local Authentication"
+        )
     }
 
     override fun onAttach(context: Context) {

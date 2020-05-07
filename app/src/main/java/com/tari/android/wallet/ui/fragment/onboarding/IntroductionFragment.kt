@@ -43,26 +43,24 @@ import android.text.method.LinkMovementMethod
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.*
+import android.widget.TextView
 import androidx.fragment.app.Fragment
-import butterknife.*
+import butterknife.BindColor
+import butterknife.BindDimen
+import butterknife.BindString
+import butterknife.ButterKnife
 import com.daasuu.ei.Ease
 import com.daasuu.ei.EasingInterpolator
 import com.tari.android.wallet.R
 import com.tari.android.wallet.databinding.FragmentIntroductionBinding
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.extension.applyURLStyle
+import com.tari.android.wallet.infrastructure.Tracker
 import com.tari.android.wallet.ui.extension.*
-import com.tari.android.wallet.ui.extension.appComponent
-import com.tari.android.wallet.ui.extension.gone
-import com.tari.android.wallet.ui.extension.invisible
-import com.tari.android.wallet.ui.extension.visible
 import com.tari.android.wallet.ui.util.UiUtil
 import com.tari.android.wallet.ui.util.UiUtil.getResourceUri
 import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.SharedPrefsWrapper
-import org.matomo.sdk.Tracker
-import org.matomo.sdk.extra.TrackHelper
 import java.lang.ref.WeakReference
 import javax.inject.Inject
 import kotlin.math.min
@@ -124,10 +122,7 @@ internal class IntroductionFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         IntroductionFragmentVisitor.visit(this, view)
         setupUi()
-        TrackHelper.track()
-            .screen("/onboarding/introduction")
-            .title("Onboarding - Introduction")
-            .with(tracker)
+        tracker.screen(path = "/onboarding/introduction", title = "Onboarding - Introduction")
     }
 
     override fun onDestroyView() {

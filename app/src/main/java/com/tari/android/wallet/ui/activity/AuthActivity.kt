@@ -32,8 +32,10 @@
  */
 package com.tari.android.wallet.ui.activity
 
-import android.animation.*
-import android.content.Context
+import android.animation.Animator
+import android.animation.AnimatorSet
+import android.animation.ObjectAnimator
+import android.animation.ValueAnimator
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
@@ -54,14 +56,13 @@ import com.tari.android.wallet.application.WalletState
 import com.tari.android.wallet.auth.AuthUtil
 import com.tari.android.wallet.databinding.ActivityAuthBinding
 import com.tari.android.wallet.event.EventBus
+import com.tari.android.wallet.infrastructure.Tracker
 import com.tari.android.wallet.ui.activity.home.HomeActivity
 import com.tari.android.wallet.ui.extension.invisible
 import com.tari.android.wallet.ui.extension.visible
 import com.tari.android.wallet.ui.util.UiUtil
 import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.SharedPrefsWrapper
-import org.matomo.sdk.Tracker
-import org.matomo.sdk.extra.TrackHelper
 import java.lang.ref.WeakReference
 import java.util.concurrent.Executors
 import javax.inject.Inject
@@ -76,14 +77,14 @@ internal class AuthActivity : AppCompatActivity(), Animator.AnimatorListener {
     private lateinit var biometricPrompt: BiometricPrompt
 
     @Inject
-    lateinit var context: Context
-    @Inject
     lateinit var tracker: Tracker
+
     @Inject
     lateinit var sharedPrefsWrapper: SharedPrefsWrapper
 
     @BindString(R.string.auth_biometric_prompt)
     lateinit var biometricAuthPrompt: String
+
     @BindString(R.string.auth_device_lock_code_prompt)
     lateinit var deviceLockCodePrompt: String
 
@@ -102,10 +103,7 @@ internal class AuthActivity : AppCompatActivity(), Animator.AnimatorListener {
         AuthActivityVisitor.visit(this)
         EventBus.subscribeToWalletState(this, this::onWalletStateChanged)
         setupUi()
-        TrackHelper.track()
-            .screen("/local_auth")
-            .title("Local Authentication")
-            .with(tracker)
+        tracker.screen(path = "/local_auth", title = "Local Authentication")
     }
 
     private fun setupUi() {
@@ -215,7 +213,8 @@ internal class AuthActivity : AppCompatActivity(), Animator.AnimatorListener {
             })
 
         val biometricAuthAvailable =
-            BiometricManager.from(context).canAuthenticate() == BiometricManager.BIOMETRIC_SUCCESS
+            BiometricManager.from(applicationContext)
+                .canAuthenticate() == BiometricManager.BIOMETRIC_SUCCESS
         val prompt = if (biometricAuthAvailable) biometricAuthPrompt else deviceLockCodePrompt
         val promptInfo = BiometricPrompt.PromptInfo.Builder()
             .setTitle(getString(R.string.auth_title))
