@@ -36,12 +36,12 @@ import com.tari.android.wallet.application.TariWalletApplication
 import com.tari.android.wallet.service.BootDeviceReceiver
 import com.tari.android.wallet.service.WalletService
 import com.tari.android.wallet.ui.activity.AuthActivity
-import com.tari.android.wallet.ui.activity.qr.QRScannerActivity
 import com.tari.android.wallet.ui.activity.SplashActivity
 import com.tari.android.wallet.ui.activity.debug.DebugActivity
 import com.tari.android.wallet.ui.activity.home.HomeActivity
 import com.tari.android.wallet.ui.activity.onboarding.OnboardingFlowActivity
 import com.tari.android.wallet.ui.activity.profile.WalletInfoActivity
+import com.tari.android.wallet.ui.activity.qr.QRScannerActivity
 import com.tari.android.wallet.ui.activity.send.SendTariActivity
 import com.tari.android.wallet.ui.activity.tx.TxDetailActivity
 import com.tari.android.wallet.ui.fragment.debug.BaseNodeConfigFragment
@@ -66,8 +66,8 @@ import javax.inject.Singleton
     modules = [
         ApplicationModule::class,
         WalletModule::class,
-        RESTModule::class,
         ConfigModule::class,
+        ServiceModule::class,
         TorModule::class,
         TrackerModule::class
     ]
@@ -77,7 +77,7 @@ internal interface ApplicationComponent {
     /**
      * Application.
      */
-    fun inject(appplication: TariWalletApplication)
+    fun inject(application: TariWalletApplication)
 
     /**
      * Activities.

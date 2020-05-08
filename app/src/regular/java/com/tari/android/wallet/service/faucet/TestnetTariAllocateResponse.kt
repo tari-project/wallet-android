@@ -30,23 +30,19 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.tari.android.wallet.service.model
+package com.tari.android.wallet.service.faucet
 
 import com.google.gson.annotations.SerializedName
 
 /**
- * Push notification request body.
+ * Allocate testnet tari request and response class.
+ *
+ * @author The Tari Development Team
  */
-data class PushNotificationRequestBody constructor(
-    @SerializedName("from_pub_key") val senderPublicKeyHex: String,
-    val signature: String,
-    @SerializedName("public_nonce") val publicNonce: String
-)
 
-/**
- * Push notification response body.
- */
-data class PushNotificationResponseBody constructor(
-    @SerializedName("sent")
-    val sent: Boolean
+data class TestnetTariAllocateResponse constructor(
+    @SerializedName("return_wallet_id")
+    val returnWalletId: String,
+    val key: String,
+    val value: String
 )
