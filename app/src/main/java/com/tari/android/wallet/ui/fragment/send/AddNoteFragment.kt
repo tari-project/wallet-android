@@ -171,6 +171,10 @@ class AddNoteFragment : Fragment(), TextWatcher, View.OnTouchListener {
         ui.emojiIdSummaryContainerView.setOnClickListener { emojiIdClicked() }
         ui.dimmerView.setOnClickListener { onEmojiIdDimmerClicked() }
         ui.copyEmojiIdButton.setOnClickListener { onCopyEmojiIdButtonClicked(it) }
+        ui.copyEmojiIdButton.setOnLongClickListener { copyEmojiIdButton ->
+            onCopyEmojiIdButtonLongClicked(copyEmojiIdButton)
+            true
+        }
 
         tracker.screen(path = "/home/send_tari/add_note", title = "Send Tari - Add Note")
     }
@@ -368,14 +372,13 @@ class AddNoteFragment : Fragment(), TextWatcher, View.OnTouchListener {
         )
     }
 
-    private fun onCopyEmojiIdButtonClicked(view: View) {
-        UiUtil.temporarilyDisableClick(view)
+    private fun completeCopyEmojiId(clipboardString: String) {
         ui.dimmerView.isClickable = false
         val mActivity = activity ?: return
         val clipBoard = ContextCompat.getSystemService(mActivity, ClipboardManager::class.java)
         val clipboardData = ClipData.newPlainText(
-            "Tari Wallet Emoji Id",
-            recipientUser.publicKey.emojiId
+            "Tari Wallet Identity",
+            clipboardString
         )
         clipBoard?.setPrimaryClip(clipboardData)
         emojiIdCopiedViewController.showEmojiIdCopiedAnim(fadeOutOnEnd = true) {
@@ -385,6 +388,16 @@ class AddNoteFragment : Fragment(), TextWatcher, View.OnTouchListener {
         val copyEmojiIdButtonAnim = ui.copyEmojiIdButtonContainerView.animate().alpha(0f)
         copyEmojiIdButtonAnim.duration = Constants.UI.xShortDurationMs
         copyEmojiIdButtonAnim.start()
+    }
+
+    private fun onCopyEmojiIdButtonClicked(view: View) {
+        UiUtil.temporarilyDisableClick(view)
+        completeCopyEmojiId(recipientUser.publicKey.emojiId)
+    }
+
+    private fun onCopyEmojiIdButtonLongClicked(view: View) {
+        UiUtil.temporarilyDisableClick(view)
+        completeCopyEmojiId(recipientUser.publicKey.hexString)
     }
 
     @SuppressLint("ClickableViewAccessibility")

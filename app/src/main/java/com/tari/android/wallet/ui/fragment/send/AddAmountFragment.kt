@@ -202,6 +202,10 @@ class AddAmountFragment(private val walletService: TariWalletService) : Fragment
         ui.emojiIdSummaryContainerView.setOnClickListener { emojiIdClicked() }
         ui.dimmerView.setOnClickListener { onEmojiIdDimmerClicked() }
         ui.copyEmojiIdButton.setOnClickListener { onCopyEmojiIdButtonClicked(it) }
+        ui.copyEmojiIdButton.setOnLongClickListener { copyEmojiIdButton ->
+            onCopyEmojiIdButtonLongClicked(copyEmojiIdButton)
+            true
+        }
         ui.txFeeDescTextView.setOnClickListener { onFeeViewClick() }
         ui.deleteButton.setOnClickListener { deleteButtonClicked() }
         ui.continueButton.setOnClickListener { continueButtonClicked() }
@@ -399,14 +403,13 @@ class AddAmountFragment(private val walletService: TariWalletService) : Fragment
         hideFullEmojiId(animated = true)
     }
 
-    private fun onCopyEmojiIdButtonClicked(view: View) {
-        UiUtil.temporarilyDisableClick(view)
+    private fun completeCopyEmojiId(clipboardString: String) {
         ui.dimmerView.isClickable = false
         val mActivity = activity ?: return
         val clipBoard = ContextCompat.getSystemService(mActivity, ClipboardManager::class.java)
         val clipboardData = ClipData.newPlainText(
-            "Tari Wallet Emoji Id",
-            recipientUser.publicKey.emojiId
+            "Tari Wallet Identity",
+            clipboardString
         )
         clipBoard?.setPrimaryClip(clipboardData)
         emojiIdCopiedViewController.showEmojiIdCopiedAnim(fadeOutOnEnd = true) {
@@ -416,6 +419,16 @@ class AddAmountFragment(private val walletService: TariWalletService) : Fragment
         val copyEmojiIdButtonAnim = ui.copyEmojiIdButtonContainerView.animate().alpha(0f)
         copyEmojiIdButtonAnim.duration = Constants.UI.xShortDurationMs
         copyEmojiIdButtonAnim.start()
+    }
+
+    private fun onCopyEmojiIdButtonClicked(view: View) {
+        UiUtil.temporarilyDisableClick(view)
+        completeCopyEmojiId(recipientUser.publicKey.emojiId)
+    }
+
+    private fun onCopyEmojiIdButtonLongClicked(view: View) {
+        UiUtil.temporarilyDisableClick(view)
+        completeCopyEmojiId(recipientUser.publicKey.hexString)
     }
 
     private fun onFeeViewClick() {

@@ -120,6 +120,10 @@ internal class WalletInfoActivity : AppCompatActivity() {
 
         ui.emojiIdSummaryContainerView.setOnClickListener(this::onEmojiSummaryClicked)
         ui.copyEmojiIdButton.setOnClickListener(this::onCopyEmojiIdButtonClicked)
+        ui.copyEmojiIdButton.setOnLongClickListener { view ->
+            onCopyEmojiIdButtonLongClicked(view)
+            true
+        }
         ui.closeButton.setOnClickListener { this.onCloseButtonClick() }
         dimmerViews.forEach { it.setOnClickListener { this.hideFullEmojiId() } }
     }
@@ -238,13 +242,12 @@ internal class WalletInfoActivity : AppCompatActivity() {
         })
     }
 
-    private fun onCopyEmojiIdButtonClicked(view: View) {
-        UiUtil.temporarilyDisableClick(view)
+    private fun completeCopy(clipboardString: String) {
         dimmerViews.forEach { dimmerView -> dimmerView.isClickable = false }
         val clipBoard = ContextCompat.getSystemService(this, ClipboardManager::class.java)
         val clipboardData = ClipData.newPlainText(
-            "Tari Wallet Emoji Id",
-            sharedPrefsWrapper.emojiId!!
+            "Tari Wallet Identity",
+            clipboardString
         )
         clipBoard?.setPrimaryClip(clipboardData)
         emojiIdCopiedViewController.showEmojiIdCopiedAnim(fadeOutOnEnd = true) {
@@ -253,6 +256,16 @@ internal class WalletInfoActivity : AppCompatActivity() {
         val copyEmojiIdButtonAnim = ui.copyEmojiIdContainerView.animate().alpha(0f)
         copyEmojiIdButtonAnim.duration = Constants.UI.xShortDurationMs
         copyEmojiIdButtonAnim.start()
+    }
+
+    private fun onCopyEmojiIdButtonClicked(view: View) {
+        UiUtil.temporarilyDisableClick(view)
+        completeCopy(sharedPrefsWrapper.emojiId!!)
+    }
+
+    private fun onCopyEmojiIdButtonLongClicked(view: View) {
+        UiUtil.temporarilyDisableClick(view)
+        completeCopy(sharedPrefsWrapper.publicKeyHexString!!)
     }
 
     private fun onCloseButtonClick() {
