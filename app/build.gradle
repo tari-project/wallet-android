@@ -1,8 +1,18 @@
+import java.nio.file.Files
+import java.nio.file.Paths
+
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
 
+final File secretPropertiesFile = project.rootProject.file("secret.properties")
+if (!secretPropertiesFile.exists()) {
+    Files.copy(
+            Paths.get(project.rootProject.file("secret-example.properties").absolutePath),
+            Paths.get(secretPropertiesFile.absolutePath),
+    )
+}
 Properties properties = new Properties()
 properties.load(project.rootProject.file("secret.properties").newDataInputStream())
 def sentryPublicDSN = properties.getProperty('sentry.public_dsn')
