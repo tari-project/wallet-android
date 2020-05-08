@@ -44,7 +44,6 @@ import com.tari.android.wallet.ui.fragment.onboarding.CreateWalletFragment
 import com.tari.android.wallet.ui.fragment.onboarding.IntroductionFragment
 import com.tari.android.wallet.ui.fragment.onboarding.LocalAuthFragment
 import com.tari.android.wallet.util.Constants
-import com.tari.android.wallet.util.Constants.UI.Auth
 import com.tari.android.wallet.util.Constants.UI.CreateWallet
 import com.tari.android.wallet.util.SharedPrefsWrapper
 import com.tari.android.wallet.util.WalletUtil

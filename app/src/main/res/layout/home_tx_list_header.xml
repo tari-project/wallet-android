@@ -21,7 +21,7 @@
         android:layout_height="wrap_content"
         android:ellipsize="end"
         android:singleLine="true"
-        android:text="@string/home_today"
+        android:text="@string/home_tx_list_header_today"
         android:textColor="@color/home_tx_section_header_title"
         android:textSize="12sp"
         app:customFont="AVENIR_LT_STD_MEDIUM" />

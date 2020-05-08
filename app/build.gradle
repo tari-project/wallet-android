@@ -136,9 +136,6 @@ dependencies {
 
     // lottie
     implementation 'com.airbnb.android:lottie:3.4.0'
-    // butterknife
-    implementation 'com.jakewharton:butterknife:10.2.1'
-    kapt 'com.jakewharton:butterknife-compiler:10.2.1'
     // logger
     implementation 'com.orhanobut:logger:2.2.0'
     // QR scanner

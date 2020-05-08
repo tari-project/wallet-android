@@ -81,7 +81,7 @@
     <color name="tx_detail_contact_name_label_text">#B2B2B2</color>
     <color name="tx_detail_contact_view_divider">#f1f1f1</color>
     <color name="tx_detail_header_shadow_gradient_start">#80B2B2B2</color>
-    <color name="tx_detail_cancel_tx">#D32C44</color>
+    <color name="tx_detail_cancel_tx_cta">#D32C44</color>
 
     <!-- local auth -->
     <color name="auth_touch_id_prompt_anim_bg">#979797</color>

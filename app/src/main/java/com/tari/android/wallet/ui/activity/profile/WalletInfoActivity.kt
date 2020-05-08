@@ -41,13 +41,13 @@ import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.animation.addListener
 import androidx.core.content.ContextCompat
-import butterknife.BindColor
-import butterknife.BindDimen
-import butterknife.BindString
-import butterknife.ButterKnife
 import com.daasuu.ei.Ease
 import com.daasuu.ei.EasingInterpolator
-import com.tari.android.wallet.R
+import com.tari.android.wallet.R.color.black
+import com.tari.android.wallet.R.color.light_gray
+import com.tari.android.wallet.R.dimen.common_copy_emoji_id_button_visible_bottom_margin
+import com.tari.android.wallet.R.dimen.wallet_info_img_qr_code_size
+import com.tari.android.wallet.R.string.*
 import com.tari.android.wallet.application.TariWalletApplication
 import com.tari.android.wallet.databinding.ActivityWalletInfoBinding
 import com.tari.android.wallet.extension.applyFontStyle
@@ -55,9 +55,7 @@ import com.tari.android.wallet.infrastructure.Tracker
 import com.tari.android.wallet.ui.component.CustomFont
 import com.tari.android.wallet.ui.component.EmojiIdCopiedViewController
 import com.tari.android.wallet.ui.component.EmojiIdSummaryViewController
-import com.tari.android.wallet.ui.extension.gone
-import com.tari.android.wallet.ui.extension.invisible
-import com.tari.android.wallet.ui.extension.visible
+import com.tari.android.wallet.ui.extension.*
 import com.tari.android.wallet.ui.util.UiUtil
 import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.EmojiUtil
@@ -83,31 +81,6 @@ internal class WalletInfoActivity : AppCompatActivity() {
     private lateinit var emojiIdSummaryController: EmojiIdSummaryViewController
     private lateinit var emojiIdCopiedViewController: EmojiIdCopiedViewController
 
-    @BindString(R.string.wallet_info_share_your_emoji_id)
-    lateinit var shareEmojiIdTitle: String
-
-    @BindString(R.string.wallet_info_share_your_emoji_id_bold_part)
-    lateinit var shareEmojiIdTitleBoldPart: String
-
-    @BindString(R.string.emoji_id_chunk_separator)
-    lateinit var emojiIdChunkSeparator: String
-
-    @BindColor(R.color.black)
-    @JvmField
-    var blackColor: Int = 0
-
-    @BindColor(R.color.light_gray)
-    @JvmField
-    var lightGrayColor: Int = 0
-
-    @BindDimen(R.dimen.wallet_info_img_qr_code_size)
-    @JvmField
-    var qrCodeImageSize: Int = 0
-
-    @BindDimen(R.dimen.common_copy_emoji_id_button_visible_bottom_margin)
-    @JvmField
-    var copyEmojiIdButtonVisibleBottomMargin: Int = 0
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         ui = ActivityWalletInfoBinding.inflate(layoutInflater).apply { setContentView(root) }
@@ -124,25 +97,25 @@ internal class WalletInfoActivity : AppCompatActivity() {
         emojiIdSummaryController.display(emojiId)
         emojiIdCopiedViewController = EmojiIdCopiedViewController(ui.emojiIdCopiedView)
         // title
-        val styledTitle = shareEmojiIdTitle.applyFontStyle(
+        val styledTitle = string(wallet_info_share_your_emoji_id).applyFontStyle(
             this,
             CustomFont.AVENIR_LT_STD_LIGHT,
-            shareEmojiIdTitleBoldPart,
+            string(wallet_info_share_your_emoji_id_bold_part),
             CustomFont.AVENIR_LT_STD_BLACK,
             applyToOnlyFirstOccurence = true
         )
         ui.shareEmojiIdTextView.text = styledTitle
 
         val content = WalletUtil.getEmojiIdDeepLink(emojiId)
-        UiUtil.getQREncodedBitmap(content, qrCodeImageSize)?.let {
+        UiUtil.getQREncodedBitmap(content, dimenPx(wallet_info_img_qr_code_size))?.let {
             ui.qrImageView.setImageBitmap(it)
         }
 
         ui.fullEmojiIdTextView.text = EmojiUtil.getFullEmojiIdSpannable(
             emojiId,
-            emojiIdChunkSeparator,
-            blackColor,
-            lightGrayColor
+            string(emoji_id_chunk_separator),
+            color(black),
+            color(light_gray)
         )
 
         ui.emojiIdSummaryContainerView.setOnClickListener(this::onEmojiSummaryClicked)
@@ -205,7 +178,7 @@ internal class WalletInfoActivity : AppCompatActivity() {
             val value = valueAnimator.animatedValue as Float
             ui.copyEmojiIdContainerView.alpha = value
             ui.copyEmojiIdContainerView.translationY =
-                -copyEmojiIdButtonVisibleBottomMargin * value
+                -dimenPx(common_copy_emoji_id_button_visible_bottom_margin) * value
         }
         copyEmojiIdButtonAnim.duration = Constants.UI.shortDurationMs
         copyEmojiIdButtonAnim.interpolator = EasingInterpolator(Ease.BACK_OUT)
@@ -250,7 +223,7 @@ internal class WalletInfoActivity : AppCompatActivity() {
                     val value = it.animatedValue as Float
                     ui.copyEmojiIdContainerView.alpha = value
                     ui.copyEmojiIdContainerView.translationY =
-                        -copyEmojiIdButtonVisibleBottomMargin * value
+                        -dimenPx(common_copy_emoji_id_button_visible_bottom_margin) * value
                 }
             }
             animSet.playSequentially(copyEmojiIdButtonAnim, emojiIdAnim)
@@ -290,7 +263,6 @@ internal class WalletInfoActivity : AppCompatActivity() {
 
         internal fun visit(activity: WalletInfoActivity) {
             (activity.application as TariWalletApplication).appComponent.inject(activity)
-            ButterKnife.bind(activity)
         }
 
     }

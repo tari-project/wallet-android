@@ -45,13 +45,11 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.fragment.app.Fragment
-import butterknife.BindColor
-import butterknife.BindDimen
-import butterknife.BindString
-import butterknife.ButterKnife
 import com.daasuu.ei.Ease
 import com.daasuu.ei.EasingInterpolator
 import com.tari.android.wallet.R
+import com.tari.android.wallet.R.color.white
+import com.tari.android.wallet.R.string.*
 import com.tari.android.wallet.databinding.FragmentIntroductionBinding
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.extension.applyURLStyle
@@ -74,27 +72,9 @@ import kotlin.math.min
  */
 internal class IntroductionFragment : Fragment() {
 
-    @BindDimen(R.dimen.splash_screen_title_bottom_margin)
-    @JvmField
-    var cryptoTitleTextLine1BottomMargin = 0
-
-    @BindColor(R.color.white)
-    @JvmField
-    var whiteColor = 0
-
-    @BindString(R.string.create_wallet_user_agreement_and_privacy_policy)
-    lateinit var userAgreementAnPrivacyPolicyDesc: String
-    @BindString(R.string.create_wallet_user_agreement)
-    lateinit var userAgreement: String
-    @BindString(R.string.create_wallet_user_agreement_url)
-    lateinit var userAgreementURL: String
-    @BindString(R.string.create_wallet_privacy_policy)
-    lateinit var privacyPolicy: String
-    @BindString(R.string.create_wallet_privacy_policy_url)
-    lateinit var privacyPolicyURL: String
-
     @Inject
     lateinit var sharedPrefsWrapper: SharedPrefsWrapper
+
     @Inject
     lateinit var tracker: Tracker
 
@@ -120,7 +100,7 @@ internal class IntroductionFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        IntroductionFragmentVisitor.visit(this, view)
+        IntroductionFragmentVisitor.visit(this)
         setupUi()
         tracker.screen(path = "/onboarding/introduction", title = "Onboarding - Introduction")
     }
@@ -162,7 +142,7 @@ internal class IntroductionFragment : Fragment() {
     }
 
     private fun setupUi() {
-        UiUtil.setProgressBarColor(ui.createWalletProgressBar, whiteColor)
+        UiUtil.setProgressBarColor(ui.createWalletProgressBar, color(white))
         ui.apply {
             tariLogoLottieAnimationView.alpha = 0f
             networkInfoTextView.alpha = 0f
@@ -174,9 +154,15 @@ internal class IntroductionFragment : Fragment() {
 
             // highlight links
             userAgreementAndPrivacyPolicyTextView.text =
-                SpannableString(userAgreementAnPrivacyPolicyDesc).apply {
-                    applyURLStyle(userAgreement, userAgreementURL)
-                    applyURLStyle(privacyPolicy, privacyPolicyURL)
+                SpannableString(string(create_wallet_user_agreement_and_privacy_policy)).apply {
+                    applyURLStyle(
+                        string(create_wallet_user_agreement),
+                        string(create_wallet_user_agreement_url)
+                    )
+                    applyURLStyle(
+                        string(create_wallet_privacy_policy),
+                        string(create_wallet_privacy_policy_url)
+                    )
                 }
             // make the links clickable
             userAgreementAndPrivacyPolicyTextView.movementMethod = LinkMovementMethod.getInstance()
@@ -346,9 +332,8 @@ internal class IntroductionFragment : Fragment() {
     }
 
     private object IntroductionFragmentVisitor {
-        internal fun visit(fragment: IntroductionFragment, view: View) {
+        internal fun visit(fragment: IntroductionFragment) {
             fragment.requireActivity().appComponent.inject(fragment)
-            ButterKnife.bind(fragment, view)
         }
     }
 }

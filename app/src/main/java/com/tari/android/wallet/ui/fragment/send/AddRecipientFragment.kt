@@ -55,13 +55,13 @@ import androidx.core.animation.addListener
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import butterknife.BindColor
-import butterknife.BindDimen
-import butterknife.BindString
-import butterknife.ButterKnife
 import com.daasuu.ei.Ease
 import com.daasuu.ei.EasingInterpolator
 import com.tari.android.wallet.R
+import com.tari.android.wallet.R.color.*
+import com.tari.android.wallet.R.dimen.add_recipient_clipboard_emoji_id_container_height
+import com.tari.android.wallet.R.dimen.add_recipient_paste_emoji_id_button_visible_top_margin
+import com.tari.android.wallet.R.string.*
 import com.tari.android.wallet.application.DeepLink
 import com.tari.android.wallet.application.DeepLink.Type.EMOJI_ID
 import com.tari.android.wallet.application.DeepLink.Type.PUBLIC_KEY_HEX
@@ -71,10 +71,7 @@ import com.tari.android.wallet.model.*
 import com.tari.android.wallet.service.TariWalletService
 import com.tari.android.wallet.ui.activity.qr.EXTRA_QR_DATA
 import com.tari.android.wallet.ui.activity.qr.QRScannerActivity
-import com.tari.android.wallet.ui.extension.appComponent
-import com.tari.android.wallet.ui.extension.gone
-import com.tari.android.wallet.ui.extension.invisible
-import com.tari.android.wallet.ui.extension.visible
+import com.tari.android.wallet.ui.extension.*
 import com.tari.android.wallet.ui.fragment.send.adapter.RecipientListAdapter
 import com.tari.android.wallet.ui.util.UiUtil
 import com.tari.android.wallet.util.*
@@ -95,41 +92,6 @@ class AddRecipientFragment(private val walletService: TariWalletService) : Fragm
     RecipientListAdapter.Listener,
     RecyclerView.OnItemTouchListener,
     TextWatcher {
-    /**
-     * Emoji id chunk separator char.
-     */
-    @BindString(R.string.emoji_id_chunk_separator)
-    lateinit var emojiIdChunkSeparator: String
-
-    @BindString(R.string.add_recipient_invalid_emoji_id)
-    lateinit var invalidEmojiIdMessage: String
-
-    @BindString(R.string.add_recipient_own_emoji_id)
-    lateinit var ownEmojiIdMessage: String
-
-    @BindDimen(R.dimen.add_recipient_contact_list_item_height)
-    @JvmField
-    var listItemHeight = 0
-
-    @BindDimen(R.dimen.add_recipient_clipboard_emoji_id_container_height)
-    @JvmField
-    var emojiIdContainerHeight = 0
-
-    @BindDimen(R.dimen.add_recipient_paste_emoji_id_button_visible_top_margin)
-    @JvmField
-    var pasteEmojiIdButtonVisibleTopMargin = 0
-
-    @BindColor(R.color.add_recipient_prog_bar)
-    @JvmField
-    var progressBarColor = 0
-
-    @BindColor(R.color.black)
-    @JvmField
-    var blackColor = 0
-
-    @BindColor(R.color.light_gray)
-    @JvmField
-    var lightGrayColor = 0
 
     @Inject
     lateinit var tracker: Tracker
@@ -215,7 +177,7 @@ class AddRecipientFragment(private val walletService: TariWalletService) : Fragm
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        AddRecipientFragmentVisitor.visit(this, view)
+        AddRecipientFragmentVisitor.visit(this)
         // initialize recycler view
         setupUi()
         // fetch data
@@ -241,7 +203,7 @@ class AddRecipientFragment(private val walletService: TariWalletService) : Fragm
         ui.contactsListRecyclerView.addOnScrollListener(scrollListener)
         ui.contactsListRecyclerView.addOnItemTouchListener(this)
         ui.scrollDepthGradientView.alpha = 0f
-        UiUtil.setProgressBarColor(ui.progressBar, progressBarColor)
+        UiUtil.setProgressBarColor(ui.progressBar, color(add_recipient_prog_bar))
         ui.progressBar.visible()
         ui.continueButton.gone()
         ui.invalidEmojiIdTextView.gone()
@@ -317,13 +279,13 @@ class AddRecipientFragment(private val walletService: TariWalletService) : Fragm
     private fun showPasteEmojiIdViews(publicKey: PublicKey) {
         ui.emojiIdTextView.text = EmojiUtil.getFullEmojiIdSpannable(
             publicKey.emojiId,
-            emojiIdChunkSeparator,
-            blackColor,
-            lightGrayColor
+            string(emoji_id_chunk_separator),
+            color(black),
+            color(light_gray)
         )
         UiUtil.setBottomMargin(
             ui.emojiIdContainerView,
-            -emojiIdContainerHeight
+            -dimenPx(add_recipient_clipboard_emoji_id_container_height)
         )
         ui.emojiIdContainerView.visible()
         dimmerViews.forEach { dimmerView ->
@@ -340,7 +302,7 @@ class AddRecipientFragment(private val walletService: TariWalletService) : Fragm
             }
             UiUtil.setBottomMargin(
                 ui.emojiIdContainerView,
-                (-emojiIdContainerHeight * (1f - animValue)).toInt()
+                (-dimenPx(add_recipient_clipboard_emoji_id_container_height) * (1f - animValue)).toInt()
             )
         }
         emojiIdAppearAnim.interpolator = EasingInterpolator(Ease.EASE_IN_OUT_EXPO)
@@ -353,7 +315,7 @@ class AddRecipientFragment(private val walletService: TariWalletService) : Fragm
             val value = valueAnimator.animatedValue as Float
             UiUtil.setTopMargin(
                 ui.pasteEmojiIdContainerView,
-                (pasteEmojiIdButtonVisibleTopMargin * value).toInt()
+                (dimenPx(add_recipient_paste_emoji_id_button_visible_top_margin) * value).toInt()
             )
             ui.pasteEmojiIdContainerView.alpha = value
         }
@@ -385,7 +347,7 @@ class AddRecipientFragment(private val walletService: TariWalletService) : Fragm
             val value = valueAnimator.animatedValue as Float
             UiUtil.setTopMargin(
                 ui.pasteEmojiIdContainerView,
-                (pasteEmojiIdButtonVisibleTopMargin * (1 - value)).toInt()
+                (dimenPx(add_recipient_paste_emoji_id_button_visible_top_margin) * (1 - value)).toInt()
             )
             ui.pasteEmojiIdContainerView.alpha = (1 - value)
         }
@@ -400,7 +362,7 @@ class AddRecipientFragment(private val walletService: TariWalletService) : Fragm
             }
             UiUtil.setBottomMargin(
                 ui.emojiIdContainerView,
-                (-emojiIdContainerHeight * value).toInt()
+                (-dimenPx(add_recipient_clipboard_emoji_id_container_height) * value).toInt()
             )
         }
         emojiIdDisappearAnim.addListener(onEnd = {
@@ -675,7 +637,7 @@ class AddRecipientFragment(private val walletService: TariWalletService) : Fragm
 
     override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {
         isDeletingSeparatorAtIndex =
-            if (count == 1 && after == 0 && s[start].toString() == emojiIdChunkSeparator) {
+            if (count == 1 && after == 0 && s[start].toString() == string(emoji_id_chunk_separator)) {
                 start
             } else {
                 null
@@ -717,12 +679,13 @@ class AddRecipientFragment(private val walletService: TariWalletService) : Fragm
             text = editable.toString()
         }
         // delete all separators first
+        val separator = string(emoji_id_chunk_separator)
         for ((offset, index) in EmojiUtil.getExistingChunkSeparatorIndices(
             text,
-            emojiIdChunkSeparator
+            separator
         ).withIndex()) {
-            val target = index - (offset * emojiIdChunkSeparator.length)
-            editable.delete(target, target + emojiIdChunkSeparator.length)
+            val target = index - (offset * separator.length)
+            editable.delete(target, target + separator.length)
         }
 
         ui.continueButton.gone()
@@ -736,10 +699,10 @@ class AddRecipientFragment(private val walletService: TariWalletService) : Fragm
             for ((offset, index) in EmojiUtil.getNewChunkSeparatorIndices(textWithoutSeparators)
                 .withIndex()) {
                 val chunkSeparatorSpannable = EmojiUtil.getChunkSeparatorSpannable(
-                    emojiIdChunkSeparator,
-                    lightGrayColor
+                    separator,
+                    color(light_gray)
                 )
-                val target = index + (offset * emojiIdChunkSeparator.length)
+                val target = index + (offset * separator.length)
                 editable.insert(target, chunkSeparatorSpannable)
             }
             // check if valid emoji - don't search if not
@@ -747,7 +710,7 @@ class AddRecipientFragment(private val walletService: TariWalletService) : Fragm
             if (textWithoutSeparators.containsNonEmoji() || numberofEmojis > emojiIdLength) {
                 emojiIdPublicKey = null
                 // invalid emoji-id : clear list and display error
-                ui.invalidEmojiIdTextView.text = invalidEmojiIdMessage
+                ui.invalidEmojiIdTextView.text = string(add_recipient_invalid_emoji_id)
                 ui.invalidEmojiIdTextView.visible()
                 ui.qrCodeButton.visible()
                 clearSearchResult()
@@ -755,7 +718,7 @@ class AddRecipientFragment(private val walletService: TariWalletService) : Fragm
                 if (numberofEmojis == emojiIdLength) {
                     if (textWithoutSeparators == sharedPrefsWrapper.emojiId!!) {
                         emojiIdPublicKey = null
-                        ui.invalidEmojiIdTextView.text = ownEmojiIdMessage
+                        ui.invalidEmojiIdTextView.text = string(add_recipient_own_emoji_id)
                         ui.invalidEmojiIdTextView.visible()
                         ui.qrCodeButton.visible()
                         clearSearchResult()
@@ -767,7 +730,8 @@ class AddRecipientFragment(private val walletService: TariWalletService) : Fragm
                                 walletService.getPublicKeyFromEmojiId(textWithoutSeparators)
                             ui.rootView.post {
                                 if (emojiIdPublicKey == null) {
-                                    ui.invalidEmojiIdTextView.text = invalidEmojiIdMessage
+                                    ui.invalidEmojiIdTextView.text =
+                                        string(add_recipient_invalid_emoji_id)
                                     ui.invalidEmojiIdTextView.visible()
                                     clearSearchResult()
                                 } else {
@@ -807,7 +771,7 @@ class AddRecipientFragment(private val walletService: TariWalletService) : Fragm
     private fun onRecyclerViewScrolled(totalDeltaY: Int) {
         ui.scrollDepthGradientView.alpha = min(
             Constants.UI.scrollDepthShadowViewMaxOpacity,
-            totalDeltaY / listItemHeight.toFloat()
+            totalDeltaY / (dimenPx(R.dimen.add_recipient_contact_list_item_height)).toFloat()
         )
     }
 
@@ -847,9 +811,8 @@ class AddRecipientFragment(private val walletService: TariWalletService) : Fragm
     // endregion
 
     private object AddRecipientFragmentVisitor {
-        internal fun visit(fragment: AddRecipientFragment, view: View) {
+        internal fun visit(fragment: AddRecipientFragment) {
             fragment.requireActivity().appComponent.inject(fragment)
-            ButterKnife.bind(fragment, view)
         }
     }
 

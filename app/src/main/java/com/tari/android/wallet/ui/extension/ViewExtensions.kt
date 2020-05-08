@@ -36,6 +36,7 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.graphics.Color
+import android.graphics.drawable.Drawable
 import android.os.Build
 import android.util.TypedValue
 import android.view.View
@@ -44,6 +45,10 @@ import android.view.ViewTreeObserver
 import android.view.WindowManager
 import android.widget.ScrollView
 import android.widget.TextView
+import androidx.annotation.ColorRes
+import androidx.annotation.DimenRes
+import androidx.annotation.DrawableRes
+import androidx.annotation.StringRes
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.tari.android.wallet.R
@@ -197,3 +202,11 @@ internal fun View.doOnGlobalLayout(block: () -> Unit) {
 internal fun View.setHeight(value: Int) {
     this.layoutParams = this.layoutParams.also { it.height = value }
 }
+
+internal fun View.string(@StringRes id: Int): String = context.string(id)
+
+internal fun View.color(@ColorRes id: Int): Int = context.color(id)
+
+internal fun View.dimenPx(@DimenRes id: Int): Int = context.dimenPx(id)
+
+internal fun View.drawable(@DrawableRes id: Int): Drawable? = context.drawable(id)

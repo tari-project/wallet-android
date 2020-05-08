@@ -32,15 +32,18 @@
  */
 package com.tari.android.wallet.ui.activity.home.adapter
 
-import android.graphics.drawable.Drawable
 import android.view.View
 import androidx.recyclerview.widget.RecyclerView
-import butterknife.*
-import com.tari.android.wallet.R
+import com.tari.android.wallet.R.color.home_tx_value_negative
+import com.tari.android.wallet.R.color.home_tx_value_positive
+import com.tari.android.wallet.R.drawable.home_tx_value_negative_bg
+import com.tari.android.wallet.R.drawable.home_tx_value_positive_bg
 import com.tari.android.wallet.databinding.HomeTxListItemBinding
 import com.tari.android.wallet.model.Contact
 import com.tari.android.wallet.model.Tx
 import com.tari.android.wallet.ui.component.EmojiIdSummaryViewController
+import com.tari.android.wallet.ui.extension.color
+import com.tari.android.wallet.ui.extension.drawable
 import com.tari.android.wallet.ui.extension.gone
 import com.tari.android.wallet.ui.extension.visible
 import com.tari.android.wallet.ui.util.UiUtil
@@ -56,20 +59,6 @@ class TxViewHolder(view: View, listener: Listener) :
     RecyclerView.ViewHolder(view),
     View.OnClickListener {
 
-    @BindDrawable(R.drawable.home_tx_value_positive_bg)
-    lateinit var positiveBgDrawable: Drawable
-
-    @BindDrawable(R.drawable.home_tx_value_negative_bg)
-    lateinit var negativeBgDrawable: Drawable
-
-    @BindColor(R.color.home_tx_value_positive)
-    @JvmField
-    var positiveColor: Int = 0
-
-    @BindColor(R.color.home_tx_value_negative)
-    @JvmField
-    var negativeColor: Int = 0
-
     private lateinit var txWR: WeakReference<Tx>
     private var emojiIdSummaryController: EmojiIdSummaryViewController
     private var listenerWR: WeakReference<Listener>
@@ -77,7 +66,6 @@ class TxViewHolder(view: View, listener: Listener) :
     private val ui = HomeTxListItemBinding.bind(view)
 
     init {
-        ButterKnife.bind(this, view)
         emojiIdSummaryController = EmojiIdSummaryViewController(ui.txItemEmojiSummaryView)
         listenerWR = WeakReference(listener)
         ui.txItemRootView.setOnClickListener(this)
@@ -110,13 +98,13 @@ class TxViewHolder(view: View, listener: Listener) :
         if (tx.direction == Tx.Direction.INBOUND) {
             val formattedValue = "+" + WalletUtil.amountFormatter.format(tx.amount.tariValue)
             ui.txItemAmountTextView.text = formattedValue
-            ui.txItemAmountTextView.setTextColor(positiveColor)
-            ui.txItemAmountTextView.background = positiveBgDrawable
+            ui.txItemAmountTextView.setTextColor(color(home_tx_value_positive))
+            ui.txItemAmountTextView.background = drawable(home_tx_value_positive_bg)
         } else {
             val formattedValue = "-" + WalletUtil.amountFormatter.format(tx.amount.tariValue)
             ui.txItemAmountTextView.text = formattedValue
-            ui.txItemAmountTextView.setTextColor(negativeColor)
-            ui.txItemAmountTextView.background = negativeBgDrawable
+            ui.txItemAmountTextView.setTextColor(color(home_tx_value_negative))
+            ui.txItemAmountTextView.background = drawable(home_tx_value_negative_bg)
         }
         val measure =
             ui.txItemAmountTextView.paint.measureText("0".repeat(ui.txItemAmountTextView.text.length))

@@ -42,13 +42,12 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.animation.addListener
 import androidx.fragment.app.Fragment
-import butterknife.BindColor
-import butterknife.BindDimen
-import butterknife.BindString
-import butterknife.ButterKnife
 import com.daasuu.ei.Ease
 import com.daasuu.ei.EasingInterpolator
-import com.tari.android.wallet.R
+import com.tari.android.wallet.R.color.black
+import com.tari.android.wallet.R.color.light_gray
+import com.tari.android.wallet.R.dimen.*
+import com.tari.android.wallet.R.string.*
 import com.tari.android.wallet.application.WalletState
 import com.tari.android.wallet.databinding.FragmentCreateWalletBinding
 import com.tari.android.wallet.di.ConfigModule
@@ -75,46 +74,6 @@ import javax.inject.Named
  * @author The Tari Development Team
  */
 internal class CreateWalletFragment : Fragment() {
-
-    @BindDimen(R.dimen.create_wallet_button_bottom_margin)
-    @JvmField
-    var createEmojiButtonBottomMargin = 0
-
-    @BindDimen(R.dimen.common_view_elevation)
-    @JvmField
-    var emojiIdContainerViewElevation = 0f
-
-    @BindDimen(R.dimen.onboarding_see_full_emoji_id_button_visible_top_margin)
-    @JvmField
-    var seeFullEmojiIdButtonVisibleTopMargin = 0
-
-    @BindDimen(R.dimen.common_horizontal_margin)
-    @JvmField
-    var horizontalMargin = 0
-
-    @BindString(R.string.create_wallet_set_of_emoji_your_wallet_address_desc)
-    @JvmField
-    var yourWalletAddressDescString = ""
-
-    /**
-     * Emoji id chunk separator char.
-     */
-    @BindString(R.string.emoji_id_chunk_separator)
-    lateinit var emojiIdChunkSeparator: String
-
-    @BindString(R.string.create_wallet_your_emoji_id_text_label)
-    lateinit var thisIsYourEmojiIdTitle: String
-
-    @BindString(R.string.create_wallet_your_emoji_id_text_label_bold_part)
-    lateinit var thisIsYourEmojiIdTitleBoldPart: String
-
-    @BindColor(R.color.black)
-    @JvmField
-    var blackColor = 0
-
-    @BindColor(R.color.light_gray)
-    @JvmField
-    var lightGrayColor = 0
 
     @Inject
     lateinit var sharedPrefsWrapper: SharedPrefsWrapper
@@ -153,7 +112,7 @@ internal class CreateWalletFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        CreateWalletFragmentVisitor.visit(this, view)
+        CreateWalletFragmentVisitor.visit(this)
         setupUi()
         tracker.screen(path = "/onboarding/create_wallet", title = "Onboarding - Create Wallet")
     }
@@ -181,12 +140,13 @@ internal class CreateWalletFragment : Fragment() {
         OverScrollDecoratorHelper.setUpOverScroll(ui.emojiIdScrollView)
         emojiIdSummaryController = EmojiIdSummaryViewController(ui.emojiIdSummaryView.root)
         ui.apply {
-            yourEmojiIdTitleTextView.text = thisIsYourEmojiIdTitle.applyFontStyle(
-                mActivity,
-                CustomFont.AVENIR_LT_STD_LIGHT,
-                thisIsYourEmojiIdTitleBoldPart,
-                CustomFont.AVENIR_LT_STD_BLACK
-            )
+            yourEmojiIdTitleTextView.text =
+                string(create_wallet_your_emoji_id_text_label).applyFontStyle(
+                    mActivity,
+                    CustomFont.AVENIR_LT_STD_LIGHT,
+                    string(create_wallet_your_emoji_id_text_label_bold_part),
+                    CustomFont.AVENIR_LT_STD_BLACK
+                )
             bottomSpinnerLottieAnimationView.alpha = 0f
             seeFullEmojiIdContainerView.invisible()
             emojiIdSummaryContainerView.invisible()
@@ -392,7 +352,7 @@ internal class CreateWalletFragment : Fragment() {
         val anim = ValueAnimator.ofFloat(0f, 1f)
         anim.addUpdateListener { valueAnimator: ValueAnimator ->
             val value = valueAnimator.animatedValue as Float
-            ui.emojiIdContainerView.elevation = value * emojiIdContainerViewElevation
+            ui.emojiIdContainerView.elevation = value * dimen(common_view_elevation)
         }
         anim.duration = Constants.UI.mediumDurationMs
         anim.interpolator = EasingInterpolator(Ease.BACK_OUT)
@@ -409,7 +369,8 @@ internal class CreateWalletFragment : Fragment() {
 
     private fun showEmojiIdContinueButton() {
         val buttonInitialBottomMargin = UiUtil.getBottomMargin(ui.continueButton)
-        val buttonBottomMarginDelta = createEmojiButtonBottomMargin - buttonInitialBottomMargin
+        val buttonBottomMarginDelta =
+            dimenPx(create_wallet_button_bottom_margin) - buttonInitialBottomMargin
         val buttonTranslationAnim = ValueAnimator.ofFloat(0f, 1f)
         buttonTranslationAnim.addUpdateListener { valueAnimator: ValueAnimator ->
             val value = valueAnimator.animatedValue as Float
@@ -438,7 +399,7 @@ internal class CreateWalletFragment : Fragment() {
         // prepare views
         val fullEmojiIdInitialWidth = ui.emojiIdSummaryContainerView.width
         val fullEmojiIdDeltaWidth =
-            (ui.rootView.width - horizontalMargin * 2) - fullEmojiIdInitialWidth
+            (ui.rootView.width - dimenPx(common_horizontal_margin) * 2) - fullEmojiIdInitialWidth
         UiUtil.setWidth(
             ui.emojiIdContainerView,
             fullEmojiIdInitialWidth
@@ -466,7 +427,7 @@ internal class CreateWalletFragment : Fragment() {
             )
             UiUtil.setTopMargin(
                 ui.seeFullEmojiIdContainerView,
-                (seeFullEmojiIdButtonVisibleTopMargin * (1f - value)).toInt()
+                (dimenPx(onboarding_see_full_emoji_id_button_visible_top_margin) * (1f - value)).toInt()
             )
             ui.seeFullEmojiIdContainerView.alpha = 1f - value
         }
@@ -491,7 +452,7 @@ internal class CreateWalletFragment : Fragment() {
         ui.emojiIdTextView.isEnabled = false
         ui.emojiIdSummaryContainerView.visible()
         ui.emojiIdSummaryContainerView.alpha = 0f
-        ui.emojiIdSummaryContainerView.elevation = emojiIdContainerViewElevation
+        ui.emojiIdSummaryContainerView.elevation = dimen(common_view_elevation)
         ui.seeFullEmojiIdContainerView.visible()
         ui.emojiIdScrollView.smoothScrollTo(0, 0)
 
@@ -510,7 +471,7 @@ internal class CreateWalletFragment : Fragment() {
             ui.emojiIdSummaryContainerView.alpha = value
             UiUtil.setTopMargin(
                 ui.seeFullEmojiIdContainerView,
-                (seeFullEmojiIdButtonVisibleTopMargin * value).toInt()
+                (dimenPx(onboarding_see_full_emoji_id_button_visible_top_margin) * value).toInt()
             )
             ui.seeFullEmojiIdContainerView.alpha = value
         }
@@ -567,7 +528,8 @@ internal class CreateWalletFragment : Fragment() {
         awesomeAnim.duration = CreateEmojiId.awesomeTextAnimDurationMs
 
         val buttonInitialBottomMargin = UiUtil.getBottomMargin(ui.createEmojiIdButton)
-        val buttonBottomMarginDelta = createEmojiButtonBottomMargin - buttonInitialBottomMargin
+        val buttonBottomMarginDelta =
+            dimenPx(create_wallet_button_bottom_margin) - buttonInitialBottomMargin
         val buttonTranslationAnim = ValueAnimator.ofFloat(0f, 1f)
         buttonTranslationAnim.addUpdateListener { valueAnimator: ValueAnimator ->
             val value = valueAnimator.animatedValue as Float
@@ -663,9 +625,9 @@ internal class CreateWalletFragment : Fragment() {
                 val emojiId = sharedPrefsWrapper.emojiId!!
                 ui.emojiIdTextView.text = EmojiUtil.getFullEmojiIdSpannable(
                     emojiId,
-                    emojiIdChunkSeparator,
-                    blackColor,
-                    lightGrayColor
+                    string(emoji_id_chunk_separator),
+                    color(black),
+                    color(light_gray)
                 )
                 emojiIdSummaryController.display(emojiId)
 
@@ -700,9 +662,8 @@ internal class CreateWalletFragment : Fragment() {
     }
 
     private object CreateWalletFragmentVisitor {
-        internal fun visit(fragment: CreateWalletFragment, view: View) {
+        internal fun visit(fragment: CreateWalletFragment) {
             fragment.requireActivity().appComponent.inject(fragment)
-            ButterKnife.bind(fragment, view)
         }
     }
 }

@@ -146,11 +146,11 @@
 
     <!-- home -->
     <string name="home_available_balance">Available Balance</string>
-    <string name="home_today">Today</string>
-    <string name="home_yesterday">Yesterday</string>
+    <string name="home_tx_list_header_today">Today</string>
+    <string name="home_tx_list_header_yesterday">Yesterday</string>
     <string name="home_send_tari">Send tXTR</string>
     <string name="home_txs">Transactions</string>
-    <string name="home_pending_txs">In Progress</string>
+    <string name="home_tx_list_header_pending_txs">In Progress</string>
     <string name="home_hello">Hello!</string>
     <string name="home_setup_is_complete">Your wallet setup is complete.</string>
     <string name="home_you_are_ready_to_explore">You’re ready to start exploring</string>

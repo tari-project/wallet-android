@@ -38,9 +38,6 @@ import android.view.View
 import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.core.animation.addListener
-import butterknife.BindColor
-import butterknife.BindView
-import butterknife.ButterKnife
 import com.daasuu.ei.Ease
 import com.daasuu.ei.EasingInterpolator
 import com.orhanobut.logger.Logger
@@ -53,6 +50,7 @@ import com.tari.android.wallet.network.NetworkConnectionState
 import com.tari.android.wallet.service.TariWalletService
 import com.tari.android.wallet.tor.TorBootstrapStatus
 import com.tari.android.wallet.tor.TorProxyState
+import com.tari.android.wallet.ui.extension.color
 import com.tari.android.wallet.ui.extension.gone
 import com.tari.android.wallet.ui.extension.invisible
 import com.tari.android.wallet.ui.extension.visible
@@ -84,26 +82,17 @@ internal class UpdateProgressViewController(
         RUNNING
     }
 
-    @BindView(R.id.home_txt_update_hourglass_icon)
-    lateinit var hourglassIconTextView: TextView
-    @BindView(R.id.home_txt_update_handshake_icon)
-    lateinit var handshakeIconTextView: TextView
-    @BindView(R.id.home_txt_checking_for_updates)
-    lateinit var checkingForUpdatesTextView: TextView
-    @BindView(R.id.home_txt_receiving_txs)
-    lateinit var receivingTxsTextView: TextView
-    @BindView(R.id.home_txt_completing_txs)
-    lateinit var completingTxsTextView: TextView
-    @BindView(R.id.home_txt_updating_txs)
-    lateinit var updatingTxsTextView: TextView
-    @BindView(R.id.home_txt_up_to_date)
-    lateinit var upToDateTextView: TextView
-    @BindView(R.id.home_prog_bar_update)
-    lateinit var progressBar: ProgressBar
-
-    @BindColor(R.color.purple)
-    @JvmField
-    var purpleColor = 0
+    private val hourglassIconTextView: TextView =
+        view.findViewById(R.id.home_txt_update_hourglass_icon)
+    private val handshakeIconTextView: TextView =
+        view.findViewById(R.id.home_txt_update_handshake_icon)
+    private val checkingForUpdatesTextView: TextView =
+        view.findViewById(R.id.home_txt_checking_for_updates)
+    private val receivingTxsTextView: TextView = view.findViewById(R.id.home_txt_receiving_txs)
+    private val completingTxsTextView: TextView = view.findViewById(R.id.home_txt_completing_txs)
+    private val updatingTxsTextView: TextView = view.findViewById(R.id.home_txt_updating_txs)
+    private val upToDateTextView: TextView = view.findViewById(R.id.home_txt_up_to_date)
+    private val progressBar: ProgressBar = view.findViewById(R.id.home_prog_bar_update)
 
     var state = State.IDLE
         private set
@@ -112,6 +101,7 @@ internal class UpdateProgressViewController(
     private var baseNodeSyncCurrentRetryCount = 0
     private var baseNodeSyncMaxRetryCount = 3
     private var connectionCheckStartTimeMs = 0L
+
     // connection status check (internet, tor, base node) timeout period
     private val timeoutPeriodMs = 30 * 1000L
     private val minStateDisplayPeriodMs = 3 * 1000L
@@ -130,8 +120,7 @@ internal class UpdateProgressViewController(
     private var torBootstrapStatusSubscription: Disposable? = null
 
     init {
-        ButterKnife.bind(this, view)
-        UiUtil.setProgressBarColor(progressBar, purpleColor)
+        UiUtil.setProgressBarColor(progressBar, view.color(R.color.purple))
         progressBar.invisible()
         subscribeToEventBus()
     }
@@ -275,7 +264,8 @@ internal class UpdateProgressViewController(
         }
         isWaitingOnBaseNodeSync = true
         // setup expiration timer
-        val toTimeoutMs = (connectionCheckStartTimeMs + timeoutPeriodMs) - System.currentTimeMillis()
+        val toTimeoutMs =
+            (connectionCheckStartTimeMs + timeoutPeriodMs) - System.currentTimeMillis()
         baseNodeSyncTimeoutSubscription = Observable
             .timer(toTimeoutMs, TimeUnit.MILLISECONDS)
             .subscribeOn(Schedulers.io())
@@ -361,7 +351,8 @@ internal class UpdateProgressViewController(
                 (-currentTextView.height * value).toInt()
             )
             if (currentTextView == checkingForUpdatesTextView
-                && nextTextView != upToDateTextView) {
+                && nextTextView != upToDateTextView
+            ) {
                 UiUtil.setTopMargin(
                     hourglassIconTextView,
                     (-hourglassIconTextView.height * value).toInt()

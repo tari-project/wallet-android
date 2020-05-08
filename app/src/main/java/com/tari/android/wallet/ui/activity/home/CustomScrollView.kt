@@ -41,12 +41,11 @@ import android.view.View
 import android.widget.ScrollView
 import androidx.core.animation.addListener
 import androidx.recyclerview.widget.RecyclerView
-import butterknife.BindDimen
-import butterknife.BindView
-import butterknife.ButterKnife
 import com.daasuu.ei.Ease
 import com.daasuu.ei.EasingInterpolator
 import com.tari.android.wallet.R
+import com.tari.android.wallet.R.dimen.*
+import com.tari.android.wallet.ui.extension.dimenPx
 import com.tari.android.wallet.ui.extension.isScrolledToTop
 import com.tari.android.wallet.ui.util.UiUtil
 import com.tari.android.wallet.util.Constants
@@ -68,33 +67,10 @@ internal class CustomScrollView @JvmOverloads constructor(
     var flingIsRunning = false
     var isScrollable = true
 
-    @BindView(R.id.recycler_view_container_view)
-    lateinit var recyclerViewContainerView: View
-    @BindView(R.id.update_progress_content_container_view)
-    lateinit var progressContainerView: View
-    @BindView(R.id.update_progress_content_view_bg)
-    lateinit var progressViewBg: View
-    @BindView(R.id.update_progress_content_view)
-    lateinit var progressView: View
-
-    @BindDimen(R.dimen.home_swipe_refresh_max_scroll_y)
-    @JvmField
-    var refreshSwipeMaxScrollY = 0
-    @BindDimen(R.dimen.home_swipe_refresh_progress_view_content_invisible_top_margin)
-    @JvmField
-    var progressViewInvisibleTopMargin = 0
-    @BindDimen(R.dimen.home_swipe_refresh_progress_view_content_visible_top_margin)
-    @JvmField
-    var progressViewVisibleTopMargin = 0
-    @BindDimen(R.dimen.home_swipe_refresh_progress_view_container_height)
-    @JvmField
-    var progressViewContainerHeight = 0
-    @BindDimen(R.dimen.common_view_elevation)
-    @JvmField
-    var elevation = 0
-    @BindDimen(R.dimen.home_grabber_height)
-    @JvmField
-    var grabberHeight = 0
+    private lateinit var recyclerViewContainerView: View
+    private lateinit var progressContainerView: View
+    private lateinit var progressViewBg: View
+    private lateinit var progressView: View
 
     private var swipeRefreshYOffset = 0
     private var lastDeltaY = 0
@@ -106,7 +82,10 @@ internal class CustomScrollView @JvmOverloads constructor(
     var updateProgressViewController: UpdateProgressViewController? = null
 
     fun bindUI() {
-        ButterKnife.bind(this, this)
+        recyclerViewContainerView = findViewById(R.id.recycler_view_container_view)
+        progressContainerView = findViewById(R.id.update_progress_content_container_view)
+        progressViewBg = findViewById(R.id.update_progress_content_view_bg)
+        progressView = findViewById(R.id.update_progress_content_view)
     }
 
     fun completeScroll() {
@@ -114,11 +93,10 @@ internal class CustomScrollView @JvmOverloads constructor(
             return
         }
         if (swipeRefreshYOffset > 0 && !isUpdating) {
-            val targetOffset = if (swipeRefreshYOffset >= progressViewContainerHeight) {
-                progressViewContainerHeight
-            } else {
-                0
-            }
+            val targetOffset =
+                if (swipeRefreshYOffset >= dimenPx(home_swipe_refresh_progress_view_container_height))
+                    dimenPx(home_swipe_refresh_progress_view_container_height)
+                else 0
             val anim = ValueAnimator.ofInt(swipeRefreshYOffset, targetOffset)
             anim.addUpdateListener {
                 swipeRefreshYOffset = it.animatedValue as Int
@@ -188,7 +166,7 @@ internal class CustomScrollView @JvmOverloads constructor(
             } else if (lastDeltaY < 0 && !isUpdating) { // enter the swipe-refresh zone
                 updateProgressViewController?.reset()
                 swipeRefreshYOffset = min(
-                    refreshSwipeMaxScrollY,
+                    dimenPx(home_swipe_refresh_max_scroll_y),
                     swipeRefreshYOffset - deltaY
                 )
                 consumed[1] = deltaY
@@ -209,16 +187,23 @@ internal class CustomScrollView @JvmOverloads constructor(
                     recyclerViewContainerView,
                     recyclerViewContainerInitialHeight - swipeRefreshYOffset
                 )
-                val totalMarginTopDelta = progressViewVisibleTopMargin - progressViewInvisibleTopMargin
-                val ratio = min(swipeRefreshYOffset.toFloat() / progressViewContainerHeight, 1f)
+                val totalMarginTopDelta =
+                    dimenPx(home_swipe_refresh_progress_view_content_visible_top_margin) -
+                            dimenPx(home_swipe_refresh_progress_view_content_invisible_top_margin)
+                val ratio = min(
+                    swipeRefreshYOffset.toFloat() /
+                            dimenPx(home_swipe_refresh_progress_view_container_height),
+                    1F
+                )
                 UiUtil.setTopMargin(
                     progressView,
-                    progressViewInvisibleTopMargin + (totalMarginTopDelta * ratio).toInt()
+                    dimenPx(home_swipe_refresh_progress_view_content_invisible_top_margin) +
+                            (totalMarginTopDelta * ratio).toInt()
                 )
                 progressView.alpha = ratio
-                progressViewBg.elevation = elevation / 2 * ratio
+                progressViewBg.elevation = dimenPx(common_view_elevation) / 2 * ratio
                 invalidate()
-                if (scrollY < grabberHeight * 2) scrollTo(0, 0)
+                if (scrollY < dimenPx(home_grabber_height) * 2) scrollTo(0, 0)
             } else {
                 UiUtil.setHeight(progressContainerView, 0)
                 UiUtil.setHeight(
@@ -263,10 +248,9 @@ internal class CustomScrollView @JvmOverloads constructor(
     }
 
 
-
     fun beginUpdate() {
         if (isUpdating) return
-        val anim = ValueAnimator.ofInt(0, progressViewContainerHeight)
+        val anim = ValueAnimator.ofInt(0, dimenPx(home_swipe_refresh_progress_view_container_height))
         anim.addUpdateListener {
             swipeRefreshYOffset = it.animatedValue as Int
             requestLayout()

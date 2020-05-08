@@ -34,10 +34,10 @@ package com.tari.android.wallet.ui.fragment.send.adapter
 
 import android.view.View
 import androidx.recyclerview.widget.RecyclerView
-import butterknife.BindString
-import butterknife.ButterKnife
-import com.tari.android.wallet.R
+import com.tari.android.wallet.R.string.add_recipient_my_contacts
+import com.tari.android.wallet.R.string.add_recipient_recent_tx_contacts
 import com.tari.android.wallet.databinding.AddRecipientListHeaderBinding
+import com.tari.android.wallet.ui.extension.string
 
 /**
  * Section header view holder.
@@ -50,22 +50,13 @@ class RecipientHeaderViewHolder(view: View, private val type: Type) :
         MY_CONTACTS
     }
 
-    @BindString(R.string.add_recipient_recent_tx_contacts)
-    lateinit var recentContactsString: String
-    @BindString(R.string.add_recipient_my_contacts)
-    lateinit var myContactsString: String
-
     private val ui = AddRecipientListHeaderBinding.bind(view)
-
-    init {
-        ButterKnife.bind(this, view)
-    }
 
     fun bind(position: Int) {
         ui.separatorView.visibility = if (position == 0) View.GONE else View.VISIBLE
         when (type) {
-            Type.RECENT_CONTACTS -> ui.titleTextView.text = recentContactsString
-            Type.MY_CONTACTS -> ui.titleTextView.text = myContactsString
+            Type.RECENT_CONTACTS -> ui.titleTextView.text = string(add_recipient_recent_tx_contacts)
+            Type.MY_CONTACTS -> ui.titleTextView.text = string(add_recipient_my_contacts)
         }
 
     }

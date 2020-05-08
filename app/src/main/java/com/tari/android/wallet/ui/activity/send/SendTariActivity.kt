@@ -40,10 +40,10 @@ import android.os.Bundle
 import android.os.IBinder
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
-import butterknife.BindColor
-import butterknife.ButterKnife
 import com.orhanobut.logger.Logger
 import com.tari.android.wallet.R
+import com.tari.android.wallet.R.color.black
+import com.tari.android.wallet.R.color.white
 import com.tari.android.wallet.application.TariWalletApplication
 import com.tari.android.wallet.databinding.ActivitySendTariBinding
 import com.tari.android.wallet.event.Event
@@ -54,6 +54,7 @@ import com.tari.android.wallet.network.NetworkConnectionState
 import com.tari.android.wallet.service.TariWalletService
 import com.tari.android.wallet.service.WalletService
 import com.tari.android.wallet.ui.dialog.BottomSlideDialog
+import com.tari.android.wallet.ui.extension.color
 import com.tari.android.wallet.ui.extension.showInternetConnectionErrorDialog
 import com.tari.android.wallet.ui.fragment.send.AddAmountFragment
 import com.tari.android.wallet.ui.fragment.send.AddNoteFragment
@@ -75,20 +76,13 @@ internal class SendTariActivity : AppCompatActivity(),
     AddNoteFragment.Listener,
     FinalizeSendTxFragment.Listener {
 
-    @BindColor(R.color.white)
-    @JvmField
-    var whiteColor = 0
-
-    @BindColor(R.color.black)
-    @JvmField
-    var blackColor = 0
-
     private lateinit var ui: ActivitySendTariBinding
 
     private var currentFragmentWR: WeakReference<Fragment>? = null
 
     private var walletService: TariWalletService? = null
 
+    // TODO [DISCUSS] access to this goes through the strong reference anyway
     private val wr = WeakReference(this)
 
     private var sendTxIsInProgress = false
@@ -125,7 +119,7 @@ internal class SendTariActivity : AppCompatActivity(),
             fragmentTx.commit()
             currentFragmentWR = WeakReference(addAmountFragment)
             ui.rootView.postDelayed({
-                wr.get()?.ui?.rootView?.setBackgroundColor(blackColor)
+                wr.get()?.ui?.rootView?.setBackgroundColor(color(black))
             }, 1000)
         } else {
             val addRecipientFragment = AddRecipientFragment.newInstance(walletService!!)
@@ -134,7 +128,7 @@ internal class SendTariActivity : AppCompatActivity(),
             fragmentTx.commit()
             currentFragmentWR = WeakReference(addRecipientFragment)
             ui.rootView.postDelayed({
-                wr.get()?.ui?.rootView?.setBackgroundColor(blackColor)
+                wr.get()?.ui?.rootView?.setBackgroundColor(color(black))
             }, 1000)
         }
     }
@@ -288,7 +282,7 @@ internal class SendTariActivity : AppCompatActivity(),
             }
         }
         ui.rootView.post {
-            wr.get()?.ui?.rootView?.setBackgroundColor(whiteColor)
+            wr.get()?.ui?.rootView?.setBackgroundColor(color(white))
         }
         supportFragmentManager
             .beginTransaction()
@@ -344,7 +338,6 @@ internal class SendTariActivity : AppCompatActivity(),
     private object SendTariActivityVisitor {
         internal fun visit(activity: SendTariActivity) {
             (activity.application as TariWalletApplication).appComponent.inject(activity)
-            ButterKnife.bind(activity)
         }
     }
 

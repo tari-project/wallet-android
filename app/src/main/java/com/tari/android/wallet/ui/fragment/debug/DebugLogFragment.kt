@@ -46,12 +46,11 @@ import androidx.core.content.FileProvider
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import butterknife.BindString
-import butterknife.ButterKnife
-import com.tari.android.wallet.R
+import com.tari.android.wallet.R.string.*
 import com.tari.android.wallet.databinding.FragmentDebugLogBinding
 import com.tari.android.wallet.di.WalletModule
 import com.tari.android.wallet.ui.extension.appComponent
+import com.tari.android.wallet.ui.extension.string
 import com.tari.android.wallet.ui.fragment.debug.adapter.LogFileSpinnerAdapter
 import com.tari.android.wallet.ui.fragment.debug.adapter.LogListAdapter
 import com.tari.android.wallet.ui.util.UiUtil
@@ -71,18 +70,10 @@ import javax.inject.Named
  */
 internal class DebugLogFragment : Fragment(), AdapterView.OnItemSelectedListener {
 
-    @BindString(R.string.ffi_admin_email_address)
-    lateinit var ffiAdminEmailAddress: String
-    @BindString(R.string.common_share)
-    lateinit var sharePrompt: String
-    @BindString(R.string.debug_log_file_size_limit_exceeded_dialog_title)
-    lateinit var fileSizeExceededDialogTitle: String
-    @BindString(R.string.debug_log_file_size_limit_exceeded_dialog_content)
-    lateinit var fileSizeExceededDialogContent: String
-
     @Inject
     @Named(WalletModule.FieldName.walletLogFilesDirPath)
     lateinit var logFilesDirPath: String
+
     @Inject
     @Named(WalletModule.FieldName.walletLogFilePath)
     lateinit var logFilePath: String
@@ -125,7 +116,7 @@ internal class DebugLogFragment : Fragment(), AdapterView.OnItemSelectedListener
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        DebugLogFragmentVisitor.visit(this, view)
+        DebugLogFragmentVisitor.visit(this)
         setupUi()
     }
 
@@ -161,15 +152,15 @@ internal class DebugLogFragment : Fragment(), AdapterView.OnItemSelectedListener
     private fun showShareLogFilesDialog() {
         UiUtil.temporarilyDisableClick(ui.shareButton)
         AlertDialog.Builder(context ?: return)
-            .setMessage(getString(R.string.debug_log_share_dialog_content))
+            .setMessage(string(debug_log_share_dialog_content))
             .setCancelable(false)
-            .setPositiveButton(getString(R.string.common_confirm)) { dialog, _ ->
+            .setPositiveButton(string(common_confirm)) { dialog, _ ->
                 dialog.cancel()
                 Thread(this::zipAndEmailLogFiles).start()
             }
             // negative button text and action
-            .setNegativeButton(getString(R.string.exit)) { dialog, _ -> dialog.cancel() }
-            .setTitle(getString(R.string.debug_log_share_dialog_title))
+            .setNegativeButton(string(exit)) { dialog, _ -> dialog.cancel() }
+            .setTitle(string(debug_log_share_dialog_title))
             .create()
             .show()
     }
@@ -239,12 +230,14 @@ internal class DebugLogFragment : Fragment(), AdapterView.OnItemSelectedListener
 
     private fun showFileSizeExceededDialog() {
         val dialogBuilder = AlertDialog.Builder(context ?: return)
-        val dialog = dialogBuilder.setMessage(fileSizeExceededDialogContent)
+        val dialog = dialogBuilder.setMessage(
+            string(debug_log_file_size_limit_exceeded_dialog_content)
+        )
             .setCancelable(false)
-            .setPositiveButton(getString(R.string.common_ok)) { dialog, _ ->
+            .setPositiveButton(string(common_ok)) { dialog, _ ->
                 dialog.cancel()
             }
-            .setTitle(fileSizeExceededDialogTitle)
+            .setTitle(string(debug_log_file_size_limit_exceeded_dialog_title))
             .create()
         dialog.show()
     }
@@ -268,7 +261,7 @@ internal class DebugLogFragment : Fragment(), AdapterView.OnItemSelectedListener
         )
         intent.putExtra(
             Intent.EXTRA_EMAIL,
-            arrayOf(ffiAdminEmailAddress)
+            arrayOf(string(ffi_admin_email_address))
         )
         intent.putExtra(
             Intent.EXTRA_SUBJECT,
@@ -279,15 +272,14 @@ internal class DebugLogFragment : Fragment(), AdapterView.OnItemSelectedListener
         mContext.startActivity(
             Intent.createChooser(
                 intent,
-                sharePrompt
+                string(common_share)
             )
         )
     }
 
     private object DebugLogFragmentVisitor {
-        internal fun visit(fragment: DebugLogFragment, view: View) {
+        internal fun visit(fragment: DebugLogFragment) {
             fragment.requireActivity().appComponent.inject(fragment)
-            ButterKnife.bind(fragment, view)
         }
     }
 

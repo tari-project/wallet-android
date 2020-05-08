@@ -47,13 +47,13 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-import butterknife.BindColor
-import butterknife.BindDimen
-import butterknife.BindString
-import butterknife.ButterKnife
 import com.daasuu.ei.Ease
 import com.daasuu.ei.EasingInterpolator
 import com.tari.android.wallet.R
+import com.tari.android.wallet.R.color.black
+import com.tari.android.wallet.R.color.light_gray
+import com.tari.android.wallet.R.dimen.*
+import com.tari.android.wallet.R.string.emoji_id_chunk_separator
 import com.tari.android.wallet.databinding.FragmentAddAmountBinding
 import com.tari.android.wallet.extension.remap
 import com.tari.android.wallet.infrastructure.Tracker
@@ -79,51 +79,6 @@ import kotlin.math.min
  * @author The Tari Development Team
  */
 class AddAmountFragment(private val walletService: TariWalletService) : Fragment() {
-
-    /**
-     * An element can be a digit or a decimal/thousands separator.
-     */
-    @BindDimen(R.dimen.add_amount_element_text_size)
-    @JvmField
-    var elementTextSize = 0f
-
-    @BindDimen(R.dimen.add_amount_element_container_translation_y)
-    @JvmField
-    var amountElementContainerTranslationY = 0
-
-    @BindDimen(R.dimen.add_amount_gem_size)
-    @JvmField
-    var amountGemSize = 0f
-
-    @BindDimen(R.dimen.add_amount_leftmost_digit_margin_start)
-    @JvmField
-    var firstElementMarginStart = 0
-
-    @BindDimen(R.dimen.add_amount_available_balance_error_amount_nudge_distance)
-    @JvmField
-    var validationErrorNudgeDistance = 0
-
-    @BindDimen(R.dimen.common_horizontal_margin)
-    @JvmField
-    var horizontalMargin = 0
-
-    @BindDimen(R.dimen.common_copy_emoji_id_button_visible_bottom_margin)
-    @JvmField
-    var copyEmojiIdButtonVisibleBottomMargin = 0
-
-    @BindColor(R.color.black)
-    @JvmField
-    var blackColor = 0
-
-    @BindColor(R.color.light_gray)
-    @JvmField
-    var lightGrayColor = 0
-
-    /**
-     * Emoji id chunk separator char.
-     */
-    @BindString(R.string.emoji_id_chunk_separator)
-    lateinit var emojiIdChunkSeparator: String
 
     @Inject
     lateinit var tracker: Tracker
@@ -211,7 +166,7 @@ class AddAmountFragment(private val walletService: TariWalletService) : Fragment
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        AddAmountFragmentVisitor.visit(this, view)
+        AddAmountFragmentVisitor.visit(this)
         setupUi()
         tracker.screen(path = "/home/send_tari/add_amount", title = "Send Tari - Add Amount")
     }
@@ -219,9 +174,9 @@ class AddAmountFragment(private val walletService: TariWalletService) : Fragment
     private fun setupUi() {
         recipientUser = arguments!!.getParcelable("recipientUser")!!
         ui.decimalPointButton.text = decimalSeparator
-        currentTextSize = elementTextSize
-        currentAmountGemSize = amountGemSize
-        currentFirstElementMarginStart = firstElementMarginStart
+        currentTextSize = dimen(add_amount_element_text_size)
+        currentAmountGemSize = dimen(add_amount_gem_size)
+        currentFirstElementMarginStart = dimenPx(add_amount_leftmost_digit_margin_start)
         // hide validation
         ui.notEnoughBalanceView.invisible()
         // hide tx fee
@@ -284,9 +239,9 @@ class AddAmountFragment(private val walletService: TariWalletService) : Fragment
         ui.titleTextView.gone()
         ui.fullEmojiIdTextView.text = EmojiUtil.getFullEmojiIdSpannable(
             emojiId,
-            emojiIdChunkSeparator,
-            blackColor,
-            lightGrayColor
+            string(emoji_id_chunk_separator),
+            color(black),
+            color(light_gray)
         )
     }
 
@@ -318,7 +273,7 @@ class AddAmountFragment(private val walletService: TariWalletService) : Fragment
         ui.dimmerView.visible()
         val fullEmojiIdInitialWidth = ui.emojiIdSummaryContainerView.width
         val fullEmojiIdDeltaWidth =
-            (ui.rootView.width - horizontalMargin * 2) - fullEmojiIdInitialWidth
+            (ui.rootView.width - dimenPx(common_horizontal_margin) * 2) - fullEmojiIdInitialWidth
         UiUtil.setWidth(
             ui.fullEmojiIdContainerView,
             fullEmojiIdInitialWidth
@@ -361,7 +316,7 @@ class AddAmountFragment(private val walletService: TariWalletService) : Fragment
             ui.copyEmojiIdButtonContainerView.alpha = value
             UiUtil.setBottomMargin(
                 ui.copyEmojiIdButtonContainerView,
-                (copyEmojiIdButtonVisibleBottomMargin * value).toInt()
+                (dimenPx(common_copy_emoji_id_button_visible_bottom_margin) * value).toInt()
             )
         }
         copyEmojiIdButtonAnim.duration = Constants.UI.shortDurationMs
@@ -399,7 +354,7 @@ class AddAmountFragment(private val walletService: TariWalletService) : Fragment
             ui.copyEmojiIdButtonContainerView.alpha = value
             UiUtil.setBottomMargin(
                 ui.copyEmojiIdButtonContainerView,
-                (copyEmojiIdButtonVisibleBottomMargin * value).toInt()
+                (dimenPx(common_copy_emoji_id_button_visible_bottom_margin) * value).toInt()
             )
         }
         // emoji id anim
@@ -787,7 +742,7 @@ class AddAmountFragment(private val walletService: TariWalletService) : Fragment
             UiUtil.setTopMargin(
                 ghostTextView!!,
                 ui.elementContainerView.top
-                        + amountElementContainerTranslationY
+                        + dimenPx(add_amount_element_container_translation_y)
                         + (ui.elementContainerView.height * (1 - value) * 0.8f).toInt()
             )
             ghostTextView!!.alpha = value
@@ -849,7 +804,7 @@ class AddAmountFragment(private val walletService: TariWalletService) : Fragment
         // scale up if needed
         var scaleFactor = 1f
         while (contentWidth < ui.elementContainerView.width
-            && (currentTextSize * scaleFactor) < elementTextSize
+            && (currentTextSize * scaleFactor) < dimen(add_amount_element_text_size)
         ) {
             contentWidth = (contentWidth * 1.05f).toInt()
             if (contentWidth < ui.elementContainerView.width) {
@@ -857,10 +812,10 @@ class AddAmountFragment(private val walletService: TariWalletService) : Fragment
             }
         }
         // normalize scale factor if needed
-        if ((currentTextSize * scaleFactor) > elementTextSize) {
-            currentTextSize = elementTextSize
-            currentAmountGemSize = amountGemSize
-            currentFirstElementMarginStart = firstElementMarginStart
+        if ((currentTextSize * scaleFactor) > dimen(add_amount_element_text_size)) {
+            currentTextSize = dimen(add_amount_element_text_size)
+            currentAmountGemSize = dimen(add_amount_gem_size)
+            currentFirstElementMarginStart = dimenPx(add_amount_leftmost_digit_margin_start)
         } else {
             currentTextSize *= scaleFactor
             currentAmountGemSize *= scaleFactor
@@ -913,9 +868,11 @@ class AddAmountFragment(private val walletService: TariWalletService) : Fragment
             ui.notEnoughBalanceView.scaleY = scale
             // nudge the amount
             if (value < 0.5f) { // nudge right for the half of the animation
-                ui.elementContainerView.translationX = validationErrorNudgeDistance * value
+                ui.elementContainerView.translationX =
+                    dimenPx(add_amount_available_balance_error_amount_nudge_distance) * value
             } else { // nudge back to original position for the second half
-                ui.elementContainerView.translationX = validationErrorNudgeDistance * (1f - value)
+                ui.elementContainerView.translationX =
+                    dimenPx(add_amount_available_balance_error_amount_nudge_distance) * (1f - value)
             }
             if (value == 1f) {
                 digitAnimIsRunning = false
@@ -1096,9 +1053,8 @@ class AddAmountFragment(private val walletService: TariWalletService) : Fragment
     // endregion
 
     private object AddAmountFragmentVisitor {
-        internal fun visit(fragment: AddAmountFragment, view: View) {
+        internal fun visit(fragment: AddAmountFragment) {
             fragment.requireActivity().appComponent.inject(fragment)
-            ButterKnife.bind(fragment, view)
         }
     }
 

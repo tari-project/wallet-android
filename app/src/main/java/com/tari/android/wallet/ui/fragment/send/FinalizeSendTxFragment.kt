@@ -45,12 +45,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import butterknife.BindString
-import butterknife.ButterKnife
 import com.daasuu.ei.Ease
 import com.daasuu.ei.EasingInterpolator
 import com.orhanobut.logger.Logger
 import com.tari.android.wallet.R
+import com.tari.android.wallet.R.string.*
 import com.tari.android.wallet.databinding.FragmentFinalizeSendTxBinding
 import com.tari.android.wallet.event.Event
 import com.tari.android.wallet.event.EventBus
@@ -62,6 +61,7 @@ import com.tari.android.wallet.tor.TorBootstrapStatus
 import com.tari.android.wallet.tor.TorProxyState
 import com.tari.android.wallet.ui.extension.appComponent
 import com.tari.android.wallet.ui.extension.invisible
+import com.tari.android.wallet.ui.extension.string
 import com.tari.android.wallet.ui.extension.visible
 import com.tari.android.wallet.ui.util.UiUtil.getResourceUri
 import com.tari.android.wallet.util.Constants
@@ -94,24 +94,6 @@ class FinalizeSendTxFragment(private val walletService: TariWalletService) : Fra
         lateinit var descLine1: String
         lateinit var descLine2: String
     }
-
-    @BindString(R.string.finalize_send_tx_sending_step_1_desc_line_1)
-    lateinit var step1DescriptionLine1: String
-
-    @BindString(R.string.finalize_send_tx_sending_step_1_desc_line_2)
-    lateinit var step1DescriptionLine2: String
-
-    @BindString(R.string.finalize_send_tx_sending_step_2_desc_line_1)
-    lateinit var step2DescriptionLine1: String
-
-    @BindString(R.string.finalize_send_tx_sending_step_2_desc_line_2)
-    lateinit var step2DescriptionLine2: String
-
-    @BindString(R.string.finalize_send_tx_sending_step_3_desc_line_1)
-    lateinit var step3DescriptionLine1: String
-
-    @BindString(R.string.finalize_send_tx_sending_step_3_desc_line_2)
-    lateinit var step3DescriptionLine2: String
 
     @Inject
     lateinit var tracker: Tracker
@@ -169,7 +151,7 @@ class FinalizeSendTxFragment(private val walletService: TariWalletService) : Fra
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        FinalizeSendTxFragmentVisitor.visit(this, view)
+        FinalizeSendTxFragmentVisitor.visit(this)
         // get tx properties
         recipientUser = arguments!!.getParcelable("recipientUser")!!
         amount = arguments!!.getParcelable("amount")!!
@@ -178,12 +160,12 @@ class FinalizeSendTxFragment(private val walletService: TariWalletService) : Fra
 
         ui.lottieAnimationView.setMaxProgress(lottieAnimationPauseProgress)
 
-        Step.CONNECTION_CHECK.descLine1 = step1DescriptionLine1
-        Step.CONNECTION_CHECK.descLine2 = step1DescriptionLine2
-        Step.DISCOVERY.descLine1 = step2DescriptionLine1
-        Step.DISCOVERY.descLine2 = step2DescriptionLine2
-        Step.SENT.descLine1 = step3DescriptionLine1
-        Step.SENT.descLine2 = step3DescriptionLine2
+        Step.CONNECTION_CHECK.descLine1 = string(finalize_send_tx_sending_step_1_desc_line_1)
+        Step.CONNECTION_CHECK.descLine2 = string(finalize_send_tx_sending_step_1_desc_line_2)
+        Step.DISCOVERY.descLine1 = string(finalize_send_tx_sending_step_2_desc_line_1)
+        Step.DISCOVERY.descLine2 = string(finalize_send_tx_sending_step_2_desc_line_2)
+        Step.SENT.descLine1 = string(finalize_send_tx_sending_step_3_desc_line_1)
+        Step.SENT.descLine2 = string(finalize_send_tx_sending_step_3_desc_line_2)
 
         ui.infoLine1TextView.invisible()
         ui.infoLine2TextView.invisible()
@@ -676,9 +658,8 @@ class FinalizeSendTxFragment(private val walletService: TariWalletService) : Fra
     }
 
     private object FinalizeSendTxFragmentVisitor {
-        internal fun visit(fragment: FinalizeSendTxFragment, view: View) {
+        internal fun visit(fragment: FinalizeSendTxFragment) {
             fragment.requireActivity().appComponent.inject(fragment)
-            ButterKnife.bind(fragment, view)
         }
     }
 

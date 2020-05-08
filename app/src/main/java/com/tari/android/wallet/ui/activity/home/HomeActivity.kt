@@ -57,17 +57,12 @@ import androidx.core.animation.addListener
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import butterknife.BindColor
-import butterknife.BindDimen
-import butterknife.BindString
-import butterknife.ButterKnife
 import com.daasuu.ei.Ease
 import com.daasuu.ei.EasingInterpolator
 import com.orhanobut.logger.Logger
 import com.squareup.seismic.ShakeDetector
 import com.tari.android.wallet.R
 import com.tari.android.wallet.application.DeepLink
-import com.tari.android.wallet.application.TariWalletApplication
 import com.tari.android.wallet.databinding.ActivityHomeBinding
 import com.tari.android.wallet.event.Event
 import com.tari.android.wallet.event.EventBus
@@ -110,79 +105,6 @@ internal class HomeActivity : AppCompatActivity(),
     CustomScrollView.Listener,
     UpdateProgressViewController.Listener,
     ShakeDetector.Listener {
-
-    @BindDimen(R.dimen.home_top_content_container_view_top_margin)
-    @JvmField
-    var topContentContainerViewTopMargin = 0
-    @BindDimen(R.dimen.home_top_content_container_scroll_vertical_shift)
-    @JvmField
-    var topContentContainerViewScrollVerticalShift = 0
-    @BindDimen(R.dimen.common_header_height)
-    @JvmField
-    var txListHeaderHeight = 0
-    @BindDimen(R.dimen.home_send_tari_button_initial_bottom_margin)
-    @JvmField
-    var sendTariButtonInitialBottomMargin = 0
-    @BindDimen(R.dimen.home_send_tari_button_visible_bottom_margin)
-    @JvmField
-    var sendTariButtonVisibleBottomMargin = 0
-    @BindDimen(R.dimen.home_tx_list_container_minimized_top_margin)
-    @JvmField
-    var txListContainerMinimizedTopMargin = 0
-    @BindDimen(R.dimen.home_scroll_view_startup_anim_height)
-    @JvmField
-    var scrollViewStartupAnimHeight = 0
-    @BindDimen(R.dimen.home_grabber_container_height)
-    @JvmField
-    var grabberContainerHeight = 0
-    @BindDimen(R.dimen.home_grabber_corner_radius)
-    @JvmField
-    var grabberCornerRadius = 0
-    @BindDimen(R.dimen.home_send_tari_button_hidden_bottom_margin)
-    @JvmField
-    var sendTariButtonHiddenBottomMargin = 0
-    @BindDimen(R.dimen.home_grabber_width)
-    @JvmField
-    var grabberViewWidth = 0
-    @BindDimen(R.dimen.home_tx_list_item_height)
-    @JvmField
-    var listItemHeight = 0
-    @BindDimen(R.dimen.home_main_content_top_margin)
-    @JvmField
-    var homeMainContentTopMargin = 0
-    @BindDimen(R.dimen.home_wallet_info_button_initial_top_margin)
-    @JvmField
-    var walletInfoButtonInitialTopMargin = 0
-    @BindColor(R.color.white)
-    @JvmField
-    var whiteColor = 0
-
-    @BindString(R.string.wallet_service_error_testnet_tari_request)
-    lateinit var homeFailToLoadTransaction: String
-    @BindString(R.string.wallet_service_error_no_internet_connection)
-    lateinit var homeNoInternetConnection: String
-    @BindString(R.string.home_tari_bot_you_got_tari_dlg_title)
-    lateinit var testnetTariReceivedDialogTitle: String
-    @BindString(R.string.home_tari_bot_you_got_tari_dlg_title_bold_part)
-    lateinit var testnetTariReceivedDialogTitleBoldPart: String
-    @BindString(R.string.home_ttl_store_dlg_title)
-    lateinit var ttlStoreDialogTitle: String
-    @BindString(R.string.home_ttl_store_dlg_title_bold_part)
-    lateinit var ttlStoreDialogTitleBoldPart: String
-    @BindString(R.string.ttl_store_url)
-    lateinit var ttlStoreUrl: String
-    @BindString(R.string.first_testnet_utxo_tx_message)
-    lateinit var firstTestnetUTXOMessage: String
-    @BindString(R.string.second_testnet_utxo_tx_message)
-    lateinit var secondTestnetUTXOMessage: String
-    @BindString(R.string.error_no_connection_title)
-    lateinit var networkConnectionErrorTitle: String
-    @BindString(R.string.error_no_connection_description)
-    lateinit var networkConnectionErrorDescription: String
-    @BindString(R.string.error_node_unreachable_title)
-    lateinit var nodeUnreachableErrorTitle: String
-    @BindString(R.string.error_node_unreachable_description)
-    lateinit var nodeUnreachableErrorDescription: String
 
     @Inject
     lateinit var sharedPrefsWrapper: SharedPrefsWrapper
@@ -281,7 +203,7 @@ internal class HomeActivity : AppCompatActivity(),
          */
 
         // hide tx list header
-        UiUtil.setTopMargin(ui.txListHeaderView, -txListHeaderHeight)
+        UiUtil.setTopMargin(ui.txListHeaderView, -dimenPx(R.dimen.common_header_height))
 
         updateProgressViewController = UpdateProgressViewController(
             ui.updateProgressContentView,
@@ -408,9 +330,9 @@ internal class HomeActivity : AppCompatActivity(),
     }
 
     private fun setupScrollView() {
-        val recyclerViewHeight = ui.rootView.height - txListHeaderHeight
+        val recyclerViewHeight = ui.rootView.height - dimenPx(R.dimen.common_header_height)
         val contentHeight =
-            txListContainerMinimizedTopMargin + grabberContainerHeight + recyclerViewHeight
+            dimenPx(R.dimen.home_tx_list_container_minimized_top_margin) + dimenPx(R.dimen.home_grabber_container_height) + recyclerViewHeight
         UiUtil.setHeight(ui.recyclerViewContainerView, recyclerViewHeight)
         UiUtil.setHeight(ui.scrollContentView, contentHeight)
         ui.scrollView.recyclerViewContainerInitialHeight = recyclerViewHeight
@@ -426,7 +348,8 @@ internal class HomeActivity : AppCompatActivity(),
         EventBus.subscribe<Event.App.AppForegrounded>(this) {
             wr.get()?.let {
                 if (it.walletService != null
-                    && it.updateProgressViewController.state == UpdateProgressViewController.State.IDLE) {
+                    && it.updateProgressViewController.state == UpdateProgressViewController.State.IDLE
+                ) {
                     it.updateProgressViewController.reset()
                     it.updateProgressViewController.start(it.walletService!!)
                     it.ui.scrollView.beginUpdate()
@@ -437,7 +360,8 @@ internal class HomeActivity : AppCompatActivity(),
         // wallet events
         EventBus.subscribe<Event.Wallet.TxCancellation>(this) {
             if (wr.get()?.updateProgressViewController?.state
-                == UpdateProgressViewController.State.IDLE) {
+                == UpdateProgressViewController.State.IDLE
+            ) {
                 wr.get()?.ui?.rootView?.post {
                     updateAllDataAndUI(restartBalanceUI = false)
                 }
@@ -450,7 +374,8 @@ internal class HomeActivity : AppCompatActivity(),
         }
         EventBus.subscribe<Event.Wallet.TxReceived>(this) {
             if (wr.get()?.updateProgressViewController?.state
-                == UpdateProgressViewController.State.IDLE) {
+                == UpdateProgressViewController.State.IDLE
+            ) {
                 wr.get()?.ui?.rootView?.post {
                     updateAllDataAndUI(restartBalanceUI = false)
                 }
@@ -669,7 +594,7 @@ internal class HomeActivity : AppCompatActivity(),
 
         // show button and list
         val sendTariButtonMarginDelta =
-            sendTariButtonVisibleBottomMargin - sendTariButtonInitialBottomMargin
+            dimenPx(R.dimen.home_send_tari_button_visible_bottom_margin) - dimenPx(R.dimen.home_send_tari_button_initial_bottom_margin)
         val anim = ValueAnimator.ofFloat(
             0.0f,
             1.0f
@@ -681,14 +606,15 @@ internal class HomeActivity : AppCompatActivity(),
             val value = valueAnimator.animatedValue as Float
 
             // animate the list (will move upwards)
-            ui.scrollContentView.y = scrollViewStartupAnimHeight * (1 - value)
+            ui.scrollContentView.y =
+                dimenPx(R.dimen.home_scroll_view_startup_anim_height) * (1 - value)
             ui.scrollContentView.alpha = value
             ui.sendTariButton.alpha = value
 
             // animate the send tari button (will move upwards)
             UiUtil.setBottomMargin(
                 ui.sendTariButton,
-                (sendTariButtonInitialBottomMargin + value * sendTariButtonMarginDelta).toInt()
+                (dimenPx(R.dimen.home_send_tari_button_initial_bottom_margin) + value * sendTariButtonMarginDelta).toInt()
             )
             ui.sendTariButtonGradientView.alpha = value
             // reveal balance title, QR code button and balance gem image
@@ -731,7 +657,7 @@ internal class HomeActivity : AppCompatActivity(),
                 ui.scrollView,
                 View.TRANSLATION_Y,
                 ui.scrollView.height.toFloat(),
-                homeMainContentTopMargin.toFloat()
+                dimenPx(R.dimen.home_main_content_top_margin).toFloat()
             )
         scrollViewTransAnim.interpolator = EasingInterpolator(Ease.CIRC_IN_OUT)
         // background fade animation
@@ -800,7 +726,8 @@ internal class HomeActivity : AppCompatActivity(),
 
     private fun testnetTariRequestSuccessful() {
         val error = WalletError()
-        val importedTx = walletService!!.importTestnetUTXO(firstTestnetUTXOMessage, error)
+        val importedTx =
+            walletService!!.importTestnetUTXO(string(R.string.first_testnet_utxo_tx_message), error)
         if (error.code != WalletErrorCode.NO_ERROR) {
             TODO("Unhandled wallet error: ${error.code}")
         }
@@ -827,10 +754,10 @@ internal class HomeActivity : AppCompatActivity(),
             canceledOnTouchOutside = false
         ).apply {
             findViewById<TextView>(R.id.home_testnet_tari_received_dlg_txt_title).text =
-                testnetTariReceivedDialogTitle.applyFontStyle(
+                string(R.string.home_tari_bot_you_got_tari_dlg_title).applyFontStyle(
                     this@HomeActivity,
                     CustomFont.AVENIR_LT_STD_LIGHT,
-                    testnetTariReceivedDialogTitleBoldPart,
+                    string(R.string.home_tari_bot_you_got_tari_dlg_title_bold_part),
                     CustomFont.AVENIR_LT_STD_BLACK
                 )
             findViewById<TextView>(R.id.home_tari_bot_dialog_txt_try_later)
@@ -858,10 +785,10 @@ internal class HomeActivity : AppCompatActivity(),
             layoutId = R.layout.home_dialog_ttl_store
         ).apply {
             findViewById<TextView>(R.id.home_ttl_store_dialog_txt_title).text =
-                ttlStoreDialogTitle.applyFontStyle(
+                string(R.string.home_ttl_store_dlg_title).applyFontStyle(
                     this@HomeActivity,
                     CustomFont.AVENIR_LT_STD_LIGHT,
-                    ttlStoreDialogTitleBoldPart,
+                    string(R.string.home_ttl_store_dlg_title_bold_part),
                     CustomFont.AVENIR_LT_STD_BLACK
                 )
             findViewById<View>(R.id.home_ttl_store_dialog_btn_later)
@@ -884,7 +811,7 @@ internal class HomeActivity : AppCompatActivity(),
         startActivity(
             Intent(
                 Intent.ACTION_VIEW,
-                Uri.parse(ttlStoreUrl)
+                Uri.parse(string(R.string.ttl_store_url))
             )
         )
     }
@@ -960,7 +887,8 @@ internal class HomeActivity : AppCompatActivity(),
     private fun onTxSendSuccessful() {
         ui.scrollView.scrollToTop()
         ui.txRecyclerView.scrollToPosition(0)
-        val topMargin = ui.rootView.height - txListContainerMinimizedTopMargin
+        val topMargin =
+            ui.rootView.height - dimenPx(R.dimen.home_tx_list_container_minimized_top_margin)
         ui.scrollContentView.y = topMargin.toFloat()
         val anim = ValueAnimator.ofInt(
             topMargin,
@@ -1004,7 +932,10 @@ internal class HomeActivity : AppCompatActivity(),
 
     private fun importSecondUTXO() {
         val error = WalletError()
-        val importedTx = walletService!!.importTestnetUTXO(secondTestnetUTXOMessage, error)
+        val importedTx = walletService!!.importTestnetUTXO(
+            string(R.string.second_testnet_utxo_tx_message),
+            error
+        )
         if (error.code != WalletErrorCode.NO_ERROR) {
             TODO("Unhandled wallet error: ${error.code}")
         }
@@ -1062,7 +993,7 @@ internal class HomeActivity : AppCompatActivity(),
         ui.sendTariButton.alpha = 1f
         val initialMargin = UiUtil.getBottomMargin(ui.sendTariButton)
         val marginDelta =
-            sendTariButtonVisibleBottomMargin - UiUtil.getBottomMargin(ui.sendTariButton)
+            dimenPx(R.dimen.home_send_tari_button_visible_bottom_margin) - UiUtil.getBottomMargin(ui.sendTariButton)
         val anim = ValueAnimator.ofFloat(
             0f,
             1f
@@ -1090,7 +1021,7 @@ internal class HomeActivity : AppCompatActivity(),
         }
         val initialMargin = UiUtil.getBottomMargin(ui.sendTariButton)
         val marginDelta =
-            sendTariButtonHiddenBottomMargin - UiUtil.getBottomMargin(ui.sendTariButton)
+            dimenPx(R.dimen.home_send_tari_button_hidden_bottom_margin) - UiUtil.getBottomMargin(ui.sendTariButton)
         val anim = ValueAnimator.ofFloat(
             0f,
             1f
@@ -1137,8 +1068,10 @@ internal class HomeActivity : AppCompatActivity(),
         }
     }
 
-    override fun updateHasFailed(source: UpdateProgressViewController,
-                                 failureReason: UpdateProgressViewController.FailureReason) {
+    override fun updateHasFailed(
+        source: UpdateProgressViewController,
+        failureReason: UpdateProgressViewController.FailureReason
+    ) {
         ui.scrollView.finishUpdate()
         when (failureReason) {
             UpdateProgressViewController.FailureReason.NETWORK_CONNECTION_ERROR -> {
@@ -1164,9 +1097,9 @@ internal class HomeActivity : AppCompatActivity(),
             dismissViewId = R.id.tx_failed_dialog_txt_close
         ).apply {
             val titleTextView = findViewById<TextView>(R.id.tx_failed_dialog_txt_title)
-            titleTextView.text = networkConnectionErrorTitle
+            titleTextView.text = string(R.string.error_no_connection_title)
             val descriptionTextView = findViewById<TextView>(R.id.tx_failed_dialog_txt_description)
-            descriptionTextView.text = networkConnectionErrorDescription
+            descriptionTextView.text = string(R.string.error_no_connection_description)
             // set text
         }.show()
     }
@@ -1178,9 +1111,9 @@ internal class HomeActivity : AppCompatActivity(),
             dismissViewId = R.id.tx_failed_dialog_txt_close
         ).apply {
             val titleTextView = findViewById<TextView>(R.id.tx_failed_dialog_txt_title)
-            titleTextView.text = nodeUnreachableErrorTitle
+            titleTextView.text = string(R.string.error_node_unreachable_title)
             val descriptionTextView = findViewById<TextView>(R.id.tx_failed_dialog_txt_description)
-            descriptionTextView.text = nodeUnreachableErrorDescription
+            descriptionTextView.text = string(R.string.error_node_unreachable_description)
             // set text
         }.show()
     }
@@ -1263,10 +1196,10 @@ internal class HomeActivity : AppCompatActivity(),
             ui.onboardingContentView.alpha = ratio
             ui.txListOverlayView.alpha = ratio
             val topContentMarginTopExtra =
-                (ratio * topContentContainerViewScrollVerticalShift).toInt()
+                (ratio * dimenPx(R.dimen.home_top_content_container_scroll_vertical_shift)).toInt()
             UiUtil.setTopMargin(
                 ui.topContentContainerView,
-                topContentContainerViewTopMargin
+                dimenPx(R.dimen.home_top_content_container_view_top_margin)
                         + topContentMarginTopExtra
             )
             ui.txListTitleTextView.alpha = ratio
@@ -1275,7 +1208,7 @@ internal class HomeActivity : AppCompatActivity(),
             if (!isOnboarding) {
                 UiUtil.setTopMargin(
                     ui.txListHeaderView,
-                    ((ratio - 1) * txListHeaderHeight).toInt()
+                    ((ratio - 1) * dimenPx(R.dimen.common_header_height)).toInt()
                 )
                 ui.grabberView.alpha = max(
                     0f,
@@ -1287,13 +1220,13 @@ internal class HomeActivity : AppCompatActivity(),
                     (max(
                         0f,
                         1f - ratio * grabberViewWidthScrollAnimCoefficient
-                    ) * grabberViewWidth).toInt()
+                    ) * dimenPx(R.dimen.home_grabber_width)).toInt()
                 )
                 val grabberBgDrawable = ui.grabberContainerView.background as GradientDrawable
                 grabberBgDrawable.cornerRadius = max(
                     0f,
                     1f - ratio * grabberViewCornerRadiusScrollAnimCoefficient
-                ) * grabberCornerRadius
+                ) * dimenPx(R.dimen.home_grabber_corner_radius)
 
                 if (ratio == 0f && !isDragging && !ui.txRecyclerView.isScrolledToTop()) {
                     ui.txRecyclerView.smoothScrollToPosition(0)
@@ -1309,11 +1242,11 @@ internal class HomeActivity : AppCompatActivity(),
 
             UiUtil.setTopMargin(
                 ui.storeButton,
-                walletInfoButtonInitialTopMargin + ui.scrollView.scrollY + topContentMarginTopExtra
+                dimenPx(R.dimen.home_wallet_info_button_initial_top_margin) + ui.scrollView.scrollY + topContentMarginTopExtra
             )
             UiUtil.setTopMargin(
                 ui.walletInfoButton,
-                walletInfoButtonInitialTopMargin + ui.scrollView.scrollY + topContentMarginTopExtra
+                dimenPx(R.dimen.home_wallet_info_button_initial_top_margin) + ui.scrollView.scrollY + topContentMarginTopExtra
             )
         }
         if (scrollY > oldScrollY
@@ -1334,7 +1267,7 @@ internal class HomeActivity : AppCompatActivity(),
     fun onRecyclerViewScrolled(totalDeltaY: Int) {
         ui.headerElevationView.alpha = min(
             Constants.UI.scrollDepthShadowViewMaxOpacity,
-            totalDeltaY / listItemHeight.toFloat()
+            totalDeltaY / dimenPx(R.dimen.home_tx_list_item_height).toFloat()
         )
     }
 
@@ -1359,8 +1292,7 @@ internal class HomeActivity : AppCompatActivity(),
 
     private object HomeActivityVisitor {
         fun visit(activity: HomeActivity) {
-            (activity.application as TariWalletApplication).appComponent.inject(activity)
-            ButterKnife.bind(activity)
+            activity.appComponent.inject(activity)
         }
     }
 
