@@ -226,6 +226,10 @@ internal class TxDetailActivity : AppCompatActivity(), ServiceConnection {
         ui.backView.setOnClickListener { onBackPressed() }
         ui.emojiIdSummaryContainerView.setOnClickListener { onEmojiSummaryClicked(it) }
         ui.copyEmojiIdButton.setOnClickListener { onCopyEmojiIdButtonClicked(it) }
+        ui.copyEmojiIdButton.setOnLongClickListener { view ->
+            onCopyEmojiIdButtonLongClicked(view)
+            true
+        }
         dimmerViews.forEach { it.setOnClickListener { hideFullEmojiId() } }
         ui.feeLabelTextView.setOnClickListener { showTxFeeToolTip() }
         ui.addContactButton.setOnClickListener { onAddContactClick() }
@@ -511,13 +515,12 @@ internal class TxDetailActivity : AppCompatActivity(), ServiceConnection {
         })
     }
 
-    private fun onCopyEmojiIdButtonClicked(view: View) {
-        UiUtil.temporarilyDisableClick(view)
+    private fun completeCopyEmojiId(clipboardString: String) {
         dimmerViews.forEach { dimmerView -> dimmerView.isClickable = false }
         val clipBoard = ContextCompat.getSystemService(this, ClipboardManager::class.java)
         val clipboardData = ClipData.newPlainText(
-            "Tari Wallet Emoji Id",
-            tx.user.publicKey.emojiId
+            "Tari Wallet Identity",
+            clipboardString
         )
         clipBoard?.setPrimaryClip(clipboardData)
         emojiIdCopiedViewController.showEmojiIdCopiedAnim(fadeOutOnEnd = true) {
@@ -526,6 +529,16 @@ internal class TxDetailActivity : AppCompatActivity(), ServiceConnection {
         val copyEmojiIdButtonAnim = ui.copyEmojiIdContainerView.animate().alpha(0f)
         copyEmojiIdButtonAnim.duration = Constants.UI.xShortDurationMs
         copyEmojiIdButtonAnim.start()
+    }
+
+    private fun onCopyEmojiIdButtonClicked(view: View) {
+        UiUtil.temporarilyDisableClick(view)
+        completeCopyEmojiId(tx.user.publicKey.emojiId)
+    }
+
+    private fun onCopyEmojiIdButtonLongClicked(view: View) {
+        UiUtil.temporarilyDisableClick(view)
+        completeCopyEmojiId(tx.user.publicKey.hexString)
     }
 
     private fun onContactEditTextEditAction(actionId: Int): Boolean {
