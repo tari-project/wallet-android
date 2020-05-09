@@ -235,7 +235,7 @@
     <string name="tx_detail_cancellation_error_title">Oops…</string>
     <string name="tx_detail_cancellation_error_description">Error occurred during TX cancellation.</string>
     <string name="tx_details_cancel_dialog_title">Are you sure?</string>
-    <string name="tx_details_cancel_dialog_description">Your recipient will be notified of the cancellation.</string>
+    <string name="tx_details_cancel_dialog_description">You will have to start a new transaction if you change your mind.</string>
     <string name="tx_details_cancel_dialog_cancel">Yes, cancel</string>
     <string name="tx_details_cancel_dialog_not_cancel">Not now</string>
 
