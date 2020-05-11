@@ -40,7 +40,6 @@ import android.net.ConnectivityManager
 import android.net.NetworkInfo
 import com.orhanobut.logger.Logger
 import com.tari.android.wallet.event.EventBus
-import java.util.concurrent.TimeUnit
 
 /**
  * Receives network connection changes and posts changes to the event bus.
@@ -51,10 +50,6 @@ internal class NetworkConnectionStateReceiver : BroadcastReceiver() {
 
     private val action = "android.net.conn.CONNECTIVITY_CHANGE"
     val intentFilter = IntentFilter(action)
-    private var pingCurrentRetry = 0
-    private val pingMaxRetryCount = 10
-    private val pingRetryPeriodMs = TimeUnit.SECONDS.toMillis(2)
-    private val pingTimeOutMs = TimeUnit.SECONDS.toMillis(30)
 
     init {
         EventBus.postNetworkConnectionState(NetworkConnectionState.UNKNOWN)
@@ -65,53 +60,20 @@ internal class NetworkConnectionStateReceiver : BroadcastReceiver() {
             return
         }
         val mContext = context ?: return
-        Thread {
-            pingCurrentRetry = 0
-            if (checkConnection(mContext)) {
-                Logger.d("Connected to the internet.")
-                EventBus.postNetworkConnectionState(NetworkConnectionState.CONNECTED)
-            } else {
-                Logger.d("Disconnected from the internet.")
-                EventBus.postNetworkConnectionState(NetworkConnectionState.DISCONNECTED)
-            }
-        }.start()
+        if (checkConnection(mContext)) {
+            Logger.d("Connected to the internet.")
+            EventBus.postNetworkConnectionState(NetworkConnectionState.CONNECTED)
+        } else {
+            Logger.d("Disconnected from the internet.")
+            EventBus.postNetworkConnectionState(NetworkConnectionState.DISCONNECTED)
+        }
     }
 
     private fun checkConnection(context: Context): Boolean {
         // check network connection status
         val cm = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         val activeNetwork: NetworkInfo? = cm.activeNetworkInfo
-        if (activeNetwork?.isConnected != true) {
-            return false
-        }
-        pingCurrentRetry = 1
-        while (pingCurrentRetry <= pingMaxRetryCount) {
-            val runtime = Runtime.getRuntime()
-            val process = runtime.exec("/system/bin/ping -c 1 8.8.8.8")
-            val timeoutMillis = System.currentTimeMillis() + pingTimeOutMs
-            while (isAlive(process) && System.currentTimeMillis() < timeoutMillis) {
-                Thread.sleep(pingRetryPeriodMs)
-            }
-            if (isAlive(process)) {
-                process.destroy()
-                pingCurrentRetry++
-                continue
-            }
-            if (process.exitValue() == 0) {
-                return true
-            }
-            pingCurrentRetry++
-        }
-        return false
-    }
-
-    private fun isAlive(process: Process): Boolean {
-        return try {
-            process.exitValue()
-            false
-        } catch (ignored: Throwable) {
-            true
-        }
+        return activeNetwork?.isConnected ?: false
     }
 
 }
