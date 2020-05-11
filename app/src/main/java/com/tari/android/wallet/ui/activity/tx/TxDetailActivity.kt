@@ -62,7 +62,7 @@ import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.extension.txFormattedDate
 import com.tari.android.wallet.infrastructure.Tracker
 import com.tari.android.wallet.model.*
-import com.tari.android.wallet.model.Status.*
+import com.tari.android.wallet.model.TxStatus.*
 import com.tari.android.wallet.service.TariWalletService
 import com.tari.android.wallet.service.WalletService
 import com.tari.android.wallet.ui.animation.collapseAndHideAnimation

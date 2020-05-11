@@ -349,13 +349,13 @@ internal class FFIWallet(
         val timestamp = tx.getTimestamp()
         val message = tx.getMessage()
         val status = when (tx.getStatus()) {
-            FFIStatus.BROADCAST -> Status.BROADCAST
-            FFIStatus.COMPLETED -> Status.COMPLETED
-            FFIStatus.IMPORTED -> Status.IMPORTED
-            FFIStatus.MINED -> Status.MINED
-            FFIStatus.PENDING -> Status.PENDING
-            FFIStatus.TX_NULL_ERROR -> Status.TX_NULL_ERROR
-            else -> Status.UNKNOWN
+            FFITxStatus.BROADCAST -> TxStatus.BROADCAST
+            FFITxStatus.COMPLETED -> TxStatus.COMPLETED
+            FFITxStatus.IMPORTED -> TxStatus.IMPORTED
+            FFITxStatus.MINED -> TxStatus.MINED
+            FFITxStatus.PENDING -> TxStatus.PENDING
+            FFITxStatus.TX_NULL_ERROR -> TxStatus.TX_NULL_ERROR
+            else -> TxStatus.UNKNOWN
         }
         tx.destroy()
 
@@ -395,13 +395,13 @@ internal class FFIWallet(
         val timestamp = tx.getTimestamp()
         val message = tx.getMessage()
         val status = when (tx.getStatus()) {
-            FFIStatus.BROADCAST -> Status.BROADCAST
-            FFIStatus.COMPLETED -> Status.COMPLETED
-            FFIStatus.IMPORTED -> Status.IMPORTED
-            FFIStatus.MINED -> Status.MINED
-            FFIStatus.PENDING -> Status.PENDING
-            FFIStatus.TX_NULL_ERROR -> Status.TX_NULL_ERROR
-            else -> Status.UNKNOWN
+            FFITxStatus.BROADCAST -> TxStatus.BROADCAST
+            FFITxStatus.COMPLETED -> TxStatus.COMPLETED
+            FFITxStatus.IMPORTED -> TxStatus.IMPORTED
+            FFITxStatus.MINED -> TxStatus.MINED
+            FFITxStatus.PENDING -> TxStatus.PENDING
+            FFITxStatus.TX_NULL_ERROR -> TxStatus.TX_NULL_ERROR
+            else -> TxStatus.UNKNOWN
         }
         tx.destroy()
 
@@ -438,13 +438,13 @@ internal class FFIWallet(
         val timestamp = tx.getTimestamp()
         val message = tx.getMessage()
         val status = when (tx.getStatus()) {
-            FFIStatus.BROADCAST -> Status.BROADCAST
-            FFIStatus.COMPLETED -> Status.COMPLETED
-            FFIStatus.IMPORTED -> Status.IMPORTED
-            FFIStatus.MINED -> Status.MINED
-            FFIStatus.PENDING -> Status.PENDING
-            FFIStatus.TX_NULL_ERROR -> Status.TX_NULL_ERROR
-            else -> Status.UNKNOWN
+            FFITxStatus.BROADCAST -> TxStatus.BROADCAST
+            FFITxStatus.COMPLETED -> TxStatus.COMPLETED
+            FFITxStatus.IMPORTED -> TxStatus.IMPORTED
+            FFITxStatus.MINED -> TxStatus.MINED
+            FFITxStatus.PENDING -> TxStatus.PENDING
+            FFITxStatus.TX_NULL_ERROR -> TxStatus.TX_NULL_ERROR
+            else -> TxStatus.UNKNOWN
         }
         tx.destroy()
 
@@ -471,13 +471,13 @@ internal class FFIWallet(
         val timestamp = tx.getTimestamp()
         val message = tx.getMessage()
         val status = when (tx.getStatus()) {
-            FFIStatus.BROADCAST -> Status.BROADCAST
-            FFIStatus.COMPLETED -> Status.COMPLETED
-            FFIStatus.IMPORTED -> Status.IMPORTED
-            FFIStatus.MINED -> Status.MINED
-            FFIStatus.PENDING -> Status.PENDING
-            FFIStatus.TX_NULL_ERROR -> Status.TX_NULL_ERROR
-            else -> Status.UNKNOWN
+            FFITxStatus.BROADCAST -> TxStatus.BROADCAST
+            FFITxStatus.COMPLETED -> TxStatus.COMPLETED
+            FFITxStatus.IMPORTED -> TxStatus.IMPORTED
+            FFITxStatus.MINED -> TxStatus.MINED
+            FFITxStatus.PENDING -> TxStatus.PENDING
+            FFITxStatus.TX_NULL_ERROR -> TxStatus.TX_NULL_ERROR
+            else -> TxStatus.UNKNOWN
         }
         tx.destroy()
 
@@ -519,13 +519,13 @@ internal class FFIWallet(
         val timestamp = tx.getTimestamp()
         val message = tx.getMessage()
         val status = when (tx.getStatus()) {
-            FFIStatus.BROADCAST -> Status.BROADCAST
-            FFIStatus.COMPLETED -> Status.COMPLETED
-            FFIStatus.IMPORTED -> Status.IMPORTED
-            FFIStatus.MINED -> Status.MINED
-            FFIStatus.PENDING -> Status.PENDING
-            FFIStatus.TX_NULL_ERROR -> Status.TX_NULL_ERROR
-            else -> Status.UNKNOWN
+            FFITxStatus.BROADCAST -> TxStatus.BROADCAST
+            FFITxStatus.COMPLETED -> TxStatus.COMPLETED
+            FFITxStatus.IMPORTED -> TxStatus.IMPORTED
+            FFITxStatus.MINED -> TxStatus.MINED
+            FFITxStatus.PENDING -> TxStatus.PENDING
+            FFITxStatus.TX_NULL_ERROR -> TxStatus.TX_NULL_ERROR
+            else -> TxStatus.UNKNOWN
         }
         tx.destroy()
 

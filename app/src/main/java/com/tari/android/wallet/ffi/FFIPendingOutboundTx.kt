@@ -126,18 +126,18 @@ internal class FFIPendingOutboundTx(pointer: FFIPendingOutboundTxPtr) : FFIBase(
         return result
     }
 
-    fun getStatus(): FFIStatus {
+    fun getStatus(): FFITxStatus {
         val error = FFIError()
         val status = jniGetStatus(error)
         throwIf(error)
         return when (status) {
-            -1 -> FFIStatus.TX_NULL_ERROR
-            0 -> FFIStatus.COMPLETED
-            1 -> FFIStatus.BROADCAST
-            2 -> FFIStatus.MINED
-            3 -> FFIStatus.IMPORTED
-            4 -> FFIStatus.PENDING
-            5 -> FFIStatus.UNKNOWN
+            -1 -> FFITxStatus.TX_NULL_ERROR
+            0 -> FFITxStatus.COMPLETED
+            1 -> FFITxStatus.BROADCAST
+            2 -> FFITxStatus.MINED
+            3 -> FFITxStatus.IMPORTED
+            4 -> FFITxStatus.PENDING
+            5 -> FFITxStatus.UNKNOWN
             else -> throw FFIException(message = "Unexpected status: $status")
         }
     }
