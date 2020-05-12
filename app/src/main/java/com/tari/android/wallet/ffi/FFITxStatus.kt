@@ -37,7 +37,7 @@ package com.tari.android.wallet.ffi
  *
  * @author The Tari Development Team
  */
-enum class FFIStatus {
+enum class FFITxStatus {
     TX_NULL_ERROR,
     COMPLETED,
     BROADCAST,

@@ -44,7 +44,7 @@ import java.math.BigInteger
 class CompletedTx() : Tx(), Parcelable {
 
     var fee = MicroTari(BigInteger("0"))
-    var status = Status.COMPLETED
+    var status = TxStatus.COMPLETED
 
     constructor(
         id: BigInteger,
@@ -54,7 +54,7 @@ class CompletedTx() : Tx(), Parcelable {
         fee: MicroTari,
         timestamp: BigInteger,
         message: String,
-        status: Status
+        status: TxStatus
     ) : this() {
         this.id = id
         this.direction = direction
@@ -113,7 +113,7 @@ class CompletedTx() : Tx(), Parcelable {
         fee = inParcel.readParcelable(MicroTari::class.java.classLoader)!!
         timestamp = inParcel.readSerializable() as BigInteger
         message = inParcel.readString() ?: ""
-        status = inParcel.readSerializable() as Status
+        status = inParcel.readSerializable() as TxStatus
     }
 
     override fun describeContents(): Int {

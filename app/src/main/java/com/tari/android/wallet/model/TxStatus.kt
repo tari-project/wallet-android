@@ -37,7 +37,7 @@ package com.tari.android.wallet.model
  *
  * @author The Tari Development Team
  */
-enum class Status {
+enum class TxStatus {
     TX_NULL_ERROR,
     COMPLETED,
     BROADCAST,

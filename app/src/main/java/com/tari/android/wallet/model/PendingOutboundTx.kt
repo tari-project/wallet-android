@@ -44,7 +44,7 @@ import java.math.BigInteger
 class PendingOutboundTx() : Tx(), Parcelable {
 
     var fee = MicroTari(BigInteger("0"))
-    var status = Status.PENDING
+    var status = TxStatus.PENDING
 
     constructor(
         id: BigInteger,
@@ -53,7 +53,7 @@ class PendingOutboundTx() : Tx(), Parcelable {
         fee: MicroTari,
         timestamp: BigInteger,
         message: String,
-        status: Status
+        status: TxStatus
     ) : this() {
         this.id = id
         this.direction = Direction.OUTBOUND
@@ -112,7 +112,7 @@ class PendingOutboundTx() : Tx(), Parcelable {
         fee = inParcel.readParcelable(MicroTari::class.java.classLoader)!!
         timestamp = inParcel.readSerializable() as BigInteger
         message = inParcel.readString() ?: ""
-        status = inParcel.readSerializable() as Status
+        status = inParcel.readSerializable() as TxStatus
     }
 
     override fun describeContents(): Int {

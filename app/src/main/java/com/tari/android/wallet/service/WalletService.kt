@@ -786,13 +786,13 @@ internal class WalletService : Service(), FFIWalletListenerAdapter {
             val sourcePublicKeyFFI = completedTxFFI.getSourcePublicKey()
             val destinationPublicKeyFFI = completedTxFFI.getDestinationPublicKey()
             val status = when (completedTxFFI.getStatus()) {
-                FFIStatus.TX_NULL_ERROR -> Status.TX_NULL_ERROR
-                FFIStatus.BROADCAST -> Status.BROADCAST
-                FFIStatus.COMPLETED -> Status.COMPLETED
-                FFIStatus.MINED -> Status.MINED
-                FFIStatus.IMPORTED -> Status.IMPORTED
-                FFIStatus.PENDING -> Status.PENDING
-                FFIStatus.UNKNOWN -> Status.UNKNOWN
+                FFITxStatus.TX_NULL_ERROR -> TxStatus.TX_NULL_ERROR
+                FFITxStatus.BROADCAST -> TxStatus.BROADCAST
+                FFITxStatus.COMPLETED -> TxStatus.COMPLETED
+                FFITxStatus.MINED -> TxStatus.MINED
+                FFITxStatus.IMPORTED -> TxStatus.IMPORTED
+                FFITxStatus.PENDING -> TxStatus.PENDING
+                FFITxStatus.UNKNOWN -> TxStatus.UNKNOWN
             }
             val user: User
             val direction: Tx.Direction
@@ -846,13 +846,13 @@ internal class WalletService : Service(), FFIWalletListenerAdapter {
             allContacts: List<Contact>
         ): PendingInboundTx {
             val status = when (pendingInboundTxFFI.getStatus()) {
-                FFIStatus.TX_NULL_ERROR -> Status.TX_NULL_ERROR
-                FFIStatus.BROADCAST -> Status.BROADCAST
-                FFIStatus.COMPLETED -> Status.COMPLETED
-                FFIStatus.MINED -> Status.MINED
-                FFIStatus.IMPORTED -> Status.IMPORTED
-                FFIStatus.PENDING -> Status.PENDING
-                FFIStatus.UNKNOWN -> Status.UNKNOWN
+                FFITxStatus.TX_NULL_ERROR -> TxStatus.TX_NULL_ERROR
+                FFITxStatus.BROADCAST -> TxStatus.BROADCAST
+                FFITxStatus.COMPLETED -> TxStatus.COMPLETED
+                FFITxStatus.MINED -> TxStatus.MINED
+                FFITxStatus.IMPORTED -> TxStatus.IMPORTED
+                FFITxStatus.PENDING -> TxStatus.PENDING
+                FFITxStatus.UNKNOWN -> TxStatus.UNKNOWN
             }
             val sourcePublicKeyFFI = pendingInboundTxFFI.getSourcePublicKey()
             val userPublicKey = PublicKey(
@@ -881,13 +881,13 @@ internal class WalletService : Service(), FFIWalletListenerAdapter {
             allContacts: List<Contact>
         ): PendingOutboundTx {
             val status = when (pendingOutboundTxFFI.getStatus()) {
-                FFIStatus.TX_NULL_ERROR -> Status.TX_NULL_ERROR
-                FFIStatus.BROADCAST -> Status.BROADCAST
-                FFIStatus.COMPLETED -> Status.COMPLETED
-                FFIStatus.MINED -> Status.MINED
-                FFIStatus.IMPORTED -> Status.IMPORTED
-                FFIStatus.PENDING -> Status.PENDING
-                FFIStatus.UNKNOWN -> Status.UNKNOWN
+                FFITxStatus.TX_NULL_ERROR -> TxStatus.TX_NULL_ERROR
+                FFITxStatus.BROADCAST -> TxStatus.BROADCAST
+                FFITxStatus.COMPLETED -> TxStatus.COMPLETED
+                FFITxStatus.MINED -> TxStatus.MINED
+                FFITxStatus.IMPORTED -> TxStatus.IMPORTED
+                FFITxStatus.PENDING -> TxStatus.PENDING
+                FFITxStatus.UNKNOWN -> TxStatus.UNKNOWN
             }
             val destinationPublicKeyFFI = pendingOutboundTxFFI.getDestinationPublicKey()
             val userPublicKey = PublicKey(

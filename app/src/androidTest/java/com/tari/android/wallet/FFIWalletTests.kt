@@ -190,7 +190,7 @@ class FFIWalletTests {
             assertTrue(inboundTxAmount > BigInteger("0"))
             val inboundTxTimestamp = inbound.getTimestamp()
             inboundTxTimestamp.toString()
-            if (inbound.getStatus() == FFIStatus.PENDING)
+            if (inbound.getStatus() == FFITxStatus.PENDING)
             {
                 val inboundTx = wallet.getPendingInboundTxById(inbound.getId())
                 assertTrue(inboundTx.getPointer() != nullptr)
