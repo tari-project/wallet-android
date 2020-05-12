@@ -36,6 +36,7 @@ import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
 import android.animation.ValueAnimator
 import android.annotation.SuppressLint
+import android.app.Dialog
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
@@ -158,6 +159,9 @@ internal class HomeActivity : AppCompatActivity(),
     private var recyclerViewScrollListener = RecyclerViewScrollListener(this)
 
     private lateinit var updateProgressViewController: UpdateProgressViewController
+
+    private var currentDialog: Dialog? = null
+
     // region lifecycle functions
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -748,7 +752,8 @@ internal class HomeActivity : AppCompatActivity(),
     }
 
     private fun showTestnetTariReceivedDialog(testnetSenderPublicKey: PublicKey) {
-        BottomSlideDialog(
+        currentDialog?.dismiss()
+        currentDialog = BottomSlideDialog(
             context = this,
             layoutId = R.layout.home_dialog_testnet_tari_received,
             canceledOnTouchOutside = false
@@ -762,6 +767,7 @@ internal class HomeActivity : AppCompatActivity(),
                 )
             findViewById<TextView>(R.id.home_tari_bot_dialog_txt_try_later)
                 .setOnClickListener {
+                    currentDialog = null
                     dismiss()
                     ui.rootView.postDelayed({
                         showSendTariButtonAnimated()
@@ -769,6 +775,7 @@ internal class HomeActivity : AppCompatActivity(),
                 }
             findViewById<TextView>(R.id.home_tari_bot_dialog_btn_send_tari)
                 .setOnClickListener {
+                    currentDialog = null
                     dismiss()
                     sendTariToUser(testnetSenderPublicKey)
                     ui.rootView.postDelayed({
@@ -780,7 +787,8 @@ internal class HomeActivity : AppCompatActivity(),
     }
 
     private fun showTTLStoreDialog() {
-        BottomSlideDialog(
+        currentDialog?.dismiss()
+        currentDialog = BottomSlideDialog(
             context = this,
             layoutId = R.layout.home_dialog_ttl_store
         ).apply {
@@ -793,12 +801,14 @@ internal class HomeActivity : AppCompatActivity(),
                 )
             findViewById<View>(R.id.home_ttl_store_dialog_btn_later)
                 .setOnClickListener {
+                    currentDialog = null
                     dismiss()
                 }
             findViewById<View>(R.id.home_ttl_store_dialog_vw_store_button)
                 .setOnClickListener {
                     visitTTLStore()
                     handler.postDelayed({
+                        currentDialog = null
                         dismiss()
                     }, Constants.UI.mediumDurationMs)
                 }
@@ -1091,7 +1101,8 @@ internal class HomeActivity : AppCompatActivity(),
     }
 
     private fun displayNetworkConnectionErrorDialog() {
-        BottomSlideDialog(
+        currentDialog?.dismiss()
+        currentDialog = BottomSlideDialog(
             context = this,
             layoutId = R.layout.tx_failed_dialog,
             dismissViewId = R.id.tx_failed_dialog_txt_close
@@ -1102,10 +1113,14 @@ internal class HomeActivity : AppCompatActivity(),
             descriptionTextView.text = string(R.string.error_no_connection_description)
             // set text
         }.show()
+        currentDialog?.setOnDismissListener {
+            currentDialog = null
+        }
     }
 
     private fun displayBaseNodeConnectionErrorDialog() {
-        BottomSlideDialog(
+        currentDialog?.dismiss()
+        currentDialog = BottomSlideDialog(
             context = this,
             layoutId = R.layout.tx_failed_dialog,
             dismissViewId = R.id.tx_failed_dialog_txt_close
@@ -1116,6 +1131,9 @@ internal class HomeActivity : AppCompatActivity(),
             descriptionTextView.text = string(R.string.error_node_unreachable_description)
             // set text
         }.show()
+        currentDialog?.setOnDismissListener {
+            currentDialog = null
+        }
     }
 
     // region send tari button animation listener

@@ -33,7 +33,10 @@ class BottomSlideDialog private constructor(private val dialog: Dialog) {
 
     fun <T : View> findViewById(id: Int): T = dialog.findViewById(id)
 
-    fun show() = dialog.show()
+    fun show(): Dialog {
+        dialog.show()
+        return dialog
+    }
 
     fun dismiss() = dialog.dismiss()
 
