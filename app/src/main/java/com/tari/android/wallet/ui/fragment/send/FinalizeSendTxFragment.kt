@@ -114,6 +114,7 @@ class FinalizeSendTxFragment(private val walletService: TariWalletService) : Fra
 
     private var currentStep = Step.CONNECTION_CHECK
     private val maxProgress = 100
+
     // progress from 0-to-max and otherwise both increment this field
     private var progressAnimationToggleCount = 0
     private val progressBarFillDurationMs = 850L
@@ -144,9 +145,10 @@ class FinalizeSendTxFragment(private val walletService: TariWalletService) : Fra
 
     override fun onDestroyView() {
         super.onDestroyView()
+        EventBus.unsubscribeFromTorProxyState(this)
+        EventBus.unsubscribe(this)
         ui.lottieAnimationView.removeAllAnimatorListeners()
         _ui = null
-        EventBus.unsubscribe(this)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -432,10 +434,9 @@ class FinalizeSendTxFragment(private val walletService: TariWalletService) : Fra
             return
         }
         // start waiting on base node sync status
+        val wr = WeakReference(this)
         EventBus.subscribe<Event.Wallet.BaseNodeSyncComplete>(this) { event ->
-            wr.get()?.ui?.rootView?.post {
-                wr.get()?.onBaseNodeSyncCompleted(event)
-            }
+            wr.get()?._ui?.rootView?.post { onBaseNodeSyncCompleted(event) }
         }
     }
 
@@ -446,10 +447,10 @@ class FinalizeSendTxFragment(private val walletService: TariWalletService) : Fra
             } else {
                 syncWithBaseNode()
             }
-            return
+        } else {
+            // base node sync success, switch to next state
+            switchToNextProgressStateOnProgressAnimComplete = true
         }
-        // base node sync success, switch to next state
-        switchToNextProgressStateOnProgressAnimComplete = true
     }
 
     private fun fadeOutTextViews(completion: () -> Unit) {
@@ -556,7 +557,7 @@ class FinalizeSendTxFragment(private val walletService: TariWalletService) : Fra
         ui.lottieAnimationView.progress = lottieAnimationPauseProgress
 
         // track event
-        val trackerEvent = when(failureReason) {
+        val trackerEvent = when (failureReason) {
             FailureReason.NETWORK_CONNECTION_ERROR -> "Transaction Failed - Tor Issue"
             FailureReason.BASE_NODE_CONNECTION_ERROR -> "Transaction Failed - Node Issue"
             FailureReason.SEND_ERROR -> "Transaction Failed - Node Issue"
