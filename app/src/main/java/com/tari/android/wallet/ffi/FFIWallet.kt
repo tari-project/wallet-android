@@ -37,6 +37,7 @@ import android.os.Looper
 import com.orhanobut.logger.Logger
 import com.tari.android.wallet.model.*
 import java.math.BigInteger
+import java.util.concurrent.atomic.AtomicReference
 
 /**
  * Wallet wrapper.
@@ -51,7 +52,10 @@ internal class FFIWallet(
 ) : FFIBase() {
 
     companion object {
-        var instance: FFIWallet? = null
+        private var atomicInstance = AtomicReference<FFIWallet>()
+        var instance: FFIWallet?
+            get() = atomicInstance.get()
+            set(value) = atomicInstance.set(value)
     }
 
     // region JNI
