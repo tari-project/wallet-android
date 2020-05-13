@@ -34,6 +34,7 @@ package com.tari.android.wallet.ui.fragment.onboarding
 
 import android.animation.*
 import android.content.Context
+import android.content.Intent
 import android.media.AudioManager
 import android.os.Build
 import android.os.Bundle
@@ -44,6 +45,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.daasuu.ei.Ease
 import com.daasuu.ei.EasingInterpolator
@@ -54,6 +56,7 @@ import com.tari.android.wallet.databinding.FragmentIntroductionBinding
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.extension.applyURLStyle
 import com.tari.android.wallet.infrastructure.Tracker
+import com.tari.android.wallet.service.WalletService
 import com.tari.android.wallet.ui.extension.*
 import com.tari.android.wallet.ui.util.UiUtil
 import com.tari.android.wallet.ui.util.UiUtil.getResourceUri
@@ -77,6 +80,9 @@ internal class IntroductionFragment : Fragment() {
 
     @Inject
     lateinit var tracker: Tracker
+
+    @Inject
+    lateinit var applicationContext: Context
 
     private var listener: Listener? = null
 
@@ -242,6 +248,7 @@ internal class IntroductionFragment : Fragment() {
         UiUtil.temporarilyDisableClick(ui.createWalletButton)
         ui.createWalletButton.gone()
         ui.createWalletProgressBar.visible()
+        startWalletService()
         val animatorSet = UiUtil.animateViewClick(ui.createWalletContainerView)
         animatorSet.addListener(object : AnimatorListenerAdapter() {
             override fun onAnimationEnd(animation: Animator?) {
@@ -252,6 +259,15 @@ internal class IntroductionFragment : Fragment() {
                 )
             }
         })
+    }
+
+    private fun startWalletService() {
+        // start the wallet service
+        applicationContext
+        ContextCompat.startForegroundService(
+            applicationContext,
+            Intent(applicationContext, WalletService::class.java)
+        )
     }
 
     private fun startTariWalletViewAnimation() {

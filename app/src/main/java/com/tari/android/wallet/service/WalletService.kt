@@ -38,6 +38,8 @@ import android.os.IBinder
 import com.orhanobut.logger.Logger
 import com.tari.android.wallet.R
 import com.tari.android.wallet.application.TariWalletApplication
+import com.tari.android.wallet.application.WalletManager
+import com.tari.android.wallet.application.WalletState
 import com.tari.android.wallet.event.Event
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.ffi.*
@@ -95,7 +97,10 @@ internal class WalletService : Service(), FFIWalletListenerAdapter {
     @Inject
     lateinit var sharedPrefsWrapper: SharedPrefsWrapper
 
-    private val wallet = FFIWallet.instance!!
+    @Inject
+    lateinit var walletManager: WalletManager
+
+    private lateinit var wallet: FFIWallet
 
     /**
      * Pairs of <tx id, recipient public key hex>.
@@ -131,63 +136,31 @@ internal class WalletService : Service(), FFIWalletListenerAdapter {
                 cancelExpiredPendingOutboundTxs()
             }
 
-    /**
-     * Cancels expired pending inbound transactions.
-     * Expiration period is defined by Constants.Wallet.pendingTxExpirationPeriodHours
-     */
-    private fun cancelExpiredPendingInboundTxs() {
-        val pendingInboundTxs = wallet.getPendingInboundTxs()
-        val pendingInboundTxsLength = pendingInboundTxs.getLength()
-        val now = DateTime.now().toLocalDateTime()
-        for (i in 0 until pendingInboundTxsLength) {
-            val tx = pendingInboundTxs.getAt(i)
-            val txDate = DateTime(tx.getTimestamp().toLong() * 1000L).toLocalDateTime()
-            val hoursPassed = Hours.hoursBetween(txDate, now).hours
-            if (hoursPassed >= Constants.Wallet.pendingTxExpirationPeriodHours) {
-                val success = wallet.cancelPendingTx(tx.getId())
-                Logger.d("Expired pending inbound tx ${tx.getId()}. Success: $success.")
-            }
-            tx.destroy()
-        }
-        pendingInboundTxs.destroy()
-    }
-
-    /**
-     * Cancels expired pending outbound transactions.
-     * Expiration period is defined by Constants.Wallet.pendingTxExpirationPeriodHours
-     */
-    private fun cancelExpiredPendingOutboundTxs() {
-        val pendingOutboundTxs = wallet.getPendingOutboundTxs()
-        val pendingOutboundTxsLength = wallet.getPendingOutboundTxs().getLength()
-        val now = DateTime.now().toLocalDateTime()
-        for (i in 0 until pendingOutboundTxsLength) {
-            val tx = pendingOutboundTxs.getAt(i)
-            val txDate = DateTime(tx.getTimestamp().toLong() * 1000L).toLocalDateTime()
-            val hoursPassed = Hours.hoursBetween(txDate, now).hours
-            if (hoursPassed >= Constants.Wallet.pendingTxExpirationPeriodHours) {
-                val success = wallet.cancelPendingTx(tx.getId())
-                Logger.d("Expired pending outbound tx ${tx.getId()}. Success: $success")
-            }
-            tx.destroy()
-        }
-
-        pendingOutboundTxs.destroy()
-    }
-
     override fun onCreate() {
         super.onCreate()
         (application as TariWalletApplication).appComponent.inject(this)
-        wallet.listenerAdapter = this
     }
 
     /**
      * Called on service start-up.
      */
     override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
+        // start wallet manager & listen to events
+        EventBus.subscribeToWalletState(this, this::onWalletStateChanged)
+        walletManager.start()
+        // start service & post foreground service notification
         val notification = notificationHelper.buildForegroundServiceNotification()
         startForeground(NOTIFICATION_ID, notification)
         Logger.d("Tari wallet service started.")
         return START_NOT_STICKY
+    }
+
+    private fun onWalletStateChanged(walletState: WalletState) {
+        if (walletState == WalletState.RUNNING) {
+            wallet = FFIWallet.instance!!
+            wallet.listenerAdapter = this
+            EventBus.unsubscribeFromWalletState(this)
+        }
     }
 
     /**
@@ -327,6 +300,49 @@ internal class WalletService : Service(), FFIWalletListenerAdapter {
         listeners.iterator().forEach {
             it.onBaseNodeSyncComplete(RxId(rxId), success)
         }
+    }
+
+    /**
+     * Cancels expired pending inbound transactions.
+     * Expiration period is defined by Constants.Wallet.pendingTxExpirationPeriodHours
+     */
+    private fun cancelExpiredPendingInboundTxs() {
+        val pendingInboundTxs = wallet.getPendingInboundTxs()
+        val pendingInboundTxsLength = pendingInboundTxs.getLength()
+        val now = DateTime.now().toLocalDateTime()
+        for (i in 0 until pendingInboundTxsLength) {
+            val tx = pendingInboundTxs.getAt(i)
+            val txDate = DateTime(tx.getTimestamp().toLong() * 1000L).toLocalDateTime()
+            val hoursPassed = Hours.hoursBetween(txDate, now).hours
+            if (hoursPassed >= Constants.Wallet.pendingTxExpirationPeriodHours) {
+                val success = wallet.cancelPendingTx(tx.getId())
+                Logger.d("Expired pending inbound tx ${tx.getId()}. Success: $success.")
+            }
+            tx.destroy()
+        }
+        pendingInboundTxs.destroy()
+    }
+
+    /**
+     * Cancels expired pending outbound transactions.
+     * Expiration period is defined by Constants.Wallet.pendingTxExpirationPeriodHours
+     */
+    private fun cancelExpiredPendingOutboundTxs() {
+        val pendingOutboundTxs = wallet.getPendingOutboundTxs()
+        val pendingOutboundTxsLength = wallet.getPendingOutboundTxs().getLength()
+        val now = DateTime.now().toLocalDateTime()
+        for (i in 0 until pendingOutboundTxsLength) {
+            val tx = pendingOutboundTxs.getAt(i)
+            val txDate = DateTime(tx.getTimestamp().toLong() * 1000L).toLocalDateTime()
+            val hoursPassed = Hours.hoursBetween(txDate, now).hours
+            if (hoursPassed >= Constants.Wallet.pendingTxExpirationPeriodHours) {
+                val success = wallet.cancelPendingTx(tx.getId())
+                Logger.d("Expired pending outbound tx ${tx.getId()}. Success: $success")
+            }
+            tx.destroy()
+        }
+
+        pendingOutboundTxs.destroy()
     }
 
     private fun postTxNotification(tx: Tx) {

@@ -170,5 +170,5 @@ dependencies {
     implementation 'com.squareup:seismic:1.0.2'
 
     // sentry - crash analytics
-    implementation 'io.sentry:sentry-android:2.0.0'
+    implementation 'io.sentry:sentry-android:2.1.1'
 }

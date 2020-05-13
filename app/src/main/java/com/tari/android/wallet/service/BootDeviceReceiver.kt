@@ -37,12 +37,7 @@ import android.content.Context
 import android.content.Intent
 import androidx.core.content.ContextCompat
 import com.orhanobut.logger.Logger
-import com.tari.android.wallet.application.TariWalletApplication
-import com.tari.android.wallet.di.WalletModule
-import com.tari.android.wallet.util.SharedPrefsWrapper
-import java.io.File
-import javax.inject.Inject
-import javax.inject.Named
+import com.tari.android.wallet.util.WalletUtil
 
 /**
  * This receiver is responsible for starting the service after boot finish.
@@ -51,20 +46,11 @@ import javax.inject.Named
  */
 class BootDeviceReceiver : BroadcastReceiver() {
 
-    @Inject
-    @Named(WalletModule.FieldName.walletFilesDirPath)
-    lateinit var walletFilesDirPath: String
-    @Inject
-    internal lateinit var sharedPrefsWrapper: SharedPrefsWrapper
-
     override fun onReceive(context: Context?, intent: Intent?) {
         if (context == null || intent == null) return
         Logger.d("Boot device broadcast received.")
-
-        (context.applicationContext as TariWalletApplication).appComponent.inject(this)
-
-        val walletExists = File(walletFilesDirPath).list()!!.isNotEmpty()
-        if (walletExists && sharedPrefsWrapper.onboardingAuthSetupCompleted && Intent.ACTION_BOOT_COMPLETED == intent.action) {
+        if (WalletUtil.walletExists(context.applicationContext)
+            && Intent.ACTION_BOOT_COMPLETED == intent.action) {
             ContextCompat.startForegroundService(
                 context,
                 Intent(context, WalletService::class.java)
