@@ -32,23 +32,22 @@
  */
 package com.tari.android.wallet.ui.fragment.send
 
-import android.animation.*
+import android.animation.AnimatorSet
+import android.animation.ObjectAnimator
+import android.animation.ValueAnimator
 import android.annotation.SuppressLint
-import android.content.ClipData
-import android.content.ClipboardManager
-import android.content.Context
-import android.os.AsyncTask
-import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
+import android.content.*
+import android.os.*
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.core.animation.addListener
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.daasuu.ei.Ease
 import com.daasuu.ei.EasingInterpolator
+import com.orhanobut.logger.Logger
 import com.tari.android.wallet.R
 import com.tari.android.wallet.R.color.black
 import com.tari.android.wallet.R.color.light_gray
@@ -59,6 +58,7 @@ import com.tari.android.wallet.extension.remap
 import com.tari.android.wallet.infrastructure.Tracker
 import com.tari.android.wallet.model.*
 import com.tari.android.wallet.service.TariWalletService
+import com.tari.android.wallet.service.WalletService
 import com.tari.android.wallet.ui.component.EmojiIdCopiedViewController
 import com.tari.android.wallet.ui.component.EmojiIdSummaryViewController
 import com.tari.android.wallet.ui.dialog.BottomSlideDialog
@@ -78,7 +78,7 @@ import kotlin.math.min
  *
  * @author The Tari Development Team
  */
-class AddAmountFragment(private val walletService: TariWalletService) : Fragment() {
+class AddAmountFragment : Fragment(), ServiceConnection {
 
     @Inject
     lateinit var tracker: Tracker
@@ -123,7 +123,6 @@ class AddAmountFragment(private val walletService: TariWalletService) : Fragment
     private val amountCheckHandler = Handler(Looper.getMainLooper())
     private val amountCheckRunnable = AmountCheckRunnable()
 
-    private val wr = WeakReference(this)
     private lateinit var listenerWR: WeakReference<Listener>
 
     /**
@@ -141,17 +140,10 @@ class AddAmountFragment(private val walletService: TariWalletService) : Fragment
      */
     private lateinit var emojiIdCopiedViewController: EmojiIdCopiedViewController
 
+    private lateinit var walletService: TariWalletService
+
     private var _ui: FragmentAddAmountBinding? = null
     private val ui get() = _ui!!
-
-    companion object {
-
-        // TODO [CRASH]
-        fun newInstance(walletService: TariWalletService): AddAmountFragment {
-            return AddAmountFragment(walletService)
-        }
-
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -159,16 +151,36 @@ class AddAmountFragment(private val walletService: TariWalletService) : Fragment
         savedInstanceState: Bundle?
     ): View? = FragmentAddAmountBinding.inflate(inflater, container, false).also { _ui = it }.root
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _ui = null
-    }
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        bindToWalletService()
         AddAmountFragmentVisitor.visit(this)
-        setupUi()
-        tracker.screen(path = "/home/send_tari/add_amount", title = "Send Tari - Add Amount")
+        if (savedInstanceState == null) {
+            tracker.screen(path = "/home/send_tari/add_amount", title = "Send Tari - Add Amount")
+        }
+    }
+
+    private fun bindToWalletService() {
+        val bindIntent = Intent(requireActivity(), WalletService::class.java)
+        requireActivity().bindService(bindIntent, this, Context.BIND_AUTO_CREATE)
+    }
+
+    override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
+        Logger.i("AddAmountFragment onServiceConnected")
+        walletService = TariWalletService.Stub.asInterface(service)
+        // Only binding UI if we have not passed `onDestroyView` line, which is a possibility
+        _ui?.let { setupUi() }
+    }
+
+    override fun onServiceDisconnected(name: ComponentName?) {
+        Logger.i("AddAmountFragment onServiceDisconnected")
+        // No-op for now
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        requireActivity().unbindService(this)
+        _ui = null
     }
 
     private fun setupUi() {
@@ -330,11 +342,7 @@ class AddAmountFragment(private val walletService: TariWalletService) : Fragment
         val animSet = AnimatorSet()
         animSet.playSequentially(emojiIdAnim, copyEmojiIdButtonAnim)
         animSet.start()
-        animSet.addListener(object : AnimatorListenerAdapter() {
-            override fun onAnimationEnd(animation: Animator?) {
-                ui.dimmerView.isClickable = true
-            }
-        })
+        animSet.addListener(onEnd = { ui.dimmerView.isClickable = true })
         // scroll animation
         ui.fullEmojiIdScrollView.postDelayed({
             ui.fullEmojiIdScrollView.smoothScrollTo(0, 0)
@@ -386,13 +394,11 @@ class AddAmountFragment(private val walletService: TariWalletService) : Fragment
             animSet.play(emojiIdAnim)
         }
         animSet.start()
-        animSet.addListener(object : AnimatorListenerAdapter() {
-            override fun onAnimationEnd(animation: Animator?) {
-                ui.dimmerView.gone()
-                ui.fullEmojiIdBgClickBlockerView.isClickable = false
-                ui.fullEmojiIdContainerView.gone()
-                ui.copyEmojiIdButtonContainerView.gone()
-            }
+        animSet.addListener(onEnd = {
+            ui.dimmerView.gone()
+            ui.fullEmojiIdBgClickBlockerView.isClickable = false
+            ui.fullEmojiIdContainerView.gone()
+            ui.copyEmojiIdButtonContainerView.gone()
         })
     }
 
@@ -899,29 +905,24 @@ class AddAmountFragment(private val walletService: TariWalletService) : Fragment
 
     private fun continueButtonClicked() {
         ui.continueButton.isClickable = false
-        AsyncTask.execute {
-            wr.get()?.checkActualAvailableBalance()
-        }
+        AsyncTask.execute { checkActualAvailableBalance() }
     }
 
     private fun checkActualAvailableBalance() {
-        val error = WalletError()
-        val balanceInfo = walletService.getBalanceInfo(error)
-        if (error.code == WalletErrorCode.NO_ERROR) {
-            if (currentAmount > balanceInfo.availableBalance) {
-                ui.rootView.post {
-                    wr.get()?.actualBalanceExceeded()
+        _ui?.let { ui ->
+            val error = WalletError()
+            val balanceInfo = walletService.getBalanceInfo(error)
+            if (error.code == WalletErrorCode.NO_ERROR) {
+                if (currentAmount > balanceInfo.availableBalance) {
+                    ui.rootView.post { actualBalanceExceeded() }
+                } else {
+                    ui.rootView.post {
+                        continueToNote()
+                        ui.continueButton.isClickable = true
+                    }
                 }
             } else {
-                ui.rootView.post {
-                    wr.get()?.continueToNote()
-                    wr.get()?.ui?.continueButton?.isClickable = true
-                }
-            }
-        } else {
-            // TODO handle wallet error
-            ui.rootView.post {
-                wr.get()?.ui?.continueButton?.isClickable = true
+                ui.rootView.post { ui.continueButton.isClickable = true }
             }
         }
     }
@@ -959,85 +960,91 @@ class AddAmountFragment(private val walletService: TariWalletService) : Fragment
 
         @SuppressLint("SetTextI18n")
         override fun run() {
-            val error = WalletError()
-            val balanceInfo = walletService.getBalanceInfo(error)
-            if (error.code != WalletErrorCode.NO_ERROR) {
-                TODO("Unhandled wallet error: ${error.code}")
-            }
-            // update fee
-            val fee = WalletUtil.calculateTxFee()
-            ui.txFeeTextView.text = "+${WalletUtil.feeFormatter.format(fee.tariValue)}"
-            // check balance
-            val availableBalance =
-                balanceInfo.availableBalance + balanceInfo.pendingIncomingBalance
-            if ((currentAmount + WalletUtil.calculateTxFee()) > availableBalance) {
-                ui.availableBalanceTextView.text =
-                    WalletUtil.amountFormatter.format(availableBalance.tariValue)
-                wr.get()?.displayAvailableBalanceError()
-                if (ui.txFeeContainerView.visibility == View.INVISIBLE) {
-                    ui.txFeeContainerView.alpha = 0f
-                    ui.txFeeContainerView.visible()
+            _ui?.let { ui ->
+                val error = WalletError()
+                val balanceInfo = walletService.getBalanceInfo(error)
+                if (error.code != WalletErrorCode.NO_ERROR) {
+                    TODO("Unhandled wallet error: ${error.code}")
+                }
+                // update fee
+                val fee = WalletUtil.calculateTxFee()
+                ui.txFeeTextView.text = "+${WalletUtil.feeFormatter.format(fee.tariValue)}"
+                // check balance
+                val availableBalance =
+                    balanceInfo.availableBalance + balanceInfo.pendingIncomingBalance
+                if ((currentAmount + WalletUtil.calculateTxFee()) > availableBalance) {
+                    ui.availableBalanceTextView.text =
+                        WalletUtil.amountFormatter.format(availableBalance.tariValue)
+                    displayAvailableBalanceError()
+                    if (ui.txFeeContainerView.visibility == View.INVISIBLE) {
+                        ui.txFeeContainerView.alpha = 0f
+                        ui.txFeeContainerView.visible()
+                        val viewAnim = ValueAnimator.ofFloat(0f, 1f)
+                        viewAnim.addUpdateListener { valueAnimator: ValueAnimator ->
+                            _ui?.let {
+                                val value = valueAnimator.animatedValue as Float
+                                it.txFeeContainerView.translationY = (1f - value) * 100
+                                it.txFeeContainerView.alpha = value
+                            }
+                        }
+                        viewAnim.duration = Constants.UI.shortDurationMs
+                        // define interpolator
+                        viewAnim.interpolator = EasingInterpolator(Ease.CIRC_OUT)
+                        viewAnim.start()
+                    }
+                } else {
+                    var showsTxFee = false
+                    var hidesTxFee = false
+                    // show/hide continue button
+                    if (currentAmount.value.toInt() == 0) {
+                        ui.continueButton.invisible()
+                        // hide fee
+                        if (ui.txFeeContainerView.visibility != View.INVISIBLE) {
+                            hidesTxFee = true
+                        }
+                    } else {
+                        showContinueButtonAnimated()
+                        // display fee
+                        if (ui.txFeeContainerView.visibility != View.VISIBLE) {
+                            showsTxFee = true
+                            ui.txFeeContainerView.alpha = 0f
+                            ui.txFeeContainerView.visible()
+                        }
+                    }
+
                     val viewAnim = ValueAnimator.ofFloat(0f, 1f)
                     viewAnim.addUpdateListener { valueAnimator: ValueAnimator ->
-                        val value = valueAnimator.animatedValue as Float
-                        wr.get()?.ui?.txFeeContainerView?.translationY = (1f - value) * 100
-                        wr.get()?.ui?.txFeeContainerView?.alpha = value
+                        _ui?.let { ui ->
+                            val value = valueAnimator.animatedValue as Float
+                            if (ui.notEnoughBalanceView.visibility != View.INVISIBLE) {
+                                // update validation view
+                                ui.notEnoughBalanceView.alpha = (1 - value)
+                                val scale = (1 - value).remap(0f, 1f, 0.5f, 1f)
+                                ui.notEnoughBalanceView.scaleX = scale
+                                ui.notEnoughBalanceView.scaleY = scale
+                                if (value == 1F) {
+                                    ui.notEnoughBalanceView.invisible()
+                                }
+                            }
+
+                            // update tx fee view
+                            if (showsTxFee) {
+                                ui.txFeeContainerView.translationY = (1f - value) * 100
+                                ui.txFeeContainerView.alpha = value
+                            } else if (hidesTxFee) {
+                                ui.txFeeContainerView.translationY = value * 100
+                                ui.txFeeContainerView.alpha = (1f - value)
+                            }
+                            if (value == 1f && hidesTxFee) {
+                                ui.txFeeContainerView.invisible()
+                            }
+                        }
                     }
                     viewAnim.duration = Constants.UI.shortDurationMs
                     // define interpolator
                     viewAnim.interpolator = EasingInterpolator(Ease.CIRC_OUT)
                     viewAnim.start()
                 }
-            } else {
-                var showsTxFee = false
-                var hidesTxFee = false
-                // show/hide continue button
-                if (currentAmount.value.toInt() == 0) {
-                    ui.continueButton.invisible()
-                    // hide fee
-                    if (ui.txFeeContainerView.visibility != View.INVISIBLE) {
-                        hidesTxFee = true
-                    }
-                } else {
-                    showContinueButtonAnimated()
-                    // display fee
-                    if (ui.txFeeContainerView.visibility != View.VISIBLE) {
-                        showsTxFee = true
-                        ui.txFeeContainerView.alpha = 0f
-                        ui.txFeeContainerView.visible()
-                    }
-                }
-
-                val viewAnim = ValueAnimator.ofFloat(0f, 1f)
-                viewAnim.addUpdateListener { valueAnimator: ValueAnimator ->
-                    val value = valueAnimator.animatedValue as Float
-                    if (wr.get()?.ui?.notEnoughBalanceView?.visibility != View.INVISIBLE) {
-                        // update validation view
-                        wr.get()?.ui?.notEnoughBalanceView?.alpha = (1 - value)
-                        val scale = (1 - value).remap(0f, 1f, 0.5f, 1f)
-                        wr.get()?.ui?.notEnoughBalanceView?.scaleX = scale
-                        wr.get()?.ui?.notEnoughBalanceView?.scaleY = scale
-                        if (value == 1f) {
-                            wr.get()?.ui?.notEnoughBalanceView?.invisible()
-                        }
-                    }
-
-                    // update tx fee view
-                    if (showsTxFee) {
-                        wr.get()?.ui?.txFeeContainerView?.translationY = (1f - value) * 100
-                        wr.get()?.ui?.txFeeContainerView?.alpha = value
-                    } else if (hidesTxFee) {
-                        wr.get()?.ui?.txFeeContainerView?.translationY = value * 100
-                        wr.get()?.ui?.txFeeContainerView?.alpha = (1f - value)
-                    }
-                    if (value == 1f && hidesTxFee) {
-                        wr.get()?.ui?.txFeeContainerView?.invisible()
-                    }
-                }
-                viewAnim.duration = Constants.UI.shortDurationMs
-                // define interpolator
-                viewAnim.interpolator = EasingInterpolator(Ease.CIRC_OUT)
-                viewAnim.start()
             }
         }
     }

@@ -35,13 +35,8 @@ package com.tari.android.wallet.ui.fragment.send
 import android.animation.AnimatorSet
 import android.animation.ValueAnimator
 import android.app.Activity
-import android.content.ClipboardManager
-import android.content.Context
-import android.content.Intent
-import android.os.AsyncTask
-import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
+import android.content.*
+import android.os.*
 import android.text.Editable
 import android.text.InputType
 import android.text.TextWatcher
@@ -57,6 +52,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.daasuu.ei.Ease
 import com.daasuu.ei.EasingInterpolator
+import com.orhanobut.logger.Logger
 import com.tari.android.wallet.R
 import com.tari.android.wallet.R.color.*
 import com.tari.android.wallet.R.dimen.add_recipient_clipboard_emoji_id_container_height
@@ -69,6 +65,7 @@ import com.tari.android.wallet.databinding.FragmentAddRecipientBinding
 import com.tari.android.wallet.infrastructure.Tracker
 import com.tari.android.wallet.model.*
 import com.tari.android.wallet.service.TariWalletService
+import com.tari.android.wallet.service.WalletService
 import com.tari.android.wallet.ui.activity.qr.EXTRA_QR_DATA
 import com.tari.android.wallet.ui.activity.qr.QRScannerActivity
 import com.tari.android.wallet.ui.extension.*
@@ -88,10 +85,11 @@ import kotlin.math.min
  * @author The Tari Development Team
  */
 
-class AddRecipientFragment(private val walletService: TariWalletService) : Fragment(),
+class AddRecipientFragment : Fragment(),
     RecipientListAdapter.Listener,
     RecyclerView.OnItemTouchListener,
-    TextWatcher {
+    TextWatcher,
+    ServiceConnection {
 
     @Inject
     lateinit var tracker: Tracker
@@ -114,7 +112,6 @@ class AddRecipientFragment(private val walletService: TariWalletService) : Fragm
     private lateinit var allPastTxUsers: MutableList<User>
 
     private val recentTxContactsLimit = 6
-    private var wr = WeakReference(this)
     private var recipientsListedForTheFirstTime = true
 
     private lateinit var listenerWR: WeakReference<Listener>
@@ -140,15 +137,7 @@ class AddRecipientFragment(private val walletService: TariWalletService) : Fragm
 
     private var hidePasteEmojiIdViewsOnTextChanged = false
 
-    companion object {
-
-        // TODO [CRASH]
-        fun newInstance(walletService: TariWalletService): AddRecipientFragment {
-            return AddRecipientFragment(walletService)
-        }
-
-    }
-
+    private lateinit var walletService: TariWalletService
     private var _ui: FragmentAddRecipientBinding? = null
     private val ui get() = _ui!!
 
@@ -162,6 +151,10 @@ class AddRecipientFragment(private val walletService: TariWalletService) : Fragm
             ui.bottomDimmerView
         )
 
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        listenerWR = WeakReference(context as Listener)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -170,33 +163,57 @@ class AddRecipientFragment(private val walletService: TariWalletService) : Fragm
     ): View? =
         FragmentAddRecipientBinding.inflate(inflater, container, false).also { _ui = it }.root
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        bindToWalletService()
+        AddRecipientFragmentVisitor.visit(this)
+        if (savedInstanceState == null) {
+            tracker.screen(
+                path = "/home/send_tari/add_recipient",
+                title = "Send Tari - Add Recipient"
+            )
+        }
+    }
+
+    private fun bindToWalletService() {
+        val context = requireActivity()
+        val bindIntent = Intent(context, WalletService::class.java)
+        context.bindService(bindIntent, this, Context.BIND_AUTO_CREATE)
+    }
+
+    override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
+        // Local variable is necessary because of thread-safety guarantee
+        Logger.i("AddRecipientFragment onServiceConnected")
+        val walletService = TariWalletService.Stub.asInterface(service)
+        this.walletService = walletService
+        _ui?.let {
+            setupUi()
+            Thread {
+                fetchAllData(walletService) {
+                    ui.rootView.post {
+                        displayInitialList()
+                        ui.searchEditText.setRawInputType(InputType.TYPE_CLASS_TEXT)
+                        ui.searchEditText.addTextChangedListener(this)
+                    }
+                    checkClipboardForValidEmojiId()
+                }
+            }.start()
+        }
+    }
+
+    override fun onServiceDisconnected(name: ComponentName?) {
+        Logger.i("AddRecipientFragment onServiceDisconnected")
+        // No-op
+    }
+
     override fun onDestroyView() {
         super.onDestroyView()
+        requireActivity().unbindService(this)
         _ui = null
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        AddRecipientFragmentVisitor.visit(this)
-        // initialize recycler view
-        setupUi()
-        // fetch data
-        Thread {
-            fetchAllData {
-                ui.rootView.post {
-                    displayInitialList()
-                    ui.searchEditText.setRawInputType(InputType.TYPE_CLASS_TEXT)
-                    ui.searchEditText.addTextChangedListener(this)
-                }
-                checkClipboardForValidEmojiId()
-            }
-        }.start()
-
-        tracker.screen(path = "/home/send_tari/add_recipient", title = "Send Tari - Add Recipient")
-    }
-
     private fun setupUi() {
-        recyclerViewLayoutManager = LinearLayoutManager(activity)
+        recyclerViewLayoutManager = LinearLayoutManager(requireActivity())
         ui.contactsListRecyclerView.layoutManager = recyclerViewLayoutManager
         recyclerViewAdapter = RecipientListAdapter(this)
         ui.contactsListRecyclerView.adapter = recyclerViewAdapter
@@ -225,11 +242,6 @@ class AddRecipientFragment(private val walletService: TariWalletService) : Fragm
             ui.searchEditText.isEnabled = true
             ui.continueButton.gone()
         }
-    }
-
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-        listenerWR = WeakReference(context as Listener)
     }
 
     private fun startQRCodeActivity() {
@@ -263,10 +275,10 @@ class AddRecipientFragment(private val walletService: TariWalletService) : Fragm
         }
         emojiIdPublicKey?.let {
             if (it.emojiId != sharedPrefsWrapper.emojiId!!) {
-                ui.contactsListRecyclerView.post {
-                    wr.get()?.hidePasteEmojiIdViewsOnTextChanged = true
-                    wr.get()?.showPasteEmojiIdViews(it)
-                    wr.get()?.focusEditTextAndShowKeyboard()
+                _ui?.rootView?.post {
+                    hidePasteEmojiIdViewsOnTextChanged = true
+                    showPasteEmojiIdViews(it)
+                    focusEditTextAndShowKeyboard()
                 }
             }
 
@@ -383,7 +395,7 @@ class AddRecipientFragment(private val walletService: TariWalletService) : Fragm
     /**
      * Called only once in onCreate.
      */
-    private fun fetchAllData(onComplete: () -> Unit) {
+    private fun fetchAllData(walletService: TariWalletService, onComplete: () -> Unit) {
         val error = WalletError()
         contacts = walletService.getContacts(error)
         recentTxUsers = walletService.getRecentTxUsers(recentTxContactsLimit, error)
@@ -499,9 +511,7 @@ class AddRecipientFragment(private val walletService: TariWalletService) : Fragm
         val mActivity = activity ?: return
         UiUtil.hideKeyboard(mActivity)
         hidePasteEmojiIdViews(animate = true) {
-            ui.rootView.postDelayed({
-                wr.get()?.startQRCodeActivity()
-            }, Constants.UI.keyboardHideWaitMs)
+            ui.rootView.postDelayed({ startQRCodeActivity() }, Constants.UI.keyboardHideWaitMs)
         }
     }
 
@@ -527,14 +537,14 @@ class AddRecipientFragment(private val walletService: TariWalletService) : Fragm
                         val publicKeyHex = deepLink.type.value
                         val publicKey = walletService.getPublicKeyFromHexString(publicKeyHex)
                         if (publicKey != null) {
-                            ui.searchEditText.post {
-                                wr.get()?.ui?.searchEditText?.setText(
+                            ui.rootView.post {
+                                _ui?.searchEditText?.setText(
                                     publicKey.emojiId,
                                     TextView.BufferType.EDITABLE
                                 )
                             }
                             ui.searchEditText.postDelayed({
-                                wr.get()?.ui?.searchEditTextScrollView?.smoothScrollTo(0, 0)
+                                _ui?.searchEditTextScrollView?.smoothScrollTo(0, 0)
                             }, Constants.UI.mediumDurationMs)
                         }
                     }
@@ -587,10 +597,7 @@ class AddRecipientFragment(private val walletService: TariWalletService) : Fragm
                 TextView.BufferType.EDITABLE
             )
             ui.searchEditText.setSelection(ui.searchEditText.text?.length ?: 0)
-
-            ui.rootView.postDelayed({
-                animateEmojiIdPaste()
-            }, Constants.UI.xShortDurationMs)
+            ui.rootView.postDelayed({ animateEmojiIdPaste() }, Constants.UI.xShortDurationMs)
         }
     }
 
