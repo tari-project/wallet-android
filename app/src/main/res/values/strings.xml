@@ -85,7 +85,7 @@
     <!-- dialog -->
     <string name="internet_connection_error_dialog_title">Can\'t connect to the interwebs</string>
     <string name="internet_connection_error_dialog_description">Your phone is either offline or has a poor connection at the moment. We\'ll wait here until you find some stronger signal.</string>
-    <string name="tari_network_connection_error_dialog_title">It\'s not you, it\' the network.</string>
+    <string name="tari_network_connection_error_dialog_title">It\'s not you, it\'s the network.</string>
     <string name="tari_network_connection_error_dialog_description">Looks like there\'s a connectivity issue on our end. Can you give us a few min, then come back and try again?</string>
 
     <!-- service -->
