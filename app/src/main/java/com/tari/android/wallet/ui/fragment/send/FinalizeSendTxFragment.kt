@@ -119,10 +119,8 @@ class FinalizeSendTxFragment(private val walletService: TariWalletService) : Fra
     private var progressAnimationToggleCount = 0
     private val progressBarFillDurationMs = 850L
     private var switchToNextProgressStateOnProgressAnimComplete = false
-    private var baseNodeSyncCurrentRetryCount = 0
-    private var baseNodeSyncMaxRetryCount = 3
     private var progressAnim: ValueAnimator? = null
-    private val connectionTimeoutSecs = 20
+    private val connectionTimeoutSecs = 30
     private lateinit var connectionCheckStartTime: DateTime
 
     private var failureReason: FailureReason? = null
@@ -380,7 +378,7 @@ class FinalizeSendTxFragment(private val walletService: TariWalletService) : Fra
     private fun checkConnectionStatus() {
         val networkConnectionState = EventBus.networkConnectionStateSubject.value
         val torProxyState = EventBus.torProxyStateSubject.value
-        // check internet connection & whether Tor proxy is running
+        // check internet connection
         if (networkConnectionState != NetworkConnectionState.CONNECTED) {
             Logger.w("Send error: not connected to the internet.")
             // either not connected or Tor proxy is not running
@@ -401,9 +399,9 @@ class FinalizeSendTxFragment(private val walletService: TariWalletService) : Fra
             EventBus.subscribeToTorProxyState(this) { state ->
                 onTorProxyStateChanged(state)
             }
-            return
+        }  else {
+            switchToNextProgressStateOnProgressAnimComplete = true
         }
-        syncWithBaseNode()
     }
 
     @SuppressLint("CheckResult")
@@ -413,43 +411,6 @@ class FinalizeSendTxFragment(private val walletService: TariWalletService) : Fra
                 EventBus.unsubscribeFromTorProxyState(this)
                 checkConnectionStatus()
             }
-        }
-    }
-
-    private fun syncWithBaseNode() {
-        baseNodeSyncCurrentRetryCount++
-        // sync base node
-        Logger.e(
-            "Try to sync with base node - retry count %d.",
-            baseNodeSyncCurrentRetryCount
-        )
-        val walletError = WalletError()
-        walletService.syncWithBaseNode(walletError)
-        if (walletError.code != WalletErrorCode.NO_ERROR) {
-            if (baseNodeSyncCurrentRetryCount >= baseNodeSyncMaxRetryCount) {
-                failureReason = FailureReason.BASE_NODE_CONNECTION_ERROR
-            } else {
-                syncWithBaseNode()
-            }
-            return
-        }
-        // start waiting on base node sync status
-        val wr = WeakReference(this)
-        EventBus.subscribe<Event.Wallet.BaseNodeSyncComplete>(this) { event ->
-            wr.get()?._ui?.rootView?.post { onBaseNodeSyncCompleted(event) }
-        }
-    }
-
-    private fun onBaseNodeSyncCompleted(event: Event.Wallet.BaseNodeSyncComplete) {
-        if (!event.success) {
-            if (baseNodeSyncCurrentRetryCount >= baseNodeSyncMaxRetryCount) {
-                failureReason = FailureReason.BASE_NODE_CONNECTION_ERROR
-            } else {
-                syncWithBaseNode()
-            }
-        } else {
-            // base node sync success, switch to next state
-            switchToNextProgressStateOnProgressAnimComplete = true
         }
     }
 
