@@ -32,15 +32,9 @@
  */
 package com.tari.android.wallet.ui.activity.send
 
-import android.content.ComponentName
-import android.content.Context
-import android.content.Intent
-import android.content.ServiceConnection
 import android.os.Bundle
-import android.os.IBinder
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
-import com.orhanobut.logger.Logger
 import com.tari.android.wallet.R
 import com.tari.android.wallet.R.color.black
 import com.tari.android.wallet.R.color.white
@@ -51,8 +45,6 @@ import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.model.MicroTari
 import com.tari.android.wallet.model.User
 import com.tari.android.wallet.network.NetworkConnectionState
-import com.tari.android.wallet.service.TariWalletService
-import com.tari.android.wallet.service.WalletService
 import com.tari.android.wallet.ui.dialog.BottomSlideDialog
 import com.tari.android.wallet.ui.extension.color
 import com.tari.android.wallet.ui.extension.showInternetConnectionErrorDialog
@@ -70,7 +62,6 @@ import java.lang.ref.WeakReference
  * @author The Tari Development Team
  */
 internal class SendTariActivity : AppCompatActivity(),
-    ServiceConnection,
     AddRecipientFragment.Listener,
     AddAmountFragment.Listener,
     AddNoteFragment.Listener,
@@ -80,26 +71,14 @@ internal class SendTariActivity : AppCompatActivity(),
 
     private var currentFragmentWR: WeakReference<Fragment>? = null
 
-    private var walletService: TariWalletService? = null
-
-    // TODO [DISCUSS] access to this goes through the strong reference anyway
-    private val wr = WeakReference(this)
-
     private var sendTxIsInProgress = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         ui = ActivitySendTariBinding.inflate(layoutInflater).apply { setContentView(root) }
         SendTariActivityVisitor.visit(this)
-    }
-
-    override fun onStart() {
-        super.onStart()
-        // start service if not started yet
-        if (walletService == null) {
-            // bind to service
-            val bindIntent = Intent(this, WalletService::class.java)
-            bindService(bindIntent, this, Context.BIND_AUTO_CREATE)
+        if (savedInstanceState == null) {
+            loadFragment()
         }
     }
 
@@ -112,24 +91,20 @@ internal class SendTariActivity : AppCompatActivity(),
             val bundle = Bundle().apply {
                 putParcelable("recipientUser", recipientUser)
             }
-            val addAmountFragment = AddAmountFragment.newInstance(walletService!!)
+            val addAmountFragment = AddAmountFragment()
             addAmountFragment.arguments = bundle
             val fragmentTx = supportFragmentManager.beginTransaction()
             fragmentTx.add(R.id.send_tari_fragment_container_view, addAmountFragment)
             fragmentTx.commit()
             currentFragmentWR = WeakReference(addAmountFragment)
-            ui.rootView.postDelayed({
-                wr.get()?.ui?.rootView?.setBackgroundColor(color(black))
-            }, 1000)
+            ui.rootView.postDelayed({ ui.rootView.setBackgroundColor(color(black)) }, 1000)
         } else {
-            val addRecipientFragment = AddRecipientFragment.newInstance(walletService!!)
+            val addRecipientFragment = AddRecipientFragment()
             val fragmentTx = supportFragmentManager.beginTransaction()
             fragmentTx.add(R.id.send_tari_fragment_container_view, addRecipientFragment)
             fragmentTx.commit()
             currentFragmentWR = WeakReference(addRecipientFragment)
-            ui.rootView.postDelayed({
-                wr.get()?.ui?.rootView?.setBackgroundColor(color(black))
-            }, 1000)
+            ui.rootView.postDelayed({ ui.rootView.setBackgroundColor(color(black)) }, 1000)
         }
     }
 
@@ -148,26 +123,8 @@ internal class SendTariActivity : AppCompatActivity(),
     }
 
     override fun onDestroy() {
-        unbindService(this)
         UiUtil.hideKeyboard(this)
         super.onDestroy()
-    }
-
-    /**
-     * Wallet service connected.
-     */
-    override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
-        Logger.d("Connected to the wallet service.")
-        walletService = TariWalletService.Stub.asInterface(service)
-        loadFragment()
-    }
-
-    /**
-     * Wallet service disconnected.
-     */
-    override fun onServiceDisconnected(name: ComponentName?) {
-        Logger.d("Disconnected from the wallet service.")
-        walletService = null
     }
 
     // region AddRecipientFragment.Listener implementation - comments in the interface definition
@@ -184,13 +141,14 @@ internal class SendTariActivity : AppCompatActivity(),
         val bundle = Bundle().apply {
             putParcelable("recipientUser", user)
         }
-        ui.rootView.postDelayed({
-            wr.get()?.goToAddAmountFragment(sourceFragment, bundle)
-        }, Constants.UI.keyboardHideWaitMs)
+        ui.rootView.postDelayed(
+            { goToAddAmountFragment(sourceFragment, bundle) },
+            Constants.UI.keyboardHideWaitMs
+        )
     }
 
     private fun goToAddAmountFragment(sourceFragment: Fragment, bundle: Bundle) {
-        val fragment = AddAmountFragment.newInstance(walletService!!)
+        val fragment = AddAmountFragment()
         fragment.arguments = bundle
         supportFragmentManager
             .beginTransaction()
@@ -273,7 +231,7 @@ internal class SendTariActivity : AppCompatActivity(),
         fee: MicroTari,
         note: String
     ) {
-        val fragment = FinalizeSendTxFragment(walletService!!).apply {
+        val fragment = FinalizeSendTxFragment().apply {
             arguments = Bundle().apply {
                 putParcelable("recipientUser", recipientUser)
                 putParcelable("amount", amount)
@@ -281,9 +239,7 @@ internal class SendTariActivity : AppCompatActivity(),
                 putString("note", note)
             }
         }
-        ui.rootView.post {
-            wr.get()?.ui?.rootView?.setBackgroundColor(color(white))
-        }
+        ui.rootView.post { ui.rootView.setBackgroundColor(color(white)) }
         supportFragmentManager
             .beginTransaction()
             .setCustomAnimations(R.anim.fade_in, R.anim.fade_out)
