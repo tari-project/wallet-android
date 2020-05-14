@@ -30,34 +30,25 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.tari.android.wallet.service.model
+package com.tari.android.wallet.di
 
-import com.google.gson.annotations.SerializedName
+import com.tari.android.wallet.service.faucet.NoOpTestnetFaucetService
+import com.tari.android.wallet.service.faucet.TestnetFaucetService
+import com.tari.android.wallet.service.notification.NoOpNotificationService
+import com.tari.android.wallet.service.notification.NotificationService
+import dagger.Module
+import dagger.Provides
+import javax.inject.Singleton
 
-/**
- * Allocate testnet tari request and response class.
- *
- * @author The Tari Development Team
- */
-data class TestnetTariAllocateRequest constructor(val signature: String, @SerializedName("public_nonce") val public_nonce: String)
+@Module
+internal class ServiceModule {
 
-data class TestnetTariAllocateResponse constructor(
-    @SerializedName("return_wallet_id")
-    val returnWalletId: String,
-    val key: String,
-    val value: String
-)
+    @Provides
+    @Singleton
+    fun provideNotificationService(): NotificationService = NoOpNotificationService()
 
-data class TestnetTariUTXOKey constructor(
-    // this field is not going to be sent to us by the server,
-    // but we fill it before we store the UTXO key in the shared preferences
-    var senderPublicKeyHex: String?,
-    val key: String,
-    val value: String
-)
+    @Provides
+    @Singleton
+    fun provideTestnetFaucetService(): TestnetFaucetService = NoOpTestnetFaucetService()
 
-data class TestnetTariAllocateMaxResponse constructor(
-    @SerializedName("return_wallet_id")
-    val returnWalletId: String,
-    val keys: List<TestnetTariUTXOKey>
-)
+}

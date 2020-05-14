@@ -32,8 +32,12 @@
  */
 package com.tari.android.wallet.di
 
-import com.tari.android.wallet.service.PushNotificationRESTService
-import com.tari.android.wallet.service.TestnetFaucetRESTService
+import com.tari.android.wallet.service.faucet.TestnetFaucetRESTGateway
+import com.tari.android.wallet.service.faucet.TestnetFaucetRESTService
+import com.tari.android.wallet.service.faucet.TestnetFaucetService
+import com.tari.android.wallet.service.notification.NotificationService
+import com.tari.android.wallet.service.notification.PushNotificationRESTGateway
+import com.tari.android.wallet.service.notification.PushNotificationRESTService
 import com.tari.android.wallet.util.Constants
 import dagger.Module
 import dagger.Provides
@@ -65,30 +69,29 @@ internal class RESTModule {
     @Provides
     @Named(FieldName.faucetHttpClient)
     @Singleton
-    fun provideFaucetHttpClient(): OkHttpClient {
-        return OkHttpClient.Builder().build()
-    }
+    fun provideFaucetHttpClient(): OkHttpClient = OkHttpClient.Builder().build()
 
     @Provides
     @Named(FieldName.faucetRetrofit)
     @Singleton
     fun provideTestnetFaucetRetrofit(
         @Named(FieldName.faucetHttpClient) okHttpClient: OkHttpClient
-    ): Retrofit {
-        return Retrofit.Builder()
-            .baseUrl(Constants.Wallet.faucetServerUrl)
-            .client(okHttpClient)
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
-    }
+    ): Retrofit = Retrofit.Builder()
+        .baseUrl(Constants.Wallet.faucetServerUrl)
+        .client(okHttpClient)
+        .addConverterFactory(GsonConverterFactory.create())
+        .build()
 
     @Provides
     @Singleton
-    fun provideTestnetFaucetRESTService(
+    fun provideTestnetFaucetRESTGateway(
         @Named(FieldName.faucetRetrofit) retrofit: Retrofit
-    ): TestnetFaucetRESTService {
-        return retrofit.create(TestnetFaucetRESTService::class.java)
-    }
+    ): TestnetFaucetRESTGateway = retrofit.create(TestnetFaucetRESTGateway::class.java)
+
+    @Provides
+    @Singleton
+    fun provideTestnetFaucetService(gateway: TestnetFaucetRESTGateway): TestnetFaucetService =
+        TestnetFaucetRESTService(gateway)
 
     @Provides
     @Named(FieldName.pushNotificationHttpClient)
@@ -103,20 +106,21 @@ internal class RESTModule {
     @Singleton
     fun providePushNotificationRetrofit(
         @Named(FieldName.pushNotificationHttpClient) okHttpClient: OkHttpClient
-    ): Retrofit {
-        return Retrofit.Builder()
-            .baseUrl(Constants.Wallet.pushNotificationServerUrl)
-            .client(okHttpClient)
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
-    }
+    ): Retrofit = Retrofit.Builder()
+        .baseUrl(Constants.Wallet.pushNotificationServerUrl)
+        .client(okHttpClient)
+        .addConverterFactory(GsonConverterFactory.create())
+        .build()
 
     @Provides
     @Singleton
     fun providePushNotificationRESTService(
         @Named(FieldName.pushNotificationRetrofit) retrofit: Retrofit
-    ): PushNotificationRESTService {
-        return retrofit.create(PushNotificationRESTService::class.java)
-    }
+    ): PushNotificationRESTGateway = retrofit.create(PushNotificationRESTGateway::class.java)
+
+    @Provides
+    @Singleton
+    fun provideNotificationService(gateway: PushNotificationRESTGateway): NotificationService =
+        PushNotificationRESTService(gateway)
 
 }

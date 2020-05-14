@@ -32,6 +32,7 @@
  */
 package com.tari.android.wallet.service
 
+import android.annotation.SuppressLint
 import android.app.Service
 import android.content.Intent
 import android.os.IBinder
@@ -47,11 +48,11 @@ import com.tari.android.wallet.model.*
 import com.tari.android.wallet.model.Tx.Direction.INBOUND
 import com.tari.android.wallet.model.Tx.Direction.OUTBOUND
 import com.tari.android.wallet.notification.NotificationHelper
-import com.tari.android.wallet.service.model.PushNotificationRequestBody
-import com.tari.android.wallet.service.model.PushNotificationResponseBody
-import com.tari.android.wallet.service.model.TestnetTariAllocateMaxResponse
-import com.tari.android.wallet.service.model.TestnetTariAllocateRequest
+import com.tari.android.wallet.service.faucet.TestnetFaucetService
+import com.tari.android.wallet.service.faucet.TestnetTariRequestException
+import com.tari.android.wallet.service.notification.NotificationService
 import com.tari.android.wallet.ui.activity.home.HomeActivity
+import com.tari.android.wallet.ui.extension.string
 import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.SharedPrefsWrapper
 import io.reactivex.Observable
@@ -59,9 +60,6 @@ import io.reactivex.schedulers.Schedulers
 import org.joda.time.DateTime
 import org.joda.time.Hours
 import org.joda.time.Minutes
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 import java.math.BigInteger
 import java.util.*
 import java.util.concurrent.CopyOnWriteArrayList
@@ -86,10 +84,10 @@ internal class WalletService : Service(), FFIWalletListenerAdapter {
     lateinit var app: TariWalletApplication
 
     @Inject
-    lateinit var testnetFaucetRESTService: TestnetFaucetRESTService
+    lateinit var testnetFaucetService: TestnetFaucetService
 
     @Inject
-    lateinit var pushNotificationRESTService: PushNotificationRESTService
+    lateinit var notificationService: NotificationService
 
     @Inject
     lateinit var notificationHelper: NotificationHelper
@@ -363,36 +361,14 @@ internal class WalletService : Service(), FFIWalletListenerAdapter {
         val signing = wallet.signMessage(fromPublicKeyHex + recipientPublicKeyHex)
         val signature = signing.split("|")[0]
         val nonce = signing.split("|")[1]
-        val requestBody = PushNotificationRequestBody(
+        notificationService.notifyRecipient(
+            recipientPublicKeyHex,
             fromPublicKeyHex,
             signature,
-            nonce
+            nonce,
+            onSuccess = { Logger.i("Push notification successfully sent to recipient.") },
+            onFailure = { Logger.e(it, "Push notification failed with exception.") }
         )
-        val response = pushNotificationRESTService.sendPushNotificationToRecipient(
-            recipientPublicKeyHex,
-            requestBody
-        )
-        response.enqueue(object : Callback<PushNotificationResponseBody> {
-            override fun onFailure(call: Call<PushNotificationResponseBody>, t: Throwable) {
-                Logger.e("Push notification failed with exception: ${t.message}.")
-            }
-
-            override fun onResponse(
-                call: Call<PushNotificationResponseBody>,
-                response: Response<PushNotificationResponseBody>
-            ) {
-                val body = response.body()
-                if (response.code() in 200..299
-                    && body != null
-                    && body.sent
-                ) {
-                    Logger.i("Push notification successfully sent to recipient.")
-                } else {
-                    val errorBody = response.errorBody()?.string()
-                    Logger.e("Push notification failed with response: $errorBody.")
-                }
-            }
-        })
     }
 
     /**
@@ -928,6 +904,7 @@ internal class WalletService : Service(), FFIWalletListenerAdapter {
             return pendingOutboundTx
         }
 
+        @SuppressLint("CheckResult")
         override fun requestTestnetTari(error: WalletError) {
             // get public key
             val publicKeyHexString = getPublicKeyHexString(error)
@@ -941,55 +918,44 @@ internal class WalletService : Service(), FFIWalletListenerAdapter {
             val signature = signing.split("|")[0]
             val nonce = signing.split("|")[1]
 
-            val requestBody =
-                TestnetTariAllocateRequest(
-                    signature,
-                    nonce
-                )
+            testnetFaucetService.requestMaxTestnetTari(
+                publicKeyHexString,
+                signature,
+                nonce,
+                { result ->
+                    Logger.i("requestMaxTestnetTari success")
+                    val senderPublicKeyFFI = FFIPublicKey(HexString(result.walletId))
+                    // add contact
+                    FFIContact("TariBot", senderPublicKeyFFI).also {
+                        wallet.addUpdateContact(it)
+                        it.destroy()
+                    }
+                    senderPublicKeyFFI.destroy()
+                    // update the keys with sender public key hex
+                    result.keys.forEach { key -> key.senderPublicKeyHex = result.walletId }
+                    // store the UTXO keys
+                    sharedPrefsWrapper.testnetTariUTXOKeyList = result.keys
 
-            val response =
-                testnetFaucetRESTService.requestMaxTestnetTari(publicKeyHexString, requestBody)
-            response.enqueue(object : Callback<TestnetTariAllocateMaxResponse> {
-                override fun onFailure(call: Call<TestnetTariAllocateMaxResponse>, t: Throwable) {
+                    // post event to bus for the internal listeners
+                    EventBus.post(Event.Testnet.TestnetTariRequestSuccessful())
+                    // notify external listeners
+                    listeners.iterator().forEach { it.onTestnetTariRequestSuccess() }
+                },
+                {
+                    Logger.i("requestMaxTestnetTari error $it")
                     error.code = WalletErrorCode.UNKNOWN_ERROR
-                    notifyTestnetTariRequestFailed(getString(R.string.wallet_service_error_no_internet_connection))
-                }
-
-                override fun onResponse(
-                    call: Call<TestnetTariAllocateMaxResponse>,
-                    response: Response<TestnetTariAllocateMaxResponse>
-                ) {
-                    val body = response.body()
-                    if (response.code() in 200..209 && body != null) {
-                        val senderPublicKeyFFI = FFIPublicKey(HexString(body.returnWalletId))
-                        // add contact
-                        FFIContact("TariBot", senderPublicKeyFFI).also {
-                            wallet.addUpdateContact(it)
-                            it.destroy()
-                        }
-                        senderPublicKeyFFI.destroy()
-                        // update the keys with sender public key hex
-                        body.keys.forEach { key -> key.senderPublicKeyHex = body.returnWalletId }
-                        // store the UTXO keys
-                        sharedPrefsWrapper.testnetTariUTXOKeyList = body.keys
-
-                        // post event to bus for the internal listeners
-                        EventBus.post(Event.Testnet.TestnetTariRequestSuccessful())
-                        // notify external listeners
-                        listeners.iterator().forEach { listener ->
-                            listener.onTestnetTariRequestSuccess()
-                        }
-                    } else {
-                        error.code = WalletErrorCode.UNKNOWN_ERROR
-                        val errorMessage =
-                            getString(R.string.wallet_service_error_testnet_tari_request) +
-                                    " " +
-                                    response.errorBody()?.string()
-                        error.message = errorMessage
+                    val errorMessage =
+                        string(R.string.wallet_service_error_testnet_tari_request) +
+                                " " +
+                                it.message
+                    error.message = errorMessage
+                    if (it is TestnetTariRequestException) {
                         notifyTestnetTariRequestFailed(errorMessage)
+                    } else {
+                        notifyTestnetTariRequestFailed(string(R.string.wallet_service_error_no_internet_connection))
                     }
                 }
-            })
+            )
         }
 
         override fun importTestnetUTXO(txMessage: String, error: WalletError): CompletedTx? {
@@ -997,7 +963,6 @@ internal class WalletService : Service(), FFIWalletListenerAdapter {
             if (keys.isEmpty()) {
                 return null
             }
-            keys.toMutableList()
             val firstUTXOKey = keys.first()
             val senderPublicKeyFFI = FFIPublicKey(HexString(firstUTXOKey.senderPublicKeyHex!!))
             val txId: BigInteger

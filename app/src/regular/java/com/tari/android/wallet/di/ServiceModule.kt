@@ -30,26 +30,9 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.tari.android.wallet.service
+package com.tari.android.wallet.di
 
-import com.tari.android.wallet.service.model.PushNotificationRequestBody
-import com.tari.android.wallet.service.model.PushNotificationResponseBody
-import retrofit2.Call
-import retrofit2.http.Body
-import retrofit2.http.POST
-import retrofit2.http.Path
+import dagger.Module
 
-/**
- *  Push notification REST API service.
- *
- *  @author The Tari Development Team
- */
-interface PushNotificationRESTService {
-
-    @POST("/send/{recipientPublicKeyHex}")
-    fun sendPushNotificationToRecipient(
-        @Path("recipientPublicKeyHex") recipientPublicKeyHex: String,
-        @Body requestBody: PushNotificationRequestBody
-    ): Call<PushNotificationResponseBody>
-
-}
+@Module(includes = [RESTModule::class])
+internal class ServiceModule

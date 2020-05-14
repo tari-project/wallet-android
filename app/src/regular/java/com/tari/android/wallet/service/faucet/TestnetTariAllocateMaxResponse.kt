@@ -30,33 +30,12 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.tari.android.wallet.service
+package com.tari.android.wallet.service.faucet
 
-import com.tari.android.wallet.service.model.TestnetTariAllocateMaxResponse
-import com.tari.android.wallet.service.model.TestnetTariAllocateRequest
-import com.tari.android.wallet.service.model.TestnetTariAllocateResponse
-import retrofit2.Call
-import retrofit2.http.Body
-import retrofit2.http.POST
-import retrofit2.http.Path
+import com.google.gson.annotations.SerializedName
 
-/**
- *  Testnet faucet REST API service.
- *
- *  @author The Tari Development Team
- */
-internal interface TestnetFaucetRESTService {
-
-    @POST("/free_tari/allocate/{publicKeyHex}")
-    fun requestTestnetTari(
-        @Path("publicKeyHex") publicKey: String,
-        @Body requestBody: TestnetTariAllocateRequest
-    ): Call<TestnetTariAllocateResponse>
-
-    @POST("/free_tari/allocate_max/{publicKeyHex}")
-    fun requestMaxTestnetTari(
-        @Path("publicKeyHex") publicKey: String,
-        @Body requestBody: TestnetTariAllocateRequest
-    ): Call<TestnetTariAllocateMaxResponse>
-
-}
+data class TestnetTariAllocateMaxResponse constructor(
+    @SerializedName("return_wallet_id")
+    val returnWalletId: String,
+    val keys: List<TestnetTariUTXOKey>
+)
