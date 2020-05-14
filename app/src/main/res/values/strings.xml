@@ -39,8 +39,8 @@
     <!-- notifications -->
     <string name="wallet_service_notification_channel_name">Tari Aurora Service Notification Channel</string>
     <string name="app_notification_channel_name">Tari Aurora Notification Channel</string>
-    <string name="notification_tx_received_title">You\'ve got XTR!</string>
-    <string name="notification_tx_received_description_format">Someone just sent you %1$s XTR.</string>
+    <string name="notification_tx_received_title">You\'ve got tXTR!</string>
+    <string name="notification_tx_received_description_format">Someone just sent you %1$s tXTR.</string>
 <!--    <string name="notification_tx_canceled_title">Your transaction was cancelled by&#032;</string>-->
     <string name="notification_tx_canceled_title">Your transaction was cancelled</string>
     <string name="notification_tx_canceled_description">The sender cancelled the transaction before it was finalized, so the tXTR was returned to them</string>
@@ -52,12 +52,9 @@
     <!-- no connection -->
     <string name="error_no_connection_title">Can\'t connect to the internet</string>
     <string name="error_no_connection_description">Your phone appears to be offline or has a poor connection at the moment. Please try again when you\'ve found a stronger signal.</string>
-    <!-- recipient offline -->
-    <string name="error_recipient_offline_title">Sorry, you can\'t send XTR to offline users</string>
-    <string name="error_recipient_offline_description">Please make sure your recipient has a reliable internet connection and try again. Also be sure you are sending to the correct Emoji ID.</string>
     <!-- balance exceeded -->
     <string name="error_balance_exceeded_title">Hold your horses! 🐴</string>
-    <string name="error_balance_exceeded_description">Sorry, you can’t send this much XTR until your previous transaction(s) are complete. Please wait for at least one transaction to complete and then try again.</string>
+    <string name="error_balance_exceeded_description">Sorry, you can’t send this much tXTR until your previous transaction(s) are complete. Please wait for at least one transaction to complete and then try again.</string>
 
     <!-- common -->
     <string name="common_continue">Continue</string>
@@ -89,9 +86,9 @@
     <string name="tari_network_connection_error_dialog_description">Looks like there\'s a connectivity issue on our end. Can you give us a few min, then come back and try again?</string>
 
     <!-- service -->
-    <string name="wallet_service_title">XTR wallet service is running.</string>
+    <string name="wallet_service_title">Tari Aurora wallet service is running.</string>
     <string name="wallet_service_description">This service carries out wallet operations across applications.</string>
-    <string name="wallet_service_error_testnet_tari_request">Could not allocate free XTR.</string>
+    <string name="wallet_service_error_testnet_tari_request">Could not allocate free tXTR.</string>
     <string name="wallet_service_error_no_internet_connection">No internet connection!</string>
 
     <!-- testnet UTXO messages -->
@@ -138,7 +135,7 @@
     <string name="auth_title">Unlock your wallet</string>
     <string name="auth_biometric_prompt">Please enter your biometrics to unlock your wallet.</string>
     <string name="auth_device_lock_code_prompt">Please enter your smartphone\'s screen lock PIN, passcode, or pattern to unlock your wallet.</string>
-    <string name="auth_description">Authentication secures your XTR Wallet.</string>
+    <string name="auth_description">Authentication secures your tXTR Wallet.</string>
     <string name="auth_not_available_or_canceled_title">Authentication Error</string>
     <string name="auth_not_available_or_canceled_desc">Tari Aurora was not able to authenticate you. Do you still want to proceed?</string>
     <string name="auth_failed_title">Authentication Failed</string>
@@ -179,15 +176,15 @@
     <string name="add_recipient_recent_tx_contacts">Recent</string>
     <string name="add_recipient_my_contacts">My Contacts</string>
     <string name="add_recipient_invalid_emoji_id">Not a valid Emoji ID</string>
-    <string name="add_recipient_own_emoji_id">Sorry, you cannot send XTR to yourself.</string>
+    <string name="add_recipient_own_emoji_id">Sorry, you cannot send tXTR to yourself.</string>
     <!-- QR-scanner -->
-    <string name="add_recipient_scan_qr_description">Scan a Tari QR code\nto send XTR to the recipient.</string>
+    <string name="add_recipient_scan_qr_description">Scan a Tari QR code\nto send tXTR to the recipient.</string>
     <string name="add_recipient_failed_init_camera_message">Failed to initialize Camera</string>
     <string name="add_recipient_camera_permission_denied_message">Camera permission denied</string>
 
     <!-- send tari - amount -->
     <string name="add_amount_under_construction">Under Construction</string>
-    <string name="add_amount_not_enough_available_balance">Not enough XTR in your available balance</string>
+    <string name="add_amount_not_enough_available_balance">Not enough tXTR in your available balance</string>
     <string name="add_amount_tx_fee">Transaction Fee</string>
 
     <!-- send tari - note -->
@@ -213,7 +210,7 @@
     <string name="wallet_info_emoji_id_copied">Your emoji ID is copied.</string>
 
     <!-- tx failed dialog -->
-    <string name="tx_failed_title">Sorry, you can\'t send XTR to offline users</string>
+    <string name="tx_failed_title">Sorry, you can\'t send tXTR to offline users</string>
     <string name="tx_failed_description">Please make sure your recipient has a reliable internet connection and has the Aurora app open on their device, and then try again. If that doesn\'t work, please verify you have the correct Emoji ID.</string>
 
     <!-- transaction detail -->
@@ -241,7 +238,7 @@
 
     <!-- Fee tooltip -->
     <string name="tx_detail_fee_tooltip_transaction_fee">Transaction Fee</string>
-    <string name="tx_detail_fee_tooltip_desc">The transaction fee is distributed to the thousands of computers (also known as \"miners\") who ensure that your XTR transactions are fast and secure.</string>
+    <string name="tx_detail_fee_tooltip_desc">The transaction fee is distributed to the thousands of computers (also known as \"miners\") who ensure that your tXTR transactions are fast and secure.</string>
     <string name="tx_details_fee_value">+%s</string>
 
     <!-- debug screens -->
