@@ -120,6 +120,10 @@ internal class FFIWallet(
         libError: FFIError
     ): FFICompletedTxsPtr
 
+    private external fun jniGetCancelledTxs(
+        libError: FFIError
+    ): FFICompletedTxsPtr
+
     private external fun jniGetCompletedTxById(
         id: String,
         libError: FFIError
@@ -289,6 +293,13 @@ internal class FFIWallet(
     fun getCompletedTxs(): FFICompletedTxs {
         val error = FFIError()
         val result = FFICompletedTxs(jniGetCompletedTxs(error))
+        throwIf(error)
+        return result
+    }
+
+    fun getCancelledTxs(): FFICompletedTxs {
+        val error = FFIError()
+        val result = FFICompletedTxs(jniGetCancelledTxs(error))
         throwIf(error)
         return result
     }

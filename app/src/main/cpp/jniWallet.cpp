@@ -600,6 +600,21 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniGetCompletedTxs(
 
 extern "C"
 JNIEXPORT jlong JNICALL
+Java_com_tari_android_wallet_ffi_FFIWallet_jniGetCancelledTxs(
+        JNIEnv *jEnv,
+        jobject jThis,
+        jobject error) {
+    int i = 0;
+    int *r = &i;
+    jlong lWallet = GetPointerField(jEnv, jThis);
+    TariWallet *pWallet = reinterpret_cast<TariWallet *>(lWallet);
+    TariCompletedTransactions *pCanceledTxs = wallet_get_cancelled_transactions(pWallet, r);
+    setErrorCode(jEnv, error, i);
+    return reinterpret_cast<jlong>(pCanceledTxs);
+}
+
+extern "C"
+JNIEXPORT jlong JNICALL
 Java_com_tari_android_wallet_ffi_FFIWallet_jniGetCompletedTxById(
         JNIEnv *jEnv,
         jobject jThis,
