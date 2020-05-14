@@ -434,14 +434,8 @@ internal class HomeActivity : AppCompatActivity(),
     private fun bindToWalletService() {
         // start service if not started yet
         if (walletService == null) {
-            // start the wallet service
-            ContextCompat.startForegroundService(
-                this,
-                Intent(this, WalletService::class.java)
-            )
             // bind to service
             val bindIntent = Intent(this, WalletService::class.java)
-            //intent.action = TariWalletService::class.java.name
             bindService(bindIntent, this, Context.BIND_AUTO_CREATE)
         }
     }

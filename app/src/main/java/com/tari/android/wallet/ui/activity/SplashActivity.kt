@@ -42,6 +42,7 @@ import com.tari.android.wallet.di.WalletModule
 import com.tari.android.wallet.ui.activity.onboarding.OnboardingFlowActivity
 import com.tari.android.wallet.util.Constants.UI.Splash
 import com.tari.android.wallet.util.SharedPrefsWrapper
+import com.tari.android.wallet.util.WalletUtil
 import java.io.File
 import javax.inject.Inject
 import javax.inject.Named
@@ -58,6 +59,7 @@ internal class SplashActivity : AppCompatActivity() {
     @Inject
     @Named(WalletModule.FieldName.walletFilesDirPath)
     lateinit var walletFilesDirPath: String
+
     @Inject
     internal lateinit var sharedPrefsWrapper: SharedPrefsWrapper
 
@@ -66,7 +68,7 @@ internal class SplashActivity : AppCompatActivity() {
         // check whether there's an existing wallet
         setContentView(R.layout.activity_splash)
         SplashActivityVisitor.visit(this)
-        val walletExists = File(walletFilesDirPath).list()!!.isNotEmpty()
+        val walletExists = WalletUtil.walletExists(applicationContext)
         if (walletExists && sharedPrefsWrapper.onboardingAuthSetupCompleted) {
             uiHandler.postDelayed({
                 startAuthActivity()

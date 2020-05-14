@@ -44,6 +44,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.biometric.BiometricManager
 import androidx.biometric.BiometricPrompt
 import androidx.core.animation.addListener
+import androidx.core.content.ContextCompat
 import com.daasuu.ei.Ease
 import com.daasuu.ei.EasingInterpolator
 import com.orhanobut.logger.Logger
@@ -57,6 +58,7 @@ import com.tari.android.wallet.auth.AuthUtil
 import com.tari.android.wallet.databinding.ActivityAuthBinding
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.infrastructure.Tracker
+import com.tari.android.wallet.service.WalletService
 import com.tari.android.wallet.ui.activity.home.HomeActivity
 import com.tari.android.wallet.ui.extension.color
 import com.tari.android.wallet.ui.extension.invisible
@@ -96,6 +98,15 @@ internal class AuthActivity : AppCompatActivity(), Animator.AnimatorListener {
         EventBus.subscribeToWalletState(this, this::onWalletStateChanged)
         setupUi()
         tracker.screen(path = "/local_auth", title = "Local Authentication")
+        startWalletService()
+    }
+
+    private fun startWalletService() {
+        // start the wallet service
+        ContextCompat.startForegroundService(
+            applicationContext,
+            Intent(applicationContext, WalletService::class.java)
+        )
     }
 
     private fun setupUi() {

@@ -70,8 +70,7 @@ internal class TariWalletApplication : Application(), LifecycleObserver {
     lateinit var notificationHelper: NotificationHelper
     @Inject
     lateinit var tracker: Tracker
-    @Inject
-    lateinit var walletManager: WalletManager
+
     @Inject
     lateinit var connectionStateReceiver: NetworkConnectionStateReceiver
 
@@ -109,15 +108,12 @@ internal class TariWalletApplication : Application(), LifecycleObserver {
             WalletUtil.clearWalletFiles(walletFilesDirPath)
             sharedPrefsWrapper.clean()
         }
-
         notificationHelper.createNotificationChannels()
 
         ProcessLifecycleOwner.get().lifecycle.addObserver(this)
 
         // user should authenticate every time the app starts up
         sharedPrefsWrapper.isAuthenticated = false
-
-        walletManager.start()
 
         registerReceiver(connectionStateReceiver, connectionStateReceiver.intentFilter)
 

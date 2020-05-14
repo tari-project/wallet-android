@@ -32,6 +32,7 @@
  */
 package com.tari.android.wallet.util
 
+import android.content.Context
 import com.tari.android.wallet.application.DeepLink
 import com.tari.android.wallet.extension.toMicroTari
 import com.tari.android.wallet.model.MicroTari
@@ -102,5 +103,12 @@ internal object WalletUtil {
         val filteredFile = files?.filter { it.extension == "log" }?.toMutableList()
         filteredFile?.sortByDescending { it.lastModified() }
         return filteredFile ?: Collections.emptyList()
+    }
+
+    fun walletExists(applicationContext: Context): Boolean {
+        return File(
+            applicationContext.filesDir,
+            Constants.Wallet.walletDBName + ".sqlite3"
+        ).exists()
     }
 }
