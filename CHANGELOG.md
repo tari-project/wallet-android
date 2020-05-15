@@ -1,8 +1,16 @@
 # Tari Aurora Changelog
 
-## [v0.1.11-jniLibs-0.9.2] - 2020-05-07
+## [v0.1.12-jniLibs-0.10.1] - 2020-05-15
+* The transaction history now lists cancelled transactions!
+* Add support for private builds!
+* (Secret feature) Copy wallet hex format public key when long clicking "Copy Emoji ID".
+* Removes slow and unnecessary base node sync check on sending Tari screen.
+* Deleted unused font resources.
+* Several crash fixes
+* Many minor tweaks and bug fixes
 * In push notification titles, if the sender is in your address list, you'll see their alias instead of the emoji ID
 
+## [v0.1.11-jniLibs-0.9.2] - 2020-05-07
 * Implement "Cancel transaction" CTA (TX list updates, push notifications and TX details statuses is yet to come)
 * Add sentry crash reporting
 * Fix BigDecimal rounding bug, making it look like receivers were paying fees.
