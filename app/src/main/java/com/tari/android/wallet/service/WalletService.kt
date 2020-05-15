@@ -207,10 +207,11 @@ internal class WalletService : Service(), FFIWalletListenerAdapter {
     }
 
     override fun onTxReceived(pendingInboundTx: PendingInboundTx) {
-        Logger.d("Tx ${pendingInboundTx.id} received.")
+        Logger.d("Tx received: $pendingInboundTx")
         pendingInboundTx.user = (serviceImpl.getContacts(WalletError()) ?: emptyList())
             .firstOrNull { it.publicKey == pendingInboundTx.user.publicKey }
             ?: pendingInboundTx.user
+        Logger.d("Received TX after contact update: $pendingInboundTx")
         // post event to bus for the internal listeners
         EventBus.post(Event.Wallet.TxReceived(pendingInboundTx))
         // manage notifications
@@ -278,15 +279,24 @@ internal class WalletService : Service(), FFIWalletListenerAdapter {
 
     override fun onTxCancellation(txId: BigInteger) {
         Logger.d("Tx $txId cancelled.")
-        // post event to bus
-        EventBus.post(Event.Wallet.TxCancellation(TxId(txId)))
-        // notify external listeners
-        if (!app.isInForeground || app.currentActivity !is HomeActivity) {
-            // TODO enable when TX support will be integrated into the JNI-accessed binary
-//            notificationHelper.postTxCanceledNotification(txId)
-        }
-        listeners.iterator().forEach {
-            it.onTxCancellation(TxId(txId))
+        val error = WalletError()
+        val tx: CancelledTx? = serviceImpl.getCancelledTxs(error)?.firstOrNull { it.id == txId }
+        if (error.code != WalletErrorCode.NO_ERROR) {
+            Logger.e("onTxCancellation($txId): Error occurred during `serviceImpl.getCanceledTxs(error)`: $error")
+        } else if (tx != null) {
+            Logger.i("onTxCancellation($txId): $tx")
+            // post event to bus
+            EventBus.post(Event.Wallet.TxCancellation(tx))
+            // notify external listeners
+            serviceImpl.getPublicKeyHexString(error)
+            // TODO check INBOUND
+            if (error.code == WalletErrorCode.NO_ERROR && tx.direction == INBOUND &&
+                !(app.isInForeground && app.currentActivity is HomeActivity)
+            ) {
+                Logger.i("Posting cancellation notification")
+                notificationHelper.postTxCanceledNotification(tx)
+            }
+            listeners.iterator().forEach { it.onTxCancellation(tx) }
         }
     }
 
@@ -539,6 +549,26 @@ internal class WalletService : Service(), FFIWalletListenerAdapter {
             }
             return try {
                 getCompletedTxs(contacts)
+            } catch (throwable: Throwable) {
+                mapThrowableIntoError(throwable, error)
+                null
+            }
+        }
+
+        private fun getCancelledTxs(contacts: List<Contact>): List<CancelledTx>? {
+            val canceledTxsFFI = wallet.getCancelledTxs()
+            return (0 until canceledTxsFFI.getLength())
+                .map {
+                    val txFfi = canceledTxsFFI.getAt(it)
+                    canceledTxFromFFI(txFfi, contacts).also { txFfi.destroy() }
+                }.also { canceledTxsFFI.destroy() }
+        }
+
+        override fun getCancelledTxs(error: WalletError): List<CancelledTx>? {
+            val contacts = getContacts(error)
+            return if (error.code != WalletErrorCode.NO_ERROR || contacts == null) null
+            else try {
+                getCancelledTxs(contacts)
             } catch (throwable: Throwable) {
                 mapThrowableIntoError(throwable, error)
                 null
@@ -831,6 +861,71 @@ internal class WalletService : Service(), FFIWalletListenerAdapter {
             sourcePublicKeyFFI.destroy()
             destinationPublicKeyFFI.destroy()
             return completedTx
+        }
+
+        private fun canceledTxFromFFI(
+            completedTxFFI: FFICompletedTx,
+            allContacts: List<Contact>
+        ): CancelledTx {
+            val sourcePublicKeyFFI = completedTxFFI.getSourcePublicKey()
+            val destinationPublicKeyFFI = completedTxFFI.getDestinationPublicKey()
+            val status = when (completedTxFFI.getStatus()) {
+                FFITxStatus.TX_NULL_ERROR -> TxStatus.TX_NULL_ERROR
+                FFITxStatus.BROADCAST -> TxStatus.BROADCAST
+                FFITxStatus.COMPLETED -> TxStatus.COMPLETED
+                FFITxStatus.MINED -> TxStatus.MINED
+                FFITxStatus.IMPORTED -> TxStatus.IMPORTED
+                FFITxStatus.PENDING -> TxStatus.PENDING
+                FFITxStatus.UNKNOWN -> TxStatus.UNKNOWN
+            }
+            val user: User
+            val direction: Tx.Direction
+
+            // get public key
+            val error = WalletError()
+            val publicKeyHexString = getPublicKeyHexString(error)
+            if (error.code != WalletErrorCode.NO_ERROR) {
+                throw FFIException(message = error.message)
+            }
+
+            if (publicKeyHexString == destinationPublicKeyFFI.toString()) {
+                direction = INBOUND
+                val userPublicKey = PublicKey(
+                    sourcePublicKeyFFI.toString(),
+                    sourcePublicKeyFFI.getEmojiNodeId()
+                )
+                user = getContactByPublicKeyHexString(
+                    allContacts,
+                    sourcePublicKeyFFI.toString()
+                ) ?: User(userPublicKey)
+            } else {
+                direction = OUTBOUND
+                val userPublicKey = PublicKey(
+                    destinationPublicKeyFFI.toString(),
+                    destinationPublicKeyFFI.getEmojiNodeId()
+                )
+                user = getContactByPublicKeyHexString(
+                    allContacts,
+                    destinationPublicKeyFFI.toString()
+                ) ?: User(userPublicKey)
+            }
+            val tx = CancelledTx(
+                completedTxFFI.getId(),
+                direction,
+                user,
+                MicroTari(completedTxFFI.getAmount()),
+                MicroTari(completedTxFFI.getFee()),
+                completedTxFFI.getTimestamp(),
+                completedTxFFI.getMessage(),
+                status
+            )
+            // destroy native objects
+            sourcePublicKeyFFI.destroy()
+            destinationPublicKeyFFI.destroy()
+            if (status != TxStatus.UNKNOWN) {
+                Logger.d("Canceled TX's status is not UNKNOWN but rather $status.\n$tx")
+            }
+            return tx
         }
 
         private fun pendingInboundTxFromFFI(

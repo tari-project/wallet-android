@@ -62,6 +62,8 @@ import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.extension.txFormattedDate
 import com.tari.android.wallet.infrastructure.Tracker
 import com.tari.android.wallet.model.*
+import com.tari.android.wallet.model.Tx.Direction.INBOUND
+import com.tari.android.wallet.model.Tx.Direction.OUTBOUND
 import com.tari.android.wallet.model.TxStatus.*
 import com.tari.android.wallet.service.TariWalletService
 import com.tari.android.wallet.service.WalletService
@@ -250,18 +252,18 @@ internal class TxDetailActivity : AppCompatActivity(), ServiceConnection {
     }
 
     private fun setTxPaymentData(tx: Tx) {
+        val state = TxState.from(tx)
         ui.amountTextView.text = WalletUtil.amountFormatter.format(tx.amount.tariValue)
-        ui.paymentStateTextView.text = when (tx) {
-            is CompletedTx ->
-                if (tx.direction == Tx.Direction.INBOUND) string(tx_detail_payment_received)
+        ui.paymentStateTextView.text = when {
+            tx is CancelledTx -> string(tx_detail_payment_cancelled)
+            state.status == MINED || state.status == IMPORTED ->
+                if (state.direction == INBOUND) string(tx_detail_payment_received)
                 else string(tx_detail_payment_sent)
-            is PendingInboundTx -> string(tx_detail_pending_payment_received)
-            is PendingOutboundTx -> string(tx_detail_pending_payment_sent)
-            else ->
-                throw IllegalArgumentException("Unexpected transaction type for transaction: ${tx.id}")
+            else -> string(tx_detail_pending_payment_received)
         }
         when {
-            tx is CompletedTx && tx.direction == Tx.Direction.OUTBOUND -> setFeeData(tx.fee)
+            tx is CompletedTx && tx.direction == OUTBOUND -> setFeeData(tx.fee)
+            tx is CancelledTx && tx.direction == OUTBOUND -> setFeeData(tx.fee)
             tx is PendingOutboundTx -> setFeeData(tx.fee)
             else -> ui.txFeeGroup.gone()
         }
@@ -292,15 +294,9 @@ internal class TxDetailActivity : AppCompatActivity(), ServiceConnection {
             ui.addContactButton.visible()
             ui.contactContainerView.gone()
         }
-        ui.fromTextView.text = when (tx) {
-            is CompletedTx ->
-                if (tx.direction == Tx.Direction.INBOUND) string(common_from)
-                else string(common_to)
-            is PendingInboundTx -> string(common_from)
-            is PendingOutboundTx -> string(common_to)
-            else ->
-                throw IllegalArgumentException("Unexpected transaction type for transaction: ${tx.id}")
-        }
+        val state = TxState.from(tx)
+        ui.fromTextView.text =
+            if (state.direction == INBOUND) string(common_from) else string(common_to)
         ui.fullEmojiIdTextView.text = EmojiUtil.getFullEmojiIdSpannable(
             tx.user.publicKey.emojiId,
             string(emoji_id_chunk_separator), color(black), color(light_gray)
@@ -309,23 +305,19 @@ internal class TxDetailActivity : AppCompatActivity(), ServiceConnection {
     }
 
     private fun setTxStatusData(tx: Tx) {
+        val state = TxState.from(tx)
         val statusText = when {
-            tx is PendingOutboundTx && tx.status == PENDING ->
-                string(tx_detail_waiting_for_recipient)
-            tx is PendingOutboundTx && (tx.status == COMPLETED ||
-                    tx.status == BROADCAST) -> string(tx_detail_broadcasting)
-            tx is PendingInboundTx && (tx.status == PENDING ||
-                    tx.status == COMPLETED) -> string(tx_detail_waiting_for_sender_to_complete)
-            tx is PendingInboundTx -> string(tx_detail_broadcasting)
+            tx is CancelledTx -> ""
+            state == TxState(INBOUND, PENDING) ->
+                string(tx_detail_waiting_for_sender_to_complete)
+            state == TxState(OUTBOUND, PENDING) -> string(tx_detail_waiting_for_recipient)
+            state.status == COMPLETED || state.status == BROADCAST ->
+                string(tx_detail_broadcasting)
             else -> ""
         }
         ui.statusTextView.text = statusText
-        if (statusText.isEmpty()) {
-            ui.statusContainerView.gone()
-        } else {
-            ui.statusContainerView.visible()
-        }
-        if (tx is PendingOutboundTx && tx.status == PENDING) {
+        ui.statusContainerView.visibility = if (statusText.isEmpty()) View.GONE else View.VISIBLE
+        if (tx !is CancelledTx && state.direction == OUTBOUND && state.status == PENDING) {
             ui.cancelTxContainerView.setOnClickListener { onTransactionCancel() }
             ui.cancelTxContainerView.visible()
         } else if (ui.cancelTxContainerView.visibility == View.VISIBLE) {
@@ -363,20 +355,14 @@ internal class TxDetailActivity : AppCompatActivity(), ServiceConnection {
         EventBus.subscribe<Event.Wallet.TxFinalized>(this) { updateTxData(it.completedTx) }
         EventBus.subscribe<Event.Wallet.TxMined>(this) { updateTxData(it.completedTx) }
         EventBus.subscribe<Event.Wallet.TxReplyReceived>(this) { updateTxData(it.completedTx) }
-        EventBus.subscribe<Event.Wallet.TxCancellation>(this) {
-            //  Main thread invocation is necessary due to happens-before relationship guarantee
-            Handler(Looper.getMainLooper()).post {
-                if (it.txId.value == this.tx.id) {
-                    // TODO handle cancellation
-                }
-            }
-        }
+        EventBus.subscribe<Event.Wallet.TxCancellation>(this) { updateTxData(it.tx) }
     }
 
     private fun updateTxData(tx: Tx) {
         //  Main thread invocation is necessary due to happens-before relationship guarantee
         Handler(Looper.getMainLooper()).post {
             if (tx.id == this.tx.id) {
+                Log.i("Debug", "Updating TX\nOld: ${this.tx}\nNew: $tx")
                 this.tx = tx
                 bindTxData()
             }
@@ -557,7 +543,7 @@ internal class TxDetailActivity : AppCompatActivity(), ServiceConnection {
     private fun onTransactionCancel() {
         val service = this.walletService ?: return
         val tx = this.tx
-        if (tx is PendingOutboundTx && tx.direction == Tx.Direction.OUTBOUND && tx.status == PENDING) {
+        if (tx is PendingOutboundTx && tx.direction == OUTBOUND && tx.status == PENDING) {
             showTxCancelDialog(service)
         } else {
             Logger.e(
@@ -586,8 +572,6 @@ internal class TxDetailActivity : AppCompatActivity(), ServiceConnection {
         val isCancelled = service.cancelPendingTx(TxId(this.tx.id), error)
         if (isCancelled || error.code == WalletErrorCode.NO_ERROR) {
             this.ui.cancelTxView.setOnClickListener(null)
-            finish()
-            overridePendingTransition(R.anim.enter_from_left, R.anim.exit_to_right)
         } else {
             ErrorDialog(
                 this, string(tx_detail_cancellation_error_title),
@@ -673,6 +657,20 @@ internal class TxDetailActivity : AppCompatActivity(), ServiceConnection {
             layoutId = R.layout.tx_fee_tooltip_dialog,
             dismissViewId = R.id.tx_fee_tooltip_dialog_txt_close
         ).show()
+    }
+
+    private data class TxState(val direction: Tx.Direction, val status: TxStatus) {
+        companion object {
+            fun from(tx: Tx): TxState {
+                return when (tx) {
+                    is PendingInboundTx -> TxState(INBOUND, tx.status)
+                    is PendingOutboundTx -> TxState(OUTBOUND, tx.status)
+                    is CompletedTx -> TxState(tx.direction, tx.status)
+                    is CancelledTx -> TxState(tx.direction, tx.status)
+                    else -> throw IllegalArgumentException("Unexpected Tx type: $tx")
+                }
+            }
+        }
     }
 
     private object TxDetailActivityVisitor {

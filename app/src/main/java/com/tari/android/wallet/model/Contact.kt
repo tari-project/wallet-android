@@ -52,6 +52,8 @@ class Contact() : User() {
         this.alias = alias
     }
 
+    override fun toString(): String = "Contact(alias='$alias') ${super.toString()}"
+
     // region Parcelable
 
     constructor(parcel: Parcel) : this() {

@@ -28,8 +28,6 @@
     <string name="emoji_handshake">🤝</string>
 
     <!-- dummy values - UI design placeholders -->
-    <string name="dummy_positive_tx_value">+ 152.75</string>
-    <string name="dummy_negative_tx_value">- 63.25</string>
     <string name="dummy_contact_alias">Sarah_D</string>
     <string name="dummy_contact_initial">S</string>
     <string name="dummy_message">Thanks again for helping with my move</string>
@@ -214,6 +212,7 @@
     <string name="tx_failed_description">Please make sure your recipient has a reliable internet connection and has the Aurora app open on their device, and then try again. If that doesn\'t work, please verify you have the correct Emoji ID.</string>
 
     <!-- transaction detail -->
+    <string name="tx_detail_payment_cancelled">Payment Cancelled</string>
     <string name="tx_detail_payment_received">Payment Received</string>
     <string name="tx_detail_payment_sent">Payment Sent</string>
     <string name="tx_detail_pending_payment_sent">Payment In Progress</string>

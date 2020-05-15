@@ -39,22 +39,20 @@ import com.tari.android.wallet.R
 import com.tari.android.wallet.model.*
 import org.joda.time.DateTime
 import org.joda.time.LocalDate
-import java.lang.RuntimeException
-import java.lang.ref.WeakReference
 
 /**
  * Transaction list recycler view adapter.
  *
  * @author The Tari Development Team
  */
+// TODO consider using diffutil
 internal class TxListAdapter(
+    private val cancelledTxes: List<CancelledTx>,
     private val completedTxs: List<CompletedTx>,
     private val pendingInboundTxs: List<PendingInboundTx>,
     private val pendingOutboundTxs: List<PendingOutboundTx>,
-    listener: Listener
-) :
-    RecyclerView.Adapter<RecyclerView.ViewHolder>(),
-    TxViewHolder.Listener {
+    private val listener: (Tx) -> Unit
+) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     private val pendingHeaderViewType = 0
     private val headerViewType = 1
@@ -62,31 +60,28 @@ internal class TxListAdapter(
 
     // items (headers and txs)
     private val items = ArrayList<Any>()
-    private val pendingTxs = ArrayList<Tx>()
-
-    /**
-     * Listener.
-     */
-    private var listenerWR: WeakReference<Listener> = WeakReference(listener)
+    private var hasPendingTxs = false
 
     fun notifyDataChanged() {
         items.clear()
-        pendingTxs.clear()
-        pendingTxs.addAll(pendingInboundTxs)
-        pendingTxs.addAll(pendingOutboundTxs)
-
-        var currentDate: LocalDate? = null
-        // add pending txs
-        if (pendingTxs.size > 0) {
-            items.add(LocalDate.now())
-            val sortedPendingTxs = ArrayList(pendingTxs)
-                .sortedWith(compareByDescending<Tx> { it.timestamp })
-            items.addAll(sortedPendingTxs)
+        val pendingTxs = ArrayList<Tx>(pendingInboundTxs.size + pendingOutboundTxs.size).apply {
+            addAll(pendingInboundTxs)
+            addAll(pendingOutboundTxs)
         }
-        val sortedCompleteTxs = ArrayList(completedTxs)
-            .sortedWith(compareByDescending<Tx> { it.timestamp })
-        // completed txs
-        for (tx in sortedCompleteTxs) {
+        hasPendingTxs = pendingTxs.isNotEmpty()
+        // add pending txs
+        if (hasPendingTxs) {
+            items.add(LocalDate.now())
+            items.addAll(pendingTxs.sortedWith(compareByDescending(Tx::timestamp)))
+        }
+        val sortedFinishedTxs =
+            ArrayList<Tx>(cancelledTxes.size + completedTxs.size).apply {
+                addAll(cancelledTxes)
+                addAll(completedTxs)
+            }.sortedWith(compareByDescending { it.timestamp })
+        // completed & canceled txs
+        var currentDate: LocalDate? = null
+        for (tx in sortedFinishedTxs) {
             val txDate = DateTime(tx.timestamp.toLong() * 1000L).toLocalDate()
             if (currentDate == null || !txDate.isEqual(currentDate)) {
                 currentDate = txDate
@@ -94,7 +89,7 @@ internal class TxListAdapter(
             }
             items.add(tx)
         }
-        notifyDataSetChanged()
+        super.notifyDataSetChanged()
     }
 
     /**
@@ -106,7 +101,7 @@ internal class TxListAdapter(
      * Defines the view type - header or transaction.
      */
     override fun getItemViewType(position: Int): Int = when {
-        pendingTxs.size > 0 && position == 0 -> pendingHeaderViewType
+        position == 0 && hasPendingTxs -> pendingHeaderViewType
         items[position] is Tx -> txViewType
         else -> headerViewType
     }
@@ -117,56 +112,38 @@ internal class TxListAdapter(
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int
-    ): RecyclerView.ViewHolder {
-        return when (viewType) {
-            pendingHeaderViewType -> {
-                val view = LayoutInflater.from(parent.context)
-                    .inflate(R.layout.home_tx_list_header, parent, false)
-                    // TODO [DISCUSS] adjust margin at the point of instantiation and have a
-                    // single textview in the xml?
-                TxHeaderViewHolder(view, TxHeaderViewHolder.Type.PENDING_TXS)
-            }
-            headerViewType -> {
-                val view = LayoutInflater.from(parent.context)
-                    .inflate(R.layout.home_tx_list_header, parent, false)
-                TxHeaderViewHolder(view, TxHeaderViewHolder.Type.DATE)
-            }
-            txViewType -> {
-                val view = LayoutInflater.from(parent.context)
-                    .inflate(R.layout.home_tx_list_item, parent, false)
-                TxViewHolder(view, this)
-            }
-            else -> {
-                throw RuntimeException("Unexpected view type $viewType.")
-            }
+    ): RecyclerView.ViewHolder =
+    // TODO [DISCUSS] adjust margin at the point of instantiation and have a
+        // single textview in the xml?
+        when (viewType) {
+            pendingHeaderViewType -> TxHeaderViewHolder(
+                LayoutInflater.from(parent.context)
+                    .inflate(R.layout.home_tx_list_header, parent, false),
+                TxHeaderViewHolder.Type.PENDING_TXS
+            )
+            headerViewType -> TxHeaderViewHolder(
+                LayoutInflater.from(parent.context)
+                    .inflate(R.layout.home_tx_list_header, parent, false),
+                TxHeaderViewHolder.Type.DATE
+            )
+            txViewType -> TxViewHolder(
+                LayoutInflater.from(parent.context)
+                    .inflate(R.layout.home_tx_list_item, parent, false), listener
+            )
+            else -> throw RuntimeException("Unexpected view type $viewType.")
         }
-    }
 
     /**
      * Bind & display header or transaction.
      */
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         when {
-            holder is TxViewHolder -> {
-                holder.bind(items[position] as Tx)
-            }
-            getItemViewType(position) == headerViewType -> {
+            holder is TxViewHolder -> holder.bind(items[position] as Tx)
+            holder.itemViewType == headerViewType ->
                 (holder as TxHeaderViewHolder).bind(items[position] as LocalDate, position)
-            }
-            getItemViewType(position) == pendingHeaderViewType -> {
+            holder.itemViewType == pendingHeaderViewType ->
                 (holder as TxHeaderViewHolder).bind(null, position)
-            }
         }
-    }
-
-    override fun onTxSelected(tx: Tx) {
-        listenerWR.get()?.onTxSelected(tx)
-    }
-
-    interface Listener {
-
-        fun onTxSelected(tx: Tx)
-
     }
 
 }

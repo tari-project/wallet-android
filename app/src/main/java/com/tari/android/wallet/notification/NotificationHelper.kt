@@ -40,17 +40,18 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.os.Build
-import android.widget.RemoteViews
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.app.TaskStackBuilder
+import com.orhanobut.logger.Logger
 import com.tari.android.wallet.R
+import com.tari.android.wallet.model.CancelledTx
 import com.tari.android.wallet.model.Tx
 import com.tari.android.wallet.ui.activity.home.HomeActivity
 import com.tari.android.wallet.ui.activity.tx.TxDetailActivity
 import com.tari.android.wallet.ui.notification.CustomTxNotificationViewHolder
+import com.tari.android.wallet.ui.notification.TxCanceledViewHolder
 import com.tari.android.wallet.util.WalletUtil
-import java.math.BigInteger
 
 /**
  * Contains helper functions for building and posting notifications.
@@ -136,7 +137,8 @@ internal class NotificationHelper(private val context: Context) {
         // title
         val notificationTitle = context.getString(R.string.notification_tx_received_title)
         // description
-        val formattedAmount = if (tx.amount.tariValue.toDouble() % 1 == 0.toDouble()) {
+        val formattedAmount = if (tx.amount.tariValue.toDouble() % 1 == 0.0
+        ) {
             tx.amount.tariValue.toBigInteger().toString()
         } else {
             WalletUtil.amountFormatter.format(tx.amount.tariValue)
@@ -188,30 +190,17 @@ internal class NotificationHelper(private val context: Context) {
     fun postCustomLayoutTxNotification(tx: Tx) {
         val notificationTitle = context.getString(R.string.notification_tx_received_title)
         // format spannable string
-        val formattedAmount = if (tx.amount.tariValue.toDouble() % 1 == 0.toDouble()) {
-            tx.amount.tariValue.toBigInteger().toString()
-        } else {
-            WalletUtil.amountFormatter.format(tx.amount.tariValue)
-        }
-        val notificationBody = String.format(
-            context.getString(R.string.notification_tx_received_description_format),
-            formattedAmount
-        )
-
-        val layout = CustomTxNotificationViewHolder(
-            context,
-            tx
-        )
+        val formattedAmount =
+            if (tx.amount.tariValue.toDouble() % 1 == 0.toDouble())
+                tx.amount.tariValue.toBigInteger().toString()
+            else WalletUtil.amountFormatter.format(tx.amount.tariValue)
+        val notificationBody =
+            context.getString(R.string.notification_tx_received_description_format, formattedAmount)
+        val layout = CustomTxNotificationViewHolder(context, tx)
         val intent = TxDetailActivity.createIntent(context, tx)
-        val pendingIntent = PendingIntent.getActivity(context, 0, intent, 0)
-        /*
-        val pendingIntent: PendingIntent? = TaskStackBuilder.create(context).run {
-            // Add the intent, which inflates the back stack
-            addNextIntentWithParentStack(intent)
-            // Get the PendingIntent containing the entire back stack
-            getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT)
-        }
-         */
+        val pendingIntent = TaskStackBuilder.create(context)
+            .addNextIntentWithParentStack(intent)
+            .getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT)
 
         // prepare transaction notification
         val notification: Notification = NotificationCompat.Builder(
@@ -246,33 +235,31 @@ internal class NotificationHelper(private val context: Context) {
         )
     }
 
-    fun postTxCanceledNotification(id: BigInteger) {
-        val title = context.getString(R.string.notification_tx_canceled_title)
-        val description = context.getString(R.string.notification_tx_canceled_description)
-        val layout = RemoteViews(context.packageName, R.layout.tx_canceled_notification)
-        val intent = Intent(context, HomeActivity::class.java)
-        val pendingIntent = PendingIntent.getActivity(context, 0, intent, 0)
-        val notification: Notification = NotificationCompat.Builder(
-            context,
-            APP_NOTIFICATION_CHANNEL_ID
-        ).run {
-            setContentTitle(title)
-            setContentText(description)
-            setSmallIcon(R.drawable.tx_notification_icon)
-            setDefaults(DEFAULT_ALL)
-            setContentIntent(pendingIntent)
-            setStyle(NotificationCompat.DecoratedCustomViewStyle())
-            setCustomContentView(layout)
-            setAutoCancel(true)
-            setGroup(APP_NOTIFICATION_GROUP_NAME)
-            setCategory(NotificationCompat.CATEGORY_EVENT)
-            priority = NotificationCompat.PRIORITY_MAX
-            build()
-        }
+    fun postTxCanceledNotification(tx: CancelledTx) {
+        Logger.i("postTxCanceledNotification: $tx")
+        val layout = TxCanceledViewHolder(context, tx)
+        val txDetailsIntent = TxDetailActivity.createIntent(context.applicationContext, tx)
+        val pendingIntent =
+            TaskStackBuilder.create(context.applicationContext)
+                .addNextIntentWithParentStack(txDetailsIntent)
+                .getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT)
+        val notification: Notification =
+            NotificationCompat.Builder(context, APP_NOTIFICATION_CHANNEL_ID).run {
+                setSmallIcon(R.drawable.tx_notification_icon)
+                setDefaults(DEFAULT_ALL)
+                setContentIntent(pendingIntent)
+                setStyle(NotificationCompat.DecoratedCustomViewStyle())
+                setCustomContentView(layout)
+                setAutoCancel(true)
+                setGroup(APP_NOTIFICATION_GROUP_NAME)
+                setCategory(NotificationCompat.CATEGORY_EVENT)
+                priority = NotificationCompat.PRIORITY_MAX
+                build()
+            }
         // send group notification
         notificationManager.notify(APP_NOTIFICATION_GROUP_ID, getTxGroupNotification)
         // send actual notification
-        notificationManager.notify(id.toInt(), notification)
+        notificationManager.notify(tx.id.toInt(), notification)
     }
 
 }

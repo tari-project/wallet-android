@@ -55,7 +55,6 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.animation.addListener
-import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.daasuu.ei.Ease
@@ -68,6 +67,7 @@ import com.tari.android.wallet.databinding.ActivityHomeBinding
 import com.tari.android.wallet.event.Event
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.extension.applyFontStyle
+import com.tari.android.wallet.extension.repopulate
 import com.tari.android.wallet.infrastructure.Tracker
 import com.tari.android.wallet.model.*
 import com.tari.android.wallet.network.NetworkConnectionState
@@ -88,6 +88,7 @@ import com.tari.android.wallet.ui.util.UiUtil
 import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.SharedPrefsWrapper
 import java.lang.ref.WeakReference
+import java.util.concurrent.CopyOnWriteArrayList
 import javax.inject.Inject
 import kotlin.math.max
 import kotlin.math.min
@@ -102,7 +103,6 @@ internal class HomeActivity : AppCompatActivity(),
     View.OnScrollChangeListener,
     View.OnTouchListener,
     Animation.AnimationListener,
-    TxListAdapter.Listener,
     CustomScrollView.Listener,
     UpdateProgressViewController.Listener,
     ShakeDetector.Listener {
@@ -118,9 +118,10 @@ internal class HomeActivity : AppCompatActivity(),
     // tx list
     private lateinit var recyclerViewAdapter: TxListAdapter
     private lateinit var recyclerViewLayoutManager: RecyclerView.LayoutManager
-    private val completedTxs = mutableListOf<CompletedTx>()
-    private val pendingInboundTxs = mutableListOf<PendingInboundTx>()
-    private val pendingOutboundTxs = mutableListOf<PendingOutboundTx>()
+    private val canceledTxs = CopyOnWriteArrayList<CancelledTx>()
+    private val completedTxs = CopyOnWriteArrayList<CompletedTx>()
+    private val pendingInboundTxs = CopyOnWriteArrayList<PendingInboundTx>()
+    private val pendingOutboundTxs = CopyOnWriteArrayList<PendingOutboundTx>()
 
     // balance
     private lateinit var balanceInfo: BalanceInfo
@@ -140,7 +141,6 @@ internal class HomeActivity : AppCompatActivity(),
     private var isServiceConnected = false
 
     private var walletService: TariWalletService? = null
-    private val wr = WeakReference(this)
     private val handler = Handler(Looper.getMainLooper())
 
     // whether the user is currently dragging the list view.
@@ -236,10 +236,7 @@ internal class HomeActivity : AppCompatActivity(),
 
             onboardingContentView.gone()
 
-            scrollView.post {
-                wr.get()?.setupScrollView()
-            }
-
+            scrollView.post { setupScrollView() }
             storeButton.setOnClickListener(this@HomeActivity::onStoreButtonClicked)
             walletInfoButton.setOnClickListener(this@HomeActivity::onWalletInfoButtonClicked)
             sendTariButton.setOnClickListener(this@HomeActivity::sendTariButtonClicked)
@@ -255,9 +252,7 @@ internal class HomeActivity : AppCompatActivity(),
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
         intent?.let {
-            handler.postDelayed({
-                wr.get()?.processIntentDeepLink(it)
-            }, Constants.UI.mediumDurationMs)
+            handler.postDelayed({ processIntentDeepLink(it) }, Constants.UI.mediumDurationMs)
         }
     }
 
@@ -308,12 +303,10 @@ internal class HomeActivity : AppCompatActivity(),
         recyclerViewLayoutManager = LinearLayoutManager(this)
         ui.txRecyclerView.layoutManager = recyclerViewLayoutManager
         recyclerViewAdapter =
-            TxListAdapter(
-                completedTxs,
-                pendingInboundTxs,
-                pendingOutboundTxs,
-                this
-            )
+            TxListAdapter(canceledTxs, completedTxs, pendingInboundTxs, pendingOutboundTxs) {
+                Logger.i("Transaction with id ${it.id} selected.")
+                startActivity(TxDetailActivity.createIntent(this, it))
+            }
         ui.txRecyclerView.adapter = recyclerViewAdapter
         // recycler view is initially disabled
         ui.txRecyclerView.isClickable = false
@@ -350,80 +343,65 @@ internal class HomeActivity : AppCompatActivity(),
     private fun subscribeToEventBus() {
         // app events
         EventBus.subscribe<Event.App.AppForegrounded>(this) {
-            wr.get()?.let {
-                if (it.walletService != null
-                    && it.updateProgressViewController.state == UpdateProgressViewController.State.IDLE
-                ) {
-                    it.updateProgressViewController.reset()
-                    it.updateProgressViewController.start(it.walletService!!)
-                    it.ui.scrollView.beginUpdate()
-                }
+            if (walletService != null
+                && updateProgressViewController.state == UpdateProgressViewController.State.IDLE
+            ) {
+                updateProgressViewController.reset()
+                updateProgressViewController.start(walletService!!)
+                ui.scrollView.beginUpdate()
             }
         }
 
         // wallet events
         EventBus.subscribe<Event.Wallet.TxCancellation>(this) {
-            if (wr.get()?.updateProgressViewController?.state
-                == UpdateProgressViewController.State.IDLE
-            ) {
-                wr.get()?.ui?.rootView?.post {
-                    updateAllDataAndUI(restartBalanceUI = false)
-                }
+            if (updateProgressViewController.state == UpdateProgressViewController.State.IDLE) {
+                ui.rootView.post { updateAllDataAndUI(restartBalanceUI = false) }
             }
         }
         EventBus.subscribe<Event.Wallet.TxMined>(this) {
-            wr.get()?.ui?.rootView?.post {
-                updateAllDataAndUI(restartBalanceUI = false)
-            }
+            ui.rootView.post { updateAllDataAndUI(restartBalanceUI = false) }
         }
         EventBus.subscribe<Event.Wallet.TxReceived>(this) {
-            if (wr.get()?.updateProgressViewController?.state
-                == UpdateProgressViewController.State.IDLE
-            ) {
-                wr.get()?.ui?.rootView?.post {
-                    updateAllDataAndUI(restartBalanceUI = false)
-                }
+            if (updateProgressViewController.state == UpdateProgressViewController.State.IDLE) {
+                ui.rootView.post { updateAllDataAndUI(restartBalanceUI = false) }
             }
         }
-
+        EventBus.subscribe<Event.Wallet.TxBroadcast>(this) {
+            if (updateProgressViewController.state == UpdateProgressViewController.State.IDLE) {
+                ui.rootView.post { updateAllDataAndUI(restartBalanceUI = false) }
+            }
+        }
+        EventBus.subscribe<Event.Wallet.TxFinalized>(this) {
+            if (updateProgressViewController.state == UpdateProgressViewController.State.IDLE) {
+                ui.rootView.post { updateAllDataAndUI(restartBalanceUI = false) }
+            }
+        }
         // Testnet Tari events
         EventBus.subscribe<Event.Testnet.TestnetTariRequestSuccessful>(this) {
-            wr.get()?.ui?.rootView?.post {
-                wr.get()?.testnetTariRequestSuccessful()
-            }
+            ui.rootView.post { testnetTariRequestSuccessful() }
         }
         EventBus.subscribe<Event.Testnet.TestnetTariRequestError>(this) { event ->
-            wr.get()?.ui?.rootView?.post {
-                wr.get()?.testnetTariRequestError(event.errorMessage)
-            }
+            ui.rootView.post { testnetTariRequestError(event.errorMessage) }
         }
 
         // tx-related app events
         EventBus.subscribe<Event.Tx.TxSendSuccessful>(this) {
-            wr.get()?.ui?.rootView?.post {
-                onTxSendSuccessful()
-            }
+            ui.rootView.post { onTxSendSuccessful() }
         }
         EventBus.subscribe<Event.Tx.TxSendFailed>(this) { event ->
-            wr.get()?.ui?.rootView?.post {
-                onTxSendFailed(event.failureReason)
-            }
+            ui.rootView.post { onTxSendFailed(event.failureReason) }
         }
 
         // network connection event
         EventBus.subscribeToNetworkConnectionState(this) { networkConnectionState ->
-            if (testnetTariRequestIsWaitingOnConnection
-                && networkConnectionState == NetworkConnectionState.CONNECTED
-            ) {
+            if (testnetTariRequestIsWaitingOnConnection && networkConnectionState == NetworkConnectionState.CONNECTED) {
                 requestTestnetTari()
             }
         }
 
         // other app-specific events
         EventBus.subscribe<Event.Contact.ContactAddedOrUpdated>(this) {
-            wr.get()?.ui?.rootView?.post {
-                updateAllDataAndUI(restartBalanceUI = false)
-            }
+            ui.rootView.post { updateAllDataAndUI(restartBalanceUI = false) }
         }
     }
 
@@ -454,14 +432,10 @@ internal class HomeActivity : AppCompatActivity(),
             // balance info
             updateBalanceInfoData()
             // init list
-            ui.rootView.post {
-                wr.get()?.initializeTxListUI()
-            }
+            ui.rootView.post { initializeTxListUI() }
         }
         // check the start-up intent for a deep link
-        handler.postDelayed({
-            wr.get()?.processIntentDeepLink(intent)
-        }, Constants.UI.xLongDurationMs)
+        handler.postDelayed({ processIntentDeepLink(intent) }, Constants.UI.xLongDurationMs)
 
     }
 
@@ -477,31 +451,29 @@ internal class HomeActivity : AppCompatActivity(),
     // endregion
 
     private val txListIsEmpty: Boolean
-        get() {
-            return completedTxs.isEmpty()
-                    && pendingInboundTxs.isEmpty()
-                    && pendingOutboundTxs.isEmpty()
-        }
+        get() = canceledTxs.isEmpty()
+                && completedTxs.isEmpty()
+                && pendingInboundTxs.isEmpty()
+                && pendingOutboundTxs.isEmpty()
 
     /**
      * Fetches transactions from the service & updates the lists.
      */
-    private fun updateTxListData(): Boolean {
+    private fun updateTxListData() {
         val error = WalletError()
-        val walletCompletedTxs = walletService!!.getCompletedTxs(error)
-        val walletPendingInboundTxs = walletService!!.getPendingInboundTxs(error)
-        val walletPendingOutboundTxs = walletService!!.getPendingOutboundTxs(error)
+        val service = walletService!!
+        val walletCanceledTxs = service.getCancelledTxs(error)
+        val walletCompletedTxs = service.getCompletedTxs(error)
+        val walletPendingInboundTxs = service.getPendingInboundTxs(error)
+        val walletPendingOutboundTxs = service.getPendingOutboundTxs(error)
         if (error.code != WalletErrorCode.NO_ERROR) {
             TODO("Unhandled wallet error: ${error.code}")
         }
 
-        completedTxs.clear()
-        completedTxs.addAll(walletCompletedTxs)
-        pendingInboundTxs.clear()
-        pendingInboundTxs.addAll(walletPendingInboundTxs)
-        pendingOutboundTxs.clear()
-        pendingOutboundTxs.addAll(walletPendingOutboundTxs)
-        return true
+        canceledTxs.repopulate(walletCanceledTxs)
+        completedTxs.repopulate(walletCompletedTxs)
+        pendingInboundTxs.repopulate(walletPendingInboundTxs)
+        pendingOutboundTxs.repopulate(walletPendingOutboundTxs)
     }
 
     private fun initializeTxListUI() {
@@ -574,9 +546,9 @@ internal class HomeActivity : AppCompatActivity(),
         AsyncTask.execute {
             updateTxListData()
             updateBalanceInfoData()
-            wr.get()?.ui?.rootView?.post {
-                wr.get()?.updateBalanceInfoUI(restartBalanceUI)
-                wr.get()?.updateTxListUI()
+            ui.rootView.post {
+                updateBalanceInfoUI(restartBalanceUI)
+                updateTxListUI()
             }
         }
     }
@@ -673,13 +645,11 @@ internal class HomeActivity : AppCompatActivity(),
         animSet.duration = Constants.UI.Home.welcomeAnimationDurationMs
         animSet.addListener(
             onEnd = {
-                wr.get()?.run {
-                    ui.topContentContainerView.visible()
-                    ui.availableBalanceTextView.alpha = 1f
-                    ui.storeImageView.alpha = 1f
-                    ui.walletInfoImageView.alpha = 1f
-                    ui.balanceGemImageView.alpha = 1f
-                }
+                ui.topContentContainerView.visible()
+                ui.availableBalanceTextView.alpha = 1f
+                ui.storeImageView.alpha = 1f
+                ui.walletInfoImageView.alpha = 1f
+                ui.balanceGemImageView.alpha = 1f
             }
         )
         animSet.start()
@@ -875,11 +845,10 @@ internal class HomeActivity : AppCompatActivity(),
         updateAllDataAndUI(restartBalanceUI = false)
         // request Testnet Tari if no txs
         if (txListIsEmpty) {
-            handler.postDelayed({
-                Thread {
-                    wr.get()?.requestTestnetTari()
-                }.start()
-            }, Constants.UI.xxLongDurationMs)
+            handler.postDelayed(
+                { Thread(this::requestTestnetTari).start() },
+                Constants.UI.xxLongDurationMs
+            )
         } else {
             showSendTariButtonAnimated()
         }
@@ -915,7 +884,7 @@ internal class HomeActivity : AppCompatActivity(),
         if (sharedPrefsWrapper.testnetTariUTXOKeyList.isNotEmpty()) {
             Thread {
                 Thread.sleep(secondUTXOImportDelayTimeMs)
-                wr.get()?.importSecondUTXO()
+                importSecondUTXO()
             }.start()
         }
     }
@@ -948,14 +917,6 @@ internal class HomeActivity : AppCompatActivity(),
         handler.postDelayed({
             showTTLStoreDialog()
         }, secondUTXOStoreModalDelayTimeMs)
-    }
-
-    /**
-     * Called when a tx gets clicked.
-     */
-    override fun onTxSelected(tx: Tx) {
-        Logger.i("Transaction with id ${tx.id} selected.")
-        startActivity(TxDetailActivity.createIntent(this, tx))
     }
 
     private fun minimizeListButtonClicked(view: View) {
@@ -1088,10 +1049,7 @@ internal class HomeActivity : AppCompatActivity(),
     }
 
     override fun updateHasCompleted(source: UpdateProgressViewController) {
-        ui.scrollView.finishUpdate {
-            wr.get()?.updateAllDataAndUI(restartBalanceUI = false)
-        }
-
+        ui.scrollView.finishUpdate { updateAllDataAndUI(restartBalanceUI = false) }
     }
 
     private fun displayNetworkConnectionErrorDialog() {
