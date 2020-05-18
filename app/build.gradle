@@ -5,6 +5,7 @@ apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
+apply from: "../download-jni-binaries.gradle"
 
 android {
     compileSdkVersion 29
@@ -14,13 +15,13 @@ android {
         applicationId "com.tari.android.wallet"
         minSdkVersion 24
         targetSdkVersion 29
-        versionCode 113
-        versionName "v0.1.13-jniLibs-0.10.3"
+        versionCode buildNumber
+        versionName versionNumber + "-jniLibs-" + jniLibsVersion
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
         ndk {
-            // ./gradlew -PbinariesVersion=?.?.? jniBinaries
-            abiFilters "arm64-v8a", "x86_64", "armeabi-v7a"
+            abiFilters = []
+            abiFilters.addAll(supportedABIs)
         }
         externalNativeBuild {
             cmake {
@@ -53,14 +54,14 @@ android {
         }
     }
 
-    flavorDimensions "private"
+    flavorDimensions "privacy-mode"
 
     productFlavors {
         regular {
-            dimension "private"
+            dimension "privacy-mode"
         }
         privacy {
-            dimension "private"
+            dimension "privacy-mode"
         }
     }
 
@@ -103,6 +104,8 @@ android {
     }
 
 }
+
+preBuild.dependsOn("downloadJNIBinaries")
 
 dependencies {
     // kotlin

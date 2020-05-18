@@ -35,9 +35,9 @@ package com.tari.android.wallet.application
 /**
  * Tari network.
  */
-enum class Network(val uriComponent: String) {
-    MAINNET("mainnet"),
-    TESTNET_1("rincewind");
+enum class Network(val uriComponent: String, val displayName: String) {
+    MAINNET("mainnet", "MAINNET"),
+    TESTNET_1("rincewind", "TESTNET");
 
     companion object {
         fun from(uriComponent: String): Network = when (uriComponent) {

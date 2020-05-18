@@ -48,6 +48,7 @@ import androidx.core.content.ContextCompat
 import com.daasuu.ei.Ease
 import com.daasuu.ei.EasingInterpolator
 import com.orhanobut.logger.Logger
+import com.tari.android.wallet.BuildConfig
 import com.tari.android.wallet.R
 import com.tari.android.wallet.R.color.white
 import com.tari.android.wallet.R.string.auth_biometric_prompt
@@ -115,6 +116,8 @@ internal class AuthActivity : AppCompatActivity(), Animator.AnimatorListener {
         // call the animations
         val wr = WeakReference(this)
         ui.bigGemImageView.post { wr.get()?.showTariText() }
+        val versionInfo = "${Constants.Wallet.network.displayName} ${BuildConfig.VERSION_NAME}"
+        ui.networkInfoTextView.text = versionInfo
     }
 
     override fun onDestroy() {

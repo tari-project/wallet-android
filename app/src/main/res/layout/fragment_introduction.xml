@@ -149,7 +149,6 @@
         android:alpha="0"
         android:background="@color/black"
         android:letterSpacing="0.1"
-        android:text="@string/testnet"
         android:textColor="#50FFFFFF"
         android:textSize="9sp"
         app:customFont="AVENIR_LT_STD_HEAVY"
