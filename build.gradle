@@ -1,5 +1,15 @@
 buildscript {
     ext.kotlin_version = '1.3.72'
+
+    // build & version
+    ext.buildNumber = 112
+    ext.versionNumber = "0.1.12"
+
+    // JNI-related
+    ext.jniLibsVersion = "0.10.1"
+    ext.jniLibsHostURL = "https://www.tari.com/binaries/"
+    ext.supportedABIs = ["arm64-v8a", "armeabi-v7a", "x86_64"]
+
     repositories {
         google()
         jcenter()
@@ -15,8 +25,6 @@ plugins {
     id "de.undercouch.download" version "4.0.4"
 }
 
-apply from: "tool/jni_binaries.gradle"
-
 allprojects {
     repositories {
         google()
@@ -24,6 +32,8 @@ allprojects {
         maven { url "https://raw.githubusercontent.com/guardianproject/gpmaven/master" }
     }
 }
+
+apply from: "download-jni-binaries.gradle"
 
 task clean(type: Delete) {
     delete rootProject.buildDir

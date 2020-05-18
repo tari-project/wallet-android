@@ -49,6 +49,7 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.daasuu.ei.Ease
 import com.daasuu.ei.EasingInterpolator
+import com.tari.android.wallet.BuildConfig
 import com.tari.android.wallet.R
 import com.tari.android.wallet.R.color.white
 import com.tari.android.wallet.R.string.*
@@ -157,6 +158,8 @@ internal class IntroductionFragment : Fragment() {
             headerLineTopTextView.alpha = 0f
             headerLineBottomTextView.alpha = 0f
             userAgreementAndPrivacyPolicyTextView.alpha = 0f
+            val versionInfo = "${Constants.Wallet.network.displayName} ${BuildConfig.VERSION_NAME}"
+            networkInfoTextView.text = versionInfo
 
             // highlight links
             userAgreementAndPrivacyPolicyTextView.text =

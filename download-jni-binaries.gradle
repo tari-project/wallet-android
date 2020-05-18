@@ -1,0 +1,35 @@
+/**
+ * Downloads JNI binaries as version specified in the project-level gradle file.
+ */
+task downloadJNIBinaries  {
+    final def binariesDir = "${rootProject.projectDir}/jniLibs/"
+    final def binaryArchives = supportedABIs.collect {
+        "libwallet-${it}-${jniLibsVersion}.tar.gz"
+    }
+
+    final File versionFile = file(binariesDir + "version.txt")
+    if (versionFile.exists()) {
+        final String version = versionFile.text
+        if (version == jniLibsVersion) {
+            return
+        }
+    }
+
+    delete {
+        delete fileTree(binariesDir)
+    }
+    download {
+        src(binaryArchives.collect { "$jniLibsHostURL$it" })
+        dest binariesDir
+    }
+    copy {
+        binaryArchives.collect { "$binariesDir$it" }.each { from tarTree(it) }
+        into binariesDir
+    }
+    delete {
+        delete fileTree(binariesDir) {
+            include '**/*.tar.gz'
+        }
+    }
+    new File(binariesDir, "version.txt").text = jniLibsVersion
+}
