@@ -36,7 +36,7 @@ import android.app.KeyguardManager
 import android.content.Context
 import android.view.View
 import android.widget.RemoteViews
-import com.ibm.icu.text.BreakIterator
+import android.icu.text.BreakIterator
 import com.tari.android.wallet.R
 import com.tari.android.wallet.model.Contact
 import com.tari.android.wallet.model.MicroTari

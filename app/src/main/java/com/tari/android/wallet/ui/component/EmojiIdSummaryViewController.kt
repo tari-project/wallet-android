@@ -33,7 +33,7 @@
 package com.tari.android.wallet.ui.component
 
 import android.view.View
-import com.ibm.icu.text.BreakIterator
+import android.icu.text.BreakIterator
 import com.tari.android.wallet.databinding.EmojiIdSummaryBinding
 
 /**
