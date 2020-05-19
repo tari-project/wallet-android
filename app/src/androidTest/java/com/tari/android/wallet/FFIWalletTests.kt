@@ -81,8 +81,8 @@ class FFIWalletTests {
             Logger.i("Store and forward :: tx id %s success %s", txId.toString(), success.toString())
         }
 
-        override fun onTxCancellation(txId: BigInteger) {
-            Logger.i("Tx cancellation :: tx id %s", txId.toString())
+        override fun onTxCancellation(completedTx: CompletedTx) {
+            Logger.i("Tx cancellation :: tx id %s", completedTx.id.toString())
         }
 
         override fun onBaseNodeSyncComplete(rxId: BigInteger, success: Boolean) {
