@@ -129,6 +129,11 @@ internal class FFIWallet(
         libError: FFIError
     ): FFICompletedTxPtr
 
+    private external fun jniGetCancelledTxById(
+        id: String,
+        libError: FFIError
+    ): FFICompletedTxPtr
+
     private external fun jniGetPendingOutboundTxs(
         libError: FFIError
     ): FFIPendingOutboundTxsPtr
@@ -221,7 +226,7 @@ internal class FFIWallet(
                 this::onTxMined.name, "(J)V",
                 this::onDirectSendResult.name, "([BZ)V",
                 this::onStoreAndForwardSendResult.name, "([BZ)V",
-                this::onTxCancellation.name, "([B)V",
+                this::onTxCancellation.name, "(J)V",
                 this::onBaseNodeSyncComplete.name, "([BZ)V",
                 error
             )
@@ -307,6 +312,13 @@ internal class FFIWallet(
     fun getCompletedTxById(id: BigInteger): FFICompletedTx {
         val error = FFIError()
         val result = FFICompletedTx(jniGetCompletedTxById(id.toString(), error))
+        throwIf(error)
+        return result
+    }
+
+    fun getCancelledTxById(id: BigInteger): FFICompletedTx {
+        val error = FFIError()
+        val result = FFICompletedTx(jniGetCancelledTxById(id.toString(), error))
         throwIf(error)
         return result
     }
@@ -577,10 +589,51 @@ internal class FFIWallet(
         listenerAdapter?.run { Handler(Looper.getMainLooper()).post { onStoreAndForwardSendResult(txId, success) } }
     }
 
-    fun onTxCancellation(bytes: ByteArray) {
-        Logger.i("Transaction cancelled.")
-        val txId = BigInteger(1, bytes)
-        listenerAdapter?.run { Handler(Looper.getMainLooper()).post { onTxCancellation(txId) } }
+    fun onTxCancellation(completedTx: FFICompletedTxPtr) {
+        Logger.i("Tx cancelled. Pointer: %s", completedTx.toString())
+        val walletKey = getPublicKey()
+        val walletHex = walletKey.toString()
+        walletKey.destroy()
+        val tx = FFICompletedTx(completedTx)
+        val id = tx.getId()
+        val destination = tx.getDestinationPublicKey()
+        val destinationHex = destination.toString()
+        val destinationEmoji = destination.getEmojiNodeId()
+        destination.destroy()
+        val amount = tx.getAmount()
+        val fee = tx.getFee()
+        val timestamp = tx.getTimestamp()
+        val message = tx.getMessage()
+        val status = when (tx.getStatus()) {
+            FFITxStatus.BROADCAST -> TxStatus.BROADCAST
+            FFITxStatus.COMPLETED -> TxStatus.COMPLETED
+            FFITxStatus.IMPORTED -> TxStatus.IMPORTED
+            FFITxStatus.MINED -> TxStatus.MINED
+            FFITxStatus.PENDING -> TxStatus.PENDING
+            FFITxStatus.TX_NULL_ERROR -> TxStatus.TX_NULL_ERROR
+            else -> TxStatus.UNKNOWN
+        }
+        tx.destroy()
+
+        var direction = Tx.Direction.INBOUND
+        if (destinationHex != walletHex) {
+            direction = Tx.Direction.OUTBOUND
+        }
+        val destinationPk = PublicKey(destinationHex, destinationEmoji)
+        val user = User(destinationPk)
+
+        val completed = CompletedTx(
+            id,
+            direction,
+            user,
+            MicroTari(amount),
+            MicroTari(fee),
+            timestamp,
+            message,
+            status
+        )
+
+        listenerAdapter?.run { Handler(Looper.getMainLooper()).post { onTxCancellation(completed) } }
     }
 
     fun onBaseNodeSyncComplete(bytes: ByteArray, success: Boolean) {

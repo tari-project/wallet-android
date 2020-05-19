@@ -366,7 +366,7 @@ internal class TxDetailActivity : AppCompatActivity(), ServiceConnection {
         EventBus.subscribe<Event.Wallet.TxCancellation>(this) {
             //  Main thread invocation is necessary due to happens-before relationship guarantee
             Handler(Looper.getMainLooper()).post {
-                if (it.txId.value == this.tx.id) {
+                if (it.completedTx.id == this.tx.id) {
                     // TODO handle cancellation
                 }
             }

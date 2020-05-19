@@ -202,16 +202,15 @@ void StoreAndForwardSendResultCallback(unsigned long long tx_id, bool success) {
     g_vm->DetachCurrentThread();
 }
 
-void TxCancellationCallback(unsigned long long tx_id) {
+void TxCancellationCallback(struct TariCompletedTransaction *pCompletedTransaction) {
     auto *jniEnv = getJNIEnv();
     if (jniEnv == nullptr) {
         return;
     }
-    jbyteArray bytes = getBytesFromUnsignedLongLong(jniEnv, tx_id);
     jniEnv->CallVoidMethod(
             callbackHandler,
             txCancellationCallbackMethodId,
-            bytes);
+            pCompletedTransaction);
     g_vm->DetachCurrentThread();
 }
 
@@ -628,6 +627,28 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniGetCompletedTxById(
     char *pEnd;
     unsigned long long id = strtoull(nativeString, &pEnd, 10);
     jlong result = reinterpret_cast<jlong>(wallet_get_completed_transaction_by_id(pWallet,
+                                                                                  id,
+                                                                                  r));
+    jEnv->ReleaseStringUTFChars(jTxId, nativeString);
+    setErrorCode(jEnv, error, i);
+    return result;
+}
+
+extern "C"
+JNIEXPORT jlong JNICALL
+Java_com_tari_android_wallet_ffi_FFIWallet_jniGetCancelledTxById(
+        JNIEnv *jEnv,
+        jobject jThis,
+        jstring jTxId,
+        jobject error) {
+    int i = 0;
+    int *r = &i;
+    jlong lWallet = GetPointerField(jEnv, jThis);
+    TariWallet *pWallet = reinterpret_cast<TariWallet *>(lWallet);
+    const char *nativeString = jEnv->GetStringUTFChars(jTxId, JNI_FALSE);
+    char *pEnd;
+    unsigned long long id = strtoull(nativeString, &pEnd, 10);
+    jlong result = reinterpret_cast<jlong>(wallet_get_cancelled_transaction_by_id(pWallet,
                                                                                   id,
                                                                                   r));
     jEnv->ReleaseStringUTFChars(jTxId, nativeString);

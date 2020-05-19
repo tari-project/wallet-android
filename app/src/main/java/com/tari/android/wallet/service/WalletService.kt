@@ -276,17 +276,17 @@ internal class WalletService : Service(), FFIWalletListenerAdapter {
         }
     }
 
-    override fun onTxCancellation(txId: BigInteger) {
-        Logger.d("Tx $txId cancelled.")
+    override fun onTxCancellation(completedTx: CompletedTx) {
+        Logger.d("Tx ${completedTx.id} cancelled.")
         // post event to bus
-        EventBus.post(Event.Wallet.TxCancellation(TxId(txId)))
+        EventBus.post(Event.Wallet.TxCancellation(completedTx))
         // notify external listeners
         if (!app.isInForeground || app.currentActivity !is HomeActivity) {
             // TODO enable when TX support will be integrated into the JNI-accessed binary
 //            notificationHelper.postTxCanceledNotification(txId)
         }
         listeners.iterator().forEach {
-            it.onTxCancellation(TxId(txId))
+            it.onTxCancellation(completedTx)
         }
     }
 
