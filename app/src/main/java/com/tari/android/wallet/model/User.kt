@@ -50,6 +50,8 @@ open class User() : Parcelable {
         this.publicKey = publicKey
     }
 
+    override fun toString(): String = "User(publicKey=$publicKey)"
+
     override fun equals(other: Any?): Boolean = (other is User)
             && publicKey == other.publicKey
 

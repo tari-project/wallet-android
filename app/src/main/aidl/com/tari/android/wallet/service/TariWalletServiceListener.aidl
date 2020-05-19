@@ -53,7 +53,7 @@ oneway interface TariWalletServiceListener {
 
     void onStoreAndForwardSendResult(in TxId txId, in boolean success);
 
-    void onTxCancellation(in TxId txId);
+    void onTxCancellation(in CancelledTx tx);
 
     void onBaseNodeSyncComplete(in RxId requestId, in boolean success);
 

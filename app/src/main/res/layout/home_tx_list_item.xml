@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/tx_item_root_view"
     android:layout_width="match_parent"
     android:layout_height="@dimen/home_tx_list_item_height"
@@ -75,10 +76,10 @@
         android:gravity="center"
         android:paddingStart="6dp"
         android:paddingEnd="6dp"
-        android:text="@string/dummy_positive_tx_value"
         android:layout_marginTop="-6dp"
         android:textColor="@color/home_tx_value_positive"
         android:textSize="12sp"
-        app:customFont="AVENIR_LT_STD_BLACK" />
+        app:customFont="AVENIR_LT_STD_BLACK"
+        tools:text="+63.75"/>
 
 </LinearLayout>

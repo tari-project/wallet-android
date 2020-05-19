@@ -43,6 +43,7 @@ parcelable BalanceInfo;
 parcelable User;
 parcelable Contact;
 parcelable CompletedTx;
+parcelable CancelledTx;
 parcelable PendingInboundTx;
 parcelable PendingOutboundTx;
 parcelable PublicKey;
