@@ -260,8 +260,8 @@ class AddRecipientFragment : Fragment(),
         if (deepLink != null) {
             // there is a deep link in the clipboard
             emojiIdPublicKey = when (deepLink.type) {
-                EMOJI_ID -> walletService.getPublicKeyFromEmojiId(deepLink.type.value)
-                PUBLIC_KEY_HEX -> walletService.getPublicKeyFromHexString(deepLink.type.value)
+                EMOJI_ID -> walletService.getPublicKeyFromEmojiId(deepLink.identifier)
+                PUBLIC_KEY_HEX -> walletService.getPublicKeyFromHexString(deepLink.identifier)
             }
         } else if (clipboardString.isPossiblyEmojiId()) { // check if clipboard data is emoji id
             // there is an emoji id in the clipboard
@@ -554,7 +554,7 @@ class AddRecipientFragment : Fragment(),
             when (deepLink.type) {
                 EMOJI_ID -> {
                     ui.searchEditText.setText(
-                        deepLink.type.value,
+                        deepLink.identifier,
                         TextView.BufferType.EDITABLE
                     )
                     ui.searchEditText.postDelayed({
@@ -563,7 +563,7 @@ class AddRecipientFragment : Fragment(),
                 }
                 PUBLIC_KEY_HEX -> {
                     AsyncTask.execute {
-                        val publicKeyHex = deepLink.type.value
+                        val publicKeyHex = deepLink.identifier
                         val publicKey = walletService.getPublicKeyFromHexString(publicKeyHex)
                         if (publicKey != null) {
                             ui.rootView.post {

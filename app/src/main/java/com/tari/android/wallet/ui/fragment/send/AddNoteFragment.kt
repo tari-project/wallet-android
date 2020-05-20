@@ -58,6 +58,7 @@ import com.daasuu.ei.EasingInterpolator
 import com.tari.android.wallet.R.color.*
 import com.tari.android.wallet.R.dimen.*
 import com.tari.android.wallet.R.string.emoji_id_chunk_separator
+import com.tari.android.wallet.application.DeepLink
 import com.tari.android.wallet.databinding.FragmentAddNoteBinding
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.infrastructure.Tracker
@@ -132,6 +133,9 @@ class AddNoteFragment : Fragment(), TextWatcher, View.OnTouchListener {
         recipientUser = arguments!!.getParcelable("recipientUser")!!
         amount = arguments!!.getParcelable("amount")!!
         fee = arguments!!.getParcelable("fee")!!
+        if (savedInstanceState == null) {
+            arguments!!.getString(DeepLink.PARAMETER_NOTE)?.let { ui.noteEditText.setText(it) }
+        }
         emojiIdSummaryController = EmojiIdSummaryViewController(ui.emojiIdSummaryView)
         ui.fullEmojiIdBgClickBlockerView.isClickable = false
         ui.fullEmojiIdContainerView.gone()
