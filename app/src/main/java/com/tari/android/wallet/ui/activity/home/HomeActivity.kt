@@ -161,6 +161,7 @@ internal class HomeActivity : AppCompatActivity(),
     private lateinit var updateProgressViewController: UpdateProgressViewController
 
     private var currentDialog: Dialog? = null
+    private var shakeDetector = ShakeDetector(this)
 
     // region lifecycle functions
 
@@ -183,21 +184,69 @@ internal class HomeActivity : AppCompatActivity(),
         }
         setupUi()
         subscribeToEventBus()
-        setupShakeDetector()
         tracker.screen("/home", "Home - Transaction List")
+    }
+
+    override fun onStart() {
+        super.onStart()
+        bindToWalletService()
+        startShakeDetector()
+    }
+
+    override fun onStop() {
+        handler.removeCallbacksAndMessages(null)
+        shakeDetector.stop()
+        super.onStop()
+    }
+
+    @SuppressLint("ClickableViewAccessibility")
+    override fun onDestroy() {
+        ui.txRecyclerView.layoutManager = null
+        ui.txRecyclerView.adapter = null
+        unsetTouchListeners()
+        if (walletService != null) {
+            unbindService(this)
+        }
+        EventBus.unsubscribe(this)
+        EventBus.unsubscribeFromNetworkConnectionState(this)
+        if (::updateProgressViewController.isInitialized) {
+            updateProgressViewController.destroy()
+        }
+        super.onDestroy()
     }
 
     /**
      * Shaking the device should take the user to the debug screen.
      */
-    private fun setupShakeDetector() {
-        val sensorManager = getSystemService(SENSOR_SERVICE) as? SensorManager
-        sensorManager?.let {
-            val shakeDetector = ShakeDetector(this)
+    private fun startShakeDetector() {
+        (getSystemService(SENSOR_SERVICE) as? SensorManager)?.let { sensorManager ->
             shakeDetector.start(sensorManager)
         }
     }
 
+    override fun onNewIntent(intent: Intent?) {
+        super.onNewIntent(intent)
+        intent?.let {
+            handler.postDelayed({ processIntentDeepLink(it) }, Constants.UI.mediumDurationMs)
+        }
+    }
+
+    private fun processIntentDeepLink(intent: Intent) {
+        // go to appropriate activity/fragment if the deep link in the intent
+        // corresponds to a public key
+        DeepLink.from(intent.data?.toString() ?: "")?.let { deepLink ->
+            when (deepLink.type) {
+                DeepLink.Type.EMOJI_ID -> walletService?.getPublicKeyFromEmojiId(deepLink.type.value)
+                DeepLink.Type.PUBLIC_KEY_HEX -> walletService?.getPublicKeyFromHexString(deepLink.type.value)
+            }?.let { publicKey ->
+                sendTariToUser(publicKey)
+            }
+        }
+    }
+
+    // endregion
+
+    // region initial setup (UI and else)
     private fun setupUi() {
         /* commented out to fix the UI cutout issue
         makeStatusBarTransparent() --
@@ -249,55 +298,6 @@ internal class HomeActivity : AppCompatActivity(),
         }
     }
 
-    override fun onNewIntent(intent: Intent?) {
-        super.onNewIntent(intent)
-        intent?.let {
-            handler.postDelayed({ processIntentDeepLink(it) }, Constants.UI.mediumDurationMs)
-        }
-    }
-
-    private fun processIntentDeepLink(intent: Intent) {
-        // go to appropriate activity/fragment if the deep link in the intent
-        // corresponds to a public key
-        DeepLink.from(intent.data?.toString() ?: "")?.let { deepLink ->
-            when (deepLink.type) {
-                DeepLink.Type.EMOJI_ID -> walletService?.getPublicKeyFromEmojiId(deepLink.type.value)
-                DeepLink.Type.PUBLIC_KEY_HEX -> walletService?.getPublicKeyFromHexString(deepLink.type.value)
-            }?.let { publicKey ->
-                sendTariToUser(publicKey)
-            }
-        }
-    }
-
-    override fun onStart() {
-        super.onStart()
-        bindToWalletService()
-    }
-
-    override fun onStop() {
-        handler.removeCallbacksAndMessages(null)
-        super.onStop()
-    }
-
-    @SuppressLint("ClickableViewAccessibility")
-    override fun onDestroy() {
-        ui.txRecyclerView.layoutManager = null
-        ui.txRecyclerView.adapter = null
-        unsetTouchListeners()
-        if (walletService != null) {
-            unbindService(this)
-        }
-        EventBus.unsubscribe(this)
-        EventBus.unsubscribeFromNetworkConnectionState(this)
-        if (::updateProgressViewController.isInitialized) {
-            updateProgressViewController.destroy()
-        }
-        super.onDestroy()
-    }
-
-    // endregion
-
-    // region initial setup (UI and else)
     private fun setupRecyclerView() {
         // initialize recycler view
         recyclerViewLayoutManager = LinearLayoutManager(this)
