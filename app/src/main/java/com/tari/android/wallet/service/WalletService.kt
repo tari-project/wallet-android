@@ -277,14 +277,14 @@ internal class WalletService : Service(), FFIWalletListenerAdapter {
         }
     }
 
-    override fun onTxCancellation(txId: BigInteger) {
-        Logger.d("Tx $txId cancelled.")
+    override fun onTxCancellation(completedTx: CompletedTx) {
+        Logger.d("Tx ${completedTx.id} cancelled.")
         val error = WalletError()
-        val tx: CancelledTx? = serviceImpl.getCancelledTxs(error)?.firstOrNull { it.id == txId }
+        val tx: CancelledTx? = serviceImpl.getCancelledTxs(error)?.firstOrNull { it.id == completedTx.id }
         if (error.code != WalletErrorCode.NO_ERROR) {
-            Logger.e("onTxCancellation($txId): Error occurred during `serviceImpl.getCanceledTxs(error)`: $error")
+            Logger.e("onTxCancellation(${completedTx.id}): Error occurred during `serviceImpl.getCanceledTxs(error)`: $error")
         } else if (tx != null) {
-            Logger.i("onTxCancellation($txId): $tx")
+            Logger.i("onTxCancellation(${completedTx.id}): $tx")
             // post event to bus
             EventBus.post(Event.Wallet.TxCancellation(tx))
             // notify external listeners
