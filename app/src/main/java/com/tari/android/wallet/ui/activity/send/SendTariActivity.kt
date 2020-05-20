@@ -38,6 +38,7 @@ import androidx.fragment.app.Fragment
 import com.tari.android.wallet.R
 import com.tari.android.wallet.R.color.black
 import com.tari.android.wallet.R.color.white
+import com.tari.android.wallet.application.DeepLink
 import com.tari.android.wallet.application.TariWalletApplication
 import com.tari.android.wallet.databinding.ActivitySendTariBinding
 import com.tari.android.wallet.event.Event
@@ -90,6 +91,9 @@ internal class SendTariActivity : AppCompatActivity(),
         if (recipientUser != null) {
             val bundle = Bundle().apply {
                 putParcelable("recipientUser", recipientUser)
+                intent.getDoubleExtra(DeepLink.PARAMETER_AMOUNT, Double.MIN_VALUE)
+                    .takeIf { it > 0 }
+                    ?.let { putDouble(DeepLink.PARAMETER_AMOUNT, it) }
             }
             val addAmountFragment = AddAmountFragment()
             addAmountFragment.arguments = bundle
@@ -138,9 +142,7 @@ internal class SendTariActivity : AppCompatActivity(),
             return
         }
         UiUtil.hideKeyboard(this)
-        val bundle = Bundle().apply {
-            putParcelable("recipientUser", user)
-        }
+        val bundle = Bundle().apply { putParcelable("recipientUser", user) }
         ui.rootView.postDelayed(
             { goToAddAmountFragment(sourceFragment, bundle) },
             Constants.UI.keyboardHideWaitMs
@@ -196,6 +198,8 @@ internal class SendTariActivity : AppCompatActivity(),
             putParcelable("recipientUser", recipientUser)
             putParcelable("amount", amount)
             putParcelable("fee", fee)
+            intent.getStringExtra(DeepLink.PARAMETER_NOTE)
+                ?.let { putString(DeepLink.PARAMETER_NOTE, it) }
         }
         goToAddNoteFragment(sourceFragment, bundle)
     }

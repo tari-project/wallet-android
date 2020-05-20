@@ -45,6 +45,7 @@ import android.graphics.drawable.GradientDrawable
 import android.hardware.SensorManager
 import android.net.Uri
 import android.os.*
+import android.util.Log
 import android.view.MotionEvent
 import android.view.View
 import android.view.animation.AccelerateInterpolator
@@ -226,6 +227,11 @@ internal class HomeActivity : AppCompatActivity(),
 
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
+        Log.i(
+            "Debug",
+            "HomeActivity onNewIntent: $intent\nData: ${intent?.data}${intent?.extras?.keySet()
+                ?.joinToString { "\n$it = ${intent.extras!!.get(it)}" } ?: ""}"
+        )
         intent?.let {
             handler.postDelayed({ processIntentDeepLink(it) }, Constants.UI.mediumDurationMs)
         }
@@ -235,12 +241,11 @@ internal class HomeActivity : AppCompatActivity(),
         // go to appropriate activity/fragment if the deep link in the intent
         // corresponds to a public key
         DeepLink.from(intent.data?.toString() ?: "")?.let { deepLink ->
-            when (deepLink.type) {
-                DeepLink.Type.EMOJI_ID -> walletService?.getPublicKeyFromEmojiId(deepLink.type.value)
-                DeepLink.Type.PUBLIC_KEY_HEX -> walletService?.getPublicKeyFromHexString(deepLink.type.value)
-            }?.let { publicKey ->
-                sendTariToUser(publicKey)
+            val pubkey = when (deepLink.type) {
+                DeepLink.Type.EMOJI_ID -> walletService?.getPublicKeyFromEmojiId(deepLink.identifier)
+                DeepLink.Type.PUBLIC_KEY_HEX -> walletService?.getPublicKeyFromHexString(deepLink.identifier)
             }
+            pubkey?.let { publicKey -> sendTariToUser(publicKey, deepLink.parameters) }
         }
     }
 
@@ -790,21 +795,24 @@ internal class HomeActivity : AppCompatActivity(),
         )
     }
 
-    private fun sendTariToUser(recipientPublicKey: PublicKey) {
+    private fun sendTariToUser(
+        recipientPublicKey: PublicKey,
+        parameters: Map<String, String> = emptyMap()
+    ) {
         // get contact or just user
         val error = WalletError()
         val contacts = walletService!!.getContacts(error)
         val recipientUser = when (error.code) {
-            WalletErrorCode.NO_ERROR -> {
-                contacts.firstOrNull { it.publicKey == recipientPublicKey } ?: User(
-                    recipientPublicKey
-                )
-            }
+            WalletErrorCode.NO_ERROR -> contacts
+                .firstOrNull { it.publicKey == recipientPublicKey } ?: User(recipientPublicKey)
             else -> User(recipientPublicKey)
         }
         // prepare intent
         val intent = Intent(this, SendTariActivity::class.java)
         intent.putExtra("recipientUser", recipientUser)
+        parameters[DeepLink.PARAMETER_NOTE]?.let { intent.putExtra(DeepLink.PARAMETER_NOTE, it) }
+        parameters[DeepLink.PARAMETER_AMOUNT]?.toDoubleOrNull()
+            ?.let { intent.putExtra(DeepLink.PARAMETER_AMOUNT, it) }
         startActivity(intent)
         overridePendingTransition(R.anim.enter_from_right, R.anim.exit_to_left)
     }

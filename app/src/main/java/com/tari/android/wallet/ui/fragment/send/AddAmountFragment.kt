@@ -53,6 +53,7 @@ import com.tari.android.wallet.R.color.black
 import com.tari.android.wallet.R.color.light_gray
 import com.tari.android.wallet.R.dimen.*
 import com.tari.android.wallet.R.string.emoji_id_chunk_separator
+import com.tari.android.wallet.application.DeepLink
 import com.tari.android.wallet.databinding.FragmentAddAmountBinding
 import com.tari.android.wallet.extension.remap
 import com.tari.android.wallet.infrastructure.Tracker
@@ -142,6 +143,7 @@ class AddAmountFragment : Fragment(), ServiceConnection {
 
     private lateinit var walletService: TariWalletService
 
+    private var isFirstLaunch: Boolean = false
     private var _ui: FragmentAddAmountBinding? = null
     private val ui get() = _ui!!
 
@@ -158,6 +160,7 @@ class AddAmountFragment : Fragment(), ServiceConnection {
         if (savedInstanceState == null) {
             tracker.screen(path = "/home/send_tari/add_amount", title = "Send Tari - Add Amount")
         }
+        isFirstLaunch = savedInstanceState == null
     }
 
     private fun bindToWalletService() {
@@ -210,6 +213,28 @@ class AddAmountFragment : Fragment(), ServiceConnection {
             UiUtil.setHeight(ui.fullEmojiIdContainerView, ui.emojiIdSummaryContainerView.height)
             UiUtil.setWidth(ui.fullEmojiIdContainerView, ui.emojiIdSummaryContainerView.width)
         }
+        val amount = arguments!!.getDouble(DeepLink.PARAMETER_AMOUNT, Double.MIN_VALUE)
+        if (isFirstLaunch && amount != Double.MIN_VALUE) {
+            val handler = Handler(Looper.getMainLooper())
+            amount.toString().withIndex().forEach { (index, char) ->
+                handler.postDelayed({
+                    if (Character.isDigit(char)) {
+                        onDigitOrSeparatorClicked(char.toString())
+                    } else {
+                        onDigitOrSeparatorClicked(decimalSeparator)
+                    }
+                }, (index + 1) * Constants.UI.AddAmount.numPadDigitEnterAnimDurationMs * 2)
+            }
+            handler.postDelayed(
+                this::setActionBindings,
+                (amount.toString().length + 1) * Constants.UI.AddAmount.numPadDigitEnterAnimDurationMs * 2
+            )
+        } else {
+            setActionBindings()
+        }
+    }
+
+    private fun setActionBindings() {
         ui.backButton.setOnClickListener { onBackButtonClicked(it) }
         ui.emojiIdSummaryContainerView.setOnClickListener { emojiIdClicked() }
         ui.dimmerView.setOnClickListener { onEmojiIdDimmerClicked() }
