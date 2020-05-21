@@ -1,5 +1,11 @@
 # Tari Aurora Changelog
 
+## [v0.1.13-jniLibs-0.10.3] - 2020-05-21
+* Add cancel transactions support!
+* Adds support for default note and amount support for deep links
+* Prevent the opening of debug screen in background mode.
+* An update for emoji processing - removes IBM ICU library and relies on the Tari emoji set.
+
 ## [v0.1.12-jniLibs-0.10.1] - 2020-05-15
 * The transaction history now lists cancelled transactions!
 * Add support for private builds!
