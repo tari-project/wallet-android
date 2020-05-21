@@ -39,10 +39,10 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.content.Intent.FLAG_ACTIVITY_CLEAR_TOP
 import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
-import androidx.core.app.TaskStackBuilder
 import com.orhanobut.logger.Logger
 import com.tari.android.wallet.R
 import com.tari.android.wallet.model.CancelledTx
@@ -131,60 +131,6 @@ internal class NotificationHelper(private val context: Context) {
         }
 
     /**
-     * Posts standard Android heads-up transaction notification.
-     */
-    fun postTxNotification(tx: Tx) {
-        // title
-        val notificationTitle = context.getString(R.string.notification_tx_received_title)
-        // description
-        val formattedAmount = if (tx.amount.tariValue.toDouble() % 1 == 0.0
-        ) {
-            tx.amount.tariValue.toBigInteger().toString()
-        } else {
-            WalletUtil.amountFormatter.format(tx.amount.tariValue)
-        }
-        val notificationBody = String.format(
-            context.getString(R.string.notification_tx_received_description_format),
-            formattedAmount
-        )
-
-        val intent = TxDetailActivity.createIntent(context, tx)
-        // val pendingIntent = PendingIntent.getActivity(context, 0, intent, 0)
-        // Create the TaskStackBuilder
-        val pendingIntent: PendingIntent? = TaskStackBuilder.create(context).run {
-            // Add the intent, which inflates the back stack
-            addNextIntentWithParentStack(intent)
-            // Get the PendingIntent containing the entire back stack
-            getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT)
-        }
-        // prepare notification
-        val notification: Notification = NotificationCompat.Builder(
-            context,
-            APP_NOTIFICATION_CHANNEL_ID
-        ).run {
-            setContentTitle(notificationTitle)
-            setContentText(notificationBody)
-            setSmallIcon(R.drawable.tx_notification_icon)
-            setDefaults(DEFAULT_ALL)
-            setContentIntent(pendingIntent)
-            setGroup(APP_NOTIFICATION_GROUP_NAME)
-            setCategory(NotificationCompat.CATEGORY_EVENT)
-            priority = NotificationCompat.PRIORITY_MAX
-            build()
-        }
-
-        // send notification
-        notificationManager.notify(
-            APP_NOTIFICATION_GROUP_ID,
-            getTxGroupNotification
-        )
-        notificationManager.notify(
-            tx.id.toInt(),
-            notification
-        )
-    }
-
-    /**
      * Posts custom-layout heads-up transaction notification.
      */
     fun postCustomLayoutTxNotification(tx: Tx) {
@@ -197,10 +143,12 @@ internal class NotificationHelper(private val context: Context) {
         val notificationBody =
             context.getString(R.string.notification_tx_received_description_format, formattedAmount)
         val layout = CustomTxNotificationViewHolder(context, tx)
-        val intent = TxDetailActivity.createIntent(context, tx)
-        val pendingIntent = TaskStackBuilder.create(context)
-            .addNextIntentWithParentStack(intent)
-            .getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT)
+        val intents = arrayOf(
+            Intent(context, HomeActivity::class.java).apply { flags = FLAG_ACTIVITY_CLEAR_TOP },
+            TxDetailActivity.createIntent(context, tx)
+        )
+        val pendingIntent =
+            PendingIntent.getActivities(context, 0, intents, PendingIntent.FLAG_UPDATE_CURRENT)
 
         // prepare transaction notification
         val notification: Notification = NotificationCompat.Builder(
@@ -238,11 +186,12 @@ internal class NotificationHelper(private val context: Context) {
     fun postTxCanceledNotification(tx: CancelledTx) {
         Logger.i("postTxCanceledNotification: $tx")
         val layout = TxCanceledViewHolder(context, tx)
-        val txDetailsIntent = TxDetailActivity.createIntent(context.applicationContext, tx)
+        val intents = arrayOf(
+            Intent(context, HomeActivity::class.java).apply { flags = FLAG_ACTIVITY_CLEAR_TOP },
+            TxDetailActivity.createIntent(context, tx)
+        )
         val pendingIntent =
-            TaskStackBuilder.create(context.applicationContext)
-                .addNextIntentWithParentStack(txDetailsIntent)
-                .getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT)
+            PendingIntent.getActivities(context, 0, intents, PendingIntent.FLAG_UPDATE_CURRENT)
         val notification: Notification =
             NotificationCompat.Builder(context, APP_NOTIFICATION_CHANNEL_ID).run {
                 setSmallIcon(R.drawable.tx_notification_icon)
