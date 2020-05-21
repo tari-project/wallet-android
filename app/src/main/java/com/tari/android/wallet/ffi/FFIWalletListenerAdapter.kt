@@ -32,6 +32,7 @@
  */
 package com.tari.android.wallet.ffi
 
+import com.tari.android.wallet.model.CancelledTx
 import com.tari.android.wallet.model.CompletedTx
 import com.tari.android.wallet.model.PendingInboundTx
 import java.math.BigInteger
@@ -48,6 +49,6 @@ internal interface FFIWalletListenerAdapter {
     fun onTxFinalized(completedTx: CompletedTx)
     fun onDirectSendResult(txId: BigInteger, success: Boolean)
     fun onStoreAndForwardSendResult(txId: BigInteger, success: Boolean)
-    fun onTxCancellation(completedTx: CompletedTx)
+    fun onTxCancellation(cancelledTx: CancelledTx)
     fun onBaseNodeSyncComplete(rxId: BigInteger, success: Boolean)
 }
