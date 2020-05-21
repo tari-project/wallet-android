@@ -40,12 +40,10 @@ enum class Network(val uriComponent: String) {
     TESTNET_1("rincewind");
 
     companion object {
-        fun from(uriComponent: String): Network {
-            return when (uriComponent) {
-                MAINNET.uriComponent -> MAINNET
-                TESTNET_1.uriComponent -> TESTNET_1
-                else -> throw RuntimeException("Unknown network: $uriComponent")
-            }
+        fun from(uriComponent: String): Network = when (uriComponent) {
+            MAINNET.uriComponent -> MAINNET
+            TESTNET_1.uriComponent -> TESTNET_1
+            else -> throw RuntimeException("Unknown network: $uriComponent")
         }
     }
 }

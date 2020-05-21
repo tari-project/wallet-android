@@ -34,11 +34,12 @@ package com.tari.android.wallet.ui.activity.home.adapter
 
 import android.view.View
 import androidx.recyclerview.widget.RecyclerView
-import com.tari.android.wallet.R.color.home_tx_value_negative
-import com.tari.android.wallet.R.color.home_tx_value_positive
+import com.tari.android.wallet.R
+import com.tari.android.wallet.R.color.*
 import com.tari.android.wallet.R.drawable.home_tx_value_negative_bg
 import com.tari.android.wallet.R.drawable.home_tx_value_positive_bg
 import com.tari.android.wallet.databinding.HomeTxListItemBinding
+import com.tari.android.wallet.model.CancelledTx
 import com.tari.android.wallet.model.Contact
 import com.tari.android.wallet.model.Tx
 import com.tari.android.wallet.ui.component.EmojiIdSummaryViewController
@@ -48,36 +49,33 @@ import com.tari.android.wallet.ui.extension.gone
 import com.tari.android.wallet.ui.extension.visible
 import com.tari.android.wallet.ui.util.UiUtil
 import com.tari.android.wallet.util.WalletUtil
-import java.lang.ref.WeakReference
 
 /**
  * Transaction view holder class.
  *
  * @author The Tari Development Team
  */
-class TxViewHolder(view: View, listener: Listener) :
+class TxViewHolder(view: View, private val listener: (Tx) -> Unit) :
     RecyclerView.ViewHolder(view),
     View.OnClickListener {
 
-    private lateinit var txWR: WeakReference<Tx>
+    private lateinit var tx: Tx
     private var emojiIdSummaryController: EmojiIdSummaryViewController
-    private var listenerWR: WeakReference<Listener>
 
     private val ui = HomeTxListItemBinding.bind(view)
 
     init {
         emojiIdSummaryController = EmojiIdSummaryViewController(ui.txItemEmojiSummaryView)
-        listenerWR = WeakReference(listener)
         ui.txItemRootView.setOnClickListener(this)
     }
 
     override fun onClick(view: View) {
         UiUtil.temporarilyDisableClick(view)
-        listenerWR.get()?.onTxSelected(txWR.get()!!)
+        listener(tx)
     }
 
     fun bind(tx: Tx) {
-        txWR = WeakReference(tx)
+        this.tx = tx
         // display contact alias or user emoji id
         val txUser = tx.user
         if (txUser is Contact) {
@@ -91,31 +89,34 @@ class TxViewHolder(view: View, listener: Listener) :
                 txUser.publicKey.emojiId
             )
         }
-
         // display message
         ui.txItemMessageTextView.text = tx.message
         // display value
-        if (tx.direction == Tx.Direction.INBOUND) {
-            val formattedValue = "+" + WalletUtil.amountFormatter.format(tx.amount.tariValue)
-            ui.txItemAmountTextView.text = formattedValue
-            ui.txItemAmountTextView.setTextColor(color(home_tx_value_positive))
-            ui.txItemAmountTextView.background = drawable(home_tx_value_positive_bg)
-        } else {
-            val formattedValue = "-" + WalletUtil.amountFormatter.format(tx.amount.tariValue)
-            ui.txItemAmountTextView.text = formattedValue
-            ui.txItemAmountTextView.setTextColor(color(home_tx_value_negative))
-            ui.txItemAmountTextView.background = drawable(home_tx_value_negative_bg)
+        val amount = WalletUtil.amountFormatter.format(tx.amount.tariValue)
+        val (amountText, textColor, background) = when {
+            tx is CancelledTx -> Triple(
+                amount,
+                color(home_tx_value_canceled),
+                drawable(R.drawable.home_tx_value_canceled_bg)!!
+            )
+            tx.direction == Tx.Direction.INBOUND -> Triple(
+                "+$amount",
+                color(home_tx_value_positive),
+                drawable(home_tx_value_positive_bg)!!
+            )
+            else -> Triple(
+                "-$amount",
+                color(home_tx_value_negative),
+                drawable(home_tx_value_negative_bg)!!
+            )
         }
+        ui.txItemAmountTextView.text = amountText
+        ui.txItemAmountTextView.setTextColor(textColor)
+        ui.txItemAmountTextView.background = background
         val measure =
             ui.txItemAmountTextView.paint.measureText("0".repeat(ui.txItemAmountTextView.text.length))
         val totalPadding = ui.txItemAmountTextView.paddingStart + ui.txItemAmountTextView.paddingEnd
         ui.txItemAmountTextView.width = totalPadding + measure.toInt()
-    }
-
-    interface Listener {
-
-        fun onTxSelected(tx: Tx)
-
     }
 
 }

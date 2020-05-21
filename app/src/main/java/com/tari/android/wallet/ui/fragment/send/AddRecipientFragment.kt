@@ -251,7 +251,7 @@ class AddRecipientFragment : Fragment(),
     }
 
     /**
-     * Checks whether a valid deep link or an emoji id is in the clipboard data.
+     * Checks clipboard data for a valid deep link or an emoji id.
      */
     private fun checkClipboardForValidEmojiId() {
         val clipboardString = clipboardManager.primaryClip?.getItemAt(0)?.text?.toString()
@@ -260,18 +260,31 @@ class AddRecipientFragment : Fragment(),
         if (deepLink != null) {
             // there is a deep link in the clipboard
             emojiIdPublicKey = when (deepLink.type) {
-                EMOJI_ID -> walletService.getPublicKeyFromEmojiId(deepLink.type.value)
-                PUBLIC_KEY_HEX -> walletService.getPublicKeyFromHexString(deepLink.type.value)
+                EMOJI_ID -> walletService.getPublicKeyFromEmojiId(deepLink.identifier)
+                PUBLIC_KEY_HEX -> walletService.getPublicKeyFromHexString(deepLink.identifier)
             }
         } else if (clipboardString.isPossiblyEmojiId()) { // check if clipboard data is emoji id
             // there is an emoji id in the clipboard
             emojiIdPublicKey = walletService.getPublicKeyFromEmojiId(clipboardString)
         } else { // might be a chunked emoji-id
-            val cleanEmojiId = clipboardString.trim().extractEmojis()
-            if (cleanEmojiId.isPossiblyEmojiId()) {
+            val emojis = clipboardString.trim().extractEmojis()
+            // search in windows of length = emoji id length
+            var currentIndex = emojis.size - emojiIdLength
+            while (currentIndex >= 0) {
+                val emojiWindow =
+                    emojis
+                        .subList(currentIndex, currentIndex + emojiIdLength)
+                        .joinToString(separator = "")
                 // there is a chunked emoji id in the clipboard
-                emojiIdPublicKey = walletService.getPublicKeyFromEmojiId(cleanEmojiId)
+                emojiIdPublicKey = walletService.getPublicKeyFromEmojiId(emojiWindow)
+                if (emojiIdPublicKey != null) {
+                    break
+                }
+                --currentIndex
             }
+        }
+        if (emojiIdPublicKey == null) {
+            checkClipboardForPublicKeyHex(clipboardString)
         }
         emojiIdPublicKey?.let {
             if (it.emojiId != sharedPrefsWrapper.emojiId!!) {
@@ -282,6 +295,22 @@ class AddRecipientFragment : Fragment(),
                 }
             }
 
+        }
+    }
+
+    /**
+     * Checks clipboard data for a public key hex string.
+     */
+    private fun checkClipboardForPublicKeyHex(clipboardString: String) {
+        val hexStringRegex = Regex("([A-Za-z0-9]{64})")
+        var result = hexStringRegex.find(clipboardString)
+        while (result != null) {
+            val hexString = result.value
+            emojiIdPublicKey = walletService.getPublicKeyFromHexString(hexString)
+            if (emojiIdPublicKey != null) {
+                return
+            }
+            result = result.next()
         }
     }
 
@@ -525,7 +554,7 @@ class AddRecipientFragment : Fragment(),
             when (deepLink.type) {
                 EMOJI_ID -> {
                     ui.searchEditText.setText(
-                        deepLink.type.value,
+                        deepLink.identifier,
                         TextView.BufferType.EDITABLE
                     )
                     ui.searchEditText.postDelayed({
@@ -534,7 +563,7 @@ class AddRecipientFragment : Fragment(),
                 }
                 PUBLIC_KEY_HEX -> {
                     AsyncTask.execute {
-                        val publicKeyHex = deepLink.type.value
+                        val publicKeyHex = deepLink.identifier
                         val publicKey = walletService.getPublicKeyFromHexString(publicKeyHex)
                         if (publicKey != null) {
                             ui.rootView.post {

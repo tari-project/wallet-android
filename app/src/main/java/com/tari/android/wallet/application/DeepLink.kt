@@ -32,12 +32,19 @@
  */
 package com.tari.android.wallet.application
 
+import java.net.URLDecoder
+
 /**
  * Parses a deep link and contains the structured deep link details.
  *
  * @author The Tari Development Team
  */
-internal class DeepLink private constructor(val network: Network, val type: Type) {
+internal class DeepLink private constructor(
+    val network: Network,
+    val type: Type,
+    val identifier: String,
+    val parameters: Map<String, String>
+) {
 
     /**
      * Deep link type.
@@ -48,22 +55,19 @@ internal class DeepLink private constructor(val network: Network, val type: Type
     enum class Type(val uriComponent: String) {
         EMOJI_ID("eid"),
         PUBLIC_KEY_HEX("pubkey");
-
-        /**
-         * Value is an emoji id or public key hex string.
-         */
-        lateinit var value: String
     }
 
     companion object {
 
+        const val PARAMETER_NOTE = "note"
+        const val PARAMETER_AMOUNT = "amount"
         private val regexNetwork =
             "(" + Network.MAINNET.uriComponent + "|" + Network.TESTNET_1.uriComponent + ")"
-        private val regexEmojiId = "(" + Type.EMOJI_ID.uriComponent + ")/(.{33})"
+        private val regexEmojiId = Type.EMOJI_ID.uriComponent + "/(.{33})"
         private val regexPublicKeyHex =
-            "(" + Type.PUBLIC_KEY_HEX.uriComponent + ")/([a-zA-Z0-9]{64})"
-        private val emojiIdRegex = Regex("tari://$regexNetwork/$regexEmojiId")
-        private val publicKeyRegex = Regex("tari://$regexNetwork/$regexPublicKeyHex")
+            Type.PUBLIC_KEY_HEX.uriComponent + "/([a-zA-Z0-9]{64})"
+        private val emojiIdRegex = Regex("tari://$regexNetwork/$regexEmojiId(\\?.*)?")
+        private val publicKeyRegex = Regex("tari://$regexNetwork/$regexPublicKeyHex(\\?.*)?")
 
         /**
          * Parse deep link.
@@ -72,26 +76,33 @@ internal class DeepLink private constructor(val network: Network, val type: Type
          */
         fun from(deepLink: String): DeepLink? {
             if (emojiIdRegex.matches(deepLink)) {
-                val matchResult = emojiIdRegex.find(deepLink)
-                val (networkUriComponent, _, value) = matchResult!!.destructured
-                val type = Type.EMOJI_ID
-                type.value = value
+                val matchResult = emojiIdRegex.find(deepLink)!!
+                val (networkUriComponent, value, parameters) = matchResult.destructured
                 return DeepLink(
                     Network.from(networkUriComponent),
-                    type
+                    Type.EMOJI_ID,
+                    value,
+                    parseParameters(parameters)
                 )
             } else if (publicKeyRegex.matches(deepLink)) {
-                val matchResult = publicKeyRegex.find(deepLink)
-                val (networkUriComponent, _, value) = matchResult!!.destructured
-                val type = Type.PUBLIC_KEY_HEX
-                type.value = value
+                val matchResult = publicKeyRegex.find(deepLink)!!
+                val (networkUriComponent, value, parameters) = matchResult.destructured
                 return DeepLink(
                     Network.from(networkUriComponent),
-                    type
+                    Type.PUBLIC_KEY_HEX,
+                    value,
+                    parseParameters(parameters)
                 )
             }
             return null
         }
+
+        private fun parseParameters(parameters: String): Map<String, String> =
+            if (parameters.length <= 1)
+                emptyMap()
+            else parameters.substring(1).split('=', '&').windowed(2, 2)
+                .map { it.first() to URLDecoder.decode(it.last(), "UTF-8") }
+                .toMap()
 
     }
 

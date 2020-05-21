@@ -48,6 +48,6 @@ internal interface FFIWalletListenerAdapter {
     fun onTxFinalized(completedTx: CompletedTx)
     fun onDirectSendResult(txId: BigInteger, success: Boolean)
     fun onStoreAndForwardSendResult(txId: BigInteger, success: Boolean)
-    fun onTxCancellation(txId: BigInteger)
+    fun onTxCancellation(completedTx: CompletedTx)
     fun onBaseNodeSyncComplete(rxId: BigInteger, success: Boolean)
 }

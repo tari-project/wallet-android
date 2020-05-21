@@ -60,6 +60,8 @@ class PublicKey() : Parcelable {
         return hexString.hashCode()
     }
 
+    override fun toString(): String = "PublicKey(hexString='$hexString', emojiId='$emojiId')"
+
     // region Parcelable
 
     constructor(parcel: Parcel) : this() {

@@ -66,6 +66,8 @@ interface TariWalletService {
     List<PendingOutboundTx> getPendingOutboundTxs(out WalletError error);
     PendingOutboundTx getPendingOutboundTxById(in TxId id, out WalletError error);
 
+    List<CancelledTx> getCancelledTxs(out WalletError error);
+
     boolean cancelPendingTx(in TxId id, out WalletError error);
 
     boolean syncWithBaseNode(out WalletError error);

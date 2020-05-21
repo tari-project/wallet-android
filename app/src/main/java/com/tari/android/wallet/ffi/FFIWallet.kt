@@ -129,6 +129,11 @@ internal class FFIWallet(
         libError: FFIError
     ): FFICompletedTxPtr
 
+    private external fun jniGetCancelledTxById(
+        id: String,
+        libError: FFIError
+    ): FFICompletedTxPtr
+
     private external fun jniGetPendingOutboundTxs(
         libError: FFIError
     ): FFIPendingOutboundTxsPtr
@@ -221,7 +226,7 @@ internal class FFIWallet(
                 this::onTxMined.name, "(J)V",
                 this::onDirectSendResult.name, "([BZ)V",
                 this::onStoreAndForwardSendResult.name, "([BZ)V",
-                this::onTxCancellation.name, "([B)V",
+                this::onTxCancellation.name, "(J)V",
                 this::onBaseNodeSyncComplete.name, "([BZ)V",
                 error
             )
@@ -311,6 +316,13 @@ internal class FFIWallet(
         return result
     }
 
+    fun getCancelledTxById(id: BigInteger): FFICompletedTx {
+        val error = FFIError()
+        val result = FFICompletedTx(jniGetCancelledTxById(id.toString(), error))
+        throwIf(error)
+        return result
+    }
+
     fun getPendingOutboundTxs(): FFIPendingOutboundTxs {
         val error = FFIError()
         val result = FFIPendingOutboundTxs(jniGetPendingOutboundTxs(error))
@@ -391,6 +403,9 @@ internal class FFIWallet(
             message,
             status
         )
+        if (status != TxStatus.MINED) {
+            Logger.e("Constructed CompletedTx has status that's not MINED: $completed")
+        }
         listenerAdapter?.run { Handler(Looper.getMainLooper()).post { onTxBroadcast(completed) } }
     }
 
@@ -437,7 +452,9 @@ internal class FFIWallet(
             message,
             status
         )
-
+        if (status != TxStatus.MINED) {
+            Logger.e("Constructed CompletedTx has status that's not MINED: $completed")
+        }
         listenerAdapter?.run { Handler(Looper.getMainLooper()).post { onTxMined(completed) } }
     }
 
@@ -503,18 +520,20 @@ internal class FFIWallet(
         val destinationPk = PublicKey(destinationHex, destinationEmoji)
         val user = User(destinationPk)
 
-        val completed =
-            CompletedTx(
-                id,
-                direction,
-                user,
-                MicroTari(amount),
-                MicroTari(fee),
-                timestamp,
-                message,
-                status
-            )
+        val completed = CompletedTx(
+            id,
+            direction,
+            user,
+            MicroTari(amount),
+            MicroTari(fee),
+            timestamp,
+            message,
+            status
+        )
 
+        if (status != TxStatus.MINED) {
+            Logger.e("Constructed CompletedTx has status that's not MINED: $completed")
+        }
         listenerAdapter?.run { Handler(Looper.getMainLooper()).post { onTxReplyReceived(completed) } }
     }
 
@@ -561,32 +580,96 @@ internal class FFIWallet(
             message,
             status
         )
-
+        if (status != TxStatus.MINED) {
+            Logger.e("Constructed CompletedTx has status that's not MINED: $completed")
+        }
         listenerAdapter?.run { Handler(Looper.getMainLooper()).post { onTxFinalized(completed) } }
     }
 
     fun onDirectSendResult(bytes: ByteArray, success: Boolean) {
         Logger.i("Direct send result received. Success: $success")
         val txId = BigInteger(1, bytes)
-        listenerAdapter?.run { Handler(Looper.getMainLooper()).post { onDirectSendResult(txId, success) } }
+        listenerAdapter?.run {
+            Handler(Looper.getMainLooper()).post {
+                onDirectSendResult(
+                    txId,
+                    success
+                )
+            }
+        }
     }
 
     fun onStoreAndForwardSendResult(bytes: ByteArray, success: Boolean) {
         Logger.i("Store and forward send result received. Success: $success")
         val txId = BigInteger(1, bytes)
-        listenerAdapter?.run { Handler(Looper.getMainLooper()).post { onStoreAndForwardSendResult(txId, success) } }
+        listenerAdapter?.run {
+            Handler(Looper.getMainLooper()).post {
+                onStoreAndForwardSendResult(
+                    txId,
+                    success
+                )
+            }
+        }
     }
 
-    fun onTxCancellation(bytes: ByteArray) {
-        Logger.i("Transaction cancelled.")
-        val txId = BigInteger(1, bytes)
-        listenerAdapter?.run { Handler(Looper.getMainLooper()).post { onTxCancellation(txId) } }
+    fun onTxCancellation(completedTx: FFICompletedTxPtr) {
+        Logger.i("Tx cancelled. Pointer: %s", completedTx.toString())
+        val walletKey = getPublicKey()
+        val walletHex = walletKey.toString()
+        walletKey.destroy()
+        val tx = FFICompletedTx(completedTx)
+        val id = tx.getId()
+        val destination = tx.getDestinationPublicKey()
+        val destinationHex = destination.toString()
+        val destinationEmoji = destination.getEmojiNodeId()
+        destination.destroy()
+        val amount = tx.getAmount()
+        val fee = tx.getFee()
+        val timestamp = tx.getTimestamp()
+        val message = tx.getMessage()
+        val status = when (tx.getStatus()) {
+            FFITxStatus.BROADCAST -> TxStatus.BROADCAST
+            FFITxStatus.COMPLETED -> TxStatus.COMPLETED
+            FFITxStatus.IMPORTED -> TxStatus.IMPORTED
+            FFITxStatus.MINED -> TxStatus.MINED
+            FFITxStatus.PENDING -> TxStatus.PENDING
+            FFITxStatus.TX_NULL_ERROR -> TxStatus.TX_NULL_ERROR
+            else -> TxStatus.UNKNOWN
+        }
+        tx.destroy()
+
+        var direction = Tx.Direction.INBOUND
+        if (destinationHex != walletHex) {
+            direction = Tx.Direction.OUTBOUND
+        }
+        val destinationPk = PublicKey(destinationHex, destinationEmoji)
+        val user = User(destinationPk)
+
+        val completed = CompletedTx(
+            id,
+            direction,
+            user,
+            MicroTari(amount),
+            MicroTari(fee),
+            timestamp,
+            message,
+            status
+        )
+
+        listenerAdapter?.run { Handler(Looper.getMainLooper()).post { onTxCancellation(completed) } }
     }
 
     fun onBaseNodeSyncComplete(bytes: ByteArray, success: Boolean) {
         Logger.i("Base node sync complete. Success: $success")
         val requestId = BigInteger(1, bytes)
-        listenerAdapter?.run { Handler(Looper.getMainLooper()).post { onBaseNodeSyncComplete(requestId, success) } }
+        listenerAdapter?.run {
+            Handler(Looper.getMainLooper()).post {
+                onBaseNodeSyncComplete(
+                    requestId,
+                    success
+                )
+            }
+        }
     }
 
     fun sendTx(
