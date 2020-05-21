@@ -915,6 +915,46 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniSendTx(
 }
 
 extern "C"
+JNIEXPORT jbyteArray JNICALL
+Java_com_tari_android_wallet_ffi_FFIWallet_jniCoinSplit(
+        JNIEnv *jEnv,
+        jobject jThis,
+        jstring jamount,
+        jstring jsplitCount,
+        jstring jfee,
+        jstring jmessage,
+        jstring jlockHeight,
+        jobject error) {
+    int i = 0;
+    int *r = &i;
+    jlong lWallet = GetPointerField(jEnv, jThis);
+    TariWallet *pWallet = reinterpret_cast<TariWallet *>(lWallet);
+    const char *nativeAmount = jEnv->GetStringUTFChars(jamount, JNI_FALSE);
+    const char *nativeFee = jEnv->GetStringUTFChars(jfee, JNI_FALSE);
+    const char *nativeHeight = jEnv->GetStringUTFChars(jlockHeight, JNI_FALSE);
+    const char *nativeCount = jEnv->GetStringUTFChars(jsplitCount, JNI_FALSE);
+    const char *pMessage = jEnv->GetStringUTFChars(jmessage, JNI_FALSE);
+    char *pAmountEnd;
+    char *pFeeEnd;
+    char *pLockHeightEnd;
+    char *pCountEnd;
+    unsigned long long fee = strtoull(nativeFee, &pFeeEnd, 10);
+    unsigned long long amount = strtoull(nativeAmount, &pAmountEnd, 10);
+    unsigned long long height = strtoull(nativeHeight, &pLockHeightEnd, 10);
+    unsigned long long count = strtoull(nativeCount, &pCountEnd, 10);
+    jbyteArray result = getBytesFromUnsignedLongLong(
+            jEnv,
+            wallet_coin_split(pWallet, amount, count, fee, pMessage, height, r));
+    setErrorCode(jEnv, error, i);
+    jEnv->ReleaseStringUTFChars(jamount, nativeAmount);
+    jEnv->ReleaseStringUTFChars(jfee, nativeFee);
+    jEnv->ReleaseStringUTFChars(jlockHeight, nativeHeight);
+    jEnv->ReleaseStringUTFChars(jsplitCount, nativeCount);
+    jEnv->ReleaseStringUTFChars(jmessage, pMessage);
+    return result;
+}
+
+extern "C"
 JNIEXPORT jstring JNICALL
 Java_com_tari_android_wallet_ffi_FFIWallet_jniSignMessage(
         JNIEnv *jEnv,
