@@ -188,6 +188,7 @@ internal class WalletService : Service(), FFIWalletListenerAdapter {
 
     override fun onTxBroadcast(completedTx: CompletedTx) {
         Logger.d("Tx ${completedTx.id} broadcast.")
+        completedTx.user = serviceImpl.getUserByPublicKey(completedTx.user.publicKey)
         // post event to bus for the internal listeners
         EventBus.post(Event.Wallet.TxBroadcast(completedTx))
         // notify external listeners
@@ -198,6 +199,7 @@ internal class WalletService : Service(), FFIWalletListenerAdapter {
 
     override fun onTxMined(completedTx: CompletedTx) {
         Logger.d("Tx ${completedTx.id} mined.")
+        completedTx.user = serviceImpl.getUserByPublicKey(completedTx.user.publicKey)
         // post event to bus for the internal listeners
         EventBus.post(Event.Wallet.TxMined(completedTx))
         // notify external listeners
@@ -208,9 +210,7 @@ internal class WalletService : Service(), FFIWalletListenerAdapter {
 
     override fun onTxReceived(pendingInboundTx: PendingInboundTx) {
         Logger.d("Tx received: $pendingInboundTx")
-        pendingInboundTx.user = (serviceImpl.getContacts(WalletError()) ?: emptyList())
-            .firstOrNull { it.publicKey == pendingInboundTx.user.publicKey }
-            ?: pendingInboundTx.user
+        pendingInboundTx.user = serviceImpl.getUserByPublicKey(pendingInboundTx.user.publicKey)
         Logger.d("Received TX after contact update: $pendingInboundTx")
         // post event to bus for the internal listeners
         EventBus.post(Event.Wallet.TxReceived(pendingInboundTx))
@@ -221,6 +221,7 @@ internal class WalletService : Service(), FFIWalletListenerAdapter {
 
     override fun onTxReplyReceived(completedTx: CompletedTx) {
         Logger.d("Tx ${completedTx.id} reply received.")
+        completedTx.user = serviceImpl.getUserByPublicKey(completedTx.user.publicKey)
         // post event to bus for the internal listeners
         EventBus.post(Event.Wallet.TxReplyReceived(completedTx))
         // notify external listeners
@@ -231,6 +232,7 @@ internal class WalletService : Service(), FFIWalletListenerAdapter {
 
     override fun onTxFinalized(completedTx: CompletedTx) {
         Logger.d("Tx ${completedTx.id} finalized.")
+        completedTx.user = serviceImpl.getUserByPublicKey(completedTx.user.publicKey)
         // post event to bus for the internal listeners
         EventBus.post(Event.Wallet.TxFinalized(completedTx))
         // notify external listeners
@@ -277,27 +279,19 @@ internal class WalletService : Service(), FFIWalletListenerAdapter {
         }
     }
 
-    override fun onTxCancellation(completedTx: CompletedTx) {
-        Logger.d("Tx ${completedTx.id} cancelled.")
-        val error = WalletError()
-        // TODO [REFACTOR] find by id
-        val tx: CancelledTx? = serviceImpl.getCancelledTxs(error)?.firstOrNull { it.id == completedTx.id }
-        if (error.code != WalletErrorCode.NO_ERROR) {
-            Logger.e("onTxCancellation(${completedTx.id}): Error occurred during `serviceImpl.getCanceledTxs(error)`: $error")
-        } else if (tx != null) {
-            Logger.i("onTxCancellation(${completedTx.id}): $tx")
-            // post event to bus
-            EventBus.post(Event.Wallet.TxCancellation(tx))
-            // notify external listeners
-            serviceImpl.getPublicKeyHexString(error)
-            if (error.code == WalletErrorCode.NO_ERROR && tx.direction == INBOUND &&
-                !(app.isInForeground && app.currentActivity is HomeActivity)
-            ) {
-                Logger.i("Posting cancellation notification")
-                notificationHelper.postTxCanceledNotification(tx)
-            }
-            listeners.iterator().forEach { it.onTxCancellation(tx) }
+    override fun onTxCancellation(cancelledTx: CancelledTx) {
+        Logger.d("Tx ${cancelledTx.id} cancelled.")
+        cancelledTx.user = serviceImpl.getUserByPublicKey(cancelledTx.user.publicKey)
+        // post event to bus
+        EventBus.post(Event.Wallet.TxCancellation(cancelledTx))
+        // notify external listeners
+        if (cancelledTx.direction == INBOUND &&
+            !(app.isInForeground && app.currentActivity is HomeActivity)
+        ) {
+            Logger.i("Posting cancellation notification")
+            notificationHelper.postTxCanceledNotification(cancelledTx)
         }
+        listeners.iterator().forEach { it.onTxCancellation(cancelledTx) }
     }
 
     override fun onBaseNodeSyncComplete(rxId: BigInteger, success: Boolean) {
@@ -402,13 +396,27 @@ internal class WalletService : Service(), FFIWalletListenerAdapter {
         private fun getContactByPublicKeyHexString(
             allContacts: List<Contact>,
             hexString: String
-        ): Contact? {
-            allContacts.iterator().forEach {
-                if (it.publicKey.hexString == hexString) {
-                    return it
+        ): Contact? = allContacts.firstOrNull { it.publicKey.hexString == hexString }
+
+        internal fun getUserByPublicKey(key: PublicKey): User {
+            val contactsFFI = wallet.getContacts()
+            for (i in 0 until contactsFFI.getLength()) {
+                val contactFFI = contactsFFI.getAt(i)
+                val publicKeyFFI = contactFFI.getPublicKey()
+                val hex = publicKeyFFI.toString()
+                val contact =
+                    if (hex == key.hexString) Contact(key, contactFFI.getAlias())
+                    else null
+                publicKeyFFI.destroy()
+                contactFFI.destroy()
+                if (contact != null) {
+                    contactsFFI.destroy()
+                    return contact
                 }
             }
-            return null
+            // destroy native collection
+            contactsFFI.destroy()
+            return User(key)
         }
 
         override fun registerListener(listener: TariWalletServiceListener): Boolean {

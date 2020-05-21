@@ -367,32 +367,13 @@ internal class FFIWallet(
         walletKey.destroy()
         val tx = FFICompletedTx(completedTx)
         val id = tx.getId()
-        val destination = tx.getDestinationPublicKey()
-        val destinationHex = destination.toString()
-        val destinationEmoji = destination.getEmojiNodeId()
-        destination.destroy()
         val amount = tx.getAmount()
         val fee = tx.getFee()
         val timestamp = tx.getTimestamp()
         val message = tx.getMessage()
-        val status = when (tx.getStatus()) {
-            FFITxStatus.BROADCAST -> TxStatus.BROADCAST
-            FFITxStatus.COMPLETED -> TxStatus.COMPLETED
-            FFITxStatus.IMPORTED -> TxStatus.IMPORTED
-            FFITxStatus.MINED -> TxStatus.MINED
-            FFITxStatus.PENDING -> TxStatus.PENDING
-            FFITxStatus.TX_NULL_ERROR -> TxStatus.TX_NULL_ERROR
-            else -> TxStatus.UNKNOWN
-        }
+        val status = mapStatus(tx)
+        val (direction, user) = defineParticipantAndDirection(tx, walletHex)
         tx.destroy()
-
-        var direction = Tx.Direction.INBOUND
-        if (destinationHex != walletHex) {
-            direction = Tx.Direction.OUTBOUND
-        }
-        val destinationPk = PublicKey(destinationHex, destinationEmoji)
-        val user = User(destinationPk)
-
         val completed = CompletedTx(
             id,
             direction,
@@ -416,32 +397,13 @@ internal class FFIWallet(
         walletKey.destroy()
         val tx = FFICompletedTx(completedTx)
         val id = tx.getId()
-        val destination = tx.getDestinationPublicKey()
-        val destinationHex = destination.toString()
-        val destinationEmoji = destination.getEmojiNodeId()
-        destination.destroy()
         val amount = tx.getAmount()
         val fee = tx.getFee()
         val timestamp = tx.getTimestamp()
         val message = tx.getMessage()
-        val status = when (tx.getStatus()) {
-            FFITxStatus.BROADCAST -> TxStatus.BROADCAST
-            FFITxStatus.COMPLETED -> TxStatus.COMPLETED
-            FFITxStatus.IMPORTED -> TxStatus.IMPORTED
-            FFITxStatus.MINED -> TxStatus.MINED
-            FFITxStatus.PENDING -> TxStatus.PENDING
-            FFITxStatus.TX_NULL_ERROR -> TxStatus.TX_NULL_ERROR
-            else -> TxStatus.UNKNOWN
-        }
+        val status = mapStatus(tx)
+        val (direction, user) = defineParticipantAndDirection(tx, walletHex)
         tx.destroy()
-
-        var direction = Tx.Direction.INBOUND
-        if (destinationHex != walletHex) {
-            direction = Tx.Direction.OUTBOUND
-        }
-        val destinationPk = PublicKey(destinationHex, destinationEmoji)
-        val user = User(destinationPk)
-
         val completed = CompletedTx(
             id,
             direction,
@@ -494,32 +456,13 @@ internal class FFIWallet(
         walletKey.destroy()
         val tx = FFICompletedTx(completedTx)
         val id = tx.getId()
-        val destination = tx.getDestinationPublicKey()
-        val destinationHex = destination.toString()
-        val destinationEmoji = destination.getEmojiNodeId()
-        destination.destroy()
         val amount = tx.getAmount()
         val fee = tx.getFee()
         val timestamp = tx.getTimestamp()
         val message = tx.getMessage()
-        val status = when (tx.getStatus()) {
-            FFITxStatus.BROADCAST -> TxStatus.BROADCAST
-            FFITxStatus.COMPLETED -> TxStatus.COMPLETED
-            FFITxStatus.IMPORTED -> TxStatus.IMPORTED
-            FFITxStatus.MINED -> TxStatus.MINED
-            FFITxStatus.PENDING -> TxStatus.PENDING
-            FFITxStatus.TX_NULL_ERROR -> TxStatus.TX_NULL_ERROR
-            else -> TxStatus.UNKNOWN
-        }
+        val status = mapStatus(tx)
+        val (direction, user) = defineParticipantAndDirection(tx, walletHex)
         tx.destroy()
-
-        var direction = Tx.Direction.INBOUND
-        if (destinationHex != walletHex) {
-            direction = Tx.Direction.OUTBOUND
-        }
-        val destinationPk = PublicKey(destinationHex, destinationEmoji)
-        val user = User(destinationPk)
-
         val completed = CompletedTx(
             id,
             direction,
@@ -544,32 +487,13 @@ internal class FFIWallet(
         walletKey.destroy()
         val tx = FFICompletedTx(completedTx)
         val id = tx.getId()
-        val destination = tx.getDestinationPublicKey()
-        val destinationHex = destination.toString()
-        val destinationEmoji = destination.getEmojiNodeId()
-        destination.destroy()
         val amount = tx.getAmount()
         val fee = tx.getFee()
         val timestamp = tx.getTimestamp()
         val message = tx.getMessage()
-        val status = when (tx.getStatus()) {
-            FFITxStatus.BROADCAST -> TxStatus.BROADCAST
-            FFITxStatus.COMPLETED -> TxStatus.COMPLETED
-            FFITxStatus.IMPORTED -> TxStatus.IMPORTED
-            FFITxStatus.MINED -> TxStatus.MINED
-            FFITxStatus.PENDING -> TxStatus.PENDING
-            FFITxStatus.TX_NULL_ERROR -> TxStatus.TX_NULL_ERROR
-            else -> TxStatus.UNKNOWN
-        }
+        val status = mapStatus(tx)
+        val (direction, user) = defineParticipantAndDirection(tx, walletHex)
         tx.destroy()
-
-        var direction = Tx.Direction.INBOUND
-        if (destinationHex != walletHex) {
-            direction = Tx.Direction.OUTBOUND
-        }
-        val destinationPk = PublicKey(destinationHex, destinationEmoji)
-        val user = User(destinationPk)
-
         val completed = CompletedTx(
             id,
             direction,
@@ -590,12 +514,7 @@ internal class FFIWallet(
         Logger.i("Direct send result received. Success: $success")
         val txId = BigInteger(1, bytes)
         listenerAdapter?.run {
-            Handler(Looper.getMainLooper()).post {
-                onDirectSendResult(
-                    txId,
-                    success
-                )
-            }
+            Handler(Looper.getMainLooper()).post { onDirectSendResult(txId, success) }
         }
     }
 
@@ -603,12 +522,7 @@ internal class FFIWallet(
         Logger.i("Store and forward send result received. Success: $success")
         val txId = BigInteger(1, bytes)
         listenerAdapter?.run {
-            Handler(Looper.getMainLooper()).post {
-                onStoreAndForwardSendResult(
-                    txId,
-                    success
-                )
-            }
+            Handler(Looper.getMainLooper()).post { onStoreAndForwardSendResult(txId, success) }
         }
     }
 
@@ -619,33 +533,14 @@ internal class FFIWallet(
         walletKey.destroy()
         val tx = FFICompletedTx(completedTx)
         val id = tx.getId()
-        val destination = tx.getDestinationPublicKey()
-        val destinationHex = destination.toString()
-        val destinationEmoji = destination.getEmojiNodeId()
-        destination.destroy()
         val amount = tx.getAmount()
         val fee = tx.getFee()
         val timestamp = tx.getTimestamp()
         val message = tx.getMessage()
-        val status = when (tx.getStatus()) {
-            FFITxStatus.BROADCAST -> TxStatus.BROADCAST
-            FFITxStatus.COMPLETED -> TxStatus.COMPLETED
-            FFITxStatus.IMPORTED -> TxStatus.IMPORTED
-            FFITxStatus.MINED -> TxStatus.MINED
-            FFITxStatus.PENDING -> TxStatus.PENDING
-            FFITxStatus.TX_NULL_ERROR -> TxStatus.TX_NULL_ERROR
-            else -> TxStatus.UNKNOWN
-        }
+        val status = mapStatus(tx)
+        val (direction, user) = defineParticipantAndDirection(tx, walletHex)
         tx.destroy()
-
-        var direction = Tx.Direction.INBOUND
-        if (destinationHex != walletHex) {
-            direction = Tx.Direction.OUTBOUND
-        }
-        val destinationPk = PublicKey(destinationHex, destinationEmoji)
-        val user = User(destinationPk)
-
-        val completed = CompletedTx(
+        val canceled = CancelledTx(
             id,
             direction,
             user,
@@ -656,19 +551,47 @@ internal class FFIWallet(
             status
         )
 
-        listenerAdapter?.run { Handler(Looper.getMainLooper()).post { onTxCancellation(completed) } }
+        listenerAdapter?.run {
+            Handler(Looper.getMainLooper()).post { onTxCancellation(canceled) }
+        }
+    }
+
+    private fun defineParticipantAndDirection(
+        tx: FFICompletedTx,
+        walletHex: String
+    ): Pair<Tx.Direction, User> {
+        val source = tx.getSourcePublicKey()
+        val sourceHex = source.toString()
+        val sourceEmoji = source.getEmojiNodeId()
+        source.destroy()
+        val destination = tx.getDestinationPublicKey()
+        val destinationHex = destination.toString()
+        val destinationEmoji = destination.getEmojiNodeId()
+        destination.destroy()
+        val direction = if (destinationHex == walletHex) Tx.Direction.INBOUND
+        else Tx.Direction.OUTBOUND
+        val user = User(
+            if (walletHex == sourceHex) PublicKey(destinationHex, destinationEmoji)
+            else PublicKey(sourceHex, sourceEmoji)
+        )
+        return Pair(direction, user)
+    }
+
+    private fun mapStatus(tx: FFICompletedTx): TxStatus = when (tx.getStatus()) {
+        FFITxStatus.BROADCAST -> TxStatus.BROADCAST
+        FFITxStatus.COMPLETED -> TxStatus.COMPLETED
+        FFITxStatus.IMPORTED -> TxStatus.IMPORTED
+        FFITxStatus.MINED -> TxStatus.MINED
+        FFITxStatus.PENDING -> TxStatus.PENDING
+        FFITxStatus.TX_NULL_ERROR -> TxStatus.TX_NULL_ERROR
+        else -> TxStatus.UNKNOWN
     }
 
     fun onBaseNodeSyncComplete(bytes: ByteArray, success: Boolean) {
         Logger.i("Base node sync complete. Success: $success")
         val requestId = BigInteger(1, bytes)
         listenerAdapter?.run {
-            Handler(Looper.getMainLooper()).post {
-                onBaseNodeSyncComplete(
-                    requestId,
-                    success
-                )
-            }
+            Handler(Looper.getMainLooper()).post { onBaseNodeSyncComplete(requestId, success) }
         }
     }
 
