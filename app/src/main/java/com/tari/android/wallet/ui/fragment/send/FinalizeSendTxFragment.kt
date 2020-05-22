@@ -126,6 +126,9 @@ class FinalizeSendTxFragment : Fragment(), ServiceConnection {
     private val connectionTimeoutSecs = 30
     private lateinit var connectionCheckStartTime: DateTime
 
+    /**
+     * Will be set when the send is successful.
+     */
     private var failureReason: FailureReason? = null
 
     /**
@@ -592,7 +595,14 @@ class FinalizeSendTxFragment : Fragment(), ServiceConnection {
         fadeOutAnim.addListener(onEnd = {
             fadeOutAnim.removeAllListeners()
             ui.lottieAnimationView.alpha = 0f
-            listenerWR.get()?.onSendTxSuccessful(this, recipientUser, amount, fee, note)
+            listenerWR.get()?.onSendTxSuccessful(
+                this,
+                sentTxId!!,
+                recipientUser,
+                amount,
+                fee,
+                note
+            )
         })
         fadeOutAnim.start()
     }
@@ -621,6 +631,7 @@ class FinalizeSendTxFragment : Fragment(), ServiceConnection {
          */
         fun onSendTxSuccessful(
             sourceFragment: FinalizeSendTxFragment,
+            txId: TxId,
             recipientUser: User,
             amount: MicroTari,
             fee: MicroTari,

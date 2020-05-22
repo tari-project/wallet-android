@@ -59,8 +59,11 @@ import com.tari.android.wallet.util.Constants
 import io.reactivex.Observable
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
+import kotlinx.coroutines.*
 import java.lang.ref.WeakReference
+import java.math.BigInteger
 import java.util.concurrent.TimeUnit
+import kotlin.coroutines.CoroutineContext
 
 /**
  * Controls the transaction list update (pull to refresh) views.
@@ -70,7 +73,11 @@ import java.util.concurrent.TimeUnit
 internal class UpdateProgressViewController(
     private val view: View,
     listener: Listener
-) {
+): CoroutineScope {
+
+    private val mJob = Job()
+    override val coroutineContext: CoroutineContext
+        get() = mJob + Dispatchers.Main
 
     enum class FailureReason {
         NETWORK_CONNECTION_ERROR,
@@ -79,7 +86,8 @@ internal class UpdateProgressViewController(
 
     enum class State {
         IDLE,
-        RUNNING
+        RUNNING,
+        RECEIVING
     }
 
     private val hourglassIconTextView: TextView =
@@ -103,9 +111,10 @@ internal class UpdateProgressViewController(
     private var connectionCheckStartTimeMs = 0L
 
     // connection status check (internet, tor, base node) timeout period
-    private val timeoutPeriodMs = 30 * 1000L
+    private val timeoutPeriodMs = 40 * 1000L
     private val minStateDisplayPeriodMs = 3 * 1000L
     private var baseNodeSyncTimeoutSubscription: Disposable? = null
+    private var baseNodeSyncRequestId: BigInteger? = null
 
     private val listenerWeakReference: WeakReference<Listener> = WeakReference(listener)
 
@@ -151,22 +160,23 @@ internal class UpdateProgressViewController(
 
     private fun subscribeToEventBus() {
         EventBus.subscribe<Event.Wallet.BaseNodeSyncComplete>(this) { event ->
-            if (isWaitingOnBaseNodeSync) {
+            Logger.i("Received BaseNodeSyncComplete in state %s.", state)
+            if (state == State.RUNNING && isWaitingOnBaseNodeSync) {
                 onBaseNodeSyncCompleted(event)
             }
         }
         EventBus.subscribe<Event.Wallet.TxReceived>(this) {
-            if (state == State.RUNNING) {
+            if (state == State.RUNNING || state == State.RECEIVING) {
                 numberOfReceivedTxs++
             }
         }
         EventBus.subscribe<Event.Wallet.TxBroadcast>(this) {
-            if (state == State.RUNNING) {
+            if (state == State.RUNNING || state == State.RECEIVING) {
                 numberOfBroadcastTxs++
             }
         }
-        EventBus.subscribe<Event.Wallet.TxCancellation>(this) {
-            if (state == State.RUNNING) {
+        EventBus.subscribe<Event.Wallet.TxCancelled>(this) {
+            if (state == State.RUNNING || state == State.RECEIVING) {
                 numberOfCancelledTxs++
             }
         }
@@ -252,15 +262,13 @@ internal class UpdateProgressViewController(
             baseNodeSyncCurrentRetryCount
         )
         val walletError = WalletError()
-        walletService.syncWithBaseNode(walletError)
-        if (walletError.code != WalletErrorCode.NO_ERROR) {
-            if (baseNodeSyncCurrentRetryCount >= baseNodeSyncMaxRetryCount) {
-                // failed
+        // long running call
+        launch(Dispatchers.IO) {
+            baseNodeSyncRequestId = walletService.syncWithBaseNode(walletError).value
+            if (isActive && walletError.code != WalletErrorCode.NO_ERROR) {
+                Logger.e("Base node sync has failed with err code %d.", walletError.code)
                 fail(FailureReason.BASE_NODE_CONNECTION_ERROR)
-            } else {
-                syncWithBaseNode()
             }
-            return
         }
         isWaitingOnBaseNodeSync = true
         // setup expiration timer
@@ -274,6 +282,10 @@ internal class UpdateProgressViewController(
     }
 
     private fun onBaseNodeSyncCompleted(event: Event.Wallet.BaseNodeSyncComplete) {
+        if (event.requestId.value != baseNodeSyncRequestId) {
+            Logger.i("Request id mismatch - ignore base node sync event.")
+            return
+        }
         isWaitingOnBaseNodeSync = false
         baseNodeSyncTimeoutSubscription?.dispose()
         if (!event.success) {
@@ -287,6 +299,7 @@ internal class UpdateProgressViewController(
         }
         // base node sync successful - start listening for events
         Logger.d("Connection tests passed. Start listening for wallet events.")
+        state = State.RECEIVING
         view.postDelayed({
             displayReceivingTxs()
         }, minStateDisplayPeriodMs)
@@ -338,7 +351,11 @@ internal class UpdateProgressViewController(
 
     private fun complete() {
         state = State.IDLE
-        listenerWeakReference.get()?.updateHasCompleted(this)
+        listenerWeakReference.get()?.updateHasCompleted(
+            this,
+            // only update UI if there's a visible change
+            (numberOfReceivedTxs + numberOfCancelledTxs) > 0
+        )
     }
 
     private fun animateToTextView(nextTextView: TextView, onComplete: (() -> Unit)? = null) {
@@ -380,22 +397,27 @@ internal class UpdateProgressViewController(
 
     private fun fail(failureReason: FailureReason) {
         state = State.IDLE
+        listenerWeakReference.get()?.updateHasFailed(this, failureReason)
+        isWaitingOnBaseNodeSync = false
         view.post {
             progressBar.invisible()
-            listenerWeakReference.get()?.updateHasFailed(this, failureReason)
         }
     }
 
     fun destroy() {
         EventBus.unsubscribe(this)
         baseNodeSyncTimeoutSubscription?.dispose()
+        cancel()
     }
 
     interface Listener {
 
         fun updateHasFailed(source: UpdateProgressViewController, failureReason: FailureReason)
 
-        fun updateHasCompleted(source: UpdateProgressViewController)
+        fun updateHasCompleted(
+            source: UpdateProgressViewController,
+            updateDataAndUI: Boolean
+        )
 
     }
 

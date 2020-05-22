@@ -351,11 +351,11 @@ internal class TxDetailActivity : AppCompatActivity(), ServiceConnection {
     }
 
     private fun observeTxUpdates() {
-        EventBus.subscribe<Event.Wallet.TxBroadcast>(this) { updateTxData(it.completedTx) }
-        EventBus.subscribe<Event.Wallet.TxFinalized>(this) { updateTxData(it.completedTx) }
-        EventBus.subscribe<Event.Wallet.TxMined>(this) { updateTxData(it.completedTx) }
-        EventBus.subscribe<Event.Wallet.TxReplyReceived>(this) { updateTxData(it.completedTx) }
-        EventBus.subscribe<Event.Wallet.TxCancellation>(this) { updateTxData(it.tx) }
+        EventBus.subscribe<Event.Wallet.TxBroadcast>(this) { updateTxData(it.tx) }
+        EventBus.subscribe<Event.Wallet.TxFinalized>(this) { updateTxData(it.tx) }
+        EventBus.subscribe<Event.Wallet.TxMined>(this) { updateTxData(it.tx) }
+        EventBus.subscribe<Event.Wallet.TxReplyReceived>(this) { updateTxData(it.tx) }
+        EventBus.subscribe<Event.Wallet.TxCancelled>(this) { updateTxData(it.tx) }
     }
 
     private fun updateTxData(tx: Tx) {
@@ -569,6 +569,7 @@ internal class TxDetailActivity : AppCompatActivity(), ServiceConnection {
 
     private fun cancelTransaction(service: TariWalletService) {
         val error = WalletError()
+        Logger.e("Cancel transaction :: %s", tx.id.toString())
         val isCancelled = service.cancelPendingTx(TxId(this.tx.id), error)
         if (isCancelled || error.code == WalletErrorCode.NO_ERROR) {
             this.ui.cancelTxView.setOnClickListener(null)

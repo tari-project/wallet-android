@@ -41,7 +41,7 @@ import java.math.BigInteger
  *
  * @author The Tari Development Team
  */
-class RxId() : Parcelable {
+class RequestId() : Parcelable {
 
     var value = BigInteger("0")
 
@@ -57,14 +57,14 @@ class RxId() : Parcelable {
         readFromParcel(parcel)
     }
 
-    companion object CREATOR : Parcelable.Creator<RxId> {
+    companion object CREATOR : Parcelable.Creator<RequestId> {
 
-        override fun createFromParcel(parcel: Parcel): RxId {
-            return RxId(parcel)
+        override fun createFromParcel(parcel: Parcel): RequestId {
+            return RequestId(parcel)
         }
 
-        override fun newArray(size: Int): Array<RxId> {
-            return Array(size) { RxId() }
+        override fun newArray(size: Int): Array<RequestId> {
+            return Array(size) { RequestId() }
         }
 
     }

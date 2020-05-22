@@ -207,10 +207,11 @@ void TxCancellationCallback(struct TariCompletedTransaction *pCompletedTransacti
     if (jniEnv == nullptr) {
         return;
     }
+    jlong jpCompletedTransaction = reinterpret_cast<jlong>(pCompletedTransaction);
     jniEnv->CallVoidMethod(
             callbackHandler,
             txCancellationCallbackMethodId,
-            pCompletedTransaction);
+            jpCompletedTransaction);
     g_vm->DetachCurrentThread();
 }
 
@@ -400,7 +401,7 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniCreate(
     TariWallet *pWallet;
     if (strlen(pLogPath) == 0) {
 
-                pWallet = wallet_create(
+        pWallet = wallet_create(
                 pWalletConfig,
                 nullptr,
                 ReceivedCallback,
@@ -413,10 +414,8 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniCreate(
                 TxCancellationCallback,
                 BaseNodeSyncCallback,
                 r);
-    }
-    else
-    {
-                pWallet = wallet_create(
+    } else {
+        pWallet = wallet_create(
                 pWalletConfig,
                 pLogPath,
                 ReceivedCallback,
@@ -1018,7 +1017,7 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniAddBaseNodePeer(
 }
 
 extern "C"
-JNIEXPORT jboolean JNICALL
+JNIEXPORT jbyteArray JNICALL
 Java_com_tari_android_wallet_ffi_FFIWallet_jniSyncWithBaseNode(
         JNIEnv *jEnv,
         jobject jThis,
@@ -1027,7 +1026,9 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniSyncWithBaseNode(
     int *r = &i;
     jlong lWallet = GetPointerField(jEnv, jThis);
     TariWallet *pWallet = reinterpret_cast<TariWallet *>(lWallet);
-    jboolean result = static_cast<jboolean>(wallet_sync_with_base_node(pWallet, r) != 0);
+    jbyteArray result = getBytesFromUnsignedLongLong(jEnv,
+                                                     wallet_sync_with_base_node(pWallet, r)
+    );
     setErrorCode(jEnv, error, i);
     return result;
 }

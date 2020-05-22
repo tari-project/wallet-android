@@ -56,6 +56,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.animation.addListener
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.daasuu.ei.Ease
@@ -88,6 +89,9 @@ import com.tari.android.wallet.ui.fragment.send.FinalizeSendTxFragment.FailureRe
 import com.tari.android.wallet.ui.util.UiUtil
 import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.SharedPrefsWrapper
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
 import java.lang.ref.WeakReference
 import java.util.concurrent.CopyOnWriteArrayList
 import javax.inject.Inject
@@ -119,7 +123,7 @@ internal class HomeActivity : AppCompatActivity(),
     // tx list
     private lateinit var recyclerViewAdapter: TxListAdapter
     private lateinit var recyclerViewLayoutManager: RecyclerView.LayoutManager
-    private val canceledTxs = CopyOnWriteArrayList<CancelledTx>()
+    private val cancelledTxs = CopyOnWriteArrayList<CancelledTx>()
     private val completedTxs = CopyOnWriteArrayList<CompletedTx>()
     private val pendingInboundTxs = CopyOnWriteArrayList<PendingInboundTx>()
     private val pendingOutboundTxs = CopyOnWriteArrayList<PendingOutboundTx>()
@@ -142,13 +146,13 @@ internal class HomeActivity : AppCompatActivity(),
     private var isServiceConnected = false
 
     private var walletService: TariWalletService? = null
-    private val handler = Handler(Looper.getMainLooper())
+    private var handler: Handler? = Handler(Looper.getMainLooper())
 
     // whether the user is currently dragging the list view.
     private var isDragging = false
     private var sendTariButtonClickAnimIsRunning = false
     private val onboardingInterstitialTimeMs = 4500L
-    private val secondUTXOImportDelayTimeMs = 1500L
+    private val secondUTXOImportDelayTimeMs = 2500L
     private val secondUTXOStoreModalDelayTimeMs = 3000L
 
     // this flag is set if the testnet
@@ -195,13 +199,14 @@ internal class HomeActivity : AppCompatActivity(),
     }
 
     override fun onStop() {
-        handler.removeCallbacksAndMessages(null)
+        handler?.removeCallbacksAndMessages(null)
         shakeDetector.stop()
         super.onStop()
     }
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onDestroy() {
+        handler = null
         ui.txRecyclerView.layoutManager = null
         ui.txRecyclerView.adapter = null
         unsetTouchListeners()
@@ -233,7 +238,7 @@ internal class HomeActivity : AppCompatActivity(),
                 ?.joinToString { "\n$it = ${intent.extras!!.get(it)}" } ?: ""}"
         )
         intent?.let {
-            handler.postDelayed({ processIntentDeepLink(it) }, Constants.UI.mediumDurationMs)
+            handler?.postDelayed({ processIntentDeepLink(it) }, Constants.UI.mediumDurationMs)
         }
     }
 
@@ -308,7 +313,7 @@ internal class HomeActivity : AppCompatActivity(),
         recyclerViewLayoutManager = LinearLayoutManager(this)
         ui.txRecyclerView.layoutManager = recyclerViewLayoutManager
         recyclerViewAdapter =
-            TxListAdapter(canceledTxs, completedTxs, pendingInboundTxs, pendingOutboundTxs) {
+            TxListAdapter(cancelledTxs, completedTxs, pendingInboundTxs, pendingOutboundTxs) {
                 Logger.i("Transaction with id ${it.id} selected.")
                 startActivity(TxDetailActivity.createIntent(this, it))
             }
@@ -334,7 +339,8 @@ internal class HomeActivity : AppCompatActivity(),
     private fun setupScrollView() {
         val recyclerViewHeight = ui.rootView.height - dimenPx(R.dimen.common_header_height)
         val contentHeight =
-            dimenPx(R.dimen.home_tx_list_container_minimized_top_margin) + dimenPx(R.dimen.home_grabber_container_height) + recyclerViewHeight
+            dimenPx(R.dimen.home_tx_list_container_minimized_top_margin) +
+                    dimenPx(R.dimen.home_grabber_container_height) + recyclerViewHeight
         UiUtil.setHeight(ui.recyclerViewContainerView, recyclerViewHeight)
         UiUtil.setHeight(ui.scrollContentView, contentHeight)
         ui.scrollView.recyclerViewContainerInitialHeight = recyclerViewHeight
@@ -351,66 +357,130 @@ internal class HomeActivity : AppCompatActivity(),
             if (walletService != null
                 && updateProgressViewController.state == UpdateProgressViewController.State.IDLE
             ) {
-                updateProgressViewController.reset()
-                updateProgressViewController.start(walletService!!)
-                ui.scrollView.beginUpdate()
+                handler?.post {
+                    updateProgressViewController.reset()
+                    updateProgressViewController.start(walletService!!)
+                    ui.scrollView.beginUpdate()
+                }
             }
         }
 
         // wallet events
-        EventBus.subscribe<Event.Wallet.TxCancellation>(this) {
-            if (updateProgressViewController.state == UpdateProgressViewController.State.IDLE) {
-                ui.rootView.post { updateAllDataAndUI(restartBalanceUI = false) }
-            }
-        }
-        EventBus.subscribe<Event.Wallet.TxMined>(this) {
-            ui.rootView.post { updateAllDataAndUI(restartBalanceUI = false) }
-        }
         EventBus.subscribe<Event.Wallet.TxReceived>(this) {
-            if (updateProgressViewController.state == UpdateProgressViewController.State.IDLE) {
-                ui.rootView.post { updateAllDataAndUI(restartBalanceUI = false) }
+            if (updateProgressViewController.state != UpdateProgressViewController.State.RECEIVING) {
+                onTxReceived(it.tx)
             }
         }
-        EventBus.subscribe<Event.Wallet.TxBroadcast>(this) {
-            if (updateProgressViewController.state == UpdateProgressViewController.State.IDLE) {
-                ui.rootView.post { updateAllDataAndUI(restartBalanceUI = false) }
-            }
+        EventBus.subscribe<Event.Wallet.TxReplyReceived>(this) {
+            onTxReplyReceived(it.tx)
         }
         EventBus.subscribe<Event.Wallet.TxFinalized>(this) {
-            if (updateProgressViewController.state == UpdateProgressViewController.State.IDLE) {
-                ui.rootView.post { updateAllDataAndUI(restartBalanceUI = false) }
+            onTxFinalized(it.tx)
+        }
+        EventBus.subscribe<Event.Wallet.TxBroadcast>(this) {
+            onTxBroadcast(it.tx)
+        }
+        EventBus.subscribe<Event.Wallet.TxMined>(this) {
+            onTxMined(it.tx)
+        }
+        EventBus.subscribe<Event.Wallet.TxCancelled>(this) {
+            if (updateProgressViewController.state != UpdateProgressViewController.State.RECEIVING) {
+                onTxCancelled(it.tx)
             }
         }
+
         // Testnet Tari events
         EventBus.subscribe<Event.Testnet.TestnetTariRequestSuccessful>(this) {
-            ui.rootView.post { testnetTariRequestSuccessful() }
+            handler?.post { testnetTariRequestSuccessful() }
         }
         EventBus.subscribe<Event.Testnet.TestnetTariRequestError>(this) { event ->
-            ui.rootView.post { testnetTariRequestError(event.errorMessage) }
+            handler?.post { testnetTariRequestError(event.errorMessage) }
         }
 
         // tx-related app events
         EventBus.subscribe<Event.Tx.TxSendSuccessful>(this) {
-            ui.rootView.post { onTxSendSuccessful() }
+            handler?.post { onTxSendSuccessful(it.txId) }
         }
         EventBus.subscribe<Event.Tx.TxSendFailed>(this) { event ->
-            ui.rootView.post { onTxSendFailed(event.failureReason) }
+            handler?.post { onTxSendFailed(event.failureReason) }
         }
 
         // network connection event
         EventBus.subscribeToNetworkConnectionState(this) { networkConnectionState ->
-            if (testnetTariRequestIsWaitingOnConnection && networkConnectionState == NetworkConnectionState.CONNECTED) {
+            if (testnetTariRequestIsWaitingOnConnection
+                && networkConnectionState == NetworkConnectionState.CONNECTED) {
                 requestTestnetTari()
             }
         }
 
         // other app-specific events
         EventBus.subscribe<Event.Contact.ContactAddedOrUpdated>(this) {
-            ui.rootView.post { updateAllDataAndUI(restartBalanceUI = false) }
+            onContactAddedOrUpdated(it.contactPublicKey, it.contactAlias)
         }
     }
 
     // endregion
+
+    private fun onTxReceived(tx: PendingInboundTx) {
+        pendingInboundTxs.add(tx)
+        // update balance
+        lifecycleScope.launch(Dispatchers.IO) {
+            updateBalanceInfoData()
+            handler?.post { updateBalanceInfoUI(restart = false) }
+        }
+        // update tx list UI
+        handler?.post { updateTxListUI() }
+    }
+
+    private fun onTxReplyReceived(tx: CompletedTx) {
+        // just update data - no UI change required
+        pendingOutboundTxs.firstOrNull { it.id == tx.id }?.status = tx.status
+    }
+
+    private fun onTxFinalized(tx: CompletedTx) {
+        // just update data - no UI change required
+        pendingInboundTxs.firstOrNull { it.id == tx.id }?.status = tx.status
+    }
+
+    private fun onTxBroadcast(tx: CompletedTx) {
+        // just update data - no UI change required
+        pendingInboundTxs.firstOrNull { it.id == tx.id }?.status = TxStatus.BROADCAST
+    }
+
+    private fun onTxMined(tx: CompletedTx) {
+        when (tx.direction) {
+            Tx.Direction.INBOUND -> pendingInboundTxs
+            Tx.Direction.OUTBOUND -> pendingOutboundTxs
+        }.removeIf { it.id == tx.id }
+        completedTxs.add(tx)
+        // update tx list UI
+        handler?.post { updateTxListUI() }
+    }
+
+    private fun onTxCancelled(tx: CancelledTx) {
+        when (tx.direction) {
+            Tx.Direction.INBOUND -> pendingInboundTxs
+            Tx.Direction.OUTBOUND -> pendingOutboundTxs
+        }.removeIf { it.id == tx.id }
+        cancelledTxs.add(tx)
+        // update balance
+        lifecycleScope.launch(Dispatchers.IO) {
+            updateBalanceInfoData()
+            handler?.post { updateBalanceInfoUI(restart = false) }
+        }
+        // update tx list UI
+        handler?.post { updateTxListUI() }
+    }
+
+    private fun onContactAddedOrUpdated(publicKey: PublicKey, alias: String) {
+        val contact = Contact(publicKey, alias)
+        (cancelledTxs + pendingInboundTxs + pendingOutboundTxs + completedTxs).filter {
+            it.user.publicKey == publicKey
+        }.forEach {
+            it.user = contact
+        }
+        handler?.post { updateTxListUI() }
+    }
 
     // region service connection
 
@@ -431,17 +501,16 @@ internal class HomeActivity : AppCompatActivity(),
         isServiceConnected = true
         walletService = TariWalletService.Stub.asInterface(service)
 
-        AsyncTask.execute {
+        lifecycleScope.launch(Dispatchers.IO) {
             // update data
             updateTxListData()
             // balance info
             updateBalanceInfoData()
             // init list
-            ui.rootView.post { initializeTxListUI() }
+            handler?.post { initializeTxListUI() }
         }
         // check the start-up intent for a deep link
-        handler.postDelayed({ processIntentDeepLink(intent) }, Constants.UI.xLongDurationMs)
-
+        handler?.postDelayed({ processIntentDeepLink(intent) }, Constants.UI.xLongDurationMs)
     }
 
     /**
@@ -456,7 +525,7 @@ internal class HomeActivity : AppCompatActivity(),
     // endregion
 
     private val txListIsEmpty: Boolean
-        get() = canceledTxs.isEmpty()
+        get() = cancelledTxs.isEmpty()
                 && completedTxs.isEmpty()
                 && pendingInboundTxs.isEmpty()
                 && pendingOutboundTxs.isEmpty()
@@ -475,7 +544,7 @@ internal class HomeActivity : AppCompatActivity(),
             TODO("Unhandled wallet error: ${error.code}")
         }
 
-        canceledTxs.repopulate(walletCanceledTxs)
+        cancelledTxs.repopulate(walletCanceledTxs)
         completedTxs.repopulate(walletCompletedTxs)
         pendingInboundTxs.repopulate(walletPendingInboundTxs)
         pendingOutboundTxs.repopulate(walletPendingOutboundTxs)
@@ -497,10 +566,8 @@ internal class HomeActivity : AppCompatActivity(),
                 requestTestnetTari()
             } else { // update
                 updateProgressViewController.reset()
-                ui.rootView.postDelayed({
-                    ui.scrollView.beginUpdate()
-                    updateProgressViewController.start(walletService!!)
-                }, Constants.UI.xLongDurationMs)
+                ui.scrollView.beginUpdate()
+                updateProgressViewController.start(walletService!!)
             }
         }
     }
@@ -539,22 +606,6 @@ internal class HomeActivity : AppCompatActivity(),
             balanceViewController.runStartupAnimation()
         } else {
             balanceViewController.balanceInfo = balanceInfo
-        }
-    }
-
-    /**
-     * Updates all displayed data & UI.
-     *
-     * @param restartBalanceUI plays the balance animation anew
-     */
-    private fun updateAllDataAndUI(restartBalanceUI: Boolean) {
-        AsyncTask.execute {
-            updateTxListData()
-            updateBalanceInfoData()
-            ui.rootView.post {
-                updateBalanceInfoUI(restartBalanceUI)
-                updateTxListUI()
-            }
         }
     }
 
@@ -690,10 +741,12 @@ internal class HomeActivity : AppCompatActivity(),
         }
         testnetTariRequestIsWaitingOnConnection = false
         testnetTariRequestIsInProgress = true
-        val error = WalletError()
-        walletService!!.requestTestnetTari(error)
-        if (error.code != WalletErrorCode.NO_ERROR) {
-            TODO("Unhandled wallet error: ${error.code}")
+        lifecycleScope.launch(Dispatchers.IO) {
+            val error = WalletError()
+            walletService!!.requestTestnetTari(error)
+            if (error.code != WalletErrorCode.NO_ERROR) {
+                TODO("Unhandled wallet error: ${error.code}")
+            }
         }
     }
 
@@ -706,12 +759,20 @@ internal class HomeActivity : AppCompatActivity(),
         }
         sharedPrefsWrapper.faucetTestnetTariRequestCompleted = true
         sharedPrefsWrapper.firstTestnetUTXOTxId = importedTx.id
-        updateAllDataAndUI(restartBalanceUI = false)
-        // display dialog
-        handler.postDelayed({
-            showTestnetTariReceivedDialog(importedTx.user.publicKey)
-        }, Constants.UI.Home.showTariBotDialogDelayMs)
-        testnetTariRequestIsInProgress = false
+        completedTxs.add(importedTx)
+        lifecycleScope.launch(Dispatchers.IO) {
+            updateBalanceInfoData()
+            // update UI
+            handler?.post {
+                updateTxListUI()
+                updateBalanceInfoUI(restart = false)
+            }
+            // display dialog
+            handler?.postDelayed({
+                showTestnetTariReceivedDialog(importedTx.user.publicKey)
+            }, Constants.UI.Home.showTariBotDialogDelayMs)
+            testnetTariRequestIsInProgress = false
+        }
     }
 
     private fun testnetTariRequestError(errorMessage: String) {
@@ -776,7 +837,7 @@ internal class HomeActivity : AppCompatActivity(),
             findViewById<View>(R.id.home_ttl_store_dialog_vw_store_button)
                 .setOnClickListener {
                     visitTTLStore()
-                    handler.postDelayed({
+                    handler?.postDelayed({
                         currentDialog = null
                         dismiss()
                     }, Constants.UI.mediumDurationMs)
@@ -850,13 +911,21 @@ internal class HomeActivity : AppCompatActivity(),
         isOnboarding = false
         ui.onboardingContentView.gone()
         ui.txListHeaderView.visible()
-        updateAllDataAndUI(restartBalanceUI = false)
+        lifecycleScope.launch(Dispatchers.IO) {
+            updateTxListData()
+            if (isActive) {
+                updateBalanceInfoData()
+                handler?.post {
+                    updateBalanceInfoUI(restart = false)
+                    updateTxListUI()
+                }
+            }
+        }
         // request Testnet Tari if no txs
         if (txListIsEmpty) {
-            handler.postDelayed(
-                { Thread(this::requestTestnetTari).start() },
-                Constants.UI.xxLongDurationMs
-            )
+            handler?.postDelayed({
+                requestTestnetTari()
+            }, Constants.UI.xxLongDurationMs)
         } else {
             showSendTariButtonAnimated()
         }
@@ -865,7 +934,7 @@ internal class HomeActivity : AppCompatActivity(),
     /**
      * Called when an outgoing transaction has been successful.
      */
-    private fun onTxSendSuccessful() {
+    private fun onTxSendSuccessful(txId: TxId) {
         ui.scrollView.scrollToTop()
         ui.txRecyclerView.scrollToPosition(0)
         val topMargin =
@@ -884,16 +953,25 @@ internal class HomeActivity : AppCompatActivity(),
         anim.start()
 
         // update data
-        Thread {
-            updateAllDataAndUI(restartBalanceUI = true)
-        }.start()
+        lifecycleScope.launch(Dispatchers.IO) {
+            val error = WalletError()
+            val tx = walletService?.getPendingOutboundTxById(txId, error)
+            if (error.code != WalletErrorCode.NO_ERROR) {
+                TODO("Unhandled wallet error: ${error.code}")
+            }
+            pendingOutboundTxs.add(tx)
+            updateBalanceInfoData()
+            handler?.post {
+                updateBalanceInfoUI(restart = true)
+                updateTxListUI()
+            }
+        }
 
         // import second testnet UTXO if it hasn't been imported yet
         if (sharedPrefsWrapper.testnetTariUTXOKeyList.isNotEmpty()) {
-            Thread {
-                Thread.sleep(secondUTXOImportDelayTimeMs)
+            handler?.postDelayed({
                 importSecondUTXO()
-            }.start()
+            }, secondUTXOImportDelayTimeMs)
         }
     }
 
@@ -921,10 +999,19 @@ internal class HomeActivity : AppCompatActivity(),
             TODO("Unhandled wallet error: ${error.code}")
         }
         sharedPrefsWrapper.secondTestnetUTXOTxId = importedTx.id
-        updateAllDataAndUI(restartBalanceUI = false)
-        handler.postDelayed({
-            showTTLStoreDialog()
-        }, secondUTXOStoreModalDelayTimeMs)
+        completedTxs.add(importedTx)
+        lifecycleScope.launch(Dispatchers.IO) {
+            updateBalanceInfoData()
+            // update UI
+            handler?.post {
+                updateTxListUI()
+                updateBalanceInfoUI(restart = false)
+            }
+            // display store dialog
+            handler?.postDelayed({
+                showTTLStoreDialog()
+            }, secondUTXOStoreModalDelayTimeMs)
+        }
     }
 
     private fun minimizeListButtonClicked(view: View) {
@@ -1045,19 +1132,36 @@ internal class HomeActivity : AppCompatActivity(),
         source: UpdateProgressViewController,
         failureReason: UpdateProgressViewController.FailureReason
     ) {
-        ui.scrollView.finishUpdate()
-        when (failureReason) {
-            UpdateProgressViewController.FailureReason.NETWORK_CONNECTION_ERROR -> {
-                displayNetworkConnectionErrorDialog()
-            }
-            UpdateProgressViewController.FailureReason.BASE_NODE_CONNECTION_ERROR -> {
-                displayBaseNodeConnectionErrorDialog()
+        handler?.post {
+            ui.scrollView.finishUpdate()
+            when (failureReason) {
+                UpdateProgressViewController.FailureReason.NETWORK_CONNECTION_ERROR -> {
+                    displayNetworkConnectionErrorDialog()
+                }
+                UpdateProgressViewController.FailureReason.BASE_NODE_CONNECTION_ERROR -> {
+                    displayBaseNodeConnectionErrorDialog()
+                }
             }
         }
     }
 
-    override fun updateHasCompleted(source: UpdateProgressViewController) {
-        ui.scrollView.finishUpdate { updateAllDataAndUI(restartBalanceUI = false) }
+    override fun updateHasCompleted(source: UpdateProgressViewController,
+                                    updateDataAndUI: Boolean) {
+        handler?.post {
+            ui.scrollView.finishUpdate()
+        }
+        if (updateDataAndUI) {
+            lifecycleScope.launch(Dispatchers.IO) {
+                updateTxListData()
+                if (isActive) {
+                    updateBalanceInfoData()
+                    handler?.post {
+                        updateBalanceInfoUI(restart = false)
+                        updateTxListUI()
+                    }
+                }
+            }
+        }
     }
 
     private fun displayNetworkConnectionErrorDialog() {
@@ -1140,7 +1244,7 @@ internal class HomeActivity : AppCompatActivity(),
                 MotionEvent.ACTION_UP -> {
                     if (ui.scrollView.scrollY == 0 && !ui.txRecyclerView.isScrolledToTop()) {
                         ui.txRecyclerView.smoothScrollToPosition(0)
-                        handler.postDelayed({
+                        handler?.postDelayed({
                             recyclerViewScrollListener.reset()
                             ui.headerElevationView.alpha = 0f
                         }, Constants.UI.mediumDurationMs)
@@ -1208,7 +1312,7 @@ internal class HomeActivity : AppCompatActivity(),
 
                 if (ratio == 0f && !isDragging && !ui.txRecyclerView.isScrolledToTop()) {
                     ui.txRecyclerView.smoothScrollToPosition(0)
-                    handler.postDelayed({
+                    handler?.postDelayed({
                         recyclerViewScrollListener.reset()
                         ui.headerElevationView.alpha = 0f
                     }, Constants.UI.mediumDurationMs)
