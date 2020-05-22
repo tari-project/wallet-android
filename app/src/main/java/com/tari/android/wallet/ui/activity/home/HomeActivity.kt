@@ -43,8 +43,10 @@ import android.content.Intent
 import android.content.ServiceConnection
 import android.graphics.drawable.GradientDrawable
 import android.hardware.SensorManager
-import android.net.Uri
-import android.os.*
+import android.os.Bundle
+import android.os.Handler
+import android.os.IBinder
+import android.os.Looper
 import android.util.Log
 import android.view.MotionEvent
 import android.view.View
@@ -86,6 +88,7 @@ import com.tari.android.wallet.ui.dialog.BottomSlideDialog
 import com.tari.android.wallet.ui.extension.*
 import com.tari.android.wallet.ui.fragment.send.FinalizeSendTxFragment
 import com.tari.android.wallet.ui.fragment.send.FinalizeSendTxFragment.FailureReason.*
+import com.tari.android.wallet.ui.fragment.store.StoreDialogFragment
 import com.tari.android.wallet.ui.util.UiUtil
 import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.SharedPrefsWrapper
@@ -836,6 +839,7 @@ internal class HomeActivity : AppCompatActivity(),
                 }
             findViewById<View>(R.id.home_ttl_store_dialog_vw_store_button)
                 .setOnClickListener {
+                    it.setOnClickListener(null)
                     visitTTLStore()
                     handler?.postDelayed({
                         currentDialog = null
@@ -848,12 +852,7 @@ internal class HomeActivity : AppCompatActivity(),
     }
 
     private fun visitTTLStore() {
-        startActivity(
-            Intent(
-                Intent.ACTION_VIEW,
-                Uri.parse(string(R.string.ttl_store_url))
-            )
-        )
+        StoreDialogFragment.newInstance().show(supportFragmentManager, null)
     }
 
     private fun sendTariToUser(

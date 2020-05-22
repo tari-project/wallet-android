@@ -2,7 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="match_parent"
     android:layout_marginLeft="@dimen/home_dialog_testnet_tari_dialog_margin"
     android:layout_marginRight="@dimen/home_dialog_testnet_tari_dialog_margin"
     android:layout_marginBottom="23dp"

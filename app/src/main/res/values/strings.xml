@@ -260,4 +260,8 @@
     <string name="debug_edit_base_node_successful">Base node peer added successfully.</string>
     <string name="debug_edit_base_node_failed">Couldn\'t add base node peer.</string>
 
+    <!-- In-app store -->
+    <string name="store_title">Tari Testnet Store</string>
+    <string name="store_no_application_to_open_the_link_error">Seems that there are no applications to handle link sharing.</string>
+
 </resources>
