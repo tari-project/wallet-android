@@ -1,0 +1,36 @@
+ext {
+    jniLibsVersion = "0.10.3"
+    jniLibsHostURL = "https://www.tari.com/binaries/"
+    supportedABIs = ["arm64-v8a", "armeabi-v7a", "x86_64"]
+}
+
+/**
+ * Downloads JNI binaries as version specified in the project-level gradle file.
+ */
+task downloadJNIBinaries  {
+    final def binariesDir = "${rootProject.projectDir}/jniLibs/"
+    inputs.property "version", jniLibsVersion
+    outputs.dir binariesDir
+    doLast {
+        logger.info("Downloading binaries with version $jniLibsVersion")
+        final def binaryArchives = supportedABIs.collect {
+            "libwallet-${it}-${jniLibsVersion}.tar.gz"
+        }
+        delete {
+            delete fileTree(binariesDir)
+        }
+        download {
+            src(binaryArchives.collect { "$jniLibsHostURL$it" })
+            dest binariesDir
+        }
+        copy {
+            binaryArchives.collect { "$binariesDir$it" }.each { from tarTree(it) }
+            into binariesDir
+        }
+        delete {
+            delete fileTree(binariesDir) {
+                include '**/*.tar.gz'
+            }
+        }
+    }
+}
