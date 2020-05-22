@@ -55,7 +55,7 @@ oneway interface TariWalletServiceListener {
 
     void onTxCancellation(in CancelledTx tx);
 
-    void onBaseNodeSyncComplete(in RxId requestId, in boolean success);
+    void onBaseNodeSyncComplete(in RequestId requestId, in boolean success);
 
     void onTestnetTariRequestSuccess();
 

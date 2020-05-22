@@ -75,7 +75,6 @@ internal class CustomScrollView @JvmOverloads constructor(
     private var swipeRefreshYOffset = 0
     private var lastDeltaY = 0
     private var isUpdating = false
-    private val updateProgressViewRevealDurationMs = 400L
     var recyclerViewContainerInitialHeight = 0
 
     var listenerWeakReference: WeakReference<Listener>? = null
@@ -250,31 +249,33 @@ internal class CustomScrollView @JvmOverloads constructor(
 
     fun beginUpdate() {
         if (isUpdating) return
-        val anim = ValueAnimator.ofInt(0, dimenPx(home_swipe_refresh_progress_view_container_height))
-        anim.addUpdateListener {
-            swipeRefreshYOffset = it.animatedValue as Int
-            requestLayout()
-        }
-        anim.duration = updateProgressViewRevealDurationMs
-        anim.addListener(onEnd = {
-            isUpdating = true
-            anim.removeAllListeners()
-        })
-        anim.start()
+        isUpdating = true
+        UiUtil.setHeight(
+            progressContainerView,
+            dimenPx(home_swipe_refresh_progress_view_container_height)
+        )
+        UiUtil.setHeight(
+            recyclerViewContainerView,
+            recyclerViewContainerInitialHeight - dimenPx(home_swipe_refresh_progress_view_container_height)
+        )
+        UiUtil.setTopMargin(
+            progressView,
+            dimenPx(home_swipe_refresh_progress_view_content_visible_top_margin)
+        )
+        progressView.alpha = 1f
+        progressViewBg.elevation = dimenPx(common_view_elevation) / 2f
+        requestLayout()
     }
 
-    fun finishUpdate(onComplete: (() -> Unit)? = null) {
+    fun finishUpdate() {
         isUpdating = false
-        val anim = ValueAnimator.ofInt(swipeRefreshYOffset, 0)
-        anim.addUpdateListener {
-            swipeRefreshYOffset = it.animatedValue as Int
-            requestLayout()
-        }
-        anim.duration = updateProgressViewRevealDurationMs
-        anim.addListener(onEnd = {
-            onComplete?.let { callback -> callback() }
-        })
-        anim.start()
+        swipeRefreshYOffset = 0
+        UiUtil.setHeight(progressContainerView, 0)
+        UiUtil.setHeight(
+            recyclerViewContainerView,
+            recyclerViewContainerInitialHeight
+        )
+        requestLayout()
     }
 
     @SuppressLint("ClickableViewAccessibility")

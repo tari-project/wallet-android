@@ -188,7 +188,7 @@ internal class WalletService : Service(), FFIWalletListenerAdapter {
 
     override fun onTxBroadcast(completedTx: CompletedTx) {
         Logger.d("Tx ${completedTx.id} broadcast.")
-        completedTx.user = serviceImpl.getUserByPublicKey(completedTx.user.publicKey)
+        completedTx.user = getUserByPublicKey(completedTx.user.publicKey)
         // post event to bus for the internal listeners
         EventBus.post(Event.Wallet.TxBroadcast(completedTx))
         // notify external listeners
@@ -199,7 +199,7 @@ internal class WalletService : Service(), FFIWalletListenerAdapter {
 
     override fun onTxMined(completedTx: CompletedTx) {
         Logger.d("Tx ${completedTx.id} mined.")
-        completedTx.user = serviceImpl.getUserByPublicKey(completedTx.user.publicKey)
+        completedTx.user = getUserByPublicKey(completedTx.user.publicKey)
         // post event to bus for the internal listeners
         EventBus.post(Event.Wallet.TxMined(completedTx))
         // notify external listeners
@@ -210,7 +210,7 @@ internal class WalletService : Service(), FFIWalletListenerAdapter {
 
     override fun onTxReceived(pendingInboundTx: PendingInboundTx) {
         Logger.d("Tx received: $pendingInboundTx")
-        pendingInboundTx.user = serviceImpl.getUserByPublicKey(pendingInboundTx.user.publicKey)
+        pendingInboundTx.user = getUserByPublicKey(pendingInboundTx.user.publicKey)
         Logger.d("Received TX after contact update: $pendingInboundTx")
         // post event to bus for the internal listeners
         EventBus.post(Event.Wallet.TxReceived(pendingInboundTx))
@@ -221,7 +221,7 @@ internal class WalletService : Service(), FFIWalletListenerAdapter {
 
     override fun onTxReplyReceived(completedTx: CompletedTx) {
         Logger.d("Tx ${completedTx.id} reply received.")
-        completedTx.user = serviceImpl.getUserByPublicKey(completedTx.user.publicKey)
+        completedTx.user = getUserByPublicKey(completedTx.user.publicKey)
         // post event to bus for the internal listeners
         EventBus.post(Event.Wallet.TxReplyReceived(completedTx))
         // notify external listeners
@@ -232,7 +232,7 @@ internal class WalletService : Service(), FFIWalletListenerAdapter {
 
     override fun onTxFinalized(completedTx: CompletedTx) {
         Logger.d("Tx ${completedTx.id} finalized.")
-        completedTx.user = serviceImpl.getUserByPublicKey(completedTx.user.publicKey)
+        completedTx.user = getUserByPublicKey(completedTx.user.publicKey)
         // post event to bus for the internal listeners
         EventBus.post(Event.Wallet.TxFinalized(completedTx))
         // notify external listeners
@@ -279,11 +279,10 @@ internal class WalletService : Service(), FFIWalletListenerAdapter {
         }
     }
 
-    override fun onTxCancellation(cancelledTx: CancelledTx) {
-        Logger.d("Tx ${cancelledTx.id} cancelled.")
-        cancelledTx.user = serviceImpl.getUserByPublicKey(cancelledTx.user.publicKey)
+    override fun onTxCancelled(cancelledTx: CancelledTx) {
+        Logger.d("Tx cancelled: $cancelledTx")
         // post event to bus
-        EventBus.post(Event.Wallet.TxCancellation(cancelledTx))
+        EventBus.post(Event.Wallet.TxCancelled(cancelledTx))
         // notify external listeners
         if (cancelledTx.direction == INBOUND &&
             !(app.isInForeground && app.currentActivity is HomeActivity)
@@ -294,13 +293,13 @@ internal class WalletService : Service(), FFIWalletListenerAdapter {
         listeners.iterator().forEach { it.onTxCancellation(cancelledTx) }
     }
 
-    override fun onBaseNodeSyncComplete(rxId: BigInteger, success: Boolean) {
-        Logger.d("Request $rxId base node sync complete. Success: $success")
+    override fun onBaseNodeSyncComplete(requestId: BigInteger, success: Boolean) {
+        Logger.d("Request $requestId base node sync complete. Success: $success")
         // post event to bus
-        EventBus.post(Event.Wallet.BaseNodeSyncComplete(RxId(rxId), success))
+        EventBus.post(Event.Wallet.BaseNodeSyncComplete(RequestId(requestId), success))
         // notify external listeners
         listeners.iterator().forEach {
-            it.onBaseNodeSyncComplete(RxId(rxId), success)
+            it.onBaseNodeSyncComplete(RequestId(requestId), success)
         }
     }
 
@@ -375,6 +374,27 @@ internal class WalletService : Service(), FFIWalletListenerAdapter {
         )
     }
 
+    private fun getUserByPublicKey(key: PublicKey): User {
+        val contactsFFI = wallet.getContacts()
+        for (i in 0 until contactsFFI.getLength()) {
+            val contactFFI = contactsFFI.getAt(i)
+            val publicKeyFFI = contactFFI.getPublicKey()
+            val hex = publicKeyFFI.toString()
+            val contact =
+                if (hex == key.hexString) Contact(key, contactFFI.getAlias())
+                else null
+            publicKeyFFI.destroy()
+            contactFFI.destroy()
+            if (contact != null) {
+                contactsFFI.destroy()
+                return contact
+            }
+        }
+        // destroy native collection
+        contactsFFI.destroy()
+        return User(key)
+    }
+
     /**
      * Implementation of the AIDL service definition.
      */
@@ -397,27 +417,6 @@ internal class WalletService : Service(), FFIWalletListenerAdapter {
             allContacts: List<Contact>,
             hexString: String
         ): Contact? = allContacts.firstOrNull { it.publicKey.hexString == hexString }
-
-        internal fun getUserByPublicKey(key: PublicKey): User {
-            val contactsFFI = wallet.getContacts()
-            for (i in 0 until contactsFFI.getLength()) {
-                val contactFFI = contactsFFI.getAt(i)
-                val publicKeyFFI = contactFFI.getPublicKey()
-                val hex = publicKeyFFI.toString()
-                val contact =
-                    if (hex == key.hexString) Contact(key, contactFFI.getAlias())
-                    else null
-                publicKeyFFI.destroy()
-                contactFFI.destroy()
-                if (contact != null) {
-                    contactsFFI.destroy()
-                    return contact
-                }
-            }
-            // destroy native collection
-            contactsFFI.destroy()
-            return User(key)
-        }
 
         override fun registerListener(listener: TariWalletServiceListener): Boolean {
             listeners.add(listener)
@@ -507,6 +506,7 @@ internal class WalletService : Service(), FFIWalletListenerAdapter {
             txs.addAll(getPendingInboundTxs(allContacts))
             txs.addAll(getPendingOutboundTxs(allContacts))
             txs.addAll(getCompletedTxs(allContacts))
+            txs.addAll(getCancelledTxs(allContacts))
             // sort them by descending timestamp
             val sortedTxs = txs.sortedWith(compareByDescending { it.timestamp })
             val recentTxUsers = mutableListOf<User>()
@@ -563,12 +563,12 @@ internal class WalletService : Service(), FFIWalletListenerAdapter {
             }
         }
 
-        private fun getCancelledTxs(contacts: List<Contact>): List<CancelledTx>? {
+        private fun getCancelledTxs(contacts: List<Contact>): List<CancelledTx> {
             val canceledTxsFFI = wallet.getCancelledTxs()
             return (0 until canceledTxsFFI.getLength())
                 .map {
-                    val txFfi = canceledTxsFFI.getAt(it)
-                    canceledTxFromFFI(txFfi, contacts).also { txFfi.destroy() }
+                    val txFFI = canceledTxsFFI.getAt(it)
+                    cancelledTxFromFFI(txFFI, contacts).also { txFFI.destroy() }
                 }.also { canceledTxsFFI.destroy() }
         }
 
@@ -577,6 +577,36 @@ internal class WalletService : Service(), FFIWalletListenerAdapter {
             return if (error.code != WalletErrorCode.NO_ERROR || contacts == null) null
             else try {
                 getCancelledTxs(contacts)
+            } catch (throwable: Throwable) {
+                mapThrowableIntoError(throwable, error)
+                null
+            }
+        }
+
+        /**
+         * Internal function to get a completed transaction by id.
+         *
+         * @param id tx id
+         * @param allContacts pre-fetched list of all contacts
+         */
+        private fun getCancelledTxById(id: TxId, allContacts: List<Contact>): CancelledTx {
+            val completedTxFFI = wallet.getCancelledTxById(id.value)
+            val cancelledTx = cancelledTxFromFFI(completedTxFFI, allContacts)
+            completedTxFFI.destroy()
+            return cancelledTx
+        }
+
+        /**
+         * Get completed transaction by id.
+         * Client-facing function.
+         */
+        override fun getCancelledTxById(id: TxId, error: WalletError): CancelledTx? {
+            val contacts = getContacts(error)
+            if (error.code != WalletErrorCode.NO_ERROR || contacts == null) {
+                return null
+            }
+            return try {
+                getCancelledTxById(id, contacts)
             } catch (throwable: Throwable) {
                 mapThrowableIntoError(throwable, error)
                 null
@@ -763,12 +793,12 @@ internal class WalletService : Service(), FFIWalletListenerAdapter {
             }
         }
 
-        override fun syncWithBaseNode(error: WalletError): Boolean {
+        override fun syncWithBaseNode(error: WalletError): RequestId? {
             return try {
-                wallet.syncWithBaseNode()
+                RequestId(wallet.syncWithBaseNode())
             } catch (throwable: Throwable) {
                 mapThrowableIntoError(throwable, error)
-                false
+                null
             }
         }
 
@@ -871,7 +901,7 @@ internal class WalletService : Service(), FFIWalletListenerAdapter {
             return completedTx
         }
 
-        private fun canceledTxFromFFI(
+        private fun cancelledTxFromFFI(
             completedTxFFI: FFICompletedTx,
             allContacts: List<Contact>
         ): CancelledTx {
@@ -1103,12 +1133,12 @@ internal class WalletService : Service(), FFIWalletListenerAdapter {
 
         override fun updateContactAlias(
             publicKey: PublicKey,
-            contactName: String,
+            alias: String,
             error: WalletError
         ) {
             try {
                 val publicKeyFFI = FFIPublicKey(HexString(publicKey.hexString))
-                val contact = FFIContact(contactName, publicKeyFFI)
+                val contact = FFIContact(alias, publicKeyFFI)
                 wallet.addUpdateContact(contact)
                 publicKeyFFI.destroy()
                 contact.destroy()

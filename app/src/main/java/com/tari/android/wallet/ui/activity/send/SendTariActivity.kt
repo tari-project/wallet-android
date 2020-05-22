@@ -44,6 +44,7 @@ import com.tari.android.wallet.databinding.ActivitySendTariBinding
 import com.tari.android.wallet.event.Event
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.model.MicroTari
+import com.tari.android.wallet.model.TxId
 import com.tari.android.wallet.model.User
 import com.tari.android.wallet.network.NetworkConnectionState
 import com.tari.android.wallet.ui.dialog.BottomSlideDialog
@@ -282,13 +283,14 @@ internal class SendTariActivity : AppCompatActivity(),
 
     override fun onSendTxSuccessful(
         sourceFragment: FinalizeSendTxFragment,
+        txId: TxId,
         recipientUser: User,
         amount: MicroTari,
         fee: MicroTari,
         note: String
     ) {
         sendTxIsInProgress = false
-        EventBus.post(Event.Tx.TxSendSuccessful())
+        EventBus.post(Event.Tx.TxSendSuccessful(txId))
         finish()
         overridePendingTransition(R.anim.fade_in, R.anim.fade_out)
     }

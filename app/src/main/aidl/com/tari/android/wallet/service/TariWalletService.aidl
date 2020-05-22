@@ -67,10 +67,11 @@ interface TariWalletService {
     PendingOutboundTx getPendingOutboundTxById(in TxId id, out WalletError error);
 
     List<CancelledTx> getCancelledTxs(out WalletError error);
+    CancelledTx getCancelledTxById(in TxId id, out WalletError error);
 
     boolean cancelPendingTx(in TxId id, out WalletError error);
 
-    boolean syncWithBaseNode(out WalletError error);
+    RequestId syncWithBaseNode(out WalletError error);
 
     TxId sendTari(
         in User contact,
@@ -92,7 +93,7 @@ interface TariWalletService {
     */
     CompletedTx importTestnetUTXO(in String txMessage, out WalletError error);
 
-    void updateContactAlias(in PublicKey contactPublicKey, in String contactAlias, out WalletError error);
+    void updateContactAlias(in PublicKey contactPublicKey, in String alias, out WalletError error);
 
     /**
     * Two functions below to get the public key from emoji id and public key hex string

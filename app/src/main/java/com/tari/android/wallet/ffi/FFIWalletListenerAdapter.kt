@@ -42,13 +42,14 @@ import java.math.BigInteger
  */
 internal interface FFIWalletListenerAdapter {
 
-    fun onTxBroadcast(completedTx: CompletedTx)
-    fun onTxMined(completedTx: CompletedTx)
+    fun onBaseNodeSyncComplete(requestId: BigInteger, success: Boolean)
     fun onTxReceived(pendingInboundTx: PendingInboundTx)
     fun onTxReplyReceived(completedTx: CompletedTx)
     fun onTxFinalized(completedTx: CompletedTx)
+    fun onTxBroadcast(completedTx: CompletedTx)
+    fun onTxMined(completedTx: CompletedTx)
+    fun onTxCancelled(cancelledTx: CancelledTx)
     fun onDirectSendResult(txId: BigInteger, success: Boolean)
     fun onStoreAndForwardSendResult(txId: BigInteger, success: Boolean)
-    fun onTxCancellation(cancelledTx: CancelledTx)
-    fun onBaseNodeSyncComplete(rxId: BigInteger, success: Boolean)
+
 }

@@ -49,15 +49,15 @@ object Event {
      * Wallet events.
      */
     object Wallet {
-        data class TxBroadcast(val completedTx: CompletedTx)
-        data class TxMined(val completedTx: CompletedTx)
-        data class TxReceived(val pendingInboundTx: PendingInboundTx)
-        data class TxReplyReceived(val completedTx: CompletedTx)
-        data class TxFinalized(val completedTx: CompletedTx)
+        data class BaseNodeSyncComplete(val requestId: RequestId, val success: Boolean)
+        data class TxReceived(val tx: PendingInboundTx)
+        data class TxReplyReceived(val tx: CompletedTx)
+        data class TxFinalized(val tx: CompletedTx)
+        data class TxBroadcast(val tx: CompletedTx)
+        data class TxMined(val tx: CompletedTx)
+        data class TxCancelled(val tx: CancelledTx)
         data class DirectSendResult(val txId: TxId, val success: Boolean)
         data class StoreAndForwardSendResult(val txId: TxId, val success: Boolean)
-        data class TxCancellation(val tx: CancelledTx)
-        data class BaseNodeSyncComplete(val rxId: RxId, val success: Boolean)
     }
 
     /**
@@ -71,7 +71,7 @@ object Event {
      * Transaction events.
      */
     object Tx {
-        class TxSendSuccessful
+        data class TxSendSuccessful(val txId: TxId)
         data class TxSendFailed(val failureReason: FinalizeSendTxFragment.FailureReason)
     }
 
