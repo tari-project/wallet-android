@@ -39,6 +39,6 @@ import com.google.gson.annotations.SerializedName
  */
 data class PushNotificationRequestBody constructor(
     @SerializedName("from_pub_key") val senderPublicKeyHex: String,
-    val signature: String,
+    @SerializedName("signature") val signature: String,
     @SerializedName("public_nonce") val publicNonce: String
 )

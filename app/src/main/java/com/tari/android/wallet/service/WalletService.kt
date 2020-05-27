@@ -361,14 +361,10 @@ internal class WalletService : Service(), FFIWalletListenerAdapter {
             recipientPublicKeyHex,
             fromPublicKeyHex
         )
-        val signing = wallet.signMessage(fromPublicKeyHex + recipientPublicKeyHex)
-        val signature = signing.split("|")[0]
-        val nonce = signing.split("|")[1]
         notificationService.notifyRecipient(
             recipientPublicKeyHex,
             fromPublicKeyHex,
-            signature,
-            nonce,
+            wallet::signMessage,
             onSuccess = { Logger.i("Push notification successfully sent to recipient.") },
             onFailure = { Logger.e(it, "Push notification failed with exception.") }
         )

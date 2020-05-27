@@ -1,5 +1,4 @@
-import java.nio.file.Files
-import java.nio.file.Paths
+import javax.annotation.Nullable
 
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
@@ -59,6 +58,8 @@ android {
     productFlavors {
         regular {
             dimension "privacy-mode"
+            final String apiKey = loadSecretProps()?.getProperty('service.notifications.api_key')
+            if (apiKey != null) buildConfigField "String", "NOTIFICATIONS_API_URL", "\"$apiKey\""
         }
         privacy {
             dimension "privacy-mode"
@@ -70,16 +71,10 @@ android {
             if (variant.buildType.name == "debug") {
                 variant.mergedFlavor.manifestPlaceholders.sentryPublicDSN = ''
             } else {
-                final File secretPropertiesFile = project.rootProject.file("secret.properties")
-                if (!secretPropertiesFile.exists()) {
-                    Files.copy(
-                            Paths.get(project.rootProject.file("secret-example.properties").absolutePath),
-                            Paths.get(secretPropertiesFile.absolutePath),
-                    )
-                }
-                Properties properties = new Properties()
-                properties.load(project.rootProject.file("secret.properties").newDataInputStream())
-                variant.mergedFlavor.manifestPlaceholders.sentryPublicDSN = properties.getProperty('sentry.public_dsn')
+                final String dsn = loadSecretProps()?.getProperty('sentry.public_dsn')
+                if (dsn == null) throw GradleException("\"secret.properties\" file with valid " +
+                        "\"sentry.public_dsn\" property is required for regular release builds")
+                variant.mergedFlavor.manifestPlaceholders.sentryPublicDSN = dsn
             }
         }
     }
@@ -105,6 +100,17 @@ android {
 
 }
 
+@Nullable
+Properties loadSecretProps() {
+    if (project.rootProject.file("secret.properties").exists()) {
+        final Properties properties = new Properties()
+        properties.load(project.rootProject.file("secret.properties").newDataInputStream())
+        return properties
+    } else {
+        return null
+    }
+}
+
 preBuild.dependsOn("downloadJNIBinaries")
 
 dependencies {
@@ -116,7 +122,7 @@ dependencies {
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.3.5"
     implementation "androidx.lifecycle:lifecycle-runtime-ktx:2.2.0"
     // kotlin extensions
-    implementation 'androidx.core:core-ktx:1.3.0-rc01'
+    implementation 'androidx.core:core-ktx:1.2.0'
     // android
     implementation 'androidx.appcompat:appcompat:1.1.0'
     // support lib

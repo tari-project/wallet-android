@@ -37,8 +37,7 @@ interface NotificationService {
     fun notifyRecipient(
         recipientPublicKeyHex: String,
         senderPublicKeyHex: String,
-        signature: String,
-        publicNonce: String,
+        signer: (String) -> String,
         onSuccess: () -> Unit,
         onFailure: (Throwable) -> Unit
     )
