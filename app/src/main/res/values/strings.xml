@@ -224,7 +224,7 @@
     <string name="tx_detail_add_contact">Add Contact Name</string>
     <string name="tx_detail_transaction_fee">Transaction Fee</string>
     <string name="tx_detail_transaction_id">Transaction ID:%s</string>
-    <string name="tx_detail_waiting_for_recipient">Waiting for recipient to accept transaction</string>
+    <string name="tx_detail_waiting_for_recipient">Waiting for the recipient to come online</string>
     <string name="tx_detail_waiting_for_sender_to_complete">Waiting for sender to complete transaction</string>
     <string name="tx_detail_broadcasting">Completing final processing…</string>
     <string name="tx_detail_cancel_tx">Cancel transaction</string>
