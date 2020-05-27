@@ -122,6 +122,6 @@ internal class RESTModule {
     @Provides
     @Singleton
     fun provideNotificationService(gateway: PushNotificationRESTGateway): NotificationService =
-        PushNotificationRESTService(gateway, BuildConfig.NOTIFICATIONS_API_URL)
+        PushNotificationRESTService(gateway, BuildConfig.NOTIFICATIONS_API_KEY)
 
 }

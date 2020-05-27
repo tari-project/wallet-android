@@ -1,4 +1,5 @@
-import javax.annotation.Nullable
+import java.nio.file.Files
+import java.nio.file.Paths
 
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
@@ -58,8 +59,8 @@ android {
     productFlavors {
         regular {
             dimension "privacy-mode"
-            final String apiKey = loadSecretProps()?.getProperty('service.notifications.api_key')
-            if (apiKey != null) buildConfigField "String", "NOTIFICATIONS_API_URL", "\"$apiKey\""
+            buildConfigField "String", "NOTIFICATIONS_API_KEY",
+                    "\"${loadSecretProps().getProperty('service.notifications.api_key')}\""
         }
         privacy {
             dimension "privacy-mode"
@@ -71,10 +72,8 @@ android {
             if (variant.buildType.name == "debug") {
                 variant.mergedFlavor.manifestPlaceholders.sentryPublicDSN = ''
             } else {
-                final String dsn = loadSecretProps()?.getProperty('sentry.public_dsn')
-                if (dsn == null) throw GradleException("\"secret.properties\" file with valid " +
-                        "\"sentry.public_dsn\" property is required for regular release builds")
-                variant.mergedFlavor.manifestPlaceholders.sentryPublicDSN = dsn
+                variant.mergedFlavor.manifestPlaceholders.sentryPublicDSN =
+                        loadSecretProps().getProperty('sentry.public_dsn')
             }
         }
     }
@@ -100,15 +99,17 @@ android {
 
 }
 
-@Nullable
 Properties loadSecretProps() {
-    if (project.rootProject.file("secret.properties").exists()) {
-        final Properties properties = new Properties()
-        properties.load(project.rootProject.file("secret.properties").newDataInputStream())
-        return properties
-    } else {
-        return null
+    final File secretProps = project.rootProject.file("secret.properties")
+    if (!secretProps.exists()) {
+        Files.copy(
+                Paths.get(project.rootProject.file("secret-example.properties").absolutePath),
+                Paths.get(secretProps.absolutePath),
+        )
     }
+    final Properties properties = new Properties()
+    properties.load(secretProps.newDataInputStream())
+    return properties
 }
 
 preBuild.dependsOn("downloadJNIBinaries")
