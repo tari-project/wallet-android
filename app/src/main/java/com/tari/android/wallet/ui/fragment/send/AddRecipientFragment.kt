@@ -190,10 +190,10 @@ class AddRecipientFragment : Fragment(),
             setupUi()
             Thread {
                 fetchAllData(walletService) {
-                    ui.rootView.post {
+                    _ui?.rootView?.post {
                         displayInitialList()
-                        ui.searchEditText.setRawInputType(InputType.TYPE_CLASS_TEXT)
-                        ui.searchEditText.addTextChangedListener(this)
+                        _ui?.searchEditText?.setRawInputType(InputType.TYPE_CLASS_TEXT)
+                        _ui?.searchEditText?.addTextChangedListener(this)
                     }
                     checkClipboardForValidEmojiId()
                 }
