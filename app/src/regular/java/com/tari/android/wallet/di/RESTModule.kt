@@ -32,6 +32,7 @@
  */
 package com.tari.android.wallet.di
 
+import com.tari.android.wallet.BuildConfig
 import com.tari.android.wallet.service.faucet.TestnetFaucetRESTGateway
 import com.tari.android.wallet.service.faucet.TestnetFaucetRESTService
 import com.tari.android.wallet.service.faucet.TestnetFaucetService
@@ -121,6 +122,6 @@ internal class RESTModule {
     @Provides
     @Singleton
     fun provideNotificationService(gateway: PushNotificationRESTGateway): NotificationService =
-        PushNotificationRESTService(gateway)
+        PushNotificationRESTService(gateway, BuildConfig.NOTIFICATIONS_API_KEY)
 
 }

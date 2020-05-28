@@ -36,21 +36,26 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
-class PushNotificationRESTService(private val gateway: PushNotificationRESTGateway) :
+class PushNotificationRESTService(
+    private val gateway: PushNotificationRESTGateway,
+    private val apiKey: String
+) :
     NotificationService {
     override fun notifyRecipient(
         recipientPublicKeyHex: String,
         senderPublicKeyHex: String,
-        signature: String,
-        publicNonce: String,
+        signer: (String) -> String,
         onSuccess: () -> Unit,
         onFailure: (Throwable) -> Unit
     ) {
+        val signing = signer(apiKey + senderPublicKeyHex + recipientPublicKeyHex)
+        val signature = signing.split("|")[0]
+        val nonce = signing.split("|")[1]
         val requestBody =
             PushNotificationRequestBody(
                 senderPublicKeyHex,
                 signature,
-                publicNonce
+                nonce
             )
         val response = gateway.sendPushNotificationToRecipient(recipientPublicKeyHex, requestBody)
         response.enqueue(object : Callback<PushNotificationResponseBody> {

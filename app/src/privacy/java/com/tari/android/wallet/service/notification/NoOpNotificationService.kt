@@ -38,17 +38,14 @@ class NoOpNotificationService : NotificationService {
     override fun notifyRecipient(
         recipientPublicKeyHex: String,
         senderPublicKeyHex: String,
-        signature: String,
-        publicNonce: String,
+        signer: (String) -> String,
         onSuccess: () -> Unit,
         onFailure: (Throwable) -> Unit
     ) {
         Logger.i(
             "notifyRecipient called with" +
                     "\nrecipientPublicKeyHex = $recipientPublicKeyHex" +
-                    "\nsenderPublicKeyHex = $senderPublicKeyHex" +
-                    "\nsignature = $signature" +
-                    "\npublicNonce = $publicNonce"
+                    "\nsenderPublicKeyHex = $senderPublicKeyHex"
         )
     }
 }
