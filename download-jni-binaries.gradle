@@ -1,5 +1,5 @@
 ext {
-    jniLibsVersion = "0.10.3"
+    jniLibsVersion = "0.11.0"
     jniLibsHostURL = "https://www.tari.com/binaries/"
     supportedABIs = ["arm64-v8a", "armeabi-v7a", "x86_64"]
 }
