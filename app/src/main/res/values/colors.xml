@@ -91,4 +91,7 @@
     <color name="finalize_send_progress_bar_passive_bg">#E1E1E1</color>
     <color name="finalize_send_progress_bar_active_bg">#888931FF</color>
 
+    <!-- store -->
+    <color name="store_grabber">#87B2B2B2</color>
+
 </resources>
