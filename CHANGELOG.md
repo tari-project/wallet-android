@@ -1,5 +1,12 @@
 # Tari Aurora Changelog
 
+## [v0.1.14-jniLibs-0.11.0] - 2020-05-29
+* Fix a crash when adding recipients in transaction flow
+* UI improvements
+* Improves the responsiveness of the transaction list.
+* Update the Tor binary to 0.2.4.7.
+* Other minor bug fixes and performance improvements
+
 ## [v0.1.13-jniLibs-0.10.3] - 2020-05-21
 * Add cancel transactions support!
 * Adds support for default note and amount support for deep links
