@@ -172,6 +172,15 @@ internal class FFIWallet(
         libError: FFIError
     ): ByteArray
 
+    private external fun jniCoinSplit(
+        amount: String,
+        splitCount: String,
+        fee: String,
+        message: String,
+        lockHeight: String,
+        libError: FFIError
+    ): ByteArray
+
     private external fun jniSignMessage(
         message: String,
         libError: FFIError
@@ -589,6 +598,35 @@ internal class FFIWallet(
             error
         )
         Logger.d("Send status code (0 means ok): %d", error.code)
+        throwIf(error)
+        return BigInteger(1, bytes)
+    }
+
+    fun coinSplit(
+        amount: BigInteger,
+        count: BigInteger,
+        height: BigInteger,
+        fee: BigInteger,
+        message: String
+    ): BigInteger {
+        val minimumLibFee = 100L
+        if (fee < BigInteger.valueOf(minimumLibFee)) {
+            throw FFIException(message = "Fee is less than the minimum of $minimumLibFee taris.")
+        }
+        if (amount < BigInteger.valueOf(0L)) {
+            throw FFIException(message = "Amount is less than 0.")
+        }
+
+        val error = FFIError()
+        val bytes = jniCoinSplit(
+            amount.toString(),
+            count.toString(),
+            fee.toString(),
+            message,
+            height.toString(),
+            error
+        )
+        Logger.d("Coin spit code (0 means ok): %d", error.code)
         throwIf(error)
         return BigInteger(1, bytes)
     }
