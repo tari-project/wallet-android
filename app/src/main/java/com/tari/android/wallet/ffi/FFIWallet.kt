@@ -32,8 +32,6 @@
  */
 package com.tari.android.wallet.ffi
 
-import android.os.Handler
-import android.os.Looper
 import com.orhanobut.logger.Logger
 import com.tari.android.wallet.model.*
 import kotlinx.coroutines.GlobalScope

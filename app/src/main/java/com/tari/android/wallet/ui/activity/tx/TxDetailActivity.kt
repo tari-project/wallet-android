@@ -163,11 +163,7 @@ internal class TxDetailActivity : AppCompatActivity(), ServiceConnection {
      * Wallet service connected.
      */
     override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
-        Logger.d("Connected to the wallet service.")
-        Log.i(
-            "Debug",
-            "Service connected (${System.currentTimeMillis()})"
-        )
+        Logger.d("Connected to the wallet service (${System.currentTimeMillis()}).")
         enableCTAs()
         walletService = TariWalletService.Stub.asInterface(service)
     }
@@ -569,7 +565,6 @@ internal class TxDetailActivity : AppCompatActivity(), ServiceConnection {
 
     private fun cancelTransaction(service: TariWalletService) {
         val error = WalletError()
-        Logger.e("Cancel transaction :: %s", tx.id.toString())
         val isCancelled = service.cancelPendingTx(TxId(this.tx.id), error)
         if (isCancelled || error.code == WalletErrorCode.NO_ERROR) {
             this.ui.cancelTxView.setOnClickListener(null)

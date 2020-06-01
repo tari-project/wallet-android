@@ -35,6 +35,6 @@ package com.tari.android.wallet.service.notification
 import com.google.gson.annotations.SerializedName
 
 data class PushNotificationResponseBody constructor(
-    @SerializedName("sent")
-    val sent: Boolean
+    @SerializedName("success")
+    val success: Boolean
 )

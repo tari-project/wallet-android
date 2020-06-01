@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/root_view"
@@ -8,6 +8,7 @@
     android:orientation="vertical">
 
     <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/top_content"
         android:layout_width="match_parent"
         android:layout_height="85dp"
         android:background="@drawable/store_grabber_bg">
@@ -27,9 +28,9 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"
-            android:singleLine="true"
             android:ellipsize="middle"
             android:gravity="center"
+            android:singleLine="true"
             android:text="@string/store_title"
             android:textColor="@color/black"
             android:textSize="@dimen/store_title_text_size"
@@ -67,7 +68,8 @@
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"
+        android:layout_above="@id/controls_scroll_view"
+        android:layout_below="@id/top_content"
         android:background="@color/white">
 
         <ProgressBar
@@ -94,7 +96,8 @@
     <androidx.core.widget.NestedScrollView
         android:id="@+id/controls_scroll_view"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
@@ -131,4 +134,21 @@
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.core.widget.NestedScrollView>
 
-</LinearLayout>
+    <!-- top view elevation-->
+    <View
+        android:id="@+id/top_elevation_view"
+        android:layout_below="@id/top_content"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/common_scroll_height_gradient_height"
+        android:alpha="0.7"
+        android:background="@drawable/view_elevation_gradient" />
+    <!-- bottom control view elevation-->
+    <View
+        android:id="@+id/bottom_elevation_view"
+        android:layout_above="@id/controls_scroll_view"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/common_scroll_height_gradient_height"
+        android:alpha="0.7"
+        android:background="@drawable/view_elevation_bottom_gradient" />
+
+</RelativeLayout>

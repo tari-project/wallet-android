@@ -35,7 +35,6 @@ package com.tari.android.wallet.ui.activity.home.adapter
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.orhanobut.logger.Logger
 import com.tari.android.wallet.R
 import com.tari.android.wallet.model.*
 import org.joda.time.DateTime
@@ -65,7 +64,6 @@ internal class TxListAdapter(
 
     fun notifyDataChanged() {
         items.clear()
-        Logger.e("CANCELLED COUNT %d", cancelledTxes.size)
         val pendingTxs = ArrayList<Tx>(pendingInboundTxs.size + pendingOutboundTxs.size).apply {
             addAll(pendingInboundTxs)
             addAll(pendingOutboundTxs)

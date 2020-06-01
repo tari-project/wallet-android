@@ -281,16 +281,23 @@ internal class WalletService : Service(), FFIWalletListenerAdapter {
 
     override fun onTxCancelled(cancelledTx: CancelledTx) {
         Logger.d("Tx cancelled: $cancelledTx")
-        // post event to bus
-        EventBus.post(Event.Wallet.TxCancelled(cancelledTx))
-        // notify external listeners
-        if (cancelledTx.direction == INBOUND &&
-            !(app.isInForeground && app.currentActivity is HomeActivity)
-        ) {
-            Logger.i("Posting cancellation notification")
-            notificationHelper.postTxCanceledNotification(cancelledTx)
+        val error = WalletError()
+        // TODO re-fetch the tx because of an FFI bug that causes the recipient public key to
+        //  be all 0s, will revert once the FFI bug is fixed
+        val refetchedCancelledTx = serviceImpl.getCancelledTxById(TxId(cancelledTx.id), error)
+        Logger.d("Cancelled tx refetched: $refetchedCancelledTx")
+        refetchedCancelledTx?.let {
+            // post event to bus
+            EventBus.post(Event.Wallet.TxCancelled(it))
+            // notify external listeners
+            if (it.direction == INBOUND &&
+                !(app.isInForeground && app.currentActivity is HomeActivity)
+            ) {
+                Logger.i("Posting cancellation notification")
+                notificationHelper.postTxCanceledNotification(it)
+            }
+            listeners.iterator().forEach { listener ->  listener.onTxCancellation(it) }
         }
-        listeners.iterator().forEach { it.onTxCancellation(cancelledTx) }
     }
 
     override fun onBaseNodeSyncComplete(requestId: BigInteger, success: Boolean) {
