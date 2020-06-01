@@ -68,7 +68,7 @@ class PushNotificationRESTService(
                 response: Response<PushNotificationResponseBody>
             ) {
                 val body = response.body()
-                if (response.isSuccessful && body != null && body.sent) {
+                if (response.isSuccessful && body != null && body.success) {
                     onSuccess()
                 } else {
                     onFailure(NotificationException(response.errorBody()?.string()))
