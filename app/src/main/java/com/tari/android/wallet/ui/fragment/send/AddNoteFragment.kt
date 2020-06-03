@@ -110,19 +110,17 @@ class AddNoteFragment : Fragment(), TextWatcher, View.OnTouchListener {
     private lateinit var amount: MicroTari
     private lateinit var fee: MicroTari
 
-    private var _ui: FragmentAddNoteBinding? = null
-    private val ui get() = _ui!!
+    private lateinit var ui: FragmentAddNoteBinding
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? = FragmentAddNoteBinding.inflate(inflater, container, false).also { _ui = it }.root
+    ): View? = FragmentAddNoteBinding.inflate(inflater, container, false).also { ui = it }.root
 
     override fun onDestroyView() {
         super.onDestroyView()
         ui.noteEditText.removeTextChangedListener(this)
-        _ui = null
     }
 
     @SuppressLint("ClickableViewAccessibility")
@@ -502,14 +500,12 @@ class AddNoteFragment : Fragment(), TextWatcher, View.OnTouchListener {
                     dimenPx(add_note_slide_button_left_margin)
                 )
                 anim.addUpdateListener { valueAnimator: ValueAnimator ->
-                    _ui?.let { ui ->
-                        val margin = valueAnimator.animatedValue as Int
-                        UiUtil.setStartMargin(ui.slideView, margin)
-                        ui.slideToSendEnabledTextView.alpha =
-                            1f - margin.toFloat() / (slideButtonContainerWidth - dimenPx(
-                                add_note_slide_button_left_margin
-                            ) - dimenPx(add_note_slide_button_width))
-                    }
+                    val margin = valueAnimator.animatedValue as Int
+                    UiUtil.setStartMargin(ui.slideView, margin)
+                    ui.slideToSendEnabledTextView.alpha =
+                        1f - margin.toFloat() / (slideButtonContainerWidth - dimenPx(
+                            add_note_slide_button_left_margin
+                        ) - dimenPx(add_note_slide_button_width))
                 }
                 anim.duration = Constants.UI.shortDurationMs
                 anim.interpolator = EasingInterpolator(Ease.QUART_IN_OUT)
@@ -526,19 +522,17 @@ class AddNoteFragment : Fragment(), TextWatcher, View.OnTouchListener {
                     )
                 )
                 anim.addUpdateListener { valueAnimator: ValueAnimator ->
-                    _ui?.let { ui ->
-                        val margin = valueAnimator.animatedValue as Int
-                        UiUtil.setStartMargin(ui.slideView, margin)
-                        ui.slideToSendEnabledTextView.alpha =
-                            1f - margin.toFloat() / (slideButtonContainerWidth -
-                                    dimenPx(add_note_slide_button_left_margin) -
-                                    dimenPx(add_note_slide_button_width))
-                    }
+                    val margin = valueAnimator.animatedValue as Int
+                    UiUtil.setStartMargin(ui.slideView, margin)
+                    ui.slideToSendEnabledTextView.alpha =
+                        1f - margin.toFloat() / (slideButtonContainerWidth -
+                                dimenPx(add_note_slide_button_left_margin) -
+                                dimenPx(add_note_slide_button_width))
                 }
                 anim.duration = Constants.UI.shortDurationMs
                 anim.interpolator = EasingInterpolator(Ease.QUART_IN_OUT)
                 anim.startDelay = 0
-                anim.addListener(onEnd = { _ui?.let { slideAnimationCompleted() } })
+                anim.addListener(onEnd = { slideAnimationCompleted() })
                 anim.start()
             }
         }
@@ -549,7 +543,7 @@ class AddNoteFragment : Fragment(), TextWatcher, View.OnTouchListener {
         // hide slide view
         val anim = ValueAnimator.ofFloat(1F, 0F)
         anim.addUpdateListener { valueAnimator: ValueAnimator ->
-            _ui?.slideView?.alpha = valueAnimator.animatedValue as Float
+            ui.slideView.alpha = valueAnimator.animatedValue as Float
         }
         anim.duration = Constants.UI.shortDurationMs
         anim.interpolator = EasingInterpolator(Ease.QUART_IN_OUT)
@@ -562,33 +556,31 @@ class AddNoteFragment : Fragment(), TextWatcher, View.OnTouchListener {
     }
 
     private fun onSlideAnimationEnd() {
-        _ui?.let { ui ->
-            if (EventBus.networkConnectionStateSubject.value != NetworkConnectionState.CONNECTED) {
-                ui.rootView.postDelayed({
-                    hideKeyboard()
-                }, Constants.UI.AddNoteAndSend.preKeyboardHideWaitMs)
-                ui.rootView.postDelayed(
-                    {
-                        restoreSlider()
-                        ui.noteEditText.setRawInputType(InputType.TYPE_CLASS_TEXT)
-                        showInternetConnectionErrorDialog(activity!!)
-                    },
-                    Constants.UI.AddNoteAndSend.preKeyboardHideWaitMs + Constants.UI.keyboardHideWaitMs
-                )
-                return@onSlideAnimationEnd
-            }
-            ui.progressBar.visible()
-            ui.slideView.gone()
+        if (EventBus.networkConnectionStateSubject.value != NetworkConnectionState.CONNECTED) {
             ui.rootView.postDelayed({
                 hideKeyboard()
             }, Constants.UI.AddNoteAndSend.preKeyboardHideWaitMs)
             ui.rootView.postDelayed(
                 {
-                    continueToFinalizeSendTx()
-                }, Constants.UI.AddNoteAndSend.preKeyboardHideWaitMs
-                        + Constants.UI.AddNoteAndSend.continueToFinalizeSendTxDelayMs
+                    restoreSlider()
+                    ui.noteEditText.setRawInputType(InputType.TYPE_CLASS_TEXT)
+                    showInternetConnectionErrorDialog(activity!!)
+                },
+                Constants.UI.AddNoteAndSend.preKeyboardHideWaitMs + Constants.UI.keyboardHideWaitMs
             )
+            return
         }
+        ui.progressBar.visible()
+        ui.slideView.gone()
+        ui.rootView.postDelayed({
+            hideKeyboard()
+        }, Constants.UI.AddNoteAndSend.preKeyboardHideWaitMs)
+        ui.rootView.postDelayed(
+            {
+                continueToFinalizeSendTx()
+            }, Constants.UI.AddNoteAndSend.preKeyboardHideWaitMs
+                    + Constants.UI.AddNoteAndSend.continueToFinalizeSendTxDelayMs
+        )
     }
 
     private fun hideKeyboard() {
@@ -619,15 +611,13 @@ class AddNoteFragment : Fragment(), TextWatcher, View.OnTouchListener {
             0f
         )
         anim.addUpdateListener { valueAnimator: ValueAnimator ->
-            _ui?.let { ui ->
-                val value = valueAnimator.animatedValue as Float
-                ui.slideView.alpha = 1f - value
-                ui.slideToSendEnabledTextView.alpha = 1f - value
-                UiUtil.setStartMargin(
-                    ui.slideView,
-                    (slideViewInitialMargin + slideViewMarginDelta * (1 - value)).toInt()
-                )
-            }
+            val value = valueAnimator.animatedValue as Float
+            ui.slideView.alpha = 1f - value
+            ui.slideToSendEnabledTextView.alpha = 1f - value
+            UiUtil.setStartMargin(
+                ui.slideView,
+                (slideViewInitialMargin + slideViewMarginDelta * (1 - value)).toInt()
+            )
         }
         anim.duration = Constants.UI.shortDurationMs
         anim.interpolator = EasingInterpolator(Ease.QUART_IN_OUT)

@@ -138,8 +138,7 @@ class FinalizeSendTxFragment : Fragment(), ServiceConnection {
     private var storeAndForwardHasFailed = false
 
     private lateinit var walletService: TariWalletService
-    private var _ui: FragmentFinalizeSendTxBinding? = null
-    private val ui get() = _ui!!
+    private lateinit var ui: FragmentFinalizeSendTxBinding
 
     // region Fragment lifecycle
 
@@ -169,7 +168,7 @@ class FinalizeSendTxFragment : Fragment(), ServiceConnection {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? =
-        FragmentFinalizeSendTxBinding.inflate(inflater, container, false).also { _ui = it }.root
+        FragmentFinalizeSendTxBinding.inflate(inflater, container, false).also { ui = it }.root
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -195,13 +194,11 @@ class FinalizeSendTxFragment : Fragment(), ServiceConnection {
     override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
         Logger.i("FinalizeSendTxFragment onServiceConnected")
         walletService = TariWalletService.Stub.asInterface(service)
-        _ui?.let {
-            setupUi()
-            // start checking network connection
-            connectionCheckStartTime = DateTime.now()
-            checkConnectionStatus()
-            subscribeToEventBus()
-        }
+        setupUi()
+        // start checking network connection
+        connectionCheckStartTime = DateTime.now()
+        checkConnectionStatus()
+        subscribeToEventBus()
     }
 
     override fun onServiceDisconnected(name: ComponentName?) {
@@ -215,7 +212,6 @@ class FinalizeSendTxFragment : Fragment(), ServiceConnection {
         EventBus.unsubscribe(this)
         ui.lottieAnimationView.removeAllAnimatorListeners()
         requireActivity().unbindService(this)
-        _ui = null
     }
 
     override fun onDestroy() {
@@ -251,20 +247,18 @@ class FinalizeSendTxFragment : Fragment(), ServiceConnection {
         ui.step2ProgressBar.progress = 0
         ui.step2ProgressBar.max = maxProgress
         ui.rootView.postDelayed({
-            _ui?.let {
-                fadeInProgressBarContainers()
-                it.lottieAnimationView.playAnimation()
-                playCurrentStepTextAppearAnimation()
-            }
+            fadeInProgressBarContainers()
+            ui.lottieAnimationView.playAnimation()
+            playCurrentStepTextAppearAnimation()
         }, Constants.UI.FinalizeSendTx.lottieAnimStartDelayMs)
     }
 
     private fun subscribeToEventBus() {
         EventBus.subscribe<Event.Wallet.DirectSendResult>(this) { event ->
-            _ui?.rootView?.post { onDirectSendResult(event.txId, event.success) }
+            ui.rootView.post { onDirectSendResult(event.txId, event.success) }
         }
         EventBus.subscribe<Event.Wallet.StoreAndForwardSendResult>(this) { event ->
-            _ui?.rootView?.post { onStoreAndForwardSendResult(event.txId, event.success) }
+            ui.rootView.post { onStoreAndForwardSendResult(event.txId, event.success) }
         }
     }
 
@@ -318,12 +312,10 @@ class FinalizeSendTxFragment : Fragment(), ServiceConnection {
     private fun fadeInProgressBarContainers() {
         val fadeAnim = ValueAnimator.ofFloat(0f, 1f)
         fadeAnim.addUpdateListener { valueAnimator: ValueAnimator ->
-            _ui?.let { ui ->
-                val alpha = valueAnimator.animatedValue as Float
-                ui.step1ProgressBarContainerView.alpha = alpha
-                ui.step2ProgressBarContainerView.alpha = alpha
-                ui.step3ProgressBarContainerView.alpha = alpha
-            }
+            val alpha = valueAnimator.animatedValue as Float
+            ui.step1ProgressBarContainerView.alpha = alpha
+            ui.step2ProgressBarContainerView.alpha = alpha
+            ui.step3ProgressBarContainerView.alpha = alpha
         }
         fadeAnim.duration = Constants.UI.longDurationMs
         fadeAnim.startDelay = Constants.UI.FinalizeSendTx.textAppearAnimStartDelayMs
@@ -333,35 +325,33 @@ class FinalizeSendTxFragment : Fragment(), ServiceConnection {
 
     private fun animateCurrentStepProgress(isReverse: Boolean) {
         // On config change the UI is already cleared out but this method can be invoked
-        _ui?.let {
-            val progressBar = when (currentStep) {
-                Step.CONNECTION_CHECK -> it.step1ProgressBar
-                Step.DISCOVERY -> it.step2ProgressBar
-                else -> it.step3ProgressBar
-            }
-            progressBar.visible()
-            progressAnim =
-                (if (isReverse) ValueAnimator.ofInt(maxProgress, 0)
-                else ValueAnimator.ofInt(0, maxProgress))
-                    .also { animator ->
-                        animator.addUpdateListener { valueAnimator: ValueAnimator ->
-                            progressBar.progress = valueAnimator.animatedValue as Int
-                        }
-                        animator.duration = progressBarFillDurationMs
-                        animator.interpolator = EasingInterpolator(Ease.QUART_IN_OUT)
-                        animator.startDelay = Constants.UI.xShortDurationMs
-                        animator.addListener(onEnd = {
-                            progressAnimationToggleCount++
-                            animator.removeAllListeners()
-                            if (progressAnimationToggleCount >= 3 && !isReverse) {
-                                tryToProceedToTheNextStepOnProgressAnimCompletion()
-                            } else {
-                                animateCurrentStepProgress(!isReverse)
-                            }
-                        })
-                        animator.start()
-                    }
+        val progressBar = when (currentStep) {
+            Step.CONNECTION_CHECK -> ui.step1ProgressBar
+            Step.DISCOVERY -> ui.step2ProgressBar
+            else -> ui.step3ProgressBar
         }
+        progressBar.visible()
+        progressAnim =
+            (if (isReverse) ValueAnimator.ofInt(maxProgress, 0)
+            else ValueAnimator.ofInt(0, maxProgress))
+                .also { animator ->
+                    animator.addUpdateListener { valueAnimator: ValueAnimator ->
+                        progressBar.progress = valueAnimator.animatedValue as Int
+                    }
+                    animator.duration = progressBarFillDurationMs
+                    animator.interpolator = EasingInterpolator(Ease.QUART_IN_OUT)
+                    animator.startDelay = Constants.UI.xShortDurationMs
+                    animator.addListener(onEnd = {
+                        progressAnimationToggleCount++
+                        animator.removeAllListeners()
+                        if (progressAnimationToggleCount >= 3 && !isReverse) {
+                            tryToProceedToTheNextStepOnProgressAnimCompletion()
+                        } else {
+                            animateCurrentStepProgress(!isReverse)
+                        }
+                    })
+                    animator.start()
+                }
     }
 
     private fun tryToProceedToTheNextStepOnProgressAnimCompletion() {
@@ -442,11 +432,9 @@ class FinalizeSendTxFragment : Fragment(), ServiceConnection {
     private fun fadeOutTextViews(completion: () -> Unit) {
         val alphaAnim = ValueAnimator.ofFloat(1F, 0F)
         alphaAnim.addUpdateListener { valueAnimator: ValueAnimator ->
-            _ui?.let {
-                val alpha = valueAnimator.animatedValue as Float
-                ui.infoLine1TextView.alpha = alpha
-                ui.infoLine2TextView.alpha = alpha
-            }
+            val alpha = valueAnimator.animatedValue as Float
+            ui.infoLine1TextView.alpha = alpha
+            ui.infoLine2TextView.alpha = alpha
         }
         alphaAnim.duration = Constants.UI.mediumDurationMs
         alphaAnim.addListener(onEnd = {
@@ -553,14 +541,12 @@ class FinalizeSendTxFragment : Fragment(), ServiceConnection {
         // fade out text and progress
         val fadeOutAnim = ValueAnimator.ofFloat(1f, 0f)
         fadeOutAnim.addUpdateListener { valueAnimator: ValueAnimator ->
-            _ui?.let { ui ->
-                val alpha = valueAnimator.animatedValue as Float
-                ui.infoLine1TextView.alpha = alpha
-                ui.infoLine2TextView.alpha = alpha
-                ui.step1ProgressBarContainerView.alpha = alpha
-                ui.step2ProgressBarContainerView.alpha = alpha
-                ui.step3ProgressBarContainerView.alpha = alpha
-            }
+            val alpha = valueAnimator.animatedValue as Float
+            ui.infoLine1TextView.alpha = alpha
+            ui.infoLine2TextView.alpha = alpha
+            ui.step1ProgressBarContainerView.alpha = alpha
+            ui.step2ProgressBarContainerView.alpha = alpha
+            ui.step3ProgressBarContainerView.alpha = alpha
         }
         fadeOutAnim.duration = Constants.UI.xLongDurationMs
         fadeOutAnim.interpolator = EasingInterpolator(Ease.QUART_IN_OUT)
@@ -580,14 +566,12 @@ class FinalizeSendTxFragment : Fragment(), ServiceConnection {
         // fade out text and progress
         val fadeOutAnim = ValueAnimator.ofFloat(1f, 0f)
         fadeOutAnim.addUpdateListener { valueAnimator: ValueAnimator ->
-            _ui?.let { ui ->
-                val alpha = valueAnimator.animatedValue as Float
-                ui.infoLine1TextView.alpha = alpha
-                ui.infoLine2TextView.alpha = alpha
-                ui.step1ProgressBarContainerView.alpha = alpha
-                ui.step2ProgressBarContainerView.alpha = alpha
-                ui.step3ProgressBarContainerView.alpha = alpha
-            }
+            val alpha = valueAnimator.animatedValue as Float
+            ui.infoLine1TextView.alpha = alpha
+            ui.infoLine2TextView.alpha = alpha
+            ui.step1ProgressBarContainerView.alpha = alpha
+            ui.step2ProgressBarContainerView.alpha = alpha
+            ui.step3ProgressBarContainerView.alpha = alpha
         }
         fadeOutAnim.duration = Constants.UI.longDurationMs
         fadeOutAnim.interpolator = EasingInterpolator(Ease.QUART_IN_OUT)

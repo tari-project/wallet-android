@@ -138,8 +138,7 @@ class AddRecipientFragment : Fragment(),
     private var hidePasteEmojiIdViewsOnTextChanged = false
 
     private lateinit var walletService: TariWalletService
-    private var _ui: FragmentAddRecipientBinding? = null
-    private val ui get() = _ui!!
+    private lateinit var ui: FragmentAddRecipientBinding
 
     /**
      * Paste-emoji-id-related views.
@@ -161,7 +160,7 @@ class AddRecipientFragment : Fragment(),
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? =
-        FragmentAddRecipientBinding.inflate(inflater, container, false).also { _ui = it }.root
+        FragmentAddRecipientBinding.inflate(inflater, container, false).also { ui = it }.root
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -186,19 +185,17 @@ class AddRecipientFragment : Fragment(),
         Logger.i("AddRecipientFragment onServiceConnected")
         val walletService = TariWalletService.Stub.asInterface(service)
         this.walletService = walletService
-        _ui?.let {
             setupUi()
             Thread {
                 fetchAllData(walletService) {
-                    _ui?.rootView?.post {
+                    ui.rootView.post {
                         displayInitialList()
-                        _ui?.searchEditText?.setRawInputType(InputType.TYPE_CLASS_TEXT)
-                        _ui?.searchEditText?.addTextChangedListener(this)
+                        ui.searchEditText.setRawInputType(InputType.TYPE_CLASS_TEXT)
+                        ui.searchEditText.addTextChangedListener(this)
                     }
                     checkClipboardForValidEmojiId()
                 }
             }.start()
-        }
     }
 
     override fun onServiceDisconnected(name: ComponentName?) {
@@ -209,7 +206,6 @@ class AddRecipientFragment : Fragment(),
     override fun onDestroyView() {
         super.onDestroyView()
         requireActivity().unbindService(this)
-        _ui = null
     }
 
     private fun setupUi() {
@@ -288,7 +284,7 @@ class AddRecipientFragment : Fragment(),
         }
         emojiIdPublicKey?.let {
             if (it.emojiId != sharedPrefsWrapper.emojiId!!) {
-                _ui?.rootView?.post {
+                ui.rootView.post {
                     hidePasteEmojiIdViewsOnTextChanged = true
                     showPasteEmojiIdViews(it)
                     focusEditTextAndShowKeyboard()
@@ -567,13 +563,13 @@ class AddRecipientFragment : Fragment(),
                         val publicKey = walletService.getPublicKeyFromHexString(publicKeyHex)
                         if (publicKey != null) {
                             ui.rootView.post {
-                                _ui?.searchEditText?.setText(
+                                ui.searchEditText.setText(
                                     publicKey.emojiId,
                                     TextView.BufferType.EDITABLE
                                 )
                             }
                             ui.searchEditText.postDelayed({
-                                _ui?.searchEditTextScrollView?.smoothScrollTo(0, 0)
+                                ui.searchEditTextScrollView.smoothScrollTo(0, 0)
                             }, Constants.UI.mediumDurationMs)
                         }
                     }

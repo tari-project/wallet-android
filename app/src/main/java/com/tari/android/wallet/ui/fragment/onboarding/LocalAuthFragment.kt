@@ -54,8 +54,8 @@ import com.tari.android.wallet.application.WalletState
 import com.tari.android.wallet.auth.AuthUtil
 import com.tari.android.wallet.databinding.FragmentLocalAuthBinding
 import com.tari.android.wallet.event.EventBus
-import com.tari.android.wallet.ui.extension.*
 import com.tari.android.wallet.infrastructure.Tracker
+import com.tari.android.wallet.ui.extension.*
 import com.tari.android.wallet.ui.util.UiUtil
 import com.tari.android.wallet.util.Constants.UI.Auth
 import com.tari.android.wallet.util.SharedPrefsWrapper
@@ -83,19 +83,13 @@ internal class LocalAuthFragment : Fragment() {
     private var authType: AuthType = AuthType.NONE
     private var listener: Listener? = null
     private var continueIsPendingOnWalletState = false
-    private var _ui: FragmentLocalAuthBinding? = null
-    private val ui get() = _ui!!
+    private lateinit var ui: FragmentLocalAuthBinding
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? = FragmentLocalAuthBinding.inflate(inflater, container, false).also { _ui = it }.root
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _ui = null
-    }
+    ): View? = FragmentLocalAuthBinding.inflate(inflater, container, false).also { ui = it }.root
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
