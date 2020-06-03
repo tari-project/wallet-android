@@ -100,15 +100,14 @@ internal class CreateWalletFragment : Fragment() {
     private var isWaitingOnWalletState = false
     private var emojiIdContinueButtonHasBeenDisplayed = false
 
-    private var _ui: FragmentCreateWalletBinding? = null
-    private val ui get() = _ui!!
+    private lateinit var ui: FragmentCreateWalletBinding
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? =
-        FragmentCreateWalletBinding.inflate(inflater, container, false).also { _ui = it }.root
+        FragmentCreateWalletBinding.inflate(inflater, container, false).also { ui = it }.root
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -120,7 +119,6 @@ internal class CreateWalletFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         uiHandler.removeCallbacksAndMessages(null)
-        _ui = null
     }
 
     override fun onAttach(context: Context) {

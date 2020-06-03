@@ -72,8 +72,7 @@ internal class BaseNodeConfigFragment : Fragment() {
     private val publicKeyRegex = Regex("[a-zA-Z0-9]{64}")
     private val addressRegex = Regex("/onion[2-3]/[a-zA-Z2-7]{56}(:[0-9]+)?")
 
-    private var _ui: FragmentBaseNodeConfigBinding? = null
-    private val ui get() = _ui!!
+    private lateinit var ui: FragmentBaseNodeConfigBinding
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -81,13 +80,8 @@ internal class BaseNodeConfigFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? =
         FragmentBaseNodeConfigBinding.inflate(inflater, container, false)
-            .also { _ui = it }
+            .also { ui = it }
             .root
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _ui = null
-    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)

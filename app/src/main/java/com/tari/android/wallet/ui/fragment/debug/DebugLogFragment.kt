@@ -95,8 +95,7 @@ internal class DebugLogFragment : Fragment(), AdapterView.OnItemSelectedListener
     private lateinit var recyclerViewAdapter: LogListAdapter
     private lateinit var recyclerViewLayoutManager: RecyclerView.LayoutManager
 
-    private var _ui: FragmentDebugLogBinding? = null
-    private val ui get() = _ui!!
+    private lateinit var ui: FragmentDebugLogBinding
 
     private val numberOfLogsFilesToShare = 2
     private val maxLogZipFileSizeBytes = 25 * 1024 * 1024
@@ -105,14 +104,7 @@ internal class DebugLogFragment : Fragment(), AdapterView.OnItemSelectedListener
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? = FragmentDebugLogBinding.inflate(inflater, container, false).also { _ui = it }.root
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        ui.recyclerView.layoutManager = null
-        ui.recyclerView.adapter = null
-        _ui = null
-    }
+    ): View? = FragmentDebugLogBinding.inflate(inflater, container, false).also { ui = it }.root
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)

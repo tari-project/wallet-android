@@ -95,26 +95,20 @@ internal class IntroductionFragment : Fragment() {
 
     private val createWalletArtificalDelay = Constants.UI.CreateWallet.tariTextAnimViewDurationMs
 
-    private var _ui: FragmentIntroductionBinding? = null
-    private val ui get() = _ui!!
+    private lateinit var ui: FragmentIntroductionBinding
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? =
-        FragmentIntroductionBinding.inflate(inflater, container, false).also { _ui = it }.root
+        FragmentIntroductionBinding.inflate(inflater, container, false).also { ui = it }.root
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         IntroductionFragmentVisitor.visit(this)
         setupUi()
         tracker.screen(path = "/onboarding/introduction", title = "Onboarding - Introduction")
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _ui = null
     }
 
     override fun onAttach(context: Context) {
