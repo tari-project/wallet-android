@@ -21,7 +21,7 @@
     <!-- bottom dialog -->
     <dimen name="bottom_dialog_margin">15dp</dimen>
     <dimen name="bottom_dialog_horizontal_padding">10dp</dimen>
-    
+
     <!-- debug -->
     <dimen name="log_item_height">42dp</dimen>
 
@@ -51,12 +51,8 @@
     <dimen name="home_send_tari_button_visible_bottom_margin">38dp</dimen>
     <dimen name="home_send_tari_button_hidden_bottom_margin">-100dp</dimen>
     <dimen name="home_send_tari_button_initial_bottom_margin">-150dp</dimen>
-    <dimen name="home_tx_list_header_height">64dp</dimen>
-    <dimen name="home_send_tari_button_height">54dp</dimen>
     <dimen name="home_main_content_top_margin">6dp</dimen>
-    <dimen name="home_dialog_testnet_tari_width">289</dimen>
     <dimen name="home_dialog_testnet_tari_dialog_margin">14dp</dimen>
-    <dimen name="home_top_content_action_button_size">30dp</dimen>
     <dimen name="home_wallet_info_button_initial_top_margin">40dp</dimen>
 
     <dimen name="home_swipe_refresh_max_scroll_y">180dp</dimen>
@@ -66,8 +62,6 @@
     <dimen name="home_swipe_refresh_progress_view_content_visible_top_margin">20dp</dimen>
 
     <dimen name="create_wallet_button_bottom_margin">36dp</dimen>
-    <dimen name="splash_screen_title_bottom_margin">48dp</dimen>
-    <dimen name="splash_screen_purple_orb_margin">40dp</dimen>
     <dimen name="home_tx_list_item_height">74dp</dimen>
 
     <!-- send tari - add recipient -->
@@ -76,7 +70,6 @@
     <dimen name="add_recipient_contact_list_item_height">68dp</dimen>
     <dimen name="add_recipient_clipboard_emoji_id_container_height">60dp</dimen>
     <dimen name="add_recipient_paste_emoji_id_button_visible_top_margin">-56dp</dimen>
-    <dimen name="add_recipient_edit_text_size">14sp</dimen>
     <!-- send tari - add amount -->
     <dimen name="add_amount_element_container_translation_y">9dp</dimen>
     <dimen name="add_amount_element_text_size">70sp</dimen>
