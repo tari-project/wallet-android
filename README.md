@@ -45,9 +45,7 @@ assuming that:
   - `Install via USB` option is being enabled through the device's `Developer options` settings (you 
   can consult your vendor's documentation or just simply search for it with any search engine);
   - your phone is connected to the build machine via USB;
-  - [keystore for application signing is created](https://developer.android.com/studio/publish/app-signing#generate-key) 
-  and Gradle's signing config is bound to this keystore (the details can be found in 
-  app/build.gradle - just follow `SIGNING:` marks);
+  - Follow instructions inside `app/build.gradle` file marked with `PRIVATE BUILD` labels;
   
-type the following: `./gradlew assemblePrivacyRelease installPrivacyRelease`. A release 
-private build should be installed to your device afterwards.
+type the following: `./gradlew installPrivacyRelease`. A release private build should be installed 
+to your device afterwards.
