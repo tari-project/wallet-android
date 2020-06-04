@@ -32,14 +32,13 @@
     <string name="dummy_contact_initial">S</string>
     <string name="dummy_message">Thanks again for helping with my move</string>
     <string name="dummy_emoji">🍀</string>
-    <string name="dummy_balance">124.56</string>
 
     <!-- notifications -->
     <string name="wallet_service_notification_channel_name">Tari Aurora Service Notification Channel</string>
     <string name="app_notification_channel_name">Tari Aurora Notification Channel</string>
     <string name="notification_tx_received_title">You\'ve got tXTR!</string>
     <string name="notification_tx_received_description_format">Someone just sent you %1$s tXTR.</string>
-<!--    <string name="notification_tx_canceled_title">Your transaction was cancelled by&#032;</string>-->
+    <!--    <string name="notification_tx_canceled_title">Your transaction was cancelled by&#032;</string>-->
     <string name="notification_tx_canceled_title">Your transaction was cancelled</string>
     <string name="notification_tx_canceled_description">The sender cancelled the transaction before it was finalized, so the tXTR was returned to them</string>
 
@@ -59,7 +58,6 @@
     <string name="common_from">From</string>
     <string name="common_to">To</string>
     <string name="common_close">Close</string>
-    <string name="common_new">New</string>
     <string name="common_new_uppercase">NEW</string>
     <string name="common_save">Save</string>
     <string name="common_cancel">Cancel</string>
@@ -80,8 +78,6 @@
     <!-- dialog -->
     <string name="internet_connection_error_dialog_title">Can\'t connect to the interwebs</string>
     <string name="internet_connection_error_dialog_description">Your phone is either offline or has a poor connection at the moment. We\'ll wait here until you find some stronger signal.</string>
-    <string name="tari_network_connection_error_dialog_title">It\'s not you, it\'s the network.</string>
-    <string name="tari_network_connection_error_dialog_description">Looks like there\'s a connectivity issue on our end. Can you give us a few min, then come back and try again?</string>
 
     <!-- service -->
     <string name="wallet_service_title">Tari Aurora wallet service is running.</string>
@@ -132,7 +128,6 @@
     <string name="auth_title">Unlock your wallet</string>
     <string name="auth_biometric_prompt">Please enter your biometrics to unlock your wallet.</string>
     <string name="auth_device_lock_code_prompt">Please enter your smartphone\'s screen lock PIN, passcode, or pattern to unlock your wallet.</string>
-    <string name="auth_description">Authentication secures your tXTR Wallet.</string>
     <string name="auth_not_available_or_canceled_title">Authentication Error</string>
     <string name="auth_not_available_or_canceled_desc">Tari Aurora was not able to authenticate you. Do you still want to proceed?</string>
     <string name="auth_failed_title">Authentication Failed</string>
@@ -145,7 +140,6 @@
     <string name="home_send_tari">Send tXTR</string>
     <string name="home_txs">Transactions</string>
     <string name="home_tx_list_header_pending_txs">In Progress</string>
-    <string name="home_hello">Hello!</string>
     <string name="home_setup_is_complete">Your wallet setup is complete.</string>
     <string name="home_you_are_ready_to_explore">You’re ready to start exploring</string>
     <string name="home_empty_wallet">We don’t see any transactions yet.\nHopefully something happens soon…🤞</string>
@@ -198,13 +192,10 @@
     <string name="finalize_send_tx_sending_step_3_desc_line_2" tools:ignore="TypographyEllipsis">Your transaction is on its way...</string>
 
     <!-- debug log - title -->
-    <string name="debug_log_title">Log</string>
     <!-- wallet info -->
     <string name="wallet_info_share_your_emoji_id">Your Emoji ID is your wallet address. Share it with others to receive tXTR.</string>
     <string name="wallet_info_share_your_emoji_id_bold_part">Emoji ID</string>
-    <string name="wallet_info_copy_emoji_id">Copy my emoji ID</string>
     <string name="wallet_info_qr_code_desc">Transacting in person? Others can scan this QR code from the Tari Aurora App to send you tXTR.</string>
-    <string name="wallet_info_emoji_id_copied">Your emoji ID is copied.</string>
 
     <!-- tx failed dialog -->
     <string name="tx_failed_title">Sorry, you can\'t send tXTR to offline users</string>
@@ -214,7 +205,6 @@
     <string name="tx_detail_payment_cancelled">Payment Cancelled</string>
     <string name="tx_detail_payment_received">Payment Received</string>
     <string name="tx_detail_payment_sent">Payment Sent</string>
-    <string name="tx_detail_pending_payment_sent">Payment In Progress</string>
     <string name="tx_detail_pending_payment_received">Payment In Progress</string>
     <string name="tx_detail_contact_name">Contact Name</string>
     <string name="tx_detail_create_contact_hint">Add Contact Name</string>

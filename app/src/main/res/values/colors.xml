@@ -31,7 +31,7 @@
 
     <!-- introduction terms & agreement links text color -->
     <color name="introduction_user_agreement_and_privacy_policy">#B2FFFFFF</color>
-    
+
     <!-- emoji id copied view -->
     <color name="emoji_id_copied_white_bg">#E5FFFFFF</color>
     <color name="emoji_id_copied_green_bg">#3323BE90</color>
@@ -53,7 +53,6 @@
     <color name="home_tx_section_header_title">#B2B2B2</color>
     <color name="home_black_overlay">#FF000000</color>
     <color name="create_emoji_id_bg">#f6f6f6</color>
-    <color name="wallet_splash_desc_text">#CCFFFFFF</color>
 
     <!-- send tari - add recipient -->
     <color name="add_recipient_hint">#B2B2B2</color>
@@ -65,27 +64,15 @@
     <color name="add_note_slide_btton_bg_gradient_end">#A72BE9</color>
     <color name="add_note_prompt_passive_color">#B2B2B2</color>
 
-    <!-- log levels -->
-    <color name="log_level_trace">#000000</color>
-    <color name="log_level_debug">#000000</color>
-    <color name="log_level_log">#000000</color>
-    <color name="log_level_info">#000000</color>
-    <color name="log_level_warn">#000000</color>
-    <color name="log_level_error">#000000</color>
-
     <!-- Wallet info -->
     <color name="wallet_info_qr_code_desc">#7f8599</color>
-    <color name="wallet_info_emoji_id_summary_divider">#979797</color>
 
     <!-- transaction detail -->
     <color name="tx_detail_contact_name_label_text">#B2B2B2</color>
     <color name="tx_detail_contact_view_divider">#f1f1f1</color>
-    <color name="tx_detail_header_shadow_gradient_start">#80B2B2B2</color>
     <color name="tx_detail_cancel_tx_cta">#D32C44</color>
 
     <!-- local auth -->
-    <color name="auth_touch_id_prompt_anim_bg">#979797</color>
-    <color name="auth_touch_id_prompt_black_bg">#E6000000</color>
 
     <!-- finalize send -->
     <color name="finalize_send_progress_bar_passive_bg">#E1E1E1</color>
