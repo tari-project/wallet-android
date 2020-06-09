@@ -48,6 +48,7 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.TextView
 import androidx.core.animation.addListener
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.daasuu.ei.Ease
@@ -74,6 +75,9 @@ import com.tari.android.wallet.ui.util.UiUtil
 import com.tari.android.wallet.util.*
 import com.tari.android.wallet.util.Constants.Wallet.emojiFormatterChunkSize
 import com.tari.android.wallet.util.Constants.Wallet.emojiIdLength
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import me.everything.android.ui.overscroll.OverScrollDecoratorHelper
 import java.lang.ref.WeakReference
 import javax.inject.Inject
@@ -185,17 +189,16 @@ class AddRecipientFragment : Fragment(),
         Logger.i("AddRecipientFragment onServiceConnected")
         val walletService = TariWalletService.Stub.asInterface(service)
         this.walletService = walletService
-            setupUi()
-            Thread {
-                fetchAllData(walletService) {
-                    ui.rootView.post {
-                        displayInitialList()
-                        ui.searchEditText.setRawInputType(InputType.TYPE_CLASS_TEXT)
-                        ui.searchEditText.addTextChangedListener(this)
-                    }
-                    checkClipboardForValidEmojiId()
-                }
-            }.start()
+        setupUi()
+        lifecycleScope.launch(Dispatchers.IO) {
+            fetchAllData(walletService)
+            withContext(Dispatchers.Main) {
+                displayInitialList()
+                ui.searchEditText.setRawInputType(InputType.TYPE_CLASS_TEXT)
+                ui.searchEditText.addTextChangedListener(this@AddRecipientFragment)
+            }
+            checkClipboardForValidEmojiId()
+        }
     }
 
     override fun onServiceDisconnected(name: ComponentName?) {
@@ -229,6 +232,7 @@ class AddRecipientFragment : Fragment(),
         ui.continueButton.setOnClickListener { onContinueButtonClicked(it) }
         dimmerViews.forEach { it.setOnClickListener { onEmojiIdDimmerClicked() } }
         ui.pasteEmojiIdButton.setOnClickListener { onPasteEmojiIdButtonClicked() }
+        ui.emojiIdTextView.setOnClickListener { onPasteEmojiIdButtonClicked() }
     }
 
     fun reset() {
@@ -284,11 +288,11 @@ class AddRecipientFragment : Fragment(),
         }
         emojiIdPublicKey?.let {
             if (it.emojiId != sharedPrefsWrapper.emojiId!!) {
-                ui.rootView.post {
+                ui.rootView.postDelayed({
                     hidePasteEmojiIdViewsOnTextChanged = true
                     showPasteEmojiIdViews(it)
                     focusEditTextAndShowKeyboard()
-                }
+                }, 100L)
             }
 
         }
@@ -420,7 +424,7 @@ class AddRecipientFragment : Fragment(),
     /**
      * Called only once in onCreate.
      */
-    private fun fetchAllData(walletService: TariWalletService, onComplete: () -> Unit) {
+    private fun fetchAllData(walletService: TariWalletService) {
         val error = WalletError()
         contacts = walletService.getContacts(error)
         recentTxUsers = walletService.getRecentTxUsers(recentTxContactsLimit, error)
@@ -441,7 +445,6 @@ class AddRecipientFragment : Fragment(),
                 allPastTxUsers.add(tx.user)
             }
         }
-        onComplete()
     }
 
     /**
