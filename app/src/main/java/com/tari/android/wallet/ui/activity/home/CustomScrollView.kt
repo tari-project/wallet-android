@@ -67,6 +67,7 @@ internal class CustomScrollView @JvmOverloads constructor(
     var flingIsRunning = false
     var isScrollable = true
 
+    private lateinit var recyclerView: RecyclerView
     private lateinit var recyclerViewContainerView: View
     private lateinit var progressContainerView: View
     private lateinit var progressViewBg: View
@@ -81,10 +82,15 @@ internal class CustomScrollView @JvmOverloads constructor(
     var updateProgressViewController: UpdateProgressViewController? = null
 
     fun bindUI() {
+        recyclerView = findViewById(R.id.tx_recycler_view)
         recyclerViewContainerView = findViewById(R.id.recycler_view_container_view)
         progressContainerView = findViewById(R.id.update_progress_content_container_view)
         progressViewBg = findViewById(R.id.update_progress_content_view_bg)
         progressView = findViewById(R.id.update_progress_content_view)
+    }
+
+    val maxScrollY by lazy {
+        UiUtil.getHeight(getChildAt(0)) - height
     }
 
     fun completeScroll() {
@@ -116,7 +122,6 @@ internal class CustomScrollView @JvmOverloads constructor(
             return
         }
 
-        val maxScrollY = UiUtil.getHeight(getChildAt(0)) - height
         val scrollRatio = scrollY.toFloat() / maxScrollY.toFloat()
         //if (scrollRatio == 0f || scrollRatio == 1f) {
         //    return
@@ -246,7 +251,6 @@ internal class CustomScrollView @JvmOverloads constructor(
         return super.onNestedPreFling(target, velocityX, velocityY)
     }
 
-
     fun beginUpdate() {
         if (isUpdating) return
         isUpdating = true
@@ -281,6 +285,10 @@ internal class CustomScrollView @JvmOverloads constructor(
     @SuppressLint("ClickableViewAccessibility")
     override fun onTouchEvent(event: MotionEvent): Boolean {
         if (!isScrollable) {
+            return true
+        }
+        if (scrollY == maxScrollY) {
+            recyclerView.onTouchEvent(event)
             return true
         }
         return super.onTouchEvent(event)
