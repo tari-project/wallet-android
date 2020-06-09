@@ -324,7 +324,7 @@
                     android:layout_height="match_parent"
                     android:background="@color/white"
                     android:overScrollMode="never"
-                    android:scrollbars="none" />
+                    android:scrollbars="vertical" />
 
                 <LinearLayout
                     android:id="@+id/onboarding_content_view"

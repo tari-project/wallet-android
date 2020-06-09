@@ -321,8 +321,8 @@ internal class HomeActivity : AppCompatActivity(),
                 startActivity(TxDetailActivity.createIntent(this, it))
             }
         ui.txRecyclerView.adapter = recyclerViewAdapter
-        // recycler view is initially disabled
-        ui.txRecyclerView.isClickable = false
+        // hide vertical scrollbar initially
+        ui.txRecyclerView.isVerticalScrollBarEnabled = false
     }
 
     @SuppressLint("ClickableViewAccessibility")
@@ -1272,8 +1272,8 @@ internal class HomeActivity : AppCompatActivity(),
         oldScrollY: Int
     ) {
         if (view is CustomScrollView) {
-            val maxScroll = ui.scrollView.getChildAt(0).height - ui.scrollView.height
-            val ratio = ui.scrollView.scrollY.toFloat() / maxScroll.toFloat()
+            ui.txRecyclerView.isVerticalScrollBarEnabled = (view.scrollY == view.maxScrollY)
+            val ratio = ui.scrollView.scrollY.toFloat() / ui.scrollView.maxScrollY.toFloat()
             ui.onboardingContentView.alpha = ratio
             ui.txListOverlayView.alpha = ratio
             val topContentMarginTopExtra =
