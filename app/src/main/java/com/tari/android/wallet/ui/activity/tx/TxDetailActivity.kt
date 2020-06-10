@@ -133,7 +133,7 @@ internal class TxDetailActivity : AppCompatActivity(), ServiceConnection {
         tx =
             if (savedInstanceState == null) intent.getParcelableExtra(TX_DETAIL_EXTRA_KEY) as Tx
             else savedInstanceState.getParcelable(TX_DETAIL_EXTRA_KEY)!!
-        setupUi()
+        setupUI()
         tracker.screen(path = "/home/tx_details", title = "Transaction Details")
     }
 
@@ -182,9 +182,9 @@ internal class TxDetailActivity : AppCompatActivity(), ServiceConnection {
         overridePendingTransition(R.anim.enter_from_left, R.anim.exit_to_right)
     }
 
-    private fun setupUi() {
+    private fun setupUI() {
         bindViews()
-        setUiCommands()
+        setUICommands()
         bindTxData()
         observeTxUpdates()
     }
@@ -220,7 +220,7 @@ internal class TxDetailActivity : AppCompatActivity(), ServiceConnection {
         ui.cancelTxView.setTextColor(color(tx_detail_cancel_tx_cta))
     }
 
-    private fun setUiCommands() {
+    private fun setUICommands() {
         ui.backView.setOnClickListener { onBackPressed() }
         ui.emojiIdSummaryContainerView.setOnClickListener { onEmojiSummaryClicked(it) }
         ui.copyEmojiIdButton.setOnClickListener { onCopyEmojiIdButtonClicked(it) }
@@ -529,6 +529,8 @@ internal class TxDetailActivity : AppCompatActivity(), ServiceConnection {
             if (!alias.isNullOrEmpty()) {
                 updateContactAlias(alias)
                 setUIAlias(alias)
+            } else {
+                removeContact()
             }
             ui.contactLabelTextView.setTextColor(color(tx_detail_contact_name_label_text))
             return false
@@ -580,6 +582,19 @@ internal class TxDetailActivity : AppCompatActivity(), ServiceConnection {
         }
     }
 
+    private fun removeContact() {
+        val contact = tx.user as? Contact ?: return
+        val error = WalletError()
+        walletService?.removeContact(contact, error)
+        if (error.code == WalletErrorCode.NO_ERROR) {
+            tx.user = User(contact.publicKey)
+            EventBus.post(Event.Contact.ContactRemoved(contact.publicKey))
+        } else {
+            TODO("Unhandled wallet error: ${error.code}")
+        }
+        bindTxData()
+    }
+
     private fun updateContactAlias(newAlias: String) {
         if (walletService == null) {
             return
@@ -591,7 +606,9 @@ internal class TxDetailActivity : AppCompatActivity(), ServiceConnection {
             error
         )
         if (error.code == WalletErrorCode.NO_ERROR) {
-            (tx.user as? Contact)?.alias = newAlias
+            // update tx contact
+            val contact = Contact(tx.user.publicKey, newAlias)
+            tx.user = contact
             EventBus.post(
                 Event.Contact.ContactAddedOrUpdated(
                     tx.user.publicKey,

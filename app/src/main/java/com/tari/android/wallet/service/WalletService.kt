@@ -1125,6 +1125,29 @@ internal class WalletService : Service(), FFIWalletListenerAdapter {
             return tx
         }
 
+        override fun removeContact(contact: Contact, error: WalletError): Boolean {
+            try {
+                val contactsFFI = wallet.getContacts()
+                for (i in 0 until contactsFFI.getLength()) {
+                    val contactFFI = contactsFFI.getAt(i)
+                    val publicKeyFFI = contactFFI.getPublicKey()
+                    if (publicKeyFFI.toString() == contact.publicKey.hexString) {
+                        val result = wallet.removeContact(contactFFI)
+                        publicKeyFFI.destroy()
+                        contactFFI.destroy()
+                        contactsFFI.destroy()
+                        return result
+                    }
+                    publicKeyFFI.destroy()
+                    contactFFI.destroy()
+                }
+                contactsFFI.destroy()
+            } catch (throwable: Throwable) {
+                mapThrowableIntoError(throwable, error)
+            }
+            return false
+        }
+
         private fun notifyTestnetTariRequestFailed(error: String) {
             // post event to bus for the internal listeners
             EventBus.post(Event.Testnet.TestnetTariRequestError(error))

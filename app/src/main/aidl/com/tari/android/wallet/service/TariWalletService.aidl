@@ -95,6 +95,8 @@ interface TariWalletService {
 
     void updateContactAlias(in PublicKey contactPublicKey, in String alias, out WalletError error);
 
+    boolean removeContact(in Contact contact, out WalletError error);
+
     /**
     * Two functions below to get the public key from emoji id and public key hex string
     * do not accept out error parameters - they will just return null if a public key
