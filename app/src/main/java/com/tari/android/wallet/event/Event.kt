@@ -65,6 +65,7 @@ object Event {
      */
     object Contact {
         data class ContactAddedOrUpdated(val contactPublicKey: PublicKey, val contactAlias: String)
+        data class ContactRemoved(val contactPublicKey: PublicKey)
     }
 
     /**

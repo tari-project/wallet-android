@@ -420,6 +420,9 @@ internal class HomeActivity : AppCompatActivity(),
         EventBus.subscribe<Event.Contact.ContactAddedOrUpdated>(this) {
             onContactAddedOrUpdated(it.contactPublicKey, it.contactAlias)
         }
+        EventBus.subscribe<Event.Contact.ContactRemoved>(this) {
+            onContactRemoved(it.contactPublicKey)
+        }
     }
 
     // endregion
@@ -482,6 +485,19 @@ internal class HomeActivity : AppCompatActivity(),
         }.forEach {
             it.user = contact
         }
+        handler?.post { updateTxListUI() }
+    }
+
+    private fun onContactRemoved(publicKey: PublicKey) {
+        // non-contact user
+        val user = User(publicKey)
+        // update txs
+        (cancelledTxs + pendingInboundTxs + pendingOutboundTxs + completedTxs).filter {
+            it.user.publicKey == publicKey
+        }.forEach {
+            it.user = user
+        }
+        // update UI
         handler?.post { updateTxListUI() }
     }
 
