@@ -36,9 +36,11 @@ import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import com.tari.android.wallet.R
 import com.tari.android.wallet.application.TariWalletApplication
 import com.tari.android.wallet.di.WalletModule
+import com.tari.android.wallet.service.WalletService
 import com.tari.android.wallet.ui.activity.home.HomeActivity
 import com.tari.android.wallet.ui.fragment.onboarding.CreateWalletFragment
 import com.tari.android.wallet.ui.fragment.onboarding.IntroductionFragment
@@ -79,6 +81,11 @@ internal class OnboardingFlowActivity : AppCompatActivity(), IntroductionFragmen
                     .commitNow()
             }
             sharedPrefsWrapper.onboardingWasInterrupted -> {
+                // start wallet service
+                ContextCompat.startForegroundService(
+                    applicationContext,
+                    Intent(applicationContext, WalletService::class.java)
+                )
                 // clean existing files & restart onboarding
                 WalletUtil.clearWalletFiles(walletFilesDirPath)
                 supportFragmentManager

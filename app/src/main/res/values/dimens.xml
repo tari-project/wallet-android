@@ -2,18 +2,22 @@
 <resources>
 
     <!-- common -->
+    <dimen name="common_horizontal_margin">15dp</dimen>
     <dimen name="common_header_height">64dp</dimen>
     <dimen name="common_scroll_height_gradient_height">10dp</dimen>
-    <dimen name="common_action_button_height">54dp</dimen>
+    <dimen name="common_action_button_height">50dp</dimen>
     <dimen name="common_view_elevation">4dp</dimen>
-    <dimen name="common_horizontal_margin">25dp</dimen>
     <dimen name="common_dialog_horizontal_margin">14dp</dimen>
     <dimen name="common_dialog_bottom_margin">24dp</dimen>
     <dimen name="common_copy_emoji_id_button_visible_bottom_margin">-56dp</dimen>
+    <dimen name="common_network_and_version_info_text_size">8sp</dimen>
 
-    <!-- emoji id & emoji id summary -->
+    <!-- onboarding -->
+    <dimen name="onboarding_bottom_progress_bar_bottom_margin">10dp</dimen>
     <dimen name="onboarding_emoji_id_container_horizontal_padding">12dp</dimen>
     <dimen name="onboarding_emoji_id_container_vertical_padding">14dp</dimen>
+
+    <!-- emoji id & emoji id summary -->
     <dimen name="emoji_id_container_horizontal_padding">14dp</dimen>
     <dimen name="emoji_id_container_vertical_padding">10dp</dimen>
     <dimen name="emoji_id_summary_letter_spacing">3dp</dimen>
@@ -27,12 +31,14 @@
 
     <!-- onboarding -->
     <dimen name="onboarding_see_full_emoji_id_button_visible_top_margin">-56dp</dimen>
+    <dimen name="onboarding_small_gem_top_margin">30dp</dimen>
     <!-- introduction -->
-    <dimen name="introduction_tari_logo_initial_margin_top">40dp</dimen>
-    <dimen name="introduction_create_wallet_button_margin_top">30dp</dimen>
+    <dimen name="introduction_header_text_size">20sp</dimen>
+    <dimen name="introduction_tari_logo_initial_margin_top">25dp</dimen>
+    <dimen name="introduction_create_wallet_button_margin_top">20dp</dimen>
     <dimen name="introduction_user_agreement_and_privacy_policy_margin_top">20dp</dimen>
     <dimen name="introduction_small_gem_margin_top">20dp</dimen>
-    <dimen name="introduction_network_margin_bottom">30dp</dimen>
+    <dimen name="introduction_network_margin_bottom">20dp</dimen>
 
     <!-- home -->
     <dimen name="home_top_content_container_view_top_margin">45dp</dimen>
@@ -48,37 +54,65 @@
     <dimen name="home_balance_digit_decimal_text_size">16sp</dimen>
     <dimen name="home_balance_digit_decimal_height">20dp</dimen>
     <dimen name="home_send_tari_button_width">159dp</dimen>
-    <dimen name="home_send_tari_button_visible_bottom_margin">38dp</dimen>
+    <dimen name="home_send_tari_button_visible_bottom_margin">25dp</dimen>
     <dimen name="home_send_tari_button_hidden_bottom_margin">-100dp</dimen>
     <dimen name="home_send_tari_button_initial_bottom_margin">-150dp</dimen>
     <dimen name="home_main_content_top_margin">6dp</dimen>
     <dimen name="home_dialog_testnet_tari_dialog_margin">14dp</dimen>
     <dimen name="home_wallet_info_button_initial_top_margin">40dp</dimen>
 
+    <!-- home swipe refresh -->
     <dimen name="home_swipe_refresh_max_scroll_y">180dp</dimen>
-    <dimen name="home_swipe_refresh_progress_view_height">48dp</dimen>
-    <dimen name="home_swipe_refresh_progress_view_container_height">88dp</dimen>
-    <dimen name="home_swipe_refresh_progress_view_content_invisible_top_margin">-48dp</dimen>
-    <dimen name="home_swipe_refresh_progress_view_content_visible_top_margin">20dp</dimen>
+    <dimen name="home_swipe_refresh_progress_view_height">44dp</dimen>
+    <dimen name="home_swipe_refresh_progress_view_container_height">68dp</dimen>
+    <dimen name="home_swipe_refresh_progress_view_content_invisible_top_margin">-44dp</dimen>
+    <dimen name="home_swipe_refresh_progress_view_content_visible_top_margin">12dp</dimen>
+    
+    <!-- home TTL store dialog -->
+    <dimen name="home_ttl_store_dialog_desc_top_margin">16dp</dimen>
+    <dimen name="home_ttl_store_dialog_visit_button_top_margin">24dp</dimen>
+    <dimen name="home_ttl_store_dialog_cancel_button_top_margin">8dp</dimen>
+    <dimen name="home_ttl_store_dialog_padding_bottom">12dp</dimen>
 
-    <dimen name="create_wallet_button_bottom_margin">36dp</dimen>
+
+    <dimen name="create_wallet_button_bottom_margin">25dp</dimen>
     <dimen name="home_tx_list_item_height">74dp</dimen>
 
+    <!-- tx details -->
+    <dimen name="tx_details_header_bottom_padding">13dp</dimen>
+    <dimen name="tx_details_tx_id_bottom_margin">12dp</dimen>
+    <dimen name="tx_details_amount_section_vertical_padding">20dp</dimen>
+    <dimen name="tx_details_contact_name_top_margin">24dp</dimen>
+    <dimen name="tx_details_contact_name_underline_top_margin">8dp</dimen>
+    <dimen name="tx_details_note_top_margin">20dp</dimen>
+    <dimen name="tx_details_tx_id_text_size">9sp</dimen>
+
+    <!-- send tari - common -->
+    <dimen name="header_top_inset">12dp</dimen>
     <!-- send tari - add recipient -->
-    <dimen name="add_recipient_search_bar_container_height">96dp</dimen>
+    <dimen name="add_recipient_search_bar_container_height">84dp</dimen>
     <dimen name="add_recipient_search_text_view_height">50dp</dimen>
     <dimen name="add_recipient_contact_list_item_height">68dp</dimen>
     <dimen name="add_recipient_clipboard_emoji_id_container_height">60dp</dimen>
     <dimen name="add_recipient_paste_emoji_id_button_visible_top_margin">-56dp</dimen>
     <!-- send tari - add amount -->
+    <dimen name="add_amount_element_text_size">55sp</dimen>
+    <dimen name="add_amount_keypad_row_height">41dp</dimen>
+    <dimen name="add_amount_keypad_text_size">24sp</dimen>
     <dimen name="add_amount_element_container_translation_y">9dp</dimen>
-    <dimen name="add_amount_element_text_size">70sp</dimen>
     <dimen name="add_amount_gem_size">21dp</dimen>
     <dimen name="add_amount_leftmost_digit_margin_start">10dp</dimen>
     <dimen name="add_amount_available_balance_error_amount_nudge_distance">40dp</dimen>
+    <dimen name="add_amount_balance_text_size">13sp</dimen>
+    <dimen name="add_amount_tx_fee_text_size">12sp</dimen>
+    <dimen name="add_amount_balance_warning_container_top_margin">2dp</dimen>
+    <dimen name="add_amount_balance_warning_container_top_padding">8dp</dimen>
+    <dimen name="add_amount_balance_warning_container_bottom_padding">6dp</dimen>
     <!-- send tari - add note -->
     <dimen name="add_note_slide_button_left_margin">5dp</dimen>
     <dimen name="add_note_slide_button_width">43dp</dimen>
+    <dimen name="add_note_prompt_text_size">12sp</dimen>
+    <dimen name="add_note_note_text_size">16sp</dimen>
     <!-- auth -->
     <dimen name="auth_button_bottom_margin">25dp</dimen>
 
@@ -86,7 +120,6 @@
     <dimen name="wallet_info_container_qr_code_size">278dp</dimen>
     <dimen name="wallet_info_img_qr_code_size">400dp</dimen>
     <dimen name="back_button_size">50dp</dimen>
-    <dimen name="header_top_inset">24dp</dimen>
 
     <!-- In-app store -->
     <dimen name="store_title_text_size">14sp</dimen>

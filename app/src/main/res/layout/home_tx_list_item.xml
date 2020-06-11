@@ -10,8 +10,7 @@
     android:focusable="true"
     android:gravity="center_vertical"
     android:orientation="horizontal"
-    android:paddingStart="25dp"
-    android:paddingEnd="25dp">
+    android:paddingHorizontal="@dimen/common_horizontal_margin">
 
     <ImageView
         android:id="@+id/tx_item_icon_image_view"

@@ -86,56 +86,60 @@
             android:layout_height="0dp"
             android:layout_weight="1">
 
-            <LinearLayout
-                android:id="@+id/not_enough_balance_view"
+            <RelativeLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="25dp"
-                android:layout_marginTop="8dp"
-                android:layout_marginEnd="25dp"
-                android:background="@drawable/validation_error_box_border_bg"
-                android:gravity="center"
-                android:orientation="vertical"
-                android:paddingTop="12dp"
-                android:paddingBottom="10dp">
-
+                android:layout_height="0dp"
+                android:layout_alignParentTop="true"
+                android:layout_above="@id/element_container_view">
                 <LinearLayout
+                    android:id="@+id/not_enough_balance_view"
                     android:layout_width="match_parent"
+                    android:layout_marginTop="@dimen/add_amount_balance_warning_container_top_margin"
                     android:layout_height="wrap_content"
+                    android:layout_marginStart="25dp"
+                    android:layout_marginEnd="25dp"
+                    android:background="@drawable/validation_error_box_border_bg"
                     android:gravity="center"
-                    android:orientation="horizontal">
-
-                    <ImageView
-                        android:layout_width="wrap_content"
+                    android:orientation="vertical"
+                    android:paddingTop="@dimen/add_amount_balance_warning_container_top_padding"
+                    android:paddingBottom="@dimen/add_amount_balance_warning_container_bottom_padding"
+                    tools:ignore="UselessParent">
+                    <LinearLayout
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:contentDescription="@null"
-                        android:src="@drawable/gem_not_enough_balance" />
-
+                        android:gravity="center"
+                        android:orientation="horizontal">
+                        <ImageView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:contentDescription="@null"
+                            android:src="@drawable/gem_not_enough_balance" />
+                        <com.tari.android.wallet.ui.component.CustomFontTextView
+                            android:id="@+id/available_balance_text_view"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="4dp"
+                            android:ellipsize="middle"
+                            android:singleLine="true"
+                            android:textColor="@color/common_error"
+                            android:textSize="@dimen/add_amount_balance_text_size"
+                            app:customFont="AVENIR_LT_STD_HEAVY"
+                            tools:text="124.56" />
+                    </LinearLayout>
                     <com.tari.android.wallet.ui.component.CustomFontTextView
-                        android:id="@+id/available_balance_text_view"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="4dp"
+                        android:layout_marginEnd="4dp"
+                        android:layout_marginTop="4dp"
                         android:ellipsize="middle"
                         android:singleLine="true"
-                        android:textColor="@color/common_error"
-                        android:textSize="14sp"
-                        app:customFont="AVENIR_LT_STD_HEAVY"
-                        tools:text="124.56" />
+                        android:text="@string/add_amount_not_enough_available_balance"
+                        android:textColor="#3C393D"
+                        android:textSize="@dimen/add_amount_tx_fee_text_size"
+                        app:customFont="AVENIR_LT_STD_ROMAN" />
                 </LinearLayout>
-
-                <com.tari.android.wallet.ui.component.CustomFontTextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="4dp"
-                    android:layout_marginTop="4dp"
-                    android:ellipsize="middle"
-                    android:singleLine="true"
-                    android:text="@string/add_amount_not_enough_available_balance"
-                    android:textColor="#3C393D"
-                    android:textSize="13sp"
-                    app:customFont="AVENIR_LT_STD_ROMAN" />
-            </LinearLayout>
+            </RelativeLayout>
 
             <!-- amount -->
             <LinearLayout
@@ -189,7 +193,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
                     android:textColor="@color/black"
-                    android:textSize="13sp"
+                    android:textSize="@dimen/add_amount_tx_fee_text_size"
                     app:customFont="AVENIR_LT_STD_HEAVY"
                     tools:text="+63.75"/>
                 <!-- description -->
@@ -202,7 +206,7 @@
                     android:drawablePadding="4dp"
                     android:text="@string/add_amount_tx_fee"
                     android:textColor="#A9AFC4"
-                    android:textSize="13sp"
+                    android:textSize="@dimen/add_amount_tx_fee_text_size"
                     app:customFont="AVENIR_LT_STD_HEAVY" />
             </LinearLayout>
         </RelativeLayout>
@@ -218,7 +222,7 @@
             <!-- num pad :: first line -->
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="62dp"
+                android:layout_height="@dimen/add_amount_keypad_row_height"
                 android:orientation="horizontal">
                 <!-- digit 1 -->
                 <com.tari.android.wallet.ui.component.CustomFontButton
@@ -229,7 +233,7 @@
                     android:background="@color/transparent"
                     android:text="@string/digit_1"
                     android:textColor="@color/black"
-                    android:textSize="36sp"
+                    android:textSize="@dimen/add_amount_keypad_text_size"
                     app:customFont="AVENIR_LT_STD_HEAVY" />
                 <!-- digit 2 -->
                 <com.tari.android.wallet.ui.component.CustomFontButton
@@ -240,7 +244,7 @@
                     android:background="@color/transparent"
                     android:text="@string/digit_2"
                     android:textColor="@color/black"
-                    android:textSize="36sp"
+                    android:textSize="@dimen/add_amount_keypad_text_size"
                     app:customFont="AVENIR_LT_STD_HEAVY" />
                 <!-- digit 3 -->
                 <com.tari.android.wallet.ui.component.CustomFontButton
@@ -251,14 +255,14 @@
                     android:background="@color/transparent"
                     android:text="@string/digit_3"
                     android:textColor="@color/black"
-                    android:textSize="36sp"
+                    android:textSize="@dimen/add_amount_keypad_text_size"
                     app:customFont="AVENIR_LT_STD_HEAVY" />
             </LinearLayout>
 
             <!-- num pad :: second line -->
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="62dp"
+                android:layout_height="@dimen/add_amount_keypad_row_height"
                 android:orientation="horizontal">
                 <!-- digit 4 -->
                 <com.tari.android.wallet.ui.component.CustomFontButton
@@ -269,7 +273,7 @@
                     android:background="@color/transparent"
                     android:text="@string/digit_4"
                     android:textColor="@color/black"
-                    android:textSize="36sp"
+                    android:textSize="@dimen/add_amount_keypad_text_size"
                     app:customFont="AVENIR_LT_STD_HEAVY" />
                 <!-- digit 5 -->
                 <com.tari.android.wallet.ui.component.CustomFontButton
@@ -280,7 +284,7 @@
                     android:background="@color/transparent"
                     android:text="@string/digit_5"
                     android:textColor="@color/black"
-                    android:textSize="36sp"
+                    android:textSize="@dimen/add_amount_keypad_text_size"
                     app:customFont="AVENIR_LT_STD_HEAVY" />
                 <!-- digit 6 -->
                 <com.tari.android.wallet.ui.component.CustomFontButton
@@ -291,14 +295,14 @@
                     android:background="@color/transparent"
                     android:text="@string/digit_6"
                     android:textColor="@color/black"
-                    android:textSize="36sp"
+                    android:textSize="@dimen/add_amount_keypad_text_size"
                     app:customFont="AVENIR_LT_STD_HEAVY" />
             </LinearLayout>
 
             <!-- num pad :: third line -->
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="62dp"
+                android:layout_height="@dimen/add_amount_keypad_row_height"
                 android:orientation="horizontal">
                 <!-- digit 7 -->
                 <com.tari.android.wallet.ui.component.CustomFontButton
@@ -309,7 +313,7 @@
                     android:background="@color/transparent"
                     android:text="@string/digit_7"
                     android:textColor="@color/black"
-                    android:textSize="36sp"
+                    android:textSize="@dimen/add_amount_keypad_text_size"
                     app:customFont="AVENIR_LT_STD_HEAVY" />
                 <!-- digit 8 -->
                 <com.tari.android.wallet.ui.component.CustomFontButton
@@ -320,7 +324,7 @@
                     android:background="@color/transparent"
                     android:text="@string/digit_8"
                     android:textColor="@color/black"
-                    android:textSize="36sp"
+                    android:textSize="@dimen/add_amount_keypad_text_size"
                     app:customFont="AVENIR_LT_STD_HEAVY" />
                 <!-- digit 9 -->
                 <com.tari.android.wallet.ui.component.CustomFontButton
@@ -331,14 +335,14 @@
                     android:background="@color/transparent"
                     android:text="@string/digit_9"
                     android:textColor="@color/black"
-                    android:textSize="36sp"
+                    android:textSize="@dimen/add_amount_keypad_text_size"
                     app:customFont="AVENIR_LT_STD_HEAVY" />
             </LinearLayout>
 
             <!-- num pad :: fourth line -->
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="62dp"
+                android:layout_height="@dimen/add_amount_keypad_row_height"
                 android:orientation="horizontal">
                 <!-- decimal separator -->
                 <com.tari.android.wallet.ui.component.CustomFontButton
@@ -349,7 +353,7 @@
                     android:background="@color/transparent"
                     android:text="@string/digit_decimal_separator_bullet_char"
                     android:textColor="@color/black"
-                    android:textSize="36sp"
+                    android:textSize="@dimen/add_amount_keypad_text_size"
                     app:customFont="AVENIR_LT_STD_HEAVY" />
                 <!-- digit 0 -->
                 <com.tari.android.wallet.ui.component.CustomFontButton
@@ -360,7 +364,7 @@
                     android:background="@color/transparent"
                     android:text="@string/digit_0"
                     android:textColor="@color/black"
-                    android:textSize="36sp"
+                    android:textSize="@dimen/add_amount_keypad_text_size"
                     app:customFont="AVENIR_LT_STD_HEAVY" />
                 <!-- delete -->
                 <ImageButton
@@ -380,7 +384,7 @@
             android:layout_marginStart="0dp"
             android:layout_marginTop="20dp"
             android:layout_marginEnd="0dp"
-            android:layout_marginBottom="30dp">
+            android:layout_marginBottom="10dp">
 
             <!-- disabled -->
             <com.tari.android.wallet.ui.component.CustomFontButton
@@ -388,8 +392,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/common_action_button_height"
                 android:layout_centerVertical="true"
-                android:layout_marginStart="25dp"
-                android:layout_marginEnd="25dp"
+                android:layout_marginHorizontal="@dimen/common_horizontal_margin"
                 android:background="@drawable/disabled_button_bg"
                 android:clickable="false"
                 android:focusable="false"
