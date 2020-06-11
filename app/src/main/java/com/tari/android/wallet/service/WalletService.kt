@@ -296,7 +296,7 @@ internal class WalletService : Service(), FFIWalletListenerAdapter {
                 Logger.i("Posting cancellation notification")
                 notificationHelper.postTxCanceledNotification(it)
             }
-            listeners.iterator().forEach { listener ->  listener.onTxCancellation(it) }
+            listeners.iterator().forEach { listener -> listener.onTxCancellation(it) }
         }
     }
 
@@ -862,22 +862,11 @@ internal class WalletService : Service(), FFIWalletListenerAdapter {
 
             // get public key
             val error = WalletError()
-            val publicKeyHexString = getPublicKeyHexString(error)
             if (error.code != WalletErrorCode.NO_ERROR) {
                 throw FFIException(message = error.message)
             }
 
-            if (publicKeyHexString == destinationPublicKeyFFI.toString()) {
-                direction = INBOUND
-                val userPublicKey = PublicKey(
-                    sourcePublicKeyFFI.toString(),
-                    sourcePublicKeyFFI.getEmojiNodeId()
-                )
-                user = getContactByPublicKeyHexString(
-                    allContacts,
-                    sourcePublicKeyFFI.toString()
-                ) ?: User(userPublicKey)
-            } else {
+            if (wallet.isCompletedTxOutbound(completedTxFFI)) {
                 direction = OUTBOUND
                 val userPublicKey = PublicKey(
                     destinationPublicKeyFFI.toString(),
@@ -887,7 +876,18 @@ internal class WalletService : Service(), FFIWalletListenerAdapter {
                     allContacts,
                     destinationPublicKeyFFI.toString()
                 ) ?: User(userPublicKey)
+            } else {
+                direction = INBOUND
+                val userPublicKey = PublicKey(
+                    sourcePublicKeyFFI.toString(),
+                    sourcePublicKeyFFI.getEmojiNodeId()
+                )
+                user = getContactByPublicKeyHexString(
+                    allContacts,
+                    sourcePublicKeyFFI.toString()
+                ) ?: User(userPublicKey)
             }
+
             val completedTx = CompletedTx(
                 completedTxFFI.getId(),
                 direction,
@@ -924,22 +924,11 @@ internal class WalletService : Service(), FFIWalletListenerAdapter {
 
             // get public key
             val error = WalletError()
-            val publicKeyHexString = getPublicKeyHexString(error)
             if (error.code != WalletErrorCode.NO_ERROR) {
                 throw FFIException(message = error.message)
             }
 
-            if (publicKeyHexString == destinationPublicKeyFFI.toString()) {
-                direction = INBOUND
-                val userPublicKey = PublicKey(
-                    sourcePublicKeyFFI.toString(),
-                    sourcePublicKeyFFI.getEmojiNodeId()
-                )
-                user = getContactByPublicKeyHexString(
-                    allContacts,
-                    sourcePublicKeyFFI.toString()
-                ) ?: User(userPublicKey)
-            } else {
+            if (wallet.isCompletedTxOutbound(completedTxFFI)) {
                 direction = OUTBOUND
                 val userPublicKey = PublicKey(
                     destinationPublicKeyFFI.toString(),
@@ -948,6 +937,16 @@ internal class WalletService : Service(), FFIWalletListenerAdapter {
                 user = getContactByPublicKeyHexString(
                     allContacts,
                     destinationPublicKeyFFI.toString()
+                ) ?: User(userPublicKey)
+            } else {
+                direction = INBOUND
+                val userPublicKey = PublicKey(
+                    sourcePublicKeyFFI.toString(),
+                    sourcePublicKeyFFI.getEmojiNodeId()
+                )
+                user = getContactByPublicKeyHexString(
+                    allContacts,
+                    sourcePublicKeyFFI.toString()
                 ) ?: User(userPublicKey)
             }
             val tx = CancelledTx(
