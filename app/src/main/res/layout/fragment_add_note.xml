@@ -74,10 +74,9 @@
     <LinearLayout
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginStart="25dp"
-        android:layout_marginTop="25dp"
-        android:layout_marginEnd="25dp"
-        android:layout_marginBottom="25dp"
+        android:layout_marginHorizontal="@dimen/common_horizontal_margin"
+        android:layout_marginTop="@dimen/common_horizontal_margin"
+        android:layout_marginBottom="@dimen/common_horizontal_margin"
         android:orientation="vertical"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -91,7 +90,7 @@
             android:singleLine="true"
             android:text="@string/add_note_prompt"
             android:textColor="@color/black"
-            android:textSize="16sp"
+            android:textSize="@dimen/add_note_prompt_text_size"
             app:customFont="AVENIR_LT_STD_HEAVY" />
 
         <com.tari.android.wallet.ui.component.CustomFontEditText
@@ -107,7 +106,7 @@
             android:lineSpacingExtra="10dp"
             android:scrollHorizontally="false"
             android:singleLine="false"
-            android:textSize="20sp"
+            android:textSize="@dimen/add_note_note_text_size"
             app:customFont="AVENIR_LT_STD_MEDIUM" />
 
         <!-- slide button container -->
@@ -115,7 +114,7 @@
             android:id="@+id/slide_button_container_view"
             android:layout_width="match_parent"
             android:layout_height="53dp"
-            android:layout_marginTop="25dp"
+            android:layout_marginTop="@dimen/common_horizontal_margin"
             android:background="@color/transparent"
             android:clipChildren="false">
 

@@ -76,8 +76,7 @@
             android:layout_width="match_parent"
             android:layout_height="@dimen/add_recipient_search_text_view_height"
             android:layout_centerInParent="true"
-            android:layout_marginStart="25dp"
-            android:layout_marginEnd="25dp"
+            android:layout_marginHorizontal="@dimen/common_horizontal_margin"
             android:background="@drawable/add_recipient_search_bg"
             android:elevation="@dimen/common_view_elevation">
 
@@ -284,8 +283,8 @@
         android:layout_height="@dimen/common_action_button_height"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginHorizontal="25dp"
-        android:layout_marginBottom="40dp"
+        android:layout_marginHorizontal="@dimen/common_horizontal_margin"
+        android:layout_marginBottom="@dimen/common_horizontal_margin"
         android:background="@drawable/gradient_button_bg"
         android:ellipsize="middle"
         android:singleLine="true"

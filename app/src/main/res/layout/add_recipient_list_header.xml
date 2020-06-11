@@ -5,8 +5,7 @@
     android:layout_height="wrap_content"
     android:background="@color/transparent"
     android:orientation="vertical"
-    android:paddingStart="25dp"
-    android:paddingEnd="25dp">
+    android:paddingHorizontal="@dimen/common_horizontal_margin">
 
     <!-- separator -->
     <View

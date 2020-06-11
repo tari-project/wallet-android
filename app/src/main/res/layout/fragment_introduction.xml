@@ -61,7 +61,7 @@
             android:letterSpacing="0.02"
             android:text="@string/introduction_crypto_wallet_title_text_line_1"
             android:textColor="@color/white"
-            android:textSize="30sp"
+            android:textSize="@dimen/introduction_header_text_size"
             app:customFont="AVENIR_LT_STD_BLACK" />
     </RelativeLayout>
 
@@ -79,7 +79,7 @@
             android:letterSpacing="0.02"
             android:text="@string/introduction_crypto_wallet_title_text_line_2"
             android:textColor="@color/white"
-            android:textSize="30sp"
+            android:textSize="@dimen/introduction_header_text_size"
             app:customFont="AVENIR_LT_STD_BLACK" />
     </RelativeLayout>
 
@@ -150,7 +150,7 @@
         android:background="@color/black"
         android:letterSpacing="0.1"
         android:textColor="#50FFFFFF"
-        android:textSize="9sp"
+        android:textSize="@dimen/common_network_and_version_info_text_size"
         app:customFont="AVENIR_LT_STD_HEAVY"
         tools:ignore="SmallSp" />
 

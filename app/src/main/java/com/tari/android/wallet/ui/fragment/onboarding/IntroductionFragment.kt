@@ -260,7 +260,6 @@ internal class IntroductionFragment : Fragment() {
 
     private fun startWalletService() {
         // start the wallet service
-        applicationContext
         ContextCompat.startForegroundService(
             applicationContext,
             Intent(applicationContext, WalletService::class.java)
