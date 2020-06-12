@@ -46,7 +46,10 @@ add_library(
         jniPendingOutboundTransaction.cpp
         jniCollections.cpp
         jniWallet.cpp
+        jniSeedWords.cpp
+        jniEmojiSet.cpp
 )
+
 find_library(
         log-lib
         log
