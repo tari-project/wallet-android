@@ -64,5 +64,5 @@ target_link_libraries(
         android
         wallet
         ${log-lib}
+        "-Wl,--allow-multiple-definition"
 )
-

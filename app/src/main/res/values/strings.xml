@@ -172,6 +172,10 @@
     <string name="add_recipient_scan_qr_description">Scan a Tari QR code\nto send tXTR to the recipient.</string>
     <string name="add_recipient_failed_init_camera_message">Failed to initialize Camera</string>
     <string name="add_recipient_camera_permission_denied_message">Camera permission denied</string>
+    <!-- incompatible emoji id dialog -->
+    <string name="add_recipient_incompatible_emoji_id">Incompatible Emoji Id</string>
+    <string name="add_recipient_incompatible_emoji_id_desc">Emoji ID in your clipboard is from an older version. Your recipient needs to upgrade to the latest version of Tari Aurora and copy their updated Emoji ID to transact with you.</string>
+    <string name="add_recipient_incompatible_emoji_id_desc_short">Your recipient needs to upgrade to the latest version of Tari Aurora and copy their updated Emoji ID to transact with you.</string>
 
     <!-- send tari - amount -->
     <string name="add_amount_under_construction">Under Construction</string>

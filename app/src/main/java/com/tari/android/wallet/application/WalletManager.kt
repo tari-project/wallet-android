@@ -182,7 +182,7 @@ internal class WalletManager(
      * Returns the list of base nodes in the resource file base_nodes.txt as pairs of
      * ({public_key_hex}, {public_address}).
      */
-    private fun getBaseNodeList(): List<Pair<String, String>> {
+    private val baseNodeList by lazy {
         val fileContent = IOUtils.toString(
             context.resources.openRawResource(R.raw.base_nodes),
             "UTF-8"
@@ -198,15 +198,15 @@ internal class WalletManager(
                 )
             )
         }
-        return baseNodes
+        baseNodes
     }
 
     /**
      * Select a base node randomly from the list of base nodes in base_nodes.tx, and sets
      * the wallet and stored the values in shared prefs.
      */
-    private fun setBaseNode() {
-        val randomBaseNode = getBaseNodeList().random()
+    private fun setRandomBaseNode() {
+        val randomBaseNode = baseNodeList.random()
         val publicKeyHex = randomBaseNode.first
         val address = randomBaseNode.second
         sharedPrefsWrapper.baseNodePublicKeyHex = publicKeyHex
@@ -253,7 +253,7 @@ internal class WalletManager(
             FFIWallet.instance = wallet
             sharedPrefsWrapper.torIdentity = wallet.getTorIdentity()
             startLogFileObserver()
-            setBaseNode()
+            setRandomBaseNode()
             saveWalletPublicKeyHexToSharedPrefs()
         }
     }

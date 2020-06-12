@@ -115,7 +115,7 @@ Properties loadSecretProps() {
     return properties
 }
 
-preBuild.dependsOn("downloadJNIBinaries")
+// preBuild.dependsOn("downloadJNIBinaries")
 
 dependencies {
     // kotlin

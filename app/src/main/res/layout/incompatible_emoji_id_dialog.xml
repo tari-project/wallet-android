@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginLeft="@dimen/home_dialog_testnet_tari_dialog_margin"
+    android:layout_marginRight="@dimen/home_dialog_testnet_tari_dialog_margin"
+    android:layout_marginBottom="23dp"
+    android:background="@drawable/bottom_dialog_bg"
+    android:orientation="vertical">
+
+    <com.tari.android.wallet.ui.component.CustomFontTextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="40dp"
+        android:layout_marginBottom="16dp"
+        android:gravity="center"
+        android:text="@string/add_recipient_incompatible_emoji_id"
+        android:textColor="@color/black"
+        android:textSize="18sp"
+        app:customFont="AVENIR_LT_STD_LIGHT" />
+
+    <com.tari.android.wallet.ui.component.CustomFontTextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:gravity="center"
+        android:letterSpacing="0.01"
+        android:lineSpacingExtra="10dp"
+        android:paddingLeft="32dp"
+        android:paddingRight="32dp"
+        android:text="@string/add_recipient_incompatible_emoji_id_desc"
+        android:textColor="@color/dark_gray"
+        android:textSize="14sp"
+        app:customFont="AVENIR_LT_STD_MEDIUM" />
+
+    <com.tari.android.wallet.ui.component.CustomFontTextView
+        android:id="@+id/incompatible_emoji_id_dialog_txt_close"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginBottom="20dp"
+        android:gravity="center"
+        android:padding="10dp"
+        android:layout_marginTop="14dp"
+        android:text="@string/common_close"
+        android:textColor="@color/dialog_cancel_action"
+        android:textSize="13sp"
+        app:customFont="AVENIR_LT_STD_HEAVY" />
+
+</LinearLayout>
