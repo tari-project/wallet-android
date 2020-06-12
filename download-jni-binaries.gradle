@@ -1,6 +1,6 @@
 ext {
     jniLibsVersion = "0.11.0"
-    jniLibsHostURL = "https://www.tari.com/binaries/"
+    jniLibsHostURL = "https://tari-binaries.s3.amazonaws.com/libwallet/"
     supportedABIs = ["arm64-v8a", "armeabi-v7a", "x86_64"]
 }
 
@@ -14,7 +14,7 @@ task downloadJNIBinaries  {
     doLast {
         logger.info("Downloading binaries with version $jniLibsVersion")
         final def binaryArchives = supportedABIs.collect {
-            "libwallet-${it}-${jniLibsVersion}.tar.gz"
+            "libwallet-${it}-libwallet-${jniLibsVersion}.tar.gz"
         }
         delete {
             delete fileTree(binariesDir)

@@ -36,22 +36,16 @@ import android.text.SpannableString
 import android.text.Spanned
 import android.text.style.ForegroundColorSpan
 import android.icu.text.BreakIterator
+import com.orhanobut.logger.Logger
 import com.tari.android.wallet.extension.applyColorStyle
 import com.tari.android.wallet.extension.applyLetterSpacingStyle
 import com.tari.android.wallet.extension.applyRelativeTextSizeStyle
-
-/**
- * @return true if the string is emoji-only and the length is equal to the emoji-id length
- */
-internal fun String.isPossiblyEmojiId(): Boolean {
-    return !this.containsNonEmoji()
-            && this.numberOfEmojis() == Constants.Wallet.emojiIdLength
-}
+import com.tari.android.wallet.ffi.FFIEmojiSet
 
 /**
  * Number of emojis from the Tari emoji set in a string.
  */
-internal fun String.numberOfEmojis(): Int {
+internal fun String.numberOfEmojis(emojiSet: Set<String> = EmojiUtil.emojiSet): Int {
     val it: BreakIterator = BreakIterator.getCharacterInstance()
     it.setText(this)
     var emojiCount = 0
@@ -62,7 +56,7 @@ internal fun String.numberOfEmojis(): Int {
             codepointBuilder.append(this[i])
         }
         val codepoint = codepointBuilder.toString()
-        if (EmojiUtil.emojiSet.contains(codepoint)) {
+        if (emojiSet.contains(codepoint)) {
             emojiCount++
         }
         previous = it.current()
@@ -74,7 +68,7 @@ internal fun String.numberOfEmojis(): Int {
 /**
  * @return true if there is at least 1 character that is not included in the Tari emoji set.
  */
-internal fun String.containsNonEmoji(): Boolean {
+internal fun String.containsNonEmoji(emojiSet: Set<String> = EmojiUtil.emojiSet): Boolean {
     // iterate through the string
     val it: BreakIterator = BreakIterator.getCharacterInstance()
     it.setText(this)
@@ -85,7 +79,7 @@ internal fun String.containsNonEmoji(): Boolean {
             codepointBuilder.append(this[i])
         }
         val codepoint = codepointBuilder.toString()
-        if (!EmojiUtil.emojiSet.contains(codepoint)) {
+        if (!emojiSet.contains(codepoint)) {
             return true
         }
         previous = it.current()
@@ -98,7 +92,7 @@ internal fun String.containsNonEmoji(): Boolean {
 /**
  * @return emojis in the string that are from the Tari emoji set
  */
-internal fun String.extractEmojis(): List<String> {
+internal fun String.extractEmojis(emojiSet: Set<String> = EmojiUtil.emojiSet): List<String> {
     // iterate through the codepoints
     val it: BreakIterator = BreakIterator.getCharacterInstance()
     it.setText(this)
@@ -110,7 +104,7 @@ internal fun String.extractEmojis(): List<String> {
             codepointBuilder.append(this[i])
         }
         val codepoint = codepointBuilder.toString()
-        if (EmojiUtil.emojiSet.contains(codepoint)) {
+        if (emojiSet.contains(codepoint)) {
             emojis.add(codepoint)
         }
         codepointBuilder.clear()
@@ -123,7 +117,7 @@ internal fun String.extractEmojis(): List<String> {
  * Checks whether a given number of first characters of the string are emojis from the Tari
  * emoji set.
  */
-internal fun String.firstNCharactersAreEmojis(n: Int): Boolean {
+internal fun String.firstNCharactersAreEmojis(n: Int, emojiSet: Set<String> = EmojiUtil.emojiSet): Boolean {
     // iterate through the string
     val it: BreakIterator = BreakIterator.getCharacterInstance()
     it.setText(this)
@@ -135,7 +129,7 @@ internal fun String.firstNCharactersAreEmojis(n: Int): Boolean {
             codepointBuilder.append(this[i])
         }
         val codepoint = codepointBuilder.toString()
-        if (EmojiUtil.emojiSet.contains(codepoint)) {
+        if (emojiSet.contains(codepoint)) {
             if (++emojiCount >= n) {
                 return true
             }
@@ -158,7 +152,7 @@ internal class EmojiUtil {
 
     companion object {
 
-        val emojiSet = setOf(
+        val oldEmojiSet = setOf(
             "😀", "😂", "🤣", "😉", "😊", "😎", "😍", "😘", "🤗", "🤩", "🤔", "🙄", "😮", "🤐", "😴", "😛", "🤤", "🙃", "🤑",
             "😤", "😨", "🤯", "😬", "😱", "🤪", "😵", "😷", "🤢", "🤮", "🤠", "🤡", "🤫", "🤭", "🤓", "😈", "👻", "👽", "🤖",
             "💩", "😺", "👶", "👩", "👨", "👮", "🤴", "👸", "🧜", "🙅", "🙋", "🤦", "🤷", "💇", "🏃", "💃", "🧗", "🛀", "🛌",
@@ -174,6 +168,20 @@ internal class EmojiUtil {
             "📝", "📅", "📌", "📎", "🔒", "🔑", "🔨", "🏹", "🔧", "💉", "💊", "🏧", "⛔", "🚫", "✅", "❌", "❓", "❕", "💯",
             "🆗", "🆘", "⬛", "🔶", "🔵", "🏁", "🚩", "🎌", "🏴"
         )
+
+        val emojiSet by lazy {
+                val emojis = mutableSetOf<String>()
+                val emojiSetFFI = FFIEmojiSet()
+                for (i in 0 until emojiSetFFI.getLength()) {
+                    val emojiFFI = emojiSetFFI.getAt(i)
+                    val emojiBytes = emojiFFI.getBytes()
+                    val emoji = String(emojiBytes)
+                    emojis.add(emoji)
+                    emojiFFI.destroy()
+                }
+                emojiSetFFI.destroy()
+                emojis
+            }
 
         /**
          * Masking-related: get the indices of current chunk separators.

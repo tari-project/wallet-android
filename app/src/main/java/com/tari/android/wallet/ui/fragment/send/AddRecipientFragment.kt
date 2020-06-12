@@ -69,6 +69,7 @@ import com.tari.android.wallet.service.TariWalletService
 import com.tari.android.wallet.service.WalletService
 import com.tari.android.wallet.ui.activity.qr.EXTRA_QR_DATA
 import com.tari.android.wallet.ui.activity.qr.QRScannerActivity
+import com.tari.android.wallet.ui.dialog.BottomSlideDialog
 import com.tari.android.wallet.ui.extension.*
 import com.tari.android.wallet.ui.fragment.send.adapter.RecipientListAdapter
 import com.tari.android.wallet.ui.util.UiUtil
@@ -192,12 +193,20 @@ class AddRecipientFragment : Fragment(),
         setupUi()
         lifecycleScope.launch(Dispatchers.IO) {
             fetchAllData(walletService)
+            val clipboardHasOldEmojiId = checkClipboardForIncompatibleEmojiId()
             withContext(Dispatchers.Main) {
-                displayInitialList()
+                displayInitialList(showKeyboard = !clipboardHasOldEmojiId)
                 ui.searchEditText.setRawInputType(InputType.TYPE_CLASS_TEXT)
                 ui.searchEditText.addTextChangedListener(this@AddRecipientFragment)
             }
-            checkClipboardForValidEmojiId()
+            if (clipboardHasOldEmojiId) {
+                // display warning
+                withContext(Dispatchers.Main) {
+                    displayOldEmojiIdWarning()
+                }
+            } else {
+                checkClipboardForValidEmojiId()
+            }
         }
     }
 
@@ -251,22 +260,31 @@ class AddRecipientFragment : Fragment(),
     }
 
     /**
+     * Checks whether an emoji id from the older version is in the clipboard.
+     */
+    private fun checkClipboardForIncompatibleEmojiId(): Boolean {
+        val clipboardString = clipboardManager.primaryClip?.getItemAt(0)?.text?.toString()
+            ?: return false
+
+        // check for old emoji id
+        val incompatibleEmojis = clipboardString.extractEmojis(emojiSet = EmojiUtil.oldEmojiSet)
+        return incompatibleEmojis.size >= emojiIdLength
+    }
+
+    /**
      * Checks clipboard data for a valid deep link or an emoji id.
      */
     private fun checkClipboardForValidEmojiId() {
         val clipboardString = clipboardManager.primaryClip?.getItemAt(0)?.text?.toString()
             ?: return
+
         val deepLink = DeepLink.from(clipboardString)
-        if (deepLink != null) {
-            // there is a deep link in the clipboard
+        if (deepLink != null) { // there is a deep link in the clipboard
             emojiIdPublicKey = when (deepLink.type) {
                 EMOJI_ID -> walletService.getPublicKeyFromEmojiId(deepLink.identifier)
                 PUBLIC_KEY_HEX -> walletService.getPublicKeyFromHexString(deepLink.identifier)
             }
-        } else if (clipboardString.isPossiblyEmojiId()) { // check if clipboard data is emoji id
-            // there is an emoji id in the clipboard
-            emojiIdPublicKey = walletService.getPublicKeyFromEmojiId(clipboardString)
-        } else { // might be a chunked emoji-id
+        } else { // try to extract a valid emoji id
             val emojis = clipboardString.trim().extractEmojis()
             // search in windows of length = emoji id length
             var currentIndex = emojis.size - emojiIdLength
@@ -421,6 +439,14 @@ class AddRecipientFragment : Fragment(),
         animSet.start()
     }
 
+    private fun displayOldEmojiIdWarning() {
+        BottomSlideDialog(
+            context = activity ?: return,
+            layoutId = R.layout.incompatible_emoji_id_dialog,
+            dismissViewId = R.id.incompatible_emoji_id_dialog_txt_close
+        ).show()
+    }
+
     /**
      * Called only once in onCreate.
      */
@@ -450,12 +476,12 @@ class AddRecipientFragment : Fragment(),
     /**
      * Displays non-search-result list.
      */
-    private fun displayInitialList() {
+    private fun displayInitialList(showKeyboard: Boolean) {
         ui.progressBar.gone()
         ui.contactsListRecyclerView.visible()
         recyclerViewAdapter.displayList(recentTxUsers, contacts)
 
-        if (recipientsListedForTheFirstTime) { // show keyboard
+        if (showKeyboard) { // show keyboard
             recipientsListedForTheFirstTime = false
             focusEditTextAndShowKeyboard()
         }
@@ -477,7 +503,7 @@ class AddRecipientFragment : Fragment(),
         ui.scrollDepthGradientView.alpha = 0f
         ui.progressBar.visible()
         if (query.isEmpty()) {
-            displayInitialList()
+            displayInitialList(showKeyboard = false)
         } else {
             searchRecipients(query)
         }
@@ -745,7 +771,14 @@ class AddRecipientFragment : Fragment(),
             if (textWithoutSeparators.containsNonEmoji() || numberofEmojis > emojiIdLength) {
                 emojiIdPublicKey = null
                 // invalid emoji-id : clear list and display error
-                ui.invalidEmojiIdTextView.text = string(add_recipient_invalid_emoji_id)
+                val incompatibleEmojis = text.extractEmojis(emojiSet = EmojiUtil.oldEmojiSet)
+                ui.invalidEmojiIdTextView.text = string(
+                    if (incompatibleEmojis.size >= emojiIdLength) {
+                        add_recipient_incompatible_emoji_id_desc_short
+                    } else {
+                        add_recipient_invalid_emoji_id
+                    }
+                )
                 ui.invalidEmojiIdTextView.visible()
                 ui.qrCodeButton.visible()
                 clearSearchResult()
@@ -760,10 +793,10 @@ class AddRecipientFragment : Fragment(),
                     } else {
                         ui.qrCodeButton.gone()
                         // valid emoji id length - clear list, no search, display continue button
-                        AsyncTask.execute {
+                        lifecycleScope.launch(Dispatchers.IO) {
                             emojiIdPublicKey =
                                 walletService.getPublicKeyFromEmojiId(textWithoutSeparators)
-                            ui.rootView.post {
+                            withContext(Dispatchers.Main) {
                                 if (emojiIdPublicKey == null) {
                                     ui.invalidEmojiIdTextView.text =
                                         string(add_recipient_invalid_emoji_id)
@@ -791,6 +824,11 @@ class AddRecipientFragment : Fragment(),
             }
         } else {
             emojiIdPublicKey = null
+            val incompatibleEmojis = text.extractEmojis(emojiSet = EmojiUtil.oldEmojiSet)
+            if (incompatibleEmojis.size >= emojiIdLength) {
+                ui.invalidEmojiIdTextView.text = string(add_recipient_incompatible_emoji_id_desc_short)
+                ui.invalidEmojiIdTextView.visible()
+            }
             ui.qrCodeButton.visible()
             ui.searchEditText.textAlignment = View.TEXT_ALIGNMENT_TEXT_START
             ui.searchEditText.letterSpacing = inputNormalLetterSpacing
