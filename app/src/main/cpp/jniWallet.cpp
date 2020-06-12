@@ -1074,6 +1074,34 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniSyncWithBaseNode(
 }
 
 extern "C"
+JNIEXPORT void JNICALL
+Java_com_tari_android_wallet_ffi_FFIWallet_jniPowerModeNormal(
+        JNIEnv *jEnv,
+        jobject jThis,
+        jobject error) {
+    int i = 0;
+    int *r = &i;
+    jlong lWallet = GetPointerField(jEnv, jThis);
+    TariWallet *pWallet = reinterpret_cast<TariWallet *>(lWallet);
+    wallet_set_normal_power_mode(pWallet, r);
+    setErrorCode(jEnv, error, i);
+}
+
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_tari_android_wallet_ffi_FFIWallet_jniPowerModeLow(
+        JNIEnv *jEnv,
+        jobject jThis,
+        jobject error) {
+    int i = 0;
+    int *r = &i;
+    jlong lWallet = GetPointerField(jEnv, jThis);
+    TariWallet *pWallet = reinterpret_cast<TariWallet *>(lWallet);
+    wallet_set_low_power_mode(pWallet, r);
+    setErrorCode(jEnv, error, i);
+}
+
+extern "C"
 JNIEXPORT jlong JNICALL
 Java_com_tari_android_wallet_ffi_FFIWallet_jniGetTorIdentity(
         JNIEnv *jEnv,
@@ -1086,6 +1114,21 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniGetTorIdentity(
     ByteVector *pTorPrivateKey = wallet_get_tor_identity(pWallet, r);
     setErrorCode(jEnv, error, i);
     return reinterpret_cast<jlong>(pTorPrivateKey);
+}
+
+extern "C"
+JNIEXPORT jlong JNICALL
+Java_com_tari_android_wallet_ffi_FFIWallet_jniGetSeedWords(
+        JNIEnv *jEnv,
+        jobject jThis,
+        jobject error) {
+    int i = 0;
+    int *r = &i;
+    jlong lWallet = GetPointerField(jEnv, jThis);
+    TariWallet *pWallet = reinterpret_cast<TariWallet *>(lWallet);
+    TariSeedWords *pSeedwords = wallet_get_seed_words(pWallet, r);
+    setErrorCode(jEnv, error, i);
+    return reinterpret_cast<jlong>(pSeedwords);
 }
 
 //endregion

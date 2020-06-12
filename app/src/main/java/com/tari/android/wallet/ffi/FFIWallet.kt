@@ -213,6 +213,18 @@ internal class FFIWallet(
         libError: FFIError
     ): FFIByteVectorPtr
 
+    private external fun jniPowerModeNormal(
+        libError: FFIError
+    )
+
+    private external fun jniPowerModeLow(
+        libError: FFIError
+    )
+
+    private external fun jniGetSeedWords(
+        libError: FFIError
+    ): FFISeedWordsPtr
+
     private external fun jniDestroy()
 
     // endregion
@@ -680,6 +692,25 @@ internal class FFIWallet(
         return FFIByteVector(resultPtr).getBytes()
     }
 
+    fun setPowerModeNormal() {
+        val error = FFIError()
+        jniPowerModeNormal(error)
+        throwIf(error)
+    }
+
+    fun setPowerModeLow() {
+        val error = FFIError()
+        jniPowerModeLow(error)
+        throwIf(error)
+    }
+
+    fun getSeedWords() : FFISeedWords {
+        val error = FFIError()
+        val result = FFISeedWords(jniGetSeedWords(error));
+        throwIf(error)
+        return result;
+    }
+
     fun addBaseNodePeer(
         baseNodePublicKey: FFIPublicKey,
         baseNodeAddress: String
@@ -766,4 +797,5 @@ internal class FFIWallet(
         throwIf(error)
         return result
     }
+
 }
