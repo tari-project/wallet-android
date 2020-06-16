@@ -46,16 +46,21 @@ internal class FFICommsConfig constructor(pointer: FFICommsConfigPtr) : FFIBase(
 
     // region JNI
 
-    private external fun jniDestroy()
     private external fun jniCreate(
         publicAddress: String,
         transport: FFITransportType,
         databaseName: String,
         datastorePath: String,
-        privateKeyPtr: FFIPrivateKey,
         discoveryTimeoutSec: Long,
         error: FFIError
     )
+
+    private external fun jniSetPrivateKey(
+        privateKey: FFIPrivateKey,
+        error: FFIError
+    )
+
+    private external fun jniDestroy()
 
     // endregion
 
@@ -70,7 +75,6 @@ internal class FFICommsConfig constructor(pointer: FFICommsConfigPtr) : FFIBase(
         transport: FFITransportType,
         databaseName: String,
         datastorePath: String,
-        privateKey: FFIPrivateKey,
         discoveryTimeoutSec: Long
     ) : this(nullptr) {
         if (databaseName.isEmpty()) {
@@ -84,7 +88,6 @@ internal class FFICommsConfig constructor(pointer: FFICommsConfigPtr) : FFIBase(
                 transport,
                 databaseName,
                 datastorePath,
-                privateKey,
                 discoveryTimeoutSec,
                 error
             )
@@ -105,6 +108,12 @@ internal class FFICommsConfig constructor(pointer: FFICommsConfigPtr) : FFIBase(
 
     fun getPointer(): FFICommsConfigPtr {
         return ptr
+    }
+
+    fun setPrivateKey(privateKey: FFIPrivateKey) {
+        val error = FFIError()
+        jniSetPrivateKey(privateKey, error)
+        throwIf(error)
     }
 
     override fun destroy() {

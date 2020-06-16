@@ -2,8 +2,8 @@ buildscript {
     ext.kotlin_version = '1.3.72'
 
     // build & version
-    ext.buildNumber = 116
-    ext.versionNumber = "0.1.14"
+    ext.buildNumber = 119
+    ext.versionNumber = "0.1.15"
 
     repositories {
         google()

@@ -1,5 +1,5 @@
 ext {
-    jniLibsVersion = "0.11.0"
+    jniLibsVersion = "0.12.2"
     jniLibsHostURL = "https://tari-binaries.s3.amazonaws.com/libwallet/"
     supportedABIs = ["arm64-v8a", "armeabi-v7a", "x86_64"]
 }

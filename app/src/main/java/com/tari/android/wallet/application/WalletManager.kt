@@ -150,7 +150,7 @@ internal class WalletManager(
      * Instantiates the comms configuration for the wallet.
      */
     private fun getCommsConfig(): FFICommsConfig {
-        return FFICommsConfig(
+        val commsConfig = FFICommsConfig(
             NetAddressString(
                 "127.0.0.1",
                 39069
@@ -158,24 +158,19 @@ internal class WalletManager(
             getTorTransport(),
             Constants.Wallet.walletDBName,
             walletFilesDirPath,
-            FFIPrivateKey((getWalletPrivateKeyHexString(sharedPrefsWrapper))),
             Constants.Wallet.discoveryTimeoutSec
         )
-    }
 
-    /**
-     * If a private key is saved in the shared prefs, returns the saved value,
-     * if not, generates a net private key, saves it in the shared prefs & returns it.
-     */
-    private fun getWalletPrivateKeyHexString(sharedPrefsWrapper: SharedPrefsWrapper): HexString {
-        var hexString = sharedPrefsWrapper.privateKeyHexString
-        if (hexString == null) {
-            val privateKeyFFI = FFIPrivateKey()
-            hexString = privateKeyFFI.toString()
-            privateKeyFFI.destroy()
-            sharedPrefsWrapper.privateKeyHexString = hexString
+        // begin: backwards compatibility for private key in shared preferences
+        sharedPrefsWrapper.privateKeyHexString?.let {
+            commsConfig.setPrivateKey(
+                FFIPrivateKey(HexString(it))
+            )
+            sharedPrefsWrapper.privateKeyHexString = null
         }
-        return HexString(hexString)
+        // end: backwards compatibility
+
+        return commsConfig
     }
 
     /**
