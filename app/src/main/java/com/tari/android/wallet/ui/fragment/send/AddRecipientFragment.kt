@@ -169,8 +169,8 @@ class AddRecipientFragment : Fragment(),
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        appComponent.inject(this)
         bindToWalletService()
-        AddRecipientFragmentVisitor.visit(this)
         if (savedInstanceState == null) {
             tracker.screen(
                 path = "/home/send_tari/add_recipient",
@@ -882,11 +882,5 @@ class AddRecipientFragment : Fragment(),
     }
 
     // endregion
-
-    private object AddRecipientFragmentVisitor {
-        internal fun visit(fragment: AddRecipientFragment) {
-            fragment.requireActivity().appComponent.inject(fragment)
-        }
-    }
 
 }

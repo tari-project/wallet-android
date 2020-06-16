@@ -93,7 +93,7 @@ internal class LocalAuthFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        LocalAuthFragmentVisitor.visit(this)
+        appComponent.inject(this)
         setDeviceAuthType()
         setupUi()
         ui.rootView.doOnGlobalLayout(this::playStartUpAnim)
@@ -297,11 +297,5 @@ internal class LocalAuthFragment : Fragment() {
 
     interface Listener {
         fun onAuthSuccess()
-    }
-
-    private object LocalAuthFragmentVisitor {
-        internal fun visit(fragment: LocalAuthFragment) {
-            fragment.requireActivity().appComponent.inject(fragment)
-        }
     }
 }

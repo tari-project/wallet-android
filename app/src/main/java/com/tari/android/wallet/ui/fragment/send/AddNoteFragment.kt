@@ -126,7 +126,7 @@ class AddNoteFragment : Fragment(), TextWatcher, View.OnTouchListener {
     @SuppressLint("ClickableViewAccessibility")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        AddNoteFragmentVisitor.visit(this)
+        appComponent.inject(this)
         // get tx properties
         recipientUser = arguments!!.getParcelable("recipientUser")!!
         amount = arguments!!.getParcelable("amount")!!
@@ -637,12 +637,6 @@ class AddNoteFragment : Fragment(), TextWatcher, View.OnTouchListener {
             note: String
         )
 
-    }
-
-    private object AddNoteFragmentVisitor {
-        internal fun visit(fragment: AddNoteFragment) {
-            fragment.requireActivity().appComponent.inject(fragment)
-        }
     }
 
 }

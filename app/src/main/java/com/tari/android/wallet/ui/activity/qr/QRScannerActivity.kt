@@ -44,9 +44,9 @@ import androidx.core.content.ContextCompat
 import com.budiyev.android.codescanner.*
 import com.google.zxing.BarcodeFormat
 import com.tari.android.wallet.R
-import com.tari.android.wallet.application.TariWalletApplication
 import com.tari.android.wallet.databinding.ActivityQrScannerBinding
 import com.tari.android.wallet.infrastructure.Tracker
+import com.tari.android.wallet.ui.extension.appComponent
 import javax.inject.Inject
 
 private const val REQUEST_CAMERA_PERMISSION = 102
@@ -74,9 +74,9 @@ internal class QRScannerActivity : AppCompatActivity() {
     private lateinit var ui: ActivityQrScannerBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        appComponent.inject(this)
         super.onCreate(savedInstanceState)
         ui = ActivityQrScannerBinding.inflate(layoutInflater).apply { setContentView(root) }
-        QRScannerActivityVisitor.visit(this)
         setupUi()
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
             == PackageManager.PERMISSION_DENIED
@@ -166,12 +166,6 @@ internal class QRScannerActivity : AppCompatActivity() {
             codeScanner.releaseResources()
         }
         super.onPause()
-    }
-
-    private object QRScannerActivityVisitor {
-        internal fun visit(activity: QRScannerActivity) {
-            (activity.application as TariWalletApplication).appComponent.inject(activity)
-        }
     }
 
 }

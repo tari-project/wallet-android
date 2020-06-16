@@ -36,9 +36,9 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.tabs.TabLayoutMediator
 import com.tari.android.wallet.R
-import com.tari.android.wallet.application.TariWalletApplication
 import com.tari.android.wallet.databinding.ActivityDebugBinding
 import com.tari.android.wallet.ui.activity.debug.adapter.DebugViewPagerAdapter
+import com.tari.android.wallet.ui.extension.appComponent
 import com.tari.android.wallet.ui.extension.string
 
 /**
@@ -55,7 +55,7 @@ internal class DebugActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         ui = ActivityDebugBinding.inflate(layoutInflater).apply { setContentView(root) }
-        DebugActivityVisitor.visit(this)
+        appComponent.inject(this)
         pagerAdapter = DebugViewPagerAdapter(this)
         ui.viewPager.adapter = pagerAdapter
         ui.viewPager.offscreenPageLimit = 1
@@ -72,12 +72,6 @@ internal class DebugActivity : AppCompatActivity() {
     override fun onBackPressed() {
         super.onBackPressed()
         overridePendingTransition(R.anim.enter_from_left, R.anim.exit_to_right)
-    }
-
-    private object DebugActivityVisitor {
-        internal fun visit(activity: DebugActivity) {
-            (activity.application as TariWalletApplication).appComponent.inject(activity)
-        }
     }
 
 }

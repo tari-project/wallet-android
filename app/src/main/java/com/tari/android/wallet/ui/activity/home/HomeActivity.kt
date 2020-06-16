@@ -176,7 +176,7 @@ internal class HomeActivity : AppCompatActivity(),
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         ui = ActivityHomeBinding.inflate(layoutInflater).apply { setContentView(root) }
-        HomeActivityVisitor.visit(this)
+        appComponent.inject(this)
         overridePendingTransition(0, 0)
 
         // the code below will send the user back to the very startup of the app
@@ -1386,11 +1386,5 @@ internal class HomeActivity : AppCompatActivity(),
     }
 
     // endregion
-
-    private object HomeActivityVisitor {
-        fun visit(activity: HomeActivity) {
-            activity.appComponent.inject(activity)
-        }
-    }
 
 }

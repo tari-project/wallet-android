@@ -48,7 +48,6 @@ import com.tari.android.wallet.R.color.light_gray
 import com.tari.android.wallet.R.dimen.common_copy_emoji_id_button_visible_bottom_margin
 import com.tari.android.wallet.R.dimen.wallet_info_img_qr_code_size
 import com.tari.android.wallet.R.string.*
-import com.tari.android.wallet.application.TariWalletApplication
 import com.tari.android.wallet.databinding.ActivityWalletInfoBinding
 import com.tari.android.wallet.extension.applyFontStyle
 import com.tari.android.wallet.infrastructure.Tracker
@@ -82,9 +81,9 @@ internal class WalletInfoActivity : AppCompatActivity() {
     private lateinit var emojiIdCopiedViewController: EmojiIdCopiedViewController
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        appComponent.inject(this)
         super.onCreate(savedInstanceState)
         ui = ActivityWalletInfoBinding.inflate(layoutInflater).apply { setContentView(root) }
-        WalletInfoActivityVisitor.visit(this)
         setupUi()
         tracker.screen(path = "/home/profile", title = "Profile - Wallet Info")
     }
@@ -271,14 +270,5 @@ internal class WalletInfoActivity : AppCompatActivity() {
     private fun onCloseButtonClick() {
         finish()
     }
-
-    private object WalletInfoActivityVisitor {
-
-        internal fun visit(activity: WalletInfoActivity) {
-            (activity.application as TariWalletApplication).appComponent.inject(activity)
-        }
-
-    }
-
 
 }
