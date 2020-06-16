@@ -42,6 +42,7 @@ import com.tari.android.wallet.ui.activity.home.HomeActivity
 import com.tari.android.wallet.ui.activity.onboarding.OnboardingFlowActivity
 import com.tari.android.wallet.ui.activity.profile.WalletInfoActivity
 import com.tari.android.wallet.ui.activity.qr.QRScannerActivity
+import com.tari.android.wallet.ui.activity.restore.WalletRestoreActivity
 import com.tari.android.wallet.ui.activity.send.SendTariActivity
 import com.tari.android.wallet.ui.activity.tx.TxDetailActivity
 import com.tari.android.wallet.ui.fragment.debug.BaseNodeConfigFragment
@@ -49,10 +50,14 @@ import com.tari.android.wallet.ui.fragment.debug.DebugLogFragment
 import com.tari.android.wallet.ui.fragment.onboarding.CreateWalletFragment
 import com.tari.android.wallet.ui.fragment.onboarding.IntroductionFragment
 import com.tari.android.wallet.ui.fragment.onboarding.LocalAuthFragment
+import com.tari.android.wallet.ui.fragment.restore.ChooseRestoreOptionFragment
+import com.tari.android.wallet.ui.fragment.restore.RestorationWithCloudFragment
 import com.tari.android.wallet.ui.fragment.send.AddAmountFragment
 import com.tari.android.wallet.ui.fragment.send.AddNoteFragment
 import com.tari.android.wallet.ui.fragment.send.AddRecipientFragment
 import com.tari.android.wallet.ui.fragment.send.FinalizeSendTxFragment
+import com.tari.android.wallet.ui.fragment.settings.AllSettingsFragment
+import com.tari.android.wallet.ui.fragment.settings.backup.WalletBackupSettingsFragment
 import dagger.Component
 import javax.inject.Singleton
 
@@ -92,6 +97,7 @@ internal interface ApplicationComponent {
     fun inject(activity: WalletInfoActivity)
     fun inject(activity: TxDetailActivity)
     fun inject(activity: DebugActivity)
+    fun inject(activity: WalletRestoreActivity)
 
     /**
      * Fragments.
@@ -106,6 +112,10 @@ internal interface ApplicationComponent {
     fun inject(fragment: LocalAuthFragment)
     fun inject(fragment: DebugLogFragment)
     fun inject(fragment: BaseNodeConfigFragment)
+    fun inject(fragment: WalletBackupSettingsFragment)
+    fun inject(fragment: AllSettingsFragment)
+    fun inject(fragment: ChooseRestoreOptionFragment)
+    fun inject(fragment: RestorationWithCloudFragment)
 
     /**
      * Service(s).

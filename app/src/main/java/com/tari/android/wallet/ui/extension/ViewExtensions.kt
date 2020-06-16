@@ -51,9 +51,12 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.airbnb.lottie.LottieAnimationView
 import com.tari.android.wallet.R
 import com.tari.android.wallet.ui.dialog.BottomSlideDialog
 import com.tari.android.wallet.ui.util.UiUtil
+import android.animation.Animator as LegacyAnimator
+import android.animation.Animator.AnimatorListener as LegacyAnimatorListener
 
 internal fun RecyclerView.isScrolledToTop(): Boolean {
     val layoutManager = (layoutManager as? LinearLayoutManager) ?: return false
@@ -189,6 +192,20 @@ internal fun ScrollView.scrollToBottom() {
     smoothScrollBy(0, delta)
 }
 
+internal fun LottieAnimationView.addAnimatorListener(
+    onStart: (LegacyAnimator?) -> Unit = {},
+    onEnd: (LegacyAnimator?) -> Unit = {},
+    onCancel: (LegacyAnimator?) -> Unit = {},
+    onRepeat: (LegacyAnimator?) -> Unit = {}
+) {
+    addAnimatorListener(object : LegacyAnimatorListener {
+        override fun onAnimationRepeat(animation: LegacyAnimator?) = onRepeat(animation)
+        override fun onAnimationEnd(animation: LegacyAnimator?) = onEnd(animation)
+        override fun onAnimationCancel(animation: LegacyAnimator?) = onCancel(animation)
+        override fun onAnimationStart(animation: LegacyAnimator?) = onStart(animation)
+    })
+}
+
 internal fun View.doOnGlobalLayout(block: () -> Unit) {
     this.viewTreeObserver.addOnGlobalLayoutListener(
         object : ViewTreeObserver.OnGlobalLayoutListener {
@@ -210,3 +227,11 @@ internal fun View.color(@ColorRes id: Int): Int = context.color(id)
 internal fun View.dimenPx(@DimenRes id: Int): Int = context.dimenPx(id)
 
 internal fun View.drawable(@DrawableRes id: Int): Drawable? = context.drawable(id)
+
+internal class ThrottleClick(private val delegate: (View) -> Unit) :
+    View.OnClickListener {
+    override fun onClick(v: View?) {
+        v?.let(UiUtil::temporarilyDisableClick)
+        v?.let(delegate)
+    }
+}

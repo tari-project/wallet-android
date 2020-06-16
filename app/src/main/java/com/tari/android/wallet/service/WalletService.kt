@@ -1041,6 +1041,11 @@ internal class WalletService : Service(), FFIWalletListenerAdapter {
 
         @SuppressLint("CheckResult")
         override fun requestTestnetTari(error: WalletError) {
+            if (
+                serviceImpl.getCompletedTxs(emptyList()).isNotEmpty() ||
+                serviceImpl.getPendingInboundTxs(emptyList()).isNotEmpty() ||
+                serviceImpl.getPendingOutboundTxs(emptyList()).isNotEmpty()
+            ) return
             // get public key
             val publicKeyHexString = getPublicKeyHexString(error)
             if (error.code != WalletErrorCode.NO_ERROR || publicKeyHexString == null) {

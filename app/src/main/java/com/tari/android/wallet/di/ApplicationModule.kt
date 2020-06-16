@@ -32,13 +32,23 @@
  */
 package com.tari.android.wallet.di
 
+import android.app.KeyguardManager
 import android.content.ClipboardManager
 import android.content.Context
+import androidx.biometric.BiometricManager
+import androidx.core.content.ContextCompat
+import com.tari.android.wallet.R.string.app_name
 import com.tari.android.wallet.application.TariWalletApplication
+import com.tari.android.wallet.infrastructure.backup.WalletBackup
+import com.tari.android.wallet.infrastructure.backup.WalletRestorationFactory
+import com.tari.android.wallet.infrastructure.backup.storage.BackupStorageFactory
+import com.tari.android.wallet.infrastructure.security.biometric.BiometricAuthenticationService
 import com.tari.android.wallet.notification.NotificationHelper
+import com.tari.android.wallet.ui.extension.string
 import com.tari.android.wallet.util.SharedPrefsWrapper
 import dagger.Module
 import dagger.Provides
+import java.io.File
 import javax.inject.Singleton
 
 /**
@@ -61,6 +71,10 @@ internal class ApplicationModule(
 
     @Provides
     @Singleton
+    fun provideFilesDir(context: Context) = context.filesDir
+
+    @Provides
+    @Singleton
     fun provideSharedPrefsWrapper(): SharedPrefsWrapper = sharedPrefsWrapper
 
     @Provides
@@ -69,7 +83,30 @@ internal class ApplicationModule(
 
     @Provides
     @Singleton
-    fun provideClipboardManager(context: Context): ClipboardManager {
-        return context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-    }
+    fun provideClipboardManager(context: Context): ClipboardManager =
+        context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+
+    @Provides
+    @Singleton
+    fun provideBiometricAuthService(context: Context): BiometricAuthenticationService =
+        BiometricAuthenticationService(
+            ContextCompat.getMainExecutor(context),
+            BiometricManager.from(context),
+            context.getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager
+        )
+
+    @Provides
+    @Singleton
+    fun provideWalletBackup(workingDir: File) = WalletBackup.defaultStrategy(workingDir)
+
+    @Provides
+    @Singleton
+    fun provideBackupStorageFactory(context: Context) =
+        BackupStorageFactory(context.string(app_name))
+
+    @Provides
+    @Singleton
+    fun provideRestorationFactory(workingDir: File) =
+        WalletRestorationFactory.defaultStrategy(workingDir)
+
 }

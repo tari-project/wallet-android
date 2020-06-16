@@ -81,4 +81,20 @@
     <!-- store -->
     <color name="store_grabber">#87B2B2B2</color>
 
+    <!-- settings -->
+    <color name="settings_background">#F6F6F6</color>
+
+    <!-- wallet restore -->
+    <color name="wallet_restore_page_background">@color/settings_background</color>
+    <color name="wallet_restore_progress_bar">#B2B2B2</color>
+    
+    <!-- wallet back up with recovery phrase -->
+    <color name="seed_phrase_word_text">#9330FF</color>
+    <color name="seed_phrase_word_background">#1A9330FF</color>
+    <color name="seed_phrase_checkbox">@color/seed_phrase_word_text</color>
+    <color name="seed_phrase_button_disabled_background_color">#CCF3F4F5</color>
+    <color name="seed_phrase_button_disabled_text_color">#B2B2B2</color>
+    <color name="seed_phrase_word_index_text_color">#807F8599</color>
+    <color name="verify_seed_phrase_selectable_word_stroke">@color/seed_phrase_button_disabled_text_color</color>
+
 </resources>

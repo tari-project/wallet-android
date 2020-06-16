@@ -71,6 +71,7 @@ internal class SendTariActivity : AppCompatActivity(),
 
     private lateinit var ui: ActivitySendTariBinding
 
+    // TODO `supportFragmentManager.fragments.last()` ?
     private var currentFragmentWR: WeakReference<Fragment>? = null
 
     private var sendTxIsInProgress = false
