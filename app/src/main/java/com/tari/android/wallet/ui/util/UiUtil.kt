@@ -32,6 +32,7 @@
  */
 package com.tari.android.wallet.ui.util
 
+import android.animation.Animator
 import android.animation.AnimatorSet
 import android.animation.ValueAnimator
 import android.app.Activity
@@ -48,6 +49,7 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.Button
 import android.widget.ProgressBar
 import androidx.annotation.NonNull
+import androidx.core.animation.addListener
 import androidx.core.graphics.BlendModeColorFilterCompat
 import androidx.core.graphics.BlendModeCompat
 import com.google.zxing.BarcodeFormat
@@ -246,7 +248,7 @@ internal object UiUtil {
     /*
     * Animation for button click
     * */
-    fun animateViewClick(view: View): AnimatorSet {
+    fun animateViewClick(view: View, onEnd: (Animator) -> Unit = {}): AnimatorSet {
         val scaleDownBtnAnim = ValueAnimator.ofFloat(
             Constants.UI.Button.clickScaleAnimFullScale,
             Constants.UI.Button.clickScaleAnimSmallScale
@@ -274,6 +276,7 @@ internal object UiUtil {
         scaleUpBtnAnim.interpolator = AccelerateInterpolator()
 
         val animSet = AnimatorSet()
+        animSet.addListener(onEnd = onEnd)
         animSet.playSequentially(scaleDownBtnAnim, scaleUpBtnAnim)
         animSet.start()
         return animSet
@@ -288,7 +291,7 @@ internal object UiUtil {
         try {
             val barcodeEncoder = BarcodeEncoder()
             val hints: HashMap<EncodeHintType, String> = HashMap()
-            hints[EncodeHintType.CHARACTER_SET] = "UTF-8";
+            hints[EncodeHintType.CHARACTER_SET] = "UTF-8"
 
             val map = barcodeEncoder.encode(content, BarcodeFormat.QR_CODE, size, size, hints)
             return barcodeEncoder.createBitmap(map)

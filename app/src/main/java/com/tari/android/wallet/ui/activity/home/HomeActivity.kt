@@ -411,7 +411,8 @@ internal class HomeActivity : AppCompatActivity(),
         // network connection event
         EventBus.subscribeToNetworkConnectionState(this) { networkConnectionState ->
             if (testnetTariRequestIsWaitingOnConnection
-                && networkConnectionState == NetworkConnectionState.CONNECTED) {
+                && networkConnectionState == NetworkConnectionState.CONNECTED
+            ) {
                 requestTestnetTari()
             }
         }
@@ -832,7 +833,8 @@ internal class HomeActivity : AppCompatActivity(),
                     }, Constants.UI.longDurationMs)
 
                 }
-        }.show()
+        }.apply { show() }
+            .asAndroidDialog()
     }
 
     private fun showTTLStoreDialog() {
@@ -864,7 +866,8 @@ internal class HomeActivity : AppCompatActivity(),
                 }
             findViewById<View>(R.id.home_ttl_store_dialog_vw_top_spacer)
                 .setOnClickListener { dismiss() }
-        }.show()
+        }.apply { show() }
+            .asAndroidDialog()
     }
 
     private fun visitTTLStore() {
@@ -1160,8 +1163,10 @@ internal class HomeActivity : AppCompatActivity(),
         }
     }
 
-    override fun updateHasCompleted(source: UpdateProgressViewController,
-                                    updateDataAndUI: Boolean) {
+    override fun updateHasCompleted(
+        source: UpdateProgressViewController,
+        updateDataAndUI: Boolean
+    ) {
         handler?.post {
             ui.scrollView.finishUpdate()
         }
@@ -1191,10 +1196,9 @@ internal class HomeActivity : AppCompatActivity(),
             val descriptionTextView = findViewById<TextView>(R.id.tx_failed_dialog_txt_description)
             descriptionTextView.text = string(R.string.error_no_connection_description)
             // set text
-        }.show()
-        currentDialog?.setOnDismissListener {
-            currentDialog = null
-        }
+        }.apply { show() }
+            .asAndroidDialog()
+            .apply { setOnDismissListener { currentDialog = null } }
     }
 
     private fun displayBaseNodeConnectionErrorDialog() {
@@ -1209,7 +1213,8 @@ internal class HomeActivity : AppCompatActivity(),
             val descriptionTextView = findViewById<TextView>(R.id.tx_failed_dialog_txt_description)
             descriptionTextView.text = string(R.string.error_node_unreachable_description)
             // set text
-        }.show()
+        }.apply { show() }
+            .asAndroidDialog()
         currentDialog?.setOnDismissListener {
             currentDialog = null
         }

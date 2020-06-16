@@ -41,6 +41,9 @@ import androidx.fragment.app.Fragment
 
 internal fun Fragment.string(@StringRes id: Int): String = requireContext().string(id)
 
+internal fun Fragment.string(@StringRes id: Int, vararg formatArgs: Any): String =
+    requireContext().string(id, *formatArgs)
+
 internal fun Fragment.color(@ColorRes id: Int): Int = requireContext().color(id)
 
 internal fun Fragment.dimenPx(@DimenRes id: Int): Int = requireContext().dimenPx(id)

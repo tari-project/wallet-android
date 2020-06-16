@@ -32,7 +32,9 @@
  */
 package com.tari.android.wallet.ui.fragment.onboarding
 
-import android.animation.*
+import android.animation.AnimatorSet
+import android.animation.ObjectAnimator
+import android.animation.ValueAnimator
 import android.content.Context
 import android.content.Intent
 import android.media.AudioManager
@@ -45,6 +47,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.core.animation.addListener
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.daasuu.ei.Ease
@@ -58,12 +61,12 @@ import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.extension.applyURLStyle
 import com.tari.android.wallet.infrastructure.Tracker
 import com.tari.android.wallet.service.WalletService
+import com.tari.android.wallet.ui.activity.restore.WalletRestoreActivity
 import com.tari.android.wallet.ui.extension.*
 import com.tari.android.wallet.ui.util.UiUtil
 import com.tari.android.wallet.ui.util.UiUtil.getResourceUri
 import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.SharedPrefsWrapper
-import java.lang.ref.WeakReference
 import javax.inject.Inject
 import kotlin.math.min
 
@@ -88,12 +91,11 @@ internal class IntroductionFragment : Fragment() {
     private var listener: Listener? = null
 
     private val handler = Handler()
-    private val wr = WeakReference(this)
 
     private var videoViewHasBeenSetup = false
     private var videoViewLastPosition = 0
 
-    private val createWalletArtificalDelay = Constants.UI.CreateWallet.tariTextAnimViewDurationMs
+    private val createWalletArtificialDelay = Constants.UI.CreateWallet.tariTextAnimViewDurationMs
 
     private lateinit var ui: FragmentIntroductionBinding
 
@@ -152,19 +154,24 @@ internal class IntroductionFragment : Fragment() {
             headerLineTopTextView.alpha = 0f
             headerLineBottomTextView.alpha = 0f
             userAgreementAndPrivacyPolicyTextView.alpha = 0f
+            restoreWalletCtaView.alpha = 0f
             val versionInfo = "${Constants.Wallet.network.displayName} ${BuildConfig.VERSION_NAME}"
             networkInfoTextView.text = versionInfo
+
+            restoreWalletCtaView.setOnClickListener {
+                startActivity(WalletRestoreActivity.navigationIntent(requireActivity()))
+            }
 
             // highlight links
             userAgreementAndPrivacyPolicyTextView.text =
                 SpannableString(string(create_wallet_user_agreement_and_privacy_policy)).apply {
                     applyURLStyle(
                         string(create_wallet_user_agreement),
-                        string(create_wallet_user_agreement_url)
+                        string(user_agreement_url)
                     )
                     applyURLStyle(
                         string(create_wallet_privacy_policy),
-                        string(create_wallet_privacy_policy_url)
+                        string(privacy_policy_url)
                     )
                 }
             // make the links clickable
@@ -234,6 +241,7 @@ internal class IntroductionFragment : Fragment() {
             ui.smallGemImageView.alpha = value
             ui.createWalletContainerView.alpha = value
             ui.userAgreementAndPrivacyPolicyTextView.alpha = value
+            ui.restoreWalletCtaView.alpha = value
         }
         anim.startDelay = Constants.UI.mediumDurationMs
         anim.duration = Constants.UI.longDurationMs
@@ -243,18 +251,15 @@ internal class IntroductionFragment : Fragment() {
 
     private fun onCreateWalletClick() {
         UiUtil.temporarilyDisableClick(ui.createWalletButton)
+        ui.restoreWalletCtaView.setOnClickListener(null)
         ui.createWalletButton.gone()
         ui.createWalletProgressBar.visible()
         startWalletService()
-        val animatorSet = UiUtil.animateViewClick(ui.createWalletContainerView)
-        animatorSet.addListener(object : AnimatorListenerAdapter() {
-            override fun onAnimationEnd(animation: Animator?) {
-                super.onAnimationEnd(animation)
-                ui.rootView.postDelayed(
-                    { wr.get()?.startTariWalletViewAnimation() },
-                    createWalletArtificalDelay
-                )
-            }
+        UiUtil.animateViewClick(ui.createWalletContainerView).addListener(onEnd = {
+            ui.rootView.postDelayed(
+                { startTariWalletViewAnimation() },
+                createWalletArtificialDelay
+            )
         })
     }
 
@@ -278,15 +283,9 @@ internal class IntroductionFragment : Fragment() {
         tariViewTranslateAnim.interpolator = EasingInterpolator(Ease.CIRC_IN_OUT)
         tariViewTranslateAnim.duration = Constants.UI.CreateWallet.tariTextAnimViewDurationMs
 
-        tariViewTranslateAnim.addListener(object : AnimatorListenerAdapter() {
-            override fun onAnimationEnd(animation: Animator?) {
-                playTariWalletLottieAnimation()
-            }
-        })
-        ui.tariLogoLottieAnimationView.addAnimatorListener(object : AnimatorListenerAdapter() {
-            override fun onAnimationEnd(animation: Animator?) {
-                listener?.continueToCreateWallet()
-            }
+        tariViewTranslateAnim.addListener(onEnd = { playTariWalletLottieAnimation() })
+        ui.tariLogoLottieAnimationView.addAnimatorListener(onEnd = {
+            listener?.continueToCreateWallet()
         })
 
         val tariViewScaleAnim = ValueAnimator.ofFloat(
@@ -303,20 +302,19 @@ internal class IntroductionFragment : Fragment() {
         fadeOutAnim.duration = Constants.UI.CreateWallet.viewContainerFadeOutDurationMs
         fadeOutAnim.addUpdateListener { valueAnimator: ValueAnimator ->
             val alpha = valueAnimator.animatedValue as Float
+            ui.restoreWalletCtaView.alpha = alpha
             ui.videoOuterContainerView.alpha = alpha
             ui.headerLineTopTextView.alpha = alpha
             ui.headerLineBottomTextView.alpha = alpha
             ui.createWalletContainerView.alpha = alpha
             ui.userAgreementAndPrivacyPolicyTextView.alpha = alpha
         }
-        fadeOutAnim.addListener(object : AnimatorListenerAdapter() {
-            override fun onAnimationEnd(animation: Animator?) {
-                ui.videoOuterContainerView.invisible()
-                ui.headerLineTopTextView.invisible()
-                ui.headerLineBottomTextView.invisible()
-                ui.createWalletContainerView.invisible()
-                ui.userAgreementAndPrivacyPolicyTextView.invisible()
-            }
+        fadeOutAnim.addListener(onEnd = {
+            ui.videoOuterContainerView.invisible()
+            ui.headerLineTopTextView.invisible()
+            ui.headerLineBottomTextView.invisible()
+            ui.createWalletContainerView.invisible()
+            ui.userAgreementAndPrivacyPolicyTextView.invisible()
         })
 
         val animSet = AnimatorSet()

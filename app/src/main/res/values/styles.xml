@@ -21,10 +21,10 @@
         <item name="android:navigationBarColor">@android:color/black</item>
     </style>
 
-<!--
-  Style that makes a dialog placed to the bottom slide from bottom on show and to bottom on hide.
-  Simply put - like on iOS.
--->
+    <!--
+      Style that makes a dialog placed to the bottom slide from bottom on show and to bottom on hide.
+      Simply put - like on iOS.
+    -->
     <style name="BottomSlideDialog" parent="Theme.AppCompat.Dialog">
         <item name="android:windowAnimationStyle">@style/BottomSlideDialogAnimation</item>
     </style>
@@ -42,6 +42,28 @@
     <style name="StoreBottomSlideDialogAnimation">
         <item name="android:windowEnterAnimation">@anim/dialog_slide_from_bottom</item>
         <item name="android:windowExitAnimation">@null</item>
+    </style>
+
+    <style name="PurpleCheckbox" parent="AppTheme">
+        <item name="colorAccent">@color/seed_phrase_checkbox</item>
+    </style>
+
+    <style name="SelectedSeedPhraseWord" parent="android:Widget.TextView">
+        <item name="android:textSize">12sp</item>
+        <item name="android:textColor">@color/dark_gray</item>
+    </style>
+
+    <style name="SelectableSeedPhraseWord" parent="android:Widget.TextView">
+        <item name="android:textSize">14sp</item>
+        <item name="android:textColor">@color/dark_gray</item>
+        <item name="android:background">@drawable/selectable_seed_phrase_word_background</item>
+    </style>
+
+    <!-- Google sign in activity transition overrides -->
+    <style name="GoogleSignInActivity" parent="android:Theme.Translucent.NoTitleBar">
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
     </style>
 
 </resources>

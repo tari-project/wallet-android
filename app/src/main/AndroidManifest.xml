@@ -11,8 +11,13 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <!-- For GSuite API -->
+    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
+    <uses-permission android:name="android.permission.MANAGE_ACCOUNTS" />
     <!-- remove billing support in case it gets included by a 3rd party lib -->
-    <uses-permission android:name="com.android.vending.BILLING" tools:node="remove" />
+    <uses-permission
+        android:name="com.android.vending.BILLING"
+        tools:node="remove" />
 
     <application
         android:name=".application.TariWalletApplication"
@@ -37,8 +42,8 @@
 
         <!-- file provider to share log files with other applications (i.e. email clients) -->
         <provider
-            android:authorities="com.tari.android.wallet.files"
             android:name="androidx.core.content.FileProvider"
+            android:authorities="com.tari.android.wallet.files"
             android:exported="false"
             android:grantUriPermissions="true">
             <meta-data
@@ -93,8 +98,13 @@
 
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-                <data android:scheme="tari" android:host="mainnet" />
-                <data android:scheme="tari" android:host="rincewind" />
+
+                <data
+                    android:host="mainnet"
+                    android:scheme="tari" />
+                <data
+                    android:host="rincewind"
+                    android:scheme="tari" />
             </intent-filter>
         </activity>
         <!-- recipient QR scanner -->
@@ -132,11 +142,35 @@
         <activity
             android:name=".ui.activity.debug.DebugActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
+            android:launchMode="singleTask"
             android:parentActivityName=".ui.activity.home.HomeActivity"
             android:screenOrientation="portrait"
-            android:launchMode="singleTask"
             android:theme="@style/AppTheme"
             android:windowSoftInputMode="adjustPan|stateAlwaysHidden" />
+
+        <activity
+            android:name=".ui.activity.settings.SettingsActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:parentActivityName=".ui.activity.home.HomeActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme"
+            android:windowSoftInputMode="adjustPan|stateAlwaysHidden" />
+
+        <activity
+            android:name=".ui.activity.restore.WalletRestoreActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:parentActivityName=".ui.activity.onboarding.OnboardingFlowActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme"
+            android:windowSoftInputMode="adjustPan|stateAlwaysHidden" />
+
+        <!-- Google sign in activity -->
+        <activity
+            android:name="com.google.android.gms.auth.api.signin.internal.SignInHubActivity"
+            android:excludeFromRecents="true"
+            android:exported="false"
+            android:theme="@style/GoogleSignInActivity"
+            tools:replace="android:theme" />
 
         <!-- This receiver is responsible for starting the service after boot finish.-->
         <receiver

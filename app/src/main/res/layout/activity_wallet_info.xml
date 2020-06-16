@@ -30,6 +30,17 @@
             android:clickable="true"
             android:focusable="true"
             android:visibility="gone" />
+
+        <ImageButton
+            android:id="@+id/open_settings_cta_view"
+            android:layout_width="@dimen/common_header_height"
+            android:layout_height="@dimen/common_header_height"
+            android:background="@color/transparent"
+            android:contentDescription="@null"
+            android:src="@drawable/icon_settings"
+            android:layout_gravity="end"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
     </FrameLayout>
 
     <ScrollView
@@ -80,7 +91,7 @@
                 android:letterSpacing="-0.018"
                 android:lineSpacingExtra="10dp"
                 android:text="@string/wallet_info_qr_code_desc"
-                android:textColor="@color/wallet_info_qr_code_desc"
+                android:textColor="@color/dark_gray"
                 android:textSize="14sp"
                 app:customFont="AVENIR_LT_STD_MEDIUM"
                 app:layout_constraintEnd_toEndOf="parent"

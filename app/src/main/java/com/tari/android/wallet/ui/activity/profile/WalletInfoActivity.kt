@@ -51,6 +51,7 @@ import com.tari.android.wallet.R.string.*
 import com.tari.android.wallet.databinding.ActivityWalletInfoBinding
 import com.tari.android.wallet.extension.applyFontStyle
 import com.tari.android.wallet.infrastructure.Tracker
+import com.tari.android.wallet.ui.activity.settings.SettingsActivity
 import com.tari.android.wallet.ui.component.CustomFont
 import com.tari.android.wallet.ui.component.EmojiIdCopiedViewController
 import com.tari.android.wallet.ui.component.EmojiIdSummaryViewController
@@ -124,6 +125,7 @@ internal class WalletInfoActivity : AppCompatActivity() {
             true
         }
         ui.closeButton.setOnClickListener { this.onCloseButtonClick() }
+        ui.openSettingsCtaView.setOnClickListener(ThrottleClick { SettingsActivity.launch(this) })
         dimmerViews.forEach { it.setOnClickListener { this.hideFullEmojiId() } }
     }
 

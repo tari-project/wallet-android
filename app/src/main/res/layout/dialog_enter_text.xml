@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:background="@drawable/bottom_dialog_bg"
+        android:orientation="vertical"
+        android:paddingHorizontal="16dp"
+        tools:ignore="UselessParent">
+
+        <com.tari.android.wallet.ui.component.CustomFontTextView
+            android:id="@+id/dialog_enter_text_title_text_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="30dp"
+            android:layout_marginBottom="16dp"
+            android:gravity="center"
+            android:lineSpacingExtra="8dp"
+            android:textColor="@color/black"
+            android:textSize="18sp"
+            app:customFont="AVENIR_LT_STD_LIGHT"
+            tools:text="Please enter text" />
+
+        <com.tari.android.wallet.ui.component.CustomFontEditText
+            android:id="@+id/dialog_enter_text_edit_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:background="@color/transparent"
+            android:imeOptions="actionDone"
+            android:inputType="textPassword"
+            android:letterSpacing="0.02"
+            android:scrollHorizontally="false"
+            android:singleLine="true"
+            android:textColor="@color/black"
+            android:textSize="14sp"
+            app:customFont="AVENIR_LT_STD_ROMAN"
+            tools:hint="Enter text here…" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:layout_marginBottom="16dp"
+            android:orientation="horizontal">
+
+            <com.tari.android.wallet.ui.component.CustomFontButton
+                android:id="@+id/dialog_enter_text_cancel_backup_cta_view"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="8dp"
+                android:layout_weight="1"
+                android:background="@color/transparent"
+                android:paddingHorizontal="10dp"
+                android:text="@string/common_cancel"
+                android:textAllCaps="false"
+                android:textColor="@color/dialog_cancel_action"
+                android:textSize="16sp"
+                app:customFont="AVENIR_LT_STD_HEAVY" />
+
+            <com.tari.android.wallet.ui.component.CustomFontButton
+                android:id="@+id/dialog_enter_text_backup_cta_view"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="16dp"
+                android:layout_weight="1"
+                android:background="@drawable/disableable_gradient_button_bg"
+                android:enabled="false"
+                android:paddingHorizontal="10dp"
+                android:text="@string/back_up_wallet_backup_cta"
+                android:textAllCaps="false"
+                android:textColor="@color/white"
+                android:textSize="16sp"
+                app:customFont="AVENIR_LT_STD_HEAVY" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</FrameLayout>

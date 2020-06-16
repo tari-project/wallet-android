@@ -42,6 +42,7 @@ import androidx.test.core.app.ApplicationProvider
 import com.orhanobut.logger.Logger
 import com.tari.android.wallet.di.WalletModule
 import com.tari.android.wallet.ffi.*
+import com.tari.android.wallet.model.CancelledTx
 import com.tari.android.wallet.model.CompletedTx
 import com.tari.android.wallet.model.PendingInboundTx
 import com.tari.android.wallet.util.Constants
@@ -69,6 +70,10 @@ class FFIWalletTests {
             Logger.i("Tx Mined :: completed tx id: %s", completedTx.id.toString())
         }
 
+        override fun onTxCancelled(cancelledTx: CancelledTx) {
+            TODO("Not yet implemented")
+        }
+
         override fun onTxFinalized(completedTx: CompletedTx) {
             Logger.i("Tx Finalized :: completed tx id: %s", completedTx.id.toString())
         }
@@ -81,12 +86,8 @@ class FFIWalletTests {
             Logger.i("Store and forward :: tx id %s success %s", txId.toString(), success.toString())
         }
 
-        override fun onTxCancellation(completedTx: CompletedTx) {
-            Logger.i("Tx cancellation :: tx id %s", completedTx.id.toString())
-        }
-
-        override fun onBaseNodeSyncComplete(rxId: BigInteger, success: Boolean) {
-            Logger.i("Base Node Sync Complete :: request id %s success %s", rxId.toString(), success.toString())
+        override fun onBaseNodeSyncComplete(requestId: BigInteger, success: Boolean) {
+            Logger.i("Base Node Sync Complete :: request id %s success %s", requestId.toString(), success.toString())
         }
     }
 

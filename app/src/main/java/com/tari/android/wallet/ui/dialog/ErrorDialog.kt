@@ -4,7 +4,6 @@ import android.app.Dialog
 import android.content.Context
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
-import android.util.Log
 import android.view.Gravity
 import android.view.View
 import android.widget.LinearLayout
@@ -18,7 +17,8 @@ class ErrorDialog private constructor(private val dialog: Dialog) {
         title: CharSequence,
         description: CharSequence,
         cancelable: Boolean = true,
-        canceledOnTouchOutside: Boolean = true
+        canceledOnTouchOutside: Boolean = true,
+        onClose: () -> Unit = {}
     ) : this(
         Dialog(context, R.style.BottomSlideDialog).apply {
             setContentView(R.layout.dialog_error)
@@ -34,7 +34,10 @@ class ErrorDialog private constructor(private val dialog: Dialog) {
             setCanceledOnTouchOutside(canceledOnTouchOutside)
             findViewById<TextView>(R.id.error_dialog_title_text_view).text = title
             findViewById<TextView>(R.id.error_dialog_description_text_view).text = description
-            findViewById<View>(R.id.error_dialog_close_view).setOnClickListener { dismiss() }
+            findViewById<View>(R.id.error_dialog_close_view).setOnClickListener {
+                onClose()
+                dismiss()
+            }
         })
 
     fun show() = dialog.show()

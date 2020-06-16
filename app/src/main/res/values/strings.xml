@@ -6,6 +6,11 @@
 
     <!-- URLs, etc -->
     <string name="ttl_store_url" translatable="false">https://store.tarilabs.com</string>
+    <string name="tari_url" translatable="false">https://tari.com</string>
+    <string name="github_repo_url" translatable="false">https://github.com/tari-project/wallet-android/</string>
+    <string name="user_agreement_url">https://www.tari.com/user_agreement/</string>
+    <string name="privacy_policy_url">https://www.tari.com/privacy_policy/</string>
+    <string name="disclaimer_url">https://www.tari.com/disclaimer/</string>
     <string name="ffi_admin_email_address" translatable="false">bug_reports@tari.com</string>
 
     <!-- digits -->
@@ -100,9 +105,8 @@
     <string name="create_wallet_just_sec_desc_text">We’re creating your wallet.</string>
     <string name="create_wallet_user_agreement_and_privacy_policy">By creating a wallet, you agree to the terms\nof the User Agreement and Privacy Policy</string>
     <string name="create_wallet_user_agreement">User Agreement</string>
-    <string name="create_wallet_user_agreement_url">https://www.tari.com/user_agreement/</string>
     <string name="create_wallet_privacy_policy">Privacy Policy</string>
-    <string name="create_wallet_privacy_policy_url">https://www.tari.com/privacy_policy/</string>
+    <string name="create_wallet_restore_wallet_cta">Restore an Existing Wallet</string>
     <!-- screen #2 -->
     <string name="create_wallet_awesome">We’re off to a great start!</string>
     <string name="create_wallet_now_text">Now, let’s create your Emoji ID.</string>
@@ -256,5 +260,57 @@
     <!-- In-app store -->
     <string name="store_title">Tari Testnet Store</string>
     <string name="store_no_application_to_open_the_link_error">Seems that there are no applications to handle link sharing.</string>
+
+    <!-- Settings -->
+    <string name="all_settings_page_title">Settings</string>
+    <string name="all_settings_close">Done</string>
+    <string name="all_settings_security_label">Security</string>
+    <string name="all_settings_back_up_wallet">Back Up Wallet</string>
+    <string name="all_settings_secondary_settings_label">More</string>
+    <string name="all_settings_visit_site">Visit Tari.com</string>
+    <string name="all_settings_contribute">Contribute to Tari Aurora</string>
+    <string name="all_settings_user_agreement">User Agreement</string>
+    <string name="all_settings_privacy_policy">Privacy policy</string>
+    <string name="all_settings_disclaimer">Disclaimer</string>
+    <string name="settings_back_up_wallet_settings_page_title">Back Up Wallet</string>
+    <string name="settings_back_up_wallet_settings_page_description">By backing up your wallet, you’ll ensure that you don’t lose your tXTR if your phone is lost or broken.</string>
+    <string name="settings_back_up_wallet_to_cloud_cta">Back up to Google Drive</string>
+    <string name="settings_back_up_wallet_with_recovery_phrase_cta">Back up with recovery phrase</string>
+
+    <!-- Wallet back up -->
+    <string name="back_up_wallet_page_title">Restore Your Wallet</string>
+    <string name="back_up_wallet_restore_with_cloud">Restore with Google Drive</string>
+    <string name="back_up_wallet_restore_with_recovery_phrase">Restore with recovery phrase</string>
+    <string name="back_up_wallet_restoring_wallet_label">Restoring your wallet</string>
+    <string name="back_up_wallet_restoring_wallet_label_description">This could take between 1 to 3 minutes.\nPlease keep the app open.</string>
+    <string name="back_up_wallet_auth_not_available_error">Local authentication not available, please enable it in your system\'s settings to enable the wallet backup</string>
+    <string name="back_up_wallet_enter_password_title">Set password for your backup</string>
+    <string name="back_up_wallet_enter_password_hint">Enter password here…</string>
+    <string name="back_up_wallet_backup_cta">Backup</string>
+    <string name="back_up_wallet_authentication_error_title">Authentication error occurred</string>
+    <string name="back_up_wallet_authentication_error_desc">Authentication is necessary in order to interact with the backup file on Google Drive</string>
+    <string name="back_up_wallet_back_up_check_error_title">Failed to check current backup</string>
+    <string name="back_up_wallet_back_up_check_error_desc">Current backup state check failed: %s</string>
+    <string name="back_up_wallet_backing_up_error_title">Backup error</string>
+    <string name="back_up_wallet_backing_up_error_desc">Error occurred during backup: %s</string>
+    <string name="back_up_wallet_back_up_is_in_progress_error">Backup already in progress</string>
+
+    <!-- Wallet back up with seed phrase -->
+    <string name="back_up_seed_phrase_page_title">Back Up With Seed Phrase</string>
+    <string name="back_up_seed_phrase_desc">Carefully write these 12 words down in order (left to right) on a piece of paper, and hide it somewhere others won’t access it. Do not take a screenshot.</string>
+    <string name="back_up_seed_phrase_verify_cta">Verify Seed Phrase</string>
+    <string name="back_up_seep_phrase_losing_warning_label">I understand that if I lose my recovery seed phrase I will not be able to restore my wallet.</string>
+
+    <!-- Verify seed phrase -->
+    <string name="verify_seed_phrase_page_title">Verify Seed Phrase</string>
+    <string name="verify_seed_phrase_select_words_label">Select the words in the correct order.</string>
+    <string name="verify_seed_phrase_select_words_description">Tap on the words above in the correct order</string>
+    <string name="verify_seed_phrase_complete_verification_cta">Complete Verification</string>
+    <string name="verify_seed_phrase_sequence_is_invalid_message">Nope, that’s not right</string>
+    <string name="verify_seed_phrase_content_description_sequence_is_correct">Sequence is correct</string>
+
+    <!-- Wallet restore -->
+    <string name="restore_wallet_with_cloud_error_title">Error occurred during restoration</string>
+    <string name="restore_wallet_with_cloud_error_desc">Wallet could not be restored: %s</string>
 
 </resources>

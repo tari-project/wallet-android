@@ -32,18 +32,19 @@
  */
 package com.tari.android.wallet.ui.fragment.onboarding
 
-import android.animation.*
+import android.animation.AnimatorSet
+import android.animation.ObjectAnimator
+import android.animation.ValueAnimator
 import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AlertDialog
-import androidx.biometric.BiometricManager
-import androidx.biometric.BiometricManager.BIOMETRIC_SUCCESS
 import androidx.biometric.BiometricPrompt
-import androidx.core.content.ContextCompat
+import androidx.core.animation.addListener
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import com.daasuu.ei.Ease
 import com.daasuu.ei.EasingInterpolator
 import com.orhanobut.logger.Logger
@@ -51,14 +52,17 @@ import com.tari.android.wallet.R
 import com.tari.android.wallet.R.dimen.auth_button_bottom_margin
 import com.tari.android.wallet.R.string.*
 import com.tari.android.wallet.application.WalletState
-import com.tari.android.wallet.auth.AuthUtil
 import com.tari.android.wallet.databinding.FragmentLocalAuthBinding
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.infrastructure.Tracker
+import com.tari.android.wallet.infrastructure.security.biometric.BiometricAuthenticationService
+import com.tari.android.wallet.infrastructure.security.biometric.BiometricAuthenticationService.BiometricAuthenticationException
+import com.tari.android.wallet.infrastructure.security.biometric.BiometricAuthenticationService.BiometricAuthenticationType.*
 import com.tari.android.wallet.ui.extension.*
 import com.tari.android.wallet.ui.util.UiUtil
 import com.tari.android.wallet.util.Constants.UI.Auth
 import com.tari.android.wallet.util.SharedPrefsWrapper
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 /**
@@ -68,19 +72,16 @@ import javax.inject.Inject
  */
 internal class LocalAuthFragment : Fragment() {
 
-    enum class AuthType {
-        BIOMETRIC,
-        PIN,
-        NONE
-    }
-
     @Inject
     lateinit var sharedPrefsWrapper: SharedPrefsWrapper
 
     @Inject
     lateinit var tracker: Tracker
 
-    private var authType: AuthType = AuthType.NONE
+    @Inject
+    lateinit var authService: BiometricAuthenticationService
+
+    private var authType = NONE
     private var listener: Listener? = null
     private var continueIsPendingOnWalletState = false
     private lateinit var ui: FragmentLocalAuthBinding
@@ -119,17 +120,16 @@ internal class LocalAuthFragment : Fragment() {
 
     private fun setDeviceAuthType() {
         authType = when {
-            BiometricManager.from(context!!)
-                .canAuthenticate() == BIOMETRIC_SUCCESS -> AuthType.BIOMETRIC
-            AuthUtil.isDeviceSecured(context!!) -> AuthType.PIN
-            else -> AuthType.NONE
+            authService.isBiometricAuthAvailable -> BIOMETRIC
+            authService.isDeviceSecured -> PIN
+            else -> NONE
         }
     }
 
     private fun setupUi() {
         ui.progressBarContainerView.invisible()
         UiUtil.setProgressBarColor(ui.progressBar, color(R.color.white))
-        if (authType == AuthType.BIOMETRIC) {
+        if (authType == BIOMETRIC) {
             //setup ui for biometric auth
             ui.authTypeImageView.setImageResource(R.drawable.fingerprint)
             ui.enableAuthButton.text = string(auth_prompt_button_touch_id_text)
@@ -177,12 +177,10 @@ internal class LocalAuthFragment : Fragment() {
     private fun onEnableAuthButtonClick(view: View) {
         UiUtil.temporarilyDisableClick(view)
         val animatorSet = UiUtil.animateButtonClick(ui.enableAuthButton)
-        animatorSet.addListener(object : AnimatorListenerAdapter() {
-            override fun onAnimationEnd(animation: Animator?) {
-                if (authType == AuthType.NONE) {
-                    displayAuthNotAvailableDialog()
-                    return
-                }
+        animatorSet.addListener(onEnd = {
+            if (authType == NONE) {
+                displayAuthNotAvailableDialog()
+            } else {
                 ui.enableAuthButton.isEnabled = false
                 doAuth()
             }
@@ -190,46 +188,21 @@ internal class LocalAuthFragment : Fragment() {
     }
 
     private fun doAuth() {
-        // display authentication dialog
-        val executor = ContextCompat.getMainExecutor(context)
-        val biometricPrompt = BiometricPrompt(
-            this,
-            executor,
-            object : BiometricPrompt.AuthenticationCallback() {
-                override fun onAuthenticationError(
-                    errorCode: Int,
-                    errString: CharSequence
-                ) {
-                    super.onAuthenticationError(errorCode, errString)
-                    when (errorCode) {
-                        BiometricPrompt.ERROR_USER_CANCELED -> authFailed()
-                        BiometricPrompt.ERROR_CANCELED -> authFailed()
-                        else -> {
-                            Logger.e("Other auth error. Code: %d", errorCode)
-                            authFailed()
-                        }
-                    }
-                }
-
-                override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
-                    super.onAuthenticationSucceeded(result)
-                    // startAuthVerifyAnim(false)
-                    authSuccess()
-                }
-            })
-
-        val biometricAuthAvailable =
-            BiometricManager.from(context!!).canAuthenticate() == BIOMETRIC_SUCCESS
-        val prompt =
-            if (biometricAuthAvailable) string(onboarding_auth_biometric_prompt)
-            else string(onboarding_auth_device_lock_code_prompt)
-        val promptInfo = BiometricPrompt.PromptInfo.Builder()
-            .setTitle(string(onboarding_auth_title))
-            .setSubtitle(prompt)
-            .setDeviceCredentialAllowed(true)
-            .build()
-        biometricPrompt.authenticate(promptInfo)
-        // hideAuthVerifyAnim()
+        lifecycleScope.launch {
+            try {
+                val isSuccessful = authService.authenticate(
+                    fragment = this@LocalAuthFragment,
+                    title = string(onboarding_auth_title),
+                    subtitle = if (authType == BIOMETRIC) string(onboarding_auth_biometric_prompt)
+                    else string(onboarding_auth_device_lock_code_prompt)
+                )
+                if (isSuccessful) authSuccess() else authFailed()
+            } catch (e: BiometricAuthenticationException) {
+                if (e.code != BiometricPrompt.ERROR_USER_CANCELED && e.code != BiometricPrompt.ERROR_CANCELED)
+                    Logger.e("Other auth error. Code: ${e.code}")
+                authFailed()
+            }
+        }
     }
 
     /**

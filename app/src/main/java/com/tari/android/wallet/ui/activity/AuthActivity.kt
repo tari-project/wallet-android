@@ -32,7 +32,6 @@
  */
 package com.tari.android.wallet.ui.activity
 
-import android.animation.Animator
 import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
 import android.animation.ValueAnimator
@@ -41,35 +40,30 @@ import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.biometric.BiometricManager
-import androidx.biometric.BiometricPrompt
+import androidx.biometric.BiometricPrompt.ERROR_CANCELED
+import androidx.biometric.BiometricPrompt.ERROR_USER_CANCELED
 import androidx.core.animation.addListener
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.lifecycleScope
 import com.daasuu.ei.Ease
 import com.daasuu.ei.EasingInterpolator
 import com.orhanobut.logger.Logger
 import com.tari.android.wallet.BuildConfig
-import com.tari.android.wallet.R
 import com.tari.android.wallet.R.color.white
-import com.tari.android.wallet.R.string.auth_biometric_prompt
-import com.tari.android.wallet.R.string.auth_device_lock_code_prompt
+import com.tari.android.wallet.R.string.*
 import com.tari.android.wallet.application.WalletState
-import com.tari.android.wallet.auth.AuthUtil
 import com.tari.android.wallet.databinding.ActivityAuthBinding
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.infrastructure.Tracker
+import com.tari.android.wallet.infrastructure.security.biometric.BiometricAuthenticationService
+import com.tari.android.wallet.infrastructure.security.biometric.BiometricAuthenticationService.BiometricAuthenticationException
 import com.tari.android.wallet.service.WalletService
 import com.tari.android.wallet.ui.activity.home.HomeActivity
 import com.tari.android.wallet.ui.extension.*
-import com.tari.android.wallet.ui.extension.color
-import com.tari.android.wallet.ui.extension.invisible
-import com.tari.android.wallet.ui.extension.string
-import com.tari.android.wallet.ui.extension.visible
 import com.tari.android.wallet.ui.util.UiUtil
 import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.SharedPrefsWrapper
-import java.lang.ref.WeakReference
-import java.util.concurrent.Executors
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 /**
@@ -77,15 +71,16 @@ import javax.inject.Inject
  *
  * @author The Tari Development Team
  */
-internal class AuthActivity : AppCompatActivity(), Animator.AnimatorListener {
-
-    private lateinit var biometricPrompt: BiometricPrompt
+internal class AuthActivity : AppCompatActivity() {
 
     @Inject
     lateinit var tracker: Tracker
 
     @Inject
     lateinit var sharedPrefsWrapper: SharedPrefsWrapper
+
+    @Inject
+    lateinit var authService: BiometricAuthenticationService
 
     private var continueIsPendingOnWalletState = false
 
@@ -114,8 +109,7 @@ internal class AuthActivity : AppCompatActivity(), Animator.AnimatorListener {
         UiUtil.setProgressBarColor(ui.progressBar, color(white))
         ui.progressBar.invisible()
         // call the animations
-        val wr = WeakReference(this)
-        ui.bigGemImageView.post { wr.get()?.showTariText() }
+        showTariText()
         val versionInfo = "${Constants.Wallet.network.displayName} ${BuildConfig.VERSION_NAME}"
         ui.networkInfoTextView.text = versionInfo
     }
@@ -148,20 +142,16 @@ internal class AuthActivity : AppCompatActivity(), Animator.AnimatorListener {
         // define animations
         val hideGemAnim = ValueAnimator.ofFloat(1f, 0f)
         val showTariTextAnim = ValueAnimator.ofFloat(0f, 1f)
-        val weakReference: WeakReference<AuthActivity> = WeakReference(this)
         hideGemAnim.addUpdateListener { valueAnimator: ValueAnimator ->
             val alpha = valueAnimator.animatedValue as Float
-            weakReference.get()?.ui?.bigGemImageView?.alpha = alpha
+            ui.bigGemImageView.alpha = alpha
         }
         showTariTextAnim.addUpdateListener { valueAnimator: ValueAnimator ->
-            weakReference.get()?.ui?.let {
-                val alpha = valueAnimator.animatedValue as Float
-                it.authAnimLottieAnimationView.alpha = alpha
-                it.networkInfoTextView.alpha = alpha
-                it.smallGemImageView.alpha = alpha
-            }
+            val alpha = valueAnimator.animatedValue as Float
+            ui.authAnimLottieAnimationView.alpha = alpha
+            ui.networkInfoTextView.alpha = alpha
+            ui.smallGemImageView.alpha = alpha
         }
-
         // chain animations
         val animSet = AnimatorSet()
         animSet.startDelay = Constants.UI.shortDurationMs
@@ -170,8 +160,7 @@ internal class AuthActivity : AppCompatActivity(), Animator.AnimatorListener {
         // define interpolator
         animSet.interpolator = EasingInterpolator(Ease.QUART_IN)
         // authenticate at the end of the animation set
-        val wr = WeakReference(this)
-        animSet.addListener(onEnd = { wr.get()?.doAuth() })
+        animSet.addListener(onEnd = { doAuth() })
         // start the animation set
         animSet.start()
     }
@@ -181,55 +170,29 @@ internal class AuthActivity : AppCompatActivity(), Animator.AnimatorListener {
      * on passcode if not.
      */
     private fun doAuth() {
-        val wr = WeakReference(this)
-
         // check whether there's at least screen lock
-        if (!AuthUtil.isDeviceSecured(this)) {
-            // local authentication not available
-            ui.authAnimLottieAnimationView.post {
-                wr.get()?.displayAuthNotAvailableDialog()
+        if (authService.isDeviceSecured) {
+            lifecycleScope.launch {
+                try {
+                    // prompt system authentication dialog
+                    authService.authenticate(
+                        this@AuthActivity,
+                        title = string(auth_title),
+                        subtitle =
+                        if (authService.isBiometricAuthAvailable) string(auth_biometric_prompt)
+                        else string(auth_device_lock_code_prompt)
+                    )
+                    authSuccessful()
+                } catch (e: BiometricAuthenticationException) {
+                    if (e.code != ERROR_USER_CANCELED && e.code != ERROR_CANCELED)
+                        Logger.e("Other biometric error. Code: ${e.code}")
+                    authHasFailed()
+                }
             }
-            return
+        } else {
+            // local authentication not available
+            displayAuthNotAvailableDialog()
         }
-
-        // display authentication dialog
-        val executor = Executors.newSingleThreadExecutor()
-        biometricPrompt = BiometricPrompt(
-            this,
-            executor,
-            object : BiometricPrompt.AuthenticationCallback() {
-
-                override fun onAuthenticationError(errorCode: Int, errString: CharSequence) {
-                    super.onAuthenticationError(errorCode, errString)
-                    when (errorCode) {
-                        BiometricPrompt.ERROR_USER_CANCELED -> wr.get()?.authHasFailed()
-                        BiometricPrompt.ERROR_CANCELED -> wr.get()?.authHasFailed()
-                        else -> {
-                            Logger.e("Other biometric error. Code: %d", errorCode)
-                            wr.get()?.authHasFailed()
-                        }
-                    }
-                }
-
-                override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
-                    super.onAuthenticationSucceeded(result)
-                    wr.get()?.authSuccessful()
-                }
-
-            })
-
-        val biometricAuthAvailable =
-            BiometricManager.from(applicationContext)
-                .canAuthenticate() == BiometricManager.BIOMETRIC_SUCCESS
-        val prompt =
-            if (biometricAuthAvailable) string(auth_biometric_prompt)
-            else string(auth_device_lock_code_prompt)
-        val promptInfo = BiometricPrompt.PromptInfo.Builder()
-            .setTitle(getString(R.string.auth_title))
-            .setSubtitle(prompt)
-            .setDeviceCredentialAllowed(true) // enable passcode (i.e. screenlock)
-            .build()
-        biometricPrompt.authenticate(promptInfo)
     }
 
     /**
@@ -237,10 +200,7 @@ internal class AuthActivity : AppCompatActivity(), Animator.AnimatorListener {
      */
     private fun authSuccessful() {
         sharedPrefsWrapper.isAuthenticated = true
-        val wr = WeakReference(this)
-        wr.get()?.ui?.authAnimLottieAnimationView?.post {
-            wr.get()?.playTariWalletAnim()
-        }
+        playTariWalletAnim()
     }
 
     /**
@@ -248,49 +208,40 @@ internal class AuthActivity : AppCompatActivity(), Animator.AnimatorListener {
      */
     private fun authHasFailed() {
         Logger.e("Authentication other error.")
-        val wr = WeakReference(this)
-        runOnUiThread { wr.get()?.displayAuthFailedDialog() }
+        displayAuthFailedDialog()
     }
 
     /**
      * Auth not available on device, i.e. lock screen is disabled
      */
     private fun displayAuthNotAvailableDialog() {
-        val wr = WeakReference(this)
         val dialogBuilder = AlertDialog.Builder(this)
-        dialogBuilder.setMessage(getString(R.string.auth_not_available_or_canceled_desc))
+        dialogBuilder.setMessage(getString(auth_not_available_or_canceled_desc))
             .setCancelable(false)
-            .setPositiveButton(getString(R.string.proceed)) { dialog, _ ->
+            .setPositiveButton(getString(proceed)) { dialog, _ ->
                 dialog.cancel()
                 // user has chosen to proceed without authentication
                 sharedPrefsWrapper.isAuthenticated = true
-                wr.get()?.ui?.authAnimLottieAnimationView?.post {
-                    wr.get()?.playTariWalletAnim()
-                }
+                playTariWalletAnim()
             }
             // negative button text and action
-            .setNegativeButton(getString(R.string.exit)) { _, _ ->
-                finish()
-            }
-
+            .setNegativeButton(getString(exit)) { _, _ -> finish() }
         val dialog = dialogBuilder.create()
-        dialog.setTitle(getString(R.string.auth_not_available_or_canceled_title))
+        dialog.setTitle(getString(auth_not_available_or_canceled_title))
         dialog.show()
     }
 
     private fun displayAuthFailedDialog() {
-        biometricPrompt.cancelAuthentication()
-
         val dialogBuilder = AlertDialog.Builder(this)
-        dialogBuilder.setMessage(getString(R.string.auth_failed_desc))
+        dialogBuilder.setMessage(getString(auth_failed_desc))
             .setCancelable(false)
             // negative button text and action
-            .setNegativeButton(getString(R.string.exit)) { _, _ ->
+            .setNegativeButton(getString(exit)) { _, _ ->
                 finish()
             }
 
         val alert = dialogBuilder.create()
-        alert.setTitle(getString(R.string.auth_failed_title))
+        alert.setTitle(getString(auth_failed_title))
         alert.show()
     }
 
@@ -298,7 +249,18 @@ internal class AuthActivity : AppCompatActivity(), Animator.AnimatorListener {
      * Plays Tari Wallet text anim.
      */
     private fun playTariWalletAnim() {
-        ui.authAnimLottieAnimationView.addAnimatorListener(this)
+        ui.authAnimLottieAnimationView.addAnimatorListener(onEnd = {
+            if (EventBus.walletStateSubject.value != WalletState.RUNNING) {
+                continueIsPendingOnWalletState = true
+                ui.progressBar.alpha = 0f
+                ui.progressBar.visible()
+                val alphaAnim = ObjectAnimator.ofFloat(ui.progressBar, View.ALPHA, 0f, 1f)
+                alphaAnim.duration = Constants.UI.mediumDurationMs
+                alphaAnim.start()
+            } else {
+                continueToHomeActivity()
+            }
+        })
         ui.authAnimLottieAnimationView.playAnimation()
 
         val fadeOutAnim = ValueAnimator.ofFloat(1f, 0f)
@@ -311,33 +273,6 @@ internal class AuthActivity : AppCompatActivity(), Animator.AnimatorListener {
         fadeOutAnim.startDelay = Constants.UI.CreateWallet.introductionBottomViewsFadeOutDelay
         fadeOutAnim.start()
     }
-
-    //region Animator Listener
-    override fun onAnimationStart(animation: Animator?) {
-        // no-op
-    }
-
-    override fun onAnimationRepeat(animation: Animator?) {
-        // no-op
-    }
-
-    override fun onAnimationCancel(animation: Animator?) {
-        // no-op
-    }
-
-    override fun onAnimationEnd(animation: Animator?) {
-        if (EventBus.walletStateSubject.value != WalletState.RUNNING) {
-            continueIsPendingOnWalletState = true
-            ui.progressBar.alpha = 0f
-            ui.progressBar.visible()
-            val alphaAnim = ObjectAnimator.ofFloat(ui.progressBar, View.ALPHA, 0f, 1f)
-            alphaAnim.duration = Constants.UI.mediumDurationMs
-            alphaAnim.start()
-        } else {
-            continueToHomeActivity()
-        }
-    }
-    //endregion Animator Listener
 
     private fun continueToHomeActivity() {
         val alphaAnim = ObjectAnimator.ofFloat(ui.progressBar, View.ALPHA, 1f, 0f)
