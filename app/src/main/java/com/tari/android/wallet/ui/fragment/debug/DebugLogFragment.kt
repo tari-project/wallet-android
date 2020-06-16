@@ -108,7 +108,7 @@ internal class DebugLogFragment : Fragment(), AdapterView.OnItemSelectedListener
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        DebugLogFragmentVisitor.visit(this)
+        appComponent.inject(this)
         setupUi()
     }
 
@@ -267,12 +267,6 @@ internal class DebugLogFragment : Fragment(), AdapterView.OnItemSelectedListener
                 string(common_share)
             )
         )
-    }
-
-    private object DebugLogFragmentVisitor {
-        internal fun visit(fragment: DebugLogFragment) {
-            fragment.requireActivity().appComponent.inject(fragment)
-        }
     }
 
 }

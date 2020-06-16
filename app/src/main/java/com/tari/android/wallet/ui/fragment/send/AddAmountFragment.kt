@@ -154,8 +154,8 @@ class AddAmountFragment : Fragment(), ServiceConnection {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        appComponent.inject(this)
         bindToWalletService()
-        AddAmountFragmentVisitor.visit(this)
         if (savedInstanceState == null) {
             tracker.screen(path = "/home/send_tari/add_amount", title = "Send Tari - Add Amount")
         }
@@ -1086,11 +1086,5 @@ class AddAmountFragment : Fragment(), ServiceConnection {
     }
 
     // endregion
-
-    private object AddAmountFragmentVisitor {
-        internal fun visit(fragment: AddAmountFragment) {
-            fragment.requireActivity().appComponent.inject(fragment)
-        }
-    }
 
 }

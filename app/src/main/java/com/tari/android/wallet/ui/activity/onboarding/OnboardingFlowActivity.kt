@@ -42,6 +42,7 @@ import com.tari.android.wallet.application.TariWalletApplication
 import com.tari.android.wallet.di.WalletModule
 import com.tari.android.wallet.service.WalletService
 import com.tari.android.wallet.ui.activity.home.HomeActivity
+import com.tari.android.wallet.ui.extension.appComponent
 import com.tari.android.wallet.ui.fragment.onboarding.CreateWalletFragment
 import com.tari.android.wallet.ui.fragment.onboarding.IntroductionFragment
 import com.tari.android.wallet.ui.fragment.onboarding.LocalAuthFragment
@@ -69,10 +70,9 @@ internal class OnboardingFlowActivity : AppCompatActivity(), IntroductionFragmen
     private val uiHandler = Handler()
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        appComponent.inject(this)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_onboarding_flow)
-        OnBoardingFlowActivityVisitor.visit(this)
-
         when {
             sharedPrefsWrapper.onboardingAuthWasInterrupted -> {
                 supportFragmentManager
@@ -165,9 +165,4 @@ internal class OnboardingFlowActivity : AppCompatActivity(), IntroductionFragmen
         finish()
     }
 
-    private object OnBoardingFlowActivityVisitor {
-        internal fun visit(activity: OnboardingFlowActivity) {
-            (activity.application as TariWalletApplication).appComponent.inject(activity)
-        }
-    }
 }

@@ -48,3 +48,6 @@ internal fun Fragment.dimenPx(@DimenRes id: Int): Int = requireContext().dimenPx
 internal fun Fragment.dimen(@DimenRes id: Int): Float = requireContext().dimen(id)
 
 internal fun Fragment.drawable(@DrawableRes id: Int): Drawable? = requireContext().drawable(id)
+
+internal val Fragment.appComponent
+    get() = requireActivity().appComponent

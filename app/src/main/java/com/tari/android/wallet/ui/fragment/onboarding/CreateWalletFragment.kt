@@ -111,7 +111,7 @@ internal class CreateWalletFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        CreateWalletFragmentVisitor.visit(this)
+        appComponent.inject(this)
         setupUi()
         tracker.screen(path = "/onboarding/create_wallet", title = "Onboarding - Create Wallet")
     }
@@ -663,9 +663,4 @@ internal class CreateWalletFragment : Fragment() {
         fun continueToEnableAuth()
     }
 
-    private object CreateWalletFragmentVisitor {
-        internal fun visit(fragment: CreateWalletFragment) {
-            fragment.requireActivity().appComponent.inject(fragment)
-        }
-    }
 }

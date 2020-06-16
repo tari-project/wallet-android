@@ -53,7 +53,6 @@ import com.tari.android.wallet.R
 import com.tari.android.wallet.R.color.white
 import com.tari.android.wallet.R.string.auth_biometric_prompt
 import com.tari.android.wallet.R.string.auth_device_lock_code_prompt
-import com.tari.android.wallet.application.TariWalletApplication
 import com.tari.android.wallet.application.WalletState
 import com.tari.android.wallet.auth.AuthUtil
 import com.tari.android.wallet.databinding.ActivityAuthBinding
@@ -61,6 +60,7 @@ import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.infrastructure.Tracker
 import com.tari.android.wallet.service.WalletService
 import com.tari.android.wallet.ui.activity.home.HomeActivity
+import com.tari.android.wallet.ui.extension.*
 import com.tari.android.wallet.ui.extension.color
 import com.tari.android.wallet.ui.extension.invisible
 import com.tari.android.wallet.ui.extension.string
@@ -92,10 +92,10 @@ internal class AuthActivity : AppCompatActivity(), Animator.AnimatorListener {
     private lateinit var ui: ActivityAuthBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        appComponent.inject(this)
         super.onCreate(savedInstanceState)
         ui = ActivityAuthBinding.inflate(layoutInflater).apply { setContentView(root) }
         overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
-        AuthActivityVisitor.visit(this)
         EventBus.subscribeToWalletState(this, this::onWalletStateChanged)
         setupUi()
         tracker.screen(path = "/local_auth", title = "Local Authentication")
@@ -349,14 +349,6 @@ internal class AuthActivity : AppCompatActivity(), Animator.AnimatorListener {
         startActivity(intent)
         // finish this activity
         finish()
-    }
-
-    private object AuthActivityVisitor {
-
-        fun visit(activity: AuthActivity) {
-            (activity.application as TariWalletApplication).appComponent.inject(activity)
-        }
-
     }
 
 }

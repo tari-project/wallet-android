@@ -85,7 +85,7 @@ internal class BaseNodeConfigFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        BaseNodeConfigFragmentVisitor.visit(this)
+        appComponent.inject(this)
         setupUi()
     }
 
@@ -225,12 +225,6 @@ internal class BaseNodeConfigFragment : Fragment() {
             R.string.debug_edit_base_node_failed,
             Toast.LENGTH_LONG
         ).show()
-    }
-
-    private object BaseNodeConfigFragmentVisitor {
-        internal fun visit(fragment: BaseNodeConfigFragment) {
-            fragment.requireActivity().appComponent.inject(fragment)
-        }
     }
 
 }

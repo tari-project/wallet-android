@@ -39,7 +39,6 @@ import com.tari.android.wallet.R
 import com.tari.android.wallet.R.color.black
 import com.tari.android.wallet.R.color.white
 import com.tari.android.wallet.application.DeepLink
-import com.tari.android.wallet.application.TariWalletApplication
 import com.tari.android.wallet.databinding.ActivitySendTariBinding
 import com.tari.android.wallet.event.Event
 import com.tari.android.wallet.event.EventBus
@@ -48,6 +47,7 @@ import com.tari.android.wallet.model.TxId
 import com.tari.android.wallet.model.User
 import com.tari.android.wallet.network.NetworkConnectionState
 import com.tari.android.wallet.ui.dialog.BottomSlideDialog
+import com.tari.android.wallet.ui.extension.appComponent
 import com.tari.android.wallet.ui.extension.color
 import com.tari.android.wallet.ui.extension.showInternetConnectionErrorDialog
 import com.tari.android.wallet.ui.fragment.send.AddAmountFragment
@@ -76,9 +76,9 @@ internal class SendTariActivity : AppCompatActivity(),
     private var sendTxIsInProgress = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        appComponent.inject(this)
         super.onCreate(savedInstanceState)
         ui = ActivitySendTariBinding.inflate(layoutInflater).apply { setContentView(root) }
-        SendTariActivityVisitor.visit(this)
         if (savedInstanceState == null) {
             loadFragment()
         }
@@ -296,11 +296,5 @@ internal class SendTariActivity : AppCompatActivity(),
     }
 
     // endregion
-
-    private object SendTariActivityVisitor {
-        internal fun visit(activity: SendTariActivity) {
-            (activity.application as TariWalletApplication).appComponent.inject(activity)
-        }
-    }
 
 }

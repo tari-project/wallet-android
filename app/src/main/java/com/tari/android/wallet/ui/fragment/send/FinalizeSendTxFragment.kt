@@ -172,8 +172,8 @@ class FinalizeSendTxFragment : Fragment(), ServiceConnection {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        appComponent.inject(this)
         bindToWalletService()
-        FinalizeSendTxFragmentVisitor.visit(this)
         listenerWR.get()?.onSendTxStarted(this)
         // get tx properties
         recipientUser = arguments!!.getParcelable("recipientUser")!!
@@ -622,12 +622,6 @@ class FinalizeSendTxFragment : Fragment(), ServiceConnection {
             note: String
         )
 
-    }
-
-    private object FinalizeSendTxFragmentVisitor {
-        internal fun visit(fragment: FinalizeSendTxFragment) {
-            fragment.requireActivity().appComponent.inject(fragment)
-        }
     }
 
 }

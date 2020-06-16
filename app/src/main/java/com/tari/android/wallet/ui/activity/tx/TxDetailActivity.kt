@@ -55,7 +55,6 @@ import com.tari.android.wallet.R
 import com.tari.android.wallet.R.color.*
 import com.tari.android.wallet.R.dimen.*
 import com.tari.android.wallet.R.string.*
-import com.tari.android.wallet.application.TariWalletApplication
 import com.tari.android.wallet.databinding.ActivityTxDetailBinding
 import com.tari.android.wallet.event.Event
 import com.tari.android.wallet.event.EventBus
@@ -126,9 +125,9 @@ internal class TxDetailActivity : AppCompatActivity(), ServiceConnection {
     private lateinit var dimmerViews: MutableList<View>
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        appComponent.inject(this)
         super.onCreate(savedInstanceState)
         ui = ActivityTxDetailBinding.inflate(layoutInflater).apply { setContentView(root) }
-        TxDetailActivityVisitor.visit(this)
         overridePendingTransition(R.anim.enter_from_right, R.anim.exit_to_left)
         tx =
             if (savedInstanceState == null) intent.getParcelableExtra(TX_DETAIL_EXTRA_KEY) as Tx
@@ -683,12 +682,6 @@ internal class TxDetailActivity : AppCompatActivity(), ServiceConnection {
                     else -> throw IllegalArgumentException("Unexpected Tx type: $tx")
                 }
             }
-        }
-    }
-
-    private object TxDetailActivityVisitor {
-        internal fun visit(activity: TxDetailActivity) {
-            (activity.application as TariWalletApplication).appComponent.inject(activity)
         }
     }
 

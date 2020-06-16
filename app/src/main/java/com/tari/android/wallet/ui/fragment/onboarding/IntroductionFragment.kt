@@ -106,7 +106,7 @@ internal class IntroductionFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        IntroductionFragmentVisitor.visit(this)
+        appComponent.inject(this)
         setupUi()
         tracker.screen(path = "/onboarding/introduction", title = "Onboarding - Introduction")
     }
@@ -343,9 +343,4 @@ internal class IntroductionFragment : Fragment() {
 
     }
 
-    private object IntroductionFragmentVisitor {
-        internal fun visit(fragment: IntroductionFragment) {
-            fragment.requireActivity().appComponent.inject(fragment)
-        }
-    }
 }
