@@ -39,7 +39,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import com.tari.android.wallet.R
 import com.tari.android.wallet.ui.activity.AuthActivity
-import com.tari.android.wallet.ui.extension.appComponent
+import com.tari.android.wallet.ui.extension.backupAndRestoreComponent
 import com.tari.android.wallet.ui.fragment.restore.ChooseRestoreOptionFragment
 import com.tari.android.wallet.ui.fragment.restore.RestorationWithCloudFragment
 import com.tari.android.wallet.ui.fragment.restore.WalletRestoringFragment
@@ -52,7 +52,7 @@ class WalletRestoreActivity : AppCompatActivity(), WalletRestoreRouter {
     lateinit var prefs: SharedPrefsWrapper
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        appComponent.inject(this)
+        backupAndRestoreComponent.inject(this)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_wallet_backup)
         if (savedInstanceState == null) {
