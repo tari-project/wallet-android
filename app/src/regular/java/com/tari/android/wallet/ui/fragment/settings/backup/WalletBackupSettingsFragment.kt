@@ -70,7 +70,7 @@ framework for UI tree rebuild on configuration changes"""
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        appComponent.inject(this)
+        backupAndRestoreComponent.inject(this)
     }
 
     override fun onCreateView(

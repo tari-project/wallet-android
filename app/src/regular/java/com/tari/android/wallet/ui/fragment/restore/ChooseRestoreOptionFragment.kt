@@ -54,7 +54,7 @@ import com.tari.android.wallet.infrastructure.backup.WalletRestorationFactory
 import com.tari.android.wallet.infrastructure.backup.storage.BackupStorageFactory
 import com.tari.android.wallet.ui.activity.restore.WalletRestoreRouter
 import com.tari.android.wallet.ui.dialog.ErrorDialog
-import com.tari.android.wallet.ui.extension.appComponent
+import com.tari.android.wallet.ui.extension.backupAndRestoreComponent
 import com.tari.android.wallet.ui.extension.string
 import com.tari.android.wallet.ui.fragment.restore.RestorationWithCloudFragment.RestorationWithCloudState
 import com.tari.android.wallet.ui.fragment.restore.RestorationWithCloudFragment.RestorationWithCloudStateFactory
@@ -78,7 +78,7 @@ framework for UI tree rebuild on configuration changes"""
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        appComponent.inject(this)
+        backupAndRestoreComponent.inject(this)
     }
 
     override fun onCreateView(
