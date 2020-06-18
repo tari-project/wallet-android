@@ -452,7 +452,7 @@ class AddRecipientFragment : Fragment(),
      */
     private fun fetchAllData(walletService: TariWalletService) {
         val error = WalletError()
-        contacts = walletService.getContacts(error)
+        contacts = walletService.getContacts(error) ?: emptyList()
         recentTxUsers = walletService.getRecentTxUsers(recentTxContactsLimit, error)
         val completedTxs = walletService.getCompletedTxs(error)
         val pendingInboundTxs = walletService.getPendingInboundTxs(error)
