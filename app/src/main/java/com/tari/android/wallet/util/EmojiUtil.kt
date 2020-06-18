@@ -36,7 +36,6 @@ import android.text.SpannableString
 import android.text.Spanned
 import android.text.style.ForegroundColorSpan
 import android.icu.text.BreakIterator
-import com.orhanobut.logger.Logger
 import com.tari.android.wallet.extension.applyColorStyle
 import com.tari.android.wallet.extension.applyLetterSpacingStyle
 import com.tari.android.wallet.extension.applyRelativeTextSizeStyle

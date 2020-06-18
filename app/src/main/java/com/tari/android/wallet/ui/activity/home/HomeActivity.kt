@@ -584,11 +584,10 @@ internal class HomeActivity : AppCompatActivity(),
             }
             if (!sharedPrefsWrapper.faucetTestnetTariRequestCompleted) {
                 requestTestnetTari()
-            } else { // update
-                updateProgressViewController.reset()
-                ui.scrollView.beginUpdate()
-                updateProgressViewController.start(walletService!!)
             }
+            updateProgressViewController.reset()
+            ui.scrollView.beginUpdate()
+            updateProgressViewController.start(walletService!!)
         }
     }
 

@@ -111,18 +111,13 @@ class SharedPrefsWrapper(
 
     var isAuthenticated: Boolean
         get() {
-            return SecurePreferences.getBooleanValue(
-                context,
-                Key.isAuthenticatedKey,
-                false
-            )
+            return sharedPrefs.getBoolean(Key.isAuthenticatedKey, false)
         }
         set(value) {
-            SecurePreferences.setValue(
-                context,
-                Key.isAuthenticatedKey,
-                value
-            )
+            sharedPrefs.edit().apply {
+                putBoolean(Key.isAuthenticatedKey, value)
+                apply()
+            }
         }
 
     var emojiId: String?
@@ -228,37 +223,23 @@ class SharedPrefsWrapper(
 
     var baseNodePublicKeyHex: String?
         get() {
-            return SecurePreferences.getStringValue(
-                context,
-                Key.baseNodePublicKeyHexKey,
-                null
-            )
+            return sharedPrefs.getString(Key.baseNodePublicKeyHexKey, null)
         }
         set(value) {
-            if (value != null) {
-                SecurePreferences.setValue(
-                    context,
-                    Key.baseNodePublicKeyHexKey,
-                    value
-                )
+            sharedPrefs.edit().apply {
+                putString(Key.baseNodePublicKeyHexKey, value)
+                apply()
             }
         }
 
     var baseNodeAddress: String?
         get() {
-            return SecurePreferences.getStringValue(
-                context,
-                Key.baseNodeAddressKey,
-                null
-            )
+            return sharedPrefs.getString(Key.baseNodeAddressKey, null)
         }
         set(value) {
-            if (value != null) {
-                SecurePreferences.setValue(
-                    context,
-                    Key.baseNodeAddressKey,
-                    value
-                )
+            sharedPrefs.edit().apply {
+                putString(Key.baseNodeAddressKey, value)
+                apply()
             }
         }
 
