@@ -625,7 +625,9 @@ internal class HomeActivity : AppCompatActivity(),
             // show digits
             balanceViewController.runStartupAnimation()
         } else {
-            balanceViewController.balanceInfo = balanceInfo
+            if (::balanceViewController.isInitialized) {
+                balanceViewController.balanceInfo = balanceInfo
+            }
         }
     }
 
