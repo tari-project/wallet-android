@@ -75,7 +75,11 @@ class WalletRestoreActivity : AppCompatActivity(), WalletRestoreRouter {
     }
 
     override fun onBackupCompleted() {
+        // wallet restored, setup shared prefs accordingly
+        prefs.onboardingCompleted = true
         prefs.onboardingAuthSetupCompleted = true
+        prefs.onboardingDisplayedAtHome = true
+
         startActivity(Intent(this, AuthActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         })

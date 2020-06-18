@@ -48,6 +48,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.animation.addListener
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import com.daasuu.ei.Ease
 import com.daasuu.ei.EasingInterpolator
 import com.orhanobut.logger.Logger
@@ -69,6 +70,8 @@ import com.tari.android.wallet.ui.extension.string
 import com.tari.android.wallet.ui.extension.visible
 import com.tari.android.wallet.ui.util.UiUtil.getResourceUri
 import com.tari.android.wallet.util.Constants
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import org.joda.time.DateTime
 import org.joda.time.Seconds
 import java.lang.ref.WeakReference
@@ -472,13 +475,15 @@ class FinalizeSendTxFragment : Fragment(), ServiceConnection {
     private fun sendTari() {
         listenerWR.get()?.onSendTxStarted(this)
         val error = WalletError()
-        val txId = walletService.sendTari(recipientUser, amount, fee, note, error)
-        // if success, just wait for the callback to happen
-        // if failed, just show the failed info & return
-        if (txId == null || error.code != WalletErrorCode.NO_ERROR) {
-            failureReason = FailureReason.SEND_ERROR
-        } else {
-            sentTxId = txId
+        lifecycleScope.launch(Dispatchers.IO) {
+            val txId = walletService.sendTari(recipientUser, amount, fee, note, error)
+            // if success, just wait for the callback to happen
+            // if failed, just show the failed info & return
+            if (txId == null || error.code != WalletErrorCode.NO_ERROR) {
+                failureReason = FailureReason.SEND_ERROR
+            } else {
+                sentTxId = txId
+            }
         }
     }
 

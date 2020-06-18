@@ -74,6 +74,7 @@ internal class WalletManager(
 ) {
 
     private var logFileObserver: LogFileObserver? = null
+    private lateinit var baseNodeIterator: Iterator<Pair<String, String>>
 
     init {
         // post initial wallet state
@@ -150,7 +151,7 @@ internal class WalletManager(
      * Instantiates the comms configuration for the wallet.
      */
     private fun getCommsConfig(): FFICommsConfig {
-        return FFICommsConfig(
+        val commsConfig = FFICommsConfig(
             NetAddressString(
                 "127.0.0.1",
                 39069
@@ -158,24 +159,19 @@ internal class WalletManager(
             getTorTransport(),
             Constants.Wallet.walletDBName,
             walletFilesDirPath,
-            FFIPrivateKey((getWalletPrivateKeyHexString(sharedPrefsWrapper))),
             Constants.Wallet.discoveryTimeoutSec
         )
-    }
 
-    /**
-     * If a private key is saved in the shared prefs, returns the saved value,
-     * if not, generates a net private key, saves it in the shared prefs & returns it.
-     */
-    private fun getWalletPrivateKeyHexString(sharedPrefsWrapper: SharedPrefsWrapper): HexString {
-        var hexString = sharedPrefsWrapper.privateKeyHexString
-        if (hexString == null) {
-            val privateKeyFFI = FFIPrivateKey()
-            hexString = privateKeyFFI.toString()
-            privateKeyFFI.destroy()
-            sharedPrefsWrapper.privateKeyHexString = hexString
+        // begin: backwards compatibility for private key in shared preferences
+        sharedPrefsWrapper.privateKeyHexString?.let {
+            commsConfig.setPrivateKey(
+                FFIPrivateKey(HexString(it))
+            )
+            sharedPrefsWrapper.privateKeyHexString = null
         }
-        return HexString(hexString)
+        // end: backwards compatibility
+
+        return commsConfig
     }
 
     /**
@@ -198,6 +194,7 @@ internal class WalletManager(
                 )
             )
         }
+        baseNodes.shuffle()
         baseNodes
     }
 
@@ -205,10 +202,13 @@ internal class WalletManager(
      * Select a base node randomly from the list of base nodes in base_nodes.tx, and sets
      * the wallet and stored the values in shared prefs.
      */
-    private fun setRandomBaseNode() {
-        val randomBaseNode = baseNodeList.random()
-        val publicKeyHex = randomBaseNode.first
-        val address = randomBaseNode.second
+    fun setNextBaseNode() {
+        if (!this::baseNodeIterator.isInitialized || !baseNodeIterator.hasNext()) {
+            baseNodeIterator = baseNodeList.iterator()
+        }
+        val baseNode = baseNodeIterator.next()
+        val publicKeyHex = baseNode.first
+        val address = baseNode.second
         sharedPrefsWrapper.baseNodePublicKeyHex = publicKeyHex
         sharedPrefsWrapper.baseNodeAddress = address
 
@@ -253,7 +253,7 @@ internal class WalletManager(
             FFIWallet.instance = wallet
             sharedPrefsWrapper.torIdentity = wallet.getTorIdentity()
             startLogFileObserver()
-            setRandomBaseNode()
+            setNextBaseNode()
             saveWalletPublicKeyHexToSharedPrefs()
         }
     }

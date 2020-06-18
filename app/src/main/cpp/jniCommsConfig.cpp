@@ -48,7 +48,6 @@ Java_com_tari_android_wallet_ffi_FFICommsConfig_jniCreate(
         jobject jTransport,
         jstring jDatabaseName,
         jstring jDatastorePath,
-        jobject jPrivateKey,
         jlong jDiscoveryTimeoutSec,
         jobject error) {
     const char *pControlServiceAddress = jEnv->GetStringUTFChars(
@@ -56,8 +55,6 @@ Java_com_tari_android_wallet_ffi_FFICommsConfig_jniCreate(
             JNI_FALSE);
     const char *pDatabaseName = jEnv->GetStringUTFChars(jDatabaseName, JNI_FALSE);
     const char *pDatastorePath = jEnv->GetStringUTFChars(jDatastorePath, JNI_FALSE);
-    jlong lPrivateKey = GetPointerField(jEnv, jPrivateKey);
-    TariPrivateKey *pPrivateKey = reinterpret_cast<TariPrivateKey *>(lPrivateKey);
     jlong lTransport = GetPointerField(jEnv, jTransport);
     TariTransportType *pTransport = reinterpret_cast<TariTransportType *>(lTransport);
     int i = 0;
@@ -70,7 +67,6 @@ Java_com_tari_android_wallet_ffi_FFICommsConfig_jniCreate(
             pTransport,
             pDatabaseName,
             pDatastorePath,
-            pPrivateKey,
             static_cast<unsigned long long int>(jDiscoveryTimeoutSec),
             r);
     jEnv->ReleaseStringUTFChars(jPublicAddress, pControlServiceAddress);
@@ -78,6 +74,23 @@ Java_com_tari_android_wallet_ffi_FFICommsConfig_jniCreate(
     jEnv->ReleaseStringUTFChars(jDatastorePath, pDatastorePath);
     setErrorCode(jEnv, error, i);
     SetPointerField(jEnv, jThis, reinterpret_cast<jlong>(pCommsConfig));
+}
+
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_tari_android_wallet_ffi_FFICommsConfig_jniSetPrivateKey(
+        JNIEnv *jEnv,
+        jobject jThis,
+        jobject jPrivateKey,
+        jobject error) {
+    jlong lCommsConfig = GetPointerField(jEnv, jThis);
+    TariCommsConfig *pCommsConfig = reinterpret_cast<TariCommsConfig *>(lCommsConfig);
+    jlong lPrivateKey = GetPointerField(jEnv, jPrivateKey);
+    TariPrivateKey *pPrivateKey = reinterpret_cast<TariPrivateKey *>(lPrivateKey);
+    int i = 0;
+    int *r = &i;
+    comms_config_set_secret_key(pCommsConfig, pPrivateKey, r);
+    setErrorCode(jEnv, error, i);
 }
 
 extern "C"

@@ -36,6 +36,10 @@ import android.annotation.SuppressLint
 import android.app.Service
 import android.content.Intent
 import android.os.IBinder
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleObserver
+import androidx.lifecycle.OnLifecycleEvent
+import androidx.lifecycle.ProcessLifecycleOwner
 import com.orhanobut.logger.Logger
 import com.tari.android.wallet.R
 import com.tari.android.wallet.application.TariWalletApplication
@@ -73,7 +77,7 @@ import kotlin.collections.ArrayList
  *
  * @author The Tari Development Team
  */
-internal class WalletService : Service(), FFIWalletListenerAdapter {
+internal class WalletService : Service(), FFIWalletListenerAdapter, LifecycleObserver {
 
     companion object {
         // notification id
@@ -122,9 +126,16 @@ internal class WalletService : Service(), FFIWalletListenerAdapter {
     private val expirationCheckPeriodMinutes = Minutes.minutes(30)
 
     /**
+     * Switch to low power mode 3 minutes after the app gets backgrounded.
+     */
+    private val backgroundLowPowerModeSwitchMinutes = Minutes.minutes(3)
+
+    /**
      * Timer to trigger the expiration checks.
      */
     private var txExpirationCheckSubscription: Disposable? = null
+
+    private var lowPowerModeSubscription: Disposable? = null
 
     override fun onCreate() {
         super.onCreate()
@@ -151,6 +162,7 @@ internal class WalletService : Service(), FFIWalletListenerAdapter {
             wallet.listenerAdapter = this
             EventBus.unsubscribeFromWalletState(this)
             scheduleExpirationCheck()
+            ProcessLifecycleOwner.get().lifecycle.addObserver(this)
         }
     }
 
@@ -190,6 +202,43 @@ internal class WalletService : Service(), FFIWalletListenerAdapter {
             Intent(this, ServiceRestartBroadcastReceiver::class.java)
         )
         super.onDestroy()
+    }
+
+    @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
+    fun onAppBackgrounded() {
+        // schedule low power mode
+        lowPowerModeSubscription =
+            Observable
+                .timer(backgroundLowPowerModeSwitchMinutes.minutes.toLong(), TimeUnit.MINUTES)
+                .subscribeOn(Schedulers.io())
+                .observeOn(Schedulers.io())
+                .subscribe {
+                    switchToLowPowerMode()
+                }
+    }
+
+    @OnLifecycleEvent(Lifecycle.Event.ON_START)
+    fun onAppForegrounded() {
+        switchToNormalPowerMode()
+    }
+
+    private fun switchToNormalPowerMode() {
+        Logger.d("Switch to normal power mode.")
+        lowPowerModeSubscription?.dispose()
+        try {
+            wallet.setPowerModeNormal()
+        } catch (e: FFIException) { // silent fail
+            Logger.e("FFI error #${e.error?.code} while switching to normal power mode.")
+        }
+    }
+
+    private fun switchToLowPowerMode() {
+        Logger.d("Switch to low power mode.")
+        try {
+            wallet.setPowerModeLow()
+        } catch (e: FFIException) { // silent fail
+            Logger.e("FFI error #${e.error?.code} while switching to low power mode.")
+        }
     }
 
     override fun onTxBroadcast(completedTx: CompletedTx) {
@@ -314,6 +363,8 @@ internal class WalletService : Service(), FFIWalletListenerAdapter {
         listeners.iterator().forEach {
             it.onBaseNodeSyncComplete(RequestId(requestId), success)
         }
+        // add the next base node from the list if sync has failed
+        if (!success) walletManager.setNextBaseNode()
     }
 
     /**
