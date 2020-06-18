@@ -212,16 +212,16 @@ internal class LocalAuthFragment : Fragment() {
         // TODO decide what do if there's no auth at all.
         //  For now let's display an alert dialog indicating the error
         Logger.e("Authentication other error.")
-
-        val dialogBuilder = AlertDialog.Builder(context!!)
-        dialogBuilder.setMessage(string(auth_failed_desc))
-            .setCancelable(false)
-            // negative button text and action
-            .setNegativeButton(string(common_ok), null)
-
-        val dialog = dialogBuilder.create()
-        dialog.setTitle(string(auth_failed_title))
-        dialog.show()
+        context?.let {
+            AlertDialog.Builder(it)
+                .setMessage(string(auth_failed_desc))
+                .setCancelable(false)
+                // negative button text and action
+                .setNegativeButton(string(common_ok), null)
+                .create()
+                .apply { setTitle(string(auth_failed_title)) }
+                .show()
+        }
         ui.enableAuthButton.isEnabled = true
     }
 
