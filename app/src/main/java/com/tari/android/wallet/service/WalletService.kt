@@ -56,6 +56,7 @@ import com.tari.android.wallet.ui.extension.string
 import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.SharedPrefsWrapper
 import io.reactivex.Observable
+import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import org.joda.time.DateTime
 import org.joda.time.Hours
@@ -123,16 +124,7 @@ internal class WalletService : Service(), FFIWalletListenerAdapter {
     /**
      * Timer to trigger the expiration checks.
      */
-    private val txExpirationCheckSubscription =
-        Observable
-            .timer(expirationCheckPeriodMinutes.minutes.toLong(), TimeUnit.MINUTES)
-            .repeat()
-            .subscribeOn(Schedulers.io())
-            .observeOn(Schedulers.io())
-            .subscribe {
-                cancelExpiredPendingInboundTxs()
-                cancelExpiredPendingOutboundTxs()
-            }
+    private var txExpirationCheckSubscription: Disposable? = null
 
     override fun onCreate() {
         super.onCreate()
@@ -158,7 +150,21 @@ internal class WalletService : Service(), FFIWalletListenerAdapter {
             wallet = FFIWallet.instance!!
             wallet.listenerAdapter = this
             EventBus.unsubscribeFromWalletState(this)
+            scheduleExpirationCheck()
         }
+    }
+
+    private fun scheduleExpirationCheck() {
+        txExpirationCheckSubscription =
+            Observable
+                .timer(expirationCheckPeriodMinutes.minutes.toLong(), TimeUnit.MINUTES)
+                .repeat()
+                .subscribeOn(Schedulers.io())
+                .observeOn(Schedulers.io())
+                .subscribe {
+                    cancelExpiredPendingInboundTxs()
+                    cancelExpiredPendingOutboundTxs()
+                }
     }
 
     /**
@@ -179,7 +185,7 @@ internal class WalletService : Service(), FFIWalletListenerAdapter {
      */
     override fun onDestroy() {
         Logger.d("Service destroyed.")
-        txExpirationCheckSubscription.dispose()
+        txExpirationCheckSubscription?.dispose()
         sendBroadcast(
             Intent(this, ServiceRestartBroadcastReceiver::class.java)
         )
