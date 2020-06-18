@@ -50,4 +50,7 @@ internal fun throwIf(error: FFIError) {
 internal class FFIException(
     val error: FFIError? = null,
     override val message: String? = null
-) : RuntimeException()
+) : RuntimeException() {
+
+    override fun toString(): String = "FFIException(error=$error, message=$message)"
+}
