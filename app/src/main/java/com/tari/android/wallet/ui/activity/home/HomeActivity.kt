@@ -209,6 +209,8 @@ internal class HomeActivity : AppCompatActivity(),
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onDestroy() {
+        EventBus.unsubscribe(this)
+        EventBus.unsubscribeFromNetworkConnectionState(this)
         handler = null
         ui.txRecyclerView.layoutManager = null
         ui.txRecyclerView.adapter = null
@@ -216,8 +218,6 @@ internal class HomeActivity : AppCompatActivity(),
         if (walletService != null) {
             unbindService(this)
         }
-        EventBus.unsubscribe(this)
-        EventBus.unsubscribeFromNetworkConnectionState(this)
         if (::updateProgressViewController.isInitialized) {
             updateProgressViewController.destroy()
         }
