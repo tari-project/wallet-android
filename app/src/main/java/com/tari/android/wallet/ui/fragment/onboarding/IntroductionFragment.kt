@@ -61,7 +61,6 @@ import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.extension.applyURLStyle
 import com.tari.android.wallet.infrastructure.Tracker
 import com.tari.android.wallet.service.WalletService
-import com.tari.android.wallet.ui.activity.restore.WalletRestoreActivity
 import com.tari.android.wallet.ui.extension.*
 import com.tari.android.wallet.ui.util.UiUtil
 import com.tari.android.wallet.ui.util.UiUtil.getResourceUri
@@ -154,14 +153,10 @@ internal class IntroductionFragment : Fragment() {
             headerLineTopTextView.alpha = 0f
             headerLineBottomTextView.alpha = 0f
             userAgreementAndPrivacyPolicyTextView.alpha = 0f
-            restoreWalletCtaView.alpha = 0f
+            restoreWalletCtaView.root.alpha = 0f
             val versionInfo = "${Constants.Wallet.network.displayName} ${BuildConfig.VERSION_NAME}"
             networkInfoTextView.text = versionInfo
-
-            restoreWalletCtaView.setOnClickListener {
-                startActivity(WalletRestoreActivity.navigationIntent(requireActivity()))
-            }
-
+            restoreWalletCtaView.root.setOnClickListener(WalletRestorationListener(requireActivity()))
             // highlight links
             userAgreementAndPrivacyPolicyTextView.text =
                 SpannableString(string(create_wallet_user_agreement_and_privacy_policy)).apply {
@@ -241,7 +236,7 @@ internal class IntroductionFragment : Fragment() {
             ui.smallGemImageView.alpha = value
             ui.createWalletContainerView.alpha = value
             ui.userAgreementAndPrivacyPolicyTextView.alpha = value
-            ui.restoreWalletCtaView.alpha = value
+            ui.restoreWalletCtaView.root.alpha = value
         }
         anim.startDelay = Constants.UI.mediumDurationMs
         anim.duration = Constants.UI.longDurationMs
@@ -251,7 +246,7 @@ internal class IntroductionFragment : Fragment() {
 
     private fun onCreateWalletClick() {
         UiUtil.temporarilyDisableClick(ui.createWalletButton)
-        ui.restoreWalletCtaView.setOnClickListener(null)
+        ui.restoreWalletCtaView.root.setOnClickListener(null)
         ui.createWalletButton.gone()
         ui.createWalletProgressBar.visible()
         startWalletService()
@@ -302,7 +297,7 @@ internal class IntroductionFragment : Fragment() {
         fadeOutAnim.duration = Constants.UI.CreateWallet.viewContainerFadeOutDurationMs
         fadeOutAnim.addUpdateListener { valueAnimator: ValueAnimator ->
             val alpha = valueAnimator.animatedValue as Float
-            ui.restoreWalletCtaView.alpha = alpha
+            ui.restoreWalletCtaView.root.alpha = alpha
             ui.videoOuterContainerView.alpha = alpha
             ui.headerLineTopTextView.alpha = alpha
             ui.headerLineBottomTextView.alpha = alpha
