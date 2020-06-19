@@ -49,6 +49,11 @@ class StorageBackupViewModel(private val storage: BackupStorage, private val bac
     private val currentState get() = _state.value!!
 
     init {
+        checkBackupStatus()
+    }
+
+    fun checkBackupStatus() {
+        if (_state.value?.backupStatus == StorageBackupStatus.CHECKING_STATUS) return
         _state.value = StorageBackupState.checkingBackupStatus()
         viewModelScope.launch(Dispatchers.Main) {
             try {
@@ -61,7 +66,7 @@ class StorageBackupViewModel(private val storage: BackupStorage, private val bac
                 Logger.e(e, "Error occurred during backup check")
                 _state.value = currentState.copy(
                     backupStatus = StorageBackupStatus.STATUS_CHECK_FAILURE,
-                    processException = e
+                    statusCheckException = e
                 )
             }
         }

@@ -32,7 +32,9 @@
  */
 package com.tari.android.wallet.ui.fragment.settings.backup
 
+import android.app.Activity
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -45,6 +47,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import com.google.api.client.googleapis.extensions.android.gms.auth.UserRecoverableAuthIOException
 import com.orhanobut.logger.Logger
 import com.tari.android.wallet.R.string.*
 import com.tari.android.wallet.databinding.FragmentWalletBackupSettingsBinding
@@ -113,8 +116,7 @@ framework for UI tree rebuild on configuration changes"""
             ui.cloudBackUpStatusProgressView.visible()
         }
         StorageBackupStatus.STATUS_CHECK_FAILURE -> {
-            displayStatusCheckFailureDialog(state.statusCheckException)
-            vm.clearStatusCheckFailure()
+            handleStatusCheckFailure(state)
         }
         StorageBackupStatus.BACKED_UP -> ui.cloudBackUpStatusSuccessView.visible()
         StorageBackupStatus.NOT_BACKED_UP, StorageBackupStatus.UNKNOWN -> {
@@ -123,13 +125,39 @@ framework for UI tree rebuild on configuration changes"""
         }
     }
 
-    private fun displayStatusCheckFailureDialog(e: Exception?) {
+    private fun handleStatusCheckFailure(state: StorageBackupState) {
+        val exception = state.statusCheckException!!
+        if (exception is UserRecoverableAuthIOException) {
+            startActivityForResult(exception.intent, REQUEST_CODE_REAUTH)
+        } else {
+            displayStatusCheckFailureDialog(
+                exception.message ?: string(back_up_wallet_status_check_unknown_error)
+            )
+            vm.clearStatusCheckFailure()
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        if (requestCode == REQUEST_CODE_REAUTH) {
+            if (resultCode == Activity.RESULT_OK) {
+                vm.clearStatusCheckFailure()
+                vm.checkBackupStatus()
+            } else {
+                displayStatusCheckFailureDialog(
+                    string(back_up_wallet_status_check_authentication_cancellation)
+                )
+                vm.clearStatusCheckFailure()
+            }
+        }
+    }
+
+    private fun displayStatusCheckFailureDialog(message: String) {
         ErrorDialog(
             requireContext(),
             title = string(back_up_wallet_back_up_check_error_title),
             description = string(
                 back_up_wallet_back_up_check_error_desc,
-                e?.message ?: ""
+                message
             )
         ).show()
     }
@@ -222,6 +250,8 @@ framework for UI tree rebuild on configuration changes"""
     companion object {
         @Suppress("DEPRECATION")
         fun newInstance() = WalletBackupSettingsFragment()
+
+        private const val REQUEST_CODE_REAUTH = 1355
     }
 
 }

@@ -294,7 +294,9 @@
     <string name="back_up_wallet_backing_up_error_title">Backup error</string>
     <string name="back_up_wallet_backing_up_error_desc">Error occurred during backup: %s</string>
     <string name="back_up_wallet_back_up_is_in_progress_error">Backup already in progress</string>
+    <string name="back_up_wallet_status_check_unknown_error">Unknown error</string>
 
+    <string name="back_up_wallet_status_check_authentication_cancellation">Authentication was cancelled</string>
     <!-- Wallet back up with seed phrase -->
     <string name="back_up_seed_phrase_page_title">Back Up With Seed Phrase</string>
     <string name="back_up_seed_phrase_desc">Carefully write these 12 words down in order (left to right) on a piece of paper, and hide it somewhere others won’t access it. Do not take a screenshot.</string>

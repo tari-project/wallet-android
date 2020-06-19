@@ -32,6 +32,8 @@
  */
 package com.tari.android.wallet.ui.fragment.restore
 
+import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -39,9 +41,9 @@ import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.*
+import com.google.api.client.googleapis.extensions.android.gms.auth.UserRecoverableAuthIOException
 import com.orhanobut.logger.Logger
-import com.tari.android.wallet.R.string.restore_wallet_with_cloud_error_desc
-import com.tari.android.wallet.R.string.restore_wallet_with_cloud_error_title
+import com.tari.android.wallet.R.string.*
 import com.tari.android.wallet.databinding.FragmentWalletRestoringBinding
 import com.tari.android.wallet.infrastructure.backup.WalletRestoration
 import com.tari.android.wallet.ui.activity.restore.WalletRestoreRouter
@@ -79,30 +81,60 @@ UI tree rebuild on configuration changes"""
         state = ViewModelProvider(requireActivity()).get()
         state.state.observe(viewLifecycleOwner, Observer {
             if (it.status == RestorationStatus.FAILURE) {
-                ErrorDialog(
-                    requireContext(),
-                    title = string(restore_wallet_with_cloud_error_title),
-                    description = string(
-                        restore_wallet_with_cloud_error_desc,
-                        it.exception?.message ?: ""
-                    ),
-                    cancelable = false,
-                    canceledOnTouchOutside = false,
-                    onClose = {
-                        blockingBackPressDispatcher.isEnabled = false
-                        requireActivity().onBackPressed()
-                        state.reset()
-                    }
-                ).show()
+                handleRestorationException(it)
             } else if (it.status == RestorationStatus.SUCCESS) {
                 (requireActivity() as WalletRestoreRouter).onBackupCompleted()
             }
         })
     }
 
+    private fun handleRestorationException(state: RestorationState) {
+        val exception = state.exception!!
+        if (exception is UserRecoverableAuthIOException) {
+            startActivityForResult(exception.intent, REQUEST_CODE_REAUTH)
+        } else {
+            showUnrecoverableExceptionDialog(
+                exception.message ?: string(
+                    back_up_wallet_status_check_unknown_error
+                )
+            )
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        if (requestCode == REQUEST_CODE_REAUTH) {
+            if (resultCode == Activity.RESULT_OK) {
+                state.reset()
+                state.restoreWallet()
+            } else {
+                showUnrecoverableExceptionDialog(
+                    string(back_up_wallet_status_check_authentication_cancellation)
+                )
+            }
+        }
+    }
+
+
+    private fun showUnrecoverableExceptionDialog(message: String) {
+        ErrorDialog(
+            requireContext(),
+            title = string(restore_wallet_with_cloud_error_title),
+            description = string(restore_wallet_with_cloud_error_desc, message),
+            cancelable = false,
+            canceledOnTouchOutside = false,
+            onClose = {
+                blockingBackPressDispatcher.isEnabled = false
+                requireActivity().onBackPressed()
+                this.state.reset()
+            }
+        ).show()
+    }
+
     companion object {
         @Suppress("DEPRECATION")
         fun newInstance() = RestorationWithCloudFragment()
+
+        private const val REQUEST_CODE_REAUTH = 11222
     }
 
     class RestorationWithCloudState(private val restoration: WalletRestoration) : ViewModel() {
