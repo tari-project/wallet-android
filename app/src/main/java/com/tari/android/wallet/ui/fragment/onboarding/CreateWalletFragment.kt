@@ -382,6 +382,8 @@ internal class CreateWalletFragment : Fragment() {
     }
 
     private fun showEmojiWheelAnimation() {
+        tracker.screen(path = "/onboarding/create_emoji_id", title = "Onboarding - Create Emoji Id")
+
         ui.emojiWheelLottieAnimationView.playAnimation()
 
         val fadeOutAnim = ValueAnimator.ofFloat(1f, 0f)
