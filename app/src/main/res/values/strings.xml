@@ -7,7 +7,7 @@
     <!-- URLs, etc -->
     <string name="ttl_store_url" translatable="false">https://store.tarilabs.com</string>
     <string name="tari_url" translatable="false">https://tari.com</string>
-    <string name="github_repo_url" translatable="false">https://github.com/tari-project/wallet-android/</string>
+    <string name="github_repo_url" translatable="false">https://github.com/tari-project/wallet-android</string>
     <string name="user_agreement_url">https://www.tari.com/user_agreement/</string>
     <string name="privacy_policy_url">https://www.tari.com/privacy_policy/</string>
     <string name="disclaimer_url">https://www.tari.com/disclaimer/</string>
