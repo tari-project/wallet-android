@@ -48,6 +48,7 @@ class SettingsActivity : AppCompatActivity(), SettingsRouter {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_settings)
+        overridePendingTransition(R.anim.enter_from_bottom, R.anim.exit_to_top)
         if (savedInstanceState == null) {
             loadFragment()
         }
@@ -61,6 +62,11 @@ class SettingsActivity : AppCompatActivity(), SettingsRouter {
 
     override fun toWalletBackupSettings() {
         addFragment(WalletBackupSettingsFragment.newInstance())
+    }
+
+    override fun onBackPressed() {
+        super.onBackPressed()
+        overridePendingTransition(R.anim.enter_from_top, R.anim.exit_to_bottom)
     }
 
     override fun toWalletBackupWithRecoveryPhrase() {
