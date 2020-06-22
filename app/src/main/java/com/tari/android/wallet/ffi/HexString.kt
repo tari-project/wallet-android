@@ -68,9 +68,6 @@ internal class HexString constructor(bytes: FFIByteVector) {
         }
     }
 
-    override fun toString(): String {
-        return hex
-    }
-
+    override fun toString(): String = hex
 
 }

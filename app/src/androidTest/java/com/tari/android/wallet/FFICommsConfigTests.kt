@@ -37,15 +37,17 @@
  */
 package com.tari.android.wallet
 
-import android.content.Context
-import androidx.test.core.app.ApplicationProvider
-import com.tari.android.wallet.di.TorModule
+import androidx.test.core.app.ApplicationProvider.getApplicationContext
 import com.tari.android.wallet.di.WalletModule
-import com.tari.android.wallet.ffi.*
+import com.tari.android.wallet.ffi.FFICommsConfig
+import com.tari.android.wallet.ffi.FFIException
+import com.tari.android.wallet.ffi.FFITransportType
+import com.tari.android.wallet.ffi.nullptr
 import com.tari.android.wallet.util.Constants
-import org.junit.Assert.assertTrue
+import org.junit.After
+import org.junit.Assert.assertNotEquals
+import org.junit.BeforeClass
 import org.junit.Test
-import java.io.File
 
 /**
  * FFI comms config tests.
@@ -54,84 +56,53 @@ import java.io.File
  */
 class FFICommsConfigTests {
 
-    private val dbName = "tari_test_db"
+    private companion object {
+        private const val DB_NAME = "tari_test_db"
+        private var walletDir = ""
 
-    @Test
-    fun testMemoryTransport()
-    {
-        val transport = FFITransportType()
-        assertTrue(transport.getPointer() != nullptr)
-        assertTrue(transport.getAddress().isNotEmpty())
-        transport.destroy()
-    }
-
-    @Test
-    fun testTCPTransport()
-    {
-        val transport = FFITransportType(FFITestUtil.address)
-        assertTrue(transport.getPointer() != nullptr)
-        transport.destroy()
-    }
-
-    @Test
-    fun testTorTransport()
-    {
-        val torMod = TorModule()
-        val context = ApplicationProvider.getApplicationContext<Context>()
-        val cookieFile = File(torMod.provideTorCookieFilePath(context))
-        val cookie = if (cookieFile.exists()) {
-            FFIByteVector(cookieFile.readBytes())
-        } else
-        {
-            FFIByteVector(nullptr)
+        @BeforeClass
+        @JvmStatic
+        fun fullSetup() {
+            walletDir = WalletModule().provideWalletFilesDirPath(getApplicationContext())
+            FFITestUtil.clearTestFiles(walletDir)
         }
-        val addressString = NetAddressString(torMod.provideTorControlAddress(),torMod.provideTorControlPort())
-        // TODO Extend to test identity as well
-        val transport = FFITransportType(addressString,torMod.provideConnectionPort(), cookie,
-            FFIByteVector(nullptr),
-            torMod.provideTorSock5Username(), torMod.provideTorSock5Password())
-        assertTrue(transport.getPointer() != nullptr)
-        transport.destroy()
+    }
+
+    @After
+    fun tearDown() {
+        FFITestUtil.clearTestFiles(walletDir)
     }
 
     @Test
-    fun testCommsConfig() {
-        val context = ApplicationProvider.getApplicationContext<Context>()
-        val walletMod = WalletModule()
-        FFITestUtil.clearTestFiles(walletMod.provideWalletFilesDirPath(context))
-        val privateKey = FFIPrivateKey(HexString(FFITestUtil.PRIVATE_KEY_HEX_STRING))
+    fun constructor_assertThatValidCommsConfigInstanceWasCreated() {
         val transport = FFITransportType()
         val commsConfig = FFICommsConfig(
             transport.getAddress(),
             transport,
-            dbName,
-            walletMod.provideWalletFilesDirPath(context),
-            privateKey,
+            DB_NAME,
+            walletDir,
             Constants.Wallet.discoveryTimeoutSec
         )
-        assertTrue(commsConfig.getPointer() != nullptr)
+        assertNotEquals(nullptr, commsConfig.getPointer())
         commsConfig.destroy()
         transport.destroy()
-        privateKey.destroy()
     }
 
     @Test(expected = FFIException::class)
-    fun testByteVectorException() {
-        val context = ApplicationProvider.getApplicationContext<Context>()
-        val walletMod = WalletModule()
-        FFITestUtil.clearTestFiles(StringBuilder().append(walletMod.provideWalletFilesDirPath(context)).toString())
-        val privateKey = FFIPrivateKey(HexString(FFITestUtil.PRIVATE_KEY_HEX_STRING))
+    fun constructor_assertThatFFIExceptionWasThrown_ifGivenDirectoryDoesNotExist() {
         val transport = FFITransportType()
-        val commsConfig = FFICommsConfig(
-            transport.getAddress(),
-            transport,
-            dbName,
-            StringBuilder().append(walletMod.provideWalletFilesDirPath(context)).append("bad_dir").toString(),
-            privateKey,
-            Constants.Wallet.discoveryTimeoutSec
-        )
-        commsConfig.destroy()
-        transport.destroy()
+        try {
+            FFICommsConfig(
+                transport.getAddress(),
+                transport,
+                DB_NAME,
+                "${walletDir}_invalid_target",
+                Constants.Wallet.discoveryTimeoutSec
+            )
+        } catch (e: Throwable) {
+            transport.destroy()
+            throw e
+        }
     }
 
 }

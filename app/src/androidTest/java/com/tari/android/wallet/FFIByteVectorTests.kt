@@ -32,13 +32,11 @@
  */
 package com.tari.android.wallet
 
-import android.util.Log
 import com.tari.android.wallet.ffi.FFIByteVector
 import com.tari.android.wallet.ffi.FFIException
 import com.tari.android.wallet.ffi.HexString
 import com.tari.android.wallet.ffi.nullptr
-import okio.Utf8
-import org.junit.Assert.assertTrue
+import org.junit.Assert.*
 import org.junit.Test
 
 /**
@@ -48,33 +46,28 @@ import org.junit.Test
  */
 class FFIByteVectorTests {
 
-    private val str = FFITestUtil.PUBLIC_KEY_HEX_STRING
+    @Test
+    fun constructor_assertThatValidObjectWasCreated() {
+        val givenHex = FFITestUtil.PUBLIC_KEY_HEX_STRING
+        val byteVector = FFIByteVector(HexString(givenHex))
+        assertNotEquals(nullptr, byteVector.getPointer())
+        assertEquals(givenHex.length, byteVector.getLength() * 2)
+        assertEquals(givenHex, byteVector.toString())
+        byteVector.destroy()
+    }
 
     @Test
-    fun testByteVector() {
-        val key = HexString(str)
-        val byteVector = FFIByteVector(key)
-        assertTrue(byteVector.getPointer() != nullptr)
-        Log.i("TestbyteVector", byteVector.getLength().toString())
-        assertTrue(byteVector.getLength() * 2 == str.length)
-        assertTrue(str == byteVector.toString())
-        val byteVector2 = FFIByteVector(byteVector.getPointer())
-        assertTrue(byteVector.toString() == byteVector2.toString())
-        assertTrue(byteVector.getBytes().contentEquals(byteVector2.getBytes()))
-
+    fun getBytes_assertThatTheArrayIsEqualToTheByteArrayGivenToTheConstructor() {
         val byteArray = "Test".toByteArray()
-        val byteVector3 = FFIByteVector(byteArray)
-        var s = byteVector3.getBytes()
-        assertTrue(byteArray.contentEquals(s))
+        val byteVector = FFIByteVector(byteArray)
+        assertArrayEquals(byteArray, byteVector.getBytes())
         byteVector.destroy()
-        byteVector2.destroy()
-        byteVector3.destroy()
     }
 
     @Test(expected = FFIException::class)
-    fun testByteVectorException() {
-        val byteVector = FFIByteVector(HexString(str.slice(0..str.length - 5)))
-        byteVector.destroy()
+    fun constructor_expectFFIExceptionThrow_ifHexLengthIs59() {
+        val givenHex = FFITestUtil.PUBLIC_KEY_HEX_STRING
+        FFIByteVector(HexString(givenHex.slice(0..givenHex.length - 5)))
     }
 
 }
