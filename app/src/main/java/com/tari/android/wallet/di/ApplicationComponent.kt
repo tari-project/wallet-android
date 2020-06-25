@@ -34,6 +34,7 @@ package com.tari.android.wallet.di
 
 import android.content.Context
 import com.tari.android.wallet.application.TariWalletApplication
+import com.tari.android.wallet.infrastructure.BugReportingService
 import com.tari.android.wallet.infrastructure.security.biometric.BiometricAuthenticationService
 import com.tari.android.wallet.service.BootDeviceReceiver
 import com.tari.android.wallet.service.WalletService
@@ -85,6 +86,8 @@ internal interface ApplicationComponent {
     val sharedPrefsWrapper: SharedPrefsWrapper
 
     val authenticationService: BiometricAuthenticationService
+
+    val bugReportingService: BugReportingService
 
     /**
      * Application.

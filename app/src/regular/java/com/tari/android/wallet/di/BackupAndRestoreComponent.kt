@@ -9,7 +9,10 @@ import dagger.Component
 import javax.inject.Scope
 
 @BackupAndRestoreScope
-@Component(dependencies = [ApplicationComponent::class], modules = [BackupAndRestoreModule::class])
+@Component(
+    dependencies = [ApplicationComponent::class],
+    modules = [BackupAndRestoreModule::class]
+)
 interface BackupAndRestoreComponent {
 
     fun inject(activity: WalletRestoreActivity)

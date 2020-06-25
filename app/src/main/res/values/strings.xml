@@ -267,6 +267,7 @@
     <string name="all_settings_security_label">Security</string>
     <string name="all_settings_back_up_wallet">Back Up Wallet</string>
     <string name="all_settings_secondary_settings_label">More</string>
+    <string name="all_settings_report_a_bug">Report a Bug</string>
     <string name="all_settings_visit_site">Visit Tari.com</string>
     <string name="all_settings_contribute">Contribute to Tari Aurora</string>
     <string name="all_settings_user_agreement">User Agreement</string>
