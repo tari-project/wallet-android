@@ -38,10 +38,16 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import com.tari.android.wallet.R.string.*
 import com.tari.android.wallet.databinding.FragmentAllSettingsBinding
+import com.tari.android.wallet.infrastructure.BugReportingService
+import com.tari.android.wallet.ui.extension.appComponent
 import com.tari.android.wallet.ui.extension.string
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class AllSettingsFragment @Deprecated(
     """Use newInstance() and supply all the necessary 
@@ -60,6 +66,7 @@ UI tree rebuild on configuration changes"""
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         ui.doneCtaView.setOnClickListener { requireActivity().onBackPressed() }
+        ui.reportBugCtaView.setOnClickListener {  shareBugReport() }
         ui.visitSiteCtaView.setOnClickListener { openLink(string(tari_url)) }
         ui.contributeCtaView.setOnClickListener { openLink(string(github_repo_url)) }
         ui.userAgreementCtaView.setOnClickListener { openLink(string(user_agreement_url)) }
@@ -69,6 +76,33 @@ UI tree rebuild on configuration changes"""
 
     private fun openLink(link: String) {
         startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(link)))
+    }
+
+    private fun shareBugReport() {
+        val mContext = context ?: return
+        lifecycleScope.launch(Dispatchers.IO) {
+            try {
+                appComponent.bugReportingService.shareBugReport(mContext)
+            } catch (e: BugReportingService.BugReportFileSizeLimitExceededException) {
+                with(Dispatchers.Main) {
+                    showBugReportFileSizeExceededDialog()
+                }
+            }
+        }
+    }
+
+    private fun showBugReportFileSizeExceededDialog() {
+        val dialogBuilder = AlertDialog.Builder(context ?: return)
+        val dialog = dialogBuilder.setMessage(
+            string(debug_log_file_size_limit_exceeded_dialog_content)
+        )
+            .setCancelable(false)
+            .setPositiveButton(string(common_ok)) { dialog, _ ->
+                dialog.cancel()
+            }
+            .setTitle(getString(debug_log_file_size_limit_exceeded_dialog_title))
+            .create()
+        dialog.show()
     }
 
     companion object {
