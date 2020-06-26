@@ -60,10 +60,12 @@ internal class FFIByteVector constructor(pointer: FFIByteVectorPtr) : FFIBase() 
     }
 
     constructor(hex: HexString) : this(nullptr) {
-        if (hex.toString().length < 64) {
-            throw FFIException(message = "Argument is invalid")
+        val stringHex = hex.toString()
+        if (stringHex.length < 64) {
+            throw FFIException(message = "Argument's length is invalid - should be 64 but got " +
+                    "${stringHex.length}\n$stringHex")
         }
-        val byteArray = BigInteger(hex.toString(), 16).toByteArray()
+        val byteArray = BigInteger(stringHex, 16).toByteArray()
         val error = FFIError()
         jniCreate(byteArray, error)
         throwIf(error)

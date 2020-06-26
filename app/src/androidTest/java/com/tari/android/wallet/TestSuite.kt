@@ -46,7 +46,8 @@ import org.junit.runners.Suite
     FFIPrivateKeyTests::class,
     FFIPublicKeyTests::class,
     FFIContactTests::class,
-    FFICommsConfigTests::class
+    FFICommsConfigTests::class,
+    FFITransportTypeTest::class
     //WalletTests::class //TODO Investigate why this fails, when it passes individually
 )
 class TestSuite

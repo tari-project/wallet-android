@@ -33,9 +33,9 @@
 package com.tari.android.wallet
 
 import com.tari.android.wallet.ffi.*
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
-import java.security.InvalidParameterException
 
 /**
  * FFI byte vector tests.
@@ -45,23 +45,25 @@ import java.security.InvalidParameterException
 class FFIContactTests {
 
     @Test
-    fun testContact() {
-        val alias = FFITestUtil.generateRandomAlphanumericString(16)
+    fun constructor_assertThatConstructedContactIsValid() {
         val publicKey = FFIPublicKey(HexString(FFITestUtil.PUBLIC_KEY_HEX_STRING))
-        val contact = FFIContact(alias, publicKey)
+        val contact = FFIContact(FFITestUtil.generateRandomAlphanumericString(16), publicKey)
         assertTrue(contact.getPointer() != nullptr)
-        assertTrue(contact.getAlias() == alias)
-        assertTrue(contact.getPublicKey().getPointer() != nullptr)
-        assertTrue(contact.getPublicKey().toString() == FFITestUtil.PUBLIC_KEY_HEX_STRING)
+        contact.destroy()
+        publicKey.destroy()
+    }
+
+    @Test
+    fun getPublicKey_assertThatContactPublicKeyIsEqualToTheGivenPublicKeyHexString() {
+        val publicKey = FFIPublicKey(HexString(FFITestUtil.PUBLIC_KEY_HEX_STRING))
+        val contact = FFIContact(FFITestUtil.generateRandomAlphanumericString(16), publicKey)
+        assertEquals(FFITestUtil.PUBLIC_KEY_HEX_STRING, contact.getPublicKey().toString())
         contact.destroy()
         publicKey.destroy()
     }
 
     @Test(expected = FFIException::class)
-    fun testByteVectorException() {
-        val alias = String()
-        val publicKey = FFIPublicKey(HexString(FFITestUtil.PUBLIC_KEY_HEX_STRING))
-        val contact = FFIContact(alias, publicKey)
-        contact.destroy()
+    fun constructor_assertThat() {
+        FFIContact("", FFIPublicKey(HexString(FFITestUtil.PUBLIC_KEY_HEX_STRING)))
     }
 }

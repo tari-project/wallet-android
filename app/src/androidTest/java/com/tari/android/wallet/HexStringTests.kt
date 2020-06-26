@@ -2,25 +2,21 @@ package com.tari.android.wallet
 
 import com.tari.android.wallet.ffi.FFIException
 import com.tari.android.wallet.ffi.HexString
-import org.junit.Assert.assertTrue
+import org.junit.Assert.assertEquals
 import org.junit.Test
-import java.util.*
-
 
 class HexStringTests {
 
-    private val str = FFITestUtil.PUBLIC_KEY_HEX_STRING
-    private val str2 = "Invalid Hex String"
-
     @Test
-    fun testHexString() {
-        val hex = HexString(str)
-        assertTrue(hex.toString() == FFITestUtil.PUBLIC_KEY_HEX_STRING)
+    fun toString_assertThatGivenConstructorArgumentWasReturned() {
+        assertEquals(
+            FFITestUtil.PUBLIC_KEY_HEX_STRING,
+            HexString(FFITestUtil.PUBLIC_KEY_HEX_STRING).toString()
+        )
     }
 
     @Test(expected = FFIException::class)
-    fun testHexStringException() {
-        val hexString = HexString(str2)
-        hexString.toString()
+    fun constructor_assertThatFFIExceptionWasThrown_ifNonHexStringArgumentWasGiven() {
+        HexString("Invalid Hex String")
     }
 }

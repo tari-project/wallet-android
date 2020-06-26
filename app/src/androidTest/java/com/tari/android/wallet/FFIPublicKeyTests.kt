@@ -33,7 +33,8 @@
 package com.tari.android.wallet
 
 import com.tari.android.wallet.ffi.*
-import org.junit.Assert.assertTrue
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotEquals
 import org.junit.Test
 
 /**
@@ -43,32 +44,42 @@ import org.junit.Test
  */
 class FFIPublicKeyTests {
 
-    private val str = FFITestUtil.PUBLIC_KEY_HEX_STRING
-    private val str2 = "A03DB4"
-
     @Test
-    fun testCreatePublicKeyFromPrivateKey() {
+    fun constructorFromPrivateKey_assertThatValidPublicKeyInstanceWasCreated() {
         val privateKey = FFIPrivateKey()
         val publicKey = FFIPublicKey(privateKey)
-        assertTrue(publicKey.getPointer() != nullptr)
+        assertNotEquals(nullptr, publicKey.getPointer())
         publicKey.destroy()
         privateKey.destroy()
-        val publicKey2 = FFIPublicKey(FFIByteVector(HexString(str)))
-        assertTrue(publicKey2.getPointer() != nullptr)
-        assertTrue(publicKey2.toString() == str)
-        publicKey2.destroy()
-        val publicKey3 = FFIPublicKey(HexString(str))
-        assertTrue(publicKey3.getPointer() != nullptr)
-        assertTrue(publicKey3.toString() == str)
-        val publicKey4 = FFIPublicKey(publicKey3.getEmojiNodeId())
-        assertTrue(publicKey3.toString() == publicKey4.toString())
-        publicKey3.destroy()
-        publicKey4.destroy()
+    }
+
+    @Test
+    fun constructorFromByteVector_assertThatValidPublicKeyInstanceWasCreated() {
+        val publicKey = FFIPublicKey(FFIByteVector(HexString(FFITestUtil.PUBLIC_KEY_HEX_STRING)))
+        assertNotEquals(nullptr, publicKey.getPointer())
+        assertEquals(FFITestUtil.PUBLIC_KEY_HEX_STRING, publicKey.toString())
+        publicKey.destroy()
+    }
+
+    @Test
+    fun constructorFromHexString_assertThatValidPublicKeyInstanceWasCreated() {
+        val publicKey = FFIPublicKey(HexString(FFITestUtil.PUBLIC_KEY_HEX_STRING))
+        assertNotEquals(nullptr, publicKey.getPointer())
+        assertEquals(FFITestUtil.PUBLIC_KEY_HEX_STRING, publicKey.toString())
+        publicKey.destroy()
+    }
+
+    @Test
+    fun constructorFromEmojiId_assertThatValidPublicKeyInstanceWasCreated() {
+        val origin = FFIPublicKey(HexString(FFITestUtil.PUBLIC_KEY_HEX_STRING))
+        val publicKey = FFIPublicKey(origin.getEmojiNodeId())
+        assertEquals(origin.toString(), publicKey.toString())
+        publicKey.destroy()
+        origin.destroy()
     }
 
     @Test(expected = FFIException::class)
-    fun testHexStringException() {
-        val publickey = FFIPublicKey(FFIByteVector(HexString(str2)))
-        publickey.destroy()
+    fun constructor_assertThatFFIExceptionWasThrown_if6CharsLengthStringWasGiven() {
+        FFIPublicKey(FFIByteVector(HexString("A03DB4")))
     }
 }

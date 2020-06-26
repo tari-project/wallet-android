@@ -35,45 +35,25 @@ package com.tari.android.wallet.ffi
 /**
  * @author The Tari Development Team
  */
-internal class NetAddressString constructor() {
+internal class NetAddressString(address: String = "0.0.0.0", port: Int = 0) {
 
-    private val pattern = StringBuilder()
-        .append("^([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.")
-        .append("([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.")
-        .append("([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.")
-        .append("([01]?\\d\\d?|2[0-4]\\d|25[0-5])$")
-        .toString()
-        .toRegex()
-    private var address: String
-    private var addressPort: Int
+    private val address: String
+    private val addressPort: Int
 
     init {
-        address = "0.0.0.0"
-        addressPort = 0
-
+        if (!ADDRESS_REGEX.matches(address)) throw FFIException(message = "String is not valid Address")
+        if (port < 0) throw FFIException(message = "Port is not valid Port")
+        this.address = address
+        this.addressPort = port
     }
 
-    constructor(string: String, port: Int) : this() {
-        if (pattern.matches(string)) {
-            address = string
-        } else {
-            throw FFIException(message = "String is not valid Address")
-        }
-        if (port >= 0) {
-            addressPort = port
-        } else {
-            throw FFIException(message = "Port is not valid Port")
-        }
-    }
+    override fun toString(): String = "/ip4/${address}/tcp/$addressPort"
 
-    override fun toString(): String {
-        val result = StringBuilder()
-            .append("/ip4/")
-            .append(address)
-            .append("/tcp/")
-            .append(addressPort)
-        return result.toString()
+    private companion object {
+        private val ADDRESS_REGEX = ("^([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\." +
+                "([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\." +
+                "([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\." +
+                "([01]?\\d\\d?|2[0-4]\\d|25[0-5])$").toRegex()
     }
-
 
 }

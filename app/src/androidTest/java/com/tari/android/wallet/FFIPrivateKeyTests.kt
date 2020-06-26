@@ -33,7 +33,8 @@
 package com.tari.android.wallet
 
 import com.tari.android.wallet.ffi.*
-import org.junit.Assert.assertTrue
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotEquals
 import org.junit.Test
 
 /**
@@ -44,26 +45,31 @@ import org.junit.Test
 class FFIPrivateKeyTests {
 
     private val str = FFITestUtil.PRIVATE_KEY_HEX_STRING
-    private val str2 = "A03DB4"
 
     @Test
-    fun testPrivateKey() {
-        val privateKey = FFIPrivateKey()
-        assertTrue(privateKey.getPointer() != nullptr)
+    fun constructor_assertThatCreatedObjectIsValid() {
+        val subject = FFIPrivateKey()
+        assertNotEquals(nullptr, subject.getPointer())
+        subject.destroy()
+    }
+
+    @Test
+    fun toString_assertThatValueIsEqualToTheGivenStringHex() {
+        val subject = FFIPrivateKey(HexString(str))
+        assertEquals(FFITestUtil.PRIVATE_KEY_HEX_STRING, subject.toString())
+        subject.destroy()
+    }
+
+    @Test
+    fun constructor_assertThatValidObjectWasConstructed_givenValidFFIByteVector() {
+        val privateKey = FFIPrivateKey(FFIByteVector(HexString(FFITestUtil.PRIVATE_KEY_HEX_STRING)))
+        assertNotEquals(nullptr, privateKey.getPointer())
+        assertEquals(FFITestUtil.PRIVATE_KEY_HEX_STRING, privateKey.toString())
         privateKey.destroy()
-        val privateKey2 = FFIPrivateKey(HexString(str))
-        assertTrue(privateKey2.getPointer() != nullptr)
-        assertTrue(privateKey2.toString() == FFITestUtil.PRIVATE_KEY_HEX_STRING)
-        privateKey2.destroy()
-        val privateKey3 = FFIPrivateKey(FFIByteVector(HexString(FFITestUtil.PRIVATE_KEY_HEX_STRING)))
-        assertTrue(privateKey3.getPointer() != nullptr)
-        assertTrue(privateKey3.toString() == FFITestUtil.PRIVATE_KEY_HEX_STRING)
-        privateKey3.destroy()
     }
 
     @Test(expected = FFIException::class)
-    fun testHexStringException() {
-        val privateKey = FFIPrivateKey(FFIByteVector(HexString(str2)))
-        privateKey.destroy()
+    fun constructor_assertThatFFIExceptionWasThrown_ifGivenHexStringHas6CharsInsteadOf64() {
+        FFIPrivateKey(FFIByteVector(HexString("A03DB4")))
     }
 }
