@@ -157,11 +157,6 @@ internal class FFIWallet(
         libError: FFIError
     ): Boolean
 
-    private external fun jniIsCompletedTxOutbound(
-        completedTx: FFICompletedTx,
-        libError: FFIError
-    ): Boolean
-
     private external fun jniSendTx(
         publicKeyPtr: FFIPublicKey,
         amount: String,
@@ -224,6 +219,11 @@ internal class FFIWallet(
     private external fun jniGetSeedWords(
         libError: FFIError
     ): FFISeedWordsPtr
+
+    private external fun jniDoPartialBackup(
+        backupFileTargetPath: String,
+        libError: FFIError
+    )
 
     private external fun jniDestroy()
 
@@ -305,13 +305,6 @@ internal class FFIWallet(
     fun removeContact(contact: FFIContact): Boolean {
         val error = FFIError()
         val result = jniRemoveContact(contact, error)
-        throwIf(error)
-        return result
-    }
-
-    fun isCompletedTxOutbound(completedTx: FFICompletedTx): Boolean {
-        val error = FFIError()
-        val result = jniIsCompletedTxOutbound(completedTx, error)
         throwIf(error)
         return result
     }
@@ -719,6 +712,12 @@ internal class FFIWallet(
         val result = jniAddBaseNodePeer(baseNodePublicKey, baseNodeAddress, error)
         throwIf(error)
         return result
+    }
+
+    fun doPartialBackup(backupFileTargetPath: String) {
+        val error = FFIError()
+        jniDoPartialBackup(backupFileTargetPath, error)
+        throwIf(error)
     }
 
     override fun destroy() {

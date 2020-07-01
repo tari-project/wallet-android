@@ -170,6 +170,21 @@ Java_com_tari_android_wallet_ffi_FFICompletedTx_jniGetStatus(
 }
 
 extern "C"
+JNIEXPORT jboolean JNICALL
+Java_com_tari_android_wallet_ffi_FFICompletedTx_jniIsOutbound(
+        JNIEnv *jEnv,
+        jobject jThis,
+        jobject error) {
+    int i = 0;
+    int *r = &i;
+    jlong lCompletedTx = GetPointerField(jEnv,jThis);
+    TariCompletedTransaction *pCompletedTx = reinterpret_cast<TariCompletedTransaction *>(lCompletedTx);
+    jboolean result = static_cast<jboolean>(completed_transaction_is_outbound(pCompletedTx, r) != 0);
+    setErrorCode(jEnv, error, i);
+    return result;
+}
+
+extern "C"
 JNIEXPORT void JNICALL
 Java_com_tari_android_wallet_ffi_FFICompletedTx_jniDestroy(
         JNIEnv *jEnv,

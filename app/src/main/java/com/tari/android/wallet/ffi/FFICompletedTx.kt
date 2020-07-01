@@ -62,6 +62,10 @@ internal class FFICompletedTx constructor(pointer: FFICompletedTxPtr) : FFIBase(
 
     private external fun jniGetMessage(libError: FFIError): String
     private external fun jniGetStatus(libError: FFIError): Int
+    private external fun jniIsOutbound(
+        libError: FFIError
+    ): Boolean
+
     private external fun jniDestroy()
 
     // endregion
@@ -139,6 +143,13 @@ internal class FFICompletedTx constructor(pointer: FFICompletedTxPtr) : FFIBase(
             5 -> FFITxStatus.UNKNOWN
             else -> throw FFIException(message = "Unexpected status: $status")
         }
+    }
+
+    fun isOutbound(): Boolean {
+        val error = FFIError()
+        val result = jniIsOutbound(error)
+        throwIf(error)
+        return result
     }
 
     override fun destroy() {

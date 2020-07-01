@@ -7,6 +7,11 @@ buildscript {
     ext.buildNumber = 121
     ext.versionNumber = "0.2.1"
 
+    // JNI libs
+    ext.jniLibsVersion = "0.14.0-rc"
+    ext.jniLibsHostURL = "https://tari-binaries.s3.amazonaws.com/libwallet/"
+    ext.supportedABIs = ["arm64-v8a", "armeabi-v7a", "x86_64"]
+
     repositories {
         google()
         jcenter()

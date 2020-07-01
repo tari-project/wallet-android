@@ -55,6 +55,7 @@ import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withTimeout
 import org.junit.*
 import org.junit.Assert.*
+import java.io.File
 import java.math.BigInteger
 import kotlin.coroutines.Continuation
 import kotlin.coroutines.resume
@@ -217,11 +218,10 @@ class FFIWalletTests {
             assertTrue(completedTxFee > BigInteger("0"))
             val completedTxTimestamp = completedTx.getTimestamp()
             completedTxTimestamp.toString()
-            val completedTxIsOutbound = wallet.isCompletedTxOutbound(completedTx)
             if (wallet.getPublicKey().toString() == completedTx.getSourcePublicKey().toString()) {
-                assertTrue(completedTxIsOutbound)
+                assertTrue(completedTx.isOutbound())
             } else {
-                assertFalse(completedTxIsOutbound)
+                assertFalse(completedTx.isOutbound())
             }
             completedTx.destroy()
         }
@@ -291,6 +291,29 @@ class FFIWalletTests {
         wallet.destroy()
 
         // TODO test listeners
+    }
+
+    @Test
+    fun testPartialBackup() {
+        val transport = FFITransportType()
+        val commsConfig = FFICommsConfig(
+            transport.getAddress(),
+            transport,
+            FFITestUtil.WALLET_DB_NAME,
+            walletDir,
+            Constants.Wallet.discoveryTimeoutSec
+        )
+        val wallet = FFIWallet(commsConfig, "")
+        wallet.listenerAdapter = TestListener()
+
+        val backupDir = File(walletDir, "backup")
+        backupDir.mkdir()
+        val backupFile = File(backupDir, "backupfile.sqlite3")
+        wallet.doPartialBackup(backupFile.absolutePath)
+        assertTrue(backupFile.exists())
+        transport.destroy()
+        commsConfig.destroy()
+        wallet.destroy()
     }
 
     class TestListener : FFIWalletListenerAdapter {
