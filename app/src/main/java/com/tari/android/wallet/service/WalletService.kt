@@ -923,7 +923,7 @@ internal class WalletService : Service(), FFIWalletListenerAdapter, LifecycleObs
                 throw FFIException(message = error.message)
             }
 
-            if (wallet.isCompletedTxOutbound(completedTxFFI)) {
+            if (completedTxFFI.isOutbound()) {
                 direction = OUTBOUND
                 val userPublicKey = PublicKey(
                     destinationPublicKeyFFI.toString(),
@@ -985,7 +985,7 @@ internal class WalletService : Service(), FFIWalletListenerAdapter, LifecycleObs
                 throw FFIException(message = error.message)
             }
 
-            if (wallet.isCompletedTxOutbound(completedTxFFI)) {
+            if (completedTxFFI.isOutbound()) {
                 direction = OUTBOUND
                 val userPublicKey = PublicKey(
                     destinationPublicKeyFFI.toString(),

@@ -563,25 +563,6 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniRemoveContact(
 }
 
 extern "C"
-JNIEXPORT jboolean JNICALL
-Java_com_tari_android_wallet_ffi_FFIWallet_jniIsCompletedTxOutbound(
-        JNIEnv *jEnv,
-        jobject jThis,
-        jobject jpCompletedTx,
-        jobject error) {
-    int i = 0;
-    int *r = &i;
-    jlong lWallet = GetPointerField(jEnv, jThis);
-    TariWallet *pWallet = reinterpret_cast<TariWallet *>(lWallet);
-    jlong lCompletedTx = GetPointerField(jEnv, jpCompletedTx);
-    TariCompletedTransaction *pTransaction = reinterpret_cast<TariCompletedTransaction *>(lCompletedTx);
-    jboolean result = static_cast<jboolean>(
-            wallet_is_completed_transaction_outbound(pWallet, pTransaction, r) != 0);
-    setErrorCode(jEnv, error, i);
-    return result;
-}
-
-extern "C"
 JNIEXPORT jlong JNICALL
 Java_com_tari_android_wallet_ffi_FFIWallet_jniGetCompletedTxs(
         JNIEnv *jEnv,
@@ -1129,6 +1110,23 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniGetSeedWords(
     TariSeedWords *pSeedwords = wallet_get_seed_words(pWallet, r);
     setErrorCode(jEnv, error, i);
     return reinterpret_cast<jlong>(pSeedwords);
+}
+
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_tari_android_wallet_ffi_FFIWallet_jniDoPartialBackup(
+        JNIEnv *jEnv,
+        jobject jThis,
+        jstring jBackupFileTargetPath,
+        jobject error) {
+    int i = 0;
+    int *r = &i;
+    jlong lWallet = GetPointerField(jEnv, jThis);
+    TariWallet *pWallet = reinterpret_cast<TariWallet *>(lWallet);
+    const char *pTargetPath = jEnv->GetStringUTFChars(jBackupFileTargetPath, JNI_FALSE);
+    wallet_partial_backup(pWallet, pTargetPath, r);
+    setErrorCode(jEnv, error, i);
+    jEnv->ReleaseStringUTFChars(jBackupFileTargetPath, pTargetPath);
 }
 
 //endregion
