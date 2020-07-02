@@ -76,17 +76,7 @@ class BackupStorageFactory(private val appName: String) {
         suspendCoroutine { continuation ->
             GoogleSignIn.getSignedInAccountFromIntent(signInResult)
                 .addOnSuccessListener { googleAccount: GoogleSignInAccount ->
-                    val credential =
-                        GoogleAccountCredential.usingOAuth2(
-                            context,
-                            listOf(DriveScopes.DRIVE_APPDATA)
-                        )
-                            .apply { selectedAccount = googleAccount.account }
-                    val drive = Drive.Builder(NetHttpTransport(), GsonFactory(), credential)
-                        .setApplicationName(appName)
-                        .build()
-                    val storage = GDriveBackupStorage(drive, Executors.newSingleThreadExecutor())
-                    continuation.resumeWith(Result.success(storage))
+                    continuation.resumeWith(Result.success(google(context, googleAccount)))
                 }
                 .addOnFailureListener { continuation.resumeWith(Result.failure(it)) }
                 .addOnCanceledListener {
@@ -94,6 +84,17 @@ class BackupStorageFactory(private val appName: String) {
                 }
         }
 
+    fun google(context: Context, googleAccount: GoogleSignInAccount): BackupStorage {
+        val credential =
+            GoogleAccountCredential.usingOAuth2(
+                context,
+                listOf(DriveScopes.DRIVE_APPDATA)
+            ).apply { selectedAccount = googleAccount.account }
+        val drive = Drive.Builder(NetHttpTransport(), GsonFactory(), credential)
+            .setApplicationName(appName)
+            .build()
+        return GDriveBackupStorage(drive, Executors.newSingleThreadExecutor())
+    }
 }
 
 private class GDriveBackupStorage(private val drive: Drive, private val executor: Executor) :

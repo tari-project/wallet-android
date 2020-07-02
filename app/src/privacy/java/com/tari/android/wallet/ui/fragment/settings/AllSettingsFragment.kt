@@ -48,6 +48,7 @@ import com.tari.android.wallet.ui.extension.appComponent
 import com.tari.android.wallet.ui.extension.string
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class AllSettingsFragment @Deprecated(
     """Use newInstance() and supply all the necessary 
@@ -84,7 +85,7 @@ UI tree rebuild on configuration changes"""
             try {
                 appComponent.bugReportingService.shareBugReport(mContext)
             } catch (e: BugReportingService.BugReportFileSizeLimitExceededException) {
-                with(Dispatchers.Main) {
+                withContext(Dispatchers.Main) {
                     showBugReportFileSizeExceededDialog()
                 }
             }

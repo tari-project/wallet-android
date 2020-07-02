@@ -36,17 +36,24 @@ import androidx.lifecycle.*
 import com.orhanobut.logger.Logger
 import com.tari.android.wallet.infrastructure.backup.WalletBackup
 import com.tari.android.wallet.infrastructure.backup.storage.BackupStorage
+import com.tari.android.wallet.util.SharedPrefsWrapper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import org.joda.time.DateTime
 import java.io.File
 
-class StorageBackupViewModel(private val storage: BackupStorage, private val backup: WalletBackup) :
+class StorageBackupViewModel(
+    private val storage: BackupStorage,
+    private val backup: WalletBackup,
+    private val registry: SharedPrefsWrapper
+) :
+
     ViewModel() {
 
     private val _state = MutableLiveData<StorageBackupState>()
     val state: LiveData<StorageBackupState> get() = _state
-    private val currentState get() = _state.value!!
+    val currentState get() = _state.value!!
 
     init {
         checkBackupStatus()
@@ -89,6 +96,7 @@ class StorageBackupViewModel(private val storage: BackupStorage, private val bac
             backupFile = backup.run(key)
             storage.addBackup(backupFile)
             backupFile.delete()
+            registry.lastSuccessfulBackupDateTime = DateTime.now()
             withContext(Dispatchers.Main) {
                 _state.value =
                     currentState.copy(
@@ -105,6 +113,17 @@ class StorageBackupViewModel(private val storage: BackupStorage, private val bac
                     processException = e
                 )
             }
+        }
+    }
+
+    fun clearStatusAndProcessErrors() {
+        val currentState = currentState
+        when {
+            currentState.backupStatus == StorageBackupStatus.STATUS_CHECK_FAILURE &&
+                    currentState.processStatus == BackupProcessStatus.FAILURE ->
+                _state.value = StorageBackupState.unknownIdle()
+            currentState.backupStatus == StorageBackupStatus.STATUS_CHECK_FAILURE -> clearStatusCheckFailure()
+            currentState.processStatus == BackupProcessStatus.FAILURE -> resetProcessStatus()
         }
     }
 
@@ -142,6 +161,8 @@ data class StorageBackupState(
             null
         )
 
+        fun unknownIdle() =
+            StorageBackupState(StorageBackupStatus.UNKNOWN, null, BackupProcessStatus.IDLE, null)
     }
 }
 
@@ -151,12 +172,13 @@ enum class BackupProcessStatus { IDLE, BACKING_UP, SUCCESS, FAILURE }
 
 class StorageBackupViewModelFactory(
     private val storage: BackupStorage,
-    private val walletBackup: WalletBackup
+    private val walletBackup: WalletBackup,
+    private val registry: SharedPrefsWrapper
 ) : ViewModelProvider.Factory {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T =
         if (modelClass === StorageBackupViewModel::class.java)
             @Suppress("UNCHECKED_CAST")
-            StorageBackupViewModel(storage, walletBackup) as T
+            StorageBackupViewModel(storage, walletBackup, registry) as T
         else
             throw IllegalArgumentException("Expected ${StorageBackupViewModel::class.java}")
 

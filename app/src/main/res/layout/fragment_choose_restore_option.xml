@@ -35,7 +35,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"
             android:layout_marginBottom="16dp"
-            android:text="@string/back_up_wallet_page_title"
+            android:text="@string/restore_wallet_page_title"
             android:textColor="@color/black"
             android:textSize="16sp"
             app:customFont="AVENIR_LT_STD_HEAVY"
@@ -88,7 +88,7 @@
             android:background="@color/settings_background" />
 
         <FrameLayout
-            android:id="@+id/back_up_with_recovery_phrase_cta_view"
+            android:id="@+id/backup_with_recovery_phrase_cta_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@drawable/setting_option_background"

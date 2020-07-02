@@ -60,13 +60,8 @@ class SettingsActivity : AppCompatActivity(), SettingsRouter {
             .commit()
     }
 
-    override fun toWalletBackupSettings() {
+    override fun toWalletBackupSettings() {поддер
         addFragment(WalletBackupSettingsFragment.newInstance())
-    }
-
-    override fun onBackPressed() {
-        super.onBackPressed()
-        overridePendingTransition(R.anim.enter_from_top, R.anim.exit_to_bottom)
     }
 
     override fun toWalletBackupWithRecoveryPhrase() {
@@ -88,6 +83,22 @@ class SettingsActivity : AppCompatActivity(), SettingsRouter {
             .add(R.id.settings_fragment_container, fragment)
             .addToBackStack(null)
             .commit()
+    }
+
+    override fun onBackPressed() {
+        super.onBackPressed()
+        // On back press all transitive fragments become visible for some reason, and when
+        // navigating back from ChangeSecurePasswordFragment then AllSettingsFragment becomes
+        // visible as well, so we hiding all the transitive fragments except for the one that
+        // becomes the topmost by force
+        overridePendingTransition(R.anim.enter_from_top, R.anim.exit_to_bottom)
+        val fragments = supportFragmentManager.fragments
+        if (fragments.size > 1) {
+            supportFragmentManager.beginTransaction()
+                .setCustomAnimations(R.anim.no_anim ,R.anim.no_anim)
+                .apply { fragments.subList(0, fragments.size - 2).forEach { hide(it) } }
+                .commit()
+        }
     }
 
     companion object {

@@ -30,31 +30,20 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.tari.android.wallet.auth
+package com.tari.android.wallet.ui.activity.settings
 
-import android.annotation.SuppressLint
-import android.app.KeyguardManager
-import android.content.Context
-import android.os.Build
+interface SettingsRouter {
 
-/**
- * Authentication-related utility functions.
- *
- * @author The Tari Development Team
- */
-internal object AuthUtil {
+    fun toWalletBackupSettings()
 
-    /**
-     * Returns true if lockscreen is enabled. Will return true if a fingerprint defined as well,
-     * which implies the lockscreen is set as well.
-     */
-    @SuppressLint("ObsoleteSdkInt")
-    fun isDeviceSecured(context: Context): Boolean {
-        val keyguardManager = context.getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager?
-            ?: return false //api 16+
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            keyguardManager.isDeviceSecure
-        } else keyguardManager.isKeyguardSecure
-    }
+    fun toWalletBackupWithRecoveryPhrase()
+
+    fun toRecoveryPhraseVerification(phrase: List<String>)
+
+    fun toConfirmPassword()
+
+    fun toChangePassword()
+
+    fun onPasswordChanged()
 
 }
