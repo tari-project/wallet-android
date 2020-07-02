@@ -72,7 +72,8 @@ framework for UI tree rebuild on configuration changes"""
         ui.backCtaView.setOnClickListener { requireActivity().onBackPressed() }
         ui.continueCtaView.setOnClickListener(ThrottleClick {
             UiUtil.animateViewClick(it) {
-                (requireActivity() as SettingsRouter).toRecoveryPhraseVerification(WORDS_POOL)
+                (requireActivity() as SettingsRouter)
+                    .toRecoveryPhraseVerification(this, WORDS_POOL)
             }
         })
         ui.phraseWordsRecyclerView.layoutManager =

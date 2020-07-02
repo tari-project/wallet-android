@@ -52,6 +52,6 @@ internal fun Date.txFormattedDate(): String {
         3 -> "rd"
         else -> "th"
     }
-    return SimpleDateFormat("MMMM d'$indicator' yyyy 'at' h:mm a", Locale.getDefault())
+    return SimpleDateFormat("MMMM d'$indicator' yyyy 'at' h:mm a", Locale.ENGLISH)
         .format(this)
 }

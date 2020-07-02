@@ -34,10 +34,12 @@ package com.tari.android.wallet.util
 
 import android.content.Context
 import android.content.SharedPreferences
+import android.net.Uri
 import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
 import com.tari.android.wallet.service.faucet.TestnetTariUTXOKey
 import de.adorsys.android.securestoragelibrary.SecurePreferences
+import org.joda.time.DateTime
 import java.math.BigInteger
 
 private val String.toPreservedByteArray: ByteArray
@@ -61,197 +63,135 @@ class SharedPrefsWrapper(
 ) {
 
     private object Key {
-        const val privateKeyHexStringKey = "tari_wallet_private_key_hex_string"
-        const val publicKeyHexStringKey = "tari_wallet_public_key_hex_string"
-        const val isAuthenticatedKey = "tari_wallet_is_authenticated"
-        const val emojiIdKey = "tari_wallet_emoji_id_"
-        const val onboardingStartedKey = "tari_wallet_onboarding_started"
-        const val onboardingAuthSetupCompletedKey = "tari_wallet_onboarding_auth_setup_completed"
-        const val onboardingAuthSetupStartedKey = "tari_wallet_onboarding_auth_setup_started"
-        const val onboardingCompletedKey = "tari_wallet_onboarding_completed"
-        const val onboardingDisplayedAtHomeKey = "tari_wallet_onboarding_displayed_at_home"
-        const val torBinPathKey = "tari_wallet_tor_bin_path"
-        const val torIdentityKey = "tari_wallet_tor_identity"
+        const val privateKeyHexString = "tari_wallet_private_key_hex_string"
+        const val publicKeyHexString = "tari_wallet_public_key_hex_string"
+        const val isAuthenticated = "tari_wallet_is_authenticated"
+        const val emojiId = "tari_wallet_emoji_id_"
+        const val onboardingStarted = "tari_wallet_onboarding_started"
+        const val onboardingAuthSetupCompleted = "tari_wallet_onboarding_auth_setup_completed"
+        const val onboardingAuthSetupStarted = "tari_wallet_onboarding_auth_setup_started"
+        const val onboardingCompleted = "tari_wallet_onboarding_completed"
+        const val onboardingDisplayedAtHome = "tari_wallet_onboarding_displayed_at_home"
+        const val torBinPath = "tari_wallet_tor_bin_path"
+        const val torIdentity = "tari_wallet_tor_identity"
         const val baseNodePublicKeyHexKey = "tari_wallet_base_node_public_key_hex"
         const val baseNodeAddressKey = "tari_wallet_base_node_address"
-        const val faucetTestnetTariRequestCompleted = "tari_wallet_faucet_testnet_tari_request_completed"
+        const val faucetTestnetTariRequestCompleted =
+            "tari_wallet_faucet_testnet_tari_request_completed"
         const val testnetTariUTXOListKey = "tari_wallet_testnet_tari_utxo_key_list"
         const val firstTestnetUTXOTxId = "tari_wallet_first_testnet_utxo_tx_id"
         const val secondTestnetUTXOTxId = "tari_wallet_second_testnet_utxo_tx_id"
+        const val lastSuccessfulBackupDate = "tari_wallet_last_successful_backup_date"
+        const val backupFailureDate = "tari_wallet_backup_failure_date"
+        const val scheduledBackupDate = "tari_wallet_scheduled_backup_date"
+        const val backupPassword = "tari_wallet_last_next_alarm_time"
+        const val localBackupFolderURI = "tari_wallet_local_backup_folder_uri"
     }
 
+    // TODO(nyarian): remove value on null possibly?
     var privateKeyHexString: String?
-        get() {
-            return SecurePreferences.getStringValue(
-                context,
-                Key.privateKeyHexStringKey,
-                null
-            )
-        }
-        set(value) {
-            if (value != null) {
-                SecurePreferences.setValue(
-                    context,
-                    Key.privateKeyHexStringKey,
-                    value
-                )
-            }
-        }
+        get() = SecurePreferences.getStringValue(context, Key.privateKeyHexString, null)
+        set(value) =
+            value?.let { SecurePreferences.setValue(context, Key.privateKeyHexString, it) }
+                ?: Unit
 
     var publicKeyHexString: String?
-        get() {
-            return sharedPrefs.getString(Key.publicKeyHexStringKey, null)
-        }
-        set(value) {
-            sharedPrefs.edit().apply {
-                putString(Key.publicKeyHexStringKey, value)
-                apply()
-            }
+        get() = sharedPrefs.getString(Key.publicKeyHexString, null)
+        set(value) = sharedPrefs.edit().run {
+            putString(Key.publicKeyHexString, value)
+            apply()
         }
 
     var isAuthenticated: Boolean
-        get() {
-            return sharedPrefs.getBoolean(Key.isAuthenticatedKey, false)
-        }
-        set(value) {
-            sharedPrefs.edit().apply {
-                putBoolean(Key.isAuthenticatedKey, value)
-                apply()
-            }
+        get() = sharedPrefs.getBoolean(Key.isAuthenticated, false)
+        set(value) = sharedPrefs.edit().run {
+            putBoolean(Key.isAuthenticated, value)
+            apply()
         }
 
     var emojiId: String?
-        get() {
-            return sharedPrefs.getString(Key.emojiIdKey, null)
-        }
-        set(value) {
-            sharedPrefs.edit().apply {
-                putString(Key.emojiIdKey, value)
-                apply()
-            }
+        get() = sharedPrefs.getString(Key.emojiId, null)
+        set(value) = sharedPrefs.edit().run {
+            putString(Key.emojiId, value)
+            apply()
         }
 
     var onboardingStarted: Boolean
-        get() {
-            return sharedPrefs.getBoolean(Key.onboardingStartedKey, false)
-        }
-        set(value) {
-            sharedPrefs.edit().apply {
-                putBoolean(Key.onboardingStartedKey, value)
-                apply()
-            }
+        get() = sharedPrefs.getBoolean(Key.onboardingStarted, false)
+        set(value) = sharedPrefs.edit().run {
+            putBoolean(Key.onboardingStarted, value)
+            apply()
         }
 
     var onboardingCompleted: Boolean
-        get() {
-            return sharedPrefs.getBoolean(Key.onboardingCompletedKey, false)
-        }
-        set(value) {
-            sharedPrefs.edit().apply {
-                putBoolean(Key.onboardingCompletedKey, value)
-                apply()
-            }
+        get() = sharedPrefs.getBoolean(Key.onboardingCompleted, false)
+        set(value) = sharedPrefs.edit().run {
+            putBoolean(Key.onboardingCompleted, value)
+            apply()
         }
 
     var onboardingAuthSetupStarted: Boolean
-        get() {
-            return sharedPrefs.getBoolean(Key.onboardingAuthSetupStartedKey, false)
-        }
-        set(value) {
-            sharedPrefs.edit().apply {
-                putBoolean(Key.onboardingAuthSetupStartedKey, value)
-                apply()
-            }
+        get() = sharedPrefs.getBoolean(Key.onboardingAuthSetupStarted, false)
+        set(value) = sharedPrefs.edit().run {
+            putBoolean(Key.onboardingAuthSetupStarted, value)
+            apply()
         }
 
 
     var onboardingAuthSetupCompleted: Boolean
-        get() {
-            return sharedPrefs.getBoolean(Key.onboardingAuthSetupCompletedKey, false)
-        }
-        set(value) {
-            sharedPrefs.edit().apply {
-                putBoolean(Key.onboardingAuthSetupCompletedKey, value)
-                apply()
-            }
+        get() = sharedPrefs.getBoolean(Key.onboardingAuthSetupCompleted, false)
+        set(value) = sharedPrefs.edit().run {
+            putBoolean(Key.onboardingAuthSetupCompleted, value)
+            apply()
         }
 
 
     val onboardingAuthWasInterrupted: Boolean
-        get() {
-            return onboardingAuthSetupStarted && !onboardingAuthSetupCompleted
-        }
+        get() = onboardingAuthSetupStarted && !onboardingAuthSetupCompleted
 
     val onboardingWasInterrupted: Boolean
-        get() {
-            return onboardingStarted && !onboardingCompleted
-        }
+        get() = onboardingStarted && !onboardingCompleted
 
     var onboardingDisplayedAtHome: Boolean
-        get() {
-            return sharedPrefs.getBoolean(Key.onboardingDisplayedAtHomeKey, false)
-        }
-        set(value) {
-            sharedPrefs.edit().apply {
-                putBoolean(Key.onboardingDisplayedAtHomeKey, value)
-                apply()
-            }
+        get() = sharedPrefs.getBoolean(Key.onboardingDisplayedAtHome, false)
+        set(value) = sharedPrefs.edit().run {
+            putBoolean(Key.onboardingDisplayedAtHome, value)
+            apply()
         }
 
     var torBinPath: String?
-        get() {
-            return sharedPrefs.getString(Key.torBinPathKey, null)
-        }
-        set(value) {
-            sharedPrefs.edit().apply {
-                putString(Key.torBinPathKey, value)
-                apply()
-            }
+        get() = sharedPrefs.getString(Key.torBinPath, null)
+        set(value) = sharedPrefs.edit().run {
+            putString(Key.torBinPath, value)
+            apply()
         }
 
     var torIdentity: ByteArray?
-        get() {
-            val identityString = sharedPrefs.getString(Key.torIdentityKey, null)
-            return identityString?.toPreservedByteArray
-        }
-        set(value) {
-            sharedPrefs.edit().apply {
-                putString(Key.torIdentityKey, value?.toPreservedString)
-                apply()
-            }
+        get() = sharedPrefs.getString(Key.torIdentity, null)?.toPreservedByteArray
+        set(value) = sharedPrefs.edit().run {
+            putString(Key.torIdentity, value?.toPreservedString)
+            apply()
         }
 
     var baseNodePublicKeyHex: String?
-        get() {
-            return sharedPrefs.getString(Key.baseNodePublicKeyHexKey, null)
-        }
-        set(value) {
-            sharedPrefs.edit().apply {
-                putString(Key.baseNodePublicKeyHexKey, value)
-                apply()
-            }
+        get() = sharedPrefs.getString(Key.baseNodePublicKeyHexKey, null)
+        set(value) = sharedPrefs.edit().run {
+            putString(Key.baseNodePublicKeyHexKey, value)
+            apply()
         }
 
     var baseNodeAddress: String?
-        get() {
-            return sharedPrefs.getString(Key.baseNodeAddressKey, null)
-        }
-        set(value) {
-            sharedPrefs.edit().apply {
-                putString(Key.baseNodeAddressKey, value)
-                apply()
-            }
+        get() = sharedPrefs.getString(Key.baseNodeAddressKey, null)
+        set(value) = sharedPrefs.edit().run {
+            putString(Key.baseNodeAddressKey, value)
+            apply()
         }
 
     var faucetTestnetTariRequestCompleted: Boolean
-        get() {
-            return sharedPrefs.getBoolean(Key.faucetTestnetTariRequestCompleted, false)
-        }
-        set(value) {
-            sharedPrefs.edit().apply {
-                putBoolean(Key.faucetTestnetTariRequestCompleted, value)
-                apply()
-            }
+        get() = sharedPrefs.getBoolean(Key.faucetTestnetTariRequestCompleted, false)
+        set(value) = sharedPrefs.edit().run {
+            putBoolean(Key.faucetTestnetTariRequestCompleted, value)
+            apply()
         }
 
     var testnetTariUTXOKeyList: List<TestnetTariUTXOKey>
@@ -260,47 +200,69 @@ class SharedPrefsWrapper(
             val listType = object : TypeToken<List<TestnetTariUTXOKey>>() {}.type
             return GsonBuilder().create().fromJson(json, listType)
         }
-        set(value) {
-            val json = GsonBuilder().create().toJson(value)
-            sharedPrefs.edit().apply {
-                putString(Key.testnetTariUTXOListKey, json)
-                apply()
-            }
+        set(value) = sharedPrefs.edit().run {
+            putString(Key.testnetTariUTXOListKey, GsonBuilder().create().toJson(value))
+            apply()
         }
 
     var firstTestnetUTXOTxId: BigInteger?
-        get() {
-            val stringValue = sharedPrefs.getString(
-                Key.firstTestnetUTXOTxId,
-                null
-            ) ?: return null
-            return BigInteger(stringValue)
-        }
-        set(value) {
-            if (value != null) {
-                sharedPrefs.edit().apply {
-                    putString(Key.firstTestnetUTXOTxId, value.toString())
-                    apply()
-                }
+        get() = sharedPrefs.getString(Key.firstTestnetUTXOTxId, null)?.run(::BigInteger)
+        set(value) = value?.let { v ->
+            sharedPrefs.edit().run {
+                putString(Key.firstTestnetUTXOTxId, v.toString())
+                apply()
             }
-        }
+        } ?: Unit
 
     var secondTestnetUTXOTxId: BigInteger?
-        get() {
-            val stringValue = sharedPrefs.getString(
-                Key.secondTestnetUTXOTxId,
-                null
-            ) ?: return null
-            return BigInteger(stringValue)
-        }
-        set(value) {
-            if (value != null) {
-                sharedPrefs.edit().apply {
-                    putString(Key.secondTestnetUTXOTxId, value.toString())
-                    apply()
-                }
+        get() = sharedPrefs.getString(Key.secondTestnetUTXOTxId, null)?.run(::BigInteger)
+        set(value) = value?.let { v ->
+            sharedPrefs.edit().run {
+                putString(Key.secondTestnetUTXOTxId, v.toString())
+                apply()
             }
-        }
+        } ?: Unit
+
+    var lastSuccessfulBackupDate: DateTime?
+        get() = sharedPrefs.getLong(Key.lastSuccessfulBackupDate, -1L)
+            .let { if (it == -1L) null else DateTime(it) }
+        set(value) = sharedPrefs.edit().apply {
+            if (value == null) remove(Key.lastSuccessfulBackupDate)
+            else putLong(Key.lastSuccessfulBackupDate, value.millis)
+        }.apply()
+
+    var backupFailureDate: DateTime?
+        get() = sharedPrefs.getLong(Key.backupFailureDate, -1L)
+            .let { if (it == -1L) null else DateTime(it) }
+        set(value) = sharedPrefs.edit().apply {
+            if (value == null) remove(Key.backupFailureDate)
+            else putLong(Key.backupFailureDate, value.millis)
+        }.apply()
+
+    var scheduledBackupDate: DateTime?
+        get() = sharedPrefs.getLong(Key.scheduledBackupDate, -1L)
+            .let { if (it == -1L) null else DateTime(it) }
+        set(value) = sharedPrefs.edit().apply {
+            if (value == null) remove(Key.scheduledBackupDate)
+            else putLong(Key.scheduledBackupDate, value.millis)
+        }.apply()
+
+    val backupIsEnabled: Boolean
+        get() = (lastSuccessfulBackupDate != null)
+
+    var backupPassword: CharArray?
+        get() = SecurePreferences.getStringValue(context, Key.backupPassword, null)?.toCharArray()
+        set(value) =
+            if (value == null) SecurePreferences.removeValue(context, Key.backupPassword)
+            else SecurePreferences.setValue(context, Key.backupPassword, value.joinToString(""))
+
+    var localBackupFolderURI: Uri?
+        get() = (sharedPrefs.getString(Key.localBackupFolderURI, null) ?: "")
+            .let { if (it.isEmpty()) null else Uri.parse(it) }
+        set(value) = sharedPrefs.edit().apply {
+            if (value == null) remove(Key.localBackupFolderURI)
+            else putString(Key.localBackupFolderURI, value.toString())
+        }.apply()
 
     init {
         // for migration purposes, to avoid a second redundant faucet call:
@@ -328,6 +290,11 @@ class SharedPrefsWrapper(
         testnetTariUTXOKeyList = mutableListOf()
         firstTestnetUTXOTxId = null
         secondTestnetUTXOTxId = null
+        lastSuccessfulBackupDate = null
+        backupFailureDate = null
+        scheduledBackupDate = null
+        backupPassword = null
+        localBackupFolderURI = null
     }
 
 }

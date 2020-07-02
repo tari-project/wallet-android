@@ -48,6 +48,7 @@ import com.tari.android.wallet.application.WalletState
 import com.tari.android.wallet.event.Event
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.ffi.*
+import com.tari.android.wallet.infrastructure.backup.BackupManager
 import com.tari.android.wallet.model.*
 import com.tari.android.wallet.model.Tx.Direction.INBOUND
 import com.tari.android.wallet.model.Tx.Direction.OUTBOUND
@@ -104,6 +105,9 @@ internal class WalletService : Service(), FFIWalletListenerAdapter, LifecycleObs
     @Inject
     lateinit var walletManager: WalletManager
 
+    @Inject
+    lateinit var backupManager: BackupManager
+
     private lateinit var wallet: FFIWallet
 
     /**
@@ -153,7 +157,7 @@ internal class WalletService : Service(), FFIWalletListenerAdapter, LifecycleObs
         // start service & post foreground service notification
         val notification = notificationHelper.buildForegroundServiceNotification()
         startForeground(NOTIFICATION_ID, notification)
-        Logger.d("Tari wallet service started.")
+        Logger.d("Wallet service started.")
         return START_NOT_STICKY
     }
 
@@ -163,6 +167,7 @@ internal class WalletService : Service(), FFIWalletListenerAdapter, LifecycleObs
             wallet.listenerAdapter = this
             EventBus.unsubscribeFromWalletState(this)
             scheduleExpirationCheck()
+            backupManager.initialize()
             ProcessLifecycleOwner.get().lifecycle.addObserver(this)
         }
     }
@@ -184,12 +189,12 @@ internal class WalletService : Service(), FFIWalletListenerAdapter, LifecycleObs
      * Bound service.
      */
     override fun onBind(intent: Intent?): IBinder? {
-        Logger.d("Service bound.")
+        Logger.d("Wallet service bound.")
         return serviceImpl
     }
 
     override fun onUnbind(intent: Intent?): Boolean {
-        Logger.d("Service unbound.")
+        Logger.d("Wallet service unbound.")
         return super.onUnbind(intent)
     }
 
@@ -197,7 +202,7 @@ internal class WalletService : Service(), FFIWalletListenerAdapter, LifecycleObs
      * A broadcast is made on destroy to get the service running again.
      */
     override fun onDestroy() {
-        Logger.d("Service destroyed.")
+        Logger.d("Wallet service destroyed.")
         txExpirationCheckSubscription?.dispose()
         sendBroadcast(
             Intent(this, ServiceRestartBroadcastReceiver::class.java)
@@ -251,6 +256,8 @@ internal class WalletService : Service(), FFIWalletListenerAdapter, LifecycleObs
         listeners.iterator().forEach {
             it.onTxBroadcast(completedTx)
         }
+        // schedule a backup
+        backupManager.scheduleBackup(resetRetryCount = true)
     }
 
     override fun onTxMined(completedTx: CompletedTx) {
@@ -262,6 +269,8 @@ internal class WalletService : Service(), FFIWalletListenerAdapter, LifecycleObs
         listeners.iterator().forEach {
             it.onTxMined(completedTx)
         }
+        // schedule a backup
+        backupManager.scheduleBackup(resetRetryCount = true)
     }
 
     override fun onTxReceived(pendingInboundTx: PendingInboundTx) {
@@ -273,6 +282,8 @@ internal class WalletService : Service(), FFIWalletListenerAdapter, LifecycleObs
         // manage notifications
         postTxNotification(pendingInboundTx)
         listeners.forEach { it.onTxReceived(pendingInboundTx) }
+        // schedule a backup
+        backupManager.scheduleBackup(resetRetryCount = true)
     }
 
     override fun onTxReplyReceived(completedTx: CompletedTx) {
@@ -284,6 +295,8 @@ internal class WalletService : Service(), FFIWalletListenerAdapter, LifecycleObs
         listeners.iterator().forEach {
             it.onTxReplyReceived(completedTx)
         }
+        // schedule a backup
+        backupManager.scheduleBackup(resetRetryCount = true)
     }
 
     override fun onTxFinalized(completedTx: CompletedTx) {
@@ -295,6 +308,8 @@ internal class WalletService : Service(), FFIWalletListenerAdapter, LifecycleObs
         listeners.iterator().forEach {
             it.onTxFinalized(completedTx)
         }
+        // schedule a backup
+        backupManager.scheduleBackup(resetRetryCount = true)
     }
 
     override fun onDirectSendResult(txId: BigInteger, success: Boolean) {
@@ -306,6 +321,8 @@ internal class WalletService : Service(), FFIWalletListenerAdapter, LifecycleObs
                 outboundTxIdsToBePushNotified.remove(it)
                 sendPushNotificationToTxRecipient(it.second)
             }
+            // schedule a backup
+            backupManager.scheduleBackup(resetRetryCount = true)
         }
         // notify external listeners
         listeners.iterator().forEach {
@@ -322,6 +339,8 @@ internal class WalletService : Service(), FFIWalletListenerAdapter, LifecycleObs
                 outboundTxIdsToBePushNotified.remove(it)
                 sendPushNotificationToTxRecipient(it.second)
             }
+            // schedule a backup
+            backupManager.scheduleBackup(resetRetryCount = true)
         }
         // notify external listeners
         listeners.iterator().forEach {
@@ -331,23 +350,18 @@ internal class WalletService : Service(), FFIWalletListenerAdapter, LifecycleObs
 
     override fun onTxCancelled(cancelledTx: CancelledTx) {
         Logger.d("Tx cancelled: $cancelledTx")
-        val error = WalletError()
-        // TODO re-fetch the tx because of an FFI bug that causes the recipient public key to
-        //  be all 0s, will revert once the FFI bug is fixed
-        val refetchedCancelledTx = serviceImpl.getCancelledTxById(TxId(cancelledTx.id), error)
-        Logger.d("Cancelled tx refetched: $refetchedCancelledTx")
-        refetchedCancelledTx?.let {
-            // post event to bus
-            EventBus.post(Event.Wallet.TxCancelled(it))
-            // notify external listeners
-            if (it.direction == INBOUND &&
-                !(app.isInForeground && app.currentActivity is HomeActivity)
-            ) {
-                Logger.i("Posting cancellation notification")
-                notificationHelper.postTxCanceledNotification(it)
-            }
-            listeners.iterator().forEach { listener -> listener.onTxCancellation(it) }
+        // post event to bus
+        EventBus.post(Event.Wallet.TxCancelled(cancelledTx))
+        // notify external listeners
+        if (cancelledTx.direction == INBOUND &&
+            !(app.isInForeground && app.currentActivity is HomeActivity)
+        ) {
+            Logger.i("Posting cancellation notification")
+            notificationHelper.postTxCanceledNotification(cancelledTx)
         }
+        listeners.iterator().forEach { listener -> listener.onTxCancellation(cancelledTx) }
+        // schedule a backup
+        backupManager.scheduleBackup(resetRetryCount = true)
     }
 
     override fun onBaseNodeSyncComplete(requestId: BigInteger, success: Boolean) {

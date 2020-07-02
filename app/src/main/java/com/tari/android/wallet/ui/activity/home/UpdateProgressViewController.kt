@@ -73,7 +73,7 @@ import kotlin.coroutines.CoroutineContext
 internal class UpdateProgressViewController(
     private val view: View,
     listener: Listener
-): CoroutineScope {
+) : CoroutineScope {
 
     private val mJob = Job()
     override val coroutineContext: CoroutineContext
@@ -353,8 +353,8 @@ internal class UpdateProgressViewController(
         state = State.IDLE
         listenerWeakReference.get()?.updateHasCompleted(
             this,
-            // only update UI if there's a visible change
-            (numberOfReceivedTxs + numberOfCancelledTxs) > 0
+            numberOfReceivedTxs,
+            numberOfCancelledTxs
         )
     }
 
@@ -416,7 +416,8 @@ internal class UpdateProgressViewController(
 
         fun updateHasCompleted(
             source: UpdateProgressViewController,
-            updateDataAndUI: Boolean
+            receivedTxCount: Int,
+            cancelledTxCount: Int
         )
 
     }
