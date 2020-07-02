@@ -37,11 +37,10 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
 import com.tari.android.wallet.R
 import com.tari.android.wallet.ui.fragment.settings.AllSettingsFragment
-import com.tari.android.wallet.ui.fragment.settings.backup.VerifySeedPhraseFragment
-import com.tari.android.wallet.ui.fragment.settings.backup.WalletBackupSettingsFragment
-import com.tari.android.wallet.ui.fragment.settings.backup.WriteDownSeedPhraseFragment
+import com.tari.android.wallet.ui.fragment.settings.backup.*
 
 class SettingsActivity : AppCompatActivity(), SettingsRouter {
 
@@ -60,35 +59,77 @@ class SettingsActivity : AppCompatActivity(), SettingsRouter {
             .commit()
     }
 
-    override fun toWalletBackupSettings() {
-        addFragment(WalletBackupSettingsFragment.newInstance())
+    override fun toWalletBackupSettings(sourceFragment: Fragment) {
+        addFragment(sourceFragment, BackupSettingsFragment.newInstance())
     }
 
-    override fun onBackPressed() {
-        super.onBackPressed()
-        overridePendingTransition(R.anim.enter_from_top, R.anim.exit_to_bottom)
+    override fun toWalletBackupWithRecoveryPhrase(sourceFragment: Fragment) {
+        addFragment(sourceFragment, WriteDownSeedPhraseFragment.newInstance())
     }
 
-    override fun toWalletBackupWithRecoveryPhrase() {
-        addFragment(WriteDownSeedPhraseFragment.newInstance())
+    override fun toRecoveryPhraseVerification(sourceFragment: Fragment, phrase: List<String>) {
+        addFragment(sourceFragment, VerifySeedPhraseFragment.newInstance(phrase))
     }
 
-    override fun toRecoveryPhraseVerification(phrase: List<String>) {
-        addFragment(VerifySeedPhraseFragment.newInstance(phrase))
+    override fun toConfirmPassword(sourceFragment: Fragment) {
+        addFragment(sourceFragment, EnterCurrentPasswordFragment.newInstance())
     }
 
-    private fun addFragment(fragment: Fragment) {
+    override fun toChangePassword(sourceFragment: Fragment) {
+        addFragment(sourceFragment, ChangeSecurePasswordFragment.newInstance())
+    }
+
+    override fun onPasswordChanged(sourceFragment: Fragment) {
+        if (supportFragmentManager
+                .findFragmentByTag(EnterCurrentPasswordFragment::class.java.simpleName) != null
+        ) {
+            supportFragmentManager.popBackStackImmediate(
+                EnterCurrentPasswordFragment::class.java.simpleName,
+                FragmentManager.POP_BACK_STACK_INCLUSIVE
+            )
+            /*
+            val fragments = supportFragmentManager.fragments
+            supportFragmentManager.beginTransaction()
+                .setCustomAnimations(R.anim.no_anim, R.anim.no_anim)
+                .apply { fragments.subList(0, fragments.size - 2).forEach { hide(it) } }
+                .commit()
+             */
+        } else {
+            onBackPressed()
+        }
+    }
+
+    private fun addFragment(sourceFragment: Fragment, fragment: Fragment) {
         supportFragmentManager
             .beginTransaction()
             .setCustomAnimations(
                 R.anim.enter_from_right, R.anim.exit_to_left,
                 R.anim.enter_from_left, R.anim.exit_to_right
             )
-            .apply { supportFragmentManager.fragments.forEach { hide(it) } }
-            .add(R.id.settings_fragment_container, fragment)
-            .addToBackStack(null)
+            .hide(sourceFragment)
+            //  .apply { supportFragmentManager.fragments.forEach { hide(it) } }
+            .add(R.id.settings_fragment_container, fragment, fragment.javaClass.simpleName)
+            .addToBackStack(fragment.javaClass.simpleName)
             .commit()
     }
+
+    /*
+    override fun onBackPressed() {
+        super.onBackPressed()
+        // On back press all transitive fragments become visible for some reason, and when
+        // navigating back from ChangeSecurePasswordFragment then AllSettingsFragment becomes
+        // visible as well, so we hiding all the transitive fragments except for the one that
+        // becomes the topmost by force
+        overridePendingTransition(R.anim.enter_from_top, R.anim.exit_to_bottom)
+        val fragments = supportFragmentManager.fragments
+        if (fragments.size > 1) {
+            supportFragmentManager.beginTransaction()
+                .setCustomAnimations(R.anim.no_anim, R.anim.no_anim)
+                .apply { fragments.subList(0, fragments.size - 2).forEach { hide(it) } }
+                .commit()
+        }
+    }
+     */
 
     companion object {
         fun launch(context: Context) {

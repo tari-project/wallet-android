@@ -1,30 +1,50 @@
 package com.tari.android.wallet.di
 
 import android.content.Context
-import com.tari.android.wallet.R
-import com.tari.android.wallet.infrastructure.backup.WalletBackup
-import com.tari.android.wallet.infrastructure.backup.WalletRestorationFactory
-import com.tari.android.wallet.infrastructure.backup.storage.BackupStorageFactory
-import com.tari.android.wallet.ui.extension.string
+import com.tari.android.wallet.infrastructure.backup.*
+import com.tari.android.wallet.infrastructure.backup.GoogleDriveBackupStorage
+import com.tari.android.wallet.util.SharedPrefsWrapper
 import dagger.Module
 import dagger.Provides
-import java.io.File
+import javax.inject.Named
+import javax.inject.Singleton
 
 @Module
-class BackupAndRestoreModule {
+internal class BackupAndRestoreModule {
 
     @Provides
-    @BackupAndRestoreScope
-    fun provideWalletBackup(workingDir: File) = WalletBackup.defaultStrategy(workingDir)
+    @Singleton
+    fun provideBackupFileProcessor(
+        sharedPrefs: SharedPrefsWrapper,
+        @Named(WalletModule.FieldName.walletFilesDirPath) walletFilesDirPath: String,
+        @Named(WalletModule.FieldName.walletDatabaseFilePath) walletDatabaseFilePath: String,
+        @Named(WalletModule.FieldName.walletTempDirPath) walletTempDirPath: String
+    ): BackupFileProcessor = BackupFileProcessor(
+        sharedPrefs,
+        walletFilesDirPath,
+        walletDatabaseFilePath,
+        walletTempDirPath
+    )
 
     @Provides
-    @BackupAndRestoreScope
-    fun provideBackupStorageFactory(context: Context) =
-        BackupStorageFactory(context.string(R.string.app_name))
+    @Singleton
+    fun provideBackupStorage(
+        context: Context,
+        sharedPrefs: SharedPrefsWrapper,
+        @Named(WalletModule.FieldName.walletTempDirPath) walletTempDirPath: String,
+        backupFileProcessor: BackupFileProcessor
+    ): BackupStorage = GoogleDriveBackupStorage(
+        context,
+        sharedPrefs,
+        walletTempDirPath,
+        backupFileProcessor
+    )
 
     @Provides
-    @BackupAndRestoreScope
-    fun provideRestorationFactory(workingDir: File) =
-        WalletRestorationFactory.defaultStrategy(workingDir)
+    @Singleton
+    fun provideBackupManager(
+        sharedPrefs: SharedPrefsWrapper,
+        backupStorage: BackupStorage
+    ): BackupManager = BackupManager(sharedPrefs, backupStorage)
 
 }

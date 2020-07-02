@@ -69,6 +69,7 @@
     <string name="common_ok">OK</string>
     <string name="common_confirm">Confirm</string>
     <string name="common_share">Share</string>
+    <string name="common_unknown_error">Unknown error</string>
 
     <!-- emoji id copied view -->
     <string name="emoji_id_copied">COPIED</string>
@@ -265,7 +266,7 @@
     <string name="all_settings_page_title">Settings</string>
     <string name="all_settings_close">Done</string>
     <string name="all_settings_security_label">Security</string>
-    <string name="all_settings_back_up_wallet">Back Up Wallet</string>
+    <string name="all_settings_back_up_wallet_settings_entry">Wallet Backups</string>
     <string name="all_settings_secondary_settings_label">More</string>
     <string name="all_settings_report_a_bug">Report a Bug</string>
     <string name="all_settings_visit_site">Visit Tari.com</string>
@@ -273,14 +274,20 @@
     <string name="all_settings_user_agreement">User Agreement</string>
     <string name="all_settings_privacy_policy">Privacy policy</string>
     <string name="all_settings_disclaimer">Disclaimer</string>
-    <string name="settings_back_up_wallet_settings_page_title">Back Up Wallet</string>
-    <string name="settings_back_up_wallet_settings_page_description">By backing up your wallet, you’ll ensure that you don’t lose your tXTR if your phone is lost or broken.</string>
-    <string name="settings_back_up_wallet_to_cloud_cta">Back up to Google Drive</string>
-    <string name="settings_back_up_wallet_with_recovery_phrase_cta">Back up with recovery phrase</string>
 
     <!-- Wallet back up -->
-    <string name="back_up_wallet_page_title">Restore Your Wallet</string>
-    <string name="back_up_wallet_restore_with_cloud">Restore with Google Drive</string>
+    <string name="back_up_wallet_page_title">Security</string>
+    <string name="back_up_wallet_page_label">Wallet Backups</string>
+    <string name="back_up_wallet_to_cloud_cta">Back up now</string>
+    <string name="back_up_wallet_with_recovery_phrase_cta">Back up with recovery phrase</string>
+    <string name="back_up_wallet_page_description">By backing up your wallet, you’ll ensure that you don’t lose your tXTR if your phone is lost or broken.</string>
+    <string name="back_up_wallet_change_backup_password_cta">Change your secure password</string>
+
+    <string name="back_up_wallet_backup_status_checking_backup">Checking</string>
+    <string name="back_up_wallet_backup_status_in_progress">In progress</string>
+    <string name="back_up_wallet_backup_status_outdated">Out of date</string>
+    <string name="back_up_wallet_backup_status_scheduled">Scheduled</string>
+    <string name="back_up_wallet_backup_status_up_to_date">Up to date</string>
     <string name="back_up_wallet_restore_with_recovery_phrase">Restore with recovery phrase</string>
     <string name="back_up_wallet_restoring_wallet_label">Restoring your wallet</string>
     <string name="back_up_wallet_restoring_wallet_label_description">This could take between 1 to 3 minutes.\nPlease keep the app open.</string>
@@ -288,16 +295,16 @@
     <string name="back_up_wallet_enter_password_title">Set password for your backup</string>
     <string name="back_up_wallet_enter_password_hint">Enter password here…</string>
     <string name="back_up_wallet_backup_cta">Backup</string>
-    <string name="back_up_wallet_authentication_error_title">Authentication error occurred</string>
-    <string name="back_up_wallet_authentication_error_desc">Authentication is necessary in order to interact with the backup file on Google Drive</string>
     <string name="back_up_wallet_back_up_check_error_title">Failed to check current backup</string>
     <string name="back_up_wallet_back_up_check_error_desc">Current backup state check failed: %s</string>
     <string name="back_up_wallet_backing_up_error_title">Backup error</string>
     <string name="back_up_wallet_backing_up_error_desc">Error occurred during backup: %s</string>
     <string name="back_up_wallet_back_up_is_in_progress_error">Backup already in progress</string>
     <string name="back_up_wallet_status_check_unknown_error">Unknown error</string>
-
+    <string name="back_up_wallet_backing_up_unknown_error">Unknown error</string>
     <string name="back_up_wallet_status_check_authentication_cancellation">Authentication was cancelled</string>
+    <string name="back_up_wallet_last_successful_backup">Last successful backup: %s at %s</string>
+
     <!-- Wallet back up with seed phrase -->
     <string name="back_up_seed_phrase_page_title">Back Up With Seed Phrase</string>
     <string name="back_up_seed_phrase_desc">Carefully write these 12 words down in order (left to right) on a piece of paper, and hide it somewhere others won’t access it. Do not take a screenshot.</string>
@@ -313,7 +320,29 @@
     <string name="verify_seed_phrase_content_description_sequence_is_correct">Sequence is correct</string>
 
     <!-- Wallet restore -->
-    <string name="restore_wallet_with_cloud_error_title">Error occurred during restoration</string>
-    <string name="restore_wallet_with_cloud_error_desc">Wallet could not be restored: %s</string>
+    <string name="restore_wallet_page_title">Restore Your Wallet</string>
+    <string name="restore_wallet_error_title">Restoration Error</string>
+    <string name="restore_wallet_error_desc">Wallet could not be restored: %s</string>
+    <string name="restore_wallet_restore_cta">Restore Wallet</string>
+    <string name="restore_wallet_password_match_error">@string/enter_backup_password_password_match_error</string>
+
+    <!--Restore -->
+    <string name="restore_with_cloud_page_title">Enter your backup password</string>
+
+    <!--Change password-->
+    <string name="change_password_enter_password_label">Enter Password</string>
+    <string name="change_password_enter_password_hint">Make it a strong one!</string>
+    <string name="change_password_confirm_password_label">Confirm Password</string>
+    <string name="change_password_confirm_password_hint">Let’s see it again</string>
+    <string name="change_password_change_password_cta">Secure Your Backup</string>
+    <string name="change_password_password_match_error">Make them match!</string>
+
+    <!--Enter backup password-->
+    <string name="enter_backup_password_page_title">Enter your current backup password</string>
+    <string name="enter_backup_password_page_description">Enter your backup password in order to change it to something different.</string>
+    <string name="enter_backup_password_enter_password_label">Enter Password</string>
+    <string name="enter_backup_password_password_match_error">That’s not it!</string>
+    <string name="enter_backup_password_change_password_cta">Change Password</string>
+    <string name="enter_backup_password_wrong_password_error">Seems that the password is wrong.</string>
 
 </resources>

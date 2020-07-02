@@ -57,6 +57,7 @@ import com.tari.android.wallet.util.SharedPrefsWrapper
 import com.tari.android.wallet.util.WalletUtil
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.*
 import javax.inject.Inject
 import javax.inject.Named
@@ -161,7 +162,7 @@ internal class DebugLogFragment : Fragment(), AdapterView.OnItemSelectedListener
             try {
                 bugReportingService.shareBugReport(mContext)
             } catch (e: BugReportingService.BugReportFileSizeLimitExceededException) {
-                with(Dispatchers.Main) {
+                withContext(Dispatchers.Main) {
                     showBugReportFileSizeExceededDialog()
                 }
             }
