@@ -1,0 +1,58 @@
+name: PR Test Workflow
+on: pull_request
+defaults:
+  run:
+    shell: bash
+
+jobs:
+    test: 
+      name: Instrumented and Unit Tests
+      runs-on: macos-latest
+      steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Create .properties Files # create local.properties and sentry.properties
+        run: |
+          rm -f local.properties
+          rm -f sentry.properties
+          touch local.properties
+          echo 'sdk.dir=/Users/runner/Library/Android/sdk' >> local.properties
+          echo 'ndk.dir=/Users/runner/Library/Android/sdk/ndk/20.1.5948944' >> local.properties
+          touch sentry.properties
+          echo ${{ secrets.SENTRY_PROPERTIES }} >> sentry.properties
+          echo ".properties files created."
+      - name: Run Instrumented Tests # run all instrumented tests through the TestSuite class
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 24
+          ndk: 20.1.5948944
+          cmake: 3.10.2.4988404
+          arch: x86_64
+          emulator-options: -no-snapshot -wipe-data -no-boot-anim  -no-window -no-audio -gpu swiftshader_indirect -camera-back none -camera-front none
+          script: ./gradlew connectedRegularDebugAndroidTest -Pandroid.testInstrumentationRunnerArguments.class=com.tari.android.wallet.TestSuite
+      - name: Upload Intrumented Test Reports
+        uses: actions/upload-artifact@v2
+        if: ${{ always() }} # IMPORTANT: Upload reports regardless of status.
+        with:
+          name: instrumented_test_reports
+          path: app/build/outputs/androidTest-results/connected/flavors/REGULAR # This folder contains test result XML files.
+      - name: Run Unit Tests
+        run: ./gradlew test
+      - name: Upload Unit Test Reports
+        uses: actions/upload-artifact@v2
+        if: ${{ always() }} # IMPORTANT: Upload reports regardless of status.
+        with:
+          name: unit_test_reports
+          path: app/build/test-results # This folder contains test result XML files.
+    test-report:
+      name: Display Unit Test Reports
+      runs-on: ubuntu-latest
+      needs: test # The report job will run after test job.
+      if: ${{ always() }} # IMPORTANT: Execute report job regardless of status.
+      steps:
+      - name: Download Unit Test Reports
+        uses: actions/download-artifact@v2
+        with:
+          name: unit_test_reports
+      - name: Display Test Reports
+        uses: asadmansr/android-test-report-action@v1.2.0
