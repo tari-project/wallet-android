@@ -34,10 +34,12 @@ package com.tari.android.wallet.ui.activity.restore
 
 interface WalletRestoreRouter {
 
-    fun toBackupWithCloud()
+    fun toEnterRestorePassword()
 
-    fun toBackupWithRecoveryPhrase()
+    fun toRestoreWithRecoveryPhrase()
 
-    fun onBackupCompleted()
+    fun toRestorationWithCloud()
+
+    fun onRestoreCompleted()
 
 }

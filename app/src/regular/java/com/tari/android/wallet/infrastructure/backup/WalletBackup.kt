@@ -44,7 +44,7 @@ interface WalletBackup {
     fun run(key: CharArray): File
 
     companion object {
-        fun defaultStrategy(workingDir: File): WalletBackup = zipOnly(workingDir)
+        fun defaultStrategy(workingDir: File): WalletBackup = aesEncryptedZip(workingDir)
 
         fun aesEncryptedZip(workingDir: File): WalletBackup = CompositeWalletBackup(
             workingDir,

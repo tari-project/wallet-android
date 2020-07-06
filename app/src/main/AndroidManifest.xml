@@ -154,7 +154,7 @@
             android:parentActivityName=".ui.activity.home.HomeActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme"
-            android:windowSoftInputMode="adjustPan|stateAlwaysHidden" />
+            android:windowSoftInputMode="adjustResize|stateAlwaysHidden" />
 
         <activity
             android:name=".ui.activity.restore.WalletRestoreActivity"
@@ -162,7 +162,7 @@
             android:parentActivityName=".ui.activity.onboarding.OnboardingFlowActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme"
-            android:windowSoftInputMode="adjustPan|stateAlwaysHidden" />
+            android:windowSoftInputMode="adjustResize|stateAlwaysHidden" />
 
         <!-- Google sign in activity -->
         <activity

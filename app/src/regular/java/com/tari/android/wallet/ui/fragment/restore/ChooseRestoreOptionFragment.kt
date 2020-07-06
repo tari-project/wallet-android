@@ -56,8 +56,8 @@ import com.tari.android.wallet.ui.activity.restore.WalletRestoreRouter
 import com.tari.android.wallet.ui.dialog.ErrorDialog
 import com.tari.android.wallet.ui.extension.backupAndRestoreComponent
 import com.tari.android.wallet.ui.extension.string
-import com.tari.android.wallet.ui.fragment.restore.RestorationWithCloudFragment.RestorationWithCloudState
-import com.tari.android.wallet.ui.fragment.restore.RestorationWithCloudFragment.RestorationWithCloudStateFactory
+import com.tari.android.wallet.ui.fragment.restore.EnterRestorationPasswordFragment.RestorationWithCloudStateFactory
+import com.tari.android.wallet.ui.fragment.restore.EnterRestorationPasswordFragment.RestorationWithCloudViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -93,16 +93,15 @@ framework for UI tree rebuild on configuration changes"""
         ui.backCtaView.setOnClickListener { requireActivity().onBackPressed() }
         ui.backUpWalletWithCloudCtaView
             .setOnClickListener { processRestorationWithCloudIntent() }
-        ui.backUpWithRecoveryPhraseCtaView
+        ui.backupWithRecoveryPhraseCtaView
             .setOnClickListener {
-                (requireActivity() as WalletRestoreRouter).toBackupWithRecoveryPhrase()
+                (requireActivity() as WalletRestoreRouter).toRestoreWithRecoveryPhrase()
             }
     }
 
     private fun processRestorationWithCloudIntent() {
         try {
-            ViewModelProvider(requireActivity()).get(RestorationWithCloudState::class.java)
-                .restoreWallet()
+            ViewModelProvider(requireActivity()).get(RestorationWithCloudViewModel::class.java)
             navigateToRestorationWithCloud()
         } catch (e: Exception) {
             // Means that we aren't authenticated yet
@@ -139,8 +138,7 @@ framework for UI tree rebuild on configuration changes"""
                 ViewModelProvider(
                     requireActivity(),
                     RestorationWithCloudStateFactory(restorationFactory.create(storage))
-                ).get(RestorationWithCloudState::class.java)
-                    .restoreWallet()
+                ).get(RestorationWithCloudViewModel::class.java)
                 navigateToRestorationWithCloud()
             } catch (e: Exception) {
                 Logger.e(e, "Error occurred during storage obtaining")
@@ -150,7 +148,7 @@ framework for UI tree rebuild on configuration changes"""
     }
 
     private fun navigateToRestorationWithCloud() {
-        (requireActivity() as WalletRestoreRouter).toBackupWithCloud()
+        (requireActivity() as WalletRestoreRouter).toEnterRestorePassword()
     }
 
     private fun showAuthFailedDialog() {

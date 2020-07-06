@@ -174,6 +174,8 @@ internal object UiUtil {
             BlendModeCompat.SRC_IN
         )
     }
+    
+    fun ProgressBar.setColor(color: Int) = setProgressBarColor(this, color)
 
     @Suppress("unused")
     fun hideKeyboard(

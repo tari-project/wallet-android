@@ -35,23 +35,31 @@ package com.tari.android.wallet.infrastructure.backup
 import com.orhanobut.logger.Logger
 import com.tari.android.wallet.infrastructure.backup.compress.CompressionMethod
 import com.tari.android.wallet.infrastructure.backup.storage.BackupStorage
+import com.tari.android.wallet.infrastructure.security.encryption.SymmetricEncryptionAlgorithm
 import java.io.File
+import java.io.FileInputStream
+import java.io.FileOutputStream
 
 class WalletRestoration(
     private val storage: BackupStorage,
     private val workingDir: File,
+    private val encryptionAlgorithm: SymmetricEncryptionAlgorithm,
     private val compressionMethod: CompressionMethod
 ) {
 
-    fun run() {
+    fun run(password: CharArray) {
         require(storage.backupExists()) { "Backup does not exist" }
-        val archive = File(
-            workingDir,
-            "restore_archive_${System.currentTimeMillis()}.${compressionMethod.extension}"
-        )
+        val time = System.currentTimeMillis()
+        val encryptedArchive = File(workingDir, "restore_bundle_$time")
+        val archive = File(workingDir, "restore_archive_$time.${compressionMethod.extension}")
         val restoreDir = File(workingDir, "restore/").apply { mkdir() }
         try {
-            storage.downloadBackup(archive)
+            storage.downloadBackup(encryptedArchive)
+            encryptionAlgorithm.decrypt(
+                password,
+                { FileInputStream(encryptedArchive) },
+                { FileOutputStream(archive) })
+            encryptedArchive.delete()
             compressionMethod.unpack(archive, restoreDir)
             archive.delete()
             BACKUP_FILES.forEach {
@@ -59,7 +67,8 @@ class WalletRestoration(
             }
             restoreDir.deleteRecursively()
         } catch (e: Exception) {
-            Logger.e(e, "Exception occurred during restoration")
+            Logger.e(e, "Exception occurred during restoration: $e")
+            encryptedArchive.delete()
             archive.delete()
             restoreDir.deleteRecursively()
             throw e
@@ -70,12 +79,18 @@ class WalletRestoration(
 
 class WalletRestorationFactory(
     private val workingDir: File,
+    private val encryptionAlgorithm: SymmetricEncryptionAlgorithm,
     private val compressionMethod: CompressionMethod
 ) {
-    fun create(storage: BackupStorage) = WalletRestoration(storage, workingDir, compressionMethod)
+    fun create(storage: BackupStorage) =
+        WalletRestoration(storage, workingDir, encryptionAlgorithm, compressionMethod)
 
     companion object {
-        fun defaultStrategy(wd: File) = WalletRestorationFactory(wd, CompressionMethod.zip())
+        fun defaultStrategy(workingDirectory: File) = WalletRestorationFactory(
+            workingDirectory,
+            SymmetricEncryptionAlgorithm.aes(),
+            CompressionMethod.zip()
+        )
     }
 
 }

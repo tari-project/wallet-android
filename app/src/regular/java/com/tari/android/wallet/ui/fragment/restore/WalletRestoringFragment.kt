@@ -36,12 +36,17 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.OnBackPressedCallback
+import androidx.core.view.postDelayed
 import androidx.fragment.app.Fragment
 import com.tari.android.wallet.databinding.FragmentWalletRestoringBinding
+import com.tari.android.wallet.ui.activity.restore.WalletRestoreRouter
 
-class WalletRestoringFragment @Deprecated("""Use newInstance() and supply all the necessary 
+class WalletRestoringFragment @Deprecated(
+    """Use newInstance() and supply all the necessary 
 data via arguments instead, as fragment's default no-op constructor is used by the framework for 
-UI tree rebuild on configuration changes""")  constructor() : Fragment() {
+UI tree rebuild on configuration changes"""
+) constructor() : Fragment() {
 
     private lateinit var ui: FragmentWalletRestoringBinding
 
@@ -52,9 +57,23 @@ UI tree rebuild on configuration changes""")  constructor() : Fragment() {
     ): View? =
         FragmentWalletRestoringBinding.inflate(inflater, container, false).also { ui = it }.root
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        requireActivity().onBackPressedDispatcher.addCallback(object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                // No-op
+            }
+        })
+        ui.root.postDelayed(ARTIFICIAL_DELAY) {
+            (requireActivity() as WalletRestoreRouter).onRestoreCompleted()
+        }
+    }
+
     companion object {
         @Suppress("DEPRECATION")
         fun newInstance() = WalletRestoringFragment()
+
+        private const val ARTIFICIAL_DELAY = 5000L
     }
 
 }

@@ -41,7 +41,7 @@ import com.tari.android.wallet.R
 import com.tari.android.wallet.ui.activity.AuthActivity
 import com.tari.android.wallet.ui.extension.backupAndRestoreComponent
 import com.tari.android.wallet.ui.fragment.restore.ChooseRestoreOptionFragment
-import com.tari.android.wallet.ui.fragment.restore.RestorationWithCloudFragment
+import com.tari.android.wallet.ui.fragment.restore.EnterRestorationPasswordFragment
 import com.tari.android.wallet.ui.fragment.restore.WalletRestoringFragment
 import com.tari.android.wallet.util.SharedPrefsWrapper
 import javax.inject.Inject
@@ -66,15 +66,19 @@ class WalletRestoreActivity : AppCompatActivity(), WalletRestoreRouter {
             .commit()
     }
 
-    override fun toBackupWithCloud() {
-        loadFragment(RestorationWithCloudFragment.newInstance())
+    override fun toEnterRestorePassword() {
+        loadFragment(EnterRestorationPasswordFragment.newInstance())
     }
 
-    override fun toBackupWithRecoveryPhrase() {
+    override fun toRestoreWithRecoveryPhrase() {
         loadFragment(WalletRestoringFragment.newInstance())
     }
 
-    override fun onBackupCompleted() {
+    override fun toRestorationWithCloud() {
+        loadFragment(WalletRestoringFragment.newInstance())
+    }
+
+    override fun onRestoreCompleted() {
         // wallet restored, setup shared prefs accordingly
         prefs.onboardingCompleted = true
         prefs.onboardingAuthSetupCompleted = true

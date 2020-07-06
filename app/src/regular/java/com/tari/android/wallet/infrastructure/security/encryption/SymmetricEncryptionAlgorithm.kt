@@ -83,13 +83,18 @@ private class AES(private val random: SecureRandom = SecureRandom()) :
         )
     }
 
-    private fun defineKeySpec(key: CharArray): Pair<ByteArray, SecretKeySpec> {
+    private fun defineKeySpec(password: CharArray): Pair<ByteArray, SecretKeySpec> {
         val salt = ByteArray(SALT_SIZE).apply(random::nextBytes)
-        val spec = PBEKeySpec(key, salt, KEY_HASHING_TIMES, BIT_KEY_SIZE)
+        val spec = PBEKeySpec(
+            if (password.isEmpty()) charArrayOf('_') else password,
+            salt,
+            KEY_HASHING_TIMES,
+            BIT_KEY_SIZE
+        )
         val secret: SecretKey =
             SecretKeyFactory.getInstance(SECRET_KEYGEN_ALGORITHM).generateSecret(spec)
         spec.clearPassword()
-        Arrays.fill(key, NULL_BYTE.toChar())
+        Arrays.fill(password, NULL_BYTE.toChar())
         return Pair(salt, SecretKeySpec(secret.encoded, ALGORITHM_AES))
     }
 
@@ -144,7 +149,12 @@ private class AES(private val random: SecureRandom = SecureRandom()) :
     }
 
     private fun deriveKey(password: CharArray, salt: ByteArray): SecretKeySpec {
-        val spec = PBEKeySpec(password, salt, KEY_HASHING_TIMES, BIT_KEY_SIZE)
+        val spec = PBEKeySpec(
+            if (password.isEmpty()) charArrayOf('_') else password,
+            salt,
+            KEY_HASHING_TIMES,
+            BIT_KEY_SIZE
+        )
         val secret: SecretKey =
             SecretKeyFactory.getInstance(SECRET_KEYGEN_ALGORITHM).generateSecret(spec)
         return SecretKeySpec(secret.encoded, ALGORITHM_AES)
