@@ -1,0 +1,12 @@
+<resources>
+    <string name="back_up_wallet_backups_switch_label">Google Drive backups</string>
+    <string name="back_up_wallet_set_backup_password_cta">Secure your Google Drive backup</string>
+    <string name="back_up_wallet_restore">Restore with Google Drive</string>
+
+    <string name="change_password_page_title">Secure your Google Drive backup</string>
+    <string name="change_password_page_description_general_part">Ensure your wallet is safe even if your Google Drive is compromised. Select a password you will remember or</string>
+    <string name="change_password_page_description_highlight_part">you will not be able to recover your wallet</string>
+
+    <string name="enter_backup_password_page_desc_general_part">Enter the password you created in Aurora to secure your cloud backups. If you cannot find the password,</string>
+    <string name="enter_backup_password_page_desc_highlighted_part">you will not be able to recover your wallet</string>
+</resources>

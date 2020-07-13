@@ -30,28 +30,16 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.tari.android.wallet.extension
+package com.tari.android.wallet.infrastructure.backup
 
-import java.text.SimpleDateFormat
-import java.util.*
+import java.io.File
 
-/**
- * Contains Date functions.
- *
- * @author The Tari Development Team
- */
+// Storage & backup-related.
+class BackupStorageSetupCancelled : IllegalStateException()
+class BackupStorageSetupException(s: String?) : IllegalStateException(s)
+class BackupStorageSetupRecoverableAuthException: IllegalStateException()
+class BackupInterruptedException(s: String?) : IllegalStateException(s)
+class BackupStorageTamperedException(s: String?) : IllegalStateException(s)
 
-internal fun Date.txFormattedDate(): String {
-    val cal: Calendar = Calendar.getInstance()
-    cal.time = this
-    val day: Int = cal.get(Calendar.DATE)
-    var indicator = "th"
-    if (day !in 11..18) indicator = when (day % 10) {
-        1 -> "st"
-        2 -> "nd"
-        3 -> "rd"
-        else -> "th"
-    }
-    return SimpleDateFormat("MMMM d'$indicator' yyyy 'at' h:mm a", Locale.ENGLISH)
-        .format(this)
-}
+// Restore-related.
+class BackupFileIsEncryptedException(encryptedFile: File, s: String?) : IllegalStateException(s)

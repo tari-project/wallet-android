@@ -92,7 +92,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical|start"
-                android:text="@string/back_up_wallet_cloud_backups_switch_label"
+                android:text="@string/back_up_wallet_backups_switch_label"
                 android:textColor="@color/black"
                 android:textSize="15sp"
                 app:customFont="AVENIR_LT_STD_MEDIUM" />
@@ -180,6 +180,7 @@
                 android:paddingVertical="24dp">
 
                 <com.tari.android.wallet.ui.component.CustomFontTextView
+                    android:id="@+id/backup_now_text_view"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical|start"
@@ -311,23 +312,5 @@
         android:textColor="@color/dark_gray"
         app:customFont="AVENIR_LT_STD_MEDIUM"
         tools:text="Last successful backup: Jul 1 2020 at 11:32 PM" />
-
-    <FrameLayout
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1">
-
-        <com.tari.android.wallet.ui.component.CustomFontTextView
-            android:id="@+id/delete_all_backups_cta_view"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom|center_horizontal"
-            android:layout_marginHorizontal="27dp"
-            android:layout_marginBottom="49dp"
-            android:text="@string/back_up_wallet_delete_all_backups_cta"
-            android:textColor="@color/common_error"
-            app:customFont="AVENIR_LT_STD_MEDIUM" />
-
-    </FrameLayout>
 
 </LinearLayout>

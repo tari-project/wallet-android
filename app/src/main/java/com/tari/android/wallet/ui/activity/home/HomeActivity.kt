@@ -73,6 +73,7 @@ import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.extension.applyFontStyle
 import com.tari.android.wallet.extension.repopulate
 import com.tari.android.wallet.infrastructure.Tracker
+import com.tari.android.wallet.infrastructure.backup.BackupManager
 import com.tari.android.wallet.model.*
 import com.tari.android.wallet.network.NetworkConnectionState
 import com.tari.android.wallet.service.TariWalletService
@@ -120,6 +121,9 @@ internal class HomeActivity : AppCompatActivity(),
 
     @Inject
     lateinit var tracker: Tracker
+
+    @Inject
+    lateinit var backupManager: BackupManager
 
     private lateinit var ui: ActivityHomeBinding
 
@@ -902,7 +906,8 @@ internal class HomeActivity : AppCompatActivity(),
      */
     private fun onStoreButtonClicked(view: View) {
         UiUtil.temporarilyDisableClick(view)
-        showTTLStoreDialog()
+        // showTTLStoreDialog()
+        backupManager.scheduleBackup()
     }
 
     /**

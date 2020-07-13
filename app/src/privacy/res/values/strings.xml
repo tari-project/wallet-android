@@ -1,0 +1,12 @@
+<resources>
+    <string name="back_up_wallet_backups_switch_label">Local backups</string>
+    <string name="back_up_wallet_set_backup_password_cta">Secure your local backup</string>
+    <string name="back_up_wallet_restore">Restore with Local Storage</string>
+
+    <string name="change_password_page_title">Secure your local backup</string>
+    <string name="change_password_page_description_general_part">Ensure your wallet is safe even if your app storage is compromised. Select a password you will remember or</string>
+    <string name="change_password_page_description_highlight_part">you will not be able to recover your wallet</string>
+
+    <string name="enter_backup_password_page_desc_general_part">Enter the password you created in Aurora to secure your local backups. If you cannot find the password,</string>
+    <string name="enter_backup_password_page_desc_highlighted_part">you will not be able to recover your wallet</string>
+</resources>

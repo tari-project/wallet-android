@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="com.tari.android.wallet">
 
     <application>
@@ -8,6 +9,14 @@
         <meta-data
             android:name="io.sentry.dsn"
             android:value="${sentryPublicDSN}" />
+
+        <!-- Google sign in activity -->
+        <activity
+            android:name="com.google.android.gms.auth.api.signin.internal.SignInHubActivity"
+            android:excludeFromRecents="true"
+            android:exported="false"
+            android:theme="@style/GoogleSignInActivity"
+            tools:replace="android:theme" />
 
     </application>
 

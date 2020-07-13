@@ -279,17 +279,15 @@
     <string name="back_up_wallet_page_title">Security</string>
     <string name="back_up_wallet_page_label">Wallet Backups</string>
     <string name="back_up_wallet_to_cloud_cta">Back up now</string>
-    <string name="back_up_wallet_delete_all_backups_cta">Delete all Google Drive backups</string>
-    <string name="back_up_wallet_cloud_backups_switch_label">Google Drive backups</string>
     <string name="back_up_wallet_with_recovery_phrase_cta">Back up with recovery phrase</string>
     <string name="back_up_wallet_page_description">By backing up your wallet, you’ll ensure that you don’t lose your tXTR if your phone is lost or broken.</string>
     <string name="back_up_wallet_change_backup_password_cta">Change your secure password</string>
-    <string name="back_up_wallet_set_backup_password_cta">Secure your Google Drive backup</string>
+
     <string name="back_up_wallet_backup_status_checking_backup">Checking</string>
     <string name="back_up_wallet_backup_status_in_progress">In progress</string>
     <string name="back_up_wallet_backup_status_outdated">Out of date</string>
-    <string name="back_up_wallet_backup_status_actual">Up to date</string>
-    <string name="back_up_wallet_restore_with_cloud">Restore with Google Drive</string>
+    <string name="back_up_wallet_backup_status_scheduled">Scheduled</string>
+    <string name="back_up_wallet_backup_status_up_to_date">Up to date</string>
     <string name="back_up_wallet_restore_with_recovery_phrase">Restore with recovery phrase</string>
     <string name="back_up_wallet_restoring_wallet_label">Restoring your wallet</string>
     <string name="back_up_wallet_restoring_wallet_label_description">This could take between 1 to 3 minutes.\nPlease keep the app open.</string>
@@ -297,9 +295,9 @@
     <string name="back_up_wallet_enter_password_title">Set password for your backup</string>
     <string name="back_up_wallet_enter_password_hint">Enter password here…</string>
     <string name="back_up_wallet_backup_cta">Backup</string>
-    <string name="back_up_wallet_authentication_error_title">Authentication error occurred</string>
-    <string name="back_up_wallet_authentication_error_desc">Authentication is necessary in order to interact with the backup file on Google Drive</string>
-    <string name="back_up_wallet_sign_out_error_title">Signing out error occurred</string>
+    <string name="back_up_wallet_storage_setup_error_title">Backup Storage Error</string>
+    <string name="back_up_wallet_storage_setup_error_desc">An error happened while setting up the backup storage. Please make sure to complete authentication or select a backup folder.</string>
+    <string name="back_up_wallet_sign_out_error_title">Sign out error</string>
     <string name="back_up_wallet_sign_out_error_desc">Could not sign out, please try again later</string>
     <string name="back_up_wallet_back_up_check_error_title">Failed to check current backup</string>
     <string name="back_up_wallet_back_up_check_error_desc">Current backup state check failed: %s</string>
@@ -327,18 +325,19 @@
 
     <!-- Wallet restore -->
     <string name="restore_wallet_page_title">Restore Your Wallet</string>
-    <string name="restore_wallet_with_cloud_error_title">Error occurred during restoration</string>
-    <string name="restore_wallet_with_cloud_error_desc">Wallet could not be restored: %s</string>
+    <string name="restore_wallet_error_title">Restoration Error</string>
+    <string name="restore_wallet_error_desc">Wallet could not be restored: %s</string>
     <string name="restore_wallet_restore_cta">Restore Wallet</string>
     <string name="restore_wallet_password_match_error">@string/enter_backup_password_password_match_error</string>
 
-    <!--Restore with cloud-->
+    <!-- Backup storage status check -->
+    <string name="check_backup_storage_status_error_title">Backup Storage Error</string>
+    <string name="check_backup_storage_status_error_description">Cannot connect to backup storage.</string>
+
+    <!--Restore -->
     <string name="restore_with_cloud_page_title">Enter your backup password</string>
 
     <!--Change password-->
-    <string name="change_password_page_title">Secure your Google Drive backup</string>
-    <string name="change_password_page_description_general_part">Ensure your wallet is safe even if your Google Drive is compromised. Select a password you will remember or</string>
-    <string name="change_password_page_description_highlight_part">you will not be able to recover your wallet</string>
     <string name="change_password_enter_password_label">Enter Password</string>
     <string name="change_password_enter_password_hint">Make it a strong one!</string>
     <string name="change_password_confirm_password_label">Confirm Password</string>
@@ -352,8 +351,6 @@
     <string name="enter_backup_password_enter_password_label">Enter Password</string>
     <string name="enter_backup_password_password_match_error">That’s not it!</string>
     <string name="enter_backup_password_change_password_cta">Change Password</string>
-    <string name="enter_backup_password_page_desc_general_part">Enter the password you created in Aurora to secure your cloud backups. If you cannot find the password,</string>
-    <string name="enter_backup_password_page_desc_highlighted_part">you will not be able to recover your wallet</string>
     <string name="enter_backup_password_wrong_password_error">Seems that the password is wrong.</string>
 
 </resources>

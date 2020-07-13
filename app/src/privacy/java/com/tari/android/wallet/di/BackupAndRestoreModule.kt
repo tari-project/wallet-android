@@ -2,7 +2,7 @@ package com.tari.android.wallet.di
 
 import android.content.Context
 import com.tari.android.wallet.infrastructure.backup.*
-import com.tari.android.wallet.infrastructure.backup.GoogleDriveBackupStorage
+import com.tari.android.wallet.infrastructure.backup.LocalBackupStorage
 import com.tari.android.wallet.util.SharedPrefsWrapper
 import dagger.Module
 import dagger.Provides
@@ -33,7 +33,7 @@ internal class BackupAndRestoreModule {
         sharedPrefs: SharedPrefsWrapper,
         @Named(WalletModule.FieldName.walletTempDirPath) walletTempDirPath: String,
         backupFileProcessor: BackupFileProcessor
-    ): BackupStorage = GoogleDriveBackupStorage(
+    ): BackupStorage = LocalBackupStorage(
         context,
         sharedPrefs,
         walletTempDirPath,

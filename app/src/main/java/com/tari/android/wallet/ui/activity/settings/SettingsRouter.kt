@@ -30,28 +30,22 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.tari.android.wallet.extension
+package com.tari.android.wallet.ui.activity.settings
 
-import java.text.SimpleDateFormat
-import java.util.*
+import androidx.fragment.app.Fragment
 
-/**
- * Contains Date functions.
- *
- * @author The Tari Development Team
- */
+interface SettingsRouter {
 
-internal fun Date.txFormattedDate(): String {
-    val cal: Calendar = Calendar.getInstance()
-    cal.time = this
-    val day: Int = cal.get(Calendar.DATE)
-    var indicator = "th"
-    if (day !in 11..18) indicator = when (day % 10) {
-        1 -> "st"
-        2 -> "nd"
-        3 -> "rd"
-        else -> "th"
-    }
-    return SimpleDateFormat("MMMM d'$indicator' yyyy 'at' h:mm a", Locale.ENGLISH)
-        .format(this)
+    fun toWalletBackupSettings(sourceFragment: Fragment)
+
+    fun toWalletBackupWithRecoveryPhrase(sourceFragment: Fragment)
+
+    fun toRecoveryPhraseVerification(sourceFragment: Fragment, phrase: List<String>)
+
+    fun toConfirmPassword(sourceFragment: Fragment)
+
+    fun toChangePassword(sourceFragment: Fragment)
+
+    fun onPasswordChanged(sourceFragment: Fragment)
+
 }
