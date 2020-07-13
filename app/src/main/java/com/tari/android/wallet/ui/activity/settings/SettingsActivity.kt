@@ -49,13 +49,41 @@ class SettingsActivity : AppCompatActivity(), SettingsRouter {
         setContentView(R.layout.activity_settings)
         overridePendingTransition(R.anim.enter_from_bottom, R.anim.exit_to_top)
         if (savedInstanceState == null) {
-            loadFragment()
+            if (intent.getBooleanExtra(KEY_SHOW_BACKUP_SETTINGS, false)) {
+                loadFragmentsStackUpToBackupSettings()
+            } else {
+                loadAllSettingsFragment()
+            }
         }
     }
 
-    private fun loadFragment() {
+    private fun loadAllSettingsFragment() {
         supportFragmentManager.beginTransaction()
             .add(R.id.settings_fragment_container, AllSettingsFragment.newInstance())
+            .commit()
+    }
+
+    private fun loadFragmentsStackUpToBackupSettings() {
+        val fm = supportFragmentManager
+        val allSettings = AllSettingsFragment.newInstance()
+        fm.beginTransaction()
+            .add(R.id.settings_fragment_container, allSettings)
+            .commit()
+        fm.executePendingTransactions()
+        val backupSettings = BackupSettingsFragment.newInstance()
+        fm
+            .beginTransaction()
+            .setCustomAnimations(
+                0, 0,
+                R.anim.enter_from_left, R.anim.exit_to_right
+            )
+            .hide(allSettings)
+            .add(
+                R.id.settings_fragment_container,
+                backupSettings,
+                backupSettings.javaClass.simpleName
+            )
+            .addToBackStack(backupSettings.javaClass.simpleName)
             .commit()
     }
 
@@ -72,11 +100,19 @@ class SettingsActivity : AppCompatActivity(), SettingsRouter {
     }
 
     override fun toConfirmPassword(sourceFragment: Fragment) {
-        addFragment(sourceFragment, EnterCurrentPasswordFragment.newInstance())
+        addFragment(
+            sourceFragment,
+            EnterCurrentPasswordFragment.newInstance(),
+            allowStateLoss = true
+        )
     }
 
     override fun toChangePassword(sourceFragment: Fragment) {
-        addFragment(sourceFragment, ChangeSecurePasswordFragment.newInstance())
+        addFragment(
+            sourceFragment,
+            ChangeSecurePasswordFragment.newInstance(),
+            allowStateLoss = true
+        )
     }
 
     override fun onPasswordChanged(sourceFragment: Fragment) {
@@ -99,7 +135,16 @@ class SettingsActivity : AppCompatActivity(), SettingsRouter {
         }
     }
 
-    private fun addFragment(sourceFragment: Fragment, fragment: Fragment) {
+    // nyarian:
+    // allowStateLoss parameter is necessary to resolve device-specific issues like one
+    // for samsung devices with biometrics enabled, as after launching the biometric prompt
+    // onSaveInstanceState is called, and commit()ing any stuff after onSaveInstanceState is called
+    // results into IllegalStateException: Can not perform this action after onSaveInstanceState
+    private fun addFragment(
+        sourceFragment: Fragment,
+        fragment: Fragment,
+        allowStateLoss: Boolean = false
+    ) {
         supportFragmentManager
             .beginTransaction()
             .setCustomAnimations(
@@ -110,7 +155,7 @@ class SettingsActivity : AppCompatActivity(), SettingsRouter {
             //  .apply { supportFragmentManager.fragments.forEach { hide(it) } }
             .add(R.id.settings_fragment_container, fragment, fragment.javaClass.simpleName)
             .addToBackStack(fragment.javaClass.simpleName)
-            .commit()
+            .apply { if (allowStateLoss) commitAllowingStateLoss() else commit() }
     }
 
     /*
@@ -132,6 +177,7 @@ class SettingsActivity : AppCompatActivity(), SettingsRouter {
      */
 
     companion object {
+        const val KEY_SHOW_BACKUP_SETTINGS = "showbackupsettings"
         fun launch(context: Context) {
             context.startActivity(Intent(context, SettingsActivity::class.java))
         }
