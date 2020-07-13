@@ -165,6 +165,19 @@
     <string name="home_store_and_forward_progress_completing_txs">Completing your transactions</string>
     <string name="home_store_and_forward_progress_updating_txs">Updating your transactions</string>
     <string name="home_store_and_forward_progress_up_to_date">You are up to date!</string>
+    <!--backup wallet prompt-->
+    <string name="home_back_up_wallet_initial_title_regular_part">Want to</string>
+    <string name="home_back_up_wallet_initial_title_highlighted_part">back up your wallet?</string>
+    <string name="home_back_up_wallet_initial_description">You can back up your wallet so that you don’t lose your tXTR if your phone is lost or broken. You can configure this in Settings anytime.</string>
+    <string name="home_back_up_wallet_repeated_title_regular_part">It\'s time to</string>
+    <string name="home_back_up_wallet_repeated_title_highlighted_part">back up your wallet</string>
+    <string name="home_back_up_wallet_repeated_description">You have quite a bit of tXTR. You should back up your wallet now so that you don\’t lose it all if your phone is lost or broken.</string>
+    <string name="home_back_up_wallet_back_up_cta">Back Up Wallet</string>
+    <string name="home_back_up_wallet_delay_back_up_cta">I\'ll do it later</string>
+    <string name="home_back_up_wallet_encrypt_title">Further secure your backups</string>
+    <string name="home_back_up_wallet_encrypt_description">Given the amount of money in your wallet, you should password-protect your backups so they\'re safe even if your Google Drive is compromised.</string>
+    <string name="home_back_up_wallet_encrypt_cta">Secure Backups</string>
+    <string name="home_back_up_wallet_delay_encrypt_cta">Not now</string>
 
     <!-- send tari - add recipient -->
     <string name="add_recipient_title">Send To</string>
@@ -295,10 +308,6 @@
     <string name="back_up_wallet_enter_password_title">Set password for your backup</string>
     <string name="back_up_wallet_enter_password_hint">Enter password here…</string>
     <string name="back_up_wallet_backup_cta">Backup</string>
-    <string name="back_up_wallet_storage_setup_error_title">Backup Storage Error</string>
-    <string name="back_up_wallet_storage_setup_error_desc">An error happened while setting up the backup storage. Please make sure to complete authentication or select a backup folder.</string>
-    <string name="back_up_wallet_sign_out_error_title">Sign out error</string>
-    <string name="back_up_wallet_sign_out_error_desc">Could not sign out, please try again later</string>
     <string name="back_up_wallet_back_up_check_error_title">Failed to check current backup</string>
     <string name="back_up_wallet_back_up_check_error_desc">Current backup state check failed: %s</string>
     <string name="back_up_wallet_backing_up_error_title">Backup error</string>

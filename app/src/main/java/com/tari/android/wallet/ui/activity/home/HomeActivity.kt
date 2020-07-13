@@ -47,6 +47,9 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.IBinder
 import android.os.Looper
+import android.text.SpannableString
+import android.text.SpannableStringBuilder
+import android.text.Spanned
 import android.util.Log
 import android.view.MotionEvent
 import android.view.View
@@ -66,6 +69,7 @@ import com.daasuu.ei.EasingInterpolator
 import com.orhanobut.logger.Logger
 import com.squareup.seismic.ShakeDetector
 import com.tari.android.wallet.R
+import com.tari.android.wallet.R.string.*
 import com.tari.android.wallet.application.DeepLink
 import com.tari.android.wallet.databinding.ActivityHomeBinding
 import com.tari.android.wallet.event.Event
@@ -83,8 +87,10 @@ import com.tari.android.wallet.ui.activity.debug.DebugActivity
 import com.tari.android.wallet.ui.activity.home.adapter.TxListAdapter
 import com.tari.android.wallet.ui.activity.profile.WalletInfoActivity
 import com.tari.android.wallet.ui.activity.send.SendTariActivity
+import com.tari.android.wallet.ui.activity.settings.SettingsActivity
 import com.tari.android.wallet.ui.activity.tx.TxDetailActivity
 import com.tari.android.wallet.ui.component.CustomFont
+import com.tari.android.wallet.ui.component.CustomTypefaceSpan
 import com.tari.android.wallet.ui.dialog.BottomSlideDialog
 import com.tari.android.wallet.ui.extension.*
 import com.tari.android.wallet.ui.fragment.send.FinalizeSendTxFragment
@@ -96,7 +102,9 @@ import com.tari.android.wallet.util.SharedPrefsWrapper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.lang.ref.WeakReference
+import java.math.BigDecimal
 import java.util.concurrent.CopyOnWriteArrayList
 import javax.inject.Inject
 import kotlin.math.max
@@ -437,10 +445,80 @@ internal class HomeActivity : AppCompatActivity(),
         // update balance
         lifecycleScope.launch(Dispatchers.IO) {
             updateBalanceInfoData()
-            handler?.post { updateBalanceInfoUI(restart = false) }
+            withContext(Dispatchers.Main) {
+                updateBalanceInfoUI(restart = false)
+                showWalletBackupPromptIfNecessary()
+            }
         }
         // update tx list UI
         handler?.post { updateTxListUI() }
+    }
+
+    private fun showWalletBackupPromptIfNecessary() {
+        if (!sharedPrefsWrapper.backupIsEnabled || sharedPrefsWrapper.backupPassword == null) {
+            val inboundNonFaucetTransactionsCount = countInboundNonFaucetTransaction()
+            val tarisAmount =
+                balanceInfo.availableBalance.tariValue + balanceInfo.pendingIncomingBalance.tariValue
+            when {
+                inboundNonFaucetTransactionsCount >= 5
+                        && tarisAmount > BigDecimal("25000")
+                        && sharedPrefsWrapper.backupIsEnabled
+                        && sharedPrefsWrapper.backupPassword == null -> showSecureYourBackupsDialog()
+                inboundNonFaucetTransactionsCount >= 4
+                        && tarisAmount > BigDecimal("8000")
+                        && !sharedPrefsWrapper.backupIsEnabled -> showRepeatedBackUpPrompt()
+                inboundNonFaucetTransactionsCount >= 3
+                        && !sharedPrefsWrapper.backupIsEnabled -> showInitialBackupPrompt()
+            }
+        }
+    }
+
+    private fun countInboundNonFaucetTransaction(): Int {
+        val faucetKeys = sharedPrefsWrapper.testnetTariUTXOKeyList.map { it.senderPublicKeyHex!! }
+        val completedInboundNonFaucetTxs = completedTxs
+            .filter { it.direction == Tx.Direction.INBOUND }
+            .filterNot { faucetKeys.contains(it.user.publicKey.hexString) }
+            .count()
+        val pendingInboundNonFaucetTxs = pendingInboundTxs
+            .filterNot { faucetKeys.contains(it.user.publicKey.hexString) }
+            .count()
+        return completedInboundNonFaucetTxs + pendingInboundNonFaucetTxs
+    }
+
+    private fun showInitialBackupPrompt() {
+        BackupWalletPrompt(
+            context = this,
+            regularTitlePart = string(home_back_up_wallet_initial_title_regular_part),
+            highlightedTitlePart = string(home_back_up_wallet_initial_title_highlighted_part),
+            description = string(home_back_up_wallet_initial_description)
+        ).asAndroidDialog()
+            .apply(::replaceDialog)
+    }
+
+    private fun showRepeatedBackUpPrompt() {
+        BackupWalletPrompt(
+            context = this,
+            regularTitlePart = string(home_back_up_wallet_repeated_title_regular_part),
+            highlightedTitlePart = string(home_back_up_wallet_repeated_title_highlighted_part),
+            description = string(home_back_up_wallet_repeated_description)
+        ).asAndroidDialog()
+            .apply(::replaceDialog)
+    }
+
+    private fun showSecureYourBackupsDialog() {
+        BackupWalletPrompt(
+            context = this,
+            title = string(home_back_up_wallet_encrypt_title),
+            description = string(home_back_up_wallet_encrypt_description),
+            ctaText = string(home_back_up_wallet_encrypt_cta),
+            dismissText = string(home_back_up_wallet_delay_encrypt_cta)
+        ).asAndroidDialog()
+            .apply(::replaceDialog)
+    }
+
+    private fun replaceDialog(dialog: Dialog) {
+        currentDialog?.dismiss()
+        currentDialog = dialog.also { it.show() }
     }
 
     private fun onTxReplyReceived(tx: CompletedTx) {
@@ -778,7 +856,7 @@ internal class HomeActivity : AppCompatActivity(),
     private fun testnetTariRequestSuccessful() {
         val error = WalletError()
         val importedTx =
-            walletService!!.importTestnetUTXO(string(R.string.first_testnet_utxo_tx_message), error)
+            walletService!!.importTestnetUTXO(string(first_testnet_utxo_tx_message), error)
         if (error.code != WalletErrorCode.NO_ERROR) {
             TODO("Unhandled wallet error: ${error.code}")
         }
@@ -814,10 +892,10 @@ internal class HomeActivity : AppCompatActivity(),
             canceledOnTouchOutside = false
         ).apply {
             findViewById<TextView>(R.id.home_testnet_tari_received_dlg_txt_title).text =
-                string(R.string.home_tari_bot_you_got_tari_dlg_title).applyFontStyle(
+                string(home_tari_bot_you_got_tari_dlg_title).applyFontStyle(
                     this@HomeActivity,
                     CustomFont.AVENIR_LT_STD_LIGHT,
-                    string(R.string.home_tari_bot_you_got_tari_dlg_title_bold_part),
+                    string(home_tari_bot_you_got_tari_dlg_title_bold_part),
                     CustomFont.AVENIR_LT_STD_BLACK
                 )
             findViewById<TextView>(R.id.home_tari_bot_dialog_txt_try_later)
@@ -849,10 +927,10 @@ internal class HomeActivity : AppCompatActivity(),
             layoutId = R.layout.home_dialog_ttl_store
         ).apply {
             findViewById<TextView>(R.id.home_ttl_store_dialog_txt_title).text =
-                string(R.string.home_ttl_store_dlg_title).applyFontStyle(
+                string(home_ttl_store_dlg_title).applyFontStyle(
                     this@HomeActivity,
                     CustomFont.AVENIR_LT_STD_LIGHT,
-                    string(R.string.home_ttl_store_dlg_title_bold_part),
+                    string(home_ttl_store_dlg_title_bold_part),
                     CustomFont.AVENIR_LT_STD_BLACK
                 )
             findViewById<View>(R.id.home_ttl_store_dialog_btn_later)
@@ -1016,7 +1094,7 @@ internal class HomeActivity : AppCompatActivity(),
     private fun importSecondUTXO() {
         val error = WalletError()
         val importedTx = walletService!!.importTestnetUTXO(
-            string(R.string.second_testnet_utxo_tx_message),
+            string(second_testnet_utxo_tx_message),
             error
         )
         if (error.code != WalletErrorCode.NO_ERROR) {
@@ -1171,19 +1249,19 @@ internal class HomeActivity : AppCompatActivity(),
 
     override fun updateHasCompleted(
         source: UpdateProgressViewController,
-        updateDataAndUI: Boolean
+        receivedTxCount: Int,
+        cancelledTxCount: Int
     ) {
-        handler?.post {
-            ui.scrollView.finishUpdate()
-        }
-        if (updateDataAndUI) {
+        handler?.post { ui.scrollView.finishUpdate() }
+        if (receivedTxCount > 0 || cancelledTxCount > 0) {
             lifecycleScope.launch(Dispatchers.IO) {
                 updateTxListData()
-                if (isActive) {
-                    updateBalanceInfoData()
-                    handler?.post {
-                        updateBalanceInfoUI(restart = false)
-                        updateTxListUI()
+                updateBalanceInfoData()
+                withContext(Dispatchers.Main) {
+                    updateBalanceInfoUI(restart = false)
+                    updateTxListUI()
+                    if (receivedTxCount > 0) {
+                        showWalletBackupPromptIfNecessary()
                     }
                 }
             }
@@ -1198,9 +1276,9 @@ internal class HomeActivity : AppCompatActivity(),
             dismissViewId = R.id.tx_failed_dialog_txt_close
         ).apply {
             val titleTextView = findViewById<TextView>(R.id.tx_failed_dialog_txt_title)
-            titleTextView.text = string(R.string.error_no_connection_title)
+            titleTextView.text = string(error_no_connection_title)
             val descriptionTextView = findViewById<TextView>(R.id.tx_failed_dialog_txt_description)
-            descriptionTextView.text = string(R.string.error_no_connection_description)
+            descriptionTextView.text = string(error_no_connection_description)
             // set text
         }.apply { show() }
             .asAndroidDialog()
@@ -1215,9 +1293,9 @@ internal class HomeActivity : AppCompatActivity(),
             dismissViewId = R.id.tx_failed_dialog_txt_close
         ).apply {
             val titleTextView = findViewById<TextView>(R.id.tx_failed_dialog_txt_title)
-            titleTextView.text = string(R.string.error_node_unreachable_title)
+            titleTextView.text = string(error_node_unreachable_title)
             val descriptionTextView = findViewById<TextView>(R.id.tx_failed_dialog_txt_description)
-            descriptionTextView.text = string(R.string.error_node_unreachable_description)
+            descriptionTextView.text = string(error_node_unreachable_description)
             // set text
         }.apply { show() }
             .asAndroidDialog()
@@ -1397,5 +1475,71 @@ internal class HomeActivity : AppCompatActivity(),
     }
 
     // endregion
+
+    class BackupWalletPrompt private constructor(private val dialog: Dialog) {
+
+        constructor(
+            context: Context,
+            title: CharSequence,
+            description: CharSequence,
+            ctaText: CharSequence = context.string(home_back_up_wallet_back_up_cta),
+            dismissText: CharSequence = context.string(home_back_up_wallet_delay_back_up_cta)
+        ) : this(
+            BottomSlideDialog(
+                context,
+                R.layout.dialog_backup_wallet_prompt,
+                canceledOnTouchOutside = false,
+                dismissViewId = R.id.home_backup_wallet_prompt_dismiss_cta_view
+            ).apply {
+                findViewById<TextView>(R.id.home_backup_wallet_prompt_title_text_view).text = title
+                findViewById<TextView>(R.id.home_backup_wallet_prompt_description_text_view).text =
+                    description
+                findViewById<TextView>(R.id.home_backup_wallet_prompt_dismiss_cta_view).text =
+                    dismissText
+                val backupCta =
+                    findViewById<TextView>(R.id.home_backup_wallet_prompt_backup_cta_view)
+                backupCta.text = ctaText
+                backupCta.setOnClickListener {
+                    context.startActivities(
+                        arrayOf(
+                            Intent(context, WalletInfoActivity::class.java),
+                            Intent(context, SettingsActivity::class.java)
+                                .apply { putExtra(SettingsActivity.KEY_SHOW_BACKUP_SETTINGS, true) }
+                        )
+                    )
+                    dismiss()
+                }
+            }.asAndroidDialog()
+        )
+
+        constructor(
+            context: Context,
+            regularTitlePart: CharSequence,
+            highlightedTitlePart: CharSequence,
+            description: CharSequence,
+            ctaText: CharSequence = context.string(home_back_up_wallet_back_up_cta),
+            dismissText: CharSequence = context.string(home_back_up_wallet_delay_back_up_cta)
+        ) : this(
+            context,
+            SpannableStringBuilder().apply {
+                val highlightedPart = SpannableString(highlightedTitlePart)
+                highlightedPart.setSpan(
+                    CustomTypefaceSpan("", CustomFont.AVENIR_LT_STD_HEAVY.asTypeface(context)),
+                    0,
+                    highlightedPart.length,
+                    Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+                )
+                insert(0, regularTitlePart)
+                insert(regularTitlePart.length, " ")
+                insert(regularTitlePart.length + 1, highlightedPart)
+            },
+            description,
+            ctaText,
+            dismissText
+        )
+
+        fun asAndroidDialog() = dialog
+
+    }
 
 }

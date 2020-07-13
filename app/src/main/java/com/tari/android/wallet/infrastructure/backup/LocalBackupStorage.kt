@@ -148,12 +148,15 @@ internal class LocalBackupStorage(
         }
     }
 
-    override suspend fun hasBackupForDate(backupDate: DateTime): Boolean {
+    override suspend fun hasBackupForDate(date: DateTime): Boolean {
         val backupFolderURI = sharedPrefs.localBackupFolderURI
             ?: return false
         val backupFolder = DocumentFile.fromTreeUri(context, backupFolderURI)
-            ?: return false
-        val expectedBackupFileName = BackupNamingPolicy.getBackupFileName(backupDate)
+            ?: throw BackupStorageAuthRevokedException()
+        if (!backupFolder.exists()) {
+            throw BackupStorageAuthRevokedException()
+        }
+        val expectedBackupFileName = BackupNamingPolicy.getBackupFileName(date)
         return backupFolder.listFiles().firstOrNull {
             it.isFile && it.name?.contains(expectedBackupFileName) == true
         } != null

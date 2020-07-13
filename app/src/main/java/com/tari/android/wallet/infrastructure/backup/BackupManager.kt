@@ -11,10 +11,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import org.joda.time.DateTime
-import java.net.ConnectException
-import java.net.UnknownHostException
 import java.util.concurrent.TimeUnit
-import javax.net.ssl.SSLException
 import kotlin.math.max
 
 internal class BackupManager(
@@ -37,7 +34,7 @@ internal class BackupManager(
                 EventBus.postBackupState(BackupDisabled)
             }
             sharedPrefs.backupFailureDate != null -> {
-                EventBus.postBackupState(BackupFailed())
+                EventBus.postBackupState(BackupOutOfDate())
             }
             scheduledBackupDate != null -> {
                 val delayMs = scheduledBackupDate.millis - DateTime.now().millis
@@ -74,11 +71,21 @@ internal class BackupManager(
             }
         } catch (exception: Exception) {
             Logger.e(exception, "Error while checking storage. %s", exception.toString())
-            sharedPrefs.backupFailureDate = DateTime.now()
-            if (sharedPrefs.scheduledBackupDate?.isAfterNow == true) {
-                EventBus.postBackupState(BackupScheduled)
-            } else {
-                EventBus.postBackupState(BackupFailed(exception))
+            when (exception) {
+                is BackupStorageAuthRevokedException -> {
+                    sharedPrefs.lastSuccessfulBackupDate = null
+                    sharedPrefs.backupPassword = null
+                    sharedPrefs.localBackupFolderURI = null
+                    sharedPrefs.scheduledBackupDate = null
+                    sharedPrefs.backupFailureDate = null
+                    EventBus.postBackupState(BackupDisabled)
+                }
+                is BackupStorageTamperedException -> {
+                    EventBus.postBackupState(BackupOutOfDate(exception))
+                }
+                else -> {
+                    EventBus.postBackupState(BackupStorageCheckFailed)
+                }
             }
             throw exception
         }
@@ -137,7 +144,6 @@ internal class BackupManager(
         retryCount++
         EventBus.postBackupState(BackupInProgress)
         try {
-            Logger.e("MANG PASS: %s", newPassword?.joinToString(separator = ""))
             val backupDate = backupStorage.backup(newPassword)
             sharedPrefs.lastSuccessfulBackupDate = backupDate
             sharedPrefs.scheduledBackupDate = null
@@ -145,14 +151,24 @@ internal class BackupManager(
             Logger.d("Backup successful.")
             EventBus.postBackupState(BackupUpToDate)
         } catch (exception: Exception) {
+            if (exception is BackupStorageAuthRevokedException) {
+                sharedPrefs.lastSuccessfulBackupDate = null
+                sharedPrefs.backupPassword = null
+                sharedPrefs.localBackupFolderURI = null
+                sharedPrefs.scheduledBackupDate = null
+                sharedPrefs.backupFailureDate = null
+                EventBus.postBackupState(BackupDisabled)
+                throw exception
+            }
             if (isInitialBackup || retryCount > Constants.Wallet.maxBackupRetries) {
                 Logger.e(
                     exception,
                     "Error happened while backing up. It's an initial backup or retry limit has been exceeded."
                 )
-                EventBus.postBackupState(BackupFailed(exception))
+                EventBus.postBackupState(BackupOutOfDate(exception))
                 sharedPrefs.scheduledBackupDate = null
                 sharedPrefs.backupFailureDate = DateTime.now()
+                retryCount = 0
                 return
             } else {
                 Logger.e(exception, "Backup failed: ${exception.message}. Will schedule.")
@@ -166,13 +182,18 @@ internal class BackupManager(
     }
 
     suspend fun clear() {
-        backupStorage.deleteAllBackupFiles()
         sharedPrefs.lastSuccessfulBackupDate = null
         sharedPrefs.backupFailureDate = null
         sharedPrefs.backupPassword = null
         sharedPrefs.scheduledBackupDate = null
         sharedPrefs.localBackupFolderURI = null
         EventBus.postBackupState(BackupDisabled)
+        try {
+            backupStorage.deleteAllBackupFiles()
+        } catch (ignored: Exception) { /* no-op */ }
+        try {
+            backupStorage.signOut()
+        } catch (ignored: Exception) { /* no-op */ }
     }
 
 }

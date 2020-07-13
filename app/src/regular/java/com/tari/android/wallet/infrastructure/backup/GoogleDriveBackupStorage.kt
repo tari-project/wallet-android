@@ -114,7 +114,13 @@ internal class GoogleDriveBackupStorage(
                 newPassword
             )
             // upload file
-            createBackupFile(backupFile, mimeType)
+            try {
+                createBackupFile(backupFile, mimeType)
+            } catch (exception: UserRecoverableAuthIOException) {
+                throw BackupStorageAuthRevokedException()
+            } catch (exception: Exception) {
+                throw exception
+            }
             // update backup password
             if (newPassword != null) {
                 sharedPrefs.backupPassword = newPassword
@@ -187,7 +193,7 @@ internal class GoogleDriveBackupStorage(
         val (backupFileId, backupFileName) = try {
             getLastBackupFileIdAndName()
         } catch (e: UserRecoverableAuthIOException) {
-            throw BackupStorageSetupRecoverableAuthException()
+            throw BackupStorageAuthRevokedException()
         } catch (e: Exception) {
             throw e
         } ?: throw BackupStorageTamperedException("Backup file not found in folder.")
@@ -206,12 +212,12 @@ internal class GoogleDriveBackupStorage(
         }
     }
 
-    override suspend fun hasBackupForDate(backupDate: DateTime): Boolean {
+    override suspend fun hasBackupForDate(date: DateTime): Boolean {
         try {
             val latestBackupFileName = getLastBackupFileIdAndName()?.second ?: return false
-            return latestBackupFileName.contains(BackupNamingPolicy.getBackupFileName(backupDate))
+            return latestBackupFileName.contains(BackupNamingPolicy.getBackupFileName(date))
         } catch (exception: UserRecoverableAuthIOException) {
-            throw BackupStorageSetupRecoverableAuthException()
+            throw BackupStorageAuthRevokedException()
         } catch (exception: Exception) {
             throw exception
         }

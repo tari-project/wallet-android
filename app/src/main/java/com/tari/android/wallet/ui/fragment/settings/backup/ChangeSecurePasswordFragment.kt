@@ -54,7 +54,7 @@ import com.tari.android.wallet.R.color.*
 import com.tari.android.wallet.R.string.*
 import com.tari.android.wallet.databinding.FragmentChangeSecurePasswordBinding
 import com.tari.android.wallet.event.EventBus
-import com.tari.android.wallet.infrastructure.backup.BackupFailed
+import com.tari.android.wallet.infrastructure.backup.BackupOutOfDate
 import com.tari.android.wallet.infrastructure.backup.BackupManager
 import com.tari.android.wallet.infrastructure.backup.BackupState
 import com.tari.android.wallet.infrastructure.backup.BackupUpToDate
@@ -283,12 +283,12 @@ framework for UI tree rebuild on configuration changes"""
                 allowExitAndPasswordEditing()
                 (requireActivity() as SettingsRouter).onPasswordChanged(this)
             }
-            is BackupFailed -> { // backup failed
+            is BackupOutOfDate -> { // backup failed
                 Logger.e(
-                    backupState.exception,
-                    "Error during encrypted backup: ${backupState.exception}"
+                    backupState.backupException,
+                    "Error during encrypted backup: ${backupState.backupException}"
                 )
-                showBackupErrorDialog(deductBackupErrorMessage(backupState.exception)) {
+                showBackupErrorDialog(deductBackupErrorMessage(backupState.backupException)) {
                     allowExitAndPasswordEditing()
                     setSecurePasswordCtaIdleState()
                 }

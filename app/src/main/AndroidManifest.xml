@@ -152,7 +152,7 @@
         <activity
             android:name=".ui.activity.settings.SettingsActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
-            android:parentActivityName=".ui.activity.home.HomeActivity"
+            android:parentActivityName=".ui.activity.profile.WalletInfoActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme"
             android:windowSoftInputMode="adjustResize|stateAlwaysHidden" />

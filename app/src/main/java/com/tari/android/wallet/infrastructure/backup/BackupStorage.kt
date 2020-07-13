@@ -12,12 +12,12 @@ interface BackupStorage {
 
     suspend fun backup(newPassword: CharArray? = null): DateTime
 
-    suspend fun hasBackupForDate(backupDate: DateTime): Boolean
+    suspend fun hasBackupForDate(date: DateTime): Boolean
 
-    suspend fun deleteAllBackupFiles()
+    suspend fun restoreLatestBackup(password: String? = null)
 
     suspend fun signOut()
 
-    suspend fun restoreLatestBackup(password: String? = null)
+    suspend fun deleteAllBackupFiles()
 
 }

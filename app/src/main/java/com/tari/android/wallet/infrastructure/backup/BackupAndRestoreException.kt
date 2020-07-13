@@ -37,7 +37,7 @@ import java.io.File
 // Storage & backup-related.
 class BackupStorageSetupCancelled : IllegalStateException()
 class BackupStorageSetupException(s: String?) : IllegalStateException(s)
-class BackupStorageSetupRecoverableAuthException: IllegalStateException()
+class BackupStorageAuthRevokedException: IllegalStateException()
 class BackupInterruptedException(s: String?) : IllegalStateException(s)
 class BackupStorageTamperedException(s: String?) : IllegalStateException(s)
 

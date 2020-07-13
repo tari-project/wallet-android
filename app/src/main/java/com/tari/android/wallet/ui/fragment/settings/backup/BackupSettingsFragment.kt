@@ -66,6 +66,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.joda.time.format.DateTimeFormat
+import java.io.IOException
 import java.net.UnknownHostException
 import java.util.*
 import javax.inject.Inject
@@ -112,9 +113,40 @@ framework for UI tree rebuild on configuration changes"""
         setupCTAs()
         subscribeToBackupState()
         lifecycleScope.launch(Dispatchers.IO) {
-            backupManager.checkStorageStatus()
+            checkStorageStatus()
         }
 
+    }
+
+    private suspend fun checkStorageStatus() {
+        try {
+            backupManager.checkStorageStatus()
+        } catch (exception: Exception) {
+            when (exception) {
+                is BackupStorageAuthRevokedException -> {
+                    Logger.e("GDrive auth error. Fail.")
+                    withContext(Dispatchers.Main) {
+                        showBackupStorageCheckFailedDialog(
+                            string(check_backup_storage_status_auth_error_description)
+                        )
+                    }
+                }
+                is IOException -> { // connection problem
+                    Logger.e("GDrive connection error.")
+                    withContext(Dispatchers.Main) {
+                        showBackupStorageCheckFailedDialog(
+                            string(check_backup_storage_status_connection_error_description)
+                        )
+                    }
+                }
+                else -> {
+                    Logger.e("GDrive storage tampered.")
+                    withContext(Dispatchers.Main) {
+                        updateLastSuccessfulBackupDate()
+                    }
+                }
+            }
+        }
     }
 
     override fun onDestroyView() {
@@ -129,7 +161,7 @@ framework for UI tree rebuild on configuration changes"""
         ui.backupPermissionSwitch.isChecked = sharedPrefs.backupIsEnabled
         backupOptionsAreVisible = if (sharedPrefs.backupIsEnabled) {
             updatePasswordChangeLabel()
-            showLastSuccessfulBackupDateTime()
+            updateLastSuccessfulBackupDate()
             true
         } else {
             hideAllBackupOptions()
@@ -144,7 +176,7 @@ framework for UI tree rebuild on configuration changes"""
             else string(back_up_wallet_change_backup_password_cta)
     }
 
-    private fun showLastSuccessfulBackupDateTime() {
+    private fun updateLastSuccessfulBackupDate() {
         ui.lastBackupTimeTextView.visible()
         val date = sharedPrefs.lastSuccessfulBackupDate?.toLocalDateTime()
         if (date == null) {
@@ -167,41 +199,91 @@ framework for UI tree rebuild on configuration changes"""
     }
 
     private fun onBackupStateChanged(backupState: BackupState) {
+        resetStatusIcons()
         when (backupState) {
-            is BackupCheckingStorage -> {
-                hideSwitchAndShowProgressBar(switchIsChecked = true)
-                updateBackupNowButtonState(backupState)
-            }
             is BackupDisabled -> {
                 hideAllBackupOptionsWithAnimation()
                 showSwitchAndHideProgressBar(switchIsChecked = false)
             }
+            is BackupCheckingStorage -> {
+                hideSwitchAndShowProgressBar(switchIsChecked = true)
+                updateLastSuccessfulBackupDate()
+                ui.backupWalletToCloudCtaView.isEnabled = false
+                ui.backupNowTextView.alpha = ALPHA_DISABLED
+                activateBackupStatusView(
+                    ui.cloudBackupStatusProgressView,
+                    back_up_wallet_backup_status_checking_backup,
+                    R.color.all_settings_back_up_status_processing
+                )
+            }
+            is BackupStorageCheckFailed -> {
+                showSwitchAndHideProgressBar(switchIsChecked = true)
+                updateLastSuccessfulBackupDate()
+                ui.backupWalletToCloudCtaView.isEnabled = false
+                ui.backupNowTextView.alpha = ALPHA_DISABLED
+                activateBackupStatusView(
+                    icon = ui.cloudBackupStatusWarningView,
+                    textColor = R.color.all_settings_back_up_status_error
+                )
+            }
+            is BackupScheduled -> {
+                showSwitchAndHideProgressBar(switchIsChecked = true)
+                ui.backupWalletToCloudCtaView.isEnabled = true
+                ui.backupNowTextView.alpha = ALPHA_VISIBLE
+                if (sharedPrefs.backupFailureDate == null) {
+                    activateBackupStatusView(
+                        ui.cloudBackupStatusSuccessView,
+                        back_up_wallet_backup_status_scheduled,
+                        R.color.all_settings_back_up_status_processing
+                    )
+                } else {
+                    activateBackupStatusView(
+                        ui.cloudBackupStatusWarningView,
+                        back_up_wallet_backup_status_scheduled,
+                        R.color.all_settings_back_up_status_processing
+                    )
+                }
+            }
+            is BackupInProgress -> {
+                hideSwitchAndShowProgressBar(switchIsChecked = true)
+                ui.backupWalletToCloudCtaView.isEnabled = false
+                ui.backupNowTextView.alpha = ALPHA_DISABLED
+                activateBackupStatusView(
+                    ui.cloudBackupStatusProgressView,
+                    back_up_wallet_backup_status_in_progress,
+                    R.color.all_settings_back_up_status_processing
+                )
+            }
             is BackupUpToDate -> {
                 showSwitchAndHideProgressBar(switchIsChecked = true)
                 showBackupOptionsWithAnimation()
-                showLastSuccessfulBackupDateTime()
+                updateLastSuccessfulBackupDate()
                 updatePasswordChangeLabel()
-                updateBackupNowButtonState(backupState)
+                ui.backupWalletToCloudCtaView.isEnabled = false
+                ui.backupNowTextView.alpha = ALPHA_DISABLED
+                activateBackupStatusView(
+                    ui.cloudBackupStatusSuccessView,
+                    back_up_wallet_backup_status_up_to_date,
+                    R.color.all_settings_back_up_status_up_to_date
+                )
             }
-            is BackupFailed -> {
+            is BackupOutOfDate -> {
                 if (!backupOptionsAreVisible) {
                     showBackupStorageSetupFailedDialog()
                     showSwitchAndHideProgressBar(switchIsChecked = false)
                 } else {
                     showSwitchAndHideProgressBar(switchIsChecked = true)
                     if (showDialogOnBackupFailedState) {
-                        showBackupFailureDialog(backupState.exception)
+                        showBackupFailureDialog(backupState.backupException)
                     }
+                    ui.backupWalletToCloudCtaView.isEnabled = true
+                    ui.backupNowTextView.alpha = ALPHA_VISIBLE
+                    activateBackupStatusView(
+                        ui.cloudBackupStatusWarningView,
+                        back_up_wallet_backup_status_outdated,
+                        R.color.all_settings_back_up_status_error
+                    )
                 }
-                updateBackupNowButtonState(backupState)
-            }
-            is BackupScheduled -> {
-                showSwitchAndHideProgressBar(switchIsChecked = true)
-                updateBackupNowButtonState(backupState)
-            }
-            is BackupInProgress -> {
-                hideSwitchAndShowProgressBar(switchIsChecked = true)
-                updateBackupNowButtonState(backupState)
             }
         }
     }
@@ -220,7 +302,11 @@ framework for UI tree rebuild on configuration changes"""
         ui.backupWalletToCloudCtaView.setOnClickListener(
             ThrottleClick {
                 lifecycleScope.launch(Dispatchers.IO) {
-                    backupManager.backup(isInitialBackup = false)
+                    try {
+                        backupManager.backup(isInitialBackup = false)
+                    } catch (exception: Exception) {
+                        showBackupFailureDialog(exception)
+                    }
                 }
             }
         )
@@ -263,14 +349,7 @@ framework for UI tree rebuild on configuration changes"""
 
     private fun clearBackup() {
         lifecycleScope.launch(Dispatchers.IO) {
-            try {
-                backupManager.clear()
-            } catch (e: Exception) {
-                Logger.e(e, "Error occurred during signing out")
-                withContext(Dispatchers.Main) {
-                    showTurnOffFailedDialog()
-                }
-            }
+            try { backupManager.clear() } catch (ignored: Exception) { /* no-op */ }
         }
     }
 
@@ -291,68 +370,6 @@ framework for UI tree rebuild on configuration changes"""
                     showBackupStorageSetupFailedDialog()
                     showSwitchAndHideProgressBar(switchIsChecked = false)
                 }
-                EventBus.postBackupState(BackupFailed(exception))
-            }
-        }
-    }
-
-    private fun updateBackupNowButtonState(state: BackupState) {
-        resetStatusIcons()
-        when (state) {
-            is BackupCheckingStorage -> {
-                ui.backupWalletToCloudCtaView.isEnabled = false
-                ui.backupNowTextView.alpha = ALPHA_DISABLED
-                activateBackupStatusView(
-                    ui.cloudBackupStatusProgressView,
-                    back_up_wallet_backup_status_checking_backup,
-                    R.color.all_settings_back_up_status_processing
-                )
-            }
-            is BackupInProgress -> {
-                ui.backupWalletToCloudCtaView.isEnabled = false
-                ui.backupNowTextView.alpha = ALPHA_DISABLED
-                activateBackupStatusView(
-                    ui.cloudBackupStatusProgressView,
-                    back_up_wallet_backup_status_in_progress,
-                    R.color.all_settings_back_up_status_processing
-                )
-            }
-            is BackupUpToDate -> {
-                ui.backupWalletToCloudCtaView.isEnabled = false
-                ui.backupNowTextView.alpha = ALPHA_DISABLED
-                activateBackupStatusView(
-                    ui.cloudBackupStatusSuccessView,
-                    back_up_wallet_backup_status_up_to_date,
-                    R.color.all_settings_back_up_status_up_to_date
-                )
-            }
-            is BackupScheduled -> {
-                ui.backupWalletToCloudCtaView.isEnabled = true
-                ui.backupNowTextView.alpha = ALPHA_VISIBLE
-                if (sharedPrefs.backupFailureDate == null) {
-                    activateBackupStatusView(
-                        ui.cloudBackupStatusSuccessView,
-                        back_up_wallet_backup_status_scheduled,
-                        R.color.all_settings_back_up_status_processing
-                    )
-                } else {
-                    activateBackupStatusView(
-                        ui.cloudBackupStatusWarningView,
-                        back_up_wallet_backup_status_scheduled,
-                        R.color.all_settings_back_up_status_processing
-                    )
-                }
-            }
-            is BackupFailed -> {
-                ui.backupWalletToCloudCtaView.isEnabled = true
-                ui.backupNowTextView.alpha = ALPHA_VISIBLE
-                activateBackupStatusView(
-                    ui.cloudBackupStatusWarningView,
-                    back_up_wallet_backup_status_outdated,
-                    R.color.all_settings_back_up_status_error
-                )
-            }
-            else -> { /* no-op */
             }
         }
     }
@@ -546,6 +563,14 @@ framework for UI tree rebuild on configuration changes"""
             .create()
             .apply { setTitle(string(auth_failed_title)) }
             .show()
+    }
+
+    private fun showBackupStorageCheckFailedDialog(message: String) {
+        ErrorDialog(
+            requireContext(),
+            title = string(check_backup_storage_status_error_title),
+            description = message
+        ).show()
     }
 
     companion object {

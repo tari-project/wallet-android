@@ -42,6 +42,7 @@ import android.view.ViewGroup
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
+import com.orhanobut.logger.Logger
 import com.tari.android.wallet.R.color.*
 import com.tari.android.wallet.R.string.*
 import com.tari.android.wallet.databinding.FragmentAllSettingsBinding
@@ -113,45 +114,41 @@ UI tree rebuild on configuration changes"""
         }
     }
 
+    override fun onDestroy() {
+        EventBus.unsubscribeFromBackupState(this)
+        super.onDestroy()
+    }
+
     private suspend fun checkStorageStatus() {
         try {
             backupManager.checkStorageStatus()
         } catch (exception: Exception) {
             when (exception) {
-                is BackupStorageSetupRecoverableAuthException -> {
-                    if (storageCheckHasBeenRetried) {
-                        withContext(Dispatchers.Main) {
-                            showBackupStorageCheckFailedDialog()
-                        }
-                    } else {
-                        storageCheckHasBeenRetried = true
-                        backupStorage.setup(this@AllSettingsFragment)
-                    }
+                is BackupStorageAuthRevokedException -> {
+                    Logger.e("GDrive auth error. No-op fail.")
                 }
                 is IOException -> { // connection problem
+                    Logger.e("GDrive connection error.")
                     withContext(Dispatchers.Main) {
-                        showBackupStorageCheckFailedDialog()
+                        showBackupStorageCheckFailedDialog(
+                            string(check_backup_storage_status_connection_error_description)
+                        )
+                    }
+                }
+                else -> {
+                    Logger.e("GDrive storage tampered.")
+                    withContext(Dispatchers.Main) {
+                        updateLastSuccessfulBackupDate()
                     }
                 }
             }
         }
     }
 
-    override fun onDestroy() {
-        EventBus.unsubscribeFromBackupState(this)
-        super.onDestroy()
-    }
-
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        lifecycleScope.launch(Dispatchers.IO) {
-            try {
-                checkStorageStatus()
-            } catch (exception: Exception) {
-                withContext(Dispatchers.Main) {
-                    showBackupStorageCheckFailedDialog()
-                }
-            }
+        lifecycleScope.launch(Dispatchers.IO) { // Google Drive re-authorized
+            checkStorageStatus()
         }
     }
 
@@ -195,6 +192,13 @@ UI tree rebuild on configuration changes"""
                         all_settings_back_up_status_processing
                     )
                 }
+                is BackupStorageCheckFailed -> {
+                    updateLastSuccessfulBackupDate()
+                    activateBackupStatusView(
+                        icon = ui.cloudBackupStatusWarningView,
+                        textColor = all_settings_back_up_status_error
+                    )
+                }
                 is BackupScheduled -> {
                     updateLastSuccessfulBackupDate()
                     if (sharedPrefs.backupFailureDate == null) {
@@ -227,7 +231,7 @@ UI tree rebuild on configuration changes"""
                         all_settings_back_up_status_processing
                     )
                 }
-                is BackupFailed -> {
+                is BackupOutOfDate -> {
                     updateLastSuccessfulBackupDate()
                     activateBackupStatusView(
                         ui.cloudBackupStatusWarningView,
@@ -298,11 +302,11 @@ UI tree rebuild on configuration changes"""
         dialog.show()
     }
 
-    private fun showBackupStorageCheckFailedDialog(message: String? = null) {
+    private fun showBackupStorageCheckFailedDialog(message: String) {
         ErrorDialog(
             requireContext(),
             title = string(check_backup_storage_status_error_title),
-            description = message ?: string(check_backup_storage_status_error_description)
+            description = message
         ).show()
     }
 

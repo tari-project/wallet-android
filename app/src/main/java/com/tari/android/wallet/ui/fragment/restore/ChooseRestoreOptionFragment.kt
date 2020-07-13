@@ -52,7 +52,7 @@ import com.tari.android.wallet.databinding.FragmentChooseRestoreOptionBinding
 import com.tari.android.wallet.infrastructure.backup.BackupFileIsEncryptedException
 import com.tari.android.wallet.infrastructure.backup.BackupStorage
 import com.tari.android.wallet.infrastructure.backup.BackupStorageSetupCancelled
-import com.tari.android.wallet.infrastructure.backup.BackupStorageSetupRecoverableAuthException
+import com.tari.android.wallet.infrastructure.backup.BackupStorageAuthRevokedException
 import com.tari.android.wallet.ui.activity.restore.WalletRestoreRouter
 import com.tari.android.wallet.ui.dialog.ErrorDialog
 import com.tari.android.wallet.ui.extension.*
@@ -170,7 +170,7 @@ framework for UI tree rebuild on configuration changes"""
                             showRestoreFailedDialog(string(error_no_connection_title))
                         }
                     }
-                    is BackupStorageSetupRecoverableAuthException -> {
+                    is BackupStorageAuthRevokedException -> {
                         Logger.e(exception, "Reauth required.")
                         backupStorage.setup(this@ChooseRestoreOptionFragment)
                     }

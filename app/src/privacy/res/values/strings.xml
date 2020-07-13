@@ -9,4 +9,13 @@
 
     <string name="enter_backup_password_page_desc_general_part">Enter the password you created in Aurora to secure your local backups. If you cannot find the password,</string>
     <string name="enter_backup_password_page_desc_highlighted_part">you will not be able to recover your wallet</string>
+
+    <string name="back_up_wallet_storage_setup_error_title">Local Storage Error</string>
+    <string name="back_up_wallet_storage_setup_error_desc">Cannot access local storage.</string>
+    <string name="back_up_wallet_sign_out_error_title">Sign out error</string>
+    <string name="back_up_wallet_sign_out_error_desc">Could not sign out, please try again later</string>
+    <!-- Backup storage status check -->
+    <string name="check_backup_storage_status_error_title">Local Storage Error</string>
+    <string name="check_backup_storage_status_connection_error_description">Cannot access local storage.</string>
+    <string name="check_backup_storage_status_auth_error_description">Cannot access local storage. Please give Tari Aurora the necessary permission.</string>
 </resources>
