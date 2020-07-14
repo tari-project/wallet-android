@@ -19,8 +19,10 @@ jobs:
           echo 'sdk.dir=/Users/runner/Library/Android/sdk' >> local.properties
           echo 'ndk.dir=/Users/runner/Library/Android/sdk/ndk/20.1.5948944' >> local.properties
           touch sentry.properties
-          echo ${{ secrets.SENTRY_PROPERTIES }} >> sentry.properties
+          echo "$SENTRY_PROPERTIES" >> sentry.properties
           echo ".properties files created."
+        env:
+          SENTRY_PROPERTIES: ${{ secrets.SENTRY_PROPERTIES }}
       - name: Run Instrumented Tests # run all instrumented tests through the TestSuite class
         uses: reactivecircus/android-emulator-runner@v2
         with:
