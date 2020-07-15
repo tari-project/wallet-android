@@ -68,6 +68,7 @@ import org.joda.time.Minutes
 import java.math.BigInteger
 import java.util.*
 import java.util.concurrent.CopyOnWriteArrayList
+import java.util.concurrent.CopyOnWriteArraySet
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import kotlin.collections.ArrayList
@@ -108,7 +109,7 @@ internal class WalletService : Service(), FFIWalletListenerAdapter, LifecycleObs
     /**
      * Pairs of <tx id, recipient public key hex>.
      */
-    private val outboundTxIdsToBePushNotified = mutableSetOf<Pair<BigInteger, String>>()
+    private val outboundTxIdsToBePushNotified = CopyOnWriteArraySet<Pair<BigInteger, String>>()
 
     /**
      * Service stub implementation.
@@ -301,12 +302,9 @@ internal class WalletService : Service(), FFIWalletListenerAdapter, LifecycleObs
         // post event to bus
         EventBus.post(Event.Wallet.DirectSendResult(TxId(txId), success))
         if (success) {
-            val txIdPublicKeyPair = outboundTxIdsToBePushNotified.firstOrNull { it.first == txId }
-            if (txIdPublicKeyPair != null) {
-                outboundTxIdsToBePushNotified.removeIf {
-                    it.first == txId
-                }
-                sendPushNotificationToTxRecipient(txIdPublicKeyPair.second)
+            outboundTxIdsToBePushNotified.firstOrNull { it.first == txId }?.let {
+                outboundTxIdsToBePushNotified.remove(it)
+                sendPushNotificationToTxRecipient(it.second)
             }
         }
         // notify external listeners
@@ -320,12 +318,9 @@ internal class WalletService : Service(), FFIWalletListenerAdapter, LifecycleObs
         // post event to bus
         EventBus.post(Event.Wallet.StoreAndForwardSendResult(TxId(txId), success))
         if (success) {
-            val txIdPublicKeyPair = outboundTxIdsToBePushNotified.firstOrNull { it.first == txId }
-            if (txIdPublicKeyPair != null) {
-                outboundTxIdsToBePushNotified.removeIf {
-                    it.first == txId
-                }
-                sendPushNotificationToTxRecipient(txIdPublicKeyPair.second)
+            outboundTxIdsToBePushNotified.firstOrNull { it.first == txId }?.let {
+                outboundTxIdsToBePushNotified.remove(it)
+                sendPushNotificationToTxRecipient(it.second)
             }
         }
         // notify external listeners
