@@ -43,11 +43,13 @@ import org.junit.runners.Suite
 @RunWith(Suite::class)
 @Suite.SuiteClasses(
     FFIByteVectorTests::class,
+    FFICommsConfigTests::class,
+    FFIContactTests::class,
     FFIPrivateKeyTests::class,
     FFIPublicKeyTests::class,
-    FFIContactTests::class,
-    FFICommsConfigTests::class,
-    FFITransportTypeTest::class
-    //WalletTests::class //TODO Investigate why this fails, when it passes individually
+    FFITransportTypeTest::class,
+    HexStringTests::class,
+    NetAddressStringTests::class
+    //WalletTests::class //TODO Still some work to do with wallet tests.
 )
 class TestSuite
