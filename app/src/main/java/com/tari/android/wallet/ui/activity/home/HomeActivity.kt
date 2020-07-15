@@ -455,20 +455,22 @@ internal class HomeActivity : AppCompatActivity(),
     }
 
     private fun onTxMined(tx: CompletedTx) {
-        when (tx.direction) {
+        val source = when (tx.direction) {
             Tx.Direction.INBOUND -> pendingInboundTxs
             Tx.Direction.OUTBOUND -> pendingOutboundTxs
-        }.removeIf { it.id == tx.id }
+        }
+        source.find { it.id == tx.id }?.let { source.remove(it) }
         completedTxs.add(tx)
         // update tx list UI
         handler?.post { updateTxListUI() }
     }
 
     private fun onTxCancelled(tx: CancelledTx) {
-        when (tx.direction) {
+        val source = when (tx.direction) {
             Tx.Direction.INBOUND -> pendingInboundTxs
             Tx.Direction.OUTBOUND -> pendingOutboundTxs
-        }.removeIf { it.id == tx.id }
+        }
+        source.find { it.id == tx.id }?.let { source.remove(it) }
         cancelledTxs.add(tx)
         // update balance
         lifecycleScope.launch(Dispatchers.IO) {
