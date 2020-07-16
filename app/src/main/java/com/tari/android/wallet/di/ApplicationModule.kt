@@ -43,6 +43,7 @@ import com.tari.android.wallet.notification.NotificationHelper
 import com.tari.android.wallet.util.SharedPrefsWrapper
 import dagger.Module
 import dagger.Provides
+import java.io.File
 import javax.inject.Singleton
 
 /**
@@ -65,7 +66,7 @@ internal class ApplicationModule(
 
     @Provides
     @Singleton
-    fun provideFilesDir(context: Context) = context.filesDir
+    fun provideFilesDir(context: Context): File = context.filesDir
 
     @Provides
     @Singleton

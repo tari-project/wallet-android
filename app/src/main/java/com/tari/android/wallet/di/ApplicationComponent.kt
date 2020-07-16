@@ -45,6 +45,7 @@ import com.tari.android.wallet.ui.activity.home.HomeActivity
 import com.tari.android.wallet.ui.activity.onboarding.OnboardingFlowActivity
 import com.tari.android.wallet.ui.activity.profile.WalletInfoActivity
 import com.tari.android.wallet.ui.activity.qr.QRScannerActivity
+import com.tari.android.wallet.ui.activity.restore.WalletRestoreActivity
 import com.tari.android.wallet.ui.activity.send.SendTariActivity
 import com.tari.android.wallet.ui.activity.tx.TxDetailActivity
 import com.tari.android.wallet.ui.fragment.debug.BaseNodeConfigFragment
@@ -52,10 +53,16 @@ import com.tari.android.wallet.ui.fragment.debug.DebugLogFragment
 import com.tari.android.wallet.ui.fragment.onboarding.CreateWalletFragment
 import com.tari.android.wallet.ui.fragment.onboarding.IntroductionFragment
 import com.tari.android.wallet.ui.fragment.onboarding.LocalAuthFragment
+import com.tari.android.wallet.ui.fragment.restore.ChooseRestoreOptionFragment
+import com.tari.android.wallet.ui.fragment.restore.EnterRestorationPasswordFragment
 import com.tari.android.wallet.ui.fragment.send.AddAmountFragment
 import com.tari.android.wallet.ui.fragment.send.AddNoteFragment
 import com.tari.android.wallet.ui.fragment.send.AddRecipientFragment
 import com.tari.android.wallet.ui.fragment.send.FinalizeSendTxFragment
+import com.tari.android.wallet.ui.fragment.settings.AllSettingsFragment
+import com.tari.android.wallet.ui.fragment.settings.backup.ChangeSecurePasswordFragment
+import com.tari.android.wallet.ui.fragment.settings.backup.EnterCurrentPasswordFragment
+import com.tari.android.wallet.ui.fragment.settings.backup.BackupSettingsFragment
 import com.tari.android.wallet.util.SharedPrefsWrapper
 import dagger.Component
 import java.io.File
@@ -71,10 +78,10 @@ import javax.inject.Singleton
     modules = [
         ApplicationModule::class,
         WalletModule::class,
-        ConfigModule::class,
         ServiceModule::class,
         TorModule::class,
-        TrackerModule::class
+        TrackerModule::class,
+        BackupAndRestoreModule::class
     ]
 )
 internal interface ApplicationComponent {
@@ -98,7 +105,6 @@ internal interface ApplicationComponent {
      * Activities.
      */
     fun inject(activity: SplashActivity)
-
     fun inject(activity: OnboardingFlowActivity)
     fun inject(activity: AuthActivity)
     fun inject(activity: HomeActivity)
@@ -112,7 +118,6 @@ internal interface ApplicationComponent {
      * Fragments.
      */
     fun inject(fragment: IntroductionFragment)
-
     fun inject(fragment: CreateWalletFragment)
     fun inject(fragment: AddRecipientFragment)
     fun inject(fragment: AddAmountFragment)
@@ -121,6 +126,19 @@ internal interface ApplicationComponent {
     fun inject(fragment: LocalAuthFragment)
     fun inject(fragment: DebugLogFragment)
     fun inject(fragment: BaseNodeConfigFragment)
+    fun inject(fragment: AllSettingsFragment)
+    /**
+     * Backup.
+     */
+    fun inject(fragment: BackupSettingsFragment)
+    fun inject(fragment: ChangeSecurePasswordFragment)
+    fun inject(fragment: EnterCurrentPasswordFragment)
+    /**
+     * Restore.
+     */
+    fun inject(activity: WalletRestoreActivity)
+    fun inject(fragment: ChooseRestoreOptionFragment)
+    fun inject(fragment: EnterRestorationPasswordFragment)
 
     /**
      * Service(s).

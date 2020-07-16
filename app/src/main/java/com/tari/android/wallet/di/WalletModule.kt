@@ -39,6 +39,7 @@ import com.tari.android.wallet.network.NetworkConnectionStateReceiver
 import com.tari.android.wallet.tor.TorConfig
 import com.tari.android.wallet.tor.TorProxyManager
 import com.tari.android.wallet.tor.TorProxyMonitor
+import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.SharedPrefsWrapper
 import dagger.Module
 import dagger.Provides
@@ -60,6 +61,8 @@ internal class WalletModule {
         const val walletFilesDirPath = "wallet_files_dir_path"
         const val walletLogFilesDirPath = "wallet_log_file_dir_path"
         const val walletLogFilePath = "wallet_log_file_path"
+        const val walletDatabaseFilePath = "wallet_database_file_path"
+        const val walletTempDirPath = "wallet_temp_dir_path"
     }
 
     private val logFilePrefix = "tari_wallet_"
@@ -105,6 +108,26 @@ internal class WalletModule {
             logFile.createNewFile()
         }
         return logFile.absolutePath
+    }
+
+    @Provides
+    @Named(FieldName.walletDatabaseFilePath)
+    @Singleton
+    fun provideWalletDatabaseFilePath(
+        @Named(FieldName.walletFilesDirPath) walletFilesDirPath: String
+    ): String {
+        return File(walletFilesDirPath, Constants.Wallet.walletDBFullFileName).absolutePath
+    }
+
+    @Provides
+    @Named(FieldName.walletTempDirPath)
+    @Singleton
+    fun provideWalletTempDirPath(
+        @Named(FieldName.walletFilesDirPath) walletFilesDirPath: String
+    ): String {
+        val tempDir = File(walletFilesDirPath, "temp")
+        if (!tempDir.exists()) tempDir.mkdir()
+        return tempDir.absolutePath
     }
 
     @Provides

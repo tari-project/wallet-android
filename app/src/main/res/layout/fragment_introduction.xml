@@ -111,9 +111,17 @@
             android:visibility="gone" />
     </FrameLayout>
 
-    <include
+    <com.tari.android.wallet.ui.component.CustomFontTextView
         android:id="@+id/restore_wallet_cta_view"
-        layout="@layout/view_restoration_block" />
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="25dp"
+        android:gravity="center"
+        android:text="@string/create_wallet_restore_wallet_cta"
+        android:textColor="@color/white"
+        android:textSize="13sp"
+        app:customFont="AVENIR_LT_STD_HEAVY" />
 
     <com.tari.android.wallet.ui.component.CustomFontTextView
         android:id="@+id/user_agreement_and_privacy_policy_text_view"

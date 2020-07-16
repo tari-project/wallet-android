@@ -50,7 +50,6 @@ import com.tari.android.wallet.R.dimen.*
 import com.tari.android.wallet.R.string.*
 import com.tari.android.wallet.application.WalletState
 import com.tari.android.wallet.databinding.FragmentCreateWalletBinding
-import com.tari.android.wallet.di.ConfigModule
 import com.tari.android.wallet.di.WalletModule
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.extension.applyFontStyle
@@ -81,14 +80,6 @@ internal class CreateWalletFragment : Fragment() {
     @Inject
     @Named(WalletModule.FieldName.walletFilesDirPath)
     lateinit var walletFilesDirPath: String
-
-    @JvmField
-    @field:[Inject Named(ConfigModule.FieldName.receiveFromAnonymous)]
-    var createNewWalletReceiveFromAnonymous: Boolean = false
-
-    @JvmField
-    @field:[Inject Named(ConfigModule.FieldName.generateTestData)]
-    var createNewWalletGenerateTestData: Boolean = false
 
     @Inject
     lateinit var tracker: Tracker

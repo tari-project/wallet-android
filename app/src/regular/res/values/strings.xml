@@ -1,0 +1,20 @@
+<resources>
+    <string name="back_up_wallet_backups_switch_label">Google Drive backups</string>
+    <string name="back_up_wallet_set_backup_password_cta">Secure your Google Drive backup</string>
+    <string name="back_up_wallet_restore">Restore with Google Drive</string>
+    <!-- Backup password entry -->
+    <string name="change_password_page_title">Secure your Google Drive backup</string>
+    <string name="change_password_page_description_general_part">Ensure your wallet is safe even if your Google Drive is compromised. Select a password you will remember or</string>
+    <string name="change_password_page_description_highlight_part">you will not be able to recover your wallet</string>
+    <!-- Enter existing password -->
+    <string name="enter_backup_password_page_desc_general_part">Enter the password you created in Aurora to secure your cloud backups. If you cannot find the password,</string>
+    <string name="enter_backup_password_page_desc_highlighted_part">you will not be able to recover your wallet</string>
+
+    <!-- Backup storage status check -->
+    <string name="check_backup_storage_status_error_title">Google Drive Error</string>
+    <string name="check_backup_storage_status_auth_revoked_error_description">Google Drive permission has been revoked. Automated wallet backups turned off.</string>
+    <string name="check_backup_storage_status_access_error_description">Can\'t connect to Google Drive. Please check your internet connection.</string>
+    <!-- Backup storage setup -->
+    <string name="back_up_wallet_storage_setup_error_title">Google Drive Error</string>
+    <string name="back_up_wallet_storage_setup_error_desc">Cannot access Google Drive. Please make sure you are connected to the internet and have given Aurora the necessary access permission.</string>
+</resources>

@@ -48,6 +48,7 @@ add_library(
         jniWallet.cpp
         jniSeedWords.cpp
         jniEmojiSet.cpp
+        jniUtil.cpp
 )
 
 find_library(

@@ -143,6 +143,9 @@ internal object Constants {
         const val pushNotificationServerUrl = "https://push.tari.com"
         const val deepLinkURLPrefix = "tari://"
         const val pendingTxExpirationPeriodHours = 3 * 24
+        const val backupDelayMs = 60 * 1000L
+        const val backupRetryPeriodMs = 5 * 1000L
+        const val maxBackupRetries = 2
     }
 
 }

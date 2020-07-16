@@ -32,12 +32,20 @@
  */
 package com.tari.android.wallet.ui.activity.settings
 
+import androidx.fragment.app.Fragment
+
 interface SettingsRouter {
 
-    fun toWalletBackupSettings()
+    fun toWalletBackupSettings(sourceFragment: Fragment)
 
-    fun toWalletBackupWithRecoveryPhrase()
+    fun toWalletBackupWithRecoveryPhrase(sourceFragment: Fragment)
 
-    fun toRecoveryPhraseVerification(phrase: List<String>)
+    fun toRecoveryPhraseVerification(sourceFragment: Fragment, phrase: List<String>)
+
+    fun toConfirmPassword(sourceFragment: Fragment)
+
+    fun toChangePassword(sourceFragment: Fragment)
+
+    fun onPasswordChanged(sourceFragment: Fragment)
 
 }

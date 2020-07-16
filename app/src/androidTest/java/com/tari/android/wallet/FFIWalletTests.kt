@@ -305,11 +305,11 @@ class FFIWalletTests {
         )
         val wallet = FFIWallet(commsConfig, "")
         wallet.listenerAdapter = TestListener()
-
+        val originalFile = File(walletDir, FFITestUtil.WALLET_DB_NAME)
         val backupDir = File(walletDir, "backup")
         backupDir.mkdir()
         val backupFile = File(backupDir, "backupfile.sqlite3")
-        wallet.doPartialBackup(backupFile.absolutePath)
+        FFIUtil.doPartialBackup(originalFile.absolutePath, backupFile.absolutePath)
         assertTrue(backupFile.exists())
         transport.destroy()
         commsConfig.destroy()

@@ -35,7 +35,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"
             android:layout_marginBottom="16dp"
-            android:text="@string/back_up_wallet_page_title"
+            android:text="@string/restore_wallet_page_title"
             android:textColor="@color/black"
             android:textSize="16sp"
             app:customFont="AVENIR_LT_STD_HEAVY"
@@ -54,7 +54,7 @@
         android:orientation="vertical">
 
         <FrameLayout
-            android:id="@+id/back_up_wallet_with_cloud_cta_view"
+            android:id="@+id/restore_wallet_cta_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@drawable/setting_option_background"
@@ -67,16 +67,24 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical|start"
-                android:text="@string/back_up_wallet_restore_with_cloud"
+                android:text="@string/back_up_wallet_restore"
                 android:textColor="@color/black"
                 android:textSize="15sp"
                 app:customFont="AVENIR_LT_STD_MEDIUM" />
 
+            <ProgressBar
+                android:id="@+id/restore_wallet_menu_item_progress_view"
+                android:layout_gravity="center_vertical|end"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:visibility="invisible"
+                tools:visibility="visible" />
+
             <ImageView
+                android:id="@+id/restore_wallet_menu_item_arrow_image_view"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical|end"
-                android:layout_marginStart="12dp"
                 android:src="@drawable/icon_apply_setting"
                 tools:ignore="ContentDescription" />
         </FrameLayout>
@@ -88,7 +96,7 @@
             android:background="@color/settings_background" />
 
         <FrameLayout
-            android:id="@+id/back_up_with_recovery_phrase_cta_view"
+            android:id="@+id/restore_with_recovery_phrase_cta_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@drawable/setting_option_background"

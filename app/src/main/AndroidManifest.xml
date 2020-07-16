@@ -14,6 +14,7 @@
     <!-- For GSuite API -->
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
     <uses-permission android:name="android.permission.MANAGE_ACCOUNTS" />
+
     <!-- remove billing support in case it gets included by a 3rd party lib -->
     <uses-permission
         android:name="com.android.vending.BILLING"
@@ -151,10 +152,10 @@
         <activity
             android:name=".ui.activity.settings.SettingsActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
-            android:parentActivityName=".ui.activity.home.HomeActivity"
+            android:parentActivityName=".ui.activity.profile.WalletInfoActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme"
-            android:windowSoftInputMode="adjustPan|stateAlwaysHidden" />
+            android:windowSoftInputMode="adjustResize|stateAlwaysHidden" />
 
         <activity
             android:name=".ui.activity.restore.WalletRestoreActivity"
@@ -162,15 +163,7 @@
             android:parentActivityName=".ui.activity.onboarding.OnboardingFlowActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme"
-            android:windowSoftInputMode="adjustPan|stateAlwaysHidden" />
-
-        <!-- Google sign in activity -->
-        <activity
-            android:name="com.google.android.gms.auth.api.signin.internal.SignInHubActivity"
-            android:excludeFromRecents="true"
-            android:exported="false"
-            android:theme="@style/GoogleSignInActivity"
-            tools:replace="android:theme" />
+            android:windowSoftInputMode="adjustResize|stateAlwaysHidden" />
 
         <!-- This receiver is responsible for starting the service after boot finish.-->
         <receiver

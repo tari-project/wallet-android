@@ -52,7 +52,7 @@ internal fun Int.toMicroTari(): MicroTari {
 }
 
 /**
- * Int to MicroTari.
+ * Long to MicroTari.
  */
 internal fun Long.toMicroTari(): MicroTari {
     return MicroTari(BigInteger.valueOf(this))
