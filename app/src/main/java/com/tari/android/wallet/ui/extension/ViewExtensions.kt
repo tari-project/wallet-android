@@ -220,6 +220,9 @@ internal fun View.setHeight(value: Int) {
     this.layoutParams = this.layoutParams.also { it.height = value }
 }
 
+internal fun View.postDelayed(timeMillis: Long, action: () -> Unit) =
+    this.postDelayed(action, timeMillis)
+
 internal fun View.string(@StringRes id: Int): String = context.string(id)
 
 internal fun View.color(@ColorRes id: Int): Int = context.color(id)

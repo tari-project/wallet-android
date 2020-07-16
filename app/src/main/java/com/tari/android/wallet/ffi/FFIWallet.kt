@@ -220,11 +220,6 @@ internal class FFIWallet(
         libError: FFIError
     ): FFISeedWordsPtr
 
-    private external fun jniDoPartialBackup(
-        backupFileTargetPath: String,
-        libError: FFIError
-    )
-
     private external fun jniDestroy()
 
     // endregion
@@ -712,12 +707,6 @@ internal class FFIWallet(
         val result = jniAddBaseNodePeer(baseNodePublicKey, baseNodeAddress, error)
         throwIf(error)
         return result
-    }
-
-    fun doPartialBackup(backupFileTargetPath: String) {
-        val error = FFIError()
-        jniDoPartialBackup(backupFileTargetPath, error)
-        throwIf(error)
     }
 
     override fun destroy() {

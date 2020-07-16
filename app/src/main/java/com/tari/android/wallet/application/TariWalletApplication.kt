@@ -48,7 +48,6 @@ import com.tari.android.wallet.infrastructure.Tracker
 import com.tari.android.wallet.network.NetworkConnectionStateReceiver
 import com.tari.android.wallet.notification.NotificationHelper
 import com.tari.android.wallet.util.SharedPrefsWrapper
-import com.tari.android.wallet.util.WalletUtil
 import net.danlew.android.joda.JodaTimeAndroid
 import javax.inject.Inject
 import javax.inject.Named
@@ -60,9 +59,6 @@ import javax.inject.Named
  */
 internal class TariWalletApplication : Application(), LifecycleObserver {
 
-    @JvmField
-    @field:[Inject Named(ConfigModule.FieldName.deleteExistingWallet)]
-    var deleteExistingWallet: Boolean = false
     @Inject
     @Named(WalletModule.FieldName.walletFilesDirPath)
     lateinit var walletFilesDirPath: String
@@ -104,10 +100,7 @@ internal class TariWalletApplication : Application(), LifecycleObserver {
         )
         appComponent = initDagger(this)
         appComponent.inject(this)
-        if (deleteExistingWallet) {
-            WalletUtil.clearWalletFiles(walletFilesDirPath)
-            sharedPrefsWrapper.clean()
-        }
+
         notificationHelper.createNotificationChannels()
 
         ProcessLifecycleOwner.get().lifecycle.addObserver(this)
@@ -117,6 +110,7 @@ internal class TariWalletApplication : Application(), LifecycleObserver {
 
         registerReceiver(connectionStateReceiver, connectionStateReceiver.intentFilter)
 
+        // track app download
         tracker.download(this)
     }
 

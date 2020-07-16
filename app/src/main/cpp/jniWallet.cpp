@@ -1112,21 +1112,4 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniGetSeedWords(
     return reinterpret_cast<jlong>(pSeedwords);
 }
 
-extern "C"
-JNIEXPORT void JNICALL
-Java_com_tari_android_wallet_ffi_FFIWallet_jniDoPartialBackup(
-        JNIEnv *jEnv,
-        jobject jThis,
-        jstring jBackupFileTargetPath,
-        jobject error) {
-    int i = 0;
-    int *r = &i;
-    jlong lWallet = GetPointerField(jEnv, jThis);
-    TariWallet *pWallet = reinterpret_cast<TariWallet *>(lWallet);
-    const char *pTargetPath = jEnv->GetStringUTFChars(jBackupFileTargetPath, JNI_FALSE);
-    wallet_partial_backup(pWallet, pTargetPath, r);
-    setErrorCode(jEnv, error, i);
-    jEnv->ReleaseStringUTFChars(jBackupFileTargetPath, pTargetPath);
-}
-
 //endregion

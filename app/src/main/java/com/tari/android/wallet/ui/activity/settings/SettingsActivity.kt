@@ -37,11 +37,10 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
 import com.tari.android.wallet.R
 import com.tari.android.wallet.ui.fragment.settings.AllSettingsFragment
-import com.tari.android.wallet.ui.fragment.settings.backup.VerifySeedPhraseFragment
-import com.tari.android.wallet.ui.fragment.settings.backup.WalletBackupSettingsFragment
-import com.tari.android.wallet.ui.fragment.settings.backup.WriteDownSeedPhraseFragment
+import com.tari.android.wallet.ui.fragment.settings.backup.*
 
 class SettingsActivity : AppCompatActivity(), SettingsRouter {
 
@@ -50,47 +49,135 @@ class SettingsActivity : AppCompatActivity(), SettingsRouter {
         setContentView(R.layout.activity_settings)
         overridePendingTransition(R.anim.enter_from_bottom, R.anim.exit_to_top)
         if (savedInstanceState == null) {
-            loadFragment()
+            if (intent.getBooleanExtra(KEY_SHOW_BACKUP_SETTINGS, false)) {
+                loadFragmentsStackUpToBackupSettings()
+            } else {
+                loadAllSettingsFragment()
+            }
         }
     }
 
-    private fun loadFragment() {
+    private fun loadAllSettingsFragment() {
         supportFragmentManager.beginTransaction()
             .add(R.id.settings_fragment_container, AllSettingsFragment.newInstance())
             .commit()
     }
 
-    override fun toWalletBackupSettings() {
-        addFragment(WalletBackupSettingsFragment.newInstance())
+    private fun loadFragmentsStackUpToBackupSettings() {
+        val fm = supportFragmentManager
+        val allSettings = AllSettingsFragment.newInstance()
+        fm.beginTransaction()
+            .add(R.id.settings_fragment_container, allSettings)
+            .commit()
+        fm.executePendingTransactions()
+        val backupSettings = BackupSettingsFragment.newInstance()
+        fm
+            .beginTransaction()
+            .setCustomAnimations(
+                0, 0,
+                R.anim.enter_from_left, R.anim.exit_to_right
+            )
+            .hide(allSettings)
+            .add(
+                R.id.settings_fragment_container,
+                backupSettings,
+                backupSettings.javaClass.simpleName
+            )
+            .addToBackStack(backupSettings.javaClass.simpleName)
+            .commit()
     }
 
-    override fun onBackPressed() {
-        super.onBackPressed()
-        overridePendingTransition(R.anim.enter_from_top, R.anim.exit_to_bottom)
+    override fun toWalletBackupSettings(sourceFragment: Fragment) {
+        addFragment(sourceFragment, BackupSettingsFragment.newInstance())
     }
 
-    override fun toWalletBackupWithRecoveryPhrase() {
-        addFragment(WriteDownSeedPhraseFragment.newInstance())
+    override fun toWalletBackupWithRecoveryPhrase(sourceFragment: Fragment) {
+        addFragment(sourceFragment, WriteDownSeedPhraseFragment.newInstance())
     }
 
-    override fun toRecoveryPhraseVerification(phrase: List<String>) {
-        addFragment(VerifySeedPhraseFragment.newInstance(phrase))
+    override fun toRecoveryPhraseVerification(sourceFragment: Fragment, phrase: List<String>) {
+        addFragment(sourceFragment, VerifySeedPhraseFragment.newInstance(phrase))
     }
 
-    private fun addFragment(fragment: Fragment) {
+    override fun toConfirmPassword(sourceFragment: Fragment) {
+        addFragment(
+            sourceFragment,
+            EnterCurrentPasswordFragment.newInstance(),
+            allowStateLoss = true
+        )
+    }
+
+    override fun toChangePassword(sourceFragment: Fragment) {
+        addFragment(
+            sourceFragment,
+            ChangeSecurePasswordFragment.newInstance(),
+            allowStateLoss = true
+        )
+    }
+
+    override fun onPasswordChanged(sourceFragment: Fragment) {
+        if (supportFragmentManager
+                .findFragmentByTag(EnterCurrentPasswordFragment::class.java.simpleName) != null
+        ) {
+            supportFragmentManager.popBackStackImmediate(
+                EnterCurrentPasswordFragment::class.java.simpleName,
+                FragmentManager.POP_BACK_STACK_INCLUSIVE
+            )
+            /*
+            val fragments = supportFragmentManager.fragments
+            supportFragmentManager.beginTransaction()
+                .setCustomAnimations(R.anim.no_anim, R.anim.no_anim)
+                .apply { fragments.subList(0, fragments.size - 2).forEach { hide(it) } }
+                .commit()
+             */
+        } else {
+            onBackPressed()
+        }
+    }
+
+    // nyarian:
+    // allowStateLoss parameter is necessary to resolve device-specific issues like one
+    // for samsung devices with biometrics enabled, as after launching the biometric prompt
+    // onSaveInstanceState is called, and commit()ing any stuff after onSaveInstanceState is called
+    // results into IllegalStateException: Can not perform this action after onSaveInstanceState
+    private fun addFragment(
+        sourceFragment: Fragment,
+        fragment: Fragment,
+        allowStateLoss: Boolean = false
+    ) {
         supportFragmentManager
             .beginTransaction()
             .setCustomAnimations(
                 R.anim.enter_from_right, R.anim.exit_to_left,
                 R.anim.enter_from_left, R.anim.exit_to_right
             )
-            .apply { supportFragmentManager.fragments.forEach { hide(it) } }
-            .add(R.id.settings_fragment_container, fragment)
-            .addToBackStack(null)
-            .commit()
+            .hide(sourceFragment)
+            //  .apply { supportFragmentManager.fragments.forEach { hide(it) } }
+            .add(R.id.settings_fragment_container, fragment, fragment.javaClass.simpleName)
+            .addToBackStack(fragment.javaClass.simpleName)
+            .apply { if (allowStateLoss) commitAllowingStateLoss() else commit() }
     }
 
+    /*
+    override fun onBackPressed() {
+        super.onBackPressed()
+        // On back press all transitive fragments become visible for some reason, and when
+        // navigating back from ChangeSecurePasswordFragment then AllSettingsFragment becomes
+        // visible as well, so we hiding all the transitive fragments except for the one that
+        // becomes the topmost by force
+        overridePendingTransition(R.anim.enter_from_top, R.anim.exit_to_bottom)
+        val fragments = supportFragmentManager.fragments
+        if (fragments.size > 1) {
+            supportFragmentManager.beginTransaction()
+                .setCustomAnimations(R.anim.no_anim, R.anim.no_anim)
+                .apply { fragments.subList(0, fragments.size - 2).forEach { hide(it) } }
+                .commit()
+        }
+    }
+     */
+
     companion object {
+        const val KEY_SHOW_BACKUP_SETTINGS = "showbackupsettings"
         fun launch(context: Context) {
             context.startActivity(Intent(context, SettingsActivity::class.java))
         }

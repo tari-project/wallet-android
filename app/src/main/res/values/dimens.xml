@@ -60,6 +60,8 @@
     <dimen name="home_main_content_top_margin">6dp</dimen>
     <dimen name="home_dialog_testnet_tari_dialog_margin">14dp</dimen>
     <dimen name="home_wallet_info_button_initial_top_margin">40dp</dimen>
+    <dimen name="home_backup_prompt_cta_width">209dp</dimen>
+    <dimen name="home_backup_prompt_cta_height">53dp</dimen>
 
     <!-- home swipe refresh -->
     <dimen name="home_swipe_refresh_max_scroll_y">180dp</dimen>
