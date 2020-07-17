@@ -344,7 +344,7 @@
     <string name="restore_with_cloud_page_title">Enter your backup password</string>
 
     <!--Change password-->
-    <string name="change_password_enter_password_label">Enter Password</string>
+    <string name="change_password_enter_password_label">Create Password</string>
     <string name="change_password_enter_password_hint">Make it a strong one!</string>
     <string name="change_password_confirm_password_label">Confirm Password</string>
     <string name="change_password_confirm_password_hint">Let’s see it again</string>

@@ -33,12 +33,14 @@
 package com.tari.android.wallet.ui.fragment.settings.backup
 
 import android.content.Context
+import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
+import com.tari.android.wallet.R
 import com.tari.android.wallet.R.color.change_password_cta_disabled
 import com.tari.android.wallet.R.color.white
 import com.tari.android.wallet.databinding.FragmentEnterBackupPasswordBinding
@@ -58,6 +60,7 @@ framework for UI tree rebuild on configuration changes"""
     lateinit var sharedPrefs: SharedPrefsWrapper
 
     private lateinit var ui: FragmentEnterBackupPasswordBinding
+    private var canEnableChangePasswordCTA = true
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -73,6 +76,7 @@ framework for UI tree rebuild on configuration changes"""
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        setChangePasswordCTAState(isEnabled = false)
         ui.passwordEditText.requestFocus()
         ui.root.postDelayed(LOCAL_AUTH_DELAY_TIME) { UiUtil.showKeyboard(requireActivity()) }
         ui.backCtaView.setOnClickListener(ThrottleClick { requireActivity().onBackPressed() })
@@ -84,19 +88,35 @@ framework for UI tree rebuild on configuration changes"""
             } else {
                 ui.changePasswordCtaTextView.isEnabled = false
                 ui.changePasswordCtaTextView.setTextColor(color(change_password_cta_disabled))
+                canEnableChangePasswordCTA = false
                 ui.root.postDelayed(DISABLE_BUTTON_TIME) {
-                    ui.changePasswordCtaTextView.isEnabled = true
-                    ui.changePasswordCtaTextView.setTextColor(color(white))
+                    canEnableChangePasswordCTA = true
+                    if (!ui.passwordEditText.text.isNullOrBlank()) {
+                        ui.changePasswordCtaTextView.isEnabled = true
+                        ui.changePasswordCtaTextView.setTextColor(color(white))
+                    }
                 }
                 ui.passwordsNotMatchLabelView.visible()
             }
         }
         ui.passwordEditText.addTextChangedListener(
-            afterTextChanged = { ui.passwordsNotMatchLabelView.gone() }
+            afterTextChanged = {
+                setChangePasswordCTAState(canEnableChangePasswordCTA && it?.length ?: 0 != 0)
+                ui.passwordsNotMatchLabelView.gone()
+            }
         )
         ui.passwordEditText.setOnFocusChangeListener { _, hasFocus ->
             if (hasFocus) ui.passwordsNotMatchLabelView.gone()
         }
+    }
+
+    private fun setChangePasswordCTAState(isEnabled: Boolean) {
+        if (ui.changePasswordCtaTextView.isEnabled == isEnabled) return
+        ui.changePasswordCtaTextView.isEnabled = isEnabled
+        ui.changePasswordCtaTextView.setTextColor(
+            if (isEnabled) Color.WHITE
+            else color(R.color.seed_phrase_button_disabled_text_color)
+        )
     }
 
     companion object {
