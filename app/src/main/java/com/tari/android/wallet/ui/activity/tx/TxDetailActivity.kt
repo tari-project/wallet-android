@@ -346,7 +346,8 @@ internal class TxDetailActivity : AppCompatActivity(), ServiceConnection {
     }
 
     private fun observeTxUpdates() {
-        EventBus.subscribe<Event.Wallet.TxBroadcast>(this) { updateTxData(it.tx) }
+        EventBus.subscribe<Event.Wallet.InboundTxBroadcast>(this) { updateTxData(it.tx) }
+        EventBus.subscribe<Event.Wallet.OutboundTxBroadcast>(this) { updateTxData(it.tx) }
         EventBus.subscribe<Event.Wallet.TxFinalized>(this) { updateTxData(it.tx) }
         EventBus.subscribe<Event.Wallet.TxMined>(this) { updateTxData(it.tx) }
         EventBus.subscribe<Event.Wallet.TxReplyReceived>(this) { updateTxData(it.tx) }

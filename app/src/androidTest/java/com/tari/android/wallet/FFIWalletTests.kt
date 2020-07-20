@@ -45,6 +45,7 @@ import com.tari.android.wallet.ffi.*
 import com.tari.android.wallet.model.CancelledTx
 import com.tari.android.wallet.model.CompletedTx
 import com.tari.android.wallet.model.PendingInboundTx
+import com.tari.android.wallet.model.PendingOutboundTx
 import com.tari.android.wallet.util.Constants
 import io.mockk.every
 import io.mockk.mockk
@@ -317,16 +318,45 @@ class FFIWalletTests {
     }
 
     class TestListener : FFIWalletListenerAdapter {
-        override fun onTxBroadcast(completedTx: CompletedTx) {
-            Logger.i("Tx Broadcast :: completed tx id %s", completedTx.id.toString())
+
+        override fun onBaseNodeSyncComplete(requestId: BigInteger, success: Boolean) {
+            Logger.i(
+                "Base Node Sync Complete :: request id %s success %s",
+                requestId.toString(),
+                success.toString()
+            )
         }
 
         override fun onTxReceived(pendingInboundTx: PendingInboundTx) {
             Logger.i("Tx Received :: pending inbound tx id %s", pendingInboundTx.id.toString())
         }
 
-        override fun onTxReplyReceived(completedTx: CompletedTx) {
-            Logger.i("Tx Reply Received :: completed tx id %s", completedTx.id.toString())
+        override fun onTxReplyReceived(pendingOutboundTx: PendingOutboundTx) {
+            Logger.i(
+                "Tx Reply Received :: pending outbound tx id %s",
+                pendingOutboundTx.id.toString()
+            )
+        }
+
+        override fun onTxFinalized(pendingInboundTx: PendingInboundTx) {
+            Logger.i(
+                "Tx Finalized :: pending inbound tx id: %s",
+                pendingInboundTx.id.toString()
+            )
+        }
+
+        override fun onInboundTxBroadcast(pendingInboundTx: PendingInboundTx) {
+            Logger.i(
+                "Inbound tx Broadcast :: pending inbound tx id %s",
+                pendingInboundTx.id.toString()
+            )
+        }
+
+        override fun onOutboundTxBroadcast(pendingOutboundTx: PendingOutboundTx) {
+            Logger.i(
+                "Outbound tx Broadcast :: pending outbound tx id %s",
+                pendingOutboundTx.id.toString()
+            )
         }
 
         override fun onTxMined(completedTx: CompletedTx) {
@@ -335,10 +365,6 @@ class FFIWalletTests {
 
         override fun onTxCancelled(cancelledTx: CancelledTx) {
             TODO("Not yet implemented")
-        }
-
-        override fun onTxFinalized(completedTx: CompletedTx) {
-            Logger.i("Tx Finalized :: completed tx id: %s", completedTx.id.toString())
         }
 
         override fun onDirectSendResult(txId: BigInteger, success: Boolean) {
@@ -353,13 +379,6 @@ class FFIWalletTests {
             )
         }
 
-        override fun onBaseNodeSyncComplete(requestId: BigInteger, success: Boolean) {
-            Logger.i(
-                "Base Node Sync Complete :: request id %s success %s",
-                requestId.toString(),
-                success.toString()
-            )
-        }
     }
 
 }

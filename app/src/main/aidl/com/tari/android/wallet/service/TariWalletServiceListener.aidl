@@ -39,23 +39,25 @@ import com.tari.android.wallet.model.Model;
 
 oneway interface TariWalletServiceListener {
 
-    void onTxBroadcast(in CompletedTx completed);
+    void onBaseNodeSyncComplete(in RequestId requestId, in boolean success);
+
+    void onTxReceived(in PendingInboundTx pendingInboundTx);
+
+    void onTxReplyReceived(in PendingOutboundTx pendingOutboundTx);
+
+    void onTxFinalized(in PendingInboundTx pendingInboundTx);
+
+    void onInboundTxBroadcast(in PendingInboundTx pendingInboundTx);
+
+    void onOutboundTxBroadcast(in PendingOutboundTx pendingOutboundTx);
 
     void onTxMined(in CompletedTx completed);
 
-    void onTxReceived(in PendingInboundTx pendingInbound);
-
-    void onTxReplyReceived(in CompletedTx completed);
-
-    void onTxFinalized(in CompletedTx completed);
+    void onTxCancelled(in CancelledTx tx);
 
     void onDirectSendResult(in TxId txId, in boolean success);
 
     void onStoreAndForwardSendResult(in TxId txId, in boolean success);
-
-    void onTxCancellation(in CancelledTx tx);
-
-    void onBaseNodeSyncComplete(in RequestId requestId, in boolean success);
 
     void onTestnetTariRequestSuccess();
 

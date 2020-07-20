@@ -170,7 +170,12 @@ internal class UpdateProgressViewController(
                 numberOfReceivedTxs++
             }
         }
-        EventBus.subscribe<Event.Wallet.TxBroadcast>(this) {
+        EventBus.subscribe<Event.Wallet.InboundTxBroadcast>(this) {
+            if (state == State.RUNNING || state == State.RECEIVING) {
+                numberOfBroadcastTxs++
+            }
+        }
+        EventBus.subscribe<Event.Wallet.OutboundTxBroadcast>(this) {
             if (state == State.RUNNING || state == State.RECEIVING) {
                 numberOfBroadcastTxs++
             }

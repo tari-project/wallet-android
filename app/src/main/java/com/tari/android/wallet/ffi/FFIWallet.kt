@@ -369,53 +369,10 @@ internal class FFIWallet(
         return result
     }
 
-    fun onTxBroadcast(completedTxPtr: FFICompletedTxPtr) {
-        Logger.i("Tx completed. Pointer: %s", completedTxPtr.toString())
-        val walletKey = getPublicKey()
-        val walletHex = walletKey.toString()
-        walletKey.destroy()
-        val tx = FFICompletedTx(completedTxPtr)
-        val (direction, user) = defineParticipantAndDirection(tx, walletHex)
-        val status = mapStatus(tx)
-        val completed = CompletedTx(
-            tx.getId(),
-            direction,
-            user,
-            MicroTari(tx.getAmount()),
-            MicroTari(tx.getFee()),
-            tx.getTimestamp(),
-            tx.getMessage(),
-            status
-        )
-        tx.destroy()
-        if (status != TxStatus.MINED) {
-            Logger.e("Constructed CompletedTx has status that's not MINED: $completed")
-        }
-        GlobalScope.launch { listenerAdapter?.onTxBroadcast(completed) }
-    }
-
-    fun onTxMined(completedTxPtr: FFICompletedTxPtr) {
-        Logger.i("Tx mined. Pointer: %s", completedTxPtr.toString())
-        val walletKey = getPublicKey()
-        val walletHex = walletKey.toString()
-        walletKey.destroy()
-        val tx = FFICompletedTx(completedTxPtr)
-        val (direction, user) = defineParticipantAndDirection(tx, walletHex)
-        val completed = CompletedTx(
-            tx.getId(),
-            direction,
-            user,
-            MicroTari(tx.getAmount()),
-            MicroTari(tx.getFee()),
-            tx.getTimestamp(),
-            tx.getMessage(),
-            mapStatus(tx)
-        )
-        tx.destroy()
-        if (completed.status != TxStatus.MINED) {
-            Logger.e("Constructed CompletedTx has status that's not MINED: $completed")
-        }
-        GlobalScope.launch { listenerAdapter?.onTxMined(completed) }
+    fun onBaseNodeSyncComplete(bytes: ByteArray, success: Boolean) {
+        Logger.i("Base node sync complete. Success: $success")
+        val requestId = BigInteger(1, bytes)
+        GlobalScope.launch { listenerAdapter?.onBaseNodeSyncComplete(requestId, success) }
     }
 
     fun onTxReceived(pendingInboundTxPtr: FFIPendingInboundTxPtr) {
@@ -452,8 +409,82 @@ internal class FFIWallet(
         val walletHex = walletKey.toString()
         walletKey.destroy()
         val tx = FFICompletedTx(completedTxPtr)
+        val (_, user) = defineParticipantAndDirection(tx, walletHex)
+        val pendingOutboundTx = PendingOutboundTx(
+            tx.getId(),
+            user,
+            MicroTari(tx.getAmount()),
+            MicroTari(tx.getFee()),
+            tx.getTimestamp(),
+            tx.getMessage(),
+            mapStatus(tx)
+        )
+        tx.destroy()
+        GlobalScope.launch { listenerAdapter?.onTxReplyReceived(pendingOutboundTx) }
+    }
+
+    fun onTxFinalized(completedTx: FFICompletedTxPtr) {
+        Logger.i("Tx finalized. Pointer: %s", completedTx.toString())
+        val walletKey = getPublicKey()
+        val walletHex = walletKey.toString()
+        walletKey.destroy()
+        val tx = FFICompletedTx(completedTx)
+        val (_, user) = defineParticipantAndDirection(tx, walletHex)
+        val pendingInboundTx = PendingInboundTx(
+            tx.getId(),
+            user,
+            MicroTari(tx.getAmount()),
+            tx.getTimestamp(),
+            tx.getMessage(),
+            mapStatus(tx)
+        )
+        tx.destroy()
+        GlobalScope.launch { listenerAdapter?.onTxFinalized(pendingInboundTx) }
+    }
+
+    fun onTxBroadcast(completedTxPtr: FFICompletedTxPtr) {
+        Logger.i("Tx completed. Pointer: %s", completedTxPtr.toString())
+        val walletKey = getPublicKey()
+        val walletHex = walletKey.toString()
+        walletKey.destroy()
+        val tx = FFICompletedTx(completedTxPtr)
         val (direction, user) = defineParticipantAndDirection(tx, walletHex)
-        val completedTx = CompletedTx(
+        when(direction) {
+            Tx.Direction.INBOUND -> {
+                val pendingInboundTx = PendingInboundTx(
+                    tx.getId(),
+                    user,
+                    MicroTari(tx.getAmount()),
+                    tx.getTimestamp(),
+                    tx.getMessage(),
+                    mapStatus(tx)
+                )
+                GlobalScope.launch { listenerAdapter?.onInboundTxBroadcast(pendingInboundTx) }
+            }
+            Tx.Direction.OUTBOUND -> {
+                val pendingOutboundTx = PendingOutboundTx(
+                    tx.getId(),
+                    user,
+                    MicroTari(tx.getAmount()),
+                    MicroTari(tx.getFee()),
+                    tx.getTimestamp(),
+                    tx.getMessage(),
+                    mapStatus(tx)
+                )
+                GlobalScope.launch { listenerAdapter?.onOutboundTxBroadcast(pendingOutboundTx) }
+            }
+        }
+        tx.destroy()
+    }
+
+    fun onTxMined(completedTxPtr: FFICompletedTxPtr) {
+        Logger.i("Tx mined. Pointer: %s", completedTxPtr.toString())
+        val walletKey = getPublicKey()
+        val walletHex = walletKey.toString()
+        walletKey.destroy()
+        val tx = FFICompletedTx(completedTxPtr)
+        val (direction, user) = defineParticipantAndDirection(tx, walletHex)
+        val completed = CompletedTx(
             tx.getId(),
             direction,
             user,
@@ -464,53 +495,10 @@ internal class FFIWallet(
             mapStatus(tx)
         )
         tx.destroy()
-
-        if (completedTx.status != TxStatus.MINED) {
-            Logger.e("Constructed CompletedTx has status that's not MINED: $completedTx")
-        }
-        GlobalScope.launch { listenerAdapter?.onTxReplyReceived(completedTx) }
-    }
-
-    fun onTxFinalized(completedTx: FFICompletedTxPtr) {
-        Logger.i("Tx finalized. Pointer: %s", completedTx.toString())
-        val walletKey = getPublicKey()
-        val walletHex = walletKey.toString()
-        walletKey.destroy()
-        val tx = FFICompletedTx(completedTx)
-        val id = tx.getId()
-        val amount = tx.getAmount()
-        val fee = tx.getFee()
-        val timestamp = tx.getTimestamp()
-        val message = tx.getMessage()
-        val status = mapStatus(tx)
-        val (direction, user) = defineParticipantAndDirection(tx, walletHex)
-        tx.destroy()
-        val completed = CompletedTx(
-            id,
-            direction,
-            user,
-            MicroTari(amount),
-            MicroTari(fee),
-            timestamp,
-            message,
-            status
-        )
-        if (status != TxStatus.MINED) {
+        if (completed.status != TxStatus.MINED) {
             Logger.e("Constructed CompletedTx has status that's not MINED: $completed")
         }
-        GlobalScope.launch { listenerAdapter?.onTxFinalized(completed) }
-    }
-
-    fun onDirectSendResult(bytes: ByteArray, success: Boolean) {
-        Logger.i("Direct send result received. Success: $success")
-        val txId = BigInteger(1, bytes)
-        GlobalScope.launch { listenerAdapter?.onDirectSendResult(txId, success) }
-    }
-
-    fun onStoreAndForwardSendResult(bytes: ByteArray, success: Boolean) {
-        Logger.i("Store and forward send result received. Success: $success")
-        val txId = BigInteger(1, bytes)
-        GlobalScope.launch { listenerAdapter?.onStoreAndForwardSendResult(txId, success) }
+        GlobalScope.launch { listenerAdapter?.onTxMined(completed) }
     }
 
     fun onTxCancelled(completedTx: FFICompletedTxPtr) {
@@ -532,6 +520,18 @@ internal class FFIWallet(
         )
         tx.destroy()
         GlobalScope.launch { listenerAdapter?.onTxCancelled(cancelled) }
+    }
+
+    fun onDirectSendResult(bytes: ByteArray, success: Boolean) {
+        Logger.i("Direct send result received. Success: $success")
+        val txId = BigInteger(1, bytes)
+        GlobalScope.launch { listenerAdapter?.onDirectSendResult(txId, success) }
+    }
+
+    fun onStoreAndForwardSendResult(bytes: ByteArray, success: Boolean) {
+        Logger.i("Store and forward send result received. Success: $success")
+        val txId = BigInteger(1, bytes)
+        GlobalScope.launch { listenerAdapter?.onStoreAndForwardSendResult(txId, success) }
     }
 
     private fun defineParticipantAndDirection(
@@ -563,12 +563,6 @@ internal class FFIWallet(
         FFITxStatus.PENDING -> TxStatus.PENDING
         FFITxStatus.TX_NULL_ERROR -> TxStatus.TX_NULL_ERROR
         else -> TxStatus.UNKNOWN
-    }
-
-    fun onBaseNodeSyncComplete(bytes: ByteArray, success: Boolean) {
-        Logger.i("Base node sync complete. Success: $success")
-        val requestId = BigInteger(1, bytes)
-        GlobalScope.launch { listenerAdapter?.onBaseNodeSyncComplete(requestId, success) }
     }
 
     fun sendTx(
