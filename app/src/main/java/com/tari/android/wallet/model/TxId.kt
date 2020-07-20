@@ -85,6 +85,10 @@ class TxId() : Parcelable {
         return value == (other as? TxId)?.value
     }
 
+    override fun hashCode(): Int {
+        return value.hashCode()
+    }
+
     // endregion
 
 }

@@ -89,12 +89,12 @@ import javax.inject.Inject
 internal class TxDetailActivity : AppCompatActivity(), ServiceConnection {
 
     companion object {
-        const val TX_DETAIL_EXTRA_KEY = "TX_DETAIL_EXTRA_KEY"
+        const val TX_ID_EXTRA_KEY = "TX_DETAIL_EXTRA_KEY"
 
         fun createIntent(context: Context, transaction: Tx): Intent {
             return Intent(context, TxDetailActivity::class.java)
                 .apply {
-                    putExtra(TX_DETAIL_EXTRA_KEY, transaction)
+                    putExtra(TX_ID_EXTRA_KEY, TxId(transaction.id))
                 }
         }
     }
@@ -129,9 +129,6 @@ internal class TxDetailActivity : AppCompatActivity(), ServiceConnection {
         super.onCreate(savedInstanceState)
         ui = ActivityTxDetailBinding.inflate(layoutInflater).apply { setContentView(root) }
         overridePendingTransition(R.anim.enter_from_right, R.anim.exit_to_left)
-        tx =
-            if (savedInstanceState == null) intent.getParcelableExtra(TX_DETAIL_EXTRA_KEY) as Tx
-            else savedInstanceState.getParcelable(TX_DETAIL_EXTRA_KEY)!!
         setupUI()
         tracker.screen(path = "/home/tx_details", title = "Transaction Details")
     }
@@ -155,7 +152,7 @@ internal class TxDetailActivity : AppCompatActivity(), ServiceConnection {
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        outState.putParcelable(TX_DETAIL_EXTRA_KEY, this.tx)
+        outState.putParcelable(TX_ID_EXTRA_KEY, this.tx)
     }
 
     /**
@@ -163,8 +160,25 @@ internal class TxDetailActivity : AppCompatActivity(), ServiceConnection {
      */
     override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
         Logger.d("Connected to the wallet service (${System.currentTimeMillis()}).")
+        val walletService = TariWalletService.Stub.asInterface(service)
+        tx = findTxById(intent.getParcelableExtra(TX_ID_EXTRA_KEY) as TxId, walletService)
+        this.walletService = walletService
+        bindTxData()
+        observeTxUpdates()
         enableCTAs()
-        walletService = TariWalletService.Stub.asInterface(service)
+    }
+
+    private fun findTxById(id: TxId, walletService: TariWalletService): Tx {
+        return nullOnException { walletService.getPendingInboundTxById(id, WalletError()) }
+            ?: nullOnException { walletService.getPendingOutboundTxById(id, WalletError()) }
+            ?: nullOnException { walletService.getCompletedTxById(id, WalletError()) }
+            ?: walletService.getCancelledTxById(id, WalletError())
+    }
+
+    private fun <T> nullOnException(supplier: () -> T): T? = try {
+        supplier()
+    } catch (e: Exception) {
+        null
     }
 
     /**
@@ -172,6 +186,7 @@ internal class TxDetailActivity : AppCompatActivity(), ServiceConnection {
      */
     override fun onServiceDisconnected(name: ComponentName?) {
         Logger.d("Disconnected from the wallet service.")
+        EventBus.unsubscribe(this)
         disableCTAs()
         walletService = null
     }
@@ -184,14 +199,10 @@ internal class TxDetailActivity : AppCompatActivity(), ServiceConnection {
     private fun setupUI() {
         bindViews()
         setUICommands()
-        bindTxData()
-        observeTxUpdates()
+        disableCTAs()
     }
 
     private fun bindViews() {
-        if (this.walletService == null) {
-            disableCTAs()
-        }
         dimmerViews = mutableListOf(ui.topDimmerView, ui.bottomDimmerView)
         currentTextSize = dimen(add_amount_element_text_size)
         currentAmountGemSize = dimen(add_amount_gem_size)
@@ -357,8 +368,9 @@ internal class TxDetailActivity : AppCompatActivity(), ServiceConnection {
     private fun updateTxData(tx: Tx) {
         //  Main thread invocation is necessary due to happens-before relationship guarantee
         Handler(Looper.getMainLooper()).post {
-            if (tx.id == this.tx.id) {
-                Log.i("Debug", "Updating TX\nOld: ${this.tx}\nNew: $tx")
+            val currentTx = this.tx
+            if (tx.id == currentTx.id) {
+                Log.i("Debug", "Updating TX\nOld: $currentTx\nNew: $tx")
                 this.tx = tx
                 bindTxData()
             }
@@ -583,11 +595,12 @@ internal class TxDetailActivity : AppCompatActivity(), ServiceConnection {
     }
 
     private fun removeContact() {
-        val contact = tx.user as? Contact ?: return
+        val currentTx = tx
+        val contact = currentTx.user as? Contact ?: return
         val error = WalletError()
         walletService?.removeContact(contact, error)
         if (error.code == WalletErrorCode.NO_ERROR) {
-            tx.user = User(contact.publicKey)
+            currentTx.user = User(contact.publicKey)
             EventBus.post(Event.Contact.ContactRemoved(contact.publicKey))
         } else {
             TODO("Unhandled wallet error: ${error.code}")
