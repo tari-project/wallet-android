@@ -46,7 +46,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
-import android.widget.EditText
 import android.widget.TextView
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
@@ -57,10 +56,6 @@ import com.tari.android.wallet.R.string.*
 import com.tari.android.wallet.databinding.FragmentChangeSecurePasswordBinding
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.infrastructure.backup.*
-import com.tari.android.wallet.infrastructure.backup.BackupManager
-import com.tari.android.wallet.infrastructure.backup.BackupOutOfDate
-import com.tari.android.wallet.infrastructure.backup.BackupState
-import com.tari.android.wallet.infrastructure.backup.BackupUpToDate
 import com.tari.android.wallet.ui.activity.settings.SettingsRouter
 import com.tari.android.wallet.ui.dialog.ErrorDialog
 import com.tari.android.wallet.ui.extension.*
@@ -173,23 +168,31 @@ framework for UI tree rebuild on configuration changes"""
         val passwordTextFieldListener = View.OnFocusChangeListener { _, _ ->
             // password
             if (!ui.enterPasswordEditText.hasFocus()
-                && !passwordIsLongEnough()) {
+                && !passwordIsLongEnough()
+            ) {
                 setPasswordTooShortErrorState()
             } else {
                 setPlainInputState(
                     ui.passwordTooShortLabelView,
-                    ui.enterPasswordEditText
+                    listOf(
+                        ui.enterPasswordEditText,
+                        ui.enterPasswordLabelTextView
+                    )
                 )
             }
             // confirm
             if (!ui.confirmPasswordEditText.hasFocus()
                 && passwordIsLongEnough()
-                && !doPasswordsMatch()) {
+                && !doPasswordsMatch()
+            ) {
                 setPasswordMatchErrorState()
             } else {
                 setPlainInputState(
                     ui.passwordsNotMatchLabelView,
-                    ui.confirmPasswordEditText
+                    listOf(
+                        ui.confirmPasswordEditText,
+                        ui.confirmPasswordLabelTextView
+                    )
                 )
             }
         }
@@ -210,18 +213,22 @@ framework for UI tree rebuild on configuration changes"""
         val passwordIsLongEnough = passwordIsLongEnough()
         val passwordsMatch = doPasswordsMatch()
         if (passwordsMatch || trigger.isNullOrEmpty()) {
-            val enabled = areTextFieldsFilled() && passwordIsLongEnough && passwordsMatch
-            setVerifyButtonState(
-                isEnabled = enabled
-            )
-            if (enabled) {
+            val canChangePassword = areTextFieldsFilled() && passwordIsLongEnough && passwordsMatch
+            setVerifyButtonState(isEnabled = canChangePassword)
+            if (canChangePassword) {
                 setPlainInputState(
                     ui.passwordTooShortLabelView,
-                    ui.enterPasswordEditText
+                    listOf(
+                        ui.enterPasswordEditText,
+                        ui.enterPasswordLabelTextView
+                    )
                 )
                 setPlainInputState(
                     ui.passwordsNotMatchLabelView,
-                    ui.confirmPasswordEditText
+                    listOf(
+                        ui.confirmPasswordEditText,
+                        ui.confirmPasswordLabelTextView
+                    )
                 )
             }
         } else if (errorCondition) {
@@ -238,18 +245,20 @@ framework for UI tree rebuild on configuration changes"""
     private fun doPasswordsMatch() =
         ui.confirmPasswordEditText.text?.toString() == ui.enterPasswordEditText.text?.toString()
 
-    private fun setPlainInputState(textView: TextView, editText: EditText) {
-        textView.gone()
-        editText.setTextColor(color(black))
+    private fun setPlainInputState(errorLabel: TextView, inputTextViews: Iterable<TextView>) {
+        errorLabel.gone()
+        inputTextViews.forEach { it.setTextColor(color(black)) }
     }
 
     private fun setPasswordTooShortErrorState() {
         ui.passwordTooShortLabelView.visible()
+        ui.enterPasswordLabelTextView.setTextColor(color(common_error))
         ui.enterPasswordEditText.setTextColor(color(common_error))
     }
 
     private fun setPasswordMatchErrorState() {
         ui.passwordsNotMatchLabelView.visible()
+        ui.confirmPasswordLabelTextView.setTextColor(color(common_error))
         ui.confirmPasswordEditText.setTextColor(color(common_error))
     }
 
