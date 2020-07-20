@@ -247,30 +247,16 @@ internal class WalletService : Service(), FFIWalletListenerAdapter, LifecycleObs
         }
     }
 
-    override fun onTxBroadcast(completedTx: CompletedTx) {
-        Logger.d("Tx ${completedTx.id} broadcast.")
-        completedTx.user = getUserByPublicKey(completedTx.user.publicKey)
-        // post event to bus for the internal listeners
-        EventBus.post(Event.Wallet.TxBroadcast(completedTx))
+    override fun onBaseNodeSyncComplete(requestId: BigInteger, success: Boolean) {
+        Logger.d("Request $requestId base node sync complete. Success: $success")
+        // post event to bus
+        EventBus.post(Event.Wallet.BaseNodeSyncComplete(RequestId(requestId), success))
         // notify external listeners
         listeners.iterator().forEach {
-            it.onTxBroadcast(completedTx)
+            it.onBaseNodeSyncComplete(RequestId(requestId), success)
         }
-        // schedule a backup
-        backupManager.scheduleBackup(resetRetryCount = true)
-    }
-
-    override fun onTxMined(completedTx: CompletedTx) {
-        Logger.d("Tx ${completedTx.id} mined.")
-        completedTx.user = getUserByPublicKey(completedTx.user.publicKey)
-        // post event to bus for the internal listeners
-        EventBus.post(Event.Wallet.TxMined(completedTx))
-        // notify external listeners
-        listeners.iterator().forEach {
-            it.onTxMined(completedTx)
-        }
-        // schedule a backup
-        backupManager.scheduleBackup(resetRetryCount = true)
+        // add the next base node from the list if sync has failed
+        if (!success) walletManager.setNextBaseNode()
     }
 
     override fun onTxReceived(pendingInboundTx: PendingInboundTx) {
@@ -286,27 +272,66 @@ internal class WalletService : Service(), FFIWalletListenerAdapter, LifecycleObs
         backupManager.scheduleBackup(resetRetryCount = true)
     }
 
-    override fun onTxReplyReceived(completedTx: CompletedTx) {
-        Logger.d("Tx ${completedTx.id} reply received.")
-        completedTx.user = getUserByPublicKey(completedTx.user.publicKey)
+    override fun onTxReplyReceived(pendingOutboundTx: PendingOutboundTx) {
+        Logger.d("Tx ${pendingOutboundTx.id} reply received.")
+        pendingOutboundTx.user = getUserByPublicKey(pendingOutboundTx.user.publicKey)
         // post event to bus for the internal listeners
-        EventBus.post(Event.Wallet.TxReplyReceived(completedTx))
+        EventBus.post(Event.Wallet.TxReplyReceived(pendingOutboundTx))
         // notify external listeners
         listeners.iterator().forEach {
-            it.onTxReplyReceived(completedTx)
+            it.onTxReplyReceived(pendingOutboundTx)
         }
         // schedule a backup
         backupManager.scheduleBackup(resetRetryCount = true)
     }
 
-    override fun onTxFinalized(completedTx: CompletedTx) {
-        Logger.d("Tx ${completedTx.id} finalized.")
-        completedTx.user = getUserByPublicKey(completedTx.user.publicKey)
+    override fun onTxFinalized(pendingInboundTx: PendingInboundTx) {
+        Logger.d("Tx ${pendingInboundTx.id} finalized.")
+        pendingInboundTx.user = getUserByPublicKey(pendingInboundTx.user.publicKey)
         // post event to bus for the internal listeners
-        EventBus.post(Event.Wallet.TxFinalized(completedTx))
+        EventBus.post(Event.Wallet.TxFinalized(pendingInboundTx))
         // notify external listeners
         listeners.iterator().forEach {
-            it.onTxFinalized(completedTx)
+            it.onTxFinalized(pendingInboundTx)
+        }
+        // schedule a backup
+        backupManager.scheduleBackup(resetRetryCount = true)
+    }
+
+    override fun onInboundTxBroadcast(pendingInboundTx: PendingInboundTx) {
+        Logger.d("Inbound tx ${pendingInboundTx.id} broadcast.")
+        pendingInboundTx.user = getUserByPublicKey(pendingInboundTx.user.publicKey)
+        // post event to bus for the internal listeners
+        EventBus.post(Event.Wallet.InboundTxBroadcast(pendingInboundTx))
+        // notify external listeners
+        listeners.iterator().forEach {
+            it.onInboundTxBroadcast(pendingInboundTx)
+        }
+        // schedule a backup
+        backupManager.scheduleBackup(resetRetryCount = true)
+    }
+
+    override fun onOutboundTxBroadcast(pendingOutboundTx: PendingOutboundTx) {
+        Logger.d("Outbound tx ${pendingOutboundTx.id} broadcast.")
+        pendingOutboundTx.user = getUserByPublicKey(pendingOutboundTx.user.publicKey)
+        // post event to bus for the internal listeners
+        EventBus.post(Event.Wallet.OutboundTxBroadcast(pendingOutboundTx))
+        // notify external listeners
+        listeners.iterator().forEach {
+            it.onOutboundTxBroadcast(pendingOutboundTx)
+        }
+        // schedule a backup
+        backupManager.scheduleBackup(resetRetryCount = true)
+    }
+
+    override fun onTxMined(completedTx: CompletedTx) {
+        Logger.d("Tx ${completedTx.id} mined.")
+        completedTx.user = getUserByPublicKey(completedTx.user.publicKey)
+        // post event to bus for the internal listeners
+        EventBus.post(Event.Wallet.TxMined(completedTx))
+        // notify external listeners
+        listeners.iterator().forEach {
+            it.onTxMined(completedTx)
         }
         // schedule a backup
         backupManager.scheduleBackup(resetRetryCount = true)
@@ -359,21 +384,9 @@ internal class WalletService : Service(), FFIWalletListenerAdapter, LifecycleObs
             Logger.i("Posting cancellation notification")
             notificationHelper.postTxCanceledNotification(cancelledTx)
         }
-        listeners.iterator().forEach { listener -> listener.onTxCancellation(cancelledTx) }
+        listeners.iterator().forEach { listener -> listener.onTxCancelled(cancelledTx) }
         // schedule a backup
         backupManager.scheduleBackup(resetRetryCount = true)
-    }
-
-    override fun onBaseNodeSyncComplete(requestId: BigInteger, success: Boolean) {
-        Logger.d("Request $requestId base node sync complete. Success: $success")
-        // post event to bus
-        EventBus.post(Event.Wallet.BaseNodeSyncComplete(RequestId(requestId), success))
-        // notify external listeners
-        listeners.iterator().forEach {
-            it.onBaseNodeSyncComplete(RequestId(requestId), success)
-        }
-        // add the next base node from the list if sync has failed
-        if (!success) walletManager.setNextBaseNode()
     }
 
     /**

@@ -392,8 +392,11 @@ internal class HomeActivity : AppCompatActivity(),
         EventBus.subscribe<Event.Wallet.TxFinalized>(this) {
             onTxFinalized(it.tx)
         }
-        EventBus.subscribe<Event.Wallet.TxBroadcast>(this) {
-            onTxBroadcast(it.tx)
+        EventBus.subscribe<Event.Wallet.InboundTxBroadcast>(this) {
+            onInboundTxBroadcast(it.tx)
+        }
+        EventBus.subscribe<Event.Wallet.OutboundTxBroadcast>(this) {
+            onOutboundTxBroadcast(it.tx)
         }
         EventBus.subscribe<Event.Wallet.TxMined>(this) {
             onTxMined(it.tx)
@@ -517,19 +520,24 @@ internal class HomeActivity : AppCompatActivity(),
         currentDialog = dialog.also { it.show() }
     }
 
-    private fun onTxReplyReceived(tx: CompletedTx) {
+    private fun onTxReplyReceived(tx: PendingOutboundTx) {
         // just update data - no UI change required
         pendingOutboundTxs.firstOrNull { it.id == tx.id }?.status = tx.status
     }
 
-    private fun onTxFinalized(tx: CompletedTx) {
+    private fun onTxFinalized(tx: PendingInboundTx) {
         // just update data - no UI change required
         pendingInboundTxs.firstOrNull { it.id == tx.id }?.status = tx.status
     }
 
-    private fun onTxBroadcast(tx: CompletedTx) {
+    private fun onInboundTxBroadcast(tx: PendingInboundTx) {
         // just update data - no UI change required
         pendingInboundTxs.firstOrNull { it.id == tx.id }?.status = TxStatus.BROADCAST
+    }
+
+    private fun onOutboundTxBroadcast(tx: PendingOutboundTx) {
+        // just update data - no UI change required
+        pendingOutboundTxs.firstOrNull { it.id == tx.id }?.status = TxStatus.BROADCAST
     }
 
     private fun onTxMined(tx: CompletedTx) {
