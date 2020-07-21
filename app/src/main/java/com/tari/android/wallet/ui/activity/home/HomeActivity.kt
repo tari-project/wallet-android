@@ -470,7 +470,7 @@ internal class HomeActivity : AppCompatActivity(),
                 inboundNonFaucetTransactionsCount >= 4
                         && tarisAmount > BigDecimal("8000")
                         && !sharedPrefsWrapper.backupIsEnabled -> showRepeatedBackUpPrompt()
-                inboundNonFaucetTransactionsCount >= 3
+                inboundNonFaucetTransactionsCount >= 1
                         && !sharedPrefsWrapper.backupIsEnabled -> showInitialBackupPrompt()
             }
         }
