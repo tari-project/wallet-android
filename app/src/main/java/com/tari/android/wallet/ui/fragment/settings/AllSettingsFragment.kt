@@ -49,18 +49,9 @@ import com.tari.android.wallet.databinding.FragmentAllSettingsBinding
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.infrastructure.BugReportingService
 import com.tari.android.wallet.infrastructure.backup.*
-import com.tari.android.wallet.infrastructure.backup.BackupDisabled
-import com.tari.android.wallet.infrastructure.backup.BackupInProgress
-import com.tari.android.wallet.infrastructure.backup.BackupUpToDate
-import com.tari.android.wallet.infrastructure.backup.BackupCheckingStorage
 import com.tari.android.wallet.ui.activity.settings.SettingsRouter
 import com.tari.android.wallet.ui.dialog.ErrorDialog
 import com.tari.android.wallet.ui.extension.*
-import com.tari.android.wallet.ui.extension.appComponent
-import com.tari.android.wallet.ui.extension.gone
-import com.tari.android.wallet.ui.extension.invisible
-import com.tari.android.wallet.ui.extension.string
-import com.tari.android.wallet.ui.extension.visible
 import com.tari.android.wallet.ui.util.UiUtil.setColor
 import com.tari.android.wallet.util.SharedPrefsWrapper
 import kotlinx.coroutines.Dispatchers
@@ -133,31 +124,25 @@ UI tree rebuild on configuration changes"""
     private suspend fun checkStorageStatus() {
         try {
             backupManager.checkStorageStatus()
-        } catch (exception: Exception) {
-            when (exception) {
-                is BackupStorageAuthRevokedException -> {
-                    Logger.e("Backup storage auth error.")
-                    // show access revoked information
-                    withContext(Dispatchers.Main) {
-                        showBackupStorageCheckFailedDialog(
-                            string(check_backup_storage_status_auth_revoked_error_description)
-                        )
-                    }
-                }
-                is IOException -> { // connection problem
-                    Logger.e("Backup storage I/O (access) error.")
-                    withContext(Dispatchers.Main) {
-                        showBackupStorageCheckFailedDialog(
-                            string(check_backup_storage_status_access_error_description)
-                        )
-                    }
-                }
-                else -> {
-                    Logger.e("Backup storage tampered.")
-                    withContext(Dispatchers.Main) {
-                        updateLastSuccessfulBackupDate()
-                    }
-                }
+        } catch (e: BackupStorageAuthRevokedException) {
+            Logger.e("Backup storage auth error.")
+            // show access revoked information
+            withContext(Dispatchers.Main) {
+                showBackupStorageCheckFailedDialog(
+                    string(check_backup_storage_status_auth_revoked_error_description)
+                )
+            }
+        } catch (e: IOException) {
+            Logger.e("Backup storage I/O (access) error.")
+            withContext(Dispatchers.Main) {
+                showBackupStorageCheckFailedDialog(
+                    string(check_backup_storage_status_access_error_description)
+                )
+            }
+        } catch (e: Exception) {
+            Logger.e("Backup storage tampered.")
+            withContext(Dispatchers.Main) {
+                updateLastSuccessfulBackupDate()
             }
         }
     }
@@ -208,9 +193,9 @@ UI tree rebuild on configuration changes"""
                     updateLastSuccessfulBackupDate()
                     if (sharedPrefs.backupFailureDate == null) {
                         activateBackupStatusView(
-                            ui.cloudBackupStatusSuccessView,
+                            ui.cloudBackupStatusScheduledView,
                             back_up_wallet_backup_status_scheduled,
-                            all_settings_back_up_status_processing
+                            all_settings_back_up_status_scheduled
                         )
                     } else {
                         activateBackupStatusView(
@@ -255,6 +240,7 @@ UI tree rebuild on configuration changes"""
         ui.cloudBackupStatusProgressView.adjustVisibility()
         ui.cloudBackupStatusSuccessView.adjustVisibility()
         ui.cloudBackupStatusWarningView.adjustVisibility()
+        ui.cloudBackupStatusScheduledView.adjustVisibility()
         val hideText = textId == -1
         ui.backupStatusTextView.text = if (hideText) "" else string(textId)
         ui.backupStatusTextView.visibility = if (hideText) View.GONE else View.VISIBLE
