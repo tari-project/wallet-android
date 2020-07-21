@@ -49,6 +49,7 @@ import androidx.core.animation.addListener
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import com.orhanobut.logger.Logger
+import com.tari.android.wallet.R
 import com.tari.android.wallet.R.color.*
 import com.tari.android.wallet.R.string.*
 import com.tari.android.wallet.databinding.FragmentWalletBackupSettingsBinding
@@ -56,6 +57,7 @@ import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.infrastructure.backup.*
 import com.tari.android.wallet.infrastructure.security.biometric.BiometricAuthenticationService
 import com.tari.android.wallet.ui.activity.settings.SettingsRouter
+import com.tari.android.wallet.ui.dialog.BottomSlideDialog
 import com.tari.android.wallet.ui.dialog.ErrorDialog
 import com.tari.android.wallet.ui.extension.*
 import com.tari.android.wallet.ui.util.UiUtil.setColor
@@ -265,14 +267,38 @@ framework for UI tree rebuild on configuration changes"""
             if (isChecked) {
                 backupManager.setupStorage(this)
             } else {
-                lifecycleScope.launch(Dispatchers.IO) {
-                    try {
-                        backupManager.turnOff()
-                    } catch (ignored: Exception) { /* no-op */
-                    }
-                }
+                showBackupsWillBeDeletedDialog(
+                    onAccept = {
+                        lifecycleScope.launch(Dispatchers.IO) {
+                            try {
+                                backupManager.turnOff()
+                            } catch (ignored: Exception) { /* no-op */
+                            }
+                        }
+                    }, onDismiss = {
+                        showSwitchAndHideProgressBar(switchIsChecked = true)
+                    })
             }
         }
+    }
+
+    private fun showBackupsWillBeDeletedDialog(onAccept: () -> Unit, onDismiss: () -> Unit) {
+        BottomSlideDialog(
+            requireContext(),
+            R.layout.dialog_turn_off_backups_will_be_deleted_warning,
+            canceledOnTouchOutside = false
+        ).apply {
+            findViewById<View>(R.id.backup_turn_off_confirm_button)
+                .setOnClickListener(ThrottleClick {
+                    onAccept()
+                    dismiss()
+                })
+            findViewById<View>(R.id.backup_turn_off_cancel_button)
+                .setOnClickListener(ThrottleClick {
+                    onDismiss()
+                    dismiss()
+                })
+        }.show()
     }
 
     private fun enableUpdatePasswordCTA() {

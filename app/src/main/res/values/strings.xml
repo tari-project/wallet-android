@@ -317,6 +317,8 @@
     <string name="back_up_wallet_backing_up_unknown_error">Unknown error</string>
     <string name="back_up_wallet_status_check_authentication_cancellation">Authentication was cancelled</string>
     <string name="back_up_wallet_last_successful_backup">Last successful backup: %s at %s</string>
+    <string name="back_up_wallet_turn_off_backup_warning_title">Your backups will be deleted</string>
+    <string name="back_up_wallet_turn_off_backup_warning_description">Are you sure you want to proceed?</string>
 
     <!-- Wallet back up with seed phrase -->
     <string name="back_up_seed_phrase_page_title">Back Up With Seed Phrase</string>
