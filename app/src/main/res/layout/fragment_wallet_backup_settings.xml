@@ -85,8 +85,9 @@
             android:background="@color/white"
             android:clickable="true"
             android:focusable="true"
-            android:paddingHorizontal="26dp"
-            android:paddingVertical="24dp">
+            android:paddingVertical="24dp"
+            android:paddingStart="26dp"
+            android:paddingEnd="16dp">
 
             <com.tari.android.wallet.ui.component.CustomFontTextView
                 android:layout_width="wrap_content"
@@ -115,10 +116,11 @@
                     android:id="@+id/backup_permission_progress_bar"
                     android:layout_width="0dp"
                     android:layout_height="0dp"
+                    android:layout_marginEnd="4dp"
                     android:visibility="gone"
                     app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintDimensionRatio="1:1"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
             </androidx.constraintlayout.widget.ConstraintLayout>
 
