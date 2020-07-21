@@ -241,6 +241,7 @@ internal class BackupManager(
             /* no-op */
             Logger.e(
                 exception,
+                // TODO(nyarian): but why ignoring this?
                 "Ignored exception while deleting all backup files: $exception"
             )
         }
