@@ -1,7 +1,6 @@
 name: PR Test Workflow
 on:
   pull_request:
-    types: [review_requested, ready_for_review]
     branches:
       - master
       - development
