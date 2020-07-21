@@ -119,25 +119,19 @@ internal class BackupManager(
             } else {
                 EventBus.postBackupState(BackupUpToDate)
             }
-        } catch (exception: Exception) {
-            Logger.e(exception, "Error while checking storage. %s", exception.toString())
-            when (exception) {
-                is BackupStorageAuthRevokedException -> {
-                    sharedPrefs.lastSuccessfulBackupDate = null
-                    sharedPrefs.backupPassword = null
-                    sharedPrefs.localBackupFolderURI = null
-                    sharedPrefs.scheduledBackupDate = null
-                    sharedPrefs.backupFailureDate = null
-                    EventBus.postBackupState(BackupDisabled)
-                }
-                is BackupStorageTamperedException -> {
-                    EventBus.postBackupState(BackupOutOfDate(exception))
-                }
-                else -> {
-                    EventBus.postBackupState(BackupStorageCheckFailed)
-                }
-            }
-            throw exception
+        } catch (e: BackupStorageAuthRevokedException) {
+            sharedPrefs.lastSuccessfulBackupDate = null
+            sharedPrefs.backupPassword = null
+            sharedPrefs.localBackupFolderURI = null
+            sharedPrefs.scheduledBackupDate = null
+            sharedPrefs.backupFailureDate = null
+            EventBus.postBackupState(BackupDisabled)
+        }  catch (e: BackupStorageTamperedException) {
+            EventBus.postBackupState(BackupOutOfDate(e))
+        } catch (e: Exception) {
+            Logger.e(e, "Error while checking storage. %s", e.toString())
+            EventBus.postBackupState(BackupStorageCheckFailed)
+            throw e
         }
     }
 
@@ -231,6 +225,7 @@ internal class BackupManager(
         }
     }
 
+    // TODO(nyarian): TBD - should side effects be separated from the direct flow?
     suspend fun turnOff() {
         sharedPrefs.lastSuccessfulBackupDate = null
         sharedPrefs.backupFailureDate = null

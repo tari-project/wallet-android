@@ -124,18 +124,10 @@ internal class GoogleDriveBackupStorage(
         intent: Intent?
     ) {
         when (requestCode) {
-            REQUEST_CODE_SIGN_IN -> {
-                when (resultCode) {
-                    Activity.RESULT_OK -> {
-                        drive = getDrive(intent)
-                    }
-                    Activity.RESULT_CANCELED -> {
-                        throw BackupStorageSetupCancelled()
-                    }
-                    else -> {
-                        throw BackupStorageSetupException("Google Drive setup error.")
-                    }
-                }
+            REQUEST_CODE_SIGN_IN -> when (resultCode) {
+                Activity.RESULT_OK -> drive = getDrive(intent)
+                Activity.RESULT_CANCELED -> throw BackupStorageSetupCancelled()
+                else -> throw BackupStorageSetupException("Google Drive setup error.")
             }
         }
     }
