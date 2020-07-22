@@ -153,6 +153,7 @@ framework for UI tree rebuild on configuration changes"""
             when(exception) {
                 is BackupStorageAuthRevokedException -> {
                     Logger.e(exception, "Auth revoked.")
+                    backupStorage.signOut()
                     withContext(Dispatchers.Main) {
                         endProgress()
                         showAuthFailedDialog()
@@ -160,6 +161,7 @@ framework for UI tree rebuild on configuration changes"""
                 }
                 is BackupStorageTamperedException -> { // backup file not found
                     Logger.e(exception, "Backup file not found.")
+                    backupStorage.signOut()
                     withContext(Dispatchers.Main) {
                         endProgress()
                         showBackupFileNotFoundDialog()
@@ -171,6 +173,7 @@ framework for UI tree rebuild on configuration changes"""
                 }
                 is IOException -> {
                     Logger.e(exception, "Restore failed: network connection.")
+                    backupStorage.signOut()
                     withContext(Dispatchers.Main) {
                         endProgress()
                         showRestoreFailedDialog(string(error_no_connection_title))
@@ -178,14 +181,13 @@ framework for UI tree rebuild on configuration changes"""
                 }
                 else -> {
                     Logger.e(exception, "Restore failed: $exception")
+                    backupStorage.signOut()
                     withContext(Dispatchers.Main) {
                         endProgress()
                         showRestoreFailedDialog(exception.message)
                     }
                 }
             }
-        } finally {
-            backupStorage.signOut()
         }
     }
 

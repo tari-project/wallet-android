@@ -990,8 +990,7 @@ internal class HomeActivity : AppCompatActivity(),
      */
     private fun onStoreButtonClicked(view: View) {
         UiUtil.temporarilyDisableClick(view)
-        // showTTLStoreDialog()
-        backupManager.scheduleBackup()
+        showTTLStoreDialog()
     }
 
     /**

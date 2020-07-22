@@ -182,6 +182,10 @@ internal class LocalBackupStorage(
             }
             backupFileProcessor.restoreBackupFile(tempFile, password)
             backupFileProcessor.clearTempFolder()
+            // restore successful, turn on automated backup
+            sharedPrefs.localBackupFolderURI = backupFolderURI
+            sharedPrefs.lastSuccessfulBackupDate = BackupNamingPolicy.getDateFromBackupFileName(tempFile.name)
+            sharedPrefs.backupPassword = password?.toCharArray()
         }
     }
 
