@@ -160,6 +160,9 @@ framework for UI tree rebuild on configuration changes"""
         ui.cloudBackupStatusProgressView.setColor(color(all_settings_back_up_status_processing))
         ui.backupPermissionSwitch.isChecked = sharedPrefs.backupIsEnabled
         backupOptionsAreVisible = if (sharedPrefs.backupIsEnabled) {
+            if (EventBus.currentBackupState() is BackupUpToDate) {
+                ui.backupWalletToCloudCtaContainerView.gone()
+            }
             updatePasswordChangeLabel()
             updateLastSuccessfulBackupDate()
             true
@@ -348,9 +351,7 @@ framework for UI tree rebuild on configuration changes"""
     }
 
     private fun showBackupOptionsWithAnimation() {
-        if (backupOptionsAreVisible) {
-            return
-        }
+        if (backupOptionsAreVisible) return
         val views = arrayOf(
             ui.backupsSeparatorView,
             ui.updatePasswordCtaView,
@@ -372,7 +373,17 @@ framework for UI tree rebuild on configuration changes"""
                         v.alpha = ALPHA_INVISIBLE
                     }
                 },
-                onCancel = { views.forEach { v -> v.alpha = ALPHA_VISIBLE } }
+                onCancel = {
+                    views.forEach { v -> v.alpha = ALPHA_VISIBLE }
+                    if (EventBus.currentBackupState() is BackupUpToDate) {
+                        animateBackupButtonUnavailability()
+                    }
+                },
+                onEnd = {
+                    if (EventBus.currentBackupState() is BackupUpToDate) {
+                        animateBackupButtonUnavailability()
+                    }
+                }
             )
             start()
         }
@@ -380,9 +391,7 @@ framework for UI tree rebuild on configuration changes"""
     }
 
     private fun hideAllBackupOptionsWithAnimation() {
-        if (!backupOptionsAreVisible) {
-            return
-        }
+        if (!backupOptionsAreVisible) return
         val views = arrayOf(
             ui.backupsSeparatorView,
             ui.updatePasswordCtaView,
@@ -469,6 +478,54 @@ framework for UI tree rebuild on configuration changes"""
             .show()
     }
 
+    private fun animateBackupButtonAvailability() {
+        val animation = optionsAnimation
+        if (backupOptionsAreVisible &&
+            ui.backupWalletToCloudCtaContainerView.visibility != View.VISIBLE &&
+            (animation == null || !animation.isRunning)
+        ) {
+            optionsAnimation = ValueAnimator.ofFloat(ALPHA_INVISIBLE, ALPHA_VISIBLE).apply {
+                duration = OPTIONS_ANIMATION_DURATION
+                interpolator = LinearInterpolator()
+                addUpdateListener {
+                    ui.backupWalletToCloudCtaContainerView.alpha = it.animatedValue as Float
+                }
+                addListener(
+                    onStart = {
+                        ui.backupWalletToCloudCtaContainerView.alpha = ALPHA_INVISIBLE
+                        ui.backupWalletToCloudCtaContainerView.visible()
+                    }
+                )
+                start()
+            }
+        }
+    }
+
+    private fun animateBackupButtonUnavailability() {
+        val animation = optionsAnimation
+        if (ui.backupWalletToCloudCtaContainerView.visibility != View.GONE &&
+            (animation == null || !animation.isRunning)
+        ) {
+            optionsAnimation = ValueAnimator.ofFloat(ALPHA_VISIBLE, ALPHA_INVISIBLE).apply {
+                duration = OPTIONS_ANIMATION_DURATION
+                interpolator = LinearInterpolator()
+                addUpdateListener {
+                    ui.backupWalletToCloudCtaContainerView.alpha = it.animatedValue as Float
+                }
+                addListener(
+                    onStart = { ui.backupWalletToCloudCtaContainerView.alpha = ALPHA_VISIBLE },
+                    onEnd = { ui.backupWalletToCloudCtaContainerView.gone() },
+                    onCancel = { ui.backupWalletToCloudCtaContainerView.gone() }
+                )
+                start()
+            }
+        }
+    }
+
+    // endregion
+
+    // region Backup state changes processing
+
     private fun subscribeToBackupState() {
         EventBus.subscribeToBackupState(this) { backupState ->
             lifecycleScope.launch(Dispatchers.Main) {
@@ -477,9 +534,6 @@ framework for UI tree rebuild on configuration changes"""
         }
     }
 
-    // endregion
-
-    // region Backup state changes processing
     private fun onBackupStateChanged(backupState: BackupState) {
         resetStatusIcons()
         when (backupState) {
@@ -500,6 +554,7 @@ framework for UI tree rebuild on configuration changes"""
             }
             showSwitchAndHideProgressBar(switchIsChecked = true)
             ui.backupWalletToCloudCtaView.isEnabled = true
+            animateBackupButtonAvailability()
             ui.backupNowTextView.alpha = ALPHA_VISIBLE
             disableUpdatePasswordCTA()
             activateBackupStatusView(
@@ -520,6 +575,7 @@ framework for UI tree rebuild on configuration changes"""
         enableUpdatePasswordCTA()
         updatePasswordChangeLabel()
         ui.backupWalletToCloudCtaView.isEnabled = false
+        animateBackupButtonUnavailability()
         ui.backupNowTextView.alpha = ALPHA_DISABLED
         activateBackupStatusView(
             ui.cloudBackupStatusSuccessView,
@@ -531,6 +587,7 @@ framework for UI tree rebuild on configuration changes"""
     private fun handleInProgressState() {
         hideSwitchAndShowProgressBar(switchIsChecked = true)
         ui.backupWalletToCloudCtaView.isEnabled = false
+        animateBackupButtonAvailability()
         ui.backupNowTextView.alpha = ALPHA_DISABLED
         disableUpdatePasswordCTA()
         activateBackupStatusView(
@@ -543,6 +600,7 @@ framework for UI tree rebuild on configuration changes"""
     private fun handleScheduledState() {
         showSwitchAndHideProgressBar(switchIsChecked = true)
         ui.backupWalletToCloudCtaView.isEnabled = true
+        animateBackupButtonAvailability()
         ui.backupNowTextView.alpha = ALPHA_VISIBLE
         enableUpdatePasswordCTA()
         if (sharedPrefs.backupFailureDate == null) {
@@ -564,6 +622,7 @@ framework for UI tree rebuild on configuration changes"""
         showSwitchAndHideProgressBar(switchIsChecked = true)
         updateLastSuccessfulBackupDate()
         ui.backupWalletToCloudCtaView.isEnabled = false
+        animateBackupButtonAvailability()
         ui.backupNowTextView.alpha = ALPHA_DISABLED
         activateBackupStatusView(
             icon = ui.cloudBackupStatusWarningView,
@@ -575,6 +634,7 @@ framework for UI tree rebuild on configuration changes"""
         hideSwitchAndShowProgressBar(switchIsChecked = true)
         updateLastSuccessfulBackupDate()
         ui.backupWalletToCloudCtaView.isEnabled = false
+        animateBackupButtonAvailability()
         ui.backupNowTextView.alpha = ALPHA_DISABLED
         disableUpdatePasswordCTA()
         activateBackupStatusView(
