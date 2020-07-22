@@ -256,7 +256,7 @@ internal class SendTariActivity : AppCompatActivity(),
                 fragment::class.java.simpleName
             )
             .addToBackStack(FinalizeSendTxFragment::class.java.simpleName)
-            .commit()
+            .commitAllowingStateLoss()
         currentFragmentWR = WeakReference(fragment)
     }
 
