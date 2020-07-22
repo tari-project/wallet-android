@@ -154,6 +154,8 @@ internal object EventBus {
 
     fun postBackupState(event: BackupState) = backupStateSubject.onNext(event)
 
+    fun currentBackupState() = backupStateSubject.value
+
     // endregion
 
 }
