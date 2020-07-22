@@ -43,6 +43,7 @@ import android.content.Intent.FLAG_ACTIVITY_CLEAR_TOP
 import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import androidx.core.app.TaskStackBuilder
 import com.orhanobut.logger.Logger
 import com.tari.android.wallet.R
 import com.tari.android.wallet.model.CancelledTx
@@ -117,7 +118,7 @@ internal class NotificationHelper(private val context: Context) {
         }
     }
 
-    private val getTxGroupNotification: Notification =
+    private val txGroupNotification: Notification =
         NotificationCompat.Builder(
             context,
             APP_NOTIFICATION_CHANNEL_ID
@@ -174,7 +175,7 @@ internal class NotificationHelper(private val context: Context) {
         // send group notification
         notificationManager.notify(
             APP_NOTIFICATION_GROUP_ID,
-            getTxGroupNotification
+            txGroupNotification
         )
         // send actual notification
         notificationManager.notify(
@@ -206,9 +207,49 @@ internal class NotificationHelper(private val context: Context) {
                 build()
             }
         // send group notification
-        notificationManager.notify(APP_NOTIFICATION_GROUP_ID, getTxGroupNotification)
+        notificationManager.notify(APP_NOTIFICATION_GROUP_ID, txGroupNotification)
         // send actual notification
         notificationManager.notify(tx.id.toInt(), notification)
+    }
+
+    /**
+     * Posts standard Android heads-up notification.
+     */
+    fun postNotification(title: String, body: String, intent: Intent? = null) {
+        // prepare notification
+        val notification: Notification = NotificationCompat.Builder(
+            context,
+            APP_NOTIFICATION_CHANNEL_ID
+        ).run {
+            setContentTitle(title)
+            setContentText(body)
+            setSmallIcon(R.drawable.notification_icon)
+            setDefaults(DEFAULT_ALL)
+            // setContentIntent(pendingIntent)
+            setGroup(APP_NOTIFICATION_GROUP_NAME)
+            setCategory(NotificationCompat.CATEGORY_EVENT)
+            priority = NotificationCompat.PRIORITY_MAX
+            build()
+        }
+        intent?.let {
+            notification.contentIntent = TaskStackBuilder.create(context).run {
+                // Add the intent, which inflates the back stack
+                addNextIntentWithParentStack(intent)
+                // Get the PendingIntent containing the entire back stack
+                getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT)
+            }
+        }
+
+
+        // send notification
+        notificationManager.notify(
+            APP_NOTIFICATION_GROUP_ID,
+            txGroupNotification
+        )
+        notificationManager.notify(
+            System.currentTimeMillis().toInt(),
+            notification
+        )
     }
 
 }

@@ -17,4 +17,7 @@
     <!-- Backup storage setup -->
     <string name="back_up_wallet_storage_setup_error_title">Local Storage Error</string>
     <string name="back_up_wallet_storage_setup_error_desc">Cannot access local storage.</string>
+    <!-- Backup storage full -->
+    <string name="backup_wallet_storage_full_title">Wallet Backup Incomplete</string>
+    <string name="backup_wallet_storage_full_desc">Your local storage is full.</string>
 </resources>

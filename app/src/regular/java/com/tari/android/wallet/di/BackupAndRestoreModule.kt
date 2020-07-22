@@ -35,6 +35,7 @@ package com.tari.android.wallet.di
 import android.content.Context
 import com.tari.android.wallet.infrastructure.backup.*
 import com.tari.android.wallet.infrastructure.backup.GoogleDriveBackupStorage
+import com.tari.android.wallet.notification.NotificationHelper
 import com.tari.android.wallet.util.SharedPrefsWrapper
 import dagger.Module
 import dagger.Provides
@@ -75,8 +76,10 @@ internal class BackupAndRestoreModule {
     @Provides
     @Singleton
     fun provideBackupManager(
+        context: Context,
         sharedPrefs: SharedPrefsWrapper,
-        backupStorage: BackupStorage
-    ): BackupManager = BackupManager(sharedPrefs, backupStorage)
+        backupStorage: BackupStorage,
+        notificationHelper: NotificationHelper
+    ): BackupManager = BackupManager(context, sharedPrefs, backupStorage, notificationHelper)
 
 }

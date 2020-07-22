@@ -32,10 +32,13 @@
  */
 package com.tari.android.wallet.infrastructure.backup
 
+import android.content.Context
 import android.content.Intent
 import androidx.fragment.app.Fragment
 import com.orhanobut.logger.Logger
+import com.tari.android.wallet.R
 import com.tari.android.wallet.event.EventBus
+import com.tari.android.wallet.notification.NotificationHelper
 import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.SharedPrefsWrapper
 import io.reactivex.Observable
@@ -45,12 +48,15 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import org.joda.time.DateTime
+import java.net.UnknownHostException
 import java.util.concurrent.TimeUnit
 import kotlin.math.max
 
 internal class BackupManager(
+    private val context: Context,
     private val sharedPrefs: SharedPrefsWrapper,
-    private val backupStorage: BackupStorage
+    private val backupStorage: BackupStorage,
+    private val notificationHelper: NotificationHelper
 ) {
 
     private var retryCount = 0
@@ -174,6 +180,7 @@ internal class BackupManager(
 
     suspend fun backup(
         isInitialBackup: Boolean = false,
+        userTriggered: Boolean = false,
         newPassword: CharArray? = null
     ) {
         if (!isInitialBackup && !sharedPrefs.backupIsEnabled) {
@@ -199,21 +206,30 @@ internal class BackupManager(
             Logger.d("Backup successful.")
             EventBus.postBackupState(BackupUpToDate)
         } catch (exception: Exception) {
-            if (isInitialBackup || exception is BackupStorageAuthRevokedException) {
+            if (isInitialBackup) {
                 turnOff()
                 retryCount = 0
                 throw exception
             }
-            if (retryCount > Constants.Wallet.maxBackupRetries) {
+            if (exception is BackupStorageAuthRevokedException) {
+                turnOff()
+                retryCount = 0
+                postBackupFailedNotification(exception)
+                throw exception
+            }
+            if (userTriggered || retryCount > Constants.Wallet.maxBackupRetries) {
                 Logger.e(
                     exception,
-                    "Error happened while backing up. It's an initial backup or retry limit has been exceeded."
+                    "Error happened while backing up. It's a user-triggered backup or retry limit has been exceeded."
                 )
                 EventBus.postBackupState(BackupOutOfDate(exception))
                 sharedPrefs.scheduledBackupDate = null
                 sharedPrefs.backupFailureDate = DateTime.now()
                 retryCount = 0
-                return
+                if (!userTriggered) { // post notification
+                    postBackupFailedNotification(exception)
+                }
+                throw exception
             } else {
                 Logger.e(exception, "Backup failed: ${exception.message}. Will schedule.")
                 scheduleBackup(
@@ -223,6 +239,28 @@ internal class BackupManager(
             }
             Logger.e(exception, "Error happened while backing up. Will retry.")
         }
+    }
+
+    private fun postBackupFailedNotification(exception: Exception) {
+        val title = when (exception) {
+            is BackupStorageFullException -> context.getString(R.string.backup_wallet_storage_full_title)
+            else -> context.getString(R.string.back_up_wallet_backing_up_error_title)
+        }
+        val body = when {
+            exception is BackupStorageFullException -> context.getString(
+                R.string.backup_wallet_storage_full_desc
+            )
+            exception is BackupStorageAuthRevokedException -> context.getString(
+                R.string.check_backup_storage_status_auth_revoked_error_description
+            )
+            exception is UnknownHostException -> context.getString(R.string.error_no_connection_title)
+            exception.message == null -> context.getString(R.string.back_up_wallet_backing_up_unknown_error)
+            else -> context.getString(R.string.back_up_wallet_backing_up_error_desc, exception.message!!)
+        }
+        notificationHelper.postNotification(
+            title = title,
+            body = body
+        )
     }
 
     // TODO(nyarian): TBD - should side effects be separated from the direct flow?

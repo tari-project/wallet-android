@@ -17,4 +17,7 @@
     <!-- Backup storage setup -->
     <string name="back_up_wallet_storage_setup_error_title">Google Drive Error</string>
     <string name="back_up_wallet_storage_setup_error_desc">Cannot access Google Drive. Please make sure you are connected to the internet and have given Aurora the necessary access permission.</string>
+    <!-- Backup storage full -->
+    <string name="backup_wallet_storage_full_title">Wallet Backup Incomplete</string>
+    <string name="backup_wallet_storage_full_desc">Your Google Drive is full.</string>
 </resources>

@@ -43,6 +43,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.Scope
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential
 import com.google.api.client.googleapis.extensions.android.gms.auth.UserRecoverableAuthIOException
+import com.google.api.client.googleapis.json.GoogleJsonResponseException
 import com.google.api.client.http.FileContent
 import com.google.api.client.http.javanet.NetHttpTransport
 import com.google.api.client.json.gson.GsonFactory
@@ -142,6 +143,13 @@ internal class GoogleDriveBackupStorage(
                 createBackupFile(backupFile, mimeType)
             } catch (exception: UserRecoverableAuthIOException) {
                 throw BackupStorageAuthRevokedException()
+            } catch(exception: GoogleJsonResponseException) {
+                for (error in exception.details.errors) {
+                    if (error.reason == "storageQuotaExceeded") {
+                        throw BackupStorageFullException()
+                    }
+                }
+                throw exception
             } catch (exception: Exception) {
                 throw exception
             }

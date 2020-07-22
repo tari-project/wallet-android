@@ -137,7 +137,7 @@ framework for UI tree rebuild on configuration changes"""
                 Logger.e("Backup storage setup failed: $exception")
                 backupManager.turnOff()
                 withContext(Dispatchers.Main) {
-                    showBackupStorageSetupFailedDialog()
+                    showBackupStorageSetupFailedDialog(exception)
                     showSwitchAndHideProgressBar(switchIsChecked = false)
                     blockingBackPressDispatcher.isEnabled = false
                 }
@@ -217,9 +217,11 @@ framework for UI tree rebuild on configuration changes"""
         ui.backupWalletToCloudCtaView.setOnClickListener(ThrottleClick {
             lifecycleScope.launch(Dispatchers.IO) {
                 try {
-                    backupManager.backup(isInitialBackup = false)
+                    backupManager.backup(isInitialBackup = false, userTriggered = true)
                 } catch (exception: Exception) {
-                    withContext(Dispatchers.Main) { showBackupFailureDialog(exception) }
+                    withContext(Dispatchers.Main) {
+                        showBackupFailureDialog(exception)
+                    }
                 }
             }
         })
@@ -429,11 +431,21 @@ framework for UI tree rebuild on configuration changes"""
         backupOptionsAreVisible = false
     }
 
-    private fun showBackupStorageSetupFailedDialog() {
+    private fun showBackupStorageSetupFailedDialog(exception: Exception? = null) {
+        val errorTitle = when (exception) {
+            is BackupStorageFullException -> string(backup_wallet_storage_full_title)
+            else -> string(back_up_wallet_storage_setup_error_title)
+        }
+        val errorDescription = when (exception) {
+            is BackupStorageFullException -> string(
+                backup_wallet_storage_full_desc
+            )
+            else -> string(back_up_wallet_storage_setup_error_desc)
+        }
         ErrorDialog(
             requireContext(),
-            title = string(back_up_wallet_storage_setup_error_title),
-            description = string(back_up_wallet_storage_setup_error_desc),
+            title = errorTitle,
+            description = errorDescription,
             onClose = ::resetSwitchState
         ).show()
     }
@@ -444,19 +456,26 @@ framework for UI tree rebuild on configuration changes"""
         ui.backupPermissionSwitch.visible()
     }
 
-    private fun showBackupFailureDialog(e: Exception?) {
-        val errorMessage = when {
-            e is BackupStorageAuthRevokedException -> string(
+    private fun showBackupFailureDialog(exception: Exception?) {
+        val errorTitle = when (exception) {
+            is BackupStorageFullException -> string(backup_wallet_storage_full_title)
+            else -> string(back_up_wallet_backing_up_error_title)
+        }
+        val errorDescription = when {
+            exception is BackupStorageFullException -> string(
+                backup_wallet_storage_full_desc
+            )
+            exception is BackupStorageAuthRevokedException -> string(
                 check_backup_storage_status_auth_revoked_error_description
             )
-            e is UnknownHostException -> string(error_no_connection_title)
-            e?.message == null -> string(back_up_wallet_backing_up_unknown_error)
-            else -> string(back_up_wallet_backing_up_error_desc, e.message!!)
+            exception is UnknownHostException -> string(error_no_connection_title)
+            exception?.message == null -> string(back_up_wallet_backing_up_unknown_error)
+            else -> string(back_up_wallet_backing_up_error_desc, exception.message!!)
         }
         ErrorDialog(
             requireContext(),
-            title = string(back_up_wallet_backing_up_error_title),
-            description = errorMessage
+            title = errorTitle,
+            description = errorDescription
         ).show()
     }
 
