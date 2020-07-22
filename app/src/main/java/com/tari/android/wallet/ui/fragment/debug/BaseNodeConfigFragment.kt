@@ -68,9 +68,12 @@ internal class BaseNodeConfigFragment : Fragment() {
     @Inject
     lateinit var sharedPrefsWrapper: SharedPrefsWrapper
 
-    private val clipboardRegex = Regex("[a-zA-Z0-9]{64}::/onion[2-3]/[a-zA-Z2-7]{56}(:[0-9]+)?")
+    private val onion2ClipboardRegex = Regex("[a-zA-Z0-9]{64}::/onion/[a-zA-Z2-7]{16}(:[0-9]+)?")
+    private val onion3ClipboardRegex = Regex("[a-zA-Z0-9]{64}::/onion[2-3]/[a-zA-Z2-7]{56}(:[0-9]+)?")
     private val publicKeyRegex = Regex("[a-zA-Z0-9]{64}")
-    private val addressRegex = Regex("/onion[2-3]/[a-zA-Z2-7]{56}(:[0-9]+)?")
+    private val onion2AddressRegex = Regex("/onion/[a-zA-Z2-7]{16}(:[0-9]+)?")
+    private val onion3AddressRegex = Regex("/onion[2-3]/[a-zA-Z2-7]{56}(:[0-9]+)?")
+
 
     private lateinit var ui: FragmentBaseNodeConfigBinding
 
@@ -131,7 +134,11 @@ internal class BaseNodeConfigFragment : Fragment() {
         val clipboardString =
             clipboardManager.primaryClip?.getItemAt(0)?.text?.toString() ?: return
         // if clipboard contains at least 1 emoji, then display paste emoji banner
-        if (clipboardRegex.matches(clipboardString)) {
+        if (onion3ClipboardRegex.matches(clipboardString)) {
+            val input = clipboardString.split("::")
+            ui.publicKeyHexEditText.setText(input[0])
+            ui.addressEditText.setText(input[1])
+        } else if (onion2ClipboardRegex.matches(clipboardString)) {
             val input = clipboardString.split("::")
             ui.publicKeyHexEditText.setText(input[0])
             ui.addressEditText.setText(input[1])
@@ -152,7 +159,7 @@ internal class BaseNodeConfigFragment : Fragment() {
         }
         // validate address
         val address = ui.addressEditText.editableText.toString()
-        if (!addressRegex.matches(address)) {
+        if (!onion3AddressRegex.matches(address) && !onion2AddressRegex.matches(address)) {
             isValid = false
             ui.addressEditText.background = drawable(base_node_config_edit_text_invalid_bg)
             ui.invalidAddressTextView.visible()
