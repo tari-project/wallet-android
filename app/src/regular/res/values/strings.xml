@@ -11,12 +11,12 @@
     <string name="enter_backup_password_page_desc_highlighted_part">you will not be able to recover your wallet</string>
 
     <!-- Backup storage status check -->
-    <string name="check_backup_storage_status_error_title">Google Drive Error</string>
-    <string name="check_backup_storage_status_auth_revoked_error_description">Google Drive permission has been revoked. Automated wallet backups turned off.</string>
+    <string name="check_backup_storage_status_error_title">Wallet Backup Incomplete</string>
+    <string name="check_backup_storage_status_auth_revoked_error_description">You are not signed into Google Drive.</string>
     <string name="check_backup_storage_status_access_error_description">Can\'t connect to Google Drive. Please check your internet connection.</string>
     <!-- Backup storage setup -->
-    <string name="back_up_wallet_storage_setup_error_title">Google Drive Error</string>
-    <string name="back_up_wallet_storage_setup_error_desc">Cannot access Google Drive. Please make sure you are connected to the internet and have given Aurora the necessary access permission.</string>
+    <string name="back_up_wallet_storage_setup_error_title">Wallet Backup Incomplete</string>
+    <string name="back_up_wallet_storage_setup_error_desc">You are not signed into Google Drive.</string>
     <!-- Backup storage full -->
     <string name="backup_wallet_storage_full_title">Wallet Backup Incomplete</string>
     <string name="backup_wallet_storage_full_desc">Your Google Drive is full.</string>
