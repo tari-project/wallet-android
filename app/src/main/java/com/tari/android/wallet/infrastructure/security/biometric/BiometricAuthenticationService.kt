@@ -38,6 +38,7 @@ import androidx.biometric.BiometricPrompt
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import java.util.concurrent.Executor
+import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.coroutines.Continuation
 import kotlin.coroutines.suspendCoroutine
 
@@ -92,7 +93,7 @@ class BiometricAuthenticationService(
         subtitle: CharSequence,
         deviceCredentialsAllowed: Boolean = true
     ): Boolean = suspendCoroutine {
-        provider(ContinuationAdapter(it)).authenticate(
+        provider(SingleSuccessOrErrorAdapterDecorator(ContinuationAdapter(it))).authenticate(
             BiometricPrompt.PromptInfo.Builder()
                 .setTitle(title)
                 .setSubtitle(subtitle)
@@ -111,6 +112,27 @@ class BiometricAuthenticationService(
             continuation.resumeWith(
                 Result.failure(BiometricAuthenticationException(errorCode, errString.toString()))
             )
+        }
+    }
+
+    private class SingleSuccessOrErrorAdapterDecorator(
+        private val decorated: BiometricPrompt.AuthenticationCallback
+    ) : BiometricPrompt.AuthenticationCallback() {
+
+        private val isResumed = AtomicBoolean(false)
+
+        override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
+            if (!isResumed.get()) {
+                decorated.onAuthenticationSucceeded(result)
+                isResumed.set(true)
+            }
+        }
+
+        override fun onAuthenticationError(errorCode: Int, errString: CharSequence) {
+            if (!isResumed.get()) {
+                decorated.onAuthenticationError(errorCode, errString)
+                isResumed.set(true)
+            }
         }
     }
 
