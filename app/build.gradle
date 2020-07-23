@@ -137,7 +137,7 @@ dependencies {
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.3.5"
     implementation "androidx.lifecycle:lifecycle-runtime-ktx:2.2.0"
     // kotlin extensions
-    implementation 'androidx.core:core-ktx:1.3.0'
+    implementation 'androidx.core:core-ktx:1.3.1'
     // android
     implementation 'androidx.appcompat:appcompat:1.1.0'
     // support lib
@@ -204,7 +204,7 @@ dependencies {
     implementation 'com.google.code.gson:gson:2.8.6'
 
     // Google services & Google drive
-    regularImplementation 'com.google.android.gms:play-services-auth:18.0.0'
+    regularImplementation 'com.google.android.gms:play-services-auth:18.1.0'
     regularImplementation 'com.google.http-client:google-http-client-gson:1.35.0'
     regularImplementation('com.google.api-client:google-api-client-android:1.30.9') {
         exclude group: 'org.apache.httpcomponents'
