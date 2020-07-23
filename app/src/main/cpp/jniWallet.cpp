@@ -400,9 +400,9 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniCreate(
 
     TariWallet *pWallet;
     if (strlen(pLogPath) == 0) {
-
         pWallet = wallet_create(
                 pWalletConfig,
+                nullptr,
                 nullptr,
                 ReceivedCallback,
                 ReplyCallback,
@@ -418,6 +418,7 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniCreate(
         pWallet = wallet_create(
                 pWalletConfig,
                 pLogPath,
+                nullptr,
                 ReceivedCallback,
                 ReplyCallback,
                 FinalizedCallback,
