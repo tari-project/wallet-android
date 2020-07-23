@@ -49,11 +49,7 @@ class SettingsActivity : AppCompatActivity(), SettingsRouter {
         setContentView(R.layout.activity_settings)
         overridePendingTransition(R.anim.enter_from_bottom, R.anim.exit_to_top)
         if (savedInstanceState == null) {
-            if (intent.getBooleanExtra(KEY_SHOW_BACKUP_SETTINGS, false)) {
-                loadFragmentsStackUpToBackupSettings()
-            } else {
-                loadAllSettingsFragment()
-            }
+            loadAllSettingsFragment()
         }
     }
 
@@ -63,29 +59,6 @@ class SettingsActivity : AppCompatActivity(), SettingsRouter {
             .commit()
     }
 
-    private fun loadFragmentsStackUpToBackupSettings() {
-        val fm = supportFragmentManager
-        val allSettings = AllSettingsFragment.newInstance()
-        fm.beginTransaction()
-            .add(R.id.settings_fragment_container, allSettings)
-            .commit()
-        fm.executePendingTransactions()
-        val backupSettings = BackupSettingsFragment.newInstance()
-        fm
-            .beginTransaction()
-            .setCustomAnimations(
-                0, 0,
-                R.anim.enter_from_left, R.anim.exit_to_right
-            )
-            .hide(allSettings)
-            .add(
-                R.id.settings_fragment_container,
-                backupSettings,
-                backupSettings.javaClass.simpleName
-            )
-            .addToBackStack(backupSettings.javaClass.simpleName)
-            .commit()
-    }
 
     override fun toWalletBackupSettings(sourceFragment: Fragment) {
         addFragment(sourceFragment, BackupSettingsFragment.newInstance())
@@ -177,7 +150,6 @@ class SettingsActivity : AppCompatActivity(), SettingsRouter {
      */
 
     companion object {
-        const val KEY_SHOW_BACKUP_SETTINGS = "showbackupsettings"
         fun launch(context: Context) {
             context.startActivity(Intent(context, SettingsActivity::class.java))
         }
