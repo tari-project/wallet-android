@@ -1509,7 +1509,6 @@ internal class HomeActivity : AppCompatActivity(),
                         arrayOf(
                             Intent(context, WalletInfoActivity::class.java),
                             Intent(context, SettingsActivity::class.java)
-                                .apply { putExtra(SettingsActivity.KEY_SHOW_BACKUP_SETTINGS, true) }
                         )
                     )
                     dismiss()
