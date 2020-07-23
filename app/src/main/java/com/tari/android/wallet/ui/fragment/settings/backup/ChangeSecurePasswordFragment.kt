@@ -56,7 +56,7 @@ import com.tari.android.wallet.R.string.*
 import com.tari.android.wallet.databinding.FragmentChangeSecurePasswordBinding
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.infrastructure.backup.*
-import com.tari.android.wallet.ui.activity.settings.SettingsRouter
+import com.tari.android.wallet.ui.activity.settings.BackupSettingsRouter
 import com.tari.android.wallet.ui.dialog.ErrorDialog
 import com.tari.android.wallet.ui.extension.*
 import com.tari.android.wallet.ui.util.UiUtil
@@ -353,7 +353,7 @@ framework for UI tree rebuild on configuration changes"""
         when (backupState) {
             is BackupUpToDate -> { // backup successful
                 allowExitAndPasswordEditing()
-                (requireActivity() as SettingsRouter).onPasswordChanged(this)
+                (requireActivity() as BackupSettingsRouter).onPasswordChanged(this)
             }
             is BackupOutOfDate -> { // backup failed
                 Logger.e(

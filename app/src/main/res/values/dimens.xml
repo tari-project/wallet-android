@@ -41,11 +41,11 @@
     <dimen name="introduction_network_margin_bottom">20dp</dimen>
 
     <!-- home -->
-    <dimen name="home_top_content_container_view_top_margin">45dp</dimen>
+    <dimen name="home_top_content_container_view_top_margin">25dp</dimen>
     <dimen name="home_top_content_container_scroll_vertical_shift">20dp</dimen>
     <dimen name="home_grabber_container_height">44dp</dimen>
     <dimen name="home_grabber_corner_radius">15dp</dimen>
-    <dimen name="home_tx_list_container_minimized_top_margin">148dp</dimen>
+    <dimen name="home_tx_list_container_minimized_top_margin">120dp</dimen>
     <dimen name="home_scroll_view_startup_anim_height">60dp</dimen>
     <dimen name="home_grabber_height">5dp</dimen>
     <dimen name="home_grabber_width">55dp</dimen>
@@ -59,7 +59,7 @@
     <dimen name="home_send_tari_button_initial_bottom_margin">-150dp</dimen>
     <dimen name="home_main_content_top_margin">6dp</dimen>
     <dimen name="home_dialog_testnet_tari_dialog_margin">14dp</dimen>
-    <dimen name="home_wallet_info_button_initial_top_margin">40dp</dimen>
+    <dimen name="home_wallet_info_button_initial_top_margin">45dp</dimen>
     <dimen name="home_backup_prompt_cta_width">209dp</dimen>
     <dimen name="home_backup_prompt_cta_height">53dp</dimen>
 

@@ -57,6 +57,7 @@ import com.google.zxing.EncodeHintType
 import com.journeyapps.barcodescanner.BarcodeEncoder
 import com.tari.android.wallet.util.Constants
 import java.lang.ref.WeakReference
+import java.util.*
 
 /**
  * Contains UI utility functions.
@@ -78,6 +79,8 @@ internal object UiUtil {
             view.layoutParams = layoutParams
         }
     }
+
+    fun View.updateWidth(width: Int) = setWidth(this, width)
 
     fun setHeight(
         @NonNull view: View,
@@ -103,19 +106,7 @@ internal object UiUtil {
         }
     }
 
-    fun getWidth(
-        @NonNull view: View
-    ): Int {
-        val layoutParams = view.layoutParams as ViewGroup.MarginLayoutParams
-        return layoutParams.width
-    }
-
-    fun getHeight(
-        @NonNull view: View
-    ): Int {
-        val layoutParams = view.layoutParams as ViewGroup.MarginLayoutParams
-        return layoutParams.height
-    }
+    fun getHeight(view: View): Int = (view.layoutParams as ViewGroup.MarginLayoutParams).height
 
     fun setTopMargin(
         @NonNull view: View,
@@ -292,9 +283,8 @@ internal object UiUtil {
     fun getQREncodedBitmap(content: String, size: Int): Bitmap? {
         try {
             val barcodeEncoder = BarcodeEncoder()
-            val hints: HashMap<EncodeHintType, String> = HashMap()
+            val hints: MutableMap<EncodeHintType, String> = EnumMap(com.google.zxing.EncodeHintType::class.java)
             hints[EncodeHintType.CHARACTER_SET] = "UTF-8"
-
             val map = barcodeEncoder.encode(content, BarcodeFormat.QR_CODE, size, size, hints)
             return barcodeEncoder.createBitmap(map)
         } catch (e: Exception) {

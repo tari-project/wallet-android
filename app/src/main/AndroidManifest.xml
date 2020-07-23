@@ -3,19 +3,15 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.tari.android.wallet">
 
-    <uses-permission android:name="android.permission.USE_BIOMETRIC" />
-    <!-- (pre-28) -->
+    <uses-permission android:name="android.permission.USE_BIOMETRIC" /> <!-- (pre-28) -->
     <uses-permission android:name="android.permission.USE_FINGERPRINT" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.CAMERA" />
-    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
-    <!-- For GSuite API -->
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" /> <!-- For GSuite API -->
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
-    <uses-permission android:name="android.permission.MANAGE_ACCOUNTS" />
-
-    <!-- remove billing support in case it gets included by a 3rd party lib -->
+    <uses-permission android:name="android.permission.MANAGE_ACCOUNTS" /> <!-- remove billing support in case it gets included by a 3rd party lib -->
     <uses-permission
         android:name="com.android.vending.BILLING"
         tools:node="remove" />
@@ -30,7 +26,6 @@
         android:supportsRtl="false"
         android:theme="@style/AppTheme"
         tools:replace="android:supportsRtl,android:allowBackup">
-
         <!-- Tari foreground service -->
         <service
             android:name=".service.WalletService"
@@ -39,9 +34,7 @@
             <intent-filter>
                 <action android:name="com.tari.android.wallet.service.TariWalletService" />
             </intent-filter>
-        </service>
-
-        <!-- file provider to share log files with other applications (i.e. email clients) -->
+        </service> <!-- file provider to share log files with other applications (i.e. email clients) -->
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="com.tari.android.wallet.files"
@@ -50,15 +43,11 @@
             <meta-data
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/file_provider" />
-        </provider>
-
-        <!-- this receiver restarts the service on destroy & keeps the service running -->
+        </provider> <!-- this receiver restarts the service on destroy & keeps the service running -->
         <receiver
             android:name=".service.ServiceRestartBroadcastReceiver"
             android:enabled="true"
-            android:exported="false" />
-
-        <!-- splash -->
+            android:exported="false" /> <!-- splash -->
         <activity
             android:name=".ui.activity.SplashActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
@@ -71,22 +60,19 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-        </activity>
-        <!-- onboarding flow -->
+        </activity> <!-- onboarding flow -->
         <activity
             android:name=".ui.activity.onboarding.OnboardingFlowActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme"
-            android:windowSoftInputMode="stateAlwaysHidden" />
-        <!-- local authentication -->
+            android:windowSoftInputMode="stateAlwaysHidden" /> <!-- local authentication -->
         <activity
             android:name=".ui.activity.AuthActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme"
-            android:windowSoftInputMode="stateAlwaysHidden" />
-        <!-- home (transaction list) -->
+            android:windowSoftInputMode="stateAlwaysHidden" /> <!-- home (transaction list) -->
         <activity
             android:name=".ui.activity.home.HomeActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
@@ -108,38 +94,26 @@
                     android:scheme="tari" />
             </intent-filter>
         </activity>
-        <!-- recipient QR scanner -->
         <activity
             android:name=".ui.activity.qr.QRScannerActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme"
-            android:windowSoftInputMode="stateAlwaysHidden" />
-        <!-- send tari -->
+            android:windowSoftInputMode="stateAlwaysHidden" /> <!-- send tari -->
         <activity
             android:name=".ui.activity.send.SendTariActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:parentActivityName=".ui.activity.home.HomeActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme"
-            android:windowSoftInputMode="adjustResize|stateAlwaysHidden" />
-        <!-- wallet info -->
-        <activity
-            android:name=".ui.activity.profile.WalletInfoActivity"
-            android:configChanges="keyboardHidden|orientation|screenSize"
-            android:parentActivityName=".ui.activity.home.HomeActivity"
-            android:screenOrientation="portrait"
-            android:theme="@style/AppTheme"
-            android:windowSoftInputMode="adjustResize|stateAlwaysHidden" />
-        <!-- transaction detail -->
+            android:windowSoftInputMode="adjustResize|stateAlwaysHidden" /> <!-- wallet info -->
         <activity
             android:name=".ui.activity.tx.TxDetailActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:parentActivityName=".ui.activity.home.HomeActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme"
-            android:windowSoftInputMode="adjustPan|stateAlwaysHidden" />
-        <!-- debug -->
+            android:windowSoftInputMode="adjustPan|stateAlwaysHidden" /> <!-- debug -->
         <activity
             android:name=".ui.activity.debug.DebugActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
@@ -148,24 +122,20 @@
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme"
             android:windowSoftInputMode="adjustPan|stateAlwaysHidden" />
-
         <activity
-            android:name=".ui.activity.settings.SettingsActivity"
+            android:name=".ui.activity.settings.BackupSettingsActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
-            android:parentActivityName=".ui.activity.profile.WalletInfoActivity"
+            android:parentActivityName=".ui.activity.home.HomeActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme"
             android:windowSoftInputMode="adjustResize|stateAlwaysHidden" />
-
         <activity
             android:name=".ui.activity.restore.WalletRestoreActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:parentActivityName=".ui.activity.onboarding.OnboardingFlowActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme"
-            android:windowSoftInputMode="adjustResize|stateAlwaysHidden" />
-
-        <!-- This receiver is responsible for starting the service after boot finish.-->
+            android:windowSoftInputMode="adjustResize|stateAlwaysHidden" /> <!-- This receiver is responsible for starting the service after boot finish. -->
         <receiver
             android:name=".service.BootDeviceReceiver"
             android:enabled="true"
@@ -174,7 +144,6 @@
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
         </receiver>
-
     </application>
 
 </manifest>

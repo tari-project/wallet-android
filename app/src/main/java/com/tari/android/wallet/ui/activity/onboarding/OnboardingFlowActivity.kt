@@ -38,7 +38,6 @@ import android.os.Handler
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import com.tari.android.wallet.R
-import com.tari.android.wallet.application.TariWalletApplication
 import com.tari.android.wallet.di.WalletModule
 import com.tari.android.wallet.service.WalletService
 import com.tari.android.wallet.ui.activity.home.HomeActivity

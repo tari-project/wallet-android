@@ -34,9 +34,7 @@ package com.tari.android.wallet.ui.activity.settings
 
 import androidx.fragment.app.Fragment
 
-interface SettingsRouter {
-
-    fun toWalletBackupSettings(sourceFragment: Fragment)
+interface BackupSettingsRouter {
 
     fun toWalletBackupWithRecoveryPhrase(sourceFragment: Fragment)
 

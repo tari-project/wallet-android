@@ -24,15 +24,6 @@
             android:textSize="16sp"
             app:customFont="AVENIR_LT_STD_HEAVY" />
 
-        <com.tari.android.wallet.ui.component.CustomFontTextView
-            android:id="@+id/done_cta_view"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="end"
-            android:text="@string/all_settings_close"
-            android:textColor="@color/purple"
-            android:textSize="16sp"
-            app:customFont="AVENIR_LT_STD_MEDIUM" />
     </FrameLayout>
 
     <ScrollView

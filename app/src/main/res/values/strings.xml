@@ -148,6 +148,15 @@
     <string name="home_setup_is_complete">Your wallet setup is complete.</string>
     <string name="home_you_are_ready_to_explore">You’re ready to start exploring</string>
     <string name="home_empty_wallet">We don’t see any transactions yet.\nHopefully something happens soon…🤞</string>
+    <string name="home_navigation_label_fragment_tx_list">Home</string>
+    <string name="home_navigation_label_fragment_store">Store</string>
+    <string name="home_navigation_label_fragment_profile">Profile</string>
+    <string name="home_navigation_label_fragment_settings">Settings</string>
+    <string name="home_navigation_content_description_navigate_to_settings">Navigate to settings</string>
+    <string name="home_navigation_content_description_navigate_to_wallet_info">Navigate to wallet info</string>
+    <string name="home_navigation_content_description_navigate_to_ttl_store">Navigate to TTL store</string>
+    <string name="home_navigation_content_description_navigate_to_transactions_list">Navigate to transactions list</string>
+    <string name="home_navigation_content_description_navigate_to_send_tari">Navigate to Tari send flow</string>
     <!--home tari bot dialog-->
     <string name="home_tari_bot_you_got_tari_dlg_title">You just got some tXTR!</string>
     <string name="home_tari_bot_you_got_tari_dlg_title_bold_part">tXTR!</string>
