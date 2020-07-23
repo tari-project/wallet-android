@@ -1,6 +1,6 @@
 name: Aurora Android Release Workflow
 on:
-  create:
+  push:
     tags:
       - v*
 
