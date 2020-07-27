@@ -34,7 +34,6 @@ package com.tari.android.wallet.ui.fragment.debug
 
 import android.content.ClipboardManager
 import android.content.Context.CLIPBOARD_SERVICE
-import android.os.AsyncTask
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -42,6 +41,7 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import com.tari.android.wallet.R
 import com.tari.android.wallet.R.color.white
 import com.tari.android.wallet.R.drawable.base_node_config_edit_text_bg
@@ -53,6 +53,9 @@ import com.tari.android.wallet.ffi.HexString
 import com.tari.android.wallet.ui.extension.*
 import com.tari.android.wallet.ui.util.UiUtil
 import com.tari.android.wallet.util.SharedPrefsWrapper
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 /**
@@ -180,19 +183,23 @@ internal class BaseNodeConfigFragment : Fragment() {
         val address = ui.addressEditText.editableText.toString()
         ui.saveButton.invisible()
         ui.progressBar.visible()
-        AsyncTask.execute {
+        lifecycleScope.launch(Dispatchers.IO) {
             addBaseNodePeer(publicKeyHex, address)
         }
     }
 
-    private fun addBaseNodePeer(publicKeyHex: String, address: String) {
+    private suspend fun addBaseNodePeer(publicKeyHex: String, address: String) {
         val baseNodeKeyFFI = FFIPublicKey(HexString(publicKeyHex))
-        val success = FFIWallet.instance!!.addBaseNodePeer(baseNodeKeyFFI, address)
+        val success = try {
+            FFIWallet.instance!!.addBaseNodePeer(baseNodeKeyFFI, address)
+            true
+        } catch (exception: Exception) {
+            false
+        }
         baseNodeKeyFFI.destroy()
-        ui.rootView.post {
+        withContext(Dispatchers.Main) {
             if (success) {
                 addBaseNodePeerSuccessful(publicKeyHex, address)
-                // show toast
             } else {
                 addBaseNodePeerFailed()
             }

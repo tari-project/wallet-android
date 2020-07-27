@@ -194,7 +194,7 @@ framework for UI tree rebuild on configuration changes"""
     private fun showAuthFailedDialog() {
         ErrorDialog(
             requireContext(),
-            title = string(back_up_wallet_storage_setup_error_title),
+            title = string(restore_wallet_error_title),
             description = string(back_up_wallet_storage_setup_error_desc)
         ).show()
     }
@@ -202,7 +202,7 @@ framework for UI tree rebuild on configuration changes"""
     private fun showBackupFileNotFoundDialog() {
         ErrorDialog(
             requireContext(),
-            title = string(back_up_wallet_storage_setup_error_title),
+            title = string(restore_wallet_error_title),
             description = string(restore_wallet_error_file_not_found),
             onClose = {
                 requireActivity().onBackPressed()
