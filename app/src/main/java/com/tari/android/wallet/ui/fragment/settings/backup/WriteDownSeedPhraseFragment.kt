@@ -44,7 +44,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.tari.android.wallet.R.color.seed_phrase_button_disabled_text_color
 import com.tari.android.wallet.databinding.FragmentWriteDownSeedPhraseBinding
-import com.tari.android.wallet.ui.activity.settings.SettingsRouter
+import com.tari.android.wallet.ui.activity.settings.BackupSettingsRouter
 import com.tari.android.wallet.ui.extension.ThrottleClick
 import com.tari.android.wallet.ui.extension.color
 import com.tari.android.wallet.ui.util.UiUtil
@@ -72,7 +72,7 @@ framework for UI tree rebuild on configuration changes"""
         ui.backCtaView.setOnClickListener { requireActivity().onBackPressed() }
         ui.continueCtaView.setOnClickListener(ThrottleClick {
             UiUtil.animateViewClick(it) {
-                (requireActivity() as SettingsRouter)
+                (requireActivity() as BackupSettingsRouter)
                     .toRecoveryPhraseVerification(this, WORDS_POOL)
             }
         })

@@ -56,7 +56,7 @@ import com.tari.android.wallet.databinding.FragmentWalletBackupSettingsBinding
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.infrastructure.backup.*
 import com.tari.android.wallet.infrastructure.security.biometric.BiometricAuthenticationService
-import com.tari.android.wallet.ui.activity.settings.SettingsRouter
+import com.tari.android.wallet.ui.activity.settings.BackupSettingsRouter
 import com.tari.android.wallet.ui.dialog.BottomSlideDialog
 import com.tari.android.wallet.ui.dialog.ErrorDialog
 import com.tari.android.wallet.ui.extension.*
@@ -210,7 +210,7 @@ framework for UI tree rebuild on configuration changes"""
         ui.backupWithRecoveryPhraseCtaView.setOnClickListener(
             ThrottleClick {
                 requireAuthorization {
-                    (requireActivity() as SettingsRouter).toWalletBackupWithRecoveryPhrase(this)
+                    (requireActivity() as BackupSettingsRouter).toWalletBackupWithRecoveryPhrase(this)
                 }
             }
         )
@@ -227,7 +227,7 @@ framework for UI tree rebuild on configuration changes"""
         })
         ui.updatePasswordCtaView.setOnClickListener(ThrottleClick {
             requireAuthorization {
-                val router = requireActivity() as SettingsRouter
+                val router = requireActivity() as BackupSettingsRouter
                 if (sharedPrefs.backupPassword == null) {
                     router.toChangePassword(this)
                 } else {

@@ -39,30 +39,25 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import com.tari.android.wallet.R
-import com.tari.android.wallet.ui.fragment.settings.AllSettingsFragment
 import com.tari.android.wallet.ui.fragment.settings.backup.*
 
-class SettingsActivity : AppCompatActivity(), SettingsRouter {
+class BackupSettingsActivity : AppCompatActivity(), BackupSettingsRouter {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_settings)
         overridePendingTransition(R.anim.enter_from_bottom, R.anim.exit_to_top)
         if (savedInstanceState == null) {
-            loadAllSettingsFragment()
+            loadBackupSettingsFragment()
         }
     }
 
-    private fun loadAllSettingsFragment() {
+    private fun loadBackupSettingsFragment() {
         supportFragmentManager.beginTransaction()
-            .add(R.id.settings_fragment_container, AllSettingsFragment.newInstance())
+            .add(R.id.settings_fragment_container, BackupSettingsFragment.newInstance())
             .commit()
     }
 
-
-    override fun toWalletBackupSettings(sourceFragment: Fragment) {
-        addFragment(sourceFragment, BackupSettingsFragment.newInstance())
-    }
 
     override fun toWalletBackupWithRecoveryPhrase(sourceFragment: Fragment) {
         addFragment(sourceFragment, WriteDownSeedPhraseFragment.newInstance())
@@ -96,13 +91,6 @@ class SettingsActivity : AppCompatActivity(), SettingsRouter {
                 EnterCurrentPasswordFragment::class.java.simpleName,
                 FragmentManager.POP_BACK_STACK_INCLUSIVE
             )
-            /*
-            val fragments = supportFragmentManager.fragments
-            supportFragmentManager.beginTransaction()
-                .setCustomAnimations(R.anim.no_anim, R.anim.no_anim)
-                .apply { fragments.subList(0, fragments.size - 2).forEach { hide(it) } }
-                .commit()
-             */
         } else {
             onBackPressed()
         }
@@ -131,27 +119,10 @@ class SettingsActivity : AppCompatActivity(), SettingsRouter {
             .apply { if (allowStateLoss) commitAllowingStateLoss() else commit() }
     }
 
-    /*
-    override fun onBackPressed() {
-        super.onBackPressed()
-        // On back press all transitive fragments become visible for some reason, and when
-        // navigating back from ChangeSecurePasswordFragment then AllSettingsFragment becomes
-        // visible as well, so we hiding all the transitive fragments except for the one that
-        // becomes the topmost by force
-        overridePendingTransition(R.anim.enter_from_top, R.anim.exit_to_bottom)
-        val fragments = supportFragmentManager.fragments
-        if (fragments.size > 1) {
-            supportFragmentManager.beginTransaction()
-                .setCustomAnimations(R.anim.no_anim, R.anim.no_anim)
-                .apply { fragments.subList(0, fragments.size - 2).forEach { hide(it) } }
-                .commit()
-        }
-    }
-     */
 
     companion object {
         fun launch(context: Context) {
-            context.startActivity(Intent(context, SettingsActivity::class.java))
+            context.startActivity(Intent(context, BackupSettingsActivity::class.java))
         }
     }
 

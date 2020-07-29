@@ -10,24 +10,14 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/top_content"
         android:layout_width="match_parent"
-        android:layout_height="85dp"
-        android:background="@drawable/store_grabber_bg">
-
-        <View
-            android:id="@+id/grabber_view"
-            android:layout_width="@dimen/home_grabber_width"
-            android:layout_height="@dimen/home_grabber_height"
-            android:layout_marginTop="22dp"
-            android:background="@drawable/store_grabber"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+        android:layout_height="wrap_content"
+        android:background="@drawable/store_grabber_bg"
+        android:paddingVertical="8dp">
 
         <com.tari.android.wallet.ui.component.CustomFontTextView
             android:id="@+id/store_title_text_view"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
             android:ellipsize="middle"
             android:gravity="center"
             android:singleLine="true"
@@ -35,20 +25,22 @@
             android:textColor="@color/black"
             android:textSize="@dimen/store_title_text_size"
             app:customFont="AVENIR_LT_STD_HEAVY"
+            app:layout_constraintBottom_toBottomOf="@id/title_left_anchor_view"
             app:layout_constraintEnd_toStartOf="@id/share_cta_view"
-            app:layout_constraintStart_toEndOf="@id/close_cta_view"
-            app:layout_constraintTop_toBottomOf="@id/grabber_view" />
+            app:layout_constraintStart_toEndOf="@id/title_left_anchor_view"
+            app:layout_constraintTop_toTopOf="@id/title_left_anchor_view" />
 
         <ImageView
-            android:id="@+id/close_cta_view"
+            android:id="@+id/title_left_anchor_view"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="15.5dp"
             android:padding="8dp"
-            android:src="@drawable/store_close"
-            app:layout_constraintBottom_toBottomOf="@id/store_title_text_view"
+            android:src="@drawable/store_share"
+            android:visibility="invisible"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@id/store_title_text_view"
+            app:layout_constraintTop_toTopOf="parent"
             tools:ignore="ContentDescription" />
 
         <ImageView
@@ -58,9 +50,9 @@
             android:layout_marginEnd="15.5dp"
             android:padding="8dp"
             android:src="@drawable/store_share"
-            app:layout_constraintBottom_toBottomOf="@id/store_title_text_view"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@id/store_title_text_view"
+            app:layout_constraintTop_toTopOf="parent"
             tools:ignore="ContentDescription" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
@@ -137,17 +129,17 @@
     <!-- top view elevation-->
     <View
         android:id="@+id/top_elevation_view"
-        android:layout_below="@id/top_content"
         android:layout_width="match_parent"
         android:layout_height="@dimen/common_scroll_height_gradient_height"
+        android:layout_below="@id/top_content"
         android:alpha="0.7"
         android:background="@drawable/view_elevation_gradient" />
     <!-- bottom control view elevation-->
     <View
         android:id="@+id/bottom_elevation_view"
-        android:layout_above="@id/controls_scroll_view"
         android:layout_width="match_parent"
         android:layout_height="@dimen/common_scroll_height_gradient_height"
+        android:layout_above="@id/controls_scroll_view"
         android:alpha="0.7"
         android:background="@drawable/view_elevation_bottom_gradient" />
 

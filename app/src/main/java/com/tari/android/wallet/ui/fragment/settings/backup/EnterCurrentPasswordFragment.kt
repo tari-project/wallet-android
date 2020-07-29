@@ -44,7 +44,7 @@ import com.tari.android.wallet.R
 import com.tari.android.wallet.R.color.change_password_cta_disabled
 import com.tari.android.wallet.R.color.white
 import com.tari.android.wallet.databinding.FragmentEnterBackupPasswordBinding
-import com.tari.android.wallet.ui.activity.settings.SettingsRouter
+import com.tari.android.wallet.ui.activity.settings.BackupSettingsRouter
 import com.tari.android.wallet.ui.extension.*
 import com.tari.android.wallet.ui.util.UiUtil
 import com.tari.android.wallet.util.SharedPrefsWrapper
@@ -84,7 +84,7 @@ framework for UI tree rebuild on configuration changes"""
             val input = (ui.passwordEditText.text?.toString() ?: "").toCharArray()
             val backupPassword = sharedPrefs.backupPassword ?: charArrayOf()
             if (input.contentEquals(backupPassword)) {
-                (requireActivity() as SettingsRouter).toChangePassword(this)
+                (requireActivity() as BackupSettingsRouter).toChangePassword(this)
             } else {
                 ui.changePasswordCtaTextView.isEnabled = false
                 ui.changePasswordCtaTextView.setTextColor(color(change_password_cta_disabled))

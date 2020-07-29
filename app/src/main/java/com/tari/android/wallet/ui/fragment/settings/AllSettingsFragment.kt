@@ -49,7 +49,6 @@ import com.tari.android.wallet.databinding.FragmentAllSettingsBinding
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.infrastructure.BugReportingService
 import com.tari.android.wallet.infrastructure.backup.*
-import com.tari.android.wallet.ui.activity.settings.SettingsRouter
 import com.tari.android.wallet.ui.dialog.ErrorDialog
 import com.tari.android.wallet.ui.extension.*
 import com.tari.android.wallet.ui.util.UiUtil.setColor
@@ -106,7 +105,6 @@ UI tree rebuild on configuration changes"""
     }
 
     private fun bindCTAs() {
-        ui.doneCtaView.setOnClickListener { requireActivity().onBackPressed() }
         ui.reportBugCtaView.setOnClickListener { shareBugReport() }
         ui.visitSiteCtaView.setOnClickListener { openLink(string(tari_url)) }
         ui.contributeCtaView.setOnClickListener { openLink(string(github_repo_url)) }
@@ -252,7 +250,7 @@ UI tree rebuild on configuration changes"""
     }
 
     private fun navigateToBackupSettings() {
-        (requireActivity() as SettingsRouter).toWalletBackupSettings(this)
+        (requireActivity() as AllSettingsRouter).toBackupSettings()
     }
 
     private fun shareBugReport() {
@@ -286,6 +284,10 @@ UI tree rebuild on configuration changes"""
             title = string(check_backup_storage_status_error_title),
             description = message
         ).show()
+    }
+
+    interface AllSettingsRouter {
+        fun toBackupSettings()
     }
 
     companion object {

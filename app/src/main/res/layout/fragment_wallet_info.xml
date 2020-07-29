@@ -7,42 +7,6 @@
     android:background="@color/white"
     android:orientation="vertical">
 
-    <FrameLayout
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/common_header_height">
-
-        <ImageButton
-            android:id="@+id/close_button"
-            android:layout_width="@dimen/common_header_height"
-            android:layout_height="@dimen/common_header_height"
-            android:background="@color/transparent"
-            android:contentDescription="@null"
-            android:src="@drawable/close_icon"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <View
-            android:id="@+id/header_dimmer_view"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:alpha="0.6"
-            android:background="@color/black"
-            android:clickable="true"
-            android:focusable="true"
-            android:visibility="gone" />
-
-        <ImageButton
-            android:id="@+id/open_settings_cta_view"
-            android:layout_width="@dimen/common_header_height"
-            android:layout_height="@dimen/common_header_height"
-            android:background="@color/transparent"
-            android:contentDescription="@null"
-            android:src="@drawable/icon_settings"
-            android:layout_gravity="end"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-    </FrameLayout>
-
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -60,7 +24,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="@dimen/common_horizontal_margin"
-                android:layout_marginTop="14dp"
+                android:layout_marginTop="48dp"
                 android:gravity="center"
                 android:letterSpacing="-0.015"
                 android:lineSpacingExtra="9dp"
@@ -157,7 +121,8 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toTopOf="parent"
+                tools:visibility="visible"/>
 
             <!--Emoji ID Copy Button-->
             <RelativeLayout
@@ -301,5 +266,6 @@
         android:background="@color/black"
         android:clickable="true"
         android:focusable="true"
-        android:visibility="gone" />
+        android:visibility="gone"
+        tools:visibility="visible"/>
 </LinearLayout>
