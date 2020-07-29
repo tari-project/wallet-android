@@ -326,7 +326,7 @@
     <string name="back_up_wallet_backing_up_unknown_error">Unknown error</string>
     <string name="back_up_wallet_status_check_authentication_cancellation">Authentication was cancelled</string>
     <string name="back_up_wallet_last_successful_backup">Last successful backup: %s at %s</string>
-    <string name="back_up_wallet_turn_off_backup_warning_title">Your backups will be deleted</string>
+    <string name="back_up_wallet_turn_off_backup_warning_title">Your backup will be deleted</string>
     <string name="back_up_wallet_turn_off_backup_warning_description">Are you sure you want to proceed?</string>
 
     <!-- Wallet back up with seed phrase -->
@@ -355,7 +355,7 @@
     <string name="restore_with_cloud_page_title">Enter your backup password</string>
 
     <!--Change password-->
-    <string name="change_password_enter_password_label">Create Password</string>
+    <string name="change_password_enter_password_label">Create a Password</string>
     <string name="change_password_enter_password_hint">Make it a strong one!</string>
     <string name="change_password_confirm_password_label">Confirm Password</string>
     <string name="change_password_confirm_password_hint">Let’s see it again</string>

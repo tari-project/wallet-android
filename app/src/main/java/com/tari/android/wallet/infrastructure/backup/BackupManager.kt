@@ -120,10 +120,16 @@ internal class BackupManager(
             if (!backupStorage.hasBackupForDate(backupDate)) {
                 throw BackupStorageTamperedException("Backup storage is tampered.")
             }
-            if (sharedPrefs.scheduledBackupDate?.isAfterNow == true) {
-                EventBus.postBackupState(BackupScheduled)
-            } else {
-                EventBus.postBackupState(BackupUpToDate)
+            when {
+                sharedPrefs.backupFailureDate != null -> {
+                    EventBus.postBackupState(BackupOutOfDate())
+                }
+                sharedPrefs.scheduledBackupDate?.isAfterNow == true -> {
+                    EventBus.postBackupState(BackupScheduled)
+                }
+                else -> {
+                    EventBus.postBackupState(BackupUpToDate)
+                }
             }
         } catch (e: BackupStorageAuthRevokedException) {
             sharedPrefs.lastSuccessfulBackupDate = null

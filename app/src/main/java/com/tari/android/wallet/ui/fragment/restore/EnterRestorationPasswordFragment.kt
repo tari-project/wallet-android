@@ -33,6 +33,7 @@
 package com.tari.android.wallet.ui.fragment.restore
 
 import android.content.Context
+import android.graphics.Color
 import android.os.Bundle
 import android.text.SpannableString
 import android.text.SpannableStringBuilder
@@ -90,10 +91,10 @@ UI tree rebuild on configuration changes"""
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        setupUi()
+        setupUI()
     }
 
-    private fun setupUi() {
+    private fun setupUI() {
         requireActivity().onBackPressedDispatcher
             .addCallback(viewLifecycleOwner, blockingBackPressDispatcher)
         setPageDescription()
@@ -108,16 +109,27 @@ UI tree rebuild on configuration changes"""
                 }
             }
         )
+        setRestoreWalletCTAState(isEnabled = false)
         ui.restoreWalletCtaView.setOnClickListener {
             showRestoringUI()
             performRestoration(ui.passwordEditText.text!!.toString())
         }
         ui.passwordEditText.addTextChangedListener(
             afterTextChanged = {
+                setRestoreWalletCTAState(it?.length ?: 0 != 0)
                 ui.enterPasswordLabelTextView.setTextColor(color(black))
                 ui.passwordEditText.setTextColor(color(black))
                 ui.wrongPasswordLabelView.gone()
             }
+        )
+    }
+
+    private fun setRestoreWalletCTAState(isEnabled: Boolean) {
+        if (ui.restoreWalletCtaView.isEnabled == isEnabled) return
+        ui.restoreWalletCtaView.isEnabled = isEnabled
+        ui.restoreWalletTextView.setTextColor(
+            if (isEnabled) Color.WHITE
+            else color(seed_phrase_button_disabled_text_color)
         )
     }
 
