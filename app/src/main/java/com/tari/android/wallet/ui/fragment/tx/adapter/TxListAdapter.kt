@@ -30,48 +30,68 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.tari.android.wallet.ui.activity.home.adapter
+package com.tari.android.wallet.ui.fragment.tx.adapter
 
-import android.view.View
+import android.view.LayoutInflater
+import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.tari.android.wallet.R.string.*
-import com.tari.android.wallet.databinding.HomeTxListHeaderBinding
-import com.tari.android.wallet.ui.extension.string
-import org.joda.time.LocalDate
+import com.tari.android.wallet.R
+import com.tari.android.wallet.model.*
 
 /**
- * Transaction list section header view holder.
+ * Transaction list recycler view adapter.
  *
  * @author The Tari Development Team
  */
-class TxHeaderViewHolder(view: View, private val type: Type) :
-    RecyclerView.ViewHolder(view) {
+internal class TxListAdapter(
+    private val cancelledTxs: List<CancelledTx>,
+    private val completedTxs: List<CompletedTx>,
+    private val pendingInboundTxs: List<PendingInboundTx>,
+    private val pendingOutboundTxs: List<PendingOutboundTx>,
+    private val listener: (Tx) -> Unit
+) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
-    enum class Type {
-        PENDING_TXS,
-        DATE
+    // transactions
+    private val items = ArrayList<Tx>()
+
+    fun notifyDataChanged() {
+        items.clear()
+        // add all txs
+        items.addAll(cancelledTxs)
+        items.addAll(completedTxs)
+        items.addAll(pendingInboundTxs)
+        items.addAll(pendingOutboundTxs)
+        // sort items by descending tx date
+        items.sortWith(compareByDescending(Tx::timestamp).thenByDescending { it.id })
+
+        super.notifyDataSetChanged()
     }
 
-    private val dateFormat = "MMMM dd, yyyy"
+    /**
+     * Item count.
+     */
+    override fun getItemCount() = items.size
 
-    private var date: LocalDate? = null
 
-    private val ui = HomeTxListHeaderBinding.bind(view)
-
-    fun bind(date: LocalDate?, position: Int) {
-        ui.txListHeaderSeparatorView.visibility = if (position == 0) View.GONE else View.VISIBLE
-        if (type == Type.PENDING_TXS) {
-            ui.txListHeaderTitleTextView.text = string(home_tx_list_header_pending_txs)
-        } else if (type == Type.DATE) {
-            this.date = date!!
-            val todayDate = LocalDate.now()
-            val yesterdayDate = todayDate.minusDays(1)
-            ui.txListHeaderTitleTextView.text = when {
-                date.isEqual(todayDate) -> string(home_tx_list_header_today)
-                date.isEqual(yesterdayDate) -> string(home_tx_list_header_yesterday)
-                else -> date.toString(dateFormat)
-            }
+    /**
+     * Create the view holder instance.
+     */
+    override fun onCreateViewHolder(
+        parent: ViewGroup,
+        viewType: Int
+    ): RecyclerView.ViewHolder =
+        TxViewHolder(
+            LayoutInflater.from(parent.context)
+                .inflate(R.layout.home_tx_list_item, parent, false)
+        ) { tx ->
+            listener(tx)
         }
 
+    /**
+     * Bind & display header or transaction.
+     */
+    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+        (holder as TxViewHolder).bind(items[position])
     }
+
 }

@@ -256,7 +256,9 @@ internal class WalletService : Service(), FFIWalletListenerAdapter, LifecycleObs
             it.onBaseNodeSyncComplete(RequestId(requestId), success)
         }
         // add the next base node from the list if sync has failed
-        if (!success) walletManager.setNextBaseNode()
+        if (!success) {
+            walletManager.setNextBaseNode()
+        }
     }
 
     override fun onTxReceived(pendingInboundTx: PendingInboundTx) {

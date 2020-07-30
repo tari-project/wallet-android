@@ -81,10 +81,7 @@ import com.tari.android.wallet.service.TariWalletService
 import com.tari.android.wallet.service.connection.TariWalletServiceConnection
 import com.tari.android.wallet.service.connection.TariWalletServiceConnection.ServiceConnectionStatus.CONNECTED
 import com.tari.android.wallet.ui.activity.debug.DebugActivity
-import com.tari.android.wallet.ui.activity.home.BalanceViewController
-import com.tari.android.wallet.ui.activity.home.CustomScrollView
-import com.tari.android.wallet.ui.activity.home.UpdateProgressViewController
-import com.tari.android.wallet.ui.activity.home.adapter.TxListAdapter
+import com.tari.android.wallet.ui.fragment.tx.adapter.TxListAdapter
 import com.tari.android.wallet.ui.activity.send.SendTariActivity
 import com.tari.android.wallet.ui.component.CustomFont
 import com.tari.android.wallet.ui.component.CustomTypefaceSpan
@@ -207,10 +204,14 @@ internal class TxListFragment : Fragment(),
     }
 
     // region initial setup (UI and else)
+    @SuppressLint("ClickableViewAccessibility")
     private fun setupUi() {
         UiUtil.setTopMargin(ui.txListHeaderView, -dimenPx(R.dimen.common_header_height))
         updateProgressViewController =
-            UpdateProgressViewController(ui.updateProgressContentView, this)
+            UpdateProgressViewController(
+                ui.updateProgressContentView,
+                this
+            )
         ui.scrollView.bindUI()
         ui.scrollView.listenerWeakReference = WeakReference(this)
         ui.scrollView.updateProgressViewController = updateProgressViewController
@@ -245,7 +246,12 @@ internal class TxListFragment : Fragment(),
     private fun setupRecyclerView() {
         ui.txRecyclerView.layoutManager = LinearLayoutManager(requireContext())
         recyclerViewAdapter =
-            TxListAdapter(cancelledTxs, completedTxs, pendingInboundTxs, pendingOutboundTxs) {
+            TxListAdapter(
+                cancelledTxs,
+                completedTxs,
+                pendingInboundTxs,
+                pendingOutboundTxs
+            ) {
                 (requireActivity() as TxListRouter).toTxDetails(it)
             }
         ui.txRecyclerView.adapter = recyclerViewAdapter
@@ -416,11 +422,15 @@ internal class TxListFragment : Fragment(),
     private fun onTxReplyReceived(tx: PendingOutboundTx) {
         // just update data - no UI change required
         pendingOutboundTxs.firstOrNull { it.id == tx.id }?.status = tx.status
+        // update tx list UI
+        lifecycleScope.launch(Dispatchers.Main) { updateTxListUI() }
     }
 
     private fun onTxFinalized(tx: PendingInboundTx) {
         // just update data - no UI change required
         pendingInboundTxs.firstOrNull { it.id == tx.id }?.status = tx.status
+        // update tx list UI
+        lifecycleScope.launch(Dispatchers.Main) { updateTxListUI() }
     }
 
     private fun onInboundTxBroadcast(tx: PendingInboundTx) {

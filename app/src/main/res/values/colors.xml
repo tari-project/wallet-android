@@ -48,6 +48,8 @@
     <color name="home_tx_value_positive">#23BE90</color>
     <color name="home_tx_value_canceled_bg">#F1F2F4</color>
     <color name="home_tx_value_canceled">#B3B9CB</color>
+    <color name="home_tx_value_pending_bg">#FBE7C0</color>
+    <color name="home_tx_value_pending">#EC9C00</color>
     <color name="home_tx_contact_alias">#40388A</color>
     <color name="home_tx_message">#A9AFC4</color>
     <color name="home_tx_section_header_title">#B2B2B2</color>
