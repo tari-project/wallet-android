@@ -34,10 +34,13 @@ android {
     }
 
     buildTypes {
+        def properties = loadSecretProps()
         debug {
             jniDebuggable true
+            buildConfigField("String", "GIPHY_KEY", "\"${properties.getProperty('giphy.key')}\"")
         }
         release {
+            buildConfigField("String", "GIPHY_KEY", "\"${properties.getProperty('giphy.key')}\"")
             minifyEnabled true
             shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
@@ -128,6 +131,12 @@ Properties loadSecretProps() {
 
 preBuild.dependsOn("downloadJNIBinaries")
 
+repositories {
+    maven {
+        url "http://giphy.bintray.com/giphy-sdk"
+    }
+}
+
 dependencies {
     // kotlin
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
@@ -157,6 +166,8 @@ dependencies {
     implementation 'me.everything:overscroll-decor-android:1.0.4'
     // lottie
     implementation 'com.airbnb.android:lottie:3.4.0'
+    // giphy
+    implementation 'com.giphy.sdk:ui:1.3.0'
     // spring animation
     implementation 'androidx.dynamicanimation:dynamicanimation:1.0.0'
     implementation 'com.daasuu:EasingInterpolator:1.3.0'

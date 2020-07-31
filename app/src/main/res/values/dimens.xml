@@ -63,6 +63,9 @@
     <dimen name="home_backup_prompt_cta_width">209dp</dimen>
     <dimen name="home_backup_prompt_cta_height">53dp</dimen>
 
+    <!-- tx list -->
+    <dimen name="tx_list_gif_container_top_margin">8dp</dimen>
+
     <!-- home swipe refresh -->
     <dimen name="home_swipe_refresh_max_scroll_y">180dp</dimen>
     <dimen name="home_swipe_refresh_progress_view_height">44dp</dimen>
@@ -75,7 +78,6 @@
     <dimen name="home_ttl_store_dialog_visit_button_top_margin">24dp</dimen>
     <dimen name="home_ttl_store_dialog_cancel_button_top_margin">8dp</dimen>
     <dimen name="home_ttl_store_dialog_padding_bottom">12dp</dimen>
-
 
     <dimen name="create_wallet_button_bottom_margin">25dp</dimen>
     <dimen name="home_tx_list_item_height">74dp</dimen>
@@ -111,8 +113,9 @@
     <dimen name="add_amount_balance_warning_container_top_padding">8dp</dimen>
     <dimen name="add_amount_balance_warning_container_bottom_padding">6dp</dimen>
     <!-- send tari - add note -->
-    <dimen name="add_note_slide_button_left_margin">5dp</dimen>
-    <dimen name="add_note_slide_button_width">43dp</dimen>
+    <dimen name="add_note_slide_button_left_margin">10dp</dimen>
+    <dimen name="add_note_slide_button_height">40dp</dimen>
+    <dimen name="add_note_slide_button_width">40dp</dimen>
     <dimen name="add_note_prompt_text_size">12sp</dimen>
     <dimen name="add_note_note_text_size">16sp</dimen>
     <!-- auth -->

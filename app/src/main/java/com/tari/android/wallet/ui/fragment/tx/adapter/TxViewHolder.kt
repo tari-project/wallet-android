@@ -35,13 +35,15 @@ package com.tari.android.wallet.ui.fragment.tx.adapter
 import android.view.View
 import androidx.recyclerview.widget.RecyclerView
 import com.tari.android.wallet.R
+import com.tari.android.wallet.R.dimen.tx_list_gif_container_top_margin
 import com.tari.android.wallet.databinding.HomeTxListItemBinding
 import com.tari.android.wallet.extension.applyFontStyle
 import com.tari.android.wallet.model.*
 import com.tari.android.wallet.ui.component.CustomFont
 import com.tari.android.wallet.ui.component.EmojiIdSummaryViewController
+import com.tari.android.wallet.ui.component.GIFContainerViewController
 import com.tari.android.wallet.ui.extension.*
-import com.tari.android.wallet.ui.extension.color
+import com.tari.android.wallet.ui.presentation.TxNote
 import com.tari.android.wallet.ui.util.UiUtil
 import com.tari.android.wallet.util.WalletUtil
 import com.tari.android.wallet.util.extractEmojis
@@ -53,6 +55,7 @@ import org.joda.time.DateTime
 import org.joda.time.Hours
 import org.joda.time.LocalDate
 import org.joda.time.Minutes
+import java.util.*
 import java.util.concurrent.TimeUnit
 
 /**
@@ -64,19 +67,26 @@ class TxViewHolder(view: View, private val listener: (Tx) -> Unit) :
     RecyclerView.ViewHolder(view),
     View.OnClickListener {
 
+    companion object {
+        // e.g. Wed, Jun 2
+        private const val dateFormat = "E, MMM d"
+    }
+
     private lateinit var tx: Tx
     private var emojiIdSummaryController: EmojiIdSummaryViewController
-
-    // e.g. Wed, Jun 2
-    private val dateFormat = "E, MMM d"
 
     private var dateUpdateTimer: Disposable? = null
 
     private val ui = HomeTxListItemBinding.bind(view)
+    private lateinit var gifContainerViewController: GIFContainerViewController
 
     init {
         emojiIdSummaryController = EmojiIdSummaryViewController(ui.participantEmojiIdView)
         ui.rootView.setOnClickListener(this)
+        UiUtil.setProgressBarColor(
+            ui.gifContainer.loadingGifProgressBar,
+            color(R.color.tx_list_loading_gif_gray)
+        )
     }
 
     override fun onClick(view: View) {
@@ -91,7 +101,13 @@ class TxViewHolder(view: View, private val listener: (Tx) -> Unit) :
         displayAmount()
         displayDate()
         displayStatus()
-        displayMessageAndGIF()
+        displayMessage()
+        gifContainerViewController = GIFContainerViewController(
+            ui.gifContainer,
+            tx,
+            dimen(tx_list_gif_container_top_margin)
+        )
+        gifContainerViewController.onRetryClick { gifContainerViewController.displayGIFUsingCache() }
     }
 
     private fun displayFirstEmoji() {
@@ -214,7 +230,7 @@ class TxViewHolder(view: View, private val listener: (Tx) -> Unit) :
                 }
             }
             txDate.isEqual(yesterdayDate) -> string(R.string.home_tx_list_header_yesterday)
-            else -> txDate.toString(dateFormat)
+            else -> txDate.toString(dateFormat, Locale.ENGLISH)
         }
     }
 
@@ -248,13 +264,28 @@ class TxViewHolder(view: View, private val listener: (Tx) -> Unit) :
         }
     }
 
-    private fun displayMessageAndGIF() {
-        ui.messageTextView.text = tx.message
-        // TODO load GIF here
-        ui.gifContainer.gone()
+    private fun displayMessage() {
+        val note = TxNote.fromNote(tx.message)
+        if (note.message == null) {
+            ui.messageTextView.gone()
+            ui.messageTextView.text = ""
+        } else {
+            ui.messageTextView.visible()
+            ui.messageTextView.text = note.message
+        }
     }
 
-    fun startDateUpdateTimer() {
+    fun onAttach() {
+        startDateUpdateTimer()
+        gifContainerViewController.displayGIFUsingCache()
+    }
+
+    fun onDetach() {
+        disposeDateUpdateTimer()
+        gifContainerViewController.detach()
+    }
+
+    private fun startDateUpdateTimer() {
         dateUpdateTimer =
             Observable
                 .timer(1, TimeUnit.MINUTES)
@@ -266,7 +297,7 @@ class TxViewHolder(view: View, private val listener: (Tx) -> Unit) :
                 }
     }
 
-    fun disposeDateUpdateTimer() {
+    private fun disposeDateUpdateTimer() {
         dateUpdateTimer?.dispose()
         dateUpdateTimer = null
     }

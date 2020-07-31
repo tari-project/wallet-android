@@ -39,10 +39,9 @@ import android.annotation.SuppressLint
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
-import android.text.Editable
 import android.text.InputType
-import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
@@ -52,9 +51,21 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.RelativeLayout
 import androidx.core.animation.addListener
 import androidx.core.content.ContextCompat
+import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import com.daasuu.ei.Ease
 import com.daasuu.ei.EasingInterpolator
+import com.giphy.sdk.core.models.Media
+import com.giphy.sdk.core.models.enums.MediaType
+import com.giphy.sdk.ui.GPHContentType
+import com.giphy.sdk.ui.GPHSettings
+import com.giphy.sdk.ui.pagination.GPHContent
+import com.giphy.sdk.ui.themes.GPHTheme
+import com.giphy.sdk.ui.themes.GridType
+import com.giphy.sdk.ui.views.GPHGridCallback
+import com.giphy.sdk.ui.views.GPHSearchGridCallback
+import com.giphy.sdk.ui.views.GifView
+import com.giphy.sdk.ui.views.GiphyDialogFragment
 import com.tari.android.wallet.R.color.*
 import com.tari.android.wallet.R.dimen.*
 import com.tari.android.wallet.R.string.emoji_id_chunk_separator
@@ -69,8 +80,11 @@ import com.tari.android.wallet.network.NetworkConnectionState
 import com.tari.android.wallet.ui.component.EmojiIdCopiedViewController
 import com.tari.android.wallet.ui.component.EmojiIdSummaryViewController
 import com.tari.android.wallet.ui.extension.*
+import com.tari.android.wallet.ui.presentation.TxNote
 import com.tari.android.wallet.ui.util.UiUtil
+import com.tari.android.wallet.ui.util.UiUtil.setColor
 import com.tari.android.wallet.util.Constants
+import com.tari.android.wallet.util.Constants.UI.AddNoteAndSend
 import com.tari.android.wallet.util.EmojiUtil
 import me.everything.android.ui.overscroll.OverScrollDecoratorHelper
 import java.lang.ref.WeakReference
@@ -81,7 +95,7 @@ import javax.inject.Inject
  *
  * @author The Tari Development Team
  */
-class AddNoteFragment : Fragment(), TextWatcher, View.OnTouchListener {
+class AddNoteFragment : Fragment(), View.OnTouchListener {
 
     @Inject
     lateinit var tracker: Tracker
@@ -111,6 +125,13 @@ class AddNoteFragment : Fragment(), TextWatcher, View.OnTouchListener {
     private lateinit var fee: MicroTari
 
     private lateinit var ui: FragmentAddNoteBinding
+    private lateinit var giphyView: GiphyView
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        appComponent.inject(this)
+        listenerWR = WeakReference(context as Listener)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -118,49 +139,79 @@ class AddNoteFragment : Fragment(), TextWatcher, View.OnTouchListener {
         savedInstanceState: Bundle?
     ): View? = FragmentAddNoteBinding.inflate(inflater, container, false).also { ui = it }.root
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        ui.noteEditText.removeTextChangedListener(this)
-    }
-
     @SuppressLint("ClickableViewAccessibility")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        appComponent.inject(this)
-        // get tx properties
+        if (savedInstanceState == null) {
+            tracker.screen(path = "/home/send_tari/add_note", title = "Send Tari - Add Note")
+        }
+        retrievePageArguments(savedInstanceState)
+        setupUI(savedInstanceState)
+        setupCTAs()
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == REQUEST_CODE_GIF) {
+            val media = data?.getParcelableExtra<Media>(GiphyDialogFragment.MEDIA_DELIVERY_KEY)
+            giphyView.gif = media
+            updateSliderState()
+        }
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        giphyView.save(outState)
+    }
+
+    @SuppressLint("ClickableViewAccessibility")
+    private fun setupUI(state: Bundle?) {
+        giphyView = GiphyView(ui.searchGiphyContainerView, ui.gifContainerView, ui.gifView, state)
+        emojiIdCopiedViewController = EmojiIdCopiedViewController(ui.emojiIdCopiedView)
+        emojiIdSummaryController = EmojiIdSummaryViewController(ui.emojiIdSummaryView)
+        ui.fullEmojiIdBgClickBlockerView.isClickable = false
+        ui.fullEmojiIdContainerView.gone()
+        displayAliasOrEmojiId()
+        hideFullEmojiId(animated = false)
+        OverScrollDecoratorHelper.setUpOverScroll(ui.fullEmojiIdScrollView)
+        ui.progressBar.setColor(color(white))
+        ui.noteEditText.addTextChangedListener(afterTextChanged = { updateSliderState() })
+        ui.slideView.setOnTouchListener(this)
+        // disable "send" slider
+        disableCallToAction()
+        focusEditTextAndShowKeyboard()
+        ui.promptTextView.setTextColor(color(black))
+        ui.noteEditText.imeOptions = EditorInfo.IME_ACTION_DONE
+        ui.noteEditText.setRawInputType(InputType.TYPE_CLASS_TEXT)
+        ui.rootView.doOnGlobalLayout {
+            UiUtil.setTopMargin(ui.fullEmojiIdContainerView, ui.emojiIdSummaryContainerView.top)
+            UiUtil.setHeight(ui.fullEmojiIdContainerView, ui.emojiIdSummaryContainerView.height)
+            UiUtil.setWidth(ui.fullEmojiIdContainerView, ui.emojiIdSummaryContainerView.width)
+        }
+        ui.giphyGridView.showViewOnGiphy = false
+        ui.giphyGridView.content = THUMBNAIL_REQUEST
+    }
+
+    private fun updateSliderState() {
+        if (ui.noteEditText.text?.toString().isNullOrEmpty() && giphyView.gif == null) {
+            ui.promptTextView.setTextColor(color(black))
+            disableCallToAction()
+        } else {
+            ui.promptTextView.setTextColor(color(add_note_prompt_passive_color))
+            enableCallToAction()
+        }
+    }
+
+    private fun retrievePageArguments(savedInstanceState: Bundle?) {
         recipientUser = arguments!!.getParcelable("recipientUser")!!
         amount = arguments!!.getParcelable("amount")!!
         fee = arguments!!.getParcelable("fee")!!
         if (savedInstanceState == null) {
             arguments!!.getString(DeepLink.PARAMETER_NOTE)?.let { ui.noteEditText.setText(it) }
         }
-        emojiIdSummaryController = EmojiIdSummaryViewController(ui.emojiIdSummaryView)
-        ui.fullEmojiIdBgClickBlockerView.isClickable = false
-        ui.fullEmojiIdContainerView.gone()
-        displayAliasOrEmojiId()
-        emojiIdCopiedViewController = EmojiIdCopiedViewController(ui.emojiIdCopiedView)
-        hideFullEmojiId(animated = false)
-        OverScrollDecoratorHelper.setUpOverScroll(ui.fullEmojiIdScrollView)
+    }
 
-        UiUtil.setProgressBarColor(ui.progressBar, color(white))
-
-        ui.noteEditText.addTextChangedListener(this)
-        ui.slideView.setOnTouchListener(this)
-
-        // disable "send" slider
-        disableCallToAction()
-        focusEditTextAndShowKeyboard()
-
-        ui.promptTextView.setTextColor(color(black))
-        ui.noteEditText.imeOptions = EditorInfo.IME_ACTION_DONE
-        ui.noteEditText.setRawInputType(InputType.TYPE_CLASS_TEXT)
-
-        ui.rootView.doOnGlobalLayout {
-            UiUtil.setTopMargin(ui.fullEmojiIdContainerView, ui.emojiIdSummaryContainerView.top)
-            UiUtil.setHeight(ui.fullEmojiIdContainerView, ui.emojiIdSummaryContainerView.height)
-            UiUtil.setWidth(ui.fullEmojiIdContainerView, ui.emojiIdSummaryContainerView.width)
-        }
-
+    private fun setupCTAs() {
         ui.backButton.setOnClickListener { onBackButtonClicked(it) }
         ui.emojiIdSummaryContainerView.setOnClickListener { emojiIdClicked() }
         ui.dimmerView.setOnClickListener { onEmojiIdDimmerClicked() }
@@ -169,13 +220,40 @@ class AddNoteFragment : Fragment(), TextWatcher, View.OnTouchListener {
             onCopyEmojiIdButtonLongClicked(copyEmojiIdButton)
             true
         }
+        ui.removeGifCtaView.setOnClickListener {
+            giphyView.gif = null
+            updateSliderState()
+        }
+        ui.searchGiphyCtaView.setOnClickListener {
+            GiphyDialogFragment.newInstance(
+                GPHSettings(GridType.waterfall, GPHTheme.Light, arrayOf(GPHContentType.gif))
+            ).apply { setTargetFragment(this@AddNoteFragment, REQUEST_CODE_GIF) }
+                .show(requireActivity().supportFragmentManager, null)
+        }
+        ui.giphyGridView.callback = object : GPHGridCallback {
+            override fun contentDidUpdate(resultCount: Int) {
+                // No-op
+            }
 
-        tracker.screen(path = "/home/send_tari/add_note", title = "Send Tari - Add Note")
-    }
+            override fun didSelectMedia(media: Media) {
+                giphyView.gif = media
+                updateSliderState()
+            }
+        }
+        ui.giphyGridView.searchCallback = object : GPHSearchGridCallback {
+            override fun didLongPressCell(cell: GifView) {
+                // No-op
+            }
 
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-        listenerWR = WeakReference(context as Listener)
+            override fun didScroll(dx: Int, dy: Int) {
+                // No-op
+            }
+
+            override fun didTapUsername(username: String) {
+                // No-op
+            }
+
+        }
     }
 
     private fun displayAliasOrEmojiId() {
@@ -283,9 +361,9 @@ class AddNoteFragment : Fragment(), TextWatcher, View.OnTouchListener {
         animSet.start()
         animSet.addListener(onEnd = { ui.dimmerView.isClickable = true })
         // scroll animation
-        ui.fullEmojiIdScrollView.postDelayed({
+        ui.fullEmojiIdScrollView.postDelayed(Constants.UI.shortDurationMs + 20) {
             ui.fullEmojiIdScrollView.smoothScrollTo(0, 0)
-        }, Constants.UI.shortDurationMs + 20)
+        }
     }
 
     private fun hideFullEmojiId(animateCopyEmojiIdButton: Boolean = true, animated: Boolean) {
@@ -424,28 +502,6 @@ class AddNoteFragment : Fragment(), TextWatcher, View.OnTouchListener {
         ui.slideView.setOnTouchListener(null)
     }
 
-    // region text change listener
-
-    override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {
-
-    }
-
-    override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
-
-    }
-
-    override fun afterTextChanged(s: Editable) {
-        if (s.toString().isNotEmpty()) {
-            ui.promptTextView.setTextColor(color(add_note_prompt_passive_color))
-            enableCallToAction()
-        } else {
-            ui.promptTextView.setTextColor(color(black))
-            disableCallToAction()
-        }
-    }
-
-    // endregion
-
     /**
      * Controls the slide button animation & behaviour on drag.
      */
@@ -557,30 +613,21 @@ class AddNoteFragment : Fragment(), TextWatcher, View.OnTouchListener {
 
     private fun onSlideAnimationEnd() {
         if (EventBus.networkConnectionStateSubject.value != NetworkConnectionState.CONNECTED) {
-            ui.rootView.postDelayed({
-                hideKeyboard()
-            }, Constants.UI.AddNoteAndSend.preKeyboardHideWaitMs)
-            ui.rootView.postDelayed(
-                {
-                    restoreSlider()
-                    ui.noteEditText.setRawInputType(InputType.TYPE_CLASS_TEXT)
-                    showInternetConnectionErrorDialog(activity!!)
-                },
-                Constants.UI.AddNoteAndSend.preKeyboardHideWaitMs + Constants.UI.keyboardHideWaitMs
-            )
-            return
+            ui.rootView.postDelayed(AddNoteAndSend.preKeyboardHideWaitMs) { hideKeyboard() }
+            ui.rootView.postDelayed(AddNoteAndSend.preKeyboardHideWaitMs + Constants.UI.keyboardHideWaitMs) {
+                restoreSlider()
+                ui.noteEditText.setRawInputType(InputType.TYPE_CLASS_TEXT)
+                showInternetConnectionErrorDialog(activity!!)
+            }
+        } else {
+            ui.removeGifCtaView.isEnabled = false
+            ui.progressBar.visible()
+            ui.slideView.gone()
+            ui.rootView.postDelayed(AddNoteAndSend.preKeyboardHideWaitMs) { hideKeyboard() }
+            val totalTime =
+                AddNoteAndSend.preKeyboardHideWaitMs + AddNoteAndSend.continueToFinalizeSendTxDelayMs
+            ui.rootView.postDelayed(totalTime) { continueToFinalizeSendTx() }
         }
-        ui.progressBar.visible()
-        ui.slideView.gone()
-        ui.rootView.postDelayed({
-            hideKeyboard()
-        }, Constants.UI.AddNoteAndSend.preKeyboardHideWaitMs)
-        ui.rootView.postDelayed(
-            {
-                continueToFinalizeSendTx()
-            }, Constants.UI.AddNoteAndSend.preKeyboardHideWaitMs
-                    + Constants.UI.AddNoteAndSend.continueToFinalizeSendTxDelayMs
-        )
     }
 
     private fun hideKeyboard() {
@@ -597,7 +644,10 @@ class AddNoteFragment : Fragment(), TextWatcher, View.OnTouchListener {
             recipientUser,
             amount,
             fee,
-            ui.noteEditText.editableText.toString()
+            TxNote(
+                ui.noteEditText.editableText.toString(),
+                giphyView.gif?.embedUrl
+            ).compose()
         )
     }
 
@@ -637,6 +687,49 @@ class AddNoteFragment : Fragment(), TextWatcher, View.OnTouchListener {
             note: String
         )
 
+    }
+
+    private inner class GiphyView(
+        private val thumbnailsContainer: View,
+        private val gifContainerView: View,
+        private val gifView: GifView,
+        state: Bundle?
+    ) {
+        var gif: Media? = null
+            set(value) {
+                field = value
+                gifView.setMedia(gif)
+                if (gif == null) {
+                    showContainer()
+                } else {
+                    showGif()
+                }
+            }
+
+        init {
+            gif = state?.getParcelable(KEY_GIF)
+        }
+
+        private fun showContainer() {
+            thumbnailsContainer.visible()
+            gifContainerView.gone()
+        }
+
+        private fun showGif() {
+            thumbnailsContainer.gone()
+            gifContainerView.visible()
+        }
+
+        fun save(bundle: Bundle) {
+            gif?.run { bundle.putParcelable(KEY_GIF, this) }
+        }
+
+    }
+
+    private companion object {
+        private const val KEY_GIF = "keygif"
+        private const val REQUEST_CODE_GIF = 1535
+        private val THUMBNAIL_REQUEST = GPHContent.searchQuery("money", mediaType = MediaType.gif)
     }
 
 }

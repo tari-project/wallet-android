@@ -49,7 +49,7 @@ internal class TxListAdapter(
     private val pendingInboundTxs: List<PendingInboundTx>,
     private val pendingOutboundTxs: List<PendingOutboundTx>,
     private val listener: (Tx) -> Unit
-) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+) : RecyclerView.Adapter<TxViewHolder>() {
 
     // transactions
     private val items = ArrayList<Tx>()
@@ -80,27 +80,26 @@ internal class TxListAdapter(
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int
-    ): RecyclerView.ViewHolder =
+    ): TxViewHolder =
         TxViewHolder(
             LayoutInflater.from(parent.context)
-                .inflate(R.layout.home_tx_list_item, parent, false)
-        ) { tx ->
-            listener(tx)
-        }
+                .inflate(R.layout.home_tx_list_item, parent, false),
+            listener
+        )
 
     /**
      * Bind & display header or transaction.
      */
-    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-        (holder as TxViewHolder).bind(items[position])
+    override fun onBindViewHolder(holder: TxViewHolder, position: Int) {
+        holder.bind(items[position])
     }
 
-    override fun onViewDetachedFromWindow(holder: RecyclerView.ViewHolder) {
-        (holder as TxViewHolder).disposeDateUpdateTimer()
+    override fun onViewAttachedToWindow(holder: TxViewHolder) {
+        holder.onAttach()
     }
 
-    override fun onViewAttachedToWindow(holder: RecyclerView.ViewHolder) {
-        (holder as TxViewHolder).startDateUpdateTimer()
+    override fun onViewDetachedFromWindow(holder: TxViewHolder) {
+        holder.onDetach()
     }
 
 }

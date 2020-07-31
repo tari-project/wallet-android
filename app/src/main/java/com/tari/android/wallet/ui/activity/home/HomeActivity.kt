@@ -47,6 +47,7 @@ import com.tari.android.wallet.R.color.home_selected_nav_item
 import com.tari.android.wallet.application.DeepLink
 import com.tari.android.wallet.databinding.ActivityHomeBinding
 import com.tari.android.wallet.event.EventBus
+import com.tari.android.wallet.infrastructure.GiphyEcosystem
 import com.tari.android.wallet.model.*
 import com.tari.android.wallet.network.NetworkConnectionState
 import com.tari.android.wallet.service.TariWalletService
@@ -56,7 +57,7 @@ import com.tari.android.wallet.service.connection.TariWalletServiceConnection.Ta
 import com.tari.android.wallet.ui.activity.SplashActivity
 import com.tari.android.wallet.ui.activity.send.SendTariActivity
 import com.tari.android.wallet.ui.activity.settings.BackupSettingsActivity
-import com.tari.android.wallet.ui.activity.tx.TxDetailActivity
+import com.tari.android.wallet.ui.activity.tx.TxDetailsActivity
 import com.tari.android.wallet.ui.extension.appComponent
 import com.tari.android.wallet.ui.extension.color
 import com.tari.android.wallet.ui.extension.showInternetConnectionErrorDialog
@@ -68,11 +69,13 @@ import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.SharedPrefsWrapper
 import javax.inject.Inject
 
-class HomeActivity : AppCompatActivity(), AllSettingsFragment.AllSettingsRouter,
+internal class HomeActivity : AppCompatActivity(), AllSettingsFragment.AllSettingsRouter,
     TxListFragment.TxListRouter {
 
     @Inject
     lateinit var sharedPrefsWrapper: SharedPrefsWrapper
+    @Inject
+    lateinit var giphy: GiphyEcosystem
 
     private lateinit var ui: ActivityHomeBinding
     private lateinit var serviceConnection: TariWalletServiceConnection
@@ -87,6 +90,7 @@ class HomeActivity : AppCompatActivity(), AllSettingsFragment.AllSettingsRouter,
             finish()
             return
         }
+        giphy.enable()
         serviceConnection = ViewModelProvider(this, TariWalletServiceConnectionFactory(this))
             .get(TariWalletServiceConnection::class.java)
         ui = ActivityHomeBinding.inflate(layoutInflater).also { setContentView(it.root) }
@@ -186,7 +190,7 @@ class HomeActivity : AppCompatActivity(), AllSettingsFragment.AllSettingsRouter,
         view.setColorFilter(color(home_selected_nav_item))
     }
 
-    override fun toTxDetails(tx: Tx) = startActivity(TxDetailActivity.createIntent(this, tx))
+    override fun toTxDetails(tx: Tx) = startActivity(TxDetailsActivity.createIntent(this, tx))
 
     override fun toTTLStore() = ui.viewPager.setCurrentItem(INDEX_STORE, NO_SMOOTH_SCROLL)
 

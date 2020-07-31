@@ -71,125 +71,229 @@
         app:barrierDirection="bottom"
         app:constraint_referenced_ids="back_button,title_text_view,emoji_id_summary_container_view" />
 
-    <LinearLayout
+    <ScrollView
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginHorizontal="@dimen/common_horizontal_margin"
         android:layout_marginTop="@dimen/common_horizontal_margin"
-        android:layout_marginBottom="@dimen/common_horizontal_margin"
-        android:orientation="vertical"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/search_giphy_container_view"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/add_note_header_barrier">
+        app:layout_constraintTop_toBottomOf="@id/add_note_header_barrier"
+        tools:background="@android:color/holo_blue_bright">
 
-        <com.tari.android.wallet.ui.component.CustomFontTextView
-            android:id="@+id/prompt_text_view"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:singleLine="true"
-            android:text="@string/add_note_prompt"
-            android:textColor="@color/black"
-            android:textSize="@dimen/add_note_prompt_text_size"
+            android:layout_marginHorizontal="@dimen/common_horizontal_margin"
+            android:orientation="vertical">
+
+            <com.tari.android.wallet.ui.component.CustomFontTextView
+                android:id="@+id/prompt_text_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:singleLine="true"
+                android:text="@string/add_note_prompt"
+                android:textColor="@color/black"
+                android:textSize="@dimen/add_note_prompt_text_size"
+                app:customFont="AVENIR_LT_STD_HEAVY" />
+
+            <com.tari.android.wallet.ui.component.CustomFontEditText
+                android:id="@+id/note_edit_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:layout_marginBottom="12dp"
+                android:layout_weight="1"
+                android:background="@color/transparent"
+                android:gravity="top"
+                android:hint="@string/add_note_hint"
+                android:inputType="textMultiLine"
+                android:lineSpacingExtra="10dp"
+                android:scrollHorizontally="false"
+                android:singleLine="false"
+                android:textSize="@dimen/add_note_note_text_size"
+                app:customFont="AVENIR_LT_STD_MEDIUM"
+                tools:ignore="InefficientWeight" />
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/gif_container_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                app:cardCornerRadius="10dp"
+                app:cardElevation="0dp"
+                tools:background="@android:color/holo_red_dark">
+
+                <com.giphy.sdk.ui.views.GifView
+                    android:id="@+id/gif_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center" />
+
+                <ImageView
+                    android:id="@+id/remove_gif_cta_view"
+                    android:layout_width="22dp"
+                    android:layout_height="22dp"
+                    android:layout_gravity="top|end"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginEnd="10dp"
+                    android:src="@drawable/icon_remove_gif"
+                    tools:ignore="ContentDescription" />
+
+            </androidx.cardview.widget.CardView>
+
+        </LinearLayout>
+    </ScrollView>
+
+    <LinearLayout
+        android:id="@+id/search_giphy_container_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toTopOf="@id/slide_button_container_view"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <LinearLayout
+                android:id="@+id/search_giphy_cta_view"
+                android:layout_width="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_height="wrap_content"
+                android:background="@drawable/search_giphy_cta_background"
+                android:orientation="horizontal"
+                android:paddingHorizontal="12dp"
+                android:paddingVertical="4dp">
+
+                <ImageView
+                    android:layout_width="9dp"
+                    android:layout_height="9dp"
+                    android:layout_gravity="center_vertical"
+                    android:src="@drawable/icon_giphy_search"
+                    tools:ignore="ContentDescription" />
+
+                <com.tari.android.wallet.ui.component.CustomFontTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="3dp"
+                    android:text="@string/add_note_search_giphy_label"
+                    android:textAllCaps="true"
+                    android:textColor="@color/white"
+                    android:textSize="9sp"
+                    app:customFont="AVENIR_LT_STD_BLACK"
+                    tools:ignore="SmallSp" />
+
+            </LinearLayout>
+
+            <ImageView
+                android:id="@+id/powered_by_giphy_image_view"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:contentDescription="@null"
+                android:src="@drawable/powered_by_giphy" />
+        </RelativeLayout>
+
+        <com.giphy.sdk.ui.views.GiphyGridView
+            android:id="@+id/giphy_grid_view"
+            android:layout_width="match_parent"
+            android:layout_height="64dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="14dp"
+            app:gphDirection="horizontal"
+            app:gphSpanCount="1" />
+
+    </LinearLayout>
+
+    <!-- slide button container -->
+    <RelativeLayout
+        android:id="@+id/slide_button_container_view"
+        android:layout_width="0dp"
+        android:layout_height="60dp"
+        android:layout_marginTop="@dimen/common_horizontal_margin"
+        android:background="@color/transparent"
+        android:clipChildren="false"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <View
+            android:id="@+id/add_note_vw_slide_disabled_bg"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/add_note_and_send_slide_button_disabled_bg" />
+
+        <View
+            android:id="@+id/slide_enabled_bg_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/add_note_and_send_slide_button_enabled_bg" />
+
+        <ProgressBar
+            android:id="@+id/progress_bar"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_centerInParent="true"
+            android:layout_gravity="center"
+            android:indeterminate="true"
+            android:visibility="invisible" />
+
+        <com.tari.android.wallet.ui.component.CustomFontTextView
+            android:id="@+id/slide_to_send_disabled_text_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:text="@string/add_note_slide_to_send"
+            android:textColor="#B2B2B2"
+            android:textSize="16sp"
             app:customFont="AVENIR_LT_STD_HEAVY" />
 
-        <com.tari.android.wallet.ui.component.CustomFontEditText
-            android:id="@+id/note_edit_text"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_marginTop="12dp"
-            android:layout_weight="1"
-            android:background="@color/transparent"
-            android:gravity="top"
-            android:hint="@string/add_note_hint"
-            android:inputType="textMultiLine"
-            android:lineSpacingExtra="10dp"
-            android:scrollHorizontally="false"
-            android:singleLine="false"
-            android:textSize="@dimen/add_note_note_text_size"
-            app:customFont="AVENIR_LT_STD_MEDIUM" />
+        <com.tari.android.wallet.ui.component.CustomFontTextView
+            android:id="@+id/slide_to_send_enabled_text_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:text="@string/add_note_slide_to_send"
+            android:textColor="@color/white"
+            android:textSize="16sp"
+            app:customFont="AVENIR_LT_STD_HEAVY" />
 
-        <!-- slide button container -->
         <RelativeLayout
-            android:id="@+id/slide_button_container_view"
-            android:layout_width="match_parent"
-            android:layout_height="53dp"
-            android:layout_marginTop="@dimen/common_horizontal_margin"
-            android:background="@color/transparent"
-            android:clipChildren="false">
+            android:id="@+id/slide_view"
+            android:layout_width="@dimen/add_note_slide_button_width"
+            android:layout_height="@dimen/add_note_slide_button_height"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="@dimen/add_note_slide_button_left_margin"
+            android:background="@drawable/add_note_slide_button_bg"
+            android:clickable="true"
+            android:focusable="true"
+            android:textColor="@color/purple">
 
-            <View
-                android:id="@+id/add_note_vw_slide_disabled_bg"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="@drawable/add_note_and_send_slide_button_disabled_bg" />
-
-            <View
-                android:id="@+id/slide_enabled_bg_view"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="@drawable/add_note_and_send_slide_button_enabled_bg" />
-
-            <ProgressBar
-                android:id="@+id/progress_bar"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:layout_centerInParent="true"
-                android:layout_gravity="center"
-                android:indeterminate="true"
-                android:visibility="invisible" />
-
-            <com.tari.android.wallet.ui.component.CustomFontTextView
-                android:id="@+id/slide_to_send_disabled_text_view"
+            <ImageView
+                android:id="@+id/add_note_img_slide_to_send_arrow_disabled"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerInParent="true"
-                android:text="@string/add_note_slide_to_send"
-                android:textColor="#B2B2B2"
-                android:textSize="16sp"
-                app:customFont="AVENIR_LT_STD_HEAVY" />
+                android:contentDescription="@null"
+                android:src="@drawable/slide_to_send_arrow_disabled" />
 
-            <com.tari.android.wallet.ui.component.CustomFontTextView
-                android:id="@+id/slide_to_send_enabled_text_view"
+            <ImageView
+                android:id="@+id/slide_to_send_arrow_enabled_image_view"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerInParent="true"
-                android:text="@string/add_note_slide_to_send"
-                android:textColor="@color/white"
-                android:textSize="16sp"
-                app:customFont="AVENIR_LT_STD_HEAVY" />
-
-            <RelativeLayout
-                android:id="@+id/slide_view"
-                android:layout_width="@dimen/add_note_slide_button_width"
-                android:layout_height="@dimen/add_note_slide_button_width"
-                android:layout_marginStart="@dimen/add_note_slide_button_left_margin"
-                android:layout_marginTop="5dp"
-                android:background="@drawable/add_note_slide_button_bg"
-                android:clickable="true"
-                android:focusable="true"
-                android:textColor="@color/purple">
-
-                <ImageView
-                    android:id="@+id/add_note_img_slide_to_send_arrow_disabled"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerInParent="true"
-                    android:contentDescription="@null"
-                    android:src="@drawable/slide_to_send_arrow_disabled" />
-
-                <ImageView
-                    android:id="@+id/slide_to_send_arrow_enabled_image_view"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerInParent="true"
-                    android:contentDescription="@null"
-                    android:src="@drawable/slide_to_send_arrow_enabled" />
-
-            </RelativeLayout>
+                android:contentDescription="@null"
+                android:src="@drawable/slide_to_send_arrow_enabled" />
 
         </RelativeLayout>
-    </LinearLayout>
+
+    </RelativeLayout>
 
     <!-- full emoji id outer container -->
     <RelativeLayout

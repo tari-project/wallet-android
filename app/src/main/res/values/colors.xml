@@ -57,6 +57,9 @@
     <color name="create_emoji_id_bg">#f6f6f6</color>
     <color name="home_selected_nav_item">#9330FF</color>
 
+    <!-- tx list -->
+    <color name="tx_list_loading_gif_gray">#817F8B</color>
+
     <!-- send tari - add recipient -->
     <color name="add_recipient_hint">#B2B2B2</color>
     <color name="add_recipient_contact_list_section_header_title">#B2B2B2</color>
