@@ -192,6 +192,7 @@
     <string name="tx_list_sent_a_payment">%s sent a payment</string>
     <string name="tx_list_sent_a_payment_bold_part">sent a payment</string>
     <string name="tx_list_you_paid">You paid</string>
+    <string name="tx_list_you_paid_with_alias">You paid %s</string>
     <string name="tx_list_paid_you">paid you.</string>
     <string name="tx_list_minutes_ago">%dm ago</string>
     <string name="tx_list_hours_ago">%dh ago</string>

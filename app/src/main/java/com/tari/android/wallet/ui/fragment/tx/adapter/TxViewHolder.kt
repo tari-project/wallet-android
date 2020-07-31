@@ -97,10 +97,20 @@ class TxViewHolder(view: View, private val listener: (Tx) -> Unit) :
         // display contact name or emoji id
         if (txUser is Contact) {
             ui.participantTextView1.visible()
-            val fullText = String.format(
-                string(R.string.tx_list_sent_a_payment),
-                txUser.alias
-            )
+            val fullText = when (tx.direction) {
+                Tx.Direction.INBOUND -> {
+                    String.format(
+                        string(R.string.tx_list_sent_a_payment),
+                        txUser.alias
+                    )
+                }
+                Tx.Direction.OUTBOUND -> {
+                    String.format(
+                        string(R.string.tx_list_you_paid_with_alias),
+                        txUser.alias
+                    )
+                }
+            }
             ui.participantTextView1.text = fullText.applyFontStyle(
                 itemView.context,
                 CustomFont.AVENIR_LT_STD_LIGHT,

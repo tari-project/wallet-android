@@ -56,14 +56,15 @@ internal class TxListAdapter(
 
     fun notifyDataChanged() {
         items.clear()
-        // add all txs
-        items.addAll(cancelledTxs)
-        items.addAll(completedTxs)
-        items.addAll(pendingInboundTxs)
-        items.addAll(pendingOutboundTxs)
-        // sort items by descending tx date
-        items.sortWith(compareByDescending(Tx::timestamp).thenByDescending { it.id })
-
+        // sort and add pending txs
+        val pendingTxs = (pendingInboundTxs + pendingOutboundTxs).toMutableList()
+        pendingTxs.sortWith(compareByDescending(Tx::timestamp).thenByDescending { it.id })
+        items.addAll(pendingTxs)
+        // sort and add non-pending txs
+        val nonPendingTxs = (cancelledTxs + completedTxs).toMutableList()
+        nonPendingTxs.sortWith(compareByDescending(Tx::timestamp).thenByDescending { it.id })
+        items.addAll(nonPendingTxs)
+        // update UI
         super.notifyDataSetChanged()
     }
 
