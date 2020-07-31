@@ -45,10 +45,15 @@ import com.tari.android.wallet.ui.extension.color
 import com.tari.android.wallet.ui.util.UiUtil
 import com.tari.android.wallet.util.WalletUtil
 import com.tari.android.wallet.util.extractEmojis
+import io.reactivex.Observable
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.Disposable
+import io.reactivex.schedulers.Schedulers
 import org.joda.time.DateTime
 import org.joda.time.Hours
 import org.joda.time.LocalDate
 import org.joda.time.Minutes
+import java.util.concurrent.TimeUnit
 
 /**
  * Transaction view holder class.
@@ -64,6 +69,8 @@ class TxViewHolder(view: View, private val listener: (Tx) -> Unit) :
 
     // e.g. Wed, Jun 2
     private val dateFormat = "E, MMM d"
+
+    private var dateUpdateTimer: Disposable? = null
 
     private val ui = HomeTxListItemBinding.bind(view)
 
@@ -87,7 +94,7 @@ class TxViewHolder(view: View, private val listener: (Tx) -> Unit) :
         displayMessageAndGIF()
     }
 
-    private fun  displayFirstEmoji() {
+    private fun displayFirstEmoji() {
         // display first emoji of emoji id
         ui.firstEmojiTextView.text = tx.user.publicKey.emojiId.extractEmojis()[0]
     }
@@ -186,15 +193,15 @@ class TxViewHolder(view: View, private val listener: (Tx) -> Unit) :
         val yesterdayDate = todayDate.minusDays(1)
         ui.dateTextView.text = when {
             txDate.isEqual(todayDate) -> {
-                val minutes = Minutes.minutesBetween(txDateTime, DateTime.now()).minutes
+                val minutesSinceTx = Minutes.minutesBetween(txDateTime, DateTime.now()).minutes
                 when {
-                    minutes == 0 -> {
+                    minutesSinceTx == 0 -> {
                         string(R.string.tx_list_now)
                     }
-                    minutes < 60 -> {
+                    minutesSinceTx < 60 -> {
                         String.format(
                             string(R.string.tx_list_minutes_ago),
-                            minutes
+                            minutesSinceTx
                         )
                     }
                     else -> {
@@ -245,6 +252,23 @@ class TxViewHolder(view: View, private val listener: (Tx) -> Unit) :
         ui.messageTextView.text = tx.message
         // TODO load GIF here
         ui.gifContainer.gone()
+    }
+
+    fun startDateUpdateTimer() {
+        dateUpdateTimer =
+            Observable
+                .timer(1, TimeUnit.MINUTES)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .repeat()
+                .subscribe {
+                    displayDate()
+                }
+    }
+
+    fun disposeDateUpdateTimer() {
+        dateUpdateTimer?.dispose()
+        dateUpdateTimer = null
     }
 
 }
