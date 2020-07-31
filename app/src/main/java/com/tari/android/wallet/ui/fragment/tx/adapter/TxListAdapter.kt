@@ -95,4 +95,12 @@ internal class TxListAdapter(
         (holder as TxViewHolder).bind(items[position])
     }
 
+    override fun onViewDetachedFromWindow(holder: RecyclerView.ViewHolder) {
+        (holder as TxViewHolder).disposeDateUpdateTimer()
+    }
+
+    override fun onViewAttachedToWindow(holder: RecyclerView.ViewHolder) {
+        (holder as TxViewHolder).startDateUpdateTimer()
+    }
+
 }
