@@ -1,84 +1,165 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/tx_item_root_view"
+    android:id="@+id/root_view"
     android:layout_width="match_parent"
-    android:layout_height="@dimen/home_tx_list_item_height"
+    android:layout_height="wrap_content"
     android:background="@color/transparent"
     android:clickable="true"
-    android:focusable="true"
-    android:gravity="center_vertical"
-    android:orientation="horizontal"
-    android:paddingHorizontal="@dimen/common_horizontal_margin">
+    android:focusable="true">
 
     <ImageView
-        android:id="@+id/tx_item_icon_image_view"
-        android:layout_width="44dp"
-        android:layout_height="44dp"
-        android:background="@drawable/home_tx_icon_bg"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="13dp"
+        android:layout_marginTop="20dp"
+        android:alpha="0.75"
         android:contentDescription="@null"
-        android:scaleType="center"
-        android:src="@drawable/home_tx_icon" />
+        android:scaleX="0.9"
+        android:scaleY="0.9"
+        android:src="@drawable/home_tx_list_item_emoji_shadow" />
+
+    <!-- large emoji icon container -->
+    <TextView
+        android:id="@+id/first_emoji_text_view"
+        android:layout_width="42dp"
+        android:layout_height="42dp"
+        android:layout_marginStart="@dimen/common_horizontal_margin"
+        android:layout_marginTop="32dp"
+        android:background="@drawable/home_tx_list_item_emoji_bg"
+        android:gravity="center"
+        android:textColor="@color/black"
+        android:textSize="20sp" />
 
     <LinearLayout
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="20dp"
-        android:layout_marginEnd="20dp"
-        android:layout_weight="1"
+        android:layout_toEndOf="@id/first_emoji_text_view"
+        android:layout_marginStart="@dimen/common_horizontal_margin"
         android:orientation="vertical">
 
-        <FrameLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <com.tari.android.wallet.ui.component.CustomFontTextView
-                android:id="@+id/tx_item_contact_alias_text_view"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@color/transparent"
-                android:ellipsize="end"
-                android:gravity="center_vertical"
-                android:singleLine="true"
-                android:text="@string/dummy_contact_alias"
-                android:textColor="@color/home_tx_contact_alias"
-                android:textSize="15sp"
-                app:customFont="AVENIR_LT_STD_HEAVY" />
-
-            <include
-                android:id="@+id/tx_item_emoji_summary_view"
-                layout="@layout/emoji_id_summary"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent" />
-        </FrameLayout>
-
-        <com.tari.android.wallet.ui.component.CustomFontTextView
-            android:id="@+id/tx_item_message_text_view"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:background="@color/transparent"
+            android:layout_marginTop="36dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <!-- participant -->
+            <LinearLayout
+                android:id="@+id/emoji_id_participant_container"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <com.tari.android.wallet.ui.component.CustomFontTextView
+                    android:id="@+id/participant_text_view_1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:ellipsize="end"
+                    android:singleLine="true"
+                    android:text="@string/tx_list_you_paid"
+                    android:textColor="#817F8A"
+                    android:layout_marginEnd="6dp"
+                    android:textSize="14sp"
+                    app:customFont="AVENIR_LT_STD_LIGHT" />
+
+                <include
+                    android:id="@+id/participant_emoji_id_view"
+                    layout="@layout/emoji_id_summary"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+
+                <com.tari.android.wallet.ui.component.CustomFontTextView
+                    android:id="@+id/participant_text_view_2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="6dp"
+                    android:ellipsize="end"
+                    android:singleLine="true"
+                    android:text="@string/tx_list_paid_you"
+                    android:textColor="#817F8A"
+                    android:textSize="14sp"
+                    app:customFont="AVENIR_LT_STD_LIGHT" />
+            </LinearLayout>
+
+            <com.tari.android.wallet.ui.component.CustomFontTextView
+                android:id="@+id/amount_text_view"
+                android:layout_width="wrap_content"
+                android:layout_height="23dp"
+                android:layout_marginStart="4dp"
+                android:layout_marginEnd="@dimen/common_horizontal_margin"
+                android:background="@drawable/home_tx_value_positive_bg"
+                android:gravity="center"
+                android:paddingStart="6dp"
+                android:paddingEnd="6dp"
+                android:textColor="@color/home_tx_value_positive"
+                android:textSize="12sp"
+                app:customFont="AVENIR_LT_STD_BLACK"
+                tools:text="+63.75" />
+        </LinearLayout>
+
+        <!-- date -->
+        <com.tari.android.wallet.ui.component.CustomFontTextView
+            android:id="@+id/date_text_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
             android:ellipsize="end"
             android:singleLine="true"
-            android:text="@string/dummy_message"
-            android:textColor="@color/home_tx_message"
+            android:textColor="#817F8A"
             android:textSize="12sp"
-            app:customFont="AVENIR_LT_STD_HEAVY" />
+            app:customFont="AVENIR_LT_STD_MEDIUM"
+            tools:text="2h ago" />
+
+        <!-- status -->
+        <com.tari.android.wallet.ui.component.CustomFontTextView
+            android:id="@+id/status_text_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="@dimen/common_horizontal_margin"
+            android:ellipsize="end"
+            android:singleLine="true"
+            android:textColor="#EC9C00"
+            android:textSize="12sp"
+            app:customFont="AVENIR_LT_STD_MEDIUM"
+            tools:text="Waiting for recipient to come online" />
+
+        <!-- status -->
+        <com.tari.android.wallet.ui.component.CustomFontTextView
+            android:id="@+id/message_text_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:layout_marginEnd="@dimen/common_horizontal_margin"
+            android:lineSpacingExtra="10dp"
+            android:singleLine="false"
+            android:textColor="#323139"
+            android:textSize="15sp"
+            app:customFont="AVENIR_LT_STD_MEDIUM"
+            tools:text="Waiting for recipient to come online" />
+
+        <!-- GIF -->
+        <FrameLayout
+            android:id="@+id/gif_container"
+            android:layout_width="match_parent"
+            android:layout_marginTop="8dp"
+            android:layout_height="160dp">
+
+            <!-- TODO GIF view comes here-->
+        </FrameLayout>
+
+        <View
+            android:id="@+id/separator"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginTop="32dp"
+            android:layout_marginEnd="@dimen/common_horizontal_margin"
+            android:background="#F1F1F1" />
     </LinearLayout>
 
-    <com.tari.android.wallet.ui.component.CustomFontTextView
-        android:id="@+id/tx_item_amount_text_view"
-        android:layout_width="wrap_content"
-        android:layout_height="23dp"
-        android:background="@drawable/home_tx_value_positive_bg"
-        android:gravity="center"
-        android:paddingStart="6dp"
-        android:paddingEnd="6dp"
-        android:layout_marginTop="-6dp"
-        android:textColor="@color/home_tx_value_positive"
-        android:textSize="12sp"
-        app:customFont="AVENIR_LT_STD_BLACK"
-        tools:text="+63.75"/>
-
-</LinearLayout>
+</RelativeLayout>

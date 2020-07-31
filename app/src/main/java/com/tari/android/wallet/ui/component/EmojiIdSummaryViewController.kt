@@ -35,6 +35,8 @@ package com.tari.android.wallet.ui.component
 import android.view.View
 import android.icu.text.BreakIterator
 import com.tari.android.wallet.databinding.EmojiIdSummaryBinding
+import com.tari.android.wallet.ui.extension.gone
+import com.tari.android.wallet.ui.extension.visible
 
 /**
  * Display a summary of the emoji id - with pipes.
@@ -45,7 +47,8 @@ internal class EmojiIdSummaryViewController(private val ui: EmojiIdSummaryBindin
 
     constructor(view: View) : this(EmojiIdSummaryBinding.bind(view))
 
-    fun display(emojiId: String) {
+    fun display(emojiId: String,
+                showEmojisFromEachEnd: Int = 3) {
         val emojis = ArrayList<String>()
         val it: BreakIterator = BreakIterator.getCharacterInstance()
         it.setText(emojiId)
@@ -59,12 +62,26 @@ internal class EmojiIdSummaryViewController(private val ui: EmojiIdSummaryBindin
             previous = it.current()
         }
 
+        if (showEmojisFromEachEnd > 3) {
+            throw IllegalArgumentException("Cannot show more than 3 emojis from each end.")
+        } else if (showEmojisFromEachEnd < 2) {
+            throw IllegalArgumentException("Cannot show less than 2 emojis from each end.")
+        }
+
         ui.emojiIdSummaryEmoji1TextView.text = emojis[0]
         ui.emojiIdSummaryEmoji2TextView.text = emojis[1]
         ui.emojiIdSummaryEmoji3TextView.text = emojis[2]
         ui.emojiIdSummaryEmoji4TextView.text = emojis.takeLast(3)[0]
         ui.emojiIdSummaryEmoji5TextView.text = emojis.takeLast(2)[0]
         ui.emojiIdSummaryEmoji6TextView.text = emojis.takeLast(1)[0]
+
+        if (showEmojisFromEachEnd == 2) {
+            ui.emojiIdSummaryEmoji3TextView.gone()
+            ui.emojiIdSummaryEmoji4TextView.gone()
+        } else {
+            ui.emojiIdSummaryEmoji3TextView.visible()
+            ui.emojiIdSummaryEmoji4TextView.visible()
+        }
     }
 
 

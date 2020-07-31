@@ -188,6 +188,15 @@
     <string name="home_back_up_wallet_encrypt_cta">Secure Backups</string>
     <string name="home_back_up_wallet_delay_encrypt_cta">Not now</string>
 
+    <!-- tx list -->
+    <string name="tx_list_sent_a_payment">%s sent a payment</string>
+    <string name="tx_list_sent_a_payment_bold_part">sent a payment</string>
+    <string name="tx_list_you_paid">You paid</string>
+    <string name="tx_list_paid_you">paid you.</string>
+    <string name="tx_list_minutes_ago">%dm ago</string>
+    <string name="tx_list_hours_ago">%dh ago</string>
+    <string name="tx_list_now">Now</string>
+
     <!-- send tari - add recipient -->
     <string name="add_recipient_title">Send To</string>
     <string name="add_recipient_hint">Enter Emoji ID or Contact Name</string>

@@ -30,7 +30,7 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.tari.android.wallet.ui.activity.home
+package com.tari.android.wallet.ui.fragment.tx
 
 import android.animation.ValueAnimator
 import android.annotation.SuppressLint
@@ -102,7 +102,8 @@ internal class UpdateProgressViewController(
     private val upToDateTextView: TextView = view.findViewById(R.id.home_txt_up_to_date)
     private val progressBar: ProgressBar = view.findViewById(R.id.home_prog_bar_update)
 
-    var state = State.IDLE
+    var state =
+        State.IDLE
         private set
     private var isReset = true
 
@@ -199,7 +200,8 @@ internal class UpdateProgressViewController(
         numberOfReceivedTxs = 0
         numberOfCancelledTxs = 0
         numberOfBroadcastTxs = 0
-        state = State.RUNNING
+        state =
+            State.RUNNING
         currentTextView = checkingForUpdatesTextView
         connectionCheckStartTimeMs = System.currentTimeMillis()
         checkNetworkConnectionStatus()
@@ -304,7 +306,8 @@ internal class UpdateProgressViewController(
         }
         // base node sync successful - start listening for events
         Logger.d("Connection tests passed. Start listening for wallet events.")
-        state = State.RECEIVING
+        state =
+            State.RECEIVING
         view.postDelayed({
             displayReceivingTxs()
         }, minStateDisplayPeriodMs)
@@ -355,7 +358,8 @@ internal class UpdateProgressViewController(
     }
 
     private fun complete() {
-        state = State.IDLE
+        state =
+            State.IDLE
         listenerWeakReference.get()?.updateHasCompleted(
             this,
             numberOfReceivedTxs,
@@ -401,7 +405,8 @@ internal class UpdateProgressViewController(
     }
 
     private fun fail(failureReason: FailureReason) {
-        state = State.IDLE
+        state =
+            State.IDLE
         listenerWeakReference.get()?.updateHasFailed(this, failureReason)
         isWaitingOnBaseNodeSync = false
         view.post {
