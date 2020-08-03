@@ -275,7 +275,6 @@ internal class BackupManager(
         sharedPrefs.backupFailureDate = null
         sharedPrefs.backupPassword = null
         sharedPrefs.scheduledBackupDate = null
-        sharedPrefs.localBackupFolderURI = null
         scheduledBackupSubscription?.dispose()
         scheduledBackupSubscription = null
         EventBus.postBackupState(BackupDisabled)
@@ -289,6 +288,7 @@ internal class BackupManager(
                 "Ignored exception while deleting all backup files: $exception"
             )
         }
+        sharedPrefs.localBackupFolderURI = null
         try {
             backupStorage.signOut()
         } catch (exception: Exception) {
