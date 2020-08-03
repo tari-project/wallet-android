@@ -20,4 +20,6 @@
     <!-- Backup storage full -->
     <string name="backup_wallet_storage_full_title">Wallet Backup Incomplete</string>
     <string name="backup_wallet_storage_full_desc">Your Google Drive is full.</string>
+    <!-- Backup prompt -->
+    <string name="home_back_up_wallet_encrypt_description">Given the amount of money in your wallet, you should password-protect your backups so they\'re safe even if your Google Drive is compromised.</string>
 </resources>

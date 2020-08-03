@@ -184,7 +184,6 @@
     <string name="home_back_up_wallet_back_up_cta">Back Up Wallet</string>
     <string name="home_back_up_wallet_delay_back_up_cta">I\'ll do it later</string>
     <string name="home_back_up_wallet_encrypt_title">Further secure your backups</string>
-    <string name="home_back_up_wallet_encrypt_description">Given the amount of money in your wallet, you should password-protect your backups so they\'re safe even if your Google Drive is compromised.</string>
     <string name="home_back_up_wallet_encrypt_cta">Secure Backups</string>
     <string name="home_back_up_wallet_delay_encrypt_cta">Not now</string>
 
