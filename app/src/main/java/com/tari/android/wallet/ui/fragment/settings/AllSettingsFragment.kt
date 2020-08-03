@@ -40,6 +40,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AlertDialog
+import androidx.biometric.BiometricPrompt
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import com.orhanobut.logger.Logger
@@ -49,6 +50,7 @@ import com.tari.android.wallet.databinding.FragmentAllSettingsBinding
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.infrastructure.BugReportingService
 import com.tari.android.wallet.infrastructure.backup.*
+import com.tari.android.wallet.infrastructure.security.biometric.BiometricAuthenticationService
 import com.tari.android.wallet.ui.dialog.ErrorDialog
 import com.tari.android.wallet.ui.extension.*
 import com.tari.android.wallet.ui.util.UiUtil.setColor
@@ -72,6 +74,9 @@ UI tree rebuild on configuration changes"""
 
     @Inject
     lateinit var backupManager: BackupManager
+
+    @Inject
+    lateinit var authService: BiometricAuthenticationService
 
     private lateinit var ui: FragmentAllSettingsBinding
 
@@ -111,7 +116,9 @@ UI tree rebuild on configuration changes"""
         ui.userAgreementCtaView.setOnClickListener { openLink(string(user_agreement_url)) }
         ui.privacyPolicyCtaView.setOnClickListener { openLink(string(privacy_policy_url)) }
         ui.disclaimerCtaView.setOnClickListener { openLink(string(disclaimer_url)) }
-        ui.backUpWalletCtaView.setOnClickListener { navigateToBackupSettings() }
+        ui.backUpWalletCtaView.setOnClickListener {
+            requireAuthorization { navigateToBackupSettings() }
+        }
     }
 
     override fun onDestroy() {
@@ -284,6 +291,40 @@ UI tree rebuild on configuration changes"""
             title = string(check_backup_storage_status_error_title),
             description = message
         ).show()
+    }
+
+    private fun requireAuthorization(onAuthorized: () -> Unit) {
+        if (authService.isDeviceSecured) {
+            lifecycleScope.launch {
+                try {
+                    // prompt system authentication dialog
+                    authService.authenticate(
+                        this@AllSettingsFragment,
+                        title = string(auth_title),
+                        subtitle =
+                        if (authService.isBiometricAuthAvailable) string(auth_biometric_prompt)
+                        else string(auth_device_lock_code_prompt)
+                    )
+                    onAuthorized()
+                } catch (e: BiometricAuthenticationService.BiometricAuthenticationException) {
+                    if (e.code != BiometricPrompt.ERROR_USER_CANCELED && e.code != BiometricPrompt.ERROR_CANCELED)
+                        Logger.e("Other biometric error. Code: ${e.code}")
+                    showAuthenticationCancellationError()
+                }
+            }
+        } else {
+            onAuthorized()
+        }
+    }
+
+    private fun showAuthenticationCancellationError() {
+        AlertDialog.Builder(requireContext())
+            .setCancelable(false)
+            .setMessage(getString(auth_failed_desc))
+            .setNegativeButton(string(exit)) { dialog, _ -> dialog.cancel() }
+            .create()
+            .apply { setTitle(string(auth_failed_title)) }
+            .show()
     }
 
     interface AllSettingsRouter {
