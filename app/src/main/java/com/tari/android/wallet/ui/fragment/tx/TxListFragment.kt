@@ -81,13 +81,13 @@ import com.tari.android.wallet.service.TariWalletService
 import com.tari.android.wallet.service.connection.TariWalletServiceConnection
 import com.tari.android.wallet.service.connection.TariWalletServiceConnection.ServiceConnectionStatus.CONNECTED
 import com.tari.android.wallet.ui.activity.debug.DebugActivity
-import com.tari.android.wallet.ui.fragment.tx.adapter.TxListAdapter
 import com.tari.android.wallet.ui.activity.send.SendTariActivity
 import com.tari.android.wallet.ui.component.CustomFont
 import com.tari.android.wallet.ui.component.CustomTypefaceSpan
 import com.tari.android.wallet.ui.dialog.BottomSlideDialog
 import com.tari.android.wallet.ui.extension.*
 import com.tari.android.wallet.ui.fragment.send.FinalizeSendTxFragment
+import com.tari.android.wallet.ui.fragment.tx.adapter.TxListAdapter
 import com.tari.android.wallet.ui.resource.AnimationResource
 import com.tari.android.wallet.ui.resource.ResourceContainer
 import com.tari.android.wallet.ui.util.UiUtil
@@ -358,27 +358,28 @@ internal class TxListFragment : Fragment(),
 
     private fun showWalletBackupPromptIfNecessary() {
         if (context != null && (!sharedPrefsWrapper.backupIsEnabled || sharedPrefsWrapper.backupPassword == null)) {
-            val inboundNonFaucetTransactionsCount = countInboundNonFaucetTransaction()
+            val inboundTransactionsCount = pendingInboundTxs.size + completedTxs.asSequence()
+                .filter { it.direction == Tx.Direction.INBOUND }.count()
             val tarisAmount =
                 balanceInfo.availableBalance.tariValue + balanceInfo.pendingIncomingBalance.tariValue
             when {
-                inboundNonFaucetTransactionsCount >= 5
-                        && tarisAmount > BigDecimal("25000")
+                inboundTransactionsCount >= 5
+                        && tarisAmount >= BigDecimal("25000")
                         && sharedPrefsWrapper.backupIsEnabled
                         && sharedPrefsWrapper.backupPassword == null -> showSecureYourBackupsDialog()
-                inboundNonFaucetTransactionsCount >= 4
-                        && tarisAmount > BigDecimal("8000")
+                inboundTransactionsCount >= 4
+                        && tarisAmount >= BigDecimal("8000")
                         && !sharedPrefsWrapper.backupIsEnabled -> showRepeatedBackUpPrompt()
-                inboundNonFaucetTransactionsCount >= 1
+                // Non-faucet transactions only here. Calculation is performed here to avoid
+                // unnecessary calculations as previous two cases have much greater chance to happen
+                pendingInboundTxs.size + completedTxs
+                    .filter { it.direction == Tx.Direction.INBOUND }
+                    .filterNot { it.status == TxStatus.IMPORTED }
+                    .count() >= 1
                         && !sharedPrefsWrapper.backupIsEnabled -> showInitialBackupPrompt()
             }
         }
     }
-
-    private fun countInboundNonFaucetTransaction(): Int = pendingInboundTxs.size + completedTxs
-        .filter { it.direction == Tx.Direction.INBOUND }
-        .filterNot { it.status == TxStatus.IMPORTED }
-        .count()
 
     private fun showInitialBackupPrompt() {
         BackupWalletPrompt(
