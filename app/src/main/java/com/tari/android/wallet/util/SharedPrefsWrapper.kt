@@ -257,8 +257,7 @@ class SharedPrefsWrapper(
             else SecurePreferences.setValue(context, Key.backupPassword, value.joinToString(""))
 
     var localBackupFolderURI: Uri?
-        get() = (sharedPrefs.getString(Key.localBackupFolderURI, null) ?: "")
-            .let { if (it.isEmpty()) null else Uri.parse(it) }
+        get() = sharedPrefs.getString(Key.localBackupFolderURI, null)?.let(Uri::parse)
         set(value) = sharedPrefs.edit().apply {
             if (value == null) remove(Key.localBackupFolderURI)
             else putString(Key.localBackupFolderURI, value.toString())
