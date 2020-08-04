@@ -233,9 +233,7 @@ internal class CreateWalletFragment : Fragment() {
                 uiHandler.postDelayed({
                     if (EventBus.walletStateSubject.value != WalletState.RUNNING) {
                         isWaitingOnWalletState = true
-                        EventBus.subscribeToWalletState(this) { walletState ->
-                            onWalletStateChanged(walletState)
-                        }
+                        EventBus.subscribeToWalletState(this, ::onWalletStateChanged)
                     } else {
                         startCheckMarkAnimation()
                     }
