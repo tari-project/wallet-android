@@ -266,11 +266,10 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniCreate(
     }
 
     const char *pReceivedMethod = jEnv->GetStringUTFChars(callback_received_tx, JNI_FALSE);
-    const char *pReceivedSig = jEnv->GetStringUTFChars(callback_received_tx_sig,
-                                                       JNI_FALSE);
+    const char *pReceivedSig = jEnv->GetStringUTFChars(callback_received_tx_sig, JNI_FALSE);
     txReceivedCallbackMethodId = jEnv->GetMethodID(jClass, pReceivedMethod, pReceivedSig);
     jEnv->ReleaseStringUTFChars(callback_received_tx_sig, pReceivedSig);
-    jEnv->ReleaseStringUTFChars(callback_received_tx, pReceivedSig);
+    jEnv->ReleaseStringUTFChars(callback_received_tx, pReceivedMethod);
     if (txReceivedCallbackMethodId == nullptr) {
         SetPointerField(jEnv, jThis, reinterpret_cast<jlong>(nullptr));
     }

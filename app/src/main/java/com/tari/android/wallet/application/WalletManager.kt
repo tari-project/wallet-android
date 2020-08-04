@@ -39,15 +39,6 @@ import com.tari.android.wallet.BuildConfig
 import com.tari.android.wallet.R
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.ffi.*
-import com.tari.android.wallet.ffi.FFIByteVector
-import com.tari.android.wallet.ffi.FFICommsConfig
-import com.tari.android.wallet.ffi.FFIPublicKey
-import com.tari.android.wallet.ffi.FFITransportType
-import com.tari.android.wallet.ffi.FFIWallet
-import com.tari.android.wallet.ffi.HexString
-import com.tari.android.wallet.ffi.LogFileObserver
-import com.tari.android.wallet.ffi.NetAddressString
-import com.tari.android.wallet.ffi.nullptr
 import com.tari.android.wallet.tor.TorConfig
 import com.tari.android.wallet.tor.TorProxyManager
 import com.tari.android.wallet.tor.TorProxyMonitor
@@ -101,9 +92,7 @@ internal class WalletManager(
         /**
          * Subscribe to Tor proxy state changes.
          */
-        EventBus.subscribeToTorProxyState(this) { state ->
-            onTorProxyStateChanged(state)
-        }
+        EventBus.subscribeToTorProxyState(this, this::onTorProxyStateChanged)
 
     }
 
