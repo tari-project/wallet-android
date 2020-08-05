@@ -12,13 +12,12 @@
     <ImageView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="13dp"
-        android:layout_marginTop="20dp"
-        android:alpha="0.75"
+        android:layout_marginStart="11dp"
+        android:layout_marginTop="18dp"
         android:contentDescription="@null"
-        android:scaleX="0.9"
-        android:scaleY="0.9"
-        android:src="@drawable/home_tx_list_item_emoji_shadow" />
+        android:scaleX="0.95"
+        android:scaleY="0.95"
+        android:src="@drawable/tx_list_item_emoji_shadow" />
 
     <!-- large emoji icon container -->
     <TextView
@@ -35,8 +34,8 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_toEndOf="@id/first_emoji_text_view"
         android:layout_marginStart="@dimen/common_horizontal_margin"
+        android:layout_toEndOf="@id/first_emoji_text_view"
         android:orientation="vertical">
 
         <LinearLayout
@@ -59,11 +58,11 @@
                     android:id="@+id/participant_text_view_1"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginEnd="6dp"
                     android:ellipsize="end"
                     android:singleLine="true"
                     android:text="@string/tx_list_you_paid"
                     android:textColor="#817F8A"
-                    android:layout_marginEnd="6dp"
                     android:textSize="14sp"
                     app:customFont="AVENIR_LT_STD_LIGHT" />
 
@@ -129,7 +128,7 @@
             app:customFont="AVENIR_LT_STD_MEDIUM"
             tools:text="Waiting for recipient to come online" />
 
-        <!-- status -->
+        <!-- message -->
         <com.tari.android.wallet.ui.component.CustomFontTextView
             android:id="@+id/message_text_view"
             android:layout_width="match_parent"
@@ -143,15 +142,12 @@
             app:customFont="AVENIR_LT_STD_MEDIUM"
             tools:text="Waiting for recipient to come online" />
 
-        <!-- GIF -->
-        <FrameLayout
+        <include
             android:id="@+id/gif_container"
+            layout="@layout/gif_container"
             android:layout_width="match_parent"
-            android:layout_marginTop="8dp"
-            android:layout_height="160dp">
-
-            <!-- TODO GIF view comes here-->
-        </FrameLayout>
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="@dimen/common_horizontal_margin" />
 
         <View
             android:id="@+id/separator"

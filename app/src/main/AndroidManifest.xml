@@ -108,7 +108,7 @@
             android:theme="@style/AppTheme"
             android:windowSoftInputMode="adjustResize|stateAlwaysHidden" /> <!-- wallet info -->
         <activity
-            android:name=".ui.activity.tx.TxDetailActivity"
+            android:name=".ui.activity.tx.TxDetailsActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:parentActivityName=".ui.activity.home.HomeActivity"
             android:screenOrientation="portrait"

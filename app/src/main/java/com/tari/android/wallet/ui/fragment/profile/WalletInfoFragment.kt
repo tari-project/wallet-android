@@ -47,8 +47,6 @@ import com.daasuu.ei.Ease
 import com.daasuu.ei.EasingInterpolator
 import com.tari.android.wallet.R
 import com.tari.android.wallet.databinding.FragmentWalletInfoBinding
-import com.tari.android.wallet.extension.applyFontStyle
-import com.tari.android.wallet.ui.component.CustomFont
 import com.tari.android.wallet.ui.component.EmojiIdCopiedViewController
 import com.tari.android.wallet.ui.component.EmojiIdSummaryViewController
 import com.tari.android.wallet.ui.extension.*
@@ -103,7 +101,6 @@ class WalletInfoFragment : Fragment() {
     // region Initial UI Setup
     private fun setupUi() {
         val emojiId = sharedPrefsWrapper.emojiId!!
-        displayStylizedTitle()
         displayQRCode(emojiId)
         displayFullEmojiId(emojiId)
         setupCTAs()
@@ -116,17 +113,6 @@ class WalletInfoFragment : Fragment() {
             color(R.color.black),
             color(R.color.light_gray)
         )
-    }
-
-    private fun displayStylizedTitle() {
-        val styledTitle = string(R.string.wallet_info_share_your_emoji_id).applyFontStyle(
-            requireContext(),
-            CustomFont.AVENIR_LT_STD_LIGHT,
-            string(R.string.wallet_info_share_your_emoji_id_bold_part),
-            CustomFont.AVENIR_LT_STD_BLACK,
-            applyToOnlyFirstOccurence = true
-        )
-        ui.shareEmojiIdTextView.text = styledTitle
     }
 
     private fun displayQRCode(emojiId: String) {

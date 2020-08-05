@@ -196,6 +196,8 @@
     <string name="tx_list_minutes_ago">%dm ago</string>
     <string name="tx_list_hours_ago">%dh ago</string>
     <string name="tx_list_now">Now</string>
+    <string name="tx_list_loading_gif">Loading GIF</string>
+    <string name="tx_list_retry_loading_gif">Retry loading GIF</string>
 
     <!-- send tari - add recipient -->
     <string name="add_recipient_title">Send To</string>
@@ -222,6 +224,7 @@
     <string name="add_note_prompt">Transaction Note</string>
     <string name="add_note_hint">Let the recipient know what the payment is for</string>
     <string name="add_note_slide_to_send">Slide to Send</string>
+    <string name="add_note_search_giphy_label">search</string>
 
     <!-- send tari - successful -->
     <string name="finalize_send_tx_sending_step_1_desc_line_1">Connecting to the</string>
@@ -233,8 +236,7 @@
 
     <!-- debug log - title -->
     <!-- wallet info -->
-    <string name="wallet_info_share_your_emoji_id">Your Emoji ID is your wallet address. Share it with others to receive tXTR.</string>
-    <string name="wallet_info_share_your_emoji_id_bold_part">Emoji ID</string>
+    <string name="wallet_info_my_profile">My Profile</string>
     <string name="wallet_info_qr_code_desc">Transacting in person? Others can scan this QR code from the Tari Aurora App to send you tXTR.</string>
 
     <!-- tx failed dialog -->

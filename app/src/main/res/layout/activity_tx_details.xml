@@ -5,27 +5,26 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fillViewport="true"
-    tools:context=".ui.activity.tx.TxDetailActivity">
+    tools:context=".ui.activity.tx.TxDetailsActivity">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <RelativeLayout
+        android:id="@+id/payment_header_view"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@color/gray_background">
+        android:layout_height="wrap_content"
+        android:background="@android:color/white"
+        tools:viewBindingIgnore="true">
 
         <LinearLayout
-            android:id="@+id/payment_header_view"
-            android:layout_width="0dp"
+            android:id="@+id/top_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@android:color/white"
             android:clipToPadding="false"
+            android:gravity="center_horizontal"
             android:orientation="vertical"
-            android:paddingBottom="13dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            tools:viewBindingIgnore="true">
+            android:paddingBottom="13dp">
 
             <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/title_and_date_container"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
@@ -102,7 +101,6 @@
                 android:id="@+id/cancel_tx_container_view"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
                 android:visibility="gone">
 
                 <com.tari.android.wallet.ui.component.CustomFontTextView
@@ -117,102 +115,115 @@
                     android:textSize="12sp"
                     app:customFont="AVENIR_LT_STD_MEDIUM" />
             </FrameLayout>
-
         </LinearLayout>
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/common_scroll_height_gradient_height"
-            android:background="@drawable/view_elevation_gradient"
-            app:layout_constraintTop_toBottomOf="@id/payment_header_view" />
-
-        <RelativeLayout
-            android:id="@+id/amount_container_view"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/tx_details_amount_section_vertical_padding"
-            android:layout_marginBottom="30dp"
-            android:orientation="horizontal"
-            android:paddingHorizontal="12dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/payment_header_view">
-
-            <ImageView
-                android:id="@+id/amount_gem_image_view"
-                android:layout_width="@dimen/add_amount_gem_size"
-                android:layout_height="@dimen/add_amount_gem_size"
-                android:layout_centerVertical="true"
-                android:layout_marginEnd="6dp"
-                android:layout_toStartOf="@id/amount_text_view"
-                android:contentDescription="@null"
-                android:src="@drawable/gem_amount" />
-
-            <com.tari.android.wallet.ui.component.CustomFontTextView
-                android:id="@+id/amount_text_view"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerHorizontal="true"
-                android:textColor="@color/black"
-                android:textSize="@dimen/add_amount_element_text_size"
-                app:customFont="AVENIR_LT_STD_BLACK"
-                tools:text="150" />
-        </RelativeLayout>
-
-        <com.tari.android.wallet.ui.component.CustomFontTextView
-            android:id="@+id/tx_fee_text_view"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="@color/black"
-            android:textSize="14sp"
-            app:customFont="AVENIR_LT_STD_HEAVY"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/amount_container_view"
-            tools:text="+5.50" />
-
-        <com.tari.android.wallet.ui.component.CustomFontTextView
-            android:id="@+id/fee_label_text_view"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="2dp"
-            android:drawableEnd="@drawable/help_icon_24dp"
-            android:drawablePadding="4dp"
-            android:text="@string/tx_detail_transaction_fee"
-            android:textColor="#A9AFC4"
-            android:textSize="14sp"
-            app:customFont="AVENIR_LT_STD_HEAVY"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tx_fee_text_view" />
 
         <View
             android:id="@+id/top_dimmer_view"
             android:layout_width="match_parent"
             android:layout_height="0dp"
+            android:layout_alignTop="@id/top_content"
+            android:layout_alignBottom="@id/top_content"
             android:alpha="0.6"
             android:background="@color/black"
             android:clickable="true"
             android:focusable="true"
-            android:visibility="gone"
-            app:layout_constraintBottom_toTopOf="@id/detail_container_view"
-            app:layout_constraintTop_toTopOf="parent" />
+            android:visibility="gone" />
+
+    </RelativeLayout>
+
+    <ScrollView
+        android:id="@+id/detail_scroll_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/payment_header_view"
+        android:background="@color/white"
+        android:fillViewport="true"
+        android:overScrollMode="never">
 
         <RelativeLayout
             android:id="@+id/detail_container_view"
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_marginTop="@dimen/tx_details_amount_section_vertical_padding"
+            android:layout_height="wrap_content"
             android:background="@color/white"
             android:clipChildren="false"
-            android:orientation="vertical"
-            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintTop_toBottomOf="@id/fee_label_text_view">
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_alignBottom="@id/amount_section_bottom_spacer"
+                android:layout_alignParentTop="true"
+                android:background="@color/gray_background" />
+
+            <RelativeLayout
+                android:id="@+id/amount_container_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/tx_details_amount_section_vertical_padding"
+                android:layout_marginBottom="30dp"
+                android:orientation="horizontal"
+                android:paddingHorizontal="12dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <ImageView
+                    android:id="@+id/amount_gem_image_view"
+                    android:layout_width="@dimen/add_amount_gem_size"
+                    android:layout_height="@dimen/add_amount_gem_size"
+                    android:layout_centerVertical="true"
+                    android:layout_marginEnd="6dp"
+                    android:layout_toStartOf="@id/amount_text_view"
+                    android:contentDescription="@null"
+                    android:src="@drawable/gem_amount" />
+
+                <com.tari.android.wallet.ui.component.CustomFontTextView
+                    android:id="@+id/amount_text_view"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerHorizontal="true"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/add_amount_element_text_size"
+                    app:customFont="AVENIR_LT_STD_BLACK"
+                    tools:text="150" />
+            </RelativeLayout>
+
+            <com.tari.android.wallet.ui.component.CustomFontTextView
+                android:id="@+id/tx_fee_text_view"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/amount_container_view"
+                android:layout_centerHorizontal="true"
+                android:textColor="@color/black"
+                android:textSize="14sp"
+                app:customFont="AVENIR_LT_STD_HEAVY"
+                tools:text="+5.50" />
+
+            <com.tari.android.wallet.ui.component.CustomFontTextView
+                android:id="@+id/fee_label_text_view"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/tx_fee_text_view"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="2dp"
+                android:drawableEnd="@drawable/help_icon_24dp"
+                android:drawablePadding="4dp"
+                android:text="@string/tx_detail_transaction_fee"
+                android:textColor="#A9AFC4"
+                android:textSize="14sp"
+                app:customFont="AVENIR_LT_STD_HEAVY" />
+
+            <View
+                android:id="@+id/amount_section_bottom_spacer"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/tx_details_amount_section_vertical_padding"
+                android:layout_below="@id/fee_label_text_view" />
 
             <com.tari.android.wallet.ui.component.CustomFontTextView
                 android:id="@+id/from_text_view"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_below="@id/amount_section_bottom_spacer"
                 android:layout_marginStart="@dimen/common_horizontal_margin"
                 android:layout_marginTop="22dp"
                 android:text="@string/common_from"
@@ -319,9 +330,8 @@
 
             <com.tari.android.wallet.ui.component.CustomFontTextView
                 android:id="@+id/tx_note_text_view"
-                android:layout_width="wrap_content"
-                android:layout_height="0dp"
-                android:layout_above="@id/tx_id_text_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 android:layout_below="@id/note_label_text_view"
                 android:layout_marginHorizontal="@dimen/common_horizontal_margin"
                 android:layout_marginTop="12dp"
@@ -333,27 +343,22 @@
                 app:layout_constraintStart_toStartOf="@id/note_label_text_view"
                 app:layout_constraintTop_toBottomOf="@id/note_label_text_view" />
 
-            <com.tari.android.wallet.ui.component.CustomFontTextView
-                android:id="@+id/tx_id_text_view"
+            <include
+                android:id="@+id/gif_container"
+                layout="@layout/gif_container"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_alignParentBottom="true"
-                android:layout_centerHorizontal="true"
-                android:layout_gravity="bottom"
-                android:layout_marginTop="4dp"
-                android:layout_marginBottom="@dimen/tx_details_tx_id_bottom_margin"
-                android:ellipsize="middle"
-                android:gravity="center"
-                android:text="@string/tx_detail_note"
-                android:textColor="@color/tx_detail_contact_name_label_text"
-                android:textSize="@dimen/tx_details_tx_id_text_size"
-                app:customFont="AVENIR_LT_STD_ROMAN"
-                tools:text="Transaction ID: 8G438GM39" />
+                android:layout_marginBottom="@dimen/common_horizontal_margin"
+                android:layout_marginTop="0dp"
+                android:layout_below="@id/tx_note_text_view"
+                android:layout_marginHorizontal="@dimen/common_horizontal_margin"
+                android:visibility="visible" />
 
             <View
                 android:id="@+id/bottom_dimmer_view"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="0dp"
+                android:layout_alignParentTop="true"
                 android:alpha="0.6"
                 android:background="@color/black"
                 android:clickable="true"
@@ -408,9 +413,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/from_text_view"
-                android:layout_marginStart="@dimen/common_horizontal_margin"
+                android:layout_marginHorizontal="@dimen/common_horizontal_margin"
                 android:layout_marginTop="14dp"
-                android:layout_marginEnd="25dp"
                 android:orientation="horizontal">
 
                 <FrameLayout
@@ -441,9 +445,9 @@
                     android:layout_alignTop="@id/emoji_id_summary_container_view"
                     android:layout_alignBottom="@id/emoji_id_summary_container_view"
                     android:layout_alignParentEnd="true"
+                    android:layout_marginStart="4dp"
                     android:layout_toEndOf="@id/emoji_id_summary_container_view"
                     android:background="@color/transparent"
-                    android:layout_marginStart="4dp"
                     android:ellipsize="middle"
                     android:gravity="center_vertical|end"
                     android:singleLine="true"
@@ -505,14 +509,13 @@
                     </FrameLayout>
                 </RelativeLayout>
             </RelativeLayout>
-
         </RelativeLayout>
+    </ScrollView>
 
-        <androidx.constraintlayout.widget.Group
-            android:id="@+id/tx_fee_group"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:constraint_referenced_ids="tx_fee_text_view,fee_label_text_view" />
-    </androidx.constraintlayout.widget.ConstraintLayout>
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/common_scroll_height_gradient_height"
+        android:layout_below="@id/payment_header_view"
+        android:background="@drawable/view_elevation_gradient" />
 
 </RelativeLayout>

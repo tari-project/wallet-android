@@ -30,19 +30,35 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.tari.android.wallet.ui.extension
+package com.tari.android.wallet.infrastructure
 
-import android.graphics.drawable.Drawable
-import androidx.annotation.ColorRes
-import androidx.annotation.DimenRes
-import androidx.annotation.DrawableRes
-import androidx.annotation.StringRes
-import androidx.recyclerview.widget.RecyclerView.ViewHolder
+import android.content.Context
+import com.giphy.sdk.core.models.Media
+import com.giphy.sdk.ui.Giphy
+import java.util.concurrent.ConcurrentHashMap
 
-internal fun ViewHolder.dimen(@DimenRes id: Int): Int = itemView.dimenPx(id)
+internal class GiphyEcosystem(
+    private val context: Context,
+    private val key: String
+) {
 
-internal fun ViewHolder.string(@StringRes id: Int): String = itemView.string(id)
+    companion object {
 
-internal fun ViewHolder.color(@ColorRes id: Int): Int = itemView.color(id)
+        private const val cacheCountLimit = 50
 
-internal fun ViewHolder.drawable(@DrawableRes id: Int): Drawable? = itemView.drawable(id)
+        private val mediaCache = ConcurrentHashMap<String,Media>()
+
+        fun cacheMedia(id: String, media: Media) {
+            if (mediaCache.size == cacheCountLimit) {
+                mediaCache.remove(mediaCache.keys.random())
+            }
+            mediaCache[id] = media
+        }
+
+        fun getCachedMedia(id: String): Media? = mediaCache[id]
+
+    }
+
+    fun enable() = Giphy.configure(context, key)
+
+}

@@ -220,6 +220,14 @@ internal fun View.setHeight(value: Int) {
     this.layoutParams = this.layoutParams.also { it.height = value }
 }
 
+internal fun View.setTopMargin(value: Int) {
+    if (layoutParams is ViewGroup.MarginLayoutParams) {
+        val layoutParams = layoutParams as ViewGroup.MarginLayoutParams
+        layoutParams.topMargin = value
+        this.layoutParams = layoutParams
+    }
+}
+
 internal fun View.postDelayed(timeMillis: Long, action: () -> Unit) =
     this.postDelayed(action, timeMillis)
 

@@ -37,7 +37,9 @@ import android.content.ClipboardManager
 import android.content.Context
 import androidx.biometric.BiometricManager
 import androidx.core.content.ContextCompat
+import com.tari.android.wallet.BuildConfig
 import com.tari.android.wallet.application.TariWalletApplication
+import com.tari.android.wallet.infrastructure.GiphyEcosystem
 import com.tari.android.wallet.infrastructure.security.biometric.BiometricAuthenticationService
 import com.tari.android.wallet.notification.NotificationHelper
 import com.tari.android.wallet.util.SharedPrefsWrapper
@@ -89,5 +91,10 @@ internal class ApplicationModule(
             BiometricManager.from(context),
             context.getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager
         )
+
+    @Provides
+    @Singleton
+    fun provideGiphyEcosystem(context: Context): GiphyEcosystem =
+        GiphyEcosystem(context, BuildConfig.GIPHY_KEY)
 
 }

@@ -65,6 +65,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.daasuu.ei.Ease
 import com.daasuu.ei.EasingInterpolator
+import com.orhanobut.logger.Logger
 import com.squareup.seismic.ShakeDetector
 import com.tari.android.wallet.R
 import com.tari.android.wallet.application.DeepLink
@@ -1104,8 +1105,10 @@ internal class TxListFragment : Fragment(),
                     1F - ratio * GRABBER_CORNER_RADIUS_SCROLL_COEFFICIENT
                 ) * dimenPx(R.dimen.home_grabber_corner_radius)
 
-                if (ratio == 0F && !isInDraggingSession && !ui.txRecyclerView.isScrolledToTop()) {
-                    ui.txRecyclerView.smoothScrollToPosition(0)
+                if (ratio == 0F && !isInDraggingSession) {
+                    if (!ui.txRecyclerView.isScrolledToTop()) {
+                        ui.txRecyclerView.smoothScrollToPosition(0)
+                    }
                     handler.postDelayed(Constants.UI.mediumDurationMs) {
                         recyclerViewScrollListener.reset()
                         ui.headerElevationView.alpha = 0F

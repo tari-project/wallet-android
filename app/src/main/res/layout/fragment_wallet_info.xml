@@ -20,30 +20,20 @@
             android:clipChildren="false">
 
             <com.tari.android.wallet.ui.component.CustomFontTextView
-                android:id="@+id/share_emoji_id_text_view"
+                android:id="@+id/my_profile_text_view"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="@dimen/common_horizontal_margin"
-                android:layout_marginTop="48dp"
+                android:layout_marginTop="24dp"
                 android:gravity="center"
                 android:letterSpacing="-0.015"
-                android:lineSpacingExtra="9dp"
-                android:text="@string/wallet_info_share_your_emoji_id"
+                android:text="@string/wallet_info_my_profile"
                 android:textColor="@color/black"
-                android:textSize="18sp"
-                app:customFont="AVENIR_LT_STD_LIGHT"
+                android:textSize="16sp"
+                app:customFont="AVENIR_LT_STD_HEAVY"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
-
-            <View
-                android:id="@+id/divider_view"
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:layout_marginHorizontal="@dimen/common_horizontal_margin"
-                android:layout_marginTop="23dp"
-                android:background="#20000000"
-                app:layout_constraintTop_toBottomOf="@id/emoji_id_container_view" />
 
             <com.tari.android.wallet.ui.component.CustomFontTextView
                 android:id="@+id/qr_code_desc_text_view"
@@ -60,14 +50,14 @@
                 app:customFont="AVENIR_LT_STD_MEDIUM"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/divider_view" />
+                app:layout_constraintTop_toBottomOf="@id/emoji_id_container_view" />
 
             <FrameLayout
                 android:id="@+id/qr_container_view"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
-                android:layout_marginTop="15dp"
+                android:layout_marginTop="25dp"
                 android:background="@drawable/wallet_info_bg_qr_code_image"
                 android:elevation="@dimen/common_view_elevation"
                 android:padding="5dp"
@@ -175,11 +165,11 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="25dp"
-                android:layout_marginTop="18dp"
+                android:layout_marginTop="25dp"
                 android:elevation="@dimen/common_view_elevation"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/share_emoji_id_text_view">
+                app:layout_constraintTop_toBottomOf="@id/my_profile_text_view">
 
                 <FrameLayout
                     android:id="@+id/emoji_id_summary_container_view"

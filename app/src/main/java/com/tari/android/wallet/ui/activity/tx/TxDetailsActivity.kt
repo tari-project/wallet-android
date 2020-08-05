@@ -36,12 +36,12 @@ import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
 import android.animation.AnimatorSet
 import android.animation.ValueAnimator
+import android.annotation.SuppressLint
 import android.content.*
 import android.os.Bundle
 import android.os.Handler
 import android.os.IBinder
 import android.os.Looper
-import android.util.Log
 import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.widget.Button
@@ -55,7 +55,7 @@ import com.tari.android.wallet.R
 import com.tari.android.wallet.R.color.*
 import com.tari.android.wallet.R.dimen.*
 import com.tari.android.wallet.R.string.*
-import com.tari.android.wallet.databinding.ActivityTxDetailBinding
+import com.tari.android.wallet.databinding.ActivityTxDetailsBinding
 import com.tari.android.wallet.event.Event
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.extension.txFormattedDate
@@ -69,9 +69,11 @@ import com.tari.android.wallet.service.WalletService
 import com.tari.android.wallet.ui.animation.collapseAndHideAnimation
 import com.tari.android.wallet.ui.component.EmojiIdCopiedViewController
 import com.tari.android.wallet.ui.component.EmojiIdSummaryViewController
+import com.tari.android.wallet.ui.component.GIFContainerViewController
 import com.tari.android.wallet.ui.dialog.BottomSlideDialog
 import com.tari.android.wallet.ui.dialog.ErrorDialog
 import com.tari.android.wallet.ui.extension.*
+import com.tari.android.wallet.ui.presentation.TxNote
 import com.tari.android.wallet.ui.util.UiUtil
 import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.EmojiUtil
@@ -80,19 +82,20 @@ import com.tari.android.wallet.util.WalletUtil
 import me.everything.android.ui.overscroll.OverScrollDecoratorHelper
 import java.util.*
 import javax.inject.Inject
+import kotlin.math.max
 
 /**
  *  Activity class - Transaction detail.
  *
  * @author The Tari Development Team
  */
-internal class TxDetailActivity : AppCompatActivity(), ServiceConnection {
+internal class TxDetailsActivity : AppCompatActivity(), ServiceConnection {
 
     companion object {
         const val TX_ID_EXTRA_KEY = "TX_DETAIL_EXTRA_KEY"
 
         fun createIntent(context: Context, transaction: Tx): Intent {
-            return Intent(context, TxDetailActivity::class.java)
+            return Intent(context, TxDetailsActivity::class.java)
                 .apply {
                     putExtra(TX_ID_EXTRA_KEY, TxId(transaction.id))
                 }
@@ -115,19 +118,21 @@ internal class TxDetailActivity : AppCompatActivity(), ServiceConnection {
 
     private lateinit var tx: Tx
     private lateinit var emojiIdSummaryController: EmojiIdSummaryViewController
+    private lateinit var gifContainerViewController: GIFContainerViewController
 
     /**
      * Animates the emoji id "copied" text.
      */
     private lateinit var emojiIdCopiedViewController: EmojiIdCopiedViewController
 
-    private lateinit var ui: ActivityTxDetailBinding
+    private lateinit var ui: ActivityTxDetailsBinding
     private lateinit var dimmerViews: MutableList<View>
+    private var scrollingIsBlocked = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         appComponent.inject(this)
         super.onCreate(savedInstanceState)
-        ui = ActivityTxDetailBinding.inflate(layoutInflater).apply { setContentView(root) }
+        ui = ActivityTxDetailsBinding.inflate(layoutInflater).apply { setContentView(root) }
         overridePendingTransition(R.anim.enter_from_right, R.anim.exit_to_left)
         setupUI()
         tracker.screen(path = "/home/tx_details", title = "Transaction Details")
@@ -139,7 +144,7 @@ internal class TxDetailActivity : AppCompatActivity(), ServiceConnection {
         if (walletService == null) {
             // bind to service
             val bindIntent = Intent(this, WalletService::class.java)
-            Log.i("Debug", "Issuing bindService (${System.currentTimeMillis()})")
+            Logger.d("Issuing bindService (${System.currentTimeMillis()})")
             bindService(bindIntent, this, Context.BIND_AUTO_CREATE)
         }
     }
@@ -202,6 +207,7 @@ internal class TxDetailActivity : AppCompatActivity(), ServiceConnection {
         disableCTAs()
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     private fun bindViews() {
         dimmerViews = mutableListOf(ui.topDimmerView, ui.bottomDimmerView)
         currentTextSize = dimen(add_amount_element_text_size)
@@ -209,6 +215,12 @@ internal class TxDetailActivity : AppCompatActivity(), ServiceConnection {
         OverScrollDecoratorHelper.setUpOverScroll(ui.fullEmojiIdScrollView)
         emojiIdCopiedViewController = EmojiIdCopiedViewController(ui.emojiIdCopiedView)
         emojiIdSummaryController = EmojiIdSummaryViewController(ui.emojiIdSummaryView)
+        ui.gifContainer.root.invisible()
+        ui.detailScrollView.setOnTouchListener { _, _ -> scrollingIsBlocked }
+        UiUtil.setProgressBarColor(
+            ui.gifContainer.loadingGifProgressBar,
+            color(tx_list_loading_gif_gray)
+        )
     }
 
     private fun disableCTAs() {
@@ -249,7 +261,7 @@ internal class TxDetailActivity : AppCompatActivity(), ServiceConnection {
     }
 
     private fun bindTxData() {
-        Log.i("Debug", "Current TX: $tx")
+        Logger.d("Current TX: $tx")
         val tx = this.tx
         setTxStatusData(tx)
         setTxMetaData(tx)
@@ -271,13 +283,17 @@ internal class TxDetailActivity : AppCompatActivity(), ServiceConnection {
             tx is CompletedTx && tx.direction == OUTBOUND -> setFeeData(tx.fee)
             tx is CancelledTx && tx.direction == OUTBOUND -> setFeeData(tx.fee)
             tx is PendingOutboundTx -> setFeeData(tx.fee)
-            else -> ui.txFeeGroup.gone()
+            else -> {
+                ui.txFeeTextView.gone()
+                ui.feeLabelTextView.gone()
+            }
         }
         ui.amountContainerView.post { scaleDownAmountTextViewIfRequired() }
     }
 
     private fun setFeeData(fee: MicroTari) {
-        ui.txFeeGroup.visible()
+        ui.txFeeTextView.visible()
+        ui.feeLabelTextView.visible()
         ui.txFeeTextView.text = string(
             tx_details_fee_value,
             WalletUtil.amountFormatter.format(fee.tariValue)
@@ -285,10 +301,24 @@ internal class TxDetailActivity : AppCompatActivity(), ServiceConnection {
     }
 
     private fun setTxMetaData(tx: Tx) {
+        // display date
         ui.dateTextView.text = Date(tx.timestamp.toLong() * 1000).txFormattedDate()
-        ui.txIdTextView.text = string(tx_detail_transaction_id, tx.id)
-        ui.txNoteTextView.text = tx.message
-        if (tx.message.isBlank()) ui.noteLabelTextView.invisible()
+        // display message
+        val note = TxNote.fromNote(tx.message)
+        if (note.message == null) {
+            ui.txNoteTextView.text = ""
+        } else {
+            ui.txNoteTextView.text = note.message
+        }
+        // display GIF
+        ui.gifContainer.root.visible()
+        gifContainerViewController = GIFContainerViewController(
+            ui.gifContainer,
+            tx,
+            dimenPx(tx_list_gif_container_top_margin)
+        )
+        gifContainerViewController.onRetryClick { gifContainerViewController.displayGIF() }
+        gifContainerViewController.displayGIF()
     }
 
     private fun setTxAddresseeData(tx: Tx) {
@@ -370,7 +400,7 @@ internal class TxDetailActivity : AppCompatActivity(), ServiceConnection {
         Handler(Looper.getMainLooper()).post {
             val currentTx = this.tx
             if (tx.id == currentTx.id) {
-                Log.i("Debug", "Updating TX\nOld: $currentTx\nNew: $tx")
+                Logger.d("Updating TX\nOld: $currentTx\nNew: $tx")
                 this.tx = tx
                 bindTxData()
             }
@@ -383,6 +413,14 @@ internal class TxDetailActivity : AppCompatActivity(), ServiceConnection {
     }
 
     private fun showFullEmojiId() {
+        scrollingIsBlocked = true
+        // resize bottom dimmer
+        ui.bottomDimmerView.setHeight(
+            max(
+                ui.detailScrollView.getChildAt(0).height,
+                ui.detailScrollView.height
+            )
+        )
         // make dimmers non-clickable until the anim is over
         dimmerViews.forEach { dimmerView -> dimmerView.isClickable = false }
         // prepare views
@@ -505,6 +543,7 @@ internal class TxDetailActivity : AppCompatActivity(), ServiceConnection {
                 }
                 ui.fullEmojiIdContainerView.gone()
                 ui.copyEmojiIdContainerView.gone()
+                scrollingIsBlocked = false
             }
         })
     }
