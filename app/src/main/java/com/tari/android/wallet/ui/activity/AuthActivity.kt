@@ -44,6 +44,7 @@ import androidx.biometric.BiometricPrompt.ERROR_CANCELED
 import androidx.biometric.BiometricPrompt.ERROR_USER_CANCELED
 import androidx.core.animation.addListener
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import com.daasuu.ei.Ease
 import com.daasuu.ei.EasingInterpolator
@@ -232,17 +233,16 @@ internal class AuthActivity : AppCompatActivity() {
     }
 
     private fun displayAuthFailedDialog() {
-        val dialogBuilder = AlertDialog.Builder(this)
-        dialogBuilder.setMessage(getString(auth_failed_desc))
-            .setCancelable(false)
-            // negative button text and action
-            .setNegativeButton(getString(exit)) { _, _ ->
-                finish()
-            }
-
-        val alert = dialogBuilder.create()
-        alert.setTitle(getString(auth_failed_title))
-        alert.show()
+        val state = lifecycle.currentState
+        if (state == Lifecycle.State.RESUMED || state == Lifecycle.State.STARTED) {
+            AlertDialog.Builder(this)
+                .setMessage(getString(auth_failed_desc))
+                .setCancelable(false)
+                .setNegativeButton(getString(exit)) { _, _ -> finish() }
+                .run(AlertDialog.Builder::create)
+                .apply { setTitle(string(auth_failed_title)) }
+                .show()
+        }
     }
 
     /**
