@@ -55,16 +55,16 @@ internal object EventBus {
     val publishSubject = PublishSubject.create<Any>()
 
     private val torProxyStateDisposables = mutableMapOf<Any, CompositeDisposable>()
-    var torProxyStateSubject = BehaviorSubject.create<TorProxyState>()
+    val torProxyStateSubject = BehaviorSubject.create<TorProxyState>()
 
     private val walletStateDisposables = mutableMapOf<Any, CompositeDisposable>()
-    var walletStateSubject = BehaviorSubject.create<WalletState>()
+    val walletStateSubject = BehaviorSubject.create<WalletState>()
 
     private val networkConnectionStateDisposables = mutableMapOf<Any, CompositeDisposable>()
-    var networkConnectionStateSubject = BehaviorSubject.create<NetworkConnectionState>()
+    val networkConnectionStateSubject = BehaviorSubject.create<NetworkConnectionState>()
 
     private val backupStateDisposables = mutableMapOf<Any, CompositeDisposable>()
-    var backupStateSubject = BehaviorSubject.create<BackupState>()
+    val backupStateSubject = BehaviorSubject.create<BackupState>()
 
     // region: general purpose event bus
 

@@ -59,9 +59,9 @@
 
     <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_above="@id/controls_scroll_view"
+        android:layout_height="match_parent"
         android:layout_below="@id/top_content"
+        android:layout_alignParentBottom="true"
         android:background="@color/white">
 
         <ProgressBar
@@ -71,25 +71,26 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center" />
 
-        <androidx.core.widget.NestedScrollView
-            android:id="@+id/scroll_view"
+        <WebView
+            android:id="@+id/web_view"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical">
-
-            <WebView
-                android:id="@+id/web_view"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent" />
-        </androidx.core.widget.NestedScrollView>
+            android:layout_height="match_parent" />
 
     </FrameLayout>
 
-    <androidx.core.widget.NestedScrollView
-        android:id="@+id/controls_scroll_view"
+    <LinearLayout
+        android:id="@+id/controls_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true">
+        android:layout_alignParentBottom="true"
+        android:orientation="vertical">
+
+        <View
+            android:id="@+id/bottom_elevation_view"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/common_scroll_height_gradient_height"
+            android:alpha="0.7"
+            android:background="@drawable/view_elevation_bottom_gradient" />
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
@@ -124,9 +125,9 @@
                 tools:ignore="ContentDescription" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
-    </androidx.core.widget.NestedScrollView>
 
-    <!-- top view elevation-->
+    </LinearLayout>
+
     <View
         android:id="@+id/top_elevation_view"
         android:layout_width="match_parent"
@@ -134,13 +135,5 @@
         android:layout_below="@id/top_content"
         android:alpha="0.7"
         android:background="@drawable/view_elevation_gradient" />
-    <!-- bottom control view elevation-->
-    <View
-        android:id="@+id/bottom_elevation_view"
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/common_scroll_height_gradient_height"
-        android:layout_above="@id/controls_scroll_view"
-        android:alpha="0.7"
-        android:background="@drawable/view_elevation_bottom_gradient" />
 
 </RelativeLayout>
