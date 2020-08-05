@@ -38,6 +38,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.webkit.WebResourceError
 import android.widget.Toast
 import androidx.appcompat.view.ContextThemeWrapper
 import androidx.fragment.app.Fragment
@@ -47,11 +48,18 @@ import com.tari.android.wallet.R.drawable.*
 import com.tari.android.wallet.R.string.store_no_application_to_open_the_link_error
 import com.tari.android.wallet.R.string.ttl_store_url
 import com.tari.android.wallet.databinding.FragmentStoreBinding
+import com.tari.android.wallet.event.EventBus
+import com.tari.android.wallet.network.NetworkConnectionState
 import com.tari.android.wallet.ui.extension.color
 import com.tari.android.wallet.ui.extension.drawable
 import com.tari.android.wallet.ui.extension.gone
 import com.tari.android.wallet.ui.extension.string
 import com.tari.android.wallet.ui.util.UiUtil
+import io.reactivex.Observable
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.Disposable
+import io.reactivex.functions.BiFunction
+import io.reactivex.subjects.PublishSubject
 
 class StoreFragment @Deprecated(
     """Use newInstance() and supply all the 
@@ -59,7 +67,9 @@ necessary data via arguments instead, as fragment's default no-op constructor is
 framework for UI tree rebuild on configuration changes"""
 ) constructor() : Fragment() {
 
+    private val webViewStatePublisher = PublishSubject.create<WebViewState>()
     private lateinit var ui: FragmentStoreBinding
+    private lateinit var subscription: Disposable
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -74,6 +84,24 @@ framework for UI tree rebuild on configuration changes"""
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setupUi()
+        reloadWebViewOnErrorAndConnectedState()
+    }
+
+    override fun onDestroyView() {
+        ui.webView.destroy()
+        subscription.dispose()
+        super.onDestroyView()
+    }
+
+    private fun reloadWebViewOnErrorAndConnectedState() {
+        subscription = Observable.combineLatest(
+            EventBus.networkConnectionStateSubject.distinctUntilChanged(),
+            webViewStatePublisher.distinctUntilChanged(),
+            BiFunction<NetworkConnectionState, WebViewState, Pair<NetworkConnectionState, WebViewState>>(::Pair)
+        )
+            .filter { it.first == NetworkConnectionState.CONNECTED && it.second.hasError }
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe { ui.webView.reload() }
     }
 
     private fun setupUi() {
@@ -101,6 +129,9 @@ framework for UI tree rebuild on configuration changes"""
                     onPageFinished = { webView, _ ->
                         ui.progressBar.gone()
                         ui.storeTitleTextView.text = webView.title
+                    },
+                    onReceivedError = { _, _, error ->
+                        webViewStatePublisher.onNext(WebViewState(PageLoadingException(error)))
                     }
                 )
             }
@@ -135,9 +166,26 @@ framework for UI tree rebuild on configuration changes"""
         )
     }
 
-    override fun onDestroyView() {
-        ui.webView.destroy()
-        super.onDestroyView()
+    private class WebViewState(val error: Exception?) {
+        val hasError
+            get() = error != null
+    }
+
+    private class PageLoadingException(val code: Int, description: String?) :
+        IllegalStateException(description) {
+
+        constructor(error: WebResourceError) : this(error.errorCode, error.description?.toString())
+
+        override fun equals(other: Any?): Boolean {
+            if (this === other) return true
+            if (javaClass != other?.javaClass) return false
+            other as PageLoadingException
+            return code == other.code
+        }
+
+        override fun hashCode(): Int = code
+
+        override fun toString(): String = "PageLoadingException(code=$code, message = $message)"
     }
 
     companion object {

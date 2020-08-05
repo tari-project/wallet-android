@@ -33,6 +33,8 @@
 package com.tari.android.wallet.ui.fragment.store
 
 import android.graphics.Bitmap
+import android.webkit.WebResourceError
+import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
 
@@ -47,18 +49,22 @@ class EventsPropagatingWebViewClient : WebViewClient() {
     fun addListener(
         onPageStarted: (WebView, String, Bitmap?) -> Unit = { _, _, _ -> },
         onPageCommitVisible: (WebView, String) -> Unit = { _, _ -> },
-        onPageFinished: (WebView, String) -> Unit = { _, _ -> }
-    ): WebViewEventListener {
-        return object : WebViewEventListener {
-            override fun onPageStarted(view: WebView, url: String, favicon: Bitmap?) =
-                onPageStarted(view, url, favicon)
+        onPageFinished: (WebView, String) -> Unit = { _, _ -> },
+        onReceivedError: (WebView, WebResourceRequest, WebResourceError) -> Unit = { _, _, _ -> }
+    ): WebViewEventListener = object : WebViewEventListener {
+        override fun onPageStarted(view: WebView, url: String, favicon: Bitmap?) =
+            onPageStarted(view, url, favicon)
 
-            override fun onPageCommitVisible(view: WebView, url: String) =
-                onPageCommitVisible(view, url)
+        override fun onPageCommitVisible(view: WebView, url: String) =
+            onPageCommitVisible(view, url)
 
-            override fun onPageFinished(view: WebView, url: String) = onPageFinished(view, url)
-        }.also(this::addListener)
-    }
+        override fun onPageFinished(view: WebView, url: String) = onPageFinished(view, url)
+        override fun onReceivedError(
+            view: WebView,
+            request: WebResourceRequest,
+            error: WebResourceError
+        ) = onReceivedError(view, request, error)
+    }.also(this::addListener)
 
     override fun onPageStarted(view: WebView, url: String, favicon: Bitmap?) {
         super.onPageStarted(view, url, favicon)
@@ -74,4 +80,15 @@ class EventsPropagatingWebViewClient : WebViewClient() {
         super.onPageFinished(view, url)
         listeners.forEach { it.onPageFinished(view, url) }
     }
+
+    override fun onReceivedError(
+        view: WebView,
+        request: WebResourceRequest,
+        error: WebResourceError
+    ) {
+        super.onReceivedError(view, request, error)
+        listeners.forEach { it.onReceivedError(view, request, error) }
+    }
+
+
 }
