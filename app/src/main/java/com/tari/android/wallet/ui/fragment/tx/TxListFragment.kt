@@ -47,7 +47,6 @@ import android.os.Looper
 import android.text.SpannableString
 import android.text.SpannableStringBuilder
 import android.text.Spanned
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
@@ -65,7 +64,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.daasuu.ei.Ease
 import com.daasuu.ei.EasingInterpolator
-import com.orhanobut.logger.Logger
 import com.squareup.seismic.ShakeDetector
 import com.tari.android.wallet.R
 import com.tari.android.wallet.application.DeepLink
@@ -596,7 +594,6 @@ internal class TxListFragment : Fragment(),
      * The startup animation - reveals the list, balance and other views.
      */
     private fun playNonOnboardingStartupAnim() {
-        Log.i("Debug", "TxListFragment playNonOnboardingStartupAnim")
         ui.topContentContainerView.visible()
         updateBalanceInfoUI(true)
         ui.scrollView.scrollToTop()
