@@ -68,7 +68,6 @@ internal class TxNote(val message: String?, val gifUrl: String?) {
             assetsDomain: String = "giphy.com",
             protocol: String = "https://"
         ): TxNote {
-            if (note.isEmpty()) throw IllegalStateException("Note can't be empty")
             val lines = note.split(Regex(" "))
             return if (Regex("$protocol$assetsDomain.*").matches(lines.last())) TxNote(
                 message = lines.take(lines.size - 1).filter(String::isNotEmpty)

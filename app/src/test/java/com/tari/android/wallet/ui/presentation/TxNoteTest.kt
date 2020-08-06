@@ -77,9 +77,11 @@ class TxNoteTest {
         )
     }
 
-    @Test(expected = IllegalStateException::class)
-    fun `fromNote, assert that IllegalStateException was thrown if note is empty`() {
-        TxNote.fromNote("")
+    @Test
+    fun `fromNote, assert that empty note and no gif will be returnedif note is empty`() {
+        val note = TxNote.fromNote("")
+        assertEquals("", note.message)
+        assertNull(note.gifUrl)
     }
 
     @Test
