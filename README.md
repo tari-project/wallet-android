@@ -1,51 +1,40 @@
-# Tari Android mobile wallet
+<p align="center">
+	<img width="300" src="https://raw.githubusercontent.com/tari-project/wallet-android/update-readme/readme/tari-logo.svg">
+</p>
 
-## Build instructions
 
-This wallet requires the rust wallet library to be placed in the `jniLibs` folder
-for the architecture you are targeting.
+[![Actions Status](https://github.com/tari-project/wallet-android/workflows/Aurora%20Android%20Release%20Workflow/badge.svg)](https://github.com/tari-project/wallet-android/actions)
 
-32-bit versions of the library are included in the git source tree, but they are
-probably out of date and, well, for 32-bit systems.
+[![Actions Status](https://github.com/tari-project/wallet-android/workflows/PR%20Test%20Workflow/badge.svg)](https://github.com/tari-project/wallet-android/actions)
 
-To get 64-bit versions of the libraries, download the relevant archive (and hash checksum file) from
-[the Tari website](https://tari.com/downloads), into the `jniLibs` folder
-and extract them:
+## What is Aurora?
+Aurora is a reference-design mobile wallet app for the forthcoming [Tari](https://www.tari.com/) digital currency. The goal is for creators and developers to be able to use the open-source Aurora libraries and codebase as a starting point for developing their own Tari wallets and applications. Aurora also sets the bar for applications that use the Tari protocol. In its production-ready state, it will be a beautiful, easy to use Tari wallet focused on Tari as a default-private digital currency.
 
-	.../jniLibs $ tar -xzvf arch.tar.gz
+Want to contribute to Aurora? Get started here in this repository for Android or [here](https://github.com/tari-project/wallet-ios) for iOS.
 
-You should verify the binaries against their hashes:
+<a href="https://play.google.com/store/apps/details?id=com.tari.android.wallet" target="_blank"><img width="100" src="https://raw.githubusercontent.com/tari-project/wallet-android/update-readme/readme/PlayStoreButton_large.svg"></a>&nbsp;&nbsp;&nbsp;<a href="https://apps.apple.com/us/app/tari-aurora/id1503654828" target="_blank"><img width="100" src="https://raw.githubusercontent.com/tari-project/wallet-android/update-readme/readme/AppStoreButton_large.svg"></a>
 
-	.../jniLibs $ sha256sum -c hashes.txt
+## Build Instructions
 
-	wallet.h: OK
-        arm64-v8a/libsqlite3.a: OK
-        arm64-v8a/libwallet_ffi.a: OK
-        arm64-v8a/libzmq.a: OK
-        armeabi-v7a/libsqlite3.a: OK
-        armeabi-v7a/libwallet_ffi.a: OK
-        armeabi-v7a/libzmq.a: OK
-        x86/libsqlite3.a: OK
-        x86/libwallet_ffi.a: OK
-        x86/libzmq.a: OK
-        x86_64/libsqlite3.a: OK
-        x86_64/libwallet_ffi.a: OK
-        x86_64/libzmq.a: OK
+1. Install [Android Studio 4.0](https://developer.android.com/studio).
+2. Clone the repository: `git clone https://github.com/tari-project/wallet-android.git`
+3. Open Android Studio, select `Open an existing Android Studio Project` and select the project root folder.
+4. Wait until Android Studio finishes initial downloading, syncing and indexing.
+5. If you have not yet configured NDK, you should see the "NDK not configured" message at the end of the build and sync process. <p align="center"><img src="https://raw.githubusercontent.com/tari-project/wallet-android/update-readme/readme/01_NDK_Config.png"></p>
+6. Click "Install NDK ..." link in the build log and accept the license, this will commence NDK and CMake installations. Let Android Studio do more downloading and sync.ing and wait until you see "CONFIGURE SUCCESSFUL" in the build logs. <p align="center"><img src="https://raw.githubusercontent.com/tari-project/wallet-android/update-readme/readme/02_Config_Successful.png"></p>
+7. At this step, please go to the `SDK Manager` and make sure that both NDK and CMake are installed. <p align="center"><img src="https://raw.githubusercontent.com/tari-project/wallet-android/update-readme/readme/03_NDK_and_CMake_Installed.png"></p>
+8. Go to `Build Variants` and select `regularDebug` for the full configuration, or `privacyDebug` for privacy configuration. <p align="center"><img src="https://raw.githubusercontent.com/tari-project/wallet-android/update-readme/readme/04_Build_Config.png"></p>
+9. Make project. (`Build` → `Make Project`)
+10. `OPTIONAL` `secret.properties` file in the project folder contains application secrets and will be generated for you with default values during the build process. Please follow the comments in this file and edit if required.
+11. `OPTIONAL` The regular build of Aurora uses [Sentry](https://sentry.io/) for error monitoring. `sentry.properties` file in the project folder contains Sentry configuration and will be created with empty values for you during the build process. Please follow the comments in this file and edit with your Sentry server values if you'd like to enable crash reporting.
+12. **_Voila_** 🎉 You're now ready to run Aurora! Please follow the next item on how to setup your emulator, or you can already run it on your device.
 
-## Tracking private builds
+### Emulator Configuration
 
-To build and install a build that does not contain Matomo events tracking, Sentry crash reporting
-and backend app interaction for iOS push notifications support and initial Tari enrollment, then,
-assuming that:
-  - the terminal's current working directory is the project's root;
-  - at least Java 8 is installed on the build machine;
-  - Tari native libraries are present in the working directory. Run 
-  `./gradlew -PbinariesVersion=?.?.? jniBinaries` with the latest version provided instead of 
-  `?.?.?` (it is available on [this page](https://www.tari.com/downloads/)) to fetch them;
-  - `Install via USB` option is being enabled through the device's `Developer options` settings (you 
-  can consult your vendor's documentation or just simply search for it with any search engine);
-  - your phone is connected to the build machine via USB;
-  - Follow instructions inside `app/build.gradle` file marked with `PRIVATE BUILD` labels;
-  
-type the following: `./gradlew installPrivacyRelease`. A release private build should be installed 
-to your device afterwards.
+Aurora Android native libraries only support `armeabi-v7a`, `arm64-v8a` and `x86_64` [ABIs](https://developer.android.com/ndk/guides/abis). Therefore you can only run Aurora on devices and emulators with a supported ABI. Android Studio emulators use the unsupported `x86` ABI as default, but you can download an `x86_64` image for your emulator and run Aurora on it. Please `Download` an `x86_64` image under the `x86 Images` tab in the `System Image` step of `Virtual Device Configuration.` <p align="center"><img src="https://raw.githubusercontent.com/tari-project/wallet-android/update-readme/readme/05_x86_64.png"></p>
+
+### Using Your Custom Native Library (FFI) Version
+
+Tari native wallet library version to be used by Aurora is specified by the `ext.jniLibsVersion` in the `build.gradle` file in the project root directory. Aurora build script automatically fetches the native libraries of this version into the `jniLibs` folder in the root directory during the build process. Any library files you place in this folder will be deleted and replaced by this automatic download process.
+
+If you want to disable the automatic download and use the native libraries of your choice, please comment out the line `preBuild.dependsOn("downloadJNIBinaries")` in the file `app/build.gradle`. 

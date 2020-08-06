@@ -34,6 +34,7 @@ android {
     }
 
     buildTypes {
+        copySentryProps()
         def properties = loadSecretProps()
         debug {
             jniDebuggable true
@@ -127,6 +128,16 @@ Properties loadSecretProps() {
     final Properties properties = new Properties()
     properties.load(secretProps.newDataInputStream())
     return properties
+}
+
+void copySentryProps() {
+    final File sentryProps = project.rootProject.file("sentry.properties")
+    if (!sentryProps.exists()) {
+        Files.copy(
+                Paths.get(project.rootProject.file("sentry-example.properties").absolutePath),
+                Paths.get(sentryProps.absolutePath),
+        )
+    }
 }
 
 preBuild.dependsOn("downloadJNIBinaries")

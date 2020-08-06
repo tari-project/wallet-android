@@ -10,7 +10,7 @@ defaults:
     shell: bash
 
 jobs:
-    test: 
+    test:
       name: Instrumented and Unit Tests
       runs-on: macos-latest
       steps:
