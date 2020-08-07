@@ -48,6 +48,7 @@ import com.orhanobut.logger.Logger
 import com.tari.android.wallet.R
 import com.tari.android.wallet.model.CancelledTx
 import com.tari.android.wallet.model.Tx
+import com.tari.android.wallet.model.TxId
 import com.tari.android.wallet.ui.activity.home.HomeActivity
 import com.tari.android.wallet.ui.activity.tx.TxDetailsActivity
 import com.tari.android.wallet.ui.notification.CustomTxNotificationViewHolder
@@ -146,7 +147,7 @@ internal class NotificationHelper(private val context: Context) {
         val layout = CustomTxNotificationViewHolder(context, tx)
         val intents = arrayOf(
             Intent(context, HomeActivity::class.java).apply { flags = FLAG_ACTIVITY_CLEAR_TOP },
-            TxDetailsActivity.createIntent(context, tx)
+            TxDetailsActivity.createIntent(context, TxId(tx.id))
         )
         val pendingIntent =
             PendingIntent.getActivities(context, 0, intents, PendingIntent.FLAG_UPDATE_CURRENT)
@@ -189,7 +190,7 @@ internal class NotificationHelper(private val context: Context) {
         val layout = TxCanceledViewHolder(context, tx)
         val intents = arrayOf(
             Intent(context, HomeActivity::class.java).apply { flags = FLAG_ACTIVITY_CLEAR_TOP },
-            TxDetailsActivity.createIntent(context, tx)
+            TxDetailsActivity.createIntent(context, TxId(tx.id))
         )
         val pendingIntent =
             PendingIntent.getActivities(context, 0, intents, PendingIntent.FLAG_UPDATE_CURRENT)

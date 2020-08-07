@@ -147,83 +147,77 @@
             android:background="@color/white"
             android:clipChildren="false"
             app:layout_constraintTop_toBottomOf="@id/fee_label_text_view">
-
-            <View
+            <LinearLayout
+                android:id="@+id/amount_section"
                 android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_alignBottom="@id/amount_section_bottom_spacer"
-                android:layout_alignParentTop="true"
-                android:background="@color/gray_background" />
+                android:orientation="vertical"
+                android:gravity="center_horizontal"
+                android:background="@color/gray_background"
+                android:layout_height="wrap_content">
 
-            <RelativeLayout
-                android:id="@+id/amount_container_view"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/tx_details_amount_section_vertical_padding"
-                android:layout_marginBottom="30dp"
-                android:orientation="horizontal"
-                android:paddingHorizontal="12dp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent">
+                <RelativeLayout
+                    android:id="@+id/amount_container_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/tx_details_amount_section_vertical_padding"
+                    android:orientation="horizontal"
+                    android:paddingHorizontal="12dp">
 
-                <ImageView
-                    android:id="@+id/amount_gem_image_view"
-                    android:layout_width="@dimen/add_amount_gem_size"
-                    android:layout_height="@dimen/add_amount_gem_size"
-                    android:layout_centerVertical="true"
-                    android:layout_marginEnd="6dp"
-                    android:layout_toStartOf="@id/amount_text_view"
-                    android:contentDescription="@null"
-                    android:src="@drawable/gem_amount" />
+                    <ImageView
+                        android:id="@+id/amount_gem_image_view"
+                        android:layout_width="@dimen/add_amount_gem_size"
+                        android:layout_height="@dimen/add_amount_gem_size"
+                        android:layout_centerVertical="true"
+                        android:layout_marginEnd="6dp"
+                        android:layout_toStartOf="@id/amount_text_view"
+                        android:contentDescription="@null"
+                        android:src="@drawable/gem_amount" />
+
+                    <com.tari.android.wallet.ui.component.CustomFontTextView
+                        android:id="@+id/amount_text_view"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerHorizontal="true"
+                        android:textColor="@color/black"
+                        android:textSize="@dimen/add_amount_element_text_size"
+                        app:customFont="AVENIR_LT_STD_BLACK"
+                        tools:text="150" />
+                </RelativeLayout>
 
                 <com.tari.android.wallet.ui.component.CustomFontTextView
-                    android:id="@+id/amount_text_view"
+                    android:id="@+id/tx_fee_text_view"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_centerHorizontal="true"
+                    android:layout_marginTop="24dp"
                     android:textColor="@color/black"
-                    android:textSize="@dimen/add_amount_element_text_size"
-                    app:customFont="AVENIR_LT_STD_BLACK"
-                    tools:text="150" />
-            </RelativeLayout>
+                    android:textSize="14sp"
+                    app:customFont="AVENIR_LT_STD_HEAVY"
+                    tools:text="+5.50" />
 
-            <com.tari.android.wallet.ui.component.CustomFontTextView
-                android:id="@+id/tx_fee_text_view"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/amount_container_view"
-                android:layout_centerHorizontal="true"
-                android:textColor="@color/black"
-                android:textSize="14sp"
-                app:customFont="AVENIR_LT_STD_HEAVY"
-                tools:text="+5.50" />
+                <com.tari.android.wallet.ui.component.CustomFontTextView
+                    android:id="@+id/fee_label_text_view"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:drawableEnd="@drawable/help_icon_24dp"
+                    android:drawablePadding="4dp"
+                    android:text="@string/tx_detail_transaction_fee"
+                    android:textColor="#A9AFC4"
+                    android:textSize="14sp"
+                    app:customFont="AVENIR_LT_STD_HEAVY" />
 
-            <com.tari.android.wallet.ui.component.CustomFontTextView
-                android:id="@+id/fee_label_text_view"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/tx_fee_text_view"
-                android:layout_centerHorizontal="true"
-                android:layout_marginTop="2dp"
-                android:drawableEnd="@drawable/help_icon_24dp"
-                android:drawablePadding="4dp"
-                android:text="@string/tx_detail_transaction_fee"
-                android:textColor="#A9AFC4"
-                android:textSize="14sp"
-                app:customFont="AVENIR_LT_STD_HEAVY" />
+                <View
+                    android:id="@+id/amount_section_bottom_spacer"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/tx_details_amount_section_vertical_padding" />
+            </LinearLayout>
 
-            <View
-                android:id="@+id/amount_section_bottom_spacer"
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/tx_details_amount_section_vertical_padding"
-                android:layout_below="@id/fee_label_text_view" />
 
             <com.tari.android.wallet.ui.component.CustomFontTextView
                 android:id="@+id/from_text_view"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/amount_section_bottom_spacer"
+                android:layout_below="@id/amount_section"
                 android:layout_marginStart="@dimen/common_horizontal_margin"
                 android:layout_marginTop="22dp"
                 android:text="@string/common_from"
