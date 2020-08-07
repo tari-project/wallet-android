@@ -92,12 +92,20 @@ import kotlin.math.max
 internal class TxDetailsActivity : AppCompatActivity(), ServiceConnection {
 
     companion object {
+        const val TX_EXTRA_KEY = "TX_EXTRA_KEY"
         const val TX_ID_EXTRA_KEY = "TX_DETAIL_EXTRA_KEY"
 
-        fun createIntent(context: Context, transaction: Tx): Intent {
+        fun createIntent(context: Context, txId: TxId): Intent {
             return Intent(context, TxDetailsActivity::class.java)
                 .apply {
-                    putExtra(TX_ID_EXTRA_KEY, TxId(transaction.id))
+                    putExtra(TX_ID_EXTRA_KEY, txId)
+                }
+        }
+
+        fun createIntent(context: Context, tx: Tx): Intent {
+            return Intent(context, TxDetailsActivity::class.java)
+                .apply {
+                    putExtra(TX_EXTRA_KEY, tx)
                 }
         }
     }
@@ -135,17 +143,23 @@ internal class TxDetailsActivity : AppCompatActivity(), ServiceConnection {
         ui = ActivityTxDetailsBinding.inflate(layoutInflater).apply { setContentView(root) }
         overridePendingTransition(R.anim.enter_from_right, R.anim.exit_to_left)
         setupUI()
-        tracker.screen(path = "/home/tx_details", title = "Transaction Details")
-    }
 
-    override fun onStart() {
-        super.onStart()
-        // start service if not started yet
+        val savedTx = savedInstanceState?.getParcelable<Tx>(TX_EXTRA_KEY)
+        val intentTx =  intent.getParcelableExtra<Tx>(TX_EXTRA_KEY)
+        (savedTx ?: intentTx)?.let {
+            tx = it
+            bindTxData()
+            observeTxUpdates()
+            enableCTAs()
+        }
         if (walletService == null) {
             // bind to service
             val bindIntent = Intent(this, WalletService::class.java)
             Logger.d("Issuing bindService (${System.currentTimeMillis()})")
             bindService(bindIntent, this, Context.BIND_AUTO_CREATE)
+        }
+        if (savedInstanceState == null) {
+            tracker.screen(path = "/home/tx_details", title = "Transaction Details")
         }
     }
 
@@ -157,7 +171,7 @@ internal class TxDetailsActivity : AppCompatActivity(), ServiceConnection {
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        outState.putParcelable(TX_ID_EXTRA_KEY, this.tx)
+        outState.putParcelable(TX_EXTRA_KEY, this.tx)
     }
 
     /**
@@ -166,11 +180,13 @@ internal class TxDetailsActivity : AppCompatActivity(), ServiceConnection {
     override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
         Logger.d("Connected to the wallet service (${System.currentTimeMillis()}).")
         val walletService = TariWalletService.Stub.asInterface(service)
-        tx = findTxById(intent.getParcelableExtra(TX_ID_EXTRA_KEY) as TxId, walletService)
         this.walletService = walletService
-        bindTxData()
-        observeTxUpdates()
-        enableCTAs()
+        if (!this::tx.isInitialized) {
+            tx = findTxById(intent.getParcelableExtra(TX_ID_EXTRA_KEY) as TxId, walletService)
+            bindTxData()
+            observeTxUpdates()
+            enableCTAs()
+        }
     }
 
     private fun findTxById(id: TxId, walletService: TariWalletService): Tx {
