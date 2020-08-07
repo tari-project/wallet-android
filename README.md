@@ -12,7 +12,7 @@ Aurora is a reference-design mobile wallet app for the forthcoming [Tari](https:
 
 Want to contribute to Aurora? Get started here in this repository for Android or [here](https://github.com/tari-project/wallet-ios) for iOS.
 
-<a href="https://play.google.com/store/apps/details?id=com.tari.android.wallet" target="_blank"><img width="100" src="https://raw.githubusercontent.com/tari-project/wallet-android/update-readme/readme/PlayStoreButton_large.svg"></a>&nbsp;&nbsp;&nbsp;<a href="https://apps.apple.com/us/app/tari-aurora/id1503654828" target="_blank"><img width="100" src="https://raw.githubusercontent.com/tari-project/wallet-android/update-readme/readme/AppStoreButton_large.svg"></a>
+<a href="https://play.google.com/store/apps/details?id=com.tari.android.wallet" target="_blank"><img width="100" src="https://raw.githubusercontent.com/tari-project/wallet-android/development/readme/PlayStoreButton_large.svg"></a>&nbsp;&nbsp;&nbsp;<a href="https://apps.apple.com/us/app/tari-aurora/id1503654828" target="_blank"><img width="100" src="https://raw.githubusercontent.com/tari-project/wallet-android/development/readme/AppStoreButton_large.svg"></a>
 
 ## Build Instructions
 
@@ -20,10 +20,10 @@ Want to contribute to Aurora? Get started here in this repository for Android or
 2. Clone the repository: `git clone https://github.com/tari-project/wallet-android.git`
 3. Open Android Studio, select `Open an existing Android Studio Project` and select the project root folder.
 4. Wait until Android Studio finishes initial downloading, syncing and indexing.
-5. If you have not yet configured NDK, you should see the "NDK not configured" message at the end of the build and sync process. <p align="center"><img src="https://raw.githubusercontent.com/tari-project/wallet-android/update-readme/readme/01_NDK_Config.png"></p>
-6. Click "Install NDK ..." link in the build log and accept the license, this will commence NDK and CMake installations. Let Android Studio do more downloading and sync.ing and wait until you see "CONFIGURE SUCCESSFUL" in the build logs. <p align="center"><img src="https://raw.githubusercontent.com/tari-project/wallet-android/update-readme/readme/02_Config_Successful.png"></p>
-7. At this step, please go to the `SDK Manager` and make sure that both NDK and CMake are installed. <p align="center"><img src="https://raw.githubusercontent.com/tari-project/wallet-android/update-readme/readme/03_NDK_and_CMake_Installed.png"></p>
-8. Go to `Build Variants` and select `regularDebug` for the full configuration, or `privacyDebug` for privacy configuration. <p align="center"><img src="https://raw.githubusercontent.com/tari-project/wallet-android/update-readme/readme/04_Build_Config.png"></p>
+5. If you have not yet configured NDK, you should see the "NDK not configured" message at the end of the build and sync process. <p align="center"><img src="https://raw.githubusercontent.com/tari-project/wallet-android/development/readme/01_NDK_Config.png"></p>
+6. Click "Install NDK ..." link in the build log and accept the license, this will commence NDK and CMake installations. Let Android Studio do more downloading and sync.ing and wait until you see "CONFIGURE SUCCESSFUL" in the build logs. <p align="center"><img src="https://raw.githubusercontent.com/tari-project/wallet-android/development/readme/02_Config_Successful.png"></p>
+7. At this step, please go to the `SDK Manager` and make sure that both NDK and CMake are installed. <p align="center"><img src="https://raw.githubusercontent.com/tari-project/wallet-android/development/readme/03_NDK_and_CMake_Installed.png"></p>
+8. Go to `Build Variants` and select `regularDebug` for the full configuration, or `privacyDebug` for privacy configuration. <p align="center"><img src="https://raw.githubusercontent.com/tari-project/wallet-android/development/readme/04_Build_Config.png"></p>
 9. Make project. (`Build` → `Make Project`)
 10. `OPTIONAL` `secret.properties` file in the project folder contains application secrets and will be generated for you with default values during the build process. Please follow the comments in this file and edit if required.
 11. `OPTIONAL` The regular build of Aurora uses [Sentry](https://sentry.io/) for error monitoring. `sentry.properties` file in the project folder contains Sentry configuration and will be created with empty values for you during the build process. Please follow the comments in this file and edit with your Sentry server values if you'd like to enable crash reporting.
@@ -31,7 +31,7 @@ Want to contribute to Aurora? Get started here in this repository for Android or
 
 ### Emulator Configuration
 
-Aurora Android native libraries only support `armeabi-v7a`, `arm64-v8a` and `x86_64` [ABIs](https://developer.android.com/ndk/guides/abis). Therefore you can only run Aurora on devices and emulators with a supported ABI. Android Studio emulators use the unsupported `x86` ABI as default, but you can download an `x86_64` image for your emulator and run Aurora on it. Please `Download` an `x86_64` image under the `x86 Images` tab in the `System Image` step of `Virtual Device Configuration.` <p align="center"><img src="https://raw.githubusercontent.com/tari-project/wallet-android/update-readme/readme/05_x86_64.png"></p>
+Aurora Android native libraries only support `armeabi-v7a`, `arm64-v8a` and `x86_64` [ABIs](https://developer.android.com/ndk/guides/abis). Therefore you can only run Aurora on devices and emulators with a supported ABI. Android Studio emulators use the unsupported `x86` ABI as default, but you can download an `x86_64` image for your emulator and run Aurora on it. Please `Download` an `x86_64` image under the `x86 Images` tab in the `System Image` step of `Virtual Device Configuration.` <p align="center"><img src="https://raw.githubusercontent.com/tari-project/wallet-android/development/readme/05_x86_64.png"></p>
 
 ### Using Your Custom Native Library (FFI) Version
 
