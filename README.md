@@ -1,5 +1,5 @@
 <p align="center">
-	<img width="300" src="https://raw.githubusercontent.com/tari-project/wallet-android/update-readme/readme/tari-logo.svg">
+	<img width="300" src="https://raw.githubusercontent.com/tari-project/wallet-android/development/readme/tari-logo.svg">
 </p>
 
 
