@@ -42,6 +42,7 @@ import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentStatePagerAdapter
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.viewpager.widget.ViewPager
 import com.tari.android.wallet.R
 import com.tari.android.wallet.R.color.home_selected_nav_item
 import com.tari.android.wallet.application.DeepLink
@@ -58,9 +59,7 @@ import com.tari.android.wallet.ui.activity.SplashActivity
 import com.tari.android.wallet.ui.activity.send.SendTariActivity
 import com.tari.android.wallet.ui.activity.settings.BackupSettingsActivity
 import com.tari.android.wallet.ui.activity.tx.TxDetailsActivity
-import com.tari.android.wallet.ui.extension.appComponent
-import com.tari.android.wallet.ui.extension.color
-import com.tari.android.wallet.ui.extension.showInternetConnectionErrorDialog
+import com.tari.android.wallet.ui.extension.*
 import com.tari.android.wallet.ui.fragment.profile.WalletInfoFragment
 import com.tari.android.wallet.ui.fragment.settings.AllSettingsFragment
 import com.tari.android.wallet.ui.fragment.store.StoreFragment
@@ -74,6 +73,7 @@ internal class HomeActivity : AppCompatActivity(), AllSettingsFragment.AllSettin
 
     @Inject
     lateinit var sharedPrefsWrapper: SharedPrefsWrapper
+
     @Inject
     lateinit var giphy: GiphyEcosystem
 
@@ -94,21 +94,56 @@ internal class HomeActivity : AppCompatActivity(), AllSettingsFragment.AllSettin
         serviceConnection = ViewModelProvider(this, TariWalletServiceConnectionFactory(this))
             .get(TariWalletServiceConnection::class.java)
         ui = ActivityHomeBinding.inflate(layoutInflater).also { setContentView(it.root) }
+        setupViewPagerListener()
         if (savedInstanceState == null) {
             enableNavigationView(ui.homeImageView)
-            serviceConnection.connection.observe(this, Observer {
-                if (it.status == CONNECTED) {
-                    ui.root.postDelayed(Constants.UI.mediumDurationMs) {
-                        processIntentDeepLink(it.service!!, intent)
-                    }
-                }
-            })
+            checkDeepLinkWhenServiceIsConnected()
         } else {
             val index = savedInstanceState.getInt(KEY_PAGE)
             ui.viewPager.setCurrentItem(index, false)
             enableNavigationView(index)
         }
         setupUi()
+    }
+
+    private fun setupViewPagerListener() {
+        ui.viewPager.addOnPageChangeListener(object : ViewPager.OnPageChangeListener {
+            override fun onPageScrolled(
+                position: Int,
+                positionOffset: Float,
+                positionOffsetPixels: Int
+            ) {
+                // No-op
+            }
+
+            override fun onPageScrollStateChanged(state: Int) {
+                // No-op
+            }
+
+            override fun onPageSelected(position: Int) {
+                // No-op
+                if (position == INDEX_HOME) {
+                    ui.bottomElevationView.visible()
+                    ui.bottomNavigationView.visible()
+                    ui.sendTariCtaView.visible()
+                } else {
+                    ui.bottomElevationView.gone()
+                    ui.bottomNavigationView.gone()
+                    ui.sendTariCtaView.gone()
+                }
+            }
+
+        })
+    }
+
+    private fun checkDeepLinkWhenServiceIsConnected() {
+        serviceConnection.connection.observe(this, Observer {
+            if (it.status == CONNECTED) {
+                ui.root.postDelayed(Constants.UI.mediumDurationMs) {
+                    processIntentDeepLink(it.service!!, intent)
+                }
+            }
+        })
     }
 
     override fun onNewIntent(intent: Intent) {

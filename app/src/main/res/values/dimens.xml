@@ -62,6 +62,7 @@
     <dimen name="home_wallet_info_button_initial_top_margin">45dp</dimen>
     <dimen name="home_backup_prompt_cta_width">209dp</dimen>
     <dimen name="home_backup_prompt_cta_height">53dp</dimen>
+    <dimen name="home_bottom_navigation_bar_height">64dp</dimen>
 
     <!-- tx list -->
     <dimen name="tx_list_gif_container_top_margin">8dp</dimen>

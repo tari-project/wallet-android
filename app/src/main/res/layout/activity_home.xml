@@ -9,7 +9,7 @@
         android:id="@+id/view_pager"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        app:layout_constraintBottom_toTopOf="@+id/bottom_navigation_view"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
@@ -27,7 +27,7 @@
     <LinearLayout
         android:id="@+id/bottom_navigation_view"
         android:layout_width="0dp"
-        android:layout_height="64dp"
+        android:layout_height="@dimen/home_bottom_navigation_bar_height"
         android:background="@color/white"
         android:orientation="horizontal"
         app:layout_constraintBottom_toBottomOf="parent"
