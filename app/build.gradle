@@ -188,6 +188,9 @@ dependencies {
     // biometric
     implementation 'androidx.biometric:biometric:1.0.1'
 
+    // WorkManager for background jobs (currently logs cleanup only)
+    implementation "androidx.work:work-runtime:2.4.0"
+
     // joda
     implementation "net.danlew:android.joda:2.10.3"
 
@@ -247,8 +250,10 @@ dependencies {
     // test
     testImplementation 'junit:junit:4.13'
     testImplementation "io.mockk:mockk:1.10.0"
+    testImplementation "joda-time:joda-time:2.10.3"
     androidTestImplementation "io.mockk:mockk-android:1.10.0"
     androidTestImplementation 'androidx.test:core:1.2.0'
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
+    androidTestImplementation "androidx.work:work-testing:2.4.0"
 }

@@ -37,15 +37,18 @@ import android.content.ClipboardManager
 import android.content.Context
 import androidx.biometric.BiometricManager
 import androidx.core.content.ContextCompat
+import androidx.work.WorkManager
 import com.tari.android.wallet.BuildConfig
 import com.tari.android.wallet.application.TariWalletApplication
 import com.tari.android.wallet.infrastructure.GiphyEcosystem
+import com.tari.android.wallet.infrastructure.log.LogsCleanupSchedule
 import com.tari.android.wallet.infrastructure.security.biometric.BiometricAuthenticationService
 import com.tari.android.wallet.notification.NotificationHelper
 import com.tari.android.wallet.util.SharedPrefsWrapper
 import dagger.Module
 import dagger.Provides
 import java.io.File
+import javax.inject.Named
 import javax.inject.Singleton
 
 /**
@@ -96,5 +99,24 @@ internal class ApplicationModule(
     @Singleton
     fun provideGiphyEcosystem(context: Context): GiphyEcosystem =
         GiphyEcosystem(context, BuildConfig.GIPHY_KEY)
+
+    @Provides
+    @Singleton
+    @Named(KEY_MAX_LOGS_SPACE)
+    // 30 MB
+    fun provideMaxLogsSpace() = MAX_LOGS_SPACE
+
+    @Provides
+    @Singleton
+    fun provideCleanupSchedule(
+        context: Context,
+        @Named(KEY_MAX_LOGS_SPACE) maxSpace: Long,
+        @Named(WalletModule.FieldName.walletLogFilesDirPath) logsDirectory: String
+    ) = LogsCleanupSchedule(WorkManager.getInstance(context), maxSpace, logsDirectory)
+
+    private companion object {
+        private const val KEY_MAX_LOGS_SPACE = "max_logs_space"
+        private const val MAX_LOGS_SPACE = 30L * 1024 * 1024
+    }
 
 }

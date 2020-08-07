@@ -48,6 +48,7 @@ import com.tari.android.wallet.application.DeepLink
 import com.tari.android.wallet.databinding.ActivityHomeBinding
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.infrastructure.GiphyEcosystem
+import com.tari.android.wallet.infrastructure.log.LogsCleanupSchedule
 import com.tari.android.wallet.model.*
 import com.tari.android.wallet.network.NetworkConnectionState
 import com.tari.android.wallet.service.TariWalletService
@@ -74,8 +75,12 @@ internal class HomeActivity : AppCompatActivity(), AllSettingsFragment.AllSettin
 
     @Inject
     lateinit var sharedPrefsWrapper: SharedPrefsWrapper
+
     @Inject
     lateinit var giphy: GiphyEcosystem
+
+    @Inject
+    lateinit var schedule: LogsCleanupSchedule
 
     private lateinit var ui: ActivityHomeBinding
     private lateinit var serviceConnection: TariWalletServiceConnection
@@ -90,6 +95,7 @@ internal class HomeActivity : AppCompatActivity(), AllSettingsFragment.AllSettin
             finish()
             return
         }
+        schedule.runDaily()
         giphy.enable()
         serviceConnection = ViewModelProvider(this, TariWalletServiceConnectionFactory(this))
             .get(TariWalletServiceConnection::class.java)
