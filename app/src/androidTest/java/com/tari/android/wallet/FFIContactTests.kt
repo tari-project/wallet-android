@@ -47,8 +47,10 @@ class FFIContactTests {
     @Test
     fun constructor_assertThatConstructedContactIsValid() {
         val publicKey = FFIPublicKey(HexString(FFITestUtil.PUBLIC_KEY_HEX_STRING))
-        val contact = FFIContact(FFITestUtil.generateRandomAlphanumericString(16), publicKey)
-        assertTrue(contact.getPointer() != nullptr)
+        val alias = FFITestUtil.generateRandomAlphanumericString(16)
+        val contact = FFIContact(alias, publicKey)
+        assertTrue(contact.pointer != nullptr)
+        assertEquals(alias, contact.getAlias())
         contact.destroy()
         publicKey.destroy()
     }

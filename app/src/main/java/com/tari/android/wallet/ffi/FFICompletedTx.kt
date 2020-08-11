@@ -39,20 +39,18 @@ import java.math.BigInteger
  *
  * @author The Tari Development Team
  */
-internal typealias FFICompletedTxPtr = Long
-
-internal class FFICompletedTx constructor(pointer: FFICompletedTxPtr) : FFIBase() {
+internal class FFICompletedTx() : FFIBase() {
 
     // region JNI
 
     private external fun jniGetId(libError: FFIError): ByteArray
     private external fun jniGetDestinationPublicKey(
         libError: FFIError
-    ): FFIPublicKeyPtr
+    ): FFIPointer
 
     private external fun jniGetSourcePublicKey(
         libError: FFIError
-    ): FFIPublicKeyPtr
+    ): FFIPointer
 
     private external fun jniGetAmount(libError: FFIError): ByteArray
     private external fun jniGetFee(libError: FFIError): ByteArray
@@ -70,14 +68,8 @@ internal class FFICompletedTx constructor(pointer: FFICompletedTxPtr) : FFIBase(
 
     // endregion
 
-    private var ptr = nullptr
-
-    init {
-        ptr = pointer
-    }
-
-    fun getPointer(): FFICompletedTxPtr {
-        return ptr
+    constructor(pointer: FFIPointer): this() {
+        this.pointer = pointer
     }
 
     fun getId(): BigInteger {

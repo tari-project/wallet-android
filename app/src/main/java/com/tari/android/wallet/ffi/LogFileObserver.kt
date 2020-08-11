@@ -83,7 +83,8 @@ internal class LogFileObserver(logFilePath: String) : FileObserver(logFilePath) 
     }
 
     override fun onEvent(event: Int, path: String?) {
-        logNewLines()
+        try { logNewLines() } catch (ignored: Exception) {  }
+
     }
 
 }

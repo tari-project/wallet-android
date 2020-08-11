@@ -246,7 +246,7 @@ internal class WalletManager(
         // set shared preferences values after instantiation
         FFIWallet.instance?.getPublicKey()?.let { publicKeyFFI ->
             sharedPrefsWrapper.publicKeyHexString = publicKeyFFI.toString()
-            sharedPrefsWrapper.emojiId = publicKeyFFI.getEmojiNodeId()
+            sharedPrefsWrapper.emojiId = publicKeyFFI.getEmojiId()
             publicKeyFFI.destroy()
         }
     }

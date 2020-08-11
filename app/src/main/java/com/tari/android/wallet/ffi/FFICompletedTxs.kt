@@ -37,9 +37,7 @@ package com.tari.android.wallet.ffi
  *
  * @author The Tari Development Team
  */
-internal typealias FFICompletedTxsPtr = Long
-
-internal class FFICompletedTxs constructor(pointer: FFICompletedTxsPtr) : FFIBase() {
+internal class FFICompletedTxs() : FFIBase() {
 
     // region JNI
 
@@ -47,20 +45,14 @@ internal class FFICompletedTxs constructor(pointer: FFICompletedTxsPtr) : FFIBas
     private external fun jniGetAt(
         index: Int,
         libError: FFIError
-    ): FFICompletedTxPtr
+    ): FFIPointer
 
     private external fun jniDestroy()
 
     // endregion
 
-    private var ptr = nullptr
-
-    init {
-        ptr = pointer
-    }
-
-    fun getPointer(): FFICompletedTxsPtr {
-        return ptr
+    constructor(pointer: FFIPointer): this() {
+        this.pointer = pointer
     }
 
     fun getLength(): Int {

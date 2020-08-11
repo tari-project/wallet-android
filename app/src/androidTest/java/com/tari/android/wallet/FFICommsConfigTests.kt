@@ -83,7 +83,7 @@ class FFICommsConfigTests {
             walletDir,
             Constants.Wallet.discoveryTimeoutSec
         )
-        assertNotEquals(nullptr, commsConfig.getPointer())
+        assertNotEquals(nullptr, commsConfig.pointer)
         commsConfig.destroy()
         transport.destroy()
     }

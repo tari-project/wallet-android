@@ -44,7 +44,7 @@ internal class HexString constructor(bytes: FFIByteVector) {
     var hex: String = String()
 
     init {
-        if (bytes.getPointer() != nullptr) {
+        if (bytes.pointer != nullptr) {
             val byteArray = ByteArray(bytes.getLength())
             if (bytes.getLength() > 0) {
                 for (i in 0 until bytes.getLength()) {

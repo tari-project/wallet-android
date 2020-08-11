@@ -28,7 +28,7 @@ jobs:
           echo ".properties files created."
         env:
           SENTRY_PROPERTIES: ${{ secrets.SENTRY_PROPERTIES }}
-      - name: Run Instrumented Tests # run all instrumented tests through the TestSuite class
+      - name: Run Instrumented Tests # run all instrumented tests through the FFITestSuite class
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: 24
@@ -36,7 +36,7 @@ jobs:
           cmake: 3.10.2.4988404
           arch: x86_64
           emulator-options: -no-snapshot -wipe-data -no-boot-anim  -no-window -no-audio -gpu swiftshader_indirect -camera-back none -camera-front none
-          script: ./gradlew connectedRegularDebugAndroidTest -Pandroid.testInstrumentationRunnerArguments.class=com.tari.android.wallet.TestSuite
+          script: ./gradlew connectedRegularDebugAndroidTest -Pandroid.testInstrumentationRunnerArguments.class=com.tari.android.wallet.FFITestSuite
       - name: Upload Intrumented Test Reports
         uses: actions/upload-artifact@v2
         if: ${{ always() }} # IMPORTANT: Upload reports regardless of status.

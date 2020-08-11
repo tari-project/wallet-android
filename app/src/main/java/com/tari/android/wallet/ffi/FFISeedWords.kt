@@ -32,14 +32,12 @@
  */
 package com.tari.android.wallet.ffi
 
-internal typealias FFISeedWordsPtr = Long
-
 /**
  * Wrapper for native private key type.
  *
  * @author The Tari Development Team
  */
-internal class FFISeedWords constructor(pointer: FFISeedWordsPtr) : FFIBase() {
+internal class FFISeedWords() : FFIBase() {
 
     // region JNI
 
@@ -52,14 +50,8 @@ internal class FFISeedWords constructor(pointer: FFISeedWordsPtr) : FFIBase() {
 
     // endregion
 
-    private var ptr = nullptr
-
-    init {
-        ptr = pointer
-    }
-
-    fun getPointer(): FFISeedWordsPtr {
-        return ptr
+    constructor(pointer: FFIPointer): this() {
+        this.pointer = pointer
     }
 
     fun getLength(): Int {

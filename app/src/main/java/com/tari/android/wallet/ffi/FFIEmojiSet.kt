@@ -32,14 +32,12 @@
  */
 package com.tari.android.wallet.ffi
 
-internal typealias FFIEmojiSetPtr = Long
-
 /**
  * Wrapper for native private key type.
  *
  * @author The Tari Development Team
  */
-internal class FFIEmojiSet constructor(pointer: FFIEmojiSetPtr) : FFIBase() {
+internal class FFIEmojiSet(): FFIBase() {
 
     // region JNI
 
@@ -49,22 +47,12 @@ internal class FFIEmojiSet constructor(pointer: FFIEmojiSetPtr) : FFIBase() {
     private external fun jniGetAt(
         index: Int,
         libError: FFIError
-    ): FFIByteVectorPtr
+    ): FFIPointer
 
     // endregion
 
-    private var ptr = nullptr
-
     init {
-        ptr = pointer
-    }
-
-    constructor() : this(nullptr) {
         jniCreate()
-    }
-
-    fun getPointer(): FFIEmojiSetPtr {
-        return ptr
     }
 
     fun getLength(): Int {

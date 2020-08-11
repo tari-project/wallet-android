@@ -44,10 +44,8 @@ JNIEXPORT void JNICALL
 Java_com_tari_android_wallet_ffi_FFIEmojiSet_jniCreate(
         JNIEnv *jEnv,
         jobject jThis) {
-    int i = 0;
-    int *r = &i;
     EmojiSet *pEmojiSet = get_emoji_set();
-    SetPointerField(jEnv,jThis, reinterpret_cast<jlong>(pEmojiSet));
+    SetPointerField(jEnv, jThis, reinterpret_cast<jlong>(pEmojiSet));
 }
 
 extern "C"
@@ -58,8 +56,8 @@ Java_com_tari_android_wallet_ffi_FFIEmojiSet_jniGetLength(
         jobject error) {
     int i = 0;
     int *r = &i;
-    jlong lEmojiSet = GetPointerField(jEnv,jThis);
-    EmojiSet *pEmojiSet = reinterpret_cast<EmojiSet *>(lEmojiSet);
+    jlong lEmojiSet = GetPointerField(jEnv, jThis);
+    auto *pEmojiSet = reinterpret_cast<EmojiSet *>(lEmojiSet);
     jint result = emoji_set_get_length(pEmojiSet, r);
     setErrorCode(jEnv, error, i);
     return result;
@@ -74,10 +72,11 @@ Java_com_tari_android_wallet_ffi_FFIEmojiSet_jniGetAt(
         jobject error) {
     int i = 0;
     int *r = &i;
-    jlong lEmojiSet = GetPointerField(jEnv,jThis);
-    EmojiSet *pEmojiSet = reinterpret_cast<EmojiSet *>(lEmojiSet);
-    jlong result = reinterpret_cast<jlong>(emoji_set_get_at(pEmojiSet,
-                                                           static_cast<unsigned int>(index), r));
+    jlong lEmojiSet = GetPointerField(jEnv, jThis);
+    auto *pEmojiSet = reinterpret_cast<EmojiSet *>(lEmojiSet);
+    auto result = reinterpret_cast<jlong>(
+            emoji_set_get_at(pEmojiSet, static_cast<unsigned int>(index), r)
+    );
     setErrorCode(jEnv, error, i);
     return result;
 }
@@ -87,7 +86,7 @@ JNIEXPORT void JNICALL
 Java_com_tari_android_wallet_ffi_FFIEmojiSet_jniDestroy(
         JNIEnv *jEnv,
         jobject jThis) {
-    jlong lEmojiSet = GetPointerField(jEnv,jThis);
+    jlong lEmojiSet = GetPointerField(jEnv, jThis);
     emoji_set_destroy(reinterpret_cast<EmojiSet *>(lEmojiSet));
-    SetPointerField(jEnv,jThis, reinterpret_cast<jlong>(nullptr));
+    SetPointerField(jEnv, jThis, reinterpret_cast<jlong>(nullptr));
 }

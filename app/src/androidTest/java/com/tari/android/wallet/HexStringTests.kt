@@ -19,4 +19,5 @@ class HexStringTests {
     fun constructor_assertThatFFIExceptionWasThrown_ifNonHexStringArgumentWasGiven() {
         HexString("Invalid Hex String")
     }
+
 }
