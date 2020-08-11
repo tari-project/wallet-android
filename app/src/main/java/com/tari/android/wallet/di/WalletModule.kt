@@ -136,21 +136,21 @@ internal class WalletModule {
         context: Context,
         @Named(FieldName.walletFilesDirPath) walletFilesDirPath: String,
         @Named(FieldName.walletLogFilePath) walletLogFilePath: String,
+        @Named(FieldName.walletLogFilesDirPath) walletLogsDirPath: String,
         torConfig: TorConfig,
         torProxyManager: TorProxyManager,
         torProxyMonitor: TorProxyMonitor,
         sharedPrefsWrapper: SharedPrefsWrapper
-    ): WalletManager {
-        return WalletManager(
-            context,
-            walletFilesDirPath,
-            walletLogFilePath,
-            torProxyManager,
-            torProxyMonitor,
-            sharedPrefsWrapper,
-            torConfig
-        )
-    }
+    ): WalletManager = WalletManager(
+        context,
+        walletFilesDirPath,
+        walletLogFilePath,
+        File(walletLogsDirPath),
+        torProxyManager,
+        torProxyMonitor,
+        sharedPrefsWrapper,
+        torConfig
+    )
 
     @Provides
     @Singleton
