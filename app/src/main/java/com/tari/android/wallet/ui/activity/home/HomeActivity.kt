@@ -74,6 +74,7 @@ internal class HomeActivity : AppCompatActivity(), AllSettingsFragment.AllSettin
 
     @Inject
     lateinit var sharedPrefsWrapper: SharedPrefsWrapper
+
     @Inject
     lateinit var giphy: GiphyEcosystem
 
@@ -85,8 +86,10 @@ internal class HomeActivity : AppCompatActivity(), AllSettingsFragment.AllSettin
         overridePendingTransition(0, 0)
         appComponent.inject(this)
         if (!sharedPrefsWrapper.isAuthenticated) {
-            startActivity(Intent(this, SplashActivity::class.java)
-                .apply { flags = Intent.FLAG_ACTIVITY_NEW_TASK })
+            val intent = Intent(this, SplashActivity::class.java)
+                .apply { flags = Intent.FLAG_ACTIVITY_NEW_TASK }
+            this.intent?.data?.let(intent::setData)
+            startActivity(intent)
             finish()
             return
         }

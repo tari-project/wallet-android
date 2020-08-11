@@ -281,6 +281,7 @@ internal class AuthActivity : AppCompatActivity() {
         // go to home activity
         val intent = Intent(this, HomeActivity::class.java)
         intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
+        this.intent.data?.let(intent::setData)
         startActivity(intent)
         // finish this activity
         finish()

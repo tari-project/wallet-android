@@ -94,6 +94,7 @@ internal class SplashActivity : AppCompatActivity() {
     private fun startAuthActivity() {
         val intent = Intent(this, AuthActivity::class.java)
         intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
+        this.intent.data?.let(intent::setData)
         startActivity(intent)
         // finish this activity
         finish()
