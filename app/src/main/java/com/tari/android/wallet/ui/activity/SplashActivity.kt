@@ -32,19 +32,19 @@
  */
 package com.tari.android.wallet.ui.activity
 
+import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
+import android.os.Looper
 import androidx.appcompat.app.AppCompatActivity
-import com.tari.android.wallet.R
-import com.tari.android.wallet.di.WalletModule
+import androidx.core.os.postDelayed
 import com.tari.android.wallet.ui.activity.onboarding.OnboardingFlowActivity
 import com.tari.android.wallet.ui.extension.appComponent
 import com.tari.android.wallet.util.Constants.UI.Splash
 import com.tari.android.wallet.util.SharedPrefsWrapper
 import com.tari.android.wallet.util.WalletUtil
 import javax.inject.Inject
-import javax.inject.Named
 
 /**
  * Splash screen activity.
@@ -53,56 +53,29 @@ import javax.inject.Named
  */
 internal class SplashActivity : AppCompatActivity() {
 
-    private val uiHandler = Handler()
-
-    @Inject
-    @Named(WalletModule.FieldName.walletFilesDirPath)
-    lateinit var walletFilesDirPath: String
-
     @Inject
     internal lateinit var sharedPrefsWrapper: SharedPrefsWrapper
 
     override fun onCreate(savedInstanceState: Bundle?) {
         appComponent.inject(this)
         super.onCreate(savedInstanceState)
-        // check whether there's an existing wallet
-        setContentView(R.layout.activity_splash)
-        val walletExists = WalletUtil.walletExists(applicationContext)
-        if (walletExists && sharedPrefsWrapper.onboardingAuthSetupCompleted) {
-            uiHandler.postDelayed({
-                startAuthActivity()
-            }, Splash.createWalletStartUpDelayMs)
-        } else {
-            uiHandler.postDelayed({
-                startOnboardingActivity()
-            }, Splash.createWalletStartUpDelayMs)
+        Handler(Looper.getMainLooper()).postDelayed(Splash.createWalletStartUpDelayMs) {
+            val exists =
+                WalletUtil.walletExists(applicationContext) && sharedPrefsWrapper.onboardingAuthSetupCompleted
+            launch(if (exists) AuthActivity::class.java else OnboardingFlowActivity::class.java)
         }
+    }
+
+    private fun <T : Activity> launch(destination: Class<T>) {
+        val intent = Intent(this, destination)
+        intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
+        this.intent.data?.let(intent::setData)
+        startActivity(intent)
+        finish()
     }
 
     override fun onBackPressed() {
         // no-op
-    }
-
-    private fun startOnboardingActivity() {
-        val intent = Intent(this, OnboardingFlowActivity::class.java)
-        intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
-        startActivity(intent)
-        // finish this activity
-        finish()
-    }
-
-    private fun startAuthActivity() {
-        val intent = Intent(this, AuthActivity::class.java)
-        intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
-        this.intent.data?.let(intent::setData)
-        startActivity(intent)
-        // finish this activity
-        finish()
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        uiHandler.removeCallbacksAndMessages(null)
     }
 
 }

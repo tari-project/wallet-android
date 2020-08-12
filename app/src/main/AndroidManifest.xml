@@ -71,7 +71,7 @@
             android:name=".ui.activity.AuthActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme"
+            android:theme="@style/AppTheme.Auth"
             android:windowSoftInputMode="stateAlwaysHidden" /> <!-- home (transaction list) -->
         <activity
             android:name=".ui.activity.home.HomeActivity"
