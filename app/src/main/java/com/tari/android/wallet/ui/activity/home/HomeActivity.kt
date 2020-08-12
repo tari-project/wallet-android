@@ -202,6 +202,8 @@ internal class HomeActivity : AppCompatActivity(), AllSettingsFragment.AllSettin
     override fun toBackupSettings() =
         startActivity(Intent(this, BackupSettingsActivity::class.java))
 
+    fun willNotifyAboutNewTx(): Boolean = ui.viewPager.currentItem == INDEX_HOME
+
     private fun processIntentDeepLink(service: TariWalletService, intent: Intent) {
         DeepLink.from(intent.data?.toString() ?: "")?.let { deepLink ->
             val pubkey = when (deepLink.type) {
