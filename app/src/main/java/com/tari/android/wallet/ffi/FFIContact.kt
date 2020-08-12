@@ -39,14 +39,14 @@ internal typealias FFIContactPtr = Long
  *
  * @author The Tari Development Team
  */
-internal class FFIContact constructor(pointer: FFIContactPtr) : FFIBase() {
+internal class FFIContact() : FFIBase() {
 
     // region JNI
 
     private external fun jniGetAlias(libError: FFIError): String
     private external fun jniGetPublicKey(
         libError: FFIError
-    ): FFIPublicKeyPtr
+    ): FFIPointer
 
     private external fun jniDestroy()
     private external fun jniCreate(
@@ -56,14 +56,11 @@ internal class FFIContact constructor(pointer: FFIContactPtr) : FFIBase() {
     )
 
     // endregion
-
-    private var ptr = nullptr
-
-    init {
-        ptr = pointer
+    constructor(pointer: FFIPointer): this() {
+        this.pointer = pointer
     }
 
-    constructor(alias: String, FFIPublicKey: FFIPublicKey) : this(nullptr) {
+    constructor(alias: String, FFIPublicKey: FFIPublicKey): this() {
         if (alias.isNotEmpty()) {
             val error = FFIError()
             jniCreate(alias, FFIPublicKey, error)
@@ -71,10 +68,6 @@ internal class FFIContact constructor(pointer: FFIContactPtr) : FFIBase() {
         } else {
             throw FFIException(message = "Alias is an empty String.")
         }
-    }
-
-    fun getPointer(): FFIContactPtr {
-        return ptr
     }
 
     fun getAlias(): String {

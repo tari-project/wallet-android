@@ -700,16 +700,18 @@ internal class TxListFragment : Fragment(),
     }
 
     private fun testnetTariRequestSuccessful() {
-        val error = WalletError()
-        val importedTx =
-            walletService!!.importTestnetUTXO(string(R.string.first_testnet_utxo_tx_message), error)
-        if (error.code != WalletErrorCode.NO_ERROR) {
-            TODO("Unhandled wallet error: ${error.code}")
-        }
-        sharedPrefsWrapper.faucetTestnetTariRequestCompleted = true
-        sharedPrefsWrapper.firstTestnetUTXOTxId = importedTx.id
-        completedTxs.add(importedTx)
         lifecycleScope.launch(Dispatchers.IO) {
+            val error = WalletError()
+            val importedTx = walletService!!.importTestnetUTXO(
+                string(R.string.first_testnet_utxo_tx_message),
+                error
+            )
+            if (error.code != WalletErrorCode.NO_ERROR) {
+                TODO("Unhandled wallet error: ${error.code}")
+            }
+            sharedPrefsWrapper.faucetTestnetTariRequestCompleted = true
+            sharedPrefsWrapper.firstTestnetUTXOTxId = importedTx.id
+            completedTxs.add(importedTx)
             updateBalanceInfoData()
             // update UI
             lifecycleScope.launch(Dispatchers.Main) {
@@ -896,17 +898,17 @@ internal class TxListFragment : Fragment(),
     }
 
     private fun importSecondUTXO() {
-        val error = WalletError()
-        val importedTx = walletService!!.importTestnetUTXO(
-            string(R.string.second_testnet_utxo_tx_message),
-            error
-        )
-        if (error.code != WalletErrorCode.NO_ERROR) {
-            TODO("Unhandled wallet error: ${error.code}")
-        }
-        sharedPrefsWrapper.secondTestnetUTXOTxId = importedTx.id
-        completedTxs.add(importedTx)
         lifecycleScope.launch(Dispatchers.IO) {
+            val error = WalletError()
+            val importedTx = walletService!!.importTestnetUTXO(
+                string(R.string.second_testnet_utxo_tx_message),
+                error
+            )
+            if (error.code != WalletErrorCode.NO_ERROR) {
+                TODO("Unhandled wallet error: ${error.code}")
+            }
+            sharedPrefsWrapper.secondTestnetUTXOTxId = importedTx.id
+            completedTxs.add(importedTx)
             updateBalanceInfoData()
             // update UI
             lifecycleScope.launch(Dispatchers.Main) {

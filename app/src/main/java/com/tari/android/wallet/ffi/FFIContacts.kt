@@ -37,9 +37,8 @@ package com.tari.android.wallet.ffi
  *
  * @author The Tari Development Team
  */
-internal typealias FFIContactsPtr = Long
 
-internal class FFIContacts constructor(pointer: FFIContactPtr) : FFIBase() {
+internal class FFIContacts() : FFIBase() {
 
     // region JNI
 
@@ -53,14 +52,8 @@ internal class FFIContacts constructor(pointer: FFIContactPtr) : FFIBase() {
 
     // endregion
 
-    private var ptr = nullptr
-
-    init {
-        ptr = pointer
-    }
-
-    fun getPointer(): FFIContactsPtr {
-        return ptr
+    constructor(pointer: FFIPointer): this() {
+        this.pointer = pointer
     }
 
     fun getLength(): Int {

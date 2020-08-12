@@ -32,14 +32,12 @@
  */
 package com.tari.android.wallet.ffi
 
-internal typealias FFIPendingInboundTxsPtr = Long
-
 /**
  * Tari pending inbound transactions wrapper.
  *
  * @author The Tari Development Team
  */
-internal class FFIPendingInboundTxs constructor(pointer: FFIPendingInboundTxsPtr) : FFIBase() {
+internal class FFIPendingInboundTxs() : FFIBase() {
 
     // region JNI
 
@@ -47,16 +45,14 @@ internal class FFIPendingInboundTxs constructor(pointer: FFIPendingInboundTxsPtr
     private external fun jniGetAt(
         index: Int,
         libError: FFIError
-    ): FFIPendingInboundTxPtr
+    ): FFIPointer
 
     private external fun jniDestroy()
 
     // endregion
 
-    private var ptr = nullptr
-
-    init {
-        ptr = pointer
+    constructor(pointer: FFIPointer): this() {
+        this.pointer = pointer
     }
 
     fun getLength(): Int {
@@ -64,10 +60,6 @@ internal class FFIPendingInboundTxs constructor(pointer: FFIPendingInboundTxsPtr
         val result = jniGetLength(error)
         throwIf(error)
         return result
-    }
-
-    fun getPointer(): FFIPendingInboundTxsPtr {
-        return ptr
     }
 
     fun getAt(index: Int): FFIPendingInboundTx {

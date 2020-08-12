@@ -40,284 +40,403 @@ package com.tari.android.wallet
 import android.content.Context
 import androidx.test.core.app.ApplicationProvider
 import com.orhanobut.logger.Logger
-import com.tari.android.wallet.di.WalletModule
 import com.tari.android.wallet.ffi.*
-import com.tari.android.wallet.model.CancelledTx
-import com.tari.android.wallet.model.CompletedTx
-import com.tari.android.wallet.model.PendingInboundTx
-import com.tari.android.wallet.model.PendingOutboundTx
+import com.tari.android.wallet.model.*
 import com.tari.android.wallet.util.Constants
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.slot
 import io.mockk.verify
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.suspendCancellableCoroutine
-import kotlinx.coroutines.withTimeout
 import org.junit.*
 import org.junit.Assert.*
 import java.io.File
 import java.math.BigInteger
-import kotlin.coroutines.Continuation
-import kotlin.coroutines.resume
 
 class FFIWalletTests {
 
-    private companion object {
-        private lateinit var walletDir: String
+    private lateinit var wallet: FFIWallet
+    private lateinit var listener: TestListener
+    private val walletDirPath =
+        ApplicationProvider.getApplicationContext<Context>().filesDir.absolutePath
 
-        @BeforeClass
-        @JvmStatic
-        fun beforeAll() {
-            val context = ApplicationProvider.getApplicationContext<Context>()
-            val walletMod = WalletModule()
-            walletDir = walletMod.provideWalletFilesDirPath(context)
-            clean()
-        }
-
-        @AfterClass
-        @JvmStatic
-        fun afterAll() {
-            val walletMod = WalletModule()
-            FFITestUtil.printFFILogFile(
-                walletMod.provideWalletLogFilePath(
-                    walletMod.provideLogFilesDirPath(walletDir)
-                )
-            )
-        }
-
-        private fun clean() {
-            val clean = FFITestUtil.clearTestFiles(walletDir)
-            if (!clean) {
-                throw RuntimeException("Test files could not cleared.")
-            }
+    private fun clean() {
+        val clean = FFITestUtil.clearTestFiles(walletDirPath)
+        if (!clean) {
+            throw RuntimeException("Test files could not cleared.")
         }
     }
 
+    @Before
+    fun setup() {
+        // clean any existing wallet data
+        clean()
+        // create memory transport
+        val transport = FFITransportType()
+        // create comms config
+        val commsConfig = FFICommsConfig(
+            transport.getAddress(),
+            transport,
+            FFITestUtil.WALLET_DB_NAME,
+            walletDirPath,
+            Constants.Wallet.discoveryTimeoutSec
+        )
+        val logFile = File(walletDirPath, "test_log.log")
+        // create wallet instance
+        wallet = FFIWallet(commsConfig, logFile.absolutePath)
+        // create listener
+        listener = TestListener()
+        wallet.listener = listener
+        commsConfig.destroy()
+        transport.destroy()
+    }
+
     @After
-    fun tearDown() {
+    fun teardown() {
+        // destroy wallet
+        wallet.listener = null
+        wallet.destroy()
+        // clean wallet folder
         clean()
     }
 
     @Test
-    fun construction_assertThatValidInstanceWasCreated() {
-        val transport = FFITransportType()
-        val commsConfig = FFICommsConfig(
-            transport.getAddress(),
-            transport,
-            FFITestUtil.WALLET_DB_NAME,
-            walletDir,
-            Constants.Wallet.discoveryTimeoutSec
+    fun validInstanceWithValidPublicKeyWasCreated() {
+        assertNotEquals(nullptr, wallet.pointer)
+        val publicKey = wallet.getPublicKey()
+        assertNotEquals(nullptr, publicKey.pointer)
+        assertEquals(
+            FFITestUtil.PUBLIC_KEY_HEX_STRING.length,
+            publicKey.toString().length
         )
-        val wallet = FFIWallet(commsConfig, "")
-        wallet.listenerAdapter = TestListener()
-        assertNotEquals(nullptr, wallet.getPointer())
-        wallet.destroy()
-        commsConfig.destroy()
-        transport.destroy()
     }
 
     @Test
-    fun getPublicKey_assertThatValidPublicKeyInstanceWasReturned() {
-        val transport = FFITransportType()
-        val commsConfig = FFICommsConfig(
-            transport.getAddress(),
-            transport,
-            FFITestUtil.WALLET_DB_NAME,
-            walletDir,
-            Constants.Wallet.discoveryTimeoutSec
-        )
-        val wallet = FFIWallet(commsConfig, "")
-        wallet.listenerAdapter = TestListener()
-        assertNotEquals(nullptr, wallet.getPublicKey().getPointer())
-        wallet.destroy()
-        commsConfig.destroy()
-        transport.destroy()
-    }
-
-    @Test
-    fun verifyMessageSignature_assertThatSignedMessageVerificationWasSuccessful() {
-        val transport = FFITransportType()
-        val commsConfig = FFICommsConfig(
-            transport.getAddress(),
-            transport,
-            FFITestUtil.WALLET_DB_NAME,
-            walletDir,
-            Constants.Wallet.discoveryTimeoutSec
-        )
-        val wallet = FFIWallet(commsConfig, "")
-        wallet.listenerAdapter = TestListener()
+    fun signedMessageVerificationWasSuccessful() {
         val message = "Hello"
         val signature = wallet.signMessage(message)
         assertTrue(wallet.verifyMessageSignature(wallet.getPublicKey(), message, signature))
-        wallet.destroy()
-        commsConfig.destroy()
-        transport.destroy()
     }
 
     @Test
-    fun onTxReceived_assertThatValidTxObjectWasGivenToTheListener() = runBlocking {
-        val listener = mockk<FFIWalletListenerAdapter>(relaxed = true, relaxUnitFun = true)
-        val receivedTxSlot = slot<PendingInboundTx>()
-        val transport = FFITransportType()
-        val commsConfig = FFICommsConfig(
-            transport.getAddress(),
-            transport,
-            FFITestUtil.WALLET_DB_NAME,
-            walletDir,
-            Constants.Wallet.discoveryTimeoutSec
+    fun testContacts() {
+        val contactCount = 127
+        // add contacts
+        repeat(contactCount) {
+            val contactPrivateKey = FFIPrivateKey.generate()
+            val contactPublicKey = FFIPublicKey(contactPrivateKey)
+            val contact = FFIContact(
+                FFITestUtil.generateRandomAlphanumericString(16),
+                contactPublicKey
+            )
+            wallet.addUpdateContact(contact)
+            contactPrivateKey.destroy()
+            contactPublicKey.destroy()
+            contact.destroy()
+        }
+        // test get contacts
+        var contacts = wallet.getContacts()
+        assertEquals(contactCount, contacts.getLength())
+        // test update alias
+        val lastContactOld = contacts.getAt(contactCount - 1)
+        val lastContactOldPublicKey = lastContactOld.getPublicKey()
+        val newAlias = FFITestUtil.generateRandomAlphanumericString(7)
+        val lastContactNew = FFIContact(
+            newAlias,
+            lastContactOldPublicKey
         )
-        val wallet = FFIWallet(commsConfig, "")
-        wallet.listenerAdapter = listener
-        commsConfig.destroy()
-        suspendWithTimeout<Unit>(2000L) { c ->
-            every { listener.onTxReceived(capture(receivedTxSlot)) } answers { c.resume(Unit)  }
-            assertTrue(wallet.testReceiveTx())
-        }
-        verify { listener.onTxReceived(any()) }
-        wallet.destroy()
-    }
-
-    private suspend inline fun <T> suspendWithTimeout(
-        timeoutMillis: Long,
-        crossinline block: (Continuation<T>) -> Unit
-    ) = withTimeout(timeoutMillis) { suspendCancellableCoroutine(block) }
-
-    @Test
-    @Ignore("Does not work currently due to failing wuth 999 code generateTestData function")
-    fun testWallet() {
-        val transport = FFITransportType()
-        val commsConfig = FFICommsConfig(
-            transport.getAddress(),
-            transport,
-            FFITestUtil.WALLET_DB_NAME,
-            walletDir,
-            Constants.Wallet.discoveryTimeoutSec
+        lastContactOldPublicKey.destroy()
+        wallet.addUpdateContact(lastContactNew)
+        lastContactOld.destroy()
+        lastContactNew.destroy()
+        contacts.destroy()
+        // re-fetch contacts
+        contacts = wallet.getContacts()
+        val lastContactUpdated = contacts.getAt(contactCount - 1)
+        assertEquals(
+            newAlias,
+            lastContactUpdated.getAlias()
         )
-        val wallet = FFIWallet(commsConfig, "")
-        wallet.listenerAdapter = TestListener()
-        commsConfig.destroy()
-
-        // test completed transactions
-        val completedTxs = wallet.getCompletedTxs()
-        assertTrue(completedTxs.getPointer() != nullptr)
-        assertTrue(completedTxs.getLength() > 0)
-        for (i in 0 until completedTxs.getLength()) {
-            val completedTx = completedTxs.getAt(i)
-            assertTrue(completedTx.getPointer() != nullptr)
-            val completedID = completedTx.getId()
-            completedID.toString()
-            val completedTxSource = completedTx.getSourcePublicKey()
-            assertTrue(completedTxSource.getPointer() != nullptr)
-            completedTxSource.destroy()
-            val completedTxDestination = completedTx.getDestinationPublicKey()
-            assertTrue(completedTxDestination.getPointer() != nullptr)
-            completedTxDestination.destroy()
-            val completedTxAmount = completedTx.getAmount()
-            assertTrue(completedTxAmount > BigInteger("0"))
-            val completedTxFee = completedTx.getFee()
-            assertTrue(completedTxFee > BigInteger("0"))
-            val completedTxTimestamp = completedTx.getTimestamp()
-            completedTxTimestamp.toString()
-            if (wallet.getPublicKey().toString() == completedTx.getSourcePublicKey().toString()) {
-                assertTrue(completedTx.isOutbound())
-            } else {
-                assertFalse(completedTx.isOutbound())
-            }
-            completedTx.destroy()
-        }
-
-        var wasRun = false
-        // test pending inbound transactions
-        assertTrue(wallet.testReceiveTx())
-        val pendingInboundTxs = wallet.getPendingInboundTxs()
-        assertTrue(pendingInboundTxs.getPointer() != nullptr)
-        assertTrue(pendingInboundTxs.getLength() > 0)
-        for (i in 0 until pendingInboundTxs.getLength()) {
-            val inbound = pendingInboundTxs.getAt(i)
-            assertTrue(inbound.getPointer() != nullptr)
-            val inboundTxID = inbound.getId()
-            inboundTxID.toString()
-            val inboundTxSource = inbound.getSourcePublicKey()
-            assertTrue(inboundTxSource.getPointer() != nullptr)
-            val inboundTxAmount = inbound.getAmount()
-            assertTrue(inboundTxAmount > BigInteger("0"))
-            val inboundTxTimestamp = inbound.getTimestamp()
-            inboundTxTimestamp.toString()
-            if (inbound.getStatus() == FFITxStatus.PENDING) {
-                val inboundTx = wallet.getPendingInboundTxById(inbound.getId())
-                assertTrue(inboundTx.getPointer() != nullptr)
-                assertTrue(wallet.testFinalizeReceivedTx(inboundTx))
-                assertTrue(wallet.testBroadcastTx(inboundTx.getId()))
-                assertTrue(wallet.testMineTx(inboundTx.getId()))
-                inboundTx.destroy()
-                wasRun = true
-            }
-            inbound.destroy()
-        }
-        pendingInboundTxs.destroy()
-        assertTrue(wasRun)
-
-        // test balances
-        val available = wallet.getAvailableBalance()
-        assertTrue(available.toString().toBigIntegerOrNull() != null)
-        val pendingIn = wallet.getPendingIncomingBalance()
-        assertTrue(pendingIn.toString().toBigIntegerOrNull() != null)
-        val pendingOut = wallet.getPendingOutgoingBalance()
-        assertTrue(pendingOut.toString().toBigIntegerOrNull() != null)
-
-        // test pending outbound transactions
-        val pendingOutboundTxs = wallet.getPendingOutboundTxs()
-        assertTrue(pendingOutboundTxs.getPointer() != nullptr)
-        assertTrue(pendingOutboundTxs.getLength() > 0)
-        for (i in 0 until pendingOutboundTxs.getLength()) {
-            val outboundTx = pendingOutboundTxs.getAt(i)
-            assertTrue(outboundTx.getPointer() != nullptr)
-            val outboundTxSource = outboundTx.getDestinationPublicKey()
-            assertTrue(outboundTxSource.getPointer() != nullptr)
-            val outboundTxAmount = outboundTx.getAmount()
-            assertTrue(outboundTxAmount > BigInteger("0"))
-            val outboundTxFee = outboundTx.getFee()
-            assertTrue(outboundTxFee > BigInteger("0"))
-            val outboundTxTimestamp = outboundTx.getTimestamp()
-            outboundTxTimestamp.toString()
-            val outboundTxStatus = outboundTx.getStatus()
-            outboundTxStatus.toString()
-            outboundTx.destroy()
-        }
-        pendingOutboundTxs.destroy()
-
-        // destroy objects
-        transport.destroy()
-        wallet.destroy()
-
-        // TODO test listeners
+        // test remove
+        wallet.removeContact(lastContactUpdated)
+        lastContactUpdated.destroy()
+        contacts.destroy()
+        contacts = wallet.getContacts()
+        assertEquals(
+            contactCount - 1,
+            contacts.getLength()
+        )
+        contacts.destroy()
     }
 
     @Test
     fun testPartialBackup() {
-        val transport = FFITransportType()
-        val commsConfig = FFICommsConfig(
-            transport.getAddress(),
-            transport,
-            FFITestUtil.WALLET_DB_NAME,
-            walletDir,
-            Constants.Wallet.discoveryTimeoutSec
-        )
-        val wallet = FFIWallet(commsConfig, "")
-        wallet.listenerAdapter = TestListener()
-        val originalFile = File(walletDir, FFITestUtil.WALLET_DB_NAME)
-        val backupDir = File(walletDir, "backup")
+        val originalFile = File(walletDirPath, FFITestUtil.WALLET_DB_NAME_WITH_EXTENSION)
+        assertTrue(originalFile.exists())
+        val backupDir = File(walletDirPath, "backup")
         backupDir.mkdir()
         val backupFile = File(backupDir, "backupfile.sqlite3")
         FFIUtil.doPartialBackup(originalFile.absolutePath, backupFile.absolutePath)
         assertTrue(backupFile.exists())
-        transport.destroy()
-        commsConfig.destroy()
-        wallet.destroy()
     }
 
-    class TestListener : FFIWalletListenerAdapter {
+    @Test
+    fun testSeedWords() {
+        val seedWords = wallet.getSeedWords()
+        assertTrue(seedWords.getLength() > 0)
+        assertTrue(seedWords.getAt(0).isNotEmpty())
+        seedWords.destroy()
+        assertEquals(nullptr, seedWords.pointer)
+    }
+
+    @Test
+    fun testEmojiSet() {
+        val emojiSet = FFIEmojiSet()
+        assertTrue(emojiSet.getLength() > 0)
+        val emoji = emojiSet.getAt(0)
+        assertTrue(emoji.toString().isNotEmpty())
+        emoji.destroy()
+        emojiSet.destroy()
+        assertEquals(nullptr, emojiSet.pointer)
+    }
+
+    @Test
+    fun testBaseNodeFunctions() {
+        val baseNodePublicKey = FFIPublicKey(
+            HexString("06e98e9c5eb52bd504836edec1878eccf12eb9f26a5fe5ec0e279423156e657a")
+        )
+        val baseNodeAddress =
+            "/onion3/bsmuof2cn4y2ysz253gzsvg3s72fcgh4f3qcm3hdlxdtcwe6al2dicyd:18141"
+
+        val mockListener = mockk<FFIWalletListener>(relaxed = true, relaxUnitFun = true)
+        val responseIds = mutableListOf<BigInteger>()
+        every {
+            mockListener.onBaseNodeSyncComplete(capture(responseIds), any())
+        } answers { }
+        wallet.listener = mockListener
+        wallet.addBaseNodePeer(baseNodePublicKey, baseNodeAddress)
+        baseNodePublicKey.destroy()
+        val requestId = wallet.syncWithBaseNode()
+        assertTrue(requestId > BigInteger("0"))
+        Thread.sleep(5000)
+        verify { mockListener.onBaseNodeSyncComplete(requestId, any()) }
+        assertTrue(responseIds.contains(requestId))
+    }
+
+    @Test
+    fun testReceiveTxFlow() {
+        val mockListener = mockk<FFIWalletListener>(relaxed = true, relaxUnitFun = true)
+        val receivedTxSlot = slot<PendingInboundTx>()
+        every { mockListener.onTxReceived(capture(receivedTxSlot)) } answers { }
+        wallet.listener = mockListener
+        // receive tx
+        assertTrue(wallet.testReceiveTx())
+        Thread.sleep(1000)
+        verify { mockListener.onTxReceived(any()) }
+        val pendingInboundTx = receivedTxSlot.captured
+        val pendingInboundTxsFFI = wallet.getPendingInboundTxs()
+        assertEquals(1, pendingInboundTxsFFI.getLength())
+        val pendingInboundTxFFI = pendingInboundTxsFFI.getAt(0)
+        assertEquals(
+            pendingInboundTx.id,
+            pendingInboundTxFFI.getId()
+        )
+        assertEquals(
+            TxStatus.PENDING,
+            pendingInboundTx.status
+        )
+        pendingInboundTxsFFI.destroy()
+        // test get pending inbound tx by id
+        val pendingInboundTxByIdFFI = wallet.getPendingInboundTxById(pendingInboundTx.id)
+        assertEquals(
+            pendingInboundTx.id,
+            pendingInboundTxByIdFFI.getId()
+        )
+        pendingInboundTxByIdFFI.destroy()
+
+        // test finalize
+        val finalizedTxSlot = slot<PendingInboundTx>()
+        every { mockListener.onTxFinalized(capture(finalizedTxSlot)) } answers { }
+        assertTrue(wallet.testFinalizeReceivedTx(pendingInboundTxFFI))
+        Thread.sleep(1000)
+        verify { mockListener.onTxFinalized(any()) }
+        val finalizedTx = finalizedTxSlot.captured
+        assertEquals(
+            pendingInboundTx.id,
+            finalizedTx.id
+        )
+        assertEquals(
+            TxStatus.COMPLETED,
+            finalizedTx.status
+        )
+        pendingInboundTxFFI.destroy()
+
+        // test broadcast
+        val broadcastTxSlot = slot<PendingInboundTx>()
+        every { mockListener.onInboundTxBroadcast(capture(broadcastTxSlot)) } answers { }
+        assertTrue(wallet.testBroadcastTx(pendingInboundTx.id))
+        Thread.sleep(1000)
+        verify { mockListener.onInboundTxBroadcast(any()) }
+        val broadcastTx = broadcastTxSlot.captured
+        assertEquals(
+            pendingInboundTx.id,
+            broadcastTx.id
+        )
+        // test wallet pending inbound balance
+        assertEquals(
+            pendingInboundTx.amount.value,
+            wallet.getPendingInboundBalance()
+        )
+
+        // test mine tx
+        val minedTxSlot = slot<CompletedTx>()
+        every { mockListener.onTxMined(capture(minedTxSlot)) } answers { }
+        assertTrue(wallet.testMineTx(pendingInboundTx.id))
+        Thread.sleep(1000)
+        verify { mockListener.onTxMined(any()) }
+        val minedTx = minedTxSlot.captured
+        assertEquals(
+            pendingInboundTx.id,
+            minedTx.id
+        )
+        assertEquals(
+            TxStatus.MINED,
+            minedTx.status
+        )
+        // get completed txs
+        val completedTxsFFI = wallet.getCompletedTxs()
+        assertEquals(1, completedTxsFFI.getLength())
+        val completedTxFFI = completedTxsFFI.getAt(0)
+        assertEquals(
+            pendingInboundTx.id,
+            completedTxFFI.getId()
+        )
+        completedTxFFI.destroy()
+        completedTxsFFI.destroy()
+        // test get by id
+        val minedTxByIdFFI = wallet.getCompletedTxById(pendingInboundTx.id)
+        assertEquals(
+            pendingInboundTx.id,
+            minedTxByIdFFI.getId()
+        )
+        minedTxByIdFFI.destroy()
+        // available balance
+        assertEquals(
+            pendingInboundTx.amount.value,
+            wallet.getAvailableBalance()
+        )
+    }
+
+    @Test
+    fun testCancelCompleteAndBroadcastAndGetByIds() {
+        Logger.i("Will generate test data.")
+        assertTrue(wallet.generateTestData(walletDirPath))
+        Logger.i("Test data generation completed.")
+        val mockListener = mockk<FFIWalletListener>(relaxed = true, relaxUnitFun = true)
+        wallet.listener = mockListener
+
+        // get a pending tx to cancel -
+        // there's no pending outbound tx in the generated test data, so pick an incoming tx
+        assertTrue(wallet.testReceiveTx())
+        val pendingInboundTxsFFI = wallet.getPendingInboundTxs()
+        var pendingInboundTxFFI: FFIPendingInboundTx? = null
+        for(i in 0 until pendingInboundTxsFFI.getLength()) {
+            pendingInboundTxFFI = pendingInboundTxsFFI.getAt(i)
+            if (pendingInboundTxFFI.getStatus() == FFITxStatus.PENDING) {
+                break
+            }
+            pendingInboundTxFFI.destroy()
+        }
+        pendingInboundTxsFFI.destroy()
+        assertNotNull(pendingInboundTxFFI)
+        // cancel tx
+        val cancelledTxSlot = slot<CancelledTx>()
+        every { mockListener.onTxCancelled(capture(cancelledTxSlot)) } answers { }
+        assertTrue(wallet.cancelPendingTx(pendingInboundTxFFI!!.getId()))
+        pendingInboundTxFFI.destroy()
+        Thread.sleep(1000)
+        verify { mockListener.onTxCancelled(any()) }
+        val cancelledTx = cancelledTxSlot.captured
+        val cancelledTxsFFI = wallet.getCancelledTxs()
+        assertEquals(1, cancelledTxsFFI.getLength())
+        val cancelledTxFFI = cancelledTxsFFI.getAt(0)
+        cancelledTxsFFI.destroy()
+        assertEquals(
+            cancelledTx.id,
+            cancelledTxFFI.getId()
+        )
+        cancelledTxFFI.destroy()
+        // get by id
+        val cancelledTxByIdFFI = wallet.getCancelledTxById(cancelledTx.id)
+        assertEquals(
+            cancelledTx.id,
+            cancelledTxByIdFFI.getId()
+        )
+        cancelledTxByIdFFI.destroy()
+
+        // pick a completed outbound tx
+        val pendingOutboundTxsFFI = wallet.getPendingOutboundTxs()
+        var pendingOutboundTxFFI: FFIPendingOutboundTx? = null
+        for(i in 0 until pendingOutboundTxsFFI.getLength()) {
+            pendingOutboundTxFFI = pendingOutboundTxsFFI.getAt(i)
+            if (pendingOutboundTxFFI.getStatus() == FFITxStatus.COMPLETED) {
+                break
+            }
+            pendingOutboundTxFFI.destroy()
+        }
+        pendingOutboundTxsFFI.destroy()
+        assertNotNull(pendingOutboundTxFFI)
+        // broadcast tx
+        val broadcastTxSlot = slot<PendingOutboundTx>()
+        every { mockListener.onOutboundTxBroadcast(capture(broadcastTxSlot)) } answers { }
+        assertTrue(wallet.testBroadcastTx(pendingOutboundTxFFI!!.getId()))
+        Thread.sleep(1000)
+        verify { mockListener.onTxCancelled(any()) }
+        val broadcastTx = broadcastTxSlot.captured
+        assertEquals(
+            TxStatus.BROADCAST,
+            broadcastTx.status
+        )
+        // mine tx
+        val minedTxSlot = slot<CompletedTx>()
+        every { mockListener.onTxMined(capture(minedTxSlot)) } answers { }
+        assertTrue(wallet.testMineTx(pendingOutboundTxFFI.getId()))
+        Thread.sleep(1000)
+        pendingOutboundTxFFI.destroy()
+        verify { mockListener.onTxMined(any()) }
+        val minedTx = minedTxSlot.captured
+        assertEquals(
+            TxStatus.MINED,
+            minedTx.status
+        )
+        // get mined tx by id
+        val minedTxFFI = wallet.getCompletedTxById(minedTx.id)
+        assertEquals(
+            minedTx.id,
+            minedTxFFI.getId()
+        )
+        minedTxFFI.destroy()
+    }
+
+    /**
+     * No return values from the functions, just testing for no exceptions.
+     */
+    @Test
+    fun testPowerModes() {
+        wallet.setPowerModeLow()
+        Thread.sleep(2000)
+        wallet.setPowerModeNormal()
+        Thread.sleep(2000)
+    }
+
+    private class TestListener : FFIWalletListener {
+
+        val receivedTxs = mutableListOf<PendingInboundTx>()
+        val finalizedTxs = mutableListOf<PendingInboundTx>()
+        val minedTxs = mutableListOf<CompletedTx>()
+        val replyReceivedTxs = mutableListOf<PendingOutboundTx>()
+        val cancelledTxs = mutableListOf<CancelledTx>()
+        val inboundBroadcastTxs = mutableListOf<PendingInboundTx>()
+        val outboundBroadcastTxs = mutableListOf<PendingOutboundTx>()
 
         override fun onBaseNodeSyncComplete(requestId: BigInteger, success: Boolean) {
             Logger.i(
@@ -328,54 +447,61 @@ class FFIWalletTests {
         }
 
         override fun onTxReceived(pendingInboundTx: PendingInboundTx) {
-            Logger.i("Tx Received :: pending inbound tx id %s", pendingInboundTx.id.toString())
+            Logger.i("Tx Received :: pending inbound tx id %s", pendingInboundTx.id)
+            receivedTxs.add(pendingInboundTx)
         }
 
         override fun onTxReplyReceived(pendingOutboundTx: PendingOutboundTx) {
             Logger.i(
                 "Tx Reply Received :: pending outbound tx id %s",
-                pendingOutboundTx.id.toString()
+                pendingOutboundTx.id
             )
+            replyReceivedTxs.add(pendingOutboundTx)
         }
 
         override fun onTxFinalized(pendingInboundTx: PendingInboundTx) {
             Logger.i(
                 "Tx Finalized :: pending inbound tx id: %s",
-                pendingInboundTx.id.toString()
+                pendingInboundTx.id
             )
+            finalizedTxs.add(pendingInboundTx)
         }
 
         override fun onInboundTxBroadcast(pendingInboundTx: PendingInboundTx) {
             Logger.i(
                 "Inbound tx Broadcast :: pending inbound tx id %s",
-                pendingInboundTx.id.toString()
+                pendingInboundTx.id
             )
+            inboundBroadcastTxs.add(pendingInboundTx)
         }
 
         override fun onOutboundTxBroadcast(pendingOutboundTx: PendingOutboundTx) {
             Logger.i(
                 "Outbound tx Broadcast :: pending outbound tx id %s",
-                pendingOutboundTx.id.toString()
+                pendingOutboundTx.id
             )
+            outboundBroadcastTxs.add(pendingOutboundTx)
         }
 
         override fun onTxMined(completedTx: CompletedTx) {
-            Logger.i("Tx Mined :: completed tx id: %s", completedTx.id.toString())
+            Logger.i("Tx Mined :: completed tx id: %s", completedTx.id)
+            minedTxs.add(completedTx)
         }
 
         override fun onTxCancelled(cancelledTx: CancelledTx) {
-            TODO("Not yet implemented")
+            Logger.i("Tx Cancelled :: cancelled tx id: %s", cancelledTx.id)
+            cancelledTxs.add(cancelledTx)
         }
 
         override fun onDirectSendResult(txId: BigInteger, success: Boolean) {
-            Logger.i("Direct send :: tx id %s success %s", txId.toString(), success.toString())
+            Logger.i("Direct send :: tx id %s success %s", txId, success)
         }
 
         override fun onStoreAndForwardSendResult(txId: BigInteger, success: Boolean) {
             Logger.i(
                 "Store and forward :: tx id %s success %s",
-                txId.toString(),
-                success.toString()
+                txId,
+                success
             )
         }
 

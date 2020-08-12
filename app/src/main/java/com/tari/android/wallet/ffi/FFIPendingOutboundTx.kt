@@ -34,21 +34,19 @@ package com.tari.android.wallet.ffi
 
 import java.math.BigInteger
 
-internal typealias FFIPendingOutboundTxPtr = Long
-
 /**
  * Pending outbound transaction wrapper.
  *
  * @author The Tari Development Team
  */
-internal class FFIPendingOutboundTx(pointer: FFIPendingOutboundTxPtr) : FFIBase() {
+internal class FFIPendingOutboundTx() : FFIBase() {
 
     // region JNI
 
     private external fun jniGetId(libError: FFIError): ByteArray
     private external fun jniGetDestinationPublicKey(
         libError: FFIError
-    ): FFIPublicKeyPtr
+    ): FFIPointer
 
     private external fun jniGetAmount(
         libError: FFIError
@@ -74,14 +72,8 @@ internal class FFIPendingOutboundTx(pointer: FFIPendingOutboundTxPtr) : FFIBase(
 
     // endregion
 
-    private var ptr = nullptr
-
-    init {
-        ptr = pointer
-    }
-
-    fun getPointer(): FFIPendingOutboundTxPtr {
-        return ptr
+    constructor(pointer: FFIPointer) : this() {
+        this.pointer = pointer
     }
 
     fun getId(): BigInteger {

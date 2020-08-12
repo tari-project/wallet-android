@@ -49,7 +49,7 @@ import org.junit.runners.Suite
     FFIPublicKeyTests::class,
     FFITransportTypeTest::class,
     HexStringTests::class,
-    NetAddressStringTests::class
-    //WalletTests::class //TODO Still some work to do with wallet tests.
+    NetAddressStringTests::class,
+    FFIWalletTests::class
 )
-class TestSuite
+class FFITestSuite

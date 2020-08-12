@@ -32,6 +32,9 @@
  */
 package com.tari.android.wallet.ffi
 
+internal typealias FFIPointer = Long
+internal const val nullptr = 0L
+
 /**
  * Base class for FFI native peer entities.
  * Extended by all model classes.
@@ -40,10 +43,15 @@ package com.tari.android.wallet.ffi
  */
 internal abstract class FFIBase {
 
+    var pointer = nullptr
+        protected set
+
     abstract fun destroy()
 
     protected fun finalize() {
-        destroy()
+        if (pointer != nullptr) {
+            destroy()
+        }
     }
 
 }

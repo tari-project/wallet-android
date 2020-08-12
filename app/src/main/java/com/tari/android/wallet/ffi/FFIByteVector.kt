@@ -39,10 +39,7 @@ import java.math.BigInteger
  *
  * @author The Tari Development Team
  */
-
-internal typealias FFIByteVectorPtr = Long
-
-internal class FFIByteVector constructor(pointer: FFIByteVectorPtr) : FFIBase() {
+internal class FFIByteVector() : FFIBase() {
 
     // region JNI
 
@@ -52,18 +49,17 @@ internal class FFIByteVector constructor(pointer: FFIByteVectorPtr) : FFIBase() 
     private external fun jniCreate(byteArray: ByteArray, error: FFIError)
 
     // endregion
-
-    private var ptr = nullptr
-
-    init {
-        ptr = pointer
+    constructor(pointer: FFIPointer): this() {
+        this.pointer = pointer
     }
 
-    constructor(hex: HexString) : this(nullptr) {
+    constructor(hex: HexString): this() {
         val stringHex = hex.toString()
         if (stringHex.length < 64) {
-            throw FFIException(message = "Argument's length is invalid - should be 64 but got " +
-                    "${stringHex.length}\n$stringHex")
+            throw FFIException(
+                message = "Argument's length is invalid - should be 64 but got " +
+                        "${stringHex.length}\n$stringHex"
+            )
         }
         val byteArray = BigInteger(stringHex, 16).toByteArray()
         val error = FFIError()
@@ -71,10 +67,17 @@ internal class FFIByteVector constructor(pointer: FFIByteVectorPtr) : FFIBase() 
         throwIf(error)
     }
 
-    constructor(bytes: ByteArray) : this(nullptr) {
+    constructor(bytes: ByteArray): this() {
         val error = FFIError()
         jniCreate(bytes, error)
         throwIf(error)
+    }
+
+    fun getAt(index: Int): Int {
+        val error = FFIError()
+        val byte = jniGetAt(index, error)
+        throwIf(error)
+        return byte
     }
 
     fun getLength(): Int {
@@ -96,17 +99,6 @@ internal class FFIByteVector constructor(pointer: FFIByteVectorPtr) : FFIBase() 
 
     override fun toString(): String {
         return HexString(this).toString()
-    }
-
-    fun getPointer(): FFIByteVectorPtr {
-        return ptr
-    }
-
-    fun getAt(index: Int): Int {
-        val error = FFIError()
-        val byte = jniGetAt(index, error)
-        throwIf(error)
-        return byte
     }
 
     override fun destroy() {

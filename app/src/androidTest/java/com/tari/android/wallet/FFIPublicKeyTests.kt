@@ -46,9 +46,9 @@ class FFIPublicKeyTests {
 
     @Test
     fun constructorFromPrivateKey_assertThatValidPublicKeyInstanceWasCreated() {
-        val privateKey = FFIPrivateKey()
+        val privateKey = FFIPrivateKey.generate()
         val publicKey = FFIPublicKey(privateKey)
-        assertNotEquals(nullptr, publicKey.getPointer())
+        assertNotEquals(nullptr, publicKey.pointer)
         publicKey.destroy()
         privateKey.destroy()
     }
@@ -56,7 +56,7 @@ class FFIPublicKeyTests {
     @Test
     fun constructorFromByteVector_assertThatValidPublicKeyInstanceWasCreated() {
         val publicKey = FFIPublicKey(FFIByteVector(HexString(FFITestUtil.PUBLIC_KEY_HEX_STRING)))
-        assertNotEquals(nullptr, publicKey.getPointer())
+        assertNotEquals(nullptr, publicKey.pointer)
         assertEquals(FFITestUtil.PUBLIC_KEY_HEX_STRING, publicKey.toString())
         publicKey.destroy()
     }
@@ -64,7 +64,7 @@ class FFIPublicKeyTests {
     @Test
     fun constructorFromHexString_assertThatValidPublicKeyInstanceWasCreated() {
         val publicKey = FFIPublicKey(HexString(FFITestUtil.PUBLIC_KEY_HEX_STRING))
-        assertNotEquals(nullptr, publicKey.getPointer())
+        assertNotEquals(nullptr, publicKey.pointer)
         assertEquals(FFITestUtil.PUBLIC_KEY_HEX_STRING, publicKey.toString())
         publicKey.destroy()
     }
@@ -72,7 +72,7 @@ class FFIPublicKeyTests {
     @Test
     fun constructorFromEmojiId_assertThatValidPublicKeyInstanceWasCreated() {
         val origin = FFIPublicKey(HexString(FFITestUtil.PUBLIC_KEY_HEX_STRING))
-        val publicKey = FFIPublicKey(origin.getEmojiNodeId())
+        val publicKey = FFIPublicKey(FFITestUtil.PUBLIC_KEY_EMOJI_ID)
         assertEquals(origin.toString(), publicKey.toString())
         publicKey.destroy()
         origin.destroy()
@@ -82,4 +82,5 @@ class FFIPublicKeyTests {
     fun constructor_assertThatFFIExceptionWasThrown_if6CharsLengthStringWasGiven() {
         FFIPublicKey(FFIByteVector(HexString("A03DB4")))
     }
+
 }

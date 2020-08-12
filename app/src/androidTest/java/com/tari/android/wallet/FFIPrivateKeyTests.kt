@@ -44,18 +44,16 @@ import org.junit.Test
  */
 class FFIPrivateKeyTests {
 
-    private val str = FFITestUtil.PRIVATE_KEY_HEX_STRING
-
     @Test
     fun constructor_assertThatCreatedObjectIsValid() {
-        val subject = FFIPrivateKey()
-        assertNotEquals(nullptr, subject.getPointer())
+        val subject = FFIPrivateKey.generate()
+        assertNotEquals(nullptr, subject.pointer)
         subject.destroy()
     }
 
     @Test
     fun toString_assertThatValueIsEqualToTheGivenStringHex() {
-        val subject = FFIPrivateKey(HexString(str))
+        val subject = FFIPrivateKey(HexString(FFITestUtil.PRIVATE_KEY_HEX_STRING))
         assertEquals(FFITestUtil.PRIVATE_KEY_HEX_STRING, subject.toString())
         subject.destroy()
     }
@@ -63,7 +61,7 @@ class FFIPrivateKeyTests {
     @Test
     fun constructor_assertThatValidObjectWasConstructed_givenValidFFIByteVector() {
         val privateKey = FFIPrivateKey(FFIByteVector(HexString(FFITestUtil.PRIVATE_KEY_HEX_STRING)))
-        assertNotEquals(nullptr, privateKey.getPointer())
+        assertNotEquals(nullptr, privateKey.pointer)
         assertEquals(FFITestUtil.PRIVATE_KEY_HEX_STRING, privateKey.toString())
         privateKey.destroy()
     }

@@ -56,7 +56,7 @@ Java_com_tari_android_wallet_ffi_FFICommsConfig_jniCreate(
     const char *pDatabaseName = jEnv->GetStringUTFChars(jDatabaseName, JNI_FALSE);
     const char *pDatastorePath = jEnv->GetStringUTFChars(jDatastorePath, JNI_FALSE);
     jlong lTransport = GetPointerField(jEnv, jTransport);
-    TariTransportType *pTransport = reinterpret_cast<TariTransportType *>(lTransport);
+    auto *pTransport = reinterpret_cast<TariTransportType *>(lTransport);
     int i = 0;
     int *r = &i;
     if (jDiscoveryTimeoutSec < 0) {
@@ -68,7 +68,8 @@ Java_com_tari_android_wallet_ffi_FFICommsConfig_jniCreate(
             pDatabaseName,
             pDatastorePath,
             static_cast<unsigned long long int>(jDiscoveryTimeoutSec),
-            r);
+            r
+    );
     jEnv->ReleaseStringUTFChars(jPublicAddress, pControlServiceAddress);
     jEnv->ReleaseStringUTFChars(jDatabaseName, pDatabaseName);
     jEnv->ReleaseStringUTFChars(jDatastorePath, pDatastorePath);
@@ -84,9 +85,9 @@ Java_com_tari_android_wallet_ffi_FFICommsConfig_jniSetPrivateKey(
         jobject jPrivateKey,
         jobject error) {
     jlong lCommsConfig = GetPointerField(jEnv, jThis);
-    TariCommsConfig *pCommsConfig = reinterpret_cast<TariCommsConfig *>(lCommsConfig);
+    auto *pCommsConfig = reinterpret_cast<TariCommsConfig *>(lCommsConfig);
     jlong lPrivateKey = GetPointerField(jEnv, jPrivateKey);
-    TariPrivateKey *pPrivateKey = reinterpret_cast<TariPrivateKey *>(lPrivateKey);
+    auto *pPrivateKey = reinterpret_cast<TariPrivateKey *>(lPrivateKey);
     int i = 0;
     int *r = &i;
     comms_config_set_secret_key(pCommsConfig, pPrivateKey, r);

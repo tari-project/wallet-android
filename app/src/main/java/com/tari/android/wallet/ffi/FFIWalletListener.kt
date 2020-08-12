@@ -41,7 +41,7 @@ import java.math.BigInteger
 /**
  * @author The Tari Development Team
  */
-internal interface FFIWalletListenerAdapter {
+internal interface FFIWalletListener {
 
     fun onBaseNodeSyncComplete(requestId: BigInteger, success: Boolean)
     fun onTxReceived(pendingInboundTx: PendingInboundTx)

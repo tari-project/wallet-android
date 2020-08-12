@@ -44,7 +44,6 @@ import java.util.concurrent.atomic.AtomicReference
  *
  * @author The Tari Development Team
  */
-internal typealias FFIWalletPtr = Long
 
 internal class FFIWallet(
     commsConfig: FFICommsConfig,
@@ -90,7 +89,7 @@ internal class FFIWallet(
 
     private external fun jniGetPublicKey(
         libError: FFIError
-    ): FFIPublicKeyPtr
+    ): FFIPointer
 
     private external fun jniGetAvailableBalance(
         libError: FFIError
@@ -104,7 +103,7 @@ internal class FFIWallet(
         libError: FFIError
     ): ByteArray
 
-    private external fun jniGetContacts(libError: FFIError): FFIContactsPtr
+    private external fun jniGetContacts(libError: FFIError): FFIPointer
 
     private external fun jniAddUpdateContact(
         contactPtr: FFIContact,
@@ -118,39 +117,39 @@ internal class FFIWallet(
 
     private external fun jniGetCompletedTxs(
         libError: FFIError
-    ): FFICompletedTxsPtr
+    ): FFIPointer
 
     private external fun jniGetCancelledTxs(
         libError: FFIError
-    ): FFICompletedTxsPtr
+    ): FFIPointer
 
     private external fun jniGetCompletedTxById(
         id: String,
         libError: FFIError
-    ): FFICompletedTxPtr
+    ): FFIPointer
 
     private external fun jniGetCancelledTxById(
         id: String,
         libError: FFIError
-    ): FFICompletedTxPtr
+    ): FFIPointer
 
     private external fun jniGetPendingOutboundTxs(
         libError: FFIError
-    ): FFIPendingOutboundTxsPtr
+    ): FFIPointer
 
     private external fun jniGetPendingOutboundTxById(
         id: String,
         libError: FFIError
-    ): FFIPendingOutboundTxPtr
+    ): FFIPointer
 
     private external fun jniGetPendingInboundTxs(
         libError: FFIError
-    ): FFIPendingInboundTxsPtr
+    ): FFIPointer
 
     private external fun jniGetPendingInboundTxById(
         id: String,
         libError: FFIError
-    ): FFIPendingInboundTxPtr
+    ): FFIPointer
 
     private external fun jniCancelPendingTx(
         id: String,
@@ -206,7 +205,7 @@ internal class FFIWallet(
 
     private external fun jniGetTorIdentity(
         libError: FFIError
-    ): FFIByteVectorPtr
+    ): FFIPointer
 
     private external fun jniPowerModeNormal(
         libError: FFIError
@@ -218,19 +217,18 @@ internal class FFIWallet(
 
     private external fun jniGetSeedWords(
         libError: FFIError
-    ): FFISeedWordsPtr
+    ): FFIPointer
 
     private external fun jniDestroy()
 
     // endregion
 
-    var ptr = nullptr
-    var listenerAdapter: FFIWalletListenerAdapter? = null
+    var listener: FFIWalletListener? = null
 
     // this acts as a constructor would for a normal class since constructors are not allowed for
     // singletons
     init {
-        if (ptr == nullptr) { // so it can only be assigned once for the singleton
+        if (pointer == nullptr) { // so it can only be assigned once for the singleton
             val error = FFIError()
             Logger.i("Pre jniCreate.")
             jniCreate(
@@ -251,10 +249,6 @@ internal class FFIWallet(
         }
     }
 
-    fun getPointer(): FFIWalletPtr {
-        return ptr
-    }
-
     fun getAvailableBalance(): BigInteger {
         val error = FFIError()
         val bytes = jniGetAvailableBalance(error)
@@ -262,14 +256,14 @@ internal class FFIWallet(
         return BigInteger(1, bytes)
     }
 
-    fun getPendingIncomingBalance(): BigInteger {
+    fun getPendingInboundBalance(): BigInteger {
         val error = FFIError()
         val bytes = jniGetPendingIncomingBalance(error)
         throwIf(error)
         return BigInteger(1, bytes)
     }
 
-    fun getPendingOutgoingBalance(): BigInteger {
+    fun getPendingOutboundBalance(): BigInteger {
         val error = FFIError()
         val bytes = jniGetPendingOutgoingBalance(error)
         throwIf(error)
@@ -369,19 +363,27 @@ internal class FFIWallet(
         return result
     }
 
+    /**
+     * This callback function cannot be private due to JNI behaviour.
+     */
+    @Suppress("MemberVisibilityCanBePrivate")
     fun onBaseNodeSyncComplete(bytes: ByteArray, success: Boolean) {
         Logger.i("Base node sync complete. Success: $success")
         val requestId = BigInteger(1, bytes)
-        GlobalScope.launch { listenerAdapter?.onBaseNodeSyncComplete(requestId, success) }
+        GlobalScope.launch { listener?.onBaseNodeSyncComplete(requestId, success) }
     }
 
-    fun onTxReceived(pendingInboundTxPtr: FFIPendingInboundTxPtr) {
+    /**
+     * This callback function cannot be private due to JNI behaviour.
+     */
+    @Suppress("MemberVisibilityCanBePrivate")
+    fun onTxReceived(pendingInboundTxPtr: FFIPointer) {
         Logger.i("Tx received. Pointer: %s", pendingInboundTxPtr.toString())
         val tx = FFIPendingInboundTx(pendingInboundTxPtr)
         val id = tx.getId()
         val source = tx.getSourcePublicKey()
         val sourceHex = source.toString()
-        val sourceEmoji = source.getEmojiNodeId()
+        val sourceEmoji = source.getEmojiId()
         source.destroy()
         val amount = tx.getAmount()
         val timestamp = tx.getTimestamp()
@@ -400,10 +402,14 @@ internal class FFIWallet(
         val pk = PublicKey(sourceHex, sourceEmoji)
         val user = User(pk)
         val pendingTx = PendingInboundTx(id, user, MicroTari(amount), timestamp, message, status)
-        GlobalScope.launch { listenerAdapter?.onTxReceived(pendingTx) }
+        GlobalScope.launch { listener?.onTxReceived(pendingTx) }
     }
 
-    fun onTxReplyReceived(completedTxPtr: FFICompletedTxPtr) {
+    /**
+     * This callback function cannot be private due to JNI behaviour.
+     */
+    @Suppress("MemberVisibilityCanBePrivate")
+    fun onTxReplyReceived(completedTxPtr: FFIPointer) {
         Logger.i("Tx reply received. Pointer: %s", completedTxPtr.toString())
         val walletKey = getPublicKey()
         val walletHex = walletKey.toString()
@@ -420,10 +426,14 @@ internal class FFIWallet(
             mapStatus(tx)
         )
         tx.destroy()
-        GlobalScope.launch { listenerAdapter?.onTxReplyReceived(pendingOutboundTx) }
+        GlobalScope.launch { listener?.onTxReplyReceived(pendingOutboundTx) }
     }
 
-    fun onTxFinalized(completedTx: FFICompletedTxPtr) {
+    /**
+     * This callback function cannot be private due to JNI behaviour.
+     */
+    @Suppress("MemberVisibilityCanBePrivate")
+    fun onTxFinalized(completedTx: FFIPointer) {
         Logger.i("Tx finalized. Pointer: %s", completedTx.toString())
         val walletKey = getPublicKey()
         val walletHex = walletKey.toString()
@@ -439,10 +449,14 @@ internal class FFIWallet(
             mapStatus(tx)
         )
         tx.destroy()
-        GlobalScope.launch { listenerAdapter?.onTxFinalized(pendingInboundTx) }
+        GlobalScope.launch { listener?.onTxFinalized(pendingInboundTx) }
     }
 
-    fun onTxBroadcast(completedTxPtr: FFICompletedTxPtr) {
+    /**
+     * This callback function cannot be private due to JNI behaviour.
+     */
+    @Suppress("MemberVisibilityCanBePrivate")
+    fun onTxBroadcast(completedTxPtr: FFIPointer) {
         Logger.i("Tx completed. Pointer: %s", completedTxPtr.toString())
         val walletKey = getPublicKey()
         val walletHex = walletKey.toString()
@@ -459,7 +473,7 @@ internal class FFIWallet(
                     tx.getMessage(),
                     mapStatus(tx)
                 )
-                GlobalScope.launch { listenerAdapter?.onInboundTxBroadcast(pendingInboundTx) }
+                GlobalScope.launch { listener?.onInboundTxBroadcast(pendingInboundTx) }
             }
             Tx.Direction.OUTBOUND -> {
                 val pendingOutboundTx = PendingOutboundTx(
@@ -471,13 +485,17 @@ internal class FFIWallet(
                     tx.getMessage(),
                     mapStatus(tx)
                 )
-                GlobalScope.launch { listenerAdapter?.onOutboundTxBroadcast(pendingOutboundTx) }
+                GlobalScope.launch { listener?.onOutboundTxBroadcast(pendingOutboundTx) }
             }
         }
         tx.destroy()
     }
 
-    fun onTxMined(completedTxPtr: FFICompletedTxPtr) {
+    /**
+     * This callback function cannot be private due to JNI behaviour.
+     */
+    @Suppress("MemberVisibilityCanBePrivate")
+    fun onTxMined(completedTxPtr: FFIPointer) {
         Logger.i("Tx mined. Pointer: %s", completedTxPtr.toString())
         val walletKey = getPublicKey()
         val walletHex = walletKey.toString()
@@ -498,10 +516,14 @@ internal class FFIWallet(
         if (completed.status != TxStatus.MINED) {
             Logger.e("Constructed CompletedTx has status that's not MINED: $completed")
         }
-        GlobalScope.launch { listenerAdapter?.onTxMined(completed) }
+        GlobalScope.launch { listener?.onTxMined(completed) }
     }
 
-    fun onTxCancelled(completedTx: FFICompletedTxPtr) {
+    /**
+     * This callback function cannot be private due to JNI behaviour.
+     */
+    @Suppress("MemberVisibilityCanBePrivate")
+    fun onTxCancelled(completedTx: FFIPointer) {
         Logger.i("Tx cancelled. Pointer: %s", completedTx.toString())
         val walletKey = getPublicKey()
         val walletHex = walletKey.toString()
@@ -519,19 +541,27 @@ internal class FFIWallet(
             mapStatus(tx)
         )
         tx.destroy()
-        GlobalScope.launch { listenerAdapter?.onTxCancelled(cancelled) }
+        GlobalScope.launch { listener?.onTxCancelled(cancelled) }
     }
 
+    /**
+     * This callback function cannot be private due to JNI behaviour.
+     */
+    @Suppress("MemberVisibilityCanBePrivate")
     fun onDirectSendResult(bytes: ByteArray, success: Boolean) {
         Logger.i("Direct send result received. Success: $success")
         val txId = BigInteger(1, bytes)
-        GlobalScope.launch { listenerAdapter?.onDirectSendResult(txId, success) }
+        GlobalScope.launch { listener?.onDirectSendResult(txId, success) }
     }
 
+    /**
+     * This callback function cannot be private due to JNI behaviour.
+     */
+    @Suppress("MemberVisibilityCanBePrivate")
     fun onStoreAndForwardSendResult(bytes: ByteArray, success: Boolean) {
         Logger.i("Store and forward send result received. Success: $success")
         val txId = BigInteger(1, bytes)
-        GlobalScope.launch { listenerAdapter?.onStoreAndForwardSendResult(txId, success) }
+        GlobalScope.launch { listener?.onStoreAndForwardSendResult(txId, success) }
     }
 
     private fun defineParticipantAndDirection(
@@ -540,11 +570,11 @@ internal class FFIWallet(
     ): Pair<Tx.Direction, User> {
         val source = tx.getSourcePublicKey()
         val sourceHex = source.toString()
-        val sourceEmoji = source.getEmojiNodeId()
+        val sourceEmoji = source.getEmojiId()
         source.destroy()
         val destination = tx.getDestinationPublicKey()
         val destinationHex = destination.toString()
-        val destinationEmoji = destination.getEmojiNodeId()
+        val destinationEmoji = destination.getEmojiId()
         destination.destroy()
         val direction = if (destinationHex == walletHex) Tx.Direction.INBOUND
         else Tx.Direction.OUTBOUND
@@ -618,7 +648,7 @@ internal class FFIWallet(
             height.toString(),
             error
         )
-        Logger.d("Coin spit code (0 means ok): %d", error.code)
+        Logger.d("Coin split code (0 means ok): %d", error.code)
         throwIf(error)
         return BigInteger(1, bytes)
     }
@@ -688,9 +718,9 @@ internal class FFIWallet(
 
     fun getSeedWords() : FFISeedWords {
         val error = FFIError()
-        val result = FFISeedWords(jniGetSeedWords(error));
+        val result = FFISeedWords(jniGetSeedWords(error))
         throwIf(error)
-        return result;
+        return result
     }
 
     fun addBaseNodePeer(
@@ -704,6 +734,7 @@ internal class FFIWallet(
     }
 
     override fun destroy() {
+        listener = null
         jniDestroy()
     }
 

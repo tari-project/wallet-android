@@ -33,14 +33,12 @@
 
 package com.tari.android.wallet.ffi
 
-internal typealias FFITransportTypePtr = Long
-
 /**
  * Wrapper for native private key type.
  *
  * @author The Tari Development Team
  */
-internal class FFITransportType constructor(pointer: FFITransportTypePtr) : FFIBase() {
+internal class FFITransportType() : FFIBase() {
 
     // region JNI
     private external fun jniMemoryTransport()
@@ -66,22 +64,25 @@ internal class FFITransportType constructor(pointer: FFITransportTypePtr) : FFIB
     private external fun jniDestroy()
     // endregion
 
-    private var ptr = nullptr
-
+    /**
+     * Default constructor creates memory transport.
+     */
     init {
-        ptr = pointer
-    }
-
-    constructor() : this(nullptr) {
         jniMemoryTransport()
     }
 
-    constructor(listenerAddress: NetAddressString) : this(nullptr) {
+    /**
+     * TCP transport.
+     */
+    constructor(listenerAddress: NetAddressString) : this() {
         val error = FFIError()
         jniTCPTransport(listenerAddress.toString(), error)
         throwIf(error)
     }
 
+    /**
+     * Tor transport.
+     */
     constructor(
         controlAddress: NetAddressString,
         torPort: Int,
@@ -89,7 +90,7 @@ internal class FFITransportType constructor(pointer: FFITransportTypePtr) : FFIB
         torIdentity: FFIByteVector,
         socksUsername: String,
         socksPassword: String
-    ) : this(nullptr) {
+    ) : this() {
         val error = FFIError()
         jniTorTransport(
             controlAddress.toString(),
@@ -101,9 +102,6 @@ internal class FFITransportType constructor(pointer: FFITransportTypePtr) : FFIB
             error
         )
         throwIf(error)
-    }
-    fun getPointer(): FFIPrivateKeyPtr {
-        return ptr
     }
 
     fun getAddress(): String {

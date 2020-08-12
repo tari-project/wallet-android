@@ -46,7 +46,7 @@ Java_com_tari_android_wallet_ffi_FFIByteVector_jniCreate(
         jobject jThis,
         jbyteArray array,
         jobject error) {
-    unsigned char *buffer = reinterpret_cast<unsigned char *>(jEnv->GetByteArrayElements(array, 0));
+    auto *buffer = reinterpret_cast<unsigned char *>(jEnv->GetByteArrayElements(array, JNI_FALSE));
     jsize size = jEnv->GetArrayLength(array);
     for (int i = 0; i < size; i++) {
         printf("%hhx", buffer[i]);
@@ -56,7 +56,7 @@ Java_com_tari_android_wallet_ffi_FFIByteVector_jniCreate(
     ByteVector *pByteVector = byte_vector_create(buffer, static_cast<unsigned int>(size), r);
     setErrorCode(jEnv, error, i);
     jEnv->ReleaseByteArrayElements(array, reinterpret_cast<jbyte *>(buffer), JNI_ABORT);
-    SetPointerField(jEnv,jThis, reinterpret_cast<jlong>(pByteVector));
+    SetPointerField(jEnv, jThis, reinterpret_cast<jlong>(pByteVector));
 }
 
 extern "C"
@@ -67,8 +67,8 @@ Java_com_tari_android_wallet_ffi_FFIByteVector_jniGetLength(
         jobject error) {
     int i = 0;
     int *r = &i;
-    jlong lByteVector = GetPointerField(jEnv,jThis);
-    ByteVector *pByteVector = reinterpret_cast<ByteVector *>(lByteVector);
+    jlong lByteVector = GetPointerField(jEnv, jThis);
+    auto *pByteVector = reinterpret_cast<ByteVector *>(lByteVector);
     jint length = byte_vector_get_length(pByteVector, r);
     setErrorCode(jEnv, error, i);
     return length;
@@ -83,8 +83,8 @@ Java_com_tari_android_wallet_ffi_FFIByteVector_jniGetAt(
         jobject error) {
     int i = 0;
     int *r = &i;
-    jlong lByteVector = GetPointerField(jEnv,jThis);
-    ByteVector *pByteVector = reinterpret_cast<ByteVector *>(lByteVector);
+    jlong lByteVector = GetPointerField(jEnv, jThis);
+    auto *pByteVector = reinterpret_cast<ByteVector *>(lByteVector);
     jint byte = byte_vector_get_at(pByteVector, static_cast<unsigned int>(index), r);
     setErrorCode(jEnv, error, i);
     return byte;
@@ -95,7 +95,7 @@ JNIEXPORT void JNICALL
 Java_com_tari_android_wallet_ffi_FFIByteVector_jniDestroy(
         JNIEnv *jEnv,
         jobject jThis) {
-    jlong lByteVector = GetPointerField(jEnv,jThis);
+    jlong lByteVector = GetPointerField(jEnv, jThis);
     byte_vector_destroy(reinterpret_cast<ByteVector *>(lByteVector));
-    SetPointerField(jEnv,jThis, reinterpret_cast<jlong>(nullptr));
+    SetPointerField(jEnv, jThis, reinterpret_cast<jlong>(nullptr));
 }
