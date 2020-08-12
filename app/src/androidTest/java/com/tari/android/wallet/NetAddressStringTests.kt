@@ -21,4 +21,5 @@ class NetAddressStringTests {
     fun constructor_assertThatFFIExceptionWasThrown_ifNegativePortNumberWasGiven() {
         NetAddressString("0.0.0.0", -10)
     }
+
 }

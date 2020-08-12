@@ -50,12 +50,12 @@ Java_com_tari_android_wallet_ffi_FFIContact_jniCreate(
     int i = 0;
     int *r = &i;
     const char *pAlias = jEnv->GetStringUTFChars(jAlias, JNI_FALSE);
-    jlong lPublicKey = GetPointerField(jEnv,jPublicKey);
-    TariPublicKey *pPublicKey = reinterpret_cast<TariPublicKey *>(lPublicKey);
+    jlong lPublicKey = GetPointerField(jEnv, jPublicKey);
+    auto *pPublicKey = reinterpret_cast<TariPublicKey *>(lPublicKey);
     TariContact *pContact = contact_create(pAlias, pPublicKey, r);
     setErrorCode(jEnv, error, i);
     jEnv->ReleaseStringUTFChars(jAlias, pAlias);
-    SetPointerField(jEnv,jThis, reinterpret_cast<jlong>(pContact));
+    SetPointerField(jEnv, jThis, reinterpret_cast<jlong>(pContact));
 }
 
 extern "C"
@@ -66,8 +66,8 @@ Java_com_tari_android_wallet_ffi_FFIContact_jniGetAlias(
         jobject error) {
     int i = 0;
     int *r = &i;
-    jlong lContact = GetPointerField(jEnv,jThis);
-    TariContact *pContact = reinterpret_cast<TariContact *>(lContact);
+    jlong lContact = GetPointerField(jEnv, jThis);
+    auto *pContact = reinterpret_cast<TariContact *>(lContact);
     const char *pAlias = contact_get_alias(pContact, r);
     setErrorCode(jEnv, error, i);
     jstring result = jEnv->NewStringUTF(pAlias);
@@ -83,9 +83,9 @@ Java_com_tari_android_wallet_ffi_FFIContact_jniGetPublicKey(
         jobject error) {
     int i = 0;
     int *r = &i;
-    jlong lContact = GetPointerField(jEnv,jThis);
-    TariContact *pContact = reinterpret_cast<TariContact *>(lContact);
-    jlong result = reinterpret_cast<jlong>(contact_get_public_key(pContact, r));
+    jlong lContact = GetPointerField(jEnv, jThis);
+    auto *pContact = reinterpret_cast<TariContact *>(lContact);
+    auto result = reinterpret_cast<jlong>(contact_get_public_key(pContact, r));
     setErrorCode(jEnv, error, i);
     return result;
 }
@@ -95,7 +95,7 @@ JNIEXPORT void JNICALL
 Java_com_tari_android_wallet_ffi_FFIContact_jniDestroy(
         JNIEnv *jEnv,
         jobject jThis) {
-    jlong lContact = GetPointerField(jEnv,jThis);
+    jlong lContact = GetPointerField(jEnv, jThis);
     contact_destroy(reinterpret_cast<TariContact *>(lContact));
-    SetPointerField(jEnv,jThis, reinterpret_cast<jlong>(nullptr));
+    SetPointerField(jEnv, jThis, reinterpret_cast<jlong>(nullptr));
 }

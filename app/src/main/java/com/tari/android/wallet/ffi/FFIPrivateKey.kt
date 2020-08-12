@@ -32,20 +32,18 @@
  */
 package com.tari.android.wallet.ffi
 
-internal typealias FFIPrivateKeyPtr = Long
-
 /**
  * Wrapper for native private key type.
  *
  * @author The Tari Development Team
  */
-internal class FFIPrivateKey constructor(pointer: FFIPrivateKeyPtr) : FFIBase() {
+internal class FFIPrivateKey private constructor() : FFIBase() {
 
     // region JNI
 
     private external fun jniGetBytes(
         libError: FFIError
-    ): FFIByteVectorPtr
+    ): FFIPointer
 
     private external fun jniDestroy()
     private external fun jniCreate(
@@ -58,23 +56,23 @@ internal class FFIPrivateKey constructor(pointer: FFIPrivateKeyPtr) : FFIBase() 
 
     // endregion
 
-    private var ptr = nullptr
+    companion object {
 
-    init {
-        ptr = pointer
+        fun generate(): FFIPrivateKey {
+            return FFIPrivateKey().apply {
+                jniGenerate()
+            }
+        }
+
     }
 
-    constructor() : this(nullptr) {
-        jniGenerate()
-    }
-
-    constructor(byteVector: FFIByteVector) : this(nullptr) {
+    constructor(byteVector: FFIByteVector) : this() {
         val error = FFIError()
         jniCreate(byteVector, error)
         throwIf(error)
     }
 
-    constructor(hexString: HexString) : this(nullptr) {
+    constructor(hexString: HexString) : this() {
         if (hexString.toString().length == 64) {
             val error = FFIError()
             jniFromHex(hexString.hex, error)
@@ -82,10 +80,6 @@ internal class FFIPrivateKey constructor(pointer: FFIPrivateKeyPtr) : FFIBase() 
         } else {
             throw FFIException(message = "HexString is not a valid PrivateKey")
         }
-    }
-
-    fun getPointer(): FFIPrivateKeyPtr {
-        return ptr
     }
 
     fun getBytes(): FFIByteVector {

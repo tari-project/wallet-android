@@ -79,7 +79,7 @@ import kotlin.collections.ArrayList
  *
  * @author The Tari Development Team
  */
-internal class WalletService : Service(), FFIWalletListenerAdapter, LifecycleObserver {
+internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
 
     companion object {
         // notification id
@@ -164,7 +164,7 @@ internal class WalletService : Service(), FFIWalletListenerAdapter, LifecycleObs
     private fun onWalletStateChanged(walletState: WalletState) {
         if (walletState == WalletState.RUNNING) {
             wallet = FFIWallet.instance!!
-            wallet.listenerAdapter = this
+            wallet.listener = this
             EventBus.unsubscribeFromWalletState(this)
             scheduleExpirationCheck()
             backupManager.initialize()
@@ -534,8 +534,8 @@ internal class WalletService : Service(), FFIWalletListenerAdapter, LifecycleObs
             return try {
                 BalanceInfo(
                     MicroTari(wallet.getAvailableBalance()),
-                    MicroTari(wallet.getPendingIncomingBalance()),
-                    MicroTari(wallet.getPendingOutgoingBalance())
+                    MicroTari(wallet.getPendingInboundBalance()),
+                    MicroTari(wallet.getPendingOutboundBalance())
                 )
             } catch (throwable: Throwable) {
                 mapThrowableIntoError(throwable, error)
@@ -922,7 +922,7 @@ internal class WalletService : Service(), FFIWalletListenerAdapter, LifecycleObs
         ): PublicKey {
             return PublicKey(
                 publicKeyFFI.toString(),
-                publicKeyFFI.getEmojiNodeId()
+                publicKeyFFI.getEmojiId()
             )
         }
 
@@ -954,7 +954,7 @@ internal class WalletService : Service(), FFIWalletListenerAdapter, LifecycleObs
                 direction = OUTBOUND
                 val userPublicKey = PublicKey(
                     destinationPublicKeyFFI.toString(),
-                    destinationPublicKeyFFI.getEmojiNodeId()
+                    destinationPublicKeyFFI.getEmojiId()
                 )
                 user = getContactByPublicKeyHexString(
                     allContacts,
@@ -964,7 +964,7 @@ internal class WalletService : Service(), FFIWalletListenerAdapter, LifecycleObs
                 direction = INBOUND
                 val userPublicKey = PublicKey(
                     sourcePublicKeyFFI.toString(),
-                    sourcePublicKeyFFI.getEmojiNodeId()
+                    sourcePublicKeyFFI.getEmojiId()
                 )
                 user = getContactByPublicKeyHexString(
                     allContacts,
@@ -1016,7 +1016,7 @@ internal class WalletService : Service(), FFIWalletListenerAdapter, LifecycleObs
                 direction = OUTBOUND
                 val userPublicKey = PublicKey(
                     destinationPublicKeyFFI.toString(),
-                    destinationPublicKeyFFI.getEmojiNodeId()
+                    destinationPublicKeyFFI.getEmojiId()
                 )
                 user = getContactByPublicKeyHexString(
                     allContacts,
@@ -1026,7 +1026,7 @@ internal class WalletService : Service(), FFIWalletListenerAdapter, LifecycleObs
                 direction = INBOUND
                 val userPublicKey = PublicKey(
                     sourcePublicKeyFFI.toString(),
-                    sourcePublicKeyFFI.getEmojiNodeId()
+                    sourcePublicKeyFFI.getEmojiId()
                 )
                 user = getContactByPublicKeyHexString(
                     allContacts,
@@ -1068,7 +1068,7 @@ internal class WalletService : Service(), FFIWalletListenerAdapter, LifecycleObs
             val sourcePublicKeyFFI = pendingInboundTxFFI.getSourcePublicKey()
             val userPublicKey = PublicKey(
                 sourcePublicKeyFFI.toString(),
-                sourcePublicKeyFFI.getEmojiNodeId()
+                sourcePublicKeyFFI.getEmojiId()
             )
             val user = getContactByPublicKeyHexString(
                 allContacts,
@@ -1103,7 +1103,7 @@ internal class WalletService : Service(), FFIWalletListenerAdapter, LifecycleObs
             val destinationPublicKeyFFI = pendingOutboundTxFFI.getDestinationPublicKey()
             val userPublicKey = PublicKey(
                 destinationPublicKeyFFI.toString(),
-                destinationPublicKeyFFI.getEmojiNodeId()
+                destinationPublicKeyFFI.getEmojiId()
             )
             val user = getContactByPublicKeyHexString(
                 allContacts,

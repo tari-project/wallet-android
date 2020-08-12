@@ -32,17 +32,15 @@
  */
 package com.tari.android.wallet.ffi
 
-import android.util.Log
+import com.orhanobut.logger.Logger
 import java.io.File
-
-internal typealias FFICommsConfigPtr = Long
 
 /**
  * Tari comms config wrapper.
  *
  * @author The Tari Development Team
  */
-internal class FFICommsConfig constructor(pointer: FFICommsConfigPtr) : FFIBase() {
+internal class FFICommsConfig() : FFIBase() {
 
     // region JNI
 
@@ -64,19 +62,13 @@ internal class FFICommsConfig constructor(pointer: FFICommsConfigPtr) : FFIBase(
 
     // endregion
 
-    private var ptr = nullptr
-
-    init {
-        ptr = pointer
-    }
-
     constructor(
         publicAddress: String,
         transport: FFITransportType,
         databaseName: String,
         datastorePath: String,
         discoveryTimeoutSec: Long
-    ) : this(nullptr) {
+    ): this() {
         if (databaseName.isEmpty()) {
             throw FFIException(message = "databaseName may not be empty")
         }
@@ -101,13 +93,9 @@ internal class FFICommsConfig constructor(pointer: FFICommsConfigPtr) : FFIBase(
             } else {
                 messageBuilder.append("Permission problem.")
             }
-            Log.e("Directory", messageBuilder.toString())
+            Logger.e(messageBuilder.toString())
             throw FFIException(message = messageBuilder.toString())
         }
-    }
-
-    fun getPointer(): FFICommsConfigPtr {
-        return ptr
     }
 
     fun setPrivateKey(privateKey: FFIPrivateKey) {

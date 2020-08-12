@@ -40,16 +40,14 @@ import java.math.BigInteger
  * @author The Tari Development Team
  */
 
-internal typealias FFIPendingInboundTxPtr = Long
-
-internal class FFIPendingInboundTx constructor(pointer: FFIPendingInboundTxPtr) : FFIBase() {
+internal class FFIPendingInboundTx() : FFIBase() {
 
     // region JNI
 
     private external fun jniGetId(libError: FFIError): ByteArray
     private external fun jniGetSourcePublicKey(
         libError: FFIError
-    ): FFIPublicKeyPtr
+    ): FFIPointer
 
     private external fun jniGetAmount(
         libError: FFIError
@@ -71,14 +69,8 @@ internal class FFIPendingInboundTx constructor(pointer: FFIPendingInboundTxPtr) 
 
     // endregion
 
-    private var ptr = nullptr
-
-    init {
-        ptr = pointer
-    }
-
-    fun getPointer(): FFIPendingInboundTxPtr {
-        return ptr
+    constructor(pointer: FFIPointer) : this() {
+        this.pointer = pointer
     }
 
     fun getId(): BigInteger {

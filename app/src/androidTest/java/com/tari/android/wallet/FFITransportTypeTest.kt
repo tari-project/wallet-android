@@ -16,23 +16,23 @@ class FFITransportTypeTest {
     @Test
     fun emptyConstructor_assertThatValidMemoryTransportWasCreated() {
         val transport = FFITransportType()
-        assertNotEquals(nullptr, transport.getPointer())
+        assertNotEquals(nullptr, transport.pointer)
         assertTrue(transport.getAddress().isNotEmpty())
         transport.destroy()
     }
 
     @Test
     fun netAddressConstructor_assertThatValidTransportWasCreated() {
-        val transport =
-            FFITransportType(FFITestUtil.address)
-        assertNotEquals(nullptr, transport.getPointer())
+        val transport = FFITransportType(FFITestUtil.address)
+        assertNotEquals(nullptr, transport.pointer)
         transport.destroy()
     }
 
     @Test
     fun torConstructor_assertThatValidTransportWasConstructed() {
         val torMod = TorModule()
-        val cookieFile = File(torMod.provideTorCookieFilePath(ApplicationProvider.getApplicationContext()))
+        val cookieFile =
+            File(torMod.provideTorCookieFilePath(ApplicationProvider.getApplicationContext()))
         val cookie =
             if (cookieFile.exists()) FFIByteVector(
                 cookieFile.readBytes()
@@ -49,7 +49,7 @@ class FFITransportTypeTest {
             FFIByteVector(nullptr),
             torMod.provideTorSock5Username(), torMod.provideTorSock5Password()
         )
-        assertNotEquals(nullptr, transport.getPointer())
+        assertNotEquals(nullptr, transport.pointer)
         transport.destroy()
     }
 
