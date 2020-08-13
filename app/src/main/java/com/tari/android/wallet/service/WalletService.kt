@@ -381,8 +381,9 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
         // post event to bus
         EventBus.post(Event.Wallet.TxCancelled(cancelledTx))
         // notify external listeners
+        val currentActivity = app.currentActivity
         if (cancelledTx.direction == INBOUND &&
-            !(app.isInForeground && app.currentActivity is HomeActivity)
+            !(app.isInForeground && currentActivity is HomeActivity && currentActivity.willNotifyAboutNewTx())
         ) {
             Logger.i("Posting cancellation notification")
             notificationHelper.postTxCanceledNotification(cancelledTx)
@@ -437,7 +438,8 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
 
     private fun postTxNotification(tx: Tx) {
         // if app is backgrounded, display heads-up notification
-        if (!app.isInForeground || app.currentActivity !is HomeActivity) {
+        val currentActivity = app.currentActivity
+        if (!app.isInForeground || currentActivity !is HomeActivity || !currentActivity.willNotifyAboutNewTx()) {
             notificationHelper.postCustomLayoutTxNotification(tx)
         }
     }
