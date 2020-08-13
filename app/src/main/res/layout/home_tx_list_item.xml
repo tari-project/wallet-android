@@ -10,10 +10,11 @@
     android:focusable="true">
 
     <ImageView
+        android:id="@+id/first_emoji_shadow_image_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="11dp"
-        android:layout_marginTop="18dp"
+        android:layout_marginTop="@dimen/tx_list_item_emoji_text_view_normal_top_margin"
         android:contentDescription="@null"
         android:scaleX="0.95"
         android:scaleY="0.95"
@@ -25,23 +26,24 @@
         android:layout_width="42dp"
         android:layout_height="42dp"
         android:layout_marginStart="@dimen/common_horizontal_margin"
-        android:layout_marginTop="32dp"
+        android:layout_marginTop="@dimen/tx_list_item_emoji_text_view_shadow_normal_top_margin"
         android:background="@drawable/home_tx_list_item_emoji_bg"
         android:gravity="center"
         android:textColor="@color/black"
         android:textSize="20sp" />
 
     <LinearLayout
+        android:id="@+id/content_container_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/common_horizontal_margin"
+        android:layout_marginTop="@dimen/tx_list_item_content_container_view_normal_top_margin"
         android:layout_toEndOf="@id/first_emoji_text_view"
         android:orientation="vertical">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="36dp"
             android:gravity="center_vertical"
             android:orientation="horizontal">
 

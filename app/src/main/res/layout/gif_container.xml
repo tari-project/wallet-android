@@ -48,7 +48,7 @@
         android:id="@+id/gif_container_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/tx_list_gif_container_top_margin"
+        android:layout_marginTop="@dimen/tx_list_item_gif_container_top_margin"
         app:cardCornerRadius="10dp"
         app:cardElevation="0dp">
 

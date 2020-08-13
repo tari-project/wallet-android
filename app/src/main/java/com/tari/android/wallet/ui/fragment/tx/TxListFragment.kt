@@ -171,7 +171,7 @@ internal class TxListFragment : Fragment(),
         super.onViewCreated(view, savedInstanceState)
         if (savedInstanceState == null) tracker.screen("/home", "Home - Transaction List")
         bindToWalletService()
-        setupUi()
+        setupUI()
         subscribeToEventBus()
     }
 
@@ -204,7 +204,7 @@ internal class TxListFragment : Fragment(),
 
     // region initial setup (UI and else)
     @SuppressLint("ClickableViewAccessibility")
-    private fun setupUi() {
+    private fun setupUI() {
         UiUtil.setTopMargin(ui.txListHeaderView, -dimenPx(R.dimen.common_header_height))
         updateProgressViewController =
             UpdateProgressViewController(

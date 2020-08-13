@@ -45,14 +45,17 @@
     <dimen name="home_top_content_container_scroll_vertical_shift">20dp</dimen>
     <dimen name="home_grabber_container_height">44dp</dimen>
     <dimen name="home_grabber_corner_radius">15dp</dimen>
-    <dimen name="home_tx_list_container_minimized_top_margin">120dp</dimen>
+    <dimen name="home_tx_list_container_minimized_top_margin">115dp</dimen>
     <dimen name="home_scroll_view_startup_anim_height">60dp</dimen>
     <dimen name="home_grabber_height">5dp</dimen>
     <dimen name="home_grabber_width">55dp</dimen>
-    <dimen name="home_balance_digit_text_size">40sp</dimen>
-    <dimen name="home_balance_digit_height">50dp</dimen>
-    <dimen name="home_balance_digit_decimal_text_size">16sp</dimen>
-    <dimen name="home_balance_digit_decimal_height">20dp</dimen>
+    <dimen name="home_balance_gem_height">14dp</dimen>
+    <dimen name="home_balance_gem_width">14dp</dimen>
+    <dimen name="home_balance_digit_text_size">30sp</dimen>
+    <dimen name="home_balance_digit_height">36dp</dimen>
+    <dimen name="home_balance_digit_decimal_text_size">12sp</dimen>
+    <dimen name="home_balance_digit_decimal_height">14dp</dimen>
+    <dimen name="home_balance_decimal_container_top_margin">2dp</dimen>
     <dimen name="home_send_tari_button_width">159dp</dimen>
     <dimen name="home_send_tari_button_visible_bottom_margin">25dp</dimen>
     <dimen name="home_send_tari_button_hidden_bottom_margin">-100dp</dimen>
@@ -64,7 +67,13 @@
     <dimen name="home_backup_prompt_cta_height">53dp</dimen>
 
     <!-- tx list -->
-    <dimen name="tx_list_gif_container_top_margin">8dp</dimen>
+    <dimen name="tx_list_item_gif_container_top_margin">8dp</dimen>
+    <dimen name="tx_list_item_emoji_text_view_normal_top_margin">32dp</dimen>
+    <dimen name="tx_list_item_emoji_text_view_shadow_normal_top_margin">18dp</dimen>
+    <dimen name="tx_list_item_content_container_view_normal_top_margin">36dp</dimen>
+    <dimen name="tx_list_item_emoji_text_view_first_item_top_margin">14dp</dimen>
+    <dimen name="tx_list_item_emoji_text_view_shadow_first_item_top_margin">0dp</dimen>
+    <dimen name="tx_list_item_content_container_view_first_item_top_margin">18dp</dimen>
 
     <!-- home swipe refresh -->
     <dimen name="home_swipe_refresh_max_scroll_y">180dp</dimen>

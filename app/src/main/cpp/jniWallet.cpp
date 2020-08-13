@@ -111,7 +111,7 @@ jmethodID syncBaseNodeId;
 
 void BroadcastCallback(struct TariCompletedTransaction *pCompletedTransaction) {
     auto *jniEnv = getJNIEnv();
-    if (jniEnv == nullptr) {
+    if (jniEnv == nullptr || callbackHandler == nullptr) {
         return;
     }
     auto jpCompletedTransaction = reinterpret_cast<jlong>(pCompletedTransaction);
@@ -124,7 +124,7 @@ void BroadcastCallback(struct TariCompletedTransaction *pCompletedTransaction) {
 
 void MinedCallback(struct TariCompletedTransaction *pCompletedTransaction) {
     auto *jniEnv = getJNIEnv();
-    if (jniEnv == nullptr) {
+    if (jniEnv == nullptr || callbackHandler == nullptr) {
         return;
     }
     auto jpCompletedTransaction = reinterpret_cast<jlong>(pCompletedTransaction);
@@ -137,7 +137,7 @@ void MinedCallback(struct TariCompletedTransaction *pCompletedTransaction) {
 
 void ReceivedCallback(struct TariPendingInboundTransaction *pPendingInboundTransaction) {
     auto *jniEnv = getJNIEnv();
-    if (jniEnv == nullptr) {
+    if (jniEnv == nullptr || callbackHandler == nullptr) {
         return;
     }
     auto jpPendingInboundTransaction = reinterpret_cast<jlong>(pPendingInboundTransaction);
@@ -150,7 +150,7 @@ void ReceivedCallback(struct TariPendingInboundTransaction *pPendingInboundTrans
 
 void ReplyCallback(struct TariCompletedTransaction *pCompletedTransaction) {
     auto *jniEnv = getJNIEnv();
-    if (jniEnv == nullptr) {
+    if (jniEnv == nullptr || callbackHandler == nullptr) {
         return;
     }
     auto jpCompletedTransaction = reinterpret_cast<jlong>(pCompletedTransaction);
@@ -163,7 +163,7 @@ void ReplyCallback(struct TariCompletedTransaction *pCompletedTransaction) {
 
 void FinalizedCallback(struct TariCompletedTransaction *pCompletedTransaction) {
     auto *jniEnv = getJNIEnv();
-    if (jniEnv == nullptr) {
+    if (jniEnv == nullptr || callbackHandler == nullptr) {
         return;
     }
     auto jpCompletedTransaction = reinterpret_cast<jlong>(pCompletedTransaction);
@@ -176,7 +176,7 @@ void FinalizedCallback(struct TariCompletedTransaction *pCompletedTransaction) {
 
 void DirectSendResultCallback(unsigned long long tx_id, bool success) {
     auto *jniEnv = getJNIEnv();
-    if (jniEnv == nullptr) {
+    if (jniEnv == nullptr || callbackHandler == nullptr) {
         return;
     }
     jbyteArray bytes = getBytesFromUnsignedLongLong(jniEnv, tx_id);
@@ -190,7 +190,7 @@ void DirectSendResultCallback(unsigned long long tx_id, bool success) {
 
 void StoreAndForwardSendResultCallback(unsigned long long tx_id, bool success) {
     auto *jniEnv = getJNIEnv();
-    if (jniEnv == nullptr) {
+    if (jniEnv == nullptr || callbackHandler == nullptr) {
         return;
     }
     jbyteArray bytes = getBytesFromUnsignedLongLong(jniEnv, tx_id);
@@ -204,7 +204,7 @@ void StoreAndForwardSendResultCallback(unsigned long long tx_id, bool success) {
 
 void TxCancellationCallback(struct TariCompletedTransaction *pCompletedTransaction) {
     auto *jniEnv = getJNIEnv();
-    if (jniEnv == nullptr) {
+    if (jniEnv == nullptr || callbackHandler == nullptr) {
         return;
     }
     auto jpCompletedTransaction = reinterpret_cast<jlong>(pCompletedTransaction);
@@ -217,7 +217,7 @@ void TxCancellationCallback(struct TariCompletedTransaction *pCompletedTransacti
 
 void BaseNodeSyncCallback(unsigned long long request_id, bool success) {
     auto *jniEnv = getJNIEnv();
-    if (jniEnv == nullptr) {
+    if (jniEnv == nullptr || callbackHandler == nullptr) {
         return;
     }
     jbyteArray bytes = getBytesFromUnsignedLongLong(jniEnv, request_id);
