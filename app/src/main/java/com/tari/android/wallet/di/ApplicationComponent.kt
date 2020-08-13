@@ -82,7 +82,8 @@ import javax.inject.Singleton
         ServiceModule::class,
         TorModule::class,
         TrackerModule::class,
-        BackupAndRestoreModule::class
+        BackupAndRestoreModule::class,
+        PresentationModule::class
     ]
 )
 internal interface ApplicationComponent {

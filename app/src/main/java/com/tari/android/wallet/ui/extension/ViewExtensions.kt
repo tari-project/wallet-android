@@ -238,6 +238,8 @@ internal fun View.string(@StringRes id: Int, vararg formatArgs: Any): String =
 
 internal fun View.color(@ColorRes id: Int): Int = context.color(id)
 
+internal fun View.dimen(@DimenRes id: Int): Float = context.dimen(id)
+
 internal fun View.dimenPx(@DimenRes id: Int): Int = context.dimenPx(id)
 
 internal fun View.drawable(@DrawableRes id: Int): Drawable? = context.drawable(id)

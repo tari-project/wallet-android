@@ -70,6 +70,7 @@
     <color name="add_note_slide_btton_bg_gradient_start">#8931FF</color>
     <color name="add_note_slide_btton_bg_gradient_end">#A72BE9</color>
     <color name="add_note_prompt_passive_color">#B2B2B2</color>
+    <color name="add_note_more_gifs_item_text">@color/wallet_info_qr_code_desc</color>
 
     <!-- Wallet info -->
     <color name="wallet_info_qr_code_desc">#7f8599</color>

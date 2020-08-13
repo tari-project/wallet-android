@@ -127,6 +127,8 @@
     <dimen name="add_note_slide_button_width">40dp</dimen>
     <dimen name="add_note_prompt_text_size">12sp</dimen>
     <dimen name="add_note_note_text_size">16sp</dimen>
+    <dimen name="add_note_gif_thumbnail_size">64dp</dimen>
+    <dimen name="add_note_gif_inner_margin">9dp</dimen>
     <!-- auth -->
     <dimen name="auth_button_bottom_margin">25dp</dimen>
 

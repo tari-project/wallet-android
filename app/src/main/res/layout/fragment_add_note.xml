@@ -72,6 +72,7 @@
         app:constraint_referenced_ids="back_button,title_text_view,emoji_id_summary_container_view" />
 
     <ScrollView
+        android:id="@+id/message_body_scroll_view"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginTop="@dimen/common_horizontal_margin"
@@ -115,20 +116,21 @@
                 app:customFont="AVENIR_LT_STD_MEDIUM"
                 tools:ignore="InefficientWeight" />
 
-            <androidx.cardview.widget.CardView
+            <FrameLayout
                 android:id="@+id/gif_container_view"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="8dp"
-                app:cardCornerRadius="10dp"
-                app:cardElevation="0dp"
                 tools:background="@android:color/holo_red_dark">
 
-                <com.giphy.sdk.ui.views.GifView
-                    android:id="@+id/gif_view"
+                <ImageView
+                    android:id="@+id/gif_image_view"
+                    android:adjustViewBounds="true"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="center" />
+                    android:layout_gravity="center"
+                    android:scaleType="fitCenter"
+                    android:contentDescription="@string/add_note_content_description_chosen_gif" />
 
                 <ImageView
                     android:id="@+id/remove_gif_cta_view"
@@ -140,7 +142,7 @@
                     android:src="@drawable/icon_remove_gif"
                     tools:ignore="ContentDescription" />
 
-            </androidx.cardview.widget.CardView>
+            </FrameLayout>
 
         </LinearLayout>
     </ScrollView>
@@ -149,8 +151,7 @@
         android:id="@+id/search_giphy_container_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="10dp"
-        android:layout_marginEnd="10dp"
+        android:paddingHorizontal="10dp"
         android:orientation="vertical"
         app:layout_constraintBottom_toTopOf="@id/slide_button_container_view"
         app:layout_constraintEnd_toEndOf="parent"
@@ -163,8 +164,8 @@
             <LinearLayout
                 android:id="@+id/search_giphy_cta_view"
                 android:layout_width="wrap_content"
-                android:layout_centerVertical="true"
                 android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
                 android:background="@drawable/search_giphy_cta_background"
                 android:orientation="horizontal"
                 android:paddingHorizontal="9dp"
@@ -199,10 +200,10 @@
                 android:src="@drawable/powered_by_giphy" />
         </RelativeLayout>
 
-        <com.giphy.sdk.ui.views.GiphyGridView
-            android:id="@+id/giphy_grid_view"
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/thumbnail_gifs_recycler_view"
             android:layout_width="match_parent"
-            android:layout_height="64dp"
+            android:layout_height="@dimen/add_note_gif_thumbnail_size"
             android:layout_marginTop="10dp"
             android:layout_marginBottom="14dp"
             app:gphDirection="horizontal"
@@ -296,6 +297,7 @@
 
     <!-- full emoji id outer container -->
     <RelativeLayout
+        android:id="@+id/full_emoji_id_outer_container"
         android:layout_width="0dp"
         android:layout_height="0dp"
         app:layout_constraintBottom_toBottomOf="parent"

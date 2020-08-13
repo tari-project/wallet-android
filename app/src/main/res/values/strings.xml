@@ -224,7 +224,9 @@
     <string name="add_note_prompt">Transaction Note</string>
     <string name="add_note_hint">Let the recipient know what the payment is for</string>
     <string name="add_note_slide_to_send">Slide to Send</string>
+    <string name="add_note_content_description_chosen_gif">chosen gif</string>
     <string name="add_note_search_giphy_label">SEARCH GIPHY</string>
+    <string name="add_note_search_giphy_carousel_item_label">SEARCH GIFS</string>
 
     <!-- send tari - successful -->
     <string name="finalize_send_tx_sending_step_1_desc_line_1">Connecting to the</string>
@@ -381,5 +383,6 @@
     <string name="enter_backup_password_password_match_error">That’s not it!</string>
     <string name="enter_backup_password_change_password_cta">Change Password</string>
     <string name="enter_backup_password_wrong_password_error">Seems that the password is wrong.</string>
+    <string name="search_gifs_dialog_hint">Search GIPHY</string>
 
 </resources>
