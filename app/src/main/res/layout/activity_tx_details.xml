@@ -90,7 +90,7 @@
                     android:ellipsize="end"
                     android:maxLines="1"
                     android:paddingHorizontal="10dp"
-                    android:textColor="#9330FF"
+                    android:textColor="@color/tx_status"
                     android:textSize="12sp"
                     app:customFont="AVENIR_LT_STD_HEAVY"
                     tools:text="Hello world" />

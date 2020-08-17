@@ -15,6 +15,7 @@
     <color name="dark_gray">#7F8599</color>
     <color name="light_gray">#3A000000</color>
     <color name="disabled_cta">@color/dark_gray</color>
+    <color name="tx_status">#FFEC9C00</color>
 
     <!-- common gradient button -->
     <color name="gradient_btn_start">#7300ff</color>
