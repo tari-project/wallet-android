@@ -35,6 +35,8 @@ package com.tari.android.wallet.ui.fragment.tx.adapter
 import android.view.View
 import androidx.recyclerview.widget.RecyclerView
 import com.tari.android.wallet.R
+import com.tari.android.wallet.R.string.tx_list_sent_a_payment
+import com.tari.android.wallet.R.string.tx_list_you_paid_with_alias
 import com.tari.android.wallet.databinding.HomeTxListItemBinding
 import com.tari.android.wallet.extension.applyFontStyle
 import com.tari.android.wallet.model.*
@@ -141,23 +143,13 @@ class TxViewHolder(view: View, private val listener: (Tx) -> Unit) :
 
     private fun displayAliasOrEmojiId() {
         val txUser = tx.user
-        // display contact name or emoji id
+        // display contact name+ or emoji id
         if (txUser is Contact) {
-            ui.participantTextView1.visible()
             val fullText = when (tx.direction) {
-                Tx.Direction.INBOUND -> {
-                    String.format(
-                        string(R.string.tx_list_sent_a_payment),
-                        txUser.alias
-                    )
-                }
-                Tx.Direction.OUTBOUND -> {
-                    String.format(
-                        string(R.string.tx_list_you_paid_with_alias),
-                        txUser.alias
-                    )
-                }
+                Tx.Direction.INBOUND -> string(tx_list_sent_a_payment, txUser.alias)
+                Tx.Direction.OUTBOUND -> string(tx_list_you_paid_with_alias, txUser.alias)
             }
+            ui.participantTextView1.visible()
             ui.participantTextView1.text = fullText.applyFontStyle(
                 itemView.context,
                 CustomFont.AVENIR_LT_STD_LIGHT,

@@ -233,6 +233,9 @@ internal fun View.postDelayed(timeMillis: Long, action: () -> Unit) =
 
 internal fun View.string(@StringRes id: Int): String = context.string(id)
 
+internal fun View.string(@StringRes id: Int, vararg formatArgs: Any): String =
+    context.string(id, *formatArgs)
+
 internal fun View.color(@ColorRes id: Int): Int = context.color(id)
 
 internal fun View.dimenPx(@DimenRes id: Int): Int = context.dimenPx(id)
