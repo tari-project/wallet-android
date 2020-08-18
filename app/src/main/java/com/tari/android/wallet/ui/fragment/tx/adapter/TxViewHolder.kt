@@ -33,11 +33,14 @@
 package com.tari.android.wallet.ui.fragment.tx.adapter
 
 import android.view.View
+import androidx.annotation.StringRes
 import androidx.recyclerview.widget.RecyclerView
 import com.tari.android.wallet.R
+import com.tari.android.wallet.R.string.*
 import com.tari.android.wallet.databinding.HomeTxListItemBinding
 import com.tari.android.wallet.extension.applyFontStyle
 import com.tari.android.wallet.model.*
+import com.tari.android.wallet.model.TxStatus.PENDING
 import com.tari.android.wallet.ui.component.CustomFont
 import com.tari.android.wallet.ui.component.EmojiIdSummaryViewController
 import com.tari.android.wallet.ui.component.GIFContainerViewController
@@ -143,21 +146,11 @@ class TxViewHolder(view: View, private val listener: (Tx) -> Unit) :
         val txUser = tx.user
         // display contact name or emoji id
         if (txUser is Contact) {
-            ui.participantTextView1.visible()
             val fullText = when (tx.direction) {
-                Tx.Direction.INBOUND -> {
-                    String.format(
-                        string(R.string.tx_list_sent_a_payment),
-                        txUser.alias
-                    )
-                }
-                Tx.Direction.OUTBOUND -> {
-                    String.format(
-                        string(R.string.tx_list_you_paid_with_alias),
-                        txUser.alias
-                    )
-                }
+                Tx.Direction.INBOUND -> string(tx_list_sent_a_payment, txUser.alias)
+                Tx.Direction.OUTBOUND -> string(tx_list_you_paid_with_alias, txUser.alias)
             }
+            ui.participantTextView1.visible()
             ui.participantTextView1.text = fullText.applyFontStyle(
                 itemView.context,
                 CustomFont.AVENIR_LT_STD_LIGHT,
@@ -176,12 +169,12 @@ class TxViewHolder(view: View, private val listener: (Tx) -> Unit) :
                 Tx.Direction.INBOUND -> {
                     ui.participantTextView1.gone()
                     ui.participantTextView2.visible()
-                    ui.participantTextView2.text = string(R.string.tx_list_paid_you)
+                    ui.participantTextView2.text = string(tx_list_paid_you)
                     // paid you
                 }
                 Tx.Direction.OUTBOUND -> {
                     ui.participantTextView1.visible()
-                    ui.participantTextView1.text = string(R.string.tx_list_you_paid)
+                    ui.participantTextView1.text = string(tx_list_you_paid)
                     ui.participantTextView2.gone()
                 }
             }
@@ -235,57 +228,40 @@ class TxViewHolder(view: View, private val listener: (Tx) -> Unit) :
             txDate.isEqual(todayDate) -> {
                 val minutesSinceTx = Minutes.minutesBetween(txDateTime, DateTime.now()).minutes
                 when {
-                    minutesSinceTx == 0 -> {
-                        string(R.string.tx_list_now)
-                    }
-                    minutesSinceTx < 60 -> {
-                        String.format(
-                            string(R.string.tx_list_minutes_ago),
-                            minutesSinceTx
-                        )
-                    }
-                    else -> {
-                        val hours = Hours.hoursBetween(txDateTime, DateTime.now()).hours
-                        String.format(
-                            string(R.string.tx_list_hours_ago),
-                            hours
-                        )
-                    }
+                    minutesSinceTx == 0 -> string(tx_list_now)
+                    minutesSinceTx < 60 -> String.format(
+                        string(tx_list_minutes_ago),
+                        minutesSinceTx
+                    )
+                    else -> String.format(
+                        string(tx_list_hours_ago),
+                        Hours.hoursBetween(txDateTime, DateTime.now()).hours
+                    )
                 }
             }
-            txDate.isEqual(yesterdayDate) -> string(R.string.home_tx_list_header_yesterday)
+            txDate.isEqual(yesterdayDate) -> string(home_tx_list_header_yesterday)
             else -> txDate.toString(dateFormat, Locale.ENGLISH)
         }
     }
 
     private fun displayStatus() {
-        when (tx) {
-            is PendingInboundTx -> {
-                ui.statusTextView.visible()
-                ui.statusTextView.text = when ((tx as PendingInboundTx).status) {
-                    TxStatus.PENDING -> {
-                        string(R.string.tx_detail_waiting_for_sender_to_complete)
-                    }
-                    else -> {
-                        string(R.string.tx_detail_broadcasting)
-                    }
-                }
-            }
-            is PendingOutboundTx -> {
-                ui.statusTextView.visible()
-                ui.statusTextView.text = when ((tx as PendingOutboundTx).status) {
-                    TxStatus.PENDING -> {
-                        string(R.string.tx_detail_waiting_for_recipient)
-                    }
-                    else -> {
-                        string(R.string.tx_detail_broadcasting)
-                    }
-                }
-            }
-            else -> {
-                ui.statusTextView.gone()
-            }
+        when (val tx = tx) {
+            is PendingInboundTx -> showStatusTextView(
+                if (tx.status == PENDING) tx_detail_waiting_for_sender_to_complete
+                else tx_detail_broadcasting
+            )
+            is PendingOutboundTx -> showStatusTextView(
+                if (tx.status == PENDING) tx_detail_waiting_for_recipient
+                else tx_detail_broadcasting
+            )
+            is CancelledTx -> showStatusTextView(tx_detail_payment_cancelled)
+            else -> ui.statusTextView.gone()
         }
+    }
+
+    private fun showStatusTextView(@StringRes messageId: Int) {
+        ui.statusTextView.visible()
+        ui.statusTextView.text = string(messageId)
     }
 
     private fun displayMessage() {
