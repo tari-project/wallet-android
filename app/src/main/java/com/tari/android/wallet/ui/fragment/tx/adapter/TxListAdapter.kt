@@ -91,7 +91,7 @@ internal class TxListAdapter(
      * Bind & display header or transaction.
      */
     override fun onBindViewHolder(holder: TxViewHolder, position: Int) {
-        holder.bind(items[position])
+        holder.bind(items[position], position)
     }
 
     override fun onViewAttachedToWindow(holder: TxViewHolder) {

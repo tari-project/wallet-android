@@ -224,7 +224,7 @@
     <string name="add_note_prompt">Transaction Note</string>
     <string name="add_note_hint">Let the recipient know what the payment is for</string>
     <string name="add_note_slide_to_send">Slide to Send</string>
-    <string name="add_note_search_giphy_label">search</string>
+    <string name="add_note_search_giphy_label">SEARCH GIPHY</string>
 
     <!-- send tari - successful -->
     <string name="finalize_send_tx_sending_step_1_desc_line_1">Connecting to the</string>
