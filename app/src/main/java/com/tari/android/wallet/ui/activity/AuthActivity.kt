@@ -94,8 +94,10 @@ internal class AuthActivity : AppCompatActivity() {
         overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
         EventBus.subscribeToWalletState(this, this::onWalletStateChanged)
         setupUi()
-        tracker.screen(path = "/local_auth", title = "Local Authentication")
         startWalletService()
+        if (savedInstanceState == null) {
+            tracker.screen(path = "/local_auth", title = "Local Authentication")
+        }
     }
 
     private fun startWalletService() {

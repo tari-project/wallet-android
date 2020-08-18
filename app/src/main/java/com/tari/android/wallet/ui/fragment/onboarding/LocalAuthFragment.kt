@@ -98,10 +98,12 @@ internal class LocalAuthFragment : Fragment() {
         setDeviceAuthType()
         setupUi()
         ui.rootView.doOnGlobalLayout(this::playStartUpAnim)
-        tracker.screen(
-            path = "/onboarding/enable_local_auth",
-            title = "Onboarding - Enable Local Authentication"
-        )
+        if (savedInstanceState == null) {
+            tracker.screen(
+                path = "/onboarding/enable_local_auth",
+                title = "Onboarding - Enable Local Authentication"
+            )
+        }
     }
 
     override fun onAttach(context: Context) {

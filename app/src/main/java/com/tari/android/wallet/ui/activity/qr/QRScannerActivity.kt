@@ -88,10 +88,12 @@ internal class QRScannerActivity : AppCompatActivity() {
             )
         } else {
             startScanning()
-            tracker.screen(
-                path = "/home/send_tari/add_recipient/qr_scan",
-                title = "Send Tari - Add Recipient - Scan QR Code"
-            )
+            if (savedInstanceState == null) {
+                tracker.screen(
+                    path = "/home/send_tari/add_recipient/qr_scan",
+                    title = "Send Tari - Add Recipient - Scan QR Code"
+                )
+            }
         }
     }
 
