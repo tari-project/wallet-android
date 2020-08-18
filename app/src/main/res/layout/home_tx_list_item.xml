@@ -127,7 +127,7 @@
             android:layout_marginEnd="@dimen/common_horizontal_margin"
             android:ellipsize="end"
             android:singleLine="true"
-            android:textColor="#EC9C00"
+            android:textColor="@color/tx_status"
             android:textSize="12sp"
             app:customFont="AVENIR_LT_STD_MEDIUM"
             tools:text="Waiting for recipient to come online" />
