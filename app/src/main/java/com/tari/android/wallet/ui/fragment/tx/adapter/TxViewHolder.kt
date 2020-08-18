@@ -35,7 +35,6 @@ package com.tari.android.wallet.ui.fragment.tx.adapter
 import android.view.View
 import androidx.recyclerview.widget.RecyclerView
 import com.tari.android.wallet.R
-import com.tari.android.wallet.R.dimen.tx_list_gif_container_top_margin
 import com.tari.android.wallet.databinding.HomeTxListItemBinding
 import com.tari.android.wallet.extension.applyFontStyle
 import com.tari.android.wallet.model.*
@@ -94,8 +93,9 @@ class TxViewHolder(view: View, private val listener: (Tx) -> Unit) :
         listener(tx)
     }
 
-    fun bind(tx: Tx) {
+    fun bind(tx: Tx, position: Int) {
         this.tx = tx
+        setContentTopMarginAccordingToPosition(position)
         displayFirstEmoji()
         displayAliasOrEmojiId()
         displayAmount()
@@ -105,9 +105,33 @@ class TxViewHolder(view: View, private val listener: (Tx) -> Unit) :
         gifContainerViewController = GIFContainerViewController(
             ui.gifContainer,
             tx,
-            dimen(tx_list_gif_container_top_margin)
+            dimen(R.dimen.tx_list_item_gif_container_top_margin)
         )
         gifContainerViewController.onRetryClick { gifContainerViewController.displayGIFUsingCache() }
+    }
+
+    private fun setContentTopMarginAccordingToPosition(position: Int) {
+        if (position == 0) {
+            ui.firstEmojiShadowImageView.setTopMargin(
+                dimen(R.dimen.tx_list_item_emoji_text_view_shadow_first_item_top_margin)
+            )
+            ui.firstEmojiTextView.setTopMargin(
+                dimen(R.dimen.tx_list_item_emoji_text_view_first_item_top_margin)
+            )
+            ui.contentContainerView.setTopMargin(
+                dimen(R.dimen.tx_list_item_content_container_view_first_item_top_margin)
+            )
+        } else {
+            ui.firstEmojiShadowImageView.setTopMargin(
+                dimen(R.dimen.tx_list_item_emoji_text_view_shadow_normal_top_margin)
+            )
+            ui.firstEmojiTextView.setTopMargin(
+                dimen(R.dimen.tx_list_item_emoji_text_view_normal_top_margin)
+            )
+            ui.contentContainerView.setTopMargin(
+                dimen(R.dimen.tx_list_item_content_container_view_normal_top_margin)
+            )
+        }
     }
 
     private fun displayFirstEmoji() {

@@ -383,23 +383,33 @@ class FFIWalletTests {
             }
             pendingOutboundTxFFI.destroy()
         }
-        pendingOutboundTxsFFI.destroy()
         assertNotNull(pendingOutboundTxFFI)
         // broadcast tx
         val broadcastTxSlot = slot<PendingOutboundTx>()
         every { mockListener.onOutboundTxBroadcast(capture(broadcastTxSlot)) } answers { }
         assertTrue(wallet.testBroadcastTx(pendingOutboundTxFFI!!.getId()))
         Thread.sleep(1000)
-        verify { mockListener.onTxCancelled(any()) }
+        verify { mockListener.onOutboundTxBroadcast(any()) }
         val broadcastTx = broadcastTxSlot.captured
         assertEquals(
             TxStatus.BROADCAST,
             broadcastTx.status
         )
+        pendingOutboundTxFFI.destroy()
+
         // mine tx
+        for(i in 0 until pendingOutboundTxsFFI.getLength()) {
+            pendingOutboundTxFFI = pendingOutboundTxsFFI.getAt(i)
+            if (pendingOutboundTxFFI.getStatus() == FFITxStatus.COMPLETED) {
+                break
+            }
+            pendingOutboundTxFFI.destroy()
+        }
+        pendingOutboundTxsFFI.destroy()
+        assertNotNull(pendingOutboundTxFFI)
         val minedTxSlot = slot<CompletedTx>()
         every { mockListener.onTxMined(capture(minedTxSlot)) } answers { }
-        assertTrue(wallet.testMineTx(pendingOutboundTxFFI.getId()))
+        assertTrue(wallet.testMineTx(pendingOutboundTxFFI!!.getId()))
         Thread.sleep(1000)
         pendingOutboundTxFFI.destroy()
         verify { mockListener.onTxMined(any()) }

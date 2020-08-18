@@ -167,7 +167,7 @@
                 android:layout_height="wrap_content"
                 android:background="@drawable/search_giphy_cta_background"
                 android:orientation="horizontal"
-                android:paddingHorizontal="12dp"
+                android:paddingHorizontal="9dp"
                 android:paddingVertical="4dp">
 
                 <ImageView
@@ -182,7 +182,6 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="3dp"
                     android:text="@string/add_note_search_giphy_label"
-                    android:textAllCaps="true"
                     android:textColor="@color/white"
                     android:textSize="9sp"
                     app:customFont="AVENIR_LT_STD_BLACK"

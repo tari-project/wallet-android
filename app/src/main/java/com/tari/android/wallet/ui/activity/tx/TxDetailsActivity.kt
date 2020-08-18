@@ -331,7 +331,7 @@ internal class TxDetailsActivity : AppCompatActivity(), ServiceConnection {
         gifContainerViewController = GIFContainerViewController(
             ui.gifContainer,
             tx,
-            dimenPx(tx_list_gif_container_top_margin)
+            dimenPx(tx_list_item_gif_container_top_margin)
         )
         gifContainerViewController.onRetryClick { gifContainerViewController.displayGIF() }
         gifContainerViewController.displayGIF()
