@@ -110,7 +110,9 @@ internal class IntroductionFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         appComponent.inject(this)
         setupUi()
-        tracker.screen(path = "/onboarding/introduction", title = "Onboarding - Introduction")
+        if (savedInstanceState == null) {
+            tracker.screen(path = "/onboarding/introduction", title = "Onboarding - Introduction")
+        }
     }
 
     override fun onAttach(context: Context) {

@@ -104,7 +104,9 @@ internal class CreateWalletFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         appComponent.inject(this)
         setupUi()
-        tracker.screen(path = "/onboarding/create_wallet", title = "Onboarding - Create Wallet")
+        if (savedInstanceState == null) {
+            tracker.screen(path = "/onboarding/create_wallet", title = "Onboarding - Create Wallet")
+        }
     }
 
     override fun onDestroyView() {
