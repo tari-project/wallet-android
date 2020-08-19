@@ -54,7 +54,6 @@ internal class BugReportingService(private val sharedPrefsWrapper: SharedPrefsWr
 
     class BugReportFileSizeLimitExceededException: Exception()
 
-    private val numberOfLogsFilesToShare = 2
     private val maxLogZipFileSizeBytes = 25 * 1024 * 1024
 
     fun shareBugReport(context: Context) {
@@ -70,9 +69,8 @@ internal class BugReportingService(private val sharedPrefsWrapper: SharedPrefsWr
         val fileOutStream = FileOutputStream(zipFile)
         // zip!
         val allLogFiles = WalletUtil.getLogFilesFromDirectory(logFilesDirPath)
-        val logFilesToShare = allLogFiles.take(numberOfLogsFilesToShare)
         ZipOutputStream(BufferedOutputStream(fileOutStream)).use { out ->
-            for (file in logFilesToShare) {
+            for (file in allLogFiles) {
                 FileInputStream(file).use { inputStream ->
                     BufferedInputStream(inputStream).use { origin ->
                         val entry = ZipEntry(file.name)

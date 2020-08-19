@@ -235,6 +235,8 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniCreate(
         jobject jThis,
         jobject jpWalletConfig,
         jstring jLogPath,
+        jint maxNumberOfRollingLogFiles,
+        jint rollingLogFileMaxSizeBytes,
         jstring callback_received_tx,
         jstring callback_received_tx_sig,
         jstring callback_received_tx_reply,
@@ -402,6 +404,8 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniCreate(
         pWallet = wallet_create(
                 pWalletConfig,
                 nullptr,
+                static_cast<unsigned int>(maxNumberOfRollingLogFiles),
+                static_cast<unsigned int>(rollingLogFileMaxSizeBytes),
                 nullptr,
                 ReceivedCallback,
                 ReplyCallback,
@@ -417,6 +421,8 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniCreate(
         pWallet = wallet_create(
                 pWalletConfig,
                 pLogPath,
+                static_cast<unsigned int>(maxNumberOfRollingLogFiles),
+                static_cast<unsigned int>(rollingLogFileMaxSizeBytes),
                 nullptr,
                 ReceivedCallback,
                 ReplyCallback,

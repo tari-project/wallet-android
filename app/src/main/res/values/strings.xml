@@ -275,7 +275,7 @@
     <!-- logs -->
     <string name="debug_log_files_title">Logs</string>
     <string name="debug_log_share_dialog_title">Share</string>
-    <string name="debug_log_share_dialog_content">Please confirm to compress and e-mail your last two FFI log files.</string>
+    <string name="debug_log_share_dialog_content">Please confirm to compress and e-mail your wallet log files.</string>
     <string name="debug_log_file_size_limit_exceeded_dialog_title">File Size Error</string>
     <string name="debug_log_file_size_limit_exceeded_dialog_content">Cannot send: zipped file is over 25MB.</string>
     <!-- base node config -->

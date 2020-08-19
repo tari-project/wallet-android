@@ -99,10 +99,17 @@ internal object WalletUtil {
 
     fun getLogFilesFromDirectory(dirPath: String): List<File> {
         val root = File(dirPath)
-        val files: MutableList<File>? = root.listFiles()?.toMutableList()
-        val filteredFile = files?.filter { it.extension == "log" }?.toMutableList()
-        filteredFile?.sortByDescending { it.lastModified() }
-        return filteredFile ?: Collections.emptyList()
+        if (!root.isDirectory) return Collections.emptyList()
+        val files = root.listFiles()!!.toMutableList()
+        val filteredFiles = files.filter { it.extension == "log" }.toMutableList()
+        filteredFiles.sortBy { it.name }
+        // actual log file will be at the end of the sorted list due to the log file rolling
+        // naming convention, move it to the top
+        if (filteredFiles.size > 1) {
+            val currentLogFile = filteredFiles.removeAt(filteredFiles.size - 1)
+            filteredFiles.add(0, currentLogFile)
+        }
+        return filteredFiles
     }
 
     fun walletExists(applicationContext: Context): Boolean {

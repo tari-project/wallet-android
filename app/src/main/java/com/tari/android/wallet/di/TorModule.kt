@@ -36,6 +36,7 @@ import android.content.Context
 import com.tari.android.wallet.tor.TorConfig
 import com.tari.android.wallet.tor.TorProxyManager
 import com.tari.android.wallet.tor.TorProxyMonitor
+import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.SharedPrefsWrapper
 import dagger.Module
 import dagger.Provides
@@ -69,12 +70,7 @@ class TorModule {
     @Provides
     @Named(FieldName.torConnectionPort)
     @Singleton
-    internal fun provideConnectionPort(): Int {
-        val socket = ServerSocket(0)
-        val port = socket.localPort
-        socket.close()
-        return port
-    }
+    internal fun provideConnectionPort() = Constants.Wallet.torPort
 
     /**
      * Provides a port for Tor proxy.
