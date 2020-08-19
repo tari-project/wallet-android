@@ -134,6 +134,9 @@ internal object Constants {
      */
     object Wallet {
         val network = Network.TESTNET_1
+        const val torPort = 18101
+        const val maxNumberOfRollingLogFiles = 3
+        const val rollingLogFileMaxSizeBytes = 30 * 1024 * 1024
         const val discoveryTimeoutSec = 20L
         const val emojiIdLength = 33
         const val emojiFormatterChunkSize = 3

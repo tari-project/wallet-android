@@ -34,6 +34,7 @@ package com.tari.android.wallet.ffi
 
 import com.orhanobut.logger.Logger
 import com.tari.android.wallet.model.*
+import com.tari.android.wallet.util.Constants
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import java.math.BigInteger
@@ -62,6 +63,8 @@ internal class FFIWallet(
     private external fun jniCreate(
         commsConfig: FFICommsConfig,
         logPath: String,
+        maxNumberOfRollingLogFiles: Int,
+        rollingLogFileMaxSizeBytes: Int,
         callbackReceivedTx: String,
         callbackReceivedTxSig: String,
         callbackReceivedTxReply: String,
@@ -232,7 +235,10 @@ internal class FFIWallet(
             val error = FFIError()
             Logger.i("Pre jniCreate.")
             jniCreate(
-                commsConfig, logPath,
+                commsConfig,
+                logPath,
+                Constants.Wallet.maxNumberOfRollingLogFiles,
+                Constants.Wallet.rollingLogFileMaxSizeBytes,
                 this::onTxReceived.name, "(J)V",
                 this::onTxReplyReceived.name, "(J)V",
                 this::onTxFinalized.name, "(J)V",
