@@ -411,11 +411,8 @@ internal class FFIWallet(
     @Suppress("MemberVisibilityCanBePrivate")
     fun onTxReplyReceived(completedTxPtr: FFIPointer) {
         Logger.i("Tx reply received. Pointer: %s", completedTxPtr.toString())
-        val walletKey = getPublicKey()
-        val walletHex = walletKey.toString()
-        walletKey.destroy()
         val tx = FFICompletedTx(completedTxPtr)
-        val (_, user) = defineParticipantAndDirection(tx, walletHex)
+        val (_, user) = defineParticipantAndDirection(tx)
         val pendingOutboundTx = PendingOutboundTx(
             tx.getId(),
             user,
@@ -435,11 +432,8 @@ internal class FFIWallet(
     @Suppress("MemberVisibilityCanBePrivate")
     fun onTxFinalized(completedTx: FFIPointer) {
         Logger.i("Tx finalized. Pointer: %s", completedTx.toString())
-        val walletKey = getPublicKey()
-        val walletHex = walletKey.toString()
-        walletKey.destroy()
         val tx = FFICompletedTx(completedTx)
-        val (_, user) = defineParticipantAndDirection(tx, walletHex)
+        val (_, user) = defineParticipantAndDirection(tx)
         val pendingInboundTx = PendingInboundTx(
             tx.getId(),
             user,
@@ -458,12 +452,9 @@ internal class FFIWallet(
     @Suppress("MemberVisibilityCanBePrivate")
     fun onTxBroadcast(completedTxPtr: FFIPointer) {
         Logger.i("Tx completed. Pointer: %s", completedTxPtr.toString())
-        val walletKey = getPublicKey()
-        val walletHex = walletKey.toString()
-        walletKey.destroy()
         val tx = FFICompletedTx(completedTxPtr)
-        val (direction, user) = defineParticipantAndDirection(tx, walletHex)
-        when(direction) {
+        val (direction, user) = defineParticipantAndDirection(tx)
+        when (direction) {
             Tx.Direction.INBOUND -> {
                 val pendingInboundTx = PendingInboundTx(
                     tx.getId(),
@@ -497,11 +488,8 @@ internal class FFIWallet(
     @Suppress("MemberVisibilityCanBePrivate")
     fun onTxMined(completedTxPtr: FFIPointer) {
         Logger.i("Tx mined. Pointer: %s", completedTxPtr.toString())
-        val walletKey = getPublicKey()
-        val walletHex = walletKey.toString()
-        walletKey.destroy()
         val tx = FFICompletedTx(completedTxPtr)
-        val (direction, user) = defineParticipantAndDirection(tx, walletHex)
+        val (direction, user) = defineParticipantAndDirection(tx)
         val completed = CompletedTx(
             tx.getId(),
             direction,
@@ -525,11 +513,8 @@ internal class FFIWallet(
     @Suppress("MemberVisibilityCanBePrivate")
     fun onTxCancelled(completedTx: FFIPointer) {
         Logger.i("Tx cancelled. Pointer: %s", completedTx.toString())
-        val walletKey = getPublicKey()
-        val walletHex = walletKey.toString()
-        walletKey.destroy()
         val tx = FFICompletedTx(completedTx)
-        val (direction, user) = defineParticipantAndDirection(tx, walletHex)
+        val (direction, user) = defineParticipantAndDirection(tx)
         val cancelled = CancelledTx(
             tx.getId(),
             direction,
@@ -564,10 +549,7 @@ internal class FFIWallet(
         GlobalScope.launch { listener?.onStoreAndForwardSendResult(txId, success) }
     }
 
-    private fun defineParticipantAndDirection(
-        tx: FFICompletedTx,
-        walletHex: String
-    ): Pair<Tx.Direction, User> {
+    private fun defineParticipantAndDirection(tx: FFICompletedTx): Pair<Tx.Direction, User> {
         val source = tx.getSourcePublicKey()
         val sourceHex = source.toString()
         val sourceEmoji = source.getEmojiId()
@@ -576,10 +558,9 @@ internal class FFIWallet(
         val destinationHex = destination.toString()
         val destinationEmoji = destination.getEmojiId()
         destination.destroy()
-        val direction = if (destinationHex == walletHex) Tx.Direction.INBOUND
-        else Tx.Direction.OUTBOUND
+        val direction = if (tx.isOutbound()) Tx.Direction.OUTBOUND else Tx.Direction.INBOUND
         val user = User(
-            if (walletHex == sourceHex) PublicKey(destinationHex, destinationEmoji)
+            if (tx.isOutbound()) PublicKey(destinationHex, destinationEmoji)
             else PublicKey(sourceHex, sourceEmoji)
         )
         return Pair(direction, user)
@@ -716,7 +697,7 @@ internal class FFIWallet(
         throwIf(error)
     }
 
-    fun getSeedWords() : FFISeedWords {
+    fun getSeedWords(): FFISeedWords {
         val error = FFIError()
         val result = FFISeedWords(jniGetSeedWords(error))
         throwIf(error)
