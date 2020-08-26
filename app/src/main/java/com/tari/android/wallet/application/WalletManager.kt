@@ -47,8 +47,6 @@ import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.SharedPrefsWrapper
 import org.apache.commons.io.IOUtils
 import java.io.File
-import java.util.concurrent.TimeUnit
-import kotlin.concurrent.fixedRateTimer
 
 /**
  * Utilized to asynchoronously manage the sometimes-long-running task of instantiation and start-up
@@ -56,12 +54,10 @@ import kotlin.concurrent.fixedRateTimer
  *
  * @author The Tari Development Team
  */
-@OptIn(ExperimentalStdlibApi::class)
 internal class WalletManager(
     private val context: Context,
     private val walletFilesDirPath: String,
     private val walletLogFilePath: String,
-    private val logsDir: File,
     private val torProxyManager: TorProxyManager,
     private val torProxyMonitor: TorProxyMonitor,
     private val sharedPrefsWrapper: SharedPrefsWrapper,
@@ -74,23 +70,6 @@ internal class WalletManager(
     init {
         // post initial wallet state
         EventBus.postWalletState(WalletState.NOT_READY)
-        schedulePeriodicLogsCleanup()
-    }
-
-    private fun schedulePeriodicLogsCleanup() {
-        fixedRateTimer(daemon = true, period = TimeUnit.MINUTES.toMillis(30L)) {
-            val files = (logsDir.listFiles() ?: emptyArray()).filterNotNull().filter(File::isFile)
-            val size = files.map(File::length).fold(0L, Long::plus)
-            if (size < LOGS_MAX_SIZE) return@fixedRateTimer
-            files.sortedBy(File::lastModified)
-                .scan(mutableListOf<File>() to 0L) { (filesAccumulator, totalLength), file ->
-                    filesAccumulator.apply { add(file) } to totalLength + file.length()
-                }
-                .first { size - it.second < LOGS_MAX_SIZE }.first.withIndex()
-                .forEach { (index, file) ->
-                    if (index == files.size - 1) file.writeBytes(ByteArray(0)) else file.delete()
-                }
-        }
     }
 
     /**
@@ -266,10 +245,6 @@ internal class WalletManager(
             setNextBaseNode()
             saveWalletPublicKeyHexToSharedPrefs()
         }
-    }
-
-    private companion object {
-        private const val LOGS_MAX_SIZE = 30L * 1024 * 1024
     }
 
 }

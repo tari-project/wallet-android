@@ -44,8 +44,6 @@ import com.tari.android.wallet.util.SharedPrefsWrapper
 import dagger.Module
 import dagger.Provides
 import java.io.File
-import java.text.SimpleDateFormat
-import java.util.*
 import javax.inject.Named
 import javax.inject.Singleton
 
@@ -65,8 +63,8 @@ internal class WalletModule {
         const val walletTempDirPath = "wallet_temp_dir_path"
     }
 
-    private val logFilePrefix = "tari_wallet_"
-    private val logFileExtension = ".log"
+    private val logFilePrefix = "tari_aurora"
+    private val logFileExtension = "log"
     private val logFilesDirName = "tari_logs"
 
     /**
@@ -89,6 +87,9 @@ internal class WalletModule {
         val logFilesDir = File(walletFilesDirPath, logFilesDirName)
         if (!logFilesDir.exists()) {
             logFilesDir.mkdir()
+        } else { // delete older log files
+            val files = logFilesDir.listFiles()?.filter { !it.name.contains(logFilePrefix) }
+            files?.forEach { it.delete() }
         }
         return logFilesDir.absolutePath
     }
@@ -100,9 +101,7 @@ internal class WalletModule {
     @Named(FieldName.walletLogFilePath)
     @Singleton
     fun provideWalletLogFilePath(@Named(FieldName.walletLogFilesDirPath) logFilesDirPath: String): String {
-        val timeStamp = SimpleDateFormat("YYYYMMdd", Locale.getDefault()).format(Date()) +
-                "_${System.currentTimeMillis()}"
-        val logFileName = "$logFilePrefix$timeStamp$logFileExtension"
+        val logFileName = "$logFilePrefix.$logFileExtension"
         val logFile = File(logFilesDirPath, logFileName)
         if (!logFile.exists()) {
             logFile.createNewFile()
@@ -136,7 +135,6 @@ internal class WalletModule {
         context: Context,
         @Named(FieldName.walletFilesDirPath) walletFilesDirPath: String,
         @Named(FieldName.walletLogFilePath) walletLogFilePath: String,
-        @Named(FieldName.walletLogFilesDirPath) walletLogsDirPath: String,
         torConfig: TorConfig,
         torProxyManager: TorProxyManager,
         torProxyMonitor: TorProxyMonitor,
@@ -145,7 +143,6 @@ internal class WalletModule {
         context,
         walletFilesDirPath,
         walletLogFilePath,
-        File(walletLogsDirPath),
         torProxyManager,
         torProxyMonitor,
         sharedPrefsWrapper,
