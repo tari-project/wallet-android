@@ -62,7 +62,7 @@
             android:ellipsize="end"
             android:singleLine="true"
             android:text="@string/dummy_message"
-            android:textColor="@color/home_tx_message"
+            android:textColor="@color/notification_description_color"
             android:textSize="12sp" />
     </LinearLayout>
 

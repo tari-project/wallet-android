@@ -58,6 +58,9 @@
     <color name="create_emoji_id_bg">#f6f6f6</color>
     <color name="home_selected_nav_item">#9330FF</color>
 
+    <!-- notifications -->
+    <color name="notification_description_color">#7D859B</color>
+
     <!-- tx list -->
     <color name="tx_list_loading_gif_gray">#817F8B</color>
 
