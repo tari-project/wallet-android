@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:id="@+id/gif_status_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <com.tari.android.wallet.ui.component.CustomFontTextView
+            android:id="@+id/loading_gif_text_view"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/tx_list_loading_gif"
+            android:textColor="@color/tx_list_loading_gif_gray"
+            android:textSize="13sp"
+            app:customFont="AVENIR_LT_STD_HEAVY" />
+
+        <com.tari.android.wallet.ui.component.CustomFontTextView
+            android:id="@+id/retry_loading_gif_text_view"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:clickable="true"
+            android:focusable="true"
+            android:text="@string/tx_list_retry_loading_gif"
+            android:textColor="@color/purple"
+            android:textSize="13sp"
+            android:visibility="gone"
+            app:customFont="AVENIR_LT_STD_HEAVY"
+            tools:visibility="visible" />
+
+        <ProgressBar
+            android:id="@+id/loading_gif_progress_bar"
+            android:layout_width="16dp"
+            android:layout_height="16dp" />
+
+    </LinearLayout>
+
+    <!-- GIF -->
+    <ImageView
+        android:id="@+id/gif_container_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="@dimen/tx_list_item_gif_container_top_margin"
+        android:adjustViewBounds="true"
+        android:contentDescription="@string/add_note_content_description_chosen_gif"
+        android:scaleType="fitCenter" />
+
+</LinearLayout>

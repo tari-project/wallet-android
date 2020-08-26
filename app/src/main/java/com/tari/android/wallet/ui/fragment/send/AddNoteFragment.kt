@@ -32,44 +32,56 @@
  */
 package com.tari.android.wallet.ui.fragment.send
 
+import android.animation.Animator
 import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
 import android.animation.ValueAnimator
 import android.annotation.SuppressLint
+import android.app.Activity
+import android.app.Dialog
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
+import android.graphics.Color
+import android.graphics.Rect
+import android.net.Uri
 import android.os.Bundle
 import android.text.InputType
-import android.view.LayoutInflater
-import android.view.MotionEvent
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
+import android.widget.ImageView
 import android.widget.RelativeLayout
+import androidx.constraintlayout.widget.ConstraintSet
+import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.animation.addListener
 import androidx.core.content.ContextCompat
 import androidx.core.widget.addTextChangedListener
+import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.*
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
+import com.bumptech.glide.RequestManager
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners
+import com.bumptech.glide.request.RequestOptions
 import com.daasuu.ei.Ease
 import com.daasuu.ei.EasingInterpolator
 import com.giphy.sdk.core.models.Media
 import com.giphy.sdk.core.models.enums.MediaType
-import com.giphy.sdk.ui.GPHContentType
-import com.giphy.sdk.ui.GPHSettings
 import com.giphy.sdk.ui.pagination.GPHContent
-import com.giphy.sdk.ui.themes.GPHTheme
-import com.giphy.sdk.ui.themes.GridType
 import com.giphy.sdk.ui.views.GPHGridCallback
-import com.giphy.sdk.ui.views.GPHSearchGridCallback
-import com.giphy.sdk.ui.views.GifView
-import com.giphy.sdk.ui.views.GiphyDialogFragment
+import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.android.material.bottomsheet.BottomSheetDialog
+import com.orhanobut.logger.Logger
+import com.tari.android.wallet.R
 import com.tari.android.wallet.R.color.*
 import com.tari.android.wallet.R.dimen.*
 import com.tari.android.wallet.R.string.emoji_id_chunk_separator
 import com.tari.android.wallet.application.DeepLink
+import com.tari.android.wallet.databinding.DialogChooseGifBinding
 import com.tari.android.wallet.databinding.FragmentAddNoteBinding
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.infrastructure.Tracker
@@ -80,15 +92,27 @@ import com.tari.android.wallet.network.NetworkConnectionState
 import com.tari.android.wallet.ui.component.EmojiIdCopiedViewController
 import com.tari.android.wallet.ui.component.EmojiIdSummaryViewController
 import com.tari.android.wallet.ui.extension.*
+import com.tari.android.wallet.ui.fragment.send.adapter.GIFThumbnailAdapter
+import com.tari.android.wallet.ui.fragment.store.LockBottomSheetBehavior
 import com.tari.android.wallet.ui.presentation.TxNote
+import com.tari.android.wallet.ui.presentation.gif.GIF
+import com.tari.android.wallet.ui.presentation.gif.GIFRepository
 import com.tari.android.wallet.ui.util.UiUtil
 import com.tari.android.wallet.ui.util.UiUtil.setColor
 import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.Constants.UI.AddNoteAndSend
 import com.tari.android.wallet.util.EmojiUtil
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.Disposable
+import io.reactivex.subjects.BehaviorSubject
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import me.everything.android.ui.overscroll.OverScrollDecoratorHelper
 import java.lang.ref.WeakReference
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
+import io.reactivex.Observer as RxObserver
 
 /**
  * Add a note to the transaction & send it through this fragment.
@@ -100,6 +124,9 @@ class AddNoteFragment : Fragment(), View.OnTouchListener {
     @Inject
     lateinit var tracker: Tracker
 
+    @Inject
+    lateinit var vmFactory: ThumbnailGIFsViewModelFactory
+
     private lateinit var listenerWR: WeakReference<Listener>
 
     // slide button animation related variables
@@ -107,25 +134,21 @@ class AddNoteFragment : Fragment(), View.OnTouchListener {
     private var slideButtonLastMarginStart = 0
     private var slideButtonContainerWidth = 0
 
-    /**
-     * Formats the summarized emoji id.
-     */
+    // Formats the summarized emoji id.
     private lateinit var emojiIdSummaryController: EmojiIdSummaryViewController
 
-    /**
-     * Animates the emoji id "copied" text.
-     */
+    // Animates the emoji id "copied" text.
     private lateinit var emojiIdCopiedViewController: EmojiIdCopiedViewController
 
-    /**
-     * Tx properties.
-     */
+    // Tx properties.
     private lateinit var recipientUser: User
     private lateinit var amount: MicroTari
     private lateinit var fee: MicroTari
 
     private lateinit var ui: FragmentAddNoteBinding
-    private lateinit var giphyView: GiphyView
+    private lateinit var viewModel: ThumbnailGIFsViewModel
+    private lateinit var gifContainer: GIFContainer
+    private lateinit var adapter: GIFThumbnailAdapter
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -145,28 +168,63 @@ class AddNoteFragment : Fragment(), View.OnTouchListener {
         if (savedInstanceState == null) {
             tracker.screen(path = "/home/send_tari/add_note", title = "Send Tari - Add Note")
         }
+        initializeGIFsViewModel()
         retrievePageArguments(savedInstanceState)
         setupUI(savedInstanceState)
         setupCTAs()
     }
 
+    private fun initializeGIFsViewModel() {
+        viewModel = ViewModelProvider(this, vmFactory)[ThumbnailGIFsViewModel::class.java]
+        viewModel.state.observe(viewLifecycleOwner) {
+            when {
+                it.isSuccessful -> adapter.repopulate(it.gifs!!)
+                it.isError -> Logger.e("GIFs request had error")
+            }
+        }
+    }
+
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == REQUEST_CODE_GIF) {
-            val media = data?.getParcelableExtra<Media>(GiphyDialogFragment.MEDIA_DELIVERY_KEY)
-            giphyView.gif = media
+            changeScrollViewBottomConstraint(R.id.slide_button_container_view)
+            val media =
+                data?.getParcelableExtra<Media>(ChooseGIFDialogFragment.MEDIA_DELIVERY_KEY)
+                    ?: return
+            gifContainer.gif = media.let {
+                GIF(it.id, Uri.parse(it.embedUrl), Uri.parse(it.images.original!!.gifUrl))
+            }
             updateSliderState()
         }
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        giphyView.save(outState)
+        gifContainer.save(outState)
+    }
+
+    override fun onDestroyView() {
+        gifContainer.dispose()
+        super.onDestroyView()
     }
 
     @SuppressLint("ClickableViewAccessibility")
     private fun setupUI(state: Bundle?) {
-        giphyView = GiphyView(ui.searchGiphyContainerView, ui.gifContainerView, ui.gifView, state)
+        gifContainer = GIFContainer(
+            Glide.with(this),
+            ui.gifContainerView,
+            ui.gifImageView,
+            ui.searchGiphyContainerView,
+            state
+        )
+        if (gifContainer.gif != null) changeScrollViewBottomConstraint(R.id.slide_button_container_view)
+        adapter = GIFThumbnailAdapter(Glide.with(this), ::handleViewMoreGIFsIntent) {
+            if (gifContainer.isShown) {
+                changeScrollViewBottomConstraint(R.id.slide_button_container_view)
+                gifContainer.gif = it
+                updateSliderState()
+            }
+        }
         emojiIdCopiedViewController = EmojiIdCopiedViewController(ui.emojiIdCopiedView)
         emojiIdSummaryController = EmojiIdSummaryViewController(ui.emojiIdSummaryView)
         ui.fullEmojiIdBgClickBlockerView.isClickable = false
@@ -188,12 +246,16 @@ class AddNoteFragment : Fragment(), View.OnTouchListener {
             UiUtil.setHeight(ui.fullEmojiIdContainerView, ui.emojiIdSummaryContainerView.height)
             UiUtil.setWidth(ui.fullEmojiIdContainerView, ui.emojiIdSummaryContainerView.width)
         }
-        ui.giphyGridView.showViewOnGiphy = false
-        ui.giphyGridView.content = THUMBNAIL_REQUEST
+        ui.thumbnailGifsRecyclerView.also {
+            val margin = dimen(add_note_gif_inner_margin).toInt()
+            it.addItemDecoration(HorizontalInnerMarginDecoration(margin))
+            it.layoutManager = LinearLayoutManager(requireContext(), RecyclerView.HORIZONTAL, false)
+            it.adapter = adapter
+        }
     }
 
     private fun updateSliderState() {
-        if (ui.noteEditText.text?.toString().isNullOrEmpty() && giphyView.gif == null) {
+        if (ui.noteEditText.text?.toString().isNullOrEmpty() && gifContainer.gif == null) {
             ui.promptTextView.setTextColor(color(black))
             disableCallToAction()
         } else {
@@ -221,39 +283,29 @@ class AddNoteFragment : Fragment(), View.OnTouchListener {
             true
         }
         ui.removeGifCtaView.setOnClickListener {
-            giphyView.gif = null
+            changeScrollViewBottomConstraint(R.id.search_giphy_container_view)
+            gifContainer.gif = null
             updateSliderState()
         }
         ui.searchGiphyCtaView.setOnClickListener {
-            GiphyDialogFragment.newInstance(
-                GPHSettings(GridType.waterfall, GPHTheme.Light, arrayOf(GPHContentType.gif))
-            ).apply { setTargetFragment(this@AddNoteFragment, REQUEST_CODE_GIF) }
+            handleViewMoreGIFsIntent()
+        }
+    }
+
+    private fun handleViewMoreGIFsIntent() {
+        if (gifContainer.isShown) {
+            UiUtil.hideKeyboard(requireActivity())
+            ChooseGIFDialogFragment.newInstance()
+                .apply { setTargetFragment(this@AddNoteFragment, REQUEST_CODE_GIF) }
                 .show(requireActivity().supportFragmentManager, null)
         }
-        ui.giphyGridView.callback = object : GPHGridCallback {
-            override fun contentDidUpdate(resultCount: Int) {
-                // No-op
-            }
 
-            override fun didSelectMedia(media: Media) {
-                giphyView.gif = media
-                updateSliderState()
-            }
-        }
-        ui.giphyGridView.searchCallback = object : GPHSearchGridCallback {
-            override fun didLongPressCell(cell: GifView) {
-                // No-op
-            }
+    }
 
-            override fun didScroll(dx: Int, dy: Int) {
-                // No-op
-            }
-
-            override fun didTapUsername(username: String) {
-                // No-op
-            }
-
-        }
+    private fun changeScrollViewBottomConstraint(toTopOf: Int) {
+        val set = ConstraintSet().apply { clone(ui.rootView) }
+        set.connect(R.id.message_body_scroll_view, ConstraintSet.BOTTOM, toTopOf, ConstraintSet.TOP)
+        set.applyTo(ui.rootView)
     }
 
     private fun displayAliasOrEmojiId() {
@@ -282,11 +334,10 @@ class AddNoteFragment : Fragment(), View.OnTouchListener {
         UiUtil.temporarilyDisableClick(view)
         // going back before hiding keyboard causes a blank white area on the screen
         // wait a while, then forward the back action to the host activity
-        val mActivity = activity ?: return
-        UiUtil.hideKeyboard(mActivity)
-        ui.rootView.postDelayed({
-            mActivity.onBackPressed()
-        }, Constants.UI.shortDurationMs)
+        activity?.let {
+            UiUtil.hideKeyboard(it)
+            ui.rootView.postDelayed(Constants.UI.shortDurationMs, it::onBackPressed)
+        }
     }
 
     /**
@@ -646,7 +697,7 @@ class AddNoteFragment : Fragment(), View.OnTouchListener {
             fee,
             TxNote(
                 ui.noteEditText.editableText.toString(),
-                giphyView.gif?.embedUrl
+                gifContainer.gif?.embedUri?.toString()
             ).compose()
         )
     }
@@ -689,20 +740,33 @@ class AddNoteFragment : Fragment(), View.OnTouchListener {
 
     }
 
-    private inner class GiphyView(
-        private val thumbnailsContainer: View,
+    private inner class GIFContainer(
+        private val glide: RequestManager,
         private val gifContainerView: View,
-        private val gifView: GifView,
+        private val gifView: ImageView,
+        thumbnailsContainer: View,
         state: Bundle?
     ) {
-        var gif: Media? = null
+
+        private val transformation = RequestOptions().transform(RoundedCorners(10))
+        private var animation = GIFsPanelAnimation(thumbnailsContainer)
+
+        val isShown: Boolean
+            get() = animation.isViewShown
+
+        var gif: GIF? = null
             set(value) {
                 field = value
-                gifView.setMedia(gif)
-                if (gif == null) {
+                if (value == null) {
+                    glide.clear(gifView)
                     showContainer()
                 } else {
-                    showGif()
+                    glide.asGif()
+                        .placeholder(R.drawable.background_gif_loading)
+                        .apply(transformation)
+                        .load(value.uri)
+                        .into(gifView)
+                    showGIF()
                 }
             }
 
@@ -711,12 +775,12 @@ class AddNoteFragment : Fragment(), View.OnTouchListener {
         }
 
         private fun showContainer() {
-            thumbnailsContainer.visible()
+            animation.show()
             gifContainerView.gone()
         }
 
-        private fun showGif() {
-            thumbnailsContainer.gone()
+        private fun showGIF() {
+            animation.hide()
             gifContainerView.visible()
         }
 
@@ -724,12 +788,226 @@ class AddNoteFragment : Fragment(), View.OnTouchListener {
             gif?.run { bundle.putParcelable(KEY_GIF, this) }
         }
 
+        fun dispose() {
+            animation.dispose()
+        }
+
     }
+
+    private data class GIFsPanelAnimationState(
+        val direction: TranslationDirection,
+        val animator: Animator?
+    )
+
+    private enum class TranslationDirection { UP, DOWN }
+
+    private class GIFsPanelAnimation(private val view: View) {
+        private var state =
+            GIFsPanelAnimationState(TranslationDirection.UP, null)
+        val isViewShown
+            get() = state.direction == TranslationDirection.UP
+
+        fun show() {
+            state.animator?.cancel()
+            state = createState(TranslationDirection.UP, to = 0F)
+        }
+
+        fun hide() {
+            state.animator?.cancel()
+            state = createState(TranslationDirection.DOWN, to = view.height.toFloat())
+        }
+
+        private fun createState(direction: TranslationDirection, to: Float) =
+            GIFsPanelAnimationState(
+                direction,
+                ValueAnimator.ofFloat(view.translationY, to).apply {
+                    duration = TRANSLATION_DURATION
+                    addUpdateListener {
+                        view.translationY = it.animatedValue as Float
+                    }
+                    start()
+                })
+
+        fun dispose() {
+            this.state.animator?.cancel()
+        }
+
+        private companion object {
+            private const val TRANSLATION_DURATION = 300L
+        }
+    }
+
+    class ThumbnailGIFsViewModelFactory(private val repository: GIFRepository) :
+        ViewModelProvider.Factory {
+        @Suppress("UNCHECKED_CAST")
+        override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+            require(modelClass === ThumbnailGIFsViewModel::class.java)
+            return ThumbnailGIFsViewModel(repository) as T
+        }
+    }
+
+    private class ThumbnailGIFsViewModel(private val gifsRepository: GIFRepository) : ViewModel() {
+
+        private val _state = MutableLiveData<GIFsState>()
+        val state: LiveData<GIFsState> get() = _state
+
+        init {
+            fetchGIFs()
+        }
+
+        private fun fetchGIFs() {
+            viewModelScope.launch(Dispatchers.Main) {
+                _state.value = GIFsState()
+                try {
+                    val gifs = withContext(Dispatchers.IO) {
+                        gifsRepository.getAll(THUMBNAIL_REQUEST_QUERY, THUMBNAIL_REQUEST_LIMIT)
+                    }
+                    _state.value = GIFsState(gifs)
+                } catch (e: Exception) {
+                    Logger.e(e, "Error occurred while fetching gifs")
+                    _state.value = GIFsState(e)
+                }
+            }
+        }
+
+        class GIFsState private constructor(val gifs: List<GIF>?, val error: Exception?) {
+            // Loading state
+            constructor() : this(null, null)
+            constructor(gifs: List<GIF>) : this(gifs, null)
+            constructor(e: Exception) : this(null, e)
+
+            val isError get() = error != null
+            val isSuccessful get() = gifs != null
+        }
+    }
+
+    private class HorizontalInnerMarginDecoration(private val value: Int) :
+        RecyclerView.ItemDecoration() {
+
+        override fun getItemOffsets(
+            outRect: Rect,
+            view: View,
+            parent: RecyclerView,
+            state: RecyclerView.State
+        ) {
+            if (parent.getChildLayoutPosition(view) > 0) outRect.left = value
+        }
+    }
+
+    class ChooseGIFDialogFragment @Deprecated(
+        """Use newInstance() and supply all the necessary data via arguments instead, as fragment's 
+default no-op constructor is used by the framework for UI tree rebuild on configuration changes"""
+    ) constructor() : DialogFragment() {
+        private lateinit var ui: DialogChooseGifBinding
+        private lateinit var behavior: LockBottomSheetBehavior<View>
+        private lateinit var searchSubscription: Disposable
+
+        override fun onCreateView(
+            inflater: LayoutInflater,
+            container: ViewGroup?,
+            savedInstanceState: Bundle?
+        ): View = DialogChooseGifBinding.inflate(inflater, container, false).also { ui = it }.root
+
+        override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+            super.onViewCreated(view, savedInstanceState)
+            val searchSubject = BehaviorSubject.create<String>()
+            searchSubscription = searchSubject
+                .debounce(500L, TimeUnit.MILLISECONDS)
+                .map { if (it.isEmpty()) INITIAL_REQUEST_QUERY else it }
+                .map { GPHContent.searchQuery(it, mediaType = MediaType.gif) }
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe { ui.giphyGridView.content = it }
+            setupUI(searchSubject)
+        }
+
+        override fun onStop() {
+            super.onStop()
+            dialog!!.window!!.setWindowAnimations(R.style.ChooseGIFBottomNoDialogAnimation)
+        }
+
+        override fun onDestroyView() {
+            searchSubscription.dispose()
+            super.onDestroyView()
+        }
+
+        private fun setupUI(observer: RxObserver<String>) {
+            ui.giphyGridView.content = INITIAL_REQUEST
+            ui.giphyGridView.callback = object : GPHGridCallback {
+                override fun contentDidUpdate(resultCount: Int) {
+                    // No-op
+                }
+
+                override fun didSelectMedia(media: Media) {
+                    val intent = Intent().apply { putExtra(MEDIA_DELIVERY_KEY, media) }
+                    targetFragment!!.onActivityResult(targetRequestCode, Activity.RESULT_OK, intent)
+                    behavior.state = BottomSheetBehavior.STATE_HIDDEN
+                }
+            }
+            ui.gifSearchEditText.addTextChangedListener(
+                afterTextChanged = afterChanged@{
+                    observer.onNext(it?.toString() ?: return@afterChanged)
+                }
+            )
+        }
+
+        override fun onCreateDialog(savedInstanceState: Bundle?): Dialog =
+            BottomSheetDialog(requireContext(), R.style.ChooseGIFDialog)
+                .apply { setOnShowListener { setupDialog(this) } }
+
+        private fun setupDialog(bottomSheetDialog: BottomSheetDialog) {
+            val bottomSheet: View = bottomSheetDialog.findViewById(R.id.design_bottom_sheet)!!
+            behavior = LockBottomSheetBehavior()
+            behavior.isHideable = true
+            behavior.skipCollapsed = true
+            behavior.state = BottomSheetBehavior.STATE_EXPANDED
+            val rootView = bottomSheet.parent as View
+            rootView.setBackgroundColor(Color.BLACK)
+            behavior.addBottomSheetCallback(DismissOnHide(this, rootView))
+            val layoutParams = bottomSheet.layoutParams as CoordinatorLayout.LayoutParams
+            layoutParams.height = ViewGroup.LayoutParams.MATCH_PARENT
+            layoutParams.behavior = behavior
+            bottomSheetDialog.setOnKeyListener { _, keyCode, _ ->
+                (keyCode == KeyEvent.KEYCODE_BACK && behavior.state != BottomSheetBehavior.STATE_HIDDEN &&
+                        behavior.state != BottomSheetBehavior.STATE_COLLAPSED).also {
+                    if (it) behavior.state = BottomSheetBehavior.STATE_HIDDEN
+                }
+            }
+        }
+
+        private class DismissOnHide(
+            private val fragment: DialogFragment,
+            private val rootView: View
+        ) :
+            BottomSheetBehavior.BottomSheetCallback() {
+            override fun onStateChanged(bottomSheet: View, newState: Int) {
+                if (newState == BottomSheetBehavior.STATE_HIDDEN || newState == BottomSheetBehavior.STATE_COLLAPSED) {
+                    fragment.dismiss()
+                }
+            }
+
+            override fun onSlide(bottomSheet: View, slideOffset: Float) {
+                val color: Int = Color.argb((slideOffset.coerceIn(0F, 1F) * 255).toInt(), 0, 0, 0)
+                rootView.setBackgroundColor(color)
+            }
+        }
+
+        companion object {
+            @Suppress("DEPRECATION")
+            fun newInstance() = ChooseGIFDialogFragment()
+            const val MEDIA_DELIVERY_KEY = "key_media"
+            private const val INITIAL_REQUEST_QUERY = "money"
+            private val INITIAL_REQUEST =
+                GPHContent.searchQuery(INITIAL_REQUEST_QUERY, mediaType = MediaType.gif)
+        }
+
+    }
+
 
     private companion object {
         private const val KEY_GIF = "keygif"
         private const val REQUEST_CODE_GIF = 1535
-        private val THUMBNAIL_REQUEST = GPHContent.searchQuery("money", mediaType = MediaType.gif)
+        private const val THUMBNAIL_REQUEST_QUERY = "money"
+        private const val THUMBNAIL_REQUEST_LIMIT = 20
     }
 
 }

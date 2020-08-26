@@ -48,6 +48,16 @@ import android.widget.Button
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.*
+import com.bumptech.glide.Glide
+import com.bumptech.glide.RequestManager
+import com.bumptech.glide.load.DataSource
+import com.bumptech.glide.load.engine.GlideException
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners
+import com.bumptech.glide.load.resource.gif.GifDrawable
+import com.bumptech.glide.request.RequestListener
+import com.bumptech.glide.request.RequestOptions
+import com.bumptech.glide.request.target.Target
 import com.daasuu.ei.Ease
 import com.daasuu.ei.EasingInterpolator
 import com.orhanobut.logger.Logger
@@ -56,6 +66,7 @@ import com.tari.android.wallet.R.color.*
 import com.tari.android.wallet.R.dimen.*
 import com.tari.android.wallet.R.string.*
 import com.tari.android.wallet.databinding.ActivityTxDetailsBinding
+import com.tari.android.wallet.databinding.TxDetailsGifContainerBinding
 import com.tari.android.wallet.event.Event
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.extension.txFormattedDate
@@ -69,16 +80,21 @@ import com.tari.android.wallet.service.WalletService
 import com.tari.android.wallet.ui.animation.collapseAndHideAnimation
 import com.tari.android.wallet.ui.component.EmojiIdCopiedViewController
 import com.tari.android.wallet.ui.component.EmojiIdSummaryViewController
-import com.tari.android.wallet.ui.component.GIFContainerViewController
 import com.tari.android.wallet.ui.dialog.BottomSlideDialog
 import com.tari.android.wallet.ui.dialog.ErrorDialog
 import com.tari.android.wallet.ui.extension.*
 import com.tari.android.wallet.ui.presentation.TxNote
+import com.tari.android.wallet.ui.presentation.gif.GIF
+import com.tari.android.wallet.ui.presentation.gif.GIFRepository
 import com.tari.android.wallet.ui.util.UiUtil
+import com.tari.android.wallet.ui.util.UiUtil.setColor
 import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.EmojiUtil
 import com.tari.android.wallet.util.SharedPrefsWrapper
 import com.tari.android.wallet.util.WalletUtil
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import me.everything.android.ui.overscroll.OverScrollDecoratorHelper
 import java.util.*
 import javax.inject.Inject
@@ -116,6 +132,9 @@ internal class TxDetailsActivity : AppCompatActivity(), ServiceConnection {
     @Inject
     lateinit var sharedPrefsWrapper: SharedPrefsWrapper
 
+    @Inject
+    lateinit var repository: GIFRepository
+
     private var walletService: TariWalletService? = null
 
     /**
@@ -126,7 +145,6 @@ internal class TxDetailsActivity : AppCompatActivity(), ServiceConnection {
 
     private lateinit var tx: Tx
     private lateinit var emojiIdSummaryController: EmojiIdSummaryViewController
-    private lateinit var gifContainerViewController: GIFContainerViewController
 
     /**
      * Animates the emoji id "copied" text.
@@ -145,9 +163,10 @@ internal class TxDetailsActivity : AppCompatActivity(), ServiceConnection {
         setupUI()
 
         val savedTx = savedInstanceState?.getParcelable<Tx>(TX_EXTRA_KEY)
-        val intentTx =  intent.getParcelableExtra<Tx>(TX_EXTRA_KEY)
+        val intentTx = intent.getParcelableExtra<Tx>(TX_EXTRA_KEY)
         (savedTx ?: intentTx)?.let {
             tx = it
+            fetchGIFIfAttached()
             bindTxData()
             observeTxUpdates()
             enableCTAs()
@@ -183,10 +202,18 @@ internal class TxDetailsActivity : AppCompatActivity(), ServiceConnection {
         this.walletService = walletService
         if (!this::tx.isInitialized) {
             tx = findTxById(intent.getParcelableExtra(TX_ID_EXTRA_KEY) as TxId, walletService)
+            fetchGIFIfAttached()
             bindTxData()
             observeTxUpdates()
             enableCTAs()
         }
+    }
+
+    private fun fetchGIFIfAttached() {
+        val gifId = TxNote.fromNote(tx.message).gifId ?: return
+        val vm = ViewModelProvider(this, GIFViewModelFactory(repository, gifId))
+            .get(GIFViewModel::class.java)
+        GIFView(ui.gifContainer, Glide.with(this), vm, this).displayGIF()
     }
 
     private fun findTxById(id: TxId, walletService: TariWalletService): Tx {
@@ -233,10 +260,7 @@ internal class TxDetailsActivity : AppCompatActivity(), ServiceConnection {
         emojiIdSummaryController = EmojiIdSummaryViewController(ui.emojiIdSummaryView)
         ui.gifContainer.root.invisible()
         ui.detailScrollView.setOnTouchListener { _, _ -> scrollingIsBlocked }
-        UiUtil.setProgressBarColor(
-            ui.gifContainer.loadingGifProgressBar,
-            color(tx_list_loading_gif_gray)
-        )
+        ui.gifContainer.loadingGifProgressBar.setColor(color(tx_list_loading_gif_gray))
     }
 
     private fun disableCTAs() {
@@ -322,19 +346,12 @@ internal class TxDetailsActivity : AppCompatActivity(), ServiceConnection {
         // display message
         val note = TxNote.fromNote(tx.message)
         if (note.message == null) {
-            ui.txNoteTextView.text = ""
+            ui.txNoteTextView.gone()
         } else {
             ui.txNoteTextView.text = note.message
         }
         // display GIF
         ui.gifContainer.root.visible()
-        gifContainerViewController = GIFContainerViewController(
-            ui.gifContainer,
-            tx,
-            dimenPx(tx_list_item_gif_container_top_margin)
-        )
-        gifContainerViewController.onRetryClick { gifContainerViewController.displayGIF() }
-        gifContainerViewController.displayGIF()
     }
 
     private fun setTxAddresseeData(tx: Tx) {
@@ -740,6 +757,56 @@ internal class TxDetailsActivity : AppCompatActivity(), ServiceConnection {
         ).show()
     }
 
+    class GIFViewModelFactory(private val repository: GIFRepository, private val gifId: String) :
+        ViewModelProvider.Factory {
+        @Suppress("UNCHECKED_CAST")
+        override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+            require(modelClass === GIFViewModel::class.java) { "Inappropriate ViewModel requested: ${modelClass.simpleName}" }
+            return GIFViewModel(repository, gifId) as T
+        }
+
+    }
+
+    private class GIFViewModel(private val repository: GIFRepository, private val gifId: String) :
+        ViewModel() {
+
+        private val _gif = MutableLiveData<GIFState>()
+        val gif: LiveData<GIFState> get() = _gif
+
+        val currentState get() = _gif.value!!
+
+        init {
+            onGIFFetchRequested()
+        }
+
+        fun onGIFFetchRequested() {
+            viewModelScope.launch(Dispatchers.IO) {
+                withContext(Dispatchers.Main) { _gif.value = GIFState() }
+                try {
+                    _gif.postValue(GIFState(repository.getById(gifId)))
+                } catch (e: Exception) {
+                    Logger.e(e, "Exception was thrown during gif downloading")
+                    _gif.postValue(GIFState(e))
+                }
+            }
+        }
+    }
+
+    private data class GIFState(val gif: GIF?, val error: Exception?) {
+
+        init {
+            require(gif == null || error == null) { "Both gif and error can't be nonnull" }
+        }
+
+        constructor() : this(null, null)
+        constructor(gif: GIF) : this(gif, null)
+        constructor(e: Exception) : this(null, e)
+
+        val isProcessing get() = gif == null && error == null
+        val isError get() = error != null
+        val isSuccessful get() = gif != null
+    }
+
     private data class TxState(val direction: Tx.Direction, val status: TxStatus) {
         companion object {
             fun from(tx: Tx): TxState {
@@ -752,6 +819,112 @@ internal class TxDetailsActivity : AppCompatActivity(), ServiceConnection {
                 }
             }
         }
+    }
+
+    private class GIFView(
+        private val ui: TxDetailsGifContainerBinding,
+        private val glide: RequestManager,
+        private val viewModel: GIFViewModel,
+        private val owner: LifecycleOwner
+    ) {
+
+        fun displayGIF() {
+            viewModel.gif.observe(owner) {
+                val state = it ?: return@observe
+                when {
+                    state.isError -> onFailure()
+                    state.isSuccessful -> downloadMedia(state.gif!!)
+                    state.isProcessing -> showDownloadingState()
+                    else -> throw IllegalStateException()
+                }
+            }
+            ui.retryLoadingGifTextView.setOnClickListener {
+                val currentState = viewModel.currentState
+                when {
+                    currentState.isError -> viewModel.onGIFFetchRequested()
+                    currentState.isSuccessful -> downloadMedia(currentState.gif!!)
+                    else -> throw IllegalStateException()
+                }
+            }
+        }
+
+        private fun showDownloadingState() {
+            shrinkGIF()
+            hideErrorUI()
+            showDownloadingUI()
+        }
+
+        private fun showErrorUI() {
+            ui.gifStatusContainer.visible()
+            ui.retryLoadingGifTextView.visible()
+        }
+
+        private fun hideErrorUI() {
+            ui.gifStatusContainer.gone()
+            ui.retryLoadingGifTextView.gone()
+        }
+
+        private fun showDownloadingUI() {
+            ui.gifStatusContainer.visible()
+            ui.loadingGifTextView.visible()
+            ui.loadingGifProgressBar.visible()
+        }
+
+        private fun hideDownloadingUI() {
+            ui.gifStatusContainer.gone()
+            ui.loadingGifTextView.gone()
+            ui.loadingGifProgressBar.gone()
+        }
+
+        private fun downloadMedia(gif: GIF) {
+            glide.asGif()
+                .load(gif.uri)
+                .apply(RequestOptions().transform(RoundedCorners(10)))
+                .listener(UIUpdateListener())
+                .into(ui.gifContainerView)
+        }
+
+        private fun onFailure() {
+            shrinkGIF()
+            hideDownloadingUI()
+            showErrorUI()
+        }
+
+        private fun shrinkGIF() {
+            // Glide won't call the listener's methods if ImageView is gone
+            ui.gifContainerView.setTopMargin(0)
+        }
+
+        private fun expandGIF() {
+            val margin = ui.root.dimenPx(tx_list_item_gif_container_top_margin)
+            ui.gifContainerView.setTopMargin(margin)
+        }
+
+        private inner class UIUpdateListener : RequestListener<GifDrawable> {
+            override fun onLoadFailed(
+                e: GlideException?,
+                model: Any?,
+                target: Target<GifDrawable>?,
+                isFirstResource: Boolean
+            ): Boolean {
+                onFailure()
+                return true
+            }
+
+            override fun onResourceReady(
+                resource: GifDrawable?,
+                model: Any?,
+                target: Target<GifDrawable>?,
+                dataSource: DataSource?,
+                isFirstResource: Boolean
+            ): Boolean {
+                hideDownloadingUI()
+                hideErrorUI()
+                expandGIF()
+                return false
+            }
+        }
+
     }
 
 }

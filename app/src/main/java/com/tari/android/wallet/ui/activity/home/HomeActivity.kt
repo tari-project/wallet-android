@@ -93,7 +93,7 @@ internal class HomeActivity : AppCompatActivity(), AllSettingsFragment.AllSettin
             finish()
             return
         }
-        giphy.enable()
+        if (savedInstanceState == null) giphy.enable()
         serviceConnection = ViewModelProvider(this, TariWalletServiceConnectionFactory(this))
             .get(TariWalletServiceConnection::class.java)
         ui = ActivityHomeBinding.inflate(layoutInflater).also { setContentView(it.root) }

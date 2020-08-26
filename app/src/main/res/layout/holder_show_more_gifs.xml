@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="64dp"
+    android:layout_height="64dp"
+    android:background="@drawable/background_more_gifs_item">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:orientation="vertical"
+        tools:ignore="UselessParent">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:src="@drawable/ic_search_giphy"
+            tools:ignore="ContentDescription" />
+
+        <com.tari.android.wallet.ui.component.CustomFontTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginHorizontal="8dp"
+            android:layout_marginTop="4dp"
+            android:lineSpacingExtra="2dp"
+            android:gravity="center_horizontal"
+            android:text="@string/add_note_search_giphy_carousel_item_label"
+            android:textColor="@color/add_note_more_gifs_item_text"
+            android:textSize="9sp"
+            app:customFont="AVENIR_LT_STD_BLACK"
+            tools:ignore="SmallSp" />
+    </LinearLayout>
+
+</FrameLayout>

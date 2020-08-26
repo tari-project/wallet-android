@@ -339,7 +339,7 @@
 
             <include
                 android:id="@+id/gif_container"
-                layout="@layout/gif_container"
+                layout="@layout/tx_details_gif_container"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="@dimen/common_horizontal_margin"
