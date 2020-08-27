@@ -73,7 +73,10 @@ import com.tari.android.wallet.extension.applyFontStyle
 import com.tari.android.wallet.extension.repopulate
 import com.tari.android.wallet.infrastructure.Tracker
 import com.tari.android.wallet.infrastructure.backup.BackupManager
+import com.tari.android.wallet.infrastructure.yat.YatUserStorage
 import com.tari.android.wallet.model.*
+import com.tari.android.wallet.model.yat.EmojiId
+import com.tari.android.wallet.model.yat.EmojiSet
 import com.tari.android.wallet.network.NetworkConnectionState
 import com.tari.android.wallet.service.TariWalletService
 import com.tari.android.wallet.service.connection.TariWalletServiceConnection
@@ -87,6 +90,7 @@ import com.tari.android.wallet.ui.dialog.ErrorDialog
 import com.tari.android.wallet.ui.extension.*
 import com.tari.android.wallet.ui.fragment.send.FinalizeSendTxFragment
 import com.tari.android.wallet.ui.fragment.tx.adapter.TxListAdapter
+import com.tari.android.wallet.ui.presentation.TxMessagePayload
 import com.tari.android.wallet.ui.presentation.gif.GIFRepository
 import com.tari.android.wallet.ui.resource.AnimationResource
 import com.tari.android.wallet.ui.resource.ResourceContainer
@@ -125,6 +129,12 @@ internal class TxListFragment : Fragment(),
 
     @Inject
     lateinit var backupManager: BackupManager
+
+    @Inject
+    lateinit var yatEmojiSet: EmojiSet
+
+    @Inject
+    lateinit var yatUserStorage: YatUserStorage
 
     private lateinit var serviceConnection: TariWalletServiceConnection
     private val walletService: TariWalletService?
@@ -185,9 +195,9 @@ internal class TxListFragment : Fragment(),
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         if (savedInstanceState == null) tracker.screen("/home", "Home - Transaction List")
-        bindToWalletService()
         setupUI()
         subscribeToEventBus()
+        bindWalletService()
     }
 
     override fun onStart() {
@@ -267,9 +277,8 @@ internal class TxListFragment : Fragment(),
                 pendingOutboundTxs,
                 repository,
                 Glide.with(this),
-            ) {
-                (requireActivity() as TxListRouter).toTxDetails(it)
-            }
+                yatEmojiSet
+            ) { (requireActivity() as TxListRouter).toTxDetails(it) }
         ui.txRecyclerView.adapter = recyclerViewAdapter
         // hide vertical scrollbar initially
         ui.txRecyclerView.isVerticalScrollBarEnabled = false
@@ -562,11 +571,13 @@ internal class TxListFragment : Fragment(),
 
     // region service connection
 
-    private fun bindToWalletService() {
+    private fun bindWalletService() {
         serviceConnection = ViewModelProvider(requireActivity())
             .get(TariWalletServiceConnection::class.java)
         serviceConnection.connection.observe(viewLifecycleOwner, {
-            if (it.status == CONNECTED) onServiceConnected()
+            if (it.status == CONNECTED) {
+                ui.rootView.post { onServiceConnected() }
+            }
         })
     }
 
@@ -707,7 +718,6 @@ internal class TxListFragment : Fragment(),
                 ui.balanceDecimalsDigitContainerView,
                 balanceInfo // initial value
             )
-
         ui.scrollView.scrollTo(0, ui.scrollView.height)
         ui.scrollContentView.alpha = 1F
         // scroll view translation animation
@@ -776,9 +786,16 @@ internal class TxListFragment : Fragment(),
 
     private fun testnetTariRequestSuccessful() {
         lifecycleScope.launch(Dispatchers.IO) {
+            // prepare message payload
+            val payload = TxMessagePayload.construct(
+                message = string(R.string.first_testnet_utxo_tx_message),
+                source = EmojiId(string(R.string.tari_bot_yat)),
+                destination = yatUserStorage.get()!!.emojiIds.first()
+            )
+            // import
             val error = WalletError()
             val importedTx = walletService!!.importTestnetUTXO(
-                string(R.string.first_testnet_utxo_tx_message),
+                payload.compose(),
                 error
             )
             if (error.code != WalletErrorCode.NO_ERROR) {
@@ -983,9 +1000,16 @@ internal class TxListFragment : Fragment(),
 
     private fun importSecondUTXO() {
         lifecycleScope.launch(Dispatchers.IO) {
+            // prepare message payload
+            val payload = TxMessagePayload.construct(
+                message = string(R.string.first_testnet_utxo_tx_message),
+                source = EmojiId(string(R.string.tari_bot_yat)),
+                destination = yatUserStorage.get()!!.emojiIds.first()
+            )
+            // import
             val error = WalletError()
             val importedTx = walletService!!.importTestnetUTXO(
-                string(R.string.second_testnet_utxo_tx_message),
+                payload.compose(),
                 error
             )
             if (error.code != WalletErrorCode.NO_ERROR) {

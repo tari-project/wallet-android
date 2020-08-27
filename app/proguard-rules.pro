@@ -20,6 +20,8 @@
 # hide the original source file name.
 -renamesourcefileattribute SourceFile
 
+-keep class net.danlew.android.joda.R$raw { *; }
+
 # FFI layer
 -keep class com.tari.android.wallet.ffi.** { *; }
 
@@ -30,3 +32,11 @@
 -keep class com.tari.android.wallet.service.faucet.TestnetTariUTXOKey { *; }
 
 -keep class net.danlew.android.joda.R$raw { *; }
+
+# Y@
+-keep class com.tari.android.wallet.infrastructure.yat.** { *; }
+-keep class com.tari.android.wallet.infrastructure.yat.authentication.** { *; }
+-keep class com.tari.android.wallet.infrastructure.yat.cart.** { *; }
+-keep class com.tari.android.wallet.infrastructure.yat.emojiid.** { *; }
+-keep class com.tari.android.wallet.infrastructure.yat.key.** { *; }
+-keep class com.tari.android.wallet.infrastructure.yat.user.** { *; }

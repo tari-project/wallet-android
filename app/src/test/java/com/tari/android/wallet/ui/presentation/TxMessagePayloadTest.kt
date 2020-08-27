@@ -32,68 +32,75 @@
  */
 package com.tari.android.wallet.ui.presentation
 
+import com.google.gson.Gson
+import com.tari.android.wallet.model.yat.EmojiId
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test
 
-class TxNoteTest {
+class TxMessagePayloadTest {
 
     @Test(expected = IllegalStateException::class)
-    fun `compose, assert that IllegalStateException was thrown if both arguments are null pointers`() {
-        TxNote(null, null)
+    fun `compose, assert that IllegalStateException was thrown if both message and gifurl are null pointers`() {
+        TxMessagePayload.construct()
     }
 
     @Test
     fun `compose, assert that only message was included if gif is null`() {
         val givenMessage = "alala"
-        assertEquals(
-            givenMessage, TxNote(
-                givenMessage,
-                null
-            ).compose()
-        )
+        val expected = """{"text":"$givenMessage"}"""
+        assertEquals(expected, TxMessagePayload.construct(givenMessage, null).compose().replace(" ", ""))
     }
 
     @Test
     fun `compose, assert that only url with a whitespace was included if message is null`() {
         val givenUrl = "https://giphy.com/embed/l2Sq9qGTQnL5NyI6Y"
-        assertEquals(
-            " $givenUrl", TxNote(
-                null,
-                givenUrl
-            ).compose()
-        )
+        val expected = """{"giphy_url":"$givenUrl"}"""
+        assertEquals(expected, TxMessagePayload.construct(null, givenUrl).compose().replace(" ", ""))
     }
 
     @Test
     fun `compose, assert that message with whitespace and url were included if both arguments point to valid values`() {
         val givenMessage = "bubun"
         val givenUrl = "https://giphy.com/embed/l2Sq9qGTQnL5NyI6Y"
+        val expected = """{"text":"$givenMessage","giphy_url":"$givenUrl"}"""
+        assertEquals(expected, TxMessagePayload.construct(givenMessage, givenUrl).compose().replace(" ", ""))
+    }
+
+    @Test
+    fun `compose, assert that source_yat was included`() {
         assertEquals(
-            "$givenMessage $givenUrl", TxNote(
-                givenMessage,
-                givenUrl
-            ).compose()
+            """{"text":"abc","source_yat":"🀄🀄🀄"}""",
+            TxMessagePayload.construct("abc", source = EmojiId("\uD83C\uDC04\uD83C\uDC04\uD83C\uDC04")).compose()
         )
     }
 
     @Test
-    fun `fromNote, assert that empty note and no gif will be returnedif note is empty`() {
-        val note = TxNote.fromNote("")
-        assertEquals("", note.message)
+    fun `compose, assert that destination_yat was included`() {
+        assertEquals(
+            """{"text":"abc","destination_yat":"🀄🀄🀄"}""",
+            TxMessagePayload.construct("abc", destination = EmojiId("\uD83C\uDC04\uD83C\uDC04\uD83C\uDC04")).compose()
+        )
+    }
+
+    @Test
+    fun `fromNote, assert that empty note and no gif will be returned if note is empty`() {
+        val givenNote = "abs"
+        val note = TxMessagePayload.fromNote(givenNote)
+        assertEquals(givenNote, note.message)
         assertNull(note.gifUrl)
     }
 
     @Test
     fun `fromNote, assert that only message was included if gif is null`() {
         val givenMessage = "alala"
-        assertEquals(TxNote(givenMessage, null), TxNote.fromNote(givenMessage))
+        assertEquals(TxMessagePayload.construct(givenMessage, gson = Gson()), TxMessagePayload.fromNote(givenMessage))
     }
 
     @Test
     fun `fromNote, assert that only url with a whitespace was included if message is null`() {
         val givenUrl = "https://giphy.com/embed/l2Sq9qGTQnL5NyI6Y"
-        assertEquals(TxNote(null, givenUrl), TxNote.fromNote(" $givenUrl"))
+        assertEquals(TxMessagePayload.construct(null, givenUrl), TxMessagePayload.fromNote(" $givenUrl"))
     }
 
     @Test
@@ -101,21 +108,21 @@ class TxNoteTest {
         val givenMessage = "bubun"
         val givenUrl = "https://giphy.com/embed/l2Sq9qGTQnL5NyI6Y"
         assertEquals(
-            TxNote(givenMessage, givenUrl),
-            TxNote.fromNote("$givenMessage $givenUrl")
+            TxMessagePayload.construct(givenMessage, givenUrl),
+            TxMessagePayload.fromNote("$givenMessage $givenUrl")
         )
     }
 
     @Test
     fun `gifId, assert that null was returned if gif is null`() {
-        assertNull(TxNote("asd", null).gifId)
+        assertNull(TxMessagePayload.construct("asd", null).gifId)
     }
 
     @Test
     fun `gifId, assert that last url part was returned if gif is not null`() {
         val id = "l2Sq9qGTQnL5NyI6Y"
         val givenUrl = "https://giphy.com/embed/$id"
-        assertEquals(id, TxNote(null, givenUrl).gifId)
+        assertEquals(id, TxMessagePayload.construct(null, givenUrl).gifId)
     }
 
 }

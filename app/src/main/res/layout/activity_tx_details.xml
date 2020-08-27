@@ -147,13 +147,14 @@
             android:background="@color/white"
             android:clipChildren="false"
             app:layout_constraintTop_toBottomOf="@id/fee_label_text_view">
+
             <LinearLayout
                 android:id="@+id/amount_section"
                 android:layout_width="match_parent"
-                android:orientation="vertical"
-                android:gravity="center_horizontal"
+                android:layout_height="wrap_content"
                 android:background="@color/gray_background"
-                android:layout_height="wrap_content">
+                android:gravity="center_horizontal"
+                android:orientation="vertical">
 
                 <RelativeLayout
                     android:id="@+id/amount_container_view"
@@ -342,10 +343,10 @@
                 layout="@layout/tx_details_gif_container"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="@dimen/common_horizontal_margin"
-                android:layout_marginTop="0dp"
                 android:layout_below="@id/tx_note_text_view"
                 android:layout_marginHorizontal="@dimen/common_horizontal_margin"
+                android:layout_marginTop="0dp"
+                android:layout_marginBottom="@dimen/common_horizontal_margin"
                 android:visibility="visible" />
 
             <View
@@ -366,8 +367,8 @@
                 android:layout_height="wrap_content"
                 android:layout_alignBottom="@id/emoji_id_container_view"
                 android:layout_centerHorizontal="true"
-                android:layout_marginBottom="0dp"
-                android:visibility="gone">
+                android:visibility="gone"
+                tools:visibility="visible">
 
                 <ImageView
                     android:id="@+id/copy_emoji_id_notch_image_view"
@@ -430,6 +431,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center" />
+
                 </FrameLayout>
 
                 <com.tari.android.wallet.ui.component.CustomFontButton

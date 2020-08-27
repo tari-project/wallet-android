@@ -4,7 +4,7 @@
     <!-- theme -->
     <color name="primary">#FFFFFF</color>
     <color name="primary_dark">#AAAAAA</color>
-    <color name="accent">#D81B60</color>
+    <color name="accent">#9330FF</color>
     <color name="gray_background">#f6f6f6</color>
 
     <!-- common -->
@@ -28,7 +28,7 @@
     <color name="common_error">#D32C44</color>
 
     <!-- dialog -->
-    <color name="dialog_cancel_action">#9430ff</color>
+    <color name="dialog_cancel_action">#9330FF</color>
 
     <!-- introduction terms & agreement links text color -->
     <color name="introduction_user_agreement_and_privacy_policy">#B2FFFFFF</color>

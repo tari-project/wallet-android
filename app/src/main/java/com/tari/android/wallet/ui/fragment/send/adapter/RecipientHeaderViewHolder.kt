@@ -42,6 +42,7 @@ import com.tari.android.wallet.ui.extension.string
 /**
  * Section header view holder.
  */
+// TODO(nyarian): rework it
 class RecipientHeaderViewHolder(view: View, private val type: Type) :
     RecyclerView.ViewHolder(view) {
 

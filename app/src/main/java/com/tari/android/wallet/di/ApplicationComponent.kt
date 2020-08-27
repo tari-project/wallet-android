@@ -56,6 +56,7 @@ import com.tari.android.wallet.ui.fragment.onboarding.LocalAuthFragment
 import com.tari.android.wallet.ui.fragment.profile.WalletInfoFragment
 import com.tari.android.wallet.ui.fragment.restore.ChooseRestoreOptionFragment
 import com.tari.android.wallet.ui.fragment.restore.EnterRestorationPasswordFragment
+import com.tari.android.wallet.ui.fragment.restore.WalletRestoringFragment
 import com.tari.android.wallet.ui.fragment.send.AddAmountFragment
 import com.tari.android.wallet.ui.fragment.send.AddNoteFragment
 import com.tari.android.wallet.ui.fragment.send.AddRecipientFragment
@@ -85,7 +86,8 @@ import javax.inject.Singleton
         TorModule::class,
         TrackerModule::class,
         BackupAndRestoreModule::class,
-        PresentationModule::class
+        PresentationModule::class,
+        YATModule::class,
     ]
 )
 internal interface ApplicationComponent {
@@ -115,6 +117,7 @@ internal interface ApplicationComponent {
     fun inject(activity: QRScannerActivity)
     fun inject(activity: SendTariActivity)
     fun inject(activity: TxDetailsActivity)
+    fun inject(activity: WalletRestoringFragment)
     fun inject(activity: DebugActivity)
     fun inject(activity: DeleteWalletActivity)
 
@@ -133,6 +136,7 @@ internal interface ApplicationComponent {
     fun inject(fragment: AllSettingsFragment)
     fun inject(fragment: WalletInfoFragment)
     fun inject(fragment: TxListFragment)
+
     /**
      * Backup.
      */
@@ -140,6 +144,7 @@ internal interface ApplicationComponent {
     fun inject(fragment: ChangeSecurePasswordFragment)
     fun inject(fragment: EnterCurrentPasswordFragment)
     fun inject(fragment: VerifySeedPhraseFragment)
+
     /**
      * Restore.
      */
@@ -153,8 +158,8 @@ internal interface ApplicationComponent {
     fun inject(service: WalletService)
 
     /**
-    * Broadcast receiver
-    */
+     * Broadcast receiver
+     */
     fun inject(receiver: BootDeviceReceiver)
 
 }

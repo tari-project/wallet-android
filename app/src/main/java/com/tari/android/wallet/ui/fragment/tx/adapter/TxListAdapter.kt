@@ -38,6 +38,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.RequestManager
 import com.tari.android.wallet.R
 import com.tari.android.wallet.model.*
+import com.tari.android.wallet.model.yat.EmojiSet
 import com.tari.android.wallet.ui.presentation.gif.GIFRepository
 
 /**
@@ -52,6 +53,7 @@ internal class TxListAdapter(
     private val pendingOutboundTxs: List<PendingOutboundTx>,
     private val repository: GIFRepository,
     private val glide: RequestManager,
+    private val set: EmojiSet,
     private val listener: (Tx) -> Unit
 ) : RecyclerView.Adapter<TxViewHolder>() {
 
@@ -96,6 +98,7 @@ internal class TxListAdapter(
                 .inflate(R.layout.home_tx_list_item, parent, false),
             TxViewHolder.GIFViewModel(repository),
             glide,
+            set,
         ) { listener(items[it]) }
 
     /**

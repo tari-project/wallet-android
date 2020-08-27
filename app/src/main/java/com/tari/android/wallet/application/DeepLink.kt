@@ -32,6 +32,8 @@
  */
 package com.tari.android.wallet.application
 
+import com.tari.android.wallet.model.yat.EmojiId
+import com.tari.android.wallet.model.yat.EmojiSet
 import java.net.URLDecoder
 
 /**
@@ -43,8 +45,16 @@ internal class DeepLink private constructor(
     val network: Network,
     val type: Type,
     val identifier: String,
-    val parameters: Map<String, String>
+    private val parameters: Map<String, String>
 ) {
+
+    val note: String?
+        get() = parameters[PARAMETER_NOTE]
+
+    val amount: Double?
+        get() = parameters[PARAMETER_AMOUNT]?.toDoubleOrNull()
+
+    fun yat(set: EmojiSet): EmojiId? = parameters[PARAMETER_YAT]?.let { EmojiId.of(it, set) }
 
     /**
      * Deep link type.
@@ -61,6 +71,7 @@ internal class DeepLink private constructor(
 
         const val PARAMETER_NOTE = "note"
         const val PARAMETER_AMOUNT = "amount"
+        private const val PARAMETER_YAT = "yat"
         private val regexNetwork =
             "(" + Network.MAINNET.uriComponent + "|" + Network.STIBBONS.uriComponent + ")"
         private val regexEmojiId = Type.EMOJI_ID.uriComponent + "/(.{33})"

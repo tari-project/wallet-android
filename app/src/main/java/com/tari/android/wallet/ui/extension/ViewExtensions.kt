@@ -33,15 +33,19 @@
 package com.tari.android.wallet.ui.extension
 
 import android.animation.AnimatorSet
+import android.animation.ObjectAnimator
 import android.animation.ValueAnimator
 import android.content.Context
 import android.graphics.drawable.Drawable
+import android.util.Property
 import android.util.TypedValue
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewTreeObserver
+import android.view.animation.AccelerateDecelerateInterpolator
 import android.view.animation.AccelerateInterpolator
 import android.view.animation.DecelerateInterpolator
+import android.view.animation.Interpolator
 import android.widget.ProgressBar
 import android.widget.ScrollView
 import android.widget.TextView
@@ -230,7 +234,9 @@ fun View.setLayoutWidth(width: Int) {
 // method name is this rather than "setHeight" because "setHeight" might conflict with View's
 // subtypes intrinsic methods
 fun View.setLayoutHeight(height: Int) {
-    this.layoutParams?.let { this@setLayoutHeight.layoutParams = it.also { p -> p.height = height } }
+    this.layoutParams?.let {
+        this@setLayoutHeight.layoutParams = it.also { p -> p.height = height }
+    }
 }
 
 fun View.setLayoutSize(width: Int, height: Int) {
@@ -321,4 +327,108 @@ fun View.animateClick(onEnd: (android.animation.Animator) -> Unit = {}) {
     animSet.addListener(onEnd = onEnd)
     animSet.playSequentially(scaleDownBtnAnim, scaleUpBtnAnim)
     animSet.start()
+}
+
+inline fun View.createObjectAnimator(
+    property: Property<View, Float>,
+    values: FloatArray,
+    interpolator: Interpolator = AccelerateDecelerateInterpolator(),
+    duration: Long = 300L,
+    startDelay: Long = 0L,
+    crossinline onEnd: (animator: LegacyAnimator) -> Unit = {},
+    crossinline onStart: (animator: android.animation.Animator) -> Unit = {},
+    crossinline onCancel: (animator: android.animation.Animator) -> Unit = {},
+    crossinline onRepeat: (animator: android.animation.Animator) -> Unit = {},
+    crossinline onUpdate: (animator: ValueAnimator) -> Unit = {},
+): ObjectAnimator = ObjectAnimator.ofFloat(this, property, *values).apply {
+    this.duration = duration
+    this.interpolator = interpolator
+    this.startDelay = startDelay
+    addUpdateListener { onUpdate(it) }
+    addListener(onEnd, onStart, onCancel, onRepeat)
+}
+
+inline fun animateValues(
+    values: FloatArray,
+    interpolator: Interpolator = AccelerateDecelerateInterpolator(),
+    duration: Long = 300L,
+    startDelay: Long = 0L,
+    crossinline onEnd: (animator: LegacyAnimator) -> Unit = {},
+    crossinline onStart: (animator: android.animation.Animator) -> Unit = {},
+    crossinline onCancel: (animator: android.animation.Animator) -> Unit = {},
+    crossinline onRepeat: (animator: android.animation.Animator) -> Unit = {},
+    crossinline onUpdate: (animator: ValueAnimator) -> Unit = {},
+): ValueAnimator = ValueAnimator.ofFloat(*values).apply {
+    this.duration = duration
+    this.interpolator = interpolator
+    this.startDelay = startDelay
+    addUpdateListener { onUpdate(it) }
+    addListener(onEnd, onStart, onCancel, onRepeat)
+}
+
+inline fun animatorSetOf(
+    startDelay: Long? = null,
+    duration: Long? = null,
+    interpolator: Interpolator? = null,
+    children: AnimatorSetPlayStrategy? = null,
+    crossinline onEnd: (animator: LegacyAnimator) -> Unit = {},
+    crossinline onStart: (animator: android.animation.Animator) -> Unit = {},
+    crossinline onCancel: (animator: android.animation.Animator) -> Unit = {},
+    crossinline onRepeat: (animator: android.animation.Animator) -> Unit = {},
+): AnimatorSet = AnimatorSet().apply {
+    applySettings(
+        startDelay,
+        duration,
+        interpolator,
+        children,
+        onEnd,
+        onStart,
+        onCancel,
+        onRepeat
+    )
+}
+
+inline fun AnimatorSet.applySettings(
+    startDelay: Long? = null,
+    duration: Long? = null,
+    interpolator: Interpolator? = null,
+    children: AnimatorSetPlayStrategy? = null,
+    crossinline onEnd: (animator: LegacyAnimator) -> Unit = {},
+    crossinline onStart: (animator: android.animation.Animator) -> Unit = {},
+    crossinline onCancel: (animator: android.animation.Animator) -> Unit = {},
+    crossinline onRepeat: (animator: android.animation.Animator) -> Unit = {},
+): AnimatorSet = apply {
+    startDelay?.let { this.startDelay = it }
+    duration?.let { this.duration = it }
+    interpolator?.let { this.interpolator = it }
+    children?.configure(this)
+    addListener(onEnd, onStart, onCancel, onRepeat)
+}
+
+fun playSequentially(vararg animators: LegacyAnimator): AnimatorSetPlayStrategy =
+    SequentialPlayStrategy(animators)
+
+fun playTogether(vararg animators: LegacyAnimator): AnimatorSetPlayStrategy =
+    SimultaneousPlayStrategy(animators)
+
+fun playOnly(animator: LegacyAnimator): AnimatorSetPlayStrategy =
+    SingleReplayStrategy(animator)
+
+interface AnimatorSetPlayStrategy {
+    fun configure(set: AnimatorSet)
+}
+
+private class SequentialPlayStrategy(private val animators: Array<out LegacyAnimator>) :
+    AnimatorSetPlayStrategy {
+    override fun configure(set: AnimatorSet) = set.playSequentially(*animators)
+}
+
+private class SimultaneousPlayStrategy(private val animators: Array<out LegacyAnimator>) :
+    AnimatorSetPlayStrategy {
+    override fun configure(set: AnimatorSet) = set.playTogether(*animators)
+}
+
+private class SingleReplayStrategy(private val animator: LegacyAnimator) :
+    AnimatorSetPlayStrategy {
+    override fun configure(set: AnimatorSet) = set.playTogether(animator)
 }

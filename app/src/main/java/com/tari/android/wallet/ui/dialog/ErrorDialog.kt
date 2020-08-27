@@ -18,7 +18,8 @@ class ErrorDialog private constructor(private val dialog: Dialog) {
         description: CharSequence,
         cancelable: Boolean = true,
         canceledOnTouchOutside: Boolean = true,
-        onClose: () -> Unit = {}
+        onClose: () -> Unit = {},
+        closeButtonTextResourceId: Int = R.string.common_close
     ) : this(
         Dialog(context, R.style.BottomSlideDialog).apply {
             setContentView(R.layout.dialog_error)
@@ -34,6 +35,7 @@ class ErrorDialog private constructor(private val dialog: Dialog) {
             setCanceledOnTouchOutside(canceledOnTouchOutside)
             findViewById<TextView>(R.id.error_dialog_title_text_view).text = title
             findViewById<TextView>(R.id.error_dialog_description_text_view).text = description
+            findViewById<TextView>(R.id.error_dialog_close_view).text = context.resources.getString(closeButtonTextResourceId)
             findViewById<View>(R.id.error_dialog_close_view).setOnClickListener {
                 onClose()
                 dismiss()

@@ -32,8 +32,6 @@
  */
 package com.tari.android.wallet.ui.activity.tx
 
-import android.animation.Animator
-import android.animation.AnimatorListenerAdapter
 import android.animation.AnimatorSet
 import android.animation.ValueAnimator
 import android.annotation.SuppressLint
@@ -42,12 +40,17 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.IBinder
 import android.os.Looper
+import android.view.Gravity
 import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.widget.Button
+import android.widget.FrameLayout
+import android.widget.RelativeLayout
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.animation.addListener
 import androidx.core.content.ContextCompat
+import androidx.core.view.doOnLayout
 import androidx.lifecycle.*
 import com.bumptech.glide.Glide
 import com.bumptech.glide.RequestManager
@@ -75,6 +78,7 @@ import com.tari.android.wallet.model.*
 import com.tari.android.wallet.model.Tx.Direction.INBOUND
 import com.tari.android.wallet.model.Tx.Direction.OUTBOUND
 import com.tari.android.wallet.model.TxStatus.*
+import com.tari.android.wallet.model.yat.EmojiSet
 import com.tari.android.wallet.service.TariWalletService
 import com.tari.android.wallet.service.WalletService
 import com.tari.android.wallet.ui.animation.collapseAndHideAnimation
@@ -83,7 +87,7 @@ import com.tari.android.wallet.ui.component.EmojiIdSummaryViewController
 import com.tari.android.wallet.ui.dialog.BottomSlideDialog
 import com.tari.android.wallet.ui.dialog.ErrorDialog
 import com.tari.android.wallet.ui.extension.*
-import com.tari.android.wallet.ui.presentation.TxNote
+import com.tari.android.wallet.ui.presentation.TxMessagePayload
 import com.tari.android.wallet.ui.presentation.gif.GIF
 import com.tari.android.wallet.ui.presentation.gif.GIFRepository
 import com.tari.android.wallet.util.Constants
@@ -109,19 +113,11 @@ internal class TxDetailsActivity : AppCompatActivity(), ServiceConnection {
         const val TX_EXTRA_KEY = "TX_EXTRA_KEY"
         const val TX_ID_EXTRA_KEY = "TX_DETAIL_EXTRA_KEY"
 
-        fun createIntent(context: Context, txId: TxId): Intent {
-            return Intent(context, TxDetailsActivity::class.java)
-                .apply {
-                    putExtra(TX_ID_EXTRA_KEY, txId)
-                }
-        }
+        fun createIntent(context: Context, txId: TxId): Intent =
+            Intent(context, TxDetailsActivity::class.java).apply { putExtra(TX_ID_EXTRA_KEY, txId) }
 
-        fun createIntent(context: Context, tx: Tx): Intent {
-            return Intent(context, TxDetailsActivity::class.java)
-                .apply {
-                    putExtra(TX_EXTRA_KEY, tx)
-                }
-        }
+        fun createIntent(context: Context, tx: Tx): Intent =
+            Intent(context, TxDetailsActivity::class.java).apply { putExtra(TX_EXTRA_KEY, tx) }
     }
 
     @Inject
@@ -133,20 +129,19 @@ internal class TxDetailsActivity : AppCompatActivity(), ServiceConnection {
     @Inject
     lateinit var repository: GIFRepository
 
+    @Inject
+    lateinit var set: EmojiSet
+
     private var walletService: TariWalletService? = null
 
-    /**
-     * Values below are used for scaling up/down of the text size.
-     */
+    // Values below are used for scaling up/down of the text size.
     private var currentTextSize = 0f
     private var currentAmountGemSize = 0f
 
     private lateinit var tx: Tx
     private lateinit var emojiIdSummaryController: EmojiIdSummaryViewController
 
-    /**
-     * Animates the emoji id "copied" text.
-     */
+    // Animates the emoji id "copied" text.
     private lateinit var emojiIdCopiedViewController: EmojiIdCopiedViewController
 
     private lateinit var ui: ActivityTxDetailsBinding
@@ -222,7 +217,7 @@ internal class TxDetailsActivity : AppCompatActivity(), ServiceConnection {
     }
 
     private fun fetchGIFIfAttached() {
-        val gifId = TxNote.fromNote(tx.message).gifId ?: return
+        val gifId = TxMessagePayload.fromNote(tx.message).gifId ?: return
         val vm = ViewModelProvider(this, GIFViewModelFactory(repository, gifId))
             .get(GIFViewModel::class.java)
         GIFView(ui.gifContainer, Glide.with(this), vm, this).displayGIF()
@@ -268,7 +263,7 @@ internal class TxDetailsActivity : AppCompatActivity(), ServiceConnection {
         currentAmountGemSize = dimen(add_amount_gem_size)
         OverScrollDecoratorHelper.setUpOverScroll(ui.fullEmojiIdScrollView)
         emojiIdCopiedViewController = EmojiIdCopiedViewController(ui.emojiIdCopiedView)
-        emojiIdSummaryController = EmojiIdSummaryViewController(ui.emojiIdSummaryView)
+        emojiIdSummaryController = EmojiIdSummaryViewController(ui.emojiIdSummaryView, set)
         ui.gifContainer.root.invisible()
         ui.detailScrollView.setOnTouchListener { _, _ -> scrollingIsBlocked }
         ui.gifContainer.loadingGifProgressBar.setColor(color(tx_list_loading_gif_gray))
@@ -295,7 +290,7 @@ internal class TxDetailsActivity : AppCompatActivity(), ServiceConnection {
 
     private fun setUICommands() {
         ui.backView.setOnClickListener { onBackPressed() }
-        ui.emojiIdSummaryContainerView.setOnClickListener { onEmojiSummaryClicked(it) }
+        ui.emojiIdSummaryView.root.setOnClickListener { onEmojiSummaryClicked(it) }
         ui.copyEmojiIdButton.setOnClickListener { onCopyEmojiIdButtonClicked(it) }
         ui.copyEmojiIdButton.setOnLongClickListener { view ->
             onCopyEmojiIdButtonLongClicked(view)
@@ -312,7 +307,6 @@ internal class TxDetailsActivity : AppCompatActivity(), ServiceConnection {
     }
 
     private fun bindTxData() {
-        Logger.d("Current TX: $tx")
         val tx = this.tx
         setTxStatusData(tx)
         setTxMetaData(tx)
@@ -355,7 +349,7 @@ internal class TxDetailsActivity : AppCompatActivity(), ServiceConnection {
         // display date
         ui.dateTextView.text = Date(tx.timestamp.toLong() * 1000).txFormattedDate()
         // display message
-        val note = TxNote.fromNote(tx.message)
+        val note = TxMessagePayload.fromNote(tx.message)
         if (note.message == null) {
             ui.txNoteTextView.gone()
         } else {
@@ -365,6 +359,7 @@ internal class TxDetailsActivity : AppCompatActivity(), ServiceConnection {
         ui.gifContainer.root.visible()
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     private fun setTxAddresseeData(tx: Tx) {
         val user = tx.user
         if (user is Contact) {
@@ -377,11 +372,27 @@ internal class TxDetailsActivity : AppCompatActivity(), ServiceConnection {
         val state = TxState.from(tx)
         ui.fromTextView.text =
             if (state.direction == INBOUND) string(common_from) else string(common_to)
-        ui.fullEmojiIdTextView.text = EmojiUtil.getFullEmojiIdSpannable(
-            tx.user.publicKey.emojiId,
-            string(emoji_id_chunk_separator), color(black), color(light_gray)
-        )
-        emojiIdSummaryController.display(tx.user.publicKey.emojiId)
+        Logger.e("TX NODE :: " + tx.message)
+        val note = TxMessagePayload.fromNote(tx.message)
+        val yat = if (tx.direction == OUTBOUND) note.destinationYat else note.sourceYat
+        emojiIdSummaryController.display(yat?.raw ?: tx.user.publicKey.emojiId)
+        if (yat == null) {
+            ui.copyEmojiIdTextView.text = string(copy_emoji_id)
+            ui.fullEmojiIdTextView.text = EmojiUtil.getFullEmojiIdSpannable(
+                tx.user.publicKey.emojiId,
+                string(emoji_id_chunk_separator),
+                color(black),
+                color(light_gray)
+            )
+        } else {
+            ui.copyEmojiIdTextView.text = string(copy_yat)
+            ui.fullEmojiIdTextView.layoutParams =
+                (ui.fullEmojiIdTextView.layoutParams as FrameLayout.LayoutParams)
+                    .apply { gravity = Gravity.CENTER }
+            ui.fullEmojiIdTextView.letterSpacing = 0.3F
+            ui.fullEmojiIdScrollView.setOnTouchListener { _, _ -> true }
+            ui.fullEmojiIdTextView.text = yat.raw
+        }
     }
 
     private fun setTxStatusData(tx: Tx) {
@@ -405,9 +416,7 @@ internal class TxDetailsActivity : AppCompatActivity(), ServiceConnection {
         }
     }
 
-    /**
-     * Scales down the amount text if the amount overflows.
-     */
+    // Scales down the amount text if the amount overflows.
     private fun scaleDownAmountTextViewIfRequired() {
         val contentWidthPreInsert =
             ui.amountContainerView.getLastChild()!!.right - ui.amountContainerView.getFirstChild()!!.left
@@ -456,55 +465,80 @@ internal class TxDetailsActivity : AppCompatActivity(), ServiceConnection {
     }
 
     private fun showFullEmojiId() {
+        val note = TxMessagePayload.fromNote(tx.message)
+        val yat = if (tx.direction == OUTBOUND) note.destinationYat else note.sourceYat
+        val isTariEmojiId = yat == null
         scrollingIsBlocked = true
-        // resize bottom dimmer
         ui.bottomDimmerView.setLayoutHeight(
             max(
                 ui.detailScrollView.getChildAt(0).height,
                 ui.detailScrollView.height
             )
         )
-        // make dimmers non-clickable until the anim is over
-        dimmerViews.forEach { dimmerView -> dimmerView.isClickable = false }
-        // prepare views
         ui.emojiIdSummaryContainerView.invisible()
-        dimmerViews.forEach { dimmerView ->
-            dimmerView.alpha = 0f
-            dimmerView.visible()
-        }
-        val fullEmojiIdInitialWidth = ui.emojiIdSummaryContainerView.width
-        val fullEmojiIdDeltaWidth = ui.emojiIdContainerView.width - fullEmojiIdInitialWidth
-        ui.fullEmojiIdContainerView.setLayoutWidth(fullEmojiIdInitialWidth)
-        ui.fullEmojiIdContainerView.alpha = 0f
-        ui.fullEmojiIdContainerView.visible()
-        // scroll to end
-        ui.fullEmojiIdScrollView.post {
-            ui.fullEmojiIdScrollView.scrollTo(
-                ui.fullEmojiIdTextView.width - ui.fullEmojiIdScrollView.width,
-                0
-            )
+        dimmerViews.forEach {
+            it.isClickable = false
+            it.alpha = 0f
+            it.visible()
         }
         ui.copyEmojiIdContainerView.alpha = 0f
         ui.copyEmojiIdContainerView.visible()
         ui.copyEmojiIdContainerView.setBottomMargin(0)
+
+        ui.fullEmojiIdContainerView.alpha = 0f
+        ui.fullEmojiIdContainerView.visible()
+
+        val fullEmojiIdContainerUpdate: (Float) -> Unit
+        if (isTariEmojiId) {
+            val fullEmojiIdInitialWidth = ui.emojiIdSummaryContainerView.width
+            val fullEmojiIdDeltaWidth = ui.emojiIdContainerView.width - fullEmojiIdInitialWidth
+            ui.fullEmojiIdContainerView.setLayoutWidth(fullEmojiIdInitialWidth)
+            // scroll to end
+            ui.fullEmojiIdScrollView.post {
+                ui.fullEmojiIdScrollView.scrollTo(
+                    ui.fullEmojiIdTextView.width - ui.fullEmojiIdScrollView.width,
+                    0
+                )
+            }
+            fullEmojiIdContainerUpdate = { value ->
+                dimmerViews.forEach { it.alpha = value * 0.6F }
+                // container alpha & scale
+                val scale = 1F + 0.2F * (1F - value)
+                ui.fullEmojiIdContainerView.alpha = value
+                ui.fullEmojiIdContainerView.scaleX = scale
+                ui.fullEmojiIdContainerView.scaleY = scale
+                val width = (fullEmojiIdInitialWidth + fullEmojiIdDeltaWidth * value).toInt()
+                ui.fullEmojiIdContainerView.setLayoutWidth(width)
+            }
+        } else {
+            ui.copyEmojiIdContainerView.doOnLayout {
+                val emojiIdWidth = ui.emojiIdSummaryContainerView.width
+                val emojiIdStartMargin =
+                    IntArray(2).apply(ui.emojiIdSummaryContainerView::getLocationOnScreen)[0]
+                val emojiIdCenter = emojiIdStartMargin + emojiIdWidth / 2
+                val copyContainerWidth = ui.copyEmojiIdContainerView.width
+                val margin = emojiIdCenter - (copyContainerWidth / 2)
+                ui.copyEmojiIdContainerView.layoutParams =
+                    (ui.copyEmojiIdContainerView.layoutParams as RelativeLayout.LayoutParams).apply {
+                        removeRule(RelativeLayout.CENTER_HORIZONTAL)
+                        marginStart = margin
+                    }
+            }
+            ui.fullEmojiIdContainerView.alpha = 1F
+            ui.fullEmojiIdContainerView.setLayoutWidth(ui.emojiIdSummaryContainerView.width)
+            fullEmojiIdContainerUpdate =
+                { value -> dimmerViews.forEach { it.alpha = value * 0.6F } }
+        }
         // animate full emoji id view
         val emojiIdAnim = ValueAnimator.ofFloat(0f, 1f)
-        emojiIdAnim.addUpdateListener { valueAnimator: ValueAnimator ->
-            val value = valueAnimator.animatedValue as Float
-            // display overlay dimmers
-            dimmerViews.forEach { dimmerView ->
-                dimmerView.alpha = value * 0.6f
-            }
-            // container alpha & scale
-            ui.fullEmojiIdContainerView.alpha = value
-            ui.fullEmojiIdContainerView.scaleX = 1f + 0.2f * (1f - value)
-            ui.fullEmojiIdContainerView.scaleY = 1f + 0.2f * (1f - value)
-            val width = (fullEmojiIdInitialWidth + fullEmojiIdDeltaWidth * value).toInt()
-            ui.fullEmojiIdContainerView.setLayoutWidth(width)
-        }
         emojiIdAnim.duration = Constants.UI.shortDurationMs
+        emojiIdAnim.addUpdateListener { valueAnimator: ValueAnimator ->
+            fullEmojiIdContainerUpdate(valueAnimator.animatedValue as Float)
+        }
         // copy emoji id button anim
         val copyEmojiIdButtonAnim = ValueAnimator.ofFloat(0f, 1f)
+        copyEmojiIdButtonAnim.duration = Constants.UI.shortDurationMs
+        copyEmojiIdButtonAnim.interpolator = EasingInterpolator(Ease.BACK_OUT)
         copyEmojiIdButtonAnim.addUpdateListener { valueAnimator: ValueAnimator ->
             val value = valueAnimator.animatedValue as Float
             ui.copyEmojiIdContainerView.alpha = value
@@ -512,22 +546,18 @@ internal class TxDetailsActivity : AppCompatActivity(), ServiceConnection {
                 (dimenPx(common_copy_emoji_id_button_visible_bottom_margin) * value).toInt()
             )
         }
-        copyEmojiIdButtonAnim.duration = Constants.UI.shortDurationMs
-        copyEmojiIdButtonAnim.interpolator = EasingInterpolator(Ease.BACK_OUT)
 
         // chain anim.s and start
         val animSet = AnimatorSet()
+        animSet.addListener(onEnd = { dimmerViews.forEach { it.isClickable = true } })
         animSet.playSequentially(emojiIdAnim, copyEmojiIdButtonAnim)
         animSet.start()
-        animSet.addListener(object : AnimatorListenerAdapter() {
-            override fun onAnimationEnd(animation: Animator?) {
-                dimmerViews.forEach { dimmerView -> dimmerView.isClickable = true }
-            }
-        })
         // scroll animation
-        ui.fullEmojiIdScrollView.postDelayed({
-            ui.fullEmojiIdScrollView.smoothScrollTo(0, 0)
-        }, Constants.UI.shortDurationMs + 20)
+        if (isTariEmojiId) {
+            ui.fullEmojiIdScrollView.postDelayed(Constants.UI.shortDurationMs + 20) {
+                ui.fullEmojiIdScrollView.smoothScrollTo(0, 0)
+            }
+        }
     }
 
     private fun hideFullEmojiId(animateCopyEmojiIdButton: Boolean = true) {
@@ -548,16 +578,16 @@ internal class TxDetailsActivity : AppCompatActivity(), ServiceConnection {
         val fullEmojiIdDeltaWidth =
             ui.emojiIdSummaryContainerView.width - ui.emojiIdContainerView.width
         val emojiIdAnim = ValueAnimator.ofFloat(0f, 1f)
+        val note = TxMessagePayload.fromNote(tx.message)
+        val yat = if (tx.direction == OUTBOUND) note.destinationYat else note.sourceYat
         emojiIdAnim.addUpdateListener { valueAnimator: ValueAnimator ->
             val value = valueAnimator.animatedValue as Float
-            // hide overlay dimmers
-            dimmerViews.forEach { dimmerView ->
-                dimmerView.alpha = (1 - value) * 0.6f
-            }
-            // container alpha & scale
+            dimmerViews.forEach { it.alpha = (1 - value) * 0.6f }
             ui.fullEmojiIdContainerView.alpha = (1 - value)
-            val width = (fullEmojiIdInitialWidth + fullEmojiIdDeltaWidth * value).toInt()
-            ui.fullEmojiIdContainerView.setLayoutWidth(width)
+            if (yat == null) {
+                val width = (fullEmojiIdInitialWidth + fullEmojiIdDeltaWidth * value).toInt()
+                ui.fullEmojiIdContainerView.setLayoutWidth(width)
+            }
         }
         // chain anim.s and start
         val animSet = AnimatorSet()
@@ -566,17 +596,13 @@ internal class TxDetailsActivity : AppCompatActivity(), ServiceConnection {
         } else {
             animSet.play(emojiIdAnim)
         }
-        animSet.start()
-        animSet.addListener(object : AnimatorListenerAdapter() {
-            override fun onAnimationEnd(animation: Animator?) {
-                dimmerViews.forEach { dimmerView ->
-                    dimmerView.gone()
-                }
-                ui.fullEmojiIdContainerView.gone()
-                ui.copyEmojiIdContainerView.gone()
-                scrollingIsBlocked = false
-            }
+        animSet.addListener(onEnd = {
+            dimmerViews.forEach(View::gone)
+            ui.fullEmojiIdContainerView.gone()
+            ui.copyEmojiIdContainerView.gone()
+            scrollingIsBlocked = false
         })
+        animSet.start()
     }
 
     private fun completeCopyEmojiId(clipboardString: String) {
@@ -597,7 +623,9 @@ internal class TxDetailsActivity : AppCompatActivity(), ServiceConnection {
 
     private fun onCopyEmojiIdButtonClicked(view: View) {
         view.temporarilyDisableClick()
-        completeCopyEmojiId(tx.user.publicKey.emojiId)
+        val yat = TxMessagePayload.fromNote(tx.message)
+            .run { if (tx.direction == INBOUND) sourceYat else destinationYat }?.raw
+        completeCopyEmojiId(yat ?: tx.user.publicKey.emojiId)
     }
 
     private fun onCopyEmojiIdButtonLongClicked(view: View) {

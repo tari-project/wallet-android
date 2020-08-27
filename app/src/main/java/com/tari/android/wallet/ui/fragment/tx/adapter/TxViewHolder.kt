@@ -56,10 +56,11 @@ import com.tari.android.wallet.extension.applyFontStyle
 import com.tari.android.wallet.model.*
 import com.tari.android.wallet.model.TxStatus.MINED_UNCONFIRMED
 import com.tari.android.wallet.model.TxStatus.PENDING
+import com.tari.android.wallet.model.yat.EmojiSet
 import com.tari.android.wallet.ui.component.CustomFont
 import com.tari.android.wallet.ui.component.EmojiIdSummaryViewController
 import com.tari.android.wallet.ui.extension.*
-import com.tari.android.wallet.ui.presentation.TxNote
+import com.tari.android.wallet.ui.presentation.TxMessagePayload
 import com.tari.android.wallet.ui.presentation.gif.GIF
 import com.tari.android.wallet.ui.presentation.gif.GIFRepository
 import com.tari.android.wallet.util.WalletUtil
@@ -86,7 +87,8 @@ class TxViewHolder(
     view: View,
     private val viewModel: GIFViewModel,
     private val glide: RequestManager,
-    private val listener: (Int) -> Unit
+    private val set: EmojiSet,
+    private val listener: (Int) -> Unit,
 ) :
     RecyclerView.ViewHolder(view),
     GIFStateConsumer {
@@ -97,7 +99,7 @@ class TxViewHolder(
     }
 
     private val ui = HomeTxListItemBinding.bind(view)
-    private val emojiIdSummaryController = EmojiIdSummaryViewController(ui.participantEmojiIdView)
+    private val emojiIdSummaryController = EmojiIdSummaryViewController(ui.participantEmojiIdView, set)
     private var tx: Tx? = null
     private var dateUpdateTimer: Disposable? = null
 
@@ -149,7 +151,15 @@ class TxViewHolder(
 
     private fun displayFirstEmoji(tx: Tx) {
         // display first emoji of emoji id
-        ui.firstEmojiTextView.text = tx.user.publicKey.emojiId.extractEmojis()[0]
+        val note = TxMessagePayload.fromNote(tx.message)
+        ui.firstEmojiTextView.text = when {
+            tx.direction == Tx.Direction.INBOUND && note.sourceYat != null ->
+                note.sourceYat.raw.extractEmojis(emojiSet = set.set!!)[0]
+            tx.direction == Tx.Direction.OUTBOUND && note.destinationYat != null ->
+                note.destinationYat.raw.extractEmojis(emojiSet = set.set!!)[0]
+            else -> tx.user.publicKey.emojiId.extractEmojis()[0]
+        }
+
     }
 
     private fun displayAliasOrEmojiId(tx: Tx) {
@@ -167,14 +177,24 @@ class TxViewHolder(
                 listOf(txUser.alias),
                 CustomFont.AVENIR_LT_STD_HEAVY
             )
-            ui.participantEmojiIdView.root.gone()
+            ui.emojiIdsContainer.gone()
             ui.participantTextView2.gone()
         } else { // display emoji id
-            ui.participantEmojiIdView.root.visible()
-            emojiIdSummaryController.display(
-                txUser.publicKey.emojiId,
-                showEmojisFromEachEnd = 2
-            )
+            val note = TxMessagePayload.fromNote(tx.message)
+            val yat = if (tx.direction == Tx.Direction.OUTBOUND) note.destinationYat else note.sourceYat
+            ui.emojiIdsContainer.visible()
+            if (yat == null) {
+                ui.participantEmojiIdView.root.visible()
+                ui.emojiIdTextView.gone()
+                emojiIdSummaryController.display(
+                    txUser.publicKey.emojiId,
+                    showEmojisFromEachEnd = 2
+                )
+            } else {
+                ui.participantEmojiIdView.root.gone()
+                ui.emojiIdTextView.visible()
+                ui.emojiIdTextView.text = yat.raw
+            }
             when (tx.direction) {
                 Tx.Direction.INBOUND -> {
                     ui.participantTextView1.gone()
@@ -287,13 +307,14 @@ class TxViewHolder(
     }
 
     private fun displayMessage(tx: Tx) {
-        val note = TxNote.fromNote(tx.message)
-        if (note.message == null) {
+        val note = TxMessagePayload.fromNote(tx.message)
+        val message = note.message
+        if (message == null || message.isEmpty()) {
             ui.messageTextView.gone()
             ui.messageTextView.text = ""
         } else {
             ui.messageTextView.visible()
-            ui.messageTextView.text = note.message
+            ui.messageTextView.text = message
         }
     }
 
@@ -329,7 +350,7 @@ class TxViewHolder(
         init {
             _gifState.value = NoGIFState
             subject
-                .map(TxNote.Companion::fromNote)
+                .map(TxMessagePayload.Companion::fromNote)
                 .map { it.gifId ?: "" }
                 .switchMap {
                     if (it.isEmpty()) Observable.just(NoGIFState)

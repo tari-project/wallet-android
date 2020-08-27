@@ -1,8 +1,9 @@
+# NOTE: Turned off temporarily for the Yat integration releases.
 name: Aurora Android Release Workflow
 on:
   push:
     tags:
-      - v*
+      - xxx* # make this value "v*"" to re-enable it
 
 defaults:
   run:

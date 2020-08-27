@@ -34,8 +34,12 @@ package com.tari.android.wallet.util
 
 import android.content.Context
 import com.tari.android.wallet.application.DeepLink
+import com.tari.android.wallet.extension.toMicroTari
+import com.tari.android.wallet.model.MicroTari
+import com.tari.android.wallet.model.yat.EmojiId
 import java.io.File
 import java.math.RoundingMode
+import java.net.URLEncoder
 import java.text.DecimalFormat
 import java.util.*
 
@@ -73,13 +77,12 @@ internal object WalletUtil {
         return false
     }
 
-    fun getEmojiIdDeepLink(emojiId: String): String {
-        return "${Constants.Wallet.deepLinkURLPrefix}${Constants.Wallet.network.uriComponent}/${DeepLink.Type.EMOJI_ID.uriComponent}/$emojiId"
-    }
+    fun getEmojiIdDeepLink(emojiId: String, yat: EmojiId): String =
+        "${Constants.Wallet.deepLinkURLPrefix}${Constants.Wallet.network.uriComponent}/${DeepLink.Type.EMOJI_ID.uriComponent}/$emojiId?yat=" +
+                URLEncoder.encode(yat.raw, "utf-8")
 
-    fun getPublicKeyHexDeepLink(publicKeyHex: String): String {
-        return "${Constants.Wallet.deepLinkURLPrefix}${Constants.Wallet.network.uriComponent}/${DeepLink.Type.PUBLIC_KEY_HEX.uriComponent}/$publicKeyHex"
-    }
+    fun getPublicKeyHexDeepLink(publicKeyHex: String, yat: EmojiId): String =
+        "${Constants.Wallet.deepLinkURLPrefix}${Constants.Wallet.network.uriComponent}/${DeepLink.Type.PUBLIC_KEY_HEX.uriComponent}/$publicKeyHex?yat=${URLEncoder.encode(yat.raw, "utf-8")}"
 
     fun getLogFilesFromDirectory(dirPath: String): List<File> {
         val root = File(dirPath)

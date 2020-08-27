@@ -37,6 +37,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.tari.android.wallet.databinding.AddRecipientListItemBinding
 import com.tari.android.wallet.model.Contact
 import com.tari.android.wallet.model.User
+import com.tari.android.wallet.model.yat.EmojiSet
 import com.tari.android.wallet.ui.component.EmojiIdSummaryViewController
 import com.tari.android.wallet.ui.extension.gone
 import com.tari.android.wallet.ui.extension.visible
@@ -47,10 +48,10 @@ import java.util.*
  *
  * @author The Tari Development Team
  */
-class RecipientViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+class RecipientViewHolder(view: View, emojiSet: EmojiSet) : RecyclerView.ViewHolder(view) {
 
     private val ui = AddRecipientListItemBinding.bind(view)
-    private var emojiIdSummaryController = EmojiIdSummaryViewController(ui.emojiSummaryView)
+    private var emojiIdSummaryController = EmojiIdSummaryViewController(ui.emojiSummaryView, emojiSet)
 
     fun bind(user: User) {
         if (user is Contact) {
@@ -58,15 +59,15 @@ class RecipientViewHolder(view: View) : RecyclerView.ViewHolder(view) {
             ui.emojiSummaryView.root.gone()
             ui.profileIconImageView.gone()
             ui.initialTextView.visible()
-
             ui.initialTextView.text = user.alias.take(1).toUpperCase(Locale.getDefault())
             ui.aliasTextView.text = user.alias
         } else {
             ui.aliasTextView.gone()
+            ui.initialTextView.gone()
             ui.emojiSummaryView.root.visible()
             ui.profileIconImageView.visible()
             ui.initialTextView.gone()
-            emojiIdSummaryController.display(user.publicKey.emojiId)
+            emojiIdSummaryController.display(user.yat ?: user.publicKey.emojiId)
         }
     }
 

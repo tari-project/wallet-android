@@ -118,8 +118,7 @@ class DeepLinkTest {
         // %D0%BF%D1%80%D0%B8%D0%B2%D0%B5%D1%82 == привет
         val givenLink = "tari://mainnet/pubkey/$PUBLIC_KEY?note=%D0%BF%D1%80%D0%B8%D0%B2%D0%B5%D1%82"
         val actual = DeepLink.from(givenLink)!!
-        assertEquals("привет", actual.parameters[DeepLink.PARAMETER_NOTE])
-        assertEquals(1, actual.parameters.size)
+        assertEquals("привет", actual.note)
     }
 
     @Suppress("MapGetWithNotNullAssertionOperator")
@@ -127,8 +126,7 @@ class DeepLinkTest {
     fun `assert that default amount parameter was parsed correctly for mainnet pubkey link`() {
         val givenLink = "tari://mainnet/pubkey/$PUBLIC_KEY?amount=5.553634"
         val actual = DeepLink.from(givenLink)!!
-        assertEquals(5.553634, actual.parameters[DeepLink.PARAMETER_AMOUNT]!!.toDouble(), 0.01)
-        assertEquals(1, actual.parameters.size)
+        assertEquals(5.553634, actual.amount!!.toDouble(), 0.01)
     }
 
     @Suppress("MapGetWithNotNullAssertionOperator")
@@ -137,18 +135,17 @@ class DeepLinkTest {
         // %D0%BF%D1%80%D0%B8%D0%B2%D0%B5%D1%82 == привет
         val givenLink = "tari://mainnet/pubkey/$PUBLIC_KEY?amount=5.553634&note=%D0%BF%D1%80%D0%B8%D0%B2%D0%B5%D1%82"
         val actual = DeepLink.from(givenLink)!!
-        assertEquals(5.553634, actual.parameters[DeepLink.PARAMETER_AMOUNT]!!.toDouble(), 0.01)
-        assertEquals("привет", actual.parameters[DeepLink.PARAMETER_NOTE])
-        assertEquals(2, actual.parameters.size)
+        assertEquals(5.553634, actual.amount!!.toDouble(), 0.01)
+        assertEquals("привет", actual.note)
     }
 
-    @Suppress("MapGetWithNotNullAssertionOperator")
     @Test
     fun `assert that default query parameters separator alone is ignored`() {
         // %D0%BF%D1%80%D0%B8%D0%B2%D0%B5%D1%82 == привет
         val givenLink = "tari://mainnet/pubkey/$PUBLIC_KEY?"
         val actual = DeepLink.from(givenLink)!!
-        assertEquals(actual.parameters, emptyMap<String, String>())
+        assertNull(actual.amount)
+        assertNull(actual.note)
     }
 
     companion object {

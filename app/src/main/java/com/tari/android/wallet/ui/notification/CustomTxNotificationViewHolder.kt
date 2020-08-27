@@ -34,16 +34,17 @@ package com.tari.android.wallet.ui.notification
 
 import android.app.KeyguardManager
 import android.content.Context
+import android.icu.text.BreakIterator
 import android.view.View
 import android.widget.RemoteViews
-import android.icu.text.BreakIterator
 import com.tari.android.wallet.R
 import com.tari.android.wallet.model.Contact
 import com.tari.android.wallet.model.MicroTari
 import com.tari.android.wallet.model.Tx
 import com.tari.android.wallet.model.User
+import com.tari.android.wallet.model.yat.EmojiId
+import com.tari.android.wallet.ui.presentation.TxMessagePayload
 import com.tari.android.wallet.util.WalletUtil
-import kotlin.collections.ArrayList
 
 /**
  * Displays custom transaction notification.
@@ -54,13 +55,14 @@ class CustomTxNotificationViewHolder(val context: Context, tx: Tx) :
     RemoteViews(context.packageName, R.layout.tx_notification) {
 
     init {
+        val payload = TxMessagePayload.fromNote(tx.message)
         val user = tx.user
         if (user is Contact) {
             displayTxContactAlias(user)
         } else {
-            displayTxUserEmojiId(user)
+            displayTxUserEmojiId(tx, payload)
         }
-        displayTxMessage(tx.message)
+        displayTxMessage(payload)
 
         // amount - display just "NEW" if the screen is locked
         val keyguardManager = context.getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager?
@@ -83,7 +85,7 @@ class CustomTxNotificationViewHolder(val context: Context, tx: Tx) :
         )
     }
 
-    private fun displayTxUserEmojiId(user: User) {
+    private fun displayTxUserEmojiId(tx: Tx, payload: TxMessagePayload) {
         setTextViewText(
             R.id.notification_tx_received_txt_contact_alias,
             ""
@@ -92,6 +94,19 @@ class CustomTxNotificationViewHolder(val context: Context, tx: Tx) :
             R.id.notification_tx_received_txt_contact_alias,
             View.INVISIBLE
         )
+        val yat = payload.otherPartyYat(tx.direction)
+        if (yat == null) {
+            setViewVisibility(R.id.yat_text_view, View.GONE)
+            setViewVisibility(R.id.emoji_id_summary_container_view, View.VISIBLE)
+            displayTariEmojiId(tx.user)
+        } else {
+            setViewVisibility(R.id.yat_text_view, View.VISIBLE)
+            setViewVisibility(R.id.emoji_id_summary_container_view, View.GONE)
+            displayYat(yat)
+        }
+    }
+
+    private fun displayTariEmojiId(user: User) {
         val emojis = ArrayList<String>()
         val it: BreakIterator = BreakIterator.getCharacterInstance()
         it.setText(user.publicKey.emojiId)
@@ -130,10 +145,12 @@ class CustomTxNotificationViewHolder(val context: Context, tx: Tx) :
         )
     }
 
-    private fun displayTxMessage(message: String) {
+    private fun displayYat(yat: EmojiId) = setTextViewText(R.id.yat_text_view, yat.raw)
+
+    private fun displayTxMessage(payload: TxMessagePayload) {
         setTextViewText(
             R.id.notification_tx_received_txt_message,
-            message
+            payload.message ?: payload.gifUrl ?: ""
         )
     }
 

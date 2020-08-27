@@ -48,7 +48,7 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.TextView
 import androidx.core.animation.addListener
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.*
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.daasuu.ei.Ease
@@ -65,11 +65,17 @@ import com.tari.android.wallet.application.DeepLink.Type.PUBLIC_KEY_HEX
 import com.tari.android.wallet.databinding.FragmentAddRecipientBinding
 import com.tari.android.wallet.extension.repopulate
 import com.tari.android.wallet.infrastructure.Tracker
+import com.tari.android.wallet.infrastructure.yat.YatService
+import com.tari.android.wallet.infrastructure.yat.YatUserStorage
 import com.tari.android.wallet.model.*
+import com.tari.android.wallet.model.yat.EmojiId
+import com.tari.android.wallet.model.yat.EmojiSet
 import com.tari.android.wallet.service.TariWalletService
 import com.tari.android.wallet.service.WalletService
 import com.tari.android.wallet.ui.activity.qr.EXTRA_QR_DATA
 import com.tari.android.wallet.ui.activity.qr.QRScannerActivity
+import com.tari.android.wallet.ui.component.EmojiIdSummaryViewController
+import com.tari.android.wallet.ui.dialog.ErrorDialog
 import com.tari.android.wallet.ui.extension.*
 import com.tari.android.wallet.ui.fragment.send.adapter.RecipientListAdapter
 import com.tari.android.wallet.util.*
@@ -79,16 +85,27 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import me.everything.android.ui.overscroll.OverScrollDecoratorHelper
-import java.lang.ref.WeakReference
 import javax.inject.Inject
 import kotlin.math.min
+
+/**
+ * => text input'un durumuna göre aramanı yap & display et
+ *
+ * search: contact alias, emoji id, yat :: birinden biri match ediyorsa torbaya ekle
+ * display: alias varsa alias, yoksa yat, yoksa emoji id
+ *
+ * click edilince: tx seçiliyse oradan yürü, contact seçiliyse yat ara ve attach et
+ * (user'ı geçiyorsun, yat'ı da ayrıca ekle (bunları tek bir nesneye indirebilirsin - Tx?))
+ *
+ * keep data in view model
+ * live data :: text input, search result
+ */
 
 /**
  * Fragment that manages the adding of a recipient to an outgoing transaction.
  *
  * @author The Tari Development Team
  */
-
 class AddRecipientFragment : Fragment(),
     RecyclerView.OnItemTouchListener,
     TextWatcher,
@@ -103,41 +120,37 @@ class AddRecipientFragment : Fragment(),
     @Inject
     lateinit var clipboardManager: ClipboardManager
 
-    /**
-     * List, adapter & layout manager.
-     */
+    @Inject
+    lateinit var yatService: YatService
+
+    @Inject
+    lateinit var yatUserStorage: YatUserStorage
+
+    @Inject
+    lateinit var yatEmojiSet: EmojiSet
+
     private lateinit var recyclerViewAdapter: RecipientListAdapter
     private lateinit var recyclerViewLayoutManager: RecyclerView.LayoutManager
-    private var scrollListener = ScrollListener(this)
+    private var scrollListener = ScrollListener(this::onRecyclerViewScrolled)
 
     private var recentTxUsersLimit = 3
     private val allTxs = ArrayList<Tx>()
     private val contacts = ArrayList<Contact>()
 
-    private lateinit var listenerWR: WeakReference<Listener>
-
-    /**
-     * Will be non-null if there's a valid emoji id in the clipboard
-     */
+    // Will be non-null if there's a valid emoji id in the clipboard
     private var emojiIdPublicKey: PublicKey? = null
 
-    /**
-     * Fields related to emoji id input masking.
-     */
+    // Fields related to emoji id input masking.
     private var isDeletingSeparatorAtIndex: Int? = null
     private var textWatcherIsRunning = false
-    private var inputNormalLetterSpacing = 0.04f
-    private var inputEmojiIdLetterSpacing = 0.27f
 
-    private val textChangedProcessDelayMs = 100L
     private val textChangedProcessHandler = Handler(Looper.getMainLooper())
-    private var textChangedProcessRunnable = Runnable {
-        processTextChanged()
-    }
+    private var textChangedProcessRunnable = Runnable { processTextChanged() }
 
     private var hidePasteEmojiIdViewsOnTextChanged = false
 
     private lateinit var walletService: TariWalletService
+    private lateinit var sendToSummaryController: EmojiIdSummaryViewController
     private lateinit var ui: FragmentAddRecipientBinding
 
     /**
@@ -150,18 +163,13 @@ class AddRecipientFragment : Fragment(),
             ui.bottomDimmerView
         )
 
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-        listenerWR = WeakReference(context as Listener)
-    }
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View = FragmentAddRecipientBinding.inflate(
-    inflater, container,
-    false
+        inflater, container,
+        false
     ).also {
         ui = it
     }.root
@@ -195,7 +203,7 @@ class AddRecipientFragment : Fragment(),
             displayInitialList()
             ui.searchEditText.setRawInputType(InputType.TYPE_CLASS_TEXT)
             ui.searchEditText.addTextChangedListener(this@AddRecipientFragment)
-            checkClipboardForValidEmojiId()
+            checkClipboardForValidEmojiIdOrYat()
         }
     }
 
@@ -206,13 +214,21 @@ class AddRecipientFragment : Fragment(),
 
     override fun onDestroyView() {
         super.onDestroyView()
+        viewModelStore.clear()
         requireActivity().unbindService(this)
     }
 
     private fun setupUI() {
+        sendToSummaryController =
+            EmojiIdSummaryViewController(ui.sendToEmojiSummaryView, yatEmojiSet)
         recyclerViewLayoutManager = LinearLayoutManager(requireActivity())
         ui.contactsListRecyclerView.layoutManager = recyclerViewLayoutManager
-        recyclerViewAdapter = RecipientListAdapter { user ->
+        recyclerViewAdapter = RecipientListAdapter(yatEmojiSet) { user ->
+            if (user is Contact) { // no yat info stored for contacts, so check if there's a yat
+                user.yat = allTxs.firstOrNull {
+                    it.user.publicKey == user.publicKey && it.user.yat != null
+                }?.user?.yat
+            }
             (activity as? Listener)?.continueToAmount(this, user)
         }
         ui.contactsListRecyclerView.adapter = recyclerViewAdapter
@@ -228,11 +244,12 @@ class AddRecipientFragment : Fragment(),
         OverScrollDecoratorHelper.setUpOverScroll(ui.searchEditTextScrollView)
         ui.searchEditText.inputType = InputType.TYPE_NULL
         ui.backButton.setOnClickListener { onBackButtonClicked(it) }
-        ui.qrCodeButton.setOnClickListener { onQRButtonClick(it) }
+        ui.qrCodeButton.setOnClickListener { onQRButtonClick() }
         ui.continueButton.setOnClickListener { onContinueButtonClicked(it) }
         dimmerViews.forEach { it.setOnClickListener { onEmojiIdDimmerClicked() } }
         ui.pasteEmojiIdButton.setOnClickListener { onPasteEmojiIdButtonClicked() }
         ui.emojiIdTextView.setOnClickListener { onPasteEmojiIdButtonClicked() }
+        ui.yatEmojiIdTextView.setOnClickListener { onPasteEmojiIdButtonClicked() }
     }
 
     fun reset() {
@@ -253,17 +270,39 @@ class AddRecipientFragment : Fragment(),
     /**
      * Checks clipboard data for a valid deep link or an emoji id.
      */
-    private fun checkClipboardForValidEmojiId() {
+    private fun checkClipboardForValidEmojiIdOrYat() {
         val clipboardString = clipboardManager.primaryClip?.getItemAt(0)?.text?.toString()
             ?: return
 
         val deepLink = DeepLink.from(clipboardString)
-        if (deepLink != null) { // there is a deep link in the clipboard
+        val yat: EmojiId? =
+            deepLink?.yat(yatEmojiSet) ?: EmojiId.of(clipboardString.trim(), yatEmojiSet)
+        if (yat != null) {
+            if (yatUserStorage.get()!!.emojiIds.all { it != yat }) {
+                ui.addRecipientTxtPasteEmojiId.text = string(paste_yat)
+                ui.yatEmojiIdTextView.visible()
+                ui.emojiIdScrollView.gone()
+                ui.yatEmojiIdTextView.text = yat.raw
+                ui.rootView.postDelayed(100L) {
+                    hidePasteEmojiIdViewsOnTextChanged = true
+                    showPasteEmojiIdViews()
+                    focusEditTextAndShowKeyboard()
+                }
+            }
+        } else {
+            parseOldLinkType(deepLink, clipboardString)
+        }
+    }
+
+    private fun parseOldLinkType(deepLink: DeepLink?, clipboardString: String) {
+        // there is a deep link in the clipboard
+        if (deepLink != null) {
             emojiIdPublicKey = when (deepLink.type) {
                 EMOJI_ID -> walletService.getPublicKeyFromEmojiId(deepLink.identifier)
                 PUBLIC_KEY_HEX -> walletService.getPublicKeyFromHexString(deepLink.identifier)
             }
-        } else { // try to extract a valid emoji id
+        } else {
+            // try to extract a valid emoji id
             val emojis = clipboardString.trim().extractEmojis()
             // search in windows of length = emoji id length
             var currentIndex = emojis.size - emojiIdLength
@@ -274,24 +313,28 @@ class AddRecipientFragment : Fragment(),
                         .joinToString(separator = "")
                 // there is a chunked emoji id in the clipboard
                 emojiIdPublicKey = walletService.getPublicKeyFromEmojiId(emojiWindow)
-                if (emojiIdPublicKey != null) {
-                    break
-                }
+                if (emojiIdPublicKey != null) break
                 --currentIndex
             }
         }
-        if (emojiIdPublicKey == null) {
-            checkClipboardForPublicKeyHex(clipboardString)
-        }
+        if (emojiIdPublicKey == null) checkClipboardForPublicKeyHex(clipboardString)
         emojiIdPublicKey?.let {
+            ui.addRecipientTxtPasteEmojiId.text = string(paste_emoji_id)
+            ui.yatEmojiIdTextView.gone()
+            ui.emojiIdScrollView.visible()
             if (it.emojiId != sharedPrefsWrapper.emojiId!!) {
-                ui.rootView.postDelayed({
+                ui.rootView.postDelayed(100L) {
                     hidePasteEmojiIdViewsOnTextChanged = true
-                    showPasteEmojiIdViews(it)
+                    ui.emojiIdTextView.text = EmojiUtil.getFullEmojiIdSpannable(
+                        it.emojiId,
+                        string(emoji_id_chunk_separator),
+                        color(black),
+                        color(light_gray)
+                    )
+                    showPasteEmojiIdViews()
                     focusEditTextAndShowKeyboard()
-                }, 100L)
+                }
             }
-
         }
     }
 
@@ -314,66 +357,54 @@ class AddRecipientFragment : Fragment(),
     /**
      * Displays paste-emoji-id-related views.
      */
-    private fun showPasteEmojiIdViews(publicKey: PublicKey) {
-        ui.emojiIdTextView.text = EmojiUtil.getFullEmojiIdSpannable(
-            publicKey.emojiId,
-            string(emoji_id_chunk_separator),
-            color(black),
-            color(light_gray)
-        )
+    private fun showPasteEmojiIdViews() {
+        ui.emojiIdContainerView.visible()
+        ui.pasteEmojiIdContainerView.setTopMargin(0)
         ui.emojiIdContainerView.setBottomMargin(
             -dimenPx(add_recipient_clipboard_emoji_id_container_height)
         )
-        ui.emojiIdContainerView.visible()
         dimmerViews.forEach { dimmerView ->
-            dimmerView.alpha = 0f
             dimmerView.visible()
+            dimmerView.alpha = 0f
         }
 
-        // animate
-        val emojiIdAppearAnim = ValueAnimator.ofFloat(0f, 1f)
-        emojiIdAppearAnim.addUpdateListener { valueAnimator: ValueAnimator ->
-            val animValue = valueAnimator.animatedValue as Float
-            dimmerViews.forEach { dimmerView ->
-                dimmerView.alpha = animValue * 0.6f
+        val emojiIdAppearAnim = animateValues(
+            values = floatArrayOf(0F, 1F),
+            interpolator = EasingInterpolator(Ease.EASE_IN_OUT_EXPO),
+            duration = Constants.UI.mediumDurationMs,
+            onUpdate = { valueAnimator ->
+                val animValue = valueAnimator.animatedValue as Float
+                dimmerViews.forEach { it.alpha = animValue * 0.6f }
+                ui.emojiIdContainerView.setBottomMargin(
+                    (-dimenPx(add_recipient_clipboard_emoji_id_container_height) * (1F - animValue)).toInt()
+                )
             }
-            ui.emojiIdContainerView.setBottomMargin(
-                (-dimenPx(add_recipient_clipboard_emoji_id_container_height) * (1f - animValue)).toInt()
-            )
-        }
-        emojiIdAppearAnim.interpolator = EasingInterpolator(Ease.EASE_IN_OUT_EXPO)
-        emojiIdAppearAnim.duration = Constants.UI.mediumDurationMs
+        )
+        val pasteButtonAppearAnim = animateValues(
+            values = floatArrayOf(0F, 1F),
+            interpolator = EasingInterpolator(Ease.BACK_OUT),
+            duration = Constants.UI.shortDurationMs,
+            onStart = { ui.pasteEmojiIdContainerView.visible() },
+            onUpdate = { valueAnimator ->
+                val value = valueAnimator.animatedValue as Float
+                ui.pasteEmojiIdContainerView.setTopMargin(
+                    (dimenPx(add_recipient_paste_emoji_id_button_visible_top_margin) * value).toInt()
+                )
+                ui.pasteEmojiIdContainerView.alpha = value
+            }
+        )
 
-        // animate and show paste emoji id button
-        ui.pasteEmojiIdContainerView.setTopMargin(0)
-        val pasteButtonAppearAnim = ValueAnimator.ofFloat(0f, 1f)
-        pasteButtonAppearAnim.addUpdateListener { valueAnimator: ValueAnimator ->
-            val value = valueAnimator.animatedValue as Float
-            ui.pasteEmojiIdContainerView.setTopMargin(
-                (dimenPx(add_recipient_paste_emoji_id_button_visible_top_margin) * value).toInt()
-            )
-            ui.pasteEmojiIdContainerView.alpha = value
-        }
-        pasteButtonAppearAnim.addListener(onStart = { ui.pasteEmojiIdContainerView.visible() })
-        pasteButtonAppearAnim.interpolator = EasingInterpolator(Ease.BACK_OUT)
-        pasteButtonAppearAnim.duration = Constants.UI.shortDurationMs
-
-        // chain anim.s and start
-        val animSet = AnimatorSet()
+        val animSet = animatorSetOf(startDelay = Constants.UI.xShortDurationMs)
         animSet.playSequentially(emojiIdAppearAnim, pasteButtonAppearAnim)
-        animSet.startDelay = Constants.UI.xShortDurationMs
         animSet.start()
     }
 
-    /**
-     * Hides paste-emoji-id-related views.
-     */
-    private fun hidePasteEmojiIdViews(animate: Boolean, onEnd: (() -> (Unit))? = null) {
+    private fun hidePasteEmojiIdViews(animate: Boolean, onEnd: () -> Unit = {}) {
         if (!animate) {
             ui.pasteEmojiIdContainerView.gone()
             ui.emojiIdContainerView.gone()
             dimmerViews.forEach(View::gone)
-            onEnd?.let { it() }
+            onEnd()
             return
         }
         // animate and hide paste emoji id button
@@ -407,15 +438,11 @@ class AddRecipientFragment : Fragment(),
         // chain anim.s and start
         val animSet = AnimatorSet()
         animSet.playSequentially(pasteButtonDisappearAnim, emojiIdDisappearAnim)
-        if (onEnd != null) {
-            animSet.addListener(onEnd = { onEnd() })
-        }
+        animSet.addListener(onEnd = { onEnd() })
         animSet.start()
     }
 
-    /**
-     * Called only once in onCreate.
-     */
+    // Called only once in onCreate.
     private fun fetchAllData(walletService: TariWalletService) {
         val error = WalletError()
         // get contacts
@@ -433,27 +460,24 @@ class AddRecipientFragment : Fragment(),
         allTxs.sortByDescending { it.timestamp }
     }
 
-    /**
-     * Displays non-search-result list.
-     */
+    // Displays non-search-result list.
     private fun displayInitialList() {
         ui.progressBar.gone()
         ui.contactsListRecyclerView.visible()
         recyclerViewAdapter.displayList(
-            allTxs.sortedByDescending {
-                it.timestamp
-            }.distinctBy { it.user }.take(recentTxUsersLimit).map { it.user },
+            allTxs.distinctBy { it.user }.take(recentTxUsersLimit).map { it.user },
             contacts
         )
         focusEditTextAndShowKeyboard()
     }
 
     private fun focusEditTextAndShowKeyboard() {
-        val mActivity = activity ?: return
+        val activity = activity ?: return
         ui.searchEditText.requestFocus()
-        val imm = mActivity.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        val imm = activity.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY)
     }
+
 
     private fun onSearchTextChanged(query: String) {
         if (query.isEmpty()) {
@@ -461,10 +485,27 @@ class AddRecipientFragment : Fragment(),
         } else {
             val users = searchRecipients(query)
             if (users.isEmpty()) {
-                ui.progressBar.gone()
-                ui.contactsListRecyclerView.visible()
-                recyclerViewAdapter.displaySearchResult(emptyList())
+                val yat = EmojiId.of(query, yatEmojiSet)
+                if (yat != null) {
+                    ui.noWalletForYatTextView.gone()
+                    ui.progressBar.gone()
+                    ui.contactsListRecyclerView.invisible()
+                    ui.sendToYatCtaContainer.visible()
+                    sendToSummaryController.display(yat.raw)
+                    ui.sendToYatCtaContainer.setOnClickListener {
+                        ui.searchEditText.isEnabled = false
+                        lifecycleScope.launch(Dispatchers.IO) { lookupYat(yat) }
+                    }
+                } else {
+                    ui.noWalletForYatTextView.gone()
+                    ui.sendToYatCtaContainer.gone()
+                    ui.progressBar.gone()
+                    ui.contactsListRecyclerView.visible()
+                    recyclerViewAdapter.displaySearchResult(emptyList())
+                }
             } else {
+                ui.noWalletForYatTextView.gone()
+                ui.sendToYatCtaContainer.gone()
                 ui.progressBar.gone()
                 ui.contactsListRecyclerView.visible()
                 recyclerViewAdapter.displaySearchResult(users)
@@ -472,22 +513,12 @@ class AddRecipientFragment : Fragment(),
         }
     }
 
-    private fun onBackButtonClicked(view: View) {
-        view.temporarilyDisableClick()
-        activity?.let {
-            it.hideKeyboard()
-            ui.rootView.postDelayed(200L) { it.onBackPressed() }
-        }
-    }
-
-    /**
-     * Makes a search by the input.
-     */
     private fun searchRecipients(query: String): List<User> {
         // search transaction users
         val filteredTxUsers = allTxs.filter {
             it.user.publicKey.emojiId.contains(query)
                     || (it.user as? Contact)?.alias?.contains(query, ignoreCase = true) ?: false
+                    || it.user.yat?.contains(query) ?: false
         }.map { it.user }.distinct()
 
         // search contacts (we don't have non-transaction contacts at the moment, but we probably
@@ -497,9 +528,74 @@ class AddRecipientFragment : Fragment(),
                     || it.alias.contains(query, ignoreCase = true)
         }
         return (filteredTxUsers + filteredContacts).distinct().sortedWith { o1, o2 ->
-            val value1 = ((o1 as? Contact)?.alias) ?: o1.publicKey.emojiId
-            val value2 = ((o2 as? Contact)?.alias) ?: o2.publicKey.emojiId
+            val value1 = ((o1 as? Contact)?.alias ?: o1.yat) ?: o1.publicKey.emojiId
+            val value2 = ((o2 as? Contact)?.alias ?: o2.yat) ?: o2.publicKey.emojiId
             value1.compareTo(value2)
+        }
+    }
+
+    private suspend fun lookupYat(yat: EmojiId) {
+        withContext(Dispatchers.Main) {
+            ui.sendToYatCtaContainer.isClickable = false
+            ui.noWalletForYatTextView.gone()
+            ui.contactsListRecyclerView.invisible()
+            scrollListener.reset()
+            ui.scrollDepthGradientView.alpha = 0f
+            ui.progressBar.visible()
+        }
+
+        try {
+            val user = yatService.getUser(yat) ?: throw UserNotFoundException(yat.raw)
+            withContext(Dispatchers.Main) { onUserFoundByYat(user) }
+        } catch (exception: UserNotFoundException) {
+            withContext(Dispatchers.Main) { onWalletDoesNotExistForYat(yat) }
+        } catch (exception: Exception) {
+            withContext(Dispatchers.Main) { onYatLookupError() }
+        }
+    }
+
+    private fun onWalletDoesNotExistForYat(id: EmojiId) {
+        ui.sendToYatCtaContainer.isClickable = false
+        ui.searchEditText.isEnabled = true
+        ui.sendToYatCtaContainer.gone()
+        ui.progressBar.gone()
+        ui.contactsListRecyclerView.invisible()
+        ui.noWalletForYatTextView.visible()
+        ui.noWalletForYatTextView.text = string(add_recipient_error_no_wallet_for_yat, id.raw)
+    }
+
+    private fun onUserFoundByYat(user: User) {
+        ui.sendToYatCtaContainer.isClickable = false
+        ui.searchEditText.isEnabled = true
+        ui.noWalletForYatTextView.gone()
+        ui.sendToYatCtaContainer.gone()
+        ui.progressBar.gone()
+        ui.contactsListRecyclerView.invisible()
+        (requireActivity() as Listener).continueToAmount(this, user)
+    }
+
+    private fun onYatLookupError() {
+        ErrorDialog(
+            requireContext(),
+            string(add_recipient_search_error_title),
+            string(add_recipient_search_error_description)
+        ).show()
+        ui.sendToYatCtaContainer.isClickable = true
+        ui.searchEditText.isEnabled = true
+        ui.progressBar.gone()
+        ui.noWalletForYatTextView.gone()
+        ui.sendToYatCtaContainer.gone()
+        ui.contactsListRecyclerView.visible()
+        scrollListener.reset()
+        ui.scrollDepthGradientView.alpha = 0f
+    }
+
+    private fun onBackButtonClicked(view: View) {
+        ui.rootView.postDelayed(200L) { requireActivity().onBackPressed() }
+        view.temporarilyDisableClick()
+        activity?.let {
+            it.hideKeyboard()
+            ui.rootView.postDelayed(200L) { it.onBackPressed() }
         }
     }
 
@@ -512,8 +608,7 @@ class AddRecipientFragment : Fragment(),
     /**
      * Open QR code scanner on button click.
      */
-    private fun onQRButtonClick(view: View) {
-        view.temporarilyDisableClick()
+    private fun onQRButtonClick() {
         requireActivity().hideKeyboard()
         hidePasteEmojiIdViews(animate = true) {
             ui.rootView.postDelayed(Constants.UI.keyboardHideWaitMs) { startQRCodeActivity() }
@@ -527,33 +622,38 @@ class AddRecipientFragment : Fragment(),
         ) {
             val qrData = data.getStringExtra(EXTRA_QR_DATA) ?: return
             val deepLink = DeepLink.from(qrData) ?: return
-            when (deepLink.type) {
-                EMOJI_ID -> {
-                    ui.searchEditText.setText(
-                        deepLink.identifier,
-                        TextView.BufferType.EDITABLE
-                    )
-                    ui.searchEditText.postDelayed({
-                        ui.searchEditTextScrollView.smoothScrollTo(0, 0)
-                    }, Constants.UI.mediumDurationMs)
-                }
-                PUBLIC_KEY_HEX -> {
-                    lifecycleScope.launch(Dispatchers.IO) {
-                        val publicKeyHex = deepLink.identifier
-                        val publicKey = walletService.getPublicKeyFromHexString(publicKeyHex)
-                        if (publicKey != null) {
-                            ui.rootView.post {
-                                ui.searchEditText.setText(
-                                    publicKey.emojiId,
-                                    TextView.BufferType.EDITABLE
-                                )
+            val yat = deepLink.yat(yatEmojiSet)
+            if (yat == null) {
+                when (deepLink.type) {
+                    EMOJI_ID -> {
+                        ui.searchEditText.setText(
+                            deepLink.identifier,
+                            TextView.BufferType.EDITABLE
+                        )
+                        ui.searchEditText.postDelayed(Constants.UI.mediumDurationMs) {
+                            ui.searchEditTextScrollView.smoothScrollTo(0, 0)
+                        }
+                    }
+                    PUBLIC_KEY_HEX -> {
+                        lifecycleScope.launch(Dispatchers.IO) {
+                            val publicKeyHex = deepLink.identifier
+                            val publicKey = walletService.getPublicKeyFromHexString(publicKeyHex)
+                            if (publicKey != null) {
+                                withContext(Dispatchers.Main) {
+                                    ui.searchEditText.setText(
+                                        publicKey.emojiId,
+                                        TextView.BufferType.EDITABLE
+                                    )
+                                }
+                                ui.searchEditText.postDelayed(Constants.UI.mediumDurationMs) {
+                                    ui.searchEditTextScrollView.smoothScrollTo(0, 0)
+                                }
                             }
-                            ui.searchEditText.postDelayed({
-                                ui.searchEditTextScrollView.smoothScrollTo(0, 0)
-                            }, Constants.UI.mediumDurationMs)
                         }
                     }
                 }
+            } else {
+                ui.searchEditText.setText(yat.raw)
             }
         }
     }
@@ -568,7 +668,7 @@ class AddRecipientFragment : Fragment(),
                 else -> null
             }
             withContext(Dispatchers.Main) {
-                listenerWR.get()?.continueToAmount(
+                (activity as? Listener)?.continueToAmount(
                     this@AddRecipientFragment,
                     recipientContact ?: User(emojiIdPublicKey!!)
                 )
@@ -576,9 +676,6 @@ class AddRecipientFragment : Fragment(),
         }
     }
 
-    /**
-     * Dimmer clicked - hide paste-related views.
-     */
     private fun onEmojiIdDimmerClicked() {
         hidePasteEmojiIdViews(animate = true) {
             requireActivity().hideKeyboard()
@@ -586,20 +683,23 @@ class AddRecipientFragment : Fragment(),
         }
     }
 
-    /**
-     * Paste banner clicked.
-     */
     private fun onPasteEmojiIdButtonClicked() {
         hidePasteEmojiIdViewsOnTextChanged = false
         hidePasteEmojiIdViews(animate = true) {
             ui.searchEditText.scaleX = 0f
             ui.searchEditText.scaleY = 0f
-            ui.searchEditText.setText(
-                emojiIdPublicKey!!.emojiId,
-                TextView.BufferType.EDITABLE
-            )
+            val pubkey = emojiIdPublicKey
+            if (pubkey == null) {
+                ui.searchEditText.setText(
+                    ui.yatEmojiIdTextView.text.toString(),
+                    TextView.BufferType.EDITABLE
+                )
+            } else {
+                ui.searchEditText.setText(pubkey.emojiId, TextView.BufferType.EDITABLE)
+                emojiIdPublicKey = null
+            }
             ui.searchEditText.setSelection(ui.searchEditText.text?.length ?: 0)
-            ui.rootView.postDelayed({ animateEmojiIdPaste() }, Constants.UI.xShortDurationMs)
+            ui.rootView.postDelayed(Constants.UI.xShortDurationMs) { animateEmojiIdPaste() }
         }
     }
 
@@ -615,9 +715,9 @@ class AddRecipientFragment : Fragment(),
         textAnim.duration = Constants.UI.shortDurationMs
         textAnim.interpolator = EasingInterpolator(Ease.BACK_OUT)
         textAnim.start()
-        ui.rootView.postDelayed({
+        ui.rootView.postDelayed(Constants.UI.shortDurationMs) {
             ui.searchEditTextScrollView.smoothScrollTo(0, 0)
-        }, Constants.UI.shortDurationMs)
+        }
     }
 
     // region recycler view item touch listener
@@ -645,11 +745,7 @@ class AddRecipientFragment : Fragment(),
 
     override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {
         isDeletingSeparatorAtIndex =
-            if (count == 1 && after == 0 && s[start].toString() == string(emoji_id_chunk_separator)) {
-                start
-            } else {
-                null
-            }
+            if (count == 1 && after == 0 && s[start].toString() == string(emoji_id_chunk_separator)) start else null
     }
 
     override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
@@ -661,97 +757,87 @@ class AddRecipientFragment : Fragment(),
             hidePasteEmojiIdViews(animate = true)
             hidePasteEmojiIdViewsOnTextChanged = false
         }
-        if (textWatcherIsRunning) {
-            return
-        }
-        textChangedProcessHandler.removeCallbacks(
-            textChangedProcessRunnable
-        )
-        textChangedProcessHandler.postDelayed(
-            textChangedProcessRunnable,
-            textChangedProcessDelayMs
-        )
+        if (textWatcherIsRunning) return
+        textChangedProcessHandler.removeCallbacks(textChangedProcessRunnable)
+        textChangedProcessHandler.postDelayed(textChangedProcessRunnable, 100L)
     }
 
     private fun processTextChanged() {
         textWatcherIsRunning = true
         val editable = ui.searchEditText.editableText
-        var text = editable.toString()
+        val text = editable.toString()
 
         ui.continueButton.gone()
         ui.invalidEmojiIdTextView.gone()
 
-        if (editable.toString().firstNCharactersAreEmojis(emojiFormatterChunkSize)) {
-            // if deleting a separator, first get the index of the character before that separator
-            // and delete that character
-            if (isDeletingSeparatorAtIndex != null) {
-                val index =
-                    EmojiUtil.getStartIndexOfItemEndingAtIndex(text, isDeletingSeparatorAtIndex!!)
-                editable.delete(index, isDeletingSeparatorAtIndex!!)
-                isDeletingSeparatorAtIndex = null
-                text = editable.toString()
-            }
+        val separator = string(emoji_id_chunk_separator)
+		val textWithoutSeparators = text.replace(separator, "")
+		val yatEmojiId = EmojiId.of(textWithoutSeparators, yatEmojiSet)?.raw
+        if (yatEmojiId != null ||
+            textWithoutSeparators.firstNCharactersAreEmojis(emojiFormatterChunkSize)
+        ) {
+            ui.searchEditText.textAlignment = View.TEXT_ALIGNMENT_CENTER
+            ui.searchEditText.letterSpacing = if (yatEmojiId == null) 0.27F else 0.04F
 
-            // delete all separators first
-            val separator = string(emoji_id_chunk_separator)
-            for ((offset, index) in EmojiUtil.getExistingChunkSeparatorIndices(
-                text,
-                separator
-            ).withIndex()) {
-                val target = index - (offset * separator.length)
+            val deleteIndices = EmojiUtil.getExistingChunkSeparatorIndices(text, separator)
+            for ((offset, index) in deleteIndices.withIndex()) {
+                val target = index - offset * separator.length
                 editable.delete(target, target + separator.length)
             }
-            val textWithoutSeparators = editable.toString()
-            ui.searchEditText.textAlignment = View.TEXT_ALIGNMENT_CENTER
-            ui.searchEditText.letterSpacing = inputEmojiIdLetterSpacing
-            // add separators
-            for ((offset, index) in EmojiUtil.getNewChunkSeparatorIndices(textWithoutSeparators)
-                .withIndex()) {
-                val chunkSeparatorSpannable = EmojiUtil.getChunkSeparatorSpannable(
-                    separator,
-                    color(light_gray)
-                )
-                val target = index + (offset * separator.length)
-                editable.insert(target, chunkSeparatorSpannable)
+            if (yatEmojiId == null) {
+                val insertIndices = EmojiUtil.getNewChunkSeparatorIndices(textWithoutSeparators)
+                for ((offset, index) in insertIndices.withIndex()) {
+                    val chunkSeparatorSpannable =
+                        EmojiUtil.getChunkSeparatorSpannable(separator, color(light_gray))
+                    editable.insert(
+                        index + (offset * separator.length),
+                        chunkSeparatorSpannable
+                    )
+                }
             }
             // check if valid emoji - don't search if not
-            val numberofEmojis = textWithoutSeparators.numberOfEmojis()
-            if (textWithoutSeparators.containsNonEmoji() || numberofEmojis > emojiIdLength) {
+            val numberOfEmojis = textWithoutSeparators.numberOfEmojis()
+            if (yatEmojiId == null
+                && (textWithoutSeparators.containsNonEmoji() || numberOfEmojis > emojiIdLength)) {
                 emojiIdPublicKey = null
+                // invalid emoji-id : clear list and display error
                 ui.invalidEmojiIdTextView.text = string(add_recipient_invalid_emoji_id)
                 ui.invalidEmojiIdTextView.visible()
                 ui.qrCodeButton.visible()
                 clearSearchResult()
             } else {
-                if (numberofEmojis == emojiIdLength) {
-                    if (textWithoutSeparators == sharedPrefsWrapper.emojiId!!) {
+                if (numberOfEmojis == emojiIdLength || yatEmojiId != null) {
+                    if (textWithoutSeparators == sharedPrefsWrapper.emojiId!! ||
+                        (yatEmojiId != null && yatUserStorage.get()!!.emojiIds.map(EmojiId::raw)
+                            .any { it == yatEmojiId })
+                    ) {
                         emojiIdPublicKey = null
                         ui.invalidEmojiIdTextView.text = string(add_recipient_own_emoji_id)
                         ui.invalidEmojiIdTextView.visible()
                         ui.qrCodeButton.visible()
                         clearSearchResult()
-                    } else {
+                    } else if (yatEmojiId == null) {
                         ui.qrCodeButton.gone()
                         // valid emoji id length - clear list, no search, display continue button
-                        lifecycleScope.launch(Dispatchers.IO) {
+                        lifecycleScope.launch(Dispatchers.Main) {
                             emojiIdPublicKey =
                                 walletService.getPublicKeyFromEmojiId(textWithoutSeparators)
-                            withContext(Dispatchers.Main) {
-                                if (emojiIdPublicKey == null) {
-                                    ui.invalidEmojiIdTextView.text =
-                                        string(add_recipient_invalid_emoji_id)
-                                    ui.invalidEmojiIdTextView.visible()
-                                    clearSearchResult()
-                                } else {
-                                    ui.invalidEmojiIdTextView.gone()
-                                    ui.continueButton.visible()
-                                    activity?.hideKeyboard()
-                                    ui.searchEditText.clearFocus()
-                                    onSearchTextChanged(textWithoutSeparators)
-                                    ui.searchEditText.isEnabled = false
-                                }
+                            if (emojiIdPublicKey == null) {
+                                ui.invalidEmojiIdTextView.text =
+                                    string(add_recipient_invalid_emoji_id)
+                                ui.invalidEmojiIdTextView.visible()
+                                clearSearchResult()
+                            } else {
+                                ui.invalidEmojiIdTextView.gone()
+                                ui.continueButton.visible()
+                                activity?.hideKeyboard()
+                                ui.searchEditText.clearFocus()
+                                onSearchTextChanged(textWithoutSeparators)
+                                ui.searchEditText.isEnabled = false
                             }
                         }
+                    } else {
+                        onSearchTextChanged(textWithoutSeparators)
                     }
                 } else {
                     emojiIdPublicKey = null
@@ -763,8 +849,8 @@ class AddRecipientFragment : Fragment(),
             emojiIdPublicKey = null
             ui.qrCodeButton.visible()
             ui.searchEditText.textAlignment = View.TEXT_ALIGNMENT_TEXT_START
-            ui.searchEditText.letterSpacing = inputNormalLetterSpacing
-            onSearchTextChanged(editable.toString())
+            ui.searchEditText.letterSpacing = 0.04f
+            onSearchTextChanged(text)
         }
         textWatcherIsRunning = false
     }
@@ -780,9 +866,8 @@ class AddRecipientFragment : Fragment(),
         )
     }
 
-    class ScrollListener(fragment: AddRecipientFragment) : RecyclerView.OnScrollListener() {
+    class ScrollListener(private val onScrolled: (Int) -> Unit) : RecyclerView.OnScrollListener() {
 
-        private val fragmentWR = WeakReference(fragment)
         private var totalDeltaY = 0
 
         fun reset() {
@@ -792,7 +877,7 @@ class AddRecipientFragment : Fragment(),
         override fun onScrolled(recyclerView: RecyclerView, dX: Int, dY: Int) {
             super.onScrolled(recyclerView, dX, dY)
             totalDeltaY += dY
-            fragmentWR.get()?.onRecyclerViewScrolled(totalDeltaY)
+            onScrolled(totalDeltaY)
         }
 
     }

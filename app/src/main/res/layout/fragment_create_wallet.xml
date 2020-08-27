@@ -14,127 +14,50 @@
         android:background="@color/create_emoji_id_bg"
         android:visibility="invisible" />
 
-    <RelativeLayout
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:gravity="center">
-
-        <!-- tap to see full emoji id button -->
-        <RelativeLayout
-            android:id="@+id/see_full_emoji_id_container_view"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignTop="@id/emoji_id_summary_container_view"
-            android:layout_centerHorizontal="true"
-            android:layout_marginTop="0dp"
-            android:elevation="4dp">
-
-            <com.tari.android.wallet.ui.component.CustomFontTextView
-                android:id="@+id/see_full_emoji_id_text_view"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="@drawable/copy_paste_emoji_id_button_bg"
-                android:paddingHorizontal="20dp"
-                android:paddingVertical="10dp"
-                android:text="@string/tap_to_see_full_emoji_id"
-                android:textColor="#9834F6"
-                android:textSize="14sp"
-                app:customFont="AVENIR_LT_STD_HEAVY" />
-
-            <Button
-                android:id="@+id/see_full_emoji_id_button"
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:layout_alignStart="@id/see_full_emoji_id_text_view"
-                android:layout_alignTop="@id/see_full_emoji_id_text_view"
-                android:layout_alignEnd="@id/see_full_emoji_id_text_view"
-                android:layout_alignBottom="@id/see_full_emoji_id_text_view"
-                android:background="@color/transparent" />
-
-            <ImageView
-                android:id="@+id/copy_emoji_id_notch_image_view"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/see_full_emoji_id_button"
-                android:layout_centerHorizontal="true"
-                android:contentDescription="@null"
-                android:src="@drawable/speech_notch_down" />
-        </RelativeLayout>
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:clipChildren="false"
+        android:clipToPadding="false"
+        android:gravity="center"
+        android:orientation="vertical">
 
         <RelativeLayout
             android:id="@+id/emoji_id_summary_container_view"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true"
-            android:layout_marginStart="@dimen/common_horizontal_margin"
-            android:layout_marginTop="-80dp"
-            android:layout_marginEnd="@dimen/common_horizontal_margin"
+            android:layout_gravity="center"
+            android:layout_marginHorizontal="@dimen/common_horizontal_margin"
             android:alpha="0"
             android:background="@drawable/emoji_id_bg"
             android:clickable="true"
+            android:elevation="8dp"
             android:focusable="true"
             android:paddingHorizontal="@dimen/onboarding_emoji_id_container_horizontal_padding"
-            android:paddingVertical="@dimen/onboarding_emoji_id_container_vertical_padding">
+            android:paddingVertical="@dimen/onboarding_emoji_id_container_vertical_padding"
+            tools:alpha="1">
 
-            <include
-                android:id="@+id/emoji_id_summary_view"
-                layout="@layout/onboarding_emoji_id_summary"
+            <TextView
+                android:id="@+id/emoji_id_text_view"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:visibility="visible" />
-        </RelativeLayout>
-
-        <RelativeLayout
-            android:id="@+id/emoji_id_container_view"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true"
-            android:layout_marginStart="@dimen/common_horizontal_margin"
-            android:layout_marginTop="-80dp"
-            android:layout_marginEnd="@dimen/common_horizontal_margin"
-            android:layout_marginBottom="20dp"
-            android:alpha="0"
-            android:background="@drawable/emoji_id_bg"
-            android:visibility="invisible">
-
-            <HorizontalScrollView
-                android:id="@+id/emoji_id_scroll_view"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:scrollbars="none"
-                tools:ignore="UselessParent">
-
-                <TextView
-                    android:id="@+id/emoji_id_text_view"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:letterSpacing="0.22"
-                    android:paddingHorizontal="@dimen/onboarding_emoji_id_container_horizontal_padding"
-                    android:paddingVertical="@dimen/onboarding_emoji_id_container_vertical_padding"
-                    android:textColor="@color/black"
-                    android:textSize="17sp" />
-            </HorizontalScrollView>
-
-            <!-- white fader for emoji-id -->
-            <View
-                android:layout_width="26dp"
-                android:layout_height="24dp"
-                android:layout_alignParentEnd="true"
-                android:layout_centerVertical="true"
-                android:background="@drawable/emoji_id_end_fader"
-                android:translationZ="6dp" />
+                android:letterSpacing="0.1"
+                android:textColor="@android:color/black"
+                android:textSize="18sp"
+                android:visibility="visible"
+                tools:text="Hello" />
         </RelativeLayout>
 
         <!-- text :: This is your Emoji ID -->
-        <LinearLayout
+        <FrameLayout
             android:id="@+id/your_emoji_id_title_container_view"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@id/emoji_id_container_view"
             android:layout_marginTop="40dp"
             android:gravity="center"
-            android:orientation="horizontal"
-            android:visibility="invisible">
+            android:visibility="invisible"
+            tools:visibility="visible">
 
             <com.tari.android.wallet.ui.component.CustomFontTextView
                 android:id="@+id/your_emoji_id_title_text_view"
@@ -144,28 +67,19 @@
                 android:layout_marginEnd="4dp"
                 android:gravity="center"
                 android:letterSpacing="0.01"
-                android:text="@string/create_wallet_your_emoji_id_text_label"
                 android:textColor="@color/black"
                 android:textSize="18sp"
-                app:customFont="AVENIR_LT_STD_LIGHT" />
-        </LinearLayout>
-
-        <View
-            android:id="@+id/your_emoji_title_back_view"
-            android:layout_width="match_parent"
-            android:layout_height="25dp"
-            android:layout_below="@id/emoji_id_container_view"
-            android:layout_marginTop="40dp"
-            android:background="@color/create_emoji_id_bg"
-            android:visibility="invisible" />
+                app:customFont="AVENIR_LT_STD_LIGHT"
+                tools:text="@string/create_wallet_your_emoji_id_text_label" />
+        </FrameLayout>
 
         <com.tari.android.wallet.ui.component.CustomFontTextView
             android:id="@+id/emoji_id_desc_text_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/your_emoji_id_title_container_view"
             android:layout_gravity="center"
             android:layout_marginHorizontal="@dimen/common_horizontal_margin"
+            android:layout_marginTop="24dp"
             android:alpha="0"
             android:gravity="center"
             android:letterSpacing="-0.02"
@@ -173,9 +87,29 @@
             android:text="@string/create_wallet_set_of_emoji_your_wallet_address_desc"
             android:textColor="@color/dark_gray"
             android:textSize="14sp"
-            app:customFont="AVENIR_LT_STD_MEDIUM" />
+            app:customFont="AVENIR_LT_STD_MEDIUM"
+            tools:alpha="1" />
 
-    </RelativeLayout>
+        <com.tari.android.wallet.ui.component.CustomFontTextView
+            android:id="@+id/get_different_yat_cta_text_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginHorizontal="@dimen/common_horizontal_margin"
+            android:layout_marginTop="24dp"
+            android:alpha="0"
+            android:gravity="center"
+            android:letterSpacing="-0.02"
+            android:lineSpacingExtra="10dp"
+            android:text="@string/create_wallet_get_different_yat_cta"
+            android:textColor="@color/accent"
+            android:textSize="13sp"
+            android:visibility="gone"
+            app:customFont="AVENIR_LT_STD_HEAVY"
+            tools:alpha="1"
+            tools:visibility="visible" />
+
+    </LinearLayout>
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -352,9 +286,8 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@id/nerd_face_emoji_lottie_animation_view"
                 android:layout_gravity="center"
-                android:layout_marginStart="@dimen/common_dialog_horizontal_margin"
+                android:layout_marginHorizontal="@dimen/common_dialog_horizontal_margin"
                 android:layout_marginTop="4dp"
-                android:layout_marginEnd="@dimen/common_dialog_horizontal_margin"
                 android:alpha="0"
                 android:gravity="center"
                 android:letterSpacing="-0.02"
@@ -366,40 +299,72 @@
 
         </RelativeLayout>
 
-        <com.tari.android.wallet.ui.component.CustomFontButton
-            android:id="@+id/continue_button"
+        <FrameLayout
+            android:id="@+id/continue_cta_view"
             style="?android:attr/borderlessButtonStyle"
             android:layout_width="match_parent"
             android:layout_height="@dimen/common_action_button_height"
             android:layout_alignParentBottom="true"
-            android:layout_marginLeft="25dp"
-            android:layout_marginRight="25dp"
+            android:layout_marginHorizontal="25dp"
             android:layout_marginBottom="@dimen/create_wallet_button_bottom_margin"
             android:background="@drawable/gradient_button_bg"
-            android:ellipsize="middle"
-            android:singleLine="true"
-            android:text="@string/common_continue"
-            android:textAllCaps="false"
-            android:textColor="@color/white"
-            android:textSize="16sp"
-            app:customFont="AVENIR_LT_STD_HEAVY" />
+            android:visibility="gone">
 
-        <com.tari.android.wallet.ui.component.CustomFontButton
-            android:id="@+id/create_emoji_id_button"
+            <com.tari.android.wallet.ui.component.CustomFontTextView
+                android:id="@+id/continue_button_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:ellipsize="middle"
+                android:singleLine="true"
+                android:text="@string/common_continue"
+                android:textAllCaps="false"
+                android:textColor="@color/white"
+                android:textSize="16sp"
+                app:customFont="AVENIR_LT_STD_HEAVY" />
+
+            <ProgressBar
+                android:id="@+id/continue_button_progress_bar"
+                android:layout_width="35dp"
+                android:layout_height="35dp"
+                android:layout_gravity="center"
+                android:visibility="gone"
+                tools:visibility="visible" />
+
+        </FrameLayout>
+
+
+        <FrameLayout
+            android:id="@+id/create_emoji_id_container"
             style="?android:attr/borderlessButtonStyle"
             android:layout_width="match_parent"
             android:layout_height="@dimen/common_action_button_height"
             android:layout_alignParentBottom="true"
-            android:layout_marginLeft="25dp"
-            android:layout_marginRight="25dp"
-            android:background="@drawable/gradient_button_bg"
-            android:ellipsize="middle"
-            android:singleLine="true"
-            android:text="@string/create_wallet_continue_and_create_emoji_id"
-            android:textAllCaps="false"
-            android:textColor="@color/white"
-            android:textSize="16sp"
-            app:customFont="AVENIR_LT_STD_HEAVY" />
+            android:layout_marginHorizontal="25dp"
+            android:background="@drawable/gradient_button_bg">
+
+            <com.tari.android.wallet.ui.component.CustomFontTextView
+                android:id="@+id/create_emoji_id_text_view"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:ellipsize="middle"
+                android:singleLine="true"
+                android:text="@string/create_wallet_continue_and_create_emoji_id"
+                android:textAllCaps="false"
+                android:textColor="@color/white"
+                android:textSize="16sp"
+                app:customFont="AVENIR_LT_STD_HEAVY" />
+
+            <ProgressBar
+                android:id="@+id/create_emoji_id_progress_bar"
+                android:layout_width="35dp"
+                android:layout_height="35dp"
+                android:layout_gravity="center"
+                android:visibility="gone"
+                tools:visibility="visible" />
+
+        </FrameLayout>
 
     </RelativeLayout>
 

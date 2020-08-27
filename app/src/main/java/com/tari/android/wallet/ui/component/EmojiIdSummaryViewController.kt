@@ -32,9 +32,10 @@
  */
 package com.tari.android.wallet.ui.component
 
-import android.view.View
 import android.icu.text.BreakIterator
 import com.tari.android.wallet.databinding.EmojiIdSummaryBinding
+import com.tari.android.wallet.model.yat.EmojiId
+import com.tari.android.wallet.model.yat.EmojiSet
 import com.tari.android.wallet.ui.extension.gone
 import com.tari.android.wallet.ui.extension.visible
 
@@ -43,12 +44,23 @@ import com.tari.android.wallet.ui.extension.visible
  *
  * @author The Tari Development Team
  */
-internal class EmojiIdSummaryViewController(private val ui: EmojiIdSummaryBinding) {
+internal class EmojiIdSummaryViewController(
+    private val ui: EmojiIdSummaryBinding,
+    private val set: EmojiSet
+) {
 
-    constructor(view: View) : this(EmojiIdSummaryBinding.bind(view))
+    fun display(emojiId: String, showEmojisFromEachEnd: Int = 3) {
+        val yat = EmojiId.of(emojiId, set)
+        if (yat == null) {
+            showTariEmojiId(emojiId, showEmojisFromEachEnd)
+        } else {
+            showYat(yat)
+        }
+    }
 
-    fun display(emojiId: String,
-                showEmojisFromEachEnd: Int = 3) {
+    private fun showTariEmojiId(emojiId: String, showEmojisFromEachEnd: Int) {
+        ui.emojiIdSummaryContainerView.visible()
+        ui.yatTextView.gone()
         val emojis = ArrayList<String>()
         val it: BreakIterator = BreakIterator.getCharacterInstance()
         it.setText(emojiId)
@@ -84,5 +96,10 @@ internal class EmojiIdSummaryViewController(private val ui: EmojiIdSummaryBindin
         }
     }
 
+    private fun showYat(yat: EmojiId) {
+        ui.emojiIdSummaryContainerView.gone()
+        ui.yatTextView.visible()
+        ui.yatTextView.text = yat.raw
+    }
 
 }

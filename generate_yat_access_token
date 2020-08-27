@@ -1,0 +1,2 @@
+curl -s -X POST -H "Content-Type: application/json" -d '{"email": "email@email.email", "password": "password"}' http://emoji-id.dyn-ip.me/auth/token | grep -Po '"access_token": *"\K[^"]*' | xclip -selection clipboard
+

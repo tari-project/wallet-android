@@ -38,8 +38,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.tari.android.wallet.R
 import com.tari.android.wallet.model.Contact
 import com.tari.android.wallet.model.User
+import com.tari.android.wallet.model.yat.EmojiSet
 import com.tari.android.wallet.ui.extension.temporarilyDisableClick
-import kotlin.collections.ArrayList
 
 /**
  * Recipient user list recycler view adapter.
@@ -47,6 +47,7 @@ import kotlin.collections.ArrayList
  * @author The Tari Development Team
  */
 internal class RecipientListAdapter(
+	private val yatEmojiSet: EmojiSet,
     private val listener: (User) -> Unit
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
@@ -100,12 +101,10 @@ internal class RecipientListAdapter(
      */
     override fun getItemViewType(position: Int): Int {
         return when (mode) {
-            Mode.LIST -> {
-                return if (items[position] is Int) { // header
-                    items[position] as Int
-                } else {
-                    userViewType
-                }
+            Mode.LIST -> if (items[position] is Int) { // header
+                items[position] as Int
+            } else {
+                userViewType
             }
             Mode.SEARCH -> userViewType
         }
@@ -114,10 +113,7 @@ internal class RecipientListAdapter(
     /**
      * Create the view holder instance.
      */
-    override fun onCreateViewHolder(
-        parent: ViewGroup,
-        viewType: Int
-    ): RecyclerView.ViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return when (viewType) {
             recentHeaderViewType -> RecipientHeaderViewHolder(
                 LayoutInflater.from(parent.context)
@@ -131,9 +127,8 @@ internal class RecipientListAdapter(
             )
             userViewType -> RecipientViewHolder(
                 LayoutInflater.from(parent.context)
-                    .inflate(R.layout.add_recipient_list_item, parent, false)
-            )
-            else -> throw RuntimeException("Unexpected view type $viewType.")
+                    .inflate(R.layout.add_recipient_list_item, parent, false), yatEmojiSet)
+            else -> throw IllegalArgumentException("Unexpected view type $viewType.")
         }
     }
 

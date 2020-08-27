@@ -58,13 +58,16 @@ import com.tari.android.wallet.databinding.FragmentFinalizeSendTxBinding
 import com.tari.android.wallet.event.Event
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.infrastructure.Tracker
+import com.tari.android.wallet.infrastructure.yat.YatUserStorage
 import com.tari.android.wallet.model.*
+import com.tari.android.wallet.model.yat.EmojiId
 import com.tari.android.wallet.network.NetworkConnectionState
 import com.tari.android.wallet.service.TariWalletService
 import com.tari.android.wallet.service.WalletService
 import com.tari.android.wallet.tor.TorBootstrapStatus
 import com.tari.android.wallet.tor.TorProxyState
 import com.tari.android.wallet.ui.extension.*
+import com.tari.android.wallet.ui.presentation.TxMessagePayload
 import com.tari.android.wallet.util.Constants
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -100,6 +103,9 @@ class FinalizeSendTxFragment : Fragment(), ServiceConnection {
 
     @Inject
     lateinit var tracker: Tracker
+
+    @Inject
+    lateinit var yatUserStorage : YatUserStorage
 
     /**
      * Tx properties.
@@ -468,13 +474,24 @@ class FinalizeSendTxFragment : Fragment(), ServiceConnection {
 
     private fun sendTari() {
         listenerWR.get()?.onSendTxStarted(this)
+
+        val destinationYat = recipientUser.yat
+        // contruct transaction message payload
+        val notePayload = TxMessagePayload.fromNote(note)
+        val messagePayload = TxMessagePayload.construct(
+            message = notePayload.message,
+            gifUrl = notePayload.gifUrl,
+            source = yatUserStorage.get()?.emojiIds?.first(),
+            destination = if (destinationYat != null) EmojiId(destinationYat) else null
+        )
+
         val error = WalletError()
         lifecycleScope.launch(Dispatchers.IO) {
             val txId = walletService.sendTari(
                 recipientUser,
                 amount,
                 Constants.Wallet.defaultFeePerGram,
-                note,
+                messagePayload.compose(),
                 error
             )
             // if success, just wait for the callback to happen

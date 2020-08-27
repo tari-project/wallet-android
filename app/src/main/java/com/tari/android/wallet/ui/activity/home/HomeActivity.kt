@@ -290,27 +290,22 @@ internal class HomeActivity : AppCompatActivity(), AllSettingsFragment.AllSettin
                 DeepLink.Type.EMOJI_ID -> service.getPublicKeyFromEmojiId(deepLink.identifier)
                 DeepLink.Type.PUBLIC_KEY_HEX -> service.getPublicKeyFromHexString(deepLink.identifier)
             }
-            pubkey?.let { publicKey -> sendTariToUser(service, publicKey, deepLink.parameters) }
+            pubkey?.let { publicKey -> sendTariToUser(service, publicKey, deepLink) }
         }
     }
 
-    private fun sendTariToUser(
-        service: TariWalletService,
-        recipientPublicKey: PublicKey,
-        parameters: Map<String, String>
-    ) {
+    private fun sendTariToUser(service: TariWalletService, destination: PublicKey, link: DeepLink) {
         val error = WalletError()
         val contacts = service.getContacts(error)
         val recipientUser = when (error.code) {
             WalletErrorCode.NO_ERROR -> contacts
-                .firstOrNull { it.publicKey == recipientPublicKey } ?: User(recipientPublicKey)
-            else -> User(recipientPublicKey)
+                .firstOrNull { it.publicKey == destination } ?: User(destination)
+            else -> User(destination)
         }
         val intent = Intent(this, SendTariActivity::class.java)
         intent.putExtra("recipientUser", recipientUser)
-        parameters[DeepLink.PARAMETER_NOTE]?.let { intent.putExtra(DeepLink.PARAMETER_NOTE, it) }
-        parameters[DeepLink.PARAMETER_AMOUNT]?.toDoubleOrNull()
-            ?.let { intent.putExtra(DeepLink.PARAMETER_AMOUNT, it) }
+        link.note?.let { intent.putExtra(DeepLink.PARAMETER_NOTE, it) }
+        link.amount?.let { intent.putExtra(DeepLink.PARAMETER_AMOUNT, it) }
         startActivity(intent)
         overridePendingTransition(R.anim.enter_from_right, R.anim.exit_to_left)
     }

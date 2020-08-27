@@ -54,15 +54,18 @@ import com.tari.android.wallet.event.Event
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.ffi.*
 import com.tari.android.wallet.infrastructure.backup.BackupManager
+import com.tari.android.wallet.infrastructure.yat.YatService
 import com.tari.android.wallet.model.*
 import com.tari.android.wallet.model.Tx.Direction.INBOUND
 import com.tari.android.wallet.model.Tx.Direction.OUTBOUND
+import com.tari.android.wallet.model.yat.ActualizingEmojiSet
 import com.tari.android.wallet.notification.NotificationHelper
 import com.tari.android.wallet.service.faucet.TestnetFaucetService
 import com.tari.android.wallet.service.faucet.TestnetTariRequestException
 import com.tari.android.wallet.service.notification.NotificationService
 import com.tari.android.wallet.ui.activity.home.HomeActivity
 import com.tari.android.wallet.ui.extension.string
+import com.tari.android.wallet.ui.presentation.TxMessagePayload
 import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.SharedPrefsWrapper
 import com.tari.android.wallet.util.WalletUtil
@@ -95,6 +98,11 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
         // key-value storage keys
         object KeyValueStorageKeys {
             const val NETWORK = "SU7FM2O6Q3BU4XVN7HDD"
+            const val YAT_ACCESS_TOKEN = "BE7DAEHKPPSMGDVAIEBA0RN2LPWDW0P39NC89SE8"
+            const val YAT_REFRESH_TOKEN = "XUPCXQMOUGRG0UQ1VT7HRGVU8PG3KB998G5GMTWO"
+            const val YAT_EMOJI_ID = "THM8DBDTOBFKKANWO7CQVF8SZ3HB4LSD9HBQEEZP"
+            const val YAT_USER_ALTERNATE_ID = "B5OJ2IV69GLRM429K492QBH3907AWGNEAV6QONSR"
+            const val YAT_USER_PASSWORD = "VCRQPKL63Y04R2OAOXUMR9PVCQW4W9W0E900CV31"
         }
 
         // intent actions
@@ -167,6 +175,12 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
     @Inject
     lateinit var backupManager: BackupManager
 
+    @Inject
+    lateinit var yatService: YatService
+
+    @Inject
+    lateinit var emojiSet: ActualizingEmojiSet
+
     private lateinit var wallet: FFIWallet
 
     private var txBroadcastRestarted = false
@@ -200,8 +214,8 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
      * Timer to trigger the expiration checks.
      */
     private var txExpirationCheckSubscription: Disposable? = null
-
     private var lowPowerModeSubscription: Disposable? = null
+    private lateinit var yatSetActualizingSubscription: Disposable
 
     private enum class BaseNodeValidationType {
         UTXO,
@@ -254,6 +268,7 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
         // start service & post foreground service notification
         val notification = notificationHelper.buildForegroundServiceNotification()
         startForeground(NOTIFICATION_ID, notification)
+        yatSetActualizingSubscription = scheduleEmojiSetActualization()
         Logger.d("Wallet service started.")
     }
 
@@ -290,17 +305,30 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
     }
 
     private fun scheduleExpirationCheck() {
-        txExpirationCheckSubscription =
-            Observable
-                .timer(expirationCheckPeriodMinutes.minutes.toLong(), TimeUnit.MINUTES)
-                .repeat()
-                .subscribeOn(Schedulers.io())
-                .observeOn(Schedulers.io())
-                .subscribe {
-                    cancelExpiredPendingInboundTxs()
-                    cancelExpiredPendingOutboundTxs()
-                }
+        val subscription = txExpirationCheckSubscription
+        if (subscription == null || subscription.isDisposed) {
+            txExpirationCheckSubscription =
+                Observable
+                    .timer(expirationCheckPeriodMinutes.minutes.toLong(), TimeUnit.MINUTES)
+                    .repeat()
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(Schedulers.io())
+                    .subscribe {
+                        cancelExpiredPendingInboundTxs()
+                        cancelExpiredPendingOutboundTxs()
+                    }
+        }
     }
+
+    private fun scheduleEmojiSetActualization() =
+        Observable
+            .timer(2L, TimeUnit.HOURS)
+            .repeat()
+            .startWith(0L)
+            .observeOn(Schedulers.io())
+            .subscribe(
+                { emojiSet.actualize() },
+                { Logger.e(it, "Could not actualize emoji set") })
 
     /**
      * Bound service.
@@ -320,6 +348,7 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
      */
     override fun onDestroy() {
         Logger.d("Wallet service destroyed.")
+        yatSetActualizingSubscription.dispose()
         txExpirationCheckSubscription?.dispose()
         sendBroadcast(
             Intent(this, ServiceRestartBroadcastReceiver::class.java)
@@ -1094,6 +1123,8 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
             if (error.code != WalletErrorCode.NO_ERROR) {
                 throw FFIException(message = error.message)
             }
+
+            val messagePayload = TxMessagePayload.fromNote(completedTxFFI.getMessage())
             if (completedTxFFI.isOutbound()) {
                 direction = OUTBOUND
                 val userPublicKey = PublicKey(
@@ -1103,6 +1134,7 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
                 user = getContactByPublicKeyHexString(
                     destinationPublicKeyFFI.toString()
                 ) ?: User(userPublicKey)
+                user.yat = messagePayload.destinationYat?.raw
             } else {
                 direction = INBOUND
                 val userPublicKey = PublicKey(
@@ -1112,6 +1144,7 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
                 user = getContactByPublicKeyHexString(
                     sourcePublicKeyFFI.toString()
                 ) ?: User(userPublicKey)
+                user.yat = messagePayload.sourceYat?.raw
             }
             val completedTx = CompletedTx(
                 completedTxFFI.getId(),
@@ -1142,6 +1175,7 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
                 throw FFIException(message = error.message)
             }
 
+            val messagePayload = TxMessagePayload.fromNote(completedTxFFI.getMessage())
             if (completedTxFFI.isOutbound()) {
                 direction = OUTBOUND
                 val userPublicKey = PublicKey(
@@ -1151,6 +1185,7 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
                 user = getContactByPublicKeyHexString(
                     destinationPublicKeyFFI.toString()
                 ) ?: User(userPublicKey)
+                user.yat = messagePayload.destinationYat?.raw
             } else {
                 direction = INBOUND
                 val userPublicKey = PublicKey(
@@ -1160,6 +1195,7 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
                 user = getContactByPublicKeyHexString(
                     sourcePublicKeyFFI.toString()
                 ) ?: User(userPublicKey)
+                user.yat = messagePayload.sourceYat?.raw
             }
             val tx = CancelledTx(
                 completedTxFFI.getId(),
@@ -1189,9 +1225,11 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
                 sourcePublicKeyFFI.toString(),
                 sourcePublicKeyFFI.getEmojiId()
             )
+            val messagePayload = TxMessagePayload.fromNote(pendingInboundTxFFI.getMessage())
             val user = getContactByPublicKeyHexString(
                 sourcePublicKeyFFI.toString()
             ) ?: User(userPublicKey)
+            user.yat = messagePayload.sourceYat?.raw
             val pendingInboundTx = PendingInboundTx(
                 pendingInboundTxFFI.getId(),
                 user,
@@ -1214,9 +1252,11 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
                 destinationPublicKeyFFI.toString(),
                 destinationPublicKeyFFI.getEmojiId()
             )
+            val messagePayload = TxMessagePayload.fromNote(pendingOutboundTxFFI.getMessage())
             val user = getContactByPublicKeyHexString(
                 destinationPublicKeyFFI.toString()
             ) ?: User(userPublicKey)
+            user.yat = messagePayload.destinationYat?.raw
             val pendingOutboundTx = PendingOutboundTx(
                 pendingOutboundTxFFI.getId(),
                 user,

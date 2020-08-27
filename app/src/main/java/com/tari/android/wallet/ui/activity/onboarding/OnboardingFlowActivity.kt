@@ -35,10 +35,22 @@ package com.tari.android.wallet.ui.activity.onboarding
 import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
+import androidx.annotation.IdRes
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
+import androidx.core.os.postDelayed
+import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.get
+import com.orhanobut.logger.Logger
 import com.tari.android.wallet.R
 import com.tari.android.wallet.di.WalletModule
+import com.tari.android.wallet.infrastructure.yat.YatJWTStorage
+import com.tari.android.wallet.infrastructure.yat.YatUserStorage
+import com.tari.android.wallet.model.WalletError
+import com.tari.android.wallet.service.TariWalletService
 import com.tari.android.wallet.service.WalletService
+import com.tari.android.wallet.service.connection.TariWalletServiceConnection
 import com.tari.android.wallet.ui.activity.home.HomeActivity
 import com.tari.android.wallet.ui.extension.appComponent
 import com.tari.android.wallet.ui.fragment.onboarding.CreateWalletFragment
@@ -56,56 +68,88 @@ import javax.inject.Named
  *
  * @author The Tari Development Team
  */
-internal class OnboardingFlowActivity : AppCompatActivity(), IntroductionFragment.Listener,
-    CreateWalletFragment.Listener, LocalAuthFragment.Listener {
+internal class OnboardingFlowActivity :
+    AppCompatActivity(),
+    IntroductionFragment.Listener,
+    CreateWalletFragment.Listener,
+    LocalAuthFragment.Listener {
 
     @Inject
     @Named(WalletModule.FieldName.walletFilesDirPath)
     lateinit var walletFilesDirPath: String
+
     @Inject
     internal lateinit var sharedPrefsWrapper: SharedPrefsWrapper
 
+    @Inject
+    lateinit var yatUserStorage: YatUserStorage
+
+    @Inject
+    lateinit var yatJWTStorage: YatJWTStorage
+
     private val uiHandler = Handler()
+    private lateinit var serviceConnection: TariWalletServiceConnection
+    private var walletService: TariWalletService? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         appComponent.inject(this)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_onboarding_flow)
         when {
-            sharedPrefsWrapper.onboardingAuthWasInterrupted -> {
-                supportFragmentManager
-                    .beginTransaction()
-                    .add(R.id.onboarding_fragment_container_1, LocalAuthFragment())
-                    .commitNow()
-            }
             sharedPrefsWrapper.onboardingWasInterrupted -> {
-                // start wallet service
-                WalletService.start(applicationContext)
                 // clean existing files & restart onboarding
                 WalletUtil.clearWalletFiles(walletFilesDirPath)
-                supportFragmentManager
-                    .beginTransaction()
-                    .add(R.id.onboarding_fragment_container_2, CreateWalletFragment())
-                    .commitNow()
+                yatUserStorage.clear()
+                yatJWTStorage.clear()
+                // start wallet service
+                WalletService.start(applicationContext)
+                bindWalletService()
+                addFragment(R.id.onboarding_fragment_container_2, CreateWalletFragment())
             }
-            else -> {
-                supportFragmentManager
-                    .beginTransaction()
-                    .add(R.id.onboarding_fragment_container_1, IntroductionFragment())
-                    .commitNow()
+            WalletUtil.walletExists(applicationContext) &&
+                    yatUserStorage.get()?.emojiIds?.firstOrNull() == null -> {
+                startWalletService()
+                bindWalletService()
+                addFragment(R.id.onboarding_fragment_container_2, CreateWalletFragment())
             }
+            sharedPrefsWrapper.onboardingAuthWasInterrupted -> {
+                startWalletService()
+                bindWalletService()
+                addFragment(R.id.onboarding_fragment_container_1, LocalAuthFragment())
+            }
+            else -> addFragment(R.id.onboarding_fragment_container_1, IntroductionFragment())
         }
     }
 
-    /**
-     * Back button should not be functional during onboarding
-     */
-    override fun onBackPressed() {
-        return
+    private fun addFragment(@IdRes id: Int, fragment: Fragment) = supportFragmentManager
+        .beginTransaction()
+        .add(id, fragment)
+        .commitNow()
+
+    // Back button should not be functional during onboarding
+    override fun onBackPressed() {}
+
+    private fun startWalletService() {
+        ContextCompat.startForegroundService(
+            applicationContext,
+            Intent(applicationContext, WalletService::class.java)
+        )
+    }
+
+    private fun bindWalletService() {
+        serviceConnection = ViewModelProvider(this,
+            TariWalletServiceConnection.TariWalletServiceConnectionFactory(this)
+        ).get()
+        serviceConnection.connection.observe(this, {
+            if (it.status == TariWalletServiceConnection.ServiceConnectionStatus.CONNECTED) {
+                walletService = it.service
+            }
+        })
     }
 
     override fun continueToCreateWallet() {
         sharedPrefsWrapper.onboardingStarted = true
+        bindWalletService()
         val createWalletFragment = CreateWalletFragment()
         supportFragmentManager.beginTransaction()
             .add(R.id.onboarding_fragment_container_2, createWalletFragment)
@@ -113,47 +157,98 @@ internal class OnboardingFlowActivity : AppCompatActivity(), IntroductionFragmen
         removeContainer1Fragment()
     }
 
-    private fun removeContainer1Fragment() {
-        uiHandler.postDelayed({
-            val fragment = supportFragmentManager.findFragmentById(R.id.onboarding_fragment_container_1)
-            fragment?.let {
-                supportFragmentManager.beginTransaction().remove(fragment).commit()
-            }
-        }, CreateWallet.removeFragmentDelayDuration)
-    }
-
     override fun onDestroy() {
-        super.onDestroy()
         uiHandler.removeCallbacksAndMessages(null)
+        super.onDestroy()
     }
 
-    override fun continueToEnableAuth() {
+    override fun onWalletCreated() {
         val fragment =
             supportFragmentManager.findFragmentById(R.id.onboarding_fragment_container_2)
-        if (fragment is CreateWalletFragment) {
-            fragment.fadeOutAllViewAnimation()
+        if (fragment is CreateWalletFragment) fragment.fadeOutAllViewAnimation()
+        if (sharedPrefsWrapper.onboardingAuthSetupCompleted) {
+            uiHandler.postDelayed(Constants.UI.mediumDurationMs) {
+                this.onAuthSuccess()
+                overridePendingTransition(0, R.anim.slide_down)
+            }
+        } else {
+            supportFragmentManager
+                .beginTransaction()
+                .setCustomAnimations(R.anim.fade_in, R.anim.fade_out)
+                .add(R.id.onboarding_fragment_container_1, LocalAuthFragment())
+                .commit()
+            removeContainer2Fragment()
         }
-        supportFragmentManager
-            .beginTransaction()
-            .setCustomAnimations(R.anim.fade_in, R.anim.fade_out)
-            .add(R.id.onboarding_fragment_container_1, LocalAuthFragment())
-            .commit()
-
-        removeContainer2Fragment()
     }
 
-    private fun removeContainer2Fragment() {
-        uiHandler.postDelayed({
-            val fragment = supportFragmentManager.findFragmentById(
-                R.id.onboarding_fragment_container_2
-            )
-            fragment?.let {
-                supportFragmentManager.beginTransaction().remove(it).commit()
-            }
-        }, Constants.UI.longDurationMs)
+    private fun removeContainer1Fragment() =
+        removeFragmentWithDelay(
+            R.id.onboarding_fragment_container_1,
+            CreateWallet.removeFragmentDelayDuration
+        )
+
+    private fun removeContainer2Fragment() =
+        removeFragmentWithDelay(R.id.onboarding_fragment_container_2, Constants.UI.longDurationMs)
+
+    private fun removeFragmentWithDelay(@IdRes id: Int, delay: Long) {
+        uiHandler.postDelayed(delay) {
+            supportFragmentManager.findFragmentById(id)
+                ?.let { supportFragmentManager.beginTransaction().remove(it).commit() }
+        }
+    }
+
+    /**
+     * This is to be able to restore Yat data after a wallet restore.
+     */
+    private fun storeYatDataInWalletDatabase() {
+        val service = walletService ?: return
+        // get data from local Android storage
+        val yatUser = yatUserStorage.get() ?: return
+        val accessToken = yatJWTStorage.accessToken() ?: return
+        val refreshToken = yatJWTStorage.refreshToken() ?: return
+
+        val error = WalletError()
+        // save yat
+        service.setKeyValue(
+            WalletService.Companion.KeyValueStorageKeys.YAT_EMOJI_ID,
+            yatUser.emojiIds.first().raw,
+            error
+        )
+        Logger.e("YAT STORED :: ${yatUser.emojiIds.first().raw}")
+        val yat = service.getKeyValue(WalletService.Companion.KeyValueStorageKeys.YAT_EMOJI_ID, error)
+        Logger.e("YAT RESTORED :: $yat")
+        // save email
+        service.setKeyValue(
+            WalletService.Companion.KeyValueStorageKeys.YAT_USER_ALTERNATE_ID,
+            yatUser.alternateId,
+            error
+        )
+        // save password
+        service.setKeyValue(
+            WalletService.Companion.KeyValueStorageKeys.YAT_USER_PASSWORD,
+            yatUser.password,
+            error
+        )
+        // save access token
+        service.setKeyValue(
+            WalletService.Companion.KeyValueStorageKeys.YAT_ACCESS_TOKEN,
+            accessToken,
+            error
+        )
+        // save refresh token
+        service.setKeyValue(
+            WalletService.Companion.KeyValueStorageKeys.YAT_REFRESH_TOKEN,
+            refreshToken,
+            error
+        )
     }
 
     override fun onAuthSuccess() {
+        storeYatDataInWalletDatabase()
+        goToHomeActivity()
+    }
+
+    private fun goToHomeActivity() {
         val intent = Intent(this, HomeActivity::class.java)
         intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
         startActivity(intent)

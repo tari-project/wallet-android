@@ -32,14 +32,15 @@
  */
 package com.tari.android.wallet.util
 
+import android.icu.text.BreakIterator
 import android.text.SpannableString
 import android.text.Spanned
 import android.text.style.ForegroundColorSpan
-import android.icu.text.BreakIterator
 import com.tari.android.wallet.extension.applyColorStyle
 import com.tari.android.wallet.extension.applyLetterSpacingStyle
 import com.tari.android.wallet.extension.applyRelativeTextSizeStyle
 import com.tari.android.wallet.ffi.FFIEmojiSet
+import kotlin.collections.ArrayList
 
 /**
  * Number of emojis from the Tari emoji set in a string.
@@ -55,14 +56,17 @@ internal fun String.numberOfEmojis(emojiSet: Set<String> = EmojiUtil.emojiSet): 
             codepointBuilder.append(this[i])
         }
         val codepoint = codepointBuilder.toString()
-        if (emojiSet.contains(codepoint)) {
-            emojiCount++
-        }
+        if (emojiSet.contains(codepoint)) emojiCount++
         previous = it.current()
         codepointBuilder.clear()
     }
     return emojiCount
 }
+
+/**
+ * Returns a string without the 0xFE0F remoji variation selector.
+ */
+private fun String.withoutEmojiVariationSelector() = filter { it != '\uFE0F' }
 
 /**
  * @return true if there is at least 1 character that is not included in the Tari emoji set.
@@ -77,14 +81,22 @@ internal fun String.containsNonEmoji(emojiSet: Set<String> = EmojiUtil.emojiSet)
         for (i in previous until it.current()) {
             codepointBuilder.append(this[i])
         }
-        val codepoint = codepointBuilder.toString()
-        if (!emojiSet.contains(codepoint)) {
+        val emojiCandidate = codepointBuilder.toString()
+        var isEmoji = false
+        for (emoji in emojiSet) {
+            // rid emojis of the variation selector
+            if(emoji.withoutEmojiVariationSelector()
+                == emojiCandidate.withoutEmojiVariationSelector()) {
+                isEmoji = true
+            }
+        }
+        if (!isEmoji) {
             return true
         }
         previous = it.current()
         codepointBuilder.clear()
     }
-    // no emojis found
+    // the string is all emojis in the given set
     return false
 }
 

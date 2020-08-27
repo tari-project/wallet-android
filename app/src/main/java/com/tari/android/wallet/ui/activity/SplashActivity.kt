@@ -39,6 +39,7 @@ import android.os.Handler
 import android.os.Looper
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.os.postDelayed
+import com.tari.android.wallet.infrastructure.yat.YatUserStorage
 import com.tari.android.wallet.ui.activity.onboarding.OnboardingFlowActivity
 import com.tari.android.wallet.ui.extension.appComponent
 import com.tari.android.wallet.util.Constants.UI.Splash
@@ -56,12 +57,17 @@ internal class SplashActivity : AppCompatActivity() {
     @Inject
     internal lateinit var sharedPrefsWrapper: SharedPrefsWrapper
 
+    @Inject
+    internal lateinit var storage: YatUserStorage
+
     override fun onCreate(savedInstanceState: Bundle?) {
         appComponent.inject(this)
         super.onCreate(savedInstanceState)
         Handler(Looper.getMainLooper()).postDelayed(Splash.createWalletStartUpDelayMs) {
-            val exists = WalletUtil.walletExists(applicationContext)
-                    && sharedPrefsWrapper.onboardingAuthSetupCompleted
+            val exists =
+                WalletUtil.walletExists(applicationContext)
+                        && sharedPrefsWrapper.onboardingAuthSetupCompleted
+                        && storage.get()?.emojiIds?.firstOrNull() != null
             launch(if (exists) AuthActivity::class.java else OnboardingFlowActivity::class.java)
         }
     }

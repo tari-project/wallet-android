@@ -12,6 +12,7 @@
     <string name="privacy_policy_url">https://www.tari.com/privacy_policy/</string>
     <string name="disclaimer_url">https://www.tari.com/disclaimer/</string>
     <string name="ffi_admin_email_address" translatable="false">bug_reports@tari.com</string>
+    <string name="tari_bot_yat">🤖💎</string>
 
     <!-- digits -->
     <string name="digit_0">0</string>
@@ -73,6 +74,7 @@
     <string name="common_share">Share</string>
     <string name="common_reset">Reset</string>
     <string name="common_error_title">Error</string>
+    <string name="common_retry">Retry</string>
     <string name="common_unknown_error">Unknown error</string>
 
     <!-- emoji id copied view -->
@@ -82,7 +84,9 @@
     <string name="emoji_id_bullet_separator">•••</string>
     <string name="emoji_id_chunk_separator">l</string>
     <string name="copy_emoji_id">Copy Emoji ID</string>
+    <string name="copy_yat">Copy Yat</string>
     <string name="paste_emoji_id">Paste copied Emoji ID</string>
+    <string name="paste_yat">Paste copied Yat</string>
     <string name="tap_to_see_full_emoji_id">Tap to see full Emoji ID</string>
 
     <!-- dialog -->
@@ -116,13 +120,20 @@
     <string name="create_wallet_restore_wallet_cta">Restore an Existing Wallet</string>
     <!-- screen #2 -->
     <string name="create_wallet_awesome">We’re off to a great start!</string>
-    <string name="create_wallet_now_text">Now, let’s create your Emoji ID.</string>
-    <string name="create_wallet_address_desc">Your Emoji ID is your wallet address.\nIt’s how people can find you and send you tXTR.</string>
-    <string name="create_wallet_continue_and_create_emoji_id">Create Your Emoji ID</string>
+    <string name="create_wallet_now_text">Now, let’s create your Yat.</string>
+    <string name="create_wallet_address_desc">Your Yat is your wallet address.\nIt’s how people can find you and send you tXTR.</string>
+    <string name="create_wallet_continue_and_create_emoji_id">Create Your Yat</string>
+    <string name="create_wallet_error_occurred_title">Error occurred during wallet creation</string>
+    <string name="create_wallet_error_occurred_description">Please, check your network connection and try again.</string>
+    <string name="create_wallet_yat_reroll_error_occurred_title">Error occurred during enrolling new Yat</string>
+    <string name="create_wallet_yat_reroll_error_occurred_description">Please, check your network connection and try again.</string>
+    <string name="create_wallet_yat_acquiring_error_occurred_title">Error occurred during Yat obtaining</string>
+    <string name="create_wallet_yat_acquiring_error_occurred_description">Please, check your network connection and try again.</string>
     <!-- screen #3 -->
-    <string name="create_wallet_your_emoji_id_text_label">This is your Emoji ID</string>
-    <string name="create_wallet_your_emoji_id_text_label_bold_part">Emoji ID</string>
-    <string name="create_wallet_set_of_emoji_your_wallet_address_desc">Your Emoji ID is your wallet’s address,\nand how others can find you and send you tXTR.</string>
+    <string name="create_wallet_your_emoji_id_text_label">This is your Yat</string>
+    <string name="create_wallet_your_emoji_id_text_label_highlighted_part">Yat</string>
+    <string name="create_wallet_set_of_emoji_your_wallet_address_desc">This set of emojis is your wallet address.\nIt’s how your friends can find you and send you Tari.</string>
+    <string name="create_wallet_get_different_yat_cta">Get a different Yat</string>
     <!-- onboarding - local auth -->
     <string name="auth_prompt_title">🔑 Let’s secure your wallet. 🔑</string>
     <string name="auth_prompt_desc">Sleep well at night knowing you’ve taken precautions to keep your tXTR wallet safe and sound.</string>
@@ -207,11 +218,15 @@
 
     <!-- send tari - add recipient -->
     <string name="add_recipient_title">Send To</string>
-    <string name="add_recipient_hint">Enter Emoji ID or Contact Name</string>
+    <string name="add_recipient_hint">Enter Contact Name or Yat</string>
     <string name="add_recipient_recent_tx_contacts">Recent</string>
     <string name="add_recipient_my_contacts">My Contacts</string>
     <string name="add_recipient_invalid_emoji_id">Not a valid Emoji ID</string>
     <string name="add_recipient_own_emoji_id">Sorry, you cannot send tXTR to yourself.</string>
+    <string name="add_recipient_search_error_title">Error occurred during user search</string>
+    <string name="add_recipient_search_error_description">Please check your network connection and try again.</string>
+    <string name="add_recipient_send_by_yat">Send to %s</string>
+    <string name="add_recipient_error_no_wallet_for_yat">There is no Tari wallet for %s</string>
     <!-- QR-scanner -->
     <string name="add_recipient_scan_qr_description">Scan a Tari QR code\nto send tXTR to the recipient.</string>
     <string name="add_recipient_failed_init_camera_message">Failed to initialize Camera</string>

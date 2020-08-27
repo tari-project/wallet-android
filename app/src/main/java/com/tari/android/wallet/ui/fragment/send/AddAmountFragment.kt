@@ -38,12 +38,15 @@ import android.animation.ValueAnimator
 import android.annotation.SuppressLint
 import android.content.*
 import android.os.*
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.FrameLayout
 import android.widget.TextView
 import androidx.core.animation.addListener
 import androidx.core.content.ContextCompat
+import androidx.core.os.postDelayed
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import com.daasuu.ei.Ease
@@ -53,12 +56,14 @@ import com.tari.android.wallet.R
 import com.tari.android.wallet.R.color.black
 import com.tari.android.wallet.R.color.light_gray
 import com.tari.android.wallet.R.dimen.*
-import com.tari.android.wallet.R.string.emoji_id_chunk_separator
+import com.tari.android.wallet.R.string.*
 import com.tari.android.wallet.application.DeepLink
 import com.tari.android.wallet.databinding.FragmentAddAmountBinding
 import com.tari.android.wallet.extension.remap
 import com.tari.android.wallet.infrastructure.Tracker
 import com.tari.android.wallet.model.*
+import com.tari.android.wallet.model.yat.EmojiId
+import com.tari.android.wallet.model.yat.EmojiSet
 import com.tari.android.wallet.service.TariWalletService
 import com.tari.android.wallet.service.WalletService
 import com.tari.android.wallet.ui.component.EmojiIdCopiedViewController
@@ -72,7 +77,6 @@ import com.tari.android.wallet.util.WalletUtil
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import me.everything.android.ui.overscroll.OverScrollDecoratorHelper
-import java.lang.ref.WeakReference
 import java.math.BigInteger
 import javax.inject.Inject
 import kotlin.math.min
@@ -86,6 +90,8 @@ class AddAmountFragment : Fragment(), ServiceConnection {
 
     @Inject
     lateinit var tracker: Tracker
+    @Inject
+    lateinit var set: EmojiSet
 
     /**
      * Maps all the elements (digits & separators) displayed in the amount text to their
@@ -126,8 +132,6 @@ class AddAmountFragment : Fragment(), ServiceConnection {
      */
     private val amountCheckHandler = Handler(Looper.getMainLooper())
     private val amountCheckRunnable = AmountCheckRunnable()
-
-    private lateinit var listenerWR: WeakReference<Listener>
 
     /**
      * Recipient is either an emoji id or a user from contacts or recent txs.
@@ -189,6 +193,7 @@ class AddAmountFragment : Fragment(), ServiceConnection {
         requireActivity().unbindService(this)
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     private fun setupUI() {
         recipientUser = requireArguments().getParcelable("recipientUser")!!
         ui.decimalPointButton.text = decimalSeparator
@@ -205,7 +210,7 @@ class AddAmountFragment : Fragment(), ServiceConnection {
         // add first digit to the element list
         elements.add(Pair("0", ui.amountElement0TextView))
         ui.fullEmojiIdBgClickBlockerView.isClickable = false
-        emojiIdSummaryController = EmojiIdSummaryViewController(ui.emojiIdSummaryView)
+        emojiIdSummaryController = EmojiIdSummaryViewController(ui.emojiIdSummaryView, set)
         displayAliasOrEmojiId()
         emojiIdCopiedViewController = EmojiIdCopiedViewController(ui.emojiIdCopiedView)
         hideFullEmojiId(animated = false)
@@ -220,13 +225,9 @@ class AddAmountFragment : Fragment(), ServiceConnection {
         if (isFirstLaunch && amount != Double.MIN_VALUE) {
             val handler = Handler(Looper.getMainLooper())
             amount.toString().withIndex().forEach { (index, char) ->
-                handler.postDelayed({
-                    if (Character.isDigit(char)) {
-                        onDigitOrSeparatorClicked(char.toString())
-                    } else {
-                        onDigitOrSeparatorClicked(decimalSeparator)
-                    }
-                }, (index + 1) * Constants.UI.AddAmount.numPadDigitEnterAnimDurationMs * 2)
+                handler.postDelayed((index + 1) * Constants.UI.AddAmount.numPadDigitEnterAnimDurationMs * 2) {
+                    onDigitOrSeparatorClicked(if (Character.isDigit(char)) char.toString() else decimalSeparator)
+                }
             }
             handler.postDelayed(
                 this::setActionBindings,
@@ -234,6 +235,13 @@ class AddAmountFragment : Fragment(), ServiceConnection {
             )
         } else {
             setActionBindings()
+        }
+        if (EmojiId.of(recipientUser.publicKey.emojiId, set) != null) {
+            ui.fullEmojiIdTextView.layoutParams =
+                (ui.fullEmojiIdTextView.layoutParams as FrameLayout.LayoutParams)
+                    .apply { gravity = Gravity.CENTER }
+            ui.fullEmojiIdTextView.letterSpacing = 0.3F
+            ui.fullEmojiIdScrollView.setOnTouchListener { _, _ -> true }
         }
     }
 
@@ -262,31 +270,34 @@ class AddAmountFragment : Fragment(), ServiceConnection {
         ui.decimalPointButton.setOnClickListener { onDigitOrSeparatorClicked(decimalSeparator) }
     }
 
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-        listenerWR = WeakReference(context as Listener)
-    }
-
     private fun displayAliasOrEmojiId() {
-        if (recipientUser is Contact) {
+        val user = recipientUser
+        if (user is Contact) {
             ui.emojiIdSummaryContainerView.gone()
             ui.titleTextView.visible()
-            ui.titleTextView.text = (recipientUser as Contact).alias
+            ui.titleTextView.text = user.alias
         } else {
-            displayEmojiId(recipientUser.publicKey.emojiId)
+            displayEmojiId(user.publicKey.emojiId)
         }
     }
 
     private fun displayEmojiId(emojiId: String) {
+        ui.titleTextView.gone()
         ui.emojiIdSummaryContainerView.visible()
         emojiIdSummaryController.display(emojiId)
-        ui.titleTextView.gone()
-        ui.fullEmojiIdTextView.text = EmojiUtil.getFullEmojiIdSpannable(
-            emojiId,
-            string(emoji_id_chunk_separator),
-            color(black),
-            color(light_gray)
-        )
+        val yat = EmojiId.of(recipientUser.publicKey.emojiId, set)
+        if (yat == null) {
+            ui.copyEmojiIdTextView.text = string(copy_emoji_id)
+            ui.fullEmojiIdTextView.text = EmojiUtil.getFullEmojiIdSpannable(
+                emojiId,
+                string(emoji_id_chunk_separator),
+                color(black),
+                color(light_gray)
+            )
+        } else {
+            ui.copyEmojiIdTextView.text = string(copy_yat)
+            ui.fullEmojiIdTextView.text = yat.raw
+        }
     }
 
     override fun onDetach() {
@@ -308,45 +319,60 @@ class AddAmountFragment : Fragment(), ServiceConnection {
     }
 
     private fun showFullEmojiId() {
-        ui.fullEmojiIdBgClickBlockerView.isClickable = true
-        // make dimmers non-clickable until the anim is over
-        ui.dimmerView.isClickable = false
-        // prepare views
+        val isTariEmojiId = EmojiId.of(recipientUser.publicKey.emojiId, set) == null
         ui.emojiIdSummaryContainerView.invisible()
+        ui.fullEmojiIdBgClickBlockerView.isClickable = true
+        ui.dimmerView.isClickable = false
         ui.dimmerView.alpha = 0f
         ui.dimmerView.visible()
-        val fullEmojiIdInitialWidth = ui.emojiIdSummaryContainerView.width
-        val fullEmojiIdDeltaWidth =
-            (ui.rootView.width - dimenPx(common_horizontal_margin) * 2) - fullEmojiIdInitialWidth
-        ui.fullEmojiIdContainerView.setLayoutWidth(fullEmojiIdInitialWidth)
-        ui.fullEmojiIdContainerView.alpha = 0f
-        ui.fullEmojiIdContainerView.visible()
-        // scroll to end
-        ui.fullEmojiIdScrollView.post {
-            ui.fullEmojiIdScrollView.scrollTo(
-                ui.fullEmojiIdTextView.width - ui.fullEmojiIdScrollView.width,
-                0
-            )
-        }
+
         ui.copyEmojiIdButtonContainerView.alpha = 0f
         ui.copyEmojiIdButtonContainerView.visible()
         ui.copyEmojiIdButtonContainerView.setBottomMargin(0)
+
+        ui.fullEmojiIdContainerView.alpha = 0f
+        ui.fullEmojiIdContainerView.visible()
+
+        val fullEmojiIdContainerUpdate: (Float) -> Unit
+        if (isTariEmojiId) {
+            val fullEmojiIdInitialWidth = ui.emojiIdSummaryContainerView.width
+            val fullEmojiIdDeltaWidth =
+                (ui.rootView.width - dimenPx(common_horizontal_margin) * 2) - fullEmojiIdInitialWidth
+            ui.fullEmojiIdContainerView.setLayoutWidth(fullEmojiIdInitialWidth)
+            // scroll to end
+            ui.fullEmojiIdScrollView.post {
+                ui.fullEmojiIdScrollView.scrollTo(
+                    ui.fullEmojiIdTextView.width - ui.fullEmojiIdScrollView.width,
+                    0
+                )
+            }
+            fullEmojiIdContainerUpdate = { value ->
+                ui.dimmerView.alpha = value * 0.6F
+                // container alpha & scale
+                val scale = 1F + 0.2F * (1F - value)
+                ui.fullEmojiIdContainerView.alpha = value
+                ui.fullEmojiIdContainerView.scaleX = scale
+                ui.fullEmojiIdContainerView.scaleY = scale
+                val width = (fullEmojiIdInitialWidth + fullEmojiIdDeltaWidth * value).toInt()
+                ui.fullEmojiIdContainerView.setLayoutWidth(width)
+            }
+        } else {
+            ui.fullEmojiIdContainerView.alpha = 1F
+            ui.fullEmojiIdContainerView.setLayoutWidth(ui.emojiIdSummaryContainerView.width)
+            fullEmojiIdContainerUpdate = {
+                ui.dimmerView.alpha = it * 0.6F
+            }
+        }
         // animate full emoji id view
         val emojiIdAnim = ValueAnimator.ofFloat(0f, 1f)
-        emojiIdAnim.addUpdateListener { valueAnimator: ValueAnimator ->
-            val value = valueAnimator.animatedValue as Float
-            ui.dimmerView.alpha = value * 0.6f
-            // container alpha & scale
-            ui.fullEmojiIdContainerView.alpha = value
-            ui.fullEmojiIdContainerView.scaleX = 1f + 0.2f * (1f - value)
-            ui.fullEmojiIdContainerView.scaleY = 1f + 0.2f * (1f - value)
-            val width = (fullEmojiIdInitialWidth + fullEmojiIdDeltaWidth * value).toInt()
-            ui.fullEmojiIdContainerView.setLayoutWidth(width)
-            ui.backButton.alpha = 1 - value
-        }
         emojiIdAnim.duration = Constants.UI.shortDurationMs
+        emojiIdAnim.addUpdateListener {
+            fullEmojiIdContainerUpdate(it.animatedValue as Float)
+        }
         // copy emoji id button anim
         val copyEmojiIdButtonAnim = ValueAnimator.ofFloat(0f, 1f)
+        copyEmojiIdButtonAnim.duration = Constants.UI.shortDurationMs
+        copyEmojiIdButtonAnim.interpolator = EasingInterpolator(Ease.BACK_OUT)
         copyEmojiIdButtonAnim.addUpdateListener { valueAnimator: ValueAnimator ->
             val value = valueAnimator.animatedValue as Float
             ui.copyEmojiIdButtonContainerView.alpha = value
@@ -354,8 +380,6 @@ class AddAmountFragment : Fragment(), ServiceConnection {
                 (dimenPx(common_copy_emoji_id_button_visible_bottom_margin) * value).toInt()
             )
         }
-        copyEmojiIdButtonAnim.duration = Constants.UI.shortDurationMs
-        copyEmojiIdButtonAnim.interpolator = EasingInterpolator(Ease.BACK_OUT)
 
         // chain anim.s and start
         val animSet = AnimatorSet()
@@ -363,9 +387,11 @@ class AddAmountFragment : Fragment(), ServiceConnection {
         animSet.start()
         animSet.addListener(onEnd = { ui.dimmerView.isClickable = true })
         // scroll animation
-        ui.fullEmojiIdScrollView.postDelayed({
-            ui.fullEmojiIdScrollView.smoothScrollTo(0, 0)
-        }, Constants.UI.shortDurationMs + 20)
+        if (isTariEmojiId) {
+            ui.fullEmojiIdScrollView.postDelayed(Constants.UI.shortDurationMs + 20) {
+                ui.fullEmojiIdScrollView.smoothScrollTo(0, 0)
+            }
+        }
     }
 
     private fun hideFullEmojiId(animateCopyEmojiIdButton: Boolean = true, animated: Boolean) {
@@ -401,7 +427,6 @@ class AddAmountFragment : Fragment(), ServiceConnection {
             val width = (fullEmojiIdInitialWidth + fullEmojiIdDeltaWidth * value).toInt()
             ui.fullEmojiIdContainerView.setLayoutWidth(width)
             ui.emojiIdSummaryContainerView.alpha = value
-            ui.backButton.alpha = value
         }
         // chain anim.s and start
         val animSet = AnimatorSet()
@@ -422,9 +447,7 @@ class AddAmountFragment : Fragment(), ServiceConnection {
     /**
      * Dimmer clicked.
      */
-    private fun onEmojiIdDimmerClicked() {
-        hideFullEmojiId(animated = true)
-    }
+    private fun onEmojiIdDimmerClicked() = hideFullEmojiId(animated = true)
 
     private fun completeCopyEmojiId(clipboardString: String) {
         ui.dimmerView.isClickable = false
@@ -945,7 +968,7 @@ class AddAmountFragment : Fragment(), ServiceConnection {
     }
 
     private fun actualBalanceExceeded() {
-        listenerWR.get()?.onAmountExceedsActualAvailableBalance(this)
+        (activity as? Listener)?.onAmountExceedsActualAvailableBalance(this)
         ui.continueButton.isClickable = true
     }
 
@@ -954,7 +977,7 @@ class AddAmountFragment : Fragment(), ServiceConnection {
         if (error.code != WalletErrorCode.NO_ERROR) {
             TODO("Unhandled wallet error: ${error.code}")
         }
-        listenerWR.get()?.continueToAddNote(
+        (activity as? Listener)?.continueToAddNote(
             this,
             recipientUser,
             currentAmount
@@ -962,14 +985,13 @@ class AddAmountFragment : Fragment(), ServiceConnection {
     }
 
     private fun showContinueButtonAnimated() {
-        if (ui.continueButton.visibility == View.VISIBLE) {
-            return
+        if (ui.continueButton.visibility != View.VISIBLE) {
+            ui.continueButton.alpha = 0f
+            ui.continueButton.visible()
+            val anim = ObjectAnimator.ofFloat(ui.continueButton, "alpha", 0f, 1f)
+            anim.duration = Constants.UI.shortDurationMs
+            anim.start()
         }
-        ui.continueButton.alpha = 0f
-        ui.continueButton.visible()
-        val anim = ObjectAnimator.ofFloat(ui.continueButton, "alpha", 0f, 1f)
-        anim.duration = Constants.UI.shortDurationMs
-        anim.start()
     }
 
     /**

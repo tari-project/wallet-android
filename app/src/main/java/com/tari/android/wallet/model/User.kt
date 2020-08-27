@@ -43,6 +43,7 @@ import android.os.Parcelable
 open class User() : Parcelable {
 
     var publicKey = PublicKey()
+    var yat: String? = null
 
     constructor(
         publicKey: PublicKey
@@ -50,12 +51,12 @@ open class User() : Parcelable {
         this.publicKey = publicKey
     }
 
-    override fun toString(): String = "User(publicKey=$publicKey)"
+    override fun toString(): String = "User(publicKey=$publicKey,yat=$yat)"
 
     override fun equals(other: Any?): Boolean = (other is User)
             && publicKey == other.publicKey
 
-    override fun hashCode(): Int = publicKey.hashCode()
+    override fun hashCode(): Int = publicKey.hashCode() * (yat?.hashCode() ?: 1)
 
     // region Parcelable
 
@@ -77,10 +78,12 @@ open class User() : Parcelable {
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {
         parcel.writeParcelable(publicKey, flags)
+        parcel.writeString(yat)
     }
 
     private fun readFromParcel(inParcel: Parcel) {
         publicKey = inParcel.readParcelable(PublicKey::class.java.classLoader)!!
+        yat = inParcel.readString()
     }
 
     override fun describeContents(): Int {
@@ -89,4 +92,9 @@ open class User() : Parcelable {
 
     // endregion
 
+}
+
+class UserNotFoundException(private val eid: String) : IllegalStateException() {
+    override val message: String
+        get() = "User with emoji id [$eid] was not found"
 }
