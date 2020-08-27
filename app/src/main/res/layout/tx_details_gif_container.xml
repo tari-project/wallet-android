@@ -12,7 +12,8 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:gravity="center_vertical"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:visibility="gone">
 
         <com.tari.android.wallet.ui.component.CustomFontTextView
             android:id="@+id/loading_gif_text_view"
