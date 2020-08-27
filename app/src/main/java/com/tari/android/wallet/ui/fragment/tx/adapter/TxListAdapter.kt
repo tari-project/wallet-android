@@ -35,8 +35,10 @@ package com.tari.android.wallet.ui.fragment.tx.adapter
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.RequestManager
 import com.tari.android.wallet.R
 import com.tari.android.wallet.model.*
+import com.tari.android.wallet.ui.presentation.gif.GIFRepository
 
 /**
  * Transaction list recycler view adapter.
@@ -48,6 +50,8 @@ internal class TxListAdapter(
     private val completedTxs: List<CompletedTx>,
     private val pendingInboundTxs: List<PendingInboundTx>,
     private val pendingOutboundTxs: List<PendingOutboundTx>,
+    private val repository: GIFRepository,
+    private val glide: RequestManager,
     private val listener: (Tx) -> Unit
 ) : RecyclerView.Adapter<TxViewHolder>() {
 
@@ -84,8 +88,9 @@ internal class TxListAdapter(
         TxViewHolder(
             LayoutInflater.from(parent.context)
                 .inflate(R.layout.home_tx_list_item, parent, false),
-            listener
-        )
+            TxViewHolder.GIFViewModel(repository),
+            glide,
+        ) { listener(items[it]) }
 
     /**
      * Bind & display header or transaction.

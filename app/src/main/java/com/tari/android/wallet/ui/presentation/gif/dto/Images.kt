@@ -37,5 +37,13 @@ import com.google.gson.annotations.SerializedName
 
 data class Images(
     @Expose @SerializedName("original") val original: Original,
-    @Expose @SerializedName("fixed_height") val fixedHeight: FixedHeight,
+    @Expose @SerializedName("fixed_height") val fixedHeight: ImageVariant,
+    @Expose @SerializedName("fixed_width") val fixedWidth: ImageVariant,
+    @Expose @SerializedName("fixed_height_small") val fixedHeightSmall: ImageVariant,
+    @Expose @SerializedName("fixed_width_small") val fixedWidthSmall: ImageVariant,
+    @Expose @SerializedName("fixed_height_downsampled") val fixedHeightDownsampled: ImageVariant,
+    @Expose @SerializedName("fixed_width_downsampled") val fixedWidthDownsampled: ImageVariant,
+    @Expose @SerializedName("downsized") val downsized: ImageVariant,
+    @Expose @SerializedName("downsized_small") val downsizedSmall: ImageVariant,
+    @Expose @SerializedName("preview_gif") val previewGif: ImageVariant,
 )

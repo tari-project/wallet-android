@@ -35,4 +35,4 @@ package com.tari.android.wallet.ui.presentation.gif.dto
 import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
 
-data class FixedHeight(@Expose @SerializedName("url") val url: String)
+data class ImageVariant(@Expose @SerializedName("url") val url: String)

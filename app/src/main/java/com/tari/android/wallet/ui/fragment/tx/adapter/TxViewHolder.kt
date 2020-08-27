@@ -32,10 +32,24 @@
  */
 package com.tari.android.wallet.ui.fragment.tx.adapter
 
+import android.annotation.SuppressLint
 import android.view.View
 import androidx.annotation.StringRes
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.RequestManager
+import com.bumptech.glide.load.DataSource
+import com.bumptech.glide.load.engine.GlideException
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
+import com.bumptech.glide.load.resource.gif.GifDrawable
+import com.bumptech.glide.request.RequestListener
+import com.bumptech.glide.request.RequestOptions
+import com.bumptech.glide.request.target.Target
+import com.orhanobut.logger.Logger
 import com.tari.android.wallet.R
+import com.tari.android.wallet.R.color.tx_list_loading_gif_gray
 import com.tari.android.wallet.R.string.*
 import com.tari.android.wallet.databinding.HomeTxListItemBinding
 import com.tari.android.wallet.extension.applyFontStyle
@@ -43,16 +57,21 @@ import com.tari.android.wallet.model.*
 import com.tari.android.wallet.model.TxStatus.PENDING
 import com.tari.android.wallet.ui.component.CustomFont
 import com.tari.android.wallet.ui.component.EmojiIdSummaryViewController
-import com.tari.android.wallet.ui.component.GIFContainerViewController
 import com.tari.android.wallet.ui.extension.*
 import com.tari.android.wallet.ui.presentation.TxNote
+import com.tari.android.wallet.ui.presentation.gif.GIF
+import com.tari.android.wallet.ui.presentation.gif.GIFRepository
+import com.tari.android.wallet.ui.presentation.gif.Placeholder
 import com.tari.android.wallet.ui.util.UiUtil
+import com.tari.android.wallet.ui.util.UiUtil.setColor
 import com.tari.android.wallet.util.WalletUtil
 import com.tari.android.wallet.util.extractEmojis
 import io.reactivex.Observable
+import io.reactivex.ObservableEmitter
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
+import io.reactivex.subjects.BehaviorSubject
 import org.joda.time.DateTime
 import org.joda.time.Hours
 import org.joda.time.LocalDate
@@ -65,52 +84,45 @@ import java.util.concurrent.TimeUnit
  *
  * @author The Tari Development Team
  */
-class TxViewHolder(view: View, private val listener: (Tx) -> Unit) :
+class TxViewHolder(
+    view: View,
+    private val viewModel: GIFViewModel,
+    private val glide: RequestManager,
+    private val listener: (Int) -> Unit
+) :
     RecyclerView.ViewHolder(view),
-    View.OnClickListener {
+    GIFStateConsumer {
 
     companion object {
         // e.g. Wed, Jun 2
         private const val dateFormat = "E, MMM d"
     }
 
-    private lateinit var tx: Tx
-    private var emojiIdSummaryController: EmojiIdSummaryViewController
-
+    private val ui = HomeTxListItemBinding.bind(view)
+    private val emojiIdSummaryController = EmojiIdSummaryViewController(ui.participantEmojiIdView)
+    private var tx: Tx? = null
     private var dateUpdateTimer: Disposable? = null
 
-    private val ui = HomeTxListItemBinding.bind(view)
-    private lateinit var gifContainerViewController: GIFContainerViewController
-
     init {
-        emojiIdSummaryController = EmojiIdSummaryViewController(ui.participantEmojiIdView)
-        ui.rootView.setOnClickListener(this)
-        UiUtil.setProgressBarColor(
-            ui.gifContainer.loadingGifProgressBar,
-            color(R.color.tx_list_loading_gif_gray)
-        )
-    }
-
-    override fun onClick(view: View) {
-        UiUtil.temporarilyDisableClick(view)
-        listener(tx)
+        ui.gifContainer.loadingGifProgressBar.setColor(color(tx_list_loading_gif_gray))
+        ui.rootView.setOnClickListener {
+            UiUtil.temporarilyDisableClick(view)
+            listener(adapterPosition)
+        }
+        ui.gifContainer.retryLoadingGifTextView.setOnClickListener { viewModel.retry() }
+        viewModel.gifState.observeForever { it.handle(this) }
     }
 
     fun bind(tx: Tx, position: Int) {
         this.tx = tx
         setContentTopMarginAccordingToPosition(position)
-        displayFirstEmoji()
-        displayAliasOrEmojiId()
-        displayAmount()
-        displayDate()
-        displayStatus()
-        displayMessage()
-        gifContainerViewController = GIFContainerViewController(
-            ui.gifContainer,
-            tx,
-            dimen(R.dimen.tx_list_item_gif_container_top_margin)
-        )
-        gifContainerViewController.onRetryClick { gifContainerViewController.displayGIFUsingCache() }
+        displayFirstEmoji(tx)
+        displayAliasOrEmojiId(tx)
+        displayAmount(tx)
+        displayDate(tx)
+        displayStatus(tx)
+        displayMessage(tx)
+        viewModel.onNewTxNote(tx.message)
     }
 
     private fun setContentTopMarginAccordingToPosition(position: Int) {
@@ -137,12 +149,12 @@ class TxViewHolder(view: View, private val listener: (Tx) -> Unit) :
         }
     }
 
-    private fun displayFirstEmoji() {
+    private fun displayFirstEmoji(tx: Tx) {
         // display first emoji of emoji id
         ui.firstEmojiTextView.text = tx.user.publicKey.emojiId.extractEmojis()[0]
     }
 
-    private fun displayAliasOrEmojiId() {
+    private fun displayAliasOrEmojiId(tx: Tx) {
         val txUser = tx.user
         // display contact name or emoji id
         if (txUser is Contact) {
@@ -181,7 +193,7 @@ class TxViewHolder(view: View, private val listener: (Tx) -> Unit) :
         }
     }
 
-    private fun displayAmount() {
+    private fun displayAmount(tx: Tx) {
         val amount = WalletUtil.amountFormatter.format(tx.amount.tariValue)
         val (amountText, textColor, background) = when {
             tx is CancelledTx -> Triple(
@@ -219,7 +231,7 @@ class TxViewHolder(view: View, private val listener: (Tx) -> Unit) :
         ui.amountTextView.width = totalPadding + measure.toInt()
     }
 
-    private fun displayDate() {
+    private fun displayDate(tx: Tx) {
         val txDateTime = DateTime(tx.timestamp.toLong() * 1000L)
         val txDate = txDateTime.toLocalDate()
         val todayDate = LocalDate.now()
@@ -244,19 +256,17 @@ class TxViewHolder(view: View, private val listener: (Tx) -> Unit) :
         }
     }
 
-    private fun displayStatus() {
-        when (val tx = tx) {
-            is PendingInboundTx -> showStatusTextView(
-                if (tx.status == PENDING) tx_detail_waiting_for_sender_to_complete
-                else tx_detail_broadcasting
-            )
-            is PendingOutboundTx -> showStatusTextView(
-                if (tx.status == PENDING) tx_detail_waiting_for_recipient
-                else tx_detail_broadcasting
-            )
-            is CancelledTx -> showStatusTextView(tx_detail_payment_cancelled)
-            else -> ui.statusTextView.gone()
-        }
+    private fun displayStatus(tx: Tx) = when (tx) {
+        is PendingInboundTx -> showStatusTextView(
+            if (tx.status == PENDING) tx_detail_waiting_for_sender_to_complete
+            else tx_detail_broadcasting
+        )
+        is PendingOutboundTx -> showStatusTextView(
+            if (tx.status == PENDING) tx_detail_waiting_for_recipient
+            else tx_detail_broadcasting
+        )
+        is CancelledTx -> showStatusTextView(tx_detail_payment_cancelled)
+        else -> ui.statusTextView.gone()
     }
 
     private fun showStatusTextView(@StringRes messageId: Int) {
@@ -264,7 +274,7 @@ class TxViewHolder(view: View, private val listener: (Tx) -> Unit) :
         ui.statusTextView.text = string(messageId)
     }
 
-    private fun displayMessage() {
+    private fun displayMessage(tx: Tx) {
         val note = TxNote.fromNote(tx.message)
         if (note.message == null) {
             ui.messageTextView.gone()
@@ -277,12 +287,10 @@ class TxViewHolder(view: View, private val listener: (Tx) -> Unit) :
 
     fun onAttach() {
         startDateUpdateTimer()
-        gifContainerViewController.displayGIFUsingCache()
     }
 
     fun onDetach() {
         disposeDateUpdateTimer()
-        gifContainerViewController.detach()
     }
 
     private fun startDateUpdateTimer() {
@@ -292,9 +300,7 @@ class TxViewHolder(view: View, private val listener: (Tx) -> Unit) :
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .repeat()
-                .subscribe {
-                    displayDate()
-                }
+                .subscribe { tx?.let(::displayDate) }
     }
 
     private fun disposeDateUpdateTimer() {
@@ -302,4 +308,134 @@ class TxViewHolder(view: View, private val listener: (Tx) -> Unit) :
         dateUpdateTimer = null
     }
 
+    @SuppressLint("CheckResult")
+    class GIFViewModel(private val repository: GIFRepository) {
+        private val subject = BehaviorSubject.create<String>()
+        private val _gifState = MutableLiveData<GIFState>()
+        val gifState: LiveData<GIFState> get() = _gifState
+
+        init {
+            _gifState.value = NoGIFState
+            subject
+                .map(TxNote.Companion::fromNote)
+                .map { it.gifId ?: "" }
+                .switchMap {
+                    if (it.isEmpty()) Observable.just(NoGIFState)
+                    else Observable.create { e: ObservableEmitter<GIF> -> retrieveGif(e, it) }
+                        .map<GIFState>(::SuccessState)
+                        .onErrorReturn { ErrorState }
+                        .startWith(LoadingState)
+                        .subscribeOn(Schedulers.io())
+                        .doOnError { e -> Logger.e(e, "Error occurred during gif loading") }
+                }
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe { _gifState.value = it }
+        }
+
+        private fun retrieveGif(e: ObservableEmitter<GIF>, id: String) {
+            try {
+                e.onNext(repository.getById(id))
+            } catch (exception: Throwable) {
+                e.tryOnError(exception)
+            }
+        }
+
+        fun onNewTxNote(note: String) = subject.onNext(note)
+
+        fun retry() {
+            subject.value?.let(subject::onNext)
+        }
+
+    }
+
+    override fun onLoadingState() {
+        glide.clear(ui.gifContainer.gifView)
+        ui.gifContainer.gifView.visible()
+        ui.gifContainer.gifStatusContainer.visible()
+        ui.gifContainer.loadingGifTextView.visible()
+        ui.gifContainer.retryLoadingGifTextView.gone()
+        ui.gifContainer.loadingGifProgressBar.visible()
+        ui.gifContainer.gifView.setTopMargin(0)
+    }
+
+    override fun onErrorState() {
+        ui.gifContainer.gifStatusContainer.visible()
+        ui.gifContainer.loadingGifProgressBar.gone()
+        ui.gifContainer.loadingGifTextView.gone()
+        ui.gifContainer.retryLoadingGifTextView.visible()
+    }
+
+    override fun onSuccessState(gif: GIF) {
+        glide
+            .asGif()
+            .placeholder(Placeholder.color(adapterPosition).asDrawable())
+            .apply(RequestOptions().transform(RoundedCorners(10)))
+            .load(gif.uri)
+            .listener(GlideGIFListener())
+            .transition(DrawableTransitionOptions.withCrossFade(250))
+            .into(ui.gifContainer.gifView)
+    }
+
+    private fun onSuccess() {
+        ui.gifContainer.gifStatusContainer.gone()
+        ui.gifContainer.gifView.setTopMargin(dimen(R.dimen.tx_list_item_gif_container_top_margin))
+    }
+
+    override fun noGIFState() {
+        glide.clear(ui.gifContainer.gifView)
+        ui.gifContainer.gifView.gone()
+        ui.gifContainer.gifStatusContainer.gone()
+    }
+
+    interface GIFState {
+        fun handle(consumer: GIFStateConsumer)
+    }
+
+    private object LoadingState : GIFState {
+        override fun handle(consumer: GIFStateConsumer) = consumer.onLoadingState()
+    }
+
+    private object ErrorState : GIFState {
+        override fun handle(consumer: GIFStateConsumer) = consumer.onErrorState()
+    }
+
+    private class SuccessState(private val gif: GIF) : GIFState {
+        override fun handle(consumer: GIFStateConsumer) = consumer.onSuccessState(gif)
+    }
+
+    private object NoGIFState : GIFState {
+        override fun handle(consumer: GIFStateConsumer) = consumer.noGIFState()
+    }
+
+    private inner class GlideGIFListener : RequestListener<GifDrawable> {
+        override fun onLoadFailed(
+            e: GlideException?,
+            model: Any?,
+            target: Target<GifDrawable>?,
+            isFirstResource: Boolean
+        ): Boolean {
+            onErrorState()
+            return true
+        }
+
+        override fun onResourceReady(
+            resource: GifDrawable?,
+            model: Any?,
+            target: Target<GifDrawable>?,
+            dataSource: DataSource?,
+            isFirstResource: Boolean
+        ): Boolean {
+            onSuccess()
+            return false
+        }
+
+    }
+
+}
+
+interface GIFStateConsumer {
+    fun onLoadingState()
+    fun onErrorState()
+    fun onSuccessState(gif: GIF)
+    fun noGIFState()
 }

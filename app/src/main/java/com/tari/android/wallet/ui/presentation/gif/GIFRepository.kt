@@ -56,7 +56,8 @@ class GiphyRESTRetrofitRepository(private val gateway: GiphyRESTGateway) : GIFRe
         val body = response.body()
         return if (response.isSuccessful && body != null && body.meta.status in 200..299)
             body.data.map {
-                GIF(it.id, Uri.parse(it.embedUrl), Uri.parse(it.images.fixedHeight.url))
+                // TODO GIF OPTIMIZATION: change it.images.*variant* here to check other variants
+                GIF(it.id, Uri.parse(it.embedUrl), Uri.parse(it.images.fixedWidth.url))
             }
         else {
             throw GIFSearchException(
@@ -69,7 +70,14 @@ class GiphyRESTRetrofitRepository(private val gateway: GiphyRESTGateway) : GIFRe
         val response: Response<SearchGIFResponse> = gateway.getGIFByID(id).execute()
         val body = response.body()
         return if (response.isSuccessful && body != null && body.meta.status in 200..299)
-            body.data.let { GIF(it.id, Uri.parse(it.embedUrl), Uri.parse(it.images.original.url)) }
+        // TODO GIF OPTIMIZATION: change it.images.*variant* here to check other variants
+            body.data.let {
+                GIF(
+                    it.id,
+                    Uri.parse(it.embedUrl),
+                    Uri.parse(it.images.fixedWidth.url)
+                )
+            }
         else {
             throw GIFSearchException(
                 body?.meta?.message ?: response.message() ?: response.errorBody()?.string()

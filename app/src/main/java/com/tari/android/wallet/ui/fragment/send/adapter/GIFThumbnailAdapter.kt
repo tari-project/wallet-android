@@ -8,11 +8,13 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.RequestManager
 import com.bumptech.glide.load.resource.bitmap.CenterCrop
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.bumptech.glide.request.RequestOptions
 import com.tari.android.wallet.R
 import com.tari.android.wallet.extension.repopulate
 import com.tari.android.wallet.ui.fragment.send.adapter.GIFThumbnailAdapter.GIFThumbnailViewHolder
 import com.tari.android.wallet.ui.presentation.gif.GIF
+import com.tari.android.wallet.ui.presentation.gif.Placeholder
 
 class GIFThumbnailAdapter(
     private val glide: RequestManager,
@@ -68,8 +70,9 @@ class GIFThumbnailAdapter(
             itemView.setOnClickListener { onGifClick(gif) }
             glide.asGif()
                 .load(gif.uri)
-                .placeholder(R.drawable.background_gif_loading)
+                .placeholder(Placeholder.color(position).asDrawable())
                 .apply(RequestOptions().transform(CenterCrop(), RoundedCorners(24)))
+                .transition(DrawableTransitionOptions.withCrossFade(250))
                 .into(imageView)
         }
     }

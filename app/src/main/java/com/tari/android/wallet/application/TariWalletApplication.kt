@@ -41,7 +41,10 @@ import androidx.lifecycle.OnLifecycleEvent
 import androidx.lifecycle.ProcessLifecycleOwner
 import com.orhanobut.logger.AndroidLogAdapter
 import com.orhanobut.logger.Logger
-import com.tari.android.wallet.di.*
+import com.tari.android.wallet.di.ApplicationComponent
+import com.tari.android.wallet.di.ApplicationModule
+import com.tari.android.wallet.di.DaggerApplicationComponent
+import com.tari.android.wallet.di.WalletModule
 import com.tari.android.wallet.event.Event
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.infrastructure.Tracker
