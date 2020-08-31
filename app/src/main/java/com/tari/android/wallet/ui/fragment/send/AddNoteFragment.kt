@@ -66,6 +66,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.RequestManager
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.bumptech.glide.request.RequestOptions
 import com.daasuu.ei.Ease
 import com.daasuu.ei.EasingInterpolator
@@ -97,6 +98,7 @@ import com.tari.android.wallet.ui.fragment.store.LockBottomSheetBehavior
 import com.tari.android.wallet.ui.presentation.TxNote
 import com.tari.android.wallet.ui.presentation.gif.GIF
 import com.tari.android.wallet.ui.presentation.gif.GIFRepository
+import com.tari.android.wallet.ui.presentation.gif.Placeholder
 import com.tari.android.wallet.ui.util.UiUtil
 import com.tari.android.wallet.ui.util.UiUtil.setColor
 import com.tari.android.wallet.util.Constants
@@ -761,12 +763,13 @@ class AddNoteFragment : Fragment(), View.OnTouchListener {
                     glide.clear(gifView)
                     showContainer()
                 } else {
+                    showGIF()
                     glide.asGif()
-                        .placeholder(R.drawable.background_gif_loading)
+                        .placeholder(Placeholder.color(value).asDrawable())
                         .apply(transformation)
                         .load(value.uri)
+                        .transition(DrawableTransitionOptions.withCrossFade(250))
                         .into(gifView)
-                    showGIF()
                 }
             }
 

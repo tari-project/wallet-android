@@ -57,11 +57,11 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.animation.addListener
 import androidx.core.os.postDelayed
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.daasuu.ei.Ease
 import com.daasuu.ei.EasingInterpolator
 import com.squareup.seismic.ShakeDetector
@@ -87,6 +87,7 @@ import com.tari.android.wallet.ui.dialog.BottomSlideDialog
 import com.tari.android.wallet.ui.extension.*
 import com.tari.android.wallet.ui.fragment.send.FinalizeSendTxFragment
 import com.tari.android.wallet.ui.fragment.tx.adapter.TxListAdapter
+import com.tari.android.wallet.ui.presentation.gif.GIFRepository
 import com.tari.android.wallet.ui.resource.AnimationResource
 import com.tari.android.wallet.ui.resource.ResourceContainer
 import com.tari.android.wallet.ui.util.UiUtil
@@ -115,6 +116,9 @@ internal class TxListFragment : Fragment(),
 
     @Inject
     lateinit var tracker: Tracker
+
+    @Inject
+    lateinit var repository: GIFRepository
 
     @Inject
     lateinit var backupManager: BackupManager
@@ -249,7 +253,9 @@ internal class TxListFragment : Fragment(),
                 cancelledTxs,
                 completedTxs,
                 pendingInboundTxs,
-                pendingOutboundTxs
+                pendingOutboundTxs,
+                repository,
+                Glide.with(this),
             ) {
                 (requireActivity() as TxListRouter).toTxDetails(it)
             }
@@ -491,7 +497,7 @@ internal class TxListFragment : Fragment(),
     private fun bindToWalletService() {
         serviceConnection = ViewModelProvider(requireActivity())
             .get(TariWalletServiceConnection::class.java)
-        serviceConnection.connection.observe(viewLifecycleOwner, Observer {
+        serviceConnection.connection.observe(viewLifecycleOwner, {
             if (it.status == CONNECTED) onServiceConnected()
         })
     }

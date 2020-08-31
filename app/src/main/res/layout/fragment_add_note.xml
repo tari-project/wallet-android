@@ -125,12 +125,12 @@
 
                 <ImageView
                     android:id="@+id/gif_image_view"
-                    android:adjustViewBounds="true"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
-                    android:scaleType="fitCenter"
-                    android:contentDescription="@string/add_note_content_description_chosen_gif" />
+                    android:adjustViewBounds="true"
+                    android:contentDescription="@string/add_note_content_description_chosen_gif"
+                    android:scaleType="fitCenter" />
 
                 <ImageView
                     android:id="@+id/remove_gif_cta_view"
@@ -151,8 +151,8 @@
         android:id="@+id/search_giphy_container_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingHorizontal="10dp"
         android:orientation="vertical"
+        android:paddingHorizontal="10dp"
         app:layout_constraintBottom_toTopOf="@id/slide_button_container_view"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent">
