@@ -45,11 +45,6 @@
     </style>
 
     <style name="ChooseGIFBottomSlideDialogAnimation">
-        <item name="android:windowEnterAnimation">@anim/dialog_slide_from_bottom</item>
-        <item name="android:windowExitAnimation">@null</item>
-    </style>
-
-    <style name="ChooseGIFBottomNoDialogAnimation">
         <item name="android:windowEnterAnimation">@null</item>
         <item name="android:windowExitAnimation">@null</item>
     </style>

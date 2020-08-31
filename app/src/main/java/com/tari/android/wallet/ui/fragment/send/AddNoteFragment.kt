@@ -57,6 +57,7 @@ import androidx.constraintlayout.widget.ConstraintSet
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.animation.addListener
 import androidx.core.content.ContextCompat
+import androidx.core.view.doOnNextLayout
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
@@ -75,6 +76,7 @@ import com.giphy.sdk.core.models.enums.MediaType
 import com.giphy.sdk.ui.pagination.GPHContent
 import com.giphy.sdk.ui.views.GPHGridCallback
 import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.android.material.bottomsheet.BottomSheetBehavior.*
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.orhanobut.logger.Logger
 import com.tari.android.wallet.R
@@ -94,7 +96,6 @@ import com.tari.android.wallet.ui.component.EmojiIdCopiedViewController
 import com.tari.android.wallet.ui.component.EmojiIdSummaryViewController
 import com.tari.android.wallet.ui.extension.*
 import com.tari.android.wallet.ui.fragment.send.adapter.GIFThumbnailAdapter
-import com.tari.android.wallet.ui.fragment.store.LockBottomSheetBehavior
 import com.tari.android.wallet.ui.presentation.TxNote
 import com.tari.android.wallet.ui.presentation.gif.GIF
 import com.tari.android.wallet.ui.presentation.gif.GIFRepository
@@ -902,7 +903,7 @@ class AddNoteFragment : Fragment(), View.OnTouchListener {
 default no-op constructor is used by the framework for UI tree rebuild on configuration changes"""
     ) constructor() : DialogFragment() {
         private lateinit var ui: DialogChooseGifBinding
-        private lateinit var behavior: LockBottomSheetBehavior<View>
+        private lateinit var behavior: BottomSheetBehavior<View>
         private lateinit var searchSubscription: Disposable
 
         override fun onCreateView(
@@ -923,11 +924,6 @@ default no-op constructor is used by the framework for UI tree rebuild on config
             setupUI(searchSubject)
         }
 
-        override fun onStop() {
-            super.onStop()
-            dialog!!.window!!.setWindowAnimations(R.style.ChooseGIFBottomNoDialogAnimation)
-        }
-
         override fun onDestroyView() {
             searchSubscription.dispose()
             super.onDestroyView()
@@ -943,7 +939,7 @@ default no-op constructor is used by the framework for UI tree rebuild on config
                 override fun didSelectMedia(media: Media) {
                     val intent = Intent().apply { putExtra(MEDIA_DELIVERY_KEY, media) }
                     targetFragment!!.onActivityResult(targetRequestCode, Activity.RESULT_OK, intent)
-                    behavior.state = BottomSheetBehavior.STATE_HIDDEN
+                    behavior.state = STATE_HIDDEN
                 }
             }
             ui.gifSearchEditText.addTextChangedListener(
@@ -959,40 +955,44 @@ default no-op constructor is used by the framework for UI tree rebuild on config
 
         private fun setupDialog(bottomSheetDialog: BottomSheetDialog) {
             val bottomSheet: View = bottomSheetDialog.findViewById(R.id.design_bottom_sheet)!!
-            behavior = LockBottomSheetBehavior()
+            behavior = BottomSheetBehavior<View>()
             behavior.isHideable = true
             behavior.skipCollapsed = true
-            behavior.state = BottomSheetBehavior.STATE_EXPANDED
-            val rootView = bottomSheet.parent as View
-            rootView.setBackgroundColor(Color.BLACK)
-            behavior.addBottomSheetCallback(DismissOnHide(this, rootView))
+            behavior.state = STATE_HIDDEN
             val layoutParams = bottomSheet.layoutParams as CoordinatorLayout.LayoutParams
             layoutParams.height = ViewGroup.LayoutParams.MATCH_PARENT
             layoutParams.behavior = behavior
             bottomSheetDialog.setOnKeyListener { _, keyCode, _ ->
-                (keyCode == KeyEvent.KEYCODE_BACK && behavior.state != BottomSheetBehavior.STATE_HIDDEN &&
-                        behavior.state != BottomSheetBehavior.STATE_COLLAPSED).also {
-                    if (it) behavior.state = BottomSheetBehavior.STATE_HIDDEN
+                (keyCode == KeyEvent.KEYCODE_BACK && behavior.state != STATE_HIDDEN &&
+                        behavior.state != STATE_COLLAPSED).also {
+                    if (it) behavior.state = STATE_HIDDEN
                 }
+            }
+            ui.root.doOnNextLayout {
+                behavior.state = STATE_EXPANDED
+                behavior.addCallback(
+                    onStateChange = { _, state ->
+                        if (state == STATE_HIDDEN || state == STATE_COLLAPSED) dismiss()
+                    },
+                    onSlided = { _, slideOffset ->
+                        val alpha = (slideOffset.coerceIn(0F, 1F) * 255).toInt()
+                        val color = Color.argb(alpha, 0, 0, 0)
+                        (bottomSheet.parent as View).setBackgroundColor(color)
+                    }
+                )
             }
         }
 
-        private class DismissOnHide(
-            private val fragment: DialogFragment,
-            private val rootView: View
-        ) :
-            BottomSheetBehavior.BottomSheetCallback() {
-            override fun onStateChanged(bottomSheet: View, newState: Int) {
-                if (newState == BottomSheetBehavior.STATE_HIDDEN || newState == BottomSheetBehavior.STATE_COLLAPSED) {
-                    fragment.dismiss()
-                }
-            }
+        private fun BottomSheetBehavior<*>.addCallback(
+            onStateChange: (View, Int) -> Unit = { _, _ -> },
+            onSlided: (View, Float) -> Unit = { _, _ -> },
+        ) = addBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
+            override fun onStateChanged(bottomSheet: View, newState: Int) =
+                onStateChange(bottomSheet, newState)
 
-            override fun onSlide(bottomSheet: View, slideOffset: Float) {
-                val color: Int = Color.argb((slideOffset.coerceIn(0F, 1F) * 255).toInt(), 0, 0, 0)
-                rootView.setBackgroundColor(color)
-            }
-        }
+            override fun onSlide(bottomSheet: View, slideOffset: Float) =
+                onSlided(bottomSheet, slideOffset)
+        })
 
         companion object {
             @Suppress("DEPRECATION")
