@@ -74,6 +74,9 @@ class SharedPrefsWrapper(
         const val onboardingDisplayedAtHome = "tari_wallet_onboarding_displayed_at_home"
         const val torBinPath = "tari_wallet_tor_bin_path"
         const val torIdentity = "tari_wallet_tor_identity"
+        const val baseNodeLastSyncWasSuccessful = "tari_wallet_base_node_last_sync_was_successful"
+        const val baseNodeIsUserCustom = "tari_wallet_base_node_is_user_custom"
+        const val baseNodeNameKey = "tari_wallet_base_node_name"
         const val baseNodePublicKeyHexKey = "tari_wallet_base_node_public_key_hex"
         const val baseNodeAddressKey = "tari_wallet_base_node_address"
         const val faucetTestnetTariRequestCompleted =
@@ -170,6 +173,27 @@ class SharedPrefsWrapper(
         get() = sharedPrefs.getString(Key.torIdentity, null)?.toPreservedByteArray
         set(value) = sharedPrefs.edit().run {
             putString(Key.torIdentity, value?.toPreservedString)
+            apply()
+        }
+
+    var baseNodeLastSyncWasSuccessful: Boolean?
+        get() = sharedPrefs.getString(Key.baseNodeLastSyncWasSuccessful, null)?.toBoolean()
+        set(value) = sharedPrefs.edit().run {
+            putString(Key.baseNodeLastSyncWasSuccessful, value?.toString())
+            apply()
+        }
+
+    var baseNodeIsUserCustom: Boolean
+        get() = sharedPrefs.getBoolean(Key.baseNodeIsUserCustom, false)
+        set(value) = sharedPrefs.edit().run {
+            putBoolean(Key.baseNodeIsUserCustom, value)
+            apply()
+        }
+
+    var baseNodeName: String?
+        get() = sharedPrefs.getString(Key.baseNodeNameKey, null)
+        set(value) = sharedPrefs.edit().run {
+            putString(Key.baseNodeNameKey, value)
             apply()
         }
 

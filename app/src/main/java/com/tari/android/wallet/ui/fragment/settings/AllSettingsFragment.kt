@@ -53,7 +53,7 @@ import com.tari.android.wallet.infrastructure.backup.*
 import com.tari.android.wallet.infrastructure.security.biometric.BiometricAuthenticationService
 import com.tari.android.wallet.ui.dialog.ErrorDialog
 import com.tari.android.wallet.ui.extension.*
-import com.tari.android.wallet.ui.util.UiUtil.setColor
+import com.tari.android.wallet.ui.util.UIUtil.setColor
 import com.tari.android.wallet.util.SharedPrefsWrapper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

@@ -83,6 +83,8 @@ internal class FFIWallet(
         callbackTxCancellationSig: String,
         callbackBaseNodeSync: String,
         callbackBaseNodeSyncSig: String,
+        callbackStoreAndForwardMessagesReceived: String,
+        callbackStoreAndForwardMessagesReceivedSig: String,
         libError: FFIError
     )
 
@@ -248,6 +250,7 @@ internal class FFIWallet(
                 this::onStoreAndForwardSendResult.name, "([BZ)V",
                 this::onTxCancelled.name, "(J)V",
                 this::onBaseNodeSyncComplete.name, "([BZ)V",
+                this::onStoreAndForwardMessagesReceived.name, "()V",
                 error
             )
             Logger.i("Post jniCreate with code: %d.", error.code)
@@ -553,6 +556,16 @@ internal class FFIWallet(
         Logger.i("Store and forward send result received. Success: $success")
         val txId = BigInteger(1, bytes)
         GlobalScope.launch { listener?.onStoreAndForwardSendResult(txId, success) }
+    }
+
+    /**
+     * This callback function cannot be private due to JNI behaviour.
+     */
+    @Suppress("MemberVisibilityCanBePrivate")
+    fun onStoreAndForwardMessagesReceived() {
+        Logger.i("Store and forward messages received.")
+        // no-op for the moment
+        GlobalScope.launch { listener?.onStoreAndForwardMessagesReceived() }
     }
 
     private fun defineParticipantAndDirection(tx: FFICompletedTx): Pair<Tx.Direction, User> {

@@ -56,7 +56,7 @@ import com.tari.android.wallet.R.dimen.*
 import com.tari.android.wallet.databinding.FragmentVerifySeedPhraseBinding
 import com.tari.android.wallet.ui.component.CustomFont
 import com.tari.android.wallet.ui.extension.*
-import com.tari.android.wallet.ui.util.UiUtil
+import com.tari.android.wallet.ui.util.UIUtil
 import java.util.*
 import kotlin.LazyThreadSafetyMode.NONE
 import kotlin.collections.ArrayList
@@ -104,7 +104,7 @@ framework for UI tree rebuild on configuration changes"""
         fillSelectedWordsContainer()
         evaluateEnteredPhrase()
         ui.backCtaView.setOnClickListener(ThrottleClick { requireActivity().onBackPressed() })
-        ui.continueCtaView.setOnClickListener(ThrottleClick { UiUtil.animateViewClick(it) })
+        ui.continueCtaView.setOnClickListener(ThrottleClick { UIUtil.animateViewClick(it) })
     }
 
     private fun fillSelectableWordsContainer() {

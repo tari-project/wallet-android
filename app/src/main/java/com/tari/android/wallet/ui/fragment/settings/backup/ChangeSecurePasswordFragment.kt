@@ -59,8 +59,8 @@ import com.tari.android.wallet.infrastructure.backup.*
 import com.tari.android.wallet.ui.activity.settings.BackupSettingsRouter
 import com.tari.android.wallet.ui.dialog.ErrorDialog
 import com.tari.android.wallet.ui.extension.*
-import com.tari.android.wallet.ui.util.UiUtil
-import com.tari.android.wallet.ui.util.UiUtil.setColor
+import com.tari.android.wallet.ui.util.UIUtil
+import com.tari.android.wallet.ui.util.UIUtil.setColor
 import com.tari.android.wallet.util.SharedPrefsWrapper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -129,7 +129,7 @@ framework for UI tree rebuild on configuration changes"""
     private fun promptPasswordEnter() {
         ui.enterPasswordEditText.postDelayed({
             ui.enterPasswordEditText.requestFocus()
-            UiUtil.showKeyboard(requireActivity())
+            UIUtil.showKeyboard(requireActivity())
             ui.enterPasswordEditText
                 .postDelayed({ ui.contentScrollView.scrollToBottom() }, KEYBOARD_ANIMATION_TIME)
         }, KEYBOARD_SHOWUP_DELAY_AFTER_LOCAL_AUTH)
@@ -276,8 +276,8 @@ framework for UI tree rebuild on configuration changes"""
             ThrottleClick { requireActivity().onBackPressed() }
         )
         ui.setPasswordCtaTextView.setOnClickListener {
-            UiUtil.animateViewClick(ui.setPasswordCtaContainerView)
-            UiUtil.hideKeyboard(requireActivity())
+            UIUtil.animateViewClick(ui.setPasswordCtaContainerView)
+            UIUtil.hideKeyboard(requireActivity())
             preventExitAndPasswordEditing()
             setSecurePasswordCtaClickedState()
             performBackupAndUpdatePassword()

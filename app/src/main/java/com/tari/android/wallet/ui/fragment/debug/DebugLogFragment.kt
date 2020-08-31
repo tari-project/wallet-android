@@ -51,7 +51,7 @@ import com.tari.android.wallet.ui.extension.appComponent
 import com.tari.android.wallet.ui.extension.string
 import com.tari.android.wallet.ui.fragment.debug.adapter.LogFileSpinnerAdapter
 import com.tari.android.wallet.ui.fragment.debug.adapter.LogListAdapter
-import com.tari.android.wallet.ui.util.UiUtil
+import com.tari.android.wallet.ui.util.UIUtil
 import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.SharedPrefsWrapper
 import com.tari.android.wallet.util.WalletUtil
@@ -131,17 +131,17 @@ internal class DebugLogFragment : Fragment(), AdapterView.OnItemSelectedListener
     }
 
     private fun onScrollToTopButtonClicked() {
-        UiUtil.temporarilyDisableClick(ui.scrollToTopButton)
+        UIUtil.temporarilyDisableClick(ui.scrollToTopButton)
         ui.recyclerView.scrollToPosition(0)
     }
 
     private fun onScrollToBottomButtonClicked() {
-        UiUtil.temporarilyDisableClick(ui.scrollToBottomButton)
+        UIUtil.temporarilyDisableClick(ui.scrollToBottomButton)
         ui.recyclerView.scrollToPosition(selectedLogFileLines.lastIndex)
     }
 
     private fun showShareLogFilesDialog() {
-        UiUtil.temporarilyDisableClick(ui.shareButton)
+        UIUtil.temporarilyDisableClick(ui.shareButton)
         AlertDialog.Builder(context ?: return)
             .setMessage(string(debug_log_share_dialog_content))
             .setCancelable(false)

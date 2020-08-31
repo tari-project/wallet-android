@@ -50,8 +50,8 @@ import com.tari.android.wallet.databinding.FragmentWalletInfoBinding
 import com.tari.android.wallet.ui.component.EmojiIdCopiedViewController
 import com.tari.android.wallet.ui.component.EmojiIdSummaryViewController
 import com.tari.android.wallet.ui.extension.*
-import com.tari.android.wallet.ui.util.UiUtil
-import com.tari.android.wallet.ui.util.UiUtil.updateWidth
+import com.tari.android.wallet.ui.util.UIUtil
+import com.tari.android.wallet.ui.util.UIUtil.updateWidth
 import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.EmojiUtil
 import com.tari.android.wallet.util.SharedPrefsWrapper
@@ -117,7 +117,7 @@ class WalletInfoFragment : Fragment() {
 
     private fun displayQRCode(emojiId: String) {
         val content = WalletUtil.getEmojiIdDeepLink(emojiId)
-        UiUtil.getQREncodedBitmap(content, dimenPx(R.dimen.wallet_info_img_qr_code_size))?.let {
+        UIUtil.getQREncodedBitmap(content, dimenPx(R.dimen.wallet_info_img_qr_code_size))?.let {
             ui.qrImageView.setImageBitmap(it)
         }
     }
@@ -137,7 +137,7 @@ class WalletInfoFragment : Fragment() {
     }
 
     private fun onEmojiSummaryClicked(view: View) {
-        UiUtil.temporarilyDisableClick(view)
+        UIUtil.temporarilyDisableClick(view)
         showFullEmojiId()
     }
 
@@ -211,7 +211,7 @@ class WalletInfoFragment : Fragment() {
         }
 
     private fun hideFullEmojiId(animateCopyEmojiIdButton: Boolean = true) {
-        dimmerViews.forEach(UiUtil::temporarilyDisableClick)
+        dimmerViews.forEach(UIUtil::temporarilyDisableClick)
         ui.fullEmojiIdScrollView.smoothScrollTo(0, 0)
         ui.emojiIdSummaryContainerView.visible()
         val fullEmojiIdInitialWidth = ui.emojiIdContainerView.width
@@ -281,12 +281,12 @@ class WalletInfoFragment : Fragment() {
     }
 
     private fun onCopyEmojiIdButtonClicked(view: View) {
-        UiUtil.temporarilyDisableClick(view)
+        UIUtil.temporarilyDisableClick(view)
         completeCopy(sharedPrefsWrapper.emojiId!!)
     }
 
     private fun onCopyEmojiIdButtonLongClicked(view: View) {
-        UiUtil.temporarilyDisableClick(view)
+        UIUtil.temporarilyDisableClick(view)
         completeCopy(sharedPrefsWrapper.publicKeyHexString!!)
     }
 

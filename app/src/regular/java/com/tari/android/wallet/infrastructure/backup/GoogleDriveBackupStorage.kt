@@ -235,7 +235,7 @@ internal class GoogleDriveBackupStorage(
             }
             pageToken = result.nextPageToken
         } while (pageToken != null)
-        val latestBackupFile = backups.maxBy { it.first }?.second
+        val latestBackupFile = backups.maxByOrNull { it.first }?.second
         return if (latestBackupFile != null) {
             (latestBackupFile.id to latestBackupFile.name)
         } else {

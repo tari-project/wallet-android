@@ -54,7 +54,7 @@ import com.tari.android.wallet.ui.extension.color
 import com.tari.android.wallet.ui.extension.gone
 import com.tari.android.wallet.ui.extension.invisible
 import com.tari.android.wallet.ui.extension.visible
-import com.tari.android.wallet.ui.util.UiUtil
+import com.tari.android.wallet.ui.util.UIUtil
 import com.tari.android.wallet.util.Constants
 import io.reactivex.Observable
 import io.reactivex.disposables.Disposable
@@ -130,7 +130,7 @@ internal class UpdateProgressViewController(
     private var torBootstrapStatusSubscription: Disposable? = null
 
     init {
-        UiUtil.setProgressBarColor(progressBar, view.color(R.color.purple))
+        UIUtil.setProgressBarColor(progressBar, view.color(R.color.purple))
         progressBar.invisible()
         subscribeToEventBus()
     }
@@ -141,20 +141,20 @@ internal class UpdateProgressViewController(
         }
         baseNodeSyncCurrentRetryCount = 0
         // emojis
-        UiUtil.setTopMargin(hourglassIconTextView, 0)
+        UIUtil.setTopMargin(hourglassIconTextView, 0)
         hourglassIconTextView.alpha = 1f
         handshakeIconTextView.alpha = 1f
         // text views
         checkingForUpdatesTextView.visible()
-        UiUtil.setTopMargin(checkingForUpdatesTextView, 0)
+        UIUtil.setTopMargin(checkingForUpdatesTextView, 0)
         receivingTxsTextView.visible()
-        UiUtil.setTopMargin(receivingTxsTextView, 0)
+        UIUtil.setTopMargin(receivingTxsTextView, 0)
         completingTxsTextView.visible()
-        UiUtil.setTopMargin(completingTxsTextView, 0)
+        UIUtil.setTopMargin(completingTxsTextView, 0)
         updatingTxsTextView.visible()
-        UiUtil.setTopMargin(updatingTxsTextView, 0)
+        UIUtil.setTopMargin(updatingTxsTextView, 0)
         upToDateTextView.visible()
-        UiUtil.setTopMargin(upToDateTextView, 0)
+        UIUtil.setTopMargin(upToDateTextView, 0)
         upToDateTextView.alpha = 1f
         isReset = true
     }
@@ -372,14 +372,14 @@ internal class UpdateProgressViewController(
         val anim = ValueAnimator.ofFloat(0f, 1f)
         anim.addUpdateListener {
             val value = it.animatedValue as Float
-            UiUtil.setTopMargin(
+            UIUtil.setTopMargin(
                 currentTextView,
                 (-currentTextView.height * value).toInt()
             )
             if (currentTextView == checkingForUpdatesTextView
                 && nextTextView != upToDateTextView
             ) {
-                UiUtil.setTopMargin(
+                UIUtil.setTopMargin(
                     hourglassIconTextView,
                     (-hourglassIconTextView.height * value).toInt()
                 )

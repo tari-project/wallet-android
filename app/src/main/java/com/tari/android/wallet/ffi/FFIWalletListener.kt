@@ -53,5 +53,6 @@ internal interface FFIWalletListener {
     fun onTxCancelled(cancelledTx: CancelledTx)
     fun onDirectSendResult(txId: BigInteger, success: Boolean)
     fun onStoreAndForwardSendResult(txId: BigInteger, success: Boolean)
+    fun onStoreAndForwardMessagesReceived()
 
 }
