@@ -58,11 +58,12 @@ internal class DebugActivity : AppCompatActivity() {
         appComponent.inject(this)
         pagerAdapter = DebugViewPagerAdapter(this)
         ui.viewPager.adapter = pagerAdapter
-        ui.viewPager.offscreenPageLimit = 1
+        ui.viewPager.offscreenPageLimit = 2
         TabLayoutMediator(ui.tabLayout, ui.viewPager) { tab, position ->
             tab.text = when (position) {
                 0 -> string(R.string.debug_log_files_title)
                 1 -> string(R.string.debug_base_node_title)
+                2 -> string(R.string.debug_about_title)
                 else -> throw RuntimeException("Unexpected position: $position")
             }
         }.attach()

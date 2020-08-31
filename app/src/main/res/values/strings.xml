@@ -292,6 +292,8 @@
     <string name="debug_edit_base_node_invalid_address">Invalid address.</string>
     <string name="debug_edit_base_node_successful">Base node peer added successfully.</string>
     <string name="debug_edit_base_node_failed">Couldn\'t add base node peer.</string>
+    <!-- about -->
+    <string name="debug_about_title">About</string>
 
     <!-- In-app store -->
     <string name="store_title">Tari Testnet Store</string>
