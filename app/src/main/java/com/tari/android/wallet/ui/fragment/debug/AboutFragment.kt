@@ -30,38 +30,39 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.tari.android.wallet.ui.activity.debug.adapter
+package com.tari.android.wallet.ui.fragment.debug
 
+import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentActivity
-import androidx.viewpager2.adapter.FragmentStateAdapter
-import com.tari.android.wallet.ui.fragment.debug.AboutFragment
-import com.tari.android.wallet.ui.fragment.debug.BaseNodeConfigFragment
-import com.tari.android.wallet.ui.fragment.debug.DebugLogFragment
+import com.tari.android.wallet.BuildConfig
+import com.tari.android.wallet.databinding.FragmentAboutBinding
 
 /**
- * Fragment pager adapter for debug activity.
+ * Debug: displays basic version info.
  *
  * @author The Tari Development Team
  */
-internal class DebugViewPagerAdapter(activity: FragmentActivity) : FragmentStateAdapter(activity) {
+internal class AboutFragment : Fragment() {
 
-    /**
-     * Logs and base node configuration.
-     */
-    private val numberOfItems = 3
+    private lateinit var ui: FragmentAboutBinding
 
-    override fun getItemCount(): Int {
-        return numberOfItems
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? = FragmentAboutBinding.inflate(inflater, container, false).also { ui = it }.root
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        setupUI()
     }
 
-    override fun createFragment(position: Int): Fragment {
-        return when (position) {
-            0 -> DebugLogFragment()
-            1 -> BaseNodeConfigFragment()
-            2 -> AboutFragment()
-            else -> throw RuntimeException("Unexpected page position: $position")
-        }
+    private fun setupUI() {
+        ui.versionNameTextView.text = String.format("v%s", BuildConfig.VERSION_NAME)
+        ui.versionCodeTextView.text = String.format("b%d", BuildConfig.VERSION_CODE)
     }
 
 }

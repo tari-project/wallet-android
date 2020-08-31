@@ -108,10 +108,10 @@ internal class DebugLogFragment : Fragment(), AdapterView.OnItemSelectedListener
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         appComponent.inject(this)
-        setupUi()
+        setupUI()
     }
 
-    private fun setupUi() {
+    private fun setupUI() {
         // read log files
         logFiles = WalletUtil.getLogFilesFromDirectory(logFilesDirPath)
 
