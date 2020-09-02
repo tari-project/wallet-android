@@ -255,8 +255,10 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
         listeners.iterator().forEach {
             it.onBaseNodeSyncComplete(RequestId(requestId), success)
         }
+        sharedPrefsWrapper.baseNodeLastSyncWasSuccessful = success
         // add the next base node from the list if sync has failed
-        if (!success) {
+        // only if the base node setting isn't user custom
+        if (!success && !sharedPrefsWrapper.baseNodeIsUserCustom) {
             walletManager.setNextBaseNode()
         }
     }
@@ -380,7 +382,6 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
         cancelledTx.user = getUserByPublicKey(cancelledTx.user.publicKey)
         // post event to bus
         EventBus.post(Event.Wallet.TxCancelled(cancelledTx))
-        // notify external listeners
         val currentActivity = app.currentActivity
         if (cancelledTx.direction == INBOUND &&
             !(app.isInForeground && currentActivity is HomeActivity && currentActivity.willNotifyAboutNewTx())
@@ -388,9 +389,18 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
             Logger.i("Posting cancellation notification")
             notificationHelper.postTxCanceledNotification(cancelledTx)
         }
+        // notify external listeners
         listeners.iterator().forEach { listener -> listener.onTxCancelled(cancelledTx) }
         // schedule a backup
         backupManager.scheduleBackup(resetRetryCount = true)
+    }
+
+    override fun onStoreAndForwardMessagesReceived() {
+        Logger.d("Store and forward messages received.")
+        // post event to bus
+        EventBus.post(Event.Wallet.StoreAndForwardMessagesReceived())
+        // notify external listeners
+        listeners.iterator().forEach { listener -> listener.onStoreAndForwardMessagesReceived() }
     }
 
     /**
@@ -880,9 +890,28 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
             }
         }
 
+        override fun addBaseNodePeer(
+            baseNodePublicKey: String,
+            baseNodeAddress: String,
+            error: WalletError
+        ): Boolean {
+            return try {
+                val publicKeyFFI = FFIPublicKey(HexString(baseNodePublicKey))
+                val result = wallet.addBaseNodePeer(publicKeyFFI, baseNodeAddress)
+                publicKeyFFI.destroy()
+                result
+            } catch (throwable: Throwable) {
+                mapThrowableIntoError(throwable, error)
+                false
+            }
+        }
+
         override fun syncWithBaseNode(error: WalletError): RequestId? {
             return try {
-                RequestId(wallet.syncWithBaseNode())
+                val requestId = RequestId(wallet.syncWithBaseNode())
+                sharedPrefsWrapper.baseNodeLastSyncWasSuccessful = null
+                EventBus.post(Event.Wallet.BaseNodeSyncStarted(requestId))
+                requestId
             } catch (throwable: Throwable) {
                 mapThrowableIntoError(throwable, error)
                 null

@@ -108,6 +108,7 @@ jmethodID directSendResultCallbackMethodId;
 jmethodID storeAndForwardSendResultCallbackMethodId;
 jmethodID txCancellationCallbackMethodId;
 jmethodID syncBaseNodeId;
+jmethodID storeAndForwardMessagesReceivedCallbackMethodId;
 
 void BroadcastCallback(struct TariCompletedTransaction *pCompletedTransaction) {
     auto *jniEnv = getJNIEnv();
@@ -228,6 +229,17 @@ void BaseNodeSyncCallback(unsigned long long request_id, bool success) {
     g_vm->DetachCurrentThread();
 }
 
+void StoreAndForwardMessagesReceivedCallback() {
+    auto *jniEnv = getJNIEnv();
+    if (jniEnv == nullptr || callbackHandler == nullptr) {
+        return;
+    }
+    jniEnv->CallVoidMethod(
+            callbackHandler,
+            storeAndForwardMessagesReceivedCallbackMethodId);
+    g_vm->DetachCurrentThread();
+}
+
 extern "C"
 JNIEXPORT void JNICALL
 Java_com_tari_android_wallet_ffi_FFIWallet_jniCreate(
@@ -255,6 +267,8 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniCreate(
         jstring callback_tx_cancellation_sig,
         jstring callback_base_node_sync,
         jstring callback_base_node_sync_sig,
+        jstring callback_store_and_forward_messages_received,
+        jstring callback_store_and_forward_messages_received_sig,
         jobject error) {
 
     int i = 0;
@@ -393,6 +407,26 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniCreate(
         SetPointerField(jEnv, jThis, reinterpret_cast<jlong>(nullptr));
     }
 
+    const char *pStoreAndForwardMessagesReceivedMethod = jEnv->GetStringUTFChars(
+            callback_store_and_forward_messages_received,
+            JNI_FALSE);
+    const char *pStoreAndForwardMessagesReceivedMethodSig = jEnv->GetStringUTFChars(
+            callback_store_and_forward_messages_received_sig,
+            JNI_FALSE);
+    storeAndForwardMessagesReceivedCallbackMethodId = jEnv->GetMethodID(
+            jClass,
+            pStoreAndForwardMessagesReceivedMethod,
+            pStoreAndForwardMessagesReceivedMethodSig);
+    jEnv->ReleaseStringUTFChars(
+            callback_base_node_sync,
+            pStoreAndForwardMessagesReceivedMethod);
+    jEnv->ReleaseStringUTFChars(
+            callback_base_node_sync_sig,
+            pStoreAndForwardMessagesReceivedMethodSig);
+    if (storeAndForwardSendResultCallbackMethodId == nullptr) {
+        SetPointerField(jEnv, jThis, reinterpret_cast<jlong>(nullptr));
+    }
+
     jlong lWalletConfig = GetPointerField(jEnv, jpWalletConfig);
     auto *pWalletConfig = reinterpret_cast<TariWalletConfig *>(lWalletConfig);
 
@@ -416,6 +450,7 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniCreate(
                 StoreAndForwardSendResultCallback,
                 TxCancellationCallback,
                 BaseNodeSyncCallback,
+                StoreAndForwardMessagesReceivedCallback,
                 r);
     } else {
         pWallet = wallet_create(
@@ -433,6 +468,7 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniCreate(
                 StoreAndForwardSendResultCallback,
                 TxCancellationCallback,
                 BaseNodeSyncCallback,
+                StoreAndForwardMessagesReceivedCallback,
                 r);
     }
     setErrorCode(jEnv, error, i);

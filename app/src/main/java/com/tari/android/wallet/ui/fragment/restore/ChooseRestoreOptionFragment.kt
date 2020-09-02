@@ -44,7 +44,6 @@ import androidx.lifecycle.lifecycleScope
 import com.orhanobut.logger.Logger
 import com.tari.android.wallet.R.color.all_settings_back_up_status_processing
 import com.tari.android.wallet.R.string.back_up_wallet_storage_setup_error_desc
-import com.tari.android.wallet.R.string.back_up_wallet_storage_setup_error_title
 import com.tari.android.wallet.R.string.restore_wallet_error_title
 import com.tari.android.wallet.R.string.restore_wallet_error_desc
 import com.tari.android.wallet.R.string.error_no_connection_title
@@ -58,7 +57,7 @@ import com.tari.android.wallet.ui.extension.appComponent
 import com.tari.android.wallet.ui.extension.color
 import com.tari.android.wallet.ui.extension.gone
 import com.tari.android.wallet.ui.extension.string
-import com.tari.android.wallet.ui.util.UiUtil.setColor
+import com.tari.android.wallet.ui.util.UIUtil.setColor
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext

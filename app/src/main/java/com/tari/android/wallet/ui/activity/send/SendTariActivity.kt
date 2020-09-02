@@ -54,7 +54,7 @@ import com.tari.android.wallet.ui.fragment.send.AddAmountFragment
 import com.tari.android.wallet.ui.fragment.send.AddNoteFragment
 import com.tari.android.wallet.ui.fragment.send.AddRecipientFragment
 import com.tari.android.wallet.ui.fragment.send.FinalizeSendTxFragment
-import com.tari.android.wallet.ui.util.UiUtil
+import com.tari.android.wallet.ui.util.UIUtil
 import com.tari.android.wallet.util.Constants
 import java.lang.ref.WeakReference
 
@@ -129,7 +129,7 @@ internal class SendTariActivity : AppCompatActivity(),
     }
 
     override fun onDestroy() {
-        UiUtil.hideKeyboard(this)
+        UIUtil.hideKeyboard(this)
         super.onDestroy()
     }
 
@@ -143,7 +143,7 @@ internal class SendTariActivity : AppCompatActivity(),
             showInternetConnectionErrorDialog(this)
             return
         }
-        UiUtil.hideKeyboard(this)
+        UIUtil.hideKeyboard(this)
         val bundle = Bundle().apply { putParcelable("recipientUser", user) }
         ui.rootView.postDelayed(
             { goToAddAmountFragment(sourceFragment, bundle) },

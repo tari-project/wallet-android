@@ -64,7 +64,7 @@ import java.util.*
  *
  * @author The Tari Development Team
  */
-internal object UiUtil {
+internal object UIUtil {
 
     // enabled view clickability after a disable
     private val clickEnablingHandler = Handler()

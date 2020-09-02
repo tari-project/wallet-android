@@ -46,12 +46,15 @@ import com.tari.android.wallet.R
 import com.tari.android.wallet.R.color.white
 import com.tari.android.wallet.R.drawable.base_node_config_edit_text_bg
 import com.tari.android.wallet.R.drawable.base_node_config_edit_text_invalid_bg
+import com.tari.android.wallet.application.WalletManager
 import com.tari.android.wallet.databinding.FragmentBaseNodeConfigBinding
+import com.tari.android.wallet.event.Event
+import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.ffi.FFIPublicKey
 import com.tari.android.wallet.ffi.FFIWallet
 import com.tari.android.wallet.ffi.HexString
 import com.tari.android.wallet.ui.extension.*
-import com.tari.android.wallet.ui.util.UiUtil
+import com.tari.android.wallet.ui.util.UIUtil
 import com.tari.android.wallet.util.SharedPrefsWrapper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -70,6 +73,8 @@ internal class BaseNodeConfigFragment : Fragment() {
 
     @Inject
     lateinit var sharedPrefsWrapper: SharedPrefsWrapper
+    @Inject
+    lateinit var walletManager: WalletManager
 
     private val onion2ClipboardRegex = Regex("[a-zA-Z0-9]{64}::/onion/[a-zA-Z2-7]{16}(:[0-9]+)?")
     private val onion3ClipboardRegex = Regex("[a-zA-Z0-9]{64}::/onion[2-3]/[a-zA-Z2-7]{56}(:[0-9]+)?")
@@ -92,22 +97,41 @@ internal class BaseNodeConfigFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         appComponent.inject(this)
-        setupUi()
+        setupUI()
+        subscribeToEventBus()
     }
 
     override fun onStart() {
         super.onStart()
-        checkClipboardForValidInput()
+        checkClipboardForValidBaseNodeData()
     }
 
-    private fun setupUi() {
-        UiUtil.setProgressBarColor(ui.progressBar, color(white))
+    override fun onDestroyView() {
+        EventBus.unsubscribe(this)
+        super.onDestroyView()
+    }
+
+    private fun subscribeToEventBus() {
+        EventBus.subscribe<Event.Wallet.BaseNodeSyncComplete>(this) {
+            lifecycleScope.launch(Dispatchers.Main) {
+                updateCurrentBaseNode()
+            }
+        }
+        EventBus.subscribe<Event.Wallet.BaseNodeSyncStarted>(this) {
+            lifecycleScope.launch(Dispatchers.Main) {
+                updateCurrentBaseNode()
+            }
+        }
+    }
+
+    private fun setupUI() {
+        UIUtil.setProgressBarColor(ui.progressBar, color(white))
         ui.apply {
-            publicKeyHexTextView.text = sharedPrefsWrapper.baseNodePublicKeyHex
-            addressTextView.text = sharedPrefsWrapper.baseNodeAddress
+            updateCurrentBaseNode()
             progressBar.gone()
             invalidPublicKeyHexTextView.invisible()
             invalidAddressTextView.invisible()
+            resetButton.setOnClickListener { resetButtonClicked(it) }
             saveButton.setOnClickListener { saveButtonClicked(it) }
             publicKeyHexEditText.addTextChangedListener(
                 onTextChanged = { _, _, _, _ -> onPublicKeyHexChanged() }
@@ -116,6 +140,30 @@ internal class BaseNodeConfigFragment : Fragment() {
                 onTextChanged = { _, _, _, _ -> onAddressChanged() }
             )
         }
+    }
+
+    private fun updateCurrentBaseNode() {
+        val syncSuccessful = sharedPrefsWrapper.baseNodeLastSyncWasSuccessful
+        ui.syncStatusTextView.text = when (syncSuccessful) {
+            null -> {
+                string(R.string.debug_base_node_syncing)
+            }
+            true -> {
+                string(R.string.debug_base_node_sync_successful)
+            }
+            else -> {
+                string(R.string.debug_base_node_sync_failed)
+            }
+        }
+        if (sharedPrefsWrapper.baseNodeIsUserCustom) {
+            ui.nameTextView.text = string(R.string.debug_base_node_custom)
+            ui.resetButton.visible()
+        } else {
+            ui.nameTextView.text = sharedPrefsWrapper.baseNodeName
+            ui.resetButton.gone()
+        }
+        ui.publicKeyHexTextView.text = sharedPrefsWrapper.baseNodePublicKeyHex
+        ui.addressTextView.text = sharedPrefsWrapper.baseNodeAddress
     }
 
     private fun onPublicKeyHexChanged() {
@@ -131,7 +179,7 @@ internal class BaseNodeConfigFragment : Fragment() {
     /**
      * Checks whether a the public key and address are in the clipboard in the expected format.
      */
-    private fun checkClipboardForValidInput() {
+    private fun checkClipboardForValidBaseNodeData() {
         val clipboardManager =
             (activity?.getSystemService(CLIPBOARD_SERVICE) as? ClipboardManager) ?: return
         val clipboardString =
@@ -173,34 +221,58 @@ internal class BaseNodeConfigFragment : Fragment() {
         return isValid
     }
 
+    private fun resetButtonClicked(view: View) {
+        UIUtil.temporarilyDisableClick(view)
+        sharedPrefsWrapper.baseNodeIsUserCustom = false
+        sharedPrefsWrapper.baseNodeLastSyncWasSuccessful = null
+        lifecycleScope.launch(Dispatchers.IO) {
+            walletManager.setNextBaseNode()
+            FFIWallet.instance!!.syncWithBaseNode()
+            withContext(Dispatchers.Main) {
+                updateCurrentBaseNode()
+            }
+        }
+    }
+
     private fun saveButtonClicked(view: View) {
-        UiUtil.temporarilyDisableClick(view)
+        UIUtil.temporarilyDisableClick(view)
         // validate
         if (!validate()) {
             return
         }
         val publicKeyHex = ui.publicKeyHexEditText.editableText.toString()
         val address = ui.addressEditText.editableText.toString()
+        sharedPrefsWrapper.baseNodeIsUserCustom = true
+        sharedPrefsWrapper.baseNodeLastSyncWasSuccessful = null
+        sharedPrefsWrapper.baseNodeName = null
+        sharedPrefsWrapper.baseNodePublicKeyHex = publicKeyHex
+        sharedPrefsWrapper.baseNodeAddress = address
+
         ui.saveButton.invisible()
         ui.progressBar.visible()
         lifecycleScope.launch(Dispatchers.IO) {
-            addBaseNodePeer(publicKeyHex, address)
+            addCustomBaseNodePeer(publicKeyHex, address)
         }
     }
 
-    private suspend fun addBaseNodePeer(publicKeyHex: String, address: String) {
+    private suspend fun addCustomBaseNodePeer(publicKeyHex: String, address: String) {
         val baseNodeKeyFFI = FFIPublicKey(HexString(publicKeyHex))
         val success = try {
-            FFIWallet.instance!!.addBaseNodePeer(baseNodeKeyFFI, address)
+            val wallet = FFIWallet.instance!!
+            wallet.addBaseNodePeer(baseNodeKeyFFI, address)
+            wallet.syncWithBaseNode()
             true
         } catch (exception: Exception) {
             false
         }
         baseNodeKeyFFI.destroy()
-        withContext(Dispatchers.Main) {
-            if (success) {
+        if (success) {
+            withContext(Dispatchers.Main) {
                 addBaseNodePeerSuccessful(publicKeyHex, address)
-            } else {
+            }
+        } else {
+            walletManager.setNextBaseNode()
+            withContext(Dispatchers.Main) {
                 addBaseNodePeerFailed()
             }
         }
@@ -226,6 +298,7 @@ internal class BaseNodeConfigFragment : Fragment() {
             R.string.debug_edit_base_node_successful,
             Toast.LENGTH_LONG
         ).show()
+        updateCurrentBaseNode()
     }
 
     private fun addBaseNodePeerFailed() {
@@ -239,6 +312,7 @@ internal class BaseNodeConfigFragment : Fragment() {
             R.string.debug_edit_base_node_failed,
             Toast.LENGTH_LONG
         ).show()
+        updateCurrentBaseNode()
     }
 
 }

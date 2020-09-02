@@ -56,7 +56,7 @@ import com.tari.android.wallet.ui.extension.color
 import com.tari.android.wallet.ui.extension.drawable
 import com.tari.android.wallet.ui.extension.gone
 import com.tari.android.wallet.ui.extension.string
-import com.tari.android.wallet.ui.util.UiUtil
+import com.tari.android.wallet.ui.util.UIUtil
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
@@ -100,7 +100,7 @@ framework for UI tree rebuild on configuration changes"""
     private fun setupUi() {
         animation = NavigationPanelAnimation(ui.controlsView)
         configureWebView()
-        UiUtil.setProgressBarColor(ui.progressBar, color(purple))
+        UIUtil.setProgressBarColor(ui.progressBar, color(purple))
         ui.browserBackCtaView.setOnClickListener {
             ui.webView.apply { if (canGoBack()) goBack() }
         }

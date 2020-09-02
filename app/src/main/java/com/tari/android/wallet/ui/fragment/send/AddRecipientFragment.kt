@@ -72,7 +72,7 @@ import com.tari.android.wallet.ui.activity.qr.QRScannerActivity
 import com.tari.android.wallet.ui.dialog.BottomSlideDialog
 import com.tari.android.wallet.ui.extension.*
 import com.tari.android.wallet.ui.fragment.send.adapter.RecipientListAdapter
-import com.tari.android.wallet.ui.util.UiUtil
+import com.tari.android.wallet.ui.util.UIUtil
 import com.tari.android.wallet.util.*
 import com.tari.android.wallet.util.Constants.Wallet.emojiFormatterChunkSize
 import com.tari.android.wallet.util.Constants.Wallet.emojiIdLength
@@ -228,7 +228,7 @@ class AddRecipientFragment : Fragment(),
         ui.contactsListRecyclerView.addOnScrollListener(scrollListener)
         ui.contactsListRecyclerView.addOnItemTouchListener(this)
         ui.scrollDepthGradientView.alpha = 0f
-        UiUtil.setProgressBarColor(ui.progressBar, color(add_recipient_prog_bar))
+        UIUtil.setProgressBarColor(ui.progressBar, color(add_recipient_prog_bar))
         ui.progressBar.visible()
         ui.continueButton.gone()
         ui.invalidEmojiIdTextView.gone()
@@ -342,7 +342,7 @@ class AddRecipientFragment : Fragment(),
             color(black),
             color(light_gray)
         )
-        UiUtil.setBottomMargin(
+        UIUtil.setBottomMargin(
             ui.emojiIdContainerView,
             -dimenPx(add_recipient_clipboard_emoji_id_container_height)
         )
@@ -359,7 +359,7 @@ class AddRecipientFragment : Fragment(),
             dimmerViews.forEach { dimmerView ->
                 dimmerView.alpha = animValue * 0.6f
             }
-            UiUtil.setBottomMargin(
+            UIUtil.setBottomMargin(
                 ui.emojiIdContainerView,
                 (-dimenPx(add_recipient_clipboard_emoji_id_container_height) * (1f - animValue)).toInt()
             )
@@ -368,11 +368,11 @@ class AddRecipientFragment : Fragment(),
         emojiIdAppearAnim.duration = Constants.UI.mediumDurationMs
 
         // animate and show paste emoji id button
-        UiUtil.setTopMargin(ui.pasteEmojiIdContainerView, 0)
+        UIUtil.setTopMargin(ui.pasteEmojiIdContainerView, 0)
         val pasteButtonAppearAnim = ValueAnimator.ofFloat(0f, 1f)
         pasteButtonAppearAnim.addUpdateListener { valueAnimator: ValueAnimator ->
             val value = valueAnimator.animatedValue as Float
-            UiUtil.setTopMargin(
+            UIUtil.setTopMargin(
                 ui.pasteEmojiIdContainerView,
                 (dimenPx(add_recipient_paste_emoji_id_button_visible_top_margin) * value).toInt()
             )
@@ -404,7 +404,7 @@ class AddRecipientFragment : Fragment(),
         val pasteButtonDisappearAnim = ValueAnimator.ofFloat(0f, 1f)
         pasteButtonDisappearAnim.addUpdateListener { valueAnimator: ValueAnimator ->
             val value = valueAnimator.animatedValue as Float
-            UiUtil.setTopMargin(
+            UIUtil.setTopMargin(
                 ui.pasteEmojiIdContainerView,
                 (dimenPx(add_recipient_paste_emoji_id_button_visible_top_margin) * (1 - value)).toInt()
             )
@@ -419,7 +419,7 @@ class AddRecipientFragment : Fragment(),
             dimmerViews.forEach { dimmerView ->
                 dimmerView.alpha = 0.6f * (1 - value)
             }
-            UiUtil.setBottomMargin(
+            UIUtil.setBottomMargin(
                 ui.emojiIdContainerView,
                 (-dimenPx(add_recipient_clipboard_emoji_id_container_height) * value).toInt()
             )
@@ -510,9 +510,9 @@ class AddRecipientFragment : Fragment(),
     }
 
     private fun onBackButtonClicked(view: View) {
-        UiUtil.temporarilyDisableClick(view)
+        UIUtil.temporarilyDisableClick(view)
         val mActivity = activity ?: return
-        UiUtil.hideKeyboard(mActivity)
+        UIUtil.hideKeyboard(mActivity)
         ui.rootView.postDelayed({
             mActivity.onBackPressed()
         }, 200L)
@@ -563,7 +563,7 @@ class AddRecipientFragment : Fragment(),
      */
     private fun onQRButtonClick() {
         val mActivity = activity ?: return
-        UiUtil.hideKeyboard(mActivity)
+        UIUtil.hideKeyboard(mActivity)
         hidePasteEmojiIdViews(animate = true) {
             ui.rootView.postDelayed({ startQRCodeActivity() }, Constants.UI.keyboardHideWaitMs)
         }
@@ -608,7 +608,7 @@ class AddRecipientFragment : Fragment(),
     }
 
     private fun onContinueButtonClicked(view: View) {
-        UiUtil.temporarilyDisableClick(view)
+        UIUtil.temporarilyDisableClick(view)
         AsyncTask.execute {
             val error = WalletError()
             val contacts = walletService.getContacts(error)
@@ -632,7 +632,7 @@ class AddRecipientFragment : Fragment(),
         hidePasteEmojiIdViews(animate = true) {
             val mActivity = activity
             if (mActivity != null) {
-                UiUtil.hideKeyboard(mActivity)
+                UIUtil.hideKeyboard(mActivity)
                 ui.searchEditText.clearFocus()
             }
         }
@@ -683,7 +683,7 @@ class AddRecipientFragment : Fragment(),
      */
     override fun onInterceptTouchEvent(rv: RecyclerView, e: MotionEvent): Boolean {
         val mActivity = activity ?: return false
-        UiUtil.hideKeyboard(mActivity)
+        UIUtil.hideKeyboard(mActivity)
         ui.searchEditText.clearFocus()
         return false
     }
@@ -807,7 +807,7 @@ class AddRecipientFragment : Fragment(),
                                     ui.continueButton.visible()
                                     val mActivity = activity
                                     if (mActivity != null) {
-                                        UiUtil.hideKeyboard(mActivity)
+                                        UIUtil.hideKeyboard(mActivity)
                                         ui.searchEditText.clearFocus()
                                     }
                                     onSearchTextChanged(textWithoutSeparators)

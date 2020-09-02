@@ -65,7 +65,7 @@ internal class WalletManager(
 ) {
 
     private var logFileObserver: LogFileObserver? = null
-    private lateinit var baseNodeIterator: Iterator<Pair<String, String>>
+    private lateinit var baseNodeIterator: Iterator<Triple<String, String, String>>
 
     init {
         // post initial wallet state
@@ -165,21 +165,22 @@ internal class WalletManager(
 
     /**
      * Returns the list of base nodes in the resource file base_nodes.txt as pairs of
-     * ({public_key_hex}, {public_address}).
+     * ({name}, {public_key_hex}, {public_address}).
      */
     private val baseNodeList by lazy {
         val fileContent = IOUtils.toString(
             context.resources.openRawResource(R.raw.base_nodes),
             "UTF-8"
         )
-        val baseNodes = mutableListOf<Pair<String, String>>()
-        val regex = Regex("([A-Za-z0-9]{64}::/onion3/[A-Za-z0-9]+:[\\d]+)")
+        val baseNodes = mutableListOf<Triple<String, String, String>>()
+        val regex = Regex("(.+::[A-Za-z0-9]{64}::/onion3/[A-Za-z0-9]+:[\\d]+)")
         regex.findAll(fileContent).forEach { matchResult ->
-            val pairString = matchResult.value.split("::")
+            val tripleString = matchResult.value.split("::")
             baseNodes.add(
-                Pair(
-                    pairString[0],
-                    pairString[1]
+                Triple(
+                    tripleString[0],
+                    tripleString[1],
+                    tripleString[2]
                 )
             )
         }
@@ -196,10 +197,14 @@ internal class WalletManager(
             baseNodeIterator = baseNodeList.iterator()
         }
         val baseNode = baseNodeIterator.next()
-        val publicKeyHex = baseNode.first
-        val address = baseNode.second
+        val name = baseNode.first
+        val publicKeyHex = baseNode.second
+        val address = baseNode.third
+        sharedPrefsWrapper.baseNodeLastSyncWasSuccessful = null
+        sharedPrefsWrapper.baseNodeName = name
         sharedPrefsWrapper.baseNodePublicKeyHex = publicKeyHex
         sharedPrefsWrapper.baseNodeAddress = address
+        sharedPrefsWrapper.baseNodeIsUserCustom = false
 
         val baseNodeKeyFFI = FFIPublicKey(HexString(publicKeyHex))
         FFIWallet.instance?.addBaseNodePeer(baseNodeKeyFFI, address)
@@ -242,7 +247,22 @@ internal class WalletManager(
             FFIWallet.instance = wallet
             sharedPrefsWrapper.torIdentity = wallet.getTorIdentity()
             startLogFileObserver()
-            setNextBaseNode()
+            // don't change the base node if it's a custom base node entered by the user
+            if (sharedPrefsWrapper.baseNodeIsUserCustom) {
+                val publicKeyHex = sharedPrefsWrapper.baseNodePublicKeyHex
+                val address = sharedPrefsWrapper.baseNodeAddress
+                if (publicKeyHex == null || address == null) {
+                    // there's something unexpected with the data, use Tari base nodes
+                    setNextBaseNode()
+                } else {
+                    // data is ok, set custom user base node
+                    val baseNodeKeyFFI = FFIPublicKey(HexString(publicKeyHex))
+                    FFIWallet.instance?.addBaseNodePeer(baseNodeKeyFFI, address)
+                    baseNodeKeyFFI.destroy()
+                }
+            } else {
+                setNextBaseNode()
+            }
             saveWalletPublicKeyHexToSharedPrefs()
         }
     }

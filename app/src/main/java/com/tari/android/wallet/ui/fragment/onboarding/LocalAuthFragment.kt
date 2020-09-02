@@ -59,7 +59,7 @@ import com.tari.android.wallet.infrastructure.security.biometric.BiometricAuthen
 import com.tari.android.wallet.infrastructure.security.biometric.BiometricAuthenticationService.BiometricAuthenticationException
 import com.tari.android.wallet.infrastructure.security.biometric.BiometricAuthenticationService.BiometricAuthenticationType.*
 import com.tari.android.wallet.ui.extension.*
-import com.tari.android.wallet.ui.util.UiUtil
+import com.tari.android.wallet.ui.util.UIUtil
 import com.tari.android.wallet.util.Constants.UI.Auth
 import com.tari.android.wallet.util.SharedPrefsWrapper
 import kotlinx.coroutines.launch
@@ -130,7 +130,7 @@ internal class LocalAuthFragment : Fragment() {
 
     private fun setupUi() {
         ui.progressBarContainerView.invisible()
-        UiUtil.setProgressBarColor(ui.progressBar, color(R.color.white))
+        UIUtil.setProgressBarColor(ui.progressBar, color(R.color.white))
         if (authType == BIOMETRIC) {
             //setup ui for biometric auth
             ui.authTypeImageView.setImageResource(R.drawable.fingerprint)
@@ -177,8 +177,8 @@ internal class LocalAuthFragment : Fragment() {
     }
 
     private fun onEnableAuthButtonClick(view: View) {
-        UiUtil.temporarilyDisableClick(view)
-        val animatorSet = UiUtil.animateButtonClick(ui.enableAuthButton)
+        UIUtil.temporarilyDisableClick(view)
+        val animatorSet = UIUtil.animateButtonClick(ui.enableAuthButton)
         animatorSet.addListener(onEnd = {
             if (authType == NONE) {
                 displayAuthNotAvailableDialog()

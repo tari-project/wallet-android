@@ -11,7 +11,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:contentDescription="@null"
-        android:layout_marginTop="-70dp"
+        android:layout_marginTop="-50dp"
         android:alpha="0.9"
         android:src="@drawable/about_logo" />
 
@@ -30,10 +30,10 @@
         android:id="@+id/version_code_text_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="6dp"
+        android:layout_marginTop="8dp"
         android:textColor="@color/black"
         android:alpha="0.8"
-        android:textSize="14sp"
+        android:textSize="15sp"
         app:customFont="AVENIR_NEXT_LT_PRO_REGULAR"
         tools:text="b123" />
 

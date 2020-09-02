@@ -46,7 +46,7 @@ import com.tari.android.wallet.R.color.white
 import com.tari.android.wallet.databinding.FragmentEnterBackupPasswordBinding
 import com.tari.android.wallet.ui.activity.settings.BackupSettingsRouter
 import com.tari.android.wallet.ui.extension.*
-import com.tari.android.wallet.ui.util.UiUtil
+import com.tari.android.wallet.ui.util.UIUtil
 import com.tari.android.wallet.util.SharedPrefsWrapper
 import javax.inject.Inject
 
@@ -78,7 +78,7 @@ framework for UI tree rebuild on configuration changes"""
         super.onViewCreated(view, savedInstanceState)
         setChangePasswordCTAState(isEnabled = false)
         ui.passwordEditText.requestFocus()
-        ui.root.postDelayed(LOCAL_AUTH_DELAY_TIME) { UiUtil.showKeyboard(requireActivity()) }
+        ui.root.postDelayed(LOCAL_AUTH_DELAY_TIME) { UIUtil.showKeyboard(requireActivity()) }
         ui.backCtaView.setOnClickListener(ThrottleClick { requireActivity().onBackPressed() })
         ui.changePasswordCtaTextView.setOnClickListener {
             val input = (ui.passwordEditText.text?.toString() ?: "").toCharArray()

@@ -515,6 +515,10 @@ class FFIWalletTests {
             )
         }
 
+        override fun onStoreAndForwardMessagesReceived() {
+            Logger.i("Store and forward messages received.")
+        }
+
     }
 
 }

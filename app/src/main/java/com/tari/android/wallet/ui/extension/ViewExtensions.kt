@@ -54,7 +54,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.airbnb.lottie.LottieAnimationView
 import com.tari.android.wallet.R
 import com.tari.android.wallet.ui.dialog.BottomSlideDialog
-import com.tari.android.wallet.ui.util.UiUtil
+import com.tari.android.wallet.ui.util.UIUtil
 import android.animation.Animator as LegacyAnimator
 import android.animation.Animator.AnimatorListener as LegacyAnimatorListener
 
@@ -118,7 +118,7 @@ internal fun TextView.setWidthToMeasured() {
         View.MeasureSpec.UNSPECIFIED,
         View.MeasureSpec.UNSPECIFIED
     )
-    UiUtil.setWidth(
+    UIUtil.setWidth(
         this,
         this.measuredWidth
     )
@@ -133,11 +133,11 @@ internal fun TextView.setWidthAndHeightToMeasured() {
         View.MeasureSpec.UNSPECIFIED,
         View.MeasureSpec.UNSPECIFIED
     )
-    UiUtil.setWidth(
+    UIUtil.setWidth(
         this,
         this.measuredWidth
     )
-    UiUtil.setHeight(
+    UIUtil.setHeight(
         this,
         this.measuredHeight
     )
@@ -247,7 +247,7 @@ internal fun View.drawable(@DrawableRes id: Int): Drawable? = context.drawable(i
 internal class ThrottleClick(private val delegate: (View) -> Unit) :
     View.OnClickListener {
     override fun onClick(v: View?) {
-        v?.let(UiUtil::temporarilyDisableClick)
+        v?.let(UIUtil::temporarilyDisableClick)
         v?.let(delegate)
     }
 }
