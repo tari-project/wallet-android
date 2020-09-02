@@ -61,7 +61,6 @@ import com.tari.android.wallet.ui.extension.*
 import com.tari.android.wallet.ui.presentation.TxNote
 import com.tari.android.wallet.ui.presentation.gif.GIF
 import com.tari.android.wallet.ui.presentation.gif.GIFRepository
-import com.tari.android.wallet.ui.presentation.gif.Placeholder
 import com.tari.android.wallet.ui.util.UIUtil
 import com.tari.android.wallet.ui.util.UIUtil.setColor
 import com.tari.android.wallet.util.WalletUtil
@@ -350,11 +349,11 @@ class TxViewHolder(
 
     override fun onLoadingState() {
         glide.clear(ui.gifContainer.gifView)
-        ui.gifContainer.gifView.visible()
         ui.gifContainer.gifStatusContainer.visible()
         ui.gifContainer.loadingGifTextView.visible()
         ui.gifContainer.retryLoadingGifTextView.gone()
         ui.gifContainer.loadingGifProgressBar.visible()
+        ui.gifContainer.gifView.gone()
         ui.gifContainer.gifView.setTopMargin(0)
     }
 
@@ -368,7 +367,7 @@ class TxViewHolder(
     override fun onSuccessState(gif: GIF) {
         glide
             .asGif()
-            .placeholder(Placeholder.color(adapterPosition).asDrawable())
+            .override(ui.gifContainer.gifContainerRootView.width, Target.SIZE_ORIGINAL)
             .apply(RequestOptions().transform(RoundedCorners(10)))
             .load(gif.uri)
             .listener(GlideGIFListener())
@@ -378,6 +377,7 @@ class TxViewHolder(
 
     private fun onSuccess() {
         ui.gifContainer.gifStatusContainer.gone()
+        ui.gifContainer.gifView.visible()
         ui.gifContainer.gifView.setTopMargin(dimen(R.dimen.tx_list_item_gif_container_top_margin))
     }
 
