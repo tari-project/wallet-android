@@ -71,6 +71,15 @@ interface TariWalletService {
 
     boolean cancelPendingTx(in TxId id, out WalletError error);
 
+    /**
+    * Sets the base node peer that the wallet syncs with.
+    */
+    boolean addBaseNodePeer(
+        in String baseNodePublicKey,
+        in String baseNodeAddress,
+        out WalletError error
+    );
+
     RequestId syncWithBaseNode(out WalletError error);
 
     TxId sendTari(

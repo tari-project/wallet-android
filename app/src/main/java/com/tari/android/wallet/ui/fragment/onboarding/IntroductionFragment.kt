@@ -63,8 +63,8 @@ import com.tari.android.wallet.infrastructure.Tracker
 import com.tari.android.wallet.service.WalletService
 import com.tari.android.wallet.ui.activity.restore.WalletRestoreActivity
 import com.tari.android.wallet.ui.extension.*
-import com.tari.android.wallet.ui.util.UiUtil
-import com.tari.android.wallet.ui.util.UiUtil.getResourceUri
+import com.tari.android.wallet.ui.util.UIUtil
+import com.tari.android.wallet.ui.util.UIUtil.getResourceUri
 import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.SharedPrefsWrapper
 import javax.inject.Inject
@@ -147,7 +147,7 @@ internal class IntroductionFragment : Fragment() {
     }
 
     private fun setupUi() {
-        UiUtil.setProgressBarColor(ui.createWalletProgressBar, color(white))
+        UIUtil.setProgressBarColor(ui.createWalletProgressBar, color(white))
         ui.apply {
             tariLogoLottieAnimationView.alpha = 0f
             networkInfoTextView.alpha = 0f
@@ -194,7 +194,7 @@ internal class IntroductionFragment : Fragment() {
             ui.videoOuterContainerView.width,
             ui.videoOuterContainerView.height
         )
-        UiUtil.setWidthAndHeight(
+        UIUtil.setWidthAndHeight(
             ui.videoInnerContainerView,
             size, size
         )
@@ -255,12 +255,12 @@ internal class IntroductionFragment : Fragment() {
     }
 
     private fun onCreateWalletClick() {
-        UiUtil.temporarilyDisableClick(ui.createWalletButton)
+        UIUtil.temporarilyDisableClick(ui.createWalletButton)
         ui.restoreWalletCtaView.setOnClickListener(null)
         ui.createWalletButton.gone()
         ui.createWalletProgressBar.visible()
         startWalletService()
-        UiUtil.animateViewClick(ui.createWalletContainerView).addListener(onEnd = {
+        UIUtil.animateViewClick(ui.createWalletContainerView).addListener(onEnd = {
             ui.rootView.postDelayed(
                 { startTariWalletViewAnimation() },
                 createWalletArtificialDelay

@@ -64,7 +64,7 @@ import com.tari.android.wallet.ui.component.EmojiIdCopiedViewController
 import com.tari.android.wallet.ui.component.EmojiIdSummaryViewController
 import com.tari.android.wallet.ui.dialog.BottomSlideDialog
 import com.tari.android.wallet.ui.extension.*
-import com.tari.android.wallet.ui.util.UiUtil
+import com.tari.android.wallet.ui.util.UIUtil
 import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.EmojiUtil
 import com.tari.android.wallet.util.WalletUtil
@@ -206,10 +206,10 @@ class AddAmountFragment : Fragment(), ServiceConnection {
         hideFullEmojiId(animated = false)
         OverScrollDecoratorHelper.setUpOverScroll(ui.fullEmojiIdScrollView)
         ui.rootView.doOnGlobalLayout {
-            UiUtil.setTopMargin(ui.txFeeContainerView, ui.elementContainerView.bottom)
-            UiUtil.setTopMargin(ui.fullEmojiIdContainerView, ui.emojiIdSummaryContainerView.top)
-            UiUtil.setHeight(ui.fullEmojiIdContainerView, ui.emojiIdSummaryContainerView.height)
-            UiUtil.setWidth(ui.fullEmojiIdContainerView, ui.emojiIdSummaryContainerView.width)
+            UIUtil.setTopMargin(ui.txFeeContainerView, ui.elementContainerView.bottom)
+            UIUtil.setTopMargin(ui.fullEmojiIdContainerView, ui.emojiIdSummaryContainerView.top)
+            UIUtil.setHeight(ui.fullEmojiIdContainerView, ui.emojiIdSummaryContainerView.height)
+            UIUtil.setWidth(ui.fullEmojiIdContainerView, ui.emojiIdSummaryContainerView.width)
         }
         val amount = arguments!!.getDouble(DeepLink.PARAMETER_AMOUNT, Double.MIN_VALUE)
         if (isFirstLaunch && amount != Double.MIN_VALUE) {
@@ -290,7 +290,7 @@ class AddAmountFragment : Fragment(), ServiceConnection {
     }
 
     private fun onBackButtonClicked(view: View) {
-        UiUtil.temporarilyDisableClick(view)
+        UIUtil.temporarilyDisableClick(view)
         val mActivity = activity ?: return
         mActivity.onBackPressed()
     }
@@ -313,7 +313,7 @@ class AddAmountFragment : Fragment(), ServiceConnection {
         val fullEmojiIdInitialWidth = ui.emojiIdSummaryContainerView.width
         val fullEmojiIdDeltaWidth =
             (ui.rootView.width - dimenPx(common_horizontal_margin) * 2) - fullEmojiIdInitialWidth
-        UiUtil.setWidth(
+        UIUtil.setWidth(
             ui.fullEmojiIdContainerView,
             fullEmojiIdInitialWidth
         )
@@ -328,7 +328,7 @@ class AddAmountFragment : Fragment(), ServiceConnection {
         }
         ui.copyEmojiIdButtonContainerView.alpha = 0f
         ui.copyEmojiIdButtonContainerView.visible()
-        UiUtil.setBottomMargin(
+        UIUtil.setBottomMargin(
             ui.copyEmojiIdButtonContainerView,
             0
         )
@@ -341,7 +341,7 @@ class AddAmountFragment : Fragment(), ServiceConnection {
             ui.fullEmojiIdContainerView.alpha = value
             ui.fullEmojiIdContainerView.scaleX = 1f + 0.2f * (1f - value)
             ui.fullEmojiIdContainerView.scaleY = 1f + 0.2f * (1f - value)
-            UiUtil.setWidth(
+            UIUtil.setWidth(
                 ui.fullEmojiIdContainerView,
                 (fullEmojiIdInitialWidth + fullEmojiIdDeltaWidth * value).toInt()
             )
@@ -353,7 +353,7 @@ class AddAmountFragment : Fragment(), ServiceConnection {
         copyEmojiIdButtonAnim.addUpdateListener { valueAnimator: ValueAnimator ->
             val value = valueAnimator.animatedValue as Float
             ui.copyEmojiIdButtonContainerView.alpha = value
-            UiUtil.setBottomMargin(
+            UIUtil.setBottomMargin(
                 ui.copyEmojiIdButtonContainerView,
                 (dimenPx(common_copy_emoji_id_button_visible_bottom_margin) * value).toInt()
             )
@@ -387,7 +387,7 @@ class AddAmountFragment : Fragment(), ServiceConnection {
         copyEmojiIdButtonAnim.addUpdateListener { valueAnimator: ValueAnimator ->
             val value = valueAnimator.animatedValue as Float
             ui.copyEmojiIdButtonContainerView.alpha = value
-            UiUtil.setBottomMargin(
+            UIUtil.setBottomMargin(
                 ui.copyEmojiIdButtonContainerView,
                 (dimenPx(common_copy_emoji_id_button_visible_bottom_margin) * value).toInt()
             )
@@ -402,7 +402,7 @@ class AddAmountFragment : Fragment(), ServiceConnection {
             ui.dimmerView.alpha = (1 - value) * 0.6f
             // container alpha & scale
             ui.fullEmojiIdContainerView.alpha = (1 - value)
-            UiUtil.setWidth(
+            UIUtil.setWidth(
                 ui.fullEmojiIdContainerView,
                 (fullEmojiIdInitialWidth + fullEmojiIdDeltaWidth * value).toInt()
             )
@@ -451,12 +451,12 @@ class AddAmountFragment : Fragment(), ServiceConnection {
     }
 
     private fun onCopyEmojiIdButtonClicked(view: View) {
-        UiUtil.temporarilyDisableClick(view)
+        UIUtil.temporarilyDisableClick(view)
         completeCopyEmojiId(recipientUser.publicKey.emojiId)
     }
 
     private fun onCopyEmojiIdButtonLongClicked(view: View) {
-        UiUtil.temporarilyDisableClick(view)
+        UIUtil.temporarilyDisableClick(view)
         completeCopyEmojiId(recipientUser.publicKey.hexString)
     }
 
@@ -647,7 +647,7 @@ class AddAmountFragment : Fragment(), ServiceConnection {
             textView.setTextSizePx(currentTextSize)
             if (!enteringDecimalPoint && !enteringFirstDigit) {
                 textView.alpha = 0f
-                UiUtil.setWidth(textView, 0)
+                UIUtil.setWidth(textView, 0)
             } else {
                 textView.setWidthAndHeightToMeasured()
             }
@@ -703,18 +703,18 @@ class AddAmountFragment : Fragment(), ServiceConnection {
             (currentFirstElementMarginStart * scaleFactor).toInt()
 
         // adjust gem size
-        UiUtil.setWidthAndHeight(
+        UIUtil.setWidthAndHeight(
             ui.amountGemImageView,
             currentAmountGemSize.toInt(),
             currentAmountGemSize.toInt()
         )
         // adjust first element margin
-        UiUtil.setStartMargin(
+        UIUtil.setStartMargin(
             elements[0].second,
             currentFirstElementMarginStart
         )
         // set center correction view width
-        UiUtil.setWidth(
+        UIUtil.setWidth(
             ui.amountCenterCorrectionView,
             currentAmountGemSize.toInt() + currentFirstElementMarginStart
         )
@@ -727,7 +727,7 @@ class AddAmountFragment : Fragment(), ServiceConnection {
             ) {
                 element.second.setWidthAndHeightToMeasured()
             } else {
-                UiUtil.setWidth(textView, 0)
+                UIUtil.setWidth(textView, 0)
             }
         }
     }
@@ -759,7 +759,7 @@ class AddAmountFragment : Fragment(), ServiceConnection {
             if (!enteringFirstDigit) {
                 // horizontal scaling if not entering first digit
                 val width = measuredWidth * value
-                UiUtil.setWidth(textView, width.toInt())
+                UIUtil.setWidth(textView, width.toInt())
             } else {
                 // alpha animation if entering first digit
                 textView.alpha = (1 - value) / 2f
@@ -771,17 +771,17 @@ class AddAmountFragment : Fragment(), ServiceConnection {
             ghostTextView!!.setTextSizePx((currentTextSize / 2f) + ((currentTextSize / 2f) * value))
             ghostTextView!!.setWidthAndHeightToMeasured()
             if (enteringFirstDigit) {
-                UiUtil.setStartMargin(
+                UIUtil.setStartMargin(
                     ghostTextView!!,
                     (location[0] + ((1 - value) * measuredWidth * 0.8f)).toInt()
                 )
             } else {
-                UiUtil.setStartMargin(
+                UIUtil.setStartMargin(
                     ghostTextView!!,
                     (location[0] + ((1 - value) * measuredWidth * 0.3f)).toInt()
                 )
             }
-            UiUtil.setTopMargin(
+            UIUtil.setTopMargin(
                 ghostTextView!!,
                 ui.elementContainerView.top
                         + dimenPx(add_amount_element_container_translation_y)
@@ -866,18 +866,18 @@ class AddAmountFragment : Fragment(), ServiceConnection {
         }
 
         // adjust gem size
-        UiUtil.setWidthAndHeight(
+        UIUtil.setWidthAndHeight(
             ui.amountGemImageView,
             currentAmountGemSize.toInt(),
             currentAmountGemSize.toInt()
         )
         // adjust first element margin
-        UiUtil.setStartMargin(
+        UIUtil.setStartMargin(
             elements[0].second,
             currentFirstElementMarginStart
         )
         // set center correction view width
-        UiUtil.setWidth(
+        UIUtil.setWidth(
             ui.amountCenterCorrectionView,
             currentAmountGemSize.toInt() + currentFirstElementMarginStart
         )

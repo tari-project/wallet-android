@@ -62,8 +62,8 @@ import com.tari.android.wallet.ui.presentation.TxNote
 import com.tari.android.wallet.ui.presentation.gif.GIF
 import com.tari.android.wallet.ui.presentation.gif.GIFRepository
 import com.tari.android.wallet.ui.presentation.gif.Placeholder
-import com.tari.android.wallet.ui.util.UiUtil
-import com.tari.android.wallet.ui.util.UiUtil.setColor
+import com.tari.android.wallet.ui.util.UIUtil
+import com.tari.android.wallet.ui.util.UIUtil.setColor
 import com.tari.android.wallet.util.WalletUtil
 import com.tari.android.wallet.util.extractEmojis
 import io.reactivex.Observable
@@ -106,7 +106,7 @@ class TxViewHolder(
     init {
         ui.gifContainer.loadingGifProgressBar.setColor(color(tx_list_loading_gif_gray))
         ui.rootView.setOnClickListener {
-            UiUtil.temporarilyDisableClick(view)
+            UIUtil.temporarilyDisableClick(view)
             listener(adapterPosition)
         }
         ui.gifContainer.retryLoadingGifTextView.setOnClickListener { viewModel.retry() }

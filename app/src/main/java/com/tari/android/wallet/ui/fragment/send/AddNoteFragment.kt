@@ -100,8 +100,8 @@ import com.tari.android.wallet.ui.presentation.TxNote
 import com.tari.android.wallet.ui.presentation.gif.GIF
 import com.tari.android.wallet.ui.presentation.gif.GIFRepository
 import com.tari.android.wallet.ui.presentation.gif.Placeholder
-import com.tari.android.wallet.ui.util.UiUtil
-import com.tari.android.wallet.ui.util.UiUtil.setColor
+import com.tari.android.wallet.ui.util.UIUtil
+import com.tari.android.wallet.ui.util.UIUtil.setColor
 import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.Constants.UI.AddNoteAndSend
 import com.tari.android.wallet.util.EmojiUtil
@@ -245,9 +245,9 @@ class AddNoteFragment : Fragment(), View.OnTouchListener {
         ui.noteEditText.imeOptions = EditorInfo.IME_ACTION_DONE
         ui.noteEditText.setRawInputType(InputType.TYPE_CLASS_TEXT)
         ui.rootView.doOnGlobalLayout {
-            UiUtil.setTopMargin(ui.fullEmojiIdContainerView, ui.emojiIdSummaryContainerView.top)
-            UiUtil.setHeight(ui.fullEmojiIdContainerView, ui.emojiIdSummaryContainerView.height)
-            UiUtil.setWidth(ui.fullEmojiIdContainerView, ui.emojiIdSummaryContainerView.width)
+            UIUtil.setTopMargin(ui.fullEmojiIdContainerView, ui.emojiIdSummaryContainerView.top)
+            UIUtil.setHeight(ui.fullEmojiIdContainerView, ui.emojiIdSummaryContainerView.height)
+            UIUtil.setWidth(ui.fullEmojiIdContainerView, ui.emojiIdSummaryContainerView.width)
         }
         ui.thumbnailGifsRecyclerView.also {
             val margin = dimen(add_note_gif_inner_margin).toInt()
@@ -297,7 +297,7 @@ class AddNoteFragment : Fragment(), View.OnTouchListener {
 
     private fun handleViewMoreGIFsIntent() {
         if (gifContainer.isShown) {
-            UiUtil.hideKeyboard(requireActivity())
+            UIUtil.hideKeyboard(requireActivity())
             ChooseGIFDialogFragment.newInstance()
                 .apply { setTargetFragment(this@AddNoteFragment, REQUEST_CODE_GIF) }
                 .show(requireActivity().supportFragmentManager, null)
@@ -334,11 +334,11 @@ class AddNoteFragment : Fragment(), View.OnTouchListener {
     }
 
     private fun onBackButtonClicked(view: View) {
-        UiUtil.temporarilyDisableClick(view)
+        UIUtil.temporarilyDisableClick(view)
         // going back before hiding keyboard causes a blank white area on the screen
         // wait a while, then forward the back action to the host activity
         activity?.let {
-            UiUtil.hideKeyboard(it)
+            UIUtil.hideKeyboard(it)
             ui.rootView.postDelayed(Constants.UI.shortDurationMs, it::onBackPressed)
         }
     }
@@ -361,7 +361,7 @@ class AddNoteFragment : Fragment(), View.OnTouchListener {
         val fullEmojiIdInitialWidth = ui.emojiIdSummaryContainerView.width
         val fullEmojiIdDeltaWidth =
             (ui.rootView.width - dimenPx(common_horizontal_margin) * 2) - fullEmojiIdInitialWidth
-        UiUtil.setWidth(
+        UIUtil.setWidth(
             ui.fullEmojiIdContainerView,
             fullEmojiIdInitialWidth
         )
@@ -376,7 +376,7 @@ class AddNoteFragment : Fragment(), View.OnTouchListener {
         }
         ui.copyEmojiIdButtonContainerView.alpha = 0f
         ui.copyEmojiIdButtonContainerView.visible()
-        UiUtil.setBottomMargin(
+        UIUtil.setBottomMargin(
             ui.copyEmojiIdButtonContainerView,
             0
         )
@@ -389,7 +389,7 @@ class AddNoteFragment : Fragment(), View.OnTouchListener {
             ui.fullEmojiIdContainerView.alpha = value
             ui.fullEmojiIdContainerView.scaleX = 1f + 0.2f * (1f - value)
             ui.fullEmojiIdContainerView.scaleY = 1f + 0.2f * (1f - value)
-            UiUtil.setWidth(
+            UIUtil.setWidth(
                 ui.fullEmojiIdContainerView,
                 (fullEmojiIdInitialWidth + fullEmojiIdDeltaWidth * value).toInt()
             )
@@ -401,7 +401,7 @@ class AddNoteFragment : Fragment(), View.OnTouchListener {
         copyEmojiIdButtonAnim.addUpdateListener { valueAnimator: ValueAnimator ->
             val value = valueAnimator.animatedValue as Float
             ui.copyEmojiIdButtonContainerView.alpha = value
-            UiUtil.setBottomMargin(
+            UIUtil.setBottomMargin(
                 ui.copyEmojiIdButtonContainerView,
                 (dimenPx(common_copy_emoji_id_button_visible_bottom_margin) * value).toInt()
             )
@@ -435,7 +435,7 @@ class AddNoteFragment : Fragment(), View.OnTouchListener {
         copyEmojiIdButtonAnim.addUpdateListener { valueAnimator: ValueAnimator ->
             val value = valueAnimator.animatedValue as Float
             ui.copyEmojiIdButtonContainerView.alpha = value
-            UiUtil.setBottomMargin(
+            UIUtil.setBottomMargin(
                 ui.copyEmojiIdButtonContainerView,
                 (dimenPx(common_copy_emoji_id_button_visible_bottom_margin) * value).toInt()
             )
@@ -451,7 +451,7 @@ class AddNoteFragment : Fragment(), View.OnTouchListener {
             ui.dimmerView.alpha = (1 - value) * 0.6f
             // container alpha & scale
             ui.fullEmojiIdContainerView.alpha = (1 - value)
-            UiUtil.setWidth(
+            UIUtil.setWidth(
                 ui.fullEmojiIdContainerView,
                 (fullEmojiIdInitialWidth + fullEmojiIdDeltaWidth * value).toInt()
             )
@@ -511,12 +511,12 @@ class AddNoteFragment : Fragment(), View.OnTouchListener {
     }
 
     private fun onCopyEmojiIdButtonClicked(view: View) {
-        UiUtil.temporarilyDisableClick(view)
+        UIUtil.temporarilyDisableClick(view)
         completeCopyEmojiId(recipientUser.publicKey.emojiId)
     }
 
     private fun onCopyEmojiIdButtonLongClicked(view: View) {
-        UiUtil.temporarilyDisableClick(view)
+        UIUtil.temporarilyDisableClick(view)
         completeCopyEmojiId(recipientUser.publicKey.hexString)
     }
 
@@ -611,7 +611,7 @@ class AddNoteFragment : Fragment(), View.OnTouchListener {
                 )
                 anim.addUpdateListener { valueAnimator: ValueAnimator ->
                     val margin = valueAnimator.animatedValue as Int
-                    UiUtil.setStartMargin(ui.slideView, margin)
+                    UIUtil.setStartMargin(ui.slideView, margin)
                     ui.slideToSendEnabledTextView.alpha =
                         1f - margin.toFloat() / (slideButtonContainerWidth - dimenPx(
                             add_note_slide_button_left_margin
@@ -633,7 +633,7 @@ class AddNoteFragment : Fragment(), View.OnTouchListener {
                 )
                 anim.addUpdateListener { valueAnimator: ValueAnimator ->
                     val margin = valueAnimator.animatedValue as Int
-                    UiUtil.setStartMargin(ui.slideView, margin)
+                    UIUtil.setStartMargin(ui.slideView, margin)
                     ui.slideToSendEnabledTextView.alpha =
                         1f - margin.toFloat() / (slideButtonContainerWidth -
                                 dimenPx(add_note_slide_button_left_margin) -
@@ -685,7 +685,7 @@ class AddNoteFragment : Fragment(), View.OnTouchListener {
     }
 
     private fun hideKeyboard() {
-        UiUtil.hideKeyboard(activity ?: return)
+        UIUtil.hideKeyboard(activity ?: return)
         ui.noteEditText.clearFocus()
     }
 
@@ -707,7 +707,7 @@ class AddNoteFragment : Fragment(), View.OnTouchListener {
 
     private fun restoreSlider() {
         // hide slide view
-        val slideViewInitialMargin = UiUtil.getStartMargin(ui.slideView)
+        val slideViewInitialMargin = UIUtil.getStartMargin(ui.slideView)
         val slideViewMarginDelta =
             dimenPx(add_note_slide_button_left_margin) - slideViewInitialMargin
         val anim = ValueAnimator.ofFloat(
@@ -718,7 +718,7 @@ class AddNoteFragment : Fragment(), View.OnTouchListener {
             val value = valueAnimator.animatedValue as Float
             ui.slideView.alpha = 1f - value
             ui.slideToSendEnabledTextView.alpha = 1f - value
-            UiUtil.setStartMargin(
+            UIUtil.setStartMargin(
                 ui.slideView,
                 (slideViewInitialMargin + slideViewMarginDelta * (1 - value)).toInt()
             )

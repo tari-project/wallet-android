@@ -47,7 +47,7 @@ import com.tari.android.wallet.R
 import com.tari.android.wallet.R.dimen.*
 import com.tari.android.wallet.ui.extension.dimenPx
 import com.tari.android.wallet.ui.extension.isScrolledToTop
-import com.tari.android.wallet.ui.util.UiUtil
+import com.tari.android.wallet.ui.util.UIUtil
 import com.tari.android.wallet.util.Constants
 import java.lang.ref.WeakReference
 import kotlin.math.max
@@ -90,7 +90,7 @@ internal class CustomScrollView @JvmOverloads constructor(
     }
 
     val maxScrollY by lazy {
-        UiUtil.getHeight(getChildAt(0)) - height
+        UIUtil.getHeight(getChildAt(0)) - height
     }
 
     fun completeScroll() {
@@ -183,11 +183,11 @@ internal class CustomScrollView @JvmOverloads constructor(
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         if (!isUpdating) {
             if (swipeRefreshYOffset > 0) {
-                UiUtil.setHeight(
+                UIUtil.setHeight(
                     progressContainerView,
                     swipeRefreshYOffset
                 )
-                UiUtil.setHeight(
+                UIUtil.setHeight(
                     recyclerViewContainerView,
                     recyclerViewContainerInitialHeight - swipeRefreshYOffset
                 )
@@ -199,7 +199,7 @@ internal class CustomScrollView @JvmOverloads constructor(
                             dimenPx(home_swipe_refresh_progress_view_container_height),
                     1F
                 )
-                UiUtil.setTopMargin(
+                UIUtil.setTopMargin(
                     progressView,
                     dimenPx(home_swipe_refresh_progress_view_content_invisible_top_margin) +
                             (totalMarginTopDelta * ratio).toInt()
@@ -209,8 +209,8 @@ internal class CustomScrollView @JvmOverloads constructor(
                 invalidate()
                 if (scrollY < dimenPx(home_grabber_height) * 2) scrollTo(0, 0)
             } else {
-                UiUtil.setHeight(progressContainerView, 0)
-                UiUtil.setHeight(
+                UIUtil.setHeight(progressContainerView, 0)
+                UIUtil.setHeight(
                     recyclerViewContainerView,
                     recyclerViewContainerInitialHeight
                 )
@@ -223,7 +223,7 @@ internal class CustomScrollView @JvmOverloads constructor(
         val targetScrollY = if (velocityY < 0) {
             0
         } else {
-            UiUtil.getHeight(getChildAt(0)) - height
+            UIUtil.getHeight(getChildAt(0)) - height
         }
         smoothScrollTo(0, targetScrollY)
         flingIsRunning = true
@@ -254,15 +254,15 @@ internal class CustomScrollView @JvmOverloads constructor(
     fun beginUpdate() {
         if (isUpdating) return
         isUpdating = true
-        UiUtil.setHeight(
+        UIUtil.setHeight(
             progressContainerView,
             dimenPx(home_swipe_refresh_progress_view_container_height)
         )
-        UiUtil.setHeight(
+        UIUtil.setHeight(
             recyclerViewContainerView,
             recyclerViewContainerInitialHeight - dimenPx(home_swipe_refresh_progress_view_container_height)
         )
-        UiUtil.setTopMargin(
+        UIUtil.setTopMargin(
             progressView,
             dimenPx(home_swipe_refresh_progress_view_content_visible_top_margin)
         )
@@ -274,8 +274,8 @@ internal class CustomScrollView @JvmOverloads constructor(
     fun finishUpdate() {
         isUpdating = false
         swipeRefreshYOffset = 0
-        UiUtil.setHeight(progressContainerView, 0)
-        UiUtil.setHeight(
+        UIUtil.setHeight(progressContainerView, 0)
+        UIUtil.setHeight(
             recyclerViewContainerView,
             recyclerViewContainerInitialHeight
         )
