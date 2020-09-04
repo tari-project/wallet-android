@@ -5,7 +5,7 @@
 
 cmake_minimum_required(VERSION 3.4.1)
 
-set(libs_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../../../../jniLibs)
+set(libs_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../../../../libwallet)
 
 add_library(
         sqlite3

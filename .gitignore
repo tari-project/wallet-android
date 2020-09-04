@@ -78,4 +78,5 @@ CMakeFiles/
 CMakeCache.txt
 
 jniLibs/
+libwallet/
 !app/src/main/jniLibs/
