@@ -739,21 +739,21 @@ class AddRecipientFragment : Fragment(),
             isDeletingSeparatorAtIndex = null
             text = editable.toString()
         }
-        // delete all separators first
-        val separator = string(emoji_id_chunk_separator)
-        for ((offset, index) in EmojiUtil.getExistingChunkSeparatorIndices(
-            text,
-            separator
-        ).withIndex()) {
-            val target = index - (offset * separator.length)
-            editable.delete(target, target + separator.length)
-        }
 
         ui.continueButton.gone()
         ui.invalidEmojiIdTextView.gone()
 
-        val textWithoutSeparators = editable.toString()
-        if (textWithoutSeparators.firstNCharactersAreEmojis(emojiFormatterChunkSize)) {
+        if (editable.toString().firstNCharactersAreEmojis(emojiFormatterChunkSize)) {
+            // delete all separators first
+            val separator = string(emoji_id_chunk_separator)
+            for ((offset, index) in EmojiUtil.getExistingChunkSeparatorIndices(
+                text,
+                separator
+            ).withIndex()) {
+                val target = index - (offset * separator.length)
+                editable.delete(target, target + separator.length)
+            }
+            val textWithoutSeparators = editable.toString()
             ui.searchEditText.textAlignment = View.TEXT_ALIGNMENT_CENTER
             ui.searchEditText.letterSpacing = inputEmojiIdLetterSpacing
             // add separators
@@ -832,7 +832,7 @@ class AddRecipientFragment : Fragment(),
             ui.qrCodeButton.visible()
             ui.searchEditText.textAlignment = View.TEXT_ALIGNMENT_TEXT_START
             ui.searchEditText.letterSpacing = inputNormalLetterSpacing
-            onSearchTextChanged(textWithoutSeparators)
+            onSearchTextChanged(editable.toString())
         }
         textWatcherIsRunning = false
     }
