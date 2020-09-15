@@ -49,16 +49,17 @@ import com.tari.android.wallet.di.WalletModule
 import com.tari.android.wallet.infrastructure.BugReportingService
 import com.tari.android.wallet.ui.extension.appComponent
 import com.tari.android.wallet.ui.extension.string
+import com.tari.android.wallet.ui.extension.temporarilyDisableClick
 import com.tari.android.wallet.ui.fragment.debug.adapter.LogFileSpinnerAdapter
 import com.tari.android.wallet.ui.fragment.debug.adapter.LogListAdapter
-import com.tari.android.wallet.ui.util.UIUtil
 import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.SharedPrefsWrapper
 import com.tari.android.wallet.util.WalletUtil
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.io.*
+import java.io.File
+import java.io.InputStream
 import javax.inject.Inject
 import javax.inject.Named
 
@@ -131,17 +132,17 @@ internal class DebugLogFragment : Fragment(), AdapterView.OnItemSelectedListener
     }
 
     private fun onScrollToTopButtonClicked() {
-        UIUtil.temporarilyDisableClick(ui.scrollToTopButton)
+        ui.scrollToTopButton.temporarilyDisableClick()
         ui.recyclerView.scrollToPosition(0)
     }
 
     private fun onScrollToBottomButtonClicked() {
-        UIUtil.temporarilyDisableClick(ui.scrollToBottomButton)
+        ui.scrollToBottomButton.temporarilyDisableClick()
         ui.recyclerView.scrollToPosition(selectedLogFileLines.lastIndex)
     }
 
     private fun showShareLogFilesDialog() {
-        UIUtil.temporarilyDisableClick(ui.shareButton)
+        ui.shareButton.temporarilyDisableClick()
         AlertDialog.Builder(context ?: return)
             .setMessage(string(debug_log_share_dialog_content))
             .setCancelable(false)

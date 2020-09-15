@@ -86,8 +86,6 @@ import com.tari.android.wallet.ui.extension.*
 import com.tari.android.wallet.ui.presentation.TxNote
 import com.tari.android.wallet.ui.presentation.gif.GIF
 import com.tari.android.wallet.ui.presentation.gif.GIFRepository
-import com.tari.android.wallet.ui.util.UIUtil
-import com.tari.android.wallet.ui.util.UIUtil.setColor
 import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.EmojiUtil
 import com.tari.android.wallet.util.SharedPrefsWrapper
@@ -411,11 +409,7 @@ internal class TxDetailsActivity : AppCompatActivity(), ServiceConnection {
         currentAmountGemSize *= scaleFactor
 
         // adjust gem size
-        UIUtil.setWidthAndHeight(
-            ui.amountGemImageView,
-            currentAmountGemSize.toInt(),
-            currentAmountGemSize.toInt()
-        )
+        ui.amountGemImageView.setLayoutSize(currentAmountGemSize.toInt(), currentAmountGemSize.toInt())
         ui.amountTextView.setTextSizePx(currentTextSize)
     }
 
@@ -441,14 +435,14 @@ internal class TxDetailsActivity : AppCompatActivity(), ServiceConnection {
     }
 
     private fun onEmojiSummaryClicked(view: View) {
-        UIUtil.temporarilyDisableClick(view)
+        view.temporarilyDisableClick()
         showFullEmojiId()
     }
 
     private fun showFullEmojiId() {
         scrollingIsBlocked = true
         // resize bottom dimmer
-        ui.bottomDimmerView.setHeight(
+        ui.bottomDimmerView.setLayoutHeight(
             max(
                 ui.detailScrollView.getChildAt(0).height,
                 ui.detailScrollView.height
@@ -464,10 +458,7 @@ internal class TxDetailsActivity : AppCompatActivity(), ServiceConnection {
         }
         val fullEmojiIdInitialWidth = ui.emojiIdSummaryContainerView.width
         val fullEmojiIdDeltaWidth = ui.emojiIdContainerView.width - fullEmojiIdInitialWidth
-        UIUtil.setWidth(
-            ui.fullEmojiIdContainerView,
-            fullEmojiIdInitialWidth
-        )
+        ui.fullEmojiIdContainerView.setLayoutWidth(fullEmojiIdInitialWidth)
         ui.fullEmojiIdContainerView.alpha = 0f
         ui.fullEmojiIdContainerView.visible()
         // scroll to end
@@ -479,10 +470,7 @@ internal class TxDetailsActivity : AppCompatActivity(), ServiceConnection {
         }
         ui.copyEmojiIdContainerView.alpha = 0f
         ui.copyEmojiIdContainerView.visible()
-        UIUtil.setBottomMargin(
-            ui.copyEmojiIdContainerView,
-            0
-        )
+        ui.copyEmojiIdContainerView.setBottomMargin(0)
         // animate full emoji id view
         val emojiIdAnim = ValueAnimator.ofFloat(0f, 1f)
         emojiIdAnim.addUpdateListener { valueAnimator: ValueAnimator ->
@@ -495,10 +483,8 @@ internal class TxDetailsActivity : AppCompatActivity(), ServiceConnection {
             ui.fullEmojiIdContainerView.alpha = value
             ui.fullEmojiIdContainerView.scaleX = 1f + 0.2f * (1f - value)
             ui.fullEmojiIdContainerView.scaleY = 1f + 0.2f * (1f - value)
-            UIUtil.setWidth(
-                ui.fullEmojiIdContainerView,
-                (fullEmojiIdInitialWidth + fullEmojiIdDeltaWidth * value).toInt()
-            )
+            val width = (fullEmojiIdInitialWidth + fullEmojiIdDeltaWidth * value).toInt()
+            ui.fullEmojiIdContainerView.setLayoutWidth(width)
         }
         emojiIdAnim.duration = Constants.UI.shortDurationMs
         // copy emoji id button anim
@@ -506,8 +492,7 @@ internal class TxDetailsActivity : AppCompatActivity(), ServiceConnection {
         copyEmojiIdButtonAnim.addUpdateListener { valueAnimator: ValueAnimator ->
             val value = valueAnimator.animatedValue as Float
             ui.copyEmojiIdContainerView.alpha = value
-            UIUtil.setBottomMargin(
-                ui.copyEmojiIdContainerView,
+            ui.copyEmojiIdContainerView.setBottomMargin(
                 (dimenPx(common_copy_emoji_id_button_visible_bottom_margin) * value).toInt()
             )
         }
@@ -530,7 +515,7 @@ internal class TxDetailsActivity : AppCompatActivity(), ServiceConnection {
     }
 
     private fun hideFullEmojiId(animateCopyEmojiIdButton: Boolean = true) {
-        dimmerViews.forEach { UIUtil.temporarilyDisableClick(it) }
+        dimmerViews.forEach { it.temporarilyDisableClick() }
         ui.fullEmojiIdScrollView.smoothScrollTo(0, 0)
         ui.emojiIdSummaryContainerView.visible()
         // copy emoji id button anim
@@ -538,8 +523,7 @@ internal class TxDetailsActivity : AppCompatActivity(), ServiceConnection {
         copyEmojiIdButtonAnim.addUpdateListener { valueAnimator: ValueAnimator ->
             val value = valueAnimator.animatedValue as Float
             ui.copyEmojiIdContainerView.alpha = value
-            UIUtil.setBottomMargin(
-                ui.copyEmojiIdContainerView,
+            ui.copyEmojiIdContainerView.setBottomMargin(
                 (dimenPx(common_copy_emoji_id_button_visible_bottom_margin) * value).toInt()
             )
         }
@@ -556,10 +540,8 @@ internal class TxDetailsActivity : AppCompatActivity(), ServiceConnection {
             }
             // container alpha & scale
             ui.fullEmojiIdContainerView.alpha = (1 - value)
-            UIUtil.setWidth(
-                ui.fullEmojiIdContainerView,
-                (fullEmojiIdInitialWidth + fullEmojiIdDeltaWidth * value).toInt()
-            )
+            val width = (fullEmojiIdInitialWidth + fullEmojiIdDeltaWidth * value).toInt()
+            ui.fullEmojiIdContainerView.setLayoutWidth(width)
         }
         // chain anim.s and start
         val animSet = AnimatorSet()
@@ -598,12 +580,12 @@ internal class TxDetailsActivity : AppCompatActivity(), ServiceConnection {
     }
 
     private fun onCopyEmojiIdButtonClicked(view: View) {
-        UIUtil.temporarilyDisableClick(view)
+        view.temporarilyDisableClick()
         completeCopyEmojiId(tx.user.publicKey.emojiId)
     }
 
     private fun onCopyEmojiIdButtonLongClicked(view: View) {
-        UIUtil.temporarilyDisableClick(view)
+        view.temporarilyDisableClick()
         completeCopyEmojiId(tx.user.publicKey.hexString)
     }
 
@@ -730,7 +712,7 @@ internal class TxDetailsActivity : AppCompatActivity(), ServiceConnection {
         ui.createContactEditText.post {
             ui.createContactEditText.requestFocus()
             ui.createContactEditText.setSelection(ui.createContactEditText.text?.length ?: 0)
-            UIUtil.showKeyboard(this)
+            showKeyboard()
         }
         ui.contactLabelTextView.setTextColor(color(black))
     }

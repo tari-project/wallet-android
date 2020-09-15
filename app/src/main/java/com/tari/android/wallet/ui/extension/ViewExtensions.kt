@@ -32,29 +32,30 @@
  */
 package com.tari.android.wallet.ui.extension
 
-import android.annotation.SuppressLint
-import android.app.Activity
+import android.animation.AnimatorSet
+import android.animation.ValueAnimator
 import android.content.Context
-import android.graphics.Color
 import android.graphics.drawable.Drawable
-import android.os.Build
 import android.util.TypedValue
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewTreeObserver
-import android.view.WindowManager
+import android.view.animation.AccelerateInterpolator
+import android.view.animation.DecelerateInterpolator
+import android.widget.ProgressBar
 import android.widget.ScrollView
 import android.widget.TextView
-import androidx.annotation.ColorRes
-import androidx.annotation.DimenRes
-import androidx.annotation.DrawableRes
-import androidx.annotation.StringRes
+import androidx.annotation.*
+import androidx.core.animation.addListener
+import androidx.core.graphics.BlendModeColorFilterCompat
+import androidx.core.graphics.BlendModeCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.airbnb.lottie.LottieAnimationView
 import com.tari.android.wallet.R
 import com.tari.android.wallet.ui.dialog.BottomSlideDialog
-import com.tari.android.wallet.ui.util.UIUtil
+import com.tari.android.wallet.util.Constants
+import java.lang.ref.WeakReference
 import android.animation.Animator as LegacyAnimator
 import android.animation.Animator.AnimatorListener as LegacyAnimatorListener
 
@@ -89,39 +90,12 @@ internal fun showInternetConnectionErrorDialog(context: Context) {
 }
 
 /**
- * Used for full-screen views.
- */
-@SuppressLint("ObsoleteSdkInt")
-internal fun Activity.makeStatusBarTransparent() {
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-        window.apply {
-            clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS)
-            addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                decorView.systemUiVisibility =
-                    View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-                // or View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
-            } else {
-                decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-            }
-            statusBarColor = Color.TRANSPARENT
-        }
-    }
-}
-
-/**
  * Sets the width of a TextView to the measured width of its contents
  * taking into account the text size and the typeface.
  */
 internal fun TextView.setWidthToMeasured() {
-    this.measure(
-        View.MeasureSpec.UNSPECIFIED,
-        View.MeasureSpec.UNSPECIFIED
-    )
-    UIUtil.setWidth(
-        this,
-        this.measuredWidth
-    )
+    measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED)
+    setLayoutWidth(measuredWidth)
 }
 
 /**
@@ -129,18 +103,9 @@ internal fun TextView.setWidthToMeasured() {
  * taking into account the text size and the typeface.
  */
 internal fun TextView.setWidthAndHeightToMeasured() {
-    this.measure(
-        View.MeasureSpec.UNSPECIFIED,
-        View.MeasureSpec.UNSPECIFIED
-    )
-    UIUtil.setWidth(
-        this,
-        this.measuredWidth
-    )
-    UIUtil.setHeight(
-        this,
-        this.measuredHeight
-    )
+    measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED)
+    setLayoutWidth(measuredWidth)
+    setLayoutHeight(measuredHeight)
 }
 
 /**
@@ -216,14 +181,18 @@ internal fun View.doOnGlobalLayout(block: () -> Unit) {
         })
 }
 
-internal fun View.setHeight(value: Int) {
-    this.layoutParams = this.layoutParams.also { it.height = value }
-}
-
-internal fun View.setTopMargin(value: Int) {
+internal fun View.setTopMargin(margin: Int) {
     if (layoutParams is ViewGroup.MarginLayoutParams) {
         val layoutParams = layoutParams as ViewGroup.MarginLayoutParams
-        layoutParams.topMargin = value
+        layoutParams.topMargin = margin
+        this.layoutParams = layoutParams
+    }
+}
+
+internal fun View.setBottomMargin(margin: Int) {
+    if (layoutParams is ViewGroup.MarginLayoutParams) {
+        val layoutParams = layoutParams as ViewGroup.MarginLayoutParams
+        layoutParams.bottomMargin = margin
         this.layoutParams = layoutParams
     }
 }
@@ -247,7 +216,107 @@ internal fun View.drawable(@DrawableRes id: Int): Drawable? = context.drawable(i
 internal class ThrottleClick(private val delegate: (View) -> Unit) :
     View.OnClickListener {
     override fun onClick(v: View?) {
-        v?.let(UIUtil::temporarilyDisableClick)
+        v?.temporarilyDisableClick()
         v?.let(delegate)
     }
+}
+
+// method name is this rather than "setWidth" because "setWidth" might conflict with View's
+// subtypes intrinsic methods
+fun View.setLayoutWidth(width: Int) {
+    this.layoutParams = this.layoutParams.also { it.width = width }
+}
+
+// method name is this rather than "setHeight" because "setHeight" might conflict with View's
+// subtypes intrinsic methods
+fun View.setLayoutHeight(height: Int) {
+    this.layoutParams = this.layoutParams.also { it.height = height }
+}
+
+fun View.setLayoutSize(width: Int, height: Int) {
+    this.layoutParams = this.layoutParams.also {
+        it.width = width
+        it.height = height
+    }
+}
+
+fun View.layoutParamsHeight() = (layoutParams as ViewGroup.MarginLayoutParams).height
+
+fun View.getBottomMargin() = (layoutParams as ViewGroup.MarginLayoutParams).bottomMargin
+
+fun View.getStartMargin() = (layoutParams as ViewGroup.MarginLayoutParams).marginStart
+
+fun View.setStartMargin(margin: Int) {
+    if (layoutParams is ViewGroup.MarginLayoutParams) {
+        val layoutParams = this.layoutParams as ViewGroup.MarginLayoutParams
+        layoutParams.marginStart = margin
+        this.layoutParams = layoutParams
+    }
+}
+
+fun ProgressBar.setColor(color: Int) {
+    this.indeterminateDrawable
+        .mutate()
+        .colorFilter = BlendModeColorFilterCompat.createBlendModeColorFilterCompat(
+        color, BlendModeCompat.SRC_IN
+    )
+}
+
+fun View.temporarilyDisableClick() {
+    isClickable = false
+    postDelayed(
+        ClickEnablingRunnable(this),
+        Constants.UI.xLongDurationMs
+    )
+}
+
+/**
+ * Makes the given view clickable again.
+ */
+private class ClickEnablingRunnable(@NonNull view: View) : Runnable {
+
+    private val viewWR: WeakReference<View> = WeakReference(view)
+
+    override fun run() {
+        viewWR.get()?.run {
+            try {
+                isClickable = true
+            } catch (e: Throwable) {
+                // no-op
+            }
+        }
+    }
+}
+
+fun View.animateClick(onEnd: (android.animation.Animator) -> Unit = {}) {
+    val scaleDownBtnAnim = ValueAnimator.ofFloat(
+        Constants.UI.Button.clickScaleAnimFullScale,
+        Constants.UI.Button.clickScaleAnimSmallScale
+    )
+    scaleDownBtnAnim.addUpdateListener { valueAnimator: ValueAnimator ->
+        val scale = valueAnimator.animatedValue as Float
+        scaleX = scale
+        scaleY = scale
+    }
+    scaleDownBtnAnim.duration = Constants.UI.Button.clickScaleAnimDurationMs
+    scaleDownBtnAnim.startDelay = Constants.UI.Button.clickScaleAnimStartOffset
+    scaleDownBtnAnim.interpolator = DecelerateInterpolator()
+
+    val scaleUpBtnAnim = ValueAnimator.ofFloat(
+        Constants.UI.Button.clickScaleAnimSmallScale,
+        Constants.UI.Button.clickScaleAnimFullScale
+    )
+    scaleUpBtnAnim.addUpdateListener { valueAnimator: ValueAnimator ->
+        val scale = valueAnimator.animatedValue as Float
+        scaleX = scale
+        scaleY = scale
+    }
+    scaleUpBtnAnim.duration = Constants.UI.Button.clickScaleAnimReturnDurationMs
+    scaleUpBtnAnim.startDelay = Constants.UI.Button.clickScaleAnimReturnStartOffset
+    scaleUpBtnAnim.interpolator = AccelerateInterpolator()
+
+    val animSet = AnimatorSet()
+    animSet.addListener(onEnd = onEnd)
+    animSet.playSequentially(scaleDownBtnAnim, scaleUpBtnAnim)
+    animSet.start()
 }

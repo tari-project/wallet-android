@@ -53,8 +53,6 @@ import com.tari.android.wallet.infrastructure.backup.BackupStorage
 import com.tari.android.wallet.ui.activity.restore.WalletRestoreRouter
 import com.tari.android.wallet.ui.dialog.ErrorDialog
 import com.tari.android.wallet.ui.extension.*
-import com.tari.android.wallet.ui.util.UIUtil
-import com.tari.android.wallet.ui.util.UIUtil.setColor
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -99,7 +97,7 @@ UI tree rebuild on configuration changes"""
             .addCallback(viewLifecycleOwner, blockingBackPressDispatcher)
         setPageDescription()
         ui.passwordEditText.requestFocus()
-        UIUtil.showKeyboard(requireActivity())
+        requireActivity().showKeyboard()
         ui.restoringProgressBar.setColor(color(white))
         ui.backCtaView.setOnClickListener(
             ThrottleClick {
@@ -139,7 +137,7 @@ UI tree rebuild on configuration changes"""
         ui.restoreWalletCtaView.isClickable = false
         ui.restoreWalletTextView.gone()
         ui.restoringProgressBar.visible()
-        UIUtil.hideKeyboard(requireActivity())
+        requireActivity().hideKeyboard()
     }
 
     private fun showInputUI() {
@@ -149,7 +147,7 @@ UI tree rebuild on configuration changes"""
         ui.restoreWalletTextView.visible()
         ui.restoringProgressBar.gone()
         ui.passwordEditText.requestFocus()
-        UIUtil.showKeyboard(requireActivity())
+        requireActivity().showKeyboard()
     }
 
     private fun showWrongPasswordErrorLabels() {

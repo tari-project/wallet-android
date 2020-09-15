@@ -90,7 +90,6 @@ import com.tari.android.wallet.ui.fragment.tx.adapter.TxListAdapter
 import com.tari.android.wallet.ui.presentation.gif.GIFRepository
 import com.tari.android.wallet.ui.resource.AnimationResource
 import com.tari.android.wallet.ui.resource.ResourceContainer
-import com.tari.android.wallet.ui.util.UIUtil
 import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.SharedPrefsWrapper
 import kotlinx.coroutines.Dispatchers
@@ -209,7 +208,7 @@ internal class TxListFragment : Fragment(),
     // region initial setup (UI and else)
     @SuppressLint("ClickableViewAccessibility")
     private fun setupUI() {
-        UIUtil.setTopMargin(ui.txListHeaderView, -dimenPx(R.dimen.common_header_height))
+        ui.txListHeaderView.setTopMargin(-dimenPx(R.dimen.common_header_height))
         updateProgressViewController =
             UpdateProgressViewController(
                 ui.updateProgressContentView,
@@ -269,8 +268,8 @@ internal class TxListFragment : Fragment(),
         val contentHeight =
             dimenPx(R.dimen.home_tx_list_container_minimized_top_margin) +
                     dimenPx(R.dimen.home_grabber_container_height) + recyclerViewHeight
-        UIUtil.setHeight(ui.recyclerViewContainerView, recyclerViewHeight)
-        UIUtil.setHeight(ui.scrollContentView, contentHeight)
+        ui.recyclerViewContainerView.setLayoutHeight(recyclerViewHeight)
+        ui.scrollContentView.setLayoutHeight(contentHeight)
         ui.scrollView.recyclerViewContainerInitialHeight = recyclerViewHeight
         ui.scrollView.scrollToTop()
 
@@ -929,13 +928,13 @@ internal class TxListFragment : Fragment(),
     }
 
     private fun minimizeListButtonClicked(view: View) {
-        UIUtil.temporarilyDisableClick(view)
+        view.temporarilyDisableClick()
         ui.scrollView.smoothScrollTo(0, 0)
         ui.txRecyclerView.smoothScrollToPosition(0)
     }
 
     private fun grabberContainerViewClicked(view: View) {
-        UIUtil.temporarilyDisableClick(view)
+        view.temporarilyDisableClick()
         ui.scrollView.smoothScrollTo(
             0,
             ui.scrollContentView.height - ui.scrollView.height
@@ -1079,8 +1078,7 @@ internal class TxListFragment : Fragment(),
             ui.txListOverlayView.alpha = ratio
             val topContentMarginTopExtra =
                 (ratio * dimenPx(R.dimen.home_top_content_container_scroll_vertical_shift)).toInt()
-            UIUtil.setTopMargin(
-                ui.topContentContainerView,
+            ui.topContentContainerView.setTopMargin(
                 dimenPx(R.dimen.home_top_content_container_view_top_margin)
                         + topContentMarginTopExtra
             )
@@ -1088,22 +1086,16 @@ internal class TxListFragment : Fragment(),
             ui.closeTxListButton.alpha = ratio
 
             if (!isOnboarding) {
-                UIUtil.setTopMargin(
-                    ui.txListHeaderView,
+                ui.txListHeaderView.setTopMargin(
                     ((ratio - 1) * dimenPx(R.dimen.common_header_height)).toInt()
                 )
                 ui.grabberView.alpha = max(
                     0F,
                     1F - ratio * GRABBER_ALPHA_SCROLL_COEFFICIENT
                 )
-
-                UIUtil.setWidth(
-                    ui.grabberView,
-                    (max(
-                        0F,
-                        1F - ratio * GRABBER_WIDTH_SCROLL_COEFFICIENT
-                    ) * dimenPx(R.dimen.home_grabber_width)).toInt()
-                )
+                val width = (max(0F, 1F - ratio * GRABBER_WIDTH_SCROLL_COEFFICIENT)
+                        * dimenPx(R.dimen.home_grabber_width)).toInt()
+                ui.grabberView.setLayoutWidth(width)
                 val grabberBgDrawable = ui.grabberContainerView.background as GradientDrawable
                 grabberBgDrawable.cornerRadius = max(
                     0F,
@@ -1124,8 +1116,7 @@ internal class TxListFragment : Fragment(),
                 endOnboarding()
             }
 
-            UIUtil.setTopMargin(
-                ui.giftCtaView,
+            ui.giftCtaView.setTopMargin(
                 dimenPx(R.dimen.home_wallet_info_button_initial_top_margin) + ui.scrollView.scrollY + topContentMarginTopExtra
             )
         }

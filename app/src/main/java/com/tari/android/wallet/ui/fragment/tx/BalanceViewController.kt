@@ -49,8 +49,9 @@ import com.tari.android.wallet.databinding.HomeBalanceDigitBinding
 import com.tari.android.wallet.databinding.HomeBalanceDigitThousandsSeparatorBinding
 import com.tari.android.wallet.model.BalanceInfo
 import com.tari.android.wallet.ui.extension.dimenPx
+import com.tari.android.wallet.ui.extension.setLayoutWidth
+import com.tari.android.wallet.ui.extension.setTopMargin
 import com.tari.android.wallet.ui.extension.setWidthToMeasured
-import com.tari.android.wallet.ui.util.UIUtil
 import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.WalletUtil
 import java.lang.ref.WeakReference
@@ -236,7 +237,7 @@ internal class BalanceViewController(
             val anim = ValueAnimator.ofFloat(1f, 0f)
             anim.addUpdateListener { valueAnimator: ValueAnimator ->
                 val animValue = valueAnimator.animatedValue as Float
-                UIUtil.setWidth(view, (width * animValue).toInt())
+                view.setLayoutWidth((width * animValue).toInt())
             }
             anim.duration = Constants.UI.Home.digitShrinkExpandAnimDurationMs
             anim.interpolator = EasingInterpolator(Ease.SINE_IN_OUT)
@@ -278,7 +279,7 @@ internal class BalanceViewController(
             val anim = ValueAnimator.ofFloat(0f, 1f)
             anim.addUpdateListener { valueAnimator: ValueAnimator ->
                 val animValue = valueAnimator.animatedValue as Float
-                UIUtil.setWidth(view, (width * animValue).toInt())
+                view.setLayoutWidth((width * animValue).toInt())
             }
             anim.duration = Constants.UI.Home.digitShrinkExpandAnimDurationMs
             anim.interpolator = EasingInterpolator(Ease.SINE_IN_OUT)
@@ -290,12 +291,12 @@ internal class BalanceViewController(
         }
 
         override fun reveal(delayMs: Long) {
-            UIUtil.setTopMargin(separatorTextView, view.dimenPx(R.dimen.home_balance_digit_height))
+            separatorTextView.setTopMargin(view.dimenPx(R.dimen.home_balance_digit_height))
             separatorTextView.setWidthToMeasured()
             val anim = ValueAnimator.ofInt(view.dimenPx(R.dimen.home_balance_digit_height), 0)
             anim.addUpdateListener { valueAnimator: ValueAnimator ->
                 val topMargin = valueAnimator.animatedValue as Int
-                UIUtil.setTopMargin(separatorTextView, topMargin)
+                separatorTextView.setTopMargin(topMargin)
                 separatorTextView.alpha =
                     1 - (topMargin.toFloat() / view.dimenPx(R.dimen.home_balance_digit_height)
                         .toFloat())
@@ -311,8 +312,7 @@ internal class BalanceViewController(
             anim.addUpdateListener { valueAnimator: ValueAnimator ->
                 val animValue = valueAnimator.animatedValue as Float
                 separatorTextView.alpha = animValue
-                UIUtil.setTopMargin(
-                    view,
+                view.setTopMargin(
                     (view.dimenPx(R.dimen.home_balance_digit_height) * (1 - animValue)).toInt()
                 )
             }
@@ -346,7 +346,7 @@ internal class BalanceViewController(
             val width = ui.balanceTopDigitTextView.measuredWidth
             anim.addUpdateListener { valueAnimator: ValueAnimator ->
                 val animValue = valueAnimator.animatedValue as Float
-                UIUtil.setWidth(view, (width * animValue).toInt())
+                view.setLayoutWidth((width * animValue).toInt())
             }
             anim.duration = Constants.UI.Home.digitShrinkExpandAnimDurationMs
             anim.interpolator = EasingInterpolator(Ease.SINE_IN_OUT)
@@ -358,14 +358,13 @@ internal class BalanceViewController(
         }
 
         override fun reveal(delayMs: Long) {
-            UIUtil.setTopMargin(
-                ui.balanceTopDigitTextView,
+            ui.balanceTopDigitTextView.setTopMargin(
                 view.dimenPx(R.dimen.home_balance_digit_height)
             )
             val anim = ValueAnimator.ofInt(view.dimenPx(R.dimen.home_balance_digit_height), 0)
             anim.addUpdateListener { valueAnimator: ValueAnimator ->
                 val topMargin = valueAnimator.animatedValue as Int
-                UIUtil.setTopMargin(ui.balanceTopDigitTextView, topMargin)
+                ui.balanceTopDigitTextView.setTopMargin(topMargin)
                 ui.balanceTopDigitTextView.alpha =
                     1 - (topMargin.toFloat() / view.dimenPx(R.dimen.home_balance_digit_height)
                         .toFloat())
@@ -387,7 +386,7 @@ internal class BalanceViewController(
                 ui.balanceTopDigitTextView.setWidthToMeasured()
                 ui.balanceTopDigitTextView.alpha = 1f
                 ui.balanceBottomDigitTextView.alpha = 0f
-                UIUtil.setTopMargin(ui.balanceTopDigitTextView, 0)
+                ui.balanceTopDigitTextView.setTopMargin(0)
             }
             changed = true
 
@@ -399,7 +398,7 @@ internal class BalanceViewController(
             val anim = ValueAnimator.ofInt(0, -view.dimenPx(R.dimen.home_balance_digit_height) - 1)
             anim.addUpdateListener { valueAnimator: ValueAnimator ->
                 val topMargin = valueAnimator.animatedValue as Int
-                UIUtil.setTopMargin(ui.balanceTopDigitTextView, topMargin)
+                ui.balanceTopDigitTextView.setTopMargin(topMargin)
                 val bottomAlpha =
                     -topMargin / view.dimenPx(R.dimen.home_balance_digit_height).toFloat()
                 ui.balanceTopDigitTextView.alpha = 1 - bottomAlpha
@@ -419,7 +418,7 @@ internal class BalanceViewController(
                 ui.balanceTopDigitTextView.setWidthToMeasured()
                 ui.balanceTopDigitTextView.alpha = 1f
                 ui.balanceBottomDigitTextView.alpha = 0f
-                UIUtil.setTopMargin(ui.balanceTopDigitTextView, 0)
+                ui.balanceTopDigitTextView.setTopMargin(0)
             }
             changed = true
 
@@ -428,8 +427,7 @@ internal class BalanceViewController(
             anim.addUpdateListener { valueAnimator: ValueAnimator ->
                 val animValue = valueAnimator.animatedValue as Float
                 ui.balanceTopDigitTextView.alpha = animValue
-                UIUtil.setTopMargin(
-                    view,
+                view.setTopMargin(
                     (view.dimenPx(R.dimen.home_balance_digit_height) * (1 - animValue)).toInt()
                 )
             }
@@ -460,8 +458,7 @@ internal class BalanceViewController(
         }
 
         override fun reveal(delayMs: Long) {
-            UIUtil.setTopMargin(
-                separatorTextView,
+            separatorTextView.setTopMargin(
                 view.dimenPx(R.dimen.home_balance_digit_decimal_height)
             )
             separatorTextView.setWidthToMeasured()
@@ -469,7 +466,7 @@ internal class BalanceViewController(
                 ValueAnimator.ofInt(view.dimenPx(R.dimen.home_balance_digit_decimal_height), 0)
             anim.addUpdateListener { valueAnimator: ValueAnimator ->
                 val topMargin = valueAnimator.animatedValue as Int
-                UIUtil.setTopMargin(separatorTextView, topMargin)
+                separatorTextView.setTopMargin(topMargin)
                 separatorTextView.alpha =
                     1 - (topMargin.toFloat() / view.dimenPx(R.dimen.home_balance_digit_decimal_height)
                         .toFloat())
@@ -503,15 +500,14 @@ internal class BalanceViewController(
             get() = ui.balanceBottomDecimalDigitTextView
 
         override fun reveal(delayMs: Long) {
-            UIUtil.setTopMargin(
-                topDecimalDigitTextView,
+            topDecimalDigitTextView.setTopMargin(
                 view.dimenPx(R.dimen.home_balance_digit_decimal_height)
             )
             val anim =
                 ValueAnimator.ofInt(view.dimenPx(R.dimen.home_balance_digit_decimal_height), 0)
             anim.addUpdateListener { valueAnimator: ValueAnimator ->
                 val topMargin = valueAnimator.animatedValue as Int
-                UIUtil.setTopMargin(topDecimalDigitTextView, topMargin)
+                topDecimalDigitTextView.setTopMargin(topMargin)
                 topDecimalDigitTextView.alpha =
                     1 - (topMargin.toFloat() / view.dimenPx(R.dimen.home_balance_digit_decimal_height)
                         .toFloat())
@@ -533,7 +529,7 @@ internal class BalanceViewController(
                 topDecimalDigitTextView.setWidthToMeasured()
                 topDecimalDigitTextView.alpha = 1f
                 bottomDecimalDigitTextView.alpha = 0f
-                UIUtil.setTopMargin(topDecimalDigitTextView, 0)
+                topDecimalDigitTextView.setTopMargin(0)
             }
             changed = true
 
@@ -545,7 +541,7 @@ internal class BalanceViewController(
                 ValueAnimator.ofInt(0, -view.dimenPx(R.dimen.home_balance_digit_decimal_height) - 1)
             anim.addUpdateListener { valueAnimator: ValueAnimator ->
                 val topMargin = valueAnimator.animatedValue as Int
-                UIUtil.setTopMargin(topDecimalDigitTextView, topMargin)
+                topDecimalDigitTextView.setTopMargin(topMargin)
                 val bottomAlpha =
                     -topMargin / view.dimenPx(R.dimen.home_balance_digit_decimal_height).toFloat()
                 topDecimalDigitTextView.alpha = 1 - bottomAlpha

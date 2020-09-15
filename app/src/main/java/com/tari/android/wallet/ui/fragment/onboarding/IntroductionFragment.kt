@@ -63,8 +63,6 @@ import com.tari.android.wallet.infrastructure.Tracker
 import com.tari.android.wallet.service.WalletService
 import com.tari.android.wallet.ui.activity.restore.WalletRestoreActivity
 import com.tari.android.wallet.ui.extension.*
-import com.tari.android.wallet.ui.util.UIUtil
-import com.tari.android.wallet.ui.util.UIUtil.getResourceUri
 import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.SharedPrefsWrapper
 import javax.inject.Inject
@@ -147,7 +145,7 @@ internal class IntroductionFragment : Fragment() {
     }
 
     private fun setupUi() {
-        UIUtil.setProgressBarColor(ui.createWalletProgressBar, color(white))
+        ui.createWalletProgressBar.setColor(color(white))
         ui.apply {
             tariLogoLottieAnimationView.alpha = 0f
             networkInfoTextView.alpha = 0f
@@ -194,10 +192,7 @@ internal class IntroductionFragment : Fragment() {
             ui.videoOuterContainerView.width,
             ui.videoOuterContainerView.height
         )
-        UIUtil.setWidthAndHeight(
-            ui.videoInnerContainerView,
-            size, size
-        )
+        ui.videoInnerContainerView.setLayoutSize(size, size)
         ui.rainAnimationVideoView.setVideoURI(context!!.getResourceUri(R.raw.purple_orb))
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             ui.rainAnimationVideoView.setAudioFocusRequest(AudioManager.AUDIOFOCUS_NONE)
@@ -255,17 +250,14 @@ internal class IntroductionFragment : Fragment() {
     }
 
     private fun onCreateWalletClick() {
-        UIUtil.temporarilyDisableClick(ui.createWalletButton)
+        ui.createWalletButton.temporarilyDisableClick()
         ui.restoreWalletCtaView.setOnClickListener(null)
         ui.createWalletButton.gone()
         ui.createWalletProgressBar.visible()
         startWalletService()
-        UIUtil.animateViewClick(ui.createWalletContainerView).addListener(onEnd = {
-            ui.rootView.postDelayed(
-                { startTariWalletViewAnimation() },
-                createWalletArtificialDelay
-            )
-        })
+        ui.createWalletContainerView.animateClick {
+            ui.rootView.postDelayed(createWalletArtificialDelay) { startTariWalletViewAnimation() }
+        }
     }
 
     private fun startWalletService() {

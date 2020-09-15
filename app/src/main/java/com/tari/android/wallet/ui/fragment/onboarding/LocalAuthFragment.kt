@@ -42,7 +42,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AlertDialog
 import androidx.biometric.BiometricPrompt
-import androidx.core.animation.addListener
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import com.daasuu.ei.Ease
@@ -59,7 +58,6 @@ import com.tari.android.wallet.infrastructure.security.biometric.BiometricAuthen
 import com.tari.android.wallet.infrastructure.security.biometric.BiometricAuthenticationService.BiometricAuthenticationException
 import com.tari.android.wallet.infrastructure.security.biometric.BiometricAuthenticationService.BiometricAuthenticationType.*
 import com.tari.android.wallet.ui.extension.*
-import com.tari.android.wallet.ui.util.UIUtil
 import com.tari.android.wallet.util.Constants.UI.Auth
 import com.tari.android.wallet.util.SharedPrefsWrapper
 import kotlinx.coroutines.launch
@@ -130,7 +128,7 @@ internal class LocalAuthFragment : Fragment() {
 
     private fun setupUi() {
         ui.progressBarContainerView.invisible()
-        UIUtil.setProgressBarColor(ui.progressBar, color(R.color.white))
+        ui.progressBar.setColor(color(R.color.white))
         if (authType == BIOMETRIC) {
             //setup ui for biometric auth
             ui.authTypeImageView.setImageResource(R.drawable.fingerprint)
@@ -177,16 +175,15 @@ internal class LocalAuthFragment : Fragment() {
     }
 
     private fun onEnableAuthButtonClick(view: View) {
-        UIUtil.temporarilyDisableClick(view)
-        val animatorSet = UIUtil.animateButtonClick(ui.enableAuthButton)
-        animatorSet.addListener(onEnd = {
+        view.temporarilyDisableClick()
+        ui.enableAuthButton.animateClick {
             if (authType == NONE) {
                 displayAuthNotAvailableDialog()
             } else {
                 ui.enableAuthButton.isEnabled = false
                 doAuth()
             }
-        })
+        }
     }
 
     private fun doAuth() {

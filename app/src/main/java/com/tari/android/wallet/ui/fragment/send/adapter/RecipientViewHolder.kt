@@ -39,8 +39,8 @@ import com.tari.android.wallet.model.Contact
 import com.tari.android.wallet.model.User
 import com.tari.android.wallet.ui.component.EmojiIdSummaryViewController
 import com.tari.android.wallet.ui.extension.gone
+import com.tari.android.wallet.ui.extension.temporarilyDisableClick
 import com.tari.android.wallet.ui.extension.visible
-import com.tari.android.wallet.ui.util.UIUtil
 import java.lang.ref.WeakReference
 import java.util.*
 
@@ -62,7 +62,7 @@ class RecipientViewHolder(view: View, listener: Listener) :
     }
 
     override fun onClick(view: View) {
-        UIUtil.temporarilyDisableClick(view)
+        view.temporarilyDisableClick()
         listenerWR.get()?.onRecipientSelected(userWR.get()!!)
     }
 

@@ -32,9 +32,21 @@
  */
 package com.tari.android.wallet.ui.extension
 
+import android.app.Activity
+import android.content.Context
+import android.view.View
+import android.view.inputmethod.InputMethodManager
 import androidx.fragment.app.FragmentActivity
 import com.tari.android.wallet.application.TariWalletApplication
 import com.tari.android.wallet.di.ApplicationComponent
 
 internal val FragmentActivity.appComponent: ApplicationComponent
     get() = (this.application as TariWalletApplication).appComponent
+
+fun Activity.hideKeyboard() =
+    (getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager)
+        .hideSoftInputFromWindow((currentFocus ?: View(this)).windowToken, 0)
+
+fun Activity.showKeyboard() =
+    (getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager)
+        .showSoftInput(currentFocus ?: View(this), InputMethodManager.SHOW_IMPLICIT)

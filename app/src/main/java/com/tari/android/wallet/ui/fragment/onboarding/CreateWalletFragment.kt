@@ -33,14 +33,13 @@
 package com.tari.android.wallet.ui.fragment.onboarding
 
 import android.animation.*
-import android.content.Context
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.animation.addListener
+import androidx.core.os.postDelayed
 import androidx.fragment.app.Fragment
 import com.daasuu.ei.Ease
 import com.daasuu.ei.EasingInterpolator
@@ -57,13 +56,11 @@ import com.tari.android.wallet.infrastructure.Tracker
 import com.tari.android.wallet.ui.component.CustomFont
 import com.tari.android.wallet.ui.component.EmojiIdSummaryViewController
 import com.tari.android.wallet.ui.extension.*
-import com.tari.android.wallet.ui.util.UIUtil
 import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.Constants.UI.CreateEmojiId
 import com.tari.android.wallet.util.EmojiUtil
 import com.tari.android.wallet.util.SharedPrefsWrapper
 import me.everything.android.ui.overscroll.OverScrollDecoratorHelper
-import java.lang.ref.WeakReference
 import javax.inject.Inject
 import javax.inject.Named
 
@@ -86,8 +83,6 @@ internal class CreateWalletFragment : Fragment() {
 
     private lateinit var emojiIdSummaryController: EmojiIdSummaryViewController
     private val uiHandler = Handler(Looper.getMainLooper())
-    private lateinit var listenerWR: WeakReference<Listener>
-
     private var isWaitingOnWalletState = false
     private var emojiIdContinueButtonHasBeenDisplayed = false
 
@@ -112,11 +107,6 @@ internal class CreateWalletFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         uiHandler.removeCallbacksAndMessages(null)
-    }
-
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-        listenerWR = WeakReference(activity as Listener)
     }
 
     private fun onWalletStateChanged(walletState: WalletState) {
@@ -149,12 +139,10 @@ internal class CreateWalletFragment : Fragment() {
             rootView.doOnGlobalLayout {
                 whiteBgView.translationY = -whiteBgView.height.toFloat()
                 playStartupWhiteBgAnimation()
-                UIUtil.setBottomMargin(
-                    createEmojiIdButton,
+                createEmojiIdButton.setBottomMargin(
                     createEmojiIdButton.height * -2
                 )
-                UIUtil.setBottomMargin(
-                    continueButton,
+                continueButton.setBottomMargin(
                     continueButton.height * -2
                 )
             }
@@ -232,14 +220,14 @@ internal class CreateWalletFragment : Fragment() {
                 super.onAnimationEnd(animation)
                 // if the wallet is not ready wait until it gets ready,
                 // otherwise display the checkmark anim & move on
-                uiHandler.postDelayed({
+                uiHandler.postDelayed(CreateEmojiId.viewChangeAnimDelayMs) {
                     if (EventBus.walletStateSubject.value != WalletState.RUNNING) {
                         isWaitingOnWalletState = true
                         EventBus.subscribeToWalletState(this, ::onWalletStateChanged)
                     } else {
                         startCheckMarkAnimation()
                     }
-                }, CreateEmojiId.viewChangeAnimDelayMs)
+                }
             }
         })
         animSet.start()
@@ -327,14 +315,13 @@ internal class CreateWalletFragment : Fragment() {
             )
         awesomeAnim.duration = CreateEmojiId.awesomeTextAnimDurationMs
 
-        val buttonInitialBottomMargin = UIUtil.getBottomMargin(ui.createEmojiIdButton)
+        val buttonInitialBottomMargin = ui.createEmojiIdButton.getBottomMargin()
         val buttonBottomMarginDelta =
             dimenPx(create_wallet_button_bottom_margin) - buttonInitialBottomMargin
         val buttonTranslationAnim = ValueAnimator.ofFloat(0f, 1f)
         buttonTranslationAnim.addUpdateListener { valueAnimator: ValueAnimator ->
             val value = valueAnimator.animatedValue as Float
-            UIUtil.setBottomMargin(
-                ui.createEmojiIdButton,
+            ui.createEmojiIdButton.setBottomMargin(
                 (buttonInitialBottomMargin + buttonBottomMarginDelta * value).toInt()
             )
         }
@@ -362,14 +349,8 @@ internal class CreateWalletFragment : Fragment() {
     }
 
     private fun onCreateEmojiIdButtonClick() {
-        UIUtil.temporarilyDisableClick(ui.createEmojiIdButton)
-        val animatorSet = UIUtil.animateButtonClick(ui.createEmojiIdButton)
-        animatorSet.addListener(object : AnimatorListenerAdapter() {
-            override fun onAnimationEnd(animation: Animator?) {
-                super.onAnimationEnd(animation)
-                showEmojiWheelAnimation()
-            }
-        })
+        ui.createEmojiIdButton.temporarilyDisableClick()
+        ui.createEmojiIdButton.animateClick { showEmojiWheelAnimation() }
     }
 
     private fun showEmojiWheelAnimation() {
@@ -499,14 +480,13 @@ internal class CreateWalletFragment : Fragment() {
     }
 
     private fun showEmojiIdContinueButton() {
-        val buttonInitialBottomMargin = UIUtil.getBottomMargin(ui.continueButton)
+        val buttonInitialBottomMargin = ui.continueButton.getBottomMargin()
         val buttonBottomMarginDelta =
             dimenPx(create_wallet_button_bottom_margin) - buttonInitialBottomMargin
         val buttonTranslationAnim = ValueAnimator.ofFloat(0f, 1f)
         buttonTranslationAnim.addUpdateListener { valueAnimator: ValueAnimator ->
             val value = valueAnimator.animatedValue as Float
-            UIUtil.setBottomMargin(
-                ui.continueButton,
+            ui.continueButton.setBottomMargin(
                 (buttonInitialBottomMargin + buttonBottomMarginDelta * value).toInt()
             )
         }
@@ -515,7 +495,7 @@ internal class CreateWalletFragment : Fragment() {
     }
 
     private fun onSeeFullEmojiIdButtonClicked(view: View) {
-        UIUtil.temporarilyDisableClick(view)
+        view.temporarilyDisableClick()
         showFullEmojiId()
         if (!emojiIdContinueButtonHasBeenDisplayed) {
             showEmojiIdContinueButton()
@@ -531,10 +511,7 @@ internal class CreateWalletFragment : Fragment() {
         val fullEmojiIdInitialWidth = ui.emojiIdSummaryContainerView.width
         val fullEmojiIdDeltaWidth =
             (ui.rootView.width - dimenPx(common_horizontal_margin) * 2) - fullEmojiIdInitialWidth
-        UIUtil.setWidth(
-            ui.emojiIdContainerView,
-            fullEmojiIdInitialWidth
-        )
+        ui.emojiIdContainerView.setLayoutWidth(fullEmojiIdInitialWidth)
         ui.emojiIdContainerView.alpha = 0f
         ui.emojiIdContainerView.visible()
         ui.emojiIdTextView.isEnabled = true
@@ -552,14 +529,11 @@ internal class CreateWalletFragment : Fragment() {
             // container alpha & scale
             ui.emojiIdContainerView.alpha = value
             ui.emojiIdSummaryContainerView.alpha = 1f - value
-            UIUtil.setWidth(
-                ui.emojiIdContainerView,
-                (fullEmojiIdInitialWidth + fullEmojiIdDeltaWidth * value).toInt()
-            )
-            UIUtil.setTopMargin(
-                ui.seeFullEmojiIdContainerView,
+            val width = (fullEmojiIdInitialWidth + fullEmojiIdDeltaWidth * value).toInt()
+            ui.emojiIdContainerView.setLayoutWidth(width)
+            val margin =
                 (dimenPx(onboarding_see_full_emoji_id_button_visible_top_margin) * (1f - value)).toInt()
-            )
+            ui.seeFullEmojiIdContainerView.setTopMargin(margin)
             ui.seeFullEmojiIdContainerView.alpha = 1f - value
         }
         emojiIdAnim.duration = Constants.UI.shortDurationMs
@@ -593,15 +567,11 @@ internal class CreateWalletFragment : Fragment() {
         val emojiIdWidthAnim = ValueAnimator.ofFloat(0f, 1f)
         emojiIdWidthAnim.addUpdateListener { valueAnimator: ValueAnimator ->
             val value = valueAnimator.animatedValue as Float
-            UIUtil.setWidth(
-                ui.emojiIdContainerView,
-                (fullEmojiIdInitialWidth + fullEmojiIdDeltaWidth * value).toInt()
-            )
-
+            val width = (fullEmojiIdInitialWidth + fullEmojiIdDeltaWidth * value).toInt()
+            ui.emojiIdContainerView.setLayoutWidth(width)
             ui.emojiIdContainerView.alpha = (1f - value)
             ui.emojiIdSummaryContainerView.alpha = value
-            UIUtil.setTopMargin(
-                ui.seeFullEmojiIdContainerView,
+            ui.seeFullEmojiIdContainerView.setTopMargin(
                 (dimenPx(onboarding_see_full_emoji_id_button_visible_top_margin) * value).toInt()
             )
             ui.seeFullEmojiIdContainerView.alpha = value
@@ -619,18 +589,17 @@ internal class CreateWalletFragment : Fragment() {
      * Minimize the emoji id view.
      */
     private fun fullEmojiIdTextViewClicked(view: View) {
-        UIUtil.temporarilyDisableClick(view)
+        view.temporarilyDisableClick()
         hideFullEmojiId()
     }
 
     private fun onContinueButtonClick() {
-        UIUtil.temporarilyDisableClick(ui.continueButton)
+        ui.continueButton.temporarilyDisableClick()
         sharedPrefsWrapper.onboardingCompleted = true
-        val animatorSet = UIUtil.animateButtonClick(ui.continueButton)
-        animatorSet.addListener(onEnd = {
+        ui.continueButton.animateClick {
             sharedPrefsWrapper.onboardingAuthSetupStarted = true
-            listenerWR.get()?.continueToEnableAuth()
-        })
+            (requireActivity() as Listener).continueToEnableAuth()
+        }
     }
 
     fun fadeOutAllViewAnimation() {
