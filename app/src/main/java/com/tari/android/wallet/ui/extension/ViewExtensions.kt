@@ -224,19 +224,21 @@ internal class ThrottleClick(private val delegate: (View) -> Unit) :
 // method name is this rather than "setWidth" because "setWidth" might conflict with View's
 // subtypes intrinsic methods
 fun View.setLayoutWidth(width: Int) {
-    this.layoutParams = this.layoutParams.also { it.width = width }
+    this.layoutParams?.let { this@setLayoutWidth.layoutParams = it.also { p -> p.width = width } }
 }
 
 // method name is this rather than "setHeight" because "setHeight" might conflict with View's
 // subtypes intrinsic methods
 fun View.setLayoutHeight(height: Int) {
-    this.layoutParams = this.layoutParams.also { it.height = height }
+    this.layoutParams?.let { this@setLayoutHeight.layoutParams = it.also { p -> p.height = height } }
 }
 
 fun View.setLayoutSize(width: Int, height: Int) {
-    this.layoutParams = this.layoutParams.also {
-        it.width = width
-        it.height = height
+    this.layoutParams?.let {
+        this@setLayoutSize.layoutParams = it.also { p ->
+            p.width = width
+            p.height = height
+        }
     }
 }
 
