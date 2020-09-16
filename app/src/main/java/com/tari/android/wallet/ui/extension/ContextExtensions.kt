@@ -32,8 +32,10 @@
  */
 package com.tari.android.wallet.ui.extension
 
+import android.content.ContentResolver
 import android.content.Context
 import android.graphics.drawable.Drawable
+import android.net.Uri
 import androidx.annotation.ColorRes
 import androidx.annotation.DimenRes
 import androidx.annotation.DrawableRes
@@ -53,3 +55,13 @@ internal fun Context.dimen(@DimenRes id: Int): Float = resources.getDimension(id
 
 internal fun Context.drawable(@DrawableRes id: Int): Drawable? =
     ContextCompat.getDrawable(this, id)
+
+/**
+ * @param resourceId identifies an application resource
+ * @return the Uri by which the application resource is accessed
+ */
+fun Context.getResourceUri(resourceId: Int): Uri = Uri.Builder()
+    .scheme(ContentResolver.SCHEME_ANDROID_RESOURCE)
+    .authority(packageName)
+    .path(resourceId.toString())
+    .build()

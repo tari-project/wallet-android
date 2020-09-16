@@ -46,8 +46,8 @@ import com.tari.android.wallet.R.color.seed_phrase_button_disabled_text_color
 import com.tari.android.wallet.databinding.FragmentWriteDownSeedPhraseBinding
 import com.tari.android.wallet.ui.activity.settings.BackupSettingsRouter
 import com.tari.android.wallet.ui.extension.ThrottleClick
+import com.tari.android.wallet.ui.extension.animateClick
 import com.tari.android.wallet.ui.extension.color
-import com.tari.android.wallet.ui.util.UIUtil
 
 class WriteDownSeedPhraseFragment @Deprecated(
     """Use newInstance() and supply all
@@ -71,7 +71,7 @@ framework for UI tree rebuild on configuration changes"""
         }
         ui.backCtaView.setOnClickListener { requireActivity().onBackPressed() }
         ui.continueCtaView.setOnClickListener(ThrottleClick {
-            UIUtil.animateViewClick(it) {
+            it.animateClick {
                 (requireActivity() as BackupSettingsRouter)
                     .toRecoveryPhraseVerification(this, WORDS_POOL)
             }

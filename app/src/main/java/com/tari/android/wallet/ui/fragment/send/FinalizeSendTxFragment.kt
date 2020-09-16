@@ -64,11 +64,7 @@ import com.tari.android.wallet.service.TariWalletService
 import com.tari.android.wallet.service.WalletService
 import com.tari.android.wallet.tor.TorBootstrapStatus
 import com.tari.android.wallet.tor.TorProxyState
-import com.tari.android.wallet.ui.extension.appComponent
-import com.tari.android.wallet.ui.extension.invisible
-import com.tari.android.wallet.ui.extension.string
-import com.tari.android.wallet.ui.extension.visible
-import com.tari.android.wallet.ui.util.UIUtil.getResourceUri
+import com.tari.android.wallet.ui.extension.*
 import com.tari.android.wallet.util.Constants
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

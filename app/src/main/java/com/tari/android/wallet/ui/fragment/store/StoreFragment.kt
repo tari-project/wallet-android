@@ -52,11 +52,7 @@ import com.tari.android.wallet.R.string.ttl_store_url
 import com.tari.android.wallet.databinding.FragmentStoreBinding
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.network.NetworkConnectionState
-import com.tari.android.wallet.ui.extension.color
-import com.tari.android.wallet.ui.extension.drawable
-import com.tari.android.wallet.ui.extension.gone
-import com.tari.android.wallet.ui.extension.string
-import com.tari.android.wallet.ui.util.UIUtil
+import com.tari.android.wallet.ui.extension.*
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
@@ -100,7 +96,7 @@ framework for UI tree rebuild on configuration changes"""
     private fun setupUi() {
         animation = NavigationPanelAnimation(ui.controlsView)
         configureWebView()
-        UIUtil.setProgressBarColor(ui.progressBar, color(purple))
+        ui.progressBar.setColor(color(purple))
         ui.browserBackCtaView.setOnClickListener {
             ui.webView.apply { if (canGoBack()) goBack() }
         }
@@ -232,8 +228,8 @@ framework for UI tree rebuild on configuration changes"""
     }
 
     private data class NavigationPanelAnimationState(
-        internal val direction: TranslationDirection,
-        internal val animator: Animator?
+        val direction: TranslationDirection,
+        val animator: Animator?
     )
 
     private enum class TranslationDirection { UP, DOWN }

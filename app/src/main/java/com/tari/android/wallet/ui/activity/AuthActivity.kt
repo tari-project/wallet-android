@@ -61,7 +61,6 @@ import com.tari.android.wallet.infrastructure.security.biometric.BiometricAuthen
 import com.tari.android.wallet.service.WalletService
 import com.tari.android.wallet.ui.activity.home.HomeActivity
 import com.tari.android.wallet.ui.extension.*
-import com.tari.android.wallet.ui.util.UIUtil
 import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.SharedPrefsWrapper
 import kotlinx.coroutines.launch
@@ -109,7 +108,7 @@ internal class AuthActivity : AppCompatActivity() {
     }
 
     private fun setupUi() {
-        UIUtil.setProgressBarColor(ui.progressBar, color(white))
+        ui.progressBar.setColor(color(white))
         ui.progressBar.invisible()
         // call the animations
         showTariText()

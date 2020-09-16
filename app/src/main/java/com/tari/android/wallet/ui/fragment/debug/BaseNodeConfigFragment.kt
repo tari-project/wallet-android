@@ -54,7 +54,6 @@ import com.tari.android.wallet.ffi.FFIPublicKey
 import com.tari.android.wallet.ffi.FFIWallet
 import com.tari.android.wallet.ffi.HexString
 import com.tari.android.wallet.ui.extension.*
-import com.tari.android.wallet.ui.util.UIUtil
 import com.tari.android.wallet.util.SharedPrefsWrapper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -125,7 +124,7 @@ internal class BaseNodeConfigFragment : Fragment() {
     }
 
     private fun setupUI() {
-        UIUtil.setProgressBarColor(ui.progressBar, color(white))
+        ui.progressBar.setColor(color(white))
         ui.apply {
             updateCurrentBaseNode()
             progressBar.gone()
@@ -222,7 +221,7 @@ internal class BaseNodeConfigFragment : Fragment() {
     }
 
     private fun resetButtonClicked(view: View) {
-        UIUtil.temporarilyDisableClick(view)
+        view.temporarilyDisableClick()
         sharedPrefsWrapper.baseNodeIsUserCustom = false
         sharedPrefsWrapper.baseNodeLastSyncWasSuccessful = null
         lifecycleScope.launch(Dispatchers.IO) {
@@ -235,11 +234,8 @@ internal class BaseNodeConfigFragment : Fragment() {
     }
 
     private fun saveButtonClicked(view: View) {
-        UIUtil.temporarilyDisableClick(view)
-        // validate
-        if (!validate()) {
-            return
-        }
+        view.temporarilyDisableClick()
+        if (!validate()) return
         val publicKeyHex = ui.publicKeyHexEditText.editableText.toString()
         val address = ui.addressEditText.editableText.toString()
         sharedPrefsWrapper.baseNodeIsUserCustom = true
@@ -247,7 +243,6 @@ internal class BaseNodeConfigFragment : Fragment() {
         sharedPrefsWrapper.baseNodeName = null
         sharedPrefsWrapper.baseNodePublicKeyHex = publicKeyHex
         sharedPrefsWrapper.baseNodeAddress = address
-
         ui.saveButton.invisible()
         ui.progressBar.visible()
         lifecycleScope.launch(Dispatchers.IO) {

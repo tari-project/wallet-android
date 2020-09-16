@@ -37,6 +37,7 @@ import android.animation.ValueAnimator
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
+import android.graphics.Bitmap
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -45,17 +46,19 @@ import androidx.core.animation.addListener
 import androidx.fragment.app.Fragment
 import com.daasuu.ei.Ease
 import com.daasuu.ei.EasingInterpolator
+import com.google.zxing.BarcodeFormat
+import com.google.zxing.EncodeHintType
+import com.journeyapps.barcodescanner.BarcodeEncoder
 import com.tari.android.wallet.R
 import com.tari.android.wallet.databinding.FragmentWalletInfoBinding
 import com.tari.android.wallet.ui.component.EmojiIdCopiedViewController
 import com.tari.android.wallet.ui.component.EmojiIdSummaryViewController
 import com.tari.android.wallet.ui.extension.*
-import com.tari.android.wallet.ui.util.UIUtil
-import com.tari.android.wallet.ui.util.UIUtil.updateWidth
 import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.EmojiUtil
 import com.tari.android.wallet.util.SharedPrefsWrapper
 import com.tari.android.wallet.util.WalletUtil
+import java.util.*
 import javax.inject.Inject
 
 class WalletInfoFragment : Fragment() {
@@ -117,10 +120,24 @@ class WalletInfoFragment : Fragment() {
 
     private fun displayQRCode(emojiId: String) {
         val content = WalletUtil.getEmojiIdDeepLink(emojiId)
-        UIUtil.getQREncodedBitmap(content, dimenPx(R.dimen.wallet_info_img_qr_code_size))?.let {
+        getQREncodedBitmap(content, dimenPx(R.dimen.wallet_info_img_qr_code_size))?.let {
             ui.qrImageView.setImageBitmap(it)
         }
     }
+
+    private fun getQREncodedBitmap(content: String, size: Int): Bitmap? {
+        try {
+            val barcodeEncoder = BarcodeEncoder()
+            val hints: MutableMap<EncodeHintType, String> =
+                EnumMap(EncodeHintType::class.java)
+            hints[EncodeHintType.CHARACTER_SET] = "UTF-8"
+            val map = barcodeEncoder.encode(content, BarcodeFormat.QR_CODE, size, size, hints)
+            return barcodeEncoder.createBitmap(map)
+        } catch (e: Exception) {
+        }
+        return null
+    }
+
 
     // endregion Initial UI Setup
 
@@ -137,7 +154,7 @@ class WalletInfoFragment : Fragment() {
     }
 
     private fun onEmojiSummaryClicked(view: View) {
-        UIUtil.temporarilyDisableClick(view)
+        view.temporarilyDisableClick()
         showFullEmojiId()
     }
 
@@ -159,7 +176,7 @@ class WalletInfoFragment : Fragment() {
     }
 
     private fun setupEmojiIdViewsForAnimation(fullEmojiIdInitialWidth: Int) {
-        ui.fullEmojiIdContainerView.updateWidth(fullEmojiIdInitialWidth)
+        ui.fullEmojiIdContainerView.setLayoutWidth(fullEmojiIdInitialWidth)
         ui.fullEmojiIdContainerView.alpha = 0F
         ui.fullEmojiIdContainerView.visible()
         // scroll the emoji id horizontal list to end
@@ -194,7 +211,7 @@ class WalletInfoFragment : Fragment() {
             ui.fullEmojiIdContainerView.scaleX = 1F + 0.2F * (1F - value)
             ui.fullEmojiIdContainerView.scaleY = 1F + 0.2F * (1F - value)
             ui.fullEmojiIdContainerView
-                .updateWidth((fullEmojiIdInitialWidth + fullEmojiIdDeltaWidth * value).toInt())
+                .setLayoutWidth((fullEmojiIdInitialWidth + fullEmojiIdDeltaWidth * value).toInt())
         }
     }
 
@@ -211,7 +228,7 @@ class WalletInfoFragment : Fragment() {
         }
 
     private fun hideFullEmojiId(animateCopyEmojiIdButton: Boolean = true) {
-        dimmerViews.forEach(UIUtil::temporarilyDisableClick)
+        dimmerViews.forEach { it.temporarilyDisableClick() }
         ui.fullEmojiIdScrollView.smoothScrollTo(0, 0)
         ui.emojiIdSummaryContainerView.visible()
         val fullEmojiIdInitialWidth = ui.emojiIdContainerView.width
@@ -261,7 +278,7 @@ class WalletInfoFragment : Fragment() {
             // container alpha & scale
             ui.fullEmojiIdContainerView.alpha = 1 - value
             ui.fullEmojiIdContainerView
-                .updateWidth((fullEmojiIdInitialWidth + fullEmojiIdDeltaWidth * value).toInt())
+                .setLayoutWidth((fullEmojiIdInitialWidth + fullEmojiIdDeltaWidth * value).toInt())
         }
     }
 
@@ -281,12 +298,12 @@ class WalletInfoFragment : Fragment() {
     }
 
     private fun onCopyEmojiIdButtonClicked(view: View) {
-        UIUtil.temporarilyDisableClick(view)
+        view.temporarilyDisableClick()
         completeCopy(sharedPrefsWrapper.emojiId!!)
     }
 
     private fun onCopyEmojiIdButtonLongClicked(view: View) {
-        UIUtil.temporarilyDisableClick(view)
+        view.temporarilyDisableClick()
         completeCopy(sharedPrefsWrapper.publicKeyHexString!!)
     }
 

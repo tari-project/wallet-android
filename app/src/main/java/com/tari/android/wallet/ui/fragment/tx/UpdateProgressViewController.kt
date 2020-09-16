@@ -50,11 +50,7 @@ import com.tari.android.wallet.network.NetworkConnectionState
 import com.tari.android.wallet.service.TariWalletService
 import com.tari.android.wallet.tor.TorBootstrapStatus
 import com.tari.android.wallet.tor.TorProxyState
-import com.tari.android.wallet.ui.extension.color
-import com.tari.android.wallet.ui.extension.gone
-import com.tari.android.wallet.ui.extension.invisible
-import com.tari.android.wallet.ui.extension.visible
-import com.tari.android.wallet.ui.util.UIUtil
+import com.tari.android.wallet.ui.extension.*
 import com.tari.android.wallet.util.Constants
 import io.reactivex.Observable
 import io.reactivex.disposables.Disposable
@@ -130,7 +126,7 @@ internal class UpdateProgressViewController(
     private var torBootstrapStatusSubscription: Disposable? = null
 
     init {
-        UIUtil.setProgressBarColor(progressBar, view.color(R.color.purple))
+        progressBar.setColor(view.color(R.color.purple))
         progressBar.invisible()
         subscribeToEventBus()
     }
@@ -141,20 +137,20 @@ internal class UpdateProgressViewController(
         }
         baseNodeSyncCurrentRetryCount = 0
         // emojis
-        UIUtil.setTopMargin(hourglassIconTextView, 0)
+        hourglassIconTextView.setTopMargin(0)
         hourglassIconTextView.alpha = 1f
         handshakeIconTextView.alpha = 1f
         // text views
         checkingForUpdatesTextView.visible()
-        UIUtil.setTopMargin(checkingForUpdatesTextView, 0)
+        checkingForUpdatesTextView.setTopMargin(0)
         receivingTxsTextView.visible()
-        UIUtil.setTopMargin(receivingTxsTextView, 0)
+        receivingTxsTextView.setTopMargin(0)
         completingTxsTextView.visible()
-        UIUtil.setTopMargin(completingTxsTextView, 0)
+        completingTxsTextView.setTopMargin(0)
         updatingTxsTextView.visible()
-        UIUtil.setTopMargin(updatingTxsTextView, 0)
+        updatingTxsTextView.setTopMargin(0)
         upToDateTextView.visible()
-        UIUtil.setTopMargin(upToDateTextView, 0)
+        upToDateTextView.setTopMargin(0)
         upToDateTextView.alpha = 1f
         isReset = true
     }
@@ -372,15 +368,13 @@ internal class UpdateProgressViewController(
         val anim = ValueAnimator.ofFloat(0f, 1f)
         anim.addUpdateListener {
             val value = it.animatedValue as Float
-            UIUtil.setTopMargin(
-                currentTextView,
+            currentTextView.setTopMargin(
                 (-currentTextView.height * value).toInt()
             )
             if (currentTextView == checkingForUpdatesTextView
                 && nextTextView != upToDateTextView
             ) {
-                UIUtil.setTopMargin(
-                    hourglassIconTextView,
+                hourglassIconTextView.setTopMargin(
                     (-hourglassIconTextView.height * value).toInt()
                 )
             } else if (nextTextView == upToDateTextView) {
