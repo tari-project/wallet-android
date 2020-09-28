@@ -268,6 +268,8 @@
     <string name="tx_details_cancel_dialog_description">You will have to start a new transaction if you change your mind.</string>
     <string name="tx_details_cancel_dialog_cancel">Yes, cancel</string>
     <string name="tx_details_cancel_dialog_not_cancel">Not now</string>
+    <string name="tx_details_error_tx_not_found_title">Requested transaction was not found</string>
+    <string name="tx_details_error_tx_not_found_desc">Please try again later</string>
 
     <!-- Fee tooltip -->
     <string name="tx_detail_fee_tooltip_transaction_fee">Transaction Fee</string>
