@@ -317,13 +317,15 @@ UI tree rebuild on configuration changes"""
     }
 
     private fun showAuthenticationCancellationError() {
-        AlertDialog.Builder(requireContext())
-            .setCancelable(false)
-            .setMessage(getString(auth_failed_desc))
-            .setNegativeButton(string(exit)) { dialog, _ -> dialog.cancel() }
-            .create()
-            .apply { setTitle(string(auth_failed_title)) }
-            .show()
+        activity?.let {
+            AlertDialog.Builder(it)
+                .setCancelable(false)
+                .setMessage(getString(auth_failed_desc))
+                .setNegativeButton(string(exit)) { dialog, _ -> dialog.cancel() }
+                .create()
+                .apply { setTitle(string(auth_failed_title)) }
+                .show()
+        }
     }
 
     interface AllSettingsRouter {
