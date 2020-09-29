@@ -47,7 +47,6 @@ import android.graphics.Color
 import android.graphics.Rect
 import android.net.Uri
 import android.os.Bundle
-import android.text.InputType
 import android.view.*
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
@@ -241,7 +240,6 @@ class AddNoteFragment : Fragment(), View.OnTouchListener {
         focusEditTextAndShowKeyboard()
         ui.promptTextView.setTextColor(color(black))
         ui.noteEditText.imeOptions = EditorInfo.IME_ACTION_DONE
-        ui.noteEditText.setRawInputType(InputType.TYPE_CLASS_TEXT)
         ui.rootView.doOnGlobalLayout {
             ui.fullEmojiIdContainerView.setTopMargin(ui.emojiIdSummaryContainerView.top)
             ui.fullEmojiIdContainerView.setLayoutHeight(ui.emojiIdSummaryContainerView.height)
@@ -609,7 +607,7 @@ class AddNoteFragment : Fragment(), View.OnTouchListener {
                 anim.start()
             } else {
                 // disable input
-                ui.noteEditText.inputType = InputType.TYPE_NULL
+                ui.noteEditText.isEnabled = false
                 // complete slide animation
                 val anim = ValueAnimator.ofInt(
                     slideButtonLastMarginStart,
@@ -656,7 +654,7 @@ class AddNoteFragment : Fragment(), View.OnTouchListener {
             ui.rootView.postDelayed(AddNoteAndSend.preKeyboardHideWaitMs) { hideKeyboard() }
             ui.rootView.postDelayed(AddNoteAndSend.preKeyboardHideWaitMs + Constants.UI.keyboardHideWaitMs) {
                 restoreSlider()
-                ui.noteEditText.setRawInputType(InputType.TYPE_CLASS_TEXT)
+                ui.noteEditText.isEnabled = true
                 showInternetConnectionErrorDialog(activity!!)
             }
         } else {
