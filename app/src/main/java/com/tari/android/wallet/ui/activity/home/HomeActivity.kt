@@ -40,8 +40,8 @@ import androidx.core.view.postDelayed
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentStatePagerAdapter
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.get
 import com.tari.android.wallet.R
 import com.tari.android.wallet.R.color.home_selected_nav_item
 import com.tari.android.wallet.application.DeepLink
@@ -93,13 +93,12 @@ internal class HomeActivity : AppCompatActivity(), AllSettingsFragment.AllSettin
             finish()
             return
         }
-        if (savedInstanceState == null) giphy.enable()
-        serviceConnection = ViewModelProvider(this, TariWalletServiceConnectionFactory(this))
-            .get(TariWalletServiceConnection::class.java)
+        serviceConnection = ViewModelProvider(this, TariWalletServiceConnectionFactory(this)).get()
         ui = ActivityHomeBinding.inflate(layoutInflater).also { setContentView(it.root) }
         if (savedInstanceState == null) {
+            giphy.enable()
             enableNavigationView(ui.homeImageView)
-            serviceConnection.connection.observe(this, Observer {
+            serviceConnection.connection.observe(this, {
                 if (it.status == CONNECTED) {
                     ui.root.postDelayed(Constants.UI.mediumDurationMs) {
                         processIntentDeepLink(it.service!!, intent)
@@ -116,8 +115,11 @@ internal class HomeActivity : AppCompatActivity(), AllSettingsFragment.AllSettin
 
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
-        if (serviceConnection.currentState.status == CONNECTED) {
+        // onNewIntent might get called before onCreate, so we anticipate that here
+        if (::serviceConnection.isInitialized && serviceConnection.currentState.status == CONNECTED) {
             processIntentDeepLink(serviceConnection.currentState.service!!, intent)
+        } else {
+            setIntent(intent)
         }
     }
 
