@@ -199,7 +199,22 @@ internal class TxDetailsActivity : AppCompatActivity(), ServiceConnection {
         val walletService = TariWalletService.Stub.asInterface(service)
         this.walletService = walletService
         if (!this::tx.isInitialized) {
-            tx = findTxById(intent.getParcelableExtra(TX_ID_EXTRA_KEY) as TxId, walletService)
+            findTxAndUpdateUI(walletService)
+        }
+    }
+
+    private fun findTxAndUpdateUI(walletService: TariWalletService) {
+        val lookedUpTx =
+            findTxById(intent.getParcelableExtra(TX_ID_EXTRA_KEY) as TxId, walletService)
+        if (lookedUpTx == null) {
+            ErrorDialog(
+                this,
+                title = string(tx_details_error_tx_not_found_title),
+                description = string(tx_details_error_tx_not_found_desc),
+                onClose = { finish() }
+            ).show()
+        } else {
+            tx = lookedUpTx
             fetchGIFIfAttached()
             bindTxData()
             observeTxUpdates()
@@ -214,12 +229,11 @@ internal class TxDetailsActivity : AppCompatActivity(), ServiceConnection {
         GIFView(ui.gifContainer, Glide.with(this), vm, this).displayGIF()
     }
 
-    private fun findTxById(id: TxId, walletService: TariWalletService): Tx {
-        return nullOnException { walletService.getPendingInboundTxById(id, WalletError()) }
+    private fun findTxById(id: TxId, walletService: TariWalletService): Tx? =
+        nullOnException { walletService.getPendingInboundTxById(id, WalletError()) }
             ?: nullOnException { walletService.getPendingOutboundTxById(id, WalletError()) }
             ?: nullOnException { walletService.getCompletedTxById(id, WalletError()) }
-            ?: walletService.getCancelledTxById(id, WalletError())
-    }
+            ?: nullOnException { walletService.getCancelledTxById(id, WalletError()) }
 
     private fun <T> nullOnException(supplier: () -> T): T? = try {
         supplier()
@@ -409,7 +423,10 @@ internal class TxDetailsActivity : AppCompatActivity(), ServiceConnection {
         currentAmountGemSize *= scaleFactor
 
         // adjust gem size
-        ui.amountGemImageView.setLayoutSize(currentAmountGemSize.toInt(), currentAmountGemSize.toInt())
+        ui.amountGemImageView.setLayoutSize(
+            currentAmountGemSize.toInt(),
+            currentAmountGemSize.toInt()
+        )
         ui.amountTextView.setTextSizePx(currentTextSize)
     }
 
