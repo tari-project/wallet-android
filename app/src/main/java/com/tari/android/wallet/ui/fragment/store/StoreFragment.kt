@@ -36,6 +36,7 @@ import android.animation.Animator
 import android.animation.ValueAnimator
 import android.annotation.SuppressLint
 import android.content.Intent
+import android.content.Intent.ACTION_VIEW
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -53,6 +54,7 @@ import com.tari.android.wallet.databinding.FragmentStoreBinding
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.network.NetworkConnectionState
 import com.tari.android.wallet.ui.extension.*
+import com.tari.android.wallet.ui.fragment.store.EventsPropagatingWebViewClient.ExternalSiteOverride
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
@@ -125,7 +127,11 @@ framework for UI tree rebuild on configuration changes"""
             // Needed for product's photos selection
             settings.javaScriptEnabled = true
             settings.javaScriptCanOpenWindowsAutomatically = true
-            webViewClient = EventsPropagatingWebViewClient().apply {
+            webViewClient = EventsPropagatingWebViewClient(
+                ExternalSiteOverride(string(ttl_store_url)) {
+                    startActivity(Intent(ACTION_VIEW, it))
+                }
+            ).apply {
                 addListener(
                     onPageStarted = { _, _, _ -> updateNavigationState() },
                     onPageCommitVisible = { _, _ -> ui.webView.scrollTo(0, 0) },

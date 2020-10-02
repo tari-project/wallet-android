@@ -33,12 +33,14 @@
 package com.tari.android.wallet.ui.fragment.store
 
 import android.graphics.Bitmap
+import android.net.Uri
 import android.webkit.WebResourceError
 import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
 
-class EventsPropagatingWebViewClient : WebViewClient() {
+class EventsPropagatingWebViewClient(private val urlOverrideStrategy: URLOverrideStrategy = NoURLOverride) :
+    WebViewClient() {
 
     private val listeners = mutableListOf<WebViewEventListener>()
 
@@ -90,5 +92,24 @@ class EventsPropagatingWebViewClient : WebViewClient() {
         listeners.forEach { it.onReceivedError(view, request, error) }
     }
 
+    override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest): Boolean =
+        urlOverrideStrategy.shouldOverride(view, request)
+
+    interface URLOverrideStrategy {
+        fun shouldOverride(view: WebView, request: WebResourceRequest): Boolean
+    }
+
+    object NoURLOverride : URLOverrideStrategy {
+        override fun shouldOverride(view: WebView, request: WebResourceRequest): Boolean = false
+    }
+
+    class ExternalSiteOverride(
+        private val base: String,
+        private val onExternalSiteOpened: (Uri) -> Unit
+    ) : URLOverrideStrategy {
+        override fun shouldOverride(view: WebView, request: WebResourceRequest): Boolean =
+            (!request.url.toString().startsWith(base))
+                .also { if (it) onExternalSiteOpened(request.url) }
+    }
 
 }
