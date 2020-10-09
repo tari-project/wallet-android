@@ -52,7 +52,6 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.animation.addListener
 import androidx.core.os.postDelayed
@@ -84,6 +83,7 @@ import com.tari.android.wallet.ui.activity.send.SendTariActivity
 import com.tari.android.wallet.ui.component.CustomFont
 import com.tari.android.wallet.ui.component.CustomTypefaceSpan
 import com.tari.android.wallet.ui.dialog.BottomSlideDialog
+import com.tari.android.wallet.ui.dialog.ErrorDialog
 import com.tari.android.wallet.ui.extension.*
 import com.tari.android.wallet.ui.fragment.send.FinalizeSendTxFragment
 import com.tari.android.wallet.ui.fragment.tx.adapter.TxListAdapter
@@ -734,7 +734,16 @@ internal class TxListFragment : Fragment(),
     private fun testnetTariRequestError(errorMessage: String) {
         testnetTariRequestIsInProgress = false
         if (context != null) {
-            Toast.makeText(requireContext(), errorMessage, Toast.LENGTH_LONG).show()
+            val title = string(R.string.faucet_error_title)
+            var description = errorMessage
+            if (errorMessage.contains("many allocation attempts")) {
+                description = string(R.string.faucet_error_too_many_allocation_attemps)
+            }
+            ErrorDialog(
+                context ?: return,
+                title = title,
+                description = description
+            ).show()
         }
     }
 

@@ -1195,7 +1195,7 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
                     listeners.iterator().forEach { it.onTestnetTariRequestSuccess() }
                 },
                 {
-                    Logger.i("requestMaxTestnetTari error $it")
+                    Logger.i("requestMaxTestnetTari error ${it.message}")
                     error.code = WalletErrorCode.UNKNOWN_ERROR
                     val errorMessage =
                         string(R.string.wallet_service_error_testnet_tari_request) +
