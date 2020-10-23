@@ -224,6 +224,22 @@ internal class FFIWallet(
         libError: FFIError
     ): FFIPointer
 
+    private external fun jniSetKeyValue(
+        key: String,
+        value: String,
+        libError: FFIError
+    ): Boolean
+
+    private external fun jniGetKeyValue(
+        key: String,
+        libError: FFIError
+    ): String
+
+    private external fun jniRemoveKeyValue(
+        key: String,
+        libError: FFIError
+    ): Boolean
+
     private external fun jniDestroy()
 
     // endregion
@@ -729,6 +745,27 @@ internal class FFIWallet(
     ): Boolean {
         val error = FFIError()
         val result = jniAddBaseNodePeer(baseNodePublicKey, baseNodeAddress, error)
+        throwIf(error)
+        return result
+    }
+
+    fun setKeyValue(key: String, value: String): Boolean {
+        val error = FFIError()
+        val result = jniSetKeyValue(key, value, error)
+        throwIf(error)
+        return result
+    }
+
+    fun getKeyValue(key: String): String {
+        val error = FFIError()
+        val result = jniGetKeyValue(key, error)
+        throwIf(error)
+        return result
+    }
+
+    fun removeKeyValue(key: String): Boolean {
+        val error = FFIError()
+        val result = jniRemoveKeyValue(key, error)
         throwIf(error)
         return result
     }

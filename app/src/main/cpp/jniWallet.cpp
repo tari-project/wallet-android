@@ -1165,4 +1165,63 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniGetSeedWords(
     return reinterpret_cast<jlong>(pSeedwords);
 }
 
+extern "C"
+JNIEXPORT jboolean JNICALL
+Java_com_tari_android_wallet_ffi_FFIWallet_jniSetKeyValue(
+        JNIEnv *jEnv,
+        jobject jThis,
+        jstring jKey,
+        jstring jValue,
+        jobject error) {
+    int i = 0;
+    int *r = &i;
+    jlong lWallet = GetPointerField(jEnv, jThis);
+    auto *pWallet = reinterpret_cast<TariWallet *>(lWallet);
+    const char *pKey = jEnv->GetStringUTFChars(jKey, JNI_FALSE);
+    const char *pValue = jEnv->GetStringUTFChars(jValue, JNI_FALSE);
+    auto result = static_cast<jboolean>(wallet_set_key_value(pWallet, pKey, pValue, r));
+    setErrorCode(jEnv, error, i);
+    jEnv->ReleaseStringUTFChars(jKey, pKey);
+    jEnv->ReleaseStringUTFChars(jValue, pValue);
+    return result;
+}
+
+extern "C"
+JNIEXPORT jstring JNICALL
+Java_com_tari_android_wallet_ffi_FFIWallet_jniGetKeyValue(
+        JNIEnv *jEnv,
+        jobject jThis,
+        jstring jKey,
+        jobject error) {
+    int i = 0;
+    int *r = &i;
+    jlong lWallet = GetPointerField(jEnv, jThis);
+    auto *pWallet = reinterpret_cast<TariWallet *>(lWallet);
+    const char *pKey = jEnv->GetStringUTFChars(jKey, JNI_FALSE);
+    const char *pValue = wallet_get_value(pWallet, pKey, r);
+    setErrorCode(jEnv, error, i);
+    jEnv->ReleaseStringUTFChars(jKey, pKey);
+    jstring result = jEnv->NewStringUTF(pValue);
+    string_destroy(const_cast<char *>(pValue));
+    return result;
+}
+
+extern "C"
+JNIEXPORT jboolean JNICALL
+Java_com_tari_android_wallet_ffi_FFIWallet_jniRemoveKeyValue(
+        JNIEnv *jEnv,
+        jobject jThis,
+        jstring jKey,
+        jobject error) {
+    int i = 0;
+    int *r = &i;
+    jlong lWallet = GetPointerField(jEnv, jThis);
+    auto *pWallet = reinterpret_cast<TariWallet *>(lWallet);
+    const char *pKey = jEnv->GetStringUTFChars(jKey, JNI_FALSE);
+    auto result = static_cast<jboolean>(wallet_clear_value(pWallet, pKey, r));
+    setErrorCode(jEnv, error, i);
+    jEnv->ReleaseStringUTFChars(jKey, pKey);
+    return result;
+}
+
 //endregion

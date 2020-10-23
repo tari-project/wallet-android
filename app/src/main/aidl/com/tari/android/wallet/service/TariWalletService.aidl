@@ -114,4 +114,11 @@ interface TariWalletService {
     PublicKey getPublicKeyFromEmojiId(in String emojiId);
     PublicKey getPublicKeyFromHexString(in String publicKeyHex);
 
+    /**
+    * Key-value storage functions.
+    */
+    boolean setKeyValue(in String key, in String value, out WalletError error);
+    String getKeyValue(in String key, out WalletError error);
+    boolean removeKeyValue(in String key, out WalletError error);
+
 }
