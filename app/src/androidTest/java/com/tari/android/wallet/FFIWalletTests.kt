@@ -438,6 +438,24 @@ class FFIWalletTests {
         Thread.sleep(2000)
     }
 
+    @Test
+    fun testKeyValueStorage() {
+        val key = "test_emoji_sequence"
+        val value = "⛵️🚿😻♐️♊️⌛️"
+        assertTrue(wallet.setKeyValue(key, value))
+        assertEquals(value, wallet.getKeyValue(key))
+        assertTrue(wallet.removeKeyValue(key))
+    }
+
+    @Test(expected = FFIException::class)
+    fun testKeyValueStorageBadAccess() {
+        val key = "test_key"
+        val value = "test_value"
+        assertTrue(wallet.setKeyValue(key, value))
+        assertTrue(wallet.removeKeyValue(key))
+        wallet.getKeyValue(key)
+    }
+
     private class TestListener : FFIWalletListener {
 
         val receivedTxs = mutableListOf<PendingInboundTx>()

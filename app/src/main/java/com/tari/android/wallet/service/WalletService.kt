@@ -1322,6 +1322,43 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
             }
         }
 
+        override fun setKeyValue(
+            key: String,
+            value: String,
+            error: WalletError
+        ): Boolean {
+            return try {
+                wallet.setKeyValue(key, value)
+            } catch (throwable: Throwable) {
+                mapThrowableIntoError(throwable, error)
+                false
+            }
+        }
+
+        override fun getKeyValue(
+            key: String,
+            error: WalletError
+        ): String? {
+            return try {
+                wallet.getKeyValue(key)
+            } catch (throwable: Throwable) {
+                mapThrowableIntoError(throwable, error)
+                null
+            }
+        }
+
+        override fun removeKeyValue(
+            key: String,
+            error: WalletError
+        ): Boolean {
+            return try {
+                wallet.removeKeyValue(key)
+            } catch (throwable: Throwable) {
+                mapThrowableIntoError(throwable, error)
+                false
+            }
+        }
+
         // endregion
     }
 }
