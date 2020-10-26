@@ -718,20 +718,21 @@ class AddRecipientFragment : Fragment(),
         textWatcherIsRunning = true
         val editable = ui.searchEditText.editableText
         var text = editable.toString()
-        // if deleting a separator, first get the index of the character before that separator
-        // and delete that character
-        if (isDeletingSeparatorAtIndex != null) {
-            val index =
-                EmojiUtil.getStartIndexOfItemEndingAtIndex(text, isDeletingSeparatorAtIndex!!)
-            editable.delete(index, isDeletingSeparatorAtIndex!!)
-            isDeletingSeparatorAtIndex = null
-            text = editable.toString()
-        }
 
         ui.continueButton.gone()
         ui.invalidEmojiIdTextView.gone()
 
         if (editable.toString().firstNCharactersAreEmojis(emojiFormatterChunkSize)) {
+            // if deleting a separator, first get the index of the character before that separator
+            // and delete that character
+            if (isDeletingSeparatorAtIndex != null) {
+                val index =
+                    EmojiUtil.getStartIndexOfItemEndingAtIndex(text, isDeletingSeparatorAtIndex!!)
+                editable.delete(index, isDeletingSeparatorAtIndex!!)
+                isDeletingSeparatorAtIndex = null
+                text = editable.toString()
+            }
+
             // delete all separators first
             val separator = string(emoji_id_chunk_separator)
             for ((offset, index) in EmojiUtil.getExistingChunkSeparatorIndices(
