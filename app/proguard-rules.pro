@@ -28,3 +28,5 @@
 
 # This one is being processed via GSON inside SharedPrefsWrapper
 -keep class com.tari.android.wallet.service.faucet.TestnetTariUTXOKey { *; }
+
+-keep class net.danlew.android.joda.R$raw { *; }

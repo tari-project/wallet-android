@@ -27,6 +27,9 @@ jobs:
         java-version: 1.8
     - name: Install NDK
       run: echo "y" | sudo ${ANDROID_HOME}/tools/bin/sdkmanager --install "ndk;20.1.5948944" --sdk_root=${ANDROID_SDK_ROOT}
+    - name: Set Build Tools Version
+      run: |
+        sudo ${ANDROID_HOME}/tools/bin/sdkmanager "build-tools;29.0.3"
     - name: Create .properties Files # create local.properties, secret.properties and sentry.properties
       env:
         SENTRY_PROPERTIES: ${{ secrets.SENTRY_PROPERTIES }}
@@ -50,6 +53,8 @@ jobs:
         ./gradlew bundleRegularRelease
     - name: Sign Privacy APK
       uses: r0adkll/sign-android-release@v1
+      env:
+        BUILD_TOOLS_VERSION: 29.0.3
       with:
         releaseDirectory: app/build/outputs/apk/privacy/release
         signingKeyBase64: ${{ secrets.SIGNING_KEY }}
@@ -58,6 +63,8 @@ jobs:
         keyPassword: ${{ secrets.KEY_PASSWORD }}
     - name: Sign Regular APK
       uses: r0adkll/sign-android-release@v1
+      env:
+        BUILD_TOOLS_VERSION: 29.0.3
       with:
         releaseDirectory: app/build/outputs/apk/regular/release
         signingKeyBase64: ${{ secrets.SIGNING_KEY }}
@@ -66,6 +73,8 @@ jobs:
         keyPassword: ${{ secrets.KEY_PASSWORD }}
     - name: Sign Regular AAB
       uses: r0adkll/sign-android-release@v1
+      env:
+        BUILD_TOOLS_VERSION: 29.0.3
       with:
         releaseDirectory: app/build/outputs/bundle/regularRelease/
         signingKeyBase64: ${{ secrets.SIGNING_KEY }}

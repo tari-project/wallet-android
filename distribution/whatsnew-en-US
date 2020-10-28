@@ -1,4 +1,2 @@
-If 0.4.0 was the thrilling bad boy your mother warned you about, then 0.4.1 is the nice stable guy you only notice after picking up the pieces from your first divorce.
-
-- Improves transaction receiving reliability
-- Many UI improvements and fixes
+- Support for the new testnet.
+- Various bug fixes and improvements.
