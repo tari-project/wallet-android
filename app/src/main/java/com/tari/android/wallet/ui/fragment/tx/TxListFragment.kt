@@ -758,7 +758,7 @@ internal class TxListFragment : Fragment(),
                 string(R.string.home_tari_bot_you_got_tari_dlg_title).applyFontStyle(
                     requireContext(),
                     CustomFont.AVENIR_LT_STD_LIGHT,
-                    string(R.string.home_tari_bot_you_got_tari_dlg_title_bold_part),
+                    listOf(string(R.string.home_tari_bot_you_got_tari_dlg_title_bold_part)),
                     CustomFont.AVENIR_LT_STD_BLACK
                 )
             findViewById<TextView>(R.id.home_tari_bot_dialog_txt_try_later)
@@ -786,7 +786,7 @@ internal class TxListFragment : Fragment(),
                 string(R.string.home_ttl_store_dlg_title).applyFontStyle(
                     requireContext(),
                     CustomFont.AVENIR_LT_STD_LIGHT,
-                    string(R.string.home_ttl_store_dlg_title_bold_part),
+                    listOf(string(R.string.home_ttl_store_dlg_title_bold_part)),
                     CustomFont.AVENIR_LT_STD_BLACK
                 )
             findViewById<View>(R.id.home_ttl_store_dialog_btn_later)

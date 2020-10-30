@@ -51,10 +51,7 @@ class BootDeviceReceiver : BroadcastReceiver() {
         Logger.d("Boot device broadcast received.")
         if (WalletUtil.walletExists(context.applicationContext)
             && Intent.ACTION_BOOT_COMPLETED == intent.action) {
-            ContextCompat.startForegroundService(
-                context,
-                Intent(context, WalletService::class.java)
-            )
+            WalletService.start(context)
         }
     }
 }

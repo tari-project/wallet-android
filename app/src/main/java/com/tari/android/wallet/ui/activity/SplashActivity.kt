@@ -60,8 +60,8 @@ internal class SplashActivity : AppCompatActivity() {
         appComponent.inject(this)
         super.onCreate(savedInstanceState)
         Handler(Looper.getMainLooper()).postDelayed(Splash.createWalletStartUpDelayMs) {
-            val exists =
-                WalletUtil.walletExists(applicationContext) && sharedPrefsWrapper.onboardingAuthSetupCompleted
+            val exists = WalletUtil.walletExists(applicationContext)
+                    && sharedPrefsWrapper.onboardingAuthSetupCompleted
             launch(if (exists) AuthActivity::class.java else OnboardingFlowActivity::class.java)
         }
     }

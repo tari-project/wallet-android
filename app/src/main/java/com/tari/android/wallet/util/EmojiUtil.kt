@@ -300,7 +300,7 @@ internal class EmojiUtil {
                 separator
             ).applyColorStyle(
                 darkColor,
-                separator,
+                listOf(separator),
                 lightColor,
                 applyToOnlyFirstOccurence = false
             )

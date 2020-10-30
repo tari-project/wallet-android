@@ -779,7 +779,6 @@ JNIEXPORT void JNICALL
 Java_com_tari_android_wallet_ffi_FFIWallet_jniDestroy(
         JNIEnv *jEnv,
         jobject jThis) {
-    LOGE("FREE WALLET");
     jlong lWallet = GetPointerField(jEnv, jThis);
     jEnv->DeleteGlobalRef(callbackHandler);
     callbackHandler = nullptr;

@@ -37,6 +37,7 @@ import android.content.SharedPreferences
 import android.net.Uri
 import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
+import com.tari.android.wallet.application.Network
 import com.tari.android.wallet.service.faucet.TestnetTariUTXOKey
 import de.adorsys.android.securestoragelibrary.SecurePreferences
 import org.joda.time.DateTime
@@ -89,6 +90,8 @@ class SharedPrefsWrapper(
         const val scheduledBackupDate = "tari_wallet_scheduled_backup_date"
         const val backupPassword = "tari_wallet_last_next_alarm_time"
         const val localBackupFolderURI = "tari_wallet_local_backup_folder_uri"
+        const val network = "tari_wallet_network"
+        const val isRestoredWallet = "tari_is_restored_wallet"
     }
 
     // TODO(nyarian): remove value on null possibly?
@@ -287,6 +290,24 @@ class SharedPrefsWrapper(
             else putString(Key.localBackupFolderURI, value.toString())
         }.apply()
 
+    var network: Network?
+        get() = try {
+            Network.from(sharedPrefs.getString(Key.network, null) ?: "")
+        } catch (exception: Exception) {
+            null
+        }
+        set(value) = sharedPrefs.edit().run {
+            putString(Key.network, value?.uriComponent)
+            apply()
+        }
+
+    var isRestoredWallet: Boolean
+        get() = sharedPrefs.getBoolean(Key.isRestoredWallet, false)
+        set(value) = sharedPrefs.edit().run {
+            putBoolean(Key.isRestoredWallet, value)
+            apply()
+        }
+
     init {
         // for migration purposes, to avoid a second redundant faucet call:
         // faucetTestnetTariRequestCompleted was introduced  after firstTestnetUTXOTxId and
@@ -296,7 +317,7 @@ class SharedPrefsWrapper(
         }
     }
 
-    fun clean() {
+    fun clear() {
         privateKeyHexString = null
         publicKeyHexString = null
         isAuthenticated = false
@@ -307,6 +328,10 @@ class SharedPrefsWrapper(
         onboardingAuthSetupCompleted = false
         onboardingDisplayedAtHome = false
         torBinPath = null
+        torIdentity = null
+        baseNodeLastSyncWasSuccessful = false
+        baseNodeIsUserCustom = false
+        baseNodeName = null
         baseNodePublicKeyHex = null
         baseNodeAddress = null
         faucetTestnetTariRequestCompleted = false
@@ -318,6 +343,8 @@ class SharedPrefsWrapper(
         scheduledBackupDate = null
         backupPassword = null
         localBackupFolderURI = null
+        network = null
+        isRestoredWallet = false
     }
 
 }

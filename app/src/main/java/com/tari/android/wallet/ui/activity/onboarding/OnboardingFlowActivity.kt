@@ -81,10 +81,7 @@ internal class OnboardingFlowActivity : AppCompatActivity(), IntroductionFragmen
             }
             sharedPrefsWrapper.onboardingWasInterrupted -> {
                 // start wallet service
-                ContextCompat.startForegroundService(
-                    applicationContext,
-                    Intent(applicationContext, WalletService::class.java)
-                )
+                WalletService.start(applicationContext)
                 // clean existing files & restart onboarding
                 WalletUtil.clearWalletFiles(walletFilesDirPath)
                 supportFragmentManager

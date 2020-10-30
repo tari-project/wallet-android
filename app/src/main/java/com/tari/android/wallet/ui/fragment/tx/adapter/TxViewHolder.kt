@@ -163,7 +163,7 @@ class TxViewHolder(
             ui.participantTextView1.text = fullText.applyFontStyle(
                 itemView.context,
                 CustomFont.AVENIR_LT_STD_LIGHT,
-                txUser.alias,
+                listOf(txUser.alias),
                 CustomFont.AVENIR_LT_STD_HEAVY
             )
             ui.participantEmojiIdView.root.gone()

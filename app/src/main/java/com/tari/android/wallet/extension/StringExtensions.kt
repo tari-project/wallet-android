@@ -84,7 +84,7 @@ internal fun SpannableString.applyURLStyle(
 internal fun String.applyFontStyle(
     context: Context,
     defaultFont: CustomFont,
-    search: String,
+    search: List<String>,
     customFont: CustomFont,
     applyToOnlyFirstOccurence: Boolean = false
 ): SpannableString {
@@ -96,11 +96,13 @@ internal fun String.applyFontStyle(
         length,
         Spanned.SPAN_EXCLUSIVE_INCLUSIVE
     )
-    spannableString.applyTypefaceStyle(
-        search,
-        customFont.asTypeface(context),
-        applyToOnlyFirstOccurence
-    )
+    search.forEach {
+        spannableString.applyTypefaceStyle(
+            it,
+            customFont.asTypeface(context),
+            applyToOnlyFirstOccurence
+        )
+    }
     return spannableString
 }
 
@@ -109,7 +111,7 @@ internal fun String.applyFontStyle(
  */
 internal fun String.applyColorStyle(
     defaultColor: Int,
-    search: String,
+    search: List<String>,
     styleColor: Int,
     applyToOnlyFirstOccurence: Boolean = false
 ): SpannableString {
@@ -120,11 +122,13 @@ internal fun String.applyColorStyle(
         length,
         Spanned.SPAN_INTERMEDIATE
     )
-    spannableString.applyColorStyle(
-        search,
-        styleColor,
-        applyToOnlyFirstOccurence
-    )
+    search.forEach {
+        spannableString.applyColorStyle(
+            it,
+            styleColor,
+            applyToOnlyFirstOccurence
+        )
+    }
     return spannableString
 }
 

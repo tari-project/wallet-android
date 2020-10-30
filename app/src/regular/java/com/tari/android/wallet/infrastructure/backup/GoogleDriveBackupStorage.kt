@@ -207,8 +207,10 @@ internal class GoogleDriveBackupStorage(
             throw e
         } ?: throw BackupStorageTamperedException("Backup file not found in folder.")
         withContext(Dispatchers.IO) {
+            val tempFolder = File(walletTempDirPath)
+            if (!tempFolder.exists()) tempFolder.mkdir()
             // copy file to temp location
-            val tempFile = File(walletTempDirPath, backupFileName)
+            val tempFile = File(tempFolder, backupFileName)
             // create file & fetch if it hasn't been fetched before
             if (!tempFile.exists()) {
                 tempFile.createNewFile()

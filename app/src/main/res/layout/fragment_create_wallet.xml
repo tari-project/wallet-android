@@ -191,7 +191,7 @@
             android:layout_marginBottom="18dp"
             android:contentDescription="@null"
             android:src="@drawable/splash_gem_small"
-            android:tint="@color/black"
+            app:tint="@color/black"
             android:visibility="gone" />
 
         <com.airbnb.lottie.LottieAnimationView
@@ -200,8 +200,8 @@
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
             android:layout_marginTop="-48dp"
-            android:scaleX="1.5"
-            android:scaleY="1.5"
+            android:scaleX="1"
+            android:scaleY="1"
             app:lottie_autoPlay="false"
             app:lottie_enableMergePathsForKitKatAndAbove="true"
             app:lottie_imageAssetsFolder="create_emoji_id/images/"

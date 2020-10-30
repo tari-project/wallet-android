@@ -411,6 +411,7 @@ internal class UpdateProgressViewController(
     fun destroy() {
         EventBus.unsubscribe(this)
         baseNodeSyncTimeoutSubscription?.dispose()
+        torBootstrapStatusSubscription?.dispose()
         cancel()
     }
 

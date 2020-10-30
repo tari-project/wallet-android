@@ -134,7 +134,7 @@ framework for UI tree rebuild on configuration changes"""
                 withContext(Dispatchers.Main) { blockingBackPressDispatcher.isEnabled = false }
             } catch (exception: Exception) {
                 Logger.e("Backup storage setup failed: $exception")
-                backupManager.turnOff()
+                backupManager.turnOff(deleteExistingBackups = true)
                 withContext(Dispatchers.Main) {
                     showBackupStorageSetupFailedDialog(exception)
                     showSwitchAndHideProgressBar(switchIsChecked = false)
@@ -275,7 +275,7 @@ framework for UI tree rebuild on configuration changes"""
                     onAccept = {
                         lifecycleScope.launch(Dispatchers.IO) {
                             try {
-                                backupManager.turnOff()
+                                backupManager.turnOff(deleteExistingBackups = true)
                             } catch (ignored: Exception) { /* no-op */
                             }
                         }

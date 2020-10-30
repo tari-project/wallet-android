@@ -54,7 +54,7 @@ internal object Constants {
         const val xLongDurationMs = 1500L
         const val xxLongDurationMs = 2000L
 
-        const val scrollDepthShadowViewMaxOpacity = 0.8f
+        const val scrollDepthShadowViewMaxOpacity = 0.75f
 
         const val emojiIdChunkSeparatorRelativeScale = 0.9f
         const val emojiIdChunkSeparatorLetterSpacing = 1f
@@ -133,7 +133,7 @@ internal object Constants {
      * Wallet constants.
      */
     object Wallet {
-        val network = Network.TESTNET_1
+        val network = Network.RIDCULLY
         const val torPort = 18101
         const val maxNumberOfRollingLogFiles = 2
         const val rollingLogFileMaxSizeBytes = 10 * 1024 * 1024

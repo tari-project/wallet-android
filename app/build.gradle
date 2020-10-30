@@ -162,7 +162,7 @@ dependencies {
     implementation 'androidx.appcompat:appcompat:1.2.0'
     // support lib
     implementation 'androidx.legacy:legacy-support-v13:1.0.0'
-    implementation 'androidx.constraintlayout:constraintlayout:2.0.2'
+    implementation 'androidx.constraintlayout:constraintlayout:2.0.3'
     // android jetpack
     implementation "androidx.lifecycle:lifecycle-extensions:2.2.0"
     // recycler view
@@ -176,7 +176,7 @@ dependencies {
     // overscroll
     implementation 'me.everything:overscroll-decor-android:1.0.4'
     // lottie
-    implementation 'com.airbnb.android:lottie:3.4.0'
+    implementation 'com.airbnb.android:lottie:3.4.4'
     // Glide - image processing & caching library
     implementation 'com.github.bumptech.glide:glide:4.11.0'
     kapt 'com.github.bumptech.glide:compiler:4.11.0'
