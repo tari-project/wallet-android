@@ -64,6 +64,7 @@
                 android:id="@+id/balance_gem_image_view"
                 android:layout_width="@dimen/home_balance_gem_width"
                 android:layout_height="@dimen/home_balance_gem_height"
+                android:layout_marginTop="-4dp"
                 android:contentDescription="@null"
                 android:src="@drawable/home_gem_balance" />
 

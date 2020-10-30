@@ -46,7 +46,7 @@ class BackupSettingsActivity : AppCompatActivity(), BackupSettingsRouter {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_settings)
-        overridePendingTransition(R.anim.enter_from_bottom, R.anim.exit_to_top)
+        overridePendingTransition(R.anim.enter_from_right, R.anim.exit_to_left)
         if (savedInstanceState == null) {
             loadBackupSettingsFragment()
         }
@@ -94,6 +94,11 @@ class BackupSettingsActivity : AppCompatActivity(), BackupSettingsRouter {
         } else {
             onBackPressed()
         }
+    }
+
+    override fun onBackPressed() {
+        super.onBackPressed()
+        overridePendingTransition(R.anim.enter_from_left, R.anim.exit_to_right)
     }
 
     // nyarian:

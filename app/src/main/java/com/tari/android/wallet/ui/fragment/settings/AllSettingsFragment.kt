@@ -44,6 +44,7 @@ import androidx.biometric.BiometricPrompt
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import com.orhanobut.logger.Logger
+import com.tari.android.wallet.R
 import com.tari.android.wallet.R.color.*
 import com.tari.android.wallet.R.string.*
 import com.tari.android.wallet.databinding.FragmentAllSettingsBinding
@@ -53,6 +54,7 @@ import com.tari.android.wallet.infrastructure.backup.*
 import com.tari.android.wallet.infrastructure.security.biometric.BiometricAuthenticationService
 import com.tari.android.wallet.ui.dialog.ErrorDialog
 import com.tari.android.wallet.ui.extension.*
+import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.SharedPrefsWrapper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -61,6 +63,7 @@ import org.joda.time.format.DateTimeFormat
 import java.io.IOException
 import java.util.*
 import javax.inject.Inject
+import kotlin.math.min
 
 internal class AllSettingsFragment @Deprecated(
     """Use newInstance() and supply all the necessary 
@@ -78,6 +81,7 @@ UI tree rebuild on configuration changes"""
     lateinit var authService: BiometricAuthenticationService
 
     private lateinit var ui: FragmentAllSettingsBinding
+    private var scrollListener = ScrollListener()
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -105,6 +109,8 @@ UI tree rebuild on configuration changes"""
 
     private fun setupUI() {
         ui.cloudBackupStatusProgressView.setColor(color(all_settings_back_up_status_processing))
+        ui.scrollElevationGradientView.alpha = 0f
+        ui.scrollView.setOnScrollChangeListener(scrollListener)
         bindCTAs()
     }
 
@@ -118,6 +124,12 @@ UI tree rebuild on configuration changes"""
         ui.backUpWalletCtaView.setOnClickListener {
             requireAuthorization { navigateToBackupSettings() }
         }
+        ui.deleteWalletCtaView.setOnClickListener { navigateToDeleteWallet() }
+    }
+
+    override fun onDestroyView() {
+        ui.scrollView.setOnScrollChangeListener(null)
+        super.onDestroyView()
     }
 
     override fun onDestroy() {
@@ -259,6 +271,10 @@ UI tree rebuild on configuration changes"""
         (requireActivity() as AllSettingsRouter).toBackupSettings()
     }
 
+    private fun navigateToDeleteWallet() {
+        (requireActivity() as AllSettingsRouter).toDeleteWallet()
+    }
+
     private fun shareBugReport() {
         val mContext = context ?: return
         lifecycleScope.launch(Dispatchers.IO) {
@@ -328,8 +344,27 @@ UI tree rebuild on configuration changes"""
         }
     }
 
+    inner class ScrollListener : View.OnScrollChangeListener {
+
+        override fun onScrollChange(
+            v: View?,
+            scrollX: Int,
+            scrollY: Int,
+            oldScrollX: Int,
+            oldScrollY: Int
+        ) {
+            ui.scrollElevationGradientView.alpha = min(
+                Constants.UI.scrollDepthShadowViewMaxOpacity,
+                scrollY / (dimenPx(R.dimen.menu_item_height)).toFloat()
+            )
+        }
+
+    }
+
     interface AllSettingsRouter {
         fun toBackupSettings()
+
+        fun toDeleteWallet()
     }
 
     companion object {

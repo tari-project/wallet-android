@@ -34,8 +34,10 @@ package com.tari.android.wallet.service
 
 import android.annotation.SuppressLint
 import android.app.Service
+import android.content.Context
 import android.content.Intent
 import android.os.IBinder
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.OnLifecycleEvent
@@ -45,6 +47,7 @@ import com.tari.android.wallet.R
 import com.tari.android.wallet.application.TariWalletApplication
 import com.tari.android.wallet.application.WalletManager
 import com.tari.android.wallet.application.WalletState
+import com.tari.android.wallet.di.WalletModule
 import com.tari.android.wallet.event.Event
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.ffi.*
@@ -60,18 +63,23 @@ import com.tari.android.wallet.ui.activity.home.HomeActivity
 import com.tari.android.wallet.ui.extension.string
 import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.SharedPrefsWrapper
+import com.tari.android.wallet.util.WalletUtil
 import io.reactivex.Observable
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import org.joda.time.DateTime
 import org.joda.time.Hours
 import org.joda.time.Minutes
+import java.lang.RuntimeException
 import java.math.BigInteger
 import java.util.*
 import java.util.concurrent.CopyOnWriteArrayList
 import java.util.concurrent.CopyOnWriteArraySet
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
+import javax.inject.Named
 import kotlin.collections.ArrayList
 
 /**
@@ -85,7 +93,60 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
         // notification id
         private const val NOTIFICATION_ID = 1
         private const val MESSAGE_PREFIX = "Hello Tari from"
+
+        // key-value storage keys
+        object KeyValueStorageKeys {
+            const val NETWORK = "SU7FM2O6Q3BU4XVN7HDD"
+        }
+
+        // intent actions
+        private const val startAction = "START_SERVICE"
+        private const val stopAction = "STOP_SERVICE"
+        private const val stopAndDeleteAction = "STOP_SERVICE_AND_DELETE_WALLET"
+
+        fun start(context: Context) {
+            ContextCompat.startForegroundService(
+                context,
+                getStartIntent(context)
+            )
+        }
+
+        fun stop(context: Context) {
+            ContextCompat.startForegroundService(
+                context,
+                getStopIntent(context)
+            )
+        }
+
+        /**
+         * Deletes the wallet and stops the wallet service.
+         */
+        fun stopAndDelete(context: Context) {
+            ContextCompat.startForegroundService(
+                context,
+                getStopAndDeleteIntent(context)
+            )
+        }
+
+        private fun getStartIntent(context: Context) =
+            Intent(context, WalletService::class.java).also {
+                it.action = startAction
+            }
+
+        private fun getStopIntent(context: Context) =
+            Intent(context, WalletService::class.java).also {
+                it.action = stopAction
+            }
+
+        private fun getStopAndDeleteIntent(context: Context) =
+            Intent(context, WalletService::class.java).also {
+                it.action = stopAndDeleteAction
+            }
     }
+
+    @Inject
+    @Named(WalletModule.FieldName.walletFilesDirPath)
+    lateinit var walletFilesDirPath: String
 
     @Inject
     lateinit var app: TariWalletApplication
@@ -148,17 +209,49 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
     }
 
     /**
-     * Called on service start-up.
+     * Called when a component decides to start or stop the foreground wallet service.
      */
     override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
-        // start wallet manager & listen to events
+        when (intent.action) {
+            startAction -> startService()
+            stopAction -> stopService(startId)
+            stopAndDeleteAction -> {
+                stopService(startId)
+                deleteWallet()
+            }
+            else -> throw RuntimeException("Unexpected intent action: ${intent.action}")
+        }
+        return START_NOT_STICKY
+    }
+
+    private fun startService() {
+        // start wallet manager on a separate thead & listen to events
         EventBus.subscribeToWalletState(this, this::onWalletStateChanged)
-        walletManager.start()
+        Thread {
+            walletManager.start()
+        }.start()
         // start service & post foreground service notification
         val notification = notificationHelper.buildForegroundServiceNotification()
         startForeground(NOTIFICATION_ID, notification)
         Logger.d("Wallet service started.")
-        return START_NOT_STICKY
+    }
+
+    private fun stopService(startId: Int) {
+        // stop service
+        stopForeground(true)
+        stopSelfResult(startId)
+        // stop wallet manager on a separate thead & unsubscribe from events
+        EventBus.unsubscribeFromWalletState(this)
+        ProcessLifecycleOwner.get().lifecycle.removeObserver(this)
+        GlobalScope.launch { backupManager.turnOff(deleteExistingBackups = false) }
+        Thread {
+            walletManager.stop()
+        }.start()
+    }
+
+    private fun deleteWallet() {
+        WalletUtil.clearWalletFiles(walletFilesDirPath)
+        sharedPrefsWrapper.clear()
     }
 
     private fun onWalletStateChanged(walletState: WalletState) {

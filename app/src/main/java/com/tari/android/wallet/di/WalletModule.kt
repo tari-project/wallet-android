@@ -38,7 +38,6 @@ import com.tari.android.wallet.infrastructure.BugReportingService
 import com.tari.android.wallet.network.NetworkConnectionStateReceiver
 import com.tari.android.wallet.tor.TorConfig
 import com.tari.android.wallet.tor.TorProxyManager
-import com.tari.android.wallet.tor.TorProxyMonitor
 import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.SharedPrefsWrapper
 import dagger.Module
@@ -137,14 +136,12 @@ internal class WalletModule {
         @Named(FieldName.walletLogFilePath) walletLogFilePath: String,
         torConfig: TorConfig,
         torProxyManager: TorProxyManager,
-        torProxyMonitor: TorProxyMonitor,
         sharedPrefsWrapper: SharedPrefsWrapper
     ): WalletManager = WalletManager(
         context,
         walletFilesDirPath,
         walletLogFilePath,
         torProxyManager,
-        torProxyMonitor,
         sharedPrefsWrapper,
         torConfig
     )

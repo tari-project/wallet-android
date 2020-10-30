@@ -12,6 +12,10 @@
     <dimen name="common_copy_emoji_id_button_visible_bottom_margin">-56dp</dimen>
     <dimen name="common_network_and_version_info_text_size">8sp</dimen>
 
+    <!-- UI components -->
+    <dimen name="menu_item_height">63dp</dimen>
+    <dimen name="header_height">64dp</dimen>
+
     <!-- onboarding -->
     <dimen name="onboarding_bottom_progress_bar_bottom_margin">10dp</dimen>
     <dimen name="onboarding_emoji_id_container_horizontal_padding">12dp</dimen>
@@ -41,11 +45,11 @@
     <dimen name="introduction_network_margin_bottom">20dp</dimen>
 
     <!-- home -->
-    <dimen name="home_top_content_container_view_top_margin">25dp</dimen>
+    <dimen name="home_top_content_container_view_top_margin">16dp</dimen>
     <dimen name="home_top_content_container_scroll_vertical_shift">20dp</dimen>
-    <dimen name="home_grabber_container_height">44dp</dimen>
+    <dimen name="home_grabber_container_height">40dp</dimen>
     <dimen name="home_grabber_corner_radius">15dp</dimen>
-    <dimen name="home_tx_list_container_minimized_top_margin">115dp</dimen>
+    <dimen name="home_tx_list_container_minimized_top_margin">98dp</dimen>
     <dimen name="home_scroll_view_startup_anim_height">60dp</dimen>
     <dimen name="home_grabber_height">5dp</dimen>
     <dimen name="home_grabber_width">55dp</dimen>

@@ -34,6 +34,9 @@ package com.tari.android.wallet.ui.activity.home
 
 import android.content.Intent
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
+import android.view.View
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.postDelayed
@@ -42,22 +45,32 @@ import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentStatePagerAdapter
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.get
+import androidx.lifecycle.lifecycleScope
 import com.tari.android.wallet.R
 import com.tari.android.wallet.R.color.home_selected_nav_item
 import com.tari.android.wallet.application.DeepLink
 import com.tari.android.wallet.databinding.ActivityHomeBinding
 import com.tari.android.wallet.event.EventBus
+import com.tari.android.wallet.extension.applyFontStyle
 import com.tari.android.wallet.infrastructure.GiphyEcosystem
 import com.tari.android.wallet.model.*
 import com.tari.android.wallet.network.NetworkConnectionState
 import com.tari.android.wallet.service.TariWalletService
+import com.tari.android.wallet.service.WalletService
 import com.tari.android.wallet.service.connection.TariWalletServiceConnection
 import com.tari.android.wallet.service.connection.TariWalletServiceConnection.ServiceConnectionStatus.CONNECTED
 import com.tari.android.wallet.service.connection.TariWalletServiceConnection.TariWalletServiceConnectionFactory
 import com.tari.android.wallet.ui.activity.SplashActivity
+import com.tari.android.wallet.ui.activity.onboarding.OnboardingFlowActivity
 import com.tari.android.wallet.ui.activity.send.SendTariActivity
 import com.tari.android.wallet.ui.activity.settings.BackupSettingsActivity
+import com.tari.android.wallet.ui.activity.settings.DeleteWalletActivity
 import com.tari.android.wallet.ui.activity.tx.TxDetailsActivity
+import com.tari.android.wallet.ui.component.CustomFont
+import com.tari.android.wallet.ui.component.CustomFontTextView
+import com.tari.android.wallet.ui.dialog.BottomSlideDialog
+import com.tari.android.wallet.ui.extension.*
+import com.tari.android.wallet.ui.extension.ThrottleClick
 import com.tari.android.wallet.ui.extension.appComponent
 import com.tari.android.wallet.ui.extension.color
 import com.tari.android.wallet.ui.extension.showInternetConnectionErrorDialog
@@ -67,6 +80,8 @@ import com.tari.android.wallet.ui.fragment.store.StoreFragment
 import com.tari.android.wallet.ui.fragment.tx.TxListFragment
 import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.SharedPrefsWrapper
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 internal class HomeActivity : AppCompatActivity(), AllSettingsFragment.AllSettingsRouter,
@@ -111,6 +126,10 @@ internal class HomeActivity : AppCompatActivity(), AllSettingsFragment.AllSettin
             enableNavigationView(index)
         }
         setupUi()
+        Handler(Looper.getMainLooper()).postDelayed(
+            { checkNetworkCompatibility() },
+            3000
+        )
     }
 
     override fun onNewIntent(intent: Intent) {
@@ -195,6 +214,56 @@ internal class HomeActivity : AppCompatActivity(), AllSettingsFragment.AllSettin
         view.setColorFilter(color(home_selected_nav_item))
     }
 
+    private fun checkNetworkCompatibility() {
+        if (sharedPrefsWrapper.network != Constants.Wallet.network) {
+            displayIncompatibleNetworkDialog()
+        }
+    }
+
+    private fun displayIncompatibleNetworkDialog() {
+        BottomSlideDialog(
+            this,
+            R.layout.dialog_incompatible_network,
+            canceledOnTouchOutside = false
+        ).apply {
+            findViewById<CustomFontTextView>(
+                R.id.incompatible_network_description_text_view
+            ).text = string(R.string.incompatible_network_description).applyFontStyle(
+                this@HomeActivity,
+                CustomFont.AVENIR_LT_STD_MEDIUM,
+                listOf(
+                    string(R.string.incompatible_network_description_bold_part_1),
+                    string(R.string.incompatible_network_description_bold_part_2)
+                ),
+                CustomFont.AVENIR_LT_STD_BLACK
+            )
+            findViewById<View>(R.id.incompatible_network_reset_now_button)
+                .setOnClickListener(ThrottleClick {
+                    deleteWallet()
+                    dismiss()
+                })
+            findViewById<View>(R.id.incompatible_network_reset_later_button)
+                .setOnClickListener(ThrottleClick {
+                    dismiss()
+                })
+        }.show()
+    }
+
+    private fun deleteWallet() {
+        // delete wallet
+        goToSplashScreen()
+        lifecycleScope.launch(Dispatchers.IO) {
+            WalletService.stopAndDelete(applicationContext)
+        }
+    }
+
+    private fun goToSplashScreen() {
+        val intent = Intent(this, OnboardingFlowActivity::class.java)
+        intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
+        startActivity(intent)
+        finishAffinity()
+    }
+
     override fun toTxDetails(tx: Tx) = startActivity(TxDetailsActivity.createIntent(this, tx))
 
     override fun toTTLStore() = ui.viewPager.setCurrentItem(INDEX_STORE, NO_SMOOTH_SCROLL)
@@ -203,6 +272,10 @@ internal class HomeActivity : AppCompatActivity(), AllSettingsFragment.AllSettin
 
     override fun toBackupSettings() =
         startActivity(Intent(this, BackupSettingsActivity::class.java))
+
+    override fun toDeleteWallet() {
+        startActivity(Intent(this, DeleteWalletActivity::class.java))
+    }
 
     fun willNotifyAboutNewTx(): Boolean = ui.viewPager.currentItem == INDEX_HOME
 

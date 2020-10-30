@@ -39,12 +39,13 @@ import com.tari.android.wallet.BuildConfig
 import com.tari.android.wallet.R
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.ffi.*
+import com.tari.android.wallet.service.WalletService
 import com.tari.android.wallet.tor.TorConfig
 import com.tari.android.wallet.tor.TorProxyManager
-import com.tari.android.wallet.tor.TorProxyMonitor
 import com.tari.android.wallet.tor.TorProxyState
 import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.SharedPrefsWrapper
+import com.tari.android.wallet.util.WalletUtil
 import org.apache.commons.io.IOUtils
 import java.io.File
 
@@ -58,8 +59,7 @@ internal class WalletManager(
     private val context: Context,
     private val walletFilesDirPath: String,
     private val walletLogFilePath: String,
-    private val torProxyManager: TorProxyManager,
-    private val torProxyMonitor: TorProxyMonitor,
+    private val torManager: TorProxyManager,
     private val sharedPrefsWrapper: SharedPrefsWrapper,
     private val torConfig: TorConfig
 ) {
@@ -73,27 +73,29 @@ internal class WalletManager(
     }
 
     /**
-     * Only visible function. Can be run from any thead.
+     * Start tor and init wallet.
      */
+    @Synchronized
     fun start() {
-        /**
-         * Run Tor on a separate thread.
-         */
         Thread {
-            torProxyManager.runTorProxy()
+            torManager.run()
         }.start()
-        /**
-         * Start monitoring Tor on a separate thread.
-         */
-        Thread {
-            torProxyMonitor.startMonitoringTor()
-        }.start()
-
-        /**
-         * Subscribe to Tor proxy state changes.
-         */
+        // subscribe to Tor proxy state changes
         EventBus.subscribeToTorProxyState(this, this::onTorProxyStateChanged)
+    }
 
+    /**
+     * Deinit the wallet and shutdown Tor.
+     */
+    @Synchronized
+    fun stop() {
+        // destroy FFI wallet object
+        FFIWallet.instance?.destroy()
+        FFIWallet.instance = null
+        EventBus.postWalletState(WalletState.NOT_READY)
+        // stop tor proxy
+        EventBus.unsubscribeFromTorProxyState(this)
+        torManager.shutdown()
     }
 
     @SuppressLint("CheckResult")
@@ -240,12 +242,31 @@ internal class WalletManager(
      */
     private fun initWallet() {
         if (FFIWallet.instance == null) {
+            // store network info in shared preferences if it's a new wallet
+            val isNewInstallation = !WalletUtil.walletExists(context)
             val wallet = FFIWallet(
                 getCommsConfig(),
                 walletLogFilePath
             )
             FFIWallet.instance = wallet
             sharedPrefsWrapper.torIdentity = wallet.getTorIdentity()
+            if (isNewInstallation) {
+                sharedPrefsWrapper.network = Constants.Wallet.network
+                FFIWallet.instance?.setKeyValue(
+                    WalletService.Companion.KeyValueStorageKeys.NETWORK,
+                    Constants.Wallet.network.uriComponent
+                )
+            } else if (sharedPrefsWrapper.isRestoredWallet && sharedPrefsWrapper.network == null) {
+                sharedPrefsWrapper.network = try {
+                    Network.from(
+                        FFIWallet.instance?.getKeyValue(
+                            WalletService.Companion.KeyValueStorageKeys.NETWORK
+                        ) ?: ""
+                    )
+                } catch (exception: Exception) {
+                    null
+                }
+            }
             startLogFileObserver()
             // don't change the base node if it's a custom base node entered by the user
             if (sharedPrefsWrapper.baseNodeIsUserCustom) {

@@ -43,7 +43,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.biometric.BiometricPrompt.ERROR_CANCELED
 import androidx.biometric.BiometricPrompt.ERROR_USER_CANCELED
 import androidx.core.animation.addListener
-import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import com.daasuu.ei.Ease
@@ -93,18 +92,10 @@ internal class AuthActivity : AppCompatActivity() {
         overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
         EventBus.subscribeToWalletState(this, this::onWalletStateChanged)
         setupUi()
-        startWalletService()
+        WalletService.start(applicationContext)
         if (savedInstanceState == null) {
             tracker.screen(path = "/local_auth", title = "Local Authentication")
         }
-    }
-
-    private fun startWalletService() {
-        // start the wallet service
-        ContextCompat.startForegroundService(
-            applicationContext,
-            Intent(applicationContext, WalletService::class.java)
-        )
     }
 
     private fun setupUi() {
@@ -112,7 +103,7 @@ internal class AuthActivity : AppCompatActivity() {
         ui.progressBar.invisible()
         // call the animations
         showTariText()
-        val versionInfo = "${Constants.Wallet.network.displayName} ${BuildConfig.VERSION_NAME}"
+        val versionInfo = "${Constants.Wallet.network.displayName} b${BuildConfig.VERSION_CODE} ${BuildConfig.VERSION_NAME}"
         ui.networkInfoTextView.text = versionInfo
     }
 

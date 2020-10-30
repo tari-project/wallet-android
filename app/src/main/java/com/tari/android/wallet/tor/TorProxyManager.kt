@@ -37,9 +37,15 @@ import android.content.Context
 import com.orhanobut.logger.Logger
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.util.SharedPrefsWrapper
+import io.reactivex.Observable
+import io.reactivex.disposables.Disposable
+import io.reactivex.schedulers.Schedulers
+import net.freehaven.tor.control.TorControlConnection
 import java.io.BufferedReader
 import java.io.File
 import java.io.InputStreamReader
+import java.net.Socket
+import java.util.concurrent.TimeUnit
 
 /**
  * Manages the installation and the running of the Tor proxy.
@@ -57,12 +63,18 @@ internal class TorProxyManager(
     }
 
     private val appCacheHome = context.getDir(torDataDirectoryName, Service.MODE_PRIVATE)
+    private val torProxyControl: TorProxyControl
 
     init {
         EventBus.postTorProxyState(TorProxyState.NotReady)
+        torProxyControl = TorProxyControl(torConfig)
     }
 
     private fun installTorResources() {
+        // install Tor geoip resources
+        val torResourceInstaller = TorResourceInstaller(context, context.filesDir)
+        torResourceInstaller.installGeoIPResources()
+        // check if there's an existing installation of Tor
         val torBinPath = sharedPrefsWrapper.torBinPath
         if (torBinPath != null) {
             val torBinFile = File(torBinPath)
@@ -70,8 +82,7 @@ internal class TorProxyManager(
                 return
             }
         }
-        val torResourceInstaller = TorResourceInstaller(context, context.filesDir)
-        torResourceInstaller.installGeoIPResources()
+        // get the Tor binary file and make it executable
         val torBinary = torResourceInstaller.getTorBinaryFile()
         sharedPrefsWrapper.torBinPath = torBinary.absolutePath
     }
@@ -104,7 +115,11 @@ internal class TorProxyManager(
     }
 
     @Synchronized
-    fun runTorProxy() {
+    fun run() {
+        // start monitoring Tor on a separate thread
+        Thread {
+            torProxyControl.startMonitoringTor()
+        }.start()
         try {
             installTorResources()
             val torCmdString =
@@ -121,8 +136,113 @@ internal class TorProxyManager(
                         "--ClientTransportPlugin \"meek_lite Socks5Proxy ${torConfig.controlHost}:47352\"" */
             exec(torCmdString)
         } catch (throwable: Throwable) {
+            Logger.e("THROWABLE")
             EventBus.postTorProxyState(TorProxyState.Failed)
         }
+    }
+
+    fun shutdown() {
+        torProxyControl.shutdownTor()
+    }
+
+    private class TorProxyControl(private val torConfig: TorConfig) {
+
+        private val initializationCheckTimeoutMillis = 15000L
+        private val initializationCheckRetryPeriodMillis = 500L
+        private var monitoringStartTimeMs = 0L
+
+        /**
+         * Check Tor status every 5 seconds.
+         */
+        private val statusCheckPeriodSecs = 5L
+        /**
+         * Timer to check Tor status.
+         */
+        private var timerSubscription: Disposable? = null
+
+        private lateinit var socket: Socket
+        private lateinit var controlConnection: TorControlConnection
+        private var currentState = EventBus.torProxyStateSubject.value
+
+        @Synchronized
+        fun startMonitoringTor() {
+            connectToTor()
+        }
+
+        @Synchronized
+        fun shutdownTor() {
+            timerSubscription?.dispose()
+            controlConnection.shutdownTor("SHUTDOWN")
+        }
+
+        private fun connectToTor() {
+            monitoringStartTimeMs = System.currentTimeMillis()
+            try {
+                socket = Socket(torConfig.controlHost, torConfig.controlPort)
+                controlConnection = TorControlConnection(socket)
+                val cookieFileBytes = File(torConfig.cookieFilePath).readBytes()
+                controlConnection.authenticate(cookieFileBytes)
+                checkTorStatus()
+            } catch (throwable: Throwable) {
+                val initializationElapsedMs = System.currentTimeMillis() - monitoringStartTimeMs
+                if (initializationElapsedMs > initializationCheckTimeoutMillis) {
+                    Logger.e(
+                        "Failed to connect to Tor proxy, timed out: %s",
+                        throwable.message
+                    )
+                    updateState(TorProxyState.Failed)
+                } else {
+                    Logger.e(
+                        "Failed to connect to Tor proxy, will retry: %s",
+                        throwable.message
+                    )
+                    timerSubscription =
+                        Observable
+                            .timer(initializationCheckRetryPeriodMillis, TimeUnit.MILLISECONDS)
+                            .subscribeOn(Schedulers.io())
+                            .observeOn(Schedulers.io())
+                            .subscribe {
+                                connectToTor()
+                            }
+                }
+            }
+        }
+
+        private fun checkTorStatus() {
+            try {
+                val bootstrapStatus = isTorRunning(controlConnection)
+                if (bootstrapStatus != null) {
+                    updateState(TorProxyState.Running(bootstrapStatus))
+                    // schedule timer
+                    timerSubscription =
+                        Observable
+                            .timer(statusCheckPeriodSecs, TimeUnit.SECONDS)
+                            .subscribeOn(Schedulers.io())
+                            .observeOn(Schedulers.io())
+                            .subscribe {
+                                checkTorStatus()
+                            }
+                } else {
+                    updateState(TorProxyState.Failed)
+                }
+            } catch (throwable: Throwable) {
+                Logger.e("Tor proxy has failed: %s", throwable.message)
+                updateState(TorProxyState.Failed)
+            }
+        }
+
+        private fun isTorRunning(controlConnection: TorControlConnection?): TorBootstrapStatus? {
+            val phaseLogLine = controlConnection?.getInfo("status/bootstrap-phase") ?: return null
+            return TorBootstrapStatus.from(phaseLogLine)
+        }
+
+        private fun updateState(newState: TorProxyState) {
+            if (currentState != newState) {
+                currentState = newState
+                EventBus.postTorProxyState(currentState!!)
+            }
+        }
+
     }
 
 }

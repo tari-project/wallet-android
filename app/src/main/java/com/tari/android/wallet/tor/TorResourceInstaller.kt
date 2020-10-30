@@ -77,9 +77,11 @@ class TorResourceInstaller(
         ): File {
             val inputStream = context.assets.open(assetPath)
             val outFile = File(filesPath, assetKey)
-            streamToFile(inputStream, outFile, isZipped = isZipped)
-            if (setExecutable) {
-                makeFileExecutable(outFile)
+            if (!outFile.exists()) {
+                streamToFile(inputStream, outFile, isZipped = isZipped)
+                if (setExecutable) {
+                    makeFileExecutable(outFile)
+                }
             }
             return outFile
         }

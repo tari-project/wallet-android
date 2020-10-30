@@ -37,12 +37,16 @@ package com.tari.android.wallet.application
  */
 enum class Network(val uriComponent: String, val displayName: String) {
     MAINNET("mainnet", "MAINNET"),
-    TESTNET_1("rincewind", "TESTNET");
+    // testnet 1
+    RINCEWIND("rincewind", "RINCEWIND"),
+    // testnet 2
+    RIDCULLY("ridcully", "RIDCULLY");
 
     companion object {
         fun from(uriComponent: String): Network = when (uriComponent) {
             MAINNET.uriComponent -> MAINNET
-            TESTNET_1.uriComponent -> TESTNET_1
+            RINCEWIND.uriComponent -> RINCEWIND
+            RIDCULLY.uriComponent -> RIDCULLY
             else -> throw RuntimeException("Unknown network: $uriComponent")
         }
     }

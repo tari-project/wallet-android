@@ -2,10 +2,10 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/root_view"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/black"
-    android:id="@+id/root_view"
     tools:context=".ui.activity.AuthActivity">
 
     <!-- Lottie animation for Tari Wallet text -->
@@ -40,8 +40,9 @@
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="22dp"
         android:background="@color/black"
-        android:textColor="#c9c9c9"
-        android:textSize="9sp"
+        android:letterSpacing="0.1"
+        android:textColor="#50FFFFFF"
+        android:textSize="@dimen/common_network_and_version_info_text_size"
         app:customFont="AVENIR_LT_STD_HEAVY"
         tools:ignore="SmallSp" />
 

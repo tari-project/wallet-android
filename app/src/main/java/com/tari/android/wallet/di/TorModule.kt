@@ -35,7 +35,6 @@ package com.tari.android.wallet.di
 import android.content.Context
 import com.tari.android.wallet.tor.TorConfig
 import com.tari.android.wallet.tor.TorProxyManager
-import com.tari.android.wallet.tor.TorProxyMonitor
 import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.SharedPrefsWrapper
 import dagger.Module
@@ -190,14 +189,6 @@ class TorModule {
             sharedPrefsWrapper,
             torConfig
         )
-    }
-
-    @Provides
-    @Singleton
-    internal fun provideTorProxyMonitor(
-        torConfig: TorConfig
-    ): TorProxyMonitor {
-        return TorProxyMonitor(torConfig)
     }
 
 }

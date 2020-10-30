@@ -125,7 +125,7 @@ internal class CreateWalletFragment : Fragment() {
                 string(create_wallet_your_emoji_id_text_label).applyFontStyle(
                     mActivity,
                     CustomFont.AVENIR_LT_STD_LIGHT,
-                    string(create_wallet_your_emoji_id_text_label_bold_part),
+                    listOf(string(create_wallet_your_emoji_id_text_label_bold_part)),
                     CustomFont.AVENIR_LT_STD_BLACK
                 )
             bottomSpinnerLottieAnimationView.alpha = 0f

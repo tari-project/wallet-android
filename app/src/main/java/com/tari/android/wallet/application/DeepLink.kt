@@ -62,7 +62,7 @@ internal class DeepLink private constructor(
         const val PARAMETER_NOTE = "note"
         const val PARAMETER_AMOUNT = "amount"
         private val regexNetwork =
-            "(" + Network.MAINNET.uriComponent + "|" + Network.TESTNET_1.uriComponent + ")"
+            "(" + Network.MAINNET.uriComponent + "|" + Network.RIDCULLY.uriComponent + ")"
         private val regexEmojiId = Type.EMOJI_ID.uriComponent + "/(.{33})"
         private val regexPublicKeyHex =
             Type.PUBLIC_KEY_HEX.uriComponent + "/([a-zA-Z0-9]{64})"

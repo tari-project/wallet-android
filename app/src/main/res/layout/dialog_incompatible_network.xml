@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginHorizontal="@dimen/common_horizontal_margin"
+    android:layout_marginBottom="@dimen/common_horizontal_margin"
+    android:background="@drawable/bottom_dialog_bg"
+    android:orientation="vertical">
+
+    <com.tari.android.wallet.ui.component.CustomFontTextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="30dp"
+        android:gravity="center"
+        android:lineSpacingExtra="8dp"
+        android:text="@string/incompatible_network_title"
+        android:textColor="@color/black"
+        android:textSize="18sp"
+        app:customFont="AVENIR_LT_STD_LIGHT" />
+
+    <com.tari.android.wallet.ui.component.CustomFontTextView
+        android:id="@+id/incompatible_network_description_text_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="32dp"
+        android:layout_marginTop="24dp"
+        android:gravity="center"
+        android:letterSpacing="0.01"
+        android:lineSpacingExtra="8dp"
+        android:text="@string/incompatible_network_description"
+        android:textColor="@color/dark_gray"
+        android:textSize="14sp"
+        app:customFont="AVENIR_LT_STD_MEDIUM" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:layout_marginBottom="16dp"
+        android:orientation="horizontal">
+
+        <com.tari.android.wallet.ui.component.CustomFontButton
+            android:id="@+id/incompatible_network_reset_later_button"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="8dp"
+            android:layout_weight="1"
+            android:background="@color/transparent"
+            android:paddingHorizontal="10dp"
+            android:text="@string/incompatible_network_reset_later"
+            android:textAllCaps="false"
+            android:textColor="@color/dark_gray"
+            android:textSize="16sp"
+            app:customFont="AVENIR_LT_STD_HEAVY" />
+
+        <com.tari.android.wallet.ui.component.CustomFontButton
+            android:id="@+id/incompatible_network_reset_now_button"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="16dp"
+            android:layout_weight="1"
+            android:background="@drawable/gradient_button_bg"
+            android:paddingHorizontal="10dp"
+            android:text="@string/incompatible_network_reset_now"
+            android:textAllCaps="false"
+            android:textColor="@color/white"
+            android:textSize="16sp"
+            app:customFont="AVENIR_LT_STD_HEAVY" />
+    </LinearLayout>
+</LinearLayout>

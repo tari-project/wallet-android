@@ -36,7 +36,6 @@ import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
 import android.animation.ValueAnimator
 import android.content.Context
-import android.content.Intent
 import android.media.AudioManager
 import android.os.Build
 import android.os.Bundle
@@ -48,7 +47,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.core.animation.addListener
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.daasuu.ei.Ease
 import com.daasuu.ei.EasingInterpolator
@@ -163,7 +161,7 @@ internal class IntroductionFragment : Fragment() {
                     it.overridePendingTransition(R.anim.enter_from_bottom, R.anim.exit_to_top)
                 }
             }
-            val versionInfo = "${Constants.Wallet.network.displayName} ${BuildConfig.VERSION_NAME}"
+            val versionInfo = "${Constants.Wallet.network.displayName} b${BuildConfig.VERSION_CODE} ${BuildConfig.VERSION_NAME}"
             networkInfoTextView.text = versionInfo
             // highlight links
             userAgreementAndPrivacyPolicyTextView.text =
@@ -262,10 +260,7 @@ internal class IntroductionFragment : Fragment() {
 
     private fun startWalletService() {
         // start the wallet service
-        ContextCompat.startForegroundService(
-            applicationContext,
-            Intent(applicationContext, WalletService::class.java)
-        )
+        WalletService.start(applicationContext)
     }
 
     private fun startTariWalletViewAnimation() {

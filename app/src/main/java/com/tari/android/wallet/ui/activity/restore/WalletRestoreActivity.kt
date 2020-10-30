@@ -88,6 +88,7 @@ class WalletRestoreActivity : AppCompatActivity(), WalletRestoreRouter {
         prefs.onboardingCompleted = true
         prefs.onboardingAuthSetupCompleted = true
         prefs.onboardingDisplayedAtHome = true
+        prefs.isRestoredWallet = true
 
         startActivity(Intent(this, AuthActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK

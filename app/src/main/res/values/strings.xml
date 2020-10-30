@@ -314,14 +314,30 @@
     <string name="all_settings_page_title">Settings</string>
     <string name="all_settings_close">Done</string>
     <string name="all_settings_security_label">Security</string>
+    <string name="all_settings_advanced_settings_label">Advanced</string>
     <string name="all_settings_back_up_wallet_settings_entry">Wallet Backups</string>
     <string name="all_settings_secondary_settings_label">More</string>
     <string name="all_settings_report_a_bug">Report a Bug</string>
+    <string name="all_settings_delete_wallet">Delete Your Wallet</string>
     <string name="all_settings_visit_site">Visit Tari.com</string>
     <string name="all_settings_contribute">Contribute to Tari Aurora</string>
     <string name="all_settings_user_agreement">User Agreement</string>
-    <string name="all_settings_privacy_policy">Privacy policy</string>
+    <string name="all_settings_privacy_policy">Privacy Policy</string>
     <string name="all_settings_disclaimer">Disclaimer</string>
+
+    <!-- delete wallet -->
+    <string name="delete_wallet_title">You\'re about to lose everything!</string>
+    <string name="delete_wallet_warning_text">Please double-check that your wallet is backed up before deleting it from this device. If you proceed, you will LOSE ALL YOUR FUNDS, your contact data and your transaction history. If this is definitely what you want, go ahead.</string>
+    <string name="delete_wallet_confirmation_title">Your wallet will be deleted</string>
+    <string name="delete_wallet_confirmation_description">Last chance! We\'re about to delete your wallet from this device. You will irreversibly lose your entire balance. Are you 100% sure we should do this?</string>
+
+    <!-- incompatible network -->
+    <string name="incompatible_network_title">Time to move on</string>
+    <string name="incompatible_network_description">Good news: The tari testnet has been reset, bringing a whole host of new features and upgrades.\n\nBad news: Your old tXTR is no longer good here, and the network will reset your balance to zero soon. But on the bright side, this is a great opportunity to start afresh with a spanking new wallet! What do you say?</string>
+    <string name="incompatible_network_description_bold_part_1">Good news:</string>
+    <string name="incompatible_network_description_bold_part_2">Bad news:</string>
+    <string name="incompatible_network_reset_later">I\'ll do it later</string>
+    <string name="incompatible_network_reset_now">Start over, I say!</string>
 
     <!-- Wallet back up -->
     <string name="back_up_wallet_page_title">Security</string>

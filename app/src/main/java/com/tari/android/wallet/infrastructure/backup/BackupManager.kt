@@ -213,12 +213,12 @@ internal class BackupManager(
             EventBus.postBackupState(BackupUpToDate)
         } catch (exception: Exception) {
             if (isInitialBackup) {
-                turnOff()
+                turnOff(deleteExistingBackups = true)
                 retryCount = 0
                 throw exception
             }
             if (exception is BackupStorageAuthRevokedException) {
-                turnOff()
+                turnOff(deleteExistingBackups = true)
                 retryCount = 0
                 postBackupFailedNotification(exception)
                 throw exception
@@ -270,7 +270,7 @@ internal class BackupManager(
     }
 
     // TODO(nyarian): TBD - should side effects be separated from the direct flow?
-    suspend fun turnOff() {
+    suspend fun turnOff(deleteExistingBackups: Boolean) {
         sharedPrefs.lastSuccessfulBackupDate = null
         sharedPrefs.backupFailureDate = null
         sharedPrefs.backupPassword = null
@@ -278,15 +278,17 @@ internal class BackupManager(
         scheduledBackupSubscription?.dispose()
         scheduledBackupSubscription = null
         EventBus.postBackupState(BackupDisabled)
-        try {
-            backupStorage.deleteAllBackupFiles()
-        } catch (exception: Exception) {
-            /* no-op */
-            Logger.e(
-                exception,
-                // TODO(nyarian): but why ignoring this?
-                "Ignored exception while deleting all backup files: $exception"
-            )
+        if (deleteExistingBackups) {
+            try {
+                backupStorage.deleteAllBackupFiles()
+            } catch (exception: Exception) {
+                /* no-op */
+                Logger.e(
+                    exception,
+                    // TODO(nyarian): but why ignoring this?
+                    "Ignored exception while deleting all backup files: $exception"
+                )
+            }
         }
         sharedPrefs.localBackupFolderURI = null
         try {

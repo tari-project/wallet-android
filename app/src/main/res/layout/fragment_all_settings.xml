@@ -1,19 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/settings_background"
-    android:orientation="vertical">
+    android:background="@color/settings_background">
 
     <FrameLayout
+        android:id="@+id/header"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="@dimen/header_height"
         android:background="@color/white"
-        android:paddingHorizontal="25dp"
-        android:paddingTop="24dp"
-        android:paddingBottom="16dp">
+        android:paddingHorizontal="@dimen/common_horizontal_margin">
 
         <com.tari.android.wallet.ui.component.CustomFontTextView
             android:layout_width="wrap_content"
@@ -27,13 +25,16 @@
     </FrameLayout>
 
     <ScrollView
+        android:id="@+id/scroll_view"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:layout_below="@id/header">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:paddingBottom="@dimen/common_horizontal_margin">
 
             <FrameLayout
                 android:layout_width="match_parent"
@@ -52,20 +53,20 @@
                     app:customFont="AVENIR_LT_STD_BLACK" />
             </FrameLayout>
 
-            <androidx.constraintlayout.widget.ConstraintLayout
+            <RelativeLayout
                 android:id="@+id/back_up_wallet_cta_view"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="@dimen/menu_item_height"
                 android:background="@drawable/setting_option_background"
                 android:clickable="true"
                 android:focusable="true"
-                android:paddingVertical="24dp">
+                android:gravity="center_vertical"
+                android:paddingHorizontal="@dimen/common_horizontal_margin">
 
                 <com.tari.android.wallet.ui.component.CustomFontTextView
                     android:id="@+id/back_up_wallet_label_view"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="25dp"
                     android:text="@string/all_settings_back_up_wallet_settings_entry"
                     android:textColor="@color/black"
                     android:textSize="15sp"
@@ -76,12 +77,9 @@
                 <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
                     android:layout_gravity="center_vertical"
-                    android:layout_marginEnd="25dp"
-                    android:orientation="horizontal"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="parent">
+                    android:orientation="horizontal">
 
                     <com.tari.android.wallet.ui.component.CustomFontTextView
                         android:id="@+id/backup_status_text_view"
@@ -160,7 +158,7 @@
                         android:src="@drawable/icon_apply_setting"
                         tools:ignore="ContentDescription" />
                 </LinearLayout>
-            </androidx.constraintlayout.widget.ConstraintLayout>
+            </RelativeLayout>
 
             <com.tari.android.wallet.ui.component.CustomFontTextView
                 android:id="@+id/last_backup_time_text_view"
@@ -199,12 +197,11 @@
                 <FrameLayout
                     android:id="@+id/report_bug_cta_view"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="@dimen/menu_item_height"
                     android:background="@drawable/setting_option_background"
                     android:clickable="true"
                     android:focusable="true"
-                    android:paddingHorizontal="26dp"
-                    android:paddingVertical="24dp">
+                    android:paddingHorizontal="@dimen/common_horizontal_margin">
 
                     <com.tari.android.wallet.ui.component.CustomFontTextView
                         android:layout_width="wrap_content"
@@ -232,12 +229,11 @@
                 <FrameLayout
                     android:id="@+id/visit_site_cta_view"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="@dimen/menu_item_height"
                     android:background="@drawable/setting_option_background"
                     android:clickable="true"
                     android:focusable="true"
-                    android:paddingHorizontal="26dp"
-                    android:paddingVertical="24dp">
+                    android:paddingHorizontal="@dimen/common_horizontal_margin">
 
                     <com.tari.android.wallet.ui.component.CustomFontTextView
                         android:layout_width="wrap_content"
@@ -265,12 +261,11 @@
                 <FrameLayout
                     android:id="@+id/contribute_cta_view"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="@dimen/menu_item_height"
                     android:background="@drawable/setting_option_background"
                     android:clickable="true"
                     android:focusable="true"
-                    android:paddingHorizontal="26dp"
-                    android:paddingVertical="24dp">
+                    android:paddingHorizontal="@dimen/common_horizontal_margin">
 
                     <com.tari.android.wallet.ui.component.CustomFontTextView
                         android:layout_width="wrap_content"
@@ -298,12 +293,11 @@
                 <FrameLayout
                     android:id="@+id/user_agreement_cta_view"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="@dimen/menu_item_height"
                     android:background="@drawable/setting_option_background"
                     android:clickable="true"
                     android:focusable="true"
-                    android:paddingHorizontal="26dp"
-                    android:paddingVertical="24dp">
+                    android:paddingHorizontal="@dimen/common_horizontal_margin">
 
                     <com.tari.android.wallet.ui.component.CustomFontTextView
                         android:layout_width="wrap_content"
@@ -331,12 +325,11 @@
                 <FrameLayout
                     android:id="@+id/privacy_policy_cta_view"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="@dimen/menu_item_height"
                     android:background="@drawable/setting_option_background"
                     android:clickable="true"
                     android:focusable="true"
-                    android:paddingHorizontal="26dp"
-                    android:paddingVertical="24dp">
+                    android:paddingHorizontal="@dimen/common_horizontal_margin">
 
                     <com.tari.android.wallet.ui.component.CustomFontTextView
                         android:layout_width="wrap_content"
@@ -364,12 +357,11 @@
                 <FrameLayout
                     android:id="@+id/disclaimer_cta_view"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="@dimen/menu_item_height"
                     android:background="@drawable/setting_option_background"
                     android:clickable="true"
                     android:focusable="true"
-                    android:paddingHorizontal="26dp"
-                    android:paddingVertical="24dp">
+                    android:paddingHorizontal="@dimen/common_horizontal_margin">
 
                     <com.tari.android.wallet.ui.component.CustomFontTextView
                         android:layout_width="wrap_content"
@@ -388,7 +380,67 @@
                         tools:ignore="ContentDescription" />
                 </FrameLayout>
             </LinearLayout>
+
+            <!-- advanced settings title -->
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingHorizontal="25dp"
+                android:paddingTop="32dp"
+                android:paddingBottom="16dp">
+
+                <com.tari.android.wallet.ui.component.CustomFontTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal|start"
+                    android:text="@string/all_settings_advanced_settings_label"
+                    android:textColor="@color/black"
+                    android:textSize="17sp"
+                    app:customFont="AVENIR_LT_STD_BLACK" />
+            </FrameLayout>
+            <!-- advanced settings menu -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/white"
+                android:orientation="vertical">
+
+                <FrameLayout
+                    android:id="@+id/delete_wallet_cta_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/menu_item_height"
+                    android:background="@drawable/setting_option_background"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:paddingHorizontal="@dimen/common_horizontal_margin">
+
+                    <com.tari.android.wallet.ui.component.CustomFontTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical|start"
+                        android:text="@string/all_settings_delete_wallet"
+                        android:textColor="@color/common_error"
+                        android:textSize="15sp"
+                        app:customFont="AVENIR_LT_STD_MEDIUM" />
+
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical|end"
+                        android:src="@drawable/icon_apply_setting_red"
+                        tools:ignore="ContentDescription" />
+                </FrameLayout>
+            </LinearLayout>
         </LinearLayout>
     </ScrollView>
 
-</LinearLayout>
+    <!-- scroll elevation gradient -->
+    <View
+        android:id="@+id/scroll_elevation_gradient_view"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/common_scroll_height_gradient_height"
+        android:layout_below="@id/header"
+        android:alpha="0.5"
+        android:background="@drawable/view_elevation_gradient" />
+
+</RelativeLayout>

@@ -51,10 +51,7 @@ class ServiceRestartBroadcastReceiver : BroadcastReceiver() {
         Logger.d("Service restart broadcast received.")
         if (WalletUtil.walletExists(context.applicationContext)) {
             // restart the service
-            ContextCompat.startForegroundService(
-                context,
-                Intent(context, WalletService::class.java)
-            )
+            WalletService.start(context)
         }
     }
 
