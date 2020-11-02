@@ -103,7 +103,7 @@ internal class AuthActivity : AppCompatActivity() {
         ui.progressBar.invisible()
         // call the animations
         showTariText()
-        val versionInfo = "${Constants.Wallet.network.displayName} b${BuildConfig.VERSION_CODE} ${BuildConfig.VERSION_NAME}"
+        val versionInfo = "${Constants.Wallet.network.displayName} ${BuildConfig.VERSION_NAME} b${BuildConfig.VERSION_CODE}"
         ui.networkInfoTextView.text = versionInfo
     }
 

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- incompatible network dialog -->
+    <dimen name="incompatible_network_dialog_button_text_size">14sp</dimen>
+
+</resources>

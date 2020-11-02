@@ -333,7 +333,7 @@
 
     <!-- incompatible network -->
     <string name="incompatible_network_title">Time to move on</string>
-    <string name="incompatible_network_description">Good news: The tari testnet has been reset, bringing a whole host of new features and upgrades.\n\nBad news: Your old tXTR is no longer good here, and the network will reset your balance to zero soon. But on the bright side, this is a great opportunity to start afresh with a spanking new wallet! What do you say?</string>
+    <string name="incompatible_network_description">Good news: The Tari testnet has been reset, bringing a whole host of new features and upgrades.\n\nBad news: Your old tXTR is no longer good here, and the network will reset your balance to zero soon. But on the bright side, this is a great opportunity to start afresh with a spanking new wallet! What do you say?</string>
     <string name="incompatible_network_description_bold_part_1">Good news:</string>
     <string name="incompatible_network_description_bold_part_2">Bad news:</string>
     <string name="incompatible_network_reset_later">I\'ll do it later</string>

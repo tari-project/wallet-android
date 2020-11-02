@@ -49,11 +49,12 @@
             android:layout_marginEnd="8dp"
             android:layout_weight="1"
             android:background="@color/transparent"
-            android:paddingHorizontal="10dp"
+            android:lines="1"
+            android:paddingHorizontal="4dp"
             android:text="@string/incompatible_network_reset_later"
             android:textAllCaps="false"
             android:textColor="@color/dark_gray"
-            android:textSize="16sp"
+            android:textSize="@dimen/incompatible_network_dialog_button_text_size"
             app:customFont="AVENIR_LT_STD_HEAVY" />
 
         <com.tari.android.wallet.ui.component.CustomFontButton
@@ -64,11 +65,12 @@
             android:layout_marginEnd="16dp"
             android:layout_weight="1"
             android:background="@drawable/gradient_button_bg"
-            android:paddingHorizontal="10dp"
+            android:lines="1"
+            android:paddingHorizontal="4dp"
             android:text="@string/incompatible_network_reset_now"
             android:textAllCaps="false"
             android:textColor="@color/white"
-            android:textSize="16sp"
+            android:textSize="@dimen/incompatible_network_dialog_button_text_size"
             app:customFont="AVENIR_LT_STD_HEAVY" />
     </LinearLayout>
 </LinearLayout>

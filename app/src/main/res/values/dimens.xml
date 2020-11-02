@@ -92,6 +92,9 @@
     <dimen name="home_ttl_store_dialog_cancel_button_top_margin">8dp</dimen>
     <dimen name="home_ttl_store_dialog_padding_bottom">12dp</dimen>
 
+    <!-- incompatible network dialog -->
+    <dimen name="incompatible_network_dialog_button_text_size">13sp</dimen>
+
     <dimen name="create_wallet_button_bottom_margin">25dp</dimen>
     <dimen name="home_tx_list_item_height">74dp</dimen>
 

@@ -161,7 +161,7 @@ internal class IntroductionFragment : Fragment() {
                     it.overridePendingTransition(R.anim.enter_from_bottom, R.anim.exit_to_top)
                 }
             }
-            val versionInfo = "${Constants.Wallet.network.displayName} b${BuildConfig.VERSION_CODE} ${BuildConfig.VERSION_NAME}"
+            val versionInfo = "${Constants.Wallet.network.displayName} ${BuildConfig.VERSION_NAME} b${BuildConfig.VERSION_CODE}"
             networkInfoTextView.text = versionInfo
             // highlight links
             userAgreementAndPrivacyPolicyTextView.text =
