@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <dimen name="add_amount_element_text_size">90sp</dimen>
+
+</resources>

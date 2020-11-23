@@ -61,7 +61,10 @@ internal class BackupFileProcessor(
         val backupPassword = newPassword ?: sharedPrefs.backupPassword
         val backupDate = DateTime.now()
         if (backupPassword == null) {
-            databaseFile = File(walletTempDirPath, Constants.Wallet.walletDBFullFileName)
+            // create temp fir if not exists
+            val tempDir = File(walletTempDirPath)
+            if (!tempDir.exists()) tempDir.mkdir()
+            databaseFile = File(tempDir, Constants.Wallet.walletDBFullFileName)
             FFIUtil.doPartialBackup(walletDatabaseFilePath, databaseFile.absolutePath)
             if (!databaseFile.exists()) {
                 throw BackupInterruptedException("Partial backup file could not be created.")
