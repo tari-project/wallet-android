@@ -162,7 +162,7 @@ dependencies {
     implementation 'androidx.appcompat:appcompat:1.2.0'
     // support lib
     implementation 'androidx.legacy:legacy-support-v13:1.0.0'
-    implementation 'androidx.constraintlayout:constraintlayout:2.0.3'
+    implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
     // android jetpack
     implementation "androidx.lifecycle:lifecycle-extensions:2.2.0"
     // recycler view

@@ -4,11 +4,11 @@ buildscript {
     ext.kotlin_version = '1.4.10'
 
     // build & version
-    ext.buildNumber = 144
-    ext.versionNumber = "0.5.1"
+    ext.buildNumber = 145
+    ext.versionNumber = "0.5.2"
 
     // JNI libs
-    ext.libwalletVersion = "0.16.9"
+    ext.libwalletVersion = "0.16.12"
     ext.libwalletHostURL = "https://tari-binaries.s3.amazonaws.com/libwallet/"
     ext.supportedABIs = ["arm64-v8a", "armeabi-v7a", "x86_64"]
 
@@ -19,7 +19,7 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:4.1.0'
+        classpath 'com.android.tools.build:gradle:4.1.1'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
         classpath "io.sentry:sentry-android-gradle-plugin:1.7.34"
     }
