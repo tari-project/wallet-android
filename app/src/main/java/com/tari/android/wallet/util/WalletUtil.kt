@@ -57,20 +57,6 @@ internal object WalletUtil {
     }
 
     /**
-     * Calculates transaction fee.
-     * See https://github.com/tari-project/tari/issues/1058.
-     */
-    fun calculateTxFee(
-        baseCost: Int = 500,
-        numInputs: Int = 1,
-        numOutputs: Int = 2,
-        r: Int = 250
-    ): MicroTari {
-        val fee = baseCost + (numInputs + 4 * numOutputs) * r
-        return fee.toMicroTari()
-    }
-
-    /**
      * Utility function to clear all previous wallet files.
      */
     fun clearWalletFiles(path: String): Boolean {

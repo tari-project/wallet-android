@@ -690,7 +690,10 @@ class AddAmountFragment : Fragment(), ServiceConnection {
             (currentFirstElementMarginStart * scaleFactor).toInt()
 
         // adjust gem size
-        ui.amountGemImageView.setLayoutSize(currentAmountGemSize.toInt(), currentAmountGemSize.toInt())
+        ui.amountGemImageView.setLayoutSize(
+            currentAmountGemSize.toInt(),
+            currentAmountGemSize.toInt()
+        )
         // adjust first element margin
         elements[0].second.setStartMargin(currentFirstElementMarginStart)
         // set center correction view width
@@ -841,7 +844,10 @@ class AddAmountFragment : Fragment(), ServiceConnection {
         }
 
         // adjust gem size
-        ui.amountGemImageView.setLayoutSize(currentAmountGemSize.toInt(), currentAmountGemSize.toInt())
+        ui.amountGemImageView.setLayoutSize(
+            currentAmountGemSize.toInt(),
+            currentAmountGemSize.toInt()
+        )
         // adjust first element margin
         elements[0].second.setStartMargin(
             currentFirstElementMarginStart
@@ -922,7 +928,22 @@ class AddAmountFragment : Fragment(), ServiceConnection {
     }
 
     private fun continueToNote() {
-        val fee = WalletUtil.calculateTxFee()
+        val gramstringbuilder = StringBuilder()
+        gramstringbuilder.append(100)
+        val gramFee = MicroTari(BigInteger(gramstringbuilder.toString()))
+        val kernels = BigInteger("1")
+        val outputs = BigInteger("1")
+        val error = WalletError()
+        val fee = walletService.estimateTxFee(
+            currentAmount,
+            gramFee,
+            kernels.toByteArray(),
+            outputs.toByteArray(),
+            error
+        )
+        if (error.code != WalletErrorCode.NO_ERROR) {
+            TODO("Unhandled wallet error: ${error.code}")
+        }
         listenerWR.get()?.continueToAddNote(
             this,
             recipientUser,
@@ -955,12 +976,26 @@ class AddAmountFragment : Fragment(), ServiceConnection {
                 TODO("Unhandled wallet error: ${error.code}")
             }
             // update fee
-            val fee = WalletUtil.calculateTxFee()
+            val gramstringbuilder = StringBuilder()
+            gramstringbuilder.append(100)
+            val gramFee = MicroTari(BigInteger(gramstringbuilder.toString()))
+            val kernels = BigInteger("1")
+            val outputs = BigInteger("1")
+            val fee = walletService.estimateTxFee(
+                currentAmount,
+                gramFee,
+                kernels.toByteArray(),
+                outputs.toByteArray(),
+                error
+            )
+            if (error.code != WalletErrorCode.NO_ERROR) {
+                TODO("Unhandled wallet error: ${error.code}")
+            }
             ui.txFeeTextView.text = "+${WalletUtil.feeFormatter.format(fee.tariValue)}"
             // check balance
             val availableBalance =
                 balanceInfo.availableBalance + balanceInfo.pendingIncomingBalance
-            if ((currentAmount + WalletUtil.calculateTxFee()) > availableBalance) {
+            if ((currentAmount + fee) > availableBalance) {
                 ui.availableBalanceTextView.text =
                     WalletUtil.amountFormatter.format(availableBalance.tariValue)
                 displayAvailableBalanceError()

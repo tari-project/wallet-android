@@ -611,6 +611,33 @@ internal class FFIWallet(
         else -> TxStatus.UNKNOWN
     }
 
+    private external fun jniEstimateTxFee(
+        amount: String,
+        gramFee: String,
+        kernelCount: String,
+        outputCount: String,
+        libError: FFIError
+    ): ByteArray
+
+    fun estimateTxFee(
+        amount: BigInteger,
+        gramFee: BigInteger,
+        kernelCount: BigInteger,
+        outputCount: BigInteger
+    ): BigInteger {
+        val error = FFIError()
+        val bytes = jniEstimateTxFee(
+            amount.toString(),
+            gramFee.toString(),
+            kernelCount.toString(),
+            outputCount.toString(),
+            error
+        )
+        Logger.d("Send status code (0 means ok): %d", error.code)
+        throwIf(error)
+        return BigInteger(1, bytes)
+    }
+
     fun sendTx(
         destination: FFIPublicKey,
         amount: BigInteger,
