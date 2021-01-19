@@ -928,17 +928,9 @@ class AddAmountFragment : Fragment(), ServiceConnection {
     }
 
     private fun continueToNote() {
-        val gramstringbuilder = StringBuilder()
-        gramstringbuilder.append(100)
-        val gramFee = MicroTari(BigInteger(gramstringbuilder.toString()))
-        val kernels = BigInteger("1")
-        val outputs = BigInteger("1")
         val error = WalletError()
         val fee = walletService.estimateTxFee(
             currentAmount,
-            gramFee,
-            kernels.toByteArray(),
-            outputs.toByteArray(),
             error
         )
         if (error.code != WalletErrorCode.NO_ERROR) {
@@ -976,16 +968,8 @@ class AddAmountFragment : Fragment(), ServiceConnection {
                 TODO("Unhandled wallet error: ${error.code}")
             }
             // update fee
-            val gramStringBuilder = StringBuilder()
-            gramStringBuilder.append(100)
-            val gramFee = MicroTari(BigInteger(gramStringBuilder.toString()))
-            val kernels = BigInteger("1")
-            val outputs = BigInteger("1")
             val fee = walletService.estimateTxFee(
                 currentAmount,
-                gramFee,
-                kernels.toByteArray(),
-                outputs.toByteArray(),
                 error
             )
             if (error.code != WalletErrorCode.NO_ERROR

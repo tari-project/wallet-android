@@ -647,18 +647,18 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
 
         override fun estimateTxFee(
             amount: MicroTari,
-            gramFee: MicroTari,
-            kernels: ByteArray,
-            outputs: ByteArray,
             error: WalletError
         ): MicroTari? {
+            val defaultGramFee = BigInteger("100")
+            val defaultKernelCount = BigInteger("1")
+            val defaultOutputCount = BigInteger("2")
             return try {
                 MicroTari(
                     wallet.estimateTxFee(
                         amount.value,
-                        gramFee.value,
-                        kernelCount = BigInteger(1, kernels),
-                        outputCount = BigInteger(1, outputs)
+                        defaultGramFee,
+                        defaultKernelCount,
+                        defaultOutputCount
                     )
                 )
             } catch (throwable: Throwable) {
