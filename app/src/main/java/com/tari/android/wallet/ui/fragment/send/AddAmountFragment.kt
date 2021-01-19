@@ -690,7 +690,10 @@ class AddAmountFragment : Fragment(), ServiceConnection {
             (currentFirstElementMarginStart * scaleFactor).toInt()
 
         // adjust gem size
-        ui.amountGemImageView.setLayoutSize(currentAmountGemSize.toInt(), currentAmountGemSize.toInt())
+        ui.amountGemImageView.setLayoutSize(
+            currentAmountGemSize.toInt(),
+            currentAmountGemSize.toInt()
+        )
         // adjust first element margin
         elements[0].second.setStartMargin(currentFirstElementMarginStart)
         // set center correction view width
@@ -841,7 +844,10 @@ class AddAmountFragment : Fragment(), ServiceConnection {
         }
 
         // adjust gem size
-        ui.amountGemImageView.setLayoutSize(currentAmountGemSize.toInt(), currentAmountGemSize.toInt())
+        ui.amountGemImageView.setLayoutSize(
+            currentAmountGemSize.toInt(),
+            currentAmountGemSize.toInt()
+        )
         // adjust first element margin
         elements[0].second.setStartMargin(
             currentFirstElementMarginStart
@@ -922,7 +928,14 @@ class AddAmountFragment : Fragment(), ServiceConnection {
     }
 
     private fun continueToNote() {
-        val fee = WalletUtil.calculateTxFee()
+        val error = WalletError()
+        val fee = walletService.estimateTxFee(
+            currentAmount,
+            error
+        )
+        if (error.code != WalletErrorCode.NO_ERROR) {
+            TODO("Unhandled wallet error: ${error.code}")
+        }
         listenerWR.get()?.continueToAddNote(
             this,
             recipientUser,
@@ -955,23 +968,31 @@ class AddAmountFragment : Fragment(), ServiceConnection {
                 TODO("Unhandled wallet error: ${error.code}")
             }
             // update fee
-            val fee = WalletUtil.calculateTxFee()
-            ui.txFeeTextView.text = "+${WalletUtil.feeFormatter.format(fee.tariValue)}"
+            val fee = walletService.estimateTxFee(
+                currentAmount,
+                error
+            )
+            if (error.code != WalletErrorCode.NO_ERROR
+                && error.code != WalletErrorCode.NOT_ENOUGH_FUNDS) {
+                TODO("Unhandled wallet error: ${error.code}")
+            }
             // check balance
             val availableBalance =
                 balanceInfo.availableBalance + balanceInfo.pendingIncomingBalance
-            if ((currentAmount + WalletUtil.calculateTxFee()) > availableBalance) {
+            if (error.code == WalletErrorCode.NOT_ENOUGH_FUNDS
+                || (currentAmount + fee) > availableBalance) {
                 ui.availableBalanceTextView.text =
                     WalletUtil.amountFormatter.format(availableBalance.tariValue)
                 displayAvailableBalanceError()
-                if (ui.txFeeContainerView.visibility == View.INVISIBLE) {
-                    ui.txFeeContainerView.alpha = 0f
-                    ui.txFeeContainerView.visible()
+                if (ui.txFeeContainerView.visibility != View.INVISIBLE) {
                     val viewAnim = ValueAnimator.ofFloat(0f, 1f)
                     viewAnim.addUpdateListener { valueAnimator: ValueAnimator ->
                         val value = valueAnimator.animatedValue as Float
-                        ui.txFeeContainerView.translationY = (1f - value) * 100
-                        ui.txFeeContainerView.alpha = value
+                        ui.txFeeContainerView.translationY = value * 100
+                        ui.txFeeContainerView.alpha = (1f - value)
+                        if (value == 1f) {
+                            ui.txFeeContainerView.invisible()
+                        }
                     }
                     viewAnim.duration = Constants.UI.shortDurationMs
                     // define interpolator
@@ -981,6 +1002,7 @@ class AddAmountFragment : Fragment(), ServiceConnection {
             } else {
                 var showsTxFee = false
                 var hidesTxFee = false
+                ui.txFeeTextView.text = "+${WalletUtil.feeFormatter.format(fee.tariValue)}"
                 // show/hide continue button
                 if (currentAmount.value.toInt() == 0) {
                     ui.continueButton.invisible()

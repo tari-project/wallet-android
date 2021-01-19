@@ -72,7 +72,6 @@ import kotlinx.coroutines.launch
 import org.joda.time.DateTime
 import org.joda.time.Hours
 import org.joda.time.Minutes
-import java.lang.RuntimeException
 import java.math.BigInteger
 import java.util.*
 import java.util.concurrent.CopyOnWriteArrayList
@@ -639,6 +638,28 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
                     MicroTari(wallet.getAvailableBalance()),
                     MicroTari(wallet.getPendingInboundBalance()),
                     MicroTari(wallet.getPendingOutboundBalance())
+                )
+            } catch (throwable: Throwable) {
+                mapThrowableIntoError(throwable, error)
+                null
+            }
+        }
+
+        override fun estimateTxFee(
+            amount: MicroTari,
+            error: WalletError
+        ): MicroTari? {
+            val defaultGramFee = BigInteger("100")
+            val defaultKernelCount = BigInteger("1")
+            val defaultOutputCount = BigInteger("2")
+            return try {
+                MicroTari(
+                    wallet.estimateTxFee(
+                        amount.value,
+                        defaultGramFee,
+                        defaultKernelCount,
+                        defaultOutputCount
+                    )
                 )
             } catch (throwable: Throwable) {
                 mapThrowableIntoError(throwable, error)

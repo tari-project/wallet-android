@@ -940,6 +940,45 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniSendTx(
 
 extern "C"
 JNIEXPORT jbyteArray JNICALL
+Java_com_tari_android_wallet_ffi_FFIWallet_jniEstimateTxFee(
+        JNIEnv *jEnv,
+        jobject jThis,
+        jstring jamount,
+        jstring jgramFee,
+        jstring jkernelCount,
+        jstring joutputCount,
+        jobject error) {
+    int i = 0;
+    int *r = &i;
+    jlong lWallet = GetPointerField(jEnv, jThis);
+    auto *pWallet = reinterpret_cast<TariWallet *>(lWallet);
+    const char *nativeAmount = jEnv->GetStringUTFChars(jamount, JNI_FALSE);
+    const char *nativeGramFee = jEnv->GetStringUTFChars(jgramFee, JNI_FALSE);
+    const char *nativeKernels = jEnv->GetStringUTFChars(jkernelCount, JNI_FALSE);
+    const char *nativeOutputs = jEnv->GetStringUTFChars(joutputCount, JNI_FALSE);
+    char *pAmountEnd;
+    char *pGramFeeEnd;
+    char *pKernelsEnd;
+    char *pOutputsEnd;
+
+    unsigned long long amount = strtoull(nativeAmount, &pAmountEnd, 10);
+    unsigned long long gramFee = strtoull(nativeGramFee, &pGramFeeEnd, 10);
+    unsigned long long kernels = strtoull(nativeKernels, &pKernelsEnd, 10);
+    unsigned long long outputs = strtoull(nativeOutputs, &pOutputsEnd, 10);
+
+    jbyteArray result = getBytesFromUnsignedLongLong(
+            jEnv,
+            wallet_get_fee_estimate(pWallet, amount, gramFee, kernels, outputs, r));
+    setErrorCode(jEnv, error, i);
+    jEnv->ReleaseStringUTFChars(jamount, nativeAmount);
+    jEnv->ReleaseStringUTFChars(jgramFee, nativeGramFee);
+    jEnv->ReleaseStringUTFChars(jkernelCount, nativeKernels);
+    jEnv->ReleaseStringUTFChars(joutputCount, nativeOutputs);
+    return result;
+}
+
+extern "C"
+JNIEXPORT jbyteArray JNICALL
 Java_com_tari_android_wallet_ffi_FFIWallet_jniCoinSplit(
         JNIEnv *jEnv,
         jobject jThis,
