@@ -976,9 +976,9 @@ class AddAmountFragment : Fragment(), ServiceConnection {
                 TODO("Unhandled wallet error: ${error.code}")
             }
             // update fee
-            val gramstringbuilder = StringBuilder()
-            gramstringbuilder.append(100)
-            val gramFee = MicroTari(BigInteger(gramstringbuilder.toString()))
+            val gramStringBuilder = StringBuilder()
+            gramStringBuilder.append(100)
+            val gramFee = MicroTari(BigInteger(gramStringBuilder.toString()))
             val kernels = BigInteger("1")
             val outputs = BigInteger("1")
             val fee = walletService.estimateTxFee(
@@ -988,25 +988,27 @@ class AddAmountFragment : Fragment(), ServiceConnection {
                 outputs.toByteArray(),
                 error
             )
-            if (error.code != WalletErrorCode.NO_ERROR) {
+            if (error.code != WalletErrorCode.NO_ERROR
+                && error.code != WalletErrorCode.NOT_ENOUGH_FUNDS) {
                 TODO("Unhandled wallet error: ${error.code}")
             }
-            ui.txFeeTextView.text = "+${WalletUtil.feeFormatter.format(fee.tariValue)}"
             // check balance
             val availableBalance =
                 balanceInfo.availableBalance + balanceInfo.pendingIncomingBalance
-            if ((currentAmount + fee) > availableBalance) {
+            if (error.code == WalletErrorCode.NOT_ENOUGH_FUNDS
+                || (currentAmount + fee) > availableBalance) {
                 ui.availableBalanceTextView.text =
                     WalletUtil.amountFormatter.format(availableBalance.tariValue)
                 displayAvailableBalanceError()
-                if (ui.txFeeContainerView.visibility == View.INVISIBLE) {
-                    ui.txFeeContainerView.alpha = 0f
-                    ui.txFeeContainerView.visible()
+                if (ui.txFeeContainerView.visibility != View.INVISIBLE) {
                     val viewAnim = ValueAnimator.ofFloat(0f, 1f)
                     viewAnim.addUpdateListener { valueAnimator: ValueAnimator ->
                         val value = valueAnimator.animatedValue as Float
-                        ui.txFeeContainerView.translationY = (1f - value) * 100
-                        ui.txFeeContainerView.alpha = value
+                        ui.txFeeContainerView.translationY = value * 100
+                        ui.txFeeContainerView.alpha = (1f - value)
+                        if (value == 1f) {
+                            ui.txFeeContainerView.invisible()
+                        }
                     }
                     viewAnim.duration = Constants.UI.shortDurationMs
                     // define interpolator
@@ -1016,6 +1018,7 @@ class AddAmountFragment : Fragment(), ServiceConnection {
             } else {
                 var showsTxFee = false
                 var hidesTxFee = false
+                ui.txFeeTextView.text = "+${WalletUtil.feeFormatter.format(fee.tariValue)}"
                 // show/hide continue button
                 if (currentAmount.value.toInt() == 0) {
                     ui.continueButton.invisible()

@@ -633,7 +633,7 @@ internal class FFIWallet(
             outputCount.toString(),
             error
         )
-        Logger.d("Send status code (0 means ok): %d", error.code)
+        Logger.d("Tx fee estimate status code (0 means ok): %d", error.code)
         throwIf(error)
         return BigInteger(1, bytes)
     }
