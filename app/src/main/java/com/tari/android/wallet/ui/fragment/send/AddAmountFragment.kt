@@ -170,7 +170,7 @@ class AddAmountFragment : Fragment(), ServiceConnection {
         Logger.i("AddAmountFragment onServiceConnected")
         walletService = TariWalletService.Stub.asInterface(service)
         // Only binding UI if we have not passed `onDestroyView` line, which is a possibility
-        setupUi()
+        setupUI()
     }
 
     override fun onServiceDisconnected(name: ComponentName?) {
@@ -183,7 +183,7 @@ class AddAmountFragment : Fragment(), ServiceConnection {
         requireActivity().unbindService(this)
     }
 
-    private fun setupUi() {
+    private fun setupUI() {
         recipientUser = arguments!!.getParcelable("recipientUser")!!
         ui.decimalPointButton.text = decimalSeparator
         currentTextSize = dimen(add_amount_element_text_size)
@@ -372,6 +372,7 @@ class AddAmountFragment : Fragment(), ServiceConnection {
         ui.fullEmojiIdScrollView.smoothScrollTo(0, 0)
         ui.emojiIdSummaryContainerView.visible()
         ui.emojiIdSummaryContainerView.alpha = 0f
+        ui.dimmerView.isClickable = false
         // copy emoji id button anim
         val copyEmojiIdButtonAnim = ValueAnimator.ofFloat(1f, 0f)
         copyEmojiIdButtonAnim.addUpdateListener { valueAnimator: ValueAnimator ->

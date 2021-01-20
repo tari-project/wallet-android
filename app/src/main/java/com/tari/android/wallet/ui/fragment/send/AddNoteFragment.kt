@@ -417,6 +417,7 @@ class AddNoteFragment : Fragment(), View.OnTouchListener {
         ui.fullEmojiIdScrollView.smoothScrollTo(0, 0)
         ui.emojiIdSummaryContainerView.visible()
         ui.emojiIdSummaryContainerView.alpha = 0f
+        ui.dimmerView.isClickable = false
         // copy emoji id button anim
         val copyEmojiIdButtonAnim = ValueAnimator.ofFloat(1f, 0f)
         copyEmojiIdButtonAnim.addUpdateListener { valueAnimator: ValueAnimator ->

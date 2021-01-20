@@ -96,13 +96,13 @@ class WalletInfoFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        setupUi()
+        setupUI()
     }
 
     // endregion Lifecycle
 
     // region Initial UI Setup
-    private fun setupUi() {
+    private fun setupUI() {
         val emojiId = sharedPrefsWrapper.emojiId!!
         displayQRCode(emojiId)
         displayFullEmojiId(emojiId)
