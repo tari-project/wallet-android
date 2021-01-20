@@ -64,7 +64,6 @@ class SharedPrefsWrapper(
 ) {
 
     private object Key {
-        const val privateKeyHexString = "tari_wallet_private_key_hex_string"
         const val publicKeyHexString = "tari_wallet_public_key_hex_string"
         const val isAuthenticated = "tari_wallet_is_authenticated"
         const val emojiId = "tari_wallet_emoji_id_"
@@ -93,13 +92,6 @@ class SharedPrefsWrapper(
         const val network = "tari_wallet_network"
         const val isRestoredWallet = "tari_is_restored_wallet"
     }
-
-    // TODO(nyarian): remove value on null possibly?
-    var privateKeyHexString: String?
-        get() = SecurePreferences.getStringValue(context, Key.privateKeyHexString, null)
-        set(value) =
-            value?.let { SecurePreferences.setValue(context, Key.privateKeyHexString, it) }
-                ?: Unit
 
     var publicKeyHexString: String?
         get() = sharedPrefs.getString(Key.publicKeyHexString, null)
@@ -173,10 +165,40 @@ class SharedPrefsWrapper(
         }
 
     var torIdentity: ByteArray?
-        get() = sharedPrefs.getString(Key.torIdentity, null)?.toPreservedByteArray
-        set(value) = sharedPrefs.edit().run {
-            putString(Key.torIdentity, value?.toPreservedString)
-            apply()
+        get() {
+            // migrate the identity from shared prefs to secure prefs
+            val identity = sharedPrefs.getString(Key.torIdentity, null)
+            if (identity != null) {
+                SecurePreferences.setValue(
+                    context,
+                    Key.torIdentity,
+                    identity
+                )
+                sharedPrefs.edit().run {
+                    putString(Key.torIdentity, null)
+                    apply()
+                }
+                return identity.toPreservedByteArray
+            }
+            return SecurePreferences.getStringValue(
+                context,
+                Key.torIdentity,
+                null
+            )?.toPreservedByteArray
+        }
+        set(value) {
+            if (value != null) {
+                SecurePreferences.setValue(
+                    context,
+                    Key.torIdentity,
+                    value.toPreservedString
+                )
+            } else {
+                SecurePreferences.removeValue(
+                    context,
+                    Key.torIdentity
+                )
+            }
         }
 
     var baseNodeLastSyncWasSuccessful: Boolean?
@@ -318,7 +340,6 @@ class SharedPrefsWrapper(
     }
 
     fun clear() {
-        privateKeyHexString = null
         publicKeyHexString = null
         isAuthenticated = false
         emojiId = null

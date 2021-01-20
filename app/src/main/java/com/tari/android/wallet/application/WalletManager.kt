@@ -142,7 +142,7 @@ internal class WalletManager(
      * Instantiates the comms configuration for the wallet.
      */
     private fun getCommsConfig(): FFICommsConfig {
-        val commsConfig = FFICommsConfig(
+        return FFICommsConfig(
             NetAddressString(
                 "127.0.0.1",
                 39069
@@ -152,17 +152,6 @@ internal class WalletManager(
             walletFilesDirPath,
             Constants.Wallet.discoveryTimeoutSec
         )
-
-        // begin: backwards compatibility for private key in shared preferences
-        sharedPrefsWrapper.privateKeyHexString?.let {
-            commsConfig.setPrivateKey(
-                FFIPrivateKey(HexString(it))
-            )
-            sharedPrefsWrapper.privateKeyHexString = null
-        }
-        // end: backwards compatibility
-
-        return commsConfig
     }
 
     /**
