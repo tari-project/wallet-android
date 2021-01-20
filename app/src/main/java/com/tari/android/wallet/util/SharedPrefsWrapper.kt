@@ -180,11 +180,12 @@ class SharedPrefsWrapper(
                 }
                 return identity.toPreservedByteArray
             }
-            return SecurePreferences.getStringValue(
+            val torIdentity = SecurePreferences.getStringValue(
                 context,
                 Key.torIdentity,
                 null
-            )?.toPreservedByteArray
+            )
+            return torIdentity?.toPreservedByteArray
         }
         set(value) {
             if (value != null) {
