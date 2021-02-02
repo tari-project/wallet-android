@@ -797,6 +797,10 @@ internal class FFIWallet(
         return result
     }
 
+    fun logMessage(message: String) {
+        jniLogMessage(message)
+    }
+
     override fun destroy() {
         listener = null
         jniDestroy()

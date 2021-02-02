@@ -43,11 +43,12 @@ class FFITransportTypeTest {
                 torMod.provideTorControlAddress(),
                 torMod.provideTorControlPort()
             )
-        // TODO Extend to test identity as well
         val transport = FFITransportType(
-            addressString, torMod.provideConnectionPort(), cookie,
-            FFIByteVector(nullptr),
-            torMod.provideTorSock5Username(), torMod.provideTorSock5Password()
+            addressString,
+            torMod.provideConnectionPort(),
+            cookie,
+            torMod.provideTorSock5Username(),
+            torMod.provideTorSock5Password()
         )
         assertNotEquals(nullptr, transport.pointer)
         transport.destroy()

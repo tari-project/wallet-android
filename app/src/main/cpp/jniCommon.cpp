@@ -36,6 +36,21 @@
 #include <cmath>
 #include <android/log.h>
 
+#define LOG_TAG "Tari Wallet"
+
+/**
+ * Log functions. Log example:
+ *
+ * int count = 5;
+ * LOGE("Count is %d", count);
+ * char[] name = "asd";
+ * LOGI("Name is %s", name);
+ */
+#define LOGE(...) __android_log_print(ANDROID_LOG_ERROR,    LOG_TAG, __VA_ARGS__)
+#define LOGW(...) __android_log_print(ANDROID_LOG_WARN,     LOG_TAG, __VA_ARGS__)
+#define LOGI(...) __android_log_print(ANDROID_LOG_INFO,     LOG_TAG, __VA_ARGS__)
+#define LOGD(...) __android_log_print(ANDROID_LOG_DEBUG,    LOG_TAG, __VA_ARGS__)
+
 inline jlong GetPointerField(JNIEnv *jEnv, jobject jThis) {
     jclass cls = jEnv->GetObjectClass(jThis);
     jfieldID fid = jEnv->GetFieldID(cls, "pointer", "J");

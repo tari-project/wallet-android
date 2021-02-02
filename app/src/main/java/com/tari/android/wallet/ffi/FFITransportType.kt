@@ -53,11 +53,10 @@ internal class FFITransportType() : FFIBase() {
 
     private external fun jniTorTransport(
         control_server_address: String,
-        tor_port: Int,
-        tor_cookie: FFIByteVector,
-        tor_identity: FFIByteVector,
-        socks_username: String,
-        socks_password: String,
+        torPort: Int,
+        torCookie: FFIByteVector,
+        socksUsername: String,
+        socksPassword: String,
         libError: FFIError
     )
 
@@ -87,7 +86,6 @@ internal class FFITransportType() : FFIBase() {
         controlAddress: NetAddressString,
         torPort: Int,
         torCookie: FFIByteVector,
-        torIdentity: FFIByteVector,
         socksUsername: String,
         socksPassword: String
     ) : this() {
@@ -96,7 +94,6 @@ internal class FFITransportType() : FFIBase() {
             controlAddress.toString(),
             torPort,
             torCookie,
-            torIdentity,
             socksUsername,
             socksPassword,
             error

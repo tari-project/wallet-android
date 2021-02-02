@@ -58,7 +58,6 @@ class TorModule {
         const val torControlPort = "tor_control_port"
         const val torControlHost = "tor_control_host"
         const val torCookieFilePath = "tor_cookie_file_path"
-        const val torIdentity = "tor_identity"
         const val torSock5Username = "tor_sock5_username"
         const val torSock5Password = "tor_sock5_password"
     }
@@ -121,16 +120,6 @@ class TorModule {
     }
 
     /**
-     * Provides identity for Tor.
-     */
-    @Provides
-    @Named(FieldName.torIdentity)
-    @Singleton
-    internal fun provideTorIdentity(sharedPrefsWrapper: SharedPrefsWrapper): ByteArray? {
-        return sharedPrefsWrapper.torIdentity
-    }
-
-    /**
      * Provides sock5 username for Tor.
      */
     @Provides
@@ -161,7 +150,6 @@ class TorModule {
         @Named(FieldName.torProxyPort) proxyPort: Int,
         @Named(FieldName.torConnectionPort) connectionPort: Int,
         @Named(FieldName.torCookieFilePath) cookieFilePath: String,
-        @Named(FieldName.torIdentity) torIdentity: ByteArray?,
         @Named(FieldName.torSock5Username) sock5Username: String,
         @Named(FieldName.torSock5Password) sock5Passsword: String
     ): TorConfig {
@@ -171,7 +159,6 @@ class TorModule {
             proxyPort = proxyPort,
             connectionPort = connectionPort,
             cookieFilePath = cookieFilePath,
-            identity = torIdentity,
             sock5Username = sock5Username,
             sock5Password = sock5Passsword
         )

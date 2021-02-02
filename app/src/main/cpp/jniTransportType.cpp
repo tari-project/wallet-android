@@ -72,7 +72,6 @@ Java_com_tari_android_wallet_ffi_FFITransportType_jniTorTransport(
         jstring jpControl,
         jint jPort,
         jobject jpTorCookie,
-        jobject jpTorIdentity,
         jstring jpSocksUser,
         jstring jpSocksPass,
         jobject error) {
@@ -81,11 +80,9 @@ Java_com_tari_android_wallet_ffi_FFITransportType_jniTorTransport(
     char *pControl = const_cast<char *>(jEnv->GetStringUTFChars(jpControl, JNI_FALSE));
     jlong lTorCookie = GetPointerField(jEnv, jpTorCookie);
     auto *pTorCookie = reinterpret_cast<ByteVector *>(lTorCookie);
-    jlong lTorIdentity = GetPointerField(jEnv, jpTorIdentity);
-    auto *pTorIdentity = reinterpret_cast<ByteVector *>(lTorIdentity);
     char *pSocksUsername = const_cast<char *>(jEnv->GetStringUTFChars(jpSocksUser, JNI_FALSE));
     char *pSocksPassword = const_cast<char *>(jEnv->GetStringUTFChars(jpSocksPass, JNI_FALSE));
-    TariTransportType *transport = transport_tor_create(pControl, pTorCookie, pTorIdentity,
+    TariTransportType *transport = transport_tor_create(pControl, pTorCookie,
                                                         static_cast<unsigned short>(jPort),
                                                         pSocksUsername, pSocksPassword, r);
     jEnv->ReleaseStringUTFChars(jpControl, pControl);

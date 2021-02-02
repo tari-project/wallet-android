@@ -41,16 +41,16 @@ class DeepLinkTest {
 
     @Test
     fun `from, assert that emoji id for testnet is deserialized correctly`() {
-        val givenLink = "tari://ridcully/eid/$EMOJI_SEQUENCE"
+        val givenLink = "tari://stibbons/eid/$EMOJI_SEQUENCE"
         val result = DeepLink.from(givenLink)!!
-        assertEquals(result.network, Network.RIDCULLY)
+        assertEquals(result.network, Network.STIBBONS)
         assertEquals(result.type, DeepLink.Type.EMOJI_ID)
         assertEquals(result.identifier, EMOJI_SEQUENCE)
     }
 
     @Test
     fun `from, assert that emoji id for testnet is not deserialized if there are 32 emojis`() {
-        val givenLink = "tari://ridcully/eid/$CUT_EMOJI_SEQUENCE"
+        val givenLink = "tari://stibbons/eid/$CUT_EMOJI_SEQUENCE"
         val result = DeepLink.from(givenLink)
         assertNull(result)
     }
@@ -73,16 +73,16 @@ class DeepLinkTest {
 
     @Test
     fun `from, assert that public key for testnet is deserialized correctly`() {
-        val givenLink = "tari://ridcully/pubkey/$PUBLIC_KEY"
+        val givenLink = "tari://stibbons/pubkey/$PUBLIC_KEY"
         val result = DeepLink.from(givenLink)!!
-        assertEquals(result.network, Network.RIDCULLY)
+        assertEquals(result.network, Network.STIBBONS)
         assertEquals(result.type, DeepLink.Type.PUBLIC_KEY_HEX)
         assertEquals(result.identifier, PUBLIC_KEY)
     }
 
     @Test
     fun `from, assert that public key for testnet is not deserialized correctly if it consists of 63 symbols`() {
-        val givenLink = "tari://ridcully/pubkey/$PUBLIC_KEY"
+        val givenLink = "tari://stibbons/pubkey/$PUBLIC_KEY"
         val result = DeepLink.from(givenLink.substring(0, givenLink.length - 1))
         assertNull(result)
     }

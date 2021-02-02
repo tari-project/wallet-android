@@ -122,11 +122,6 @@ internal class WalletManager(
         val cookieFile = File(torConfig.cookieFilePath)
         val cookieString = cookieFile.readBytes()
         val torCookie = FFIByteVector(cookieString)
-        val torIdentity = if (torConfig.identity != null) {
-            FFIByteVector(torConfig.identity)
-        } else {
-            FFIByteVector(nullptr)
-        }
         return FFITransportType(
             NetAddressString(
                 torConfig.controlHost,
@@ -134,7 +129,6 @@ internal class WalletManager(
             ),
             torConfig.connectionPort,
             torCookie,
-            torIdentity,
             torConfig.sock5Username,
             torConfig.sock5Password
         )
