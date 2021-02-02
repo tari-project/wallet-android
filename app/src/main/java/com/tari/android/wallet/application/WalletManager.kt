@@ -34,8 +34,6 @@ package com.tari.android.wallet.application
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.os.Handler
-import android.os.Looper
 import com.orhanobut.logger.Logger
 import com.tari.android.wallet.BuildConfig
 import com.tari.android.wallet.R
@@ -234,9 +232,6 @@ internal class WalletManager(
                 walletLogFilePath
             )
             FFIWallet.instance = wallet
-            Handler(Looper.getMainLooper()).post {
-                sharedPrefsWrapper.torIdentity = wallet.getTorIdentity()
-            }
             if (isNewInstallation) {
                 sharedPrefsWrapper.network = Constants.Wallet.network
                 FFIWallet.instance?.setKeyValue(

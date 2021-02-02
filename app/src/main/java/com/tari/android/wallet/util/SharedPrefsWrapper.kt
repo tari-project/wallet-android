@@ -43,16 +43,6 @@ import de.adorsys.android.securestoragelibrary.SecurePreferences
 import org.joda.time.DateTime
 import java.math.BigInteger
 
-private val String.toPreservedByteArray: ByteArray
-    get() {
-        return this.toByteArray(Charsets.ISO_8859_1)
-    }
-
-private val ByteArray.toPreservedString: String
-    get() {
-        return String(this, Charsets.ISO_8859_1)
-    }
-
 /**
  * Provides easy access to the shared preferences.
  *
@@ -73,7 +63,6 @@ class SharedPrefsWrapper(
         const val onboardingCompleted = "tari_wallet_onboarding_completed"
         const val onboardingDisplayedAtHome = "tari_wallet_onboarding_displayed_at_home"
         const val torBinPath = "tari_wallet_tor_bin_path"
-        const val torIdentity = "tari_wallet_tor_identity"
         const val baseNodeLastSyncWasSuccessful = "tari_wallet_base_node_last_sync_was_successful"
         const val baseNodeIsUserCustom = "tari_wallet_base_node_is_user_custom"
         const val baseNodeNameKey = "tari_wallet_base_node_name"
@@ -162,44 +151,6 @@ class SharedPrefsWrapper(
         set(value) = sharedPrefs.edit().run {
             putString(Key.torBinPath, value)
             apply()
-        }
-
-    var torIdentity: ByteArray?
-        get() {
-            // migrate the identity from shared prefs to secure prefs
-            val identity = sharedPrefs.getString(Key.torIdentity, null)
-            if (identity != null) {
-                SecurePreferences.setValue(
-                    context,
-                    Key.torIdentity,
-                    identity
-                )
-                sharedPrefs.edit().run {
-                    putString(Key.torIdentity, null)
-                    apply()
-                }
-                return identity.toPreservedByteArray
-            }
-            val torIdentity = SecurePreferences.getStringValue(
-                context,
-                Key.torIdentity,
-                null
-            )
-            return torIdentity?.toPreservedByteArray
-        }
-        set(value) {
-            if (value != null) {
-                SecurePreferences.setValue(
-                    context,
-                    Key.torIdentity,
-                    value.toPreservedString
-                )
-            } else {
-                SecurePreferences.removeValue(
-                    context,
-                    Key.torIdentity
-                )
-            }
         }
 
     var baseNodeLastSyncWasSuccessful: Boolean?
@@ -350,7 +301,6 @@ class SharedPrefsWrapper(
         onboardingAuthSetupCompleted = false
         onboardingDisplayedAtHome = false
         torBinPath = null
-        torIdentity = null
         baseNodeLastSyncWasSuccessful = false
         baseNodeIsUserCustom = false
         baseNodeName = null

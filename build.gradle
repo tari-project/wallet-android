@@ -5,7 +5,7 @@ buildscript {
 
     // build & version
     ext.buildNumber = 149
-    ext.versionNumber = "0.5.4"
+    ext.versionNumber = "0.6.0"
 
     // JNI libs
     ext.libwalletVersion = "0.16.17"
