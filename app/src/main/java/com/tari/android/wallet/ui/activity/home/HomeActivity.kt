@@ -244,6 +244,11 @@ internal class HomeActivity : AppCompatActivity(), AllSettingsFragment.AllSettin
                 })
             findViewById<View>(R.id.incompatible_network_reset_later_button)
                 .setOnClickListener(ThrottleClick {
+                    /**
+                     * User has been let know of the incompatible network and dismissed the alert.
+                     * Set the network and carry on.
+                     */
+                    sharedPrefsWrapper.network = Constants.Wallet.network
                     dismiss()
                 })
         }.show()
