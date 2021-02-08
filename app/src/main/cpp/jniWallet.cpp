@@ -1246,4 +1246,41 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniRemoveKeyValue(
     return result;
 }
 
+extern "C"
+JNIEXPORT jbyteArray JNICALL
+Java_com_tari_android_wallet_ffi_FFIWallet_jniGetConfirmations(
+        JNIEnv *jEnv,
+        jobject jThis,
+        jobject error) {
+    int i = 0;
+    int *r = &i;
+    jlong lWallet = GetPointerField(jEnv, jThis);
+    auto *pWallet = reinterpret_cast<TariWallet *>(lWallet);
+    jbyteArray result = getBytesFromUnsignedLongLong(
+            jEnv,
+            wallet_get_num_confirmations_required(pWallet, r)
+            );
+    setErrorCode(jEnv, error, i);
+    return result;
+}
+
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_tari_android_wallet_ffi_FFIWallet_jniSetConfirmations(
+        JNIEnv *jEnv,
+        jobject jThis,
+        jstring jNumber,
+        jobject error) {
+    int i = 0;
+    int *r = &i;
+    jlong lWallet = GetPointerField(jEnv, jThis);
+    auto *pWallet = reinterpret_cast<TariWallet *>(lWallet);
+    const char *nativeString = jEnv->GetStringUTFChars(jNumber, JNI_FALSE);
+    char *pEnd;
+    unsigned long long number = strtoull(nativeString, &pEnd, 10);
+    wallet_set_num_confirmations_required(pWallet, number, r);
+    jEnv->ReleaseStringUTFChars(jNumber, nativeString);
+    setErrorCode(jEnv, error, i);
+}
+
 //endregion
