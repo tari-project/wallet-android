@@ -208,10 +208,6 @@ internal class FFIWallet(
         libError: FFIError
     ): ByteArray
 
-    private external fun jniGetTorIdentity(
-        libError: FFIError
-    ): FFIPointer
-
     private external fun jniPowerModeNormal(
         libError: FFIError
     )
@@ -738,13 +734,6 @@ internal class FFIWallet(
         val bytes = jniSyncWithBaseNode(error)
         throwIf(error)
         return BigInteger(1, bytes)
-    }
-
-    fun getTorIdentity(): ByteArray {
-        val error = FFIError()
-        val resultPtr = jniGetTorIdentity(error)
-        throwIf(error)
-        return FFIByteVector(resultPtr).getBytes()
     }
 
     fun setPowerModeNormal() {
