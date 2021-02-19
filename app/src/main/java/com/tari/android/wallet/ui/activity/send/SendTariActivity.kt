@@ -189,8 +189,7 @@ internal class SendTariActivity : AppCompatActivity(),
     override fun continueToAddNote(
         sourceFragment: AddAmountFragment,
         recipientUser: User,
-        amount: MicroTari,
-        fee: MicroTari
+        amount: MicroTari
     ) {
         if (EventBus.networkConnectionStateSubject.value != NetworkConnectionState.CONNECTED) {
             showInternetConnectionErrorDialog(this)
@@ -199,7 +198,6 @@ internal class SendTariActivity : AppCompatActivity(),
         val bundle = Bundle().apply {
             putParcelable("recipientUser", recipientUser)
             putParcelable("amount", amount)
-            putParcelable("fee", fee)
             intent.getStringExtra(DeepLink.PARAMETER_NOTE)
                 ?.let { putString(DeepLink.PARAMETER_NOTE, it) }
         }
@@ -234,14 +232,12 @@ internal class SendTariActivity : AppCompatActivity(),
         sourceFragment: AddNoteFragment,
         recipientUser: User,
         amount: MicroTari,
-        fee: MicroTari,
         note: String
     ) {
         val fragment = FinalizeSendTxFragment().apply {
             arguments = Bundle().apply {
                 putParcelable("recipientUser", recipientUser)
                 putParcelable("amount", amount)
-                putParcelable("fee", fee)
                 putString("note", note)
             }
         }
@@ -272,7 +268,6 @@ internal class SendTariActivity : AppCompatActivity(),
         sourceFragment: FinalizeSendTxFragment,
         recipientUser: User,
         amount: MicroTari,
-        fee: MicroTari,
         note: String,
         failureReason: FinalizeSendTxFragment.FailureReason
     ) {
@@ -287,7 +282,6 @@ internal class SendTariActivity : AppCompatActivity(),
         txId: TxId,
         recipientUser: User,
         amount: MicroTari,
-        fee: MicroTari,
         note: String
     ) {
         sendTxIsInProgress = false

@@ -32,9 +32,10 @@
  */
 package com.tari.android.wallet.ui.fragment.debug
 
-import android.content.ClipboardManager
+import android.content.*
 import android.content.Context.CLIPBOARD_SERVICE
 import android.os.Bundle
+import android.os.IBinder
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -42,6 +43,7 @@ import android.widget.Toast
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
+import com.orhanobut.logger.Logger
 import com.tari.android.wallet.R
 import com.tari.android.wallet.R.color.white
 import com.tari.android.wallet.R.drawable.base_node_config_edit_text_bg
@@ -53,6 +55,10 @@ import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.ffi.FFIPublicKey
 import com.tari.android.wallet.ffi.FFIWallet
 import com.tari.android.wallet.ffi.HexString
+import com.tari.android.wallet.model.BaseNodeValidationResult
+import com.tari.android.wallet.model.WalletError
+import com.tari.android.wallet.service.TariWalletService
+import com.tari.android.wallet.service.WalletService
 import com.tari.android.wallet.ui.extension.*
 import com.tari.android.wallet.util.SharedPrefsWrapper
 import kotlinx.coroutines.Dispatchers
@@ -68,7 +74,7 @@ import javax.inject.Inject
  *
  * @author The Tari Development Team
  */
-internal class BaseNodeConfigFragment : Fragment() {
+internal class BaseNodeConfigFragment : Fragment(), ServiceConnection {
 
     @Inject
     lateinit var sharedPrefsWrapper: SharedPrefsWrapper
@@ -81,14 +87,14 @@ internal class BaseNodeConfigFragment : Fragment() {
     private val onion2AddressRegex = Regex("/onion/[a-zA-Z2-7]{16}(:[0-9]+)?")
     private val onion3AddressRegex = Regex("/onion[2-3]/[a-zA-Z2-7]{56}(:[0-9]+)?")
 
-
     private lateinit var ui: FragmentBaseNodeConfigBinding
+    private lateinit var walletService: TariWalletService
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? =
+    ): View =
         FragmentBaseNodeConfigBinding.inflate(inflater, container, false)
             .also { ui = it }
             .root
@@ -96,6 +102,7 @@ internal class BaseNodeConfigFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         appComponent.inject(this)
+        bindToWalletService()
         setupUI()
         subscribeToEventBus()
     }
@@ -123,6 +130,23 @@ internal class BaseNodeConfigFragment : Fragment() {
         }
     }
 
+    private fun bindToWalletService() {
+        val bindIntent = Intent(requireActivity(), WalletService::class.java)
+        requireActivity().bindService(bindIntent, this, Context.BIND_AUTO_CREATE)
+    }
+
+    override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
+        Logger.i("AddAmountFragment onServiceConnected")
+        walletService = TariWalletService.Stub.asInterface(service)
+        // Only binding UI if we have not passed `onDestroyView` line, which is a possibility
+        setupUI()
+    }
+
+    override fun onServiceDisconnected(name: ComponentName?) {
+        Logger.i("AddAmountFragment onServiceDisconnected")
+        // No-op for now
+    }
+
     private fun setupUI() {
         ui.progressBar.setColor(color(white))
         ui.apply {
@@ -142,12 +166,12 @@ internal class BaseNodeConfigFragment : Fragment() {
     }
 
     private fun updateCurrentBaseNode() {
-        val syncSuccessful = sharedPrefsWrapper.baseNodeLastSyncWasSuccessful
+        val syncSuccessful = sharedPrefsWrapper.baseNodeLastSyncResult
         ui.syncStatusTextView.text = when (syncSuccessful) {
             null -> {
                 string(R.string.debug_base_node_syncing)
             }
-            true -> {
+            BaseNodeValidationResult.SUCCESS -> {
                 string(R.string.debug_base_node_sync_successful)
             }
             else -> {
@@ -223,10 +247,10 @@ internal class BaseNodeConfigFragment : Fragment() {
     private fun resetButtonClicked(view: View) {
         view.temporarilyDisableClick()
         sharedPrefsWrapper.baseNodeIsUserCustom = false
-        sharedPrefsWrapper.baseNodeLastSyncWasSuccessful = null
+        sharedPrefsWrapper.baseNodeLastSyncResult = null
         lifecycleScope.launch(Dispatchers.IO) {
             walletManager.setNextBaseNode()
-            FFIWallet.instance!!.syncWithBaseNode()
+            walletService.startBaseNodeSync(WalletError())
             withContext(Dispatchers.Main) {
                 updateCurrentBaseNode()
             }
@@ -239,7 +263,7 @@ internal class BaseNodeConfigFragment : Fragment() {
         val publicKeyHex = ui.publicKeyHexEditText.editableText.toString()
         val address = ui.addressEditText.editableText.toString()
         sharedPrefsWrapper.baseNodeIsUserCustom = true
-        sharedPrefsWrapper.baseNodeLastSyncWasSuccessful = null
+        sharedPrefsWrapper.baseNodeLastSyncResult = null
         sharedPrefsWrapper.baseNodeName = null
         sharedPrefsWrapper.baseNodePublicKeyHex = publicKeyHex
         sharedPrefsWrapper.baseNodeAddress = address
@@ -255,7 +279,6 @@ internal class BaseNodeConfigFragment : Fragment() {
         val success = try {
             val wallet = FFIWallet.instance!!
             wallet.addBaseNodePeer(baseNodeKeyFFI, address)
-            wallet.syncWithBaseNode()
             true
         } catch (exception: Exception) {
             false
@@ -267,6 +290,7 @@ internal class BaseNodeConfigFragment : Fragment() {
             }
         } else {
             walletManager.setNextBaseNode()
+            walletService.startBaseNodeSync(WalletError())
             withContext(Dispatchers.Main) {
                 addBaseNodePeerFailed()
             }

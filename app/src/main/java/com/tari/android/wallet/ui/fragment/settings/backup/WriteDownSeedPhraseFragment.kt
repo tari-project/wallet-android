@@ -61,7 +61,7 @@ framework for UI tree rebuild on configuration changes"""
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? = FragmentWriteDownSeedPhraseBinding.inflate(inflater, container, false)
+    ): View = FragmentWriteDownSeedPhraseBinding.inflate(inflater, container, false)
         .also { ui = it }.root
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

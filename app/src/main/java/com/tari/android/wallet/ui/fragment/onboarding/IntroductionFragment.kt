@@ -99,7 +99,7 @@ internal class IntroductionFragment : Fragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? =
+    ): View =
         FragmentIntroductionBinding.inflate(inflater, container, false).also { ui = it }.root
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -191,7 +191,7 @@ internal class IntroductionFragment : Fragment() {
             ui.videoOuterContainerView.height
         )
         ui.videoInnerContainerView.setLayoutSize(size, size)
-        ui.rainAnimationVideoView.setVideoURI(context!!.getResourceUri(R.raw.purple_orb))
+        ui.rainAnimationVideoView.setVideoURI(requireContext().getResourceUri(R.raw.purple_orb))
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             ui.rainAnimationVideoView.setAudioFocusRequest(AudioManager.AUDIOFOCUS_NONE)
         }

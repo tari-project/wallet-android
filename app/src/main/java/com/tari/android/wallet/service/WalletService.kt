@@ -74,9 +74,7 @@ import org.joda.time.Hours
 import org.joda.time.Minutes
 import java.math.BigInteger
 import java.util.*
-import java.util.concurrent.CopyOnWriteArrayList
-import java.util.concurrent.CopyOnWriteArraySet
-import java.util.concurrent.TimeUnit
+import java.util.concurrent.*
 import javax.inject.Inject
 import javax.inject.Named
 import kotlin.collections.ArrayList
@@ -202,6 +200,21 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
 
     private var lowPowerModeSubscription: Disposable? = null
 
+    private enum class BaseNodeValidationType {
+        UTXO,
+        STXO,
+        INVALID_TXO,
+        TX;
+    }
+
+    /**
+     * Maps the validation type to the request id and validation result. This map will be
+     * initialized at the beginning of each base node validation sequence.
+     * Validation results will all be null, and will be set as the result callbacks get called.
+     */
+    private var baseNodeValidationStatusMap:
+            ConcurrentMap<BaseNodeValidationType, Pair<BigInteger, BaseNodeValidationResult?>> = ConcurrentHashMap()
+
     override fun onCreate() {
         super.onCreate()
         (application as TariWalletApplication).appComponent.inject(this)
@@ -280,7 +293,7 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
     /**
      * Bound service.
      */
-    override fun onBind(intent: Intent?): IBinder? {
+    override fun onBind(intent: Intent?): IBinder {
         Logger.d("Wallet service bound.")
         return serviceImpl
     }
@@ -336,22 +349,6 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
             wallet.setPowerModeLow()
         } catch (e: FFIException) { // silent fail
             Logger.e("FFI error #${e.error?.code} while switching to low power mode.")
-        }
-    }
-
-    override fun onBaseNodeSyncComplete(requestId: BigInteger, success: Boolean) {
-        Logger.d("Request $requestId base node sync complete. Success: $success")
-        // post event to bus
-        EventBus.post(Event.Wallet.BaseNodeSyncComplete(RequestId(requestId), success))
-        // notify external listeners
-        listeners.iterator().forEach {
-            it.onBaseNodeSyncComplete(RequestId(requestId), success)
-        }
-        sharedPrefsWrapper.baseNodeLastSyncWasSuccessful = success
-        // add the next base node from the list if sync has failed
-        // only if the base node setting isn't user custom
-        if (!success && !sharedPrefsWrapper.baseNodeIsUserCustom) {
-            walletManager.setNextBaseNode()
         }
     }
 
@@ -433,6 +430,21 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
         backupManager.scheduleBackup(resetRetryCount = true)
     }
 
+    override fun onTxMinedUnconfirmed(completedTx: CompletedTx, confirmationCount: Int) {
+        Logger.d(
+            "Tx ${completedTx.id} mined, yet unconfirmed. Confirmation count: $confirmationCount"
+        )
+        completedTx.user = getUserByPublicKey(completedTx.user.publicKey)
+        // post event to bus for the internal listeners
+        EventBus.post(Event.Wallet.TxMinedUnconfirmed(completedTx, confirmationCount))
+        // notify external listeners
+        listeners.iterator().forEach {
+            it.onTxMinedUnconfirmed(completedTx, confirmationCount)
+        }
+        // schedule a backup
+        backupManager.scheduleBackup(resetRetryCount = true)
+    }
+
     override fun onDirectSendResult(txId: BigInteger, success: Boolean) {
         Logger.d("Tx $txId direct send completed. Success: $success")
         // post event to bus
@@ -487,12 +499,102 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
         backupManager.scheduleBackup(resetRetryCount = true)
     }
 
-    override fun onStoreAndForwardMessagesReceived() {
-        Logger.d("Store and forward messages received.")
-        // post event to bus
-        EventBus.post(Event.Wallet.StoreAndForwardMessagesReceived())
-        // notify external listeners
-        listeners.iterator().forEach { listener -> listener.onStoreAndForwardMessagesReceived() }
+    private fun checkBaseNodeSyncCompletion() {
+        // make a copy of the status map for concurrency protection
+        val statusMapCopy = baseNodeValidationStatusMap.toMap()
+        // if base node not in sync, then switch to the next base node
+        val baseNodeNotInSync = statusMapCopy.filter {
+            it.value.second != null && it.value.second == BaseNodeValidationResult.BASE_NODE_NOT_IN_SYNC
+        }.isNotEmpty()
+        if (baseNodeNotInSync) {
+            baseNodeValidationStatusMap.clear()
+            sharedPrefsWrapper.baseNodeLastSyncResult = BaseNodeValidationResult.BASE_NODE_NOT_IN_SYNC
+            if (!sharedPrefsWrapper.baseNodeIsUserCustom) {
+                walletManager.setNextBaseNode()
+            }
+            EventBus.post(Event.Wallet.BaseNodeSyncComplete(BaseNodeValidationResult.BASE_NODE_NOT_IN_SYNC))
+            listeners.iterator().forEach { it.onBaseNodeSyncComplete(false) }
+            return
+        }
+        // check if any is aborted
+        val aborted = statusMapCopy.filter {
+            it.value.second != null && it.value.second == BaseNodeValidationResult.ABORTED
+        }.isNotEmpty()
+        if (aborted) {
+            baseNodeValidationStatusMap.clear()
+            sharedPrefsWrapper.baseNodeLastSyncResult = BaseNodeValidationResult.ABORTED
+            EventBus.post(Event.Wallet.BaseNodeSyncComplete(BaseNodeValidationResult.ABORTED))
+            return
+        }
+        // check if any has failed
+        val failed = statusMapCopy.filter {
+            it.value.second != null && it.value.second == BaseNodeValidationResult.FAILURE
+        }.isNotEmpty()
+        if (failed) {
+            baseNodeValidationStatusMap.clear()
+            sharedPrefsWrapper.baseNodeLastSyncResult = BaseNodeValidationResult.FAILURE
+            if (!sharedPrefsWrapper.baseNodeIsUserCustom) {
+                walletManager.setNextBaseNode()
+            }
+            EventBus.post(Event.Wallet.BaseNodeSyncComplete(BaseNodeValidationResult.FAILURE))
+            listeners.iterator().forEach { it.onBaseNodeSyncComplete(false) }
+            return
+        }
+        // if any of the results is null, we're still waiting for all callbacks to happen
+        val inProgress = statusMapCopy.filter { it.value.second == null }.isNotEmpty()
+        if (inProgress) { return }
+        // check if it's successful
+        val successful = statusMapCopy.filter {
+            it.value.second != null && it.value.second != BaseNodeValidationResult.SUCCESS
+        }.isEmpty()
+        if (successful) {
+            baseNodeValidationStatusMap.clear()
+            sharedPrefsWrapper.baseNodeLastSyncResult = BaseNodeValidationResult.SUCCESS
+            EventBus.post(Event.Wallet.BaseNodeSyncComplete(BaseNodeValidationResult.SUCCESS))
+            listeners.iterator().forEach { it.onBaseNodeSyncComplete(true) }
+        }
+        // shouldn't ever reach here - no-op
+    }
+
+    private fun checkValidationResult(type: BaseNodeValidationType,
+                                      responseId: BigInteger,
+                                      result: BaseNodeValidationResult) {
+        val currentStatus = baseNodeValidationStatusMap[type]
+        if (currentStatus == null) {
+            Logger.d(
+                type.name + " validation [$responseId] complete. Result: $result."
+                        + " Current status is null, means we're not expecting a callback. Ignoring."
+            )
+            return
+        }
+        if (currentStatus.first != responseId) {
+            Logger.d(
+                type.name + " Validation [$responseId] complete. Result: $result."
+                        + " Request id [${currentStatus.first}] mismatch. Ignoring."
+            )
+        }
+        Logger.d(type.name + " Validation [$responseId] complete. Result: $result.")
+        baseNodeValidationStatusMap[type] = Pair(
+            currentStatus.first,
+            result
+        )
+        checkBaseNodeSyncCompletion()
+    }
+
+    override fun onUTXOValidationComplete(responseId: BigInteger, result: BaseNodeValidationResult) {
+        checkValidationResult(BaseNodeValidationType.UTXO, responseId, result)
+    }
+
+    override fun onSTXOValidationComplete(responseId: BigInteger, result: BaseNodeValidationResult) {
+        checkValidationResult(BaseNodeValidationType.STXO, responseId, result)
+    }
+
+    override fun onInvalidTXOValidationComplete(responseId: BigInteger, result: BaseNodeValidationResult) {
+        checkValidationResult(BaseNodeValidationType.INVALID_TXO, responseId, result)
+    }
+
+    override fun onTxValidationComplete(responseId: BigInteger, result: BaseNodeValidationResult) {
+        checkValidationResult(BaseNodeValidationType.TX, responseId, result)
     }
 
     /**
@@ -541,7 +643,9 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
     private fun postTxNotification(tx: Tx) {
         // if app is backgrounded, display heads-up notification
         val currentActivity = app.currentActivity
-        if (!app.isInForeground || currentActivity !is HomeActivity || !currentActivity.willNotifyAboutNewTx()) {
+        if (!app.isInForeground
+            || currentActivity !is HomeActivity
+            || !currentActivity.willNotifyAboutNewTx()) {
             notificationHelper.postCustomLayoutTxNotification(tx)
         }
     }
@@ -1013,6 +1117,9 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
                 val publicKeyFFI = FFIPublicKey(HexString(baseNodePublicKey))
                 val result = wallet.addBaseNodePeer(publicKeyFFI, baseNodeAddress)
                 publicKeyFFI.destroy()
+                if (result) {
+                    baseNodeValidationStatusMap.clear()
+                }
                 result
             } catch (throwable: Throwable) {
                 mapThrowableIntoError(throwable, error)
@@ -1020,22 +1127,42 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
             }
         }
 
-        override fun syncWithBaseNode(error: WalletError): RequestId? {
+        override fun startBaseNodeSync(error: WalletError): Boolean {
+            baseNodeValidationStatusMap.clear()
             return try {
-                val requestId = RequestId(wallet.syncWithBaseNode())
-                sharedPrefsWrapper.baseNodeLastSyncWasSuccessful = null
-                EventBus.post(Event.Wallet.BaseNodeSyncStarted(requestId))
-                requestId
+                baseNodeValidationStatusMap[BaseNodeValidationType.UTXO] = Pair(
+                    wallet.startUTXOValidation(),
+                    null
+                )
+                baseNodeValidationStatusMap[BaseNodeValidationType.STXO] = Pair(
+                    wallet.startSTXOValidation(),
+                    null
+                )
+                baseNodeValidationStatusMap[BaseNodeValidationType.INVALID_TXO] = Pair(
+                    wallet.startInvalidTXOValidation(),
+                    null
+                )
+                baseNodeValidationStatusMap[BaseNodeValidationType.TX] = Pair(
+                    wallet.startTxValidation(),
+                    null
+                )
+                sharedPrefsWrapper.baseNodeLastSyncResult = null
+                EventBus.post(Event.Wallet.BaseNodeSyncStarted)
+                true
             } catch (throwable: Throwable) {
+                Logger.e("Base node validation error: $throwable")
+                sharedPrefsWrapper.baseNodeLastSyncResult = BaseNodeValidationResult.FAILURE
+                baseNodeValidationStatusMap.clear()
                 mapThrowableIntoError(throwable, error)
-                null
+                false
             }
+
         }
 
         override fun sendTari(
             user: User,
             amount: MicroTari,
-            fee: MicroTari,
+            feePerGram: MicroTari,
             message: String,
             error: WalletError
         ): TxId? {
@@ -1045,7 +1172,7 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
                 val txId = wallet.sendTx(
                     publicKeyFFI,
                     amount.value,
-                    fee.value,
+                    feePerGram.value,
                     message
                 )
                 publicKeyFFI.destroy()
@@ -1075,15 +1202,7 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
         ): CompletedTx {
             val sourcePublicKeyFFI = completedTxFFI.getSourcePublicKey()
             val destinationPublicKeyFFI = completedTxFFI.getDestinationPublicKey()
-            val status = when (completedTxFFI.getStatus()) {
-                FFITxStatus.TX_NULL_ERROR -> TxStatus.TX_NULL_ERROR
-                FFITxStatus.BROADCAST -> TxStatus.BROADCAST
-                FFITxStatus.COMPLETED -> TxStatus.COMPLETED
-                FFITxStatus.MINED -> TxStatus.MINED
-                FFITxStatus.IMPORTED -> TxStatus.IMPORTED
-                FFITxStatus.PENDING -> TxStatus.PENDING
-                FFITxStatus.UNKNOWN -> TxStatus.UNKNOWN
-            }
+            val status = TxStatus.map(completedTxFFI.getStatus())
             val user: User
             val direction: Tx.Direction
 
@@ -1137,15 +1256,7 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
         ): CancelledTx {
             val sourcePublicKeyFFI = completedTxFFI.getSourcePublicKey()
             val destinationPublicKeyFFI = completedTxFFI.getDestinationPublicKey()
-            val status = when (completedTxFFI.getStatus()) {
-                FFITxStatus.TX_NULL_ERROR -> TxStatus.TX_NULL_ERROR
-                FFITxStatus.BROADCAST -> TxStatus.BROADCAST
-                FFITxStatus.COMPLETED -> TxStatus.COMPLETED
-                FFITxStatus.MINED -> TxStatus.MINED
-                FFITxStatus.IMPORTED -> TxStatus.IMPORTED
-                FFITxStatus.PENDING -> TxStatus.PENDING
-                FFITxStatus.UNKNOWN -> TxStatus.UNKNOWN
-            }
+            val status = TxStatus.map(completedTxFFI.getStatus())
             val user: User
             val direction: Tx.Direction
 
@@ -1199,15 +1310,7 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
             pendingInboundTxFFI: FFIPendingInboundTx,
             allContacts: List<Contact>
         ): PendingInboundTx {
-            val status = when (pendingInboundTxFFI.getStatus()) {
-                FFITxStatus.TX_NULL_ERROR -> TxStatus.TX_NULL_ERROR
-                FFITxStatus.BROADCAST -> TxStatus.BROADCAST
-                FFITxStatus.COMPLETED -> TxStatus.COMPLETED
-                FFITxStatus.MINED -> TxStatus.MINED
-                FFITxStatus.IMPORTED -> TxStatus.IMPORTED
-                FFITxStatus.PENDING -> TxStatus.PENDING
-                FFITxStatus.UNKNOWN -> TxStatus.UNKNOWN
-            }
+            val status = TxStatus.map(pendingInboundTxFFI.getStatus())
             val sourcePublicKeyFFI = pendingInboundTxFFI.getSourcePublicKey()
             val userPublicKey = PublicKey(
                 sourcePublicKeyFFI.toString(),
@@ -1234,15 +1337,7 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
             pendingOutboundTxFFI: FFIPendingOutboundTx,
             allContacts: List<Contact>
         ): PendingOutboundTx {
-            val status = when (pendingOutboundTxFFI.getStatus()) {
-                FFITxStatus.TX_NULL_ERROR -> TxStatus.TX_NULL_ERROR
-                FFITxStatus.BROADCAST -> TxStatus.BROADCAST
-                FFITxStatus.COMPLETED -> TxStatus.COMPLETED
-                FFITxStatus.MINED -> TxStatus.MINED
-                FFITxStatus.IMPORTED -> TxStatus.IMPORTED
-                FFITxStatus.PENDING -> TxStatus.PENDING
-                FFITxStatus.UNKNOWN -> TxStatus.UNKNOWN
-            }
+            val status = TxStatus.map(pendingOutboundTxFFI.getStatus())
             val destinationPublicKeyFFI = pendingOutboundTxFFI.getDestinationPublicKey()
             val userPublicKey = PublicKey(
                 destinationPublicKeyFFI.toString(),

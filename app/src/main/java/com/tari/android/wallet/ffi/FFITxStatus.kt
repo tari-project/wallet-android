@@ -41,8 +41,27 @@ enum class FFITxStatus {
     TX_NULL_ERROR,
     COMPLETED,
     BROADCAST,
-    MINED,
+    MINED_UNCONFIRMED,
     IMPORTED,
     PENDING,
-    UNKNOWN
+    COINBASE,
+    MINED_CONFIRMED,
+    UNKNOWN;
+    
+    companion object {
+        fun map(status: Int): FFITxStatus {
+            return when (status) {
+                -1 -> TX_NULL_ERROR
+                0 -> COMPLETED
+                1 -> BROADCAST
+                2 -> MINED_UNCONFIRMED
+                3 -> IMPORTED
+                4 -> PENDING
+                5 -> COINBASE
+                6 -> MINED_CONFIRMED
+                7 -> UNKNOWN
+                else -> throw FFIException(message = "Unexpected status: $status")
+            }
+        }
+    }
 }

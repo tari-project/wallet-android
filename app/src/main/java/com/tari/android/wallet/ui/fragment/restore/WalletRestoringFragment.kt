@@ -54,7 +54,7 @@ UI tree rebuild on configuration changes"""
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? =
+    ): View =
         FragmentWalletRestoringBinding.inflate(inflater, container, false).also { ui = it }.root
 
 

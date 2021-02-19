@@ -204,8 +204,7 @@ internal class TxDetailsActivity : AppCompatActivity(), ServiceConnection {
     }
 
     private fun findTxAndUpdateUI(walletService: TariWalletService) {
-        val lookedUpTx =
-            findTxById(intent.getParcelableExtra(TX_ID_EXTRA_KEY) as TxId, walletService)
+        val lookedUpTx = findTxById(intent.getParcelableExtra(TX_ID_EXTRA_KEY)!!, walletService)
         if (lookedUpTx == null) {
             ErrorDialog(
                 this,
@@ -326,7 +325,7 @@ internal class TxDetailsActivity : AppCompatActivity(), ServiceConnection {
         ui.amountTextView.text = WalletUtil.amountFormatter.format(tx.amount.tariValue)
         ui.paymentStateTextView.text = when {
             tx is CancelledTx -> string(tx_detail_payment_cancelled)
-            state.status == MINED || state.status == IMPORTED ->
+            state.status == MINED_CONFIRMED || state.status == IMPORTED ->
                 if (state.direction == INBOUND) string(tx_detail_payment_received)
                 else string(tx_detail_payment_sent)
             else -> string(tx_detail_pending_payment_received)
@@ -393,7 +392,7 @@ internal class TxDetailsActivity : AppCompatActivity(), ServiceConnection {
                 string(tx_detail_waiting_for_sender_to_complete)
             state == TxState(OUTBOUND, PENDING) -> string(tx_detail_waiting_for_recipient)
             state.status == COMPLETED || state.status == BROADCAST ->
-                string(tx_detail_broadcasting)
+                string(tx_detail_completing_final_processing)
             else -> ""
         }
         ui.statusTextView.text = statusText
@@ -760,7 +759,9 @@ internal class TxDetailsActivity : AppCompatActivity(), ServiceConnection {
         ViewModelProvider.Factory {
         @Suppress("UNCHECKED_CAST")
         override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-            require(modelClass === GIFViewModel::class.java) { "Inappropriate ViewModel requested: ${modelClass.simpleName}" }
+            require(modelClass === GIFViewModel::class.java) {
+                "Inappropriate ViewModel requested: ${modelClass.simpleName}"
+            }
             return GIFViewModel(repository, gifId) as T
         }
 

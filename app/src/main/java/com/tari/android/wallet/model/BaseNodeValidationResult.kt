@@ -30,48 +30,29 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.tari.android.wallet.ui.dialog
+package com.tari.android.wallet.model
 
-import android.app.Dialog
-import android.content.Context
-import android.graphics.Color
-import android.graphics.drawable.ColorDrawable
-import android.view.Gravity
-import android.view.View
-import android.widget.LinearLayout
-import com.tari.android.wallet.R
+/**
+ * Validation result, used to indicate the result of a UTXO validation, STXO validation,
+ * invalid TXO validation or transaction validation status.
+ *
+ * @author The Tari Development Team
+ */
+enum class BaseNodeValidationResult(val status: Int) {
+    SUCCESS(0),
+    ABORTED(1),
+    FAILURE(2),
+    BASE_NODE_NOT_IN_SYNC(3);
 
-class BottomSlideDialog private constructor(private val dialog: Dialog) {
-
-
-    constructor(
-        context: Context,
-        layoutId: Int,
-        cancelable: Boolean = true,
-        canceledOnTouchOutside: Boolean = true,
-        dismissViewId: Int? = null
-    ) : this(
-        Dialog(context, R.style.BottomSlideDialog).apply {
-            window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-            setContentView(layoutId)
-            setCancelable(cancelable)
-            setCanceledOnTouchOutside(canceledOnTouchOutside)
-            window?.setLayout(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT
-            )
-            window?.setGravity(Gravity.BOTTOM)
-            dismissViewId?.let { findViewById<View>(it).setOnClickListener { dismiss() } }
-        })
-
-    fun <T : View> findViewById(id: Int): T = dialog.findViewById(id)
-
-    fun show() {
-        dialog.show()
+    companion object {
+        fun map(status: Int): BaseNodeValidationResult? {
+            return when (status) {
+                SUCCESS.status -> SUCCESS
+                ABORTED.status -> ABORTED
+                FAILURE.status -> FAILURE
+                BASE_NODE_NOT_IN_SYNC.status -> BASE_NODE_NOT_IN_SYNC
+                else -> null
+            }
+        }
     }
-
-    fun asAndroidDialog() = dialog
-
-    fun dismiss() = dialog.dismiss()
-
 }

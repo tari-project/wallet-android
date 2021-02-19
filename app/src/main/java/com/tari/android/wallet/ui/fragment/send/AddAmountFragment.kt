@@ -149,7 +149,7 @@ class AddAmountFragment : Fragment(), ServiceConnection {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? = FragmentAddAmountBinding.inflate(inflater, container, false).also { ui = it }.root
+    ): View = FragmentAddAmountBinding.inflate(inflater, container, false).also { ui = it }.root
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -184,7 +184,7 @@ class AddAmountFragment : Fragment(), ServiceConnection {
     }
 
     private fun setupUI() {
-        recipientUser = arguments!!.getParcelable("recipientUser")!!
+        recipientUser = requireArguments().getParcelable("recipientUser")!!
         ui.decimalPointButton.text = decimalSeparator
         currentTextSize = dimen(add_amount_element_text_size)
         currentAmountGemSize = dimen(add_amount_gem_size)
@@ -210,7 +210,7 @@ class AddAmountFragment : Fragment(), ServiceConnection {
             ui.fullEmojiIdContainerView.setLayoutHeight(ui.emojiIdSummaryContainerView.height)
             ui.fullEmojiIdContainerView.setLayoutWidth(ui.emojiIdSummaryContainerView.width)
         }
-        val amount = arguments!!.getDouble(DeepLink.PARAMETER_AMOUNT, Double.MIN_VALUE)
+        val amount = requireArguments().getDouble(DeepLink.PARAMETER_AMOUNT, Double.MIN_VALUE)
         if (isFirstLaunch && amount != Double.MIN_VALUE) {
             val handler = Handler(Looper.getMainLooper())
             amount.toString().withIndex().forEach { (index, char) ->
@@ -930,18 +930,13 @@ class AddAmountFragment : Fragment(), ServiceConnection {
 
     private fun continueToNote() {
         val error = WalletError()
-        val fee = walletService.estimateTxFee(
-            currentAmount,
-            error
-        )
         if (error.code != WalletErrorCode.NO_ERROR) {
             TODO("Unhandled wallet error: ${error.code}")
         }
         listenerWR.get()?.continueToAddNote(
             this,
             recipientUser,
-            currentAmount,
-            fee
+            currentAmount
         )
     }
 
@@ -1070,8 +1065,7 @@ class AddAmountFragment : Fragment(), ServiceConnection {
         fun continueToAddNote(
             sourceFragment: AddAmountFragment,
             recipientUser: User,
-            amount: MicroTari,
-            fee: MicroTari
+            amount: MicroTari
         )
 
     }

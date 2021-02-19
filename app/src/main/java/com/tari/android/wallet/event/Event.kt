@@ -49,18 +49,18 @@ object Event {
      * Wallet events.
      */
     object Wallet {
-        data class BaseNodeSyncStarted(val requestId: RequestId)
-        data class BaseNodeSyncComplete(val requestId: RequestId, val success: Boolean)
         data class TxReceived(val tx: PendingInboundTx)
         data class TxReplyReceived(val tx: PendingOutboundTx)
         data class TxFinalized(val tx: PendingInboundTx)
         data class InboundTxBroadcast(val tx: PendingInboundTx)
         data class OutboundTxBroadcast(val tx: PendingOutboundTx)
         data class TxMined(val tx: CompletedTx)
+        data class TxMinedUnconfirmed(val tx: CompletedTx, val confirmationCount: Int)
         data class TxCancelled(val tx: CancelledTx)
         data class DirectSendResult(val txId: TxId, val success: Boolean)
         data class StoreAndForwardSendResult(val txId: TxId, val success: Boolean)
-        class StoreAndForwardMessagesReceived
+        object BaseNodeSyncStarted
+        data class BaseNodeSyncComplete(val result: BaseNodeValidationResult)
     }
 
     /**

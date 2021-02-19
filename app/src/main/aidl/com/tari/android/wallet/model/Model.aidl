@@ -47,3 +47,4 @@ parcelable CancelledTx;
 parcelable PendingInboundTx;
 parcelable PendingOutboundTx;
 parcelable PublicKey;
+parcelable ValidationResult;

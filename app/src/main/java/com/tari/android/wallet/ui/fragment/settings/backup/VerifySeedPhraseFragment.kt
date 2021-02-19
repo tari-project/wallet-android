@@ -68,7 +68,7 @@ framework for UI tree rebuild on configuration changes"""
 
     private lateinit var ui: FragmentVerifySeedPhraseBinding
     private val state by lazy {
-        val words = arguments!!.getStringArrayList(WORDS_KEY)!!
+        val words = requireArguments().getStringArrayList(WORDS_KEY)!!
         ViewModelProvider(this, VerificationStateFactory(words)).get(VerificationState::class.java)
     }
     private val avenirHeavy: Typeface
@@ -90,7 +90,7 @@ framework for UI tree rebuild on configuration changes"""
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? =
+    ): View =
         FragmentVerifySeedPhraseBinding.inflate(inflater, container, false).also { ui = it }.root
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

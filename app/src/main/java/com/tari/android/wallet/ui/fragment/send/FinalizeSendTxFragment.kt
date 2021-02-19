@@ -106,7 +106,6 @@ class FinalizeSendTxFragment : Fragment(), ServiceConnection {
      */
     private lateinit var recipientUser: User
     private lateinit var amount: MicroTari
-    private lateinit var fee: MicroTari
     private lateinit var note: String
 
     private lateinit var listenerWR: WeakReference<Listener>
@@ -166,7 +165,7 @@ class FinalizeSendTxFragment : Fragment(), ServiceConnection {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? =
+    ): View =
         FragmentFinalizeSendTxBinding.inflate(inflater, container, false).also { ui = it }.root
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -175,10 +174,9 @@ class FinalizeSendTxFragment : Fragment(), ServiceConnection {
         bindToWalletService()
         listenerWR.get()?.onSendTxStarted(this)
         // get tx properties
-        recipientUser = arguments!!.getParcelable("recipientUser")!!
-        amount = arguments!!.getParcelable("amount")!!
-        fee = arguments!!.getParcelable("fee")!!
-        note = arguments!!.getString("note")!!
+        recipientUser = requireArguments().getParcelable("recipientUser")!!
+        amount = requireArguments().getParcelable("amount")!!
+        note = requireArguments().getString("note")!!
         if (savedInstanceState == null) {
             tracker.screen(path = "/home/send_tari/finalize", title = "Send Tari - Finalize")
         }
@@ -472,7 +470,13 @@ class FinalizeSendTxFragment : Fragment(), ServiceConnection {
         listenerWR.get()?.onSendTxStarted(this)
         val error = WalletError()
         lifecycleScope.launch(Dispatchers.IO) {
-            val txId = walletService.sendTari(recipientUser, amount, fee, note, error)
+            val txId = walletService.sendTari(
+                recipientUser,
+                amount,
+                Constants.Wallet.defaultFeePerGram,
+                note,
+                error
+            )
             // if success, just wait for the callback to happen
             // if failed, just show the failed info & return
             if (txId == null || error.code != WalletErrorCode.NO_ERROR) {
@@ -554,7 +558,12 @@ class FinalizeSendTxFragment : Fragment(), ServiceConnection {
         fadeOutAnim.addListener(onEnd = {
             fadeOutAnim.removeAllListeners()
             ui.lottieAnimationView.alpha = 0f
-            listenerWR.get()?.onSendTxFailure(this, recipientUser, amount, fee, note, failureReason)
+            listenerWR.get()?.onSendTxFailure(
+                this, recipientUser,
+                amount,
+                note,
+                failureReason
+            )
 
         })
         fadeOutAnim.start()
@@ -585,7 +594,6 @@ class FinalizeSendTxFragment : Fragment(), ServiceConnection {
                 sentTxId!!,
                 recipientUser,
                 amount,
-                fee,
                 note
             )
         })
@@ -606,7 +614,6 @@ class FinalizeSendTxFragment : Fragment(), ServiceConnection {
             sourceFragment: FinalizeSendTxFragment,
             recipientUser: User,
             amount: MicroTari,
-            fee: MicroTari,
             note: String,
             failureReason: FailureReason
         )
@@ -619,7 +626,6 @@ class FinalizeSendTxFragment : Fragment(), ServiceConnection {
             txId: TxId,
             recipientUser: User,
             amount: MicroTari,
-            fee: MicroTari,
             note: String
         )
 

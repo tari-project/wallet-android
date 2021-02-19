@@ -44,6 +44,7 @@ import com.orhanobut.logger.Logger
 import com.tari.android.wallet.R
 import com.tari.android.wallet.event.Event
 import com.tari.android.wallet.event.EventBus
+import com.tari.android.wallet.model.BaseNodeValidationResult
 import com.tari.android.wallet.model.WalletError
 import com.tari.android.wallet.model.WalletErrorCode
 import com.tari.android.wallet.network.NetworkConnectionState
@@ -57,7 +58,6 @@ import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.*
 import java.lang.ref.WeakReference
-import java.math.BigInteger
 import java.util.concurrent.TimeUnit
 import kotlin.coroutines.CoroutineContext
 
@@ -77,7 +77,7 @@ internal class UpdateProgressViewController(
 
     enum class FailureReason {
         NETWORK_CONNECTION_ERROR,
-        BASE_NODE_CONNECTION_ERROR
+        BASE_NODE_VALIDATION_ERROR
     }
 
     enum class State {
@@ -104,14 +104,13 @@ internal class UpdateProgressViewController(
     private var isReset = true
 
     private var baseNodeSyncCurrentRetryCount = 0
-    private var baseNodeSyncMaxRetryCount = 3
+    private val baseNodeSyncMaxRetryCount = 3
     private var connectionCheckStartTimeMs = 0L
 
     // connection status check (internet, tor, base node) timeout period
     private val timeoutPeriodMs = 40 * 1000L
     private val minStateDisplayPeriodMs = 3 * 1000L
     private var baseNodeSyncTimeoutSubscription: Disposable? = null
-    private var baseNodeSyncRequestId: BigInteger? = null
 
     private val listenerWeakReference: WeakReference<Listener> = WeakReference(listener)
 
@@ -222,7 +221,7 @@ internal class UpdateProgressViewController(
         torBootstrapStatusSubscription?.dispose()
         // check for expiration
         if (connectionCheckHasTimedOut()) {
-            fail(FailureReason.BASE_NODE_CONNECTION_ERROR)
+            fail(FailureReason.BASE_NODE_VALIDATION_ERROR)
             return
         }
         val torProxyState = EventBus.torProxyStateSubject.value
@@ -231,7 +230,7 @@ internal class UpdateProgressViewController(
             // either not connected or Tor proxy is not running
             Logger.e("Update error: Tor proxy is not running.")
             view.postDelayed({
-                fail(FailureReason.BASE_NODE_CONNECTION_ERROR)
+                fail(FailureReason.BASE_NODE_VALIDATION_ERROR)
             }, minStateDisplayPeriodMs)
             return
         }
@@ -249,13 +248,13 @@ internal class UpdateProgressViewController(
                 .subscribe { checkTorBootstrapStatus() }
             return
         }
-        syncWithBaseNode()
+        startBaseNodeSync()
     }
 
-    private fun syncWithBaseNode() {
+    private fun startBaseNodeSync() {
         // check for expiration
         if (connectionCheckHasTimedOut()) {
-            fail(FailureReason.BASE_NODE_CONNECTION_ERROR)
+            fail(FailureReason.BASE_NODE_VALIDATION_ERROR)
             return
         }
         baseNodeSyncCurrentRetryCount++
@@ -267,10 +266,10 @@ internal class UpdateProgressViewController(
         val walletError = WalletError()
         // long running call
         launch(Dispatchers.IO) {
-            baseNodeSyncRequestId = walletService.syncWithBaseNode(walletError).value
-            if (isActive && walletError.code != WalletErrorCode.NO_ERROR) {
-                Logger.e("Base node sync has failed with err code %d.", walletError.code)
-                fail(FailureReason.BASE_NODE_CONNECTION_ERROR)
+            val success = walletService.startBaseNodeSync(walletError)
+            if (isActive && (!success || walletError.code != WalletErrorCode.NO_ERROR)) {
+                Logger.e("Base node sync has failed.")
+                fail(FailureReason.BASE_NODE_VALIDATION_ERROR)
             }
         }
         isWaitingOnBaseNodeSync = true
@@ -285,28 +284,35 @@ internal class UpdateProgressViewController(
     }
 
     private fun onBaseNodeSyncCompleted(event: Event.Wallet.BaseNodeSyncComplete) {
-        if (event.requestId.value != baseNodeSyncRequestId) {
-            Logger.i("Request id mismatch - ignore base node sync event.")
-            return
-        }
         isWaitingOnBaseNodeSync = false
         baseNodeSyncTimeoutSubscription?.dispose()
-        if (!event.success) {
-            if (baseNodeSyncCurrentRetryCount >= baseNodeSyncMaxRetryCount) {
-                // failed
-                fail(FailureReason.BASE_NODE_CONNECTION_ERROR)
-            } else {
-                syncWithBaseNode()
+        when (event.result) {
+            BaseNodeValidationResult.SUCCESS -> {
+                // base node sync successful - start listening for events
+                Logger.d("Base node sync successful. Start listening for wallet events.")
+                state =
+                    State.RECEIVING
+                view.postDelayed({
+                    displayReceivingTxs()
+                }, minStateDisplayPeriodMs)
             }
-            return
+            BaseNodeValidationResult.ABORTED -> {
+                fail(
+                    FailureReason.BASE_NODE_VALIDATION_ERROR,
+                    event.result
+                )
+            }
+            BaseNodeValidationResult.BASE_NODE_NOT_IN_SYNC, BaseNodeValidationResult.FAILURE -> {
+                if (baseNodeSyncCurrentRetryCount >= baseNodeSyncMaxRetryCount) {
+                    fail(
+                        FailureReason.BASE_NODE_VALIDATION_ERROR,
+                        event.result
+                    )
+                } else {
+                    startBaseNodeSync()
+                }
+            }
         }
-        // base node sync successful - start listening for events
-        Logger.d("Connection tests passed. Start listening for wallet events.")
-        state =
-            State.RECEIVING
-        view.postDelayed({
-            displayReceivingTxs()
-        }, minStateDisplayPeriodMs)
     }
 
     private fun displayReceivingTxs() {
@@ -395,12 +401,11 @@ internal class UpdateProgressViewController(
 
     private fun baseNodeSyncTimedOut() {
         Logger.e("Base node sync timed out.")
-        fail(FailureReason.BASE_NODE_CONNECTION_ERROR)
+        fail(FailureReason.BASE_NODE_VALIDATION_ERROR)
     }
 
-    private fun fail(failureReason: FailureReason) {
-        state =
-            State.IDLE
+    private fun fail(failureReason: FailureReason, validationResult: BaseNodeValidationResult? = null) {
+        state = State.IDLE
         listenerWeakReference.get()?.updateHasFailed(this, failureReason)
         isWaitingOnBaseNodeSync = false
         view.post {
@@ -417,7 +422,11 @@ internal class UpdateProgressViewController(
 
     interface Listener {
 
-        fun updateHasFailed(source: UpdateProgressViewController, failureReason: FailureReason)
+        fun updateHasFailed(
+            source: UpdateProgressViewController,
+            failureReason: FailureReason,
+            validationResult: BaseNodeValidationResult? = null
+        )
 
         fun updateHasCompleted(
             source: UpdateProgressViewController,

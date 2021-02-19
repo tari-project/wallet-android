@@ -116,10 +116,12 @@ internal class FFIPendingInboundTx() : FFIBase() {
             -1 -> FFITxStatus.TX_NULL_ERROR
             0 -> FFITxStatus.COMPLETED
             1 -> FFITxStatus.BROADCAST
-            2 -> FFITxStatus.MINED
+            2 -> FFITxStatus.MINED_UNCONFIRMED
             3 -> FFITxStatus.IMPORTED
             4 -> FFITxStatus.PENDING
-            5 -> FFITxStatus.UNKNOWN
+            5 -> FFITxStatus.COINBASE
+            6 -> FFITxStatus.MINED_CONFIRMED
+            7 -> FFITxStatus.UNKNOWN
             else -> throw FFIException(message = "Unexpected status: $status")
         }
     }

@@ -84,7 +84,7 @@ class WalletInfoFragment : Fragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         ui = FragmentWalletInfoBinding.inflate(inflater, container, false)
         dimmerViews = listOf(ui.scrollDimmerView, ui.qrDimmerView, ui.bottomDimmerView)
         emojiIdSummaryController = EmojiIdSummaryViewController(ui.emojiIdSummaryView)

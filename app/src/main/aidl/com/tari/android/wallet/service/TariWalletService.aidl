@@ -82,12 +82,12 @@ interface TariWalletService {
         out WalletError error
     );
 
-    RequestId syncWithBaseNode(out WalletError error);
+    boolean startBaseNodeSync(out WalletError error);
 
     TxId sendTari(
         in User contact,
         in MicroTari amount,
-        in MicroTari fee,
+        in MicroTari feePerGram,
         String message,
         out WalletError error
     );

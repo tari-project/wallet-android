@@ -34,8 +34,6 @@ package com.tari.android.wallet.util
 
 import android.content.Context
 import com.tari.android.wallet.application.DeepLink
-import com.tari.android.wallet.extension.toMicroTari
-import com.tari.android.wallet.model.MicroTari
 import java.io.File
 import java.math.RoundingMode
 import java.text.DecimalFormat

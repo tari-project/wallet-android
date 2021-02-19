@@ -32,6 +32,8 @@
  */
 package com.tari.android.wallet.model
 
+import com.tari.android.wallet.ffi.FFITxStatus
+
 /**
  * Transaction status.
  *
@@ -41,8 +43,26 @@ enum class TxStatus {
     TX_NULL_ERROR,
     COMPLETED,
     BROADCAST,
-    MINED,
+    MINED_UNCONFIRMED,
     IMPORTED,
     PENDING,
-    UNKNOWN
+    COINBASE,
+    MINED_CONFIRMED,
+    UNKNOWN;
+    
+    companion object {
+        fun map(ffiStatus: FFITxStatus): TxStatus {
+            return when (ffiStatus) {
+                FFITxStatus.TX_NULL_ERROR -> TX_NULL_ERROR
+                FFITxStatus.COMPLETED -> COMPLETED
+                FFITxStatus.BROADCAST -> BROADCAST
+                FFITxStatus.MINED_UNCONFIRMED -> MINED_UNCONFIRMED
+                FFITxStatus.IMPORTED -> IMPORTED
+                FFITxStatus.PENDING -> PENDING
+                FFITxStatus.COINBASE -> COINBASE
+                FFITxStatus.MINED_CONFIRMED -> MINED_CONFIRMED
+                else -> UNKNOWN
+            }
+        }
+    }
 }

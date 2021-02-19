@@ -88,13 +88,16 @@ jmethodID txReplyReceivedCallbackMethodId;
 jmethodID txFinalizedCallbackMethodId;
 jmethodID txBroadcastCallbackMethodId;
 jmethodID txMinedCallbackMethodId;
+jmethodID txMinedUnconfirmedCallbackMethodId;
 jmethodID directSendResultCallbackMethodId;
 jmethodID storeAndForwardSendResultCallbackMethodId;
 jmethodID txCancellationCallbackMethodId;
-jmethodID syncBaseNodeId;
-jmethodID storeAndForwardMessagesReceivedCallbackMethodId;
+jmethodID utxoValidationCompleteCallbackMethodId;
+jmethodID stxoValidationCompleteCallbackMethodId;
+jmethodID invalidTxoValidationCompleteCallbackMethodId;
+jmethodID transactionValidationCompleteCallbackMethodId;
 
-void BroadcastCallback(struct TariCompletedTransaction *pCompletedTransaction) {
+void txBroadcastCallback(struct TariCompletedTransaction *pCompletedTransaction) {
     auto *jniEnv = getJNIEnv();
     if (jniEnv == nullptr || callbackHandler == nullptr) {
         return;
@@ -107,7 +110,7 @@ void BroadcastCallback(struct TariCompletedTransaction *pCompletedTransaction) {
     g_vm->DetachCurrentThread();
 }
 
-void MinedCallback(struct TariCompletedTransaction *pCompletedTransaction) {
+void txMinedCallback(struct TariCompletedTransaction *pCompletedTransaction) {
     auto *jniEnv = getJNIEnv();
     if (jniEnv == nullptr || callbackHandler == nullptr) {
         return;
@@ -120,7 +123,23 @@ void MinedCallback(struct TariCompletedTransaction *pCompletedTransaction) {
     g_vm->DetachCurrentThread();
 }
 
-void ReceivedCallback(struct TariPendingInboundTransaction *pPendingInboundTransaction) {
+void txMinedUnconfirmedCallback(struct TariCompletedTransaction *pCompletedTransaction,
+                                unsigned long long confirmationCount) {
+    auto *jniEnv = getJNIEnv();
+    if (jniEnv == nullptr || callbackHandler == nullptr) {
+        return;
+    }
+    jbyteArray bytes = getBytesFromUnsignedLongLong(jniEnv, confirmationCount);
+    auto jpCompletedTransaction = reinterpret_cast<jlong>(pCompletedTransaction);
+    jniEnv->CallVoidMethod(
+            callbackHandler,
+            txMinedUnconfirmedCallbackMethodId,
+            jpCompletedTransaction,
+            confirmationCount);
+    g_vm->DetachCurrentThread();
+}
+
+void txReceivedCallback(struct TariPendingInboundTransaction *pPendingInboundTransaction) {
     auto *jniEnv = getJNIEnv();
     if (jniEnv == nullptr || callbackHandler == nullptr) {
         return;
@@ -133,7 +152,7 @@ void ReceivedCallback(struct TariPendingInboundTransaction *pPendingInboundTrans
     g_vm->DetachCurrentThread();
 }
 
-void ReplyCallback(struct TariCompletedTransaction *pCompletedTransaction) {
+void txReplyReceivedCallback(struct TariCompletedTransaction *pCompletedTransaction) {
     auto *jniEnv = getJNIEnv();
     if (jniEnv == nullptr || callbackHandler == nullptr) {
         return;
@@ -146,7 +165,7 @@ void ReplyCallback(struct TariCompletedTransaction *pCompletedTransaction) {
     g_vm->DetachCurrentThread();
 }
 
-void FinalizedCallback(struct TariCompletedTransaction *pCompletedTransaction) {
+void txFinalizedCallback(struct TariCompletedTransaction *pCompletedTransaction) {
     auto *jniEnv = getJNIEnv();
     if (jniEnv == nullptr || callbackHandler == nullptr) {
         return;
@@ -159,12 +178,12 @@ void FinalizedCallback(struct TariCompletedTransaction *pCompletedTransaction) {
     g_vm->DetachCurrentThread();
 }
 
-void DirectSendResultCallback(unsigned long long tx_id, bool success) {
+void txDirectSendResultCallback(unsigned long long txId, bool success) {
     auto *jniEnv = getJNIEnv();
     if (jniEnv == nullptr || callbackHandler == nullptr) {
         return;
     }
-    jbyteArray bytes = getBytesFromUnsignedLongLong(jniEnv, tx_id);
+    jbyteArray bytes = getBytesFromUnsignedLongLong(jniEnv, txId);
     jniEnv->CallVoidMethod(
             callbackHandler,
             directSendResultCallbackMethodId,
@@ -173,12 +192,12 @@ void DirectSendResultCallback(unsigned long long tx_id, bool success) {
     g_vm->DetachCurrentThread();
 }
 
-void StoreAndForwardSendResultCallback(unsigned long long tx_id, bool success) {
+void txStoreAndForwardSendResultCallback(unsigned long long txId, bool success) {
     auto *jniEnv = getJNIEnv();
     if (jniEnv == nullptr || callbackHandler == nullptr) {
         return;
     }
-    jbyteArray bytes = getBytesFromUnsignedLongLong(jniEnv, tx_id);
+    jbyteArray bytes = getBytesFromUnsignedLongLong(jniEnv, txId);
     jniEnv->CallVoidMethod(
             callbackHandler,
             storeAndForwardSendResultCallbackMethodId,
@@ -187,7 +206,7 @@ void StoreAndForwardSendResultCallback(unsigned long long tx_id, bool success) {
     g_vm->DetachCurrentThread();
 }
 
-void TxCancellationCallback(struct TariCompletedTransaction *pCompletedTransaction) {
+void txCancellationCallback(struct TariCompletedTransaction *pCompletedTransaction) {
     auto *jniEnv = getJNIEnv();
     if (jniEnv == nullptr || callbackHandler == nullptr) {
         return;
@@ -200,28 +219,74 @@ void TxCancellationCallback(struct TariCompletedTransaction *pCompletedTransacti
     g_vm->DetachCurrentThread();
 }
 
-void BaseNodeSyncCallback(unsigned long long request_id, bool success) {
+void utxoValidationCompleteCallback(unsigned long long requestId, unsigned char result) {
     auto *jniEnv = getJNIEnv();
     if (jniEnv == nullptr || callbackHandler == nullptr) {
         return;
     }
-    jbyteArray bytes = getBytesFromUnsignedLongLong(jniEnv, request_id);
-
+    jbyteArray requestIdBytes = getBytesFromUnsignedLongLong(jniEnv, requestId);
     jniEnv->CallVoidMethod(
             callbackHandler,
-            syncBaseNodeId, bytes, success);
+            utxoValidationCompleteCallbackMethodId,
+            requestIdBytes,
+            static_cast<jint>(result));
     g_vm->DetachCurrentThread();
 }
 
-void StoreAndForwardMessagesReceivedCallback() {
+void stxoValidationCompleteCallback(unsigned long long requestId, unsigned char result) {
     auto *jniEnv = getJNIEnv();
     if (jniEnv == nullptr || callbackHandler == nullptr) {
         return;
     }
+    jbyteArray requestIdBytes = getBytesFromUnsignedLongLong(jniEnv, requestId);
     jniEnv->CallVoidMethod(
             callbackHandler,
-            storeAndForwardMessagesReceivedCallbackMethodId);
+            stxoValidationCompleteCallbackMethodId,
+            requestIdBytes,
+            static_cast<jint>(result));
     g_vm->DetachCurrentThread();
+}
+
+void invalidTxoValidationCompleteCallback(unsigned long long requestId, unsigned char result) {
+    auto *jniEnv = getJNIEnv();
+    if (jniEnv == nullptr || callbackHandler == nullptr) {
+        return;
+    }
+    jbyteArray requestIdBytes = getBytesFromUnsignedLongLong(jniEnv, requestId);
+    jniEnv->CallVoidMethod(
+            callbackHandler,
+            invalidTxoValidationCompleteCallbackMethodId,
+            requestIdBytes,
+            static_cast<jint>(result));
+    g_vm->DetachCurrentThread();
+}
+
+void transactionValidationCompleteCallback(unsigned long long requestId, unsigned char result) {
+    auto *jniEnv = getJNIEnv();
+    if (jniEnv == nullptr || callbackHandler == nullptr) {
+        return;
+    }
+    jbyteArray requestIdBytes = getBytesFromUnsignedLongLong(jniEnv, requestId);
+    jniEnv->CallVoidMethod(
+            callbackHandler,
+            transactionValidationCompleteCallbackMethodId,
+            requestIdBytes,
+            static_cast<jint>(result));
+    g_vm->DetachCurrentThread();
+}
+
+void storeAndForwardMessagesReceivedCallback() {
+    // no-op
+}
+
+jmethodID getMethodId(JNIEnv *jniEnv, jobject jThis, jstring methodName, jstring methodSignature) {
+    jclass jClass = jniEnv->GetObjectClass(jThis);
+    const char *method = jniEnv->GetStringUTFChars(methodName, JNI_FALSE);
+    const char *signature = jniEnv->GetStringUTFChars(methodSignature, JNI_FALSE);
+    jmethodID methodId = jniEnv->GetMethodID(jClass, method, signature);
+    jniEnv->ReleaseStringUTFChars(methodSignature, signature);
+    jniEnv->ReleaseStringUTFChars(methodName, method);
+    return methodId;
 }
 
 extern "C"
@@ -233,8 +298,8 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniCreate(
         jstring jLogPath,
         jint maxNumberOfRollingLogFiles,
         jint rollingLogFileMaxSizeBytes,
-        jstring callback_received_tx,
-        jstring callback_received_tx_sig,
+        jstring txReceivedCallbackMethodName,
+        jstring txReceivedCallbackMethodSignature,
         jstring callback_received_tx_reply,
         jstring callback_received_tx_reply_sig,
         jstring callback_received_finalized_tx,
@@ -243,16 +308,22 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniCreate(
         jstring callback_tx_broadcast_sig,
         jstring callback_tx_mined,
         jstring callback_tx_mined_sig,
+        jstring callback_tx_mined_unconfirmed,
+        jstring callback_tx_mined_unconfirmed_sig,
         jstring callback_direct_send_result,
         jstring callback_direct_send_result_sig,
         jstring callback_store_and_forward_send_result,
         jstring callback_store_and_forward_send_result_sig,
         jstring callback_tx_cancellation,
         jstring callback_tx_cancellation_sig,
-        jstring callback_base_node_sync,
-        jstring callback_base_node_sync_sig,
-        jstring callback_store_and_forward_messages_received,
-        jstring callback_store_and_forward_messages_received_sig,
+        jstring callback_utxo_validation_complete,
+        jstring callback_utxo_validation_complete_sig,
+        jstring callback_stxo_validation_complete,
+        jstring callback_stxo_validation_complete_sig,
+        jstring callback_invalid_txo_validation_complete,
+        jstring callback_invalid_txo_validation_complete_sig,
+        jstring callback_transaction_validation_complete,
+        jstring callback_transaction_validation_complete_sig,
         jobject error) {
 
     int i = 0;
@@ -265,149 +336,120 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniCreate(
         SetPointerField(jEnv, jThis, reinterpret_cast<jlong>(nullptr));
     }
 
-    const char *pReceivedMethod = jEnv->GetStringUTFChars(callback_received_tx, JNI_FALSE);
-    const char *pReceivedSig = jEnv->GetStringUTFChars(callback_received_tx_sig, JNI_FALSE);
-    txReceivedCallbackMethodId = jEnv->GetMethodID(jClass, pReceivedMethod, pReceivedSig);
-    jEnv->ReleaseStringUTFChars(callback_received_tx_sig, pReceivedSig);
-    jEnv->ReleaseStringUTFChars(callback_received_tx, pReceivedMethod);
+    txReceivedCallbackMethodId = getMethodId(
+            jEnv,
+            jThis,
+            txReceivedCallbackMethodName,
+            txReceivedCallbackMethodSignature);
     if (txReceivedCallbackMethodId == nullptr) {
         SetPointerField(jEnv, jThis, reinterpret_cast<jlong>(nullptr));
     }
 
-    const char *pReceivedReplyMethod = jEnv->GetStringUTFChars(callback_received_tx_reply,
-                                                               JNI_FALSE);
-    const char *pReceivedReplySig = jEnv->GetStringUTFChars(callback_received_tx_reply_sig,
-                                                            JNI_FALSE);
-    txReplyReceivedCallbackMethodId = jEnv->GetMethodID(jClass, pReceivedReplyMethod,
-                                                        pReceivedReplySig);
-    jEnv->ReleaseStringUTFChars(callback_received_tx_reply_sig, pReceivedReplySig);
-    jEnv->ReleaseStringUTFChars(callback_received_tx_reply, pReceivedReplyMethod);
+    txReplyReceivedCallbackMethodId = getMethodId(
+            jEnv,
+            jThis,
+            callback_received_tx_reply,
+            callback_received_tx_reply_sig);
     if (txReplyReceivedCallbackMethodId == nullptr) {
         SetPointerField(jEnv, jThis, reinterpret_cast<jlong>(nullptr));
     }
 
-    const char *pFinalizedMethod = jEnv->GetStringUTFChars(callback_received_finalized_tx,
-                                                           JNI_FALSE);
-    const char *pFinalizedSig = jEnv->GetStringUTFChars(callback_received_finalized_tx_sig,
-                                                        JNI_FALSE);
-    txFinalizedCallbackMethodId = jEnv->GetMethodID(jClass, pFinalizedMethod, pFinalizedSig);
-    jEnv->ReleaseStringUTFChars(callback_received_finalized_tx_sig, pFinalizedSig);
-    jEnv->ReleaseStringUTFChars(callback_received_finalized_tx, pFinalizedMethod);
+    txFinalizedCallbackMethodId = getMethodId(
+            jEnv,
+            jThis,
+            callback_received_finalized_tx,
+            callback_received_finalized_tx_sig);
     if (txFinalizedCallbackMethodId == nullptr) {
         SetPointerField(jEnv, jThis, reinterpret_cast<jlong>(nullptr));
     }
 
-    const char *pBroadcastMethod = jEnv->GetStringUTFChars(callback_tx_broadcast,
-                                                           JNI_FALSE);
-    const char *pBroadcastSig = jEnv->GetStringUTFChars(callback_tx_broadcast_sig,
-                                                        JNI_FALSE);
-    txBroadcastCallbackMethodId = jEnv->GetMethodID(jClass, pBroadcastMethod, pBroadcastSig);
-    jEnv->ReleaseStringUTFChars(callback_tx_broadcast_sig, pBroadcastSig);
-    jEnv->ReleaseStringUTFChars(callback_tx_broadcast, pBroadcastMethod);
+    txBroadcastCallbackMethodId = getMethodId(
+            jEnv,
+            jThis,
+            callback_tx_broadcast,
+            callback_tx_broadcast_sig);
     if (txBroadcastCallbackMethodId == nullptr) {
         SetPointerField(jEnv, jThis, reinterpret_cast<jlong>(nullptr));
     }
 
-    const char *pMinedMethod = jEnv->GetStringUTFChars(callback_tx_mined, JNI_FALSE);
-    const char *pMinedSig = jEnv->GetStringUTFChars(callback_tx_mined_sig, JNI_FALSE);
-    txMinedCallbackMethodId = jEnv->GetMethodID(jClass, pMinedMethod, pMinedSig);
-    jEnv->ReleaseStringUTFChars(callback_tx_mined_sig, pMinedSig);
-    jEnv->ReleaseStringUTFChars(callback_tx_mined, pMinedMethod);
+    txMinedCallbackMethodId = getMethodId(
+            jEnv,
+            jThis,
+            callback_tx_mined,
+            callback_tx_mined_sig);
     if (txMinedCallbackMethodId == nullptr) {
         SetPointerField(jEnv, jThis, reinterpret_cast<jlong>(nullptr));
     }
 
-    // keep direct send result callback reference
-    const char *pDirectSendResultCallbackMethod = jEnv->GetStringUTFChars(
+    txMinedUnconfirmedCallbackMethodId = getMethodId(
+            jEnv,
+            jThis,
+            callback_tx_mined_unconfirmed,
+            callback_tx_mined_unconfirmed_sig);
+    if (txMinedUnconfirmedCallbackMethodId == nullptr) {
+        SetPointerField(jEnv, jThis, reinterpret_cast<jlong>(nullptr));
+    }
+
+    directSendResultCallbackMethodId = getMethodId(
+            jEnv,
+            jThis,
             callback_direct_send_result,
-            JNI_FALSE);
-    const char *pDirectSendResultCallbackMethodSignature = jEnv->GetStringUTFChars(
-            callback_direct_send_result_sig,
-            JNI_FALSE);
-    directSendResultCallbackMethodId = jEnv->GetMethodID(
-            jClass,
-            pDirectSendResultCallbackMethod,
-            pDirectSendResultCallbackMethodSignature);
-    jEnv->ReleaseStringUTFChars(
-            callback_direct_send_result,
-            pDirectSendResultCallbackMethod);
-    jEnv->ReleaseStringUTFChars(
-            callback_direct_send_result_sig,
-            pDirectSendResultCallbackMethodSignature);
+            callback_direct_send_result_sig);
     if (directSendResultCallbackMethodId == nullptr) {
         SetPointerField(jEnv, jThis, reinterpret_cast<jlong>(nullptr));
     }
 
-    // keep store & forward send result callback
-    const char *pStoreAndForwardSendResultCallbackMethod = jEnv->GetStringUTFChars(
+    storeAndForwardSendResultCallbackMethodId = getMethodId(
+            jEnv,
+            jThis,
             callback_store_and_forward_send_result,
-            JNI_FALSE);
-    const char *pStoreAndForwardSendResultCallbackMethodSignature = jEnv->GetStringUTFChars(
-            callback_store_and_forward_send_result_sig,
-            JNI_FALSE);
-    storeAndForwardSendResultCallbackMethodId = jEnv->GetMethodID(
-            jClass,
-            pStoreAndForwardSendResultCallbackMethod,
-            pStoreAndForwardSendResultCallbackMethodSignature);
-    jEnv->ReleaseStringUTFChars(
-            callback_store_and_forward_send_result,
-            pStoreAndForwardSendResultCallbackMethod);
-    jEnv->ReleaseStringUTFChars(
-            callback_store_and_forward_send_result_sig,
-            pStoreAndForwardSendResultCallbackMethodSignature);
+            callback_store_and_forward_send_result_sig);
     if (storeAndForwardSendResultCallbackMethodId == nullptr) {
         SetPointerField(jEnv, jThis, reinterpret_cast<jlong>(nullptr));
     }
 
-    // keep transaction cancellation callback
-    const char *pTxCancellationCallbackMethod = jEnv->GetStringUTFChars(
+    txCancellationCallbackMethodId = getMethodId(
+            jEnv,
+            jThis,
             callback_tx_cancellation,
-            JNI_FALSE);
-    const char *pTxCancellationCallbackMethodSignature = jEnv->GetStringUTFChars(
-            callback_tx_cancellation_sig,
-            JNI_FALSE);
-    txCancellationCallbackMethodId = jEnv->GetMethodID(
-            jClass,
-            pTxCancellationCallbackMethod,
-            pTxCancellationCallbackMethodSignature);
-    jEnv->ReleaseStringUTFChars(
-            callback_tx_cancellation,
-            pTxCancellationCallbackMethod);
-    jEnv->ReleaseStringUTFChars(
-            callback_tx_cancellation_sig,
-            pTxCancellationCallbackMethodSignature);
+            callback_tx_cancellation_sig);
     if (txCancellationCallbackMethodId == nullptr) {
         SetPointerField(jEnv, jThis, reinterpret_cast<jlong>(nullptr));
     }
 
-    const char *pBaseNodeSync = jEnv->GetStringUTFChars(callback_base_node_sync,
-                                                        JNI_FALSE);
-    const char *pBaseNodeSyncSig = jEnv->GetStringUTFChars(callback_base_node_sync_sig,
-                                                           JNI_FALSE);
-    syncBaseNodeId = jEnv->GetMethodID(jClass, pBaseNodeSync, pBaseNodeSyncSig);
-    jEnv->ReleaseStringUTFChars(callback_base_node_sync_sig, pBaseNodeSyncSig);
-    jEnv->ReleaseStringUTFChars(callback_base_node_sync, pBaseNodeSync);
-    if (syncBaseNodeId == nullptr) {
+    utxoValidationCompleteCallbackMethodId = getMethodId(
+            jEnv,
+            jThis,
+            callback_utxo_validation_complete,
+            callback_utxo_validation_complete_sig);
+    if (utxoValidationCompleteCallbackMethodId == nullptr) {
         SetPointerField(jEnv, jThis, reinterpret_cast<jlong>(nullptr));
     }
 
-    const char *pStoreAndForwardMessagesReceivedMethod = jEnv->GetStringUTFChars(
-            callback_store_and_forward_messages_received,
-            JNI_FALSE);
-    const char *pStoreAndForwardMessagesReceivedMethodSig = jEnv->GetStringUTFChars(
-            callback_store_and_forward_messages_received_sig,
-            JNI_FALSE);
-    storeAndForwardMessagesReceivedCallbackMethodId = jEnv->GetMethodID(
-            jClass,
-            pStoreAndForwardMessagesReceivedMethod,
-            pStoreAndForwardMessagesReceivedMethodSig);
-    jEnv->ReleaseStringUTFChars(
-            callback_base_node_sync,
-            pStoreAndForwardMessagesReceivedMethod);
-    jEnv->ReleaseStringUTFChars(
-            callback_base_node_sync_sig,
-            pStoreAndForwardMessagesReceivedMethodSig);
-    if (storeAndForwardSendResultCallbackMethodId == nullptr) {
+    stxoValidationCompleteCallbackMethodId = getMethodId(
+            jEnv,
+            jThis,
+            callback_stxo_validation_complete,
+            callback_stxo_validation_complete_sig);
+    if (stxoValidationCompleteCallbackMethodId == nullptr) {
+        SetPointerField(jEnv, jThis, reinterpret_cast<jlong>(nullptr));
+    }
+
+    invalidTxoValidationCompleteCallbackMethodId = getMethodId(
+            jEnv,
+            jThis,
+            callback_invalid_txo_validation_complete,
+            callback_invalid_txo_validation_complete_sig);
+    if (invalidTxoValidationCompleteCallbackMethodId == nullptr) {
+        SetPointerField(jEnv, jThis, reinterpret_cast<jlong>(nullptr));
+    }
+
+    transactionValidationCompleteCallbackMethodId = getMethodId(
+            jEnv,
+            jThis,
+            callback_transaction_validation_complete,
+            callback_transaction_validation_complete_sig);
+    if (transactionValidationCompleteCallbackMethodId == nullptr) {
         SetPointerField(jEnv, jThis, reinterpret_cast<jlong>(nullptr));
     }
 
@@ -425,16 +467,20 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniCreate(
                 static_cast<unsigned int>(maxNumberOfRollingLogFiles),
                 static_cast<unsigned int>(rollingLogFileMaxSizeBytes),
                 nullptr,
-                ReceivedCallback,
-                ReplyCallback,
-                FinalizedCallback,
-                BroadcastCallback,
-                MinedCallback,
-                DirectSendResultCallback,
-                StoreAndForwardSendResultCallback,
-                TxCancellationCallback,
-                BaseNodeSyncCallback,
-                StoreAndForwardMessagesReceivedCallback,
+                txReceivedCallback,
+                txReplyReceivedCallback,
+                txFinalizedCallback,
+                txBroadcastCallback,
+                txMinedCallback,
+                txMinedUnconfirmedCallback,
+                txDirectSendResultCallback,
+                txStoreAndForwardSendResultCallback,
+                txCancellationCallback,
+                utxoValidationCompleteCallback,
+                stxoValidationCompleteCallback,
+                invalidTxoValidationCompleteCallback,
+                transactionValidationCompleteCallback,
+                storeAndForwardMessagesReceivedCallback,
                 r);
     } else {
         pWallet = wallet_create(
@@ -443,16 +489,20 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniCreate(
                 static_cast<unsigned int>(maxNumberOfRollingLogFiles),
                 static_cast<unsigned int>(rollingLogFileMaxSizeBytes),
                 nullptr,
-                ReceivedCallback,
-                ReplyCallback,
-                FinalizedCallback,
-                BroadcastCallback,
-                MinedCallback,
-                DirectSendResultCallback,
-                StoreAndForwardSendResultCallback,
-                TxCancellationCallback,
-                BaseNodeSyncCallback,
-                StoreAndForwardMessagesReceivedCallback,
+                txReceivedCallback,
+                txReplyReceivedCallback,
+                txFinalizedCallback,
+                txBroadcastCallback,
+                txMinedCallback,
+                txMinedUnconfirmedCallback,
+                txDirectSendResultCallback,
+                txStoreAndForwardSendResultCallback,
+                txCancellationCallback,
+                utxoValidationCompleteCallback,
+                stxoValidationCompleteCallback,
+                invalidTxoValidationCompleteCallback,
+                transactionValidationCompleteCallback,
+                storeAndForwardMessagesReceivedCallback,
                 r);
     }
     setErrorCode(jEnv, error, i);
@@ -772,156 +822,6 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniDestroy(
 
 //endregion
 
-//region Wallet Test Functions
-extern "C"
-JNIEXPORT jboolean JNICALL
-Java_com_tari_android_wallet_ffi_FFIWallet_jniGenerateTestData(
-        JNIEnv *jEnv,
-        jobject jThis,
-        jstring jDatastorePath,
-        jobject error) {
-    int i = 0;
-    int *r = &i;
-    jlong lWallet = GetPointerField(jEnv, jThis);
-    const char *pDatastorePath = jEnv->GetStringUTFChars(jDatastorePath, JNI_FALSE);
-    auto result = static_cast<jboolean>(
-            wallet_test_generate_data(
-                    reinterpret_cast<TariWallet *>(lWallet), pDatastorePath, r
-            ) != 0
-    );
-    setErrorCode(jEnv, error, i);
-    jEnv->ReleaseStringUTFChars(jDatastorePath, pDatastorePath);
-    return result;
-}
-
-extern "C"
-JNIEXPORT jboolean JNICALL
-Java_com_tari_android_wallet_ffi_FFIWallet_jniTestBroadcastTx(
-        JNIEnv *jEnv,
-        jobject jThis,
-        jstring jTxID,
-        jobject error) {
-    int i = 0;
-    int *r = &i;
-    jlong lWallet = GetPointerField(jEnv, jThis);
-    auto *pWallet = reinterpret_cast<TariWallet *>(lWallet);
-    const char *pTxId = jEnv->GetStringUTFChars(jTxID, JNI_FALSE);
-    char *pEnd;
-    unsigned long long tx = strtoull(pTxId, &pEnd, 10);
-    jEnv->ReleaseStringUTFChars(jTxID, pTxId);
-    auto result = static_cast<jboolean>(wallet_test_broadcast_transaction(pWallet, tx, r) != 0);
-    setErrorCode(jEnv, error, i);
-    return result;
-}
-
-extern "C"
-JNIEXPORT jboolean JNICALL
-Java_com_tari_android_wallet_ffi_FFIWallet_jniTestFinalizeReceivedTx(
-        JNIEnv *jEnv,
-        jobject jThis,
-        jobject jTx,
-        jobject error) {
-    int i = 0;
-    int *r = &i;
-    jlong lWallet = GetPointerField(jEnv, jThis);
-    auto *pWallet = reinterpret_cast<TariWallet *>(lWallet);
-    jlong lTx = GetPointerField(jEnv, jTx);
-    auto *pTx = reinterpret_cast<TariPendingInboundTransaction *>(lTx);
-    auto result = static_cast<jboolean>(
-            wallet_test_finalize_received_transaction(pWallet, pTx, r) != 0
-    );
-    setErrorCode(jEnv, error, i);
-    return result;
-}
-
-extern "C"
-JNIEXPORT jboolean JNICALL
-Java_com_tari_android_wallet_ffi_FFIWallet_jniTestCompleteSentTx(
-        JNIEnv *jEnv,
-        jobject jThis,
-        jobject jTx,
-        jobject error) {
-    int i = 0;
-    int *r = &i;
-    jlong lWallet = GetPointerField(jEnv, jThis);
-    auto *pWallet = reinterpret_cast<TariWallet *>(lWallet);
-    jlong lTx = GetPointerField(jEnv, jTx);
-    auto *pTx = reinterpret_cast<TariPendingOutboundTransaction *>(lTx);
-    auto result = static_cast<jboolean>(
-            wallet_test_complete_sent_transaction(pWallet, pTx, r) != 0);
-    setErrorCode(jEnv, error, i);
-    return result;
-}
-
-extern "C"
-JNIEXPORT jboolean JNICALL
-Java_com_tari_android_wallet_ffi_FFIWallet_jniTestMineTx(
-        JNIEnv *jEnv,
-        jobject jThis,
-        jstring jTxID,
-        jobject error) {
-    int i = 0;
-    int *r = &i;
-    jlong lWallet = GetPointerField(jEnv, jThis);
-    auto *pWallet = reinterpret_cast<TariWallet *>(lWallet);
-    const char *pTxId = jEnv->GetStringUTFChars(jTxID, JNI_FALSE);
-    char *pEnd;
-    unsigned long long tx = strtoull(pTxId, &pEnd, 10);
-    jEnv->ReleaseStringUTFChars(jTxID, pTxId);
-    auto result = static_cast<jboolean>(wallet_test_mine_transaction(pWallet, tx, r) != 0);
-    setErrorCode(jEnv, error, i);
-    return result;
-}
-
-extern "C"
-JNIEXPORT jboolean JNICALL
-Java_com_tari_android_wallet_ffi_FFIWallet_jniTestReceiveTx(
-        JNIEnv *jEnv,
-        jobject jThis,
-        jobject error) {
-    int i = 0;
-    int *r = &i;
-    jlong lWallet = GetPointerField(jEnv, jThis);
-    auto *pWallet = reinterpret_cast<TariWallet *>(lWallet);
-    auto result = static_cast<jboolean>(wallet_test_receive_transaction(pWallet, r) != 0);
-    setErrorCode(jEnv, error, i);
-    return result;
-}
-
-extern "C"
-JNIEXPORT jbyteArray JNICALL
-Java_com_tari_android_wallet_ffi_FFIWallet_jniSendTx(
-        JNIEnv *jEnv,
-        jobject jThis,
-        jobject jdestination,
-        jstring jamount,
-        jstring jfee,
-        jstring jmessage,
-        jobject error) {
-    int i = 0;
-    int *r = &i;
-    jlong lWallet = GetPointerField(jEnv, jThis);
-    auto *pWallet = reinterpret_cast<TariWallet *>(lWallet);
-    jlong lDestination = GetPointerField(jEnv, jdestination);
-    auto *pDestination = reinterpret_cast<TariPublicKey *>(lDestination);
-    const char *nativeAmount = jEnv->GetStringUTFChars(jamount, JNI_FALSE);
-    const char *nativeFee = jEnv->GetStringUTFChars(jfee, JNI_FALSE);
-    const char *pMessage = jEnv->GetStringUTFChars(jmessage, JNI_FALSE);
-    char *pAmountEnd;
-    char *pFeeEnd;
-    unsigned long long fee = strtoull(nativeFee, &pFeeEnd, 10);
-    unsigned long long amount = strtoull(nativeAmount, &pAmountEnd, 10);
-
-    jbyteArray result = getBytesFromUnsignedLongLong(
-            jEnv,
-            wallet_send_transaction(pWallet, pDestination, amount, fee, pMessage, r));
-    setErrorCode(jEnv, error, i);
-    jEnv->ReleaseStringUTFChars(jamount, nativeAmount);
-    jEnv->ReleaseStringUTFChars(jfee, nativeFee);
-    jEnv->ReleaseStringUTFChars(jmessage, pMessage);
-    return result;
-}
-
 extern "C"
 JNIEXPORT jbyteArray JNICALL
 Java_com_tari_android_wallet_ffi_FFIWallet_jniEstimateTxFee(
@@ -1113,7 +1013,7 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniAddBaseNodePeer(
 
 extern "C"
 JNIEXPORT jbyteArray JNICALL
-Java_com_tari_android_wallet_ffi_FFIWallet_jniSyncWithBaseNode(
+Java_com_tari_android_wallet_ffi_FFIWallet_jniStartUTXOValidation(
         JNIEnv *jEnv,
         jobject jThis,
         jobject error) {
@@ -1123,7 +1023,79 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniSyncWithBaseNode(
     auto *pWallet = reinterpret_cast<TariWallet *>(lWallet);
     jbyteArray result = getBytesFromUnsignedLongLong(
             jEnv,
-            wallet_sync_with_base_node(pWallet, r)
+            wallet_start_utxo_validation(pWallet, r)
+    );
+    setErrorCode(jEnv, error, i);
+    return result;
+}
+
+extern "C"
+JNIEXPORT jbyteArray JNICALL
+Java_com_tari_android_wallet_ffi_FFIWallet_jniStartSTXOValidation(
+        JNIEnv *jEnv,
+        jobject jThis,
+        jobject error) {
+    int i = 0;
+    int *r = &i;
+    jlong lWallet = GetPointerField(jEnv, jThis);
+    auto *pWallet = reinterpret_cast<TariWallet *>(lWallet);
+    jbyteArray result = getBytesFromUnsignedLongLong(
+            jEnv,
+            wallet_start_stxo_validation(pWallet, r)
+    );
+    setErrorCode(jEnv, error, i);
+    return result;
+}
+
+extern "C"
+JNIEXPORT jbyteArray JNICALL
+Java_com_tari_android_wallet_ffi_FFIWallet_jniStartInvalidTXOValidation(
+        JNIEnv *jEnv,
+        jobject jThis,
+        jobject error) {
+    int i = 0;
+    int *r = &i;
+    jlong lWallet = GetPointerField(jEnv, jThis);
+    auto *pWallet = reinterpret_cast<TariWallet *>(lWallet);
+    jbyteArray result = getBytesFromUnsignedLongLong(
+            jEnv,
+            wallet_start_invalid_txo_validation(pWallet, r)
+    );
+    setErrorCode(jEnv, error, i);
+    return result;
+}
+
+extern "C"
+JNIEXPORT jbyteArray JNICALL
+Java_com_tari_android_wallet_ffi_FFIWallet_jniStartTxValidation(
+        JNIEnv *jEnv,
+        jobject jThis,
+        jobject error) {
+    int i = 0;
+    int *r = &i;
+    jlong lWallet = GetPointerField(jEnv, jThis);
+    auto *pWallet = reinterpret_cast<TariWallet *>(lWallet);
+    jbyteArray result = getBytesFromUnsignedLongLong(
+            jEnv,
+            wallet_start_transaction_validation(pWallet, r)
+    );
+    setErrorCode(jEnv, error, i);
+    return result;
+}
+
+extern "C"
+JNIEXPORT jbyteArray JNICALL
+Java_com_tari_android_wallet_ffi_FFIWallet_jniRestartTxBroadcast(
+        JNIEnv *jEnv,
+        jobject jThis,
+        jobject error) {
+    int i = 0;
+    int *r = &i;
+    jlong lWallet = GetPointerField(jEnv, jThis);
+    auto *pWallet = reinterpret_cast<TariWallet *>(lWallet);
+    jbyteArray result = getBytesFromUnsignedLongLong(
+            jEnv,
+            wallet_restart_transaction_broadcast(pWallet, r)
     );
     setErrorCode(jEnv, error, i);
     return result;
@@ -1266,6 +1238,156 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniSetConfirmations(
     wallet_set_num_confirmations_required(pWallet, number, r);
     jEnv->ReleaseStringUTFChars(jNumber, nativeString);
     setErrorCode(jEnv, error, i);
+}
+
+//region Wallet Test Functions
+extern "C"
+JNIEXPORT jboolean JNICALL
+Java_com_tari_android_wallet_ffi_FFIWallet_jniGenerateTestData(
+        JNIEnv *jEnv,
+        jobject jThis,
+        jstring jDatastorePath,
+        jobject error) {
+    int i = 0;
+    int *r = &i;
+    jlong lWallet = GetPointerField(jEnv, jThis);
+    const char *pDatastorePath = jEnv->GetStringUTFChars(jDatastorePath, JNI_FALSE);
+    auto result = static_cast<jboolean>(
+            wallet_test_generate_data(
+                    reinterpret_cast<TariWallet *>(lWallet), pDatastorePath, r
+            ) != 0
+    );
+    setErrorCode(jEnv, error, i);
+    jEnv->ReleaseStringUTFChars(jDatastorePath, pDatastorePath);
+    return result;
+}
+
+extern "C"
+JNIEXPORT jboolean JNICALL
+Java_com_tari_android_wallet_ffi_FFIWallet_jniTestBroadcastTx(
+        JNIEnv *jEnv,
+        jobject jThis,
+        jstring jTxID,
+        jobject error) {
+    int i = 0;
+    int *r = &i;
+    jlong lWallet = GetPointerField(jEnv, jThis);
+    auto *pWallet = reinterpret_cast<TariWallet *>(lWallet);
+    const char *pTxId = jEnv->GetStringUTFChars(jTxID, JNI_FALSE);
+    char *pEnd;
+    unsigned long long tx = strtoull(pTxId, &pEnd, 10);
+    jEnv->ReleaseStringUTFChars(jTxID, pTxId);
+    auto result = static_cast<jboolean>(wallet_test_broadcast_transaction(pWallet, tx, r) != 0);
+    setErrorCode(jEnv, error, i);
+    return result;
+}
+
+extern "C"
+JNIEXPORT jboolean JNICALL
+Java_com_tari_android_wallet_ffi_FFIWallet_jniTestFinalizeReceivedTx(
+        JNIEnv *jEnv,
+        jobject jThis,
+        jobject jTx,
+        jobject error) {
+    int i = 0;
+    int *r = &i;
+    jlong lWallet = GetPointerField(jEnv, jThis);
+    auto *pWallet = reinterpret_cast<TariWallet *>(lWallet);
+    jlong lTx = GetPointerField(jEnv, jTx);
+    auto *pTx = reinterpret_cast<TariPendingInboundTransaction *>(lTx);
+    auto result = static_cast<jboolean>(
+            wallet_test_finalize_received_transaction(pWallet, pTx, r) != 0
+    );
+    setErrorCode(jEnv, error, i);
+    return result;
+}
+
+extern "C"
+JNIEXPORT jboolean JNICALL
+Java_com_tari_android_wallet_ffi_FFIWallet_jniTestCompleteSentTx(
+        JNIEnv *jEnv,
+        jobject jThis,
+        jobject jTx,
+        jobject error) {
+    int i = 0;
+    int *r = &i;
+    jlong lWallet = GetPointerField(jEnv, jThis);
+    auto *pWallet = reinterpret_cast<TariWallet *>(lWallet);
+    jlong lTx = GetPointerField(jEnv, jTx);
+    auto *pTx = reinterpret_cast<TariPendingOutboundTransaction *>(lTx);
+    auto result = static_cast<jboolean>(
+            wallet_test_complete_sent_transaction(pWallet, pTx, r) != 0);
+    setErrorCode(jEnv, error, i);
+    return result;
+}
+
+extern "C"
+JNIEXPORT jboolean JNICALL
+Java_com_tari_android_wallet_ffi_FFIWallet_jniTestMineTx(
+        JNIEnv *jEnv,
+        jobject jThis,
+        jstring jTxID,
+        jobject error) {
+    int i = 0;
+    int *r = &i;
+    jlong lWallet = GetPointerField(jEnv, jThis);
+    auto *pWallet = reinterpret_cast<TariWallet *>(lWallet);
+    const char *pTxId = jEnv->GetStringUTFChars(jTxID, JNI_FALSE);
+    char *pEnd;
+    unsigned long long tx = strtoull(pTxId, &pEnd, 10);
+    jEnv->ReleaseStringUTFChars(jTxID, pTxId);
+    auto result = static_cast<jboolean>(wallet_test_mine_transaction(pWallet, tx, r) != 0);
+    setErrorCode(jEnv, error, i);
+    return result;
+}
+
+extern "C"
+JNIEXPORT jboolean JNICALL
+Java_com_tari_android_wallet_ffi_FFIWallet_jniTestReceiveTx(
+        JNIEnv *jEnv,
+        jobject jThis,
+        jobject error) {
+    int i = 0;
+    int *r = &i;
+    jlong lWallet = GetPointerField(jEnv, jThis);
+    auto *pWallet = reinterpret_cast<TariWallet *>(lWallet);
+    auto result = static_cast<jboolean>(wallet_test_receive_transaction(pWallet, r) != 0);
+    setErrorCode(jEnv, error, i);
+    return result;
+}
+
+extern "C"
+JNIEXPORT jbyteArray JNICALL
+Java_com_tari_android_wallet_ffi_FFIWallet_jniSendTx(
+        JNIEnv *jEnv,
+        jobject jThis,
+        jobject jdestination,
+        jstring jamount,
+        jstring jfeePerGram,
+        jstring jmessage,
+        jobject error) {
+    int i = 0;
+    int *r = &i;
+    jlong lWallet = GetPointerField(jEnv, jThis);
+    auto *pWallet = reinterpret_cast<TariWallet *>(lWallet);
+    jlong lDestination = GetPointerField(jEnv, jdestination);
+    auto *pDestination = reinterpret_cast<TariPublicKey *>(lDestination);
+    const char *nativeAmount = jEnv->GetStringUTFChars(jamount, JNI_FALSE);
+    const char *nativeFeePerGram = jEnv->GetStringUTFChars(jfeePerGram, JNI_FALSE);
+    const char *pMessage = jEnv->GetStringUTFChars(jmessage, JNI_FALSE);
+    char *pAmountEnd;
+    char *pFeeEnd;
+    unsigned long long feePerGram = strtoull(nativeFeePerGram, &pFeeEnd, 10);
+    unsigned long long amount = strtoull(nativeAmount, &pAmountEnd, 10);
+
+    jbyteArray result = getBytesFromUnsignedLongLong(
+            jEnv,
+            wallet_send_transaction(pWallet, pDestination, amount, feePerGram, pMessage, r));
+    setErrorCode(jEnv, error, i);
+    jEnv->ReleaseStringUTFChars(jamount, nativeAmount);
+    jEnv->ReleaseStringUTFChars(jfeePerGram, nativeFeePerGram);
+    jEnv->ReleaseStringUTFChars(jmessage, pMessage);
+    return result;
 }
 
 //endregion

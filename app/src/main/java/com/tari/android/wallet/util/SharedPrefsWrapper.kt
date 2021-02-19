@@ -38,6 +38,7 @@ import android.net.Uri
 import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
 import com.tari.android.wallet.application.Network
+import com.tari.android.wallet.model.BaseNodeValidationResult
 import com.tari.android.wallet.service.faucet.TestnetTariUTXOKey
 import de.adorsys.android.securestoragelibrary.SecurePreferences
 import org.joda.time.DateTime
@@ -63,7 +64,7 @@ class SharedPrefsWrapper(
         const val onboardingCompleted = "tari_wallet_onboarding_completed"
         const val onboardingDisplayedAtHome = "tari_wallet_onboarding_displayed_at_home"
         const val torBinPath = "tari_wallet_tor_bin_path"
-        const val baseNodeLastSyncWasSuccessful = "tari_wallet_base_node_last_sync_was_successful"
+        const val baseNodeLastSyncResult = "tari_wallet_base_node_last_sync_result"
         const val baseNodeIsUserCustom = "tari_wallet_base_node_is_user_custom"
         const val baseNodeNameKey = "tari_wallet_base_node_name"
         const val baseNodePublicKeyHexKey = "tari_wallet_base_node_public_key_hex"
@@ -153,10 +154,14 @@ class SharedPrefsWrapper(
             apply()
         }
 
-    var baseNodeLastSyncWasSuccessful: Boolean?
-        get() = sharedPrefs.getString(Key.baseNodeLastSyncWasSuccessful, null)?.toBoolean()
+    var baseNodeLastSyncResult: BaseNodeValidationResult?
+        get() = try {
+            BaseNodeValidationResult.map(sharedPrefs.getInt(Key.baseNodeLastSyncResult, -1))
+        } catch (exception: Exception) {
+            null
+        }
         set(value) = sharedPrefs.edit().run {
-            putString(Key.baseNodeLastSyncWasSuccessful, value?.toString())
+            putInt(Key.baseNodeLastSyncResult, value?.status ?: -1)
             apply()
         }
 
@@ -301,7 +306,7 @@ class SharedPrefsWrapper(
         onboardingAuthSetupCompleted = false
         onboardingDisplayedAtHome = false
         torBinPath = null
-        baseNodeLastSyncWasSuccessful = false
+        baseNodeLastSyncResult = null
         baseNodeIsUserCustom = false
         baseNodeName = null
         baseNodePublicKeyHex = null

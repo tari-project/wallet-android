@@ -185,7 +185,7 @@ internal class WalletManager(
         val name = baseNode.first
         val publicKeyHex = baseNode.second
         val address = baseNode.third
-        sharedPrefsWrapper.baseNodeLastSyncWasSuccessful = null
+        sharedPrefsWrapper.baseNodeLastSyncResult = null
         sharedPrefsWrapper.baseNodeName = name
         sharedPrefsWrapper.baseNodePublicKeyHex = publicKeyHex
         sharedPrefsWrapper.baseNodeAddress = address

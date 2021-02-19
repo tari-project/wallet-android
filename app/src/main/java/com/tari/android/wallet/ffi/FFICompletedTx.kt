@@ -125,16 +125,7 @@ internal class FFICompletedTx() : FFIBase() {
         val error = FFIError()
         val status = jniGetStatus(error)
         throwIf(error)
-        return when (status) {
-            -1 -> FFITxStatus.TX_NULL_ERROR
-            0 -> FFITxStatus.COMPLETED
-            1 -> FFITxStatus.BROADCAST
-            2 -> FFITxStatus.MINED
-            3 -> FFITxStatus.IMPORTED
-            4 -> FFITxStatus.PENDING
-            5 -> FFITxStatus.UNKNOWN
-            else -> throw FFIException(message = "Unexpected status: $status")
-        }
+        return FFITxStatus.map(status)
     }
 
     fun isOutbound(): Boolean {

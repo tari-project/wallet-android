@@ -54,6 +54,7 @@ import com.tari.android.wallet.R.string.*
 import com.tari.android.wallet.databinding.HomeTxListItemBinding
 import com.tari.android.wallet.extension.applyFontStyle
 import com.tari.android.wallet.model.*
+import com.tari.android.wallet.model.TxStatus.MINED_CONFIRMED
 import com.tari.android.wallet.model.TxStatus.PENDING
 import com.tari.android.wallet.ui.component.CustomFont
 import com.tari.android.wallet.ui.component.EmojiIdSummaryViewController
@@ -256,12 +257,18 @@ class TxViewHolder(
     private fun displayStatus(tx: Tx) = when (tx) {
         is PendingInboundTx -> showStatusTextView(
             if (tx.status == PENDING) tx_detail_waiting_for_sender_to_complete
-            else tx_detail_broadcasting
+            else tx_detail_completing_final_processing
         )
         is PendingOutboundTx -> showStatusTextView(
             if (tx.status == PENDING) tx_detail_waiting_for_recipient
-            else tx_detail_broadcasting
+            else tx_detail_completing_final_processing
         )
+        is CompletedTx -> {
+            when (tx.status) {
+                MINED_CONFIRMED -> showStatusTextView(tx_detail_completing_final_processing)
+                else -> ui.statusTextView.gone()
+            }
+        }
         is CancelledTx -> showStatusTextView(tx_detail_payment_cancelled)
         else -> ui.statusTextView.gone()
     }

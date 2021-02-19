@@ -33,6 +33,8 @@
 package com.tari.android.wallet.util
 
 import com.tari.android.wallet.application.Network
+import com.tari.android.wallet.model.MicroTari
+import java.math.BigInteger
 
 /**
  * Contains application-wide constant values.
@@ -149,6 +151,7 @@ internal object Constants {
         const val backupDelayMs = 60 * 1000L
         const val backupRetryPeriodMs = 0L
         const val maxBackupRetries = 2
+        val defaultFeePerGram = MicroTari(BigInteger.valueOf(100))
     }
 
 }

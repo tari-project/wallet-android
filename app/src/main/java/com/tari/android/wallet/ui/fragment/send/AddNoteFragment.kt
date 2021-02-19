@@ -143,7 +143,6 @@ class AddNoteFragment : Fragment(), View.OnTouchListener {
     // Tx properties.
     private lateinit var recipientUser: User
     private lateinit var amount: MicroTari
-    private lateinit var fee: MicroTari
 
     private lateinit var ui: FragmentAddNoteBinding
     private lateinit var viewModel: ThumbnailGIFsViewModel
@@ -160,7 +159,7 @@ class AddNoteFragment : Fragment(), View.OnTouchListener {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? = FragmentAddNoteBinding.inflate(inflater, container, false).also { ui = it }.root
+    ): View = FragmentAddNoteBinding.inflate(inflater, container, false).also { ui = it }.root
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -264,11 +263,10 @@ class AddNoteFragment : Fragment(), View.OnTouchListener {
     }
 
     private fun retrievePageArguments(savedInstanceState: Bundle?) {
-        recipientUser = arguments!!.getParcelable("recipientUser")!!
-        amount = arguments!!.getParcelable("amount")!!
-        fee = arguments!!.getParcelable("fee")!!
+        recipientUser = requireArguments().getParcelable("recipientUser")!!
+        amount = requireArguments().getParcelable("amount")!!
         if (savedInstanceState == null) {
-            arguments!!.getString(DeepLink.PARAMETER_NOTE)?.let { ui.noteEditText.setText(it) }
+            requireArguments().getString(DeepLink.PARAMETER_NOTE)?.let { ui.noteEditText.setText(it) }
         }
     }
 
@@ -656,7 +654,7 @@ class AddNoteFragment : Fragment(), View.OnTouchListener {
             ui.rootView.postDelayed(AddNoteAndSend.preKeyboardHideWaitMs + Constants.UI.keyboardHideWaitMs) {
                 restoreSlider()
                 ui.noteEditText.isEnabled = true
-                showInternetConnectionErrorDialog(activity!!)
+                showInternetConnectionErrorDialog(requireActivity())
             }
         } else {
             ui.removeGifCtaView.isEnabled = false
@@ -682,7 +680,6 @@ class AddNoteFragment : Fragment(), View.OnTouchListener {
             this,
             recipientUser,
             amount,
-            fee,
             TxNote(
                 ui.noteEditText.editableText.toString(),
                 gifContainer.gif?.embedUri?.toString()
@@ -721,7 +718,6 @@ class AddNoteFragment : Fragment(), View.OnTouchListener {
             sourceFragment: AddNoteFragment,
             recipientUser: User,
             amount: MicroTari,
-            fee: MicroTari,
             note: String
         )
 

@@ -76,7 +76,7 @@ framework for UI tree rebuild on configuration changes"""
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? = FragmentStoreBinding.inflate(
+    ): View = FragmentStoreBinding.inflate(
         LayoutInflater.from(ContextThemeWrapper(requireContext(), R.style.AppTheme)),
         container,
         false

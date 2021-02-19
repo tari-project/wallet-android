@@ -88,7 +88,7 @@ internal class LocalAuthFragment : Fragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? = FragmentLocalAuthBinding.inflate(inflater, container, false).also { ui = it }.root
+    ): View = FragmentLocalAuthBinding.inflate(inflater, container, false).also { ui = it }.root
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -228,7 +228,7 @@ internal class LocalAuthFragment : Fragment() {
      * Auth not available on device
      */
     private fun displayAuthNotAvailableDialog() {
-        val dialogBuilder = AlertDialog.Builder(context!!)
+        val dialogBuilder = AlertDialog.Builder(requireContext())
         dialogBuilder.setMessage(string(auth_not_available_or_canceled_desc))
             .setCancelable(false)
             .setPositiveButton(string(proceed)) { dialog, _ ->

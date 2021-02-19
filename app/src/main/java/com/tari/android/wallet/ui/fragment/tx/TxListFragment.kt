@@ -168,7 +168,7 @@ internal class TxListFragment : Fragment(),
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? = FragmentTxListBinding.inflate(inflater, container, false).also { ui = it }.root
+    ): View = FragmentTxListBinding.inflate(inflater, container, false).also { ui = it }.root
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -971,16 +971,19 @@ internal class TxListFragment : Fragment(),
 
     override fun updateHasFailed(
         source: UpdateProgressViewController,
-        failureReason: UpdateProgressViewController.FailureReason
+        failureReason: UpdateProgressViewController.FailureReason,
+        validationResult: BaseNodeValidationResult?
     ) {
         lifecycleScope.launch(Dispatchers.Main) {
             ui.scrollView.finishUpdate()
-            when (failureReason) {
-                UpdateProgressViewController.FailureReason.NETWORK_CONNECTION_ERROR -> {
-                    displayNetworkConnectionErrorDialog()
-                }
-                UpdateProgressViewController.FailureReason.BASE_NODE_CONNECTION_ERROR -> {
-                    displayBaseNodeConnectionErrorDialog()
+            if (validationResult != BaseNodeValidationResult.ABORTED) {
+                when (failureReason) {
+                    UpdateProgressViewController.FailureReason.NETWORK_CONNECTION_ERROR -> {
+                        displayNetworkConnectionErrorDialog()
+                    }
+                    UpdateProgressViewController.FailureReason.BASE_NODE_VALIDATION_ERROR -> {
+                        displayBaseNodeConnectionErrorDialog()
+                    }
                 }
             }
         }
