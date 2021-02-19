@@ -236,6 +236,15 @@ internal class FFIWallet(
         libError: FFIError
     ): Boolean
 
+    private external fun jniGetConfirmations(
+        libError: FFIError
+    ): ByteArray
+
+    private external fun jniSetConfirmations(
+        number: String,
+        libError: FFIError
+    )
+
     private external fun jniDestroy()
 
     // endregion
@@ -788,6 +797,24 @@ internal class FFIWallet(
 
     fun logMessage(message: String) {
         jniLogMessage(message)
+    }
+
+    fun getConfirmations(): BigInteger {
+        val error = FFIError()
+        val bytes = jniGetConfirmations(
+            error
+        )
+        throwIf(error)
+        return BigInteger(1, bytes)
+    }
+
+    fun setConfirmations(number: BigInteger) {
+        val error = FFIError()
+        val bytes = jniSetConfirmations(
+            number.toString(),
+            error
+        )
+        throwIf(error)
     }
 
     override fun destroy() {
