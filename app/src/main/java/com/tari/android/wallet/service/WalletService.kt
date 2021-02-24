@@ -572,6 +572,7 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
                 type.name + " Validation [$responseId] complete. Result: $result."
                         + " Request id [${currentStatus.first}] mismatch. Ignoring."
             )
+            return
         }
         Logger.d(type.name + " Validation [$responseId] complete. Result: $result.")
         baseNodeValidationStatusMap[type] = Pair(

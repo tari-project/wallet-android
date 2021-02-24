@@ -4,7 +4,7 @@ buildscript {
     ext.kotlin_version = '1.4.21'
 
     // build & version
-    ext.buildNumber = 150
+    ext.buildNumber = 151
     ext.versionNumber = "0.6.0"
 
     // JNI libs

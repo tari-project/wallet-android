@@ -54,7 +54,7 @@ import com.tari.android.wallet.R.string.*
 import com.tari.android.wallet.databinding.HomeTxListItemBinding
 import com.tari.android.wallet.extension.applyFontStyle
 import com.tari.android.wallet.model.*
-import com.tari.android.wallet.model.TxStatus.MINED_CONFIRMED
+import com.tari.android.wallet.model.TxStatus.MINED_UNCONFIRMED
 import com.tari.android.wallet.model.TxStatus.PENDING
 import com.tari.android.wallet.ui.component.CustomFont
 import com.tari.android.wallet.ui.component.EmojiIdSummaryViewController
@@ -209,6 +209,14 @@ class TxViewHolder(
                 color(R.color.home_tx_value_pending),
                 drawable(R.drawable.home_tx_value_pending_bg)!!
             )
+            tx is CompletedTx && tx.status == MINED_UNCONFIRMED -> Triple(
+                when (tx.direction) {
+                    Tx.Direction.OUTBOUND -> "-$amount"
+                    Tx.Direction.INBOUND -> "+$amount"
+                },
+                color(R.color.home_tx_value_pending),
+                drawable(R.drawable.home_tx_value_pending_bg)!!
+            )
             tx.direction == Tx.Direction.INBOUND -> Triple(
                 "+$amount",
                 color(R.color.home_tx_value_positive),
@@ -265,7 +273,7 @@ class TxViewHolder(
         )
         is CompletedTx -> {
             when (tx.status) {
-                MINED_CONFIRMED -> showStatusTextView(tx_detail_completing_final_processing)
+                MINED_UNCONFIRMED -> showStatusTextView(tx_detail_completing_final_processing)
                 else -> ui.statusTextView.gone()
             }
         }
