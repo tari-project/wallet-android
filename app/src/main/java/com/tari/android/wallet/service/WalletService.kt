@@ -168,6 +168,8 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
 
     private lateinit var wallet: FFIWallet
 
+    private var txBroadcastRestarted = false
+
     /**
      * Pairs of <tx id, recipient public key hex>.
      */
@@ -596,6 +598,15 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
 
     override fun onTxValidationComplete(responseId: BigInteger, result: BaseNodeValidationResult) {
         checkValidationResult(BaseNodeValidationType.TX, responseId, result)
+        if (!txBroadcastRestarted && result == BaseNodeValidationResult.SUCCESS) {
+            try {
+                wallet.restartTxBroadcast()
+                txBroadcastRestarted = true
+                Logger.i("Transaction broadcast restarted.")
+            } catch (e: Exception) {
+                Logger.e("Error while restarting tx broadcast: " + e.message)
+            }
+        }
     }
 
     /**

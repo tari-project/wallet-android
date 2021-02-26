@@ -818,7 +818,7 @@ internal class FFIWallet(
         return BigInteger(1, bytes)
     }
 
-    fun restartTxValidation(): BigInteger {
+    fun restartTxBroadcast(): BigInteger {
         val error = FFIError()
         val bytes = jniRestartTxBroadcast(error)
         throwIf(error)

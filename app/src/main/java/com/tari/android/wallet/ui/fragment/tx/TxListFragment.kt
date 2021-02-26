@@ -308,6 +308,9 @@ internal class TxListFragment : Fragment(),
         EventBus.subscribe<Event.Wallet.OutboundTxBroadcast>(this) {
             onOutboundTxBroadcast(it.tx)
         }
+        EventBus.subscribe<Event.Wallet.TxMinedUnconfirmed>(this) {
+            onTxMinedUnconfirmed(it.tx, it.confirmationCount)
+        }
         EventBus.subscribe<Event.Wallet.TxMined>(this) {
             onTxMined(it.tx)
         }
@@ -448,13 +451,21 @@ internal class TxListFragment : Fragment(),
         pendingOutboundTxs.firstOrNull { it.id == tx.id }?.status = TxStatus.BROADCAST
     }
 
-    private fun onTxMined(tx: CompletedTx) {
+    private fun onTxMinedUnconfirmed(tx: CompletedTx, confirmationCount: Int) {
         val source = when (tx.direction) {
             Tx.Direction.INBOUND -> pendingInboundTxs
             Tx.Direction.OUTBOUND -> pendingOutboundTxs
         }
         source.find { it.id == tx.id }?.let { source.remove(it) }
-        completedTxs.add(tx)
+        if (completedTxs.find { it.id == tx.id } == null) {
+            completedTxs.add(tx)
+        }
+        // update tx list UI
+        lifecycleScope.launch(Dispatchers.Main) { updateTxListUI() }
+    }
+
+    private fun onTxMined(tx: CompletedTx) {
+        completedTxs.firstOrNull { it.id == tx.id }?.status = TxStatus.MINED_CONFIRMED
         // update tx list UI
         lifecycleScope.launch(Dispatchers.Main) { updateTxListUI() }
     }

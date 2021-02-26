@@ -135,7 +135,7 @@ void txMinedUnconfirmedCallback(struct TariCompletedTransaction *pCompletedTrans
             callbackHandler,
             txMinedUnconfirmedCallbackMethodId,
             jpCompletedTransaction,
-            confirmationCount);
+            bytes);
     g_vm->DetachCurrentThread();
 }
 
