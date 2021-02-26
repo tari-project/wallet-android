@@ -236,7 +236,7 @@ class AddRecipientFragment : Fragment(),
         OverScrollDecoratorHelper.setUpOverScroll(ui.searchEditTextScrollView)
         ui.searchEditText.inputType = InputType.TYPE_NULL
         ui.backButton.setOnClickListener { onBackButtonClicked(it) }
-        ui.qrCodeButton.setOnClickListener { onQRButtonClick() }
+        ui.qrCodeButton.setOnClickListener { onQRButtonClick(it) }
         ui.continueButton.setOnClickListener { onContinueButtonClicked(it) }
         dimmerViews.forEach { it.setOnClickListener { onEmojiIdDimmerClicked() } }
         ui.pasteEmojiIdButton.setOnClickListener { onPasteEmojiIdButtonClicked() }
@@ -554,7 +554,8 @@ class AddRecipientFragment : Fragment(),
     /**
      * Open QR code scanner on button click.
      */
-    private fun onQRButtonClick() {
+    private fun onQRButtonClick(view: View) {
+        view.temporarilyDisableClick()
         requireActivity().hideKeyboard()
         hidePasteEmojiIdViews(animate = true) {
             ui.rootView.postDelayed(Constants.UI.keyboardHideWaitMs) { startQRCodeActivity() }
