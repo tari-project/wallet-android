@@ -60,12 +60,18 @@ internal class TxListAdapter(
 
     fun notifyDataChanged() {
         items.clear()
+        val minedUnconfirmedTxs = completedTxs.filter {
+            it.status == TxStatus.MINED_UNCONFIRMED
+        }
+        val nonMinedUnconfirmedCompletedTxs = completedTxs.filter {
+            it.status != TxStatus.MINED_UNCONFIRMED
+        }
         // sort and add pending txs
-        val pendingTxs = (pendingInboundTxs + pendingOutboundTxs).toMutableList()
+        val pendingTxs = (pendingInboundTxs + pendingOutboundTxs + minedUnconfirmedTxs).toMutableList()
         pendingTxs.sortWith(compareByDescending(Tx::timestamp).thenByDescending { it.id })
         items.addAll(pendingTxs)
         // sort and add non-pending txs
-        val nonPendingTxs = (cancelledTxs + completedTxs).toMutableList()
+        val nonPendingTxs = (cancelledTxs + nonMinedUnconfirmedCompletedTxs).toMutableList()
         nonPendingTxs.sortWith(compareByDescending(Tx::timestamp).thenByDescending { it.id })
         items.addAll(nonPendingTxs)
         // update UI

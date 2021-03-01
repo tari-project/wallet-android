@@ -391,8 +391,7 @@ internal class TxDetailsActivity : AppCompatActivity(), ServiceConnection {
             state == TxState(INBOUND, PENDING) ->
                 string(tx_detail_waiting_for_sender_to_complete)
             state == TxState(OUTBOUND, PENDING) -> string(tx_detail_waiting_for_recipient)
-            state.status == COMPLETED || state.status == BROADCAST ->
-                string(tx_detail_completing_final_processing)
+            state.status != MINED_CONFIRMED -> string(tx_detail_completing_final_processing)
             else -> ""
         }
         ui.statusTextView.text = statusText
@@ -434,6 +433,7 @@ internal class TxDetailsActivity : AppCompatActivity(), ServiceConnection {
         EventBus.subscribe<Event.Wallet.OutboundTxBroadcast>(this) { updateTxData(it.tx) }
         EventBus.subscribe<Event.Wallet.TxFinalized>(this) { updateTxData(it.tx) }
         EventBus.subscribe<Event.Wallet.TxMined>(this) { updateTxData(it.tx) }
+        EventBus.subscribe<Event.Wallet.TxMinedUnconfirmed>(this) { updateTxData(it.tx) }
         EventBus.subscribe<Event.Wallet.TxReplyReceived>(this) { updateTxData(it.tx) }
         EventBus.subscribe<Event.Wallet.TxCancelled>(this) { updateTxData(it.tx) }
     }
