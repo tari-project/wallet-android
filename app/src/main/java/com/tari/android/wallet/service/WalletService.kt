@@ -77,7 +77,6 @@ import java.util.*
 import java.util.concurrent.*
 import javax.inject.Inject
 import javax.inject.Named
-import kotlin.collections.ArrayList
 
 /**
  * Foreground wallet service.
@@ -705,6 +704,34 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
      */
     inner class TariWalletServiceImpl : TariWalletService.Stub() {
 
+        private var _cachedContacts: List<Contact>? = null
+        private val cachedContacts: List<Contact>
+            @Synchronized get() {
+                _cachedContacts?.let {
+                    return it
+                }
+                val contactsFFI = wallet.getContacts()
+                val contacts = mutableListOf<Contact>()
+                for (i in 0 until contactsFFI.getLength()) {
+                    val contactFFI = contactsFFI.getAt(i)
+                    val publicKeyFFI = contactFFI.getPublicKey()
+                    contacts.add(
+                        Contact(
+                            publicKeyFromFFI(publicKeyFFI),
+                            contactFFI.getAlias()
+                        )
+                    )
+                    // destroy native objects
+                    publicKeyFFI.destroy()
+                    contactFFI.destroy()
+                }
+                // destroy native collection
+                contactsFFI.destroy()
+                return contacts.sortedWith(compareBy { it.alias }).also {
+                    _cachedContacts = it
+                }
+            }
+
         /**
          * Maps the throwable into the error out parameter.
          */
@@ -719,9 +746,8 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
         }
 
         private fun getContactByPublicKeyHexString(
-            allContacts: List<Contact>,
             hexString: String
-        ): Contact? = allContacts.firstOrNull { it.publicKey.hexString == hexString }
+        ): Contact? = cachedContacts.firstOrNull { it.publicKey.hexString == hexString }
 
         override fun registerListener(listener: TariWalletServiceListener): Boolean {
             listeners.add(listener)
@@ -787,140 +813,48 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
          * Get all contacts.
          */
         override fun getContacts(error: WalletError): List<Contact>? {
-            try {
-                val contactsFFI = wallet.getContacts()
-                val contacts = mutableListOf<Contact>()
-                for (i in 0 until contactsFFI.getLength()) {
-                    val contactFFI = contactsFFI.getAt(i)
-                    val publicKeyFFI = contactFFI.getPublicKey()
-                    contacts.add(
-                        Contact(
-                            publicKeyFromFFI(publicKeyFFI),
-                            contactFFI.getAlias()
-                        )
-                    )
-                    // destroy native objects
-                    publicKeyFFI.destroy()
-                    contactFFI.destroy()
-                }
-                // destroy native collection
-                contactsFFI.destroy()
-                return contacts.sortedWith(compareBy { it.alias })
+            return try {
+                cachedContacts
             } catch (throwable: Throwable) {
-                error.code = WalletErrorCode.UNKNOWN_ERROR
-                error.message = throwable.message
-                if (throwable is FFIException) {
-                    if (throwable.error != null) {
-                        error.code = WalletErrorCode.fromCode(throwable.error.code)
-                    }
-                }
-                return null
+                mapThrowableIntoError(throwable, error)
+                null
             }
         }
-
-        /**
-         * Gets all users that this wallet had a transaction with, and returns a list
-         * of most recent ones, limited by the limit parameter.
-         */
-        override fun getRecentTxUsers(maxCount: Int, error: WalletError): MutableList<User>? {
-            // pre-fetch contacs
-            val allContacts = getContacts(error)
-            if (error.code != WalletErrorCode.NO_ERROR || allContacts == null) {
-                return null
-            }
-            val txs = ArrayList<Tx>()
-            // collect all transactions
-            txs.addAll(getPendingInboundTxs(allContacts))
-            txs.addAll(getPendingOutboundTxs(allContacts))
-            txs.addAll(getCompletedTxs(allContacts))
-            txs.addAll(getCancelledTxs(allContacts))
-            // sort them by descending timestamp
-            val sortedTxs = txs.sortedWith(compareByDescending { it.timestamp })
-            val recentTxUsers = mutableListOf<User>()
-
-            for (tx in sortedTxs) {
-                if (recentTxUsers.size >= maxCount) { // comes first for the case of (maxCount <= 0)
-                    break
-                }
-                if (!recentTxUsers.contains(tx.user)) {
-                    val txUser = getContactByPublicKeyHexString(
-                        allContacts,
-                        tx.user.publicKey.hexString
-                    ) ?: tx.user
-                    recentTxUsers.add(txUser)
-                }
-            }
-            return recentTxUsers
-        }
-
-        /**
-         * Internal function to get all completed transactions.
-         *
-         * @param allContacts pre-fetched list of all contacts
-         */
-        private fun getCompletedTxs(allContacts: List<Contact>): List<CompletedTx> {
-            val completedTxsFFI = wallet.getCompletedTxs()
-            val completedTxs = mutableListOf<CompletedTx>()
-            for (i in 0 until completedTxsFFI.getLength()) {
-                val completedTxFFI = completedTxsFFI.getAt(i)
-                val completedTx = completedTxFromFFI(completedTxFFI, allContacts)
-                completedTxFFI.destroy()
-                completedTxs.add(completedTx)
-            }
-            // destroy native collection
-            completedTxsFFI.destroy()
-            return completedTxs
-        }
-
 
         /**
          * Get all completed transactions.
          * Client-facing function.
          */
         override fun getCompletedTxs(error: WalletError): List<CompletedTx>? {
-            val contacts = getContacts(error)
-            if (error.code != WalletErrorCode.NO_ERROR || contacts == null) {
-                return null
-            }
             return try {
-                getCompletedTxs(contacts)
+                val completedTxsFFI = wallet.getCompletedTxs()
+                return (0 until completedTxsFFI.getLength())
+                    .map {
+                        val completedTxFFI = completedTxsFFI.getAt(it)
+                        completedTxFromFFI(completedTxFFI).also {
+                            completedTxFFI.destroy()
+                        }
+                    }.also { completedTxsFFI.destroy() }
             } catch (throwable: Throwable) {
                 mapThrowableIntoError(throwable, error)
                 null
             }
-        }
-
-        private fun getCancelledTxs(contacts: List<Contact>): List<CancelledTx> {
-            val canceledTxsFFI = wallet.getCancelledTxs()
-            return (0 until canceledTxsFFI.getLength())
-                .map {
-                    val txFFI = canceledTxsFFI.getAt(it)
-                    cancelledTxFromFFI(txFFI, contacts).also { txFFI.destroy() }
-                }.also { canceledTxsFFI.destroy() }
         }
 
         override fun getCancelledTxs(error: WalletError): List<CancelledTx>? {
-            val contacts = getContacts(error)
-            return if (error.code != WalletErrorCode.NO_ERROR || contacts == null) null
-            else try {
-                getCancelledTxs(contacts)
+            return try {
+                val canceledTxsFFI = wallet.getCancelledTxs()
+                return (0 until canceledTxsFFI.getLength())
+                    .map {
+                        val cancelledTxFFI = canceledTxsFFI.getAt(it)
+                        cancelledTxFromFFI(cancelledTxFFI).also {
+                            cancelledTxFFI.destroy()
+                        }
+                    }.also { canceledTxsFFI.destroy() }
             } catch (throwable: Throwable) {
                 mapThrowableIntoError(throwable, error)
                 null
             }
-        }
-
-        /**
-         * Internal function to get a completed transaction by id.
-         *
-         * @param id tx id
-         * @param allContacts pre-fetched list of all contacts
-         */
-        private fun getCancelledTxById(id: TxId, allContacts: List<Contact>): CancelledTx {
-            val completedTxFFI = wallet.getCancelledTxById(id.value)
-            val cancelledTx = cancelledTxFromFFI(completedTxFFI, allContacts)
-            completedTxFFI.destroy()
-            return cancelledTx
         }
 
         /**
@@ -928,29 +862,15 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
          * Client-facing function.
          */
         override fun getCancelledTxById(id: TxId, error: WalletError): CancelledTx? {
-            val contacts = getContacts(error)
-            if (error.code != WalletErrorCode.NO_ERROR || contacts == null) {
-                return null
-            }
             return try {
-                getCancelledTxById(id, contacts)
+                val completedTxFFI = wallet.getCancelledTxById(id.value)
+                cancelledTxFromFFI(completedTxFFI).also {
+                    completedTxFFI.destroy()
+                }
             } catch (throwable: Throwable) {
                 mapThrowableIntoError(throwable, error)
                 null
             }
-        }
-
-        /**
-         * Internal function to get a completed transaction by id.
-         *
-         * @param id tx id
-         * @param allContacts pre-fetched list of all contacts
-         */
-        private fun getCompletedTxById(id: TxId, allContacts: List<Contact>): CompletedTx {
-            val completedTxFFI = wallet.getCompletedTxById(id.value)
-            val completedTx = completedTxFromFFI(completedTxFFI, allContacts)
-            completedTxFFI.destroy()
-            return completedTx
         }
 
         /**
@@ -958,35 +878,15 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
          * Client-facing function.
          */
         override fun getCompletedTxById(id: TxId, error: WalletError): CompletedTx? {
-            val contacts = getContacts(error)
-            if (error.code != WalletErrorCode.NO_ERROR || contacts == null) {
-                return null
-            }
             return try {
-                getCompletedTxById(id, contacts)
+                val completedTxFFI = wallet.getCompletedTxById(id.value)
+                completedTxFromFFI(completedTxFFI).also {
+                    completedTxFFI.destroy()
+                }
             } catch (throwable: Throwable) {
                 mapThrowableIntoError(throwable, error)
                 null
             }
-        }
-
-        /**
-         * Internal function to get all pending inbound transactions.
-         *
-         * @param allContacts pre-fetched list of all contacts
-         */
-        private fun getPendingInboundTxs(allContacts: List<Contact>): List<PendingInboundTx> {
-            val pendingInboundTxsFFI = wallet.getPendingInboundTxs()
-            val pendingInboundTxs = mutableListOf<PendingInboundTx>()
-            for (i in 0 until pendingInboundTxsFFI.getLength()) {
-                val pendingInboundTxFFI = pendingInboundTxsFFI.getAt(i)
-                val pendingInboundTx = pendingInboundTxFromFFI(pendingInboundTxFFI, allContacts)
-                pendingInboundTxFFI.destroy()
-                pendingInboundTxs.add(pendingInboundTx)
-            }
-            // destroy native collection
-            pendingInboundTxsFFI.destroy()
-            return pendingInboundTxs
         }
 
         /**
@@ -994,32 +894,19 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
          * Client-facing function.
          */
         override fun getPendingInboundTxs(error: WalletError): List<PendingInboundTx>? {
-            val contacts = getContacts(error)
-            if (error.code != WalletErrorCode.NO_ERROR || contacts == null) {
-                return null
-            }
             return try {
-                getPendingInboundTxs(contacts)
+                val pendingInboundTxsFFI = wallet.getPendingInboundTxs()
+                return (0 until pendingInboundTxsFFI.getLength())
+                    .map {
+                        val pendingInboundTxFFI = pendingInboundTxsFFI.getAt(it)
+                        pendingInboundTxFromFFI(pendingInboundTxFFI).also {
+                            pendingInboundTxFFI.destroy()
+                        }
+                    }.also { pendingInboundTxsFFI.destroy() }
             } catch (throwable: Throwable) {
                 mapThrowableIntoError(throwable, error)
                 null
             }
-        }
-
-        /**
-         * Internal function to get a pending inbound transaction by id.
-         *
-         * @param id tx id
-         * @param allContacts pre-fetched list of all contacts
-         */
-        private fun getPendingInboundTxById(
-            id: TxId,
-            allContacts: List<Contact>
-        ): PendingInboundTx {
-            val pendingInboundTxFFI = wallet.getPendingInboundTxById(id.value)
-            val pendingInboundTx = pendingInboundTxFromFFI(pendingInboundTxFFI, allContacts)
-            pendingInboundTxFFI.destroy()
-            return pendingInboundTx
         }
 
         /**
@@ -1027,36 +914,15 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
          * Client-facing function.
          */
         override fun getPendingInboundTxById(id: TxId, error: WalletError): PendingInboundTx? {
-            // call the corresponding function with fresh contacts list
-            val contacts = getContacts(error)
-            if (error.code != WalletErrorCode.NO_ERROR || contacts == null) {
-                return null
-            }
             return try {
-                getPendingInboundTxById(id, contacts)
+                val pendingInboundTxFFI = wallet.getPendingInboundTxById(id.value)
+                pendingInboundTxFromFFI(pendingInboundTxFFI).also {
+                    pendingInboundTxFFI.destroy()
+                }
             } catch (throwable: Throwable) {
                 mapThrowableIntoError(throwable, error)
                 null
             }
-        }
-
-        /**
-         * Internal function to get all pending outbound transactions.
-         *
-         * @param allContacts pre-fetched list of all contacts
-         */
-        private fun getPendingOutboundTxs(allContacts: List<Contact>): List<PendingOutboundTx> {
-            val pendingOutboundTxsFFI = wallet.getPendingOutboundTxs()
-            val pendingOutboundTxs = mutableListOf<PendingOutboundTx>()
-            for (i in 0 until pendingOutboundTxsFFI.getLength()) {
-                val pendingOutboundTxFFI = pendingOutboundTxsFFI.getAt(i)
-                val pendingOutboundTx = pendingOutboundTxFromFFI(pendingOutboundTxFFI, allContacts)
-                pendingOutboundTxFFI.destroy()
-                pendingOutboundTxs.add(pendingOutboundTx)
-            }
-            // destroy native collection
-            pendingOutboundTxsFFI.destroy()
-            return pendingOutboundTxs
         }
 
         /**
@@ -1064,13 +930,15 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
          * Client-facing function.
          */
         override fun getPendingOutboundTxs(error: WalletError): List<PendingOutboundTx>? {
-            // call the corresponding function with fresh contacts list
-            val contacts = getContacts(error)
-            if (error.code != WalletErrorCode.NO_ERROR || contacts == null) {
-                return null
-            }
             return try {
-                getPendingOutboundTxs(contacts)
+                val pendingOutboundTxsFFI = wallet.getPendingOutboundTxs()
+                return (0 until pendingOutboundTxsFFI.getLength())
+                    .map {
+                        val pendingOutboundTxFFI = pendingOutboundTxsFFI.getAt(it)
+                        pendingOutboundTxFromFFI(pendingOutboundTxFFI).also {
+                            pendingOutboundTxFFI.destroy()
+                        }
+                    }.also { pendingOutboundTxsFFI.destroy() }
             } catch (throwable: Throwable) {
                 mapThrowableIntoError(throwable, error)
                 null
@@ -1078,33 +946,15 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
         }
 
         /**
-         * Internal function to get a pending outbound transaction by id.
-         *
-         * @param id tx id
-         * @param allContacts pre-fetched list of all contacts
-         */
-        private fun getPendingOutboundTxById(
-            id: TxId,
-            allContacts: List<Contact>
-        ): PendingOutboundTx {
-            val pendingOutboundTxFFI = wallet.getPendingOutboundTxById(id.value)
-            val pendingOutboundTx = pendingOutboundTxFromFFI(pendingOutboundTxFFI, allContacts)
-            pendingOutboundTxFFI.destroy()
-            return pendingOutboundTx
-        }
-
-        /**
          * Get pending outbound transaction by id.
          * Client-facing function.
          */
         override fun getPendingOutboundTxById(id: TxId, error: WalletError): PendingOutboundTx? {
-            // call the corresponding function with fresh contacts list
-            val contacts = getContacts(error)
-            if (error.code != WalletErrorCode.NO_ERROR || contacts == null) {
-                return null
-            }
             return try {
-                getPendingOutboundTxById(id, contacts)
+                val pendingOutboundTxFFI = wallet.getPendingOutboundTxById(id.value)
+                return pendingOutboundTxFromFFI(pendingOutboundTxFFI).also {
+                    pendingOutboundTxFFI.destroy()
+                }
             } catch (throwable: Throwable) {
                 mapThrowableIntoError(throwable, error)
                 null
@@ -1208,10 +1058,7 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
             )
         }
 
-        private fun completedTxFromFFI(
-            completedTxFFI: FFICompletedTx,
-            allContacts: List<Contact>
-        ): CompletedTx {
+        private fun completedTxFromFFI(completedTxFFI: FFICompletedTx): CompletedTx {
             val sourcePublicKeyFFI = completedTxFFI.getSourcePublicKey()
             val destinationPublicKeyFFI = completedTxFFI.getDestinationPublicKey()
             val status = TxStatus.map(completedTxFFI.getStatus())
@@ -1231,7 +1078,6 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
                     destinationPublicKeyFFI.getEmojiId()
                 )
                 user = getContactByPublicKeyHexString(
-                    allContacts,
                     destinationPublicKeyFFI.toString()
                 ) ?: User(userPublicKey)
             } else {
@@ -1241,7 +1087,6 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
                     sourcePublicKeyFFI.getEmojiId()
                 )
                 user = getContactByPublicKeyHexString(
-                    allContacts,
                     sourcePublicKeyFFI.toString()
                 ) ?: User(userPublicKey)
             }
@@ -1262,10 +1107,7 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
             return completedTx
         }
 
-        private fun cancelledTxFromFFI(
-            completedTxFFI: FFICompletedTx,
-            allContacts: List<Contact>
-        ): CancelledTx {
+        private fun cancelledTxFromFFI(completedTxFFI: FFICompletedTx): CancelledTx {
             val sourcePublicKeyFFI = completedTxFFI.getSourcePublicKey()
             val destinationPublicKeyFFI = completedTxFFI.getDestinationPublicKey()
             val status = TxStatus.map(completedTxFFI.getStatus())
@@ -1285,7 +1127,6 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
                     destinationPublicKeyFFI.getEmojiId()
                 )
                 user = getContactByPublicKeyHexString(
-                    allContacts,
                     destinationPublicKeyFFI.toString()
                 ) ?: User(userPublicKey)
             } else {
@@ -1295,7 +1136,6 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
                     sourcePublicKeyFFI.getEmojiId()
                 )
                 user = getContactByPublicKeyHexString(
-                    allContacts,
                     sourcePublicKeyFFI.toString()
                 ) ?: User(userPublicKey)
             }
@@ -1319,8 +1159,7 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
         }
 
         private fun pendingInboundTxFromFFI(
-            pendingInboundTxFFI: FFIPendingInboundTx,
-            allContacts: List<Contact>
+            pendingInboundTxFFI: FFIPendingInboundTx
         ): PendingInboundTx {
             val status = TxStatus.map(pendingInboundTxFFI.getStatus())
             val sourcePublicKeyFFI = pendingInboundTxFFI.getSourcePublicKey()
@@ -1329,7 +1168,6 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
                 sourcePublicKeyFFI.getEmojiId()
             )
             val user = getContactByPublicKeyHexString(
-                allContacts,
                 sourcePublicKeyFFI.toString()
             ) ?: User(userPublicKey)
             val pendingInboundTx = PendingInboundTx(
@@ -1346,8 +1184,7 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
         }
 
         private fun pendingOutboundTxFromFFI(
-            pendingOutboundTxFFI: FFIPendingOutboundTx,
-            allContacts: List<Contact>
+            pendingOutboundTxFFI: FFIPendingOutboundTx
         ): PendingOutboundTx {
             val status = TxStatus.map(pendingOutboundTxFFI.getStatus())
             val destinationPublicKeyFFI = pendingOutboundTxFFI.getDestinationPublicKey()
@@ -1356,7 +1193,6 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
                 destinationPublicKeyFFI.getEmojiId()
             )
             val user = getContactByPublicKeyHexString(
-                allContacts,
                 destinationPublicKeyFFI.toString()
             ) ?: User(userPublicKey)
             val pendingOutboundTx = PendingOutboundTx(
@@ -1375,11 +1211,8 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
 
         @SuppressLint("CheckResult")
         override fun requestTestnetTari(error: WalletError) {
-            if (
-                serviceImpl.getCompletedTxs(emptyList()).isNotEmpty() ||
-                serviceImpl.getPendingInboundTxs(emptyList()).isNotEmpty() ||
-                serviceImpl.getPendingOutboundTxs(emptyList()).isNotEmpty()
-            ) return
+            // avoid multiple faucet requests
+            if (sharedPrefsWrapper.faucetTestnetTariRequestCompleted) return
             // get public key
             val publicKeyHexString = getPublicKeyHexString(error)
             if (error.code != WalletErrorCode.NO_ERROR || publicKeyHexString == null) {
@@ -1388,9 +1221,9 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
             }
 
             val message = "$MESSAGE_PREFIX $publicKeyHexString"
-            val signing = wallet.signMessage(message)
-            val signature = signing.split("|")[0]
-            val nonce = signing.split("|")[1]
+            val signing = wallet.signMessage(message).split("|")
+            val signature = signing[0]
+            val nonce = signing[1]
 
             testnetFaucetService.requestMaxTestnetTari(
                 publicKeyHexString,
@@ -1470,11 +1303,12 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
                     val contactFFI = contactsFFI.getAt(i)
                     val publicKeyFFI = contactFFI.getPublicKey()
                     if (publicKeyFFI.toString() == contact.publicKey.hexString) {
-                        val result = wallet.removeContact(contactFFI)
-                        publicKeyFFI.destroy()
-                        contactFFI.destroy()
-                        contactsFFI.destroy()
-                        return result
+                        return wallet.removeContact(contactFFI).also {
+                            publicKeyFFI.destroy()
+                            contactFFI.destroy()
+                            contactsFFI.destroy()
+                            _cachedContacts = null
+                        }
                     }
                     publicKeyFFI.destroy()
                     contactFFI.destroy()
@@ -1499,16 +1333,19 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
             publicKey: PublicKey,
             alias: String,
             error: WalletError
-        ) {
+        ): Boolean {
             try {
                 val publicKeyFFI = FFIPublicKey(HexString(publicKey.hexString))
                 val contact = FFIContact(alias, publicKeyFFI)
-                wallet.addUpdateContact(contact)
-                publicKeyFFI.destroy()
-                contact.destroy()
+                return wallet.addUpdateContact(contact).also {
+                    publicKeyFFI.destroy()
+                    contact.destroy()
+                    _cachedContacts = null
+                }
             } catch (throwable: Throwable) {
                 mapThrowableIntoError(throwable, error)
             }
+            return false
         }
 
         /**

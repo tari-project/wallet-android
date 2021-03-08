@@ -57,8 +57,6 @@ interface TariWalletService {
 
     List<Contact> getContacts(out WalletError error);
 
-    List<User> getRecentTxUsers(int maxCount, out WalletError error);
-
     List<CompletedTx> getCompletedTxs(out WalletError error);
     CompletedTx getCompletedTxById(in TxId id, out WalletError error);
 
@@ -104,7 +102,7 @@ interface TariWalletService {
     */
     CompletedTx importTestnetUTXO(in String txMessage, out WalletError error);
 
-    void updateContactAlias(in PublicKey contactPublicKey, in String alias, out WalletError error);
+    boolean updateContactAlias(in PublicKey contactPublicKey, in String alias, out WalletError error);
 
     boolean removeContact(in Contact contact, out WalletError error);
 

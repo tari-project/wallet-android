@@ -39,9 +39,7 @@ import com.tari.android.wallet.model.Contact
 import com.tari.android.wallet.model.User
 import com.tari.android.wallet.ui.component.EmojiIdSummaryViewController
 import com.tari.android.wallet.ui.extension.gone
-import com.tari.android.wallet.ui.extension.temporarilyDisableClick
 import com.tari.android.wallet.ui.extension.visible
-import java.lang.ref.WeakReference
 import java.util.*
 
 /**
@@ -49,25 +47,12 @@ import java.util.*
  *
  * @author The Tari Development Team
  */
-class RecipientViewHolder(view: View, listener: Listener) :
-    RecyclerView.ViewHolder(view), View.OnClickListener {
+class RecipientViewHolder(view: View) : RecyclerView.ViewHolder(view) {
 
     private val ui = AddRecipientListItemBinding.bind(view)
-    private val listenerWR: WeakReference<Listener> = WeakReference(listener)
     private var emojiIdSummaryController = EmojiIdSummaryViewController(ui.emojiSummaryView)
-    private lateinit var userWR: WeakReference<User>
-
-    init {
-        ui.rootView.setOnClickListener(this)
-    }
-
-    override fun onClick(view: View) {
-        view.temporarilyDisableClick()
-        listenerWR.get()?.onRecipientSelected(userWR.get()!!)
-    }
 
     fun bind(user: User) {
-        userWR = WeakReference(user)
         if (user is Contact) {
             ui.aliasTextView.visible()
             ui.emojiSummaryView.root.gone()
@@ -81,17 +66,8 @@ class RecipientViewHolder(view: View, listener: Listener) :
             ui.emojiSummaryView.root.visible()
             ui.profileIconImageView.visible()
             ui.initialTextView.gone()
-
-            emojiIdSummaryController.display(
-                user.publicKey.emojiId
-            )
+            emojiIdSummaryController.display(user.publicKey.emojiId)
         }
-    }
-
-    interface Listener {
-
-        fun onRecipientSelected(recipient: User)
-
     }
 
 }

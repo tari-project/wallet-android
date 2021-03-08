@@ -38,7 +38,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.tari.android.wallet.R
 import com.tari.android.wallet.model.Contact
 import com.tari.android.wallet.model.User
-import java.lang.ref.WeakReference
+import com.tari.android.wallet.ui.extension.temporarilyDisableClick
 import kotlin.collections.ArrayList
 
 /**
@@ -47,10 +47,8 @@ import kotlin.collections.ArrayList
  * @author The Tari Development Team
  */
 internal class RecipientListAdapter(
-    listener: Listener
-) :
-    RecyclerView.Adapter<RecyclerView.ViewHolder>(),
-    RecipientViewHolder.Listener {
+    private val listener: (User) -> Unit
+) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     enum class Mode {
         LIST,
@@ -65,11 +63,6 @@ internal class RecipientListAdapter(
     private val items = ArrayList<Any>()
     // mode
     private lateinit var mode: Mode
-
-    /**
-     * Listener.
-     */
-    private var listenerWR: WeakReference<Listener> = WeakReference(listener)
 
     fun displayList(
         recentTxUsers: List<User>,
@@ -126,33 +119,21 @@ internal class RecipientListAdapter(
         viewType: Int
     ): RecyclerView.ViewHolder {
         return when (viewType) {
-            recentHeaderViewType -> {
-                val view = LayoutInflater.from(parent.context)
-                    .inflate(R.layout.add_recipient_list_header, parent, false)
-                RecipientHeaderViewHolder(
-                    view,
-                    RecipientHeaderViewHolder.Type.RECENT_CONTACTS
-                )
-            }
-            headerViewType -> {
-                val view = LayoutInflater.from(parent.context)
-                    .inflate(R.layout.add_recipient_list_header, parent, false)
-                RecipientHeaderViewHolder(
-                    view,
-                    RecipientHeaderViewHolder.Type.MY_CONTACTS
-                )
-            }
-            userViewType -> {
-                val view = LayoutInflater.from(parent.context)
+            recentHeaderViewType -> RecipientHeaderViewHolder(
+                LayoutInflater.from(parent.context)
+                    .inflate(R.layout.add_recipient_list_header, parent, false),
+                RecipientHeaderViewHolder.Type.RECENT_CONTACTS
+            )
+            headerViewType -> RecipientHeaderViewHolder(
+                LayoutInflater.from(parent.context)
+                    .inflate(R.layout.add_recipient_list_header, parent, false),
+                RecipientHeaderViewHolder.Type.MY_CONTACTS
+            )
+            userViewType -> RecipientViewHolder(
+                LayoutInflater.from(parent.context)
                     .inflate(R.layout.add_recipient_list_item, parent, false)
-                RecipientViewHolder(
-                    view,
-                    this
-                )
-            }
-            else -> {
-                throw RuntimeException("Unexpected view type $viewType.")
-            }
+            )
+            else -> throw RuntimeException("Unexpected view type $viewType.")
         }
     }
 
@@ -162,7 +143,12 @@ internal class RecipientListAdapter(
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         when {
             holder is RecipientViewHolder -> {
-                holder.bind(items[position] as User)
+                val user = items[position] as User
+                holder.bind(user)
+                holder.itemView.setOnClickListener {
+                    it.temporarilyDisableClick()
+                    listener(user)
+                }
             }
             getItemViewType(position) == headerViewType -> {
                 (holder as RecipientHeaderViewHolder).bind(position)
@@ -171,16 +157,6 @@ internal class RecipientListAdapter(
                 (holder as RecipientHeaderViewHolder).bind(position)
             }
         }
-    }
-
-    override fun onRecipientSelected(recipient: User) {
-        listenerWR.get()?.onRecipientSelected(recipient)
-    }
-
-    interface Listener {
-
-        fun onRecipientSelected(recipient: User)
-
     }
 
 }

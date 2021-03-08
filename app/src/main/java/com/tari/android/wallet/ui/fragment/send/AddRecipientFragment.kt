@@ -63,13 +63,13 @@ import com.tari.android.wallet.application.DeepLink
 import com.tari.android.wallet.application.DeepLink.Type.EMOJI_ID
 import com.tari.android.wallet.application.DeepLink.Type.PUBLIC_KEY_HEX
 import com.tari.android.wallet.databinding.FragmentAddRecipientBinding
+import com.tari.android.wallet.extension.repopulate
 import com.tari.android.wallet.infrastructure.Tracker
 import com.tari.android.wallet.model.*
 import com.tari.android.wallet.service.TariWalletService
 import com.tari.android.wallet.service.WalletService
 import com.tari.android.wallet.ui.activity.qr.EXTRA_QR_DATA
 import com.tari.android.wallet.ui.activity.qr.QRScannerActivity
-import com.tari.android.wallet.ui.dialog.BottomSlideDialog
 import com.tari.android.wallet.ui.extension.*
 import com.tari.android.wallet.ui.fragment.send.adapter.RecipientListAdapter
 import com.tari.android.wallet.util.*
@@ -90,7 +90,6 @@ import kotlin.math.min
  */
 
 class AddRecipientFragment : Fragment(),
-    RecipientListAdapter.Listener,
     RecyclerView.OnItemTouchListener,
     TextWatcher,
     ServiceConnection {
@@ -111,12 +110,9 @@ class AddRecipientFragment : Fragment(),
     private lateinit var recyclerViewLayoutManager: RecyclerView.LayoutManager
     private var scrollListener = ScrollListener(this)
 
-    private lateinit var recentTxUsers: List<User>
-    private lateinit var contacts: List<Contact>
-    private lateinit var allPastTxUsers: MutableList<User>
-
-    private val recentTxContactsLimit = 6
-    private var recipientsListedForTheFirstTime = true
+    private var recentTxUsersLimit = 3
+    private val allTxs = ArrayList<Tx>()
+    private val contacts = ArrayList<Contact>()
 
     private lateinit var listenerWR: WeakReference<Listener>
 
@@ -163,8 +159,12 @@ class AddRecipientFragment : Fragment(),
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View =
-        FragmentAddRecipientBinding.inflate(inflater, container, false).also { ui = it }.root
+    ): View = FragmentAddRecipientBinding.inflate(
+    inflater, container,
+    false
+    ).also {
+        ui = it
+    }.root
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -189,23 +189,13 @@ class AddRecipientFragment : Fragment(),
         Logger.i("AddRecipientFragment onServiceConnected")
         val walletService = TariWalletService.Stub.asInterface(service)
         this.walletService = walletService
-        setupUi()
-        lifecycleScope.launch(Dispatchers.IO) {
-            fetchAllData(walletService)
-            val clipboardHasOldEmojiId = checkClipboardForIncompatibleEmojiId()
-            withContext(Dispatchers.Main) {
-                displayInitialList(showKeyboard = !clipboardHasOldEmojiId)
-                ui.searchEditText.setRawInputType(InputType.TYPE_CLASS_TEXT)
-                ui.searchEditText.addTextChangedListener(this@AddRecipientFragment)
-            }
-            if (clipboardHasOldEmojiId) {
-                // display warning
-                withContext(Dispatchers.Main) {
-                    displayOldEmojiIdWarning()
-                }
-            } else {
-                checkClipboardForValidEmojiId()
-            }
+        lifecycleScope.launch(Dispatchers.Main) {
+            setupUI()
+            withContext(Dispatchers.IO) { fetchAllData(walletService) }
+            displayInitialList()
+            ui.searchEditText.setRawInputType(InputType.TYPE_CLASS_TEXT)
+            ui.searchEditText.addTextChangedListener(this@AddRecipientFragment)
+            checkClipboardForValidEmojiId()
         }
     }
 
@@ -219,10 +209,12 @@ class AddRecipientFragment : Fragment(),
         requireActivity().unbindService(this)
     }
 
-    private fun setupUi() {
+    private fun setupUI() {
         recyclerViewLayoutManager = LinearLayoutManager(requireActivity())
         ui.contactsListRecyclerView.layoutManager = recyclerViewLayoutManager
-        recyclerViewAdapter = RecipientListAdapter(this)
+        recyclerViewAdapter = RecipientListAdapter { user ->
+            (activity as? Listener)?.continueToAmount(this, user)
+        }
         ui.contactsListRecyclerView.adapter = recyclerViewAdapter
         ui.contactsListRecyclerView.addOnScrollListener(scrollListener)
         ui.contactsListRecyclerView.addOnItemTouchListener(this)
@@ -256,18 +248,6 @@ class AddRecipientFragment : Fragment(),
         val intent = Intent(activity, QRScannerActivity::class.java)
         startActivityForResult(intent, QRScannerActivity.REQUEST_QR_SCANNER)
         activity?.overridePendingTransition(R.anim.slide_up, 0)
-    }
-
-    /**
-     * Checks whether an emoji id from the older version is in the clipboard.
-     */
-    private fun checkClipboardForIncompatibleEmojiId(): Boolean {
-        val clipboardString = clipboardManager.primaryClip?.getItemAt(0)?.text?.toString()
-            ?: return false
-
-        // check for old emoji id
-        val incompatibleEmojis = clipboardString.extractEmojis(emojiSet = EmojiUtil.oldEmojiSet)
-        return incompatibleEmojis.size >= emojiIdLength
     }
 
     /**
@@ -433,73 +413,62 @@ class AddRecipientFragment : Fragment(),
         animSet.start()
     }
 
-    private fun displayOldEmojiIdWarning() {
-        BottomSlideDialog(
-            context = activity ?: return,
-            layoutId = R.layout.incompatible_emoji_id_dialog,
-            dismissViewId = R.id.incompatible_emoji_id_dialog_txt_close
-        ).show()
-    }
-
     /**
      * Called only once in onCreate.
      */
     private fun fetchAllData(walletService: TariWalletService) {
         val error = WalletError()
-        contacts = walletService.getContacts(error) ?: emptyList()
-        recentTxUsers = walletService.getRecentTxUsers(recentTxContactsLimit, error)
-        val completedTxs = walletService.getCompletedTxs(error)
-        val pendingInboundTxs = walletService.getPendingInboundTxs(error)
-        val pendingOutboundTxs = walletService.getPendingOutboundTxs(error)
+        // get contacts
+        contacts.repopulate(
+            walletService.getContacts(error) ?: emptyList()
+        )
+        // get all txs
+        allTxs.addAll(walletService.getCompletedTxs(error) ?: emptyList())
+        allTxs.addAll(walletService.getPendingInboundTxs(error) ?: emptyList())
+        allTxs.addAll(walletService.getPendingOutboundTxs(error) ?: emptyList())
+        allTxs.addAll(walletService.getCancelledTxs(error) ?: emptyList())
         if (error.code != WalletErrorCode.NO_ERROR) {
             TODO("Unhandled wallet error: ${error.code}")
         }
-        val allTxs = ArrayList<Tx>()
-        allTxs.addAll(completedTxs)
-        allTxs.addAll(pendingInboundTxs)
-        allTxs.addAll(pendingOutboundTxs)
-        allPastTxUsers = mutableListOf()
-        // TODO happens-before relationship is not guaranteed
-        allTxs.forEach { tx ->
-            if (!allPastTxUsers.contains(tx.user)) {
-                allPastTxUsers.add(tx.user)
-            }
-        }
+        allTxs.sortByDescending { it.timestamp }
     }
 
     /**
      * Displays non-search-result list.
      */
-    private fun displayInitialList(showKeyboard: Boolean) {
+    private fun displayInitialList() {
         ui.progressBar.gone()
         ui.contactsListRecyclerView.visible()
-        recyclerViewAdapter.displayList(recentTxUsers, contacts)
-
-        if (showKeyboard) { // show keyboard
-            recipientsListedForTheFirstTime = false
-            focusEditTextAndShowKeyboard()
-        }
+        recyclerViewAdapter.displayList(
+            allTxs.sortedByDescending {
+                it.timestamp
+            }.distinctBy { it.user }.take(recentTxUsersLimit).map { it.user },
+            contacts
+        )
+        focusEditTextAndShowKeyboard()
     }
 
     private fun focusEditTextAndShowKeyboard() {
         val mActivity = activity ?: return
         ui.searchEditText.requestFocus()
         val imm = mActivity.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-        imm.toggleSoftInput(
-            InputMethodManager.SHOW_FORCED,
-            InputMethodManager.HIDE_IMPLICIT_ONLY
-        )
+        imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY)
     }
 
     private fun onSearchTextChanged(query: String) {
-        ui.contactsListRecyclerView.invisible()
-        scrollListener.reset()
-        ui.scrollDepthGradientView.alpha = 0f
-        ui.progressBar.visible()
         if (query.isEmpty()) {
-            displayInitialList(showKeyboard = false)
+            displayInitialList()
         } else {
-            searchRecipients(query)
+            val users = searchRecipients(query)
+            if (users.isEmpty()) {
+                ui.progressBar.gone()
+                ui.contactsListRecyclerView.visible()
+                recyclerViewAdapter.displaySearchResult(emptyList())
+            } else {
+                ui.progressBar.gone()
+                ui.contactsListRecyclerView.visible()
+                recyclerViewAdapter.displaySearchResult(users)
+            }
         }
     }
 
@@ -514,41 +483,30 @@ class AddRecipientFragment : Fragment(),
     /**
      * Makes a search by the input.
      */
-    private fun searchRecipients(query: String) {
-        val users = ArrayList<User>()
-        // get all contacts and filter by alias and emoji id
+    private fun searchRecipients(query: String): List<User> {
+        // search transaction users
+        val filteredTxUsers = allTxs.filter {
+            it.user.publicKey.emojiId.contains(query)
+                    || (it.user as? Contact)?.alias?.contains(query, ignoreCase = true) ?: false
+        }.map { it.user }.distinct()
+
+        // search contacts (we don't have non-transaction contacts at the moment, but we probably
+        // will have them in the future - so this is a safety measure)
         val filteredContacts = contacts.filter {
-            it.alias.contains(query, ignoreCase = true) || it.publicKey.emojiId.contains(query)
+            it.publicKey.emojiId.contains(query)
+                    || it.alias.contains(query, ignoreCase = true)
         }
-        users.addAll(filteredContacts)
-        allPastTxUsers.forEach { txUser ->
-            if (txUser.publicKey.emojiId.contains(query)) {
-                if (!users.contains(txUser)) {
-                    users.add(txUser)
-                }
-            }
+        return (filteredTxUsers + filteredContacts).distinct().sortedWith { o1, o2 ->
+            val value1 = ((o1 as? Contact)?.alias) ?: o1.publicKey.emojiId
+            val value2 = ((o2 as? Contact)?.alias) ?: o2.publicKey.emojiId
+            value1.compareTo(value2)
         }
-        displaySearchResult(users)
     }
 
     private fun clearSearchResult() {
         ui.progressBar.gone()
         ui.contactsListRecyclerView.visible()
         recyclerViewAdapter.displaySearchResult(ArrayList())
-    }
-
-    private fun displaySearchResult(users: List<User>) {
-        ui.progressBar.gone()
-        ui.contactsListRecyclerView.visible()
-        recyclerViewAdapter.displaySearchResult(users)
-    }
-
-    /**
-     * Recipient selected from the list.
-     */
-    override fun onRecipientSelected(recipient: User) {
-        // go to amount fragment
-        listenerWR.get()?.continueToAmount(this, recipient)
     }
 
     /**
@@ -580,7 +538,7 @@ class AddRecipientFragment : Fragment(),
                     }, Constants.UI.mediumDurationMs)
                 }
                 PUBLIC_KEY_HEX -> {
-                    AsyncTask.execute {
+                    lifecycleScope.launch(Dispatchers.IO) {
                         val publicKeyHex = deepLink.identifier
                         val publicKey = walletService.getPublicKeyFromHexString(publicKeyHex)
                         if (publicKey != null) {
@@ -602,16 +560,16 @@ class AddRecipientFragment : Fragment(),
 
     private fun onContinueButtonClicked(view: View) {
         view.temporarilyDisableClick()
-        AsyncTask.execute {
+        lifecycleScope.launch(Dispatchers.IO) {
             val error = WalletError()
             val contacts = walletService.getContacts(error)
             val recipientContact: Contact? = when (error.code) {
                 WalletErrorCode.NO_ERROR -> contacts.firstOrNull { it.publicKey == emojiIdPublicKey }
                 else -> null
             }
-            ui.rootView.post {
+            withContext(Dispatchers.Main) {
                 listenerWR.get()?.continueToAmount(
-                    this,
+                    this@AddRecipientFragment,
                     recipientContact ?: User(emojiIdPublicKey!!)
                 )
             }
@@ -760,15 +718,7 @@ class AddRecipientFragment : Fragment(),
             val numberofEmojis = textWithoutSeparators.numberOfEmojis()
             if (textWithoutSeparators.containsNonEmoji() || numberofEmojis > emojiIdLength) {
                 emojiIdPublicKey = null
-                // invalid emoji-id : clear list and display error
-                val incompatibleEmojis = text.extractEmojis(emojiSet = EmojiUtil.oldEmojiSet)
-                ui.invalidEmojiIdTextView.text = string(
-                    if (incompatibleEmojis.size >= emojiIdLength) {
-                        add_recipient_incompatible_emoji_id_desc_short
-                    } else {
-                        add_recipient_invalid_emoji_id
-                    }
-                )
+                ui.invalidEmojiIdTextView.text = string(add_recipient_invalid_emoji_id)
                 ui.invalidEmojiIdTextView.visible()
                 ui.qrCodeButton.visible()
                 clearSearchResult()
@@ -811,12 +761,6 @@ class AddRecipientFragment : Fragment(),
             }
         } else {
             emojiIdPublicKey = null
-            val incompatibleEmojis = text.extractEmojis(emojiSet = EmojiUtil.oldEmojiSet)
-            if (incompatibleEmojis.size >= emojiIdLength) {
-                ui.invalidEmojiIdTextView.text =
-                    string(add_recipient_incompatible_emoji_id_desc_short)
-                ui.invalidEmojiIdTextView.visible()
-            }
             ui.qrCodeButton.visible()
             ui.searchEditText.textAlignment = View.TEXT_ALIGNMENT_TEXT_START
             ui.searchEditText.letterSpacing = inputNormalLetterSpacing
