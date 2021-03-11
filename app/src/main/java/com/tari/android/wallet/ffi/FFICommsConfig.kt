@@ -50,6 +50,7 @@ internal class FFICommsConfig() : FFIBase() {
         databaseName: String,
         datastorePath: String,
         discoveryTimeoutSec: Long,
+        jSafDurationSec: Long,
         error: FFIError
     )
 
@@ -67,7 +68,8 @@ internal class FFICommsConfig() : FFIBase() {
         transport: FFITransportType,
         databaseName: String,
         datastorePath: String,
-        discoveryTimeoutSec: Long
+        discoveryTimeoutSec: Long,
+        safMessageDurationSec: Long
     ): this() {
         if (databaseName.isEmpty()) {
             throw FFIException(message = "databaseName may not be empty")
@@ -81,6 +83,7 @@ internal class FFICommsConfig() : FFIBase() {
                 databaseName,
                 datastorePath,
                 discoveryTimeoutSec,
+                safMessageDurationSec,
                 error
             )
             throwIf(error)

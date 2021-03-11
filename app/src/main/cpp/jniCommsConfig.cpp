@@ -49,6 +49,7 @@ Java_com_tari_android_wallet_ffi_FFICommsConfig_jniCreate(
         jstring jDatabaseName,
         jstring jDatastorePath,
         jlong jDiscoveryTimeoutSec,
+        jlong jSafDurationSec,
         jobject error) {
     const char *pControlServiceAddress = jEnv->GetStringUTFChars(
             jPublicAddress,
@@ -68,6 +69,7 @@ Java_com_tari_android_wallet_ffi_FFICommsConfig_jniCreate(
             pDatabaseName,
             pDatastorePath,
             static_cast<unsigned long long int>(jDiscoveryTimeoutSec),
+            static_cast<unsigned long long int>(jSafDurationSec),
             r
     );
     jEnv->ReleaseStringUTFChars(jPublicAddress, pControlServiceAddress);
