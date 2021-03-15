@@ -791,14 +791,13 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
             amount: MicroTari,
             error: WalletError
         ): MicroTari? {
-            val defaultGramFee = BigInteger("100")
             val defaultKernelCount = BigInteger("1")
             val defaultOutputCount = BigInteger("2")
             return try {
                 MicroTari(
                     wallet.estimateTxFee(
                         amount.value,
-                        defaultGramFee,
+                        Constants.Wallet.defaultFeePerGram.value,
                         defaultKernelCount,
                         defaultOutputCount
                     )

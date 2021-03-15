@@ -46,12 +46,12 @@ import java.util.*
  */
 internal object WalletUtil {
 
-    val amountFormatter = DecimalFormat("#,##0.00").apply {
+    val balanceFormatter = DecimalFormat("#,##0.00").apply {
         roundingMode = RoundingMode.FLOOR
     }
 
-    val feeFormatter = DecimalFormat("#,##0.0000").apply {
-        roundingMode = RoundingMode.CEILING
+    val amountFormatter = DecimalFormat("#,##0.00####").apply {
+        roundingMode = RoundingMode.FLOOR
     }
 
     /**

@@ -75,7 +75,7 @@ internal class BalanceViewController(
 
     init {
         val balance = _balanceInfo.availableBalance + _balanceInfo.pendingIncomingBalance
-        formattedBalance = WalletUtil.amountFormatter.format(balance.tariValue)
+        formattedBalance = WalletUtil.balanceFormatter.format(balance.tariValue)
         // decimal tens
         viewHolders.add(
             DecimalDigitViewHolder(
@@ -139,7 +139,7 @@ internal class BalanceViewController(
             /* execute setter logic */
             _balanceInfo = value
             val balance = _balanceInfo.availableBalance + _balanceInfo.pendingIncomingBalance
-            formattedBalance = WalletUtil.amountFormatter.format(balance.tariValue)
+            formattedBalance = WalletUtil.balanceFormatter.format(balance)
             val sizeDiff = formattedBalance.length - viewHolders.size
             if (sizeDiff <= 0) {
                 // delete items

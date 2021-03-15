@@ -45,6 +45,7 @@ import android.widget.TextView
 import androidx.core.animation.addListener
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import com.daasuu.ei.Ease
 import com.daasuu.ei.EasingInterpolator
 import com.orhanobut.logger.Logger
@@ -67,6 +68,8 @@ import com.tari.android.wallet.ui.extension.*
 import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.EmojiUtil
 import com.tari.android.wallet.util.WalletUtil
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import me.everything.android.ui.overscroll.OverScrollDecoratorHelper
 import java.lang.ref.WeakReference
 import java.math.BigInteger
@@ -144,6 +147,8 @@ class AddAmountFragment : Fragment(), ServiceConnection {
 
     private var isFirstLaunch: Boolean = false
     private lateinit var ui: FragmentAddAmountBinding
+
+    private var estimatedFee: MicroTari? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -494,8 +499,7 @@ class AddAmountFragment : Fragment(), ServiceConnection {
 
         // insert new thousands separators
         val decimalIndex = decimalSeparatorIndex
-        val onesEndIndex: Int
-        onesEndIndex = if (decimalIndex >= 1) { // no thousands
+        val onesEndIndex = if (decimalIndex >= 1) { // no thousands
             if (decimalIndex < (thousandsGroupSize + 1)) {
                 return deltaWidth
             } else {
@@ -903,7 +907,7 @@ class AddAmountFragment : Fragment(), ServiceConnection {
 
     private fun continueButtonClicked() {
         ui.continueButton.isClickable = false
-        AsyncTask.execute { checkActualAvailableBalance() }
+        lifecycleScope.launch(Dispatchers.IO) { checkActualAvailableBalance() }
     }
 
     private fun checkActualAvailableBalance() {
@@ -911,9 +915,9 @@ class AddAmountFragment : Fragment(), ServiceConnection {
         val balanceInfo = walletService.getBalanceInfo(error)
         if (error.code == WalletErrorCode.NO_ERROR) {
             if (currentAmount > balanceInfo.availableBalance) {
-                ui.rootView.post { actualBalanceExceeded() }
+                lifecycleScope.launch(Dispatchers.Main) { actualBalanceExceeded() }
             } else {
-                ui.rootView.post {
+                lifecycleScope.launch(Dispatchers.Main) {
                     continueToNote()
                     ui.continueButton.isClickable = true
                 }
@@ -972,6 +976,7 @@ class AddAmountFragment : Fragment(), ServiceConnection {
                 && error.code != WalletErrorCode.NOT_ENOUGH_FUNDS) {
                 TODO("Unhandled wallet error: ${error.code}")
             }
+            estimatedFee = fee
             // check balance
             val availableBalance =
                 balanceInfo.availableBalance + balanceInfo.pendingIncomingBalance
@@ -998,7 +1003,7 @@ class AddAmountFragment : Fragment(), ServiceConnection {
             } else {
                 var showsTxFee = false
                 var hidesTxFee = false
-                ui.txFeeTextView.text = "+${WalletUtil.feeFormatter.format(fee.tariValue)}"
+                ui.txFeeTextView.text = "+${WalletUtil.amountFormatter.format(fee.tariValue)}"
                 // show/hide continue button
                 if (currentAmount.value.toInt() == 0) {
                     ui.continueButton.invisible()

@@ -701,10 +701,6 @@ internal class FFIWallet(
         feePerGram: BigInteger,
         message: String
     ): BigInteger {
-        val minimumLibFee = 100L
-        if (feePerGram < BigInteger.valueOf(minimumLibFee)) {
-            throw FFIException(message = "Fee is less than the minimum of $minimumLibFee taris.")
-        }
         if (amount < BigInteger.valueOf(0L)) {
             throw FFIException(message = "Amount is less than 0.")
         }

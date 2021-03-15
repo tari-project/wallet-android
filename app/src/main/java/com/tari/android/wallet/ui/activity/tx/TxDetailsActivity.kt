@@ -347,7 +347,7 @@ internal class TxDetailsActivity : AppCompatActivity(), ServiceConnection {
         ui.feeLabelTextView.visible()
         ui.txFeeTextView.text = string(
             tx_details_fee_value,
-            WalletUtil.feeFormatter.format(fee.tariValue)
+            WalletUtil.amountFormatter.format(fee.tariValue)
         )
     }
 

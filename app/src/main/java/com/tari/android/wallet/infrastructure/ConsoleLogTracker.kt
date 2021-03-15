@@ -50,7 +50,7 @@ class ConsoleLogTracker : Tracker {
     }
 
     override fun event(category: String, action: String) {
-        Log.i(TRACK_TAG, "Event track issued with categoty \"$category\" and action \"$action\"")
+        Log.i(TRACK_TAG, "Event track issued with category \"$category\" and action \"$action\"")
     }
 
     private companion object {
