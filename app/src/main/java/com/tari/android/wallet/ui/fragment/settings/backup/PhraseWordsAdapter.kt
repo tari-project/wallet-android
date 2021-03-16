@@ -40,7 +40,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.tari.android.wallet.R
 import com.tari.android.wallet.ui.fragment.settings.backup.PhraseWordsAdapter.PhraseWordViewHolder
 
-class PhraseWordsAdapter(private val words: List<String>) :
+class PhraseWordsAdapter(private val seedWords: List<String>) :
     RecyclerView.Adapter<PhraseWordViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PhraseWordViewHolder {
@@ -53,10 +53,10 @@ class PhraseWordsAdapter(private val words: List<String>) :
     override fun onBindViewHolder(holder: PhraseWordViewHolder, position: Int) {
         // So that indexing follows the column direction rather than row
         val index = if (position % 2 == 0) position / 2 else 12 + ((position - 1) / 2)
-        holder.bind(index, words[index])
+        holder.bind(index, seedWords[index])
     }
 
-    override fun getItemCount(): Int = words.size
+    override fun getItemCount(): Int = seedWords.size
 
     class PhraseWordViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 

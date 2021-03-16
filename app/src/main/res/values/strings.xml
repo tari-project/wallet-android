@@ -57,6 +57,8 @@
     <!-- balance exceeded -->
     <string name="error_balance_exceeded_title">Hold your horses! 🐴</string>
     <string name="error_balance_exceeded_description">Sorry, you can’t send this much tXTR until your previous transaction(s) are complete. Please wait for at least one transaction to complete and then try again.</string>
+    <string name="error_fee_more_than_amount_title">Amount Error</string>
+    <string name="error_fee_more_than_amount_description">Sorry, the amount cannot be less than the fee.</string>
 
     <!-- common -->
     <string name="common_continue">Continue</string>
@@ -70,6 +72,7 @@
     <string name="common_confirm">Confirm</string>
     <string name="common_share">Share</string>
     <string name="common_reset">Reset</string>
+    <string name="common_error_title">Error</string>
     <string name="common_unknown_error">Unknown error</string>
 
     <!-- emoji id copied view -->
@@ -339,7 +342,7 @@
     <string name="back_up_wallet_page_title">Security</string>
     <string name="back_up_wallet_page_label">Wallet Backups</string>
     <string name="back_up_wallet_to_cloud_cta">Back up now</string>
-    <string name="back_up_wallet_with_recovery_phrase_cta">Back up with recovery phrase</string>
+    <string name="back_up_wallet_with_recovery_phrase_cta">Write Down Seed Phrase</string>
     <string name="back_up_wallet_page_description">By backing up your wallet, you’ll ensure that you don’t lose your tXTR if your phone is lost or broken.</string>
     <string name="back_up_wallet_change_backup_password_cta">Change your secure password</string>
 
@@ -372,6 +375,7 @@
     <string name="back_up_seed_phrase_desc">Carefully write these 12 words down in order (left to right) on a piece of paper, and hide it somewhere others won’t access it. Do not take a screenshot.</string>
     <string name="back_up_seed_phrase_verify_cta">Verify Seed Phrase</string>
     <string name="back_up_seep_phrase_losing_warning_label">I understand that if I lose my recovery seed phrase I will not be able to restore my wallet.</string>
+    <string name="back_up_seed_phrase_error">Error while getting the wallet seed phrase. Please try again later.</string>
 
     <!-- Verify seed phrase -->
     <string name="verify_seed_phrase_page_title">Verify Seed Phrase</string>

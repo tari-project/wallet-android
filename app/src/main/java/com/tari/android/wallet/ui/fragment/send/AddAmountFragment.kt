@@ -64,6 +64,7 @@ import com.tari.android.wallet.service.WalletService
 import com.tari.android.wallet.ui.component.EmojiIdCopiedViewController
 import com.tari.android.wallet.ui.component.EmojiIdSummaryViewController
 import com.tari.android.wallet.ui.dialog.BottomSlideDialog
+import com.tari.android.wallet.ui.dialog.ErrorDialog
 import com.tari.android.wallet.ui.extension.*
 import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.EmojiUtil
@@ -907,23 +908,39 @@ class AddAmountFragment : Fragment(), ServiceConnection {
 
     private fun continueButtonClicked() {
         ui.continueButton.isClickable = false
-        lifecycleScope.launch(Dispatchers.IO) { checkActualAvailableBalance() }
+        lifecycleScope.launch(Dispatchers.IO) { checkAmountAndFee() }
     }
 
-    private fun checkActualAvailableBalance() {
+    private fun checkAmountAndFee() {
         val error = WalletError()
         val balanceInfo = walletService.getBalanceInfo(error)
-        if (error.code == WalletErrorCode.NO_ERROR) {
-            if (currentAmount > balanceInfo.availableBalance) {
-                lifecycleScope.launch(Dispatchers.Main) { actualBalanceExceeded() }
+        val fee = estimatedFee
+        val amount = currentAmount
+        if (error.code == WalletErrorCode.NO_ERROR && fee != null) {
+            if (amount > balanceInfo.availableBalance) {
+                lifecycleScope.launch(Dispatchers.Main) {
+                    actualBalanceExceeded()
+                }
             } else {
                 lifecycleScope.launch(Dispatchers.Main) {
-                    continueToNote()
-                    ui.continueButton.isClickable = true
+                    if (fee > amount) {
+                        ErrorDialog(
+                            requireActivity(),
+                            title = string(R.string.error_fee_more_than_amount_title),
+                            description = string(R.string.error_fee_more_than_amount_description),
+                            canceledOnTouchOutside = true
+                        ).show()
+                        ui.continueButton.isClickable = true
+                    } else {
+                        continueToNote()
+                        ui.continueButton.isClickable = true
+                    }
                 }
             }
         } else {
-            ui.rootView.post { ui.continueButton.isClickable = true }
+            lifecycleScope.launch(Dispatchers.Main) {
+                ui.continueButton.isClickable = true
+            }
         }
     }
 

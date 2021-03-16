@@ -152,6 +152,6 @@
     <dimen name="verify_seed_phrase_selectable_word_vertical_padding">3dp</dimen>
     <dimen name="verify_seed_phrase_selectable_word_end_margin">8dp</dimen>
     <dimen name="verify_seed_phrase_selected_word_end_margin">25dp</dimen>
-    <dimen name="verify_seed_phrase_word_bottom_margin">10dp</dimen>
+    <dimen name="verify_seed_phrase_word_bottom_margin">14dp</dimen>
 
 </resources>

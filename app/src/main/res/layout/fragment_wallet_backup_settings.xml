@@ -258,6 +258,13 @@
 
         </LinearLayout>
 
+        <View
+            android:id="@+id/seed_phrase_separator_view"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginHorizontal="25dp"
+            android:background="@color/settings_background" />
+
         <FrameLayout
             android:id="@+id/backup_with_recovery_phrase_cta_view"
             android:layout_width="match_parent"
@@ -267,7 +274,7 @@
             android:focusable="true"
             android:paddingHorizontal="26dp"
             android:paddingVertical="24dp"
-            android:visibility="gone">
+            android:visibility="visible">
 
             <com.tari.android.wallet.ui.component.CustomFontTextView
                 android:layout_width="wrap_content"
@@ -290,6 +297,14 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
                     android:src="@drawable/icon_wallet_not_backed_up"
+                    tools:ignore="ContentDescription" />
+
+                <ImageView
+                    android:id="@+id/backup_with_recovery_phrase_success_view"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:src="@drawable/ic_positive_check"
                     tools:ignore="ContentDescription" />
 
                 <ImageView

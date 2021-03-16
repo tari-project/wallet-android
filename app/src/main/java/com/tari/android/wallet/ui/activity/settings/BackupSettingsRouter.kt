@@ -38,12 +38,14 @@ interface BackupSettingsRouter {
 
     fun toWalletBackupWithRecoveryPhrase(sourceFragment: Fragment)
 
-    fun toRecoveryPhraseVerification(sourceFragment: Fragment, phrase: List<String>)
+    fun toSeedPhraseVerification(sourceFragment: Fragment, seedWords: List<String>)
 
     fun toConfirmPassword(sourceFragment: Fragment)
 
     fun toChangePassword(sourceFragment: Fragment)
 
     fun onPasswordChanged(sourceFragment: Fragment)
+
+    fun onSeedPhraseVerificationComplete(sourceFragment: Fragment)
 
 }

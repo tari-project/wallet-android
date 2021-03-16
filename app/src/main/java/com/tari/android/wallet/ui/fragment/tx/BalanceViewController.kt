@@ -139,7 +139,7 @@ internal class BalanceViewController(
             /* execute setter logic */
             _balanceInfo = value
             val balance = _balanceInfo.availableBalance + _balanceInfo.pendingIncomingBalance
-            formattedBalance = WalletUtil.balanceFormatter.format(balance)
+            formattedBalance = WalletUtil.balanceFormatter.format(balance.tariValue)
             val sizeDiff = formattedBalance.length - viewHolders.size
             if (sizeDiff <= 0) {
                 // delete items

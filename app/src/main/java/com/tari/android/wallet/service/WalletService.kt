@@ -1416,6 +1416,19 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
             }
         }
 
+        override fun getSeedWords(error: WalletError): List<String>? {
+            return try {
+                val seedWordsFFI = wallet.getSeedWords()
+                return (0 until seedWordsFFI.getLength())
+                    .map {
+                        seedWordsFFI.getAt(it)
+                    }.also { seedWordsFFI.destroy() }
+            } catch (throwable: Throwable) {
+                mapThrowableIntoError(throwable, error)
+                null
+            }
+        }
+
         // endregion
     }
 }

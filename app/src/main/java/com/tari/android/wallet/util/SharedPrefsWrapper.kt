@@ -81,6 +81,7 @@ class SharedPrefsWrapper(
         const val localBackupFolderURI = "tari_wallet_local_backup_folder_uri"
         const val network = "tari_wallet_network"
         const val isRestoredWallet = "tari_is_restored_wallet"
+        const val hasVerifiedSeedWords = "tari_has_verified_seed_words"
     }
 
     var publicKeyHexString: String?
@@ -287,6 +288,13 @@ class SharedPrefsWrapper(
             apply()
         }
 
+    var hasVerifiedSeedWords: Boolean
+        get() = sharedPrefs.getBoolean(Key.hasVerifiedSeedWords, false)
+        set(value) = sharedPrefs.edit().run {
+            putBoolean(Key.hasVerifiedSeedWords, value)
+            apply()
+        }
+
     init {
         // for migration purposes, to avoid a second redundant faucet call:
         // faucetTestnetTariRequestCompleted was introduced  after firstTestnetUTXOTxId and
@@ -322,6 +330,7 @@ class SharedPrefsWrapper(
         localBackupFolderURI = null
         network = null
         isRestoredWallet = false
+        hasVerifiedSeedWords = false
     }
 
 }

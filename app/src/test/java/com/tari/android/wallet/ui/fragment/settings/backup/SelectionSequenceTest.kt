@@ -32,7 +32,7 @@
  */
 package com.tari.android.wallet.ui.fragment.settings.backup
 
-import com.tari.android.wallet.ui.fragment.settings.backup.VerifySeedPhraseFragment.Phrase
+import com.tari.android.wallet.ui.fragment.settings.backup.VerifySeedPhraseFragment.SeedPhrase
 import com.tari.android.wallet.ui.fragment.settings.backup.VerifySeedPhraseFragment.SelectionSequence
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -43,21 +43,21 @@ class SelectionSequenceTest {
     @Test(expected = IllegalArgumentException::class)
     fun `assert that IllegalArgumentException is thrown if selection index is equal to the phrase length`() {
         val givenWord = "gword"
-        val originalPhrase = Phrase(listOf(givenWord))
+        val originalPhrase = SeedPhrase(listOf(givenWord))
         SelectionSequence(originalPhrase, originalPhrase).apply { add(originalPhrase.length) }
     }
 
     @Test(expected = IllegalArgumentException::class)
     fun `assert that IllegalArgumentException is thrown if selection index is negative`() {
         val givenWord = "gword"
-        val originalPhrase = Phrase(listOf(givenWord))
+        val originalPhrase = SeedPhrase(listOf(givenWord))
         SelectionSequence(originalPhrase, originalPhrase).apply { add(-1) }
     }
 
     @Test
     fun `assert that one-word sequence having a word from one-word phrase matches the original phrase`() {
         val givenWord = "gword"
-        val original = Phrase(listOf(givenWord))
+        val original = SeedPhrase(listOf(givenWord))
         val seq = SelectionSequence(original, original).apply { add(0) }
         assertTrue(seq.matchesOriginalPhrase())
     }
@@ -65,8 +65,8 @@ class SelectionSequenceTest {
     @Test
     fun `assert that current selection returns an expected set of values`() {
         val givenWords = listOf("w1", "w2", "w3")
-        val original = Phrase(givenWords)
-        val seq = SelectionSequence(original, Phrase(givenWords.reversed())).apply {
+        val original = SeedPhrase(givenWords)
+        val seq = SelectionSequence(original, SeedPhrase(givenWords.reversed())).apply {
             add(0)
             add(1)
         }
@@ -75,20 +75,20 @@ class SelectionSequenceTest {
 
     @Test(expected = IllegalArgumentException::class)
     fun `assert that IllegalArgumentException was thrown if given phrases do not have the same length`() {
-        val original = Phrase(listOf("1", "2"))
-        SelectionSequence(original, Phrase(listOf("1")))
+        val original = SeedPhrase(listOf("1", "2"))
+        SelectionSequence(original, SeedPhrase(listOf("1")))
     }
 
     @Test(expected = IllegalArgumentException::class)
     fun `assert that IllegalArgumentException was thrown if size is already matches phrase length`() {
-        val sequence = Phrase(listOf("1", "2", "3")).startSelection().second
+        val sequence = SeedPhrase(listOf("1", "2", "3")).startSelection().second
             .apply { (0..2).forEach(this::add) }
         sequence.add(0)
     }
 
     @Test(expected = IllegalArgumentException::class)
     fun `assert that IllegalArgumentException was thrown if a word was already selected`() {
-        Phrase(listOf("1", "2", "3")).startSelection().second.apply {
+        SeedPhrase(listOf("1", "2", "3")).startSelection().second.apply {
             add(0)
             add(0)
         }
@@ -96,14 +96,14 @@ class SelectionSequenceTest {
 
     @Test(expected = IllegalArgumentException::class)
     fun `assert that IllegalArgumentException was thrown if an index that's not added was removed`() {
-        Phrase(listOf("1", "2", "3")).startSelection().second.apply {
+        SeedPhrase(listOf("1", "2", "3")).startSelection().second.apply {
             remove(0)
         }
     }
 
     @Test
     fun `assert that an added index can be removed OK`() {
-        Phrase(listOf("1", "2", "3")).startSelection().second.apply {
+        SeedPhrase(listOf("1", "2", "3")).startSelection().second.apply {
             add(0)
             remove(0)
         }
@@ -111,7 +111,7 @@ class SelectionSequenceTest {
 
     @Test
     fun `assert that remove operation has complementary semantics in relation to add`() {
-        val phrase = Phrase(listOf("1", "2", "3"))
+        val phrase = SeedPhrase(listOf("1", "2", "3"))
         SelectionSequence(phrase, phrase).apply {
             add(0)
             remove(0)

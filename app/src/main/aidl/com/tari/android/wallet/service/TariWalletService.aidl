@@ -121,4 +121,9 @@ interface TariWalletService {
     String getKeyValue(in String key, out WalletError error);
     boolean removeKeyValue(in String key, out WalletError error);
 
+    /**
+    * Seed words.
+    */
+    List<String> getSeedWords(out WalletError error);
+
 }

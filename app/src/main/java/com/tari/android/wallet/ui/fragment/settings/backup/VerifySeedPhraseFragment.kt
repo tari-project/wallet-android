@@ -37,6 +37,7 @@ import android.content.Context
 import android.graphics.Color
 import android.graphics.Typeface
 import android.os.Bundle
+import android.util.TypedValue
 import android.view.ContextThemeWrapper
 import android.view.LayoutInflater
 import android.view.View
@@ -51,12 +52,14 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.flexbox.FlexboxLayout
 import com.tari.android.wallet.R
-import com.tari.android.wallet.R.color.seed_phrase_button_disabled_text_color
 import com.tari.android.wallet.R.dimen.*
 import com.tari.android.wallet.databinding.FragmentVerifySeedPhraseBinding
+import com.tari.android.wallet.ui.activity.settings.BackupSettingsRouter
 import com.tari.android.wallet.ui.component.CustomFont
 import com.tari.android.wallet.ui.extension.*
+import com.tari.android.wallet.util.SharedPrefsWrapper
 import java.util.*
+import javax.inject.Inject
 import kotlin.LazyThreadSafetyMode.NONE
 import kotlin.collections.ArrayList
 
@@ -66,9 +69,12 @@ the necessary data via arguments instead, as fragment's default no-op constructo
 framework for UI tree rebuild on configuration changes"""
 ) constructor() : Fragment() {
 
+    @Inject
+    lateinit var sharedPrefs: SharedPrefsWrapper
+
     private lateinit var ui: FragmentVerifySeedPhraseBinding
     private val state by lazy {
-        val words = requireArguments().getStringArrayList(WORDS_KEY)!!
+        val words = requireArguments().getStringArrayList(SEED_WORDS_KEY)!!
         ViewModelProvider(this, VerificationStateFactory(words)).get(VerificationState::class.java)
     }
     private val avenirHeavy: Typeface
@@ -86,6 +92,11 @@ framework for UI tree rebuild on configuration changes"""
     private val selectableWordEndMargin: Int
             by lazy(NONE) { dimenPx(verify_seed_phrase_selectable_word_end_margin) }
 
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        appComponent.inject(this)
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -95,15 +106,21 @@ framework for UI tree rebuild on configuration changes"""
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        setupUi()
+        setupUI()
     }
 
-    private fun setupUi() {
+    private fun setupUI() {
         fillSelectableWordsContainer()
         fillSelectedWordsContainer()
         evaluateEnteredPhrase()
         ui.backCtaView.setOnClickListener(ThrottleClick { requireActivity().onBackPressed() })
-        ui.continueCtaView.setOnClickListener(ThrottleClick { it.animateClick() })
+        ui.continueCtaView.setOnClickListener(ThrottleClick {
+            it.animateClick {
+                sharedPrefs.hasVerifiedSeedWords = true
+                (requireActivity() as BackupSettingsRouter)
+                    .onSeedPhraseVerificationComplete(this)
+            }
+        })
     }
 
     private fun fillSelectableWordsContainer() {
@@ -152,6 +169,7 @@ framework for UI tree rebuild on configuration changes"""
         TextView(selectedWordThemedContext).apply {
             typeface = avenirHeavy
             text = word
+            setTextSize(TypedValue.COMPLEX_UNIT_DIP, 12f)
             layoutParams = FlexboxLayout.LayoutParams(WRAP_CONTENT, WRAP_CONTENT)
                 .apply { setMargins(0, 0, selectedWordEndMargin, wordBottomMargin) }
             setOnClickListener { view ->
@@ -208,7 +226,7 @@ framework for UI tree rebuild on configuration changes"""
         ui.continueCtaView.isEnabled = enable
         ui.continueCtaView.setTextColor(
             if (enable) Color.WHITE
-            else color(seed_phrase_button_disabled_text_color)
+            else color(R.color.seed_phrase_button_disabled_text_color)
         )
     }
 
@@ -216,51 +234,54 @@ framework for UI tree rebuild on configuration changes"""
         ViewModelProvider.Factory {
         @Suppress("UNCHECKED_CAST")
         override fun <T : ViewModel?> create(modelClass: Class<T>): T =
-            VerificationState(Phrase(words)) as T
+            VerificationState(SeedPhrase(words)) as T
     }
 
-    internal class VerificationState(phrase: Phrase) : ViewModel() {
+    internal class VerificationState(seedPhrase: SeedPhrase) : ViewModel() {
 
-        val shuffled: Phrase
+        val shuffled: SeedPhrase
         val selection: SelectionSequence
 
         init {
-            val (shuffled, selectionSequence) = phrase.startSelection()
+            val (shuffled, selectionSequence) = seedPhrase.startSelection()
             this.shuffled = shuffled
             this.selection = selectionSequence
         }
 
     }
 
-    internal class Phrase(private val words: List<String>) : Iterable<String> {
+    internal class SeedPhrase(private val seedWords: List<String>) : Iterable<String> {
         val length
-            get() = words.size
+            get() = seedWords.size
 
-        private fun shuffled(): Phrase = Phrase(words.shuffled())
+        private fun shuffled(): SeedPhrase = SeedPhrase(seedWords.shuffled())
 
-        fun consistsOf(result: List<String>): Boolean = words == result
+        fun consistsOf(result: List<String>): Boolean = seedWords == result
 
         operator fun get(index: Int): String {
             if (index >= length) throw IllegalArgumentException(
                 "Selection index ($index) isn't less than original phrase's length " +
                         "($length)\nPhrase: $this"
             )
-            return words[index]
+            return seedWords[index]
         }
 
         fun startSelection() = shuffled().let { s -> Pair(s, SelectionSequence(this, s)) }
 
-        override fun iterator(): Iterator<String> = words.iterator()
+        override fun iterator(): Iterator<String> = seedWords.iterator()
 
         override fun equals(other: Any?): Boolean =
-            this === other || javaClass == other?.javaClass && words == (other as Phrase).words
+            this === other || javaClass == other?.javaClass && seedWords == (other as SeedPhrase).seedWords
 
-        override fun hashCode(): Int = words.hashCode()
-        override fun toString(): String = "Phrase(words=${words.joinToString()})"
+        override fun hashCode(): Int = seedWords.hashCode()
+        override fun toString(): String = "Phrase(words=${seedWords.joinToString()})"
 
     }
 
-    internal class SelectionSequence(private val original: Phrase, private val shuffled: Phrase) {
+    internal class SelectionSequence(
+        private val original: SeedPhrase,
+        private val shuffled: SeedPhrase
+    ) {
         private val selections = LinkedList<Int>()
         val size: Int
             get() = selections.size
@@ -324,10 +345,11 @@ framework for UI tree rebuild on configuration changes"""
         @Suppress("DEPRECATION")
         fun newInstance(words: List<String>): VerifySeedPhraseFragment =
             VerifySeedPhraseFragment().also {
-                it.arguments = Bundle().apply { putStringArrayList(WORDS_KEY, ArrayList(words)) }
+                it.arguments =
+                    Bundle().apply { putStringArrayList(SEED_WORDS_KEY, ArrayList(words)) }
             }
 
-        private const val WORDS_KEY = "wordz"
+        private const val SEED_WORDS_KEY = "wordz"
     }
 
 }

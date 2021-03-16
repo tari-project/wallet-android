@@ -32,30 +32,48 @@
  */
 package com.tari.android.wallet.ui.fragment.settings.backup
 
+import android.content.ComponentName
+import android.content.Context
+import android.content.Intent
+import android.content.ServiceConnection
 import android.graphics.Color
 import android.graphics.Rect
 import android.os.Bundle
+import android.os.IBinder
 import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.orhanobut.logger.Logger
+import com.tari.android.wallet.R
 import com.tari.android.wallet.R.color.seed_phrase_button_disabled_text_color
 import com.tari.android.wallet.databinding.FragmentWriteDownSeedPhraseBinding
+import com.tari.android.wallet.model.WalletError
+import com.tari.android.wallet.service.TariWalletService
+import com.tari.android.wallet.service.WalletService
 import com.tari.android.wallet.ui.activity.settings.BackupSettingsRouter
+import com.tari.android.wallet.ui.dialog.ErrorDialog
 import com.tari.android.wallet.ui.extension.ThrottleClick
 import com.tari.android.wallet.ui.extension.animateClick
 import com.tari.android.wallet.ui.extension.color
+import com.tari.android.wallet.ui.extension.string
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class WriteDownSeedPhraseFragment @Deprecated(
     """Use newInstance() and supply all
 the necessary data via arguments instead, as fragment's default no-op constructor is used by the
 framework for UI tree rebuild on configuration changes"""
-) constructor() : Fragment() {
+) constructor() : Fragment(), ServiceConnection {
 
     private lateinit var ui: FragmentWriteDownSeedPhraseBinding
+    private lateinit var walletService: TariWalletService
+
+    private val seedWords = mutableListOf<String>()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -73,12 +91,12 @@ framework for UI tree rebuild on configuration changes"""
         ui.continueCtaView.setOnClickListener(ThrottleClick {
             it.animateClick {
                 (requireActivity() as BackupSettingsRouter)
-                    .toRecoveryPhraseVerification(this, WORDS_POOL)
+                    .toSeedPhraseVerification(this, seedWords)
             }
         })
         ui.phraseWordsRecyclerView.layoutManager =
             GridLayoutManager(requireContext(), WORD_COLUMNS_COUNT)
-        ui.phraseWordsRecyclerView.adapter = PhraseWordsAdapter(WORDS_POOL)
+        ui.phraseWordsRecyclerView.adapter = PhraseWordsAdapter(seedWords)
         ui.phraseWordsRecyclerView.addItemDecoration(
             VerticalInnerMarginDecoration(
                 value = TypedValue.applyDimension(
@@ -89,6 +107,49 @@ framework for UI tree rebuild on configuration changes"""
                 spans = WORD_COLUMNS_COUNT
             )
         )
+        bindToWalletService()
+    }
+
+    override fun onDestroyView() {
+        requireActivity().unbindService(this)
+        super.onDestroyView()
+    }
+
+    private fun bindToWalletService() {
+        val bindIntent = Intent(requireActivity(), WalletService::class.java)
+        requireActivity().bindService(bindIntent, this, Context.BIND_AUTO_CREATE)
+    }
+
+    override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
+        Logger.i("WriteDownSeedPhraseFragment onServiceConnected")
+        walletService = TariWalletService.Stub.asInterface(service)
+        lifecycleScope.launch(Dispatchers.IO) {
+            getSeedWords()
+        }
+    }
+
+    override fun onServiceDisconnected(name: ComponentName?) {
+        Logger.i("WriteDownSeedPhraseFragment onServiceDisconnected")
+        // No-op for now
+    }
+
+    private fun getSeedWords() {
+        val error = WalletError()
+        val seedWords = walletService.getSeedWords(error)
+        if (seedWords != null) {
+            this.seedWords.clear()
+            this.seedWords.addAll(seedWords)
+            lifecycleScope.launch(Dispatchers.Main) {
+                ui.phraseWordsRecyclerView.adapter?.notifyDataSetChanged()
+            }
+        } else {
+            // display error
+            ErrorDialog(
+                requireContext(),
+                title = string(R.string.common_error_title),
+                description = string(R.string.back_up_seed_phrase_error)
+            ).show()
+        }
     }
 
     private fun updateContinueButtonState(isChecked: Boolean) {
@@ -121,32 +182,6 @@ framework for UI tree rebuild on configuration changes"""
 
         @Suppress("DEPRECATION")
         fun newInstance() = WriteDownSeedPhraseFragment()
-        private val WORDS_POOL = listOf(
-            "Aurora",
-            "Decentralized",
-            "Fluffy",
-            "Digital",
-            "Contribute",
-            "Collect",
-            "Tokens",
-            "Assets",
-            "Scalable",
-            "Tari",
-            "Gems",
-            "Code",
-            "Code",
-            "Gems",
-            "Tari",
-            "Scalable",
-            "Assets",
-            "Tokens",
-            "Collect",
-            "Contribute",
-            "Digital",
-            "Fluffy",
-            "Decentralized",
-            "Aurora"
-        )
     }
 
 }

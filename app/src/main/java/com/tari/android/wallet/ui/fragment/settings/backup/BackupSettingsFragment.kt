@@ -123,6 +123,11 @@ framework for UI tree rebuild on configuration changes"""
         super.onDestroyView()
     }
 
+    override fun onHiddenChanged(hidden: Boolean) {
+        super.onHiddenChanged(hidden)
+        setSeedWordVerificationStateIcon()
+    }
+
     override fun onActivityResult(requestCode: Int, resultCode: Int, intent: Intent?) {
         super.onActivityResult(requestCode, resultCode, intent)
         lifecycleScope.launch(Dispatchers.IO) {
@@ -483,7 +488,17 @@ framework for UI tree rebuild on configuration changes"""
         ui.cloudBackupStatusProgressView.invisible()
         ui.cloudBackupStatusSuccessView.invisible()
         ui.cloudBackupStatusWarningView.invisible()
-        ui.backupWithRecoveryPhraseWarningView.gone()
+        setSeedWordVerificationStateIcon()
+    }
+
+    private fun setSeedWordVerificationStateIcon() {
+        if (sharedPrefs.hasVerifiedSeedWords) {
+            ui.backupWithRecoveryPhraseWarningView.gone()
+            ui.backupWithRecoveryPhraseSuccessView.visible()
+        } else {
+            ui.backupWithRecoveryPhraseWarningView.visible()
+            ui.backupWithRecoveryPhraseSuccessView.gone()
+        }
     }
 
     private fun showAuthenticationCancellationError() {

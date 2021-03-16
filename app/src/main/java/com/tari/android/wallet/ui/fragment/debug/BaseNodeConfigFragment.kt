@@ -114,6 +114,7 @@ internal class BaseNodeConfigFragment : Fragment(), ServiceConnection {
 
     override fun onDestroyView() {
         EventBus.unsubscribe(this)
+        requireActivity().unbindService(this)
         super.onDestroyView()
     }
 

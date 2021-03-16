@@ -64,6 +64,7 @@ import com.tari.android.wallet.ui.fragment.settings.AllSettingsFragment
 import com.tari.android.wallet.ui.fragment.settings.backup.BackupSettingsFragment
 import com.tari.android.wallet.ui.fragment.settings.backup.ChangeSecurePasswordFragment
 import com.tari.android.wallet.ui.fragment.settings.backup.EnterCurrentPasswordFragment
+import com.tari.android.wallet.ui.fragment.settings.backup.VerifySeedPhraseFragment
 import com.tari.android.wallet.ui.fragment.tx.TxListFragment
 import com.tari.android.wallet.util.SharedPrefsWrapper
 import dagger.Component
@@ -138,6 +139,7 @@ internal interface ApplicationComponent {
     fun inject(fragment: BackupSettingsFragment)
     fun inject(fragment: ChangeSecurePasswordFragment)
     fun inject(fragment: EnterCurrentPasswordFragment)
+    fun inject(fragment: VerifySeedPhraseFragment)
     /**
      * Restore.
      */

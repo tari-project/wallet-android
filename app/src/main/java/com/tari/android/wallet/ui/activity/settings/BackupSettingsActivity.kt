@@ -63,8 +63,8 @@ class BackupSettingsActivity : AppCompatActivity(), BackupSettingsRouter {
         addFragment(sourceFragment, WriteDownSeedPhraseFragment.newInstance())
     }
 
-    override fun toRecoveryPhraseVerification(sourceFragment: Fragment, phrase: List<String>) {
-        addFragment(sourceFragment, VerifySeedPhraseFragment.newInstance(phrase))
+    override fun toSeedPhraseVerification(sourceFragment: Fragment, seedWords: List<String>) {
+        addFragment(sourceFragment, VerifySeedPhraseFragment.newInstance(seedWords))
     }
 
     override fun toConfirmPassword(sourceFragment: Fragment) {
@@ -94,6 +94,13 @@ class BackupSettingsActivity : AppCompatActivity(), BackupSettingsRouter {
         } else {
             onBackPressed()
         }
+    }
+
+    override fun onSeedPhraseVerificationComplete(sourceFragment: Fragment) {
+        supportFragmentManager.popBackStackImmediate(
+            WriteDownSeedPhraseFragment::class.java.simpleName,
+            FragmentManager.POP_BACK_STACK_INCLUSIVE
+        )
     }
 
     override fun onBackPressed() {
