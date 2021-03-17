@@ -372,7 +372,7 @@
 
     <!-- Wallet back up with seed phrase -->
     <string name="back_up_seed_phrase_page_title">Back Up With Seed Phrase</string>
-    <string name="back_up_seed_phrase_desc">Carefully write these 12 words down in order (left to right) on a piece of paper, and hide it somewhere others won’t access it. Do not take a screenshot.</string>
+    <string name="back_up_seed_phrase_desc">Carefully write these 24 words down in order, and keep the paper somewhere secure where others can\'t access it. Do not take a screenshot.</string>
     <string name="back_up_seed_phrase_verify_cta">Verify Seed Phrase</string>
     <string name="back_up_seep_phrase_losing_warning_label">I understand that if I lose my recovery seed phrase I will not be able to restore my wallet.</string>
     <string name="back_up_seed_phrase_error">Error while getting the wallet seed phrase. Please try again later.</string>
@@ -380,7 +380,7 @@
     <!-- Verify seed phrase -->
     <string name="verify_seed_phrase_page_title">Verify Seed Phrase</string>
     <string name="verify_seed_phrase_select_words_label">Select the words in the correct order.</string>
-    <string name="verify_seed_phrase_select_words_description">Tap on the words above in the correct order</string>
+    <string name="verify_seed_phrase_select_words_description">Tap on the words below in the correct order</string>
     <string name="verify_seed_phrase_complete_verification_cta">Complete Verification</string>
     <string name="verify_seed_phrase_sequence_is_invalid_message">Nope, that’s not right</string>
     <string name="verify_seed_phrase_content_description_sequence_is_correct">Sequence is correct</string>
