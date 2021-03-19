@@ -92,6 +92,9 @@ import com.tari.android.wallet.ui.resource.AnimationResource
 import com.tari.android.wallet.ui.resource.ResourceContainer
 import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.SharedPrefsWrapper
+import io.reactivex.Observable
+import io.reactivex.disposables.Disposable
+import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
@@ -99,6 +102,7 @@ import kotlinx.coroutines.withContext
 import java.lang.ref.WeakReference
 import java.math.BigDecimal
 import java.util.concurrent.CopyOnWriteArrayList
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import kotlin.math.max
 import kotlin.math.min
@@ -152,6 +156,14 @@ internal class TxListFragment : Fragment(),
 
     // TODO(nyarian): remove
     private var testnetTariRequestIsWaitingOnConnection = false
+
+    private var txEventUIActionDelayMs = 500L
+    private var txReceivedDelayedAction: Disposable? = null
+    private var txReplyReceivedDelayedAction: Disposable? = null
+    private var txFinalizedDelayedAction: Disposable? = null
+    private var txMinedUnconfirmedDelayedAction: Disposable? = null
+    private var txMinedDelayedAction: Disposable? = null
+    private var txCancelledDelayedAction: Disposable? = null
 
     private val txListIsEmpty: Boolean
         get() = cancelledTxs.isEmpty()
@@ -354,13 +366,21 @@ internal class TxListFragment : Fragment(),
 
     private fun onTxReceived(tx: PendingInboundTx) {
         pendingInboundTxs.add(tx)
+        txReceivedDelayedAction?.dispose()
         // update balance
-        lifecycleScope.launch(Dispatchers.Main) {
-            withContext(Dispatchers.IO) { updateBalanceInfoData() }
-            updateBalanceInfoUI(restart = false)
-            showWalletBackupPromptIfNecessary()
-            updateTxListUI()
-        }
+        txReceivedDelayedAction =
+            Observable
+                .timer(txEventUIActionDelayMs, TimeUnit.MILLISECONDS)
+                .subscribeOn(Schedulers.io())
+                .observeOn(Schedulers.io())
+                .subscribe {
+                    updateBalanceInfoData()
+                    lifecycleScope.launch(Dispatchers.Main) {
+                        updateBalanceInfoUI(restart = false)
+                        showWalletBackupPromptIfNecessary()
+                        updateTxListUI()
+                    }
+                }
     }
 
     private fun showWalletBackupPromptIfNecessary() {
@@ -428,17 +448,35 @@ internal class TxListFragment : Fragment(),
     }
 
     private fun onTxReplyReceived(tx: PendingOutboundTx) {
-        // just update data - no UI change required
         pendingOutboundTxs.firstOrNull { it.id == tx.id }?.status = tx.status
-        // update tx list UI
-        lifecycleScope.launch(Dispatchers.Main) { updateTxListUI() }
+        txReplyReceivedDelayedAction?.dispose()
+        txReplyReceivedDelayedAction =
+            Observable
+                .timer(txEventUIActionDelayMs, TimeUnit.MILLISECONDS)
+                .subscribeOn(Schedulers.io())
+                .observeOn(Schedulers.io())
+                .subscribe {
+                    updateBalanceInfoData()
+                    lifecycleScope.launch(Dispatchers.Main) {
+                        lifecycleScope.launch(Dispatchers.Main) { updateTxListUI() }
+                    }
+                }
     }
 
     private fun onTxFinalized(tx: PendingInboundTx) {
-        // just update data - no UI change required
         pendingInboundTxs.firstOrNull { it.id == tx.id }?.status = tx.status
-        // update tx list UI
-        lifecycleScope.launch(Dispatchers.Main) { updateTxListUI() }
+        txFinalizedDelayedAction?.dispose()
+        txFinalizedDelayedAction =
+            Observable
+                .timer(txEventUIActionDelayMs, TimeUnit.MILLISECONDS)
+                .subscribeOn(Schedulers.io())
+                .observeOn(Schedulers.io())
+                .subscribe {
+                    updateBalanceInfoData()
+                    lifecycleScope.launch(Dispatchers.Main) {
+                        lifecycleScope.launch(Dispatchers.Main) { updateTxListUI() }
+                    }
+                }
     }
 
     private fun onInboundTxBroadcast(tx: PendingInboundTx) {
@@ -460,14 +498,28 @@ internal class TxListFragment : Fragment(),
         if (completedTxs.find { it.id == tx.id } == null) {
             completedTxs.add(tx)
         }
-        // update tx list UI
-        lifecycleScope.launch(Dispatchers.Main) { updateTxListUI() }
+        txMinedUnconfirmedDelayedAction?.dispose()
+        txMinedUnconfirmedDelayedAction =
+            Observable
+                .timer(txEventUIActionDelayMs, TimeUnit.MILLISECONDS)
+                .subscribeOn(Schedulers.io())
+                .observeOn(Schedulers.io())
+                .subscribe {
+                    lifecycleScope.launch(Dispatchers.Main) { updateTxListUI() }
+                }
     }
 
     private fun onTxMined(tx: CompletedTx) {
         completedTxs.firstOrNull { it.id == tx.id }?.status = TxStatus.MINED_CONFIRMED
-        // update tx list UI
-        lifecycleScope.launch(Dispatchers.Main) { updateTxListUI() }
+        txMinedDelayedAction?.dispose()
+        txMinedDelayedAction =
+            Observable
+                .timer(txEventUIActionDelayMs, TimeUnit.MILLISECONDS)
+                .subscribeOn(Schedulers.io())
+                .observeOn(Schedulers.io())
+                .subscribe {
+                    lifecycleScope.launch(Dispatchers.Main) { updateTxListUI() }
+                }
     }
 
     private fun onTxCancelled(tx: CancelledTx) {
@@ -477,13 +529,19 @@ internal class TxListFragment : Fragment(),
         }
         source.find { it.id == tx.id }?.let { source.remove(it) }
         cancelledTxs.add(tx)
-        lifecycleScope.launch(Dispatchers.IO) {
-            updateBalanceInfoData()
-            withContext(Dispatchers.Main) {
-                updateBalanceInfoUI(restart = false)
-                updateTxListUI()
-            }
-        }
+        txCancelledDelayedAction?.dispose()
+        txCancelledDelayedAction =
+            Observable
+                .timer(txEventUIActionDelayMs, TimeUnit.MILLISECONDS)
+                .subscribeOn(Schedulers.io())
+                .observeOn(Schedulers.io())
+                .subscribe {
+                    updateBalanceInfoData()
+                    lifecycleScope.launch(Dispatchers.Main) {
+                        updateBalanceInfoUI(restart = false)
+                        updateTxListUI()
+                    }
+                }
     }
 
     private fun onContactAddedOrUpdated(publicKey: PublicKey, alias: String) {
@@ -534,14 +592,14 @@ internal class TxListFragment : Fragment(),
     private fun updateTxListData() {
         val error = WalletError()
         val service = walletService!!
-        val walletCanceledTxs = service.getCancelledTxs(error)
+        val walletCancelledTxs = service.getCancelledTxs(error)
         val walletCompletedTxs = service.getCompletedTxs(error)
         val walletPendingInboundTxs = service.getPendingInboundTxs(error)
         val walletPendingOutboundTxs = service.getPendingOutboundTxs(error)
         if (error.code != WalletErrorCode.NO_ERROR) {
             TODO("Unhandled wallet error: ${error.code}")
         }
-        cancelledTxs.repopulate(walletCanceledTxs)
+        cancelledTxs.repopulate(walletCancelledTxs)
         completedTxs.repopulate(walletCompletedTxs)
         pendingInboundTxs.repopulate(walletPendingInboundTxs)
         pendingOutboundTxs.repopulate(walletPendingOutboundTxs)

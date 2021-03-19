@@ -209,6 +209,12 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
     }
 
     /**
+     * Debounce for inbound transaction notification.
+     */
+    private var txReceivedNotificationDelayedAction: Disposable? = null
+    private var inboundTxEventNotificationTxs = mutableListOf<Tx>()
+
+    /**
      * Maps the validation type to the request id and validation result. This map will be
      * initialized at the beginning of each base node validation sequence.
      * Validation results will all be null, and will be set as the result callbacks get called.
@@ -652,13 +658,25 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
     }
 
     private fun postTxNotification(tx: Tx) {
-        // if app is backgrounded, display heads-up notification
-        val currentActivity = app.currentActivity
-        if (!app.isInForeground
-            || currentActivity !is HomeActivity
-            || !currentActivity.willNotifyAboutNewTx()) {
-            notificationHelper.postCustomLayoutTxNotification(tx)
-        }
+        txReceivedNotificationDelayedAction?.dispose()
+        inboundTxEventNotificationTxs.add(tx)
+        txReceivedNotificationDelayedAction =
+            Observable
+                .timer(500, TimeUnit.MILLISECONDS)
+                .subscribeOn(Schedulers.io())
+                .observeOn(Schedulers.io())
+                .subscribe {
+                    // if app is backgrounded, display heads-up notification
+                    val currentActivity = app.currentActivity
+                    if (!app.isInForeground
+                        || currentActivity !is HomeActivity
+                        || !currentActivity.willNotifyAboutNewTx()) {
+                        notificationHelper.postCustomLayoutTxNotification(
+                            inboundTxEventNotificationTxs.last()
+                        )
+                    }
+                    inboundTxEventNotificationTxs.clear()
+                }
     }
 
     private fun sendPushNotificationToTxRecipient(recipientPublicKeyHex: String) {
@@ -833,7 +851,9 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
                         completedTxFromFFI(completedTxFFI).also {
                             completedTxFFI.destroy()
                         }
-                    }.also { completedTxsFFI.destroy() }
+                    }.also {
+                        completedTxsFFI.destroy()
+                    }
             } catch (throwable: Throwable) {
                 mapThrowableIntoError(throwable, error)
                 null
@@ -1069,7 +1089,6 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
             if (error.code != WalletErrorCode.NO_ERROR) {
                 throw FFIException(message = error.message)
             }
-
             if (completedTxFFI.isOutbound()) {
                 direction = OUTBOUND
                 val userPublicKey = PublicKey(
@@ -1089,7 +1108,6 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
                     sourcePublicKeyFFI.toString()
                 ) ?: User(userPublicKey)
             }
-
             val completedTx = CompletedTx(
                 completedTxFFI.getId(),
                 direction,
