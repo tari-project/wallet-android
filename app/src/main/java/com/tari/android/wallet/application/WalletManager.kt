@@ -144,7 +144,8 @@ internal class WalletManager(
             getTorTransport(),
             Constants.Wallet.walletDBName,
             walletFilesDirPath,
-            Constants.Wallet.discoveryTimeoutSec
+            Constants.Wallet.discoveryTimeoutSec,
+            Constants.Wallet.safMessageDurationSec
         )
     }
 
