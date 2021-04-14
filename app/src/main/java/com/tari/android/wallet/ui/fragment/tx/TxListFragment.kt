@@ -612,7 +612,8 @@ internal class TxListFragment : Fragment(),
             if (txListIsEmpty) {
                 showNoTxsTextView()
             }
-            if (!sharedPrefsWrapper.faucetTestnetTariRequestCompleted) {
+            if (!sharedPrefsWrapper.faucetTestnetTariRequestCompleted
+                && !sharedPrefsWrapper.isRestoredWallet) {
                 requestTestnetTari()
             }
             updateProgressViewController.reset()

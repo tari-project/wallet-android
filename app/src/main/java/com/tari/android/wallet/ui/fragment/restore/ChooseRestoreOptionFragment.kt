@@ -161,8 +161,10 @@ framework for UI tree rebuild on configuration changes"""
                     }
                 }
                 is BackupFileIsEncryptedException -> {
-                    withContext(Dispatchers.Main) { endProgress() }
-                    (requireActivity() as WalletRestoreRouter).toEnterRestorePassword()
+                    withContext(Dispatchers.Main) {
+                        endProgress()
+                        (requireActivity() as WalletRestoreRouter).toEnterRestorePassword()
+                    }
                 }
                 is IOException -> {
                     Logger.e(exception, "Restore failed: network connection.")

@@ -79,7 +79,7 @@ class FFIWalletTests {
             FFITestUtil.WALLET_DB_NAME,
             walletDirPath,
             Constants.Wallet.discoveryTimeoutSec,
-            Constants.Wallet.safMessageDurationSec
+            Constants.Wallet.storeAndForwardMessageDurationSec
         )
         val logFile = File(walletDirPath, "test_log.log")
         // create wallet instance

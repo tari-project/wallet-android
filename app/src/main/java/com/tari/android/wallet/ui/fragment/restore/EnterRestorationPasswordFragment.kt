@@ -174,7 +174,9 @@ UI tree rebuild on configuration changes"""
         lifecycleScope.launch(Dispatchers.IO) {
             try {
                 backupStorage.restoreLatestBackup(password)
-                (requireActivity() as WalletRestoreRouter).toRestoreInProgress()
+                withContext(Dispatchers.Main) {
+                    (requireActivity() as WalletRestoreRouter).toRestoreInProgress()
+                }
             } catch (exception: Exception) {
                 withContext(Dispatchers.Main) {
                     handleRestorationFailure(exception)

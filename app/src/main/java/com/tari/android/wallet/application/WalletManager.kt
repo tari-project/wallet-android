@@ -145,7 +145,7 @@ internal class WalletManager(
             Constants.Wallet.walletDBName,
             walletFilesDirPath,
             Constants.Wallet.discoveryTimeoutSec,
-            Constants.Wallet.safMessageDurationSec
+            Constants.Wallet.storeAndForwardMessageDurationSec
         )
     }
 

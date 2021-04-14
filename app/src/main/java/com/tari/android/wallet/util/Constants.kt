@@ -140,7 +140,7 @@ internal object Constants {
         const val maxNumberOfRollingLogFiles = 2
         const val rollingLogFileMaxSizeBytes = 10 * 1024 * 1024
         const val discoveryTimeoutSec = 20L
-        const val safMessageDurationSec = 10800L
+        const val storeAndForwardMessageDurationSec = 10800L
         const val emojiIdLength = 33
         const val emojiFormatterChunkSize = 3
         const val walletDBName: String = "tari_wallet_db"

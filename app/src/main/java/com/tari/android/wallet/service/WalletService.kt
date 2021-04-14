@@ -36,7 +36,9 @@ import android.annotation.SuppressLint
 import android.app.Service
 import android.content.Context
 import android.content.Intent
+import android.os.Handler
 import android.os.IBinder
+import android.os.Looper
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
@@ -280,7 +282,10 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
             EventBus.unsubscribeFromWalletState(this)
             scheduleExpirationCheck()
             backupManager.initialize()
-            ProcessLifecycleOwner.get().lifecycle.addObserver(this)
+            val handler = Handler(Looper.getMainLooper())
+            handler.post {
+                ProcessLifecycleOwner.get().lifecycle.addObserver(this)
+            }
         }
     }
 
