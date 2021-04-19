@@ -1,14 +1,14 @@
 import org.gradle.api.tasks.testing.logging.TestLogEvent
 
 buildscript {
-    ext.kotlin_version = '1.4.31'
+    ext.kotlin_version = '1.4.32'
 
     // build & version
     ext.buildNumber = 157
-    ext.versionNumber = "0.6.3"
+    ext.versionNumber = "0.6.2"
 
     // JNI libs
-    ext.libwalletVersion = "0.16.26"
+    ext.libwalletVersion = "0.16.27"
     ext.libwalletHostURL = "https://tari-binaries.s3.amazonaws.com/libwallet/"
     ext.supportedABIs = ["arm64-v8a", "armeabi-v7a", "x86_64"]
 
