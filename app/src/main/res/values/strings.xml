@@ -220,6 +220,7 @@
     <!-- send tari - amount -->
     <string name="add_amount_under_construction">Under Construction</string>
     <string name="add_amount_not_enough_available_balance">Not enough tXTR in your available balance</string>
+    <string name="add_amount_funds_pending">Sorry, you can’t send this much tXTR. Please wait for at least one transaction to complete and then try again.</string>
     <string name="add_amount_tx_fee">Transaction Fee</string>
 
     <!-- send tari - note -->

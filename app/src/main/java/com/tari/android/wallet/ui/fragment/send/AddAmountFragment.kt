@@ -990,17 +990,28 @@ class AddAmountFragment : Fragment(), ServiceConnection {
                 error
             )
             if (error.code != WalletErrorCode.NO_ERROR
-                && error.code != WalletErrorCode.NOT_ENOUGH_FUNDS) {
+                && error.code != WalletErrorCode.NOT_ENOUGH_FUNDS
+                && error.code != WalletErrorCode.FUNDS_PENDING) {
                 TODO("Unhandled wallet error: ${error.code}")
             }
             estimatedFee = fee
             // check balance
             val availableBalance =
                 balanceInfo.availableBalance + balanceInfo.pendingIncomingBalance
-            if (error.code == WalletErrorCode.NOT_ENOUGH_FUNDS
+            if (error.code == WalletErrorCode.FUNDS_PENDING
+                || error.code == WalletErrorCode.NOT_ENOUGH_FUNDS
                 || (currentAmount + fee) > availableBalance) {
-                ui.availableBalanceTextView.text =
-                    WalletUtil.amountFormatter.format(availableBalance.tariValue)
+                if (error.code == WalletErrorCode.FUNDS_PENDING) {
+                    ui.availableBalanceContainerView.gone()
+                    ui.notEnoughBalanceDescriptionTextView.text =
+                        string(R.string.add_amount_funds_pending)
+                } else {
+                    ui.availableBalanceContainerView.visible()
+                    ui.availableBalanceTextView.text =
+                        WalletUtil.amountFormatter.format(availableBalance.tariValue)
+                    ui.notEnoughBalanceDescriptionTextView.text =
+                        string(R.string.add_amount_not_enough_available_balance)
+                }
                 displayAvailableBalanceError()
                 if (ui.txFeeContainerView.visibility != View.INVISIBLE) {
                     val viewAnim = ValueAnimator.ofFloat(0f, 1f)

@@ -105,6 +105,7 @@
                     android:paddingBottom="@dimen/add_amount_balance_warning_container_bottom_padding"
                     tools:ignore="UselessParent">
                     <LinearLayout
+                        android:id="@+id/available_balance_container_view"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:gravity="center"
@@ -127,13 +128,16 @@
                             tools:text="124.56" />
                     </LinearLayout>
                     <com.tari.android.wallet.ui.component.CustomFontTextView
+                        android:id="@+id/not_enough_balance_description_text_view"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="4dp"
-                        android:layout_marginEnd="4dp"
+                        android:layout_marginStart="16dp"
+                        android:layout_marginEnd="16dp"
                         android:layout_marginTop="4dp"
+                        android:gravity="center"
+                        android:lineSpacingExtra="10dp"
                         android:ellipsize="middle"
-                        android:singleLine="true"
+                        android:singleLine="false"
                         android:text="@string/add_amount_not_enough_available_balance"
                         android:textColor="#3C393D"
                         android:textSize="@dimen/add_amount_tx_fee_text_size"
