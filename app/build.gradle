@@ -247,7 +247,7 @@ dependencies {
     // matomo - tracking
     regularImplementation 'org.matomo.sdk:tracker:4.1.2'
     // sentry - crash analytics
-    regularImplementation 'io.sentry:sentry-android:2.1.1'
+    regularImplementation 'io.sentry:sentry-android:4.3.0'
 
     // test
     testImplementation 'junit:junit:4.13.2'
