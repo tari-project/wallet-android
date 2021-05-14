@@ -122,6 +122,12 @@ interface TariWalletService {
     boolean removeKeyValue(in String key, out WalletError error);
 
     /**
+    * Required confirmation count functions.
+    */
+    long getRequiredConfirmationCount(out WalletError error);
+    void setRequiredConfirmationCount(long number, out WalletError error);
+
+    /**
     * Seed words.
     */
     List<String> getSeedWords(out WalletError error);

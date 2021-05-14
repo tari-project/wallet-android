@@ -130,6 +130,8 @@ internal class TxListFragment : Fragment(),
     private val walletService: TariWalletService?
         get() = serviceConnection.currentState.service
 
+    private var requiredConfirmationCount: Long = 0
+
     private val cancelledTxs = CopyOnWriteArrayList<CancelledTx>()
     private val completedTxs = CopyOnWriteArrayList<CompletedTx>()
     private val pendingInboundTxs = CopyOnWriteArrayList<PendingInboundTx>()
@@ -265,6 +267,7 @@ internal class TxListFragment : Fragment(),
                 completedTxs,
                 pendingInboundTxs,
                 pendingOutboundTxs,
+                { requiredConfirmationCount },
                 repository,
                 Glide.with(this),
             ) {
@@ -321,7 +324,7 @@ internal class TxListFragment : Fragment(),
             onOutboundTxBroadcast(it.tx)
         }
         EventBus.subscribe<Event.Wallet.TxMinedUnconfirmed>(this) {
-            onTxMinedUnconfirmed(it.tx, it.confirmationCount)
+            onTxMinedUnconfirmed(it.tx)
         }
         EventBus.subscribe<Event.Wallet.TxMined>(this) {
             onTxMined(it.tx)
@@ -489,14 +492,17 @@ internal class TxListFragment : Fragment(),
         pendingOutboundTxs.firstOrNull { it.id == tx.id }?.status = TxStatus.BROADCAST
     }
 
-    private fun onTxMinedUnconfirmed(tx: CompletedTx, confirmationCount: Int) {
+    private fun onTxMinedUnconfirmed(tx: CompletedTx) {
         val source = when (tx.direction) {
             Tx.Direction.INBOUND -> pendingInboundTxs
             Tx.Direction.OUTBOUND -> pendingOutboundTxs
         }
         source.find { it.id == tx.id }?.let { source.remove(it) }
-        if (completedTxs.find { it.id == tx.id } == null) {
+        val index = completedTxs.indexOfFirst { it.id == tx.id }
+        if (index == -1) {
             completedTxs.add(tx)
+        } else {
+            completedTxs[index] = tx
         }
         txMinedUnconfirmedDelayedAction?.dispose()
         txMinedUnconfirmedDelayedAction =
@@ -574,6 +580,7 @@ internal class TxListFragment : Fragment(),
         lifecycleScope.launch(Dispatchers.IO) {
             updateTxListData()
             updateBalanceInfoData()
+            fetchRequiredConfirmationCount()
             withContext(Dispatchers.Main) {
                 if (activity != null) {
                     // TODO(nyarian): properly handle memory leak
@@ -643,6 +650,15 @@ internal class TxListFragment : Fragment(),
             TODO("Unhandled wallet error: ${error.code}")
         }
         return true
+    }
+
+    private fun fetchRequiredConfirmationCount() {
+        val error = WalletError()
+        val service = walletService!!
+        requiredConfirmationCount = service.getRequiredConfirmationCount(error)
+        if (error.code != WalletErrorCode.NO_ERROR) {
+            TODO("Unhandled wallet error: ${error.code}")
+        }
     }
 
     private fun updateBalanceInfoUI(restart: Boolean) {

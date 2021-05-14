@@ -55,7 +55,7 @@ object Event {
         data class InboundTxBroadcast(val tx: PendingInboundTx)
         data class OutboundTxBroadcast(val tx: PendingOutboundTx)
         data class TxMined(val tx: CompletedTx)
-        data class TxMinedUnconfirmed(val tx: CompletedTx, val confirmationCount: Int)
+        data class TxMinedUnconfirmed(val tx: CompletedTx)
         data class TxCancelled(val tx: CancelledTx)
         data class DirectSendResult(val txId: TxId, val success: Boolean)
         data class StoreAndForwardSendResult(val txId: TxId, val success: Boolean)

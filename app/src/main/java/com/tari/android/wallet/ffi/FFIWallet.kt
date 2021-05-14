@@ -535,7 +535,8 @@ internal class FFIWallet(
             MicroTari(tx.getFee()),
             tx.getTimestamp(),
             tx.getMessage(),
-            TxStatus.map(tx.getStatus())
+            TxStatus.map(tx.getStatus()),
+            tx.getConfirmationCount()
         )
         tx.destroy()
         GlobalScope.launch { listener?.onTxMined(completed) }
@@ -558,7 +559,8 @@ internal class FFIWallet(
             MicroTari(tx.getFee()),
             tx.getTimestamp(),
             tx.getMessage(),
-            TxStatus.map(tx.getStatus())
+            TxStatus.map(tx.getStatus()),
+            tx.getConfirmationCount()
         )
         tx.destroy()
         GlobalScope.launch { listener?.onTxMinedUnconfirmed(completed, confirmationCount) }
@@ -875,7 +877,7 @@ internal class FFIWallet(
         jniLogMessage(message)
     }
 
-    fun getConfirmations(): BigInteger {
+    fun getRequiredConfirmationCount(): BigInteger {
         val error = FFIError()
         val bytes = jniGetConfirmations(
             error
@@ -884,7 +886,7 @@ internal class FFIWallet(
         return BigInteger(1, bytes)
     }
 
-    fun setConfirmations(number: BigInteger) {
+    fun setRequiredConfirmationCount(number: BigInteger) {
         val error = FFIError()
         val bytes = jniSetConfirmations(
             number.toString(),

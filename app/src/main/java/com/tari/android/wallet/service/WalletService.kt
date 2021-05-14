@@ -448,7 +448,7 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
         )
         completedTx.user = getUserByPublicKey(completedTx.user.publicKey)
         // post event to bus for the internal listeners
-        EventBus.post(Event.Wallet.TxMinedUnconfirmed(completedTx, confirmationCount))
+        EventBus.post(Event.Wallet.TxMinedUnconfirmed(completedTx))
         // notify external listeners
         listeners.iterator().forEach {
             it.onTxMinedUnconfirmed(completedTx, confirmationCount)
@@ -1121,7 +1121,8 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
                 MicroTari(completedTxFFI.getFee()),
                 completedTxFFI.getTimestamp(),
                 completedTxFFI.getMessage(),
-                status
+                status,
+                completedTxFFI.getConfirmationCount()
             )
             // destroy native objects
             sourcePublicKeyFFI.destroy()
@@ -1436,6 +1437,23 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
             } catch (throwable: Throwable) {
                 mapThrowableIntoError(throwable, error)
                 false
+            }
+        }
+
+        override fun getRequiredConfirmationCount(error: WalletError): Long {
+            return try {
+                wallet.getRequiredConfirmationCount().toLong()
+            } catch (throwable: Throwable) {
+                mapThrowableIntoError(throwable, error)
+                0
+            }
+        }
+
+        override fun setRequiredConfirmationCount(number: Long, error: WalletError) {
+            try {
+                wallet.setRequiredConfirmationCount(BigInteger.valueOf(number))
+            } catch (throwable: Throwable) {
+                mapThrowableIntoError(throwable, error)
             }
         }
 

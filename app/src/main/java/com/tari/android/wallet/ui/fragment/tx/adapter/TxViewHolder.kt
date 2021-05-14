@@ -86,7 +86,8 @@ class TxViewHolder(
     view: View,
     private val viewModel: GIFViewModel,
     private val glide: RequestManager,
-    private val listener: (Int) -> Unit
+    private val requiredConfirmationCount: Long,
+    private val listener: (Int) -> Unit,
 ) :
     RecyclerView.ViewHolder(view),
     GIFStateConsumer {
@@ -263,17 +264,17 @@ class TxViewHolder(
     }
 
     private fun displayStatus(tx: Tx) = when (tx) {
-        is PendingInboundTx -> showStatusTextView(
-            if (tx.status == PENDING) tx_detail_waiting_for_sender_to_complete
-            else tx_detail_completing_final_processing
-        )
-        is PendingOutboundTx -> showStatusTextView(
-            if (tx.status == PENDING) tx_detail_waiting_for_recipient
-            else tx_detail_completing_final_processing
-        )
+        is PendingInboundTx -> when (tx.status) {
+            PENDING -> showStatusTextView(tx_detail_waiting_for_sender_to_complete)
+            else -> showStatusTextViewFinalProcessing()
+        }
+        is PendingOutboundTx -> when (tx.status) {
+            PENDING -> showStatusTextView(tx_detail_waiting_for_recipient)
+            else -> showStatusTextViewFinalProcessing()
+        }
         is CompletedTx -> {
             when (tx.status) {
-                MINED_UNCONFIRMED -> showStatusTextView(tx_detail_completing_final_processing)
+                MINED_UNCONFIRMED -> showStatusTextViewFinalProcessing(tx.confirmationCount.toInt())
                 else -> ui.statusTextView.gone()
             }
         }
@@ -281,9 +282,19 @@ class TxViewHolder(
         else -> ui.statusTextView.gone()
     }
 
-    private fun showStatusTextView(@StringRes messageId: Int) {
+    private fun showStatusTextViewFinalProcessing(step: Int = 0) = showStatusTextView(
+        string(
+            tx_detail_completing_final_processing,
+            step + 1, requiredConfirmationCount + 1
+        )
+    )
+
+    private fun showStatusTextView(@StringRes messageId: Int) =
+        showStatusTextView(string(messageId))
+
+    private fun showStatusTextView(status: String) {
         ui.statusTextView.visible()
-        ui.statusTextView.text = string(messageId)
+        ui.statusTextView.text = status
     }
 
     private fun displayMessage(tx: Tx) {

@@ -60,6 +60,7 @@ internal class FFICompletedTx() : FFIBase() {
 
     private external fun jniGetMessage(libError: FFIError): String
     private external fun jniGetStatus(libError: FFIError): Int
+    private external fun jniGetConfirmationCount(libError: FFIError): ByteArray
     private external fun jniIsOutbound(
         libError: FFIError
     ): Boolean
@@ -126,6 +127,13 @@ internal class FFICompletedTx() : FFIBase() {
         val status = jniGetStatus(error)
         throwIf(error)
         return FFITxStatus.map(status)
+    }
+
+    fun getConfirmationCount(): BigInteger {
+        val error = FFIError()
+        val bytes = jniGetConfirmationCount(error)
+        throwIf(error)
+        return BigInteger(1, bytes)
     }
 
     fun isOutbound(): Boolean {
