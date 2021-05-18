@@ -37,6 +37,7 @@ import android.animation.ObjectAnimator
 import android.animation.ValueAnimator
 import android.annotation.SuppressLint
 import android.content.*
+import android.content.res.ColorStateList
 import android.os.*
 import android.view.LayoutInflater
 import android.view.View
@@ -56,7 +57,6 @@ import com.tari.android.wallet.R.dimen.*
 import com.tari.android.wallet.R.string.emoji_id_chunk_separator
 import com.tari.android.wallet.application.DeepLink
 import com.tari.android.wallet.databinding.FragmentAddAmountBinding
-import com.tari.android.wallet.extension.remap
 import com.tari.android.wallet.infrastructure.Tracker
 import com.tari.android.wallet.model.*
 import com.tari.android.wallet.service.TariWalletService
@@ -150,6 +150,8 @@ class AddAmountFragment : Fragment(), ServiceConnection {
     private lateinit var ui: FragmentAddAmountBinding
 
     private var estimatedFee: MicroTari? = null
+    private lateinit var balanceInfo: BalanceInfo
+    private lateinit var availableBalance: MicroTari
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -195,8 +197,8 @@ class AddAmountFragment : Fragment(), ServiceConnection {
         currentTextSize = dimen(add_amount_element_text_size)
         currentAmountGemSize = dimen(add_amount_gem_size)
         currentFirstElementMarginStart = dimenPx(add_amount_leftmost_digit_margin_start)
-        // hide validation
-        ui.notEnoughBalanceView.invisible()
+        // setup amount validation
+        amountCheckRunnable.run()
         // hide tx fee
         ui.txFeeContainerView.invisible()
         // hide/disable continue button
@@ -868,44 +870,6 @@ class AddAmountFragment : Fragment(), ServiceConnection {
         }
     }
 
-    private fun displayAvailableBalanceError() {
-        // hide continue button
-        ui.continueButton.invisible()
-
-        // show validation message box
-        if (ui.notEnoughBalanceView.visibility == View.VISIBLE) {
-            // return if visible already
-            return
-        }
-        // don't allow digit entry during this animation
-        digitAnimIsRunning = true
-        ui.notEnoughBalanceView.alpha = 0f
-        ui.notEnoughBalanceView.visible()
-        val viewAnim = ValueAnimator.ofFloat(0f, 1f)
-        viewAnim.addUpdateListener { valueAnimator: ValueAnimator ->
-            val value = valueAnimator.animatedValue as Float
-            ui.notEnoughBalanceView.alpha = value
-            val scale = value.remap(0f, 1f, 0.5f, 1f)
-            ui.notEnoughBalanceView.scaleX = scale
-            ui.notEnoughBalanceView.scaleY = scale
-            // nudge the amount
-            if (value < 0.5f) { // nudge right for the half of the animation
-                ui.elementContainerView.translationX =
-                    dimenPx(add_amount_available_balance_error_amount_nudge_distance) * value
-            } else { // nudge back to original position for the second half
-                ui.elementContainerView.translationX =
-                    dimenPx(add_amount_available_balance_error_amount_nudge_distance) * (1f - value)
-            }
-            if (value == 1f) {
-                digitAnimIsRunning = false
-            }
-        }
-        viewAnim.duration = Constants.UI.shortDurationMs
-        // define interpolator
-        viewAnim.interpolator = EasingInterpolator(Ease.CIRC_OUT)
-        viewAnim.start()
-    }
-
     private fun continueButtonClicked() {
         ui.continueButton.isClickable = false
         lifecycleScope.launch(Dispatchers.IO) { checkAmountAndFee() }
@@ -944,32 +908,27 @@ class AddAmountFragment : Fragment(), ServiceConnection {
         }
     }
 
+    private fun updateBalanceInfo() {
+        val error = WalletError()
+
+        balanceInfo = walletService.getBalanceInfo(error)
+        if (error.code != WalletErrorCode.NO_ERROR) {
+            TODO("Unhandled wallet error: ${error.code}")
+        }
+
+        availableBalance = balanceInfo.availableBalance + balanceInfo.pendingIncomingBalance
+
+        ui.availableBalanceTextView.text =
+            WalletUtil.balanceFormatter.format(availableBalance.tariValue)
+    }
+
     private fun actualBalanceExceeded() {
         listenerWR.get()?.onAmountExceedsActualAvailableBalance(this)
         ui.continueButton.isClickable = true
     }
 
     private fun continueToNote() {
-        val error = WalletError()
-        if (error.code != WalletErrorCode.NO_ERROR) {
-            TODO("Unhandled wallet error: ${error.code}")
-        }
-        listenerWR.get()?.continueToAddNote(
-            this,
-            recipientUser,
-            currentAmount
-        )
-    }
-
-    private fun showContinueButtonAnimated() {
-        if (ui.continueButton.visibility == View.VISIBLE) {
-            return
-        }
-        ui.continueButton.alpha = 0f
-        ui.continueButton.visible()
-        val anim = ObjectAnimator.ofFloat(ui.continueButton, "alpha", 0f, 1f)
-        anim.duration = Constants.UI.shortDurationMs
-        anim.start()
+        listenerWR.get()?.continueToAddNote(this, recipientUser, currentAmount)
     }
 
     /**
@@ -977,109 +936,168 @@ class AddAmountFragment : Fragment(), ServiceConnection {
      */
     private inner class AmountCheckRunnable : Runnable {
 
-        @SuppressLint("SetTextI18n")
         override fun run() {
             val error = WalletError()
-            val balanceInfo = walletService.getBalanceInfo(error)
-            if (error.code != WalletErrorCode.NO_ERROR) {
-                TODO("Unhandled wallet error: ${error.code}")
-            }
+
             // update fee
-            val fee = walletService.estimateTxFee(
-                currentAmount,
-                error
-            )
+            val fee = walletService.estimateTxFee(currentAmount, error)
+            estimatedFee = fee
+
             if (error.code != WalletErrorCode.NO_ERROR
                 && error.code != WalletErrorCode.NOT_ENOUGH_FUNDS
-                && error.code != WalletErrorCode.FUNDS_PENDING) {
+                && error.code != WalletErrorCode.FUNDS_PENDING
+            ) {
                 TODO("Unhandled wallet error: ${error.code}")
             }
-            estimatedFee = fee
-            // check balance
-            val availableBalance =
-                balanceInfo.availableBalance + balanceInfo.pendingIncomingBalance
+
+            updateBalanceInfo()
+
             if (error.code == WalletErrorCode.FUNDS_PENDING
                 || error.code == WalletErrorCode.NOT_ENOUGH_FUNDS
-                || (currentAmount + fee) > availableBalance) {
-                if (error.code == WalletErrorCode.FUNDS_PENDING) {
-                    ui.availableBalanceContainerView.gone()
-                    ui.notEnoughBalanceDescriptionTextView.text =
-                        string(R.string.add_amount_funds_pending)
-                } else {
-                    ui.availableBalanceContainerView.visible()
-                    ui.availableBalanceTextView.text =
-                        WalletUtil.amountFormatter.format(availableBalance.tariValue)
-                    ui.notEnoughBalanceDescriptionTextView.text =
-                        string(R.string.add_amount_not_enough_available_balance)
-                }
-                displayAvailableBalanceError()
-                if (ui.txFeeContainerView.visibility != View.INVISIBLE) {
-                    val viewAnim = ValueAnimator.ofFloat(0f, 1f)
-                    viewAnim.addUpdateListener { valueAnimator: ValueAnimator ->
-                        val value = valueAnimator.animatedValue as Float
-                        ui.txFeeContainerView.translationY = value * 100
-                        ui.txFeeContainerView.alpha = (1f - value)
-                        if (value == 1f) {
-                            ui.txFeeContainerView.invisible()
-                        }
-                    }
-                    viewAnim.duration = Constants.UI.shortDurationMs
-                    // define interpolator
-                    viewAnim.interpolator = EasingInterpolator(Ease.CIRC_OUT)
-                    viewAnim.start()
-                }
+                || (currentAmount + fee) > availableBalance
+            ) {
+                showErrorState(error)
             } else {
-                var showsTxFee = false
-                var hidesTxFee = false
-                ui.txFeeTextView.text = "+${WalletUtil.amountFormatter.format(fee.tariValue)}"
-                // show/hide continue button
-                if (currentAmount.value.toInt() == 0) {
-                    ui.continueButton.invisible()
-                    // hide fee
-                    if (ui.txFeeContainerView.visibility != View.INVISIBLE) {
-                        hidesTxFee = true
-                    }
-                } else {
-                    showContinueButtonAnimated()
-                    // display fee
-                    if (ui.txFeeContainerView.visibility != View.VISIBLE) {
-                        showsTxFee = true
-                        ui.txFeeContainerView.alpha = 0f
-                        ui.txFeeContainerView.visible()
-                    }
-                }
+                showSuccessState(fee)
+            }
+        }
 
-                val viewAnim = ValueAnimator.ofFloat(0f, 1f)
-                viewAnim.addUpdateListener { valueAnimator: ValueAnimator ->
+        @SuppressLint("SetTextI18n")
+        private fun showSuccessState(fee: MicroTari) = with(ui) {
+            notEnoughBalanceDescriptionTextView.text = string(R.string.add_amount_wallet_balance)
+            availableBalanceContainerView.visible()
+
+            val showsTxFee: Boolean
+            txFeeTextView.text = "+${WalletUtil.amountFormatter.format(fee.tariValue)}"
+            // show/hide continue button
+            if (currentAmount.value.toInt() == 0) {
+                hideContinueButton()
+                showsTxFee = false
+            } else {
+                showContinueButtonAnimated()
+                showsTxFee = true
+            }
+
+            showBalance()
+
+            showOrHideFeeViewAnimated(showsTxFee)
+        }
+
+        private fun showOrHideFeeViewAnimated(showsTxFee: Boolean) = with(ui) {
+            if (showsTxFee && txFeeContainerView.visibility == View.VISIBLE ||
+                !showsTxFee && txFeeContainerView.visibility == View.INVISIBLE
+            ) {
+                return@with
+            }
+
+            if (showsTxFee) {
+                txFeeContainerView.alpha = 0f
+                txFeeContainerView.visible()
+            }
+
+            ValueAnimator.ofFloat(0f, 1f).apply {
+                addUpdateListener { valueAnimator: ValueAnimator ->
                     val value = valueAnimator.animatedValue as Float
-                    if (ui.notEnoughBalanceView.visibility != View.INVISIBLE) {
-                        // update validation view
-                        ui.notEnoughBalanceView.alpha = (1 - value)
-                        val scale = (1 - value).remap(0f, 1f, 0.5f, 1f)
-                        ui.notEnoughBalanceView.scaleX = scale
-                        ui.notEnoughBalanceView.scaleY = scale
-                        if (value == 1F) {
-                            ui.notEnoughBalanceView.invisible()
+
+                    if (showsTxFee) {
+                        txFeeContainerView.translationY = (1f - value) * 100
+                        txFeeContainerView.alpha = value
+                    } else {
+                        txFeeContainerView.translationY = value * 100
+                        txFeeContainerView.alpha = (1f - value)
+
+                        if (value == 1f) {
+                            txFeeContainerView.invisible()
                         }
                     }
+                }
+                duration = Constants.UI.shortDurationMs
+                interpolator = EasingInterpolator(Ease.CIRC_OUT)
+                start()
+            }
+        }
 
-                    // update tx fee view
-                    if (showsTxFee) {
-                        ui.txFeeContainerView.translationY = (1f - value) * 100
-                        ui.txFeeContainerView.alpha = value
-                    } else if (hidesTxFee) {
-                        ui.txFeeContainerView.translationY = value * 100
-                        ui.txFeeContainerView.alpha = (1f - value)
+        private fun showErrorState(
+            error: WalletError
+        ) = with(ui) {
+            if (error.code == WalletErrorCode.FUNDS_PENDING) {
+                availableBalanceContainerView.gone()
+                notEnoughBalanceDescriptionTextView.text =
+                    string(R.string.add_amount_funds_pending)
+            } else {
+                availableBalanceContainerView.visible()
+                notEnoughBalanceDescriptionTextView.text =
+                    string(R.string.add_amount_not_enough_available_balance)
+            }
+
+            hideContinueButton()
+
+            showAvailableBalanceError()
+
+            nudgeAmountView()
+
+            showOrHideFeeViewAnimated(true)
+        }
+
+        private fun showAvailableBalanceError() = with(ui) {
+            notEnoughBalanceView.background = ContextCompat.getDrawable(
+                requireContext(),
+                R.drawable.validation_error_box_border_bg
+            )
+            gemNotEnoughBalance.imageTintList = null
+            availableBalanceTextView.setTextColor(
+                ContextCompat.getColor(
+                    requireContext(),
+                    R.color.common_error
+                )
+            )
+        }
+
+        private fun showBalance() = with(ui) {
+            notEnoughBalanceView.background = null
+            gemNotEnoughBalance.imageTintList =
+                ColorStateList.valueOf(ContextCompat.getColor(requireContext(), black))
+            availableBalanceTextView.setTextColor(ContextCompat.getColor(requireContext(), black))
+        }
+
+        private fun nudgeAmountView() = with(ui) {
+            // don't allow digit entry during this animation
+            digitAnimIsRunning = true
+            ValueAnimator.ofFloat(0f, 1f).apply {
+                addUpdateListener { valueAnimator: ValueAnimator ->
+                    val value = valueAnimator.animatedValue as Float
+                    // nudge the amount
+                    if (value < 0.5f) { // nudge right for the half of the animation
+                        elementContainerView.translationX =
+                            dimenPx(add_amount_available_balance_error_amount_nudge_distance) * value
+                    } else { // nudge back to original position for the second half
+                        elementContainerView.translationX =
+                            dimenPx(add_amount_available_balance_error_amount_nudge_distance) * (1f - value)
                     }
-                    if (value == 1f && hidesTxFee) {
-                        ui.txFeeContainerView.invisible()
+                    if (value == 1f) {
+                        digitAnimIsRunning = false
                     }
                 }
-                viewAnim.duration = Constants.UI.shortDurationMs
-                // define interpolator
-                viewAnim.interpolator = EasingInterpolator(Ease.CIRC_OUT)
-                viewAnim.start()
+                duration = Constants.UI.shortDurationMs
+                interpolator = EasingInterpolator(Ease.CIRC_OUT)
+                start()
             }
+        }
+
+        private fun showContinueButtonAnimated() = with(ui) {
+            if (continueButton.visibility == View.VISIBLE) {
+                return@with
+            }
+            continueButton.alpha = 0f
+            continueButton.visible()
+            ObjectAnimator.ofFloat(continueButton, "alpha", 0f, 1f).apply {
+                duration = Constants.UI.shortDurationMs
+                start()
+            }
+        }
+
+        private fun hideContinueButton() = with(ui) {
+            continueButton.invisible()
         }
     }
 

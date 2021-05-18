@@ -89,14 +89,15 @@
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:layout_alignParentTop="true"
-                android:layout_above="@id/element_container_view">
+                android:layout_above="@id/element_container_view"
+                android:layout_alignParentTop="true">
+
                 <LinearLayout
                     android:id="@+id/not_enough_balance_view"
                     android:layout_width="match_parent"
-                    android:layout_marginTop="@dimen/add_amount_balance_warning_container_top_margin"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="25dp"
+                    android:layout_marginTop="@dimen/add_amount_balance_warning_container_top_margin"
                     android:layout_marginEnd="25dp"
                     android:background="@drawable/validation_error_box_border_bg"
                     android:gravity="center"
@@ -104,17 +105,21 @@
                     android:paddingTop="@dimen/add_amount_balance_warning_container_top_padding"
                     android:paddingBottom="@dimen/add_amount_balance_warning_container_bottom_padding"
                     tools:ignore="UselessParent">
+
                     <LinearLayout
                         android:id="@+id/available_balance_container_view"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:gravity="center"
                         android:orientation="horizontal">
-                        <ImageView
+
+                        <androidx.appcompat.widget.AppCompatImageView
+                            android:id="@+id/gem_not_enough_balance"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:contentDescription="@null"
                             android:src="@drawable/gem_not_enough_balance" />
+
                         <com.tari.android.wallet.ui.component.CustomFontTextView
                             android:id="@+id/available_balance_text_view"
                             android:layout_width="wrap_content"
@@ -127,16 +132,17 @@
                             app:customFont="AVENIR_LT_STD_HEAVY"
                             tools:text="124.56" />
                     </LinearLayout>
+
                     <com.tari.android.wallet.ui.component.CustomFontTextView
                         android:id="@+id/not_enough_balance_description_text_view"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="16dp"
-                        android:layout_marginEnd="16dp"
                         android:layout_marginTop="4dp"
+                        android:layout_marginEnd="16dp"
+                        android:ellipsize="middle"
                         android:gravity="center"
                         android:lineSpacingExtra="10dp"
-                        android:ellipsize="middle"
                         android:singleLine="false"
                         android:text="@string/add_amount_not_enough_available_balance"
                         android:textColor="#3C393D"
@@ -199,7 +205,7 @@
                     android:textColor="@color/black"
                     android:textSize="@dimen/add_amount_tx_fee_text_size"
                     app:customFont="AVENIR_LT_STD_HEAVY"
-                    tools:text="+63.75"/>
+                    tools:text="+63.75" />
                 <!-- description -->
                 <com.tari.android.wallet.ui.component.CustomFontTextView
                     android:id="@+id/tx_fee_desc_text_view"
