@@ -34,6 +34,7 @@ package com.tari.android.wallet.di
 
 import com.tari.android.wallet.BuildConfig
 import com.tari.android.wallet.ui.fragment.send.AddNoteFragment.ThumbnailGIFsViewModelFactory
+import com.tari.android.wallet.ui.fragment.send.repository.GiphyKeywordsRepository
 import com.tari.android.wallet.ui.presentation.gif.GIFRepository
 import com.tari.android.wallet.ui.presentation.gif.GiphyRESTRetrofitRepository
 import dagger.Module
@@ -91,7 +92,12 @@ class PresentationModule {
 
     @Provides
     @Singleton
-    fun provideThumbnailGIFsViewModelFactory(repository: GIFRepository) =
-        ThumbnailGIFsViewModelFactory(repository)
+    fun provideGiphyKeywordsRepository(): GiphyKeywordsRepository = GiphyKeywordsRepository()
 
+    @Provides
+    @Singleton
+    fun provideThumbnailGIFsViewModelFactory(
+        repository: GIFRepository,
+        keywords: GiphyKeywordsRepository
+    ) = ThumbnailGIFsViewModelFactory(repository, keywords)
 }

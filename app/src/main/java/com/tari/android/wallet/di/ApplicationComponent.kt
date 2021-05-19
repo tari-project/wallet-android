@@ -126,6 +126,7 @@ internal interface ApplicationComponent {
     fun inject(fragment: AddRecipientFragment)
     fun inject(fragment: AddAmountFragment)
     fun inject(fragment: AddNoteFragment)
+    fun inject(fragment: AddNoteFragment.ChooseGIFDialogFragment)
     fun inject(fragment: FinalizeSendTxFragment)
     fun inject(fragment: LocalAuthFragment)
     fun inject(fragment: DebugLogFragment)
