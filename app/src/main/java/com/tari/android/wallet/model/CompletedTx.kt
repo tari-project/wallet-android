@@ -44,6 +44,7 @@ import java.math.BigInteger
 class CompletedTx() : Tx(), Parcelable {
 
     var fee = MicroTari(BigInteger("0"))
+    var confirmationCount = BigInteger("0")
     var status = TxStatus.COMPLETED
 
     constructor(
@@ -54,7 +55,8 @@ class CompletedTx() : Tx(), Parcelable {
         fee: MicroTari,
         timestamp: BigInteger,
         message: String,
-        status: TxStatus
+        status: TxStatus,
+        confirmationCount: BigInteger
     ) : this() {
         this.id = id
         this.direction = direction
@@ -64,6 +66,7 @@ class CompletedTx() : Tx(), Parcelable {
         this.timestamp = timestamp
         this.message = message
         this.status = status
+        this.confirmationCount = confirmationCount
     }
 
     // region Parcelable
@@ -73,7 +76,7 @@ class CompletedTx() : Tx(), Parcelable {
     }
 
     override fun toString(): String {
-        return "CompletedTx(fee=$fee, status=$status) ${super.toString()}"
+        return "CompletedTx(fee=$fee, status=$status, confirmationCount=$confirmationCount) ${super.toString()}"
     }
 
     companion object CREATOR : Parcelable.Creator<CompletedTx> {
@@ -98,6 +101,7 @@ class CompletedTx() : Tx(), Parcelable {
         parcel.writeSerializable(timestamp)
         parcel.writeString(message)
         parcel.writeSerializable(status)
+        parcel.writeSerializable(confirmationCount)
     }
 
     private fun readFromParcel(inParcel: Parcel) {
@@ -114,6 +118,7 @@ class CompletedTx() : Tx(), Parcelable {
         timestamp = inParcel.readSerializable() as BigInteger
         message = inParcel.readString() ?: ""
         status = inParcel.readSerializable() as TxStatus
+        confirmationCount = inParcel.readSerializable() as BigInteger
     }
 
     override fun describeContents(): Int {

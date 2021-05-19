@@ -135,6 +135,8 @@ internal class TxDetailsActivity : AppCompatActivity(), ServiceConnection {
 
     private var walletService: TariWalletService? = null
 
+    private var requiredConfirmationCount : Long = 0
+
     /**
      * Values below are used for scaling up/down of the text size.
      */
@@ -200,6 +202,9 @@ internal class TxDetailsActivity : AppCompatActivity(), ServiceConnection {
         this.walletService = walletService
         if (!this::tx.isInitialized) {
             findTxAndUpdateUI(walletService)
+        } else {
+            fetchRequiredConfirmationCount()
+            setTxStatusData(tx)
         }
     }
 
@@ -214,10 +219,20 @@ internal class TxDetailsActivity : AppCompatActivity(), ServiceConnection {
             ).show()
         } else {
             tx = lookedUpTx
+            fetchRequiredConfirmationCount()
             fetchGIFIfAttached()
             bindTxData()
             observeTxUpdates()
             enableCTAs()
+        }
+    }
+
+    private fun fetchRequiredConfirmationCount() {
+        val error = WalletError()
+        val service = walletService!!
+        requiredConfirmationCount = service.getRequiredConfirmationCount(error)
+        if (error.code != WalletErrorCode.NO_ERROR) {
+            TODO("Unhandled wallet error: ${error.code}")
         }
     }
 
@@ -386,12 +401,21 @@ internal class TxDetailsActivity : AppCompatActivity(), ServiceConnection {
 
     private fun setTxStatusData(tx: Tx) {
         val state = TxState.from(tx)
+        val error = WalletError()
+        val requiredConfirmation = walletService?.getRequiredConfirmationCount(error) ?: 0
+        if (error.code != WalletErrorCode.NO_ERROR) {
+            TODO("Unhandled wallet error: ${error.code}")
+        }
+
         val statusText = when {
             tx is CancelledTx -> ""
-            state == TxState(INBOUND, PENDING) ->
-                string(tx_detail_waiting_for_sender_to_complete)
+            state == TxState(INBOUND, PENDING) -> string(tx_detail_waiting_for_sender_to_complete)
             state == TxState(OUTBOUND, PENDING) -> string(tx_detail_waiting_for_recipient)
-            state.status != MINED_CONFIRMED -> string(tx_detail_completing_final_processing)
+            state.status != MINED_CONFIRMED -> string(
+                tx_detail_completing_final_processing,
+                if (tx is CompletedTx) tx.confirmationCount.toInt() + 1 else 1,
+                requiredConfirmation + 1
+            )
             else -> ""
         }
         ui.statusTextView.text = statusText

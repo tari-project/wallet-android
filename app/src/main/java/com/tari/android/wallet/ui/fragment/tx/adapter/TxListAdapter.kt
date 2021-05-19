@@ -50,6 +50,7 @@ internal class TxListAdapter(
     private val completedTxs: List<CompletedTx>,
     private val pendingInboundTxs: List<PendingInboundTx>,
     private val pendingOutboundTxs: List<PendingOutboundTx>,
+    private val requiredConfirmationCountFetcher: () -> Long,
     private val repository: GIFRepository,
     private val glide: RequestManager,
     private val listener: (Tx) -> Unit
@@ -96,6 +97,7 @@ internal class TxListAdapter(
                 .inflate(R.layout.home_tx_list_item, parent, false),
             TxViewHolder.GIFViewModel(repository),
             glide,
+            requiredConfirmationCountFetcher(),
         ) { listener(items[it]) }
 
     /**
