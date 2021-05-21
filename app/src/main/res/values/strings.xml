@@ -84,6 +84,7 @@
     <string name="copy_emoji_id">Copy Emoji ID</string>
     <string name="paste_emoji_id">Paste copied Emoji ID</string>
     <string name="tap_to_see_full_emoji_id">Tap to see full Emoji ID</string>
+    <string name="full_emoji_id_long_tap_hint">ℹ️ You can long-press the Copy Emoji ID button to copy the address in hexadecimal format.</string>
 
     <!-- dialog -->
     <string name="internet_connection_error_dialog_title">Can\'t connect to the interwebs</string>

@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/emoji_id_outer_container"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <View
+        android:id="@+id/dimmer_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:alpha="0.6"
+        android:background="@color/black"
+        android:clickable="true"
+        android:focusable="true" />
+
+    <!-- height and width of this view will be set dynamically at runtime -->
+
+    <RelativeLayout
+        android:id="@+id/full_emoji_id_container_view"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_alignParentTop="true"
+        android:layout_centerInParent="true"
+        android:background="@drawable/emoji_id_bg"
+        android:clickable="true"
+        android:elevation="@dimen/common_view_elevation"
+        android:focusable="true">
+
+        <HorizontalScrollView
+            android:id="@+id/full_emoji_id_scroll_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scrollbars="none"
+            tools:ignore="UselessParent">
+
+            <TextView
+                android:id="@+id/full_emoji_id_text_view"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:gravity="center_vertical"
+                android:letterSpacing="0.22"
+                android:paddingHorizontal="12dp"
+                android:textColor="@color/black"
+                android:textSize="14sp" />
+        </HorizontalScrollView>
+
+        <!-- white fader for emoji-id -->
+        <View
+            android:id="@+id/full_emoji_id_fader_view"
+            android:layout_width="26dp"
+            android:layout_height="24dp"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:background="@drawable/emoji_id_end_fader"
+            android:translationZ="6dp" />
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:translationZ="7dp">
+
+            <include
+                android:id="@+id/emoji_id_copied_view"
+                layout="@layout/emoji_id_copied_anim_view"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:visibility="visible" />
+        </FrameLayout>
+    </RelativeLayout>
+
+    <!-- copy emoji id button -->
+    <RelativeLayout
+        android:id="@+id/copy_emoji_id_button_container_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@id/full_emoji_id_container_view"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="0dp">
+
+        <ImageView
+            android:id="@+id/copy_emoji_id_notch_image_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:contentDescription="@null"
+            android:src="@drawable/speech_notch_up" />
+
+        <com.tari.android.wallet.ui.component.CustomFontTextView
+            android:id="@+id/copy_emoji_id_text_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/copy_emoji_id_notch_image_view"
+            android:background="@drawable/copy_paste_emoji_id_button_bg"
+            android:paddingHorizontal="20dp"
+            android:paddingVertical="10dp"
+            android:text="@string/copy_emoji_id"
+            android:textColor="#9834F6"
+            android:textSize="14sp"
+            app:customFont="AVENIR_LT_STD_HEAVY" />
+
+        <Button
+            android:id="@+id/copy_emoji_id_button"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_alignStart="@id/copy_emoji_id_text_view"
+            android:layout_alignTop="@id/copy_emoji_id_text_view"
+            android:layout_alignEnd="@id/copy_emoji_id_text_view"
+            android:layout_alignBottom="@id/copy_emoji_id_text_view"
+            android:background="@color/transparent" />
+    </RelativeLayout>
+
+    <FrameLayout
+        android:id="@+id/long_press_hint_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginHorizontal="24dp"
+        android:layout_marginBottom="32dp"
+        android:background="@drawable/emoji_id_long_press_hint_bg"
+        android:clickable="true"
+        android:elevation="@dimen/common_view_elevation"
+        android:focusable="true"
+        android:focusableInTouchMode="true">
+
+        <com.tari.android.wallet.ui.component.CustomFontTextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="start"
+            android:letterSpacing="-0.018"
+            android:lineSpacingExtra="10dp"
+            android:paddingHorizontal="12dp"
+            android:paddingVertical="12dp"
+            android:text="@string/full_emoji_id_long_tap_hint"
+            android:textColor="@color/dark_gray"
+            android:textSize="14sp"
+            app:customFont="AVENIR_LT_STD_MEDIUM" />
+
+    </FrameLayout>
+
+</RelativeLayout>
