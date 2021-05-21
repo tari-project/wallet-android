@@ -95,6 +95,7 @@ import com.tari.android.wallet.ui.component.EmojiIdCopiedViewController
 import com.tari.android.wallet.ui.component.EmojiIdSummaryViewController
 import com.tari.android.wallet.ui.extension.*
 import com.tari.android.wallet.ui.fragment.send.adapter.GIFThumbnailAdapter
+import com.tari.android.wallet.ui.fragment.send.repository.GiphyKeywordsRepository
 import com.tari.android.wallet.ui.presentation.TxNote
 import com.tari.android.wallet.ui.presentation.gif.GIF
 import com.tari.android.wallet.ui.presentation.gif.GIFRepository
@@ -266,7 +267,8 @@ class AddNoteFragment : Fragment(), View.OnTouchListener {
         recipientUser = requireArguments().getParcelable("recipientUser")!!
         amount = requireArguments().getParcelable("amount")!!
         if (savedInstanceState == null) {
-            requireArguments().getString(DeepLink.PARAMETER_NOTE)?.let { ui.noteEditText.setText(it) }
+            requireArguments().getString(DeepLink.PARAMETER_NOTE)
+                ?.let { ui.noteEditText.setText(it) }
         }
     }
 
@@ -821,16 +823,22 @@ class AddNoteFragment : Fragment(), View.OnTouchListener {
         }
     }
 
-    class ThumbnailGIFsViewModelFactory(private val repository: GIFRepository) :
+    class ThumbnailGIFsViewModelFactory(
+        private val repository: GIFRepository,
+        private val giphyKeywordsRepository: GiphyKeywordsRepository
+    ) :
         ViewModelProvider.Factory {
         @Suppress("UNCHECKED_CAST")
         override fun <T : ViewModel?> create(modelClass: Class<T>): T {
             require(modelClass === ThumbnailGIFsViewModel::class.java)
-            return ThumbnailGIFsViewModel(repository) as T
+            return ThumbnailGIFsViewModel(repository, giphyKeywordsRepository) as T
         }
     }
 
-    private class ThumbnailGIFsViewModel(private val gifsRepository: GIFRepository) : ViewModel() {
+    private class ThumbnailGIFsViewModel(
+        private val gifsRepository: GIFRepository,
+        private val giphyKeywordsRepository: GiphyKeywordsRepository
+    ) : ViewModel() {
 
         private val _state = MutableLiveData<GIFsState>()
         val state: LiveData<GIFsState> get() = _state
@@ -844,7 +852,10 @@ class AddNoteFragment : Fragment(), View.OnTouchListener {
                 _state.value = GIFsState()
                 try {
                     val gifs = withContext(Dispatchers.IO) {
-                        gifsRepository.getAll(THUMBNAIL_REQUEST_QUERY, THUMBNAIL_REQUEST_LIMIT)
+                        gifsRepository.getAll(
+                            giphyKeywordsRepository.getNext(),
+                            THUMBNAIL_REQUEST_LIMIT
+                        )
                     }
                     _state.value = GIFsState(gifs)
                 } catch (e: Exception) {
@@ -886,6 +897,14 @@ default no-op constructor is used by the framework for UI tree rebuild on config
         private lateinit var behavior: BottomSheetBehavior<View>
         private lateinit var searchSubscription: Disposable
 
+        @Inject
+        lateinit var giphyKeywordsRepository: GiphyKeywordsRepository
+
+        override fun onAttach(context: Context) {
+            super.onAttach(context)
+            appComponent.inject(this)
+        }
+
         override fun onCreateView(
             inflater: LayoutInflater,
             container: ViewGroup?,
@@ -897,7 +916,7 @@ default no-op constructor is used by the framework for UI tree rebuild on config
             val searchSubject = BehaviorSubject.create<String>()
             searchSubscription = searchSubject
                 .debounce(500L, TimeUnit.MILLISECONDS)
-                .map { if (it.isEmpty()) INITIAL_REQUEST_QUERY else it }
+                .map { if (it.isEmpty()) giphyKeywordsRepository.getCurrent() else it }
                 .map { GPHContent.searchQuery(it, mediaType = MediaType.gif) }
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe { ui.giphyGridView.content = it }
@@ -910,7 +929,8 @@ default no-op constructor is used by the framework for UI tree rebuild on config
         }
 
         private fun setupUI(observer: RxObserver<String>) {
-            ui.giphyGridView.content = INITIAL_REQUEST
+            ui.giphyGridView.content =
+                GPHContent.searchQuery(giphyKeywordsRepository.getCurrent(), MediaType.gif)
             ui.giphyGridView.callback = object : GPHGridCallback {
                 override fun contentDidUpdate(resultCount: Int) {
                     // No-op
@@ -978,19 +998,14 @@ default no-op constructor is used by the framework for UI tree rebuild on config
             @Suppress("DEPRECATION")
             fun newInstance() = ChooseGIFDialogFragment()
             const val MEDIA_DELIVERY_KEY = "key_media"
-            private const val INITIAL_REQUEST_QUERY = "money"
-            private val INITIAL_REQUEST =
-                GPHContent.searchQuery(INITIAL_REQUEST_QUERY, mediaType = MediaType.gif)
         }
-
     }
-
 
     private companion object {
         private const val KEY_GIF = "keygif"
         private const val REQUEST_CODE_GIF = 1535
-        private const val THUMBNAIL_REQUEST_QUERY = "money"
         private const val THUMBNAIL_REQUEST_LIMIT = 20
     }
-
 }
+
+
