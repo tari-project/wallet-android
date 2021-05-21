@@ -39,8 +39,6 @@ import android.animation.ValueAnimator
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.Dialog
-import android.content.ClipData
-import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
 import android.graphics.Color
@@ -55,7 +53,6 @@ import android.widget.RelativeLayout
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.animation.addListener
-import androidx.core.content.ContextCompat
 import androidx.core.view.doOnNextLayout
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.DialogFragment
@@ -91,8 +88,8 @@ import com.tari.android.wallet.model.Contact
 import com.tari.android.wallet.model.MicroTari
 import com.tari.android.wallet.model.User
 import com.tari.android.wallet.network.NetworkConnectionState
-import com.tari.android.wallet.ui.component.EmojiIdCopiedViewController
 import com.tari.android.wallet.ui.component.EmojiIdSummaryViewController
+import com.tari.android.wallet.ui.component.FullEmojiIdViewController
 import com.tari.android.wallet.ui.extension.*
 import com.tari.android.wallet.ui.fragment.send.adapter.GIFThumbnailAdapter
 import com.tari.android.wallet.ui.fragment.send.repository.GiphyKeywordsRepository
@@ -138,8 +135,8 @@ class AddNoteFragment : Fragment(), View.OnTouchListener {
     // Formats the summarized emoji id.
     private lateinit var emojiIdSummaryController: EmojiIdSummaryViewController
 
-    // Animates the emoji id "copied" text.
-    private lateinit var emojiIdCopiedViewController: EmojiIdCopiedViewController
+    // Control full emoji popups
+    private lateinit var fullEmojiIdViewController: FullEmojiIdViewController
 
     // Tx properties.
     private lateinit var recipientUser: User
@@ -225,13 +222,29 @@ class AddNoteFragment : Fragment(), View.OnTouchListener {
                 updateSliderState()
             }
         }
-        emojiIdCopiedViewController = EmojiIdCopiedViewController(ui.emojiIdCopiedView)
         emojiIdSummaryController = EmojiIdSummaryViewController(ui.emojiIdSummaryView)
-        ui.fullEmojiIdBgClickBlockerView.isClickable = false
-        ui.fullEmojiIdContainerView.gone()
+
+        val fullEmojiIdListener = object : FullEmojiIdViewController.Listener {
+            override fun animationHide(value: Float) {
+                ui.backButton.alpha = 1 - value
+            }
+
+            override fun animationShow(value: Float) {
+                ui.backButton.alpha = 1 - value
+            }
+        }
+
+        fullEmojiIdViewController = FullEmojiIdViewController(
+            ui.emojiIdOuterContainer,
+            ui.emojiIdSummaryView,
+            recipientUser.publicKey.emojiId,
+            recipientUser.publicKey.hexString,
+            requireContext(),
+            fullEmojiIdListener
+        )
+
         displayAliasOrEmojiId()
-        hideFullEmojiId(animated = false)
-        OverScrollDecoratorHelper.setUpOverScroll(ui.fullEmojiIdScrollView)
+        OverScrollDecoratorHelper.setUpOverScroll(ui.emojiIdOuterContainer.fullEmojiIdScrollView)
         ui.progressBar.setColor(color(white))
         ui.noteEditText.addTextChangedListener(afterTextChanged = { updateSliderState() })
         ui.slideView.setOnTouchListener(this)
@@ -241,9 +254,11 @@ class AddNoteFragment : Fragment(), View.OnTouchListener {
         ui.promptTextView.setTextColor(color(black))
         ui.noteEditText.imeOptions = EditorInfo.IME_ACTION_DONE
         ui.rootView.doOnGlobalLayout {
-            ui.fullEmojiIdContainerView.setTopMargin(ui.emojiIdSummaryContainerView.top)
-            ui.fullEmojiIdContainerView.setLayoutHeight(ui.emojiIdSummaryContainerView.height)
-            ui.fullEmojiIdContainerView.setLayoutWidth(ui.emojiIdSummaryContainerView.width)
+            ui.emojiIdOuterContainer.fullEmojiIdContainerView.apply {
+                setTopMargin(ui.emojiIdSummaryContainerView.top)
+                setLayoutHeight(ui.emojiIdSummaryContainerView.height)
+                setLayoutWidth(ui.emojiIdSummaryContainerView.width)
+            }
         }
         ui.thumbnailGifsRecyclerView.also {
             val margin = dimen(add_note_gif_inner_margin).toInt()
@@ -275,12 +290,6 @@ class AddNoteFragment : Fragment(), View.OnTouchListener {
     private fun setupCTAs() {
         ui.backButton.setOnClickListener { onBackButtonClicked(it) }
         ui.emojiIdSummaryContainerView.setOnClickListener { emojiIdClicked() }
-        ui.dimmerView.setOnClickListener { onEmojiIdDimmerClicked() }
-        ui.copyEmojiIdButton.setOnClickListener { onCopyEmojiIdButtonClicked(it) }
-        ui.copyEmojiIdButton.setOnLongClickListener { copyEmojiIdButton ->
-            onCopyEmojiIdButtonLongClicked(copyEmojiIdButton)
-            true
-        }
         ui.removeGifCtaView.setOnClickListener {
             changeScrollViewBottomConstraint(R.id.search_giphy_container_view)
             gifContainer.gif = null
@@ -321,12 +330,6 @@ class AddNoteFragment : Fragment(), View.OnTouchListener {
         ui.emojiIdSummaryContainerView.visible()
         emojiIdSummaryController.display(emojiId)
         ui.titleTextView.gone()
-        ui.fullEmojiIdTextView.text = EmojiUtil.getFullEmojiIdSpannable(
-            emojiId,
-            string(emoji_id_chunk_separator),
-            color(black),
-            color(light_gray)
-        )
     }
 
     private fun onBackButtonClicked(view: View) {
@@ -343,128 +346,7 @@ class AddNoteFragment : Fragment(), View.OnTouchListener {
      * Display full emoji id and dim out all other views.
      */
     private fun emojiIdClicked() {
-        showFullEmojiId()
-    }
-
-    private fun showFullEmojiId() {
-        ui.fullEmojiIdBgClickBlockerView.isClickable = true
-        // make dimmers non-clickable until the anim is over
-        ui.dimmerView.isClickable = false
-        // prepare views
-        ui.emojiIdSummaryContainerView.invisible()
-        ui.dimmerView.alpha = 0f
-        ui.dimmerView.visible()
-        val fullEmojiIdInitialWidth = ui.emojiIdSummaryContainerView.width
-        val fullEmojiIdDeltaWidth =
-            (ui.rootView.width - dimenPx(common_horizontal_margin) * 2) - fullEmojiIdInitialWidth
-        ui.fullEmojiIdContainerView.setLayoutWidth(fullEmojiIdInitialWidth)
-        ui.fullEmojiIdContainerView.alpha = 0f
-        ui.fullEmojiIdContainerView.visible()
-        // scroll to end
-        ui.fullEmojiIdScrollView.post {
-            ui.fullEmojiIdScrollView.scrollTo(
-                ui.fullEmojiIdTextView.width - ui.fullEmojiIdScrollView.width,
-                0
-            )
-        }
-        ui.copyEmojiIdButtonContainerView.alpha = 0f
-        ui.copyEmojiIdButtonContainerView.visible()
-        ui.copyEmojiIdButtonContainerView.setBottomMargin(0)
-        // animate full emoji id view
-        val emojiIdAnim = ValueAnimator.ofFloat(0f, 1f)
-        emojiIdAnim.addUpdateListener { valueAnimator: ValueAnimator ->
-            val value = valueAnimator.animatedValue as Float
-            ui.dimmerView.alpha = value * 0.6f
-            // container alpha & scale
-            ui.fullEmojiIdContainerView.alpha = value
-            ui.fullEmojiIdContainerView.scaleX = 1f + 0.2f * (1f - value)
-            ui.fullEmojiIdContainerView.scaleY = 1f + 0.2f * (1f - value)
-            val width = (fullEmojiIdInitialWidth + fullEmojiIdDeltaWidth * value).toInt()
-            ui.fullEmojiIdContainerView.setLayoutWidth(width)
-            ui.backButton.alpha = 1 - value
-        }
-        emojiIdAnim.duration = Constants.UI.shortDurationMs
-        // copy emoji id button anim
-        val copyEmojiIdButtonAnim = ValueAnimator.ofFloat(0f, 1f)
-        copyEmojiIdButtonAnim.addUpdateListener { valueAnimator: ValueAnimator ->
-            val value = valueAnimator.animatedValue as Float
-            ui.copyEmojiIdButtonContainerView.alpha = value
-            ui.copyEmojiIdButtonContainerView.setBottomMargin(
-                (dimenPx(common_copy_emoji_id_button_visible_bottom_margin) * value).toInt()
-            )
-        }
-        copyEmojiIdButtonAnim.duration = Constants.UI.shortDurationMs
-        copyEmojiIdButtonAnim.interpolator = EasingInterpolator(Ease.BACK_OUT)
-
-        // chain anim.s and start
-        val animSet = AnimatorSet()
-        animSet.playSequentially(emojiIdAnim, copyEmojiIdButtonAnim)
-        animSet.start()
-        animSet.addListener(onEnd = { ui.dimmerView.isClickable = true })
-        // scroll animation
-        ui.fullEmojiIdScrollView.postDelayed(Constants.UI.shortDurationMs + 20) {
-            ui.fullEmojiIdScrollView.smoothScrollTo(0, 0)
-        }
-    }
-
-    private fun hideFullEmojiId(animateCopyEmojiIdButton: Boolean = true, animated: Boolean) {
-        if (!animated) {
-            ui.fullEmojiIdContainerView.gone()
-            ui.dimmerView.gone()
-            ui.copyEmojiIdButtonContainerView.gone()
-            return
-        }
-        ui.fullEmojiIdScrollView.smoothScrollTo(0, 0)
-        ui.emojiIdSummaryContainerView.visible()
-        ui.emojiIdSummaryContainerView.alpha = 0f
-        ui.dimmerView.isClickable = false
-        // copy emoji id button anim
-        val copyEmojiIdButtonAnim = ValueAnimator.ofFloat(1f, 0f)
-        copyEmojiIdButtonAnim.addUpdateListener { valueAnimator: ValueAnimator ->
-            val value = valueAnimator.animatedValue as Float
-            ui.copyEmojiIdButtonContainerView.alpha = value
-            ui.copyEmojiIdButtonContainerView.setBottomMargin(
-                (dimenPx(common_copy_emoji_id_button_visible_bottom_margin) * value).toInt()
-            )
-        }
-        copyEmojiIdButtonAnim.duration = Constants.UI.shortDurationMs
-        // emoji id anim
-        val fullEmojiIdInitialWidth = ui.fullEmojiIdContainerView.width
-        val fullEmojiIdDeltaWidth =
-            ui.emojiIdSummaryContainerView.width - ui.fullEmojiIdContainerView.width
-        val emojiIdAnim = ValueAnimator.ofFloat(0f, 1f)
-        emojiIdAnim.addUpdateListener { valueAnimator: ValueAnimator ->
-            val value = valueAnimator.animatedValue as Float
-            ui.dimmerView.alpha = (1 - value) * 0.6f
-            // container alpha & scale
-            ui.fullEmojiIdContainerView.alpha = (1 - value)
-            val width = (fullEmojiIdInitialWidth + fullEmojiIdDeltaWidth * value).toInt()
-            ui.fullEmojiIdContainerView.setLayoutWidth(width)
-            ui.emojiIdSummaryContainerView.alpha = value
-            ui.backButton.alpha = value
-        }
-        emojiIdAnim.duration = Constants.UI.shortDurationMs
-        // chain anim.s and start
-        val animSet = AnimatorSet()
-        if (animateCopyEmojiIdButton) {
-            animSet.playSequentially(copyEmojiIdButtonAnim, emojiIdAnim)
-        } else {
-            animSet.play(emojiIdAnim)
-        }
-        animSet.start()
-        animSet.addListener(onEnd = {
-            ui.dimmerView.gone()
-            ui.fullEmojiIdBgClickBlockerView.isClickable = false
-            ui.fullEmojiIdContainerView.gone()
-            ui.copyEmojiIdButtonContainerView.gone()
-        })
-    }
-
-    /**
-     * Dimmer clicked - hide dimmers.
-     */
-    private fun onEmojiIdDimmerClicked() {
-        hideFullEmojiId(animated = true)
+        fullEmojiIdViewController.showFullEmojiId()
     }
 
     private fun focusEditTextAndShowKeyboard() {
@@ -475,34 +357,6 @@ class AddNoteFragment : Fragment(), View.OnTouchListener {
             InputMethodManager.SHOW_FORCED,
             InputMethodManager.HIDE_IMPLICIT_ONLY
         )
-    }
-
-    private fun completeCopyEmojiId(clipboardString: String) {
-        ui.dimmerView.isClickable = false
-        val mActivity = activity ?: return
-        val clipBoard = ContextCompat.getSystemService(mActivity, ClipboardManager::class.java)
-        val clipboardData = ClipData.newPlainText(
-            "Tari Wallet Identity",
-            clipboardString
-        )
-        clipBoard?.setPrimaryClip(clipboardData)
-        emojiIdCopiedViewController.showEmojiIdCopiedAnim(fadeOutOnEnd = true) {
-            hideFullEmojiId(animateCopyEmojiIdButton = false, animated = true)
-        }
-        // hide copy emoji id button
-        val copyEmojiIdButtonAnim = ui.copyEmojiIdButtonContainerView.animate().alpha(0f)
-        copyEmojiIdButtonAnim.duration = Constants.UI.xShortDurationMs
-        copyEmojiIdButtonAnim.start()
-    }
-
-    private fun onCopyEmojiIdButtonClicked(view: View) {
-        view.temporarilyDisableClick()
-        completeCopyEmojiId(recipientUser.publicKey.emojiId)
-    }
-
-    private fun onCopyEmojiIdButtonLongClicked(view: View) {
-        view.temporarilyDisableClick()
-        completeCopyEmojiId(recipientUser.publicKey.hexString)
     }
 
     @SuppressLint("ClickableViewAccessibility")

@@ -296,128 +296,14 @@
     </RelativeLayout>
 
     <!-- full emoji id outer container -->
-    <RelativeLayout
-        android:id="@+id/full_emoji_id_outer_container"
+    <include
+        android:id="@+id/emoji_id_outer_container"
+        layout="@layout/view_full_emoji_id"
         android:layout_width="0dp"
         android:layout_height="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:visibility="gone">
-
-        <View
-            android:id="@+id/full_emoji_id_bg_click_blocker_view"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:alpha="0.6"
-            android:background="@color/transparent"
-            android:clickable="true"
-            android:focusable="true" />
-
-        <View
-            android:id="@+id/dimmer_view"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:alpha="0.6"
-            android:background="@color/black"
-            android:clickable="true"
-            android:focusable="true" />
-
-        <!-- copy emoji id button -->
-        <RelativeLayout
-            android:id="@+id/copy_emoji_id_button_container_view"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignBottom="@id/full_emoji_id_container_view"
-            android:layout_centerHorizontal="true"
-            android:layout_marginBottom="0dp">
-
-            <ImageView
-                android:id="@+id/add_note_img_copy_emoji_id_notch"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerHorizontal="true"
-                android:contentDescription="@null"
-                android:src="@drawable/speech_notch_up" />
-
-            <com.tari.android.wallet.ui.component.CustomFontTextView
-                android:id="@+id/add_note_txt_copy_emoji_id"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/add_note_img_copy_emoji_id_notch"
-                android:background="@drawable/copy_paste_emoji_id_button_bg"
-                android:paddingHorizontal="20dp"
-                android:paddingVertical="10dp"
-                android:text="@string/copy_emoji_id"
-                android:textColor="#9834F6"
-                android:textSize="14sp"
-                app:customFont="AVENIR_LT_STD_HEAVY" />
-
-            <Button
-                android:id="@+id/copy_emoji_id_button"
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:layout_alignStart="@id/add_note_txt_copy_emoji_id"
-                android:layout_alignTop="@id/add_note_txt_copy_emoji_id"
-                android:layout_alignEnd="@id/add_note_txt_copy_emoji_id"
-                android:layout_alignBottom="@id/add_note_txt_copy_emoji_id"
-                android:background="@color/transparent" />
-        </RelativeLayout>
-
-        <!-- height and width of this view will be set dynamically at runtime -->
-        <RelativeLayout
-            android:id="@+id/full_emoji_id_container_view"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout_alignParentTop="true"
-            android:layout_centerInParent="true"
-            android:background="@drawable/emoji_id_bg"
-            android:clickable="true"
-            android:elevation="@dimen/common_view_elevation"
-            android:focusable="true">
-
-            <HorizontalScrollView
-                android:id="@+id/full_emoji_id_scroll_view"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:scrollbars="none"
-                tools:ignore="UselessParent">
-
-                <TextView
-                    android:id="@+id/full_emoji_id_text_view"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:gravity="center_vertical"
-                    android:letterSpacing="0.22"
-                    android:paddingHorizontal="12dp"
-                    android:textColor="@color/black"
-                    android:textSize="14sp" />
-            </HorizontalScrollView>
-
-            <!-- white fader for emoji-id -->
-            <View
-                android:id="@+id/add_note_vw_full_emoji_id_fader"
-                android:layout_width="26dp"
-                android:layout_height="24dp"
-                android:layout_alignParentEnd="true"
-                android:layout_centerVertical="true"
-                android:background="@drawable/emoji_id_end_fader"
-                android:translationZ="6dp" />
-
-            <FrameLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:translationZ="7dp">
-
-                <include
-                    android:id="@+id/emoji_id_copied_view"
-                    layout="@layout/emoji_id_copied_anim_view"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:visibility="visible" />
-            </FrameLayout>
-        </RelativeLayout>
-    </RelativeLayout>
+        app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
