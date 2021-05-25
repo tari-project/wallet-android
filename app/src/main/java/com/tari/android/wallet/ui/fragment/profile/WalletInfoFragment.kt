@@ -85,10 +85,10 @@ class WalletInfoFragment : Fragment() {
         fullEmojiIdViewController = FullEmojiIdViewController(
             ui.emojiIdOuterContainer,
             ui.emojiIdSummaryView,
-            sharedPrefsWrapper.emojiId!!,
-            sharedPrefsWrapper.publicKeyHexString!!,
             requireContext()
         )
+        fullEmojiIdViewController.fullEmojiId = sharedPrefsWrapper.emojiId!!
+        fullEmojiIdViewController.emojiIdHex = sharedPrefsWrapper.publicKeyHexString!!
 
         ui.root.doOnGlobalLayout {
             ui.emojiIdOuterContainer.fullEmojiIdContainerView.apply {

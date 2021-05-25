@@ -214,21 +214,12 @@ class AddAmountFragment : Fragment(), ServiceConnection {
         fullEmojiIdViewController = FullEmojiIdViewController(
             ui.emojiIdOuterContainer,
             ui.emojiIdSummaryView,
-            recipientUser.publicKey.emojiId,
-            recipientUser.publicKey.hexString,
             requireContext(),
             fullEmojiIdListener
         )
+        fullEmojiIdViewController.fullEmojiId = recipientUser.publicKey.emojiId
+        fullEmojiIdViewController.emojiIdHex = recipientUser.publicKey.hexString
         displayAliasOrEmojiId()
-        OverScrollDecoratorHelper.setUpOverScroll(ui.emojiIdOuterContainer.fullEmojiIdScrollView)
-        ui.rootView.doOnGlobalLayout {
-            ui.txFeeContainerView.setTopMargin(ui.elementContainerView.bottom)
-            ui.emojiIdOuterContainer.fullEmojiIdContainerView.apply {
-                setTopMargin(ui.emojiIdSummaryContainerView.top)
-                setLayoutHeight(ui.emojiIdSummaryContainerView.height)
-                setLayoutWidth(ui.emojiIdSummaryContainerView.width)
-            }
-        }
         val amount = requireArguments().getDouble(DeepLink.PARAMETER_AMOUNT, Double.MIN_VALUE)
         if (isFirstLaunch && amount != Double.MIN_VALUE) {
             val handler = Handler(Looper.getMainLooper())

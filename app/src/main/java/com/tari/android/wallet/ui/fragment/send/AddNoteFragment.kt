@@ -237,14 +237,13 @@ class AddNoteFragment : Fragment(), View.OnTouchListener {
         fullEmojiIdViewController = FullEmojiIdViewController(
             ui.emojiIdOuterContainer,
             ui.emojiIdSummaryView,
-            recipientUser.publicKey.emojiId,
-            recipientUser.publicKey.hexString,
             requireContext(),
             fullEmojiIdListener
         )
+        fullEmojiIdViewController.fullEmojiId = recipientUser.publicKey.emojiId
+        fullEmojiIdViewController.emojiIdHex = recipientUser.publicKey.hexString
 
         displayAliasOrEmojiId()
-        OverScrollDecoratorHelper.setUpOverScroll(ui.emojiIdOuterContainer.fullEmojiIdScrollView)
         ui.progressBar.setColor(color(white))
         ui.noteEditText.addTextChangedListener(afterTextChanged = { updateSliderState() })
         ui.slideView.setOnTouchListener(this)
@@ -253,13 +252,6 @@ class AddNoteFragment : Fragment(), View.OnTouchListener {
         focusEditTextAndShowKeyboard()
         ui.promptTextView.setTextColor(color(black))
         ui.noteEditText.imeOptions = EditorInfo.IME_ACTION_DONE
-        ui.rootView.doOnGlobalLayout {
-            ui.emojiIdOuterContainer.fullEmojiIdContainerView.apply {
-                setTopMargin(ui.emojiIdSummaryContainerView.top)
-                setLayoutHeight(ui.emojiIdSummaryContainerView.height)
-                setLayoutWidth(ui.emojiIdSummaryContainerView.width)
-            }
-        }
         ui.thumbnailGifsRecyclerView.also {
             val margin = dimen(add_note_gif_inner_margin).toInt()
             it.addItemDecoration(HorizontalInnerMarginDecoration(margin))
