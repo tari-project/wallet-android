@@ -516,7 +516,15 @@ internal class TxListFragment : Fragment(),
     }
 
     private fun onTxMined(tx: CompletedTx) {
-        completedTxs.firstOrNull { it.id == tx.id }?.status = TxStatus.MINED_CONFIRMED
+        pendingInboundTxs.removeIf { it.id == tx.id }
+        pendingOutboundTxs.removeIf { it.id == tx.id }
+
+        val index = completedTxs.indexOfFirst { it.id == tx.id }
+        if (index == -1) {
+            completedTxs.add(tx)
+        } else {
+            completedTxs[index] = tx
+        }
         txMinedDelayedAction?.dispose()
         txMinedDelayedAction =
             Observable
@@ -620,7 +628,8 @@ internal class TxListFragment : Fragment(),
                 showNoTxsTextView()
             }
             if (!sharedPrefsWrapper.faucetTestnetTariRequestCompleted
-                && !sharedPrefsWrapper.isRestoredWallet) {
+                && !sharedPrefsWrapper.isRestoredWallet
+            ) {
                 requestTestnetTari()
             }
             updateProgressViewController.reset()
@@ -1081,16 +1090,15 @@ internal class TxListFragment : Fragment(),
         cancelledTxCount: Int
     ) {
         lifecycleScope.launch(Dispatchers.Main) { ui.scrollView.finishUpdate() }
-        if (receivedTxCount > 0 || cancelledTxCount > 0) {
-            lifecycleScope.launch(Dispatchers.IO) {
-                updateTxListData()
-                updateBalanceInfoData()
-                withContext(Dispatchers.Main) {
-                    updateBalanceInfoUI(restart = false)
-                    updateTxListUI()
-                    if (receivedTxCount > 0) {
-                        showWalletBackupPromptIfNecessary()
-                    }
+
+        lifecycleScope.launch(Dispatchers.IO) {
+            updateTxListData()
+            updateBalanceInfoData()
+            withContext(Dispatchers.Main) {
+                updateBalanceInfoUI(restart = false)
+                updateTxListUI()
+                if (receivedTxCount > 0) {
+                    showWalletBackupPromptIfNecessary()
                 }
             }
         }
