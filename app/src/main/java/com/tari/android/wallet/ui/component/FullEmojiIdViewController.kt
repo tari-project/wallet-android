@@ -47,6 +47,7 @@ import com.tari.android.wallet.databinding.ViewFullEmojiIdBinding
 import com.tari.android.wallet.ui.extension.*
 import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.EmojiUtil
+import me.everything.android.ui.overscroll.OverScrollDecoratorHelper
 
 /**
  * Used to display the full emoji id
@@ -56,20 +57,28 @@ import com.tari.android.wallet.util.EmojiUtil
 internal class FullEmojiIdViewController(
     private val ui: ViewFullEmojiIdBinding,
     summary: EmojiIdSummaryBinding,
-    private val fullEmojiId: String,
-    private var emojiIdHex: String,
     private val context: Context,
     private val listener: Listener? = null
 ) {
     private val emojiIdCopiedViewController = EmojiIdCopiedViewController(ui.emojiIdCopiedView)
     private val summaryParent = summary.root.parent as View
+    private var _fullEmojiId = ""
+
+    var fullEmojiId: String
+        set(value) {
+            _fullEmojiId = value
+            displayFullEmojiId()
+        }
+        get() = _fullEmojiId
+    var emojiIdHex: String = ""
 
     init {
         ui.dimmerView.setOnClickListener { hideFullEmojiIdAnimated() }
         ui.copyEmojiIdButton.setOnClickListener { onCopyEmojiIdButtonClicked() }
         ui.copyEmojiIdButton.setOnLongClickListener { onCopyEmojiIdButtonLongClicked() }
 
-        displayFullEmojiId(emojiId = fullEmojiId)
+        OverScrollDecoratorHelper.setUpOverScroll(ui.fullEmojiIdScrollView)
+
         hideFullEmojiIdWithoutAnimation()
     }
 
@@ -108,6 +117,23 @@ internal class FullEmojiIdViewController(
 
         summaryParent.invisible()
         emojiIdOuterContainer.visible()
+
+        ui.fullEmojiIdContainerView.doOnGlobalLayout {
+            // get right position on the screen with considering scrolls, offsets and e.t.c
+            val locationSummary = IntArray(2)
+            summaryParent.getLocationOnScreen(locationSummary)
+
+            val parentLocation = IntArray(2)
+            ui.emojiIdOuterContainer.getLocationOnScreen(parentLocation)
+            val topOffset = locationSummary[1] - parentLocation[1]
+
+            ui.fullEmojiIdContainerView.apply {
+                setTopMargin(topOffset)
+                setLayoutHeight(summaryParent.height)
+                setLayoutWidth(summaryParent.width)
+            }
+        }
+
 
         fullEmojiIdContainerView.visibleAndZeroAlpha()
         fullEmojiIdContainerView.setLayoutWidth(summaryParent.width)
@@ -251,9 +277,9 @@ internal class FullEmojiIdViewController(
     // endregion Animations
 
 
-    private fun displayFullEmojiId(emojiId: String) = with(context) {
+    private fun displayFullEmojiId() = with(context) {
         ui.fullEmojiIdTextView.text = EmojiUtil.getFullEmojiIdSpannable(
-            emojiId,
+            _fullEmojiId,
             string(R.string.emoji_id_chunk_separator),
             color(R.color.black),
             color(R.color.light_gray)
