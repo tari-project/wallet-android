@@ -21,6 +21,7 @@ build/
 local.properties
 
 # App secrets
+yat.properties
 secret.properties
 sentry.properties
 

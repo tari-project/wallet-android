@@ -46,6 +46,7 @@ import com.google.zxing.BarcodeFormat
 import com.tari.android.wallet.R
 import com.tari.android.wallet.databinding.ActivityQrScannerBinding
 import com.tari.android.wallet.infrastructure.Tracker
+import com.tari.android.wallet.ui.activity.CommonActivity
 import com.tari.android.wallet.ui.extension.appComponent
 import javax.inject.Inject
 
@@ -57,7 +58,7 @@ const val EXTRA_QR_DATA = "extra_qr_text"
  *
  * @author The Tari Development Team
  */
-internal class QRScannerActivity : AppCompatActivity() {
+internal class QRScannerActivity : CommonActivity() {
 
     companion object {
         /**

@@ -81,6 +81,7 @@ import com.tari.android.wallet.model.TxStatus.*
 import com.tari.android.wallet.model.yat.EmojiSet
 import com.tari.android.wallet.service.TariWalletService
 import com.tari.android.wallet.service.WalletService
+import com.tari.android.wallet.ui.activity.CommonActivity
 import com.tari.android.wallet.ui.animation.collapseAndHideAnimation
 import com.tari.android.wallet.ui.component.EmojiIdCopiedViewController
 import com.tari.android.wallet.ui.component.EmojiIdSummaryViewController
@@ -107,7 +108,7 @@ import kotlin.math.max
  *
  * @author The Tari Development Team
  */
-internal class TxDetailsActivity : AppCompatActivity(), ServiceConnection {
+internal class TxDetailsActivity : CommonActivity(), ServiceConnection {
 
     companion object {
         const val TX_EXTRA_KEY = "TX_EXTRA_KEY"

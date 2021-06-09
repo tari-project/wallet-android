@@ -39,6 +39,7 @@ import android.content.Intent
 import android.os.Handler
 import android.os.IBinder
 import android.os.Looper
+import android.provider.Settings
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
@@ -72,8 +73,7 @@ import com.tari.android.wallet.util.WalletUtil
 import io.reactivex.Observable
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import org.joda.time.DateTime
 import org.joda.time.Hours
 import org.joda.time.Minutes
@@ -82,6 +82,7 @@ import java.util.*
 import java.util.concurrent.*
 import javax.inject.Inject
 import javax.inject.Named
+import kotlin.coroutines.CoroutineContext
 
 /**
  * Foreground wallet service.
@@ -176,14 +177,13 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
     lateinit var backupManager: BackupManager
 
     @Inject
-    lateinit var yatService: YatService
-
-    @Inject
     lateinit var emojiSet: ActualizingEmojiSet
 
     private lateinit var wallet: FFIWallet
 
     private var txBroadcastRestarted = false
+
+    private var walletServiceScope = CoroutineScope(Dispatchers.IO)
 
     /**
      * Pairs of <tx id, recipient public key hex>.
@@ -236,7 +236,8 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
      * Validation results will all be null, and will be set as the result callbacks get called.
      */
     private var baseNodeValidationStatusMap:
-            ConcurrentMap<BaseNodeValidationType, Pair<BigInteger, BaseNodeValidationResult?>> = ConcurrentHashMap()
+            ConcurrentMap<BaseNodeValidationType, Pair<BigInteger, BaseNodeValidationResult?>> =
+        ConcurrentHashMap()
 
     override fun onCreate() {
         super.onCreate()
@@ -327,7 +328,11 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
             .startWith(0L)
             .observeOn(Schedulers.io())
             .subscribe(
-                { emojiSet.actualize() },
+                {
+                    walletServiceScope.launch(Dispatchers.IO) {
+                        emojiSet.actualize()
+                    }
+                },
                 { Logger.e(it, "Could not actualize emoji set") })
 
     /**
@@ -549,7 +554,8 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
         }.isNotEmpty()
         if (baseNodeNotInSync) {
             baseNodeValidationStatusMap.clear()
-            sharedPrefsWrapper.baseNodeLastSyncResult = BaseNodeValidationResult.BASE_NODE_NOT_IN_SYNC
+            sharedPrefsWrapper.baseNodeLastSyncResult =
+                BaseNodeValidationResult.BASE_NODE_NOT_IN_SYNC
             if (!sharedPrefsWrapper.baseNodeIsUserCustom) {
                 walletManager.setNextBaseNode()
             }
@@ -583,7 +589,9 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
         }
         // if any of the results is null, we're still waiting for all callbacks to happen
         val inProgress = statusMapCopy.filter { it.value.second == null }.isNotEmpty()
-        if (inProgress) { return }
+        if (inProgress) {
+            return
+        }
         // check if it's successful
         val successful = statusMapCopy.filter {
             it.value.second != null && it.value.second != BaseNodeValidationResult.SUCCESS
@@ -597,9 +605,11 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
         // shouldn't ever reach here - no-op
     }
 
-    private fun checkValidationResult(type: BaseNodeValidationType,
-                                      responseId: BigInteger,
-                                      result: BaseNodeValidationResult) {
+    private fun checkValidationResult(
+        type: BaseNodeValidationType,
+        responseId: BigInteger,
+        result: BaseNodeValidationResult
+    ) {
         val currentStatus = baseNodeValidationStatusMap[type]
         if (currentStatus == null) {
             Logger.d(
@@ -623,15 +633,24 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
         checkBaseNodeSyncCompletion()
     }
 
-    override fun onUTXOValidationComplete(responseId: BigInteger, result: BaseNodeValidationResult) {
+    override fun onUTXOValidationComplete(
+        responseId: BigInteger,
+        result: BaseNodeValidationResult
+    ) {
         checkValidationResult(BaseNodeValidationType.UTXO, responseId, result)
     }
 
-    override fun onSTXOValidationComplete(responseId: BigInteger, result: BaseNodeValidationResult) {
+    override fun onSTXOValidationComplete(
+        responseId: BigInteger,
+        result: BaseNodeValidationResult
+    ) {
         checkValidationResult(BaseNodeValidationType.STXO, responseId, result)
     }
 
-    override fun onInvalidTXOValidationComplete(responseId: BigInteger, result: BaseNodeValidationResult) {
+    override fun onInvalidTXOValidationComplete(
+        responseId: BigInteger,
+        result: BaseNodeValidationResult
+    ) {
         checkValidationResult(BaseNodeValidationType.INVALID_TXO, responseId, result)
     }
 
@@ -704,7 +723,8 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
                     val currentActivity = app.currentActivity
                     if (!app.isInForeground
                         || currentActivity !is HomeActivity
-                        || !currentActivity.willNotifyAboutNewTx()) {
+                        || !currentActivity.willNotifyAboutNewTx()
+                    ) {
                         notificationHelper.postCustomLayoutTxNotification(
                             inboundTxEventNotificationTxs.last()
                         )

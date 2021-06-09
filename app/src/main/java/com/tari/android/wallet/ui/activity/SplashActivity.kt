@@ -52,7 +52,7 @@ import javax.inject.Inject
  *
  * @author The Tari Development Team
  */
-internal class SplashActivity : AppCompatActivity() {
+internal class SplashActivity : CommonActivity() {
 
     @Inject
     internal lateinit var sharedPrefsWrapper: SharedPrefsWrapper

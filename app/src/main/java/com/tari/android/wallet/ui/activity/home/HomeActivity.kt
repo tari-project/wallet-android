@@ -60,6 +60,7 @@ import com.tari.android.wallet.service.WalletService
 import com.tari.android.wallet.service.connection.TariWalletServiceConnection
 import com.tari.android.wallet.service.connection.TariWalletServiceConnection.ServiceConnectionStatus.CONNECTED
 import com.tari.android.wallet.service.connection.TariWalletServiceConnection.TariWalletServiceConnectionFactory
+import com.tari.android.wallet.ui.activity.CommonActivity
 import com.tari.android.wallet.ui.activity.SplashActivity
 import com.tari.android.wallet.ui.activity.onboarding.OnboardingFlowActivity
 import com.tari.android.wallet.ui.activity.send.SendTariActivity
@@ -84,7 +85,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-internal class HomeActivity : AppCompatActivity(), AllSettingsFragment.AllSettingsRouter,
+internal class HomeActivity : CommonActivity(), AllSettingsFragment.AllSettingsRouter,
     TxListFragment.TxListRouter {
 
     @Inject

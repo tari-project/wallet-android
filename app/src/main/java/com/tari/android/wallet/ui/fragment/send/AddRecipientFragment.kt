@@ -545,7 +545,7 @@ class AddRecipientFragment : Fragment(),
         }
 
         try {
-            val user = yatService.getUser(yat) ?: throw UserNotFoundException(yat.raw)
+            val user = yatService.lookupUser(yat) ?: throw UserNotFoundException(yat.raw)
             withContext(Dispatchers.Main) { onUserFoundByYat(user) }
         } catch (exception: UserNotFoundException) {
             withContext(Dispatchers.Main) { onWalletDoesNotExistForYat(yat) }

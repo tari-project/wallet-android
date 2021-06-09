@@ -39,6 +39,7 @@ import com.tari.android.wallet.infrastructure.security.biometric.BiometricAuthen
 import com.tari.android.wallet.service.BootDeviceReceiver
 import com.tari.android.wallet.service.WalletService
 import com.tari.android.wallet.ui.activity.AuthActivity
+import com.tari.android.wallet.ui.activity.CommonActivity
 import com.tari.android.wallet.ui.activity.SplashActivity
 import com.tari.android.wallet.ui.activity.debug.DebugActivity
 import com.tari.android.wallet.ui.activity.home.HomeActivity
@@ -50,9 +51,9 @@ import com.tari.android.wallet.ui.activity.settings.DeleteWalletActivity
 import com.tari.android.wallet.ui.activity.tx.TxDetailsActivity
 import com.tari.android.wallet.ui.fragment.debug.BaseNodeConfigFragment
 import com.tari.android.wallet.ui.fragment.debug.DebugLogFragment
-import com.tari.android.wallet.ui.fragment.onboarding.CreateWalletFragment
 import com.tari.android.wallet.ui.fragment.onboarding.IntroductionFragment
 import com.tari.android.wallet.ui.fragment.onboarding.LocalAuthFragment
+import com.tari.android.wallet.ui.fragment.onboarding.createWallet.CreateWalletFragment
 import com.tari.android.wallet.ui.fragment.profile.WalletInfoFragment
 import com.tari.android.wallet.ui.fragment.restore.ChooseRestoreOptionFragment
 import com.tari.android.wallet.ui.fragment.restore.EnterRestorationPasswordFragment
@@ -110,6 +111,7 @@ internal interface ApplicationComponent {
     /**
      * Activities.
      */
+    fun inject(activity: CommonActivity)
     fun inject(activity: SplashActivity)
     fun inject(activity: OnboardingFlowActivity)
     fun inject(activity: AuthActivity)
