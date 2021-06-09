@@ -39,6 +39,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import com.tari.android.wallet.R
 import com.tari.android.wallet.ui.activity.AuthActivity
+import com.tari.android.wallet.ui.activity.CommonActivity
 import com.tari.android.wallet.ui.extension.appComponent
 import com.tari.android.wallet.ui.fragment.restore.ChooseRestoreOptionFragment
 import com.tari.android.wallet.ui.fragment.restore.EnterRestorationPasswordFragment
@@ -46,7 +47,7 @@ import com.tari.android.wallet.ui.fragment.restore.WalletRestoringFragment
 import com.tari.android.wallet.util.SharedPrefsWrapper
 import javax.inject.Inject
 
-class WalletRestoreActivity : AppCompatActivity(), WalletRestoreRouter {
+class WalletRestoreActivity : CommonActivity(), WalletRestoreRouter {
 
     @Inject
     lateinit var prefs: SharedPrefsWrapper

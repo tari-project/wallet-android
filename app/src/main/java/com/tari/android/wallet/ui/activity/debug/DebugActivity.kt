@@ -37,6 +37,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.tabs.TabLayoutMediator
 import com.tari.android.wallet.R
 import com.tari.android.wallet.databinding.ActivityDebugBinding
+import com.tari.android.wallet.ui.activity.CommonActivity
 import com.tari.android.wallet.ui.activity.debug.adapter.DebugViewPagerAdapter
 import com.tari.android.wallet.ui.extension.appComponent
 import com.tari.android.wallet.ui.extension.string
@@ -46,7 +47,7 @@ import com.tari.android.wallet.ui.extension.string
  *
  * @author The Tari Development Team
  */
-internal class DebugActivity : AppCompatActivity() {
+internal class DebugActivity : CommonActivity() {
 
     private lateinit var pagerAdapter: DebugViewPagerAdapter
 

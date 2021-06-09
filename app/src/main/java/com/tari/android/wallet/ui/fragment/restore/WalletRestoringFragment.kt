@@ -48,8 +48,6 @@ import androidx.lifecycle.lifecycleScope
 import com.tari.android.wallet.application.WalletState
 import com.tari.android.wallet.databinding.FragmentWalletRestoringBinding
 import com.tari.android.wallet.event.EventBus
-import com.tari.android.wallet.infrastructure.security.authentication.OAuthTokenPair
-import com.tari.android.wallet.infrastructure.yat.YatJWTStorage
 import com.tari.android.wallet.infrastructure.yat.YatUser
 import com.tari.android.wallet.infrastructure.yat.YatUserStorage
 import com.tari.android.wallet.model.WalletError
@@ -81,9 +79,6 @@ UI tree rebuild on configuration changes"""
 
     @Inject
     lateinit var yatUserStorage: YatUserStorage
-
-    @Inject
-    lateinit var yatJWTStorage: YatJWTStorage
 
     private lateinit var ui: FragmentWalletRestoringBinding
 
@@ -181,16 +176,17 @@ UI tree rebuild on configuration changes"""
                 setOf(yatFromWalletDB)
             )
             yatUserStorage.put(restoredYatUser)
-            val restoredAccessToken = service.getKeyValue(
-                WalletService.Companion.KeyValueStorageKeys.YAT_ACCESS_TOKEN,
-                error
-            )
-            val restoredRefreshToken = service.getKeyValue(
-                WalletService.Companion.KeyValueStorageKeys.YAT_REFRESH_TOKEN,
-                error
-            )
-            val tokenPair = OAuthTokenPair(restoredAccessToken, restoredRefreshToken)
-            yatJWTStorage.put(tokenPair)
+//            val restoredAccessToken = service.getKeyValue(
+//                WalletService.Companion.KeyValueStorageKeys.YAT_ACCESS_TOKEN,
+//                error
+//            )
+//            val restoredRefreshToken = service.getKeyValue(
+//                WalletService.Companion.KeyValueStorageKeys.YAT_REFRESH_TOKEN,
+//                error
+//            )
+//            val tokenPair = OAuthTokenPair(restoredAccessToken, restoredRefreshToken)
+            //todo fix restoring
+//            yatJWTStorage.put(tokenPair)
         }
     }
 

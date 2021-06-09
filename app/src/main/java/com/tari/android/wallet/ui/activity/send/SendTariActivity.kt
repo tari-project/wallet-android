@@ -46,6 +46,7 @@ import com.tari.android.wallet.model.MicroTari
 import com.tari.android.wallet.model.TxId
 import com.tari.android.wallet.model.User
 import com.tari.android.wallet.network.NetworkConnectionState
+import com.tari.android.wallet.ui.activity.CommonActivity
 import com.tari.android.wallet.ui.dialog.BottomSlideDialog
 import com.tari.android.wallet.ui.extension.appComponent
 import com.tari.android.wallet.ui.extension.color
@@ -63,7 +64,7 @@ import java.lang.ref.WeakReference
  *
  * @author The Tari Development Team
  */
-internal class SendTariActivity : AppCompatActivity(),
+internal class SendTariActivity : CommonActivity(),
     AddRecipientFragment.Listener,
     AddAmountFragment.Listener,
     AddNoteFragment.Listener,

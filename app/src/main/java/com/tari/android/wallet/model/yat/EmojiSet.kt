@@ -2,7 +2,7 @@ package com.tari.android.wallet.model.yat
 
 import android.content.Context
 import com.google.gson.Gson
-import com.tari.android.wallet.infrastructure.yat.emojiid.YatEmojiIdAPI
+import com.tari.android.wallet.infrastructure.yat.adapter.YatAdapter
 import de.adorsys.android.securestoragelibrary.SecurePreferences
 import java.util.concurrent.atomic.AtomicReference
 
@@ -16,7 +16,7 @@ interface MutableEmojiSet : EmojiSet {
 }
 
 interface ActualizingEmojiSet : EmojiSet {
-    fun actualize()
+    suspend fun actualize()
 }
 
 class EmojiSetActualizationException(message: String? = null, cause: Throwable? = null) :
@@ -64,18 +64,17 @@ class PersistingEmojiSet(private val context: Context, private val gson: Gson) :
 
 class YatAPISynchronizingSet(
     private val emojiSet: MutableEmojiSet,
-    private val api: YatEmojiIdAPI
+    private val yatAdapter: YatAdapter
 ) : ActualizingEmojiSet {
     override val set: Set<String>?
         get() = emojiSet.set
 
-    override fun actualize() {
-        val response = api.getSupportedSet().execute()
-        if (response.isSuccessful) {
-            emojiSet.set = response.body()!!.toSet()
+    override suspend fun actualize() {
+        val response = yatAdapter.getSupportedEmojiSet()
+        if (response.error == null) {
+            emojiSet.set = response.response!!.toSet()
         } else {
-            throw EmojiSetActualizationException(message = response.errorBody()?.string())
+            throw EmojiSetActualizationException(message = response.error.message)
         }
     }
-
 }

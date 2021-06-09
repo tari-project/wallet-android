@@ -36,14 +36,31 @@ android {
     buildTypes {
         copySentryProps()
         def properties = loadSecretProps()
+        def yatProperties = loadYatProps()
+
         debug {
             jniDebuggable true
             buildConfigField("String", "GIPHY_KEY", "\"${properties.getProperty('giphy.key')}\"")
             buildConfigField("String", "YAT_API_BASIC_AUTH_KEY", "\"${properties.getProperty('yat.api.basic_auth_key')}\"")
+
+            buildConfigField("String", "YAT_APPNAME", "\"${yatProperties.getProperty('yat.appName')}\"")
+            buildConfigField("String", "YAT_SOURCE_NAME", "\"${yatProperties.getProperty('yat.sourceName')}\"")
+            buildConfigField("String", "YAT_PATH_KEY", "\"${yatProperties.getProperty('yat.pathKey')}\"")
+            buildConfigField("String", "YAT_PUBLIC_KEY", "\"${yatProperties.getProperty('yat.pubKey')}\"")
+            buildConfigField("String", "YAT_CODE", "\"${yatProperties.getProperty('yat.code')}\"")
+            buildConfigField("String", "YAT_AUTH_TOKEN", "\"${yatProperties.getProperty('yat.authToken')}\"")
         }
         release {
             buildConfigField("String", "GIPHY_KEY", "\"${properties.getProperty('giphy.key')}\"")
             buildConfigField("String", "YAT_API_BASIC_AUTH_KEY", "\"${properties.getProperty('yat.api.basic_auth_key')}\"")
+
+            buildConfigField("String", "YAT_APPNAME", "\"${yatProperties.getProperty('yat.appName')}\"")
+            buildConfigField("String", "YAT_SOURCE_NAME", "\"${yatProperties.getProperty('yat.sourceName')}\"")
+            buildConfigField("String", "YAT_PATH_KEY", "\"${yatProperties.getProperty('yat.pathKey')}\"")
+            buildConfigField("String", "YAT_PUBLIC_KEY", "\"${yatProperties.getProperty('yat.pubKey')}\"")
+            buildConfigField("String", "YAT_CODE", "\"${yatProperties.getProperty('yat.code')}\"")
+            buildConfigField("String", "YAT_AUTH_TOKEN", "\"${yatProperties.getProperty('yat.authToken')}\"")
+
             minifyEnabled true
             shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
@@ -132,6 +149,19 @@ Properties loadSecretProps() {
     }
     final Properties properties = new Properties()
     properties.load(secretProps.newDataInputStream())
+    return properties
+}
+
+Properties loadYatProps() {
+    final File yatProps = project.rootProject.file("yat.properties")
+    if (!yatProps.exists()) {
+        Files.copy(
+                Paths.get(project.rootProject.file("yat-example.properties").absolutePath),
+                Paths.get(yatProps.absolutePath),
+        )
+    }
+    final Properties properties = new Properties()
+    properties.load(yatProps.newDataInputStream())
     return properties
 }
 
@@ -250,6 +280,9 @@ dependencies {
     regularImplementation 'org.matomo.sdk:tracker:4.1.2'
     // sentry - crash analytics
     regularImplementation 'io.sentry:sentry-android:4.3.0'
+
+    // yat
+    implementation 'com.github.yat-labs:yat-lib-android:0.1.3'
 
     // test
 	testImplementation 'junit:junit:4.13.2'

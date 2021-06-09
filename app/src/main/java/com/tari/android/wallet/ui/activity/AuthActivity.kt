@@ -39,7 +39,6 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.app.AppCompatActivity
 import androidx.biometric.BiometricPrompt.ERROR_CANCELED
 import androidx.biometric.BiometricPrompt.ERROR_USER_CANCELED
 import androidx.core.animation.addListener
@@ -70,7 +69,7 @@ import javax.inject.Inject
  *
  * @author The Tari Development Team
  */
-internal class AuthActivity : AppCompatActivity() {
+internal class AuthActivity : CommonActivity() {
 
     @Inject
     lateinit var tracker: Tracker

@@ -45,21 +45,23 @@ import androidx.lifecycle.get
 import com.orhanobut.logger.Logger
 import com.tari.android.wallet.R
 import com.tari.android.wallet.di.WalletModule
-import com.tari.android.wallet.infrastructure.yat.YatJWTStorage
 import com.tari.android.wallet.infrastructure.yat.YatUserStorage
+import com.tari.android.wallet.infrastructure.yat.adapter.YatAdapter
 import com.tari.android.wallet.model.WalletError
 import com.tari.android.wallet.service.TariWalletService
 import com.tari.android.wallet.service.WalletService
 import com.tari.android.wallet.service.connection.TariWalletServiceConnection
+import com.tari.android.wallet.ui.activity.CommonActivity
 import com.tari.android.wallet.ui.activity.home.HomeActivity
 import com.tari.android.wallet.ui.extension.appComponent
-import com.tari.android.wallet.ui.fragment.onboarding.CreateWalletFragment
 import com.tari.android.wallet.ui.fragment.onboarding.IntroductionFragment
 import com.tari.android.wallet.ui.fragment.onboarding.LocalAuthFragment
+import com.tari.android.wallet.ui.fragment.onboarding.createWallet.CreateWalletFragment
 import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.Constants.UI.CreateWallet
 import com.tari.android.wallet.util.SharedPrefsWrapper
 import com.tari.android.wallet.util.WalletUtil
+import yat.android.YatLib
 import javax.inject.Inject
 import javax.inject.Named
 
@@ -69,7 +71,7 @@ import javax.inject.Named
  * @author The Tari Development Team
  */
 internal class OnboardingFlowActivity :
-    AppCompatActivity(),
+    CommonActivity(),
     IntroductionFragment.Listener,
     CreateWalletFragment.Listener,
     LocalAuthFragment.Listener {
@@ -84,9 +86,6 @@ internal class OnboardingFlowActivity :
     @Inject
     lateinit var yatUserStorage: YatUserStorage
 
-    @Inject
-    lateinit var yatJWTStorage: YatJWTStorage
-
     private val uiHandler = Handler()
     private lateinit var serviceConnection: TariWalletServiceConnection
     private var walletService: TariWalletService? = null
@@ -100,7 +99,8 @@ internal class OnboardingFlowActivity :
                 // clean existing files & restart onboarding
                 WalletUtil.clearWalletFiles(walletFilesDirPath)
                 yatUserStorage.clear()
-                yatJWTStorage.clear()
+                //todo clear throught adapter
+//                yatJWTStorage.clear()
                 // start wallet service
                 WalletService.start(applicationContext)
                 bindWalletService()
@@ -201,46 +201,47 @@ internal class OnboardingFlowActivity :
      * This is to be able to restore Yat data after a wallet restore.
      */
     private fun storeYatDataInWalletDatabase() {
-        val service = walletService ?: return
-        // get data from local Android storage
-        val yatUser = yatUserStorage.get() ?: return
-        val accessToken = yatJWTStorage.accessToken() ?: return
-        val refreshToken = yatJWTStorage.refreshToken() ?: return
-
-        val error = WalletError()
-        // save yat
-        service.setKeyValue(
-            WalletService.Companion.KeyValueStorageKeys.YAT_EMOJI_ID,
-            yatUser.emojiIds.first().raw,
-            error
-        )
-        Logger.e("YAT STORED :: ${yatUser.emojiIds.first().raw}")
-        val yat = service.getKeyValue(WalletService.Companion.KeyValueStorageKeys.YAT_EMOJI_ID, error)
-        Logger.e("YAT RESTORED :: $yat")
-        // save email
-        service.setKeyValue(
-            WalletService.Companion.KeyValueStorageKeys.YAT_USER_ALTERNATE_ID,
-            yatUser.alternateId,
-            error
-        )
-        // save password
-        service.setKeyValue(
-            WalletService.Companion.KeyValueStorageKeys.YAT_USER_PASSWORD,
-            yatUser.password,
-            error
-        )
-        // save access token
-        service.setKeyValue(
-            WalletService.Companion.KeyValueStorageKeys.YAT_ACCESS_TOKEN,
-            accessToken,
-            error
-        )
-        // save refresh token
-        service.setKeyValue(
-            WalletService.Companion.KeyValueStorageKeys.YAT_REFRESH_TOKEN,
-            refreshToken,
-            error
-        )
+        //todo revive that
+//        val service = walletService ?: return
+//        // get data from local Android storage
+//        val yatUser = yatUserStorage.get() ?: return
+//        val accessToken = yatJWTStorage.accessToken() ?: return
+//        val refreshToken = yatJWTStorage.refreshToken() ?: return
+//
+//        val error = WalletError()
+//        // save yat
+//        service.setKeyValue(
+//            WalletService.Companion.KeyValueStorageKeys.YAT_EMOJI_ID,
+//            yatUser.emojiIds.first().raw,
+//            error
+//        )
+//        Logger.e("YAT STORED :: ${yatUser.emojiIds.first().raw}")
+//        val yat = service.getKeyValue(WalletService.Companion.KeyValueStorageKeys.YAT_EMOJI_ID, error)
+//        Logger.e("YAT RESTORED :: $yat")
+//        // save email
+//        service.setKeyValue(
+//            WalletService.Companion.KeyValueStorageKeys.YAT_USER_ALTERNATE_ID,
+//            yatUser.alternateId,
+//            error
+//        )
+//        // save password
+//        service.setKeyValue(
+//            WalletService.Companion.KeyValueStorageKeys.YAT_USER_PASSWORD,
+//            yatUser.password,
+//            error
+//        )
+//        // save access token
+//        service.setKeyValue(
+//            WalletService.Companion.KeyValueStorageKeys.YAT_ACCESS_TOKEN,
+//            accessToken,
+//            error
+//        )
+//        // save refresh token
+//        service.setKeyValue(
+//            WalletService.Companion.KeyValueStorageKeys.YAT_REFRESH_TOKEN,
+//            refreshToken,
+//            error
+//        )
     }
 
     override fun onAuthSuccess() {

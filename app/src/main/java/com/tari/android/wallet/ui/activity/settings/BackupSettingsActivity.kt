@@ -39,9 +39,10 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import com.tari.android.wallet.R
+import com.tari.android.wallet.ui.activity.CommonActivity
 import com.tari.android.wallet.ui.fragment.settings.backup.*
 
-class BackupSettingsActivity : AppCompatActivity(), BackupSettingsRouter {
+class BackupSettingsActivity : CommonActivity(), BackupSettingsRouter {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
