@@ -74,7 +74,6 @@ internal class SplashActivity : CommonActivity() {
 
     private fun <T : Activity> launch(destination: Class<T>) {
         val intent = Intent(this, destination)
-        intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
         this.intent.data?.let(intent::setData)
         startActivity(intent)
         finish()

@@ -29,16 +29,18 @@ class WalletCreationViewModel(private val service: YatService) : ViewModel() {
         action()
     }
 
-    fun showError() {
-        _state.value = InitialYatSearchErrorState(Exception())
-    }
-
-    fun handleYatState(dto: YatAdapter.YatIntegrationStateDto) = when (dto.state) {
-        YatAdapter.YatIntegrationState.None -> Unit
-        YatAdapter.YatIntegrationState.Complete -> _state.value =
-            InitialYatFoundState(EmojiId(dto.yat.orEmpty()))
-        YatAdapter.YatIntegrationState.Failed -> _state.value =
-            InitialYatSearchErrorState(Exception(dto.failureType?.name))
+    fun handleYatState(dto: YatAdapter.YatIntegrationStateDto) {
+        when (dto.state) {
+            YatAdapter.YatIntegrationState.None -> Unit
+            YatAdapter.YatIntegrationState.Complete -> {
+                _state.value = InitialYatFoundState(EmojiId(dto.yat.orEmpty()))
+            }
+            YatAdapter.YatIntegrationState.Failed -> {
+                if (_state.value == SearchingForInitialYatState) {
+                    _state.value = InitialYatSearchErrorState(Exception(dto.failureType?.name))
+                }
+            }
+        }
     }
 
     fun onYatAcquireInitiated(yat: String) {

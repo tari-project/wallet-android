@@ -107,17 +107,6 @@ class CreateWalletFragment : Fragment(), WalletCreationStateVisitor {
         yatAdapter.state.observe(viewLifecycleOwner) { viewModel.handleYatState(it) }
     }
 
-    override fun onResume() {
-        super.onResume()
-
-        //should to handle back navigation from yat component
-        if (yatAdapter.state.value?.state == YatAdapter.YatIntegrationState.None
-            && viewModel.state.value is SearchingForInitialYatState
-        ) {
-            viewModel.showError()
-        }
-    }
-
     override fun onInitial() = with(ui) {
         yourEmojiIdTitleTextView.text =
             string(create_wallet_your_emoji_id_text_label).applyFontStyle(

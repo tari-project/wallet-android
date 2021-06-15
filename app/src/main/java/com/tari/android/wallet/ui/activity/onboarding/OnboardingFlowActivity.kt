@@ -99,8 +99,7 @@ internal class OnboardingFlowActivity :
                 // clean existing files & restart onboarding
                 WalletUtil.clearWalletFiles(walletFilesDirPath)
                 yatUserStorage.clear()
-                //todo clear throught adapter
-//                yatJWTStorage.clear()
+                yatAdapter.getJWTStorage().clear()
                 // start wallet service
                 WalletService.start(applicationContext)
                 bindWalletService()
@@ -129,12 +128,7 @@ internal class OnboardingFlowActivity :
     // Back button should not be functional during onboarding
     override fun onBackPressed() {}
 
-    private fun startWalletService() {
-        ContextCompat.startForegroundService(
-            applicationContext,
-            Intent(applicationContext, WalletService::class.java)
-        )
-    }
+    private fun startWalletService() = WalletService.start(applicationContext)
 
     private fun bindWalletService() {
         serviceConnection = ViewModelProvider(this,
@@ -201,47 +195,47 @@ internal class OnboardingFlowActivity :
      * This is to be able to restore Yat data after a wallet restore.
      */
     private fun storeYatDataInWalletDatabase() {
-        //todo revive that
-//        val service = walletService ?: return
-//        // get data from local Android storage
-//        val yatUser = yatUserStorage.get() ?: return
-//        val accessToken = yatJWTStorage.accessToken() ?: return
-//        val refreshToken = yatJWTStorage.refreshToken() ?: return
-//
-//        val error = WalletError()
-//        // save yat
-//        service.setKeyValue(
-//            WalletService.Companion.KeyValueStorageKeys.YAT_EMOJI_ID,
-//            yatUser.emojiIds.first().raw,
-//            error
-//        )
-//        Logger.e("YAT STORED :: ${yatUser.emojiIds.first().raw}")
-//        val yat = service.getKeyValue(WalletService.Companion.KeyValueStorageKeys.YAT_EMOJI_ID, error)
-//        Logger.e("YAT RESTORED :: $yat")
-//        // save email
-//        service.setKeyValue(
-//            WalletService.Companion.KeyValueStorageKeys.YAT_USER_ALTERNATE_ID,
-//            yatUser.alternateId,
-//            error
-//        )
-//        // save password
-//        service.setKeyValue(
-//            WalletService.Companion.KeyValueStorageKeys.YAT_USER_PASSWORD,
-//            yatUser.password,
-//            error
-//        )
-//        // save access token
-//        service.setKeyValue(
-//            WalletService.Companion.KeyValueStorageKeys.YAT_ACCESS_TOKEN,
-//            accessToken,
-//            error
-//        )
-//        // save refresh token
-//        service.setKeyValue(
-//            WalletService.Companion.KeyValueStorageKeys.YAT_REFRESH_TOKEN,
-//            refreshToken,
-//            error
-//        )
+        val yatJWTStorage = yatAdapter.getJWTStorage()
+        val service = walletService ?: return
+        // get data from local Android storage
+        val yatUser = yatUserStorage.get() ?: return
+        val accessToken = yatJWTStorage.getAccessToken() ?: return
+        val refreshToken = yatJWTStorage.getRefreshToken() ?: return
+
+        val error = WalletError()
+        // save yat
+        service.setKeyValue(
+            WalletService.Companion.KeyValueStorageKeys.YAT_EMOJI_ID,
+            yatUser.emojiIds.first().raw,
+            error
+        )
+        Logger.e("YAT STORED :: ${yatUser.emojiIds.first().raw}")
+        val yat = service.getKeyValue(WalletService.Companion.KeyValueStorageKeys.YAT_EMOJI_ID, error)
+        Logger.e("YAT RESTORED :: $yat")
+        // save email
+        service.setKeyValue(
+            WalletService.Companion.KeyValueStorageKeys.YAT_USER_ALTERNATE_ID,
+            yatUser.alternateId,
+            error
+        )
+        // save password
+        service.setKeyValue(
+            WalletService.Companion.KeyValueStorageKeys.YAT_USER_PASSWORD,
+            yatUser.password,
+            error
+        )
+        // save access token
+        service.setKeyValue(
+            WalletService.Companion.KeyValueStorageKeys.YAT_ACCESS_TOKEN,
+            accessToken,
+            error
+        )
+        // save refresh token
+        service.setKeyValue(
+            WalletService.Companion.KeyValueStorageKeys.YAT_REFRESH_TOKEN,
+            refreshToken,
+            error
+        )
     }
 
     override fun onAuthSuccess() {

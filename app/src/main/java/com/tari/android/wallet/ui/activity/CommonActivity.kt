@@ -19,6 +19,6 @@ open class CommonActivity : AppCompatActivity() {
 
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
-        yatAdapter.processDeeplink(intent)
+        yatAdapter.processDeeplink(this, intent)
     }
 }

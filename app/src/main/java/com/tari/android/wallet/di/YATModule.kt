@@ -31,9 +31,10 @@ class YATModule {
     @Singleton
     fun provideYatAdapter(
         yatUserStorage: YatUserStorage,
-        sharedPrefsWrapper: SharedPrefsWrapper
+        sharedPrefsWrapper: SharedPrefsWrapper,
+        context: Context
     ): YatAdapter =
-        YatAdapterImpl(yatUserStorage, sharedPrefsWrapper)
+        YatAdapterImpl(yatUserStorage, sharedPrefsWrapper, context)
 
     @Provides
     @Singleton

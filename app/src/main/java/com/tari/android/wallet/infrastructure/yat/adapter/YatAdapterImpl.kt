@@ -1,6 +1,7 @@
 package com.tari.android.wallet.infrastructure.yat.adapter
 
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -23,16 +24,21 @@ import java.util.*
 
 class YatAdapterImpl (
     val yatUserStorage: YatUserStorage,
-    val sharedPrefsWrapper: SharedPrefsWrapper
+    val sharedPrefsWrapper: SharedPrefsWrapper,
+    context: Context
 ) : YatAdapter, YatLib.Delegate {
+
+    init {
+        YatLib.initialize(context, this)
+    }
 
     private val _state =
         MutableLiveData(YatAdapter.YatIntegrationStateDto(YatAdapter.YatIntegrationState.None))
     override val state: LiveData<YatAdapter.YatIntegrationStateDto> = Transformations.map(_state) { it }
 
-    override fun processDeeplink(intent: Intent) {
+    override fun processDeeplink(context: Context, intent: Intent) {
         intent.data?.let {
-            YatLib.processDeepLink(it)
+            YatLib.processDeepLink(context, it)
         }
     }
 
@@ -40,6 +46,8 @@ class YatAdapterImpl (
         initializeYatLib()
         YatLib.start(intent)
     }
+
+    override fun getJWTStorage() = YatLib.jwtStorage
 
     override suspend fun lookupYatUser(yat: String): YatAdapter.YatResponse<YatLookupResponse> =
         mapToYatResponse { onSuccess, onError -> YatLib.lookupYat(yat, onSuccess, onError) }
@@ -86,12 +94,11 @@ class YatAdapterImpl (
         )
         yatUserStorage.put(yatUser)
 
-        YatLib.initialize(
+        YatLib.setup(
             config = config,
             userId = yatUser.alternateId,
             userPassword = yatUser.password,
             colorMode = YatLib.ColorMode.LIGHT,
-            delegate = this,
             yatRecords = yatRecords
         )
     }
@@ -110,7 +117,7 @@ class YatAdapterImpl (
         Logger.e("Yat integration had error")
         _state.postValue(
             YatAdapter.YatIntegrationStateDto(
-                YatAdapter.YatIntegrationState.Complete,
+                YatAdapter.YatIntegrationState.Failed,
                 null,
                 failureType
             )

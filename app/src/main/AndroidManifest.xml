@@ -60,10 +60,23 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:host="y.at"
+                    android:scheme="${yatHostName}" />
+
+            </intent-filter>
         </activity> <!-- onboarding flow -->
         <activity
             android:name=".ui.activity.onboarding.OnboardingFlowActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
+            android:launchMode="singleTask"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme"
             android:windowSoftInputMode="stateAlwaysHidden" /> <!-- local authentication -->
@@ -77,6 +90,7 @@
             android:name=".ui.activity.home.HomeActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:launchMode="singleTask"
+            android:exported="true"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme"
             android:windowSoftInputMode="stateAlwaysHidden">
@@ -92,6 +106,7 @@
                 <data
                     android:host="rincewind"
                     android:scheme="tari" />
+
             </intent-filter>
         </activity>
         <activity

@@ -50,6 +50,7 @@ import com.tari.android.wallet.databinding.FragmentWalletRestoringBinding
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.infrastructure.yat.YatUser
 import com.tari.android.wallet.infrastructure.yat.YatUserStorage
+import com.tari.android.wallet.infrastructure.yat.adapter.YatAdapter
 import com.tari.android.wallet.model.WalletError
 import com.tari.android.wallet.model.yat.EmojiId
 import com.tari.android.wallet.model.yat.EmojiSet
@@ -62,6 +63,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import yat.android.data.storage.OAuthTokenPair
 import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
 
@@ -79,6 +81,9 @@ UI tree rebuild on configuration changes"""
 
     @Inject
     lateinit var yatUserStorage: YatUserStorage
+
+    @Inject
+    lateinit var yatAdapter: YatAdapter
 
     private lateinit var ui: FragmentWalletRestoringBinding
 
@@ -109,7 +114,7 @@ UI tree rebuild on configuration changes"""
             }
         })
         EventBus.subscribeToWalletState(this, this::onWalletStateChanged)
-        startWalletService()
+        WalletService.start(applicationContext)
         bindWalletService()
         ui.root.postDelayed(screenShowDurationMs) {
             if (!yatDataIsRestored.get()) {
@@ -118,13 +123,6 @@ UI tree rebuild on configuration changes"""
                 (requireActivity() as WalletRestoreRouter).onRestoreCompleted()
             }
         }
-    }
-
-    private fun startWalletService() {
-        ContextCompat.startForegroundService(
-            applicationContext,
-            Intent(applicationContext, WalletService::class.java)
-        )
     }
 
     private fun bindWalletService() {
@@ -176,17 +174,16 @@ UI tree rebuild on configuration changes"""
                 setOf(yatFromWalletDB)
             )
             yatUserStorage.put(restoredYatUser)
-//            val restoredAccessToken = service.getKeyValue(
-//                WalletService.Companion.KeyValueStorageKeys.YAT_ACCESS_TOKEN,
-//                error
-//            )
-//            val restoredRefreshToken = service.getKeyValue(
-//                WalletService.Companion.KeyValueStorageKeys.YAT_REFRESH_TOKEN,
-//                error
-//            )
-//            val tokenPair = OAuthTokenPair(restoredAccessToken, restoredRefreshToken)
-            //todo fix restoring
-//            yatJWTStorage.put(tokenPair)
+            val restoredAccessToken = service.getKeyValue(
+                WalletService.Companion.KeyValueStorageKeys.YAT_ACCESS_TOKEN,
+                error
+            )
+            val restoredRefreshToken = service.getKeyValue(
+                WalletService.Companion.KeyValueStorageKeys.YAT_REFRESH_TOKEN,
+                error
+            )
+            val tokenPair = OAuthTokenPair(restoredAccessToken, restoredRefreshToken)
+            yatAdapter.getJWTStorage().put(tokenPair)
         }
     }
 
