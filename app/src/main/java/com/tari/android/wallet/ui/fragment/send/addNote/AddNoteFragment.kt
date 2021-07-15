@@ -30,7 +30,7 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.tari.android.wallet.ui.fragment.send
+package com.tari.android.wallet.ui.fragment.send.addNote
 
 import android.animation.Animator
 import android.animation.AnimatorSet
@@ -78,7 +78,6 @@ import com.orhanobut.logger.Logger
 import com.tari.android.wallet.R
 import com.tari.android.wallet.R.color.*
 import com.tari.android.wallet.R.dimen.*
-import com.tari.android.wallet.R.string.emoji_id_chunk_separator
 import com.tari.android.wallet.application.DeepLink
 import com.tari.android.wallet.databinding.DialogChooseGifBinding
 import com.tari.android.wallet.databinding.FragmentAddNoteBinding
@@ -97,16 +96,15 @@ import com.tari.android.wallet.ui.presentation.TxNote
 import com.tari.android.wallet.ui.presentation.gif.GIF
 import com.tari.android.wallet.ui.presentation.gif.GIFRepository
 import com.tari.android.wallet.ui.presentation.gif.Placeholder
+import com.tari.android.wallet.ui.viewModel.CommonViewModel
 import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.Constants.UI.AddNoteAndSend
-import com.tari.android.wallet.util.EmojiUtil
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.subjects.BehaviorSubject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import me.everything.android.ui.overscroll.OverScrollDecoratorHelper
 import java.lang.ref.WeakReference
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
@@ -121,9 +119,6 @@ class AddNoteFragment : Fragment(), View.OnTouchListener {
 
     @Inject
     lateinit var tracker: Tracker
-
-    @Inject
-    lateinit var vmFactory: ThumbnailGIFsViewModelFactory
 
     private lateinit var listenerWR: WeakReference<Listener>
 
@@ -172,7 +167,7 @@ class AddNoteFragment : Fragment(), View.OnTouchListener {
     }
 
     private fun initializeGIFsViewModel() {
-        viewModel = ViewModelProvider(this, vmFactory)[ThumbnailGIFsViewModel::class.java]
+        viewModel = ViewModelProvider(this)[ThumbnailGIFsViewModel::class.java]
         viewModel.state.observe(viewLifecycleOwner) {
             when {
                 it.isSuccessful -> adapter.repopulate(it.gifs!!)
@@ -669,22 +664,18 @@ class AddNoteFragment : Fragment(), View.OnTouchListener {
         }
     }
 
-    class ThumbnailGIFsViewModelFactory(
-        private val repository: GIFRepository,
-        private val giphyKeywordsRepository: GiphyKeywordsRepository
-    ) :
-        ViewModelProvider.Factory {
-        @Suppress("UNCHECKED_CAST")
-        override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-            require(modelClass === ThumbnailGIFsViewModel::class.java)
-            return ThumbnailGIFsViewModel(repository, giphyKeywordsRepository) as T
-        }
-    }
+    class ThumbnailGIFsViewModel() : CommonViewModel() {
 
-    private class ThumbnailGIFsViewModel(
-        private val gifsRepository: GIFRepository,
-        private val giphyKeywordsRepository: GiphyKeywordsRepository
-    ) : ViewModel() {
+        init {
+            component?.inject(this)
+        }
+
+        @Inject
+        lateinit var gifsRepository: GIFRepository
+
+        @Inject
+        lateinit var giphyKeywordsRepository: GiphyKeywordsRepository
+
 
         private val _state = MutableLiveData<GIFsState>()
         val state: LiveData<GIFsState> get() = _state

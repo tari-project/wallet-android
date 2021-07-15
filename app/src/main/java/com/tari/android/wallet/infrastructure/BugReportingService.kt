@@ -49,7 +49,7 @@ import java.util.zip.ZipOutputStream
  *
  * @author The Tari Development Team
  */
-internal class BugReportingService(private val sharedPrefsWrapper: SharedPrefsWrapper,
+class BugReportingService(private val sharedPrefsWrapper: SharedPrefsWrapper,
                                    private val logFilesDirPath: String) {
 
     class BugReportFileSizeLimitExceededException: Exception()

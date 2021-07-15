@@ -52,6 +52,7 @@ import com.tari.android.wallet.network.NetworkConnectionStateReceiver
 import com.tari.android.wallet.notification.NotificationHelper
 import com.tari.android.wallet.util.SharedPrefsWrapper
 import net.danlew.android.joda.JodaTimeAndroid
+import java.lang.ref.WeakReference
 import javax.inject.Inject
 import javax.inject.Named
 
@@ -91,6 +92,8 @@ internal class TariWalletApplication : Application(), LifecycleObserver {
 
     override fun onCreate() {
         super.onCreate()
+        INSTANCE = WeakReference(this)
+
         registerActivityLifecycleCallbacks(activityLifecycleCallbacks)
         Logger.addLogAdapter(AndroidLogAdapter())
         JodaTimeAndroid.init(this)
@@ -136,4 +139,10 @@ internal class TariWalletApplication : Application(), LifecycleObserver {
         EventBus.post(Event.App.AppForegrounded())
     }
 
+    companion object {
+
+        @Volatile
+        var INSTANCE: WeakReference<TariWalletApplication> = WeakReference(null)
+            private set
+    }
 }

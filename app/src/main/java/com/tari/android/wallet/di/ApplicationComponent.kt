@@ -57,7 +57,7 @@ import com.tari.android.wallet.ui.fragment.profile.WalletInfoFragment
 import com.tari.android.wallet.ui.fragment.restore.ChooseRestoreOptionFragment
 import com.tari.android.wallet.ui.fragment.restore.EnterRestorationPasswordFragment
 import com.tari.android.wallet.ui.fragment.send.AddAmountFragment
-import com.tari.android.wallet.ui.fragment.send.AddNoteFragment
+import com.tari.android.wallet.ui.fragment.send.addNote.AddNoteFragment
 import com.tari.android.wallet.ui.fragment.send.AddRecipientFragment
 import com.tari.android.wallet.ui.fragment.send.FinalizeSendTxFragment
 import com.tari.android.wallet.ui.fragment.settings.AllSettingsFragment
@@ -66,6 +66,7 @@ import com.tari.android.wallet.ui.fragment.settings.backup.ChangeSecurePasswordF
 import com.tari.android.wallet.ui.fragment.settings.backup.EnterCurrentPasswordFragment
 import com.tari.android.wallet.ui.fragment.settings.backup.VerifySeedPhraseFragment
 import com.tari.android.wallet.ui.fragment.tx.TxListFragment
+import com.tari.android.wallet.ui.viewModel.CommonViewModel
 import com.tari.android.wallet.util.SharedPrefsWrapper
 import dagger.Component
 import java.io.File
@@ -148,6 +149,12 @@ internal interface ApplicationComponent {
     fun inject(fragment: ChooseRestoreOptionFragment)
     fun inject(fragment: EnterRestorationPasswordFragment)
 
+    /**
+     * ViewModels.
+     */
+    fun inject(commonViewModel: CommonViewModel)
+    fun inject(thumbnailGIFsViewModel: AddNoteFragment.ThumbnailGIFsViewModel)
+    fun inject(gifViewModel: TxDetailsActivity.GIFViewModel)
     /**
      * Service(s).
      */

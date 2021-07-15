@@ -62,10 +62,7 @@ class DeleteWalletActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         overridePendingTransition(R.anim.enter_from_right, R.anim.exit_to_left)
         appComponent.inject(this)
-        serviceConnection = ViewModelProvider(
-            this,
-            TariWalletServiceConnection.TariWalletServiceConnectionFactory(this)
-        ).get()
+        serviceConnection = ViewModelProvider(this)[TariWalletServiceConnection::class.java]
         setupUI()
     }
 

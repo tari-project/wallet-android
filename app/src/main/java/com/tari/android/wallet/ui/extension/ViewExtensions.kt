@@ -78,6 +78,10 @@ internal fun View.gone() {
     this.visibility = View.GONE
 }
 
+internal fun View.setVisible(visible: Boolean, hideState: Int = View.GONE) {
+    visibility = if (visible) View.VISIBLE else hideState
+}
+
 /**
  * Given the context, displays the standard "no internet connection" dialog.
  */

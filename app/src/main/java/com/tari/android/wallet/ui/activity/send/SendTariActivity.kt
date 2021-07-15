@@ -52,7 +52,7 @@ import com.tari.android.wallet.ui.extension.color
 import com.tari.android.wallet.ui.extension.hideKeyboard
 import com.tari.android.wallet.ui.extension.showInternetConnectionErrorDialog
 import com.tari.android.wallet.ui.fragment.send.AddAmountFragment
-import com.tari.android.wallet.ui.fragment.send.AddNoteFragment
+import com.tari.android.wallet.ui.fragment.send.addNote.AddNoteFragment
 import com.tari.android.wallet.ui.fragment.send.AddRecipientFragment
 import com.tari.android.wallet.ui.fragment.send.FinalizeSendTxFragment
 import com.tari.android.wallet.util.Constants

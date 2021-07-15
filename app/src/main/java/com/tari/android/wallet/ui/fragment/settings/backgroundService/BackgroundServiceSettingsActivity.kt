@@ -15,7 +15,7 @@
  * 3. Neither the name of the copyright holder nor the names of
  * its contributors may be used to endorse or promote products
  * derived from this software without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND
  * CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES,
  * INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
@@ -30,23 +30,49 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.tari.android.wallet.ui.component
+package com.tari.android.wallet.ui.fragment.settings.backgroundService
 
 import android.content.Context
-import android.util.AttributeSet
-import androidx.appcompat.widget.AppCompatButton
+import android.content.Intent
+import android.os.Bundle
+import androidx.activity.viewModels
+import com.tari.android.wallet.R
+import com.tari.android.wallet.databinding.ActivityBackgroundServiceSettingsBinding
+import com.tari.android.wallet.extension.observe
+import com.tari.android.wallet.ui.extension.ThrottleClick
+import com.tari.android.wallet.ui.viewModel.CommonActivity
 
-/**
- * Custom font enabled button.
- *
- * @author The Tari Development Team
- */
-class CustomFontButton(context: Context, attrs: AttributeSet) :
-    AppCompatButton(context, attrs) {
+class BackgroundServiceSettingsActivity :
+    CommonActivity<ActivityBackgroundServiceSettingsBinding, BackgroundServiceSettingsViewModel>() {
 
-    init {
-        if (!isInEditMode) {
-            typeface = CustomFont.getFromAttributeSet(context, attrs)
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        ui = ActivityBackgroundServiceSettingsBinding.inflate(layoutInflater)
+        setContentView(ui.root)
+
+        val viewModel: BackgroundServiceSettingsViewModel by viewModels()
+        bindViewModel(viewModel)
+
+        setupViews()
+
+        observeUI()
+    }
+
+    private fun setupViews() = with(ui) {
+        backCtaView.setOnClickListener(ThrottleClick { onBackPressed() })
+        loadingSwitchView.ui.switchView.setOnCheckedChangeListener { _, isChecked ->
+            viewModel.toggleBackgroundServiceEnable(isChecked)
+        }
+    }
+
+    private fun observeUI() = with(viewModel) {
+        observe(switchState) { ui.loadingSwitchView.setState(it) }
+    }
+
+    companion object {
+        fun launch(context: Context) {
+            context.startActivity(Intent(context, BackgroundServiceSettingsActivity::class.java))
         }
     }
 }
+

@@ -79,6 +79,7 @@ import com.tari.android.wallet.ui.extension.*
 import com.tari.android.wallet.ui.presentation.TxNote
 import com.tari.android.wallet.ui.presentation.gif.GIF
 import com.tari.android.wallet.ui.presentation.gif.GIFRepository
+import com.tari.android.wallet.ui.viewModel.CommonViewModel
 import com.tari.android.wallet.util.SharedPrefsWrapper
 import com.tari.android.wallet.util.WalletUtil
 import kotlinx.coroutines.Dispatchers
@@ -221,8 +222,8 @@ internal class TxDetailsActivity : AppCompatActivity(), ServiceConnection {
 
     private fun fetchGIFIfAttached() {
         val gifId = TxNote.fromNote(tx.message).gifId ?: return
-        val vm = ViewModelProvider(this, GIFViewModelFactory(repository, gifId))
-            .get(GIFViewModel::class.java)
+        val vm = ViewModelProvider(this)[GIFViewModel::class.java]
+        vm.onGIFFetchRequested(gifId)
         GIFView(ui.gifContainer, Glide.with(this), vm, this).displayGIF()
     }
 
@@ -610,20 +611,16 @@ internal class TxDetailsActivity : AppCompatActivity(), ServiceConnection {
         ).show()
     }
 
-    class GIFViewModelFactory(private val repository: GIFRepository, private val gifId: String) :
-        ViewModelProvider.Factory {
-        @Suppress("UNCHECKED_CAST")
-        override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-            require(modelClass === GIFViewModel::class.java) {
-                "Inappropriate ViewModel requested: ${modelClass.simpleName}"
-            }
-            return GIFViewModel(repository, gifId) as T
+    class GIFViewModel() : CommonViewModel() {
+
+        init {
+            component?.inject(this)
         }
 
-    }
+        @Inject
+        lateinit var repository: GIFRepository
 
-    private class GIFViewModel(private val repository: GIFRepository, private val gifId: String) :
-        ViewModel() {
+        private var gifId: String = ""
 
         private val _gif = MutableLiveData<GIFState>()
         val gif: LiveData<GIFState> get() = _gif
@@ -631,6 +628,11 @@ internal class TxDetailsActivity : AppCompatActivity(), ServiceConnection {
         val currentState get() = _gif.value!!
 
         init {
+            onGIFFetchRequested()
+        }
+
+        fun onGIFFetchRequested(gifId: String) {
+            this.gifId = gifId
             onGIFFetchRequested()
         }
 
@@ -647,7 +649,7 @@ internal class TxDetailsActivity : AppCompatActivity(), ServiceConnection {
         }
     }
 
-    private data class GIFState(val gif: GIF?, val error: Exception?) {
+    internal data class GIFState(val gif: GIF?, val error: Exception?) {
 
         init {
             require(gif == null || error == null) { "Both gif and error can't be nonnull" }

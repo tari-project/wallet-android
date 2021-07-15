@@ -15,7 +15,7 @@
  * 3. Neither the name of the copyright holder nor the names of
  * its contributors may be used to endorse or promote products
  * derived from this software without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND
  * CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES,
  * INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
@@ -30,23 +30,48 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.tari.android.wallet.ui.component
+package com.tari.android.wallet.ui.component.loadingSwitch
 
 import android.content.Context
 import android.util.AttributeSet
-import androidx.appcompat.widget.AppCompatButton
+import android.view.LayoutInflater
+import android.widget.FrameLayout
+import com.tari.android.wallet.databinding.ViewProgressSwitchBinding
+import com.tari.android.wallet.ui.extension.setVisible
 
-/**
- * Custom font enabled button.
- *
- * @author The Tari Development Team
- */
-class CustomFontButton(context: Context, attrs: AttributeSet) :
-    AppCompatButton(context, attrs) {
+class LoadingSwitchView : FrameLayout {
 
-    init {
-        if (!isInEditMode) {
-            typeface = CustomFont.getFromAttributeSet(context, attrs)
+    lateinit var ui: ViewProgressSwitchBinding
+
+    constructor(context: Context) : super(context) {
+        init()
+    }
+
+    constructor(context: Context, attrs: AttributeSet) : super(context, attrs) {
+        init()
+    }
+
+    constructor(context: Context, attrs: AttributeSet, defStyleAttr: Int) : super(
+        context,
+        attrs,
+        defStyleAttr
+    ) {
+        init()
+
+        setState(LoadingSwitchState(false, false))
+    }
+
+    private fun init() {
+        ui = ViewProgressSwitchBinding.inflate(LayoutInflater.from(context), this, false)
+        addView(ui.root)
+    }
+
+    fun setState(state: LoadingSwitchState) = with(ui) {
+        if (switchView.isChecked != state.isChecked) {
+            switchView.isChecked = state.isChecked
         }
+
+        switchView.setVisible(!state.isLoading)
+        progressBar.setVisible(state.isLoading)
     }
 }
