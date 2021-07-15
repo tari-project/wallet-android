@@ -55,7 +55,7 @@ import com.tari.android.wallet.infrastructure.security.biometric.BiometricAuthen
 import com.tari.android.wallet.ui.dialog.ErrorDialog
 import com.tari.android.wallet.ui.extension.*
 import com.tari.android.wallet.util.Constants
-import com.tari.android.wallet.util.SharedPrefsWrapper
+import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -68,7 +68,7 @@ import kotlin.math.min
 internal class AllSettingsFragment private constructor() : Fragment() {
 
     @Inject
-    lateinit var sharedPrefs: SharedPrefsWrapper
+    lateinit var sharedPrefs: SharedPrefsRepository
 
     @Inject
     lateinit var backupManager: BackupManager

@@ -61,7 +61,7 @@ import com.tari.android.wallet.service.WalletService
 import com.tari.android.wallet.ui.activity.home.HomeActivity
 import com.tari.android.wallet.ui.extension.*
 import com.tari.android.wallet.util.Constants
-import com.tari.android.wallet.util.SharedPrefsWrapper
+import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -76,7 +76,7 @@ internal class AuthActivity : AppCompatActivity() {
     lateinit var tracker: Tracker
 
     @Inject
-    lateinit var sharedPrefsWrapper: SharedPrefsWrapper
+    lateinit var sharedPrefsWrapper: SharedPrefsRepository
 
     @Inject
     lateinit var authService: BiometricAuthenticationService

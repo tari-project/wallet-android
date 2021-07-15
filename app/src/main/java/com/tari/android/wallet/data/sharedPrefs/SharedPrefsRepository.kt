@@ -30,7 +30,7 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.tari.android.wallet.util
+package com.tari.android.wallet.data.sharedPrefs
 
 import android.content.Context
 import android.content.SharedPreferences
@@ -38,6 +38,10 @@ import android.net.Uri
 import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
 import com.tari.android.wallet.application.Network
+import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefBigIntegerDelegate
+import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefBooleanDelegate
+import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefDateTimeDelegate
+import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefStringDelegate
 import com.tari.android.wallet.model.BaseNodeValidationResult
 import com.tari.android.wallet.service.faucet.TestnetTariUTXOKey
 import de.adorsys.android.securestoragelibrary.SecurePreferences
@@ -49,7 +53,8 @@ import java.math.BigInteger
  *
  * @author The Tari Development Team
  */
-class SharedPrefsWrapper(
+
+class SharedPrefsRepository(
     private val context: Context,
     private val sharedPrefs: SharedPreferences
 ) {
@@ -69,8 +74,7 @@ class SharedPrefsWrapper(
         const val baseNodeNameKey = "tari_wallet_base_node_name"
         const val baseNodePublicKeyHexKey = "tari_wallet_base_node_public_key_hex"
         const val baseNodeAddressKey = "tari_wallet_base_node_address"
-        const val faucetTestnetTariRequestCompleted =
-            "tari_wallet_faucet_testnet_tari_request_completed"
+        const val faucetTestnetTariRequestCompleted = "tari_wallet_faucet_testnet_tari_request_completed"
         const val testnetTariUTXOListKey = "tari_wallet_testnet_tari_utxo_key_list"
         const val firstTestnetUTXOTxId = "tari_wallet_first_testnet_utxo_tx_id"
         const val secondTestnetUTXOTxId = "tari_wallet_second_testnet_utxo_tx_id"
@@ -82,58 +86,22 @@ class SharedPrefsWrapper(
         const val network = "tari_wallet_network"
         const val isRestoredWallet = "tari_is_restored_wallet"
         const val hasVerifiedSeedWords = "tari_has_verified_seed_words"
+        const val backgroundServiceTurnedOnKey = "tari_background_service_turned_on"
     }
 
-    var publicKeyHexString: String?
-        get() = sharedPrefs.getString(Key.publicKeyHexString, null)
-        set(value) = sharedPrefs.edit().run {
-            putString(Key.publicKeyHexString, value)
-            apply()
-        }
+    var publicKeyHexString: String? by SharedPrefStringDelegate(sharedPrefs, Key.publicKeyHexString)
 
-    var isAuthenticated: Boolean
-        get() = sharedPrefs.getBoolean(Key.isAuthenticated, false)
-        set(value) = sharedPrefs.edit().run {
-            putBoolean(Key.isAuthenticated, value)
-            apply()
-        }
+    var isAuthenticated: Boolean by SharedPrefBooleanDelegate(sharedPrefs, Key.isAuthenticated)
 
-    var emojiId: String?
-        get() = sharedPrefs.getString(Key.emojiId, null)
-        set(value) = sharedPrefs.edit().run {
-            putString(Key.emojiId, value)
-            apply()
-        }
+    var emojiId: String? by SharedPrefStringDelegate(sharedPrefs, Key.emojiId)
 
-    var onboardingStarted: Boolean
-        get() = sharedPrefs.getBoolean(Key.onboardingStarted, false)
-        set(value) = sharedPrefs.edit().run {
-            putBoolean(Key.onboardingStarted, value)
-            apply()
-        }
+    var onboardingStarted: Boolean by SharedPrefBooleanDelegate(sharedPrefs, Key.onboardingStarted)
 
-    var onboardingCompleted: Boolean
-        get() = sharedPrefs.getBoolean(Key.onboardingCompleted, false)
-        set(value) = sharedPrefs.edit().run {
-            putBoolean(Key.onboardingCompleted, value)
-            apply()
-        }
+    var onboardingCompleted: Boolean by SharedPrefBooleanDelegate(sharedPrefs, Key.onboardingCompleted)
 
-    var onboardingAuthSetupStarted: Boolean
-        get() = sharedPrefs.getBoolean(Key.onboardingAuthSetupStarted, false)
-        set(value) = sharedPrefs.edit().run {
-            putBoolean(Key.onboardingAuthSetupStarted, value)
-            apply()
-        }
+    var onboardingAuthSetupStarted: Boolean by SharedPrefBooleanDelegate(sharedPrefs, Key.onboardingAuthSetupStarted)
 
-
-    var onboardingAuthSetupCompleted: Boolean
-        get() = sharedPrefs.getBoolean(Key.onboardingAuthSetupCompleted, false)
-        set(value) = sharedPrefs.edit().run {
-            putBoolean(Key.onboardingAuthSetupCompleted, value)
-            apply()
-        }
-
+    var onboardingAuthSetupCompleted: Boolean by SharedPrefBooleanDelegate(sharedPrefs, Key.onboardingAuthSetupCompleted)
 
     val onboardingAuthWasInterrupted: Boolean
         get() = onboardingAuthSetupStarted && !onboardingAuthSetupCompleted
@@ -141,19 +109,9 @@ class SharedPrefsWrapper(
     val onboardingWasInterrupted: Boolean
         get() = onboardingStarted && !onboardingCompleted
 
-    var onboardingDisplayedAtHome: Boolean
-        get() = sharedPrefs.getBoolean(Key.onboardingDisplayedAtHome, false)
-        set(value) = sharedPrefs.edit().run {
-            putBoolean(Key.onboardingDisplayedAtHome, value)
-            apply()
-        }
+    var onboardingDisplayedAtHome: Boolean by SharedPrefBooleanDelegate(sharedPrefs, Key.onboardingDisplayedAtHome)
 
-    var torBinPath: String?
-        get() = sharedPrefs.getString(Key.torBinPath, null)
-        set(value) = sharedPrefs.edit().run {
-            putString(Key.torBinPath, value)
-            apply()
-        }
+    var torBinPath: String? by SharedPrefStringDelegate(sharedPrefs, Key.torBinPath)
 
     var baseNodeLastSyncResult: BaseNodeValidationResult?
         get() = try {
@@ -166,40 +124,15 @@ class SharedPrefsWrapper(
             apply()
         }
 
-    var baseNodeIsUserCustom: Boolean
-        get() = sharedPrefs.getBoolean(Key.baseNodeIsUserCustom, false)
-        set(value) = sharedPrefs.edit().run {
-            putBoolean(Key.baseNodeIsUserCustom, value)
-            apply()
-        }
+    var baseNodeIsUserCustom: Boolean by SharedPrefBooleanDelegate(sharedPrefs, Key.baseNodeIsUserCustom)
 
-    var baseNodeName: String?
-        get() = sharedPrefs.getString(Key.baseNodeNameKey, null)
-        set(value) = sharedPrefs.edit().run {
-            putString(Key.baseNodeNameKey, value)
-            apply()
-        }
+    var baseNodeName: String? by SharedPrefStringDelegate(sharedPrefs, Key.baseNodeNameKey)
 
-    var baseNodePublicKeyHex: String?
-        get() = sharedPrefs.getString(Key.baseNodePublicKeyHexKey, null)
-        set(value) = sharedPrefs.edit().run {
-            putString(Key.baseNodePublicKeyHexKey, value)
-            apply()
-        }
+    var baseNodePublicKeyHex: String? by SharedPrefStringDelegate(sharedPrefs, Key.baseNodePublicKeyHexKey)
 
-    var baseNodeAddress: String?
-        get() = sharedPrefs.getString(Key.baseNodeAddressKey, null)
-        set(value) = sharedPrefs.edit().run {
-            putString(Key.baseNodeAddressKey, value)
-            apply()
-        }
+    var baseNodeAddress: String? by SharedPrefStringDelegate(sharedPrefs, Key.baseNodeAddressKey)
 
-    var faucetTestnetTariRequestCompleted: Boolean
-        get() = sharedPrefs.getBoolean(Key.faucetTestnetTariRequestCompleted, false)
-        set(value) = sharedPrefs.edit().run {
-            putBoolean(Key.faucetTestnetTariRequestCompleted, value)
-            apply()
-        }
+    var faucetTestnetTariRequestCompleted: Boolean by SharedPrefBooleanDelegate(sharedPrefs, Key.faucetTestnetTariRequestCompleted)
 
     var testnetTariUTXOKeyList: List<TestnetTariUTXOKey>
         get() {
@@ -212,47 +145,15 @@ class SharedPrefsWrapper(
             apply()
         }
 
-    var firstTestnetUTXOTxId: BigInteger?
-        get() = sharedPrefs.getString(Key.firstTestnetUTXOTxId, null)?.run(::BigInteger)
-        set(value) = value?.let { v ->
-            sharedPrefs.edit().run {
-                putString(Key.firstTestnetUTXOTxId, v.toString())
-                apply()
-            }
-        } ?: Unit
+    var firstTestnetUTXOTxId: BigInteger? by SharedPrefBigIntegerDelegate(sharedPrefs, Key.firstTestnetUTXOTxId)
 
-    var secondTestnetUTXOTxId: BigInteger?
-        get() = sharedPrefs.getString(Key.secondTestnetUTXOTxId, null)?.run(::BigInteger)
-        set(value) = value?.let { v ->
-            sharedPrefs.edit().run {
-                putString(Key.secondTestnetUTXOTxId, v.toString())
-                apply()
-            }
-        } ?: Unit
+    var secondTestnetUTXOTxId: BigInteger? by SharedPrefBigIntegerDelegate(sharedPrefs, Key.secondTestnetUTXOTxId)
 
-    var lastSuccessfulBackupDate: DateTime?
-        get() = sharedPrefs.getLong(Key.lastSuccessfulBackupDate, -1L)
-            .let { if (it == -1L) null else DateTime(it) }
-        set(value) = sharedPrefs.edit().apply {
-            if (value == null) remove(Key.lastSuccessfulBackupDate)
-            else putLong(Key.lastSuccessfulBackupDate, value.millis)
-        }.apply()
+    var lastSuccessfulBackupDate: DateTime? by SharedPrefDateTimeDelegate(sharedPrefs, Key.lastSuccessfulBackupDate)
 
-    var backupFailureDate: DateTime?
-        get() = sharedPrefs.getLong(Key.backupFailureDate, -1L)
-            .let { if (it == -1L) null else DateTime(it) }
-        set(value) = sharedPrefs.edit().apply {
-            if (value == null) remove(Key.backupFailureDate)
-            else putLong(Key.backupFailureDate, value.millis)
-        }.apply()
+    var backupFailureDate: DateTime? by SharedPrefDateTimeDelegate(sharedPrefs, Key.backupFailureDate)
 
-    var scheduledBackupDate: DateTime?
-        get() = sharedPrefs.getLong(Key.scheduledBackupDate, -1L)
-            .let { if (it == -1L) null else DateTime(it) }
-        set(value) = sharedPrefs.edit().apply {
-            if (value == null) remove(Key.scheduledBackupDate)
-            else putLong(Key.scheduledBackupDate, value.millis)
-        }.apply()
+    var scheduledBackupDate: DateTime? by SharedPrefDateTimeDelegate(sharedPrefs, Key.scheduledBackupDate)
 
     val backupIsEnabled: Boolean
         get() = (lastSuccessfulBackupDate != null)
@@ -281,19 +182,11 @@ class SharedPrefsWrapper(
             apply()
         }
 
-    var isRestoredWallet: Boolean
-        get() = sharedPrefs.getBoolean(Key.isRestoredWallet, false)
-        set(value) = sharedPrefs.edit().run {
-            putBoolean(Key.isRestoredWallet, value)
-            apply()
-        }
+    var isRestoredWallet: Boolean by SharedPrefBooleanDelegate(sharedPrefs, Key.isRestoredWallet)
 
-    var hasVerifiedSeedWords: Boolean
-        get() = sharedPrefs.getBoolean(Key.hasVerifiedSeedWords, false)
-        set(value) = sharedPrefs.edit().run {
-            putBoolean(Key.hasVerifiedSeedWords, value)
-            apply()
-        }
+    var hasVerifiedSeedWords: Boolean by SharedPrefBooleanDelegate(sharedPrefs, Key.hasVerifiedSeedWords)
+
+    var backgroundServiceTurnedOn: Boolean by SharedPrefBooleanDelegate(sharedPrefs, Key.backgroundServiceTurnedOnKey, true)
 
     init {
         // for migration purposes, to avoid a second redundant faucet call:

@@ -1,4 +1,4 @@
-package com.tari.android.wallet.ui.viewModel
+package com.tari.android.wallet.ui.common
 
 import android.content.Intent
 import android.net.Uri

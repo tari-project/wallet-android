@@ -34,7 +34,6 @@ package com.tari.android.wallet.application
 
 import android.app.Activity
 import android.app.Application
-import android.content.Context
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.OnLifecycleEvent
@@ -50,7 +49,7 @@ import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.infrastructure.Tracker
 import com.tari.android.wallet.network.NetworkConnectionStateReceiver
 import com.tari.android.wallet.notification.NotificationHelper
-import com.tari.android.wallet.util.SharedPrefsWrapper
+import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import net.danlew.android.joda.JodaTimeAndroid
 import java.lang.ref.WeakReference
 import javax.inject.Inject
@@ -75,7 +74,7 @@ internal class TariWalletApplication : Application(), LifecycleObserver {
     lateinit var connectionStateReceiver: NetworkConnectionStateReceiver
 
     lateinit var appComponent: ApplicationComponent
-    private lateinit var sharedPrefsWrapper: SharedPrefsWrapper
+    private lateinit var sharedPrefsWrapper: SharedPrefsRepository
     private val sharedPrefsFileName = "tari_wallet_shared_prefs"
     private val activityLifecycleCallbacks = ActivityLifecycleCallbacks()
     var isInForeground = false
@@ -97,11 +96,11 @@ internal class TariWalletApplication : Application(), LifecycleObserver {
         registerActivityLifecycleCallbacks(activityLifecycleCallbacks)
         Logger.addLogAdapter(AndroidLogAdapter())
         JodaTimeAndroid.init(this)
-        sharedPrefsWrapper = SharedPrefsWrapper(
+        sharedPrefsWrapper = SharedPrefsRepository(
             this,
             getSharedPreferences(
                 sharedPrefsFileName,
-                Context.MODE_PRIVATE
+                MODE_PRIVATE
             )
         )
         appComponent = initDagger(this)

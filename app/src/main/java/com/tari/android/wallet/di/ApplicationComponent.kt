@@ -66,8 +66,9 @@ import com.tari.android.wallet.ui.fragment.settings.backup.ChangeSecurePasswordF
 import com.tari.android.wallet.ui.fragment.settings.backup.EnterCurrentPasswordFragment
 import com.tari.android.wallet.ui.fragment.settings.backup.VerifySeedPhraseFragment
 import com.tari.android.wallet.ui.fragment.tx.TxListFragment
-import com.tari.android.wallet.ui.viewModel.CommonViewModel
-import com.tari.android.wallet.util.SharedPrefsWrapper
+import com.tari.android.wallet.ui.common.CommonViewModel
+import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
+import com.tari.android.wallet.ui.fragment.settings.backgroundService.BackgroundServiceSettingsViewModel
 import dagger.Component
 import java.io.File
 import javax.inject.Singleton
@@ -95,7 +96,7 @@ internal interface ApplicationComponent {
 
     val workingDir: File
 
-    val sharedPrefsWrapper: SharedPrefsWrapper
+    val sharedPrefsWrapper: SharedPrefsRepository
 
     val authenticationService: BiometricAuthenticationService
 
@@ -155,6 +156,7 @@ internal interface ApplicationComponent {
     fun inject(commonViewModel: CommonViewModel)
     fun inject(thumbnailGIFsViewModel: AddNoteFragment.ThumbnailGIFsViewModel)
     fun inject(gifViewModel: TxDetailsActivity.GIFViewModel)
+    fun inject(backgroundServiceSettingsViewModel: BackgroundServiceSettingsViewModel)
     /**
      * Service(s).
      */

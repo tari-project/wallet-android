@@ -79,8 +79,8 @@ import com.tari.android.wallet.ui.extension.*
 import com.tari.android.wallet.ui.presentation.TxNote
 import com.tari.android.wallet.ui.presentation.gif.GIF
 import com.tari.android.wallet.ui.presentation.gif.GIFRepository
-import com.tari.android.wallet.ui.viewModel.CommonViewModel
-import com.tari.android.wallet.util.SharedPrefsWrapper
+import com.tari.android.wallet.ui.common.CommonViewModel
+import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import com.tari.android.wallet.util.WalletUtil
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -118,7 +118,7 @@ internal class TxDetailsActivity : AppCompatActivity(), ServiceConnection {
     lateinit var tracker: Tracker
 
     @Inject
-    lateinit var sharedPrefsWrapper: SharedPrefsWrapper
+    lateinit var sharedPrefsWrapper: SharedPrefsRepository
 
     @Inject
     lateinit var repository: GIFRepository

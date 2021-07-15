@@ -43,13 +43,13 @@ import com.tari.android.wallet.ui.extension.appComponent
 import com.tari.android.wallet.ui.fragment.restore.ChooseRestoreOptionFragment
 import com.tari.android.wallet.ui.fragment.restore.EnterRestorationPasswordFragment
 import com.tari.android.wallet.ui.fragment.restore.WalletRestoringFragment
-import com.tari.android.wallet.util.SharedPrefsWrapper
+import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import javax.inject.Inject
 
 class WalletRestoreActivity : AppCompatActivity(), WalletRestoreRouter {
 
     @Inject
-    lateinit var prefs: SharedPrefsWrapper
+    lateinit var prefs: SharedPrefsRepository
 
     override fun onCreate(savedInstanceState: Bundle?) {
         appComponent.inject(this)

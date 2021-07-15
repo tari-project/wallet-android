@@ -42,7 +42,7 @@ import com.tari.android.wallet.application.TariWalletApplication
 import com.tari.android.wallet.infrastructure.GiphyEcosystem
 import com.tari.android.wallet.infrastructure.security.biometric.BiometricAuthenticationService
 import com.tari.android.wallet.notification.NotificationHelper
-import com.tari.android.wallet.util.SharedPrefsWrapper
+import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import dagger.Module
 import dagger.Provides
 import java.io.File
@@ -56,7 +56,7 @@ import javax.inject.Singleton
 @Module
 internal class ApplicationModule(
     private val app: TariWalletApplication,
-    private val sharedPrefsWrapper: SharedPrefsWrapper
+    private val sharedPrefsWrapper: SharedPrefsRepository
 ) {
     @Provides
     @Singleton
@@ -72,7 +72,7 @@ internal class ApplicationModule(
 
     @Provides
     @Singleton
-    fun provideSharedPrefsWrapper(): SharedPrefsWrapper = sharedPrefsWrapper
+    fun provideSharedPrefsWrapper(): SharedPrefsRepository = sharedPrefsWrapper
 
     @Provides
     @Singleton

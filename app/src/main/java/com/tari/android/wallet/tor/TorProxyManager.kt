@@ -36,7 +36,7 @@ import android.app.Service
 import android.content.Context
 import com.orhanobut.logger.Logger
 import com.tari.android.wallet.event.EventBus
-import com.tari.android.wallet.util.SharedPrefsWrapper
+import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import io.reactivex.Observable
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
@@ -54,7 +54,7 @@ import java.util.concurrent.TimeUnit
  */
 internal class TorProxyManager(
     private val context: Context,
-    private val sharedPrefsWrapper: SharedPrefsWrapper,
+    private val sharedPrefsWrapper: SharedPrefsRepository,
     private val torConfig: TorConfig
 ) {
 

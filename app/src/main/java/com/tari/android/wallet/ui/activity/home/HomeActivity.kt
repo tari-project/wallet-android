@@ -78,7 +78,7 @@ import com.tari.android.wallet.ui.fragment.settings.backgroundService.Background
 import com.tari.android.wallet.ui.fragment.store.StoreFragment
 import com.tari.android.wallet.ui.fragment.tx.TxListFragment
 import com.tari.android.wallet.util.Constants
-import com.tari.android.wallet.util.SharedPrefsWrapper
+import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -87,7 +87,7 @@ internal class HomeActivity : AppCompatActivity(), AllSettingsFragment.AllSettin
     TxListFragment.TxListRouter {
 
     @Inject
-    lateinit var sharedPrefsWrapper: SharedPrefsWrapper
+    lateinit var sharedPrefsWrapper: SharedPrefsRepository
 
     @Inject
     lateinit var giphy: GiphyEcosystem

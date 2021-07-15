@@ -64,7 +64,7 @@ import com.tari.android.wallet.service.notification.NotificationService
 import com.tari.android.wallet.ui.activity.home.HomeActivity
 import com.tari.android.wallet.ui.extension.string
 import com.tari.android.wallet.util.Constants
-import com.tari.android.wallet.util.SharedPrefsWrapper
+import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import com.tari.android.wallet.util.WalletUtil
 import io.reactivex.Observable
 import io.reactivex.disposables.Disposable
@@ -159,7 +159,7 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
     lateinit var notificationHelper: NotificationHelper
 
     @Inject
-    lateinit var sharedPrefsWrapper: SharedPrefsWrapper
+    lateinit var sharedPrefsWrapper: SharedPrefsRepository
 
     @Inject
     lateinit var walletManager: WalletManager

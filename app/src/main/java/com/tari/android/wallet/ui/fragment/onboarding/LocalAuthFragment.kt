@@ -59,7 +59,7 @@ import com.tari.android.wallet.infrastructure.security.biometric.BiometricAuthen
 import com.tari.android.wallet.infrastructure.security.biometric.BiometricAuthenticationService.BiometricAuthenticationType.*
 import com.tari.android.wallet.ui.extension.*
 import com.tari.android.wallet.util.Constants.UI.Auth
-import com.tari.android.wallet.util.SharedPrefsWrapper
+import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -71,7 +71,7 @@ import javax.inject.Inject
 internal class LocalAuthFragment : Fragment() {
 
     @Inject
-    lateinit var sharedPrefsWrapper: SharedPrefsWrapper
+    lateinit var sharedPrefsWrapper: SharedPrefsRepository
 
     @Inject
     lateinit var tracker: Tracker

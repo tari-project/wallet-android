@@ -96,7 +96,7 @@ import com.tari.android.wallet.ui.presentation.TxNote
 import com.tari.android.wallet.ui.presentation.gif.GIF
 import com.tari.android.wallet.ui.presentation.gif.GIFRepository
 import com.tari.android.wallet.ui.presentation.gif.Placeholder
-import com.tari.android.wallet.ui.viewModel.CommonViewModel
+import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.Constants.UI.AddNoteAndSend
 import io.reactivex.android.schedulers.AndroidSchedulers

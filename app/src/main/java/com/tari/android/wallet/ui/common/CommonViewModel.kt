@@ -1,4 +1,4 @@
-package com.tari.android.wallet.ui.viewModel
+package com.tari.android.wallet.ui.common
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
