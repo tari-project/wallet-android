@@ -35,6 +35,8 @@ package com.tari.android.wallet.di
 import android.app.KeyguardManager
 import android.content.ClipboardManager
 import android.content.Context
+import android.content.Context.MODE_PRIVATE
+import android.content.SharedPreferences
 import androidx.biometric.BiometricManager
 import androidx.core.content.ContextCompat
 import com.tari.android.wallet.BuildConfig
@@ -55,8 +57,7 @@ import javax.inject.Singleton
  */
 @Module
 internal class ApplicationModule(
-    private val app: TariWalletApplication,
-    private val sharedPrefsWrapper: SharedPrefsRepository
+    private val app: TariWalletApplication
 ) {
     @Provides
     @Singleton
@@ -72,7 +73,16 @@ internal class ApplicationModule(
 
     @Provides
     @Singleton
-    fun provideSharedPrefsWrapper(): SharedPrefsRepository = sharedPrefsWrapper
+    fun provideSharedPrefs() : SharedPreferences = app.getSharedPreferences(
+        sharedPrefsFileName,
+        MODE_PRIVATE
+    )
+
+    @Provides
+    @Singleton
+    fun provideSharedPrefsRepository(context: Context, prefs: SharedPreferences) : SharedPrefsRepository {
+        return SharedPrefsRepository(context, prefs)
+    }
 
     @Provides
     @Singleton
@@ -97,4 +107,7 @@ internal class ApplicationModule(
     fun provideGiphyEcosystem(context: Context): GiphyEcosystem =
         GiphyEcosystem(context, BuildConfig.GIPHY_KEY)
 
+    companion object {
+        private const val sharedPrefsFileName = "tari_wallet_shared_prefs"
+    }
 }

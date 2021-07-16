@@ -70,6 +70,7 @@ import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import com.tari.android.wallet.ui.fragment.settings.backgroundService.BackgroundServiceSettingsViewModel
 import dagger.Component
+import dagger.Provides
 import java.io.File
 import javax.inject.Singleton
 
@@ -90,6 +91,7 @@ import javax.inject.Singleton
         PresentationModule::class
     ]
 )
+
 internal interface ApplicationComponent {
 
     val context: Context

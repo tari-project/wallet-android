@@ -47,6 +47,7 @@ import com.tari.android.wallet.service.faucet.TestnetTariUTXOKey
 import de.adorsys.android.securestoragelibrary.SecurePreferences
 import org.joda.time.DateTime
 import java.math.BigInteger
+import javax.inject.Inject
 
 /**
  * Provides easy access to the shared preferences.

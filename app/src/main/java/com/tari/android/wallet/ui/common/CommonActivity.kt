@@ -16,6 +16,8 @@ abstract class CommonActivity<Binding : ViewBinding, VM : CommonViewModel> :
     protected lateinit var viewModel: VM
 
     fun bindViewModel(viewModel: VM) = with(viewModel) {
+        this@CommonActivity.viewModel = viewModel
+
         observe(openLink) { startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(it))) }
     }
 

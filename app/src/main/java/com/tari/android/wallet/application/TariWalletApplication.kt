@@ -65,17 +65,20 @@ internal class TariWalletApplication : Application(), LifecycleObserver {
     @Inject
     @Named(WalletModule.FieldName.walletFilesDirPath)
     lateinit var walletFilesDirPath: String
+
     @Inject
     lateinit var notificationHelper: NotificationHelper
+
     @Inject
     lateinit var tracker: Tracker
 
     @Inject
     lateinit var connectionStateReceiver: NetworkConnectionStateReceiver
 
+    @Inject
+    lateinit var sharedPrefsRepository: SharedPrefsRepository
+
     lateinit var appComponent: ApplicationComponent
-    private lateinit var sharedPrefsWrapper: SharedPrefsRepository
-    private val sharedPrefsFileName = "tari_wallet_shared_prefs"
     private val activityLifecycleCallbacks = ActivityLifecycleCallbacks()
     var isInForeground = false
         private set
@@ -85,9 +88,7 @@ internal class TariWalletApplication : Application(), LifecycleObserver {
     }
 
     val currentActivity: Activity?
-        get() {
-            return activityLifecycleCallbacks.currentActivity
-        }
+        get() = activityLifecycleCallbacks.currentActivity
 
     override fun onCreate() {
         super.onCreate()
@@ -96,13 +97,7 @@ internal class TariWalletApplication : Application(), LifecycleObserver {
         registerActivityLifecycleCallbacks(activityLifecycleCallbacks)
         Logger.addLogAdapter(AndroidLogAdapter())
         JodaTimeAndroid.init(this)
-        sharedPrefsWrapper = SharedPrefsRepository(
-            this,
-            getSharedPreferences(
-                sharedPrefsFileName,
-                MODE_PRIVATE
-            )
-        )
+
         appComponent = initDagger(this)
         appComponent.inject(this)
 
@@ -111,7 +106,7 @@ internal class TariWalletApplication : Application(), LifecycleObserver {
         ProcessLifecycleOwner.get().lifecycle.addObserver(this)
 
         // user should authenticate every time the app starts up
-        sharedPrefsWrapper.isAuthenticated = false
+        sharedPrefsRepository.isAuthenticated = false
 
         registerReceiver(connectionStateReceiver, connectionStateReceiver.intentFilter)
 
@@ -121,7 +116,7 @@ internal class TariWalletApplication : Application(), LifecycleObserver {
 
     private fun initDagger(app: TariWalletApplication): ApplicationComponent =
         DaggerApplicationComponent.builder()
-            .applicationModule(ApplicationModule(app, sharedPrefsWrapper))
+            .applicationModule(ApplicationModule(app))
             .build()
 
     @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
