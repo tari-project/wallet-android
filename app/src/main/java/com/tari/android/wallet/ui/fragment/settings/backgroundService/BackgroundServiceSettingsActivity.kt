@@ -46,6 +46,7 @@ class BackgroundServiceSettingsActivity :
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         ui = ActivityBackgroundServiceSettingsBinding.inflate(layoutInflater)
         setContentView(ui.root)
 
@@ -59,9 +60,7 @@ class BackgroundServiceSettingsActivity :
 
     private fun setupViews() = with(ui) {
         backCtaView.setOnClickListener(ThrottleClick { onBackPressed() })
-        loadingSwitchView.ui.switchView.setOnCheckedChangeListener { _, isChecked ->
-            viewModel.toggleBackgroundServiceEnable(isChecked)
-        }
+        loadingSwitchView.setOnCheckedChangeListener { viewModel.toggleBackgroundServiceEnable(it) }
     }
 
     private fun observeUI() = with(viewModel) {

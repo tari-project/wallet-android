@@ -7,6 +7,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.viewbinding.ViewBinding
 import com.tari.android.wallet.R
 import com.tari.android.wallet.extension.observe
+import com.tari.android.wallet.ui.dialog.confirm.ConfirmDialog
 
 abstract class CommonActivity<Binding : ViewBinding, VM : CommonViewModel> :
     AppCompatActivity() {
@@ -19,6 +20,8 @@ abstract class CommonActivity<Binding : ViewBinding, VM : CommonViewModel> :
         this@CommonActivity.viewModel = viewModel
 
         observe(openLink) { startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(it))) }
+
+        observe(confirmDialog) { ConfirmDialog(this@CommonActivity, it).show() }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

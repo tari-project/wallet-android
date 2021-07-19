@@ -65,6 +65,9 @@ import com.tari.android.wallet.ui.activity.home.HomeActivity
 import com.tari.android.wallet.ui.extension.string
 import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
+import com.tari.android.wallet.service.WalletServiceLauncher.Companion.startAction
+import com.tari.android.wallet.service.WalletServiceLauncher.Companion.stopAction
+import com.tari.android.wallet.service.WalletServiceLauncher.Companion.stopAndDeleteAction
 import com.tari.android.wallet.util.WalletUtil
 import io.reactivex.Observable
 import io.reactivex.disposables.Disposable
@@ -96,50 +99,6 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
         object KeyValueStorageKeys {
             const val NETWORK = "SU7FM2O6Q3BU4XVN7HDD"
         }
-
-        // intent actions
-        private const val startAction = "START_SERVICE"
-        private const val stopAction = "STOP_SERVICE"
-        private const val stopAndDeleteAction = "STOP_SERVICE_AND_DELETE_WALLET"
-
-        fun start(context: Context) {
-            ContextCompat.startForegroundService(
-                context,
-                getStartIntent(context)
-            )
-        }
-
-        fun stop(context: Context) {
-            ContextCompat.startForegroundService(
-                context,
-                getStopIntent(context)
-            )
-        }
-
-        /**
-         * Deletes the wallet and stops the wallet service.
-         */
-        fun stopAndDelete(context: Context) {
-            ContextCompat.startForegroundService(
-                context,
-                getStopAndDeleteIntent(context)
-            )
-        }
-
-        private fun getStartIntent(context: Context) =
-            Intent(context, WalletService::class.java).also {
-                it.action = startAction
-            }
-
-        private fun getStopIntent(context: Context) =
-            Intent(context, WalletService::class.java).also {
-                it.action = stopAction
-            }
-
-        private fun getStopAndDeleteIntent(context: Context) =
-            Intent(context, WalletService::class.java).also {
-                it.action = stopAndDeleteAction
-            }
     }
 
     @Inject

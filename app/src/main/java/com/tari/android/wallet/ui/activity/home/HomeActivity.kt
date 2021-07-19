@@ -79,6 +79,7 @@ import com.tari.android.wallet.ui.fragment.store.StoreFragment
 import com.tari.android.wallet.ui.fragment.tx.TxListFragment
 import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
+import com.tari.android.wallet.service.WalletServiceLauncher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -88,6 +89,9 @@ internal class HomeActivity : AppCompatActivity(), AllSettingsFragment.AllSettin
 
     @Inject
     lateinit var sharedPrefsWrapper: SharedPrefsRepository
+
+    @Inject
+    lateinit var walletServiceLauncher: WalletServiceLauncher
 
     @Inject
     lateinit var giphy: GiphyEcosystem
@@ -257,7 +261,7 @@ internal class HomeActivity : AppCompatActivity(), AllSettingsFragment.AllSettin
         // delete wallet
         goToSplashScreen()
         lifecycleScope.launch(Dispatchers.IO) {
-            WalletService.stopAndDelete(applicationContext)
+            walletServiceLauncher.stopAndDelete()
         }
     }
 

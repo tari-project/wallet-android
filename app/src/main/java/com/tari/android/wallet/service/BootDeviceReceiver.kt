@@ -49,9 +49,8 @@ class BootDeviceReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context?, intent: Intent?) {
         if (context == null || intent == null) return
         Logger.d("Boot device broadcast received.")
-        if (WalletUtil.walletExists(context.applicationContext)
-            && Intent.ACTION_BOOT_COMPLETED == intent.action) {
-            WalletService.start(context)
+        if (Intent.ACTION_BOOT_COMPLETED == intent.action) {
+            WalletServiceLauncher(context).startIfExist()
         }
     }
 }

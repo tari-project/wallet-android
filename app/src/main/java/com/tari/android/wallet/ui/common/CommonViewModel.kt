@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.tari.android.wallet.application.TariWalletApplication
 import com.tari.android.wallet.di.ApplicationComponent
+import com.tari.android.wallet.ui.dialog.confirm.ConfirmDialogArgs
 
 open class CommonViewModel : ViewModel() {
 
@@ -15,6 +16,9 @@ open class CommonViewModel : ViewModel() {
         component?.inject(this)
     }
 
-    private val _openLink = MutableLiveData<String>()
+    protected val _openLink = SingleLiveEvent<String>()
     val openLink: LiveData<String> = _openLink
+
+    protected val _confirmDialog = SingleLiveEvent<ConfirmDialogArgs>()
+    val confirmDialog: LiveData<ConfirmDialogArgs> = _confirmDialog
 }

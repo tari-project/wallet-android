@@ -47,6 +47,7 @@ import com.tari.android.wallet.ui.fragment.onboarding.LocalAuthFragment
 import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.Constants.UI.CreateWallet
 import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
+import com.tari.android.wallet.service.WalletServiceLauncher
 import com.tari.android.wallet.util.WalletUtil
 import javax.inject.Inject
 import javax.inject.Named
@@ -62,8 +63,12 @@ internal class OnboardingFlowActivity : AppCompatActivity(), IntroductionFragmen
     @Inject
     @Named(WalletModule.FieldName.walletFilesDirPath)
     lateinit var walletFilesDirPath: String
+
     @Inject
     internal lateinit var sharedPrefsWrapper: SharedPrefsRepository
+
+    @Inject
+    internal lateinit var walletServiceLauncher: WalletServiceLauncher
 
     private val uiHandler = Handler()
 
@@ -80,7 +85,7 @@ internal class OnboardingFlowActivity : AppCompatActivity(), IntroductionFragmen
             }
             sharedPrefsWrapper.onboardingWasInterrupted -> {
                 // start wallet service
-                WalletService.start(applicationContext)
+                walletServiceLauncher.start()
                 // clean existing files & restart onboarding
                 WalletUtil.clearWalletFiles(walletFilesDirPath)
                 supportFragmentManager

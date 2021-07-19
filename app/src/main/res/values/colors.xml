@@ -17,6 +17,7 @@
     <color name="disabled_cta">@color/dark_gray</color>
     <color name="tx_status">#FFEC9C00</color>
 
+
     <!-- common gradient button -->
     <color name="gradient_btn_start">#7300ff</color>
     <color name="gradient_btn_center">#8E31FF</color>
@@ -25,6 +26,7 @@
     <!-- common function -->
     <color name="scroll_height_gradient_start_gray">#30000000</color>
     <color name="scroll_height_gradient_mid_gray">#10000000</color>
+    <color name="common_progress_bar">#B2B2B2</color>
     <color name="common_error">#D32C44</color>
 
     <!-- dialog -->
