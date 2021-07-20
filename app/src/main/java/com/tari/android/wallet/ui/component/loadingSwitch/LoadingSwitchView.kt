@@ -74,6 +74,7 @@ class LoadingSwitchView : FrameLayout {
 
     fun setOnCheckedChangeListener(listener: (boolean: Boolean) -> Unit) {
         isCheckedChangeListener = listener
+        ui.switchView.setOnCheckedChangeListener { _, isChecked -> isCheckedChangeListener.invoke(isChecked) }
     }
 
     fun setState(state: LoadingSwitchState) = with(ui) {

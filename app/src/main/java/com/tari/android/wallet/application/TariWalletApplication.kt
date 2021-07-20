@@ -50,6 +50,7 @@ import com.tari.android.wallet.infrastructure.Tracker
 import com.tari.android.wallet.network.NetworkConnectionStateReceiver
 import com.tari.android.wallet.notification.NotificationHelper
 import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
+import com.tari.android.wallet.service.WalletServiceLauncher
 import net.danlew.android.joda.JodaTimeAndroid
 import java.lang.ref.WeakReference
 import javax.inject.Inject
@@ -77,6 +78,9 @@ internal class TariWalletApplication : Application(), LifecycleObserver {
 
     @Inject
     lateinit var sharedPrefsRepository: SharedPrefsRepository
+
+    @Inject
+    lateinit var walletServiceLauncher: WalletServiceLauncher
 
     lateinit var appComponent: ApplicationComponent
     private val activityLifecycleCallbacks = ActivityLifecycleCallbacks()
@@ -123,6 +127,7 @@ internal class TariWalletApplication : Application(), LifecycleObserver {
     fun onAppBackgrounded() {
         Logger.d("App in background.")
         isInForeground = false
+        walletServiceLauncher.stopOnAppBackgrounded()
         EventBus.post(Event.App.AppBackgrounded())
     }
 
@@ -130,8 +135,10 @@ internal class TariWalletApplication : Application(), LifecycleObserver {
     fun onAppForegrounded() {
         Logger.d("App in foreground.")
         isInForeground = true
+        walletServiceLauncher.startOnAppForegrounded()
         EventBus.post(Event.App.AppForegrounded())
     }
+
 
     companion object {
 

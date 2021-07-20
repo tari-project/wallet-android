@@ -86,11 +86,12 @@ internal class ApplicationModule(
 
     @Provides
     @Singleton
-    fun provideResourceManager(context: Context) : ResourceManager = ResourceManager(context)
+    fun provideResourceManager(context: Context): ResourceManager = ResourceManager(context)
 
     @Provides
     @Singleton
-    fun provideWalletServiceLauncher(context: Context): WalletServiceLauncher = WalletServiceLauncher(context)
+    fun provideWalletServiceLauncher(context: Context, prefsRepository: SharedPrefsRepository): WalletServiceLauncher =
+        WalletServiceLauncher(prefsRepository, context)
 
     @Provides
     @Singleton
@@ -116,6 +117,6 @@ internal class ApplicationModule(
         GiphyEcosystem(context, BuildConfig.GIPHY_KEY)
 
     companion object {
-        private const val sharedPrefsFileName = "tari_wallet_shared_prefs"
+        const val sharedPrefsFileName = "tari_wallet_shared_prefs"
     }
 }

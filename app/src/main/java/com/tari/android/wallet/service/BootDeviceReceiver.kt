@@ -35,9 +35,7 @@ package com.tari.android.wallet.service
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import androidx.core.content.ContextCompat
 import com.orhanobut.logger.Logger
-import com.tari.android.wallet.util.WalletUtil
 
 /**
  * This receiver is responsible for starting the service after boot finish.
