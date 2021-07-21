@@ -337,7 +337,7 @@
 
     <!-- Background service -->
     <string name="background_service_title">Background service</string>
-    <string name="background_service_warning_text">Background service allow us to communicate with base node, get updates and messages. It\'s could be a reason adversely affect battery life</string>
+    <string name="background_service_warning_text">The background service allow us to connect to a Tari node and receive updates and messages while you\'re doing other things on your phone. This is great for not missing any payments, but it does hurt your battery life. If you want to reduce battery strain and don\'t mind having Aurora in the foreground to keep your wallet up to date, then turn this setting off.</string>
     <string name="background_service_button_title">Allow Tari to receive transactions and notifications in the background</string>
     <string name="background_service_button_confirmation_title">Background service will be turned off</string>
     <string name="background_service_button_confirmation_description">You will not get any notifications and updates. Are you sure you want to proceed?</string>
