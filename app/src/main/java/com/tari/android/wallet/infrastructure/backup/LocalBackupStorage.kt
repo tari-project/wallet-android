@@ -39,7 +39,7 @@ import androidx.documentfile.provider.DocumentFile
 import androidx.fragment.app.Fragment
 import com.orhanobut.logger.Logger
 import com.tari.android.wallet.extension.getLastPathComponent
-import com.tari.android.wallet.util.SharedPrefsWrapper
+import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.apache.commons.io.FileUtils
@@ -53,7 +53,7 @@ import java.io.File
  */
 internal class LocalBackupStorage(
     private val context: Context,
-    private val sharedPrefs: SharedPrefsWrapper,
+    private val sharedPrefs: SharedPrefsRepository,
     private val walletTempDirPath: String,
     private val backupFileProcessor: BackupFileProcessor
 ) : BackupStorage {

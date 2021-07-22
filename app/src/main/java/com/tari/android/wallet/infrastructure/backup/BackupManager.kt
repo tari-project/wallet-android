@@ -40,7 +40,7 @@ import com.tari.android.wallet.R
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.notification.NotificationHelper
 import com.tari.android.wallet.util.Constants
-import com.tari.android.wallet.util.SharedPrefsWrapper
+import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import io.reactivex.Observable
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
@@ -54,7 +54,7 @@ import kotlin.math.max
 
 internal class BackupManager(
     private val context: Context,
-    private val sharedPrefs: SharedPrefsWrapper,
+    private val sharedPrefs: SharedPrefsRepository,
     private val backupStorage: BackupStorage,
     private val notificationHelper: NotificationHelper
 ) {

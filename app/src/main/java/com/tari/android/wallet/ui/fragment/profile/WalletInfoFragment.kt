@@ -48,8 +48,7 @@ import com.tari.android.wallet.databinding.FragmentWalletInfoBinding
 import com.tari.android.wallet.ui.component.EmojiIdSummaryViewController
 import com.tari.android.wallet.ui.component.FullEmojiIdViewController
 import com.tari.android.wallet.ui.extension.*
-import com.tari.android.wallet.util.EmojiUtil
-import com.tari.android.wallet.util.SharedPrefsWrapper
+import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import com.tari.android.wallet.util.WalletUtil
 import java.util.*
 import javax.inject.Inject
@@ -57,7 +56,7 @@ import javax.inject.Inject
 class WalletInfoFragment : Fragment() {
 
     @Inject
-    lateinit var sharedPrefsWrapper: SharedPrefsWrapper
+    lateinit var sharedPrefsWrapper: SharedPrefsRepository
 
     @Inject
     lateinit var clipboardManager: ClipboardManager

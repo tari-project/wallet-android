@@ -35,9 +35,7 @@ package com.tari.android.wallet.service
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import androidx.core.content.ContextCompat
 import com.orhanobut.logger.Logger
-import com.tari.android.wallet.util.WalletUtil
 
 /**
  * This receiver is responsible for starting the service after boot finish.
@@ -49,9 +47,8 @@ class BootDeviceReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context?, intent: Intent?) {
         if (context == null || intent == null) return
         Logger.d("Boot device broadcast received.")
-        if (WalletUtil.walletExists(context.applicationContext)
-            && Intent.ACTION_BOOT_COMPLETED == intent.action) {
-            WalletService.start(context)
+        if (Intent.ACTION_BOOT_COMPLETED == intent.action) {
+            WalletServiceLauncher(context).startIfExist()
         }
     }
 }

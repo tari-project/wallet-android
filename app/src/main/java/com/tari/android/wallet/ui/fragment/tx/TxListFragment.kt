@@ -91,7 +91,7 @@ import com.tari.android.wallet.ui.presentation.gif.GIFRepository
 import com.tari.android.wallet.ui.resource.AnimationResource
 import com.tari.android.wallet.ui.resource.ResourceContainer
 import com.tari.android.wallet.util.Constants
-import com.tari.android.wallet.util.SharedPrefsWrapper
+import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import io.reactivex.Observable
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
@@ -115,7 +115,7 @@ internal class TxListFragment : Fragment(),
     ShakeDetector.Listener {
 
     @Inject
-    lateinit var sharedPrefsWrapper: SharedPrefsWrapper
+    lateinit var sharedPrefsWrapper: SharedPrefsRepository
 
     @Inject
     lateinit var tracker: Tracker

@@ -40,15 +40,18 @@ import android.os.IBinder
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
+import com.tari.android.wallet.application.TariWalletApplication
 import com.tari.android.wallet.service.TariWalletService
 import com.tari.android.wallet.service.WalletService
 
-class TariWalletServiceConnection(private val context: Context) : ViewModel(), ServiceConnection {
+class TariWalletServiceConnection : ViewModel(), ServiceConnection {
 
     private val _connection = MutableLiveData<ServiceConnectionState>()
     val connection: LiveData<ServiceConnectionState> get() = _connection
     val currentState get() = _connection.value!!
+
+    val context: Context
+        get() = TariWalletApplication.INSTANCE.get() ?: throw Throwable("Application is not launched")
 
     init {
         _connection.value = ServiceConnectionState(ServiceConnectionStatus.NOT_YET_CONNECTED, null)
@@ -79,16 +82,5 @@ class TariWalletServiceConnection(private val context: Context) : ViewModel(), S
         val status: ServiceConnectionStatus,
         val service: TariWalletService?
     )
-
-    class TariWalletServiceConnectionFactory(private val context: Context) :
-        ViewModelProvider.Factory {
-        @Suppress("UNCHECKED_CAST")
-        override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-            require(modelClass === TariWalletServiceConnection::class.java) { "Wrong class" }
-            return TariWalletServiceConnection(context) as T
-        }
-
-    }
-
 }
 

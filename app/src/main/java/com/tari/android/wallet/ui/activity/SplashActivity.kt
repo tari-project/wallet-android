@@ -42,7 +42,7 @@ import androidx.core.os.postDelayed
 import com.tari.android.wallet.ui.activity.onboarding.OnboardingFlowActivity
 import com.tari.android.wallet.ui.extension.appComponent
 import com.tari.android.wallet.util.Constants.UI.Splash
-import com.tari.android.wallet.util.SharedPrefsWrapper
+import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import com.tari.android.wallet.util.WalletUtil
 import javax.inject.Inject
 
@@ -54,7 +54,7 @@ import javax.inject.Inject
 internal class SplashActivity : AppCompatActivity() {
 
     @Inject
-    internal lateinit var sharedPrefsWrapper: SharedPrefsWrapper
+    internal lateinit var sharedPrefsWrapper: SharedPrefsRepository
 
     override fun onCreate(savedInstanceState: Bundle?) {
         appComponent.inject(this)

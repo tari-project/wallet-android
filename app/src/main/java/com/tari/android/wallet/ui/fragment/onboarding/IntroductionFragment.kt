@@ -62,7 +62,8 @@ import com.tari.android.wallet.service.WalletService
 import com.tari.android.wallet.ui.activity.restore.WalletRestoreActivity
 import com.tari.android.wallet.ui.extension.*
 import com.tari.android.wallet.util.Constants
-import com.tari.android.wallet.util.SharedPrefsWrapper
+import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
+import com.tari.android.wallet.service.WalletServiceLauncher
 import javax.inject.Inject
 import kotlin.math.min
 
@@ -76,7 +77,10 @@ import kotlin.math.min
 internal class IntroductionFragment : Fragment() {
 
     @Inject
-    lateinit var sharedPrefsWrapper: SharedPrefsWrapper
+    lateinit var sharedPrefsWrapper: SharedPrefsRepository
+
+    @Inject
+    lateinit var walletServiceLauncher: WalletServiceLauncher
 
     @Inject
     lateinit var tracker: Tracker
@@ -252,15 +256,10 @@ internal class IntroductionFragment : Fragment() {
         ui.restoreWalletCtaView.setOnClickListener(null)
         ui.createWalletButton.gone()
         ui.createWalletProgressBar.visible()
-        startWalletService()
+        walletServiceLauncher.start()
         ui.createWalletContainerView.animateClick {
             ui.rootView.postDelayed(createWalletArtificialDelay) { startTariWalletViewAnimation() }
         }
-    }
-
-    private fun startWalletService() {
-        // start the wallet service
-        WalletService.start(applicationContext)
     }
 
     private fun startTariWalletViewAnimation() {

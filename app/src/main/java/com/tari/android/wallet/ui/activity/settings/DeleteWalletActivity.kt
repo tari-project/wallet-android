@@ -42,6 +42,7 @@ import androidx.lifecycle.lifecycleScope
 import com.tari.android.wallet.R
 import com.tari.android.wallet.databinding.ActivityDeleteWalletBinding
 import com.tari.android.wallet.service.WalletService
+import com.tari.android.wallet.service.WalletServiceLauncher
 import com.tari.android.wallet.service.connection.TariWalletServiceConnection
 import com.tari.android.wallet.ui.activity.onboarding.OnboardingFlowActivity
 import com.tari.android.wallet.ui.dialog.BottomSlideDialog
@@ -52,8 +53,12 @@ import com.tari.android.wallet.ui.extension.color
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
 class DeleteWalletActivity : AppCompatActivity() {
+
+    @Inject
+    internal lateinit var walletServiceLauncher: WalletServiceLauncher
 
     private var ui: ActivityDeleteWalletBinding? = null
     private lateinit var serviceConnection: TariWalletServiceConnection
@@ -62,10 +67,7 @@ class DeleteWalletActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         overridePendingTransition(R.anim.enter_from_right, R.anim.exit_to_left)
         appComponent.inject(this)
-        serviceConnection = ViewModelProvider(
-            this,
-            TariWalletServiceConnection.TariWalletServiceConnectionFactory(this)
-        ).get()
+        serviceConnection = ViewModelProvider(this)[TariWalletServiceConnection::class.java]
         setupUI()
     }
 
@@ -106,7 +108,7 @@ class DeleteWalletActivity : AppCompatActivity() {
         ui?.deleteWalletProgress?.visible()
         // delete wallet
         lifecycleScope.launch(Dispatchers.IO) {
-            WalletService.stopAndDelete(applicationContext)
+            walletServiceLauncher.stopAndDelete()
             withContext(Dispatchers.Main) {
                 goToSplashScreen()
             }

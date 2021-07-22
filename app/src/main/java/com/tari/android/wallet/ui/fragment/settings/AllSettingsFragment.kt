@@ -55,7 +55,7 @@ import com.tari.android.wallet.infrastructure.security.biometric.BiometricAuthen
 import com.tari.android.wallet.ui.dialog.ErrorDialog
 import com.tari.android.wallet.ui.extension.*
 import com.tari.android.wallet.util.Constants
-import com.tari.android.wallet.util.SharedPrefsWrapper
+import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -65,14 +65,10 @@ import java.util.*
 import javax.inject.Inject
 import kotlin.math.min
 
-internal class AllSettingsFragment @Deprecated(
-    """Use newInstance() and supply all the necessary 
-data via arguments instead, as fragment's default no-op constructor is used by the framework for 
-UI tree rebuild on configuration changes"""
-) constructor() : Fragment() {
+internal class AllSettingsFragment private constructor() : Fragment() {
 
     @Inject
-    lateinit var sharedPrefs: SharedPrefsWrapper
+    lateinit var sharedPrefs: SharedPrefsRepository
 
     @Inject
     lateinit var backupManager: BackupManager
@@ -124,6 +120,7 @@ UI tree rebuild on configuration changes"""
         ui.backUpWalletCtaView.setOnClickListener {
             requireAuthorization { navigateToBackupSettings() }
         }
+        ui.backgroundServiceCtaView.setOnClickListener { navigateToBackgroundServiceSettings() }
         ui.deleteWalletCtaView.setOnClickListener { navigateToDeleteWallet() }
     }
 
@@ -275,6 +272,10 @@ UI tree rebuild on configuration changes"""
         (requireActivity() as AllSettingsRouter).toDeleteWallet()
     }
 
+    private fun navigateToBackgroundServiceSettings() {
+        (requireActivity() as AllSettingsRouter).toBackgroundService()
+    }
+
     private fun shareBugReport() {
         val mContext = context ?: return
         lifecycleScope.launch(Dispatchers.IO) {
@@ -365,6 +366,8 @@ UI tree rebuild on configuration changes"""
         fun toBackupSettings()
 
         fun toDeleteWallet()
+
+        fun toBackgroundService()
     }
 
     companion object {

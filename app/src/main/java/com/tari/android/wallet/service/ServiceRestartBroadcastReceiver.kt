@@ -49,10 +49,6 @@ class ServiceRestartBroadcastReceiver : BroadcastReceiver() {
 
     override fun onReceive(context: Context, intent: Intent) {
         Logger.d("Service restart broadcast received.")
-        if (WalletUtil.walletExists(context.applicationContext)) {
-            // restart the service
-            WalletService.start(context)
-        }
+        WalletServiceLauncher(context).startIfExist()
     }
-
 }

@@ -61,7 +61,8 @@ import com.tari.android.wallet.service.WalletService
 import com.tari.android.wallet.ui.activity.home.HomeActivity
 import com.tari.android.wallet.ui.extension.*
 import com.tari.android.wallet.util.Constants
-import com.tari.android.wallet.util.SharedPrefsWrapper
+import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
+import com.tari.android.wallet.service.WalletServiceLauncher
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -76,10 +77,13 @@ internal class AuthActivity : AppCompatActivity() {
     lateinit var tracker: Tracker
 
     @Inject
-    lateinit var sharedPrefsWrapper: SharedPrefsWrapper
+    lateinit var sharedPrefsWrapper: SharedPrefsRepository
 
     @Inject
     lateinit var authService: BiometricAuthenticationService
+
+    @Inject
+    lateinit var walletServiceLauncher: WalletServiceLauncher
 
     private var continueIsPendingOnWalletState = false
 
@@ -92,7 +96,7 @@ internal class AuthActivity : AppCompatActivity() {
         overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
         EventBus.subscribeToWalletState(this, this::onWalletStateChanged)
         setupUi()
-        WalletService.start(applicationContext)
+        walletServiceLauncher.start()
         if (savedInstanceState == null) {
             tracker.screen(path = "/local_auth", title = "Local Authentication")
         }

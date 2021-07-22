@@ -44,7 +44,7 @@ import com.tari.android.wallet.tor.TorConfig
 import com.tari.android.wallet.tor.TorProxyManager
 import com.tari.android.wallet.tor.TorProxyState
 import com.tari.android.wallet.util.Constants
-import com.tari.android.wallet.util.SharedPrefsWrapper
+import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import com.tari.android.wallet.util.WalletUtil
 import org.apache.commons.io.IOUtils
 import java.io.File
@@ -60,7 +60,7 @@ internal class WalletManager(
     private val walletFilesDirPath: String,
     private val walletLogFilePath: String,
     private val torManager: TorProxyManager,
-    private val sharedPrefsWrapper: SharedPrefsWrapper,
+    private val sharedPrefsWrapper: SharedPrefsRepository,
     private val torConfig: TorConfig
 ) {
 

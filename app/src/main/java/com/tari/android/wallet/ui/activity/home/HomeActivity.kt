@@ -44,7 +44,6 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentStatePagerAdapter
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.get
 import androidx.lifecycle.lifecycleScope
 import com.tari.android.wallet.R
 import com.tari.android.wallet.R.color.home_selected_nav_item
@@ -59,7 +58,6 @@ import com.tari.android.wallet.service.TariWalletService
 import com.tari.android.wallet.service.WalletService
 import com.tari.android.wallet.service.connection.TariWalletServiceConnection
 import com.tari.android.wallet.service.connection.TariWalletServiceConnection.ServiceConnectionStatus.CONNECTED
-import com.tari.android.wallet.service.connection.TariWalletServiceConnection.TariWalletServiceConnectionFactory
 import com.tari.android.wallet.ui.activity.SplashActivity
 import com.tari.android.wallet.ui.activity.onboarding.OnboardingFlowActivity
 import com.tari.android.wallet.ui.activity.send.SendTariActivity
@@ -76,10 +74,12 @@ import com.tari.android.wallet.ui.extension.color
 import com.tari.android.wallet.ui.extension.showInternetConnectionErrorDialog
 import com.tari.android.wallet.ui.fragment.profile.WalletInfoFragment
 import com.tari.android.wallet.ui.fragment.settings.AllSettingsFragment
+import com.tari.android.wallet.ui.fragment.settings.backgroundService.BackgroundServiceSettingsActivity
 import com.tari.android.wallet.ui.fragment.store.StoreFragment
 import com.tari.android.wallet.ui.fragment.tx.TxListFragment
 import com.tari.android.wallet.util.Constants
-import com.tari.android.wallet.util.SharedPrefsWrapper
+import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
+import com.tari.android.wallet.service.WalletServiceLauncher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -88,7 +88,10 @@ internal class HomeActivity : AppCompatActivity(), AllSettingsFragment.AllSettin
     TxListFragment.TxListRouter {
 
     @Inject
-    lateinit var sharedPrefsWrapper: SharedPrefsWrapper
+    lateinit var sharedPrefsWrapper: SharedPrefsRepository
+
+    @Inject
+    lateinit var walletServiceLauncher: WalletServiceLauncher
 
     @Inject
     lateinit var giphy: GiphyEcosystem
@@ -108,7 +111,7 @@ internal class HomeActivity : AppCompatActivity(), AllSettingsFragment.AllSettin
             finish()
             return
         }
-        serviceConnection = ViewModelProvider(this, TariWalletServiceConnectionFactory(this)).get()
+        serviceConnection = ViewModelProvider(this)[TariWalletServiceConnection::class.java]
         ui = ActivityHomeBinding.inflate(layoutInflater).also { setContentView(it.root) }
         if (savedInstanceState == null) {
             giphy.enable()
@@ -258,7 +261,7 @@ internal class HomeActivity : AppCompatActivity(), AllSettingsFragment.AllSettin
         // delete wallet
         goToSplashScreen()
         lifecycleScope.launch(Dispatchers.IO) {
-            WalletService.stopAndDelete(applicationContext)
+            walletServiceLauncher.stopAndDelete()
         }
     }
 
@@ -280,6 +283,10 @@ internal class HomeActivity : AppCompatActivity(), AllSettingsFragment.AllSettin
 
     override fun toDeleteWallet() {
         startActivity(Intent(this, DeleteWalletActivity::class.java))
+    }
+
+    override fun toBackgroundService() {
+        startActivity(Intent(this, BackgroundServiceSettingsActivity::class.java))
     }
 
     fun willNotifyAboutNewTx(): Boolean = ui.viewPager.currentItem == INDEX_HOME

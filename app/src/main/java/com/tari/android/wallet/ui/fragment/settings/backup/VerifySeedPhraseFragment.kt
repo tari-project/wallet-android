@@ -57,7 +57,7 @@ import com.tari.android.wallet.databinding.FragmentVerifySeedPhraseBinding
 import com.tari.android.wallet.ui.activity.settings.BackupSettingsRouter
 import com.tari.android.wallet.ui.component.CustomFont
 import com.tari.android.wallet.ui.extension.*
-import com.tari.android.wallet.util.SharedPrefsWrapper
+import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import java.util.*
 import javax.inject.Inject
 import kotlin.LazyThreadSafetyMode.NONE
@@ -70,7 +70,7 @@ framework for UI tree rebuild on configuration changes"""
 ) constructor() : Fragment() {
 
     @Inject
-    lateinit var sharedPrefs: SharedPrefsWrapper
+    lateinit var sharedPrefs: SharedPrefsRepository
 
     private lateinit var ui: FragmentVerifySeedPhraseBinding
     private val state by lazy {

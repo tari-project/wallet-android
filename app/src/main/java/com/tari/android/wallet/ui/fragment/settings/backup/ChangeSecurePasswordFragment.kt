@@ -59,7 +59,7 @@ import com.tari.android.wallet.infrastructure.backup.*
 import com.tari.android.wallet.ui.activity.settings.BackupSettingsRouter
 import com.tari.android.wallet.ui.dialog.ErrorDialog
 import com.tari.android.wallet.ui.extension.*
-import com.tari.android.wallet.util.SharedPrefsWrapper
+import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -73,7 +73,7 @@ framework for UI tree rebuild on configuration changes"""
 ) constructor() : Fragment() {
 
     @Inject
-    lateinit var sharedPrefs: SharedPrefsWrapper
+    lateinit var sharedPrefs: SharedPrefsRepository
 
     @Inject
     lateinit var backupManager: BackupManager

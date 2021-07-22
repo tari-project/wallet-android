@@ -37,7 +37,7 @@ import android.content.Intent
 import android.net.Uri
 import androidx.core.content.FileProvider
 import com.tari.android.wallet.R
-import com.tari.android.wallet.util.SharedPrefsWrapper
+import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import com.tari.android.wallet.util.WalletUtil
 import java.io.*
 import java.util.zip.ZipEntry
@@ -49,8 +49,8 @@ import java.util.zip.ZipOutputStream
  *
  * @author The Tari Development Team
  */
-internal class BugReportingService(private val sharedPrefsWrapper: SharedPrefsWrapper,
-                                   private val logFilesDirPath: String) {
+class BugReportingService(private val sharedPrefsWrapper: SharedPrefsRepository,
+                          private val logFilesDirPath: String) {
 
     class BugReportFileSizeLimitExceededException: Exception()
 

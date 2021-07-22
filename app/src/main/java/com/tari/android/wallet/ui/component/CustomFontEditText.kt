@@ -44,15 +44,9 @@ import androidx.appcompat.widget.AppCompatEditText
 class CustomFontEditText(context: Context, attrs: AttributeSet) :
     AppCompatEditText(context, attrs) {
 
-    private val sScheme = "http://schemas.android.com/apk/res-auto"
-    private val sAttribute = "customFont"
-
     init {
         if (!isInEditMode) {
-            val fontName = attrs.getAttributeValue(sScheme, sAttribute)
-            requireNotNull(fontName) { "You must provide \"$sAttribute\" for your text view." }
-            val customTypeface = CustomFont.fromString(fontName).asTypeface(context)
-            typeface = customTypeface
+            typeface = CustomFont.getFromAttributeSet(context, attrs)
         }
     }
 }

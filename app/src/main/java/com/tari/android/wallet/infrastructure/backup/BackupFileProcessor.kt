@@ -39,7 +39,7 @@ import com.tari.android.wallet.ffi.FFIUtil
 import com.tari.android.wallet.infrastructure.backup.compress.CompressionMethod
 import com.tari.android.wallet.infrastructure.security.encryption.SymmetricEncryptionAlgorithm
 import com.tari.android.wallet.util.Constants
-import com.tari.android.wallet.util.SharedPrefsWrapper
+import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import org.joda.time.DateTime
 import java.io.File
 
@@ -49,7 +49,7 @@ import java.io.File
  * @author The Tari Development Team
  */
 internal class BackupFileProcessor(
-    private val sharedPrefs: SharedPrefsWrapper,
+    private val sharedPrefs: SharedPrefsRepository,
     private val walletFilesDirPath: String,
     private val walletDatabaseFilePath: String,
     private val walletTempDirPath: String

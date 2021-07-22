@@ -57,7 +57,7 @@ import com.tari.android.wallet.ui.fragment.profile.WalletInfoFragment
 import com.tari.android.wallet.ui.fragment.restore.ChooseRestoreOptionFragment
 import com.tari.android.wallet.ui.fragment.restore.EnterRestorationPasswordFragment
 import com.tari.android.wallet.ui.fragment.send.AddAmountFragment
-import com.tari.android.wallet.ui.fragment.send.AddNoteFragment
+import com.tari.android.wallet.ui.fragment.send.addNote.AddNoteFragment
 import com.tari.android.wallet.ui.fragment.send.AddRecipientFragment
 import com.tari.android.wallet.ui.fragment.send.FinalizeSendTxFragment
 import com.tari.android.wallet.ui.fragment.settings.AllSettingsFragment
@@ -66,8 +66,11 @@ import com.tari.android.wallet.ui.fragment.settings.backup.ChangeSecurePasswordF
 import com.tari.android.wallet.ui.fragment.settings.backup.EnterCurrentPasswordFragment
 import com.tari.android.wallet.ui.fragment.settings.backup.VerifySeedPhraseFragment
 import com.tari.android.wallet.ui.fragment.tx.TxListFragment
-import com.tari.android.wallet.util.SharedPrefsWrapper
+import com.tari.android.wallet.ui.common.CommonViewModel
+import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
+import com.tari.android.wallet.ui.fragment.settings.backgroundService.BackgroundServiceSettingsViewModel
 import dagger.Component
+import dagger.Provides
 import java.io.File
 import javax.inject.Singleton
 
@@ -88,13 +91,14 @@ import javax.inject.Singleton
         PresentationModule::class
     ]
 )
+
 internal interface ApplicationComponent {
 
     val context: Context
 
     val workingDir: File
 
-    val sharedPrefsWrapper: SharedPrefsWrapper
+    val sharedPrefsWrapper: SharedPrefsRepository
 
     val authenticationService: BiometricAuthenticationService
 
@@ -148,6 +152,13 @@ internal interface ApplicationComponent {
     fun inject(fragment: ChooseRestoreOptionFragment)
     fun inject(fragment: EnterRestorationPasswordFragment)
 
+    /**
+     * ViewModels.
+     */
+    fun inject(commonViewModel: CommonViewModel)
+    fun inject(thumbnailGIFsViewModel: AddNoteFragment.ThumbnailGIFsViewModel)
+    fun inject(gifViewModel: TxDetailsActivity.GIFViewModel)
+    fun inject(backgroundServiceSettingsViewModel: BackgroundServiceSettingsViewModel)
     /**
      * Service(s).
      */

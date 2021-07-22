@@ -34,6 +34,8 @@ package com.tari.android.wallet.ui.component
 
 import android.content.Context
 import android.graphics.Typeface
+import android.util.AttributeSet
+import com.tari.android.wallet.ui.extension.string
 import java.util.*
 
 /**
@@ -51,14 +53,24 @@ enum class CustomFont(private val fileName: String) {
     AVENIR_NEXT_LT_PRO_REGULAR("fonts/AvenirNextLTPro-Regular.otf"),
     AVENIR_LT_STD_LIGHT("fonts/AvenirLTStd-Light.otf");
 
-    companion object {
-        fun fromString(fontName: String): CustomFont {
-            return valueOf(fontName.toUpperCase(Locale.US))
-        }
-    }
-
     fun asTypeface(context: Context): Typeface {
         return Typeface.createFromAsset(context.assets, fileName)
     }
 
+    companion object {
+        private const val sScheme = "http://schemas.android.com/apk/res-auto"
+        private const val sAttribute = "customFont"
+
+        fun fromString(fontName: String): CustomFont? {
+            return values().firstOrNull { it.name == fontName.toUpperCase(Locale.getDefault()) }
+        }
+
+        fun getFromAttributeSet(context: Context, attr: AttributeSet): Typeface {
+            val fontName = attr.getAttributeValue(sScheme, sAttribute)
+            val fontNameRes = attr.getAttributeResourceValue(sScheme, sAttribute, 0)
+            requireNotNull(fontName) { "You must provide \"$sAttribute\"" }
+            val customFont = fromString(fontName) ?: fromString(context.string(fontNameRes)) ?: throw Throwable("Font wasn't found")
+            return customFont.asTypeface(context)
+        }
+    }
 }
