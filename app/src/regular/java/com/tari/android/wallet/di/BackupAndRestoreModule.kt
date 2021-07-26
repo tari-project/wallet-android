@@ -33,10 +33,10 @@
 package com.tari.android.wallet.di
 
 import android.content.Context
+import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import com.tari.android.wallet.infrastructure.backup.*
 import com.tari.android.wallet.infrastructure.backup.GoogleDriveBackupStorage
 import com.tari.android.wallet.notification.NotificationHelper
-import com.tari.android.wallet.util.SharedPrefsWrapper
 import dagger.Module
 import dagger.Provides
 import javax.inject.Named
@@ -48,7 +48,7 @@ internal class BackupAndRestoreModule {
     @Provides
     @Singleton
     fun provideBackupFileProcessor(
-        sharedPrefs: SharedPrefsWrapper,
+        sharedPrefs: SharedPrefsRepository,
         @Named(WalletModule.FieldName.walletFilesDirPath) walletFilesDirPath: String,
         @Named(WalletModule.FieldName.walletDatabaseFilePath) walletDatabaseFilePath: String,
         @Named(WalletModule.FieldName.walletTempDirPath) walletTempDirPath: String
@@ -63,7 +63,7 @@ internal class BackupAndRestoreModule {
     @Singleton
     fun provideBackupStorage(
         context: Context,
-        sharedPrefs: SharedPrefsWrapper,
+        sharedPrefs: SharedPrefsRepository,
         @Named(WalletModule.FieldName.walletTempDirPath) walletTempDirPath: String,
         backupFileProcessor: BackupFileProcessor
     ): BackupStorage = GoogleDriveBackupStorage(
@@ -77,7 +77,7 @@ internal class BackupAndRestoreModule {
     @Singleton
     fun provideBackupManager(
         context: Context,
-        sharedPrefs: SharedPrefsWrapper,
+        sharedPrefs: SharedPrefsRepository,
         backupStorage: BackupStorage,
         notificationHelper: NotificationHelper
     ): BackupManager = BackupManager(context, sharedPrefs, backupStorage, notificationHelper)
