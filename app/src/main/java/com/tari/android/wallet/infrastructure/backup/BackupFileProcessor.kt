@@ -40,6 +40,8 @@ import com.tari.android.wallet.infrastructure.backup.compress.CompressionMethod
 import com.tari.android.wallet.infrastructure.security.encryption.SymmetricEncryptionAlgorithm
 import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
+import com.tari.android.wallet.ffi.FFIWallet
+import com.tari.android.wallet.util.WalletUtil
 import org.joda.time.DateTime
 import java.io.File
 
@@ -56,6 +58,9 @@ internal class BackupFileProcessor(
 ) {
 
     fun generateBackupFile(newPassword: CharArray? = null): Triple<File, DateTime, String> {
+        // decrypt database
+        FFIWallet.instance?.removeEncryption()
+
         // create partial backup in temp folder if password not set
         var databaseFile = File(walletDatabaseFilePath)
         val backupPassword = newPassword ?: sharedPrefs.backupPassword
@@ -94,6 +99,9 @@ internal class BackupFileProcessor(
             )
             mimeType = encryptionAlgorithm.mimeType
         }
+        // encrypt after finish backup
+        FFIWallet.instance?.enableEncryption()
+
         return Triple(fileToBackup, backupDate, mimeType)
     }
 

@@ -350,9 +350,10 @@ internal class FFIWallet(
         }
     }
 
-    private fun enableEncryption() {
+    fun enableEncryption() {
         val passphrase = sharedPrefsRepository.databasePassphrase
         if (passphrase == null) {
+            Logger.i("Database encryption enable")
             sharedPrefsRepository.generateDatabasePassphrase()
             setEncryption(sharedPrefsRepository.databasePassphrase.orEmpty())
         }
