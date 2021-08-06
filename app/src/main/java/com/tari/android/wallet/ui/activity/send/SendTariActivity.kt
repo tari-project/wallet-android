@@ -139,7 +139,7 @@ internal class SendTariActivity : AppCompatActivity(),
         sourceFragment: AddRecipientFragment,
         user: User
     ) {
-        if (EventBus.networkConnectionStateSubject.value != NetworkConnectionState.CONNECTED) {
+        if (EventBus.networkConnectionState.publishSubject.value != NetworkConnectionState.CONNECTED) {
             showInternetConnectionErrorDialog(this)
             return
         }
@@ -191,7 +191,7 @@ internal class SendTariActivity : AppCompatActivity(),
         recipientUser: User,
         amount: MicroTari
     ) {
-        if (EventBus.networkConnectionStateSubject.value != NetworkConnectionState.CONNECTED) {
+        if (EventBus.networkConnectionState.publishSubject.value != NetworkConnectionState.CONNECTED) {
             showInternetConnectionErrorDialog(this)
             return
         }
@@ -272,7 +272,7 @@ internal class SendTariActivity : AppCompatActivity(),
         failureReason: FinalizeSendTxFragment.FailureReason
     ) {
         sendTxIsInProgress = false
-        EventBus.post(Event.Tx.TxSendFailed(failureReason))
+        EventBus.post(Event.Transaction.TxSendFailed(failureReason))
         finish()
         overridePendingTransition(R.anim.fade_in, R.anim.fade_out)
     }
@@ -285,7 +285,7 @@ internal class SendTariActivity : AppCompatActivity(),
         note: String
     ) {
         sendTxIsInProgress = false
-        EventBus.post(Event.Tx.TxSendSuccessful(txId))
+        EventBus.post(Event.Transaction.TxSendSuccessful(txId))
         finish()
         overridePendingTransition(R.anim.fade_in, R.anim.fade_out)
     }

@@ -64,6 +64,8 @@ import java.io.IOException
 import java.util.*
 import javax.inject.Inject
 import kotlin.math.min
+import com.tari.android.wallet.infrastructure.backup.BackupState.*
+
 
 internal class AllSettingsFragment private constructor() : Fragment() {
 
@@ -93,7 +95,7 @@ internal class AllSettingsFragment private constructor() : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setupUI()
-        EventBus.subscribeToBackupState(this) { backupState ->
+        EventBus.backupState.subscribe(this) { backupState ->
             lifecycleScope.launch(Dispatchers.Main) {
                 onBackupStateChanged(backupState)
             }
@@ -130,7 +132,7 @@ internal class AllSettingsFragment private constructor() : Fragment() {
     }
 
     override fun onDestroy() {
-        EventBus.unsubscribeFromBackupState(this)
+        EventBus.backupState.unsubscribe(this)
         super.onDestroy()
     }
 

@@ -66,7 +66,7 @@ internal class TorProxyManager(
     private val torProxyControl: TorProxyControl
 
     init {
-        EventBus.postTorProxyState(TorProxyState.NotReady)
+        EventBus.torProxyState.post(TorProxyState.NotReady)
         torProxyControl = TorProxyControl(torConfig)
     }
 
@@ -94,14 +94,14 @@ internal class TorProxyManager(
         // execute the command
         val process = Runtime.getRuntime().exec(command)
         Logger.d("Tor command executed: %s", command)
-        EventBus.postTorProxyState(TorProxyState.Initializing)
+        EventBus.torProxyState.post(TorProxyState.Initializing)
         val response = BufferedReader(
             InputStreamReader(process.inputStream)
         ).use(BufferedReader::readText)
         Logger.d("Tor proxy response: %s", response)
         process.waitFor()
         // Tor proxy is down
-        EventBus.postTorProxyState(TorProxyState.Failed)
+        EventBus.torProxyState.post(TorProxyState.Failed)
     }
 
     private fun getHashedPassword(password: String): String {
@@ -137,7 +137,7 @@ internal class TorProxyManager(
             exec(torCmdString)
         } catch (throwable: Throwable) {
             Logger.e("THROWABLE")
-            EventBus.postTorProxyState(TorProxyState.Failed)
+            EventBus.torProxyState.post(TorProxyState.Failed)
         }
     }
 
@@ -162,7 +162,7 @@ internal class TorProxyManager(
 
         private lateinit var socket: Socket
         private lateinit var controlConnection: TorControlConnection
-        private var currentState = EventBus.torProxyStateSubject.value
+        private var currentState = EventBus.torProxyState.publishSubject.value
 
         @Synchronized
         fun startMonitoringTor() {
@@ -239,7 +239,7 @@ internal class TorProxyManager(
         private fun updateState(newState: TorProxyState) {
             if (currentState != newState) {
                 currentState = newState
-                EventBus.postTorProxyState(currentState!!)
+                EventBus.torProxyState.post(currentState!!)
             }
         }
 

@@ -44,9 +44,6 @@ import android.hardware.SensorManager
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.text.SpannableString
-import android.text.SpannableStringBuilder
-import android.text.Spanned
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
@@ -56,6 +53,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.animation.addListener
 import androidx.core.os.postDelayed
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -63,6 +61,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.daasuu.ei.Ease
 import com.daasuu.ei.EasingInterpolator
+import com.orhanobut.logger.Logger
 import com.squareup.seismic.ShakeDetector
 import com.tari.android.wallet.R
 import com.tari.android.wallet.application.DeepLink
@@ -81,7 +80,6 @@ import com.tari.android.wallet.service.connection.TariWalletServiceConnection.Se
 import com.tari.android.wallet.ui.activity.debug.DebugActivity
 import com.tari.android.wallet.ui.activity.send.SendTariActivity
 import com.tari.android.wallet.ui.component.CustomFont
-import com.tari.android.wallet.ui.component.CustomTypefaceSpan
 import com.tari.android.wallet.ui.dialog.BottomSlideDialog
 import com.tari.android.wallet.ui.dialog.ErrorDialog
 import com.tari.android.wallet.ui.extension.*
@@ -92,6 +90,8 @@ import com.tari.android.wallet.ui.resource.AnimationResource
 import com.tari.android.wallet.ui.resource.ResourceContainer
 import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
+import com.tari.android.wallet.ui.common.CommonFragment
+import com.tari.android.wallet.ui.component.networkStateIndicator.ConnectionIndicatorViewModel
 import io.reactivex.Observable
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
@@ -107,6 +107,7 @@ import javax.inject.Inject
 import kotlin.math.max
 import kotlin.math.min
 
+//todo split logic into viewModel and animations
 internal class TxListFragment : Fragment(),
     View.OnScrollChangeListener,
     View.OnTouchListener,
@@ -125,6 +126,8 @@ internal class TxListFragment : Fragment(),
 
     @Inject
     lateinit var backupManager: BackupManager
+
+    private val networkIndicatorViewModel: ConnectionIndicatorViewModel by viewModels()
 
     private lateinit var serviceConnection: TariWalletServiceConnection
     private val walletService: TariWalletService?
@@ -152,9 +155,6 @@ internal class TxListFragment : Fragment(),
     private var isOnboarding = false
     private var isInDraggingSession = false
     private var testnetTariRequestIsInProgress = false
-
-    // TODO(nyarian): remove
-    private var sendTariButtonIsVisible = true
 
     // TODO(nyarian): remove
     private var testnetTariRequestIsWaitingOnConnection = false
@@ -190,6 +190,7 @@ internal class TxListFragment : Fragment(),
         bindToWalletService()
         setupUI()
         subscribeToEventBus()
+        subscribeToViewModel()
     }
 
     override fun onStart() {
@@ -205,7 +206,7 @@ internal class TxListFragment : Fragment(),
 
     override fun onDestroyView() {
         EventBus.unsubscribe(this)
-        EventBus.unsubscribeFromNetworkConnectionState(this)
+        EventBus.networkConnectionState.unsubscribe(this)
         if (::updateProgressViewController.isInitialized) {
             updateProgressViewController.destroy()
         }
@@ -239,7 +240,7 @@ internal class TxListFragment : Fragment(),
         ui.apply {
             headerElevationView.alpha = 0F
             availableBalanceTextView.alpha = 0F
-            walletInfoImageView.alpha = 0F
+            networkStatusStateIndicatorView.alpha = 0F
             balanceGemImageView.alpha = 0F
             scrollContentView.alpha = 0F
             noTxsInfoTextView.gone()
@@ -306,30 +307,30 @@ internal class TxListFragment : Fragment(),
             }
         }
 
-        EventBus.subscribe<Event.Wallet.TxReceived>(this) {
+        EventBus.subscribe<Event.Transaction.TxReceived>(this) {
             if (updateProgressViewController.state != UpdateProgressViewController.State.RECEIVING) {
                 onTxReceived(it.tx)
             }
         }
-        EventBus.subscribe<Event.Wallet.TxReplyReceived>(this) {
+        EventBus.subscribe<Event.Transaction.TxReplyReceived>(this) {
             onTxReplyReceived(it.tx)
         }
-        EventBus.subscribe<Event.Wallet.TxFinalized>(this) {
+        EventBus.subscribe<Event.Transaction.TxFinalized>(this) {
             onTxFinalized(it.tx)
         }
-        EventBus.subscribe<Event.Wallet.InboundTxBroadcast>(this) {
+        EventBus.subscribe<Event.Transaction.InboundTxBroadcast>(this) {
             onInboundTxBroadcast(it.tx)
         }
-        EventBus.subscribe<Event.Wallet.OutboundTxBroadcast>(this) {
+        EventBus.subscribe<Event.Transaction.OutboundTxBroadcast>(this) {
             onOutboundTxBroadcast(it.tx)
         }
-        EventBus.subscribe<Event.Wallet.TxMinedUnconfirmed>(this) {
+        EventBus.subscribe<Event.Transaction.TxMinedUnconfirmed>(this) {
             onTxMinedUnconfirmed(it.tx)
         }
-        EventBus.subscribe<Event.Wallet.TxMined>(this) {
+        EventBus.subscribe<Event.Transaction.TxMined>(this) {
             onTxMined(it.tx)
         }
-        EventBus.subscribe<Event.Wallet.TxCancelled>(this) {
+        EventBus.subscribe<Event.Transaction.TxCancelled>(this) {
             if (updateProgressViewController.state != UpdateProgressViewController.State.RECEIVING) {
                 onTxCancelled(it.tx)
             }
@@ -342,14 +343,14 @@ internal class TxListFragment : Fragment(),
             lifecycleScope.launch(Dispatchers.Main) { testnetTariRequestError(event.errorMessage) }
         }
 
-        EventBus.subscribe<Event.Tx.TxSendSuccessful>(this) {
+        EventBus.subscribe<Event.Transaction.TxSendSuccessful>(this) {
             lifecycleScope.launch(Dispatchers.Main) { onTxSendSuccessful(it.txId) }
         }
-        EventBus.subscribe<Event.Tx.TxSendFailed>(this) { event ->
+        EventBus.subscribe<Event.Transaction.TxSendFailed>(this) { event ->
             lifecycleScope.launch(Dispatchers.Main) { onTxSendFailed(event.failureReason) }
         }
 
-        EventBus.subscribeToNetworkConnectionState(this) { networkConnectionState ->
+        EventBus.networkConnectionState.subscribe(this) { networkConnectionState ->
             if (testnetTariRequestIsWaitingOnConnection
                 && networkConnectionState == NetworkConnectionState.CONNECTED
             ) {
@@ -363,6 +364,11 @@ internal class TxListFragment : Fragment(),
         EventBus.subscribe<Event.Contact.ContactRemoved>(this) {
             onContactRemoved(it.contactPublicKey)
         }
+    }
+
+    private fun subscribeToViewModel() {
+        ui.networkStatusStateIndicatorView.viewLifecycle = viewLifecycleOwner
+        ui.networkStatusStateIndicatorView.bindViewModel(networkIndicatorViewModel)
     }
 
     // endregion
@@ -577,8 +583,7 @@ internal class TxListFragment : Fragment(),
     // region service connection
 
     private fun bindToWalletService() {
-        serviceConnection = ViewModelProvider(requireActivity())
-            .get(TariWalletServiceConnection::class.java)
+        serviceConnection = ViewModelProvider(requireActivity()).get(TariWalletServiceConnection::class.java)
         serviceConnection.connection.observe(viewLifecycleOwner, {
             if (it.status == CONNECTED) onServiceConnected()
         })
@@ -697,7 +702,6 @@ internal class TxListFragment : Fragment(),
         ui.topContentContainerView.visible()
         updateBalanceInfoUI(true)
         ui.scrollView.scrollToTop()
-        sendTariButtonIsVisible = true
         handler.postDelayed(Constants.UI.Home.startupAnimDurationMs) { ui.blockerView.gone() }
         ValueAnimator.ofFloat(0.0F, 1.0F).apply {
             duration = Constants.UI.Home.startupAnimDurationMs
@@ -710,7 +714,7 @@ internal class TxListFragment : Fragment(),
                 ui.scrollContentView.alpha = value
                 // reveal balance title, QR code button and balance gem image
                 ui.availableBalanceTextView.alpha = value
-                ui.walletInfoImageView.alpha = value
+                ui.networkStatusStateIndicatorView.alpha = value
                 ui.balanceGemImageView.alpha = value
             }
         }
@@ -758,7 +762,7 @@ internal class TxListFragment : Fragment(),
             onEnd = {
                 ui.topContentContainerView.visible()
                 ui.availableBalanceTextView.alpha = 1F
-                ui.walletInfoImageView.alpha = 1F
+                ui.networkStatusStateIndicatorView.alpha = 1F
                 ui.balanceGemImageView.alpha = 1F
             }
         )
@@ -784,7 +788,7 @@ internal class TxListFragment : Fragment(),
 
     private fun requestTestnetTari() {
         if (testnetTariRequestIsInProgress) return
-        if (EventBus.networkConnectionStateSubject.value != NetworkConnectionState.CONNECTED) {
+        if (EventBus.networkConnectionState.publishSubject.value != NetworkConnectionState.CONNECTED) {
             testnetTariRequestIsWaitingOnConnection = true
         } else {
             testnetTariRequestIsWaitingOnConnection = false
@@ -1146,6 +1150,8 @@ internal class TxListFragment : Fragment(),
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onTouch(view: View?, event: MotionEvent?): Boolean {
+        ui.networkStatusStateIndicatorView.dispatchTouchEvent(event)
+
         if (view != null && event != null && (view === ui.scrollView || view === ui.txRecyclerView)) {
             when (event.action) {
                 MotionEvent.ACTION_DOWN -> isInDraggingSession = true
@@ -1255,71 +1261,6 @@ internal class TxListFragment : Fragment(),
     }
 
     // endregion
-
-    class BackupWalletPrompt private constructor(
-        private val dialog: Dialog
-    ) {
-
-        constructor(
-            context: Context,
-            title: CharSequence,
-            description: CharSequence,
-            ctaText: CharSequence = context.string(R.string.home_back_up_wallet_back_up_cta),
-            dismissText: CharSequence = context.string(R.string.home_back_up_wallet_delay_back_up_cta),
-            router: TxListRouter
-        ) : this(
-            BottomSlideDialog(
-                context,
-                R.layout.dialog_backup_wallet_prompt,
-                canceledOnTouchOutside = false,
-                dismissViewId = R.id.home_backup_wallet_prompt_dismiss_cta_view
-            ).apply {
-                findViewById<TextView>(R.id.home_backup_wallet_prompt_title_text_view).text = title
-                findViewById<TextView>(R.id.home_backup_wallet_prompt_description_text_view).text =
-                    description
-                findViewById<TextView>(R.id.home_backup_wallet_prompt_dismiss_cta_view).text =
-                    dismissText
-                val backupCta =
-                    findViewById<TextView>(R.id.home_backup_wallet_prompt_backup_cta_view)
-                backupCta.text = ctaText
-                backupCta.setOnClickListener {
-                    router.toAllSettings()
-                    dismiss()
-                }
-            }.asAndroidDialog()
-        )
-
-        constructor(
-            context: Context,
-            regularTitlePart: CharSequence,
-            highlightedTitlePart: CharSequence,
-            description: CharSequence,
-            ctaText: CharSequence = context.string(R.string.home_back_up_wallet_back_up_cta),
-            dismissText: CharSequence = context.string(R.string.home_back_up_wallet_delay_back_up_cta),
-            router: TxListRouter
-        ) : this(
-            context,
-            SpannableStringBuilder().apply {
-                val highlightedPart = SpannableString(highlightedTitlePart)
-                highlightedPart.setSpan(
-                    CustomTypefaceSpan("", CustomFont.AVENIR_LT_STD_HEAVY.asTypeface(context)),
-                    0,
-                    highlightedPart.length,
-                    Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
-                )
-                insert(0, regularTitlePart)
-                insert(regularTitlePart.length, " ")
-                insert(regularTitlePart.length + 1, highlightedPart)
-            },
-            description,
-            ctaText,
-            dismissText,
-            router
-        )
-
-        fun asAndroidDialog() = dialog
-
-    }
 
     interface TxListRouter {
         fun toTxDetails(tx: Tx)

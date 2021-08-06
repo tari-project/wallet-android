@@ -34,12 +34,10 @@ package com.tari.android.wallet.service
 
 import android.annotation.SuppressLint
 import android.app.Service
-import android.content.Context
 import android.content.Intent
 import android.os.Handler
 import android.os.IBinder
 import android.os.Looper
-import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.OnLifecycleEvent
@@ -49,6 +47,7 @@ import com.tari.android.wallet.R
 import com.tari.android.wallet.application.TariWalletApplication
 import com.tari.android.wallet.application.WalletManager
 import com.tari.android.wallet.application.WalletState
+import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import com.tari.android.wallet.di.WalletModule
 import com.tari.android.wallet.event.Event
 import com.tari.android.wallet.event.EventBus
@@ -58,16 +57,16 @@ import com.tari.android.wallet.model.*
 import com.tari.android.wallet.model.Tx.Direction.INBOUND
 import com.tari.android.wallet.model.Tx.Direction.OUTBOUND
 import com.tari.android.wallet.notification.NotificationHelper
+import com.tari.android.wallet.service.WalletServiceLauncher.Companion.startAction
+import com.tari.android.wallet.service.WalletServiceLauncher.Companion.stopAction
+import com.tari.android.wallet.service.WalletServiceLauncher.Companion.stopAndDeleteAction
+import com.tari.android.wallet.service.baseNode.BaseNodeState
 import com.tari.android.wallet.service.faucet.TestnetFaucetService
 import com.tari.android.wallet.service.faucet.TestnetTariRequestException
 import com.tari.android.wallet.service.notification.NotificationService
 import com.tari.android.wallet.ui.activity.home.HomeActivity
 import com.tari.android.wallet.ui.extension.string
 import com.tari.android.wallet.util.Constants
-import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
-import com.tari.android.wallet.service.WalletServiceLauncher.Companion.startAction
-import com.tari.android.wallet.service.WalletServiceLauncher.Companion.stopAction
-import com.tari.android.wallet.service.WalletServiceLauncher.Companion.stopAndDeleteAction
 import com.tari.android.wallet.util.WalletUtil
 import io.reactivex.Observable
 import io.reactivex.disposables.Disposable
@@ -206,7 +205,7 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
 
     private fun startService() {
         // start wallet manager on a separate thead & listen to events
-        EventBus.subscribeToWalletState(this, this::onWalletStateChanged)
+        EventBus.walletState.subscribe(this, this::onWalletStateChanged)
         Thread {
             walletManager.start()
         }.start()
@@ -221,7 +220,7 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
         stopForeground(true)
         stopSelfResult(startId)
         // stop wallet manager on a separate thead & unsubscribe from events
-        EventBus.unsubscribeFromWalletState(this)
+        EventBus.walletState.unsubscribe(this)
         ProcessLifecycleOwner.get().lifecycle.removeObserver(this)
         GlobalScope.launch { backupManager.turnOff(deleteExistingBackups = false) }
         Thread {
@@ -238,7 +237,7 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
         if (walletState == WalletState.RUNNING) {
             wallet = FFIWallet.instance!!
             wallet.listener = this
-            EventBus.unsubscribeFromWalletState(this)
+            EventBus.walletState.unsubscribe(this)
             scheduleExpirationCheck()
             backupManager.initialize()
             val handler = Handler(Looper.getMainLooper())
@@ -328,7 +327,7 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
         pendingInboundTx.user = getUserByPublicKey(pendingInboundTx.user.publicKey)
         Logger.d("Received TX after contact update: $pendingInboundTx")
         // post event to bus for the internal listeners
-        EventBus.post(Event.Wallet.TxReceived(pendingInboundTx))
+        EventBus.post(Event.Transaction.TxReceived(pendingInboundTx))
         // manage notifications
         postTxNotification(pendingInboundTx)
         listeners.forEach { it.onTxReceived(pendingInboundTx) }
@@ -340,7 +339,7 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
         Logger.d("Tx ${pendingOutboundTx.id} reply received.")
         pendingOutboundTx.user = getUserByPublicKey(pendingOutboundTx.user.publicKey)
         // post event to bus for the internal listeners
-        EventBus.post(Event.Wallet.TxReplyReceived(pendingOutboundTx))
+        EventBus.post(Event.Transaction.TxReplyReceived(pendingOutboundTx))
         // notify external listeners
         listeners.iterator().forEach {
             it.onTxReplyReceived(pendingOutboundTx)
@@ -353,7 +352,7 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
         Logger.d("Tx ${pendingInboundTx.id} finalized.")
         pendingInboundTx.user = getUserByPublicKey(pendingInboundTx.user.publicKey)
         // post event to bus for the internal listeners
-        EventBus.post(Event.Wallet.TxFinalized(pendingInboundTx))
+        EventBus.post(Event.Transaction.TxFinalized(pendingInboundTx))
         // notify external listeners
         listeners.iterator().forEach {
             it.onTxFinalized(pendingInboundTx)
@@ -366,7 +365,7 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
         Logger.d("Inbound tx ${pendingInboundTx.id} broadcast.")
         pendingInboundTx.user = getUserByPublicKey(pendingInboundTx.user.publicKey)
         // post event to bus for the internal listeners
-        EventBus.post(Event.Wallet.InboundTxBroadcast(pendingInboundTx))
+        EventBus.post(Event.Transaction.InboundTxBroadcast(pendingInboundTx))
         // notify external listeners
         listeners.iterator().forEach {
             it.onInboundTxBroadcast(pendingInboundTx)
@@ -379,7 +378,7 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
         Logger.d("Outbound tx ${pendingOutboundTx.id} broadcast.")
         pendingOutboundTx.user = getUserByPublicKey(pendingOutboundTx.user.publicKey)
         // post event to bus for the internal listeners
-        EventBus.post(Event.Wallet.OutboundTxBroadcast(pendingOutboundTx))
+        EventBus.post(Event.Transaction.OutboundTxBroadcast(pendingOutboundTx))
         // notify external listeners
         listeners.iterator().forEach {
             it.onOutboundTxBroadcast(pendingOutboundTx)
@@ -392,7 +391,7 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
         Logger.d("Tx ${completedTx.id} mined.")
         completedTx.user = getUserByPublicKey(completedTx.user.publicKey)
         // post event to bus for the internal listeners
-        EventBus.post(Event.Wallet.TxMined(completedTx))
+        EventBus.post(Event.Transaction.TxMined(completedTx))
         // notify external listeners
         listeners.iterator().forEach {
             it.onTxMined(completedTx)
@@ -407,7 +406,7 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
         )
         completedTx.user = getUserByPublicKey(completedTx.user.publicKey)
         // post event to bus for the internal listeners
-        EventBus.post(Event.Wallet.TxMinedUnconfirmed(completedTx))
+        EventBus.post(Event.Transaction.TxMinedUnconfirmed(completedTx))
         // notify external listeners
         listeners.iterator().forEach {
             it.onTxMinedUnconfirmed(completedTx, confirmationCount)
@@ -419,7 +418,7 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
     override fun onDirectSendResult(txId: BigInteger, success: Boolean) {
         Logger.d("Tx $txId direct send completed. Success: $success")
         // post event to bus
-        EventBus.post(Event.Wallet.DirectSendResult(TxId(txId), success))
+        EventBus.post(Event.Transaction.DirectSendResult(TxId(txId), success))
         if (success) {
             outboundTxIdsToBePushNotified.firstOrNull { it.first == txId }?.let {
                 outboundTxIdsToBePushNotified.remove(it)
@@ -437,7 +436,7 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
     override fun onStoreAndForwardSendResult(txId: BigInteger, success: Boolean) {
         Logger.d("Tx $txId store and forward send completed. Success: $success")
         // post event to bus
-        EventBus.post(Event.Wallet.StoreAndForwardSendResult(TxId(txId), success))
+        EventBus.post(Event.Transaction.StoreAndForwardSendResult(TxId(txId), success))
         if (success) {
             outboundTxIdsToBePushNotified.firstOrNull { it.first == txId }?.let {
                 outboundTxIdsToBePushNotified.remove(it)
@@ -456,7 +455,7 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
         Logger.d("Tx cancelled: $cancelledTx")
         cancelledTx.user = getUserByPublicKey(cancelledTx.user.publicKey)
         // post event to bus
-        EventBus.post(Event.Wallet.TxCancelled(cancelledTx))
+        EventBus.post(Event.Transaction.TxCancelled(cancelledTx))
         val currentActivity = app.currentActivity
         if (cancelledTx.direction == INBOUND &&
             !(app.isInForeground && currentActivity is HomeActivity && currentActivity.willNotifyAboutNewTx())
@@ -483,7 +482,7 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
             if (!sharedPrefsWrapper.baseNodeIsUserCustom) {
                 walletManager.setNextBaseNode()
             }
-            EventBus.post(Event.Wallet.BaseNodeSyncComplete(BaseNodeValidationResult.BASE_NODE_NOT_IN_SYNC))
+            EventBus.baseNodeState.post(BaseNodeState.SyncCompleted(BaseNodeValidationResult.BASE_NODE_NOT_IN_SYNC))
             listeners.iterator().forEach { it.onBaseNodeSyncComplete(false) }
             return
         }
@@ -494,7 +493,7 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
         if (aborted) {
             baseNodeValidationStatusMap.clear()
             sharedPrefsWrapper.baseNodeLastSyncResult = BaseNodeValidationResult.ABORTED
-            EventBus.post(Event.Wallet.BaseNodeSyncComplete(BaseNodeValidationResult.ABORTED))
+            EventBus.baseNodeState.post(BaseNodeState.SyncCompleted(BaseNodeValidationResult.ABORTED))
             return
         }
         // check if any has failed
@@ -507,7 +506,7 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
             if (!sharedPrefsWrapper.baseNodeIsUserCustom) {
                 walletManager.setNextBaseNode()
             }
-            EventBus.post(Event.Wallet.BaseNodeSyncComplete(BaseNodeValidationResult.FAILURE))
+            EventBus.baseNodeState.post(BaseNodeState.SyncCompleted(BaseNodeValidationResult.FAILURE))
             listeners.iterator().forEach { it.onBaseNodeSyncComplete(false) }
             return
         }
@@ -521,7 +520,7 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
         if (successful) {
             baseNodeValidationStatusMap.clear()
             sharedPrefsWrapper.baseNodeLastSyncResult = BaseNodeValidationResult.SUCCESS
-            EventBus.post(Event.Wallet.BaseNodeSyncComplete(BaseNodeValidationResult.SUCCESS))
+            EventBus.baseNodeState.post(BaseNodeState.SyncCompleted(BaseNodeValidationResult.SUCCESS))
             listeners.iterator().forEach { it.onBaseNodeSyncComplete(true) }
         }
         // shouldn't ever reach here - no-op
@@ -992,7 +991,7 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
                     null
                 )
                 sharedPrefsWrapper.baseNodeLastSyncResult = null
-                EventBus.post(Event.Wallet.BaseNodeSyncStarted)
+                EventBus.baseNodeState.post(BaseNodeState.SyncStarted)
                 true
             } catch (throwable: Throwable) {
                 Logger.e("Base node validation error: $throwable")
@@ -1432,3 +1431,5 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
         // endregion
     }
 }
+
+

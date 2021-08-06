@@ -435,13 +435,13 @@ internal class TxDetailsActivity : AppCompatActivity(), ServiceConnection {
     }
 
     private fun observeTxUpdates() {
-        EventBus.subscribe<Event.Wallet.InboundTxBroadcast>(this) { updateTxData(it.tx) }
-        EventBus.subscribe<Event.Wallet.OutboundTxBroadcast>(this) { updateTxData(it.tx) }
-        EventBus.subscribe<Event.Wallet.TxFinalized>(this) { updateTxData(it.tx) }
-        EventBus.subscribe<Event.Wallet.TxMined>(this) { updateTxData(it.tx) }
-        EventBus.subscribe<Event.Wallet.TxMinedUnconfirmed>(this) { updateTxData(it.tx) }
-        EventBus.subscribe<Event.Wallet.TxReplyReceived>(this) { updateTxData(it.tx) }
-        EventBus.subscribe<Event.Wallet.TxCancelled>(this) { updateTxData(it.tx) }
+        EventBus.subscribe<Event.Transaction.InboundTxBroadcast>(this) { updateTxData(it.tx) }
+        EventBus.subscribe<Event.Transaction.OutboundTxBroadcast>(this) { updateTxData(it.tx) }
+        EventBus.subscribe<Event.Transaction.TxFinalized>(this) { updateTxData(it.tx) }
+        EventBus.subscribe<Event.Transaction.TxMined>(this) { updateTxData(it.tx) }
+        EventBus.subscribe<Event.Transaction.TxMinedUnconfirmed>(this) { updateTxData(it.tx) }
+        EventBus.subscribe<Event.Transaction.TxReplyReceived>(this) { updateTxData(it.tx) }
+        EventBus.subscribe<Event.Transaction.TxCancelled>(this) { updateTxData(it.tx) }
     }
 
     private fun updateTxData(tx: Tx) {

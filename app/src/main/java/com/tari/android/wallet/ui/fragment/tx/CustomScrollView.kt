@@ -48,6 +48,7 @@ import com.tari.android.wallet.R.dimen.*
 import com.tari.android.wallet.ui.extension.*
 import com.tari.android.wallet.util.Constants
 import java.lang.ref.WeakReference
+import java.util.logging.Logger
 import kotlin.math.max
 import kotlin.math.min
 
@@ -264,6 +265,7 @@ internal class CustomScrollView @JvmOverloads constructor(
             recyclerView.onTouchEvent(event)
             return true
         }
+
         return super.onTouchEvent(event)
     }
 

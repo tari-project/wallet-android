@@ -69,7 +69,7 @@ internal class WalletManager(
 
     init {
         // post initial wallet state
-        EventBus.postWalletState(WalletState.NOT_READY)
+        EventBus.walletState.post(WalletState.NOT_READY)
     }
 
     /**
@@ -81,7 +81,7 @@ internal class WalletManager(
             torManager.run()
         }.start()
         // subscribe to Tor proxy state changes
-        EventBus.subscribeToTorProxyState(this, this::onTorProxyStateChanged)
+        EventBus.torProxyState.subscribe(this, this::onTorProxyStateChanged)
     }
 
     /**
@@ -92,9 +92,9 @@ internal class WalletManager(
         // destroy FFI wallet object
         FFIWallet.instance?.destroy()
         FFIWallet.instance = null
-        EventBus.postWalletState(WalletState.NOT_READY)
+        EventBus.walletState.post(WalletState.NOT_READY)
         // stop tor proxy
-        EventBus.unsubscribeFromTorProxyState(this)
+        EventBus.torProxyState.unsubscribe(this)
         torManager.shutdown()
     }
 
@@ -102,12 +102,12 @@ internal class WalletManager(
     private fun onTorProxyStateChanged(torProxyState: TorProxyState) {
         Logger.d("Tor proxy state has changed: $torProxyState.")
         if (torProxyState is TorProxyState.Running) {
-            if (EventBus.walletStateSubject.value == WalletState.NOT_READY) {
+            if (EventBus.walletState.publishSubject.value == WalletState.NOT_READY) {
                 Logger.d("Initialize wallet.")
-                EventBus.postWalletState(WalletState.INITIALIZING)
+                EventBus.walletState.post(WalletState.INITIALIZING)
                 Thread {
                     initWallet()
-                    EventBus.postWalletState(WalletState.RUNNING)
+                    EventBus.walletState.post(WalletState.RUNNING)
                 }.start()
             }
         }

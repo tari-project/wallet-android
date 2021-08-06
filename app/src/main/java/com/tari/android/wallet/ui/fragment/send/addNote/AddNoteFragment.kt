@@ -492,7 +492,7 @@ class AddNoteFragment : Fragment(), View.OnTouchListener {
     }
 
     private fun onSlideAnimationEnd() {
-        if (EventBus.networkConnectionStateSubject.value != NetworkConnectionState.CONNECTED) {
+        if (EventBus.networkConnectionState.publishSubject.value != NetworkConnectionState.CONNECTED) {
             ui.rootView.postDelayed(AddNoteAndSend.preKeyboardHideWaitMs) { hideKeyboard() }
             ui.rootView.postDelayed(AddNoteAndSend.preKeyboardHideWaitMs + Constants.UI.keyboardHideWaitMs) {
                 restoreSlider()

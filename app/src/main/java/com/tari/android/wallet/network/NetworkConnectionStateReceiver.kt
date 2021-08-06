@@ -52,7 +52,7 @@ internal class NetworkConnectionStateReceiver : BroadcastReceiver() {
     val intentFilter = IntentFilter(action)
 
     init {
-        EventBus.postNetworkConnectionState(NetworkConnectionState.UNKNOWN)
+        EventBus.networkConnectionState.post(NetworkConnectionState.UNKNOWN)
     }
 
     override fun onReceive(context: Context?, intent: Intent?) {
@@ -62,10 +62,10 @@ internal class NetworkConnectionStateReceiver : BroadcastReceiver() {
         val mContext = context ?: return
         if (checkConnection(mContext)) {
             Logger.d("Connected to the internet.")
-            EventBus.postNetworkConnectionState(NetworkConnectionState.CONNECTED)
+            EventBus.networkConnectionState.post(NetworkConnectionState.CONNECTED)
         } else {
             Logger.d("Disconnected from the internet.")
-            EventBus.postNetworkConnectionState(NetworkConnectionState.DISCONNECTED)
+            EventBus.networkConnectionState.post(NetworkConnectionState.DISCONNECTED)
         }
     }
 

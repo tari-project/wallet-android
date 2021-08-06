@@ -55,7 +55,6 @@ import com.tari.android.wallet.infrastructure.GiphyEcosystem
 import com.tari.android.wallet.model.*
 import com.tari.android.wallet.network.NetworkConnectionState
 import com.tari.android.wallet.service.TariWalletService
-import com.tari.android.wallet.service.WalletService
 import com.tari.android.wallet.service.connection.TariWalletServiceConnection
 import com.tari.android.wallet.service.connection.TariWalletServiceConnection.ServiceConnectionStatus.CONNECTED
 import com.tari.android.wallet.ui.activity.SplashActivity
@@ -166,7 +165,7 @@ internal class HomeActivity : AppCompatActivity(), AllSettingsFragment.AllSettin
 
     private fun setupCTAs() {
         ui.sendTariCtaView.setOnClickListener {
-            if (EventBus.networkConnectionStateSubject.value != NetworkConnectionState.CONNECTED) {
+            if (EventBus.networkConnectionState.publishSubject.value != NetworkConnectionState.CONNECTED) {
                 showInternetConnectionErrorDialog(this)
             } else {
                 startActivity(Intent(this, SendTariActivity::class.java))

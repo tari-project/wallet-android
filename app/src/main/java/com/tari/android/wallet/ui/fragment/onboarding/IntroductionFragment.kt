@@ -58,7 +58,6 @@ import com.tari.android.wallet.databinding.FragmentIntroductionBinding
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.extension.applyURLStyle
 import com.tari.android.wallet.infrastructure.Tracker
-import com.tari.android.wallet.service.WalletService
 import com.tari.android.wallet.ui.activity.restore.WalletRestoreActivity
 import com.tari.android.wallet.ui.extension.*
 import com.tari.android.wallet.util.Constants
@@ -123,7 +122,7 @@ internal class IntroductionFragment : Fragment() {
     }
 
     override fun onDestroy() {
-        EventBus.unsubscribeFromWalletState(this)
+        EventBus.walletState.unsubscribe(this)
         listener = null
         super.onDestroy()
     }

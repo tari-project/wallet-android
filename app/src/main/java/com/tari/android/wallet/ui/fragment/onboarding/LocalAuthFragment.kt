@@ -246,11 +246,11 @@ internal class LocalAuthFragment : Fragment() {
 
     private fun authSuccess() {
         // check if the wallet is ready & switch to wait mode if not & start listening
-        if (EventBus.walletStateSubject.value != WalletState.RUNNING) {
+        if (EventBus.walletState.publishSubject.value != WalletState.RUNNING) {
             ui.progressBarContainerView.visible()
             ui.enableAuthButton.invisible()
             continueIsPendingOnWalletState = true
-            EventBus.subscribeToWalletState(this) { walletState ->
+            EventBus.walletState.subscribe(this) { walletState ->
                 onWalletStateChanged(walletState)
             }
         } else {

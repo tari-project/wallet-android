@@ -69,6 +69,7 @@ import java.net.UnknownHostException
 import java.util.*
 import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
+import com.tari.android.wallet.infrastructure.backup.BackupState.*
 
 internal class BackupSettingsFragment @Deprecated(
     """Use newInstance() and supply all the 
@@ -119,7 +120,7 @@ framework for UI tree rebuild on configuration changes"""
     }
 
     override fun onDestroyView() {
-        EventBus.unsubscribeFromBackupState(this)
+        EventBus.backupState.unsubscribe(this)
         super.onDestroyView()
     }
 
@@ -164,7 +165,7 @@ framework for UI tree rebuild on configuration changes"""
         ui.cloudBackupStatusProgressView.setColor(color(all_settings_back_up_status_processing))
         ui.backupPermissionSwitch.isChecked = sharedPrefs.backupIsEnabled
         backupOptionsAreVisible = if (sharedPrefs.backupIsEnabled) {
-            if (EventBus.currentBackupState() is BackupUpToDate) {
+            if (EventBus.backupState.publishSubject.value is BackupUpToDate) {
                 ui.backupWalletToCloudCtaContainerView.gone()
             }
             updatePasswordChangeLabel()
@@ -381,12 +382,12 @@ framework for UI tree rebuild on configuration changes"""
                 },
                 onCancel = {
                     views.forEach { v -> v.alpha = ALPHA_VISIBLE }
-                    if (EventBus.currentBackupState() is BackupUpToDate) {
+                    if (EventBus.backupState.publishSubject.value is BackupUpToDate) {
                         animateBackupButtonUnavailability()
                     }
                 },
                 onEnd = {
-                    if (EventBus.currentBackupState() is BackupUpToDate) {
+                    if (EventBus.backupState.publishSubject.value is BackupUpToDate) {
                         animateBackupButtonUnavailability()
                     }
                 }
@@ -560,7 +561,7 @@ framework for UI tree rebuild on configuration changes"""
     // region Backup state changes processing
 
     private fun subscribeToBackupState() {
-        EventBus.subscribeToBackupState(this) { backupState ->
+        EventBus.backupState.subscribe(this) { backupState ->
             lifecycleScope.launch(Dispatchers.Main) {
                 onBackupStateChanged(backupState)
             }

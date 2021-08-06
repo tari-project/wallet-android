@@ -71,10 +71,10 @@ internal class BackupManager(
         val scheduledBackupDate = sharedPrefs.scheduledBackupDate
         when {
             !sharedPrefs.backupIsEnabled -> {
-                EventBus.postBackupState(BackupDisabled)
+                EventBus.backupState.post(BackupState.BackupDisabled)
             }
             sharedPrefs.backupFailureDate != null -> {
-                EventBus.postBackupState(BackupOutOfDate())
+                EventBus.backupState.post(BackupState.BackupOutOfDate())
             }
             scheduledBackupDate != null -> {
                 val delayMs = scheduledBackupDate.millis - DateTime.now().millis
@@ -84,7 +84,7 @@ internal class BackupManager(
                 )
             }
             else -> {
-                EventBus.postBackupState(BackupUpToDate)
+                EventBus.backupState.post(BackupState.BackupUpToDate)
             }
         }
     }
@@ -109,11 +109,11 @@ internal class BackupManager(
         if (!sharedPrefs.backupIsEnabled) {
             return
         }
-        if (EventBus.backupStateSubject.value is BackupInProgress) {
+        if (EventBus.backupState.publishSubject.value is BackupState.BackupInProgress) {
             return
         }
         Logger.d("Check backup storage status.")
-        EventBus.postBackupState(BackupCheckingStorage)
+        EventBus.backupState.post(BackupState.BackupCheckingStorage)
         // check storage
         try {
             val backupDate = sharedPrefs.lastSuccessfulBackupDate!!
@@ -122,13 +122,13 @@ internal class BackupManager(
             }
             when {
                 sharedPrefs.backupFailureDate != null -> {
-                    EventBus.postBackupState(BackupOutOfDate())
+                    EventBus.backupState.post(BackupState.BackupOutOfDate())
                 }
                 sharedPrefs.scheduledBackupDate?.isAfterNow == true -> {
-                    EventBus.postBackupState(BackupScheduled)
+                    EventBus.backupState.post(BackupState.BackupScheduled)
                 }
                 else -> {
-                    EventBus.postBackupState(BackupUpToDate)
+                    EventBus.backupState.post(BackupState.BackupUpToDate)
                 }
             }
         } catch (e: BackupStorageAuthRevokedException) {
@@ -137,12 +137,12 @@ internal class BackupManager(
             sharedPrefs.localBackupFolderURI = null
             sharedPrefs.scheduledBackupDate = null
             sharedPrefs.backupFailureDate = null
-            EventBus.postBackupState(BackupDisabled)
+            EventBus.backupState.post(BackupState.BackupDisabled)
         }  catch (e: BackupStorageTamperedException) {
-            EventBus.postBackupState(BackupOutOfDate(e))
+            EventBus.backupState.post(BackupState.BackupOutOfDate(e))
         } catch (e: Exception) {
             Logger.e(e, "Error while checking storage. %s", e.toString())
-            EventBus.postBackupState(BackupStorageCheckFailed)
+            EventBus.backupState.post(BackupState.BackupStorageCheckFailed)
             throw e
         }
     }
@@ -180,7 +180,7 @@ internal class BackupManager(
                 }
         sharedPrefs.scheduledBackupDate =
             DateTime.now().plusMillis(delayMs?.toInt() ?: Constants.Wallet.backupDelayMs.toInt())
-        EventBus.postBackupState(BackupScheduled)
+        EventBus.backupState.post(BackupState.BackupScheduled)
         Logger.i("Backup scheduled.")
     }
 
@@ -193,7 +193,7 @@ internal class BackupManager(
             Logger.d("Backup is disabled. Exit.")
             return
         }
-        if (EventBus.backupStateSubject.value is BackupInProgress) {
+        if (EventBus.backupState.publishSubject.value is BackupState.BackupInProgress) {
             Logger.d("Backup is in progress. Exit.")
             return
         }
@@ -203,14 +203,14 @@ internal class BackupManager(
         scheduledBackupSubscription?.dispose()
         scheduledBackupSubscription = null
         retryCount++
-        EventBus.postBackupState(BackupInProgress)
+        EventBus.backupState.post(BackupState.BackupInProgress)
         try {
             val backupDate = backupStorage.backup(newPassword)
             sharedPrefs.lastSuccessfulBackupDate = backupDate
             sharedPrefs.scheduledBackupDate = null
             sharedPrefs.backupFailureDate = null
             Logger.d("Backup successful.")
-            EventBus.postBackupState(BackupUpToDate)
+            EventBus.backupState.post(BackupState.BackupUpToDate)
         } catch (exception: Exception) {
             if (isInitialBackup) {
                 turnOff(deleteExistingBackups = true)
@@ -228,7 +228,7 @@ internal class BackupManager(
                     exception,
                     "Error happened while backing up. It's a user-triggered backup or retry limit has been exceeded."
                 )
-                EventBus.postBackupState(BackupOutOfDate(exception))
+                EventBus.backupState.post(BackupState.BackupOutOfDate(exception))
                 sharedPrefs.scheduledBackupDate = null
                 sharedPrefs.backupFailureDate = DateTime.now()
                 retryCount = 0
@@ -277,7 +277,7 @@ internal class BackupManager(
         sharedPrefs.scheduledBackupDate = null
         scheduledBackupSubscription?.dispose()
         scheduledBackupSubscription = null
-        EventBus.postBackupState(BackupDisabled)
+        EventBus.backupState.post(BackupState.BackupDisabled)
         if (deleteExistingBackups) {
             try {
                 backupStorage.deleteAllBackupFiles()
