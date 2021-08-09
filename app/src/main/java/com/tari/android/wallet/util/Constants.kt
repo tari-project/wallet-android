@@ -135,7 +135,7 @@ internal object Constants {
      * Wallet constants.
      */
     object Wallet {
-        val network = Network.STIBBONS
+        val network = Network.WEATHERWAX
         const val torPort = 18101
         const val maxNumberOfRollingLogFiles = 2
         const val rollingLogFileMaxSizeBytes = 10 * 1024 * 1024

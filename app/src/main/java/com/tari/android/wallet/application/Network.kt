@@ -42,7 +42,9 @@ enum class Network(val uriComponent: String, val displayName: String) {
     // testnet 2
     RIDCULLY("ridcully", "RIDCULLY"),
     // testnet 3
-    STIBBONS("stibbons", "STIBBONS");
+    STIBBONS("stibbons", "STIBBONS"),
+
+    WEATHERWAX("weatherwax", "WEATHERWAX");
 
     companion object {
         fun from(uriComponent: String): Network = when (uriComponent) {
@@ -50,6 +52,7 @@ enum class Network(val uriComponent: String, val displayName: String) {
             RINCEWIND.uriComponent -> RINCEWIND
             RIDCULLY.uriComponent -> RIDCULLY
             STIBBONS.uriComponent -> STIBBONS
+            WEATHERWAX.uriComponent -> WEATHERWAX
             else -> throw RuntimeException("Unknown network: $uriComponent")
         }
     }
