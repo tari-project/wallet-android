@@ -47,7 +47,8 @@ import com.tari.android.wallet.service.faucet.TestnetTariUTXOKey
 import de.adorsys.android.securestoragelibrary.SecurePreferences
 import org.joda.time.DateTime
 import java.math.BigInteger
-import javax.inject.Inject
+import java.nio.charset.Charset
+import kotlin.random.Random
 
 /**
  * Provides easy access to the shared preferences.
@@ -83,6 +84,7 @@ class SharedPrefsRepository(
         const val backupFailureDate = "tari_wallet_backup_failure_date"
         const val scheduledBackupDate = "tari_wallet_scheduled_backup_date"
         const val backupPassword = "tari_wallet_last_next_alarm_time"
+        const val walletDatabasePassphrase = "tari_wallet_database_passphrase"
         const val localBackupFolderURI = "tari_wallet_local_backup_folder_uri"
         const val network = "tari_wallet_network"
         const val isRestoredWallet = "tari_is_restored_wallet"
@@ -183,6 +185,13 @@ class SharedPrefsRepository(
             apply()
         }
 
+    var databasePassphrase: String?
+        get() = SecurePreferences.getStringValue(context, Key.walletDatabasePassphrase, null)
+        set(value) = sharedPrefs.edit().apply {
+            if (value == null) remove(Key.walletDatabasePassphrase)
+            else putString(Key.walletDatabasePassphrase, value)
+        }.apply()
+
     var isRestoredWallet: Boolean by SharedPrefBooleanDelegate(sharedPrefs, Key.isRestoredWallet)
 
     var hasVerifiedSeedWords: Boolean by SharedPrefBooleanDelegate(sharedPrefs, Key.hasVerifiedSeedWords)
@@ -225,6 +234,13 @@ class SharedPrefsRepository(
         network = null
         isRestoredWallet = false
         hasVerifiedSeedWords = false
+        databasePassphrase = null
     }
 
+    fun generateDatabasePassphrase() {
+        val array = ByteArray(32)
+        Random.nextBytes(array)
+        val generatedString = String(array, Charset.forName("UTF-8"))
+        databasePassphrase = generatedString
+    }
 }

@@ -33,6 +33,7 @@
 package com.tari.android.wallet.ffi
 
 import com.orhanobut.logger.Logger
+import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import com.tari.android.wallet.model.*
 import com.tari.android.wallet.util.Constants
 import kotlinx.coroutines.GlobalScope
@@ -47,6 +48,7 @@ import java.util.concurrent.atomic.AtomicReference
  */
 
 internal class FFIWallet(
+    val sharedPrefsRepository: SharedPrefsRepository,
     commsConfig: FFICommsConfig,
     logPath: String
 ) : FFIBase() {
@@ -65,6 +67,7 @@ internal class FFIWallet(
         logPath: String,
         maxNumberOfRollingLogFiles: Int,
         rollingLogFileMaxSizeBytes: Int,
+        passphrase: String?,
         callbackReceivedTx: String,
         callbackReceivedTxSig: String,
         callbackReceivedTxReply: String,
@@ -267,6 +270,45 @@ internal class FFIWallet(
         libError: FFIError
     )
 
+    private external fun jniEstimateTxFee(
+        amount: String,
+        gramFee: String,
+        kernelCount: String,
+        outputCount: String,
+        libError: FFIError
+    ): ByteArray
+
+    private external fun jniGenerateTestData(
+        datastorePath: String,
+        libError: FFIError
+    ): Boolean
+
+    private external fun jniTestBroadcastTx(
+        txPtr: String,
+        libError: FFIError
+    ): Boolean
+
+    private external fun jniTestFinalizeReceivedTx(
+        txPtr: FFIPendingInboundTx,
+        libError: FFIError
+    ): Boolean
+
+    private external fun jniTestCompleteSentTx(
+        txPtr: FFIPendingOutboundTx,
+        libError: FFIError
+    ): Boolean
+
+    private external fun jniTestMineTx(
+        txId: String,
+        libError: FFIError
+    ): Boolean
+
+    private external fun jniTestReceiveTx(libError: FFIError): Boolean
+
+    private external fun jniApplyEncryption(passphrase: String, libError: FFIError)
+
+    private external fun jniRemoveEncryption(libError: FFIError)
+
     private external fun jniDestroy()
 
     // endregion
@@ -279,11 +321,13 @@ internal class FFIWallet(
         if (pointer == nullptr) { // so it can only be assigned once for the singleton
             val error = FFIError()
             Logger.i("Pre jniCreate.")
+            Logger.i(sharedPrefsRepository.databasePassphrase.toString())
             jniCreate(
                 commsConfig,
                 logPath,
                 Constants.Wallet.maxNumberOfRollingLogFiles,
                 Constants.Wallet.rollingLogFileMaxSizeBytes,
+                sharedPrefsRepository.databasePassphrase,
                 this::onTxReceived.name, "(J)V",
                 this::onTxReplyReceived.name, "(J)V",
                 this::onTxFinalized.name, "(J)V",
@@ -301,6 +345,17 @@ internal class FFIWallet(
             )
             Logger.i("Post jniCreate with code: %d.", error.code)
             throwIf(error)
+
+            enableEncryption()
+        }
+    }
+
+    fun enableEncryption() {
+        val passphrase = sharedPrefsRepository.databasePassphrase
+        if (passphrase == null) {
+            Logger.i("Database encryption enable")
+            sharedPrefsRepository.generateDatabasePassphrase()
+            setEncryption(sharedPrefsRepository.databasePassphrase.orEmpty())
         }
     }
 
@@ -638,7 +693,8 @@ internal class FFIWallet(
         val requestId = BigInteger(1, bytes)
         val validationResult = BaseNodeValidationResult.map(result)!!
         Logger.i("Invalid TXO validation [$requestId] complete. Result: $validationResult")
-        GlobalScope.launch { listener?.onInvalidTXOValidationComplete(requestId, validationResult)
+        GlobalScope.launch {
+            listener?.onInvalidTXOValidationComplete(requestId, validationResult)
         }
     }
 
@@ -669,14 +725,6 @@ internal class FFIWallet(
         )
         return Pair(direction, user)
     }
-
-    private external fun jniEstimateTxFee(
-        amount: String,
-        gramFee: String,
-        kernelCount: String,
-        outputCount: String,
-        libError: FFIError
-    ): ByteArray
 
     fun estimateTxFee(
         amount: BigInteger,
@@ -895,42 +943,6 @@ internal class FFIWallet(
         throwIf(error)
     }
 
-    override fun destroy() {
-        listener = null
-        jniDestroy()
-    }
-
-    // region JNI
-
-    private external fun jniGenerateTestData(
-        datastorePath: String,
-        libError: FFIError
-    ): Boolean
-
-    private external fun jniTestBroadcastTx(
-        txPtr: String,
-        libError: FFIError
-    ): Boolean
-
-    private external fun jniTestFinalizeReceivedTx(
-        txPtr: FFIPendingInboundTx,
-        libError: FFIError
-    ): Boolean
-
-    private external fun jniTestCompleteSentTx(
-        txPtr: FFIPendingOutboundTx,
-        libError: FFIError
-    ): Boolean
-
-    private external fun jniTestMineTx(
-        txId: String,
-        libError: FFIError
-    ): Boolean
-
-    private external fun jniTestReceiveTx(libError: FFIError): Boolean
-
-    // endregion
-
     fun generateTestData(datastorePath: String): Boolean {
         val error = FFIError()
         val result = jniGenerateTestData(datastorePath, error)
@@ -966,6 +978,20 @@ internal class FFIWallet(
         return result
     }
 
+    fun setEncryption(passphrase: String) {
+        val error = FFIError()
+        val result = jniApplyEncryption(passphrase, error)
+        throwIf(error)
+        return result
+    }
+
+    fun removeEncryption() {
+        val error = FFIError()
+        val result = jniRemoveEncryption(error)
+        throwIf(error)
+        return result
+    }
+
     fun testReceiveTx(): Boolean {
         val error = FFIError()
         val result = jniTestReceiveTx(error)
@@ -973,4 +999,8 @@ internal class FFIWallet(
         return result
     }
 
+    override fun destroy() {
+        listener = null
+        jniDestroy()
+    }
 }

@@ -229,6 +229,7 @@ internal class WalletManager(
             // store network info in shared preferences if it's a new wallet
             val isNewInstallation = !WalletUtil.walletExists(context)
             val wallet = FFIWallet(
+                sharedPrefsWrapper,
                 getCommsConfig(),
                 walletLogFilePath
             )

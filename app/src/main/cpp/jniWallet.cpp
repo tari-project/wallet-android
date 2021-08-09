@@ -298,6 +298,7 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniCreate(
         jstring jLogPath,
         jint maxNumberOfRollingLogFiles,
         jint rollingLogFileMaxSizeBytes,
+        jstring jPassphrase,
         jstring txReceivedCallbackMethodName,
         jstring txReceivedCallbackMethodSignature,
         jstring callback_received_tx_reply,
@@ -459,6 +460,11 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniCreate(
     // TODO investigate this
     const char *pLogPath = jEnv->GetStringUTFChars(jLogPath, JNI_FALSE);
 
+    const char *pPassphrase = nullptr;
+    if (jPassphrase != nullptr) {
+        pPassphrase = jEnv->GetStringUTFChars(jPassphrase, JNI_FALSE);
+    }
+
     TariWallet *pWallet;
     if (strlen(pLogPath) == 0) {
         pWallet = wallet_create(
@@ -466,7 +472,7 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniCreate(
                 nullptr,
                 static_cast<unsigned int>(maxNumberOfRollingLogFiles),
                 static_cast<unsigned int>(rollingLogFileMaxSizeBytes),
-                nullptr,
+                pPassphrase,
                 txReceivedCallback,
                 txReplyReceivedCallback,
                 txFinalizedCallback,
@@ -488,7 +494,7 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniCreate(
                 pLogPath,
                 static_cast<unsigned int>(maxNumberOfRollingLogFiles),
                 static_cast<unsigned int>(rollingLogFileMaxSizeBytes),
-                nullptr,
+                pPassphrase,
                 txReceivedCallback,
                 txReplyReceivedCallback,
                 txFinalizedCallback,
@@ -1388,6 +1394,36 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniSendTx(
     jEnv->ReleaseStringUTFChars(jfeePerGram, nativeFeePerGram);
     jEnv->ReleaseStringUTFChars(jmessage, pMessage);
     return result;
+}
+
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_tari_android_wallet_ffi_FFIWallet_jniApplyEncryption(
+        JNIEnv *jEnv,
+        jobject jThis,
+        jstring jPassphrase,
+        jobject error) {
+    int i = 0;
+    int *r = &i;
+    jlong lWallet = GetPointerField(jEnv, jThis);
+    auto *pWallet = reinterpret_cast<TariWallet *>(lWallet);
+    const char *pKey = jEnv->GetStringUTFChars(jPassphrase, JNI_FALSE);
+    wallet_apply_encryption(pWallet, pKey, r);
+    setErrorCode(jEnv, error, i);
+}
+
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_tari_android_wallet_ffi_FFIWallet_jniRemoveEncryption(
+        JNIEnv *jEnv,
+        jobject jThis,
+        jobject error) {
+    int i = 0;
+    int *r = &i;
+    jlong lWallet = GetPointerField(jEnv, jThis);
+    auto *pWallet = reinterpret_cast<TariWallet *>(lWallet);
+    wallet_remove_encryption(pWallet, r);
+    setErrorCode(jEnv, error, i);
 }
 
 //endregion
