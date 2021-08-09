@@ -1,11 +1,11 @@
 import org.gradle.api.tasks.testing.logging.TestLogEvent
 
 buildscript {
-    ext.kotlin_version = '1.4.32'
+    ext.kotlin_version = '1.5.21'
 
     // build & version
-    ext.buildNumber = 160
-    ext.versionNumber = "0.6.3"
+    ext.buildNumber = 161
+    ext.versionNumber = "0.6.4"
 
     // JNI libs
     ext.libwalletVersion = "0.16.27"
@@ -19,7 +19,7 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:4.2.1'
+        classpath 'com.android.tools.build:gradle:4.2.2'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
         classpath "io.sentry:sentry-android-gradle-plugin:1.7.34"
     }

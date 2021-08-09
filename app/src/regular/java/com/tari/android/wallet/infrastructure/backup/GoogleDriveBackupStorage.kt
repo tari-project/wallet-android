@@ -52,8 +52,8 @@ import com.google.api.services.drive.DriveScopes
 import com.google.api.services.drive.model.FileList
 import com.orhanobut.logger.Logger
 import com.tari.android.wallet.R
+import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import com.tari.android.wallet.extension.getLastPathComponent
-import com.tari.android.wallet.util.SharedPrefsWrapper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.joda.time.DateTime
@@ -64,7 +64,7 @@ import kotlin.coroutines.suspendCoroutine
 
 internal class GoogleDriveBackupStorage(
     private val context: Context,
-    private val sharedPrefs: SharedPrefsWrapper,
+    private val sharedPrefs: SharedPrefsRepository,
     private val walletTempDirPath: String,
     private val backupFileProcessor: BackupFileProcessor
 ) : BackupStorage {
