@@ -118,7 +118,7 @@ internal class WalletManager(
      */
     private fun getTorTransport(): FFITransportType {
         val cookieFile = File(torConfig.cookieFilePath)
-        val cookieString = cookieFile.readBytes()
+        val cookieString: ByteArray = cookieFile.readBytes()
         val torCookie = FFIByteVector(cookieString)
         return FFITransportType(
             NetAddressString(
@@ -145,7 +145,8 @@ internal class WalletManager(
             Constants.Wallet.walletDBName,
             walletFilesDirPath,
             Constants.Wallet.discoveryTimeoutSec,
-            Constants.Wallet.storeAndForwardMessageDurationSec
+            Constants.Wallet.storeAndForwardMessageDurationSec,
+            Network.WEATHERWAX.uriComponent,
         )
     }
 
@@ -184,7 +185,7 @@ internal class WalletManager(
         }
         val baseNode = baseNodeIterator.next()
         val name = baseNode.first
-        val publicKeyHex = baseNode.second
+        val publicKeyHex: String = baseNode.second
         val address = baseNode.third
         sharedPrefsWrapper.baseNodeLastSyncResult = null
         sharedPrefsWrapper.baseNodeName = name

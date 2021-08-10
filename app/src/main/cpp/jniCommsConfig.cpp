@@ -50,12 +50,14 @@ Java_com_tari_android_wallet_ffi_FFICommsConfig_jniCreate(
         jstring jDatastorePath,
         jlong jDiscoveryTimeoutSec,
         jlong jSafDurationSec,
+        jstring jNetworkName,
         jobject error) {
     const char *pControlServiceAddress = jEnv->GetStringUTFChars(
             jPublicAddress,
             JNI_FALSE);
     const char *pDatabaseName = jEnv->GetStringUTFChars(jDatabaseName, JNI_FALSE);
     const char *pDatastorePath = jEnv->GetStringUTFChars(jDatastorePath, JNI_FALSE);
+    const char *pNetworkName = jEnv->GetStringUTFChars(jNetworkName, JNI_FALSE);
     jlong lTransport = GetPointerField(jEnv, jTransport);
     auto *pTransport = reinterpret_cast<TariTransportType *>(lTransport);
     int i = 0;
@@ -70,11 +72,13 @@ Java_com_tari_android_wallet_ffi_FFICommsConfig_jniCreate(
             pDatastorePath,
             static_cast<unsigned long long int>(jDiscoveryTimeoutSec),
             static_cast<unsigned long long int>(jSafDurationSec),
+            pNetworkName,
             r
     );
     jEnv->ReleaseStringUTFChars(jPublicAddress, pControlServiceAddress);
     jEnv->ReleaseStringUTFChars(jDatabaseName, pDatabaseName);
     jEnv->ReleaseStringUTFChars(jDatastorePath, pDatastorePath);
+    jEnv->ReleaseStringUTFChars(jNetworkName, pNetworkName);
     setErrorCode(jEnv, error, i);
     SetPointerField(jEnv, jThis, reinterpret_cast<jlong>(pCommsConfig));
 }
