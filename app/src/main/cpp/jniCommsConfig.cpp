@@ -81,23 +81,6 @@ Java_com_tari_android_wallet_ffi_FFICommsConfig_jniCreate(
 
 extern "C"
 JNIEXPORT void JNICALL
-Java_com_tari_android_wallet_ffi_FFICommsConfig_jniSetPrivateKey(
-        JNIEnv *jEnv,
-        jobject jThis,
-        jobject jPrivateKey,
-        jobject error) {
-    jlong lCommsConfig = GetPointerField(jEnv, jThis);
-    auto *pCommsConfig = reinterpret_cast<TariCommsConfig *>(lCommsConfig);
-    jlong lPrivateKey = GetPointerField(jEnv, jPrivateKey);
-    auto *pPrivateKey = reinterpret_cast<TariPrivateKey *>(lPrivateKey);
-    int i = 0;
-    int *r = &i;
-    comms_config_set_secret_key(pCommsConfig, pPrivateKey, r);
-    setErrorCode(jEnv, error, i);
-}
-
-extern "C"
-JNIEXPORT void JNICALL
 Java_com_tari_android_wallet_ffi_FFICommsConfig_jniDestroy(
         JNIEnv *jEnv,
         jobject jThis) {

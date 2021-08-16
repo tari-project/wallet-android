@@ -188,8 +188,8 @@ class SharedPrefsRepository(
     var databasePassphrase: String?
         get() = SecurePreferences.getStringValue(context, Key.walletDatabasePassphrase, null)
         set(value) = sharedPrefs.edit().apply {
-            if (value == null) remove(Key.walletDatabasePassphrase)
-            else putString(Key.walletDatabasePassphrase, value)
+            if (value == null) SecurePreferences.removeValue(context, Key.walletDatabasePassphrase)
+            else SecurePreferences.setValue(context, Key.walletDatabasePassphrase, value)
         }.apply()
 
     var isRestoredWallet: Boolean by SharedPrefBooleanDelegate(sharedPrefs, Key.isRestoredWallet)

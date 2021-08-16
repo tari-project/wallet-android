@@ -45,8 +45,8 @@ class FFITransportTypeTest {
             )
         val transport = FFITransportType(
             addressString,
-            torMod.provideConnectionPort(),
             cookie,
+            torMod.provideConnectionPort(),
             torMod.provideTorSock5Username(),
             torMod.provideTorSock5Password()
         )

@@ -53,8 +53,8 @@ internal class FFITransportType() : FFIBase() {
 
     private external fun jniTorTransport(
         control_server_address: String,
-        torPort: Int,
         torCookie: FFIByteVector,
+        torPort: Int,
         socksUsername: String,
         socksPassword: String,
         libError: FFIError
@@ -84,16 +84,16 @@ internal class FFITransportType() : FFIBase() {
      */
     constructor(
         controlAddress: NetAddressString,
-        torPort: Int,
         torCookie: FFIByteVector,
+        torPort: Int,
         socksUsername: String,
         socksPassword: String
     ) : this() {
         val error = FFIError()
         jniTorTransport(
             controlAddress.toString(),
-            torPort,
             torCookie,
+            torPort,
             socksUsername,
             socksPassword,
             error

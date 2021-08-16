@@ -455,7 +455,7 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniCreate(
     }
 
     jlong lWalletConfig = GetPointerField(jEnv, jpWalletConfig);
-    auto *pWalletConfig = reinterpret_cast<TariWalletConfig *>(lWalletConfig);
+    auto *pWalletConfig = reinterpret_cast<TariCommsConfig *>(lWalletConfig);
 
     // TODO investigate this
     const char *pLogPath = jEnv->GetStringUTFChars(jLogPath, JNI_FALSE);
@@ -473,6 +473,7 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniCreate(
                 static_cast<unsigned int>(maxNumberOfRollingLogFiles),
                 static_cast<unsigned int>(rollingLogFileMaxSizeBytes),
                 pPassphrase,
+                nullptr,
                 txReceivedCallback,
                 txReplyReceivedCallback,
                 txFinalizedCallback,
@@ -495,6 +496,7 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniCreate(
                 static_cast<unsigned int>(maxNumberOfRollingLogFiles),
                 static_cast<unsigned int>(rollingLogFileMaxSizeBytes),
                 pPassphrase,
+                nullptr,
                 txReceivedCallback,
                 txReplyReceivedCallback,
                 txFinalizedCallback,

@@ -54,11 +54,6 @@ internal class FFICommsConfig() : FFIBase() {
         error: FFIError
     )
 
-    private external fun jniSetPrivateKey(
-        privateKey: FFIPrivateKey,
-        error: FFIError
-    )
-
     private external fun jniDestroy()
 
     // endregion
@@ -99,12 +94,6 @@ internal class FFICommsConfig() : FFIBase() {
             Logger.e(messageBuilder.toString())
             throw FFIException(message = messageBuilder.toString())
         }
-    }
-
-    fun setPrivateKey(privateKey: FFIPrivateKey) {
-        val error = FFIError()
-        jniSetPrivateKey(privateKey, error)
-        throwIf(error)
     }
 
     override fun destroy() {
