@@ -50,7 +50,6 @@ import com.tari.android.wallet.R.drawable.base_node_config_edit_text_bg
 import com.tari.android.wallet.R.drawable.base_node_config_edit_text_invalid_bg
 import com.tari.android.wallet.application.WalletManager
 import com.tari.android.wallet.databinding.FragmentBaseNodeConfigBinding
-import com.tari.android.wallet.event.Event
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.ffi.FFIPublicKey
 import com.tari.android.wallet.ffi.FFIWallet
@@ -113,18 +112,13 @@ internal class BaseNodeConfigFragment : Fragment(), ServiceConnection {
     }
 
     override fun onDestroyView() {
-        EventBus.unsubscribe(this)
+        EventBus.baseNodeState.unsubscribe(this)
         requireActivity().unbindService(this)
         super.onDestroyView()
     }
 
     private fun subscribeToEventBus() {
-        EventBus.subscribe<Event.Wallet.BaseNodeSyncComplete>(this) {
-            lifecycleScope.launch(Dispatchers.Main) {
-                updateCurrentBaseNode()
-            }
-        }
-        EventBus.subscribe<Event.Wallet.BaseNodeSyncStarted>(this) {
+        EventBus.baseNodeState.subscribe(this) {
             lifecycleScope.launch(Dispatchers.Main) {
                 updateCurrentBaseNode()
             }

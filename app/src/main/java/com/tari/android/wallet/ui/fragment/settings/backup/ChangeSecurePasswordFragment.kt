@@ -65,6 +65,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.net.UnknownHostException
 import javax.inject.Inject
+import com.tari.android.wallet.infrastructure.backup.BackupState.*
 
 internal class ChangeSecurePasswordFragment @Deprecated(
     """Use newInstance() and supply all the 
@@ -103,7 +104,7 @@ framework for UI tree rebuild on configuration changes"""
     }
 
     override fun onDestroyView() {
-        EventBus.unsubscribeFromBackupState(this)
+        EventBus.backupState.unsubscribe(this)
         super.onDestroyView()
     }
 
@@ -333,7 +334,7 @@ framework for UI tree rebuild on configuration changes"""
     }
 
     private fun subscribeToBackupState() {
-        EventBus.subscribeToBackupState(this) { backupState ->
+        EventBus.backupState.subscribe(this) { backupState ->
             lifecycleScope.launch(Dispatchers.Main) {
                 onBackupStateChanged(backupState)
             }

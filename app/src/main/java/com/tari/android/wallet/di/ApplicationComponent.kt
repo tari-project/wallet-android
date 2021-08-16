@@ -68,6 +68,7 @@ import com.tari.android.wallet.ui.fragment.settings.backup.VerifySeedPhraseFragm
 import com.tari.android.wallet.ui.fragment.tx.TxListFragment
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
+import com.tari.android.wallet.ui.component.networkStateIndicator.ConnectionIndicatorViewModel
 import com.tari.android.wallet.ui.fragment.settings.backgroundService.BackgroundServiceSettingsViewModel
 import dagger.Component
 import dagger.Provides
@@ -159,6 +160,7 @@ internal interface ApplicationComponent {
     fun inject(thumbnailGIFsViewModel: AddNoteFragment.ThumbnailGIFsViewModel)
     fun inject(gifViewModel: TxDetailsActivity.GIFViewModel)
     fun inject(backgroundServiceSettingsViewModel: BackgroundServiceSettingsViewModel)
+    fun inject(connectionIndicatorViewModel: ConnectionIndicatorViewModel)
     /**
      * Service(s).
      */

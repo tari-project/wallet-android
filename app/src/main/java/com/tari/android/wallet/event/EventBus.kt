@@ -35,10 +35,8 @@ package com.tari.android.wallet.event
 import com.tari.android.wallet.application.WalletState
 import com.tari.android.wallet.infrastructure.backup.BackupState
 import com.tari.android.wallet.network.NetworkConnectionState
+import com.tari.android.wallet.service.baseNode.BaseNodeState
 import com.tari.android.wallet.tor.TorProxyState
-import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.subjects.BehaviorSubject
-import io.reactivex.subjects.PublishSubject
 
 /**
  * Event bus for the pub/sub model.
@@ -49,113 +47,17 @@ import io.reactivex.subjects.PublishSubject
  *      // op.s
  * }
  */
-internal object EventBus {
+internal object EventBus : GeneralEventBus() {
 
-    private val disposables = mutableMapOf<Any, CompositeDisposable>()
-    val publishSubject = PublishSubject.create<Any>()
+    //todo looks like better to have it into appropriate classes than here
+    val torProxyState = BehaviorEventBus<TorProxyState>()
 
-    private val torProxyStateDisposables = mutableMapOf<Any, CompositeDisposable>()
-    val torProxyStateSubject = BehaviorSubject.create<TorProxyState>()
+    val walletState = BehaviorEventBus<WalletState>()
 
-    private val walletStateDisposables = mutableMapOf<Any, CompositeDisposable>()
-    val walletStateSubject = BehaviorSubject.create<WalletState>()
+    val networkConnectionState = BehaviorEventBus<NetworkConnectionState>()
 
-    private val networkConnectionStateDisposables = mutableMapOf<Any, CompositeDisposable>()
-    val networkConnectionStateSubject = BehaviorSubject.create<NetworkConnectionState>()
+    val backupState = BehaviorEventBus<BackupState>()
 
-    private val backupStateDisposables = mutableMapOf<Any, CompositeDisposable>()
-    val backupStateSubject = BehaviorSubject.create<BackupState>()
-
-    // region: general purpose event bus
-
-    inline fun <reified T : Any> subscribe(subscriber: Any, noinline consumer: (T) -> Unit) {
-        val observer = publishSubject.ofType(T::class.java).subscribe(consumer)
-        val disposable = disposables[subscriber]
-            ?: CompositeDisposable().apply { disposables[subscriber] = this }
-        disposable.add(observer)
-    }
-
-    fun unsubscribe(subscriber: Any) = disposables.apply {
-        get(subscriber)?.clear()
-        remove(subscriber)
-    }
-
-    fun post(event: Any) = publishSubject.onNext(event)
-
-    // endregion
-
-    // region: Tor proxy state
-
-    fun subscribeToTorProxyState(subscriber: Any, consumer: (TorProxyState) -> Unit) {
-        val observer = torProxyStateSubject.ofType(TorProxyState::class.java).subscribe(consumer)
-        val disposable = torProxyStateDisposables[subscriber]
-            ?: CompositeDisposable().apply { torProxyStateDisposables[subscriber] = this }
-        disposable.add(observer)
-    }
-
-    fun unsubscribeFromTorProxyState(subscriber: Any) = torProxyStateDisposables.apply {
-        get(subscriber)?.clear()
-        remove(subscriber)
-    }
-
-    fun postTorProxyState(event: TorProxyState) = torProxyStateSubject.onNext(event)
-
-    // endregion
-
-    // region: wallet state
-
-    fun subscribeToWalletState(subscriber: Any, consumer: (WalletState) -> Unit) {
-        val observer = walletStateSubject.ofType(WalletState::class.java).subscribe(consumer)
-        val disposable = walletStateDisposables[subscriber]
-            ?: CompositeDisposable().apply { walletStateDisposables[subscriber] = this }
-        disposable.add(observer)
-    }
-
-    fun unsubscribeFromWalletState(subscriber: Any) = walletStateDisposables.apply {
-        get(subscriber)?.clear()
-        remove(subscriber)
-    }
-
-    fun postWalletState(event: WalletState) = walletStateSubject.onNext(event)
-
-    // endregion
-
-    // region: connectivity state
-
-    fun subscribeToNetworkConnectionState(subscriber: Any, consumer: (NetworkConnectionState) -> Unit) {
-        val observer = networkConnectionStateSubject.ofType(NetworkConnectionState::class.java).subscribe(consumer)
-        val disposable = networkConnectionStateDisposables[subscriber]
-            ?: CompositeDisposable().apply { networkConnectionStateDisposables[subscriber] = this }
-        disposable.add(observer)
-    }
-
-    fun unsubscribeFromNetworkConnectionState(subscriber: Any) = networkConnectionStateDisposables.apply {
-        get(subscriber)?.clear()
-        remove(subscriber)
-    }
-
-    fun postNetworkConnectionState(event: NetworkConnectionState) = networkConnectionStateSubject.onNext(event)
-
-    // endregion
-
-    // region: backup state
-
-    fun subscribeToBackupState(subscriber: Any, consumer: (BackupState) -> Unit) {
-        val observer = backupStateSubject.ofType(BackupState::class.java).subscribe(consumer)
-        val disposable = backupStateDisposables[subscriber]
-            ?: CompositeDisposable().apply { backupStateDisposables[subscriber] = this }
-        disposable.add(observer)
-    }
-
-    fun unsubscribeFromBackupState(subscriber: Any) = backupStateDisposables.apply {
-        get(subscriber)?.clear()
-        remove(subscriber)
-    }
-
-    fun postBackupState(event: BackupState) = backupStateSubject.onNext(event)
-
-    fun currentBackupState() = backupStateSubject.value
-
-    // endregion
-
+    val baseNodeState = BehaviorEventBus<BaseNodeState>()
 }
+

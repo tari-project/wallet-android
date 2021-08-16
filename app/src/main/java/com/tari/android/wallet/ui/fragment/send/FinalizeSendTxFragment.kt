@@ -205,7 +205,7 @@ class FinalizeSendTxFragment : Fragment(), ServiceConnection {
 
     override fun onDestroyView() {
         super.onDestroyView()
-        EventBus.unsubscribeFromTorProxyState(this)
+        EventBus.torProxyState.unsubscribe(this)
         EventBus.unsubscribe(this)
         ui.lottieAnimationView.removeAllAnimatorListeners()
         requireActivity().unbindService(this)
@@ -251,10 +251,10 @@ class FinalizeSendTxFragment : Fragment(), ServiceConnection {
     }
 
     private fun subscribeToEventBus() {
-        EventBus.subscribe<Event.Wallet.DirectSendResult>(this) { event ->
+        EventBus.subscribe<Event.Transaction.DirectSendResult>(this) { event ->
             ui.rootView.post { onDirectSendResult(event.txId, event.success) }
         }
-        EventBus.subscribe<Event.Wallet.StoreAndForwardSendResult>(this) { event ->
+        EventBus.subscribe<Event.Transaction.StoreAndForwardSendResult>(this) { event ->
             ui.rootView.post { onStoreAndForwardSendResult(event.txId, event.success) }
         }
     }
@@ -370,7 +370,7 @@ class FinalizeSendTxFragment : Fragment(), ServiceConnection {
                 DateTime.now()
             ).seconds
             if (secondsElapsed >= connectionTimeoutSecs) { // network connection timeout
-                val networkConnectionState = EventBus.networkConnectionStateSubject.value
+                val networkConnectionState = EventBus.networkConnectionState.publishSubject.value
                 if (networkConnectionState != NetworkConnectionState.CONNECTED) {
                     // internet connection problem
                     onFailure(FailureReason.NETWORK_CONNECTION_ERROR)
@@ -388,8 +388,8 @@ class FinalizeSendTxFragment : Fragment(), ServiceConnection {
      * Step #1 of the flow.
      */
     private fun checkConnectionStatus() {
-        val networkConnectionState = EventBus.networkConnectionStateSubject.value
-        val torProxyState = EventBus.torProxyStateSubject.value
+        val networkConnectionState = EventBus.networkConnectionState.publishSubject.value
+        val torProxyState = EventBus.torProxyState.publishSubject.value
         // check internet connection
         if (networkConnectionState != NetworkConnectionState.CONNECTED) {
             Logger.w("Send error: not connected to the internet.")
@@ -408,7 +408,7 @@ class FinalizeSendTxFragment : Fragment(), ServiceConnection {
         if (torProxyState.bootstrapStatus.progress < TorBootstrapStatus.maxProgress) {
             Logger.d("Tor proxy not ready - start waiting.")
             // subscribe to Tor proxy state changes - start waiting on it
-            EventBus.subscribeToTorProxyState(this) { state ->
+            EventBus.torProxyState.subscribe(this) { state ->
                 onTorProxyStateChanged(state)
             }
         } else {
@@ -420,7 +420,7 @@ class FinalizeSendTxFragment : Fragment(), ServiceConnection {
     private fun onTorProxyStateChanged(torProxyState: TorProxyState) {
         if (torProxyState is TorProxyState.Running) {
             if (torProxyState.bootstrapStatus.progress == TorBootstrapStatus.maxProgress) {
-                EventBus.unsubscribeFromTorProxyState(this)
+                EventBus.torProxyState.unsubscribe(this)
                 checkConnectionStatus()
             }
         }

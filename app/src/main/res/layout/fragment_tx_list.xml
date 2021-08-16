@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/root_view"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -21,17 +22,15 @@
         android:layout_marginStart="@dimen/common_horizontal_margin"
         android:layout_marginTop="@dimen/home_top_content_container_view_top_margin">
 
-        <!-- referral icon (image only) -->
-        <ImageView
-            android:id="@+id/wallet_info_image_view"
+        <!-- network state indicator -->
+        <com.tari.android.wallet.ui.component.networkStateIndicator.ConnectionIndicatorView
+            android:id="@+id/network_status_state_indicator_view"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
-            android:layout_centerInParent="true"
-            android:contentDescription="@null"
-            android:scaleType="center"
-            android:src="@drawable/icon_gift"
-            android:visibility="invisible" />
+            android:layout_marginBottom="8dp"
+            android:layout_alignTop="@+id/balance_container"
+            android:layout_alignBottom="@+id/balance_container"/>
 
         <!-- title -->
         <com.tari.android.wallet.ui.component.CustomFontTextView
@@ -41,21 +40,22 @@
             android:layout_alignParentStart="true"
             android:layout_marginTop="12dp"
             android:layout_marginEnd="4dp"
-            android:layout_toStartOf="@+id/wallet_info_image_view"
+            android:layout_toStartOf="@+id/network_status_state_indicator_view"
             android:letterSpacing="-0.018"
             android:text="@string/home_available_balance"
             android:textColor="@color/white"
             android:textSize="12sp"
-            app:customFont="AVENIR_LT_STD_MEDIUM" />
+            app:customFont="@string/font_medium" />
 
         <LinearLayout
+            android:id="@+id/balance_container"
             android:layout_width="0dp"
             android:layout_height="@dimen/home_balance_digit_height"
             android:layout_below="@id/available_balance_text_view"
             android:layout_alignParentStart="true"
             android:layout_marginTop="2dp"
             android:layout_marginEnd="4dp"
-            android:layout_toStartOf="@+id/wallet_info_image_view"
+            android:layout_toStartOf="@+id/network_status_state_indicator_view"
             android:gravity="center_vertical"
             android:orientation="horizontal">
 
@@ -107,7 +107,6 @@
         android:id="@+id/scroll_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:clickable="false"
         android:overScrollMode="never">
 
         <RelativeLayout
@@ -234,7 +233,7 @@
                             android:text="@string/home_store_and_forward_progress_checking_for_updates"
                             android:textColor="@color/purple"
                             android:textSize="13sp"
-                            app:customFont="AVENIR_LT_STD_HEAVY" />
+                            app:customFont="@string/font_heavy" />
 
                         <com.tari.android.wallet.ui.component.CustomFontTextView
                             android:id="@+id/home_txt_receiving_txs"
@@ -244,7 +243,7 @@
                             android:text="@string/home_store_and_forward_progress_receiving_txs"
                             android:textColor="@color/purple"
                             android:textSize="13sp"
-                            app:customFont="AVENIR_LT_STD_HEAVY" />
+                            app:customFont="@string/font_heavy" />
 
                         <com.tari.android.wallet.ui.component.CustomFontTextView
                             android:id="@+id/home_txt_completing_txs"
@@ -254,7 +253,7 @@
                             android:text="@string/home_store_and_forward_progress_completing_txs"
                             android:textColor="@color/purple"
                             android:textSize="13sp"
-                            app:customFont="AVENIR_LT_STD_HEAVY" />
+                            app:customFont="@string/font_heavy" />
 
                         <com.tari.android.wallet.ui.component.CustomFontTextView
                             android:id="@+id/home_txt_updating_txs"
@@ -264,7 +263,7 @@
                             android:text="@string/home_store_and_forward_progress_updating_txs"
                             android:textColor="@color/purple"
                             android:textSize="13sp"
-                            app:customFont="AVENIR_LT_STD_HEAVY" />
+                            app:customFont="@string/font_heavy" />
 
                         <com.tari.android.wallet.ui.component.CustomFontTextView
                             android:id="@+id/home_txt_up_to_date"
@@ -274,7 +273,7 @@
                             android:text="@string/home_store_and_forward_progress_up_to_date"
                             android:textColor="#23BE90"
                             android:textSize="13sp"
-                            app:customFont="AVENIR_LT_STD_HEAVY" />
+                            app:customFont="@string/font_heavy" />
                     </LinearLayout>
 
                     <ProgressBar
@@ -334,7 +333,7 @@
                         android:text="@string/home_setup_is_complete"
                         android:textColor="@color/black"
                         android:textSize="18sp"
-                        app:customFont="AVENIR_LT_STD_LIGHT" />
+                        app:customFont="@string/font_light" />
 
                     <com.tari.android.wallet.ui.component.CustomFontTextView
                         android:layout_width="match_parent"
@@ -365,7 +364,7 @@
                     android:textColor="@color/dark_gray"
                     android:textSize="14sp"
                     android:translationY="-85dp"
-                    app:customFont="AVENIR_LT_STD_MEDIUM" />
+                    app:customFont="@string/font_medium" />
             </RelativeLayout>
 
             <View
@@ -383,7 +382,8 @@
         android:layout_width="match_parent"
         android:layout_height="@dimen/common_header_height"
         android:layout_marginTop="0dp"
-        android:background="@color/white">
+        android:background="@color/white"
+        tools:visibility="gone">
 
         <ImageButton
             android:id="@+id/close_tx_list_button"
@@ -401,7 +401,7 @@
             android:text="@string/home_txs"
             android:textColor="@color/black"
             android:textSize="16sp"
-            app:customFont="AVENIR_LT_STD_HEAVY" />
+            app:customFont="@string/font_heavy" />
 
     </RelativeLayout>
 

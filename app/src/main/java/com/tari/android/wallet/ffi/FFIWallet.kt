@@ -321,7 +321,6 @@ internal class FFIWallet(
         if (pointer == nullptr) { // so it can only be assigned once for the singleton
             val error = FFIError()
             Logger.i("Pre jniCreate.")
-            Logger.i(sharedPrefsRepository.databasePassphrase.toString())
             jniCreate(
                 commsConfig,
                 logPath,
@@ -355,6 +354,7 @@ internal class FFIWallet(
         if (passphrase == null) {
             Logger.i("Database encryption enable")
             sharedPrefsRepository.generateDatabasePassphrase()
+            Logger.i(sharedPrefsRepository.databasePassphrase.orEmpty())
             setEncryption(sharedPrefsRepository.databasePassphrase.orEmpty())
         }
     }

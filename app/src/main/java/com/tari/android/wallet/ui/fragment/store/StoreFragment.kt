@@ -110,7 +110,7 @@ framework for UI tree rebuild on configuration changes"""
 
     private fun reloadWebViewOnErrorAndConnectedState() {
         subscription = Observable.combineLatest(
-            EventBus.networkConnectionStateSubject.distinctUntilChanged(),
+            EventBus.networkConnectionState.publishSubject.distinctUntilChanged(),
             webViewStatePublisher.distinctUntilChanged(),
             BiFunction<NetworkConnectionState, WebViewState, Pair<NetworkConnectionState, WebViewState>>(
                 ::Pair

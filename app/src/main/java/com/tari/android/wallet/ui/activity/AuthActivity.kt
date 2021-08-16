@@ -57,7 +57,6 @@ import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.infrastructure.Tracker
 import com.tari.android.wallet.infrastructure.security.biometric.BiometricAuthenticationService
 import com.tari.android.wallet.infrastructure.security.biometric.BiometricAuthenticationService.BiometricAuthenticationException
-import com.tari.android.wallet.service.WalletService
 import com.tari.android.wallet.ui.activity.home.HomeActivity
 import com.tari.android.wallet.ui.extension.*
 import com.tari.android.wallet.util.Constants
@@ -94,7 +93,7 @@ internal class AuthActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         ui = ActivityAuthBinding.inflate(layoutInflater).apply { setContentView(root) }
         overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
-        EventBus.subscribeToWalletState(this, this::onWalletStateChanged)
+        EventBus.walletState.subscribe(this, this::onWalletStateChanged)
         setupUi()
         walletServiceLauncher.start()
         if (savedInstanceState == null) {
@@ -112,7 +111,7 @@ internal class AuthActivity : AppCompatActivity() {
     }
 
     override fun onDestroy() {
-        EventBus.unsubscribeFromWalletState(this)
+        EventBus.walletState.unsubscribe(this)
         super.onDestroy()
     }
 
@@ -246,7 +245,7 @@ internal class AuthActivity : AppCompatActivity() {
      */
     private fun playTariWalletAnim() {
         ui.authAnimLottieAnimationView.addAnimatorListener(onEnd = {
-            if (EventBus.walletStateSubject.value != WalletState.RUNNING) {
+            if (EventBus.walletState.publishSubject.value != WalletState.RUNNING) {
                 continueIsPendingOnWalletState = true
                 ui.progressBar.alpha = 0f
                 ui.progressBar.visible()

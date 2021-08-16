@@ -17,7 +17,6 @@
     <color name="disabled_cta">@color/dark_gray</color>
     <color name="tx_status">#FFEC9C00</color>
 
-
     <!-- common gradient button -->
     <color name="gradient_btn_start">#7300ff</color>
     <color name="gradient_btn_center">#8E31FF</color>
@@ -119,5 +118,14 @@
     <color name="change_password_edit_text_underline">#F1F1F1</color>
     <color name="change_password_hint">@color/home_tx_section_header_title</color>
     <color name="change_password_cta_disabled">@color/change_password_hint</color>
+
+    <!-- network status indicator -->
+    <color name="connection_status_error">#D32C44</color>
+    <color name="connection_status_ok">#3DDC84</color>
+    <color name="connection_status_orange">#FFB340</color>
+
+    <!-- tooltip -->
+    <color name="tooltip_background">#80000000</color>
+    <color name="tooltip_text_color">#FFFFFF</color>
 
 </resources>

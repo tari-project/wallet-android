@@ -42,6 +42,7 @@ enum class BaseNodeValidationResult(val status: Int) {
     SUCCESS(0),
     ABORTED(1),
     FAILURE(2),
+    //todo no proper usages, need to investigate
     BASE_NODE_NOT_IN_SYNC(3);
 
     companion object {

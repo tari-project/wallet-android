@@ -49,6 +49,7 @@ import com.tari.android.wallet.model.WalletError
 import com.tari.android.wallet.model.WalletErrorCode
 import com.tari.android.wallet.network.NetworkConnectionState
 import com.tari.android.wallet.service.TariWalletService
+import com.tari.android.wallet.service.baseNode.BaseNodeState
 import com.tari.android.wallet.tor.TorBootstrapStatus
 import com.tari.android.wallet.tor.TorProxyState
 import com.tari.android.wallet.ui.extension.*
@@ -155,28 +156,28 @@ internal class UpdateProgressViewController(
     }
 
     private fun subscribeToEventBus() {
-        EventBus.subscribe<Event.Wallet.BaseNodeSyncComplete>(this) { event ->
+        EventBus.baseNodeState.subscribeOnEvent<BaseNodeState.SyncCompleted>(this) { event ->
             Logger.i("Received BaseNodeSyncComplete in state %s.", state)
             if (state == State.RUNNING && isWaitingOnBaseNodeSync) {
                 onBaseNodeSyncCompleted(event)
             }
         }
-        EventBus.subscribe<Event.Wallet.TxReceived>(this) {
+        EventBus.subscribe<Event.Transaction.TxReceived>(this) {
             if (state == State.RUNNING || state == State.RECEIVING) {
                 numberOfReceivedTxs++
             }
         }
-        EventBus.subscribe<Event.Wallet.InboundTxBroadcast>(this) {
+        EventBus.subscribe<Event.Transaction.InboundTxBroadcast>(this) {
             if (state == State.RUNNING || state == State.RECEIVING) {
                 numberOfBroadcastTxs++
             }
         }
-        EventBus.subscribe<Event.Wallet.OutboundTxBroadcast>(this) {
+        EventBus.subscribe<Event.Transaction.OutboundTxBroadcast>(this) {
             if (state == State.RUNNING || state == State.RECEIVING) {
                 numberOfBroadcastTxs++
             }
         }
-        EventBus.subscribe<Event.Wallet.TxCancelled>(this) {
+        EventBus.subscribe<Event.Transaction.TxCancelled>(this) {
             if (state == State.RUNNING || state == State.RECEIVING) {
                 numberOfCancelledTxs++
             }
@@ -204,7 +205,7 @@ internal class UpdateProgressViewController(
 
     private fun checkNetworkConnectionStatus() {
         Logger.d("Start connection check.")
-        val networkConnectionState = EventBus.networkConnectionStateSubject.value
+        val networkConnectionState = EventBus.networkConnectionState.publishSubject.value
         if (networkConnectionState != NetworkConnectionState.CONNECTED) {
             Logger.e("Update error: not connected to the internet.")
             view.postDelayed({
@@ -224,7 +225,7 @@ internal class UpdateProgressViewController(
             fail(FailureReason.BASE_NODE_VALIDATION_ERROR)
             return
         }
-        val torProxyState = EventBus.torProxyStateSubject.value
+        val torProxyState = EventBus.torProxyState.publishSubject.value
         // check whether Tor proxy is running
         if (torProxyState !is TorProxyState.Running) {
             // either not connected or Tor proxy is not running
@@ -283,7 +284,7 @@ internal class UpdateProgressViewController(
             .subscribe { baseNodeSyncTimedOut() }
     }
 
-    private fun onBaseNodeSyncCompleted(event: Event.Wallet.BaseNodeSyncComplete) {
+    private fun onBaseNodeSyncCompleted(event: BaseNodeState.SyncCompleted) {
         isWaitingOnBaseNodeSync = false
         baseNodeSyncTimeoutSubscription?.dispose()
         when (event.result) {
