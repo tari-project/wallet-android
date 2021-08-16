@@ -125,8 +125,8 @@ internal class WalletManager(
                 torConfig.controlHost,
                 torConfig.controlPort
             ),
-            torConfig.connectionPort,
             torCookie,
+            torConfig.connectionPort,
             torConfig.sock5Username,
             torConfig.sock5Password
         )

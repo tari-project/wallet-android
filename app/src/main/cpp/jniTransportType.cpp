@@ -70,8 +70,8 @@ Java_com_tari_android_wallet_ffi_FFITransportType_jniTorTransport(
         JNIEnv *jEnv,
         jobject jThis,
         jstring jpControl,
-        jint jPort,
         jobject jpTorCookie,
+        jint jPort,
         jstring jpSocksUser,
         jstring jpSocksPass,
         jobject error) {
