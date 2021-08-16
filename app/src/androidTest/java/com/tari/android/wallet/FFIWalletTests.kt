@@ -40,6 +40,7 @@ package com.tari.android.wallet
 import android.content.Context
 import androidx.test.core.app.ApplicationProvider
 import com.orhanobut.logger.Logger
+import com.tari.android.wallet.application.Network
 import com.tari.android.wallet.ffi.*
 import com.tari.android.wallet.model.*
 import com.tari.android.wallet.util.Constants
@@ -79,7 +80,8 @@ class FFIWalletTests {
             FFITestUtil.WALLET_DB_NAME,
             walletDirPath,
             Constants.Wallet.discoveryTimeoutSec,
-            Constants.Wallet.storeAndForwardMessageDurationSec
+            Constants.Wallet.storeAndForwardMessageDurationSec,
+            Network.WEATHERWAX.uriComponent
         )
         val logFile = File(walletDirPath, "test_log.log")
         // create wallet instance

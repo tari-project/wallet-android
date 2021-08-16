@@ -38,6 +38,7 @@
 package com.tari.android.wallet
 
 import androidx.test.core.app.ApplicationProvider.getApplicationContext
+import com.tari.android.wallet.application.Network
 import com.tari.android.wallet.di.WalletModule
 import com.tari.android.wallet.ffi.FFICommsConfig
 import com.tari.android.wallet.ffi.FFIException
@@ -82,7 +83,8 @@ class FFICommsConfigTests {
             DB_NAME,
             walletDir,
             Constants.Wallet.discoveryTimeoutSec,
-            Constants.Wallet.storeAndForwardMessageDurationSec
+            Constants.Wallet.storeAndForwardMessageDurationSec,
+            Network.WEATHERWAX.uriComponent
         )
         assertNotEquals(nullptr, commsConfig.pointer)
         commsConfig.destroy()
@@ -99,7 +101,8 @@ class FFICommsConfigTests {
                 DB_NAME,
                 "${walletDir}_invalid_target",
                 Constants.Wallet.discoveryTimeoutSec,
-                Constants.Wallet.storeAndForwardMessageDurationSec
+                Constants.Wallet.storeAndForwardMessageDurationSec,
+                Network.WEATHERWAX.uriComponent
             )
         } catch (e: Throwable) {
             transport.destroy()
