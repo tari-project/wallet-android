@@ -56,7 +56,7 @@ import com.tari.android.wallet.model.WalletError
 import com.tari.android.wallet.service.TariWalletService
 import com.tari.android.wallet.service.WalletService
 import com.tari.android.wallet.ui.activity.settings.BackupSettingsRouter
-import com.tari.android.wallet.ui.dialog.ErrorDialog
+import com.tari.android.wallet.ui.dialog.error.ErrorDialog
 import com.tari.android.wallet.ui.extension.ThrottleClick
 import com.tari.android.wallet.ui.extension.animateClick
 import com.tari.android.wallet.ui.extension.color

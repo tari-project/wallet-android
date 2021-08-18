@@ -7,4 +7,4 @@
     android:text="@string/digit_0"
     android:textColor="@color/black"
     android:textSize="@dimen/add_amount_element_text_size"
-    app:customFont="AVENIR_LT_STD_BLACK" />
+    app:customFont="@string/font_black" />

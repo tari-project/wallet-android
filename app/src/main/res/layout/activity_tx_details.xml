@@ -49,7 +49,7 @@
                     android:text="@string/tx_detail_payment_received"
                     android:textColor="@color/black"
                     android:textSize="16sp"
-                    app:customFont="AVENIR_LT_STD_HEAVY"
+                    app:customFont="@string/font_heavy"
                     app:layout_constraintBottom_toBottomOf="@id/back_view"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
@@ -64,7 +64,7 @@
                     android:layout_marginBottom="24dp"
                     android:textColor="@color/tx_detail_contact_name_label_text"
                     android:textSize="13sp"
-                    app:customFont="AVENIR_LT_STD_MEDIUM"
+                    app:customFont="@string/font_medium"
                     app:layout_constraintEnd_toEndOf="@id/payment_state_text_view"
                     app:layout_constraintStart_toStartOf="@id/payment_state_text_view"
                     app:layout_constraintTop_toBottomOf="@id/payment_state_text_view"
@@ -93,7 +93,7 @@
                     android:paddingHorizontal="10dp"
                     android:textColor="@color/tx_status"
                     android:textSize="12sp"
-                    app:customFont="AVENIR_LT_STD_HEAVY"
+                    app:customFont="@string/font_heavy"
                     tools:text="Hello world" />
 
             </FrameLayout>
@@ -114,7 +114,7 @@
                     android:text="@string/tx_detail_cancel_tx"
                     android:textColor="@color/tx_detail_cancel_tx_cta"
                     android:textSize="12sp"
-                    app:customFont="AVENIR_LT_STD_MEDIUM" />
+                    app:customFont="@string/font_medium" />
             </FrameLayout>
         </LinearLayout>
 
@@ -176,7 +176,7 @@
                         android:layout_centerHorizontal="true"
                         android:textColor="@color/black"
                         android:textSize="@dimen/add_amount_element_text_size"
-                        app:customFont="AVENIR_LT_STD_BLACK"
+                        app:customFont="@string/font_black"
                         tools:text="150" />
                 </RelativeLayout>
 
@@ -187,7 +187,7 @@
                     android:layout_marginTop="24dp"
                     android:textColor="@color/black"
                     android:textSize="14sp"
-                    app:customFont="AVENIR_LT_STD_HEAVY"
+                    app:customFont="@string/font_heavy"
                     tools:text="+5.50" />
 
                 <com.tari.android.wallet.ui.component.CustomFontTextView
@@ -200,7 +200,7 @@
                     android:text="@string/tx_detail_transaction_fee"
                     android:textColor="#A9AFC4"
                     android:textSize="14sp"
-                    app:customFont="AVENIR_LT_STD_HEAVY" />
+                    app:customFont="@string/font_heavy" />
 
                 <View
                     android:id="@+id/amount_section_bottom_spacer"
@@ -218,7 +218,7 @@
                 android:text="@string/common_from"
                 android:textColor="@color/tx_detail_contact_name_label_text"
                 android:textSize="13sp"
-                app:customFont="AVENIR_LT_STD_MEDIUM" />
+                app:customFont="@string/font_medium" />
 
             <FrameLayout
                 android:id="@+id/emoji_id_summary_container_view"
@@ -262,7 +262,7 @@
                 android:textAllCaps="false"
                 android:textColor="@color/purple"
                 android:textSize="14sp"
-                app:customFont="AVENIR_LT_STD_MEDIUM" />
+                app:customFont="@string/font_medium" />
 
             <RelativeLayout
                 android:id="@+id/contact_container_view"
@@ -283,7 +283,7 @@
                     android:text="@string/tx_detail_contact_name"
                     android:textColor="@color/tx_detail_contact_name_label_text"
                     android:textSize="13sp"
-                    app:customFont="AVENIR_LT_STD_MEDIUM" />
+                    app:customFont="@string/font_medium" />
 
                 <com.tari.android.wallet.ui.component.CustomFontTextView
                     android:id="@+id/edit_contact_label_text_view"
@@ -296,7 +296,7 @@
                     android:padding="12dp"
                     android:text="@string/tx_detail_edit"
                     android:textColor="@color/purple"
-                    app:customFont="AVENIR_LT_STD_MEDIUM" />
+                    app:customFont="@string/font_medium" />
 
                 <com.tari.android.wallet.ui.component.CustomFontEditText
                     android:id="@+id/create_contact_edit_text"
@@ -357,7 +357,7 @@
                 android:text="@string/tx_detail_note"
                 android:textColor="@color/tx_detail_contact_name_label_text"
                 android:textSize="13sp"
-                app:customFont="AVENIR_LT_STD_MEDIUM"
+                app:customFont="@string/font_medium"
                 app:layout_constraintStart_toStartOf="@id/contact_container_view"
                 app:layout_constraintTop_toBottomOf="@id/contact_container_view" />
 

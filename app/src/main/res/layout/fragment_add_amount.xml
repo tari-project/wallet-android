@@ -32,7 +32,7 @@
         android:text="@string/add_amount_under_construction"
         android:textColor="@color/black"
         android:textSize="16sp"
-        app:customFont="AVENIR_LT_STD_HEAVY"
+        app:customFont="@string/font_heavy"
         app:layout_constraintBottom_toBottomOf="@id/back_button"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -129,7 +129,7 @@
                             android:singleLine="true"
                             android:textColor="@color/common_error"
                             android:textSize="@dimen/add_amount_balance_text_size"
-                            app:customFont="AVENIR_LT_STD_HEAVY"
+                            app:customFont="@string/font_heavy"
                             tools:text="124.56" />
                     </LinearLayout>
 
@@ -181,7 +181,7 @@
                     android:text="@string/digit_0"
                     android:textColor="@color/black"
                     android:textSize="@dimen/add_amount_element_text_size"
-                    app:customFont="AVENIR_LT_STD_BLACK" />
+                    app:customFont="@string/font_black" />
 
                 <View
                     android:id="@+id/amount_center_correction_view"
@@ -205,7 +205,7 @@
                     android:layout_marginTop="8dp"
                     android:textColor="@color/black"
                     android:textSize="@dimen/add_amount_tx_fee_text_size"
-                    app:customFont="AVENIR_LT_STD_HEAVY"
+                    app:customFont="@string/font_heavy"
                     tools:text="+63.75" />
                 <!-- description -->
                 <com.tari.android.wallet.ui.component.CustomFontTextView
@@ -218,7 +218,7 @@
                     android:text="@string/add_amount_tx_fee"
                     android:textColor="#A9AFC4"
                     android:textSize="@dimen/add_amount_tx_fee_text_size"
-                    app:customFont="AVENIR_LT_STD_HEAVY" />
+                    app:customFont="@string/font_heavy" />
             </LinearLayout>
         </RelativeLayout>
 
@@ -245,7 +245,7 @@
                     android:text="@string/digit_1"
                     android:textColor="@color/black"
                     android:textSize="@dimen/add_amount_keypad_text_size"
-                    app:customFont="AVENIR_LT_STD_HEAVY" />
+                    app:customFont="@string/font_heavy" />
                 <!-- digit 2 -->
                 <com.tari.android.wallet.ui.component.CustomFontButton
                     android:id="@+id/pad_2_button"
@@ -256,7 +256,7 @@
                     android:text="@string/digit_2"
                     android:textColor="@color/black"
                     android:textSize="@dimen/add_amount_keypad_text_size"
-                    app:customFont="AVENIR_LT_STD_HEAVY" />
+                    app:customFont="@string/font_heavy" />
                 <!-- digit 3 -->
                 <com.tari.android.wallet.ui.component.CustomFontButton
                     android:id="@+id/pad_3_button"
@@ -267,7 +267,7 @@
                     android:text="@string/digit_3"
                     android:textColor="@color/black"
                     android:textSize="@dimen/add_amount_keypad_text_size"
-                    app:customFont="AVENIR_LT_STD_HEAVY" />
+                    app:customFont="@string/font_heavy" />
             </LinearLayout>
 
             <!-- num pad :: second line -->
@@ -285,7 +285,7 @@
                     android:text="@string/digit_4"
                     android:textColor="@color/black"
                     android:textSize="@dimen/add_amount_keypad_text_size"
-                    app:customFont="AVENIR_LT_STD_HEAVY" />
+                    app:customFont="@string/font_heavy" />
                 <!-- digit 5 -->
                 <com.tari.android.wallet.ui.component.CustomFontButton
                     android:id="@+id/pad_5_button"
@@ -296,7 +296,7 @@
                     android:text="@string/digit_5"
                     android:textColor="@color/black"
                     android:textSize="@dimen/add_amount_keypad_text_size"
-                    app:customFont="AVENIR_LT_STD_HEAVY" />
+                    app:customFont="@string/font_heavy" />
                 <!-- digit 6 -->
                 <com.tari.android.wallet.ui.component.CustomFontButton
                     android:id="@+id/pad_6_button"
@@ -307,7 +307,7 @@
                     android:text="@string/digit_6"
                     android:textColor="@color/black"
                     android:textSize="@dimen/add_amount_keypad_text_size"
-                    app:customFont="AVENIR_LT_STD_HEAVY" />
+                    app:customFont="@string/font_heavy" />
             </LinearLayout>
 
             <!-- num pad :: third line -->
@@ -325,7 +325,7 @@
                     android:text="@string/digit_7"
                     android:textColor="@color/black"
                     android:textSize="@dimen/add_amount_keypad_text_size"
-                    app:customFont="AVENIR_LT_STD_HEAVY" />
+                    app:customFont="@string/font_heavy" />
                 <!-- digit 8 -->
                 <com.tari.android.wallet.ui.component.CustomFontButton
                     android:id="@+id/pad_8_button"
@@ -336,7 +336,7 @@
                     android:text="@string/digit_8"
                     android:textColor="@color/black"
                     android:textSize="@dimen/add_amount_keypad_text_size"
-                    app:customFont="AVENIR_LT_STD_HEAVY" />
+                    app:customFont="@string/font_heavy" />
                 <!-- digit 9 -->
                 <com.tari.android.wallet.ui.component.CustomFontButton
                     android:id="@+id/pad_9_button"
@@ -347,7 +347,7 @@
                     android:text="@string/digit_9"
                     android:textColor="@color/black"
                     android:textSize="@dimen/add_amount_keypad_text_size"
-                    app:customFont="AVENIR_LT_STD_HEAVY" />
+                    app:customFont="@string/font_heavy" />
             </LinearLayout>
 
             <!-- num pad :: fourth line -->
@@ -365,7 +365,7 @@
                     android:text="@string/digit_decimal_separator_bullet_char"
                     android:textColor="@color/black"
                     android:textSize="@dimen/add_amount_keypad_text_size"
-                    app:customFont="AVENIR_LT_STD_HEAVY" />
+                    app:customFont="@string/font_heavy" />
                 <!-- digit 0 -->
                 <com.tari.android.wallet.ui.component.CustomFontButton
                     android:id="@+id/pad_0_button"
@@ -376,7 +376,7 @@
                     android:text="@string/digit_0"
                     android:textColor="@color/black"
                     android:textSize="@dimen/add_amount_keypad_text_size"
-                    app:customFont="AVENIR_LT_STD_HEAVY" />
+                    app:customFont="@string/font_heavy" />
                 <!-- delete -->
                 <ImageButton
                     android:id="@+id/delete_button"
@@ -412,7 +412,7 @@
                 android:textAllCaps="false"
                 android:textColor="#B2B2B2"
                 android:textSize="16sp"
-                app:customFont="AVENIR_LT_STD_HEAVY" />
+                app:customFont="@string/font_heavy" />
             <!-- actual button -->
             <com.tari.android.wallet.ui.component.CustomFontButton
                 android:id="@+id/continue_button"
@@ -428,7 +428,7 @@
                 android:textAllCaps="false"
                 android:textColor="@color/white"
                 android:textSize="16sp"
-                app:customFont="AVENIR_LT_STD_HEAVY" />
+                app:customFont="@string/font_heavy" />
         </RelativeLayout>
     </LinearLayout>
 

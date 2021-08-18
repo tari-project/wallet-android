@@ -55,7 +55,7 @@ import kotlin.random.Random
  *
  * @author The Tari Development Team
  */
-
+//todo Need to thing about reactive realization
 class SharedPrefsRepository(
     private val context: Context,
     private val sharedPrefs: SharedPreferences

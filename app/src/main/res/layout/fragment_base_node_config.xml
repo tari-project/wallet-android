@@ -25,7 +25,7 @@
             android:text="@string/debug_current_base_node"
             android:textColor="@color/black"
             android:textSize="16sp"
-            app:customFont="AVENIR_LT_STD_HEAVY"
+            app:customFont="@string/font_heavy"
             app:textAllCaps="true" />
 
         <!-- public key -->
@@ -45,7 +45,7 @@
                 android:text="@string/debug_current_base_node_name"
                 android:textColor="@color/black"
                 android:textSize="15sp"
-                app:customFont="AVENIR_LT_STD_HEAVY" />
+                app:customFont="@string/font_heavy" />
 
             <com.tari.android.wallet.ui.component.CustomFontTextView
                 android:id="@+id/name_text_view"
@@ -58,7 +58,7 @@
                 android:singleLine="true"
                 android:textColor="@color/black"
                 android:textSize="15sp"
-                app:customFont="AVENIR_LT_STD_MEDIUM" />
+                app:customFont="@string/font_medium" />
         </LinearLayout>
 
         <!-- public key -->
@@ -78,7 +78,7 @@
                 android:text="@string/debug_current_base_node_public_key"
                 android:textColor="@color/black"
                 android:textSize="15sp"
-                app:customFont="AVENIR_LT_STD_HEAVY" />
+                app:customFont="@string/font_heavy" />
 
             <com.tari.android.wallet.ui.component.CustomFontTextView
                 android:id="@+id/public_key_hex_text_view"
@@ -92,7 +92,7 @@
                 android:textAllCaps="true"
                 android:textColor="@color/black"
                 android:textSize="15sp"
-                app:customFont="AVENIR_LT_STD_MEDIUM" />
+                app:customFont="@string/font_medium" />
         </LinearLayout>
 
         <LinearLayout
@@ -111,7 +111,7 @@
                 android:text="@string/debug_current_base_node_address"
                 android:textColor="@color/black"
                 android:textSize="15sp"
-                app:customFont="AVENIR_LT_STD_HEAVY" />
+                app:customFont="@string/font_heavy" />
 
             <com.tari.android.wallet.ui.component.CustomFontTextView
                 android:id="@+id/address_text_view"
@@ -122,7 +122,7 @@
                 android:singleLine="true"
                 android:textColor="@color/black"
                 android:textSize="15sp"
-                app:customFont="AVENIR_LT_STD_MEDIUM" />
+                app:customFont="@string/font_medium" />
         </LinearLayout>
 
         <LinearLayout
@@ -141,7 +141,7 @@
                 android:text="@string/debug_last_sync_status"
                 android:textColor="@color/black"
                 android:textSize="15sp"
-                app:customFont="AVENIR_LT_STD_HEAVY" />
+                app:customFont="@string/font_heavy" />
 
             <TextView
                 android:id="@+id/sync_status_text_view"
@@ -166,7 +166,7 @@
             android:textAllCaps="false"
             android:textColor="@color/white"
             android:textSize="16sp"
-            app:customFont="AVENIR_LT_STD_HEAVY" />
+            app:customFont="@string/font_heavy" />
 
         <com.tari.android.wallet.ui.component.CustomFontTextView
             android:layout_width="match_parent"
@@ -180,7 +180,7 @@
             android:text="@string/debug_custom_base_node"
             android:textColor="@color/black"
             android:textSize="16sp"
-            app:customFont="AVENIR_LT_STD_HEAVY"
+            app:customFont="@string/font_heavy"
             app:textAllCaps="true" />
 
         <com.tari.android.wallet.ui.component.CustomFontEditText
@@ -196,7 +196,7 @@
             android:singleLine="true"
             android:textColor="@color/black"
             android:textSize="15sp"
-            app:customFont="AVENIR_NEXT_LT_PRO_REGULAR" />
+            app:customFont="@string/font_regular" />
 
         <com.tari.android.wallet.ui.component.CustomFontTextView
             android:id="@+id/invalid_public_key_hex_text_view"
@@ -207,7 +207,7 @@
             android:text="@string/debug_edit_base_node_invalid_public_key"
             android:textColor="@color/common_error"
             android:textSize="14sp"
-            app:customFont="AVENIR_LT_STD_LIGHT" />
+            app:customFont="@string/font_light" />
 
 
         <com.tari.android.wallet.ui.component.CustomFontEditText
@@ -223,7 +223,7 @@
             android:singleLine="true"
             android:textColor="@color/black"
             android:textSize="15sp"
-            app:customFont="AVENIR_NEXT_LT_PRO_REGULAR" />
+            app:customFont="@string/font_regular" />
 
         <com.tari.android.wallet.ui.component.CustomFontTextView
             android:id="@+id/invalid_address_text_view"
@@ -234,7 +234,7 @@
             android:text="@string/debug_edit_base_node_invalid_address"
             android:textColor="@color/common_error"
             android:textSize="14sp"
-            app:customFont="AVENIR_LT_STD_LIGHT" />
+            app:customFont="@string/font_light" />
 
         <RelativeLayout
             android:layout_width="wrap_content"
@@ -252,7 +252,7 @@
                 android:textAllCaps="false"
                 android:textColor="@color/white"
                 android:textSize="16sp"
-                app:customFont="AVENIR_LT_STD_HEAVY" />
+                app:customFont="@string/font_heavy" />
 
             <ProgressBar
                 android:id="@+id/progress_bar"

@@ -4,9 +4,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.tari.android.wallet.R
 import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
-import com.tari.android.wallet.ui.component.loadingSwitch.LoadingSwitchState
 import com.tari.android.wallet.ui.common.CommonViewModel
-import com.tari.android.wallet.ui.common.domain.ResourceManager
+import com.tari.android.wallet.ui.component.loadingSwitch.LoadingSwitchState
 import com.tari.android.wallet.ui.dialog.confirm.ConfirmDialogArgs
 import javax.inject.Inject
 
@@ -14,9 +13,6 @@ class BackgroundServiceSettingsViewModel : CommonViewModel() {
 
     @Inject
     lateinit var sharedPrefsRepository: SharedPrefsRepository
-
-    @Inject
-    lateinit var resourceManager: ResourceManager
 
     private val _switchState = MutableLiveData<LoadingSwitchState>()
     val switchState: LiveData<LoadingSwitchState> = _switchState

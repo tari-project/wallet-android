@@ -62,7 +62,7 @@
             android:text="@string/introduction_crypto_wallet_title_text_line_1"
             android:textColor="@color/white"
             android:textSize="@dimen/introduction_header_text_size"
-            app:customFont="AVENIR_LT_STD_BLACK" />
+            app:customFont="@string/font_black" />
     </RelativeLayout>
 
     <RelativeLayout
@@ -80,7 +80,7 @@
             android:text="@string/introduction_crypto_wallet_title_text_line_2"
             android:textColor="@color/white"
             android:textSize="@dimen/introduction_header_text_size"
-            app:customFont="AVENIR_LT_STD_BLACK" />
+            app:customFont="@string/font_black" />
     </RelativeLayout>
 
     <FrameLayout
@@ -101,7 +101,7 @@
             android:textAllCaps="false"
             android:textColor="@color/white"
             android:textSize="16sp"
-            app:customFont="AVENIR_LT_STD_HEAVY" />
+            app:customFont="@string/font_heavy" />
 
         <ProgressBar
             android:id="@+id/create_wallet_progress_bar"
@@ -121,7 +121,7 @@
         android:text="@string/create_wallet_restore_wallet_cta"
         android:textColor="@color/white"
         android:textSize="13sp"
-        app:customFont="AVENIR_LT_STD_HEAVY" />
+        app:customFont="@string/font_heavy" />
 
     <com.tari.android.wallet.ui.component.CustomFontTextView
         android:id="@+id/user_agreement_and_privacy_policy_text_view"
@@ -138,7 +138,7 @@
         android:textColorHighlight="#33FFFFFF"
         android:textColorLink="@color/introduction_user_agreement_and_privacy_policy"
         android:textSize="12sp"
-        app:customFont="AVENIR_LT_STD_MEDIUM" />
+        app:customFont="@string/font_medium" />
 
     <ImageView
         android:id="@+id/small_gem_image_view"
@@ -163,7 +163,7 @@
         android:letterSpacing="0.1"
         android:textColor="#50FFFFFF"
         android:textSize="@dimen/common_network_and_version_info_text_size"
-        app:customFont="AVENIR_LT_STD_HEAVY"
+        app:customFont="@string/font_heavy"
         tools:ignore="SmallSp" />
 
 </LinearLayout>

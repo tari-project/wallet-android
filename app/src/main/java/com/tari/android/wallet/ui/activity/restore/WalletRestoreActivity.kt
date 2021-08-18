@@ -38,12 +38,13 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import com.tari.android.wallet.R
+import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import com.tari.android.wallet.ui.activity.AuthActivity
 import com.tari.android.wallet.ui.extension.appComponent
-import com.tari.android.wallet.ui.fragment.restore.ChooseRestoreOptionFragment
-import com.tari.android.wallet.ui.fragment.restore.EnterRestorationPasswordFragment
-import com.tari.android.wallet.ui.fragment.restore.WalletRestoringFragment
-import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
+import com.tari.android.wallet.ui.fragment.restore.chooseRestoreOption.ChooseRestoreOptionFragment
+import com.tari.android.wallet.ui.fragment.restore.enterRestorationPassword.EnterRestorationPasswordFragment
+import com.tari.android.wallet.ui.fragment.restore.recoverFromSeedWords.RecoveringFromSeedWordsFragment
+import com.tari.android.wallet.ui.fragment.restore.walletRestoring.WalletRestoringFragment
 import javax.inject.Inject
 
 class WalletRestoreActivity : AppCompatActivity(), WalletRestoreRouter {
@@ -76,7 +77,7 @@ class WalletRestoreActivity : AppCompatActivity(), WalletRestoreRouter {
     }
 
     override fun toRestoreWithRecoveryPhrase() {
-        loadFragment(WalletRestoringFragment.newInstance())
+        loadFragment(RecoveringFromSeedWordsFragment.newInstance())
     }
 
     override fun toRestoreInProgress() {

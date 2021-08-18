@@ -38,8 +38,8 @@ import android.content.Intent
 import androidx.documentfile.provider.DocumentFile
 import androidx.fragment.app.Fragment
 import com.orhanobut.logger.Logger
-import com.tari.android.wallet.extension.getLastPathComponent
 import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
+import com.tari.android.wallet.extension.getLastPathComponent
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.apache.commons.io.FileUtils
@@ -51,6 +51,7 @@ import java.io.File
  *
  * @author The Tari Development Team
  */
+// todo review
 internal class LocalBackupStorage(
     private val context: Context,
     private val sharedPrefs: SharedPrefsRepository,
@@ -174,6 +175,9 @@ internal class LocalBackupStorage(
             // copy file to temp location
             val tempFile = File(walletTempDirPath, backupFiles.last().name!!)
             // create file & fetch if it hasn't been fetched before
+            if (tempFile.parentFile?.exists() == false) {
+                tempFile.parentFile?.mkdirs()
+            }
             if (!tempFile.exists()) {
                 tempFile.createNewFile()
                 context.contentResolver.openInputStream(backupFiles.last().uri).use { inputStream ->
@@ -206,5 +210,4 @@ internal class LocalBackupStorage(
     companion object {
         private const val REQUEST_CODE_PICK_BACKUP_FOLDER = 1354
     }
-
 }

@@ -24,7 +24,7 @@
             android:text="@string/store_title"
             android:textColor="@color/black"
             android:textSize="@dimen/store_title_text_size"
-            app:customFont="AVENIR_LT_STD_HEAVY"
+            app:customFont="@string/font_heavy"
             app:layout_constraintBottom_toBottomOf="@id/title_left_anchor_view"
             app:layout_constraintEnd_toStartOf="@id/share_cta_view"
             app:layout_constraintStart_toEndOf="@id/title_left_anchor_view"

@@ -42,7 +42,7 @@
             android:inputType="text"
             android:textColorHint="@color/add_recipient_hint"
             android:textSize="14sp"
-            app:customFont="AVENIR_LT_STD_MEDIUM" />
+            app:customFont="@string/font_medium" />
     </LinearLayout>
 
     <com.giphy.sdk.ui.views.GiphyGridView

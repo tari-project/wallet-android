@@ -24,5 +24,5 @@
         android:text="@string/emoji_id_copied"
         android:textColor="#9834F6"
         android:textSize="13sp"
-        app:customFont="AVENIR_LT_STD_BLACK" />
+        app:customFont="@string/font_black" />
 </RelativeLayout>

@@ -411,6 +411,20 @@
     <string name="restore_wallet_restore_cta">Restore Wallet</string>
     <string name="restore_wallet_password_match_error">@string/enter_backup_password_password_match_error</string>
 
+    <!-- Wallet recovery with seed phrase -->
+    <string name="restore_from_seed_words_title">Restore With Seed Phrase</string>
+    <string name="restore_from_seed_words_description">Enter your seed phrase to restore your wallet</string>
+    <string name="restore_from_seed_words_submit_title">Restore Wallet</string>
+
+    <string name="restore_from_seed_words_error_invalid_seed_word">At least one of the entered seed words is invalid. Please review them and try again.</string>
+    <string name="restore_from_seed_words_error_phrase_too_short">You entered not enough seed words. Please add some more and try again.</string>
+    <string name="restore_from_seed_words_error_phrase_too_long">You entered too much seed words. Please remove few and try again.</string>
+    <string name="restore_from_seed_words_error_unknown">Unable to generate key from seed words. Please check your seed words and try again.</string>
+
+    <string name="restore_from_seed_words_overlay_title">Restoring your wallet</string>
+    <string name="restore_from_seed_words_overlay_description">This could take between 1 to 3 minutes.\nPlease keep the app open.</string>
+    <string name="restore_from_seed_words_overlay_success">Your wallet was restored. Welcome back!</string>
+
     <!--Restore -->
     <string name="restore_with_cloud_page_title">Enter your backup password</string>
 

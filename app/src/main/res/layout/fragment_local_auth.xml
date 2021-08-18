@@ -51,7 +51,7 @@
             android:text="@string/auth_prompt_title"
             android:textColor="@color/black"
             android:textSize="18sp"
-            app:customFont="AVENIR_LT_STD_LIGHT" />
+            app:customFont="@string/font_light" />
 
         <View
             android:layout_width="match_parent"
@@ -78,7 +78,7 @@
             android:textColor="@color/dark_gray"
             android:textSize="14sp"
             android:visibility="visible"
-            app:customFont="AVENIR_LT_STD_MEDIUM" />
+            app:customFont="@string/font_medium" />
 
     </RelativeLayout>
 
@@ -118,7 +118,7 @@
             android:textAllCaps="false"
             android:textColor="@color/white"
             android:textSize="16sp"
-            app:customFont="AVENIR_LT_STD_HEAVY" />
+            app:customFont="@string/font_heavy" />
 
     </RelativeLayout>
 </RelativeLayout>

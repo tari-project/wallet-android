@@ -18,7 +18,7 @@
         android:text="@string/incompatible_network_title"
         android:textColor="@color/black"
         android:textSize="18sp"
-        app:customFont="AVENIR_LT_STD_LIGHT" />
+        app:customFont="@string/font_light" />
 
     <com.tari.android.wallet.ui.component.CustomFontTextView
         android:id="@+id/incompatible_network_description_text_view"
@@ -32,7 +32,7 @@
         android:text="@string/incompatible_network_description"
         android:textColor="@color/dark_gray"
         android:textSize="14sp"
-        app:customFont="AVENIR_LT_STD_MEDIUM" />
+        app:customFont="@string/font_medium" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -55,7 +55,7 @@
             android:textAllCaps="false"
             android:textColor="@color/dark_gray"
             android:textSize="@dimen/incompatible_network_dialog_button_text_size"
-            app:customFont="AVENIR_LT_STD_HEAVY" />
+            app:customFont="@string/font_heavy" />
 
         <com.tari.android.wallet.ui.component.CustomFontButton
             android:id="@+id/incompatible_network_reset_now_button"
@@ -71,6 +71,6 @@
             android:textAllCaps="false"
             android:textColor="@color/white"
             android:textSize="@dimen/incompatible_network_dialog_button_text_size"
-            app:customFont="AVENIR_LT_STD_HEAVY" />
+            app:customFont="@string/font_heavy" />
     </LinearLayout>
 </LinearLayout>

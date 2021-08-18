@@ -29,7 +29,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@id/back_button"
-        app:customFont="AVENIR_LT_STD_HEAVY" />
+        app:customFont="@string/font_heavy" />
 
     <androidx.constraintlayout.widget.Barrier
         android:id="@+id/add_recipient_header_barrier"
@@ -201,7 +201,7 @@
                 android:text="@string/paste_emoji_id"
                 android:textColor="#9834F6"
                 android:textSize="14sp"
-                app:customFont="AVENIR_LT_STD_HEAVY" />
+                app:customFont="@string/font_heavy" />
 
             <Button
                 android:id="@+id/paste_emoji_id_button"
@@ -278,7 +278,7 @@
         app:layout_constraintTop_toBottomOf="@id/add_recipient_vw_search_container"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:customFont="AVENIR_LT_STD_HEAVY" />
+        app:customFont="@string/font_heavy" />
 
     <com.tari.android.wallet.ui.component.CustomFontButton
         android:id="@+id/continue_button"
@@ -298,6 +298,6 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:customFont="AVENIR_LT_STD_HEAVY" />
+        app:customFont="@string/font_heavy" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

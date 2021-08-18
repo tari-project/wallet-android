@@ -31,7 +31,7 @@
             android:text="@string/add_note_search_giphy_carousel_item_label"
             android:textColor="@color/add_note_more_gifs_item_text"
             android:textSize="9sp"
-            app:customFont="AVENIR_LT_STD_BLACK"
+            app:customFont="@string/font_black"
             tools:ignore="SmallSp" />
     </LinearLayout>
 

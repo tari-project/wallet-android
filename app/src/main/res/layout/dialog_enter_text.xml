@@ -25,7 +25,7 @@
             android:lineSpacingExtra="8dp"
             android:textColor="@color/black"
             android:textSize="18sp"
-            app:customFont="AVENIR_LT_STD_LIGHT"
+            app:customFont="@string/font_light"
             tools:text="Please enter text" />
 
         <com.tari.android.wallet.ui.component.CustomFontEditText
@@ -64,7 +64,7 @@
                 android:textAllCaps="false"
                 android:textColor="@color/dialog_cancel_action"
                 android:textSize="16sp"
-                app:customFont="AVENIR_LT_STD_HEAVY" />
+                app:customFont="@string/font_heavy" />
 
             <com.tari.android.wallet.ui.component.CustomFontButton
                 android:id="@+id/dialog_enter_text_backup_cta_view"
@@ -80,7 +80,7 @@
                 android:textAllCaps="false"
                 android:textColor="@color/white"
                 android:textSize="16sp"
-                app:customFont="AVENIR_LT_STD_HEAVY" />
+                app:customFont="@string/font_heavy" />
 
         </LinearLayout>
 

@@ -39,7 +39,7 @@
                 android:text="@string/tap_to_see_full_emoji_id"
                 android:textColor="#9834F6"
                 android:textSize="14sp"
-                app:customFont="AVENIR_LT_STD_HEAVY" />
+                app:customFont="@string/font_heavy" />
 
             <Button
                 android:id="@+id/see_full_emoji_id_button"
@@ -147,7 +147,7 @@
                 android:text="@string/create_wallet_your_emoji_id_text_label"
                 android:textColor="@color/black"
                 android:textSize="18sp"
-                app:customFont="AVENIR_LT_STD_LIGHT" />
+                app:customFont="@string/font_light" />
         </LinearLayout>
 
         <View
@@ -173,7 +173,7 @@
             android:text="@string/create_wallet_set_of_emoji_your_wallet_address_desc"
             android:textColor="@color/dark_gray"
             android:textSize="14sp"
-            app:customFont="AVENIR_LT_STD_MEDIUM" />
+            app:customFont="@string/font_medium" />
 
     </RelativeLayout>
 
@@ -227,7 +227,7 @@
                 android:textColor="@color/black"
                 android:textSize="18sp"
                 android:visibility="invisible"
-                app:customFont="AVENIR_LT_STD_BLACK" />
+                app:customFont="@string/font_black" />
 
             <View
                 android:id="@+id/just_sec_title_back_view"
@@ -291,7 +291,7 @@
                 android:textColor="@color/black"
                 android:textSize="18sp"
                 android:visibility="invisible"
-                app:customFont="AVENIR_LT_STD_BLACK" />
+                app:customFont="@string/font_black" />
 
             <View
                 android:id="@+id/create_your_emoji_id_line_1_blocker_view"
@@ -362,7 +362,7 @@
                 android:text="@string/create_wallet_address_desc"
                 android:textColor="@color/dark_gray"
                 android:textSize="14sp"
-                app:customFont="AVENIR_LT_STD_MEDIUM" />
+                app:customFont="@string/font_medium" />
 
         </RelativeLayout>
 
@@ -382,7 +382,7 @@
             android:textAllCaps="false"
             android:textColor="@color/white"
             android:textSize="16sp"
-            app:customFont="AVENIR_LT_STD_HEAVY" />
+            app:customFont="@string/font_heavy" />
 
         <com.tari.android.wallet.ui.component.CustomFontButton
             android:id="@+id/create_emoji_id_button"
@@ -399,7 +399,7 @@
             android:textAllCaps="false"
             android:textColor="@color/white"
             android:textSize="16sp"
-            app:customFont="AVENIR_LT_STD_HEAVY" />
+            app:customFont="@string/font_heavy" />
 
     </RelativeLayout>
 

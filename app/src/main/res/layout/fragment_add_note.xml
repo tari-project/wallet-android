@@ -32,7 +32,7 @@
         android:text="@string/add_amount_under_construction"
         android:textColor="@color/black"
         android:textSize="16sp"
-        app:customFont="AVENIR_LT_STD_HEAVY"
+        app:customFont="@string/font_heavy"
         app:layout_constraintBottom_toBottomOf="@id/back_button"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -96,7 +96,7 @@
                 android:text="@string/add_note_prompt"
                 android:textColor="@color/black"
                 android:textSize="@dimen/add_note_prompt_text_size"
-                app:customFont="AVENIR_LT_STD_HEAVY" />
+                app:customFont="@string/font_heavy" />
 
             <com.tari.android.wallet.ui.component.CustomFontEditText
                 android:id="@+id/note_edit_text"
@@ -113,7 +113,7 @@
                 android:scrollHorizontally="false"
                 android:singleLine="false"
                 android:textSize="@dimen/add_note_note_text_size"
-                app:customFont="AVENIR_LT_STD_MEDIUM"
+                app:customFont="@string/font_medium"
                 tools:ignore="InefficientWeight" />
 
             <FrameLayout
@@ -185,7 +185,7 @@
                     android:text="@string/add_note_search_giphy_label"
                     android:textColor="@color/white"
                     android:textSize="9sp"
-                    app:customFont="AVENIR_LT_STD_BLACK"
+                    app:customFont="@string/font_black"
                     tools:ignore="SmallSp" />
 
             </LinearLayout>
@@ -252,7 +252,7 @@
             android:text="@string/add_note_slide_to_send"
             android:textColor="#B2B2B2"
             android:textSize="16sp"
-            app:customFont="AVENIR_LT_STD_HEAVY" />
+            app:customFont="@string/font_heavy" />
 
         <com.tari.android.wallet.ui.component.CustomFontTextView
             android:id="@+id/slide_to_send_enabled_text_view"
@@ -262,7 +262,7 @@
             android:text="@string/add_note_slide_to_send"
             android:textColor="@color/white"
             android:textSize="16sp"
-            app:customFont="AVENIR_LT_STD_HEAVY" />
+            app:customFont="@string/font_heavy" />
 
         <RelativeLayout
             android:id="@+id/slide_view"

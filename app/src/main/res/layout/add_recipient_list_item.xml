@@ -51,7 +51,7 @@
             android:text="@string/dummy_contact_alias"
             android:textColor="#423986"
             android:textSize="15sp"
-            app:customFont="AVENIR_LT_STD_HEAVY" />
+            app:customFont="@string/font_heavy" />
 
         <!-- emoji id summary -->
         <include

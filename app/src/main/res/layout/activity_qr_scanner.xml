@@ -51,7 +51,7 @@
             android:textAlignment="center"
             android:textColor="@color/white"
             android:textSize="16sp"
-            app:customFont="AVENIR_LT_STD_HEAVY" />
+            app:customFont="@string/font_heavy" />
 
     </LinearLayout>
 

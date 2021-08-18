@@ -20,6 +20,6 @@
         android:paddingHorizontal="8dp"
         android:textColor="@color/black"
         android:textSize="14sp"
-        app:customFont="AVENIR_NEXT_LT_PRO_REGULAR" />
+        app:customFont="@string/font_regular" />
 
 </FrameLayout>
