@@ -40,6 +40,33 @@
 #include "jniCommon.cpp"
 
 extern "C"
+JNIEXPORT void JNICALL
+Java_com_tari_android_wallet_ffi_FFISeedWords_jniCreate(
+        JNIEnv *jEnv,
+        jobject jThis) {
+    TariSeedWords *pSeedWords = seed_words_create();
+    SetPointerField(jEnv, jThis, reinterpret_cast<jlong>(pSeedWords));
+}
+
+extern "C"
+JNIEXPORT jint JNICALL
+Java_com_tari_android_wallet_ffi_FFISeedWords_jniPushWord(
+        JNIEnv *jEnv,
+        jobject jThis,
+        jstring jWord,
+        jobject error) {
+    int i = 0;
+    int *r = &i;
+    jlong lSeedWords = GetPointerField(jEnv, jThis);
+    auto *pSeedWords = reinterpret_cast<TariSeedWords *>(lSeedWords);
+    const char *pWord = jEnv->GetStringUTFChars(jWord, JNI_FALSE);
+    jint result = seed_words_push_word(pSeedWords, pWord, r);
+    jEnv->ReleaseStringUTFChars(jWord, pWord);
+    setErrorCode(jEnv, error, i);
+    return result;
+}
+
+extern "C"
 JNIEXPORT jint JNICALL
 Java_com_tari_android_wallet_ffi_FFISeedWords_jniGetLength(
         JNIEnv *jEnv,

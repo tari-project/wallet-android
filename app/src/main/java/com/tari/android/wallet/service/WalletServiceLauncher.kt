@@ -3,6 +3,7 @@ package com.tari.android.wallet.service
 import android.content.Context
 import android.content.Intent
 import androidx.core.content.ContextCompat
+import com.tari.android.wallet.application.TariWalletApplication
 import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import com.tari.android.wallet.util.WalletUtil
 
@@ -28,10 +29,14 @@ class WalletServiceLauncher(private val context: Context) {
     }
 
     fun start() {
-        ContextCompat.startForegroundService(
-            context,
-            getStartIntent(context)
-        )
+        if (sharedPrefsRepository.backgroundServiceTurnedOn ||
+            !sharedPrefsRepository.backgroundServiceTurnedOn && TariWalletApplication.INSTANCE.get()?.isInForeground == true
+        ) {
+            ContextCompat.startForegroundService(
+                context,
+                getStartIntent(context)
+            )
+        }
     }
 
     fun stop() {
@@ -50,7 +55,6 @@ class WalletServiceLauncher(private val context: Context) {
             getStopAndDeleteIntent(context)
         )
     }
-
 
     fun startOnAppForegrounded() {
         if (!sharedPrefsRepository.backgroundServiceTurnedOn) {

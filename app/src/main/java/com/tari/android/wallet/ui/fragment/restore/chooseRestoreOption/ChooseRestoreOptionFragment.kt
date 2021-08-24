@@ -89,10 +89,7 @@ internal class ChooseRestoreOptionFragment : CommonFragment<FragmentChooseRestor
             processState(ChooseRestoreOptionState.BeginProgress)
             backupManager.setupStorage(this@ChooseRestoreOptionFragment)
         }
-        restoreWithRecoveryPhraseCtaView.setOnClickListener {
-            processNavigation(ChooseRestoreOptionNavigation.ToRestoreWithRecoveryPhrase)
-            (requireActivity() as WalletRestoreRouter).toRestoreWithRecoveryPhrase()
-        }
+        restoreWithRecoveryPhraseCtaView.setOnClickListener { processNavigation(ChooseRestoreOptionNavigation.ToRestoreWithRecoveryPhrase) }
     }
 
     private fun observeUI() = with(viewModel) {

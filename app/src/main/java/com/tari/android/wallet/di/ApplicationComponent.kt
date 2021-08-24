@@ -60,7 +60,8 @@ import com.tari.android.wallet.ui.fragment.profile.WalletInfoFragment
 import com.tari.android.wallet.ui.fragment.restore.chooseRestoreOption.ChooseRestoreOptionFragment
 import com.tari.android.wallet.ui.fragment.restore.chooseRestoreOption.ChooseRestoreOptionViewModel
 import com.tari.android.wallet.ui.fragment.restore.enterRestorationPassword.EnterRestorationPasswordViewModel
-import com.tari.android.wallet.ui.fragment.restore.recoverFromSeedWords.RecoveringFromSeedWordsViewModel
+import com.tari.android.wallet.ui.fragment.restore.inputSeedWords.InputSeedWordsViewModel
+import com.tari.android.wallet.ui.fragment.restore.walletRestoringFromSeedWords.WalletRestoringFromSeedWordsViewModel
 import com.tari.android.wallet.ui.fragment.send.AddAmountFragment
 import com.tari.android.wallet.ui.fragment.send.AddRecipientFragment
 import com.tari.android.wallet.ui.fragment.send.FinalizeSendTxFragment
@@ -163,9 +164,10 @@ internal interface ApplicationComponent {
     fun inject(backgroundServiceSettingsViewModel: BackgroundServiceSettingsViewModel)
     fun inject(connectionIndicatorViewModel: ConnectionIndicatorViewModel)
     fun inject(chooseRestoreOptionViewModel: ChooseRestoreOptionViewModel)
-    fun inject(chooseRestoreOptionViewModel: EnterRestorationPasswordViewModel)
-    fun inject(chooseRestoreOptionViewModel: RecoveringFromSeedWordsViewModel)
-    fun inject(chooseRestoreOptionViewModel: VerifySeedPhraseViewModel)
+    fun inject(enterRestorationPasswordViewModel: EnterRestorationPasswordViewModel)
+    fun inject(walletRestoringFromSeedWordsViewModel: WalletRestoringFromSeedWordsViewModel)
+    fun inject(inputSeedWordsViewModel: InputSeedWordsViewModel)
+    fun inject(verifySeedPhraseViewModel: VerifySeedPhraseViewModel)
     fun inject(backupSettingsViewModel: BackupSettingsViewModel)
     fun inject(biometricAuthenticationViewModel: BiometricAuthenticationViewModel)
     /**

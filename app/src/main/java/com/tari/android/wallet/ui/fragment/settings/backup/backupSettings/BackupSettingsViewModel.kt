@@ -177,7 +177,7 @@ internal class BackupSettingsViewModel : CommonViewModel() {
             is BackupStorageFullException -> resourceManager.getString(R.string.backup_wallet_storage_full_desc)
             else -> resourceManager.getString(R.string.back_up_wallet_storage_setup_error_desc)
         }
-        _errorDialag.postValue(ErrorDialogArgs(errorTitle, errorDescription) {
+        _errorDialog.postValue(ErrorDialogArgs(errorTitle, errorDescription) {
             _backupPermissionSwitchChecked.postValue(false)
             _inProgress.postValue(false)
         })
@@ -199,7 +199,7 @@ internal class BackupSettingsViewModel : CommonViewModel() {
             exception?.message == null -> resourceManager.getString(R.string.back_up_wallet_backing_up_unknown_error)
             else -> resourceManager.getString(R.string.back_up_wallet_backing_up_error_desc, exception.message!!)
         }
-        _errorDialag.postValue(ErrorDialogArgs(errorTitle, errorDescription))
+        _errorDialog.postValue(ErrorDialogArgs(errorTitle, errorDescription))
     }
 
     private fun onBackupStateChanged(backupState: BackupState) {
