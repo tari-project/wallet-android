@@ -354,7 +354,6 @@ internal class FFIWallet(
         if (passphrase == null) {
             Logger.i("Database encryption enable")
             sharedPrefsRepository.generateDatabasePassphrase()
-            Logger.i(sharedPrefsRepository.databasePassphrase.orEmpty())
             try {
                 setEncryption(sharedPrefsRepository.databasePassphrase.orEmpty())
             } catch (e: Exception) {

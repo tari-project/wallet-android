@@ -37,6 +37,7 @@ import android.content.Context
 import com.orhanobut.logger.Logger
 import com.tari.android.wallet.BuildConfig
 import com.tari.android.wallet.R
+import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.ffi.*
 import com.tari.android.wallet.service.WalletService
@@ -44,7 +45,6 @@ import com.tari.android.wallet.tor.TorConfig
 import com.tari.android.wallet.tor.TorProxyManager
 import com.tari.android.wallet.tor.TorProxyState
 import com.tari.android.wallet.util.Constants
-import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import com.tari.android.wallet.util.WalletUtil
 import org.apache.commons.io.IOUtils
 import java.io.File
@@ -69,7 +69,7 @@ internal class WalletManager(
 
     init {
         // post initial wallet state
-        EventBus.walletState.post(WalletState.NOT_READY)
+        EventBus.walletState.post(WalletState.NotReady)
     }
 
     /**
@@ -92,7 +92,7 @@ internal class WalletManager(
         // destroy FFI wallet object
         FFIWallet.instance?.destroy()
         FFIWallet.instance = null
-        EventBus.walletState.post(WalletState.NOT_READY)
+        EventBus.walletState.post(WalletState.NotReady)
         // stop tor proxy
         EventBus.torProxyState.unsubscribe(this)
         torManager.shutdown()
@@ -102,12 +102,18 @@ internal class WalletManager(
     private fun onTorProxyStateChanged(torProxyState: TorProxyState) {
         Logger.d("Tor proxy state has changed: $torProxyState.")
         if (torProxyState is TorProxyState.Running) {
-            if (EventBus.walletState.publishSubject.value == WalletState.NOT_READY) {
+            if (EventBus.walletState.publishSubject.value == WalletState.NotReady ||
+                EventBus.walletState.publishSubject.value is WalletState.Failed
+            ) {
                 Logger.d("Initialize wallet.")
-                EventBus.walletState.post(WalletState.INITIALIZING)
+                EventBus.walletState.post(WalletState.Initializing)
                 Thread {
-                    initWallet()
-                    EventBus.walletState.post(WalletState.RUNNING)
+                    try {
+                        initWallet()
+                        EventBus.walletState.post(WalletState.Running)
+                    } catch (e: Exception) {
+                        EventBus.walletState.post(WalletState.Failed(e))
+                    }
                 }.start()
             }
         }

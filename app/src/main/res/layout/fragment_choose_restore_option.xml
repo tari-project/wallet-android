@@ -73,9 +73,9 @@
 
             <ProgressBar
                 android:id="@+id/restore_wallet_menu_item_progress_view"
-                android:layout_gravity="center_vertical|end"
                 android:layout_width="20dp"
                 android:layout_height="20dp"
+                android:layout_gravity="center_vertical|end"
                 android:visibility="invisible"
                 tools:visibility="visible" />
 
@@ -102,7 +102,8 @@
             android:clickable="true"
             android:focusable="true"
             android:paddingHorizontal="26dp"
-            android:paddingVertical="24dp">
+            android:paddingVertical="24dp"
+            android:visibility="gone">
 
             <com.tari.android.wallet.ui.component.CustomFontTextView
                 android:layout_width="wrap_content"

@@ -44,3 +44,4 @@ class BackupStorageTamperedException(s: String?) : IllegalStateException(s)
 
 // Restore-related.
 class BackupFileIsEncryptedException(encryptedFile: File, s: String?) : IllegalStateException(s)
+class WalletStartFailedException(e: Throwable) : java.lang.IllegalStateException(e)
