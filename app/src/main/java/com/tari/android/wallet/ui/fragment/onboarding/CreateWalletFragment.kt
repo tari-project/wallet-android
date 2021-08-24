@@ -110,7 +110,7 @@ internal class CreateWalletFragment : Fragment() {
     }
 
     private fun onWalletStateChanged(walletState: WalletState) {
-        if (walletState == WalletState.RUNNING && isWaitingOnWalletState) {
+        if (walletState == WalletState.Running && isWaitingOnWalletState) {
             isWaitingOnWalletState = false
             ui.rootView.post { startCheckMarkAnimation() }
         }
@@ -221,7 +221,7 @@ internal class CreateWalletFragment : Fragment() {
                 // if the wallet is not ready wait until it gets ready,
                 // otherwise display the checkmark anim & move on
                 uiHandler.postDelayed(CreateEmojiId.viewChangeAnimDelayMs) {
-                    if (EventBus.walletState.publishSubject.value != WalletState.RUNNING) {
+                    if (EventBus.walletState.publishSubject.value != WalletState.Running) {
                         isWaitingOnWalletState = true
                         EventBus.walletState.subscribe(this, ::onWalletStateChanged)
                     } else {

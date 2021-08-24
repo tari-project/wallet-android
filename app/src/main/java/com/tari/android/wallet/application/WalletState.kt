@@ -37,8 +37,13 @@ package com.tari.android.wallet.application
  *
  * @author The Tari Development Team
  */
-enum class WalletState {
-    NOT_READY,
-    INITIALIZING,
-    RUNNING
+
+sealed class WalletState {
+    object NotReady : WalletState()
+
+    object Initializing : WalletState()
+
+    object Running : WalletState()
+
+    class Failed(val exception: Exception) : WalletState()
 }
