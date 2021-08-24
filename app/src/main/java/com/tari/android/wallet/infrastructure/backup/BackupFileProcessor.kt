@@ -33,15 +33,12 @@
 package com.tari.android.wallet.infrastructure.backup
 
 import com.orhanobut.logger.Logger
+import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import com.tari.android.wallet.extension.compress
 import com.tari.android.wallet.extension.encrypt
-import com.tari.android.wallet.ffi.FFIUtil
+import com.tari.android.wallet.ffi.FFIWallet
 import com.tari.android.wallet.infrastructure.backup.compress.CompressionMethod
 import com.tari.android.wallet.infrastructure.security.encryption.SymmetricEncryptionAlgorithm
-import com.tari.android.wallet.util.Constants
-import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
-import com.tari.android.wallet.ffi.FFIWallet
-import com.tari.android.wallet.util.WalletUtil
 import org.joda.time.DateTime
 import java.io.File
 
@@ -62,20 +59,9 @@ internal class BackupFileProcessor(
         FFIWallet.instance?.removeEncryption()
 
         // create partial backup in temp folder if password not set
-        var databaseFile = File(walletDatabaseFilePath)
+        val databaseFile = File(walletDatabaseFilePath)
         val backupPassword = newPassword ?: sharedPrefs.backupPassword
         val backupDate = DateTime.now()
-        if (backupPassword == null) {
-            // create temp fir if not exists
-            val tempDir = File(walletTempDirPath)
-            if (!tempDir.exists()) tempDir.mkdir()
-            databaseFile = File(tempDir, Constants.Wallet.walletDBFullFileName)
-            FFIUtil.doPartialBackup(walletDatabaseFilePath, databaseFile.absolutePath)
-            if (!databaseFile.exists()) {
-                throw BackupInterruptedException("Partial backup file could not be created.")
-            }
-            Logger.d("Partial backup file created.")
-        }
         // zip the file
         val compressionMethod = CompressionMethod.zip()
         var mimeType = compressionMethod.mimeType

@@ -36,17 +36,17 @@ import android.annotation.SuppressLint
 import android.content.Context
 import com.orhanobut.logger.Logger
 import com.tari.android.wallet.BuildConfig
-import com.tari.android.wallet.R
+import com.tari.android.wallet.application.baseNodes.BaseNodes
+import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.ffi.*
 import com.tari.android.wallet.service.WalletService
+import com.tari.android.wallet.service.seedPhrase.SeedPhraseRepository
 import com.tari.android.wallet.tor.TorConfig
 import com.tari.android.wallet.tor.TorProxyManager
 import com.tari.android.wallet.tor.TorProxyState
 import com.tari.android.wallet.util.Constants
-import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import com.tari.android.wallet.util.WalletUtil
-import org.apache.commons.io.IOUtils
 import java.io.File
 
 /**
@@ -61,15 +61,16 @@ internal class WalletManager(
     private val walletLogFilePath: String,
     private val torManager: TorProxyManager,
     private val sharedPrefsWrapper: SharedPrefsRepository,
+    private val seedPhraseRepository: SeedPhraseRepository,
+    private val baseNodes: BaseNodes,
     private val torConfig: TorConfig
 ) {
 
     private var logFileObserver: LogFileObserver? = null
-    private lateinit var baseNodeIterator: Iterator<Triple<String, String, String>>
 
     init {
         // post initial wallet state
-        EventBus.walletState.post(WalletState.NOT_READY)
+        EventBus.walletState.post(WalletState.NotReady)
     }
 
     /**
@@ -92,7 +93,7 @@ internal class WalletManager(
         // destroy FFI wallet object
         FFIWallet.instance?.destroy()
         FFIWallet.instance = null
-        EventBus.walletState.post(WalletState.NOT_READY)
+        EventBus.walletState.post(WalletState.NotReady)
         // stop tor proxy
         EventBus.torProxyState.unsubscribe(this)
         torManager.shutdown()
@@ -102,12 +103,18 @@ internal class WalletManager(
     private fun onTorProxyStateChanged(torProxyState: TorProxyState) {
         Logger.d("Tor proxy state has changed: $torProxyState.")
         if (torProxyState is TorProxyState.Running) {
-            if (EventBus.walletState.publishSubject.value == WalletState.NOT_READY) {
+            if (EventBus.walletState.publishSubject.value == WalletState.NotReady ||
+                EventBus.walletState.publishSubject.value is WalletState.Failed
+            ) {
                 Logger.d("Initialize wallet.")
-                EventBus.walletState.post(WalletState.INITIALIZING)
+                EventBus.walletState.post(WalletState.Initializing)
                 Thread {
-                    initWallet()
-                    EventBus.walletState.post(WalletState.RUNNING)
+                    try {
+                        initWallet()
+                        EventBus.walletState.post(WalletState.Running)
+                    } catch (e: Exception) {
+                        EventBus.walletState.post(WalletState.Failed(e))
+                    }
                 }.start()
             }
         }
@@ -151,54 +158,6 @@ internal class WalletManager(
     }
 
     /**
-     * Returns the list of base nodes in the resource file base_nodes.txt as pairs of
-     * ({name}, {public_key_hex}, {public_address}).
-     */
-    private val baseNodeList by lazy {
-        val fileContent = IOUtils.toString(
-            context.resources.openRawResource(R.raw.base_nodes),
-            "UTF-8"
-        )
-        val baseNodes = mutableListOf<Triple<String, String, String>>()
-        val regex = Regex("(.+::[A-Za-z0-9]{64}::/onion3/[A-Za-z0-9]+:[\\d]+)")
-        regex.findAll(fileContent).forEach { matchResult ->
-            val tripleString = matchResult.value.split("::")
-            baseNodes.add(
-                Triple(
-                    tripleString[0],
-                    tripleString[1],
-                    tripleString[2]
-                )
-            )
-        }
-        baseNodes.shuffle()
-        baseNodes
-    }
-
-    /**
-     * Select a base node randomly from the list of base nodes in base_nodes.tx, and sets
-     * the wallet and stored the values in shared prefs.
-     */
-    fun setNextBaseNode() {
-        if (!this::baseNodeIterator.isInitialized || !baseNodeIterator.hasNext()) {
-            baseNodeIterator = baseNodeList.iterator()
-        }
-        val baseNode = baseNodeIterator.next()
-        val name = baseNode.first
-        val publicKeyHex: String = baseNode.second
-        val address = baseNode.third
-        sharedPrefsWrapper.baseNodeLastSyncResult = null
-        sharedPrefsWrapper.baseNodeName = name
-        sharedPrefsWrapper.baseNodePublicKeyHex = publicKeyHex
-        sharedPrefsWrapper.baseNodeAddress = address
-        sharedPrefsWrapper.baseNodeIsUserCustom = false
-
-        val baseNodeKeyFFI = FFIPublicKey(HexString(publicKeyHex))
-        FFIWallet.instance?.addBaseNodePeer(baseNodeKeyFFI, address)
-        baseNodeKeyFFI.destroy()
-    }
-
-    /**
      * Starts the log file observer only in debug mode.
      * Will skip if the app is in release config.
      */
@@ -231,6 +190,7 @@ internal class WalletManager(
             val isNewInstallation = !WalletUtil.walletExists(context)
             val wallet = FFIWallet(
                 sharedPrefsWrapper,
+                seedPhraseRepository,
                 getCommsConfig(),
                 walletLogFilePath
             )
@@ -259,7 +219,7 @@ internal class WalletManager(
                 val address = sharedPrefsWrapper.baseNodeAddress
                 if (publicKeyHex == null || address == null) {
                     // there's something unexpected with the data, use Tari base nodes
-                    setNextBaseNode()
+                    baseNodes.setNextBaseNode()
                 } else {
                     // data is ok, set custom user base node
                     val baseNodeKeyFFI = FFIPublicKey(HexString(publicKeyHex))
@@ -267,7 +227,7 @@ internal class WalletManager(
                     baseNodeKeyFFI.destroy()
                 }
             } else {
-                setNextBaseNode()
+                baseNodes.setNextBaseNode()
             }
             saveWalletPublicKeyHexToSharedPrefs()
         }

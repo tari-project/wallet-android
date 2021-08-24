@@ -30,6 +30,10 @@ abstract class CommonFragment<Binding: ViewBinding, VM: CommonViewModel> : Fragm
     fun bindViewModel(viewModel: VM) = with(viewModel) {
         this@CommonFragment.viewModel = this
 
+        subscribeVM(viewModel)
+    }
+
+    fun <VM: CommonViewModel>subscribeVM(viewModel: VM) = with(viewModel) {
         observe(backPressed) { requireActivity().onBackPressed() }
 
         observe(openLink) { startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(it))) }

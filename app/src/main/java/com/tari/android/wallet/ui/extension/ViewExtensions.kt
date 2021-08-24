@@ -46,12 +46,14 @@ import android.widget.ProgressBar
 import android.widget.ScrollView
 import android.widget.TextView
 import androidx.annotation.*
+import androidx.appcompat.widget.AppCompatEditText
 import androidx.core.animation.addListener
 import androidx.core.graphics.BlendModeColorFilterCompat
 import androidx.core.graphics.BlendModeCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.airbnb.lottie.LottieAnimationView
+import com.orhanobut.logger.Logger
 import com.tari.android.wallet.R
 import com.tari.android.wallet.ui.dialog.BottomSlideDialog
 import com.tari.android.wallet.util.Constants
@@ -274,6 +276,32 @@ fun View.temporarilyDisableClick() {
         ClickEnablingRunnable(this),
         Constants.UI.xLongDurationMs
     )
+}
+
+fun AppCompatEditText.setTextSilently(newText: String) {
+    if (text.toString() != newText) {
+        try {
+            var selectionStartPoint = selectionStart
+            var selectionEndPoint = selectionEnd
+            setText(newText)
+            selectionEndPoint = Math.min(selectionEnd, newText.length)
+            selectionStartPoint = Math.min(selectionStart, selectionEnd)
+            setSelection(selectionStartPoint, selectionEndPoint)
+        }
+        catch (e: Throwable) {
+            Logger.i(e.toString())
+        }
+    }
+}
+
+fun AppCompatEditText.setSelectionToEnd() {
+    try {
+        val selectionEndPoint = Math.min(selectionEnd, text.toString().length)
+        setSelection(selectionEndPoint, selectionEndPoint)
+    }
+    catch (e: Throwable) {
+        Logger.i(e.toString())
+    }
 }
 
 /**

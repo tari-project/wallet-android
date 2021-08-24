@@ -120,7 +120,7 @@ internal class AuthActivity : AppCompatActivity() {
     }
 
     private fun onWalletStateChanged(walletState: WalletState) {
-        if (walletState == WalletState.RUNNING && continueIsPendingOnWalletState) {
+        if (walletState == WalletState.Running && continueIsPendingOnWalletState) {
             continueIsPendingOnWalletState = false
             ui.rootView.post(this::continueToHomeActivity)
         }
@@ -245,7 +245,7 @@ internal class AuthActivity : AppCompatActivity() {
      */
     private fun playTariWalletAnim() {
         ui.authAnimLottieAnimationView.addAnimatorListener(onEnd = {
-            if (EventBus.walletState.publishSubject.value != WalletState.RUNNING) {
+            if (EventBus.walletState.publishSubject.value != WalletState.Running) {
                 continueIsPendingOnWalletState = true
                 ui.progressBar.alpha = 0f
                 ui.progressBar.visible()

@@ -116,6 +116,7 @@ class SharedPrefsRepository(
 
     var torBinPath: String? by SharedPrefStringDelegate(sharedPrefs, Key.torBinPath)
 
+    //todo Extract to baseNodesRepository
     var baseNodeLastSyncResult: BaseNodeValidationResult?
         get() = try {
             BaseNodeValidationResult.map(sharedPrefs.getInt(Key.baseNodeLastSyncResult, -1))

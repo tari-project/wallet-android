@@ -48,7 +48,7 @@ import com.tari.android.wallet.ui.common.CommonFragment
 import com.tari.android.wallet.ui.extension.*
 import javax.inject.Inject
 
-class ChooseRestoreOptionFragment : CommonFragment<FragmentChooseRestoreOptionBinding, ChooseRestoreOptionViewModel>() {
+internal class ChooseRestoreOptionFragment : CommonFragment<FragmentChooseRestoreOptionBinding, ChooseRestoreOptionViewModel>() {
 
     @Inject
     internal lateinit var backupManager: BackupManager
@@ -89,10 +89,7 @@ class ChooseRestoreOptionFragment : CommonFragment<FragmentChooseRestoreOptionBi
             processState(ChooseRestoreOptionState.BeginProgress)
             backupManager.setupStorage(this@ChooseRestoreOptionFragment)
         }
-        restoreWithRecoveryPhraseCtaView.setOnClickListener {
-            processNavigation(ChooseRestoreOptionNavigation.ToRestoreWithRecoveryPhrase)
-            (requireActivity() as WalletRestoreRouter).toRestoreWithRecoveryPhrase()
-        }
+        restoreWithRecoveryPhraseCtaView.setOnClickListener { processNavigation(ChooseRestoreOptionNavigation.ToRestoreWithRecoveryPhrase) }
     }
 
     private fun observeUI() = with(viewModel) {

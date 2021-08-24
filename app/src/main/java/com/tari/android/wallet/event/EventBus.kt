@@ -34,6 +34,7 @@ package com.tari.android.wallet.event
 
 import com.tari.android.wallet.application.WalletState
 import com.tari.android.wallet.infrastructure.backup.BackupState
+import com.tari.android.wallet.model.recovery.WalletRestorationResult
 import com.tari.android.wallet.network.NetworkConnectionState
 import com.tari.android.wallet.service.baseNode.BaseNodeState
 import com.tari.android.wallet.tor.TorProxyState
@@ -59,5 +60,17 @@ internal object EventBus : GeneralEventBus() {
     val backupState = BehaviorEventBus<BackupState>()
 
     val baseNodeState = BehaviorEventBus<BaseNodeState>()
+
+    val walletRestorationState = BehaviorEventBus<WalletRestorationResult>()
+
+    fun unsubscribeAll(subscriber: Any) {
+        EventBus.unsubscribe(subscriber)
+        torProxyState.unsubscribe(subscriber)
+        walletState.unsubscribe(subscriber)
+        networkConnectionState.unsubscribe(subscriber)
+        backupState.unsubscribe(subscriber)
+        baseNodeState.unsubscribe(subscriber)
+        baseNodeState.unsubscribe(subscriber)
+    }
 }
 
