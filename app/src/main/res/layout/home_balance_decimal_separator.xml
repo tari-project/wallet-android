@@ -10,4 +10,4 @@
     android:text="@string/digit_decimal_separator"
     android:textColor="@color/white"
     android:textSize="@dimen/home_balance_digit_decimal_text_size"
-    app:customFont="AVENIR_LT_STD_BLACK" />
+    app:customFont="@string/font_black" />

@@ -49,6 +49,7 @@ internal class FFIUtil {
 
         private val instance = FFIUtil()
 
+        @Deprecated("Not should be using after 0.16.27")
         fun doPartialBackup(
             sourceFilePath: String,
             targetFilePath: String

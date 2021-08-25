@@ -43,7 +43,7 @@
         android:letterSpacing="0.1"
         android:textColor="#50FFFFFF"
         android:textSize="@dimen/common_network_and_version_info_text_size"
-        app:customFont="AVENIR_LT_STD_HEAVY"
+        app:customFont="@string/font_heavy"
         tools:ignore="SmallSp" />
 
     <!-- small gem -->

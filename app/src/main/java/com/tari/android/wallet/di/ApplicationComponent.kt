@@ -34,6 +34,7 @@ package com.tari.android.wallet.di
 
 import android.content.Context
 import com.tari.android.wallet.application.TariWalletApplication
+import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import com.tari.android.wallet.infrastructure.BugReportingService
 import com.tari.android.wallet.infrastructure.security.biometric.BiometricAuthenticationService
 import com.tari.android.wallet.service.BootDeviceReceiver
@@ -48,30 +49,32 @@ import com.tari.android.wallet.ui.activity.restore.WalletRestoreActivity
 import com.tari.android.wallet.ui.activity.send.SendTariActivity
 import com.tari.android.wallet.ui.activity.settings.DeleteWalletActivity
 import com.tari.android.wallet.ui.activity.tx.TxDetailsActivity
+import com.tari.android.wallet.ui.common.CommonViewModel
+import com.tari.android.wallet.ui.component.networkStateIndicator.ConnectionIndicatorViewModel
 import com.tari.android.wallet.ui.fragment.debug.BaseNodeConfigFragment
 import com.tari.android.wallet.ui.fragment.debug.DebugLogFragment
 import com.tari.android.wallet.ui.fragment.onboarding.CreateWalletFragment
 import com.tari.android.wallet.ui.fragment.onboarding.IntroductionFragment
 import com.tari.android.wallet.ui.fragment.onboarding.LocalAuthFragment
 import com.tari.android.wallet.ui.fragment.profile.WalletInfoFragment
-import com.tari.android.wallet.ui.fragment.restore.ChooseRestoreOptionFragment
-import com.tari.android.wallet.ui.fragment.restore.EnterRestorationPasswordFragment
+import com.tari.android.wallet.ui.fragment.restore.chooseRestoreOption.ChooseRestoreOptionFragment
+import com.tari.android.wallet.ui.fragment.restore.chooseRestoreOption.ChooseRestoreOptionViewModel
+import com.tari.android.wallet.ui.fragment.restore.enterRestorationPassword.EnterRestorationPasswordViewModel
+import com.tari.android.wallet.ui.fragment.restore.recoverFromSeedWords.RecoveringFromSeedWordsViewModel
 import com.tari.android.wallet.ui.fragment.send.AddAmountFragment
-import com.tari.android.wallet.ui.fragment.send.addNote.AddNoteFragment
 import com.tari.android.wallet.ui.fragment.send.AddRecipientFragment
 import com.tari.android.wallet.ui.fragment.send.FinalizeSendTxFragment
+import com.tari.android.wallet.ui.fragment.send.addNote.AddNoteFragment
 import com.tari.android.wallet.ui.fragment.settings.AllSettingsFragment
-import com.tari.android.wallet.ui.fragment.settings.backup.BackupSettingsFragment
+import com.tari.android.wallet.ui.fragment.settings.backgroundService.BackgroundServiceSettingsViewModel
 import com.tari.android.wallet.ui.fragment.settings.backup.ChangeSecurePasswordFragment
 import com.tari.android.wallet.ui.fragment.settings.backup.EnterCurrentPasswordFragment
-import com.tari.android.wallet.ui.fragment.settings.backup.VerifySeedPhraseFragment
+import com.tari.android.wallet.ui.fragment.settings.backup.backupSettings.BackupSettingsFragment
+import com.tari.android.wallet.ui.fragment.settings.backup.backupSettings.BackupSettingsViewModel
+import com.tari.android.wallet.ui.fragment.settings.backup.verifySeedPhrase.VerifySeedPhraseViewModel
+import com.tari.android.wallet.ui.fragment.settings.userAutorization.BiometricAuthenticationViewModel
 import com.tari.android.wallet.ui.fragment.tx.TxListFragment
-import com.tari.android.wallet.ui.common.CommonViewModel
-import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
-import com.tari.android.wallet.ui.component.networkStateIndicator.ConnectionIndicatorViewModel
-import com.tari.android.wallet.ui.fragment.settings.backgroundService.BackgroundServiceSettingsViewModel
 import dagger.Component
-import dagger.Provides
 import java.io.File
 import javax.inject.Singleton
 
@@ -145,13 +148,11 @@ internal interface ApplicationComponent {
     fun inject(fragment: BackupSettingsFragment)
     fun inject(fragment: ChangeSecurePasswordFragment)
     fun inject(fragment: EnterCurrentPasswordFragment)
-    fun inject(fragment: VerifySeedPhraseFragment)
+    fun inject(fragment: ChooseRestoreOptionFragment)
     /**
      * Restore.
      */
     fun inject(activity: WalletRestoreActivity)
-    fun inject(fragment: ChooseRestoreOptionFragment)
-    fun inject(fragment: EnterRestorationPasswordFragment)
 
     /**
      * ViewModels.
@@ -161,6 +162,12 @@ internal interface ApplicationComponent {
     fun inject(gifViewModel: TxDetailsActivity.GIFViewModel)
     fun inject(backgroundServiceSettingsViewModel: BackgroundServiceSettingsViewModel)
     fun inject(connectionIndicatorViewModel: ConnectionIndicatorViewModel)
+    fun inject(chooseRestoreOptionViewModel: ChooseRestoreOptionViewModel)
+    fun inject(chooseRestoreOptionViewModel: EnterRestorationPasswordViewModel)
+    fun inject(chooseRestoreOptionViewModel: RecoveringFromSeedWordsViewModel)
+    fun inject(chooseRestoreOptionViewModel: VerifySeedPhraseViewModel)
+    fun inject(backupSettingsViewModel: BackupSettingsViewModel)
+    fun inject(biometricAuthenticationViewModel: BiometricAuthenticationViewModel)
     /**
      * Service(s).
      */

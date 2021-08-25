@@ -18,6 +18,7 @@ task downloadLibwallet  {
             dest binariesDir
         }
         copy {
+            duplicatesStrategy = 'include'
             binaryArchives.collect { "$binariesDir$it" }.each { from tarTree(it) }
             into binariesDir
         }

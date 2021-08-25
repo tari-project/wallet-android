@@ -47,7 +47,7 @@
                 android:text="@string/finalize_send_tx_sending_step_1_desc_line_1"
                 android:textColor="@color/black"
                 android:textSize="18sp"
-                app:customFont="AVENIR_LT_STD_LIGHT" />
+                app:customFont="@string/font_light" />
         </LinearLayout>
 
         <LinearLayout
@@ -64,7 +64,7 @@
                 android:text="@string/finalize_send_tx_sending_step_1_desc_line_2"
                 android:textColor="@color/black"
                 android:textSize="18sp"
-                app:customFont="AVENIR_LT_STD_BLACK" />
+                app:customFont="@string/font_black" />
         </LinearLayout>
 
         <LinearLayout

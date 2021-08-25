@@ -57,7 +57,7 @@ import com.tari.android.wallet.databinding.FragmentChangeSecurePasswordBinding
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.infrastructure.backup.*
 import com.tari.android.wallet.ui.activity.settings.BackupSettingsRouter
-import com.tari.android.wallet.ui.dialog.ErrorDialog
+import com.tari.android.wallet.ui.dialog.error.ErrorDialog
 import com.tari.android.wallet.ui.extension.*
 import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import kotlinx.coroutines.Dispatchers

@@ -93,6 +93,24 @@ internal class GoogleDriveBackupStorage(
         }
     }
 
+    override fun setup(hostFragment: Fragment) {
+        hostFragment.startActivityForResult(googleClient.signInIntent, REQUEST_CODE_SIGN_IN)
+    }
+
+    override suspend fun onSetupActivityResult(
+        requestCode: Int,
+        resultCode: Int,
+        intent: Intent?
+    ) {
+        when (requestCode) {
+            REQUEST_CODE_SIGN_IN -> when (resultCode) {
+                Activity.RESULT_OK -> drive = getDrive(intent)
+                Activity.RESULT_CANCELED -> throw BackupStorageSetupCancelled()
+                else -> throw BackupStorageSetupException("Google Drive setup error.")
+            }
+        }
+    }
+
     private suspend fun getDrive(intent: Intent?): Drive {
         return suspendCoroutine { continuation ->
             GoogleSignIn.getSignedInAccountFromIntent(intent)
@@ -112,24 +130,6 @@ internal class GoogleDriveBackupStorage(
                         Result.failure(BackupInterruptedException(""))
                     )
                 }
-        }
-    }
-
-    override fun setup(hostFragment: Fragment) {
-        hostFragment.startActivityForResult(googleClient.signInIntent, REQUEST_CODE_SIGN_IN)
-    }
-
-    override suspend fun onSetupActivityResult(
-        requestCode: Int,
-        resultCode: Int,
-        intent: Intent?
-    ) {
-        when (requestCode) {
-            REQUEST_CODE_SIGN_IN -> when (resultCode) {
-                Activity.RESULT_OK -> drive = getDrive(intent)
-                Activity.RESULT_CANCELED -> throw BackupStorageSetupCancelled()
-                else -> throw BackupStorageSetupException("Google Drive setup error.")
-            }
         }
     }
 

@@ -37,10 +37,10 @@ import android.content.Intent
 import androidx.fragment.app.Fragment
 import com.orhanobut.logger.Logger
 import com.tari.android.wallet.R
+import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.notification.NotificationHelper
 import com.tari.android.wallet.util.Constants
-import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import io.reactivex.Observable
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
@@ -138,7 +138,7 @@ internal class BackupManager(
             sharedPrefs.scheduledBackupDate = null
             sharedPrefs.backupFailureDate = null
             EventBus.backupState.post(BackupState.BackupDisabled)
-        }  catch (e: BackupStorageTamperedException) {
+        } catch (e: BackupStorageTamperedException) {
             EventBus.backupState.post(BackupState.BackupOutOfDate(e))
         } catch (e: Exception) {
             Logger.e(e, "Error while checking storage. %s", e.toString())

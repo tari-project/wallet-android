@@ -34,7 +34,7 @@
             android:text="@string/back_up_wallet_page_title"
             android:textColor="@color/black"
             android:textSize="16sp"
-            app:customFont="AVENIR_LT_STD_HEAVY" />
+            app:customFont="@string/font_heavy" />
 
     </RelativeLayout>
 
@@ -52,7 +52,7 @@
             android:text="@string/back_up_wallet_page_label"
             android:textColor="@color/black"
             android:textSize="17sp"
-            app:customFont="AVENIR_LT_STD_BLACK" />
+            app:customFont="@string/font_black" />
 
         <com.tari.android.wallet.ui.component.CustomFontTextView
             android:layout_width="wrap_content"
@@ -61,7 +61,7 @@
             android:lineSpacingMultiplier="1.5"
             android:text="@string/back_up_wallet_page_description"
             android:textColor="@color/dark_gray"
-            app:customFont="AVENIR_LT_STD_MEDIUM" />
+            app:customFont="@string/font_medium" />
 
     </LinearLayout>
 
@@ -85,7 +85,7 @@
                 android:text="@string/back_up_wallet_backups_switch_label"
                 android:textColor="@color/black"
                 android:textSize="15sp"
-                app:customFont="AVENIR_LT_STD_MEDIUM" />
+                app:customFont="@string/font_medium" />
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="wrap_content"
@@ -138,7 +138,7 @@
                 android:layout_gravity="center_vertical|start"
                 android:textColor="@color/black"
                 android:textSize="15sp"
-                app:customFont="AVENIR_LT_STD_MEDIUM" />
+                app:customFont="@string/font_medium" />
 
             <ImageView
                 android:id="@+id/update_password_arrow_image_view"
@@ -177,7 +177,7 @@
                     android:text="@string/back_up_wallet_to_cloud_cta"
                     android:textColor="@color/black"
                     android:textSize="15sp"
-                    app:customFont="AVENIR_LT_STD_MEDIUM" />
+                    app:customFont="@string/font_medium" />
 
                 <LinearLayout
                     android:layout_width="wrap_content"
@@ -191,7 +191,7 @@
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical"
                         android:visibility="gone"
-                        app:customFont="AVENIR_LT_STD_MEDIUM"
+                        app:customFont="@string/font_medium"
                         tools:text="@string/back_up_wallet_backup_status_checking_backup"
                         tools:textColor="@color/all_settings_back_up_status_processing"
                         tools:visibility="visible" />
@@ -283,7 +283,7 @@
                 android:text="@string/back_up_wallet_with_recovery_phrase_cta"
                 android:textColor="@color/black"
                 android:textSize="15sp"
-                app:customFont="AVENIR_LT_STD_MEDIUM" />
+                app:customFont="@string/font_medium" />
 
             <LinearLayout
                 android:layout_width="wrap_content"
@@ -328,7 +328,7 @@
         android:layout_marginHorizontal="27dp"
         android:layout_marginTop="8dp"
         android:textColor="@color/dark_gray"
-        app:customFont="AVENIR_LT_STD_MEDIUM"
+        app:customFont="@string/font_medium"
         tools:text="Last successful backup: Jul 1 2020 at 11:32 PM" />
 
 </LinearLayout>

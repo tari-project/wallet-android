@@ -101,7 +101,6 @@
             android:background="@drawable/setting_option_background"
             android:clickable="true"
             android:focusable="true"
-            android:visibility="gone"
             android:paddingHorizontal="26dp"
             android:paddingVertical="24dp">
 
@@ -112,7 +111,7 @@
                 android:text="@string/back_up_wallet_restore_with_recovery_phrase"
                 android:textColor="@color/black"
                 android:textSize="15sp"
-                app:customFont="AVENIR_LT_STD_MEDIUM" />
+                app:customFont="@string/font_medium" />
 
             <ImageView
                 android:layout_width="wrap_content"

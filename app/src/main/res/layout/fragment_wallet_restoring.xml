@@ -26,7 +26,7 @@
         android:text="@string/back_up_wallet_restoring_wallet_label"
         android:textColor="@color/black"
         android:textSize="18sp"
-        app:customFont="AVENIR_LT_STD_LIGHT"
+        app:customFont="@string/font_light"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/icon_view" />
@@ -39,7 +39,7 @@
         android:lineSpacingMultiplier="1.5"
         android:text="@string/back_up_wallet_restoring_wallet_label_description"
         android:textColor="@color/dark_gray"
-        app:customFont="AVENIR_LT_STD_MEDIUM"
+        app:customFont="@string/font_medium"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/label_view" />

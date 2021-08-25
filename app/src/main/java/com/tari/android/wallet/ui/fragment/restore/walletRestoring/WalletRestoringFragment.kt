@@ -30,23 +30,19 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.tari.android.wallet.ui.fragment.restore
+package com.tari.android.wallet.ui.fragment.restore.walletRestoring
 
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.activity.OnBackPressedCallback
 import androidx.core.view.postDelayed
 import androidx.fragment.app.Fragment
 import com.tari.android.wallet.databinding.FragmentWalletRestoringBinding
 import com.tari.android.wallet.ui.activity.restore.WalletRestoreRouter
+import com.tari.android.wallet.ui.component.MutedBackPressedCallback
 
-class WalletRestoringFragment @Deprecated(
-    """Use newInstance() and supply all the necessary 
-data via arguments instead, as fragment's default no-op constructor is used by the framework for 
-UI tree rebuild on configuration changes"""
-) constructor() : Fragment() {
+class WalletRestoringFragment : Fragment() {
 
     private lateinit var ui: FragmentWalletRestoringBinding
 
@@ -57,22 +53,16 @@ UI tree rebuild on configuration changes"""
     ): View =
         FragmentWalletRestoringBinding.inflate(inflater, container, false).also { ui = it }.root
 
-
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        requireActivity().onBackPressedDispatcher.addCallback(object : OnBackPressedCallback(true) {
-            override fun handleOnBackPressed() {
-                // No-op
-            }
-        })
+        requireActivity().onBackPressedDispatcher.addCallback(MutedBackPressedCallback(true))
         ui.root.postDelayed(ARTIFICIAL_DELAY) {
             (requireActivity() as WalletRestoreRouter).onRestoreCompleted()
         }
     }
 
     companion object {
-        @Suppress("DEPRECATION")
+
         fun newInstance() = WalletRestoringFragment()
 
         private const val ARTIFICIAL_DELAY = 5000L
