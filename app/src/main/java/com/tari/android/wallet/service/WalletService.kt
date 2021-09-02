@@ -234,7 +234,7 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
     }
 
     private fun onWalletStateChanged(walletState: WalletState) {
-        if (walletState == WalletState.RUNNING) {
+        if (walletState == WalletState.Running) {
             wallet = FFIWallet.instance!!
             wallet.listener = this
             EventBus.walletState.unsubscribe(this)

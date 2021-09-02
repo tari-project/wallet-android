@@ -407,6 +407,7 @@
     <string name="restore_wallet_page_title">Restore Your Wallet</string>
     <string name="restore_wallet_error_title">Restoration Error</string>
     <string name="restore_wallet_error_desc">Wallet could not be restored: %s</string>
+    <string name="restore_wallet_error_file_not_supported">The wallet could not be restored. The backup file is not supported. We updated the wallet version, old backup files without a password are not valid anymore. You can download an older version, make a backup with a password and try again</string>
     <string name="restore_wallet_error_file_not_found">Wallet could not be restored. Backup does not exist.</string>
     <string name="restore_wallet_restore_cta">Restore Wallet</string>
     <string name="restore_wallet_password_match_error">@string/enter_backup_password_password_match_error</string>
