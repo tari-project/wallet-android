@@ -47,7 +47,9 @@ internal class FFICompletedTx() : FFIBase() {
     private external fun jniGetDestinationPublicKey(
         libError: FFIError
     ): FFIPointer
-
+    private external fun jniGetTransactionKernel(
+        libError: FFIError
+    ): FFIPointer
     private external fun jniGetSourcePublicKey(
         libError: FFIError
     ): FFIPointer
@@ -139,6 +141,13 @@ internal class FFICompletedTx() : FFIBase() {
     fun isOutbound(): Boolean {
         val error = FFIError()
         val result = jniIsOutbound(error)
+        throwIf(error)
+        return result
+    }
+
+    fun getTransactionKernel(): FFICompletedTxKernel {
+        val error = FFIError()
+        val result = FFICompletedTxKernel(jniGetTransactionKernel(error))
         throwIf(error)
         return result
     }
