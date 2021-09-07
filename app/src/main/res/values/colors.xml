@@ -28,6 +28,10 @@
     <color name="common_progress_bar">#B2B2B2</color>
     <color name="common_error">#D32C44</color>
 
+    <!-- button -->
+    <color name="button_enabled_text_color">#FFFFFF</color>
+    <color name="button_disabled_text_color">#807F8599</color>
+
     <!-- dialog -->
     <color name="dialog_cancel_action">#9430ff</color>
 
@@ -103,6 +107,7 @@
     <!-- wallet back up with recovery phrase -->
     <color name="seed_phrase_word_text">#9330FF</color>
     <color name="seed_phrase_word_background">#1A9330FF</color>
+    <color name="seed_phrase_word_recovery_background">#FFFFFF</color>
     <color name="seed_phrase_checkbox">@color/seed_phrase_word_text</color>
     <color name="seed_phrase_button_disabled_background_color">#CCF3F4F5</color>
     <color name="seed_phrase_button_disabled_text_color">#B2B2B2</color>

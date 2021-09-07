@@ -43,8 +43,9 @@ import com.tari.android.wallet.ui.activity.AuthActivity
 import com.tari.android.wallet.ui.extension.appComponent
 import com.tari.android.wallet.ui.fragment.restore.chooseRestoreOption.ChooseRestoreOptionFragment
 import com.tari.android.wallet.ui.fragment.restore.enterRestorationPassword.EnterRestorationPasswordFragment
-import com.tari.android.wallet.ui.fragment.restore.recoverFromSeedWords.RecoveringFromSeedWordsFragment
+import com.tari.android.wallet.ui.fragment.restore.inputSeedWords.InputSeedWordsFragment
 import com.tari.android.wallet.ui.fragment.restore.walletRestoring.WalletRestoringFragment
+import com.tari.android.wallet.ui.fragment.restore.walletRestoringFromSeedWords.WalletRestoringFromSeedWordsFragment
 import javax.inject.Inject
 
 class WalletRestoreActivity : AppCompatActivity(), WalletRestoreRouter {
@@ -77,11 +78,15 @@ class WalletRestoreActivity : AppCompatActivity(), WalletRestoreRouter {
     }
 
     override fun toRestoreWithRecoveryPhrase() {
-        loadFragment(RecoveringFromSeedWordsFragment.newInstance())
+        loadFragment(InputSeedWordsFragment.newInstance())
     }
 
     override fun toRestoreInProgress() {
         loadFragment(WalletRestoringFragment.newInstance())
+    }
+
+    override fun toRestoreFromSeedWordsInProgress() {
+        loadFragment(WalletRestoringFromSeedWordsFragment.newInstance())
     }
 
     override fun onRestoreCompleted() {

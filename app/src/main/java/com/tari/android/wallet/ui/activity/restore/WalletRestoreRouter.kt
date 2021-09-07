@@ -40,6 +40,8 @@ interface WalletRestoreRouter {
 
     fun toRestoreInProgress()
 
+    fun toRestoreFromSeedWordsInProgress()
+
     fun onRestoreCompleted()
 
 }

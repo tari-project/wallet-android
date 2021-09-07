@@ -96,6 +96,7 @@ jmethodID utxoValidationCompleteCallbackMethodId;
 jmethodID stxoValidationCompleteCallbackMethodId;
 jmethodID invalidTxoValidationCompleteCallbackMethodId;
 jmethodID transactionValidationCompleteCallbackMethodId;
+jmethodID recoveringProcessCompleteCallbackMethodId;
 
 void txBroadcastCallback(struct TariCompletedTransaction *pCompletedTransaction) {
     auto *jniEnv = getJNIEnv();
@@ -279,6 +280,22 @@ void storeAndForwardMessagesReceivedCallback() {
     // no-op
 }
 
+void recoveringProcessCompleteCallback(unsigned char first, unsigned long long second, unsigned long long third) {
+    auto *jniEnv = getJNIEnv();
+    if (jniEnv == nullptr || callbackHandler == nullptr) {
+        return;
+    }
+    jbyteArray bytes2 = getBytesFromUnsignedLongLong(jniEnv, second);
+    jbyteArray bytes3 = getBytesFromUnsignedLongLong(jniEnv, third);
+    jniEnv->CallVoidMethod(
+            callbackHandler,
+            recoveringProcessCompleteCallbackMethodId,
+            static_cast<jint>(first),
+            bytes2,
+            bytes3);
+    g_vm->DetachCurrentThread();
+}
+
 jmethodID getMethodId(JNIEnv *jniEnv, jobject jThis, jstring methodName, jstring methodSignature) {
     jclass jClass = jniEnv->GetObjectClass(jThis);
     const char *method = jniEnv->GetStringUTFChars(methodName, JNI_FALSE);
@@ -299,6 +316,7 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniCreate(
         jint maxNumberOfRollingLogFiles,
         jint rollingLogFileMaxSizeBytes,
         jstring jPassphrase,
+        jobject jSeed_words,
         jstring txReceivedCallbackMethodName,
         jstring txReceivedCallbackMethodSignature,
         jstring callback_received_tx_reply,
@@ -457,62 +475,45 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniCreate(
     jlong lWalletConfig = GetPointerField(jEnv, jpWalletConfig);
     auto *pWalletConfig = reinterpret_cast<TariCommsConfig *>(lWalletConfig);
 
-    // TODO investigate this
     const char *pLogPath = jEnv->GetStringUTFChars(jLogPath, JNI_FALSE);
+    if (strlen(pLogPath) == 0) {
+        pLogPath = nullptr;
+    }
 
     const char *pPassphrase = nullptr;
     if (jPassphrase != nullptr) {
         pPassphrase = jEnv->GetStringUTFChars(jPassphrase, JNI_FALSE);
     }
 
-    TariWallet *pWallet;
-    if (strlen(pLogPath) == 0) {
-        pWallet = wallet_create(
-                pWalletConfig,
-                nullptr,
-                static_cast<unsigned int>(maxNumberOfRollingLogFiles),
-                static_cast<unsigned int>(rollingLogFileMaxSizeBytes),
-                pPassphrase,
-                nullptr,
-                txReceivedCallback,
-                txReplyReceivedCallback,
-                txFinalizedCallback,
-                txBroadcastCallback,
-                txMinedCallback,
-                txMinedUnconfirmedCallback,
-                txDirectSendResultCallback,
-                txStoreAndForwardSendResultCallback,
-                txCancellationCallback,
-                utxoValidationCompleteCallback,
-                stxoValidationCompleteCallback,
-                invalidTxoValidationCompleteCallback,
-                transactionValidationCompleteCallback,
-                storeAndForwardMessagesReceivedCallback,
-                r);
-    } else {
-        pWallet = wallet_create(
-                pWalletConfig,
-                pLogPath,
-                static_cast<unsigned int>(maxNumberOfRollingLogFiles),
-                static_cast<unsigned int>(rollingLogFileMaxSizeBytes),
-                pPassphrase,
-                nullptr,
-                txReceivedCallback,
-                txReplyReceivedCallback,
-                txFinalizedCallback,
-                txBroadcastCallback,
-                txMinedCallback,
-                txMinedUnconfirmedCallback,
-                txDirectSendResultCallback,
-                txStoreAndForwardSendResultCallback,
-                txCancellationCallback,
-                utxoValidationCompleteCallback,
-                stxoValidationCompleteCallback,
-                invalidTxoValidationCompleteCallback,
-                transactionValidationCompleteCallback,
-                storeAndForwardMessagesReceivedCallback,
-                r);
+    TariSeedWords *pSeedWords = nullptr;
+    if (jSeed_words != nullptr) {
+        jlong lSeedWords = GetPointerField(jEnv, jSeed_words);
+        pSeedWords = reinterpret_cast<TariSeedWords *>(lSeedWords);
     }
+
+    TariWallet *pWallet = wallet_create(
+            pWalletConfig,
+            pLogPath,
+            static_cast<unsigned int>(maxNumberOfRollingLogFiles),
+            static_cast<unsigned int>(rollingLogFileMaxSizeBytes),
+            pPassphrase,
+            pSeedWords,
+            txReceivedCallback,
+            txReplyReceivedCallback,
+            txFinalizedCallback,
+            txBroadcastCallback,
+            txMinedCallback,
+            txMinedUnconfirmedCallback,
+            txDirectSendResultCallback,
+            txStoreAndForwardSendResultCallback,
+            txCancellationCallback,
+            utxoValidationCompleteCallback,
+            stxoValidationCompleteCallback,
+            invalidTxoValidationCompleteCallback,
+            transactionValidationCompleteCallback,
+            storeAndForwardMessagesReceivedCallback,
+            r);
+
     setErrorCode(jEnv, error, i);
     jEnv->ReleaseStringUTFChars(jLogPath, pLogPath);
     SetPointerField(jEnv, jThis, reinterpret_cast<jlong>(pWallet));
@@ -1224,7 +1225,7 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniGetConfirmations(
     jbyteArray result = getBytesFromUnsignedLongLong(
             jEnv,
             wallet_get_num_confirmations_required(pWallet, r)
-            );
+    );
     setErrorCode(jEnv, error, i);
     return result;
 }
@@ -1427,5 +1428,38 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniRemoveEncryption(
     wallet_remove_encryption(pWallet, r);
     setErrorCode(jEnv, error, i);
 }
+
+extern "C"
+JNIEXPORT jboolean JNICALL
+Java_com_tari_android_wallet_ffi_FFIWallet_jniStartRecovery(
+        JNIEnv *jEnv,
+        jobject jThis,
+        jobject base_node_public_key,
+        jstring callback,
+        jstring callback_sig,
+        jobject error) {
+    int i = 0;
+    int *r = &i;
+    jlong lWallet = GetPointerField(jEnv, jThis);
+
+    jlong lbase_node_public_key = GetPointerField(jEnv, base_node_public_key);
+    auto *pTariPublicKey = reinterpret_cast<TariPublicKey *>(lbase_node_public_key);
+
+    recoveringProcessCompleteCallbackMethodId = getMethodId(
+            jEnv,
+            jThis,
+            callback,
+            callback_sig);
+    if (recoveringProcessCompleteCallbackMethodId == nullptr) {
+        SetPointerField(jEnv, jThis, reinterpret_cast<jlong>(nullptr));
+    }
+
+    auto *pWallet = reinterpret_cast<TariWallet *>(lWallet);
+
+    jboolean result = wallet_start_recovery(pWallet, pTariPublicKey, recoveringProcessCompleteCallback, r);
+    setErrorCode(jEnv, error, i);
+    return result;
+}
+
 
 //endregion

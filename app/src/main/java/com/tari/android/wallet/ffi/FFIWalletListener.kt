@@ -33,6 +33,7 @@
 package com.tari.android.wallet.ffi
 
 import com.tari.android.wallet.model.*
+import com.tari.android.wallet.model.recovery.WalletRestorationResult
 import java.math.BigInteger
 
 /**
@@ -54,5 +55,5 @@ internal interface FFIWalletListener {
     fun onSTXOValidationComplete(responseId: BigInteger, result: BaseNodeValidationResult)
     fun onInvalidTXOValidationComplete(responseId: BigInteger, result: BaseNodeValidationResult)
     fun onTxValidationComplete(responseId: BigInteger, result: BaseNodeValidationResult)
-
+    fun onWalletRestoration(result: WalletRestorationResult)
 }

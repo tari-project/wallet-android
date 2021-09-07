@@ -33,13 +33,15 @@
 package com.tari.android.wallet.di
 
 import android.content.Context
+import com.tari.android.wallet.application.baseNodes.BaseNodes
 import com.tari.android.wallet.application.WalletManager
+import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import com.tari.android.wallet.infrastructure.BugReportingService
 import com.tari.android.wallet.network.NetworkConnectionStateReceiver
+import com.tari.android.wallet.service.seedPhrase.SeedPhraseRepository
 import com.tari.android.wallet.tor.TorConfig
 import com.tari.android.wallet.tor.TorProxyManager
 import com.tari.android.wallet.util.Constants
-import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import dagger.Module
 import dagger.Provides
 import java.io.File
@@ -136,13 +138,17 @@ internal class WalletModule {
         @Named(FieldName.walletLogFilePath) walletLogFilePath: String,
         torConfig: TorConfig,
         torProxyManager: TorProxyManager,
-        sharedPrefsWrapper: SharedPrefsRepository
+        sharedPrefsWrapper: SharedPrefsRepository,
+        seedPhraseRepository: SeedPhraseRepository,
+        baseNodes: BaseNodes
     ): WalletManager = WalletManager(
         context,
         walletFilesDirPath,
         walletLogFilePath,
         torProxyManager,
         sharedPrefsWrapper,
+        seedPhraseRepository,
+        baseNodes,
         torConfig
     )
 
@@ -161,4 +167,11 @@ internal class WalletModule {
         return BugReportingService(sharedPrefsWrapper, logFilesDirPath)
     }
 
+    @Provides
+    @Singleton
+    fun provideSeedPhraseRepository() = SeedPhraseRepository()
+
+    @Provides
+    @Singleton
+    fun provideBaseNodes(context: Context, sharedPrefsRepository: SharedPrefsRepository) = BaseNodes(context, sharedPrefsRepository)
 }

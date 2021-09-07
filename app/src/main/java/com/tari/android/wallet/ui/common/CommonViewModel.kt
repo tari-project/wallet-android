@@ -13,7 +13,7 @@ import javax.inject.Inject
 
 open class CommonViewModel : ViewModel() {
 
-    protected val compositeDisposable: CompositeDisposable = CompositeDisposable()
+    protected var compositeDisposable: CompositeDisposable = CompositeDisposable()
 
     internal val component: ApplicationComponent?
         get() = TariWalletApplication.INSTANCE.get()?.appComponent
@@ -30,13 +30,7 @@ open class CommonViewModel : ViewModel() {
 
         compositeDisposable.clear()
 
-        //todo double check it
-        EventBus.unsubscribe(this)
-        EventBus.torProxyState.unsubscribe(this)
-        EventBus.walletState.unsubscribe(this)
-        EventBus.networkConnectionState.unsubscribe(this)
-        EventBus.backupState.unsubscribe(this)
-        EventBus.baseNodeState.unsubscribe(this)
+        EventBus.unsubscribeAll(this)
     }
 
     protected val _backPressed = SingleLiveEvent<Unit>()
@@ -48,8 +42,8 @@ open class CommonViewModel : ViewModel() {
     protected val _confirmDialog = SingleLiveEvent<ConfirmDialogArgs>()
     val confirmDialog: LiveData<ConfirmDialogArgs> = _confirmDialog
 
-    protected val _errorDialag = SingleLiveEvent<ErrorDialogArgs>()
-    val errorDialog: LiveData<ErrorDialogArgs> = _errorDialag
+    protected val _errorDialog = SingleLiveEvent<ErrorDialogArgs>()
+    val errorDialog: LiveData<ErrorDialogArgs> = _errorDialog
 
     protected val _blockedBackPressed = SingleLiveEvent<Boolean>()
     val blockedBackPressed: LiveData<Boolean> = _blockedBackPressed
