@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.tari.android.wallet.R
+import com.tari.android.wallet.application.baseNodes.BaseNodeDto
 import com.tari.android.wallet.application.baseNodes.BaseNodes
 import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import com.tari.android.wallet.event.EventBus
@@ -18,12 +19,14 @@ import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.common.SingleLiveEvent
 import com.tari.android.wallet.ui.common.domain.ResourceManager
 import com.tari.android.wallet.ui.dialog.error.ErrorDialogArgs
+import io.reactivex.disposables.CompositeDisposable
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.text.DecimalFormat
 import javax.inject.Inject
 
 internal class WalletRestoringFromSeedWordsViewModel() : CommonViewModel() {
+
 
     @Inject
     lateinit var seedPhraseRepository: SeedPhraseRepository
@@ -37,6 +40,7 @@ internal class WalletRestoringFromSeedWordsViewModel() : CommonViewModel() {
     @Inject
     lateinit var baseNodes: BaseNodes
 
+    private lateinit var baseNodeIterator: Iterator<BaseNodeDto>
 
     private val _navigation = SingleLiveEvent<WalletRestoringFromSeedWordsNavigation>()
     val navigation: LiveData<WalletRestoringFromSeedWordsNavigation> = _navigation
@@ -49,14 +53,27 @@ internal class WalletRestoringFromSeedWordsViewModel() : CommonViewModel() {
     }
 
     fun startRestoring() = viewModelScope.launch(Dispatchers.IO) {
+        baseNodeIterator = baseNodes.baseNodeList.iterator()
+        tryNextBaseNode()
+    }
+
+    private fun tryNextBaseNode() = viewModelScope.launch(Dispatchers.IO) {
+        if (baseNodeIterator.hasNext()) {
+            startRestoringOnNode(baseNodeIterator.next())
+        } else {
+            onError(RestorationError.ConnectionFailed(resourceManager, this@WalletRestoringFromSeedWordsViewModel::onErrorClosed))
+        }
+    }
+
+    private fun startRestoringOnNode(baseNode: BaseNodeDto) {
         try {
-            for (baseNode in baseNodes.baseNodeList) {
-                val baseNodeFFI = FFIPublicKey(HexString(baseNode.publicKeyHex))
-                val result = FFIWallet.instance?.startRecovery(baseNodeFFI)
-                if (result == true) {
-                    subscribeOnRestorationState()
-                    return@launch
-                }
+            val baseNodeFFI = FFIPublicKey(HexString(baseNode.publicKeyHex))
+            val result = FFIWallet.instance?.startRecovery(baseNodeFFI)
+            if (result == true) {
+                subscribeOnRestorationState()
+                return
+            } else {
+                tryNextBaseNode()
             }
             onError(RestorationError.ConnectionFailed(resourceManager, this@WalletRestoringFromSeedWordsViewModel::onErrorClosed))
         } catch (e: Throwable) {
@@ -65,14 +82,21 @@ internal class WalletRestoringFromSeedWordsViewModel() : CommonViewModel() {
     }
 
     private fun subscribeOnRestorationState() {
-        EventBus.walletRestorationState.publishSubject.subscribe {
+        EventBus.walletRestorationState.publishSubject.skip(1).subscribe {
             when (it) {
                 is WalletRestorationResult.ConnectingToBaseNode -> onProgress(RecoveryState.ConnectingToBaseNode(resourceManager))
                 is WalletRestorationResult.ConnectedToBaseNode -> onProgress(RecoveryState.ConnectedToBaseNode(resourceManager))
                 is WalletRestorationResult.ScanningRoundFailed ->
                     onProgress(RecoveryState.ConnectionFailed(resourceManager, it.retryCount, it.retryLimit))
-                is WalletRestorationResult.ConnectionToBaseNodeFailed ->
-                    onProgress(RecoveryState.ConnectionFailed(resourceManager, it.retryCount, it.retryLimit))
+                is WalletRestorationResult.ConnectionToBaseNodeFailed -> {
+                    if (it.retryCount == it.retryLimit) {
+                        compositeDisposable.dispose()
+                        compositeDisposable = CompositeDisposable()
+                        tryNextBaseNode()
+                    } else {
+                        onProgress(RecoveryState.ConnectionFailed(resourceManager, it.retryCount, it.retryLimit))
+                    }
+                }
                 is WalletRestorationResult.Progress -> onProgress(RecoveryState.Recovery(resourceManager, it.currentBlock, it.numberOfBlocks))
                 is WalletRestorationResult.RecoveryFailed ->
                     onError(RestorationError.RecoveryInternalError(resourceManager, this@WalletRestoringFromSeedWordsViewModel::onErrorClosed))
