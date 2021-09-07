@@ -3,7 +3,6 @@ package com.tari.android.wallet.ui.fragment.restore.inputSeedWords
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
-import androidx.lifecycle.viewModelScope
 import com.tari.android.wallet.R
 import com.tari.android.wallet.application.WalletState
 import com.tari.android.wallet.event.EventBus
@@ -16,9 +15,6 @@ import com.tari.android.wallet.ui.common.SingleLiveEvent
 import com.tari.android.wallet.ui.common.domain.ResourceManager
 import com.tari.android.wallet.ui.dialog.error.ErrorDialogArgs
 import io.reactivex.disposables.CompositeDisposable
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 internal class InputSeedWordsViewModel() : CommonViewModel() {
@@ -55,6 +51,7 @@ internal class InputSeedWordsViewModel() : CommonViewModel() {
         component?.inject(this)
         _words.value = mutableListOf()
         _focusedIndex.value = 0
+        clear()
     }
 
     fun startRestoringWallet() {
@@ -71,9 +68,12 @@ internal class InputSeedWordsViewModel() : CommonViewModel() {
     }
 
     private fun startRestoring() {
-        EventBus.walletState.publishSubject.subscribe {
+        EventBus.walletState.publishSubject.distinct().subscribe {
             when (it) {
-                is WalletState.Failed -> onError(RestorationError.Unknown(resourceManager))
+                is WalletState.Failed -> {
+                    onError(RestorationError.Unknown(resourceManager))
+                    clear()
+                }
                 WalletState.Running -> _navigation.postValue(InputSeedWordsNavigation.ToRestoreFormSeedWordsInProgress)
                 else -> Unit
             }
@@ -93,18 +93,13 @@ internal class InputSeedWordsViewModel() : CommonViewModel() {
         onError(errorDialogArgs)
     }
 
-    private fun onError(restorationError: RestorationError) {
-        walletServiceLauncher.stopAndDelete()
-        clear()
-        _errorDialog.postValue(restorationError.args)
-    }
+    private fun onError(restorationError: RestorationError) = _errorDialog.postValue(restorationError.args)
 
     private fun clear() {
         walletServiceLauncher.stopAndDelete()
         compositeDisposable.dispose()
         compositeDisposable = CompositeDisposable()
     }
-
 
     fun addWord(index: Int, text: String = "") {
         val newWord = WordItemViewModel.create(text)
@@ -193,7 +188,6 @@ internal class InputSeedWordsViewModel() : CommonViewModel() {
             word.index.value = index
         }
     }
-
 
     sealed class RestorationError(title: String, message: String) {
 

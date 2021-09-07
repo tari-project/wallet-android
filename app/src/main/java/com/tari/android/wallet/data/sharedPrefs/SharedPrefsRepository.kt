@@ -235,6 +235,7 @@ class SharedPrefsRepository(
         network = null
         isRestoredWallet = false
         hasVerifiedSeedWords = false
+        backgroundServiceTurnedOn = true
         databasePassphrase = null
     }
 

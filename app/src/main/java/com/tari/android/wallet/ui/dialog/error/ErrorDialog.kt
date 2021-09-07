@@ -40,10 +40,8 @@ class ErrorDialog constructor(context: Context, errorDialogArgs: ErrorDialogArgs
                 setCanceledOnTouchOutside(canceledOnTouchOutside)
                 ui.errorDialogTitleTextView.text = title
                 ui.errorDialogDescriptionTextView.text = description
-                ui.errorDialogCloseView.setOnClickListener {
-                    onClose()
-                    dismiss()
-                }
+                ui.errorDialogCloseView.setOnClickListener { dismiss() }
+                setOnDismissListener { onClose() }
             }
         }
     }
