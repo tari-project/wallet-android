@@ -140,6 +140,8 @@
     <!-- auth -->
     <string name="proceed">Proceed</string>
     <string name="exit">Exit</string>
+    <string name="wallet_error_title">Wallet corrupted</string>
+    <string name="wallet_error_description">We are in process of developing an application and sometimes happening that we need to update our internal data. We updated the protocol version in this update and, unfortunately, need to ask you to do a hard reset. The wallet will be deleted. If you want to save your funds, download the older version and make a backup. Do you ready to delete your wallet?</string>
     <!-- begin :: dialog -->
     <string name="onboarding_auth_title">Secure your wallet</string>
     <string name="onboarding_auth_biometric_prompt">Please enter your biometrics. Tari Aurora will require it each time you open the app.</string>

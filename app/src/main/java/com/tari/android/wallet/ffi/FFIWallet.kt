@@ -357,6 +357,7 @@ internal class FFIWallet(
                     error
                 )
             } catch (e: Throwable) {
+                Sentry.captureException(e)
                 Logger.i("Post jniCreate with exception: %d.", e)
                 throw e
             }

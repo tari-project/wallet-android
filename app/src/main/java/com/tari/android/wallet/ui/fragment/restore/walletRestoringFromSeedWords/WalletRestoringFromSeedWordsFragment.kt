@@ -36,7 +36,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import com.tari.android.wallet.databinding.FragmentWalletRestoringFromSeedWordsBinding
 import com.tari.android.wallet.extension.observe
 import com.tari.android.wallet.ui.activity.restore.WalletRestoreRouter
@@ -55,7 +55,7 @@ internal class WalletRestoringFromSeedWordsFragment :
         super.onViewCreated(view, savedInstanceState)
         changeOnBackPressed(true)
 
-        val viewModel: WalletRestoringFromSeedWordsViewModel by activityViewModels()
+        val viewModel: WalletRestoringFromSeedWordsViewModel by viewModels()
         bindViewModel(viewModel)
 
         subscribeUI()
