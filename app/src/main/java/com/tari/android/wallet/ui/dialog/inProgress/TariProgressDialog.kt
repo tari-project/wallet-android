@@ -8,9 +8,10 @@ import android.view.Gravity
 import android.widget.LinearLayout
 import com.tari.android.wallet.R
 import com.tari.android.wallet.databinding.DialogErrorBinding
+import com.tari.android.wallet.ui.dialog.TariDialog
 import com.tari.android.wallet.ui.extension.setVisible
 
-class TariProgressDialog constructor(context: Context, progressDialogArgs: ProgressDialogArgs) {
+class TariProgressDialog constructor(context: Context, progressDialogArgs: ProgressDialogArgs) : TariDialog {
 
     private var dialog: Dialog
 
@@ -44,7 +45,7 @@ class TariProgressDialog constructor(context: Context, progressDialogArgs: Progr
         }
     }
 
-    fun show() = dialog.show()
+    override fun show() = dialog.show()
 
-    fun dismiss() = dialog.dismiss()
+    override fun dismiss() = dialog.dismiss()
 }

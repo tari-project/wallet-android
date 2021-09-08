@@ -7,11 +7,13 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.viewbinding.ViewBinding
 import com.tari.android.wallet.R
 import com.tari.android.wallet.extension.observe
+import com.tari.android.wallet.ui.dialog.TariDialog
 import com.tari.android.wallet.ui.dialog.confirm.ConfirmDialog
 import com.tari.android.wallet.ui.dialog.error.ErrorDialog
 
-abstract class CommonActivity<Binding : ViewBinding, VM : CommonViewModel> :
-    AppCompatActivity() {
+abstract class CommonActivity<Binding : ViewBinding, VM : CommonViewModel> : AppCompatActivity() {
+
+    private var currentDialog: TariDialog? = null
 
     protected lateinit var ui: Binding
 
@@ -24,9 +26,9 @@ abstract class CommonActivity<Binding : ViewBinding, VM : CommonViewModel> :
 
         observe(openLink) { startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(it))) }
 
-        observe(confirmDialog) { ConfirmDialog(this@CommonActivity, it).show() }
+        observe(confirmDialog) { replaceDialog(ConfirmDialog(this@CommonActivity, it)) }
 
-        observe(errorDialog) { ErrorDialog(this@CommonActivity, it).show() }
+        observe(errorDialog) { replaceDialog(ErrorDialog(this@CommonActivity, it)) }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -37,6 +39,11 @@ abstract class CommonActivity<Binding : ViewBinding, VM : CommonViewModel> :
     override fun onBackPressed() {
         super.onBackPressed()
         overridePendingTransition(R.anim.enter_from_left, R.anim.exit_to_right)
+    }
+
+    private fun replaceDialog(dialog: TariDialog) {
+        currentDialog?.dismiss()
+        currentDialog = dialog.also { it.show() }
     }
 }
 

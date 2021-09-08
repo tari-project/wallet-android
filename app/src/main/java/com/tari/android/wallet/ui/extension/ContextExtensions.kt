@@ -36,6 +36,7 @@ import android.content.ContentResolver
 import android.content.Context
 import android.graphics.drawable.Drawable
 import android.net.Uri
+import android.util.TypedValue
 import androidx.annotation.ColorRes
 import androidx.annotation.DimenRes
 import androidx.annotation.DrawableRes
@@ -44,8 +45,7 @@ import androidx.core.content.ContextCompat
 
 internal fun Context.string(@StringRes id: Int): String = resources.getString(id)
 
-internal fun Context.string(@StringRes id: Int, vararg formatArgs: Any): String =
-    resources.getString(id, *formatArgs)
+internal fun Context.string(@StringRes id: Int, vararg formatArgs: Any): String = resources.getString(id, *formatArgs)
 
 internal fun Context.color(@ColorRes id: Int): Int = ContextCompat.getColor(this, id)
 
@@ -53,8 +53,10 @@ internal fun Context.dimenPx(@DimenRes id: Int): Int = resources.getDimensionPix
 
 internal fun Context.dimen(@DimenRes id: Int): Float = resources.getDimension(id)
 
-internal fun Context.drawable(@DrawableRes id: Int): Drawable? =
-    ContextCompat.getDrawable(this, id)
+internal fun Context.dpToPx(dp: Float): Float = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, resources?.displayMetrics)
+
+internal fun Context.drawable(@DrawableRes id: Int): Drawable? = ContextCompat.getDrawable(this, id)
+
 
 /**
  * @param resourceId identifies an application resource

@@ -37,36 +37,38 @@ import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
 import android.os.IBinder
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.tari.android.wallet.application.TariWalletApplication
 import com.tari.android.wallet.service.TariWalletService
 import com.tari.android.wallet.service.WalletService
+import io.reactivex.Observable
+import io.reactivex.subjects.BehaviorSubject
 
 class TariWalletServiceConnection : ViewModel(), ServiceConnection {
 
-    private val _connection = MutableLiveData<ServiceConnectionState>()
-    val connection: LiveData<ServiceConnectionState> get() = _connection
+    private val _connection = BehaviorSubject.create<ServiceConnectionState>()
+    val connection: Observable<ServiceConnectionState> get() = _connection
     val currentState get() = _connection.value!!
 
     val context: Context
         get() = TariWalletApplication.INSTANCE.get() ?: throw Throwable("Application is not launched")
 
     init {
-        _connection.value = ServiceConnectionState(ServiceConnectionStatus.NOT_YET_CONNECTED, null)
+        _connection.onNext(ServiceConnectionState(ServiceConnectionStatus.NOT_YET_CONNECTED, null))
         val bindIntent = Intent(context, WalletService::class.java)
         context.bindService(bindIntent, this, Context.BIND_AUTO_CREATE)
     }
 
     override fun onServiceDisconnected(name: ComponentName?) {
-        _connection.value = ServiceConnectionState(ServiceConnectionStatus.DISCONNECTED, null)
+        _connection.onNext(ServiceConnectionState(ServiceConnectionStatus.DISCONNECTED, null))
     }
 
     override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
-        _connection.value = ServiceConnectionState(
-            ServiceConnectionStatus.CONNECTED,
-            TariWalletService.Stub.asInterface(service)
+        _connection.onNext(
+            ServiceConnectionState(
+                ServiceConnectionStatus.CONNECTED,
+                TariWalletService.Stub.asInterface(service)
+            )
         )
     }
 

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_marginLeft="@dimen/home_dialog_testnet_tari_dialog_margin"
@@ -11,14 +12,15 @@
     <View
         android:id="@+id/home_ttl_store_dialog_vw_top_spacer"
         android:layout_width="match_parent"
+        android:layout_height="65dp"
         android:clickable="true"
-        android:focusable="true"
-        android:layout_height="65dp" />
+        android:focusable="true" />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/home_ttl_store_dialog_vw_top_spacer"
+        android:layout_marginTop="-26dp"
         android:background="@drawable/bottom_dialog_bg"
         android:gravity="center_horizontal"
         android:orientation="vertical"
@@ -29,9 +31,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:lineSpacingExtra="10dp"
-            android:layout_marginTop="136dp"
+            android:layout_marginTop="150dp"
             android:gravity="center"
+            android:lineSpacingExtra="10dp"
             android:text="@string/home_ttl_store_dlg_title"
             android:textColor="@color/black"
             android:textSize="18sp"
@@ -99,10 +101,10 @@
     <ImageView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:clickable="true"
-        android:focusable="true"
         android:layout_centerHorizontal="true"
+        android:clickable="true"
         android:contentDescription="@null"
+        android:focusable="true"
         android:src="@drawable/store_modal" />
 
 </RelativeLayout>

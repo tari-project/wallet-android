@@ -8,10 +8,10 @@ import android.view.Gravity
 import android.widget.LinearLayout
 import com.tari.android.wallet.R
 import com.tari.android.wallet.databinding.DialogConfirmDefaultBinding
-import com.tari.android.wallet.ui.extension.ThrottleClick
+import com.tari.android.wallet.ui.dialog.TariDialog
 import com.tari.android.wallet.ui.extension.string
 
-class ConfirmDialog(context: Context, args: ConfirmDialogArgs) {
+class ConfirmDialog(context: Context, args: ConfirmDialogArgs) : TariDialog {
 
     private var dialog: Dialog
 
@@ -48,7 +48,9 @@ class ConfirmDialog(context: Context, args: ConfirmDialogArgs) {
         }
     }
 
-    fun show() = dialog.show()
+    override fun show() = dialog.show()
+
+    override fun dismiss() = dialog.dismiss()
 
     private fun getStyleRes(confirmStyle: ConfirmStyle) = when (confirmStyle) {
         ConfirmStyle.Warning -> R.layout.dialog_confirm_warning

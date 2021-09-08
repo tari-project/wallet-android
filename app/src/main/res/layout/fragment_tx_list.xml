@@ -103,7 +103,7 @@
         android:background="@color/home_black_overlay"
         android:clickable="false" />
 
-    <com.tari.android.wallet.ui.fragment.tx.CustomScrollView
+    <com.tari.android.wallet.ui.fragment.tx.ui.CustomScrollView
         android:id="@+id/scroll_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -375,7 +375,7 @@
                 android:alpha="0.8"
                 android:background="@drawable/view_elevation_gradient" />
         </RelativeLayout>
-    </com.tari.android.wallet.ui.fragment.tx.CustomScrollView>
+    </com.tari.android.wallet.ui.fragment.tx.ui.CustomScrollView>
 
     <RelativeLayout
         android:id="@+id/tx_list_header_view"

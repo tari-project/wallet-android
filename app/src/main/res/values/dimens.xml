@@ -11,6 +11,7 @@
     <dimen name="common_dialog_bottom_margin">24dp</dimen>
     <dimen name="common_copy_emoji_id_button_visible_bottom_margin">-56dp</dimen>
     <dimen name="common_network_and_version_info_text_size">8sp</dimen>
+    <dimen name="common_zero">0dp</dimen>
 
     <!-- UI components -->
     <dimen name="menu_item_height">63dp</dimen>
@@ -80,6 +81,7 @@
     <dimen name="tx_list_item_emoji_text_view_first_item_top_margin">14dp</dimen>
     <dimen name="tx_list_item_emoji_text_view_shadow_first_item_top_margin">0dp</dimen>
     <dimen name="tx_list_item_content_container_view_first_item_top_margin">18dp</dimen>
+    <dimen name="home_header_top_margin">40dp</dimen>
 
     <!-- home swipe refresh -->
     <dimen name="home_swipe_refresh_max_scroll_y">180dp</dimen>
