@@ -12,6 +12,7 @@
     <string name="privacy_policy_url">https://www.tari.com/privacy_policy/</string>
     <string name="disclaimer_url">https://www.tari.com/disclaimer/</string>
     <string name="ffi_admin_email_address" translatable="false">bug_reports@tari.com</string>
+    <string name="tari_lab_university_url" translatable="false">https://tlu.tarilabs.com/</string>
 
     <!-- digits -->
     <string name="digit_0">0</string>
@@ -155,7 +156,8 @@
     <string name="auth_failed_desc">Tari Aurora was not able to authenticate you.</string>
 
     <!-- home -->
-    <string name="home_available_balance">Available Balance</string>
+    <string name="home_available_balance">Balance</string>
+    <string name="home_available_to_spend_balance">Available to spend</string>
     <string name="home_tx_list_header_today">Today</string>
     <string name="home_tx_list_header_yesterday">Yesterday</string>
     <string name="home_send_tari">Send tXTR</string>
@@ -173,6 +175,8 @@
     <string name="home_navigation_content_description_navigate_to_ttl_store">Navigate to TTL store</string>
     <string name="home_navigation_content_description_navigate_to_transactions_list">Navigate to transactions list</string>
     <string name="home_navigation_content_description_navigate_to_send_tari">Navigate to Tari send flow</string>
+    <string name="home_pending_transactions_title">Pending Transactions</string>
+    <string name="home_completed_transactions_title">Completed Transactions</string>
     <!--home tari bot dialog-->
     <string name="home_tari_bot_you_got_tari_dlg_title">You just got some tXTR!</string>
     <string name="home_tari_bot_you_got_tari_dlg_title_bold_part">tXTR!</string>
@@ -202,6 +206,11 @@
     <string name="home_back_up_wallet_encrypt_title">Further secure your backups</string>
     <string name="home_back_up_wallet_encrypt_cta">Secure Backups</string>
     <string name="home_back_up_wallet_delay_encrypt_cta">Not now</string>
+    <string name="home_question_mark">\?</string>
+    <!--Balance label-->
+    <string name="home_balance_info_help_title">Why is some of my balance not spendable right now?</string>
+    <string name="home_balance_info_help_description">The Tari in your wallet is made up of notes, just as your real wallet contains notes and coins. When you spend Tari, you must use up entire notes and wait for change. While you\'re waiting, the change is not spendable until your transaction is mined. You can find out more about how Tari transactions work in TariLabs University</string>
+    <string name="home_balance_info_help_button">Go to TariLabs University</string>
 
     <!-- tx list -->
     <string name="tx_list_sent_a_payment">%s sent a payment</string>

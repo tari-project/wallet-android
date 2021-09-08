@@ -75,6 +75,7 @@ import com.tari.android.wallet.ui.fragment.settings.backup.backupSettings.Backup
 import com.tari.android.wallet.ui.fragment.settings.backup.verifySeedPhrase.VerifySeedPhraseViewModel
 import com.tari.android.wallet.ui.fragment.settings.userAutorization.BiometricAuthenticationViewModel
 import com.tari.android.wallet.ui.fragment.tx.TxListFragment
+import com.tari.android.wallet.ui.fragment.tx.TxListViewModel
 import dagger.Component
 import java.io.File
 import javax.inject.Singleton
@@ -170,6 +171,7 @@ internal interface ApplicationComponent {
     fun inject(verifySeedPhraseViewModel: VerifySeedPhraseViewModel)
     fun inject(backupSettingsViewModel: BackupSettingsViewModel)
     fun inject(biometricAuthenticationViewModel: BiometricAuthenticationViewModel)
+    fun inject(txListViewModel: TxListViewModel)
     /**
      * Service(s).
      */

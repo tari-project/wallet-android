@@ -59,13 +59,11 @@
             android:gravity="center_vertical"
             android:orientation="horizontal">
 
-            <!-- gem icon -->
-            <ImageView
+            <androidx.appcompat.widget.AppCompatImageView
                 android:id="@+id/balance_gem_image_view"
                 android:layout_width="@dimen/home_balance_gem_width"
                 android:layout_height="@dimen/home_balance_gem_height"
                 android:layout_marginTop="-4dp"
-                android:contentDescription="@null"
                 android:src="@drawable/home_gem_balance" />
 
             <LinearLayout
@@ -93,6 +91,41 @@
                     android:padding="0dp" />
             </LinearLayout>
         </LinearLayout>
+
+        <com.tari.android.wallet.ui.component.CustomFontTextView
+            android:id="@+id/available_balance_text_view2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/balance_container"
+            android:layout_alignParentStart="true"
+            android:layout_marginEnd="4dp"
+            android:letterSpacing="-0.018"
+            android:text="@string/home_available_to_spend_balance"
+            android:textColor="@color/white"
+            android:textSize="12sp"
+            app:customFont="@string/font_medium" />
+
+        <com.tari.android.wallet.ui.fragment.tx.questionMark.QuestionMarkView
+            android:id="@+id/balance_question_mark"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignTop="@+id/available_balance_text_view2"
+            android:layout_alignBottom="@+id/available_balance_text_view2"
+            android:layout_toEndOf="@+id/available_balance_text_view2" />
+
+        <com.tari.android.wallet.ui.component.CustomFontTextView
+            android:id="@+id/available_balance"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/available_balance_text_view2"
+            android:text="0.00"
+            android:layout_alignParentStart="true"
+            android:layout_marginEnd="4dp"
+            android:letterSpacing="-0.018"
+            android:textColor="@color/white"
+            android:textSize="12sp"
+            app:customFont="@string/font_heavy" />
+
     </RelativeLayout>
 
     <View
@@ -103,7 +136,7 @@
         android:background="@color/home_black_overlay"
         android:clickable="false" />
 
-    <com.tari.android.wallet.ui.fragment.tx.CustomScrollView
+    <com.tari.android.wallet.ui.fragment.tx.ui.CustomScrollView
         android:id="@+id/scroll_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -375,7 +408,7 @@
                 android:alpha="0.8"
                 android:background="@drawable/view_elevation_gradient" />
         </RelativeLayout>
-    </com.tari.android.wallet.ui.fragment.tx.CustomScrollView>
+    </com.tari.android.wallet.ui.fragment.tx.ui.CustomScrollView>
 
     <RelativeLayout
         android:id="@+id/tx_list_header_view"

@@ -10,10 +10,13 @@ import androidx.fragment.app.Fragment
 import androidx.viewbinding.ViewBinding
 import com.tari.android.wallet.extension.observe
 import com.tari.android.wallet.ui.component.MutedBackPressedCallback
+import com.tari.android.wallet.ui.dialog.TariDialog
 import com.tari.android.wallet.ui.dialog.confirm.ConfirmDialog
 import com.tari.android.wallet.ui.dialog.error.ErrorDialog
 
 abstract class CommonFragment<Binding : ViewBinding, VM : CommonViewModel> : Fragment() {
+
+    private var currentDialog: TariDialog? = null
 
     protected var blockingBackPressDispatcher = MutedBackPressedCallback(false)
 
@@ -38,9 +41,9 @@ abstract class CommonFragment<Binding : ViewBinding, VM : CommonViewModel> : Fra
 
         observe(openLink) { startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(it))) }
 
-        observe(confirmDialog) { ConfirmDialog(requireContext(), it).show() }
+        observe(confirmDialog) { replaceDialog(ConfirmDialog(requireContext(), it)) }
 
-        observe(errorDialog) { ErrorDialog(requireContext(), it).show() }
+        observe(errorDialog) { replaceDialog(ErrorDialog(requireContext(), it)) }
 
         observe(blockedBackPressed) {
             blockingBackPressDispatcher.isEnabled = it
@@ -51,5 +54,10 @@ abstract class CommonFragment<Binding : ViewBinding, VM : CommonViewModel> : Fra
         blockingBackPressDispatcher.isEnabled = false
         blockingBackPressDispatcher = MutedBackPressedCallback(isBlocked)
         requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, blockingBackPressDispatcher)
+    }
+
+    protected fun replaceDialog(dialog: TariDialog) {
+        currentDialog?.dismiss()
+        currentDialog = dialog.also { it.show() }
     }
 }

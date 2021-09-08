@@ -8,8 +8,9 @@ import android.view.Gravity
 import android.widget.LinearLayout
 import com.tari.android.wallet.R
 import com.tari.android.wallet.databinding.DialogErrorBinding
+import com.tari.android.wallet.ui.dialog.TariDialog
 
-class ErrorDialog constructor(context: Context, errorDialogArgs: ErrorDialogArgs) {
+class ErrorDialog constructor(context: Context, errorDialogArgs: ErrorDialogArgs) : TariDialog {
 
     @Deprecated("Use through viewModel or via errorDialogArgs")
     constructor(
@@ -46,5 +47,7 @@ class ErrorDialog constructor(context: Context, errorDialogArgs: ErrorDialogArgs
         }
     }
 
-    fun show() = dialog.show()
+    override fun show() = dialog.show()
+
+    override fun dismiss() = dialog.dismiss()
 }

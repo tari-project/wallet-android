@@ -30,7 +30,7 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.tari.android.wallet.ui.fragment.tx
+package com.tari.android.wallet.ui.fragment.tx.ui
 
 import android.animation.ValueAnimator
 import android.annotation.SuppressLint
@@ -48,7 +48,6 @@ import com.tari.android.wallet.R.dimen.*
 import com.tari.android.wallet.ui.extension.*
 import com.tari.android.wallet.util.Constants
 import java.lang.ref.WeakReference
-import java.util.logging.Logger
 import kotlin.math.max
 import kotlin.math.min
 
