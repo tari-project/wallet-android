@@ -52,16 +52,19 @@ import com.tari.android.wallet.BuildConfig
 import com.tari.android.wallet.R.color.white
 import com.tari.android.wallet.R.string.*
 import com.tari.android.wallet.application.WalletState
+import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import com.tari.android.wallet.databinding.ActivityAuthBinding
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.infrastructure.Tracker
 import com.tari.android.wallet.infrastructure.security.biometric.BiometricAuthenticationService
 import com.tari.android.wallet.infrastructure.security.biometric.BiometricAuthenticationService.BiometricAuthenticationException
+import com.tari.android.wallet.service.WalletServiceLauncher
 import com.tari.android.wallet.ui.activity.home.HomeActivity
+import com.tari.android.wallet.ui.dialog.confirm.ConfirmDialog
+import com.tari.android.wallet.ui.dialog.confirm.ConfirmDialogArgs
 import com.tari.android.wallet.ui.extension.*
 import com.tari.android.wallet.util.Constants
-import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
-import com.tari.android.wallet.service.WalletServiceLauncher
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -123,6 +126,29 @@ internal class AuthActivity : AppCompatActivity() {
         if (walletState == WalletState.Running && continueIsPendingOnWalletState) {
             continueIsPendingOnWalletState = false
             ui.rootView.post(this::continueToHomeActivity)
+        } else if (walletState is WalletState.Failed && continueIsPendingOnWalletState) {
+            lifecycleScope.launch(Dispatchers.Main) {
+                val args = ConfirmDialogArgs(
+                    string(wallet_error_title),
+                    string(wallet_error_description),
+                    string(common_cancel),
+                    string(common_confirm),
+                    cancelable = false,
+                    canceledOnTouchOutside = false,
+                    confirmStyle = ConfirmDialog.ConfirmStyle.Warning,
+                    onCancel = {
+                        finish()
+                    },
+                    onConfirm = {
+                        walletServiceLauncher.stopAndDelete()
+
+                        val intent = Intent(this@AuthActivity, SplashActivity::class.java).apply { flags = Intent.FLAG_ACTIVITY_NEW_TASK }
+                        startActivity(intent)
+                        finish()
+                    }
+                )
+                ConfirmDialog(this@AuthActivity, args).show()
+            }
         }
     }
 

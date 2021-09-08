@@ -35,8 +35,8 @@ package com.tari.android.wallet.tor
 import android.app.Service
 import android.content.Context
 import com.orhanobut.logger.Logger
-import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
+import com.tari.android.wallet.event.EventBus
 import io.reactivex.Observable
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
@@ -155,6 +155,7 @@ internal class TorProxyManager(
          * Check Tor status every 5 seconds.
          */
         private val statusCheckPeriodSecs = 5L
+
         /**
          * Timer to check Tor status.
          */
@@ -172,7 +173,9 @@ internal class TorProxyManager(
         @Synchronized
         fun shutdownTor() {
             timerSubscription?.dispose()
-            controlConnection.shutdownTor("SHUTDOWN")
+            if (this::controlConnection.isInitialized) {
+                controlConnection.shutdownTor("SHUTDOWN")
+            }
         }
 
         private fun connectToTor() {

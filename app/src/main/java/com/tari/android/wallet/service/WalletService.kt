@@ -196,6 +196,7 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
      * Called when a component decides to start or stop the foreground wallet service.
      */
     override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
+        startForeground()
         when (intent.action) {
             startAction -> startService()
             stopAction -> stopService(startId)
@@ -208,16 +209,20 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
         return START_NOT_STICKY
     }
 
+
     private fun startService() {
         // start wallet manager on a separate thead & listen to events
         EventBus.walletState.subscribe(this, this::onWalletStateChanged)
         Thread {
             walletManager.start()
         }.start()
+        Logger.d("Wallet service started.")
+    }
+
+    private fun startForeground() {
         // start service & post foreground service notification
         val notification = notificationHelper.buildForegroundServiceNotification()
         startForeground(NOTIFICATION_ID, notification)
-        Logger.d("Wallet service started.")
     }
 
     private fun stopService(startId: Int) {

@@ -30,7 +30,8 @@
         <service
             android:name=".service.WalletService"
             android:description="@string/wallet_service_desc"
-            android:enabled="true">
+            android:enabled="true"
+            android:exported="false">
             <intent-filter>
                 <action android:name="com.tari.android.wallet.service.TariWalletService" />
             </intent-filter>
@@ -51,6 +52,7 @@
         <activity
             android:name=".ui.activity.SplashActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
+            android:exported="true"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.Splash"
             android:windowSoftInputMode="stateAlwaysHidden">
@@ -76,6 +78,7 @@
         <activity
             android:name=".ui.activity.home.HomeActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
+            android:exported="true"
             android:launchMode="singleTask"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme"
