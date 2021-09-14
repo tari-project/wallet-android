@@ -48,13 +48,16 @@ import androidx.lifecycle.lifecycleScope
 import com.tari.android.wallet.R
 import com.tari.android.wallet.R.color.home_selected_nav_item
 import com.tari.android.wallet.application.DeepLink
+import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import com.tari.android.wallet.databinding.ActivityHomeBinding
 import com.tari.android.wallet.event.EventBus
+import com.tari.android.wallet.extension.addTo
 import com.tari.android.wallet.extension.applyFontStyle
 import com.tari.android.wallet.infrastructure.GiphyEcosystem
 import com.tari.android.wallet.model.*
 import com.tari.android.wallet.network.NetworkConnectionState
 import com.tari.android.wallet.service.TariWalletService
+import com.tari.android.wallet.service.WalletServiceLauncher
 import com.tari.android.wallet.service.connection.TariWalletServiceConnection
 import com.tari.android.wallet.service.connection.TariWalletServiceConnection.ServiceConnectionStatus.CONNECTED
 import com.tari.android.wallet.ui.activity.SplashActivity
@@ -67,24 +70,19 @@ import com.tari.android.wallet.ui.component.CustomFont
 import com.tari.android.wallet.ui.component.CustomFontTextView
 import com.tari.android.wallet.ui.dialog.BottomSlideDialog
 import com.tari.android.wallet.ui.extension.*
-import com.tari.android.wallet.ui.extension.ThrottleClick
-import com.tari.android.wallet.ui.extension.appComponent
-import com.tari.android.wallet.ui.extension.color
-import com.tari.android.wallet.ui.extension.showInternetConnectionErrorDialog
 import com.tari.android.wallet.ui.fragment.profile.WalletInfoFragment
 import com.tari.android.wallet.ui.fragment.settings.AllSettingsFragment
 import com.tari.android.wallet.ui.fragment.settings.backgroundService.BackgroundServiceSettingsActivity
 import com.tari.android.wallet.ui.fragment.store.StoreFragment
 import com.tari.android.wallet.ui.fragment.tx.TxListFragment
+import com.tari.android.wallet.ui.fragment.tx.TxListRouter
 import com.tari.android.wallet.util.Constants
-import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
-import com.tari.android.wallet.service.WalletServiceLauncher
+import io.reactivex.disposables.CompositeDisposable
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-internal class HomeActivity : AppCompatActivity(), AllSettingsFragment.AllSettingsRouter,
-    TxListFragment.TxListRouter {
+internal class HomeActivity : AppCompatActivity(), AllSettingsFragment.AllSettingsRouter, TxListRouter {
 
     @Inject
     lateinit var sharedPrefsWrapper: SharedPrefsRepository
@@ -97,6 +95,7 @@ internal class HomeActivity : AppCompatActivity(), AllSettingsFragment.AllSettin
 
     private lateinit var ui: ActivityHomeBinding
     private lateinit var serviceConnection: TariWalletServiceConnection
+    private var compositeDisposable: CompositeDisposable = CompositeDisposable()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -115,13 +114,13 @@ internal class HomeActivity : AppCompatActivity(), AllSettingsFragment.AllSettin
         if (savedInstanceState == null) {
             giphy.enable()
             enableNavigationView(ui.homeImageView)
-            serviceConnection.connection.observe(this, {
+            serviceConnection.connection.subscribe{
                 if (it.status == CONNECTED) {
                     ui.root.postDelayed(Constants.UI.mediumDurationMs) {
                         processIntentDeepLink(it.service!!, intent)
                     }
                 }
-            })
+            }.addTo(compositeDisposable)
         } else {
             val index = savedInstanceState.getInt(KEY_PAGE)
             ui.viewPager.setCurrentItem(index, false)
@@ -324,6 +323,7 @@ internal class HomeActivity : AppCompatActivity(), AllSettingsFragment.AllSettin
     override fun onDestroy() {
         super.onDestroy()
         viewModelStore.clear()
+        compositeDisposable.dispose()
     }
 
     private class HomeAdapter(fm: FragmentManager) :

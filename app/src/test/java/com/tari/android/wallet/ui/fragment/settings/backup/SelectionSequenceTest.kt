@@ -32,8 +32,8 @@
  */
 package com.tari.android.wallet.ui.fragment.settings.backup
 
-import com.tari.android.wallet.ui.fragment.settings.backup.verifySeedPhrase.VerifySeedPhraseFragment.SeedPhrase
-import com.tari.android.wallet.ui.fragment.settings.backup.verifySeedPhrase.VerifySeedPhraseFragment.SelectionSequence
+import com.tari.android.wallet.ui.fragment.settings.backup.verifySeedPhrase.SeedPhrase
+import com.tari.android.wallet.ui.fragment.settings.backup.verifySeedPhrase.SelectionSequence
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test

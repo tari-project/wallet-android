@@ -30,7 +30,7 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.tari.android.wallet.ui.fragment.tx
+package com.tari.android.wallet.ui.fragment.tx.ui
 
 import android.animation.ValueAnimator
 import android.annotation.SuppressLint
@@ -87,21 +87,28 @@ internal class UpdateProgressViewController(
         RECEIVING
     }
 
-    private val hourglassIconTextView: TextView =
-        view.findViewById(R.id.home_txt_update_hourglass_icon)
-    private val handshakeIconTextView: TextView =
-        view.findViewById(R.id.home_txt_update_handshake_icon)
-    private val checkingForUpdatesTextView: TextView =
-        view.findViewById(R.id.home_txt_checking_for_updates)
+    class UpdateProgressState() {
+        var state = State.IDLE
+
+        var numberOfReceivedTxs = 0
+
+        var numberOfBroadcastTxs = 0
+
+        var numberOfCancelledTxs = 0
+    }
+
+
+    private val hourglassIconTextView: TextView = view.findViewById(R.id.home_txt_update_hourglass_icon)
+    private val handshakeIconTextView: TextView = view.findViewById(R.id.home_txt_update_handshake_icon)
+    private val checkingForUpdatesTextView: TextView = view.findViewById(R.id.home_txt_checking_for_updates)
     private val receivingTxsTextView: TextView = view.findViewById(R.id.home_txt_receiving_txs)
     private val completingTxsTextView: TextView = view.findViewById(R.id.home_txt_completing_txs)
     private val updatingTxsTextView: TextView = view.findViewById(R.id.home_txt_updating_txs)
     private val upToDateTextView: TextView = view.findViewById(R.id.home_txt_up_to_date)
     private val progressBar: ProgressBar = view.findViewById(R.id.home_prog_bar_update)
 
-    var state =
-        State.IDLE
-        private set
+    val state = UpdateProgressState()
+
     private var isReset = true
 
     private var baseNodeSyncCurrentRetryCount = 0
@@ -117,9 +124,6 @@ internal class UpdateProgressViewController(
 
     private lateinit var walletService: TariWalletService
 
-    private var numberOfReceivedTxs = 0
-    private var numberOfBroadcastTxs = 0
-    private var numberOfCancelledTxs = 0
     private var isWaitingOnBaseNodeSync = false
     private lateinit var currentTextView: TextView
 
@@ -158,28 +162,28 @@ internal class UpdateProgressViewController(
     private fun subscribeToEventBus() {
         EventBus.baseNodeState.subscribeOnEvent<BaseNodeState.SyncCompleted>(this) { event ->
             Logger.i("Received BaseNodeSyncComplete in state %s.", state)
-            if (state == State.RUNNING && isWaitingOnBaseNodeSync) {
+            if (state.state == State.RUNNING && isWaitingOnBaseNodeSync) {
                 onBaseNodeSyncCompleted(event)
             }
         }
         EventBus.subscribe<Event.Transaction.TxReceived>(this) {
-            if (state == State.RUNNING || state == State.RECEIVING) {
-                numberOfReceivedTxs++
+            if (state.state == State.RUNNING || state.state == State.RECEIVING) {
+                state.numberOfReceivedTxs++
             }
         }
         EventBus.subscribe<Event.Transaction.InboundTxBroadcast>(this) {
-            if (state == State.RUNNING || state == State.RECEIVING) {
-                numberOfBroadcastTxs++
+            if (state.state == State.RUNNING || state.state == State.RECEIVING) {
+                state.numberOfBroadcastTxs++
             }
         }
         EventBus.subscribe<Event.Transaction.OutboundTxBroadcast>(this) {
-            if (state == State.RUNNING || state == State.RECEIVING) {
-                numberOfBroadcastTxs++
+            if (state.state == State.RUNNING || state.state == State.RECEIVING) {
+                state.numberOfBroadcastTxs++
             }
         }
         EventBus.subscribe<Event.Transaction.TxCancelled>(this) {
-            if (state == State.RUNNING || state == State.RECEIVING) {
-                numberOfCancelledTxs++
+            if (state.state == State.RUNNING || state.state == State.RECEIVING) {
+                state.numberOfCancelledTxs++
             }
         }
     }
@@ -193,11 +197,10 @@ internal class UpdateProgressViewController(
         Logger.d("Start update.")
         progressBar.visible()
         isReset = false
-        numberOfReceivedTxs = 0
-        numberOfCancelledTxs = 0
-        numberOfBroadcastTxs = 0
-        state =
-            State.RUNNING
+        state.numberOfReceivedTxs = 0
+        state.numberOfCancelledTxs = 0
+        state.numberOfBroadcastTxs = 0
+        state.state = State.RUNNING
         currentTextView = checkingForUpdatesTextView
         connectionCheckStartTimeMs = System.currentTimeMillis()
         checkNetworkConnectionStatus()
@@ -291,8 +294,7 @@ internal class UpdateProgressViewController(
             BaseNodeValidationResult.SUCCESS -> {
                 // base node sync successful - start listening for events
                 Logger.d("Base node sync successful. Start listening for wallet events.")
-                state =
-                    State.RECEIVING
+                state.state = State.RECEIVING
                 view.postDelayed({
                     displayReceivingTxs()
                 }, minStateDisplayPeriodMs)
@@ -317,7 +319,7 @@ internal class UpdateProgressViewController(
     }
 
     private fun displayReceivingTxs() {
-        if (numberOfReceivedTxs == 0) {
+        if (state.numberOfReceivedTxs == 0) {
             receivingTxsTextView.gone()
             displayCompletingTxs()
             return
@@ -329,7 +331,7 @@ internal class UpdateProgressViewController(
     }
 
     private fun displayCompletingTxs() {
-        if (numberOfBroadcastTxs == 0) {
+        if (state.numberOfBroadcastTxs == 0) {
             completingTxsTextView.gone()
             displayUpdatingTxs()
             return
@@ -341,7 +343,7 @@ internal class UpdateProgressViewController(
     }
 
     private fun displayUpdatingTxs() {
-        if (numberOfCancelledTxs == 0) {
+        if (state.numberOfCancelledTxs == 0) {
             updatingTxsTextView.gone()
             displayUpToDate()
             return
@@ -361,12 +363,11 @@ internal class UpdateProgressViewController(
     }
 
     private fun complete() {
-        state =
-            State.IDLE
+        state.state = State.IDLE
         listenerWeakReference.get()?.updateHasCompleted(
             this,
-            numberOfReceivedTxs,
-            numberOfCancelledTxs
+            state.numberOfReceivedTxs,
+            state.numberOfCancelledTxs
         )
     }
 
@@ -406,7 +407,7 @@ internal class UpdateProgressViewController(
     }
 
     private fun fail(failureReason: FailureReason, validationResult: BaseNodeValidationResult? = null) {
-        state = State.IDLE
+        state.state = State.IDLE
         listenerWeakReference.get()?.updateHasFailed(this, failureReason)
         isWaitingOnBaseNodeSync = false
         view.post {

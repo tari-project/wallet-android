@@ -83,5 +83,14 @@ class WalletError(
     }
 
     // endregion
+}
 
+class WalletException(val walletError: WalletError) : RuntimeException(walletError.message) {
+    override fun toString(): String = "Unhandled wallet error: ${walletError.code}"
+}
+
+internal fun throwIf(error: WalletError) {
+    if (error.code != WalletErrorCode.NO_ERROR) {
+        throw WalletException(error)
+    }
 }
