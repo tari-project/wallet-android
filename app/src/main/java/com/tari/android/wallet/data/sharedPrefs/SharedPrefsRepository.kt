@@ -90,6 +90,7 @@ class SharedPrefsRepository(
         const val isRestoredWallet = "tari_is_restored_wallet"
         const val hasVerifiedSeedWords = "tari_has_verified_seed_words"
         const val backgroundServiceTurnedOnKey = "tari_background_service_turned_on"
+        const val isDataCleared = "tari_is_data_cleared"
     }
 
     var publicKeyHexString: String? by SharedPrefStringDelegate(sharedPrefs, Key.publicKeyHexString)
@@ -199,6 +200,8 @@ class SharedPrefsRepository(
 
     var backgroundServiceTurnedOn: Boolean by SharedPrefBooleanDelegate(sharedPrefs, Key.backgroundServiceTurnedOnKey, true)
 
+    var isDataCleared: Boolean by SharedPrefBooleanDelegate(sharedPrefs, Key.isDataCleared, true)
+
     init {
         // for migration purposes, to avoid a second redundant faucet call:
         // faucetTestnetTariRequestCompleted was introduced  after firstTestnetUTXOTxId and
@@ -244,5 +247,15 @@ class SharedPrefsRepository(
         Random.nextBytes(array)
         val generatedString = String(array, Charset.forName("UTF-8"))
         databasePassphrase = generatedString
+    }
+
+    // Runs when user manually clear the application data
+    fun checkIfIsDataCleared() : Boolean {
+        val isCleared = isDataCleared
+        if (isCleared) {
+            clear()
+            isDataCleared = false
+        }
+        return isCleared
     }
 }

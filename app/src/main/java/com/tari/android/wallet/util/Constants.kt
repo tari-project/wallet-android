@@ -143,8 +143,8 @@ internal object Constants {
         const val storeAndForwardMessageDurationSec = 10800L
         const val emojiIdLength = 33
         const val emojiFormatterChunkSize = 3
-        const val walletDBName: String = "tari_wallet_db"
-        const val walletDBFullFileName: String = "$walletDBName.sqlite3"
+        val walletDBName: String = "tari_wallet_${network.uriComponent}"
+        val walletDBFullFileName: String = "$walletDBName.sqlite3"
         const val faucetServerUrl = "https://faucet.tari.com"
         const val pushNotificationServerUrl = "https://push.tari.com"
         const val deepLinkURLPrefix = "tari://"
