@@ -33,7 +33,6 @@
 package com.tari.android.wallet.ui.fragment.settings.backup.verifySeedPhrase
 
 import android.animation.ValueAnimator
-import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -43,7 +42,6 @@ import android.view.ViewGroup
 import androidx.core.animation.addListener
 import androidx.core.view.get
 import androidx.fragment.app.viewModels
-import com.tari.android.wallet.R
 import com.tari.android.wallet.databinding.FragmentVerifySeedPhraseBinding
 import com.tari.android.wallet.extension.observe
 import com.tari.android.wallet.ui.activity.settings.BackupSettingsRouter
@@ -170,12 +168,7 @@ class VerifySeedPhraseFragment : CommonFragment<FragmentVerifySeedPhraseBinding,
     }
 
     private fun updateVerifyButtonState(enable: Boolean) = with(ui) {
-        if (continueCtaView.isEnabled == enable) return
         continueCtaView.isEnabled = enable
-        continueCtaView.setTextColor(
-            if (enable) Color.WHITE
-            else color(R.color.seed_phrase_button_disabled_text_color)
-        )
     }
 
     companion object {

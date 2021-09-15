@@ -39,10 +39,11 @@ import android.os.Handler
 import android.os.Looper
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.os.postDelayed
+import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
+import com.tari.android.wallet.service.WalletServiceLauncher
 import com.tari.android.wallet.ui.activity.onboarding.OnboardingFlowActivity
 import com.tari.android.wallet.ui.extension.appComponent
 import com.tari.android.wallet.util.Constants.UI.Splash
-import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import com.tari.android.wallet.util.WalletUtil
 import javax.inject.Inject
 
@@ -54,14 +55,22 @@ import javax.inject.Inject
 internal class SplashActivity : AppCompatActivity() {
 
     @Inject
-    internal lateinit var sharedPrefsWrapper: SharedPrefsRepository
+    internal lateinit var sharedPrefsRepository: SharedPrefsRepository
+
+    @Inject
+    internal lateinit var walletServiceLauncher: WalletServiceLauncher
 
     override fun onCreate(savedInstanceState: Bundle?) {
         appComponent.inject(this)
         super.onCreate(savedInstanceState)
+
+        if (sharedPrefsRepository.checkIfIsDataCleared()) {
+            walletServiceLauncher.stopAndDelete()
+        }
+
         Handler(Looper.getMainLooper()).postDelayed(Splash.createWalletStartUpDelayMs) {
             val exists = WalletUtil.walletExists(applicationContext)
-                    && sharedPrefsWrapper.onboardingAuthSetupCompleted
+                    && sharedPrefsRepository.onboardingAuthSetupCompleted
             launch(if (exists) AuthActivity::class.java else OnboardingFlowActivity::class.java)
         }
     }

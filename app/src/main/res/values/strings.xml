@@ -140,6 +140,8 @@
     <!-- auth -->
     <string name="proceed">Proceed</string>
     <string name="exit">Exit</string>
+    <string name="wallet_error_title">Wallet corrupted</string>
+    <string name="wallet_error_description">We are in process of developing an application and sometimes happening that we need to update our internal data. We updated the protocol version in this update and, unfortunately, need to ask you to do a hard reset. The wallet will be deleted. If you want to save your funds, download the older version and make a backup. Do you ready to delete your wallet?</string>
     <!-- begin :: dialog -->
     <string name="onboarding_auth_title">Secure your wallet</string>
     <string name="onboarding_auth_biometric_prompt">Please enter your biometrics. Tari Aurora will require it each time you open the app.</string>
@@ -371,7 +373,7 @@
     <string name="back_up_wallet_backup_status_up_to_date">Up to date</string>
     <string name="back_up_wallet_restore_with_recovery_phrase">Restore with recovery phrase</string>
     <string name="back_up_wallet_restoring_wallet_label">Restoring your wallet</string>
-    <string name="back_up_wallet_restoring_wallet_label_description">This could take between 1 to 3 minutes.\nPlease keep the app open.</string>
+    <string name="back_up_wallet_restoring_wallet_label_description">This could take between 1 to 3 minutes.\nPlease keep the app open</string>
     <string name="back_up_wallet_auth_not_available_error">Local authentication not available, please enable it in your system\'s settings to enable the wallet backup</string>
     <string name="back_up_wallet_enter_password_title">Set password for your backup</string>
     <string name="back_up_wallet_enter_password_hint">Enter password here…</string>
@@ -417,14 +419,23 @@
     <string name="restore_from_seed_words_description">Enter your seed phrase to restore your wallet</string>
     <string name="restore_from_seed_words_submit_title">Restore Wallet</string>
 
-    <string name="restore_from_seed_words_error_invalid_seed_word">At least one of the entered seed words is invalid. Please review them and try again.</string>
-    <string name="restore_from_seed_words_error_phrase_too_short">You entered not enough seed words. Please add some more and try again.</string>
-    <string name="restore_from_seed_words_error_phrase_too_long">You entered too much seed words. Please remove few and try again.</string>
-    <string name="restore_from_seed_words_error_unknown">Unable to generate key from seed words. Please check your seed words and try again.</string>
+    <string name="restore_from_seed_words_error_invalid_seed_word">At least one of the entered seed words is invalid. Please review them and try again</string>
+    <string name="restore_from_seed_words_error_phrase_too_short">You entered not enough seed words. Please add some more and try again</string>
+    <string name="restore_from_seed_words_error_phrase_too_long">You entered too much seed words. Please remove few and try again</string>
+    <string name="restore_from_seed_words_error_unknown">Unable to generate key from seed words. Please check your seed words and try again</string>
 
     <string name="restore_from_seed_words_overlay_title">Restoring your wallet</string>
-    <string name="restore_from_seed_words_overlay_description">This could take between 1 to 3 minutes.\nPlease keep the app open.</string>
+    <string name="restore_from_seed_words_overlay_description">This could take between 1 to 3 minutes.\nPlease keep the app open</string>
     <string name="restore_from_seed_words_overlay_success">Your wallet was restored. Welcome back!</string>
+
+    <string name="restore_from_seed_words_overlay_status_connecting">Waiting for connection</string>
+    <string name="restore_from_seed_words_overlay_status_connected">Connection established. The process will start soon</string>
+    <string name="restore_from_seed_words_overlay_status_progress">Restoring in progress:</string>
+    <string name="restore_from_seed_words_overlay_status_connection_failed">Attempt %s out of %s</string>
+
+    <string name="restore_from_seed_words_overlay_error_title">Recovery Failed</string>
+    <string name="restore_from_seed_words_overlay_error_description_connection_failed">Unable to connect with base node. Please try again later</string>
+    <string name="restore_from_seed_words_overlay_error_description_internal_error">Unable to recover your wallet due to the internal error</string>
 
     <!--Restore -->
     <string name="restore_with_cloud_page_title">Enter your backup password</string>

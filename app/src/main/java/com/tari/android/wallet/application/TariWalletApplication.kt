@@ -40,6 +40,7 @@ import androidx.lifecycle.OnLifecycleEvent
 import androidx.lifecycle.ProcessLifecycleOwner
 import com.orhanobut.logger.AndroidLogAdapter
 import com.orhanobut.logger.Logger
+import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import com.tari.android.wallet.di.ApplicationComponent
 import com.tari.android.wallet.di.ApplicationModule
 import com.tari.android.wallet.di.DaggerApplicationComponent
@@ -49,7 +50,6 @@ import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.infrastructure.Tracker
 import com.tari.android.wallet.network.NetworkConnectionStateReceiver
 import com.tari.android.wallet.notification.NotificationHelper
-import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import com.tari.android.wallet.service.WalletServiceLauncher
 import net.danlew.android.joda.JodaTimeAndroid
 import java.lang.ref.WeakReference
@@ -123,11 +123,18 @@ internal class TariWalletApplication : Application(), LifecycleObserver {
             .applicationModule(ApplicationModule(app))
             .build()
 
+    @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)
+    fun onAppDestroyed() {
+        Logger.d("App was destroyed.")
+        walletServiceLauncher.stopOnAppBackgrounded()
+    }
+
     @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
     fun onAppBackgrounded() {
         Logger.d("App in background.")
         isInForeground = false
-        walletServiceLauncher.stopOnAppBackgrounded()
+        //todo get back when the whole application will have ability to reconnect to wallet
+//        walletServiceLauncher.stopOnAppBackgrounded()
         EventBus.post(Event.App.AppBackgrounded())
     }
 

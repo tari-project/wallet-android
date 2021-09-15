@@ -68,6 +68,6 @@ class EnterRestorationPasswordViewModel() : CommonViewModel() {
             cancelable = false,
             canceledOnTouchOutside = false,
             onClose = { _backPressed.call() })
-        _errorDialag.postValue(args)
+        _errorDialog.postValue(args)
     }
 }

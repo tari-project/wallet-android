@@ -35,7 +35,10 @@ package com.tari.android.wallet.ffi
 import com.orhanobut.logger.Logger
 import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import com.tari.android.wallet.model.*
+import com.tari.android.wallet.model.recovery.WalletRestorationResult
+import com.tari.android.wallet.service.seedPhrase.SeedPhraseRepository
 import com.tari.android.wallet.util.Constants
+import io.sentry.Sentry
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import java.math.BigInteger
@@ -49,6 +52,7 @@ import java.util.concurrent.atomic.AtomicReference
 
 internal class FFIWallet(
     val sharedPrefsRepository: SharedPrefsRepository,
+    val seedPhraseRepository: SeedPhraseRepository,
     commsConfig: FFICommsConfig,
     logPath: String
 ) : FFIBase() {
@@ -68,6 +72,7 @@ internal class FFIWallet(
         maxNumberOfRollingLogFiles: Int,
         rollingLogFileMaxSizeBytes: Int,
         passphrase: String?,
+        seedWords: FFISeedWords?,
         callbackReceivedTx: String,
         callbackReceivedTxSig: String,
         callbackReceivedTxReply: String,
@@ -321,6 +326,13 @@ internal class FFIWallet(
 
     private external fun jniRemoveEncryption(libError: FFIError)
 
+    private external fun jniStartRecovery(
+        base_node_public_key: FFIPublicKey,
+        callback: String,
+        callback_sig: String,
+        libError: FFIError
+    ) : Boolean
+
     private external fun jniDestroy()
 
     // endregion
@@ -333,27 +345,35 @@ internal class FFIWallet(
         if (pointer == nullptr) { // so it can only be assigned once for the singleton
             val error = FFIError()
             Logger.i("Pre jniCreate.")
-            jniCreate(
-                commsConfig,
-                logPath,
-                Constants.Wallet.maxNumberOfRollingLogFiles,
-                Constants.Wallet.rollingLogFileMaxSizeBytes,
-                sharedPrefsRepository.databasePassphrase,
-                this::onTxReceived.name, "(J)V",
-                this::onTxReplyReceived.name, "(J)V",
-                this::onTxFinalized.name, "(J)V",
-                this::onTxBroadcast.name, "(J)V",
-                this::onTxMined.name, "(J)V",
-                this::onTxMinedUnconfirmed.name, "(J[B)V",
-                this::onDirectSendResult.name, "([BZ)V",
-                this::onStoreAndForwardSendResult.name, "([BZ)V",
-                this::onTxCancelled.name, "(J)V",
-                this::onUTXOValidationComplete.name, "([BI)V",
-                this::onSTXOValidationComplete.name, "([BI)V",
-                this::onInvalidTXOValidationComplete.name, "([BI)V",
-                this::onTxValidationComplete.name, "([BI)V",
-                error
-            )
+            try {
+                jniCreate(
+                    commsConfig,
+                    logPath,
+                    Constants.Wallet.maxNumberOfRollingLogFiles,
+                    Constants.Wallet.rollingLogFileMaxSizeBytes,
+                    sharedPrefsRepository.databasePassphrase,
+                    seedPhraseRepository.getPhrase()?.ffiSeedWords,
+                    this::onTxReceived.name, "(J)V",
+                    this::onTxReplyReceived.name, "(J)V",
+                    this::onTxFinalized.name, "(J)V",
+                    this::onTxBroadcast.name, "(J)V",
+                    this::onTxMined.name, "(J)V",
+                    this::onTxMinedUnconfirmed.name, "(J[B)V",
+                    this::onDirectSendResult.name, "([BZ)V",
+                    this::onStoreAndForwardSendResult.name, "([BZ)V",
+                    this::onTxCancelled.name, "(J)V",
+                    this::onUTXOValidationComplete.name, "([BI)V",
+                    this::onSTXOValidationComplete.name, "([BI)V",
+                    this::onInvalidTXOValidationComplete.name, "([BI)V",
+                    this::onTxValidationComplete.name, "([BI)V",
+                    error
+                )
+            } catch (e: Throwable) {
+                Sentry.captureException(e)
+                Logger.i("Post jniCreate with exception: %d.", e)
+                throw e
+            }
+
             Logger.i("Post jniCreate with code: %d.", error.code)
             throwIf(error)
 
@@ -368,7 +388,8 @@ internal class FFIWallet(
             sharedPrefsRepository.generateDatabasePassphrase()
             try {
                 setEncryption(sharedPrefsRepository.databasePassphrase.orEmpty())
-            } catch (e: Exception) {
+            } catch (e: Throwable) {
+                Sentry.captureException(e)
                 sharedPrefsRepository.databasePassphrase = null
             }
         }
@@ -991,6 +1012,24 @@ internal class FFIWallet(
         throwIf(error)
         return result
     }
+
+    fun startRecovery(baseNodePublicKey: FFIPublicKey) : Boolean {
+        val error = FFIError()
+        val result = jniStartRecovery(baseNodePublicKey, this::onWalletRecovery.name, "(I[B[B)V", error)
+        throwIf(error)
+        return result
+    }
+
+    /**
+     * This callback function cannot be private due to JNI behaviour.
+     */
+    @Suppress("MemberVisibilityCanBePrivate")
+    fun onWalletRecovery(event: Int, firstArg: ByteArray, secondArg: ByteArray) {
+        val result = WalletRestorationResult.create(event, firstArg, secondArg)
+        Logger.i("Wallet restoration. Result: $result")
+        GlobalScope.launch { listener?.onWalletRestoration(result) }
+    }
+
 
     fun testReceiveTx(): Boolean {
         return false

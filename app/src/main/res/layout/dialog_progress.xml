@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/root"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginHorizontal="@dimen/home_dialog_testnet_tari_dialog_margin"
+    android:layout_marginBottom="23dp"
+    android:background="@drawable/bottom_dialog_bg"
+    android:orientation="vertical"
+    android:paddingBottom="20dp">
+
+    <com.tari.android.wallet.ui.component.CustomFontTextView
+        android:id="@+id/error_dialog_title_text_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginHorizontal="32dp"
+        android:layout_marginTop="30dp"
+        android:layout_marginBottom="16dp"
+        android:gravity="center"
+        android:lineSpacingExtra="8dp"
+        android:textColor="@color/black"
+        android:textSize="18sp"
+        app:customFont="@string/font_light"
+        tools:text="@string/tx_failed_title" />
+
+    <com.tari.android.wallet.ui.component.CustomFontTextView
+        android:id="@+id/error_dialog_description_text_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="32dp"
+        android:layout_marginTop="8dp"
+        android:gravity="center"
+        android:letterSpacing="0.01"
+        android:lineSpacingExtra="10dp"
+        android:textColor="@color/dark_gray"
+        android:textSize="14sp"
+        app:customFont="@string/font_medium"
+        tools:text="@string/tx_failed_description" />
+
+    <com.tari.android.wallet.ui.component.CustomFontTextView
+        android:id="@+id/error_dialog_close_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="14dp"
+        android:gravity="center"
+        android:padding="10dp"
+        android:text="@string/common_close"
+        android:textColor="@color/dialog_cancel_action"
+        android:textSize="13sp"
+        app:customFont="@string/font_heavy" />
+
+</LinearLayout>

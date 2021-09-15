@@ -32,6 +32,8 @@
  */
 package com.tari.android.wallet.ffi
 
+import com.tari.android.wallet.model.seedPhrase.SeedWordsWordPushResult
+
 /**
  * Wrapper for native private key type.
  *
@@ -40,17 +42,23 @@ package com.tari.android.wallet.ffi
 internal class FFISeedWords() : FFIBase() {
 
     // region JNI
-
-    private external fun jniDestroy()
+    private external fun jniCreate()
+    private external fun jniPushWord(word: String, libError: FFIError): Int
     private external fun jniGetLength(libError: FFIError): Int
     private external fun jniGetAt(
         index: Int,
         libError: FFIError
     ): String
 
+    private external fun jniDestroy()
+
     // endregion
 
-    constructor(pointer: FFIPointer): this() {
+    init {
+        jniCreate()
+    }
+
+    constructor(pointer: FFIPointer) : this() {
         this.pointer = pointer
     }
 
@@ -68,8 +76,15 @@ internal class FFISeedWords() : FFIBase() {
         return result
     }
 
+    fun pushWord(word: String) : SeedWordsWordPushResult {
+        val error = FFIError()
+        val result = jniPushWord(word, error)
+        throwIf(error)
+        return SeedWordsWordPushResult.fromInt(result)
+    }
+
     override fun destroy() {
         jniDestroy()
     }
-
 }
+

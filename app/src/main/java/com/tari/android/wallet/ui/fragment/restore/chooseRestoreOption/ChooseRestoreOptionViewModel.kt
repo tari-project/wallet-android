@@ -124,7 +124,7 @@ internal class ChooseRestoreOptionViewModel : CommonViewModel() {
             resourceManager.getString(R.string.restore_wallet_error_title),
             resourceManager.getString(R.string.restore_wallet_error_file_not_found),
             onClose = { _backPressed.call() })
-        _errorDialag.postValue(args)
+        _errorDialog.postValue(args)
     }
 
     private fun showRestoreFailedDialog(message: String? = null) {
@@ -132,7 +132,7 @@ internal class ChooseRestoreOptionViewModel : CommonViewModel() {
             resourceManager.getString(R.string.restore_wallet_error_title),
             message ?: resourceManager.getString(R.string.restore_wallet_error_desc)
         )
-        _errorDialag.postValue(args)
+        _errorDialog.postValue(args)
     }
 
     private fun showAuthFailedDialog() {
@@ -140,6 +140,6 @@ internal class ChooseRestoreOptionViewModel : CommonViewModel() {
             resourceManager.getString(R.string.restore_wallet_error_title),
             resourceManager.getString(R.string.back_up_wallet_storage_setup_error_desc)
         )
-        _errorDialag.postValue(args)
+        _errorDialog.postValue(args)
     }
 }

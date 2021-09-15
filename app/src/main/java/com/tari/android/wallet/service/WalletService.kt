@@ -47,6 +47,7 @@ import com.tari.android.wallet.R
 import com.tari.android.wallet.application.TariWalletApplication
 import com.tari.android.wallet.application.WalletManager
 import com.tari.android.wallet.application.WalletState
+import com.tari.android.wallet.application.baseNodes.BaseNodes
 import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import com.tari.android.wallet.di.WalletModule
 import com.tari.android.wallet.event.Event
@@ -56,6 +57,7 @@ import com.tari.android.wallet.infrastructure.backup.BackupManager
 import com.tari.android.wallet.model.*
 import com.tari.android.wallet.model.Tx.Direction.INBOUND
 import com.tari.android.wallet.model.Tx.Direction.OUTBOUND
+import com.tari.android.wallet.model.recovery.WalletRestorationResult
 import com.tari.android.wallet.notification.NotificationHelper
 import com.tari.android.wallet.service.WalletServiceLauncher.Companion.startAction
 import com.tari.android.wallet.service.WalletServiceLauncher.Companion.stopAction
@@ -125,6 +127,9 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
     @Inject
     lateinit var backupManager: BackupManager
 
+    @Inject
+    lateinit var baseNodes: BaseNodes
+
     private lateinit var wallet: FFIWallet
 
     private var txBroadcastRestarted = false
@@ -191,6 +196,7 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
      * Called when a component decides to start or stop the foreground wallet service.
      */
     override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
+        startForeground()
         when (intent.action) {
             startAction -> startService()
             stopAction -> stopService(startId)
@@ -203,16 +209,20 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
         return START_NOT_STICKY
     }
 
+
     private fun startService() {
         // start wallet manager on a separate thead & listen to events
         EventBus.walletState.subscribe(this, this::onWalletStateChanged)
         Thread {
             walletManager.start()
         }.start()
+        Logger.d("Wallet service started.")
+    }
+
+    private fun startForeground() {
         // start service & post foreground service notification
         val notification = notificationHelper.buildForegroundServiceNotification()
         startForeground(NOTIFICATION_ID, notification)
-        Logger.d("Wallet service started.")
     }
 
     private fun stopService(startId: Int) {
@@ -480,7 +490,7 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
             baseNodeValidationStatusMap.clear()
             sharedPrefsWrapper.baseNodeLastSyncResult = BaseNodeValidationResult.BASE_NODE_NOT_IN_SYNC
             if (!sharedPrefsWrapper.baseNodeIsUserCustom) {
-                walletManager.setNextBaseNode()
+                baseNodes.setNextBaseNode()
             }
             EventBus.baseNodeState.post(BaseNodeState.SyncCompleted(BaseNodeValidationResult.BASE_NODE_NOT_IN_SYNC))
             listeners.iterator().forEach { it.onBaseNodeSyncComplete(false) }
@@ -504,7 +514,7 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
             baseNodeValidationStatusMap.clear()
             sharedPrefsWrapper.baseNodeLastSyncResult = BaseNodeValidationResult.FAILURE
             if (!sharedPrefsWrapper.baseNodeIsUserCustom) {
-                walletManager.setNextBaseNode()
+                baseNodes.setNextBaseNode()
             }
             EventBus.baseNodeState.post(BaseNodeState.SyncCompleted(BaseNodeValidationResult.FAILURE))
             listeners.iterator().forEach { it.onBaseNodeSyncComplete(false) }
@@ -512,7 +522,9 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
         }
         // if any of the results is null, we're still waiting for all callbacks to happen
         val inProgress = statusMapCopy.filter { it.value.second == null }.isNotEmpty()
-        if (inProgress) { return }
+        if (inProgress) {
+            return
+        }
         // check if it's successful
         val successful = statusMapCopy.filter {
             it.value.second != null && it.value.second != BaseNodeValidationResult.SUCCESS
@@ -526,9 +538,11 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
         // shouldn't ever reach here - no-op
     }
 
-    private fun checkValidationResult(type: BaseNodeValidationType,
-                                      responseId: BigInteger,
-                                      result: BaseNodeValidationResult) {
+    private fun checkValidationResult(
+        type: BaseNodeValidationType,
+        responseId: BigInteger,
+        result: BaseNodeValidationResult
+    ) {
         val currentStatus = baseNodeValidationStatusMap[type]
         if (currentStatus == null) {
             Logger.d(
@@ -575,6 +589,10 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
                 Logger.e("Error while restarting tx broadcast: " + e.message)
             }
         }
+    }
+
+    override fun onWalletRestoration(result: WalletRestorationResult) {
+        EventBus.walletRestorationState.post(result)
     }
 
     /**
@@ -633,7 +651,8 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
                     val currentActivity = app.currentActivity
                     if (!app.isInForeground
                         || currentActivity !is HomeActivity
-                        || !currentActivity.willNotifyAboutNewTx()) {
+                        || !currentActivity.willNotifyAboutNewTx()
+                    ) {
                         notificationHelper.postCustomLayoutTxNotification(
                             inboundTxEventNotificationTxs.last()
                         )

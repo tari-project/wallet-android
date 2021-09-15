@@ -69,7 +69,7 @@
                 android:text="@string/back_up_wallet_restore"
                 android:textColor="@color/black"
                 android:textSize="15sp"
-                app:customFont="AVENIR_LT_STD_MEDIUM" />
+                app:customFont="@string/font_medium" />
 
             <ProgressBar
                 android:id="@+id/restore_wallet_menu_item_progress_view"
@@ -91,19 +91,18 @@
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:layout_marginHorizontal="25dp"
+            android:layout_marginHorizontal="@dimen/common_horizontal_margin"
             android:background="@color/settings_background" />
 
         <FrameLayout
             android:id="@+id/restore_with_recovery_phrase_cta_view"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="@dimen/menu_item_height"
             android:background="@drawable/setting_option_background"
             android:clickable="true"
             android:focusable="true"
-            android:paddingHorizontal="26dp"
-            android:paddingVertical="24dp"
-            android:visibility="gone">
+            android:layout_gravity="center_vertical|start"
+            android:paddingHorizontal="@dimen/common_horizontal_margin">
 
             <com.tari.android.wallet.ui.component.CustomFontTextView
                 android:layout_width="wrap_content"

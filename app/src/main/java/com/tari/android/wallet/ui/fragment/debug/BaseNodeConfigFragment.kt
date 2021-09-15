@@ -49,6 +49,7 @@ import com.tari.android.wallet.R.color.white
 import com.tari.android.wallet.R.drawable.base_node_config_edit_text_bg
 import com.tari.android.wallet.R.drawable.base_node_config_edit_text_invalid_bg
 import com.tari.android.wallet.application.WalletManager
+import com.tari.android.wallet.application.baseNodes.BaseNodes
 import com.tari.android.wallet.databinding.FragmentBaseNodeConfigBinding
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.ffi.FFIPublicKey
@@ -77,8 +78,12 @@ internal class BaseNodeConfigFragment : Fragment(), ServiceConnection {
 
     @Inject
     lateinit var sharedPrefsWrapper: SharedPrefsRepository
+
     @Inject
     lateinit var walletManager: WalletManager
+
+    @Inject
+    lateinit var baseNodes: BaseNodes
 
     private val onion2ClipboardRegex = Regex("[a-zA-Z0-9]{64}::/onion/[a-zA-Z2-7]{16}(:[0-9]+)?")
     private val onion3ClipboardRegex = Regex("[a-zA-Z0-9]{64}::/onion[2-3]/[a-zA-Z2-7]{56}(:[0-9]+)?")
@@ -244,7 +249,7 @@ internal class BaseNodeConfigFragment : Fragment(), ServiceConnection {
         sharedPrefsWrapper.baseNodeIsUserCustom = false
         sharedPrefsWrapper.baseNodeLastSyncResult = null
         lifecycleScope.launch(Dispatchers.IO) {
-            walletManager.setNextBaseNode()
+            baseNodes.setNextBaseNode()
             walletService.startBaseNodeSync(WalletError())
             withContext(Dispatchers.Main) {
                 updateCurrentBaseNode()
@@ -284,7 +289,7 @@ internal class BaseNodeConfigFragment : Fragment(), ServiceConnection {
                 addBaseNodePeerSuccessful(publicKeyHex, address)
             }
         } else {
-            walletManager.setNextBaseNode()
+            baseNodes.setNextBaseNode()
             walletService.startBaseNodeSync(WalletError())
             withContext(Dispatchers.Main) {
                 addBaseNodePeerFailed()
