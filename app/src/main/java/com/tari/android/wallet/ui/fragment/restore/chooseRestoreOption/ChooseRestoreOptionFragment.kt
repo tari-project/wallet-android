@@ -82,14 +82,14 @@ internal class ChooseRestoreOptionFragment : CommonFragment<FragmentChooseRestor
     }
 
     private fun setupUI() = with(ui) {
-        backCtaView.setOnClickListener { requireActivity().onBackPressed() }
+        backCtaView.setOnThrottledClickListener { requireActivity().onBackPressed() }
         restoreWalletMenuItemProgressView.setColor(color(all_settings_back_up_status_processing))
         restoreWalletMenuItemProgressView.gone()
-        restoreWalletCtaView.setOnClickListener {
+        restoreWalletCtaView.setOnThrottledClickListener {
             processState(ChooseRestoreOptionState.BeginProgress)
             backupManager.setupStorage(this@ChooseRestoreOptionFragment)
         }
-        restoreWithRecoveryPhraseCtaView.setOnClickListener { processNavigation(ChooseRestoreOptionNavigation.ToRestoreWithRecoveryPhrase) }
+        restoreWithRecoveryPhraseCtaView.setOnThrottledClickListener { processNavigation(ChooseRestoreOptionNavigation.ToRestoreWithRecoveryPhrase) }
     }
 
     private fun observeUI() = with(viewModel) {

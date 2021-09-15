@@ -8,6 +8,7 @@ import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.ui.common.domain.ResourceManager
 import com.tari.android.wallet.ui.dialog.confirm.ConfirmDialogArgs
 import com.tari.android.wallet.ui.dialog.error.ErrorDialogArgs
+import com.tari.android.wallet.ui.dialog.inProgress.ProgressDialogArgs
 import io.reactivex.disposables.CompositeDisposable
 import javax.inject.Inject
 
@@ -44,6 +45,9 @@ open class CommonViewModel : ViewModel() {
 
     protected val _errorDialog = SingleLiveEvent<ErrorDialogArgs>()
     val errorDialog: LiveData<ErrorDialogArgs> = _errorDialog
+
+    protected val _loadingDialog = SingleLiveEvent<ProgressDialogArgs>()
+    val loadingDialog: LiveData<ProgressDialogArgs> = _loadingDialog
 
     protected val _blockedBackPressed = SingleLiveEvent<Boolean>()
     val blockedBackPressed: LiveData<Boolean> = _blockedBackPressed
