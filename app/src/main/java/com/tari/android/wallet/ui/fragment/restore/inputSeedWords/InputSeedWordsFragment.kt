@@ -38,11 +38,21 @@ internal class InputSeedWordsFragment : CommonFragment<FragmentWalletInputSeedWo
     }
 
     private fun setupUI() = with(ui) {
-        seedWordsContainer.setOnClickListener { viewModel.getFocusToNextElement(-1) }
-        backCtaView.setOnClickListener { requireActivity().onBackPressed() }
-        continueCtaView.setOnClickListener {
+        seedWordsContainer.setOnThrottledClickListener { viewModel.getFocusToNextElement(-1) }
+        backCtaView.setOnThrottledClickListener { requireActivity().onBackPressed() }
+        continueCtaView.setOnThrottledClickListener {
             onFinishEntering()
             viewModel.startRestoringWallet()
+        }
+        seedWordsContainer.setOnLongClickListener {
+            val word = seedWordsFlexboxLayout.getChildAt(viewModel.focusedIndex.value!!) as? WordTextView
+            word?.ui?.text?.let {
+                it.requestFocus()
+                it.selectAll()
+                it.performLongClick()
+                it.performLongClick()
+            }
+            true
         }
     }
 
@@ -53,13 +63,16 @@ internal class InputSeedWordsFragment : CommonFragment<FragmentWalletInputSeedWo
 
         observe(removedWord) { removeWord(it) }
 
-        observe(isAllEntered) { ui.continueCtaView.isEnabled = it }
+        observe(continueButtonState) { ui.continueCtaView.setState(it) }
 
         observe(finishEntering) { onFinishEntering() }
 
         observe(focusedIndex) { requestFocusAtIndex(it) }
 
         observe(navigation) { processNavigation(it) }
+
+        observeOnLoad(isAllEntered)
+        observeOnLoad(isInProgress)
     }
 
     private fun processNavigation(navigation: InputSeedWordsNavigation) {

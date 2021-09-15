@@ -219,8 +219,11 @@ internal fun View.dimenPx(@DimenRes id: Int): Int = context.dimenPx(id)
 
 internal fun View.drawable(@DrawableRes id: Int): Drawable? = context.drawable(id)
 
-internal class ThrottleClick(private val delegate: (View) -> Unit) :
-    View.OnClickListener {
+internal fun View.setOnThrottledClickListener(action: (View) -> Unit) {
+    this.setOnClickListener(ThrottleClick(action))
+}
+
+internal class ThrottleClick(private val delegate: (View) -> Unit) : View.OnClickListener {
     override fun onClick(v: View?) {
         v?.temporarilyDisableClick()
         v?.let(delegate)

@@ -1,6 +1,7 @@
 package com.tari.android.wallet.ui.fragment.restore.inputSeedWords
 
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import com.tari.android.wallet.R
@@ -13,6 +14,7 @@ import com.tari.android.wallet.service.seedPhrase.SeedPhraseRepository
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.common.SingleLiveEvent
 import com.tari.android.wallet.ui.common.domain.ResourceManager
+import com.tari.android.wallet.ui.component.loadingButton.LoadingButtonState
 import com.tari.android.wallet.ui.dialog.error.ErrorDialogArgs
 import io.reactivex.disposables.CompositeDisposable
 import javax.inject.Inject
@@ -43,12 +45,22 @@ internal class InputSeedWordsViewModel() : CommonViewModel() {
     private val _focusedIndex = MutableLiveData<Int>()
     val focusedIndex: LiveData<Int> = _focusedIndex
 
+    private val _inProgress = MutableLiveData(false)
+    val isInProgress: LiveData<Boolean> = _inProgress
+
     val isAllEntered: LiveData<Boolean> = Transformations.map(_words) { words ->
         words.all { it.text.value!!.isNotEmpty() } && words.size == SeedPhrase.SeedPhraseLength
     }
 
+    private val _continueButtonState = MediatorLiveData<LoadingButtonState>()
+    val continueButtonState: LiveData<LoadingButtonState> = _continueButtonState
+
     init {
         component?.inject(this)
+
+        _continueButtonState.addSource(isAllEntered) { updateContinueState() }
+        _continueButtonState.addSource(isInProgress) { updateContinueState() }
+
         _words.value = mutableListOf()
         _focusedIndex.value = 0
         clear()
@@ -68,13 +80,18 @@ internal class InputSeedWordsViewModel() : CommonViewModel() {
     }
 
     private fun startRestoring() {
+        _inProgress.postValue(true)
         EventBus.walletState.publishSubject.distinct().subscribe {
             when (it) {
                 is WalletState.Failed -> {
                     onError(RestorationError.Unknown(resourceManager))
+                    _inProgress.postValue(false)
                     clear()
                 }
-                WalletState.Running -> _navigation.postValue(InputSeedWordsNavigation.ToRestoreFormSeedWordsInProgress)
+                WalletState.Running -> {
+                    _navigation.postValue(InputSeedWordsNavigation.ToRestoreFormSeedWordsInProgress)
+                    _inProgress.postValue(false)
+                }
                 else -> Unit
             }
         }.addTo(compositeDisposable)
@@ -134,12 +151,20 @@ internal class InputSeedWordsViewModel() : CommonViewModel() {
         val list = _words.value!!
         if (list[index].text.value!! == text) return
 
-        val formattedText = text.replace(" ", "")
-        list[index].text.value = formattedText
-        if (text.contains(" ")) {
-            finishEntering(index, formattedText)
-        } else {
-            _words.value = list
+        val formattedText = text.split(" ", "\n", "\r").filter { it.isNotEmpty() }
+        if (formattedText.isNotEmpty()) {
+            list[index].text.value = formattedText[0]
+            for ((formattedIndex, item) in formattedText.drop(1).withIndex()) {
+                val nextIndex = index + formattedIndex + 1
+                if (list.size < SeedPhrase.SeedPhraseLength) {
+                    addWord(nextIndex, item)
+                }
+            }
+            if (text.endsWith(" ")) {
+                finishEntering(index, formattedText.last())
+            } else {
+                _words.value = list
+            }
         }
     }
 
@@ -187,6 +212,12 @@ internal class InputSeedWordsViewModel() : CommonViewModel() {
         for ((index, word) in _words.value!!.withIndex()) {
             word.index.value = index
         }
+    }
+
+    private fun updateContinueState() {
+        val title = resourceManager.getString(R.string.restore_from_seed_words_submit_title)
+        val state = LoadingButtonState(title, isAllEntered.value!! && !_inProgress.value!!, _inProgress.value!!)
+        _continueButtonState.postValue(state)
     }
 
     sealed class RestorationError(title: String, message: String) {

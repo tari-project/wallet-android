@@ -110,19 +110,14 @@
 
             </FrameLayout>
 
-            <com.tari.android.wallet.ui.component.CustomFontTextView
+            <com.tari.android.wallet.ui.component.loadingButton.LoadingButtonView
                 android:id="@+id/continue_cta_view"
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/common_action_button_height"
+                android:gravity="center"
                 android:layout_marginTop="60dp"
                 android:layout_marginHorizontal="25dp"
                 android:layout_marginBottom="15dp"
-                android:background="@drawable/disableable_gradient_button_bg"
-                android:gravity="center"
-                android:text="@string/restore_from_seed_words_submit_title"
-                android:textColor="@color/button_text_color_selector"
-                android:textSize="16sp"
-                app:customFont="@string/font_heavy" />
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
 
         </LinearLayout>
 

@@ -13,6 +13,7 @@ import com.tari.android.wallet.ui.component.MutedBackPressedCallback
 import com.tari.android.wallet.ui.dialog.TariDialog
 import com.tari.android.wallet.ui.dialog.confirm.ConfirmDialog
 import com.tari.android.wallet.ui.dialog.error.ErrorDialog
+import com.tari.android.wallet.ui.dialog.inProgress.TariProgressDialog
 
 abstract class CommonFragment<Binding : ViewBinding, VM : CommonViewModel> : Fragment() {
 
@@ -44,6 +45,8 @@ abstract class CommonFragment<Binding : ViewBinding, VM : CommonViewModel> : Fra
         observe(confirmDialog) { replaceDialog(ConfirmDialog(requireContext(), it)) }
 
         observe(errorDialog) { replaceDialog(ErrorDialog(requireContext(), it)) }
+
+        observe(loadingDialog) { if (it.isShow) replaceDialog(TariProgressDialog(requireContext(), it)) else currentDialog?.dismiss() }
 
         observe(blockedBackPressed) {
             blockingBackPressDispatcher.isEnabled = it
