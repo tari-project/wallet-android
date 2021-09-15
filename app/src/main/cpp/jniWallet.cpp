@@ -485,6 +485,9 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniCreate(
         pPassphrase = jEnv->GetStringUTFChars(jPassphrase, JNI_FALSE);
     }
 
+    bool recoveryInProgress = false;
+    bool *recovery = &recoveryInProgress;
+
     TariSeedWords *pSeedWords = nullptr;
     if (jSeed_words != nullptr) {
         jlong lSeedWords = GetPointerField(jEnv, jSeed_words);
@@ -512,6 +515,7 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniCreate(
             invalidTxoValidationCompleteCallback,
             transactionValidationCompleteCallback,
             storeAndForwardMessagesReceivedCallback,
+            recovery,
             r);
 
     setErrorCode(jEnv, error, i);
@@ -1250,6 +1254,7 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniSetConfirmations(
 }
 
 //region Wallet Test Functions
+/*
 extern "C"
 JNIEXPORT jboolean JNICALL
 Java_com_tari_android_wallet_ffi_FFIWallet_jniGenerateTestData(
@@ -1270,7 +1275,9 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniGenerateTestData(
     jEnv->ReleaseStringUTFChars(jDatastorePath, pDatastorePath);
     return result;
 }
+*/
 
+/*
 extern "C"
 JNIEXPORT jboolean JNICALL
 Java_com_tari_android_wallet_ffi_FFIWallet_jniTestBroadcastTx(
@@ -1290,7 +1297,9 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniTestBroadcastTx(
     setErrorCode(jEnv, error, i);
     return result;
 }
+*/
 
+/*
 extern "C"
 JNIEXPORT jboolean JNICALL
 Java_com_tari_android_wallet_ffi_FFIWallet_jniTestFinalizeReceivedTx(
@@ -1310,7 +1319,9 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniTestFinalizeReceivedTx(
     setErrorCode(jEnv, error, i);
     return result;
 }
+*/
 
+/*
 extern "C"
 JNIEXPORT jboolean JNICALL
 Java_com_tari_android_wallet_ffi_FFIWallet_jniTestCompleteSentTx(
@@ -1329,7 +1340,9 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniTestCompleteSentTx(
     setErrorCode(jEnv, error, i);
     return result;
 }
+*/
 
+/*
 extern "C"
 JNIEXPORT jboolean JNICALL
 Java_com_tari_android_wallet_ffi_FFIWallet_jniTestMineTx(
@@ -1349,7 +1362,9 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniTestMineTx(
     setErrorCode(jEnv, error, i);
     return result;
 }
+*/
 
+/*
 extern "C"
 JNIEXPORT jboolean JNICALL
 Java_com_tari_android_wallet_ffi_FFIWallet_jniTestReceiveTx(
@@ -1364,6 +1379,7 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniTestReceiveTx(
     setErrorCode(jEnv, error, i);
     return result;
 }
+*/
 
 extern "C"
 JNIEXPORT jbyteArray JNICALL

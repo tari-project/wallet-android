@@ -65,6 +65,7 @@ add_library(
         jniContact.cpp
         jniCommsConfig.cpp
         jniCompletedTransaction.cpp
+        jniCompletedTransactionKernel.cpp
         jniPendingInboundTransaction.cpp
         jniPendingOutboundTransaction.cpp
         jniCollections.cpp

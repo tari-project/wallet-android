@@ -283,32 +283,44 @@ internal class FFIWallet(
         libError: FFIError
     ): ByteArray
 
+    /*
     private external fun jniGenerateTestData(
         datastorePath: String,
         libError: FFIError
     ): Boolean
+    */
 
+    /*
     private external fun jniTestBroadcastTx(
         txPtr: String,
         libError: FFIError
     ): Boolean
+     */
 
+    /*
     private external fun jniTestFinalizeReceivedTx(
         txPtr: FFIPendingInboundTx,
         libError: FFIError
     ): Boolean
+    */
 
+    /*
     private external fun jniTestCompleteSentTx(
         txPtr: FFIPendingOutboundTx,
         libError: FFIError
     ): Boolean
+    */
 
+    /*
     private external fun jniTestMineTx(
         txId: String,
         libError: FFIError
     ): Boolean
+     */
 
+    /*
     private external fun jniTestReceiveTx(libError: FFIError): Boolean
+     */
 
     private external fun jniApplyEncryption(passphrase: String, libError: FFIError)
 
@@ -968,38 +980,23 @@ internal class FFIWallet(
     }
 
     fun generateTestData(datastorePath: String): Boolean {
-        val error = FFIError()
-        val result = jniGenerateTestData(datastorePath, error)
-        throwIf(error)
-        return result
+        return false
     }
 
     fun testBroadcastTx(tx: BigInteger): Boolean {
-        val error = FFIError()
-        val result = jniTestBroadcastTx(tx.toString(), error)
-        throwIf(error)
-        return result
+        return false
     }
 
     fun testCompleteSentTx(tx: FFIPendingOutboundTx): Boolean {
-        val error = FFIError()
-        val result = jniTestCompleteSentTx(tx, error)
-        throwIf(error)
-        return result
+        return false
     }
 
     fun testMineTx(tx: BigInteger): Boolean {
-        val error = FFIError()
-        val result = jniTestMineTx(tx.toString(), error)
-        throwIf(error)
-        return result
+        return false
     }
 
     fun testFinalizeReceivedTx(tx: FFIPendingInboundTx): Boolean {
-        val error = FFIError()
-        val result = jniTestFinalizeReceivedTx(tx, error)
-        throwIf(error)
-        return result
+        return false
     }
 
     fun setEncryption(passphrase: String) {
@@ -1035,10 +1032,7 @@ internal class FFIWallet(
 
 
     fun testReceiveTx(): Boolean {
-        val error = FFIError()
-        val result = jniTestReceiveTx(error)
-        throwIf(error)
-        return result
+        return false
     }
 
     override fun destroy() {
