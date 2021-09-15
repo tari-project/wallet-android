@@ -1,34 +1,42 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/debug_root"
     android:layout_width="match_parent"
-    android:background="@color/white"
-    android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:layout_height="match_parent">
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="@dimen/common_header_height"
-        android:orientation="horizontal">
+        android:layout_height="match_parent"
+        android:background="@color/white"
+        android:orientation="vertical">
 
-        <!-- back -->
-        <ImageButton
-            android:id="@+id/back_button"
-            android:layout_width="@dimen/common_header_height"
-            android:layout_height="match_parent"
-            android:background="@color/white"
-            android:contentDescription="@null"
-            android:src="@drawable/back_icon" />
-
-        <com.google.android.material.tabs.TabLayout
-            android:id="@+id/tab_layout"
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="@color/white" />
+            android:layout_height="@dimen/common_header_height"
+            android:orientation="horizontal">
+
+            <!-- back -->
+            <androidx.appcompat.widget.AppCompatImageButton
+                android:id="@+id/back_button"
+                android:layout_width="@dimen/common_header_height"
+                android:layout_height="match_parent"
+                android:background="@color/white"
+                android:src="@drawable/back_icon" />
+
+            <com.google.android.material.tabs.TabLayout
+                android:id="@+id/tab_layout"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/white" />
+        </LinearLayout>
+
+        <androidx.viewpager2.widget.ViewPager2
+            android:id="@+id/view_pager"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
     </LinearLayout>
 
-    <androidx.viewpager2.widget.ViewPager2
-        android:id="@+id/view_pager"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1" />
-</LinearLayout>
+</FrameLayout>

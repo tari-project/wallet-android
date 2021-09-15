@@ -15,7 +15,6 @@ import com.tari.android.wallet.ui.common.SingleLiveEvent
 import com.tari.android.wallet.ui.common.recyclerView.CommonViewHolderItem
 import com.tari.android.wallet.ui.common.recyclerView.items.TitleViewHolderItem
 import com.tari.android.wallet.ui.dialog.backup.BackupWalletDialogArgs
-import com.tari.android.wallet.ui.dialog.confirm.ConfirmDialogArgs
 import com.tari.android.wallet.ui.dialog.error.ErrorDialogArgs
 import com.tari.android.wallet.ui.dialog.testnet.TestnetReceivedDialogArgs
 import com.tari.android.wallet.ui.dialog.ttl.TtlStoreWalletDialogArgs
@@ -338,7 +337,7 @@ internal class TxListViewModel() : CommonViewModel() {
         refreshBalance(true)
 
         // import second testnet UTXO if it hasn't been imported yet
-        if (sharedPrefsRepository.testnetTariUTXOKeyList.isNotEmpty()) {
+        if (sharedPrefsRepository.testnetTariUTXOKeyList.orEmpty().isNotEmpty()) {
             viewModelScope.launch(Dispatchers.IO) {
                 delay(SECOND_UTXO_IMPORT_DELAY)
                 importSecondUTXO()

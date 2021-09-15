@@ -2,16 +2,23 @@ package com.tari.android.wallet.application.baseNodes
 
 import android.content.Context
 import com.tari.android.wallet.R
-import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
+import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodeDto
+import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodeSharedRepository
+import com.tari.android.wallet.extension.executeWithError
 import com.tari.android.wallet.ffi.FFIPublicKey
 import com.tari.android.wallet.ffi.FFIWallet
 import com.tari.android.wallet.ffi.HexString
+import com.tari.android.wallet.service.connection.TariWalletServiceConnection
 import org.apache.commons.io.IOUtils
 
 class BaseNodes(
     private val context: Context,
-    private val sharedPrefsRepository: SharedPrefsRepository
+    private val baseNodeSharedRepository: BaseNodeSharedRepository
 ) {
+
+    private val serviceConnection = TariWalletServiceConnection()
+    private val walletService
+        get() = serviceConnection.currentState.service!!
 
     private lateinit var baseNodeIterator: Iterator<BaseNodeDto>
 
@@ -49,15 +56,19 @@ class BaseNodes(
             baseNodeIterator = baseNodeList.iterator()
         }
         val baseNode = baseNodeIterator.next()
-        sharedPrefsRepository.baseNodeLastSyncResult = null
-        sharedPrefsRepository.baseNodeName = baseNode.name
-        sharedPrefsRepository.baseNodePublicKeyHex = baseNode.publicKeyHex
-        sharedPrefsRepository.baseNodeAddress = baseNode.address
-        sharedPrefsRepository.baseNodeIsUserCustom = false
+        setBaseNode(baseNode)
+    }
 
+    fun setBaseNode(baseNode: BaseNodeDto) {
+        baseNodeSharedRepository.baseNodeLastSyncResult = null
+        baseNodeSharedRepository.currentBaseNode = baseNode
+        addIntoWallet(baseNode)
+    }
+
+    fun addIntoWallet(baseNode: BaseNodeDto) {
         val baseNodeKeyFFI = FFIPublicKey(HexString(baseNode.publicKeyHex))
         FFIWallet.instance?.addBaseNodePeer(baseNodeKeyFFI, baseNode.address)
         baseNodeKeyFFI.destroy()
+        walletService.executeWithError { error, wallet -> wallet.startBaseNodeSync(error) }
     }
 }
-

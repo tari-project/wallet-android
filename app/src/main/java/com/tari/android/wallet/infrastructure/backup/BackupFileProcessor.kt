@@ -60,7 +60,7 @@ internal class BackupFileProcessor(
 
         // create partial backup in temp folder if password not set
         val databaseFile = File(walletDatabaseFilePath)
-        val backupPassword = newPassword ?: sharedPrefs.backupPassword
+        val backupPassword = newPassword ?: sharedPrefs.backupPassword?.toCharArray()
         val backupDate = DateTime.now()
         // zip the file
         val compressionMethod = CompressionMethod.zip()

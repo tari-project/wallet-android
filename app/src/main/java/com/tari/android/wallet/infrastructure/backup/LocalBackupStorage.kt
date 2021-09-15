@@ -113,7 +113,7 @@ internal class LocalBackupStorage(
             }
             // update backup password
             if (newPassword != null) {
-                sharedPrefs.backupPassword = newPassword
+                sharedPrefs.backupPassword = newPassword.toString()
             }
             try {
                 // clear temp folder
@@ -189,7 +189,7 @@ internal class LocalBackupStorage(
             // restore successful, turn on automated backup
             sharedPrefs.localBackupFolderURI = backupFolderURI
             sharedPrefs.lastSuccessfulBackupDate = BackupNamingPolicy.getDateFromBackupFileName(tempFile.name)
-            sharedPrefs.backupPassword = password?.toCharArray()
+            sharedPrefs.backupPassword = password
         }
     }
 

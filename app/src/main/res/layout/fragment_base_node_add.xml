@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.appcompat.widget.LinearLayoutCompat xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/root_view"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    android:orientation="vertical">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <FrameLayout
+            android:id="@+id/back_cta_view"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginTop="8dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintDimensionRatio="1:1"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:src="@drawable/back_icon" />
+
+        </FrameLayout>
+
+        <com.tari.android.wallet.ui.component.CustomFontTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:layout_marginBottom="16dp"
+            android:text="@string/debug_custom_base_node"
+            android:textColor="@color/black"
+            android:textSize="16sp"
+            app:customFont="@string/font_heavy"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/white">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingHorizontal="25dp">
+
+            <com.tari.android.wallet.ui.component.CustomFontEditText
+                android:id="@+id/name_edit_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:background="@drawable/base_node_config_edit_text_bg"
+                android:hint="@string/debug_edit_base_node_public_key_hint"
+                android:imeOptions="actionNext"
+                android:paddingHorizontal="6dp"
+                android:paddingVertical="12dp"
+                android:singleLine="true"
+                android:text="@string/debug_base_node_custom"
+                android:textColor="@color/black"
+                android:textSize="15sp"
+                app:customFont="@string/font_regular" />
+
+            <com.tari.android.wallet.ui.component.CustomFontEditText
+                android:id="@+id/public_key_hex_edit_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:background="@drawable/base_node_config_edit_text_bg"
+                android:hint="@string/debug_edit_base_node_public_key_hint"
+                android:imeOptions="actionNext"
+                android:paddingHorizontal="6dp"
+                android:paddingVertical="12dp"
+                android:singleLine="true"
+                android:textColor="@color/black"
+                android:textSize="15sp"
+                app:customFont="@string/font_regular" />
+
+            <com.tari.android.wallet.ui.component.CustomFontTextView
+                android:id="@+id/invalid_public_key_hex_text_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:singleLine="true"
+                android:text="@string/debug_edit_base_node_invalid_public_key"
+                android:textColor="@color/common_error"
+                android:textSize="14sp"
+                app:customFont="@string/font_light" />
+
+
+            <com.tari.android.wallet.ui.component.CustomFontEditText
+                android:id="@+id/address_edit_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:background="@drawable/base_node_config_edit_text_bg"
+                android:hint="@string/debug_edit_base_node_address_hint"
+                android:imeOptions="actionDone"
+                android:paddingHorizontal="6dp"
+                android:paddingVertical="12dp"
+                android:singleLine="true"
+                android:textColor="@color/black"
+                android:textSize="15sp"
+                app:customFont="@string/font_regular" />
+
+            <com.tari.android.wallet.ui.component.CustomFontTextView
+                android:id="@+id/invalid_address_text_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:singleLine="true"
+                android:text="@string/debug_edit_base_node_invalid_address"
+                android:textColor="@color/common_error"
+                android:textSize="14sp"
+                app:customFont="@string/font_light" />
+
+            <com.tari.android.wallet.ui.component.CustomFontButton
+                android:id="@+id/save_button"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/common_action_button_height"
+                android:layout_gravity="end"
+                android:layout_marginTop="32dp"
+                android:background="@drawable/disableable_gradient_button_bg"
+                android:text="@string/common_save"
+                android:textAllCaps="false"
+                android:textColor="@color/button_text_color_selector"
+                android:textSize="16sp"
+                app:customFont="@string/font_heavy" />
+
+        </LinearLayout>
+    </ScrollView>
+
+</androidx.appcompat.widget.LinearLayoutCompat>
+

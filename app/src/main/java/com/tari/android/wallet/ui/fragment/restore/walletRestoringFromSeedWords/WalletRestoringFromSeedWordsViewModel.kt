@@ -4,7 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.tari.android.wallet.R
-import com.tari.android.wallet.application.baseNodes.BaseNodeDto
+import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodeDto
 import com.tari.android.wallet.application.baseNodes.BaseNodes
 import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import com.tari.android.wallet.event.EventBus

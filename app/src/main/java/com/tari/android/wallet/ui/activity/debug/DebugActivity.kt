@@ -34,19 +34,23 @@ package com.tari.android.wallet.ui.activity.debug
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.Fragment
 import com.google.android.material.tabs.TabLayoutMediator
 import com.tari.android.wallet.R
 import com.tari.android.wallet.databinding.ActivityDebugBinding
 import com.tari.android.wallet.ui.activity.debug.adapter.DebugViewPagerAdapter
 import com.tari.android.wallet.ui.extension.appComponent
 import com.tari.android.wallet.ui.extension.string
+import com.tari.android.wallet.ui.fragment.debug.baseNodeConfig.BaseNodeConfigRouter
+import com.tari.android.wallet.ui.fragment.debug.baseNodeConfig.addBaseNode.AddCustomBaseNodeFragment
+import com.tari.android.wallet.ui.fragment.debug.baseNodeConfig.changeBaseNode.ChangeBaseNodeFragment
 
 /**
  * Contains debug fragments.
  *
  * @author The Tari Development Team
  */
-internal class DebugActivity : AppCompatActivity() {
+internal class DebugActivity : AppCompatActivity(), BaseNodeConfigRouter {
 
     private lateinit var pagerAdapter: DebugViewPagerAdapter
 
@@ -75,4 +79,20 @@ internal class DebugActivity : AppCompatActivity() {
         overridePendingTransition(R.anim.enter_from_left, R.anim.exit_to_right)
     }
 
+    override fun toAddCustomBaseNode() = loadFragment(AddCustomBaseNodeFragment.getNewInstance())
+
+    override fun toChangeBaseNode() = loadFragment(ChangeBaseNodeFragment.getNewInstance())
+
+    private fun loadFragment(fragment: Fragment) {
+        supportFragmentManager
+            .beginTransaction()
+            .setCustomAnimations(
+                R.anim.enter_from_right, R.anim.exit_to_left,
+                R.anim.enter_from_left, R.anim.exit_to_right
+            )
+            .apply { supportFragmentManager.fragments.forEach { hide(it) } }
+            .add(R.id.debug_root, fragment)
+            .addToBackStack(null)
+            .commit()
+    }
 }

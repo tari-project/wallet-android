@@ -41,10 +41,11 @@ import androidx.biometric.BiometricManager
 import androidx.core.content.ContextCompat
 import com.tari.android.wallet.BuildConfig
 import com.tari.android.wallet.application.TariWalletApplication
+import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
+import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodeSharedRepository
 import com.tari.android.wallet.infrastructure.GiphyEcosystem
 import com.tari.android.wallet.infrastructure.security.biometric.BiometricAuthenticationService
 import com.tari.android.wallet.notification.NotificationHelper
-import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import com.tari.android.wallet.service.WalletServiceLauncher
 import com.tari.android.wallet.ui.common.domain.ResourceManager
 import dagger.Module
@@ -82,7 +83,15 @@ internal class ApplicationModule(
 
     @Provides
     @Singleton
-    fun provideSharedPrefsRepository(context: Context, prefs: SharedPreferences): SharedPrefsRepository = SharedPrefsRepository(context, prefs)
+    fun provideBaseNodeSharedRepository(prefs: SharedPreferences): BaseNodeSharedRepository = BaseNodeSharedRepository(prefs)
+
+    @Provides
+    @Singleton
+    fun provideSharedPrefsRepository(
+        context: Context,
+        prefs: SharedPreferences,
+        baseNodeSharedRepository: BaseNodeSharedRepository
+    ): SharedPrefsRepository = SharedPrefsRepository(context, prefs, baseNodeSharedRepository)
 
     @Provides
     @Singleton

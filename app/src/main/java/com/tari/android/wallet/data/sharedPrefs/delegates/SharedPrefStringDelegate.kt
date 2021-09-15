@@ -8,8 +8,7 @@ class SharedPrefStringDelegate(
     val name: String,
     val defValue: String? = null
 ) {
-    operator fun getValue(thisRef: Any?, property: KProperty<*>): String? =
-        prefs.getString(name, defValue)
+    operator fun getValue(thisRef: Any?, property: KProperty<*>): String? = prefs.getString(name, defValue)
 
     operator fun setValue(thisRef: Any?, property: KProperty<*>, value: String?) =
         prefs.edit().run {

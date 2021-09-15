@@ -155,7 +155,7 @@ internal class GoogleDriveBackupStorage(
             }
             // update backup password
             if (newPassword != null) {
-                sharedPrefs.backupPassword = newPassword
+                sharedPrefs.backupPassword = newPassword.toString()
             }
             try {
                 backupFileProcessor.clearTempFolder()
@@ -222,7 +222,7 @@ internal class GoogleDriveBackupStorage(
             backupFileProcessor.clearTempFolder()
             // restore successful, turn on automated backup
             sharedPrefs.lastSuccessfulBackupDate = BackupNamingPolicy.getDateFromBackupFileName(tempFile.name)
-            sharedPrefs.backupPassword = password?.toCharArray()
+            sharedPrefs.backupPassword = password
         }
     }
 

@@ -9,8 +9,7 @@ class SharedPrefBigIntegerDelegate(
     val name: String,
     val defValue: BigInteger? = null
 ) {
-    operator fun getValue(thisRef: Any?, property: KProperty<*>): BigInteger? =
-        prefs.getString(name, defValue?.toString())?.run(::BigInteger)
+    operator fun getValue(thisRef: Any?, property: KProperty<*>): BigInteger? = prefs.getString(name, defValue?.toString())?.run(::BigInteger)
 
     operator fun setValue(thisRef: Any?, property: KProperty<*>, value: BigInteger?) =
         prefs.edit().run {
@@ -18,3 +17,4 @@ class SharedPrefBigIntegerDelegate(
             apply()
         }
 }
+
