@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <com.tari.android.wallet.ui.component.CustomFontTextView
+        android:id="@+id/tvName"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/common_horizontal_margin"
+        android:layout_marginTop="14dp"
+        android:ellipsize="end"
+        android:lines="1"
+        android:singleLine="true"
+        android:textColor="@color/common_header_title"
+        android:textSize="16sp"
+        app:customFont="@string/font_medium"
+        app:layout_constraintEnd_toStartOf="@+id/status_container"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <com.tari.android.wallet.ui.component.CustomFontTextView
+        android:id="@+id/tvHex"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/common_horizontal_margin"
+        android:layout_marginTop="4dp"
+        android:ellipsize="end"
+        android:lines="1"
+        android:singleLine="true"
+        android:textColor="@color/secondary_text"
+        android:textSize="14sp"
+        app:customFont="@string/font_regular"
+        app:layout_constraintEnd_toStartOf="@+id/status_container"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tvName" />
+
+    <com.tari.android.wallet.ui.component.CustomFontTextView
+        android:id="@+id/tvOnionAddress"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/common_horizontal_margin"
+        android:layout_marginTop="4dp"
+        android:ellipsize="end"
+        android:lines="1"
+        android:singleLine="true"
+        android:textColor="@color/secondary_text"
+        android:textSize="14sp"
+        app:customFont="@string/font_regular"
+        app:layout_constraintEnd_toStartOf="@+id/status_container"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tvHex" />
+
+    <FrameLayout
+        android:id="@+id/status_container"
+        android:layout_width="60dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <com.tari.android.wallet.ui.component.CustomFontButton
+            android:id="@+id/delete_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:background="@null"
+            android:text="@string/common_delete"
+            android:textAllCaps="false"
+            android:textColor="@color/purple"
+            android:textSize="14sp"
+            android:visibility="gone"
+            app:customFont="@string/font_regular" />
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/done"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:src="@drawable/circle_done"
+            android:visibility="gone" />
+
+    </FrameLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="14dp"
+        android:background="@color/common_divider"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tvOnionAddress" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

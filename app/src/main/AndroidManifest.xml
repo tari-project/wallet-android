@@ -124,7 +124,7 @@
             android:parentActivityName=".ui.activity.home.HomeActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme"
-            android:windowSoftInputMode="adjustPan|stateAlwaysHidden" />
+            android:windowSoftInputMode="adjustResize|stateAlwaysHidden" />
         <activity
             android:name=".ui.activity.settings.BackupSettingsActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"

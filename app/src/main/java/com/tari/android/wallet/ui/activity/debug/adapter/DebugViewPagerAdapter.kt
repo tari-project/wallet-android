@@ -36,7 +36,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.tari.android.wallet.ui.fragment.debug.AboutFragment
-import com.tari.android.wallet.ui.fragment.debug.BaseNodeConfigFragment
+import com.tari.android.wallet.ui.fragment.debug.baseNodeConfig.BaseNodeConfigFragment
 import com.tari.android.wallet.ui.fragment.debug.DebugLogFragment
 
 /**

@@ -43,10 +43,10 @@ import androidx.fragment.app.Fragment
 import com.tari.android.wallet.R
 import com.tari.android.wallet.R.color.change_password_cta_disabled
 import com.tari.android.wallet.R.color.white
+import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import com.tari.android.wallet.databinding.FragmentEnterBackupPasswordBinding
 import com.tari.android.wallet.ui.activity.settings.BackupSettingsRouter
 import com.tari.android.wallet.ui.extension.*
-import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import javax.inject.Inject
 
 class EnterCurrentPasswordFragment @Deprecated(
@@ -81,7 +81,7 @@ framework for UI tree rebuild on configuration changes"""
         ui.backCtaView.setOnClickListener(ThrottleClick { requireActivity().onBackPressed() })
         ui.changePasswordCtaTextView.setOnClickListener {
             val input = (ui.passwordEditText.text?.toString() ?: "").toCharArray()
-            val backupPassword = sharedPrefs.backupPassword ?: charArrayOf()
+            val backupPassword = sharedPrefs.backupPassword?.toCharArray() ?: charArrayOf()
             if (input.contentEquals(backupPassword)) {
                 (requireActivity() as BackupSettingsRouter).toChangePassword(this)
             } else {

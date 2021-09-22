@@ -47,15 +47,16 @@ import com.orhanobut.logger.Logger
 import com.tari.android.wallet.R
 import com.tari.android.wallet.R.color.*
 import com.tari.android.wallet.R.string.*
+import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import com.tari.android.wallet.databinding.FragmentAllSettingsBinding
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.infrastructure.BugReportingService
 import com.tari.android.wallet.infrastructure.backup.*
+import com.tari.android.wallet.infrastructure.backup.BackupState.*
 import com.tari.android.wallet.infrastructure.security.biometric.BiometricAuthenticationService
 import com.tari.android.wallet.ui.dialog.error.ErrorDialog
 import com.tari.android.wallet.ui.extension.*
 import com.tari.android.wallet.util.Constants
-import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -64,10 +65,8 @@ import java.io.IOException
 import java.util.*
 import javax.inject.Inject
 import kotlin.math.min
-import com.tari.android.wallet.infrastructure.backup.BackupState.*
 
-
-internal class AllSettingsFragment private constructor() : Fragment() {
+internal class AllSettingsFragment: Fragment() {
 
     @Inject
     lateinit var sharedPrefs: SharedPrefsRepository

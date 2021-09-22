@@ -29,6 +29,7 @@
     <color name="common_error">#D32C44</color>
     <color name="common_divider">#f1f1f1</color>
     <color name="common_header_title">#000000</color>
+    <color name="secondary_text">#B2B2B2</color>
 
     <!-- button -->
     <color name="button_enabled_text_color">#FFFFFF</color>

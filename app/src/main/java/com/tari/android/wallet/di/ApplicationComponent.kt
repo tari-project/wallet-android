@@ -51,8 +51,11 @@ import com.tari.android.wallet.ui.activity.settings.DeleteWalletActivity
 import com.tari.android.wallet.ui.activity.tx.TxDetailsActivity
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.component.networkStateIndicator.ConnectionIndicatorViewModel
-import com.tari.android.wallet.ui.fragment.debug.BaseNodeConfigFragment
 import com.tari.android.wallet.ui.fragment.debug.DebugLogFragment
+import com.tari.android.wallet.ui.fragment.debug.baseNodeConfig.BaseNodeConfigFragment
+import com.tari.android.wallet.ui.fragment.debug.baseNodeConfig.BaseNodeConfigViewModel
+import com.tari.android.wallet.ui.fragment.debug.baseNodeConfig.addBaseNode.AddCustomBaseNodeViewModel
+import com.tari.android.wallet.ui.fragment.debug.baseNodeConfig.changeBaseNode.ChangeBaseNodeViewModel
 import com.tari.android.wallet.ui.fragment.onboarding.CreateWalletFragment
 import com.tari.android.wallet.ui.fragment.onboarding.IntroductionFragment
 import com.tari.android.wallet.ui.fragment.onboarding.LocalAuthFragment
@@ -172,6 +175,9 @@ internal interface ApplicationComponent {
     fun inject(backupSettingsViewModel: BackupSettingsViewModel)
     fun inject(biometricAuthenticationViewModel: BiometricAuthenticationViewModel)
     fun inject(txListViewModel: TxListViewModel)
+    fun inject(baseNodeConfigViewModel: BaseNodeConfigViewModel)
+    fun inject(changeBaseNodeViewModel: ChangeBaseNodeViewModel)
+    fun inject(addCustomBaseNodeViewModel: AddCustomBaseNodeViewModel)
     /**
      * Service(s).
      */

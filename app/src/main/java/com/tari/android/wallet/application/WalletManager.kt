@@ -38,6 +38,7 @@ import com.orhanobut.logger.Logger
 import com.tari.android.wallet.BuildConfig
 import com.tari.android.wallet.application.baseNodes.BaseNodes
 import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
+import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodeSharedRepository
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.ffi.*
 import com.tari.android.wallet.service.WalletService
@@ -61,6 +62,7 @@ internal class WalletManager(
     private val walletLogFilePath: String,
     private val torManager: TorProxyManager,
     private val sharedPrefsWrapper: SharedPrefsRepository,
+    private val baseNodeSharedRepository: BaseNodeSharedRepository,
     private val seedPhraseRepository: SeedPhraseRepository,
     private val baseNodes: BaseNodes,
     private val torConfig: TorConfig
@@ -213,19 +215,9 @@ internal class WalletManager(
                 }
             }
             startLogFileObserver()
-            // don't change the base node if it's a custom base node entered by the user
-            if (sharedPrefsWrapper.baseNodeIsUserCustom) {
-                val publicKeyHex = sharedPrefsWrapper.baseNodePublicKeyHex
-                val address = sharedPrefsWrapper.baseNodeAddress
-                if (publicKeyHex == null || address == null) {
-                    // there's something unexpected with the data, use Tari base nodes
-                    baseNodes.setNextBaseNode()
-                } else {
-                    // data is ok, set custom user base node
-                    val baseNodeKeyFFI = FFIPublicKey(HexString(publicKeyHex))
-                    FFIWallet.instance?.addBaseNodePeer(baseNodeKeyFFI, address)
-                    baseNodeKeyFFI.destroy()
-                }
+            val currentBaseNode = baseNodeSharedRepository.currentBaseNode
+            if (currentBaseNode != null) {
+                baseNodes.addIntoWallet(currentBaseNode)
             } else {
                 baseNodes.setNextBaseNode()
             }

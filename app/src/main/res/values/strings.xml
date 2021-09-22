@@ -82,6 +82,7 @@
     <string name="common_reset">Reset</string>
     <string name="common_error_title">Error</string>
     <string name="common_unknown_error">Unknown error</string>
+    <string name="common_delete">Delete</string>
 
     <!-- emoji id copied view -->
     <string name="emoji_id_copied">COPIED</string>
@@ -315,8 +316,11 @@
     <string name="debug_current_base_node_name">Name:</string>
     <string name="debug_current_base_node_public_key">Public Key:</string>
     <string name="debug_current_base_node_address">Address:</string>
+    <string name="debug_change_base_node">Change base node</string>
+    <string name="debug_add_base_node">Add base node</string>
     <string name="debug_last_sync_status">Sync Status:</string>
     <string name="debug_custom_base_node">Custom Base Node</string>
+    <string name="debug_edit_base_node_name_hint">Base Node Name</string>
     <string name="debug_edit_base_node_public_key_hint">Public Key HEX</string>
     <string name="debug_edit_base_node_address_hint">Address</string>
     <string name="debug_edit_base_node_invalid_public_key">Invalid public key hex.</string>
