@@ -42,14 +42,6 @@ internal class TxListViewModel() : CommonViewModel() {
     @Inject
     lateinit var gifRepository: GIFRepository
 
-    init {
-        component?.inject(this)
-
-        subscribeToEventBus()
-
-        bindToWalletService()
-    }
-
     lateinit var serviceConnection: TariWalletServiceConnection
     val walletService: TariWalletService
         get() = serviceConnection.currentState.service!!
@@ -101,6 +93,12 @@ internal class TxListViewModel() : CommonViewModel() {
     private val _txSendSuccessful = SingleLiveEvent<Unit>()
     val txSendSuccessful: MutableLiveData<Unit> = _txSendSuccessful
 
+    init {
+        component?.inject(this)
+
+        bindToWalletService()
+    }
+
     val txListIsEmpty: Boolean
         get() = cancelledTxs.isEmpty()
                 && completedTxs.isEmpty()
@@ -134,6 +132,8 @@ internal class TxListViewModel() : CommonViewModel() {
     }
 
     private fun onServiceConnected() {
+        subscribeToEventBus()
+
         viewModelScope.launch(Dispatchers.IO) {
             updateTxListData()
             fetchBalanceInfoData()

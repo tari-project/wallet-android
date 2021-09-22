@@ -2,25 +2,42 @@ package com.tari.android.wallet.application.baseNodes
 
 import android.content.Context
 import com.tari.android.wallet.R
+import com.tari.android.wallet.application.WalletState
 import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodeDto
 import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodeSharedRepository
+import com.tari.android.wallet.event.EventBus
+import com.tari.android.wallet.extension.addTo
 import com.tari.android.wallet.extension.executeWithError
 import com.tari.android.wallet.ffi.FFIPublicKey
 import com.tari.android.wallet.ffi.FFIWallet
 import com.tari.android.wallet.ffi.HexString
 import com.tari.android.wallet.service.connection.TariWalletServiceConnection
+import io.reactivex.disposables.CompositeDisposable
 import org.apache.commons.io.IOUtils
 
 class BaseNodes(
     private val context: Context,
     private val baseNodeSharedRepository: BaseNodeSharedRepository
 ) {
+    private val compositeDisposable = CompositeDisposable()
 
     private val serviceConnection = TariWalletServiceConnection()
     private val walletService
         get() = serviceConnection.currentState.service!!
 
     private lateinit var baseNodeIterator: Iterator<BaseNodeDto>
+
+    init {
+        serviceConnection.connection.subscribe {
+            if (it.status == TariWalletServiceConnection.ServiceConnectionStatus.CONNECTED) {
+                startSync()
+            }
+        }.addTo(compositeDisposable)
+
+        EventBus.walletState.publishSubject.subscribe {
+            startSync()
+        }.addTo(compositeDisposable)
+    }
 
     /**
      * Returns the list of base nodes in the resource file base_nodes.txt as pairs of
@@ -62,10 +79,15 @@ class BaseNodes(
     fun setBaseNode(baseNode: BaseNodeDto) {
         baseNodeSharedRepository.baseNodeLastSyncResult = null
         baseNodeSharedRepository.currentBaseNode = baseNode
-        addIntoWallet(baseNode)
+        startSync()
     }
 
-    fun addIntoWallet(baseNode: BaseNodeDto) {
+    fun startSync() {
+        //essential for wallet creation flow
+        val baseNode = baseNodeSharedRepository.currentBaseNode ?: return
+        serviceConnection.currentState.service ?: return
+        if (EventBus.walletState.publishSubject.value != WalletState.Running) return
+
         val baseNodeKeyFFI = FFIPublicKey(HexString(baseNode.publicKeyHex))
         FFIWallet.instance?.addBaseNodePeer(baseNodeKeyFFI, baseNode.address)
         baseNodeKeyFFI.destroy()

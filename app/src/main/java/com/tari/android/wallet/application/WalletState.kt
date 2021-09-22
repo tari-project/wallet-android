@@ -43,6 +43,8 @@ sealed class WalletState {
 
     object Initializing : WalletState()
 
+    object Started: WalletState()
+
     object Running : WalletState()
 
     class Failed(val exception: Exception) : WalletState()

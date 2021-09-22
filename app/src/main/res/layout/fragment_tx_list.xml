@@ -34,7 +34,7 @@
 
         <!-- title -->
         <com.tari.android.wallet.ui.component.CustomFontTextView
-            android:id="@+id/available_balance_text_view"
+            android:id="@+id/balance_text_view"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentStart="true"
@@ -51,7 +51,7 @@
             android:id="@+id/balance_container"
             android:layout_width="0dp"
             android:layout_height="@dimen/home_balance_digit_height"
-            android:layout_below="@id/available_balance_text_view"
+            android:layout_below="@id/balance_text_view"
             android:layout_alignParentStart="true"
             android:layout_marginTop="2dp"
             android:layout_marginEnd="4dp"
@@ -93,7 +93,7 @@
         </LinearLayout>
 
         <com.tari.android.wallet.ui.component.CustomFontTextView
-            android:id="@+id/available_balance_text_view2"
+            android:id="@+id/available_balance_text_view"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@+id/balance_container"
@@ -109,15 +109,15 @@
             android:id="@+id/balance_question_mark"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignTop="@+id/available_balance_text_view2"
-            android:layout_alignBottom="@+id/available_balance_text_view2"
-            android:layout_toEndOf="@+id/available_balance_text_view2" />
+            android:layout_alignTop="@+id/available_balance_text_view"
+            android:layout_alignBottom="@+id/available_balance_text_view"
+            android:layout_toEndOf="@+id/available_balance_text_view" />
 
         <com.tari.android.wallet.ui.component.CustomFontTextView
             android:id="@+id/available_balance"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/available_balance_text_view2"
+            android:layout_below="@+id/available_balance_text_view"
             android:text="0.00"
             android:layout_alignParentStart="true"
             android:layout_marginEnd="4dp"

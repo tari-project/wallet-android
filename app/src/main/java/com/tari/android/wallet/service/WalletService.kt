@@ -250,7 +250,7 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
     }
 
     private fun onWalletStateChanged(walletState: WalletState) {
-        if (walletState == WalletState.Running) {
+        if (walletState == WalletState.Started) {
             wallet = FFIWallet.instance!!
             wallet.listener = this
             EventBus.walletState.unsubscribe(this)
@@ -260,6 +260,7 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
             handler.post {
                 ProcessLifecycleOwner.get().lifecycle.addObserver(this)
             }
+            EventBus.walletState.post(WalletState.Running)
         }
     }
 
@@ -1027,7 +1028,6 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
                 mapThrowableIntoError(throwable, error)
                 false
             }
-
         }
 
         override fun sendTari(

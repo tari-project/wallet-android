@@ -113,7 +113,7 @@ internal class WalletManager(
                 Thread {
                     try {
                         initWallet()
-                        EventBus.walletState.post(WalletState.Running)
+                        EventBus.walletState.post(WalletState.Started)
                     } catch (e: Exception) {
                         EventBus.walletState.post(WalletState.Failed(e))
                     }
@@ -217,7 +217,7 @@ internal class WalletManager(
             startLogFileObserver()
             val currentBaseNode = baseNodeSharedRepository.currentBaseNode
             if (currentBaseNode != null) {
-                baseNodes.addIntoWallet(currentBaseNode)
+                baseNodes.startSync()
             } else {
                 baseNodes.setNextBaseNode()
             }

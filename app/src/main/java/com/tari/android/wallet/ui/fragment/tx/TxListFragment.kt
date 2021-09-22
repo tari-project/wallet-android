@@ -205,7 +205,10 @@ internal class TxListFragment : CommonFragment<FragmentTxListBinding, TxListView
         txRecyclerView.setOnTouchListener(this@TxListFragment)
 
         headerElevationView.alpha = 0F
+        balanceTextView.alpha = 0F
         availableBalanceTextView.alpha = 0F
+        balanceQuestionMark.alpha = 0F
+        availableBalance.alpha = 0F
         networkStatusStateIndicatorView.alpha = 0F
         balanceGemImageView.alpha = 0F
         scrollContentView.alpha = 0F
@@ -343,6 +346,8 @@ internal class TxListFragment : CommonFragment<FragmentTxListBinding, TxListView
     }
 
     private fun showNoTxsTextView() {
+        if (isOnboarding) return
+
         ui.noTxsInfoTextView.alpha = 0F
         ui.noTxsInfoTextView.visible()
         ValueAnimator.ofFloat(0F, 1F).apply {
@@ -548,16 +553,16 @@ internal class TxListFragment : CommonFragment<FragmentTxListBinding, TxListView
             addUpdateListener { valueAnimator: ValueAnimator ->
                 val value = valueAnimator.animatedValue as Float
                 // animate the list (will move upwards)
-                ui.scrollContentView.y =
-                    dimenPx(R.dimen.home_scroll_view_startup_anim_height) * (1 - value)
+                ui.scrollContentView.y = dimenPx(R.dimen.home_scroll_view_startup_anim_height) * (1 - value)
                 ui.scrollContentView.alpha = value
-                // reveal balance title, QR code button and balance gem image
-                ui.availableBalanceTextView.alpha = value
-                ui.networkStatusStateIndicatorView.alpha = value
-                ui.balanceGemImageView.alpha = value
+                ui.balanceTextView.alpha = 1F
+                ui.availableBalanceTextView.alpha = 1F
+                ui.balanceQuestionMark.alpha = 1F
+                ui.availableBalance.alpha = 1F
+                ui.networkStatusStateIndicatorView.alpha = 1F
+                ui.balanceGemImageView.alpha = 1F
             }
-        }
-            .also { AnimationResource(it).attachAndCutoffOnFinish(container) }
+        }.also { AnimationResource(it).attachAndCutoffOnFinish(container) }
             .start()
     }
 
@@ -566,6 +571,7 @@ internal class TxListFragment : CommonFragment<FragmentTxListBinding, TxListView
      */
     private fun playOnboardingAnim() {
         ui.onboardingContentView.visible()
+        ui.noTxsInfoTextView.gone()
         // initialize the balance view controller
 
         ui.scrollView.scrollTo(0, ui.scrollView.height)
@@ -586,18 +592,22 @@ internal class TxListFragment : CommonFragment<FragmentTxListBinding, TxListView
             ui.txListOverlayView.alpha = value
         }
         // the animation set
-        val animSet = AnimatorSet()
-        animSet.playTogether(scrollViewTransAnim, blackBgViewFadeAnim)
-        animSet.duration = Constants.UI.Home.welcomeAnimationDurationMs
-        animSet.addListener(
-            onEnd = {
-                ui.topContentContainerView.visible()
-                ui.availableBalanceTextView.alpha = 1F
-                ui.networkStatusStateIndicatorView.alpha = 1F
-                ui.balanceGemImageView.alpha = 1F
-            }
-        )
-        animSet.start()
+        AnimatorSet().apply {
+            playTogether(scrollViewTransAnim, blackBgViewFadeAnim)
+            duration = Constants.UI.Home.welcomeAnimationDurationMs
+            addListener(
+                onEnd = {
+                    ui.topContentContainerView.visible()
+                    ui.balanceTextView.alpha = 1F
+                    ui.availableBalanceTextView.alpha = 1F
+                    ui.balanceQuestionMark.alpha = 1F
+                    ui.availableBalance.alpha = 1F
+                    ui.networkStatusStateIndicatorView.alpha = 1F
+                    ui.balanceGemImageView.alpha = 1F
+                }
+            )
+            start()
+        }
 
         // show interstitial & finish after delay
         ui.scrollView.isScrollable = false
