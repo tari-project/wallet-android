@@ -24,7 +24,7 @@ class WalletServiceLauncher(private val context: Context) {
 
     fun startIfExist() {
         if (WalletUtil.walletExists(context.applicationContext)) {
-            start()
+            startService()
         }
     }
 
@@ -32,11 +32,15 @@ class WalletServiceLauncher(private val context: Context) {
         if (sharedPrefsRepository.backgroundServiceTurnedOn ||
             !sharedPrefsRepository.backgroundServiceTurnedOn && TariWalletApplication.INSTANCE.get()?.isInForeground == true
         ) {
-            ContextCompat.startForegroundService(
-                context,
-                getStartIntent(context)
-            )
+            startService()
         }
+    }
+
+    private fun startService() {
+        ContextCompat.startForegroundService(
+            context,
+            getStartIntent(context)
+        )
     }
 
     fun stop() {
