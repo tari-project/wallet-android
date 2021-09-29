@@ -20,7 +20,7 @@
         app:frameThickness="10dp"
         app:maskColor="#77000000" />
 
-    <ImageView
+    <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/qr_close_view"
         android:layout_width="42dp"
         android:layout_height="42dp"

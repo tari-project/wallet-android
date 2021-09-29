@@ -38,6 +38,7 @@ import android.content.Intent
 import androidx.documentfile.provider.DocumentFile
 import androidx.fragment.app.Fragment
 import com.orhanobut.logger.Logger
+import com.tari.android.wallet.data.network.NetworkRepository
 import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import com.tari.android.wallet.extension.getLastPathComponent
 import kotlinx.coroutines.Dispatchers
@@ -56,6 +57,7 @@ internal class LocalBackupStorage(
     private val context: Context,
     private val sharedPrefs: SharedPrefsRepository,
     private val walletTempDirPath: String,
+    private val networkRepository: NetworkRepository,
     private val backupFileProcessor: BackupFileProcessor
 ) : BackupStorage {
 
@@ -79,8 +81,7 @@ internal class LocalBackupStorage(
                     Logger.d("Backup URI selected: $uri")
                     sharedPrefs.localBackupFolderURI = uri
                     // persist permissions
-                    val takeFlags: Int = Intent.FLAG_GRANT_READ_URI_PERMISSION or
-                            Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+                    val takeFlags: Int = Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
                     context.contentResolver.takePersistableUriPermission(uri, takeFlags)
                 } else {
                     throw BackupStorageSetupException("No folder was selected.")
@@ -93,24 +94,15 @@ internal class LocalBackupStorage(
     }
 
     override suspend fun backup(newPassword: CharArray?): DateTime {
-        val backupFolderURI = sharedPrefs.localBackupFolderURI
-            ?: throw BackupInterruptedException("Local backup folder URI is not set.")
-        val backupFolder = DocumentFile.fromTreeUri(context, backupFolderURI)
-            ?: throw BackupInterruptedException("Folder could not be accessed.")
-        Logger.d("Backup to folder $backupFolderURI.")
+        val backupFolder = getBackupFolder()
 
         return withContext(Dispatchers.IO) {
             val (backupFile, backupDate, mimeType) = backupFileProcessor.generateBackupFile(newPassword)
             val backupFileName = backupFile.getLastPathComponent()!!
             // create target file
-            val targetBackupFile = backupFolder.createFile(
-                mimeType,
-                backupFileName
-            ) ?: throw BackupStorageAuthRevokedException() // file could not be created
+            val targetBackupFile = backupFolder.createFile(mimeType, backupFileName) ?: throw BackupStorageAuthRevokedException()
             // write to target file
-            context.contentResolver.openOutputStream(targetBackupFile.uri).use { outputStream ->
-                FileUtils.copyFile(backupFile, outputStream)
-            }
+            context.contentResolver.openOutputStream(targetBackupFile.uri).use { outputStream -> FileUtils.copyFile(backupFile, outputStream) }
             // update backup password
             if (newPassword != null) {
                 sharedPrefs.backupPassword = newPassword.toString()
@@ -139,10 +131,7 @@ internal class LocalBackupStorage(
     }
 
     override suspend fun deleteAllBackupFiles() {
-        val backupFolderURI = sharedPrefs.localBackupFolderURI
-            ?: throw BackupInterruptedException("Local backup folder URI is not set.")
-        val backupFolder = DocumentFile.fromTreeUri(context, backupFolderURI)
-            ?: throw BackupInterruptedException("Folder could not be accessed.")
+        val backupFolder = getBackupFolder()
         // delete all backup files
         for (existingFile in backupFolder.listFiles()) {
             // delete if it's an old backup file
@@ -160,10 +149,7 @@ internal class LocalBackupStorage(
     }
 
     override suspend fun restoreLatestBackup(password: String?) {
-        val backupFolderURI = sharedPrefs.localBackupFolderURI
-            ?: throw BackupStorageTamperedException("Backup storage not accessible.")
-        val backupFolder = DocumentFile.fromTreeUri(context, backupFolderURI)
-            ?: throw BackupStorageTamperedException("Backup storage is not a folder.")
+        val backupFolder = getBackupFolder()
         val backupFiles = backupFolder.listFiles().filter { file ->
             BackupNamingPolicy.getDateFromBackupFileName(file.name ?: "") != null
         }
@@ -187,7 +173,6 @@ internal class LocalBackupStorage(
             backupFileProcessor.restoreBackupFile(tempFile, password)
             backupFileProcessor.clearTempFolder()
             // restore successful, turn on automated backup
-            sharedPrefs.localBackupFolderURI = backupFolderURI
             sharedPrefs.lastSuccessfulBackupDate = BackupNamingPolicy.getDateFromBackupFileName(tempFile.name)
             sharedPrefs.backupPassword = password
         }
@@ -205,6 +190,14 @@ internal class LocalBackupStorage(
         return backupFolder.listFiles().firstOrNull {
             it.isFile && it.name?.contains(expectedBackupFileName) == true
         } != null
+    }
+
+    private fun getBackupFolder(): DocumentFile {
+        val backupFolderURI = sharedPrefs.localBackupFolderURI ?: throw BackupStorageTamperedException("Backup storage not accessible.")
+        val networkFolder = networkRepository.currentNetwork!!.network.displayName
+        var rootFolder = DocumentFile.fromTreeUri(context, backupFolderURI) ?: throw BackupStorageTamperedException("Backup storage is not a folder.")
+        rootFolder = rootFolder.findFile(networkFolder) ?: (rootFolder.createDirectory(networkFolder) ?: rootFolder)
+        return rootFolder
     }
 
     companion object {

@@ -35,7 +35,7 @@ package com.tari.android.wallet.data.sharedPrefs
 import android.content.Context
 import android.content.SharedPreferences
 import android.net.Uri
-import com.tari.android.wallet.application.Network
+import com.tari.android.wallet.data.network.NetworkRepository
 import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodeSharedRepository
 import com.tari.android.wallet.data.sharedPrefs.delegates.*
 import org.joda.time.DateTime
@@ -49,9 +49,11 @@ import kotlin.random.Random
  * @author The Tari Development Team
  */
 //todo Need to thing about reactive realization
+
 class SharedPrefsRepository(
     private val context: Context,
     private val sharedPrefs: SharedPreferences,
+    private val networkRepository: NetworkRepository,
     private val baseNodeSharedRepository: BaseNodeSharedRepository
 ) {
 
@@ -75,26 +77,25 @@ class SharedPrefsRepository(
         const val backupPassword = "tari_wallet_last_next_alarm_time"
         const val walletDatabasePassphrase = "tari_wallet_database_passphrase"
         const val localBackupFolderURI = "tari_wallet_local_backup_folder_uri"
-        const val network = "tari_wallet_network"
         const val isRestoredWallet = "tari_is_restored_wallet"
         const val hasVerifiedSeedWords = "tari_has_verified_seed_words"
         const val backgroundServiceTurnedOnKey = "tari_background_service_turned_on"
         const val isDataCleared = "tari_is_data_cleared"
     }
 
-    var publicKeyHexString: String? by SharedPrefStringDelegate(sharedPrefs, Key.publicKeyHexString)
+    var publicKeyHexString: String? by SharedPrefStringDelegate(sharedPrefs, formatKey(Key.publicKeyHexString))
 
-    var isAuthenticated: Boolean by SharedPrefBooleanDelegate(sharedPrefs, Key.isAuthenticated)
+    var isAuthenticated: Boolean by SharedPrefBooleanDelegate(sharedPrefs, formatKey(Key.isAuthenticated))
 
-    var emojiId: String? by SharedPrefStringDelegate(sharedPrefs, Key.emojiId)
+    var emojiId: String? by SharedPrefStringDelegate(sharedPrefs, formatKey(Key.emojiId))
 
-    var onboardingStarted: Boolean by SharedPrefBooleanDelegate(sharedPrefs, Key.onboardingStarted)
+    var onboardingStarted: Boolean by SharedPrefBooleanDelegate(sharedPrefs, formatKey(Key.onboardingStarted))
 
-    var onboardingCompleted: Boolean by SharedPrefBooleanDelegate(sharedPrefs, Key.onboardingCompleted)
+    var onboardingCompleted: Boolean by SharedPrefBooleanDelegate(sharedPrefs, formatKey(Key.onboardingCompleted))
 
-    var onboardingAuthSetupStarted: Boolean by SharedPrefBooleanDelegate(sharedPrefs, Key.onboardingAuthSetupStarted)
+    var onboardingAuthSetupStarted: Boolean by SharedPrefBooleanDelegate(sharedPrefs, formatKey(Key.onboardingAuthSetupStarted))
 
-    var onboardingAuthSetupCompleted: Boolean by SharedPrefBooleanDelegate(sharedPrefs, Key.onboardingAuthSetupCompleted)
+    var onboardingAuthSetupCompleted: Boolean by SharedPrefBooleanDelegate(sharedPrefs, formatKey(Key.onboardingAuthSetupCompleted))
 
     val onboardingAuthWasInterrupted: Boolean
         get() = onboardingAuthSetupStarted && !onboardingAuthSetupCompleted
@@ -102,42 +103,40 @@ class SharedPrefsRepository(
     val onboardingWasInterrupted: Boolean
         get() = onboardingStarted && !onboardingCompleted
 
-    var onboardingDisplayedAtHome: Boolean by SharedPrefBooleanDelegate(sharedPrefs, Key.onboardingDisplayedAtHome)
+    var onboardingDisplayedAtHome: Boolean by SharedPrefBooleanDelegate(sharedPrefs, formatKey(Key.onboardingDisplayedAtHome))
 
-    var torBinPath: String? by SharedPrefStringDelegate(sharedPrefs, Key.torBinPath)
+    var torBinPath: String? by SharedPrefStringDelegate(sharedPrefs, formatKey(Key.torBinPath))
 
-    var faucetTestnetTariRequestCompleted: Boolean by SharedPrefBooleanDelegate(sharedPrefs, Key.faucetTestnetTariRequestCompleted)
+    var faucetTestnetTariRequestCompleted: Boolean by SharedPrefBooleanDelegate(sharedPrefs, formatKey(Key.faucetTestnetTariRequestCompleted))
 
-    var testnetTariUTXOKeyList: TestnetUtxoList? by SharedPrefGsonDelegate(sharedPrefs, Key.testnetTariUTXOListKey, TestnetUtxoList::class.java)
+    var testnetTariUTXOKeyList: TestnetUtxoList? by SharedPrefGsonDelegate(sharedPrefs, formatKey(Key.testnetTariUTXOListKey), TestnetUtxoList::class.java)
 
-    var firstTestnetUTXOTxId: BigInteger? by SharedPrefBigIntegerDelegate(sharedPrefs, Key.firstTestnetUTXOTxId)
+    var firstTestnetUTXOTxId: BigInteger? by SharedPrefBigIntegerDelegate(sharedPrefs, formatKey(Key.firstTestnetUTXOTxId))
 
-    var secondTestnetUTXOTxId: BigInteger? by SharedPrefBigIntegerDelegate(sharedPrefs, Key.secondTestnetUTXOTxId)
+    var secondTestnetUTXOTxId: BigInteger? by SharedPrefBigIntegerDelegate(sharedPrefs, formatKey(Key.secondTestnetUTXOTxId))
 
-    var lastSuccessfulBackupDate: DateTime? by SharedPrefDateTimeDelegate(sharedPrefs, Key.lastSuccessfulBackupDate)
+    var lastSuccessfulBackupDate: DateTime? by SharedPrefDateTimeDelegate(sharedPrefs, formatKey(Key.lastSuccessfulBackupDate))
 
-    var backupFailureDate: DateTime? by SharedPrefDateTimeDelegate(sharedPrefs, Key.backupFailureDate)
+    var backupFailureDate: DateTime? by SharedPrefDateTimeDelegate(sharedPrefs, formatKey(Key.backupFailureDate))
 
-    var scheduledBackupDate: DateTime? by SharedPrefDateTimeDelegate(sharedPrefs, Key.scheduledBackupDate)
+    var scheduledBackupDate: DateTime? by SharedPrefDateTimeDelegate(sharedPrefs, formatKey(Key.scheduledBackupDate))
 
     val backupIsEnabled: Boolean
         get() = (lastSuccessfulBackupDate != null)
 
-    var backupPassword: String? by SharedPrefStringSecuredDelegate(context, sharedPrefs, Key.backupPassword)
+    var backupPassword: String? by SharedPrefStringSecuredDelegate(context, sharedPrefs, formatKey(Key.backupPassword))
 
-    var localBackupFolderURI: Uri? by SharedPrefGsonDelegate(sharedPrefs, Key.localBackupFolderURI, Uri::class.java)
+    var localBackupFolderURI: Uri? by SharedPrefGsonDelegate(sharedPrefs, formatKey(Key.localBackupFolderURI), Uri::class.java)
 
-    var network: Network? by SharedPrefGsonDelegate(sharedPrefs, Key.network, Network::class.java, Network.WEATHERWAX)
+    var databasePassphrase: String? by SharedPrefStringSecuredDelegate(context, sharedPrefs, formatKey(Key.walletDatabasePassphrase))
 
-    var databasePassphrase: String? by SharedPrefStringSecuredDelegate(context, sharedPrefs, Key.walletDatabasePassphrase)
+    var isRestoredWallet: Boolean by SharedPrefBooleanDelegate(sharedPrefs, formatKey(Key.isRestoredWallet))
 
-    var isRestoredWallet: Boolean by SharedPrefBooleanDelegate(sharedPrefs, Key.isRestoredWallet)
+    var hasVerifiedSeedWords: Boolean by SharedPrefBooleanDelegate(sharedPrefs, formatKey(Key.hasVerifiedSeedWords))
 
-    var hasVerifiedSeedWords: Boolean by SharedPrefBooleanDelegate(sharedPrefs, Key.hasVerifiedSeedWords)
+    var backgroundServiceTurnedOn: Boolean by SharedPrefBooleanDelegate(sharedPrefs, formatKey(Key.backgroundServiceTurnedOnKey), true)
 
-    var backgroundServiceTurnedOn: Boolean by SharedPrefBooleanDelegate(sharedPrefs, Key.backgroundServiceTurnedOnKey, true)
-
-    var isDataCleared: Boolean by SharedPrefBooleanDelegate(sharedPrefs, Key.isDataCleared, true)
+    var isDataCleared: Boolean by SharedPrefBooleanDelegate(sharedPrefs, formatKey(Key.isDataCleared), true)
 
     init {
         // for migration purposes, to avoid a second redundant faucet call:
@@ -168,7 +167,6 @@ class SharedPrefsRepository(
         scheduledBackupDate = null
         backupPassword = null
         localBackupFolderURI = null
-        network = null
         isRestoredWallet = false
         hasVerifiedSeedWords = false
         backgroundServiceTurnedOn = true
@@ -191,4 +189,6 @@ class SharedPrefsRepository(
         }
         return isCleared
     }
+
+    private fun formatKey(key: String) : String = key + "_" + networkRepository.currentNetwork!!.network.displayName
 }

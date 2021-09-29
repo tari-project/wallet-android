@@ -37,32 +37,31 @@ import com.tari.android.wallet.model.Model;
 
 // Declare any non-default types here with import statements
 
-oneway interface TariWalletServiceListener {
+interface TariWalletServiceListener {
 
-    void onTxReceived(in PendingInboundTx pendingInboundTx);
+    oneway void onTxReceived(in PendingInboundTx pendingInboundTx);
 
-    void onTxReplyReceived(in PendingOutboundTx pendingOutboundTx);
+    oneway void onTxReplyReceived(in PendingOutboundTx pendingOutboundTx);
 
-    void onTxFinalized(in PendingInboundTx pendingInboundTx);
+    oneway void onTxFinalized(in PendingInboundTx pendingInboundTx);
 
-    void onInboundTxBroadcast(in PendingInboundTx pendingInboundTx);
+    oneway void onInboundTxBroadcast(in PendingInboundTx pendingInboundTx);
 
-    void onOutboundTxBroadcast(in PendingOutboundTx pendingOutboundTx);
+    oneway void onOutboundTxBroadcast(in PendingOutboundTx pendingOutboundTx);
 
-    void onTxMined(in CompletedTx completed);
+    oneway void onTxMined(in CompletedTx completed);
 
-    void onTxMinedUnconfirmed(in CompletedTx completed, in int confirmationCount);
+    oneway void onTxMinedUnconfirmed(in CompletedTx completed, in int confirmationCount);
 
-    void onTxCancelled(in CancelledTx tx);
+    oneway void onTxCancelled(in CancelledTx tx);
 
-    void onDirectSendResult(in TxId txId, in boolean success);
+    oneway void onDirectSendResult(in TxId txId, in boolean success);
 
-    void onStoreAndForwardSendResult(in TxId txId, in boolean success);
+    oneway void onStoreAndForwardSendResult(in TxId txId, in boolean success);
 
-    void onBaseNodeSyncComplete(in boolean success);
+    oneway void onBaseNodeSyncComplete(in boolean success);
 
-    void onTestnetTariRequestSuccess();
+    oneway void onTestnetTariRequestSuccess();
 
-    void onTestnetTariRequestError(in String error);
-
+    oneway void onTestnetTariRequestError(in String error);
 }

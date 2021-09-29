@@ -45,8 +45,8 @@ import com.budiyev.android.codescanner.*
 import com.google.zxing.BarcodeFormat
 import com.tari.android.wallet.R
 import com.tari.android.wallet.databinding.ActivityQrScannerBinding
+import com.tari.android.wallet.di.DiContainer.appComponent
 import com.tari.android.wallet.infrastructure.Tracker
-import com.tari.android.wallet.ui.extension.appComponent
 import javax.inject.Inject
 
 private const val REQUEST_CAMERA_PERMISSION = 102

@@ -52,6 +52,7 @@ import com.google.api.services.drive.DriveScopes
 import com.google.api.services.drive.model.FileList
 import com.orhanobut.logger.Logger
 import com.tari.android.wallet.R
+import com.tari.android.wallet.data.network.NetworkRepository
 import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import com.tari.android.wallet.extension.getLastPathComponent
 import kotlinx.coroutines.Dispatchers
@@ -64,6 +65,7 @@ import kotlin.coroutines.suspendCoroutine
 
 internal class GoogleDriveBackupStorage(
     private val context: Context,
+    private val networkRepository: NetworkRepository,
     private val sharedPrefs: SharedPrefsRepository,
     private val walletTempDirPath: String,
     private val backupFileProcessor: BackupFileProcessor
@@ -177,7 +179,7 @@ internal class GoogleDriveBackupStorage(
     ) {
         val metadata: com.google.api.services.drive.model.File =
             com.google.api.services.drive.model.File()
-                .setParents(listOf(DRIVE_BACKUP_PARENT_FOLDER_NAME))
+                .setParents(listOf(getParentFolder()))
                 .setMimeType(mimeType)
                 .setName(file.getLastPathComponent()!!)
         drive.files()
@@ -247,8 +249,8 @@ internal class GoogleDriveBackupStorage(
 
     private fun searchForBackups(pageToken: String?): FileList =
         drive.files().list()
-            .setSpaces(DRIVE_BACKUP_PARENT_FOLDER_NAME)
-            .setQ("'${DRIVE_BACKUP_PARENT_FOLDER_NAME}' in parents")
+            .setSpaces(getParentFolder())
+            .setQ("'${getParentFolder()}' in parents")
             .setFields("nextPageToken, files(id, name)")
             .setPageToken(pageToken)
             .execute()
@@ -286,6 +288,8 @@ internal class GoogleDriveBackupStorage(
                 .addOnSuccessListener { continuation.resumeWith(Result.success(Unit)) }
         }
     }
+
+    private fun getParentFolder() : String = DRIVE_BACKUP_PARENT_FOLDER_NAME + "/" + networkRepository.currentNetwork!!.network.displayName
 
     private companion object {
         private const val DRIVE_BACKUP_PARENT_FOLDER_NAME = "appDataFolder"

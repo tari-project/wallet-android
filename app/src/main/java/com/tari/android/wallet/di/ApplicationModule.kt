@@ -41,6 +41,8 @@ import androidx.biometric.BiometricManager
 import androidx.core.content.ContextCompat
 import com.tari.android.wallet.BuildConfig
 import com.tari.android.wallet.application.TariWalletApplication
+import com.tari.android.wallet.data.WalletConfig
+import com.tari.android.wallet.data.network.NetworkRepository
 import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodeSharedRepository
 import com.tari.android.wallet.infrastructure.GiphyEcosystem
@@ -76,22 +78,25 @@ internal class ApplicationModule(
 
     @Provides
     @Singleton
-    fun provideSharedPrefs(): SharedPreferences = app.getSharedPreferences(
-        sharedPrefsFileName,
-        MODE_PRIVATE
-    )
+    fun provideSharedPrefs(): SharedPreferences = app.getSharedPreferences(sharedPrefsFileName, MODE_PRIVATE)
 
     @Provides
     @Singleton
-    fun provideBaseNodeSharedRepository(prefs: SharedPreferences): BaseNodeSharedRepository = BaseNodeSharedRepository(prefs)
+    fun provideBaseNodeSharedRepository(prefs: SharedPreferences, networkRepository: NetworkRepository): BaseNodeSharedRepository =
+        BaseNodeSharedRepository(prefs, networkRepository)
+
+    @Provides
+    @Singleton
+    fun provideNetworkRepository(prefs: SharedPreferences): NetworkRepository = NetworkRepository(prefs)
 
     @Provides
     @Singleton
     fun provideSharedPrefsRepository(
         context: Context,
         prefs: SharedPreferences,
-        baseNodeSharedRepository: BaseNodeSharedRepository
-    ): SharedPrefsRepository = SharedPrefsRepository(context, prefs, baseNodeSharedRepository)
+        baseNodeSharedRepository: BaseNodeSharedRepository,
+        networkRepository: NetworkRepository
+    ): SharedPrefsRepository = SharedPrefsRepository(context, prefs, networkRepository, baseNodeSharedRepository)
 
     @Provides
     @Singleton
@@ -99,8 +104,8 @@ internal class ApplicationModule(
 
     @Provides
     @Singleton
-    fun provideWalletServiceLauncher(context: Context, prefsRepository: SharedPrefsRepository): WalletServiceLauncher =
-        WalletServiceLauncher(prefsRepository, context)
+    fun provideWalletServiceLauncher(context: Context, prefsRepository: SharedPrefsRepository, walletConfig: WalletConfig): WalletServiceLauncher =
+        WalletServiceLauncher(prefsRepository, walletConfig, context)
 
     @Provides
     @Singleton
@@ -108,8 +113,7 @@ internal class ApplicationModule(
 
     @Provides
     @Singleton
-    fun provideClipboardManager(context: Context): ClipboardManager =
-        context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+    fun provideClipboardManager(context: Context): ClipboardManager = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
 
     @Provides
     @Singleton
@@ -122,8 +126,7 @@ internal class ApplicationModule(
 
     @Provides
     @Singleton
-    fun provideGiphyEcosystem(context: Context): GiphyEcosystem =
-        GiphyEcosystem(context, BuildConfig.GIPHY_KEY)
+    fun provideGiphyEcosystem(context: Context): GiphyEcosystem = GiphyEcosystem(context, BuildConfig.GIPHY_KEY)
 
     companion object {
         const val sharedPrefsFileName = "tari_wallet_shared_prefs"

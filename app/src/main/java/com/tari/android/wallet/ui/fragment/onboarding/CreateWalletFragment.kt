@@ -48,8 +48,9 @@ import com.tari.android.wallet.R.color.light_gray
 import com.tari.android.wallet.R.dimen.*
 import com.tari.android.wallet.R.string.*
 import com.tari.android.wallet.application.WalletState
+import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import com.tari.android.wallet.databinding.FragmentCreateWalletBinding
-import com.tari.android.wallet.di.WalletModule
+import com.tari.android.wallet.di.DiContainer.appComponent
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.extension.applyFontStyle
 import com.tari.android.wallet.infrastructure.Tracker
@@ -59,10 +60,8 @@ import com.tari.android.wallet.ui.extension.*
 import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.Constants.UI.CreateEmojiId
 import com.tari.android.wallet.util.EmojiUtil
-import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import me.everything.android.ui.overscroll.OverScrollDecoratorHelper
 import javax.inject.Inject
-import javax.inject.Named
 
 /**
  * onBoarding flow : wallet creation step.
@@ -73,10 +72,6 @@ internal class CreateWalletFragment : Fragment() {
 
     @Inject
     lateinit var sharedPrefsWrapper: SharedPrefsRepository
-
-    @Inject
-    @Named(WalletModule.FieldName.walletFilesDirPath)
-    lateinit var walletFilesDirPath: String
 
     @Inject
     lateinit var tracker: Tracker
@@ -92,8 +87,7 @@ internal class CreateWalletFragment : Fragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? =
-        FragmentCreateWalletBinding.inflate(inflater, container, false).also { ui = it }.root
+    ): View = FragmentCreateWalletBinding.inflate(inflater, container, false).also { ui = it }.root
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)

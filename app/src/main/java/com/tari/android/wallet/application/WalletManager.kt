@@ -37,6 +37,8 @@ import android.content.Context
 import com.orhanobut.logger.Logger
 import com.tari.android.wallet.BuildConfig
 import com.tari.android.wallet.application.baseNodes.BaseNodes
+import com.tari.android.wallet.data.WalletConfig
+import com.tari.android.wallet.data.network.NetworkRepository
 import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodeSharedRepository
 import com.tari.android.wallet.event.EventBus
@@ -58,12 +60,12 @@ import java.io.File
  */
 internal class WalletManager(
     private val context: Context,
-    private val walletFilesDirPath: String,
-    private val walletLogFilePath: String,
+    private val walletConfig: WalletConfig,
     private val torManager: TorProxyManager,
     private val sharedPrefsWrapper: SharedPrefsRepository,
     private val baseNodeSharedRepository: BaseNodeSharedRepository,
     private val seedPhraseRepository: SeedPhraseRepository,
+    private val networkRepository: NetworkRepository,
     private val baseNodes: BaseNodes,
     private val torConfig: TorConfig
 ) {
@@ -144,15 +146,15 @@ internal class WalletManager(
     /**
      * Instantiates the comms configuration for the wallet.
      */
-    private fun getCommsConfig(): FFICommsConfig {
+    private fun getCommsConfig(walletConfig: WalletConfig): FFICommsConfig {
         return FFICommsConfig(
             NetAddressString(
                 "127.0.0.1",
                 39069
             ).toString(),
             getTorTransport(),
-            Constants.Wallet.walletDBName,
-            walletFilesDirPath,
+            walletConfig.walletDBName,
+            walletConfig.getWalletFilesDirPath(),
             Constants.Wallet.discoveryTimeoutSec,
             Constants.Wallet.storeAndForwardMessageDurationSec,
             Network.WEATHERWAX.uriComponent,
@@ -165,7 +167,7 @@ internal class WalletManager(
      */
     private fun startLogFileObserver() {
         if (BuildConfig.DEBUG) {
-            logFileObserver = LogFileObserver(walletLogFilePath)
+            logFileObserver = LogFileObserver(walletConfig.getWalletLogFilePath())
             logFileObserver?.startWatching()
         }
     }
@@ -189,27 +191,22 @@ internal class WalletManager(
     private fun initWallet() {
         if (FFIWallet.instance == null) {
             // store network info in shared preferences if it's a new wallet
-            val isNewInstallation = !WalletUtil.walletExists(context)
+            val isNewInstallation = !WalletUtil.walletExists(walletConfig)
             val wallet = FFIWallet(
                 sharedPrefsWrapper,
                 seedPhraseRepository,
-                getCommsConfig(),
-                walletLogFilePath
+                getCommsConfig(walletConfig),
+                walletConfig.getWalletLogFilePath()
             )
             FFIWallet.instance = wallet
             if (isNewInstallation) {
-                sharedPrefsWrapper.network = Constants.Wallet.network
                 FFIWallet.instance?.setKeyValue(
                     WalletService.Companion.KeyValueStorageKeys.NETWORK,
-                    Constants.Wallet.network.uriComponent
+                    networkRepository.currentNetwork!!.network.uriComponent
                 )
-            } else if (sharedPrefsWrapper.isRestoredWallet && sharedPrefsWrapper.network == null) {
-                sharedPrefsWrapper.network = try {
-                    Network.from(
-                        FFIWallet.instance?.getKeyValue(
-                            WalletService.Companion.KeyValueStorageKeys.NETWORK
-                        ) ?: ""
-                    )
+            } else if (sharedPrefsWrapper.isRestoredWallet && networkRepository.ffiNetwork == null) {
+                networkRepository.ffiNetwork = try {
+                    Network.from(FFIWallet.instance?.getKeyValue(WalletService.Companion.KeyValueStorageKeys.NETWORK) ?: "")
                 } catch (exception: Exception) {
                     null
                 }

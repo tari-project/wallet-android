@@ -32,7 +32,6 @@
  */
 package com.tari.android.wallet.util
 
-import com.tari.android.wallet.application.Network
 import com.tari.android.wallet.model.MicroTari
 import java.math.BigInteger
 
@@ -135,7 +134,6 @@ internal object Constants {
      * Wallet constants.
      */
     object Wallet {
-        val network = Network.WEATHERWAX
         const val torPort = 18101
         const val maxNumberOfRollingLogFiles = 2
         const val rollingLogFileMaxSizeBytes = 10 * 1024 * 1024
@@ -143,8 +141,6 @@ internal object Constants {
         const val storeAndForwardMessageDurationSec = 10800L
         const val emojiIdLength = 33
         const val emojiFormatterChunkSize = 3
-        val walletDBName: String = "tari_wallet_${network.uriComponent}"
-        val walletDBFullFileName: String = "$walletDBName.sqlite3"
         const val faucetServerUrl = "https://faucet.tari.com"
         const val pushNotificationServerUrl = "https://push.tari.com"
         const val deepLinkURLPrefix = "tari://"

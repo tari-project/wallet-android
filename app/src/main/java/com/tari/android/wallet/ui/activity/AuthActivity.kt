@@ -52,8 +52,10 @@ import com.tari.android.wallet.BuildConfig
 import com.tari.android.wallet.R.color.white
 import com.tari.android.wallet.R.string.*
 import com.tari.android.wallet.application.WalletState
+import com.tari.android.wallet.data.network.NetworkRepository
 import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import com.tari.android.wallet.databinding.ActivityAuthBinding
+import com.tari.android.wallet.di.DiContainer.appComponent
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.infrastructure.Tracker
 import com.tari.android.wallet.infrastructure.security.biometric.BiometricAuthenticationService
@@ -80,6 +82,9 @@ internal class AuthActivity : AppCompatActivity() {
 
     @Inject
     lateinit var sharedPrefsWrapper: SharedPrefsRepository
+
+    @Inject
+    lateinit var networkRepository: NetworkRepository
 
     @Inject
     lateinit var authService: BiometricAuthenticationService
@@ -109,7 +114,7 @@ internal class AuthActivity : AppCompatActivity() {
         ui.progressBar.invisible()
         // call the animations
         showTariText()
-        val versionInfo = "${Constants.Wallet.network.displayName} ${BuildConfig.VERSION_NAME} b${BuildConfig.VERSION_CODE}"
+        val versionInfo = "${networkRepository.currentNetwork!!.network.displayName} ${BuildConfig.VERSION_NAME} b${BuildConfig.VERSION_CODE}"
         ui.networkInfoTextView.text = versionInfo
     }
 

@@ -48,8 +48,10 @@ import androidx.lifecycle.lifecycleScope
 import com.tari.android.wallet.R
 import com.tari.android.wallet.R.color.home_selected_nav_item
 import com.tari.android.wallet.application.DeepLink
+import com.tari.android.wallet.data.network.NetworkRepository
 import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import com.tari.android.wallet.databinding.ActivityHomeBinding
+import com.tari.android.wallet.di.DiContainer.appComponent
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.extension.addTo
 import com.tari.android.wallet.extension.applyFontStyle
@@ -70,9 +72,14 @@ import com.tari.android.wallet.ui.component.CustomFont
 import com.tari.android.wallet.ui.component.CustomFontTextView
 import com.tari.android.wallet.ui.dialog.BottomSlideDialog
 import com.tari.android.wallet.ui.extension.*
+import com.tari.android.wallet.ui.fragment.debug.baseNodeConfig.BaseNodeConfigRouter
+import com.tari.android.wallet.ui.fragment.debug.baseNodeConfig.addBaseNode.AddCustomBaseNodeFragment
+import com.tari.android.wallet.ui.fragment.debug.baseNodeConfig.changeBaseNode.ChangeBaseNodeFragment
 import com.tari.android.wallet.ui.fragment.profile.WalletInfoFragment
-import com.tari.android.wallet.ui.fragment.settings.AllSettingsFragment
+import com.tari.android.wallet.ui.fragment.settings.allSettings.AllSettingsFragment
+import com.tari.android.wallet.ui.fragment.settings.allSettings.AllSettingsRouter
 import com.tari.android.wallet.ui.fragment.settings.backgroundService.BackgroundServiceSettingsActivity
+import com.tari.android.wallet.ui.fragment.settings.networkSelection.NetworkSelectionFragment
 import com.tari.android.wallet.ui.fragment.store.StoreFragment
 import com.tari.android.wallet.ui.fragment.tx.TxListFragment
 import com.tari.android.wallet.ui.fragment.tx.TxListRouter
@@ -82,13 +89,16 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-internal class HomeActivity : AppCompatActivity(), AllSettingsFragment.AllSettingsRouter, TxListRouter {
+internal class HomeActivity : AppCompatActivity(), AllSettingsRouter, TxListRouter, BaseNodeConfigRouter {
 
     @Inject
     lateinit var sharedPrefsWrapper: SharedPrefsRepository
 
     @Inject
     lateinit var walletServiceLauncher: WalletServiceLauncher
+
+    @Inject
+    lateinit var networkRepository: NetworkRepository
 
     @Inject
     lateinit var giphy: GiphyEcosystem
@@ -114,7 +124,7 @@ internal class HomeActivity : AppCompatActivity(), AllSettingsFragment.AllSettin
         if (savedInstanceState == null) {
             giphy.enable()
             enableNavigationView(ui.homeImageView)
-            serviceConnection.connection.subscribe{
+            serviceConnection.connection.subscribe {
                 if (it.status == CONNECTED) {
                     ui.root.postDelayed(Constants.UI.mediumDurationMs) {
                         processIntentDeepLink(it.service!!, intent)
@@ -149,11 +159,15 @@ internal class HomeActivity : AppCompatActivity(), AllSettingsFragment.AllSettin
     }
 
     override fun onBackPressed() {
-        if (ui.viewPager.currentItem == INDEX_HOME) {
+        if (supportFragmentManager.backStackEntryCount > 0) {
             super.onBackPressed()
         } else {
-            ui.viewPager.setCurrentItem(INDEX_HOME, NO_SMOOTH_SCROLL)
-            enableNavigationView(ui.homeImageView)
+            if (ui.viewPager.currentItem == INDEX_HOME) {
+                super.onBackPressed()
+            } else {
+                ui.viewPager.setCurrentItem(INDEX_HOME, NO_SMOOTH_SCROLL)
+                enableNavigationView(ui.homeImageView)
+            }
         }
     }
 
@@ -216,42 +230,34 @@ internal class HomeActivity : AppCompatActivity(), AllSettingsFragment.AllSettin
     }
 
     private fun checkNetworkCompatibility() {
-        if (sharedPrefsWrapper.network != Constants.Wallet.network) {
+        if (networkRepository.lastNetwork != networkRepository.currentNetwork!!.network && !networkRepository.incompatibleNetworkShown) {
+            networkRepository.incompatibleNetworkShown = true
             displayIncompatibleNetworkDialog()
         }
     }
 
     private fun displayIncompatibleNetworkDialog() {
+        if (this.isFinishing) return
         BottomSlideDialog(
             this,
             R.layout.dialog_incompatible_network,
             canceledOnTouchOutside = false
         ).apply {
-            findViewById<CustomFontTextView>(
-                R.id.incompatible_network_description_text_view
-            ).text = string(R.string.incompatible_network_description).applyFontStyle(
-                this@HomeActivity,
-                CustomFont.AVENIR_LT_STD_MEDIUM,
-                listOf(
-                    string(R.string.incompatible_network_description_bold_part_1),
-                    string(R.string.incompatible_network_description_bold_part_2)
-                ),
-                CustomFont.AVENIR_LT_STD_BLACK
-            )
-            findViewById<View>(R.id.incompatible_network_reset_now_button)
-                .setOnClickListener(ThrottleClick {
-                    deleteWallet()
-                    dismiss()
-                })
-            findViewById<View>(R.id.incompatible_network_reset_later_button)
-                .setOnClickListener(ThrottleClick {
-                    /**
-                     * User has been let know of the incompatible network and dismissed the alert.
-                     * Set the network and carry on.
-                     */
-                    sharedPrefsWrapper.network = Constants.Wallet.network
-                    dismiss()
-                })
+            findViewById<CustomFontTextView>(R.id.incompatible_network_description_text_view).text = string(R.string.incompatible_network_description)
+                .applyFontStyle(
+                    this@HomeActivity,
+                    CustomFont.AVENIR_LT_STD_MEDIUM,
+                    listOf(
+                        string(R.string.incompatible_network_description_bold_part_1),
+                        string(R.string.incompatible_network_description_bold_part_2)
+                    ),
+                    CustomFont.AVENIR_LT_STD_BLACK
+                )
+            findViewById<View>(R.id.incompatible_network_reset_now_button).setOnThrottledClickListener {
+                deleteWallet()
+                dismiss()
+            }
+            findViewById<View>(R.id.incompatible_network_reset_later_button).setOnThrottledClickListener { dismiss() }
         }.show()
     }
 
@@ -276,15 +282,31 @@ internal class HomeActivity : AppCompatActivity(), AllSettingsFragment.AllSettin
 
     override fun toAllSettings() = ui.viewPager.setCurrentItem(INDEX_SETTINGS, NO_SMOOTH_SCROLL)
 
-    override fun toBackupSettings() =
-        startActivity(Intent(this, BackupSettingsActivity::class.java))
+    override fun toBackupSettings() = startActivity(Intent(this, BackupSettingsActivity::class.java))
 
-    override fun toDeleteWallet() {
-        startActivity(Intent(this, DeleteWalletActivity::class.java))
-    }
+    override fun toDeleteWallet() = startActivity(Intent(this, DeleteWalletActivity::class.java))
 
-    override fun toBackgroundService() {
-        startActivity(Intent(this, BackgroundServiceSettingsActivity::class.java))
+    override fun toBackgroundService() = startActivity(Intent(this, BackgroundServiceSettingsActivity::class.java))
+
+    override fun toBaseNodeSelection() = loadFragment(ChangeBaseNodeFragment())
+
+    override fun toNetworkSelection() = loadFragment(NetworkSelectionFragment())
+
+    override fun toAddCustomBaseNode() = loadFragment(AddCustomBaseNodeFragment())
+
+    override fun toChangeBaseNode() = loadFragment(ChangeBaseNodeFragment())
+
+    private fun loadFragment(fragment: Fragment) {
+        supportFragmentManager
+            .beginTransaction()
+            .setCustomAnimations(
+                R.anim.enter_from_right, R.anim.exit_to_left,
+                R.anim.enter_from_left, R.anim.exit_to_right
+            )
+            .apply { supportFragmentManager.fragments.forEach { hide(it) } }
+            .add(R.id.nav_container, fragment)
+            .addToBackStack(null)
+            .commit()
     }
 
     fun willNotifyAboutNewTx(): Boolean = ui.viewPager.currentItem == INDEX_HOME
@@ -326,8 +348,7 @@ internal class HomeActivity : AppCompatActivity(), AllSettingsFragment.AllSettin
         compositeDisposable.dispose()
     }
 
-    private class HomeAdapter(fm: FragmentManager) :
-        FragmentStatePagerAdapter(fm, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
+    private class HomeAdapter(fm: FragmentManager) : FragmentStatePagerAdapter(fm, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
         override fun getItem(position: Int): Fragment =
             when (position) {
                 INDEX_HOME -> TxListFragment()

@@ -33,13 +33,16 @@
 package com.tari.android.wallet.di
 
 import android.content.Context
+import com.tari.android.wallet.data.WalletConfig
+import com.tari.android.wallet.data.network.NetworkRepository
 import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
-import com.tari.android.wallet.infrastructure.backup.*
+import com.tari.android.wallet.infrastructure.backup.BackupFileProcessor
+import com.tari.android.wallet.infrastructure.backup.BackupManager
+import com.tari.android.wallet.infrastructure.backup.BackupStorage
 import com.tari.android.wallet.infrastructure.backup.GoogleDriveBackupStorage
 import com.tari.android.wallet.notification.NotificationHelper
 import dagger.Module
 import dagger.Provides
-import javax.inject.Named
 import javax.inject.Singleton
 
 @Module
@@ -47,29 +50,22 @@ internal class BackupAndRestoreModule {
 
     @Provides
     @Singleton
-    fun provideBackupFileProcessor(
-        sharedPrefs: SharedPrefsRepository,
-        @Named(WalletModule.FieldName.walletFilesDirPath) walletFilesDirPath: String,
-        @Named(WalletModule.FieldName.walletDatabaseFilePath) walletDatabaseFilePath: String,
-        @Named(WalletModule.FieldName.walletTempDirPath) walletTempDirPath: String
-    ): BackupFileProcessor = BackupFileProcessor(
-        sharedPrefs,
-        walletFilesDirPath,
-        walletDatabaseFilePath,
-        walletTempDirPath
-    )
+    fun provideBackupFileProcessor(sharedPrefs: SharedPrefsRepository, walletConfig: WalletConfig): BackupFileProcessor =
+        BackupFileProcessor(sharedPrefs, walletConfig)
 
     @Provides
     @Singleton
     fun provideBackupStorage(
         context: Context,
         sharedPrefs: SharedPrefsRepository,
-        @Named(WalletModule.FieldName.walletTempDirPath) walletTempDirPath: String,
-        backupFileProcessor: BackupFileProcessor
+        walletConfig: WalletConfig,
+        backupFileProcessor: BackupFileProcessor,
+        networkRepository: NetworkRepository
     ): BackupStorage = GoogleDriveBackupStorage(
         context,
+        networkRepository,
         sharedPrefs,
-        walletTempDirPath,
+        walletConfig.getWalletTempDirPath(),
         backupFileProcessor
     )
 

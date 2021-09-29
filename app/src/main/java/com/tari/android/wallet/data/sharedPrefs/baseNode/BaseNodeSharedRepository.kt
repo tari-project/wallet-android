@@ -33,13 +33,15 @@
 package com.tari.android.wallet.data.sharedPrefs.baseNode
 
 import android.content.SharedPreferences
+import com.tari.android.wallet.data.network.NetworkRepository
 import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodeSharedRepository.Key.baseNodeLastSyncResultField
 import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodeSharedRepository.Key.currentBaseNodeField
 import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodeSharedRepository.Key.userBaseNodeListField
 import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefGsonDelegate
 import com.tari.android.wallet.model.BaseNodeValidationResult
 
-class BaseNodeSharedRepository(sharedPrefs: SharedPreferences) {
+class BaseNodeSharedRepository(sharedPrefs: SharedPreferences,
+val networkRepository: NetworkRepository) {
 
     private object Key {
         const val currentBaseNodeField = "tari_wallet_current_base_node"
@@ -48,9 +50,9 @@ class BaseNodeSharedRepository(sharedPrefs: SharedPreferences) {
         const val baseNodeLastSyncResultField = "tari_wallet_base_node_last_sync_result"
     }
 
-    var currentBaseNode: BaseNodeDto? by SharedPrefGsonDelegate(sharedPrefs, currentBaseNodeField, BaseNodeDto::class.java)
+    var currentBaseNode: BaseNodeDto? by SharedPrefGsonDelegate(sharedPrefs, formatKey(currentBaseNodeField), BaseNodeDto::class.java)
 
-    var userBaseNodes: BaseNodeList? by SharedPrefGsonDelegate(sharedPrefs, userBaseNodeListField, BaseNodeList::class.java)
+    var userBaseNodes: BaseNodeList? by SharedPrefGsonDelegate(sharedPrefs, formatKey(userBaseNodeListField), BaseNodeList::class.java)
 
     var baseNodeLastSyncResult: BaseNodeValidationResult? by SharedPrefGsonDelegate(
         sharedPrefs, baseNodeLastSyncResultField, BaseNodeValidationResult::class.java
@@ -76,4 +78,6 @@ class BaseNodeSharedRepository(sharedPrefs: SharedPreferences) {
         currentBaseNode = null
         userBaseNodes = null
     }
+
+    private fun formatKey(key: String) : String = key + "_" + networkRepository.currentNetwork!!.network.displayName
 }

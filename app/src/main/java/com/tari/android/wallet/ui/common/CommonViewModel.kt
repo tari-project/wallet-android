@@ -2,8 +2,8 @@ package com.tari.android.wallet.ui.common
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
-import com.tari.android.wallet.application.TariWalletApplication
 import com.tari.android.wallet.di.ApplicationComponent
+import com.tari.android.wallet.di.DiContainer
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.ui.common.domain.ResourceManager
 import com.tari.android.wallet.ui.dialog.confirm.ConfirmDialogArgs
@@ -16,14 +16,15 @@ open class CommonViewModel : ViewModel() {
 
     protected var compositeDisposable: CompositeDisposable = CompositeDisposable()
 
-    internal val component: ApplicationComponent?
-        get() = TariWalletApplication.INSTANCE.get()?.appComponent
+    internal val component: ApplicationComponent
+        get() = DiContainer.appComponent
+
 
     @Inject
     lateinit var resourceManager: ResourceManager
 
     init {
-        component?.inject(this)
+        component.inject(this)
     }
 
     override fun onCleared() {

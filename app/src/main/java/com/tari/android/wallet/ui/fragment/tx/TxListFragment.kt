@@ -61,6 +61,7 @@ import com.tari.android.wallet.R
 import com.tari.android.wallet.application.DeepLink
 import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import com.tari.android.wallet.databinding.FragmentTxListBinding
+import com.tari.android.wallet.di.DiContainer.appComponent
 import com.tari.android.wallet.event.Event
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.extension.observe

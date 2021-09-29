@@ -58,8 +58,10 @@ import com.tari.android.wallet.R
 import com.tari.android.wallet.R.color.*
 import com.tari.android.wallet.R.dimen.*
 import com.tari.android.wallet.R.string.*
+import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import com.tari.android.wallet.databinding.ActivityTxDetailsBinding
 import com.tari.android.wallet.databinding.TxDetailsGifContainerBinding
+import com.tari.android.wallet.di.DiContainer.appComponent
 import com.tari.android.wallet.event.Event
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.extension.txFormattedDate
@@ -71,6 +73,7 @@ import com.tari.android.wallet.model.TxStatus.*
 import com.tari.android.wallet.service.TariWalletService
 import com.tari.android.wallet.service.WalletService
 import com.tari.android.wallet.ui.animation.collapseAndHideAnimation
+import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.component.EmojiIdSummaryViewController
 import com.tari.android.wallet.ui.component.FullEmojiIdViewController
 import com.tari.android.wallet.ui.dialog.BottomSlideDialog
@@ -79,8 +82,6 @@ import com.tari.android.wallet.ui.extension.*
 import com.tari.android.wallet.ui.presentation.TxNote
 import com.tari.android.wallet.ui.presentation.gif.GIF
 import com.tari.android.wallet.ui.presentation.gif.GIFRepository
-import com.tari.android.wallet.ui.common.CommonViewModel
-import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import com.tari.android.wallet.util.WalletUtil
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

@@ -41,6 +41,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.viewModels
 import com.tari.android.wallet.R.color.all_settings_back_up_status_processing
 import com.tari.android.wallet.databinding.FragmentChooseRestoreOptionBinding
+import com.tari.android.wallet.di.DiContainer.appComponent
 import com.tari.android.wallet.extension.observe
 import com.tari.android.wallet.infrastructure.backup.BackupManager
 import com.tari.android.wallet.ui.activity.restore.WalletRestoreRouter

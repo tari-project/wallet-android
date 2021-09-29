@@ -51,7 +51,9 @@ import com.tari.android.wallet.R
 import com.tari.android.wallet.R.dimen.auth_button_bottom_margin
 import com.tari.android.wallet.R.string.*
 import com.tari.android.wallet.application.WalletState
+import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import com.tari.android.wallet.databinding.FragmentLocalAuthBinding
+import com.tari.android.wallet.di.DiContainer.appComponent
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.infrastructure.Tracker
 import com.tari.android.wallet.infrastructure.security.biometric.BiometricAuthenticationService
@@ -59,7 +61,6 @@ import com.tari.android.wallet.infrastructure.security.biometric.BiometricAuthen
 import com.tari.android.wallet.infrastructure.security.biometric.BiometricAuthenticationService.BiometricAuthenticationType.*
 import com.tari.android.wallet.ui.extension.*
 import com.tari.android.wallet.util.Constants.UI.Auth
-import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 

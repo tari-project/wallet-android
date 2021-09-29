@@ -53,19 +53,23 @@ import androidx.lifecycle.lifecycleScope
 import com.orhanobut.logger.Logger
 import com.tari.android.wallet.R.color.*
 import com.tari.android.wallet.R.string.*
+import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import com.tari.android.wallet.databinding.FragmentChangeSecurePasswordBinding
+import com.tari.android.wallet.di.DiContainer.appComponent
 import com.tari.android.wallet.event.EventBus
-import com.tari.android.wallet.infrastructure.backup.*
+import com.tari.android.wallet.infrastructure.backup.BackupManager
+import com.tari.android.wallet.infrastructure.backup.BackupState
+import com.tari.android.wallet.infrastructure.backup.BackupState.BackupOutOfDate
+import com.tari.android.wallet.infrastructure.backup.BackupState.BackupUpToDate
+import com.tari.android.wallet.infrastructure.backup.BackupStorageAuthRevokedException
 import com.tari.android.wallet.ui.activity.settings.BackupSettingsRouter
 import com.tari.android.wallet.ui.dialog.error.ErrorDialog
 import com.tari.android.wallet.ui.extension.*
-import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.net.UnknownHostException
 import javax.inject.Inject
-import com.tari.android.wallet.infrastructure.backup.BackupState.*
 
 internal class ChangeSecurePasswordFragment @Deprecated(
     """Use newInstance() and supply all the 

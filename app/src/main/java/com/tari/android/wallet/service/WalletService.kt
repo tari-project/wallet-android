@@ -48,11 +48,12 @@ import com.tari.android.wallet.application.TariWalletApplication
 import com.tari.android.wallet.application.WalletManager
 import com.tari.android.wallet.application.WalletState
 import com.tari.android.wallet.application.baseNodes.BaseNodes
+import com.tari.android.wallet.data.WalletConfig
 import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import com.tari.android.wallet.data.sharedPrefs.TestnetUtxoList
 import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodeSharedRepository
 import com.tari.android.wallet.data.sharedPrefs.orEmpty
-import com.tari.android.wallet.di.WalletModule
+import com.tari.android.wallet.di.DiContainer
 import com.tari.android.wallet.event.Event
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.ffi.*
@@ -85,7 +86,6 @@ import java.math.BigInteger
 import java.util.*
 import java.util.concurrent.*
 import javax.inject.Inject
-import javax.inject.Named
 
 /**
  * Foreground wallet service.
@@ -106,8 +106,7 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
     }
 
     @Inject
-    @Named(WalletModule.FieldName.walletFilesDirPath)
-    lateinit var walletFilesDirPath: String
+    lateinit var walletConfig: WalletConfig
 
     @Inject
     lateinit var app: TariWalletApplication
@@ -195,7 +194,7 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
 
     override fun onCreate() {
         super.onCreate()
-        (application as TariWalletApplication).appComponent.inject(this)
+        DiContainer.appComponent.inject(this)
     }
 
     /**
@@ -217,6 +216,8 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
 
 
     private fun startService() {
+        //todo total crutch. Service is auto-creating during the bind func. Need to refactor this first
+        DiContainer.appComponent.inject(this)
         // start wallet manager on a separate thead & listen to events
         EventBus.walletState.subscribe(this, this::onWalletStateChanged)
         Thread {
@@ -245,7 +246,7 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
     }
 
     private fun deleteWallet() {
-        WalletUtil.clearWalletFiles(walletFilesDirPath)
+        WalletUtil.clearWalletFiles(walletConfig.getWalletFilesDirPath())
         sharedPrefsWrapper.clear()
     }
 

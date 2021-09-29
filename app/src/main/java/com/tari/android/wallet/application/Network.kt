@@ -44,7 +44,9 @@ enum class Network(val uriComponent: String, val displayName: String) {
     // testnet 3
     STIBBONS("stibbons", "STIBBONS"),
 
-    WEATHERWAX("weatherwax", "WEATHERWAX");
+    WEATHERWAX("weatherwax", "WEATHERWAX"),
+
+    IGOR("igor", "IGOR");
 
     companion object {
         fun from(uriComponent: String): Network = when (uriComponent) {

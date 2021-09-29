@@ -81,6 +81,7 @@ import com.tari.android.wallet.R.dimen.*
 import com.tari.android.wallet.application.DeepLink
 import com.tari.android.wallet.databinding.DialogChooseGifBinding
 import com.tari.android.wallet.databinding.FragmentAddNoteBinding
+import com.tari.android.wallet.di.DiContainer.appComponent
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.infrastructure.Tracker
 import com.tari.android.wallet.model.Contact
