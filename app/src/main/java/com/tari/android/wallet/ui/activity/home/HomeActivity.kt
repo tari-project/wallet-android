@@ -222,6 +222,7 @@ internal class HomeActivity : AppCompatActivity(), AllSettingsFragment.AllSettin
     }
 
     private fun displayIncompatibleNetworkDialog() {
+        if (this.isFinishing) return
         BottomSlideDialog(
             this,
             R.layout.dialog_incompatible_network,

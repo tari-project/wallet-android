@@ -119,7 +119,7 @@ internal class DebugLogFragment : Fragment(), AdapterView.OnItemSelectedListener
         // initialize recycler view
         recyclerViewLayoutManager = LinearLayoutManager(activity)
         recyclerViewAdapter = LogListAdapter(selectedLogFileLines)
-        spinnerAdapter = LogFileSpinnerAdapter(context!!, logFiles)
+        spinnerAdapter = LogFileSpinnerAdapter(requireContext(), logFiles)
         ui.apply {
             recyclerView.layoutManager = recyclerViewLayoutManager
             recyclerView.adapter = recyclerViewAdapter

@@ -1,5 +1,3 @@
-import org.gradle.api.tasks.testing.logging.TestLogEvent
-
 buildscript {
     ext.kotlin_version = '1.5.21'
 
@@ -46,13 +44,13 @@ afterEvaluate {
                 showCauses true
                 showStackTraces true
                 exceptionFormat 'short'
-                events TestLogEvent.FAILED, TestLogEvent.SKIPPED
+                events org.gradle.api.tasks.testing.logging.TestLogEvent.FAILED, org.gradle.api.tasks.testing.logging.TestLogEvent.SKIPPED
                 debug {
                     exceptionFormat 'full'
-                    events TestLogEvent.FAILED,
-                            TestLogEvent.PASSED,
-                            TestLogEvent.SKIPPED,
-                            TestLogEvent.STANDARD_OUT
+                    events org.gradle.api.tasks.testing.logging.TestLogEvent.FAILED,
+                            org.gradle.api.tasks.testing.logging.TestLogEvent.PASSED,
+                            org.gradle.api.tasks.testing.logging.TestLogEvent.SKIPPED,
+                            org.gradle.api.tasks.testing.logging.TestLogEvent.STANDARD_OUT
                 }
             }
         }
