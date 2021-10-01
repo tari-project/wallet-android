@@ -55,6 +55,7 @@ import java.io.File
 // todo review
 internal class LocalBackupStorage(
     private val context: Context,
+    private val namingPolicy: BackupNamingPolicy,
     private val sharedPrefs: SharedPrefsRepository,
     private val walletTempDirPath: String,
     private val networkRepository: NetworkRepository,
@@ -114,7 +115,7 @@ internal class LocalBackupStorage(
                 for (existingFile in backupFolder.listFiles()) {
                     // delete if it's an old backup file
                     if (existingFile.isFile
-                        && BackupNamingPolicy.isBackupFileName(existingFile.name ?: "")
+                        && namingPolicy.isBackupFileName(existingFile.name ?: "")
                         && existingFile.name != backupFileName
                     ) {
                         existingFile.delete()
@@ -135,8 +136,7 @@ internal class LocalBackupStorage(
         // delete all backup files
         for (existingFile in backupFolder.listFiles()) {
             // delete if it's an old backup file
-            if (existingFile.isFile
-                && BackupNamingPolicy.isBackupFileName(existingFile.name ?: "")
+            if (existingFile.isFile && namingPolicy.isBackupFileName(existingFile.name ?: "")
             ) {
                 existingFile.delete()
             }
@@ -150,9 +150,7 @@ internal class LocalBackupStorage(
 
     override suspend fun restoreLatestBackup(password: String?) {
         val backupFolder = getBackupFolder()
-        val backupFiles = backupFolder.listFiles().filter { file ->
-            BackupNamingPolicy.getDateFromBackupFileName(file.name ?: "") != null
-        }
+        val backupFiles = backupFolder.listFiles().filter { file -> namingPolicy.getDateFromBackupFileName(file.name ?: "") != null }
         if (backupFiles.isEmpty()) {
             throw BackupStorageTamperedException("Backup file not found in folder.")
         }
@@ -173,7 +171,7 @@ internal class LocalBackupStorage(
             backupFileProcessor.restoreBackupFile(tempFile, password)
             backupFileProcessor.clearTempFolder()
             // restore successful, turn on automated backup
-            sharedPrefs.lastSuccessfulBackupDate = BackupNamingPolicy.getDateFromBackupFileName(tempFile.name)
+            sharedPrefs.lastSuccessfulBackupDate = namingPolicy.getDateFromBackupFileName(tempFile.name)
             sharedPrefs.backupPassword = password
         }
     }
@@ -186,7 +184,7 @@ internal class LocalBackupStorage(
         if (!backupFolder.exists()) {
             throw BackupStorageAuthRevokedException()
         }
-        val expectedBackupFileName = BackupNamingPolicy.getBackupFileName(date)
+        val expectedBackupFileName = namingPolicy.getBackupFileName(date)
         return backupFolder.listFiles().firstOrNull {
             it.isFile && it.name?.contains(expectedBackupFileName) == true
         } != null

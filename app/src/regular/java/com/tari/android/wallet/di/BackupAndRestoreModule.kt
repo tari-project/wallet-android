@@ -36,10 +36,7 @@ import android.content.Context
 import com.tari.android.wallet.data.WalletConfig
 import com.tari.android.wallet.data.network.NetworkRepository
 import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
-import com.tari.android.wallet.infrastructure.backup.BackupFileProcessor
-import com.tari.android.wallet.infrastructure.backup.BackupManager
-import com.tari.android.wallet.infrastructure.backup.BackupStorage
-import com.tari.android.wallet.infrastructure.backup.GoogleDriveBackupStorage
+import com.tari.android.wallet.infrastructure.backup.*
 import com.tari.android.wallet.notification.NotificationHelper
 import dagger.Module
 import dagger.Provides
@@ -50,8 +47,12 @@ internal class BackupAndRestoreModule {
 
     @Provides
     @Singleton
-    fun provideBackupFileProcessor(sharedPrefs: SharedPrefsRepository, walletConfig: WalletConfig): BackupFileProcessor =
-        BackupFileProcessor(sharedPrefs, walletConfig)
+    fun provideBackupFileProcessor(
+        sharedPrefs: SharedPrefsRepository,
+        walletConfig: WalletConfig,
+        namingPolicy: BackupNamingPolicy
+    ): BackupFileProcessor =
+        BackupFileProcessor(sharedPrefs, walletConfig, namingPolicy)
 
     @Provides
     @Singleton
@@ -60,10 +61,10 @@ internal class BackupAndRestoreModule {
         sharedPrefs: SharedPrefsRepository,
         walletConfig: WalletConfig,
         backupFileProcessor: BackupFileProcessor,
-        networkRepository: NetworkRepository
+        namingPolicy: BackupNamingPolicy,
     ): BackupStorage = GoogleDriveBackupStorage(
         context,
-        networkRepository,
+        namingPolicy,
         sharedPrefs,
         walletConfig.getWalletTempDirPath(),
         backupFileProcessor
@@ -78,4 +79,6 @@ internal class BackupAndRestoreModule {
         notificationHelper: NotificationHelper
     ): BackupManager = BackupManager(context, sharedPrefs, backupStorage, notificationHelper)
 
+    @Provides
+    fun provideBackupNamingPolicy(networkRepository: NetworkRepository): BackupNamingPolicy = BackupNamingPolicy(networkRepository)
 }

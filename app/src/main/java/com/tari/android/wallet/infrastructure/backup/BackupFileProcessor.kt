@@ -51,6 +51,7 @@ import java.io.File
 internal class BackupFileProcessor(
     private val sharedPrefs: SharedPrefsRepository,
     private val walletConfig: WalletConfig,
+    private val namingPolicy: BackupNamingPolicy,
 ) {
 
     fun generateBackupFile(newPassword: CharArray? = null): Triple<File, DateTime, String> {
@@ -64,7 +65,7 @@ internal class BackupFileProcessor(
         // zip the file
         val compressionMethod = CompressionMethod.zip()
         var mimeType = compressionMethod.mimeType
-        val backupFileName = BackupNamingPolicy.getBackupFileName(backupDate)
+        val backupFileName = namingPolicy.getBackupFileName(backupDate)
         val compressedFile = File(
             walletConfig.getWalletTempDirPath(),
             "$backupFileName.${compressionMethod.extension}"

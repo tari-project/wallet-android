@@ -52,7 +52,6 @@ import com.google.api.services.drive.DriveScopes
 import com.google.api.services.drive.model.FileList
 import com.orhanobut.logger.Logger
 import com.tari.android.wallet.R
-import com.tari.android.wallet.data.network.NetworkRepository
 import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import com.tari.android.wallet.extension.getLastPathComponent
 import kotlinx.coroutines.Dispatchers
@@ -65,7 +64,7 @@ import kotlin.coroutines.suspendCoroutine
 
 internal class GoogleDriveBackupStorage(
     private val context: Context,
-    private val networkRepository: NetworkRepository,
+    private val namingPolicy: BackupNamingPolicy,
     private val sharedPrefs: SharedPrefsRepository,
     private val walletTempDirPath: String,
     private val backupFileProcessor: BackupFileProcessor
@@ -179,7 +178,7 @@ internal class GoogleDriveBackupStorage(
     ) {
         val metadata: com.google.api.services.drive.model.File =
             com.google.api.services.drive.model.File()
-                .setParents(listOf(getParentFolder()))
+                .setParents(listOf(DRIVE_BACKUP_PARENT_FOLDER_NAME))
                 .setMimeType(mimeType)
                 .setName(file.getLastPathComponent()!!)
         drive.files()
@@ -192,7 +191,7 @@ internal class GoogleDriveBackupStorage(
     override suspend fun hasBackupForDate(date: DateTime): Boolean {
         try {
             val latestBackupFileName = getLastBackupFileIdAndName()?.second ?: return false
-            return latestBackupFileName.contains(BackupNamingPolicy.getBackupFileName(date))
+            return latestBackupFileName.contains(namingPolicy.getBackupFileName(date))
         } catch (exception: UserRecoverableAuthIOException) {
             throw BackupStorageAuthRevokedException()
         } catch (exception: Exception) {
@@ -223,7 +222,7 @@ internal class GoogleDriveBackupStorage(
             backupFileProcessor.restoreBackupFile(tempFile, password)
             backupFileProcessor.clearTempFolder()
             // restore successful, turn on automated backup
-            sharedPrefs.lastSuccessfulBackupDate = BackupNamingPolicy.getDateFromBackupFileName(tempFile.name)
+            sharedPrefs.lastSuccessfulBackupDate = namingPolicy.getDateFromBackupFileName(tempFile.name)
             sharedPrefs.backupPassword = password
         }
     }
@@ -234,7 +233,7 @@ internal class GoogleDriveBackupStorage(
         do {
             val result: FileList = searchForBackups(pageToken)
             result.files.forEach {
-                BackupNamingPolicy.getDateFromBackupFileName(it.name)
+                namingPolicy.getDateFromBackupFileName(it.name)
                     ?.let { time -> backups.add(time to it) }
             }
             pageToken = result.nextPageToken
@@ -249,8 +248,8 @@ internal class GoogleDriveBackupStorage(
 
     private fun searchForBackups(pageToken: String?): FileList =
         drive.files().list()
-            .setSpaces(getParentFolder())
-            .setQ("'${getParentFolder()}' in parents")
+            .setSpaces(DRIVE_BACKUP_PARENT_FOLDER_NAME)
+            .setQ("'${DRIVE_BACKUP_PARENT_FOLDER_NAME}' in parents")
             .setFields("nextPageToken, files(id, name)")
             .setPageToken(pageToken)
             .execute()
@@ -266,12 +265,12 @@ internal class GoogleDriveBackupStorage(
             val result: FileList = searchForBackups(pageToken)
             result.files.forEach { file ->
                 val excludeName: String? = if (excludeBackupWithDate != null) {
-                    BackupNamingPolicy.getBackupFileName(excludeBackupWithDate)
+                    namingPolicy.getBackupFileName(excludeBackupWithDate)
                 } else {
                     null
                 }
                 if (excludeName == null || !file.name.contains(excludeName)) {
-                    BackupNamingPolicy.getDateFromBackupFileName(file.name)?.let {
+                    namingPolicy.getDateFromBackupFileName(file.name)?.let {
                         driveFiles.delete(file.id).execute()
                     }
                 }
@@ -288,8 +287,6 @@ internal class GoogleDriveBackupStorage(
                 .addOnSuccessListener { continuation.resumeWith(Result.success(Unit)) }
         }
     }
-
-    private fun getParentFolder() : String = DRIVE_BACKUP_PARENT_FOLDER_NAME + "/" + networkRepository.currentNetwork!!.network.displayName
 
     private companion object {
         private const val DRIVE_BACKUP_PARENT_FOLDER_NAME = "appDataFolder"
