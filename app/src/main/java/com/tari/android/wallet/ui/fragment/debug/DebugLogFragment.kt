@@ -44,16 +44,16 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.tari.android.wallet.R.string.*
+import com.tari.android.wallet.data.WalletConfig
+import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import com.tari.android.wallet.databinding.FragmentDebugLogBinding
-import com.tari.android.wallet.di.WalletModule
+import com.tari.android.wallet.di.DiContainer.appComponent
 import com.tari.android.wallet.infrastructure.BugReportingService
-import com.tari.android.wallet.ui.extension.appComponent
 import com.tari.android.wallet.ui.extension.string
 import com.tari.android.wallet.ui.extension.temporarilyDisableClick
 import com.tari.android.wallet.ui.fragment.debug.adapter.LogFileSpinnerAdapter
 import com.tari.android.wallet.ui.fragment.debug.adapter.LogListAdapter
 import com.tari.android.wallet.util.Constants
-import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import com.tari.android.wallet.util.WalletUtil
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -61,7 +61,6 @@ import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.InputStream
 import javax.inject.Inject
-import javax.inject.Named
 
 /**
  * Debug: show logs from file.
@@ -71,12 +70,7 @@ import javax.inject.Named
 internal class DebugLogFragment : Fragment(), AdapterView.OnItemSelectedListener {
 
     @Inject
-    @Named(WalletModule.FieldName.walletLogFilesDirPath)
-    lateinit var logFilesDirPath: String
-
-    @Inject
-    @Named(WalletModule.FieldName.walletLogFilePath)
-    lateinit var logFilePath: String
+    lateinit var walletConfig: WalletConfig
 
     @Inject
     lateinit var sharedPrefsWrapper: SharedPrefsRepository
@@ -104,7 +98,7 @@ internal class DebugLogFragment : Fragment(), AdapterView.OnItemSelectedListener
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? = FragmentDebugLogBinding.inflate(inflater, container, false).also { ui = it }.root
+    ): View = FragmentDebugLogBinding.inflate(inflater, container, false).also { ui = it }.root
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -114,7 +108,7 @@ internal class DebugLogFragment : Fragment(), AdapterView.OnItemSelectedListener
 
     private fun setupUI() {
         // read log files
-        logFiles = WalletUtil.getLogFilesFromDirectory(logFilesDirPath)
+        logFiles = WalletUtil.getLogFilesFromDirectory(walletConfig.getWalletLogFilesDirPath())
 
         // initialize recycler view
         recyclerViewLayoutManager = LinearLayoutManager(activity)

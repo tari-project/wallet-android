@@ -36,21 +36,21 @@ import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.Fragment
 import com.tari.android.wallet.R
-import com.tari.android.wallet.di.WalletModule
-import com.tari.android.wallet.service.WalletService
+import com.tari.android.wallet.data.WalletConfig
+import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
+import com.tari.android.wallet.di.DiContainer.appComponent
+import com.tari.android.wallet.service.WalletServiceLauncher
 import com.tari.android.wallet.ui.activity.home.HomeActivity
-import com.tari.android.wallet.ui.extension.appComponent
 import com.tari.android.wallet.ui.fragment.onboarding.CreateWalletFragment
 import com.tari.android.wallet.ui.fragment.onboarding.IntroductionFragment
 import com.tari.android.wallet.ui.fragment.onboarding.LocalAuthFragment
+import com.tari.android.wallet.ui.fragment.settings.networkSelection.NetworkSelectionFragment
 import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.Constants.UI.CreateWallet
-import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
-import com.tari.android.wallet.service.WalletServiceLauncher
 import com.tari.android.wallet.util.WalletUtil
 import javax.inject.Inject
-import javax.inject.Named
 
 /**
  * onBoarding activity class : contain  splash screen and loading sequence
@@ -61,8 +61,7 @@ internal class OnboardingFlowActivity : AppCompatActivity(), IntroductionFragmen
     CreateWalletFragment.Listener, LocalAuthFragment.Listener {
 
     @Inject
-    @Named(WalletModule.FieldName.walletFilesDirPath)
-    lateinit var walletFilesDirPath: String
+    lateinit var walletConfig: WalletConfig
 
     @Inject
     internal lateinit var sharedPrefsWrapper: SharedPrefsRepository
@@ -77,36 +76,43 @@ internal class OnboardingFlowActivity : AppCompatActivity(), IntroductionFragmen
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_onboarding_flow)
         when {
-            sharedPrefsWrapper.onboardingAuthWasInterrupted -> {
-                supportFragmentManager
-                    .beginTransaction()
-                    .add(R.id.onboarding_fragment_container_1, LocalAuthFragment())
-                    .commitNow()
-            }
+            sharedPrefsWrapper.onboardingAuthWasInterrupted -> loadFragment(LocalAuthFragment())
             sharedPrefsWrapper.onboardingWasInterrupted -> {
                 // start wallet service
                 walletServiceLauncher.start()
                 // clean existing files & restart onboarding
-                WalletUtil.clearWalletFiles(walletFilesDirPath)
-                supportFragmentManager
-                    .beginTransaction()
-                    .add(R.id.onboarding_fragment_container_2, CreateWalletFragment())
-                    .commitNow()
+                WalletUtil.clearWalletFiles(walletConfig.getWalletFilesDirPath())
+                loadFragment(CreateWalletFragment())
             }
-            else -> {
-                supportFragmentManager
-                    .beginTransaction()
-                    .add(R.id.onboarding_fragment_container_1, IntroductionFragment())
-                    .commitNow()
-            }
+            else -> loadFragment(IntroductionFragment())
         }
+    }
+
+    fun navigateToNetworkSelection() = loadFragment(NetworkSelectionFragment(), true)
+
+    private fun loadFragment(fragment: Fragment, isAnimated: Boolean = false) {
+        supportFragmentManager
+            .beginTransaction()
+            .apply {
+                if (isAnimated) {
+                    setCustomAnimations(
+                        R.anim.enter_from_right, R.anim.exit_to_left,
+                        R.anim.enter_from_left, R.anim.exit_to_right
+                    )
+                }
+            }
+            .add(R.id.onboarding_fragment_container_1, fragment)
+            .addToBackStack(null)
+            .commit()
     }
 
     /**
      * Back button should not be functional during onboarding
      */
     override fun onBackPressed() {
-        return
+        if (supportFragmentManager.backStackEntryCount > 1) {
+            supportFragmentManager.popBackStack()
+        }
     }
 
     override fun continueToCreateWallet() {
@@ -164,5 +170,4 @@ internal class OnboardingFlowActivity : AppCompatActivity(), IntroductionFragmen
         startActivity(intent)
         finish()
     }
-
 }

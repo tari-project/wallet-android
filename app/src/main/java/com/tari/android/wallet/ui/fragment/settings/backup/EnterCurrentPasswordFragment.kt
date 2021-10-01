@@ -45,6 +45,7 @@ import com.tari.android.wallet.R.color.change_password_cta_disabled
 import com.tari.android.wallet.R.color.white
 import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import com.tari.android.wallet.databinding.FragmentEnterBackupPasswordBinding
+import com.tari.android.wallet.di.DiContainer.appComponent
 import com.tari.android.wallet.ui.activity.settings.BackupSettingsRouter
 import com.tari.android.wallet.ui.extension.*
 import javax.inject.Inject

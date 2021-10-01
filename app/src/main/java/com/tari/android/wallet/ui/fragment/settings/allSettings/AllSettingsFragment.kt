@@ -30,7 +30,7 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.tari.android.wallet.ui.fragment.settings
+package com.tari.android.wallet.ui.fragment.settings.allSettings
 
 import android.content.Context
 import android.content.Intent
@@ -49,6 +49,7 @@ import com.tari.android.wallet.R.color.*
 import com.tari.android.wallet.R.string.*
 import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import com.tari.android.wallet.databinding.FragmentAllSettingsBinding
+import com.tari.android.wallet.di.DiContainer.appComponent
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.infrastructure.BugReportingService
 import com.tari.android.wallet.infrastructure.backup.*
@@ -111,18 +112,19 @@ internal class AllSettingsFragment: Fragment() {
         bindCTAs()
     }
 
-    private fun bindCTAs() {
-        ui.reportBugCtaView.setOnClickListener { shareBugReport() }
-        ui.visitSiteCtaView.setOnClickListener { openLink(string(tari_url)) }
-        ui.contributeCtaView.setOnClickListener { openLink(string(github_repo_url)) }
-        ui.userAgreementCtaView.setOnClickListener { openLink(string(user_agreement_url)) }
-        ui.privacyPolicyCtaView.setOnClickListener { openLink(string(privacy_policy_url)) }
-        ui.disclaimerCtaView.setOnClickListener { openLink(string(disclaimer_url)) }
-        ui.backUpWalletCtaView.setOnClickListener {
-            requireAuthorization { navigateToBackupSettings() }
-        }
-        ui.backgroundServiceCtaView.setOnClickListener { navigateToBackgroundServiceSettings() }
-        ui.deleteWalletCtaView.setOnClickListener { navigateToDeleteWallet() }
+    private fun bindCTAs() = with(ui) {
+        reportBugCtaView.setOnThrottledClickListener { shareBugReport() }
+        visitSiteCtaView.setOnThrottledClickListener { openLink(string(tari_url)) }
+        contributeCtaView.setOnThrottledClickListener { openLink(string(github_repo_url)) }
+        userAgreementCtaView.setOnThrottledClickListener { openLink(string(user_agreement_url)) }
+        privacyPolicyCtaView.setOnThrottledClickListener { openLink(string(privacy_policy_url)) }
+        disclaimerCtaView.setOnThrottledClickListener { openLink(string(disclaimer_url)) }
+        backUpWalletCtaView.setOnThrottledClickListener { requireAuthorization { navigateToBackupSettings() } }
+        backgroundServiceCtaView.setOnThrottledClickListener { navigateToBackgroundServiceSettings() }
+        changeBaseNodeCtaView.setOnThrottledClickListener { navigateToBaseNodeSelection() }
+        changeNetworkCtaView.setOnThrottledClickListener { navigateToNetworkSelection() }
+        backgroundServiceCtaView.setOnThrottledClickListener { navigateToBackgroundServiceSettings() }
+        deleteWalletCtaView.setOnThrottledClickListener { navigateToDeleteWallet() }
     }
 
     override fun onDestroyView() {
@@ -261,21 +263,17 @@ internal class AllSettingsFragment: Fragment() {
         if (textColor != -1) ui.backupStatusTextView.setTextColor(color(textColor))
     }
 
-    private fun openLink(link: String) {
-        startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(link)))
-    }
+    private fun openLink(link: String) = startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(link)))
 
-    private fun navigateToBackupSettings() {
-        (requireActivity() as AllSettingsRouter).toBackupSettings()
-    }
+    private fun navigateToBackupSettings() = (requireActivity() as AllSettingsRouter).toBackupSettings()
 
-    private fun navigateToDeleteWallet() {
-        (requireActivity() as AllSettingsRouter).toDeleteWallet()
-    }
+    private fun navigateToDeleteWallet() = (requireActivity() as AllSettingsRouter).toDeleteWallet()
 
-    private fun navigateToBackgroundServiceSettings() {
-        (requireActivity() as AllSettingsRouter).toBackgroundService()
-    }
+    private fun navigateToBackgroundServiceSettings() = (requireActivity() as AllSettingsRouter).toBackgroundService()
+
+    private fun navigateToBaseNodeSelection() = (requireActivity() as AllSettingsRouter).toBaseNodeSelection()
+
+    private fun navigateToNetworkSelection() = (requireActivity() as AllSettingsRouter).toNetworkSelection()
 
     private fun shareBugReport() {
         val mContext = context ?: return
@@ -363,14 +361,6 @@ internal class AllSettingsFragment: Fragment() {
 
     }
 
-    interface AllSettingsRouter {
-        fun toBackupSettings()
-
-        fun toDeleteWallet()
-
-        fun toBackgroundService()
-    }
-
     companion object {
         @Suppress("DEPRECATION")
         fun newInstance() = AllSettingsFragment()
@@ -378,5 +368,5 @@ internal class AllSettingsFragment: Fragment() {
             DateTimeFormat.forPattern("MMM dd yyyy").withLocale(Locale.ENGLISH)
         private val BACKUP_TIME_FORMATTER = DateTimeFormat.forPattern("hh:mm a")
     }
-
 }
+

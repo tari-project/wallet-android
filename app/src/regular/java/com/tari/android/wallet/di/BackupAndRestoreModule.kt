@@ -33,13 +33,13 @@
 package com.tari.android.wallet.di
 
 import android.content.Context
+import com.tari.android.wallet.data.WalletConfig
+import com.tari.android.wallet.data.network.NetworkRepository
 import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import com.tari.android.wallet.infrastructure.backup.*
-import com.tari.android.wallet.infrastructure.backup.GoogleDriveBackupStorage
 import com.tari.android.wallet.notification.NotificationHelper
 import dagger.Module
 import dagger.Provides
-import javax.inject.Named
 import javax.inject.Singleton
 
 @Module
@@ -49,27 +49,24 @@ internal class BackupAndRestoreModule {
     @Singleton
     fun provideBackupFileProcessor(
         sharedPrefs: SharedPrefsRepository,
-        @Named(WalletModule.FieldName.walletFilesDirPath) walletFilesDirPath: String,
-        @Named(WalletModule.FieldName.walletDatabaseFilePath) walletDatabaseFilePath: String,
-        @Named(WalletModule.FieldName.walletTempDirPath) walletTempDirPath: String
-    ): BackupFileProcessor = BackupFileProcessor(
-        sharedPrefs,
-        walletFilesDirPath,
-        walletDatabaseFilePath,
-        walletTempDirPath
-    )
+        walletConfig: WalletConfig,
+        namingPolicy: BackupNamingPolicy
+    ): BackupFileProcessor =
+        BackupFileProcessor(sharedPrefs, walletConfig, namingPolicy)
 
     @Provides
     @Singleton
     fun provideBackupStorage(
         context: Context,
         sharedPrefs: SharedPrefsRepository,
-        @Named(WalletModule.FieldName.walletTempDirPath) walletTempDirPath: String,
-        backupFileProcessor: BackupFileProcessor
+        walletConfig: WalletConfig,
+        backupFileProcessor: BackupFileProcessor,
+        namingPolicy: BackupNamingPolicy,
     ): BackupStorage = GoogleDriveBackupStorage(
         context,
+        namingPolicy,
         sharedPrefs,
-        walletTempDirPath,
+        walletConfig.getWalletTempDirPath(),
         backupFileProcessor
     )
 
@@ -82,4 +79,6 @@ internal class BackupAndRestoreModule {
         notificationHelper: NotificationHelper
     ): BackupManager = BackupManager(context, sharedPrefs, backupStorage, notificationHelper)
 
+    @Provides
+    fun provideBackupNamingPolicy(networkRepository: NetworkRepository): BackupNamingPolicy = BackupNamingPolicy(networkRepository)
 }

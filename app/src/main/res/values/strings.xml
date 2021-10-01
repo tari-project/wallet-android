@@ -115,6 +115,7 @@
     <string name="introduction_crypto_wallet_title_text_line_1">Private by default.</string>
     <string name="introduction_crypto_wallet_title_text_line_2">Useful by design.</string>
     <string name="introduction_create_wallet">Create Your Wallet</string>
+    <string name="introduction_selected_wallet">Selected Network: %s</string>
 
     <!-- onboarding - create wallet -->
     <!-- screen #1 -->
@@ -349,6 +350,10 @@
     <string name="all_settings_privacy_policy">Privacy Policy</string>
     <string name="all_settings_disclaimer">Disclaimer</string>
     <string name="all_settings_background_service">Background Service</string>
+    <string name="all_settings_select_base_node">Select Base Node</string>
+    <string name="all_settings_select_network">Select Network</string>
+    <string name="all_settings_select_network_confirm_title">One thing before you go</string>
+    <string name="all_settings_select_network_confirm_description">You will be logged out and switched to a different network. Do you want to continue?</string>
 
     <!-- Background service -->
     <string name="background_service_title">Background service</string>

@@ -32,17 +32,19 @@
  */
 package com.tari.android.wallet.infrastructure.backup
 
+import com.tari.android.wallet.data.network.NetworkRepository
 import org.joda.time.DateTime
 import org.joda.time.format.DateTimeFormat
 import org.joda.time.format.DateTimeFormatter
+import javax.inject.Inject
 
-internal object BackupNamingPolicy {
+class BackupNamingPolicy @Inject constructor(val networkRepository: NetworkRepository) {
 
-    private const val backupFileNamePrefix = "Tari-Aurora-Backup-"
+    private val backupFileNamePrefix = "Tari-Aurora-Backup-${networkRepository.currentNetwork!!.network.displayName}-"
 
-    // Tari-Aurora-Backup_yyyy-MM-dd_HH-mm-ss.*
+    // Tari-Aurora-Backup-network-yyyy-MM-dd_HH-mm-ss.*
     private val regex =
-        Regex("Tari-Aurora-Backup-(\\d{4}-(((0)[1-9])|((1)[0-2]))-((0)[1-9]|[1-2][0-9]|(3)[0-1])_([0-1][0-9]|(2)[0-3])-([0-5][0-9])-([0-5][0-9]))\\..+")
+        Regex("$backupFileNamePrefix(\\d{4}-(((0)[1-9])|((1)[0-2]))-((0)[1-9]|[1-2][0-9]|(3)[0-1])_([0-1][0-9]|(2)[0-3])-([0-5][0-9])-([0-5][0-9]))\\..+")
     private val dateFormatter: DateTimeFormatter = DateTimeFormat.forPattern("yyyy-MM-dd_HH-mm-ss")
 
     fun getBackupFileName(backupDate: DateTime = DateTime.now()): String {

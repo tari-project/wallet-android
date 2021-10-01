@@ -2,7 +2,9 @@ package com.tari.android.wallet.application.baseNodes
 
 import android.content.Context
 import com.tari.android.wallet.R
+import com.tari.android.wallet.application.Network
 import com.tari.android.wallet.application.WalletState
+import com.tari.android.wallet.data.network.NetworkRepository
 import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodeDto
 import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodeSharedRepository
 import com.tari.android.wallet.event.EventBus
@@ -17,7 +19,8 @@ import org.apache.commons.io.IOUtils
 
 class BaseNodes(
     private val context: Context,
-    private val baseNodeSharedRepository: BaseNodeSharedRepository
+    private val baseNodeSharedRepository: BaseNodeSharedRepository,
+    private val networkRepository: NetworkRepository,
 ) {
     private val compositeDisposable = CompositeDisposable()
 
@@ -45,23 +48,13 @@ class BaseNodes(
      */
     val baseNodeList by lazy {
         val fileContent = IOUtils.toString(
-            context.resources.openRawResource(R.raw.base_nodes),
+            context.resources.openRawResource(getBaseNodeResource(networkRepository.currentNetwork!!.network)),
             "UTF-8"
         )
-        val baseNodes = mutableListOf<BaseNodeDto>()
-        val regex = Regex("(.+::[A-Za-z0-9]{64}::/onion3/[A-Za-z0-9]+:[\\d]+)")
-        regex.findAll(fileContent).forEach { matchResult ->
+        Regex("(.+::[A-Za-z0-9]{64}::/onion3/[A-Za-z0-9]+:[\\d]+)").findAll(fileContent).map { matchResult ->
             val tripleString = matchResult.value.split("::")
-            baseNodes.add(
-                BaseNodeDto(
-                    tripleString[0],
-                    tripleString[1],
-                    tripleString[2]
-                )
-            )
+            BaseNodeDto(tripleString[0], tripleString[1], tripleString[2])
         }
-        baseNodes.shuffle()
-        baseNodes
     }
 
     /**
@@ -92,5 +85,10 @@ class BaseNodes(
         FFIWallet.instance?.addBaseNodePeer(baseNodeKeyFFI, baseNode.address)
         baseNodeKeyFFI.destroy()
         walletService.executeWithError { error, wallet -> wallet.startBaseNodeSync(error) }
+    }
+
+    private fun getBaseNodeResource(network: Network): Int = when(network) {
+        Network.IGOR -> R.raw.igor_base_nodes
+        else -> R.raw.weatherwax_base_nodes
     }
 }

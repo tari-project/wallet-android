@@ -4,14 +4,15 @@ import android.content.Context
 import android.content.Intent
 import androidx.core.content.ContextCompat
 import com.tari.android.wallet.application.TariWalletApplication
+import com.tari.android.wallet.data.WalletConfig
 import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import com.tari.android.wallet.util.WalletUtil
 
-class WalletServiceLauncher(private val context: Context) {
+class WalletServiceLauncher(private val context: Context, val walletConfig: WalletConfig ) {
 
     private lateinit var sharedPrefsRepository: SharedPrefsRepository
 
-    constructor(sharedPrefsRepository: SharedPrefsRepository, context: Context) : this(context) {
+    constructor(sharedPrefsRepository: SharedPrefsRepository, walletConfig: WalletConfig, context: Context) : this(context, walletConfig) {
         this.sharedPrefsRepository = sharedPrefsRepository
     }
 
@@ -23,7 +24,7 @@ class WalletServiceLauncher(private val context: Context) {
     }
 
     fun startIfExist() {
-        if (WalletUtil.walletExists(context.applicationContext)) {
+        if (WalletUtil.walletExists(walletConfig)) {
             startService()
         }
     }

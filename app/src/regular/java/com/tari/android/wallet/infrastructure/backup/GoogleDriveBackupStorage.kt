@@ -64,6 +64,7 @@ import kotlin.coroutines.suspendCoroutine
 
 internal class GoogleDriveBackupStorage(
     private val context: Context,
+    private val namingPolicy: BackupNamingPolicy,
     private val sharedPrefs: SharedPrefsRepository,
     private val walletTempDirPath: String,
     private val backupFileProcessor: BackupFileProcessor
@@ -190,7 +191,7 @@ internal class GoogleDriveBackupStorage(
     override suspend fun hasBackupForDate(date: DateTime): Boolean {
         try {
             val latestBackupFileName = getLastBackupFileIdAndName()?.second ?: return false
-            return latestBackupFileName.contains(BackupNamingPolicy.getBackupFileName(date))
+            return latestBackupFileName.contains(namingPolicy.getBackupFileName(date))
         } catch (exception: UserRecoverableAuthIOException) {
             throw BackupStorageAuthRevokedException()
         } catch (exception: Exception) {
@@ -221,7 +222,7 @@ internal class GoogleDriveBackupStorage(
             backupFileProcessor.restoreBackupFile(tempFile, password)
             backupFileProcessor.clearTempFolder()
             // restore successful, turn on automated backup
-            sharedPrefs.lastSuccessfulBackupDate = BackupNamingPolicy.getDateFromBackupFileName(tempFile.name)
+            sharedPrefs.lastSuccessfulBackupDate = namingPolicy.getDateFromBackupFileName(tempFile.name)
             sharedPrefs.backupPassword = password
         }
     }
@@ -232,7 +233,7 @@ internal class GoogleDriveBackupStorage(
         do {
             val result: FileList = searchForBackups(pageToken)
             result.files.forEach {
-                BackupNamingPolicy.getDateFromBackupFileName(it.name)
+                namingPolicy.getDateFromBackupFileName(it.name)
                     ?.let { time -> backups.add(time to it) }
             }
             pageToken = result.nextPageToken
@@ -264,12 +265,12 @@ internal class GoogleDriveBackupStorage(
             val result: FileList = searchForBackups(pageToken)
             result.files.forEach { file ->
                 val excludeName: String? = if (excludeBackupWithDate != null) {
-                    BackupNamingPolicy.getBackupFileName(excludeBackupWithDate)
+                    namingPolicy.getBackupFileName(excludeBackupWithDate)
                 } else {
                     null
                 }
                 if (excludeName == null || !file.name.contains(excludeName)) {
-                    BackupNamingPolicy.getDateFromBackupFileName(file.name)?.let {
+                    namingPolicy.getDateFromBackupFileName(file.name)?.let {
                         driveFiles.delete(file.id).execute()
                     }
                 }

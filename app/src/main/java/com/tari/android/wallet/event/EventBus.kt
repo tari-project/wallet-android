@@ -70,7 +70,17 @@ internal object EventBus : GeneralEventBus() {
         networkConnectionState.unsubscribe(subscriber)
         backupState.unsubscribe(subscriber)
         baseNodeState.unsubscribe(subscriber)
-        baseNodeState.unsubscribe(subscriber)
+        walletRestorationState.unsubscribe(subscriber)
+    }
+
+    override fun clear() {
+        super.clear()
+        torProxyState.clear()
+        walletState.clear()
+        networkConnectionState.clear()
+        backupState.clear()
+        baseNodeState.clear()
+        walletRestorationState.clear()
     }
 }
 

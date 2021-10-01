@@ -35,6 +35,8 @@ package com.tari.android.wallet.di
 import android.content.Context
 import com.tari.android.wallet.application.WalletManager
 import com.tari.android.wallet.application.baseNodes.BaseNodes
+import com.tari.android.wallet.data.WalletConfig
+import com.tari.android.wallet.data.network.NetworkRepository
 import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodeSharedRepository
 import com.tari.android.wallet.infrastructure.BugReportingService
@@ -42,133 +44,50 @@ import com.tari.android.wallet.network.NetworkConnectionStateReceiver
 import com.tari.android.wallet.service.seedPhrase.SeedPhraseRepository
 import com.tari.android.wallet.tor.TorConfig
 import com.tari.android.wallet.tor.TorProxyManager
-import com.tari.android.wallet.util.Constants
 import dagger.Module
 import dagger.Provides
-import java.io.File
-import javax.inject.Named
 import javax.inject.Singleton
 
-/**
- * Dagger module to inject wallet-related dependencies.
- *
- * @author The Tari Development Team
- */
+
 @Module
 internal class WalletModule {
 
-    object FieldName {
-        const val walletFilesDirPath = "wallet_files_dir_path"
-        const val walletLogFilesDirPath = "wallet_log_file_dir_path"
-        const val walletLogFilePath = "wallet_log_file_path"
-        const val walletDatabaseFilePath = "wallet_database_file_path"
-        const val walletTempDirPath = "wallet_temp_dir_path"
-    }
-
-    private val logFilePrefix = "tari_aurora"
-    private val logFileExtension = "log"
-    private val logFilesDirName = "tari_logs"
-
-    /**
-     * The directory in which the wallet files reside.
-     */
     @Provides
-    @Named(FieldName.walletFilesDirPath)
     @Singleton
-    fun provideWalletFilesDirPath(context: Context): String = context.filesDir.absolutePath
-
-    /**
-     * The directory in which the wallet log files reside.
-     */
-    @Provides
-    @Named(FieldName.walletLogFilesDirPath)
-    @Singleton
-    fun provideLogFilesDirPath(
-        @Named(FieldName.walletFilesDirPath) walletFilesDirPath: String
-    ): String {
-        val logFilesDir = File(walletFilesDirPath, logFilesDirName)
-        if (!logFilesDir.exists()) {
-            logFilesDir.mkdir()
-        } else { // delete older log files
-            val files = logFilesDir.listFiles()?.filter { !it.name.contains(logFilePrefix) }
-            files?.forEach { it.delete() }
-        }
-        return logFilesDir.absolutePath
-    }
-
-    /**
-     * FFI log file path.
-     */
-    @Provides
-    @Named(FieldName.walletLogFilePath)
-    @Singleton
-    fun provideWalletLogFilePath(@Named(FieldName.walletLogFilesDirPath) logFilesDirPath: String): String {
-        val logFileName = "$logFilePrefix.$logFileExtension"
-        val logFile = File(logFilesDirPath, logFileName)
-        if (!logFile.exists()) {
-            logFile.createNewFile()
-        }
-        return logFile.absolutePath
-    }
-
-    @Provides
-    @Named(FieldName.walletDatabaseFilePath)
-    @Singleton
-    fun provideWalletDatabaseFilePath(
-        @Named(FieldName.walletFilesDirPath) walletFilesDirPath: String
-    ): String {
-        return File(walletFilesDirPath, Constants.Wallet.walletDBFullFileName).absolutePath
-    }
-
-    @Provides
-    @Named(FieldName.walletTempDirPath)
-    @Singleton
-    fun provideWalletTempDirPath(
-        @Named(FieldName.walletFilesDirPath) walletFilesDirPath: String
-    ): String {
-        val tempDir = File(walletFilesDirPath, "temp")
-        if (!tempDir.exists()) tempDir.mkdir()
-        return tempDir.absolutePath
-    }
+    fun provideWalletConfig(context: Context, networkRepository: NetworkRepository) = WalletConfig(context, networkRepository)
 
     @Provides
     @Singleton
     fun provideWalletManager(
         context: Context,
-        @Named(FieldName.walletFilesDirPath) walletFilesDirPath: String,
-        @Named(FieldName.walletLogFilePath) walletLogFilePath: String,
+        walletConfig: WalletConfig,
         torConfig: TorConfig,
         torProxyManager: TorProxyManager,
         sharedPrefsWrapper: SharedPrefsRepository,
         baseNodeSharedRepository: BaseNodeSharedRepository,
         seedPhraseRepository: SeedPhraseRepository,
+        networkRepository: NetworkRepository,
         baseNodes: BaseNodes
     ): WalletManager = WalletManager(
         context,
-        walletFilesDirPath,
-        walletLogFilePath,
+        walletConfig,
         torProxyManager,
         sharedPrefsWrapper,
         baseNodeSharedRepository,
         seedPhraseRepository,
+        networkRepository,
         baseNodes,
         torConfig
     )
 
     @Provides
     @Singleton
-    fun provideNetworkConnectionStatusReceiver(): NetworkConnectionStateReceiver {
-        return NetworkConnectionStateReceiver()
-    }
+    fun provideNetworkConnectionStatusReceiver(): NetworkConnectionStateReceiver = NetworkConnectionStateReceiver()
 
     @Provides
     @Singleton
-    fun provideBugReportingService(
-        sharedPrefsWrapper: SharedPrefsRepository,
-        @Named(FieldName.walletLogFilesDirPath) logFilesDirPath: String
-    ): BugReportingService {
-        return BugReportingService(sharedPrefsWrapper, logFilesDirPath)
-    }
+    fun provideBugReportingService(sharedPrefsWrapper: SharedPrefsRepository, walletConfig: WalletConfig): BugReportingService =
+        BugReportingService(sharedPrefsWrapper, walletConfig.getWalletLogFilePath())
 
     @Provides
     @Singleton
@@ -176,5 +95,6 @@ internal class WalletModule {
 
     @Provides
     @Singleton
-    fun provideBaseNodes(context: Context, baseNodeSharedRepository: BaseNodeSharedRepository) = BaseNodes(context, baseNodeSharedRepository)
+    fun provideBaseNodes(context: Context, baseNodeSharedRepository: BaseNodeSharedRepository, networkRepository: NetworkRepository) =
+        BaseNodes(context, baseNodeSharedRepository, networkRepository)
 }

@@ -53,6 +53,7 @@ import com.tari.android.wallet.R.color.black
 import com.tari.android.wallet.R.dimen.*
 import com.tari.android.wallet.application.DeepLink
 import com.tari.android.wallet.databinding.FragmentAddAmountBinding
+import com.tari.android.wallet.di.DiContainer.appComponent
 import com.tari.android.wallet.infrastructure.Tracker
 import com.tari.android.wallet.model.*
 import com.tari.android.wallet.service.TariWalletService

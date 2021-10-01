@@ -3,7 +3,6 @@ package com.tari.android.wallet.ui.component.networkStateIndicator
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
-import com.orhanobut.logger.Logger
 import com.tari.android.wallet.R
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.model.BaseNodeValidationResult
@@ -22,7 +21,7 @@ internal class ConnectionIndicatorViewModel : CommonViewModel() {
     val state = Transformations.map(_state) { it }
 
     init {
-        component?.inject(this)
+        component.inject(this)
 
         _state.addSource(_torProxyState) { updateConnectionState() }
         _state.addSource(_networkState) { updateConnectionState() }

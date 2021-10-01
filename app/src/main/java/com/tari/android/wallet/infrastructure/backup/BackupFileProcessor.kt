@@ -33,6 +33,7 @@
 package com.tari.android.wallet.infrastructure.backup
 
 import com.orhanobut.logger.Logger
+import com.tari.android.wallet.data.WalletConfig
 import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import com.tari.android.wallet.extension.compress
 import com.tari.android.wallet.extension.encrypt
@@ -49,9 +50,8 @@ import java.io.File
  */
 internal class BackupFileProcessor(
     private val sharedPrefs: SharedPrefsRepository,
-    private val walletFilesDirPath: String,
-    private val walletDatabaseFilePath: String,
-    private val walletTempDirPath: String
+    private val walletConfig: WalletConfig,
+    private val namingPolicy: BackupNamingPolicy,
 ) {
 
     fun generateBackupFile(newPassword: CharArray? = null): Triple<File, DateTime, String> {
@@ -59,15 +59,15 @@ internal class BackupFileProcessor(
         FFIWallet.instance?.removeEncryption()
 
         // create partial backup in temp folder if password not set
-        val databaseFile = File(walletDatabaseFilePath)
+        val databaseFile = File(walletConfig.walletDatabaseFilePath)
         val backupPassword = newPassword ?: sharedPrefs.backupPassword?.toCharArray()
         val backupDate = DateTime.now()
         // zip the file
         val compressionMethod = CompressionMethod.zip()
         var mimeType = compressionMethod.mimeType
-        val backupFileName = BackupNamingPolicy.getBackupFileName(backupDate)
+        val backupFileName = namingPolicy.getBackupFileName(backupDate)
         val compressedFile = File(
-            walletTempDirPath,
+            walletConfig.getWalletTempDirPath(),
             "$backupFileName.${compressionMethod.extension}"
         )
         var fileToBackup = listOf(databaseFile).compress(
@@ -81,7 +81,7 @@ internal class BackupFileProcessor(
             fileToBackup = fileToBackup.encrypt(
                 encryptionAlgorithm,
                 backupPassword,
-                File(walletTempDirPath, targetFileName).absolutePath
+                File(walletConfig.getWalletTempDirPath(), targetFileName).absolutePath
             )
             mimeType = encryptionAlgorithm.mimeType
         }
@@ -92,12 +92,12 @@ internal class BackupFileProcessor(
     }
 
     fun restoreBackupFile(file: File, password: String? = null) {
-        val walletFilesDir = File(walletFilesDirPath)
+        val walletFilesDir = File(walletConfig.getWalletFilesDirPath())
         val compressionMethod = CompressionMethod.zip()
         // encrypt file if password is supplied
         if (!password.isNullOrEmpty()) {
             val unencryptedCompressedFile = File(
-                walletTempDirPath,
+                walletConfig.getWalletTempDirPath(),
                 "temp_" + System.currentTimeMillis() + "." + compressionMethod.extension
             )
             unencryptedCompressedFile.createNewFile()
@@ -110,7 +110,7 @@ internal class BackupFileProcessor(
                 unencryptedCompressedFile,
                 walletFilesDir
             )
-            if (!File(walletDatabaseFilePath).exists()) {
+            if (!File(walletConfig.walletDatabaseFilePath).exists()) {
                 // delete uncompressed files
                 walletFilesDir.deleteRecursively()
                 throw BackupStorageTamperedException("Invalid encrypted backup.")
@@ -121,7 +121,7 @@ internal class BackupFileProcessor(
                 walletFilesDir
             )
             // check if wallet database file exists
-            if (!File(walletDatabaseFilePath).exists()) {
+            if (!File(walletConfig.walletDatabaseFilePath).exists()) {
                 walletFilesDir.listFiles()?.let { files ->
                     // delete uncompressed files
                     for (extractedFile in files) {
@@ -139,7 +139,7 @@ internal class BackupFileProcessor(
 
     fun clearTempFolder() {
         try {
-            File(walletTempDirPath).listFiles()?.forEach { it.delete() }
+            File(walletConfig.getWalletTempDirPath()).listFiles()?.forEach { it.delete() }
         } catch (e: Exception) {
             Logger.e(
                 e,

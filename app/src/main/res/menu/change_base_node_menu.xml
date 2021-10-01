@@ -1,0 +1,10 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/add_base_node_action"
+        android:icon="@drawable/ic_plus"
+        app:showAsAction="ifRoom"
+        android:title="@string/debug_add_base_node" />
+
+</menu>

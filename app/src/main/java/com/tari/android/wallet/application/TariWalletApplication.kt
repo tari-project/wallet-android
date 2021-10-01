@@ -41,10 +41,7 @@ import androidx.lifecycle.ProcessLifecycleOwner
 import com.orhanobut.logger.AndroidLogAdapter
 import com.orhanobut.logger.Logger
 import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
-import com.tari.android.wallet.di.ApplicationComponent
-import com.tari.android.wallet.di.ApplicationModule
-import com.tari.android.wallet.di.DaggerApplicationComponent
-import com.tari.android.wallet.di.WalletModule
+import com.tari.android.wallet.di.DiContainer
 import com.tari.android.wallet.event.Event
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.infrastructure.Tracker
@@ -54,7 +51,6 @@ import com.tari.android.wallet.service.WalletServiceLauncher
 import net.danlew.android.joda.JodaTimeAndroid
 import java.lang.ref.WeakReference
 import javax.inject.Inject
-import javax.inject.Named
 
 /**
  * Main application class.
@@ -62,10 +58,6 @@ import javax.inject.Named
  * @author The Tari Development Team
  */
 internal class TariWalletApplication : Application(), LifecycleObserver {
-
-    @Inject
-    @Named(WalletModule.FieldName.walletFilesDirPath)
-    lateinit var walletFilesDirPath: String
 
     @Inject
     lateinit var notificationHelper: NotificationHelper
@@ -82,7 +74,6 @@ internal class TariWalletApplication : Application(), LifecycleObserver {
     @Inject
     lateinit var walletServiceLauncher: WalletServiceLauncher
 
-    lateinit var appComponent: ApplicationComponent
     private val activityLifecycleCallbacks = ActivityLifecycleCallbacks()
     var isInForeground = false
         private set
@@ -102,12 +93,16 @@ internal class TariWalletApplication : Application(), LifecycleObserver {
         Logger.addLogAdapter(AndroidLogAdapter())
         JodaTimeAndroid.init(this)
 
-        appComponent = initDagger(this)
-        appComponent.inject(this)
-
-        notificationHelper.createNotificationChannels()
+        DiContainer.initContainer(this)
+        initApplication()
 
         ProcessLifecycleOwner.get().lifecycle.addObserver(this)
+    }
+
+    fun initApplication() {
+        DiContainer.appComponent.inject(this)
+
+        notificationHelper.createNotificationChannels()
 
         // user should authenticate every time the app starts up
         sharedPrefsRepository.isAuthenticated = false
@@ -117,11 +112,6 @@ internal class TariWalletApplication : Application(), LifecycleObserver {
         // track app download
         tracker.download(this)
     }
-
-    private fun initDagger(app: TariWalletApplication): ApplicationComponent =
-        DaggerApplicationComponent.builder()
-            .applicationModule(ApplicationModule(app))
-            .build()
 
     @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)
     fun onAppDestroyed() {

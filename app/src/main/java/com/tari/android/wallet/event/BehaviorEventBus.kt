@@ -4,8 +4,11 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.subjects.BehaviorSubject
 
 open class BehaviorEventBus<Consumer: Any> {
-    val disposables = mutableMapOf<Any, CompositeDisposable>()
-    val publishSubject = BehaviorSubject.create<Consumer>()
+    var disposables = mutableMapOf<Any, CompositeDisposable>()
+        private set
+
+    var publishSubject = BehaviorSubject.create<Consumer>()
+        private set
 
     fun subscribe(subscriber: Any, consumer: (Consumer) -> Unit) {
         val observer = publishSubject.subscribe(consumer)
@@ -22,6 +25,13 @@ open class BehaviorEventBus<Consumer: Any> {
     fun unsubscribe(subscriber: Any) = disposables.apply {
         get(subscriber)?.clear()
         remove(subscriber)
+    }
+
+    fun clear() {
+        for (disposable in disposables) disposable.value.dispose()
+        disposables.clear()
+        publishSubject = BehaviorSubject.create()
+        disposables = mutableMapOf()
     }
 
     fun post(event: Consumer) = publishSubject.onNext(event)

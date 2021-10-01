@@ -33,16 +33,16 @@
 package com.tari.android.wallet.ui.fragment.debug.baseNodeConfig.changeBaseNode
 
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.tari.android.wallet.R
 import com.tari.android.wallet.databinding.FragmentBaseNodeChangeBinding
 import com.tari.android.wallet.extension.observe
 import com.tari.android.wallet.ui.common.CommonFragment
 import com.tari.android.wallet.ui.common.recyclerView.CommonAdapter
 import com.tari.android.wallet.ui.extension.setOnThrottledClickListener
+import com.tari.android.wallet.ui.fragment.debug.baseNodeConfig.BaseNodeConfigRouter
 import com.tari.android.wallet.ui.fragment.debug.baseNodeConfig.changeBaseNode.adapter.BaseNodeViewHolderItem
 import com.tari.android.wallet.ui.fragment.debug.baseNodeConfig.changeBaseNode.adapter.ChangeBaseNodeAdapter
 
@@ -59,13 +59,27 @@ internal class ChangeBaseNodeFragment : CommonFragment<FragmentBaseNodeChangeBin
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val viewModel: ChangeBaseNodeViewModel by viewModels()
+        setHasOptionsMenu(true)
+        ui.rootView
         bindViewModel(viewModel)
         setupUI()
         observeUI()
     }
 
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.change_base_node_menu, menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when(item.itemId) {
+            R.id.add_base_node_action -> (requireActivity() as BaseNodeConfigRouter).toAddCustomBaseNode()
+        }
+        return super.onOptionsItemSelected(item)
+    }
+
     private fun setupUI() = with(ui) {
         backCtaView.setOnThrottledClickListener { requireActivity().onBackPressed() }
+        addBaseNodeButton.setOnThrottledClickListener {  (requireActivity() as BaseNodeConfigRouter).toAddCustomBaseNode() }
         baseNodesList.adapter = adapter
         baseNodesList.layoutManager = LinearLayoutManager(requireContext())
         adapter.setClickListener(CommonAdapter.ItemClickListener { viewModel.selectBaseNode((it as BaseNodeViewHolderItem).baseNodeDto) })

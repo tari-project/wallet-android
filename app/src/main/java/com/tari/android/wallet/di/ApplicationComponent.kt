@@ -69,13 +69,14 @@ import com.tari.android.wallet.ui.fragment.send.AddAmountFragment
 import com.tari.android.wallet.ui.fragment.send.AddRecipientFragment
 import com.tari.android.wallet.ui.fragment.send.FinalizeSendTxFragment
 import com.tari.android.wallet.ui.fragment.send.addNote.AddNoteFragment
-import com.tari.android.wallet.ui.fragment.settings.AllSettingsFragment
+import com.tari.android.wallet.ui.fragment.settings.allSettings.AllSettingsFragment
 import com.tari.android.wallet.ui.fragment.settings.backgroundService.BackgroundServiceSettingsViewModel
 import com.tari.android.wallet.ui.fragment.settings.backup.ChangeSecurePasswordFragment
 import com.tari.android.wallet.ui.fragment.settings.backup.EnterCurrentPasswordFragment
 import com.tari.android.wallet.ui.fragment.settings.backup.backupSettings.BackupSettingsFragment
 import com.tari.android.wallet.ui.fragment.settings.backup.backupSettings.BackupSettingsViewModel
 import com.tari.android.wallet.ui.fragment.settings.backup.verifySeedPhrase.VerifySeedPhraseViewModel
+import com.tari.android.wallet.ui.fragment.settings.networkSelection.NetworkSelectionViewModel
 import com.tari.android.wallet.ui.fragment.settings.userAutorization.BiometricAuthenticationViewModel
 import com.tari.android.wallet.ui.fragment.tx.TxListFragment
 import com.tari.android.wallet.ui.fragment.tx.TxListViewModel
@@ -178,6 +179,7 @@ internal interface ApplicationComponent {
     fun inject(baseNodeConfigViewModel: BaseNodeConfigViewModel)
     fun inject(changeBaseNodeViewModel: ChangeBaseNodeViewModel)
     fun inject(addCustomBaseNodeViewModel: AddCustomBaseNodeViewModel)
+    fun inject(networkSelectionViewModel: NetworkSelectionViewModel)
     /**
      * Service(s).
      */

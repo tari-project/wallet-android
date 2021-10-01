@@ -44,11 +44,13 @@ import com.google.zxing.BarcodeFormat
 import com.google.zxing.EncodeHintType
 import com.journeyapps.barcodescanner.BarcodeEncoder
 import com.tari.android.wallet.R
+import com.tari.android.wallet.data.network.NetworkRepository
+import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import com.tari.android.wallet.databinding.FragmentWalletInfoBinding
+import com.tari.android.wallet.di.DiContainer.appComponent
 import com.tari.android.wallet.ui.component.EmojiIdSummaryViewController
 import com.tari.android.wallet.ui.component.FullEmojiIdViewController
 import com.tari.android.wallet.ui.extension.*
-import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import com.tari.android.wallet.util.WalletUtil
 import java.util.*
 import javax.inject.Inject
@@ -60,6 +62,9 @@ class WalletInfoFragment : Fragment() {
 
     @Inject
     lateinit var clipboardManager: ClipboardManager
+
+    @Inject
+    lateinit var networkRepository: NetworkRepository
 
     private lateinit var ui: FragmentWalletInfoBinding
 
@@ -115,7 +120,7 @@ class WalletInfoFragment : Fragment() {
     }
 
     private fun displayQRCode(emojiId: String) {
-        val content = WalletUtil.getEmojiIdDeepLink(emojiId)
+        val content = WalletUtil.getEmojiIdDeepLink(emojiId, networkRepository.currentNetwork!!.network)
         getQREncodedBitmap(content, dimenPx(R.dimen.wallet_info_img_qr_code_size))?.let {
             ui.qrImageView.setImageBitmap(it)
         }

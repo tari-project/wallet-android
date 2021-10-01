@@ -32,8 +32,9 @@
  */
 package com.tari.android.wallet.util
 
-import android.content.Context
 import com.tari.android.wallet.application.DeepLink
+import com.tari.android.wallet.application.Network
+import com.tari.android.wallet.data.WalletConfig
 import java.io.File
 import java.math.RoundingMode
 import java.text.DecimalFormat
@@ -73,12 +74,12 @@ internal object WalletUtil {
         return false
     }
 
-    fun getEmojiIdDeepLink(emojiId: String): String {
-        return "${Constants.Wallet.deepLinkURLPrefix}${Constants.Wallet.network.uriComponent}/${DeepLink.Type.EMOJI_ID.uriComponent}/$emojiId"
+    fun getEmojiIdDeepLink(emojiId: String, network: Network): String {
+        return "${Constants.Wallet.deepLinkURLPrefix}${network.uriComponent}/${DeepLink.Type.EMOJI_ID.uriComponent}/$emojiId"
     }
 
-    fun getPublicKeyHexDeepLink(publicKeyHex: String): String {
-        return "${Constants.Wallet.deepLinkURLPrefix}${Constants.Wallet.network.uriComponent}/${DeepLink.Type.PUBLIC_KEY_HEX.uriComponent}/$publicKeyHex"
+    fun getPublicKeyHexDeepLink(publicKeyHex: String, network: Network): String {
+        return "${Constants.Wallet.deepLinkURLPrefix}${network.uriComponent}/${DeepLink.Type.PUBLIC_KEY_HEX.uriComponent}/$publicKeyHex"
     }
 
     fun getLogFilesFromDirectory(dirPath: String): List<File> {
@@ -96,10 +97,5 @@ internal object WalletUtil {
         return filteredFiles
     }
 
-    fun walletExists(applicationContext: Context): Boolean {
-        return File(
-            applicationContext.filesDir,
-            Constants.Wallet.walletDBName + ".sqlite3"
-        ).exists()
-    }
+    fun walletExists(walletConfig: WalletConfig): Boolean = File(walletConfig.getWalletFilesDirPath(), walletConfig.walletDBFullFileName).exists()
 }
