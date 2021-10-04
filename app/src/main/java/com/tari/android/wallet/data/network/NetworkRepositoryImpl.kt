@@ -12,7 +12,7 @@ class NetworkRepositoryImpl(private val sharedPrefs: SharedPreferences) : Networ
     private val mainNetThicker = "XTR"
     private val testNetThicker = "tXTR"
 
-    override var lastNetwork: Network = Network.WEATHERWAX
+    override var supportedNetworks: List<Network> = listOf(Network.WEATHERWAX, Network.IGOR)
 
     override var currentNetwork by SharedPrefGsonDelegate(sharedPrefs, networkPropertyName, TariNetwork::class.java)
 

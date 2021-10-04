@@ -19,6 +19,7 @@
         android:imeOptions="actionNext"
         android:lines="1"
         android:minWidth="15dp"
+        android:inputType="textVisiblePassword"
         android:singleLine="true"
         android:textSize="14sp"
         app:customFont="@string/font_heavy"
