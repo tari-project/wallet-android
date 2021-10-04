@@ -40,8 +40,10 @@ import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodeSharedRepositor
 import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefGsonDelegate
 import com.tari.android.wallet.model.BaseNodeValidationResult
 
-class BaseNodeSharedRepository(sharedPrefs: SharedPreferences,
-val networkRepository: NetworkRepository) {
+class BaseNodeSharedRepository(
+    sharedPrefs: SharedPreferences,
+    val networkRepository: NetworkRepository
+) {
 
     private object Key {
         const val currentBaseNodeField = "tari_wallet_current_base_node"
@@ -79,5 +81,5 @@ val networkRepository: NetworkRepository) {
         userBaseNodes = null
     }
 
-    private fun formatKey(key: String) : String = key + "_" + networkRepository.currentNetwork!!.network.displayName
+    private fun formatKey(key: String): String = key + "_" + networkRepository.currentNetwork!!.network.displayName
 }
