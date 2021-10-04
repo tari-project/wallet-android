@@ -42,6 +42,7 @@ import androidx.test.core.app.ApplicationProvider.getApplicationContext
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.orhanobut.logger.Logger
 import com.tari.android.wallet.application.Network
+import com.tari.android.wallet.data.network.NetworkRepository
 import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodeSharedRepository
 import com.tari.android.wallet.di.ApplicationModule
@@ -69,8 +70,9 @@ class FFIWalletTests {
     private lateinit var listener: TestListener
     private val context = getApplicationContext<Context>()
     private val prefs = context.getSharedPreferences(ApplicationModule.sharedPrefsFileName, Context.MODE_PRIVATE)
-    private val baseNodeSharedPrefsRepository = BaseNodeSharedRepository(prefs)
-    private val sharedPrefsRepository = SharedPrefsRepository(context, prefs, baseNodeSharedPrefsRepository)
+    private val networkRepository = NetworkRepository(prefs)
+    private val baseNodeSharedPrefsRepository = BaseNodeSharedRepository(prefs, networkRepository)
+    private val sharedPrefsRepository = SharedPrefsRepository(context, prefs, networkRepository, baseNodeSharedPrefsRepository)
     private val walletDirPath = context.filesDir.absolutePath
 
     private fun clean() {
@@ -205,7 +207,7 @@ class FFIWalletTests {
         assertEquals(nullptr, emojiSet.pointer)
     }
 
-//    @Test
+    //    @Test
     //todo implement transactions testing
     fun testReceiveTxFlow() {
         val mockListener = mockk<FFIWalletListener>(relaxed = true, relaxUnitFun = true)
@@ -324,7 +326,7 @@ class FFIWalletTests {
         assertTrue(wallet.testReceiveTx())
         val pendingInboundTxsFFI = wallet.getPendingInboundTxs()
         var pendingInboundTxFFI: FFIPendingInboundTx? = null
-        for(i in 0 until pendingInboundTxsFFI.getLength()) {
+        for (i in 0 until pendingInboundTxsFFI.getLength()) {
             pendingInboundTxFFI = pendingInboundTxsFFI.getAt(i)
             if (pendingInboundTxFFI.getStatus() == FFITxStatus.PENDING) {
                 break
@@ -361,7 +363,7 @@ class FFIWalletTests {
         // pick a completed outbound tx
         val pendingOutboundTxsFFI = wallet.getPendingOutboundTxs()
         var pendingOutboundTxFFI: FFIPendingOutboundTx? = null
-        for(i in 0 until pendingOutboundTxsFFI.getLength()) {
+        for (i in 0 until pendingOutboundTxsFFI.getLength()) {
             pendingOutboundTxFFI = pendingOutboundTxsFFI.getAt(i)
             if (pendingOutboundTxFFI.getStatus() == FFITxStatus.COMPLETED) {
                 break
@@ -383,7 +385,7 @@ class FFIWalletTests {
         pendingOutboundTxFFI.destroy()
 
         // mine tx
-        for(i in 0 until pendingOutboundTxsFFI.getLength()) {
+        for (i in 0 until pendingOutboundTxsFFI.getLength()) {
             pendingOutboundTxFFI = pendingOutboundTxsFFI.getAt(i)
             if (pendingOutboundTxFFI.getStatus() == FFITxStatus.COMPLETED) {
                 break
