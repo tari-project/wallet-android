@@ -32,6 +32,9 @@
  */
 package com.tari.android.wallet.infrastructure.backup.storage
 
+import com.tari.android.wallet.application.Network
+import com.tari.android.wallet.data.network.NetworkRepository
+import com.tari.android.wallet.data.network.TariNetwork
 import com.tari.android.wallet.infrastructure.backup.BackupNamingPolicy
 import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
@@ -50,43 +53,43 @@ class TariBackupNameValidationPolicyTest {
     @get:Rule
     val rule = JodaAndroidFixRule()
 
-    private val policy = BackupNamingPolicy
+    private val policy = BackupNamingPolicy(NetworkRepositoryMock())
 
     @Test
     fun `assert expected valid date inside archive name with zip extension`() {
-        val name = "Tari-Aurora-Backup-2020-05-25_12-00-00.zip"
+        val name = "Tari-Aurora-Backup-WEATHERWAX-2020-05-25_12-00-00.zip"
         val expected = DateTime(2020, 5, 25, 12, 0, 0, DateTimeZone.UTC)
         assertEquals(expected, policy.getDateFromBackupFileName(name))
     }
 
     @Test
     fun `assert expected valid date inside archive name with rar extension`() {
-        val name = "Tari-Aurora-Backup-2020-05-25_12-00-00.rar"
+        val name = "Tari-Aurora-Backup-WEATHERWAX-2020-05-25_12-00-00.rar"
         val expected = DateTime(2020, 5, 25, 12, 0, 0, DateTimeZone.UTC)
         assertEquals(expected, policy.getDateFromBackupFileName(name))
     }
 
     @Test
     fun `assert expected null date if month is 0`() {
-        val name = "Tari-Aurora-Backup-2020-00-25_12-00-00.zip"
+        val name = "Tari-Aurora-Backup-WEATHERWAX-2020-00-25_12-00-00.zip"
         assertNull(policy.getDateFromBackupFileName(name))
     }
 
     @Test
     fun `assert expected null date if day is 0`() {
-        val name = "Tari-Aurora-Backup-2020-01-00_12-00-00.zip"
+        val name = "Tari-Aurora-Backup-WEATHERWAX-2020-01-00_12-00-00.zip"
         assertNull(policy.getDateFromBackupFileName(name))
     }
 
     @Test
     fun `assert expected null date if date part is invalid`() {
-        val name = "Tari-Aurora-Backup-2020-01-0_12-00-00.zip"
+        val name = "Tari-Aurora-Backup-WEATHERWAX-2020-01-0_12-00-00.zip"
         assertNull(policy.getDateFromBackupFileName(name))
     }
 
     @Test
     fun `assert expected date if hour is 0`() {
-        val name = "Tari-Aurora-Backup-2020-01-01_00-05-05.zip"
+        val name = "Tari-Aurora-Backup-WEATHERWAX-2020-01-01_00-05-05.zip"
         assertEquals(
             DateTime(2020, 1, 1, 0, 5, 5, DateTimeZone.UTC),
             policy.getDateFromBackupFileName(name)
@@ -95,13 +98,13 @@ class TariBackupNameValidationPolicyTest {
 
     @Test
     fun `assert expected null date if hour is 24`() {
-        val name = "Tari-Aurora-Backup-2020-01-01_24-00-00.zip"
+        val name = "Tari-Aurora-Backup-WEATHERWAX-2020-01-01_24-00-00.zip"
         assertNull(policy.getDateFromBackupFileName(name))
     }
 
     @Test
     fun `assert expected date if minute is 0`() {
-        val name = "Tari-Aurora-Backup-2020-01-01_05-00-05.zip"
+        val name = "Tari-Aurora-Backup-WEATHERWAX-2020-01-01_05-00-05.zip"
         assertEquals(
             DateTime(2020, 1, 1, 5, 0, 5, DateTimeZone.UTC),
             policy.getDateFromBackupFileName(name)
@@ -110,13 +113,13 @@ class TariBackupNameValidationPolicyTest {
 
     @Test
     fun `assert expected null date if minute is 60`() {
-        val name = "Tari-Aurora-Backup-2020-01-01_05-60-05.zip"
+        val name = "Tari-Aurora-Backup-WEATHERWAX-2020-01-01_05-60-05.zip"
         assertNull(policy.getDateFromBackupFileName(name))
     }
 
     @Test
     fun `assert expected date if second is 0`() {
-        val name = "Tari-Aurora-Backup-2020-01-01_05-05-00.zip"
+        val name = "Tari-Aurora-Backup-WEATHERWAX-2020-01-01_05-05-00.zip"
         assertEquals(
             DateTime(2020, 1, 1, 5, 5, 0, DateTimeZone.UTC),
             policy.getDateFromBackupFileName(name)
@@ -125,10 +128,19 @@ class TariBackupNameValidationPolicyTest {
 
     @Test
     fun `assert expected null date if second is 60`() {
-        val name = "Tari-Aurora-Backup-2020-01-01_05-00-60.zip"
+        val name = "Tari-Aurora-Backup-WEATHERWAX-2020-01-01_05-00-60.zip"
         assertNull(policy.getDateFromBackupFileName(name))
     }
 
+}
+
+class NetworkRepositoryMock : NetworkRepository {
+    override var lastNetwork: Network = Network.WEATHERWAX
+    override var currentNetwork: TariNetwork? = TariNetwork(Network.WEATHERWAX, "xtr")
+    override var ffiNetwork: Network? = Network.WEATHERWAX
+    override var incompatibleNetworkShown: Boolean = false
+
+    override fun getAllNetworks(): List<TariNetwork> = listOf()
 }
 
 class JodaAndroidFixRule @JvmOverloads constructor(private val provider: Provider = UTCProvider()) :
