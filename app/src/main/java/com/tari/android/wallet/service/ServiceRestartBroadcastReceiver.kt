@@ -37,7 +37,7 @@ import android.content.Context
 import android.content.Intent
 import com.orhanobut.logger.Logger
 import com.tari.android.wallet.data.WalletConfig
-import com.tari.android.wallet.data.network.NetworkRepository
+import com.tari.android.wallet.data.network.NetworkRepositoryImpl
 import com.tari.android.wallet.di.ApplicationModule
 
 /**
@@ -50,7 +50,7 @@ class ServiceRestartBroadcastReceiver : BroadcastReceiver() {
 
     override fun onReceive(context: Context, intent: Intent) {
         Logger.d("Service restart broadcast received.")
-        val networkRepository = NetworkRepository(context.getSharedPreferences(ApplicationModule.sharedPrefsFileName, Context.MODE_PRIVATE))
+        val networkRepository = NetworkRepositoryImpl(context.getSharedPreferences(ApplicationModule.sharedPrefsFileName, Context.MODE_PRIVATE))
         WalletServiceLauncher(context, WalletConfig(context, networkRepository)).startIfExist()
     }
 }

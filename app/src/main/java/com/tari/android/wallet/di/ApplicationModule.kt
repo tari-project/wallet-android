@@ -43,6 +43,7 @@ import com.tari.android.wallet.BuildConfig
 import com.tari.android.wallet.application.TariWalletApplication
 import com.tari.android.wallet.data.WalletConfig
 import com.tari.android.wallet.data.network.NetworkRepository
+import com.tari.android.wallet.data.network.NetworkRepositoryImpl
 import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodeSharedRepository
 import com.tari.android.wallet.infrastructure.GiphyEcosystem
@@ -87,7 +88,7 @@ internal class ApplicationModule(
 
     @Provides
     @Singleton
-    fun provideNetworkRepository(prefs: SharedPreferences): NetworkRepository = NetworkRepository(prefs)
+    fun provideNetworkRepository(prefs: SharedPreferences): NetworkRepository = NetworkRepositoryImpl(prefs)
 
     @Provides
     @Singleton
