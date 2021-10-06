@@ -3,6 +3,7 @@ package com.tari.android.wallet.ui.fragment.settings.networkSelection
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.tari.android.wallet.R
+import com.tari.android.wallet.application.WalletState
 import com.tari.android.wallet.data.network.NetworkRepository
 import com.tari.android.wallet.data.network.TariNetwork
 import com.tari.android.wallet.di.DiContainer
@@ -21,7 +22,7 @@ class NetworkSelectionViewModel : CommonViewModel() {
     lateinit var networkRepository: NetworkRepository
 
     @Inject
-    lateinit var walletManager: WalletServiceLauncher
+    lateinit var walletServiceLauncher: WalletServiceLauncher
 
     private val _networks = MutableLiveData<MutableList<CommonViewHolderItem>>()
     val networks: LiveData<MutableList<CommonViewHolderItem>> = _networks
@@ -57,9 +58,15 @@ class NetworkSelectionViewModel : CommonViewModel() {
     private fun changeNetwork(newNetwork: TariNetwork) {
         networkRepository.currentNetwork = newNetwork
         loadData()
-        walletManager.stop()
-        EventBus.clear()
-        DiContainer.reinitContainer()
-        _recreate.postValue(Unit)
+
+        EventBus.walletState.subscribe(this) {
+            if (it == WalletState.NotReady) {
+                EventBus.clear()
+                DiContainer.reinitContainer()
+                _recreate.postValue(Unit)
+            }
+        }
+
+        walletServiceLauncher.stop()
     }
 }

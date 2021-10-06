@@ -230,7 +230,7 @@ internal class HomeActivity : AppCompatActivity(), AllSettingsRouter, TxListRout
     }
 
     private fun checkNetworkCompatibility() {
-        if (networkRepository.lastNetwork != networkRepository.currentNetwork!!.network && !networkRepository.incompatibleNetworkShown) {
+        if (!networkRepository.supportedNetworks.contains(networkRepository.currentNetwork!!.network) && !networkRepository.incompatibleNetworkShown) {
             networkRepository.incompatibleNetworkShown = true
             displayIncompatibleNetworkDialog()
         }

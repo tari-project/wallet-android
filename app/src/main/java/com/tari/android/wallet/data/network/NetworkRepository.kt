@@ -3,7 +3,7 @@ package com.tari.android.wallet.data.network
 import com.tari.android.wallet.application.Network
 
 interface NetworkRepository {
-    var lastNetwork: Network
+    var supportedNetworks: List<Network>
 
     var currentNetwork: TariNetwork?
 

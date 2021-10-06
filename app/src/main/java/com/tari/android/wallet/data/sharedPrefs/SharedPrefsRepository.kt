@@ -128,7 +128,7 @@ class SharedPrefsRepository(
 
     var localBackupFolderURI: Uri? by SharedPrefGsonDelegate(sharedPrefs, formatKey(Key.localBackupFolderURI), Uri::class.java)
 
-    var databasePassphrase: String? by SharedPrefStringSecuredDelegate(context, sharedPrefs, Key.walletDatabasePassphrase)
+    var databasePassphrase: String? by SharedPrefStringSecuredDelegate(context, sharedPrefs, formatKey(Key.walletDatabasePassphrase))
 
     var isRestoredWallet: Boolean by SharedPrefBooleanDelegate(sharedPrefs, formatKey(Key.isRestoredWallet))
 

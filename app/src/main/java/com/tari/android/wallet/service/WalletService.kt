@@ -206,6 +206,8 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
             startAction -> startService()
             stopAction -> stopService(startId)
             stopAndDeleteAction -> {
+                //todo total crutch. Service is auto-creating during the bind func. Need to refactor this first
+                DiContainer.appComponent.inject(this)
                 stopService(startId)
                 deleteWallet()
             }
