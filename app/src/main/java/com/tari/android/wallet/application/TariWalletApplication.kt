@@ -48,6 +48,7 @@ import com.tari.android.wallet.infrastructure.Tracker
 import com.tari.android.wallet.network.NetworkConnectionStateReceiver
 import com.tari.android.wallet.notification.NotificationHelper
 import com.tari.android.wallet.service.WalletServiceLauncher
+import com.tari.android.wallet.yat.YatAdapter
 import net.danlew.android.joda.JodaTimeAndroid
 import java.lang.ref.WeakReference
 import javax.inject.Inject
@@ -73,6 +74,9 @@ internal class TariWalletApplication : Application(), LifecycleObserver {
 
     @Inject
     lateinit var walletServiceLauncher: WalletServiceLauncher
+
+    @Inject
+    lateinit var yatAdapter: YatAdapter
 
     private val activityLifecycleCallbacks = ActivityLifecycleCallbacks()
     var isInForeground = false
@@ -111,6 +115,8 @@ internal class TariWalletApplication : Application(), LifecycleObserver {
 
         // track app download
         tracker.download(this)
+
+        yatAdapter.initYat()
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)
@@ -136,7 +142,6 @@ internal class TariWalletApplication : Application(), LifecycleObserver {
         EventBus.post(Event.App.AppForegrounded())
     }
 
-
     companion object {
 
         @Volatile
@@ -144,3 +149,4 @@ internal class TariWalletApplication : Application(), LifecycleObserver {
             private set
     }
 }
+

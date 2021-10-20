@@ -340,6 +340,7 @@
     <string name="all_settings_close">Done</string>
     <string name="all_settings_security_label">Security</string>
     <string name="all_settings_advanced_settings_label">Advanced</string>
+    <string name="all_settings_yat_settings_label">Yat</string>
     <string name="all_settings_back_up_wallet_settings_entry">Wallet Backups</string>
     <string name="all_settings_secondary_settings_label">More</string>
     <string name="all_settings_report_a_bug">Report a Bug</string>
@@ -350,6 +351,8 @@
     <string name="all_settings_privacy_policy">Privacy Policy</string>
     <string name="all_settings_disclaimer">Disclaimer</string>
     <string name="all_settings_background_service">Background Service</string>
+    <string name="all_settings_manage_yats">Manage Yats</string>
+    <string name="all_settings_connect_yats">Connect Yats</string>
     <string name="all_settings_select_base_node">Select Base Node</string>
     <string name="all_settings_select_network">Select Network</string>
     <string name="all_settings_select_network_confirm_title">One thing before you go</string>

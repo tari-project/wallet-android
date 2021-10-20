@@ -33,98 +33,150 @@
 package com.tari.android.wallet.ui.fragment.settings.allSettings
 
 import android.content.Context
-import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AlertDialog
-import androidx.biometric.BiometricPrompt
-import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
-import com.orhanobut.logger.Logger
 import com.tari.android.wallet.R
-import com.tari.android.wallet.R.color.*
-import com.tari.android.wallet.R.string.*
-import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
+import com.tari.android.wallet.R.color.all_settings_back_up_status_processing
 import com.tari.android.wallet.databinding.FragmentAllSettingsBinding
 import com.tari.android.wallet.di.DiContainer.appComponent
 import com.tari.android.wallet.event.EventBus
+import com.tari.android.wallet.extension.observe
 import com.tari.android.wallet.infrastructure.BugReportingService
-import com.tari.android.wallet.infrastructure.backup.*
-import com.tari.android.wallet.infrastructure.backup.BackupState.*
 import com.tari.android.wallet.infrastructure.security.biometric.BiometricAuthenticationService
-import com.tari.android.wallet.ui.dialog.error.ErrorDialog
+import com.tari.android.wallet.ui.common.CommonFragment
 import com.tari.android.wallet.ui.extension.*
+import com.tari.android.wallet.ui.fragment.settings.userAutorization.BiometricAuthenticationViewModel
 import com.tari.android.wallet.util.Constants
+import com.tari.android.wallet.yat.YatAdapter
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import org.joda.time.format.DateTimeFormat
-import java.io.IOException
-import java.util.*
 import javax.inject.Inject
 import kotlin.math.min
 
-internal class AllSettingsFragment: Fragment() {
-
-    @Inject
-    lateinit var sharedPrefs: SharedPrefsRepository
-
-    @Inject
-    lateinit var backupManager: BackupManager
+internal class AllSettingsFragment : CommonFragment<FragmentAllSettingsBinding, AllSettingsViewModel>() {
 
     @Inject
     lateinit var authService: BiometricAuthenticationService
 
-    private lateinit var ui: FragmentAllSettingsBinding
-    private var scrollListener = ScrollListener()
+    @Inject
+    lateinit var bugReportingService: BugReportingService
+
+    @Inject
+    lateinit var yatAdapter: YatAdapter
+
+    private val biometricAuthenticationViewModel: BiometricAuthenticationViewModel by viewModels()
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
         appComponent.inject(this)
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View = FragmentAllSettingsBinding.inflate(inflater, container, false).also { ui = it }.root
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
+        FragmentAllSettingsBinding.inflate(inflater, container, false).also { ui = it }.root
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        val viewModel: AllSettingsViewModel by viewModels()
+        bindViewModel(viewModel)
+
+        BiometricAuthenticationViewModel.bindToFragment(biometricAuthenticationViewModel, this)
+        viewModel.authenticationViewModel = biometricAuthenticationViewModel
+
         setupUI()
-        EventBus.backupState.subscribe(this) { backupState ->
-            lifecycleScope.launch(Dispatchers.Main) {
-                onBackupStateChanged(backupState)
-            }
-        }
-        lifecycleScope.launch(Dispatchers.IO) {
-            checkStorageStatus()
-        }
+        observeUI()
     }
 
     private fun setupUI() {
         ui.cloudBackupStatusProgressView.setColor(color(all_settings_back_up_status_processing))
         ui.scrollElevationGradientView.alpha = 0f
-        ui.scrollView.setOnScrollChangeListener(scrollListener)
+        ui.scrollView.setOnScrollChangeListener(ScrollListener())
         bindCTAs()
     }
 
     private fun bindCTAs() = with(ui) {
-        reportBugCtaView.setOnThrottledClickListener { shareBugReport() }
-        visitSiteCtaView.setOnThrottledClickListener { openLink(string(tari_url)) }
-        contributeCtaView.setOnThrottledClickListener { openLink(string(github_repo_url)) }
-        userAgreementCtaView.setOnThrottledClickListener { openLink(string(user_agreement_url)) }
-        privacyPolicyCtaView.setOnThrottledClickListener { openLink(string(privacy_policy_url)) }
-        disclaimerCtaView.setOnThrottledClickListener { openLink(string(disclaimer_url)) }
-        backUpWalletCtaView.setOnThrottledClickListener { requireAuthorization { navigateToBackupSettings() } }
-        backgroundServiceCtaView.setOnThrottledClickListener { navigateToBackgroundServiceSettings() }
-        changeBaseNodeCtaView.setOnThrottledClickListener { navigateToBaseNodeSelection() }
-        changeNetworkCtaView.setOnThrottledClickListener { navigateToNetworkSelection() }
-        backgroundServiceCtaView.setOnThrottledClickListener { navigateToBackgroundServiceSettings() }
-        deleteWalletCtaView.setOnThrottledClickListener { navigateToDeleteWallet() }
+        reportBugCtaView.setOnThrottledClickListener { viewModel.shareBugReport() }
+        visitSiteCtaView.setOnThrottledClickListener { viewModel.openTariUrl() }
+        contributeCtaView.setOnThrottledClickListener { viewModel.openGithubUrl() }
+        userAgreementCtaView.setOnThrottledClickListener { viewModel.openAgreementUrl() }
+        privacyPolicyCtaView.setOnThrottledClickListener { viewModel.openPrivateUrl() }
+        disclaimerCtaView.setOnThrottledClickListener { viewModel.openDisclaimerUrl() }
+        backUpWalletCtaView.setOnThrottledClickListener { viewModel.navigateToBackupSettings() }
+        backgroundServiceCtaView.setOnThrottledClickListener { viewModel.navigateToBackgroundServiceSettings() }
+        changeBaseNodeCtaView.setOnThrottledClickListener { viewModel.navigateToBaseNodeSelection() }
+        changeNetworkCtaView.setOnThrottledClickListener { viewModel.navigateToNetworkSelection() }
+        backgroundServiceCtaView.setOnThrottledClickListener { viewModel.navigateToBackgroundServiceSettings() }
+        deleteWalletCtaView.setOnThrottledClickListener { viewModel.navigateToDeleteWallet() }
+        connectYats.setOnThrottledClickListener { yatAdapter.openOnboarding(requireActivity()) }
+    }
+
+    private fun observeUI() = with(viewModel) {
+        observe(navigation) { processNavigation(it) }
+
+        observe(shareBugReport) { this@AllSettingsFragment.shareBugReport() }
+
+        observe(backupState) { activateBackupStatusView(it) }
+
+        observe(lastBackupDate) { ui.lastBackupTimeTextView.text = it }
+    }
+
+    private fun activateBackupStatusView(backupState: PresentationBackupState) {
+        val iconView = when (backupState.status) {
+            PresentationBackupState.BackupStateStatus.InProgress -> ui.cloudBackupStatusProgressView
+            PresentationBackupState.BackupStateStatus.Success -> ui.cloudBackupStatusSuccessView
+            PresentationBackupState.BackupStateStatus.Warning -> ui.cloudBackupStatusWarningView
+            PresentationBackupState.BackupStateStatus.Scheduled -> ui.cloudBackupStatusScheduledView
+        }
+
+        fun View.adjustVisibility() {
+            visibility = if (this == iconView) View.VISIBLE else View.INVISIBLE
+        }
+
+        ui.cloudBackupStatusProgressView.adjustVisibility()
+        ui.cloudBackupStatusSuccessView.adjustVisibility()
+        ui.cloudBackupStatusWarningView.adjustVisibility()
+        ui.cloudBackupStatusScheduledView.adjustVisibility()
+        val hideText = backupState.textId == -1
+        ui.backupStatusTextView.text = if (hideText) "" else string(backupState.textId)
+        ui.backupStatusTextView.visibility = if (hideText) View.GONE else View.VISIBLE
+        if (backupState.textColor != -1) ui.backupStatusTextView.setTextColor(color(backupState.textColor))
+    }
+
+    private fun shareBugReport() {
+        lifecycleScope.launch(Dispatchers.IO) {
+            try {
+                bugReportingService.shareBugReport(requireActivity())
+            } catch (e: BugReportingService.BugReportFileSizeLimitExceededException) {
+                showBugReportFileSizeExceededDialog()
+            }
+        }
+    }
+
+    private fun showBugReportFileSizeExceededDialog() {
+        val dialogBuilder = AlertDialog.Builder(context ?: return)
+        val dialog = dialogBuilder.setMessage(string(R.string.debug_log_file_size_limit_exceeded_dialog_content))
+            .setCancelable(false)
+            .setPositiveButton(string(R.string.common_ok)) { dialog, _ -> dialog.cancel() }
+            .setTitle(getString(R.string.debug_log_file_size_limit_exceeded_dialog_title))
+            .create()
+        dialog.show()
+    }
+
+    private fun processNavigation(navigation: AllSettingsNavigation) {
+        val router = requireActivity() as AllSettingsRouter
+
+        when (navigation) {
+            AllSettingsNavigation.ToBackgroundService -> router.toBackgroundService()
+            AllSettingsNavigation.ToBackupSettings -> router.toBackupSettings()
+            AllSettingsNavigation.ToBaseNodeSelection -> router.toBaseNodeSelection()
+            AllSettingsNavigation.ToDeleteWallet -> router.toDeleteWallet()
+            AllSettingsNavigation.ToNetworkSelection -> router.toNetworkSelection()
+        }
     }
 
     override fun onDestroyView() {
@@ -137,236 +189,16 @@ internal class AllSettingsFragment: Fragment() {
         super.onDestroy()
     }
 
-    private suspend fun checkStorageStatus() {
-        try {
-            backupManager.checkStorageStatus()
-        } catch (e: BackupStorageAuthRevokedException) {
-            Logger.e("Backup storage auth error.")
-            // show access revoked information
-            withContext(Dispatchers.Main) {
-                showBackupStorageCheckFailedDialog(
-                    string(check_backup_storage_status_auth_revoked_error_description)
-                )
-            }
-        } catch (e: IOException) {
-            Logger.e("Backup storage I/O (access) error.")
-            withContext(Dispatchers.Main) {
-                showBackupStorageCheckFailedDialog(
-                    string(check_backup_storage_status_access_error_description)
-                )
-            }
-        } catch (e: Exception) {
-            Logger.e("Backup storage tampered.")
-            withContext(Dispatchers.Main) {
-                updateLastSuccessfulBackupDate()
-            }
-        }
-    }
-
-    private fun updateLastSuccessfulBackupDate() {
-        ui.lastBackupTimeTextView.visible()
-        val time = sharedPrefs.lastSuccessfulBackupDate?.toLocalDateTime()
-        if (time == null) {
-            ui.lastBackupTimeTextView.text = ""
-        } else {
-            ui.lastBackupTimeTextView.text = string(
-                back_up_wallet_last_successful_backup,
-                BACKUP_DATE_FORMATTER.print(time),
-                BACKUP_TIME_FORMATTER.print(time)
-            )
-        }
-    }
-
-    private fun onBackupStateChanged(backupState: BackupState?) {
-        if (backupState == null) {
-            ui.cloudBackupStatusProgressView.invisible()
-            ui.cloudBackupStatusSuccessView.invisible()
-            ui.cloudBackupStatusWarningView.visible()
-            ui.backupStatusTextView.text = ""
-            ui.lastBackupTimeTextView.gone()
-        } else {
-            when (backupState) {
-                is BackupDisabled -> {
-                    updateLastSuccessfulBackupDate()
-                    activateBackupStatusView(ui.cloudBackupStatusWarningView)
-                }
-                is BackupCheckingStorage -> {
-                    updateLastSuccessfulBackupDate()
-                    activateBackupStatusView(
-                        ui.cloudBackupStatusProgressView,
-                        back_up_wallet_backup_status_checking_backup,
-                        all_settings_back_up_status_processing
-                    )
-                }
-                is BackupStorageCheckFailed -> {
-                    updateLastSuccessfulBackupDate()
-                    activateBackupStatusView(
-                        icon = ui.cloudBackupStatusWarningView,
-                        textColor = all_settings_back_up_status_error
-                    )
-                }
-                is BackupScheduled -> {
-                    updateLastSuccessfulBackupDate()
-                    if (sharedPrefs.backupFailureDate == null) {
-                        activateBackupStatusView(
-                            ui.cloudBackupStatusScheduledView,
-                            back_up_wallet_backup_status_scheduled,
-                            all_settings_back_up_status_scheduled
-                        )
-                    } else {
-                        activateBackupStatusView(
-                            ui.cloudBackupStatusWarningView,
-                            back_up_wallet_backup_status_scheduled,
-                            all_settings_back_up_status_processing
-                        )
-                    }
-                }
-                is BackupInProgress -> {
-                    updateLastSuccessfulBackupDate()
-                    activateBackupStatusView(
-                        ui.cloudBackupStatusProgressView,
-                        back_up_wallet_backup_status_in_progress,
-                        all_settings_back_up_status_processing
-                    )
-                }
-                is BackupUpToDate -> {
-                    updateLastSuccessfulBackupDate()
-                    activateBackupStatusView(
-                        ui.cloudBackupStatusSuccessView,
-                        back_up_wallet_backup_status_up_to_date,
-                        all_settings_back_up_status_up_to_date
-                    )
-                }
-                is BackupOutOfDate -> {
-                    updateLastSuccessfulBackupDate()
-                    activateBackupStatusView(
-                        ui.cloudBackupStatusWarningView,
-                        back_up_wallet_backup_status_outdated,
-                        all_settings_back_up_status_error
-                    )
-                }
-            }
-        }
-    }
-
-    private fun activateBackupStatusView(icon: View?, textId: Int = -1, textColor: Int = -1) {
-        fun View.adjustVisibility() {
-            visibility = if (this == icon) View.VISIBLE else View.INVISIBLE
-        }
-        ui.cloudBackupStatusProgressView.adjustVisibility()
-        ui.cloudBackupStatusSuccessView.adjustVisibility()
-        ui.cloudBackupStatusWarningView.adjustVisibility()
-        ui.cloudBackupStatusScheduledView.adjustVisibility()
-        val hideText = textId == -1
-        ui.backupStatusTextView.text = if (hideText) "" else string(textId)
-        ui.backupStatusTextView.visibility = if (hideText) View.GONE else View.VISIBLE
-        if (textColor != -1) ui.backupStatusTextView.setTextColor(color(textColor))
-    }
-
-    private fun openLink(link: String) = startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(link)))
-
-    private fun navigateToBackupSettings() = (requireActivity() as AllSettingsRouter).toBackupSettings()
-
-    private fun navigateToDeleteWallet() = (requireActivity() as AllSettingsRouter).toDeleteWallet()
-
-    private fun navigateToBackgroundServiceSettings() = (requireActivity() as AllSettingsRouter).toBackgroundService()
-
-    private fun navigateToBaseNodeSelection() = (requireActivity() as AllSettingsRouter).toBaseNodeSelection()
-
-    private fun navigateToNetworkSelection() = (requireActivity() as AllSettingsRouter).toNetworkSelection()
-
-    private fun shareBugReport() {
-        val mContext = context ?: return
-        lifecycleScope.launch(Dispatchers.IO) {
-            try {
-                appComponent.bugReportingService.shareBugReport(mContext)
-            } catch (e: BugReportingService.BugReportFileSizeLimitExceededException) {
-                withContext(Dispatchers.Main) { showBugReportFileSizeExceededDialog() }
-            }
-        }
-    }
-
-    private fun showBugReportFileSizeExceededDialog() {
-        val dialogBuilder = AlertDialog.Builder(context ?: return)
-        val dialog = dialogBuilder.setMessage(
-            string(debug_log_file_size_limit_exceeded_dialog_content)
-        )
-            .setCancelable(false)
-            .setPositiveButton(string(common_ok)) { dialog, _ ->
-                dialog.cancel()
-            }
-            .setTitle(getString(debug_log_file_size_limit_exceeded_dialog_title))
-            .create()
-        dialog.show()
-    }
-
-    private fun showBackupStorageCheckFailedDialog(message: String) {
-        ErrorDialog(
-            requireContext(),
-            title = string(check_backup_storage_status_error_title),
-            description = message
-        ).show()
-    }
-
-    private fun requireAuthorization(onAuthorized: () -> Unit) {
-        if (authService.isDeviceSecured) {
-            lifecycleScope.launch {
-                try {
-                    // prompt system authentication dialog
-                    authService.authenticate(
-                        this@AllSettingsFragment,
-                        title = string(auth_title),
-                        subtitle =
-                        if (authService.isBiometricAuthAvailable) string(auth_biometric_prompt)
-                        else string(auth_device_lock_code_prompt)
-                    )
-                    onAuthorized()
-                } catch (e: BiometricAuthenticationService.BiometricAuthenticationException) {
-                    if (e.code != BiometricPrompt.ERROR_USER_CANCELED && e.code != BiometricPrompt.ERROR_CANCELED)
-                        Logger.e("Other biometric error. Code: ${e.code}")
-                    showAuthenticationCancellationError()
-                }
-            }
-        } else {
-            onAuthorized()
-        }
-    }
-
-    private fun showAuthenticationCancellationError() {
-        activity?.let {
-            AlertDialog.Builder(it)
-                .setCancelable(false)
-                .setMessage(getString(auth_failed_desc))
-                .setNegativeButton(string(exit)) { dialog, _ -> dialog.cancel() }
-                .create()
-                .apply { setTitle(string(auth_failed_title)) }
-                .show()
-        }
-    }
-
     inner class ScrollListener : View.OnScrollChangeListener {
 
-        override fun onScrollChange(
-            v: View?,
-            scrollX: Int,
-            scrollY: Int,
-            oldScrollX: Int,
-            oldScrollY: Int
-        ) {
-            ui.scrollElevationGradientView.alpha = min(
-                Constants.UI.scrollDepthShadowViewMaxOpacity,
-                scrollY / (dimenPx(R.dimen.menu_item_height)).toFloat()
-            )
+        override fun onScrollChange(v: View?, scrollX: Int, scrollY: Int, oldScrollX: Int, oldScrollY: Int) {
+            ui.scrollElevationGradientView.alpha =
+                min(Constants.UI.scrollDepthShadowViewMaxOpacity, scrollY / (dimenPx(R.dimen.menu_item_height)).toFloat())
         }
-
     }
 
     companion object {
-        @Suppress("DEPRECATION")
         fun newInstance() = AllSettingsFragment()
-        private val BACKUP_DATE_FORMATTER =
-            DateTimeFormat.forPattern("MMM dd yyyy").withLocale(Locale.ENGLISH)
-        private val BACKUP_TIME_FORMATTER = DateTimeFormat.forPattern("hh:mm a")
     }
 }
 

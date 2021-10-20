@@ -20,7 +20,7 @@ class BiometricAuthenticationViewModel : CommonViewModel() {
     lateinit var authService: BiometricAuthenticationService
 
     init {
-        component?.inject(this)
+        component.inject(this)
     }
 
     private val _startAuthenticate = SingleLiveEvent<BiometricAuthenticateArgs>()

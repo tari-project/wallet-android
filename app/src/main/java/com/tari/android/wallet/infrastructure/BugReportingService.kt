@@ -49,20 +49,16 @@ import java.util.zip.ZipOutputStream
  *
  * @author The Tari Development Team
  */
-class BugReportingService(private val sharedPrefsWrapper: SharedPrefsRepository,
-                          private val logFilesDirPath: String) {
+class BugReportingService(private val sharedPrefsWrapper: SharedPrefsRepository, private val logFilesDirPath: String) {
 
-    class BugReportFileSizeLimitExceededException: Exception()
+    class BugReportFileSizeLimitExceededException : Exception()
 
     private val maxLogZipFileSizeBytes = 25 * 1024 * 1024
 
     fun shareBugReport(context: Context) {
         // delete if zipped file exists
         val publicKeyHex = sharedPrefsWrapper.publicKeyHexString
-        val zipFile = File(
-            logFilesDirPath,
-            "ffi_logs_${publicKeyHex}.zip"
-        )
+        val zipFile = File(logFilesDirPath, "ffi_logs_${publicKeyHex}.zip")
         if (zipFile.exists()) {
             zipFile.delete()
         }
@@ -89,42 +85,23 @@ class BugReportingService(private val sharedPrefsWrapper: SharedPrefsRepository,
             zipFile.delete()
             throw BugReportFileSizeLimitExceededException()
         } else {
-            shareLogZipFile(context, zipFile)
+            shareLogZipFile(zipFile, context)
         }
     }
 
-    private fun shareLogZipFile(context: Context, zipFile: File) {
-        // file is zipped, create the intent
+    private fun shareLogZipFile(zipFile: File, context: Context) {
+        val zipFileUri = FileProvider.getUriForFile(context, "com.tari.android.wallet.files", zipFile)
         val emailIntent = Intent(Intent.ACTION_SENDTO)
-        val intent = Intent(Intent.ACTION_SEND)
+        val extraText = "Public Key:\n" + sharedPrefsWrapper.publicKeyHexString + "\n\n" + "Emoji Id:\n" + sharedPrefsWrapper.emojiId
         emailIntent.data = Uri.parse("mailto:")
-        val zipFileUri = FileProvider.getUriForFile(
-            context,
-            "com.tari.android.wallet.files",
-            zipFile
-        )
-        intent.putExtra(Intent.EXTRA_STREAM, zipFileUri)
-        intent.putExtra(
-            Intent.EXTRA_TEXT,
-            "Public Key:\n" + sharedPrefsWrapper.publicKeyHexString + "\n\n"
-                    + "Emoji Id:\n" + sharedPrefsWrapper.emojiId
-        )
-        intent.putExtra(
-            Intent.EXTRA_EMAIL,
-            arrayOf(context.getString(R.string.ffi_admin_email_address))
-        )
-        intent.putExtra(
-            Intent.EXTRA_SUBJECT,
-            "Aurora Android Bug Report"
-        )
-        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-        intent.selector = emailIntent
-        context.startActivity(
-            Intent.createChooser(
-                intent,
-                context.getString(R.string.common_share)
-            )
-        )
+        Intent(Intent.ACTION_SEND).apply {
+            putExtra(Intent.EXTRA_STREAM, zipFileUri)
+            putExtra(Intent.EXTRA_TEXT, extraText)
+            putExtra(Intent.EXTRA_EMAIL, arrayOf(context.getString(R.string.ffi_admin_email_address)))
+            putExtra(Intent.EXTRA_SUBJECT, "Aurora Android Bug Report")
+            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            selector = emailIntent
+            context.startActivity(Intent.createChooser(this, context.getString(R.string.common_share)))
+        }
     }
-
 }
