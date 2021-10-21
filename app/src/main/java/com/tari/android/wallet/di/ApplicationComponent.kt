@@ -32,11 +32,7 @@
  */
 package com.tari.android.wallet.di
 
-import android.content.Context
 import com.tari.android.wallet.application.TariWalletApplication
-import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
-import com.tari.android.wallet.infrastructure.BugReportingService
-import com.tari.android.wallet.infrastructure.security.biometric.BiometricAuthenticationService
 import com.tari.android.wallet.service.BootDeviceReceiver
 import com.tari.android.wallet.service.WalletService
 import com.tari.android.wallet.ui.activity.AuthActivity
@@ -70,6 +66,7 @@ import com.tari.android.wallet.ui.fragment.send.AddRecipientFragment
 import com.tari.android.wallet.ui.fragment.send.FinalizeSendTxFragment
 import com.tari.android.wallet.ui.fragment.send.addNote.AddNoteFragment
 import com.tari.android.wallet.ui.fragment.settings.allSettings.AllSettingsFragment
+import com.tari.android.wallet.ui.fragment.settings.allSettings.AllSettingsViewModel
 import com.tari.android.wallet.ui.fragment.settings.backgroundService.BackgroundServiceSettingsViewModel
 import com.tari.android.wallet.ui.fragment.settings.backup.ChangeSecurePasswordFragment
 import com.tari.android.wallet.ui.fragment.settings.backup.EnterCurrentPasswordFragment
@@ -81,7 +78,6 @@ import com.tari.android.wallet.ui.fragment.settings.userAutorization.BiometricAu
 import com.tari.android.wallet.ui.fragment.tx.TxListFragment
 import com.tari.android.wallet.ui.fragment.tx.TxListViewModel
 import dagger.Component
-import java.io.File
 import javax.inject.Singleton
 
 /**
@@ -98,21 +94,12 @@ import javax.inject.Singleton
         TorModule::class,
         TrackerModule::class,
         BackupAndRestoreModule::class,
-        PresentationModule::class
+        PresentationModule::class,
+        YatModule::class
     ]
 )
 
 internal interface ApplicationComponent {
-
-    val context: Context
-
-    val workingDir: File
-
-    val sharedPrefsWrapper: SharedPrefsRepository
-
-    val authenticationService: BiometricAuthenticationService
-
-    val bugReportingService: BugReportingService
 
     /**
      * Application.
@@ -180,6 +167,7 @@ internal interface ApplicationComponent {
     fun inject(changeBaseNodeViewModel: ChangeBaseNodeViewModel)
     fun inject(addCustomBaseNodeViewModel: AddCustomBaseNodeViewModel)
     fun inject(networkSelectionViewModel: NetworkSelectionViewModel)
+    fun inject(allSettingsViewModel: AllSettingsViewModel)
     /**
      * Service(s).
      */

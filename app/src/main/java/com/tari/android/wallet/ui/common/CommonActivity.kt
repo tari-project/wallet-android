@@ -11,6 +11,7 @@ import com.tari.android.wallet.ui.dialog.TariDialog
 import com.tari.android.wallet.ui.dialog.confirm.ConfirmDialog
 import com.tari.android.wallet.ui.dialog.error.ErrorDialog
 import com.tari.android.wallet.ui.dialog.inProgress.TariProgressDialog
+import yat.android.lib.YatIntegration
 
 abstract class CommonActivity<Binding : ViewBinding, VM : CommonViewModel> : AppCompatActivity() {
 
@@ -32,6 +33,11 @@ abstract class CommonActivity<Binding : ViewBinding, VM : CommonViewModel> : App
         observe(errorDialog) { replaceDialog(ErrorDialog(this@CommonActivity, it)) }
 
         observe(loadingDialog) { if (it.isShow) replaceDialog(TariProgressDialog(this@CommonActivity, it)) else currentDialog?.dismiss() }
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        intent.data?.let { deepLink -> YatIntegration.processDeepLink(this, deepLink) }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

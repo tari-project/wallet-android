@@ -38,7 +38,7 @@ import android.os.Handler
 import android.os.Looper
 import android.view.View
 import android.widget.ImageView
-import androidx.appcompat.app.AppCompatActivity
+import androidx.activity.viewModels
 import androidx.core.view.postDelayed
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
@@ -68,6 +68,7 @@ import com.tari.android.wallet.ui.activity.send.SendTariActivity
 import com.tari.android.wallet.ui.activity.settings.BackupSettingsActivity
 import com.tari.android.wallet.ui.activity.settings.DeleteWalletActivity
 import com.tari.android.wallet.ui.activity.tx.TxDetailsActivity
+import com.tari.android.wallet.ui.common.CommonActivity
 import com.tari.android.wallet.ui.component.CustomFont
 import com.tari.android.wallet.ui.component.CustomFontTextView
 import com.tari.android.wallet.ui.dialog.BottomSlideDialog
@@ -89,7 +90,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-internal class HomeActivity : AppCompatActivity(), AllSettingsRouter, TxListRouter, BaseNodeConfigRouter {
+internal class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>(), AllSettingsRouter, TxListRouter, BaseNodeConfigRouter {
 
     @Inject
     lateinit var sharedPrefsWrapper: SharedPrefsRepository
@@ -103,12 +104,15 @@ internal class HomeActivity : AppCompatActivity(), AllSettingsRouter, TxListRout
     @Inject
     lateinit var giphy: GiphyEcosystem
 
-    private lateinit var ui: ActivityHomeBinding
     private lateinit var serviceConnection: TariWalletServiceConnection
     private var compositeDisposable: CompositeDisposable = CompositeDisposable()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        val viewModel: HomeViewModel by viewModels()
+        bindViewModel(viewModel)
+
         overridePendingTransition(0, 0)
         appComponent.inject(this)
         if (!sharedPrefsWrapper.isAuthenticated) {

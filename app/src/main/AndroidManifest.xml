@@ -95,6 +95,9 @@
                 <data
                     android:host="rincewind"
                     android:scheme="tari" />
+                <data
+                    android:host="y.at"
+                    android:scheme="tari" />
             </intent-filter>
         </activity>
         <activity
