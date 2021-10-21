@@ -40,7 +40,6 @@ import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodeSharedRepositor
 import com.tari.android.wallet.data.sharedPrefs.delegates.*
 import org.joda.time.DateTime
 import java.math.BigInteger
-import java.nio.charset.Charset
 import kotlin.random.Random
 
 /**
@@ -109,7 +108,11 @@ class SharedPrefsRepository(
 
     var faucetTestnetTariRequestCompleted: Boolean by SharedPrefBooleanDelegate(sharedPrefs, formatKey(Key.faucetTestnetTariRequestCompleted))
 
-    var testnetTariUTXOKeyList: TestnetUtxoList? by SharedPrefGsonDelegate(sharedPrefs, formatKey(Key.testnetTariUTXOListKey), TestnetUtxoList::class.java)
+    var testnetTariUTXOKeyList: TestnetUtxoList? by SharedPrefGsonDelegate(
+        sharedPrefs,
+        formatKey(Key.testnetTariUTXOListKey),
+        TestnetUtxoList::class.java
+    )
 
     var firstTestnetUTXOTxId: BigInteger? by SharedPrefBigIntegerDelegate(sharedPrefs, formatKey(Key.firstTestnetUTXOTxId))
 
@@ -174,9 +177,19 @@ class SharedPrefsRepository(
     }
 
     fun generateDatabasePassphrase() {
-        val array = ByteArray(32)
-        Random.nextBytes(array)
-        val generatedString = String(array, Charset.forName("UTF-8"))
+        var generatedString = ""
+        val charset = Charsets.UTF_8
+        val utfErrorCode = Char(65533)
+
+        while (generatedString.length < 32) {
+            val nextByte = Random.nextBytes(1).first()
+            val str = String(ByteArray(1) { nextByte }, charset)
+            if (str.first() != utfErrorCode) {
+                generatedString += str
+                break
+            }
+        }
+
         databasePassphrase = generatedString
     }
 
@@ -190,5 +203,5 @@ class SharedPrefsRepository(
         return isCleared
     }
 
-    private fun formatKey(key: String) : String = key + "_" + networkRepository.currentNetwork!!.network.displayName
+    private fun formatKey(key: String): String = key + "_" + networkRepository.currentNetwork!!.network.displayName
 }
