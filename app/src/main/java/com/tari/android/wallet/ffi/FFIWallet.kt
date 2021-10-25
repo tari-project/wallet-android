@@ -91,12 +91,8 @@ internal class FFIWallet(
         callbackStoreAndForwardSendResultSig: String,
         callbackTxCancellation: String,
         callbackTxCancellationSig: String,
-        callbackUTXOValidationComplete: String,
-        callbackUTXOValidationCompleteSig: String,
-        callbackSTXOValidationComplete: String,
-        callbackSTXOValidationCompleteSig: String,
-        callbackInvalidTXOValidationComplete: String,
-        callbackInvalidTXOValidationCompleteSig: String,
+        callbackTXOValidationComplete: String,
+        callbackTXOValidationCompleteSig: String,
         callbackTransactionValidationComplete: String,
         callbackTransactionValidationCompleteSig: String,
         libError: FFIError
@@ -218,15 +214,7 @@ internal class FFIWallet(
         libError: FFIError
     ): Boolean
 
-    private external fun jniStartUTXOValidation(
-        libError: FFIError
-    ): ByteArray
-
-    private external fun jniStartSTXOValidation(
-        libError: FFIError
-    ): ByteArray
-
-    private external fun jniStartInvalidTXOValidation(
+    private external fun jniStartTXOValidation(
         libError: FFIError
     ): ByteArray
 
@@ -362,9 +350,7 @@ internal class FFIWallet(
                     this::onDirectSendResult.name, "([BZ)V",
                     this::onStoreAndForwardSendResult.name, "([BZ)V",
                     this::onTxCancelled.name, "(J)V",
-                    this::onUTXOValidationComplete.name, "([BI)V",
-                    this::onSTXOValidationComplete.name, "([BI)V",
-                    this::onInvalidTXOValidationComplete.name, "([BI)V",
+                    this::onTXOValidationComplete.name, "([BI)V",
                     this::onTxValidationComplete.name, "([BI)V",
                     error
                 )
@@ -703,34 +689,12 @@ internal class FFIWallet(
      * This callback function cannot be private due to JNI behaviour.
      */
     @Suppress("MemberVisibilityCanBePrivate")
-    fun onUTXOValidationComplete(bytes: ByteArray, result: Int) {
-        val requestId = BigInteger(1, bytes)
-        val validationResult = BaseNodeValidationResult.map(result)!!
-        Logger.i("UTXO validation [$requestId] complete. Result: $validationResult")
-        GlobalScope.launch { listener?.onUTXOValidationComplete(requestId, validationResult) }
-    }
-
-    /**
-     * This callback function cannot be private due to JNI behaviour.
-     */
-    @Suppress("MemberVisibilityCanBePrivate")
-    fun onSTXOValidationComplete(bytes: ByteArray, result: Int) {
-        val requestId = BigInteger(1, bytes)
-        val validationResult = BaseNodeValidationResult.map(result)!!
-        Logger.i("STXO validation [$requestId] complete. Result: $validationResult")
-        GlobalScope.launch { listener?.onSTXOValidationComplete(requestId, validationResult) }
-    }
-
-    /**
-     * This callback function cannot be private due to JNI behaviour.
-     */
-    @Suppress("MemberVisibilityCanBePrivate")
-    fun onInvalidTXOValidationComplete(bytes: ByteArray, result: Int) {
+    fun onTXOValidationComplete(bytes: ByteArray, result: Int) {
         val requestId = BigInteger(1, bytes)
         val validationResult = BaseNodeValidationResult.map(result)!!
         Logger.i("Invalid TXO validation [$requestId] complete. Result: $validationResult")
         GlobalScope.launch {
-            listener?.onInvalidTXOValidationComplete(requestId, validationResult)
+            listener?.onTXOValidationComplete(requestId, validationResult)
         }
     }
 
@@ -872,23 +836,9 @@ internal class FFIWallet(
         return BigInteger(1, bytes)
     }
 
-    fun startUTXOValidation(): BigInteger {
+    fun startTXOValidation(): BigInteger {
         val error = FFIError()
-        val bytes = jniStartUTXOValidation(error)
-        throwIf(error)
-        return BigInteger(1, bytes)
-    }
-
-    fun startSTXOValidation(): BigInteger {
-        val error = FFIError()
-        val bytes = jniStartSTXOValidation(error)
-        throwIf(error)
-        return BigInteger(1, bytes)
-    }
-
-    fun startInvalidTXOValidation(): BigInteger {
-        val error = FFIError()
-        val bytes = jniStartInvalidTXOValidation(error)
+        val bytes = jniStartTXOValidation(error)
         throwIf(error)
         return BigInteger(1, bytes)
     }

@@ -501,7 +501,7 @@ class FFIWalletTests {
             Logger.i("STXO validation complete :: response id %s result %s", responseId, result)
         }
 
-        override fun onInvalidTXOValidationComplete(responseId: BigInteger, result: BaseNodeValidationResult) {
+        override fun onTXOValidationComplete(responseId: BigInteger, result: BaseNodeValidationResult) {
             Logger.i("Invalid TXO validation complete :: response id %s result %s", responseId, result)
         }
 
