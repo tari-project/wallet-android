@@ -172,9 +172,7 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
     private var lowPowerModeSubscription: Disposable? = null
 
     private enum class BaseNodeValidationType {
-        UTXO,
-        STXO,
-        INVALID_TXO,
+        TXO,
         TX;
     }
 
@@ -578,16 +576,8 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
         checkBaseNodeSyncCompletion()
     }
 
-    override fun onUTXOValidationComplete(responseId: BigInteger, result: BaseNodeValidationResult) {
-        checkValidationResult(BaseNodeValidationType.UTXO, responseId, result)
-    }
-
-    override fun onSTXOValidationComplete(responseId: BigInteger, result: BaseNodeValidationResult) {
-        checkValidationResult(BaseNodeValidationType.STXO, responseId, result)
-    }
-
-    override fun onInvalidTXOValidationComplete(responseId: BigInteger, result: BaseNodeValidationResult) {
-        checkValidationResult(BaseNodeValidationType.INVALID_TXO, responseId, result)
+    override fun onTXOValidationComplete(responseId: BigInteger, result: BaseNodeValidationResult) {
+        checkValidationResult(BaseNodeValidationType.TXO, responseId, result)
     }
 
     override fun onTxValidationComplete(responseId: BigInteger, result: BaseNodeValidationResult) {
@@ -1005,16 +995,8 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
         override fun startBaseNodeSync(error: WalletError): Boolean {
             baseNodeValidationStatusMap.clear()
             return try {
-                baseNodeValidationStatusMap[BaseNodeValidationType.UTXO] = Pair(
-                    wallet.startUTXOValidation(),
-                    null
-                )
-                baseNodeValidationStatusMap[BaseNodeValidationType.STXO] = Pair(
-                    wallet.startSTXOValidation(),
-                    null
-                )
-                baseNodeValidationStatusMap[BaseNodeValidationType.INVALID_TXO] = Pair(
-                    wallet.startInvalidTXOValidation(),
+                baseNodeValidationStatusMap[BaseNodeValidationType.TXO] = Pair(
+                    wallet.startTXOValidation(),
                     null
                 )
                 baseNodeValidationStatusMap[BaseNodeValidationType.TX] = Pair(
