@@ -74,14 +74,14 @@ import com.tari.android.wallet.service.TariWalletService
 import com.tari.android.wallet.service.WalletService
 import com.tari.android.wallet.ui.animation.collapseAndHideAnimation
 import com.tari.android.wallet.ui.common.CommonViewModel
+import com.tari.android.wallet.ui.common.gyphy.repository.GIFItem
+import com.tari.android.wallet.ui.common.gyphy.repository.GIFRepository
 import com.tari.android.wallet.ui.component.EmojiIdSummaryViewController
 import com.tari.android.wallet.ui.component.FullEmojiIdViewController
 import com.tari.android.wallet.ui.dialog.BottomSlideDialog
 import com.tari.android.wallet.ui.dialog.error.ErrorDialog
 import com.tari.android.wallet.ui.extension.*
 import com.tari.android.wallet.ui.presentation.TxNote
-import com.tari.android.wallet.ui.presentation.gif.GIF
-import com.tari.android.wallet.ui.presentation.gif.GIFRepository
 import com.tari.android.wallet.util.WalletUtil
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -650,19 +650,19 @@ internal class TxDetailsActivity : AppCompatActivity(), ServiceConnection {
         }
     }
 
-    internal data class GIFState(val gif: GIF?, val error: Exception?) {
+    internal data class GIFState(val gifItem: GIFItem?, val error: Exception?) {
 
         init {
-            require(gif == null || error == null) { "Both gif and error can't be nonnull" }
+            require(gifItem == null || error == null) { "Both gif and error can't be nonnull" }
         }
 
         constructor() : this(null, null)
-        constructor(gif: GIF) : this(gif, null)
+        constructor(gifItem: GIFItem) : this(gifItem, null)
         constructor(e: Exception) : this(null, e)
 
-        val isProcessing get() = gif == null && error == null
+        val isProcessing get() = gifItem == null && error == null
         val isError get() = error != null
-        val isSuccessful get() = gif != null
+        val isSuccessful get() = gifItem != null
     }
 
     private data class TxState(val direction: Tx.Direction, val status: TxStatus) {
@@ -691,7 +691,7 @@ internal class TxDetailsActivity : AppCompatActivity(), ServiceConnection {
                 val state = it ?: return@observe
                 when {
                     state.isError -> onFailure()
-                    state.isSuccessful -> downloadMedia(state.gif!!)
+                    state.isSuccessful -> downloadMedia(state.gifItem!!)
                     state.isProcessing -> showDownloadingState()
                     else -> throw IllegalStateException()
                 }
@@ -700,7 +700,7 @@ internal class TxDetailsActivity : AppCompatActivity(), ServiceConnection {
                 val currentState = viewModel.currentState
                 when {
                     currentState.isError -> viewModel.onGIFFetchRequested()
-                    currentState.isSuccessful -> downloadMedia(currentState.gif!!)
+                    currentState.isSuccessful -> downloadMedia(currentState.gifItem!!)
                     else -> throw IllegalStateException()
                 }
             }
@@ -734,9 +734,9 @@ internal class TxDetailsActivity : AppCompatActivity(), ServiceConnection {
             ui.loadingGifProgressBar.gone()
         }
 
-        private fun downloadMedia(gif: GIF) {
+        private fun downloadMedia(gifItem: GIFItem) {
             glide.asGif()
-                .load(gif.uri)
+                .load(gifItem.uri)
                 .apply(RequestOptions().transform(RoundedCorners(10)))
                 .listener(UIUpdateListener())
                 .into(ui.gifContainerView)

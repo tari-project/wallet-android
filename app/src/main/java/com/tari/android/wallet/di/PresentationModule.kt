@@ -33,9 +33,9 @@
 package com.tari.android.wallet.di
 
 import com.tari.android.wallet.BuildConfig
-import com.tari.android.wallet.ui.fragment.send.repository.GiphyKeywordsRepository
-import com.tari.android.wallet.ui.presentation.gif.GIFRepository
-import com.tari.android.wallet.ui.presentation.gif.GiphyRESTRetrofitRepository
+import com.tari.android.wallet.ui.common.gyphy.GiphyKeywordsRepository
+import com.tari.android.wallet.ui.common.gyphy.repository.GIFRepository
+import com.tari.android.wallet.ui.common.gyphy.repository.GiphyRESTRetrofitRepository
 import dagger.Module
 import dagger.Provides
 import okhttp3.Interceptor

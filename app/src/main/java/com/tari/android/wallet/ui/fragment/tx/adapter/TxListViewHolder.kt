@@ -10,15 +10,15 @@ import com.tari.android.wallet.R
 import com.tari.android.wallet.databinding.HomeTxListItemBinding
 import com.tari.android.wallet.extension.applyFontStyle
 import com.tari.android.wallet.model.*
+import com.tari.android.wallet.ui.common.gyphy.presentation.GIFStateConsumer
+import com.tari.android.wallet.ui.common.gyphy.presentation.GlideGIFListener
+import com.tari.android.wallet.ui.common.gyphy.repository.GIFItem
 import com.tari.android.wallet.ui.common.recyclerView.CommonViewHolder
 import com.tari.android.wallet.ui.common.recyclerView.ViewHolderBuilder
 import com.tari.android.wallet.ui.component.CustomFont
 import com.tari.android.wallet.ui.component.EmojiIdSummaryViewController
 import com.tari.android.wallet.ui.extension.*
-import com.tari.android.wallet.ui.fragment.tx.gif.GIFStateConsumer
-import com.tari.android.wallet.ui.fragment.tx.gif.GlideGIFListener
 import com.tari.android.wallet.ui.presentation.TxNote
-import com.tari.android.wallet.ui.presentation.gif.GIF
 import com.tari.android.wallet.util.WalletUtil
 import com.tari.android.wallet.util.extractEmojis
 import org.joda.time.DateTime
@@ -226,12 +226,12 @@ internal class TxListViewHolder(view: HomeTxListItemBinding) : CommonViewHolder<
         ui.gifContainer.retryLoadingGifTextView.visible()
     }
 
-    override fun onSuccessState(gif: GIF) {
+    override fun onSuccessState(gifItem: GIFItem) {
         glide
             .asGif()
             .override(ui.gifContainer.gifContainerRootView.width, Target.SIZE_ORIGINAL)
             .apply(RequestOptions().transform(RoundedCorners(10)))
-            .load(gif.uri)
+            .load(gifItem.uri)
             .listener(GlideGIFListener(this))
             .transition(DrawableTransitionOptions.withCrossFade(250))
             .into(ui.gifContainer.gifView)

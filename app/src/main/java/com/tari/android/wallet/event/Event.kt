@@ -33,7 +33,7 @@
 package com.tari.android.wallet.event
 
 import com.tari.android.wallet.model.*
-import com.tari.android.wallet.ui.fragment.send.FinalizeSendTxFragment
+import com.tari.android.wallet.ui.fragment.send.finalize.FinalizeSendTxFragment
 
 /**
  * App-wide events.

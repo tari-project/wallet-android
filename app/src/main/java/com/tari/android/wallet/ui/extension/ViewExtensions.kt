@@ -50,6 +50,7 @@ import androidx.appcompat.widget.AppCompatEditText
 import androidx.core.animation.addListener
 import androidx.core.graphics.BlendModeColorFilterCompat
 import androidx.core.graphics.BlendModeCompat
+import androidx.fragment.app.FragmentTransaction
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.airbnb.lottie.LottieAnimationView
@@ -354,4 +355,17 @@ fun View.animateClick(onEnd: (android.animation.Animator) -> Unit = {}) {
     animSet.addListener(onEnd = onEnd)
     animSet.playSequentially(scaleDownBtnAnim, scaleUpBtnAnim)
     animSet.start()
+}
+
+fun FragmentTransaction.addFadeInAnimation(): FragmentTransaction {
+    this.setCustomAnimations(R.anim.fade_in, R.anim.fade_out)
+    return this
+}
+
+fun FragmentTransaction.addEnterLeftAnimation(): FragmentTransaction {
+    this.setCustomAnimations(
+        R.anim.enter_from_right, R.anim.exit_to_left,
+        R.anim.enter_from_left, R.anim.exit_to_right
+    )
+    return this
 }

@@ -40,6 +40,7 @@ import com.tari.android.wallet.R
 import com.tari.android.wallet.databinding.ActivityDebugBinding
 import com.tari.android.wallet.di.DiContainer.appComponent
 import com.tari.android.wallet.ui.activity.debug.adapter.DebugViewPagerAdapter
+import com.tari.android.wallet.ui.extension.addEnterLeftAnimation
 import com.tari.android.wallet.ui.extension.string
 import com.tari.android.wallet.ui.fragment.debug.baseNodeConfig.BaseNodeConfigRouter
 import com.tari.android.wallet.ui.fragment.debug.baseNodeConfig.addBaseNode.AddCustomBaseNodeFragment
@@ -86,10 +87,7 @@ internal class DebugActivity : AppCompatActivity(), BaseNodeConfigRouter {
     private fun loadFragment(fragment: Fragment) {
         supportFragmentManager
             .beginTransaction()
-            .setCustomAnimations(
-                R.anim.enter_from_right, R.anim.exit_to_left,
-                R.anim.enter_from_left, R.anim.exit_to_right
-            )
+            .addEnterLeftAnimation()
             .apply { supportFragmentManager.fragments.forEach { hide(it) } }
             .add(R.id.debug_root, fragment)
             .addToBackStack(null)

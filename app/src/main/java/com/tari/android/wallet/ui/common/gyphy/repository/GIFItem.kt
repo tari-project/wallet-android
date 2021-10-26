@@ -30,60 +30,28 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.tari.android.wallet.model
+package com.tari.android.wallet.ui.common.gyphy.repository
 
+import android.net.Uri
 import android.os.Parcel
 import android.os.Parcelable
 
-/**
- * User with a wallet.
- *
- * @author The Tari Development Team
- */
-open class User() : Parcelable {
-
-    var publicKey = PublicKey()
-
-    constructor(publicKey: PublicKey) : this() {
-        this.publicKey = publicKey
+data class GIFItem(val id: String, val embedUri: Uri, val uri: Uri) : Parcelable {
+    override fun writeToParcel(dest: Parcel, flags: Int) {
+        dest.writeString(id)
+        dest.writeParcelable(embedUri, flags)
+        dest.writeParcelable(uri, flags)
     }
 
-    override fun toString(): String = "User(publicKey=$publicKey)"
+    override fun describeContents(): Int = 0
 
-    override fun equals(other: Any?): Boolean = (other is User) && publicKey == other.publicKey
+    companion object CREATOR : Parcelable.Creator<GIFItem> {
+        override fun createFromParcel(parcel: Parcel): GIFItem = GIFItem(
+            parcel.readString()!!,
+            parcel.readParcelable(Uri::class.java.classLoader)!!,
+            parcel.readParcelable(Uri::class.java.classLoader)!!
+        )
 
-    override fun hashCode(): Int = publicKey.hashCode()
-
-    // region Parcelable
-
-    constructor(parcel: Parcel) : this() {
-        readFromParcel(parcel)
+        override fun newArray(size: Int): Array<GIFItem?> = arrayOfNulls(size)
     }
-
-    companion object CREATOR : Parcelable.Creator<User> {
-
-        override fun createFromParcel(parcel: Parcel): User {
-            return User(parcel)
-        }
-
-        override fun newArray(size: Int): Array<User> {
-            return Array(size) { User() }
-        }
-
-    }
-
-    override fun writeToParcel(parcel: Parcel, flags: Int) {
-        parcel.writeParcelable(publicKey, flags)
-    }
-
-    private fun readFromParcel(inParcel: Parcel) {
-        publicKey = inParcel.readParcelable(PublicKey::class.java.classLoader)!!
-    }
-
-    override fun describeContents(): Int {
-        return 0
-    }
-
-    // endregion
-
 }

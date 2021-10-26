@@ -107,7 +107,7 @@
             android:theme="@style/AppTheme"
             android:windowSoftInputMode="stateAlwaysHidden" /> <!-- send tari -->
         <activity
-            android:name=".ui.activity.send.SendTariActivity"
+            android:name=".ui.fragment.send.activity.SendTariActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:parentActivityName=".ui.activity.home.HomeActivity"
             android:screenOrientation="portrait"

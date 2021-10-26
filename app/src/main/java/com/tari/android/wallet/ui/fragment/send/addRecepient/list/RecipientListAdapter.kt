@@ -30,60 +30,15 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.tari.android.wallet.model
+package com.tari.android.wallet.ui.fragment.send.addRecepient.list
 
-import android.os.Parcel
-import android.os.Parcelable
+import com.tari.android.wallet.ui.common.recyclerView.CommonAdapter
+import com.tari.android.wallet.ui.common.recyclerView.CommonViewHolderItem
+import com.tari.android.wallet.ui.common.recyclerView.ViewHolderBuilder
 
-/**
- * User with a wallet.
- *
- * @author The Tari Development Team
- */
-open class User() : Parcelable {
-
-    var publicKey = PublicKey()
-
-    constructor(publicKey: PublicKey) : this() {
-        this.publicKey = publicKey
-    }
-
-    override fun toString(): String = "User(publicKey=$publicKey)"
-
-    override fun equals(other: Any?): Boolean = (other is User) && publicKey == other.publicKey
-
-    override fun hashCode(): Int = publicKey.hashCode()
-
-    // region Parcelable
-
-    constructor(parcel: Parcel) : this() {
-        readFromParcel(parcel)
-    }
-
-    companion object CREATOR : Parcelable.Creator<User> {
-
-        override fun createFromParcel(parcel: Parcel): User {
-            return User(parcel)
-        }
-
-        override fun newArray(size: Int): Array<User> {
-            return Array(size) { User() }
-        }
-
-    }
-
-    override fun writeToParcel(parcel: Parcel, flags: Int) {
-        parcel.writeParcelable(publicKey, flags)
-    }
-
-    private fun readFromParcel(inParcel: Parcel) {
-        publicKey = inParcel.readParcelable(PublicKey::class.java.classLoader)!!
-    }
-
-    override fun describeContents(): Int {
-        return 0
-    }
-
-    // endregion
-
+internal class RecipientListAdapter : CommonAdapter<CommonViewHolderItem>() {
+    override var viewHolderBuilders: List<ViewHolderBuilder> = listOf(
+        RecipientHeaderViewHolder.getBuilder(),
+        RecipientViewHolder.getBuilder()
+    )
 }

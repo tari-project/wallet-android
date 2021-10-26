@@ -67,7 +67,7 @@ import java.math.BigInteger
 class FFIWalletTests {
 
     private lateinit var wallet: FFIWallet
-    private lateinit var listener: TestListener
+    private lateinit var listener: TestAddRecipientListener
     private val context = getApplicationContext<Context>()
     private val prefs = context.getSharedPreferences(ApplicationModule.sharedPrefsFileName, Context.MODE_PRIVATE)
     private val networkRepository = NetworkRepositoryImpl(prefs)
@@ -103,7 +103,7 @@ class FFIWalletTests {
         // create wallet instance
         wallet = FFIWallet(sharedPrefsRepository, SeedPhraseRepository(), commsConfig, logFile.absolutePath)
         // create listener
-        listener = TestListener()
+        listener = TestAddRecipientListener()
         wallet.listener = listener
         commsConfig.destroy()
         transport.destroy()
@@ -443,7 +443,7 @@ class FFIWalletTests {
         wallet.getKeyValue(key)
     }
 
-    private class TestListener : FFIWalletListener {
+    private class TestAddRecipientListener : FFIWalletListener {
 
         val receivedTxs = mutableListOf<PendingInboundTx>()
         val finalizedTxs = mutableListOf<PendingInboundTx>()
@@ -491,14 +491,6 @@ class FFIWalletTests {
         override fun onTxCancelled(cancelledTx: CancelledTx) {
             Logger.i("Tx Cancelled :: cancelled tx id: %s", cancelledTx.id)
             cancelledTxs.add(cancelledTx)
-        }
-
-        override fun onUTXOValidationComplete(responseId: BigInteger, result: BaseNodeValidationResult) {
-            Logger.i("UTXO validation complete :: response id %s result %s", responseId, result)
-        }
-
-        override fun onSTXOValidationComplete(responseId: BigInteger, result: BaseNodeValidationResult) {
-            Logger.i("STXO validation complete :: response id %s result %s", responseId, result)
         }
 
         override fun onTXOValidationComplete(responseId: BigInteger, result: BaseNodeValidationResult) {
