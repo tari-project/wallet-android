@@ -55,7 +55,7 @@ import com.tari.android.wallet.di.DiContainer.appComponent
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.extension.addTo
 import com.tari.android.wallet.extension.applyFontStyle
-import com.tari.android.wallet.infrastructure.GiphyEcosystem
+import com.tari.android.wallet.ui.common.gyphy.GiphyEcosystem
 import com.tari.android.wallet.model.*
 import com.tari.android.wallet.network.NetworkConnectionState
 import com.tari.android.wallet.service.TariWalletService
@@ -64,7 +64,6 @@ import com.tari.android.wallet.service.connection.TariWalletServiceConnection
 import com.tari.android.wallet.service.connection.TariWalletServiceConnection.ServiceConnectionStatus.CONNECTED
 import com.tari.android.wallet.ui.activity.SplashActivity
 import com.tari.android.wallet.ui.activity.onboarding.OnboardingFlowActivity
-import com.tari.android.wallet.ui.activity.send.SendTariActivity
 import com.tari.android.wallet.ui.activity.settings.BackupSettingsActivity
 import com.tari.android.wallet.ui.activity.settings.DeleteWalletActivity
 import com.tari.android.wallet.ui.activity.tx.TxDetailsActivity
@@ -77,6 +76,7 @@ import com.tari.android.wallet.ui.fragment.debug.baseNodeConfig.BaseNodeConfigRo
 import com.tari.android.wallet.ui.fragment.debug.baseNodeConfig.addBaseNode.AddCustomBaseNodeFragment
 import com.tari.android.wallet.ui.fragment.debug.baseNodeConfig.changeBaseNode.ChangeBaseNodeFragment
 import com.tari.android.wallet.ui.fragment.profile.WalletInfoFragment
+import com.tari.android.wallet.ui.fragment.send.activity.SendTariActivity
 import com.tari.android.wallet.ui.fragment.settings.allSettings.AllSettingsFragment
 import com.tari.android.wallet.ui.fragment.settings.allSettings.AllSettingsRouter
 import com.tari.android.wallet.ui.fragment.settings.backgroundService.BackgroundServiceSettingsActivity

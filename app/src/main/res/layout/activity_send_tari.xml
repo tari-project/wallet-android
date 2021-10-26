@@ -5,7 +5,7 @@
     android:id="@+id/root_view"
     android:layout_height="match_parent"
     android:background="@color/white"
-    tools:context=".ui.activity.send.SendTariActivity">
+    tools:context=".ui.fragment.send.activity.SendTariActivity">
 
     <!-- fragment container -->
     <FrameLayout

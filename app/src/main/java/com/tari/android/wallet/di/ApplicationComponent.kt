@@ -42,7 +42,6 @@ import com.tari.android.wallet.ui.activity.home.HomeActivity
 import com.tari.android.wallet.ui.activity.onboarding.OnboardingFlowActivity
 import com.tari.android.wallet.ui.activity.qr.QRScannerActivity
 import com.tari.android.wallet.ui.activity.restore.WalletRestoreActivity
-import com.tari.android.wallet.ui.activity.send.SendTariActivity
 import com.tari.android.wallet.ui.activity.settings.DeleteWalletActivity
 import com.tari.android.wallet.ui.activity.tx.TxDetailsActivity
 import com.tari.android.wallet.ui.common.CommonViewModel
@@ -61,10 +60,12 @@ import com.tari.android.wallet.ui.fragment.restore.chooseRestoreOption.ChooseRes
 import com.tari.android.wallet.ui.fragment.restore.enterRestorationPassword.EnterRestorationPasswordViewModel
 import com.tari.android.wallet.ui.fragment.restore.inputSeedWords.InputSeedWordsViewModel
 import com.tari.android.wallet.ui.fragment.restore.walletRestoringFromSeedWords.WalletRestoringFromSeedWordsViewModel
-import com.tari.android.wallet.ui.fragment.send.AddAmountFragment
-import com.tari.android.wallet.ui.fragment.send.AddRecipientFragment
-import com.tari.android.wallet.ui.fragment.send.FinalizeSendTxFragment
+import com.tari.android.wallet.ui.fragment.send.activity.SendTariActivity
+import com.tari.android.wallet.ui.fragment.send.addAmount.AddAmountFragment
 import com.tari.android.wallet.ui.fragment.send.addNote.AddNoteFragment
+import com.tari.android.wallet.ui.fragment.send.addRecepient.AddRecipientFragment
+import com.tari.android.wallet.ui.fragment.send.addRecepient.AddRecipientViewModel
+import com.tari.android.wallet.ui.fragment.send.finalize.FinalizeSendTxFragment
 import com.tari.android.wallet.ui.fragment.settings.allSettings.AllSettingsFragment
 import com.tari.android.wallet.ui.fragment.settings.allSettings.AllSettingsViewModel
 import com.tari.android.wallet.ui.fragment.settings.backgroundService.BackgroundServiceSettingsViewModel
@@ -168,6 +169,7 @@ internal interface ApplicationComponent {
     fun inject(addCustomBaseNodeViewModel: AddCustomBaseNodeViewModel)
     fun inject(networkSelectionViewModel: NetworkSelectionViewModel)
     fun inject(allSettingsViewModel: AllSettingsViewModel)
+    fun inject(addRecipientViewModel: AddRecipientViewModel)
     /**
      * Service(s).
      */

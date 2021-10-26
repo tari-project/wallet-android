@@ -30,60 +30,35 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.tari.android.wallet.model
+package com.tari.android.wallet.ui.common.gyphy
 
-import android.os.Parcel
-import android.os.Parcelable
+import android.content.Context
+import com.giphy.sdk.core.models.Media
+import com.giphy.sdk.ui.Giphy
+import java.util.concurrent.ConcurrentHashMap
 
-/**
- * User with a wallet.
- *
- * @author The Tari Development Team
- */
-open class User() : Parcelable {
+internal class GiphyEcosystem(
+    private val context: Context,
+    private val key: String
+) {
 
-    var publicKey = PublicKey()
+    companion object {
 
-    constructor(publicKey: PublicKey) : this() {
-        this.publicKey = publicKey
-    }
+        private const val cacheCountLimit = 50
 
-    override fun toString(): String = "User(publicKey=$publicKey)"
+        private val mediaCache = ConcurrentHashMap<String,Media>()
 
-    override fun equals(other: Any?): Boolean = (other is User) && publicKey == other.publicKey
-
-    override fun hashCode(): Int = publicKey.hashCode()
-
-    // region Parcelable
-
-    constructor(parcel: Parcel) : this() {
-        readFromParcel(parcel)
-    }
-
-    companion object CREATOR : Parcelable.Creator<User> {
-
-        override fun createFromParcel(parcel: Parcel): User {
-            return User(parcel)
+        fun cacheMedia(id: String, media: Media) {
+            if (mediaCache.size == cacheCountLimit) {
+                mediaCache.remove(mediaCache.keys.random())
+            }
+            mediaCache[id] = media
         }
 
-        override fun newArray(size: Int): Array<User> {
-            return Array(size) { User() }
-        }
+        fun getCachedMedia(id: String): Media? = mediaCache[id]
 
     }
 
-    override fun writeToParcel(parcel: Parcel, flags: Int) {
-        parcel.writeParcelable(publicKey, flags)
-    }
-
-    private fun readFromParcel(inParcel: Parcel) {
-        publicKey = inParcel.readParcelable(PublicKey::class.java.classLoader)!!
-    }
-
-    override fun describeContents(): Int {
-        return 0
-    }
-
-    // endregion
+    fun enable() = Giphy.configure(context, key)
 
 }

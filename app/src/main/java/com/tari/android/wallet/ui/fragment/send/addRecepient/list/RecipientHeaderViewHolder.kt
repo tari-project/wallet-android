@@ -30,60 +30,25 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.tari.android.wallet.model
+package com.tari.android.wallet.ui.fragment.send.addRecepient.list
 
-import android.os.Parcel
-import android.os.Parcelable
+import android.view.View
+import com.tari.android.wallet.databinding.AddRecipientListHeaderBinding
+import com.tari.android.wallet.ui.common.recyclerView.CommonViewHolder
+import com.tari.android.wallet.ui.common.recyclerView.ViewHolderBuilder
 
-/**
- * User with a wallet.
- *
- * @author The Tari Development Team
- */
-open class User() : Parcelable {
+class RecipientHeaderViewHolder(view: AddRecipientListHeaderBinding) : CommonViewHolder<RecipientHeaderItem, AddRecipientListHeaderBinding>(view) {
+    override fun bind(item: RecipientHeaderItem) {
+        super.bind(item)
 
-    var publicKey = PublicKey()
-
-    constructor(publicKey: PublicKey) : this() {
-        this.publicKey = publicKey
+        ui.separatorView.visibility = if (item.position == 0) View.GONE else View.VISIBLE
+        ui.titleTextView.text = item.title
     }
 
-    override fun toString(): String = "User(publicKey=$publicKey)"
-
-    override fun equals(other: Any?): Boolean = (other is User) && publicKey == other.publicKey
-
-    override fun hashCode(): Int = publicKey.hashCode()
-
-    // region Parcelable
-
-    constructor(parcel: Parcel) : this() {
-        readFromParcel(parcel)
+    companion object {
+        fun getBuilder(): ViewHolderBuilder =
+            ViewHolderBuilder(AddRecipientListHeaderBinding::inflate, RecipientHeaderItem::class.java) { RecipientHeaderViewHolder(it as AddRecipientListHeaderBinding) }
     }
-
-    companion object CREATOR : Parcelable.Creator<User> {
-
-        override fun createFromParcel(parcel: Parcel): User {
-            return User(parcel)
-        }
-
-        override fun newArray(size: Int): Array<User> {
-            return Array(size) { User() }
-        }
-
-    }
-
-    override fun writeToParcel(parcel: Parcel, flags: Int) {
-        parcel.writeParcelable(publicKey, flags)
-    }
-
-    private fun readFromParcel(inParcel: Parcel) {
-        publicKey = inParcel.readParcelable(PublicKey::class.java.classLoader)!!
-    }
-
-    override fun describeContents(): Int {
-        return 0
-    }
-
-    // endregion
-
 }
+
+

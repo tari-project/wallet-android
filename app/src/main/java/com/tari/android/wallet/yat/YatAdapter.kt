@@ -4,6 +4,7 @@ import android.content.Context
 import com.orhanobut.logger.Logger
 import com.tari.android.wallet.BuildConfig
 import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
+import yat.android.api.LookupEmojiIdWithSymbolResponse
 import yat.android.data.YatRecord
 import yat.android.data.YatRecordType
 import yat.android.lib.YatConfiguration
@@ -17,6 +18,8 @@ class YatAdapter(
         val config = YatConfiguration(BuildConfig.YAT_ORGANIZATION_RETURN_URL, BuildConfig.YAT_ORGANIZATION_NAME, BuildConfig.YAT_ORGANIZATION_KEY)
         YatIntegration.setup(config, YatIntegration.ColorMode.LIGHT, this)
     }
+
+    suspend fun searchYats(query: String) : LookupEmojiIdWithSymbolResponse = YatIntegration.yatApi.lookupEmojiIdWithSymbol(query, "XTR")
 
     fun openOnboarding(context: Context) {
         val address = commonRepository.publicKeyHexString.orEmpty()

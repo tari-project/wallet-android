@@ -84,20 +84,19 @@ import com.tari.android.wallet.databinding.FragmentAddNoteBinding
 import com.tari.android.wallet.di.DiContainer.appComponent
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.infrastructure.Tracker
+import com.tari.android.wallet.ui.common.gyphy.GiphyKeywordsRepository
 import com.tari.android.wallet.model.Contact
 import com.tari.android.wallet.model.MicroTari
 import com.tari.android.wallet.model.User
 import com.tari.android.wallet.network.NetworkConnectionState
+import com.tari.android.wallet.ui.common.CommonViewModel
+import com.tari.android.wallet.ui.common.gyphy.repository.GIFItem
+import com.tari.android.wallet.ui.common.gyphy.repository.GIFRepository
+import com.tari.android.wallet.ui.common.gyphy.placeholder.GifPlaceholder
 import com.tari.android.wallet.ui.component.EmojiIdSummaryViewController
 import com.tari.android.wallet.ui.component.FullEmojiIdViewController
 import com.tari.android.wallet.ui.extension.*
-import com.tari.android.wallet.ui.fragment.send.adapter.GIFThumbnailAdapter
-import com.tari.android.wallet.ui.fragment.send.repository.GiphyKeywordsRepository
 import com.tari.android.wallet.ui.presentation.TxNote
-import com.tari.android.wallet.ui.presentation.gif.GIF
-import com.tari.android.wallet.ui.presentation.gif.GIFRepository
-import com.tari.android.wallet.ui.presentation.gif.Placeholder
-import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.Constants.UI.AddNoteAndSend
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -171,7 +170,7 @@ class AddNoteFragment : Fragment(), View.OnTouchListener {
         viewModel = ViewModelProvider(this)[ThumbnailGIFsViewModel::class.java]
         viewModel.state.observe(viewLifecycleOwner) {
             when {
-                it.isSuccessful -> adapter.repopulate(it.gifs!!)
+                it.isSuccessful -> adapter.repopulate(it.gifItems!!)
                 it.isError -> Logger.e("GIFs request had error")
             }
         }
@@ -184,8 +183,8 @@ class AddNoteFragment : Fragment(), View.OnTouchListener {
             val media =
                 data?.getParcelableExtra<Media>(ChooseGIFDialogFragment.MEDIA_DELIVERY_KEY)
                     ?: return
-            gifContainer.gif = media.let {
-                GIF(it.id, Uri.parse(it.embedUrl), Uri.parse(it.images.original!!.gifUrl))
+            gifContainer.gifItem = media.let {
+                GIFItem(it.id, Uri.parse(it.embedUrl), Uri.parse(it.images.original!!.gifUrl))
             }
             updateSliderState()
         }
@@ -210,11 +209,11 @@ class AddNoteFragment : Fragment(), View.OnTouchListener {
             ui.searchGiphyContainerView,
             state
         )
-        if (gifContainer.gif != null) changeScrollViewBottomConstraint(R.id.slide_button_container_view)
+        if (gifContainer.gifItem != null) changeScrollViewBottomConstraint(R.id.slide_button_container_view)
         adapter = GIFThumbnailAdapter(Glide.with(this), ::handleViewMoreGIFsIntent) {
             if (gifContainer.isShown) {
                 changeScrollViewBottomConstraint(R.id.slide_button_container_view)
-                gifContainer.gif = it
+                gifContainer.gifItem = it
                 updateSliderState()
             }
         }
@@ -257,7 +256,7 @@ class AddNoteFragment : Fragment(), View.OnTouchListener {
     }
 
     private fun updateSliderState() {
-        if (ui.noteEditText.text?.toString().isNullOrEmpty() && gifContainer.gif == null) {
+        if (ui.noteEditText.text?.toString().isNullOrEmpty() && gifContainer.gifItem == null) {
             ui.promptTextView.setTextColor(color(black))
             disableCallToAction()
         } else {
@@ -280,7 +279,7 @@ class AddNoteFragment : Fragment(), View.OnTouchListener {
         ui.emojiIdSummaryContainerView.setOnClickListener { emojiIdClicked() }
         ui.removeGifCtaView.setOnClickListener {
             changeScrollViewBottomConstraint(R.id.search_giphy_container_view)
-            gifContainer.gif = null
+            gifContainer.gifItem = null
             updateSliderState()
         }
         ui.searchGiphyCtaView.setOnClickListener {
@@ -526,7 +525,7 @@ class AddNoteFragment : Fragment(), View.OnTouchListener {
             amount,
             TxNote(
                 ui.noteEditText.editableText.toString(),
-                gifContainer.gif?.embedUri?.toString()
+                gifContainer.gifItem?.embedUri?.toString()
             ).compose()
         )
     }
@@ -581,7 +580,7 @@ class AddNoteFragment : Fragment(), View.OnTouchListener {
         val isShown: Boolean
             get() = animation.isViewShown
 
-        var gif: GIF? = null
+        var gifItem: GIFItem? = null
             set(value) {
                 field = value
                 if (value == null) {
@@ -590,7 +589,7 @@ class AddNoteFragment : Fragment(), View.OnTouchListener {
                 } else {
                     showGIF()
                     glide.asGif()
-                        .placeholder(Placeholder.color(value).asDrawable())
+                        .placeholder(GifPlaceholder.color(value).asDrawable())
                         .apply(transformation)
                         .load(value.uri)
                         .transition(DrawableTransitionOptions.withCrossFade(250))
@@ -599,7 +598,7 @@ class AddNoteFragment : Fragment(), View.OnTouchListener {
             }
 
         init {
-            gif = state?.getParcelable(KEY_GIF)
+            gifItem = state?.getParcelable(KEY_GIF)
         }
 
         private fun showContainer() {
@@ -613,7 +612,7 @@ class AddNoteFragment : Fragment(), View.OnTouchListener {
         }
 
         fun save(bundle: Bundle) {
-            gif?.run { bundle.putParcelable(KEY_GIF, this) }
+            gifItem?.run { bundle.putParcelable(KEY_GIF, this) }
         }
 
         fun dispose() {
@@ -703,14 +702,14 @@ class AddNoteFragment : Fragment(), View.OnTouchListener {
             }
         }
 
-        class GIFsState private constructor(val gifs: List<GIF>?, val error: Exception?) {
+        class GIFsState private constructor(val gifItems: List<GIFItem>?, val error: Exception?) {
             // Loading state
             constructor() : this(null, null)
-            constructor(gifs: List<GIF>) : this(gifs, null)
+            constructor(gifItems: List<GIFItem>) : this(gifItems, null)
             constructor(e: Exception) : this(null, e)
 
             val isError get() = error != null
-            val isSuccessful get() = gifs != null
+            val isSuccessful get() = gifItems != null
         }
     }
 
