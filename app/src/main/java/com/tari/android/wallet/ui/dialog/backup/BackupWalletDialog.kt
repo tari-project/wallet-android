@@ -35,6 +35,7 @@ internal class BackupWalletDialog(context: Context, args: BackupWalletDialogArgs
         }
         ui.homeBackupWalletPromptTitleTextView.text = title
         ui.homeBackupWalletPromptDescriptionTextView.text = args.description
+        ui.homeBackupWalletPromptBackupCtaView.text = context.string(args.ctaText)
         ui.homeBackupWalletPromptDismissCtaView.text = context.string(args.dismissText)
         ui.homeBackupWalletPromptBackupCtaView.apply {
             context.string(args.ctaText)

@@ -12,6 +12,8 @@ import com.tari.android.wallet.service.TariWalletService
 import com.tari.android.wallet.service.connection.TariWalletServiceConnection
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.common.SingleLiveEvent
+import com.tari.android.wallet.ui.common.gyphy.presentation.GIFViewModel
+import com.tari.android.wallet.ui.common.gyphy.repository.GIFRepository
 import com.tari.android.wallet.ui.common.recyclerView.CommonViewHolderItem
 import com.tari.android.wallet.ui.common.recyclerView.items.TitleViewHolderItem
 import com.tari.android.wallet.ui.dialog.backup.BackupWalletDialogArgs
@@ -20,9 +22,7 @@ import com.tari.android.wallet.ui.dialog.testnet.TestnetReceivedDialogArgs
 import com.tari.android.wallet.ui.dialog.ttl.TtlStoreWalletDialogArgs
 import com.tari.android.wallet.ui.fragment.send.finalize.FinalizeSendTxFragment
 import com.tari.android.wallet.ui.fragment.tx.adapter.TransactionItem
-import com.tari.android.wallet.ui.common.gyphy.presentation.GIFViewModel
 import com.tari.android.wallet.ui.fragment.tx.ui.UpdateProgressViewController
-import com.tari.android.wallet.ui.common.gyphy.repository.GIFRepository
 import com.tari.android.wallet.util.Constants
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -94,7 +94,7 @@ internal class TxListViewModel() : CommonViewModel() {
     val txSendSuccessful: MutableLiveData<Unit> = _txSendSuccessful
 
     init {
-        component?.inject(this)
+        component.inject(this)
 
         bindToWalletService()
     }
