@@ -12,17 +12,17 @@ import com.tari.android.wallet.service.TariWalletService
 import com.tari.android.wallet.service.connection.TariWalletServiceConnection
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.common.SingleLiveEvent
+import com.tari.android.wallet.ui.common.gyphy.presentation.GIFViewModel
+import com.tari.android.wallet.ui.common.gyphy.repository.GIFRepository
 import com.tari.android.wallet.ui.common.recyclerView.CommonViewHolderItem
 import com.tari.android.wallet.ui.common.recyclerView.items.TitleViewHolderItem
 import com.tari.android.wallet.ui.dialog.backup.BackupWalletDialogArgs
 import com.tari.android.wallet.ui.dialog.error.ErrorDialogArgs
 import com.tari.android.wallet.ui.dialog.testnet.TestnetReceivedDialogArgs
 import com.tari.android.wallet.ui.dialog.ttl.TtlStoreWalletDialogArgs
-import com.tari.android.wallet.ui.fragment.send.finalize.FinalizeSendTxFragment
+import com.tari.android.wallet.ui.fragment.send.finalize.TxFailureReason
 import com.tari.android.wallet.ui.fragment.tx.adapter.TransactionItem
-import com.tari.android.wallet.ui.common.gyphy.presentation.GIFViewModel
 import com.tari.android.wallet.ui.fragment.tx.ui.UpdateProgressViewController
-import com.tari.android.wallet.ui.common.gyphy.repository.GIFRepository
 import com.tari.android.wallet.util.Constants
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -94,7 +94,7 @@ internal class TxListViewModel() : CommonViewModel() {
     val txSendSuccessful: MutableLiveData<Unit> = _txSendSuccessful
 
     init {
-        component?.inject(this)
+        component.inject(this)
 
         bindToWalletService()
     }
@@ -348,12 +348,12 @@ internal class TxListViewModel() : CommonViewModel() {
     /**
      * Called when an outgoing transaction has failed.
      */
-    private fun onTxSendFailed(failureReason: FinalizeSendTxFragment.FailureReason) {
+    private fun onTxSendFailed(failureReason: TxFailureReason) {
         when (failureReason) {
-            FinalizeSendTxFragment.FailureReason.NETWORK_CONNECTION_ERROR -> {
+            TxFailureReason.NETWORK_CONNECTION_ERROR -> {
                 displayNetworkConnectionErrorDialog()
             }
-            FinalizeSendTxFragment.FailureReason.BASE_NODE_CONNECTION_ERROR, FinalizeSendTxFragment.FailureReason.SEND_ERROR -> {
+            TxFailureReason.BASE_NODE_CONNECTION_ERROR, TxFailureReason.SEND_ERROR -> {
                 displayBaseNodeConnectionErrorDialog()
             }
         }

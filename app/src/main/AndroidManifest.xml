@@ -114,6 +114,13 @@
             android:theme="@style/AppTheme"
             android:windowSoftInputMode="adjustResize|stateAlwaysHidden" /> <!-- wallet info -->
         <activity
+            android:exported="true"
+            android:name=".ui.fragment.send.finalize.YatFinalizeSendTxActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:screenOrientation="portrait"
+            android:theme="@style/YatLibTheme.TransparentCompat"
+            android:windowSoftInputMode="stateAlwaysHidden" />
+        <activity
             android:name=".ui.activity.tx.TxDetailsActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:parentActivityName=".ui.activity.home.HomeActivity"
