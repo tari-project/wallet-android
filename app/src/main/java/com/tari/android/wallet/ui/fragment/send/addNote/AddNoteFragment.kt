@@ -84,18 +84,19 @@ import com.tari.android.wallet.databinding.FragmentAddNoteBinding
 import com.tari.android.wallet.di.DiContainer.appComponent
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.infrastructure.Tracker
-import com.tari.android.wallet.ui.common.gyphy.GiphyKeywordsRepository
 import com.tari.android.wallet.model.Contact
 import com.tari.android.wallet.model.MicroTari
 import com.tari.android.wallet.model.User
 import com.tari.android.wallet.network.NetworkConnectionState
 import com.tari.android.wallet.ui.common.CommonViewModel
+import com.tari.android.wallet.ui.common.gyphy.GiphyKeywordsRepository
+import com.tari.android.wallet.ui.common.gyphy.placeholder.GifPlaceholder
 import com.tari.android.wallet.ui.common.gyphy.repository.GIFItem
 import com.tari.android.wallet.ui.common.gyphy.repository.GIFRepository
-import com.tari.android.wallet.ui.common.gyphy.placeholder.GifPlaceholder
 import com.tari.android.wallet.ui.component.EmojiIdSummaryViewController
 import com.tari.android.wallet.ui.component.FullEmojiIdViewController
 import com.tari.android.wallet.ui.extension.*
+import com.tari.android.wallet.ui.fragment.send.common.TransactionData
 import com.tari.android.wallet.ui.presentation.TxNote
 import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.Constants.UI.AddNoteAndSend
@@ -519,15 +520,8 @@ class AddNoteFragment : Fragment(), View.OnTouchListener {
         // track event
         tracker.event(category = "Transaction", action = "Transaction Initiated")
         // notify listener (i.e. activity)
-        listenerWR.get()?.continueToFinalizeSendTx(
-            this,
-            recipientUser,
-            amount,
-            TxNote(
-                ui.noteEditText.editableText.toString(),
-                gifContainer.gifItem?.embedUri?.toString()
-            ).compose()
-        )
+        val note = TxNote(ui.noteEditText.editableText.toString(), gifContainer.gifItem?.embedUri?.toString()).compose()
+        listenerWR.get()?.continueToFinalizeSendTx(this, TransactionData(recipientUser, amount, note))
     }
 
     private fun restoreSlider() {
@@ -557,12 +551,7 @@ class AddNoteFragment : Fragment(), View.OnTouchListener {
      */
     interface Listener {
 
-        fun continueToFinalizeSendTx(
-            sourceFragment: AddNoteFragment,
-            recipientUser: User,
-            amount: MicroTari,
-            note: String
-        )
+        fun continueToFinalizeSendTx(sourceFragment: AddNoteFragment, transactionData: TransactionData)
 
     }
 

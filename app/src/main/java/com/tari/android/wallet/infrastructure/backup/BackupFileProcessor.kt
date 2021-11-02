@@ -34,12 +34,12 @@ package com.tari.android.wallet.infrastructure.backup
 
 import com.orhanobut.logger.Logger
 import com.tari.android.wallet.data.WalletConfig
-import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import com.tari.android.wallet.extension.compress
 import com.tari.android.wallet.extension.encrypt
 import com.tari.android.wallet.ffi.FFIWallet
 import com.tari.android.wallet.infrastructure.backup.compress.CompressionMethod
 import com.tari.android.wallet.infrastructure.security.encryption.SymmetricEncryptionAlgorithm
+import com.tari.android.wallet.ui.dialog.backup.BackupSettingsRepository
 import org.joda.time.DateTime
 import java.io.File
 
@@ -49,7 +49,7 @@ import java.io.File
  * @author The Tari Development Team
  */
 internal class BackupFileProcessor(
-    private val sharedPrefs: SharedPrefsRepository,
+    private val backupSettingsRepository: BackupSettingsRepository,
     private val walletConfig: WalletConfig,
     private val namingPolicy: BackupNamingPolicy,
 ) {
@@ -60,7 +60,7 @@ internal class BackupFileProcessor(
 
         // create partial backup in temp folder if password not set
         val databaseFile = File(walletConfig.walletDatabaseFilePath)
-        val backupPassword = newPassword ?: sharedPrefs.backupPassword?.toCharArray()
+        val backupPassword = newPassword ?: backupSettingsRepository.backupPassword?.toCharArray()
         val backupDate = DateTime.now()
         // zip the file
         val compressionMethod = CompressionMethod.zip()

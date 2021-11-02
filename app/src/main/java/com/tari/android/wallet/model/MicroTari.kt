@@ -35,6 +35,7 @@ package com.tari.android.wallet.model
 import android.os.Parcel
 import android.os.Parcelable
 import com.tari.android.wallet.extension.toMicroTari
+import java.io.Serializable
 import java.math.BigDecimal
 import java.math.BigInteger
 import java.math.RoundingMode
@@ -44,7 +45,7 @@ import java.math.RoundingMode
  *
  * @author The Tari Development Team
  */
-class MicroTari() : Parcelable, Comparable<MicroTari> {
+class MicroTari() : Parcelable, Comparable<MicroTari>, Serializable {
 
     var value = BigInteger("0")
 

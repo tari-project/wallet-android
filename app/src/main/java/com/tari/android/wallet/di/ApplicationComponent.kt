@@ -66,6 +66,7 @@ import com.tari.android.wallet.ui.fragment.send.addNote.AddNoteFragment
 import com.tari.android.wallet.ui.fragment.send.addRecepient.AddRecipientFragment
 import com.tari.android.wallet.ui.fragment.send.addRecepient.AddRecipientViewModel
 import com.tari.android.wallet.ui.fragment.send.finalize.FinalizeSendTxFragment
+import com.tari.android.wallet.ui.fragment.send.finalize.FinalizeSendTxViewModel
 import com.tari.android.wallet.ui.fragment.settings.allSettings.AllSettingsFragment
 import com.tari.android.wallet.ui.fragment.settings.allSettings.AllSettingsViewModel
 import com.tari.android.wallet.ui.fragment.settings.backgroundService.BackgroundServiceSettingsViewModel
@@ -170,6 +171,7 @@ internal interface ApplicationComponent {
     fun inject(networkSelectionViewModel: NetworkSelectionViewModel)
     fun inject(allSettingsViewModel: AllSettingsViewModel)
     fun inject(addRecipientViewModel: AddRecipientViewModel)
+    fun inject(finalizeSentTxListViewModel: FinalizeSendTxViewModel)
     /**
      * Service(s).
      */

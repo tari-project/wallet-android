@@ -33,7 +33,7 @@
 package com.tari.android.wallet.event
 
 import com.tari.android.wallet.model.*
-import com.tari.android.wallet.ui.fragment.send.finalize.FinalizeSendTxFragment
+import com.tari.android.wallet.ui.fragment.send.finalize.TxFailureReason
 
 /**
  * App-wide events.
@@ -60,7 +60,7 @@ object Event {
         data class DirectSendResult(val txId: TxId, val success: Boolean)
         data class StoreAndForwardSendResult(val txId: TxId, val success: Boolean)
         data class TxSendSuccessful(val txId: TxId)
-        data class TxSendFailed(val failureReason: FinalizeSendTxFragment.FailureReason)
+        data class TxSendFailed(val failureReason: TxFailureReason)
     }
 
     /**

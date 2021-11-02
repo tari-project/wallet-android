@@ -34,11 +34,10 @@ package com.tari.android.wallet.data.sharedPrefs
 
 import android.content.Context
 import android.content.SharedPreferences
-import android.net.Uri
 import com.tari.android.wallet.data.network.NetworkRepository
 import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodeSharedRepository
 import com.tari.android.wallet.data.sharedPrefs.delegates.*
-import org.joda.time.DateTime
+import com.tari.android.wallet.ui.dialog.backup.BackupSettingsRepository
 import java.math.BigInteger
 import kotlin.random.Random
 
@@ -53,6 +52,7 @@ class SharedPrefsRepository(
     private val context: Context,
     private val sharedPrefs: SharedPreferences,
     private val networkRepository: NetworkRepository,
+    private val backupSettingsRepository: BackupSettingsRepository,
     private val baseNodeSharedRepository: BaseNodeSharedRepository
 ) {
 
@@ -70,12 +70,7 @@ class SharedPrefsRepository(
         const val testnetTariUTXOListKey = "tari_wallet_testnet_tari_utxo_key_list"
         const val firstTestnetUTXOTxId = "tari_wallet_first_testnet_utxo_tx_id"
         const val secondTestnetUTXOTxId = "tari_wallet_second_testnet_utxo_tx_id"
-        const val lastSuccessfulBackupDate = "tari_wallet_last_successful_backup_date"
-        const val backupFailureDate = "tari_wallet_backup_failure_date"
-        const val scheduledBackupDate = "tari_wallet_scheduled_backup_date"
-        const val backupPassword = "tari_wallet_last_next_alarm_time"
         const val walletDatabasePassphrase = "tari_wallet_database_passphrase"
-        const val localBackupFolderURI = "tari_wallet_local_backup_folder_uri"
         const val isRestoredWallet = "tari_is_restored_wallet"
         const val hasVerifiedSeedWords = "tari_has_verified_seed_words"
         const val backgroundServiceTurnedOnKey = "tari_background_service_turned_on"
@@ -118,19 +113,6 @@ class SharedPrefsRepository(
 
     var secondTestnetUTXOTxId: BigInteger? by SharedPrefBigIntegerDelegate(sharedPrefs, formatKey(Key.secondTestnetUTXOTxId))
 
-    var lastSuccessfulBackupDate: DateTime? by SharedPrefDateTimeDelegate(sharedPrefs, formatKey(Key.lastSuccessfulBackupDate))
-
-    var backupFailureDate: DateTime? by SharedPrefDateTimeDelegate(sharedPrefs, formatKey(Key.backupFailureDate))
-
-    var scheduledBackupDate: DateTime? by SharedPrefDateTimeDelegate(sharedPrefs, formatKey(Key.scheduledBackupDate))
-
-    val backupIsEnabled: Boolean
-        get() = (lastSuccessfulBackupDate != null)
-
-    var backupPassword: String? by SharedPrefStringSecuredDelegate(context, sharedPrefs, formatKey(Key.backupPassword))
-
-    var localBackupFolderURI: Uri? by SharedPrefGsonDelegate(sharedPrefs, formatKey(Key.localBackupFolderURI), Uri::class.java)
-
     var databasePassphrase: String? by SharedPrefStringSecuredDelegate(context, sharedPrefs, formatKey(Key.walletDatabasePassphrase))
 
     var isRestoredWallet: Boolean by SharedPrefBooleanDelegate(sharedPrefs, formatKey(Key.isRestoredWallet))
@@ -152,6 +134,7 @@ class SharedPrefsRepository(
 
     fun clear() {
         baseNodeSharedRepository.clear()
+        backupSettingsRepository.clear()
         publicKeyHexString = null
         isAuthenticated = false
         emojiId = null
@@ -165,11 +148,6 @@ class SharedPrefsRepository(
         testnetTariUTXOKeyList = null
         firstTestnetUTXOTxId = null
         secondTestnetUTXOTxId = null
-        lastSuccessfulBackupDate = null
-        backupFailureDate = null
-        scheduledBackupDate = null
-        backupPassword = null
-        localBackupFolderURI = null
         isRestoredWallet = false
         hasVerifiedSeedWords = false
         backgroundServiceTurnedOn = true

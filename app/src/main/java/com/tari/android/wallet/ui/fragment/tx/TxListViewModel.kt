@@ -17,17 +17,19 @@ import com.tari.android.wallet.ui.common.gyphy.presentation.GIFViewModel
 import com.tari.android.wallet.ui.common.gyphy.repository.GIFRepository
 import com.tari.android.wallet.ui.common.recyclerView.CommonViewHolderItem
 import com.tari.android.wallet.ui.common.recyclerView.items.TitleViewHolderItem
+import com.tari.android.wallet.ui.dialog.backup.BackupSettingsRepository
 import com.tari.android.wallet.ui.dialog.backup.BackupWalletDialogArgs
 import com.tari.android.wallet.ui.dialog.error.ErrorDialogArgs
 import com.tari.android.wallet.ui.dialog.testnet.TestnetReceivedDialogArgs
 import com.tari.android.wallet.ui.dialog.ttl.TtlStoreWalletDialogArgs
-import com.tari.android.wallet.ui.fragment.send.finalize.FinalizeSendTxFragment
+import com.tari.android.wallet.ui.fragment.send.finalize.TxFailureReason
 import com.tari.android.wallet.ui.fragment.tx.adapter.TransactionItem
 import com.tari.android.wallet.ui.fragment.tx.ui.UpdateProgressViewController
 import com.tari.android.wallet.util.Constants
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import org.joda.time.DateTime
 import java.math.BigDecimal
 import java.util.concurrent.CopyOnWriteArrayList
 import javax.inject.Inject
@@ -45,6 +47,9 @@ internal class TxListViewModel() : CommonViewModel() {
 
     @Inject
     lateinit var networkRepository: NetworkRepository
+
+    @Inject
+    lateinit var backupSettingsRepository: BackupSettingsRepository
 
     lateinit var serviceConnection: TariWalletServiceConnection
     val walletService: TariWalletService
@@ -98,7 +103,7 @@ internal class TxListViewModel() : CommonViewModel() {
     val txSendSuccessful: MutableLiveData<Unit> = _txSendSuccessful
 
     init {
-        component?.inject(this)
+        component.inject(this)
 
         bindToWalletService()
     }
@@ -352,12 +357,12 @@ internal class TxListViewModel() : CommonViewModel() {
     /**
      * Called when an outgoing transaction has failed.
      */
-    private fun onTxSendFailed(failureReason: FinalizeSendTxFragment.FailureReason) {
+    private fun onTxSendFailed(failureReason: TxFailureReason) {
         when (failureReason) {
-            FinalizeSendTxFragment.FailureReason.NETWORK_CONNECTION_ERROR -> {
+            TxFailureReason.NETWORK_CONNECTION_ERROR -> {
                 displayNetworkConnectionErrorDialog()
             }
-            FinalizeSendTxFragment.FailureReason.BASE_NODE_CONNECTION_ERROR, FinalizeSendTxFragment.FailureReason.SEND_ERROR -> {
+            TxFailureReason.BASE_NODE_CONNECTION_ERROR, TxFailureReason.SEND_ERROR -> {
                 displayBaseNodeConnectionErrorDialog()
             }
         }
@@ -412,25 +417,27 @@ internal class TxListViewModel() : CommonViewModel() {
     }
 
     private fun showWalletBackupPromptIfNecessary() {
-        if (!sharedPrefsRepository.backupIsEnabled || sharedPrefsRepository.backupPassword == null) {
-            val inboundTransactionsCount = pendingInboundTxs.size + completedTxs.asSequence()
-                .filter { it.direction == Tx.Direction.INBOUND }.count()
+        if (!backupSettingsRepository.isShowHintDialog()) return
+
+        if (!backupSettingsRepository.backupIsEnabled || backupSettingsRepository.backupPassword == null) {
+            backupSettingsRepository.lastBackupDialogShown = DateTime.now()
+            val inboundTransactionsCount = pendingInboundTxs.size + completedTxs.asSequence().filter { it.direction == Tx.Direction.INBOUND }.count()
             val tarisAmount = balanceInfo.value!!.availableBalance.tariValue + balanceInfo.value!!.pendingIncomingBalance.tariValue
             when {
                 inboundTransactionsCount >= 5
                         && tarisAmount >= BigDecimal("25000")
-                        && sharedPrefsRepository.backupIsEnabled
-                        && sharedPrefsRepository.backupPassword == null -> showSecureYourBackupsDialog()
+                        && backupSettingsRepository.backupIsEnabled
+                        && backupSettingsRepository.backupPassword == null -> showSecureYourBackupsDialog()
                 inboundTransactionsCount >= 4
                         && tarisAmount >= BigDecimal("8000")
-                        && !sharedPrefsRepository.backupIsEnabled -> showRepeatedBackUpPrompt()
+                        && !backupSettingsRepository.backupIsEnabled -> showRepeatedBackUpPrompt()
                 // Non-faucet transactions only here. Calculation is performed here to avoid
                 // unnecessary calculations as previous two cases have much greater chance to happen
                 pendingInboundTxs.size + completedTxs
                     .filter { it.direction == Tx.Direction.INBOUND }
                     .filterNot { it.status == TxStatus.IMPORTED }
                     .count() >= 1
-                        && !sharedPrefsRepository.backupIsEnabled -> showInitialBackupPrompt()
+                        && !backupSettingsRepository.backupIsEnabled -> showInitialBackupPrompt()
             }
         }
     }
