@@ -32,10 +32,14 @@
  */
 package com.tari.android.wallet.di
 
+import android.content.Context
+import android.content.SharedPreferences
 import com.tari.android.wallet.BuildConfig
+import com.tari.android.wallet.data.network.NetworkRepository
 import com.tari.android.wallet.ui.common.gyphy.GiphyKeywordsRepository
 import com.tari.android.wallet.ui.common.gyphy.repository.GIFRepository
 import com.tari.android.wallet.ui.common.gyphy.repository.GiphyRESTRetrofitRepository
+import com.tari.android.wallet.ui.dialog.backup.BackupSettingsRepository
 import dagger.Module
 import dagger.Provides
 import okhttp3.Interceptor
@@ -92,4 +96,12 @@ class PresentationModule {
     @Provides
     @Singleton
     fun provideGiphyKeywordsRepository(): GiphyKeywordsRepository = GiphyKeywordsRepository()
+
+    @Provides
+    @Singleton
+    fun provideBackupSettingsRepository(
+        context: Context,
+        networkRepository: NetworkRepository,
+        sharedPreferences: SharedPreferences
+    ): BackupSettingsRepository = BackupSettingsRepository(context, sharedPreferences, networkRepository)
 }

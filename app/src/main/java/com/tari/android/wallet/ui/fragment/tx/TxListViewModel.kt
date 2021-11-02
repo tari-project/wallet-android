@@ -16,6 +16,7 @@ import com.tari.android.wallet.ui.common.gyphy.presentation.GIFViewModel
 import com.tari.android.wallet.ui.common.gyphy.repository.GIFRepository
 import com.tari.android.wallet.ui.common.recyclerView.CommonViewHolderItem
 import com.tari.android.wallet.ui.common.recyclerView.items.TitleViewHolderItem
+import com.tari.android.wallet.ui.dialog.backup.BackupSettingsRepository
 import com.tari.android.wallet.ui.dialog.backup.BackupWalletDialogArgs
 import com.tari.android.wallet.ui.dialog.error.ErrorDialogArgs
 import com.tari.android.wallet.ui.dialog.testnet.TestnetReceivedDialogArgs
@@ -27,6 +28,7 @@ import com.tari.android.wallet.util.Constants
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import org.joda.time.DateTime
 import java.math.BigDecimal
 import java.util.concurrent.CopyOnWriteArrayList
 import javax.inject.Inject
@@ -41,6 +43,9 @@ internal class TxListViewModel() : CommonViewModel() {
 
     @Inject
     lateinit var gifRepository: GIFRepository
+
+    @Inject
+    lateinit var backupSettingsRepository: BackupSettingsRepository
 
     lateinit var serviceConnection: TariWalletServiceConnection
     val walletService: TariWalletService
@@ -406,25 +411,27 @@ internal class TxListViewModel() : CommonViewModel() {
     }
 
     private fun showWalletBackupPromptIfNecessary() {
-        if (!sharedPrefsRepository.backupIsEnabled || sharedPrefsRepository.backupPassword == null) {
-            val inboundTransactionsCount = pendingInboundTxs.size + completedTxs.asSequence()
-                .filter { it.direction == Tx.Direction.INBOUND }.count()
+        if (!backupSettingsRepository.isShowHintDialog()) return
+
+        if (!backupSettingsRepository.backupIsEnabled || backupSettingsRepository.backupPassword == null) {
+            backupSettingsRepository.lastBackupDialogShown = DateTime.now()
+            val inboundTransactionsCount = pendingInboundTxs.size + completedTxs.asSequence().filter { it.direction == Tx.Direction.INBOUND }.count()
             val tarisAmount = balanceInfo.value!!.availableBalance.tariValue + balanceInfo.value!!.pendingIncomingBalance.tariValue
             when {
                 inboundTransactionsCount >= 5
                         && tarisAmount >= BigDecimal("25000")
-                        && sharedPrefsRepository.backupIsEnabled
-                        && sharedPrefsRepository.backupPassword == null -> showSecureYourBackupsDialog()
+                        && backupSettingsRepository.backupIsEnabled
+                        && backupSettingsRepository.backupPassword == null -> showSecureYourBackupsDialog()
                 inboundTransactionsCount >= 4
                         && tarisAmount >= BigDecimal("8000")
-                        && !sharedPrefsRepository.backupIsEnabled -> showRepeatedBackUpPrompt()
+                        && !backupSettingsRepository.backupIsEnabled -> showRepeatedBackUpPrompt()
                 // Non-faucet transactions only here. Calculation is performed here to avoid
                 // unnecessary calculations as previous two cases have much greater chance to happen
                 pendingInboundTxs.size + completedTxs
                     .filter { it.direction == Tx.Direction.INBOUND }
                     .filterNot { it.status == TxStatus.IMPORTED }
                     .count() >= 1
-                        && !sharedPrefsRepository.backupIsEnabled -> showInitialBackupPrompt()
+                        && !backupSettingsRepository.backupIsEnabled -> showInitialBackupPrompt()
             }
         }
     }

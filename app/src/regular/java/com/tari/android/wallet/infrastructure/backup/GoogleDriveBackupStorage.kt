@@ -52,8 +52,8 @@ import com.google.api.services.drive.DriveScopes
 import com.google.api.services.drive.model.FileList
 import com.orhanobut.logger.Logger
 import com.tari.android.wallet.R
-import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import com.tari.android.wallet.extension.getLastPathComponent
+import com.tari.android.wallet.ui.dialog.backup.BackupSettingsRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.joda.time.DateTime
@@ -65,7 +65,7 @@ import kotlin.coroutines.suspendCoroutine
 internal class GoogleDriveBackupStorage(
     private val context: Context,
     private val namingPolicy: BackupNamingPolicy,
-    private val sharedPrefs: SharedPrefsRepository,
+    private val backupSettingsRepository: BackupSettingsRepository,
     private val walletTempDirPath: String,
     private val backupFileProcessor: BackupFileProcessor
 ) : BackupStorage {
@@ -156,7 +156,7 @@ internal class GoogleDriveBackupStorage(
             }
             // update backup password
             if (newPassword != null) {
-                sharedPrefs.backupPassword = newPassword.toString()
+                backupSettingsRepository.backupPassword = newPassword.toString()
             }
             try {
                 backupFileProcessor.clearTempFolder()
@@ -222,8 +222,8 @@ internal class GoogleDriveBackupStorage(
             backupFileProcessor.restoreBackupFile(tempFile, password)
             backupFileProcessor.clearTempFolder()
             // restore successful, turn on automated backup
-            sharedPrefs.lastSuccessfulBackupDate = namingPolicy.getDateFromBackupFileName(tempFile.name)
-            sharedPrefs.backupPassword = password
+            backupSettingsRepository.lastSuccessfulBackupDate = namingPolicy.getDateFromBackupFileName(tempFile.name)
+            backupSettingsRepository.backupPassword = password
         }
     }
 
