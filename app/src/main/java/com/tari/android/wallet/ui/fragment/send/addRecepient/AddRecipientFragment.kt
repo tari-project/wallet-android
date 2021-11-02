@@ -61,17 +61,18 @@ import com.tari.android.wallet.R.string.*
 import com.tari.android.wallet.application.DeepLink
 import com.tari.android.wallet.application.DeepLink.Type.EMOJI_ID
 import com.tari.android.wallet.application.DeepLink.Type.PUBLIC_KEY_HEX
+import com.tari.android.wallet.data.network.NetworkRepository
 import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import com.tari.android.wallet.databinding.FragmentAddRecipientBinding
 import com.tari.android.wallet.di.DiContainer.appComponent
 import com.tari.android.wallet.extension.observe
 import com.tari.android.wallet.infrastructure.Tracker
 import com.tari.android.wallet.model.*
-import com.tari.android.wallet.ui.activity.qr.EXTRA_QR_DATA
-import com.tari.android.wallet.ui.activity.qr.QRScannerActivity
 import com.tari.android.wallet.ui.common.CommonFragment
 import com.tari.android.wallet.ui.common.recyclerView.CommonAdapter
 import com.tari.android.wallet.ui.extension.*
+import com.tari.android.wallet.ui.fragment.qr.EXTRA_QR_DATA
+import com.tari.android.wallet.ui.fragment.qr.QRScannerActivity
 import com.tari.android.wallet.ui.fragment.send.addRecepient.list.RecipientListAdapter
 import com.tari.android.wallet.ui.fragment.send.addRecepient.list.RecipientViewHolderItem
 import com.tari.android.wallet.util.*
@@ -98,6 +99,9 @@ class AddRecipientFragment : CommonFragment<FragmentAddRecipientBinding, AddReci
 
     @Inject
     lateinit var clipboardManager: ClipboardManager
+
+    @Inject
+    lateinit var networkRepository: NetworkRepository
 
     /**
      * List, adapter & layout manager.
@@ -370,7 +374,7 @@ class AddRecipientFragment : CommonFragment<FragmentAddRecipientBinding, AddReci
             && data != null
         ) {
             val qrData = data.getStringExtra(EXTRA_QR_DATA) ?: return
-            val deepLink = DeepLink.from(qrData) ?: return
+            val deepLink = DeepLink.from(networkRepository, qrData) ?: return
             when (deepLink.type) {
                 EMOJI_ID -> {
                     ui.searchEditText.setText(

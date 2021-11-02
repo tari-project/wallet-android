@@ -47,6 +47,7 @@ import com.tari.android.wallet.ffi.FFICommsConfig
 import com.tari.android.wallet.ffi.FFIException
 import com.tari.android.wallet.ffi.FFITransportType
 import com.tari.android.wallet.ffi.nullptr
+import com.tari.android.wallet.ui.common.domain.ResourceManager
 import com.tari.android.wallet.util.Constants
 import org.junit.After
 import org.junit.Assert.assertNotEquals
@@ -64,8 +65,9 @@ class FFICommsConfigTests {
         private const val DB_NAME = "tari_test_db"
         private var walletDir = ""
         private val context = getApplicationContext<Context>()
+        private val resourceManager = ResourceManager(context)
         private val prefs = context.getSharedPreferences(ApplicationModule.sharedPrefsFileName, Context.MODE_PRIVATE)
-        private val networkRepository = NetworkRepositoryImpl(prefs)
+        private val networkRepository = NetworkRepositoryImpl(resourceManager, prefs)
 
         @BeforeClass
         @JvmStatic

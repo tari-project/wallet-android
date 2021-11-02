@@ -32,6 +32,7 @@
  */
 package com.tari.android.wallet.application
 
+import com.tari.android.wallet.data.network.NetworkRepository
 import java.net.URLDecoder
 
 /**
@@ -61,20 +62,19 @@ internal class DeepLink private constructor(
 
         const val PARAMETER_NOTE = "note"
         const val PARAMETER_AMOUNT = "amount"
-        private val regexNetwork =
-            "(" + Network.MAINNET.uriComponent + "|" + Network.STIBBONS.uriComponent + ")"
         private val regexEmojiId = Type.EMOJI_ID.uriComponent + "/(.{33})"
-        private val regexPublicKeyHex =
-            Type.PUBLIC_KEY_HEX.uriComponent + "/([a-zA-Z0-9]{64})"
-        private val emojiIdRegex = Regex("tari://$regexNetwork/$regexEmojiId(\\?.*)?")
-        private val publicKeyRegex = Regex("tari://$regexNetwork/$regexPublicKeyHex(\\?.*)?")
-
+        private val regexPublicKeyHex = Type.PUBLIC_KEY_HEX.uriComponent + "/([a-zA-Z0-9]{64})"
         /**
          * Parse deep link.
          *
          * @return null if deep link is not in valid format
          */
-        fun from(deepLink: String): DeepLink? {
+        fun from(networkRepository: NetworkRepository, deepLink: String): DeepLink? {
+            val regexNetwork = "(" + Network.MAINNET.uriComponent + "|" + networkRepository.currentNetwork!!.network.uriComponent + ")"
+
+            val emojiIdRegex = Regex("tari://$regexNetwork/$regexEmojiId(\\?.*)?")
+            val publicKeyRegex = Regex("tari://$regexNetwork/$regexPublicKeyHex(\\?.*)?")
+
             if (emojiIdRegex.matches(deepLink)) {
                 val matchResult = emojiIdRegex.find(deepLink)!!
                 val (networkUriComponent, value, parameters) = matchResult.destructured
@@ -105,5 +105,4 @@ internal class DeepLink private constructor(
                 .toMap()
 
     }
-
 }

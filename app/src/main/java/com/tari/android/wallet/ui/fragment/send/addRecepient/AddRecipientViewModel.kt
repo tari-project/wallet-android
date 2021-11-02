@@ -6,6 +6,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.tari.android.wallet.R
 import com.tari.android.wallet.application.DeepLink
+import com.tari.android.wallet.data.network.NetworkRepository
 import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import com.tari.android.wallet.extension.addTo
 import com.tari.android.wallet.extension.executeWithError
@@ -55,6 +56,9 @@ class AddRecipientViewModel() : CommonViewModel() {
 
     @Inject
     lateinit var sharedPrefsWrapper: SharedPrefsRepository
+
+    @Inject
+    lateinit var networkRepository: NetworkRepository
 
     private val serviceConnection = TariWalletServiceConnection()
     private val walletService
@@ -147,7 +151,7 @@ class AddRecipientViewModel() : CommonViewModel() {
     fun checkClipboardForValidEmojiId() {
         val clipboardString = clipboardManager.primaryClip?.getItemAt(0)?.text?.toString() ?: return
 
-        val deepLink = DeepLink.from(clipboardString)
+        val deepLink = DeepLink.from(networkRepository, clipboardString)
         if (deepLink != null) { // there is a deep link in the clipboard
             emojiIdPublicKey = when (deepLink.type) {
                 DeepLink.Type.EMOJI_ID -> walletService.getPublicKeyFromEmojiId(deepLink.identifier)
