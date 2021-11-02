@@ -39,6 +39,7 @@ import com.orhanobut.logger.Logger
 import com.tari.android.wallet.data.WalletConfig
 import com.tari.android.wallet.data.network.NetworkRepositoryImpl
 import com.tari.android.wallet.di.ApplicationModule
+import com.tari.android.wallet.ui.common.domain.ResourceManager
 
 /**
  * This receiver is responsible for starting the service after boot finish.
@@ -51,7 +52,9 @@ class BootDeviceReceiver : BroadcastReceiver() {
         if (context == null || intent == null) return
         Logger.d("Boot device broadcast received.")
         if (Intent.ACTION_BOOT_COMPLETED == intent.action) {
-            val networkRepository = NetworkRepositoryImpl(context.getSharedPreferences(ApplicationModule.sharedPrefsFileName, Context.MODE_PRIVATE))
+            val resourceManager = ResourceManager(context)
+            val sharedPreferences = context.getSharedPreferences(ApplicationModule.sharedPrefsFileName, Context.MODE_PRIVATE)
+            val networkRepository = NetworkRepositoryImpl(resourceManager, sharedPreferences)
             WalletServiceLauncher(context, WalletConfig(context, networkRepository)).startIfExist()
         }
     }

@@ -2,6 +2,7 @@ package com.tari.android.wallet.ui.fragment.tx
 
 import androidx.lifecycle.*
 import com.tari.android.wallet.R
+import com.tari.android.wallet.data.network.NetworkRepository
 import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import com.tari.android.wallet.event.Event
 import com.tari.android.wallet.event.EventBus
@@ -12,6 +13,8 @@ import com.tari.android.wallet.service.TariWalletService
 import com.tari.android.wallet.service.connection.TariWalletServiceConnection
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.common.SingleLiveEvent
+import com.tari.android.wallet.ui.common.gyphy.presentation.GIFViewModel
+import com.tari.android.wallet.ui.common.gyphy.repository.GIFRepository
 import com.tari.android.wallet.ui.common.recyclerView.CommonViewHolderItem
 import com.tari.android.wallet.ui.common.recyclerView.items.TitleViewHolderItem
 import com.tari.android.wallet.ui.dialog.backup.BackupWalletDialogArgs
@@ -20,9 +23,7 @@ import com.tari.android.wallet.ui.dialog.testnet.TestnetReceivedDialogArgs
 import com.tari.android.wallet.ui.dialog.ttl.TtlStoreWalletDialogArgs
 import com.tari.android.wallet.ui.fragment.send.finalize.FinalizeSendTxFragment
 import com.tari.android.wallet.ui.fragment.tx.adapter.TransactionItem
-import com.tari.android.wallet.ui.common.gyphy.presentation.GIFViewModel
 import com.tari.android.wallet.ui.fragment.tx.ui.UpdateProgressViewController
-import com.tari.android.wallet.ui.common.gyphy.repository.GIFRepository
 import com.tari.android.wallet.util.Constants
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -41,6 +42,9 @@ internal class TxListViewModel() : CommonViewModel() {
 
     @Inject
     lateinit var gifRepository: GIFRepository
+
+    @Inject
+    lateinit var networkRepository: NetworkRepository
 
     lateinit var serviceConnection: TariWalletServiceConnection
     val walletService: TariWalletService
@@ -382,10 +386,12 @@ internal class TxListViewModel() : CommonViewModel() {
 
     private fun testnetTariRequestError(errorMessage: String) {
         testnetTariRequestIsInProgress = false
-        val description = if (errorMessage.contains("many allocation attempts"))
-            resourceManager.getString(R.string.faucet_error_too_many_allocation_attemps) else errorMessage
-        val errorDialogArgs = ErrorDialogArgs(resourceManager.getString(R.string.faucet_error_title), description)
-        _errorDialog.postValue(errorDialogArgs)
+        if (!networkRepository.currentNetwork?.faucetUrl.isNullOrEmpty()) {
+            val description = if (errorMessage.contains("many allocation attempts"))
+                resourceManager.getString(R.string.faucet_error_too_many_allocation_attemps) else errorMessage
+            val errorDialogArgs = ErrorDialogArgs(resourceManager.getString(R.string.faucet_error_title), description)
+            _errorDialog.postValue(errorDialogArgs)
+        }
     }
 
 

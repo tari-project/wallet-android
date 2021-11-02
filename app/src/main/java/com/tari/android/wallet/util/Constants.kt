@@ -141,7 +141,6 @@ internal object Constants {
         const val storeAndForwardMessageDurationSec = 10800L
         const val emojiIdLength = 33
         const val emojiFormatterChunkSize = 3
-        const val faucetServerUrl = "https://faucet.tari.com"
         const val pushNotificationServerUrl = "https://push.tari.com"
         const val deepLinkURLPrefix = "tari://"
         const val pendingTxExpirationPeriodHours = 3 * 24

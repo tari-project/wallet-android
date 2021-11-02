@@ -46,11 +46,11 @@ import com.tari.android.wallet.data.network.NetworkRepository
 import com.tari.android.wallet.data.network.NetworkRepositoryImpl
 import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodeSharedRepository
-import com.tari.android.wallet.ui.common.gyphy.GiphyEcosystem
 import com.tari.android.wallet.infrastructure.security.biometric.BiometricAuthenticationService
 import com.tari.android.wallet.notification.NotificationHelper
 import com.tari.android.wallet.service.WalletServiceLauncher
 import com.tari.android.wallet.ui.common.domain.ResourceManager
+import com.tari.android.wallet.ui.common.gyphy.GiphyEcosystem
 import dagger.Module
 import dagger.Provides
 import java.io.File
@@ -88,7 +88,8 @@ internal class ApplicationModule(
 
     @Provides
     @Singleton
-    fun provideNetworkRepository(prefs: SharedPreferences): NetworkRepository = NetworkRepositoryImpl(prefs)
+    fun provideNetworkRepository(resourceManager: ResourceManager, prefs: SharedPreferences): NetworkRepository =
+        NetworkRepositoryImpl(resourceManager, prefs)
 
     @Provides
     @Singleton
