@@ -34,13 +34,14 @@ package com.tari.android.wallet.model
 
 import android.os.Parcel
 import android.os.Parcelable
+import java.io.Serializable
 
 /**
  * User with a wallet.
  *
  * @author The Tari Development Team
  */
-open class User() : Parcelable {
+open class User() : Parcelable, Serializable {
 
     var publicKey = PublicKey()
 

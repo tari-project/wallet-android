@@ -33,9 +33,9 @@
 package com.tari.android.wallet.ui.fragment.send.activity
 
 import android.os.Bundle
+import androidx.activity.viewModels
 import androidx.fragment.app.Fragment
 import com.tari.android.wallet.R
-import com.tari.android.wallet.R.color.white
 import com.tari.android.wallet.application.DeepLink
 import com.tari.android.wallet.databinding.ActivitySendTariBinding
 import com.tari.android.wallet.di.DiContainer.appComponent
@@ -55,8 +55,15 @@ import com.tari.android.wallet.ui.fragment.send.addAmount.AddAmountFragment
 import com.tari.android.wallet.ui.fragment.send.addNote.AddNoteFragment
 import com.tari.android.wallet.ui.fragment.send.addRecepient.AddRecipientFragment
 import com.tari.android.wallet.ui.fragment.send.addRecepient.AddRecipientListener
+import com.tari.android.wallet.ui.fragment.send.common.TransactionData
 import com.tari.android.wallet.ui.fragment.send.finalize.FinalizeSendTxFragment
+import com.tari.android.wallet.ui.fragment.send.finalize.FinalizeSendTxListener
+import com.tari.android.wallet.ui.fragment.send.finalize.TxFailureReason
 import com.tari.android.wallet.util.Constants
+import com.tari.android.wallet.yat.YatAdapter
+import com.tari.android.wallet.yat.YatUser
+import java.lang.ref.WeakReference
+import javax.inject.Inject
 
 
 /**
@@ -68,12 +75,20 @@ internal class SendTariActivity : CommonActivity<ActivitySendTariBinding, SendTa
     AddRecipientListener,
     AddAmountFragment.Listener,
     AddNoteFragment.Listener,
-    FinalizeSendTxFragment.Listener {
+    FinalizeSendTxListener {
+
+    @Inject
+    lateinit var yatAdapter: YatAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        instance = WeakReference(this)
         appComponent.inject(this)
         super.onCreate(savedInstanceState)
         ui = ActivitySendTariBinding.inflate(layoutInflater).apply { setContentView(root) }
+
+        val viewModel: SendTariViewModel by viewModels()
+        bindViewModel(viewModel)
+
         if (savedInstanceState == null) {
             loadFragment()
         }
@@ -129,50 +144,32 @@ internal class SendTariActivity : CommonActivity<ActivitySendTariBinding, SendTa
         addFragment(AddNoteFragment(), bundle)
     }
 
-    override fun continueToFinalizeSendTx(
-        sourceFragment: AddNoteFragment,
-        recipientUser: User,
-        amount: MicroTari,
-        note: String
-    ) {
-        val bundle = Bundle().apply {
-            putParcelable("recipientUser", recipientUser)
-            putParcelable("amount", amount)
-            putString("note", note)
+    override fun continueToFinalizeSendTx(sourceFragment: AddNoteFragment, transactionData: TransactionData) {
+        if (transactionData.recipientUser is YatUser) {
+            yatAdapter.showOutcomingFinalizeActivity(this, transactionData)
+        } else {
+            addFragment(FinalizeSendTxFragment.create(transactionData))
+            ui.rootView.post { ui.rootView.setBackgroundColor(color(R.color.white)) }
         }
-        addFragment(FinalizeSendTxFragment(), bundle)
-
-        ui.rootView.post { ui.rootView.setBackgroundColor(color(white)) }
     }
 
-    override fun onSendTxFailure(
-        sourceFragment: FinalizeSendTxFragment,
-        recipientUser: User,
-        amount: MicroTari,
-        note: String,
-        failureReason: FinalizeSendTxFragment.FailureReason
-    ) {
-        EventBus.post(Event.Transaction.TxSendFailed(failureReason))
+    override fun onSendTxFailure(transactionData: TransactionData, txFailureReason: TxFailureReason) {
+        EventBus.post(Event.Transaction.TxSendFailed(txFailureReason))
         finish()
         overridePendingTransition(R.anim.fade_in, R.anim.fade_out)
     }
 
-    override fun onSendTxSuccessful(
-        sourceFragment: FinalizeSendTxFragment,
-        txId: TxId,
-        recipientUser: User,
-        amount: MicroTari,
-        note: String
-    ) {
+    override fun onSendTxSuccessful(txId: TxId, transactionData: TransactionData) {
         EventBus.post(Event.Transaction.TxSendSuccessful(txId))
         finish()
         overridePendingTransition(R.anim.fade_in, R.anim.fade_out)
     }
 
     private fun addFragment(fragment: Fragment, bundle: Bundle? = null, isRoot: Boolean = false) {
-        fragment.arguments = bundle
+        bundle?.let { fragment.arguments = it }
         val transaction = supportFragmentManager.beginTransaction()
             .addEnterLeftAnimation()
+            .apply { supportFragmentManager.fragments.forEach { hide(it) } }
             .add(R.id.send_tari_fragment_container_view, fragment, fragment::class.java.simpleName)
         if (!isRoot) {
             transaction.addToBackStack(null)
@@ -185,5 +182,8 @@ internal class SendTariActivity : CommonActivity<ActivitySendTariBinding, SendTa
         super.onDestroy()
     }
 
-    override fun onSendTxStarted(sourceFragment: FinalizeSendTxFragment) = Unit
+    companion object {
+        var instance: WeakReference<SendTariActivity> = WeakReference(null)
+            private set
+    }
 }

@@ -4,8 +4,11 @@ import android.os.Parcel
 import android.os.Parcelable
 import com.tari.android.wallet.model.PublicKey
 import com.tari.android.wallet.model.User
+import java.io.Serializable
 
-class YatUser : User {
+class YatUser : User, Serializable {
+
+    var yat: String = ""
 
     constructor(publicKey: PublicKey) : super() {
         this.publicKey = publicKey

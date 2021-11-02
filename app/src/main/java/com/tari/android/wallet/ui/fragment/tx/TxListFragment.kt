@@ -43,6 +43,7 @@ import android.hardware.SensorManager
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.os.Parcelable
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
@@ -69,7 +70,6 @@ import com.tari.android.wallet.extension.observeOnLoad
 import com.tari.android.wallet.infrastructure.Tracker
 import com.tari.android.wallet.model.*
 import com.tari.android.wallet.ui.activity.debug.DebugActivity
-import com.tari.android.wallet.ui.fragment.send.activity.SendTariActivity
 import com.tari.android.wallet.ui.common.CommonFragment
 import com.tari.android.wallet.ui.common.recyclerView.CommonAdapter
 import com.tari.android.wallet.ui.common.recyclerView.CommonViewHolderItem
@@ -78,6 +78,7 @@ import com.tari.android.wallet.ui.dialog.backup.BackupWalletDialog
 import com.tari.android.wallet.ui.dialog.testnet.TestnetReceivedDialog
 import com.tari.android.wallet.ui.dialog.ttl.TtlStoreWalletDialog
 import com.tari.android.wallet.ui.extension.*
+import com.tari.android.wallet.ui.fragment.send.activity.SendTariActivity
 import com.tari.android.wallet.ui.fragment.tx.adapter.TxListAdapter
 import com.tari.android.wallet.ui.fragment.tx.questionMark.QuestionMarkViewModel
 import com.tari.android.wallet.ui.fragment.tx.ui.BalanceViewController
@@ -282,7 +283,7 @@ internal class TxListFragment : CommonFragment<FragmentTxListBinding, TxListView
 
     private fun navigateToSendTari(user: User) {
         val intent = Intent(requireContext(), SendTariActivity::class.java)
-        intent.putExtra("recipientUser", user)
+        intent.putExtra("recipientUser", user as Parcelable)
         val parameters: Map<String, String> = emptyMap()
         parameters[DeepLink.PARAMETER_NOTE]?.let { intent.putExtra(DeepLink.PARAMETER_NOTE, it) }
         parameters[DeepLink.PARAMETER_AMOUNT]?.toDoubleOrNull()?.let { intent.putExtra(DeepLink.PARAMETER_AMOUNT, it) }

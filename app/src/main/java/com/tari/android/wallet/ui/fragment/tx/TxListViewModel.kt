@@ -21,7 +21,7 @@ import com.tari.android.wallet.ui.dialog.backup.BackupWalletDialogArgs
 import com.tari.android.wallet.ui.dialog.error.ErrorDialogArgs
 import com.tari.android.wallet.ui.dialog.testnet.TestnetReceivedDialogArgs
 import com.tari.android.wallet.ui.dialog.ttl.TtlStoreWalletDialogArgs
-import com.tari.android.wallet.ui.fragment.send.finalize.FinalizeSendTxFragment
+import com.tari.android.wallet.ui.fragment.send.finalize.TxFailureReason
 import com.tari.android.wallet.ui.fragment.tx.adapter.TransactionItem
 import com.tari.android.wallet.ui.fragment.tx.ui.UpdateProgressViewController
 import com.tari.android.wallet.util.Constants
@@ -353,12 +353,12 @@ internal class TxListViewModel() : CommonViewModel() {
     /**
      * Called when an outgoing transaction has failed.
      */
-    private fun onTxSendFailed(failureReason: FinalizeSendTxFragment.FailureReason) {
+    private fun onTxSendFailed(failureReason: TxFailureReason) {
         when (failureReason) {
-            FinalizeSendTxFragment.FailureReason.NETWORK_CONNECTION_ERROR -> {
+            TxFailureReason.NETWORK_CONNECTION_ERROR -> {
                 displayNetworkConnectionErrorDialog()
             }
-            FinalizeSendTxFragment.FailureReason.BASE_NODE_CONNECTION_ERROR, FinalizeSendTxFragment.FailureReason.SEND_ERROR -> {
+            TxFailureReason.BASE_NODE_CONNECTION_ERROR, TxFailureReason.SEND_ERROR -> {
                 displayBaseNodeConnectionErrorDialog()
             }
         }

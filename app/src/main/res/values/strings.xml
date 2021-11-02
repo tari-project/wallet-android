@@ -228,7 +228,7 @@
 
     <!-- send tari - add recipient -->
     <string name="add_recipient_title">Send To</string>
-    <string name="add_recipient_hint">Enter Emoji ID or Contact Name</string>
+    <string name="add_recipient_hint">Enter Emoji ID, Contact Name or Yat</string>
     <string name="add_recipient_recent_tx_contacts">Recent</string>
     <string name="add_recipient_my_contacts">My Contacts</string>
     <string name="add_recipient_invalid_emoji_id">Not a valid Emoji ID</string>

@@ -115,7 +115,7 @@ class AddRecipientViewModel() : CommonViewModel() {
             if (searchResult.status) {
                 val list = _list.value!!
                 val records = searchResult.result.filter { it.type == YatRecordType.TARI_PUBKEY }
-                    .map { result -> YatUser(walletService.getPublicKeyFromHexString(result.data)) }
+                    .map { result -> YatUser(walletService.getPublicKeyFromHexString(result.data)).apply { yat = query } }
                     .map { user -> RecipientViewHolderItem(user) }
                 list.addAll(0, records)
                 _list.postValue(list)

@@ -9,6 +9,7 @@ import android.widget.LinearLayout
 import com.tari.android.wallet.R
 import com.tari.android.wallet.databinding.DialogErrorBinding
 import com.tari.android.wallet.ui.dialog.TariDialog
+import yat.android.ui.extension.HtmlHelper
 
 class ErrorDialog constructor(context: Context, errorDialogArgs: ErrorDialogArgs) : TariDialog {
 
@@ -40,7 +41,7 @@ class ErrorDialog constructor(context: Context, errorDialogArgs: ErrorDialogArgs
                 setCancelable(cancelable)
                 setCanceledOnTouchOutside(canceledOnTouchOutside)
                 ui.errorDialogTitleTextView.text = title
-                ui.errorDialogDescriptionTextView.text = description
+                ui.errorDialogDescriptionTextView.text = HtmlHelper.getSpannedText(description.toString())
                 ui.errorDialogCloseView.setOnClickListener { dismiss() }
                 setOnDismissListener { onClose() }
             }

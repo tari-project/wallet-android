@@ -36,6 +36,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.os.Parcelable
 import android.view.View
 import android.widget.ImageView
 import androidx.activity.viewModels
@@ -55,7 +56,6 @@ import com.tari.android.wallet.di.DiContainer.appComponent
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.extension.addTo
 import com.tari.android.wallet.extension.applyFontStyle
-import com.tari.android.wallet.ui.common.gyphy.GiphyEcosystem
 import com.tari.android.wallet.model.*
 import com.tari.android.wallet.network.NetworkConnectionState
 import com.tari.android.wallet.service.TariWalletService
@@ -68,6 +68,7 @@ import com.tari.android.wallet.ui.activity.settings.BackupSettingsActivity
 import com.tari.android.wallet.ui.activity.settings.DeleteWalletActivity
 import com.tari.android.wallet.ui.activity.tx.TxDetailsActivity
 import com.tari.android.wallet.ui.common.CommonActivity
+import com.tari.android.wallet.ui.common.gyphy.GiphyEcosystem
 import com.tari.android.wallet.ui.component.CustomFont
 import com.tari.android.wallet.ui.component.CustomFontTextView
 import com.tari.android.wallet.ui.dialog.BottomSlideDialog
@@ -338,7 +339,7 @@ internal class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>
             else -> User(recipientPublicKey)
         }
         val intent = Intent(this, SendTariActivity::class.java)
-        intent.putExtra("recipientUser", recipientUser)
+        intent.putExtra("recipientUser", recipientUser as Parcelable)
         parameters[DeepLink.PARAMETER_NOTE]?.let { intent.putExtra(DeepLink.PARAMETER_NOTE, it) }
         parameters[DeepLink.PARAMETER_AMOUNT]?.toDoubleOrNull()
             ?.let { intent.putExtra(DeepLink.PARAMETER_AMOUNT, it) }
