@@ -14,6 +14,7 @@ import com.tari.android.wallet.infrastructure.backup.BackupStorageAuthRevokedExc
 import com.tari.android.wallet.infrastructure.backup.BackupStorageFullException
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.common.SingleLiveEvent
+import com.tari.android.wallet.ui.dialog.backup.BackupSettingsRepository
 import com.tari.android.wallet.ui.dialog.error.ErrorDialogArgs
 import com.tari.android.wallet.ui.fragment.settings.userAutorization.BiometricAuthenticationViewModel
 import kotlinx.coroutines.Dispatchers
@@ -29,7 +30,7 @@ internal class BackupSettingsViewModel : CommonViewModel() {
     lateinit var backupManager: BackupManager
 
     @Inject
-    lateinit var sharedPrefs: SharedPrefsRepository
+    lateinit var backupSettingsRepository: BackupSettingsRepository
 
     lateinit var biometricAuthenticationViewModel: BiometricAuthenticationViewModel
 
@@ -83,8 +84,8 @@ internal class BackupSettingsViewModel : CommonViewModel() {
 
         EventBus.backupState.subscribe(this, this::onBackupStateChanged)
 
-        backupOptionsAreVisible.postValue(sharedPrefs.backupIsEnabled)
-        _backupPermissionSwitchChecked.postValue(sharedPrefs.backupIsEnabled)
+        backupOptionsAreVisible.postValue(backupSettingsRepository.backupIsEnabled)
+        _backupPermissionSwitchChecked.postValue(backupSettingsRepository.backupIsEnabled)
         _backupStateChanged.postValue(Unit)
         refillSharedPrefsData()
     }
@@ -116,7 +117,7 @@ internal class BackupSettingsViewModel : CommonViewModel() {
 
     fun onUpdatePassword() {
         biometricAuthenticationViewModel.requireAuthorization {
-            if (sharedPrefs.backupPassword == null) {
+            if (backupSettingsRepository.backupPassword == null) {
                 _navigation.postValue(BackupSettingsNavigation.ToChangePassword)
             } else {
                 _navigation.postValue(BackupSettingsNavigation.ToConfirmPassword)
@@ -164,8 +165,8 @@ internal class BackupSettingsViewModel : CommonViewModel() {
     }
 
     private fun refillSharedPrefsData() {
-        _backupPassword.postValue(Optional.ofNullable(sharedPrefs.backupPassword?.toString()))
-        _lastSuccessfulBackupDate.postValue(Optional.ofNullable(sharedPrefs.lastSuccessfulBackupDate))
+        _backupPassword.postValue(Optional.ofNullable(backupSettingsRepository.backupPassword))
+        _lastSuccessfulBackupDate.postValue(Optional.ofNullable(backupSettingsRepository.lastSuccessfulBackupDate))
     }
 
     private fun showBackupStorageSetupFailedDialog(exception: Exception? = null) {
@@ -270,7 +271,7 @@ internal class BackupSettingsViewModel : CommonViewModel() {
         _isBackupAvailable.postValue(true)
         _isBackupNowEnabled.postValue(true)
         _updatePasswordEnabled.postValue(true)
-        if (sharedPrefs.backupFailureDate == null) {
+        if (backupSettingsRepository.backupFailureDate == null) {
             _cloudBackupStatus.postValue(CloudBackupStatus.Scheduled)
         } else {
             _cloudBackupStatus.postValue(
