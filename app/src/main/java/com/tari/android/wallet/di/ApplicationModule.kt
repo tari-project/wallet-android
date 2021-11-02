@@ -89,7 +89,8 @@ internal class ApplicationModule(
 
     @Provides
     @Singleton
-    fun provideNetworkRepository(prefs: SharedPreferences): NetworkRepository = NetworkRepositoryImpl(prefs)
+    fun provideNetworkRepository(resourceManager: ResourceManager, prefs: SharedPreferences): NetworkRepository =
+        NetworkRepositoryImpl(resourceManager, prefs)
 
     @Provides
     @Singleton

@@ -39,6 +39,7 @@ import com.orhanobut.logger.Logger
 import com.tari.android.wallet.data.WalletConfig
 import com.tari.android.wallet.data.network.NetworkRepositoryImpl
 import com.tari.android.wallet.di.ApplicationModule
+import com.tari.android.wallet.ui.common.domain.ResourceManager
 
 /**
  * This receiver is responsible for restarting the service when it gets destroyed - i.e. when
@@ -50,7 +51,9 @@ class ServiceRestartBroadcastReceiver : BroadcastReceiver() {
 
     override fun onReceive(context: Context, intent: Intent) {
         Logger.d("Service restart broadcast received.")
-        val networkRepository = NetworkRepositoryImpl(context.getSharedPreferences(ApplicationModule.sharedPrefsFileName, Context.MODE_PRIVATE))
+        val resourceManager = ResourceManager(context)
+        val sharedPreferences = context.getSharedPreferences(ApplicationModule.sharedPrefsFileName, Context.MODE_PRIVATE)
+        val networkRepository = NetworkRepositoryImpl(resourceManager, sharedPreferences)
         WalletServiceLauncher(context, WalletConfig(context, networkRepository)).startIfExist()
     }
 }

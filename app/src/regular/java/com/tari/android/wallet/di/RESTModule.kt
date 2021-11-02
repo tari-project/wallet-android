@@ -33,6 +33,7 @@
 package com.tari.android.wallet.di
 
 import com.tari.android.wallet.BuildConfig
+import com.tari.android.wallet.data.network.NetworkRepository
 import com.tari.android.wallet.service.faucet.TestnetFaucetRESTGateway
 import com.tari.android.wallet.service.faucet.TestnetFaucetRESTService
 import com.tari.android.wallet.service.faucet.TestnetFaucetService
@@ -76,9 +77,11 @@ internal class RESTModule {
     @Named(FieldName.faucetRetrofit)
     @Singleton
     fun provideTestnetFaucetRetrofit(
+        networkRepository: NetworkRepository,
         @Named(FieldName.faucetHttpClient) okHttpClient: OkHttpClient
     ): Retrofit = Retrofit.Builder()
-        .baseUrl(Constants.Wallet.faucetServerUrl)
+        //cant live without empty base url
+        .baseUrl(networkRepository.currentNetwork?.faucetUrl ?: "https://localhost/")
         .client(okHttpClient)
         .addConverterFactory(GsonConverterFactory.create())
         .build()

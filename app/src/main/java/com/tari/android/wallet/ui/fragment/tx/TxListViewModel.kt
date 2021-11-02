@@ -2,6 +2,7 @@ package com.tari.android.wallet.ui.fragment.tx
 
 import androidx.lifecycle.*
 import com.tari.android.wallet.R
+import com.tari.android.wallet.data.network.NetworkRepository
 import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import com.tari.android.wallet.event.Event
 import com.tari.android.wallet.event.EventBus
@@ -43,6 +44,9 @@ internal class TxListViewModel() : CommonViewModel() {
 
     @Inject
     lateinit var gifRepository: GIFRepository
+
+    @Inject
+    lateinit var networkRepository: NetworkRepository
 
     @Inject
     lateinit var backupSettingsRepository: BackupSettingsRepository
@@ -387,10 +391,12 @@ internal class TxListViewModel() : CommonViewModel() {
 
     private fun testnetTariRequestError(errorMessage: String) {
         testnetTariRequestIsInProgress = false
-        val description = if (errorMessage.contains("many allocation attempts"))
-            resourceManager.getString(R.string.faucet_error_too_many_allocation_attemps) else errorMessage
-        val errorDialogArgs = ErrorDialogArgs(resourceManager.getString(R.string.faucet_error_title), description)
-        _errorDialog.postValue(errorDialogArgs)
+        if (!networkRepository.currentNetwork?.faucetUrl.isNullOrEmpty()) {
+            val description = if (errorMessage.contains("many allocation attempts"))
+                resourceManager.getString(R.string.faucet_error_too_many_allocation_attemps) else errorMessage
+            val errorDialogArgs = ErrorDialogArgs(resourceManager.getString(R.string.faucet_error_title), description)
+            _errorDialog.postValue(errorDialogArgs)
+        }
     }
 
 
