@@ -58,6 +58,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 add_library(
         native-lib SHARED
         jniCommon.cpp
+        jniBalance.cpp
         jniByteVector.cpp
         jniTransportType.cpp
         jniPrivateKey.cpp
