@@ -317,7 +317,7 @@ internal class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>
     fun willNotifyAboutNewTx(): Boolean = ui.viewPager.currentItem == INDEX_HOME
 
     private fun processIntentDeepLink(service: TariWalletService, intent: Intent) {
-        DeepLink.from(intent.data?.toString() ?: "")?.let { deepLink ->
+        DeepLink.from(networkRepository, intent.data?.toString().orEmpty())?.let { deepLink ->
             val pubkey = when (deepLink.type) {
                 DeepLink.Type.EMOJI_ID -> service.getPublicKeyFromEmojiId(deepLink.identifier)
                 DeepLink.Type.PUBLIC_KEY_HEX -> service.getPublicKeyFromHexString(deepLink.identifier)

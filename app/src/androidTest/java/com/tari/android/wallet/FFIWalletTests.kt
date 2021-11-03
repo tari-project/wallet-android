@@ -50,6 +50,8 @@ import com.tari.android.wallet.ffi.*
 import com.tari.android.wallet.model.*
 import com.tari.android.wallet.model.recovery.WalletRestorationResult
 import com.tari.android.wallet.service.seedPhrase.SeedPhraseRepository
+import com.tari.android.wallet.ui.common.domain.ResourceManager
+import com.tari.android.wallet.ui.dialog.backup.BackupSettingsRepository
 import com.tari.android.wallet.util.Constants
 import io.mockk.every
 import io.mockk.mockk
@@ -70,9 +72,12 @@ class FFIWalletTests {
     private lateinit var listener: TestAddRecipientListener
     private val context = getApplicationContext<Context>()
     private val prefs = context.getSharedPreferences(ApplicationModule.sharedPrefsFileName, Context.MODE_PRIVATE)
-    private val networkRepository = NetworkRepositoryImpl(prefs)
+    private val resourseManager: ResourceManager = ResourceManager(context)
+    private val networkRepository = NetworkRepositoryImpl(resourseManager, prefs)
     private val baseNodeSharedPrefsRepository = BaseNodeSharedRepository(prefs, networkRepository)
-    private val sharedPrefsRepository = SharedPrefsRepository(context, prefs, networkRepository, baseNodeSharedPrefsRepository)
+    private val backupSettingsRepository = BackupSettingsRepository(context, prefs, networkRepository)
+    private val sharedPrefsRepository =
+        SharedPrefsRepository(context, prefs, networkRepository, backupSettingsRepository, baseNodeSharedPrefsRepository)
     private val walletDirPath = context.filesDir.absolutePath
 
     private fun clean() {

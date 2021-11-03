@@ -101,7 +101,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".ui.activity.qr.QRScannerActivity"
+            android:name="com.tari.android.wallet.ui.fragment.qr.QRScannerActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme"

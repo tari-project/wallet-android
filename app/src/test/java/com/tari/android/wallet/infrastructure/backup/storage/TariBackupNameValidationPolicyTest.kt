@@ -137,7 +137,7 @@ class TariBackupNameValidationPolicyTest {
 class NetworkRepositoryMock : NetworkRepository {
 
     override var supportedNetworks: List<Network> = listOf(Network.WEATHERWAX)
-    override var currentNetwork: TariNetwork? = TariNetwork(Network.WEATHERWAX, "xtr")
+    override var currentNetwork: TariNetwork? = TariNetwork(Network.WEATHERWAX, "xtr", "")
     override var ffiNetwork: Network? = Network.WEATHERWAX
     override var incompatibleNetworkShown: Boolean = false
 
