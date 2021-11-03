@@ -270,7 +270,7 @@ dependencies {
     // sentry - crash analytics
     regularImplementation 'io.sentry:sentry-android:5.0.1'
 
-    implementation "com.github.yat-labs:yat-lib-android:0.1.18"
+    implementation "com.github.yat-labs:yat-lib-android:0.1.20"
 
     // test
     testImplementation 'junit:junit:4.13.2'
