@@ -50,6 +50,7 @@ import com.tari.android.wallet.R.string.*
 import com.tari.android.wallet.databinding.FragmentFinalizeSendTxBinding
 import com.tari.android.wallet.di.DiContainer.appComponent
 import com.tari.android.wallet.event.EventBus
+import com.tari.android.wallet.extension.observeOnLoad
 import com.tari.android.wallet.model.*
 import com.tari.android.wallet.network.NetworkConnectionState
 import com.tari.android.wallet.ui.common.CommonFragment
@@ -90,8 +91,17 @@ class FinalizeSendTxFragment : CommonFragment<FragmentFinalizeSendTxBinding, Fin
         val viewModel: FinalizeSendTxViewModel by viewModels()
         bindViewModel(viewModel)
 
-        viewModel.transactionData = requireArguments().getSerializable(FinalizeSendTxViewModel.transactionDataKey) as TransactionData
+        viewModel.transactionData = requireArguments().getParcelable(FinalizeSendTxViewModel.transactionDataKey)!!
         setupUi()
+        subscribeUI()
+    }
+
+    private fun subscribeUI() = with(viewModel) {
+        observeOnLoad(txFailureReason)
+        observeOnLoad(sentTxId)
+        observeOnLoad(currentStep)
+        observeOnLoad(finishedSending)
+        observeOnLoad(torConnected)
     }
 
     override fun onStart() {
@@ -343,7 +353,7 @@ class FinalizeSendTxFragment : CommonFragment<FragmentFinalizeSendTxBinding, Fin
         fun create(transactionData: TransactionData): FinalizeSendTxFragment {
             return FinalizeSendTxFragment().apply {
                 arguments = Bundle().apply {
-                    putSerializable(FinalizeSendTxViewModel.transactionDataKey, transactionData)
+                    putParcelable(FinalizeSendTxViewModel.transactionDataKey, transactionData)
                 }
             }
         }

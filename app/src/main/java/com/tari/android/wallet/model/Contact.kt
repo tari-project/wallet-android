@@ -34,14 +34,13 @@ package com.tari.android.wallet.model
 
 import android.os.Parcel
 import android.os.Parcelable
-import java.io.Serializable
 
 /**
  * Contact is a user with an alias.
  *
  * @author The Tari Development Team
  */
-class Contact() : User(), Serializable {
+class Contact() : User(), Parcelable {
 
     var alias: String = ""
 
