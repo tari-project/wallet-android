@@ -338,9 +338,14 @@ internal class TxListViewModel() : CommonViewModel() {
         _txSendSuccessful.postValue(Unit)
 
         viewModelScope.launch(Dispatchers.IO) {
-            val tx = walletService.getWithError { error, wallet -> wallet.getPendingOutboundTxById(txId, error) }
-            pendingOutboundTxs.add(tx)
-            _listUpdateTrigger.postValue(Unit)
+            val error = WalletError()
+            val tx = walletService.getPendingOutboundTxById(txId, error)
+            if (error.code == WalletErrorCode.NO_ERROR) {
+                pendingOutboundTxs.add(tx)
+                _listUpdateTrigger.postValue(Unit)
+            } else {
+                refreshAllData()
+            }
         }
 
         refreshBalance(true)

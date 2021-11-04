@@ -4,6 +4,7 @@ import android.app.Activity
 import android.app.ActivityOptions
 import android.content.Context
 import android.content.Intent
+import com.google.gson.Gson
 import com.orhanobut.logger.Logger
 import com.tari.android.wallet.BuildConfig
 import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
@@ -39,8 +40,9 @@ class YatAdapter(
         val data = YatLibOutcomingTransactionData(transactionData.amount!!.tariValue.toDouble(), "Tari", yatUser.yat)
 
         val intent = Intent(activity, YatFinalizeSendTxActivity::class.java)
-        intent.putExtra("YatLibDataKey", data)
-        intent.putExtra(FinalizeSendTxViewModel.transactionDataKey, transactionData as Serializable)
+        intent.putExtra("YatLibDataKey", data as Serializable)
+        val gson = Gson().toJson(transactionData)
+        intent.putExtra(FinalizeSendTxViewModel.transactionDataKey, gson)
         intent.flags = Intent.FLAG_ACTIVITY_NO_ANIMATION
         activity.startActivity(intent, ActivityOptions.makeSceneTransitionAnimation(activity).toBundle())
     }

@@ -33,6 +33,7 @@ class FinalizeSendTxViewModel : CommonViewModel() {
     var sentTxId: MutableLiveData<TxId> = MutableLiveData()
     var txFailureReason: MutableLiveData<TxFailureReason> = MutableLiveData()
     var torConnected: SingleLiveEvent<Unit> = SingleLiveEvent()
+    var finishedSending: SingleLiveEvent<Unit> = SingleLiveEvent()
 
     /**
      * Both send methods have to fail to arrive at the judgement that the send has failed.
@@ -154,6 +155,7 @@ class FinalizeSendTxViewModel : CommonViewModel() {
             // progress state
             switchToNextProgressStateOnProgressAnimComplete = true
             EventBus.unsubscribe(this)
+            finishedSending.postValue(Unit)
         } else {
             directSendHasFailed = true
             checkForCombinedFailure()
@@ -172,6 +174,7 @@ class FinalizeSendTxViewModel : CommonViewModel() {
             // progress state
             switchToNextProgressStateOnProgressAnimComplete = true
             EventBus.unsubscribe(this)
+            finishedSending.postValue(Unit)
         } else {
             storeAndForwardHasFailed = true
             checkForCombinedFailure()
