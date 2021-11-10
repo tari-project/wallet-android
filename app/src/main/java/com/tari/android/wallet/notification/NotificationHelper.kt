@@ -104,7 +104,7 @@ internal class NotificationHelper(private val context: Context) {
 
     fun buildForegroundServiceNotification(): Notification {
         val intent = Intent(context, HomeActivity::class.java)
-        val pendingIntent = PendingIntent.getActivity(context, 0, intent, 0)
+        val pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_IMMUTABLE)
         // prepare foreground service notification
         return NotificationCompat.Builder(
             context,
@@ -149,8 +149,7 @@ internal class NotificationHelper(private val context: Context) {
             Intent(context, HomeActivity::class.java).apply { flags = FLAG_ACTIVITY_CLEAR_TOP },
             TxDetailsActivity.createIntent(context, TxId(tx.id))
         )
-        val pendingIntent =
-            PendingIntent.getActivities(context, 0, intents, PendingIntent.FLAG_UPDATE_CURRENT)
+        val pendingIntent = PendingIntent.getActivities(context, 0, intents, PendingIntent.FLAG_IMMUTABLE)
 
         // prepare transaction notification
         val notification: Notification = NotificationCompat.Builder(
@@ -192,10 +191,8 @@ internal class NotificationHelper(private val context: Context) {
             Intent(context, HomeActivity::class.java).apply { flags = FLAG_ACTIVITY_CLEAR_TOP },
             TxDetailsActivity.createIntent(context, TxId(tx.id))
         )
-        val pendingIntent =
-            PendingIntent.getActivities(context, 0, intents, PendingIntent.FLAG_UPDATE_CURRENT)
-        val notification: Notification =
-            NotificationCompat.Builder(context, APP_NOTIFICATION_CHANNEL_ID).run {
+        val pendingIntent = PendingIntent.getActivities(context, 0, intents, PendingIntent.FLAG_IMMUTABLE)
+        val notification = NotificationCompat.Builder(context, APP_NOTIFICATION_CHANNEL_ID).run {
                 setSmallIcon(R.drawable.tx_notification_icon)
                 setDefaults(DEFAULT_ALL)
                 setContentIntent(pendingIntent)
