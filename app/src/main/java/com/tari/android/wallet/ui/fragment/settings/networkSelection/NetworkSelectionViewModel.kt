@@ -38,7 +38,8 @@ class NetworkSelectionViewModel : CommonViewModel() {
     private fun loadData() {
         val networks = networkRepository.getAllNetworks()
         val currentNetwork = networkRepository.currentNetwork!!.network
-        _networks.postValue(networks.map { NetworkViewHolderItem(it, currentNetwork) }.toMutableList())
+        val recommendedNetworks = networkRepository.recommendedNetworks
+        _networks.postValue(networks.map { NetworkViewHolderItem(it, recommendedNetworks.contains(it.network), currentNetwork) }.toMutableList())
     }
 
     fun selectNetwork(networkViewHolderItem: NetworkViewHolderItem) {

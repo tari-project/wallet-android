@@ -7,9 +7,11 @@ import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefBooleanDeleg
 import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefGsonDelegate
 import com.tari.android.wallet.ui.common.domain.ResourceManager
 
-class NetworkRepositoryImpl(private val resourceManager: ResourceManager, private val sharedPrefs: SharedPreferences) : NetworkRepository {
+class NetworkRepositoryImpl(private val resourceManager: ResourceManager, sharedPrefs: SharedPreferences) : NetworkRepository {
 
     override var supportedNetworks: List<Network> = listOf(Network.WEATHERWAX, Network.IGOR)
+
+    override var recommendedNetworks: List<Network> = listOf(Network.WEATHERWAX)
 
     override var currentNetwork by SharedPrefGsonDelegate(sharedPrefs, Keys.currentNetwork, TariNetwork::class.java)
 
