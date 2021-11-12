@@ -7,6 +7,7 @@ import android.content.Intent
 import com.google.gson.Gson
 import com.orhanobut.logger.Logger
 import com.tari.android.wallet.BuildConfig
+import com.tari.android.wallet.data.network.NetworkRepository
 import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import com.tari.android.wallet.ui.fragment.send.common.TransactionData
 import com.tari.android.wallet.ui.fragment.send.finalize.FinalizeSendTxViewModel
@@ -21,6 +22,7 @@ import java.io.Serializable
 
 class YatAdapter(
     private val yatSharedRepository: YatSharedRepository,
+    private val networkRepository: NetworkRepository,
     private val commonRepository: SharedPrefsRepository
 ) : YatIntegration.Delegate {
     fun initYat() {
@@ -37,7 +39,8 @@ class YatAdapter(
 
     fun showOutcomingFinalizeActivity(activity: Activity, transactionData: TransactionData) {
         val yatUser = transactionData.recipientUser as YatUser
-        val data = YatLibOutcomingTransactionData(transactionData.amount!!.tariValue.toDouble(), "Tari", yatUser.yat)
+        val currentTicker = networkRepository.currentNetwork?.ticker.orEmpty()
+        val data = YatLibOutcomingTransactionData(transactionData.amount!!.tariValue.toDouble(), currentTicker, yatUser.yat)
 
         val intent = Intent(activity, YatFinalizeSendTxActivity::class.java)
         intent.putExtra("YatLibDataKey", data as Serializable)
