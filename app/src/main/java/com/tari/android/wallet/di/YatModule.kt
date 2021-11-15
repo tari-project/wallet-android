@@ -33,6 +33,7 @@
 package com.tari.android.wallet.di
 
 import android.content.SharedPreferences
+import com.tari.android.wallet.data.network.NetworkRepository
 import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import com.tari.android.wallet.yat.YatAdapter
 import com.tari.android.wallet.yat.YatSharedRepository
@@ -49,7 +50,11 @@ class YatModule {
 
     @Provides
     @Singleton
-    fun provideYatAdapter(yatSharedRepository: YatSharedRepository, commonRepository: SharedPrefsRepository): YatAdapter =
-        YatAdapter(yatSharedRepository, commonRepository)
+    fun provideYatAdapter(
+        yatSharedRepository: YatSharedRepository,
+        commonRepository: SharedPrefsRepository,
+        networkRepository: NetworkRepository
+    ): YatAdapter =
+        YatAdapter(yatSharedRepository, networkRepository, commonRepository)
 
 }
