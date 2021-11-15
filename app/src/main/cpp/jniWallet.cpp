@@ -95,6 +95,7 @@ jmethodID txCancellationCallbackMethodId;
 jmethodID txoValidationCompleteCallbackMethodId;
 jmethodID transactionValidationCompleteCallbackMethodId;
 jmethodID recoveringProcessCompleteCallbackMethodId;
+jmethodID balanceUpdatedCallbackMethodId;
 
 void txBroadcastCallback(struct TariCompletedTransaction *pCompletedTransaction) {
     auto *jniEnv = getJNIEnv();
@@ -246,6 +247,19 @@ void transactionValidationCompleteCallback(unsigned long long requestId, unsigne
     g_vm->DetachCurrentThread();
 }
 
+void balanceUpdatedCallback(struct TariBalance* pBalance) {
+    auto *jniEnv = getJNIEnv();
+    if (jniEnv == nullptr || callbackHandler == nullptr) {
+        return;
+    }
+    auto jpBalance = reinterpret_cast<jlong>(pBalance);
+    jniEnv->CallVoidMethod(
+            callbackHandler,
+            balanceUpdatedCallbackMethodId,
+            jpBalance);
+    g_vm->DetachCurrentThread();
+}
+
 void storeAndForwardMessagesReceivedCallback() {
     // no-op
 }
@@ -307,6 +321,8 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniCreate(
         jstring callback_tx_cancellation_sig,
         jstring callback_txo_validation_complete,
         jstring callback_txo_validation_complete_sig,
+        jstring callback_balance_updated,
+        jstring callback_balance_updated_sig,
         jstring callback_transaction_validation_complete,
         jstring callback_transaction_validation_complete_sig,
         jobject error) {
@@ -420,6 +436,15 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniCreate(
         SetPointerField(jEnv, jThis, reinterpret_cast<jlong>(nullptr));
     }
 
+   balanceUpdatedCallbackMethodId = getMethodId(
+            jEnv,
+            jThis,
+            callback_balance_updated,
+            callback_balance_updated_sig);
+    if (balanceUpdatedCallbackMethodId == nullptr) {
+        SetPointerField(jEnv, jThis, reinterpret_cast<jlong>(nullptr));
+    }
+
     jlong lWalletConfig = GetPointerField(jEnv, jpWalletConfig);
     auto *pWalletConfig = reinterpret_cast<TariCommsConfig *>(lWalletConfig);
 
@@ -459,6 +484,7 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniCreate(
             txStoreAndForwardSendResultCallback,
             txCancellationCallback,
             txoValidationCompleteCallback,
+            balanceUpdatedCallback,
             transactionValidationCompleteCallback,
             storeAndForwardMessagesReceivedCallback,
             recovery,
@@ -467,6 +493,21 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniCreate(
     setErrorCode(jEnv, error, i);
     jEnv->ReleaseStringUTFChars(jLogPath, pLogPath);
     SetPointerField(jEnv, jThis, reinterpret_cast<jlong>(pWallet));
+}
+
+extern "C"
+JNIEXPORT jlong JNICALL
+Java_com_tari_android_wallet_ffi_FFIWallet_jniGetBalance(
+        JNIEnv *jEnv,
+        jobject jThis,
+        jobject error) {
+    int i = 0;
+    int *r = &i;
+    jlong lWallet = GetPointerField(jEnv, jThis);
+    auto *pWallet = reinterpret_cast<TariWallet *>(lWallet);
+    auto result = reinterpret_cast<jlong>(wallet_get_balance(pWallet, r));
+    setErrorCode(jEnv, error, i);
+    return result;
 }
 
 extern "C"
@@ -491,60 +532,6 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniGetPublicKey(
     jlong lWallet = GetPointerField(jEnv, jThis);
     auto *pWallet = reinterpret_cast<TariWallet *>(lWallet);
     auto result = reinterpret_cast<jlong>(wallet_get_public_key(pWallet, r));
-    setErrorCode(jEnv, error, i);
-    return result;
-}
-
-extern "C"
-JNIEXPORT jbyteArray JNICALL
-Java_com_tari_android_wallet_ffi_FFIWallet_jniGetAvailableBalance(
-        JNIEnv *jEnv,
-        jobject jThis,
-        jobject error) {
-    int i = 0;
-    int *r = &i;
-    jlong lWallet = GetPointerField(jEnv, jThis);
-    auto *pWallet = reinterpret_cast<TariWallet *>(lWallet);
-    jbyteArray result = getBytesFromUnsignedLongLong(
-            jEnv,
-            wallet_get_available_balance(pWallet, r)
-    );
-    setErrorCode(jEnv, error, i);
-    return result;
-}
-
-extern "C"
-JNIEXPORT jbyteArray JNICALL
-Java_com_tari_android_wallet_ffi_FFIWallet_jniGetPendingIncomingBalance(
-        JNIEnv *jEnv,
-        jobject jThis,
-        jobject error) {
-    int i = 0;
-    int *r = &i;
-    jlong lWallet = GetPointerField(jEnv, jThis);
-    auto *pWallet = reinterpret_cast<TariWallet *>(lWallet);
-    jbyteArray result = getBytesFromUnsignedLongLong(
-            jEnv,
-            wallet_get_pending_incoming_balance(pWallet, r)
-    );
-    setErrorCode(jEnv, error, i);
-    return result;
-}
-
-extern "C"
-JNIEXPORT jbyteArray JNICALL
-Java_com_tari_android_wallet_ffi_FFIWallet_jniGetPendingOutgoingBalance(
-        JNIEnv *jEnv,
-        jobject jThis,
-        jobject error) {
-    int i = 0;
-    int *r = &i;
-    jlong lWallet = GetPointerField(jEnv, jThis);
-    auto *pWallet = reinterpret_cast<TariWallet *>(lWallet);
-    jbyteArray result = getBytesFromUnsignedLongLong(
-            jEnv,
-            wallet_get_pending_outgoing_balance(pWallet, r)
-    );
     setErrorCode(jEnv, error, i);
     return result;
 }

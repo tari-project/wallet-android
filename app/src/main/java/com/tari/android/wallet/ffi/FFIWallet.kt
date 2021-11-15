@@ -57,6 +57,8 @@ internal class FFIWallet(
     logPath: String
 ) : FFIBase() {
 
+   private var balance : BalanceInfo = BalanceInfo()
+
     companion object {
         private var atomicInstance = AtomicReference<FFIWallet>()
         var instance: FFIWallet?
@@ -93,10 +95,16 @@ internal class FFIWallet(
         callbackTxCancellationSig: String,
         callbackTXOValidationComplete: String,
         callbackTXOValidationCompleteSig: String,
+        callbackBalanceUpdated: String,
+        callbackBalanceUpdatedSig: String,
         callbackTransactionValidationComplete: String,
         callbackTransactionValidationCompleteSig: String,
         libError: FFIError
     )
+
+    private external fun jniGetBalance(
+        libError: FFIError
+    ): FFIPointer
 
     private external fun jniLogMessage(
         message: String
@@ -105,18 +113,6 @@ internal class FFIWallet(
     private external fun jniGetPublicKey(
         libError: FFIError
     ): FFIPointer
-
-    private external fun jniGetAvailableBalance(
-        libError: FFIError
-    ): ByteArray
-
-    private external fun jniGetPendingIncomingBalance(
-        libError: FFIError
-    ): ByteArray
-
-    private external fun jniGetPendingOutgoingBalance(
-        libError: FFIError
-    ): ByteArray
 
     private external fun jniGetContacts(libError: FFIError): FFIPointer
 
@@ -271,45 +267,6 @@ internal class FFIWallet(
         libError: FFIError
     ): ByteArray
 
-    /*
-    private external fun jniGenerateTestData(
-        datastorePath: String,
-        libError: FFIError
-    ): Boolean
-    */
-
-    /*
-    private external fun jniTestBroadcastTx(
-        txPtr: String,
-        libError: FFIError
-    ): Boolean
-     */
-
-    /*
-    private external fun jniTestFinalizeReceivedTx(
-        txPtr: FFIPendingInboundTx,
-        libError: FFIError
-    ): Boolean
-    */
-
-    /*
-    private external fun jniTestCompleteSentTx(
-        txPtr: FFIPendingOutboundTx,
-        libError: FFIError
-    ): Boolean
-    */
-
-    /*
-    private external fun jniTestMineTx(
-        txId: String,
-        libError: FFIError
-    ): Boolean
-     */
-
-    /*
-    private external fun jniTestReceiveTx(libError: FFIError): Boolean
-     */
-
     private external fun jniApplyEncryption(passphrase: String, libError: FFIError)
 
     private external fun jniRemoveEncryption(libError: FFIError)
@@ -351,6 +308,7 @@ internal class FFIWallet(
                     this::onStoreAndForwardSendResult.name, "([BZ)V",
                     this::onTxCancelled.name, "(J)V",
                     this::onTXOValidationComplete.name, "([BI)V",
+                    this::onBalanceUpdated.name,"(J)V",
                     this::onTxValidationComplete.name, "([BI)V",
                     error
                 )
@@ -375,31 +333,29 @@ internal class FFIWallet(
             try {
                 setEncryption(sharedPrefsRepository.databasePassphrase.orEmpty())
             } catch (e: Throwable) {
-                Sentry.captureException(e)
+                //Sentry.captureException(e)
                 sharedPrefsRepository.databasePassphrase = null
             }
         }
     }
 
-    fun getAvailableBalance(): BigInteger {
+    fun getBalance(): BalanceInfo {
         val error = FFIError()
-        val bytes = jniGetAvailableBalance(error)
+        val result = jniGetBalance(error)
         throwIf(error)
-        return BigInteger(1, bytes)
-    }
-
-    fun getPendingInboundBalance(): BigInteger {
-        val error = FFIError()
-        val bytes = jniGetPendingIncomingBalance(error)
-        throwIf(error)
-        return BigInteger(1, bytes)
-    }
-
-    fun getPendingOutboundBalance(): BigInteger {
-        val error = FFIError()
-        val bytes = jniGetPendingOutgoingBalance(error)
-        throwIf(error)
-        return BigInteger(1, bytes)
+        val b = FFIBalance(result)
+        val bal = BalanceInfo(
+            b.getAvailable(),
+            b.getIncoming(),
+            b.getOutgoing(),
+            b.getTimeLocked(),
+        )
+        b.destroy()
+        if (balance != bal)
+        {
+            balance = bal
+        }
+        return balance
     }
 
     fun getPublicKey(): FFIPublicKey {
@@ -689,6 +645,23 @@ internal class FFIWallet(
      * This callback function cannot be private due to JNI behaviour.
      */
     @Suppress("MemberVisibilityCanBePrivate")
+    fun onBalanceUpdated(ptr: FFIPointer) {
+        Logger.i("Balance Updated. Pointer: %s", ptr.toString())
+        val b = FFIBalance(ptr)
+        val balance = BalanceInfo(
+            b.getAvailable(),
+            b.getIncoming(),
+            b.getOutgoing(),
+            b.getTimeLocked(),
+        )
+        b.destroy()
+        this.balance = balance
+    }
+
+    /**
+     * This callback function cannot be private due to JNI behaviour.
+     */
+    @Suppress("MemberVisibilityCanBePrivate")
     fun onTXOValidationComplete(bytes: ByteArray, result: Int) {
         val requestId = BigInteger(1, bytes)
         val validationResult = BaseNodeValidationResult.map(result)!!
@@ -922,7 +895,7 @@ internal class FFIWallet(
 
     fun setRequiredConfirmationCount(number: BigInteger) {
         val error = FFIError()
-        val bytes = jniSetConfirmations(
+        jniSetConfirmations(
             number.toString(),
             error
         )
