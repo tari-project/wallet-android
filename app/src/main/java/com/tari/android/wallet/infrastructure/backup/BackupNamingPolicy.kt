@@ -32,7 +32,7 @@
  */
 package com.tari.android.wallet.infrastructure.backup
 
-import com.tari.android.wallet.data.network.NetworkRepository
+import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepository
 import org.joda.time.DateTime
 import org.joda.time.format.DateTimeFormat
 import org.joda.time.format.DateTimeFormatter

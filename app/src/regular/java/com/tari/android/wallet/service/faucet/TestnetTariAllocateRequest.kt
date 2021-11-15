@@ -35,6 +35,10 @@ package com.tari.android.wallet.service.faucet
 import com.google.gson.annotations.SerializedName
 
 data class TestnetTariAllocateRequest constructor(
+    @SerializedName("signature")
     val signature: String,
-    @SerializedName("public_nonce") val public_nonce: String
+    @SerializedName("public_nonce")
+    val public_nonce: String,
+    @SerializedName("network")
+    val network: String
 )

@@ -33,7 +33,7 @@
 package com.tari.android.wallet.di
 
 import com.tari.android.wallet.BuildConfig
-import com.tari.android.wallet.data.network.NetworkRepository
+import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepository
 import com.tari.android.wallet.service.faucet.TestnetFaucetRESTGateway
 import com.tari.android.wallet.service.faucet.TestnetFaucetRESTService
 import com.tari.android.wallet.service.faucet.TestnetFaucetService
@@ -94,8 +94,8 @@ internal class RESTModule {
 
     @Provides
     @Singleton
-    fun provideTestnetFaucetService(gateway: TestnetFaucetRESTGateway): TestnetFaucetService =
-        TestnetFaucetRESTService(gateway)
+    fun provideTestnetFaucetService(gateway: TestnetFaucetRESTGateway, networkRepository: NetworkRepository): TestnetFaucetService =
+        TestnetFaucetRESTService(gateway, networkRepository)
 
     @Provides
     @Named(FieldName.pushNotificationHttpClient)

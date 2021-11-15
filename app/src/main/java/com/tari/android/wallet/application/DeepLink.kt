@@ -32,7 +32,7 @@
  */
 package com.tari.android.wallet.application
 
-import com.tari.android.wallet.data.network.NetworkRepository
+import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepository
 import java.net.URLDecoder
 
 /**

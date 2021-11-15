@@ -44,7 +44,7 @@ import com.google.zxing.BarcodeFormat
 import com.google.zxing.EncodeHintType
 import com.journeyapps.barcodescanner.BarcodeEncoder
 import com.tari.android.wallet.R
-import com.tari.android.wallet.data.network.NetworkRepository
+import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepository
 import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import com.tari.android.wallet.databinding.FragmentWalletInfoBinding
 import com.tari.android.wallet.di.DiContainer.appComponent

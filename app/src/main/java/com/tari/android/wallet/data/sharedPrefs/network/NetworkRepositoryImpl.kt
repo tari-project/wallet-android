@@ -1,4 +1,4 @@
-package com.tari.android.wallet.data.network
+package com.tari.android.wallet.data.sharedPrefs.network
 
 import android.content.SharedPreferences
 import com.tari.android.wallet.R

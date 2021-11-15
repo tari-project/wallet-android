@@ -42,7 +42,7 @@ import androidx.test.core.app.ApplicationProvider.getApplicationContext
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.orhanobut.logger.Logger
 import com.tari.android.wallet.application.Network
-import com.tari.android.wallet.data.network.NetworkRepositoryImpl
+import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepositoryImpl
 import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodeSharedRepository
 import com.tari.android.wallet.di.ApplicationModule

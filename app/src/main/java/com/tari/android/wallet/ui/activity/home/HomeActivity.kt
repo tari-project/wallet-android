@@ -49,7 +49,7 @@ import androidx.lifecycle.lifecycleScope
 import com.tari.android.wallet.R
 import com.tari.android.wallet.R.color.home_selected_nav_item
 import com.tari.android.wallet.application.DeepLink
-import com.tari.android.wallet.data.network.NetworkRepository
+import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepository
 import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import com.tari.android.wallet.databinding.ActivityHomeBinding
 import com.tari.android.wallet.di.DiContainer.appComponent

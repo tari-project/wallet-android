@@ -40,7 +40,7 @@ package com.tari.android.wallet
 import android.content.Context
 import androidx.test.core.app.ApplicationProvider.getApplicationContext
 import com.tari.android.wallet.application.Network
-import com.tari.android.wallet.data.network.NetworkRepositoryImpl
+import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepositoryImpl
 import com.tari.android.wallet.di.ApplicationModule
 import com.tari.android.wallet.di.WalletModule
 import com.tari.android.wallet.ffi.FFICommsConfig

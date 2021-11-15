@@ -2,8 +2,8 @@ package com.tari.android.wallet.ui.fragment.tx
 
 import androidx.lifecycle.*
 import com.tari.android.wallet.R
-import com.tari.android.wallet.data.network.NetworkRepository
-import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
+import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepository
+import com.tari.android.wallet.data.sharedPrefs.testnetFaucet.TestnetFaucetRepository
 import com.tari.android.wallet.event.Event
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.extension.*
@@ -40,9 +40,6 @@ internal class TxListViewModel() : CommonViewModel() {
     lateinit var repository: GIFRepository
 
     @Inject
-    lateinit var sharedPrefsRepository: SharedPrefsRepository
-
-    @Inject
     lateinit var gifRepository: GIFRepository
 
     @Inject
@@ -50,6 +47,9 @@ internal class TxListViewModel() : CommonViewModel() {
 
     @Inject
     lateinit var backupSettingsRepository: BackupSettingsRepository
+
+    @Inject
+    lateinit var testnetRepository: TestnetFaucetRepository
 
     lateinit var serviceConnection: TariWalletServiceConnection
     val walletService: TariWalletService
@@ -351,7 +351,7 @@ internal class TxListViewModel() : CommonViewModel() {
         refreshBalance(true)
 
         // import second testnet UTXO if it hasn't been imported yet
-        if (sharedPrefsRepository.testnetTariUTXOKeyList.orEmpty().isNotEmpty()) {
+        if (testnetRepository.testnetTariUTXOKeyList.orEmpty().isNotEmpty()) {
             viewModelScope.launch(Dispatchers.IO) {
                 delay(SECOND_UTXO_IMPORT_DELAY)
                 importSecondUTXO()
@@ -379,8 +379,8 @@ internal class TxListViewModel() : CommonViewModel() {
                 wallet.importTestnetUTXO(resourceManager.getString(R.string.first_testnet_utxo_tx_message), error)
             }
 
-            sharedPrefsRepository.faucetTestnetTariRequestCompleted = true
-            sharedPrefsRepository.firstTestnetUTXOTxId = importedTx.id
+            testnetRepository.faucetTestnetTariRequestCompleted = true
+            testnetRepository.firstTestnetUTXOTxId = importedTx.id
             completedTxs.add(importedTx)
             refreshBalance(false)
             updateList()
@@ -510,7 +510,7 @@ internal class TxListViewModel() : CommonViewModel() {
             val importedTx = walletService.getWithError { error, wallet ->
                 wallet.importTestnetUTXO(resourceManager.getString(R.string.second_testnet_utxo_tx_message), error)
             }
-            sharedPrefsRepository.secondTestnetUTXOTxId = importedTx.id
+            testnetRepository.secondTestnetUTXOTxId = importedTx.id
             completedTxs.add(importedTx)
             refreshBalance(false)
             updateList()

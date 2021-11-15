@@ -32,6 +32,8 @@
  */
 package com.tari.android.wallet.service.faucet
 
+import com.tari.android.wallet.data.sharedPrefs.testnetFaucet.TestnetTariUTXOKey
+
 data class TestnetTariMaxAllocationResult(
     val walletId: String,
     val keys: List<TestnetTariUTXOKey>

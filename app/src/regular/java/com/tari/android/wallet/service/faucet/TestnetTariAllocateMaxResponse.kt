@@ -33,9 +33,12 @@
 package com.tari.android.wallet.service.faucet
 
 import com.google.gson.annotations.SerializedName
+import com.tari.android.wallet.data.sharedPrefs.testnetFaucet.TestnetTariUTXOKey
 
 data class TestnetTariAllocateMaxResponse constructor(
     @SerializedName("return_wallet_id")
     val returnWalletId: String,
+
+    @SerializedName("keys")
     val keys: List<TestnetTariUTXOKey>
 )
