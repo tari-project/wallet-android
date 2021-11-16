@@ -40,17 +40,16 @@ import android.os.*
 import android.text.Editable
 import android.text.InputType
 import android.text.TextWatcher
-import android.view.LayoutInflater
-import android.view.MotionEvent
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.view.inputmethod.InputMethodManager
 import android.widget.TextView
 import androidx.core.animation.addListener
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.transition.TransitionManager
 import com.daasuu.ei.Ease
 import com.daasuu.ei.EasingInterpolator
 import com.tari.android.wallet.R
@@ -78,6 +77,7 @@ import com.tari.android.wallet.ui.fragment.send.addRecepient.list.RecipientViewH
 import com.tari.android.wallet.util.*
 import com.tari.android.wallet.util.Constants.Wallet.emojiFormatterChunkSize
 import com.tari.android.wallet.util.Constants.Wallet.emojiIdLength
+import com.tari.android.wallet.yat.YatUser
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -85,6 +85,7 @@ import me.everything.android.ui.overscroll.OverScrollDecoratorHelper
 import java.lang.ref.WeakReference
 import javax.inject.Inject
 import kotlin.math.min
+
 
 //todo needed to refactor
 class AddRecipientFragment : CommonFragment<FragmentAddRecipientBinding, AddRecipientViewModel>(),
@@ -122,6 +123,7 @@ class AddRecipientFragment : CommonFragment<FragmentAddRecipientBinding, AddReci
     private var textChangedProcessRunnable = Runnable { processTextChanged() }
 
     private var hidePasteEmojiIdViewsOnTextChanged = false
+    private var yatEyeState = true
 
     /**
      * Paste-emoji-id-related views.
@@ -160,6 +162,8 @@ class AddRecipientFragment : CommonFragment<FragmentAddRecipientBinding, AddReci
         observe(navigation) { processNavigation(it) }
 
         observe(showClipboardData) { showClipboardData(it) }
+
+        observe(foundYatUser) { showYatUser(if (it.isPresent) it.get() else null) }
     }
 
     private fun showClipboardData(data: PublicKey) {
@@ -175,6 +179,29 @@ class AddRecipientFragment : CommonFragment<FragmentAddRecipientBinding, AddReci
 
         when(navigation) {
             is AddRecipientNavigation.ToAmount -> listener.continueToAmount(this, navigation.user)
+        }
+    }
+
+    private fun showYatUser(yatUser: YatUser?) {
+        val isExist = yatUser != null
+        ui.yatEyeButton.setVisible(isExist)
+
+        if (isExist) {
+            setYatState(true)
+            ui.searchEditText.postDelayed({
+                TransitionManager.beginDelayedTransition(ui.searchEditTextAnimateContainer)
+                ui.searchEditText.textAlignment = View.TEXT_ALIGNMENT_CENTER
+                ui.searchEditText.gravity = Gravity.CENTER
+            }, 100)
+
+            ui.continueButton.visible()
+            requireActivity().hideKeyboard()
+            ui.searchEditText.clearFocus()
+        } else {
+            ui.searchEditText.postDelayed({
+                ui.searchEditText.textAlignment = View.TEXT_ALIGNMENT_TEXT_START
+                ui.searchEditText.gravity = Gravity.CENTER_VERTICAL or Gravity.START
+            }, 100)
         }
     }
 
@@ -203,6 +230,28 @@ class AddRecipientFragment : CommonFragment<FragmentAddRecipientBinding, AddReci
         dimmerViews.forEach { it.setOnClickListener { onEmojiIdDimmerClicked() } }
         ui.pasteEmojiIdButton.setOnClickListener { onPasteEmojiIdButtonClicked() }
         ui.emojiIdTextView.setOnClickListener { onPasteEmojiIdButtonClicked() }
+        ui.yatEyeButton.setOnClickListener { toggleYatEye() }
+    }
+
+    private fun toggleYatEye() {
+        setYatState(!yatEyeState)
+    }
+
+    private fun setYatState(isOpen: Boolean) {
+        if (!isOpen) {
+            ui.searchEditText.removeTextChangedListener(this)
+            ui.searchEditText.isEnabled = false
+            ui.searchEditText.setText(viewModel.foundYatUser.value!!.get().publicKey.hexString)
+            ui.yatEyeButton.setImageDrawable(ContextCompat.getDrawable(requireContext(), R.drawable.closed_eye))
+        } else {
+            ui.searchEditText.isEnabled = true
+            ui.searchEditText.removeTextChangedListener(this)
+            ui.searchEditText.setText(viewModel.foundYatUser.value!!.get().yat)
+            ui.searchEditText.setSelectionToEnd()
+            ui.searchEditText.addTextChangedListener(this)
+            ui.yatEyeButton.setImageDrawable(ContextCompat.getDrawable(requireContext(), R.drawable.opened_eye))
+        }
+        yatEyeState = isOpen
     }
 
     fun reset() {

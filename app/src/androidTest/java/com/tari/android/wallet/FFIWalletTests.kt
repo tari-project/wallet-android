@@ -275,7 +275,7 @@ class FFIWalletTests {
         // test wallet pending inbound balance
         assertEquals(
             pendingInboundTx.amount.value,
-            wallet.getPendingInboundBalance()
+            wallet.getBalance().pendingIncomingBalance
         )
 
         // test mine tx
@@ -313,7 +313,7 @@ class FFIWalletTests {
         // available balance
         assertEquals(
             pendingInboundTx.amount.value,
-            wallet.getAvailableBalance()
+            wallet.getBalance().availableBalance
         )
     }
 

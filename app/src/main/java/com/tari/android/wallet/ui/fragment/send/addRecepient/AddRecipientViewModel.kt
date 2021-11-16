@@ -26,8 +26,10 @@ import com.tari.android.wallet.util.extractEmojis
 import com.tari.android.wallet.yat.YatAdapter
 import com.tari.android.wallet.yat.YatUser
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import yat.android.data.YatRecordType
+import java.util.*
 import javax.inject.Inject
 
 //todo needed to refactor input methods
@@ -35,6 +37,7 @@ class AddRecipientViewModel() : CommonViewModel() {
 
     var emojiIdPublicKey: PublicKey? = null
 
+    private var seachingJob: Job? = null
     private var recentTxUsersLimit = 3
     private var allTxs = mutableListOf<Tx>()
     private var contacts = mutableListOf<Contact>()
@@ -47,6 +50,9 @@ class AddRecipientViewModel() : CommonViewModel() {
 
     private val _showClipboardData: SingleLiveEvent<PublicKey> = SingleLiveEvent()
     val showClipboardData: LiveData<PublicKey> = _showClipboardData
+
+    private val _foundYatUser: SingleLiveEvent<Optional<YatUser>> = SingleLiveEvent()
+    val foundYatUser: LiveData<Optional<YatUser>> = _foundYatUser
 
     @Inject
     lateinit var yatAdapter: YatAdapter
@@ -98,6 +104,8 @@ class AddRecipientViewModel() : CommonViewModel() {
     }
 
     fun searchAndDisplayRecipients(query: String) {
+        seachingJob?.cancel()
+        _foundYatUser.value = Optional.ofNullable(null)
         // search transaction users
         val filteredTxUsers = allTxs.filter {
             it.user.publicKey.emojiId.contains(query) || (it.user as? Contact)?.alias?.contains(query, ignoreCase = true) ?: false
@@ -114,15 +122,15 @@ class AddRecipientViewModel() : CommonViewModel() {
 
         displaySearchList(users)
 
-        viewModelScope.launch(Dispatchers.IO) {
+        seachingJob = viewModelScope.launch(Dispatchers.IO) {
             val searchResult = yatAdapter.searchYats(query)
             if (searchResult.status) {
-                val list = _list.value!!
-                val records = searchResult.result.orEmpty().filter { it.type == YatRecordType.TARI_PUBKEY }
+                val records = searchResult.result.orEmpty()
+                    .filter { it.type == YatRecordType.TARI_PUBKEY }
                     .map { result -> YatUser(walletService.getPublicKeyFromHexString(result.data)).apply { yat = query } }
-                    .map { user -> RecipientViewHolderItem(user) }
-                list.addAll(0, records)
-                _list.postValue(list)
+                if (records.isNotEmpty()) {
+                    _foundYatUser.postValue(Optional.ofNullable(records.first()))
+                }
             }
         }
     }
@@ -140,7 +148,9 @@ class AddRecipientViewModel() : CommonViewModel() {
 
     fun onContinue() {
         viewModelScope.launch(Dispatchers.IO) {
-            val user = contacts.firstOrNull { it.publicKey == emojiIdPublicKey } ?: User(emojiIdPublicKey!!)
+            val yatUserOptional = _foundYatUser.value
+            val yatUser = if (yatUserOptional?.isPresent == true) yatUserOptional.get() else null
+            val user = yatUser ?: contacts.firstOrNull { it.publicKey == emojiIdPublicKey } ?: User(emojiIdPublicKey!!)
             _navigation.postValue(AddRecipientNavigation.ToAmount(user))
         }
     }

@@ -30,31 +30,69 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.tari.android.wallet.di
+package com.tari.android.wallet.ffi
 
-import android.content.SharedPreferences
-import com.tari.android.wallet.data.network.NetworkRepository
-import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
-import com.tari.android.wallet.yat.YatAdapter
-import com.tari.android.wallet.yat.YatSharedRepository
-import dagger.Module
-import dagger.Provides
-import javax.inject.Singleton
+import com.tari.android.wallet.model.MicroTari
+import java.math.BigInteger
 
-@Module
-class YatModule {
+/**
+ * Wrapper for native byte vector type.
+ *
+ * @author The Tari Development Team
+ */
+internal class FFIBalance() : FFIBase() {
 
-    @Provides
-    @Singleton
-    fun provideYatSharedRepository(sharedPreferences: SharedPreferences): YatSharedRepository = YatSharedRepository(sharedPreferences)
+    // region JNI
 
-    @Provides
-    @Singleton
-    fun provideYatAdapter(
-        yatSharedRepository: YatSharedRepository,
-        commonRepository: SharedPrefsRepository,
-        networkRepository: NetworkRepository
-    ): YatAdapter =
-        YatAdapter(yatSharedRepository, networkRepository, commonRepository)
+    private external fun jniGetAvailable(
+        libError: FFIError
+    ): ByteArray
+    private external fun jniGetIncoming(
+        libError: FFIError
+    ): ByteArray
+    private external fun jniGetOutgoing(
+        libError: FFIError
+    ): ByteArray
+    private external fun jniGetTimeLocked(
+        libError: FFIError
+    ): ByteArray
+    private external fun jniDestroy()
+
+    // endregion
+    constructor(pointer: FFIPointer): this() {
+        this.pointer = pointer
+    }
+
+    fun getAvailable(): MicroTari {
+        val error = FFIError()
+        val bytes = jniGetAvailable(error)
+        throwIf(error)
+        return MicroTari(BigInteger(1, bytes))
+    }
+
+    fun getIncoming(): MicroTari {
+        val error = FFIError()
+        val bytes = jniGetIncoming(error)
+        throwIf(error)
+        return MicroTari(BigInteger(1, bytes))
+    }
+
+    fun getOutgoing(): MicroTari {
+        val error = FFIError()
+        val bytes = jniGetOutgoing(error)
+        throwIf(error)
+        return MicroTari(BigInteger(1, bytes))
+    }
+
+    fun getTimeLocked(): MicroTari {
+        val error = FFIError()
+        val bytes = jniGetTimeLocked(error)
+        throwIf(error)
+        return MicroTari(BigInteger(1, bytes))
+    }
+
+    override fun destroy() {
+        jniDestroy()
+    }
 
 }

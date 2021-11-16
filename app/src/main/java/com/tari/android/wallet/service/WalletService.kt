@@ -776,17 +776,8 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
         /**
          * Wallet balance info.
          */
-        override fun getBalanceInfo(error: WalletError): BalanceInfo? {
-            return try {
-                BalanceInfo(
-                    MicroTari(wallet.getAvailableBalance()),
-                    MicroTari(wallet.getPendingInboundBalance()),
-                    MicroTari(wallet.getPendingOutboundBalance())
-                )
-            } catch (throwable: Throwable) {
-                mapThrowableIntoError(throwable, error)
-                null
-            }
+        override fun getBalanceInfo(error: WalletError): BalanceInfo {
+                return wallet.getBalance()
         }
 
         override fun estimateTxFee(
