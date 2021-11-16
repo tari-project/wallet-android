@@ -42,10 +42,28 @@
             android:layout_alignParentBottom="true"/>
     </RelativeLayout>
 
+    <com.tari.android.wallet.ui.component.CustomFontTextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/common_horizontal_margin"
+        android:layout_marginTop="35dp"
+        android:layout_marginBottom="12dp"
+        android:lineSpacingMultiplier="1.5"
+        android:text="@string/all_settings_select_network_description"
+        android:textColor="@color/dark_gray"
+        android:textSize="14sp"
+        app:customFont="@string/font_medium" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="14dp"
+        android:background="@color/common_divider"
+        android:layout_alignParentBottom="true"/>
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/network_list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
-
 
 </LinearLayout>
