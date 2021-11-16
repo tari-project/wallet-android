@@ -52,7 +52,7 @@ import com.tari.android.wallet.BuildConfig
 import com.tari.android.wallet.R.color.white
 import com.tari.android.wallet.R.string.*
 import com.tari.android.wallet.application.WalletState
-import com.tari.android.wallet.data.network.NetworkRepository
+import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepository
 import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import com.tari.android.wallet.databinding.ActivityAuthBinding
 import com.tari.android.wallet.di.DiContainer.appComponent

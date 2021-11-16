@@ -32,12 +32,16 @@
  */
 package com.tari.android.wallet.service.faucet
 
+import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepository
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
-internal class TestnetFaucetRESTService(private val gateway: TestnetFaucetRESTGateway) :
-    TestnetFaucetService {
+internal class TestnetFaucetRESTService(
+    private val gateway: TestnetFaucetRESTGateway,
+    private val networkRepository: NetworkRepository
+) : TestnetFaucetService {
+
     override fun requestMaxTestnetTari(
         publicKey: String,
         signature: String,
@@ -45,27 +49,20 @@ internal class TestnetFaucetRESTService(private val gateway: TestnetFaucetRESTGa
         onSuccess: (TestnetTariMaxAllocationResult) -> Unit,
         onError: (Throwable) -> Unit
     ) {
-        val request = TestnetTariAllocateRequest(signature, publicNonce)
-        gateway.requestMaxTestnetTari(publicKey, request).enqueue(
-            object : Callback<TestnetTariAllocateMaxResponse> {
-                override fun onFailure(call: Call<TestnetTariAllocateMaxResponse>, t: Throwable) =
-                    onError(t)
+        val request = TestnetTariAllocateRequest(signature, publicNonce, networkRepository.currentNetwork!!.network.uriComponent)
 
-                override fun onResponse(
-                    call: Call<TestnetTariAllocateMaxResponse>,
-                    response: Response<TestnetTariAllocateMaxResponse>
-                ) {
-                    val body = response.body()
-                    if (response.isSuccessful && body != null) {
-                        onSuccess(TestnetTariMaxAllocationResult(body.returnWalletId, body.keys))
-                    } else {
-                        val message =
-                            "Status = ${response.code()}, ${response.errorBody()?.string()}"
-                        onError(TestnetTariRequestException(message))
-                    }
+        gateway.requestMaxTestnetTari(publicKey, request).enqueue(object : Callback<TestnetTariAllocateMaxResponse> {
+            override fun onFailure(call: Call<TestnetTariAllocateMaxResponse>, t: Throwable) = onError(t)
+
+            override fun onResponse(call: Call<TestnetTariAllocateMaxResponse>, response: Response<TestnetTariAllocateMaxResponse>) {
+                val body = response.body()
+                if (response.isSuccessful && body != null) {
+                    onSuccess(TestnetTariMaxAllocationResult(body.returnWalletId, body.keys))
+                } else {
+                    val message = "Status = ${response.code()}, ${response.errorBody()?.string()}"
+                    onError(TestnetTariRequestException(message))
                 }
-
             }
-        )
+        })
     }
 }

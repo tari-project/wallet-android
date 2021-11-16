@@ -30,12 +30,19 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.tari.android.wallet.service.faucet
+package com.tari.android.wallet.data.sharedPrefs.testnetFaucet
+
+import com.google.gson.annotations.SerializedName
 
 data class TestnetTariUTXOKey constructor(
     // this field is not going to be sent to us by the server,
     // but we fill it before we store the UTXO key in the shared preferences
+    @SerializedName("senderPublicKeyHex")
     var senderPublicKeyHex: String?,
+
+    @SerializedName("key")
     val key: String,
+
+    @SerializedName("value")
     val value: String
 )

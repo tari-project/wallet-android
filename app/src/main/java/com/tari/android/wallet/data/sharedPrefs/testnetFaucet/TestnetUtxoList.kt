@@ -1,6 +1,4 @@
-package com.tari.android.wallet.data.sharedPrefs
-
-import com.tari.android.wallet.service.faucet.TestnetTariUTXOKey
+package com.tari.android.wallet.data.sharedPrefs.testnetFaucet
 
 class TestnetUtxoList() : ArrayList<TestnetTariUTXOKey>() {
     constructor(e: List<TestnetTariUTXOKey>) : this() {

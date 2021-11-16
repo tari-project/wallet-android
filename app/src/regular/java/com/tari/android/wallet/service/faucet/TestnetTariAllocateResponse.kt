@@ -43,6 +43,10 @@ import com.google.gson.annotations.SerializedName
 data class TestnetTariAllocateResponse constructor(
     @SerializedName("return_wallet_id")
     val returnWalletId: String,
+
+    @SerializedName("key")
     val key: String,
+
+    @SerializedName("value")
     val value: String
 )

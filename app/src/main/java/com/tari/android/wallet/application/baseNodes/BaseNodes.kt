@@ -4,7 +4,7 @@ import android.content.Context
 import com.tari.android.wallet.R
 import com.tari.android.wallet.application.Network
 import com.tari.android.wallet.application.WalletState
-import com.tari.android.wallet.data.network.NetworkRepository
+import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepository
 import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodeDto
 import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodeSharedRepository
 import com.tari.android.wallet.event.EventBus

@@ -1,7 +1,7 @@
 package com.tari.android.wallet.data
 
 import android.content.Context
-import com.tari.android.wallet.data.network.NetworkRepository
+import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepository
 import java.io.File
 
 /**
