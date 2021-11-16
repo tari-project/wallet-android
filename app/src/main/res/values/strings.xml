@@ -356,6 +356,8 @@
     <string name="all_settings_connect_yats">Connect Yats</string>
     <string name="all_settings_select_base_node">Select Base Node</string>
     <string name="all_settings_select_network">Select Network</string>
+    <string name="all_settings_select_network_recommended">(Recommended)</string>
+    <string name="all_settings_select_network_description">Please select the network to which you want to connect</string>
     <string name="all_settings_select_network_confirm_title">One thing before you go</string>
     <string name="all_settings_select_network_confirm_description">You will be logged out and switched to a different network. Do you want to continue?</string>
 

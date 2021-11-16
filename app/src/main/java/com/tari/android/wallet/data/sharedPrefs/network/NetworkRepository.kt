@@ -5,6 +5,8 @@ import com.tari.android.wallet.application.Network
 interface NetworkRepository {
     var supportedNetworks: List<Network>
 
+    var recommendedNetworks: List<Network>
+
     var currentNetwork: TariNetwork?
 
     var ffiNetwork: Network?

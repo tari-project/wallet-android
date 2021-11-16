@@ -1,5 +1,6 @@
 package com.tari.android.wallet.ui.fragment.settings.networkSelection.networkItem
 
+import com.tari.android.wallet.R
 import com.tari.android.wallet.databinding.ItemNetworkBinding
 import com.tari.android.wallet.ui.common.recyclerView.CommonViewHolder
 import com.tari.android.wallet.ui.common.recyclerView.ViewHolderBuilder
@@ -10,7 +11,9 @@ class NetworkTariViewHolder(view: ItemNetworkBinding) : CommonViewHolder<Network
     override fun bind(item: NetworkViewHolderItem) {
         super.bind(item)
 
-        ui.tvName.text = item.network.network.displayName
+        val recommendedText = if (item.isRecommended) " " + itemView.context.getString(R.string.all_settings_select_network_recommended) else ""
+        val networkText = item.network.network.displayName + recommendedText
+        ui.tvName.text = networkText
 
         ui.done.setVisible(item.network.network == item.currentNetwork)
     }
