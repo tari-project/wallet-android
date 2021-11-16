@@ -32,8 +32,8 @@
  */
 package com.tari.android.wallet.application
 
-import com.tari.android.wallet.data.network.NetworkRepository
-import com.tari.android.wallet.data.network.TariNetwork
+import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepository
+import com.tari.android.wallet.data.sharedPrefs.network.TariNetwork
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test

@@ -27,6 +27,6 @@
 -keep class com.tari.android.wallet.model.** { *; }
 
 # This one is being processed via GSON inside SharedPrefsWrapper
--keep class com.tari.android.wallet.service.faucet.TestnetTariUTXOKey { *; }
+-keep class com.tari.android.wallet.data.sharedPrefs.testnetFaucet.TestnetTariUTXOKey { *; }
 
 -keep class net.danlew.android.joda.R$raw { *; }

@@ -34,11 +34,13 @@ package com.tari.android.wallet.data.sharedPrefs
 
 import android.content.Context
 import android.content.SharedPreferences
-import com.tari.android.wallet.data.network.NetworkRepository
 import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodeSharedRepository
-import com.tari.android.wallet.data.sharedPrefs.delegates.*
+import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefBooleanDelegate
+import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefStringDelegate
+import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefStringSecuredDelegate
+import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepository
+import com.tari.android.wallet.data.sharedPrefs.testnetFaucet.TestnetFaucetRepository
 import com.tari.android.wallet.ui.dialog.backup.BackupSettingsRepository
-import java.math.BigInteger
 import kotlin.random.Random
 
 /**
@@ -49,11 +51,12 @@ import kotlin.random.Random
 //todo Need to thing about reactive realization
 
 class SharedPrefsRepository(
-    private val context: Context,
-    private val sharedPrefs: SharedPreferences,
+    context: Context,
+    sharedPrefs: SharedPreferences,
     private val networkRepository: NetworkRepository,
     private val backupSettingsRepository: BackupSettingsRepository,
-    private val baseNodeSharedRepository: BaseNodeSharedRepository
+    private val baseNodeSharedRepository: BaseNodeSharedRepository,
+    private val testnetFaucetRepository: TestnetFaucetRepository
 ) {
 
     private object Key {
@@ -66,10 +69,6 @@ class SharedPrefsRepository(
         const val onboardingCompleted = "tari_wallet_onboarding_completed"
         const val onboardingDisplayedAtHome = "tari_wallet_onboarding_displayed_at_home"
         const val torBinPath = "tari_wallet_tor_bin_path"
-        const val faucetTestnetTariRequestCompleted = "tari_wallet_faucet_testnet_tari_request_completed"
-        const val testnetTariUTXOListKey = "tari_wallet_testnet_tari_utxo_key_list"
-        const val firstTestnetUTXOTxId = "tari_wallet_first_testnet_utxo_tx_id"
-        const val secondTestnetUTXOTxId = "tari_wallet_second_testnet_utxo_tx_id"
         const val walletDatabasePassphrase = "tari_wallet_database_passphrase"
         const val isRestoredWallet = "tari_is_restored_wallet"
         const val hasVerifiedSeedWords = "tari_has_verified_seed_words"
@@ -101,18 +100,6 @@ class SharedPrefsRepository(
 
     var torBinPath: String? by SharedPrefStringDelegate(sharedPrefs, formatKey(Key.torBinPath))
 
-    var faucetTestnetTariRequestCompleted: Boolean by SharedPrefBooleanDelegate(sharedPrefs, formatKey(Key.faucetTestnetTariRequestCompleted))
-
-    var testnetTariUTXOKeyList: TestnetUtxoList? by SharedPrefGsonDelegate(
-        sharedPrefs,
-        formatKey(Key.testnetTariUTXOListKey),
-        TestnetUtxoList::class.java
-    )
-
-    var firstTestnetUTXOTxId: BigInteger? by SharedPrefBigIntegerDelegate(sharedPrefs, formatKey(Key.firstTestnetUTXOTxId))
-
-    var secondTestnetUTXOTxId: BigInteger? by SharedPrefBigIntegerDelegate(sharedPrefs, formatKey(Key.secondTestnetUTXOTxId))
-
     var databasePassphrase: String? by SharedPrefStringSecuredDelegate(context, sharedPrefs, formatKey(Key.walletDatabasePassphrase))
 
     var isRestoredWallet: Boolean by SharedPrefBooleanDelegate(sharedPrefs, formatKey(Key.isRestoredWallet))
@@ -123,18 +110,10 @@ class SharedPrefsRepository(
 
     var isDataCleared: Boolean by SharedPrefBooleanDelegate(sharedPrefs, formatKey(Key.isDataCleared), true)
 
-    init {
-        // for migration purposes, to avoid a second redundant faucet call:
-        // faucetTestnetTariRequestCompleted was introduced  after firstTestnetUTXOTxId and
-        // secondTestnetUTXOTxId properties
-        if (firstTestnetUTXOTxId != null && secondTestnetUTXOTxId != null) {
-            faucetTestnetTariRequestCompleted = true
-        }
-    }
-
     fun clear() {
         baseNodeSharedRepository.clear()
         backupSettingsRepository.clear()
+        testnetFaucetRepository.clear()
         publicKeyHexString = null
         isAuthenticated = false
         emojiId = null
@@ -144,10 +123,6 @@ class SharedPrefsRepository(
         onboardingAuthSetupCompleted = false
         onboardingDisplayedAtHome = false
         torBinPath = null
-        faucetTestnetTariRequestCompleted = false
-        testnetTariUTXOKeyList = null
-        firstTestnetUTXOTxId = null
-        secondTestnetUTXOTxId = null
         isRestoredWallet = false
         hasVerifiedSeedWords = false
         backgroundServiceTurnedOn = true

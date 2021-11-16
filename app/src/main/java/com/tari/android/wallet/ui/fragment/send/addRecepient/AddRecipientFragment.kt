@@ -60,7 +60,7 @@ import com.tari.android.wallet.R.string.*
 import com.tari.android.wallet.application.DeepLink
 import com.tari.android.wallet.application.DeepLink.Type.EMOJI_ID
 import com.tari.android.wallet.application.DeepLink.Type.PUBLIC_KEY_HEX
-import com.tari.android.wallet.data.network.NetworkRepository
+import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepository
 import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import com.tari.android.wallet.databinding.FragmentAddRecipientBinding
 import com.tari.android.wallet.di.DiContainer.appComponent

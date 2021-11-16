@@ -3,7 +3,7 @@ package com.tari.android.wallet.ui.dialog.backup
 import android.content.Context
 import android.content.SharedPreferences
 import android.net.Uri
-import com.tari.android.wallet.data.network.NetworkRepository
+import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepository
 import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefDateTimeDelegate
 import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefGsonDelegate
 import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefStringSecuredDelegate

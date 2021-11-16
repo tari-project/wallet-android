@@ -42,10 +42,11 @@ import androidx.core.content.ContextCompat
 import com.tari.android.wallet.BuildConfig
 import com.tari.android.wallet.application.TariWalletApplication
 import com.tari.android.wallet.data.WalletConfig
-import com.tari.android.wallet.data.network.NetworkRepository
-import com.tari.android.wallet.data.network.NetworkRepositoryImpl
 import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodeSharedRepository
+import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepository
+import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepositoryImpl
+import com.tari.android.wallet.data.sharedPrefs.testnetFaucet.TestnetFaucetRepository
 import com.tari.android.wallet.infrastructure.security.biometric.BiometricAuthenticationService
 import com.tari.android.wallet.notification.NotificationHelper
 import com.tari.android.wallet.service.WalletServiceLauncher
@@ -94,13 +95,20 @@ internal class ApplicationModule(
 
     @Provides
     @Singleton
+    fun provideTestnetFaucetRepository(prefs: SharedPreferences, networkRepository: NetworkRepository): TestnetFaucetRepository =
+        TestnetFaucetRepository(prefs, networkRepository)
+
+    @Provides
+    @Singleton
     fun provideSharedPrefsRepository(
         context: Context,
         prefs: SharedPreferences,
         backupSettingsRepository: BackupSettingsRepository,
         baseNodeSharedRepository: BaseNodeSharedRepository,
-        networkRepository: NetworkRepository
-    ): SharedPrefsRepository = SharedPrefsRepository(context, prefs, networkRepository, backupSettingsRepository, baseNodeSharedRepository)
+        networkRepository: NetworkRepository,
+        testnetFaucetRepository: TestnetFaucetRepository
+    ): SharedPrefsRepository =
+        SharedPrefsRepository(context, prefs, networkRepository, backupSettingsRepository, baseNodeSharedRepository, testnetFaucetRepository)
 
     @Provides
     @Singleton

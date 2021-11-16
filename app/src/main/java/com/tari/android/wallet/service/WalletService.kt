@@ -50,9 +50,10 @@ import com.tari.android.wallet.application.WalletState
 import com.tari.android.wallet.application.baseNodes.BaseNodes
 import com.tari.android.wallet.data.WalletConfig
 import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
-import com.tari.android.wallet.data.sharedPrefs.TestnetUtxoList
 import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodeSharedRepository
-import com.tari.android.wallet.data.sharedPrefs.orEmpty
+import com.tari.android.wallet.data.sharedPrefs.testnetFaucet.TestnetFaucetRepository
+import com.tari.android.wallet.data.sharedPrefs.testnetFaucet.TestnetUtxoList
+import com.tari.android.wallet.data.sharedPrefs.testnetFaucet.orEmpty
 import com.tari.android.wallet.di.DiContainer
 import com.tari.android.wallet.event.Event
 import com.tari.android.wallet.event.EventBus
@@ -134,6 +135,9 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
 
     @Inject
     lateinit var baseNodes: BaseNodes
+
+    @Inject
+    lateinit var testnetFaucetRepository: TestnetFaucetRepository
 
     private lateinit var wallet: FFIWallet
 
@@ -1196,7 +1200,7 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
         @SuppressLint("CheckResult")
         override fun requestTestnetTari(error: WalletError) {
             // avoid multiple faucet requests
-            if (sharedPrefsWrapper.faucetTestnetTariRequestCompleted) return
+            if (testnetFaucetRepository.faucetTestnetTariRequestCompleted) return
             // get public key
             val publicKeyHexString = getPublicKeyHexString(error)
             if (error.code != WalletErrorCode.NO_ERROR || publicKeyHexString == null) {
@@ -1225,7 +1229,7 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
                     // update the keys with sender public key hex
                     result.keys.forEach { key -> key.senderPublicKeyHex = result.walletId }
                     // store the UTXO keys
-                    sharedPrefsWrapper.testnetTariUTXOKeyList = TestnetUtxoList(result.keys)
+                    testnetFaucetRepository.testnetTariUTXOKeyList = TestnetUtxoList(result.keys)
 
                     // post event to bus for the internal listeners
                     EventBus.post(Event.Testnet.TestnetTariRequestSuccessful())
@@ -1250,7 +1254,7 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
         }
 
         override fun importTestnetUTXO(txMessage: String, error: WalletError): CompletedTx? {
-            val keys = sharedPrefsWrapper.testnetTariUTXOKeyList.orEmpty()
+            val keys = testnetFaucetRepository.testnetTariUTXOKeyList.orEmpty()
             if (keys.isEmpty()) {
                 return null
             }
@@ -1270,7 +1274,7 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
             senderPublicKeyFFI.destroy()
             // remove the used key
             keys.remove(firstUTXOKey)
-            sharedPrefsWrapper.testnetTariUTXOKeyList = keys
+            testnetFaucetRepository.testnetTariUTXOKeyList = keys
             // get transaction and post notification
             val tx = getCompletedTxById(TxId(txId), error)
             if (error.code != WalletErrorCode.NO_ERROR || tx == null) {

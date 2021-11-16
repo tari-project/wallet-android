@@ -37,7 +37,7 @@ import android.content.Context
 import android.content.Intent
 import com.orhanobut.logger.Logger
 import com.tari.android.wallet.data.WalletConfig
-import com.tari.android.wallet.data.network.NetworkRepositoryImpl
+import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepositoryImpl
 import com.tari.android.wallet.di.ApplicationModule
 import com.tari.android.wallet.ui.common.domain.ResourceManager
 

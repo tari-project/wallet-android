@@ -33,8 +33,8 @@
 package com.tari.android.wallet.infrastructure.backup.storage
 
 import com.tari.android.wallet.application.Network
-import com.tari.android.wallet.data.network.NetworkRepository
-import com.tari.android.wallet.data.network.TariNetwork
+import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepository
+import com.tari.android.wallet.data.sharedPrefs.network.TariNetwork
 import com.tari.android.wallet.infrastructure.backup.BackupNamingPolicy
 import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
