@@ -21,6 +21,7 @@ import com.tari.android.wallet.ui.extension.*
 import com.tari.android.wallet.ui.fragment.restore.inputSeedWords.suggestions.SuggestionState
 import com.tari.android.wallet.ui.fragment.restore.inputSeedWords.suggestions.SuggestionViewHolderItem
 import com.tari.android.wallet.ui.fragment.restore.inputSeedWords.suggestions.SuggestionsAdapter
+import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent
 
 internal class InputSeedWordsFragment : CommonFragment<FragmentWalletInputSeedWordsBinding, InputSeedWordsViewModel>() {
 
@@ -65,6 +66,8 @@ internal class InputSeedWordsFragment : CommonFragment<FragmentWalletInputSeedWo
         suggestionsAdapter.setClickListener(CommonAdapter.ItemClickListener { viewModel.selectSuggestion(it) })
         suggestions.adapter = suggestionsAdapter
         suggestions.layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
+
+        KeyboardVisibilityEvent.setEventListener(requireActivity()) { viewModel.setSuggestionState(it) }
     }
 
     private fun subscribeUI() = with(viewModel) {
@@ -131,7 +134,7 @@ internal class InputSeedWordsFragment : CommonFragment<FragmentWalletInputSeedWo
             }
             setOnClickListener { viewModel.getFocus(word.index.value!!) }
             ui.removeView.setOnClickListener { viewModel.removeWord(word.index.value!!) }
-            ui.text.doAfterTextChanged { viewModel.onCurrentWordChanges(word.index.value!!, ui.text.text?.toString().orEmpty()) }
+            ui.text.doAfterTextChanged { viewModel.onCurrentWordChanges(word.index.value!!, it?.toString().orEmpty()) }
             ui.text.setOnKeyListener { v, keyCode, event ->
                 if (keyCode == KeyEvent.KEYCODE_DEL && ui.text.text.isNullOrEmpty() && word.index.value!! != 0) {
                     viewModel.removeWord(word.index.value!!)
@@ -160,15 +163,16 @@ internal class InputSeedWordsFragment : CommonFragment<FragmentWalletInputSeedWo
 
     private fun removeWord(word: WordItemViewModel) {
         ui.seedWordsFlexboxLayout.removeViewAt(word.index.value!!)
-        viewModel.getFocus(word.index.value!!)
     }
 
     private fun requestFocusAtIndex(index: Int) {
-        val child = ui.seedWordsFlexboxLayout.getChildAt(index) as WordTextView
-        child.ui.text.clearFocus()
-        child.ui.text.requestFocus()
-        child.ui.text.setSelectionToEnd()
-        requireActivity().showKeyboard()
+        val textView = (ui.seedWordsFlexboxLayout.getChildAt(index) as WordTextView).ui.text
+        textView.post {
+            textView.clearFocus()
+            textView.requestFocus()
+            textView.setSelectionToEnd()
+            requireActivity().showKeyboard()
+        }
     }
 
     private fun onFinishEntering() {

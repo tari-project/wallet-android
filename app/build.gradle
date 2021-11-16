@@ -270,6 +270,8 @@ dependencies {
     // sentry - crash analytics
     regularImplementation 'io.sentry:sentry-android:5.0.1'
 
+    implementation 'net.yslibrary.keyboardvisibilityevent:keyboardvisibilityevent:2.2.0'
+
     implementation "com.github.yat-labs:yat-lib-android:0.1.25"
 
     // test

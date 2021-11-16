@@ -11,6 +11,7 @@ import com.tari.android.wallet.service.WalletServiceLauncher
 import com.tari.android.wallet.service.seedPhrase.SeedPhraseRepository
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.common.SingleLiveEvent
+import com.tari.android.wallet.ui.common.debounce
 import com.tari.android.wallet.ui.common.domain.ResourceManager
 import com.tari.android.wallet.ui.component.loadingButton.LoadingButtonState
 import com.tari.android.wallet.ui.dialog.error.ErrorDialogArgs
@@ -35,10 +36,10 @@ internal class InputSeedWordsViewModel() : CommonViewModel() {
     val navigation: LiveData<InputSeedWordsNavigation> = _navigation
 
     private val _suggestions = MediatorLiveData<SuggestionState>()
-    val suggestions: LiveData<SuggestionState> = _suggestions
+    val suggestions: LiveData<SuggestionState> = _suggestions.debounce(50)
 
     private val _words = MutableLiveData<MutableList<WordItemViewModel>>()
-    val words: LiveData<MutableList<WordItemViewModel>> = _words
+    val words: LiveData<MutableList<WordItemViewModel>> = _words.debounce(50)
 
     private val _addedWord = SingleLiveEvent<WordItemViewModel>()
     val addedWord: LiveData<WordItemViewModel> = _addedWord
@@ -50,7 +51,7 @@ internal class InputSeedWordsViewModel() : CommonViewModel() {
     val finishEntering: LiveData<Unit> = _finishEntering
 
     private val _focusedIndex = MutableLiveData<Int>()
-    val focusedIndex: LiveData<Int> = _focusedIndex
+    val focusedIndex: LiveData<Int> = _focusedIndex.debounce(50)
 
     private val _inProgress = MutableLiveData(false)
     val isInProgress: LiveData<Boolean> = _inProgress
@@ -154,15 +155,16 @@ internal class InputSeedWordsViewModel() : CommonViewModel() {
     fun removeWord(index: Int) {
         val list = _words.value!!
         val removedWord = list[index]
+        val focusedIndex = _focusedIndex.value!!
         list.removeAt(index)
         reindex()
         _removedWord.value = removedWord
         _words.value = list
+        if (focusedIndex != index) return
         if (list.isEmpty()) {
             addWord(0, "")
             getFocus(0)
         } else {
-            val focusedIndex = _focusedIndex.value!!
             when {
                 focusedIndex == list.size -> getFocus(list.size - 1)
                 index < focusedIndex -> getFocus((focusedIndex - 1).coerceAtLeast(0))
@@ -173,6 +175,7 @@ internal class InputSeedWordsViewModel() : CommonViewModel() {
 
     fun onCurrentWordChanges(index: Int, text: String) {
         val list = _words.value!!
+        if (!list.indices.contains(index)) return
         if (list[index].text.value!! == text) return
 
         val formattedText = text.split(" ", "\n", "\r").filter { it.isNotEmpty() }
@@ -189,6 +192,9 @@ internal class InputSeedWordsViewModel() : CommonViewModel() {
             } else {
                 _words.value = list
             }
+        } else {
+            list[index].text.value = ""
+            _words.value = list
         }
     }
 
@@ -246,6 +252,14 @@ internal class InputSeedWordsViewModel() : CommonViewModel() {
 
     fun selectSuggestion(suggestionViewHolderItem: SuggestionViewHolderItem) {
         onCurrentWordChanges(_focusedIndex.value!!, suggestionViewHolderItem.suggestion + " ")
+    }
+
+    fun setSuggestionState(isOpened: Boolean) {
+        if (isOpened) {
+            processSuggestions()
+        } else {
+            _suggestions.postValue(SuggestionState.Hidden)
+        }
     }
 
     private fun processSuggestions() {
