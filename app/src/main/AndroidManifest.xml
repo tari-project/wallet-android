@@ -163,7 +163,7 @@
             android:parentActivityName=".ui.activity.onboarding.OnboardingFlowActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme"
-            android:windowSoftInputMode="adjustResize|stateAlwaysHidden" /> <!-- This receiver is responsible for starting the service after boot finish. -->
+            android:windowSoftInputMode="adjustResize" /> <!-- This receiver is responsible for starting the service after boot finish. -->
         <receiver
             android:name=".service.BootDeviceReceiver"
             android:enabled="true"

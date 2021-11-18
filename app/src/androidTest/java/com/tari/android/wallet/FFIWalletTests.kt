@@ -42,9 +42,10 @@ import androidx.test.core.app.ApplicationProvider.getApplicationContext
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.orhanobut.logger.Logger
 import com.tari.android.wallet.application.Network
-import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepositoryImpl
 import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodeSharedRepository
+import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepositoryImpl
+import com.tari.android.wallet.data.sharedPrefs.testnetFaucet.TestnetFaucetRepository
 import com.tari.android.wallet.di.ApplicationModule
 import com.tari.android.wallet.ffi.*
 import com.tari.android.wallet.model.*
@@ -76,8 +77,9 @@ class FFIWalletTests {
     private val networkRepository = NetworkRepositoryImpl(resourseManager, prefs)
     private val baseNodeSharedPrefsRepository = BaseNodeSharedRepository(prefs, networkRepository)
     private val backupSettingsRepository = BackupSettingsRepository(context, prefs, networkRepository)
+    private val testnetFaucetRepository = TestnetFaucetRepository(prefs, networkRepository)
     private val sharedPrefsRepository =
-        SharedPrefsRepository(context, prefs, networkRepository, backupSettingsRepository, baseNodeSharedPrefsRepository)
+        SharedPrefsRepository(context, prefs, networkRepository, backupSettingsRepository, baseNodeSharedPrefsRepository, testnetFaucetRepository)
     private val walletDirPath = context.filesDir.absolutePath
 
     private fun clean() {

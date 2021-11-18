@@ -461,6 +461,9 @@
     <string name="restore_from_seed_words_overlay_error_description_connection_failed">Unable to connect with base node. Please try again later</string>
     <string name="restore_from_seed_words_overlay_error_description_internal_error">Unable to recover your wallet due to the internal error</string>
 
+    <string name="restore_from_seed_words_autocompletion_start_typing">Start typing to see suggestions</string>
+    <string name="restore_from_seed_words_autocompletion_no_suggestions">here are no suggestions for the phrase</string>
+
     <!--Restore -->
     <string name="restore_with_cloud_page_title">Enter your backup password</string>
 

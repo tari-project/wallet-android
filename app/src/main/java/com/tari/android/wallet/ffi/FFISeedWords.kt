@@ -45,12 +45,10 @@ internal class FFISeedWords() : FFIBase() {
     private external fun jniCreate()
     private external fun jniPushWord(word: String, libError: FFIError): Int
     private external fun jniGetLength(libError: FFIError): Int
-    private external fun jniGetAt(
-        index: Int,
-        libError: FFIError
-    ): String
-
+    private external fun jniGetAt(index: Int, libError: FFIError): String
     private external fun jniDestroy()
+
+    external fun jniGetMnemonicWordListForLanguage(language: String)
 
     // endregion
 
@@ -85,6 +83,17 @@ internal class FFISeedWords() : FFIBase() {
 
     override fun destroy() {
         jniDestroy()
+    }
+
+    companion object {
+        fun getMnemomicWordList(language: Language) : FFISeedWords = FFISeedWords().apply {
+            jniGetMnemonicWordListForLanguage(language.name)
+        }
+    }
+
+    enum class Language {
+        English,
+        Spanish
     }
 }
 

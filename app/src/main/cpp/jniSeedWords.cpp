@@ -49,6 +49,19 @@ Java_com_tari_android_wallet_ffi_FFISeedWords_jniCreate(
 }
 
 extern "C"
+JNIEXPORT void JNICALL
+Java_com_tari_android_wallet_ffi_FFISeedWords_jniGetMnemonicWordListForLanguage(
+        JNIEnv *jEnv,
+        jobject jThis,
+        jstring language) {
+    int i = 0;
+    int *r = &i;
+    const char *pLanguage = jEnv->GetStringUTFChars(language, JNI_FALSE);
+    TariSeedWords *pSeedWords = seed_words_get_mnemonic_word_list_for_language(pLanguage, r);
+    SetPointerField(jEnv, jThis, reinterpret_cast<jlong>(pSeedWords));
+}
+
+extern "C"
 JNIEXPORT jint JNICALL
 Java_com_tari_android_wallet_ffi_FFISeedWords_jniPushWord(
         JNIEnv *jEnv,

@@ -1,25 +1,30 @@
 package com.tari.android.wallet.ui.fragment.restore.inputSeedWords
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MediatorLiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Transformations
+import androidx.lifecycle.*
 import com.tari.android.wallet.R
 import com.tari.android.wallet.application.WalletState
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.extension.addTo
+import com.tari.android.wallet.ffi.FFISeedWords
 import com.tari.android.wallet.model.seedPhrase.SeedPhrase
 import com.tari.android.wallet.service.WalletServiceLauncher
 import com.tari.android.wallet.service.seedPhrase.SeedPhraseRepository
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.common.SingleLiveEvent
+import com.tari.android.wallet.ui.common.debounce
 import com.tari.android.wallet.ui.common.domain.ResourceManager
 import com.tari.android.wallet.ui.component.loadingButton.LoadingButtonState
 import com.tari.android.wallet.ui.dialog.error.ErrorDialogArgs
+import com.tari.android.wallet.ui.fragment.restore.inputSeedWords.suggestions.SuggestionState
+import com.tari.android.wallet.ui.fragment.restore.inputSeedWords.suggestions.SuggestionViewHolderItem
 import io.reactivex.disposables.CompositeDisposable
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 internal class InputSeedWordsViewModel() : CommonViewModel() {
+
+    private var mnemonicList = mutableListOf<String>()
 
     @Inject
     lateinit var seedPhraseRepository: SeedPhraseRepository
@@ -30,8 +35,11 @@ internal class InputSeedWordsViewModel() : CommonViewModel() {
     private val _navigation = SingleLiveEvent<InputSeedWordsNavigation>()
     val navigation: LiveData<InputSeedWordsNavigation> = _navigation
 
+    private val _suggestions = MediatorLiveData<SuggestionState>()
+    val suggestions: LiveData<SuggestionState> = _suggestions.debounce(50)
+
     private val _words = MutableLiveData<MutableList<WordItemViewModel>>()
-    val words: LiveData<MutableList<WordItemViewModel>> = _words
+    val words: LiveData<MutableList<WordItemViewModel>> = _words.debounce(50)
 
     private val _addedWord = SingleLiveEvent<WordItemViewModel>()
     val addedWord: LiveData<WordItemViewModel> = _addedWord
@@ -43,7 +51,7 @@ internal class InputSeedWordsViewModel() : CommonViewModel() {
     val finishEntering: LiveData<Unit> = _finishEntering
 
     private val _focusedIndex = MutableLiveData<Int>()
-    val focusedIndex: LiveData<Int> = _focusedIndex
+    val focusedIndex: LiveData<Int> = _focusedIndex.debounce(50)
 
     private val _inProgress = MutableLiveData(false)
     val isInProgress: LiveData<Boolean> = _inProgress
@@ -56,7 +64,7 @@ internal class InputSeedWordsViewModel() : CommonViewModel() {
     val continueButtonState: LiveData<LoadingButtonState> = _continueButtonState
 
     init {
-        component?.inject(this)
+        component.inject(this)
 
         _continueButtonState.addSource(isAllEntered) { updateContinueState() }
         _continueButtonState.addSource(isInProgress) { updateContinueState() }
@@ -64,6 +72,13 @@ internal class InputSeedWordsViewModel() : CommonViewModel() {
         _words.value = mutableListOf()
         _focusedIndex.value = 0
         clear()
+
+        loadSuggestions()
+
+        _suggestions.postValue(SuggestionState.Empty)
+
+        _suggestions.addSource(focusedIndex) { processSuggestions() }
+        _suggestions.addSource(_words) { processSuggestions() }
     }
 
     fun startRestoringWallet() {
@@ -76,6 +91,16 @@ internal class InputSeedWordsViewModel() : CommonViewModel() {
             startRestoring()
         } else {
             handleSeedPhraseResult(result)
+        }
+    }
+
+    private fun loadSuggestions() {
+        viewModelScope.launch(Dispatchers.IO) {
+            val mnemonic = FFISeedWords.getMnemomicWordList(FFISeedWords.Language.English)
+            val size = mnemonic.getLength()
+            for (i in 0 until size) {
+                mnemonicList.add(mnemonic.getAt(i))
+            }
         }
     }
 
@@ -130,15 +155,16 @@ internal class InputSeedWordsViewModel() : CommonViewModel() {
     fun removeWord(index: Int) {
         val list = _words.value!!
         val removedWord = list[index]
+        val focusedIndex = _focusedIndex.value!!
         list.removeAt(index)
         reindex()
         _removedWord.value = removedWord
         _words.value = list
+        if (focusedIndex != index) return
         if (list.isEmpty()) {
             addWord(0, "")
             getFocus(0)
         } else {
-            val focusedIndex = _focusedIndex.value!!
             when {
                 focusedIndex == list.size -> getFocus(list.size - 1)
                 index < focusedIndex -> getFocus((focusedIndex - 1).coerceAtLeast(0))
@@ -149,6 +175,7 @@ internal class InputSeedWordsViewModel() : CommonViewModel() {
 
     fun onCurrentWordChanges(index: Int, text: String) {
         val list = _words.value!!
+        if (!list.indices.contains(index)) return
         if (list[index].text.value!! == text) return
 
         val formattedText = text.split(" ", "\n", "\r").filter { it.isNotEmpty() }
@@ -165,6 +192,9 @@ internal class InputSeedWordsViewModel() : CommonViewModel() {
             } else {
                 _words.value = list
             }
+        } else {
+            list[index].text.value = ""
+            _words.value = list
         }
     }
 
@@ -218,6 +248,37 @@ internal class InputSeedWordsViewModel() : CommonViewModel() {
         val title = resourceManager.getString(R.string.restore_from_seed_words_submit_title)
         val state = LoadingButtonState(title, isAllEntered.value!! && !_inProgress.value!!, _inProgress.value!!)
         _continueButtonState.postValue(state)
+    }
+
+    fun selectSuggestion(suggestionViewHolderItem: SuggestionViewHolderItem) {
+        onCurrentWordChanges(_focusedIndex.value!!, suggestionViewHolderItem.suggestion + " ")
+    }
+
+    fun setSuggestionState(isOpened: Boolean) {
+        if (isOpened) {
+            processSuggestions()
+        } else {
+            _suggestions.postValue(SuggestionState.Hidden)
+        }
+    }
+
+    private fun processSuggestions() {
+        val focusedIndex = _focusedIndex.value!!
+        val words = _words.value.orEmpty()
+        if(!words.indices.contains(focusedIndex)) return
+        val focusedItem = _words.value.orEmpty()[focusedIndex]
+        val text = focusedItem.text.value.orEmpty()
+        val state = if (text.isEmpty()) {
+            SuggestionState.NotStarted
+        } else {
+            val suggested = mnemonicList.filter { it.startsWith(text) }.toMutableList()
+            if (suggested.isEmpty()) {
+                SuggestionState.Empty
+            } else {
+                SuggestionState.Suggested(suggested)
+            }
+        }
+        _suggestions.postValue(state)
     }
 
     sealed class RestorationError(title: String, message: String) {
