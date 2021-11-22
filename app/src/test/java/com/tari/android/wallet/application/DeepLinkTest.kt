@@ -172,6 +172,7 @@ class DeepLinkTest {
         override var currentNetwork: TariNetwork? = TariNetwork(Network.WEATHERWAX, "", "")
         override var ffiNetwork: Network? = Network.WEATHERWAX
         override var incompatibleNetworkShown: Boolean = false
+        override var recommendedNetworks: List<Network> = listOf(Network.WEATHERWAX)
 
         override fun getAllNetworks(): List<TariNetwork> = listOf()
 
