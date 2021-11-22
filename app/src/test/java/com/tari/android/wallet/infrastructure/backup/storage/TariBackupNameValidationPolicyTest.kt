@@ -140,6 +140,7 @@ class NetworkRepositoryMock : NetworkRepository {
     override var currentNetwork: TariNetwork? = TariNetwork(Network.WEATHERWAX, "xtr", "")
     override var ffiNetwork: Network? = Network.WEATHERWAX
     override var incompatibleNetworkShown: Boolean = false
+    override var recommendedNetworks: List<Network> = listOf(Network.WEATHERWAX)
 
     override fun getAllNetworks(): List<TariNetwork> = listOf()
 }
