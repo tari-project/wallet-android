@@ -40,7 +40,7 @@ internal class AddCustomBaseNodeViewModel : CommonViewModel() {
     val addressValidationState: LiveData<Validator.State> = _addressValidationState
 
     init {
-        component?.inject(this)
+        component.inject(this)
     }
 
     fun saveCustomNode() {
@@ -50,8 +50,12 @@ internal class AddCustomBaseNodeViewModel : CommonViewModel() {
 
         val publicKeyHex = publicHexText.value.orEmpty()
         val address = onionAddressText.value.orEmpty()
+        var name = nameText.value.orEmpty()
+        if (name.isEmpty()) {
+            name = resourceManager.getString(R.string.debug_base_node_custom)
+        }
         try {
-            val baseNodeDto = BaseNodeDto(nameText.value.orEmpty(), publicKeyHex, address, true)
+            val baseNodeDto = BaseNodeDto(name, publicKeyHex, address, true)
             baseNodeSharedRepository.addUserBaseNode(baseNodeDto)
             baseNodes.setBaseNode(baseNodeDto)
             _backPressed.postValue(Unit)

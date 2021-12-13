@@ -63,7 +63,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="24dp"
                 android:background="@drawable/base_node_config_edit_text_bg"
-                android:hint="@string/debug_edit_base_node_public_key_hint"
+                android:hint="@string/debug_edit_base_node_name_hint"
                 android:imeOptions="actionNext"
                 android:paddingHorizontal="6dp"
                 android:paddingVertical="12dp"
