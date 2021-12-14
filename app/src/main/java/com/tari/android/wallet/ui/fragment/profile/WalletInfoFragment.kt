@@ -61,9 +61,6 @@ class WalletInfoFragment : Fragment() {
     lateinit var sharedPrefsWrapper: SharedPrefsRepository
 
     @Inject
-    lateinit var clipboardManager: ClipboardManager
-
-    @Inject
     lateinit var networkRepository: NetworkRepository
 
     private lateinit var ui: FragmentWalletInfoBinding
