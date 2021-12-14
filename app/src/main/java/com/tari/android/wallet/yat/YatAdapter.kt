@@ -2,6 +2,7 @@ package com.tari.android.wallet.yat
 
 import android.app.Activity
 import android.app.ActivityOptions
+import android.app.Application
 import android.content.Context
 import android.content.Intent
 import com.google.gson.Gson
@@ -25,9 +26,9 @@ class YatAdapter(
     private val networkRepository: NetworkRepository,
     private val commonRepository: SharedPrefsRepository
 ) : YatIntegration.Delegate {
-    fun initYat() {
+    fun initYat(application: Application) {
         val config = YatConfiguration(BuildConfig.YAT_ORGANIZATION_RETURN_URL, BuildConfig.YAT_ORGANIZATION_NAME, BuildConfig.YAT_ORGANIZATION_KEY)
-        YatIntegration.setup(config, YatIntegration.ColorMode.LIGHT, this)
+        YatIntegration.setup(application, config, YatIntegration.ColorMode.LIGHT, this)
     }
 
     suspend fun searchYats(query: String) : LookupEmojiIdWithSymbolResponse = YatIntegration.yatApi.lookupEmojiIdWithSymbol(query, "XTR")

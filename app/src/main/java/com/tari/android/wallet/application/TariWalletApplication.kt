@@ -116,7 +116,7 @@ internal class TariWalletApplication : Application(), LifecycleObserver {
         // track app download
         tracker.download(this)
 
-        yatAdapter.initYat()
+        yatAdapter.initYat(this)
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)
