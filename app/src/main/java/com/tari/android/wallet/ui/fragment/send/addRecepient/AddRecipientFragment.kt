@@ -60,11 +60,12 @@ import com.tari.android.wallet.R.string.*
 import com.tari.android.wallet.application.DeepLink
 import com.tari.android.wallet.application.DeepLink.Type.EMOJI_ID
 import com.tari.android.wallet.application.DeepLink.Type.PUBLIC_KEY_HEX
-import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepository
 import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
+import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepository
 import com.tari.android.wallet.databinding.FragmentAddRecipientBinding
 import com.tari.android.wallet.di.DiContainer.appComponent
 import com.tari.android.wallet.extension.observe
+import com.tari.android.wallet.extension.observeOnLoad
 import com.tari.android.wallet.infrastructure.Tracker
 import com.tari.android.wallet.model.*
 import com.tari.android.wallet.ui.common.CommonFragment
@@ -97,9 +98,6 @@ class AddRecipientFragment : CommonFragment<FragmentAddRecipientBinding, AddReci
 
     @Inject
     lateinit var sharedPrefsWrapper: SharedPrefsRepository
-
-    @Inject
-    lateinit var clipboardManager: ClipboardManager
 
     @Inject
     lateinit var networkRepository: NetworkRepository
@@ -148,12 +146,16 @@ class AddRecipientFragment : CommonFragment<FragmentAddRecipientBinding, AddReci
         displayInitialList()
         ui.searchEditText.setRawInputType(InputType.TYPE_CLASS_TEXT)
         ui.searchEditText.addTextChangedListener(this@AddRecipientFragment)
-        viewModel.checkClipboardForValidEmojiId()
 
         if (savedInstanceState == null) {
             tracker.screen(path = "/home/send_tari/add_recipient", title = "Send Tari - Add Recipient")
         }
         subscribeViewModal()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        viewModel.readyToInteract.postValue(true)
     }
 
     private fun subscribeViewModal() = with(viewModel) {
@@ -164,6 +166,10 @@ class AddRecipientFragment : CommonFragment<FragmentAddRecipientBinding, AddReci
         observe(showClipboardData) { showClipboardData(it) }
 
         observe(foundYatUser) { showYatUser(if (it.isPresent) it.get() else null) }
+
+        observeOnLoad(readyToInteract)
+        observeOnLoad(serviceIsReady)
+        observeOnLoad(clipboardChecker)
     }
 
     private fun showClipboardData(data: PublicKey) {
@@ -171,7 +177,7 @@ class AddRecipientFragment : CommonFragment<FragmentAddRecipientBinding, AddReci
             hidePasteEmojiIdViewsOnTextChanged = true
             showPasteEmojiIdViews(data)
             focusEditTextAndShowKeyboard()
-        }, 100L)
+        }, 100)
     }
 
     private fun processNavigation(navigation: AddRecipientNavigation) {

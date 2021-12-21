@@ -144,7 +144,7 @@ internal class GoogleDriveBackupStorage(
                 createBackupFile(backupFile, mimeType)
             } catch (exception: UserRecoverableAuthIOException) {
                 throw BackupStorageAuthRevokedException()
-            } catch(exception: GoogleJsonResponseException) {
+            } catch (exception: GoogleJsonResponseException) {
                 for (error in exception.details.errors) {
                     if (error.reason == "storageQuotaExceeded") {
                         throw BackupStorageFullException()
@@ -284,7 +284,7 @@ internal class GoogleDriveBackupStorage(
             backupFileProcessor.clearTempFolder()
             googleClient.signOut()
                 .addOnFailureListener { continuation.resumeWith(Result.failure(it)) }
-                .addOnSuccessListener { continuation.resumeWith(Result.success(Unit)) }
+                .addOnCompleteListener { continuation.resumeWith(Result.success(Unit)) }
         }
     }
 
