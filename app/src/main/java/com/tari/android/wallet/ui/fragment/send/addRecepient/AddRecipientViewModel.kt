@@ -2,12 +2,13 @@ package com.tari.android.wallet.ui.fragment.send.addRecepient
 
 import android.content.ClipboardManager
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.tari.android.wallet.R
 import com.tari.android.wallet.application.DeepLink
-import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepository
 import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
+import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepository
 import com.tari.android.wallet.extension.addTo
 import com.tari.android.wallet.extension.executeWithError
 import com.tari.android.wallet.extension.getWithError
@@ -48,11 +49,17 @@ class AddRecipientViewModel() : CommonViewModel() {
     private val _navigation: SingleLiveEvent<AddRecipientNavigation> = SingleLiveEvent()
     val navigation: LiveData<AddRecipientNavigation> = _navigation
 
-    private val _showClipboardData: SingleLiveEvent<PublicKey> = SingleLiveEvent()
+    private val _showClipboardData: MutableLiveData<PublicKey> = MutableLiveData()
     val showClipboardData: LiveData<PublicKey> = _showClipboardData
 
     private val _foundYatUser: SingleLiveEvent<Optional<YatUser>> = SingleLiveEvent()
     val foundYatUser: LiveData<Optional<YatUser>> = _foundYatUser
+
+    val readyToInteract = MutableLiveData(false)
+
+    val serviceIsReady = MutableLiveData(false)
+
+    val clipboardChecker = MediatorLiveData<Unit>()
 
     @Inject
     lateinit var yatAdapter: YatAdapter
@@ -73,8 +80,11 @@ class AddRecipientViewModel() : CommonViewModel() {
     init {
         component.inject(this)
 
+        clipboardChecker.addSource(serviceIsReady) { if (readyToInteract.value!! && serviceIsReady.value!!) checkClipboardForValidEmojiId() }
+
         serviceConnection.connection.subscribe {
             if (it.status == TariWalletServiceConnection.ServiceConnectionStatus.CONNECTED) {
+                serviceIsReady.postValue(true)
                 viewModelScope.launch(Dispatchers.IO) {
                     fetchAllData()
                     displayList()
@@ -158,7 +168,7 @@ class AddRecipientViewModel() : CommonViewModel() {
     /**
      * Checks clipboard data for a valid deep link or an emoji id.
      */
-    fun checkClipboardForValidEmojiId() {
+    private fun checkClipboardForValidEmojiId() {
         val clipboardString = clipboardManager.primaryClip?.getItemAt(0)?.text?.toString() ?: return
 
         val deepLink = DeepLink.from(networkRepository, clipboardString)
