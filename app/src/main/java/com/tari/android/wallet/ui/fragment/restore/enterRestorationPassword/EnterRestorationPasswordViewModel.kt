@@ -17,7 +17,7 @@ class EnterRestorationPasswordViewModel() : CommonViewModel() {
     lateinit var backupStorage: BackupStorage
 
     init {
-        component?.inject(this)
+        component.inject(this)
     }
 
     private val _state = SingleLiveEvent<EnterRestorationPasswordState>()
@@ -27,7 +27,7 @@ class EnterRestorationPasswordViewModel() : CommonViewModel() {
     val navigation: LiveData<EnterRestorationPasswordNavigation> = _navigation
 
     fun onBack() {
-        _backPressed.call()
+        _backPressed.postValue(Unit)
         viewModelScope.launch(Dispatchers.IO) {
             backupStorage.signOut()
         }
