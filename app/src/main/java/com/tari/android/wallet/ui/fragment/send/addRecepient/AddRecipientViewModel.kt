@@ -29,7 +29,6 @@ import com.tari.android.wallet.yat.YatUser
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
-import yat.android.data.YatRecordType
 import java.util.*
 import javax.inject.Inject
 
@@ -133,13 +132,10 @@ class AddRecipientViewModel() : CommonViewModel() {
         displaySearchList(users)
 
         seachingJob = viewModelScope.launch(Dispatchers.IO) {
-            val searchResult = yatAdapter.searchYats(query)
-            if (searchResult.status) {
-                val records = searchResult.result.orEmpty()
-                    .filter { it.type == YatRecordType.TARI_PUBKEY }
-                    .map { result -> YatUser(walletService.getPublicKeyFromHexString(result.data)).apply { yat = query } }
-                if (records.isNotEmpty()) {
-                    _foundYatUser.postValue(Optional.ofNullable(records.first()))
+            yatAdapter.searchYats(query)?.result?.entries?.firstOrNull()?.let { response ->
+                walletService.getPublicKeyFromHexString(response.value.address)?.let { pubKey ->
+                    val yatUser = YatUser(pubKey).apply { yat = query }
+                    _foundYatUser.postValue(Optional.ofNullable(yatUser))
                 }
             }
         }
@@ -207,7 +203,7 @@ class AddRecipientViewModel() : CommonViewModel() {
     /**
      * Checks clipboard data for a public key hex string.
      */
-    fun checkForPublicKeyHex(input: String) : Boolean {
+    fun checkForPublicKeyHex(input: String): Boolean {
         val hexStringRegex = Regex("([A-Za-z0-9]{64})")
         var result = hexStringRegex.find(input)
         while (result != null) {

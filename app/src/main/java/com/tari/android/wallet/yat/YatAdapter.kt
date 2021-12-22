@@ -13,11 +13,12 @@ import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepository
 import com.tari.android.wallet.ui.fragment.send.common.TransactionData
 import com.tari.android.wallet.ui.fragment.send.finalize.FinalizeSendTxViewModel
 import com.tari.android.wallet.ui.fragment.send.finalize.YatFinalizeSendTxActivity
-import yat.android.api.lookup.LookupEmojiIdWithSymbolResponse
 import yat.android.data.YatRecord
 import yat.android.data.YatRecordType
 import yat.android.lib.YatConfiguration
 import yat.android.lib.YatIntegration
+import yat.android.lib.YatLibApi
+import yat.android.sdk.models.PaymentAddressResponse
 import yat.android.ui.transactions.outcoming.YatLibOutcomingTransactionData
 import java.io.Serializable
 
@@ -31,7 +32,8 @@ class YatAdapter(
         YatIntegration.setup(application, config, YatIntegration.ColorMode.LIGHT, this)
     }
 
-    suspend fun searchYats(query: String) : LookupEmojiIdWithSymbolResponse = YatIntegration.yatApi.lookupEmojiIdWithSymbol(query, "XTR")
+    suspend fun searchYats(query: String): PaymentAddressResponse? =
+        kotlin.runCatching { YatLibApi.emojiIDApi.lookupEmojiIDPayment(query, "0x0101") }.getOrNull()
 
     fun openOnboarding(context: Context) {
         val address = commonRepository.publicKeyHexString.orEmpty()
