@@ -126,7 +126,6 @@ class EnterRestorationPasswordFragment : CommonFragment<FragmentEnterRestorePass
     }
 
     private fun showRestoringUI() = with(ui) {
-        blockingBackPressDispatcher.isEnabled = true
         passwordEditText.isEnabled = false
         restoreWalletCtaView.isClickable = false
         restoreWalletTextView.gone()
@@ -135,7 +134,6 @@ class EnterRestorationPasswordFragment : CommonFragment<FragmentEnterRestorePass
     }
 
     private fun showInputUI() = with(ui) {
-        blockingBackPressDispatcher.isEnabled = false
         passwordEditText.isEnabled = true
         restoreWalletCtaView.isClickable = true
         restoreWalletTextView.visible()
