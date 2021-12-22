@@ -195,7 +195,7 @@ class AddRecipientViewModel() : CommonViewModel() {
             }
         }
         if (emojiIdPublicKey == null) {
-            checkClipboardForPublicKeyHex(clipboardString)
+            checkForPublicKeyHex(clipboardString)
         }
         emojiIdPublicKey?.let {
             if (it.emojiId != sharedPrefsWrapper.emojiId!!) {
@@ -207,17 +207,18 @@ class AddRecipientViewModel() : CommonViewModel() {
     /**
      * Checks clipboard data for a public key hex string.
      */
-    private fun checkClipboardForPublicKeyHex(clipboardString: String) {
+    fun checkForPublicKeyHex(input: String) : Boolean {
         val hexStringRegex = Regex("([A-Za-z0-9]{64})")
-        var result = hexStringRegex.find(clipboardString)
+        var result = hexStringRegex.find(input)
         while (result != null) {
             val hexString = result.value
             emojiIdPublicKey = walletService.getPublicKeyFromHexString(hexString)
             if (emojiIdPublicKey != null) {
-                return
+                return true
             }
             result = result.next()
         }
+        return false
     }
 
     fun getPublicKeyFromHexString(publicKeyHex: String) = walletService.getWithError { _, wallet -> wallet.getPublicKeyFromHexString(publicKeyHex) }

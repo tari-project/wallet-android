@@ -81,7 +81,6 @@ import com.tari.android.wallet.util.Constants.Wallet.emojiIdLength
 import com.tari.android.wallet.yat.YatUser
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import me.everything.android.ui.overscroll.OverScrollDecoratorHelper
 import java.lang.ref.WeakReference
 import javax.inject.Inject
@@ -183,7 +182,7 @@ class AddRecipientFragment : CommonFragment<FragmentAddRecipientBinding, AddReci
     private fun processNavigation(navigation: AddRecipientNavigation) {
         val listener = requireActivity() as AddRecipientListener
 
-        when(navigation) {
+        when (navigation) {
             is AddRecipientNavigation.ToAmount -> listener.continueToAmount(this, navigation.user)
         }
     }
@@ -339,28 +338,30 @@ class AddRecipientFragment : CommonFragment<FragmentAddRecipientBinding, AddReci
             return
         }
         // animate and hide paste emoji id button
-        val pasteButtonDisappearAnim = ValueAnimator.ofFloat(0f, 1f)
-        pasteButtonDisappearAnim.addUpdateListener { valueAnimator: ValueAnimator ->
-            val value = valueAnimator.animatedValue as Float
-            ui.pasteEmojiIdContainerView.setTopMargin(
-                (dimenPx(add_recipient_paste_emoji_id_button_visible_top_margin) * (1 - value)).toInt()
-            )
-            ui.pasteEmojiIdContainerView.alpha = (1 - value)
+        val pasteButtonDisappearAnim = ValueAnimator.ofFloat(0f, 1f).apply {
+            addUpdateListener { valueAnimator: ValueAnimator ->
+                val value = valueAnimator.animatedValue as Float
+                ui.pasteEmojiIdContainerView.setTopMargin(
+                    (dimenPx(add_recipient_paste_emoji_id_button_visible_top_margin) * (1 - value)).toInt()
+                )
+                ui.pasteEmojiIdContainerView.alpha = (1 - value)
+            }
+            addListener(onEnd = { ui.pasteEmojiIdContainerView.gone() })
+            duration = Constants.UI.shortDurationMs
         }
-        pasteButtonDisappearAnim.addListener(onEnd = { ui.pasteEmojiIdContainerView.gone() })
-        pasteButtonDisappearAnim.duration = Constants.UI.shortDurationMs
         // animate and hide emoji id & dimmers
-        val emojiIdDisappearAnim = ValueAnimator.ofFloat(0f, 1f)
-        emojiIdDisappearAnim.addUpdateListener { valueAnimator: ValueAnimator ->
-            val value = valueAnimator.animatedValue as Float
-            dimmerViews.forEach { dimmerView -> dimmerView.alpha = 0.6f * (1 - value) }
-            ui.emojiIdContainerView.setBottomMargin((-dimenPx(add_recipient_clipboard_emoji_id_container_height) * value).toInt())
+        val emojiIdDisappearAnim = ValueAnimator.ofFloat(0f, 1f).apply {
+            addUpdateListener { valueAnimator: ValueAnimator ->
+                val value = valueAnimator.animatedValue as Float
+                dimmerViews.forEach { dimmerView -> dimmerView.alpha = 0.6f * (1 - value) }
+                ui.emojiIdContainerView.setBottomMargin((-dimenPx(add_recipient_clipboard_emoji_id_container_height) * value).toInt())
+            }
+            addListener(onEnd = {
+                ui.emojiIdContainerView.gone()
+                dimmerViews.forEach(View::gone)
+            })
+            duration = Constants.UI.shortDurationMs
         }
-        emojiIdDisappearAnim.addListener(onEnd = {
-            ui.emojiIdContainerView.gone()
-            dimmerViews.forEach(View::gone)
-        })
-        emojiIdDisappearAnim.duration = Constants.UI.shortDurationMs
 
         // chain anim.s and start
         val animSet = AnimatorSet()
@@ -424,10 +425,7 @@ class AddRecipientFragment : CommonFragment<FragmentAddRecipientBinding, AddReci
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        if (requestCode == QRScannerActivity.REQUEST_QR_SCANNER
-            && resultCode == Activity.RESULT_OK
-            && data != null
-        ) {
+        if (requestCode == QRScannerActivity.REQUEST_QR_SCANNER && resultCode == Activity.RESULT_OK && data != null) {
             val qrData = data.getStringExtra(EXTRA_QR_DATA) ?: return
             val deepLink = DeepLink.from(networkRepository, qrData) ?: return
             when (deepLink.type) {
@@ -488,16 +486,17 @@ class AddRecipientFragment : CommonFragment<FragmentAddRecipientBinding, AddReci
 
     private fun animateEmojiIdPaste() {
         // animate text size
-        val textAnim = ValueAnimator.ofFloat(0f, 1f)
-        textAnim.addUpdateListener { valueAnimator: ValueAnimator ->
-            val value = valueAnimator.animatedValue as Float
-            ui.searchEditText.scaleX = value
-            ui.searchEditText.scaleY = value
-            // searchEditText.translationX = -width * (1f - value) / 2f
+        ValueAnimator.ofFloat(0f, 1f).apply {
+            addUpdateListener { valueAnimator: ValueAnimator ->
+                val value = valueAnimator.animatedValue as Float
+                ui.searchEditText.scaleX = value
+                ui.searchEditText.scaleY = value
+                // searchEditText.translationX = -width * (1f - value) / 2f
+            }
+            duration = Constants.UI.shortDurationMs
+            interpolator = EasingInterpolator(Ease.BACK_OUT)
+            start()
         }
-        textAnim.duration = Constants.UI.shortDurationMs
-        textAnim.interpolator = EasingInterpolator(Ease.BACK_OUT)
-        textAnim.start()
         ui.rootView.postDelayed({
             ui.searchEditTextScrollView.smoothScrollTo(0, 0)
         }, Constants.UI.shortDurationMs)
@@ -602,40 +601,15 @@ class AddRecipientFragment : CommonFragment<FragmentAddRecipientBinding, AddReci
                 clearSearchResult()
             } else {
                 if (numberofEmojis == emojiIdLength) {
-                    if (textWithoutSeparators == sharedPrefsWrapper.emojiId!!) {
-                        viewModel.emojiIdPublicKey = null
-                        ui.invalidEmojiIdTextView.text = string(add_recipient_own_emoji_id)
-                        ui.invalidEmojiIdTextView.visible()
-                        ui.qrCodeButton.visible()
-                        clearSearchResult()
-                    } else {
-                        ui.qrCodeButton.gone()
-                        // valid emoji id length - clear list, no search, display continue button
-                        lifecycleScope.launch(Dispatchers.IO) {
-                            viewModel.emojiIdPublicKey = viewModel.getPublicKeyFromEmojiId(textWithoutSeparators)
-                            withContext(Dispatchers.Main) {
-                                if (viewModel.emojiIdPublicKey == null) {
-                                    ui.invalidEmojiIdTextView.text =
-                                        string(add_recipient_invalid_emoji_id)
-                                    ui.invalidEmojiIdTextView.visible()
-                                    clearSearchResult()
-                                } else {
-                                    ui.invalidEmojiIdTextView.gone()
-                                    ui.continueButton.visible()
-                                    activity?.hideKeyboard()
-                                    ui.searchEditText.clearFocus()
-                                    onSearchTextChanged(textWithoutSeparators)
-                                    ui.searchEditText.isEnabled = false
-                                }
-                            }
-                        }
-                    }
+                    finishEntering(textWithoutSeparators)
                 } else {
                     viewModel.emojiIdPublicKey = null
                     ui.qrCodeButton.visible()
                     onSearchTextChanged(textWithoutSeparators)
                 }
             }
+        } else if (viewModel.checkForPublicKeyHex(text)) {
+            finishEntering(viewModel.emojiIdPublicKey!!.emojiId)
         } else {
             viewModel.emojiIdPublicKey = null
             ui.qrCodeButton.visible()
@@ -644,6 +618,36 @@ class AddRecipientFragment : CommonFragment<FragmentAddRecipientBinding, AddReci
             onSearchTextChanged(editable.toString())
         }
         textWatcherIsRunning = false
+    }
+
+    private fun finishEntering(text: String) {
+        if (text == sharedPrefsWrapper.emojiId!!) {
+            viewModel.emojiIdPublicKey = null
+            ui.invalidEmojiIdTextView.text = string(add_recipient_own_emoji_id)
+            ui.invalidEmojiIdTextView.visible()
+            ui.qrCodeButton.visible()
+            clearSearchResult()
+        } else {
+            ui.qrCodeButton.gone()
+            // valid emoji id length - clear list, no search, display continue button
+            lifecycleScope.launch(Dispatchers.IO) {
+                viewModel.emojiIdPublicKey = viewModel.getPublicKeyFromEmojiId(text)
+                lifecycleScope.launch(Dispatchers.Main) {
+                    if (viewModel.emojiIdPublicKey == null) {
+                        ui.invalidEmojiIdTextView.text = string(add_recipient_invalid_emoji_id)
+                        ui.invalidEmojiIdTextView.visible()
+                        clearSearchResult()
+                    } else {
+                        ui.invalidEmojiIdTextView.gone()
+                        ui.continueButton.visible()
+                        activity?.hideKeyboard()
+                        ui.searchEditText.clearFocus()
+                        onSearchTextChanged(text)
+                        ui.searchEditText.isEnabled = false
+                    }
+                }
+            }
+        }
     }
 
     // endregion
