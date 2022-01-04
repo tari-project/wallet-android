@@ -117,7 +117,7 @@ internal class ApplicationModule(
     @Provides
     @Singleton
     fun provideWalletServiceLauncher(context: Context, prefsRepository: SharedPrefsRepository, walletConfig: WalletConfig): WalletServiceLauncher =
-        WalletServiceLauncher(prefsRepository, walletConfig, context)
+        WalletServiceLauncher(context, walletConfig, prefsRepository)
 
     @Provides
     @Singleton
