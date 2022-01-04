@@ -71,8 +71,8 @@ import com.tari.android.wallet.model.*
 import com.tari.android.wallet.ui.common.CommonFragment
 import com.tari.android.wallet.ui.common.recyclerView.CommonAdapter
 import com.tari.android.wallet.ui.extension.*
-import com.tari.android.wallet.ui.fragment.qr.EXTRA_QR_DATA
 import com.tari.android.wallet.ui.fragment.qr.QRScannerActivity
+import com.tari.android.wallet.ui.fragment.qr.QRScannerActivity.Companion.EXTRA_QR_DATA
 import com.tari.android.wallet.ui.fragment.send.addRecepient.list.RecipientListAdapter
 import com.tari.android.wallet.ui.fragment.send.addRecepient.list.RecipientViewHolderItem
 import com.tari.android.wallet.util.*
