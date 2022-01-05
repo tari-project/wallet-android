@@ -50,7 +50,7 @@ internal interface FFIWalletListener {
     fun onTxMinedUnconfirmed(completedTx: CompletedTx, confirmationCount: Int)
     fun onDirectSendResult(txId: BigInteger, success: Boolean)
     fun onStoreAndForwardSendResult(txId: BigInteger, success: Boolean)
-    fun onTxCancelled(cancelledTx: CancelledTx)
+    fun onTxCancelled(cancelledTx: CancelledTx, rejectionReason: Int)
     fun onTXOValidationComplete(responseId: BigInteger, result: BaseNodeValidationResult)
     fun onTxValidationComplete(responseId: BigInteger, result: BaseNodeValidationResult)
     fun onWalletRestoration(result: WalletRestorationResult)

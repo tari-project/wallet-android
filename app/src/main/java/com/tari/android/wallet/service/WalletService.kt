@@ -473,7 +473,7 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
         }
     }
 
-    override fun onTxCancelled(cancelledTx: CancelledTx) {
+    override fun onTxCancelled(cancelledTx: CancelledTx, rejectionReason: Int) {
         Logger.d("Tx cancelled: $cancelledTx")
         cancelledTx.user = getUserByPublicKey(cancelledTx.user.publicKey)
         // post event to bus

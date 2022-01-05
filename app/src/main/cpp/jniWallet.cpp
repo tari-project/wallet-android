@@ -206,16 +206,18 @@ void txStoreAndForwardSendResultCallback(unsigned long long txId, bool success) 
     g_vm->DetachCurrentThread();
 }
 
-void txCancellationCallback(struct TariCompletedTransaction *pCompletedTransaction) {
+void txCancellationCallback(struct TariCompletedTransaction *pCompletedTransaction, unsigned long long rejectionReason) {
     auto *jniEnv = getJNIEnv();
     if (jniEnv == nullptr || callbackHandler == nullptr) {
         return;
     }
+    jbyteArray bytes = getBytesFromUnsignedLongLong(jniEnv, rejectionReason);
     auto jpCompletedTransaction = reinterpret_cast<jlong>(pCompletedTransaction);
     jniEnv->CallVoidMethod(
             callbackHandler,
             txCancellationCallbackMethodId,
-            jpCompletedTransaction);
+            jpCompletedTransaction,
+            bytes);
     g_vm->DetachCurrentThread();
 }
 
@@ -515,9 +517,13 @@ JNIEXPORT void JNICALL
 Java_com_tari_android_wallet_ffi_FFIWallet_jniLogMessage(
         JNIEnv *jEnv,
         jobject jThis,
-        jstring jMessage) {
+        jstring jMessage,
+        jobject error) {
+    int i = 0;
+    int *r = &i;
     const char *pMessage = jEnv->GetStringUTFChars(jMessage, JNI_FALSE);
-    log_debug_message(pMessage);
+    log_debug_message(pMessage, r);
+    setErrorCode(jEnv, error, i);
     jEnv->ReleaseStringUTFChars(jMessage, pMessage);
 }
 
@@ -1304,7 +1310,7 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniSendTx(
 
     jbyteArray result = getBytesFromUnsignedLongLong(
             jEnv,
-            wallet_send_transaction(pWallet, pDestination, amount, feePerGram, pMessage, r));
+            wallet_send_transaction(pWallet, pDestination, amount, feePerGram, pMessage, false, r));
     setErrorCode(jEnv, error, i);
     jEnv->ReleaseStringUTFChars(jamount, nativeAmount);
     jEnv->ReleaseStringUTFChars(jfeePerGram, nativeFeePerGram);

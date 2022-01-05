@@ -84,6 +84,7 @@ Java_com_tari_android_wallet_ffi_FFITransportType_jniTorTransport(
     char *pSocksPassword = const_cast<char *>(jEnv->GetStringUTFChars(jpSocksPass, JNI_FALSE));
     TariTransportType *transport = transport_tor_create(pControl, pTorCookie,
                                                         static_cast<unsigned short>(jPort),
+                                                        false,
                                                         pSocksUsername, pSocksPassword, r);
     jEnv->ReleaseStringUTFChars(jpControl, pControl);
     jEnv->ReleaseStringUTFChars(jpSocksUser, pSocksUsername);
