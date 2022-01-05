@@ -49,9 +49,6 @@ import com.tari.android.wallet.di.DiContainer.appComponent
 import com.tari.android.wallet.infrastructure.Tracker
 import javax.inject.Inject
 
-private const val REQUEST_CAMERA_PERMISSION = 102
-const val EXTRA_QR_DATA = "extra_qr_text"
-
 /**
  * QR code scanner activity - used to add a recipient by QR code.
  *
@@ -64,6 +61,9 @@ internal class QRScannerActivity : AppCompatActivity() {
          * Activity result code.
          */
         const val REQUEST_QR_SCANNER = 101
+
+        private const val REQUEST_CAMERA_PERMISSION = 102
+        const val EXTRA_QR_DATA = "extra_qr_text"
     }
 
     @Inject
@@ -78,21 +78,12 @@ internal class QRScannerActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         ui = ActivityQrScannerBinding.inflate(layoutInflater).apply { setContentView(root) }
         setupUi()
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
-            == PackageManager.PERMISSION_DENIED
-        ) {
-            ActivityCompat.requestPermissions(
-                this,
-                arrayOf(Manifest.permission.CAMERA),
-                REQUEST_CAMERA_PERMISSION
-            )
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_DENIED) {
+            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.CAMERA), REQUEST_CAMERA_PERMISSION)
         } else {
             startScanning()
             if (savedInstanceState == null) {
-                tracker.screen(
-                    path = "/home/send_tari/add_recipient/qr_scan",
-                    title = "Send Tari - Add Recipient - Scan QR Code"
-                )
+                tracker.screen(path = "/home/send_tari/add_recipient/qr_scan", title = "Send Tari - Add Recipient - Scan QR Code")
             }
         }
     }
@@ -123,18 +114,10 @@ internal class QRScannerActivity : AppCompatActivity() {
         }
 
         codeScanner.errorCallback = ErrorCallback {
-            runOnUiThread {
-                Toast.makeText(
-                    this,
-                    R.string.add_recipient_failed_init_camera_message,
-                    Toast.LENGTH_LONG
-                ).show()
-            }
+            runOnUiThread { Toast.makeText(this, R.string.add_recipient_failed_init_camera_message, Toast.LENGTH_LONG).show() }
         }
 
-        ui.scannerView.setOnClickListener {
-            codeScanner.startPreview()
-        }
+        ui.scannerView.setOnClickListener { codeScanner.startPreview() }
     }
 
     override fun onRequestPermissionsResult(
@@ -147,11 +130,7 @@ internal class QRScannerActivity : AppCompatActivity() {
             if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 startScanning()
             } else {
-                Toast.makeText(
-                    this,
-                    R.string.add_recipient_camera_permission_denied_message,
-                    Toast.LENGTH_LONG
-                ).show()
+                Toast.makeText(this, R.string.add_recipient_camera_permission_denied_message, Toast.LENGTH_LONG).show()
             }
         }
     }
@@ -169,5 +148,4 @@ internal class QRScannerActivity : AppCompatActivity() {
         }
         super.onPause()
     }
-
 }

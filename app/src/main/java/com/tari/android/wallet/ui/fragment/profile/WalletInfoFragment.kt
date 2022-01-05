@@ -32,7 +32,6 @@
  */
 package com.tari.android.wallet.ui.fragment.profile
 
-import android.content.ClipboardManager
 import android.content.Context
 import android.graphics.Bitmap
 import android.os.Bundle
@@ -74,11 +73,7 @@ class WalletInfoFragment : Fragment() {
         appComponent.inject(this)
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         ui = FragmentWalletInfoBinding.inflate(inflater, container, false)
         emojiIdSummaryController = EmojiIdSummaryViewController(ui.emojiIdSummaryView)
         emojiIdSummaryController.display(sharedPrefsWrapper.emojiId!!)
@@ -111,34 +106,26 @@ class WalletInfoFragment : Fragment() {
 
     // region Initial UI Setup
     private fun setupUI() {
-        val emojiId = sharedPrefsWrapper.emojiId!!
-        displayQRCode(emojiId)
+        displayQRCode(sharedPrefsWrapper.publicKeyHexString!!)
         setupCTAs()
     }
 
-    private fun displayQRCode(emojiId: String) {
-        val content = WalletUtil.getEmojiIdDeepLink(emojiId, networkRepository.currentNetwork!!.network)
-        getQREncodedBitmap(content, dimenPx(R.dimen.wallet_info_img_qr_code_size))?.let {
-            ui.qrImageView.setImageBitmap(it)
-        }
+    private fun displayQRCode(publicKeyHex: String) {
+        val content = WalletUtil.getPublicKeyHexDeepLink(publicKeyHex, networkRepository.currentNetwork!!.network)
+        getQREncodedBitmap(content, dimenPx(R.dimen.wallet_info_img_qr_code_size))?.let { ui.qrImageView.setImageBitmap(it) }
     }
 
     private fun getQREncodedBitmap(content: String, size: Int): Bitmap? {
-        try {
-            val barcodeEncoder = BarcodeEncoder()
-            val hints: MutableMap<EncodeHintType, String> =
-                EnumMap(EncodeHintType::class.java)
+        return try {
+            val hints: MutableMap<EncodeHintType, String> = EnumMap(EncodeHintType::class.java)
             hints[EncodeHintType.CHARACTER_SET] = "UTF-8"
+            val barcodeEncoder = BarcodeEncoder()
             val map = barcodeEncoder.encode(content, BarcodeFormat.QR_CODE, size, size, hints)
-            return barcodeEncoder.createBitmap(map)
+            barcodeEncoder.createBitmap(map)
         } catch (e: Exception) {
+            null
         }
-        return null
     }
-
-    // endregion Initial UI Setup
-
-    // region CTAs setup
 
     private fun setupCTAs() {
         ui.emojiIdSummaryContainerView.setOnClickListener(this::onEmojiSummaryClicked)
@@ -148,7 +135,4 @@ class WalletInfoFragment : Fragment() {
         view.temporarilyDisableClick()
         fullEmojiIdViewController.showFullEmojiId()
     }
-
-    // endregion CTAs setup
-
 }
