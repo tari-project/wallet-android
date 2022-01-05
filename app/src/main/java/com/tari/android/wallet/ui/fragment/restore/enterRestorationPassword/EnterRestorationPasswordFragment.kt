@@ -79,9 +79,8 @@ class EnterRestorationPasswordFragment : CommonFragment<FragmentEnterRestorePass
         passwordEditText.requestFocus()
         requireActivity().showKeyboard()
         restoringProgressBar.setColor(color(white))
-        backCtaView.setOnClickListener(ThrottleClick { viewModel.onBack() })
-        setRestoreWalletCTAState(isEnabled = false)
-        restoreWalletCtaView.setOnClickListener { viewModel.onRestore(passwordEditText.text?.toString().orEmpty()) }
+        backCtaView.setOnThrottledClickListener { viewModel.onBack() }
+        restoreWalletCtaView.setOnThrottledClickListener { viewModel.onRestore(passwordEditText.text?.toString().orEmpty()) }
         passwordEditText.addTextChangedListener(afterTextChanged = this@EnterRestorationPasswordFragment::afterTextChanged)
     }
 
