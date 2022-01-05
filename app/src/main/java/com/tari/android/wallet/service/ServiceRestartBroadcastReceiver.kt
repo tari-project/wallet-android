@@ -37,9 +37,13 @@ import android.content.Context
 import android.content.Intent
 import com.orhanobut.logger.Logger
 import com.tari.android.wallet.data.WalletConfig
+import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
+import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodeSharedRepository
 import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepositoryImpl
+import com.tari.android.wallet.data.sharedPrefs.testnetFaucet.TestnetFaucetRepository
 import com.tari.android.wallet.di.ApplicationModule
 import com.tari.android.wallet.ui.common.domain.ResourceManager
+import com.tari.android.wallet.ui.dialog.backup.BackupSettingsRepository
 
 /**
  * This receiver is responsible for restarting the service when it gets destroyed - i.e. when
@@ -54,6 +58,17 @@ class ServiceRestartBroadcastReceiver : BroadcastReceiver() {
         val resourceManager = ResourceManager(context)
         val sharedPreferences = context.getSharedPreferences(ApplicationModule.sharedPrefsFileName, Context.MODE_PRIVATE)
         val networkRepository = NetworkRepositoryImpl(resourceManager, sharedPreferences)
-        WalletServiceLauncher(context, WalletConfig(context, networkRepository)).startIfExist()
+        val backupSettingRepository = BackupSettingsRepository(context, sharedPreferences, networkRepository)
+        val baseNodeSharedPrefsRepository = BaseNodeSharedRepository(sharedPreferences, networkRepository)
+        val testnetFaucetRepository = TestnetFaucetRepository(sharedPreferences, networkRepository)
+        val sharedPrefsRepository = SharedPrefsRepository(
+            context,
+            sharedPreferences,
+            networkRepository,
+            backupSettingRepository,
+            baseNodeSharedPrefsRepository,
+            testnetFaucetRepository
+        )
+        WalletServiceLauncher(context, WalletConfig(context, networkRepository), sharedPrefsRepository).startIfExist()
     }
 }

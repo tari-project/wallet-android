@@ -8,13 +8,7 @@ import com.tari.android.wallet.data.WalletConfig
 import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import com.tari.android.wallet.util.WalletUtil
 
-class WalletServiceLauncher(private val context: Context, val walletConfig: WalletConfig ) {
-
-    private lateinit var sharedPrefsRepository: SharedPrefsRepository
-
-    constructor(sharedPrefsRepository: SharedPrefsRepository, walletConfig: WalletConfig, context: Context) : this(context, walletConfig) {
-        this.sharedPrefsRepository = sharedPrefsRepository
-    }
+class WalletServiceLauncher(private val context: Context, val walletConfig: WalletConfig, val sharedPrefsRepository: SharedPrefsRepository) {
 
     companion object {
         // intent actions
