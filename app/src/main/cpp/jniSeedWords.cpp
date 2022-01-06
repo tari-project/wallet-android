@@ -54,10 +54,10 @@ Java_com_tari_android_wallet_ffi_FFISeedWords_jniGetMnemonicWordListForLanguage(
         JNIEnv *jEnv,
         jobject jThis,
         jstring language) {
-    int i = 0;
-    int *r = &i;
+    int errorCode = 0;
+    int *errorCodePointer = &errorCode;
     const char *pLanguage = jEnv->GetStringUTFChars(language, JNI_FALSE);
-    TariSeedWords *pSeedWords = seed_words_get_mnemonic_word_list_for_language(pLanguage, r);
+    TariSeedWords *pSeedWords = seed_words_get_mnemonic_word_list_for_language(pLanguage, errorCodePointer);
     SetPointerField(jEnv, jThis, reinterpret_cast<jlong>(pSeedWords));
 }
 
@@ -68,14 +68,14 @@ Java_com_tari_android_wallet_ffi_FFISeedWords_jniPushWord(
         jobject jThis,
         jstring jWord,
         jobject error) {
-    int i = 0;
-    int *r = &i;
+    int errorCode = 0;
+    int *errorCodePointer = &errorCode;
     jlong lSeedWords = GetPointerField(jEnv, jThis);
     auto *pSeedWords = reinterpret_cast<TariSeedWords *>(lSeedWords);
     const char *pWord = jEnv->GetStringUTFChars(jWord, JNI_FALSE);
-    jint result = seed_words_push_word(pSeedWords, pWord, r);
+    jint result = seed_words_push_word(pSeedWords, pWord, errorCodePointer);
     jEnv->ReleaseStringUTFChars(jWord, pWord);
-    setErrorCode(jEnv, error, i);
+    setErrorCode(jEnv, error, errorCode);
     return result;
 }
 
@@ -85,12 +85,12 @@ Java_com_tari_android_wallet_ffi_FFISeedWords_jniGetLength(
         JNIEnv *jEnv,
         jobject jThis,
         jobject error) {
-    int i = 0;
-    int *r = &i;
+    int errorCode = 0;
+    int *errorCodePointer = &errorCode;
     jlong lSeedWords = GetPointerField(jEnv, jThis);
     auto *pSeedWords = reinterpret_cast<TariSeedWords *>(lSeedWords);
-    jint result = seed_words_get_length(pSeedWords, r);
-    setErrorCode(jEnv, error, i);
+    jint result = seed_words_get_length(pSeedWords, errorCodePointer);
+    setErrorCode(jEnv, error, errorCode);
     return result;
 }
 
@@ -101,12 +101,12 @@ Java_com_tari_android_wallet_ffi_FFISeedWords_jniGetAt(
         jobject jThis,
         jint index,
         jobject error) {
-    int i = 0;
-    int *r = &i;
+    int errorCode = 0;
+    int *errorCodePointer = &errorCode;
     jlong lSeedWords = GetPointerField(jEnv, jThis);
     auto *pSeedWords = reinterpret_cast<TariSeedWords *>(lSeedWords);
-    const char *pWord = seed_words_get_at(pSeedWords, static_cast<unsigned int>(index), r);
-    setErrorCode(jEnv, error, i);
+    const char *pWord = seed_words_get_at(pSeedWords, static_cast<unsigned int>(index), errorCodePointer);
+    setErrorCode(jEnv, error, errorCode);
     jstring result = jEnv->NewStringUTF(pWord);
     string_destroy(const_cast<char *>(pWord));
     return result;

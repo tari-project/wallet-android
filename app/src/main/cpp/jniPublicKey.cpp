@@ -46,12 +46,12 @@ Java_com_tari_android_wallet_ffi_FFIPublicKey_jniCreate(
         jobject jThis,
         jobject jByteVector,
         jobject error) {
-    int i = 0;
-    int *r = &i;
+    int errorCode = 0;
+    int *errorCodePointer = &errorCode;
     jlong lByteVector = GetPointerField(jEnv, jByteVector);
     auto *pByteVector = reinterpret_cast<ByteVector *>(lByteVector);
-    auto result = reinterpret_cast<jlong>(public_key_create(pByteVector, r));
-    setErrorCode(jEnv, error, i);
+    auto result = reinterpret_cast<jlong>(public_key_create(pByteVector, errorCodePointer));
+    setErrorCode(jEnv, error, errorCode);
     SetPointerField(jEnv, jThis, result);
 }
 
@@ -62,11 +62,11 @@ Java_com_tari_android_wallet_ffi_FFIPublicKey_jniFromHex(
         jobject jThis,
         jstring jHexStr,
         jobject error) {
-    int i = 0;
-    int *r = &i;
+    int errorCode = 0;
+    int *errorCodePointer = &errorCode;
     const char *pStr = jEnv->GetStringUTFChars(jHexStr, JNI_FALSE);
-    TariPublicKey *pPublicKey = public_key_from_hex(pStr, r);
-    setErrorCode(jEnv, error, i);
+    TariPublicKey *pPublicKey = public_key_from_hex(pStr, errorCodePointer);
+    setErrorCode(jEnv, error, errorCode);
     jEnv->ReleaseStringUTFChars(jHexStr, pStr);
     SetPointerField(jEnv, jThis, reinterpret_cast<jlong>(pPublicKey));
 }
@@ -78,12 +78,12 @@ Java_com_tari_android_wallet_ffi_FFIPublicKey_jniFromPrivateKey(
         jobject jThis,
         jobject jPrivateKey,
         jobject error) {
-    int i = 0;
-    int *r = &i;
+    int errorCode = 0;
+    int *errorCodePointer = &errorCode;
     jlong lPrivateKey = GetPointerField(jEnv, jPrivateKey);
     auto *pPrivateKey = reinterpret_cast<TariPrivateKey *>(lPrivateKey);
-    auto result = reinterpret_cast<jlong>(public_key_from_private_key(pPrivateKey, r));
-    setErrorCode(jEnv, error, i);
+    auto result = reinterpret_cast<jlong>(public_key_from_private_key(pPrivateKey, errorCodePointer));
+    setErrorCode(jEnv, error, errorCode);
     SetPointerField(jEnv, jThis, result);
 }
 
@@ -94,12 +94,12 @@ Java_com_tari_android_wallet_ffi_FFIPublicKey_jniFromEmojiId(
         jobject jThis,
         jstring jpEmoji,
         jobject error) {
-    int i = 0;
-    int *r = &i;
+    int errorCode = 0;
+    int *errorCodePointer = &errorCode;
     const char *pStr = jEnv->GetStringUTFChars(jpEmoji, JNI_FALSE);
-    auto result = reinterpret_cast<jlong>(emoji_id_to_public_key(pStr, r));
+    auto result = reinterpret_cast<jlong>(emoji_id_to_public_key(pStr, errorCodePointer));
     jEnv->ReleaseStringUTFChars(jpEmoji, pStr);
-    setErrorCode(jEnv, error, i);
+    setErrorCode(jEnv, error, errorCode);
     SetPointerField(jEnv, jThis, result);
 }
 
@@ -109,12 +109,12 @@ Java_com_tari_android_wallet_ffi_FFIPublicKey_jniGetEmojiId(
         JNIEnv *jEnv,
         jobject jThis,
         jobject error) {
-    int i = 0;
-    int *r = &i;
+    int errorCode = 0;
+    int *errorCodePointer = &errorCode;
     jlong lPublicKey = GetPointerField(jEnv, jThis);
     auto *pPublicKey = reinterpret_cast<TariPublicKey *>(lPublicKey);
-    const char *pEmoji = public_key_to_emoji_id(pPublicKey, r);
-    setErrorCode(jEnv, error, i);
+    const char *pEmoji = public_key_to_emoji_id(pPublicKey, errorCodePointer);
+    setErrorCode(jEnv, error, errorCode);
     jstring result = jEnv->NewStringUTF(pEmoji);
     string_destroy(const_cast<char *>(pEmoji));
     return result;
@@ -126,12 +126,12 @@ Java_com_tari_android_wallet_ffi_FFIPublicKey_jniGetBytes(
         JNIEnv *jEnv,
         jobject jThis,
         jobject error) {
-    int i = 0;
-    int *r = &i;
+    int errorCode = 0;
+    int *errorCodePointer = &errorCode;
     jlong lPublicKey = GetPointerField(jEnv, jThis);
     auto *pPublicKey = reinterpret_cast<TariPublicKey *>(lPublicKey);
-    auto result = reinterpret_cast<jlong>(public_key_get_bytes(pPublicKey, r));
-    setErrorCode(jEnv, error, i);
+    auto result = reinterpret_cast<jlong>(public_key_get_bytes(pPublicKey, errorCodePointer));
+    setErrorCode(jEnv, error, errorCode);
     return result;
 }
 
