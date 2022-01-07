@@ -45,12 +45,12 @@ Java_com_tari_android_wallet_ffi_FFICompletedTxKernel_jniGetExcess(
         JNIEnv *jEnv,
         jobject jThis,
         jobject error) {
-    int i = 0;
-    int *r = &i;
+    int errorCode = 0;
+    int *errorCodePointer = &errorCode;
     jlong lKernel = GetPointerField(jEnv, jThis);
     auto *pKernel = reinterpret_cast<TariTransactionKernel *>(lKernel);
-    const char *pStr = transaction_kernel_get_excess_hex(pKernel, r);
-    setErrorCode(jEnv, error, i);
+    const char *pStr = transaction_kernel_get_excess_hex(pKernel, errorCodePointer);
+    setErrorCode(jEnv, error, errorCode);
     jstring result = jEnv->NewStringUTF(pStr);
     string_destroy(const_cast<char *>(pStr));
     return result;
@@ -62,12 +62,12 @@ Java_com_tari_android_wallet_ffi_FFICompletedTxKernel_jniGetExcessPublicNonce(
         JNIEnv *jEnv,
         jobject jThis,
         jobject error) {
-    int i = 0;
-    int *r = &i;
+    int errorCode = 0;
+    int *errorCodePointer = &errorCode;
     jlong lKernel = GetPointerField(jEnv, jThis);
     auto *pKernel = reinterpret_cast<TariTransactionKernel *>(lKernel);
-    const char *pStr = transaction_kernel_get_excess_public_nonce_hex(pKernel, r);
-    setErrorCode(jEnv, error, i);
+    const char *pStr = transaction_kernel_get_excess_public_nonce_hex(pKernel, errorCodePointer);
+    setErrorCode(jEnv, error, errorCode);
     jstring result = jEnv->NewStringUTF(pStr);
     string_destroy(const_cast<char *>(pStr));
     return result;
@@ -79,12 +79,12 @@ Java_com_tari_android_wallet_ffi_FFICompletedTxKernel_jniGetExcessSignature(
         JNIEnv *jEnv,
         jobject jThis,
         jobject error) {
-    int i = 0;
-    int *r = &i;
+    int errorCode = 0;
+    int *errorCodePointer = &errorCode;
     jlong lKernel = GetPointerField(jEnv, jThis);
     auto *pKernel = reinterpret_cast<TariTransactionKernel *>(lKernel);
-    const char *pStr = transaction_kernel_get_excess_signature_hex(pKernel, r);
-    setErrorCode(jEnv, error, i);
+    const char *pStr = transaction_kernel_get_excess_signature_hex(pKernel, errorCodePointer);
+    setErrorCode(jEnv, error, errorCode);
     jstring result = jEnv->NewStringUTF(pStr);
     string_destroy(const_cast<char *>(pStr));
     return result;

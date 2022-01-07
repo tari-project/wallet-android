@@ -41,12 +41,12 @@ Java_com_tari_android_wallet_ffi_FFIUtil_jniDoPartialBackup(
         jstring jBackupFileSourcePath,
         jstring jBackupFileTargetPath,
         jobject error) {
-    int i = 0;
-    int *r = &i;
+    int errorCode = 0;
+    int *errorCodePointer = &errorCode;
     const char *pSourcePath = jEnv->GetStringUTFChars(jBackupFileSourcePath, JNI_FALSE);
     const char *pTargetPath = jEnv->GetStringUTFChars(jBackupFileTargetPath, JNI_FALSE);
-    file_partial_backup(pSourcePath, pTargetPath, r);
-    setErrorCode(jEnv, error, i);
+    file_partial_backup(pSourcePath, pTargetPath, errorCodePointer);
+    setErrorCode(jEnv, error, errorCode);
     jEnv->ReleaseStringUTFChars(jBackupFileSourcePath, pSourcePath);
     jEnv->ReleaseStringUTFChars(jBackupFileTargetPath, pTargetPath);
 }

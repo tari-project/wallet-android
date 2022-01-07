@@ -54,12 +54,12 @@ Java_com_tari_android_wallet_ffi_FFIEmojiSet_jniGetLength(
         JNIEnv *jEnv,
         jobject jThis,
         jobject error) {
-    int i = 0;
-    int *r = &i;
+    int errorCode = 0;
+    int *errorCodePointer = &errorCode;
     jlong lEmojiSet = GetPointerField(jEnv, jThis);
     auto *pEmojiSet = reinterpret_cast<EmojiSet *>(lEmojiSet);
-    jint result = emoji_set_get_length(pEmojiSet, r);
-    setErrorCode(jEnv, error, i);
+    jint result = emoji_set_get_length(pEmojiSet, errorCodePointer);
+    setErrorCode(jEnv, error, errorCode);
     return result;
 }
 
@@ -70,14 +70,14 @@ Java_com_tari_android_wallet_ffi_FFIEmojiSet_jniGetAt(
         jobject jThis,
         jint index,
         jobject error) {
-    int i = 0;
-    int *r = &i;
+    int errorCode = 0;
+    int *errorCodePointer = &errorCode;
     jlong lEmojiSet = GetPointerField(jEnv, jThis);
     auto *pEmojiSet = reinterpret_cast<EmojiSet *>(lEmojiSet);
     auto result = reinterpret_cast<jlong>(
-            emoji_set_get_at(pEmojiSet, static_cast<unsigned int>(index), r)
+            emoji_set_get_at(pEmojiSet, static_cast<unsigned int>(index), errorCodePointer)
     );
-    setErrorCode(jEnv, error, i);
+    setErrorCode(jEnv, error, errorCode);
     return result;
 }
 

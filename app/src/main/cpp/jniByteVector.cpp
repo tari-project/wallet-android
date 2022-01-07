@@ -51,10 +51,10 @@ Java_com_tari_android_wallet_ffi_FFIByteVector_jniCreate(
     for (int i = 0; i < size; i++) {
         printf("%hhx", buffer[i]);
     }
-    int i = 0;
-    int *r = &i;
-    ByteVector *pByteVector = byte_vector_create(buffer, static_cast<unsigned int>(size), r);
-    setErrorCode(jEnv, error, i);
+    int errorCode = 0;
+    int *errorCodePointer = &errorCode;
+    ByteVector *pByteVector = byte_vector_create(buffer, static_cast<unsigned int>(size), errorCodePointer);
+    setErrorCode(jEnv, error, errorCode);
     jEnv->ReleaseByteArrayElements(array, reinterpret_cast<jbyte *>(buffer), JNI_ABORT);
     SetPointerField(jEnv, jThis, reinterpret_cast<jlong>(pByteVector));
 }
@@ -65,12 +65,12 @@ Java_com_tari_android_wallet_ffi_FFIByteVector_jniGetLength(
         JNIEnv *jEnv,
         jobject jThis,
         jobject error) {
-    int i = 0;
-    int *r = &i;
+    int errorCode = 0;
+    int *errorCodePointer = &errorCode;
     jlong lByteVector = GetPointerField(jEnv, jThis);
     auto *pByteVector = reinterpret_cast<ByteVector *>(lByteVector);
-    jint length = byte_vector_get_length(pByteVector, r);
-    setErrorCode(jEnv, error, i);
+    jint length = byte_vector_get_length(pByteVector, errorCodePointer);
+    setErrorCode(jEnv, error, errorCode);
     return length;
 }
 
@@ -81,12 +81,12 @@ Java_com_tari_android_wallet_ffi_FFIByteVector_jniGetAt(
         jobject jThis,
         jint index,
         jobject error) {
-    int i = 0;
-    int *r = &i;
+    int errorCode = 0;
+    int *errorCodePointer = &errorCode;
     jlong lByteVector = GetPointerField(jEnv, jThis);
     auto *pByteVector = reinterpret_cast<ByteVector *>(lByteVector);
-    jint byte = byte_vector_get_at(pByteVector, static_cast<unsigned int>(index), r);
-    setErrorCode(jEnv, error, i);
+    jint byte = byte_vector_get_at(pByteVector, static_cast<unsigned int>(index), errorCodePointer);
+    setErrorCode(jEnv, error, errorCode);
     return byte;
 }
 
