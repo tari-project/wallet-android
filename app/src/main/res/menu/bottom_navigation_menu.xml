@@ -12,6 +12,10 @@
         android:title="@string/home_navigation_content_description_navigate_to_ttl_store"/>
 
     <item
+        android:id="@+id/middle_button"
+        android:title=""/>
+
+    <item
         android:id="@+id/profileFragment"
         android:icon="@drawable/icon_profile"
         android:title="@string/home_navigation_content_description_navigate_to_wallet_info"/>

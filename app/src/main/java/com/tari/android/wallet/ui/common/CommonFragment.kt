@@ -6,8 +6,14 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.annotation.AnimRes
+import androidx.annotation.AnimatorRes
+import androidx.annotation.IdRes
 import androidx.fragment.app.Fragment
+import androidx.navigation.NavOptions
+import androidx.navigation.fragment.findNavController
 import androidx.viewbinding.ViewBinding
+import com.tari.android.wallet.R
 import com.tari.android.wallet.extension.observe
 import com.tari.android.wallet.ui.component.MutedBackPressedCallback
 import com.tari.android.wallet.ui.dialog.TariDialog
@@ -51,6 +57,17 @@ abstract class CommonFragment<Binding : ViewBinding, VM : CommonViewModel> : Fra
         observe(blockedBackPressed) {
             blockingBackPressDispatcher.isEnabled = it
         }
+    }
+
+    protected fun navigate(@IdRes id: Int, bundle: Bundle? = null) {
+        val navOptions = NavOptions.Builder()
+            .setEnterAnim(R.anim.enter_from_right)
+            .setExitAnim(R.anim.exit_to_left)
+            .setPopEnterAnim( R.anim.enter_from_left)
+            .setPopExitAnim(R.anim.exit_to_right)
+            .build()
+
+        findNavController().navigate(id, bundle, navOptions)
     }
 
     protected fun changeOnBackPressed(isBlocked: Boolean) {

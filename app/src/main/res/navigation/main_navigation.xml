@@ -23,6 +23,31 @@
     <fragment
         android:id="@+id/settingsFragment"
         android:name="com.tari.android.wallet.ui.fragment.settings.allSettings.AllSettingsFragment"
-        tools:layout="@layout/fragment_all_settings" />
+        tools:layout="@layout/fragment_all_settings" >
+        <action
+            android:id="@+id/action_settingsFragment_to_addCustomBaseNodeFragment"
+            app:destination="@id/addCustomBaseNodeFragment" />
+        <action
+            android:id="@+id/action_settingsFragment_to_networkSelectionFragment"
+            app:destination="@id/networkSelectionFragment" />
+        <action
+            android:id="@+id/action_settingsFragment_to_changeBaseNodeFragment"
+            app:destination="@id/changeBaseNodeFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/changeBaseNodeFragment"
+        android:name="com.tari.android.wallet.ui.fragment.debug.baseNodeConfig.changeBaseNode.ChangeBaseNodeFragment"
+        tools:layout="@layout/fragment_base_node_change"/>
+
+    <fragment
+        android:id="@+id/networkSelectionFragment"
+        android:name="com.tari.android.wallet.ui.fragment.settings.networkSelection.NetworkSelectionFragment"
+        tools:layout="@layout/fragment_network_selection"/>
+
+    <fragment
+        android:id="@+id/addCustomBaseNodeFragment"
+        android:name="com.tari.android.wallet.ui.fragment.debug.baseNodeConfig.addBaseNode.AddCustomBaseNodeFragment"
+        tools:layout="@layout/fragment_base_node_add"/>
 
 </navigation>

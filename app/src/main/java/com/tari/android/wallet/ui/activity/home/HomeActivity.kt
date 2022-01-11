@@ -38,16 +38,12 @@ import android.os.Handler
 import android.os.Looper
 import android.os.Parcelable
 import android.view.View
-import android.widget.ImageView
 import androidx.activity.viewModels
 import androidx.core.view.postDelayed
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentManager
-import androidx.fragment.app.FragmentStatePagerAdapter
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.tari.android.wallet.R
-import com.tari.android.wallet.R.color.home_selected_nav_item
 import com.tari.android.wallet.application.DeepLink
 import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepository
 import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
@@ -76,14 +72,10 @@ import com.tari.android.wallet.ui.extension.*
 import com.tari.android.wallet.ui.fragment.debug.baseNodeConfig.BaseNodeConfigRouter
 import com.tari.android.wallet.ui.fragment.debug.baseNodeConfig.addBaseNode.AddCustomBaseNodeFragment
 import com.tari.android.wallet.ui.fragment.debug.baseNodeConfig.changeBaseNode.ChangeBaseNodeFragment
-import com.tari.android.wallet.ui.fragment.profile.WalletInfoFragment
 import com.tari.android.wallet.ui.fragment.send.activity.SendTariActivity
-import com.tari.android.wallet.ui.fragment.settings.allSettings.AllSettingsFragment
 import com.tari.android.wallet.ui.fragment.settings.allSettings.AllSettingsRouter
 import com.tari.android.wallet.ui.fragment.settings.backgroundService.BackgroundServiceSettingsActivity
 import com.tari.android.wallet.ui.fragment.settings.networkSelection.NetworkSelectionFragment
-import com.tari.android.wallet.ui.fragment.store.StoreFragment
-import com.tari.android.wallet.ui.fragment.tx.TxListFragment
 import com.tari.android.wallet.ui.fragment.tx.TxListRouter
 import com.tari.android.wallet.util.Constants
 import io.reactivex.disposables.CompositeDisposable
@@ -92,11 +84,12 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 import androidx.navigation.ui.NavigationUI
 import com.google.android.material.bottomnavigation.BottomNavigationView
-import androidx.navigation.NavController
 import androidx.navigation.Navigation
+import androidx.navigation.findNavController
+import androidx.navigation.ui.AppBarConfiguration
 
 
-internal class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>(), AllSettingsRouter, TxListRouter, BaseNodeConfigRouter {
+internal class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>(), TxListRouter {
 
     @Inject
     lateinit var sharedPrefsWrapper: SharedPrefsRepository
@@ -109,6 +102,8 @@ internal class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>
 
     @Inject
     lateinit var giphy: GiphyEcosystem
+
+    private val navController by lazy { Navigation.findNavController(this, R.id.nav_host_fragment) }
 
     private lateinit var serviceConnection: TariWalletServiceConnection
     private var compositeDisposable: CompositeDisposable = CompositeDisposable()
@@ -134,7 +129,6 @@ internal class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>
 
         if (savedInstanceState == null) {
             giphy.enable()
-//            enableNavigationView(ui.homeImageView)
             serviceConnection.connection.subscribe {
                 if (it.status == CONNECTED) {
                     ui.root.postDelayed(Constants.UI.mediumDurationMs) {
@@ -142,15 +136,9 @@ internal class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>
                     }
                 }
             }.addTo(compositeDisposable)
-        } else {
-//            val index = savedInstanceState.getInt(KEY_PAGE)
-//            ui.viewPager.setCurrentItem(index, false)
-//            enableNavigationView(index)
         }
 
-        val navController: NavController = Navigation.findNavController(this, R.id.nav_host_fragment)
-        val bottomNavigationView = findViewById<BottomNavigationView>(R.id.activity_main_bottom_navigation_view)
-        NavigationUI.setupWithNavController(bottomNavigationView, navController)
+        NavigationUI.setupWithNavController(ui.bottomNavigationView, navController)
 
         setupUi()
         Handler(Looper.getMainLooper()).postDelayed(
@@ -170,20 +158,21 @@ internal class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>
     }
 
     override fun onBackPressed() {
-        if (supportFragmentManager.backStackEntryCount > 0) {
-            super.onBackPressed()
+        val appBarConfiguration = setOf(R.id.txListFragment, R.id.ttlStoreFragment, R.id.profileFragment, R.id.settingsFragment)
+        if (!appBarConfiguration.contains(navController.currentBackStackEntry?.destination?.id ?: -1)) {
+            navController.popBackStack()
         } else {
-//            if (ui.viewPager.currentItem == INDEX_HOME) {
-//                super.onBackPressed()
-//            } else {
-//                ui.viewPager.setCurrentItem(INDEX_HOME, NO_SMOOTH_SCROLL)
-//                enableNavigationView(ui.homeImageView)
-//            }
+            val bottomNavigationView = findViewById<BottomNavigationView>(R.id.bottom_navigation_view)
+            if (ui.bottomNavigationView.selectedItemId != R.id.txListFragment) {
+                bottomNavigationView.selectedItemId = R.id.txListFragment
+            } else {
+                finish()
+            }
+            bottomNavigationView.selectedItemId = R.id.txListFragment
         }
     }
 
     private fun setupUi() {
-        setupBottomNavigation()
         setupCTAs()
     }
 
@@ -200,45 +189,6 @@ internal class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>
             }
         }
     }
-
-    private fun setupBottomNavigation() {
-//        enableNavigationView(ui.homeImageView)
-//        ui.viewPager.adapter = HomeAdapter(supportFragmentManager)
-//        ui.viewPager.offscreenPageLimit = 3
-//        ui.homeView.setOnClickListener {
-//            ui.viewPager.setCurrentItem(INDEX_HOME, NO_SMOOTH_SCROLL)
-//            enableNavigationView(ui.homeImageView)
-//        }
-//        ui.storeView.setOnClickListener {
-//            ui.viewPager.setCurrentItem(INDEX_STORE, NO_SMOOTH_SCROLL)
-//            enableNavigationView(ui.storeImageView)
-//        }
-//        ui.walletInfoView.setOnClickListener {
-//            ui.viewPager.setCurrentItem(INDEX_PROFILE, NO_SMOOTH_SCROLL)
-//            enableNavigationView(ui.walletInfoImageView)
-//        }
-//        ui.settingsView.setOnClickListener {
-//            ui.viewPager.setCurrentItem(INDEX_SETTINGS, NO_SMOOTH_SCROLL)
-//            enableNavigationView(ui.settingsImageView)
-//        }
-    }
-
-//    private fun enableNavigationView(index: Int) {
-//        val view: ImageView = when (index) {
-//            INDEX_HOME -> ui.homeImageView
-//            INDEX_STORE -> ui.storeImageView
-//            INDEX_PROFILE -> ui.walletInfoImageView
-//            INDEX_SETTINGS -> ui.settingsImageView
-//            else -> error("Unexpected index: $index")
-//        }
-//        enableNavigationView(view)
-//    }
-//
-//    private fun enableNavigationView(view: ImageView) {
-//        arrayOf(ui.homeImageView, ui.storeImageView, ui.walletInfoImageView, ui.settingsImageView)
-//            .forEach { it.clearColorFilter() }
-//        view.setColorFilter(color(home_selected_nav_item))
-//    }
 
     private fun checkNetworkCompatibility() {
         if (!networkRepository.supportedNetworks.contains(networkRepository.currentNetwork!!.network) && !networkRepository.incompatibleNetworkShown) {
@@ -289,41 +239,15 @@ internal class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>
 
     override fun toTxDetails(tx: Tx) = startActivity(TxDetailsActivity.createIntent(this, tx))
 
-//    override fun toTTLStore() = ui.viewPager.setCurrentItem(INDEX_STORE, NO_SMOOTH_SCROLL)
-    override fun toTTLStore() {}
-
-//    override fun toAllSettings() = ui.viewPager.setCurrentItem(INDEX_SETTINGS, NO_SMOOTH_SCROLL)
-    override fun toAllSettings() {}
-
-    override fun toBackupSettings() = startActivity(Intent(this, BackupSettingsActivity::class.java))
-
-    override fun toDeleteWallet() = startActivity(Intent(this, DeleteWalletActivity::class.java))
-
-    override fun toBackgroundService() = startActivity(Intent(this, BackgroundServiceSettingsActivity::class.java))
-
-    override fun toBaseNodeSelection() = loadFragment(ChangeBaseNodeFragment())
-
-    override fun toNetworkSelection() = loadFragment(NetworkSelectionFragment())
-
-    override fun toAddCustomBaseNode() = loadFragment(AddCustomBaseNodeFragment())
-
-    override fun toChangeBaseNode() = loadFragment(ChangeBaseNodeFragment())
-
-    private fun loadFragment(fragment: Fragment) {
-        supportFragmentManager
-            .beginTransaction()
-            .setCustomAnimations(
-                R.anim.enter_from_right, R.anim.exit_to_left,
-                R.anim.enter_from_left, R.anim.exit_to_right
-            )
-            .apply { supportFragmentManager.fragments.forEach { hide(it) } }
-            .add(R.id.nav_container, fragment)
-            .addToBackStack(null)
-            .commit()
+    override fun toTTLStore() {
+        ui.bottomNavigationView.selectedItemId = R.id.ttlStoreFragment
     }
 
-//    fun willNotifyAboutNewTx(): Boolean = ui.viewPager.currentItem == INDEX_HOME
-    fun willNotifyAboutNewTx(): Boolean = true
+    override fun toAllSettings() {
+        ui.bottomNavigationView.selectedItemId = R.id.settingsFragment
+    }
+
+    fun willNotifyAboutNewTx(): Boolean = ui.bottomNavigationView.selectedItemId == R.id.txListFragment
 
     private fun processIntentDeepLink(service: TariWalletService, intent: Intent) {
         DeepLink.from(networkRepository, intent.data?.toString().orEmpty())?.let { deepLink ->

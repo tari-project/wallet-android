@@ -33,6 +33,7 @@
 package com.tari.android.wallet.ui.fragment.settings.allSettings
 
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -48,8 +49,11 @@ import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.extension.observe
 import com.tari.android.wallet.infrastructure.BugReportingService
 import com.tari.android.wallet.infrastructure.security.biometric.BiometricAuthenticationService
+import com.tari.android.wallet.ui.activity.settings.BackupSettingsActivity
+import com.tari.android.wallet.ui.activity.settings.DeleteWalletActivity
 import com.tari.android.wallet.ui.common.CommonFragment
 import com.tari.android.wallet.ui.extension.*
+import com.tari.android.wallet.ui.fragment.settings.backgroundService.BackgroundServiceSettingsActivity
 import com.tari.android.wallet.ui.fragment.settings.userAutorization.BiometricAuthenticationViewModel
 import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.yat.YatAdapter
@@ -168,16 +172,20 @@ internal class AllSettingsFragment : CommonFragment<FragmentAllSettingsBinding, 
     }
 
     private fun processNavigation(navigation: AllSettingsNavigation) {
-        val router = requireActivity() as AllSettingsRouter
-
         when (navigation) {
-            AllSettingsNavigation.ToBackgroundService -> router.toBackgroundService()
-            AllSettingsNavigation.ToBackupSettings -> router.toBackupSettings()
-            AllSettingsNavigation.ToBaseNodeSelection -> router.toBaseNodeSelection()
-            AllSettingsNavigation.ToDeleteWallet -> router.toDeleteWallet()
-            AllSettingsNavigation.ToNetworkSelection -> router.toNetworkSelection()
+            AllSettingsNavigation.ToBackgroundService -> toBackgroundService()
+            AllSettingsNavigation.ToBackupSettings -> toBackupSettings()
+            AllSettingsNavigation.ToBaseNodeSelection -> navigate(R.id.action_settingsFragment_to_changeBaseNodeFragment)
+            AllSettingsNavigation.ToDeleteWallet -> toDeleteWallet()
+            AllSettingsNavigation.ToNetworkSelection -> navigate(R.id.action_settingsFragment_to_networkSelectionFragment)
         }
     }
+
+    private fun toBackupSettings() = startActivity(Intent(requireContext(), BackupSettingsActivity::class.java))
+
+    private fun toDeleteWallet() = startActivity(Intent(requireContext(), DeleteWalletActivity::class.java))
+
+    private fun toBackgroundService() = startActivity(Intent(requireContext(), BackgroundServiceSettingsActivity::class.java))
 
     override fun onDestroyView() {
         ui.scrollView.setOnScrollChangeListener(null)
