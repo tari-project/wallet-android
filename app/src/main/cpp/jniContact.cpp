@@ -47,13 +47,13 @@ Java_com_tari_android_wallet_ffi_FFIContact_jniCreate(
         jstring jAlias,
         jobject jPublicKey,
         jobject error) {
-    int i = 0;
-    int *r = &i;
+    int errorCode = 0;
+    int *errorCodePointer = &errorCode;
     const char *pAlias = jEnv->GetStringUTFChars(jAlias, JNI_FALSE);
     jlong lPublicKey = GetPointerField(jEnv, jPublicKey);
     auto *pPublicKey = reinterpret_cast<TariPublicKey *>(lPublicKey);
-    TariContact *pContact = contact_create(pAlias, pPublicKey, r);
-    setErrorCode(jEnv, error, i);
+    TariContact *pContact = contact_create(pAlias, pPublicKey, errorCodePointer);
+    setErrorCode(jEnv, error, errorCode);
     jEnv->ReleaseStringUTFChars(jAlias, pAlias);
     SetPointerField(jEnv, jThis, reinterpret_cast<jlong>(pContact));
 }
@@ -64,12 +64,12 @@ Java_com_tari_android_wallet_ffi_FFIContact_jniGetAlias(
         JNIEnv *jEnv,
         jobject jThis,
         jobject error) {
-    int i = 0;
-    int *r = &i;
+    int errorCode = 0;
+    int *errorCodePointer = &errorCode;
     jlong lContact = GetPointerField(jEnv, jThis);
     auto *pContact = reinterpret_cast<TariContact *>(lContact);
-    const char *pAlias = contact_get_alias(pContact, r);
-    setErrorCode(jEnv, error, i);
+    const char *pAlias = contact_get_alias(pContact, errorCodePointer);
+    setErrorCode(jEnv, error, errorCode);
     jstring result = jEnv->NewStringUTF(pAlias);
     string_destroy(const_cast<char *>(pAlias));
     return result;
@@ -81,12 +81,12 @@ Java_com_tari_android_wallet_ffi_FFIContact_jniGetPublicKey(
         JNIEnv *jEnv,
         jobject jThis,
         jobject error) {
-    int i = 0;
-    int *r = &i;
+    int errorCode = 0;
+    int *errorCodePointer = &errorCode;
     jlong lContact = GetPointerField(jEnv, jThis);
     auto *pContact = reinterpret_cast<TariContact *>(lContact);
-    auto result = reinterpret_cast<jlong>(contact_get_public_key(pContact, r));
-    setErrorCode(jEnv, error, i);
+    auto result = reinterpret_cast<jlong>(contact_get_public_key(pContact, errorCodePointer));
+    setErrorCode(jEnv, error, errorCode);
     return result;
 }
 

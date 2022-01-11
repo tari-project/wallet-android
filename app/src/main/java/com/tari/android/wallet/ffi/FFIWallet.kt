@@ -107,7 +107,8 @@ internal class FFIWallet(
     ): FFIPointer
 
     private external fun jniLogMessage(
-        message: String
+        message: String,
+        libError: FFIError
     )
 
     private external fun jniGetPublicKey(
@@ -306,7 +307,7 @@ internal class FFIWallet(
                     this::onTxMinedUnconfirmed.name, "(J[B)V",
                     this::onDirectSendResult.name, "([BZ)V",
                     this::onStoreAndForwardSendResult.name, "([BZ)V",
-                    this::onTxCancelled.name, "(J)V",
+                    this::onTxCancelled.name, "(J[B)V",
                     this::onTXOValidationComplete.name, "([BI)V",
                     this::onBalanceUpdated.name,"(J)V",
                     this::onTxValidationComplete.name, "([BI)V",
@@ -623,10 +624,11 @@ internal class FFIWallet(
      * This callback function cannot be private due to JNI behaviour.
      */
     @Suppress("MemberVisibilityCanBePrivate")
-    fun onTxCancelled(completedTx: FFIPointer) {
+    fun onTxCancelled(completedTx: FFIPointer, rejectionReason: ByteArray) {
         Logger.i("Tx cancelled. Pointer: %s", completedTx.toString())
         val tx = FFICompletedTx(completedTx)
         val (direction, user) = defineParticipantAndDirection(tx)
+        val rejectionReasonInt = BigInteger(1, rejectionReason).toInt()
         val cancelled = CancelledTx(
             tx.getId(),
             direction,
@@ -638,7 +640,7 @@ internal class FFIWallet(
             TxStatus.map(tx.getStatus())
         )
         tx.destroy()
-        GlobalScope.launch { listener?.onTxCancelled(cancelled) }
+        GlobalScope.launch { listener?.onTxCancelled(cancelled, rejectionReasonInt) }
     }
 
     /**
@@ -881,7 +883,9 @@ internal class FFIWallet(
     }
 
     fun logMessage(message: String) {
-        jniLogMessage(message)
+        val error = FFIError()
+        jniLogMessage(message, error)
+        throwIf(error)
     }
 
     fun getRequiredConfirmationCount(): BigInteger {

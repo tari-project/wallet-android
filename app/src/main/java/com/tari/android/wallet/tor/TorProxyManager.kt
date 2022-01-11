@@ -174,7 +174,7 @@ internal class TorProxyManager(
         fun shutdownTor() {
             timerSubscription?.dispose()
             if (this::controlConnection.isInitialized) {
-                controlConnection.shutdownTor("SHUTDOWN")
+                runCatching { controlConnection.shutdownTor("SHUTDOWN") }
             }
         }
 
