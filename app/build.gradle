@@ -60,7 +60,7 @@ android {
 //            PRIVATE BUILD: comment (add two slashes at the start of each line) all the `sentry`
 //            block for private release builds support
             sentry { // https://docs.sentry.io/platforms/android/#gradle-configuration
-                autoProguardConfig true
+                autoProguardConfig false
                 autoUpload true
                 uploadNativeSymbols true
                 includeNativeSources true
