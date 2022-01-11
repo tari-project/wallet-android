@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/txListFragment"
+        android:icon="@drawable/icon_home"
+        android:title="@string/home_navigation_content_description_navigate_to_transactions_list"/>
+
+    <item
+        android:id="@+id/ttlStoreFragment"
+        android:icon="@drawable/icon_ttl_store"
+        android:title="@string/home_navigation_content_description_navigate_to_ttl_store"/>
+
+    <item
+        android:id="@+id/profileFragment"
+        android:icon="@drawable/icon_profile"
+        android:title="@string/home_navigation_content_description_navigate_to_wallet_info"/>
+
+    <item
+        android:id="@+id/settingsFragment"
+        android:icon="@drawable/icon_settings"
+        android:title="@string/home_navigation_content_description_navigate_to_settings"/>
+
+</menu>

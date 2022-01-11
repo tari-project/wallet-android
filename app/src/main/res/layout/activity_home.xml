@@ -12,16 +12,17 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <com.tari.android.wallet.ui.activity.home.NonSwipeableViewPager
-            android:id="@+id/view_pager"
+        <androidx.fragment.app.FragmentContainerView
+            android:id="@+id/nav_host_fragment"
+            android:name="androidx.navigation.fragment.NavHostFragment"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            app:layout_constraintBottom_toTopOf="@+id/bottom_navigation_view"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            tools:ignore="FragmentTagUsage"
-            tools:viewBindingIgnore="true" />
+            app:layout_constraintBottom_toTopOf="@+id/activity_main_bottom_navigation_view"
+            app:defaultNavHost="true"
+            app:navGraph="@navigation/main_navigation" />
 
         <View
             android:id="@+id/bottom_elevation_view"
@@ -29,85 +30,17 @@
             android:layout_height="@dimen/common_scroll_height_gradient_height"
             android:alpha="0.7"
             android:background="@drawable/view_elevation_bottom_gradient"
-            app:layout_constraintBottom_toTopOf="@id/bottom_navigation_view" />
+            app:layout_constraintBottom_toTopOf="@id/activity_main_bottom_navigation_view" />
 
-        <LinearLayout
-            android:id="@+id/bottom_navigation_view"
-            android:layout_width="0dp"
-            android:layout_height="64dp"
+        <com.google.android.material.bottomnavigation.BottomNavigationView
             android:background="@color/white"
-            android:orientation="horizontal"
+            android:id="@+id/activity_main_bottom_navigation_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent">
-
-            <FrameLayout
-                android:id="@+id/home_view"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1">
-
-                <ImageView
-                    android:id="@+id/home_image_view"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:contentDescription="@string/home_navigation_content_description_navigate_to_transactions_list"
-                    android:src="@drawable/icon_home" />
-            </FrameLayout>
-
-            <FrameLayout
-                android:id="@+id/store_view"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1">
-
-                <ImageView
-                    android:id="@+id/store_image_view"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:contentDescription="@string/home_navigation_content_description_navigate_to_ttl_store"
-                    android:src="@drawable/icon_ttl_store" />
-            </FrameLayout>
-
-            <View
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:layout_weight="1"
-                android:background="@color/white" />
-
-            <FrameLayout
-                android:id="@+id/wallet_info_view"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1">
-
-                <ImageView
-                    android:id="@+id/wallet_info_image_view"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:contentDescription="@string/home_navigation_content_description_navigate_to_wallet_info"
-                    android:src="@drawable/icon_profile" />
-            </FrameLayout>
-
-            <FrameLayout
-                android:id="@+id/settings_view"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1">
-
-                <ImageView
-                    android:id="@+id/settings_image_view"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:contentDescription="@string/home_navigation_content_description_navigate_to_settings"
-                    android:src="@drawable/icon_settings" />
-            </FrameLayout>
-
-        </LinearLayout>
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:menu="@menu/bottom_navigation_menu"/>
 
         <ImageView
             android:id="@+id/send_tari_cta_view"

@@ -90,6 +90,11 @@ import io.reactivex.disposables.CompositeDisposable
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import androidx.navigation.ui.NavigationUI
+import com.google.android.material.bottomnavigation.BottomNavigationView
+import androidx.navigation.NavController
+import androidx.navigation.Navigation
+
 
 internal class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>(), AllSettingsRouter, TxListRouter, BaseNodeConfigRouter {
 
@@ -126,9 +131,10 @@ internal class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>
         }
         serviceConnection = ViewModelProvider(this)[TariWalletServiceConnection::class.java]
         ui = ActivityHomeBinding.inflate(layoutInflater).also { setContentView(it.root) }
+
         if (savedInstanceState == null) {
             giphy.enable()
-            enableNavigationView(ui.homeImageView)
+//            enableNavigationView(ui.homeImageView)
             serviceConnection.connection.subscribe {
                 if (it.status == CONNECTED) {
                     ui.root.postDelayed(Constants.UI.mediumDurationMs) {
@@ -137,10 +143,15 @@ internal class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>
                 }
             }.addTo(compositeDisposable)
         } else {
-            val index = savedInstanceState.getInt(KEY_PAGE)
-            ui.viewPager.setCurrentItem(index, false)
-            enableNavigationView(index)
+//            val index = savedInstanceState.getInt(KEY_PAGE)
+//            ui.viewPager.setCurrentItem(index, false)
+//            enableNavigationView(index)
         }
+
+        val navController: NavController = Navigation.findNavController(this, R.id.nav_host_fragment)
+        val bottomNavigationView = findViewById<BottomNavigationView>(R.id.activity_main_bottom_navigation_view)
+        NavigationUI.setupWithNavController(bottomNavigationView, navController)
+
         setupUi()
         Handler(Looper.getMainLooper()).postDelayed(
             { checkNetworkCompatibility() },
@@ -158,21 +169,16 @@ internal class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>
         }
     }
 
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-        outState.putInt(KEY_PAGE, ui.viewPager.currentItem)
-    }
-
     override fun onBackPressed() {
         if (supportFragmentManager.backStackEntryCount > 0) {
             super.onBackPressed()
         } else {
-            if (ui.viewPager.currentItem == INDEX_HOME) {
-                super.onBackPressed()
-            } else {
-                ui.viewPager.setCurrentItem(INDEX_HOME, NO_SMOOTH_SCROLL)
-                enableNavigationView(ui.homeImageView)
-            }
+//            if (ui.viewPager.currentItem == INDEX_HOME) {
+//                super.onBackPressed()
+//            } else {
+//                ui.viewPager.setCurrentItem(INDEX_HOME, NO_SMOOTH_SCROLL)
+//                enableNavigationView(ui.homeImageView)
+//            }
         }
     }
 
@@ -196,43 +202,43 @@ internal class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>
     }
 
     private fun setupBottomNavigation() {
-        enableNavigationView(ui.homeImageView)
-        ui.viewPager.adapter = HomeAdapter(supportFragmentManager)
-        ui.viewPager.offscreenPageLimit = 3
-        ui.homeView.setOnClickListener {
-            ui.viewPager.setCurrentItem(INDEX_HOME, NO_SMOOTH_SCROLL)
-            enableNavigationView(ui.homeImageView)
-        }
-        ui.storeView.setOnClickListener {
-            ui.viewPager.setCurrentItem(INDEX_STORE, NO_SMOOTH_SCROLL)
-            enableNavigationView(ui.storeImageView)
-        }
-        ui.walletInfoView.setOnClickListener {
-            ui.viewPager.setCurrentItem(INDEX_PROFILE, NO_SMOOTH_SCROLL)
-            enableNavigationView(ui.walletInfoImageView)
-        }
-        ui.settingsView.setOnClickListener {
-            ui.viewPager.setCurrentItem(INDEX_SETTINGS, NO_SMOOTH_SCROLL)
-            enableNavigationView(ui.settingsImageView)
-        }
+//        enableNavigationView(ui.homeImageView)
+//        ui.viewPager.adapter = HomeAdapter(supportFragmentManager)
+//        ui.viewPager.offscreenPageLimit = 3
+//        ui.homeView.setOnClickListener {
+//            ui.viewPager.setCurrentItem(INDEX_HOME, NO_SMOOTH_SCROLL)
+//            enableNavigationView(ui.homeImageView)
+//        }
+//        ui.storeView.setOnClickListener {
+//            ui.viewPager.setCurrentItem(INDEX_STORE, NO_SMOOTH_SCROLL)
+//            enableNavigationView(ui.storeImageView)
+//        }
+//        ui.walletInfoView.setOnClickListener {
+//            ui.viewPager.setCurrentItem(INDEX_PROFILE, NO_SMOOTH_SCROLL)
+//            enableNavigationView(ui.walletInfoImageView)
+//        }
+//        ui.settingsView.setOnClickListener {
+//            ui.viewPager.setCurrentItem(INDEX_SETTINGS, NO_SMOOTH_SCROLL)
+//            enableNavigationView(ui.settingsImageView)
+//        }
     }
 
-    private fun enableNavigationView(index: Int) {
-        val view: ImageView = when (index) {
-            INDEX_HOME -> ui.homeImageView
-            INDEX_STORE -> ui.storeImageView
-            INDEX_PROFILE -> ui.walletInfoImageView
-            INDEX_SETTINGS -> ui.settingsImageView
-            else -> error("Unexpected index: $index")
-        }
-        enableNavigationView(view)
-    }
-
-    private fun enableNavigationView(view: ImageView) {
-        arrayOf(ui.homeImageView, ui.storeImageView, ui.walletInfoImageView, ui.settingsImageView)
-            .forEach { it.clearColorFilter() }
-        view.setColorFilter(color(home_selected_nav_item))
-    }
+//    private fun enableNavigationView(index: Int) {
+//        val view: ImageView = when (index) {
+//            INDEX_HOME -> ui.homeImageView
+//            INDEX_STORE -> ui.storeImageView
+//            INDEX_PROFILE -> ui.walletInfoImageView
+//            INDEX_SETTINGS -> ui.settingsImageView
+//            else -> error("Unexpected index: $index")
+//        }
+//        enableNavigationView(view)
+//    }
+//
+//    private fun enableNavigationView(view: ImageView) {
+//        arrayOf(ui.homeImageView, ui.storeImageView, ui.walletInfoImageView, ui.settingsImageView)
+//            .forEach { it.clearColorFilter() }
+//        view.setColorFilter(color(home_selected_nav_item))
+//    }
 
     private fun checkNetworkCompatibility() {
         if (!networkRepository.supportedNetworks.contains(networkRepository.currentNetwork!!.network) && !networkRepository.incompatibleNetworkShown) {
@@ -283,9 +289,11 @@ internal class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>
 
     override fun toTxDetails(tx: Tx) = startActivity(TxDetailsActivity.createIntent(this, tx))
 
-    override fun toTTLStore() = ui.viewPager.setCurrentItem(INDEX_STORE, NO_SMOOTH_SCROLL)
+//    override fun toTTLStore() = ui.viewPager.setCurrentItem(INDEX_STORE, NO_SMOOTH_SCROLL)
+    override fun toTTLStore() {}
 
-    override fun toAllSettings() = ui.viewPager.setCurrentItem(INDEX_SETTINGS, NO_SMOOTH_SCROLL)
+//    override fun toAllSettings() = ui.viewPager.setCurrentItem(INDEX_SETTINGS, NO_SMOOTH_SCROLL)
+    override fun toAllSettings() {}
 
     override fun toBackupSettings() = startActivity(Intent(this, BackupSettingsActivity::class.java))
 
@@ -314,7 +322,8 @@ internal class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>
             .commit()
     }
 
-    fun willNotifyAboutNewTx(): Boolean = ui.viewPager.currentItem == INDEX_HOME
+//    fun willNotifyAboutNewTx(): Boolean = ui.viewPager.currentItem == INDEX_HOME
+    fun willNotifyAboutNewTx(): Boolean = true
 
     private fun processIntentDeepLink(service: TariWalletService, intent: Intent) {
         DeepLink.from(networkRepository, intent.data?.toString().orEmpty())?.let { deepLink ->
@@ -353,26 +362,7 @@ internal class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>
         compositeDisposable.dispose()
     }
 
-    private class HomeAdapter(fm: FragmentManager) : FragmentStatePagerAdapter(fm, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
-        override fun getItem(position: Int): Fragment =
-            when (position) {
-                INDEX_HOME -> TxListFragment()
-                INDEX_STORE -> StoreFragment.newInstance()
-                INDEX_PROFILE -> WalletInfoFragment()
-                INDEX_SETTINGS -> AllSettingsFragment.newInstance()
-                else -> error("Unexpected position: $position")
-            }
-
-        override fun getCount(): Int = 4
-
-    }
-
     companion object {
-        private const val KEY_PAGE = "key_page"
-        private const val INDEX_HOME = 0
-        private const val INDEX_STORE = 1
-        private const val INDEX_PROFILE = 2
-        private const val INDEX_SETTINGS = 3
         private const val NO_SMOOTH_SCROLL = false
     }
 }

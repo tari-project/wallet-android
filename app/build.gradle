@@ -5,6 +5,8 @@ apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-kapt'
 apply from: "../download-libwallet.gradle"
+apply plugin: "androidx.navigation.safeargs"
+
 // PRIVATE BUILD: comment (add two slashes at the start) the following line for private release
 // builds support
 apply plugin: 'io.sentry.android.gradle'
@@ -204,6 +206,7 @@ dependencies {
     implementation 'com.airbnb.android:lottie:3.6.1'
     // Glide - image processing & caching library
     implementation 'com.github.bumptech.glide:glide:4.12.0'
+
     kapt 'com.github.bumptech.glide:compiler:4.12.0'
     // giphy
     implementation 'com.giphy.sdk:ui:2.0.9'
@@ -273,6 +276,19 @@ dependencies {
     implementation 'net.yslibrary.keyboardvisibilityevent:keyboardvisibilityevent:2.2.0'
 
     implementation "com.github.yat-labs:yat-lib-android:0.1.30"
+
+    // Kotlin
+    implementation "androidx.navigation:navigation-fragment-ktx:$nav_version"
+    implementation "androidx.navigation:navigation-ui-ktx:$nav_version"
+
+    // Feature module Support
+    implementation "androidx.navigation:navigation-dynamic-features-fragment:$nav_version"
+
+    // Testing Navigation
+    androidTestImplementation "androidx.navigation:navigation-testing:$nav_version"
+
+    // Jetpack Compose Integration
+    implementation "androidx.navigation:navigation-compose:2.4.0-rc01"
 
     // test
     testImplementation 'junit:junit:4.13.2'

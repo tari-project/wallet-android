@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    app:startDestination="@id/txListFragment"
+    android:id="@+id/main_navigation">
+
+    <fragment
+        android:id="@+id/txListFragment"
+        android:name="com.tari.android.wallet.ui.fragment.tx.TxListFragment"
+        tools:layout="@layout/fragment_tx_list" />
+
+    <fragment
+        android:id="@+id/ttlStoreFragment"
+        android:name="com.tari.android.wallet.ui.fragment.store.StoreFragment"
+        tools:layout="@layout/fragment_store" />
+
+    <fragment
+        android:id="@+id/profileFragment"
+        android:name="com.tari.android.wallet.ui.fragment.profile.WalletInfoFragment"
+        tools:layout="@layout/fragment_wallet_info" />
+
+    <fragment
+        android:id="@+id/settingsFragment"
+        android:name="com.tari.android.wallet.ui.fragment.settings.allSettings.AllSettingsFragment"
+        tools:layout="@layout/fragment_all_settings" />
+
+</navigation>
