@@ -79,7 +79,7 @@ internal class TxListViewModel() : CommonViewModel() {
     private val _showTestnetReceived = SingleLiveEvent<TestnetReceivedDialogArgs>()
     val showTestnetReceived: LiveData<TestnetReceivedDialogArgs> = _showTestnetReceived
 
-    private val _connected = SingleLiveEvent<Unit>()
+    private val _connected = MutableLiveData<Unit>()
     val connected: LiveData<Unit> = _connected
 
     private val _balanceInfo = MutableLiveData<BalanceInfo>()

@@ -87,6 +87,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import androidx.navigation.Navigation
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
+import androidx.navigation.ui.NavigationUI.setupActionBarWithNavController
 
 
 internal class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>(), TxListRouter {
@@ -104,6 +105,8 @@ internal class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>
     lateinit var giphy: GiphyEcosystem
 
     private val navController by lazy { Navigation.findNavController(this, R.id.nav_host_fragment) }
+
+    private var appBarConfiguration = AppBarConfiguration(setOf(R.id.txListFragment, R.id.ttlStoreFragment, R.id.profileFragment, R.id.settingsFragment))
 
     private lateinit var serviceConnection: TariWalletServiceConnection
     private var compositeDisposable: CompositeDisposable = CompositeDisposable()
@@ -157,20 +160,7 @@ internal class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>
         }
     }
 
-    override fun onBackPressed() {
-        val appBarConfiguration = setOf(R.id.txListFragment, R.id.ttlStoreFragment, R.id.profileFragment, R.id.settingsFragment)
-        if (!appBarConfiguration.contains(navController.currentBackStackEntry?.destination?.id ?: -1)) {
-            navController.popBackStack()
-        } else {
-            val bottomNavigationView = findViewById<BottomNavigationView>(R.id.bottom_navigation_view)
-            if (ui.bottomNavigationView.selectedItemId != R.id.txListFragment) {
-                bottomNavigationView.selectedItemId = R.id.txListFragment
-            } else {
-                finish()
-            }
-            bottomNavigationView.selectedItemId = R.id.txListFragment
-        }
-    }
+    override fun onSupportNavigateUp(): Boolean = NavigationUI.navigateUp(navController, appBarConfiguration)
 
     private fun setupUi() {
         setupCTAs()
