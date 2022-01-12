@@ -1,9 +1,8 @@
 import org.gradle.api.tasks.testing.logging.TestLogEvent
 
 buildscript {
-    ext.kotlin_version = '1.5.31'
+    ext.kotlin_version = "1.6.10"
     ext.nav_version = "2.3.5"
-
 
     // build & version
     ext.buildNumber = 185
@@ -23,7 +22,7 @@ buildscript {
     dependencies {
         classpath 'com.android.tools.build:gradle:7.0.4'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-        classpath "io.sentry:sentry-android-gradle-plugin:1.7.34"
+        classpath "io.sentry:sentry-android-gradle-plugin:2.1.5"
         classpath "androidx.navigation:navigation-safe-args-gradle-plugin:$nav_version"
     }
 }
