@@ -143,7 +143,7 @@ internal class InputSeedWordsFragment : CommonFragment<FragmentWalletInputSeedWo
                 false
             }
             ui.text.setOnFocusChangeListener { v, hasFocus ->
-                updateState(hasFocus)
+                updateState(hasFocus, word.isValid())
                 if (hasFocus) viewModel.getFocus(word.index.value!!, true)
             }
             ui.text.setOnEditorActionListener { v, actionId, _ ->
