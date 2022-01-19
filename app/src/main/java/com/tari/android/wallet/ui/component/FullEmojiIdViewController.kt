@@ -47,6 +47,8 @@ import com.tari.android.wallet.databinding.ViewFullEmojiIdBinding
 import com.tari.android.wallet.ui.extension.*
 import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.EmojiUtil
+import com.tari.android.wallet.util.EmojiUtil.Companion.getGraphemeLength
+import com.tari.android.wallet.util.EmojiUtil.Companion.smallEmojiIdSize
 import me.everything.android.ui.overscroll.OverScrollDecoratorHelper
 
 /**
@@ -201,8 +203,7 @@ internal class FullEmojiIdViewController(
     // region Animations
 
     private fun getFullEmojiIdAnimation(isShow: Boolean) = with(ui) {
-        val fullEmojiIdDeltaWidth =
-            (emojiIdOuterContainer.width - context.dimenPx(R.dimen.common_horizontal_margin) * 2) - summaryParent.width
+        val fullEmojiIdDeltaWidth = (emojiIdOuterContainer.width - context.dimenPx(R.dimen.common_horizontal_margin) * 2) - summaryParent.width
 
         val start = if (isShow) 0f else 1f
         val end = if (isShow) 1f else 0f
@@ -267,7 +268,9 @@ internal class FullEmojiIdViewController(
     }
 
     private fun smoothScrollToStart() = with(ui.fullEmojiIdScrollView) {
-        postDelayed({ smoothScrollTo(0, 0) }, Constants.UI.shortDurationMs + 20)
+        if (_fullEmojiId.getGraphemeLength() > smallEmojiIdSize) {
+            postDelayed({ smoothScrollTo(0, 0) }, Constants.UI.shortDurationMs + 20)
+        }
     }
 
     private fun smoothScrollToEnd() = with(ui.fullEmojiIdScrollView) {

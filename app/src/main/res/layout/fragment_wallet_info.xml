@@ -58,10 +58,23 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center" />
+
             </FrameLayout>
 
+            <androidx.appcompat.widget.AppCompatImageButton
+                android:id="@+id/yat_button"
+                android:layout_width="26dp"
+                android:layout_height="26dp"
+                android:layout_marginStart="15dp"
+                android:background="@null"
+                android:src="@drawable/tari_yat_open"
+                android:visibility="invisible"
+                app:layout_constraintBottom_toBottomOf="@+id/emoji_id_summary_container_view"
+                app:layout_constraintLeft_toRightOf="@+id/emoji_id_summary_container_view"
+                app:layout_constraintTop_toTopOf="@+id/emoji_id_summary_container_view" />
+
             <com.tari.android.wallet.ui.component.CustomFontTextView
-                android:id="@+id/qr_code_desc_text_view"
+                android:id="@+id/desc_text_view"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="@dimen/common_horizontal_margin"
@@ -88,7 +101,7 @@
                 android:padding="5dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/qr_code_desc_text_view">
+                app:layout_constraintTop_toBottomOf="@id/desc_text_view">
 
                 <ImageView
                     android:id="@+id/qr_image_view"
@@ -158,6 +171,6 @@
         android:id="@+id/emoji_id_outer_container"
         layout="@layout/view_full_emoji_id"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_height="match_parent" />
 
 </FrameLayout>
