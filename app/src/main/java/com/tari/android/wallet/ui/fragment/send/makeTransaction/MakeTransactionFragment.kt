@@ -14,8 +14,8 @@ import com.tari.android.wallet.R
 import com.tari.android.wallet.databinding.FragmentMakeTransactionBinding
 import com.tari.android.wallet.ui.common.CommonFragment
 import com.tari.android.wallet.ui.extension.setOnThrottledClickListener
-import com.tari.android.wallet.ui.fragment.send.addAmount.AddAmountFragment
 import com.tari.android.wallet.ui.fragment.send.addRecepient.AddRecipientFragment
+import com.tari.android.wallet.ui.fragment.send.requestTari.RequestTariFragment
 
 class MakeTransactionFragment : CommonFragment<FragmentMakeTransactionBinding, MakeTransactionViewModel>() {
 
@@ -67,7 +67,7 @@ class MakeTransactionFragment : CommonFragment<FragmentMakeTransactionBinding, M
         override fun createFragment(position: Int): Fragment {
             return when (position) {
                 0 -> AddRecipientFragment()
-                else -> AddAmountFragment()
+                else -> RequestTariFragment()
             }
         }
     }
