@@ -59,6 +59,7 @@ import com.tari.android.wallet.ui.fragment.send.common.TransactionData
 import com.tari.android.wallet.ui.fragment.send.finalize.FinalizeSendTxFragment
 import com.tari.android.wallet.ui.fragment.send.finalize.FinalizeSendTxListener
 import com.tari.android.wallet.ui.fragment.send.finalize.TxFailureReason
+import com.tari.android.wallet.ui.fragment.send.makeTransaction.MakeTransactionFragment
 import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.yat.YatAdapter
 import com.tari.android.wallet.yat.YatUser
@@ -108,7 +109,7 @@ internal class SendTariActivity : CommonActivity<ActivitySendTariBinding, SendTa
             }
             addFragment(AddAmountFragment(), bundle, true)
         } else {
-            addFragment(AddRecipientFragment(), null, true)
+            addFragment(MakeTransactionFragment(), null, true)
         }
         ui.rootView.postDelayed({ ui.rootView.setBackgroundColor(color(R.color.black)) }, 1000)
     }

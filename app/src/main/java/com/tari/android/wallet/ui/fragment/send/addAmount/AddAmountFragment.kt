@@ -111,10 +111,8 @@ class AddAmountFragment : Fragment(), ServiceConnection {
      */
     private val actionWaitLengthMs = 500L
 
-    private val decimalSeparator =
-        WalletUtil.amountFormatter.decimalFormatSymbols.decimalSeparator.toString()
-    private val thousandsSeparator =
-        WalletUtil.amountFormatter.decimalFormatSymbols.groupingSeparator.toString()
+    private val decimalSeparator = WalletUtil.amountFormatter.decimalFormatSymbols.decimalSeparator.toString()
+    private val thousandsSeparator = WalletUtil.amountFormatter.decimalFormatSymbols.groupingSeparator.toString()
 
     /**
      * Below two are related to amount check and validation.
@@ -127,7 +125,7 @@ class AddAmountFragment : Fragment(), ServiceConnection {
     /**
      * Recipient is either an emoji id or a user from contacts or recent txs.
      */
-    private lateinit var recipientUser: User
+    private var recipientUser: User? = null
 
     /**
      *     Control full emoji popups
@@ -187,7 +185,7 @@ class AddAmountFragment : Fragment(), ServiceConnection {
     }
 
     private fun setupUI() {
-        recipientUser = requireArguments().getParcelable("recipientUser")!!
+        recipientUser = arguments?.getParcelable("recipientUser")
         ui.decimalPointButton.text = decimalSeparator
         currentTextSize = dimen(add_amount_element_text_size)
         currentAmountGemSize = dimen(add_amount_gem_size)
@@ -217,11 +215,11 @@ class AddAmountFragment : Fragment(), ServiceConnection {
             requireContext(),
             fullEmojiIdListener
         )
-        fullEmojiIdViewController.fullEmojiId = recipientUser.publicKey.emojiId
-        fullEmojiIdViewController.emojiIdHex = recipientUser.publicKey.hexString
+        fullEmojiIdViewController.fullEmojiId = recipientUser?.publicKey?.emojiId.orEmpty()
+        fullEmojiIdViewController.emojiIdHex = recipientUser?.publicKey?.hexString.orEmpty()
         displayAliasOrEmojiId()
-        val amount = requireArguments().getDouble(DeepLink.PARAMETER_AMOUNT, Double.MIN_VALUE)
-        if (isFirstLaunch && amount != Double.MIN_VALUE) {
+        val amount = arguments?.getDouble(DeepLink.PARAMETER_AMOUNT, Double.MIN_VALUE)
+        if (isFirstLaunch && amount != null && amount != Double.MIN_VALUE) {
             val handler = Handler(Looper.getMainLooper())
             amount.toString().withIndex().forEach { (index, char) ->
                 handler.postDelayed({
@@ -271,7 +269,9 @@ class AddAmountFragment : Fragment(), ServiceConnection {
             ui.titleTextView.visible()
             ui.titleTextView.text = (recipientUser as Contact).alias
         } else {
-            displayEmojiId(recipientUser.publicKey.emojiId)
+            recipientUser?.publicKey?.emojiId?.let {
+                displayEmojiId(it)
+            }
         }
     }
 
@@ -315,14 +315,7 @@ class AddAmountFragment : Fragment(), ServiceConnection {
      * -1 if no decimal separator, index otherwise.
      */
     private val decimalSeparatorIndex: Int
-        get() {
-            for ((index, element) in elements.iterator().withIndex()) {
-                if (element.first == decimalSeparator) {
-                    return index
-                }
-            }
-            return -1
-        }
+        get() = elements.map { it.first }.indexOf(decimalSeparator)
 
 
     /**
@@ -771,7 +764,7 @@ class AddAmountFragment : Fragment(), ServiceConnection {
     }
 
     private fun continueToNote() {
-        listenerWR.get()?.continueToAddNote(this, recipientUser, currentAmount)
+        listenerWR.get()?.continueToAddNote(this, recipientUser!!, currentAmount)
     }
 
     /**

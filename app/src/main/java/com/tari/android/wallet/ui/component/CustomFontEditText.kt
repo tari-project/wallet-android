@@ -36,13 +36,13 @@ import android.content.Context
 import android.util.AttributeSet
 import androidx.appcompat.widget.AppCompatEditText
 
+
 /**
  * Custom font enabled text edit.
  *
  * @author The Tari Development Team
  */
-class CustomFontEditText(context: Context, attrs: AttributeSet) :
-    AppCompatEditText(context, attrs) {
+class CustomFontEditText(context: Context, attrs: AttributeSet) : AppCompatEditText(context, attrs) {
 
     init {
         if (!isInEditMode) {

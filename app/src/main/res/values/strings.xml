@@ -227,6 +227,12 @@
     <string name="tx_list_loading_gif">Loading GIF</string>
     <string name="tx_list_retry_loading_gif">Retry loading GIF</string>
 
+    <!-- send tari -->
+    <string name="send_tari_title">Send Tari</string>
+    <string name="request_tari_title">Request Tari</string>
+    <string name="send_tari_subtitle">Send</string>
+    <string name="request_tari_subtitle">Request</string>
+
     <!-- send tari - add recipient -->
     <string name="add_recipient_title">Send To</string>
     <string name="add_recipient_hint">Enter Emoji ID, Contact Name or Yat</string>
