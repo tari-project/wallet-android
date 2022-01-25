@@ -103,9 +103,7 @@ internal class SendTariActivity : CommonActivity<ActivitySendTariBinding, SendTa
         if (recipientUser != null) {
             val bundle = Bundle().apply {
                 putParcelable("recipientUser", recipientUser)
-                intent.getDoubleExtra(DeepLink.PARAMETER_AMOUNT, Double.MIN_VALUE)
-                    .takeIf { it > 0 }
-                    ?.let { putDouble(DeepLink.PARAMETER_AMOUNT, it) }
+                intent.getDoubleExtra(DeepLink.PARAMETER_AMOUNT, Double.MIN_VALUE).takeIf { it > 0 }?.let { putDouble(DeepLink.PARAMETER_AMOUNT, it) }
             }
             addFragment(AddAmountFragment(), bundle, true)
         } else {

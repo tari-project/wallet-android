@@ -83,8 +83,8 @@ internal object WalletUtil {
         return "${Constants.Wallet.deepLinkURLPrefix}${network.uriComponent}/${DeepLink.Type.PUBLIC_KEY_HEX.uriComponent}/$publicKeyHex"
     }
 
-    fun generateFullQrCodeDeepLink(publicKeyHex: String, network: Network, amount: MicroTari, alias: String): String {
-        return "${Constants.Wallet.deepLinkURLPrefix}${network.uriComponent}/${DeepLink.Type.PUBLIC_KEY_HEX.uriComponent}/$publicKeyHex?alias=$alias&amount=${amount.tariValue}"
+    fun generateFullQrCodeDeepLink(publicKeyHex: String, network: Network, amount: MicroTari, alias: String = ""): String {
+        return "${Constants.Wallet.deepLinkURLPrefix}${network.uriComponent}/${DeepLink.Type.PUBLIC_KEY_HEX.uriComponent}/$publicKeyHex?${DeepLink.PARAMETER_AMOUNT}=${amount.formattedTariValue}&${DeepLink.PARAMETER_ALIAS}=$alias"
     }
 
     fun getLogFilesFromDirectory(dirPath: String): List<File> {

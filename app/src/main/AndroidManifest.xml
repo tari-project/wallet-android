@@ -93,8 +93,15 @@
                 <data
                     android:host="mainnet"
                     android:scheme="tari" />
+
                 <data
-                    android:host="rincewind"
+                    android:host="weatherwax"
+                    android:scheme="tari" />
+                <data
+                    android:host="igor"
+                    android:scheme="tari" />
+                <data
+                    android:host="dibbler"
                     android:scheme="tari" />
                 <data
                     android:host="y.at"

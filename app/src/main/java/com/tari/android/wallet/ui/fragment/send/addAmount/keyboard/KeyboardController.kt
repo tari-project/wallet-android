@@ -21,7 +21,7 @@ import java.math.BigInteger
 import kotlin.math.min
 
 internal class KeyboardController {
-    
+
     /**
      * Maps all the elements (digits & separators) displayed in the amount text to their
      * corresponding TextViews.
@@ -62,18 +62,25 @@ internal class KeyboardController {
     private lateinit var context: Context
     private lateinit var numpadBinding: ViewNumpadBinding
     private lateinit var amountInputBinding: ViewInputAmountBinding
+    private var startAmount: Double = Double.MIN_VALUE
 
-    private var isFirstLaunch: Boolean = false
+    private var isFirstLaunch: Boolean = true
 
-    fun setup(context: Context, amountRunnable: Runnable, numpadBinding: ViewNumpadBinding, amountInputBinding: ViewInputAmountBinding) {
+    fun setup(
+        context: Context,
+        amountRunnable: Runnable,
+        numpadBinding: ViewNumpadBinding,
+        amountInputBinding: ViewInputAmountBinding,
+        startAmount: Double? = Double.MIN_VALUE
+    ) {
         this.context = context
         this.numpadBinding = numpadBinding
         this.amountInputBinding = amountInputBinding
         this.amountCheckRunnable = amountRunnable
+        this.startAmount = startAmount ?: Double.MIN_VALUE
         setupUI()
     }
-    
-    
+
     private fun setupUI() {
         numpadBinding.decimalPointButton.text = decimalSeparator
         currentTextSize = context.dimen(R.dimen.add_amount_element_text_size)
@@ -83,27 +90,27 @@ internal class KeyboardController {
         amountCheckRunnable.run()
         // add first digit to the element list
         elements.add(Pair("0", amountInputBinding.amountElement0TextView))
-        //todo
-//        val amount = arguments?.getDouble(DeepLink.PARAMETER_AMOUNT, Double.MIN_VALUE)
-//        if (isFirstLaunch && amount != null && amount != Double.MIN_VALUE) {
-//            val handler = Handler(Looper.getMainLooper())
-//            amount.toString().withIndex().forEach { (index, char) ->
-//                handler.postDelayed({
-//                    if (Character.isDigit(char)) {
-//                        onDigitOrSeparatorClicked(char.toString())
-//                    } else {
-//                        onDigitOrSeparatorClicked(decimalSeparator)
-//                    }
-//                }, (index + 1) * Constants.amountInputBinding.AddAmount.numPadDigitEnterAnimDurationMs * 2)
-//            }
-//            handler.postDelayed(
-//                this::setActionBindings,
-//                (amount.toString().length + 1) * Constants.amountInputBinding.AddAmount.numPadDigitEnterAnimDurationMs * 2
-//            )
-//        } else {
-//        }
 
-        setActionBindings()
+        // input start amount
+        if (isFirstLaunch && startAmount != Double.MIN_VALUE) {
+            val handler = Handler(Looper.getMainLooper())
+            isFirstLaunch = false
+            startAmount.toString().withIndex().forEach { (index, char) ->
+                handler.postDelayed({
+                    if (Character.isDigit(char)) {
+                        onDigitOrSeparatorClicked(char.toString())
+                    } else {
+                        onDigitOrSeparatorClicked(decimalSeparator)
+                    }
+                }, (index + 1) * Constants.UI.AddAmount.numPadDigitEnterAnimDurationMs * 2)
+            }
+            handler.postDelayed(
+                this::setActionBindings,
+                (startAmount.toString().length + 1) * Constants.UI.AddAmount.numPadDigitEnterAnimDurationMs * 2
+            )
+        } else {
+            setActionBindings()
+        }
     }
 
     private fun setActionBindings() = with(numpadBinding) {

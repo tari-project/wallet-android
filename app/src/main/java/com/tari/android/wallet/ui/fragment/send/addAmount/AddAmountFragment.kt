@@ -51,6 +51,7 @@ import com.tari.android.wallet.R
 import com.tari.android.wallet.R.color.black
 import com.tari.android.wallet.R.dimen.*
 import com.tari.android.wallet.amountInputBinding.fragment.send.addAmount.keyboard.KeyboardController
+import com.tari.android.wallet.application.DeepLink
 import com.tari.android.wallet.databinding.FragmentAddAmountBinding
 import com.tari.android.wallet.di.DiContainer.appComponent
 import com.tari.android.wallet.infrastructure.Tracker
@@ -146,7 +147,8 @@ class AddAmountFragment : Fragment(), ServiceConnection {
     }
 
     private fun setupUI() {
-        keyboardController.setup(requireContext(), AmountCheckRunnable(), ui.numpad, ui.amount)
+        val amount = arguments?.getDouble(DeepLink.PARAMETER_AMOUNT, Double.MIN_VALUE)
+        keyboardController.setup(requireContext(), AmountCheckRunnable(), ui.numpad, ui.amount, amount)
         recipientUser = arguments?.getParcelable("recipientUser")
         // hide tx fee
         ui.txFeeContainerView.invisible()
@@ -173,25 +175,6 @@ class AddAmountFragment : Fragment(), ServiceConnection {
         fullEmojiIdViewController.fullEmojiId = recipientUser?.publicKey?.emojiId.orEmpty()
         fullEmojiIdViewController.emojiIdHex = recipientUser?.publicKey?.hexString.orEmpty()
         displayAliasOrEmojiId()
-//        val amount = arguments?.getDouble(DeepLink.PARAMETER_AMOUNT, Double.MIN_VALUE)
-//        if (isFirstLaunch && amount != null && amount != Double.MIN_VALUE) {
-//            val handler = Handler(Looper.getMainLooper())
-//            amount.toString().withIndex().forEach { (index, char) ->
-//                handler.postDelayed({
-//                    if (Character.isDigit(char)) {
-//                        onDigitOrSeparatorClicked(char.toString())
-//                    } else {
-//                        onDigitOrSeparatorClicked(decimalSeparator)
-//                    }
-//                }, (index + 1) * Constants.UI.AddAmount.numPadDigitEnterAnimDurationMs * 2)
-//            }
-//            handler.postDelayed(
-//                this::setActionBindings,
-//                (amount.toString().length + 1) * Constants.UI.AddAmount.numPadDigitEnterAnimDurationMs * 2
-//            )
-//        } else {
-//            setActionBindings()
-//        }
         setActionBindings()
     }
 

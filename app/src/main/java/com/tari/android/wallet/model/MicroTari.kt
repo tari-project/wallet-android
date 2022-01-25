@@ -54,6 +54,9 @@ class MicroTari() : Parcelable, Comparable<MicroTari>, Serializable {
         // Note: BigDecimal keeps track of both precision and scale, 1e6 != 1_000_000 in this case (scale 6, scale 0)
         get() = value.toBigDecimal().divide(million,6,RoundingMode.HALF_UP)
 
+    val formattedTariValue: String
+        get() = tariValue.toString().trimEnd { it == '0' }.trimEnd { it == '.' }.trimEnd { it == ',' }
+
     constructor(
         value: BigInteger
     ) : this() {

@@ -9,9 +9,11 @@ import androidx.fragment.app.viewModels
 import com.tari.android.wallet.R
 import com.tari.android.wallet.amountInputBinding.fragment.send.addAmount.keyboard.KeyboardController
 import com.tari.android.wallet.databinding.FragmentRequestTariBinding
-import com.tari.android.wallet.extension.observe
 import com.tari.android.wallet.ui.common.CommonFragment
+import com.tari.android.wallet.ui.extension.hideKeyboard
 import com.tari.android.wallet.ui.extension.setOnThrottledClickListener
+import com.tari.android.wallet.ui.fragment.send.shareQr.QRCodeDialogArgs
+import com.tari.android.wallet.ui.fragment.send.shareQr.ShareQRCodeDialog
 
 
 class RequestTariFragment : CommonFragment<FragmentRequestTariBinding, RequestTariViewModel>() {
@@ -32,22 +34,34 @@ class RequestTariFragment : CommonFragment<FragmentRequestTariBinding, RequestTa
         subscribeUI()
     }
 
-    private fun subscribeUI() = with(viewModel) {
-        observe(deeplink) { shareDeeplink(it) }
+    override fun onResume() {
+        super.onResume()
+        requireActivity().hideKeyboard()
     }
+
+    private fun subscribeUI() = Unit
 
     private fun setupUI() {
         keyboardController.setup(requireContext(), AmountCheckRunnable(), ui.numpad, ui.amount)
-        ui.shareButton.setOnThrottledClickListener { viewModel.generateQRCodeDeeplink(keyboardController.currentAmount) }
+        ui.shareButton.setOnThrottledClickListener { shareDeeplink(viewModel.getDeepLink(keyboardController.currentAmount)) }
+        ui.generateButton.setOnThrottledClickListener { showQRCodeDialog(viewModel.getDeepLink(keyboardController.currentAmount)) }
     }
 
     private fun shareDeeplink(deeplink: String) {
-        val subject = requireContext().getString(R.string.request_tari_share_text, keyboardController.currentAmount.tariValue.toString(), deeplink)
+        val subject = requireContext().getString(R.string.request_tari_share_text, keyboardController.currentAmount.formattedTariValue, deeplink)
+
         ShareCompat.IntentBuilder(requireContext())
+            .setType("text/x-uri")
             .setText(deeplink)
-            .setType("text/plain")
             .setChooserTitle(subject)
             .startChooser()
+    }
+
+    private fun showQRCodeDialog(deeplink: String) {
+        val args = QRCodeDialogArgs(deeplink, requireContext(), true, true) {
+            shareDeeplink(deeplink)
+        }
+        ShareQRCodeDialog(requireContext(), args).show()
     }
 
     private inner class AmountCheckRunnable : Runnable {
