@@ -308,9 +308,9 @@ internal class FFIWallet(
                     this::onDirectSendResult.name, "([BZ)V",
                     this::onStoreAndForwardSendResult.name, "([BZ)V",
                     this::onTxCancelled.name, "(J[B)V",
-                    this::onTXOValidationComplete.name, "([BI)V",
+                    this::onTXOValidationComplete.name, "([BZ)V",
                     this::onBalanceUpdated.name,"(J)V",
-                    this::onTxValidationComplete.name, "([BI)V",
+                    this::onTxValidationComplete.name, "([BZ)V",
                     error
                 )
             } catch (e: Throwable) {
@@ -664,12 +664,11 @@ internal class FFIWallet(
      * This callback function cannot be private due to JNI behaviour.
      */
     @Suppress("MemberVisibilityCanBePrivate")
-    fun onTXOValidationComplete(bytes: ByteArray, result: Int) {
+    fun onTXOValidationComplete(bytes: ByteArray, isSuccess: Boolean) {
         val requestId = BigInteger(1, bytes)
-        val validationResult = BaseNodeValidationResult.map(result)!!
-        Logger.i("Invalid TXO validation [$requestId] complete. Result: $validationResult")
+        Logger.i("Invalid TXO validation [$requestId] complete. Result: $isSuccess")
         GlobalScope.launch {
-            listener?.onTXOValidationComplete(requestId, validationResult)
+            listener?.onTXOValidationComplete(requestId, isSuccess)
         }
     }
 
@@ -677,11 +676,10 @@ internal class FFIWallet(
      * This callback function cannot be private due to JNI behaviour.
      */
     @Suppress("MemberVisibilityCanBePrivate")
-    fun onTxValidationComplete(bytes: ByteArray, result: Int) {
+    fun onTxValidationComplete(bytes: ByteArray, isSuccess: Boolean) {
         val requestId = BigInteger(1, bytes)
-        val validationResult = BaseNodeValidationResult.map(result)!!
-        Logger.i("Transaction validation [$requestId] complete. Result: $validationResult")
-        GlobalScope.launch { listener?.onTxValidationComplete(requestId, validationResult) }
+        Logger.i("Transaction validation [$requestId] complete. Result: $isSuccess")
+        GlobalScope.launch { listener?.onTxValidationComplete(requestId, isSuccess) }
     }
 
     private fun defineParticipantAndDirection(tx: FFICompletedTx): Pair<Tx.Direction, User> {

@@ -344,11 +344,11 @@ class FFIWalletTests {
         assertNotNull(pendingInboundTxFFI)
         // cancel tx
         val cancelledTxSlot = slot<CancelledTx>()
-        every { mockListener.onTxCancelled(capture(cancelledTxSlot)) } answers { }
+        every { mockListener.onTxCancelled(capture(cancelledTxSlot), 1) } answers { }
         assertTrue(wallet.cancelPendingTx(pendingInboundTxFFI!!.getId()))
         pendingInboundTxFFI.destroy()
         Thread.sleep(1000)
-        verify { mockListener.onTxCancelled(any()) }
+        verify { mockListener.onTxCancelled(any(), 1) }
         val cancelledTx = cancelledTxSlot.captured
         val cancelledTxsFFI = wallet.getCancelledTxs()
         assertEquals(1, cancelledTxsFFI.getLength())
@@ -495,17 +495,17 @@ class FFIWalletTests {
             minedTxs.add(completedTx)
         }
 
-        override fun onTxCancelled(cancelledTx: CancelledTx) {
-            Logger.i("Tx Cancelled :: cancelled tx id: %s", cancelledTx.id)
+        override fun onTxCancelled(cancelledTx: CancelledTx, rejectionReason: Int) {
+            Logger.i("Tx Cancelled :: cancelled tx id: %s, reason code: %s", cancelledTx.id, rejectionReason.toString())
             cancelledTxs.add(cancelledTx)
         }
 
-        override fun onTXOValidationComplete(responseId: BigInteger, result: BaseNodeValidationResult) {
-            Logger.i("Invalid TXO validation complete :: response id %s result %s", responseId, result)
+        override fun onTXOValidationComplete(responseId: BigInteger, isSuccess: Boolean) {
+            Logger.i("Invalid TXO validation complete :: response id %s result %s", responseId, isSuccess)
         }
 
-        override fun onTxValidationComplete(responseId: BigInteger, result: BaseNodeValidationResult) {
-            Logger.i("TX validation complete :: response id %s result %s", responseId, result)
+        override fun onTxValidationComplete(responseId: BigInteger, isSuccess: Boolean) {
+            Logger.i("TX validation complete :: response id %s result %s", responseId, isSuccess)
         }
 
         override fun onWalletRestoration(result: WalletRestorationResult) {
