@@ -41,6 +41,7 @@ import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefStringSecure
 import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepository
 import com.tari.android.wallet.data.sharedPrefs.testnetFaucet.TestnetFaucetRepository
 import com.tari.android.wallet.ui.dialog.backup.BackupSettingsRepository
+import com.tari.android.wallet.yat.YatSharedRepository
 import kotlin.random.Random
 
 /**
@@ -56,7 +57,8 @@ class SharedPrefsRepository(
     private val networkRepository: NetworkRepository,
     private val backupSettingsRepository: BackupSettingsRepository,
     private val baseNodeSharedRepository: BaseNodeSharedRepository,
-    private val testnetFaucetRepository: TestnetFaucetRepository
+    private val testnetFaucetRepository: TestnetFaucetRepository,
+    private val yatSharedRepository: YatSharedRepository
 ) {
 
     private object Key {
@@ -114,6 +116,7 @@ class SharedPrefsRepository(
         baseNodeSharedRepository.clear()
         backupSettingsRepository.clear()
         testnetFaucetRepository.clear()
+        yatSharedRepository.clear()
         publicKeyHexString = null
         isAuthenticated = false
         emojiId = null

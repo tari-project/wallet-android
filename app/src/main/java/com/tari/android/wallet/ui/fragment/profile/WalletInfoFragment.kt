@@ -45,6 +45,7 @@ import com.journeyapps.barcodescanner.BarcodeEncoder
 import com.tari.android.wallet.R
 import com.tari.android.wallet.databinding.FragmentWalletInfoBinding
 import com.tari.android.wallet.extension.observe
+import com.tari.android.wallet.extension.observeOnLoad
 import com.tari.android.wallet.ui.common.CommonFragment
 import com.tari.android.wallet.ui.component.EmojiIdSummaryViewController
 import com.tari.android.wallet.ui.component.FullEmojiIdViewController
@@ -91,10 +92,13 @@ class WalletInfoFragment : CommonFragment<FragmentWalletInfoBinding, WalletInfoV
             ui.yatButton.setImageDrawable(drawable)
         }
 
-        observe(yatDisconnected) {
+        observe(reconnectVisibility) {
             val text = if (it) R.string.wallet_info_yat_disconnected_description else R.string.wallet_info_qr_code_desc
             ui.descTextView.setText(text)
+            ui.reconnectButton.setVisible(it)
         }
+
+        observeOnLoad(yatDisconnected)
     }
 
     private fun setupUI() {
@@ -118,6 +122,7 @@ class WalletInfoFragment : CommonFragment<FragmentWalletInfoBinding, WalletInfoV
 
         ui.yatButton.setOnClickListener { viewModel.changeYatVisibility() }
 
+        ui.reconnectButton.setOnThrottledClickListener { viewModel.openYatOnboarding(requireContext()) }
     }
 
     private fun getQREncodedBitmap(content: String, size: Int): Bitmap? {

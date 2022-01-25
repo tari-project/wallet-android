@@ -1,12 +1,18 @@
 package com.tari.android.wallet.ui.fragment.profile
 
+import android.content.Context
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.viewModelScope
 import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepository
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.util.WalletUtil
+import com.tari.android.wallet.yat.YatAdapter
 import com.tari.android.wallet.yat.YatSharedRepository
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 class WalletInfoViewModel() : CommonViewModel() {
@@ -18,6 +24,9 @@ class WalletInfoViewModel() : CommonViewModel() {
 
     @Inject
     lateinit var yatSharedPrefsRepository: YatSharedRepository
+
+    @Inject
+    lateinit var yatAdapter: YatAdapter
 
     private val _emojiId: MutableLiveData<String> = MutableLiveData()
     val emojiId: LiveData<String> = _emojiId
@@ -37,8 +46,14 @@ class WalletInfoViewModel() : CommonViewModel() {
     private val _isYatForegrounded: MutableLiveData<Boolean> = MutableLiveData(false)
     val isYatForegrounded: LiveData<Boolean> = _isYatForegrounded
 
+    private val _reconnectVisibility: MediatorLiveData<Boolean> = MediatorLiveData()
+    val reconnectVisibility: LiveData<Boolean> = _reconnectVisibility
+
     init {
         component.inject(this)
+
+        _reconnectVisibility.addSource(_yatDisconnected) { updateReconnectVisibility() }
+        _reconnectVisibility.addSource(_isYatForegrounded) { updateReconnectVisibility() }
 
         refreshData()
     }
@@ -49,12 +64,39 @@ class WalletInfoViewModel() : CommonViewModel() {
         val qrCode = WalletUtil.getPublicKeyHexDeepLink(sharedPrefsWrapper.publicKeyHexString!!, networkRepository.currentNetwork!!.network)
         _qrDeepLink.postValue(qrCode)
         _yat.postValue(yatSharedPrefsRepository.connectedYat.orEmpty())
-        _yatDisconnected.postValue(false)
+        _yatDisconnected.postValue(yatSharedPrefsRepository.yatWasDisconnected)
+
+        checkEmojiIdConnection()
     }
 
     fun changeYatVisibility() {
         val newValue = !isYatForegrounded.value!!
         _isYatForegrounded.postValue(!_isYatForegrounded.value!!)
         _emojiId.postValue(if (newValue) yatSharedPrefsRepository.connectedYat else sharedPrefsWrapper.emojiId)
+    }
+
+    fun openYatOnboarding(context: Context) {
+        yatAdapter.openOnboarding(context)
+    }
+
+    private fun checkEmojiIdConnection() {
+        val connectedYat = yatSharedPrefsRepository.connectedYat.orEmpty()
+        if (connectedYat.isNotEmpty()) {
+            viewModelScope.launch(Dispatchers.IO) {
+                yatAdapter.searchYats(connectedYat)?.let {
+                    if (it.status) {
+                        it.result?.entries?.firstOrNull()?.let { response ->
+                            val wasDisconnected = response.value.address.lowercase() != sharedPrefsWrapper.publicKeyHexString.orEmpty().lowercase()
+                            yatSharedPrefsRepository.yatWasDisconnected = wasDisconnected
+                            _yatDisconnected.postValue(wasDisconnected)
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private fun updateReconnectVisibility() {
+        _reconnectVisibility.postValue(_isYatForegrounded.value!! && _yatDisconnected.value!!)
     }
 }
