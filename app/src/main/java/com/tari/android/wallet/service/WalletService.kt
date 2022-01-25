@@ -192,7 +192,7 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
      * Validation results will all be null, and will be set as the result callbacks get called.
      */
     private var baseNodeValidationStatusMap:
-            ConcurrentMap<BaseNodeValidationType, Pair<BigInteger, BaseNodeValidationResult?>> = ConcurrentHashMap()
+            ConcurrentMap<BaseNodeValidationType, Pair<BigInteger, Boolean?>> = ConcurrentHashMap()
 
     override fun onCreate() {
         super.onCreate()
@@ -495,98 +495,63 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
         // make a copy of the status map for concurrency protection
         val statusMapCopy = baseNodeValidationStatusMap.toMap()
         // if base node not in sync, then switch to the next base node
-        val baseNodeNotInSync = statusMapCopy.filter {
-            it.value.second != null && it.value.second == BaseNodeValidationResult.BASE_NODE_NOT_IN_SYNC
-        }.isNotEmpty()
-        if (baseNodeNotInSync) {
-            baseNodeValidationStatusMap.clear()
-            baseNodeSharedPrefsRepository.baseNodeLastSyncResult = BaseNodeValidationResult.BASE_NODE_NOT_IN_SYNC
-            val currentBaseNode = baseNodeSharedPrefsRepository.currentBaseNode
-            if (currentBaseNode == null || !currentBaseNode.isCustom) {
-                baseNodes.setNextBaseNode()
-            }
-            EventBus.baseNodeState.post(BaseNodeState.SyncCompleted(BaseNodeValidationResult.BASE_NODE_NOT_IN_SYNC))
-            listeners.iterator().forEach { it.onBaseNodeSyncComplete(false) }
-            return
-        }
-        // check if any is aborted
-        val aborted = statusMapCopy.filter {
-            it.value.second != null && it.value.second == BaseNodeValidationResult.ABORTED
-        }.isNotEmpty()
-        if (aborted) {
-            baseNodeValidationStatusMap.clear()
-            baseNodeSharedPrefsRepository.baseNodeLastSyncResult = BaseNodeValidationResult.ABORTED
-            EventBus.baseNodeState.post(BaseNodeState.SyncCompleted(BaseNodeValidationResult.ABORTED))
-            return
-        }
         // check if any has failed
-        val failed = statusMapCopy.filter {
-            it.value.second != null && it.value.second == BaseNodeValidationResult.FAILURE
-        }.isNotEmpty()
+        val failed = statusMapCopy.any { it.value.second == false}
         if (failed) {
             baseNodeValidationStatusMap.clear()
-            baseNodeSharedPrefsRepository.baseNodeLastSyncResult = BaseNodeValidationResult.FAILURE
+            baseNodeSharedPrefsRepository.baseNodeLastSyncResult = false
             val currentBaseNode = baseNodeSharedPrefsRepository.currentBaseNode
             if (currentBaseNode == null || !currentBaseNode.isCustom) {
                 baseNodes.setNextBaseNode()
             }
-            EventBus.baseNodeState.post(BaseNodeState.SyncCompleted(BaseNodeValidationResult.FAILURE))
+            EventBus.baseNodeState.post(BaseNodeState.SyncCompleted(false))
             listeners.iterator().forEach { it.onBaseNodeSyncComplete(false) }
             return
         }
         // if any of the results is null, we're still waiting for all callbacks to happen
-        val inProgress = statusMapCopy.filter { it.value.second == null }.isNotEmpty()
+        val inProgress = statusMapCopy.any { it.value.second == null }
         if (inProgress) {
             return
         }
         // check if it's successful
-        val successful = statusMapCopy.filter {
-            it.value.second != null && it.value.second != BaseNodeValidationResult.SUCCESS
-        }.isEmpty()
+        val successful = statusMapCopy.all { it.value.second == true }
         if (successful) {
             baseNodeValidationStatusMap.clear()
-            baseNodeSharedPrefsRepository.baseNodeLastSyncResult = BaseNodeValidationResult.SUCCESS
-            EventBus.baseNodeState.post(BaseNodeState.SyncCompleted(BaseNodeValidationResult.SUCCESS))
+            baseNodeSharedPrefsRepository.baseNodeLastSyncResult = true
+            EventBus.baseNodeState.post(BaseNodeState.SyncCompleted(true))
             listeners.iterator().forEach { it.onBaseNodeSyncComplete(true) }
         }
         // shouldn't ever reach here - no-op
     }
 
-    private fun checkValidationResult(
-        type: BaseNodeValidationType,
-        responseId: BigInteger,
-        result: BaseNodeValidationResult
-    ) {
+    private fun checkValidationResult(type: BaseNodeValidationType, responseId: BigInteger, isSuccess: Boolean) {
         val currentStatus = baseNodeValidationStatusMap[type]
         if (currentStatus == null) {
             Logger.d(
-                type.name + " validation [$responseId] complete. Result: $result."
+                type.name + " validation [$responseId] complete. Result: $isSuccess."
                         + " Current status is null, means we're not expecting a callback. Ignoring."
             )
             return
         }
         if (currentStatus.first != responseId) {
             Logger.d(
-                type.name + " Validation [$responseId] complete. Result: $result."
+                type.name + " Validation [$responseId] complete. Result: $isSuccess."
                         + " Request id [${currentStatus.first}] mismatch. Ignoring."
             )
             return
         }
-        Logger.d(type.name + " Validation [$responseId] complete. Result: $result.")
-        baseNodeValidationStatusMap[type] = Pair(
-            currentStatus.first,
-            result
-        )
+        Logger.d(type.name + " Validation [$responseId] complete. Result: $isSuccess.")
+        baseNodeValidationStatusMap[type] = Pair(currentStatus.first, isSuccess)
         checkBaseNodeSyncCompletion()
     }
 
-    override fun onTXOValidationComplete(responseId: BigInteger, result: BaseNodeValidationResult) {
-        checkValidationResult(BaseNodeValidationType.TXO, responseId, result)
+    override fun onTXOValidationComplete(responseId: BigInteger, isSuccess: Boolean) {
+        checkValidationResult(BaseNodeValidationType.TXO, responseId, isSuccess)
     }
 
-    override fun onTxValidationComplete(responseId: BigInteger, result: BaseNodeValidationResult) {
-        checkValidationResult(BaseNodeValidationType.TX, responseId, result)
-        if (!txBroadcastRestarted && result == BaseNodeValidationResult.SUCCESS) {
+    override fun onTxValidationComplete(responseId: BigInteger, isSuccess: Boolean) {
+        checkValidationResult(BaseNodeValidationType.TX, responseId, isSuccess)
+        if (!txBroadcastRestarted && isSuccess) {
             try {
                 wallet.restartTxBroadcast()
                 txBroadcastRestarted = true
@@ -990,20 +955,14 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
         override fun startBaseNodeSync(error: WalletError): Boolean {
             baseNodeValidationStatusMap.clear()
             return try {
-                baseNodeValidationStatusMap[BaseNodeValidationType.TXO] = Pair(
-                    wallet.startTXOValidation(),
-                    null
-                )
-                baseNodeValidationStatusMap[BaseNodeValidationType.TX] = Pair(
-                    wallet.startTxValidation(),
-                    null
-                )
+                baseNodeValidationStatusMap[BaseNodeValidationType.TXO] = Pair(wallet.startTXOValidation(), null)
+                baseNodeValidationStatusMap[BaseNodeValidationType.TX] = Pair(wallet.startTxValidation(), null)
                 baseNodeSharedPrefsRepository.baseNodeLastSyncResult = null
                 EventBus.baseNodeState.post(BaseNodeState.SyncStarted)
                 true
             } catch (throwable: Throwable) {
                 Logger.e("Base node validation error: $throwable")
-                baseNodeSharedPrefsRepository.baseNodeLastSyncResult = BaseNodeValidationResult.FAILURE
+                baseNodeSharedPrefsRepository.baseNodeLastSyncResult = false
                 baseNodeValidationStatusMap.clear()
                 mapThrowableIntoError(throwable, error)
                 false

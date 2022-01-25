@@ -14,6 +14,7 @@
     <string name="ffi_admin_email_address" translatable="false">bug_reports@tari.com</string>
     <string name="tari_lab_university_url" translatable="false">https://tlu.tarilabs.com/</string>
     <string name="network_faucet_url" translatable="false">https://faucet.tari.com</string>
+    <string name="dibbler_faucet_url" translatable="false">https://dibbler-faucet.tari.com</string>
 
     <!-- digits -->
     <string name="digit_0">0</string>

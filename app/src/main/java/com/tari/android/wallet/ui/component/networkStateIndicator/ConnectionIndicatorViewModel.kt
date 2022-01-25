@@ -5,7 +5,6 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import com.tari.android.wallet.R
 import com.tari.android.wallet.event.EventBus
-import com.tari.android.wallet.model.BaseNodeValidationResult
 import com.tari.android.wallet.network.NetworkConnectionState
 import com.tari.android.wallet.service.baseNode.BaseNodeState
 import com.tari.android.wallet.tor.TorProxyState
@@ -48,11 +47,9 @@ internal class ConnectionIndicatorViewModel : CommonViewModel() {
                     is TorProxyState.Running -> {
                         when (val validationResult = _baseNodeState.value) {
                             is BaseNodeState.SyncCompleted -> {
-                                when (validationResult.result) {
-                                    BaseNodeValidationResult.SUCCESS -> ConnectionIndicatorState.Connected(R.string.connection_status_ok)
-                                    BaseNodeValidationResult.FAILURE,
-                                    BaseNodeValidationResult.BASE_NODE_NOT_IN_SYNC,
-                                    BaseNodeValidationResult.ABORTED -> ConnectionIndicatorState.ConnectedWithIssues(R.string.connection_status_warning_sync_failed)
+                                when (validationResult.isSuccess) {
+                                    true -> ConnectionIndicatorState.Connected(R.string.connection_status_ok)
+                                    false -> ConnectionIndicatorState.ConnectedWithIssues(R.string.connection_status_warning_sync_failed)
                                 }
                             }
                             is BaseNodeState.SyncStarted -> ConnectionIndicatorState.ConnectedWithIssues(R.string.connection_status_warning_sync_in_progress)
