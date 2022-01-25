@@ -53,6 +53,7 @@ import com.tari.android.wallet.service.WalletServiceLauncher
 import com.tari.android.wallet.ui.common.domain.ResourceManager
 import com.tari.android.wallet.ui.common.gyphy.GiphyEcosystem
 import com.tari.android.wallet.ui.dialog.backup.BackupSettingsRepository
+import com.tari.android.wallet.yat.YatSharedRepository
 import dagger.Module
 import dagger.Provides
 import java.io.File
@@ -106,9 +107,18 @@ internal class ApplicationModule(
         backupSettingsRepository: BackupSettingsRepository,
         baseNodeSharedRepository: BaseNodeSharedRepository,
         networkRepository: NetworkRepository,
-        testnetFaucetRepository: TestnetFaucetRepository
+        testnetFaucetRepository: TestnetFaucetRepository,
+        yatSharedRepository: YatSharedRepository
     ): SharedPrefsRepository =
-        SharedPrefsRepository(context, prefs, networkRepository, backupSettingsRepository, baseNodeSharedRepository, testnetFaucetRepository)
+        SharedPrefsRepository(
+            context,
+            prefs,
+            networkRepository,
+            backupSettingsRepository,
+            baseNodeSharedRepository,
+            testnetFaucetRepository,
+            yatSharedRepository
+        )
 
     @Provides
     @Singleton

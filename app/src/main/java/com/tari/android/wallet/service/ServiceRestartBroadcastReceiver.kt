@@ -44,6 +44,7 @@ import com.tari.android.wallet.data.sharedPrefs.testnetFaucet.TestnetFaucetRepos
 import com.tari.android.wallet.di.ApplicationModule
 import com.tari.android.wallet.ui.common.domain.ResourceManager
 import com.tari.android.wallet.ui.dialog.backup.BackupSettingsRepository
+import com.tari.android.wallet.yat.YatSharedRepository
 
 /**
  * This receiver is responsible for restarting the service when it gets destroyed - i.e. when
@@ -61,13 +62,15 @@ class ServiceRestartBroadcastReceiver : BroadcastReceiver() {
         val backupSettingRepository = BackupSettingsRepository(context, sharedPreferences, networkRepository)
         val baseNodeSharedPrefsRepository = BaseNodeSharedRepository(sharedPreferences, networkRepository)
         val testnetFaucetRepository = TestnetFaucetRepository(sharedPreferences, networkRepository)
+        val yatSharedRepository = YatSharedRepository(sharedPreferences, networkRepository)
         val sharedPrefsRepository = SharedPrefsRepository(
             context,
             sharedPreferences,
             networkRepository,
             backupSettingRepository,
             baseNodeSharedPrefsRepository,
-            testnetFaucetRepository
+            testnetFaucetRepository,
+            yatSharedRepository
         )
         WalletServiceLauncher(context, WalletConfig(context, networkRepository), sharedPrefsRepository).startIfExist()
     }

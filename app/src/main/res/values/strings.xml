@@ -267,6 +267,8 @@
     <!-- wallet info -->
     <string name="wallet_info_my_profile">My Profile</string>
     <string name="wallet_info_qr_code_desc">Transacting in person? Others can scan this QR code from the Tari Aurora App to send you tXTR.</string>
+    <string name="wallet_info_yat_disconnected_description">You\'ve previously connected this Yat.\n Do you want to re-connect it to your wallet?</string>
+    <string name="wallet_info_yat_disconnected_reconnect">Reconnect Yat</string>
 
     <!-- tx failed dialog -->
     <string name="tx_failed_title">Sorry, you can\'t send tXTR to offline users</string>
