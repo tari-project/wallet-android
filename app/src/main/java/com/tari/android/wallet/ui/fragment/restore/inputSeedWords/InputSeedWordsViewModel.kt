@@ -144,7 +144,7 @@ internal class InputSeedWordsViewModel() : CommonViewModel() {
     }
 
     fun addWord(index: Int, text: String = "") {
-        val newWord = WordItemViewModel.create(text)
+        val newWord = WordItemViewModel.create(text, mnemonicList)
         _words.value?.add(index, newWord)
         reindex()
         _addedWord.value = newWord
@@ -203,7 +203,7 @@ internal class InputSeedWordsViewModel() : CommonViewModel() {
         if (list.isEmpty() ||
             list.isNotEmpty() && list.last().text.value!!.isNotEmpty() && list.size < SeedPhrase.SeedPhraseLength
         ) {
-            WordItemViewModel().apply {
+            WordItemViewModel.create("", mnemonicList).apply {
                 list.add(this)
                 reindex()
                 _addedWord.value = this
