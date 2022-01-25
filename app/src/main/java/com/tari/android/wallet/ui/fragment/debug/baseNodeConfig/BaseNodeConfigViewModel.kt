@@ -7,7 +7,6 @@ import com.tari.android.wallet.application.baseNodes.BaseNodes
 import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodeDto
 import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodeSharedRepository
 import com.tari.android.wallet.event.EventBus
-import com.tari.android.wallet.model.BaseNodeValidationResult
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.common.SingleLiveEvent
 import javax.inject.Inject
@@ -30,7 +29,7 @@ internal class BaseNodeConfigViewModel : CommonViewModel() {
     val syncStatus: LiveData<String> = _syncStatus
 
     init {
-        component?.inject(this)
+        component.inject(this)
 
         EventBus.baseNodeState.subscribe(this) { updateCurrentBaseNode() }
     }
@@ -42,7 +41,7 @@ internal class BaseNodeConfigViewModel : CommonViewModel() {
     private fun updateCurrentBaseNode() {
         val syncStatus = when (baseNodeSharedRepository.baseNodeLastSyncResult) {
             null -> resourceManager.getString(R.string.debug_base_node_syncing)
-            BaseNodeValidationResult.SUCCESS -> resourceManager.getString(R.string.debug_base_node_sync_successful)
+            true -> resourceManager.getString(R.string.debug_base_node_sync_successful)
             else -> resourceManager.getString(R.string.debug_base_node_sync_failed)
         }
         _syncStatus.postValue(syncStatus)

@@ -271,7 +271,7 @@ dependencies {
 
     implementation 'net.yslibrary.keyboardvisibilityevent:keyboardvisibilityevent:2.2.0'
 
-    implementation "com.github.yat-labs:yat-lib-android:0.1.31"
+    implementation "com.github.yat-labs:yat-lib-android:0.1.32"
 
     // test
     testImplementation 'junit:junit:4.13.2'

@@ -44,7 +44,6 @@ import com.orhanobut.logger.Logger
 import com.tari.android.wallet.R
 import com.tari.android.wallet.event.Event
 import com.tari.android.wallet.event.EventBus
-import com.tari.android.wallet.model.BaseNodeValidationResult
 import com.tari.android.wallet.model.WalletError
 import com.tari.android.wallet.model.WalletErrorCode
 import com.tari.android.wallet.network.NetworkConnectionState
@@ -290,8 +289,8 @@ internal class UpdateProgressViewController(
     private fun onBaseNodeSyncCompleted(event: BaseNodeState.SyncCompleted) {
         isWaitingOnBaseNodeSync = false
         baseNodeSyncTimeoutSubscription?.dispose()
-        when (event.result) {
-            BaseNodeValidationResult.SUCCESS -> {
+        when (event.isSuccess) {
+            true -> {
                 // base node sync successful - start listening for events
                 Logger.d("Base node sync successful. Start listening for wallet events.")
                 state.state = State.RECEIVING
@@ -299,18 +298,9 @@ internal class UpdateProgressViewController(
                     displayReceivingTxs()
                 }, minStateDisplayPeriodMs)
             }
-            BaseNodeValidationResult.ABORTED -> {
-                fail(
-                    FailureReason.BASE_NODE_VALIDATION_ERROR,
-                    event.result
-                )
-            }
-            BaseNodeValidationResult.BASE_NODE_NOT_IN_SYNC, BaseNodeValidationResult.FAILURE -> {
+            false -> {
                 if (baseNodeSyncCurrentRetryCount >= baseNodeSyncMaxRetryCount) {
-                    fail(
-                        FailureReason.BASE_NODE_VALIDATION_ERROR,
-                        event.result
-                    )
+                    fail(FailureReason.BASE_NODE_VALIDATION_ERROR)
                 } else {
                     startBaseNodeSync()
                 }
@@ -406,7 +396,7 @@ internal class UpdateProgressViewController(
         fail(FailureReason.BASE_NODE_VALIDATION_ERROR)
     }
 
-    private fun fail(failureReason: FailureReason, validationResult: BaseNodeValidationResult? = null) {
+    private fun fail(failureReason: FailureReason) {
         state.state = State.IDLE
         listenerWeakReference.get()?.updateHasFailed(this, failureReason)
         isWaitingOnBaseNodeSync = false
@@ -427,7 +417,6 @@ internal class UpdateProgressViewController(
         fun updateHasFailed(
             source: UpdateProgressViewController,
             failureReason: FailureReason,
-            validationResult: BaseNodeValidationResult? = null
         )
 
         fun updateHasCompleted(

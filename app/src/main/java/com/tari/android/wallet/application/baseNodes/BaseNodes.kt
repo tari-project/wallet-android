@@ -4,9 +4,9 @@ import android.content.Context
 import com.tari.android.wallet.R
 import com.tari.android.wallet.application.Network
 import com.tari.android.wallet.application.WalletState
-import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepository
 import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodeDto
 import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodeSharedRepository
+import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepository
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.extension.addTo
 import com.tari.android.wallet.extension.executeWithError
@@ -89,6 +89,7 @@ class BaseNodes(
 
     private fun getBaseNodeResource(network: Network): Int = when(network) {
         Network.IGOR -> R.raw.igor_base_nodes
+        Network.DIBBLER -> R.raw.dibbler_base_nodes
         else -> R.raw.weatherwax_base_nodes
     }
 }

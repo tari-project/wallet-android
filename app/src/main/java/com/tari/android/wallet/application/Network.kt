@@ -46,6 +46,8 @@ enum class Network(val uriComponent: String, val displayName: String) {
 
     WEATHERWAX("weatherwax", "WEATHERWAX"),
 
+    DIBBLER("dibbler", "DIBBLER"),
+
     IGOR("igor", "IGOR");
 
     companion object {

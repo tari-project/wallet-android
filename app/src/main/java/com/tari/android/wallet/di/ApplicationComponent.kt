@@ -54,6 +54,7 @@ import com.tari.android.wallet.ui.fragment.onboarding.CreateWalletFragment
 import com.tari.android.wallet.ui.fragment.onboarding.IntroductionFragment
 import com.tari.android.wallet.ui.fragment.onboarding.LocalAuthFragment
 import com.tari.android.wallet.ui.fragment.profile.WalletInfoFragment
+import com.tari.android.wallet.ui.fragment.profile.WalletInfoViewModel
 import com.tari.android.wallet.ui.fragment.qr.QRScannerActivity
 import com.tari.android.wallet.ui.fragment.restore.chooseRestoreOption.ChooseRestoreOptionFragment
 import com.tari.android.wallet.ui.fragment.restore.chooseRestoreOption.ChooseRestoreOptionViewModel
@@ -173,6 +174,7 @@ internal interface ApplicationComponent {
     fun inject(allSettingsViewModel: AllSettingsViewModel)
     fun inject(addRecipientViewModel: AddRecipientViewModel)
     fun inject(finalizeSentTxListViewModel: FinalizeSendTxViewModel)
+    fun inject(walletInfoViewModel: WalletInfoViewModel)
     fun inject(requestTariViewModel: RequestTariViewModel)
     /**
      * Service(s).

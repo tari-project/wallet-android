@@ -221,7 +221,7 @@ void txCancellationCallback(struct TariCompletedTransaction *pCompletedTransacti
     g_vm->DetachCurrentThread();
 }
 
-void txoValidationCompleteCallback(unsigned long long requestId, unsigned char result) {
+void txoValidationCompleteCallback(unsigned long long requestId, bool success) {
     auto *jniEnv = getJNIEnv();
     if (jniEnv == nullptr || callbackHandler == nullptr) {
         return;
@@ -231,11 +231,11 @@ void txoValidationCompleteCallback(unsigned long long requestId, unsigned char r
             callbackHandler,
             txoValidationCompleteCallbackMethodId,
             requestIdBytes,
-            static_cast<jint>(result));
+            success);
     g_vm->DetachCurrentThread();
 }
 
-void transactionValidationCompleteCallback(unsigned long long requestId, unsigned char result) {
+void transactionValidationCompleteCallback(unsigned long long requestId, bool success) {
     auto *jniEnv = getJNIEnv();
     if (jniEnv == nullptr || callbackHandler == nullptr) {
         return;
@@ -245,7 +245,7 @@ void transactionValidationCompleteCallback(unsigned long long requestId, unsigne
             callbackHandler,
             transactionValidationCompleteCallbackMethodId,
             requestIdBytes,
-            static_cast<jint>(result));
+            success);
     g_vm->DetachCurrentThread();
 }
 
