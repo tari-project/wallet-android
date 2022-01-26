@@ -16,7 +16,7 @@ import com.tari.android.wallet.ui.dialog.error.ErrorDialog
 abstract class CommonView<VM : CommonViewModel, VB : ViewBinding> : LinearLayout {
     lateinit var viewModel: VM
 
-    lateinit var binding: VB
+    lateinit var ui: VB
         private set
 
     abstract fun bindingInflate(layoutInflater: LayoutInflater, parent: ViewGroup?, attachToRoot: Boolean): VB
@@ -40,7 +40,7 @@ abstract class CommonView<VM : CommonViewModel, VB : ViewBinding> : LinearLayout
     }
 
     private fun init() {
-        binding = bindingInflate(LayoutInflater.from(context), this, true)
+        ui = bindingInflate(LayoutInflater.from(context), this, true)
 
         setup()
     }

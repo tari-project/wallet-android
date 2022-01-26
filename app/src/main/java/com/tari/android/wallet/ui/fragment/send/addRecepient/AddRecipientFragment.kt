@@ -126,7 +126,7 @@ class AddRecipientFragment : CommonFragment<FragmentAddRecipientBinding, AddReci
      * Paste-emoji-id-related views.
      */
     private val dimmerViews
-        get() = arrayOf(ui.topDimmerView, ui.middleDimmerView, ui.bottomDimmerView)
+        get() = arrayOf(ui.middleDimmerView, ui.bottomDimmerView)
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -229,7 +229,6 @@ class AddRecipientFragment : CommonFragment<FragmentAddRecipientBinding, AddReci
         OverScrollDecoratorHelper.setUpOverScroll(ui.emojiIdScrollView)
         OverScrollDecoratorHelper.setUpOverScroll(ui.searchEditTextScrollView)
         ui.searchEditText.inputType = InputType.TYPE_NULL
-        ui.backButton.setOnClickListener { onBackButtonClicked(it) }
         ui.qrCodeButton.setOnClickListener { onQRButtonClick(it) }
         ui.continueButton.setOnClickListener { onContinueButtonClicked(it) }
         dimmerViews.forEach { it.setOnClickListener { onEmojiIdDimmerClicked() } }
@@ -396,14 +395,6 @@ class AddRecipientFragment : CommonFragment<FragmentAddRecipientBinding, AddReci
             viewModel.searchAndDisplayRecipients(query)
             ui.progressBar.gone()
             ui.contactsListRecyclerView.visible()
-        }
-    }
-
-    private fun onBackButtonClicked(view: View) {
-        view.temporarilyDisableClick()
-        activity?.let {
-            it.hideKeyboard()
-            ui.rootView.postDelayed(200L) { it.onBackPressed() }
         }
     }
 

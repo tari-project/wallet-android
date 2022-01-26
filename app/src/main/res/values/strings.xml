@@ -228,6 +228,17 @@
     <string name="tx_list_loading_gif">Loading GIF</string>
     <string name="tx_list_retry_loading_gif">Retry loading GIF</string>
 
+    <!-- send tari -->
+    <string name="send_tari_title">Send Tari</string>
+    <string name="request_tari_title">Request Tari</string>
+    <string name="send_tari_subtitle">Send</string>
+    <string name="request_tari_subtitle">Request</string>
+
+    <!-- request tari -->
+    <string name="request_tari_generate_qr_code">Generate QR Code</string>
+    <string name="request_tari_share">Share</string>
+    <string name="request_tari_share_text">Hi! Please send me %s Tari(s) using this link: %s</string>
+
     <!-- send tari - add recipient -->
     <string name="add_recipient_title">Send To</string>
     <string name="add_recipient_hint">Enter Emoji ID, Contact Name or Yat</string>

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?><!-- amount -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/element_container_view"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_centerVertical="true"
+    android:layout_marginStart="25dp"
+    android:layout_marginEnd="25dp"
+    android:clipChildren="false"
+    android:clipToPadding="false"
+    android:gravity="center"
+    android:orientation="horizontal"
+    android:translationY="@dimen/add_amount_element_container_translation_y">
+
+    <!-- gem -->
+    <ImageView
+        android:id="@+id/amount_gem_image_view"
+        android:layout_width="@dimen/add_amount_gem_size"
+        android:layout_height="@dimen/add_amount_gem_size"
+        android:contentDescription="@null"
+        android:src="@drawable/gem_amount" />
+
+    <!-- first digit (never disappears) -->
+    <com.tari.android.wallet.ui.component.CustomFontTextView
+        android:id="@+id/amount_element_0_text_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/add_amount_leftmost_digit_margin_start"
+        android:text="@string/digit_0"
+        android:textColor="@color/black"
+        android:textSize="@dimen/add_amount_element_text_size"
+        app:customFont="@string/font_black" />
+
+    <View
+        android:id="@+id/amount_center_correction_view"
+        android:layout_width="31dp"
+        android:layout_height="2dp" />
+
+</LinearLayout>

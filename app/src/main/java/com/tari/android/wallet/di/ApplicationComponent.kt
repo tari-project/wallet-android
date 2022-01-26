@@ -40,7 +40,6 @@ import com.tari.android.wallet.ui.activity.SplashActivity
 import com.tari.android.wallet.ui.activity.debug.DebugActivity
 import com.tari.android.wallet.ui.activity.home.HomeActivity
 import com.tari.android.wallet.ui.activity.onboarding.OnboardingFlowActivity
-import com.tari.android.wallet.ui.fragment.qr.QRScannerActivity
 import com.tari.android.wallet.ui.activity.restore.WalletRestoreActivity
 import com.tari.android.wallet.ui.activity.settings.DeleteWalletActivity
 import com.tari.android.wallet.ui.activity.tx.TxDetailsActivity
@@ -56,6 +55,7 @@ import com.tari.android.wallet.ui.fragment.onboarding.IntroductionFragment
 import com.tari.android.wallet.ui.fragment.onboarding.LocalAuthFragment
 import com.tari.android.wallet.ui.fragment.profile.WalletInfoFragment
 import com.tari.android.wallet.ui.fragment.profile.WalletInfoViewModel
+import com.tari.android.wallet.ui.fragment.qr.QRScannerActivity
 import com.tari.android.wallet.ui.fragment.restore.chooseRestoreOption.ChooseRestoreOptionFragment
 import com.tari.android.wallet.ui.fragment.restore.chooseRestoreOption.ChooseRestoreOptionViewModel
 import com.tari.android.wallet.ui.fragment.restore.enterRestorationPassword.EnterRestorationPasswordViewModel
@@ -68,6 +68,7 @@ import com.tari.android.wallet.ui.fragment.send.addRecepient.AddRecipientFragmen
 import com.tari.android.wallet.ui.fragment.send.addRecepient.AddRecipientViewModel
 import com.tari.android.wallet.ui.fragment.send.finalize.FinalizeSendTxFragment
 import com.tari.android.wallet.ui.fragment.send.finalize.FinalizeSendTxViewModel
+import com.tari.android.wallet.ui.fragment.send.requestTari.RequestTariViewModel
 import com.tari.android.wallet.ui.fragment.settings.allSettings.AllSettingsFragment
 import com.tari.android.wallet.ui.fragment.settings.allSettings.AllSettingsViewModel
 import com.tari.android.wallet.ui.fragment.settings.backgroundService.BackgroundServiceSettingsViewModel
@@ -174,6 +175,7 @@ internal interface ApplicationComponent {
     fun inject(addRecipientViewModel: AddRecipientViewModel)
     fun inject(finalizeSentTxListViewModel: FinalizeSendTxViewModel)
     fun inject(walletInfoViewModel: WalletInfoViewModel)
+    fun inject(requestTariViewModel: RequestTariViewModel)
     /**
      * Service(s).
      */
@@ -183,5 +185,4 @@ internal interface ApplicationComponent {
     * Broadcast receiver
     */
     fun inject(receiver: BootDeviceReceiver)
-
 }
