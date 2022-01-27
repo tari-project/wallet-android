@@ -88,8 +88,6 @@ class BaseNodes(
     }
 
     private fun getBaseNodeResource(network: Network): Int = when(network) {
-        Network.IGOR -> R.raw.igor_base_nodes
-        Network.DIBBLER -> R.raw.dibbler_base_nodes
-        else -> R.raw.weatherwax_base_nodes
+        else -> R.raw.dibbler_base_nodes
     }
 }

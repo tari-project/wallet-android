@@ -95,17 +95,9 @@
                     android:scheme="tari" />
 
                 <data
-                    android:host="weatherwax"
-                    android:scheme="tari" />
-                <data
-                    android:host="igor"
-                    android:scheme="tari" />
-                <data
-                    android:host="dibbler"
-                    android:scheme="tari" />
-                <data
                     android:host="y.at"
                     android:scheme="tari" />
+
             </intent-filter>
         </activity>
         <activity

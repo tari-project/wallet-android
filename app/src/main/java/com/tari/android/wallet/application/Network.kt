@@ -38,11 +38,7 @@ package com.tari.android.wallet.application
 enum class Network(val uriComponent: String, val displayName: String) {
     MAINNET("mainnet", "MAINNET"),
 
-    WEATHERWAX("weatherwax", "WEATHERWAX"),
-
-    DIBBLER("dibbler", "DIBBLER"),
-
-    IGOR("igor", "IGOR");
+    DIBBLER("dibbler", "DIBBLER");
 
     companion object {
         fun from(uriComponent: String): Network {

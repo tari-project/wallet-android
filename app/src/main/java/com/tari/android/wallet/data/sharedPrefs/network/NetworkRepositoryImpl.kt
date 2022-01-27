@@ -9,7 +9,7 @@ import com.tari.android.wallet.ui.common.domain.ResourceManager
 
 class NetworkRepositoryImpl(private val resourceManager: ResourceManager, sharedPrefs: SharedPreferences) : NetworkRepository {
 
-    override var supportedNetworks: List<Network> = listOf(Network.DIBBLER, Network.WEATHERWAX, Network.IGOR)
+    override var supportedNetworks: List<Network> = listOf(Network.DIBBLER)
 
     override var recommendedNetworks: List<Network> = listOf(Network.DIBBLER)
 
@@ -25,11 +25,7 @@ class NetworkRepositoryImpl(private val resourceManager: ResourceManager, shared
 
     override var incompatibleNetworkShown by SharedPrefBooleanDelegate(sharedPrefs, formatKey(Keys.networkIncompatible), false)
 
-    override fun getAllNetworks(): List<TariNetwork> = listOf(
-        getDibbler(resourceManager),
-        getWeatherwax(resourceManager),
-        getIgor()
-    )
+    override fun getAllNetworks(): List<TariNetwork> = listOf(getDibbler(resourceManager))
 
     private fun formatKey(key: String): String = key + "_" + currentNetwork!!.network.displayName
 
@@ -42,11 +38,6 @@ class NetworkRepositoryImpl(private val resourceManager: ResourceManager, shared
     companion object {
         private const val mainNetThicker = "XTR"
         private const val testNetThicker = "tXTR"
-
-        fun getWeatherwax(resourceManager: ResourceManager): TariNetwork =
-            TariNetwork(Network.WEATHERWAX, resourceManager.getString(R.string.network_faucet_url), testNetThicker)
-
-        fun getIgor(): TariNetwork = TariNetwork(Network.IGOR, null, testNetThicker)
 
         fun getDibbler(resourceManager: ResourceManager): TariNetwork =
             TariNetwork(Network.DIBBLER, resourceManager.getString(R.string.dibbler_faucet_url), testNetThicker)
