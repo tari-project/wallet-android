@@ -65,6 +65,7 @@ class WalletInfoViewModel() : CommonViewModel() {
         _qrDeepLink.postValue(qrCode)
         _yat.postValue(yatSharedPrefsRepository.connectedYat.orEmpty())
         _yatDisconnected.postValue(yatSharedPrefsRepository.yatWasDisconnected)
+        _isYatForegrounded.postValue(false)
 
         checkEmojiIdConnection()
     }
@@ -83,13 +84,16 @@ class WalletInfoViewModel() : CommonViewModel() {
         val connectedYat = yatSharedPrefsRepository.connectedYat.orEmpty()
         if (connectedYat.isNotEmpty()) {
             viewModelScope.launch(Dispatchers.IO) {
-                yatAdapter.searchYats(connectedYat)?.let {
-                    if (it.status) {
+                yatAdapter.searchYats(connectedYat).let {
+                    if (it?.status == true) {
                         it.result?.entries?.firstOrNull()?.let { response ->
                             val wasDisconnected = response.value.address.lowercase() != sharedPrefsWrapper.publicKeyHexString.orEmpty().lowercase()
                             yatSharedPrefsRepository.yatWasDisconnected = wasDisconnected
                             _yatDisconnected.postValue(wasDisconnected)
                         }
+                    } else {
+                        yatSharedPrefsRepository.yatWasDisconnected = true
+                        _yatDisconnected.postValue(true)
                     }
                 }
             }
