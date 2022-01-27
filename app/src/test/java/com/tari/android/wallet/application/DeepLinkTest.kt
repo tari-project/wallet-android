@@ -41,7 +41,7 @@ import org.junit.Test
 class DeepLinkTest {
 
     private val networkRepository: NetworkRepository = NetworkRepositoryMock()
-    private val currentNetwork = Network.WEATHERWAX
+    private val currentNetwork = Network.DIBBLER
 
     @Test
     fun `from, assert that emoji id for testnet is deserialized correctly`() {
@@ -168,11 +168,13 @@ class DeepLinkTest {
     }
 
     class NetworkRepositoryMock : NetworkRepository {
-        override var supportedNetworks: List<Network> = listOf(Network.WEATHERWAX)
-        override var currentNetwork: TariNetwork? = TariNetwork(Network.WEATHERWAX, "", "")
-        override var ffiNetwork: Network? = Network.WEATHERWAX
+        private val network: Network = Network.DIBBLER
+
+        override var supportedNetworks: List<Network> = listOf(network)
+        override var currentNetwork: TariNetwork? = TariNetwork(network, "", "")
+        override var ffiNetwork: Network? = network
         override var incompatibleNetworkShown: Boolean = false
-        override var recommendedNetworks: List<Network> = listOf(Network.WEATHERWAX)
+        override var recommendedNetworks: List<Network> = listOf(network)
 
         override fun getAllNetworks(): List<TariNetwork> = listOf()
 

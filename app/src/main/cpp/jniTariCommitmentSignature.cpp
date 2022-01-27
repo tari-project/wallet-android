@@ -30,34 +30,48 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.tari.android.wallet.ffi
 
-/**
- * Contains FFI utility functions.
- *
- * @author The Tari Development Team
- */
-internal class FFIUtil {
+#include <jni.h>
+#include <android/log.h>
+#include <wallet.h>
+#include <string>
+#include <cmath>
+#include <android/log.h>
+#include "jniCommon.cpp"
 
-    private external fun jniDoPartialBackup(
-        sourceFilePath: String,
-        targetFilePath: String,
-        libError: FFIError
-    )
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_tari_android_wallet_ffi_FFITariCommitmentSignature_jniCommitmentSignatureCreateFromBytes(
+        JNIEnv *jEnv,
+        jobject jThis,
+        jobject jppublic_nonce_bytes,
+        jobject jpu_bytes,
+        jobject jpv_bytes,
+        jobject error) {
+    int errorCode = 0;
+    int *errorCodePointer = &errorCode;
 
-    companion object {
+    jlong jpublicNonceBytes = GetPointerField(jEnv, jppublic_nonce_bytes);
+    auto *ppublicNonceBytes = reinterpret_cast<ByteVector *>(jpublicNonceBytes);
 
-        private val instance = FFIUtil()
+    jlong juBytes = GetPointerField(jEnv, jpu_bytes);
+    auto *puBytes = reinterpret_cast<ByteVector *>(juBytes);
 
-        @Deprecated("Not should be using after 0.16.27")
-        fun doPartialBackup(
-            sourceFilePath: String,
-            targetFilePath: String
-        ) {
-            val error = FFIError()
-            instance.jniDoPartialBackup(sourceFilePath, targetFilePath, error)
-            throwIf(error)
-        }
-    }
+    jlong jvBytes = GetPointerField(jEnv, jpv_bytes);
+    auto *pvBytes = reinterpret_cast<ByteVector *>(jvBytes);
 
+    auto result = reinterpret_cast<jlong>(commitment_signature_create_from_bytes(ppublicNonceBytes, puBytes, pvBytes, errorCodePointer));
+
+    setErrorCode(jEnv, error, errorCode);
+    SetPointerField(jEnv, jThis, reinterpret_cast<jlong>(result));
+}
+
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_tari_android_wallet_ffi_FFITariCommitmentSignature_jniDestroy(
+        JNIEnv *jEnv,
+        jobject jThis) {
+        jlong lByteVector = GetPointerField(jEnv, jThis);
+        commitment_signature_destroy(reinterpret_cast<TariCommitmentSignature *>(lByteVector));
+        SetPointerField(jEnv, jThis, reinterpret_cast<jlong>(nullptr));
 }
