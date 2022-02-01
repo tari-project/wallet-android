@@ -44,5 +44,8 @@ data class TestnetTariUTXOKey constructor(
     val key: String,
 
     @SerializedName("value")
-    val value: String
+    val value: String,
+
+    @SerializedName("output")
+    val output: TestnetTariOutput
 )

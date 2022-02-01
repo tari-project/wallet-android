@@ -496,7 +496,7 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
         val statusMapCopy = baseNodeValidationStatusMap.toMap()
         // if base node not in sync, then switch to the next base node
         // check if any has failed
-        val failed = statusMapCopy.any { it.value.second == false}
+        val failed = statusMapCopy.any { it.value.second == false }
         if (failed) {
             baseNodeValidationStatusMap.clear()
             baseNodeSharedPrefsRepository.baseNodeLastSyncResult = false
@@ -746,7 +746,7 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
          * Wallet balance info.
          */
         override fun getBalanceInfo(error: WalletError): BalanceInfo {
-                return wallet.getBalance()
+            return wallet.getBalance()
         }
 
         override fun estimateTxFee(
@@ -1220,16 +1220,23 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
             val firstUTXOKey = keys.first()
             val senderPublicKeyFFI = FFIPublicKey(HexString(firstUTXOKey.senderPublicKeyHex!!))
             val txId: BigInteger
-            FFIPrivateKey(HexString(firstUTXOKey.key)).also { spendingPrivateKeyFFI ->
-                val amount = BigInteger(firstUTXOKey.value)
-                txId = wallet.importUTXO(
-                    amount,
-                    txMessage,
-                    spendingPrivateKeyFFI,
-                    senderPublicKeyFFI
-                )
-                spendingPrivateKeyFFI.destroy()
-            }
+            val privateKey = FFIPrivateKey(HexString(firstUTXOKey.key))
+            val scriptPrivateKey = FFIPrivateKey(HexString(firstUTXOKey.key))
+            val amount = BigInteger(firstUTXOKey.value)
+            txId = wallet.importUTXO(
+                amount,
+                txMessage,
+                privateKey,
+                senderPublicKeyFFI,
+                FFITariCommitmentSignature(
+                    FFIByteVector(HexString(firstUTXOKey.output.metadataSignature.public_nonce)),
+                    FFIByteVector(HexString(firstUTXOKey.output.metadataSignature.u)),
+                    FFIByteVector(HexString(firstUTXOKey.output.metadataSignature.v))
+                ),
+                FFIPublicKey(HexString(firstUTXOKey.output.senderOffsetPublicKey)),
+                scriptPrivateKey
+            )
+            privateKey.destroy()
             senderPublicKeyFFI.destroy()
             // remove the used key
             keys.remove(firstUTXOKey)

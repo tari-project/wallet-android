@@ -198,9 +198,12 @@ internal class FFIWallet(
     ): Boolean
 
     private external fun jniImportUTXO(
+        amount: String,
         spendingKey: FFIPrivateKey,
         sourcePublicKey: FFIPublicKey,
-        amount: String,
+        tariCommitmentSignature: FFITariCommitmentSignature,
+        sourceSenderPublicKey: FFIPublicKey,
+        scriptPrivateKey: FFIPrivateKey,
         message: String,
         libError: FFIError
     ): ByteArray
@@ -795,13 +798,19 @@ internal class FFIWallet(
         amount: BigInteger,
         message: String,
         spendingKey: FFIPrivateKey,
-        sourcePublicKey: FFIPublicKey
-    ): BigInteger {
+        sourcePublicKey: FFIPublicKey,
+        tariCommitmentSignature: FFITariCommitmentSignature,
+        senderPublicKey: FFIPublicKey,
+        scriptPrivateKey: FFIPrivateKey,
+        ): BigInteger {
         val error = FFIError()
         val bytes = jniImportUTXO(
+            amount.toString(),
             spendingKey,
             sourcePublicKey,
-            amount.toString(),
+            tariCommitmentSignature,
+            senderPublicKey,
+            scriptPrivateKey,
             message,
             error
         )

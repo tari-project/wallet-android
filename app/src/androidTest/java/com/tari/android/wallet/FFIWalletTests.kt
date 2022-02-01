@@ -54,6 +54,7 @@ import com.tari.android.wallet.service.seedPhrase.SeedPhraseRepository
 import com.tari.android.wallet.ui.common.domain.ResourceManager
 import com.tari.android.wallet.ui.dialog.backup.BackupSettingsRepository
 import com.tari.android.wallet.util.Constants
+import com.tari.android.wallet.yat.YatSharedRepository
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.slot
@@ -71,6 +72,7 @@ class FFIWalletTests {
 
     private lateinit var wallet: FFIWallet
     private lateinit var listener: TestAddRecipientListener
+    private var network: Network = Network.DIBBLER
     private val context = getApplicationContext<Context>()
     private val prefs = context.getSharedPreferences(ApplicationModule.sharedPrefsFileName, Context.MODE_PRIVATE)
     private val resourseManager: ResourceManager = ResourceManager(context)
@@ -78,8 +80,9 @@ class FFIWalletTests {
     private val baseNodeSharedPrefsRepository = BaseNodeSharedRepository(prefs, networkRepository)
     private val backupSettingsRepository = BackupSettingsRepository(context, prefs, networkRepository)
     private val testnetFaucetRepository = TestnetFaucetRepository(prefs, networkRepository)
+    private val yatSharedPrefsRepository = YatSharedRepository(prefs, networkRepository)
     private val sharedPrefsRepository =
-        SharedPrefsRepository(context, prefs, networkRepository, backupSettingsRepository, baseNodeSharedPrefsRepository, testnetFaucetRepository)
+        SharedPrefsRepository(context, prefs, networkRepository, backupSettingsRepository, baseNodeSharedPrefsRepository, testnetFaucetRepository, yatSharedPrefsRepository)
     private val walletDirPath = context.filesDir.absolutePath
 
     private fun clean() {
@@ -104,7 +107,7 @@ class FFIWalletTests {
             walletDirPath,
             Constants.Wallet.discoveryTimeoutSec,
             Constants.Wallet.storeAndForwardMessageDurationSec,
-            Network.WEATHERWAX.uriComponent
+            network.uriComponent
         )
         val logFile = File(walletDirPath, "test_log.log")
         // create wallet instance

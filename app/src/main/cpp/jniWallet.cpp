@@ -906,23 +906,43 @@ JNIEXPORT jbyteArray JNICALL
 Java_com_tari_android_wallet_ffi_FFIWallet_jniImportUTXO(
         JNIEnv *jEnv,
         jobject jThis,
+        jstring jAmount,
         jobject jpSpendingKey,
         jobject jpSourcePublicKey,
-        jstring jAmount,
+        //todo features
+        jobject jpTariCommitmentSignature,
+        jobject jpSourceSenderPublicKey,
+        jobject jpScriptPrivateKey,
+        //todo covenant
         jstring jMessage,
         jobject error) {
+
     int errorCode = 0;
     int *errorCodePointer = &errorCode;
+
     jlong lWallet = GetPointerField(jEnv, jThis);
     auto *pWallet = reinterpret_cast<TariWallet *>(lWallet);
+
     jlong lSpendingKey = GetPointerField(jEnv, jpSpendingKey);
     auto *pSpendingKey = reinterpret_cast<TariPrivateKey *>(lSpendingKey);
+
     jlong lSourcePublicKey = GetPointerField(jEnv, jpSourcePublicKey);
     auto *pSourcePublicKey = reinterpret_cast<TariPublicKey *>(lSourcePublicKey);
+
+    jlong lSourceSenderPublicKey = GetPointerField(jEnv, jpSourceSenderPublicKey);
+    auto *pSourceSenderPublicKey = reinterpret_cast<TariPublicKey *>(lSourceSenderPublicKey);
+
+    jlong jTariCommitmentSignature = GetPointerField(jEnv, jpTariCommitmentSignature);
+    auto *pTariCommitmentSignature = reinterpret_cast<TariCommitmentSignature *>(jTariCommitmentSignature);
+
+    jlong jScriptPrivateKey = GetPointerField(jEnv, jpScriptPrivateKey);
+    auto *pScriptPrivateKey = reinterpret_cast<TariPrivateKey *>(jScriptPrivateKey);
+
     char *pAmountEnd;
     const char *nativeAmount = jEnv->GetStringUTFChars(jAmount, JNI_FALSE);
     const char *pMessage = jEnv->GetStringUTFChars(jMessage, JNI_FALSE);
     unsigned long long amount = strtoull(nativeAmount, &pAmountEnd, 10);
+
     jbyteArray result = getBytesFromUnsignedLongLong(
             jEnv,
             wallet_import_utxo(
@@ -930,6 +950,11 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniImportUTXO(
                     amount,
                     pSpendingKey,
                     pSourcePublicKey,
+                    nullptr,
+                    pTariCommitmentSignature,
+                    pSourceSenderPublicKey,
+                    pScriptPrivateKey,
+                    nullptr,
                     pMessage,
                     errorCodePointer
             )

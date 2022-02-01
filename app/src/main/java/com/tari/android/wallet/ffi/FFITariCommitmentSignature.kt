@@ -32,82 +32,46 @@
  */
 package com.tari.android.wallet.ffi
 
-import java.math.BigInteger
-
 /**
  * Wrapper for native byte vector type.
  *
  * @author The Tari Development Team
  */
-internal class FFIByteVector() : FFIBase() {
+internal class FFITariCommitmentSignature() : FFIBase() {
 
     // region JNI
 
-    private external fun jniGetLength(error: FFIError): Int
-    private external fun jniGetAt(index: Int, error: FFIError): Int
+    private external fun jniCommitmentSignatureCreateFromBytes(
+        public_nonce_bytes: FFIByteVector,
+        u_bytes: FFIByteVector,
+        v_bytes: FFIByteVector,
+        libError: FFIError
+    )
+
     private external fun jniDestroy()
-    private external fun jniCreate(byteArray: ByteArray, error: FFIError)
 
     // endregion
     constructor(pointer: FFIPointer): this() {
         this.pointer = pointer
     }
 
-    constructor(hex: HexString): this() {
-        val stringHex = hex.toString()
-        if (stringHex.length < 64) {
-            throw FFIException(
-                message = "Argument's length is invalid - should be 64 but got " +
-                        "${stringHex.length}\n$stringHex"
-            )
-        }
-        val hexInteger = BigInteger(stringHex, 16)
-        var byteArray = hexInteger.toByteArray()
-        // toByteArray for some reason added one leading zero. Probably gets it from protocol
-        if (byteArray.size == 33 && byteArray[0] == 0.toByte()) {
-            byteArray = byteArray.drop(1).toByteArray()
-        }
+    constructor(
+        public_nonce_bytes: FFIByteVector,
+        u_bytes: FFIByteVector,
+        v_bytes: FFIByteVector,
+    ) : this() {
         val error = FFIError()
-        jniCreate(byteArray, error)
+        jniCommitmentSignatureCreateFromBytes(
+            public_nonce_bytes,
+            u_bytes,
+            v_bytes,
+            error
+        )
         throwIf(error)
     }
 
-    constructor(bytes: ByteArray): this() {
-        val error = FFIError()
-        jniCreate(bytes, error)
-        throwIf(error)
-    }
-
-    fun getAt(index: Int): Int {
-        val error = FFIError()
-        val byte = jniGetAt(index, error)
-        throwIf(error)
-        return byte
-    }
-
-    fun getLength(): Int {
-        val error = FFIError()
-        val len = jniGetLength(error)
-        throwIf(error)
-        return len
-    }
-
-    fun getBytes(): ByteArray {
-        val length = getLength()
-        val byteArray = ByteArray(length)
-        for (i in 0 until length) {
-            val m = getAt(i)
-            byteArray[i] = m.toByte()
-        }
-        return byteArray
-    }
-
-    override fun toString(): String {
-        return HexString(this).toString()
-    }
 
     override fun destroy() {
         jniDestroy()
     }
-
 }

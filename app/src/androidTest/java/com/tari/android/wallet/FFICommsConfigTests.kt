@@ -64,6 +64,7 @@ class FFICommsConfigTests {
     private companion object {
         private const val DB_NAME = "tari_test_db"
         private var walletDir = ""
+        private var network: Network = Network.DIBBLER
         private val context = getApplicationContext<Context>()
         private val resourceManager = ResourceManager(context)
         private val prefs = context.getSharedPreferences(ApplicationModule.sharedPrefsFileName, Context.MODE_PRIVATE)
@@ -92,7 +93,7 @@ class FFICommsConfigTests {
             walletDir,
             Constants.Wallet.discoveryTimeoutSec,
             Constants.Wallet.storeAndForwardMessageDurationSec,
-            Network.WEATHERWAX.uriComponent
+            network.uriComponent
         )
         assertNotEquals(nullptr, commsConfig.pointer)
         commsConfig.destroy()
@@ -110,7 +111,7 @@ class FFICommsConfigTests {
                 "${walletDir}_invalid_target",
                 Constants.Wallet.discoveryTimeoutSec,
                 Constants.Wallet.storeAndForwardMessageDurationSec,
-                Network.WEATHERWAX.uriComponent
+                network.uriComponent
             )
         } catch (e: Throwable) {
             transport.destroy()
