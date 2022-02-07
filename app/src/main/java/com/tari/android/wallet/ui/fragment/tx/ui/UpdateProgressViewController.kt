@@ -45,7 +45,6 @@ import com.tari.android.wallet.R
 import com.tari.android.wallet.event.Event
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.model.WalletError
-import com.tari.android.wallet.model.WalletErrorCode
 import com.tari.android.wallet.network.NetworkConnectionState
 import com.tari.android.wallet.service.TariWalletService
 import com.tari.android.wallet.service.baseNode.BaseNodeState
@@ -270,7 +269,7 @@ internal class UpdateProgressViewController(
         // long running call
         launch(Dispatchers.IO) {
             val success = walletService.startBaseNodeSync(walletError)
-            if (isActive && (!success || walletError.code != WalletErrorCode.NO_ERROR)) {
+            if (isActive && (!success || walletError != WalletError.NoError)) {
                 Logger.e("Base node sync has failed.")
                 fail(FailureReason.BASE_NODE_VALIDATION_ERROR)
             }

@@ -9,7 +9,6 @@ import com.tari.android.wallet.extension.addTo
 import com.tari.android.wallet.infrastructure.Tracker
 import com.tari.android.wallet.model.TxId
 import com.tari.android.wallet.model.WalletError
-import com.tari.android.wallet.model.WalletErrorCode
 import com.tari.android.wallet.network.NetworkConnectionState
 import com.tari.android.wallet.service.TariWalletService
 import com.tari.android.wallet.service.connection.TariWalletServiceConnection
@@ -132,7 +131,7 @@ class FinalizeSendTxViewModel : CommonViewModel() {
             )
             // if success, just wait for the callback to happen
             // if failed, just show the failed info & return
-            if (txId == null || error.code != WalletErrorCode.NO_ERROR) {
+            if (txId == null || error != WalletError.NoError) {
                 txFailureReason.postValue(TxFailureReason.SEND_ERROR)
             } else {
                 sentTxId.postValue(txId)

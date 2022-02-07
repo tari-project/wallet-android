@@ -52,8 +52,8 @@ import com.tari.android.wallet.BuildConfig
 import com.tari.android.wallet.R.color.white
 import com.tari.android.wallet.R.string.*
 import com.tari.android.wallet.application.WalletState
-import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepository
 import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
+import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepository
 import com.tari.android.wallet.databinding.ActivityAuthBinding
 import com.tari.android.wallet.di.DiContainer.appComponent
 import com.tari.android.wallet.event.EventBus
@@ -62,8 +62,8 @@ import com.tari.android.wallet.infrastructure.security.biometric.BiometricAuthen
 import com.tari.android.wallet.infrastructure.security.biometric.BiometricAuthenticationService.BiometricAuthenticationException
 import com.tari.android.wallet.service.WalletServiceLauncher
 import com.tari.android.wallet.ui.activity.home.HomeActivity
-import com.tari.android.wallet.ui.dialog.confirm.ConfirmDialog
-import com.tari.android.wallet.ui.dialog.confirm.ConfirmDialogArgs
+import com.tari.android.wallet.ui.dialog.error.ErrorDialog
+import com.tari.android.wallet.ui.dialog.error.ErrorDialogArgs
 import com.tari.android.wallet.ui.extension.*
 import com.tari.android.wallet.util.Constants
 import kotlinx.coroutines.Dispatchers
@@ -128,32 +128,25 @@ internal class AuthActivity : AppCompatActivity() {
     }
 
     private fun onWalletStateChanged(walletState: WalletState) {
-        if (walletState == WalletState.Running && continueIsPendingOnWalletState) {
-            continueIsPendingOnWalletState = false
-            ui.rootView.post(this::continueToHomeActivity)
-        } else if (walletState is WalletState.Failed && continueIsPendingOnWalletState) {
-            lifecycleScope.launch(Dispatchers.Main) {
-                val args = ConfirmDialogArgs(
-                    string(wallet_error_title),
-                    string(wallet_error_description),
-                    string(common_cancel),
-                    string(common_confirm),
-                    cancelable = false,
-                    canceledOnTouchOutside = false,
-                    confirmStyle = ConfirmDialog.ConfirmStyle.Warning,
-                    onCancel = {
-                        finish()
-                    },
-                    onConfirm = {
-                        walletServiceLauncher.stopAndDelete()
+        showWalletError()
+//        if (walletState == WalletState.Running && continueIsPendingOnWalletState) {
+//            continueIsPendingOnWalletState = false
+//            ui.rootView.post(this::continueToHomeActivity)
+//        } else if (walletState is WalletState.Failed && continueIsPendingOnWalletState) {
+//            showWalletError(walletState)
+//        }
+    }
 
-                        val intent = Intent(this@AuthActivity, SplashActivity::class.java).apply { flags = Intent.FLAG_ACTIVITY_NEW_TASK }
-                        startActivity(intent)
-                        finish()
-                    }
-                )
-                ConfirmDialog(this@AuthActivity, args).show()
-            }
+    private fun showWalletError() {
+        lifecycleScope.launch(Dispatchers.Main) {
+            val args = ErrorDialogArgs(
+                string(wallet_error_title),
+                string(wallet_error_description),
+                onClose = {
+                      // todo
+                },
+            )
+            ErrorDialog(this@AuthActivity, args).show()
         }
     }
 
@@ -167,29 +160,28 @@ internal class AuthActivity : AppCompatActivity() {
         ui.smallGemImageView.alpha = 0f
 
         // define animations
-        val hideGemAnim = ValueAnimator.ofFloat(1f, 0f)
-        val showTariTextAnim = ValueAnimator.ofFloat(0f, 1f)
-        hideGemAnim.addUpdateListener { valueAnimator: ValueAnimator ->
-            val alpha = valueAnimator.animatedValue as Float
-            ui.bigGemImageView.alpha = alpha
+        val hideGemAnim = ValueAnimator.ofFloat(1f, 0f).apply {
+            addUpdateListener { valueAnimator: ValueAnimator ->
+                val alpha = valueAnimator.animatedValue as Float
+                ui.bigGemImageView.alpha = alpha
+            }
         }
-        showTariTextAnim.addUpdateListener { valueAnimator: ValueAnimator ->
-            val alpha = valueAnimator.animatedValue as Float
-            ui.authAnimLottieAnimationView.alpha = alpha
-            ui.networkInfoTextView.alpha = alpha
-            ui.smallGemImageView.alpha = alpha
+        val showTariTextAnim = ValueAnimator.ofFloat(0f, 1f).apply {
+            addUpdateListener { valueAnimator: ValueAnimator ->
+                val alpha = valueAnimator.animatedValue as Float
+                ui.authAnimLottieAnimationView.alpha = alpha
+                ui.networkInfoTextView.alpha = alpha
+                ui.smallGemImageView.alpha = alpha
+            }
         }
-        // chain animations
-        val animSet = AnimatorSet()
-        animSet.startDelay = Constants.UI.shortDurationMs
-        animSet.play(showTariTextAnim).after(hideGemAnim)
-        animSet.duration = Constants.UI.shortDurationMs
-        // define interpolator
-        animSet.interpolator = EasingInterpolator(Ease.QUART_IN)
-        // authenticate at the end of the animation set
-        animSet.addListener(onEnd = { doAuth() })
-        // start the animation set
-        animSet.start()
+        AnimatorSet().apply {
+            startDelay = Constants.UI.shortDurationMs
+            play(showTariTextAnim).after(hideGemAnim)
+            duration = Constants.UI.shortDurationMs
+            interpolator = EasingInterpolator(Ease.QUART_IN)
+            addListener(onEnd = { doAuth() })
+            start()
+        }
     }
 
     /**
@@ -289,27 +281,30 @@ internal class AuthActivity : AppCompatActivity() {
         })
         ui.authAnimLottieAnimationView.playAnimation()
 
-        val fadeOutAnim = ValueAnimator.ofFloat(1f, 0f)
-        fadeOutAnim.duration = Constants.UI.mediumDurationMs
-        fadeOutAnim.addUpdateListener { valueAnimator: ValueAnimator ->
-            val alpha = valueAnimator.animatedValue as Float
-            ui.smallGemImageView.alpha = alpha
-            ui.networkInfoTextView.alpha = alpha
+        ValueAnimator.ofFloat(1f, 0f).apply {
+            duration = Constants.UI.mediumDurationMs
+            addUpdateListener { valueAnimator: ValueAnimator ->
+                val alpha = valueAnimator.animatedValue as Float
+                ui.smallGemImageView.alpha = alpha
+                ui.networkInfoTextView.alpha = alpha
+            }
+            startDelay = Constants.UI.CreateWallet.introductionBottomViewsFadeOutDelay
+            start()
         }
-        fadeOutAnim.startDelay = Constants.UI.CreateWallet.introductionBottomViewsFadeOutDelay
-        fadeOutAnim.start()
     }
 
     private fun continueToHomeActivity() {
-        val alphaAnim = ObjectAnimator.ofFloat(ui.progressBar, View.ALPHA, 1f, 0f)
-        alphaAnim.duration = Constants.UI.shortDurationMs
-        alphaAnim.start()
+        ObjectAnimator.ofFloat(ui.progressBar, View.ALPHA, 1f, 0f).apply {
+            duration = Constants.UI.shortDurationMs
+            start()
+        }
+
         // go to home activity
-        val intent = Intent(this, HomeActivity::class.java)
-        intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
-        this.intent.data?.let(intent::setData)
-        startActivity(intent)
-        // finish this activity
+        Intent(this, HomeActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
+            this@AuthActivity.intent.data?.let(::setData)
+            startActivity(this)
+        }
         finish()
     }
 

@@ -56,7 +56,10 @@ import com.tari.android.wallet.di.DiContainer.appComponent
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.extension.addTo
 import com.tari.android.wallet.extension.applyFontStyle
-import com.tari.android.wallet.model.*
+import com.tari.android.wallet.model.PublicKey
+import com.tari.android.wallet.model.Tx
+import com.tari.android.wallet.model.User
+import com.tari.android.wallet.model.WalletError
 import com.tari.android.wallet.network.NetworkConnectionState
 import com.tari.android.wallet.service.TariWalletService
 import com.tari.android.wallet.service.WalletServiceLauncher
@@ -72,7 +75,10 @@ import com.tari.android.wallet.ui.common.gyphy.GiphyEcosystem
 import com.tari.android.wallet.ui.component.CustomFont
 import com.tari.android.wallet.ui.component.CustomFontTextView
 import com.tari.android.wallet.ui.dialog.BottomSlideDialog
-import com.tari.android.wallet.ui.extension.*
+import com.tari.android.wallet.ui.extension.color
+import com.tari.android.wallet.ui.extension.setOnThrottledClickListener
+import com.tari.android.wallet.ui.extension.showInternetConnectionErrorDialog
+import com.tari.android.wallet.ui.extension.string
 import com.tari.android.wallet.ui.fragment.debug.baseNodeConfig.BaseNodeConfigRouter
 import com.tari.android.wallet.ui.fragment.debug.baseNodeConfig.addBaseNode.AddCustomBaseNodeFragment
 import com.tari.android.wallet.ui.fragment.debug.baseNodeConfig.changeBaseNode.ChangeBaseNodeFragment
@@ -333,8 +339,8 @@ internal class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>
     ) {
         val error = WalletError()
         val contacts = service.getContacts(error)
-        val recipientUser = when (error.code) {
-            WalletErrorCode.NO_ERROR -> contacts.firstOrNull { it.publicKey == recipientPublicKey } ?: User(recipientPublicKey)
+        val recipientUser = when (error) {
+            WalletError.NoError -> contacts.firstOrNull { it.publicKey == recipientPublicKey } ?: User(recipientPublicKey)
             else -> User(recipientPublicKey)
         }
         val intent = Intent(this, SendTariActivity::class.java)

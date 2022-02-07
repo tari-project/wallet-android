@@ -1,96 +1,53 @@
-/**
- * Copyright 2020 The Tari Project
- *
- * Redistribution and use in source and binary forms, with or
- * without modification, are permitted provided that the
- * following conditions are met:
- *
- * 1. Redistributions of source code must retain the above copyright notice,
- * this list of conditions and the following disclaimer.
- *
- * 2. Redistributions in binary form must reproduce the above
- * copyright notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * 3. Neither the name of the copyright holder nor the names of
- * its contributors may be used to endorse or promote products
- * derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND
- * CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES,
- * INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR
- * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
- * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
- * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- */
 package com.tari.android.wallet.model
 
 import android.os.Parcel
 import android.os.Parcelable
 
-/**
- * Wallet error.
- *
- * @author The Tari Development Team
- */
-class WalletError(
-    var code: WalletErrorCode = WalletErrorCode.NO_ERROR,
-    var message: String? = null
-) : Parcelable {
+open class WalletError : CoreError {
 
-    override fun toString(): String {
-        return "WalletError(code=$code, message=$message)"
-    }
+    constructor() : super(NoError.code, "FFI")
 
-    // region Parcelable
+    constructor(code: Int) : super(code, "FFI")
 
-    constructor(parcel: Parcel) : this(
-        parcel.readSerializable() as WalletErrorCode,
-        parcel.readString()
-    )
+    constructor(parcel: Parcel) : super(parcel)
 
-    companion object CREATOR : Parcelable.Creator<WalletError> {
+    class CommonError(code: Int): WalletError(code)
 
-        override fun createFromParcel(parcel: Parcel): WalletError {
-            return WalletError(parcel)
-        }
+    object DatabaseDataError : WalletError(114)
+    object TransactionNotFoundError : WalletError(204)
+    object ContactNotFoundError : WalletError(401)
+    object InvalidPassphraseEncryptionCypherError : WalletError(420)
+    object InvalidPassphraseError : WalletError(428)
+    object SeedWordsInvalidDataError : WalletError(429)
+    object SeedWordsVersionMismatchError : WalletError(430)
+    object UnknownError : WalletError(-1)
 
-        override fun newArray(size: Int): Array<WalletError?> {
-            return arrayOfNulls(size)
-        }
+    object NoError : WalletError(0)
 
-    }
+
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {
-        parcel.writeSerializable(code)
-        parcel.writeString(message)
+        parcel.writeInt(code)
+        parcel.writeString(domain)
     }
 
-    fun readFromParcel(inParcel: Parcel) {
-        code = inParcel.readSerializable() as WalletErrorCode
-        message = inParcel.readString()
-    }
+    override fun describeContents(): Int = 0
 
-    override fun describeContents(): Int {
-        return 0
-    }
+    companion object {
+        @JvmField val CREATOR = object : Parcelable.Creator<CoreError> {
+            override fun createFromParcel(parcel: Parcel): CoreError = CoreError(parcel)
 
-    // endregion
+            override fun newArray(size: Int): Array<CoreError?> = arrayOfNulls(size)
+        }
+    }
 }
 
-class WalletException(val walletError: WalletError) : RuntimeException(walletError.message) {
-    override fun toString(): String = "Unhandled wallet error: ${walletError.code}"
-}
-
-internal fun throwIf(error: WalletError) {
-    if (error.code != WalletErrorCode.NO_ERROR) {
+internal fun throwIf(error: CoreError?) {
+    if (error != null && error.code != 0) {
         throw WalletException(error)
     }
+}
+
+class WalletException(val walletError: CoreError) : RuntimeException(walletError.signature) {
+    override fun toString(): String = "Unhandled wallet error: ${walletError.code}"
 }

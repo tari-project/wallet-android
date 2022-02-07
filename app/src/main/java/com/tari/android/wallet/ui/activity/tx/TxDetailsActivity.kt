@@ -33,7 +33,10 @@
 package com.tari.android.wallet.ui.activity.tx
 
 import android.annotation.SuppressLint
-import android.content.*
+import android.content.ComponentName
+import android.content.Context
+import android.content.Intent
+import android.content.ServiceConnection
 import android.os.Bundle
 import android.os.Handler
 import android.os.IBinder
@@ -80,6 +83,7 @@ import com.tari.android.wallet.ui.component.EmojiIdSummaryViewController
 import com.tari.android.wallet.ui.component.FullEmojiIdViewController
 import com.tari.android.wallet.ui.dialog.BottomSlideDialog
 import com.tari.android.wallet.ui.dialog.error.ErrorDialog
+import com.tari.android.wallet.ui.dialog.error.ErrorDialogArgs
 import com.tari.android.wallet.ui.extension.*
 import com.tari.android.wallet.ui.presentation.TxNote
 import com.tari.android.wallet.util.WalletUtil
@@ -196,12 +200,8 @@ internal class TxDetailsActivity : AppCompatActivity(), ServiceConnection {
     private fun findTxAndUpdateUI(walletService: TariWalletService) {
         val lookedUpTx = findTxById(intent.getParcelableExtra(TX_ID_EXTRA_KEY)!!, walletService)
         if (lookedUpTx == null) {
-            ErrorDialog(
-                this,
-                title = string(tx_details_error_tx_not_found_title),
-                description = string(tx_details_error_tx_not_found_desc),
-                onClose = { finish() }
-            ).show()
+            val args = ErrorDialogArgs(string(tx_details_error_tx_not_found_title), string(tx_details_error_tx_not_found_desc)) { finish() }
+            ErrorDialog(this, args).show()
         } else {
             tx = lookedUpTx
             fetchRequiredConfirmationCount()
@@ -216,9 +216,7 @@ internal class TxDetailsActivity : AppCompatActivity(), ServiceConnection {
         val error = WalletError()
         val service = walletService!!
         requiredConfirmationCount = service.getRequiredConfirmationCount(error)
-        if (error.code != WalletErrorCode.NO_ERROR) {
-            TODO("Unhandled wallet error: ${error.code}")
-        }
+        throwIf(error)
     }
 
     private fun fetchGIFIfAttached() {
@@ -229,16 +227,10 @@ internal class TxDetailsActivity : AppCompatActivity(), ServiceConnection {
     }
 
     private fun findTxById(id: TxId, walletService: TariWalletService): Tx? =
-        nullOnException { walletService.getPendingInboundTxById(id, WalletError()) }
-            ?: nullOnException { walletService.getPendingOutboundTxById(id, WalletError()) }
-            ?: nullOnException { walletService.getCompletedTxById(id, WalletError()) }
-            ?: nullOnException { walletService.getCancelledTxById(id, WalletError()) }
-
-    private fun <T> nullOnException(supplier: () -> T): T? = try {
-        supplier()
-    } catch (e: Exception) {
-        null
-    }
+        runCatching { walletService.getPendingInboundTxById(id, WalletError()) }.getOrNull()
+            ?: runCatching { walletService.getPendingOutboundTxById(id, WalletError()) }.getOrNull()
+            ?: runCatching { walletService.getCompletedTxById(id, WalletError()) }.getOrNull()
+            ?: runCatching { walletService.getCancelledTxById(id, WalletError()) }.getOrNull()
 
     /**
      * Wallet service disconnected.
@@ -386,9 +378,7 @@ internal class TxDetailsActivity : AppCompatActivity(), ServiceConnection {
         val state = TxState.from(tx)
         val error = WalletError()
         val requiredConfirmation = walletService?.getRequiredConfirmationCount(error) ?: 0
-        if (error.code != WalletErrorCode.NO_ERROR) {
-            TODO("Unhandled wallet error: ${error.code}")
-        }
+        throwIf(error)
 
         val statusText = when {
             tx is CancelledTx -> ""
@@ -507,17 +497,12 @@ internal class TxDetailsActivity : AppCompatActivity(), ServiceConnection {
     private fun cancelTransaction(service: TariWalletService) {
         val error = WalletError()
         val isCancelled = service.cancelPendingTx(TxId(this.tx.id), error)
-        if (isCancelled || error.code == WalletErrorCode.NO_ERROR) {
+        if (isCancelled || error == WalletError.NoError) {
             this.ui.cancelTxView.setOnClickListener(null)
         } else {
-            ErrorDialog(
-                this, string(tx_detail_cancellation_error_title),
-                string(tx_detail_cancellation_error_description)
-            ).show()
-            Logger.e(
-                "Error occurred during TX cancellation.\nCancelled? $isCancelled" +
-                        "\nError: $error"
-            )
+            val args = ErrorDialogArgs(string(tx_detail_cancellation_error_title), string(tx_detail_cancellation_error_description))
+            ErrorDialog(this, args).show()
+            Logger.e("Error occurred during TX cancellation.\nCancelled? $isCancelled\nError: $error")
         }
     }
 
@@ -526,12 +511,11 @@ internal class TxDetailsActivity : AppCompatActivity(), ServiceConnection {
         val contact = currentTx.user as? Contact ?: return
         val error = WalletError()
         walletService?.removeContact(contact, error)
-        if (error.code == WalletErrorCode.NO_ERROR) {
-            currentTx.user = User(contact.publicKey)
-            EventBus.post(Event.Contact.ContactRemoved(contact.publicKey))
-        } else {
-            TODO("Unhandled wallet error: ${error.code}")
-        }
+        throwIf(error)
+
+        currentTx.user = User(contact.publicKey)
+        EventBus.post(Event.Contact.ContactRemoved(contact.publicKey))
+
         bindTxData()
     }
 
@@ -540,24 +524,11 @@ internal class TxDetailsActivity : AppCompatActivity(), ServiceConnection {
             return
         }
         val error = WalletError()
-        walletService?.updateContactAlias(
-            tx.user.publicKey,
-            newAlias,
-            error
-        )
-        if (error.code == WalletErrorCode.NO_ERROR) {
-            // update tx contact
-            val contact = Contact(tx.user.publicKey, newAlias)
-            tx.user = contact
-            EventBus.post(
-                Event.Contact.ContactAddedOrUpdated(
-                    tx.user.publicKey,
-                    newAlias
-                )
-            )
-        } else {
-            TODO("Unhandled wallet error: ${error.code}")
-        }
+        walletService?.updateContactAlias(tx.user.publicKey, newAlias, error)
+        throwIf(error)
+
+        tx.user = Contact(tx.user.publicKey, newAlias)
+        EventBus.post(Event.Contact.ContactAddedOrUpdated(tx.user.publicKey, newAlias))
     }
 
     private fun setUIAlias(alias: String) {
@@ -615,7 +586,7 @@ internal class TxDetailsActivity : AppCompatActivity(), ServiceConnection {
     class GIFViewModel() : CommonViewModel() {
 
         init {
-            component?.inject(this)
+            component.inject(this)
         }
 
         @Inject

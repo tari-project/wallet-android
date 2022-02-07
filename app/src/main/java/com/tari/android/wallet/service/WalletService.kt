@@ -32,7 +32,6 @@
  */
 package com.tari.android.wallet.service
 
-import android.annotation.SuppressLint
 import android.app.Service
 import android.content.Intent
 import android.os.Handler
@@ -634,7 +633,7 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
 
     private fun sendPushNotificationToTxRecipient(recipientPublicKeyHex: String) {
         // the push notification server accepts lower-case hex strings as of now
-        val fromPublicKeyHex = wallet.getPublicKey().toString().toLowerCase(Locale.ENGLISH)
+        val fromPublicKeyHex = wallet.getPublicKey().toString().lowercase(Locale.ENGLISH)
         Logger.d(
             "Will send push notification to recipient %s from %s.",
             recipientPublicKeyHex,
@@ -703,22 +702,29 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
                 }
             }
 
-        /**
-         * Maps the throwable into the error out parameter.
-         */
-        private fun mapThrowableIntoError(throwable: Throwable, error: WalletError) {
-            error.code = WalletErrorCode.UNKNOWN_ERROR
-            error.message = throwable.message
+
+        private fun mapThrowableIntoError(walletError: WalletError, throwable: Throwable) {
             if (throwable is FFIException) {
                 if (throwable.error != null) {
-                    error.code = WalletErrorCode.fromCode(throwable.error.code)
+                    walletError.code = throwable.error.code
+                    return
                 }
+            }
+            // todo maybe put message or something
+            walletError.code = WalletError.UnknownError.code
+        }
+
+        private fun <T> executeWithMapping(walletError: WalletError, onError: (Throwable) -> (Unit) = {}, action: () -> T?): T? {
+            return try {
+                action()
+            } catch (throwable: Throwable) {
+                onError(throwable)
+                mapThrowableIntoError(walletError, throwable)
+                null
             }
         }
 
-        private fun getContactByPublicKeyHexString(
-            hexString: String
-        ): Contact? = cachedContacts.firstOrNull { it.publicKey.hexString == hexString }
+        private fun getContactByPublicKeyHexString(hexString: String): Contact? = cachedContacts.firstOrNull { it.publicKey.hexString == hexString }
 
         override fun registerListener(listener: TariWalletServiceListener): Boolean {
             listeners.add(listener)
@@ -729,318 +735,162 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
             return true
         }
 
-        override fun unregisterListener(listener: TariWalletServiceListener): Boolean {
-            return listeners.remove(listener)
-        }
+        override fun unregisterListener(listener: TariWalletServiceListener): Boolean = listeners.remove(listener)
 
-        override fun getPublicKeyHexString(error: WalletError): String? {
-            return try {
-                wallet.getPublicKey().toString()
-            } catch (throwable: Throwable) {
-                mapThrowableIntoError(throwable, error)
-                null
-            }
-        }
+        override fun getPublicKeyHexString(error: WalletError): String? = executeWithMapping(error) { wallet.getPublicKey().toString() }
 
-        /**
-         * Wallet balance info.
-         */
-        override fun getBalanceInfo(error: WalletError): BalanceInfo {
-            return wallet.getBalance()
-        }
+        override fun getBalanceInfo(error: WalletError): BalanceInfo? = executeWithMapping(error) { wallet.getBalance() }
 
-        override fun estimateTxFee(
-            amount: MicroTari,
-            error: WalletError
-        ): MicroTari? {
+        override fun estimateTxFee(amount: MicroTari, error: WalletError): MicroTari? = executeWithMapping(error) {
             val defaultKernelCount = BigInteger("1")
             val defaultOutputCount = BigInteger("2")
-            return try {
-                MicroTari(
-                    wallet.estimateTxFee(
-                        amount.value,
-                        Constants.Wallet.defaultFeePerGram.value,
-                        defaultKernelCount,
-                        defaultOutputCount
-                    )
+            MicroTari(
+                wallet.estimateTxFee(
+                    amount.value,
+                    Constants.Wallet.defaultFeePerGram.value,
+                    defaultKernelCount,
+                    defaultOutputCount
                 )
-            } catch (throwable: Throwable) {
-                mapThrowableIntoError(throwable, error)
-                null
-            }
+            )
         }
 
         /**
          * Get all contacts.
          */
-        override fun getContacts(error: WalletError): List<Contact>? {
-            return try {
-                cachedContacts
-            } catch (throwable: Throwable) {
-                mapThrowableIntoError(throwable, error)
-                null
-            }
-        }
+        override fun getContacts(error: WalletError): List<Contact>? = executeWithMapping(error) { cachedContacts }
 
         /**
          * Get all completed transactions.
          * Client-facing function.
          */
-        override fun getCompletedTxs(error: WalletError): List<CompletedTx>? {
-            return try {
-                val completedTxsFFI = wallet.getCompletedTxs()
-                return (0 until completedTxsFFI.getLength())
-                    .map {
-                        val completedTxFFI = completedTxsFFI.getAt(it)
-                        completedTxFromFFI(completedTxFFI).also {
-                            completedTxFFI.destroy()
-                        }
-                    }.also {
-                        completedTxsFFI.destroy()
-                    }
-            } catch (throwable: Throwable) {
-                mapThrowableIntoError(throwable, error)
-                null
-            }
+        override fun getCompletedTxs(error: WalletError): List<CompletedTx>? = executeWithMapping(error) {
+            val completedTxsFFI = wallet.getCompletedTxs()
+            (0 until completedTxsFFI.getLength())
+                .map {
+                    val completedTxFFI = completedTxsFFI.getAt(it)
+                    completedTxFromFFI(completedTxFFI).also { completedTxFFI.destroy() }
+                }.also { completedTxsFFI.destroy() }
         }
 
-        override fun getCancelledTxs(error: WalletError): List<CancelledTx>? {
-            return try {
-                val canceledTxsFFI = wallet.getCancelledTxs()
-                return (0 until canceledTxsFFI.getLength())
-                    .map {
-                        val cancelledTxFFI = canceledTxsFFI.getAt(it)
-                        cancelledTxFromFFI(cancelledTxFFI).also {
-                            cancelledTxFFI.destroy()
-                        }
-                    }.also { canceledTxsFFI.destroy() }
-            } catch (throwable: Throwable) {
-                mapThrowableIntoError(throwable, error)
-                null
-            }
+        override fun getCancelledTxs(error: WalletError): List<CancelledTx>? = executeWithMapping(error) {
+            val canceledTxsFFI = wallet.getCancelledTxs()
+            (0 until canceledTxsFFI.getLength())
+                .map {
+                    val cancelledTxFFI = canceledTxsFFI.getAt(it)
+                    cancelledTxFromFFI(cancelledTxFFI).also { cancelledTxFFI.destroy() }
+                }.also { canceledTxsFFI.destroy() }
         }
 
         /**
          * Get completed transaction by id.
          * Client-facing function.
          */
-        override fun getCancelledTxById(id: TxId, error: WalletError): CancelledTx? {
-            return try {
-                val completedTxFFI = wallet.getCancelledTxById(id.value)
-                cancelledTxFromFFI(completedTxFFI).also {
-                    completedTxFFI.destroy()
-                }
-            } catch (throwable: Throwable) {
-                mapThrowableIntoError(throwable, error)
-                null
-            }
+        override fun getCancelledTxById(id: TxId, error: WalletError): CancelledTx? = executeWithMapping(error) {
+            val completedTxFFI = wallet.getCancelledTxById(id.value)
+            cancelledTxFromFFI(completedTxFFI).also { completedTxFFI.destroy() }
         }
 
         /**
          * Get completed transaction by id.
          * Client-facing function.
          */
-        override fun getCompletedTxById(id: TxId, error: WalletError): CompletedTx? {
-            return try {
-                val completedTxFFI = wallet.getCompletedTxById(id.value)
-                completedTxFromFFI(completedTxFFI).also {
-                    completedTxFFI.destroy()
-                }
-            } catch (throwable: Throwable) {
-                mapThrowableIntoError(throwable, error)
-                null
-            }
+        override fun getCompletedTxById(id: TxId, error: WalletError): CompletedTx? = executeWithMapping(error) {
+            val completedTxFFI = wallet.getCompletedTxById(id.value)
+            completedTxFromFFI(completedTxFFI).also { completedTxFFI.destroy() }
         }
 
         /**
          * Get all pending inbound transactions.
          * Client-facing function.
          */
-        override fun getPendingInboundTxs(error: WalletError): List<PendingInboundTx>? {
-            return try {
-                val pendingInboundTxsFFI = wallet.getPendingInboundTxs()
-                return (0 until pendingInboundTxsFFI.getLength())
-                    .map {
-                        val pendingInboundTxFFI = pendingInboundTxsFFI.getAt(it)
-                        pendingInboundTxFromFFI(pendingInboundTxFFI).also {
-                            pendingInboundTxFFI.destroy()
-                        }
-                    }.also { pendingInboundTxsFFI.destroy() }
-            } catch (throwable: Throwable) {
-                mapThrowableIntoError(throwable, error)
-                null
-            }
+        override fun getPendingInboundTxs(error: WalletError): List<PendingInboundTx>? = executeWithMapping(error) {
+            val pendingInboundTxsFFI = wallet.getPendingInboundTxs()
+            (0 until pendingInboundTxsFFI.getLength())
+                .map {
+                    val pendingInboundTxFFI = pendingInboundTxsFFI.getAt(it)
+                    pendingInboundTxFromFFI(pendingInboundTxFFI).also { pendingInboundTxFFI.destroy() }
+                }.also { pendingInboundTxsFFI.destroy() }
         }
 
         /**
          * Get pending inbound transaction by id.
          * Client-facing function.
          */
-        override fun getPendingInboundTxById(id: TxId, error: WalletError): PendingInboundTx? {
-            return try {
-                val pendingInboundTxFFI = wallet.getPendingInboundTxById(id.value)
-                pendingInboundTxFromFFI(pendingInboundTxFFI).also {
-                    pendingInboundTxFFI.destroy()
-                }
-            } catch (throwable: Throwable) {
-                mapThrowableIntoError(throwable, error)
-                null
-            }
+        override fun getPendingInboundTxById(id: TxId, error: WalletError): PendingInboundTx? = executeWithMapping(error) {
+            val pendingInboundTxFFI = wallet.getPendingInboundTxById(id.value)
+            pendingInboundTxFromFFI(pendingInboundTxFFI).also { pendingInboundTxFFI.destroy() }
         }
 
         /**
          * Get all pending outbound transactions.
          * Client-facing function.
          */
-        override fun getPendingOutboundTxs(error: WalletError): List<PendingOutboundTx>? {
-            return try {
-                val pendingOutboundTxsFFI = wallet.getPendingOutboundTxs()
-                return (0 until pendingOutboundTxsFFI.getLength())
-                    .map {
-                        val pendingOutboundTxFFI = pendingOutboundTxsFFI.getAt(it)
-                        pendingOutboundTxFromFFI(pendingOutboundTxFFI).also {
-                            pendingOutboundTxFFI.destroy()
-                        }
-                    }.also { pendingOutboundTxsFFI.destroy() }
-            } catch (throwable: Throwable) {
-                mapThrowableIntoError(throwable, error)
-                null
-            }
+        override fun getPendingOutboundTxs(error: WalletError): List<PendingOutboundTx>? = executeWithMapping(error) {
+            val pendingOutboundTxsFFI = wallet.getPendingOutboundTxs()
+            (0 until pendingOutboundTxsFFI.getLength())
+                .map {
+                    val pendingOutboundTxFFI = pendingOutboundTxsFFI.getAt(it)
+                    pendingOutboundTxFromFFI(pendingOutboundTxFFI).also { pendingOutboundTxFFI.destroy() }
+                }.also { pendingOutboundTxsFFI.destroy() }
         }
 
         /**
          * Get pending outbound transaction by id.
          * Client-facing function.
          */
-        override fun getPendingOutboundTxById(id: TxId, error: WalletError): PendingOutboundTx? {
-            return try {
-                val pendingOutboundTxFFI = wallet.getPendingOutboundTxById(id.value)
-                return pendingOutboundTxFromFFI(pendingOutboundTxFFI).also {
-                    pendingOutboundTxFFI.destroy()
-                }
-            } catch (throwable: Throwable) {
-                mapThrowableIntoError(throwable, error)
-                null
-            }
+        override fun getPendingOutboundTxById(id: TxId, error: WalletError): PendingOutboundTx? = executeWithMapping(error) {
+            val pendingOutboundTxFFI = wallet.getPendingOutboundTxById(id.value)
+            pendingOutboundTxFromFFI(pendingOutboundTxFFI).also { pendingOutboundTxFFI.destroy() }
         }
 
-        override fun cancelPendingTx(id: TxId, error: WalletError): Boolean {
-            return try {
-                wallet.cancelPendingTx(id.value)
-            } catch (throwable: Throwable) {
-                mapThrowableIntoError(throwable, error)
-                false
-            }
-        }
+        override fun cancelPendingTx(id: TxId, error: WalletError): Boolean = executeWithMapping(error) {
+            wallet.cancelPendingTx(id.value)
+        } ?: false
 
-        override fun addBaseNodePeer(
-            baseNodePublicKey: String,
-            baseNodeAddress: String,
-            error: WalletError
-        ): Boolean {
-            return try {
-                val publicKeyFFI = FFIPublicKey(HexString(baseNodePublicKey))
-                val result = wallet.addBaseNodePeer(publicKeyFFI, baseNodeAddress)
-                publicKeyFFI.destroy()
-                if (result) {
-                    baseNodeValidationStatusMap.clear()
-                }
-                result
-            } catch (throwable: Throwable) {
-                mapThrowableIntoError(throwable, error)
-                false
-            }
-        }
-
-        override fun startBaseNodeSync(error: WalletError): Boolean {
-            baseNodeValidationStatusMap.clear()
-            return try {
-                baseNodeValidationStatusMap[BaseNodeValidationType.TXO] = Pair(wallet.startTXOValidation(), null)
-                baseNodeValidationStatusMap[BaseNodeValidationType.TX] = Pair(wallet.startTxValidation(), null)
-                baseNodeSharedPrefsRepository.baseNodeLastSyncResult = null
-                EventBus.baseNodeState.post(BaseNodeState.SyncStarted)
-                true
-            } catch (throwable: Throwable) {
-                Logger.e("Base node validation error: $throwable")
-                baseNodeSharedPrefsRepository.baseNodeLastSyncResult = false
+        override fun addBaseNodePeer(baseNodePublicKey: String, baseNodeAddress: String, error: WalletError): Boolean = executeWithMapping(error) {
+            val publicKeyFFI = FFIPublicKey(HexString(baseNodePublicKey))
+            val result = wallet.addBaseNodePeer(publicKeyFFI, baseNodeAddress)
+            publicKeyFFI.destroy()
+            if (result) {
                 baseNodeValidationStatusMap.clear()
-                mapThrowableIntoError(throwable, error)
-                false
             }
-        }
+            result
+        } ?: false
 
-        override fun sendTari(
-            user: User,
-            amount: MicroTari,
-            feePerGram: MicroTari,
-            message: String,
-            error: WalletError
-        ): TxId? {
-            return try {
+        override fun startBaseNodeSync(error: WalletError): Boolean = executeWithMapping(error, {
+            Logger.e("Base node validation error: $it")
+            baseNodeSharedPrefsRepository.baseNodeLastSyncResult = false
+            baseNodeValidationStatusMap.clear()
+        }) {
+            baseNodeValidationStatusMap.clear()
+            baseNodeValidationStatusMap[BaseNodeValidationType.TXO] = Pair(wallet.startTXOValidation(), null)
+            baseNodeValidationStatusMap[BaseNodeValidationType.TX] = Pair(wallet.startTxValidation(), null)
+            baseNodeSharedPrefsRepository.baseNodeLastSyncResult = null
+            EventBus.baseNodeState.post(BaseNodeState.SyncStarted)
+            true
+        } ?: false
+
+        override fun sendTari(user: User, amount: MicroTari, feePerGram: MicroTari, message: String, error: WalletError): TxId? =
+            executeWithMapping(error) {
                 val recipientPublicKeyHex = user.publicKey.hexString
                 val publicKeyFFI = FFIPublicKey(HexString(recipientPublicKeyHex))
-                val txId = wallet.sendTx(
-                    publicKeyFFI,
-                    amount.value,
-                    feePerGram.value,
-                    message
-                )
+                val txId = wallet.sendTx(publicKeyFFI, amount.value, feePerGram.value, message)
                 publicKeyFFI.destroy()
-                outboundTxIdsToBePushNotified.add(
-                    Pair(txId, recipientPublicKeyHex.toLowerCase(Locale.ENGLISH))
-                )
+                outboundTxIdsToBePushNotified.add(Pair(txId, recipientPublicKeyHex.lowercase(Locale.ENGLISH)))
                 TxId(txId)
-            } catch (throwable: Throwable) {
-                mapThrowableIntoError(throwable, error)
-                null
             }
-        }
 
         // region FFI to model extraction functions
-        private fun publicKeyFromFFI(
-            publicKeyFFI: FFIPublicKey
-        ): PublicKey {
-            return PublicKey(
-                publicKeyFFI.toString(),
-                publicKeyFFI.getEmojiId()
-            )
-        }
+        private fun publicKeyFromFFI(publicKeyFFI: FFIPublicKey): PublicKey = PublicKey(publicKeyFFI.toString(), publicKeyFFI.getEmojiId())
 
         private fun completedTxFromFFI(completedTxFFI: FFICompletedTx): CompletedTx {
-            val sourcePublicKeyFFI = completedTxFFI.getSourcePublicKey()
-            val destinationPublicKeyFFI = completedTxFFI.getDestinationPublicKey()
             val status = TxStatus.map(completedTxFFI.getStatus())
-            val user: User
-            val direction: Tx.Direction
+            val user = getUser(completedTxFFI)
 
-            // get public key
-            val error = WalletError()
-            if (error.code != WalletErrorCode.NO_ERROR) {
-                throw FFIException(message = error.message)
-            }
-            if (completedTxFFI.isOutbound()) {
-                direction = OUTBOUND
-                val userPublicKey = PublicKey(
-                    destinationPublicKeyFFI.toString(),
-                    destinationPublicKeyFFI.getEmojiId()
-                )
-                user = getContactByPublicKeyHexString(
-                    destinationPublicKeyFFI.toString()
-                ) ?: User(userPublicKey)
-            } else {
-                direction = INBOUND
-                val userPublicKey = PublicKey(
-                    sourcePublicKeyFFI.toString(),
-                    sourcePublicKeyFFI.getEmojiId()
-                )
-                user = getContactByPublicKeyHexString(
-                    sourcePublicKeyFFI.toString()
-                ) ?: User(userPublicKey)
-            }
-            val completedTx = CompletedTx(
+            return CompletedTx(
                 completedTxFFI.getId(),
-                direction,
-                user,
+                user.second,
+                user.first,
                 MicroTari(completedTxFFI.getAmount()),
                 MicroTari(completedTxFFI.getFee()),
                 completedTxFFI.getTimestamp(),
@@ -1048,75 +898,56 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
                 status,
                 completedTxFFI.getConfirmationCount()
             )
-            // destroy native objects
-            sourcePublicKeyFFI.destroy()
-            destinationPublicKeyFFI.destroy()
-            return completedTx
         }
 
         private fun cancelledTxFromFFI(completedTxFFI: FFICompletedTx): CancelledTx {
-            val sourcePublicKeyFFI = completedTxFFI.getSourcePublicKey()
-            val destinationPublicKeyFFI = completedTxFFI.getDestinationPublicKey()
             val status = TxStatus.map(completedTxFFI.getStatus())
-            val user: User
-            val direction: Tx.Direction
 
-            // get public key
-            val error = WalletError()
-            if (error.code != WalletErrorCode.NO_ERROR) {
-                throw FFIException(message = error.message)
+            if (status != TxStatus.UNKNOWN) {
+                Logger.d("Canceled TX's status is not UNKNOWN but rather $status.\n$completedTxFFI")
             }
 
-            if (completedTxFFI.isOutbound()) {
-                direction = OUTBOUND
-                val userPublicKey = PublicKey(
-                    destinationPublicKeyFFI.toString(),
-                    destinationPublicKeyFFI.getEmojiId()
-                )
-                user = getContactByPublicKeyHexString(
-                    destinationPublicKeyFFI.toString()
-                ) ?: User(userPublicKey)
-            } else {
-                direction = INBOUND
-                val userPublicKey = PublicKey(
-                    sourcePublicKeyFFI.toString(),
-                    sourcePublicKeyFFI.getEmojiId()
-                )
-                user = getContactByPublicKeyHexString(
-                    sourcePublicKeyFFI.toString()
-                ) ?: User(userPublicKey)
-            }
-            val tx = CancelledTx(
+            val user = getUser(completedTxFFI)
+
+            return CancelledTx(
                 completedTxFFI.getId(),
-                direction,
-                user,
+                user.second,
+                user.first,
                 MicroTari(completedTxFFI.getAmount()),
                 MicroTari(completedTxFFI.getFee()),
                 completedTxFFI.getTimestamp(),
                 completedTxFFI.getMessage(),
                 status
             )
-            // destroy native objects
-            sourcePublicKeyFFI.destroy()
-            destinationPublicKeyFFI.destroy()
-            if (status != TxStatus.UNKNOWN) {
-                Logger.d("Canceled TX's status is not UNKNOWN but rather $status.\n$tx")
-            }
-            return tx
         }
 
-        private fun pendingInboundTxFromFFI(
-            pendingInboundTxFFI: FFIPendingInboundTx
-        ): PendingInboundTx {
+        private fun getUser(completedTxFFI: FFICompletedTx): Pair<User, Tx.Direction> {
+            val sourcePublicKeyFFI = completedTxFFI.getSourcePublicKey()
+            val destinationPublicKeyFFI = completedTxFFI.getDestinationPublicKey()
+            val user: User
+            val direction: Tx.Direction
+
+            if (completedTxFFI.isOutbound()) {
+                direction = OUTBOUND
+                val userPublicKey = PublicKey(destinationPublicKeyFFI.toString(), destinationPublicKeyFFI.getEmojiId())
+                user = getContactByPublicKeyHexString(destinationPublicKeyFFI.toString()) ?: User(userPublicKey)
+            } else {
+                direction = INBOUND
+                val userPublicKey = PublicKey(sourcePublicKeyFFI.toString(), sourcePublicKeyFFI.getEmojiId())
+                user = getContactByPublicKeyHexString(sourcePublicKeyFFI.toString()) ?: User(userPublicKey)
+            }
+            sourcePublicKeyFFI.destroy()
+            destinationPublicKeyFFI.destroy()
+
+            return Pair(user, direction)
+        }
+
+        private fun pendingInboundTxFromFFI(pendingInboundTxFFI: FFIPendingInboundTx): PendingInboundTx {
             val status = TxStatus.map(pendingInboundTxFFI.getStatus())
             val sourcePublicKeyFFI = pendingInboundTxFFI.getSourcePublicKey()
-            val userPublicKey = PublicKey(
-                sourcePublicKeyFFI.toString(),
-                sourcePublicKeyFFI.getEmojiId()
-            )
-            val user = getContactByPublicKeyHexString(
-                sourcePublicKeyFFI.toString()
-            ) ?: User(userPublicKey)
+            val userPublicKey = PublicKey(sourcePublicKeyFFI.toString(), sourcePublicKeyFFI.getEmojiId())
+            val user = getContactByPublicKeyHexString(sourcePublicKeyFFI.toString()) ?: User(userPublicKey)
+
             val pendingInboundTx = PendingInboundTx(
                 pendingInboundTxFFI.getId(),
                 user,
@@ -1130,18 +961,12 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
             return pendingInboundTx
         }
 
-        private fun pendingOutboundTxFromFFI(
-            pendingOutboundTxFFI: FFIPendingOutboundTx
-        ): PendingOutboundTx {
+        private fun pendingOutboundTxFromFFI(pendingOutboundTxFFI: FFIPendingOutboundTx): PendingOutboundTx {
             val status = TxStatus.map(pendingOutboundTxFFI.getStatus())
             val destinationPublicKeyFFI = pendingOutboundTxFFI.getDestinationPublicKey()
-            val userPublicKey = PublicKey(
-                destinationPublicKeyFFI.toString(),
-                destinationPublicKeyFFI.getEmojiId()
-            )
-            val user = getContactByPublicKeyHexString(
-                destinationPublicKeyFFI.toString()
-            ) ?: User(userPublicKey)
+            val userPublicKey = PublicKey(destinationPublicKeyFFI.toString(), destinationPublicKeyFFI.getEmojiId())
+            val user = getContactByPublicKeyHexString(destinationPublicKeyFFI.toString()) ?: User(userPublicKey)
+
             val pendingOutboundTx = PendingOutboundTx(
                 pendingOutboundTxFFI.getId(),
                 user,
@@ -1156,13 +981,12 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
             return pendingOutboundTx
         }
 
-        @SuppressLint("CheckResult")
         override fun requestTestnetTari(error: WalletError) {
             // avoid multiple faucet requests
             if (testnetFaucetRepository.faucetTestnetTariRequestCompleted) return
             // get public key
             val publicKeyHexString = getPublicKeyHexString(error)
-            if (error.code != WalletErrorCode.NO_ERROR || publicKeyHexString == null) {
+            if (error.code != WalletError.NoError.code || publicKeyHexString == null) {
                 notifyTestnetTariRequestFailed("Service error.")
                 return
             }
@@ -1197,12 +1021,10 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
                 },
                 {
                     Logger.i("requestMaxTestnetTari error ${it.message}")
-                    error.code = WalletErrorCode.UNKNOWN_ERROR
-                    val errorMessage =
-                        string(R.string.wallet_service_error_testnet_tari_request) +
-                                " " +
-                                it.message
-                    error.message = errorMessage
+                    error.code = WalletError.UnknownError.code
+                    val errorMessage = string(R.string.wallet_service_error_testnet_tari_request) + " " + it.message
+                    // todo maybe needed
+//                    error.message = errorMessage
                     if (it is TestnetTariRequestException) {
                         notifyTestnetTariRequestFailed(errorMessage)
                     } else {
@@ -1214,191 +1036,118 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
 
         override fun importTestnetUTXO(txMessage: String, error: WalletError): CompletedTx? {
             val keys = testnetFaucetRepository.testnetTariUTXOKeyList.orEmpty()
-            if (keys.isEmpty()) {
-                return null
-            }
+            if (keys.isEmpty()) return null
+
             val firstUTXOKey = keys.first()
             val senderPublicKeyFFI = FFIPublicKey(HexString(firstUTXOKey.senderPublicKeyHex!!))
-            val txId: BigInteger
             val privateKey = FFIPrivateKey(HexString(firstUTXOKey.key))
             val scriptPrivateKey = FFIPrivateKey(HexString(firstUTXOKey.key))
             val amount = BigInteger(firstUTXOKey.value)
-            txId = wallet.importUTXO(
+            val senderPublicKey = FFIPublicKey(HexString(firstUTXOKey.output.senderOffsetPublicKey))
+            val signature = FFITariCommitmentSignature(
+                FFIByteVector(HexString(firstUTXOKey.output.metadataSignature.public_nonce)),
+                FFIByteVector(HexString(firstUTXOKey.output.metadataSignature.u)),
+                FFIByteVector(HexString(firstUTXOKey.output.metadataSignature.v))
+            )
+            val txId = wallet.importUTXO(
                 amount,
                 txMessage,
                 privateKey,
                 senderPublicKeyFFI,
-                FFITariCommitmentSignature(
-                    FFIByteVector(HexString(firstUTXOKey.output.metadataSignature.public_nonce)),
-                    FFIByteVector(HexString(firstUTXOKey.output.metadataSignature.u)),
-                    FFIByteVector(HexString(firstUTXOKey.output.metadataSignature.v))
-                ),
-                FFIPublicKey(HexString(firstUTXOKey.output.senderOffsetPublicKey)),
+                signature,
+                senderPublicKey,
                 scriptPrivateKey
             )
             privateKey.destroy()
             senderPublicKeyFFI.destroy()
+            signature.destroy()
             // remove the used key
             keys.remove(firstUTXOKey)
             testnetFaucetRepository.testnetTariUTXOKeyList = keys
             // get transaction and post notification
             val tx = getCompletedTxById(TxId(txId), error)
-            if (error.code != WalletErrorCode.NO_ERROR || tx == null) {
-                return null
-            }
+            if (error != WalletError.NoError || tx == null) return null
+
             postTxNotification(tx)
             return tx
         }
 
-        override fun removeContact(contact: Contact, error: WalletError): Boolean {
-            try {
-                val contactsFFI = wallet.getContacts()
-                for (i in 0 until contactsFFI.getLength()) {
-                    val contactFFI = contactsFFI.getAt(i)
-                    val publicKeyFFI = contactFFI.getPublicKey()
-                    if (publicKeyFFI.toString() == contact.publicKey.hexString) {
-                        return wallet.removeContact(contactFFI).also {
-                            publicKeyFFI.destroy()
-                            contactFFI.destroy()
-                            contactsFFI.destroy()
-                            _cachedContacts = null
-                        }
+        override fun removeContact(contact: Contact, error: WalletError): Boolean = executeWithMapping(error) {
+            val contactsFFI = wallet.getContacts()
+            for (i in 0 until contactsFFI.getLength()) {
+                val contactFFI = contactsFFI.getAt(i)
+                val publicKeyFFI = contactFFI.getPublicKey()
+                if (publicKeyFFI.toString() == contact.publicKey.hexString) {
+                    return@executeWithMapping wallet.removeContact(contactFFI).also {
+                        publicKeyFFI.destroy()
+                        contactFFI.destroy()
+                        contactsFFI.destroy()
+                        _cachedContacts = null
                     }
-                    publicKeyFFI.destroy()
-                    contactFFI.destroy()
                 }
-                contactsFFI.destroy()
-            } catch (throwable: Throwable) {
-                mapThrowableIntoError(throwable, error)
+                publicKeyFFI.destroy()
+                contactFFI.destroy()
             }
-            return false
-        }
+            contactsFFI.destroy()
+            false
+        } ?: false
 
         private fun notifyTestnetTariRequestFailed(error: String) {
             // post event to bus for the internal listeners
             EventBus.post(Event.Testnet.TestnetTariRequestError(error))
             // notify external listeners
-            listeners.iterator().forEach { listener ->
-                listener.onTestnetTariRequestError(error)
-            }
+            listeners.iterator().forEach { listener -> listener.onTestnetTariRequestError(error) }
         }
 
-        override fun updateContactAlias(
-            publicKey: PublicKey,
-            alias: String,
-            error: WalletError
-        ): Boolean {
-            try {
-                val publicKeyFFI = FFIPublicKey(HexString(publicKey.hexString))
-                val contact = FFIContact(alias, publicKeyFFI)
-                return wallet.addUpdateContact(contact).also {
-                    publicKeyFFI.destroy()
-                    contact.destroy()
-                    _cachedContacts = null
-                }
-            } catch (throwable: Throwable) {
-                mapThrowableIntoError(throwable, error)
+        override fun updateContactAlias(publicKey: PublicKey, alias: String, error: WalletError): Boolean = executeWithMapping(error) {
+            val publicKeyFFI = FFIPublicKey(HexString(publicKey.hexString))
+            val contact = FFIContact(alias, publicKeyFFI)
+            wallet.addUpdateContact(contact).also {
+                publicKeyFFI.destroy()
+                contact.destroy()
+                _cachedContacts = null
             }
-            return false
-        }
+        } ?: false
 
         /**
          * @return public key constructed from input emoji id. Null if the emoji id is invalid
          * or it does not correspond to a public key.
          */
-        override fun getPublicKeyFromEmojiId(emojiId: String?): PublicKey? {
-            try {
-                FFIPublicKey(emojiId ?: "").run {
-                    val publicKey = publicKeyFromFFI(this)
-                    destroy()
-                    return publicKey
-                }
-            } catch (ignored: Throwable) {
-                return null
-            }
-        }
+        override fun getPublicKeyFromEmojiId(emojiId: String?): PublicKey? = runCatching {
+            FFIPublicKey(emojiId.orEmpty()).run { publicKeyFromFFI(this).also { destroy() } }
+        }.getOrNull()
 
         /**
          * @return public key constructed from input public key hex string id. Null if the emoji id
          * is invalid or it does not correspond to a public key.
          */
-        override fun getPublicKeyFromHexString(publicKeyHex: String?): PublicKey? {
-            try {
-                FFIPublicKey(HexString(publicKeyHex ?: "")).run {
-                    val publicKey = publicKeyFromFFI(this)
-                    destroy()
-                    return publicKey
-                }
-            } catch (ignored: Throwable) {
-                return null
-            }
-        }
+        override fun getPublicKeyFromHexString(publicKeyHex: String?): PublicKey? = runCatching {
+            FFIPublicKey(HexString(publicKeyHex ?: "")).run { publicKeyFromFFI(this).also { destroy() } }
+        }.getOrNull()
 
-        override fun setKeyValue(
-            key: String,
-            value: String,
-            error: WalletError
-        ): Boolean {
-            return try {
-                wallet.setKeyValue(key, value)
-            } catch (throwable: Throwable) {
-                mapThrowableIntoError(throwable, error)
-                false
-            }
-        }
+        override fun setKeyValue(key: String, value: String, error: WalletError): Boolean = executeWithMapping(error) {
+            wallet.setKeyValue(key, value)
+        } ?: false
 
-        override fun getKeyValue(
-            key: String,
-            error: WalletError
-        ): String? {
-            return try {
-                wallet.getKeyValue(key)
-            } catch (throwable: Throwable) {
-                mapThrowableIntoError(throwable, error)
-                null
-            }
-        }
+        override fun getKeyValue(key: String, error: WalletError): String? = executeWithMapping(error) { wallet.getKeyValue(key) }
 
-        override fun removeKeyValue(
-            key: String,
-            error: WalletError
-        ): Boolean {
-            return try {
-                wallet.removeKeyValue(key)
-            } catch (throwable: Throwable) {
-                mapThrowableIntoError(throwable, error)
-                false
-            }
-        }
+        override fun removeKeyValue(key: String, error: WalletError): Boolean = executeWithMapping(error) {
+            wallet.removeKeyValue(key)
+        } ?: false
 
-        override fun getRequiredConfirmationCount(error: WalletError): Long {
-            return try {
-                wallet.getRequiredConfirmationCount().toLong()
-            } catch (throwable: Throwable) {
-                mapThrowableIntoError(throwable, error)
-                0
-            }
-        }
+        override fun getRequiredConfirmationCount(error: WalletError): Long = executeWithMapping(error) {
+            wallet.getRequiredConfirmationCount().toLong()
+        } ?: 0
 
         override fun setRequiredConfirmationCount(number: Long, error: WalletError) {
-            try {
-                wallet.setRequiredConfirmationCount(BigInteger.valueOf(number))
-            } catch (throwable: Throwable) {
-                mapThrowableIntoError(throwable, error)
-            }
+            executeWithMapping(error) { wallet.setRequiredConfirmationCount(BigInteger.valueOf(number)) }
         }
 
-        override fun getSeedWords(error: WalletError): List<String>? {
-            return try {
-                val seedWordsFFI = wallet.getSeedWords()
-                return (0 until seedWordsFFI.getLength())
-                    .map {
-                        seedWordsFFI.getAt(it)
-                    }.also { seedWordsFFI.destroy() }
-            } catch (throwable: Throwable) {
-                mapThrowableIntoError(throwable, error)
-                null
-            }
+        override fun getSeedWords(error: WalletError): List<String>? = executeWithMapping(error) {
+            val seedWordsFFI = wallet.getSeedWords()
+            (0 until seedWordsFFI.getLength())
+                .map { seedWordsFFI.getAt(it) }
+                .also { seedWordsFFI.destroy() }
         }
 
         // endregion

@@ -340,7 +340,7 @@ internal class TxListViewModel() : CommonViewModel() {
         viewModelScope.launch(Dispatchers.IO) {
             val error = WalletError()
             val tx = walletService.getPendingOutboundTxById(txId, error)
-            if (error.code == WalletErrorCode.NO_ERROR) {
+            if (error == WalletError.NoError) {
                 pendingOutboundTxs.add(tx)
                 _listUpdateTrigger.postValue(Unit)
             } else {
@@ -497,8 +497,8 @@ internal class TxListViewModel() : CommonViewModel() {
     private fun sendTariToUser(recipientPublicKey: PublicKey) {
         val error = WalletError()
         val contacts = walletService.getContacts(error)
-        val recipientUser = when (error.code) {
-            WalletErrorCode.NO_ERROR -> contacts.firstOrNull { it.publicKey == recipientPublicKey } ?: User(recipientPublicKey)
+        val recipientUser = when (error) {
+            WalletError.NoError -> contacts.firstOrNull { it.publicKey == recipientPublicKey } ?: User(recipientPublicKey)
             else -> User(recipientPublicKey)
         }
 

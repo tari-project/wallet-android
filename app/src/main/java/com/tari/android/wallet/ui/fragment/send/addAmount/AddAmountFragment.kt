@@ -35,9 +35,13 @@ package com.tari.android.wallet.ui.fragment.send.addAmount
 import android.animation.ObjectAnimator
 import android.animation.ValueAnimator
 import android.annotation.SuppressLint
-import android.content.*
+import android.content.ComponentName
+import android.content.Context
+import android.content.Intent
+import android.content.ServiceConnection
 import android.content.res.ColorStateList
-import android.os.*
+import android.os.Bundle
+import android.os.IBinder
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -49,11 +53,11 @@ import com.daasuu.ei.EasingInterpolator
 import com.orhanobut.logger.Logger
 import com.tari.android.wallet.R
 import com.tari.android.wallet.R.color.black
-import com.tari.android.wallet.R.dimen.*
 import com.tari.android.wallet.amountInputBinding.fragment.send.addAmount.keyboard.KeyboardController
 import com.tari.android.wallet.application.DeepLink
 import com.tari.android.wallet.databinding.FragmentAddAmountBinding
 import com.tari.android.wallet.di.DiContainer.appComponent
+import com.tari.android.wallet.extension.getWithError
 import com.tari.android.wallet.infrastructure.Tracker
 import com.tari.android.wallet.model.*
 import com.tari.android.wallet.service.TariWalletService
@@ -62,6 +66,7 @@ import com.tari.android.wallet.ui.component.EmojiIdSummaryViewController
 import com.tari.android.wallet.ui.component.FullEmojiIdViewController
 import com.tari.android.wallet.ui.dialog.BottomSlideDialog
 import com.tari.android.wallet.ui.dialog.error.ErrorDialog
+import com.tari.android.wallet.ui.dialog.error.ErrorDialogArgs
 import com.tari.android.wallet.ui.extension.*
 import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.WalletUtil
@@ -244,7 +249,7 @@ class AddAmountFragment : Fragment(), ServiceConnection {
         val balanceInfo = walletService.getBalanceInfo(error)
         val fee = estimatedFee
         val amount = keyboardController.currentAmount
-        if (error.code == WalletErrorCode.NO_ERROR && fee != null) {
+        if (error == WalletError.NoError && fee != null) {
             if (amount > balanceInfo.availableBalance) {
                 lifecycleScope.launch(Dispatchers.Main) {
                     actualBalanceExceeded()
@@ -252,12 +257,8 @@ class AddAmountFragment : Fragment(), ServiceConnection {
             } else {
                 lifecycleScope.launch(Dispatchers.Main) {
                     if (fee > amount) {
-                        ErrorDialog(
-                            requireActivity(),
-                            title = string(R.string.error_fee_more_than_amount_title),
-                            description = string(R.string.error_fee_more_than_amount_description),
-                            canceledOnTouchOutside = true
-                        ).show()
+                        val args = ErrorDialogArgs(string(R.string.error_fee_more_than_amount_title), string(R.string.error_fee_more_than_amount_description))
+                        ErrorDialog(requireContext(), args).show()
                         ui.continueButton.isClickable = true
                     } else {
                         continueToNote()
@@ -273,17 +274,9 @@ class AddAmountFragment : Fragment(), ServiceConnection {
     }
 
     private fun updateBalanceInfo() {
-        val error = WalletError()
-
-        balanceInfo = walletService.getBalanceInfo(error)
-        if (error.code != WalletErrorCode.NO_ERROR) {
-            TODO("Unhandled wallet error: ${error.code}")
-        }
-
+        balanceInfo = walletService.getWithError { error, wallet -> wallet.getBalanceInfo(error) }
         availableBalance = balanceInfo.availableBalance + balanceInfo.pendingIncomingBalance
-
-        ui.availableBalanceTextView.text =
-            WalletUtil.balanceFormatter.format(availableBalance.tariValue)
+        ui.availableBalanceTextView.text = WalletUtil.balanceFormatter.format(availableBalance.tariValue)
     }
 
     private fun actualBalanceExceeded() {
@@ -303,26 +296,21 @@ class AddAmountFragment : Fragment(), ServiceConnection {
         override fun run() {
             val error = WalletError()
 
-            // update fee
-            val fee = walletService.estimateTxFee(keyboardController.currentAmount, error)
-            estimatedFee = fee
+            estimatedFee = walletService.estimateTxFee(keyboardController.currentAmount, error)
 
-            if (error.code != WalletErrorCode.NO_ERROR
-                && error.code != WalletErrorCode.NOT_ENOUGH_FUNDS
-                && error.code != WalletErrorCode.FUNDS_PENDING
-            ) {
-                TODO("Unhandled wallet error: ${error.code}")
-            }
+            //todo
+//            && error.code != WalletError.NOT_ENOUGH_FUNDS
+//            && error.code != WalletError.FUNDS_PENDING
+            throwIf(error)
 
             updateBalanceInfo()
 
-            if (error.code == WalletErrorCode.FUNDS_PENDING
-                || error.code == WalletErrorCode.NOT_ENOUGH_FUNDS
-                || (keyboardController.currentAmount + fee) > availableBalance
-            ) {
+//            error.code == WalletError.FUNDS_PENDING
+//                || error.code == WalletError.NOT_ENOUGH_FUNDS
+            if ((keyboardController.currentAmount + estimatedFee!!) > availableBalance) {
                 showErrorState(error)
             } else {
-                showSuccessState(fee)
+                showSuccessState(estimatedFee!!)
             }
         }
 
@@ -384,7 +372,8 @@ class AddAmountFragment : Fragment(), ServiceConnection {
         private fun showErrorState(
             error: WalletError
         ) = with(ui) {
-            if (error.code == WalletErrorCode.FUNDS_PENDING) {
+            //todo
+            if (error.code == 115) {
                 availableBalanceContainerView.gone()
                 notEnoughBalanceDescriptionTextView.text =
                     string(R.string.add_amount_funds_pending)

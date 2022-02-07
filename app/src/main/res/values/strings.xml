@@ -70,6 +70,15 @@
     <string name="error_fee_more_than_amount_title">Amount Error</string>
     <string name="error_fee_more_than_amount_description">Sorry, the amount cannot be less than the fee.</string>
 
+    <string name="error_code_prefix">Error Code:</string>
+    <string name="error_wallet_message_114">Something went wrong processing output. Please try again later or contact the support.</string>
+    <string name="error_wallet_message_204">Transaction not found. Please try again later. Please submit a bug report using the \"Report a Bug\" option from the settings menu if this problem appears again.</string>
+    <string name="error_wallet_message_401">Contact not found. Please try again later. Please submit a bug report using the \"Report a Bug\" option from the settings menu if this problem appears again.</string>
+    <string name="error_wallet_message_420">Wallet was not encrypted but a passphrase was supplied. Please try again later or try to restore your wallet.</string>
+    <string name="error_wallet_message_428">Unable to decrypt the wallet. Please try again later or try to restore your wallet.</string>
+    <string name="error_wallet_message_429">Unable to recover your wallet from provided seed words. Please check the list of entered seed words and try again.</string>
+    <string name="error_wallet_message_430">The provided seed words are not compatible with the current wallet version. Please get in touch with support for more details.</string>
+
     <!-- common -->
     <string name="common_continue">Continue</string>
     <string name="common_from">From</string>

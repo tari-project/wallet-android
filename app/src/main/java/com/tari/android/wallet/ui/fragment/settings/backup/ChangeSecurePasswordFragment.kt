@@ -64,6 +64,7 @@ import com.tari.android.wallet.infrastructure.backup.BackupState.BackupUpToDate
 import com.tari.android.wallet.infrastructure.backup.BackupStorageAuthRevokedException
 import com.tari.android.wallet.ui.activity.settings.BackupSettingsRouter
 import com.tari.android.wallet.ui.dialog.error.ErrorDialog
+import com.tari.android.wallet.ui.dialog.error.ErrorDialogArgs
 import com.tari.android.wallet.ui.extension.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -329,12 +330,8 @@ framework for UI tree rebuild on configuration changes"""
 
     private fun displayStorageAuthRevokedDialog() {
         val message = string(check_backup_storage_status_auth_revoked_error_description)
-        ErrorDialog(
-            requireContext(),
-            title = string(back_up_wallet_backing_up_error_title),
-            description = message,
-            onClose = { requireActivity().onBackPressed() }
-        ).show()
+        val args = ErrorDialogArgs(string(back_up_wallet_backing_up_error_title), message) { requireActivity().onBackPressed() }
+        ErrorDialog(requireContext(), args).show()
     }
 
     private fun subscribeToBackupState() {
@@ -378,14 +375,8 @@ framework for UI tree rebuild on configuration changes"""
     }
 
     private fun showBackupErrorDialog(message: String, onClose: () -> Unit) {
-        ErrorDialog(
-            requireContext(),
-            title = string(back_up_wallet_backing_up_error_title),
-            description = message,
-            cancelable = false,
-            canceledOnTouchOutside = false,
-            onClose = onClose
-        ).show()
+        val args = ErrorDialogArgs(string(back_up_wallet_backing_up_error_title), message, false, false, onClose)
+        ErrorDialog(requireContext(), args).show()
     }
 
     companion object {
