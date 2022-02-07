@@ -50,12 +50,11 @@ import androidx.core.animation.addListener
 import androidx.fragment.app.Fragment
 import com.daasuu.ei.Ease
 import com.daasuu.ei.EasingInterpolator
-import com.tari.android.wallet.BuildConfig
 import com.tari.android.wallet.R
 import com.tari.android.wallet.R.color.white
 import com.tari.android.wallet.R.string.*
-import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepository
 import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
+import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepository
 import com.tari.android.wallet.databinding.FragmentIntroductionBinding
 import com.tari.android.wallet.di.DiContainer.appComponent
 import com.tari.android.wallet.event.EventBus
@@ -65,6 +64,7 @@ import com.tari.android.wallet.service.WalletServiceLauncher
 import com.tari.android.wallet.ui.activity.onboarding.OnboardingFlowActivity
 import com.tari.android.wallet.ui.activity.restore.WalletRestoreActivity
 import com.tari.android.wallet.ui.extension.*
+import com.tari.android.wallet.ui.fragment.settings.allSettings.TariVersionModel
 import com.tari.android.wallet.util.Constants
 import javax.inject.Inject
 import kotlin.math.min
@@ -175,8 +175,7 @@ internal class IntroductionFragment : Fragment() {
                     it.overridePendingTransition(R.anim.enter_from_bottom, R.anim.exit_to_top)
                 }
             }
-            val versionInfo = "${networkRepository.currentNetwork!!.network.displayName} ${BuildConfig.VERSION_NAME} b${BuildConfig.VERSION_CODE}"
-            networkInfoTextView.text = versionInfo
+            networkInfoTextView.text = TariVersionModel(networkRepository).versionInfo
             // highlight links
             userAgreementAndPrivacyPolicyTextView.text =
                 SpannableString(string(create_wallet_user_agreement_and_privacy_policy)).apply {

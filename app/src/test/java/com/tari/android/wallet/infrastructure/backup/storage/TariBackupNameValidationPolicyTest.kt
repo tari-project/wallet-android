@@ -33,8 +33,6 @@
 package com.tari.android.wallet.infrastructure.backup.storage
 
 import com.tari.android.wallet.application.Network
-import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepository
-import com.tari.android.wallet.data.sharedPrefs.network.TariNetwork
 import com.tari.android.wallet.infrastructure.backup.BackupNamingPolicy
 import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
@@ -134,18 +132,6 @@ class TariBackupNameValidationPolicyTest {
         assertNull(policy.getDateFromBackupFileName(name))
     }
 
-}
-
-class NetworkRepositoryMock : NetworkRepository {
-    private val network: Network = Network.DIBBLER
-
-    override var supportedNetworks: List<Network> = listOf(network)
-    override var currentNetwork: TariNetwork? = TariNetwork(network, "xtr", "")
-    override var ffiNetwork: Network? = network
-    override var incompatibleNetworkShown: Boolean = false
-    override var recommendedNetworks: List<Network> = listOf(network)
-
-    override fun getAllNetworks(): List<TariNetwork> = listOf()
 }
 
 class JodaAndroidFixRule @JvmOverloads constructor(private val provider: Provider = UTCProvider()) : TestRule {
