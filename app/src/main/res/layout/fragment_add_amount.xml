@@ -194,6 +194,17 @@
             android:id="@+id/numpad"
             layout="@layout/view_numpad" />
 
+        <androidx.appcompat.widget.SwitchCompat
+            android:id="@+id/one_side_payment_switch_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="10dp"
+            android:checked="true"
+            android:text="@string/add_amount_one_side_payment_switcher"
+            android:textColor="@color/black"
+            android:textSize="16sp" />
+
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="74dp"

@@ -1318,6 +1318,7 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniSendTx(
         jstring jamount,
         jstring jfeePerGram,
         jstring jmessage,
+        jboolean jOneSided,
         jobject error) {
     int errorCode = 0;
     int *errorCodePointer = &errorCode;
@@ -1335,7 +1336,7 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniSendTx(
 
     jbyteArray result = getBytesFromUnsignedLongLong(
             jEnv,
-            wallet_send_transaction(pWallet, pDestination, amount, feePerGram, pMessage, false, errorCodePointer));
+            wallet_send_transaction(pWallet, pDestination, amount, feePerGram, pMessage, jOneSided, errorCodePointer));
     setErrorCode(jEnv, error, errorCode);
     jEnv->ReleaseStringUTFChars(jamount, nativeAmount);
     jEnv->ReleaseStringUTFChars(jfeePerGram, nativeFeePerGram);

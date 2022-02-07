@@ -974,6 +974,7 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
             amount: MicroTari,
             feePerGram: MicroTari,
             message: String,
+            isOneSidePayment: Boolean,
             error: WalletError
         ): TxId? {
             return try {
@@ -983,7 +984,8 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
                     publicKeyFFI,
                     amount.value,
                     feePerGram.value,
-                    message
+                    message,
+                    isOneSidePayment
                 )
                 publicKeyFFI.destroy()
                 outboundTxIdsToBePushNotified.add(

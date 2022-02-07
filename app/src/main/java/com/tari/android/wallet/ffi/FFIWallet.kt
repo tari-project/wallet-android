@@ -173,6 +173,7 @@ internal class FFIWallet(
         amount: String,
         feePerGram: String,
         message: String,
+        oneSided: Boolean,
         libError: FFIError
     ): ByteArray
 
@@ -721,12 +722,7 @@ internal class FFIWallet(
         return BigInteger(1, bytes)
     }
 
-    fun sendTx(
-        destination: FFIPublicKey,
-        amount: BigInteger,
-        feePerGram: BigInteger,
-        message: String
-    ): BigInteger {
+    fun sendTx(destination: FFIPublicKey, amount: BigInteger, feePerGram: BigInteger, message: String, isOneSided: Boolean): BigInteger {
         if (amount < BigInteger.valueOf(0L)) {
             throw FFIException(message = "Amount is less than 0.")
         }
@@ -739,6 +735,7 @@ internal class FFIWallet(
             amount.toString(),
             feePerGram.toString(),
             message,
+            isOneSided,
             error
         )
         Logger.d("Send status code (0 means ok): %d", error.code)

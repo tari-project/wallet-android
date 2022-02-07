@@ -75,5 +75,4 @@ object Event {
         class TestnetTariRequestSuccessful
         data class TestnetTariRequestError(val errorMessage: String)
     }
-
 }

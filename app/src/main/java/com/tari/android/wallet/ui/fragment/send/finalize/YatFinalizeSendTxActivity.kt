@@ -27,12 +27,11 @@ class YatFinalizeSendTxActivity : YatLibOutcomingTransactionActivity() {
     private fun subscribeOnUI() = with(viewModel) {
         observe(txFailureReason) { setTransactionState(TransactionState.Failed) }
 
-        observe(torConnected) { viewModel.sendTari() }
-
-        observe(finishedSending) { setTransactionState(TransactionState.Complete) }
+        observe(isSuccess) { setTransactionState(TransactionState.Complete) }
 
         observeOnLoad(sentTxId)
-        observeOnLoad(currentStep)
+        observeOnLoad(steps)
+        observeOnLoad(nextStep)
     }
 
     override fun onStop() {

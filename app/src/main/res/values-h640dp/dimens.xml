@@ -46,8 +46,8 @@
     <!-- send tari - add recipient -->
     <dimen name="add_recipient_search_bar_container_height">96dp</dimen>
     <!-- send tari - add amount -->
-    <dimen name="add_amount_element_text_size">82sp</dimen>
-    <dimen name="add_amount_keypad_row_height">62dp</dimen>
+    <dimen name="add_amount_element_text_size">72sp</dimen>
+    <dimen name="add_amount_keypad_row_height">52dp</dimen>
     <dimen name="add_amount_keypad_text_size">36sp</dimen>
     <dimen name="add_amount_balance_text_size">14sp</dimen>
     <dimen name="add_amount_tx_fee_text_size">13sp</dimen>

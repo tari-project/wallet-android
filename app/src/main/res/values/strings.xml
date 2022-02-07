@@ -257,6 +257,7 @@
     <string name="add_amount_funds_pending">Sorry, you can’t send this much tXTR. Please wait for at least one transaction to complete and then try again.</string>
     <string name="add_amount_tx_fee">Transaction Fee</string>
     <string name="add_amount_wallet_balance">Wallet Balance</string>
+    <string name="add_amount_one_side_payment_switcher">One Side Payment</string>
 
     <!-- send tari - note -->
     <string name="add_note_prompt">Transaction Note</string>

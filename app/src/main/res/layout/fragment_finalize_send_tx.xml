@@ -68,63 +68,12 @@
         </LinearLayout>
 
         <LinearLayout
+            android:id="@+id/steps_container"
             android:layout_width="wrap_content"
             android:layout_height="4dp"
-            android:layout_marginTop="40dp">
+            android:layout_marginTop="40dp"
+            android:orientation="horizontal" />
 
-            <FrameLayout
-                android:id="@+id/step_1_progress_bar_container_view"
-                android:layout_width="55dp"
-                android:background="@color/finalize_send_progress_bar_passive_bg"
-                android:layout_height="match_parent">
-
-                <ProgressBar
-                    android:id="@+id/step_1_progress_bar"
-                    style="?android:attr/progressBarStyleHorizontal"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:indeterminate="false"
-                    android:progressBackgroundTint="@color/finalize_send_progress_bar_active_bg"
-                    android:progress="0"
-                    android:progressTint="@color/purple" />
-            </FrameLayout>
-
-            <FrameLayout
-                android:id="@+id/step_2_progress_bar_container_view"
-                android:layout_marginStart="6dp"
-                android:layout_width="55dp"
-                android:background="@color/finalize_send_progress_bar_passive_bg"
-                android:layout_height="match_parent">
-
-                <ProgressBar
-                    android:id="@+id/step_2_progress_bar"
-                    style="?android:attr/progressBarStyleHorizontal"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:indeterminate="false"
-                    android:progressBackgroundTint="@color/finalize_send_progress_bar_active_bg"
-                    android:progress="0"
-                    android:progressTint="@color/purple" />
-            </FrameLayout>
-
-            <FrameLayout
-                android:id="@+id/step_3_progress_bar_container_view"
-                android:layout_width="55dp"
-                android:layout_marginStart="6dp"
-                android:background="@color/finalize_send_progress_bar_passive_bg"
-                android:layout_height="match_parent">
-
-                <ProgressBar
-                    android:id="@+id/step_3_progress_bar"
-                    style="?android:attr/progressBarStyleHorizontal"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:indeterminate="false"
-                    android:progressBackgroundTint="@color/finalize_send_progress_bar_active_bg"
-                    android:progress="0"
-                    android:progressTint="@color/purple" />
-            </FrameLayout>
-        </LinearLayout>
     </LinearLayout>
 
 </RelativeLayout>

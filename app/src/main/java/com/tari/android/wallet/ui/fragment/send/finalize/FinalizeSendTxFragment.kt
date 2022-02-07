@@ -34,7 +34,6 @@ package com.tari.android.wallet.ui.fragment.send.finalize
 
 import android.animation.ObjectAnimator
 import android.animation.ValueAnimator
-import android.content.Context
 import android.media.AudioManager
 import android.os.Build
 import android.os.Bundle
@@ -46,42 +45,23 @@ import androidx.fragment.app.viewModels
 import com.daasuu.ei.Ease
 import com.daasuu.ei.EasingInterpolator
 import com.tari.android.wallet.R
-import com.tari.android.wallet.R.string.*
 import com.tari.android.wallet.databinding.FragmentFinalizeSendTxBinding
 import com.tari.android.wallet.di.DiContainer.appComponent
-import com.tari.android.wallet.event.EventBus
+import com.tari.android.wallet.extension.observe
 import com.tari.android.wallet.extension.observeOnLoad
-import com.tari.android.wallet.model.*
-import com.tari.android.wallet.network.NetworkConnectionState
 import com.tari.android.wallet.ui.common.CommonFragment
 import com.tari.android.wallet.ui.component.CustomFontTextView
-import com.tari.android.wallet.ui.extension.*
+import com.tari.android.wallet.ui.extension.getResourceUri
+import com.tari.android.wallet.ui.extension.invisible
+import com.tari.android.wallet.ui.extension.visible
 import com.tari.android.wallet.ui.fragment.send.common.TransactionData
 import com.tari.android.wallet.util.Constants
-import org.joda.time.DateTime
-import org.joda.time.Seconds
-import java.lang.ref.WeakReference
 
 class FinalizeSendTxFragment : CommonFragment<FragmentFinalizeSendTxBinding, FinalizeSendTxViewModel>() {
 
-    private lateinit var finalizeSendTxListenerWR: WeakReference<FinalizeSendTxListener>
+    private var stepListView = mutableListOf<FinalizingStepView>()
 
-    // progress from 0-to-max and otherwise both increment this field
-    private var progressAnimationToggleCount = 0
-    private var progressAnim: ValueAnimator? = null
-
-    // region Fragment lifecycle
-
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-        finalizeSendTxListenerWR = WeakReference(context as FinalizeSendTxListener)
-    }
-
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View =
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
         FragmentFinalizeSendTxBinding.inflate(inflater, container, false).also { ui = it }.root
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -92,16 +72,21 @@ class FinalizeSendTxFragment : CommonFragment<FragmentFinalizeSendTxBinding, Fin
         bindViewModel(viewModel)
 
         viewModel.transactionData = requireArguments().getParcelable(FinalizeSendTxViewModel.transactionDataKey)!!
+        viewModel.start()
         setupUi()
         subscribeUI()
     }
 
     private fun subscribeUI() = with(viewModel) {
-        observeOnLoad(txFailureReason)
+        observe(txFailureReason) { onFailure(it) }
+
+        observe(steps) { createAllSteps(it) }
+
+        observe(isSuccess) { onSuccess() }
+
+        observe(nextStep) { showNextStep() }
+
         observeOnLoad(sentTxId)
-        observeOnLoad(currentStep)
-        observeOnLoad(finishedSending)
-        observeOnLoad(torConnected)
     }
 
     override fun onStart() {
@@ -121,30 +106,29 @@ class FinalizeSendTxFragment : CommonFragment<FragmentFinalizeSendTxBinding, Fin
         super.onStop()
     }
 
-    // endregion
+    private fun createAllSteps(steps: List<FinalizeSendTxViewModel.FinalizingStep>) {
+        for (step in steps) {
+            val view = FinalizingStepView(requireContext())
+            view.setup(step) { viewModel.checkStepStatus() }
+            stepListView.add(view)
+            ui.stepsContainer.addView(view)
+        }
+    }
+
+    private fun getCurrentStepView(): FinalizingStepView? = stepListView.firstOrNull { !it.step.isCompleted }
+
+    private fun showNextStep() {
+        fadeOutTextViews {
+            playCurrentStepTextAppearAnimation()
+            getCurrentStepView()?.animateCurrentStepProgress(isReverse = false)
+        }
+    }
 
     private fun setupUi() = with(ui) {
         lottieAnimationView.setMaxProgress(lottieAnimationPauseProgress)
         infoLine1TextView.invisible()
         infoLine2TextView.invisible()
-        step1ProgressBarContainerView.alpha = 0f
-        step1ProgressBar.apply {
-            visible()
-            progress = 0
-            max = maxProgress
-        }
-        step2ProgressBarContainerView.alpha = 0f
-        step2ProgressBar.apply {
-            invisible()
-            progress = 0
-            max = maxProgress
-        }
-        step3ProgressBarContainerView.alpha = 0f
-        step1ProgressBar.apply {
-            invisible()
-            progress = 0
-            max = maxProgress
-        }
+
         rootView.postDelayed({
             fadeInProgressBarContainers()
             ui.lottieAnimationView.playAnimation()
@@ -153,8 +137,8 @@ class FinalizeSendTxFragment : CommonFragment<FragmentFinalizeSendTxBinding, Fin
     }
 
     private fun playCurrentStepTextAppearAnimation() {
-        playStepAppearAnimation(viewModel.currentStep.value!!.descLine1, ui.infoLine1TextView)
-        playStepAppearAnimation(viewModel.currentStep.value!!.descLine2, ui.infoLine2TextView, Constants.UI.xShortDurationMs)
+        playStepAppearAnimation(viewModel.currentStep?.descriptionLine1.orEmpty(), ui.infoLine1TextView)
+        playStepAppearAnimation(viewModel.currentStep?.descriptionLine2.orEmpty(), ui.infoLine2TextView, Constants.UI.xShortDurationMs)
     }
 
     private fun playStepAppearAnimation(lineText: String, textView: CustomFontTextView, additionalDelay: Long = 0) = with(textView) {
@@ -176,74 +160,13 @@ class FinalizeSendTxFragment : CommonFragment<FragmentFinalizeSendTxBinding, Fin
         ValueAnimator.ofFloat(0f, 1f).apply {
             addUpdateListener { valueAnimator: ValueAnimator ->
                 val alpha = valueAnimator.animatedValue as Float
-                ui.step1ProgressBarContainerView.alpha = alpha
-                ui.step2ProgressBarContainerView.alpha = alpha
-                ui.step3ProgressBarContainerView.alpha = alpha
+                stepListView.forEach { it.ui.stepProgressBarContainerView.alpha = alpha }
             }
             duration = Constants.UI.longDurationMs
             startDelay = Constants.UI.FinalizeSendTx.textAppearAnimStartDelayMs
-            addListener(onEnd = { animateCurrentStepProgress(isReverse = false) })
+            addListener(onEnd = { getCurrentStepView()?.animateCurrentStepProgress(isReverse = false) })
             start()
         }
-    }
-
-    private fun animateCurrentStepProgress(isReverse: Boolean) {
-        // On config change the UI is already cleared out but this method can be invoked
-        val progressBar = when (viewModel.currentStep.value!!) {
-            is FinalizingStep.ConnectionCheck -> ui.step1ProgressBar
-            is FinalizingStep.Discovery -> ui.step2ProgressBar
-            else -> ui.step3ProgressBar
-        }
-        progressBar.visible()
-        val minValue = if (isReverse) maxProgress else 0
-        val maxValue = if (isReverse) 0 else maxProgress
-        progressAnim = ValueAnimator.ofInt(minValue, maxValue).apply {
-            addUpdateListener { valueAnimator: ValueAnimator -> progressBar.progress = valueAnimator.animatedValue as Int }
-            duration = progressBarFillDurationMs
-            interpolator = EasingInterpolator(Ease.QUART_IN_OUT)
-            startDelay = Constants.UI.xShortDurationMs
-            addListener(onEnd = {
-                progressAnimationToggleCount++
-                removeAllListeners()
-                if (progressAnimationToggleCount >= 3 && !isReverse) {
-                    tryToProceedToTheNextStepOnProgressAnimCompletion()
-                } else {
-                    animateCurrentStepProgress(!isReverse)
-                }
-            })
-            start()
-        }
-    }
-
-    private fun tryToProceedToTheNextStepOnProgressAnimCompletion() {
-        viewModel.txFailureReason.value?.let {
-            onFailure(it)
-            return@tryToProceedToTheNextStepOnProgressAnimCompletion
-        }
-
-        if (viewModel.switchToNextProgressStateOnProgressAnimComplete) {
-            viewModel.switchToNextProgressStateOnProgressAnimComplete = false
-            goToNextStep()
-            return
-        } else if (viewModel.currentStep.value is FinalizingStep.Sent) {
-            onSuccess()
-            return
-        }
-        if (viewModel.currentStep.value is FinalizingStep.ConnectionCheck) {
-            val secondsElapsed = Seconds.secondsBetween(viewModel.connectionCheckStartTime, DateTime.now()).seconds
-            if (secondsElapsed >= connectionTimeoutSecs) { // network connection timeout
-                val networkConnectionState = EventBus.networkConnectionState.publishSubject.value
-                if (networkConnectionState != NetworkConnectionState.CONNECTED) {
-                    // internet connection problem
-                    onFailure(TxFailureReason.NETWORK_CONNECTION_ERROR)
-                } else {
-                    // tor connection problem
-                    onFailure(TxFailureReason.BASE_NODE_CONNECTION_ERROR)
-                }
-                return
-            }
-        }
-        animateCurrentStepProgress(isReverse = true)
     }
 
     private fun fadeOutTextViews(completion: () -> Unit) {
@@ -262,28 +185,8 @@ class FinalizeSendTxFragment : CommonFragment<FragmentFinalizeSendTxBinding, Fin
         }
     }
 
-    private fun goToNextStep() {
-        when (viewModel.currentStep.value) {
-            is FinalizingStep.ConnectionCheck -> {
-                showNextStep(FinalizingStep.Discovery(viewModel.resourceManager))
-                viewModel.sendTari()
-            }
-            is FinalizingStep.Discovery -> showNextStep(FinalizingStep.Sent(viewModel.resourceManager))
-            is FinalizingStep.Sent -> onSuccess()
-        }
-    }
-
-    private fun showNextStep(step: FinalizingStep) {
-        fadeOutTextViews {
-            progressAnimationToggleCount = 0
-            viewModel.currentStep.value = step
-            playCurrentStepTextAppearAnimation()
-            animateCurrentStepProgress(isReverse = false)
-        }
-    }
-
     private fun onFailure(txFailureReason: TxFailureReason) {
-        progressAnim?.removeAllListeners()
+        stepListView.forEach { it.progressAnim?.removeAllUpdateListeners() }
         ui.lottieAnimationView.speed = -1f
         ui.lottieAnimationView.playAnimation()
         ui.lottieAnimationView.progress = lottieAnimationPauseProgress
@@ -302,22 +205,21 @@ class FinalizeSendTxFragment : CommonFragment<FragmentFinalizeSendTxBinding, Fin
                 val alpha = valueAnimator.animatedValue as Float
                 ui.infoLine1TextView.alpha = alpha
                 ui.infoLine2TextView.alpha = alpha
-                ui.step1ProgressBarContainerView.alpha = alpha
-                ui.step2ProgressBarContainerView.alpha = alpha
-                ui.step3ProgressBarContainerView.alpha = alpha
+                stepListView.forEach { it.ui.stepProgressBarContainerView.alpha = alpha }
             }
             duration = Constants.UI.xLongDurationMs
             interpolator = EasingInterpolator(Ease.QUART_IN_OUT)
             addListener(onEnd = {
                 removeAllListeners()
                 ui.lottieAnimationView.alpha = 0f
-                finalizeSendTxListenerWR.get()?.onSendTxFailure(viewModel.transactionData, txFailureReason)
+                (requireActivity() as? FinalizeSendTxListener)?.onSendTxFailure(viewModel.transactionData, txFailureReason)
             })
             start()
         }
     }
 
     private fun onSuccess() {
+        stepListView.forEach { it.progressAnim?.removeAllUpdateListeners() }
         ui.lottieAnimationView.setMaxProgress(1.0f)
         ui.lottieAnimationView.playAnimation()
         ui.lottieAnimationView.progress = lottieAnimationPauseProgress
@@ -328,9 +230,7 @@ class FinalizeSendTxFragment : CommonFragment<FragmentFinalizeSendTxBinding, Fin
                 val alpha = valueAnimator.animatedValue as Float
                 ui.infoLine1TextView.alpha = alpha
                 ui.infoLine2TextView.alpha = alpha
-                ui.step1ProgressBarContainerView.alpha = alpha
-                ui.step2ProgressBarContainerView.alpha = alpha
-                ui.step3ProgressBarContainerView.alpha = alpha
+                stepListView.forEach { it.ui.stepProgressBarContainerView.alpha = alpha }
             }
             duration = Constants.UI.longDurationMs
             interpolator = EasingInterpolator(Ease.QUART_IN_OUT)
@@ -338,17 +238,16 @@ class FinalizeSendTxFragment : CommonFragment<FragmentFinalizeSendTxBinding, Fin
             addListener(onEnd = {
                 removeAllListeners()
                 ui.lottieAnimationView.alpha = 0f
-                finalizeSendTxListenerWR.get()?.onSendTxSuccessful(viewModel.sentTxId.value!!, viewModel.transactionData)
+                (requireActivity() as? FinalizeSendTxListener)?.onSendTxSuccessful(viewModel.sentTxId.value!!, viewModel.transactionData)
             })
             start()
         }
     }
 
     companion object {
-        private const val maxProgress = 100
-        private const val progressBarFillDurationMs = 850L
-        private const val connectionTimeoutSecs = 30
-        private const val lottieAnimationPauseProgress = 0.3f
+        const val maxProgress = 100
+        const val progressBarFillDurationMs = 850L
+        const val lottieAnimationPauseProgress = 0.3f
 
         fun create(transactionData: TransactionData): FinalizeSendTxFragment {
             return FinalizeSendTxFragment().apply {
@@ -359,3 +258,4 @@ class FinalizeSendTxFragment : CommonFragment<FragmentFinalizeSendTxBinding, Fin
         }
     }
 }
+

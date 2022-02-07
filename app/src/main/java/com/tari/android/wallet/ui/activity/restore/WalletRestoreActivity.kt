@@ -39,6 +39,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import com.tari.android.wallet.R
 import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
+import com.tari.android.wallet.data.sharedPrefs.tariSettings.TariSettingsSharedRepository
 import com.tari.android.wallet.di.DiContainer.appComponent
 import com.tari.android.wallet.ui.activity.AuthActivity
 import com.tari.android.wallet.ui.fragment.restore.chooseRestoreOption.ChooseRestoreOptionFragment
@@ -52,6 +53,9 @@ class WalletRestoreActivity : AppCompatActivity(), WalletRestoreRouter {
 
     @Inject
     lateinit var prefs: SharedPrefsRepository
+
+    @Inject
+    lateinit var tariSettingsSharedRepository: TariSettingsSharedRepository
 
     override fun onCreate(savedInstanceState: Bundle?) {
         appComponent.inject(this)
@@ -94,7 +98,7 @@ class WalletRestoreActivity : AppCompatActivity(), WalletRestoreRouter {
         prefs.onboardingCompleted = true
         prefs.onboardingAuthSetupCompleted = true
         prefs.onboardingDisplayedAtHome = true
-        prefs.isRestoredWallet = true
+        tariSettingsSharedRepository.isRestoredWallet = true
 
         startActivity(Intent(this, AuthActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK

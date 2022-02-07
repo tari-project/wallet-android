@@ -30,34 +30,34 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.tari.android.wallet.service
+package com.tari.android.wallet.data.sharedPrefs.tariSettings
 
-import android.content.BroadcastReceiver
-import android.content.Context
-import android.content.Intent
-import com.orhanobut.logger.Logger
-import com.tari.android.wallet.data.WalletConfig
-import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepositoryImpl
-import com.tari.android.wallet.data.sharedPrefs.tariSettings.TariSettingsSharedRepository
-import com.tari.android.wallet.di.ApplicationModule
-import com.tari.android.wallet.ui.common.domain.ResourceManager
+import android.content.SharedPreferences
+import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefBooleanDelegate
+import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepository
 
-/**
- * This receiver is responsible for starting the service after boot finish.
- *
- * @author The Tari Development Team
- */
-class BootDeviceReceiver : BroadcastReceiver() {
+class TariSettingsSharedRepository(sharedPrefs: SharedPreferences, val networkRepository: NetworkRepository) {
 
-    override fun onReceive(context: Context?, intent: Intent?) {
-        if (context == null || intent == null) return
-        Logger.d("Boot device broadcast received.")
-        if (Intent.ACTION_BOOT_COMPLETED == intent.action) {
-            val resourceManager = ResourceManager(context)
-            val sharedPreferences = context.getSharedPreferences(ApplicationModule.sharedPrefsFileName, Context.MODE_PRIVATE)
-            val networkRepository = NetworkRepositoryImpl(resourceManager, sharedPreferences)
-            val tariSettingsSharedRepository = TariSettingsSharedRepository(sharedPreferences, networkRepository)
-            WalletServiceLauncher(context, WalletConfig(context, networkRepository), tariSettingsSharedRepository).startIfExist()
-        }
+    private object Key {
+        const val isRestoredWallet = "tari_is_restored_wallet"
+        const val hasVerifiedSeedWords = "tari_has_verified_seed_words"
+        const val backgroundServiceTurnedOnKey = "tari_background_service_turned_on"
+        const val isOneSidePaymentEnabledKey = "is_one_side_payment_enabled"
     }
+
+    var isRestoredWallet: Boolean by SharedPrefBooleanDelegate(sharedPrefs, formatKey(Key.isRestoredWallet))
+
+    var hasVerifiedSeedWords: Boolean by SharedPrefBooleanDelegate(sharedPrefs, formatKey(Key.hasVerifiedSeedWords))
+
+    var backgroundServiceTurnedOn: Boolean by SharedPrefBooleanDelegate(sharedPrefs, formatKey(Key.backgroundServiceTurnedOnKey), true)
+
+    var isOneSidePaymentEnabled: Boolean by SharedPrefBooleanDelegate(sharedPrefs, formatKey(Key.isOneSidePaymentEnabledKey), false)
+
+    fun clear() {
+        isRestoredWallet = false
+        hasVerifiedSeedWords = false
+        backgroundServiceTurnedOn = true
+    }
+
+    private fun formatKey(key: String): String = key + "_" + networkRepository.currentNetwork!!.network.displayName
 }

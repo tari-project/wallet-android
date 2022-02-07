@@ -35,29 +35,34 @@ package com.tari.android.wallet.ui.fragment.send.addAmount
 import android.animation.ObjectAnimator
 import android.animation.ValueAnimator
 import android.annotation.SuppressLint
-import android.content.*
+import android.content.ComponentName
+import android.content.Context
+import android.content.Intent
+import android.content.ServiceConnection
 import android.content.res.ColorStateList
-import android.os.*
+import android.os.Bundle
+import android.os.IBinder
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
-import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.daasuu.ei.Ease
 import com.daasuu.ei.EasingInterpolator
 import com.orhanobut.logger.Logger
 import com.tari.android.wallet.R
 import com.tari.android.wallet.R.color.black
-import com.tari.android.wallet.R.dimen.*
 import com.tari.android.wallet.amountInputBinding.fragment.send.addAmount.keyboard.KeyboardController
 import com.tari.android.wallet.application.DeepLink
 import com.tari.android.wallet.databinding.FragmentAddAmountBinding
 import com.tari.android.wallet.di.DiContainer.appComponent
+import com.tari.android.wallet.extension.observe
 import com.tari.android.wallet.infrastructure.Tracker
 import com.tari.android.wallet.model.*
 import com.tari.android.wallet.service.TariWalletService
 import com.tari.android.wallet.service.WalletService
+import com.tari.android.wallet.ui.common.CommonFragment
 import com.tari.android.wallet.ui.component.EmojiIdSummaryViewController
 import com.tari.android.wallet.ui.component.FullEmojiIdViewController
 import com.tari.android.wallet.ui.dialog.BottomSlideDialog
@@ -70,17 +75,12 @@ import kotlinx.coroutines.launch
 import java.lang.ref.WeakReference
 import javax.inject.Inject
 
-/**
- * Amount entry fragment.
- *
- * @author The Tari Development Team
- */
-class AddAmountFragment : Fragment(), ServiceConnection {
+class AddAmountFragment : CommonFragment<FragmentAddAmountBinding, AddAmountViewModel>(), ServiceConnection {
 
     @Inject
     lateinit var tracker: Tracker
 
-    private lateinit var listenerWR: WeakReference<Listener>
+    private lateinit var addAmountListenerWR: WeakReference<AddAmountListener>
 
     /**
      * Recipient is either an emoji id or a user from contacts or recent txs.
@@ -102,7 +102,6 @@ class AddAmountFragment : Fragment(), ServiceConnection {
     private lateinit var walletService: TariWalletService
 
     private var isFirstLaunch: Boolean = false
-    private lateinit var ui: FragmentAddAmountBinding
 
     private var estimatedFee: MicroTari? = null
     private lateinit var balanceInfo: BalanceInfo
@@ -117,11 +116,20 @@ class AddAmountFragment : Fragment(), ServiceConnection {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         appComponent.inject(this)
+
+        val viewModel: AddAmountViewModel by viewModels()
+        bindViewModel(viewModel)
+        subscribeVM()
+
         bindToWalletService()
         if (savedInstanceState == null) {
             tracker.screen(path = "/home/send_tari/add_amount", title = "Send Tari - Add Amount")
         }
         isFirstLaunch = savedInstanceState == null
+    }
+
+    private fun subscribeVM() = with(viewModel) {
+        observe(isOneSidePaymentEnabled) { ui.oneSidePaymentSwitchView.isChecked = it }
     }
 
     private fun bindToWalletService() {
@@ -183,11 +191,12 @@ class AddAmountFragment : Fragment(), ServiceConnection {
         ui.emojiIdSummaryContainerView.setOnClickListener { emojiIdClicked() }
         ui.txFeeDescTextView.setOnClickListener { onFeeViewClick() }
         ui.continueButton.setOnClickListener { continueButtonClicked() }
+        ui.oneSidePaymentSwitchView.setOnClickListener { viewModel.toggleOneSidePayment() }
     }
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        listenerWR = WeakReference(context as Listener)
+        addAmountListenerWR = WeakReference(context as AddAmountListener)
     }
 
     private fun displayAliasOrEmojiId() {
@@ -232,7 +241,6 @@ class AddAmountFragment : Fragment(), ServiceConnection {
             dismissViewId = R.id.tx_fee_tooltip_dialog_txt_close
         ).show()
     }
-
 
     private fun continueButtonClicked() {
         ui.continueButton.isClickable = false
@@ -287,12 +295,12 @@ class AddAmountFragment : Fragment(), ServiceConnection {
     }
 
     private fun actualBalanceExceeded() {
-        listenerWR.get()?.onAmountExceedsActualAvailableBalance(this)
+        addAmountListenerWR.get()?.onAmountExceedsActualAvailableBalance(this)
         ui.continueButton.isClickable = true
     }
 
     private fun continueToNote() {
-        listenerWR.get()?.continueToAddNote(this, recipientUser!!, keyboardController.currentAmount)
+        addAmountListenerWR.get()?.continueToAddNote(recipientUser!!, keyboardController.currentAmount, ui.oneSidePaymentSwitchView.isChecked)
     }
 
     /**
@@ -440,26 +448,4 @@ class AddAmountFragment : Fragment(), ServiceConnection {
             continueButton.invisible()
         }
     }
-
-    // region listener interface
-
-    /**
-     * Listener interface - to be implemented by the host activity.
-     */
-    interface Listener {
-
-        fun onAmountExceedsActualAvailableBalance(fragment: AddAmountFragment)
-
-        /**
-         * Recipient is user.
-         */
-        fun continueToAddNote(
-            sourceFragment: AddAmountFragment,
-            recipientUser: User,
-            amount: MicroTari
-        )
-
-    }
-
-    // endregion
 }

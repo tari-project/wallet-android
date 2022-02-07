@@ -58,8 +58,6 @@ abstract class Tx : Parcelable {
      */
     var user = User()
 
-    override fun toString(): String =
-        "Tx(id=$id, direction=$direction, amount=$amount, timestamp=$timestamp, message='$message'," +
-                " user=$user)"
+    override fun toString(): String = "Tx(id=$id, direction=$direction, amount=$amount, timestamp=$timestamp, message='$message', user=$user)"
 
 }

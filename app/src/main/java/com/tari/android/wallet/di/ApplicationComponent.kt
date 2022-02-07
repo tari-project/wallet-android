@@ -63,7 +63,10 @@ import com.tari.android.wallet.ui.fragment.restore.inputSeedWords.InputSeedWords
 import com.tari.android.wallet.ui.fragment.restore.walletRestoringFromSeedWords.WalletRestoringFromSeedWordsViewModel
 import com.tari.android.wallet.ui.fragment.send.activity.SendTariActivity
 import com.tari.android.wallet.ui.fragment.send.addAmount.AddAmountFragment
+import com.tari.android.wallet.ui.fragment.send.addAmount.AddAmountViewModel
 import com.tari.android.wallet.ui.fragment.send.addNote.AddNoteFragment
+import com.tari.android.wallet.ui.fragment.send.addNote.gif.ChooseGIFDialogFragment
+import com.tari.android.wallet.ui.fragment.send.addNote.gif.ThumbnailGIFsViewModel
 import com.tari.android.wallet.ui.fragment.send.addRecepient.AddRecipientFragment
 import com.tari.android.wallet.ui.fragment.send.addRecepient.AddRecipientViewModel
 import com.tari.android.wallet.ui.fragment.send.finalize.FinalizeSendTxFragment
@@ -131,7 +134,7 @@ internal interface ApplicationComponent {
     fun inject(fragment: AddRecipientFragment)
     fun inject(fragment: AddAmountFragment)
     fun inject(fragment: AddNoteFragment)
-    fun inject(fragment: AddNoteFragment.ChooseGIFDialogFragment)
+    fun inject(fragment: ChooseGIFDialogFragment)
     fun inject(fragment: FinalizeSendTxFragment)
     fun inject(fragment: LocalAuthFragment)
     fun inject(fragment: DebugLogFragment)
@@ -155,7 +158,7 @@ internal interface ApplicationComponent {
      * ViewModels.
      */
     fun inject(commonViewModel: CommonViewModel)
-    fun inject(thumbnailGIFsViewModel: AddNoteFragment.ThumbnailGIFsViewModel)
+    fun inject(thumbnailGIFsViewModel: ThumbnailGIFsViewModel)
     fun inject(gifViewModel: TxDetailsActivity.GIFViewModel)
     fun inject(backgroundServiceSettingsViewModel: BackgroundServiceSettingsViewModel)
     fun inject(connectionIndicatorViewModel: ConnectionIndicatorViewModel)
@@ -176,6 +179,7 @@ internal interface ApplicationComponent {
     fun inject(finalizeSentTxListViewModel: FinalizeSendTxViewModel)
     fun inject(walletInfoViewModel: WalletInfoViewModel)
     fun inject(requestTariViewModel: RequestTariViewModel)
+    fun inject(addAmountViewModel: AddAmountViewModel)
     /**
      * Service(s).
      */
