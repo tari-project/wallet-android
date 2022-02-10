@@ -109,7 +109,7 @@
 
     <!-- testnet UTXO messages -->
     <string name="faucet_error_title">Failed to claim tXTR</string>
-    <string name="faucet_error_too_many_allocation_attemps">You have made too many free tXTR requests.</string>
+    <string name="faucet_error_common">No free tXTR is available right now! Hang tight, we\'ll get you some tXTR the moment it is available.</string>
     <string name="first_testnet_utxo_tx_message">💸 Here’s some tXTR!</string>
     <string name="second_testnet_utxo_tx_message">Nice work! Here\'s more tXTR to fill your coffers. Be sure to hit the Store icon to see real, exclusive items you can redeem with your "hard-earned" tXTR.</string>
 
