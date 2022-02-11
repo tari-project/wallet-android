@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.orhanobut.logger.Logger
 import com.tari.android.wallet.R.color.*
 import com.tari.android.wallet.R.string.*
+import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepository
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.infrastructure.backup.BackupManager
 import com.tari.android.wallet.infrastructure.backup.BackupState
@@ -40,6 +41,9 @@ internal class AllSettingsViewModel : CommonViewModel() {
     lateinit var backupManager: BackupManager
 
     @Inject
+    lateinit var networkRepository: NetworkRepository
+
+    @Inject
     lateinit var authService: BiometricAuthenticationService
 
     private val _navigation: SingleLiveEvent<AllSettingsNavigation> = SingleLiveEvent()
@@ -54,10 +58,15 @@ internal class AllSettingsViewModel : CommonViewModel() {
     private val _lastBackupDate: MutableLiveData<String> = MutableLiveData()
     val lastBackupDate: LiveData<String> = _lastBackupDate
 
+    private val _versionInfo: MutableLiveData<String> = MutableLiveData()
+    var versionInfo: LiveData<String> = _versionInfo
+
     init {
         component.inject(this)
         EventBus.backupState.subscribe(this) { backupState -> onBackupStateChanged(backupState) }
         checkStorageStatus()
+
+        _versionInfo.postValue(TariVersionModel(networkRepository).versionInfo)
     }
 
     fun openTariUrl() = _openLink.postValue(resourceManager.getString(tari_url))
@@ -69,6 +78,8 @@ internal class AllSettingsViewModel : CommonViewModel() {
     fun openPrivateUrl() = _openLink.postValue(resourceManager.getString(privacy_policy_url))
 
     fun openDisclaimerUrl() = _openLink.postValue(resourceManager.getString(disclaimer_url))
+
+    fun openExplorerUrl() = _openLink.postValue(resourceManager.getString(explorer_url))
 
     fun navigateToDeleteWallet() = _navigation.postValue(AllSettingsNavigation.ToDeleteWallet)
 
