@@ -231,7 +231,7 @@ internal class TxListViewModel() : CommonViewModel() {
         }
 
         EventBus.subscribe<Event.Testnet.TestnetTariRequestSuccessful>(this) { testnetTariRequestSuccessful() }
-        EventBus.subscribe<Event.Testnet.TestnetTariRequestError>(this) { event -> testnetTariRequestError(event.errorMessage) }
+        EventBus.subscribe<Event.Testnet.TestnetTariRequestError>(this) { testnetTariRequestError() }
 
         EventBus.subscribe<Event.Transaction.TxSendSuccessful>(this) { onTxSendSuccessful(it.txId) }
         EventBus.subscribe<Event.Transaction.TxSendFailed>(this) { onTxSendFailed(it.failureReason) }
@@ -394,11 +394,10 @@ internal class TxListViewModel() : CommonViewModel() {
         }
     }
 
-    private fun testnetTariRequestError(errorMessage: String) {
+    private fun testnetTariRequestError() {
         testnetTariRequestIsInProgress = false
         if (!networkRepository.currentNetwork?.faucetUrl.isNullOrEmpty()) {
-            val description = if (errorMessage.contains("many allocation attempts"))
-                resourceManager.getString(R.string.faucet_error_too_many_allocation_attemps) else errorMessage
+            val description = resourceManager.getString(R.string.faucet_error_common)
             val errorDialogArgs = ErrorDialogArgs(resourceManager.getString(R.string.faucet_error_title), description)
             _errorDialog.postValue(errorDialogArgs)
         }
