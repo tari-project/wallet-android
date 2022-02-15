@@ -34,45 +34,32 @@ package com.tari.android.wallet.ffi
 
 import java.math.BigInteger
 
-/**
- * Completed transaction wrapper.
- *
- * @author The Tari Development Team
- */
-internal class FFICompletedTx() : FFIBase() {
+
+internal class FFICompletedTx() : FFITxBase() {
 
     // region JNI
 
     private external fun jniGetId(libError: FFIError): ByteArray
-    private external fun jniGetDestinationPublicKey(
-        libError: FFIError
-    ): FFIPointer
-    private external fun jniGetTransactionKernel(
-        libError: FFIError
-    ): FFIPointer
-    private external fun jniGetSourcePublicKey(
-        libError: FFIError
-    ): FFIPointer
-
+    private external fun jniGetDestinationPublicKey(libError: FFIError): FFIPointer
+    private external fun jniGetTransactionKernel(libError: FFIError): FFIPointer
+    private external fun jniGetSourcePublicKey(libError: FFIError): FFIPointer
     private external fun jniGetAmount(libError: FFIError): ByteArray
     private external fun jniGetFee(libError: FFIError): ByteArray
-    private external fun jniGetTimestamp(
-        libError: FFIError
-    ): ByteArray
-
+    private external fun jniGetTimestamp(libError: FFIError): ByteArray
     private external fun jniGetMessage(libError: FFIError): String
     private external fun jniGetStatus(libError: FFIError): Int
     private external fun jniGetConfirmationCount(libError: FFIError): ByteArray
-    private external fun jniIsOutbound(
-        libError: FFIError
-    ): Boolean
-
+    private external fun jniIsOutbound(libError: FFIError): Boolean
     private external fun jniDestroy()
 
     // endregion
 
     constructor(pointer: FFIPointer): this() {
         this.pointer = pointer
+    }
+
+    override fun destroy() {
+        jniDestroy()
     }
 
     fun getId(): BigInteger {
@@ -82,14 +69,14 @@ internal class FFICompletedTx() : FFIBase() {
         return BigInteger(1, bytes)
     }
 
-    fun getDestinationPublicKey(): FFIPublicKey {
+    override fun getDestinationPublicKey(): FFIPublicKey {
         val error = FFIError()
         val result = FFIPublicKey(jniGetDestinationPublicKey(error))
         throwIf(error)
         return result
     }
 
-    fun getSourcePublicKey(): FFIPublicKey {
+    override fun getSourcePublicKey(): FFIPublicKey {
         val error = FFIError()
         val result = FFIPublicKey(jniGetSourcePublicKey(error))
         throwIf(error)
@@ -138,7 +125,7 @@ internal class FFICompletedTx() : FFIBase() {
         return BigInteger(1, bytes)
     }
 
-    fun isOutbound(): Boolean {
+    override fun isOutbound(): Boolean {
         val error = FFIError()
         val result = jniIsOutbound(error)
         throwIf(error)
@@ -151,9 +138,4 @@ internal class FFICompletedTx() : FFIBase() {
         throwIf(error)
         return result
     }
-
-    override fun destroy() {
-        jniDestroy()
-    }
-
 }

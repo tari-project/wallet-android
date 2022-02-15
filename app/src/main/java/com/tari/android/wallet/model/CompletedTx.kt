@@ -34,6 +34,8 @@ package com.tari.android.wallet.model
 
 import android.os.Parcel
 import android.os.Parcelable
+import com.tari.android.wallet.ffi.FFICompletedTx
+import com.tari.android.wallet.ffi.FFIPointer
 import java.math.BigInteger
 
 /**
@@ -45,7 +47,6 @@ class CompletedTx() : Tx(), Parcelable {
 
     var fee = MicroTari(BigInteger("0"))
     var confirmationCount = BigInteger("0")
-    var status = TxStatus.COMPLETED
 
     constructor(
         id: BigInteger,
@@ -69,6 +70,21 @@ class CompletedTx() : Tx(), Parcelable {
         this.confirmationCount = confirmationCount
     }
 
+    constructor(pointer: FFIPointer) : this() {
+        val tx = FFICompletedTx(pointer)
+        this.id = tx.getId()
+        this.direction = tx.getDirection()
+        this.user = tx.getUser()
+        this.amount = MicroTari(tx.getAmount())
+        this.fee = MicroTari(tx.getFee())
+        this.timestamp = tx.getTimestamp()
+        this.message = tx.getMessage()
+        this.status = TxStatus.map(tx.getStatus())
+        this.confirmationCount = tx.getConfirmationCount()
+
+        tx.destroy()
+    }
+
     // region Parcelable
 
     constructor(parcel: Parcel) : this() {
@@ -88,7 +104,6 @@ class CompletedTx() : Tx(), Parcelable {
         override fun newArray(size: Int): Array<CompletedTx> {
             return Array(size) { CompletedTx() }
         }
-
     }
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {
@@ -126,5 +141,4 @@ class CompletedTx() : Tx(), Parcelable {
     }
 
     // endregion
-
 }

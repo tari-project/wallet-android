@@ -34,6 +34,8 @@ package com.tari.android.wallet.model
 
 import android.os.Parcel
 import android.os.Parcelable
+import com.tari.android.wallet.ffi.FFIPendingInboundTx
+import com.tari.android.wallet.ffi.FFIPointer
 import java.math.BigInteger
 
 /**
@@ -43,16 +45,7 @@ import java.math.BigInteger
  */
 class PendingInboundTx() : Tx(), Parcelable {
 
-    var status = TxStatus.PENDING
-
-    constructor(
-        id: BigInteger,
-        user: User,
-        amount: MicroTari,
-        timestamp: BigInteger,
-        message: String,
-        status: TxStatus
-    ) : this() {
+    constructor(id: BigInteger, user: User, amount: MicroTari, timestamp: BigInteger, message: String, status: TxStatus) : this() {
         this.id = id
         this.direction = Direction.INBOUND
         this.user = user
@@ -60,6 +53,18 @@ class PendingInboundTx() : Tx(), Parcelable {
         this.timestamp = timestamp
         this.message = message
         this.status = status
+    }
+
+    constructor(pointer: FFIPointer) : this() {
+        val tx = FFIPendingInboundTx(pointer)
+        this.id = tx.getId()
+        this.direction = tx.getDirection()
+        this.user = tx.getUser()
+        this.amount = MicroTari(tx.getAmount())
+        this.timestamp = tx.getTimestamp()
+        this.message = tx.getMessage()
+        this.status = TxStatus.map(tx.getStatus())
+        tx.destroy()
     }
 
     override fun toString(): String {
@@ -81,7 +86,6 @@ class PendingInboundTx() : Tx(), Parcelable {
         override fun newArray(size: Int): Array<PendingInboundTx> {
             return Array(size) { PendingInboundTx() }
         }
-
     }
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {

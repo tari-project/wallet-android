@@ -423,9 +423,7 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
     }
 
     override fun onTxMinedUnconfirmed(completedTx: CompletedTx, confirmationCount: Int) {
-        Logger.d(
-            "Tx ${completedTx.id} mined, yet unconfirmed. Confirmation count: $confirmationCount"
-        )
+        Logger.d("Tx ${completedTx.id} mined, yet unconfirmed. Confirmation count: $confirmationCount")
         completedTx.user = getUserByPublicKey(completedTx.user.publicKey)
         // post event to bus for the internal listeners
         EventBus.post(Event.Transaction.TxMinedUnconfirmed(completedTx))
@@ -433,6 +431,28 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
         listeners.iterator().forEach {
             it.onTxMinedUnconfirmed(completedTx, confirmationCount)
         }
+        // schedule a backup
+        backupManager.scheduleBackup(resetRetryCount = true)
+    }
+
+    override fun onTxFeuxConfirmed(completedTx: CompletedTx) {
+        Logger.d("Tx feux ${completedTx.id} confirmed.")
+        completedTx.user = getUserByPublicKey(completedTx.user.publicKey)
+        // post event to bus for the internal listeners
+        EventBus.post(Event.Transaction.TxFeuxConfirmed(completedTx))
+        // notify external listeners
+        listeners.iterator().forEach { it.onTxFauxConfirmed(completedTx) }
+        // schedule a backup
+        backupManager.scheduleBackup(resetRetryCount = true)
+    }
+
+    override fun onTxFeuxUnconfirmed(completedTx: CompletedTx, confirmationCount: Int) {
+        Logger.d("Tx feux ${completedTx.id} yet unconfirmed. Confirmation count: $confirmationCount")
+        completedTx.user = getUserByPublicKey(completedTx.user.publicKey)
+        // post event to bus for the internal listeners
+        EventBus.post(Event.Transaction.TxFeuxMinedUnconfirmed(completedTx))
+        // notify external listeners
+        listeners.iterator().forEach { it.onTxFauxUnconfirmed(completedTx, confirmationCount) }
         // schedule a backup
         backupManager.scheduleBackup(resetRetryCount = true)
     }
@@ -1022,22 +1042,12 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
             }
             if (completedTxFFI.isOutbound()) {
                 direction = OUTBOUND
-                val userPublicKey = PublicKey(
-                    destinationPublicKeyFFI.toString(),
-                    destinationPublicKeyFFI.getEmojiId()
-                )
-                user = getContactByPublicKeyHexString(
-                    destinationPublicKeyFFI.toString()
-                ) ?: User(userPublicKey)
+                val userPublicKey = PublicKey(destinationPublicKeyFFI.toString(), destinationPublicKeyFFI.getEmojiId())
+                user = getContactByPublicKeyHexString(destinationPublicKeyFFI.toString()) ?: User(userPublicKey)
             } else {
                 direction = INBOUND
-                val userPublicKey = PublicKey(
-                    sourcePublicKeyFFI.toString(),
-                    sourcePublicKeyFFI.getEmojiId()
-                )
-                user = getContactByPublicKeyHexString(
-                    sourcePublicKeyFFI.toString()
-                ) ?: User(userPublicKey)
+                val userPublicKey = PublicKey(sourcePublicKeyFFI.toString(), sourcePublicKeyFFI.getEmojiId())
+                user = getContactByPublicKeyHexString(sourcePublicKeyFFI.toString()) ?: User(userPublicKey)
             }
             val completedTx = CompletedTx(
                 completedTxFFI.getId(),
@@ -1071,22 +1081,12 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
 
             if (completedTxFFI.isOutbound()) {
                 direction = OUTBOUND
-                val userPublicKey = PublicKey(
-                    destinationPublicKeyFFI.toString(),
-                    destinationPublicKeyFFI.getEmojiId()
-                )
-                user = getContactByPublicKeyHexString(
-                    destinationPublicKeyFFI.toString()
-                ) ?: User(userPublicKey)
+                val userPublicKey = PublicKey(destinationPublicKeyFFI.toString(), destinationPublicKeyFFI.getEmojiId())
+                user = getContactByPublicKeyHexString(destinationPublicKeyFFI.toString()) ?: User(userPublicKey)
             } else {
                 direction = INBOUND
-                val userPublicKey = PublicKey(
-                    sourcePublicKeyFFI.toString(),
-                    sourcePublicKeyFFI.getEmojiId()
-                )
-                user = getContactByPublicKeyHexString(
-                    sourcePublicKeyFFI.toString()
-                ) ?: User(userPublicKey)
+                val userPublicKey = PublicKey(sourcePublicKeyFFI.toString(), sourcePublicKeyFFI.getEmojiId())
+                user = getContactByPublicKeyHexString(sourcePublicKeyFFI.toString()) ?: User(userPublicKey)
             }
             val tx = CancelledTx(
                 completedTxFFI.getId(),
@@ -1107,18 +1107,11 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
             return tx
         }
 
-        private fun pendingInboundTxFromFFI(
-            pendingInboundTxFFI: FFIPendingInboundTx
-        ): PendingInboundTx {
+        private fun pendingInboundTxFromFFI(pendingInboundTxFFI: FFIPendingInboundTx): PendingInboundTx {
             val status = TxStatus.map(pendingInboundTxFFI.getStatus())
             val sourcePublicKeyFFI = pendingInboundTxFFI.getSourcePublicKey()
-            val userPublicKey = PublicKey(
-                sourcePublicKeyFFI.toString(),
-                sourcePublicKeyFFI.getEmojiId()
-            )
-            val user = getContactByPublicKeyHexString(
-                sourcePublicKeyFFI.toString()
-            ) ?: User(userPublicKey)
+            val userPublicKey = PublicKey(sourcePublicKeyFFI.toString(), sourcePublicKeyFFI.getEmojiId())
+            val user = getContactByPublicKeyHexString(sourcePublicKeyFFI.toString()) ?: User(userPublicKey)
             val pendingInboundTx = PendingInboundTx(
                 pendingInboundTxFFI.getId(),
                 user,
@@ -1132,18 +1125,11 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
             return pendingInboundTx
         }
 
-        private fun pendingOutboundTxFromFFI(
-            pendingOutboundTxFFI: FFIPendingOutboundTx
-        ): PendingOutboundTx {
+        private fun pendingOutboundTxFromFFI(pendingOutboundTxFFI: FFIPendingOutboundTx): PendingOutboundTx {
             val status = TxStatus.map(pendingOutboundTxFFI.getStatus())
             val destinationPublicKeyFFI = pendingOutboundTxFFI.getDestinationPublicKey()
-            val userPublicKey = PublicKey(
-                destinationPublicKeyFFI.toString(),
-                destinationPublicKeyFFI.getEmojiId()
-            )
-            val user = getContactByPublicKeyHexString(
-                destinationPublicKeyFFI.toString()
-            ) ?: User(userPublicKey)
+            val userPublicKey = PublicKey(destinationPublicKeyFFI.toString(), destinationPublicKeyFFI.getEmojiId())
+            val user = getContactByPublicKeyHexString(destinationPublicKeyFFI.toString()) ?: User(userPublicKey)
             val pendingOutboundTx = PendingOutboundTx(
                 pendingOutboundTxFFI.getId(),
                 user,

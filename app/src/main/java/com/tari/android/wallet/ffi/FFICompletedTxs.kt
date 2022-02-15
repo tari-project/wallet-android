@@ -42,10 +42,7 @@ internal class FFICompletedTxs() : FFIBase() {
     // region JNI
 
     private external fun jniGetLength(libError: FFIError): Int
-    private external fun jniGetAt(
-        index: Int,
-        libError: FFIError
-    ): FFIPointer
+    private external fun jniGetAt(index: Int, libError: FFIError): FFIPointer
 
     private external fun jniDestroy()
 
