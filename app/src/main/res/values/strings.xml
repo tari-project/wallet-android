@@ -11,6 +11,7 @@
     <string name="user_agreement_url">https://www.tari.com/user_agreement/</string>
     <string name="privacy_policy_url">https://www.tari.com/privacy_policy/</string>
     <string name="disclaimer_url">https://www.tari.com/disclaimer/</string>
+    <string name="explorer_url">https://explore.tari.com</string>
     <string name="ffi_admin_email_address" translatable="false">bug_reports@tari.com</string>
     <string name="tari_lab_university_url" translatable="false">https://tlu.tarilabs.com/</string>
     <string name="network_faucet_url" translatable="false">https://faucet.tari.com</string>
@@ -109,7 +110,7 @@
 
     <!-- testnet UTXO messages -->
     <string name="faucet_error_title">Failed to claim tXTR</string>
-    <string name="faucet_error_too_many_allocation_attemps">You have made too many free tXTR requests.</string>
+    <string name="faucet_error_common">No free tXTR is available right now! Hang tight, we\'ll get you some tXTR the moment it is available.</string>
     <string name="first_testnet_utxo_tx_message">💸 Here’s some tXTR!</string>
     <string name="second_testnet_utxo_tx_message">Nice work! Here\'s more tXTR to fill your coffers. Be sure to hit the Store icon to see real, exclusive items you can redeem with your "hard-earned" tXTR.</string>
 
@@ -366,6 +367,7 @@
     <string name="all_settings_user_agreement">User Agreement</string>
     <string name="all_settings_privacy_policy">Privacy Policy</string>
     <string name="all_settings_disclaimer">Disclaimer</string>
+    <string name="all_settings_explorer">Block Explorer</string>
     <string name="all_settings_background_service">Background Service</string>
     <string name="all_settings_manage_yats">Manage Yats</string>
     <string name="all_settings_connect_yats">Connect Yats</string>
@@ -375,6 +377,8 @@
     <string name="all_settings_select_network_description">Please select the network to which you want to connect</string>
     <string name="all_settings_select_network_confirm_title">One thing before you go</string>
     <string name="all_settings_select_network_confirm_description">You will be logged out and switched to a different network. Do you want to continue?</string>
+    <string name="all_settings_version_text_copy_title">Tari Wallet Version</string>
+    <string name="all_settings_version_text_copy_toast_message">Tari version was copied</string>
 
     <!-- Background service -->
     <string name="background_service_title">Background service</string>

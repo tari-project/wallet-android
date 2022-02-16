@@ -372,6 +372,37 @@
                         android:layout_gravity="center_vertical|end"
                         android:src="@drawable/icon_apply_setting" />
                 </FrameLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginHorizontal="25dp"
+                    android:background="@color/settings_background" />
+
+                <FrameLayout
+                    android:id="@+id/explorer_cta_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/menu_item_height"
+                    android:background="@drawable/setting_option_background"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:paddingHorizontal="@dimen/common_horizontal_margin">
+
+                    <com.tari.android.wallet.ui.component.CustomFontTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical|start"
+                        android:text="@string/all_settings_explorer"
+                        android:textColor="@color/black"
+                        android:textSize="15sp"
+                        app:customFont="@string/font_medium" />
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical|end"
+                        android:src="@drawable/icon_apply_setting" />
+                </FrameLayout>
             </LinearLayout>
 
             <!-- yat settings title -->
@@ -425,36 +456,36 @@
                         android:src="@drawable/open_in_browser" />
                 </FrameLayout>
 
-<!--                <View-->
-<!--                    android:layout_width="match_parent"-->
-<!--                    android:layout_height="1dp"-->
-<!--                    android:layout_marginHorizontal="25dp"-->
-<!--                    android:background="@color/settings_background" />-->
+                <!--                <View-->
+                <!--                    android:layout_width="match_parent"-->
+                <!--                    android:layout_height="1dp"-->
+                <!--                    android:layout_marginHorizontal="25dp"-->
+                <!--                    android:background="@color/settings_background" />-->
 
-<!--                <FrameLayout-->
-<!--                    android:id="@+id/manage_yats"-->
-<!--                    android:layout_width="match_parent"-->
-<!--                    android:layout_height="@dimen/menu_item_height"-->
-<!--                    android:background="@drawable/setting_option_background"-->
-<!--                    android:clickable="true"-->
-<!--                    android:focusable="true"-->
-<!--                    android:paddingHorizontal="@dimen/common_horizontal_margin">-->
+                <!--                <FrameLayout-->
+                <!--                    android:id="@+id/manage_yats"-->
+                <!--                    android:layout_width="match_parent"-->
+                <!--                    android:layout_height="@dimen/menu_item_height"-->
+                <!--                    android:background="@drawable/setting_option_background"-->
+                <!--                    android:clickable="true"-->
+                <!--                    android:focusable="true"-->
+                <!--                    android:paddingHorizontal="@dimen/common_horizontal_margin">-->
 
-<!--                    <com.tari.android.wallet.ui.component.CustomFontTextView-->
-<!--                        android:layout_width="wrap_content"-->
-<!--                        android:layout_height="wrap_content"-->
-<!--                        android:layout_gravity="center_vertical|start"-->
-<!--                        android:text="@string/all_settings_manage_yats"-->
-<!--                        android:textColor="@color/black"-->
-<!--                        android:textSize="15sp"-->
-<!--                        app:customFont="@string/font_medium" />-->
+                <!--                    <com.tari.android.wallet.ui.component.CustomFontTextView-->
+                <!--                        android:layout_width="wrap_content"-->
+                <!--                        android:layout_height="wrap_content"-->
+                <!--                        android:layout_gravity="center_vertical|start"-->
+                <!--                        android:text="@string/all_settings_manage_yats"-->
+                <!--                        android:textColor="@color/black"-->
+                <!--                        android:textSize="15sp"-->
+                <!--                        app:customFont="@string/font_medium" />-->
 
-<!--                    <androidx.appcompat.widget.AppCompatImageView-->
-<!--                        android:layout_width="wrap_content"-->
-<!--                        android:layout_height="wrap_content"-->
-<!--                        android:layout_gravity="center_vertical|end"-->
-<!--                        android:src="@drawable/open_in_browser" />-->
-<!--                </FrameLayout>-->
+                <!--                    <androidx.appcompat.widget.AppCompatImageView-->
+                <!--                        android:layout_width="wrap_content"-->
+                <!--                        android:layout_height="wrap_content"-->
+                <!--                        android:layout_gravity="center_vertical|end"-->
+                <!--                        android:src="@drawable/open_in_browser" />-->
+                <!--                </FrameLayout>-->
 
             </LinearLayout>
 
@@ -598,6 +629,33 @@
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical|end"
                         android:src="@drawable/icon_apply_setting_red" />
+                </FrameLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginHorizontal="25dp"
+                    android:background="@color/settings_background" />
+
+                <FrameLayout
+                    android:id="@+id/network_info_cta_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/menu_item_height"
+                    android:background="@drawable/setting_option_background"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:paddingHorizontal="@dimen/common_horizontal_margin">
+
+                    <com.tari.android.wallet.ui.component.CustomFontTextView
+                        android:id="@+id/network_info_text_view"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:letterSpacing="0.1"
+                        android:textColor="@color/settings_version_label"
+                        android:textSize="15sp"
+                        app:customFont="@string/font_medium"
+                        tools:text="version text" />
                 </FrameLayout>
             </LinearLayout>
         </LinearLayout>

@@ -102,6 +102,7 @@
 
     <!-- settings -->
     <color name="settings_background">#F6F6F6</color>
+    <color name="settings_version_label">#817E8A</color>
 
     <!-- wallet restore -->
     <color name="wallet_restore_page_background">@color/settings_background</color>
