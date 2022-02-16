@@ -3,7 +3,7 @@ package com.tari.android.wallet.ui.fragment.send.finalize
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.orhanobut.logger.Logger
-import com.tari.android.wallet.R
+import com.tari.android.wallet.R.string.*
 import com.tari.android.wallet.event.Event
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.extension.addTo
@@ -29,16 +29,12 @@ import javax.inject.Inject
 class FinalizeSendTxViewModel : CommonViewModel() {
 
     lateinit var transactionData: TransactionData
-    lateinit var connectionCheckStartTime: DateTime
 
     val steps: MutableLiveData<MutableList<FinalizingStep>> = MutableLiveData<MutableList<FinalizingStep>>()
     val sentTxId: MutableLiveData<TxId> = MutableLiveData()
     val txFailureReason: MutableLiveData<TxFailureReason> = MutableLiveData()
     val isSuccess = MutableLiveData<Boolean>()
     val nextStep = MutableLiveData<FinalizingStep>()
-
-    val currentStep
-        get() = steps.value?.firstOrNull { !it.isCompleted }
 
     private val connectionService: TariWalletServiceConnection = TariWalletServiceConnection()
     val walletService: TariWalletService
@@ -56,30 +52,29 @@ class FinalizeSendTxViewModel : CommonViewModel() {
     fun start() {
         val stepList = mutableListOf<FinalizingStep>()
         stepList.add(ConnectionCheckStep(resourceManager))
-        if (transactionData.isOneSidePayment) {
-            stepList.add(SuccessStep(resourceManager))
-        } else {
-            stepList.add(DiscoveryStep(resourceManager))
+        stepList.add(DiscoveryStep(resourceManager))
+        if (!transactionData.isOneSidePayment) {
             stepList.add(SentStep(resourceManager))
         }
-        steps.postValue(stepList)
+        steps.value = stepList
+
+        checkStepStatus()
     }
 
-    fun checkStepStatus(): Boolean {
-        steps.value?.firstOrNull { !it.isCompleted }?.let {
+    fun checkStepStatus() {
+        steps.value?.firstOrNull { !it.isCompleted || !it.isStarted }?.let {
             val isStarted = it.isStarted
             it.check()
 
             if (!isStarted) {
                 this.nextStep.postValue(it)
-                return true
+                return
             }
         }
 
-        if (steps.value?.all { it.isCompleted } == true) {
+        if (steps.value?.all { it.isStarted && it.isCompleted } == true && txFailureReason.value == null) {
             isSuccess.postValue(true)
         }
-        return false
     }
 
     abstract inner class FinalizingStep(val resourceManager: ResourceManager, descLine1Res: Int, descLine2Res: Int) {
@@ -87,8 +82,8 @@ class FinalizeSendTxViewModel : CommonViewModel() {
         var isStarted: Boolean = false
         var isCompleted: Boolean = false
 
-        val descriptionLine1 = resourceManager.getString(descLine1Res)
-        val descriptionLine2 = resourceManager.getString(descLine2Res)
+        var descriptionLine1 = resourceManager.getString(descLine1Res)
+        var descriptionLine2 = resourceManager.getString(descLine2Res)
 
         abstract fun execute()
 
@@ -102,22 +97,27 @@ class FinalizeSendTxViewModel : CommonViewModel() {
 
     inner class ConnectionCheckStep(resourceManager: ResourceManager) : FinalizingStep(
         resourceManager,
-        R.string.finalize_send_tx_sending_step_1_desc_line_1,
-        R.string.finalize_send_tx_sending_step_1_desc_line_2
+        finalize_send_tx_sending_step_1_desc_line_1,
+        finalize_send_tx_sending_step_1_desc_line_2
     ) {
+        var connectionCheckStartTime: DateTime? = null
+
         override fun check() {
             super.check()
+
+            connectionCheckStartTime ?: return
 
             val secondsElapsed = Seconds.secondsBetween(connectionCheckStartTime, DateTime.now()).seconds
             if (secondsElapsed >= connectionTimeoutSecs) {
                 val networkConnectionState = EventBus.networkConnectionState.publishSubject.value
                 if (networkConnectionState != NetworkConnectionState.CONNECTED) {
                     // internet connection problem
-                    txFailureReason.postValue(TxFailureReason.NETWORK_CONNECTION_ERROR)
+                    txFailureReason.value = TxFailureReason.NETWORK_CONNECTION_ERROR
                 } else {
                     // tor connection problem
-                    txFailureReason.postValue(TxFailureReason.BASE_NODE_CONNECTION_ERROR)
+                    txFailureReason.value = TxFailureReason.BASE_NODE_CONNECTION_ERROR
                 }
+                isCompleted = true
                 return
             }
         }
@@ -150,14 +150,16 @@ class FinalizeSendTxViewModel : CommonViewModel() {
             if (networkConnectionState != NetworkConnectionState.CONNECTED) {
                 Logger.w("Send error: not connected to the internet.")
                 // either not connected or Tor proxy is not running
-                txFailureReason.postValue(TxFailureReason.NETWORK_CONNECTION_ERROR)
+                txFailureReason.value = TxFailureReason.NETWORK_CONNECTION_ERROR
+                isCompleted = true
                 return
             }
             // check whether Tor proxy is running
             if (torProxyState !is TorProxyState.Running) {
                 Logger.w("Send error: Tor proxy is not running.")
                 // either not connected or Tor proxy is not running
-                txFailureReason.postValue(TxFailureReason.NETWORK_CONNECTION_ERROR)
+                txFailureReason.value = TxFailureReason.NETWORK_CONNECTION_ERROR
+                isCompleted = true
                 return
             }
             // check Tor bootstrap status
@@ -171,15 +173,21 @@ class FinalizeSendTxViewModel : CommonViewModel() {
         }
     }
 
-    inner class DiscoveryStep(resourceManager: ResourceManager) :
+    open inner class DiscoveryStep(resourceManager: ResourceManager) :
         FinalizingStep(
             resourceManager,
-            R.string.finalize_send_tx_sending_step_2_desc_line_1,
-            R.string.finalize_send_tx_sending_step_2_desc_line_2
+            finalize_send_tx_sending_step_2_desc_line_1,
+            finalize_send_tx_sending_step_2_desc_line_2
         ) {
-        override fun execute() {
-            //TODO maybe callback needed changed
 
+        init {
+            if (transactionData.isOneSidePayment) {
+                descriptionLine1 = resourceManager.getString(finalize_send_tx_sending_step_3_desc_line_1)
+                descriptionLine2 = resourceManager.getString(finalize_send_tx_sending_step_3_desc_line_2)
+            }
+        }
+
+        override fun execute() {
             viewModelScope.launch(Dispatchers.IO) {
                 val error = WalletError()
                 val txId = walletService.sendTari(
@@ -192,11 +200,11 @@ class FinalizeSendTxViewModel : CommonViewModel() {
                 )
                 // if success, just wait for the callback to happen
                 // if failed, just show the failed info & return
+                isCompleted = true
                 if (txId == null || error.code != WalletErrorCode.NO_ERROR) {
                     txFailureReason.postValue(TxFailureReason.SEND_ERROR)
                 } else {
                     sentTxId.postValue(txId)
-                    isCompleted = true
                 }
             }
         }
@@ -205,9 +213,13 @@ class FinalizeSendTxViewModel : CommonViewModel() {
     inner class SentStep(resourceManager: ResourceManager) :
         FinalizingStep(
             resourceManager,
-            R.string.finalize_send_tx_sending_step_3_desc_line_1,
-            R.string.finalize_send_tx_sending_step_3_desc_line_2
+            finalize_send_tx_sending_step_3_desc_line_1,
+            finalize_send_tx_sending_step_3_desc_line_2
         ) {
+
+        init {
+            subscribeToEventBus()
+        }
 
         /**
          * Both send methods have to fail to arrive at the judgement that the send has failed.
@@ -215,7 +227,7 @@ class FinalizeSendTxViewModel : CommonViewModel() {
         private var directSendHasFailed = false
         private var storeAndForwardHasFailed = false
 
-        override fun execute() = subscribeToEventBus()
+        override fun execute() = Unit
 
         private fun subscribeToEventBus() {
             EventBus.subscribe<Event.Transaction.DirectSendResult>(this) { event -> onDirectSendResult(event.txId, event.success) }
@@ -263,18 +275,9 @@ class FinalizeSendTxViewModel : CommonViewModel() {
 
         private fun checkForCombinedFailure() {
             if (directSendHasFailed && storeAndForwardHasFailed) { // both have failed
-                txFailureReason.postValue(TxFailureReason.SEND_ERROR)
+                txFailureReason.value = TxFailureReason.SEND_ERROR
+                isCompleted = true
             }
-        }
-    }
-
-    inner class SuccessStep(resourceManager: ResourceManager) : FinalizingStep(
-        resourceManager,
-        R.string.finalize_send_tx_sending_step_3_desc_line_1,
-        R.string.finalize_send_tx_sending_step_3_desc_line_2
-    )  {
-        override fun execute() {
-            isCompleted = true
         }
     }
 

@@ -509,9 +509,16 @@ class FFIWalletTests {
             minedTxs.add(completedTx)
         }
 
+        override fun onTxFeuxConfirmed(completedTx: CompletedTx) {
+            TODO("Not yet implemented")
+        }
+
+        override fun onTxFeuxUnconfirmed(completedTx: CompletedTx, confirmationCount: Int) {
+            TODO("Not yet implemented")
+        }
+
         override fun onTxCancelled(cancelledTx: CancelledTx, rejectionReason: Int) {
             Logger.i("Tx Cancelled :: cancelled tx id: %s, reason code: %s", cancelledTx.id, rejectionReason.toString())
-            cancelledTxs.add(cancelledTx)
         }
 
         override fun onTXOValidationComplete(responseId: BigInteger, isSuccess: Boolean) {

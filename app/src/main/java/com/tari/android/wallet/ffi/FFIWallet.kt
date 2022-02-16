@@ -384,17 +384,17 @@ internal class FFIWallet(
     @Suppress("MemberVisibilityCanBePrivate")
     fun onTxReceived(pendingInboundTxPtr: FFIPointer) {
         Logger.i("Tx received. Pointer: %s", pendingInboundTxPtr.toString())
-        val pendingTx = PendingInboundTx(pendingInboundTxPtr)
+        val pendingTx = PendingInboundTx(FFICompletedTx(pendingInboundTxPtr))
         GlobalScope.launch { listener?.onTxReceived(pendingTx) }
     }
 
     /**
-     * This callback function cannot be private due to JNI behaviour.
+     * This callback function cannot be private due to JNI behaviour
      */
     @Suppress("MemberVisibilityCanBePrivate")
     fun onTxReplyReceived(txPointer: FFIPointer) {
         Logger.i("Tx reply received. Pointer: %s", txPointer.toString())
-        val pendingOutboundTx = PendingOutboundTx(txPointer)
+        val pendingOutboundTx = PendingOutboundTx(FFICompletedTx(txPointer))
         GlobalScope.launch { listener?.onTxReplyReceived(pendingOutboundTx) }
     }
 
@@ -404,7 +404,7 @@ internal class FFIWallet(
     @Suppress("MemberVisibilityCanBePrivate")
     fun onTxFinalized(completedTx: FFIPointer) {
         Logger.i("Tx finalized. Pointer: %s", completedTx.toString())
-        val pendingInboundTx = PendingInboundTx(completedTx)
+        val pendingInboundTx = PendingInboundTx(FFICompletedTx(completedTx))
         GlobalScope.launch { listener?.onTxFinalized(pendingInboundTx) }
     }
 
@@ -417,15 +417,14 @@ internal class FFIWallet(
         val tx = FFICompletedTx(completedTxPtr)
         when (tx.getDirection()) {
             Tx.Direction.INBOUND -> {
-                val pendingInboundTx = PendingInboundTx(completedTxPtr)
+                val pendingInboundTx = PendingInboundTx(tx)
                 GlobalScope.launch { listener?.onInboundTxBroadcast(pendingInboundTx) }
             }
             Tx.Direction.OUTBOUND -> {
-                val pendingOutboundTx = PendingOutboundTx(completedTxPtr)
+                val pendingOutboundTx = PendingOutboundTx(tx)
                 GlobalScope.launch { listener?.onOutboundTxBroadcast(pendingOutboundTx) }
             }
         }
-        tx.destroy()
     }
 
     /**
@@ -493,8 +492,14 @@ internal class FFIWallet(
     fun onTxCancelled(completedTx: FFIPointer, rejectionReason: ByteArray) {
         Logger.i("Tx cancelled. Pointer: %s", completedTx.toString())
         val rejectionReasonInt = BigInteger(1, rejectionReason).toInt()
-        val cancelled = CancelledTx(pointer)
-        GlobalScope.launch { listener?.onTxCancelled(cancelled, rejectionReasonInt) }
+
+        val tx = FFICompletedTx(completedTx)
+        when (tx.getDirection()) {
+            Tx.Direction.OUTBOUND -> {
+                val cancelledTx = CancelledTx(tx)
+                GlobalScope.launch { listener?.onTxCancelled(cancelledTx, rejectionReasonInt) }
+            }
+        }
     }
 
     /**

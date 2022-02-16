@@ -20,7 +20,7 @@ class FinalizingStepView : FrameLayout {
 
     lateinit var ui: ViewFinalizingStepBinding
     lateinit var step: FinalizeSendTxViewModel.FinalizingStep
-    lateinit var ticAction: () -> Boolean
+    lateinit var ticAction: () -> Unit
 
     constructor(context: Context) : super(context) {
         init()
@@ -50,7 +50,7 @@ class FinalizingStepView : FrameLayout {
         }
     }
 
-    fun setup(step: FinalizeSendTxViewModel.FinalizingStep, ticAction: () -> Boolean) {
+    fun setup(step: FinalizeSendTxViewModel.FinalizingStep, ticAction: () -> Unit) {
         this.step = step
         this.ticAction = ticAction
     }
@@ -79,7 +79,8 @@ class FinalizingStepView : FrameLayout {
     }
 
     private fun tryToProceedToTheNextStepOnProgressAnimCompletion(isReverse: Boolean) {
-        if (!step.isCompleted && !ticAction()) {
+        ticAction()
+        if (!step.isCompleted) {
             animateCurrentStepProgress(isReverse)
         } else {
             progressAnim?.removeAllListeners()

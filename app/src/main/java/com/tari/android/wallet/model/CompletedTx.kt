@@ -70,7 +70,7 @@ class CompletedTx() : Tx(), Parcelable {
         this.confirmationCount = confirmationCount
     }
 
-    constructor(pointer: FFIPointer) : this() {
+    internal constructor(pointer: FFIPointer) : this() {
         val tx = FFICompletedTx(pointer)
         this.id = tx.getId()
         this.direction = tx.getDirection()

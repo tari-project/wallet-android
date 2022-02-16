@@ -402,9 +402,7 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
         // post event to bus for the internal listeners
         EventBus.post(Event.Transaction.OutboundTxBroadcast(pendingOutboundTx))
         // notify external listeners
-        listeners.iterator().forEach {
-            it.onOutboundTxBroadcast(pendingOutboundTx)
-        }
+        listeners.iterator().forEach { it.onOutboundTxBroadcast(pendingOutboundTx) }
         // schedule a backup
         backupManager.scheduleBackup(resetRetryCount = true)
     }

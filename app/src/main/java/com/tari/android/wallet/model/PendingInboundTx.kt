@@ -34,8 +34,7 @@ package com.tari.android.wallet.model
 
 import android.os.Parcel
 import android.os.Parcelable
-import com.tari.android.wallet.ffi.FFIPendingInboundTx
-import com.tari.android.wallet.ffi.FFIPointer
+import com.tari.android.wallet.ffi.FFICompletedTx
 import java.math.BigInteger
 
 /**
@@ -55,8 +54,7 @@ class PendingInboundTx() : Tx(), Parcelable {
         this.status = status
     }
 
-    constructor(pointer: FFIPointer) : this() {
-        val tx = FFIPendingInboundTx(pointer)
+    internal constructor(tx: FFICompletedTx) : this() {
         this.id = tx.getId()
         this.direction = tx.getDirection()
         this.user = tx.getUser()

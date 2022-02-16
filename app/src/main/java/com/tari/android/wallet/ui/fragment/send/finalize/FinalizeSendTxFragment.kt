@@ -84,7 +84,7 @@ class FinalizeSendTxFragment : CommonFragment<FragmentFinalizeSendTxBinding, Fin
 
         observe(isSuccess) { onSuccess() }
 
-        observe(nextStep) { showNextStep() }
+        observe(nextStep) { showNextStep(it) }
 
         observeOnLoad(sentTxId)
     }
@@ -115,12 +115,12 @@ class FinalizeSendTxFragment : CommonFragment<FragmentFinalizeSendTxBinding, Fin
         }
     }
 
-    private fun getCurrentStepView(): FinalizingStepView? = stepListView.firstOrNull { !it.step.isCompleted }
+    private fun getCurrentStepView(step: FinalizeSendTxViewModel.FinalizingStep): FinalizingStepView? = stepListView.firstOrNull { it.step == step }
 
-    private fun showNextStep() {
+    private fun showNextStep(step: FinalizeSendTxViewModel.FinalizingStep) {
         fadeOutTextViews {
-            playCurrentStepTextAppearAnimation()
-            getCurrentStepView()?.animateCurrentStepProgress(isReverse = false)
+            playCurrentStepTextAppearAnimation(step)
+            getCurrentStepView(step)?.animateCurrentStepProgress(isReverse = false)
         }
     }
 
@@ -132,13 +132,12 @@ class FinalizeSendTxFragment : CommonFragment<FragmentFinalizeSendTxBinding, Fin
         rootView.postDelayed({
             fadeInProgressBarContainers()
             ui.lottieAnimationView.playAnimation()
-            playCurrentStepTextAppearAnimation()
         }, Constants.UI.FinalizeSendTx.lottieAnimStartDelayMs)
     }
 
-    private fun playCurrentStepTextAppearAnimation() {
-        playStepAppearAnimation(viewModel.currentStep?.descriptionLine1.orEmpty(), ui.infoLine1TextView)
-        playStepAppearAnimation(viewModel.currentStep?.descriptionLine2.orEmpty(), ui.infoLine2TextView, Constants.UI.xShortDurationMs)
+    private fun playCurrentStepTextAppearAnimation(step: FinalizeSendTxViewModel.FinalizingStep) {
+        playStepAppearAnimation(step.descriptionLine1, ui.infoLine1TextView)
+        playStepAppearAnimation(step.descriptionLine2, ui.infoLine2TextView, Constants.UI.xShortDurationMs)
     }
 
     private fun playStepAppearAnimation(lineText: String, textView: CustomFontTextView, additionalDelay: Long = 0) = with(textView) {
@@ -164,7 +163,6 @@ class FinalizeSendTxFragment : CommonFragment<FragmentFinalizeSendTxBinding, Fin
             }
             duration = Constants.UI.longDurationMs
             startDelay = Constants.UI.FinalizeSendTx.textAppearAnimStartDelayMs
-            addListener(onEnd = { getCurrentStepView()?.animateCurrentStepProgress(isReverse = false) })
             start()
         }
     }
@@ -210,9 +208,11 @@ class FinalizeSendTxFragment : CommonFragment<FragmentFinalizeSendTxBinding, Fin
             duration = Constants.UI.xLongDurationMs
             interpolator = EasingInterpolator(Ease.QUART_IN_OUT)
             addListener(onEnd = {
-                removeAllListeners()
-                ui.lottieAnimationView.alpha = 0f
-                (requireActivity() as? FinalizeSendTxListener)?.onSendTxFailure(viewModel.transactionData, txFailureReason)
+                runCatching {
+                    removeAllListeners()
+                    ui.lottieAnimationView.alpha = 0f
+                    (requireActivity() as? FinalizeSendTxListener)?.onSendTxFailure(viewModel.transactionData, txFailureReason)
+                }
             })
             start()
         }
@@ -236,9 +236,11 @@ class FinalizeSendTxFragment : CommonFragment<FragmentFinalizeSendTxBinding, Fin
             interpolator = EasingInterpolator(Ease.QUART_IN_OUT)
             startDelay = Constants.UI.FinalizeSendTx.successfulInfoFadeOutAnimStartDelayMs
             addListener(onEnd = {
-                removeAllListeners()
-                ui.lottieAnimationView.alpha = 0f
-                (requireActivity() as? FinalizeSendTxListener)?.onSendTxSuccessful(viewModel.sentTxId.value!!, viewModel.transactionData)
+                runCatching {
+                    removeAllListeners()
+                    ui.lottieAnimationView.alpha = 0f
+                    (requireActivity() as? FinalizeSendTxListener)?.onSendTxSuccessful(viewModel.sentTxId.value!!, viewModel.transactionData)
+                }
             })
             start()
         }

@@ -35,7 +35,6 @@ package com.tari.android.wallet.model
 import android.os.Parcel
 import android.os.Parcelable
 import com.tari.android.wallet.ffi.FFICompletedTx
-import com.tari.android.wallet.ffi.FFIPointer
 import java.math.BigInteger
 
 /**
@@ -67,8 +66,7 @@ class CancelledTx() : Tx(), Parcelable {
         this.status = status
     }
 
-    constructor(pointer: FFIPointer) : this() {
-        val tx = FFICompletedTx(pointer)
+    internal constructor(tx: FFICompletedTx) : this() {
         this.id = tx.getId()
         this.direction = tx.getDirection()
         this.user = tx.getUser()
@@ -79,7 +77,6 @@ class CancelledTx() : Tx(), Parcelable {
         this.status = TxStatus.map(tx.getStatus())
         tx.destroy()
     }
-
 
     // region Parcelable
 
