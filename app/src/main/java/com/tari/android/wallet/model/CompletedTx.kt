@@ -48,30 +48,7 @@ class CompletedTx() : Tx(), Parcelable {
     var fee = MicroTari(BigInteger("0"))
     var confirmationCount = BigInteger("0")
 
-    constructor(
-        id: BigInteger,
-        direction: Direction,
-        user: User,
-        amount: MicroTari,
-        fee: MicroTari,
-        timestamp: BigInteger,
-        message: String,
-        status: TxStatus,
-        confirmationCount: BigInteger
-    ) : this() {
-        this.id = id
-        this.direction = direction
-        this.user = user
-        this.amount = amount
-        this.fee = fee
-        this.timestamp = timestamp
-        this.message = message
-        this.status = status
-        this.confirmationCount = confirmationCount
-    }
-
-    internal constructor(pointer: FFIPointer) : this() {
-        val tx = FFICompletedTx(pointer)
+    internal constructor(tx: FFICompletedTx) : this() {
         this.id = tx.getId()
         this.direction = tx.getDirection()
         this.user = tx.getUser()
@@ -84,6 +61,9 @@ class CompletedTx() : Tx(), Parcelable {
 
         tx.destroy()
     }
+
+    internal constructor(pointer: FFIPointer) : this(FFICompletedTx(pointer))
+
 
     // region Parcelable
 

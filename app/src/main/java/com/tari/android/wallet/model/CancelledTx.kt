@@ -35,6 +35,7 @@ package com.tari.android.wallet.model
 import android.os.Parcel
 import android.os.Parcelable
 import com.tari.android.wallet.ffi.FFICompletedTx
+import com.tari.android.wallet.ffi.FFITxCancellationReason
 import java.math.BigInteger
 
 /**
@@ -45,26 +46,7 @@ import java.math.BigInteger
 class CancelledTx() : Tx(), Parcelable {
 
     var fee: MicroTari = MicroTari(BigInteger("0"))
-
-    constructor(
-        id: BigInteger,
-        direction: Direction,
-        user: User,
-        amount: MicroTari,
-        fee: MicroTari?,
-        timestamp: BigInteger,
-        message: String,
-        status: TxStatus
-    ) : this() {
-        this.id = id
-        this.direction = direction
-        this.user = user
-        this.amount = amount
-        this.fee = fee ?: MicroTari(BigInteger("0"))
-        this.timestamp = timestamp
-        this.message = message
-        this.status = status
-    }
+    var cancellationReason: FFITxCancellationReason = FFITxCancellationReason.NotCancelled
 
     internal constructor(tx: FFICompletedTx) : this() {
         this.id = tx.getId()
@@ -75,6 +57,7 @@ class CancelledTx() : Tx(), Parcelable {
         this.timestamp = tx.getTimestamp()
         this.message = tx.getMessage()
         this.status = TxStatus.map(tx.getStatus())
+        this.cancellationReason = tx.getCancellationReason()
         tx.destroy()
     }
 

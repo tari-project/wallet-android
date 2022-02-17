@@ -384,7 +384,8 @@ internal class FFIWallet(
     @Suppress("MemberVisibilityCanBePrivate")
     fun onTxReceived(pendingInboundTxPtr: FFIPointer) {
         Logger.i("Tx received. Pointer: %s", pendingInboundTxPtr.toString())
-        val pendingTx = PendingInboundTx(FFICompletedTx(pendingInboundTxPtr))
+        val tx = FFIPendingInboundTx(pendingInboundTxPtr)
+        val pendingTx = PendingInboundTx(tx)
         GlobalScope.launch { listener?.onTxReceived(pendingTx) }
     }
 
@@ -394,7 +395,8 @@ internal class FFIWallet(
     @Suppress("MemberVisibilityCanBePrivate")
     fun onTxReplyReceived(txPointer: FFIPointer) {
         Logger.i("Tx reply received. Pointer: %s", txPointer.toString())
-        val pendingOutboundTx = PendingOutboundTx(FFICompletedTx(txPointer))
+        val tx = FFICompletedTx(txPointer)
+        val pendingOutboundTx = PendingOutboundTx(tx)
         GlobalScope.launch { listener?.onTxReplyReceived(pendingOutboundTx) }
     }
 
@@ -404,7 +406,8 @@ internal class FFIWallet(
     @Suppress("MemberVisibilityCanBePrivate")
     fun onTxFinalized(completedTx: FFIPointer) {
         Logger.i("Tx finalized. Pointer: %s", completedTx.toString())
-        val pendingInboundTx = PendingInboundTx(FFICompletedTx(completedTx))
+        val tx = FFICompletedTx(completedTx)
+        val pendingInboundTx = PendingInboundTx(tx)
         GlobalScope.launch { listener?.onTxFinalized(pendingInboundTx) }
     }
 

@@ -42,7 +42,6 @@ import com.tari.android.wallet.ui.activity.home.HomeActivity
 import com.tari.android.wallet.ui.activity.onboarding.OnboardingFlowActivity
 import com.tari.android.wallet.ui.activity.restore.WalletRestoreActivity
 import com.tari.android.wallet.ui.activity.settings.DeleteWalletActivity
-import com.tari.android.wallet.ui.activity.tx.TxDetailsActivity
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.component.networkStateIndicator.ConnectionIndicatorViewModel
 import com.tari.android.wallet.ui.fragment.debug.DebugLogFragment
@@ -84,6 +83,8 @@ import com.tari.android.wallet.ui.fragment.settings.networkSelection.NetworkSele
 import com.tari.android.wallet.ui.fragment.settings.userAutorization.BiometricAuthenticationViewModel
 import com.tari.android.wallet.ui.fragment.tx.TxListFragment
 import com.tari.android.wallet.ui.fragment.tx.TxListViewModel
+import com.tari.android.wallet.ui.fragment.tx.details.gif.GIFViewModel
+import com.tari.android.wallet.ui.fragment.tx.details.TxDetailsFragment
 import dagger.Component
 import javax.inject.Singleton
 
@@ -122,7 +123,7 @@ internal interface ApplicationComponent {
     fun inject(activity: HomeActivity)
     fun inject(activity: QRScannerActivity)
     fun inject(activity: SendTariActivity)
-    fun inject(activity: TxDetailsActivity)
+    fun inject(fragment: TxDetailsFragment)
     fun inject(activity: DebugActivity)
     fun inject(activity: DeleteWalletActivity)
 
@@ -159,7 +160,7 @@ internal interface ApplicationComponent {
      */
     fun inject(commonViewModel: CommonViewModel)
     fun inject(thumbnailGIFsViewModel: ThumbnailGIFsViewModel)
-    fun inject(gifViewModel: TxDetailsActivity.GIFViewModel)
+    fun inject(gifViewModel: GIFViewModel)
     fun inject(backgroundServiceSettingsViewModel: BackgroundServiceSettingsViewModel)
     fun inject(connectionIndicatorViewModel: ConnectionIndicatorViewModel)
     fun inject(chooseRestoreOptionViewModel: ChooseRestoreOptionViewModel)
