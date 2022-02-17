@@ -53,6 +53,7 @@ import com.daasuu.ei.EasingInterpolator
 import com.orhanobut.logger.Logger
 import com.tari.android.wallet.R
 import com.tari.android.wallet.R.color.black
+import com.tari.android.wallet.R.string.*
 import com.tari.android.wallet.amountInputBinding.fragment.send.addAmount.keyboard.KeyboardController
 import com.tari.android.wallet.application.DeepLink
 import com.tari.android.wallet.databinding.FragmentAddAmountBinding
@@ -65,8 +66,9 @@ import com.tari.android.wallet.service.WalletService
 import com.tari.android.wallet.ui.common.CommonFragment
 import com.tari.android.wallet.ui.component.EmojiIdSummaryViewController
 import com.tari.android.wallet.ui.component.FullEmojiIdViewController
-import com.tari.android.wallet.ui.dialog.BottomSlideDialog
 import com.tari.android.wallet.ui.dialog.error.ErrorDialog
+import com.tari.android.wallet.ui.dialog.tooltipDialog.TooltipDialog
+import com.tari.android.wallet.ui.dialog.tooltipDialog.TooltipDialogArgs
 import com.tari.android.wallet.ui.extension.*
 import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.WalletUtil
@@ -189,7 +191,8 @@ class AddAmountFragment : CommonFragment<FragmentAddAmountBinding, AddAmountView
     private fun setActionBindings() {
         ui.backButton.setOnClickListener { onBackButtonClicked(it) }
         ui.emojiIdSummaryContainerView.setOnClickListener { emojiIdClicked() }
-        ui.txFeeDescTextView.setOnClickListener { onFeeViewClick() }
+        ui.txFeeDescTextView.setOnClickListener { showTxFeeToolTip() }
+        ui.oneSidePaymentHelp.setOnClickListener { showOneSidePaymentTooltip() }
         ui.continueButton.setOnClickListener { continueButtonClicked() }
         ui.oneSidePaymentSwitchView.setOnClickListener { viewModel.toggleOneSidePayment() }
     }
@@ -230,16 +233,13 @@ class AddAmountFragment : CommonFragment<FragmentAddAmountBinding, AddAmountView
         fullEmojiIdViewController.showFullEmojiId()
     }
 
-    private fun onFeeViewClick() {
-        showTxFeeToolTip()
+    private fun showTxFeeToolTip() {
+        TooltipDialog(requireContext(), TooltipDialogArgs(string(tx_detail_fee_tooltip_transaction_fee), string(tx_detail_fee_tooltip_desc))).show()
     }
 
-    private fun showTxFeeToolTip() {
-        BottomSlideDialog(
-            context = activity ?: return,
-            layoutId = R.layout.tx_fee_tooltip_dialog,
-            dismissViewId = R.id.tx_fee_tooltip_dialog_txt_close
-        ).show()
+    private fun showOneSidePaymentTooltip() {
+        val args = TooltipDialogArgs(string(add_amount_one_side_payment_switcher), string(add_amount_one_side_payment_question_mark))
+        TooltipDialog(requireContext(), args).show()
     }
 
     private fun continueButtonClicked() {
@@ -262,8 +262,8 @@ class AddAmountFragment : CommonFragment<FragmentAddAmountBinding, AddAmountView
                     if (fee > amount) {
                         ErrorDialog(
                             requireActivity(),
-                            title = string(R.string.error_fee_more_than_amount_title),
-                            description = string(R.string.error_fee_more_than_amount_description),
+                            title = string(error_fee_more_than_amount_title),
+                            description = string(error_fee_more_than_amount_description),
                             canceledOnTouchOutside = true
                         ).show()
                         ui.continueButton.isClickable = true
@@ -336,7 +336,7 @@ class AddAmountFragment : CommonFragment<FragmentAddAmountBinding, AddAmountView
 
         @SuppressLint("SetTextI18n")
         private fun showSuccessState(fee: MicroTari) = with(ui) {
-            notEnoughBalanceDescriptionTextView.text = string(R.string.add_amount_wallet_balance)
+            notEnoughBalanceDescriptionTextView.text = string(add_amount_wallet_balance)
             availableBalanceContainerView.visible()
 
             val showsTxFee: Boolean
@@ -395,11 +395,11 @@ class AddAmountFragment : CommonFragment<FragmentAddAmountBinding, AddAmountView
             if (error.code == WalletErrorCode.FUNDS_PENDING) {
                 availableBalanceContainerView.gone()
                 notEnoughBalanceDescriptionTextView.text =
-                    string(R.string.add_amount_funds_pending)
+                    string(add_amount_funds_pending)
             } else {
                 availableBalanceContainerView.visible()
                 notEnoughBalanceDescriptionTextView.text =
-                    string(R.string.add_amount_not_enough_available_balance)
+                    string(add_amount_not_enough_available_balance)
             }
 
             hideContinueButton()

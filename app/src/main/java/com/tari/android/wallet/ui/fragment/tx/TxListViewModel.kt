@@ -225,8 +225,8 @@ internal class TxListViewModel() : CommonViewModel() {
         EventBus.subscribe<Event.Transaction.TxMinedUnconfirmed>(this) { onTxMinedUnconfirmed(it.tx) }
         EventBus.subscribe<Event.Transaction.TxMinedUnconfirmed>(this) { onTxMinedUnconfirmed(it.tx) }
         EventBus.subscribe<Event.Transaction.TxMined>(this) { onTxMined(it.tx) }
-        EventBus.subscribe<Event.Transaction.TxFeuxMinedUnconfirmed>(this) { onTxFeuxMinedUnconfirmed(it.tx) }
-        EventBus.subscribe<Event.Transaction.TxFeuxConfirmed>(this) { onFeuxTxMined(it.tx) }
+        EventBus.subscribe<Event.Transaction.TxFauxMinedUnconfirmed>(this) { onTxFauxMinedUnconfirmed(it.tx) }
+        EventBus.subscribe<Event.Transaction.TxFauxConfirmed>(this) { onFauxTxMined(it.tx) }
         EventBus.subscribe<Event.Transaction.TxCancelled>(this) {
             if (progressControllerState.state != UpdateProgressViewController.State.RECEIVING) {
                 onTxCancelled(it.tx)
@@ -308,7 +308,7 @@ internal class TxListViewModel() : CommonViewModel() {
         _listUpdateTrigger.postValue(Unit)
     }
 
-    private fun onTxFeuxMinedUnconfirmed(tx: CompletedTx) {
+    private fun onTxFauxMinedUnconfirmed(tx: CompletedTx) {
         when (tx.direction) {
             Tx.Direction.INBOUND -> pendingInboundTxs
             Tx.Direction.OUTBOUND -> pendingOutboundTxs
@@ -322,7 +322,7 @@ internal class TxListViewModel() : CommonViewModel() {
         _listUpdateTrigger.postValue(Unit)
     }
 
-    private fun onFeuxTxMined(tx: CompletedTx) {
+    private fun onFauxTxMined(tx: CompletedTx) {
         pendingInboundTxs.removeIf { it.id == tx.id }
         pendingOutboundTxs.removeIf { it.id == tx.id }
 

@@ -505,20 +505,23 @@ class FFIWalletTests {
         }
 
         override fun onTxMinedUnconfirmed(completedTx: CompletedTx, confirmationCount: Int) {
-            Logger.i("Tx Mined :: completed tx id: %s", completedTx.id)
+            Logger.i("Tx Mined unconfirmed :: completed tx id: %s", completedTx.id)
             minedTxs.add(completedTx)
         }
 
-        override fun onTxFeuxConfirmed(completedTx: CompletedTx) {
-            TODO("Not yet implemented")
+        override fun onTxFauxConfirmed(completedTx: CompletedTx) {
+            Logger.i("Tx Faux Mined :: completed tx id: %s", completedTx.id)
+            minedTxs.add(completedTx)
         }
 
-        override fun onTxFeuxUnconfirmed(completedTx: CompletedTx, confirmationCount: Int) {
-            TODO("Not yet implemented")
+        override fun onTxFauxUnconfirmed(completedTx: CompletedTx, confirmationCount: Int) {
+            Logger.i("Tx Faux Mined unconfirmed :: completed tx id: %s", completedTx.id)
+            minedTxs.add(completedTx)
         }
 
         override fun onTxCancelled(cancelledTx: CancelledTx, rejectionReason: Int) {
             Logger.i("Tx Cancelled :: cancelled tx id: %s, reason code: %s", cancelledTx.id, rejectionReason.toString())
+            cancelledTxs.add(cancelledTx)
         }
 
         override fun onTXOValidationComplete(responseId: BigInteger, isSuccess: Boolean) {
@@ -538,11 +541,7 @@ class FFIWalletTests {
         }
 
         override fun onStoreAndForwardSendResult(txId: BigInteger, success: Boolean) {
-            Logger.i(
-                "Store and forward :: tx id %s success %s",
-                txId,
-                success
-            )
+            Logger.i("Store and forward :: tx id %s success %s", txId, success)
         }
     }
 }

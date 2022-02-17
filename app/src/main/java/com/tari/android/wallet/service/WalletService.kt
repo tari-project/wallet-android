@@ -433,22 +433,22 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
         backupManager.scheduleBackup(resetRetryCount = true)
     }
 
-    override fun onTxFeuxConfirmed(completedTx: CompletedTx) {
-        Logger.d("Tx feux ${completedTx.id} confirmed.")
+    override fun onTxFauxConfirmed(completedTx: CompletedTx) {
+        Logger.d("Tx faux ${completedTx.id} confirmed.")
         completedTx.user = getUserByPublicKey(completedTx.user.publicKey)
         // post event to bus for the internal listeners
-        EventBus.post(Event.Transaction.TxFeuxConfirmed(completedTx))
+        EventBus.post(Event.Transaction.TxFauxConfirmed(completedTx))
         // notify external listeners
         listeners.iterator().forEach { it.onTxFauxConfirmed(completedTx) }
         // schedule a backup
         backupManager.scheduleBackup(resetRetryCount = true)
     }
 
-    override fun onTxFeuxUnconfirmed(completedTx: CompletedTx, confirmationCount: Int) {
-        Logger.d("Tx feux ${completedTx.id} yet unconfirmed. Confirmation count: $confirmationCount")
+    override fun onTxFauxUnconfirmed(completedTx: CompletedTx, confirmationCount: Int) {
+        Logger.d("Tx faux ${completedTx.id} yet unconfirmed. Confirmation count: $confirmationCount")
         completedTx.user = getUserByPublicKey(completedTx.user.publicKey)
         // post event to bus for the internal listeners
-        EventBus.post(Event.Transaction.TxFeuxMinedUnconfirmed(completedTx))
+        EventBus.post(Event.Transaction.TxFauxMinedUnconfirmed(completedTx))
         // notify external listeners
         listeners.iterator().forEach { it.onTxFauxUnconfirmed(completedTx, confirmationCount) }
         // schedule a backup
