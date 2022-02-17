@@ -50,11 +50,12 @@ internal class FFICompletedTx() : FFITxBase() {
     private external fun jniGetStatus(libError: FFIError): Int
     private external fun jniGetConfirmationCount(libError: FFIError): ByteArray
     private external fun jniIsOutbound(libError: FFIError): Boolean
+    private external fun jniGetCancellationReason(libError: FFIError): Int
     private external fun jniDestroy()
 
     // endregion
 
-    constructor(pointer: FFIPointer): this() {
+    constructor(pointer: FFIPointer) : this() {
         this.pointer = pointer
     }
 
@@ -128,6 +129,13 @@ internal class FFICompletedTx() : FFITxBase() {
     override fun isOutbound(): Boolean {
         val error = FFIError()
         val result = jniIsOutbound(error)
+        throwIf(error)
+        return result
+    }
+
+    fun getCancellationReason(): FFITxCancellationReason {
+        val error = FFIError()
+        val result = FFITxCancellationReason.map(jniGetCancellationReason(error))
         throwIf(error)
         return result
     }

@@ -61,7 +61,6 @@ import com.tari.android.wallet.ffi.*
 import com.tari.android.wallet.infrastructure.backup.BackupManager
 import com.tari.android.wallet.model.*
 import com.tari.android.wallet.model.Tx.Direction.INBOUND
-import com.tari.android.wallet.model.Tx.Direction.OUTBOUND
 import com.tari.android.wallet.model.recovery.WalletRestorationResult
 import com.tari.android.wallet.notification.NotificationHelper
 import com.tari.android.wallet.service.WalletServiceLauncher.Companion.startAction
@@ -497,8 +496,7 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
         // post event to bus
         EventBus.post(Event.Transaction.TxCancelled(cancelledTx))
         val currentActivity = app.currentActivity
-        if (cancelledTx.direction == INBOUND &&
-            !(app.isInForeground && currentActivity is HomeActivity && currentActivity.willNotifyAboutNewTx())
+        if (cancelledTx.direction == INBOUND && !(app.isInForeground && currentActivity is HomeActivity && currentActivity.willNotifyAboutNewTx())
         ) {
             Logger.i("Posting cancellation notification")
             notificationHelper.postTxCanceledNotification(cancelledTx)
@@ -808,12 +806,7 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
             return try {
                 val completedTxsFFI = wallet.getCompletedTxs()
                 return (0 until completedTxsFFI.getLength())
-                    .map {
-                        val completedTxFFI = completedTxsFFI.getAt(it)
-                        completedTxFromFFI(completedTxFFI).also {
-                            completedTxFFI.destroy()
-                        }
-                    }.also {
+                    .map { CompletedTx(completedTxsFFI.getAt(it)) }.also {
                         completedTxsFFI.destroy()
                     }
             } catch (throwable: Throwable) {
@@ -826,12 +819,7 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
             return try {
                 val canceledTxsFFI = wallet.getCancelledTxs()
                 return (0 until canceledTxsFFI.getLength())
-                    .map {
-                        val cancelledTxFFI = canceledTxsFFI.getAt(it)
-                        cancelledTxFromFFI(cancelledTxFFI).also {
-                            cancelledTxFFI.destroy()
-                        }
-                    }.also { canceledTxsFFI.destroy() }
+                    .map { CancelledTx(canceledTxsFFI.getAt(it)) }.also { canceledTxsFFI.destroy() }
             } catch (throwable: Throwable) {
                 mapThrowableIntoError(throwable, error)
                 null
@@ -844,10 +832,7 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
          */
         override fun getCancelledTxById(id: TxId, error: WalletError): CancelledTx? {
             return try {
-                val completedTxFFI = wallet.getCancelledTxById(id.value)
-                cancelledTxFromFFI(completedTxFFI).also {
-                    completedTxFFI.destroy()
-                }
+                CancelledTx(wallet.getCancelledTxById(id.value))
             } catch (throwable: Throwable) {
                 mapThrowableIntoError(throwable, error)
                 null
@@ -860,10 +845,7 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
          */
         override fun getCompletedTxById(id: TxId, error: WalletError): CompletedTx? {
             return try {
-                val completedTxFFI = wallet.getCompletedTxById(id.value)
-                completedTxFromFFI(completedTxFFI).also {
-                    completedTxFFI.destroy()
-                }
+                CompletedTx(wallet.getCompletedTxById(id.value))
             } catch (throwable: Throwable) {
                 mapThrowableIntoError(throwable, error)
                 null
@@ -878,12 +860,8 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
             return try {
                 val pendingInboundTxsFFI = wallet.getPendingInboundTxs()
                 return (0 until pendingInboundTxsFFI.getLength())
-                    .map {
-                        val pendingInboundTxFFI = pendingInboundTxsFFI.getAt(it)
-                        pendingInboundTxFromFFI(pendingInboundTxFFI).also {
-                            pendingInboundTxFFI.destroy()
-                        }
-                    }.also { pendingInboundTxsFFI.destroy() }
+                    .map { PendingInboundTx(pendingInboundTxsFFI.getAt(it)) }
+                    .also { pendingInboundTxsFFI.destroy() }
             } catch (throwable: Throwable) {
                 mapThrowableIntoError(throwable, error)
                 null
@@ -896,10 +874,7 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
          */
         override fun getPendingInboundTxById(id: TxId, error: WalletError): PendingInboundTx? {
             return try {
-                val pendingInboundTxFFI = wallet.getPendingInboundTxById(id.value)
-                pendingInboundTxFromFFI(pendingInboundTxFFI).also {
-                    pendingInboundTxFFI.destroy()
-                }
+                PendingInboundTx(wallet.getPendingInboundTxById(id.value))
             } catch (throwable: Throwable) {
                 mapThrowableIntoError(throwable, error)
                 null
@@ -914,12 +889,8 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
             return try {
                 val pendingOutboundTxsFFI = wallet.getPendingOutboundTxs()
                 return (0 until pendingOutboundTxsFFI.getLength())
-                    .map {
-                        val pendingOutboundTxFFI = pendingOutboundTxsFFI.getAt(it)
-                        pendingOutboundTxFromFFI(pendingOutboundTxFFI).also {
-                            pendingOutboundTxFFI.destroy()
-                        }
-                    }.also { pendingOutboundTxsFFI.destroy() }
+                    .map { PendingOutboundTx(pendingOutboundTxsFFI.getAt(it)) }
+                    .also { pendingOutboundTxsFFI.destroy() }
             } catch (throwable: Throwable) {
                 mapThrowableIntoError(throwable, error)
                 null
@@ -932,10 +903,7 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
          */
         override fun getPendingOutboundTxById(id: TxId, error: WalletError): PendingOutboundTx? {
             return try {
-                val pendingOutboundTxFFI = wallet.getPendingOutboundTxById(id.value)
-                return pendingOutboundTxFromFFI(pendingOutboundTxFFI).also {
-                    pendingOutboundTxFFI.destroy()
-                }
+                return PendingOutboundTx(wallet.getPendingOutboundTxById(id.value))
             } catch (throwable: Throwable) {
                 mapThrowableIntoError(throwable, error)
                 null
@@ -1017,129 +985,8 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
         }
 
         // region FFI to model extraction functions
-        private fun publicKeyFromFFI(
-            publicKeyFFI: FFIPublicKey
-        ): PublicKey {
-            return PublicKey(
-                publicKeyFFI.toString(),
-                publicKeyFFI.getEmojiId()
-            )
-        }
-
-        private fun completedTxFromFFI(completedTxFFI: FFICompletedTx): CompletedTx {
-            val sourcePublicKeyFFI = completedTxFFI.getSourcePublicKey()
-            val destinationPublicKeyFFI = completedTxFFI.getDestinationPublicKey()
-            val status = TxStatus.map(completedTxFFI.getStatus())
-            val user: User
-            val direction: Tx.Direction
-
-            // get public key
-            val error = WalletError()
-            if (error.code != WalletErrorCode.NO_ERROR) {
-                throw FFIException(message = error.message)
-            }
-            if (completedTxFFI.isOutbound()) {
-                direction = OUTBOUND
-                val userPublicKey = PublicKey(destinationPublicKeyFFI.toString(), destinationPublicKeyFFI.getEmojiId())
-                user = getContactByPublicKeyHexString(destinationPublicKeyFFI.toString()) ?: User(userPublicKey)
-            } else {
-                direction = INBOUND
-                val userPublicKey = PublicKey(sourcePublicKeyFFI.toString(), sourcePublicKeyFFI.getEmojiId())
-                user = getContactByPublicKeyHexString(sourcePublicKeyFFI.toString()) ?: User(userPublicKey)
-            }
-            val completedTx = CompletedTx(
-                completedTxFFI.getId(),
-                direction,
-                user,
-                MicroTari(completedTxFFI.getAmount()),
-                MicroTari(completedTxFFI.getFee()),
-                completedTxFFI.getTimestamp(),
-                completedTxFFI.getMessage(),
-                status,
-                completedTxFFI.getConfirmationCount()
-            )
-            // destroy native objects
-            sourcePublicKeyFFI.destroy()
-            destinationPublicKeyFFI.destroy()
-            return completedTx
-        }
-
-        private fun cancelledTxFromFFI(completedTxFFI: FFICompletedTx): CancelledTx {
-            val sourcePublicKeyFFI = completedTxFFI.getSourcePublicKey()
-            val destinationPublicKeyFFI = completedTxFFI.getDestinationPublicKey()
-            val status = TxStatus.map(completedTxFFI.getStatus())
-            val user: User
-            val direction: Tx.Direction
-
-            // get public key
-            val error = WalletError()
-            if (error.code != WalletErrorCode.NO_ERROR) {
-                throw FFIException(message = error.message)
-            }
-
-            if (completedTxFFI.isOutbound()) {
-                direction = OUTBOUND
-                val userPublicKey = PublicKey(destinationPublicKeyFFI.toString(), destinationPublicKeyFFI.getEmojiId())
-                user = getContactByPublicKeyHexString(destinationPublicKeyFFI.toString()) ?: User(userPublicKey)
-            } else {
-                direction = INBOUND
-                val userPublicKey = PublicKey(sourcePublicKeyFFI.toString(), sourcePublicKeyFFI.getEmojiId())
-                user = getContactByPublicKeyHexString(sourcePublicKeyFFI.toString()) ?: User(userPublicKey)
-            }
-            val tx = CancelledTx(
-                completedTxFFI.getId(),
-                direction,
-                user,
-                MicroTari(completedTxFFI.getAmount()),
-                MicroTari(completedTxFFI.getFee()),
-                completedTxFFI.getTimestamp(),
-                completedTxFFI.getMessage(),
-                status
-            )
-            // destroy native objects
-            sourcePublicKeyFFI.destroy()
-            destinationPublicKeyFFI.destroy()
-            if (status != TxStatus.UNKNOWN) {
-                Logger.d("Canceled TX's status is not UNKNOWN but rather $status.\n$tx")
-            }
-            return tx
-        }
-
-        private fun pendingInboundTxFromFFI(pendingInboundTxFFI: FFIPendingInboundTx): PendingInboundTx {
-            val status = TxStatus.map(pendingInboundTxFFI.getStatus())
-            val sourcePublicKeyFFI = pendingInboundTxFFI.getSourcePublicKey()
-            val userPublicKey = PublicKey(sourcePublicKeyFFI.toString(), sourcePublicKeyFFI.getEmojiId())
-            val user = getContactByPublicKeyHexString(sourcePublicKeyFFI.toString()) ?: User(userPublicKey)
-            val pendingInboundTx = PendingInboundTx(
-                pendingInboundTxFFI.getId(),
-                user,
-                MicroTari(pendingInboundTxFFI.getAmount()),
-                pendingInboundTxFFI.getTimestamp(),
-                pendingInboundTxFFI.getMessage(),
-                status
-            )
-            // destroy native objects
-            sourcePublicKeyFFI.destroy()
-            return pendingInboundTx
-        }
-
-        private fun pendingOutboundTxFromFFI(pendingOutboundTxFFI: FFIPendingOutboundTx): PendingOutboundTx {
-            val status = TxStatus.map(pendingOutboundTxFFI.getStatus())
-            val destinationPublicKeyFFI = pendingOutboundTxFFI.getDestinationPublicKey()
-            val userPublicKey = PublicKey(destinationPublicKeyFFI.toString(), destinationPublicKeyFFI.getEmojiId())
-            val user = getContactByPublicKeyHexString(destinationPublicKeyFFI.toString()) ?: User(userPublicKey)
-            val pendingOutboundTx = PendingOutboundTx(
-                pendingOutboundTxFFI.getId(),
-                user,
-                MicroTari(pendingOutboundTxFFI.getAmount()),
-                MicroTari(pendingOutboundTxFFI.getFee()),
-                pendingOutboundTxFFI.getTimestamp(),
-                pendingOutboundTxFFI.getMessage(),
-                status
-            )
-            // destroy native objects
-            destinationPublicKeyFFI.destroy()
-            return pendingOutboundTx
+        private fun publicKeyFromFFI(publicKeyFFI: FFIPublicKey): PublicKey {
+            return PublicKey(publicKeyFFI.toString(), publicKeyFFI.getEmojiId())
         }
 
         @SuppressLint("CheckResult")

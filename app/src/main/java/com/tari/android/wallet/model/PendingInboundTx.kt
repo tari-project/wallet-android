@@ -35,6 +35,7 @@ package com.tari.android.wallet.model
 import android.os.Parcel
 import android.os.Parcelable
 import com.tari.android.wallet.ffi.FFICompletedTx
+import com.tari.android.wallet.ffi.FFIPendingInboundTx
 import java.math.BigInteger
 
 /**
@@ -44,17 +45,18 @@ import java.math.BigInteger
  */
 class PendingInboundTx() : Tx(), Parcelable {
 
-    constructor(id: BigInteger, user: User, amount: MicroTari, timestamp: BigInteger, message: String, status: TxStatus) : this() {
-        this.id = id
-        this.direction = Direction.INBOUND
-        this.user = user
-        this.amount = amount
-        this.timestamp = timestamp
-        this.message = message
-        this.status = status
+    internal constructor(tx: FFICompletedTx) : this() {
+        this.id = tx.getId()
+        this.direction = tx.getDirection()
+        this.user = tx.getUser()
+        this.amount = MicroTari(tx.getAmount())
+        this.timestamp = tx.getTimestamp()
+        this.message = tx.getMessage()
+        this.status = TxStatus.map(tx.getStatus())
+        tx.destroy()
     }
 
-    internal constructor(tx: FFICompletedTx) : this() {
+    internal constructor(tx: FFIPendingInboundTx) : this() {
         this.id = tx.getId()
         this.direction = tx.getDirection()
         this.user = tx.getUser()

@@ -313,6 +313,15 @@
     <string name="tx_details_error_tx_not_found_title">Requested transaction was not found</string>
     <string name="tx_details_error_tx_not_found_desc">Please try again later</string>
 
+    <string name="tx_details_cancellation_reason_unknown">The transaction failed for an unknown reason.</string>
+    <string name="tx_details_cancellation_reason_user_cancelled">The transaction was canceled by the sender.</string>
+    <string name="tx_details_cancellation_reason_timeout">The transaction failed due to timeout.</string>
+    <string name="tx_details_cancellation_reason_double_spend">The transaction was cancelled as it is spending funds that have already been spent.</string>
+    <string name="tx_details_cancellation_reason_orphan">The transaction was cancelled due to some funds being spent no longer being present in the chain.</string>
+    <string name="tx_details_cancellation_reason_time_locked">This transaction was cancelled due to the funds not having reached their time-lock period yet.</string>
+    <string name="tx_details_cancellation_reason_invalid_transaction">The transaction failed to the invalid input data. This situation shouldn\'t happen. Please send a bug report or contact us directly.</string>
+    <string name="tx_details_cancellation_reason_abandoned_coinbase">The coinbase was abandoned.</string>
+
     <!-- Fee tooltip -->
     <string name="tx_detail_fee_tooltip_transaction_fee">Transaction Fee</string>
     <string name="tx_detail_fee_tooltip_desc">The transaction fee is distributed to the thousands of computers (also known as \"miners\") who ensure that your tXTR transactions are fast and secure.</string>
