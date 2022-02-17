@@ -87,6 +87,7 @@ interface TariWalletService {
         in MicroTari amount,
         in MicroTari feePerGram,
         String message,
+        boolean isOneSidePayment,
         out WalletError error
     );
 

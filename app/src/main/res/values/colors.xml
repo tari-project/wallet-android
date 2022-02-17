@@ -4,7 +4,7 @@
     <!-- theme -->
     <color name="primary">#FFFFFF</color>
     <color name="primary_dark">#AAAAAA</color>
-    <color name="accent">#D81B60</color>
+    <color name="accent">@color/purple</color>
     <color name="gray_background">#f6f6f6</color>
 
     <!-- common -->

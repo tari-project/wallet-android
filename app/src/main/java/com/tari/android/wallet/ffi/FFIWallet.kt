@@ -57,7 +57,7 @@ internal class FFIWallet(
     logPath: String
 ) : FFIBase() {
 
-   private var balance : BalanceInfo = BalanceInfo()
+    private var balance: BalanceInfo = BalanceInfo()
 
     companion object {
         private var atomicInstance = AtomicReference<FFIWallet>()
@@ -85,6 +85,10 @@ internal class FFIWallet(
         callbackTxBroadcastSig: String,
         callbackTxMined: String,
         callbackTxMinedSig: String,
+        callbackTxFauxConfirmed: String,
+        callbackTxFauxConfirmedSig: String,
+        callbackTxFauxUnconfirmed: String,
+        callbackTxFauxUnconfirmedSig: String,
         callbackTxMinedUnconfirmed: String,
         callbackTxMinedUnconfirmedSig: String,
         callbackDirectSendResult: String,
@@ -99,80 +103,47 @@ internal class FFIWallet(
         callbackBalanceUpdatedSig: String,
         callbackTransactionValidationComplete: String,
         callbackTransactionValidationCompleteSig: String,
+        callbackConnectivityStatus: String,
+        callbackConnectivityStatusSig: String,
         libError: FFIError
     )
 
-    private external fun jniGetBalance(
-        libError: FFIError
-    ): FFIPointer
+    private external fun jniGetBalance(libError: FFIError): FFIPointer
 
-    private external fun jniLogMessage(
-        message: String,
-        libError: FFIError
-    )
+    private external fun jniLogMessage(message: String, libError: FFIError)
 
-    private external fun jniGetPublicKey(
-        libError: FFIError
-    ): FFIPointer
+    private external fun jniGetPublicKey(libError: FFIError): FFIPointer
 
     private external fun jniGetContacts(libError: FFIError): FFIPointer
 
-    private external fun jniAddUpdateContact(
-        contactPtr: FFIContact,
-        libError: FFIError
-    ): Boolean
+    private external fun jniAddUpdateContact(contactPtr: FFIContact, libError: FFIError): Boolean
 
-    private external fun jniRemoveContact(
-        contactPtr: FFIContact,
-        libError: FFIError
-    ): Boolean
+    private external fun jniRemoveContact(contactPtr: FFIContact, libError: FFIError): Boolean
 
-    private external fun jniGetCompletedTxs(
-        libError: FFIError
-    ): FFIPointer
+    private external fun jniGetCompletedTxs(libError: FFIError): FFIPointer
 
-    private external fun jniGetCancelledTxs(
-        libError: FFIError
-    ): FFIPointer
+    private external fun jniGetCancelledTxs(libError: FFIError): FFIPointer
 
-    private external fun jniGetCompletedTxById(
-        id: String,
-        libError: FFIError
-    ): FFIPointer
+    private external fun jniGetCompletedTxById(id: String, libError: FFIError): FFIPointer
 
-    private external fun jniGetCancelledTxById(
-        id: String,
-        libError: FFIError
-    ): FFIPointer
+    private external fun jniGetCancelledTxById(id: String, libError: FFIError): FFIPointer
 
-    private external fun jniGetPendingOutboundTxs(
-        libError: FFIError
-    ): FFIPointer
+    private external fun jniGetPendingOutboundTxs(libError: FFIError): FFIPointer
 
-    private external fun jniGetPendingOutboundTxById(
-        id: String,
-        libError: FFIError
-    ): FFIPointer
+    private external fun jniGetPendingOutboundTxById(id: String, libError: FFIError): FFIPointer
 
-    private external fun jniGetPendingInboundTxs(
-        libError: FFIError
-    ): FFIPointer
+    private external fun jniGetPendingInboundTxs(libError: FFIError): FFIPointer
 
-    private external fun jniGetPendingInboundTxById(
-        id: String,
-        libError: FFIError
-    ): FFIPointer
+    private external fun jniGetPendingInboundTxById(id: String, libError: FFIError): FFIPointer
 
-    private external fun jniCancelPendingTx(
-        id: String,
-        libError: FFIError
-    ): Boolean
+    private external fun jniCancelPendingTx(id: String, libError: FFIError): Boolean
 
     private external fun jniSendTx(
         publicKeyPtr: FFIPublicKey,
         amount: String,
         feePerGram: String,
         message: String,
+        oneSided: Boolean,
         libError: FFIError
     ): ByteArray
 
@@ -185,17 +156,9 @@ internal class FFIWallet(
         libError: FFIError
     ): ByteArray
 
-    private external fun jniSignMessage(
-        message: String,
-        libError: FFIError
-    ): String
+    private external fun jniSignMessage(message: String, libError: FFIError): String
 
-    private external fun jniVerifyMessageSignature(
-        publicKeyPtr: FFIPublicKey,
-        message: String,
-        signature: String,
-        libError: FFIError
-    ): Boolean
+    private external fun jniVerifyMessageSignature(publicKeyPtr: FFIPublicKey, message: String, signature: String, libError: FFIError): Boolean
 
     private external fun jniImportUTXO(
         amount: String,
@@ -208,79 +171,37 @@ internal class FFIWallet(
         libError: FFIError
     ): ByteArray
 
-    private external fun jniAddBaseNodePeer(
-        publicKey: FFIPublicKey,
-        address: String,
-        libError: FFIError
-    ): Boolean
+    private external fun jniAddBaseNodePeer(publicKey: FFIPublicKey, address: String, libError: FFIError): Boolean
 
-    private external fun jniStartTXOValidation(
-        libError: FFIError
-    ): ByteArray
+    private external fun jniStartTXOValidation(libError: FFIError): ByteArray
 
-    private external fun jniStartTxValidation(
-        libError: FFIError
-    ): ByteArray
+    private external fun jniStartTxValidation(libError: FFIError): ByteArray
 
-    private external fun jniRestartTxBroadcast(
-        libError: FFIError
-    ): ByteArray
+    private external fun jniRestartTxBroadcast(libError: FFIError): ByteArray
 
-    private external fun jniPowerModeNormal(
-        libError: FFIError
-    )
+    private external fun jniPowerModeNormal(libError: FFIError)
 
-    private external fun jniPowerModeLow(
-        libError: FFIError
-    )
+    private external fun jniPowerModeLow(libError: FFIError)
 
-    private external fun jniGetSeedWords(
-        libError: FFIError
-    ): FFIPointer
+    private external fun jniGetSeedWords(libError: FFIError): FFIPointer
 
-    private external fun jniSetKeyValue(
-        key: String,
-        value: String,
-        libError: FFIError
-    ): Boolean
+    private external fun jniSetKeyValue(key: String, value: String, libError: FFIError): Boolean
 
-    private external fun jniGetKeyValue(
-        key: String,
-        libError: FFIError
-    ): String
+    private external fun jniGetKeyValue(key: String, libError: FFIError): String
 
-    private external fun jniRemoveKeyValue(
-        key: String,
-        libError: FFIError
-    ): Boolean
+    private external fun jniRemoveKeyValue(key: String, libError: FFIError): Boolean
 
-    private external fun jniGetConfirmations(
-        libError: FFIError
-    ): ByteArray
+    private external fun jniGetConfirmations(libError: FFIError): ByteArray
 
-    private external fun jniSetConfirmations(
-        number: String,
-        libError: FFIError
-    )
+    private external fun jniSetConfirmations(number: String, libError: FFIError)
 
-    private external fun jniEstimateTxFee(
-        amount: String,
-        gramFee: String,
-        kernelCount: String,
-        outputCount: String,
-        libError: FFIError
-    ): ByteArray
+    private external fun jniEstimateTxFee(amount: String, gramFee: String, kernelCount: String, outputCount: String, libError: FFIError): ByteArray
 
     private external fun jniApplyEncryption(passphrase: String, libError: FFIError)
 
     private external fun jniRemoveEncryption(libError: FFIError)
 
-    private external fun jniStartRecovery(
-        base_node_public_key: FFIPublicKey,
-        callback: String,
-        callback_sig: String,
-        libError: FFIError
-    ) : Boolean
+    private external fun jniStartRecovery(base_node_public_key: FFIPublicKey, callback: String, callback_sig: String, libError: FFIError): Boolean
 
     private external fun jniDestroy()
 
@@ -308,12 +229,15 @@ internal class FFIWallet(
                     this::onTxBroadcast.name, "(J)V",
                     this::onTxMined.name, "(J)V",
                     this::onTxMinedUnconfirmed.name, "(J[B)V",
+                    this::onTxFauxConfirmed.name, "(J)V",
+                    this::onTxFauxUnconfirmed.name, "(J[B)V",
                     this::onDirectSendResult.name, "([BZ)V",
                     this::onStoreAndForwardSendResult.name, "([BZ)V",
                     this::onTxCancelled.name, "(J[B)V",
                     this::onTXOValidationComplete.name, "([BZ)V",
-                    this::onBalanceUpdated.name,"(J)V",
+                    this::onBalanceUpdated.name, "(J)V",
                     this::onTxValidationComplete.name, "([BZ)V",
+                    this::onConnectivityStatus.name, "([B)V",
                     error
                 )
             } catch (e: Throwable) {
@@ -355,8 +279,7 @@ internal class FFIWallet(
             b.getTimeLocked(),
         )
         b.destroy()
-        if (balance != bal)
-        {
+        if (balance != bal) {
             balance = bal
         }
         return balance
@@ -461,42 +384,17 @@ internal class FFIWallet(
     @Suppress("MemberVisibilityCanBePrivate")
     fun onTxReceived(pendingInboundTxPtr: FFIPointer) {
         Logger.i("Tx received. Pointer: %s", pendingInboundTxPtr.toString())
-        val tx = FFIPendingInboundTx(pendingInboundTxPtr)
-        val id = tx.getId()
-        val source = tx.getSourcePublicKey()
-        val sourceHex = source.toString()
-        val sourceEmoji = source.getEmojiId()
-        source.destroy()
-        val amount = tx.getAmount()
-        val timestamp = tx.getTimestamp()
-        val message = tx.getMessage()
-        val status = TxStatus.map(tx.getStatus())
-        tx.destroy()
-
-        val pk = PublicKey(sourceHex, sourceEmoji)
-        val user = User(pk)
-        val pendingTx = PendingInboundTx(id, user, MicroTari(amount), timestamp, message, status)
+        val pendingTx = PendingInboundTx(FFICompletedTx(pendingInboundTxPtr))
         GlobalScope.launch { listener?.onTxReceived(pendingTx) }
     }
 
     /**
-     * This callback function cannot be private due to JNI behaviour.
+     * This callback function cannot be private due to JNI behaviour
      */
     @Suppress("MemberVisibilityCanBePrivate")
-    fun onTxReplyReceived(completedTxPtr: FFIPointer) {
-        Logger.i("Tx reply received. Pointer: %s", completedTxPtr.toString())
-        val tx = FFICompletedTx(completedTxPtr)
-        val (_, user) = defineParticipantAndDirection(tx)
-        val pendingOutboundTx = PendingOutboundTx(
-            tx.getId(),
-            user,
-            MicroTari(tx.getAmount()),
-            MicroTari(tx.getFee()),
-            tx.getTimestamp(),
-            tx.getMessage(),
-            TxStatus.map(tx.getStatus())
-        )
-        tx.destroy()
+    fun onTxReplyReceived(txPointer: FFIPointer) {
+        Logger.i("Tx reply received. Pointer: %s", txPointer.toString())
+        val pendingOutboundTx = PendingOutboundTx(FFICompletedTx(txPointer))
         GlobalScope.launch { listener?.onTxReplyReceived(pendingOutboundTx) }
     }
 
@@ -506,17 +404,7 @@ internal class FFIWallet(
     @Suppress("MemberVisibilityCanBePrivate")
     fun onTxFinalized(completedTx: FFIPointer) {
         Logger.i("Tx finalized. Pointer: %s", completedTx.toString())
-        val tx = FFICompletedTx(completedTx)
-        val (_, user) = defineParticipantAndDirection(tx)
-        val pendingInboundTx = PendingInboundTx(
-            tx.getId(),
-            user,
-            MicroTari(tx.getAmount()),
-            tx.getTimestamp(),
-            tx.getMessage(),
-            TxStatus.map(tx.getStatus())
-        )
-        tx.destroy()
+        val pendingInboundTx = PendingInboundTx(FFICompletedTx(completedTx))
         GlobalScope.launch { listener?.onTxFinalized(pendingInboundTx) }
     }
 
@@ -527,33 +415,16 @@ internal class FFIWallet(
     fun onTxBroadcast(completedTxPtr: FFIPointer) {
         Logger.i("Tx completed. Pointer: %s", completedTxPtr.toString())
         val tx = FFICompletedTx(completedTxPtr)
-        val (direction, user) = defineParticipantAndDirection(tx)
-        when (direction) {
+        when (tx.getDirection()) {
             Tx.Direction.INBOUND -> {
-                val pendingInboundTx = PendingInboundTx(
-                    tx.getId(),
-                    user,
-                    MicroTari(tx.getAmount()),
-                    tx.getTimestamp(),
-                    tx.getMessage(),
-                    TxStatus.map(tx.getStatus())
-                )
+                val pendingInboundTx = PendingInboundTx(tx)
                 GlobalScope.launch { listener?.onInboundTxBroadcast(pendingInboundTx) }
             }
             Tx.Direction.OUTBOUND -> {
-                val pendingOutboundTx = PendingOutboundTx(
-                    tx.getId(),
-                    user,
-                    MicroTari(tx.getAmount()),
-                    MicroTari(tx.getFee()),
-                    tx.getTimestamp(),
-                    tx.getMessage(),
-                    TxStatus.map(tx.getStatus())
-                )
+                val pendingOutboundTx = PendingOutboundTx(tx)
                 GlobalScope.launch { listener?.onOutboundTxBroadcast(pendingOutboundTx) }
             }
         }
-        tx.destroy()
     }
 
     /**
@@ -562,20 +433,7 @@ internal class FFIWallet(
     @Suppress("MemberVisibilityCanBePrivate")
     fun onTxMined(completedTxPtr: FFIPointer) {
         Logger.i("Tx mined & confirmed. Pointer: %s", completedTxPtr.toString())
-        val tx = FFICompletedTx(completedTxPtr)
-        val (direction, user) = defineParticipantAndDirection(tx)
-        val completed = CompletedTx(
-            tx.getId(),
-            direction,
-            user,
-            MicroTari(tx.getAmount()),
-            MicroTari(tx.getFee()),
-            tx.getTimestamp(),
-            tx.getMessage(),
-            TxStatus.map(tx.getStatus()),
-            tx.getConfirmationCount()
-        )
-        tx.destroy()
+        val completed = CompletedTx(completedTxPtr)
         GlobalScope.launch { listener?.onTxMined(completed) }
     }
 
@@ -585,21 +443,25 @@ internal class FFIWallet(
     @Suppress("MemberVisibilityCanBePrivate")
     fun onTxMinedUnconfirmed(completedTxPtr: FFIPointer, confirmationCountBytes: ByteArray) {
         Logger.i("Tx mined & unconfirmed. Pointer: %s", completedTxPtr.toString())
-        val tx = FFICompletedTx(completedTxPtr)
         val confirmationCount = BigInteger(1, confirmationCountBytes).toInt()
-        val (direction, user) = defineParticipantAndDirection(tx)
-        val completed = CompletedTx(
-            tx.getId(),
-            direction,
-            user,
-            MicroTari(tx.getAmount()),
-            MicroTari(tx.getFee()),
-            tx.getTimestamp(),
-            tx.getMessage(),
-            TxStatus.map(tx.getStatus()),
-            tx.getConfirmationCount()
-        )
-        tx.destroy()
+        val completed = CompletedTx(completedTxPtr)
+        GlobalScope.launch { listener?.onTxMinedUnconfirmed(completed, confirmationCount) }
+    }
+
+    /**
+     * This callback function cannot be private due to JNI behaviour.
+     */
+    @Suppress("MemberVisibilityCanBePrivate")
+    fun onTxFauxConfirmed(completedTxPtr: FFIPointer) {
+        Logger.i("Tx faux confirmed. Pointer: %s", completedTxPtr.toString())
+        val completed = CompletedTx(completedTxPtr)
+        GlobalScope.launch { listener?.onTxMined(completed) }
+    }
+
+    fun onTxFauxUnconfirmed(completedTxPtr: FFIPointer, confirmationCountBytes: ByteArray) {
+        Logger.i("Tx faux unconfirmed. Pointer: %s", completedTxPtr.toString())
+        val confirmationCount = BigInteger(1, confirmationCountBytes).toInt()
+        val completed = CompletedTx(completedTxPtr)
         GlobalScope.launch { listener?.onTxMinedUnconfirmed(completed, confirmationCount) }
     }
 
@@ -629,21 +491,24 @@ internal class FFIWallet(
     @Suppress("MemberVisibilityCanBePrivate")
     fun onTxCancelled(completedTx: FFIPointer, rejectionReason: ByteArray) {
         Logger.i("Tx cancelled. Pointer: %s", completedTx.toString())
-        val tx = FFICompletedTx(completedTx)
-        val (direction, user) = defineParticipantAndDirection(tx)
         val rejectionReasonInt = BigInteger(1, rejectionReason).toInt()
-        val cancelled = CancelledTx(
-            tx.getId(),
-            direction,
-            user,
-            MicroTari(tx.getAmount()),
-            MicroTari(tx.getFee()),
-            tx.getTimestamp(),
-            tx.getMessage(),
-            TxStatus.map(tx.getStatus())
-        )
-        tx.destroy()
-        GlobalScope.launch { listener?.onTxCancelled(cancelled, rejectionReasonInt) }
+
+        val tx = FFICompletedTx(completedTx)
+        when (tx.getDirection()) {
+            Tx.Direction.OUTBOUND -> {
+                val cancelledTx = CancelledTx(tx)
+                GlobalScope.launch { listener?.onTxCancelled(cancelledTx, rejectionReasonInt) }
+            }
+        }
+    }
+
+    /**
+     * This callback function cannot be private due to JNI behaviour.
+     */
+    @Suppress("MemberVisibilityCanBePrivate")
+    fun onConnectivityStatus(bytes: ByteArray) {
+        val connectivityStatus = BigInteger(1, bytes)
+        Logger.i("ConnectivityStatus is [$connectivityStatus]")
     }
 
     /**
@@ -653,12 +518,7 @@ internal class FFIWallet(
     fun onBalanceUpdated(ptr: FFIPointer) {
         Logger.i("Balance Updated. Pointer: %s", ptr.toString())
         val b = FFIBalance(ptr)
-        val balance = BalanceInfo(
-            b.getAvailable(),
-            b.getIncoming(),
-            b.getOutgoing(),
-            b.getTimeLocked(),
-        )
+        val balance = BalanceInfo(b.getAvailable(), b.getIncoming(), b.getOutgoing(), b.getTimeLocked())
         b.destroy()
         this.balance = balance
     }
@@ -670,9 +530,7 @@ internal class FFIWallet(
     fun onTXOValidationComplete(bytes: ByteArray, isSuccess: Boolean) {
         val requestId = BigInteger(1, bytes)
         Logger.i("Invalid TXO validation [$requestId] complete. Result: $isSuccess")
-        GlobalScope.launch {
-            listener?.onTXOValidationComplete(requestId, isSuccess)
-        }
+        GlobalScope.launch { listener?.onTXOValidationComplete(requestId, isSuccess) }
     }
 
     /**
@@ -685,48 +543,15 @@ internal class FFIWallet(
         GlobalScope.launch { listener?.onTxValidationComplete(requestId, isSuccess) }
     }
 
-    private fun defineParticipantAndDirection(tx: FFICompletedTx): Pair<Tx.Direction, User> {
-        val source = tx.getSourcePublicKey()
-        val sourceHex = source.toString()
-        val sourceEmoji = source.getEmojiId()
-        source.destroy()
-        val destination = tx.getDestinationPublicKey()
-        val destinationHex = destination.toString()
-        val destinationEmoji = destination.getEmojiId()
-        destination.destroy()
-        val direction = if (tx.isOutbound()) Tx.Direction.OUTBOUND else Tx.Direction.INBOUND
-        val user = User(
-            if (tx.isOutbound()) PublicKey(destinationHex, destinationEmoji)
-            else PublicKey(sourceHex, sourceEmoji)
-        )
-        return Pair(direction, user)
-    }
-
-    fun estimateTxFee(
-        amount: BigInteger,
-        gramFee: BigInteger,
-        kernelCount: BigInteger,
-        outputCount: BigInteger
-    ): BigInteger {
+    fun estimateTxFee(amount: BigInteger, gramFee: BigInteger, kernelCount: BigInteger, outputCount: BigInteger): BigInteger {
         val error = FFIError()
-        val bytes = jniEstimateTxFee(
-            amount.toString(),
-            gramFee.toString(),
-            kernelCount.toString(),
-            outputCount.toString(),
-            error
-        )
+        val bytes = jniEstimateTxFee(amount.toString(), gramFee.toString(), kernelCount.toString(), outputCount.toString(), error)
         Logger.d("Tx fee estimate status code (0 means ok): %d", error.code)
         throwIf(error)
         return BigInteger(1, bytes)
     }
 
-    fun sendTx(
-        destination: FFIPublicKey,
-        amount: BigInteger,
-        feePerGram: BigInteger,
-        message: String
-    ): BigInteger {
+    fun sendTx(destination: FFIPublicKey, amount: BigInteger, feePerGram: BigInteger, message: String, isOneSided: Boolean): BigInteger {
         if (amount < BigInteger.valueOf(0L)) {
             throw FFIException(message = "Amount is less than 0.")
         }
@@ -734,25 +559,12 @@ internal class FFIWallet(
             throw FFIException(message = "Tx source and destination are the same.")
         }
         val error = FFIError()
-        val bytes = jniSendTx(
-            destination,
-            amount.toString(),
-            feePerGram.toString(),
-            message,
-            error
-        )
-        Logger.d("Send status code (0 means ok): %d", error.code)
+        val bytes = jniSendTx(destination, amount.toString(), feePerGram.toString(), message, isOneSided, error)
         throwIf(error)
         return BigInteger(1, bytes)
     }
 
-    fun coinSplit(
-        amount: BigInteger,
-        count: BigInteger,
-        height: BigInteger,
-        fee: BigInteger,
-        message: String
-    ): BigInteger {
+    fun coinSplit(amount: BigInteger, count: BigInteger, height: BigInteger, fee: BigInteger, message: String): BigInteger {
         val minimumLibFee = 100L
         if (fee < BigInteger.valueOf(minimumLibFee)) {
             throw FFIException(message = "Fee is less than the minimum of $minimumLibFee taris.")
@@ -762,14 +574,7 @@ internal class FFIWallet(
         }
 
         val error = FFIError()
-        val bytes = jniCoinSplit(
-            amount.toString(),
-            count.toString(),
-            fee.toString(),
-            message,
-            height.toString(),
-            error
-        )
+        val bytes = jniCoinSplit(amount.toString(), count.toString(), fee.toString(), message, height.toString(), error)
         Logger.d("Coin split code (0 means ok): %d", error.code)
         throwIf(error)
         return BigInteger(1, bytes)
@@ -782,14 +587,9 @@ internal class FFIWallet(
         return result
     }
 
-    fun verifyMessageSignature(
-        contactPublicKey: FFIPublicKey,
-        message: String,
-        signature: String
-    ): Boolean {
+    fun verifyMessageSignature(contactPublicKey: FFIPublicKey, message: String, signature: String): Boolean {
         val error = FFIError()
-        val result =
-            jniVerifyMessageSignature(contactPublicKey, message, signature, error)
+        val result = jniVerifyMessageSignature(contactPublicKey, message, signature, error)
         throwIf(error)
         return result
     }
@@ -802,7 +602,7 @@ internal class FFIWallet(
         tariCommitmentSignature: FFITariCommitmentSignature,
         senderPublicKey: FFIPublicKey,
         scriptPrivateKey: FFIPrivateKey,
-        ): BigInteger {
+    ): BigInteger {
         val error = FFIError()
         val bytes = jniImportUTXO(
             amount.toString(),
@@ -913,26 +713,6 @@ internal class FFIWallet(
         throwIf(error)
     }
 
-    fun generateTestData(datastorePath: String): Boolean {
-        return false
-    }
-
-    fun testBroadcastTx(tx: BigInteger): Boolean {
-        return false
-    }
-
-    fun testCompleteSentTx(tx: FFIPendingOutboundTx): Boolean {
-        return false
-    }
-
-    fun testMineTx(tx: BigInteger): Boolean {
-        return false
-    }
-
-    fun testFinalizeReceivedTx(tx: FFIPendingInboundTx): Boolean {
-        return false
-    }
-
     fun setEncryption(passphrase: String) {
         val error = FFIError()
         val result = jniApplyEncryption(passphrase, error)
@@ -947,7 +727,7 @@ internal class FFIWallet(
         return result
     }
 
-    fun startRecovery(baseNodePublicKey: FFIPublicKey) : Boolean {
+    fun startRecovery(baseNodePublicKey: FFIPublicKey): Boolean {
         val error = FFIError()
         val result = jniStartRecovery(baseNodePublicKey, this::onWalletRecovery.name, "(I[B[B)V", error)
         throwIf(error)
@@ -964,13 +744,21 @@ internal class FFIWallet(
         GlobalScope.launch { listener?.onWalletRestoration(result) }
     }
 
-
-    fun testReceiveTx(): Boolean {
-        return false
-    }
-
     override fun destroy() {
         listener = null
         jniDestroy()
     }
+
+
+    fun generateTestData(datastorePath: String): Boolean = false
+
+    fun testBroadcastTx(tx: BigInteger): Boolean = false
+
+    fun testCompleteSentTx(tx: FFIPendingOutboundTx): Boolean = false
+
+    fun testMineTx(tx: BigInteger): Boolean = false
+
+    fun testFinalizeReceivedTx(tx: FFIPendingInboundTx): Boolean = false
+
+    fun testReceiveTx(): Boolean = false
 }

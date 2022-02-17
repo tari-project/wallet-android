@@ -46,6 +46,7 @@ import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodeSharedRepository
 import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepository
 import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepositoryImpl
+import com.tari.android.wallet.data.sharedPrefs.tariSettings.TariSettingsSharedRepository
 import com.tari.android.wallet.data.sharedPrefs.testnetFaucet.TestnetFaucetRepository
 import com.tari.android.wallet.infrastructure.security.biometric.BiometricAuthenticationService
 import com.tari.android.wallet.notification.NotificationHelper
@@ -91,6 +92,11 @@ internal class ApplicationModule(
 
     @Provides
     @Singleton
+    fun provideTariSettingsSharedRepository(prefs: SharedPreferences, networkRepository: NetworkRepository): TariSettingsSharedRepository =
+        TariSettingsSharedRepository(prefs, networkRepository)
+
+    @Provides
+    @Singleton
     fun provideNetworkRepository(resourceManager: ResourceManager, prefs: SharedPreferences): NetworkRepository =
         NetworkRepositoryImpl(resourceManager, prefs)
 
@@ -108,7 +114,8 @@ internal class ApplicationModule(
         baseNodeSharedRepository: BaseNodeSharedRepository,
         networkRepository: NetworkRepository,
         testnetFaucetRepository: TestnetFaucetRepository,
-        yatSharedRepository: YatSharedRepository
+        yatSharedRepository: YatSharedRepository,
+        tariSettingsSharedRepository: TariSettingsSharedRepository
     ): SharedPrefsRepository =
         SharedPrefsRepository(
             context,
@@ -117,7 +124,8 @@ internal class ApplicationModule(
             backupSettingsRepository,
             baseNodeSharedRepository,
             testnetFaucetRepository,
-            yatSharedRepository
+            yatSharedRepository,
+            tariSettingsSharedRepository
         )
 
     @Provides
@@ -126,8 +134,12 @@ internal class ApplicationModule(
 
     @Provides
     @Singleton
-    fun provideWalletServiceLauncher(context: Context, prefsRepository: SharedPrefsRepository, walletConfig: WalletConfig): WalletServiceLauncher =
-        WalletServiceLauncher(context, walletConfig, prefsRepository)
+    fun provideWalletServiceLauncher(
+        context: Context,
+        tariSettingsSharedRepository: TariSettingsSharedRepository,
+        walletConfig: WalletConfig
+    ): WalletServiceLauncher =
+        WalletServiceLauncher(context, walletConfig, tariSettingsSharedRepository)
 
     @Provides
     @Singleton

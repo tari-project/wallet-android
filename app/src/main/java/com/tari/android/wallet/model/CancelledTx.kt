@@ -34,6 +34,7 @@ package com.tari.android.wallet.model
 
 import android.os.Parcel
 import android.os.Parcelable
+import com.tari.android.wallet.ffi.FFICompletedTx
 import java.math.BigInteger
 
 /**
@@ -41,10 +42,9 @@ import java.math.BigInteger
  *
  * @author The Tari Development Team
  */
-class CancelledTx : Tx, Parcelable {
+class CancelledTx() : Tx(), Parcelable {
 
-    val fee: MicroTari
-    val status: TxStatus
+    var fee: MicroTari = MicroTari(BigInteger("0"))
 
     constructor(
         id: BigInteger,
@@ -55,7 +55,7 @@ class CancelledTx : Tx, Parcelable {
         timestamp: BigInteger,
         message: String,
         status: TxStatus
-    ) : super() {
+    ) : this() {
         this.id = id
         this.direction = direction
         this.user = user
@@ -66,9 +66,21 @@ class CancelledTx : Tx, Parcelable {
         this.status = status
     }
 
+    internal constructor(tx: FFICompletedTx) : this() {
+        this.id = tx.getId()
+        this.direction = tx.getDirection()
+        this.user = tx.getUser()
+        this.amount = MicroTari(tx.getAmount())
+        this.fee = MicroTari(tx.getFee())
+        this.timestamp = tx.getTimestamp()
+        this.message = tx.getMessage()
+        this.status = TxStatus.map(tx.getStatus())
+        tx.destroy()
+    }
+
     // region Parcelable
 
-    constructor(parcel: Parcel) : super() {
+    constructor(parcel: Parcel) : this() {
         id = parcel.readSerializable() as BigInteger
         direction = parcel.readSerializable() as Direction
         val userIsContact = parcel.readSerializable() == Contact::class.java
@@ -89,7 +101,6 @@ class CancelledTx : Tx, Parcelable {
         override fun createFromParcel(parcel: Parcel): CancelledTx = CancelledTx(parcel)
 
         override fun newArray(size: Int): Array<CancelledTx?> = arrayOfNulls(size)
-
     }
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {

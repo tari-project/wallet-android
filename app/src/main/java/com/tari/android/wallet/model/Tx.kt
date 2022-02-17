@@ -40,7 +40,7 @@ import java.math.BigInteger
  *
  * @author The Tari Development Team
  */
-abstract class Tx : Parcelable {
+abstract class Tx() : Parcelable {
 
     enum class Direction {
         INBOUND,
@@ -52,14 +52,13 @@ abstract class Tx : Parcelable {
     var amount = MicroTari(BigInteger("0"))
     var timestamp = BigInteger("0")
     var message = ""
+    var status = TxStatus.PENDING
 
     /**
      * This is the receiver for an outbound tx and sender for an inbound tx.
      */
     var user = User()
 
-    override fun toString(): String =
-        "Tx(id=$id, direction=$direction, amount=$amount, timestamp=$timestamp, message='$message'," +
-                " user=$user)"
+    override fun toString(): String = "Tx(id=$id, direction=$direction, amount=$amount, timestamp=$timestamp, message='$message', user=$user)"
 
 }

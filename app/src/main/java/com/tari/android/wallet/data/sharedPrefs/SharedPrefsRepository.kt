@@ -39,6 +39,7 @@ import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefBooleanDeleg
 import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefStringDelegate
 import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefStringSecuredDelegate
 import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepository
+import com.tari.android.wallet.data.sharedPrefs.tariSettings.TariSettingsSharedRepository
 import com.tari.android.wallet.data.sharedPrefs.testnetFaucet.TestnetFaucetRepository
 import com.tari.android.wallet.ui.dialog.backup.BackupSettingsRepository
 import com.tari.android.wallet.yat.YatSharedRepository
@@ -58,7 +59,8 @@ class SharedPrefsRepository(
     private val backupSettingsRepository: BackupSettingsRepository,
     private val baseNodeSharedRepository: BaseNodeSharedRepository,
     private val testnetFaucetRepository: TestnetFaucetRepository,
-    private val yatSharedRepository: YatSharedRepository
+    private val yatSharedRepository: YatSharedRepository,
+    private var tariSettingsSharedRepository: TariSettingsSharedRepository
 ) {
 
     private object Key {
@@ -72,9 +74,6 @@ class SharedPrefsRepository(
         const val onboardingDisplayedAtHome = "tari_wallet_onboarding_displayed_at_home"
         const val torBinPath = "tari_wallet_tor_bin_path"
         const val walletDatabasePassphrase = "tari_wallet_database_passphrase"
-        const val isRestoredWallet = "tari_is_restored_wallet"
-        const val hasVerifiedSeedWords = "tari_has_verified_seed_words"
-        const val backgroundServiceTurnedOnKey = "tari_background_service_turned_on"
         const val isDataCleared = "tari_is_data_cleared"
     }
 
@@ -104,12 +103,6 @@ class SharedPrefsRepository(
 
     var databasePassphrase: String? by SharedPrefStringSecuredDelegate(context, sharedPrefs, formatKey(Key.walletDatabasePassphrase))
 
-    var isRestoredWallet: Boolean by SharedPrefBooleanDelegate(sharedPrefs, formatKey(Key.isRestoredWallet))
-
-    var hasVerifiedSeedWords: Boolean by SharedPrefBooleanDelegate(sharedPrefs, formatKey(Key.hasVerifiedSeedWords))
-
-    var backgroundServiceTurnedOn: Boolean by SharedPrefBooleanDelegate(sharedPrefs, formatKey(Key.backgroundServiceTurnedOnKey), true)
-
     var isDataCleared: Boolean by SharedPrefBooleanDelegate(sharedPrefs, formatKey(Key.isDataCleared), true)
 
     fun clear() {
@@ -117,6 +110,7 @@ class SharedPrefsRepository(
         backupSettingsRepository.clear()
         testnetFaucetRepository.clear()
         yatSharedRepository.clear()
+        tariSettingsSharedRepository.clear()
         publicKeyHexString = null
         isAuthenticated = false
         emojiId = null
@@ -126,9 +120,6 @@ class SharedPrefsRepository(
         onboardingAuthSetupCompleted = false
         onboardingDisplayedAtHome = false
         torBinPath = null
-        isRestoredWallet = false
-        hasVerifiedSeedWords = false
-        backgroundServiceTurnedOn = true
         databasePassphrase = null
     }
 

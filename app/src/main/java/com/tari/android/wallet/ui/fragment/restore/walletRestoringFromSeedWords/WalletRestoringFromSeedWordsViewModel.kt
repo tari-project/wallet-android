@@ -4,9 +4,10 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.tari.android.wallet.R
-import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodeDto
 import com.tari.android.wallet.application.baseNodes.BaseNodes
 import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
+import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodeDto
+import com.tari.android.wallet.data.sharedPrefs.tariSettings.TariSettingsSharedRepository
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.extension.addTo
 import com.tari.android.wallet.ffi.FFIPublicKey
@@ -36,6 +37,9 @@ internal class WalletRestoringFromSeedWordsViewModel() : CommonViewModel() {
 
     @Inject
     lateinit var walletServiceLauncher: WalletServiceLauncher
+
+    @Inject
+    lateinit var tariSettingsSharedRepository: TariSettingsSharedRepository
 
     @Inject
     lateinit var baseNodes: BaseNodes
@@ -111,7 +115,7 @@ internal class WalletRestoringFromSeedWordsViewModel() : CommonViewModel() {
     }
 
     private fun onSuccessRestoration() {
-        sharedPrefsRepository.hasVerifiedSeedWords = true
+        tariSettingsSharedRepository.hasVerifiedSeedWords = true
         _navigation.postValue(WalletRestoringFromSeedWordsNavigation.OnRestoreCompleted)
     }
 

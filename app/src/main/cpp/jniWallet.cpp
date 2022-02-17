@@ -89,9 +89,12 @@ jmethodID txFinalizedCallbackMethodId;
 jmethodID txBroadcastCallbackMethodId;
 jmethodID txMinedCallbackMethodId;
 jmethodID txMinedUnconfirmedCallbackMethodId;
+jmethodID txFauxConfirmedCallbackMethodId;
+jmethodID txFauxUnconfirmedCallbackMethodId;
 jmethodID directSendResultCallbackMethodId;
 jmethodID storeAndForwardSendResultCallbackMethodId;
 jmethodID txCancellationCallbackMethodId;
+jmethodID connectivityStatusCallbackId;
 jmethodID txoValidationCompleteCallbackMethodId;
 jmethodID transactionValidationCompleteCallbackMethodId;
 jmethodID recoveringProcessCompleteCallbackMethodId;
@@ -134,6 +137,35 @@ void txMinedUnconfirmedCallback(struct TariCompletedTransaction *pCompletedTrans
     jniEnv->CallVoidMethod(
             callbackHandler,
             txMinedUnconfirmedCallbackMethodId,
+            jpCompletedTransaction,
+            bytes);
+    g_vm->DetachCurrentThread();
+}
+
+void txFauxConfirmedCallback(struct TariCompletedTransaction *pCompletedTransaction) {
+    auto *jniEnv = getJNIEnv();
+    if (jniEnv == nullptr || callbackHandler == nullptr) {
+        return;
+    }
+    auto jpCompletedTransaction = reinterpret_cast<jlong>(pCompletedTransaction);
+    jniEnv->CallVoidMethod(
+            callbackHandler,
+            txFauxConfirmedCallbackMethodId,
+            jpCompletedTransaction);
+    g_vm->DetachCurrentThread();
+}
+
+void txFauxUnconfirmedCallback(struct TariCompletedTransaction *pCompletedTransaction,
+                               unsigned long long confirmationCount) {
+    auto *jniEnv = getJNIEnv();
+    if (jniEnv == nullptr || callbackHandler == nullptr) {
+        return;
+    }
+    jbyteArray bytes = getBytesFromUnsignedLongLong(jniEnv, confirmationCount);
+    auto jpCompletedTransaction = reinterpret_cast<jlong>(pCompletedTransaction);
+    jniEnv->CallVoidMethod(
+            callbackHandler,
+            txFauxUnconfirmedCallbackMethodId,
             jpCompletedTransaction,
             bytes);
     g_vm->DetachCurrentThread();
@@ -249,6 +281,19 @@ void transactionValidationCompleteCallback(unsigned long long requestId, bool su
     g_vm->DetachCurrentThread();
 }
 
+void connectivityStatusCallback(unsigned long long status) {
+    auto *jniEnv = getJNIEnv();
+    if (jniEnv == nullptr || callbackHandler == nullptr) {
+        return;
+    }
+    jbyteArray requestIdBytes = getBytesFromUnsignedLongLong(jniEnv, status);
+    jniEnv->CallVoidMethod(
+            callbackHandler,
+            connectivityStatusCallbackId,
+            requestIdBytes);
+    g_vm->DetachCurrentThread();
+}
+
 void balanceUpdatedCallback(struct TariBalance* pBalance) {
     auto *jniEnv = getJNIEnv();
     if (jniEnv == nullptr || callbackHandler == nullptr) {
@@ -315,6 +360,10 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniCreate(
         jstring callback_tx_mined_sig,
         jstring callback_tx_mined_unconfirmed,
         jstring callback_tx_mined_unconfirmed_sig,
+        jstring callback_tx_faux_confirmed,
+        jstring callback_tx_faux_confirmed_sig,
+        jstring callback_tx_faux_unconfirmed,
+        jstring callback_tx_faux_unconfirmed_sig,
         jstring callback_direct_send_result,
         jstring callback_direct_send_result_sig,
         jstring callback_store_and_forward_send_result,
@@ -327,6 +376,8 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniCreate(
         jstring callback_balance_updated_sig,
         jstring callback_transaction_validation_complete,
         jstring callback_transaction_validation_complete_sig,
+        jstring callback_connectivity_status,
+        jstring callback_connectivity_status_sig,
         jobject error) {
 
     int errorCode = 0;
@@ -393,6 +444,24 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniCreate(
         SetPointerField(jEnv, jThis, reinterpret_cast<jlong>(nullptr));
     }
 
+    txFauxConfirmedCallbackMethodId = getMethodId(
+            jEnv,
+            jThis,
+            callback_tx_faux_confirmed,
+            callback_tx_faux_confirmed_sig);
+    if (txFauxConfirmedCallbackMethodId == nullptr) {
+        SetPointerField(jEnv, jThis, reinterpret_cast<jlong>(nullptr));
+    }
+
+    txFauxUnconfirmedCallbackMethodId = getMethodId(
+            jEnv,
+            jThis,
+            callback_tx_faux_unconfirmed,
+            callback_tx_faux_unconfirmed_sig);
+    if (txFauxUnconfirmedCallbackMethodId == nullptr) {
+        SetPointerField(jEnv, jThis, reinterpret_cast<jlong>(nullptr));
+    }
+
     directSendResultCallbackMethodId = getMethodId(
             jEnv,
             jThis,
@@ -417,6 +486,15 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniCreate(
             callback_tx_cancellation,
             callback_tx_cancellation_sig);
     if (txCancellationCallbackMethodId == nullptr) {
+        SetPointerField(jEnv, jThis, reinterpret_cast<jlong>(nullptr));
+    }
+
+    connectivityStatusCallbackId = getMethodId(
+            jEnv,
+            jThis,
+            callback_connectivity_status,
+            callback_connectivity_status_sig);
+    if (connectivityStatusCallbackId == nullptr) {
         SetPointerField(jEnv, jThis, reinterpret_cast<jlong>(nullptr));
     }
 
@@ -460,8 +538,8 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniCreate(
         pPassphrase = jEnv->GetStringUTFChars(jPassphrase, JNI_FALSE);
     }
 
-    bool recoveryInProgress = false;
-    bool *recovery = &recoveryInProgress;
+    bool jRecoveryInProgress = false;
+    bool *pRecovery = &jRecoveryInProgress;
 
     TariSeedWords *pSeedWords = nullptr;
     if (jSeed_words != nullptr) {
@@ -482,6 +560,8 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniCreate(
             txBroadcastCallback,
             txMinedCallback,
             txMinedUnconfirmedCallback,
+            txFauxConfirmedCallback,
+            txFauxUnconfirmedCallback,
             txDirectSendResultCallback,
             txStoreAndForwardSendResultCallback,
             txCancellationCallback,
@@ -489,7 +569,8 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniCreate(
             balanceUpdatedCallback,
             transactionValidationCompleteCallback,
             storeAndForwardMessagesReceivedCallback,
-            recovery,
+            connectivityStatusCallback,
+            pRecovery,
             errorCodePointer);
 
     setErrorCode(jEnv, error, errorCode);
@@ -1318,6 +1399,7 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniSendTx(
         jstring jamount,
         jstring jfeePerGram,
         jstring jmessage,
+        jboolean jOneSided,
         jobject error) {
     int errorCode = 0;
     int *errorCodePointer = &errorCode;
@@ -1335,7 +1417,7 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniSendTx(
 
     jbyteArray result = getBytesFromUnsignedLongLong(
             jEnv,
-            wallet_send_transaction(pWallet, pDestination, amount, feePerGram, pMessage, false, errorCodePointer));
+            wallet_send_transaction(pWallet, pDestination, amount, feePerGram, pMessage, jOneSided, errorCodePointer));
     setErrorCode(jEnv, error, errorCode);
     jEnv->ReleaseStringUTFChars(jamount, nativeAmount);
     jEnv->ReleaseStringUTFChars(jfeePerGram, nativeFeePerGram);
