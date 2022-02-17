@@ -52,8 +52,9 @@ import com.tari.android.wallet.ui.extension.color
 import com.tari.android.wallet.ui.extension.hideKeyboard
 import com.tari.android.wallet.ui.extension.showInternetConnectionErrorDialog
 import com.tari.android.wallet.ui.fragment.send.addAmount.AddAmountFragment
+import com.tari.android.wallet.ui.fragment.send.addAmount.AddAmountListener
+import com.tari.android.wallet.ui.fragment.send.addNote.AddNodeListener
 import com.tari.android.wallet.ui.fragment.send.addNote.AddNoteFragment
-import com.tari.android.wallet.ui.fragment.send.addRecepient.AddRecipientFragment
 import com.tari.android.wallet.ui.fragment.send.addRecepient.AddRecipientListener
 import com.tari.android.wallet.ui.fragment.send.common.TransactionData
 import com.tari.android.wallet.ui.fragment.send.finalize.FinalizeSendTxFragment
@@ -74,8 +75,8 @@ import javax.inject.Inject
  */
 internal class SendTariActivity : CommonActivity<ActivitySendTariBinding, SendTariViewModel>(),
     AddRecipientListener,
-    AddAmountFragment.Listener,
-    AddNoteFragment.Listener,
+    AddAmountListener,
+    AddNodeListener,
     FinalizeSendTxListener {
 
     @Inject
@@ -112,7 +113,7 @@ internal class SendTariActivity : CommonActivity<ActivitySendTariBinding, SendTa
         ui.rootView.postDelayed({ ui.rootView.setBackgroundColor(color(R.color.black)) }, 1000)
     }
 
-    override fun continueToAmount(sourceFragment: AddRecipientFragment, user: User) {
+    override fun continueToAmount(user: User) {
         if (EventBus.networkConnectionState.publishSubject.value != NetworkConnectionState.CONNECTED) {
             showInternetConnectionErrorDialog(this)
             return
@@ -130,7 +131,7 @@ internal class SendTariActivity : CommonActivity<ActivitySendTariBinding, SendTa
         ).show()
     }
 
-    override fun continueToAddNote(sourceFragment: AddAmountFragment, recipientUser: User, amount: MicroTari) {
+    override fun continueToAddNote(recipientUser: User, amount: MicroTari, isOneSidePayment: Boolean) {
         if (EventBus.networkConnectionState.publishSubject.value != NetworkConnectionState.CONNECTED) {
             showInternetConnectionErrorDialog(this)
             return
@@ -138,12 +139,13 @@ internal class SendTariActivity : CommonActivity<ActivitySendTariBinding, SendTa
         val bundle = Bundle().apply {
             putParcelable("recipientUser", recipientUser)
             putParcelable("amount", amount)
+            putBoolean("isOneSidePayment", isOneSidePayment)
             intent.getStringExtra(DeepLink.PARAMETER_NOTE)?.let { putString(DeepLink.PARAMETER_NOTE, it) }
         }
         addFragment(AddNoteFragment(), bundle)
     }
 
-    override fun continueToFinalizeSendTx(sourceFragment: AddNoteFragment, transactionData: TransactionData) {
+    override fun continueToFinalizeSendTx(transactionData: TransactionData) {
         if (transactionData.recipientUser is YatUser) {
             yatAdapter.showOutcomingFinalizeActivity(this, transactionData)
         } else {

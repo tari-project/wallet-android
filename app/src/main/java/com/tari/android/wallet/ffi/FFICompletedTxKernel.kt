@@ -73,5 +73,4 @@ internal class FFICompletedTxKernel() : FFIBase() {
     override fun destroy() {
         jniDestroy()
     }
-
 }

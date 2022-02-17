@@ -243,3 +243,18 @@ Java_com_tari_android_wallet_ffi_FFICompletedTx_jniDestroy(
     completed_transaction_destroy(pCompletedTx);
     SetPointerField(jEnv, jThis, reinterpret_cast<jlong>(nullptr));
 }
+
+extern "C"
+JNIEXPORT jint JNICALL
+Java_com_tari_android_wallet_ffi_FFICompletedTx_jniGetCancellationReason(
+        JNIEnv *jEnv,
+        jobject jThis,
+        jobject error) {
+    int errorCode = 0;
+    int *errorCodePointer = &errorCode;
+    jlong lCompletedTx = GetPointerField(jEnv, jThis);
+    auto *pCompletedTx = reinterpret_cast<TariCompletedTransaction *>(lCompletedTx);
+    jint result = reinterpret_cast<jint>(completed_transaction_get_cancellation_reason(pCompletedTx, errorCodePointer));
+    setErrorCode(jEnv, error, errorCode);
+    return result;
+}

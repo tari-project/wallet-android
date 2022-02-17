@@ -45,6 +45,7 @@ import com.tari.android.wallet.application.Network
 import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodeSharedRepository
 import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepositoryImpl
+import com.tari.android.wallet.data.sharedPrefs.tariSettings.TariSettingsSharedRepository
 import com.tari.android.wallet.data.sharedPrefs.testnetFaucet.TestnetFaucetRepository
 import com.tari.android.wallet.di.ApplicationModule
 import com.tari.android.wallet.ffi.*
@@ -71,7 +72,7 @@ import java.math.BigInteger
 class FFIWalletTests {
 
     private lateinit var wallet: FFIWallet
-    private lateinit var listener: TestAddRecipientListener
+    private lateinit var listener: TestAddRecipientAddNodeListener
     private var network: Network = Network.DIBBLER
     private val context = getApplicationContext<Context>()
     private val prefs = context.getSharedPreferences(ApplicationModule.sharedPrefsFileName, Context.MODE_PRIVATE)
@@ -81,8 +82,18 @@ class FFIWalletTests {
     private val backupSettingsRepository = BackupSettingsRepository(context, prefs, networkRepository)
     private val testnetFaucetRepository = TestnetFaucetRepository(prefs, networkRepository)
     private val yatSharedPrefsRepository = YatSharedRepository(prefs, networkRepository)
+    private val tariSettingsRepository = TariSettingsSharedRepository(prefs, networkRepository)
     private val sharedPrefsRepository =
-        SharedPrefsRepository(context, prefs, networkRepository, backupSettingsRepository, baseNodeSharedPrefsRepository, testnetFaucetRepository, yatSharedPrefsRepository)
+        SharedPrefsRepository(
+            context,
+            prefs,
+            networkRepository,
+            backupSettingsRepository,
+            baseNodeSharedPrefsRepository,
+            testnetFaucetRepository,
+            yatSharedPrefsRepository,
+            tariSettingsRepository
+        )
     private val walletDirPath = context.filesDir.absolutePath
 
     private fun clean() {
@@ -113,7 +124,7 @@ class FFIWalletTests {
         // create wallet instance
         wallet = FFIWallet(sharedPrefsRepository, SeedPhraseRepository(), commsConfig, logFile.absolutePath)
         // create listener
-        listener = TestAddRecipientListener()
+        listener = TestAddRecipientAddNodeListener()
         wallet.listener = listener
         commsConfig.destroy()
         transport.destroy()
@@ -453,7 +464,7 @@ class FFIWalletTests {
         wallet.getKeyValue(key)
     }
 
-    private class TestAddRecipientListener : FFIWalletListener {
+    private class TestAddRecipientAddNodeListener : FFIWalletListener {
 
         val receivedTxs = mutableListOf<PendingInboundTx>()
         val finalizedTxs = mutableListOf<PendingInboundTx>()
@@ -494,7 +505,17 @@ class FFIWalletTests {
         }
 
         override fun onTxMinedUnconfirmed(completedTx: CompletedTx, confirmationCount: Int) {
-            Logger.i("Tx Mined :: completed tx id: %s", completedTx.id)
+            Logger.i("Tx Mined unconfirmed :: completed tx id: %s", completedTx.id)
+            minedTxs.add(completedTx)
+        }
+
+        override fun onTxFauxConfirmed(completedTx: CompletedTx) {
+            Logger.i("Tx Faux Mined :: completed tx id: %s", completedTx.id)
+            minedTxs.add(completedTx)
+        }
+
+        override fun onTxFauxUnconfirmed(completedTx: CompletedTx, confirmationCount: Int) {
+            Logger.i("Tx Faux Mined unconfirmed :: completed tx id: %s", completedTx.id)
             minedTxs.add(completedTx)
         }
 
@@ -520,11 +541,7 @@ class FFIWalletTests {
         }
 
         override fun onStoreAndForwardSendResult(txId: BigInteger, success: Boolean) {
-            Logger.i(
-                "Store and forward :: tx id %s success %s",
-                txId,
-                success
-            )
+            Logger.i("Store and forward :: tx id %s success %s", txId, success)
         }
     }
 }

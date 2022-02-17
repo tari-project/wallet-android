@@ -32,16 +32,20 @@
  */
 package com.tari.android.wallet.ui.fragment.settings.allSettings
 
+import android.content.ClipData
+import android.content.ClipboardManager
 import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
-import com.tari.android.wallet.R
 import com.tari.android.wallet.R.color.all_settings_back_up_status_processing
+import com.tari.android.wallet.R.dimen.menu_item_height
+import com.tari.android.wallet.R.string.*
 import com.tari.android.wallet.databinding.FragmentAllSettingsBinding
 import com.tari.android.wallet.di.DiContainer.appComponent
 import com.tari.android.wallet.event.EventBus
@@ -65,6 +69,9 @@ internal class AllSettingsFragment : CommonFragment<FragmentAllSettingsBinding, 
 
     @Inject
     lateinit var bugReportingService: BugReportingService
+
+    @Inject
+    lateinit var clipboardManager: ClipboardManager
 
     @Inject
     lateinit var yatAdapter: YatAdapter
@@ -106,6 +113,7 @@ internal class AllSettingsFragment : CommonFragment<FragmentAllSettingsBinding, 
         userAgreementCtaView.setOnThrottledClickListener { viewModel.openAgreementUrl() }
         privacyPolicyCtaView.setOnThrottledClickListener { viewModel.openPrivateUrl() }
         disclaimerCtaView.setOnThrottledClickListener { viewModel.openDisclaimerUrl() }
+        explorerCtaView.setOnThrottledClickListener { viewModel.openExplorerUrl() }
         backUpWalletCtaView.setOnThrottledClickListener { viewModel.navigateToBackupSettings() }
         backgroundServiceCtaView.setOnThrottledClickListener { viewModel.navigateToBackgroundServiceSettings() }
         changeBaseNodeCtaView.setOnThrottledClickListener { viewModel.navigateToBaseNodeSelection() }
@@ -113,6 +121,7 @@ internal class AllSettingsFragment : CommonFragment<FragmentAllSettingsBinding, 
         backgroundServiceCtaView.setOnThrottledClickListener { viewModel.navigateToBackgroundServiceSettings() }
         deleteWalletCtaView.setOnThrottledClickListener { viewModel.navigateToDeleteWallet() }
         connectYats.setOnThrottledClickListener { yatAdapter.openOnboarding(requireActivity()) }
+        networkInfoCtaView.setOnThrottledClickListener { copy(viewModel.versionInfo.value.orEmpty()) }
     }
 
     private fun observeUI() = with(viewModel) {
@@ -123,6 +132,8 @@ internal class AllSettingsFragment : CommonFragment<FragmentAllSettingsBinding, 
         observe(backupState) { activateBackupStatusView(it) }
 
         observe(lastBackupDate) { ui.lastBackupTimeTextView.text = it }
+
+        observe(versionInfo) { ui.networkInfoTextView.text = it }
     }
 
     private fun activateBackupStatusView(backupState: PresentationBackupState) {
@@ -159,10 +170,10 @@ internal class AllSettingsFragment : CommonFragment<FragmentAllSettingsBinding, 
 
     private fun showBugReportFileSizeExceededDialog() {
         val dialogBuilder = AlertDialog.Builder(context ?: return)
-        val dialog = dialogBuilder.setMessage(string(R.string.debug_log_file_size_limit_exceeded_dialog_content))
+        val dialog = dialogBuilder.setMessage(string(debug_log_file_size_limit_exceeded_dialog_content))
             .setCancelable(false)
-            .setPositiveButton(string(R.string.common_ok)) { dialog, _ -> dialog.cancel() }
-            .setTitle(getString(R.string.debug_log_file_size_limit_exceeded_dialog_title))
+            .setPositiveButton(string(common_ok)) { dialog, _ -> dialog.cancel() }
+            .setTitle(getString(debug_log_file_size_limit_exceeded_dialog_title))
             .create()
         dialog.show()
     }
@@ -179,6 +190,11 @@ internal class AllSettingsFragment : CommonFragment<FragmentAllSettingsBinding, 
         }
     }
 
+    private fun copy(text: String) {
+        clipboardManager.setPrimaryClip(ClipData.newPlainText(string(all_settings_version_text_copy_title), text))
+        Toast.makeText(requireActivity(), string(all_settings_version_text_copy_toast_message), Toast.LENGTH_LONG).show()
+    }
+
     override fun onDestroyView() {
         ui.scrollView.setOnScrollChangeListener(null)
         super.onDestroyView()
@@ -193,7 +209,7 @@ internal class AllSettingsFragment : CommonFragment<FragmentAllSettingsBinding, 
 
         override fun onScrollChange(v: View?, scrollX: Int, scrollY: Int, oldScrollX: Int, oldScrollY: Int) {
             ui.scrollElevationGradientView.alpha =
-                min(Constants.UI.scrollDepthShadowViewMaxOpacity, scrollY / (dimenPx(R.dimen.menu_item_height)).toFloat())
+                min(Constants.UI.scrollDepthShadowViewMaxOpacity, scrollY / (dimenPx(menu_item_height)).toFloat())
         }
     }
 

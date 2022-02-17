@@ -223,7 +223,10 @@ internal class TxListViewModel() : CommonViewModel() {
         EventBus.subscribe<Event.Transaction.InboundTxBroadcast>(this) { onInboundTxBroadcast(it.tx) }
         EventBus.subscribe<Event.Transaction.OutboundTxBroadcast>(this) { onOutboundTxBroadcast(it.tx) }
         EventBus.subscribe<Event.Transaction.TxMinedUnconfirmed>(this) { onTxMinedUnconfirmed(it.tx) }
+        EventBus.subscribe<Event.Transaction.TxMinedUnconfirmed>(this) { onTxMinedUnconfirmed(it.tx) }
         EventBus.subscribe<Event.Transaction.TxMined>(this) { onTxMined(it.tx) }
+        EventBus.subscribe<Event.Transaction.TxFauxMinedUnconfirmed>(this) { onTxFauxMinedUnconfirmed(it.tx) }
+        EventBus.subscribe<Event.Transaction.TxFauxConfirmed>(this) { onFauxTxMined(it.tx) }
         EventBus.subscribe<Event.Transaction.TxCancelled>(this) {
             if (progressControllerState.state != UpdateProgressViewController.State.RECEIVING) {
                 onTxCancelled(it.tx)
@@ -231,7 +234,7 @@ internal class TxListViewModel() : CommonViewModel() {
         }
 
         EventBus.subscribe<Event.Testnet.TestnetTariRequestSuccessful>(this) { testnetTariRequestSuccessful() }
-        EventBus.subscribe<Event.Testnet.TestnetTariRequestError>(this) { event -> testnetTariRequestError(event.errorMessage) }
+        EventBus.subscribe<Event.Testnet.TestnetTariRequestError>(this) { testnetTariRequestError() }
 
         EventBus.subscribe<Event.Transaction.TxSendSuccessful>(this) { onTxSendSuccessful(it.txId) }
         EventBus.subscribe<Event.Transaction.TxSendFailed>(this) { onTxSendFailed(it.failureReason) }
@@ -279,11 +282,10 @@ internal class TxListViewModel() : CommonViewModel() {
     }
 
     private fun onTxMinedUnconfirmed(tx: CompletedTx) {
-        val source = when (tx.direction) {
+       when (tx.direction) {
             Tx.Direction.INBOUND -> pendingInboundTxs
             Tx.Direction.OUTBOUND -> pendingOutboundTxs
-        }
-        source.find { it.id == tx.id }?.let { source.remove(it) }
+        }.removeIf { it.id == tx.id }
         val index = completedTxs.indexOfFirst { it.id == tx.id }
         if (index == -1) {
             completedTxs.add(tx)
@@ -294,6 +296,33 @@ internal class TxListViewModel() : CommonViewModel() {
     }
 
     private fun onTxMined(tx: CompletedTx) {
+        pendingInboundTxs.removeIf { it.id == tx.id }
+        pendingOutboundTxs.removeIf { it.id == tx.id }
+
+        val index = completedTxs.indexOfFirst { it.id == tx.id }
+        if (index == -1) {
+            completedTxs.add(tx)
+        } else {
+            completedTxs[index] = tx
+        }
+        _listUpdateTrigger.postValue(Unit)
+    }
+
+    private fun onTxFauxMinedUnconfirmed(tx: CompletedTx) {
+        when (tx.direction) {
+            Tx.Direction.INBOUND -> pendingInboundTxs
+            Tx.Direction.OUTBOUND -> pendingOutboundTxs
+        }.removeIf { it.id == tx.id }
+        val index = completedTxs.indexOfFirst { it.id == tx.id }
+        if (index == -1) {
+            completedTxs.add(tx)
+        } else {
+            completedTxs[index] = tx
+        }
+        _listUpdateTrigger.postValue(Unit)
+    }
+
+    private fun onFauxTxMined(tx: CompletedTx) {
         pendingInboundTxs.removeIf { it.id == tx.id }
         pendingOutboundTxs.removeIf { it.id == tx.id }
 
@@ -394,11 +423,10 @@ internal class TxListViewModel() : CommonViewModel() {
         }
     }
 
-    private fun testnetTariRequestError(errorMessage: String) {
+    private fun testnetTariRequestError() {
         testnetTariRequestIsInProgress = false
         if (!networkRepository.currentNetwork?.faucetUrl.isNullOrEmpty()) {
-            val description = if (errorMessage.contains("many allocation attempts"))
-                resourceManager.getString(R.string.faucet_error_too_many_allocation_attemps) else errorMessage
+            val description = resourceManager.getString(R.string.faucet_error_common)
             val errorDialogArgs = ErrorDialogArgs(resourceManager.getString(R.string.faucet_error_title), description)
             _errorDialog.postValue(errorDialogArgs)
         }

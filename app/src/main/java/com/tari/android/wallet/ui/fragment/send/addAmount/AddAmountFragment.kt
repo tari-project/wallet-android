@@ -46,27 +46,31 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
-import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.daasuu.ei.Ease
 import com.daasuu.ei.EasingInterpolator
 import com.orhanobut.logger.Logger
 import com.tari.android.wallet.R
 import com.tari.android.wallet.R.color.black
+import com.tari.android.wallet.R.string.*
 import com.tari.android.wallet.amountInputBinding.fragment.send.addAmount.keyboard.KeyboardController
 import com.tari.android.wallet.application.DeepLink
 import com.tari.android.wallet.databinding.FragmentAddAmountBinding
 import com.tari.android.wallet.di.DiContainer.appComponent
 import com.tari.android.wallet.extension.getWithError
+import com.tari.android.wallet.extension.observe
 import com.tari.android.wallet.infrastructure.Tracker
 import com.tari.android.wallet.model.*
 import com.tari.android.wallet.service.TariWalletService
 import com.tari.android.wallet.service.WalletService
+import com.tari.android.wallet.ui.common.CommonFragment
 import com.tari.android.wallet.ui.component.EmojiIdSummaryViewController
 import com.tari.android.wallet.ui.component.FullEmojiIdViewController
-import com.tari.android.wallet.ui.dialog.BottomSlideDialog
 import com.tari.android.wallet.ui.dialog.error.ErrorDialog
 import com.tari.android.wallet.ui.dialog.error.ErrorDialogArgs
+import com.tari.android.wallet.ui.dialog.tooltipDialog.TooltipDialog
+import com.tari.android.wallet.ui.dialog.tooltipDialog.TooltipDialogArgs
 import com.tari.android.wallet.ui.extension.*
 import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.WalletUtil
@@ -75,17 +79,12 @@ import kotlinx.coroutines.launch
 import java.lang.ref.WeakReference
 import javax.inject.Inject
 
-/**
- * Amount entry fragment.
- *
- * @author The Tari Development Team
- */
-class AddAmountFragment : Fragment(), ServiceConnection {
+class AddAmountFragment : CommonFragment<FragmentAddAmountBinding, AddAmountViewModel>(), ServiceConnection {
 
     @Inject
     lateinit var tracker: Tracker
 
-    private lateinit var listenerWR: WeakReference<Listener>
+    private lateinit var addAmountListenerWR: WeakReference<AddAmountListener>
 
     /**
      * Recipient is either an emoji id or a user from contacts or recent txs.
@@ -107,7 +106,6 @@ class AddAmountFragment : Fragment(), ServiceConnection {
     private lateinit var walletService: TariWalletService
 
     private var isFirstLaunch: Boolean = false
-    private lateinit var ui: FragmentAddAmountBinding
 
     private var estimatedFee: MicroTari? = null
     private lateinit var balanceInfo: BalanceInfo
@@ -122,11 +120,20 @@ class AddAmountFragment : Fragment(), ServiceConnection {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         appComponent.inject(this)
+
+        val viewModel: AddAmountViewModel by viewModels()
+        bindViewModel(viewModel)
+        subscribeVM()
+
         bindToWalletService()
         if (savedInstanceState == null) {
             tracker.screen(path = "/home/send_tari/add_amount", title = "Send Tari - Add Amount")
         }
         isFirstLaunch = savedInstanceState == null
+    }
+
+    private fun subscribeVM() = with(viewModel) {
+        observe(isOneSidePaymentEnabled) { ui.oneSidePaymentSwitchView.isChecked = it }
     }
 
     private fun bindToWalletService() {
@@ -186,13 +193,15 @@ class AddAmountFragment : Fragment(), ServiceConnection {
     private fun setActionBindings() {
         ui.backButton.setOnClickListener { onBackButtonClicked(it) }
         ui.emojiIdSummaryContainerView.setOnClickListener { emojiIdClicked() }
-        ui.txFeeDescTextView.setOnClickListener { onFeeViewClick() }
+        ui.txFeeDescTextView.setOnClickListener { showTxFeeToolTip() }
+        ui.oneSidePaymentHelp.setOnClickListener { showOneSidePaymentTooltip() }
         ui.continueButton.setOnClickListener { continueButtonClicked() }
+        ui.oneSidePaymentSwitchView.setOnClickListener { viewModel.toggleOneSidePayment() }
     }
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        listenerWR = WeakReference(context as Listener)
+        addAmountListenerWR = WeakReference(context as AddAmountListener)
     }
 
     private fun displayAliasOrEmojiId() {
@@ -226,18 +235,14 @@ class AddAmountFragment : Fragment(), ServiceConnection {
         fullEmojiIdViewController.showFullEmojiId()
     }
 
-    private fun onFeeViewClick() {
-        showTxFeeToolTip()
-    }
-
     private fun showTxFeeToolTip() {
-        BottomSlideDialog(
-            context = activity ?: return,
-            layoutId = R.layout.tx_fee_tooltip_dialog,
-            dismissViewId = R.id.tx_fee_tooltip_dialog_txt_close
-        ).show()
+        TooltipDialog(requireContext(), TooltipDialogArgs(string(tx_detail_fee_tooltip_transaction_fee), string(tx_detail_fee_tooltip_desc))).show()
     }
 
+    private fun showOneSidePaymentTooltip() {
+        val args = TooltipDialogArgs(string(add_amount_one_side_payment_switcher), string(add_amount_one_side_payment_question_mark))
+        TooltipDialog(requireContext(), args).show()
+    }
 
     private fun continueButtonClicked() {
         ui.continueButton.isClickable = false
@@ -257,7 +262,10 @@ class AddAmountFragment : Fragment(), ServiceConnection {
             } else {
                 lifecycleScope.launch(Dispatchers.Main) {
                     if (fee > amount) {
-                        val args = ErrorDialogArgs(string(R.string.error_fee_more_than_amount_title), string(R.string.error_fee_more_than_amount_description))
+                        val args = ErrorDialogArgs(
+                            string(R.string.error_fee_more_than_amount_title),
+                            string(R.string.error_fee_more_than_amount_description)
+                        )
                         ErrorDialog(requireContext(), args).show()
                         ui.continueButton.isClickable = true
                     } else {
@@ -280,12 +288,12 @@ class AddAmountFragment : Fragment(), ServiceConnection {
     }
 
     private fun actualBalanceExceeded() {
-        listenerWR.get()?.onAmountExceedsActualAvailableBalance(this)
+        addAmountListenerWR.get()?.onAmountExceedsActualAvailableBalance(this)
         ui.continueButton.isClickable = true
     }
 
     private fun continueToNote() {
-        listenerWR.get()?.continueToAddNote(this, recipientUser!!, keyboardController.currentAmount)
+        addAmountListenerWR.get()?.continueToAddNote(recipientUser!!, keyboardController.currentAmount, ui.oneSidePaymentSwitchView.isChecked)
     }
 
     /**
@@ -294,21 +302,14 @@ class AddAmountFragment : Fragment(), ServiceConnection {
     private inner class AmountCheckRunnable : Runnable {
 
         override fun run() {
-            val error = WalletError()
-
-            estimatedFee = walletService.estimateTxFee(keyboardController.currentAmount, error)
-
-            //todo
-//            && error.code != WalletError.NOT_ENOUGH_FUNDS
-//            && error.code != WalletError.FUNDS_PENDING
-            throwIf(error)
+            estimatedFee = walletService.getWithError({ showErrorState(it) }) { error, wallet ->
+                wallet.estimateTxFee(keyboardController.currentAmount, error)
+            }
 
             updateBalanceInfo()
 
-//            error.code == WalletError.FUNDS_PENDING
-//                || error.code == WalletError.NOT_ENOUGH_FUNDS
             if ((keyboardController.currentAmount + estimatedFee!!) > availableBalance) {
-                showErrorState(error)
+                showErrorState()
             } else {
                 showSuccessState(estimatedFee!!)
             }
@@ -316,7 +317,7 @@ class AddAmountFragment : Fragment(), ServiceConnection {
 
         @SuppressLint("SetTextI18n")
         private fun showSuccessState(fee: MicroTari) = with(ui) {
-            notEnoughBalanceDescriptionTextView.text = string(R.string.add_amount_wallet_balance)
+            notEnoughBalanceDescriptionTextView.text = string(add_amount_wallet_balance)
             availableBalanceContainerView.visible()
 
             val showsTxFee: Boolean
@@ -369,18 +370,15 @@ class AddAmountFragment : Fragment(), ServiceConnection {
             }
         }
 
-        private fun showErrorState(
-            error: WalletError
-        ) = with(ui) {
-            //todo
-            if (error.code == 115) {
+        private fun showErrorState(error: WalletError? = null) = with(ui) {
+            if (error?.code == 115) {
                 availableBalanceContainerView.gone()
                 notEnoughBalanceDescriptionTextView.text =
-                    string(R.string.add_amount_funds_pending)
+                    string(add_amount_funds_pending)
             } else {
                 availableBalanceContainerView.visible()
                 notEnoughBalanceDescriptionTextView.text =
-                    string(R.string.add_amount_not_enough_available_balance)
+                    string(add_amount_not_enough_available_balance)
             }
 
             hideContinueButton()
@@ -429,26 +427,4 @@ class AddAmountFragment : Fragment(), ServiceConnection {
             continueButton.invisible()
         }
     }
-
-    // region listener interface
-
-    /**
-     * Listener interface - to be implemented by the host activity.
-     */
-    interface Listener {
-
-        fun onAmountExceedsActualAvailableBalance(fragment: AddAmountFragment)
-
-        /**
-         * Recipient is user.
-         */
-        fun continueToAddNote(
-            sourceFragment: AddAmountFragment,
-            recipientUser: User,
-            amount: MicroTari
-        )
-
-    }
-
-    // endregion
 }

@@ -5,32 +5,27 @@ import android.os.Parcelable
 import com.tari.android.wallet.model.MicroTari
 import com.tari.android.wallet.model.User
 
-data class TransactionData(val recipientUser: User?, val amount: MicroTari?, val note: String?) : Parcelable {
+data class TransactionData(val recipientUser: User?, val amount: MicroTari?, val note: String?, val isOneSidePayment: Boolean) : Parcelable {
 
     constructor(parcel: Parcel) : this(
         parcel.readParcelable(User::class.java.classLoader),
         parcel.readParcelable(MicroTari::class.java.classLoader),
-        parcel.readString()
-    ) {
-    }
+        parcel.readString(),
+        parcel.readInt() == 1
+    )
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {
         parcel.writeParcelable(recipientUser, flags)
         parcel.writeParcelable(amount, flags)
         parcel.writeString(note)
+        parcel.writeInt(if(isOneSidePayment) 1 else 0)
     }
 
-    override fun describeContents(): Int {
-        return 0
-    }
+    override fun describeContents(): Int = 0
 
     companion object CREATOR : Parcelable.Creator<TransactionData> {
-        override fun createFromParcel(parcel: Parcel): TransactionData {
-            return TransactionData(parcel)
-        }
+        override fun createFromParcel(parcel: Parcel): TransactionData = TransactionData(parcel)
 
-        override fun newArray(size: Int): Array<TransactionData?> {
-            return arrayOfNulls(size)
-        }
+        override fun newArray(size: Int): Array<TransactionData?> = arrayOfNulls(size)
     }
 }

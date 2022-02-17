@@ -128,13 +128,12 @@ internal class AuthActivity : AppCompatActivity() {
     }
 
     private fun onWalletStateChanged(walletState: WalletState) {
-        showWalletError()
-//        if (walletState == WalletState.Running && continueIsPendingOnWalletState) {
-//            continueIsPendingOnWalletState = false
-//            ui.rootView.post(this::continueToHomeActivity)
-//        } else if (walletState is WalletState.Failed && continueIsPendingOnWalletState) {
-//            showWalletError(walletState)
-//        }
+        if (walletState == WalletState.Running && continueIsPendingOnWalletState) {
+            continueIsPendingOnWalletState = false
+            ui.rootView.post(this::continueToHomeActivity)
+        } else if (walletState is WalletState.Failed && continueIsPendingOnWalletState) {
+            showWalletError()
+        }
     }
 
     private fun showWalletError() {
@@ -142,9 +141,7 @@ internal class AuthActivity : AppCompatActivity() {
             val args = ErrorDialogArgs(
                 string(wallet_error_title),
                 string(wallet_error_description),
-                onClose = {
-                      // todo
-                },
+                onClose = { },
             )
             ErrorDialog(this@AuthActivity, args).show()
         }

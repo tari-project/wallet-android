@@ -40,31 +40,16 @@ import java.math.BigInteger
  * @author The Tari Development Team
  */
 
-internal class FFIPendingInboundTx() : FFIBase() {
+internal class FFIPendingInboundTx() : FFITxBase() {
 
     // region JNI
 
     private external fun jniGetId(libError: FFIError): ByteArray
-    private external fun jniGetSourcePublicKey(
-        libError: FFIError
-    ): FFIPointer
-
-    private external fun jniGetAmount(
-        libError: FFIError
-    ): ByteArray
-
-    private external fun jniGetTimestamp(
-        libError: FFIError
-    ): ByteArray
-
-    private external fun jniGetMessage(
-        libError: FFIError
-    ): String
-
-    private external fun jniGetStatus(
-        libError: FFIError
-    ): Int
-
+    private external fun jniGetSourcePublicKey(libError: FFIError): FFIPointer
+    private external fun jniGetAmount(libError: FFIError): ByteArray
+    private external fun jniGetTimestamp(libError: FFIError): ByteArray
+    private external fun jniGetMessage(libError: FFIError): String
+    private external fun jniGetStatus(libError: FFIError): Int
     private external fun jniDestroy()
 
     // endregion
@@ -80,12 +65,16 @@ internal class FFIPendingInboundTx() : FFIBase() {
         return BigInteger(1, bytes)
     }
 
-    fun getSourcePublicKey(): FFIPublicKey {
+    override fun getSourcePublicKey(): FFIPublicKey {
         val error = FFIError()
         val result = FFIPublicKey(jniGetSourcePublicKey(error))
         throwIf(error)
         return result
     }
+
+    override fun getDestinationPublicKey(): FFIPublicKey = TODO()
+
+    override fun isOutbound(): Boolean = false
 
     fun getAmount(): BigInteger {
         val error = FFIError()

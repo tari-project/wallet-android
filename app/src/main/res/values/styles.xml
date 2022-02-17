@@ -10,6 +10,7 @@
         <!--item name="android:windowDrawsSystemBarBackgrounds">true</item-->
         <item name="android:statusBarColor">@android:color/black</item>
         <item name="android:navigationBarColor">@android:color/black</item>
+        <item name="alertDialogTheme">@style/AlertDialogTheme</item>
     </style>
 
     <!-- splash screen theme -->
@@ -30,6 +31,20 @@
       Style that makes a dialog placed to the bottom slide from bottom on show and to bottom on hide.
       Simply put - like on iOS.
     -->
+
+    <style name="AlertDialogTheme" parent="ThemeOverlay.AppCompat.Dialog.Alert">
+        <item name="buttonBarNegativeButtonStyle">@style/NegativeButtonStyle</item>
+        <item name="buttonBarPositiveButtonStyle">@style/PositiveButtonStyle</item>
+    </style>
+
+    <style name="NegativeButtonStyle" parent="Widget.AppCompat.Button.ButtonBar.AlertDialog">
+        <item name="android:textColor">@color/common_error</item>
+    </style>
+
+    <style name="PositiveButtonStyle" parent="Widget.AppCompat.Button.ButtonBar.AlertDialog">
+        <item name="android:textColor">@color/accent</item>
+    </style>
+
     <style name="BottomSlideDialog" parent="Theme.AppCompat.Dialog">
         <item name="android:windowAnimationStyle">@style/BottomSlideDialogAnimation</item>
     </style>

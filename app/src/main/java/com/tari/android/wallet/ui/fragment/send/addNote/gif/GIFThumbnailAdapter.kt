@@ -1,4 +1,4 @@
-package com.tari.android.wallet.ui.fragment.send.addNote
+package com.tari.android.wallet.ui.fragment.send.addNote.gif
 
 import android.view.LayoutInflater
 import android.view.View
@@ -14,7 +14,7 @@ import com.tari.android.wallet.R
 import com.tari.android.wallet.extension.repopulate
 import com.tari.android.wallet.ui.common.gyphy.placeholder.GifPlaceholder
 import com.tari.android.wallet.ui.common.gyphy.repository.GIFItem
-import com.tari.android.wallet.ui.fragment.send.addNote.GIFThumbnailAdapter.GIFThumbnailViewHolder
+import com.tari.android.wallet.ui.fragment.send.addNote.gif.GIFThumbnailAdapter.GIFThumbnailViewHolder
 
 class GIFThumbnailAdapter(
     private val glide: RequestManager,

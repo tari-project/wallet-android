@@ -40,7 +40,6 @@ import android.os.Parcelable
 import android.view.View
 import android.widget.ImageView
 import androidx.activity.viewModels
-import androidx.core.view.postDelayed
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentStatePagerAdapter
@@ -56,10 +55,7 @@ import com.tari.android.wallet.di.DiContainer.appComponent
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.extension.addTo
 import com.tari.android.wallet.extension.applyFontStyle
-import com.tari.android.wallet.model.PublicKey
-import com.tari.android.wallet.model.Tx
-import com.tari.android.wallet.model.User
-import com.tari.android.wallet.model.WalletError
+import com.tari.android.wallet.model.*
 import com.tari.android.wallet.network.NetworkConnectionState
 import com.tari.android.wallet.service.TariWalletService
 import com.tari.android.wallet.service.WalletServiceLauncher
@@ -69,7 +65,6 @@ import com.tari.android.wallet.ui.activity.SplashActivity
 import com.tari.android.wallet.ui.activity.onboarding.OnboardingFlowActivity
 import com.tari.android.wallet.ui.activity.settings.BackupSettingsActivity
 import com.tari.android.wallet.ui.activity.settings.DeleteWalletActivity
-import com.tari.android.wallet.ui.activity.tx.TxDetailsActivity
 import com.tari.android.wallet.ui.common.CommonActivity
 import com.tari.android.wallet.ui.common.gyphy.GiphyEcosystem
 import com.tari.android.wallet.ui.component.CustomFont
@@ -91,6 +86,9 @@ import com.tari.android.wallet.ui.fragment.settings.networkSelection.NetworkSele
 import com.tari.android.wallet.ui.fragment.store.StoreFragment
 import com.tari.android.wallet.ui.fragment.tx.TxListFragment
 import com.tari.android.wallet.ui.fragment.tx.TxListRouter
+import com.tari.android.wallet.ui.fragment.tx.details.TxDetailsFragment
+import com.tari.android.wallet.ui.fragment.tx.details.TxDetailsFragment.Companion.TX_EXTRA_KEY
+import com.tari.android.wallet.ui.fragment.tx.details.TxDetailsFragment.Companion.TX_ID_EXTRA_KEY
 import com.tari.android.wallet.util.Constants
 import io.reactivex.disposables.CompositeDisposable
 import kotlinx.coroutines.Dispatchers
@@ -137,9 +135,9 @@ internal class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>
             enableNavigationView(ui.homeImageView)
             serviceConnection.connection.subscribe {
                 if (it.status == CONNECTED) {
-                    ui.root.postDelayed(Constants.UI.mediumDurationMs) {
+                    ui.root.postDelayed({
                         processIntentDeepLink(it.service!!, intent)
-                    }
+                    }, Constants.UI.mediumDurationMs)
                 }
             }.addTo(compositeDisposable)
         } else {
@@ -157,6 +155,7 @@ internal class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         // onNewIntent might get called before onCreate, so we anticipate that here
+        checkScreensDeeplink(intent)
         if (::serviceConnection.isInitialized && serviceConnection.currentState.status == CONNECTED) {
             processIntentDeepLink(serviceConnection.currentState.service!!, intent)
         } else {
@@ -287,7 +286,23 @@ internal class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>
         finishAffinity()
     }
 
-    override fun toTxDetails(tx: Tx) = startActivity(TxDetailsActivity.createIntent(this, tx))
+    private fun checkScreensDeeplink(intent: Intent) {
+        val screen = intent.getStringExtra(HomeDeeplinkScreens.Key)
+        if (screen.orEmpty().isNotEmpty()) {
+            when (HomeDeeplinkScreens.parse(screen)) {
+                HomeDeeplinkScreens.TxDetails -> {
+                    (intent.getParcelableExtra<TxId>(HomeDeeplinkScreens.KeyTxDetailsArgs))?.let { toTxDetails(null, it) }
+                }
+            }
+        }
+    }
+
+    override fun toTxDetails(tx: Tx?, txId: TxId?) = loadFragment(TxDetailsFragment().apply {
+        arguments = Bundle().apply {
+            putParcelable(TX_EXTRA_KEY, tx)
+            putParcelable(TX_ID_EXTRA_KEY, txId)
+        }
+    })
 
     override fun toTTLStore() = ui.viewPager.setCurrentItem(INDEX_STORE, NO_SMOOTH_SCROLL)
 

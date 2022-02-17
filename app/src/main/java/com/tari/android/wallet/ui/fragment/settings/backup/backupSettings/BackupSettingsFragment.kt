@@ -48,6 +48,7 @@ import com.tari.android.wallet.R.color.all_settings_back_up_status_processing
 import com.tari.android.wallet.R.color.back_up_settings_permission_processing
 import com.tari.android.wallet.R.string.*
 import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
+import com.tari.android.wallet.data.sharedPrefs.tariSettings.TariSettingsSharedRepository
 import com.tari.android.wallet.databinding.FragmentWalletBackupSettingsBinding
 import com.tari.android.wallet.di.DiContainer.appComponent
 import com.tari.android.wallet.event.EventBus
@@ -69,6 +70,9 @@ internal class BackupSettingsFragment : CommonFragment<FragmentWalletBackupSetti
 
     @Inject
     lateinit var sharedPrefs: SharedPrefsRepository
+
+    @Inject
+    lateinit var tariSettingsSharedRepository: TariSettingsSharedRepository
 
     @Inject
     lateinit var backupManager: BackupManager
@@ -230,7 +234,7 @@ internal class BackupSettingsFragment : CommonFragment<FragmentWalletBackupSetti
     }
 
     private fun setSeedWordVerificationStateIcon() = with(ui) {
-        val hasVerifiedSeedWords = sharedPrefs.hasVerifiedSeedWords
+        val hasVerifiedSeedWords = tariSettingsSharedRepository.hasVerifiedSeedWords
         backupWithRecoveryPhraseSuccessView.setVisible(hasVerifiedSeedWords)
         backupWithRecoveryPhraseWarningView.setVisible(!hasVerifiedSeedWords)
     }

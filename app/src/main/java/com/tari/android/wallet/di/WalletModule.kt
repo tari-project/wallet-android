@@ -36,9 +36,10 @@ import android.content.Context
 import com.tari.android.wallet.application.WalletManager
 import com.tari.android.wallet.application.baseNodes.BaseNodes
 import com.tari.android.wallet.data.WalletConfig
-import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepository
 import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodeSharedRepository
+import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepository
+import com.tari.android.wallet.data.sharedPrefs.tariSettings.TariSettingsSharedRepository
 import com.tari.android.wallet.infrastructure.BugReportingService
 import com.tari.android.wallet.network.NetworkConnectionStateReceiver
 import com.tari.android.wallet.service.seedPhrase.SeedPhraseRepository
@@ -59,7 +60,6 @@ internal class WalletModule {
     @Provides
     @Singleton
     fun provideWalletManager(
-        context: Context,
         walletConfig: WalletConfig,
         torConfig: TorConfig,
         torProxyManager: TorProxyManager,
@@ -67,15 +67,16 @@ internal class WalletModule {
         baseNodeSharedRepository: BaseNodeSharedRepository,
         seedPhraseRepository: SeedPhraseRepository,
         networkRepository: NetworkRepository,
+        tariSettingsSharedRepository: TariSettingsSharedRepository,
         baseNodes: BaseNodes
     ): WalletManager = WalletManager(
-        context,
         walletConfig,
         torProxyManager,
         sharedPrefsWrapper,
         baseNodeSharedRepository,
         seedPhraseRepository,
         networkRepository,
+        tariSettingsSharedRepository,
         baseNodes,
         torConfig
     )

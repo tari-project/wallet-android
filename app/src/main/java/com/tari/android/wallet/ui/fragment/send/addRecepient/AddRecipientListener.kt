@@ -4,6 +4,6 @@ import com.tari.android.wallet.model.User
 
 interface AddRecipientListener {
 
-    fun continueToAmount(sourceFragment: AddRecipientFragment, user: User)
+    fun continueToAmount(user: User)
 
 }

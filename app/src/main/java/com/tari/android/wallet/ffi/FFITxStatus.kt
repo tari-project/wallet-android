@@ -46,8 +46,11 @@ enum class FFITxStatus {
     PENDING,
     COINBASE,
     MINED_CONFIRMED,
+    REJECTED,
+    FAUX_UNCONFIRMED,
+    FAUX_CONFIRMED,
     UNKNOWN;
-    
+
     companion object {
         fun map(status: Int): FFITxStatus {
             return when (status) {
@@ -59,7 +62,10 @@ enum class FFITxStatus {
                 4 -> PENDING
                 5 -> COINBASE
                 6 -> MINED_CONFIRMED
-                7 -> UNKNOWN
+                7 -> REJECTED
+                8 -> FAUX_UNCONFIRMED
+                9 -> FAUX_CONFIRMED
+                10 -> UNKNOWN
                 else -> throw FFIException(message = "Unexpected status: $status")
             }
         }
