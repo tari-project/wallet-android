@@ -6,16 +6,13 @@ import android.graphics.drawable.BitmapDrawable
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import android.widget.PopupWindow
-import com.orhanobut.logger.Logger
 import com.tari.android.wallet.R
-import com.tari.android.wallet.databinding.TooltipLayoutBinding
+import com.tari.android.wallet.databinding.ViewTooltipLayoutBinding
 import com.tari.android.wallet.ui.extension.dimenPx
 
 class TooltipWindow(context: Context) {
-    private val binding: TooltipLayoutBinding =
-        TooltipLayoutBinding.inflate(LayoutInflater.from(context), null, false)
+    private val binding: ViewTooltipLayoutBinding = ViewTooltipLayoutBinding.inflate(LayoutInflater.from(context), null, false)
     private val tipWindow: PopupWindow = PopupWindow(context)
 
     fun showToolTip(anchor: View, text: String) = with(tipWindow) {

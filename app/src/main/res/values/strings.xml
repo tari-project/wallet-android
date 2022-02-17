@@ -258,7 +258,8 @@
     <string name="add_amount_funds_pending">Sorry, you can’t send this much tXTR. Please wait for at least one transaction to complete and then try again.</string>
     <string name="add_amount_tx_fee">Transaction Fee</string>
     <string name="add_amount_wallet_balance">Wallet Balance</string>
-    <string name="add_amount_one_side_payment_switcher">One Side Payment</string>
+    <string name="add_amount_one_side_payment_switcher">One Sided Payment</string>
+    <string name="add_amount_one_side_payment_question_mark">One-sided payments are broadcast instantly and do not require the recipient to be online. But they are less private. Use them if you know the recipient is offline for long periods, or for things like \'tip-jars\'.</string>
 
     <!-- send tari - note -->
     <string name="add_note_prompt">Transaction Note</string>

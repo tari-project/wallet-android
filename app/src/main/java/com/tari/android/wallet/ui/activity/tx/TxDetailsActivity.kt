@@ -33,7 +33,10 @@
 package com.tari.android.wallet.ui.activity.tx
 
 import android.annotation.SuppressLint
-import android.content.*
+import android.content.ComponentName
+import android.content.Context
+import android.content.Intent
+import android.content.ServiceConnection
 import android.os.Bundle
 import android.os.Handler
 import android.os.IBinder
@@ -80,6 +83,8 @@ import com.tari.android.wallet.ui.component.EmojiIdSummaryViewController
 import com.tari.android.wallet.ui.component.FullEmojiIdViewController
 import com.tari.android.wallet.ui.dialog.BottomSlideDialog
 import com.tari.android.wallet.ui.dialog.error.ErrorDialog
+import com.tari.android.wallet.ui.dialog.tooltipDialog.TooltipDialog
+import com.tari.android.wallet.ui.dialog.tooltipDialog.TooltipDialogArgs
 import com.tari.android.wallet.ui.extension.*
 import com.tari.android.wallet.ui.presentation.TxNote
 import com.tari.android.wallet.util.WalletUtil
@@ -605,17 +610,13 @@ internal class TxDetailsActivity : AppCompatActivity(), ServiceConnection {
     }
 
     private fun showTxFeeToolTip() {
-        BottomSlideDialog(
-            context = this,
-            layoutId = R.layout.tx_fee_tooltip_dialog,
-            dismissViewId = R.id.tx_fee_tooltip_dialog_txt_close
-        ).show()
+        TooltipDialog(this, TooltipDialogArgs(string(tx_detail_fee_tooltip_transaction_fee), string(tx_detail_fee_tooltip_desc))).show()
     }
 
     class GIFViewModel() : CommonViewModel() {
 
         init {
-            component?.inject(this)
+            component.inject(this)
         }
 
         @Inject
