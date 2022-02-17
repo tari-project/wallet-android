@@ -9,5 +9,7 @@ interface AllSettingsRouter {
 
     fun toNetworkSelection()
 
+    fun toTorBridges()
+
     fun toBaseNodeSelection()
 }

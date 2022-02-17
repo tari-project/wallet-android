@@ -72,7 +72,10 @@ import com.tari.android.wallet.ui.common.gyphy.GiphyEcosystem
 import com.tari.android.wallet.ui.component.CustomFont
 import com.tari.android.wallet.ui.component.CustomFontTextView
 import com.tari.android.wallet.ui.dialog.BottomSlideDialog
-import com.tari.android.wallet.ui.extension.*
+import com.tari.android.wallet.ui.extension.color
+import com.tari.android.wallet.ui.extension.setOnThrottledClickListener
+import com.tari.android.wallet.ui.extension.showInternetConnectionErrorDialog
+import com.tari.android.wallet.ui.extension.string
 import com.tari.android.wallet.ui.fragment.debug.baseNodeConfig.BaseNodeConfigRouter
 import com.tari.android.wallet.ui.fragment.debug.baseNodeConfig.addBaseNode.AddCustomBaseNodeFragment
 import com.tari.android.wallet.ui.fragment.debug.baseNodeConfig.changeBaseNode.ChangeBaseNodeFragment
@@ -294,6 +297,8 @@ internal class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>
     override fun toBackgroundService() = startActivity(Intent(this, BackgroundServiceSettingsActivity::class.java))
 
     override fun toBaseNodeSelection() = loadFragment(ChangeBaseNodeFragment())
+
+    override fun toTorBridges() = loadFragment(ChangeBaseNodeFragment())
 
     override fun toNetworkSelection() = loadFragment(NetworkSelectionFragment())
 

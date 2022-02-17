@@ -116,6 +116,7 @@ internal class AllSettingsFragment : CommonFragment<FragmentAllSettingsBinding, 
         explorerCtaView.setOnThrottledClickListener { viewModel.openExplorerUrl() }
         backUpWalletCtaView.setOnThrottledClickListener { viewModel.navigateToBackupSettings() }
         backgroundServiceCtaView.setOnThrottledClickListener { viewModel.navigateToBackgroundServiceSettings() }
+        torBridgesCta.setOnThrottledClickListener { viewModel.navigateToTorBridgesSettings() }
         changeBaseNodeCtaView.setOnThrottledClickListener { viewModel.navigateToBaseNodeSelection() }
         changeNetworkCtaView.setOnThrottledClickListener { viewModel.navigateToNetworkSelection() }
         backgroundServiceCtaView.setOnThrottledClickListener { viewModel.navigateToBackgroundServiceSettings() }
@@ -187,6 +188,7 @@ internal class AllSettingsFragment : CommonFragment<FragmentAllSettingsBinding, 
             AllSettingsNavigation.ToBaseNodeSelection -> router.toBaseNodeSelection()
             AllSettingsNavigation.ToDeleteWallet -> router.toDeleteWallet()
             AllSettingsNavigation.ToNetworkSelection -> router.toNetworkSelection()
+            AllSettingsNavigation.ToTorBridges -> router.toTorBridges()
         }
     }
 
