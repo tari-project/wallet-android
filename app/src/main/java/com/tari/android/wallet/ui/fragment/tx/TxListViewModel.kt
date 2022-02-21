@@ -407,6 +407,7 @@ internal class TxListViewModel() : CommonViewModel() {
             val importedTx = walletService.getWithError { error, wallet ->
                 wallet.importTestnetUTXO(resourceManager.getString(R.string.first_testnet_utxo_tx_message), error)
             }
+            importedTx ?: return@launch
 
             testnetRepository.faucetTestnetTariRequestCompleted = true
             testnetRepository.firstTestnetUTXOTxId = importedTx.id
@@ -538,6 +539,7 @@ internal class TxListViewModel() : CommonViewModel() {
             val importedTx = walletService.getWithError { error, wallet ->
                 wallet.importTestnetUTXO(resourceManager.getString(R.string.second_testnet_utxo_tx_message), error)
             }
+            importedTx ?: return@launch
             testnetRepository.secondTestnetUTXOTxId = importedTx.id
             completedTxs.add(importedTx)
             refreshBalance(false)
