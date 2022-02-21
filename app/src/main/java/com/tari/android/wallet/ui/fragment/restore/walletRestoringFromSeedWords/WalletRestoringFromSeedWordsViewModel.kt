@@ -102,8 +102,9 @@ internal class WalletRestoringFromSeedWordsViewModel() : CommonViewModel() {
                     }
                 }
                 is WalletRestorationResult.Progress -> onProgress(RecoveryState.Recovery(resourceManager, it.currentBlock, it.numberOfBlocks))
-                is WalletRestorationResult.RecoveryFailed ->
+                is WalletRestorationResult.RecoveryFailed -> if (!baseNodeIterator.hasNext()) {
                     onError(RestorationError.RecoveryInternalError(resourceManager, this@WalletRestoringFromSeedWordsViewModel::onErrorClosed))
+                }
                 is WalletRestorationResult.Completed -> onSuccessRestoration()
             }
         }.addTo(compositeDisposable)

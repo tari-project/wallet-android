@@ -57,6 +57,7 @@ import com.tari.android.wallet.service.TariWalletService
 import com.tari.android.wallet.service.WalletService
 import com.tari.android.wallet.ui.activity.settings.BackupSettingsRouter
 import com.tari.android.wallet.ui.dialog.error.ErrorDialog
+import com.tari.android.wallet.ui.dialog.error.ErrorDialogArgs
 import com.tari.android.wallet.ui.extension.ThrottleClick
 import com.tari.android.wallet.ui.extension.animateClick
 import com.tari.android.wallet.ui.extension.color
@@ -134,8 +135,7 @@ framework for UI tree rebuild on configuration changes"""
     }
 
     private fun getSeedWords() {
-        val error = WalletError()
-        val seedWords = walletService.getSeedWords(error)
+        val seedWords = walletService.getSeedWords(WalletError())
         if (seedWords != null) {
             this.seedWords.clear()
             this.seedWords.addAll(seedWords)
@@ -143,12 +143,8 @@ framework for UI tree rebuild on configuration changes"""
                 ui.phraseWordsRecyclerView.adapter?.notifyDataSetChanged()
             }
         } else {
-            // display error
-            ErrorDialog(
-                requireContext(),
-                title = string(R.string.common_error_title),
-                description = string(R.string.back_up_seed_phrase_error)
-            ).show()
+            val args = ErrorDialogArgs(string(R.string.common_error_title), string(R.string.back_up_seed_phrase_error))
+            ErrorDialog(requireContext(), args).show()
         }
     }
 

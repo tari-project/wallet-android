@@ -7,3 +7,4 @@ class ErrorDialogArgs(
     val canceledOnTouchOutside: Boolean = true,
     val onClose: () -> Unit = {},
 )
+

@@ -13,15 +13,10 @@ import yat.android.ui.extension.HtmlHelper
 
 class ErrorDialog constructor(context: Context, errorDialogArgs: ErrorDialogArgs) : TariDialog {
 
-    @Deprecated("Use through viewModel or via errorDialogArgs")
-    constructor(
-        context: Context,
-        title: CharSequence,
-        description: CharSequence,
-        cancelable: Boolean = true,
-        canceledOnTouchOutside: Boolean = true,
-        onClose: () -> Unit = {}
-    ) : this(context, ErrorDialogArgs(title, description, cancelable, canceledOnTouchOutside, onClose))
+    constructor(context: Context, errorArgs: WalletErrorArgs) : this(
+        context,
+        ErrorDialogArgs(errorArgs.title, errorArgs.description, onClose = errorArgs.dismissAction)
+    )
 
     private var dialog: Dialog
 

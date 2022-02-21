@@ -46,6 +46,8 @@ abstract class CommonFragment<Binding : ViewBinding, VM : CommonViewModel> : Fra
 
         observe(errorDialog) { replaceDialog(ErrorDialog(requireContext(), it)) }
 
+        observe(walletErrorDialog) { replaceDialog(ErrorDialog(requireContext(), it)) }
+
         observe(loadingDialog) { if (it.isShow) replaceDialog(TariProgressDialog(requireContext(), it)) else currentDialog?.dismiss() }
 
         observe(blockedBackPressed) {
