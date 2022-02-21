@@ -62,8 +62,9 @@ import com.tari.android.wallet.infrastructure.security.biometric.BiometricAuthen
 import com.tari.android.wallet.infrastructure.security.biometric.BiometricAuthenticationService.BiometricAuthenticationException
 import com.tari.android.wallet.service.WalletServiceLauncher
 import com.tari.android.wallet.ui.activity.home.HomeActivity
+import com.tari.android.wallet.ui.common.domain.ResourceManager
 import com.tari.android.wallet.ui.dialog.error.ErrorDialog
-import com.tari.android.wallet.ui.dialog.error.ErrorDialogArgs
+import com.tari.android.wallet.ui.dialog.error.WalletErrorArgs
 import com.tari.android.wallet.ui.extension.*
 import com.tari.android.wallet.util.Constants
 import kotlinx.coroutines.Dispatchers
@@ -92,7 +93,11 @@ internal class AuthActivity : AppCompatActivity() {
     @Inject
     lateinit var walletServiceLauncher: WalletServiceLauncher
 
-    private var continueIsPendingOnWalletState = false
+    @Inject
+    lateinit var resourceManager: ResourceManager
+
+    private var authWasSuccessful = false
+    private var isPending = true
 
     private lateinit var ui: ActivityAuthBinding
 
@@ -123,26 +128,24 @@ internal class AuthActivity : AppCompatActivity() {
         super.onDestroy()
     }
 
-    override fun onBackPressed() {
-        // no-op
-    }
+    override fun onBackPressed() = Unit
 
-    private fun onWalletStateChanged(walletState: WalletState) {
-        if (walletState == WalletState.Running && continueIsPendingOnWalletState) {
-            continueIsPendingOnWalletState = false
-            ui.rootView.post(this::continueToHomeActivity)
-        } else if (walletState is WalletState.Failed && continueIsPendingOnWalletState) {
-            showWalletError()
+    private fun onWalletStateChanged(walletState: WalletState?) {
+        if (authWasSuccessful && isPending) {
+            if (walletState == WalletState.Running) {
+                isPending = false
+                EventBus.unsubscribeAll(this)
+                ui.rootView.post(this::continueToHomeActivity)
+            } else if (walletState is WalletState.Failed) {
+                isPending = false
+                showWalletError(walletState)
+            }
         }
     }
 
-    private fun showWalletError() {
+    private fun showWalletError(state: WalletState.Failed) {
         lifecycleScope.launch(Dispatchers.Main) {
-            val args = ErrorDialogArgs(
-                string(wallet_error_title),
-                string(wallet_error_description),
-                onClose = { },
-            )
+            val args = WalletErrorArgs(resourceManager, state.exception) { finish() }
             ErrorDialog(this@AuthActivity, args).show()
         }
     }
@@ -265,16 +268,15 @@ internal class AuthActivity : AppCompatActivity() {
      */
     private fun playTariWalletAnim() {
         ui.authAnimLottieAnimationView.addAnimatorListener(onEnd = {
-            if (EventBus.walletState.publishSubject.value != WalletState.Running) {
-                continueIsPendingOnWalletState = true
-                ui.progressBar.alpha = 0f
-                ui.progressBar.visible()
-                val alphaAnim = ObjectAnimator.ofFloat(ui.progressBar, View.ALPHA, 0f, 1f)
-                alphaAnim.duration = Constants.UI.mediumDurationMs
-                alphaAnim.start()
-            } else {
-                continueToHomeActivity()
+            authWasSuccessful = true
+            ui.progressBar.alpha = 0f
+            ui.progressBar.visible()
+            ObjectAnimator.ofFloat(ui.progressBar, View.ALPHA, 0f, 1f).apply {
+                duration = Constants.UI.mediumDurationMs
+                start()
             }
+
+            onWalletStateChanged(EventBus.walletState.publishSubject.value)
         })
         ui.authAnimLottieAnimationView.playAnimation()
 

@@ -13,7 +13,10 @@ import yat.android.ui.extension.HtmlHelper
 
 class ErrorDialog constructor(context: Context, errorDialogArgs: ErrorDialogArgs) : TariDialog {
 
-    constructor(context: Context, errorArgs: WalletErrorArgs) : this(context, ErrorDialogArgs("", ""))
+    constructor(context: Context, errorArgs: WalletErrorArgs) : this(
+        context,
+        ErrorDialogArgs(errorArgs.title, errorArgs.description, onClose = errorArgs.dismissAction)
+    )
 
     private var dialog: Dialog
 

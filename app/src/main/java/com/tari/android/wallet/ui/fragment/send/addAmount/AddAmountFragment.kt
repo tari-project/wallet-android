@@ -305,6 +305,7 @@ class AddAmountFragment : CommonFragment<FragmentAddAmountBinding, AddAmountView
             estimatedFee = walletService.getWithError({ showErrorState(it) }) { error, wallet ->
                 wallet.estimateTxFee(keyboardController.currentAmount, error)
             }
+            estimatedFee ?: return
 
             updateBalanceInfo()
 
