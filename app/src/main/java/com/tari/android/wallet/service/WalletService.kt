@@ -952,38 +952,40 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
             val keys = testnetFaucetRepository.testnetTariUTXOKeyList.orEmpty()
             if (keys.isEmpty()) return null
 
-            val firstUTXOKey = keys.first()
-            val senderPublicKeyFFI = FFIPublicKey(HexString(firstUTXOKey.senderPublicKeyHex!!))
-            val privateKey = FFIPrivateKey(HexString(firstUTXOKey.key))
-            val scriptPrivateKey = FFIPrivateKey(HexString(firstUTXOKey.key))
-            val amount = BigInteger(firstUTXOKey.value)
-            val senderPublicKey = FFIPublicKey(HexString(firstUTXOKey.output.senderOffsetPublicKey))
-            val signature = FFITariCommitmentSignature(
-                FFIByteVector(HexString(firstUTXOKey.output.metadataSignature.public_nonce)),
-                FFIByteVector(HexString(firstUTXOKey.output.metadataSignature.u)),
-                FFIByteVector(HexString(firstUTXOKey.output.metadataSignature.v))
-            )
-            val txId = wallet.importUTXO(
-                amount,
-                txMessage,
-                privateKey,
-                senderPublicKeyFFI,
-                signature,
-                senderPublicKey,
-                scriptPrivateKey
-            )
-            privateKey.destroy()
-            senderPublicKeyFFI.destroy()
-            signature.destroy()
-            // remove the used key
-            keys.remove(firstUTXOKey)
-            testnetFaucetRepository.testnetTariUTXOKeyList = keys
-            // get transaction and post notification
-            val tx = getCompletedTxById(TxId(txId), error)
-            if (error != WalletError.NoError || tx == null) return null
+            return runCatching {
+                val firstUTXOKey = keys.first()
+                val senderPublicKeyFFI = FFIPublicKey(HexString(firstUTXOKey.senderPublicKeyHex!!))
+                val privateKey = FFIPrivateKey(HexString(firstUTXOKey.key))
+                val scriptPrivateKey = FFIPrivateKey(HexString(firstUTXOKey.key))
+                val amount = BigInteger(firstUTXOKey.value)
+                val senderPublicKey = FFIPublicKey(HexString(firstUTXOKey.output.senderOffsetPublicKey))
+                val signature = FFITariCommitmentSignature(
+                    FFIByteVector(HexString(firstUTXOKey.output.metadataSignature.public_nonce)),
+                    FFIByteVector(HexString(firstUTXOKey.output.metadataSignature.u)),
+                    FFIByteVector(HexString(firstUTXOKey.output.metadataSignature.v))
+                )
+                val txId = wallet.importUTXO(
+                    amount,
+                    txMessage,
+                    privateKey,
+                    senderPublicKeyFFI,
+                    signature,
+                    senderPublicKey,
+                    scriptPrivateKey
+                )
+                privateKey.destroy()
+                senderPublicKeyFFI.destroy()
+                signature.destroy()
+                // remove the used key
+                keys.remove(firstUTXOKey)
+                testnetFaucetRepository.testnetTariUTXOKeyList = keys
+                // get transaction and post notification
+                val tx = getCompletedTxById(TxId(txId), error)
+                if (error != WalletError.NoError || tx == null) return null
 
-            postTxNotification(tx)
-            return tx
+                postTxNotification(tx)
+                tx
+            }.getOrNull()
         }
 
         override fun removeContact(contact: Contact, error: WalletError): Boolean = executeWithMapping(error) {
