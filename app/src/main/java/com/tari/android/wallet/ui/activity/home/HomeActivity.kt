@@ -85,6 +85,8 @@ import com.tari.android.wallet.ui.fragment.settings.allSettings.AllSettingsFragm
 import com.tari.android.wallet.ui.fragment.settings.allSettings.AllSettingsRouter
 import com.tari.android.wallet.ui.fragment.settings.backgroundService.BackgroundServiceSettingsActivity
 import com.tari.android.wallet.ui.fragment.settings.networkSelection.NetworkSelectionFragment
+import com.tari.android.wallet.ui.fragment.settings.torBridges.TorBridgesSelectionFragment
+import com.tari.android.wallet.ui.fragment.settings.torBridges.customBridges.CustomTorBridgesFragment
 import com.tari.android.wallet.ui.fragment.store.StoreFragment
 import com.tari.android.wallet.ui.fragment.tx.TxListFragment
 import com.tari.android.wallet.ui.fragment.tx.TxListRouter
@@ -298,7 +300,13 @@ internal class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>
 
     override fun toBaseNodeSelection() = loadFragment(ChangeBaseNodeFragment())
 
-    override fun toTorBridges() = loadFragment(ChangeBaseNodeFragment())
+    override fun toTorBridges() = loadFragment(TorBridgesSelectionFragment())
+
+    override fun toCustomTorBridges() = loadFragment(CustomTorBridgesFragment())
+
+    override fun toScanQrCodeBridge() = loadFragment(CustomTorBridgesFragment())
+
+    override fun toUploadQrCodeBridge() = loadFragment(CustomTorBridgesFragment())
 
     override fun toNetworkSelection() = loadFragment(NetworkSelectionFragment())
 

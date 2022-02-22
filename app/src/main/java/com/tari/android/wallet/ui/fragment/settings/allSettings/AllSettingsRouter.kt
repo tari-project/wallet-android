@@ -11,5 +11,11 @@ interface AllSettingsRouter {
 
     fun toTorBridges()
 
+    fun toCustomTorBridges()
+
+    fun toScanQrCodeBridge()
+
+    fun toUploadQrCodeBridge()
+
     fun toBaseNodeSelection()
 }

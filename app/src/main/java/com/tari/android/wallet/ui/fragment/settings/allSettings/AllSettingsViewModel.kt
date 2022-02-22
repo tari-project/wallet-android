@@ -85,7 +85,7 @@ internal class AllSettingsViewModel : CommonViewModel() {
 
     fun navigateToBackgroundServiceSettings() = _navigation.postValue(AllSettingsNavigation.ToBackgroundService)
 
-    fun navigateToTorBridgesSettings() = _navigation.postValue(AllSettingsNavigation.ToBackgroundService)
+    fun navigateToTorBridgesSettings() = _navigation.postValue(AllSettingsNavigation.ToTorBridges)
 
     fun navigateToBaseNodeSelection() = _navigation.postValue(AllSettingsNavigation.ToBaseNodeSelection)
 

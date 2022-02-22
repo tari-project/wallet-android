@@ -119,7 +119,6 @@ internal class AllSettingsFragment : CommonFragment<FragmentAllSettingsBinding, 
         torBridgesCta.setOnThrottledClickListener { viewModel.navigateToTorBridgesSettings() }
         changeBaseNodeCtaView.setOnThrottledClickListener { viewModel.navigateToBaseNodeSelection() }
         changeNetworkCtaView.setOnThrottledClickListener { viewModel.navigateToNetworkSelection() }
-        backgroundServiceCtaView.setOnThrottledClickListener { viewModel.navigateToBackgroundServiceSettings() }
         deleteWalletCtaView.setOnThrottledClickListener { viewModel.navigateToDeleteWallet() }
         connectYats.setOnThrottledClickListener { yatAdapter.openOnboarding(requireActivity()) }
         networkInfoCtaView.setOnThrottledClickListener { copy(viewModel.versionInfo.value.orEmpty()) }
