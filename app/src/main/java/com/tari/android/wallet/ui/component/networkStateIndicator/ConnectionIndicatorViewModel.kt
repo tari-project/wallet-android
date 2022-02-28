@@ -45,14 +45,9 @@ internal class ConnectionIndicatorViewModel : CommonViewModel() {
                     TorProxyState.Initializing -> ConnectionIndicatorState.Disconnected(R.string.connection_status_error_unknown_network_connection_status)
                     TorProxyState.NotReady -> ConnectionIndicatorState.Disconnected(R.string.connection_status_error_connecting_with_tor)
                     is TorProxyState.Running -> {
-                        when (val validationResult = _baseNodeState.value) {
-                            is BaseNodeState.SyncCompleted -> {
-                                when (validationResult.isSuccess) {
-                                    true -> ConnectionIndicatorState.Connected(R.string.connection_status_ok)
-                                    false -> ConnectionIndicatorState.ConnectedWithIssues(R.string.connection_status_warning_sync_failed)
-                                }
-                            }
+                        when (_baseNodeState.value) {
                             is BaseNodeState.SyncStarted -> ConnectionIndicatorState.ConnectedWithIssues(R.string.connection_status_warning_sync_in_progress)
+                            is BaseNodeState.Online -> ConnectionIndicatorState.Connected(R.string.connection_status_ok)
                             else -> ConnectionIndicatorState.Disconnected(R.string.connection_status_error_disconnected_from_base_node)
                         }
                     }
