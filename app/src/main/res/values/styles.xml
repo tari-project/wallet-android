@@ -68,16 +68,6 @@
         <item name="colorAccent">@color/seed_phrase_checkbox</item>
     </style>
 
-    <style name="SelectedSeedPhraseWord" parent="android:Widget.TextView">
-        <item name="android:textSize">12sp</item>
-        <item name="android:textColor">@color/dark_gray</item>
-    </style>
-
-    <style name="SelectableSeedPhraseWord" parent="android:Widget.TextView">
-        <item name="android:textSize">14sp</item>
-        <item name="android:textColor">@color/dark_gray</item>
-        <item name="android:background">@drawable/selectable_seed_phrase_word_background</item>
-    </style>
 
     <!-- Google sign in activity transition overrides -->
     <style name="GoogleSignInActivity" parent="android:Theme.Translucent.NoTitleBar">

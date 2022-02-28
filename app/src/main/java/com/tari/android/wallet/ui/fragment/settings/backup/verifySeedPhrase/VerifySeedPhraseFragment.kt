@@ -95,8 +95,8 @@ class VerifySeedPhraseFragment : CommonFragment<FragmentVerifySeedPhraseBinding,
 
     private fun fillSelectableWordsContainer() {
         viewModel.shuffledPhrase.withIndex().forEach { iv ->
-            SelectableWordTextView.createSelectableWord(requireContext(), false).apply {
-                text = iv.value
+            SelectableWordTextView(requireContext(), false).apply {
+                ui.text.text = iv.value
                 val selected = viewModel.selectionPhrase.contains(iv.index)
                 visibility = if (selected) INVISIBLE else VISIBLE
                 isEnabled = !selected
@@ -105,13 +105,12 @@ class VerifySeedPhraseFragment : CommonFragment<FragmentVerifySeedPhraseBinding,
                     ValueAnimator.ofFloat(1F, 0F).apply {
                         addUpdateListener { view.alpha = it.animatedValue as Float }
                         addListener(onEnd = {
-                            view.visibility = INVISIBLE
-                            ui.selectWordsLabelView.gone()
+                            view.gone()
                             viewModel.selectWord(iv.index)
                         })
                     }.start()
                 }
-                ui.selectableWordsFlexboxLayout.addView(this)
+                this@VerifySeedPhraseFragment.ui.selectableWordsFlexboxLayout.addView(this)
             }
         }
     }
@@ -123,13 +122,13 @@ class VerifySeedPhraseFragment : CommonFragment<FragmentVerifySeedPhraseBinding,
     }
 
     private fun addSelectedWord(word: String, index: Int) {
-        SelectableWordTextView.createSelectableWord(requireContext(), true).apply {
-            text = word
+        SelectableWordTextView(requireContext(), true).apply {
+            ui.text.text = word
             setOnClickListener { view ->
                 updateVerifyButtonState(enable = false)
                 view.isEnabled = false
-                val selectableWordView = ui.selectableWordsFlexboxLayout[index]
-                selectableWordView.visibility = VISIBLE
+                val selectableWordView = this@VerifySeedPhraseFragment.ui.selectableWordsFlexboxLayout[index]
+                selectableWordView.visible()
                 ValueAnimator.ofFloat(1F, 0F).apply {
                     addUpdateListener {
                         val value = it.animatedValue as Float
@@ -138,18 +137,19 @@ class VerifySeedPhraseFragment : CommonFragment<FragmentVerifySeedPhraseBinding,
                     }
                     addListener(
                         onStart = {
-                            ui.sequenceCorrectLabelView.gone()
-                            ui.sequenceInvalidLabelView.gone()
-                            ui.selectableWordsFlexboxLayout.visible()
+                            this@VerifySeedPhraseFragment.ui.sequenceCorrectLabelView.gone()
+                            this@VerifySeedPhraseFragment.ui.sequenceInvalidLabelView.gone()
+                            this@VerifySeedPhraseFragment.ui.selectableWordsFlexboxLayout.visible()
                         },
                         onEnd = {
-                            ui.selectableWordsFlexboxLayout.removeView(view)
+                            this@VerifySeedPhraseFragment.ui.selectableWordsFlexboxLayout.removeView(view)
                             selectableWordView.isEnabled = true
+                            view.gone()
                             viewModel.unselectWord(index)
                         })
                 }.start()
             }
-            ui.selectedWordsFlexboxLayout.addView(this)
+            this@VerifySeedPhraseFragment.ui.selectedWordsFlexboxLayout.addView(this)
         }
     }
 

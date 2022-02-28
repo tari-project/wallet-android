@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -8,9 +8,13 @@
     android:orientation="vertical">
 
     <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/white">
+        android:background="@color/white"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
         <FrameLayout
             android:id="@+id/back_cta_view"
@@ -32,6 +36,7 @@
         </FrameLayout>
 
         <com.tari.android.wallet.ui.component.CustomFontTextView
+            android:id="@+id/title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"
@@ -45,101 +50,122 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
-
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="@color/settings_background" />
-
-    <com.tari.android.wallet.ui.component.CustomFontTextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginHorizontal="25dp"
-        android:layout_marginTop="20dp"
-        android:text="@string/verify_seed_phrase_select_words_label"
-        android:textColor="@color/dark_gray"
-        android:textSize="14sp"
-        app:customFont="@string/font_medium"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <FrameLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginHorizontal="25dp"
-        android:layout_marginTop="20dp"
-        android:background="@drawable/verify_phrase_words_container_background"
-        android:minHeight="188dp">
-
-        <com.tari.android.wallet.ui.component.CustomFontTextView
-            android:id="@+id/select_words_label_view"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:text="@string/verify_seed_phrase_select_words_description"
-            android:textColor="@color/dark_gray"
-            android:textSize="12sp"
-            app:customFont="@string/font_medium"
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/settings_background"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintStart_toStartOf="parent" />
 
-        <com.google.android.flexbox.FlexboxLayout
-            android:id="@+id/selected_words_flexbox_layout"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="20dp"
-            app:flexWrap="wrap" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
-    </FrameLayout>
-
-    <ScrollView
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_margin="25dp"
-        android:layout_weight="1">
+        android:fillViewport="true"
+        app:layout_constraintBottom_toTopOf="@+id/continue_cta_view"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/toolbar">
 
-        <FrameLayout
+        <androidx.appcompat.widget.LinearLayoutCompat
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
 
             <com.tari.android.wallet.ui.component.CustomFontTextView
-                android:id="@+id/sequence_invalid_label_view"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="25dp"
+                android:layout_marginTop="20dp"
+                android:text="@string/verify_seed_phrase_select_words_label"
+                android:textColor="@color/dark_gray"
+                android:textSize="14sp"
+                app:customFont="@string/font_medium"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <FrameLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@drawable/validation_error_box_border_bg"
-                android:gravity="center_horizontal"
-                android:paddingVertical="9dp"
-                android:text="@string/verify_seed_phrase_sequence_is_invalid_message"
-                android:textColor="@color/common_error"
-                android:visibility="gone"
-                app:customFont="@string/font_heavy"
-                tools:visibility="visible" />
+                android:layout_marginHorizontal="25dp"
+                android:layout_marginTop="20dp"
+                android:background="@drawable/verify_phrase_words_container_background"
+                android:minHeight="188dp">
 
-            <ImageView
-                android:id="@+id/sequence_correct_label_view"
-                android:layout_width="29dp"
-                android:layout_height="29dp"
-                android:layout_gravity="top|center_horizontal"
-                android:layout_marginTop="5dp"
-                android:contentDescription="@string/verify_seed_phrase_content_description_sequence_is_correct"
-                android:src="@drawable/ic_positive_check"
-                android:visibility="gone"
-                tools:visibility="visible" />
+                <com.tari.android.wallet.ui.component.CustomFontTextView
+                    android:id="@+id/select_words_label_view"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:text="@string/verify_seed_phrase_select_words_description"
+                    android:textColor="@color/dark_gray"
+                    android:textSize="12sp"
+                    app:customFont="@string/font_medium"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
 
-            <com.google.android.flexbox.FlexboxLayout
-                android:id="@+id/selectable_words_flexbox_layout"
+                <com.google.android.flexbox.FlexboxLayout
+                    android:id="@+id/selected_words_flexbox_layout"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="20dp"
+                    app:flexWrap="wrap" />
+
+            </FrameLayout>
+
+            <androidx.core.widget.NestedScrollView
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:flexWrap="wrap" />
+                android:layout_height="0dp"
+                android:layout_margin="25dp"
+                android:layout_weight="1">
 
-        </FrameLayout>
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
 
-    </ScrollView>
+                    <com.tari.android.wallet.ui.component.CustomFontTextView
+                        android:id="@+id/sequence_invalid_label_view"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/validation_error_box_border_bg"
+                        android:gravity="center_horizontal"
+                        android:paddingVertical="9dp"
+                        android:text="@string/verify_seed_phrase_sequence_is_invalid_message"
+                        android:textColor="@color/common_error"
+                        android:visibility="gone"
+                        app:customFont="@string/font_heavy"
+                        tools:visibility="visible" />
+
+                    <ImageView
+                        android:id="@+id/sequence_correct_label_view"
+                        android:layout_width="29dp"
+                        android:layout_height="29dp"
+                        android:layout_gravity="top|center_horizontal"
+                        android:layout_marginTop="5dp"
+                        android:contentDescription="@string/verify_seed_phrase_content_description_sequence_is_correct"
+                        android:src="@drawable/ic_positive_check"
+                        android:visibility="gone"
+                        tools:visibility="visible" />
+
+                    <com.google.android.flexbox.FlexboxLayout
+                        android:id="@+id/selectable_words_flexbox_layout"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        app:flexWrap="wrap" />
+
+                </FrameLayout>
+
+            </androidx.core.widget.NestedScrollView>
+
+        </androidx.appcompat.widget.LinearLayoutCompat>
+
+    </androidx.core.widget.NestedScrollView>
 
     <com.tari.android.wallet.ui.component.CustomFontTextView
         android:id="@+id/continue_cta_view"
@@ -152,6 +178,9 @@
         android:text="@string/verify_seed_phrase_complete_verification_cta"
         android:textColor="@color/button_text_color_selector"
         android:textSize="16sp"
-        app:customFont="@string/font_heavy" />
+        app:customFont="@string/font_heavy"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
-</LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>
