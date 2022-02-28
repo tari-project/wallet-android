@@ -4,7 +4,7 @@ class SeedPhrase(private val seedWords: List<String>) : Iterable<String> {
     val length
         get() = seedWords.size
 
-    private fun shuffled(): SeedPhrase = SeedPhrase(seedWords.shuffled())
+    private fun sorted(): SeedPhrase = SeedPhrase(seedWords.sorted())
 
     fun consistsOf(result: List<String>): Boolean = seedWords == result
 
@@ -16,7 +16,7 @@ class SeedPhrase(private val seedWords: List<String>) : Iterable<String> {
         return seedWords[index]
     }
 
-    fun startSelection() = shuffled().let { s -> Pair(s, SelectionSequence(this, s)) }
+    fun startSelection() = sorted().let { s -> Pair(s, SelectionSequence(this, s)) }
 
     override fun iterator(): Iterator<String> = seedWords.iterator()
 
