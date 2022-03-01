@@ -48,6 +48,9 @@ enum class TxStatus {
     PENDING,
     COINBASE,
     MINED_CONFIRMED,
+    REJECTED,
+    FAUX_UNCONFIRMED,
+    FAUX_CONFIRMED,
     UNKNOWN;
     
     companion object {
@@ -61,6 +64,9 @@ enum class TxStatus {
                 FFITxStatus.PENDING -> PENDING
                 FFITxStatus.COINBASE -> COINBASE
                 FFITxStatus.MINED_CONFIRMED -> MINED_CONFIRMED
+                FFITxStatus.REJECTED -> REJECTED
+                FFITxStatus.FAUX_CONFIRMED -> FAUX_CONFIRMED
+                FFITxStatus.FAUX_UNCONFIRMED -> FAUX_UNCONFIRMED
                 else -> UNKNOWN
             }
         }

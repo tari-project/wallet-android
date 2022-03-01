@@ -61,6 +61,7 @@ import com.squareup.seismic.ShakeDetector
 import com.tari.android.wallet.R
 import com.tari.android.wallet.application.DeepLink
 import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
+import com.tari.android.wallet.data.sharedPrefs.tariSettings.TariSettingsSharedRepository
 import com.tari.android.wallet.data.sharedPrefs.testnetFaucet.TestnetFaucetRepository
 import com.tari.android.wallet.databinding.FragmentTxListBinding
 import com.tari.android.wallet.di.DiContainer.appComponent
@@ -69,7 +70,8 @@ import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.extension.observe
 import com.tari.android.wallet.extension.observeOnLoad
 import com.tari.android.wallet.infrastructure.Tracker
-import com.tari.android.wallet.model.*
+import com.tari.android.wallet.model.BalanceInfo
+import com.tari.android.wallet.model.User
 import com.tari.android.wallet.ui.activity.debug.DebugActivity
 import com.tari.android.wallet.ui.common.CommonFragment
 import com.tari.android.wallet.ui.common.recyclerView.CommonAdapter
@@ -108,6 +110,9 @@ internal class TxListFragment : CommonFragment<FragmentTxListBinding, TxListView
 
     @Inject
     lateinit var testnetFaucetRepository: TestnetFaucetRepository
+
+    @Inject
+    lateinit var tariSettingsSharedRepository: TariSettingsSharedRepository
 
     @Inject
     lateinit var tracker: Tracker
@@ -337,7 +342,7 @@ internal class TxListFragment : CommonFragment<FragmentTxListBinding, TxListView
             if (viewModel.txListIsEmpty) {
                 showNoTxsTextView()
             }
-            if (!testnetFaucetRepository.faucetTestnetTariRequestCompleted && !sharedPrefsWrapper.isRestoredWallet
+            if (!testnetFaucetRepository.faucetTestnetTariRequestCompleted && !tariSettingsSharedRepository.isRestoredWallet
             ) {
                 viewModel.requestTestnetTari()
             }

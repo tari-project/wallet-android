@@ -72,6 +72,16 @@
     <string name="error_fee_more_than_amount_title">Amount Error</string>
     <string name="error_fee_more_than_amount_description">Sorry, the amount cannot be less than the fee.</string>
 
+    <string name="error_code_prefix">Error Code:</string>
+    <string name="error_wallet_message_generic">Something went wrong! Please try again later. Please send us a bug report if this problem persists.</string>
+    <string name="error_wallet_message_114">Something went wrong processing output. Please try again later or contact the support.</string>
+    <string name="error_wallet_message_204">Transaction not found. Please try again later. Please submit a bug report using the \"Report a Bug\" option from the settings menu if this problem appears again.</string>
+    <string name="error_wallet_message_401">Contact not found. Please try again later. Please submit a bug report using the \"Report a Bug\" option from the settings menu if this problem appears again.</string>
+    <string name="error_wallet_message_420">Wallet was not encrypted but a passphrase was supplied. Please try again later or try to restore your wallet.</string>
+    <string name="error_wallet_message_428">Unable to decrypt the wallet. Please try again later or try to restore your wallet.</string>
+    <string name="error_wallet_message_429">Unable to recover your wallet from provided seed words. Please check the list of entered seed words and try again.</string>
+    <string name="error_wallet_message_430">The provided seed words are not compatible with the current wallet version. Please get in touch with support for more details.</string>
+
     <!-- common -->
     <string name="common_continue">Continue</string>
     <string name="common_from">From</string>
@@ -147,8 +157,6 @@
     <!-- auth -->
     <string name="proceed">Proceed</string>
     <string name="exit">Exit</string>
-    <string name="wallet_error_title">Wallet corrupted</string>
-    <string name="wallet_error_description">We are in process of developing an application and sometimes happening that we need to update our internal data. We updated the protocol version in this update and, unfortunately, need to ask you to do a hard reset. The wallet will be deleted. If you want to save your funds, download the older version and make a backup. Do you ready to delete your wallet?</string>
     <!-- begin :: dialog -->
     <string name="onboarding_auth_title">Secure your wallet</string>
     <string name="onboarding_auth_biometric_prompt">Please enter your biometrics. Tari Aurora will require it each time you open the app.</string>
@@ -259,6 +267,8 @@
     <string name="add_amount_funds_pending">Sorry, you can’t send this much tXTR. Please wait for at least one transaction to complete and then try again.</string>
     <string name="add_amount_tx_fee">Transaction Fee</string>
     <string name="add_amount_wallet_balance">Wallet Balance</string>
+    <string name="add_amount_one_side_payment_switcher">One Sided Payment</string>
+    <string name="add_amount_one_side_payment_question_mark">One-sided payments are broadcast instantly and do not require the recipient to be online. But they are less private. Use them if you know the recipient is offline for long periods, or for things like \'tip-jars\'.</string>
 
     <!-- send tari - note -->
     <string name="add_note_prompt">Transaction Note</string>
@@ -311,6 +321,15 @@
     <string name="tx_details_cancel_dialog_not_cancel">Not now</string>
     <string name="tx_details_error_tx_not_found_title">Requested transaction was not found</string>
     <string name="tx_details_error_tx_not_found_desc">Please try again later</string>
+
+    <string name="tx_details_cancellation_reason_unknown">The transaction failed for an unknown reason.</string>
+    <string name="tx_details_cancellation_reason_user_cancelled">The transaction was canceled by the sender.</string>
+    <string name="tx_details_cancellation_reason_timeout">The transaction failed due to timeout.</string>
+    <string name="tx_details_cancellation_reason_double_spend">The transaction was cancelled as it is spending funds that have already been spent.</string>
+    <string name="tx_details_cancellation_reason_orphan">The transaction was cancelled due to some funds being spent no longer being present in the chain.</string>
+    <string name="tx_details_cancellation_reason_time_locked">This transaction was cancelled due to the funds not having reached their time-lock period yet.</string>
+    <string name="tx_details_cancellation_reason_invalid_transaction">The transaction failed to the invalid input data. This situation shouldn\'t happen. Please send a bug report or contact us directly.</string>
+    <string name="tx_details_cancellation_reason_abandoned_coinbase">The coinbase was abandoned.</string>
 
     <!-- Fee tooltip -->
     <string name="tx_detail_fee_tooltip_transaction_fee">Transaction Fee</string>

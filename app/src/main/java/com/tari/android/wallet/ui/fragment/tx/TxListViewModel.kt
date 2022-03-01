@@ -223,7 +223,10 @@ internal class TxListViewModel() : CommonViewModel() {
         EventBus.subscribe<Event.Transaction.InboundTxBroadcast>(this) { onInboundTxBroadcast(it.tx) }
         EventBus.subscribe<Event.Transaction.OutboundTxBroadcast>(this) { onOutboundTxBroadcast(it.tx) }
         EventBus.subscribe<Event.Transaction.TxMinedUnconfirmed>(this) { onTxMinedUnconfirmed(it.tx) }
+        EventBus.subscribe<Event.Transaction.TxMinedUnconfirmed>(this) { onTxMinedUnconfirmed(it.tx) }
         EventBus.subscribe<Event.Transaction.TxMined>(this) { onTxMined(it.tx) }
+        EventBus.subscribe<Event.Transaction.TxFauxMinedUnconfirmed>(this) { onTxFauxMinedUnconfirmed(it.tx) }
+        EventBus.subscribe<Event.Transaction.TxFauxConfirmed>(this) { onFauxTxMined(it.tx) }
         EventBus.subscribe<Event.Transaction.TxCancelled>(this) {
             if (progressControllerState.state != UpdateProgressViewController.State.RECEIVING) {
                 onTxCancelled(it.tx)
@@ -279,11 +282,10 @@ internal class TxListViewModel() : CommonViewModel() {
     }
 
     private fun onTxMinedUnconfirmed(tx: CompletedTx) {
-        val source = when (tx.direction) {
+       when (tx.direction) {
             Tx.Direction.INBOUND -> pendingInboundTxs
             Tx.Direction.OUTBOUND -> pendingOutboundTxs
-        }
-        source.find { it.id == tx.id }?.let { source.remove(it) }
+        }.removeIf { it.id == tx.id }
         val index = completedTxs.indexOfFirst { it.id == tx.id }
         if (index == -1) {
             completedTxs.add(tx)
@@ -294,6 +296,33 @@ internal class TxListViewModel() : CommonViewModel() {
     }
 
     private fun onTxMined(tx: CompletedTx) {
+        pendingInboundTxs.removeIf { it.id == tx.id }
+        pendingOutboundTxs.removeIf { it.id == tx.id }
+
+        val index = completedTxs.indexOfFirst { it.id == tx.id }
+        if (index == -1) {
+            completedTxs.add(tx)
+        } else {
+            completedTxs[index] = tx
+        }
+        _listUpdateTrigger.postValue(Unit)
+    }
+
+    private fun onTxFauxMinedUnconfirmed(tx: CompletedTx) {
+        when (tx.direction) {
+            Tx.Direction.INBOUND -> pendingInboundTxs
+            Tx.Direction.OUTBOUND -> pendingOutboundTxs
+        }.removeIf { it.id == tx.id }
+        val index = completedTxs.indexOfFirst { it.id == tx.id }
+        if (index == -1) {
+            completedTxs.add(tx)
+        } else {
+            completedTxs[index] = tx
+        }
+        _listUpdateTrigger.postValue(Unit)
+    }
+
+    private fun onFauxTxMined(tx: CompletedTx) {
         pendingInboundTxs.removeIf { it.id == tx.id }
         pendingOutboundTxs.removeIf { it.id == tx.id }
 
@@ -340,7 +369,7 @@ internal class TxListViewModel() : CommonViewModel() {
         viewModelScope.launch(Dispatchers.IO) {
             val error = WalletError()
             val tx = walletService.getPendingOutboundTxById(txId, error)
-            if (error.code == WalletErrorCode.NO_ERROR) {
+            if (error == WalletError.NoError) {
                 pendingOutboundTxs.add(tx)
                 _listUpdateTrigger.postValue(Unit)
             } else {
@@ -378,6 +407,7 @@ internal class TxListViewModel() : CommonViewModel() {
             val importedTx = walletService.getWithError { error, wallet ->
                 wallet.importTestnetUTXO(resourceManager.getString(R.string.first_testnet_utxo_tx_message), error)
             }
+            importedTx ?: return@launch
 
             testnetRepository.faucetTestnetTariRequestCompleted = true
             testnetRepository.firstTestnetUTXOTxId = importedTx.id
@@ -496,8 +526,8 @@ internal class TxListViewModel() : CommonViewModel() {
     private fun sendTariToUser(recipientPublicKey: PublicKey) {
         val error = WalletError()
         val contacts = walletService.getContacts(error)
-        val recipientUser = when (error.code) {
-            WalletErrorCode.NO_ERROR -> contacts.firstOrNull { it.publicKey == recipientPublicKey } ?: User(recipientPublicKey)
+        val recipientUser = when (error) {
+            WalletError.NoError -> contacts.firstOrNull { it.publicKey == recipientPublicKey } ?: User(recipientPublicKey)
             else -> User(recipientPublicKey)
         }
 
@@ -509,6 +539,7 @@ internal class TxListViewModel() : CommonViewModel() {
             val importedTx = walletService.getWithError { error, wallet ->
                 wallet.importTestnetUTXO(resourceManager.getString(R.string.second_testnet_utxo_tx_message), error)
             }
+            importedTx ?: return@launch
             testnetRepository.secondTestnetUTXOTxId = importedTx.id
             completedTxs.add(importedTx)
             refreshBalance(false)

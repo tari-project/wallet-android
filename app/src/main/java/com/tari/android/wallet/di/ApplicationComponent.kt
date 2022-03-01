@@ -42,7 +42,6 @@ import com.tari.android.wallet.ui.activity.home.HomeActivity
 import com.tari.android.wallet.ui.activity.onboarding.OnboardingFlowActivity
 import com.tari.android.wallet.ui.activity.restore.WalletRestoreActivity
 import com.tari.android.wallet.ui.activity.settings.DeleteWalletActivity
-import com.tari.android.wallet.ui.activity.tx.TxDetailsActivity
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.component.networkStateIndicator.ConnectionIndicatorViewModel
 import com.tari.android.wallet.ui.fragment.debug.DebugLogFragment
@@ -63,7 +62,10 @@ import com.tari.android.wallet.ui.fragment.restore.inputSeedWords.InputSeedWords
 import com.tari.android.wallet.ui.fragment.restore.walletRestoringFromSeedWords.WalletRestoringFromSeedWordsViewModel
 import com.tari.android.wallet.ui.fragment.send.activity.SendTariActivity
 import com.tari.android.wallet.ui.fragment.send.addAmount.AddAmountFragment
+import com.tari.android.wallet.ui.fragment.send.addAmount.AddAmountViewModel
 import com.tari.android.wallet.ui.fragment.send.addNote.AddNoteFragment
+import com.tari.android.wallet.ui.fragment.send.addNote.gif.ChooseGIFDialogFragment
+import com.tari.android.wallet.ui.fragment.send.addNote.gif.ThumbnailGIFsViewModel
 import com.tari.android.wallet.ui.fragment.send.addRecepient.AddRecipientFragment
 import com.tari.android.wallet.ui.fragment.send.addRecepient.AddRecipientViewModel
 import com.tari.android.wallet.ui.fragment.send.finalize.FinalizeSendTxFragment
@@ -81,6 +83,8 @@ import com.tari.android.wallet.ui.fragment.settings.networkSelection.NetworkSele
 import com.tari.android.wallet.ui.fragment.settings.userAutorization.BiometricAuthenticationViewModel
 import com.tari.android.wallet.ui.fragment.tx.TxListFragment
 import com.tari.android.wallet.ui.fragment.tx.TxListViewModel
+import com.tari.android.wallet.ui.fragment.tx.details.gif.GIFViewModel
+import com.tari.android.wallet.ui.fragment.tx.details.TxDetailsFragment
 import dagger.Component
 import javax.inject.Singleton
 
@@ -119,7 +123,7 @@ internal interface ApplicationComponent {
     fun inject(activity: HomeActivity)
     fun inject(activity: QRScannerActivity)
     fun inject(activity: SendTariActivity)
-    fun inject(activity: TxDetailsActivity)
+    fun inject(fragment: TxDetailsFragment)
     fun inject(activity: DebugActivity)
     fun inject(activity: DeleteWalletActivity)
 
@@ -131,7 +135,7 @@ internal interface ApplicationComponent {
     fun inject(fragment: AddRecipientFragment)
     fun inject(fragment: AddAmountFragment)
     fun inject(fragment: AddNoteFragment)
-    fun inject(fragment: AddNoteFragment.ChooseGIFDialogFragment)
+    fun inject(fragment: ChooseGIFDialogFragment)
     fun inject(fragment: FinalizeSendTxFragment)
     fun inject(fragment: LocalAuthFragment)
     fun inject(fragment: DebugLogFragment)
@@ -155,8 +159,8 @@ internal interface ApplicationComponent {
      * ViewModels.
      */
     fun inject(commonViewModel: CommonViewModel)
-    fun inject(thumbnailGIFsViewModel: AddNoteFragment.ThumbnailGIFsViewModel)
-    fun inject(gifViewModel: TxDetailsActivity.GIFViewModel)
+    fun inject(thumbnailGIFsViewModel: ThumbnailGIFsViewModel)
+    fun inject(gifViewModel: GIFViewModel)
     fun inject(backgroundServiceSettingsViewModel: BackgroundServiceSettingsViewModel)
     fun inject(connectionIndicatorViewModel: ConnectionIndicatorViewModel)
     fun inject(chooseRestoreOptionViewModel: ChooseRestoreOptionViewModel)
@@ -176,6 +180,7 @@ internal interface ApplicationComponent {
     fun inject(finalizeSentTxListViewModel: FinalizeSendTxViewModel)
     fun inject(walletInfoViewModel: WalletInfoViewModel)
     fun inject(requestTariViewModel: RequestTariViewModel)
+    fun inject(addAmountViewModel: AddAmountViewModel)
     /**
      * Service(s).
      */

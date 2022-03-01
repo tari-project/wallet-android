@@ -35,8 +35,11 @@ package com.tari.android.wallet.ui.fragment.send.addRecepient
 import android.animation.AnimatorSet
 import android.animation.ValueAnimator
 import android.app.Activity
-import android.content.*
-import android.os.*
+import android.content.Context
+import android.content.Intent
+import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.text.Editable
 import android.text.InputType
 import android.text.TextWatcher
@@ -67,7 +70,7 @@ import com.tari.android.wallet.di.DiContainer.appComponent
 import com.tari.android.wallet.extension.observe
 import com.tari.android.wallet.extension.observeOnLoad
 import com.tari.android.wallet.infrastructure.Tracker
-import com.tari.android.wallet.model.*
+import com.tari.android.wallet.model.PublicKey
 import com.tari.android.wallet.ui.common.CommonFragment
 import com.tari.android.wallet.ui.common.recyclerView.CommonAdapter
 import com.tari.android.wallet.ui.extension.*
@@ -183,7 +186,7 @@ class AddRecipientFragment : CommonFragment<FragmentAddRecipientBinding, AddReci
         val listener = requireActivity() as AddRecipientListener
 
         when (navigation) {
-            is AddRecipientNavigation.ToAmount -> listener.continueToAmount(this, navigation.user)
+            is AddRecipientNavigation.ToAmount -> listener.continueToAmount(navigation.user)
         }
     }
 
@@ -213,9 +216,7 @@ class AddRecipientFragment : CommonFragment<FragmentAddRecipientBinding, AddReci
     private fun setupUI() {
         ui.contactsListRecyclerView.layoutManager = LinearLayoutManager(requireContext())
         recyclerViewAdapter.setClickListener(CommonAdapter.ItemClickListener() {
-            (it as? RecipientViewHolderItem)?.user?.let { user ->
-                (activity as? AddRecipientListener)?.continueToAmount(this, user)
-            }
+            (it as? RecipientViewHolderItem)?.user?.let { user -> (activity as? AddRecipientListener)?.continueToAmount(user) }
         })
         ui.contactsListRecyclerView.adapter = recyclerViewAdapter
         ui.contactsListRecyclerView.addOnScrollListener(scrollListener)

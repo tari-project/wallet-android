@@ -30,51 +30,34 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.tari.android.wallet.model
+package com.tari.android.wallet.data.sharedPrefs.tariSettings
 
-/**
- * Enumerates FFI error codes.
- *
- * @author The Tari Development Team
- */
-enum class WalletErrorCode(val code: Int) {
+import android.content.SharedPreferences
+import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefBooleanDelegate
+import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepository
 
-    NO_ERROR(0),
+class TariSettingsSharedRepository(sharedPrefs: SharedPreferences, val networkRepository: NetworkRepository) {
 
-    /**
-     * For any error with an unknown error code, or a different class than FFIError.
-     */
-    UNKNOWN_ERROR(1000000),
-
-    // TODO The rest will be completed once the error codes get updated in the Rust codebase.
-    // https://github.com/tari-project/tari/blob/development/base_layer/wallet_ffi/src/error.rs
-    NULL_ERROR(1),
-    ALLOCATION_ERROR(2),
-    POSITION_INVALID_ERROR(3),
-    TOKIO_ERROR(3),
-
-    NOT_ENOUGH_FUNDS(101),
-    INCOMPLETE_TX(102),
-    DUPLICATE_OUTPUT(103),
-    VALUES_NOT_FOUND(104),
-    OUTPUT_ALREADY_SPENT(105),
-    PENDING_TX_NOT_FOUND(106),
-    FUNDS_PENDING(115),
-
-    OUTBOUND_SEND_DISCOVERY_IN_PROGRESS(210);
-
-    companion object {
-
-        fun fromCode(code: Int): WalletErrorCode {
-            for (value in values()) {
-                if (value.code == code) {
-                    return value
-                }
-            }
-            return UNKNOWN_ERROR
-        }
-
+    private object Key {
+        const val isRestoredWallet = "tari_is_restored_wallet"
+        const val hasVerifiedSeedWords = "tari_has_verified_seed_words"
+        const val backgroundServiceTurnedOnKey = "tari_background_service_turned_on"
+        const val isOneSidePaymentEnabledKey = "is_one_side_payment_enabled"
     }
 
+    var isRestoredWallet: Boolean by SharedPrefBooleanDelegate(sharedPrefs, formatKey(Key.isRestoredWallet))
 
+    var hasVerifiedSeedWords: Boolean by SharedPrefBooleanDelegate(sharedPrefs, formatKey(Key.hasVerifiedSeedWords))
+
+    var backgroundServiceTurnedOn: Boolean by SharedPrefBooleanDelegate(sharedPrefs, formatKey(Key.backgroundServiceTurnedOnKey), true)
+
+    var isOneSidePaymentEnabled: Boolean by SharedPrefBooleanDelegate(sharedPrefs, formatKey(Key.isOneSidePaymentEnabledKey), false)
+
+    fun clear() {
+        isRestoredWallet = false
+        hasVerifiedSeedWords = false
+        backgroundServiceTurnedOn = true
+    }
+
+    private fun formatKey(key: String): String = key + "_" + networkRepository.currentNetwork!!.network.displayName
 }

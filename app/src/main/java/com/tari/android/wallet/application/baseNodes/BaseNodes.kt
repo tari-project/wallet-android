@@ -9,7 +9,7 @@ import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodeSharedRepositor
 import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepository
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.extension.addTo
-import com.tari.android.wallet.extension.executeWithError
+import com.tari.android.wallet.extension.getWithError
 import com.tari.android.wallet.ffi.FFIPublicKey
 import com.tari.android.wallet.ffi.FFIWallet
 import com.tari.android.wallet.ffi.HexString
@@ -84,7 +84,7 @@ class BaseNodes(
         val baseNodeKeyFFI = FFIPublicKey(HexString(baseNode.publicKeyHex))
         FFIWallet.instance?.addBaseNodePeer(baseNodeKeyFFI, baseNode.address)
         baseNodeKeyFFI.destroy()
-        walletService.executeWithError { error, wallet -> wallet.startBaseNodeSync(error) }
+        walletService.getWithError { error, wallet -> wallet.startBaseNodeSync(error) }
     }
 
     private fun getBaseNodeResource(network: Network): Int = when(network) {

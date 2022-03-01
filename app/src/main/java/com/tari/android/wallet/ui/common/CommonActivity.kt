@@ -32,6 +32,8 @@ abstract class CommonActivity<Binding : ViewBinding, VM : CommonViewModel> : App
 
         observe(errorDialog) { replaceDialog(ErrorDialog(this@CommonActivity, it)) }
 
+        observe(walletErrorDialog) { replaceDialog(ErrorDialog(this@CommonActivity, it)) }
+
         observe(loadingDialog) { if (it.isShow) replaceDialog(TariProgressDialog(this@CommonActivity, it)) else currentDialog?.dismiss() }
     }
 

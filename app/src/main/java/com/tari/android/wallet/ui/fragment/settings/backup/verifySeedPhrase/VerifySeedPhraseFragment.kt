@@ -50,11 +50,8 @@ import com.tari.android.wallet.ui.extension.*
 
 class VerifySeedPhraseFragment : CommonFragment<FragmentVerifySeedPhraseBinding, VerifySeedPhraseViewModel>() {
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View = FragmentVerifySeedPhraseBinding.inflate(inflater, container, false).also { ui = it }.root
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
+        FragmentVerifySeedPhraseBinding.inflate(inflater, container, false).also { ui = it }.root
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -94,7 +91,7 @@ class VerifySeedPhraseFragment : CommonFragment<FragmentVerifySeedPhraseBinding,
     }
 
     private fun fillSelectableWordsContainer() {
-        viewModel.shuffledPhrase.withIndex().forEach { iv ->
+        viewModel.sortedPhrase.withIndex().forEach { iv ->
             SelectableWordTextView.createSelectableWord(requireContext(), false).apply {
                 text = iv.value
                 val selected = viewModel.selectionPhrase.contains(iv.index)

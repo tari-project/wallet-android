@@ -6,6 +6,7 @@ import com.tari.android.wallet.application.WalletState
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.extension.addTo
 import com.tari.android.wallet.ffi.FFISeedWords
+import com.tari.android.wallet.model.WalletError
 import com.tari.android.wallet.model.seedPhrase.SeedPhrase
 import com.tari.android.wallet.service.WalletServiceLauncher
 import com.tari.android.wallet.service.seedPhrase.SeedPhraseRepository
@@ -15,6 +16,7 @@ import com.tari.android.wallet.ui.common.debounce
 import com.tari.android.wallet.ui.common.domain.ResourceManager
 import com.tari.android.wallet.ui.component.loadingButton.LoadingButtonState
 import com.tari.android.wallet.ui.dialog.error.ErrorDialogArgs
+import com.tari.android.wallet.ui.dialog.error.WalletErrorArgs
 import com.tari.android.wallet.ui.fragment.restore.inputSeedWords.suggestions.SuggestionState
 import com.tari.android.wallet.ui.fragment.restore.inputSeedWords.suggestions.SuggestionViewHolderItem
 import io.reactivex.disposables.CompositeDisposable
@@ -109,7 +111,12 @@ internal class InputSeedWordsViewModel() : CommonViewModel() {
         EventBus.walletState.publishSubject.distinct().subscribe {
             when (it) {
                 is WalletState.Failed -> {
-                    onError(RestorationError.Unknown(resourceManager))
+                    val walletError = WalletError.createFromException(it.exception)
+                    if (walletError == WalletError.NoError) {
+                        onError(RestorationError.Unknown(resourceManager))
+                    } else {
+                        _walletErrorDialog.postValue(WalletErrorArgs(resourceManager, it.exception))
+                    }
                     _inProgress.postValue(false)
                     clear()
                 }
@@ -265,7 +272,7 @@ internal class InputSeedWordsViewModel() : CommonViewModel() {
     private fun processSuggestions() {
         val focusedIndex = _focusedIndex.value!!
         val words = _words.value.orEmpty()
-        if(!words.indices.contains(focusedIndex)) return
+        if (!words.indices.contains(focusedIndex)) return
         val focusedItem = _words.value.orEmpty()[focusedIndex]
         val text = focusedItem.text.value.orEmpty()
         val state = if (text.isEmpty()) {

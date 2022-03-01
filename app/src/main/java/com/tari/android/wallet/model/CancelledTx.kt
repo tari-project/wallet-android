@@ -34,6 +34,8 @@ package com.tari.android.wallet.model
 
 import android.os.Parcel
 import android.os.Parcelable
+import com.tari.android.wallet.ffi.FFICompletedTx
+import com.tari.android.wallet.ffi.FFITxCancellationReason
 import java.math.BigInteger
 
 /**
@@ -41,34 +43,27 @@ import java.math.BigInteger
  *
  * @author The Tari Development Team
  */
-class CancelledTx : Tx, Parcelable {
+class CancelledTx() : Tx(), Parcelable {
 
-    val fee: MicroTari
-    val status: TxStatus
+    var fee: MicroTari = MicroTari(BigInteger("0"))
+    var cancellationReason: FFITxCancellationReason = FFITxCancellationReason.NotCancelled
 
-    constructor(
-        id: BigInteger,
-        direction: Direction,
-        user: User,
-        amount: MicroTari,
-        fee: MicroTari?,
-        timestamp: BigInteger,
-        message: String,
-        status: TxStatus
-    ) : super() {
-        this.id = id
-        this.direction = direction
-        this.user = user
-        this.amount = amount
-        this.fee = fee ?: MicroTari(BigInteger("0"))
-        this.timestamp = timestamp
-        this.message = message
-        this.status = status
+    internal constructor(tx: FFICompletedTx) : this() {
+        this.id = tx.getId()
+        this.direction = tx.getDirection()
+        this.user = tx.getUser()
+        this.amount = MicroTari(tx.getAmount())
+        this.fee = MicroTari(tx.getFee())
+        this.timestamp = tx.getTimestamp()
+        this.message = tx.getMessage()
+        this.status = TxStatus.map(tx.getStatus())
+        this.cancellationReason = tx.getCancellationReason()
+        tx.destroy()
     }
 
     // region Parcelable
 
-    constructor(parcel: Parcel) : super() {
+    constructor(parcel: Parcel) : this() {
         id = parcel.readSerializable() as BigInteger
         direction = parcel.readSerializable() as Direction
         val userIsContact = parcel.readSerializable() == Contact::class.java
@@ -89,7 +84,6 @@ class CancelledTx : Tx, Parcelable {
         override fun createFromParcel(parcel: Parcel): CancelledTx = CancelledTx(parcel)
 
         override fun newArray(size: Int): Array<CancelledTx?> = arrayOfNulls(size)
-
     }
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {
