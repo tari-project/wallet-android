@@ -83,7 +83,9 @@ import org.joda.time.Hours
 import org.joda.time.Minutes
 import java.math.BigInteger
 import java.util.*
-import java.util.concurrent.*
+import java.util.concurrent.CopyOnWriteArrayList
+import java.util.concurrent.CopyOnWriteArraySet
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 /**
@@ -184,13 +186,6 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
     private var txReceivedNotificationDelayedAction: Disposable? = null
     private var inboundTxEventNotificationTxs = mutableListOf<Tx>()
 
-    /**
-     * Maps the validation type to the request id and validation result. This map will be
-     * initialized at the beginning of each base node validation sequence.
-     * Validation results will all be null, and will be set as the result callbacks get called.
-     */
-    private var baseNodeValidationStatusMap:
-            ConcurrentMap<BaseNodeValidationType, Pair<BigInteger, Boolean?>> = ConcurrentHashMap()
 
     override fun onCreate() {
         super.onCreate()
@@ -506,66 +501,11 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
         backupManager.scheduleBackup(resetRetryCount = true)
     }
 
-    private fun checkBaseNodeSyncCompletion() {
-        // make a copy of the status map for concurrency protection
-        val statusMapCopy = baseNodeValidationStatusMap.toMap()
-        // if base node not in sync, then switch to the next base node
-        // check if any has failed
-        val failed = statusMapCopy.any { it.value.second == false }
-        if (failed) {
-            baseNodeValidationStatusMap.clear()
-            baseNodeSharedPrefsRepository.baseNodeLastSyncResult = false
-            val currentBaseNode = baseNodeSharedPrefsRepository.currentBaseNode
-            if (currentBaseNode == null || !currentBaseNode.isCustom) {
-                baseNodes.setNextBaseNode()
-            }
-            EventBus.baseNodeState.post(BaseNodeState.SyncCompleted(false))
-            listeners.iterator().forEach { it.onBaseNodeSyncComplete(false) }
-            return
-        }
-        // if any of the results is null, we're still waiting for all callbacks to happen
-        val inProgress = statusMapCopy.any { it.value.second == null }
-        if (inProgress) {
-            return
-        }
-        // check if it's successful
-        val successful = statusMapCopy.all { it.value.second == true }
-        if (successful) {
-            baseNodeValidationStatusMap.clear()
-            baseNodeSharedPrefsRepository.baseNodeLastSyncResult = true
-            EventBus.baseNodeState.post(BaseNodeState.SyncCompleted(true))
-            listeners.iterator().forEach { it.onBaseNodeSyncComplete(true) }
-        }
-        // shouldn't ever reach here - no-op
-    }
-
-    private fun checkValidationResult(type: BaseNodeValidationType, responseId: BigInteger, isSuccess: Boolean) {
-        val currentStatus = baseNodeValidationStatusMap[type]
-        if (currentStatus == null) {
-            Logger.d(
-                type.name + " validation [$responseId] complete. Result: $isSuccess."
-                        + " Current status is null, means we're not expecting a callback. Ignoring."
-            )
-            return
-        }
-        if (currentStatus.first != responseId) {
-            Logger.d(
-                type.name + " Validation [$responseId] complete. Result: $isSuccess."
-                        + " Request id [${currentStatus.first}] mismatch. Ignoring."
-            )
-            return
-        }
-        Logger.d(type.name + " Validation [$responseId] complete. Result: $isSuccess.")
-        baseNodeValidationStatusMap[type] = Pair(currentStatus.first, isSuccess)
-        checkBaseNodeSyncCompletion()
-    }
-
     override fun onTXOValidationComplete(responseId: BigInteger, isSuccess: Boolean) {
-        checkValidationResult(BaseNodeValidationType.TXO, responseId, isSuccess)
+        Logger.i("onTXOValidationComplete responseId: $responseId, isSuccess: $isSuccess")
     }
 
     override fun onTxValidationComplete(responseId: BigInteger, isSuccess: Boolean) {
-        checkValidationResult(BaseNodeValidationType.TX, responseId, isSuccess)
         if (!txBroadcastRestarted && isSuccess) {
             try {
                 wallet.restartTxBroadcast()
@@ -573,6 +513,25 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
                 Logger.i("Transaction broadcast restarted.")
             } catch (e: Exception) {
                 Logger.e("Error while restarting tx broadcast: " + e.message)
+            }
+        }
+    }
+
+    override fun onConnectivityStatus(status: Int) {
+        when (status) {
+            1 -> {
+                baseNodeSharedPrefsRepository.baseNodeLastSyncResult = true
+                EventBus.baseNodeState.post(BaseNodeState.Online)
+                listeners.iterator().forEach { it.onBaseNodeSyncComplete(true) }
+            }
+            2 -> {
+                baseNodeSharedPrefsRepository.baseNodeLastSyncResult = false
+                val currentBaseNode = baseNodeSharedPrefsRepository.currentBaseNode
+                if (currentBaseNode == null || !currentBaseNode.isCustom) {
+                    baseNodes.setNextBaseNode()
+                }
+                EventBus.baseNodeState.post(BaseNodeState.Offline)
+                listeners.iterator().forEach { it.onBaseNodeSyncComplete(false) }
             }
         }
     }
@@ -854,20 +813,13 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
             val publicKeyFFI = FFIPublicKey(HexString(baseNodePublicKey))
             val result = wallet.addBaseNodePeer(publicKeyFFI, baseNodeAddress)
             publicKeyFFI.destroy()
-            if (result) {
-                baseNodeValidationStatusMap.clear()
-            }
             result
         } ?: false
 
         override fun startBaseNodeSync(error: WalletError): Boolean = executeWithMapping(error, {
             Logger.e("Base node validation error: $it")
             baseNodeSharedPrefsRepository.baseNodeLastSyncResult = false
-            baseNodeValidationStatusMap.clear()
         }) {
-            baseNodeValidationStatusMap.clear()
-            baseNodeValidationStatusMap[BaseNodeValidationType.TXO] = Pair(wallet.startTXOValidation(), null)
-            baseNodeValidationStatusMap[BaseNodeValidationType.TX] = Pair(wallet.startTxValidation(), null)
             baseNodeSharedPrefsRepository.baseNodeLastSyncResult = null
             EventBus.baseNodeState.post(BaseNodeState.SyncStarted)
             true

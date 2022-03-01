@@ -58,5 +58,6 @@ internal interface FFIWalletListener {
     fun onTxCancelled(cancelledTx: CancelledTx, rejectionReason: Int)
     fun onTXOValidationComplete(responseId: BigInteger, isSuccess: Boolean)
     fun onTxValidationComplete(responseId: BigInteger, isSuccess: Boolean)
+    fun onConnectivityStatus(status: Int)
     fun onWalletRestoration(result: WalletRestorationResult)
 }
