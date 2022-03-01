@@ -28,13 +28,13 @@ class VerifySeedPhraseViewModel() : CommonViewModel() {
     private val _addWord = MutableLiveData<Pair<String, Int>>()
     val addWord: LiveData<Pair<String, Int>> = _addWord
 
-    lateinit var shuffledPhrase: SeedPhrase
+    lateinit var sortedPhrase: SeedPhrase
     lateinit var selectionPhrase: SelectionSequence
 
     fun initWithSeedPhrase(seedWords: ArrayList<String>) {
         val seedPhrase = SeedPhrase(seedWords)
-        val (shuffled, selectionSequence) = seedPhrase.startSelection()
-        this.shuffledPhrase = shuffled
+        val (sorted, selectionSequence) = seedPhrase.startSelection()
+        this.sortedPhrase = sorted
         this.selectionPhrase = selectionSequence
 
         evaluateEnteredPhrase()
@@ -42,7 +42,7 @@ class VerifySeedPhraseViewModel() : CommonViewModel() {
 
     fun selectWord(index: Int) {
         selectionPhrase.add(index)
-        _addWord.postValue(Pair(shuffledPhrase[index], index))
+        _addWord.postValue(Pair(sortedPhrase[index], index))
         evaluateEnteredPhrase()
     }
 
