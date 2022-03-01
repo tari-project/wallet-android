@@ -158,7 +158,7 @@ internal class UpdateProgressViewController(
     }
 
     private fun subscribeToEventBus() {
-        EventBus.baseNodeState.subscribeOnEvent<BaseNodeState.SyncCompleted>(this) { event ->
+        EventBus.baseNodeState.subscribeOnEvent<BaseNodeState>(this) { event ->
             Logger.i("Received BaseNodeSyncComplete in state %s.", state)
             if (state.state == State.RUNNING && isWaitingOnBaseNodeSync) {
                 onBaseNodeSyncCompleted(event)
@@ -285,11 +285,12 @@ internal class UpdateProgressViewController(
             .subscribe { baseNodeSyncTimedOut() }
     }
 
-    private fun onBaseNodeSyncCompleted(event: BaseNodeState.SyncCompleted) {
+    private fun onBaseNodeSyncCompleted(event: BaseNodeState) {
+        if (event is BaseNodeState.SyncStarted) return
         isWaitingOnBaseNodeSync = false
         baseNodeSyncTimeoutSubscription?.dispose()
-        when (event.isSuccess) {
-            true -> {
+        when (event) {
+            is BaseNodeState.Online -> {
                 // base node sync successful - start listening for events
                 Logger.d("Base node sync successful. Start listening for wallet events.")
                 state.state = State.RECEIVING
@@ -297,13 +298,14 @@ internal class UpdateProgressViewController(
                     displayReceivingTxs()
                 }, minStateDisplayPeriodMs)
             }
-            false -> {
+            is BaseNodeState.Offline -> {
                 if (baseNodeSyncCurrentRetryCount >= baseNodeSyncMaxRetryCount) {
                     fail(FailureReason.BASE_NODE_VALIDATION_ERROR)
                 } else {
                     startBaseNodeSync()
                 }
             }
+            else -> Unit
         }
     }
 

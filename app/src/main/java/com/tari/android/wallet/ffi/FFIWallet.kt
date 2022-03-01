@@ -511,6 +511,7 @@ internal class FFIWallet(
     @Suppress("MemberVisibilityCanBePrivate")
     fun onConnectivityStatus(bytes: ByteArray) {
         val connectivityStatus = BigInteger(1, bytes)
+        GlobalScope.launch { listener?.onConnectivityStatus(connectivityStatus.toInt()) }
         Logger.i("ConnectivityStatus is [$connectivityStatus]")
     }
 
