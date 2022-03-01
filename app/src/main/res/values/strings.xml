@@ -12,7 +12,7 @@
     <string name="privacy_policy_url">https://www.tari.com/privacy_policy/</string>
     <string name="disclaimer_url">https://www.tari.com/disclaimer/</string>
     <string name="explorer_url">https://explore.tari.com</string>
-    <string name="tor_bridges_url">https://torproject.org</string>
+    <string name="tor_bridges_url">https://bridges.torproject.org/bridges</string>
     <string name="ffi_admin_email_address" translatable="false">bug_reports@tari.com</string>
     <string name="tari_lab_university_url" translatable="false">https://tlu.tarilabs.com/</string>
     <string name="network_faucet_url" translatable="false">https://faucet.tari.com</string>
@@ -540,7 +540,7 @@
     <string name="tor_bridges_custom_bridges">Custom Bridges</string>
     <string name="tor_bridges_description">If you are in a country or using a connection that censor Tor, you might need to use bridges</string>
     <string name="tor_bridges_paste_bridges">Paste Bridges</string>
-    <string name="tor_bridges_hint">Big hint here</string>
+    <string name="tor_bridges_hint" formatted="false">Available formates:\n• obfs4 &lt;IP ADDRESS>:&lt;PORT> &lt;FINGERPRINT> cert=&lt;CERTIFICATE> iat-mode=&lt;value>\nexample:\nobfs4 192.95.36.142:443 CDF2E852BF539B82BD10E27E9115A31734E378C2 cert=qUVQ0srL1JI/vO6V6m/24anYXiJD3QP2HgzUKQtQ7GRqqUvs7P+tG43RtAqdhLOALP7DJQ iat-mode=1\n\n • &lt;IP ADDRESS>:&lt;PORT> &lt;FINGERPRINT>\nexample:\n78.156.103.189:9301 2BD90810282F8B331FC7D47705167166253E1442"</string>
     <string name="tor_bridges_request">Request Bridges from torproject.org</string>
     <string name="tor_bridges_scan_qr">Scan QR Code</string>
     <string name="tor_bridges_upload_qr_code">Upload QR Code</string>

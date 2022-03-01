@@ -2,10 +2,19 @@ package com.tari.android.wallet.ui.fragment.settings.torBridges
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import com.tari.android.wallet.data.sharedPrefs.tor.TorSharedRepository
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.fragment.settings.torBridges.torItem.TorBridgeViewHolderItem
+import javax.inject.Inject
 
 class TorBridgesSelectionViewModel() : CommonViewModel() {
+
+    @Inject
+    lateinit var torSharedRepository: TorSharedRepository
+
+    init {
+        component.inject(this)
+    }
 
     private val _torBridges = MutableLiveData<MutableList<TorBridgeViewHolderItem>>()
     val torBridges: LiveData<MutableList<TorBridgeViewHolderItem>> = _torBridges
@@ -14,13 +23,20 @@ class TorBridgesSelectionViewModel() : CommonViewModel() {
     val navigation: LiveData<TorBridgeNavigation> = _navigation
 
     init {
+        loadData()
+    }
+
+    fun loadData() {
         val noBridges = TorBridgeViewHolderItem.Empty(resourceManager)
         val customBridges = TorBridgeViewHolderItem.CustomBridges(resourceManager)
 
         val bridgeConfigurations = mutableListOf<TorBridgeViewHolderItem>()
         bridgeConfigurations.add(noBridges)
 
-        val bridges = mutableListOf<TorBridgeViewHolderItem>()
+        val bridges = mutableListOf<TorBridgeViewHolderItem.Bridge>()
+        bridges.addAll(torSharedRepository.customTorBridges.orEmpty().map { TorBridgeViewHolderItem.Bridge(it, false) })
+        bridges.firstOrNull { it.bridgeConfiguration == torSharedRepository.currentTorBridge }?.isSelected = true
+
         bridgeConfigurations.addAll(bridges)
         noBridges.isSelected = bridges.isEmpty()
 

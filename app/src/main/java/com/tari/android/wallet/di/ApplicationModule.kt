@@ -48,6 +48,7 @@ import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepository
 import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepositoryImpl
 import com.tari.android.wallet.data.sharedPrefs.tariSettings.TariSettingsSharedRepository
 import com.tari.android.wallet.data.sharedPrefs.testnetFaucet.TestnetFaucetRepository
+import com.tari.android.wallet.data.sharedPrefs.tor.TorSharedRepository
 import com.tari.android.wallet.infrastructure.security.biometric.BiometricAuthenticationService
 import com.tari.android.wallet.notification.NotificationHelper
 import com.tari.android.wallet.service.WalletServiceLauncher
@@ -107,6 +108,11 @@ internal class ApplicationModule(
 
     @Provides
     @Singleton
+    fun provideTorSharedRepository(prefs: SharedPreferences, networkRepository: NetworkRepository): TorSharedRepository =
+        TorSharedRepository(prefs, networkRepository)
+
+    @Provides
+    @Singleton
     fun provideSharedPrefsRepository(
         context: Context,
         prefs: SharedPreferences,
@@ -115,6 +121,7 @@ internal class ApplicationModule(
         networkRepository: NetworkRepository,
         testnetFaucetRepository: TestnetFaucetRepository,
         yatSharedRepository: YatSharedRepository,
+        torSharedRepository: TorSharedRepository,
         tariSettingsSharedRepository: TariSettingsSharedRepository
     ): SharedPrefsRepository =
         SharedPrefsRepository(
@@ -125,6 +132,7 @@ internal class ApplicationModule(
             baseNodeSharedRepository,
             testnetFaucetRepository,
             yatSharedRepository,
+            torSharedRepository,
             tariSettingsSharedRepository
         )
 

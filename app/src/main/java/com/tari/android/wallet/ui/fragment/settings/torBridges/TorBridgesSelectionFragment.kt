@@ -32,6 +32,11 @@ class TorBridgesSelectionFragment : CommonFragment<FragmentTorBridgeSelectionBin
         observeUI()
     }
 
+    override fun onResume() {
+        super.onResume()
+        viewModel.loadData()
+    }
+
     private fun setupViews() = with(ui) {
         backCtaView.setOnThrottledClickListener { requireActivity().onBackPressed() }
         torBridgesList.layoutManager = LinearLayoutManager(requireContext())
