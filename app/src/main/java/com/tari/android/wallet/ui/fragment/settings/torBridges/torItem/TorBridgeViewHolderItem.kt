@@ -9,7 +9,7 @@ sealed class TorBridgeViewHolderItem(val title: String, var isSelected: Boolean 
     class Empty(resourceManager: ResourceManager, isSelected: Boolean = false) :
         TorBridgeViewHolderItem(resourceManager.getString(R.string.tor_bridges_no_bridges), isSelected)
 
-    class Bridge(val bridgeConfiguration: TorBridgeConfiguration, isSelected: Boolean) : TorBridgeViewHolderItem(bridgeConfiguration.name, isSelected)
+    class Bridge(val bridgeConfiguration: TorBridgeConfiguration, isSelected: Boolean) : TorBridgeViewHolderItem(bridgeConfiguration.toString(), isSelected)
 
     class CustomBridges(resourceManager: ResourceManager) : TorBridgeViewHolderItem(resourceManager.getString(R.string.tor_bridges_custom_bridges))
 }

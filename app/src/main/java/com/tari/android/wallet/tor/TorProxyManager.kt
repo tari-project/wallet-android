@@ -36,6 +36,7 @@ import android.app.Service
 import android.content.Context
 import com.orhanobut.logger.Logger
 import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
+import com.tari.android.wallet.data.sharedPrefs.tor.TorSharedRepository
 import com.tari.android.wallet.event.EventBus
 import io.reactivex.Observable
 import io.reactivex.disposables.Disposable
@@ -54,7 +55,7 @@ import java.util.concurrent.TimeUnit
  */
 internal class TorProxyManager(
     private val context: Context,
-    private val sharedPrefsWrapper: SharedPrefsRepository,
+    private val torSharedRepository: TorSharedRepository,
     private val torConfig: TorConfig
 ) {
 
@@ -75,7 +76,7 @@ internal class TorProxyManager(
         val torResourceInstaller = TorResourceInstaller(context, context.filesDir)
         torResourceInstaller.installGeoIPResources()
         // check if there's an existing installation of Tor
-        val torBinPath = sharedPrefsWrapper.torBinPath
+        val torBinPath = torSharedRepository.torBinPath
         if (torBinPath != null) {
             val torBinFile = File(torBinPath)
             if (torBinFile.exists() && torBinFile.canExecute()) {
@@ -84,7 +85,7 @@ internal class TorProxyManager(
         }
         // get the Tor binary file and make it executable
         val torBinary = torResourceInstaller.getTorBinaryFile()
-        sharedPrefsWrapper.torBinPath = torBinary.absolutePath
+        torSharedRepository.torBinPath = torBinary.absolutePath
     }
 
     /**
@@ -105,7 +106,7 @@ internal class TorProxyManager(
     }
 
     private fun getHashedPassword(password: String): String {
-        val cmd1 = "${sharedPrefsWrapper.torBinPath} DataDirectory ${appCacheHome.absolutePath}" +
+        val cmd1 = "${torSharedRepository.torBinPath} DataDirectory ${appCacheHome.absolutePath}" +
                 " --hash-password my-secret"
         Logger.d("Tor HASH CMD %s", cmd1)
         val process = Runtime.getRuntime().exec(cmd1)
@@ -122,8 +123,8 @@ internal class TorProxyManager(
         }.start()
         try {
             installTorResources()
-            val torCmdString =
-                "${sharedPrefsWrapper.torBinPath} DataDirectory ${appCacheHome.absolutePath} " +
+            var torCmdString =
+                "${torSharedRepository.torBinPath} DataDirectory ${appCacheHome.absolutePath} " +
                         "--allow-missing-torrc --ignore-missing-torrc " +
                         "--clientonly 1 " +
                         "--socksport ${torConfig.proxyPort} " +
@@ -134,6 +135,10 @@ internal class TorProxyManager(
                         "--clientuseipv6 1 " /* +
                         "--ClientTransportPlugin obfs4 socks5 ${torConfig.controlHost}:47351 " +
                         "--ClientTransportPlugin \"meek_lite Socks5Proxy ${torConfig.controlHost}:47352\"" */
+            torSharedRepository.currentTorBridge?.let {
+                //todo
+                torCmdString += "--ClientTransportPlugin ${it.transportTechnology} socks5 ${it.ip}:${it.port} "
+            }
             exec(torCmdString)
         } catch (throwable: Throwable) {
             Logger.e("THROWABLE")

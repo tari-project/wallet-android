@@ -544,5 +544,6 @@
     <string name="tor_bridges_request">Request Bridges from torproject.org</string>
     <string name="tor_bridges_scan_qr">Scan QR Code</string>
     <string name="tor_bridges_upload_qr_code">Upload QR Code</string>
+    <string name="tor_bridges_incorrect_format">Incorrect tor bridge format</string>
 
 </resources>

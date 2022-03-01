@@ -34,6 +34,7 @@ package com.tari.android.wallet.data.sharedPrefs.tor
 
 import android.content.SharedPreferences
 import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefGsonDelegate
+import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefStringDelegate
 import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepository
 
 class TorSharedRepository(sharedPrefs: SharedPreferences, val networkRepository: NetworkRepository) {
@@ -41,6 +42,7 @@ class TorSharedRepository(sharedPrefs: SharedPreferences, val networkRepository:
     private object Key {
         const val currentTorBridge = "tari_current_tor_bridge"
         const val customTorBridges = "tari_custom_tor_bridges"
+        const val torBinPath = "tari_wallet_tor_bin_path"
     }
 
     var currentTorBridge: TorBridgeConfiguration? by SharedPrefGsonDelegate(
@@ -55,15 +57,19 @@ class TorSharedRepository(sharedPrefs: SharedPreferences, val networkRepository:
         TorBridgeConfigurationList::class.java
     )
 
+    var torBinPath: String? by SharedPrefStringDelegate(sharedPrefs, formatKey(Key.torBinPath))
+
+
     fun clear() {
         currentTorBridge = null
         customTorBridges = TorBridgeConfigurationList()
+        torBinPath = null
     }
 
     fun addTorBridgeConfiguration(torBridgeConfiguration: TorBridgeConfiguration) {
         customTorBridges.orEmpty().apply {
             add(torBridgeConfiguration)
-            customTorBridges = this
+            customTorBridges = TorBridgeConfigurationList(this.distinct())
         }
     }
 

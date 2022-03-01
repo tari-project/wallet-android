@@ -74,7 +74,6 @@ class SharedPrefsRepository(
         const val onboardingAuthSetupStarted = "tari_wallet_onboarding_auth_setup_started"
         const val onboardingCompleted = "tari_wallet_onboarding_completed"
         const val onboardingDisplayedAtHome = "tari_wallet_onboarding_displayed_at_home"
-        const val torBinPath = "tari_wallet_tor_bin_path"
         const val walletDatabasePassphrase = "tari_wallet_database_passphrase"
         const val isDataCleared = "tari_is_data_cleared"
     }
@@ -101,8 +100,6 @@ class SharedPrefsRepository(
 
     var onboardingDisplayedAtHome: Boolean by SharedPrefBooleanDelegate(sharedPrefs, formatKey(Key.onboardingDisplayedAtHome))
 
-    var torBinPath: String? by SharedPrefStringDelegate(sharedPrefs, formatKey(Key.torBinPath))
-
     var databasePassphrase: String? by SharedPrefStringSecuredDelegate(context, sharedPrefs, formatKey(Key.walletDatabasePassphrase))
 
     var isDataCleared: Boolean by SharedPrefBooleanDelegate(sharedPrefs, formatKey(Key.isDataCleared), true)
@@ -122,7 +119,6 @@ class SharedPrefsRepository(
         onboardingAuthSetupStarted = false
         onboardingAuthSetupCompleted = false
         onboardingDisplayedAtHome = false
-        torBinPath = null
         databasePassphrase = null
     }
 

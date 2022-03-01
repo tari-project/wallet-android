@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.tari.android.wallet.data.sharedPrefs.tor.TorSharedRepository
 import com.tari.android.wallet.ui.common.CommonViewModel
+import com.tari.android.wallet.ui.common.SingleLiveEvent
 import com.tari.android.wallet.ui.fragment.settings.torBridges.torItem.TorBridgeViewHolderItem
 import javax.inject.Inject
 
@@ -19,7 +20,7 @@ class TorBridgesSelectionViewModel() : CommonViewModel() {
     private val _torBridges = MutableLiveData<MutableList<TorBridgeViewHolderItem>>()
     val torBridges: LiveData<MutableList<TorBridgeViewHolderItem>> = _torBridges
 
-    private val _navigation = MutableLiveData<TorBridgeNavigation>()
+    private val _navigation = SingleLiveEvent<TorBridgeNavigation>()
     val navigation: LiveData<TorBridgeNavigation> = _navigation
 
     init {

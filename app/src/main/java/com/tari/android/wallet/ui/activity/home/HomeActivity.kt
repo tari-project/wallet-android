@@ -340,7 +340,7 @@ internal class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>
                 R.anim.enter_from_left, R.anim.exit_to_right
             )
             .apply { supportFragmentManager.fragments.forEach { hide(it) } }
-            .add(R.id.nav_container, fragment)
+            .replace(R.id.nav_container, fragment)
             .addToBackStack(null)
             .commit()
     }
