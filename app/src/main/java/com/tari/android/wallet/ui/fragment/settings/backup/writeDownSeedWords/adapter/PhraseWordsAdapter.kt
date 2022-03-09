@@ -37,7 +37,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.tari.android.wallet.R
 
-class PhraseWordsAdapter(val seedWords: MutableList<String> = mutableListOf()) : RecyclerView.Adapter<PhraseWordViewHolder>() {
+class PhraseWordsAdapter(val seedWords: MutableList<String> = mutableListOf(), var isExpanded: Boolean = false) : RecyclerView.Adapter<PhraseWordViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PhraseWordViewHolder =
         PhraseWordViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.holder_phrase_word, parent, false))
@@ -45,7 +45,7 @@ class PhraseWordsAdapter(val seedWords: MutableList<String> = mutableListOf()) :
     override fun onBindViewHolder(holder: PhraseWordViewHolder, position: Int) {
         // So that indexing follows the column direction rather than row
         val index = if (position % 2 == 0) position / 2 else 12 + ((position - 1) / 2)
-        holder.bind(index, seedWords[index])
+        holder.bind(index, seedWords[index], isExpanded)
     }
 
     override fun getItemCount(): Int = seedWords.size

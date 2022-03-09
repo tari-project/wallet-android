@@ -34,26 +34,30 @@ package com.tari.android.wallet.ui.fragment.settings.backup.writeDownSeedWords
 
 import android.graphics.Color
 import android.os.Bundle
-import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.constraintlayout.widget.ConstraintSet
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.GridLayoutManager
+import androidx.transition.ChangeBounds
+import androidx.transition.Transition
+import androidx.transition.TransitionManager
+import com.tari.android.wallet.R
 import com.tari.android.wallet.R.color.seed_phrase_button_disabled_text_color
 import com.tari.android.wallet.databinding.FragmentWriteDownSeedPhraseBinding
 import com.tari.android.wallet.extension.observe
 import com.tari.android.wallet.ui.activity.settings.BackupSettingsRouter
 import com.tari.android.wallet.ui.common.CommonFragment
-import com.tari.android.wallet.ui.extension.ThrottleClick
-import com.tari.android.wallet.ui.extension.animateClick
-import com.tari.android.wallet.ui.extension.color
+import com.tari.android.wallet.ui.extension.*
 import com.tari.android.wallet.ui.fragment.settings.backup.writeDownSeedWords.adapter.PhraseWordsAdapter
-import com.tari.android.wallet.ui.fragment.settings.backup.writeDownSeedWords.adapter.VerticalInnerMarginDecoration
+import com.tari.android.wallet.util.Constants
+
 
 class WriteDownSeedPhraseFragment : CommonFragment<FragmentWriteDownSeedPhraseBinding, WriteDownSeedPhraseViewModel>() {
 
     private val adapter = PhraseWordsAdapter()
+    private var isExpanded = false
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
         FragmentWriteDownSeedPhraseBinding.inflate(inflater, container, false).also { ui = it }.root
@@ -76,15 +80,28 @@ class WriteDownSeedPhraseFragment : CommonFragment<FragmentWriteDownSeedPhraseBi
         })
         ui.phraseWordsRecyclerView.layoutManager = GridLayoutManager(requireContext(), WORD_COLUMNS_COUNT)
         ui.phraseWordsRecyclerView.adapter = adapter
-        val dimen = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, WORD_BOTTOM_MARGIN_DP.toFloat(), resources.displayMetrics).toInt()
-        ui.phraseWordsRecyclerView.addItemDecoration(VerticalInnerMarginDecoration(dimen, WORD_COLUMNS_COUNT))
+        ui.expandButtonView.setOnClickListener { expandList() }
     }
 
     private fun observeVM() = with(viewModel) {
         observe(seedWords) {
             adapter.seedWords.clear()
             adapter.seedWords.addAll(it)
+            adapter.notifyDataSetChanged()
+            checkScreensFit()
         }
+    }
+
+    private fun checkScreensFit() {
+        ui.phraseWordsRecyclerView.measure(
+            View.MeasureSpec.makeMeasureSpec(ui.phraseWordsRecyclerView.width, View.MeasureSpec.EXACTLY),
+            View.MeasureSpec.UNSPECIFIED
+        )
+        val contentHeight = ui.phraseWordsRecyclerView.measuredHeight
+        val containerHeight = ui.listContainer.height
+        val isOverlapped = contentHeight > containerHeight
+        ui.bottomShadow.setVisible(isOverlapped)
+        ui.expandButtonView.setVisible(isOverlapped)
     }
 
     private fun updateContinueButtonState(isChecked: Boolean) {
@@ -93,9 +110,83 @@ class WriteDownSeedPhraseFragment : CommonFragment<FragmentWriteDownSeedPhraseBi
         ui.continueCtaView.setTextColor(color)
     }
 
+    private fun expandList() {
+        isExpanded = !isExpanded
+        adapter.isExpanded = isExpanded
+        for (i in adapter.seedWords.indices) {
+            adapter.notifyItemChanged(i)
+        }
+        val resDrawable = if (!isExpanded) R.drawable.recovery_expand_icon else R.drawable.recovery_collapse_button
+        ui.expandButtonView.setImageResource(resDrawable)
+        animateExpanding(isExpanded)
+    }
+
+    private fun animateExpanding(isExpanding: Boolean = true) {
+        val set = ConstraintSet()
+        set.clone(ui.root)
+        set.clear(R.id.list_container)
+        set.clear(R.id.expand_button_view, ConstraintSet.TOP)
+        set.clear(R.id.expand_button_view, ConstraintSet.BOTTOM)
+
+        if (isExpanding) {
+            set.connect(R.id.list_container, ConstraintSet.TOP, ConstraintSet.PARENT_ID, ConstraintSet.TOP)
+            set.connect(R.id.list_container, ConstraintSet.LEFT, ConstraintSet.PARENT_ID, ConstraintSet.LEFT)
+            set.connect(R.id.list_container, ConstraintSet.BOTTOM, ConstraintSet.PARENT_ID, ConstraintSet.BOTTOM)
+            set.connect(R.id.list_container, ConstraintSet.RIGHT, ConstraintSet.PARENT_ID, ConstraintSet.RIGHT)
+
+            set.connect(
+                R.id.expand_button_view,
+                ConstraintSet.TOP,
+                R.id.list_container,
+                ConstraintSet.TOP,
+                dimenPx(R.dimen.write_down_seed_expand_button_top_margin)
+            )
+        } else {
+            set.connect(
+                R.id.list_container,
+                ConstraintSet.TOP,
+                R.id.description,
+                ConstraintSet.BOTTOM,
+                dimenPx(R.dimen.write_down_seed_phrase_list_vertical_margin)
+            )
+            set.connect(
+                R.id.list_container,
+                ConstraintSet.LEFT,
+                ConstraintSet.PARENT_ID,
+                ConstraintSet.LEFT,
+                dimenPx(R.dimen.write_down_seed_phrase_list_horizontal_margin)
+            )
+            set.connect(
+                R.id.list_container,
+                ConstraintSet.BOTTOM,
+                R.id.warning_view,
+                ConstraintSet.TOP,
+                dimenPx(R.dimen.write_down_seed_phrase_list_vertical_margin)
+            )
+            set.connect(
+                R.id.list_container,
+                ConstraintSet.RIGHT,
+                ConstraintSet.PARENT_ID,
+                ConstraintSet.RIGHT,
+                dimenPx(R.dimen.write_down_seed_phrase_list_horizontal_margin)
+            )
+
+            set.connect(
+                R.id.expand_button_view,
+                ConstraintSet.BOTTOM,
+                R.id.list_container,
+                ConstraintSet.BOTTOM,
+                dimenPx(R.dimen.write_down_seed_expand_button_bottom_margin)
+            )
+        }
+        val transition: Transition = ChangeBounds()
+        transition.duration = Constants.UI.mediumDurationMs
+        TransitionManager.beginDelayedTransition(ui.root, transition)
+        set.applyTo(ui.root)
+    }
+
     companion object {
         private const val WORD_COLUMNS_COUNT = 2
-        private const val WORD_BOTTOM_MARGIN_DP = 5
 
         fun newInstance() = WriteDownSeedPhraseFragment()
     }
