@@ -33,8 +33,10 @@
 package com.tari.android.wallet.tor
 
 import android.content.Context
-import java.io.*
-import java.lang.RuntimeException
+import java.io.File
+import java.io.FileOutputStream
+import java.io.IOException
+import java.io.InputStream
 import java.util.zip.ZipInputStream
 
 /**
@@ -90,36 +92,21 @@ class TorResourceInstaller(
          * Write the inputstream contents to the file
          */
         @Throws(IOException::class)
-        private fun streamToFile(
-            inputStream: InputStream,
-            outFile: File,
-            append: Boolean = false,
-            isZipped: Boolean = false
-        ) {
-            val outputStream: OutputStream = FileOutputStream(outFile.absolutePath, append)
-            var zipInputStream: ZipInputStream? = null
-            if (isZipped) {
-                zipInputStream = ZipInputStream(inputStream)
-                zipInputStream.nextEntry
+        private fun streamToFile(inputStream: InputStream, outFile: File, append: Boolean = false, isZipped: Boolean = false) {
+            FileOutputStream(outFile.absolutePath, append).use { outputStream ->
+                (if (isZipped) ZipInputStream(inputStream).also { it.nextEntry } else inputStream).use { input ->
+                    var bytecount: Int
+                    val buffer = ByteArray(FILE_WRITE_BUFFER_SIZE)
+                    while (input.read(buffer).also { bytecount = it } > 0) {
+                        outputStream.write(buffer, 0, bytecount)
+                    }
+                }
             }
-            val fileInputStream = zipInputStream ?: inputStream
-
-            var bytecount: Int
-            val buffer = ByteArray(FILE_WRITE_BUFFER_SIZE)
-            while (fileInputStream.read(buffer).also { bytecount = it } > 0) {
-                outputStream.write(buffer, 0, bytecount)
-            }
-            outputStream.close()
-            zipInputStream?.close()
-            inputStream.close()
         }
     }
 
     fun getTorBinaryFile(): File {
-        val torBinaryFile = File(
-            context.applicationInfo.nativeLibraryDir,
-            TOR_BINARY_FILE_NAME
-        )
+        val torBinaryFile = File(context.applicationInfo.nativeLibraryDir, TOR_BINARY_FILE_NAME)
         if (!torBinaryFile.exists()) {
             throw RuntimeException("Tor binary cannot be found.")
         }
@@ -134,18 +121,7 @@ class TorResourceInstaller(
      * Install the Tor geo IP resources from assets to app files directory.
      */
     fun installGeoIPResources() {
-        Util.assetToFile(
-            context = context,
-            filesPath = installFolder.absolutePath,
-            assetPath = COMMON_ASSET_KEY + GEOIP_ASSET_KEY,
-            assetKey = GEOIP_ASSET_KEY
-        )
-        Util.assetToFile(
-            context = context,
-            filesPath = installFolder.absolutePath,
-            assetPath = COMMON_ASSET_KEY + GEOIP6_ASSET_KEY,
-            assetKey = GEOIP6_ASSET_KEY
-        )
+        Util.assetToFile(context, installFolder.absolutePath, COMMON_ASSET_KEY + GEOIP_ASSET_KEY, GEOIP_ASSET_KEY)
+        Util.assetToFile(context, installFolder.absolutePath, COMMON_ASSET_KEY + GEOIP6_ASSET_KEY, GEOIP6_ASSET_KEY)
     }
-
 }

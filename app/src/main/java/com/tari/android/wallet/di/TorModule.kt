@@ -36,7 +36,6 @@ import android.content.Context
 import com.tari.android.wallet.data.sharedPrefs.tor.TorSharedRepository
 import com.tari.android.wallet.tor.TorConfig
 import com.tari.android.wallet.tor.TorProxyManager
-import com.tari.android.wallet.util.Constants
 import dagger.Module
 import dagger.Provides
 import java.io.File
@@ -65,10 +64,10 @@ class TorModule {
         controlSocket.close()
 
         return TorConfig(
-            controlPort = controlPort,
+        controlPort = controlPort,
             controlHost = "127.0.0.1",
             proxyPort = port,
-            connectionPort = Constants.Wallet.torPort,
+            connectionPort = 18101,
             cookieFilePath = cookieFilePath,
             sock5Username = "user123",
             sock5Password = "123456"

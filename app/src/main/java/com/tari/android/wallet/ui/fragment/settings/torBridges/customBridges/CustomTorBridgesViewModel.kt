@@ -58,9 +58,6 @@ class CustomTorBridgesViewModel() : CommonViewModel() {
         }
 
         newBridges.forEach { torSharedRepository.addTorBridgeConfiguration(it) }
-        torSharedRepository.currentTorBridge = newBridges.first()
-        //todo need to wait and than back or error
-        restartTor()
         _backPressed.postValue(Unit)
     }
 
@@ -70,11 +67,5 @@ class CustomTorBridgesViewModel() : CommonViewModel() {
             resourceManager.getString(R.string.tor_bridges_incorrect_format)
         )
         _errorDialog.postValue(args)
-    }
-
-    private fun restartTor() {
-        //todo need to test closely
-        walletManager.stop()
-        walletManager.start()
     }
 }

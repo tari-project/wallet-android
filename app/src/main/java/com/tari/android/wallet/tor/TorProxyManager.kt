@@ -35,21 +35,15 @@ package com.tari.android.wallet.tor
 import android.app.Service
 import android.content.Context
 import com.orhanobut.logger.Logger
-import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import com.tari.android.wallet.data.sharedPrefs.tor.TorSharedRepository
 import com.tari.android.wallet.event.EventBus
-import io.reactivex.Observable
-import io.reactivex.disposables.Disposable
-import io.reactivex.schedulers.Schedulers
-import net.freehaven.tor.control.TorControlConnection
 import java.io.BufferedReader
 import java.io.File
 import java.io.InputStreamReader
-import java.net.Socket
-import java.util.concurrent.TimeUnit
 
 /**
  * Manages the installation and the running of the Tor proxy.
+ * https://2019.www.torproject.org/docs/tor-manual.html.en
  *
  * @author The Tari Development Team
  */
@@ -84,8 +78,7 @@ internal class TorProxyManager(
             }
         }
         // get the Tor binary file and make it executable
-        val torBinary = torResourceInstaller.getTorBinaryFile()
-        torSharedRepository.torBinPath = torBinary.absolutePath
+        torSharedRepository.torBinPath = torResourceInstaller.getTorBinaryFile().absolutePath
     }
 
     /**
@@ -96,9 +89,7 @@ internal class TorProxyManager(
         val process = Runtime.getRuntime().exec(command)
         Logger.d("Tor command executed: %s", command)
         EventBus.torProxyState.post(TorProxyState.Initializing)
-        val response = BufferedReader(
-            InputStreamReader(process.inputStream)
-        ).use(BufferedReader::readText)
+        val response = BufferedReader(InputStreamReader(process.inputStream)).use(BufferedReader::readText)
         Logger.d("Tor proxy response: %s", response)
         process.waitFor()
         // Tor proxy is down
@@ -106,21 +97,16 @@ internal class TorProxyManager(
     }
 
     private fun getHashedPassword(password: String): String {
-        val cmd1 = "${torSharedRepository.torBinPath} DataDirectory ${appCacheHome.absolutePath}" +
-                " --hash-password my-secret"
+        val cmd1 = "${torSharedRepository.torBinPath} DataDirectory ${appCacheHome.absolutePath} --hash-password my-secret"
         Logger.d("Tor HASH CMD %s", cmd1)
         val process = Runtime.getRuntime().exec(cmd1)
-        return BufferedReader(
-            InputStreamReader(process.inputStream)
-        ).use(BufferedReader::readText)
+        return BufferedReader(InputStreamReader(process.inputStream)).use(BufferedReader::readText)
     }
 
     @Synchronized
     fun run() {
         // start monitoring Tor on a separate thread
-        Thread {
-            torProxyControl.startMonitoringTor()
-        }.start()
+        Thread { torProxyControl.startMonitoringTor() }.start()
         try {
             installTorResources()
             var torCmdString =
@@ -132,12 +118,16 @@ internal class TorProxyManager(
                         "--CookieAuthentication 1 " +
                         "--Socks5ProxyUsername ${torConfig.sock5Username} " +
                         "--Socks5ProxyPassword ${torConfig.sock5Password} " +
-                        "--clientuseipv6 1 " /* +
+                        "--clientuseipv6 1 " /*+
                         "--ClientTransportPlugin obfs4 socks5 ${torConfig.controlHost}:47351 " +
                         "--ClientTransportPlugin \"meek_lite Socks5Proxy ${torConfig.controlHost}:47352\"" */
             torSharedRepository.currentTorBridge?.let {
-                //todo
-                torCmdString += "--ClientTransportPlugin ${it.transportTechnology} socks5 ${it.ip}:${it.port} "
+                torCmdString += "--bridge ${it.transportTechnology} ${it.ip}:${it.port} ${it.fingerprint}"
+                if (it.transportTechnology.isNotBlank()) {
+                    //obfs4, obfs3, meek-azure, fte
+                    //todo
+                }
+                torCmdString += "--usebridges 1 "
             }
             exec(torCmdString)
         } catch (throwable: Throwable) {
@@ -149,108 +139,4 @@ internal class TorProxyManager(
     fun shutdown() {
         torProxyControl.shutdownTor()
     }
-
-    private class TorProxyControl(private val torConfig: TorConfig) {
-
-        private val initializationCheckTimeoutMillis = 15000L
-        private val initializationCheckRetryPeriodMillis = 500L
-        private var monitoringStartTimeMs = 0L
-
-        /**
-         * Check Tor status every 5 seconds.
-         */
-        private val statusCheckPeriodSecs = 5L
-
-        /**
-         * Timer to check Tor status.
-         */
-        private var timerSubscription: Disposable? = null
-
-        private lateinit var socket: Socket
-        private lateinit var controlConnection: TorControlConnection
-        private var currentState = EventBus.torProxyState.publishSubject.value
-
-        @Synchronized
-        fun startMonitoringTor() {
-            connectToTor()
-        }
-
-        @Synchronized
-        fun shutdownTor() {
-            timerSubscription?.dispose()
-            if (this::controlConnection.isInitialized) {
-                runCatching { controlConnection.shutdownTor("SHUTDOWN") }
-            }
-        }
-
-        private fun connectToTor() {
-            monitoringStartTimeMs = System.currentTimeMillis()
-            try {
-                socket = Socket(torConfig.controlHost, torConfig.controlPort)
-                controlConnection = TorControlConnection(socket)
-                val cookieFileBytes = File(torConfig.cookieFilePath).readBytes()
-                controlConnection.authenticate(cookieFileBytes)
-                checkTorStatus()
-            } catch (throwable: Throwable) {
-                val initializationElapsedMs = System.currentTimeMillis() - monitoringStartTimeMs
-                if (initializationElapsedMs > initializationCheckTimeoutMillis) {
-                    Logger.e(
-                        "Failed to connect to Tor proxy, timed out: %s",
-                        throwable.message
-                    )
-                    updateState(TorProxyState.Failed)
-                } else {
-                    Logger.e(
-                        "Failed to connect to Tor proxy, will retry: %s",
-                        throwable.message
-                    )
-                    timerSubscription =
-                        Observable
-                            .timer(initializationCheckRetryPeriodMillis, TimeUnit.MILLISECONDS)
-                            .subscribeOn(Schedulers.io())
-                            .observeOn(Schedulers.io())
-                            .subscribe {
-                                connectToTor()
-                            }
-                }
-            }
-        }
-
-        private fun checkTorStatus() {
-            try {
-                val bootstrapStatus = isTorRunning(controlConnection)
-                if (bootstrapStatus != null) {
-                    updateState(TorProxyState.Running(bootstrapStatus))
-                    // schedule timer
-                    timerSubscription =
-                        Observable
-                            .timer(statusCheckPeriodSecs, TimeUnit.SECONDS)
-                            .subscribeOn(Schedulers.io())
-                            .observeOn(Schedulers.io())
-                            .subscribe {
-                                checkTorStatus()
-                            }
-                } else {
-                    updateState(TorProxyState.Failed)
-                }
-            } catch (throwable: Throwable) {
-                Logger.e("Tor proxy has failed: %s", throwable.message)
-                updateState(TorProxyState.Failed)
-            }
-        }
-
-        private fun isTorRunning(controlConnection: TorControlConnection?): TorBootstrapStatus? {
-            val phaseLogLine = controlConnection?.getInfo("status/bootstrap-phase") ?: return null
-            return TorBootstrapStatus.from(phaseLogLine)
-        }
-
-        private fun updateState(newState: TorProxyState) {
-            if (currentState != newState) {
-                currentState = newState
-                EventBus.torProxyState.post(currentState!!)
-            }
-        }
-
-    }
-
 }

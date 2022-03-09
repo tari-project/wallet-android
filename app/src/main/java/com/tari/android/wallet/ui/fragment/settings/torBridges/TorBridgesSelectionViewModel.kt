@@ -2,6 +2,7 @@ package com.tari.android.wallet.ui.fragment.settings.torBridges
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import com.tari.android.wallet.application.WalletManager
 import com.tari.android.wallet.data.sharedPrefs.tor.TorSharedRepository
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.common.SingleLiveEvent
@@ -12,6 +13,9 @@ class TorBridgesSelectionViewModel() : CommonViewModel() {
 
     @Inject
     lateinit var torSharedRepository: TorSharedRepository
+
+    @Inject
+    internal lateinit var walletManager: WalletManager
 
     init {
         component.inject(this)
@@ -48,11 +52,23 @@ class TorBridgesSelectionViewModel() : CommonViewModel() {
 
     fun select(torBridgeItem: TorBridgeViewHolderItem) {
         when (torBridgeItem) {
-            is TorBridgeViewHolderItem.Empty -> selectItem(torBridgeItem)
+            is TorBridgeViewHolderItem.Empty -> connectNoBridges(torBridgeItem)
             is TorBridgeViewHolderItem.Bridge -> connectBridge(torBridgeItem)
             is TorBridgeViewHolderItem.CustomBridges -> _navigation.postValue(TorBridgeNavigation.ToCustomBridges)
         }
         _torBridges.postValue(_torBridges.value)
+    }
+
+    private fun connectNoBridges(torBridgeItem: TorBridgeViewHolderItem.Empty) {
+        selectItem(torBridgeItem)
+        torSharedRepository.currentTorBridge = null
+        restartTor()
+    }
+
+    private fun connectBridge(torBridgeItem: TorBridgeViewHolderItem.Bridge) {
+        selectItem(torBridgeItem)
+        torSharedRepository.currentTorBridge = torBridgeItem.bridgeConfiguration
+        restartTor()
     }
 
     private fun selectItem(torBridgeItem: TorBridgeViewHolderItem) {
@@ -61,7 +77,9 @@ class TorBridgesSelectionViewModel() : CommonViewModel() {
         _backPressed.call()
     }
 
-    private fun connectBridge(torBridgeItem: TorBridgeViewHolderItem.Bridge) {
-        selectItem(torBridgeItem)
+    private fun restartTor() {
+        //todo need to test closely
+        walletManager.stop()
+        walletManager.start()
     }
 }

@@ -45,7 +45,7 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <com.tari.android.wallet.ui.component.CustomFontTextView
-            android:id="@+id/add_base_node_button"
+            android:id="@+id/connect_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
@@ -54,6 +54,7 @@
             android:background="@null"
             android:text="@string/tor_bridges_connect"
             android:textAllCaps="false"
+            android:textColor="@color/purple"
             app:customFont="@string/font_heavy"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintDimensionRatio="1:1"
@@ -73,20 +74,20 @@
 
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
-        android:fillViewport="true"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:fillViewport="true">
 
         <androidx.appcompat.widget.LinearLayoutCompat
-            android:background="@color/gray_background"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:background="@color/gray_background"
             android:orientation="vertical">
 
             <androidx.recyclerview.widget.RecyclerView
-                android:layout_marginTop="20dp"
                 android:id="@+id/tor_bridges_list"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp" />
 
             <TextView
                 android:layout_width="match_parent"
