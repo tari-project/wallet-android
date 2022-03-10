@@ -39,9 +39,11 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import com.tari.android.wallet.R
-import com.tari.android.wallet.ui.fragment.settings.backup.*
+import com.tari.android.wallet.ui.fragment.settings.backup.ChangeSecurePasswordFragment
+import com.tari.android.wallet.ui.fragment.settings.backup.EnterCurrentPasswordFragment
 import com.tari.android.wallet.ui.fragment.settings.backup.backupSettings.BackupSettingsFragment
 import com.tari.android.wallet.ui.fragment.settings.backup.verifySeedPhrase.VerifySeedPhraseFragment
+import com.tari.android.wallet.ui.fragment.settings.backup.writeDownSeedWords.WriteDownSeedPhraseFragment
 
 class BackupSettingsActivity : AppCompatActivity(), BackupSettingsRouter {
 

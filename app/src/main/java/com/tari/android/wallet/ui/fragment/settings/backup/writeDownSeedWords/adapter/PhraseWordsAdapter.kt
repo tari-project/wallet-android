@@ -30,43 +30,24 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.tari.android.wallet.ui.fragment.settings.backup
+package com.tari.android.wallet.ui.fragment.settings.backup.writeDownSeedWords.adapter
 
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.tari.android.wallet.R
-import com.tari.android.wallet.ui.fragment.settings.backup.PhraseWordsAdapter.PhraseWordViewHolder
 
-class PhraseWordsAdapter(private val seedWords: List<String>) :
-    RecyclerView.Adapter<PhraseWordViewHolder>() {
+class PhraseWordsAdapter(val seedWords: MutableList<String> = mutableListOf(), var isExpanded: Boolean = false) : RecyclerView.Adapter<PhraseWordViewHolder>() {
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PhraseWordViewHolder {
-        return PhraseWordViewHolder(
-            LayoutInflater.from(parent.context)
-                .inflate(R.layout.holder_phrase_word, parent, false)
-        )
-    }
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PhraseWordViewHolder =
+        PhraseWordViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.holder_phrase_word, parent, false))
 
     override fun onBindViewHolder(holder: PhraseWordViewHolder, position: Int) {
         // So that indexing follows the column direction rather than row
         val index = if (position % 2 == 0) position / 2 else 12 + ((position - 1) / 2)
-        holder.bind(index, seedWords[index])
+        holder.bind(index, seedWords[index], isExpanded)
     }
 
     override fun getItemCount(): Int = seedWords.size
-
-    class PhraseWordViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-
-        private val indexTV: TextView = itemView.findViewById(R.id.word_position_text_view)
-        private val contentTV: TextView = itemView.findViewById(R.id.word_content_text_view)
-
-        fun bind(index: Int, word: String) {
-            indexTV.text = (index + 1).toString()
-            contentTV.text = word
-        }
-
-    }
 }
+
