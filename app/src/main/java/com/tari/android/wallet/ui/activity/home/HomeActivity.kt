@@ -322,10 +322,6 @@ internal class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>
 
     override fun toCustomTorBridges() = loadFragment(CustomTorBridgesFragment())
 
-    override fun toScanQrCodeBridge() = loadFragment(CustomTorBridgesFragment())
-
-    override fun toUploadQrCodeBridge() = loadFragment(CustomTorBridgesFragment())
-
     override fun toNetworkSelection() = loadFragment(NetworkSelectionFragment())
 
     override fun toAddCustomBaseNode() = loadFragment(AddCustomBaseNodeFragment())

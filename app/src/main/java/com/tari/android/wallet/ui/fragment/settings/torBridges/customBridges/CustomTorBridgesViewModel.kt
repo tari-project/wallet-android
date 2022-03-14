@@ -36,17 +36,23 @@ class CustomTorBridgesViewModel() : CommonViewModel() {
         for (bridgeInput in inputStr.split("\n").filter { it.isNotEmpty() }) {
             val splitted = bridgeInput.split(" ").filter { it.isNotEmpty() }.toMutableList()
             var technology = ""
-            if (splitted.size == 3) {
+            if (splitted.size == 3 || splitted.size == 5) {
                 technology = splitted[0]
                 splitted.removeAt(0)
             }
-            if (splitted.size == 2) {
+            if (splitted.size == 2 || splitted.size == 4) {
                 val ipAndPort = splitted[0].split(":")
                 if (ipAndPort.size != 2) {
                     incorrectFormat()
                     return
                 }
-                newBridges.add(TorBridgeConfiguration(technology, ipAndPort[0], ipAndPort[1], splitted.last()))
+                if (splitted.size == 2) {
+                    newBridges.add(TorBridgeConfiguration(technology, ipAndPort[0], ipAndPort[1], splitted.last()))
+                } else {
+                    val cert = splitted[2].replaceFirst("cert=", "", true)
+                    val mode = splitted[3].replaceFirst("iat-mode=", "", true)
+                    newBridges.add(TorBridgeConfiguration(technology, ipAndPort[0], ipAndPort[1], splitted.last(), cert, mode))
+                }
             } else {
                 incorrectFormat()
                 return
