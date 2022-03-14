@@ -186,6 +186,9 @@ internal class TxDetailsFragment : CommonFragment<FragmentTxDetailsBinding, TxDe
     }
 
     private fun bindTxData(tx: Tx) {
+        ui.userContainer.setVisible(!tx.isOneSided)
+        ui.contactContainerView.setVisible(!tx.isOneSided)
+
         setTxStatusData(tx)
         setTxMetaData(tx)
         setTxAddresseeData(tx)
@@ -237,7 +240,7 @@ internal class TxDetailsFragment : CommonFragment<FragmentTxDetailsBinding, TxDe
         if (note.message == null) {
             ui.txNoteTextView.gone()
         } else {
-            ui.txNoteTextView.text = note.message
+            ui.txNoteTextView.text = if (tx.isOneSided) string(tx_list_you_received_one_side_payment) else note.message
         }
         // display GIF
         ui.gifContainer.root.visible()

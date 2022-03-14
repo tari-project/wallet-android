@@ -99,6 +99,8 @@ internal class FFIWallet(
         callbackTxCancellationSig: String,
         callbackTXOValidationComplete: String,
         callbackTXOValidationCompleteSig: String,
+        callbackContactsLivenessDataUpdated: String,
+        callbackContactsLivenessDataUpdatedSig: String,
         callbackBalanceUpdated: String,
         callbackBalanceUpdatedSig: String,
         callbackTransactionValidationComplete: String,
@@ -235,6 +237,7 @@ internal class FFIWallet(
                     this::onStoreAndForwardSendResult.name, "([BZ)V",
                     this::onTxCancelled.name, "(J[B)V",
                     this::onTXOValidationComplete.name, "([BZ)V",
+                    this::onContactLivenessDataUpdated.name, "(J)V",
                     this::onBalanceUpdated.name, "(J)V",
                     this::onTxValidationComplete.name, "([BZ)V",
                     this::onConnectivityStatus.name, "([B)V",
@@ -545,6 +548,14 @@ internal class FFIWallet(
         val requestId = BigInteger(1, bytes)
         Logger.i("Transaction validation [$requestId] complete. Result: $isSuccess")
         GlobalScope.launch { listener?.onTxValidationComplete(requestId, isSuccess) }
+    }
+
+    /**
+     * This callback function cannot be private due to JNI behaviour.
+     */
+    @Suppress("MemberVisibilityCanBePrivate")
+    fun onContactLivenessDataUpdated(livedessUpdate: FFIPointer) {
+        Logger.i("OnContactLivenessDataUpdated. Pointer: %s", livedessUpdate.toString())
     }
 
     fun estimateTxFee(amount: BigInteger, gramFee: BigInteger, kernelCount: BigInteger, outputCount: BigInteger): BigInteger {

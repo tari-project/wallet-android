@@ -236,6 +236,8 @@
     <string name="tx_list_now">Now</string>
     <string name="tx_list_loading_gif">Loading GIF</string>
     <string name="tx_list_retry_loading_gif">Retry loading GIF</string>
+    <string name="tx_list_someone">Someone</string>
+    <string name="tx_list_you_received_one_side_payment">You received a one side payment</string>
 
     <!-- send tari -->
     <string name="send_tari_title">Send Tari</string>
