@@ -49,9 +49,10 @@ class CustomTorBridgesViewModel() : CommonViewModel() {
                 if (splitted.size == 2) {
                     newBridges.add(TorBridgeConfiguration(technology, ipAndPort[0], ipAndPort[1], splitted.last()))
                 } else {
+                    val fingerprint = splitted[1]
                     val cert = splitted[2].replaceFirst("cert=", "", true)
                     val mode = splitted[3].replaceFirst("iat-mode=", "", true)
-                    newBridges.add(TorBridgeConfiguration(technology, ipAndPort[0], ipAndPort[1], splitted.last(), cert, mode))
+                    newBridges.add(TorBridgeConfiguration(technology, ipAndPort[0], ipAndPort[1], fingerprint, cert, mode))
                 }
             } else {
                 incorrectFormat()

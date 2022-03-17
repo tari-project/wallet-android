@@ -39,7 +39,6 @@ import com.tari.android.wallet.tor.TorProxyManager
 import dagger.Module
 import dagger.Provides
 import java.io.File
-import java.net.ServerSocket
 import javax.inject.Singleton
 
 /**
@@ -55,18 +54,10 @@ class TorModule {
     internal fun provideTorConfig(context: Context): TorConfig {
         val cookieFilePath = File(context.getDir(TorProxyManager.torDataDirectoryName, Context.MODE_PRIVATE), "control_auth_cookie").absolutePath
 
-        val socket = ServerSocket(0)
-        val port = socket.localPort
-        socket.close()
-
-        val controlSocket = ServerSocket(0)
-        val controlPort = controlSocket.localPort
-        controlSocket.close()
-
         return TorConfig(
-        controlPort = controlPort,
+            controlPort = 39069,
             controlHost = "127.0.0.1",
-            proxyPort = port,
+            proxyPort = 39059,
             connectionPort = 18101,
             cookieFilePath = cookieFilePath,
             sock5Username = "user123",

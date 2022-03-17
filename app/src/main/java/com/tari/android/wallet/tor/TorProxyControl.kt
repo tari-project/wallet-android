@@ -28,7 +28,6 @@ class TorProxyControl(private val torConfig: TorConfig) {
 
     private lateinit var socket: Socket
     private lateinit var controlConnection: TorControlConnection
-    private var currentState = EventBus.torProxyState.publishSubject.value
 
     @Synchronized
     fun startMonitoringTor() {
@@ -54,7 +53,7 @@ class TorProxyControl(private val torConfig: TorConfig) {
             val initializationElapsedMs = System.currentTimeMillis() - monitoringStartTimeMs
             if (initializationElapsedMs > initializationCheckTimeoutMillis) {
                 Logger.e("Failed to connect to Tor proxy, timed out: %s", throwable.message)
-                updateState(TorProxyState.Failed)
+                updateState(TorProxyState.Failed(throwable))
             } else {
                 Logger.e("Failed to connect to Tor proxy, will retry: %s", throwable.message)
                 timerSubscription = Observable.timer(initializationCheckRetryPeriodMillis, TimeUnit.MILLISECONDS)
@@ -72,15 +71,15 @@ class TorProxyControl(private val torConfig: TorConfig) {
                 updateState(TorProxyState.Running(bootstrapStatus))
                 // schedule timer
                 timerSubscription = Observable.timer(statusCheckPeriodSecs, TimeUnit.SECONDS)
-                        .subscribeOn(Schedulers.io())
-                        .observeOn(Schedulers.io())
-                        .subscribe { checkTorStatus() }
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(Schedulers.io())
+                    .subscribe { checkTorStatus() }
             } else {
-                updateState(TorProxyState.Failed)
+                updateState(TorProxyState.Failed(Throwable("Tor not running")))
             }
         } catch (throwable: Throwable) {
             Logger.e("Tor proxy has failed: %s", throwable.message)
-            updateState(TorProxyState.Failed)
+            updateState(TorProxyState.Failed(throwable))
         }
     }
 
@@ -90,9 +89,6 @@ class TorProxyControl(private val torConfig: TorConfig) {
     }
 
     private fun updateState(newState: TorProxyState) {
-        if (currentState != newState) {
-            currentState = newState
-            EventBus.torProxyState.post(currentState!!)
-        }
+        EventBus.torProxyState.post(newState)
     }
 }

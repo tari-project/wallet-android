@@ -243,7 +243,8 @@ dependencies {
     implementation "de.adorsys.android:securestoragelibrary:1.2.4"
 
     // Tor control
-    implementation 'net.freehaven.tor.control:jtorctl:0.2'
+    implementation 'info.guardianproject:tor-android:0.4.6.10'
+    implementation 'info.guardianproject:jtorctl:0.4.5.7'
 
     // used to read log files
     //noinspection GradleDependency

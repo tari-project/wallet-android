@@ -43,12 +43,13 @@ class TorSharedRepository(sharedPrefs: SharedPreferences, val networkRepository:
         const val currentTorBridge = "tari_current_tor_bridge"
         const val customTorBridges = "tari_custom_tor_bridges"
         const val torBinPath = "tari_wallet_tor_bin_path"
+        const val torrcBinPath = "tari_wallet_torrc_bin_path"
     }
 
-    var currentTorBridge: TorBridgeConfiguration? by SharedPrefGsonDelegate(
+    var currentTorBridges: TorBridgeConfigurationList? by SharedPrefGsonDelegate(
         sharedPrefs,
         formatKey(Key.currentTorBridge),
-        TorBridgeConfiguration::class.java
+        TorBridgeConfigurationList::class.java
     )
 
     var customTorBridges: TorBridgeConfigurationList? by SharedPrefGsonDelegate(
@@ -59,9 +60,10 @@ class TorSharedRepository(sharedPrefs: SharedPreferences, val networkRepository:
 
     var torBinPath: String? by SharedPrefStringDelegate(sharedPrefs, formatKey(Key.torBinPath))
 
+    var torrcBinPath: String? by SharedPrefStringDelegate(sharedPrefs, formatKey(Key.torrcBinPath))
 
     fun clear() {
-        currentTorBridge = null
+        currentTorBridges = null
         customTorBridges = TorBridgeConfigurationList()
         torBinPath = null
     }
@@ -70,6 +72,20 @@ class TorSharedRepository(sharedPrefs: SharedPreferences, val networkRepository:
         customTorBridges.orEmpty().apply {
             add(torBridgeConfiguration)
             customTorBridges = TorBridgeConfigurationList(this.distinct())
+        }
+    }
+
+    fun addCurrentTorBridge(torBridgeConfiguration: TorBridgeConfiguration) {
+        currentTorBridges.orEmpty().apply {
+            add(torBridgeConfiguration)
+            currentTorBridges = TorBridgeConfigurationList(this.distinct())
+        }
+    }
+
+    fun removeCurrentTorBridge(torBridgeConfiguration: TorBridgeConfiguration) {
+        currentTorBridges.orEmpty().apply {
+            remove(torBridgeConfiguration)
+            currentTorBridges = TorBridgeConfigurationList(this.distinct())
         }
     }
 

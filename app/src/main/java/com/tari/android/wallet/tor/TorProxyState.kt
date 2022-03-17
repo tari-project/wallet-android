@@ -44,5 +44,5 @@ sealed class TorProxyState {
 
     data class Running(val bootstrapStatus: TorBootstrapStatus) : TorProxyState()
 
-    object Failed : TorProxyState()
+    class Failed(val e: Throwable) : TorProxyState()
 }

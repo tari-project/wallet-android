@@ -545,5 +545,14 @@
     <string name="tor_bridges_scan_qr">Scan QR Code</string>
     <string name="tor_bridges_upload_qr_code">Upload QR Code</string>
     <string name="tor_bridges_incorrect_format">Incorrect tor bridge format</string>
+    <string name="tor_bridges_connecting_error_title">Connection error</string>
+    <string name="tor_bridges_connecting_error_description">Can\'t connect to the bridge because: %s</string>
+    <string name="tor_bridges_connection_progress_title">Connecting to the TOR</string>
+    <string name="tor_bridges_connection_progress_description">Trying to connect to the TOR</string>
+    <string name="tor_bridges_connection_progress_description_full">"Trying to connect to the TOR:\n%s\nProgress: %s%%"</string>
+    <string name="tor_bridges_connection_progress_successful_title">Connection to the TOR</string>
+    <string name="tor_bridges_connection_progress_successful_description">Connecting to TOR connection was established successfully\n</string>
+    <string name="tor_bridges_connection_progress_successful_no_bridges">No used bridges</string>
+    <string name="tor_bridges_connection_progress_successful_used_bridges">Used bridges\n</string>
 
 </resources>

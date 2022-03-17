@@ -38,7 +38,6 @@ import com.orhanobut.logger.Logger
 import com.tari.android.wallet.data.sharedPrefs.tor.TorSharedRepository
 import com.tari.android.wallet.event.EventBus
 import java.io.BufferedReader
-import java.io.File
 import java.io.InputStreamReader
 
 /**
@@ -67,18 +66,10 @@ internal class TorProxyManager(
 
     private fun installTorResources() {
         // install Tor geoip resources
-        val torResourceInstaller = TorResourceInstaller(context, context.filesDir)
-        torResourceInstaller.installGeoIPResources()
-        // check if there's an existing installation of Tor
-        val torBinPath = torSharedRepository.torBinPath
-        if (torBinPath != null) {
-            val torBinFile = File(torBinPath)
-            if (torBinFile.exists() && torBinFile.canExecute()) {
-                return
-            }
-        }
-        // get the Tor binary file and make it executable
-        torSharedRepository.torBinPath = torResourceInstaller.getTorBinaryFile().absolutePath
+        val torResourceInstaller = TorResourceInstaller(context, torSharedRepository, torConfig)
+        torResourceInstaller.installResources()
+        torSharedRepository.torBinPath = torResourceInstaller.fileTor.absolutePath
+        torSharedRepository.torrcBinPath = torResourceInstaller.fileTorrc.absolutePath
     }
 
     /**
@@ -92,51 +83,31 @@ internal class TorProxyManager(
         val response = BufferedReader(InputStreamReader(process.inputStream)).use(BufferedReader::readText)
         Logger.d("Tor proxy response: %s", response)
         process.waitFor()
-        // Tor proxy is down
-        EventBus.torProxyState.post(TorProxyState.Failed)
-    }
-
-    private fun getHashedPassword(password: String): String {
-        val cmd1 = "${torSharedRepository.torBinPath} DataDirectory ${appCacheHome.absolutePath} --hash-password my-secret"
-        Logger.d("Tor HASH CMD %s", cmd1)
-        val process = Runtime.getRuntime().exec(cmd1)
-        return BufferedReader(InputStreamReader(process.inputStream)).use(BufferedReader::readText)
+        Logger.d("Tor proxy stopped")
     }
 
     @Synchronized
     fun run() {
-        // start monitoring Tor on a separate thread
-        Thread { torProxyControl.startMonitoringTor() }.start()
-        try {
-            installTorResources()
-            var torCmdString =
-                "${torSharedRepository.torBinPath} DataDirectory ${appCacheHome.absolutePath} " +
-                        "--allow-missing-torrc --ignore-missing-torrc " +
-                        "--clientonly 1 " +
-                        "--socksport ${torConfig.proxyPort} " +
-                        "--controlport ${torConfig.controlHost}:${torConfig.controlPort} " +
-                        "--CookieAuthentication 1 " +
-                        "--Socks5ProxyUsername ${torConfig.sock5Username} " +
-                        "--Socks5ProxyPassword ${torConfig.sock5Password} " +
-                        "--clientuseipv6 1 " /*+
-                        "--ClientTransportPlugin obfs4 socks5 ${torConfig.controlHost}:47351 " +
-                        "--ClientTransportPlugin \"meek_lite Socks5Proxy ${torConfig.controlHost}:47352\"" */
-            torSharedRepository.currentTorBridge?.let {
-                torCmdString += "--bridge ${it.transportTechnology} ${it.ip}:${it.port} ${it.fingerprint}"
-                if (it.transportTechnology.isNotBlank()) {
-                    //obfs4, obfs3, meek-azure, fte
-                    //todo
-                }
-                torCmdString += "--usebridges 1 "
+        Thread {
+            try {
+                // start monitoring Tor on a separate thread
+                Thread { torProxyControl.startMonitoringTor() }.start()
+
+                installTorResources()
+
+                val torCmdString = "${torSharedRepository.torBinPath} DataDirectory ${appCacheHome.absolutePath} " +
+                        "--defaults-torrc ${torSharedRepository.torrcBinPath}.custom"
+
+                exec(torCmdString)
+            } catch (throwable: Throwable) {
+                Logger.e(throwable.message.orEmpty())
+                EventBus.torProxyState.post(TorProxyState.Failed(throwable))
             }
-            exec(torCmdString)
-        } catch (throwable: Throwable) {
-            Logger.e("THROWABLE")
-            EventBus.torProxyState.post(TorProxyState.Failed)
-        }
+        }.start()
     }
 
     fun shutdown() {
         torProxyControl.shutdownTor()
+        EventBus.torProxyState.post(TorProxyState.NotReady)
     }
 }

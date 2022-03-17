@@ -1,5 +1,7 @@
 package com.tari.android.wallet.tor
 
+import com.orhanobut.logger.Logger
+
 data class TorBootstrapStatus(val progress: Int, val summary: String, val warning: String? = null) {
 
     companion object {
@@ -9,6 +11,7 @@ data class TorBootstrapStatus(val progress: Int, val summary: String, val warnin
         const val maxProgress = 100
 
         fun from(logLine: String): TorBootstrapStatus {
+            Logger.i("tor connection status: $logLine")
             if (warningLogRegex.matches(logLine)) {
                 val matchResult = warningLogRegex.find(logLine)
                 val (progress, summary, warning) = matchResult!!.destructured

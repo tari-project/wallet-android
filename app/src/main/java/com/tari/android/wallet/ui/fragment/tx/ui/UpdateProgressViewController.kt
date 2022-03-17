@@ -231,9 +231,7 @@ internal class UpdateProgressViewController(
         if (torProxyState !is TorProxyState.Running) {
             // either not connected or Tor proxy is not running
             Logger.e("Update error: Tor proxy is not running.")
-            view.postDelayed({
-                fail(FailureReason.BASE_NODE_VALIDATION_ERROR)
-            }, minStateDisplayPeriodMs)
+            view.postDelayed({ fail(FailureReason.BASE_NODE_VALIDATION_ERROR) }, minStateDisplayPeriodMs)
             return
         }
         // check Tor bootstrap status

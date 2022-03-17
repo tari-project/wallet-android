@@ -8,6 +8,6 @@ data class TorBridgeConfiguration(
     val certificate: String = "",
     val iatMode: String = ""
 ) {
-    override fun toString(): String = "$transportTechnology $ip:$port $fingerprint ${if (certificate.isNotBlank()) "cert=$certificate" else ""}" +
-            "${if (iatMode.isNotBlank()) "iat-mode=$iatMode" else ""}\""
+    override fun toString(): String = ("$transportTechnology $ip:$port $fingerprint ${if (certificate.isNotBlank()) "cert=$certificate" else ""} " +
+            if (iatMode.isNotBlank()) "iat-mode=$iatMode" else "").trim()
 }

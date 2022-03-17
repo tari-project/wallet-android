@@ -41,7 +41,8 @@ class TorBridgesSelectionFragment : CommonFragment<FragmentTorBridgeSelectionBin
         backCtaView.setOnThrottledClickListener { requireActivity().onBackPressed() }
         torBridgesList.layoutManager = LinearLayoutManager(requireContext())
         torBridgesList.adapter = adapter
-        adapter.setClickListener(CommonAdapter.ItemClickListener { viewModel.select(it) })
+        adapter.setClickListener(CommonAdapter.ItemClickListener { viewModel.preselect(it) })
+        connectButton.setOnClickListener { viewModel.connect() }
     }
 
     private fun observeUI() = with(viewModel) {
