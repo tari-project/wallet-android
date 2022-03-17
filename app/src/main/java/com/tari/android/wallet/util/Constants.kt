@@ -134,7 +134,6 @@ internal object Constants {
      * Wallet constants.
      */
     object Wallet {
-        const val torPort = 18101
         const val maxNumberOfRollingLogFiles = 2
         const val rollingLogFileMaxSizeBytes = 10 * 1024 * 1024
         const val discoveryTimeoutSec = 20L

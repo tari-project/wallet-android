@@ -12,6 +12,7 @@
     <string name="privacy_policy_url">https://www.tari.com/privacy_policy/</string>
     <string name="disclaimer_url">https://www.tari.com/disclaimer/</string>
     <string name="explorer_url">https://explore.tari.com</string>
+    <string name="tor_bridges_url">https://bridges.torproject.org/bridges</string>
     <string name="ffi_admin_email_address" translatable="false">bug_reports@tari.com</string>
     <string name="tari_lab_university_url" translatable="false">https://tlu.tarilabs.com/</string>
     <string name="network_faucet_url" translatable="false">https://faucet.tari.com</string>
@@ -387,6 +388,7 @@
     <string name="all_settings_disclaimer">Disclaimer</string>
     <string name="all_settings_explorer">Block Explorer</string>
     <string name="all_settings_background_service">Background Service</string>
+    <string name="all_settings_bridge_configuration">Bridge Configuration</string>
     <string name="all_settings_manage_yats">Manage Yats</string>
     <string name="all_settings_connect_yats">Connect Yats</string>
     <string name="all_settings_select_base_node">Select Base Node</string>
@@ -531,5 +533,26 @@
     <string name="connection_status_error_connecting_with_tor">Connecting with Tor</string>
     <string name="connection_status_error_unknown_tor_connection_status">Unknown connection status with Tor</string>
     <string name="connection_status_error_disconnected_from_base_node">Disconnected from the base node</string>
+
+    <string name="tor_bridges_title">Bridges Configuration</string>
+    <string name="tor_bridges_connect">Connect</string>
+    <string name="tor_bridges_no_bridges">No Bridges</string>
+    <string name="tor_bridges_custom_bridges">Custom Bridges</string>
+    <string name="tor_bridges_description">If you are in a country or using a connection that censor Tor, you might need to use bridges</string>
+    <string name="tor_bridges_paste_bridges">Paste Bridges</string>
+    <string name="tor_bridges_hint" formatted="false">Available formates:\n• obfs4 &lt;IP ADDRESS>:&lt;PORT> &lt;FINGERPRINT> cert=&lt;CERTIFICATE> iat-mode=&lt;value>\nexample:\nobfs4 192.95.36.142:443 CDF2E852BF539B82BD10E27E9115A31734E378C2 cert=qUVQ0srL1JI/vO6V6m/24anYXiJD3QP2HgzUKQtQ7GRqqUvs7P+tG43RtAqdhLOALP7DJQ iat-mode=1\n\n • &lt;IP ADDRESS>:&lt;PORT> &lt;FINGERPRINT>\nexample:\n78.156.103.189:9301 2BD90810282F8B331FC7D47705167166253E1442"</string>
+    <string name="tor_bridges_request">Request Bridges from torproject.org</string>
+    <string name="tor_bridges_scan_qr">Scan QR Code</string>
+    <string name="tor_bridges_upload_qr_code">Upload QR Code</string>
+    <string name="tor_bridges_incorrect_format">Incorrect tor bridge format</string>
+    <string name="tor_bridges_connecting_error_title">Connection error</string>
+    <string name="tor_bridges_connecting_error_description">Can\'t connect to the bridge because: %s</string>
+    <string name="tor_bridges_connection_progress_title">Connecting to the TOR</string>
+    <string name="tor_bridges_connection_progress_description">Trying to connect to the TOR</string>
+    <string name="tor_bridges_connection_progress_description_full">"Trying to connect to the TOR:\n%s\nProgress: %s%%"</string>
+    <string name="tor_bridges_connection_progress_successful_title">Connection to the TOR</string>
+    <string name="tor_bridges_connection_progress_successful_description">Connecting to TOR connection was established successfully\n</string>
+    <string name="tor_bridges_connection_progress_successful_no_bridges">No used bridges</string>
+    <string name="tor_bridges_connection_progress_successful_used_bridges">Used bridges\n</string>
 
 </resources>

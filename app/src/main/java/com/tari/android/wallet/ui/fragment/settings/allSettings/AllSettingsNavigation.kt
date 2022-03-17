@@ -4,6 +4,7 @@ sealed class AllSettingsNavigation() {
     object ToBackupSettings : AllSettingsNavigation()
     object ToDeleteWallet : AllSettingsNavigation()
     object ToBackgroundService : AllSettingsNavigation()
+    object ToTorBridges : AllSettingsNavigation()
     object ToNetworkSelection : AllSettingsNavigation()
     object ToBaseNodeSelection : AllSettingsNavigation()
 }

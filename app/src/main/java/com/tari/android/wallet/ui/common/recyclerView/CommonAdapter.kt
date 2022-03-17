@@ -24,11 +24,22 @@ abstract class CommonAdapter<T : CommonViewHolderItem>(): RecyclerView.Adapter<C
 
     override fun getItemViewType(position: Int): Int {
         val item = items[position]
-        val builder = viewHolderBuilders.firstOrNull { it.itemJavaClass == item.javaClass }
+        val builder = viewHolderBuilders.firstOrNull { it.itemJavaClass == item.javaClass || isFitSuperclass(item.javaClass, it.itemJavaClass, ) }
 
         builder ?: throw Exception("Нет такого билдера \nнужный: ${item.javaClass} \nposition: $position \n$viewHolderBuilders \n${item.javaClass}")
 
         return viewHolderBuilders.indexOf<ViewHolderBuilder?>(builder)
+    }
+
+    private fun isFitSuperclass(startClass: Class<*>, superClass: Class<*>) : Boolean {
+        var currentClass: Class<*>? = startClass
+        while (currentClass != null) {
+            if (currentClass == superClass) {
+                return true
+            }
+            currentClass = currentClass.superclass
+        }
+        return false
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CommonViewHolder<T, ViewBinding> {

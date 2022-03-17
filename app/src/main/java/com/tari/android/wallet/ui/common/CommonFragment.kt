@@ -50,6 +50,10 @@ abstract class CommonFragment<Binding : ViewBinding, VM : CommonViewModel> : Fra
 
         observe(loadingDialog) { if (it.isShow) replaceDialog(TariProgressDialog(requireContext(), it)) else currentDialog?.dismiss() }
 
+        observe(loadingDialog) { if (it.isShow) replaceDialog(TariProgressDialog(requireContext(), it)) else currentDialog?.dismiss() }
+
+        observe(dismissDialog) { currentDialog?.dismiss() }
+
         observe(blockedBackPressed) {
             blockingBackPressDispatcher.isEnabled = it
         }
@@ -62,6 +66,11 @@ abstract class CommonFragment<Binding : ViewBinding, VM : CommonViewModel> : Fra
     }
 
     protected fun replaceDialog(dialog: TariDialog) {
+        val currentLoadingDialog = currentDialog as? TariProgressDialog
+        if (currentLoadingDialog != null && currentLoadingDialog.isShowing() && dialog is TariProgressDialog) {
+            (currentDialog as TariProgressDialog).applyArgs(dialog.progressDialogArgs)
+            return
+        }
         currentDialog?.dismiss()
         currentDialog = dialog.also { it.show() }
     }

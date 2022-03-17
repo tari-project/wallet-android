@@ -48,7 +48,6 @@ import com.tari.android.wallet.ui.extension.setOnThrottledClickListener
 import com.tari.android.wallet.ui.fragment.settings.networkSelection.networkItem.NetworkAdapter
 import com.tari.android.wallet.ui.fragment.settings.networkSelection.networkItem.NetworkViewHolderItem
 
-
 class NetworkSelectionFragment : CommonFragment<FragmentNetworkSelectionBinding, NetworkSelectionViewModel>() {
 
     private var adapter: NetworkAdapter = NetworkAdapter()

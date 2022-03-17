@@ -83,6 +83,8 @@ import com.tari.android.wallet.ui.fragment.settings.allSettings.AllSettingsFragm
 import com.tari.android.wallet.ui.fragment.settings.allSettings.AllSettingsRouter
 import com.tari.android.wallet.ui.fragment.settings.backgroundService.BackgroundServiceSettingsActivity
 import com.tari.android.wallet.ui.fragment.settings.networkSelection.NetworkSelectionFragment
+import com.tari.android.wallet.ui.fragment.settings.torBridges.TorBridgesSelectionFragment
+import com.tari.android.wallet.ui.fragment.settings.torBridges.customBridges.CustomTorBridgesFragment
 import com.tari.android.wallet.ui.fragment.store.StoreFragment
 import com.tari.android.wallet.ui.fragment.tx.TxListFragment
 import com.tari.android.wallet.ui.fragment.tx.TxListRouter
@@ -316,6 +318,10 @@ internal class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>
 
     override fun toBaseNodeSelection() = loadFragment(ChangeBaseNodeFragment())
 
+    override fun toTorBridges() = loadFragment(TorBridgesSelectionFragment())
+
+    override fun toCustomTorBridges() = loadFragment(CustomTorBridgesFragment())
+
     override fun toNetworkSelection() = loadFragment(NetworkSelectionFragment())
 
     override fun toAddCustomBaseNode() = loadFragment(AddCustomBaseNodeFragment())
@@ -330,7 +336,7 @@ internal class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>
                 R.anim.enter_from_left, R.anim.exit_to_right
             )
             .apply { supportFragmentManager.fragments.forEach { hide(it) } }
-            .add(R.id.nav_container, fragment)
+            .replace(R.id.nav_container, fragment)
             .addToBackStack(null)
             .commit()
     }

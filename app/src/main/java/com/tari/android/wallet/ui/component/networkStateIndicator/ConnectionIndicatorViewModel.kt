@@ -41,7 +41,7 @@ internal class ConnectionIndicatorViewModel : CommonViewModel() {
             NetworkConnectionState.DISCONNECTED -> ConnectionIndicatorState.Disconnected(R.string.connection_status_error_no_network_connection)
             NetworkConnectionState.CONNECTED -> {
                 when (_torProxyState.value) {
-                    TorProxyState.Failed -> ConnectionIndicatorState.Disconnected(R.string.connection_status_error_disconnected_from_tor)
+                    is TorProxyState.Failed -> ConnectionIndicatorState.Disconnected(R.string.connection_status_error_disconnected_from_tor)
                     TorProxyState.Initializing -> ConnectionIndicatorState.Disconnected(R.string.connection_status_error_unknown_network_connection_status)
                     TorProxyState.NotReady -> ConnectionIndicatorState.Disconnected(R.string.connection_status_error_connecting_with_tor)
                     is TorProxyState.Running -> {

@@ -9,6 +9,7 @@ import android.widget.LinearLayout
 import com.tari.android.wallet.R
 import com.tari.android.wallet.databinding.DialogConfirmDefaultBinding
 import com.tari.android.wallet.ui.dialog.TariDialog
+import com.tari.android.wallet.ui.extension.setVisible
 import com.tari.android.wallet.ui.extension.string
 
 class ConfirmDialog(context: Context, args: ConfirmDialogArgs) : TariDialog {
@@ -33,6 +34,7 @@ class ConfirmDialog(context: Context, args: ConfirmDialogArgs) : TariDialog {
                 setOnDismissListener { onDismiss() }
                 ui.title.text = title
                 ui.description.text = description
+                ui.cancelButton.setVisible(cancelable)
                 ui.cancelButton.text = cancelButtonText ?: context.string(R.string.common_cancel)
                 ui.confirmButton.text = confirmButtonText ?: context.string(R.string.common_confirm)
 
@@ -51,6 +53,8 @@ class ConfirmDialog(context: Context, args: ConfirmDialogArgs) : TariDialog {
     override fun show() = dialog.show()
 
     override fun dismiss() = dialog.dismiss()
+
+    override fun isShowing() : Boolean = dialog.isShowing
 
     private fun getStyleRes(confirmStyle: ConfirmStyle) = when (confirmStyle) {
         ConfirmStyle.Warning -> R.layout.dialog_confirm_warning

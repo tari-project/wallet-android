@@ -31,4 +31,6 @@ internal class TtlStoreWalletDialog(context: Context, args: TtlStoreWalletDialog
     override fun show() = dialog.show()
 
     override fun dismiss() = dialog.dismiss()
+
+    override fun isShowing() : Boolean = dialog.isShowing
 }
