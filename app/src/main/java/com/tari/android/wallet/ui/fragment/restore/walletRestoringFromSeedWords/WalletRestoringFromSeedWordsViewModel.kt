@@ -72,7 +72,7 @@ internal class WalletRestoringFromSeedWordsViewModel() : CommonViewModel() {
     private fun startRestoringOnNode(baseNode: BaseNodeDto) {
         try {
             val baseNodeFFI = FFIPublicKey(HexString(baseNode.publicKeyHex))
-            val result = FFIWallet.instance?.startRecovery(baseNodeFFI)
+            val result = FFIWallet.instance?.startRecovery(baseNodeFFI, resourceManager.getString(R.string.restore_wallet_output_message))
             if (result == true) {
                 subscribeOnRestorationState()
                 return

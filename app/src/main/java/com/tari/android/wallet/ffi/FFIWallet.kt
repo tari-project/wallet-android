@@ -203,7 +203,13 @@ internal class FFIWallet(
 
     private external fun jniRemoveEncryption(libError: FFIError)
 
-    private external fun jniStartRecovery(base_node_public_key: FFIPublicKey, callback: String, callback_sig: String, libError: FFIError): Boolean
+    private external fun jniStartRecovery(
+        base_node_public_key: FFIPublicKey,
+        callback: String,
+        callback_sig: String,
+        recoveryOutputMessage: String,
+        libError: FFIError
+    ): Boolean
 
     private external fun jniDestroy()
 
@@ -742,9 +748,9 @@ internal class FFIWallet(
         return result
     }
 
-    fun startRecovery(baseNodePublicKey: FFIPublicKey): Boolean {
+    fun startRecovery(baseNodePublicKey: FFIPublicKey, recoveryOutputMessage: String): Boolean {
         val error = FFIError()
-        val result = jniStartRecovery(baseNodePublicKey, this::onWalletRecovery.name, "(I[B[B)V", error)
+        val result = jniStartRecovery(baseNodePublicKey, this::onWalletRecovery.name, "(I[B[B)V", recoveryOutputMessage, error)
         throwIf(error)
         return result
     }

@@ -236,6 +236,7 @@
     <string name="tx_list_now">Now</string>
     <string name="tx_list_loading_gif">Loading GIF</string>
     <string name="tx_list_retry_loading_gif">Retry loading GIF</string>
+    <string name="tx_list_emoji_one_side_payment_placeholder">➡️</string>
     <string name="tx_list_someone">Someone</string>
     <string name="tx_list_you_received_one_side_payment">You received a one side payment</string>
 
@@ -476,6 +477,7 @@
     <string name="restore_wallet_error_file_not_found">Wallet could not be restored. Backup does not exist.</string>
     <string name="restore_wallet_restore_cta">Restore Wallet</string>
     <string name="restore_wallet_password_match_error">@string/enter_backup_password_password_match_error</string>
+    <string name="restore_wallet_output_message">You recovered some funds</string>
 
     <!-- Wallet recovery with seed phrase -->
     <string name="restore_from_seed_words_title">Restore With Seed Phrase</string>

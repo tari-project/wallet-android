@@ -1489,6 +1489,7 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniStartRecovery(
         jobject base_node_public_key,
         jstring callback,
         jstring callback_sig,
+        jstring recovery_output_message,
         jobject error) {
     int errorCode = 0;
     int *errorCodePointer = &errorCode;
@@ -1507,11 +1508,9 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniStartRecovery(
     }
 
     auto *pWallet = reinterpret_cast<TariWallet *>(lWallet);
+    const char *pRecoveryOutputMessage = jEnv->GetStringUTFChars(recovery_output_message, JNI_FALSE);
 
-    //todo
-    char *pAmountEnd;
-
-    jboolean result = wallet_start_recovery(pWallet, pTariPublicKey, recoveringProcessCompleteCallback, pAmountEnd, errorCodePointer);
+    jboolean result = wallet_start_recovery(pWallet, pTariPublicKey, recoveringProcessCompleteCallback, pRecoveryOutputMessage, errorCodePointer);
     setErrorCode(jEnv, error, errorCode);
     return result;
 }
