@@ -80,11 +80,13 @@ import com.tari.android.wallet.ui.fragment.settings.backup.backupSettings.Backup
 import com.tari.android.wallet.ui.fragment.settings.backup.backupSettings.BackupSettingsViewModel
 import com.tari.android.wallet.ui.fragment.settings.backup.verifySeedPhrase.VerifySeedPhraseViewModel
 import com.tari.android.wallet.ui.fragment.settings.networkSelection.NetworkSelectionViewModel
+import com.tari.android.wallet.ui.fragment.settings.torBridges.TorBridgesSelectionViewModel
+import com.tari.android.wallet.ui.fragment.settings.torBridges.customBridges.CustomTorBridgesViewModel
 import com.tari.android.wallet.ui.fragment.settings.userAutorization.BiometricAuthenticationViewModel
 import com.tari.android.wallet.ui.fragment.tx.TxListFragment
 import com.tari.android.wallet.ui.fragment.tx.TxListViewModel
-import com.tari.android.wallet.ui.fragment.tx.details.gif.GIFViewModel
 import com.tari.android.wallet.ui.fragment.tx.details.TxDetailsFragment
+import com.tari.android.wallet.ui.fragment.tx.details.gif.GIFViewModel
 import dagger.Component
 import javax.inject.Singleton
 
@@ -181,6 +183,8 @@ internal interface ApplicationComponent {
     fun inject(walletInfoViewModel: WalletInfoViewModel)
     fun inject(requestTariViewModel: RequestTariViewModel)
     fun inject(addAmountViewModel: AddAmountViewModel)
+    fun inject(torBridgesSelectionViewModel: TorBridgesSelectionViewModel)
+    fun inject(customTorBridgeViewModel: CustomTorBridgesViewModel)
     /**
      * Service(s).
      */

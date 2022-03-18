@@ -54,6 +54,9 @@ open class CommonViewModel : ViewModel() {
     protected val _loadingDialog = SingleLiveEvent<ProgressDialogArgs>()
     val loadingDialog: LiveData<ProgressDialogArgs> = _loadingDialog
 
+    protected val _dissmissDialog = SingleLiveEvent<Unit>()
+    val dismissDialog: LiveData<Unit> = _dissmissDialog
+
     protected val _blockedBackPressed = SingleLiveEvent<Boolean>()
     val blockedBackPressed: LiveData<Boolean> = _blockedBackPressed
 }

@@ -82,9 +82,7 @@ internal class WalletManager(
      */
     @Synchronized
     fun start() {
-        Thread {
-            torManager.run()
-        }.start()
+        torManager.run()
         // subscribe to Tor proxy state changes
         EventBus.torProxyState.subscribe(this, this::onTorProxyStateChanged)
     }
@@ -98,6 +96,7 @@ internal class WalletManager(
         FFIWallet.instance?.destroy()
         FFIWallet.instance = null
         EventBus.walletState.post(WalletState.NotReady)
+        EventBus.torProxyState.post(TorProxyState.NotReady)
         // stop tor proxy
         EventBus.torProxyState.unsubscribe(this)
         torManager.shutdown()

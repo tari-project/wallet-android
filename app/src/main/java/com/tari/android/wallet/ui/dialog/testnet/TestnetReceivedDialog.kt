@@ -34,4 +34,6 @@ internal class TestnetReceivedDialog(context: Context, args: TestnetReceivedDial
     override fun show() = dialog.show()
 
     override fun dismiss() = dialog.dismiss()
+
+    override fun isShowing() : Boolean = dialog.isShowing
 }

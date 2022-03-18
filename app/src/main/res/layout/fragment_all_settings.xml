@@ -545,6 +545,37 @@
                     android:background="@color/settings_background" />
 
                 <FrameLayout
+                    android:id="@+id/tor_bridges_cta"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/menu_item_height"
+                    android:background="@drawable/setting_option_background"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:paddingHorizontal="@dimen/common_horizontal_margin">
+
+                    <com.tari.android.wallet.ui.component.CustomFontTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical|start"
+                        android:text="@string/all_settings_bridge_configuration"
+                        android:textColor="@color/black"
+                        android:textSize="15sp"
+                        app:customFont="@string/font_medium" />
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical|end"
+                        android:src="@drawable/icon_apply_setting" />
+                </FrameLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginHorizontal="25dp"
+                    android:background="@color/settings_background" />
+
+                <FrameLayout
                     android:id="@+id/change_network_cta_view"
                     android:layout_width="match_parent"
                     android:layout_height="@dimen/menu_item_height"

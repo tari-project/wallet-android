@@ -116,9 +116,9 @@ internal class AllSettingsFragment : CommonFragment<FragmentAllSettingsBinding, 
         explorerCtaView.setOnThrottledClickListener { viewModel.openExplorerUrl() }
         backUpWalletCtaView.setOnThrottledClickListener { viewModel.navigateToBackupSettings() }
         backgroundServiceCtaView.setOnThrottledClickListener { viewModel.navigateToBackgroundServiceSettings() }
+        torBridgesCta.setOnThrottledClickListener { viewModel.navigateToTorBridgesSettings() }
         changeBaseNodeCtaView.setOnThrottledClickListener { viewModel.navigateToBaseNodeSelection() }
         changeNetworkCtaView.setOnThrottledClickListener { viewModel.navigateToNetworkSelection() }
-        backgroundServiceCtaView.setOnThrottledClickListener { viewModel.navigateToBackgroundServiceSettings() }
         deleteWalletCtaView.setOnThrottledClickListener { viewModel.navigateToDeleteWallet() }
         connectYats.setOnThrottledClickListener { yatAdapter.openOnboarding(requireActivity()) }
         networkInfoCtaView.setOnThrottledClickListener { copy(viewModel.versionInfo.value.orEmpty()) }
@@ -187,6 +187,7 @@ internal class AllSettingsFragment : CommonFragment<FragmentAllSettingsBinding, 
             AllSettingsNavigation.ToBaseNodeSelection -> router.toBaseNodeSelection()
             AllSettingsNavigation.ToDeleteWallet -> router.toDeleteWallet()
             AllSettingsNavigation.ToNetworkSelection -> router.toNetworkSelection()
+            AllSettingsNavigation.ToTorBridges -> router.toTorBridges()
         }
     }
 
