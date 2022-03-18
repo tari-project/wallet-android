@@ -99,6 +99,8 @@ internal class FFIWallet(
         callbackTxCancellationSig: String,
         callbackTXOValidationComplete: String,
         callbackTXOValidationCompleteSig: String,
+        callbackContactsLivenessDataUpdated: String,
+        callbackContactsLivenessDataUpdatedSig: String,
         callbackBalanceUpdated: String,
         callbackBalanceUpdatedSig: String,
         callbackTransactionValidationComplete: String,
@@ -201,7 +203,13 @@ internal class FFIWallet(
 
     private external fun jniRemoveEncryption(libError: FFIError)
 
-    private external fun jniStartRecovery(base_node_public_key: FFIPublicKey, callback: String, callback_sig: String, libError: FFIError): Boolean
+    private external fun jniStartRecovery(
+        base_node_public_key: FFIPublicKey,
+        callback: String,
+        callback_sig: String,
+        recoveryOutputMessage: String,
+        libError: FFIError
+    ): Boolean
 
     private external fun jniDestroy()
 
@@ -235,6 +243,7 @@ internal class FFIWallet(
                     this::onStoreAndForwardSendResult.name, "([BZ)V",
                     this::onTxCancelled.name, "(J[B)V",
                     this::onTXOValidationComplete.name, "([BZ)V",
+                    this::onContactLivenessDataUpdated.name, "(J)V",
                     this::onBalanceUpdated.name, "(J)V",
                     this::onTxValidationComplete.name, "([BZ)V",
                     this::onConnectivityStatus.name, "([B)V",
@@ -547,6 +556,14 @@ internal class FFIWallet(
         GlobalScope.launch { listener?.onTxValidationComplete(requestId, isSuccess) }
     }
 
+    /**
+     * This callback function cannot be private due to JNI behaviour.
+     */
+    @Suppress("MemberVisibilityCanBePrivate")
+    fun onContactLivenessDataUpdated(livedessUpdate: FFIPointer) {
+        Logger.i("OnContactLivenessDataUpdated. Pointer: %s", livedessUpdate.toString())
+    }
+
     fun estimateTxFee(amount: BigInteger, gramFee: BigInteger, kernelCount: BigInteger, outputCount: BigInteger): BigInteger {
         val error = FFIError()
         val bytes = jniEstimateTxFee(amount.toString(), gramFee.toString(), kernelCount.toString(), outputCount.toString(), error)
@@ -731,9 +748,9 @@ internal class FFIWallet(
         return result
     }
 
-    fun startRecovery(baseNodePublicKey: FFIPublicKey): Boolean {
+    fun startRecovery(baseNodePublicKey: FFIPublicKey, recoveryOutputMessage: String): Boolean {
         val error = FFIError()
-        val result = jniStartRecovery(baseNodePublicKey, this::onWalletRecovery.name, "(I[B[B)V", error)
+        val result = jniStartRecovery(baseNodePublicKey, this::onWalletRecovery.name, "(I[B[B)V", recoveryOutputMessage, error)
         throwIf(error)
         return result
     }

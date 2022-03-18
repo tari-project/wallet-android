@@ -94,6 +94,7 @@ jmethodID txFauxUnconfirmedCallbackMethodId;
 jmethodID directSendResultCallbackMethodId;
 jmethodID storeAndForwardSendResultCallbackMethodId;
 jmethodID txCancellationCallbackMethodId;
+jmethodID contactsLivenessDataUpdatedCallbackMethodId;
 jmethodID connectivityStatusCallbackId;
 jmethodID txoValidationCompleteCallbackMethodId;
 jmethodID transactionValidationCompleteCallbackMethodId;
@@ -267,6 +268,19 @@ void txoValidationCompleteCallback(unsigned long long requestId, bool success) {
     g_vm->DetachCurrentThread();
 }
 
+void contactsLivenessDataUpdatedCallback(struct TariContactsLivenessData *pTariContactsLivenessData) {
+    auto *jniEnv = getJNIEnv();
+    if (jniEnv == nullptr || callbackHandler == nullptr) {
+        return;
+    }
+    auto jpTariContactsLivenessData = reinterpret_cast<jlong>(pTariContactsLivenessData);
+    jniEnv->CallVoidMethod(
+            callbackHandler,
+            contactsLivenessDataUpdatedCallbackMethodId,
+            jpTariContactsLivenessData);
+    g_vm->DetachCurrentThread();
+}
+
 void transactionValidationCompleteCallback(unsigned long long requestId, bool success) {
     auto *jniEnv = getJNIEnv();
     if (jniEnv == nullptr || callbackHandler == nullptr) {
@@ -294,7 +308,7 @@ void connectivityStatusCallback(unsigned long long status) {
     g_vm->DetachCurrentThread();
 }
 
-void balanceUpdatedCallback(struct TariBalance* pBalance) {
+void balanceUpdatedCallback(struct TariBalance *pBalance) {
     auto *jniEnv = getJNIEnv();
     if (jniEnv == nullptr || callbackHandler == nullptr) {
         return;
@@ -372,6 +386,8 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniCreate(
         jstring callback_tx_cancellation_sig,
         jstring callback_txo_validation_complete,
         jstring callback_txo_validation_complete_sig,
+        jstring callback_contacts_liveness_data_updated,
+        jstring callback_contacts_liveness_data_updated_sig,
         jstring callback_balance_updated,
         jstring callback_balance_updated_sig,
         jstring callback_transaction_validation_complete,
@@ -516,7 +532,16 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniCreate(
         SetPointerField(jEnv, jThis, reinterpret_cast<jlong>(nullptr));
     }
 
-   balanceUpdatedCallbackMethodId = getMethodId(
+    contactsLivenessDataUpdatedCallbackMethodId = getMethodId(
+            jEnv,
+            jThis,
+            callback_contacts_liveness_data_updated,
+            callback_contacts_liveness_data_updated_sig);
+    if (contactsLivenessDataUpdatedCallbackMethodId == nullptr) {
+        SetPointerField(jEnv, jThis, reinterpret_cast<jlong>(nullptr));
+    }
+
+    balanceUpdatedCallbackMethodId = getMethodId(
             jEnv,
             jThis,
             callback_balance_updated,
@@ -566,6 +591,7 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniCreate(
             txStoreAndForwardSendResultCallback,
             txCancellationCallback,
             txoValidationCompleteCallback,
+            contactsLivenessDataUpdatedCallback,
             balanceUpdatedCallback,
             transactionValidationCompleteCallback,
             storeAndForwardMessagesReceivedCallback,
@@ -1463,6 +1489,7 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniStartRecovery(
         jobject base_node_public_key,
         jstring callback,
         jstring callback_sig,
+        jstring recovery_output_message,
         jobject error) {
     int errorCode = 0;
     int *errorCodePointer = &errorCode;
@@ -1481,8 +1508,9 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniStartRecovery(
     }
 
     auto *pWallet = reinterpret_cast<TariWallet *>(lWallet);
+    const char *pRecoveryOutputMessage = jEnv->GetStringUTFChars(recovery_output_message, JNI_FALSE);
 
-    jboolean result = wallet_start_recovery(pWallet, pTariPublicKey, recoveringProcessCompleteCallback, errorCodePointer);
+    jboolean result = wallet_start_recovery(pWallet, pTariPublicKey, recoveringProcessCompleteCallback, pRecoveryOutputMessage, errorCodePointer);
     setErrorCode(jEnv, error, errorCode);
     return result;
 }

@@ -8,7 +8,7 @@ buildscript {
     ext.versionNumber = "0.11.0"
 
     // JNI libs
-    ext.libwalletVersion = "0.28.1"
+    ext.libwalletVersion = "0.30.0"
     ext.libwalletHostURL = "https://tari-binaries.s3.amazonaws.com/libwallet/"
     ext.supportedABIs = ["arm64-v8a", "x86_64"]
 
