@@ -36,7 +36,6 @@ import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.fragment.app.Fragment
 import com.tari.android.wallet.R
-import com.tari.android.wallet.application.DeepLink
 import com.tari.android.wallet.databinding.ActivitySendTariBinding
 import com.tari.android.wallet.di.DiContainer.appComponent
 import com.tari.android.wallet.event.Event
@@ -104,7 +103,7 @@ internal class SendTariActivity : CommonActivity<ActivitySendTariBinding, SendTa
         if (recipientUser != null) {
             val bundle = Bundle().apply {
                 putParcelable("recipientUser", recipientUser)
-                intent.getDoubleExtra(DeepLink.PARAMETER_AMOUNT, Double.MIN_VALUE).takeIf { it > 0 }?.let { putDouble(DeepLink.PARAMETER_AMOUNT, it) }
+                intent.getDoubleExtra(PARAMETER_AMOUNT, Double.MIN_VALUE).takeIf { it > 0 }?.let { putDouble(PARAMETER_AMOUNT, it) }
             }
             addFragment(AddAmountFragment(), bundle, true)
         } else {
@@ -140,7 +139,7 @@ internal class SendTariActivity : CommonActivity<ActivitySendTariBinding, SendTa
             putParcelable("recipientUser", recipientUser)
             putParcelable("amount", amount)
             putBoolean("isOneSidePayment", isOneSidePayment)
-            intent.getStringExtra(DeepLink.PARAMETER_NOTE)?.let { putString(DeepLink.PARAMETER_NOTE, it) }
+            intent.getStringExtra(PARAMETER_NOTE)?.let { putString(PARAMETER_NOTE, it) }
         }
         addFragment(AddNoteFragment(), bundle)
     }
@@ -184,6 +183,9 @@ internal class SendTariActivity : CommonActivity<ActivitySendTariBinding, SendTa
     }
 
     companion object {
+        const val PARAMETER_NOTE = "note"
+        const val PARAMETER_AMOUNT = "amount"
+
         var instance: WeakReference<SendTariActivity> = WeakReference(null)
             private set
     }

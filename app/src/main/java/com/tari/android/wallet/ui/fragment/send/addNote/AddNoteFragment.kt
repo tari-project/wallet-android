@@ -62,7 +62,6 @@ import com.orhanobut.logger.Logger
 import com.tari.android.wallet.R
 import com.tari.android.wallet.R.color.*
 import com.tari.android.wallet.R.dimen.*
-import com.tari.android.wallet.application.DeepLink
 import com.tari.android.wallet.databinding.FragmentAddNoteBinding
 import com.tari.android.wallet.di.DiContainer.appComponent
 import com.tari.android.wallet.event.EventBus
@@ -76,6 +75,7 @@ import com.tari.android.wallet.ui.common.gyphy.repository.GIFItem
 import com.tari.android.wallet.ui.component.EmojiIdSummaryViewController
 import com.tari.android.wallet.ui.component.FullEmojiIdViewController
 import com.tari.android.wallet.ui.extension.*
+import com.tari.android.wallet.ui.fragment.send.activity.SendTariActivity
 import com.tari.android.wallet.ui.fragment.send.addNote.gif.*
 import com.tari.android.wallet.ui.fragment.send.addNote.gif.ThumbnailGIFsViewModel.Companion.REQUEST_CODE_GIF
 import com.tari.android.wallet.ui.fragment.send.common.TransactionData
@@ -246,7 +246,7 @@ class AddNoteFragment : Fragment(), View.OnTouchListener {
         amount = requireArguments().getParcelable("amount")!!
         isOneSidePayment = requireArguments().getBoolean("isOneSidePayment")
         if (savedInstanceState == null) {
-            requireArguments().getString(DeepLink.PARAMETER_NOTE)
+            requireArguments().getString(SendTariActivity.PARAMETER_NOTE)
                 ?.let { ui.noteEditText.setText(it) }
         }
     }

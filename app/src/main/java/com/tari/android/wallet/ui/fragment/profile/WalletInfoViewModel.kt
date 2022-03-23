@@ -5,10 +5,10 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
+import com.tari.android.wallet.application.deeplinks.DeepLink
+import com.tari.android.wallet.application.deeplinks.DeeplinkHandler
 import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
-import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepository
 import com.tari.android.wallet.ui.common.CommonViewModel
-import com.tari.android.wallet.util.WalletUtil
 import com.tari.android.wallet.yat.YatAdapter
 import com.tari.android.wallet.yat.YatSharedRepository
 import kotlinx.coroutines.Dispatchers
@@ -20,13 +20,13 @@ class WalletInfoViewModel() : CommonViewModel() {
     lateinit var sharedPrefsWrapper: SharedPrefsRepository
 
     @Inject
-    lateinit var networkRepository: NetworkRepository
-
-    @Inject
     lateinit var yatSharedPrefsRepository: YatSharedRepository
 
     @Inject
     lateinit var yatAdapter: YatAdapter
+
+    @Inject
+    lateinit var deeplinkHandler: DeeplinkHandler
 
     private val _emojiId: MutableLiveData<String> = MutableLiveData()
     val emojiId: LiveData<String> = _emojiId
@@ -61,7 +61,7 @@ class WalletInfoViewModel() : CommonViewModel() {
     fun refreshData() {
         _emojiId.postValue(sharedPrefsWrapper.emojiId)
         _publicKeyHex.postValue(sharedPrefsWrapper.publicKeyHexString)
-        val qrCode = WalletUtil.getPublicKeyHexDeepLink(sharedPrefsWrapper.publicKeyHexString!!, networkRepository.currentNetwork!!.network)
+        val qrCode = deeplinkHandler.getDeeplink(DeepLink.Send(sharedPrefsWrapper.publicKeyHexString.orEmpty()))
         _qrDeepLink.postValue(qrCode)
         _yat.postValue(yatSharedPrefsRepository.connectedYat.orEmpty())
         _yatDisconnected.postValue(yatSharedPrefsRepository.yatWasDisconnected)

@@ -47,6 +47,7 @@ import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodeSharedRepositor
 import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepositoryImpl
 import com.tari.android.wallet.data.sharedPrefs.tariSettings.TariSettingsSharedRepository
 import com.tari.android.wallet.data.sharedPrefs.testnetFaucet.TestnetFaucetRepository
+import com.tari.android.wallet.data.sharedPrefs.tor.TorSharedRepository
 import com.tari.android.wallet.di.ApplicationModule
 import com.tari.android.wallet.ffi.*
 import com.tari.android.wallet.model.*
@@ -83,6 +84,7 @@ class FFIWalletTests {
     private val testnetFaucetRepository = TestnetFaucetRepository(prefs, networkRepository)
     private val yatSharedPrefsRepository = YatSharedRepository(prefs, networkRepository)
     private val tariSettingsRepository = TariSettingsSharedRepository(prefs, networkRepository)
+    private val torSharedRepository = TorSharedRepository(prefs, networkRepository)
     private val sharedPrefsRepository =
         SharedPrefsRepository(
             context,
@@ -92,6 +94,7 @@ class FFIWalletTests {
             baseNodeSharedPrefsRepository,
             testnetFaucetRepository,
             yatSharedPrefsRepository,
+            torSharedRepository,
             tariSettingsRepository
         )
     private val walletDirPath = context.filesDir.absolutePath
@@ -542,6 +545,10 @@ class FFIWalletTests {
 
         override fun onStoreAndForwardSendResult(txId: BigInteger, success: Boolean) {
             Logger.i("Store and forward :: tx id %s success %s", txId, success)
+        }
+
+        override fun onConnectivityStatus(status: Int) {
+            Logger.i("Connectivity status: %s", status)
         }
     }
 }

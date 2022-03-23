@@ -32,10 +32,7 @@
  */
 package com.tari.android.wallet.util
 
-import com.tari.android.wallet.application.DeepLink
-import com.tari.android.wallet.application.Network
 import com.tari.android.wallet.data.WalletConfig
-import com.tari.android.wallet.model.MicroTari
 import java.io.File
 import java.math.RoundingMode
 import java.text.DecimalFormat
@@ -73,18 +70,6 @@ internal object WalletUtil {
             return true
         }
         return false
-    }
-
-    fun getEmojiIdDeepLink(emojiId: String, network: Network): String {
-        return "${Constants.Wallet.deepLinkURLPrefix}${network.uriComponent}/${DeepLink.Type.EMOJI_ID.uriComponent}/$emojiId"
-    }
-
-    fun getPublicKeyHexDeepLink(publicKeyHex: String, network: Network): String {
-        return "${Constants.Wallet.deepLinkURLPrefix}${network.uriComponent}/${DeepLink.Type.PUBLIC_KEY_HEX.uriComponent}/$publicKeyHex"
-    }
-
-    fun generateFullQrCodeDeepLink(publicKeyHex: String, network: Network, amount: MicroTari): String {
-        return "${Constants.Wallet.deepLinkURLPrefix}${network.uriComponent}/${DeepLink.Type.PUBLIC_KEY_HEX.uriComponent}/$publicKeyHex?${DeepLink.PARAMETER_AMOUNT}=${amount.formattedTariValue}"
     }
 
     fun getLogFilesFromDirectory(dirPath: String): List<File> {

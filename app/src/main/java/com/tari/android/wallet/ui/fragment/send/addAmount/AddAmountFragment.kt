@@ -55,7 +55,6 @@ import com.tari.android.wallet.R
 import com.tari.android.wallet.R.color.black
 import com.tari.android.wallet.R.string.*
 import com.tari.android.wallet.amountInputBinding.fragment.send.addAmount.keyboard.KeyboardController
-import com.tari.android.wallet.application.DeepLink
 import com.tari.android.wallet.databinding.FragmentAddAmountBinding
 import com.tari.android.wallet.di.DiContainer.appComponent
 import com.tari.android.wallet.extension.getWithError
@@ -72,6 +71,7 @@ import com.tari.android.wallet.ui.dialog.error.ErrorDialogArgs
 import com.tari.android.wallet.ui.dialog.tooltipDialog.TooltipDialog
 import com.tari.android.wallet.ui.dialog.tooltipDialog.TooltipDialogArgs
 import com.tari.android.wallet.ui.extension.*
+import com.tari.android.wallet.ui.fragment.send.activity.SendTariActivity
 import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.WalletUtil
 import kotlinx.coroutines.Dispatchers
@@ -159,7 +159,7 @@ class AddAmountFragment : CommonFragment<FragmentAddAmountBinding, AddAmountView
     }
 
     private fun setupUI() {
-        val amount = arguments?.getDouble(DeepLink.PARAMETER_AMOUNT, Double.MIN_VALUE)
+        val amount = arguments?.getDouble(SendTariActivity.PARAMETER_AMOUNT, Double.MIN_VALUE)
         keyboardController.setup(requireContext(), AmountCheckRunnable(), ui.numpad, ui.amount, amount)
         recipientUser = arguments?.getParcelable("recipientUser")
         // hide tx fee

@@ -1,10 +1,10 @@
 package com.tari.android.wallet.ui.fragment.send.requestTari
 
+import com.tari.android.wallet.application.deeplinks.DeepLink
+import com.tari.android.wallet.application.deeplinks.DeeplinkHandler
 import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
-import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepository
 import com.tari.android.wallet.model.MicroTari
 import com.tari.android.wallet.ui.common.CommonViewModel
-import com.tari.android.wallet.util.WalletUtil
 import javax.inject.Inject
 
 class RequestTariViewModel : CommonViewModel() {
@@ -13,15 +13,13 @@ class RequestTariViewModel : CommonViewModel() {
     lateinit var sharedPrefsWrapper: SharedPrefsRepository
 
     @Inject
-    lateinit var networkRepository: NetworkRepository
+    lateinit var deeplinkHandler: DeeplinkHandler
 
     init {
         component.inject(this)
     }
 
-    fun getDeepLink(amount: MicroTari) : String {
-        val hex = sharedPrefsWrapper.publicKeyHexString!!
-        val network = networkRepository.currentNetwork!!.network
-        return WalletUtil.generateFullQrCodeDeepLink(hex, network, amount)
+    fun getDeepLink(amount: MicroTari): String {
+        return deeplinkHandler.getDeeplink(DeepLink.Send(sharedPrefsWrapper.publicKeyHexString!!, amount))
     }
 }
