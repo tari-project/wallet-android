@@ -144,6 +144,10 @@ internal class SendTariActivity : CommonActivity<ActivitySendTariBinding, SendTa
         addFragment(AddNoteFragment(), bundle)
     }
 
+    override fun continueToFinalizing(recipientUser: User, amount: MicroTari, isOneSidePayment: Boolean) {
+        continueToFinalizeSendTx(TransactionData(recipientUser, amount, "", isOneSidePayment))
+    }
+
     override fun continueToFinalizeSendTx(transactionData: TransactionData) {
         if (transactionData.recipientUser is YatUser) {
             yatAdapter.showOutcomingFinalizeActivity(this, transactionData)

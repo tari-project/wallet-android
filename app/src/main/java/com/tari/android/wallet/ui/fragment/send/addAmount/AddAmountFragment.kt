@@ -293,7 +293,12 @@ class AddAmountFragment : CommonFragment<FragmentAddAmountBinding, AddAmountView
     }
 
     private fun continueToNote() {
-        addAmountListenerWR.get()?.continueToAddNote(recipientUser!!, keyboardController.currentAmount, ui.oneSidePaymentSwitchView.isChecked)
+        val isOneSidePayment = ui.oneSidePaymentSwitchView.isChecked
+        if (isOneSidePayment) {
+            addAmountListenerWR.get()?.continueToFinalizing(recipientUser!!, keyboardController.currentAmount, isOneSidePayment)
+        } else {
+            addAmountListenerWR.get()?.continueToAddNote(recipientUser!!, keyboardController.currentAmount, isOneSidePayment)
+        }
     }
 
     /**
