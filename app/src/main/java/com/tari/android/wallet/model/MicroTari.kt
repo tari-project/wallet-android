@@ -55,7 +55,12 @@ class MicroTari() : Parcelable, Comparable<MicroTari>, Serializable {
         get() = value.toBigDecimal().divide(million,6,RoundingMode.HALF_UP)
 
     val formattedTariValue: String
-        get() = tariValue.toString().trimEnd { it == '0' }.trimEnd { it == '.' }.trimEnd { it == ',' }
+        get() = getFormattedValue(tariValue.toString())
+
+    val formattedValue: String
+        get() = getFormattedValue(value.toString())
+
+    private fun getFormattedValue(value: String): String = value.trimEnd { it == '0' }.trimEnd { it == '.' }.trimEnd { it == ',' }
 
     constructor(
         value: BigInteger

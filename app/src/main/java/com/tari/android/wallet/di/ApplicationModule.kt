@@ -41,6 +41,7 @@ import androidx.biometric.BiometricManager
 import androidx.core.content.ContextCompat
 import com.tari.android.wallet.BuildConfig
 import com.tari.android.wallet.application.TariWalletApplication
+import com.tari.android.wallet.application.deeplinks.DeeplinkHandler
 import com.tari.android.wallet.data.WalletConfig
 import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodeSharedRepository
@@ -165,6 +166,10 @@ internal class ApplicationModule(
             BiometricManager.from(context),
             context.getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager
         )
+
+    @Provides
+    @Singleton
+    fun provideDeeplinkHandler(networkRepository: NetworkRepository): DeeplinkHandler = DeeplinkHandler(networkRepository)
 
     @Provides
     @Singleton

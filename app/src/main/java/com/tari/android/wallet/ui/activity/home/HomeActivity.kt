@@ -47,7 +47,8 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.tari.android.wallet.R
 import com.tari.android.wallet.R.color.home_selected_nav_item
-import com.tari.android.wallet.application.DeepLink
+import com.tari.android.wallet.application.deeplinks.DeepLink
+import com.tari.android.wallet.application.deeplinks.DeeplinkHandler
 import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepository
 import com.tari.android.wallet.databinding.ActivityHomeBinding
@@ -55,7 +56,10 @@ import com.tari.android.wallet.di.DiContainer.appComponent
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.extension.addTo
 import com.tari.android.wallet.extension.applyFontStyle
-import com.tari.android.wallet.model.*
+import com.tari.android.wallet.model.Tx
+import com.tari.android.wallet.model.TxId
+import com.tari.android.wallet.model.User
+import com.tari.android.wallet.model.WalletError
 import com.tari.android.wallet.network.NetworkConnectionState
 import com.tari.android.wallet.service.TariWalletService
 import com.tari.android.wallet.service.WalletServiceLauncher
@@ -107,6 +111,9 @@ internal class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>
 
     @Inject
     lateinit var networkRepository: NetworkRepository
+
+    @Inject
+    lateinit var deeplinkHandler: DeeplinkHandler
 
     @Inject
     lateinit var giphy: GiphyEcosystem
@@ -344,32 +351,29 @@ internal class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>
     fun willNotifyAboutNewTx(): Boolean = ui.viewPager.currentItem == INDEX_HOME
 
     private fun processIntentDeepLink(service: TariWalletService, intent: Intent) {
-        DeepLink.from(networkRepository, intent.data?.toString().orEmpty())?.let { deepLink ->
-            val pubkey = when (deepLink.type) {
-                DeepLink.Type.EMOJI_ID -> service.getPublicKeyFromEmojiId(deepLink.identifier)
-                DeepLink.Type.PUBLIC_KEY_HEX -> service.getPublicKeyFromHexString(deepLink.identifier)
-            }
-            pubkey?.let { publicKey -> sendTariToUser(service, publicKey, deepLink.parameters) }
+        deeplinkHandler.handle(intent.data?.toString().orEmpty())?.let { deepLink ->
+            (deepLink as? DeepLink.Send)?.let { sendTariToUser(service, it) }
         }
     }
 
-    private fun sendTariToUser(
-        service: TariWalletService,
-        recipientPublicKey: PublicKey,
-        parameters: Map<String, String>
-    ) {
+    private fun sendTariToUser(service: TariWalletService, sendDeeplink: DeepLink.Send) {
         val error = WalletError()
         val contacts = service.getContacts(error)
+        val pubKey = service.getPublicKeyFromHexString(sendDeeplink.publicKeyHex)
         val recipientUser = when (error) {
-            WalletError.NoError -> contacts.firstOrNull { it.publicKey == recipientPublicKey } ?: User(recipientPublicKey)
-            else -> User(recipientPublicKey)
+            WalletError.NoError -> contacts.firstOrNull { it.publicKey == pubKey } ?: User(pubKey)
+            else -> User(pubKey)
         }
         val intent = Intent(this, SendTariActivity::class.java)
         intent.putExtra("recipientUser", recipientUser as Parcelable)
-        parameters[DeepLink.PARAMETER_NOTE]?.let { intent.putExtra(DeepLink.PARAMETER_NOTE, it) }
-        parameters[DeepLink.PARAMETER_AMOUNT]?.toDoubleOrNull()?.let { intent.putExtra(DeepLink.PARAMETER_AMOUNT, it) }
+        sendDeeplink.note?.let { intent.putExtra(SendTariActivity.PARAMETER_NOTE, it) }
+        sendDeeplink.amount?.let { intent.putExtra(SendTariActivity.PARAMETER_AMOUNT, it.tariValue) }
         startActivity(intent)
         overridePendingTransition(R.anim.enter_from_right, R.anim.exit_to_left)
+    }
+
+    private fun addNewBaseNode(service: TariWalletService, sendDeeplink: DeepLink.AddBaseNode) {
+        //todo
     }
 
     override fun onDestroy() {

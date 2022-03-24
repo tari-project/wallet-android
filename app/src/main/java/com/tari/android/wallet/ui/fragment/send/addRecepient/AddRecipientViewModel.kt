@@ -6,9 +6,9 @@ import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.tari.android.wallet.R
-import com.tari.android.wallet.application.DeepLink
+import com.tari.android.wallet.application.deeplinks.DeepLink
+import com.tari.android.wallet.application.deeplinks.DeeplinkHandler
 import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
-import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepository
 import com.tari.android.wallet.extension.addTo
 import com.tari.android.wallet.extension.executeWithError
 import com.tari.android.wallet.extension.getWithError
@@ -70,7 +70,7 @@ class AddRecipientViewModel() : CommonViewModel() {
     lateinit var sharedPrefsWrapper: SharedPrefsRepository
 
     @Inject
-    lateinit var networkRepository: NetworkRepository
+    lateinit var deeplinkHandler: DeeplinkHandler
 
     private val serviceConnection = TariWalletServiceConnection()
     private val walletService
@@ -167,12 +167,9 @@ class AddRecipientViewModel() : CommonViewModel() {
     private fun checkClipboardForValidEmojiId() {
         val clipboardString = clipboardManager.primaryClip?.getItemAt(0)?.text?.toString() ?: return
 
-        val deepLink = DeepLink.from(networkRepository, clipboardString)
+        val deepLink = deeplinkHandler.handle(clipboardString) as? DeepLink.Send
         if (deepLink != null) { // there is a deep link in the clipboard
-            emojiIdPublicKey = when (deepLink.type) {
-                DeepLink.Type.EMOJI_ID -> walletService.getPublicKeyFromEmojiId(deepLink.identifier)
-                DeepLink.Type.PUBLIC_KEY_HEX -> walletService.getPublicKeyFromHexString(deepLink.identifier)
-            }
+            emojiIdPublicKey = walletService.getPublicKeyFromHexString(deepLink.publicKeyHex)
         } else { // try to extract a valid emoji id
             val emojis = clipboardString.trim().extractEmojis()
             // search in windows of length = emoji id length

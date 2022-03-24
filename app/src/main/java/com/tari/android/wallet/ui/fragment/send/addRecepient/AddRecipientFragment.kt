@@ -60,11 +60,9 @@ import com.tari.android.wallet.R.color.*
 import com.tari.android.wallet.R.dimen.add_recipient_clipboard_emoji_id_container_height
 import com.tari.android.wallet.R.dimen.add_recipient_paste_emoji_id_button_visible_top_margin
 import com.tari.android.wallet.R.string.*
-import com.tari.android.wallet.application.DeepLink
-import com.tari.android.wallet.application.DeepLink.Type.EMOJI_ID
-import com.tari.android.wallet.application.DeepLink.Type.PUBLIC_KEY_HEX
+import com.tari.android.wallet.application.deeplinks.DeepLink
+import com.tari.android.wallet.application.deeplinks.DeeplinkHandler
 import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
-import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepository
 import com.tari.android.wallet.databinding.FragmentAddRecipientBinding
 import com.tari.android.wallet.di.DiContainer.appComponent
 import com.tari.android.wallet.extension.observe
@@ -102,7 +100,7 @@ class AddRecipientFragment : CommonFragment<FragmentAddRecipientBinding, AddReci
     lateinit var sharedPrefsWrapper: SharedPrefsRepository
 
     @Inject
-    lateinit var networkRepository: NetworkRepository
+    lateinit var deeplinkHandler: DeeplinkHandler
 
     /**
      * List, adapter & layout manager.
@@ -419,25 +417,12 @@ class AddRecipientFragment : CommonFragment<FragmentAddRecipientBinding, AddReci
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == QRScannerActivity.REQUEST_QR_SCANNER && resultCode == Activity.RESULT_OK && data != null) {
             val qrData = data.getStringExtra(EXTRA_QR_DATA) ?: return
-            val deepLink = DeepLink.from(networkRepository, qrData) ?: return
-            when (deepLink.type) {
-                EMOJI_ID -> {
-                    ui.searchEditText.setText(
-                        deepLink.identifier,
-                        TextView.BufferType.EDITABLE
-                    )
-                    ui.searchEditText.postDelayed({
-                        ui.searchEditTextScrollView.smoothScrollTo(0, 0)
-                    }, Constants.UI.mediumDurationMs)
-                }
-                PUBLIC_KEY_HEX -> {
-                    lifecycleScope.launch(Dispatchers.IO) {
-                        val publicKeyHex = deepLink.identifier
-                        val publicKey = viewModel.getPublicKeyFromHexString(publicKeyHex)
-                        if (publicKey != null) {
-                            ui.rootView.post { ui.searchEditText.setText(publicKey.emojiId, TextView.BufferType.EDITABLE) }
-                            ui.searchEditText.postDelayed({ ui.searchEditTextScrollView.smoothScrollTo(0, 0) }, Constants.UI.mediumDurationMs)
-                        }
+            (deeplinkHandler.handle(qrData) as? DeepLink.Send)?.let {
+                lifecycleScope.launch(Dispatchers.IO) {
+                    val publicKey = viewModel.getPublicKeyFromHexString(it.publicKeyHex)
+                    if (publicKey != null) {
+                        ui.rootView.post { ui.searchEditText.setText(publicKey.emojiId, TextView.BufferType.EDITABLE) }
+                        ui.searchEditText.postDelayed({ ui.searchEditTextScrollView.smoothScrollTo(0, 0) }, Constants.UI.mediumDurationMs)
                     }
                 }
             }

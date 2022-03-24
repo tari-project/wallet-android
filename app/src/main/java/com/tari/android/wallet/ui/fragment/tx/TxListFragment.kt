@@ -59,7 +59,6 @@ import com.daasuu.ei.Ease
 import com.daasuu.ei.EasingInterpolator
 import com.squareup.seismic.ShakeDetector
 import com.tari.android.wallet.R
-import com.tari.android.wallet.application.DeepLink
 import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import com.tari.android.wallet.data.sharedPrefs.tariSettings.TariSettingsSharedRepository
 import com.tari.android.wallet.data.sharedPrefs.testnetFaucet.TestnetFaucetRepository
@@ -291,11 +290,9 @@ internal class TxListFragment : CommonFragment<FragmentTxListBinding, TxListView
     }
 
     private fun navigateToSendTari(user: User) {
-        val intent = Intent(requireContext(), SendTariActivity::class.java)
-        intent.putExtra("recipientUser", user as Parcelable)
-        val parameters: Map<String, String> = emptyMap()
-        parameters[DeepLink.PARAMETER_NOTE]?.let { intent.putExtra(DeepLink.PARAMETER_NOTE, it) }
-        parameters[DeepLink.PARAMETER_AMOUNT]?.toDoubleOrNull()?.let { intent.putExtra(DeepLink.PARAMETER_AMOUNT, it) }
+        val intent = Intent(requireContext(), SendTariActivity::class.java).apply {
+            putExtra("recipientUser", user as Parcelable)
+        }
         startActivity(intent)
         requireActivity().overridePendingTransition(R.anim.enter_from_right, R.anim.exit_to_left)
     }
