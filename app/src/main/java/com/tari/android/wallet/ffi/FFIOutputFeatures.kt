@@ -30,38 +30,18 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.tari.android.wallet.model
-
-import android.os.Parcelable
-import java.math.BigInteger
+package com.tari.android.wallet.ffi
 
 /**
- * Base transaction class.
+ * Tari contact wrapper.
  *
  * @author The Tari Development Team
  */
-abstract class Tx() : Parcelable {
+internal class FFIOutputFeatures() : FFIBase() {
 
-    enum class Direction {
-        INBOUND,
-        OUTBOUND
+    constructor(pointer: FFIPointer): this() {
+        this.pointer = pointer
     }
 
-    var id = BigInteger("0")
-    var direction = Direction.INBOUND
-    var amount = MicroTari(BigInteger("0"))
-    var timestamp = BigInteger("0")
-    var message = ""
-    var status = TxStatus.PENDING
-
-    /**
-     * This is the receiver for an outbound tx and sender for an inbound tx.
-     */
-    var user = User()
-
-    val isOneSided
-        get() = user.publicKey.hexString.all{ it == '0' }
-
-    override fun toString(): String = "Tx(id=$id, direction=$direction, amount=$amount, timestamp=$timestamp, message='$message', user=$user)"
-
+    override fun destroy() = Unit
 }
