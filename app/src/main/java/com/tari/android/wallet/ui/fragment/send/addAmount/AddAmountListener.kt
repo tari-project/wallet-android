@@ -8,4 +8,6 @@ interface AddAmountListener {
     fun onAmountExceedsActualAvailableBalance(fragment: AddAmountFragment)
 
     fun continueToAddNote(recipientUser: User, amount: MicroTari, isOneSidePayment: Boolean)
+
+    fun continueToFinalizing(recipientUser: User, amount: MicroTari, isOneSidePayment: Boolean)
 }
