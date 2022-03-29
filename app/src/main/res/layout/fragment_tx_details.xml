@@ -59,9 +59,9 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_horizontal"
+                    android:layout_marginHorizontal="52dp"
                     android:layout_marginTop="12dp"
                     android:layout_marginBottom="24dp"
-                    android:layout_marginHorizontal="52dp"
                     android:orientation="vertical"
                     app:layout_constraintEnd_toEndOf="@id/payment_state_text_view"
                     app:layout_constraintStart_toStartOf="@id/payment_state_text_view"
@@ -69,12 +69,12 @@
 
                     <com.tari.android.wallet.ui.component.CustomFontTextView
                         android:id="@+id/cancellation_reason_view"
-                        android:visibility="gone"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_horizontal"
                         android:textColor="@color/secondary_text_color"
                         android:textSize="13sp"
+                        android:visibility="gone"
                         app:customFont="@string/font_medium"
                         tools:text="November 1st 2019 at 2:39 PM" />
 
@@ -232,8 +232,8 @@
             <RelativeLayout
                 android:id="@+id/user_container"
                 android:layout_width="match_parent"
-                android:layout_below="@id/amount_section"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:layout_below="@id/amount_section">
 
                 <com.tari.android.wallet.ui.component.CustomFontTextView
                     android:id="@+id/from_text_view"
@@ -244,7 +244,7 @@
                     android:text="@string/common_from"
                     android:textColor="@color/tx_detail_contact_name_label_text"
                     android:textSize="13sp"
-                    app:customFont="@string/font_medium"/>
+                    app:customFont="@string/font_medium" />
 
                 <FrameLayout
                     android:id="@+id/emoji_id_summary_container_view"
@@ -297,8 +297,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/user_container"
+                android:layout_marginHorizontal="25dp"
                 android:layout_marginStart="@dimen/common_horizontal_margin"
-                android:layout_marginTop="@dimen/tx_details_contact_name_top_margin"
                 android:layout_marginEnd="12dp"
                 android:orientation="vertical"
                 android:visibility="visible"
@@ -364,56 +364,116 @@
                     android:textSize="14sp"
                     app:customFont="AVENIR_LT_STD_ROMAN" />
 
-                <View
-                    android:id="@+id/separator_view"
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:layout_below="@id/contact_name_text_view"
-                    android:layout_marginTop="@dimen/tx_details_contact_name_underline_top_margin"
-                    android:layout_marginEnd="24dp"
-                    android:background="@color/tx_detail_contact_view_divider"
-                    app:layout_constraintEnd_toEndOf="parent" />
             </RelativeLayout>
 
-            <com.tari.android.wallet.ui.component.CustomFontTextView
-                android:id="@+id/note_label_text_view"
-                android:layout_width="wrap_content"
+            <androidx.appcompat.widget.LinearLayoutCompat
+                android:id="@+id/note_container"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/contact_container_view"
-                android:layout_marginHorizontal="@dimen/common_horizontal_margin"
-                android:layout_marginTop="@dimen/tx_details_note_top_margin"
-                android:text="@string/tx_detail_note"
-                android:textColor="@color/tx_detail_contact_name_label_text"
-                android:textSize="13sp"
-                app:customFont="@string/font_medium"
-                app:layout_constraintStart_toStartOf="@id/contact_container_view"
-                app:layout_constraintTop_toBottomOf="@id/contact_container_view" />
+                android:orientation="vertical">
 
-            <com.tari.android.wallet.ui.component.CustomFontTextView
-                android:id="@+id/tx_note_text_view"
+                <View
+                    android:id="@+id/note_divider"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginHorizontal="25dp"
+                    android:layout_marginTop="@dimen/tx_details_note_top_margin"
+                    android:background="@color/settings_background" />
+
+                <com.tari.android.wallet.ui.component.CustomFontTextView
+                    android:id="@+id/note_label_text_view"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="@dimen/common_horizontal_margin"
+                    android:layout_marginTop="@dimen/tx_details_note_top_margin"
+                    android:text="@string/tx_detail_note"
+                    android:textColor="@color/tx_detail_contact_name_label_text"
+                    android:textSize="13sp"
+                    app:customFont="@string/font_medium"
+                    app:layout_constraintStart_toStartOf="@id/contact_container_view"
+                    app:layout_constraintTop_toBottomOf="@id/contact_container_view" />
+
+                <com.tari.android.wallet.ui.component.CustomFontTextView
+                    android:id="@+id/tx_note_text_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/note_label_text_view"
+                    android:layout_marginHorizontal="@dimen/common_horizontal_margin"
+                    android:layout_marginTop="12dp"
+                    android:lineSpacingExtra="8dp"
+                    android:scrollbars="vertical"
+                    android:textColor="@color/black"
+                    android:textSize="14sp"
+                    app:customFont="AVENIR_LT_STD_ROMAN"
+                    app:layout_constraintStart_toStartOf="@id/note_label_text_view"
+                    app:layout_constraintTop_toBottomOf="@id/note_label_text_view" />
+
+                <include
+                    android:id="@+id/gif_container"
+                    layout="@layout/tx_details_gif_container"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/tx_note_text_view"
+                    android:layout_marginHorizontal="@dimen/common_horizontal_margin"
+                    android:layout_marginTop="0dp"
+                    android:layout_marginBottom="@dimen/common_horizontal_margin"
+                    android:visibility="visible" />
+
+            </androidx.appcompat.widget.LinearLayoutCompat>
+
+            <androidx.appcompat.widget.LinearLayoutCompat
+                android:id="@+id/explorer_container_view"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/note_label_text_view"
+                android:layout_below="@id/note_container"
                 android:layout_marginHorizontal="@dimen/common_horizontal_margin"
-                android:layout_marginTop="12dp"
-                android:lineSpacingExtra="8dp"
-                android:scrollbars="vertical"
-                android:textColor="@color/black"
-                android:textSize="14sp"
-                app:customFont="AVENIR_LT_STD_ROMAN"
-                app:layout_constraintStart_toStartOf="@id/note_label_text_view"
-                app:layout_constraintTop_toBottomOf="@id/note_label_text_view" />
+                android:orientation="vertical"
+                android:paddingBottom="20dp"
+                android:visibility="visible"
+                app:layout_constraintEnd_toEndOf="parent">
 
-            <include
-                android:id="@+id/gif_container"
-                layout="@layout/tx_details_gif_container"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/tx_note_text_view"
-                android:layout_marginHorizontal="@dimen/common_horizontal_margin"
-                android:layout_marginTop="0dp"
-                android:layout_marginBottom="@dimen/common_horizontal_margin"
-                android:visibility="visible" />
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@color/settings_background" />
+
+                <com.tari.android.wallet.ui.component.CustomFontTextView
+                    android:id="@+id/contact_label_text_view2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="21dp"
+                    android:text="@string/tx_detail_explorer_title"
+                    android:textColor="@color/tx_detail_contact_name_label_text"
+                    android:textSize="13sp"
+                    app:customFont="@string/font_medium" />
+
+                <androidx.appcompat.widget.LinearLayoutCompat
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:orientation="horizontal">
+
+                    <com.tari.android.wallet.ui.component.CustomFontTextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical|start"
+                        android:layout_weight="1"
+                        android:gravity="center_vertical"
+                        android:text="@string/tx_detail_explorer_button"
+                        android:textColor="@color/black"
+                        android:textSize="15sp"
+                        app:customFont="@string/font_medium" />
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical|end"
+                        android:src="@drawable/icon_apply_setting" />
+
+                </androidx.appcompat.widget.LinearLayoutCompat>
+
+            </androidx.appcompat.widget.LinearLayoutCompat>
 
         </RelativeLayout>
 
