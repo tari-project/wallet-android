@@ -29,6 +29,9 @@ class TxDetailsViewModel() : CommonViewModel() {
     private val _cancellationReason = MutableLiveData<String>()
     val cancellationReason: LiveData<String> = _cancellationReason
 
+    private val _explorerLink = MutableLiveData("")
+    val explorerLink: LiveData<String> = _explorerLink
+
     private val serviceConnection = TariWalletServiceConnection()
     private val walletService
         get() = serviceConnection.currentState.service!!
@@ -45,8 +48,9 @@ class TxDetailsViewModel() : CommonViewModel() {
     }
 
     fun setTxArg(tx: Tx) {
-        _tx.postValue(tx)
+        _tx.value = tx
         _cancellationReason.postValue(getCancellationReason(tx))
+        generateExplorerLink()
     }
 
     fun loadTxById(txId: TxId) {
@@ -85,6 +89,10 @@ class TxDetailsViewModel() : CommonViewModel() {
         tx.user = Contact(tx.user.publicKey, newAlias)
         EventBus.post(Event.Contact.ContactAddedOrUpdated(tx.user.publicKey, newAlias))
         _tx.value = tx
+    }
+
+    fun openInBlockExplorer() {
+        _openLink.postValue(_explorerLink.value.orEmpty())
     }
 
     private fun getCancellationReason(tx: Tx): String {
@@ -133,6 +141,14 @@ class TxDetailsViewModel() : CommonViewModel() {
             _errorDialog.postValue(errorArgs)
         } else {
             foundTx.let { _tx.value = it }
+            generateExplorerLink()
+        }
+    }
+
+    private fun generateExplorerLink() {
+        (tx.value as? CompletedTx)?.txKernel?.let {
+            val fullLink = resourceManager.getString(R.string.explorer_kernel_url) + it.publicNonce + "/" + it.signature
+            _explorerLink.postValue(fullLink)
         }
     }
 

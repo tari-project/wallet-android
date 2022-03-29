@@ -12,6 +12,7 @@
     <string name="privacy_policy_url">https://www.tari.com/privacy_policy/</string>
     <string name="disclaimer_url">https://www.tari.com/disclaimer/</string>
     <string name="explorer_url">https://explore.tari.com</string>
+    <string name="explorer_kernel_url">https://explore.tari.com/kernel/</string>
     <string name="tor_bridges_url">https://bridges.torproject.org/bridges</string>
     <string name="ffi_admin_email_address" translatable="false">bug_reports@tari.com</string>
     <string name="tari_lab_university_url" translatable="false">https://tlu.tarilabs.com/</string>
@@ -306,6 +307,8 @@
     <string name="tx_detail_payment_sent">Payment Sent</string>
     <string name="tx_detail_pending_payment_received">Payment In Progress</string>
     <string name="tx_detail_contact_name">Contact Name</string>
+    <string name="tx_detail_explorer_title">Information</string>
+    <string name="tx_detail_explorer_button">View on the Block Explorer</string>
     <string name="tx_detail_create_contact_hint">Add Contact Name</string>
     <string name="tx_detail_note">Note</string>
     <string name="tx_detail_edit">Edit</string>

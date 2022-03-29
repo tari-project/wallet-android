@@ -47,6 +47,7 @@ class CompletedTx() : Tx(), Parcelable {
 
     var fee = MicroTari(BigInteger("0"))
     var confirmationCount = BigInteger("0")
+    var txKernel: CompletedTransactionKernel? = null
 
     internal constructor(tx: FFICompletedTx) : this() {
         this.id = tx.getId()
@@ -58,6 +59,9 @@ class CompletedTx() : Tx(), Parcelable {
         this.message = tx.getMessage()
         this.status = TxStatus.map(tx.getStatus())
         this.confirmationCount = tx.getConfirmationCount()
+        runCatching { tx.getTransactionKernel() }.getOrNull()?.let {
+            this.txKernel = CompletedTransactionKernel(it.getExcess(), it.getExcessPublicNonce(), it.getExcessSignature())
+        }
 
         tx.destroy()
     }

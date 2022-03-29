@@ -130,6 +130,8 @@ internal class TxDetailsFragment : CommonFragment<FragmentTxDetailsBinding, TxDe
         }
 
         observe(cancellationReason) { setCancellationReason(it) }
+
+        observe(explorerLink) { showExplorerLink(it) }
     }
 
     private fun setCancellationReason(text: String) {
@@ -226,23 +228,18 @@ internal class TxDetailsFragment : CommonFragment<FragmentTxDetailsBinding, TxDe
     private fun setFeeData(fee: MicroTari) {
         ui.txFeeTextView.visible()
         ui.feeLabelTextView.visible()
-        ui.txFeeTextView.text = string(
-            tx_details_fee_value,
-            WalletUtil.amountFormatter.format(fee.tariValue)
-        )
+        ui.txFeeTextView.text = string(tx_details_fee_value, WalletUtil.amountFormatter.format(fee.tariValue))
     }
 
     private fun setTxMetaData(tx: Tx) {
-        // display date
         ui.dateTextView.text = Date(tx.timestamp.toLong() * 1000).txFormattedDate()
-        // display message
         val note = TxNote.fromNote(tx.message)
         if (note.message == null) {
             ui.txNoteTextView.gone()
         } else {
             ui.txNoteTextView.text = if (tx.isOneSided) string(tx_list_you_received_one_side_payment) else note.message
         }
-        // display GIF
+        ui.noteDivider.setVisible(!tx.isOneSided)
         ui.gifContainer.root.visible()
     }
 
@@ -284,6 +281,11 @@ internal class TxDetailsFragment : CommonFragment<FragmentTxDetailsBinding, TxDe
             ui.cancelTxContainerView.setOnClickListener(null)
             collapseAndHideAnimation(ui.cancelTxContainerView).start()
         }
+    }
+
+    private fun showExplorerLink(explorerLink: String) {
+        ui.explorerContainerView.setVisible(explorerLink.isNotEmpty())
+        ui.explorerContainerView.setOnClickListener { viewModel.openInBlockExplorer() }
     }
 
     /**
