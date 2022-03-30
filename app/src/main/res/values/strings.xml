@@ -191,6 +191,11 @@
     <string name="home_navigation_content_description_navigate_to_send_tari">Navigate to Tari send flow</string>
     <string name="home_pending_transactions_title">Pending Transactions</string>
     <string name="home_completed_transactions_title">Completed Transactions</string>
+    <string name="home_custom_base_node_title">Add custom base node</string>
+    <string name="home_custom_base_node_description">The QR code is a deep link request to assign your wallet to use this base node.</string>
+    <string name="home_custom_base_node_full_description"><![CDATA[<strong>Name: </strong>%s<br><br><strong>Peer:</strong><br>%s]]></string>
+    <string name="home_custom_base_node_yes_button">Yes! Let\'s do it!</string>
+    <string name="home_custom_base_node_no_button">Not this time</string>
     <!--home tari bot dialog-->
     <string name="home_tari_bot_you_got_tari_dlg_title">You just got some tXTR!</string>
     <string name="home_tari_bot_you_got_tari_dlg_title_bold_part">tXTR!</string>

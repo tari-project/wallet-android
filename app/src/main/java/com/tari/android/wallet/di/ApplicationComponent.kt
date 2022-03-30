@@ -33,6 +33,7 @@
 package com.tari.android.wallet.di
 
 import com.tari.android.wallet.application.TariWalletApplication
+import com.tari.android.wallet.application.deeplinks.DeeplinkViewModel
 import com.tari.android.wallet.service.BootDeviceReceiver
 import com.tari.android.wallet.service.WalletService
 import com.tari.android.wallet.ui.activity.AuthActivity
@@ -185,6 +186,7 @@ internal interface ApplicationComponent {
     fun inject(addAmountViewModel: AddAmountViewModel)
     fun inject(torBridgesSelectionViewModel: TorBridgesSelectionViewModel)
     fun inject(customTorBridgeViewModel: CustomTorBridgesViewModel)
+    fun inject(deeplinkViewModel: DeeplinkViewModel)
     /**
      * Service(s).
      */

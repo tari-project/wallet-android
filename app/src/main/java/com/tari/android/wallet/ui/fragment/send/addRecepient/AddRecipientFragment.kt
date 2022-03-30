@@ -62,6 +62,7 @@ import com.tari.android.wallet.R.dimen.add_recipient_paste_emoji_id_button_visib
 import com.tari.android.wallet.R.string.*
 import com.tari.android.wallet.application.deeplinks.DeepLink
 import com.tari.android.wallet.application.deeplinks.DeeplinkHandler
+import com.tari.android.wallet.application.deeplinks.DeeplinkViewModel
 import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import com.tari.android.wallet.databinding.FragmentAddRecipientBinding
 import com.tari.android.wallet.di.DiContainer.appComponent
@@ -70,6 +71,7 @@ import com.tari.android.wallet.extension.observeOnLoad
 import com.tari.android.wallet.infrastructure.Tracker
 import com.tari.android.wallet.model.PublicKey
 import com.tari.android.wallet.ui.common.CommonFragment
+import com.tari.android.wallet.ui.common.domain.ResourceManager
 import com.tari.android.wallet.ui.common.recyclerView.CommonAdapter
 import com.tari.android.wallet.ui.extension.*
 import com.tari.android.wallet.ui.fragment.qr.QRScannerActivity
@@ -100,7 +102,12 @@ class AddRecipientFragment : CommonFragment<FragmentAddRecipientBinding, AddReci
     lateinit var sharedPrefsWrapper: SharedPrefsRepository
 
     @Inject
+    lateinit var resourceManager: ResourceManager
+
+    @Inject
     lateinit var deeplinkHandler: DeeplinkHandler
+
+    private val deeplinkViewModel: DeeplinkViewModel by viewModels()
 
     /**
      * List, adapter & layout manager.
@@ -426,6 +433,8 @@ class AddRecipientFragment : CommonFragment<FragmentAddRecipientBinding, AddReci
                     }
                 }
             }
+
+            (deeplinkHandler.handle(qrData) as? DeepLink.AddBaseNode)?.let { deeplinkViewModel.executeAction(requireContext(), it) }
         }
     }
 

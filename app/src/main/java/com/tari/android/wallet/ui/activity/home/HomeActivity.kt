@@ -49,6 +49,7 @@ import com.tari.android.wallet.R
 import com.tari.android.wallet.R.color.home_selected_nav_item
 import com.tari.android.wallet.application.deeplinks.DeepLink
 import com.tari.android.wallet.application.deeplinks.DeeplinkHandler
+import com.tari.android.wallet.application.deeplinks.DeeplinkViewModel
 import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepository
 import com.tari.android.wallet.databinding.ActivityHomeBinding
@@ -70,6 +71,7 @@ import com.tari.android.wallet.ui.activity.onboarding.OnboardingFlowActivity
 import com.tari.android.wallet.ui.activity.settings.BackupSettingsActivity
 import com.tari.android.wallet.ui.activity.settings.DeleteWalletActivity
 import com.tari.android.wallet.ui.common.CommonActivity
+import com.tari.android.wallet.ui.common.domain.ResourceManager
 import com.tari.android.wallet.ui.common.gyphy.GiphyEcosystem
 import com.tari.android.wallet.ui.component.CustomFont
 import com.tari.android.wallet.ui.component.CustomFontTextView
@@ -116,7 +118,12 @@ internal class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>
     lateinit var deeplinkHandler: DeeplinkHandler
 
     @Inject
+    lateinit var resourceManager: ResourceManager
+
+    @Inject
     lateinit var giphy: GiphyEcosystem
+
+    private val deeplinkViewModel: DeeplinkViewModel by viewModels()
 
     private lateinit var serviceConnection: TariWalletServiceConnection
     private var compositeDisposable: CompositeDisposable = CompositeDisposable()
@@ -353,6 +360,8 @@ internal class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>
     private fun processIntentDeepLink(service: TariWalletService, intent: Intent) {
         deeplinkHandler.handle(intent.data?.toString().orEmpty())?.let { deepLink ->
             (deepLink as? DeepLink.Send)?.let { sendTariToUser(service, it) }
+
+            (deepLink as? DeepLink.AddBaseNode)?.let { deeplinkViewModel.executeAction(this, it) }
         }
     }
 
@@ -370,10 +379,6 @@ internal class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>
         sendDeeplink.amount?.let { intent.putExtra(SendTariActivity.PARAMETER_AMOUNT, it.tariValue) }
         startActivity(intent)
         overridePendingTransition(R.anim.enter_from_right, R.anim.exit_to_left)
-    }
-
-    private fun addNewBaseNode(service: TariWalletService, sendDeeplink: DeepLink.AddBaseNode) {
-        //todo
     }
 
     override fun onDestroy() {
