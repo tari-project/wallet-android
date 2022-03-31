@@ -30,13 +30,15 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.tari.android.wallet.ui.activity.restore
+package com.tari.android.wallet.ui.fragment.restore.restore
 
 interface WalletRestoreRouter {
 
     fun toEnterRestorePassword()
 
     fun toRestoreWithRecoveryPhrase()
+
+    fun toBaseNodeSelection()
 
     fun toRestoreInProgress()
 

@@ -30,7 +30,7 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.tari.android.wallet.ui.activity.restore
+package com.tari.android.wallet.ui.fragment.restore.restore
 
 import android.content.Context
 import android.content.Intent
@@ -42,6 +42,9 @@ import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import com.tari.android.wallet.data.sharedPrefs.tariSettings.TariSettingsSharedRepository
 import com.tari.android.wallet.di.DiContainer.appComponent
 import com.tari.android.wallet.ui.activity.AuthActivity
+import com.tari.android.wallet.ui.fragment.debug.baseNodeConfig.BaseNodeConfigRouter
+import com.tari.android.wallet.ui.fragment.debug.baseNodeConfig.addBaseNode.AddCustomBaseNodeFragment
+import com.tari.android.wallet.ui.fragment.debug.baseNodeConfig.changeBaseNode.ChangeBaseNodeFragment
 import com.tari.android.wallet.ui.fragment.restore.chooseRestoreOption.ChooseRestoreOptionFragment
 import com.tari.android.wallet.ui.fragment.restore.enterRestorationPassword.EnterRestorationPasswordFragment
 import com.tari.android.wallet.ui.fragment.restore.inputSeedWords.InputSeedWordsFragment
@@ -49,7 +52,7 @@ import com.tari.android.wallet.ui.fragment.restore.walletRestoring.WalletRestori
 import com.tari.android.wallet.ui.fragment.restore.walletRestoringFromSeedWords.WalletRestoringFromSeedWordsFragment
 import javax.inject.Inject
 
-class WalletRestoreActivity : AppCompatActivity(), WalletRestoreRouter {
+class WalletRestoreActivity : AppCompatActivity(), WalletRestoreRouter, BaseNodeConfigRouter {
 
     @Inject
     lateinit var prefs: SharedPrefsRepository
@@ -93,6 +96,10 @@ class WalletRestoreActivity : AppCompatActivity(), WalletRestoreRouter {
         loadFragment(WalletRestoringFromSeedWordsFragment.newInstance())
     }
 
+    override fun toBaseNodeSelection() {
+        loadFragment(ChangeBaseNodeFragment())
+    }
+
     override fun onRestoreCompleted() {
         // wallet restored, setup shared prefs accordingly
         prefs.onboardingCompleted = true
@@ -105,15 +112,15 @@ class WalletRestoreActivity : AppCompatActivity(), WalletRestoreRouter {
         })
     }
 
+    override fun toChangeBaseNode() = Unit
+
+    override fun toAddCustomBaseNode() = loadFragment(AddCustomBaseNodeFragment())
+
     private fun loadFragment(fragment: Fragment) {
         supportFragmentManager
             .beginTransaction()
-            .setCustomAnimations(
-                R.anim.enter_from_right, R.anim.exit_to_left,
-                R.anim.enter_from_left, R.anim.exit_to_right
-            )
-            .apply { supportFragmentManager.fragments.forEach { hide(it) } }
-            .add(R.id.backup_fragment_container, fragment)
+            .setCustomAnimations(R.anim.enter_from_right, R.anim.exit_to_left, R.anim.enter_from_left, R.anim.exit_to_right)
+            .replace(R.id.backup_fragment_container, fragment)
             .addToBackStack(null)
             .commit()
     }
@@ -121,5 +128,4 @@ class WalletRestoreActivity : AppCompatActivity(), WalletRestoreRouter {
     companion object {
         fun navigationIntent(context: Context) = Intent(context, WalletRestoreActivity::class.java)
     }
-
 }

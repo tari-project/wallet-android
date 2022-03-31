@@ -150,7 +150,7 @@
             android:theme="@style/AppTheme"
             android:windowSoftInputMode="adjustResize|stateAlwaysHidden" />
         <activity
-            android:name=".ui.activity.restore.WalletRestoreActivity"
+            android:name="com.tari.android.wallet.ui.fragment.restore.restore.WalletRestoreActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:parentActivityName=".ui.activity.onboarding.OnboardingFlowActivity"
             android:screenOrientation="portrait"
