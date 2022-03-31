@@ -1055,7 +1055,7 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniImportUTXO(
 
     jbyteArray result = getBytesFromUnsignedLongLong(
             jEnv,
-            wallet_import_utxo(
+            wallet_import_external_utxo_as_non_rewindable(
                     pWallet,
                     amount,
                     pSpendingKey,
