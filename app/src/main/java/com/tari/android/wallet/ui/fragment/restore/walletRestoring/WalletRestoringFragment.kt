@@ -39,7 +39,7 @@ import android.view.ViewGroup
 import androidx.core.view.postDelayed
 import androidx.fragment.app.Fragment
 import com.tari.android.wallet.databinding.FragmentWalletRestoringBinding
-import com.tari.android.wallet.ui.activity.restore.WalletRestoreRouter
+import com.tari.android.wallet.ui.fragment.restore.restore.WalletRestoreRouter
 import com.tari.android.wallet.ui.component.MutedBackPressedCallback
 
 class WalletRestoringFragment : Fragment() {

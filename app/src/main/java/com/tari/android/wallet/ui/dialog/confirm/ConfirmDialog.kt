@@ -12,15 +12,16 @@ import com.tari.android.wallet.ui.dialog.TariDialog
 import com.tari.android.wallet.ui.extension.setVisible
 import com.tari.android.wallet.ui.extension.string
 
-class ConfirmDialog(context: Context, args: ConfirmDialogArgs) : TariDialog {
+open class ConfirmDialog(context: Context, args: ConfirmDialogArgs) : TariDialog {
 
     private var dialog: Dialog
+    protected var ui: DialogConfirmDefaultBinding
 
     init {
         with(args) {
             dialog = Dialog(context, R.style.BottomSlideDialog).apply {
                 setContentView(getStyleRes(confirmStyle))
-                val ui = DialogConfirmDefaultBinding.bind(findViewById(R.id.dialog_root_view))
+                ui = DialogConfirmDefaultBinding.bind(findViewById(R.id.dialog_root_view))
                 window?.apply {
                     setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
                     setLayout(

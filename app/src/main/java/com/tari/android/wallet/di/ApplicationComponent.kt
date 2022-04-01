@@ -33,6 +33,7 @@
 package com.tari.android.wallet.di
 
 import com.tari.android.wallet.application.TariWalletApplication
+import com.tari.android.wallet.application.deeplinks.DeeplinkViewModel
 import com.tari.android.wallet.service.BootDeviceReceiver
 import com.tari.android.wallet.service.WalletService
 import com.tari.android.wallet.ui.activity.AuthActivity
@@ -40,7 +41,7 @@ import com.tari.android.wallet.ui.activity.SplashActivity
 import com.tari.android.wallet.ui.activity.debug.DebugActivity
 import com.tari.android.wallet.ui.activity.home.HomeActivity
 import com.tari.android.wallet.ui.activity.onboarding.OnboardingFlowActivity
-import com.tari.android.wallet.ui.activity.restore.WalletRestoreActivity
+import com.tari.android.wallet.ui.fragment.restore.restore.WalletRestoreActivity
 import com.tari.android.wallet.ui.activity.settings.DeleteWalletActivity
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.component.networkStateIndicator.ConnectionIndicatorViewModel
@@ -185,6 +186,7 @@ internal interface ApplicationComponent {
     fun inject(addAmountViewModel: AddAmountViewModel)
     fun inject(torBridgesSelectionViewModel: TorBridgesSelectionViewModel)
     fun inject(customTorBridgeViewModel: CustomTorBridgesViewModel)
+    fun inject(deeplinkViewModel: DeeplinkViewModel)
     /**
      * Service(s).
      */

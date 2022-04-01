@@ -44,7 +44,7 @@ import com.tari.android.wallet.databinding.FragmentChooseRestoreOptionBinding
 import com.tari.android.wallet.di.DiContainer.appComponent
 import com.tari.android.wallet.extension.observe
 import com.tari.android.wallet.infrastructure.backup.BackupManager
-import com.tari.android.wallet.ui.activity.restore.WalletRestoreRouter
+import com.tari.android.wallet.ui.fragment.restore.restore.WalletRestoreRouter
 import com.tari.android.wallet.ui.common.CommonFragment
 import com.tari.android.wallet.ui.extension.*
 import javax.inject.Inject
