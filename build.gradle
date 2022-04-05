@@ -4,11 +4,11 @@ buildscript {
     ext.kotlin_version = "1.6.10"
 
     // build & version
-    ext.buildNumber = 191
+    ext.buildNumber = 192
     ext.versionNumber = "0.12.0"
 
     // JNI libs
-    ext.libwalletVersion = "0.30.0"
+    ext.libwalletVersion = "0.30.2"
     ext.libwalletHostURL = "https://tari-binaries.s3.amazonaws.com/libwallet/"
     ext.supportedABIs = ["arm64-v8a", "x86_64"]
 
