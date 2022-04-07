@@ -42,6 +42,9 @@ open class CommonViewModel : ViewModel() {
     protected val _openLink = SingleLiveEvent<String>()
     val openLink: LiveData<String> = _openLink
 
+    protected val _copyToClipboard = SingleLiveEvent<ClipboardArgs>()
+    val copyToClipboard: LiveData<ClipboardArgs> = _copyToClipboard
+
     protected val _confirmDialog = SingleLiveEvent<ConfirmDialogArgs>()
     val confirmDialog: LiveData<ConfirmDialogArgs> = _confirmDialog
 

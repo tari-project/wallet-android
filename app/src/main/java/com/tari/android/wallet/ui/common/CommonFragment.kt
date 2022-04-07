@@ -1,13 +1,17 @@
 package com.tari.android.wallet.ui.common
 
+import android.content.ClipData
+import android.content.ClipboardManager
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.viewbinding.ViewBinding
+import com.tari.android.wallet.di.DiContainer
 import com.tari.android.wallet.extension.observe
 import com.tari.android.wallet.ui.component.MutedBackPressedCallback
 import com.tari.android.wallet.ui.dialog.TariDialog
@@ -16,6 +20,8 @@ import com.tari.android.wallet.ui.dialog.error.ErrorDialog
 import com.tari.android.wallet.ui.dialog.inProgress.TariProgressDialog
 
 abstract class CommonFragment<Binding : ViewBinding, VM : CommonViewModel> : Fragment() {
+
+    lateinit var clipboardManager: ClipboardManager
 
     private var currentDialog: TariDialog? = null
 
@@ -26,6 +32,8 @@ abstract class CommonFragment<Binding : ViewBinding, VM : CommonViewModel> : Fra
     protected lateinit var viewModel: VM
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        clipboardManager = DiContainer.appComponent.getClipboardManager()
+
         requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, blockingBackPressDispatcher)
 
         return super.onCreateView(inflater, container, savedInstanceState)
@@ -41,6 +49,8 @@ abstract class CommonFragment<Binding : ViewBinding, VM : CommonViewModel> : Fra
         observe(backPressed) { requireActivity().onBackPressed() }
 
         observe(openLink) { startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(it))) }
+
+        observe(copyToClipboard) { copy(it) }
 
         observe(confirmDialog) { replaceDialog(ConfirmDialog(requireContext(), it)) }
 
@@ -73,5 +83,10 @@ abstract class CommonFragment<Binding : ViewBinding, VM : CommonViewModel> : Fra
         }
         currentDialog?.dismiss()
         currentDialog = dialog.also { it.show() }
+    }
+
+    private fun copy(clipboardArgs: ClipboardArgs) {
+        clipboardManager.setPrimaryClip(ClipData.newPlainText(clipboardArgs.clipLabel, clipboardArgs.clipText))
+        Toast.makeText(requireActivity(), clipboardArgs.toastMessage, Toast.LENGTH_LONG).show()
     }
 }
