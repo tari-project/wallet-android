@@ -122,7 +122,7 @@ internal class BackupSettingsFragment : CommonFragment<FragmentWalletBackupSetti
     }
 
     private fun setupViews() = with(ui) {
-        backupPermissionProgressBar.setColor(color(back_up_settings_permission_processing))
+        googleDriveBackupPermissionProgressBar.setColor(color(back_up_settings_permission_processing))
         cloudBackupStatusProgressView.setColor(color(all_settings_back_up_status_processing))
         initBackupOptions()
     }
@@ -136,7 +136,7 @@ internal class BackupSettingsFragment : CommonFragment<FragmentWalletBackupSetti
     }
 
     private fun setPermissionSwitchListener() {
-        ui.backupPermissionSwitch.setOnCheckedChangeListener { _, isChecked -> viewModel.onBackupPermissionSwitch(isChecked) }
+        ui.googleDriveBackupPermissionSwitch.setOnCheckedChangeListener { _, isChecked -> viewModel.onBackupPermissionSwitch(isChecked) }
     }
 
     private fun subscribeUI() = with(viewModel) {
@@ -210,8 +210,8 @@ internal class BackupSettingsFragment : CommonFragment<FragmentWalletBackupSetti
     }
 
     private fun onChangeInProgress(inProgress: Boolean) = with(ui) {
-        backupPermissionSwitch.setVisible(!inProgress, View.INVISIBLE)
-        backupPermissionProgressBar.setVisible(inProgress, View.INVISIBLE)
+        googleDriveBackupPermissionSwitch.setVisible(!inProgress, View.INVISIBLE)
+        googleDriveBackupPermissionProgressBar.setVisible(inProgress, View.INVISIBLE)
     }
 
     private fun onChangeUpdatePasswordEnabled(isEnabled: Boolean) = with(ui) {
@@ -221,8 +221,8 @@ internal class BackupSettingsFragment : CommonFragment<FragmentWalletBackupSetti
     }
 
     private fun setSwitchCheck(isChecked: Boolean) = with(ui) {
-        backupPermissionSwitch.setOnCheckedChangeListener(null)
-        backupPermissionSwitch.isChecked = isChecked
+        googleDriveBackupPermissionSwitch.setOnCheckedChangeListener(null)
+        googleDriveBackupPermissionSwitch.isChecked = isChecked
         setPermissionSwitchListener()
     }
 

@@ -71,6 +71,7 @@
         android:orientation="vertical">
 
         <FrameLayout
+            android:id="@+id/google_drive_backup"
             android:layout_width="match_parent"
             android:layout_height="@dimen/menu_item_height"
             android:background="@color/white"
@@ -93,7 +94,7 @@
                 android:layout_gravity="center_vertical|end">
 
                 <androidx.appcompat.widget.SwitchCompat
-                    android:id="@+id/backup_permission_switch"
+                    android:id="@+id/google_drive_backup_permission_switch"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     app:layout_constraintBottom_toBottomOf="parent"
@@ -102,7 +103,7 @@
                     app:layout_constraintTop_toTopOf="parent" />
 
                 <ProgressBar
-                    android:id="@+id/backup_permission_progress_bar"
+                    android:id="@+id/google_drive_backup_permission_progress_bar"
                     android:layout_width="0dp"
                     android:layout_height="0dp"
                     android:layout_marginEnd="4dp"
@@ -117,6 +118,59 @@
 
         <View
             android:id="@+id/backups_separator_view"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginHorizontal="25dp"
+            android:background="@color/settings_background" />
+
+        <FrameLayout
+            android:id="@+id/dropbox_backup"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/menu_item_height"
+            android:background="@color/white"
+            android:clickable="true"
+            android:focusable="true"
+            android:paddingHorizontal="@dimen/common_horizontal_margin">
+
+            <com.tari.android.wallet.ui.component.CustomFontTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical|start"
+                android:text="@string/back_up_wallet_dropbox_title"
+                android:textColor="@color/black"
+                android:textSize="15sp"
+                app:customFont="@string/font_medium" />
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical|end">
+
+                <androidx.appcompat.widget.SwitchCompat
+                    android:id="@+id/dropbox_backup_permission_switch"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <ProgressBar
+                    android:id="@+id/dropbox_backup_permission_progress_bar"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_marginEnd="4dp"
+                    android:visibility="gone"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintDimensionRatio="1:1"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </FrameLayout>
+
+        <View
+            android:id="@+id/backups_separator_view_2"
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:layout_marginHorizontal="25dp"

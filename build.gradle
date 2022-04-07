@@ -1,7 +1,7 @@
 import org.gradle.api.tasks.testing.logging.TestLogEvent
 
 buildscript {
-    ext.kotlin_version = "1.6.10"
+    ext.kotlin_version = "1.6.20"
 
     // build & version
     ext.buildNumber = 192
