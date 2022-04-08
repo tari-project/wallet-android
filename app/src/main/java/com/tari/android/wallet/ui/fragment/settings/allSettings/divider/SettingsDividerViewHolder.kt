@@ -8,7 +8,8 @@ import com.tari.android.wallet.ui.common.recyclerView.items.DividerViewHolderIte
 class SettingsDividerViewHolder(view: ItemSettingsDividerBinding) : CommonViewHolder<DividerViewHolderItem, ItemSettingsDividerBinding>(view) {
 
     companion object {
-        fun getBuilder(): ViewHolderBuilder =
-            ViewHolderBuilder(ItemSettingsDividerBinding::inflate, DividerViewHolderItem::class.java) { SettingsDividerViewHolder(it as ItemSettingsDividerBinding) }
+        fun getBuilder(): ViewHolderBuilder = ViewHolderBuilder(ItemSettingsDividerBinding::inflate, DividerViewHolderItem::class.java) {
+            SettingsDividerViewHolder(it as ItemSettingsDividerBinding)
+        }
     }
 }

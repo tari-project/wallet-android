@@ -4,15 +4,14 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.orhanobut.logger.Logger
-import com.tari.android.wallet.R
 import com.tari.android.wallet.R.color.*
+import com.tari.android.wallet.R.drawable.*
 import com.tari.android.wallet.R.string.*
 import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepository
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.infrastructure.backup.BackupManager
 import com.tari.android.wallet.infrastructure.backup.BackupState
 import com.tari.android.wallet.infrastructure.backup.BackupStorageAuthRevokedException
-import com.tari.android.wallet.infrastructure.security.biometric.BiometricAuthenticationService
 import com.tari.android.wallet.ui.common.ClipboardArgs
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.common.SingleLiveEvent
@@ -22,6 +21,7 @@ import com.tari.android.wallet.ui.dialog.backup.BackupSettingsRepository
 import com.tari.android.wallet.ui.dialog.error.ErrorDialogArgs
 import com.tari.android.wallet.ui.fragment.settings.allSettings.PresentationBackupState.BackupStateStatus.*
 import com.tari.android.wallet.ui.fragment.settings.allSettings.backupOptions.SettingsBackupOptionViewHolderItem
+import com.tari.android.wallet.ui.fragment.settings.allSettings.button.ButtonStyle
 import com.tari.android.wallet.ui.fragment.settings.allSettings.button.ButtonViewDto
 import com.tari.android.wallet.ui.fragment.settings.allSettings.title.SettingsTitleDto
 import com.tari.android.wallet.ui.fragment.settings.allSettings.version.SettingsVersionViewHolderItem
@@ -42,7 +42,7 @@ internal class AllSettingsViewModel : CommonViewModel() {
 
     lateinit var authenticationViewModel: BiometricAuthenticationViewModel
 
-    private val backupOption = SettingsBackupOptionViewHolderItem {
+    private val backupOption = SettingsBackupOptionViewHolderItem(leftIconId = all_settings_backup_options_icon) {
         authenticationViewModel.requireAuthorization { _navigation.postValue(AllSettingsNavigation.ToBackupSettings) }
     }
 
@@ -54,9 +54,6 @@ internal class AllSettingsViewModel : CommonViewModel() {
 
     @Inject
     lateinit var networkRepository: NetworkRepository
-
-    @Inject
-    lateinit var authService: BiometricAuthenticationService
 
     private val _navigation: SingleLiveEvent<AllSettingsNavigation> = SingleLiveEvent()
     val navigation: LiveData<AllSettingsNavigation> = _navigation
@@ -89,31 +86,55 @@ internal class AllSettingsViewModel : CommonViewModel() {
             SettingsTitleDto(resourceManager.getString(all_settings_security_label)),
             backupOption,
             SettingsTitleDto(resourceManager.getString(all_settings_secondary_settings_label)),
-            ButtonViewDto(resourceManager.getString(all_settings_report_a_bug)) { _shareBugReport.postValue(Unit) },
+            ButtonViewDto(resourceManager.getString(all_settings_report_a_bug), all_settings_report_bug_icon) { _shareBugReport.postValue(Unit) },
             DividerViewHolderItem(),
-            ButtonViewDto(resourceManager.getString(all_settings_visit_site)) { _openLink.postValue(resourceManager.getString(tari_url)) },
+            ButtonViewDto(resourceManager.getString(all_settings_visit_site), all_settings_visit_tari_icon) {
+                _openLink.postValue(resourceManager.getString(tari_url))
+            },
             DividerViewHolderItem(),
-            ButtonViewDto(resourceManager.getString(all_settings_contribute)) { _openLink.postValue(resourceManager.getString(github_repo_url)) },
+            ButtonViewDto(resourceManager.getString(all_settings_contribute), all_settings_contribute_to_tari_icon) {
+                _openLink.postValue(resourceManager.getString(github_repo_url))
+            },
             DividerViewHolderItem(),
-            ButtonViewDto(resourceManager.getString(all_settings_user_agreement)) { _openLink.postValue(resourceManager.getString(user_agreement_url)) },
+            ButtonViewDto(resourceManager.getString(all_settings_user_agreement), all_settings_user_agreement_icon) {
+                _openLink.postValue(resourceManager.getString(user_agreement_url))
+            },
             DividerViewHolderItem(),
-            ButtonViewDto(resourceManager.getString(all_settings_privacy_policy)) { _openLink.postValue(resourceManager.getString(privacy_policy_url)) },
+            ButtonViewDto(resourceManager.getString(all_settings_privacy_policy), all_settings_privacy_policy_icon) {
+                _openLink.postValue(resourceManager.getString(privacy_policy_url))
+            },
             DividerViewHolderItem(),
-            ButtonViewDto(resourceManager.getString(all_settings_disclaimer)) { _openLink.postValue(resourceManager.getString(disclaimer_url)) },
+            ButtonViewDto(resourceManager.getString(all_settings_disclaimer), all_settings_disclaimer_icon) {
+                _openLink.postValue(resourceManager.getString(disclaimer_url))
+            },
             DividerViewHolderItem(),
-            ButtonViewDto(resourceManager.getString(all_settings_explorer)) { _openLink.postValue(resourceManager.getString(explorer_url)) },
+            ButtonViewDto(resourceManager.getString(all_settings_explorer), all_settings_block_explorer_icon) {
+                _openLink.postValue(resourceManager.getString(explorer_url))
+            },
             SettingsTitleDto(resourceManager.getString(all_settings_yat_settings_label)),
-            ButtonViewDto(resourceManager.getString(all_settings_connect_yats), R.drawable.open_in_browser) { _openYatOnboarding.postValue(Unit) },
+            ButtonViewDto(resourceManager.getString(all_settings_connect_yats), all_settings_yat_icon, open_in_browser_icon) {
+                _openYatOnboarding.postValue(Unit)
+            },
             SettingsTitleDto(resourceManager.getString(all_settings_advanced_settings_label)),
-            ButtonViewDto(resourceManager.getString(all_settings_background_service)) { _navigation.postValue(AllSettingsNavigation.ToBackgroundService) },
+            ButtonViewDto(resourceManager.getString(all_settings_background_service), all_settings_bridge_configuration_icon) {
+                _navigation.postValue(AllSettingsNavigation.ToBackgroundService)
+            },
             DividerViewHolderItem(),
-            ButtonViewDto(resourceManager.getString(all_settings_bridge_configuration)) { _navigation.postValue(AllSettingsNavigation.ToTorBridges) },
+            ButtonViewDto(resourceManager.getString(all_settings_bridge_configuration), all_settings_bridge_configuration_icon) {
+                _navigation.postValue(AllSettingsNavigation.ToTorBridges)
+            },
             DividerViewHolderItem(),
-            ButtonViewDto(resourceManager.getString(all_settings_select_network)) { _navigation.postValue(AllSettingsNavigation.ToNetworkSelection) },
+            ButtonViewDto(resourceManager.getString(all_settings_select_network), all_settings_select_network_icon) {
+                _navigation.postValue(AllSettingsNavigation.ToNetworkSelection)
+            },
             DividerViewHolderItem(),
-            ButtonViewDto(resourceManager.getString(all_settings_select_base_node)) { _navigation.postValue(AllSettingsNavigation.ToBaseNodeSelection) },
+            ButtonViewDto(resourceManager.getString(all_settings_select_base_node), all_settings_select_base_node_icon) {
+                _navigation.postValue(AllSettingsNavigation.ToBaseNodeSelection)
+            },
             DividerViewHolderItem(),
-            ButtonViewDto(resourceManager.getString(all_settings_delete_wallet)) { _navigation.postValue(AllSettingsNavigation.ToDeleteWallet) },
+            ButtonViewDto(resourceManager.getString(all_settings_delete_wallet), all_settings_delete_button_icon, null, ButtonStyle.Warning) {
+                _navigation.postValue(AllSettingsNavigation.ToDeleteWallet)
+            },
             DividerViewHolderItem(),
             SettingsVersionViewHolderItem(versionText) { _copyToClipboard.postValue(versionArgs) }
         )

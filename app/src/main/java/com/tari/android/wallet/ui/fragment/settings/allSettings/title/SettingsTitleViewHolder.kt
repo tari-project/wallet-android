@@ -12,7 +12,8 @@ class SettingsTitleViewHolder(view: ItemSettingsTitleBinding) : CommonViewHolder
     }
 
     companion object {
-        fun getBuilder(): ViewHolderBuilder =
-            ViewHolderBuilder(ItemSettingsTitleBinding::inflate, SettingsTitleDto::class.java) { SettingsTitleViewHolder(it as ItemSettingsTitleBinding) }
+        fun getBuilder(): ViewHolderBuilder = ViewHolderBuilder(ItemSettingsTitleBinding::inflate, SettingsTitleDto::class.java) {
+            SettingsTitleViewHolder(it as ItemSettingsTitleBinding)
+        }
     }
 }

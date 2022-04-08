@@ -12,7 +12,8 @@ class ButtonViewHolder(view: ItemButtonBinding) : CommonViewHolder<ButtonViewDto
     }
 
     companion object {
-        fun getBuilder(): ViewHolderBuilder =
-            ViewHolderBuilder(ItemButtonBinding::inflate, ButtonViewDto::class.java) { ButtonViewHolder(it as ItemButtonBinding) }
+        fun getBuilder(): ViewHolderBuilder = ViewHolderBuilder(ItemButtonBinding::inflate, ButtonViewDto::class.java) {
+            ButtonViewHolder(it as ItemButtonBinding)
+        }
     }
 }

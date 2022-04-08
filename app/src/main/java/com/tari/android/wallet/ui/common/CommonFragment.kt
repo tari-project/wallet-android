@@ -31,9 +31,13 @@ abstract class CommonFragment<Binding : ViewBinding, VM : CommonViewModel> : Fra
 
     protected lateinit var viewModel: VM
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        clipboardManager = DiContainer.appComponent.getClipboardManager()
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
+        clipboardManager = DiContainer.appComponent.getClipboardManager()
+    }
+
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, blockingBackPressDispatcher)
 
         return super.onCreateView(inflater, container, savedInstanceState)

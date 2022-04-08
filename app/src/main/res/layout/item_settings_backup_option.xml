@@ -10,7 +10,7 @@
     android:focusable="true"
     android:orientation="vertical">
 
-    <RelativeLayout
+    <androidx.appcompat.widget.LinearLayoutCompat
         android:id="@+id/back_up_wallet_cta_view"
         android:layout_width="match_parent"
         android:layout_height="@dimen/menu_item_height"
@@ -18,12 +18,21 @@
         android:clickable="true"
         android:focusable="true"
         android:gravity="center_vertical"
+        android:orientation="horizontal"
         android:paddingHorizontal="@dimen/common_horizontal_margin">
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/left_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical|end"
+            android:layout_marginEnd="22dp"/>
 
         <com.tari.android.wallet.ui.component.CustomFontTextView
             android:id="@+id/back_up_wallet_label_view"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_weight="1"
             android:text="@string/all_settings_back_up_wallet_settings_entry"
             android:textColor="@color/black"
             android:textSize="15sp"
@@ -114,7 +123,7 @@
                 android:layout_marginStart="10dp"
                 android:src="@drawable/icon_apply_setting" />
         </LinearLayout>
-    </RelativeLayout>
+    </androidx.appcompat.widget.LinearLayoutCompat>
 
     <com.tari.android.wallet.ui.component.CustomFontTextView
         android:id="@+id/last_backup_time_text_view"
