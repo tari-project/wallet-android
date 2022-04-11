@@ -21,6 +21,8 @@ class BackupSettingsRepository(
 
     var dropboxOption: BackupOptionDto? by SharedPrefGsonDelegate(sharedPrefs, formatKey(Keys.dropBoxOptionKey), BackupOptionDto::class.java)
 
+    var scheduledBackupDate: DateTime? by SharedPrefDateTimeDelegate(sharedPrefs, formatKey(Keys.scheduledBackupDate))
+
     var backupPassword: String? by SharedPrefStringSecuredDelegate(context, sharedPrefs, formatKey(Keys.backupPassword))
 
     var localBackupFolderURI: Uri? by SharedPrefGsonDelegate(sharedPrefs, formatKey(Keys.localBackupFolderURI), Uri::class.java)
@@ -39,6 +41,7 @@ class BackupSettingsRepository(
     fun isShowHintDialog(): Boolean = with(lastBackupDialogShown) { this == null || !this.plusMinutes(delayTimeInMinutes).isAfterNow }
 
     fun clear() {
+        scheduledBackupDate = null
         lastBackupDialogShown = null
         backupPassword = null
         localBackupFolderURI = null
@@ -49,12 +52,21 @@ class BackupSettingsRepository(
         dropboxOption = BackupOptionDto(BackupOptions.Dropbox)
     }
 
+    fun updateOptions(options: List<BackupOptionDto>) = options.forEach { option ->
+        when (option.type) {
+            BackupOptions.Dropbox -> dropboxOption = option
+            BackupOptions.Google -> googleDriveOption = option
+            BackupOptions.Local -> localFileOption = option
+        }
+    }
+
     private fun formatKey(key: String): String = key + "_" + networkRepository.currentNetwork!!.network.displayName
 
     object Keys {
-        const val localFileOptionsKey = "tari_wallet_local_file_backup_options_"
         const val googleDriveOptionKey = "tari_wallet_google_drive_backup_options"
         const val dropBoxOptionKey = "tari_wallet_dropbox_backup_options"
+        const val localFileOptionsKey = "tari_wallet_local_file_backup_options"
+        const val scheduledBackupDate = "tari_wallet_scheduled_backup_date"
         const val backupPassword = "tari_wallet_last_next_alarm_time"
         const val localBackupFolderURI = "tari_wallet_local_backup_folder_uri"
         const val lastBackupDialogShownTime = "last_shown_time_key"

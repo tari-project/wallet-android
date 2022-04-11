@@ -13,8 +13,8 @@ import com.tari.android.wallet.infrastructure.backup.BackupStorageAuthRevokedExc
 import com.tari.android.wallet.infrastructure.backup.BackupStorageFullException
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.common.SingleLiveEvent
-import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupSettingsRepository
 import com.tari.android.wallet.ui.dialog.error.ErrorDialogArgs
+import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupSettingsRepository
 import com.tari.android.wallet.ui.fragment.settings.userAutorization.BiometricAuthenticationViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -83,8 +83,8 @@ internal class BackupSettingsViewModel : CommonViewModel() {
 
         EventBus.backupState.subscribe(this, this::onBackupStateChanged)
 
-        backupOptionsAreVisible.postValue(backupSettingsRepository.backupIsEnabled)
-        _googleDriveBackupPermissionSwitchChecked.postValue(backupSettingsRepository.backupIsEnabled)
+        backupOptionsAreVisible.postValue(backupSettingsRepository.getOptionList.any { it.isEnable })
+        _googleDriveBackupPermissionSwitchChecked.postValue(backupSettingsRepository.googleDriveOption?.isEnable ?: false)
         _backupStateChanged.postValue(Unit)
         refillSharedPrefsData()
     }
@@ -176,7 +176,7 @@ internal class BackupSettingsViewModel : CommonViewModel() {
 
     private fun refillSharedPrefsData() {
         _backupPassword.postValue(Optional.ofNullable(backupSettingsRepository.backupPassword))
-        _lastSuccessfulBackupDate.postValue(Optional.ofNullable(backupSettingsRepository.lastSuccessfulBackupDate))
+        _lastSuccessfulBackupDate.postValue(Optional.ofNullable(backupSettingsRepository.getOptionList.mapNotNull { it.lastSuccessDate }.minOrNull()))
     }
 
     private fun showBackupStorageSetupFailedDialog(exception: Exception? = null) {
@@ -281,7 +281,7 @@ internal class BackupSettingsViewModel : CommonViewModel() {
         _isBackupAvailable.postValue(true)
         _isBackupNowEnabled.postValue(true)
         _updatePasswordEnabled.postValue(true)
-        if (backupSettingsRepository.backupFailureDate == null) {
+        if (backupSettingsRepository.getOptionList.all { it.lastFailureDate == null }) {
             _cloudBackupStatus.postValue(CloudBackupStatus.Scheduled)
         } else {
             _cloudBackupStatus.postValue(

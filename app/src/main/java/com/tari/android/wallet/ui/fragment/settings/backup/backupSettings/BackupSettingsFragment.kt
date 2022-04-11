@@ -181,7 +181,7 @@ internal class BackupSettingsFragment : CommonFragment<FragmentWalletBackupSetti
     }
 
     private fun initBackupOptions() {
-        if (viewModel.backupSettingsRepository.backupIsEnabled) {
+        if (viewModel.backupSettingsRepository.getOptionList.any { it.isEnable }) {
             if (EventBus.backupState.publishSubject.value is BackupUpToDate) {
                 ui.backupWalletToCloudCtaContainerView.gone()
             }
