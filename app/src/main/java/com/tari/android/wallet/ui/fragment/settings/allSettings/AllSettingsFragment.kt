@@ -32,35 +32,28 @@
  */
 package com.tari.android.wallet.ui.fragment.settings.allSettings
 
-import android.content.ClipData
-import android.content.ClipboardManager
 import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
-import com.tari.android.wallet.R.color.all_settings_back_up_status_processing
-import com.tari.android.wallet.R.dimen.menu_item_height
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.tari.android.wallet.R.string.*
 import com.tari.android.wallet.databinding.FragmentAllSettingsBinding
 import com.tari.android.wallet.di.DiContainer.appComponent
-import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.extension.observe
 import com.tari.android.wallet.infrastructure.BugReportingService
 import com.tari.android.wallet.infrastructure.security.biometric.BiometricAuthenticationService
 import com.tari.android.wallet.ui.common.CommonFragment
-import com.tari.android.wallet.ui.extension.*
+import com.tari.android.wallet.ui.extension.string
 import com.tari.android.wallet.ui.fragment.settings.userAutorization.BiometricAuthenticationViewModel
-import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.yat.YatAdapter
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-import kotlin.math.min
 
 internal class AllSettingsFragment : CommonFragment<FragmentAllSettingsBinding, AllSettingsViewModel>() {
 
@@ -71,10 +64,9 @@ internal class AllSettingsFragment : CommonFragment<FragmentAllSettingsBinding, 
     lateinit var bugReportingService: BugReportingService
 
     @Inject
-    lateinit var clipboardManager: ClipboardManager
-
-    @Inject
     lateinit var yatAdapter: YatAdapter
+
+    private val optionsAdapter = AllSettingsOptionAdapter()
 
     private val biometricAuthenticationViewModel: BiometricAuthenticationViewModel by viewModels()
 
@@ -100,28 +92,8 @@ internal class AllSettingsFragment : CommonFragment<FragmentAllSettingsBinding, 
     }
 
     private fun setupUI() {
-        ui.cloudBackupStatusProgressView.setColor(color(all_settings_back_up_status_processing))
-        ui.scrollElevationGradientView.alpha = 0f
-        ui.scrollView.setOnScrollChangeListener(ScrollListener())
-        bindCTAs()
-    }
-
-    private fun bindCTAs() = with(ui) {
-        reportBugCtaView.setOnThrottledClickListener { viewModel.shareBugReport() }
-        visitSiteCtaView.setOnThrottledClickListener { viewModel.openTariUrl() }
-        contributeCtaView.setOnThrottledClickListener { viewModel.openGithubUrl() }
-        userAgreementCtaView.setOnThrottledClickListener { viewModel.openAgreementUrl() }
-        privacyPolicyCtaView.setOnThrottledClickListener { viewModel.openPrivateUrl() }
-        disclaimerCtaView.setOnThrottledClickListener { viewModel.openDisclaimerUrl() }
-        explorerCtaView.setOnThrottledClickListener { viewModel.openExplorerUrl() }
-        backUpWalletCtaView.setOnThrottledClickListener { viewModel.navigateToBackupSettings() }
-        backgroundServiceCtaView.setOnThrottledClickListener { viewModel.navigateToBackgroundServiceSettings() }
-        torBridgesCta.setOnThrottledClickListener { viewModel.navigateToTorBridgesSettings() }
-        changeBaseNodeCtaView.setOnThrottledClickListener { viewModel.navigateToBaseNodeSelection() }
-        changeNetworkCtaView.setOnThrottledClickListener { viewModel.navigateToNetworkSelection() }
-        deleteWalletCtaView.setOnThrottledClickListener { viewModel.navigateToDeleteWallet() }
-        connectYats.setOnThrottledClickListener { yatAdapter.openOnboarding(requireActivity()) }
-        networkInfoCtaView.setOnThrottledClickListener { copy(viewModel.versionInfo.value.orEmpty()) }
+        ui.optionsList.layoutManager = LinearLayoutManager(requireContext())
+        ui.optionsList.adapter = optionsAdapter
     }
 
     private fun observeUI() = with(viewModel) {
@@ -129,33 +101,9 @@ internal class AllSettingsFragment : CommonFragment<FragmentAllSettingsBinding, 
 
         observe(shareBugReport) { this@AllSettingsFragment.shareBugReport() }
 
-        observe(backupState) { activateBackupStatusView(it) }
+        observe(openYatOnboarding) { yatAdapter.openOnboarding(requireActivity()) }
 
-        observe(lastBackupDate) { ui.lastBackupTimeTextView.text = it }
-
-        observe(versionInfo) { ui.networkInfoTextView.text = it }
-    }
-
-    private fun activateBackupStatusView(backupState: PresentationBackupState) {
-        val iconView = when (backupState.status) {
-            PresentationBackupState.BackupStateStatus.InProgress -> ui.cloudBackupStatusProgressView
-            PresentationBackupState.BackupStateStatus.Success -> ui.cloudBackupStatusSuccessView
-            PresentationBackupState.BackupStateStatus.Warning -> ui.cloudBackupStatusWarningView
-            PresentationBackupState.BackupStateStatus.Scheduled -> ui.cloudBackupStatusScheduledView
-        }
-
-        fun View.adjustVisibility() {
-            visibility = if (this == iconView) View.VISIBLE else View.INVISIBLE
-        }
-
-        ui.cloudBackupStatusProgressView.adjustVisibility()
-        ui.cloudBackupStatusSuccessView.adjustVisibility()
-        ui.cloudBackupStatusWarningView.adjustVisibility()
-        ui.cloudBackupStatusScheduledView.adjustVisibility()
-        val hideText = backupState.textId == -1
-        ui.backupStatusTextView.text = if (hideText) "" else string(backupState.textId)
-        ui.backupStatusTextView.visibility = if (hideText) View.GONE else View.VISIBLE
-        if (backupState.textColor != -1) ui.backupStatusTextView.setTextColor(color(backupState.textColor))
+        observe(allSettingsOptions) { optionsAdapter.update(it) }
     }
 
     private fun shareBugReport() {
@@ -188,29 +136,6 @@ internal class AllSettingsFragment : CommonFragment<FragmentAllSettingsBinding, 
             AllSettingsNavigation.ToDeleteWallet -> router.toDeleteWallet()
             AllSettingsNavigation.ToNetworkSelection -> router.toNetworkSelection()
             AllSettingsNavigation.ToTorBridges -> router.toTorBridges()
-        }
-    }
-
-    private fun copy(text: String) {
-        clipboardManager.setPrimaryClip(ClipData.newPlainText(string(all_settings_version_text_copy_title), text))
-        Toast.makeText(requireActivity(), string(all_settings_version_text_copy_toast_message), Toast.LENGTH_LONG).show()
-    }
-
-    override fun onDestroyView() {
-        ui.scrollView.setOnScrollChangeListener(null)
-        super.onDestroyView()
-    }
-
-    override fun onDestroy() {
-        EventBus.backupState.unsubscribe(this)
-        super.onDestroy()
-    }
-
-    inner class ScrollListener : View.OnScrollChangeListener {
-
-        override fun onScrollChange(v: View?, scrollX: Int, scrollY: Int, oldScrollX: Int, oldScrollY: Int) {
-            ui.scrollElevationGradientView.alpha =
-                min(Constants.UI.scrollDepthShadowViewMaxOpacity, scrollY / (dimenPx(menu_item_height)).toFloat())
         }
     }
 
