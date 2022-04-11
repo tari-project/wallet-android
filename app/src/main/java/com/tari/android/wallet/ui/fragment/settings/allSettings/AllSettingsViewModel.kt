@@ -116,7 +116,7 @@ internal class AllSettingsViewModel : CommonViewModel() {
                 _openYatOnboarding.postValue(Unit)
             },
             SettingsTitleDto(resourceManager.getString(all_settings_advanced_settings_label)),
-            ButtonViewDto(resourceManager.getString(all_settings_background_service), all_settings_bridge_configuration_icon) {
+            ButtonViewDto(resourceManager.getString(all_settings_background_service), all_settings_background_service_icon) {
                 _navigation.postValue(AllSettingsNavigation.ToBackgroundService)
             },
             DividerViewHolderItem(),
@@ -160,7 +160,6 @@ internal class AllSettingsViewModel : CommonViewModel() {
     private fun onBackupStateChanged(backupState: BackupState?) {
         if (backupState == null) {
             backupOption.backupState = PresentationBackupState(Warning)
-            _allSettingsOptions.postValue(_allSettingsOptions.value)
         } else {
             updateLastSuccessfulBackupDate()
             val presentationBackupState = when (backupState) {
@@ -187,8 +186,8 @@ internal class AllSettingsViewModel : CommonViewModel() {
                 }
             }
             backupOption.backupState = presentationBackupState
-            _allSettingsOptions.postValue(_allSettingsOptions.value)
         }
+        _allSettingsOptions.postValue(_allSettingsOptions.value)
     }
 
     private fun updateLastSuccessfulBackupDate() {
