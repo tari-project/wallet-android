@@ -6,7 +6,6 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.orhanobut.logger.Logger
 import com.tari.android.wallet.R
-import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.infrastructure.backup.BackupManager
 import com.tari.android.wallet.infrastructure.backup.BackupState
@@ -14,7 +13,7 @@ import com.tari.android.wallet.infrastructure.backup.BackupStorageAuthRevokedExc
 import com.tari.android.wallet.infrastructure.backup.BackupStorageFullException
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.common.SingleLiveEvent
-import com.tari.android.wallet.ui.dialog.backup.BackupSettingsRepository
+import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupSettingsRepository
 import com.tari.android.wallet.ui.dialog.error.ErrorDialogArgs
 import com.tari.android.wallet.ui.fragment.settings.userAutorization.BiometricAuthenticationViewModel
 import kotlinx.coroutines.Dispatchers
@@ -46,8 +45,8 @@ internal class BackupSettingsViewModel : CommonViewModel() {
     private val _isBackupAvailable = MutableLiveData<Boolean>()
     val isBackupAvailable: LiveData<Boolean> = _isBackupAvailable
 
-    private val _backupPermissionSwitchChecked = MutableLiveData<Boolean>()
-    val backupPermissionSwitch: LiveData<Boolean> = _backupPermissionSwitchChecked
+    private val _googleDriveBackupPermissionSwitchChecked = MutableLiveData<Boolean>()
+    val googleDriveBackupPermissionSwitch: LiveData<Boolean> = _googleDriveBackupPermissionSwitchChecked
 
     private val _inProgress = MutableLiveData<Boolean>()
     val inProgress: LiveData<Boolean> = _inProgress
@@ -80,12 +79,12 @@ internal class BackupSettingsViewModel : CommonViewModel() {
     val backupOptionsVisibility: LiveData<Boolean> = _backupOptionVisibility
 
     init {
-        component?.inject(this)
+        component.inject(this)
 
         EventBus.backupState.subscribe(this, this::onBackupStateChanged)
 
         backupOptionsAreVisible.postValue(backupSettingsRepository.backupIsEnabled)
-        _backupPermissionSwitchChecked.postValue(backupSettingsRepository.backupIsEnabled)
+        _googleDriveBackupPermissionSwitchChecked.postValue(backupSettingsRepository.backupIsEnabled)
         _backupStateChanged.postValue(Unit)
         refillSharedPrefsData()
     }
@@ -101,7 +100,7 @@ internal class BackupSettingsViewModel : CommonViewModel() {
                 Logger.e("Backup storage setup failed: $exception")
                 backupManager.turnOff(deleteExistingBackups = true)
                 _inProgress.postValue(false)
-                _backupPermissionSwitchChecked.postValue(false)
+                _googleDriveBackupPermissionSwitchChecked.postValue(false)
                 showBackupStorageSetupFailedDialog(exception)
             } finally {
                 _blockedBackPressed.postValue(false)
@@ -135,9 +134,20 @@ internal class BackupSettingsViewModel : CommonViewModel() {
         }
     }
 
+    fun onDropboxBackup() {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                backupManager.backup(isInitialBackup = false, userTriggered = true)
+            } catch (exception: Exception) {
+                showBackupFailureDialog(exception)
+            }
+        }
+    }
+
+
     fun onBackupPermissionSwitch(isChecked: Boolean) {
         _inProgress.postValue(true)
-        _backupPermissionSwitchChecked.postValue(isChecked)
+        _googleDriveBackupPermissionSwitchChecked.postValue(isChecked)
 
         if (isChecked) {
             _openFolderSelection.postValue(Unit)
@@ -159,7 +169,7 @@ internal class BackupSettingsViewModel : CommonViewModel() {
                 }
             }, onDismiss = {
                 _inProgress.postValue(false)
-                _backupPermissionSwitchChecked.postValue(true)
+                _googleDriveBackupPermissionSwitchChecked.postValue(true)
             })
         _showBackupsWillBeDeletedDialog.postValue(args)
     }
@@ -179,7 +189,7 @@ internal class BackupSettingsViewModel : CommonViewModel() {
             else -> resourceManager.getString(R.string.back_up_wallet_storage_setup_error_desc)
         }
         _errorDialog.postValue(ErrorDialogArgs(errorTitle, errorDescription) {
-            _backupPermissionSwitchChecked.postValue(false)
+            _googleDriveBackupPermissionSwitchChecked.postValue(false)
             _inProgress.postValue(false)
         })
     }
@@ -225,7 +235,7 @@ internal class BackupSettingsViewModel : CommonViewModel() {
                 showBackupFailureDialog(backupState.backupException)
             }
             _inProgress.postValue(false)
-            _backupPermissionSwitchChecked.postValue(true)
+            _googleDriveBackupPermissionSwitchChecked.postValue(true)
             _backupWalletToCloudEnabled.postValue(true)
             _isBackupAvailable.postValue(true)
             _isBackupNowEnabled.postValue(true)
@@ -239,13 +249,13 @@ internal class BackupSettingsViewModel : CommonViewModel() {
         } else {
             showBackupStorageSetupFailedDialog()
             _inProgress.postValue(false)
-            _backupPermissionSwitchChecked.postValue(false)
+            _googleDriveBackupPermissionSwitchChecked.postValue(false)
         }
     }
 
     private fun handleUpToDateState() {
         _inProgress.postValue(false)
-        _backupPermissionSwitchChecked.postValue(true)
+        _googleDriveBackupPermissionSwitchChecked.postValue(true)
         _backupOptionVisibility.postValue(true)
         _updatePasswordEnabled.postValue(true)
         _backupWalletToCloudEnabled.postValue(false)
@@ -256,7 +266,7 @@ internal class BackupSettingsViewModel : CommonViewModel() {
 
     private fun handleInProgressState() {
         _inProgress.postValue(true)
-        _backupPermissionSwitchChecked.postValue(true)
+        _googleDriveBackupPermissionSwitchChecked.postValue(true)
         _backupWalletToCloudEnabled.postValue(false)
         _isBackupAvailable.postValue(true)
         _isBackupNowEnabled.postValue(false)
@@ -266,7 +276,7 @@ internal class BackupSettingsViewModel : CommonViewModel() {
 
     private fun handleScheduledState() {
         _inProgress.postValue(false)
-        _backupPermissionSwitchChecked.postValue(true)
+        _googleDriveBackupPermissionSwitchChecked.postValue(true)
         _backupWalletToCloudEnabled.postValue(true)
         _isBackupAvailable.postValue(true)
         _isBackupNowEnabled.postValue(true)
@@ -285,7 +295,7 @@ internal class BackupSettingsViewModel : CommonViewModel() {
 
     private fun handleStorageCheckFailedState() {
         _inProgress.postValue(false)
-        _backupPermissionSwitchChecked.postValue(true)
+        _googleDriveBackupPermissionSwitchChecked.postValue(true)
         _backupWalletToCloudEnabled.postValue(false)
         _isBackupAvailable.postValue(true)
         _isBackupNowEnabled.postValue(false)
@@ -294,7 +304,7 @@ internal class BackupSettingsViewModel : CommonViewModel() {
 
     private fun handleCheckingStorageState() {
         _inProgress.postValue(true)
-        _backupPermissionSwitchChecked.postValue(true)
+        _googleDriveBackupPermissionSwitchChecked.postValue(true)
         _backupWalletToCloudEnabled.postValue(false)
         _isBackupAvailable.postValue(true)
         _isBackupNowEnabled.postValue(false)
@@ -305,7 +315,7 @@ internal class BackupSettingsViewModel : CommonViewModel() {
     private fun handleDisabledState() {
         _backupOptionVisibility.postValue(false)
         _inProgress.postValue(false)
-        _backupPermissionSwitchChecked.postValue(false)
+        _googleDriveBackupPermissionSwitchChecked.postValue(false)
     }
 }
 

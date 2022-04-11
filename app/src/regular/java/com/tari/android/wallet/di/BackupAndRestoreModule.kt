@@ -37,7 +37,7 @@ import com.tari.android.wallet.data.WalletConfig
 import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepository
 import com.tari.android.wallet.infrastructure.backup.*
 import com.tari.android.wallet.notification.NotificationHelper
-import com.tari.android.wallet.ui.dialog.backup.BackupSettingsRepository
+import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupSettingsRepository
 import dagger.Module
 import dagger.Provides
 import javax.inject.Singleton

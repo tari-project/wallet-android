@@ -14,9 +14,9 @@ import com.tari.android.wallet.infrastructure.backup.BackupStorageAuthRevokedExc
 import com.tari.android.wallet.infrastructure.security.biometric.BiometricAuthenticationService
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.common.SingleLiveEvent
-import com.tari.android.wallet.ui.dialog.backup.BackupSettingsRepository
 import com.tari.android.wallet.ui.dialog.error.ErrorDialogArgs
 import com.tari.android.wallet.ui.fragment.settings.allSettings.PresentationBackupState.BackupStateStatus.*
+import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupSettingsRepository
 import com.tari.android.wallet.ui.fragment.settings.userAutorization.BiometricAuthenticationViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -123,7 +123,8 @@ internal class AllSettingsViewModel : CommonViewModel() {
                 }
                 is BackupState.BackupStorageCheckFailed -> PresentationBackupState(InProgress, -1, all_settings_back_up_status_error)
                 is BackupState.BackupScheduled -> {
-                    if (backupSettingsRepository.backupFailureDate == null) {
+                    val failureDate = backupSettingsRepository.getOptionList.mapNotNull { it.lastFailureDate }.firstOrNull()?.toLocalDateTime()
+                    if (failureDate == null) {
                         PresentationBackupState(Scheduled, back_up_wallet_backup_status_scheduled, all_settings_back_up_status_scheduled)
                     } else {
                         PresentationBackupState(Warning, back_up_wallet_backup_status_scheduled, all_settings_back_up_status_processing)
@@ -144,7 +145,7 @@ internal class AllSettingsViewModel : CommonViewModel() {
     }
 
     private fun updateLastSuccessfulBackupDate() {
-        val time = backupSettingsRepository.lastSuccessfulBackupDate?.toLocalDateTime()
+        val time = backupSettingsRepository.getOptionList.mapNotNull { it.lastSuccessDate }.firstOrNull()?.toLocalDateTime()
         val text = if (time == null) "" else {
             resourceManager.getString(back_up_wallet_last_successful_backup, BACKUP_DATE_FORMATTER.print(time), BACKUP_TIME_FORMATTER.print(time))
         }

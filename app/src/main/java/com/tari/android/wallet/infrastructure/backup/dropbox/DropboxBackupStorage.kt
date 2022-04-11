@@ -26,7 +26,7 @@ import com.tari.android.wallet.R
 import com.tari.android.wallet.extension.getLastPathComponent
 import com.tari.android.wallet.infrastructure.backup.*
 import com.tari.android.wallet.infrastructure.backup.dropbox.DropboxClientFactory
-import com.tari.android.wallet.ui.dialog.backup.BackupSettingsRepository
+import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupSettingsRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.joda.time.DateTime
@@ -271,7 +271,8 @@ internal class DropboxBackupStorage(
             backupFileProcessor.restoreBackupFile(tempFile, password)
             backupFileProcessor.clearTempFolder()
             // restore successful, turn on automated backup
-            backupSettingsRepository.lastSuccessfulBackupDate = namingPolicy.getDateFromBackupFileName(tempFile.name)
+            val lastSuccessfulDate = namingPolicy.getDateFromBackupFileName(tempFile.name)
+            backupSettingsRepository.dropboxOption = backupSettingsRepository.dropboxOption!!.copy(lastSuccessDate = lastSuccessfulDate)
             backupSettingsRepository.backupPassword = password
         }
     }

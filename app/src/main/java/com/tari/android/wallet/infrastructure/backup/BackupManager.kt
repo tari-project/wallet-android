@@ -39,7 +39,7 @@ import com.orhanobut.logger.Logger
 import com.tari.android.wallet.R
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.notification.NotificationHelper
-import com.tari.android.wallet.ui.dialog.backup.BackupSettingsRepository
+import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupSettingsRepository
 import com.tari.android.wallet.util.Constants
 import io.reactivex.Observable
 import io.reactivex.disposables.Disposable
@@ -89,16 +89,8 @@ internal class BackupManager(
         backupStorage.setup(hostFragment)
     }
 
-    suspend fun onSetupActivityResult(
-        requestCode: Int,
-        resultCode: Int,
-        intent: Intent?
-    ) {
-        backupStorage.onSetupActivityResult(
-            requestCode,
-            resultCode,
-            intent
-        )
+    suspend fun onSetupActivityResult(requestCode: Int, resultCode: Int, intent: Intent?) {
+        backupStorage.onSetupActivityResult(requestCode, resultCode, intent)
     }
 
     suspend fun checkStorageStatus() {
@@ -137,10 +129,7 @@ internal class BackupManager(
         }
     }
 
-    fun scheduleBackup(
-        delayMs: Long? = null,
-        resetRetryCount: Boolean = false
-    ) {
+    fun scheduleBackup(delayMs: Long? = null, resetRetryCount: Boolean = false) {
         if (!backupSettingsRepository.backupIsEnabled) {
             Logger.i("Backup is not enabled - cannot schedule a backup.")
             return // if backup is disabled or there's a scheduled backup
@@ -173,11 +162,7 @@ internal class BackupManager(
         Logger.i("Backup scheduled.")
     }
 
-    suspend fun backup(
-        isInitialBackup: Boolean = false,
-        userTriggered: Boolean = false,
-        newPassword: CharArray? = null
-    ) {
+    suspend fun backup(isInitialBackup: Boolean = false, userTriggered: Boolean = false, newPassword: CharArray? = null) {
         if (!isInitialBackup && !backupSettingsRepository.backupIsEnabled) {
             Logger.d("Backup is disabled. Exit.")
             return
@@ -213,10 +198,7 @@ internal class BackupManager(
                 throw exception
             }
             if (userTriggered || retryCount > Constants.Wallet.maxBackupRetries) {
-                Logger.e(
-                    exception,
-                    "Error happened while backing up. It's a user-triggered backup or retry limit has been exceeded."
-                )
+                Logger.e(exception, "Error happened while backing up. It's a user-triggered backup or retry limit has been exceeded.")
                 EventBus.backupState.post(BackupState.BackupOutOfDate(exception))
                 backupSettingsRepository.scheduledBackupDate = null
                 backupSettingsRepository.backupFailureDate = DateTime.now()
@@ -227,10 +209,7 @@ internal class BackupManager(
                 throw exception
             } else {
                 Logger.e(exception, "Backup failed: ${exception.message}. Will schedule.")
-                scheduleBackup(
-                    delayMs = Constants.Wallet.backupRetryPeriodMs,
-                    resetRetryCount = false
-                )
+                scheduleBackup(Constants.Wallet.backupRetryPeriodMs, false)
             }
             Logger.e(exception, "Error happened while backing up. Will retry.")
         }
@@ -252,10 +231,7 @@ internal class BackupManager(
             exception.message == null -> context.getString(R.string.back_up_wallet_backing_up_unknown_error)
             else -> context.getString(R.string.back_up_wallet_backing_up_error_desc, exception.message!!)
         }
-        notificationHelper.postNotification(
-            title = title,
-            body = body
-        )
+        notificationHelper.postNotification(title, body)
     }
 
     // TODO(nyarian): TBD - should side effects be separated from the direct flow?
@@ -283,11 +259,7 @@ internal class BackupManager(
         try {
             backupStorage.signOut()
         } catch (exception: Exception) {
-            /* no-op */
-            Logger.e(
-                exception,
-                "Ignored exception while turning off: $exception"
-            )
+            Logger.e(exception, "Ignored exception while turning off: $exception")
         }
     }
 

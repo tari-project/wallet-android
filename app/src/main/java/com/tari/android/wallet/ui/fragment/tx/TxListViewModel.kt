@@ -17,12 +17,12 @@ import com.tari.android.wallet.ui.common.gyphy.presentation.GIFViewModel
 import com.tari.android.wallet.ui.common.gyphy.repository.GIFRepository
 import com.tari.android.wallet.ui.common.recyclerView.CommonViewHolderItem
 import com.tari.android.wallet.ui.common.recyclerView.items.TitleViewHolderItem
-import com.tari.android.wallet.ui.dialog.backup.BackupSettingsRepository
 import com.tari.android.wallet.ui.dialog.backup.BackupWalletDialogArgs
 import com.tari.android.wallet.ui.dialog.error.ErrorDialogArgs
 import com.tari.android.wallet.ui.dialog.testnet.TestnetReceivedDialogArgs
 import com.tari.android.wallet.ui.dialog.ttl.TtlStoreWalletDialogArgs
 import com.tari.android.wallet.ui.fragment.send.finalize.TxFailureReason
+import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupSettingsRepository
 import com.tari.android.wallet.ui.fragment.tx.adapter.TransactionItem
 import com.tari.android.wallet.ui.fragment.tx.ui.UpdateProgressViewController
 import com.tari.android.wallet.util.Constants
@@ -95,7 +95,7 @@ internal class TxListViewModel() : CommonViewModel() {
     val list: LiveData<MutableList<CommonViewHolderItem>> = _list
 
     private val _listUpdateTrigger = MediatorLiveData<Unit>()
-    val listUpdateTrigger : LiveData<Unit> = _listUpdateTrigger
+    val listUpdateTrigger: LiveData<Unit> = _listUpdateTrigger
 
     val debouncedList = Transformations.map(listUpdateTrigger.debounce(LIST_UPDATE_DEBOUNCE)) { updateList() }
 
@@ -207,7 +207,14 @@ internal class TxListViewModel() : CommonViewModel() {
         nonPendingTxs.sortWith(compareByDescending(Tx::timestamp).thenByDescending { it.id })
         if (nonPendingTxs.isNotEmpty()) {
             items.add(TitleViewHolderItem(resourceManager.getString(R.string.home_completed_transactions_title), false))
-            items.addAll(nonPendingTxs.mapIndexed { index, tx -> TransactionItem(tx, index + pendingTxs.size, GIFViewModel(gifRepository), confirmationCount) })
+            items.addAll(nonPendingTxs.mapIndexed { index, tx ->
+                TransactionItem(
+                    tx,
+                    index + pendingTxs.size,
+                    GIFViewModel(gifRepository),
+                    confirmationCount
+                )
+            })
         }
         _list.postValue(items)
     }
@@ -282,7 +289,7 @@ internal class TxListViewModel() : CommonViewModel() {
     }
 
     private fun onTxMinedUnconfirmed(tx: CompletedTx) {
-       when (tx.direction) {
+        when (tx.direction) {
             Tx.Direction.INBOUND -> pendingInboundTxs
             Tx.Direction.OUTBOUND -> pendingOutboundTxs
         }.removeIf { it.id == tx.id }
@@ -453,25 +460,26 @@ internal class TxListViewModel() : CommonViewModel() {
     private fun showWalletBackupPromptIfNecessary() {
         if (!backupSettingsRepository.isShowHintDialog()) return
 
-        if (!backupSettingsRepository.backupIsEnabled || backupSettingsRepository.backupPassword == null) {
+        val isAnyBackupEnabled = backupSettingsRepository.getOptionList.any { it.isEnable }
+        if (!isAnyBackupEnabled || backupSettingsRepository.backupPassword == null) {
             backupSettingsRepository.lastBackupDialogShown = DateTime.now()
             val inboundTransactionsCount = pendingInboundTxs.size + completedTxs.asSequence().filter { it.direction == Tx.Direction.INBOUND }.count()
             val tarisAmount = balanceInfo.value!!.availableBalance.tariValue + balanceInfo.value!!.pendingIncomingBalance.tariValue
             when {
                 inboundTransactionsCount >= 5
                         && tarisAmount >= BigDecimal("25000")
-                        && backupSettingsRepository.backupIsEnabled
+                        && isAnyBackupEnabled
                         && backupSettingsRepository.backupPassword == null -> showSecureYourBackupsDialog()
                 inboundTransactionsCount >= 4
                         && tarisAmount >= BigDecimal("8000")
-                        && !backupSettingsRepository.backupIsEnabled -> showRepeatedBackUpPrompt()
+                        && !isAnyBackupEnabled -> showRepeatedBackUpPrompt()
                 // Non-faucet transactions only here. Calculation is performed here to avoid
                 // unnecessary calculations as previous two cases have much greater chance to happen
                 pendingInboundTxs.size + completedTxs
                     .filter { it.direction == Tx.Direction.INBOUND }
                     .filterNot { it.status == TxStatus.IMPORTED }
                     .count() >= 1
-                        && !backupSettingsRepository.backupIsEnabled -> showInitialBackupPrompt()
+                        && !isAnyBackupEnabled -> showInitialBackupPrompt()
             }
         }
     }

@@ -40,7 +40,7 @@ import androidx.fragment.app.Fragment
 import com.orhanobut.logger.Logger
 import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepository
 import com.tari.android.wallet.extension.getLastPathComponent
-import com.tari.android.wallet.ui.dialog.backup.BackupSettingsRepository
+import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupSettingsRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.apache.commons.io.FileUtils
@@ -171,7 +171,8 @@ internal class LocalBackupStorage(
             backupFileProcessor.restoreBackupFile(tempFile, password)
             backupFileProcessor.clearTempFolder()
             // restore successful, turn on automated backup
-            backupSettingsRepository.lastSuccessfulBackupDate = namingPolicy.getDateFromBackupFileName(tempFile.name)
+            val lastSuccessfulDate = namingPolicy.getDateFromBackupFileName(tempFile.name)
+            backupSettingsRepository.localFileOption = backupSettingsRepository.localFileOption!!.copy(lastSuccessDate = lastSuccessfulDate)
             backupSettingsRepository.backupPassword = password
         }
     }

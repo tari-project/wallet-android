@@ -45,7 +45,6 @@ import androidx.core.animation.addListener
 import androidx.fragment.app.viewModels
 import com.tari.android.wallet.R
 import com.tari.android.wallet.R.color.all_settings_back_up_status_processing
-import com.tari.android.wallet.R.color.back_up_settings_permission_processing
 import com.tari.android.wallet.R.string.*
 import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import com.tari.android.wallet.data.sharedPrefs.tariSettings.TariSettingsSharedRepository
@@ -122,7 +121,6 @@ internal class BackupSettingsFragment : CommonFragment<FragmentWalletBackupSetti
     }
 
     private fun setupViews() = with(ui) {
-        googleDriveBackupPermissionProgressBar.setColor(color(back_up_settings_permission_processing))
         cloudBackupStatusProgressView.setColor(color(all_settings_back_up_status_processing))
         initBackupOptions()
     }
@@ -136,7 +134,7 @@ internal class BackupSettingsFragment : CommonFragment<FragmentWalletBackupSetti
     }
 
     private fun setPermissionSwitchListener() {
-        ui.googleDriveBackupPermissionSwitch.setOnCheckedChangeListener { _, isChecked -> viewModel.onBackupPermissionSwitch(isChecked) }
+        ui.googleDriveBackup.ui.backupPermissionSwitch.setOnCheckedChangeListener { _, isChecked -> viewModel.onBackupPermissionSwitch(isChecked) }
     }
 
     private fun subscribeUI() = with(viewModel) {
@@ -154,7 +152,7 @@ internal class BackupSettingsFragment : CommonFragment<FragmentWalletBackupSetti
 
         observe(inProgress) { onChangeInProgress(it) }
 
-        observe(backupPermissionSwitch) { setSwitchCheck(it) }
+        observe(googleDriveBackupPermissionSwitch) { setSwitchCheck(it) }
 
         observe(isBackupNowEnabled) { ui.backupNowTextView.alpha = if (it) ALPHA_VISIBLE else ALPHA_DISABLED }
 
@@ -195,12 +193,7 @@ internal class BackupSettingsFragment : CommonFragment<FragmentWalletBackupSetti
 
     private fun hideAllBackupOptions() {
         if (viewModel.backupOptionsAreVisible.value!!) {
-            arrayOf(
-                ui.backupsSeparatorView,
-                ui.updatePasswordCtaView,
-                ui.backupWalletToCloudCtaContainerView,
-                ui.lastBackupTimeTextView
-            ).forEach(View::gone)
+            arrayOf(ui.updatePasswordCtaView, ui.backupWalletToCloudCtaContainerView, ui.lastBackupTimeTextView).forEach(View::gone)
             viewModel.backupOptionsAreVisible.postValue(false)
         }
     }
@@ -210,8 +203,8 @@ internal class BackupSettingsFragment : CommonFragment<FragmentWalletBackupSetti
     }
 
     private fun onChangeInProgress(inProgress: Boolean) = with(ui) {
-        googleDriveBackupPermissionSwitch.setVisible(!inProgress, View.INVISIBLE)
-        googleDriveBackupPermissionProgressBar.setVisible(inProgress, View.INVISIBLE)
+        ui.googleDriveBackup.ui.backupPermissionSwitch.setVisible(!inProgress, View.INVISIBLE)
+        ui.googleDriveBackup.ui.backupPermissionProgressBar.setVisible(inProgress, View.INVISIBLE)
     }
 
     private fun onChangeUpdatePasswordEnabled(isEnabled: Boolean) = with(ui) {
@@ -221,8 +214,8 @@ internal class BackupSettingsFragment : CommonFragment<FragmentWalletBackupSetti
     }
 
     private fun setSwitchCheck(isChecked: Boolean) = with(ui) {
-        googleDriveBackupPermissionSwitch.setOnCheckedChangeListener(null)
-        googleDriveBackupPermissionSwitch.isChecked = isChecked
+        ui.googleDriveBackup.ui.backupPermissionSwitch.setOnCheckedChangeListener(null)
+        ui.googleDriveBackup.ui.backupPermissionSwitch.isChecked = isChecked
         setPermissionSwitchListener()
     }
 
@@ -347,7 +340,6 @@ internal class BackupSettingsFragment : CommonFragment<FragmentWalletBackupSetti
     private fun showBackupOptionsWithAnimation() {
         if (viewModel.backupOptionsAreVisible.value!!) return
         val views = arrayOf(
-            ui.backupsSeparatorView,
             ui.updatePasswordCtaView,
             ui.lastBackupTimeTextView,
             ui.backupWalletToCloudCtaContainerView
@@ -386,12 +378,7 @@ internal class BackupSettingsFragment : CommonFragment<FragmentWalletBackupSetti
 
     private fun hideAllBackupOptionsWithAnimation() {
         if (!viewModel.backupOptionsAreVisible.value!!) return
-        val views = arrayOf(
-            ui.backupsSeparatorView,
-            ui.updatePasswordCtaView,
-            ui.backupWalletToCloudCtaContainerView,
-            ui.lastBackupTimeTextView
-        )
+        val views = arrayOf(ui.updatePasswordCtaView, ui.backupWalletToCloudCtaContainerView, ui.lastBackupTimeTextView)
         val wasClickable = views.map { it.isClickable }
         optionsAnimation?.cancel()
         optionsAnimation = ValueAnimator.ofFloat(ALPHA_VISIBLE, ALPHA_INVISIBLE).apply {
@@ -435,5 +422,3 @@ internal class BackupSettingsFragment : CommonFragment<FragmentWalletBackupSetti
         private const val ALPHA_DISABLED = 0.15F
     }
 }
-
-
