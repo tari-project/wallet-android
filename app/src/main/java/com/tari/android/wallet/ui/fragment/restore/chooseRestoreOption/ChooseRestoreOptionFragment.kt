@@ -39,14 +39,16 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
-import com.tari.android.wallet.R.color.all_settings_back_up_status_processing
+import com.tari.android.wallet.R
 import com.tari.android.wallet.databinding.FragmentChooseRestoreOptionBinding
 import com.tari.android.wallet.di.DiContainer.appComponent
 import com.tari.android.wallet.extension.observe
 import com.tari.android.wallet.infrastructure.backup.BackupManager
-import com.tari.android.wallet.ui.fragment.restore.restore.WalletRestoreRouter
 import com.tari.android.wallet.ui.common.CommonFragment
-import com.tari.android.wallet.ui.extension.*
+import com.tari.android.wallet.ui.extension.setOnThrottledClickListener
+import com.tari.android.wallet.ui.fragment.restore.chooseRestoreOption.option.RecoveryOptionView
+import com.tari.android.wallet.ui.fragment.restore.restore.WalletRestoreRouter
+import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupOptions
 import javax.inject.Inject
 
 internal class ChooseRestoreOptionFragment : CommonFragment<FragmentChooseRestoreOptionBinding, ChooseRestoreOptionViewModel>() {
@@ -84,13 +86,16 @@ internal class ChooseRestoreOptionFragment : CommonFragment<FragmentChooseRestor
 
     private fun setupUI() = with(ui) {
         backCtaView.setOnThrottledClickListener { requireActivity().onBackPressed() }
-        restoreWalletMenuItemProgressView.setColor(color(all_settings_back_up_status_processing))
-        restoreWalletMenuItemProgressView.gone()
-        restoreWalletCtaView.setOnThrottledClickListener {
-            processState(ChooseRestoreOptionState.BeginProgress)
-            backupManager.setupStorage(this@ChooseRestoreOptionFragment)
-        }
+        googleDriveRestoreOption.ui.restoreWalletCtaView.setOnThrottledClickListener { startRecovery(BackupOptions.Google) }
+        dropboxRestoreOption.ui.restoreWalletCtaView.setOnThrottledClickListener { startRecovery(BackupOptions.Dropbox) }
         restoreWithRecoveryPhraseCtaView.setOnThrottledClickListener { processNavigation(ChooseRestoreOptionNavigation.ToRestoreWithRecoveryPhrase) }
+        googleDriveRestoreOption.init(getString(R.string.back_up_wallet_restore_with_google_drive))
+        dropboxRestoreOption.init(getString(R.string.back_up_wallet_restore_with_dropbox))
+    }
+
+    private fun startRecovery(options: BackupOptions) {
+        viewModel.startRestore(options)
+        backupManager.setupStorage(options, this)
     }
 
     private fun observeUI() = with(viewModel) {
@@ -101,8 +106,8 @@ internal class ChooseRestoreOptionFragment : CommonFragment<FragmentChooseRestor
 
     private fun processState(state: ChooseRestoreOptionState) {
         when (state) {
-            ChooseRestoreOptionState.BeginProgress -> beginProgress()
-            ChooseRestoreOptionState.EndProgress -> endProgress()
+            is ChooseRestoreOptionState.BeginProgress -> updateProgress(state.backupOptions, true)
+            is ChooseRestoreOptionState.EndProgress -> updateProgress(state.backupOptions, false)
         }
     }
 
@@ -116,18 +121,17 @@ internal class ChooseRestoreOptionFragment : CommonFragment<FragmentChooseRestor
         }
     }
 
-    private fun beginProgress() = with(ui) {
-        blockingBackPressDispatcher.isEnabled = true
-        restoreWalletMenuItemProgressView.visible()
-        restoreWalletMenuItemArrowImageView.invisible()
-        restoreWalletCtaView.isEnabled = false
+    private fun updateProgress(backupOptions: BackupOptions, isStarted: Boolean) {
+        blockingBackPressDispatcher.isEnabled = isStarted
+        getBackupOptionView(backupOptions)?.updateLoading(isStarted)
     }
 
-    private fun endProgress() = with(ui) {
-        blockingBackPressDispatcher.isEnabled = false
-        restoreWalletMenuItemProgressView.invisible()
-        restoreWalletMenuItemArrowImageView.visible()
-        restoreWalletCtaView.isEnabled = true
+    private fun getBackupOptionView(backupOptions: BackupOptions): RecoveryOptionView? {
+        return when (backupOptions) {
+            BackupOptions.Google -> ui.googleDriveRestoreOption
+            BackupOptions.Dropbox -> ui.dropboxRestoreOption
+            BackupOptions.Local -> null
+        }
     }
 
     companion object {

@@ -124,6 +124,7 @@ internal class BackupSettingsViewModel : CommonViewModel() {
         }
     }
 
+    //todo backuping all
     fun onBackupToCloud() {
         viewModelScope.launch(Dispatchers.IO) {
             try {
@@ -133,17 +134,6 @@ internal class BackupSettingsViewModel : CommonViewModel() {
             }
         }
     }
-
-    fun onDropboxBackup() {
-        viewModelScope.launch(Dispatchers.IO) {
-            try {
-                backupManager.backup(isInitialBackup = false, userTriggered = true)
-            } catch (exception: Exception) {
-                showBackupFailureDialog(exception)
-            }
-        }
-    }
-
 
     fun onBackupPermissionSwitch(isChecked: Boolean) {
         _inProgress.postValue(true)

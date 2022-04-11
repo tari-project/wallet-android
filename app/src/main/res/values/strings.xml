@@ -463,7 +463,9 @@
     <string name="back_up_wallet_last_successful_backup">Last successful backup: %s at %s</string>
     <string name="back_up_wallet_turn_off_backup_warning_title">Your backup will be deleted</string>
     <string name="back_up_wallet_turn_off_backup_warning_description">Are you sure you want to proceed?</string>
+    <string name="back_up_wallet_google_title">Google drive backups</string>
     <string name="back_up_wallet_dropbox_title">Dropbox backups</string>
+    <string name="back_up_wallet_restore_with_google_drive">Restore with Google Drive</string>
     <string name="back_up_wallet_restore_with_dropbox">Restore with Dropbox</string>
 
     <!-- Wallet back up with seed phrase -->

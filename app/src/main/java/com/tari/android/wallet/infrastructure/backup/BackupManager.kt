@@ -40,6 +40,7 @@ import com.tari.android.wallet.R
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.notification.NotificationHelper
 import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupOptionDto
+import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupOptions
 import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupSettingsRepository
 import com.tari.android.wallet.util.Constants
 import io.reactivex.Observable
@@ -59,6 +60,8 @@ internal class BackupManager(
     private val backupStorage: BackupStorage,
     private val notificationHelper: NotificationHelper
 ) {
+
+    private var currentOption: BackupOptions? = null
 
     private var currentBackupOption: BackupOptionDto
         get() = backupSettingsRepository.googleDriveOption!!
@@ -93,7 +96,8 @@ internal class BackupManager(
         }
     }
 
-    fun setupStorage(hostFragment: Fragment) {
+    fun setupStorage(option: BackupOptions, hostFragment: Fragment) {
+        currentOption = option
         backupStorage.setup(hostFragment)
     }
 

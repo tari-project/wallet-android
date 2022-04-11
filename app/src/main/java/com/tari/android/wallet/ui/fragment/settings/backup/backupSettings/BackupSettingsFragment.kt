@@ -59,6 +59,8 @@ import com.tari.android.wallet.ui.activity.settings.BackupSettingsRouter
 import com.tari.android.wallet.ui.common.CommonFragment
 import com.tari.android.wallet.ui.dialog.BottomSlideDialog
 import com.tari.android.wallet.ui.extension.*
+import com.tari.android.wallet.ui.fragment.settings.backup.backupSettings.option.BackupOptionViewModel
+import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupOptions
 import com.tari.android.wallet.ui.fragment.settings.userAutorization.BiometricAuthenticationViewModel
 import org.joda.time.DateTime
 import org.joda.time.format.DateTimeFormat
@@ -142,7 +144,10 @@ internal class BackupSettingsFragment : CommonFragment<FragmentWalletBackupSetti
 
         observe(cloudBackupStatus) { processCloudBackupStatus(it) }
 
-        observe(openFolderSelection) { backupManager.setupStorage(this@BackupSettingsFragment) }
+        observe(openFolderSelection) {
+            //todo
+            backupManager.setupStorage( BackupOptions.Google,this@BackupSettingsFragment)
+        }
 
         observe(backupStateChanged) { resetStatusIcons() }
 
@@ -181,6 +186,12 @@ internal class BackupSettingsFragment : CommonFragment<FragmentWalletBackupSetti
     }
 
     private fun initBackupOptions() {
+        val googleDriveViewModel: BackupOptionViewModel by viewModels()
+        val dropboxViewModel: BackupOptionViewModel by viewModels()
+
+        ui.googleDriveBackup.init(googleDriveViewModel)
+        ui.dropboxBackup.init(dropboxViewModel)
+
         if (viewModel.backupSettingsRepository.getOptionList.any { it.isEnable }) {
             if (EventBus.backupState.publishSubject.value is BackupUpToDate) {
                 ui.backupWalletToCloudCtaContainerView.gone()

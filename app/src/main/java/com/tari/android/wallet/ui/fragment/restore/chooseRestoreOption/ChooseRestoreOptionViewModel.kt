@@ -15,6 +15,7 @@ import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.common.SingleLiveEvent
 import com.tari.android.wallet.ui.dialog.error.ErrorDialogArgs
 import com.tari.android.wallet.ui.dialog.error.WalletErrorArgs
+import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupOptions
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.io.IOException
@@ -31,8 +32,10 @@ internal class ChooseRestoreOptionViewModel : CommonViewModel() {
     @Inject
     lateinit var walletServiceLauncher: WalletServiceLauncher
 
+    private var currentOption: BackupOptions? = null
+
     init {
-        component?.inject(this)
+        component.inject(this)
     }
 
     private val _state = SingleLiveEvent<ChooseRestoreOptionState>()
@@ -40,6 +43,10 @@ internal class ChooseRestoreOptionViewModel : CommonViewModel() {
 
     private val _navigation = SingleLiveEvent<ChooseRestoreOptionNavigation>()
     val navigation: LiveData<ChooseRestoreOptionNavigation> = _navigation
+
+    fun startRestore(options: BackupOptions) {
+        _state.postValue(ChooseRestoreOptionState.BeginProgress(options))
+    }
 
     fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         viewModelScope.launch(Dispatchers.IO) {
@@ -49,7 +56,7 @@ internal class ChooseRestoreOptionViewModel : CommonViewModel() {
             } catch (exception: Exception) {
                 Logger.e("Backup storage setup failed: $exception")
                 backupStorage.signOut()
-                _state.postValue(ChooseRestoreOptionState.EndProgress)
+                _state.postValue(ChooseRestoreOptionState.EndProgress(currentOption!!))
                 showAuthFailedDialog()
             }
         }
@@ -119,7 +126,7 @@ internal class ChooseRestoreOptionViewModel : CommonViewModel() {
             }
         }
 
-        _state.postValue(ChooseRestoreOptionState.EndProgress)
+        _state.postValue(ChooseRestoreOptionState.EndProgress(currentOption!!))
     }
 
     private fun showBackupFileNotFoundDialog() {
