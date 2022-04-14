@@ -80,6 +80,7 @@ import com.tari.android.wallet.ui.fragment.settings.backup.ChangeSecurePasswordF
 import com.tari.android.wallet.ui.fragment.settings.backup.EnterCurrentPasswordFragment
 import com.tari.android.wallet.ui.fragment.settings.backup.backupSettings.BackupSettingsFragment
 import com.tari.android.wallet.ui.fragment.settings.backup.backupSettings.BackupSettingsViewModel
+import com.tari.android.wallet.ui.fragment.settings.backup.backupSettings.option.BackupOptionViewModel
 import com.tari.android.wallet.ui.fragment.settings.backup.verifySeedPhrase.VerifySeedPhraseViewModel
 import com.tari.android.wallet.ui.fragment.settings.networkSelection.NetworkSelectionViewModel
 import com.tari.android.wallet.ui.fragment.settings.torBridges.TorBridgesSelectionViewModel
@@ -188,6 +189,7 @@ internal interface ApplicationComponent {
     fun inject(torBridgesSelectionViewModel: TorBridgesSelectionViewModel)
     fun inject(customTorBridgeViewModel: CustomTorBridgesViewModel)
     fun inject(deeplinkViewModel: DeeplinkViewModel)
+    fun inject(backupOptionViewModel: BackupOptionViewModel)
     /**
      * Service(s).
      */

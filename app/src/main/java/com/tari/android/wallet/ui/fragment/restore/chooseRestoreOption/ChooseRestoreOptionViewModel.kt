@@ -45,6 +45,7 @@ internal class ChooseRestoreOptionViewModel : CommonViewModel() {
     val navigation: LiveData<ChooseRestoreOptionNavigation> = _navigation
 
     fun startRestore(options: BackupOptions) {
+        currentOption = options
         _state.postValue(ChooseRestoreOptionState.BeginProgress(options))
     }
 

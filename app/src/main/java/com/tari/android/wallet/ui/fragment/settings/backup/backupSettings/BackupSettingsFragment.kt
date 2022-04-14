@@ -91,8 +91,7 @@ internal class BackupSettingsFragment : CommonFragment<FragmentWalletBackupSetti
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View = FragmentWalletBackupSettingsBinding.inflate(inflater, container, false)
-        .also { ui = it }.root
+    ): View = FragmentWalletBackupSettingsBinding.inflate(inflater, container, false).also { ui = it }.root
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -132,11 +131,6 @@ internal class BackupSettingsFragment : CommonFragment<FragmentWalletBackupSetti
         backupWithRecoveryPhraseCtaView.setOnClickListener(ThrottleClick { viewModel.onBackupWithRecoveryPhrase() })
         backupWalletToCloudCtaView.setOnClickListener(ThrottleClick { viewModel.onBackupToCloud() })
         updatePasswordCtaView.setOnClickListener(ThrottleClick { viewModel.onUpdatePassword() })
-        setPermissionSwitchListener()
-    }
-
-    private fun setPermissionSwitchListener() {
-        ui.googleDriveBackup.ui.backupPermissionSwitch.setOnCheckedChangeListener { _, isChecked -> viewModel.onBackupPermissionSwitch(isChecked) }
     }
 
     private fun subscribeUI() = with(viewModel) {
@@ -144,20 +138,11 @@ internal class BackupSettingsFragment : CommonFragment<FragmentWalletBackupSetti
 
         observe(cloudBackupStatus) { processCloudBackupStatus(it) }
 
-        observe(openFolderSelection) {
-            //todo
-            backupManager.setupStorage( BackupOptions.Google,this@BackupSettingsFragment)
-        }
-
         observe(backupStateChanged) { resetStatusIcons() }
 
         observe(isBackupAvailable) { onChangeIsBackupAvailable(it) }
 
         observe(backupWalletToCloudEnabled) { ui.backupWalletToCloudCtaView.isEnabled = it }
-
-        observe(inProgress) { onChangeInProgress(it) }
-
-        observe(googleDriveBackupPermissionSwitch) { setSwitchCheck(it) }
 
         observe(isBackupNowEnabled) { ui.backupNowTextView.alpha = if (it) ALPHA_VISIBLE else ALPHA_DISABLED }
 
@@ -167,7 +152,7 @@ internal class BackupSettingsFragment : CommonFragment<FragmentWalletBackupSetti
 
         observe(lastSuccessfulBackupDate) { updateLastSuccessfulBackupDate(if (it.isPresent) it.get() else null) }
 
-        observe(showBackupsWillBeDeletedDialog) { showBackupsWillBeDeletedDialog(it.onAccept, it.onDismiss) }
+//        observe(showBackupsWillBeDeletedDialog) { showBackupsWillBeDeletedDialog(it.onAccept, it.onDismiss) }
 
         observe(backupOptionsVisibility) { if (it) showBackupOptionsWithAnimation() else hideAllBackupOptionsWithAnimation() }
 
@@ -186,14 +171,19 @@ internal class BackupSettingsFragment : CommonFragment<FragmentWalletBackupSetti
     }
 
     private fun initBackupOptions() {
-        val googleDriveViewModel: BackupOptionViewModel by viewModels()
-        val dropboxViewModel: BackupOptionViewModel by viewModels()
+        val googleDriveViewModel = BackupOptionViewModel()
+        val dropboxViewModel = BackupOptionViewModel()
 
-        ui.googleDriveBackup.init(googleDriveViewModel)
-        ui.dropboxBackup.init(dropboxViewModel)
+        ui.googleDriveBackup.viewLifecycle = viewLifecycleOwner
+        ui.dropboxBackup.viewLifecycle = viewLifecycleOwner
+
+        ui.googleDriveBackup.init(this, googleDriveViewModel.apply { setup(BackupOptions.Google) })
+        ui.dropboxBackup.init(this, dropboxViewModel.apply { setup(BackupOptions.Dropbox) })
+
+        viewModel.setupWithOptions(listOf(googleDriveViewModel, dropboxViewModel))
 
         if (viewModel.backupSettingsRepository.getOptionList.any { it.isEnable }) {
-            if (EventBus.backupState.publishSubject.value is BackupUpToDate) {
+            if (EventBus.backupState.publishSubject.value?.backupsState is BackupUpToDate) {
                 ui.backupWalletToCloudCtaContainerView.gone()
             }
         } else {
@@ -213,21 +203,10 @@ internal class BackupSettingsFragment : CommonFragment<FragmentWalletBackupSetti
         if (isAvailable) animateBackupButtonAvailability() else animateBackupButtonUnavailability()
     }
 
-    private fun onChangeInProgress(inProgress: Boolean) = with(ui) {
-        ui.googleDriveBackup.ui.backupPermissionSwitch.setVisible(!inProgress, View.INVISIBLE)
-        ui.googleDriveBackup.ui.backupPermissionProgressBar.setVisible(inProgress, View.INVISIBLE)
-    }
-
     private fun onChangeUpdatePasswordEnabled(isEnabled: Boolean) = with(ui) {
         updatePasswordCtaView.isEnabled = isEnabled
         updatePasswordLabelTextView.alpha = if (isEnabled) ALPHA_VISIBLE else ALPHA_DISABLED
         updatePasswordArrowImageView.alpha = if (isEnabled) ALPHA_VISIBLE else ALPHA_DISABLED
-    }
-
-    private fun setSwitchCheck(isChecked: Boolean) = with(ui) {
-        ui.googleDriveBackup.ui.backupPermissionSwitch.setOnCheckedChangeListener(null)
-        ui.googleDriveBackup.ui.backupPermissionSwitch.isChecked = isChecked
-        setPermissionSwitchListener()
     }
 
     private fun resetStatusIcons() = with(ui) {
@@ -372,12 +351,12 @@ internal class BackupSettingsFragment : CommonFragment<FragmentWalletBackupSetti
                 },
                 onCancel = {
                     views.forEach { v -> v.alpha = ALPHA_VISIBLE }
-                    if (EventBus.backupState.publishSubject.value is BackupUpToDate) {
+                    if (EventBus.backupState.publishSubject.value?.backupsState is BackupUpToDate) {
                         animateBackupButtonUnavailability()
                     }
                 },
                 onEnd = {
-                    if (EventBus.backupState.publishSubject.value is BackupUpToDate) {
+                    if (EventBus.backupState.publishSubject.value?.backupsState is BackupUpToDate) {
                         animateBackupButtonUnavailability()
                     }
                 }

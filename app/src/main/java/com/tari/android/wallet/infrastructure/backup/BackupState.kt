@@ -32,20 +32,18 @@
  */
 package com.tari.android.wallet.infrastructure.backup
 
-import java.lang.Exception
-
-/**
- * Backup status.
- *
- * @author The Tari Development Team
- */
-internal sealed class BackupState {
+sealed class BackupState {
     object BackupDisabled : BackupState()
+
     object BackupCheckingStorage : BackupState()
+
     object BackupStorageCheckFailed : BackupState()
+
     object BackupScheduled : BackupState()
+
     object BackupInProgress : BackupState()
+
     object BackupUpToDate : BackupState()
+
     data class BackupOutOfDate(val backupException: Exception? = null) : BackupState()
 }
-

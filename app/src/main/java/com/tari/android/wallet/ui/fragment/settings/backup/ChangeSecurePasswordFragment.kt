@@ -319,7 +319,7 @@ framework for UI tree rebuild on configuration changes"""
         lifecycleScope.launch(Dispatchers.IO) {
             // backup
             try {
-                backupManager.backup(newPassword = password)
+                backupManager.backupAll(newPassword = password)
             } catch (exception: BackupStorageAuthRevokedException) {
                 withContext(Dispatchers.Main) {
                     displayStorageAuthRevokedDialog()
@@ -337,7 +337,7 @@ framework for UI tree rebuild on configuration changes"""
     private fun subscribeToBackupState() {
         EventBus.backupState.subscribe(this) { backupState ->
             lifecycleScope.launch(Dispatchers.Main) {
-                onBackupStateChanged(backupState)
+                onBackupStateChanged(backupState.backupsState)
             }
         }
     }

@@ -32,10 +32,15 @@
  */
 package com.tari.android.wallet.di
 
+import DropboxBackupStorage
 import android.content.Context
 import com.tari.android.wallet.data.WalletConfig
 import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepository
-import com.tari.android.wallet.infrastructure.backup.*
+import com.tari.android.wallet.infrastructure.backup.BackupFileProcessor
+import com.tari.android.wallet.infrastructure.backup.BackupManager
+import com.tari.android.wallet.infrastructure.backup.BackupNamingPolicy
+import com.tari.android.wallet.infrastructure.backup.googleDrive.GoogleDriveBackupStorage
+import com.tari.android.wallet.infrastructure.backup.local.LocalBackupStorage
 import com.tari.android.wallet.notification.NotificationHelper
 import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupSettingsRepository
 import dagger.Module
@@ -56,13 +61,13 @@ internal class BackupAndRestoreModule {
 
     @Provides
     @Singleton
-    fun provideBackupStorage(
+    fun provideGoogleDriveBackupStorage(
         context: Context,
         backupSettingsRepository: BackupSettingsRepository,
         walletConfig: WalletConfig,
         backupFileProcessor: BackupFileProcessor,
         namingPolicy: BackupNamingPolicy,
-    ): BackupStorage = GoogleDriveBackupStorage(
+    ): GoogleDriveBackupStorage = GoogleDriveBackupStorage(
         context,
         namingPolicy,
         backupSettingsRepository,
@@ -72,12 +77,55 @@ internal class BackupAndRestoreModule {
 
     @Provides
     @Singleton
+    fun provideDropboxBackupStorage(
+        context: Context,
+        backupSettingsRepository: BackupSettingsRepository,
+        walletConfig: WalletConfig,
+        backupFileProcessor: BackupFileProcessor,
+        namingPolicy: BackupNamingPolicy,
+    ): DropboxBackupStorage = DropboxBackupStorage(
+        context,
+        namingPolicy,
+        backupSettingsRepository,
+        walletConfig.getWalletTempDirPath(),
+        backupFileProcessor
+    )
+
+    @Provides
+    @Singleton
+    fun provideLocalFileBackupStorage(
+        context: Context,
+        backupSettingsRepository: BackupSettingsRepository,
+        walletConfig: WalletConfig,
+        networkRepository: NetworkRepository,
+        namingPolicy: BackupNamingPolicy,
+        backupFileProcessor: BackupFileProcessor
+    ): LocalBackupStorage = LocalBackupStorage(
+        context,
+        backupSettingsRepository,
+        namingPolicy,
+        walletConfig.getWalletTempDirPath(),
+        networkRepository,
+        backupFileProcessor
+    )
+
+    @Provides
+    @Singleton
     fun provideBackupManager(
         context: Context,
         backupSettingsRepository: BackupSettingsRepository,
-        backupStorage: BackupStorage,
+        localFileBackupStorage: LocalBackupStorage,
+        dropboxBackupStorage: DropboxBackupStorage,
+        googleDriveBackupStorage: GoogleDriveBackupStorage,
         notificationHelper: NotificationHelper
-    ): BackupManager = BackupManager(context, backupSettingsRepository, backupStorage, notificationHelper)
+    ): BackupManager = BackupManager(
+        context,
+        backupSettingsRepository,
+        localFileBackupStorage,
+        dropboxBackupStorage,
+        googleDriveBackupStorage,
+        notificationHelper
+    )
 
     @Provides
     fun provideBackupNamingPolicy(networkRepository: NetworkRepository): BackupNamingPolicy = BackupNamingPolicy(networkRepository)

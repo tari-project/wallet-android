@@ -30,7 +30,7 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.tari.android.wallet.infrastructure.backup
+package com.tari.android.wallet.infrastructure.backup.googleDrive
 
 import android.app.Activity
 import android.content.Context
@@ -53,6 +53,7 @@ import com.google.api.services.drive.model.FileList
 import com.orhanobut.logger.Logger
 import com.tari.android.wallet.R
 import com.tari.android.wallet.extension.getLastPathComponent
+import com.tari.android.wallet.infrastructure.backup.*
 import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupSettingsRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -250,7 +251,7 @@ internal class GoogleDriveBackupStorage(
     private fun searchForBackups(pageToken: String?): FileList =
         drive.files().list()
             .setSpaces(DRIVE_BACKUP_PARENT_FOLDER_NAME)
-            .setQ("'${DRIVE_BACKUP_PARENT_FOLDER_NAME}' in parents")
+            .setQ("'$DRIVE_BACKUP_PARENT_FOLDER_NAME' in parents")
             .setFields("nextPageToken, files(id, name)")
             .setPageToken(pageToken)
             .execute()

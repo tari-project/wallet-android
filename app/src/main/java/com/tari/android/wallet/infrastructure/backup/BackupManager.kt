@@ -32,12 +32,15 @@
  */
 package com.tari.android.wallet.infrastructure.backup
 
+import DropboxBackupStorage
 import android.content.Context
 import android.content.Intent
 import androidx.fragment.app.Fragment
 import com.orhanobut.logger.Logger
 import com.tari.android.wallet.R
 import com.tari.android.wallet.event.EventBus
+import com.tari.android.wallet.infrastructure.backup.googleDrive.GoogleDriveBackupStorage
+import com.tari.android.wallet.infrastructure.backup.local.LocalBackupStorage
 import com.tari.android.wallet.notification.NotificationHelper
 import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupOptionDto
 import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupOptions
@@ -57,97 +60,84 @@ import kotlin.math.max
 internal class BackupManager(
     private val context: Context,
     private val backupSettingsRepository: BackupSettingsRepository,
-    private val backupStorage: BackupStorage,
+    private val localFileBackupStorage: LocalBackupStorage,
+    private val dropboxBackupStorage: DropboxBackupStorage,
+    private val googleDriveBackupStorage: GoogleDriveBackupStorage,
     private val notificationHelper: NotificationHelper
 ) {
 
-    private var currentOption: BackupOptions? = null
-
-    private var currentBackupOption: BackupOptionDto
-        get() = backupSettingsRepository.googleDriveOption!!
-        set(value) {
-            backupSettingsRepository.googleDriveOption = value
-        }
-
-
     private var retryCount = 0
-
-    /**
-     * Timer to trigger scheduled backups.
-     */
+    var currentOption: BackupOptions? = null
     private var scheduledBackupSubscription: Disposable? = null
 
     fun initialize() {
         Logger.d("Start backup manager.")
-        val scheduledBackupDate = backupSettingsRepository.scheduledBackupDate
-        when {
-            !currentBackupOption.isEnable -> EventBus.backupState.post(BackupState.BackupDisabled)
-            currentBackupOption.lastFailureDate != null -> EventBus.backupState.post(BackupState.BackupOutOfDate())
-            scheduledBackupDate != null -> {
-                val delayMs = scheduledBackupDate.millis - DateTime.now().millis
-                scheduleBackup(
-                    delayMs = max(0, delayMs),
-                    resetRetryCount = true
-                )
-            }
-            else -> {
-                EventBus.backupState.post(BackupState.BackupUpToDate)
-            }
-        }
+        val backupsState = BackupsState(backupSettingsRepository.getOptionList.associate { Pair(it.type, getBackupByOption(it)) })
+        EventBus.backupState.post(backupsState)
     }
 
     fun setupStorage(option: BackupOptions, hostFragment: Fragment) {
         currentOption = option
-        backupStorage.setup(hostFragment)
+        getStorageByOption(option).setup(hostFragment)
     }
 
-    suspend fun onSetupActivityResult(requestCode: Int, resultCode: Int, intent: Intent?) {
-        backupStorage.onSetupActivityResult(requestCode, resultCode, intent)
-    }
+    suspend fun onSetupActivityResult(requestCode: Int, resultCode: Int, intent: Intent?) =
+        getStorageByOption(currentOption!!).onSetupActivityResult(requestCode, resultCode, intent)
 
     suspend fun checkStorageStatus() {
-        if (!currentBackupOption.isEnable) {
-            return
-        }
-        if (EventBus.backupState.publishSubject.value is BackupState.BackupInProgress) {
-            return
-        }
-        Logger.d("Check backup storage status.")
-        EventBus.backupState.post(BackupState.BackupCheckingStorage)
-        // check storage
-        try {
-            val backupDate = currentBackupOption.lastSuccessDate!!
-            if (!backupStorage.hasBackupForDate(backupDate)) {
-                throw BackupStorageTamperedException("Backup storage is tampered.")
+        for (currentBackupOption in backupSettingsRepository.getOptionList) {
+            val backupsState = EventBus.backupState.publishSubject.value!!.copy()
+            if (!currentBackupOption.isEnable) {
+                return
             }
-            when {
-                currentBackupOption.lastFailureDate != null -> EventBus.backupState.post(BackupState.BackupOutOfDate())
-                backupSettingsRepository.scheduledBackupDate?.isAfterNow == true -> EventBus.backupState.post(BackupState.BackupScheduled)
-                else -> EventBus.backupState.post(BackupState.BackupUpToDate)
+            if (backupsState.backupsStates[currentBackupOption.type] is BackupState.BackupInProgress) {
+                return
             }
-        } catch (e: BackupStorageAuthRevokedException) {
-            currentBackupOption = currentBackupOption.copy(lastSuccessDate = null, lastFailureDate = null)
-            backupSettingsRepository.backupPassword = null
-            backupSettingsRepository.localBackupFolderURI = null
-            backupSettingsRepository.scheduledBackupDate = null
-            EventBus.backupState.post(BackupState.BackupDisabled)
-        } catch (e: BackupStorageTamperedException) {
-            EventBus.backupState.post(BackupState.BackupOutOfDate(e))
-        } catch (e: Exception) {
-            Logger.e(e, "Error while checking storage. %s", e.toString())
-            EventBus.backupState.post(BackupState.BackupStorageCheckFailed)
-            throw e
+            Logger.d("Check backup storage status.")
+
+            fun updateState(state: BackupState) {
+                val newState = backupsState.copy(
+                    backupsStates = backupsState.backupsStates.toMutableMap().also { it[currentBackupOption.type] = state })
+                EventBus.backupState.post(newState)
+            }
+
+            updateState(BackupState.BackupCheckingStorage)
+            try {
+                val backupDate = currentBackupOption.lastSuccessDate!!
+                if (! getStorageByOption(currentBackupOption.type).hasBackupForDate(backupDate)) {
+                    throw BackupStorageTamperedException("Backup storage is tampered.")
+                }
+                when {
+                    currentBackupOption.lastFailureDate != null -> updateState(BackupState.BackupOutOfDate())
+                    backupSettingsRepository.scheduledBackupDate?.isAfterNow == true -> updateState(BackupState.BackupScheduled)
+                    else -> updateState(BackupState.BackupUpToDate)
+                }
+            } catch (e: BackupStorageAuthRevokedException) {
+                backupSettingsRepository.clear()
+                updateState(BackupState.BackupDisabled)
+            } catch (e: BackupStorageTamperedException) {
+                updateState(BackupState.BackupOutOfDate(e))
+            } catch (e: Exception) {
+                Logger.e(e, "Error while checking storage. %s", e.toString())
+                updateState(BackupState.BackupStorageCheckFailed)
+                throw e
+            }
         }
     }
 
-    fun scheduleBackup(delayMs: Long? = null, resetRetryCount: Boolean = false) {
-        if (!currentBackupOption.isEnable) {
+    fun scheduleBackupAll(delayMs: Long? = null, resetRetryCount: Boolean = false) {
+        backupSettingsRepository.getOptionList.forEach { scheduleBackup(it.type, delayMs, resetRetryCount) }
+    }
+
+    fun scheduleBackup(optionType: BackupOptions, delayMs: Long? = null, resetRetryCount: Boolean = false): BackupState {
+        val currentDto = backupSettingsRepository.getOptionList.firstOrNull { it.type == optionType } ?: return BackupState.BackupDisabled
+        if (!currentDto.isEnable) {
             Logger.i("Backup is not enabled - cannot schedule a backup.")
-            return // if backup is disabled or there's a scheduled backup
+            return BackupState.BackupDisabled
         }
         if (scheduledBackupSubscription?.isDisposed == false) {
             Logger.i("There is already a scheduled backup - cannot schedule a backup.")
-            return // if backup is disabled or there's a scheduled backup
+            return BackupState.BackupDisabled
         }
         Logger.d("Schedule backup.")
         if (resetRetryCount) {
@@ -162,55 +152,70 @@ internal class BackupManager(
                 .subscribe {
                     GlobalScope.launch(Dispatchers.IO) {
                         try {
-                            backup()
+                            backup(optionType)
                         } catch (exception: Exception) {
                             Logger.e(exception, "Error during scheduled backup: $exception")
                         }
                     }
                 }
         backupSettingsRepository.scheduledBackupDate = DateTime.now().plusMillis(delayMs?.toInt() ?: Constants.Wallet.backupDelayMs.toInt())
-        EventBus.backupState.post(BackupState.BackupScheduled)
         Logger.i("Backup scheduled.")
+        return BackupState.BackupScheduled
     }
 
-    suspend fun backup(isInitialBackup: Boolean = false, userTriggered: Boolean = false, newPassword: CharArray? = null) {
-        if (!isInitialBackup && !currentBackupOption.isEnable) {
+    suspend fun backupAll(isInitialBackup: Boolean = false, userTriggered: Boolean = false, newPassword: CharArray? = null) {
+        backupSettingsRepository.getOptionList.forEach { backup(it.type, isInitialBackup, userTriggered, newPassword) }
+    }
+
+    suspend fun backup(optionType: BackupOptions, isInitialBackup: Boolean = false, userTriggered: Boolean = false, newPassword: CharArray? = null) {
+        val currentDto = backupSettingsRepository.getOptionList.firstOrNull { it.type == optionType } ?: return
+        if (!isInitialBackup && !currentDto.isEnable) {
             Logger.d("Backup is disabled. Exit.")
             return
         }
-        if (EventBus.backupState.publishSubject.value is BackupState.BackupInProgress) {
+
+        val backupsState = EventBus.backupState.publishSubject.value!!.copy()
+        if (backupsState.backupsStates[optionType] is BackupState.BackupInProgress) {
             Logger.d("Backup is in progress. Exit.")
             return
         }
+
+        fun updateState(state: BackupState) {
+            val newState = backupsState.copy(backupsStates = backupsState.backupsStates.toMutableMap().also { it[optionType] = state })
+            EventBus.backupState.post(newState)
+        }
+
         // Do the work here--in this case, upload the images.
         Logger.d("Do backup.")
         // cancel any scheduled backup
         scheduledBackupSubscription?.dispose()
         scheduledBackupSubscription = null
         retryCount++
-        EventBus.backupState.post(BackupState.BackupInProgress)
+        updateState(BackupState.BackupInProgress)
         try {
-            val backupDate = backupStorage.backup(newPassword)
-            currentBackupOption = currentBackupOption.copy(lastSuccessDate = backupDate, lastFailureDate = null)
+            val backupDate = getStorageByOption(optionType).backup(newPassword)
+            //todo
+//            currentBackupOption = currentBackupOption.copy(lastSuccessDate = backupDate, lastFailureDate = null)
             backupSettingsRepository.scheduledBackupDate = null
             Logger.d("Backup successful.")
-            EventBus.backupState.post(BackupState.BackupUpToDate)
+            updateState(BackupState.BackupUpToDate)
         } catch (exception: Exception) {
             if (isInitialBackup) {
-                turnOff(deleteExistingBackups = true)
+                turnOff(optionType, deleteExistingBackups = true)
                 retryCount = 0
                 throw exception
             }
             if (exception is BackupStorageAuthRevokedException) {
-                turnOff(deleteExistingBackups = true)
+                turnOff(optionType, deleteExistingBackups = true)
                 retryCount = 0
                 postBackupFailedNotification(exception)
                 throw exception
             }
             if (userTriggered || retryCount > Constants.Wallet.maxBackupRetries) {
                 Logger.e(exception, "Error happened while backing up. It's a user-triggered backup or retry limit has been exceeded.")
-                EventBus.backupState.post(BackupState.BackupOutOfDate(exception))
-                currentBackupOption = currentBackupOption.copy(lastSuccessDate = null, lastFailureDate = DateTime.now())
+                updateState(BackupState.BackupOutOfDate(exception))
+                //todo
+//                currentBackupOption = currentBackupOption . copy (lastSuccessDate = null, lastFailureDate = DateTime.now()
                 retryCount = 0
                 if (!userTriggered) { // post notification
                     postBackupFailedNotification(exception)
@@ -218,10 +223,55 @@ internal class BackupManager(
                 throw exception
             } else {
                 Logger.e(exception, "Backup failed: ${exception.message}. Will schedule.")
-                scheduleBackup(Constants.Wallet.backupRetryPeriodMs, false)
+                scheduleBackup(optionType, Constants.Wallet.backupRetryPeriodMs, false)
             }
             Logger.e(exception, "Error happened while backing up. Will retry.")
         }
+    }
+
+    suspend fun turnOffAll(deleteExistingBackups: Boolean) {
+        backupSettingsRepository.getOptionList.forEach { turnOff(it.type, deleteExistingBackups) }
+    }
+
+    suspend fun turnOff(optionType: BackupOptions, deleteExistingBackups: Boolean) {
+        val options = backupSettingsRepository.getOptionList.map {
+            it.copy(type = it.type, isEnable = false, lastSuccessDate = null, lastFailureDate = null)
+        }
+        val backupsState = EventBus.backupState.publishSubject.value!!.copy()
+        backupSettingsRepository.updateOptions(options)
+        backupSettingsRepository.backupPassword = null
+        scheduledBackupSubscription?.dispose()
+        scheduledBackupSubscription = null
+        val newState =
+            backupsState.copy(backupsStates = backupsState.backupsStates.toMutableMap().also { it[optionType] = BackupState.BackupDisabled })
+        EventBus.backupState.post(newState)
+        val backupStorage = getStorageByOption(optionType)
+        if (deleteExistingBackups) {
+            backupStorage.deleteAllBackupFiles()
+        }
+        backupSettingsRepository.localBackupFolderURI = null
+        backupStorage.signOut()
+    }
+
+    private fun getBackupByOption(optionDto: BackupOptionDto): BackupState {
+        val scheduledBackupDate = backupSettingsRepository.scheduledBackupDate
+        return when {
+            !optionDto.isEnable -> BackupState.BackupDisabled
+            optionDto.lastFailureDate != null -> BackupState.BackupOutOfDate()
+            scheduledBackupDate != null -> {
+                val delayMs = scheduledBackupDate.millis - DateTime.now().millis
+                scheduleBackup(optionDto.type, delayMs = max(0, delayMs), resetRetryCount = true)
+            }
+            else -> {
+                BackupState.BackupUpToDate
+            }
+        }
+    }
+
+    private fun getStorageByOption(optionType: BackupOptions) : BackupStorage = when (optionType) {
+        BackupOptions.Google -> googleDriveBackupStorage
+        BackupOptions.Dropbox -> dropboxBackupStorage
+        BackupOptions.Local -> localFileBackupStorage
     }
 
     private fun postBackupFailedNotification(exception: Exception) {
@@ -242,36 +292,4 @@ internal class BackupManager(
         }
         notificationHelper.postNotification(title, body)
     }
-
-    // TODO(nyarian): TBD - should side effects be separated from the direct flow?
-    suspend fun turnOff(deleteExistingBackups: Boolean) {
-        val options = backupSettingsRepository.getOptionList.map {
-            it.copy(type = it.type, isEnable = false, lastSuccessDate = null, lastFailureDate = null)
-        }
-        backupSettingsRepository.updateOptions(options)
-
-        backupSettingsRepository.backupPassword = null
-        scheduledBackupSubscription?.dispose()
-        scheduledBackupSubscription = null
-        EventBus.backupState.post(BackupState.BackupDisabled)
-        if (deleteExistingBackups) {
-            try {
-                backupStorage.deleteAllBackupFiles()
-            } catch (exception: Exception) {
-                /* no-op */
-                Logger.e(
-                    exception,
-                    // TODO(nyarian): but why ignoring this?
-                    "Ignored exception while deleting all backup files: $exception"
-                )
-            }
-        }
-        backupSettingsRepository.localBackupFolderURI = null
-        try {
-            backupStorage.signOut()
-        } catch (exception: Exception) {
-            Logger.e(exception, "Ignored exception while turning off: $exception")
-        }
-    }
-
 }

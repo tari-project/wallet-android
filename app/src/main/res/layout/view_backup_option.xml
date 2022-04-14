@@ -26,7 +26,7 @@
         android:layout_gravity="center_vertical|end">
 
         <androidx.appcompat.widget.SwitchCompat
-            android:id="@+id/backup_permission_switch"
+            android:id="@+id/backup_switch"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:layout_constraintBottom_toBottomOf="parent"

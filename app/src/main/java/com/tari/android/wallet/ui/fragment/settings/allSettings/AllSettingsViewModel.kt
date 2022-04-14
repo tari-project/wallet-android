@@ -12,6 +12,7 @@ import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.infrastructure.backup.BackupManager
 import com.tari.android.wallet.infrastructure.backup.BackupState
 import com.tari.android.wallet.infrastructure.backup.BackupStorageAuthRevokedException
+import com.tari.android.wallet.infrastructure.backup.BackupsState
 import com.tari.android.wallet.ui.common.ClipboardArgs
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.common.SingleLiveEvent
@@ -157,12 +158,12 @@ internal class AllSettingsViewModel : CommonViewModel() {
         }
     }
 
-    private fun onBackupStateChanged(backupState: BackupState?) {
+    private fun onBackupStateChanged(backupState: BackupsState?) {
         if (backupState == null) {
             backupOption.backupState = PresentationBackupState(Warning)
         } else {
             updateLastSuccessfulBackupDate()
-            val presentationBackupState = when (backupState) {
+            val presentationBackupState = when (backupState.backupsState) {
                 is BackupState.BackupDisabled -> PresentationBackupState(Warning)
                 is BackupState.BackupCheckingStorage -> {
                     PresentationBackupState(InProgress, back_up_wallet_backup_status_checking_backup, all_settings_back_up_status_error)

@@ -236,7 +236,7 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
         // stop wallet manager on a separate thead & unsubscribe from events
         EventBus.walletState.unsubscribe(this)
         ProcessLifecycleOwner.get().lifecycle.removeObserver(this)
-        GlobalScope.launch { backupManager.turnOff(deleteExistingBackups = false) }
+        GlobalScope.launch { backupManager.turnOffAll(deleteExistingBackups = false) }
         Thread {
             walletManager.stop()
         }.start()
@@ -347,7 +347,7 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
         postTxNotification(pendingInboundTx)
         listeners.forEach { it.onTxReceived(pendingInboundTx) }
         // schedule a backup
-        backupManager.scheduleBackup(resetRetryCount = true)
+        backupManager.scheduleBackupAll(resetRetryCount = true)
     }
 
     override fun onTxReplyReceived(pendingOutboundTx: PendingOutboundTx) {
@@ -360,7 +360,7 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
             it.onTxReplyReceived(pendingOutboundTx)
         }
         // schedule a backup
-        backupManager.scheduleBackup(resetRetryCount = true)
+        backupManager.scheduleBackupAll(resetRetryCount = true)
     }
 
     override fun onTxFinalized(pendingInboundTx: PendingInboundTx) {
@@ -373,7 +373,7 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
             it.onTxFinalized(pendingInboundTx)
         }
         // schedule a backup
-        backupManager.scheduleBackup(resetRetryCount = true)
+        backupManager.scheduleBackupAll(resetRetryCount = true)
     }
 
     override fun onInboundTxBroadcast(pendingInboundTx: PendingInboundTx) {
@@ -386,7 +386,7 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
             it.onInboundTxBroadcast(pendingInboundTx)
         }
         // schedule a backup
-        backupManager.scheduleBackup(resetRetryCount = true)
+        backupManager.scheduleBackupAll(resetRetryCount = true)
     }
 
     override fun onOutboundTxBroadcast(pendingOutboundTx: PendingOutboundTx) {
@@ -397,7 +397,7 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
         // notify external listeners
         listeners.iterator().forEach { it.onOutboundTxBroadcast(pendingOutboundTx) }
         // schedule a backup
-        backupManager.scheduleBackup(resetRetryCount = true)
+        backupManager.scheduleBackupAll(resetRetryCount = true)
     }
 
     override fun onTxMined(completedTx: CompletedTx) {
@@ -410,7 +410,7 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
             it.onTxMined(completedTx)
         }
         // schedule a backup
-        backupManager.scheduleBackup(resetRetryCount = true)
+        backupManager.scheduleBackupAll(resetRetryCount = true)
     }
 
     override fun onTxMinedUnconfirmed(completedTx: CompletedTx, confirmationCount: Int) {
@@ -423,7 +423,7 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
             it.onTxMinedUnconfirmed(completedTx, confirmationCount)
         }
         // schedule a backup
-        backupManager.scheduleBackup(resetRetryCount = true)
+        backupManager.scheduleBackupAll(resetRetryCount = true)
     }
 
     override fun onTxFauxConfirmed(completedTx: CompletedTx) {
@@ -434,7 +434,7 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
         // notify external listeners
         listeners.iterator().forEach { it.onTxFauxConfirmed(completedTx) }
         // schedule a backup
-        backupManager.scheduleBackup(resetRetryCount = true)
+        backupManager.scheduleBackupAll(resetRetryCount = true)
     }
 
     override fun onTxFauxUnconfirmed(completedTx: CompletedTx, confirmationCount: Int) {
@@ -445,7 +445,7 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
         // notify external listeners
         listeners.iterator().forEach { it.onTxFauxUnconfirmed(completedTx, confirmationCount) }
         // schedule a backup
-        backupManager.scheduleBackup(resetRetryCount = true)
+        backupManager.scheduleBackupAll(resetRetryCount = true)
     }
 
     override fun onDirectSendResult(txId: BigInteger, success: Boolean) {
@@ -458,7 +458,7 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
                 sendPushNotificationToTxRecipient(it.second)
             }
             // schedule a backup
-            backupManager.scheduleBackup(resetRetryCount = true)
+            backupManager.scheduleBackupAll(resetRetryCount = true)
         }
         // notify external listeners
         listeners.iterator().forEach {
@@ -476,7 +476,7 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
                 sendPushNotificationToTxRecipient(it.second)
             }
             // schedule a backup
-            backupManager.scheduleBackup(resetRetryCount = true)
+            backupManager.scheduleBackupAll(resetRetryCount = true)
         }
         // notify external listeners
         listeners.iterator().forEach {
@@ -498,7 +498,7 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
         // notify external listeners
         listeners.iterator().forEach { listener -> listener.onTxCancelled(cancelledTx) }
         // schedule a backup
-        backupManager.scheduleBackup(resetRetryCount = true)
+        backupManager.scheduleBackupAll(resetRetryCount = true)
     }
 
     override fun onTXOValidationComplete(responseId: BigInteger, isSuccess: Boolean) {
