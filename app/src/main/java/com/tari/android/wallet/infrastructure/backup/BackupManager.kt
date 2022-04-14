@@ -32,13 +32,13 @@
  */
 package com.tari.android.wallet.infrastructure.backup
 
-import DropboxBackupStorage
 import android.content.Context
 import android.content.Intent
 import androidx.fragment.app.Fragment
 import com.orhanobut.logger.Logger
 import com.tari.android.wallet.R
 import com.tari.android.wallet.event.EventBus
+import com.tari.android.wallet.infrastructure.backup.dropbox.DropboxBackupStorage
 import com.tari.android.wallet.infrastructure.backup.googleDrive.GoogleDriveBackupStorage
 import com.tari.android.wallet.infrastructure.backup.local.LocalBackupStorage
 import com.tari.android.wallet.notification.NotificationHelper
@@ -57,7 +57,7 @@ import java.net.UnknownHostException
 import java.util.concurrent.TimeUnit
 import kotlin.math.max
 
-internal class BackupManager(
+class BackupManager(
     private val context: Context,
     private val backupSettingsRepository: BackupSettingsRepository,
     private val localFileBackupStorage: LocalBackupStorage,
@@ -70,8 +70,7 @@ internal class BackupManager(
     var currentOption: BackupOptions? = null
     private var scheduledBackupSubscription: Disposable? = null
 
-    fun initialize() {
-        Logger.d("Start backup manager.")
+    init {
         val backupsState = BackupsState(backupSettingsRepository.getOptionList.associate { Pair(it.type, getBackupByOption(it)) })
         EventBus.backupState.post(backupsState)
     }
@@ -104,7 +103,7 @@ internal class BackupManager(
             updateState(BackupState.BackupCheckingStorage)
             try {
                 val backupDate = currentBackupOption.lastSuccessDate!!
-                if (! getStorageByOption(currentBackupOption.type).hasBackupForDate(backupDate)) {
+                if (!getStorageByOption(currentBackupOption.type).hasBackupForDate(backupDate)) {
                     throw BackupStorageTamperedException("Backup storage is tampered.")
                 }
                 when {
@@ -251,6 +250,14 @@ internal class BackupManager(
         }
         backupSettingsRepository.localBackupFolderURI = null
         backupStorage.signOut()
+    }
+
+    suspend fun signOut() {
+        getStorageByOption(currentOption!!).signOut()
+    }
+
+    suspend fun restoreLatestBackup(password: String? = null) {
+        getStorageByOption(currentOption!!).restoreLatestBackup(password)
     }
 
     private fun getBackupByOption(optionDto: BackupOptionDto): BackupState {

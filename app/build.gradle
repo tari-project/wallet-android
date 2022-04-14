@@ -113,7 +113,11 @@ android {
     buildFeatures {
         viewBinding = true
     }
+
     packagingOptions {
+        jniLibs {
+            useLegacyPackaging = true
+        }
         resources {
             excludes += ['META-INF/DEPENDENCIES',
                          'META-INF/LICENSE',

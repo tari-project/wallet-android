@@ -31,7 +31,6 @@ internal class BackupSettingsViewModel : CommonViewModel() {
     lateinit var biometricAuthenticationViewModel: BiometricAuthenticationViewModel
 
     val backupOptionsAreVisible = MutableLiveData(true)
-    val folderSelectionWasSuccessful = MutableLiveData(false)
     val options = MutableLiveData<List<BackupOptionViewModel>>()
 
     private val _cloudBackupStatus = SingleLiveEvent<CloudBackupStatus>()
@@ -40,14 +39,14 @@ internal class BackupSettingsViewModel : CommonViewModel() {
     private val _navigation = SingleLiveEvent<BackupSettingsNavigation>()
     val navigation: LiveData<BackupSettingsNavigation> = _navigation
 
-    private val _isBackupAvailable = MutableLiveData<Boolean>()
-    val isBackupAvailable: LiveData<Boolean> = _isBackupAvailable
-
-    private val _backupWalletToCloudEnabled = MutableLiveData<Boolean>()
-    val backupWalletToCloudEnabled: LiveData<Boolean> = _backupWalletToCloudEnabled
+    private val _isBackupNowAvailabilityChanged = MutableLiveData<Boolean>()
+    val isBackupNowAvailabilityChanged: LiveData<Boolean> = _isBackupNowAvailabilityChanged
 
     private val _isBackupNowEnabled = MutableLiveData<Boolean>()
-    val isBackupNowEnabled: LiveData<Boolean> = _isBackupNowEnabled
+    val backupNowEnabled: LiveData<Boolean> = _isBackupNowEnabled
+
+    private val _isBackupNowAvailable = MutableLiveData<Boolean>()
+    val isBackupNowAvailable: LiveData<Boolean> = _isBackupNowAvailable
 
     private val _backupStateChanged = MutableLiveData<Unit>()
     val backupStateChanged: LiveData<Unit> = _backupStateChanged
@@ -130,21 +129,6 @@ internal class BackupSettingsViewModel : CommonViewModel() {
         _lastSuccessfulBackupDate.postValue(Optional.ofNullable(backupSettingsRepository.getOptionList.mapNotNull { it.lastSuccessDate }.minOrNull()))
     }
 
-    private fun showBackupStorageSetupFailedDialog(exception: Exception? = null) {
-        val errorTitle = when (exception) {
-            is BackupStorageFullException -> resourceManager.getString(R.string.backup_wallet_storage_full_title)
-            else -> resourceManager.getString(R.string.back_up_wallet_storage_setup_error_title)
-        }
-        val errorDescription = when (exception) {
-            is BackupStorageFullException -> resourceManager.getString(R.string.backup_wallet_storage_full_desc)
-            else -> resourceManager.getString(R.string.back_up_wallet_storage_setup_error_desc)
-        }
-        _errorDialog.postValue(ErrorDialogArgs(errorTitle, errorDescription) {
-//            _googleDriveBackupPermissionSwitchChecked.postValue(false)
-//            _inProgress.postValue(false)
-        })
-    }
-
     private fun showBackupFailureDialog(exception: Exception?) {
         val errorTitle = when (exception) {
             is BackupStorageFullException -> resourceManager.getString(R.string.backup_wallet_storage_full_title)
@@ -165,7 +149,10 @@ internal class BackupSettingsViewModel : CommonViewModel() {
     }
 
     private fun onBackupStateChanged(backupState: BackupsState) {
-        _backupWalletToCloudEnabled.postValue(true)
+        backupState.backupsStates.forEach { state ->
+            options.value.orEmpty().firstOrNull { it.option.value!!.type == state.key }?.onBackupStateChanged(state.value)
+        }
+        _isBackupNowEnabled.postValue(true)
         _backupStateChanged.postValue(Unit)
         refillSharedPrefsData()
         when (backupState.backupsState) {
@@ -181,56 +168,37 @@ internal class BackupSettingsViewModel : CommonViewModel() {
 
     private fun handleOutOfDateState(backupState: BackupState.BackupOutOfDate) {
         if (backupOptionsAreVisible.value!!) {
-            if (folderSelectionWasSuccessful.value!!) {
-                folderSelectionWasSuccessful.postValue(false)
-                showBackupFailureDialog(backupState.backupException)
-            }
-//            _inProgress.postValue(false)
-//            _googleDriveBackupPermissionSwitchChecked.postValue(true)
-            _backupWalletToCloudEnabled.postValue(true)
-            _isBackupAvailable.postValue(true)
             _isBackupNowEnabled.postValue(true)
+            _isBackupNowAvailabilityChanged.postValue(true)
+            _isBackupNowAvailable.postValue(true)
             _updatePasswordEnabled.postValue(false)
             _cloudBackupStatus.postValue(
-                CloudBackupStatus.Warning(
-                    R.string.back_up_wallet_backup_status_outdated,
-                    R.color.all_settings_back_up_status_error
-                )
+                CloudBackupStatus.Warning(R.string.back_up_wallet_backup_status_outdated, R.color.all_settings_back_up_status_error)
             )
-        } else {
-            showBackupStorageSetupFailedDialog()
-//            _inProgress.postValue(false)
-//            _googleDriveBackupPermissionSwitchChecked.postValue(false)
         }
     }
 
     private fun handleUpToDateState() {
-//        _inProgress.postValue(false)
-//        _googleDriveBackupPermissionSwitchChecked.postValue(true)
         _backupOptionVisibility.postValue(true)
         _updatePasswordEnabled.postValue(true)
-        _backupWalletToCloudEnabled.postValue(false)
-        _isBackupAvailable.postValue(false)
         _isBackupNowEnabled.postValue(false)
+        _isBackupNowAvailabilityChanged.postValue(false)
+        _isBackupNowAvailable.postValue(false)
         _cloudBackupStatus.postValue(CloudBackupStatus.Success)
     }
 
     private fun handleInProgressState() {
-//        _inProgress.postValue(true)
-//        _googleDriveBackupPermissionSwitchChecked.postValue(true)
-        _backupWalletToCloudEnabled.postValue(false)
-        _isBackupAvailable.postValue(true)
         _isBackupNowEnabled.postValue(false)
+        _isBackupNowAvailabilityChanged.postValue(true)
+        _isBackupNowAvailable.postValue(false)
         _updatePasswordEnabled.postValue(false)
         _cloudBackupStatus.postValue(CloudBackupStatus.InProgress(R.string.back_up_wallet_backup_status_in_progress))
     }
 
     private fun handleScheduledState() {
-//        _inProgress.postValue(false)
-//        _googleDriveBackupPermissionSwitchChecked.postValue(true)
-        _backupWalletToCloudEnabled.postValue(true)
-        _isBackupAvailable.postValue(true)
         _isBackupNowEnabled.postValue(true)
+        _isBackupNowAvailabilityChanged.postValue(true)
+        _isBackupNowAvailable.postValue(true)
         _updatePasswordEnabled.postValue(true)
         if (backupSettingsRepository.getOptionList.all { it.lastFailureDate == null }) {
             _cloudBackupStatus.postValue(CloudBackupStatus.Scheduled)
@@ -245,28 +213,22 @@ internal class BackupSettingsViewModel : CommonViewModel() {
     }
 
     private fun handleStorageCheckFailedState() {
-//        _inProgress.postValue(false)
-//        _googleDriveBackupPermissionSwitchChecked.postValue(true)
-        _backupWalletToCloudEnabled.postValue(false)
-        _isBackupAvailable.postValue(true)
         _isBackupNowEnabled.postValue(false)
+        _isBackupNowAvailabilityChanged.postValue(true)
+        _isBackupNowAvailable.postValue(false)
         _cloudBackupStatus.postValue(CloudBackupStatus.Warning(color = R.color.all_settings_back_up_status_error))
     }
 
     private fun handleCheckingStorageState() {
-//        _inProgress.postValue(true)
-//        _googleDriveBackupPermissionSwitchChecked.postValue(true)
-        _backupWalletToCloudEnabled.postValue(false)
-        _isBackupAvailable.postValue(true)
         _isBackupNowEnabled.postValue(false)
+        _isBackupNowAvailabilityChanged.postValue(true)
+        _isBackupNowAvailable.postValue(false)
         _updatePasswordEnabled.postValue(false)
         _cloudBackupStatus.postValue(CloudBackupStatus.InProgress(R.string.back_up_wallet_backup_status_checking_backup))
     }
 
     private fun handleDisabledState() {
         _backupOptionVisibility.postValue(false)
-//        _inProgress.postValue(false)
-//        _googleDriveBackupPermissionSwitchChecked.postValue(false)
     }
 }
 

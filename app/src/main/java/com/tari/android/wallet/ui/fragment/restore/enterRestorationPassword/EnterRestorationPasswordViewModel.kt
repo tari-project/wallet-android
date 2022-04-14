@@ -3,7 +3,7 @@ package com.tari.android.wallet.ui.fragment.restore.enterRestorationPassword
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.viewModelScope
 import com.tari.android.wallet.R
-import com.tari.android.wallet.infrastructure.backup.BackupStorage
+import com.tari.android.wallet.infrastructure.backup.BackupManager
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.common.SingleLiveEvent
 import com.tari.android.wallet.ui.dialog.error.ErrorDialogArgs
@@ -13,8 +13,9 @@ import java.security.GeneralSecurityException
 import javax.inject.Inject
 
 class EnterRestorationPasswordViewModel() : CommonViewModel() {
+
     @Inject
-    lateinit var backupStorage: BackupStorage
+    lateinit var backupStorage: BackupManager
 
     init {
         component.inject(this)

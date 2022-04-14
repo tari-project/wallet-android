@@ -24,7 +24,7 @@ import javax.inject.Inject
 internal class ChooseRestoreOptionViewModel : CommonViewModel() {
 
     @Inject
-    lateinit var backupStorage: BackupStorage
+    lateinit var backupManager: BackupManager
 
     @Inject
     lateinit var walletManager: WalletManager
@@ -52,11 +52,11 @@ internal class ChooseRestoreOptionViewModel : CommonViewModel() {
     fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                backupStorage.onSetupActivityResult(requestCode, resultCode, data)
+                backupManager.onSetupActivityResult(requestCode, resultCode, data)
                 restoreFromBackup()
             } catch (exception: Exception) {
                 Logger.e("Backup storage setup failed: $exception")
-                backupStorage.signOut()
+                backupManager.signOut()
                 _state.postValue(ChooseRestoreOptionState.EndProgress(currentOption!!))
                 showAuthFailedDialog()
             }
@@ -66,7 +66,7 @@ internal class ChooseRestoreOptionViewModel : CommonViewModel() {
     private suspend fun restoreFromBackup() {
         try {
             // try to restore with no password
-            backupStorage.restoreLatestBackup()
+            backupManager.restoreLatestBackup()
             EventBus.walletState.subscribe(this) {
                 when (it) {
                     WalletState.Initializing,
@@ -89,12 +89,12 @@ internal class ChooseRestoreOptionViewModel : CommonViewModel() {
         when (exception) {
             is BackupStorageAuthRevokedException -> {
                 Logger.e(exception, "Auth revoked.")
-                backupStorage.signOut()
+                backupManager.signOut()
                 showAuthFailedDialog()
             }
             is BackupStorageTamperedException -> { // backup file not found
                 Logger.e(exception, "Backup file not found.")
-                backupStorage.signOut()
+                backupManager.signOut()
                 showBackupFileNotFoundDialog()
             }
             is BackupFileIsEncryptedException -> {
@@ -117,12 +117,12 @@ internal class ChooseRestoreOptionViewModel : CommonViewModel() {
             }
             is IOException -> {
                 Logger.e(exception, "Restore failed: network connection.")
-                backupStorage.signOut()
+                backupManager.signOut()
                 showRestoreFailedDialog(resourceManager.getString(R.string.error_no_connection_title))
             }
             else -> {
                 Logger.e(exception, "Restore failed: $exception")
-                backupStorage.signOut()
+                backupManager.signOut()
                 showRestoreFailedDialog(exception.message)
             }
         }

@@ -157,8 +157,7 @@ framework for UI tree rebuild on configuration changes"""
         ui.enterPasswordEditText.addTextChangedListener(afterTextChanged = {
             updateVerifyButtonStateBasedOnEditTexts(
                 it,
-                !passwordIsLongEnough()
-                        || (!ui.confirmPasswordEditText.text.isNullOrEmpty() && !doPasswordsMatch())
+                !passwordIsLongEnough() || (!ui.confirmPasswordEditText.text.isNullOrEmpty() && !doPasswordsMatch())
             )
         }
         )
@@ -210,10 +209,7 @@ framework for UI tree rebuild on configuration changes"""
         }
     }
 
-    private fun updateVerifyButtonStateBasedOnEditTexts(
-        trigger: Editable?,
-        errorCondition: Boolean
-    ) {
+    private fun updateVerifyButtonStateBasedOnEditTexts(trigger: Editable?, errorCondition: Boolean) {
         val passwordIsLongEnough = passwordIsLongEnough()
         val passwordsMatch = doPasswordsMatch()
         if (passwordsMatch || trigger.isNullOrEmpty()) {
@@ -221,8 +217,7 @@ framework for UI tree rebuild on configuration changes"""
             setVerifyButtonState(isEnabled = canChangePassword)
             if (canChangePassword) {
                 setPlainInputState(
-                    ui.passwordTooShortLabelView,
-                    listOf(
+                    ui.passwordTooShortLabelView, listOf(
                         ui.enterPasswordEditText,
                         ui.enterPasswordLabelTextView
                     )
@@ -240,14 +235,11 @@ framework for UI tree rebuild on configuration changes"""
         }
     }
 
-    private fun areTextFieldsFilled() = ui.enterPasswordEditText.text!!.isNotEmpty() &&
-            ui.confirmPasswordEditText.text!!.isNotEmpty()
+    private fun areTextFieldsFilled() = ui.enterPasswordEditText.text!!.isNotEmpty() && ui.confirmPasswordEditText.text!!.isNotEmpty()
 
-    private fun passwordIsLongEnough() =
-        (ui.enterPasswordEditText.text?.toString() ?: "").length >= 6
+    private fun passwordIsLongEnough() = (ui.enterPasswordEditText.text?.toString() ?: "").length >= 6
 
-    private fun doPasswordsMatch() =
-        ui.confirmPasswordEditText.text?.toString() == ui.enterPasswordEditText.text?.toString()
+    private fun doPasswordsMatch() = ui.confirmPasswordEditText.text?.toString() == ui.enterPasswordEditText.text?.toString()
 
     private fun setPlainInputState(errorLabel: TextView, inputTextViews: Iterable<TextView>) {
         errorLabel.gone()
@@ -276,9 +268,7 @@ framework for UI tree rebuild on configuration changes"""
     }
 
     private fun setCTAs() {
-        ui.backCtaView.setOnClickListener(
-            ThrottleClick { requireActivity().onBackPressed() }
-        )
+        ui.backCtaView.setOnClickListener(ThrottleClick { requireActivity().onBackPressed() })
         ui.setPasswordCtaTextView.setOnClickListener {
             ui.setPasswordCtaContainerView.animateClick()
             requireActivity().hideKeyboard()
@@ -343,23 +333,14 @@ framework for UI tree rebuild on configuration changes"""
     }
 
     private fun onBackupStateChanged(backupState: BackupState?) {
-        if (!subscribedToBackupState) {
-            // ignore first call
-            Logger.d("Ignore first state: $backupState")
-            subscribedToBackupState = true
-            return
-        }
         Logger.d("Backup state changed: $backupState")
         when (backupState) {
-            is BackupUpToDate -> { // backup successful
+            is BackupUpToDate -> {
                 allowExitAndPasswordEditing()
                 (requireActivity() as BackupSettingsRouter).onPasswordChanged(this)
             }
-            is BackupOutOfDate -> { // backup failed
-                Logger.e(
-                    backupState.backupException,
-                    "Error during encrypted backup: ${backupState.backupException}"
-                )
+            is BackupOutOfDate -> {
+                Logger.e(backupState.backupException, "Error during encrypted backup: ${backupState.backupException}")
                 showBackupErrorDialog(deductBackupErrorMessage(backupState.backupException)) {
                     allowExitAndPasswordEditing()
                     setSecurePasswordCtaIdleState()

@@ -253,7 +253,6 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
             wallet.listener = this
             EventBus.walletState.unsubscribe(this)
             scheduleExpirationCheck()
-            backupManager.initialize()
             val handler = Handler(Looper.getMainLooper())
             handler.post {
                 ProcessLifecycleOwner.get().lifecycle.addObserver(this)

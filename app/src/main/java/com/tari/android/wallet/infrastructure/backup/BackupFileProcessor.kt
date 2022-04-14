@@ -48,7 +48,7 @@ import java.io.File
  *
  * @author The Tari Development Team
  */
-internal class BackupFileProcessor(
+class BackupFileProcessor(
     private val backupSettingsRepository: BackupSettingsRepository,
     private val walletConfig: WalletConfig,
     private val namingPolicy: BackupNamingPolicy,

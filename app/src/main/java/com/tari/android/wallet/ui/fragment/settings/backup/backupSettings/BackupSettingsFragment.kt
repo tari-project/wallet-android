@@ -43,7 +43,6 @@ import android.view.ViewGroup
 import android.view.animation.LinearInterpolator
 import androidx.core.animation.addListener
 import androidx.fragment.app.viewModels
-import com.tari.android.wallet.R
 import com.tari.android.wallet.R.color.all_settings_back_up_status_processing
 import com.tari.android.wallet.R.string.*
 import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
@@ -57,7 +56,6 @@ import com.tari.android.wallet.infrastructure.backup.BackupManager
 import com.tari.android.wallet.infrastructure.backup.BackupState.BackupUpToDate
 import com.tari.android.wallet.ui.activity.settings.BackupSettingsRouter
 import com.tari.android.wallet.ui.common.CommonFragment
-import com.tari.android.wallet.ui.dialog.BottomSlideDialog
 import com.tari.android.wallet.ui.extension.*
 import com.tari.android.wallet.ui.fragment.settings.backup.backupSettings.option.BackupOptionViewModel
 import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupOptions
@@ -140,11 +138,11 @@ internal class BackupSettingsFragment : CommonFragment<FragmentWalletBackupSetti
 
         observe(backupStateChanged) { resetStatusIcons() }
 
-        observe(isBackupAvailable) { onChangeIsBackupAvailable(it) }
+        observe(isBackupNowAvailabilityChanged) { onChangeIsBackupAvailable(it) }
 
-        observe(backupWalletToCloudEnabled) { ui.backupWalletToCloudCtaView.isEnabled = it }
+        observe(backupNowEnabled) { ui.backupWalletToCloudCtaView.isEnabled = it }
 
-        observe(isBackupNowEnabled) { ui.backupNowTextView.alpha = if (it) ALPHA_VISIBLE else ALPHA_DISABLED }
+        observe(isBackupNowAvailable) { ui.backupNowTextView.alpha = if (it) ALPHA_VISIBLE else ALPHA_DISABLED }
 
         observe(backupPassword) { updatePasswordChangeLabel(if (it.isPresent) it.get() else null) }
 
@@ -152,13 +150,9 @@ internal class BackupSettingsFragment : CommonFragment<FragmentWalletBackupSetti
 
         observe(lastSuccessfulBackupDate) { updateLastSuccessfulBackupDate(if (it.isPresent) it.get() else null) }
 
-//        observe(showBackupsWillBeDeletedDialog) { showBackupsWillBeDeletedDialog(it.onAccept, it.onDismiss) }
-
         observe(backupOptionsVisibility) { if (it) showBackupOptionsWithAnimation() else hideAllBackupOptionsWithAnimation() }
 
         observeOnLoad(backupOptionsAreVisible)
-
-        observeOnLoad(folderSelectionWasSuccessful)
     }
 
     private fun processNavigation(navigation: BackupSettingsNavigation) {
@@ -173,14 +167,17 @@ internal class BackupSettingsFragment : CommonFragment<FragmentWalletBackupSetti
     private fun initBackupOptions() {
         val googleDriveViewModel = BackupOptionViewModel()
         val dropboxViewModel = BackupOptionViewModel()
+        val localFileViewModel = BackupOptionViewModel()
 
         ui.googleDriveBackup.viewLifecycle = viewLifecycleOwner
         ui.dropboxBackup.viewLifecycle = viewLifecycleOwner
+        ui.localFileBackup.viewLifecycle = viewLifecycleOwner
 
         ui.googleDriveBackup.init(this, googleDriveViewModel.apply { setup(BackupOptions.Google) })
         ui.dropboxBackup.init(this, dropboxViewModel.apply { setup(BackupOptions.Dropbox) })
+        ui.localFileBackup.init(this, localFileViewModel.apply { setup(BackupOptions.Local) })
 
-        viewModel.setupWithOptions(listOf(googleDriveViewModel, dropboxViewModel))
+        viewModel.setupWithOptions(listOf(googleDriveViewModel, dropboxViewModel, localFileViewModel))
 
         if (viewModel.backupSettingsRepository.getOptionList.any { it.isEnable }) {
             if (EventBus.backupState.publishSubject.value?.backupsState is BackupUpToDate) {
@@ -264,27 +261,6 @@ internal class BackupSettingsFragment : CommonFragment<FragmentWalletBackupSetti
         if (textColor != -1) backupStatusTextView.setTextColor(color(textColor))
     }
 
-    //todo refactor to nice state
-    private fun showBackupsWillBeDeletedDialog(onAccept: () -> Unit, onDismiss: () -> Unit) {
-        BottomSlideDialog(
-            requireContext(),
-            R.layout.dialog_turn_off_backups_will_be_deleted_warning,
-            canceledOnTouchOutside = false
-        ).apply {
-            findViewById<View>(R.id.backup_turn_off_confirm_button)
-                .setOnClickListener(ThrottleClick {
-                    onAccept()
-                    dismiss()
-                })
-            findViewById<View>(R.id.backup_turn_off_cancel_button)
-                .setOnClickListener(ThrottleClick {
-                    onDismiss()
-                    dismiss()
-                })
-        }.show()
-    }
-
-    // region Backup button animations
     private fun animateBackupButtonAvailability() {
         val animation = optionsAnimation
         if (viewModel.backupOptionsAreVisible.value == true &&
@@ -322,10 +298,6 @@ internal class BackupSettingsFragment : CommonFragment<FragmentWalletBackupSetti
             }
         }
     }
-    // endRegion
-
-
-    // region Backup options animations
 
     private fun showBackupOptionsWithAnimation() {
         if (viewModel.backupOptionsAreVisible.value!!) return
@@ -399,7 +371,6 @@ internal class BackupSettingsFragment : CommonFragment<FragmentWalletBackupSetti
         }
         viewModel.backupOptionsAreVisible.postValue(false)
     }
-    // endRegion
 
     companion object {
         fun newInstance() = BackupSettingsFragment()

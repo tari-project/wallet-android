@@ -92,6 +92,17 @@
             android:layout_marginHorizontal="25dp"
             android:background="@color/settings_background" />
 
+        <com.tari.android.wallet.ui.fragment.settings.backup.backupSettings.option.BackupOptionView
+            android:id="@+id/localFileBackup"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginHorizontal="25dp"
+            android:background="@color/settings_background" />
+
         <FrameLayout
             android:id="@+id/update_password_cta_view"
             android:layout_width="match_parent"

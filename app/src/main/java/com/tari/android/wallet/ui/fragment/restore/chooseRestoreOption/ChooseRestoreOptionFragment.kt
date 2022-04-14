@@ -88,9 +88,11 @@ internal class ChooseRestoreOptionFragment : CommonFragment<FragmentChooseRestor
         backCtaView.setOnThrottledClickListener { requireActivity().onBackPressed() }
         googleDriveRestoreOption.ui.restoreWalletCtaView.setOnClickListener { startRecovery(BackupOptions.Google) }
         dropboxRestoreOption.ui.restoreWalletCtaView.setOnClickListener { startRecovery(BackupOptions.Dropbox) }
+        localFileRestoreOption.ui.restoreWalletCtaView.setOnClickListener { startRecovery(BackupOptions.Local) }
         restoreWithRecoveryPhraseCtaView.setOnClickListener { processNavigation(ChooseRestoreOptionNavigation.ToRestoreWithRecoveryPhrase) }
         googleDriveRestoreOption.init(getString(R.string.back_up_wallet_restore_with_google_drive))
         dropboxRestoreOption.init(getString(R.string.back_up_wallet_restore_with_dropbox))
+        localFileRestoreOption.init(getString(R.string.back_up_wallet_restore_with_local_files))
     }
 
     private fun startRecovery(options: BackupOptions) {
@@ -130,7 +132,7 @@ internal class ChooseRestoreOptionFragment : CommonFragment<FragmentChooseRestor
         return when (backupOptions) {
             BackupOptions.Google -> ui.googleDriveRestoreOption
             BackupOptions.Dropbox -> ui.dropboxRestoreOption
-            BackupOptions.Local -> null
+            BackupOptions.Local -> ui.localFileRestoreOption
         }
     }
 

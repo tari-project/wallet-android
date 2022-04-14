@@ -1,3 +1,4 @@
+package com.tari.android.wallet.infrastructure.backup.dropbox
 
 import android.app.Activity
 import android.content.Context
@@ -25,7 +26,6 @@ import com.tari.android.wallet.BuildConfig
 import com.tari.android.wallet.R
 import com.tari.android.wallet.extension.getLastPathComponent
 import com.tari.android.wallet.infrastructure.backup.*
-import com.tari.android.wallet.infrastructure.backup.dropbox.DropboxClientFactory
 import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupSettingsRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -35,7 +35,7 @@ import java.io.FileOutputStream
 import java.io.IOException
 import kotlin.coroutines.suspendCoroutine
 
-internal class DropboxBackupStorage(
+class DropboxBackupStorage(
     private val context: Context,
     private val namingPolicy: BackupNamingPolicy,
     private val backupSettingsRepository: BackupSettingsRepository,
@@ -299,7 +299,7 @@ internal class DropboxBackupStorage(
     private fun searchForBackups(pageToken: String?): FileList =
         drive.files().list()
             .setSpaces(DRIVE_BACKUP_PARENT_FOLDER_NAME)
-            .setQ("'${DRIVE_BACKUP_PARENT_FOLDER_NAME}' in parents")
+            .setQ("'$DRIVE_BACKUP_PARENT_FOLDER_NAME' in parents")
             .setFields("nextPageToken, files(id, name)")
             .setPageToken(pageToken)
             .execute()
