@@ -66,7 +66,7 @@
 
             <include
                 android:id="@+id/emoji_id_copied_view"
-                layout="@layout/emoji_id_copied_anim_view"
+                layout="@layout/view_emoji_id_copied_anim"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:visibility="visible" />

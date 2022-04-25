@@ -34,7 +34,7 @@ package com.tari.android.wallet.ui.component
 
 import android.icu.text.BreakIterator
 import android.view.View
-import com.tari.android.wallet.databinding.EmojiIdSummaryBinding
+import com.tari.android.wallet.databinding.ViewEmojiIdSummaryBinding
 import com.tari.android.wallet.ui.extension.setVisible
 
 /**
@@ -42,9 +42,9 @@ import com.tari.android.wallet.ui.extension.setVisible
  *
  * @author The Tari Development Team
  */
-internal class EmojiIdSummaryViewController(private val ui: EmojiIdSummaryBinding) {
+internal class EmojiIdSummaryViewController(private val ui: ViewEmojiIdSummaryBinding) {
 
-    constructor(view: View) : this(EmojiIdSummaryBinding.bind(view))
+    constructor(view: View) : this(ViewEmojiIdSummaryBinding.bind(view))
 
     fun display(emojiId: String, showEmojisFromEachEnd: Int = 3) {
 

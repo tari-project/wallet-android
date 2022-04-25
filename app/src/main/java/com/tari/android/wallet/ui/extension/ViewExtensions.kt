@@ -56,7 +56,13 @@ import androidx.recyclerview.widget.RecyclerView
 import com.airbnb.lottie.LottieAnimationView
 import com.orhanobut.logger.Logger
 import com.tari.android.wallet.R
-import com.tari.android.wallet.ui.dialog.BottomSlideDialog
+import com.tari.android.wallet.ui.dialog.modular.DialogArgs
+import com.tari.android.wallet.ui.dialog.modular.ModularDialog
+import com.tari.android.wallet.ui.dialog.modular.ModularDialogArgs
+import com.tari.android.wallet.ui.dialog.modular.modules.body.BodyModule
+import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonModule
+import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonStyle
+import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
 import com.tari.android.wallet.util.Constants
 import java.lang.ref.WeakReference
 import android.animation.Animator as LegacyAnimator
@@ -89,11 +95,12 @@ internal fun View.setVisible(visible: Boolean, hideState: Int = View.GONE) {
  * Given the context, displays the standard "no internet connection" dialog.
  */
 internal fun showInternetConnectionErrorDialog(context: Context) {
-    BottomSlideDialog(
-        context = context,
-        layoutId = R.layout.internet_connection_error_dialog,
-        dismissViewId = R.id.internet_connection_error_dialog_txt_close
-    ).show()
+    val args = ModularDialogArgs(DialogArgs(), listOf(
+        HeadModule(context.string(R.string.internet_connection_error_dialog_title)),
+        BodyModule(context.string(R.string.internet_connection_error_dialog_description)),
+        ButtonModule(context.string(R.string.common_close), ButtonStyle.Close)
+    ))
+    ModularDialog(context, args).show()
 }
 
 /**

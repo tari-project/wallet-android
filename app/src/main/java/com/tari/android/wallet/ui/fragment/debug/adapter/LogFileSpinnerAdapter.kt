@@ -69,7 +69,7 @@ internal class LogFileSpinnerAdapter(context: Context, files: List<File>) :
 
     @SuppressLint("InflateParams")
     override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
-        val view: View = convertView ?: inflater.inflate(R.layout.log_file_spinner_item, null)
+        val view: View = convertView ?: inflater.inflate(R.layout.item_log_file_spinner, null)
         val textView = view.findViewById<TextView>(R.id.log_file_spinner_item_txt_file_name)
         textView.text = fileNames[position]
         view.findViewById<View>(R.id.log_file_spinner_item_vw_gray_bg).gone()

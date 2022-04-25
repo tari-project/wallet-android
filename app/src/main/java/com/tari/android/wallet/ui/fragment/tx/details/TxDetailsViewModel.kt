@@ -65,7 +65,7 @@ class TxDetailsViewModel() : CommonViewModel() {
                 resourceManager.getString(R.string.tx_detail_cancellation_error_title),
                 resourceManager.getString(R.string.tx_detail_cancellation_error_description)
             )
-            _errorDialog.postValue(errorDialogArgs)
+            _modularDialog.postValue(errorDialogArgs.getModular(resourceManager))
         }
     }
 
@@ -138,7 +138,7 @@ class TxDetailsViewModel() : CommonViewModel() {
                 resourceManager.getString(R.string.tx_details_error_tx_not_found_title),
                 resourceManager.getString(R.string.tx_details_error_tx_not_found_desc)
             ) { _backPressed.call() }
-            _errorDialog.postValue(errorArgs)
+            _modularDialog.postValue(errorArgs.getModular(resourceManager))
         } else {
             foundTx.let { _tx.value = it }
             generateExplorerLink()

@@ -40,7 +40,7 @@ import com.tari.android.wallet.model.CancelledTx
 import com.tari.android.wallet.util.WalletUtil
 
 class TxCanceledViewHolder(context: Context, tx: CancelledTx) :
-    RemoteViews(context.packageName, R.layout.tx_canceled_notification) {
+    RemoteViews(context.packageName, R.layout.remote_tx_canceled_notification) {
 
     init {
         // amount - display just "NEW" if the screen is locked
