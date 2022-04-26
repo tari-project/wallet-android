@@ -66,9 +66,8 @@ import com.tari.android.wallet.service.WalletService
 import com.tari.android.wallet.ui.common.CommonFragment
 import com.tari.android.wallet.ui.component.EmojiIdSummaryViewController
 import com.tari.android.wallet.ui.component.FullEmojiIdViewController
-import com.tari.android.wallet.ui.dialog.error.ErrorDialog
 import com.tari.android.wallet.ui.dialog.error.ErrorDialogArgs
-import com.tari.android.wallet.ui.dialog.tooltipDialog.TooltipDialog
+import com.tari.android.wallet.ui.dialog.modular.ModularDialog
 import com.tari.android.wallet.ui.dialog.tooltipDialog.TooltipDialogArgs
 import com.tari.android.wallet.ui.extension.*
 import com.tari.android.wallet.ui.fragment.send.activity.SendTariActivity
@@ -236,12 +235,17 @@ class AddAmountFragment : CommonFragment<FragmentAddAmountBinding, AddAmountView
     }
 
     private fun showTxFeeToolTip() {
-        TooltipDialog(requireContext(), TooltipDialogArgs(string(tx_detail_fee_tooltip_transaction_fee), string(tx_detail_fee_tooltip_desc))).show()
+        val args = TooltipDialogArgs(string(tx_detail_fee_tooltip_transaction_fee), string(tx_detail_fee_tooltip_desc))
+            .getModular(viewModel.resourceManager)
+        ModularDialog(requireContext(), args).show()
     }
 
     private fun showOneSidePaymentTooltip() {
-        val args = TooltipDialogArgs(string(add_amount_one_side_payment_switcher), string(add_amount_one_side_payment_question_mark))
-        TooltipDialog(requireContext(), args).show()
+        val args = TooltipDialogArgs(
+            string(add_amount_one_side_payment_switcher),
+            string(add_amount_one_side_payment_question_mark)
+        ).getModular(viewModel.resourceManager)
+        ModularDialog(requireContext(), args).show()
     }
 
     private fun continueButtonClicked() {
@@ -266,7 +270,7 @@ class AddAmountFragment : CommonFragment<FragmentAddAmountBinding, AddAmountView
                             string(R.string.error_fee_more_than_amount_title),
                             string(R.string.error_fee_more_than_amount_description)
                         )
-                        ErrorDialog(requireContext(), args).show()
+                        ModularDialog(requireContext(), args.getModular(viewModel.resourceManager)).show()
                         ui.continueButton.isClickable = true
                     } else {
                         continueToNote()

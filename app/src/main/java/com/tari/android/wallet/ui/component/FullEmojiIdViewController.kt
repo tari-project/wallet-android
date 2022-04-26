@@ -32,7 +32,8 @@
  */
 package com.tari.android.wallet.ui.component
 
-import android.animation.*
+import android.animation.AnimatorSet
+import android.animation.ValueAnimator
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
@@ -42,7 +43,7 @@ import androidx.core.content.ContextCompat
 import com.daasuu.ei.Ease
 import com.daasuu.ei.EasingInterpolator
 import com.tari.android.wallet.R
-import com.tari.android.wallet.databinding.EmojiIdSummaryBinding
+import com.tari.android.wallet.databinding.ViewEmojiIdSummaryBinding
 import com.tari.android.wallet.databinding.ViewFullEmojiIdBinding
 import com.tari.android.wallet.ui.extension.*
 import com.tari.android.wallet.util.Constants
@@ -58,7 +59,7 @@ import me.everything.android.ui.overscroll.OverScrollDecoratorHelper
  */
 internal class FullEmojiIdViewController(
     private val ui: ViewFullEmojiIdBinding,
-    summary: EmojiIdSummaryBinding,
+    summary: ViewEmojiIdSummaryBinding,
     private val context: Context,
     private val listener: Listener? = null
 ) {

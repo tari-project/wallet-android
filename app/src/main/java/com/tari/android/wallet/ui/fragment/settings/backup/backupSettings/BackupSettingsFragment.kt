@@ -43,7 +43,6 @@ import android.view.ViewGroup
 import android.view.animation.LinearInterpolator
 import androidx.core.animation.addListener
 import androidx.fragment.app.viewModels
-import com.tari.android.wallet.R
 import com.tari.android.wallet.R.color.all_settings_back_up_status_processing
 import com.tari.android.wallet.R.color.back_up_settings_permission_processing
 import com.tari.android.wallet.R.string.*
@@ -58,7 +57,6 @@ import com.tari.android.wallet.infrastructure.backup.BackupManager
 import com.tari.android.wallet.infrastructure.backup.BackupState.BackupUpToDate
 import com.tari.android.wallet.ui.activity.settings.BackupSettingsRouter
 import com.tari.android.wallet.ui.common.CommonFragment
-import com.tari.android.wallet.ui.dialog.BottomSlideDialog
 import com.tari.android.wallet.ui.extension.*
 import com.tari.android.wallet.ui.fragment.settings.userAutorization.BiometricAuthenticationViewModel
 import org.joda.time.DateTime
@@ -163,8 +161,6 @@ internal class BackupSettingsFragment : CommonFragment<FragmentWalletBackupSetti
         observe(updatePasswordEnabled) { onChangeUpdatePasswordEnabled(it) }
 
         observe(lastSuccessfulBackupDate) { updateLastSuccessfulBackupDate(if (it.isPresent) it.get() else null) }
-
-        observe(showBackupsWillBeDeletedDialog) { showBackupsWillBeDeletedDialog(it.onAccept, it.onDismiss) }
 
         observe(backupOptionsVisibility) { if (it) showBackupOptionsWithAnimation() else hideAllBackupOptionsWithAnimation() }
 
@@ -281,32 +277,11 @@ internal class BackupSettingsFragment : CommonFragment<FragmentWalletBackupSetti
         if (textColor != -1) backupStatusTextView.setTextColor(color(textColor))
     }
 
-    //todo refactor to nice state
-    private fun showBackupsWillBeDeletedDialog(onAccept: () -> Unit, onDismiss: () -> Unit) {
-        BottomSlideDialog(
-            requireContext(),
-            R.layout.dialog_turn_off_backups_will_be_deleted_warning,
-            canceledOnTouchOutside = false
-        ).apply {
-            findViewById<View>(R.id.backup_turn_off_confirm_button)
-                .setOnClickListener(ThrottleClick {
-                    onAccept()
-                    dismiss()
-                })
-            findViewById<View>(R.id.backup_turn_off_cancel_button)
-                .setOnClickListener(ThrottleClick {
-                    onDismiss()
-                    dismiss()
-                })
-        }.show()
-    }
-
     // region Backup button animations
     private fun animateBackupButtonAvailability() {
-        val animation = optionsAnimation
         if (viewModel.backupOptionsAreVisible.value == true &&
             ui.backupWalletToCloudCtaContainerView.visibility != View.VISIBLE &&
-            (animation == null || !animation.isRunning)
+            (optionsAnimation == null || !optionsAnimation!!.isRunning)
         ) {
             optionsAnimation = ValueAnimator.ofFloat(ALPHA_INVISIBLE, ALPHA_VISIBLE).apply {
                 duration = OPTIONS_ANIMATION_DURATION

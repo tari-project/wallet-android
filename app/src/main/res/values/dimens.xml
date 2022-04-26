@@ -32,6 +32,7 @@
     <!-- bottom dialog -->
     <dimen name="bottom_dialog_margin">15dp</dimen>
     <dimen name="bottom_dialog_horizontal_padding">10dp</dimen>
+    <dimen name="bottom_dialog_modules_margin">8dp</dimen>
 
     <!-- debug -->
     <dimen name="log_item_height">42dp</dimen>

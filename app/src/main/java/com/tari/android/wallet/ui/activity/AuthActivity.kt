@@ -63,8 +63,8 @@ import com.tari.android.wallet.infrastructure.security.biometric.BiometricAuthen
 import com.tari.android.wallet.service.WalletServiceLauncher
 import com.tari.android.wallet.ui.activity.home.HomeActivity
 import com.tari.android.wallet.ui.common.domain.ResourceManager
-import com.tari.android.wallet.ui.dialog.error.ErrorDialog
 import com.tari.android.wallet.ui.dialog.error.WalletErrorArgs
+import com.tari.android.wallet.ui.dialog.modular.ModularDialog
 import com.tari.android.wallet.ui.extension.*
 import com.tari.android.wallet.util.Constants
 import kotlinx.coroutines.Dispatchers
@@ -146,7 +146,7 @@ internal class AuthActivity : AppCompatActivity() {
     private fun showWalletError(state: WalletState.Failed) {
         lifecycleScope.launch(Dispatchers.Main) {
             val args = WalletErrorArgs(resourceManager, state.exception) { finish() }
-            ErrorDialog(this@AuthActivity, args).show()
+            ModularDialog(this@AuthActivity, args.getErrorArgs().getModular(resourceManager)).show()
         }
     }
 

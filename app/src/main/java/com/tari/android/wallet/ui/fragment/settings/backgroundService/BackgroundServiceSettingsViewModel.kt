@@ -28,12 +28,14 @@ class BackgroundServiceSettingsViewModel : CommonViewModel() {
             turnSwitcher(true)
         } else {
             _switchState.value = LoadingSwitchState(isChecked = true, isLoading = true)
-            _confirmDialog.value = ConfirmDialogArgs(
+            _modularDialog.value = ConfirmDialogArgs(
                 resourceManager.getString(R.string.background_service_button_confirmation_title),
                 resourceManager.getString(R.string.background_service_button_confirmation_description),
                 onConfirm = { turnSwitcher(false) },
                 onCancel = { _switchState.value = LoadingSwitchState(isChecked = true, isLoading = false) },
-                onDismiss = { _switchState.value = LoadingSwitchState(isChecked = _switchState.value!!.isChecked, isLoading = false) })
+                onDismiss = { _switchState.value = LoadingSwitchState(isChecked = _switchState.value!!.isChecked, isLoading = false) }).getModular(
+                resourceManager
+            )
         }
     }
 

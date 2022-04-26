@@ -264,7 +264,7 @@
 
                     <include
                         android:id="@+id/emoji_id_summary_view"
-                        layout="@layout/emoji_id_summary"
+                        layout="@layout/view_emoji_id_summary"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center" />
@@ -411,7 +411,7 @@
 
                 <include
                     android:id="@+id/gif_container"
-                    layout="@layout/tx_details_gif_container"
+                    layout="@layout/view_tx_details_gif_container"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_below="@id/tx_note_text_view"

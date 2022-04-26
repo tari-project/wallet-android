@@ -76,9 +76,6 @@ import com.tari.android.wallet.ui.common.CommonFragment
 import com.tari.android.wallet.ui.common.recyclerView.CommonAdapter
 import com.tari.android.wallet.ui.common.recyclerView.CommonViewHolderItem
 import com.tari.android.wallet.ui.component.networkStateIndicator.ConnectionIndicatorViewModel
-import com.tari.android.wallet.ui.dialog.backup.BackupWalletDialog
-import com.tari.android.wallet.ui.dialog.testnet.TestnetReceivedDialog
-import com.tari.android.wallet.ui.dialog.ttl.TtlStoreWalletDialog
 import com.tari.android.wallet.ui.extension.*
 import com.tari.android.wallet.ui.fragment.send.activity.SendTariActivity
 import com.tari.android.wallet.ui.fragment.tx.adapter.TxListAdapter
@@ -159,12 +156,6 @@ internal class TxListFragment : CommonFragment<FragmentTxListBinding, TxListView
         observe(refreshBalanceInfo) { updateBalanceInfoUI(it) }
 
         observe(navigation) { processNavigation(it) }
-
-        observe(showTtlStoreDialog) { replaceDialog(TtlStoreWalletDialog(requireContext(), it)) }
-
-        observe(showBackupPrompt) { replaceDialog(BackupWalletDialog(requireContext(), it)) }
-
-        observe(showTestnetReceived) { replaceDialog(TestnetReceivedDialog(requireContext(), it)) }
 
         observe(txSendSuccessful) { playTxSendSuccessfulAnim() }
 
@@ -290,9 +281,7 @@ internal class TxListFragment : CommonFragment<FragmentTxListBinding, TxListView
     }
 
     private fun navigateToSendTari(user: User) {
-        val intent = Intent(requireContext(), SendTariActivity::class.java).apply {
-            putExtra("recipientUser", user as Parcelable)
-        }
+        val intent = Intent(requireContext(), SendTariActivity::class.java).apply { putExtra("recipientUser", user as Parcelable) }
         startActivity(intent)
         requireActivity().overridePendingTransition(R.anim.enter_from_right, R.anim.exit_to_left)
     }

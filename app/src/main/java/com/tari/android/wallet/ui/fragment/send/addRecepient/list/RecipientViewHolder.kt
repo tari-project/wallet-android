@@ -33,7 +33,7 @@
 package com.tari.android.wallet.ui.fragment.send.addRecepient.list
 
 import com.tari.android.wallet.R
-import com.tari.android.wallet.databinding.AddRecipientListItemBinding
+import com.tari.android.wallet.databinding.ItemAddRecipientListBinding
 import com.tari.android.wallet.model.Contact
 import com.tari.android.wallet.ui.common.recyclerView.CommonViewHolder
 import com.tari.android.wallet.ui.common.recyclerView.ViewHolderBuilder
@@ -42,7 +42,7 @@ import com.tari.android.wallet.ui.extension.setVisible
 import com.tari.android.wallet.yat.YatUser
 import java.util.*
 
-class RecipientViewHolder(view: AddRecipientListItemBinding) : CommonViewHolder<RecipientViewHolderItem, AddRecipientListItemBinding>(view) {
+class RecipientViewHolder(view: ItemAddRecipientListBinding) : CommonViewHolder<RecipientViewHolderItem, ItemAddRecipientListBinding>(view) {
 
     private var emojiIdSummaryController = EmojiIdSummaryViewController(ui.emojiSummaryView)
 
@@ -55,7 +55,7 @@ class RecipientViewHolder(view: AddRecipientListItemBinding) : CommonViewHolder<
         ui.profileIconImageView.setVisible(!isContact)
         ui.initialTextView.setVisible(isContact)
 
-        when(item.user) {
+        when (item.user) {
             is Contact -> {
                 ui.initialTextView.text = item.user.alias.take(1).toUpperCase(Locale.getDefault())
                 ui.aliasTextView.text = item.user.alias
@@ -72,7 +72,8 @@ class RecipientViewHolder(view: AddRecipientListItemBinding) : CommonViewHolder<
     }
 
     companion object {
-        fun getBuilder(): ViewHolderBuilder =
-            ViewHolderBuilder(AddRecipientListItemBinding::inflate, RecipientViewHolderItem::class.java) { RecipientViewHolder(it as AddRecipientListItemBinding) }
+        fun getBuilder(): ViewHolderBuilder = ViewHolderBuilder(ItemAddRecipientListBinding::inflate, RecipientViewHolderItem::class.java) {
+            RecipientViewHolder(it as ItemAddRecipientListBinding)
+        }
     }
 }

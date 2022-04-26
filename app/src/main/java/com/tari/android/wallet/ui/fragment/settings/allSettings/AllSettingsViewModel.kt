@@ -17,7 +17,7 @@ import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.common.SingleLiveEvent
 import com.tari.android.wallet.ui.common.recyclerView.CommonViewHolderItem
 import com.tari.android.wallet.ui.common.recyclerView.items.DividerViewHolderItem
-import com.tari.android.wallet.ui.dialog.backup.BackupSettingsRepository
+import com.tari.android.wallet.ui.fragment.settings.backup.BackupSettingsRepository
 import com.tari.android.wallet.ui.dialog.error.ErrorDialogArgs
 import com.tari.android.wallet.ui.fragment.settings.allSettings.PresentationBackupState.BackupStateStatus.*
 import com.tari.android.wallet.ui.fragment.settings.allSettings.backupOptions.SettingsBackupOptionViewHolderItem
@@ -201,7 +201,7 @@ internal class AllSettingsViewModel : CommonViewModel() {
 
     private fun showBackupStorageCheckFailedDialog(message: String) {
         val errorArgs = ErrorDialogArgs(resourceManager.getString(check_backup_storage_status_error_title), message)
-        _errorDialog.postValue(errorArgs)
+        _modularDialog.postValue(errorArgs.getModular(resourceManager))
     }
 }
 

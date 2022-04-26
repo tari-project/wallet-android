@@ -39,7 +39,7 @@ import com.orhanobut.logger.Logger
 import com.tari.android.wallet.R
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.notification.NotificationHelper
-import com.tari.android.wallet.ui.dialog.backup.BackupSettingsRepository
+import com.tari.android.wallet.ui.fragment.settings.backup.BackupSettingsRepository
 import com.tari.android.wallet.util.Constants
 import io.reactivex.Observable
 import io.reactivex.disposables.Disposable

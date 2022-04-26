@@ -6,7 +6,6 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.orhanobut.logger.Logger
 import com.tari.android.wallet.R
-import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.infrastructure.backup.BackupManager
 import com.tari.android.wallet.infrastructure.backup.BackupState
@@ -14,8 +13,14 @@ import com.tari.android.wallet.infrastructure.backup.BackupStorageAuthRevokedExc
 import com.tari.android.wallet.infrastructure.backup.BackupStorageFullException
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.common.SingleLiveEvent
-import com.tari.android.wallet.ui.dialog.backup.BackupSettingsRepository
 import com.tari.android.wallet.ui.dialog.error.ErrorDialogArgs
+import com.tari.android.wallet.ui.dialog.modular.DialogArgs
+import com.tari.android.wallet.ui.dialog.modular.ModularDialogArgs
+import com.tari.android.wallet.ui.dialog.modular.modules.body.BodyModule
+import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonModule
+import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonStyle
+import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
+import com.tari.android.wallet.ui.fragment.settings.backup.BackupSettingsRepository
 import com.tari.android.wallet.ui.fragment.settings.userAutorization.BiometricAuthenticationViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -55,9 +60,6 @@ internal class BackupSettingsViewModel : CommonViewModel() {
     private val _openFolderSelection = SingleLiveEvent<Unit>()
     val openFolderSelection: LiveData<Unit> = _openFolderSelection
 
-    private val _showBackupsWillBeDeletedDialog = SingleLiveEvent<BackupsWillBeDeletedDialogArgs>()
-    val showBackupsWillBeDeletedDialog: LiveData<BackupsWillBeDeletedDialogArgs> = _showBackupsWillBeDeletedDialog
-
     private val _backupWalletToCloudEnabled = MutableLiveData<Boolean>()
     val backupWalletToCloudEnabled: LiveData<Boolean> = _backupWalletToCloudEnabled
 
@@ -80,7 +82,7 @@ internal class BackupSettingsViewModel : CommonViewModel() {
     val backupOptionsVisibility: LiveData<Boolean> = _backupOptionVisibility
 
     init {
-        component?.inject(this)
+        component.inject(this)
 
         EventBus.backupState.subscribe(this, this::onBackupStateChanged)
 
@@ -147,21 +149,36 @@ internal class BackupSettingsViewModel : CommonViewModel() {
     }
 
     private fun tryToTurnOffBackup() {
-        val args = BackupsWillBeDeletedDialogArgs(
-            onAccept = {
-                viewModelScope.launch(Dispatchers.IO) {
-                    try {
-                        //todo looks not finished
-                        backupManager.turnOff(deleteExistingBackups = true)
-                    } catch (exception: Exception) {
-                        Logger.i(exception.toString())
-                    }
+        val onAcceptAction = {
+            viewModelScope.launch(Dispatchers.IO) {
+                try {
+                    //todo looks not finished
+                    backupManager.turnOff(deleteExistingBackups = true)
+                } catch (exception: Exception) {
+                    Logger.i(exception.toString())
                 }
-            }, onDismiss = {
-                _inProgress.postValue(false)
-                _backupPermissionSwitchChecked.postValue(true)
-            })
-        _showBackupsWillBeDeletedDialog.postValue(args)
+            }
+        }
+
+        val onDismissAction = {
+            _inProgress.postValue(false)
+            _backupPermissionSwitchChecked.postValue(true)
+        }
+
+        val args = ModularDialogArgs(DialogArgs(true, canceledOnTouchOutside = false), listOf(
+            HeadModule(resourceManager.getString(R.string.back_up_wallet_turn_off_backup_warning_title)),
+            BodyModule(resourceManager.getString(R.string.back_up_wallet_turn_off_backup_warning_description)),
+            ButtonModule(resourceManager.getString(R.string.common_confirm), ButtonStyle.Normal) {
+                onAcceptAction()
+                _dissmissDialog.value = Unit
+            },
+            ButtonModule(resourceManager.getString(R.string.common_cancel), ButtonStyle.Close) {
+                onDismissAction()
+                _dissmissDialog.value = Unit
+            }
+        ))
+
+        _modularDialog.postValue(args)
     }
 
     private fun refillSharedPrefsData() {
@@ -178,10 +195,10 @@ internal class BackupSettingsViewModel : CommonViewModel() {
             is BackupStorageFullException -> resourceManager.getString(R.string.backup_wallet_storage_full_desc)
             else -> resourceManager.getString(R.string.back_up_wallet_storage_setup_error_desc)
         }
-        _errorDialog.postValue(ErrorDialogArgs(errorTitle, errorDescription) {
+        _modularDialog.postValue(ErrorDialogArgs(errorTitle, errorDescription) {
             _backupPermissionSwitchChecked.postValue(false)
             _inProgress.postValue(false)
-        })
+        }.getModular(resourceManager))
     }
 
     private fun showBackupFailureDialog(exception: Exception?) {
@@ -200,7 +217,7 @@ internal class BackupSettingsViewModel : CommonViewModel() {
             exception?.message == null -> resourceManager.getString(R.string.back_up_wallet_backing_up_unknown_error)
             else -> resourceManager.getString(R.string.back_up_wallet_backing_up_error_desc, exception.message!!)
         }
-        _errorDialog.postValue(ErrorDialogArgs(errorTitle, errorDescription))
+        _modularDialog.postValue(ErrorDialogArgs(errorTitle, errorDescription).getModular(resourceManager))
     }
 
     private fun onBackupStateChanged(backupState: BackupState) {

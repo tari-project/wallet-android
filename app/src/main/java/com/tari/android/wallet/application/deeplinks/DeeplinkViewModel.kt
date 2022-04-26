@@ -6,9 +6,8 @@ import com.tari.android.wallet.application.baseNodes.BaseNodes
 import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodeDto
 import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodeSharedRepository
 import com.tari.android.wallet.ui.common.CommonViewModel
-import com.tari.android.wallet.ui.dialog.addCustomBaseNode.AddCustomBaseNodeDialog
-import com.tari.android.wallet.ui.dialog.addCustomBaseNode.AddCustomBaseNodeDialogArgs
 import com.tari.android.wallet.ui.dialog.confirm.ConfirmDialogArgs
+import com.tari.android.wallet.ui.dialog.modular.ModularDialog
 import javax.inject.Inject
 
 class DeeplinkViewModel() : CommonViewModel() {
@@ -25,15 +24,14 @@ class DeeplinkViewModel() : CommonViewModel() {
 
     fun executeAction(context: Context, deeplink: DeepLink.AddBaseNode) {
         val baseNode = BaseNodeDto.fromDeeplink(deeplink)
-        val confirmArgs = ConfirmDialogArgs(
+        val args = ConfirmDialogArgs(
             resourceManager.getString(R.string.home_custom_base_node_title),
             resourceManager.getString(R.string.home_custom_base_node_description),
             resourceManager.getString(R.string.home_custom_base_node_no_button),
             resourceManager.getString(R.string.home_custom_base_node_yes_button),
             onConfirm = { addBaseNode(baseNode) }
-        )
-        val args = AddCustomBaseNodeDialogArgs(baseNode, confirmArgs)
-        AddCustomBaseNodeDialog(context, args).show()
+        ).getModular(baseNode, resourceManager)
+        ModularDialog(context, args).show()
     }
 
     private fun addBaseNode(baseNodeDto: BaseNodeDto) {

@@ -10,10 +10,14 @@ import com.tari.android.wallet.R
 import com.tari.android.wallet.amountInputBinding.fragment.send.addAmount.keyboard.KeyboardController
 import com.tari.android.wallet.databinding.FragmentRequestTariBinding
 import com.tari.android.wallet.ui.common.CommonFragment
+import com.tari.android.wallet.ui.dialog.modular.DialogArgs
+import com.tari.android.wallet.ui.dialog.modular.ModularDialog
+import com.tari.android.wallet.ui.dialog.modular.ModularDialogArgs
+import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonModule
+import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonStyle
 import com.tari.android.wallet.ui.extension.hideKeyboard
 import com.tari.android.wallet.ui.extension.setOnThrottledClickListener
-import com.tari.android.wallet.ui.fragment.send.shareQr.QRCodeDialogArgs
-import com.tari.android.wallet.ui.fragment.send.shareQr.ShareQRCodeDialog
+import com.tari.android.wallet.ui.fragment.send.shareQr.ShareQrCodeModule
 
 
 class RequestTariFragment : CommonFragment<FragmentRequestTariBinding, RequestTariViewModel>() {
@@ -58,10 +62,15 @@ class RequestTariFragment : CommonFragment<FragmentRequestTariBinding, RequestTa
     }
 
     private fun showQRCodeDialog(deeplink: String) {
-        val args = QRCodeDialogArgs(deeplink, requireContext(), true, true) {
-            shareDeeplink(deeplink)
-        }
-        ShareQRCodeDialog(requireContext(), args).show()
+        val args = ModularDialogArgs(
+            DialogArgs(true, canceledOnTouchOutside = true), listOf(
+                ShareQrCodeModule(deeplink),
+                ButtonModule(viewModel.resourceManager.getString(R.string.common_share), ButtonStyle.Normal) { shareDeeplink(deeplink) },
+                ButtonModule(viewModel.resourceManager.getString(R.string.common_close), ButtonStyle.Close)
+            )
+        )
+
+        ModularDialog(requireContext(), args).show()
     }
 
     private inner class AmountCheckRunnable : Runnable {
