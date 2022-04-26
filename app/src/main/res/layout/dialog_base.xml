@@ -7,7 +7,8 @@
     android:layout_height="wrap_content"
     android:layout_marginHorizontal="14dp"
     android:layout_marginBottom="23dp"
-    android:paddingVertical="20dp"
+    android:paddingTop="20dp"
+    android:paddingBottom="13dp"
     android:background="@drawable/bottom_dialog_bg"
     android:orientation="vertical">
 

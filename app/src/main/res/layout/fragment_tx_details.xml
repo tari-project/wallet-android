@@ -298,6 +298,7 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@id/user_container"
                 android:layout_marginHorizontal="25dp"
+                android:layout_marginTop="25dp"
                 android:layout_marginStart="@dimen/common_horizontal_margin"
                 android:layout_marginEnd="12dp"
                 android:orientation="vertical"

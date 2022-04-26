@@ -390,7 +390,7 @@ internal class TxListFragment : CommonFragment<FragmentTxListBinding, TxListView
         lifecycleScope.launch(Dispatchers.Main) {
             ui.scrollView.finishUpdate()
             when (failureReason) {
-                UpdateProgressViewController.FailureReason.NETWORK_CONNECTION_ERROR -> viewModel.displayNetworkConnectionErrorDialog()
+                UpdateProgressViewController.FailureReason.NETWORK_CONNECTION_ERROR,
                 UpdateProgressViewController.FailureReason.BASE_NODE_VALIDATION_ERROR -> viewModel.displayNetworkConnectionErrorDialog()
             }
         }

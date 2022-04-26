@@ -157,7 +157,8 @@ internal class TxListViewModel() : CommonViewModel() {
     }
 
     private fun fetchBalanceInfoData() {
-        _balanceInfo.postValue(walletService.getWithError { error, service -> service.getBalanceInfo(error) })
+        val balance = walletService.getWithError { error, service -> service.getBalanceInfo(error) }
+        _balanceInfo.postValue(balance)
     }
 
     private fun fetchRequiredConfirmationCount() {
@@ -390,15 +391,9 @@ internal class TxListViewModel() : CommonViewModel() {
     /**
      * Called when an outgoing transaction has failed.
      */
-    private fun onTxSendFailed(failureReason: TxFailureReason) {
-        when (failureReason) {
-            TxFailureReason.NETWORK_CONNECTION_ERROR -> {
-                displayNetworkConnectionErrorDialog()
-            }
-            TxFailureReason.BASE_NODE_CONNECTION_ERROR, TxFailureReason.SEND_ERROR -> {
-                displayBaseNodeConnectionErrorDialog()
-            }
-        }
+    private fun onTxSendFailed(failureReason: TxFailureReason) = when (failureReason) {
+        TxFailureReason.NETWORK_CONNECTION_ERROR -> displayNetworkConnectionErrorDialog()
+        TxFailureReason.BASE_NODE_CONNECTION_ERROR, TxFailureReason.SEND_ERROR -> displayBaseNodeConnectionErrorDialog()
     }
 
     private fun testnetTariRequestSuccessful() {
