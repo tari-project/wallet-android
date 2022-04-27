@@ -45,11 +45,14 @@ import com.tari.android.wallet.model.TxId
 import com.tari.android.wallet.model.User
 import com.tari.android.wallet.network.NetworkConnectionState
 import com.tari.android.wallet.ui.common.CommonActivity
-import com.tari.android.wallet.ui.dialog.BottomSlideDialog
-import com.tari.android.wallet.ui.extension.addEnterLeftAnimation
-import com.tari.android.wallet.ui.extension.color
-import com.tari.android.wallet.ui.extension.hideKeyboard
-import com.tari.android.wallet.ui.extension.showInternetConnectionErrorDialog
+import com.tari.android.wallet.ui.dialog.modular.DialogArgs
+import com.tari.android.wallet.ui.dialog.modular.ModularDialog
+import com.tari.android.wallet.ui.dialog.modular.ModularDialogArgs
+import com.tari.android.wallet.ui.dialog.modular.modules.body.BodyModule
+import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonModule
+import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonStyle
+import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
+import com.tari.android.wallet.ui.extension.*
 import com.tari.android.wallet.ui.fragment.send.addAmount.AddAmountFragment
 import com.tari.android.wallet.ui.fragment.send.addAmount.AddAmountListener
 import com.tari.android.wallet.ui.fragment.send.addNote.AddNodeListener
@@ -123,11 +126,12 @@ internal class SendTariActivity : CommonActivity<ActivitySendTariBinding, SendTa
     }
 
     override fun onAmountExceedsActualAvailableBalance(fragment: AddAmountFragment) {
-        BottomSlideDialog(
-            context = this,
-            layoutId = R.layout.add_amount_dialog_actual_balance_exceeded,
-            dismissViewId = R.id.add_amount_dialog_btn_close
-        ).show()
+        val args = ModularDialogArgs(DialogArgs(), listOf(
+            HeadModule(string(R.string.error_balance_exceeded_title)),
+            BodyModule(string(R.string.error_balance_exceeded_description)),
+            ButtonModule(string(R.string.common_close), ButtonStyle.Close),
+        ))
+        ModularDialog(this, args).show()
     }
 
     override fun continueToAddNote(recipientUser: User, amount: MicroTari, isOneSidePayment: Boolean) {

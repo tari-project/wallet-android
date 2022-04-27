@@ -26,9 +26,9 @@ class GIFThumbnailAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): GIFThumbnailViewHolder =
         if (viewType == VIEW_TYPE_MORE)
-            parent.inflate(R.layout.holder_show_more_gifs)
+            parent.inflate(R.layout.item_show_more_gifs)
                 .run { ShowMoreViewHolder(this, onShowMoreClick) }
-        else parent.inflate(R.layout.holder_thumbnail_gif)
+        else parent.inflate(R.layout.item_thumbnail_gif)
             .run { GIFViewHolder(this, glide, onGifClick) }
 
     private fun ViewGroup.inflate(id: Int) = LayoutInflater.from(context)

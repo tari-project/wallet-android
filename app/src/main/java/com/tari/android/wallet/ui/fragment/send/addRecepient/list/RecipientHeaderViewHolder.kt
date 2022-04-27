@@ -33,11 +33,13 @@
 package com.tari.android.wallet.ui.fragment.send.addRecepient.list
 
 import android.view.View
-import com.tari.android.wallet.databinding.AddRecipientListHeaderBinding
+import com.tari.android.wallet.databinding.ItemAddRecipientListHeaderBinding
 import com.tari.android.wallet.ui.common.recyclerView.CommonViewHolder
 import com.tari.android.wallet.ui.common.recyclerView.ViewHolderBuilder
 
-class RecipientHeaderViewHolder(view: AddRecipientListHeaderBinding) : CommonViewHolder<RecipientHeaderItem, AddRecipientListHeaderBinding>(view) {
+class RecipientHeaderViewHolder(view: ItemAddRecipientListHeaderBinding) :
+    CommonViewHolder<RecipientHeaderItem, ItemAddRecipientListHeaderBinding>(view) {
+
     override fun bind(item: RecipientHeaderItem) {
         super.bind(item)
 
@@ -46,8 +48,9 @@ class RecipientHeaderViewHolder(view: AddRecipientListHeaderBinding) : CommonVie
     }
 
     companion object {
-        fun getBuilder(): ViewHolderBuilder =
-            ViewHolderBuilder(AddRecipientListHeaderBinding::inflate, RecipientHeaderItem::class.java) { RecipientHeaderViewHolder(it as AddRecipientListHeaderBinding) }
+        fun getBuilder(): ViewHolderBuilder = ViewHolderBuilder(ItemAddRecipientListHeaderBinding::inflate, RecipientHeaderItem::class.java) {
+            RecipientHeaderViewHolder(it as ItemAddRecipientListHeaderBinding)
+        }
     }
 }
 

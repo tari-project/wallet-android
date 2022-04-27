@@ -40,7 +40,7 @@ import com.tari.android.wallet.R
 class PhraseWordsAdapter(val seedWords: MutableList<String> = mutableListOf(), var isExpanded: Boolean = false) : RecyclerView.Adapter<PhraseWordViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PhraseWordViewHolder =
-        PhraseWordViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.holder_phrase_word, parent, false))
+        PhraseWordViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.item_phrase_word, parent, false))
 
     override fun onBindViewHolder(holder: PhraseWordViewHolder, position: Int) {
         // So that indexing follows the column direction rather than row

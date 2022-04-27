@@ -6,10 +6,8 @@ import com.tari.android.wallet.di.ApplicationComponent
 import com.tari.android.wallet.di.DiContainer
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.ui.common.domain.ResourceManager
-import com.tari.android.wallet.ui.dialog.confirm.ConfirmDialogArgs
-import com.tari.android.wallet.ui.dialog.error.ErrorDialogArgs
-import com.tari.android.wallet.ui.dialog.error.WalletErrorArgs
 import com.tari.android.wallet.ui.dialog.inProgress.ProgressDialogArgs
+import com.tari.android.wallet.ui.dialog.modular.ModularDialogArgs
 import io.reactivex.disposables.CompositeDisposable
 import javax.inject.Inject
 
@@ -42,14 +40,11 @@ open class CommonViewModel : ViewModel() {
     protected val _openLink = SingleLiveEvent<String>()
     val openLink: LiveData<String> = _openLink
 
-    protected val _confirmDialog = SingleLiveEvent<ConfirmDialogArgs>()
-    val confirmDialog: LiveData<ConfirmDialogArgs> = _confirmDialog
+    protected val _copyToClipboard = SingleLiveEvent<ClipboardArgs>()
+    val copyToClipboard: LiveData<ClipboardArgs> = _copyToClipboard
 
-    protected val _errorDialog = SingleLiveEvent<ErrorDialogArgs>()
-    val errorDialog: LiveData<ErrorDialogArgs> = _errorDialog
-
-    protected val _walletErrorDialog = SingleLiveEvent<WalletErrorArgs>()
-    val walletErrorDialog: LiveData<WalletErrorArgs> = _walletErrorDialog
+    protected val _modularDialog = SingleLiveEvent<ModularDialogArgs>()
+    val modularDialog: LiveData<ModularDialogArgs> = _modularDialog
 
     protected val _loadingDialog = SingleLiveEvent<ProgressDialogArgs>()
     val loadingDialog: LiveData<ProgressDialogArgs> = _loadingDialog

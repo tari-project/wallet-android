@@ -288,7 +288,7 @@ internal class KeyboardController {
             elements[0].second
         } else { // inflate text view
             val textView = inflater.inflate(
-                R.layout.add_amount_element,
+                R.layout.view_add_amount_element,
                 amountInputBinding.elementContainerView,
                 false
             ) as TextView
@@ -316,7 +316,7 @@ internal class KeyboardController {
     private fun insertThousandsSeparator(index: Int): Pair<String, TextView> {
         val inflater = LayoutInflater.from(context)
         val textView = inflater.inflate(
-            R.layout.add_amount_element,
+            R.layout.view_add_amount_element,
             amountInputBinding.elementContainerView,
             false
         ) as TextView
@@ -385,7 +385,7 @@ internal class KeyboardController {
     ) {
         val inflater = LayoutInflater.from(context)
         var ghostTextView = inflater.inflate(
-            R.layout.add_amount_element,
+            R.layout.view_add_amount_element,
             amountInputBinding.root.parent as ViewGroup,
             false
         ) as TextView?

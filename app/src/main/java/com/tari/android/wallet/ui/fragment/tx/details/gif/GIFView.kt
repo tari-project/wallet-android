@@ -11,7 +11,7 @@ import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.RequestOptions
 import com.bumptech.glide.request.target.Target
 import com.tari.android.wallet.R
-import com.tari.android.wallet.databinding.TxDetailsGifContainerBinding
+import com.tari.android.wallet.databinding.ViewTxDetailsGifContainerBinding
 import com.tari.android.wallet.ui.common.gyphy.repository.GIFItem
 import com.tari.android.wallet.ui.extension.dimenPx
 import com.tari.android.wallet.ui.extension.gone
@@ -19,7 +19,7 @@ import com.tari.android.wallet.ui.extension.setTopMargin
 import com.tari.android.wallet.ui.extension.visible
 
 internal class GIFView(
-    private val ui: TxDetailsGifContainerBinding,
+    private val ui: ViewTxDetailsGifContainerBinding,
     private val glide: RequestManager,
     private val viewModel: GIFViewModel,
     private val owner: LifecycleOwner

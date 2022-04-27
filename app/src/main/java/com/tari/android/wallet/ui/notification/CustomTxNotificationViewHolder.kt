@@ -34,16 +34,15 @@ package com.tari.android.wallet.ui.notification
 
 import android.app.KeyguardManager
 import android.content.Context
+import android.icu.text.BreakIterator
 import android.view.View
 import android.widget.RemoteViews
-import android.icu.text.BreakIterator
 import com.tari.android.wallet.R
 import com.tari.android.wallet.model.Contact
 import com.tari.android.wallet.model.MicroTari
 import com.tari.android.wallet.model.Tx
 import com.tari.android.wallet.model.User
 import com.tari.android.wallet.util.WalletUtil
-import kotlin.collections.ArrayList
 
 /**
  * Displays custom transaction notification.
@@ -51,7 +50,7 @@ import kotlin.collections.ArrayList
  * @author The Tari Development Team
  */
 class CustomTxNotificationViewHolder(val context: Context, tx: Tx) :
-    RemoteViews(context.packageName, R.layout.tx_notification) {
+    RemoteViews(context.packageName, R.layout.remote_tx_notification) {
 
     init {
         val user = tx.user

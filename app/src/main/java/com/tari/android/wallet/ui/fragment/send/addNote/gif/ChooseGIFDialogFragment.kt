@@ -21,7 +21,7 @@ import com.giphy.sdk.ui.views.GPHGridCallback
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.tari.android.wallet.R
-import com.tari.android.wallet.databinding.DialogChooseGifBinding
+import com.tari.android.wallet.databinding.FragmentChooseGifBinding
 import com.tari.android.wallet.di.DiContainer
 import com.tari.android.wallet.ui.common.gyphy.GiphyKeywordsRepository
 import io.reactivex.Observer
@@ -32,7 +32,7 @@ import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 class ChooseGIFDialogFragment() : DialogFragment() {
-    private lateinit var ui: DialogChooseGifBinding
+    private lateinit var ui: FragmentChooseGifBinding
     private lateinit var behavior: BottomSheetBehavior<View>
     private lateinit var searchSubscription: Disposable
 
@@ -45,7 +45,7 @@ class ChooseGIFDialogFragment() : DialogFragment() {
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
-        DialogChooseGifBinding.inflate(inflater, container, false).also { ui = it }.root
+        FragmentChooseGifBinding.inflate(inflater, container, false).also { ui = it }.root
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)

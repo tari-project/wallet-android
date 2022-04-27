@@ -34,7 +34,7 @@ package com.tari.android.wallet.ui.fragment.debug.adapter
 
 import android.view.View
 import androidx.recyclerview.widget.RecyclerView
-import com.tari.android.wallet.databinding.LogItemBinding
+import com.tari.android.wallet.databinding.ItemLogBinding
 import com.tari.android.wallet.ffi.LogLevel
 import com.tari.android.wallet.ui.extension.gone
 import com.tari.android.wallet.ui.extension.visible
@@ -46,7 +46,7 @@ import com.tari.android.wallet.ui.extension.visible
  */
 class LogViewHolder(view: View) : RecyclerView.ViewHolder(view) {
 
-    private val ui = LogItemBinding.bind(view)
+    private val ui = ItemLogBinding.bind(view)
 
     fun bind(
         log: String,

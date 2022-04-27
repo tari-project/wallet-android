@@ -11,6 +11,7 @@ import com.tari.android.wallet.databinding.DialogProgressBinding
 import com.tari.android.wallet.ui.dialog.TariDialog
 import com.tari.android.wallet.ui.extension.setVisible
 
+@Deprecated("Use modular dialog")
 class TariProgressDialog constructor(val context: Context, val progressDialogArgs: ProgressDialogArgs) : TariDialog {
 
     var dialog: Dialog
@@ -23,10 +24,7 @@ class TariProgressDialog constructor(val context: Context, val progressDialogArg
             ui = DialogProgressBinding.bind(findViewById(R.id.root))
             window?.apply {
                 setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-                setLayout(
-                    LinearLayout.LayoutParams.MATCH_PARENT,
-                    LinearLayout.LayoutParams.WRAP_CONTENT
-                )
+                setLayout(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT)
                 setGravity(Gravity.CENTER)
             }
         }
