@@ -18,7 +18,6 @@ import com.tari.android.wallet.ui.dialog.modular.modules.customBaseNodeBody.Cust
 import com.tari.android.wallet.ui.dialog.modular.modules.head.*
 import com.tari.android.wallet.ui.dialog.modular.modules.imageModule.ImageModule
 import com.tari.android.wallet.ui.dialog.modular.modules.imageModule.ImageModuleView
-import com.tari.android.wallet.ui.extension.dimenPx
 import com.tari.android.wallet.ui.fragment.send.shareQr.ShareQRCodeModuleView
 import com.tari.android.wallet.ui.fragment.send.shareQr.ShareQrCodeModule
 
@@ -63,10 +62,6 @@ open class ModularDialog(val context: Context) : TariDialog {
                 else -> View(context)
             }
             root.addView(view)
-            val parameters = view.layoutParams as LinearLayout.LayoutParams
-            val margin = context.dimenPx(R.dimen.bottom_dialog_modules_margin)
-            parameters.setMargins(0, margin, 0, margin)
-            view.layoutParams = parameters
         }
     }
 

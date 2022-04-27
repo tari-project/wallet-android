@@ -10,9 +10,10 @@
     <com.tari.android.wallet.ui.component.CustomFontButton
         android:id="@+id/button"
         android:layout_width="match_parent"
-        android:layout_marginHorizontal="30dp"
         android:layout_height="@dimen/common_action_button_height"
         android:layout_gravity="center_horizontal"
+        android:layout_marginHorizontal="30dp"
+        android:layout_marginBottom="13dp"
         android:background="@drawable/disableable_gradient_button_bg"
         android:elevation="0dp"
         android:text="@string/request_tari_share"
