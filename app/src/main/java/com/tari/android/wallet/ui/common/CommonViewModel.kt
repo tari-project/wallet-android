@@ -2,10 +2,13 @@ package com.tari.android.wallet.ui.common
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
+import com.tari.android.wallet.application.WalletState
 import com.tari.android.wallet.di.ApplicationComponent
 import com.tari.android.wallet.di.DiContainer
 import com.tari.android.wallet.event.EventBus
+import com.tari.android.wallet.extension.addTo
 import com.tari.android.wallet.ui.common.domain.ResourceManager
+import com.tari.android.wallet.ui.dialog.error.WalletErrorArgs
 import com.tari.android.wallet.ui.dialog.inProgress.ProgressDialogArgs
 import com.tari.android.wallet.ui.dialog.modular.ModularDialogArgs
 import io.reactivex.disposables.CompositeDisposable
@@ -24,6 +27,12 @@ open class CommonViewModel : ViewModel() {
 
     init {
         component.inject(this)
+
+        EventBus.walletState.publishSubject.filter { it is WalletState.Failed }
+            .subscribe {
+                val errorArgs = WalletErrorArgs(resourceManager, (it as WalletState.Failed).exception).getErrorArgs().getModular(resourceManager)
+                _modularDialog.postValue(errorArgs)
+            }.addTo(compositeDisposable)
     }
 
     override fun onCleared() {
@@ -35,7 +44,7 @@ open class CommonViewModel : ViewModel() {
     }
 
     protected val _backPressed = SingleLiveEvent<Unit>()
-    val backPressed : LiveData<Unit> = _backPressed
+    val backPressed: LiveData<Unit> = _backPressed
 
     protected val _openLink = SingleLiveEvent<String>()
     val openLink: LiveData<String> = _openLink

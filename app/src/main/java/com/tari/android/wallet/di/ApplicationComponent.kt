@@ -41,7 +41,7 @@ import com.tari.android.wallet.ui.activity.AuthActivity
 import com.tari.android.wallet.ui.activity.SplashActivity
 import com.tari.android.wallet.ui.activity.debug.DebugActivity
 import com.tari.android.wallet.ui.activity.home.HomeActivity
-import com.tari.android.wallet.ui.activity.onboarding.OnboardingFlowActivity
+import com.tari.android.wallet.ui.fragment.onboarding.activity.OnboardingFlowActivity
 import com.tari.android.wallet.ui.activity.settings.DeleteWalletActivity
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.component.networkStateIndicator.ConnectionIndicatorViewModel
@@ -50,8 +50,9 @@ import com.tari.android.wallet.ui.fragment.debug.baseNodeConfig.BaseNodeConfigFr
 import com.tari.android.wallet.ui.fragment.debug.baseNodeConfig.BaseNodeConfigViewModel
 import com.tari.android.wallet.ui.fragment.debug.baseNodeConfig.addBaseNode.AddCustomBaseNodeViewModel
 import com.tari.android.wallet.ui.fragment.debug.baseNodeConfig.changeBaseNode.ChangeBaseNodeViewModel
-import com.tari.android.wallet.ui.fragment.onboarding.CreateWalletFragment
 import com.tari.android.wallet.ui.fragment.onboarding.IntroductionFragment
+import com.tari.android.wallet.ui.fragment.onboarding.createWallet.CreateWalletFragment
+import com.tari.android.wallet.ui.fragment.onboarding.createWallet.CreateWalletViewModel
 import com.tari.android.wallet.ui.fragment.onboarding.localAuth.LocalAuthFragment
 import com.tari.android.wallet.ui.fragment.onboarding.localAuth.LocalAuthViewModel
 import com.tari.android.wallet.ui.fragment.profile.WalletInfoFragment
@@ -190,6 +191,7 @@ internal interface ApplicationComponent {
     fun inject(customTorBridgeViewModel: CustomTorBridgesViewModel)
     fun inject(deeplinkViewModel: DeeplinkViewModel)
     fun inject(localAuthViewModel: LocalAuthViewModel)
+    fun inject(viewModel: CreateWalletViewModel)
     /**
      * Service(s).
      */

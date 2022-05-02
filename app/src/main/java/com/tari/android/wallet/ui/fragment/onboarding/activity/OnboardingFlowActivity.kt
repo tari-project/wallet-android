@@ -30,7 +30,7 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.tari.android.wallet.ui.activity.onboarding
+package com.tari.android.wallet.ui.fragment.onboarding.activity
 
 import android.content.Intent
 import android.os.Bundle
@@ -43,8 +43,9 @@ import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import com.tari.android.wallet.di.DiContainer.appComponent
 import com.tari.android.wallet.service.WalletServiceLauncher
 import com.tari.android.wallet.ui.activity.home.HomeActivity
-import com.tari.android.wallet.ui.fragment.onboarding.CreateWalletFragment
 import com.tari.android.wallet.ui.fragment.onboarding.IntroductionFragment
+import com.tari.android.wallet.ui.fragment.onboarding.createWallet.CreateWalletFragment
+import com.tari.android.wallet.ui.fragment.onboarding.createWallet.CreateWalletListener
 import com.tari.android.wallet.ui.fragment.onboarding.localAuth.LocalAuthFragment
 import com.tari.android.wallet.ui.fragment.onboarding.localAuth.LocalAuthListener
 import com.tari.android.wallet.ui.fragment.settings.networkSelection.NetworkSelectionFragment
@@ -61,7 +62,7 @@ import javax.inject.Inject
  *
  * @author The Tari Development Team
  */
-internal class OnboardingFlowActivity : AppCompatActivity(), IntroductionFragment.Listener, CreateWalletFragment.Listener, LocalAuthListener {
+class OnboardingFlowActivity : AppCompatActivity(), IntroductionFragment.Listener, CreateWalletListener, LocalAuthListener {
 
     @Inject
     lateinit var walletConfig: WalletConfig

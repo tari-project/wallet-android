@@ -43,7 +43,7 @@ import com.tari.android.wallet.data.WalletConfig
 import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import com.tari.android.wallet.di.DiContainer.appComponent
 import com.tari.android.wallet.service.WalletServiceLauncher
-import com.tari.android.wallet.ui.activity.onboarding.OnboardingFlowActivity
+import com.tari.android.wallet.ui.fragment.onboarding.activity.OnboardingFlowActivity
 import com.tari.android.wallet.util.Constants.UI.Splash
 import com.tari.android.wallet.util.WalletUtil
 import javax.inject.Inject

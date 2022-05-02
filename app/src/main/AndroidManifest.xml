@@ -65,7 +65,7 @@
             </intent-filter>
         </activity> <!-- onboarding flow -->
         <activity
-            android:name=".ui.activity.onboarding.OnboardingFlowActivity"
+            android:name=".ui.fragment.onboarding.activity.OnboardingFlowActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme"
@@ -152,7 +152,7 @@
         <activity
             android:name="com.tari.android.wallet.ui.fragment.restore.restore.WalletRestoreActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
-            android:parentActivityName=".ui.activity.onboarding.OnboardingFlowActivity"
+            android:parentActivityName=".ui.fragment.onboarding.activity.OnboardingFlowActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme"
             android:windowSoftInputMode="adjustResize" /> <!-- This receiver is responsible for starting the service after boot finish. -->
