@@ -52,7 +52,8 @@ import com.tari.android.wallet.ui.fragment.debug.baseNodeConfig.addBaseNode.AddC
 import com.tari.android.wallet.ui.fragment.debug.baseNodeConfig.changeBaseNode.ChangeBaseNodeViewModel
 import com.tari.android.wallet.ui.fragment.onboarding.CreateWalletFragment
 import com.tari.android.wallet.ui.fragment.onboarding.IntroductionFragment
-import com.tari.android.wallet.ui.fragment.onboarding.LocalAuthFragment
+import com.tari.android.wallet.ui.fragment.onboarding.localAuth.LocalAuthFragment
+import com.tari.android.wallet.ui.fragment.onboarding.localAuth.LocalAuthViewModel
 import com.tari.android.wallet.ui.fragment.profile.WalletInfoFragment
 import com.tari.android.wallet.ui.fragment.profile.WalletInfoViewModel
 import com.tari.android.wallet.ui.fragment.qr.QRScannerActivity
@@ -188,6 +189,7 @@ internal interface ApplicationComponent {
     fun inject(torBridgesSelectionViewModel: TorBridgesSelectionViewModel)
     fun inject(customTorBridgeViewModel: CustomTorBridgesViewModel)
     fun inject(deeplinkViewModel: DeeplinkViewModel)
+    fun inject(localAuthViewModel: LocalAuthViewModel)
     /**
      * Service(s).
      */

@@ -13,7 +13,7 @@ import javax.inject.Inject
 
 open class CommonViewModel : ViewModel() {
 
-    protected var compositeDisposable: CompositeDisposable = CompositeDisposable()
+    var compositeDisposable: CompositeDisposable = CompositeDisposable()
 
     internal val component: ApplicationComponent
         get() = DiContainer.appComponent

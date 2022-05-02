@@ -58,8 +58,8 @@ import com.tari.android.wallet.databinding.ActivityAuthBinding
 import com.tari.android.wallet.di.DiContainer.appComponent
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.infrastructure.Tracker
+import com.tari.android.wallet.infrastructure.security.biometric.BiometricAuthenticationException
 import com.tari.android.wallet.infrastructure.security.biometric.BiometricAuthenticationService
-import com.tari.android.wallet.infrastructure.security.biometric.BiometricAuthenticationService.BiometricAuthenticationException
 import com.tari.android.wallet.service.WalletServiceLauncher
 import com.tari.android.wallet.ui.activity.home.HomeActivity
 import com.tari.android.wallet.ui.common.domain.ResourceManager

@@ -34,9 +34,9 @@ package com.tari.android.wallet.ui.activity.onboarding
 
 import android.content.Intent
 import android.os.Bundle
-import android.os.Handler
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import com.tari.android.wallet.R
 import com.tari.android.wallet.data.WalletConfig
 import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
@@ -45,11 +45,15 @@ import com.tari.android.wallet.service.WalletServiceLauncher
 import com.tari.android.wallet.ui.activity.home.HomeActivity
 import com.tari.android.wallet.ui.fragment.onboarding.CreateWalletFragment
 import com.tari.android.wallet.ui.fragment.onboarding.IntroductionFragment
-import com.tari.android.wallet.ui.fragment.onboarding.LocalAuthFragment
+import com.tari.android.wallet.ui.fragment.onboarding.localAuth.LocalAuthFragment
+import com.tari.android.wallet.ui.fragment.onboarding.localAuth.LocalAuthListener
 import com.tari.android.wallet.ui.fragment.settings.networkSelection.NetworkSelectionFragment
 import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.Constants.UI.CreateWallet
 import com.tari.android.wallet.util.WalletUtil
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 /**
@@ -57,26 +61,26 @@ import javax.inject.Inject
  *
  * @author The Tari Development Team
  */
-internal class OnboardingFlowActivity : AppCompatActivity(), IntroductionFragment.Listener,
-    CreateWalletFragment.Listener, LocalAuthFragment.Listener {
+internal class OnboardingFlowActivity : AppCompatActivity(), IntroductionFragment.Listener, CreateWalletFragment.Listener, LocalAuthListener {
 
     @Inject
     lateinit var walletConfig: WalletConfig
 
     @Inject
-    internal lateinit var sharedPrefsWrapper: SharedPrefsRepository
+    lateinit var sharedPrefsWrapper: SharedPrefsRepository
 
     @Inject
-    internal lateinit var walletServiceLauncher: WalletServiceLauncher
-
-    private val uiHandler = Handler()
+    lateinit var walletServiceLauncher: WalletServiceLauncher
 
     override fun onCreate(savedInstanceState: Bundle?) {
         appComponent.inject(this)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_onboarding_flow)
         when {
-            sharedPrefsWrapper.onboardingAuthWasInterrupted -> loadFragment(LocalAuthFragment())
+            sharedPrefsWrapper.onboardingAuthWasInterrupted -> {
+                walletServiceLauncher.start()
+                loadFragment(LocalAuthFragment())
+            }
             sharedPrefsWrapper.onboardingWasInterrupted -> {
                 // start wallet service
                 walletServiceLauncher.start()
@@ -95,10 +99,7 @@ internal class OnboardingFlowActivity : AppCompatActivity(), IntroductionFragmen
             .beginTransaction()
             .apply {
                 if (isAnimated) {
-                    setCustomAnimations(
-                        R.anim.enter_from_right, R.anim.exit_to_left,
-                        R.anim.enter_from_left, R.anim.exit_to_right
-                    )
+                    setCustomAnimations(R.anim.enter_from_right, R.anim.exit_to_left, R.anim.enter_from_left, R.anim.exit_to_right)
                 }
             }
             .add(R.id.onboarding_fragment_container_1, fragment)
@@ -117,33 +118,25 @@ internal class OnboardingFlowActivity : AppCompatActivity(), IntroductionFragmen
 
     override fun continueToCreateWallet() {
         sharedPrefsWrapper.onboardingStarted = true
-        val createWalletFragment = CreateWalletFragment()
         supportFragmentManager.beginTransaction()
-            .add(R.id.onboarding_fragment_container_2, createWalletFragment)
+            .add(R.id.onboarding_fragment_container_2, CreateWalletFragment())
             .commit()
         removeContainer1Fragment()
     }
 
     private fun removeContainer1Fragment() {
-        uiHandler.postDelayed({
-            val fragment = supportFragmentManager.findFragmentById(R.id.onboarding_fragment_container_1)
-            fragment?.let {
-                supportFragmentManager.beginTransaction().remove(fragment).commit()
+        lifecycleScope.launch(Dispatchers.IO) {
+            delay(CreateWallet.removeFragmentDelayDuration)
+            launch(Dispatchers.Main) {
+                supportFragmentManager.findFragmentById(R.id.onboarding_fragment_container_1)?.let {
+                    supportFragmentManager.beginTransaction().remove(it).commit()
+                }
             }
-        }, CreateWallet.removeFragmentDelayDuration)
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        uiHandler.removeCallbacksAndMessages(null)
+        }
     }
 
     override fun continueToEnableAuth() {
-        val fragment =
-            supportFragmentManager.findFragmentById(R.id.onboarding_fragment_container_2)
-        if (fragment is CreateWalletFragment) {
-            fragment.fadeOutAllViewAnimation()
-        }
+        (supportFragmentManager.findFragmentById(R.id.onboarding_fragment_container_2) as? CreateWalletFragment)?.fadeOutAllViewAnimation()
         supportFragmentManager
             .beginTransaction()
             .setCustomAnimations(R.anim.fade_in, R.anim.fade_out)
@@ -154,14 +147,14 @@ internal class OnboardingFlowActivity : AppCompatActivity(), IntroductionFragmen
     }
 
     private fun removeContainer2Fragment() {
-        uiHandler.postDelayed({
-            val fragment = supportFragmentManager.findFragmentById(
-                R.id.onboarding_fragment_container_2
-            )
-            fragment?.let {
-                supportFragmentManager.beginTransaction().remove(it).commit()
+        lifecycleScope.launch(Dispatchers.IO) {
+            delay(Constants.UI.longDurationMs)
+            launch(Dispatchers.Main) {
+                supportFragmentManager.findFragmentById(R.id.onboarding_fragment_container_2)?.let {
+                    supportFragmentManager.beginTransaction().remove(it).commit()
+                }
             }
-        }, Constants.UI.longDurationMs)
+        }
     }
 
     override fun onAuthSuccess() {
