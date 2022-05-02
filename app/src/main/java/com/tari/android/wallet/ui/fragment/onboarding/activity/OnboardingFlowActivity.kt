@@ -43,9 +43,10 @@ import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import com.tari.android.wallet.di.DiContainer.appComponent
 import com.tari.android.wallet.service.WalletServiceLauncher
 import com.tari.android.wallet.ui.activity.home.HomeActivity
-import com.tari.android.wallet.ui.fragment.onboarding.inroduction.IntroductionFragment
 import com.tari.android.wallet.ui.fragment.onboarding.createWallet.CreateWalletFragment
 import com.tari.android.wallet.ui.fragment.onboarding.createWallet.CreateWalletListener
+import com.tari.android.wallet.ui.fragment.onboarding.inroduction.IntroductionFragment
+import com.tari.android.wallet.ui.fragment.onboarding.inroduction.IntroductionListener
 import com.tari.android.wallet.ui.fragment.onboarding.localAuth.LocalAuthFragment
 import com.tari.android.wallet.ui.fragment.onboarding.localAuth.LocalAuthListener
 import com.tari.android.wallet.ui.fragment.settings.networkSelection.NetworkSelectionFragment
@@ -62,7 +63,7 @@ import javax.inject.Inject
  *
  * @author The Tari Development Team
  */
-class OnboardingFlowActivity : AppCompatActivity(), IntroductionFragment.Listener, CreateWalletListener, LocalAuthListener {
+class OnboardingFlowActivity : AppCompatActivity(), IntroductionListener, CreateWalletListener, LocalAuthListener {
 
     @Inject
     lateinit var walletConfig: WalletConfig

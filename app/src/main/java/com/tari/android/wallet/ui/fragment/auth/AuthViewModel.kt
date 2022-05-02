@@ -1,27 +1,28 @@
-package com.tari.android.wallet.ui.fragment.onboarding.localAuth
+package com.tari.android.wallet.ui.fragment.auth
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
+import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepository
 import com.tari.android.wallet.infrastructure.Tracker
 import com.tari.android.wallet.infrastructure.security.biometric.BiometricAuthenticationService
-import com.tari.android.wallet.infrastructure.security.biometric.BiometricAuthenticationType
+import com.tari.android.wallet.service.WalletServiceLauncher
 import com.tari.android.wallet.ui.common.CommonViewModel
 import javax.inject.Inject
 
-class LocalAuthViewModel() : CommonViewModel() {
+class AuthViewModel : CommonViewModel() {
 
     @Inject
     lateinit var sharedPrefsWrapper: SharedPrefsRepository
 
     @Inject
+    lateinit var networkRepository: NetworkRepository
+
+    @Inject
     lateinit var authService: BiometricAuthenticationService
 
-    private val _authType = MutableLiveData<BiometricAuthenticationType>()
-    val authType: LiveData<BiometricAuthenticationType> = _authType
+    @Inject
+    lateinit var walletServiceLauncher: WalletServiceLauncher
 
     init {
         component.inject(this)
-        _authType.value = authService.authType
     }
 }

@@ -14,9 +14,6 @@ class IntroductionViewModel : CommonViewModel() {
     @Inject
     lateinit var walletServiceLauncher: WalletServiceLauncher
 
-    @Inject
-    lateinit var tracker: Tracker
-
     init {
         component.inject(this)
     }

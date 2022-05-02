@@ -3,7 +3,9 @@ package com.tari.android.wallet.ui.fragment.tx
 import androidx.lifecycle.*
 import com.tari.android.wallet.R
 import com.tari.android.wallet.R.string.*
+import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepository
+import com.tari.android.wallet.data.sharedPrefs.tariSettings.TariSettingsSharedRepository
 import com.tari.android.wallet.data.sharedPrefs.testnetFaucet.TestnetFaucetRepository
 import com.tari.android.wallet.event.Event
 import com.tari.android.wallet.event.EventBus
@@ -56,6 +58,15 @@ internal class TxListViewModel() : CommonViewModel() {
 
     @Inject
     lateinit var testnetRepository: TestnetFaucetRepository
+
+    @Inject
+    lateinit var sharedPrefsWrapper: SharedPrefsRepository
+
+    @Inject
+    lateinit var testnetFaucetRepository: TestnetFaucetRepository
+
+    @Inject
+    lateinit var tariSettingsSharedRepository: TariSettingsSharedRepository
 
     lateinit var serviceConnection: TariWalletServiceConnection
     val walletService: TariWalletService

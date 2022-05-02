@@ -71,7 +71,7 @@
             android:theme="@style/AppTheme"
             android:windowSoftInputMode="stateAlwaysHidden" /> <!-- local authentication -->
         <activity
-            android:name=".ui.activity.AuthActivity"
+            android:name=".ui.fragment.auth.AuthActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.Auth"

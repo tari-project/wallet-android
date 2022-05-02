@@ -9,9 +9,6 @@ class CreateWalletViewModel() : CommonViewModel() {
     @Inject
     lateinit var sharedPrefsWrapper: SharedPrefsRepository
 
-    @Inject
-    lateinit var tracker: Tracker
-
     init {
         component.inject(this)
     }

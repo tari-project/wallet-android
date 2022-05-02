@@ -9,6 +9,7 @@ import com.tari.android.wallet.R.drawable.*
 import com.tari.android.wallet.R.string.*
 import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepository
 import com.tari.android.wallet.event.EventBus
+import com.tari.android.wallet.infrastructure.BugReportingService
 import com.tari.android.wallet.infrastructure.backup.BackupManager
 import com.tari.android.wallet.infrastructure.backup.BackupState
 import com.tari.android.wallet.infrastructure.backup.BackupStorageAuthRevokedException
@@ -17,7 +18,6 @@ import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.common.SingleLiveEvent
 import com.tari.android.wallet.ui.common.recyclerView.CommonViewHolderItem
 import com.tari.android.wallet.ui.common.recyclerView.items.DividerViewHolderItem
-import com.tari.android.wallet.ui.fragment.settings.backup.BackupSettingsRepository
 import com.tari.android.wallet.ui.dialog.error.ErrorDialogArgs
 import com.tari.android.wallet.ui.fragment.settings.allSettings.PresentationBackupState.BackupStateStatus.*
 import com.tari.android.wallet.ui.fragment.settings.allSettings.backupOptions.SettingsBackupOptionViewHolderItem
@@ -25,7 +25,9 @@ import com.tari.android.wallet.ui.fragment.settings.allSettings.button.ButtonSty
 import com.tari.android.wallet.ui.fragment.settings.allSettings.button.ButtonViewDto
 import com.tari.android.wallet.ui.fragment.settings.allSettings.title.SettingsTitleDto
 import com.tari.android.wallet.ui.fragment.settings.allSettings.version.SettingsVersionViewHolderItem
+import com.tari.android.wallet.ui.fragment.settings.backup.BackupSettingsRepository
 import com.tari.android.wallet.ui.fragment.settings.userAutorization.BiometricAuthenticationViewModel
+import com.tari.android.wallet.yat.YatAdapter
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.joda.time.format.DateTimeFormat
@@ -35,16 +37,17 @@ import javax.inject.Inject
 
 internal class AllSettingsViewModel : CommonViewModel() {
 
-    companion object {
-        private val BACKUP_DATE_FORMATTER = DateTimeFormat.forPattern("MMM dd yyyy").withLocale(Locale.ENGLISH)
-        private val BACKUP_TIME_FORMATTER = DateTimeFormat.forPattern("hh:mm a")
-    }
-
     lateinit var authenticationViewModel: BiometricAuthenticationViewModel
 
     private val backupOption = SettingsBackupOptionViewHolderItem(leftIconId = all_settings_backup_options_icon) {
         authenticationViewModel.requireAuthorization { _navigation.postValue(AllSettingsNavigation.ToBackupSettings) }
     }
+
+    @Inject
+    lateinit var bugReportingService: BugReportingService
+
+    @Inject
+    lateinit var yatAdapter: YatAdapter
 
     @Inject
     lateinit var backupSettingsRepository: BackupSettingsRepository
@@ -202,6 +205,11 @@ internal class AllSettingsViewModel : CommonViewModel() {
     private fun showBackupStorageCheckFailedDialog(message: String) {
         val errorArgs = ErrorDialogArgs(resourceManager.getString(check_backup_storage_status_error_title), message)
         _modularDialog.postValue(errorArgs.getModular(resourceManager))
+    }
+
+    companion object {
+        private val BACKUP_DATE_FORMATTER = DateTimeFormat.forPattern("MMM dd yyyy").withLocale(Locale.ENGLISH)
+        private val BACKUP_TIME_FORMATTER = DateTimeFormat.forPattern("hh:mm a")
     }
 }
 

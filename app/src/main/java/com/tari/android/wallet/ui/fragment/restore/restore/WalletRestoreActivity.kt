@@ -41,7 +41,7 @@ import com.tari.android.wallet.R
 import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import com.tari.android.wallet.data.sharedPrefs.tariSettings.TariSettingsSharedRepository
 import com.tari.android.wallet.di.DiContainer.appComponent
-import com.tari.android.wallet.ui.activity.AuthActivity
+import com.tari.android.wallet.ui.fragment.auth.AuthActivity
 import com.tari.android.wallet.ui.fragment.debug.baseNodeConfig.BaseNodeConfigRouter
 import com.tari.android.wallet.ui.fragment.debug.baseNodeConfig.addBaseNode.AddCustomBaseNodeFragment
 import com.tari.android.wallet.ui.fragment.debug.baseNodeConfig.changeBaseNode.ChangeBaseNodeFragment
@@ -76,7 +76,7 @@ class WalletRestoreActivity : AppCompatActivity(), WalletRestoreRouter, BaseNode
 
     private fun loadChooseBackupOptionFragment() {
         supportFragmentManager.beginTransaction()
-            .add(R.id.backup_fragment_container, ChooseRestoreOptionFragment.newInstance())
+            .add(R.id.backup_fragment_container, ChooseRestoreOptionFragment())
             .commit()
     }
 
