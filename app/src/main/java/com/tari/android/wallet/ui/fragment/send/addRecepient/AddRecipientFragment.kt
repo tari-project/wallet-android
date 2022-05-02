@@ -35,8 +35,11 @@ package com.tari.android.wallet.ui.fragment.send.addRecepient
 import android.animation.AnimatorSet
 import android.animation.ValueAnimator
 import android.app.Activity
-import android.content.*
-import android.os.*
+import android.content.Context
+import android.content.Intent
+import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.text.Editable
 import android.text.InputType
 import android.text.TextWatcher
@@ -57,18 +60,18 @@ import com.tari.android.wallet.R.color.*
 import com.tari.android.wallet.R.dimen.add_recipient_clipboard_emoji_id_container_height
 import com.tari.android.wallet.R.dimen.add_recipient_paste_emoji_id_button_visible_top_margin
 import com.tari.android.wallet.R.string.*
-import com.tari.android.wallet.application.DeepLink
-import com.tari.android.wallet.application.DeepLink.Type.EMOJI_ID
-import com.tari.android.wallet.application.DeepLink.Type.PUBLIC_KEY_HEX
+import com.tari.android.wallet.application.deeplinks.DeepLink
+import com.tari.android.wallet.application.deeplinks.DeeplinkHandler
+import com.tari.android.wallet.application.deeplinks.DeeplinkViewModel
 import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
-import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepository
 import com.tari.android.wallet.databinding.FragmentAddRecipientBinding
 import com.tari.android.wallet.di.DiContainer.appComponent
 import com.tari.android.wallet.extension.observe
 import com.tari.android.wallet.extension.observeOnLoad
 import com.tari.android.wallet.infrastructure.Tracker
-import com.tari.android.wallet.model.*
+import com.tari.android.wallet.model.PublicKey
 import com.tari.android.wallet.ui.common.CommonFragment
+import com.tari.android.wallet.ui.common.domain.ResourceManager
 import com.tari.android.wallet.ui.common.recyclerView.CommonAdapter
 import com.tari.android.wallet.ui.extension.*
 import com.tari.android.wallet.ui.fragment.qr.QRScannerActivity
@@ -99,7 +102,12 @@ class AddRecipientFragment : CommonFragment<FragmentAddRecipientBinding, AddReci
     lateinit var sharedPrefsWrapper: SharedPrefsRepository
 
     @Inject
-    lateinit var networkRepository: NetworkRepository
+    lateinit var resourceManager: ResourceManager
+
+    @Inject
+    lateinit var deeplinkHandler: DeeplinkHandler
+
+    private val deeplinkViewModel: DeeplinkViewModel by viewModels()
 
     /**
      * List, adapter & layout manager.
@@ -126,7 +134,7 @@ class AddRecipientFragment : CommonFragment<FragmentAddRecipientBinding, AddReci
      * Paste-emoji-id-related views.
      */
     private val dimmerViews
-        get() = arrayOf(ui.topDimmerView, ui.middleDimmerView, ui.bottomDimmerView)
+        get() = arrayOf(ui.middleDimmerView, ui.bottomDimmerView)
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -183,7 +191,7 @@ class AddRecipientFragment : CommonFragment<FragmentAddRecipientBinding, AddReci
         val listener = requireActivity() as AddRecipientListener
 
         when (navigation) {
-            is AddRecipientNavigation.ToAmount -> listener.continueToAmount(this, navigation.user)
+            is AddRecipientNavigation.ToAmount -> listener.continueToAmount(navigation.user)
         }
     }
 
@@ -213,9 +221,7 @@ class AddRecipientFragment : CommonFragment<FragmentAddRecipientBinding, AddReci
     private fun setupUI() {
         ui.contactsListRecyclerView.layoutManager = LinearLayoutManager(requireContext())
         recyclerViewAdapter.setClickListener(CommonAdapter.ItemClickListener() {
-            (it as? RecipientViewHolderItem)?.user?.let { user ->
-                (activity as? AddRecipientListener)?.continueToAmount(this, user)
-            }
+            (it as? RecipientViewHolderItem)?.user?.let { user -> (activity as? AddRecipientListener)?.continueToAmount(user) }
         })
         ui.contactsListRecyclerView.adapter = recyclerViewAdapter
         ui.contactsListRecyclerView.addOnScrollListener(scrollListener)
@@ -229,7 +235,6 @@ class AddRecipientFragment : CommonFragment<FragmentAddRecipientBinding, AddReci
         OverScrollDecoratorHelper.setUpOverScroll(ui.emojiIdScrollView)
         OverScrollDecoratorHelper.setUpOverScroll(ui.searchEditTextScrollView)
         ui.searchEditText.inputType = InputType.TYPE_NULL
-        ui.backButton.setOnClickListener { onBackButtonClicked(it) }
         ui.qrCodeButton.setOnClickListener { onQRButtonClick(it) }
         ui.continueButton.setOnClickListener { onContinueButtonClicked(it) }
         dimmerViews.forEach { it.setOnClickListener { onEmojiIdDimmerClicked() } }
@@ -399,14 +404,6 @@ class AddRecipientFragment : CommonFragment<FragmentAddRecipientBinding, AddReci
         }
     }
 
-    private fun onBackButtonClicked(view: View) {
-        view.temporarilyDisableClick()
-        activity?.let {
-            it.hideKeyboard()
-            ui.rootView.postDelayed(200L) { it.onBackPressed() }
-        }
-    }
-
     private fun clearSearchResult() {
         ui.progressBar.gone()
         ui.contactsListRecyclerView.visible()
@@ -427,28 +424,17 @@ class AddRecipientFragment : CommonFragment<FragmentAddRecipientBinding, AddReci
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == QRScannerActivity.REQUEST_QR_SCANNER && resultCode == Activity.RESULT_OK && data != null) {
             val qrData = data.getStringExtra(EXTRA_QR_DATA) ?: return
-            val deepLink = DeepLink.from(networkRepository, qrData) ?: return
-            when (deepLink.type) {
-                EMOJI_ID -> {
-                    ui.searchEditText.setText(
-                        deepLink.identifier,
-                        TextView.BufferType.EDITABLE
-                    )
-                    ui.searchEditText.postDelayed({
-                        ui.searchEditTextScrollView.smoothScrollTo(0, 0)
-                    }, Constants.UI.mediumDurationMs)
-                }
-                PUBLIC_KEY_HEX -> {
-                    lifecycleScope.launch(Dispatchers.IO) {
-                        val publicKeyHex = deepLink.identifier
-                        val publicKey = viewModel.getPublicKeyFromHexString(publicKeyHex)
-                        if (publicKey != null) {
-                            ui.rootView.post { ui.searchEditText.setText(publicKey.emojiId, TextView.BufferType.EDITABLE) }
-                            ui.searchEditText.postDelayed({ ui.searchEditTextScrollView.smoothScrollTo(0, 0) }, Constants.UI.mediumDurationMs)
-                        }
+            (deeplinkHandler.handle(qrData) as? DeepLink.Send)?.let {
+                lifecycleScope.launch(Dispatchers.IO) {
+                    val publicKey = viewModel.getPublicKeyFromHexString(it.publicKeyHex)
+                    if (publicKey != null) {
+                        ui.rootView.post { ui.searchEditText.setText(publicKey.emojiId, TextView.BufferType.EDITABLE) }
+                        ui.searchEditText.postDelayed({ ui.searchEditTextScrollView.smoothScrollTo(0, 0) }, Constants.UI.mediumDurationMs)
                     }
                 }
             }
+
+            (deeplinkHandler.handle(qrData) as? DeepLink.AddBaseNode)?.let { deeplinkViewModel.executeAction(requireContext(), it) }
         }
     }
 

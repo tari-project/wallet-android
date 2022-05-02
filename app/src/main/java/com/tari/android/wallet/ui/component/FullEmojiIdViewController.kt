@@ -32,7 +32,8 @@
  */
 package com.tari.android.wallet.ui.component
 
-import android.animation.*
+import android.animation.AnimatorSet
+import android.animation.ValueAnimator
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
@@ -42,11 +43,13 @@ import androidx.core.content.ContextCompat
 import com.daasuu.ei.Ease
 import com.daasuu.ei.EasingInterpolator
 import com.tari.android.wallet.R
-import com.tari.android.wallet.databinding.EmojiIdSummaryBinding
+import com.tari.android.wallet.databinding.ViewEmojiIdSummaryBinding
 import com.tari.android.wallet.databinding.ViewFullEmojiIdBinding
 import com.tari.android.wallet.ui.extension.*
 import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.EmojiUtil
+import com.tari.android.wallet.util.EmojiUtil.Companion.getGraphemeLength
+import com.tari.android.wallet.util.EmojiUtil.Companion.smallEmojiIdSize
 import me.everything.android.ui.overscroll.OverScrollDecoratorHelper
 
 /**
@@ -56,7 +59,7 @@ import me.everything.android.ui.overscroll.OverScrollDecoratorHelper
  */
 internal class FullEmojiIdViewController(
     private val ui: ViewFullEmojiIdBinding,
-    summary: EmojiIdSummaryBinding,
+    summary: ViewEmojiIdSummaryBinding,
     private val context: Context,
     private val listener: Listener? = null
 ) {
@@ -201,8 +204,7 @@ internal class FullEmojiIdViewController(
     // region Animations
 
     private fun getFullEmojiIdAnimation(isShow: Boolean) = with(ui) {
-        val fullEmojiIdDeltaWidth =
-            (emojiIdOuterContainer.width - context.dimenPx(R.dimen.common_horizontal_margin) * 2) - summaryParent.width
+        val fullEmojiIdDeltaWidth = (emojiIdOuterContainer.width - context.dimenPx(R.dimen.common_horizontal_margin) * 2) - summaryParent.width
 
         val start = if (isShow) 0f else 1f
         val end = if (isShow) 1f else 0f
@@ -267,7 +269,9 @@ internal class FullEmojiIdViewController(
     }
 
     private fun smoothScrollToStart() = with(ui.fullEmojiIdScrollView) {
-        postDelayed({ smoothScrollTo(0, 0) }, Constants.UI.shortDurationMs + 20)
+        if (_fullEmojiId.getGraphemeLength() > smallEmojiIdSize) {
+            postDelayed({ smoothScrollTo(0, 0) }, Constants.UI.shortDurationMs + 20)
+        }
     }
 
     private fun smoothScrollToEnd() = with(ui.fullEmojiIdScrollView) {

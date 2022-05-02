@@ -32,23 +32,22 @@
  */
 package com.tari.android.wallet.ui.component
 
-import android.view.View
 import android.icu.text.BreakIterator
-import com.tari.android.wallet.databinding.EmojiIdSummaryBinding
-import com.tari.android.wallet.ui.extension.gone
-import com.tari.android.wallet.ui.extension.visible
+import android.view.View
+import com.tari.android.wallet.databinding.ViewEmojiIdSummaryBinding
+import com.tari.android.wallet.ui.extension.setVisible
 
 /**
  * Display a summary of the emoji id - with pipes.
  *
  * @author The Tari Development Team
  */
-internal class EmojiIdSummaryViewController(private val ui: EmojiIdSummaryBinding) {
+internal class EmojiIdSummaryViewController(private val ui: ViewEmojiIdSummaryBinding) {
 
-    constructor(view: View) : this(EmojiIdSummaryBinding.bind(view))
+    constructor(view: View) : this(ViewEmojiIdSummaryBinding.bind(view))
 
-    fun display(emojiId: String,
-                showEmojisFromEachEnd: Int = 3) {
+    fun display(emojiId: String, showEmojisFromEachEnd: Int = 3) {
+
         val emojis = ArrayList<String>()
         val it: BreakIterator = BreakIterator.getCharacterInstance()
         it.setText(emojiId)
@@ -68,21 +67,34 @@ internal class EmojiIdSummaryViewController(private val ui: EmojiIdSummaryBindin
             throw IllegalArgumentException("Cannot show less than 2 emojis from each end.")
         }
 
-        ui.emojiIdSummaryEmoji1TextView.text = emojis[0]
-        ui.emojiIdSummaryEmoji2TextView.text = emojis[1]
-        ui.emojiIdSummaryEmoji3TextView.text = emojis[2]
-        ui.emojiIdSummaryEmoji4TextView.text = emojis.takeLast(3)[0]
-        ui.emojiIdSummaryEmoji5TextView.text = emojis.takeLast(2)[0]
-        ui.emojiIdSummaryEmoji6TextView.text = emojis.takeLast(1)[0]
+        val textViews = arrayListOf(
+            ui.emojiIdSummaryEmoji1TextView,
+            ui.emojiIdSummaryEmoji2TextView,
+            ui.emojiIdSummaryEmoji3TextView,
+            ui.emojiIdSummaryEmoji4TextView,
+            ui.emojiIdSummaryEmoji5TextView,
+            ui.emojiIdSummaryEmoji6TextView,
+        )
+        textViews.forEach { it.setVisible(false) }
 
-        if (showEmojisFromEachEnd == 2) {
-            ui.emojiIdSummaryEmoji3TextView.gone()
-            ui.emojiIdSummaryEmoji4TextView.gone()
+        if (emojis.size <= showEmojisFromEachEnd * 2) {
+            ui.emojiIdSummaryTxtEmojiSeparator.setVisible(false)
+
+            for ((index, emoji) in emojis.withIndex()) {
+                textViews[index].text = emoji
+                textViews[index].setVisible(true)
+            }
         } else {
-            ui.emojiIdSummaryEmoji3TextView.visible()
-            ui.emojiIdSummaryEmoji4TextView.visible()
+            ui.emojiIdSummaryTxtEmojiSeparator.setVisible(true)
+            for (i in 0 until showEmojisFromEachEnd) {
+                textViews[i].text = emojis[i]
+                textViews[i].setVisible(true)
+            }
+
+            for (i in 0 until showEmojisFromEachEnd) {
+                textViews[showEmojisFromEachEnd + i].text = emojis[emojis.size - i - 1]
+                textViews[showEmojisFromEachEnd + i].setVisible(true)
+            }
         }
     }
-
-
 }

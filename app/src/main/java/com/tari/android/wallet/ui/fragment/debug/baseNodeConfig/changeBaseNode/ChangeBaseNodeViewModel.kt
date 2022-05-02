@@ -23,7 +23,7 @@ internal class ChangeBaseNodeViewModel : CommonViewModel() {
     val baseNodeList: LiveData<MutableList<CommonViewHolderItem>> = _baseNodeList
 
     init {
-        component?.inject(this)
+        component.inject(this)
 
         EventBus.baseNodeState.subscribe(this) { loadList() }
 
@@ -35,13 +35,15 @@ internal class ChangeBaseNodeViewModel : CommonViewModel() {
         _backPressed.postValue(Unit)
     }
 
+    fun refresh() = loadList()
+
     private fun deleteBaseNode(baseNodeDto: BaseNodeDto) {
         baseNodeSharedRepository.deleteUserBaseNode(baseNodeDto)
         loadList()
     }
 
     private fun loadList() {
-        val currentBaseNode = baseNodeSharedRepository.currentBaseNode ?: return
+        val currentBaseNode = baseNodeSharedRepository.currentBaseNode
         val items = mutableListOf<CommonViewHolderItem>()
         items.addAll(baseNodeSharedRepository.userBaseNodes.orEmpty().map { BaseNodeViewHolderItem(it, currentBaseNode, this::deleteBaseNode) })
         items.addAll(baseNodes.baseNodeList.map { BaseNodeViewHolderItem(it, currentBaseNode, this::deleteBaseNode) })

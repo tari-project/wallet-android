@@ -43,10 +43,10 @@ import android.widget.TextView
 import com.daasuu.ei.Ease
 import com.daasuu.ei.EasingInterpolator
 import com.tari.android.wallet.R
-import com.tari.android.wallet.databinding.HomeBalanceDecimalDigitBinding
-import com.tari.android.wallet.databinding.HomeBalanceDecimalSeparatorBinding
-import com.tari.android.wallet.databinding.HomeBalanceDigitBinding
-import com.tari.android.wallet.databinding.HomeBalanceDigitThousandsSeparatorBinding
+import com.tari.android.wallet.databinding.ViewHomeBalanceDecimalDigitBinding
+import com.tari.android.wallet.databinding.ViewHomeBalanceDecimalSeparatorBinding
+import com.tari.android.wallet.databinding.ViewHomeBalanceDigitBinding
+import com.tari.android.wallet.databinding.ViewHomeBalanceDigitThousandsSeparatorBinding
 import com.tari.android.wallet.model.BalanceInfo
 import com.tari.android.wallet.ui.extension.dimenPx
 import com.tari.android.wallet.ui.extension.setLayoutWidth
@@ -260,8 +260,7 @@ internal class BalanceViewController(
     class DigitSeparatorViewHolder(context: Context, separator: String) :
         BalanceDigitViewHolder() {
 
-        private val ui =
-            HomeBalanceDigitThousandsSeparatorBinding.inflate(LayoutInflater.from(context))
+        private val ui = ViewHomeBalanceDigitThousandsSeparatorBinding.inflate(LayoutInflater.from(context))
 
         init {
             separatorTextView.text = separator
@@ -331,7 +330,7 @@ internal class BalanceViewController(
 
         private var changed = false
 
-        private val ui = HomeBalanceDigitBinding.inflate(LayoutInflater.from(context))
+        private val ui = ViewHomeBalanceDigitBinding.inflate(LayoutInflater.from(context))
 
         override val view: View
             get() = ui.root
@@ -444,8 +443,7 @@ internal class BalanceViewController(
     class DecimalDigitSeparatorViewHolder(context: Context, separator: String) :
         BalanceDigitViewHolder() {
 
-        private val ui =
-            HomeBalanceDecimalSeparatorBinding.inflate(LayoutInflater.from(context))
+        private val ui = ViewHomeBalanceDecimalSeparatorBinding.inflate(LayoutInflater.from(context))
 
         override val view: View
             get() = ui.root
@@ -483,7 +481,7 @@ internal class BalanceViewController(
 
         private var changed = false
 
-        private val ui = HomeBalanceDecimalDigitBinding.inflate(LayoutInflater.from(context))
+        private val ui = ViewHomeBalanceDecimalDigitBinding.inflate(LayoutInflater.from(context))
 
         init {
             topDecimalDigitTextView.text = value.toString()

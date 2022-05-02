@@ -1,20 +1,29 @@
 package com.tari.android.wallet.yat
 
 import android.content.SharedPreferences
-import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefGsonDelegate
+import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefBooleanDelegate
+import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefStringDelegate
+import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepository
 
-class YatSharedRepository(private val sharedPreferences: SharedPreferences) {
+class YatSharedRepository(private val sharedPreferences: SharedPreferences, private val networkRepository: NetworkRepository) {
     private object Key {
-        const val yatKey = "tari_wallet_yat_list"
+        const val yatKey = "tari_wallet_yat_string"
+        const val yatKeyDisconnected = "tari_wallet_yat_disconnected_string"
     }
 
-    var connectedYats : YatsList? by SharedPrefGsonDelegate(sharedPreferences,Key.yatKey,YatsList::class.java)
+    var connectedYat : String? by SharedPrefStringDelegate(sharedPreferences, formatKey(Key.yatKey))
 
-    fun saveYat(newYat: String) {
-        val list = connectedYats ?: YatsList()
-        if (!list.contains(newYat)) {
-            list.add(newYat)
-        }
-        connectedYats = list
+    var yatWasDisconnected: Boolean by SharedPrefBooleanDelegate(sharedPreferences, formatKey(Key.yatKeyDisconnected), false)
+
+    fun saveYat(newYat: String?) {
+        connectedYat = newYat
+        yatWasDisconnected = false
     }
+
+    fun clear() {
+        connectedYat = null
+        yatWasDisconnected = false
+    }
+
+    private fun formatKey(key: String): String = key + "_" + networkRepository.currentNetwork!!.network.displayName
 }

@@ -34,7 +34,6 @@ package com.tari.android.wallet.ui.activity.settings
 
 import android.content.Intent
 import android.os.Bundle
-import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
@@ -43,12 +42,15 @@ import com.tari.android.wallet.databinding.ActivityDeleteWalletBinding
 import com.tari.android.wallet.di.DiContainer.appComponent
 import com.tari.android.wallet.service.WalletServiceLauncher
 import com.tari.android.wallet.service.connection.TariWalletServiceConnection
-import com.tari.android.wallet.ui.activity.onboarding.OnboardingFlowActivity
-import com.tari.android.wallet.ui.dialog.BottomSlideDialog
-import com.tari.android.wallet.ui.extension.ThrottleClick
-import com.tari.android.wallet.ui.extension.color
-import com.tari.android.wallet.ui.extension.setColor
-import com.tari.android.wallet.ui.extension.visible
+import com.tari.android.wallet.ui.fragment.onboarding.activity.OnboardingFlowActivity
+import com.tari.android.wallet.ui.dialog.modular.DialogArgs
+import com.tari.android.wallet.ui.dialog.modular.ModularDialog
+import com.tari.android.wallet.ui.dialog.modular.ModularDialogArgs
+import com.tari.android.wallet.ui.dialog.modular.modules.body.BodyModule
+import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonModule
+import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonStyle
+import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
+import com.tari.android.wallet.ui.extension.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -83,21 +85,19 @@ class DeleteWalletActivity : AppCompatActivity() {
     }
 
     private fun confirmDeleteWallet() {
-        BottomSlideDialog(
-            this,
-            R.layout.dialog_confirm_delete_wallet,
-            canceledOnTouchOutside = true
-        ).apply {
-            findViewById<View>(R.id.delete_wallet_confirm_button)
-                .setOnClickListener(ThrottleClick {
-                    deleteWallet()
-                    dismiss()
-                })
-            findViewById<View>(R.id.delete_wallet_cancel_button)
-                .setOnClickListener(ThrottleClick {
-                    dismiss()
-                })
-        }.show()
+        val dialog = ModularDialog(this)
+        val args = ModularDialogArgs(
+            DialogArgs(), listOf(
+            HeadModule(string(R.string.delete_wallet_confirmation_title)),
+            BodyModule(string(R.string.delete_wallet_confirmation_description)),
+            ButtonModule(string(R.string.common_confirm), ButtonStyle.Warning) {
+                deleteWallet()
+                dialog.dismiss()
+            },
+            ButtonModule(string(R.string.common_cancel), ButtonStyle.Close)
+        ))
+        dialog.applyArgs(args)
+        dialog.show()
     }
 
     private fun deleteWallet() {

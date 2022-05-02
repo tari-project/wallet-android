@@ -65,13 +65,13 @@
             </intent-filter>
         </activity> <!-- onboarding flow -->
         <activity
-            android:name=".ui.activity.onboarding.OnboardingFlowActivity"
+            android:name=".ui.fragment.onboarding.activity.OnboardingFlowActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme"
             android:windowSoftInputMode="stateAlwaysHidden" /> <!-- local authentication -->
         <activity
-            android:name=".ui.activity.AuthActivity"
+            android:name=".ui.fragment.auth.AuthActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.Auth"
@@ -83,7 +83,7 @@
             android:launchMode="singleTask"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme"
-            android:windowSoftInputMode="stateAlwaysHidden">
+            android:windowSoftInputMode="stateAlwaysHidden|adjustResize">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
 
@@ -93,12 +93,11 @@
                 <data
                     android:host="mainnet"
                     android:scheme="tari" />
-                <data
-                    android:host="rincewind"
-                    android:scheme="tari" />
+
                 <data
                     android:host="y.at"
                     android:scheme="tari" />
+
             </intent-filter>
         </activity>
         <activity
@@ -121,13 +120,6 @@
             android:screenOrientation="portrait"
             android:theme="@style/YatLibTheme.TransparentCompat"
             android:windowSoftInputMode="stateAlwaysHidden" />
-        <activity
-            android:name=".ui.activity.tx.TxDetailsActivity"
-            android:configChanges="keyboardHidden|orientation|screenSize"
-            android:parentActivityName=".ui.activity.home.HomeActivity"
-            android:screenOrientation="portrait"
-            android:theme="@style/AppTheme"
-            android:windowSoftInputMode="adjustPan|stateAlwaysHidden" /> <!-- debug -->
         <activity
             android:name=".ui.activity.debug.DebugActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
@@ -158,9 +150,9 @@
             android:theme="@style/AppTheme"
             android:windowSoftInputMode="adjustResize|stateAlwaysHidden" />
         <activity
-            android:name=".ui.activity.restore.WalletRestoreActivity"
+            android:name="com.tari.android.wallet.ui.fragment.restore.restore.WalletRestoreActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
-            android:parentActivityName=".ui.activity.onboarding.OnboardingFlowActivity"
+            android:parentActivityName=".ui.fragment.onboarding.activity.OnboardingFlowActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme"
             android:windowSoftInputMode="adjustResize" /> <!-- This receiver is responsible for starting the service after boot finish. -->

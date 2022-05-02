@@ -4,7 +4,7 @@
     <!-- theme -->
     <color name="primary">#FFFFFF</color>
     <color name="primary_dark">#AAAAAA</color>
-    <color name="accent">#D81B60</color>
+    <color name="accent">@color/purple</color>
     <color name="gray_background">#f6f6f6</color>
 
     <!-- common -->
@@ -16,6 +16,7 @@
     <color name="light_gray">#3A000000</color>
     <color name="disabled_cta">@color/dark_gray</color>
     <color name="tx_status">#FFEC9C00</color>
+    <color name="secondary_text_color">#817E8A</color>
 
     <!-- common gradient button -->
     <color name="gradient_btn_start">#7300ff</color>
@@ -102,6 +103,7 @@
 
     <!-- settings -->
     <color name="settings_background">#F6F6F6</color>
+    <color name="settings_version_label">#817E8A</color>
 
     <!-- wallet restore -->
     <color name="wallet_restore_page_background">@color/settings_background</color>

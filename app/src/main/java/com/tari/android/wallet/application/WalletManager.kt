@@ -33,14 +33,14 @@
 package com.tari.android.wallet.application
 
 import android.annotation.SuppressLint
-import android.content.Context
 import com.orhanobut.logger.Logger
 import com.tari.android.wallet.BuildConfig
 import com.tari.android.wallet.application.baseNodes.BaseNodes
 import com.tari.android.wallet.data.WalletConfig
-import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepository
 import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodeSharedRepository
+import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepository
+import com.tari.android.wallet.data.sharedPrefs.tariSettings.TariSettingsSharedRepository
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.ffi.*
 import com.tari.android.wallet.service.WalletService
@@ -59,13 +59,13 @@ import java.io.File
  * @author The Tari Development Team
  */
 internal class WalletManager(
-    private val context: Context,
     private val walletConfig: WalletConfig,
     private val torManager: TorProxyManager,
     private val sharedPrefsWrapper: SharedPrefsRepository,
     private val baseNodeSharedRepository: BaseNodeSharedRepository,
     private val seedPhraseRepository: SeedPhraseRepository,
     private val networkRepository: NetworkRepository,
+    private var tariSettingsSharedRepository: TariSettingsSharedRepository,
     private val baseNodes: BaseNodes,
     private val torConfig: TorConfig
 ) {
@@ -82,9 +82,7 @@ internal class WalletManager(
      */
     @Synchronized
     fun start() {
-        Thread {
-            torManager.run()
-        }.start()
+        torManager.run()
         // subscribe to Tor proxy state changes
         EventBus.torProxyState.subscribe(this, this::onTorProxyStateChanged)
     }
@@ -98,6 +96,7 @@ internal class WalletManager(
         FFIWallet.instance?.destroy()
         FFIWallet.instance = null
         EventBus.walletState.post(WalletState.NotReady)
+        EventBus.torProxyState.post(TorProxyState.NotReady)
         // stop tor proxy
         EventBus.torProxyState.unsubscribe(this)
         torManager.shutdown()
@@ -146,7 +145,7 @@ internal class WalletManager(
     /**
      * Instantiates the comms configuration for the wallet.
      */
-    private fun getCommsConfig(walletConfig: WalletConfig): FFICommsConfig {
+    private fun getCommsConfig(currentNetworkRepository: NetworkRepository, walletConfig: WalletConfig): FFICommsConfig {
         return FFICommsConfig(
             NetAddressString(
                 "127.0.0.1",
@@ -157,7 +156,7 @@ internal class WalletManager(
             walletConfig.getWalletFilesDirPath(),
             Constants.Wallet.discoveryTimeoutSec,
             Constants.Wallet.storeAndForwardMessageDurationSec,
-            Network.WEATHERWAX.uriComponent,
+            currentNetworkRepository.currentNetwork!!.network.uriComponent,
         )
     }
 
@@ -195,7 +194,7 @@ internal class WalletManager(
             val wallet = FFIWallet(
                 sharedPrefsWrapper,
                 seedPhraseRepository,
-                getCommsConfig(walletConfig),
+                getCommsConfig(networkRepository, walletConfig),
                 walletConfig.getWalletLogFilePath()
             )
             FFIWallet.instance = wallet
@@ -204,7 +203,7 @@ internal class WalletManager(
                     WalletService.Companion.KeyValueStorageKeys.NETWORK,
                     networkRepository.currentNetwork!!.network.uriComponent
                 )
-            } else if (sharedPrefsWrapper.isRestoredWallet && networkRepository.ffiNetwork == null) {
+            } else if (tariSettingsSharedRepository.isRestoredWallet && networkRepository.ffiNetwork == null) {
                 networkRepository.ffiNetwork = try {
                     Network.from(FFIWallet.instance?.getKeyValue(WalletService.Companion.KeyValueStorageKeys.NETWORK) ?: "")
                 } catch (exception: Exception) {

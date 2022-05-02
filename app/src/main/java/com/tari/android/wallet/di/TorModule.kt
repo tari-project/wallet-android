@@ -33,15 +33,12 @@
 package com.tari.android.wallet.di
 
 import android.content.Context
+import com.tari.android.wallet.data.sharedPrefs.tor.TorSharedRepository
 import com.tari.android.wallet.tor.TorConfig
 import com.tari.android.wallet.tor.TorProxyManager
-import com.tari.android.wallet.util.Constants
-import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import dagger.Module
 import dagger.Provides
 import java.io.File
-import java.net.ServerSocket
-import javax.inject.Named
 import javax.inject.Singleton
 
 /**
@@ -52,130 +49,24 @@ import javax.inject.Singleton
 @Module
 class TorModule {
 
-    object FieldName {
-        const val torProxyPort = "tor_proxy_port"
-        const val torConnectionPort = "tor_connection_port"
-        const val torControlPort = "tor_control_port"
-        const val torControlHost = "tor_control_host"
-        const val torCookieFilePath = "tor_cookie_file_path"
-        const val torSock5Username = "tor_sock5_username"
-        const val torSock5Password = "tor_sock5_password"
-    }
-
-    /**
-     * Provides a port for Tor connection.
-     */
-    @Provides
-    @Named(FieldName.torConnectionPort)
-    @Singleton
-    internal fun provideConnectionPort() = Constants.Wallet.torPort
-
-    /**
-     * Provides a port for Tor proxy.
-     */
-    @Provides
-    @Named(FieldName.torProxyPort)
-    @Singleton
-    internal fun provideTorProxyPort(): Int {
-        val socket = ServerSocket(0)
-        val port = socket.localPort
-        socket.close()
-        return port
-    }
-
-    /**
-     * Provides a port for Tor control.
-     */
-    @Provides
-    @Named(FieldName.torControlPort)
-    @Singleton
-    internal fun provideTorControlPort(): Int {
-        val socket = ServerSocket(0)
-        val port = socket.localPort
-        socket.close()
-        return port
-    }
-
-    /**
-     * Provides host for Tor control.
-     */
-    @Provides
-    @Named(FieldName.torControlHost)
-    @Singleton
-    internal fun provideTorControlAddress(): String {
-        return "127.0.0.1"
-    }
-
-    /**
-     * Provides cookie file path for Tor.
-     */
-    @Provides
-    @Named(FieldName.torCookieFilePath)
-    @Singleton
-    internal fun provideTorCookieFilePath(context: Context): String {
-        return File(
-            context.getDir(TorProxyManager.torDataDirectoryName, Context.MODE_PRIVATE),
-            "control_auth_cookie"
-        ).absolutePath
-    }
-
-    /**
-     * Provides sock5 username for Tor.
-     */
-    @Provides
-    @Named(FieldName.torSock5Username)
-    @Singleton
-    internal fun provideTorSock5Username(): String {
-        return "user123"
-    }
-
-    /**
-     * Provides sock5 password for Tor.
-     */
-    @Provides
-    @Named(FieldName.torSock5Password)
-    @Singleton
-    internal fun provideTorSock5Password(): String {
-        return "123456"
-    }
-
-    /**
-     * Provides config for Tor.
-     */
     @Provides
     @Singleton
-    internal fun provideTorConfig(
-        @Named(FieldName.torControlHost) controlHost: String,
-        @Named(FieldName.torControlPort) controlPort: Int,
-        @Named(FieldName.torProxyPort) proxyPort: Int,
-        @Named(FieldName.torConnectionPort) connectionPort: Int,
-        @Named(FieldName.torCookieFilePath) cookieFilePath: String,
-        @Named(FieldName.torSock5Username) sock5Username: String,
-        @Named(FieldName.torSock5Password) sock5Passsword: String
-    ): TorConfig {
+    internal fun provideTorConfig(context: Context): TorConfig {
+        val cookieFilePath = File(context.getDir(TorProxyManager.torDataDirectoryName, Context.MODE_PRIVATE), "control_auth_cookie").absolutePath
+
         return TorConfig(
-            controlPort = controlPort,
-            controlHost = controlHost,
-            proxyPort = proxyPort,
-            connectionPort = connectionPort,
+            controlPort = 39069,
+            controlHost = "127.0.0.1",
+            proxyPort = 39059,
+            connectionPort = 18101,
             cookieFilePath = cookieFilePath,
-            sock5Username = sock5Username,
-            sock5Password = sock5Passsword
+            sock5Username = "user123",
+            sock5Password = "123456"
         )
     }
 
     @Provides
     @Singleton
-    internal fun provideTorProxyManager(
-        context: Context,
-        sharedPrefsWrapper: SharedPrefsRepository,
-        torConfig: TorConfig
-    ): TorProxyManager {
-        return TorProxyManager(
-            context,
-            sharedPrefsWrapper,
-            torConfig
-        )
-    }
-
+    internal fun provideTorProxyManager(context: Context, torSharedRepository: TorSharedRepository, torConfig: TorConfig): TorProxyManager =
+        TorProxyManager(context, torSharedRepository, torConfig)
 }

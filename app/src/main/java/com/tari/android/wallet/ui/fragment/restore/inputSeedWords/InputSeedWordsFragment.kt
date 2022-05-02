@@ -14,13 +14,13 @@ import com.tari.android.wallet.databinding.FragmentWalletInputSeedWordsBinding
 import com.tari.android.wallet.extension.observe
 import com.tari.android.wallet.extension.observeOnLoad
 import com.tari.android.wallet.model.seedPhrase.SeedPhrase
-import com.tari.android.wallet.ui.activity.restore.WalletRestoreRouter
 import com.tari.android.wallet.ui.common.CommonFragment
 import com.tari.android.wallet.ui.common.recyclerView.CommonAdapter
 import com.tari.android.wallet.ui.extension.*
 import com.tari.android.wallet.ui.fragment.restore.inputSeedWords.suggestions.SuggestionState
 import com.tari.android.wallet.ui.fragment.restore.inputSeedWords.suggestions.SuggestionViewHolderItem
 import com.tari.android.wallet.ui.fragment.restore.inputSeedWords.suggestions.SuggestionsAdapter
+import com.tari.android.wallet.ui.fragment.restore.restore.WalletRestoreRouter
 import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent
 
 internal class InputSeedWordsFragment : CommonFragment<FragmentWalletInputSeedWordsBinding, InputSeedWordsViewModel>() {
@@ -63,6 +63,7 @@ internal class InputSeedWordsFragment : CommonFragment<FragmentWalletInputSeedWo
             }
             true
         }
+        chooseBaseNodeButton.setOnClickListener { processNavigation(InputSeedWordsNavigation.ToBaseNodeSelection) }
         suggestionsAdapter.setClickListener(CommonAdapter.ItemClickListener { viewModel.selectSuggestion(it) })
         suggestions.adapter = suggestionsAdapter
         suggestions.layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
@@ -95,6 +96,7 @@ internal class InputSeedWordsFragment : CommonFragment<FragmentWalletInputSeedWo
         val router = requireActivity() as WalletRestoreRouter
         when (navigation) {
             InputSeedWordsNavigation.ToRestoreFormSeedWordsInProgress -> router.toRestoreFromSeedWordsInProgress()
+            InputSeedWordsNavigation.ToBaseNodeSelection -> router.toBaseNodeSelection()
         }
     }
 
@@ -143,7 +145,7 @@ internal class InputSeedWordsFragment : CommonFragment<FragmentWalletInputSeedWo
                 false
             }
             ui.text.setOnFocusChangeListener { v, hasFocus ->
-                updateState(hasFocus)
+                updateState(hasFocus, word.isValid())
                 if (hasFocus) viewModel.getFocus(word.index.value!!, true)
             }
             ui.text.setOnEditorActionListener { v, actionId, _ ->

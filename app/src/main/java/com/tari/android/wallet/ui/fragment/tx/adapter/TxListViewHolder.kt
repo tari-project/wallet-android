@@ -7,7 +7,7 @@ import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.bumptech.glide.request.RequestOptions
 import com.bumptech.glide.request.target.Target
 import com.tari.android.wallet.R
-import com.tari.android.wallet.databinding.HomeTxListItemBinding
+import com.tari.android.wallet.databinding.ItemHomeTxListBinding
 import com.tari.android.wallet.extension.applyFontStyle
 import com.tari.android.wallet.model.*
 import com.tari.android.wallet.ui.common.gyphy.presentation.GIFStateConsumer
@@ -27,7 +27,7 @@ import org.joda.time.LocalDate
 import org.joda.time.Minutes
 import java.util.*
 
-internal class TxListViewHolder(view: HomeTxListItemBinding) : CommonViewHolder<TransactionItem, HomeTxListItemBinding>(view), GIFStateConsumer {
+internal class TxListViewHolder(view: ItemHomeTxListBinding) : CommonViewHolder<TransactionItem, ItemHomeTxListBinding>(view), GIFStateConsumer {
 
     private val glide = Glide.with(itemView.context)
     private val emojiIdSummaryController = EmojiIdSummaryViewController(ui.participantEmojiIdView)
@@ -64,40 +64,52 @@ internal class TxListViewHolder(view: HomeTxListItemBinding) : CommonViewHolder<
 
     private fun displayFirstEmoji(tx: Tx) {
         // display first emoji of emoji id
-        ui.firstEmojiTextView.text = tx.user.publicKey.emojiId.extractEmojis()[0]
+        val firstEmoji =
+            if (tx.isOneSided) string(R.string.tx_list_emoji_one_side_payment_placeholder) else tx.user.publicKey.emojiId.extractEmojis()[0]
+        ui.firstEmojiTextView.text = firstEmoji
     }
 
     private fun displayAliasOrEmojiId(tx: Tx) {
         val txUser = tx.user
         // display contact name or emoji id
-        if (txUser is Contact) {
-            val fullText = when (tx.direction) {
-                Tx.Direction.INBOUND -> string(R.string.tx_list_sent_a_payment, txUser.alias)
-                Tx.Direction.OUTBOUND -> string(R.string.tx_list_you_paid_with_alias, txUser.alias)
+        when {
+            tx.isOneSided -> {
+                val title = string(R.string.tx_list_someone) + " " + string(R.string.tx_list_paid_you)
+                ui.participantTextView1.visible()
+                ui.participantTextView2.gone()
+                ui.participantEmojiIdView.root.gone()
+                ui.participantTextView1.text = title
             }
-            ui.participantTextView1.visible()
-            ui.participantTextView1.text = fullText.applyFontStyle(
-                itemView.context,
-                CustomFont.AVENIR_LT_STD_LIGHT,
-                listOf(txUser.alias),
-                CustomFont.AVENIR_LT_STD_HEAVY
-            )
-            ui.participantEmojiIdView.root.gone()
-            ui.participantTextView2.gone()
-        } else { // display emoji id
-            ui.participantEmojiIdView.root.visible()
-            emojiIdSummaryController.display(txUser.publicKey.emojiId, showEmojisFromEachEnd = 2)
-            when (tx.direction) {
-                Tx.Direction.INBOUND -> {
-                    ui.participantTextView1.gone()
-                    ui.participantTextView2.visible()
-                    ui.participantTextView2.text = string(R.string.tx_list_paid_you)
-                    // paid you
+            txUser is Contact -> {
+                val fullText = when (tx.direction) {
+                    Tx.Direction.INBOUND -> string(R.string.tx_list_sent_a_payment, txUser.alias)
+                    Tx.Direction.OUTBOUND -> string(R.string.tx_list_you_paid_with_alias, txUser.alias)
                 }
-                Tx.Direction.OUTBOUND -> {
-                    ui.participantTextView1.visible()
-                    ui.participantTextView1.text = string(R.string.tx_list_you_paid)
-                    ui.participantTextView2.gone()
+                ui.participantTextView1.visible()
+                ui.participantTextView1.text = fullText.applyFontStyle(
+                    itemView.context,
+                    CustomFont.AVENIR_LT_STD_LIGHT,
+                    listOf(txUser.alias),
+                    CustomFont.AVENIR_LT_STD_HEAVY
+                )
+                ui.participantEmojiIdView.root.gone()
+                ui.participantTextView2.gone()
+            }
+            else -> { // display emoji id
+                ui.participantEmojiIdView.root.visible()
+                emojiIdSummaryController.display(txUser.publicKey.emojiId, showEmojisFromEachEnd = 2)
+                when (tx.direction) {
+                    Tx.Direction.INBOUND -> {
+                        ui.participantTextView1.gone()
+                        ui.participantTextView2.visible()
+                        ui.participantTextView2.text = string(R.string.tx_list_paid_you)
+                        // paid you
+                    }
+                    Tx.Direction.OUTBOUND -> {
+                        ui.participantTextView1.visible()
+                        ui.participantTextView1.text = string(R.string.tx_list_you_paid)
+                        ui.participantTextView2.gone()
+                    }
                 }
             }
         }
@@ -205,7 +217,7 @@ internal class TxListViewHolder(view: HomeTxListItemBinding) : CommonViewHolder<
             ui.messageTextView.text = ""
         } else {
             ui.messageTextView.visible()
-            ui.messageTextView.text = note.message
+            ui.messageTextView.text = if (tx.isOneSided) string(R.string.tx_list_you_received_one_side_payment) else note.message
         }
     }
 
@@ -251,7 +263,7 @@ internal class TxListViewHolder(view: HomeTxListItemBinding) : CommonViewHolder<
 
     companion object {
         fun getBuilder(): ViewHolderBuilder =
-            ViewHolderBuilder(HomeTxListItemBinding::inflate, TransactionItem::class.java) { TxListViewHolder(it as HomeTxListItemBinding) }
+            ViewHolderBuilder(ItemHomeTxListBinding::inflate, TransactionItem::class.java) { TxListViewHolder(it as ItemHomeTxListBinding) }
 
         // e.g. Wed, Jun 2
         private const val dateFormat = "E, MMM d"

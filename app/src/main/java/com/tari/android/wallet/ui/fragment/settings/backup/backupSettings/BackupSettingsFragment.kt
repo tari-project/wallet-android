@@ -34,7 +34,6 @@ package com.tari.android.wallet.ui.fragment.settings.backup.backupSettings
 
 import android.animation.Animator
 import android.animation.ValueAnimator
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -43,51 +42,30 @@ import android.view.ViewGroup
 import android.view.animation.LinearInterpolator
 import androidx.core.animation.addListener
 import androidx.fragment.app.viewModels
-import com.tari.android.wallet.R
 import com.tari.android.wallet.R.color.all_settings_back_up_status_processing
 import com.tari.android.wallet.R.color.back_up_settings_permission_processing
 import com.tari.android.wallet.R.string.*
-import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import com.tari.android.wallet.databinding.FragmentWalletBackupSettingsBinding
-import com.tari.android.wallet.di.DiContainer.appComponent
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.extension.observe
 import com.tari.android.wallet.extension.observeOnLoad
-import com.tari.android.wallet.infrastructure.backup.BackupManager
 import com.tari.android.wallet.infrastructure.backup.BackupState.BackupUpToDate
 import com.tari.android.wallet.ui.activity.settings.BackupSettingsRouter
 import com.tari.android.wallet.ui.common.CommonFragment
-import com.tari.android.wallet.ui.dialog.BottomSlideDialog
 import com.tari.android.wallet.ui.extension.*
 import com.tari.android.wallet.ui.fragment.settings.userAutorization.BiometricAuthenticationViewModel
 import org.joda.time.DateTime
 import org.joda.time.format.DateTimeFormat
 import java.util.*
-import javax.inject.Inject
 
 internal class BackupSettingsFragment : CommonFragment<FragmentWalletBackupSettingsBinding, BackupSettingsViewModel>() {
-
-    @Inject
-    lateinit var sharedPrefs: SharedPrefsRepository
-
-    @Inject
-    lateinit var backupManager: BackupManager
 
     private var optionsAnimation: Animator? = null
 
     private val biometricAuthenticationViewModel: BiometricAuthenticationViewModel by viewModels()
 
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-        appComponent.inject(this)
-    }
-
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View = FragmentWalletBackupSettingsBinding.inflate(inflater, container, false)
-        .also { ui = it }.root
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
+        FragmentWalletBackupSettingsBinding.inflate(inflater, container, false).also { ui = it }.root
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -160,8 +138,6 @@ internal class BackupSettingsFragment : CommonFragment<FragmentWalletBackupSetti
 
         observe(lastSuccessfulBackupDate) { updateLastSuccessfulBackupDate(if (it.isPresent) it.get() else null) }
 
-        observe(showBackupsWillBeDeletedDialog) { showBackupsWillBeDeletedDialog(it.onAccept, it.onDismiss) }
-
         observe(backupOptionsVisibility) { if (it) showBackupOptionsWithAnimation() else hideAllBackupOptionsWithAnimation() }
 
         observeOnLoad(backupOptionsAreVisible)
@@ -230,7 +206,7 @@ internal class BackupSettingsFragment : CommonFragment<FragmentWalletBackupSetti
     }
 
     private fun setSeedWordVerificationStateIcon() = with(ui) {
-        val hasVerifiedSeedWords = sharedPrefs.hasVerifiedSeedWords
+        val hasVerifiedSeedWords = viewModel.tariSettingsSharedRepository.hasVerifiedSeedWords
         backupWithRecoveryPhraseSuccessView.setVisible(hasVerifiedSeedWords)
         backupWithRecoveryPhraseWarningView.setVisible(!hasVerifiedSeedWords)
     }
@@ -277,32 +253,11 @@ internal class BackupSettingsFragment : CommonFragment<FragmentWalletBackupSetti
         if (textColor != -1) backupStatusTextView.setTextColor(color(textColor))
     }
 
-    //todo refactor to nice state
-    private fun showBackupsWillBeDeletedDialog(onAccept: () -> Unit, onDismiss: () -> Unit) {
-        BottomSlideDialog(
-            requireContext(),
-            R.layout.dialog_turn_off_backups_will_be_deleted_warning,
-            canceledOnTouchOutside = false
-        ).apply {
-            findViewById<View>(R.id.backup_turn_off_confirm_button)
-                .setOnClickListener(ThrottleClick {
-                    onAccept()
-                    dismiss()
-                })
-            findViewById<View>(R.id.backup_turn_off_cancel_button)
-                .setOnClickListener(ThrottleClick {
-                    onDismiss()
-                    dismiss()
-                })
-        }.show()
-    }
-
     // region Backup button animations
     private fun animateBackupButtonAvailability() {
-        val animation = optionsAnimation
         if (viewModel.backupOptionsAreVisible.value == true &&
             ui.backupWalletToCloudCtaContainerView.visibility != View.VISIBLE &&
-            (animation == null || !animation.isRunning)
+            (optionsAnimation == null || !optionsAnimation!!.isRunning)
         ) {
             optionsAnimation = ValueAnimator.ofFloat(ALPHA_INVISIBLE, ALPHA_VISIBLE).apply {
                 duration = OPTIONS_ANIMATION_DURATION

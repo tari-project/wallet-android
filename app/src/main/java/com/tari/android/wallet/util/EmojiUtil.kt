@@ -32,10 +32,10 @@
  */
 package com.tari.android.wallet.util
 
+import android.icu.text.BreakIterator
 import android.text.SpannableString
 import android.text.Spanned
 import android.text.style.ForegroundColorSpan
-import android.icu.text.BreakIterator
 import com.tari.android.wallet.extension.applyColorStyle
 import com.tari.android.wallet.extension.applyLetterSpacingStyle
 import com.tari.android.wallet.extension.applyRelativeTextSizeStyle
@@ -151,6 +151,8 @@ internal class EmojiUtil {
 
     companion object {
 
+        const val smallEmojiIdSize = 6
+
         val emojiSet by lazy {
                 val emojis = mutableSetOf<String>()
                 val emojiSetFFI = FFIEmojiSet()
@@ -204,6 +206,7 @@ internal class EmojiUtil {
          */
         fun getNewChunkSeparatorIndices(string: String): ArrayList<Int> {
             val newIndices = ArrayList<Int>()
+            if (string.getGraphemeLength() < smallEmojiIdSize) return newIndices
             var currentIndex = 0
             // prep the iterator
             val it: BreakIterator = BreakIterator.getCharacterInstance()
@@ -299,6 +302,15 @@ internal class EmojiUtil {
             return spannable
         }
 
+        fun String.getGraphemeLength(): Int {
+            val it: BreakIterator = BreakIterator.getCharacterInstance()
+            it.setText(this)
+            var count = 0
+            while (it.next() != BreakIterator.DONE) {
+                count++
+            }
+            return count
+        }
     }
 
 }

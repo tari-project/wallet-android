@@ -4,9 +4,10 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.tari.android.wallet.R
-import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodeDto
 import com.tari.android.wallet.application.baseNodes.BaseNodes
 import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
+import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodeDto
+import com.tari.android.wallet.data.sharedPrefs.tariSettings.TariSettingsSharedRepository
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.extension.addTo
 import com.tari.android.wallet.ffi.FFIPublicKey
@@ -36,6 +37,9 @@ internal class WalletRestoringFromSeedWordsViewModel() : CommonViewModel() {
 
     @Inject
     lateinit var walletServiceLauncher: WalletServiceLauncher
+
+    @Inject
+    lateinit var tariSettingsSharedRepository: TariSettingsSharedRepository
 
     @Inject
     lateinit var baseNodes: BaseNodes
@@ -68,7 +72,7 @@ internal class WalletRestoringFromSeedWordsViewModel() : CommonViewModel() {
     private fun startRestoringOnNode(baseNode: BaseNodeDto) {
         try {
             val baseNodeFFI = FFIPublicKey(HexString(baseNode.publicKeyHex))
-            val result = FFIWallet.instance?.startRecovery(baseNodeFFI)
+            val result = FFIWallet.instance?.startRecovery(baseNodeFFI, resourceManager.getString(R.string.restore_wallet_output_message))
             if (result == true) {
                 subscribeOnRestorationState()
                 return
@@ -98,8 +102,9 @@ internal class WalletRestoringFromSeedWordsViewModel() : CommonViewModel() {
                     }
                 }
                 is WalletRestorationResult.Progress -> onProgress(RecoveryState.Recovery(resourceManager, it.currentBlock, it.numberOfBlocks))
-                is WalletRestorationResult.RecoveryFailed ->
+                is WalletRestorationResult.RecoveryFailed -> if (!baseNodeIterator.hasNext()) {
                     onError(RestorationError.RecoveryInternalError(resourceManager, this@WalletRestoringFromSeedWordsViewModel::onErrorClosed))
+                }
                 is WalletRestorationResult.Completed -> onSuccessRestoration()
             }
         }.addTo(compositeDisposable)
@@ -107,11 +112,11 @@ internal class WalletRestoringFromSeedWordsViewModel() : CommonViewModel() {
 
     private fun onError(restorationError: RestorationError) {
         walletServiceLauncher.stopAndDelete()
-        _errorDialog.postValue(restorationError.args)
+        _modularDialog.postValue(restorationError.args.getModular(resourceManager))
     }
 
     private fun onSuccessRestoration() {
-        sharedPrefsRepository.hasVerifiedSeedWords = true
+        tariSettingsSharedRepository.hasVerifiedSeedWords = true
         _navigation.postValue(WalletRestoringFromSeedWordsNavigation.OnRestoreCompleted)
     }
 

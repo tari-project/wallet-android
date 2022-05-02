@@ -32,13 +32,13 @@
  */
 package com.tari.android.wallet.ffi
 
-import com.tari.android.wallet.model.WalletErrorCode.NO_ERROR
+import com.tari.android.wallet.model.WalletError
 
 /**
  * Throws FFIException if error code indicates a problem.
  */
 internal fun throwIf(error: FFIError) {
-    if (error.code != NO_ERROR.code) {
+    if (error.code != WalletError.NoError.code) {
         throw FFIException(error)
     }
 }

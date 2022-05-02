@@ -49,7 +49,7 @@ import com.tari.android.wallet.R.string.enter_backup_password_page_desc_general_
 import com.tari.android.wallet.R.string.enter_backup_password_page_desc_highlighted_part
 import com.tari.android.wallet.databinding.FragmentEnterRestorePasswordBinding
 import com.tari.android.wallet.extension.observe
-import com.tari.android.wallet.ui.activity.restore.WalletRestoreRouter
+import com.tari.android.wallet.ui.fragment.restore.restore.WalletRestoreRouter
 import com.tari.android.wallet.ui.common.CommonFragment
 import com.tari.android.wallet.ui.extension.*
 

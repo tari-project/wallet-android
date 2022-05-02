@@ -36,7 +36,6 @@ import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
 import android.animation.ValueAnimator
 import android.annotation.SuppressLint
-import android.content.Context
 import android.content.Intent
 import android.graphics.drawable.GradientDrawable
 import android.hardware.SensorManager
@@ -59,25 +58,18 @@ import com.daasuu.ei.Ease
 import com.daasuu.ei.EasingInterpolator
 import com.squareup.seismic.ShakeDetector
 import com.tari.android.wallet.R
-import com.tari.android.wallet.application.DeepLink
-import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
-import com.tari.android.wallet.data.sharedPrefs.testnetFaucet.TestnetFaucetRepository
 import com.tari.android.wallet.databinding.FragmentTxListBinding
-import com.tari.android.wallet.di.DiContainer.appComponent
 import com.tari.android.wallet.event.Event
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.extension.observe
 import com.tari.android.wallet.extension.observeOnLoad
-import com.tari.android.wallet.infrastructure.Tracker
-import com.tari.android.wallet.model.*
+import com.tari.android.wallet.model.BalanceInfo
+import com.tari.android.wallet.model.User
 import com.tari.android.wallet.ui.activity.debug.DebugActivity
 import com.tari.android.wallet.ui.common.CommonFragment
 import com.tari.android.wallet.ui.common.recyclerView.CommonAdapter
 import com.tari.android.wallet.ui.common.recyclerView.CommonViewHolderItem
 import com.tari.android.wallet.ui.component.networkStateIndicator.ConnectionIndicatorViewModel
-import com.tari.android.wallet.ui.dialog.backup.BackupWalletDialog
-import com.tari.android.wallet.ui.dialog.testnet.TestnetReceivedDialog
-import com.tari.android.wallet.ui.dialog.ttl.TtlStoreWalletDialog
 import com.tari.android.wallet.ui.extension.*
 import com.tari.android.wallet.ui.fragment.send.activity.SendTariActivity
 import com.tari.android.wallet.ui.fragment.tx.adapter.TxListAdapter
@@ -92,7 +84,6 @@ import com.tari.android.wallet.util.WalletUtil
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.lang.ref.WeakReference
-import javax.inject.Inject
 import kotlin.math.max
 import kotlin.math.min
 
@@ -102,15 +93,6 @@ internal class TxListFragment : CommonFragment<FragmentTxListBinding, TxListView
     CustomScrollView.Listener,
     UpdateProgressViewController.Listener,
     ShakeDetector.Listener {
-
-    @Inject
-    lateinit var sharedPrefsWrapper: SharedPrefsRepository
-
-    @Inject
-    lateinit var testnetFaucetRepository: TestnetFaucetRepository
-
-    @Inject
-    lateinit var tracker: Tracker
 
     private val networkIndicatorViewModel: ConnectionIndicatorViewModel by viewModels()
     private val questionMarkViewModel: QuestionMarkViewModel by viewModels()
@@ -127,22 +109,17 @@ internal class TxListFragment : CommonFragment<FragmentTxListBinding, TxListView
     private var isOnboarding = false
     private var isInDraggingSession = false
 
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-        appComponent.inject(this)
-    }
-
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View = FragmentTxListBinding.inflate(inflater, container, false).also { ui = it }.root
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
+        FragmentTxListBinding.inflate(inflater, container, false).also { ui = it }.root
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        if (savedInstanceState == null) tracker.screen("/home", "Home - Transaction List")
+
         val viewModel: TxListViewModel by viewModels()
         bindViewModel(viewModel)
+
+        if (savedInstanceState == null) viewModel.tracker.screen("/home", "Home - Transaction List")
+
         setupUI()
         subscribeToEventBus()
         subscribeToViewModel()
@@ -155,12 +132,6 @@ internal class TxListFragment : CommonFragment<FragmentTxListBinding, TxListView
         observe(refreshBalanceInfo) { updateBalanceInfoUI(it) }
 
         observe(navigation) { processNavigation(it) }
-
-        observe(showTtlStoreDialog) { replaceDialog(TtlStoreWalletDialog(requireContext(), it)) }
-
-        observe(showBackupPrompt) { replaceDialog(BackupWalletDialog(requireContext(), it)) }
-
-        observe(showTestnetReceived) { replaceDialog(TestnetReceivedDialog(requireContext(), it)) }
 
         observe(txSendSuccessful) { playTxSendSuccessfulAnim() }
 
@@ -286,11 +257,7 @@ internal class TxListFragment : CommonFragment<FragmentTxListBinding, TxListView
     }
 
     private fun navigateToSendTari(user: User) {
-        val intent = Intent(requireContext(), SendTariActivity::class.java)
-        intent.putExtra("recipientUser", user as Parcelable)
-        val parameters: Map<String, String> = emptyMap()
-        parameters[DeepLink.PARAMETER_NOTE]?.let { intent.putExtra(DeepLink.PARAMETER_NOTE, it) }
-        parameters[DeepLink.PARAMETER_AMOUNT]?.toDoubleOrNull()?.let { intent.putExtra(DeepLink.PARAMETER_AMOUNT, it) }
+        val intent = Intent(requireContext(), SendTariActivity::class.java).apply { putExtra("recipientUser", user as Parcelable) }
         startActivity(intent)
         requireActivity().overridePendingTransition(R.anim.enter_from_right, R.anim.exit_to_left)
     }
@@ -331,13 +298,13 @@ internal class TxListFragment : CommonFragment<FragmentTxListBinding, TxListView
 
 
     private fun initializeTxListUI() {
-        if (sharedPrefsWrapper.onboardingDisplayedAtHome) {
+        if (viewModel.sharedPrefsWrapper.onboardingDisplayedAtHome) {
             recyclerViewAdapter.update(viewModel.list.value!!)
             playNonOnboardingStartupAnim()
             if (viewModel.txListIsEmpty) {
                 showNoTxsTextView()
             }
-            if (!testnetFaucetRepository.faucetTestnetTariRequestCompleted && !sharedPrefsWrapper.isRestoredWallet
+            if (!viewModel.testnetFaucetRepository.faucetTestnetTariRequestCompleted && !viewModel.tariSettingsSharedRepository.isRestoredWallet
             ) {
                 viewModel.requestTestnetTari()
             }
@@ -347,7 +314,7 @@ internal class TxListFragment : CommonFragment<FragmentTxListBinding, TxListView
         } else {
             isOnboarding = true
             playOnboardingAnim()
-            sharedPrefsWrapper.onboardingDisplayedAtHome = true
+            viewModel.sharedPrefsWrapper.onboardingDisplayedAtHome = true
         }
     }
 
@@ -394,20 +361,13 @@ internal class TxListFragment : CommonFragment<FragmentTxListBinding, TxListView
 
     override fun updateHasFailed(
         source: UpdateProgressViewController,
-        failureReason: UpdateProgressViewController.FailureReason,
-        validationResult: BaseNodeValidationResult?
+        failureReason: UpdateProgressViewController.FailureReason
     ) {
         lifecycleScope.launch(Dispatchers.Main) {
             ui.scrollView.finishUpdate()
-            if (validationResult != BaseNodeValidationResult.ABORTED) {
-                when (failureReason) {
-                    UpdateProgressViewController.FailureReason.NETWORK_CONNECTION_ERROR -> {
-                        viewModel.displayNetworkConnectionErrorDialog()
-                    }
-                    UpdateProgressViewController.FailureReason.BASE_NODE_VALIDATION_ERROR -> {
-                        viewModel.displayNetworkConnectionErrorDialog()
-                    }
-                }
+            when (failureReason) {
+                UpdateProgressViewController.FailureReason.NETWORK_CONNECTION_ERROR,
+                UpdateProgressViewController.FailureReason.BASE_NODE_VALIDATION_ERROR -> viewModel.displayNetworkConnectionErrorDialog()
             }
         }
     }

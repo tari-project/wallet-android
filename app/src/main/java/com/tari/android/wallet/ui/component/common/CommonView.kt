@@ -10,13 +10,12 @@ import android.widget.LinearLayout
 import androidx.lifecycle.LifecycleOwner
 import androidx.viewbinding.ViewBinding
 import com.tari.android.wallet.ui.common.CommonViewModel
-import com.tari.android.wallet.ui.dialog.confirm.ConfirmDialog
-import com.tari.android.wallet.ui.dialog.error.ErrorDialog
+import com.tari.android.wallet.ui.dialog.modular.ModularDialog
 
 abstract class CommonView<VM : CommonViewModel, VB : ViewBinding> : LinearLayout {
     lateinit var viewModel: VM
 
-    lateinit var binding: VB
+    lateinit var ui: VB
         private set
 
     abstract fun bindingInflate(layoutInflater: LayoutInflater, parent: ViewGroup?, attachToRoot: Boolean): VB
@@ -40,7 +39,7 @@ abstract class CommonView<VM : CommonViewModel, VB : ViewBinding> : LinearLayout
     }
 
     private fun init() {
-        binding = bindingInflate(LayoutInflater.from(context), this, true)
+        ui = bindingInflate(LayoutInflater.from(context), this, true)
 
         setup()
     }
@@ -52,8 +51,6 @@ abstract class CommonView<VM : CommonViewModel, VB : ViewBinding> : LinearLayout
 
         viewModel.openLink.observe(viewLifecycle) { context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(it))) }
 
-        viewModel.confirmDialog.observe(viewLifecycle) { ConfirmDialog(context, it).show() }
-
-        viewModel.errorDialog.observe(viewLifecycle) { ErrorDialog(context, it).show() }
+        viewModel.modularDialog.observe(viewLifecycle) { ModularDialog(context, it).show() }
     }
 }

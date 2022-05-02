@@ -8,12 +8,13 @@ import com.tari.android.wallet.R
 import com.tari.android.wallet.application.WalletManager
 import com.tari.android.wallet.application.WalletState
 import com.tari.android.wallet.event.EventBus
-import com.tari.android.wallet.ffi.FFIException
 import com.tari.android.wallet.infrastructure.backup.*
+import com.tari.android.wallet.model.WalletError
 import com.tari.android.wallet.service.WalletServiceLauncher
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.common.SingleLiveEvent
 import com.tari.android.wallet.ui.dialog.error.ErrorDialogArgs
+import com.tari.android.wallet.ui.dialog.error.WalletErrorArgs
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.io.IOException
@@ -30,8 +31,11 @@ internal class ChooseRestoreOptionViewModel : CommonViewModel() {
     @Inject
     lateinit var walletServiceLauncher: WalletServiceLauncher
 
+    @Inject
+    lateinit var backupManager: BackupManager
+
     init {
-        component?.inject(this)
+        component.inject(this)
     }
 
     private val _state = SingleLiveEvent<ChooseRestoreOptionState>()
@@ -97,11 +101,13 @@ internal class ChooseRestoreOptionViewModel : CommonViewModel() {
                 viewModelScope.launch(Dispatchers.Main) {
                     walletServiceLauncher.stopAndDelete()
                 }
-                val cause = exception.cause
-                if (cause is FFIException && cause.error?.code == 114) {
+                val cause = WalletError.createFromException(exception.cause)
+                if (cause == WalletError.DatabaseDataError) {
                     showRestoreFailedDialog(resourceManager.getString(R.string.restore_wallet_error_file_not_supported))
+                } else if (cause != WalletError.NoError) {
+                    _modularDialog.postValue(WalletErrorArgs(resourceManager, cause).getErrorArgs().getModular(resourceManager))
                 } else {
-                    showRestoreFailedDialog(cause?.message)
+                    showRestoreFailedDialog(exception.cause?.message)
                 }
             }
             is IOException -> {
@@ -124,7 +130,7 @@ internal class ChooseRestoreOptionViewModel : CommonViewModel() {
             resourceManager.getString(R.string.restore_wallet_error_title),
             resourceManager.getString(R.string.restore_wallet_error_file_not_found),
             onClose = { _backPressed.call() })
-        _errorDialog.postValue(args)
+        _modularDialog.postValue(args.getModular(resourceManager))
     }
 
     private fun showRestoreFailedDialog(message: String? = null) {
@@ -132,7 +138,7 @@ internal class ChooseRestoreOptionViewModel : CommonViewModel() {
             resourceManager.getString(R.string.restore_wallet_error_title),
             message ?: resourceManager.getString(R.string.restore_wallet_error_desc)
         )
-        _errorDialog.postValue(args)
+        _modularDialog.postValue(args.getModular(resourceManager))
     }
 
     private fun showAuthFailedDialog() {
@@ -140,6 +146,6 @@ internal class ChooseRestoreOptionViewModel : CommonViewModel() {
             resourceManager.getString(R.string.restore_wallet_error_title),
             resourceManager.getString(R.string.back_up_wallet_storage_setup_error_desc)
         )
-        _errorDialog.postValue(args)
+        _modularDialog.postValue(args.getModular(resourceManager))
     }
 }

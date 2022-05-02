@@ -39,7 +39,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.viewModels
 import com.tari.android.wallet.databinding.FragmentWalletRestoringFromSeedWordsBinding
 import com.tari.android.wallet.extension.observe
-import com.tari.android.wallet.ui.activity.restore.WalletRestoreRouter
+import com.tari.android.wallet.ui.fragment.restore.restore.WalletRestoreRouter
 import com.tari.android.wallet.ui.common.CommonFragment
 
 internal class WalletRestoringFromSeedWordsFragment :

@@ -1,17 +1,17 @@
 import org.gradle.api.tasks.testing.logging.TestLogEvent
 
 buildscript {
-    ext.kotlin_version = "1.6.10"
-    ext.nav_version = "2.4.0-rc01"
+    ext.kotlin_version = "1.6.21"
+    ext.nav_version = "2.4.2"
 
     // build & version
-    ext.buildNumber = 185
-    ext.versionNumber = "0.9.2"
+    ext.buildNumber = 196
+    ext.versionNumber = "0.13.0"
 
     // JNI libs
-    ext.libwalletVersion = "0.22.1"
+    ext.libwalletVersion = "0.30.2"
     ext.libwalletHostURL = "https://tari-binaries.s3.amazonaws.com/libwallet/"
-    ext.supportedABIs = ["arm64-v8a", "armeabi-v7a", "x86_64"]
+    ext.supportedABIs = ["arm64-v8a", "x86_64"]
 
     repositories {
         google()
@@ -20,7 +20,7 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:7.0.4'
+        classpath 'com.android.tools.build:gradle:7.2.0-rc01'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
         classpath "io.sentry:sentry-android-gradle-plugin:2.1.5"
         classpath "androidx.navigation:navigation-safe-args-gradle-plugin:$nav_version"

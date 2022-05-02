@@ -92,7 +92,7 @@ internal class ConnectionIndicatorView : CommonView<ConnectionIndicatorViewModel
 
         with(viewModel) {
             observe(state) {
-                binding.dot.setBackgroundResource(it.resId)
+                ui.dot.setBackgroundResource(it.resId)
 
                 if (tooltipWindow.isTooltipShown) {
                     tooltipWindow.dismissTooltip()
@@ -104,7 +104,7 @@ internal class ConnectionIndicatorView : CommonView<ConnectionIndicatorViewModel
 
     private fun showTooltip() {
         val message = string(viewModel.state.value!!.messageId)
-        tooltipWindow.showToolTip(binding.root, message)
+        tooltipWindow.showToolTip(ui.root, message)
     }
 
     private fun isExistPoint(event: MotionEvent): Boolean {

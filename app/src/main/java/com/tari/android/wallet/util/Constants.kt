@@ -134,7 +134,6 @@ internal object Constants {
      * Wallet constants.
      */
     object Wallet {
-        const val torPort = 18101
         const val maxNumberOfRollingLogFiles = 2
         const val rollingLogFileMaxSizeBytes = 10 * 1024 * 1024
         const val discoveryTimeoutSec = 20L
@@ -142,7 +141,6 @@ internal object Constants {
         const val emojiIdLength = 33
         const val emojiFormatterChunkSize = 3
         const val pushNotificationServerUrl = "https://push.tari.com"
-        const val deepLinkURLPrefix = "tari://"
         const val pendingTxExpirationPeriodHours = 3 * 24
         const val backupDelayMs = 60 * 1000L
         const val backupRetryPeriodMs = 0L

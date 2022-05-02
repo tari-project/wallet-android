@@ -32,53 +32,56 @@
  */
 package com.tari.android.wallet.di
 
+import android.content.ClipboardManager
 import com.tari.android.wallet.application.TariWalletApplication
+import com.tari.android.wallet.application.deeplinks.DeeplinkViewModel
 import com.tari.android.wallet.service.BootDeviceReceiver
 import com.tari.android.wallet.service.WalletService
-import com.tari.android.wallet.ui.activity.AuthActivity
 import com.tari.android.wallet.ui.activity.SplashActivity
 import com.tari.android.wallet.ui.activity.debug.DebugActivity
 import com.tari.android.wallet.ui.activity.home.HomeActivity
-import com.tari.android.wallet.ui.activity.onboarding.OnboardingFlowActivity
-import com.tari.android.wallet.ui.fragment.qr.QRScannerActivity
-import com.tari.android.wallet.ui.activity.restore.WalletRestoreActivity
 import com.tari.android.wallet.ui.activity.settings.DeleteWalletActivity
-import com.tari.android.wallet.ui.activity.tx.TxDetailsActivity
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.component.networkStateIndicator.ConnectionIndicatorViewModel
+import com.tari.android.wallet.ui.fragment.auth.AuthActivity
+import com.tari.android.wallet.ui.fragment.auth.AuthViewModel
 import com.tari.android.wallet.ui.fragment.debug.DebugLogFragment
-import com.tari.android.wallet.ui.fragment.debug.baseNodeConfig.BaseNodeConfigFragment
 import com.tari.android.wallet.ui.fragment.debug.baseNodeConfig.BaseNodeConfigViewModel
 import com.tari.android.wallet.ui.fragment.debug.baseNodeConfig.addBaseNode.AddCustomBaseNodeViewModel
 import com.tari.android.wallet.ui.fragment.debug.baseNodeConfig.changeBaseNode.ChangeBaseNodeViewModel
-import com.tari.android.wallet.ui.fragment.onboarding.CreateWalletFragment
-import com.tari.android.wallet.ui.fragment.onboarding.IntroductionFragment
-import com.tari.android.wallet.ui.fragment.onboarding.LocalAuthFragment
-import com.tari.android.wallet.ui.fragment.profile.WalletInfoFragment
-import com.tari.android.wallet.ui.fragment.restore.chooseRestoreOption.ChooseRestoreOptionFragment
+import com.tari.android.wallet.ui.fragment.onboarding.activity.OnboardingFlowActivity
+import com.tari.android.wallet.ui.fragment.onboarding.createWallet.CreateWalletViewModel
+import com.tari.android.wallet.ui.fragment.onboarding.inroduction.IntroductionViewModel
+import com.tari.android.wallet.ui.fragment.onboarding.localAuth.LocalAuthViewModel
+import com.tari.android.wallet.ui.fragment.profile.WalletInfoViewModel
+import com.tari.android.wallet.ui.fragment.qr.QRScannerActivity
 import com.tari.android.wallet.ui.fragment.restore.chooseRestoreOption.ChooseRestoreOptionViewModel
 import com.tari.android.wallet.ui.fragment.restore.enterRestorationPassword.EnterRestorationPasswordViewModel
 import com.tari.android.wallet.ui.fragment.restore.inputSeedWords.InputSeedWordsViewModel
+import com.tari.android.wallet.ui.fragment.restore.restore.WalletRestoreActivity
 import com.tari.android.wallet.ui.fragment.restore.walletRestoringFromSeedWords.WalletRestoringFromSeedWordsViewModel
 import com.tari.android.wallet.ui.fragment.send.activity.SendTariActivity
-import com.tari.android.wallet.ui.fragment.send.addAmount.AddAmountFragment
+import com.tari.android.wallet.ui.fragment.send.addAmount.AddAmountViewModel
 import com.tari.android.wallet.ui.fragment.send.addNote.AddNoteFragment
+import com.tari.android.wallet.ui.fragment.send.addNote.gif.ChooseGIFDialogFragment
+import com.tari.android.wallet.ui.fragment.send.addNote.gif.ThumbnailGIFsViewModel
 import com.tari.android.wallet.ui.fragment.send.addRecepient.AddRecipientFragment
 import com.tari.android.wallet.ui.fragment.send.addRecepient.AddRecipientViewModel
-import com.tari.android.wallet.ui.fragment.send.finalize.FinalizeSendTxFragment
 import com.tari.android.wallet.ui.fragment.send.finalize.FinalizeSendTxViewModel
-import com.tari.android.wallet.ui.fragment.settings.allSettings.AllSettingsFragment
+import com.tari.android.wallet.ui.fragment.send.requestTari.RequestTariViewModel
 import com.tari.android.wallet.ui.fragment.settings.allSettings.AllSettingsViewModel
 import com.tari.android.wallet.ui.fragment.settings.backgroundService.BackgroundServiceSettingsViewModel
 import com.tari.android.wallet.ui.fragment.settings.backup.ChangeSecurePasswordFragment
 import com.tari.android.wallet.ui.fragment.settings.backup.EnterCurrentPasswordFragment
-import com.tari.android.wallet.ui.fragment.settings.backup.backupSettings.BackupSettingsFragment
 import com.tari.android.wallet.ui.fragment.settings.backup.backupSettings.BackupSettingsViewModel
 import com.tari.android.wallet.ui.fragment.settings.backup.verifySeedPhrase.VerifySeedPhraseViewModel
 import com.tari.android.wallet.ui.fragment.settings.networkSelection.NetworkSelectionViewModel
+import com.tari.android.wallet.ui.fragment.settings.torBridges.TorBridgesSelectionViewModel
+import com.tari.android.wallet.ui.fragment.settings.torBridges.customBridges.CustomTorBridgesViewModel
 import com.tari.android.wallet.ui.fragment.settings.userAutorization.BiometricAuthenticationViewModel
-import com.tari.android.wallet.ui.fragment.tx.TxListFragment
 import com.tari.android.wallet.ui.fragment.tx.TxListViewModel
+import com.tari.android.wallet.ui.fragment.tx.details.TxDetailsFragment
+import com.tari.android.wallet.ui.fragment.tx.details.gif.GIFViewModel
 import dagger.Component
 import javax.inject.Singleton
 
@@ -117,33 +120,22 @@ internal interface ApplicationComponent {
     fun inject(activity: HomeActivity)
     fun inject(activity: QRScannerActivity)
     fun inject(activity: SendTariActivity)
-    fun inject(activity: TxDetailsActivity)
+    fun inject(fragment: TxDetailsFragment)
     fun inject(activity: DebugActivity)
     fun inject(activity: DeleteWalletActivity)
 
     /**
      * Fragments.
      */
-    fun inject(fragment: IntroductionFragment)
-    fun inject(fragment: CreateWalletFragment)
     fun inject(fragment: AddRecipientFragment)
-    fun inject(fragment: AddAmountFragment)
     fun inject(fragment: AddNoteFragment)
-    fun inject(fragment: AddNoteFragment.ChooseGIFDialogFragment)
-    fun inject(fragment: FinalizeSendTxFragment)
-    fun inject(fragment: LocalAuthFragment)
+    fun inject(fragment: ChooseGIFDialogFragment)
     fun inject(fragment: DebugLogFragment)
-    fun inject(fragment: BaseNodeConfigFragment)
-    fun inject(fragment: AllSettingsFragment)
-    fun inject(fragment: WalletInfoFragment)
-    fun inject(fragment: TxListFragment)
     /**
      * Backup.
      */
-    fun inject(fragment: BackupSettingsFragment)
     fun inject(fragment: ChangeSecurePasswordFragment)
     fun inject(fragment: EnterCurrentPasswordFragment)
-    fun inject(fragment: ChooseRestoreOptionFragment)
     /**
      * Restore.
      */
@@ -153,8 +145,8 @@ internal interface ApplicationComponent {
      * ViewModels.
      */
     fun inject(commonViewModel: CommonViewModel)
-    fun inject(thumbnailGIFsViewModel: AddNoteFragment.ThumbnailGIFsViewModel)
-    fun inject(gifViewModel: TxDetailsActivity.GIFViewModel)
+    fun inject(thumbnailGIFsViewModel: ThumbnailGIFsViewModel)
+    fun inject(gifViewModel: GIFViewModel)
     fun inject(backgroundServiceSettingsViewModel: BackgroundServiceSettingsViewModel)
     fun inject(connectionIndicatorViewModel: ConnectionIndicatorViewModel)
     fun inject(chooseRestoreOptionViewModel: ChooseRestoreOptionViewModel)
@@ -172,6 +164,16 @@ internal interface ApplicationComponent {
     fun inject(allSettingsViewModel: AllSettingsViewModel)
     fun inject(addRecipientViewModel: AddRecipientViewModel)
     fun inject(finalizeSentTxListViewModel: FinalizeSendTxViewModel)
+    fun inject(walletInfoViewModel: WalletInfoViewModel)
+    fun inject(requestTariViewModel: RequestTariViewModel)
+    fun inject(addAmountViewModel: AddAmountViewModel)
+    fun inject(torBridgesSelectionViewModel: TorBridgesSelectionViewModel)
+    fun inject(customTorBridgeViewModel: CustomTorBridgesViewModel)
+    fun inject(deeplinkViewModel: DeeplinkViewModel)
+    fun inject(localAuthViewModel: LocalAuthViewModel)
+    fun inject(viewModel: CreateWalletViewModel)
+    fun inject(viewModel: IntroductionViewModel)
+    fun inject(viewModel: AuthViewModel)
     /**
      * Service(s).
      */
@@ -182,4 +184,5 @@ internal interface ApplicationComponent {
     */
     fun inject(receiver: BootDeviceReceiver)
 
+    fun getClipboardManager(): ClipboardManager
 }

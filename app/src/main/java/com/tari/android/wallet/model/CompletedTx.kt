@@ -34,6 +34,8 @@ package com.tari.android.wallet.model
 
 import android.os.Parcel
 import android.os.Parcelable
+import com.tari.android.wallet.ffi.FFICompletedTx
+import com.tari.android.wallet.ffi.FFIPointer
 import java.math.BigInteger
 
 /**
@@ -45,29 +47,27 @@ class CompletedTx() : Tx(), Parcelable {
 
     var fee = MicroTari(BigInteger("0"))
     var confirmationCount = BigInteger("0")
-    var status = TxStatus.COMPLETED
+    var txKernel: CompletedTransactionKernel? = null
 
-    constructor(
-        id: BigInteger,
-        direction: Direction,
-        user: User,
-        amount: MicroTari,
-        fee: MicroTari,
-        timestamp: BigInteger,
-        message: String,
-        status: TxStatus,
-        confirmationCount: BigInteger
-    ) : this() {
-        this.id = id
-        this.direction = direction
-        this.user = user
-        this.amount = amount
-        this.fee = fee
-        this.timestamp = timestamp
-        this.message = message
-        this.status = status
-        this.confirmationCount = confirmationCount
+    internal constructor(tx: FFICompletedTx) : this() {
+        this.id = tx.getId()
+        this.direction = tx.getDirection()
+        this.user = tx.getUser()
+        this.amount = MicroTari(tx.getAmount())
+        this.fee = MicroTari(tx.getFee())
+        this.timestamp = tx.getTimestamp()
+        this.message = tx.getMessage()
+        this.status = TxStatus.map(tx.getStatus())
+        this.confirmationCount = tx.getConfirmationCount()
+        runCatching { tx.getTransactionKernel() }.getOrNull()?.let {
+            this.txKernel = CompletedTransactionKernel(it.getExcess(), it.getExcessPublicNonce(), it.getExcessSignature())
+        }
+
+        tx.destroy()
     }
+
+    internal constructor(pointer: FFIPointer) : this(FFICompletedTx(pointer))
+
 
     // region Parcelable
 
@@ -88,7 +88,6 @@ class CompletedTx() : Tx(), Parcelable {
         override fun newArray(size: Int): Array<CompletedTx> {
             return Array(size) { CompletedTx() }
         }
-
     }
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {
@@ -126,5 +125,4 @@ class CompletedTx() : Tx(), Parcelable {
     }
 
     // endregion
-
 }

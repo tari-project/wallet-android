@@ -1,58 +1,45 @@
 package com.tari.android.wallet.ui.fragment.settings.backup.verifySeedPhrase
 
-import android.annotation.SuppressLint
 import android.content.Context
-import android.graphics.Typeface
-import android.util.TypedValue
-import android.view.ContextThemeWrapper
-import android.view.ViewGroup
-import androidx.appcompat.widget.AppCompatTextView
-import com.google.android.flexbox.FlexboxLayout
+import android.util.AttributeSet
+import android.view.LayoutInflater
+import android.widget.FrameLayout
+import androidx.core.content.ContextCompat
 import com.tari.android.wallet.R
-import com.tari.android.wallet.ui.component.CustomFont
-import com.tari.android.wallet.ui.extension.dimenPx
+import com.tari.android.wallet.databinding.ViewConfirmWordBinding
+import com.tari.android.wallet.ui.extension.setVisible
 
-@SuppressLint("ViewConstructor")
-class SelectableWordTextView(private val isSelectedFlag: Boolean, context: Context) : AppCompatTextView(context, null) {
+class SelectableWordTextView : FrameLayout {
 
-    private val avenirHeavy: Typeface
-            by lazy(LazyThreadSafetyMode.NONE) { CustomFont.AVENIR_LT_STD_BLACK.asTypeface(context) }
-    private val selectedWordEndMargin: Int
-            by lazy(LazyThreadSafetyMode.NONE) { dimenPx(R.dimen.verify_seed_phrase_selected_word_end_margin) }
-    private val wordBottomMargin: Int
-            by lazy(LazyThreadSafetyMode.NONE) { dimenPx(R.dimen.verify_seed_phrase_word_bottom_margin) }
-    private val selectableWordHorizontalPadding: Int
-            by lazy(LazyThreadSafetyMode.NONE) { dimenPx(R.dimen.verify_seed_phrase_selectable_word_horizontal_padding) }
-    private val selectableWordVerticalPadding: Int
-            by lazy(LazyThreadSafetyMode.NONE) { dimenPx(R.dimen.verify_seed_phrase_selectable_word_vertical_padding) }
-    private val selectableWordEndMargin: Int
-            by lazy(LazyThreadSafetyMode.NONE) { dimenPx(R.dimen.verify_seed_phrase_selectable_word_end_margin) }
-
-    init {
-        typeface = avenirHeavy
-        if (isSelectedFlag) {
-            setTextSize(TypedValue.COMPLEX_UNIT_DIP, 12f)
-            layoutParams = FlexboxLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
-                .apply { setMargins(0, 0, selectedWordEndMargin, wordBottomMargin) }
-
-        } else {
-            layoutParams = FlexboxLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
-                .apply { setMargins(0, 0, selectableWordEndMargin, wordBottomMargin) }
-
-            setPadding(
-                selectableWordHorizontalPadding,
-                selectableWordVerticalPadding,
-                selectableWordHorizontalPadding,
-                selectableWordVerticalPadding
-            )
-        }
+    constructor(context: Context) : super(context, null) {
+        init()
     }
 
-    companion object {
-        fun createSelectableWord(context: Context, isSelectedFlag: Boolean): SelectableWordTextView {
-            val theme = if (isSelectedFlag) R.style.SelectedSeedPhraseWord else R.style.SelectableSeedPhraseWord
-            val themedContext = ContextThemeWrapper(context, theme)
-            return SelectableWordTextView(isSelectedFlag, themedContext)
+    constructor(context: Context, attrs: AttributeSet?) : super(context, attrs) {
+        init()
+    }
+
+    constructor(context: Context, attrs: AttributeSet, defStyleAttr: Int) : super(
+        context,
+        attrs,
+        defStyleAttr
+    ) {
+        init()
+    }
+
+    constructor(context: Context, isSelected: Boolean) : super(context, null) {
+        init(isSelected)
+    }
+
+    lateinit var ui: ViewConfirmWordBinding
+
+    private fun init(isSelected: Boolean = false) {
+        ui = ViewConfirmWordBinding.inflate(LayoutInflater.from(context), this, false).apply {
+            text.background = null
+            text.setPadding(0, 0, 0, 0)
         }
+        ui.root.background = ContextCompat.getDrawable(context, R.drawable.restoring_seed_phrase_word_background)
+        ui.removeView.setVisible(isSelected)
+        addView(ui.root)
     }
 }

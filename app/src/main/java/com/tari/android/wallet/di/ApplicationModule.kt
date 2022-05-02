@@ -41,18 +41,22 @@ import androidx.biometric.BiometricManager
 import androidx.core.content.ContextCompat
 import com.tari.android.wallet.BuildConfig
 import com.tari.android.wallet.application.TariWalletApplication
+import com.tari.android.wallet.application.deeplinks.DeeplinkHandler
 import com.tari.android.wallet.data.WalletConfig
 import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodeSharedRepository
 import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepository
 import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepositoryImpl
+import com.tari.android.wallet.data.sharedPrefs.tariSettings.TariSettingsSharedRepository
 import com.tari.android.wallet.data.sharedPrefs.testnetFaucet.TestnetFaucetRepository
+import com.tari.android.wallet.data.sharedPrefs.tor.TorSharedRepository
 import com.tari.android.wallet.infrastructure.security.biometric.BiometricAuthenticationService
 import com.tari.android.wallet.notification.NotificationHelper
 import com.tari.android.wallet.service.WalletServiceLauncher
 import com.tari.android.wallet.ui.common.domain.ResourceManager
 import com.tari.android.wallet.ui.common.gyphy.GiphyEcosystem
-import com.tari.android.wallet.ui.dialog.backup.BackupSettingsRepository
+import com.tari.android.wallet.ui.fragment.settings.backup.BackupSettingsRepository
+import com.tari.android.wallet.yat.YatSharedRepository
 import dagger.Module
 import dagger.Provides
 import java.io.File
@@ -90,6 +94,11 @@ internal class ApplicationModule(
 
     @Provides
     @Singleton
+    fun provideTariSettingsSharedRepository(prefs: SharedPreferences, networkRepository: NetworkRepository): TariSettingsSharedRepository =
+        TariSettingsSharedRepository(prefs, networkRepository)
+
+    @Provides
+    @Singleton
     fun provideNetworkRepository(resourceManager: ResourceManager, prefs: SharedPreferences): NetworkRepository =
         NetworkRepositoryImpl(resourceManager, prefs)
 
@@ -100,15 +109,33 @@ internal class ApplicationModule(
 
     @Provides
     @Singleton
+    fun provideTorSharedRepository(prefs: SharedPreferences, networkRepository: NetworkRepository): TorSharedRepository =
+        TorSharedRepository(prefs, networkRepository)
+
+    @Provides
+    @Singleton
     fun provideSharedPrefsRepository(
         context: Context,
         prefs: SharedPreferences,
         backupSettingsRepository: BackupSettingsRepository,
         baseNodeSharedRepository: BaseNodeSharedRepository,
         networkRepository: NetworkRepository,
-        testnetFaucetRepository: TestnetFaucetRepository
+        testnetFaucetRepository: TestnetFaucetRepository,
+        yatSharedRepository: YatSharedRepository,
+        torSharedRepository: TorSharedRepository,
+        tariSettingsSharedRepository: TariSettingsSharedRepository
     ): SharedPrefsRepository =
-        SharedPrefsRepository(context, prefs, networkRepository, backupSettingsRepository, baseNodeSharedRepository, testnetFaucetRepository)
+        SharedPrefsRepository(
+            context,
+            prefs,
+            networkRepository,
+            backupSettingsRepository,
+            baseNodeSharedRepository,
+            testnetFaucetRepository,
+            yatSharedRepository,
+            torSharedRepository,
+            tariSettingsSharedRepository
+        )
 
     @Provides
     @Singleton
@@ -116,8 +143,12 @@ internal class ApplicationModule(
 
     @Provides
     @Singleton
-    fun provideWalletServiceLauncher(context: Context, prefsRepository: SharedPrefsRepository, walletConfig: WalletConfig): WalletServiceLauncher =
-        WalletServiceLauncher(context, walletConfig, prefsRepository)
+    fun provideWalletServiceLauncher(
+        context: Context,
+        tariSettingsSharedRepository: TariSettingsSharedRepository,
+        walletConfig: WalletConfig
+    ): WalletServiceLauncher =
+        WalletServiceLauncher(context, walletConfig, tariSettingsSharedRepository)
 
     @Provides
     @Singleton
@@ -135,6 +166,10 @@ internal class ApplicationModule(
             BiometricManager.from(context),
             context.getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager
         )
+
+    @Provides
+    @Singleton
+    fun provideDeeplinkHandler(networkRepository: NetworkRepository): DeeplinkHandler = DeeplinkHandler(networkRepository)
 
     @Provides
     @Singleton

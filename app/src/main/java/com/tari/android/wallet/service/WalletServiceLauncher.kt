@@ -5,10 +5,10 @@ import android.content.Intent
 import androidx.core.content.ContextCompat
 import com.tari.android.wallet.application.TariWalletApplication
 import com.tari.android.wallet.data.WalletConfig
-import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
+import com.tari.android.wallet.data.sharedPrefs.tariSettings.TariSettingsSharedRepository
 import com.tari.android.wallet.util.WalletUtil
 
-class WalletServiceLauncher(private val context: Context, val walletConfig: WalletConfig, val sharedPrefsRepository: SharedPrefsRepository) {
+class WalletServiceLauncher(private val context: Context, val walletConfig: WalletConfig, val tariSettingsSharedRepository: TariSettingsSharedRepository) {
 
     companion object {
         // intent actions
@@ -24,8 +24,8 @@ class WalletServiceLauncher(private val context: Context, val walletConfig: Wall
     }
 
     fun start() {
-        if (sharedPrefsRepository.backgroundServiceTurnedOn ||
-            !sharedPrefsRepository.backgroundServiceTurnedOn && TariWalletApplication.INSTANCE.get()?.isInForeground == true
+        if (tariSettingsSharedRepository.backgroundServiceTurnedOn ||
+            !tariSettingsSharedRepository.backgroundServiceTurnedOn && TariWalletApplication.INSTANCE.get()?.isInForeground == true
         ) {
             startService()
         }
@@ -56,13 +56,13 @@ class WalletServiceLauncher(private val context: Context, val walletConfig: Wall
     }
 
     fun startOnAppForegrounded() {
-        if (!sharedPrefsRepository.backgroundServiceTurnedOn) {
+        if (!tariSettingsSharedRepository.backgroundServiceTurnedOn) {
             start()
         }
     }
 
     fun stopOnAppBackgrounded() {
-        if (!sharedPrefsRepository.backgroundServiceTurnedOn) {
+        if (!tariSettingsSharedRepository.backgroundServiceTurnedOn) {
             stop()
         }
     }

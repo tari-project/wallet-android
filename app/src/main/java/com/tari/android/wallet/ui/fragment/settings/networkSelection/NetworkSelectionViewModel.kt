@@ -59,7 +59,7 @@ class NetworkSelectionViewModel : CommonViewModel() {
                 resourceManager.getString(R.string.all_settings_select_network_confirm_description),
                 onConfirm = { changeNetwork(networkViewHolderItem.network) }
             )
-            _confirmDialog.postValue(confirmDialogArgs)
+            _modularDialog.postValue(confirmDialogArgs.getModular(resourceManager))
         } else {
             changeNetwork(networkViewHolderItem.network)
         }

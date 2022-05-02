@@ -32,7 +32,6 @@
  */
 package com.tari.android.wallet.ui.fragment.settings.allSettings
 
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -41,44 +40,26 @@ import android.view.ViewGroup
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.tari.android.wallet.R
-import com.tari.android.wallet.R.color.all_settings_back_up_status_processing
+import com.tari.android.wallet.R.string.*
 import com.tari.android.wallet.databinding.FragmentAllSettingsBinding
-import com.tari.android.wallet.di.DiContainer.appComponent
-import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.extension.observe
 import com.tari.android.wallet.infrastructure.BugReportingService
-import com.tari.android.wallet.infrastructure.security.biometric.BiometricAuthenticationService
 import com.tari.android.wallet.ui.activity.settings.BackupSettingsActivity
 import com.tari.android.wallet.ui.activity.settings.DeleteWalletActivity
 import com.tari.android.wallet.ui.common.CommonFragment
-import com.tari.android.wallet.ui.extension.*
+import com.tari.android.wallet.ui.extension.string
 import com.tari.android.wallet.ui.fragment.settings.backgroundService.BackgroundServiceSettingsActivity
 import com.tari.android.wallet.ui.fragment.settings.userAutorization.BiometricAuthenticationViewModel
-import com.tari.android.wallet.util.Constants
-import com.tari.android.wallet.yat.YatAdapter
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import javax.inject.Inject
-import kotlin.math.min
 
 internal class AllSettingsFragment : CommonFragment<FragmentAllSettingsBinding, AllSettingsViewModel>() {
 
-    @Inject
-    lateinit var authService: BiometricAuthenticationService
-
-    @Inject
-    lateinit var bugReportingService: BugReportingService
-
-    @Inject
-    lateinit var yatAdapter: YatAdapter
+    private val optionsAdapter = AllSettingsOptionAdapter()
 
     private val biometricAuthenticationViewModel: BiometricAuthenticationViewModel by viewModels()
-
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-        appComponent.inject(this)
-    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
         FragmentAllSettingsBinding.inflate(inflater, container, false).also { ui = it }.root
@@ -97,26 +78,8 @@ internal class AllSettingsFragment : CommonFragment<FragmentAllSettingsBinding, 
     }
 
     private fun setupUI() {
-        ui.cloudBackupStatusProgressView.setColor(color(all_settings_back_up_status_processing))
-        ui.scrollElevationGradientView.alpha = 0f
-        ui.scrollView.setOnScrollChangeListener(ScrollListener())
-        bindCTAs()
-    }
-
-    private fun bindCTAs() = with(ui) {
-        reportBugCtaView.setOnThrottledClickListener { viewModel.shareBugReport() }
-        visitSiteCtaView.setOnThrottledClickListener { viewModel.openTariUrl() }
-        contributeCtaView.setOnThrottledClickListener { viewModel.openGithubUrl() }
-        userAgreementCtaView.setOnThrottledClickListener { viewModel.openAgreementUrl() }
-        privacyPolicyCtaView.setOnThrottledClickListener { viewModel.openPrivateUrl() }
-        disclaimerCtaView.setOnThrottledClickListener { viewModel.openDisclaimerUrl() }
-        backUpWalletCtaView.setOnThrottledClickListener { viewModel.navigateToBackupSettings() }
-        backgroundServiceCtaView.setOnThrottledClickListener { viewModel.navigateToBackgroundServiceSettings() }
-        changeBaseNodeCtaView.setOnThrottledClickListener { viewModel.navigateToBaseNodeSelection() }
-        changeNetworkCtaView.setOnThrottledClickListener { viewModel.navigateToNetworkSelection() }
-        backgroundServiceCtaView.setOnThrottledClickListener { viewModel.navigateToBackgroundServiceSettings() }
-        deleteWalletCtaView.setOnThrottledClickListener { viewModel.navigateToDeleteWallet() }
-        connectYats.setOnThrottledClickListener { yatAdapter.openOnboarding(requireActivity()) }
+        ui.optionsList.layoutManager = LinearLayoutManager(requireContext())
+        ui.optionsList.adapter = optionsAdapter
     }
 
     private fun observeUI() = with(viewModel) {
@@ -124,37 +87,15 @@ internal class AllSettingsFragment : CommonFragment<FragmentAllSettingsBinding, 
 
         observe(shareBugReport) { this@AllSettingsFragment.shareBugReport() }
 
-        observe(backupState) { activateBackupStatusView(it) }
+        observe(openYatOnboarding) { yatAdapter.openOnboarding(requireActivity()) }
 
-        observe(lastBackupDate) { ui.lastBackupTimeTextView.text = it }
-    }
-
-    private fun activateBackupStatusView(backupState: PresentationBackupState) {
-        val iconView = when (backupState.status) {
-            PresentationBackupState.BackupStateStatus.InProgress -> ui.cloudBackupStatusProgressView
-            PresentationBackupState.BackupStateStatus.Success -> ui.cloudBackupStatusSuccessView
-            PresentationBackupState.BackupStateStatus.Warning -> ui.cloudBackupStatusWarningView
-            PresentationBackupState.BackupStateStatus.Scheduled -> ui.cloudBackupStatusScheduledView
-        }
-
-        fun View.adjustVisibility() {
-            visibility = if (this == iconView) View.VISIBLE else View.INVISIBLE
-        }
-
-        ui.cloudBackupStatusProgressView.adjustVisibility()
-        ui.cloudBackupStatusSuccessView.adjustVisibility()
-        ui.cloudBackupStatusWarningView.adjustVisibility()
-        ui.cloudBackupStatusScheduledView.adjustVisibility()
-        val hideText = backupState.textId == -1
-        ui.backupStatusTextView.text = if (hideText) "" else string(backupState.textId)
-        ui.backupStatusTextView.visibility = if (hideText) View.GONE else View.VISIBLE
-        if (backupState.textColor != -1) ui.backupStatusTextView.setTextColor(color(backupState.textColor))
+        observe(allSettingsOptions) { optionsAdapter.update(it) }
     }
 
     private fun shareBugReport() {
         lifecycleScope.launch(Dispatchers.IO) {
             try {
-                bugReportingService.shareBugReport(requireActivity())
+                viewModel.bugReportingService.shareBugReport(requireActivity())
             } catch (e: BugReportingService.BugReportFileSizeLimitExceededException) {
                 showBugReportFileSizeExceededDialog()
             }
@@ -163,10 +104,10 @@ internal class AllSettingsFragment : CommonFragment<FragmentAllSettingsBinding, 
 
     private fun showBugReportFileSizeExceededDialog() {
         val dialogBuilder = AlertDialog.Builder(context ?: return)
-        val dialog = dialogBuilder.setMessage(string(R.string.debug_log_file_size_limit_exceeded_dialog_content))
+        val dialog = dialogBuilder.setMessage(string(debug_log_file_size_limit_exceeded_dialog_content))
             .setCancelable(false)
-            .setPositiveButton(string(R.string.common_ok)) { dialog, _ -> dialog.cancel() }
-            .setTitle(getString(R.string.debug_log_file_size_limit_exceeded_dialog_title))
+            .setPositiveButton(string(common_ok)) { dialog, _ -> dialog.cancel() }
+            .setTitle(getString(debug_log_file_size_limit_exceeded_dialog_title))
             .create()
         dialog.show()
     }
@@ -190,23 +131,6 @@ internal class AllSettingsFragment : CommonFragment<FragmentAllSettingsBinding, 
     override fun onDestroyView() {
         ui.scrollView.setOnScrollChangeListener(null)
         super.onDestroyView()
-    }
-
-    override fun onDestroy() {
-        EventBus.backupState.unsubscribe(this)
-        super.onDestroy()
-    }
-
-    inner class ScrollListener : View.OnScrollChangeListener {
-
-        override fun onScrollChange(v: View?, scrollX: Int, scrollY: Int, oldScrollX: Int, oldScrollY: Int) {
-            ui.scrollElevationGradientView.alpha =
-                min(Constants.UI.scrollDepthShadowViewMaxOpacity, scrollY / (dimenPx(R.dimen.menu_item_height)).toFloat())
-        }
-    }
-
-    companion object {
-        fun newInstance() = AllSettingsFragment()
     }
 }
 

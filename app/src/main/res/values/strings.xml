@@ -11,9 +11,13 @@
     <string name="user_agreement_url">https://www.tari.com/user_agreement/</string>
     <string name="privacy_policy_url">https://www.tari.com/privacy_policy/</string>
     <string name="disclaimer_url">https://www.tari.com/disclaimer/</string>
+    <string name="explorer_url">https://explore.tari.com</string>
+    <string name="explorer_kernel_url">https://explore.tari.com/kernel/</string>
+    <string name="tor_bridges_url">https://bridges.torproject.org/bridges</string>
     <string name="ffi_admin_email_address" translatable="false">bug_reports@tari.com</string>
     <string name="tari_lab_university_url" translatable="false">https://tlu.tarilabs.com/</string>
     <string name="network_faucet_url" translatable="false">https://faucet.tari.com</string>
+    <string name="dibbler_faucet_url" translatable="false">https://dibbler-faucet.tari.com</string>
 
     <!-- digits -->
     <string name="digit_0">0</string>
@@ -69,6 +73,16 @@
     <string name="error_fee_more_than_amount_title">Amount Error</string>
     <string name="error_fee_more_than_amount_description">Sorry, the amount cannot be less than the fee.</string>
 
+    <string name="error_code_prefix">Error Code:</string>
+    <string name="error_wallet_message_generic">Something went wrong! Please try again later. Please send us a bug report if this problem persists.</string>
+    <string name="error_wallet_message_114">Something went wrong processing output. Please try again later or contact the support.</string>
+    <string name="error_wallet_message_204">Transaction not found. Please try again later. Please submit a bug report using the \"Report a Bug\" option from the settings menu if this problem appears again.</string>
+    <string name="error_wallet_message_401">Contact not found. Please try again later. Please submit a bug report using the \"Report a Bug\" option from the settings menu if this problem appears again.</string>
+    <string name="error_wallet_message_420">Wallet was not encrypted but a passphrase was supplied. Please try again later or try to restore your wallet.</string>
+    <string name="error_wallet_message_428">Unable to decrypt the wallet. Please try again later or try to restore your wallet.</string>
+    <string name="error_wallet_message_429">Unable to recover your wallet from provided seed words. Please check the list of entered seed words and try again.</string>
+    <string name="error_wallet_message_430">The provided seed words are not compatible with the current wallet version. Please get in touch with support for more details.</string>
+
     <!-- common -->
     <string name="common_continue">Continue</string>
     <string name="common_from">From</string>
@@ -108,7 +122,7 @@
 
     <!-- testnet UTXO messages -->
     <string name="faucet_error_title">Failed to claim tXTR</string>
-    <string name="faucet_error_too_many_allocation_attemps">You have made too many free tXTR requests.</string>
+    <string name="faucet_error_common">No free tXTR is available right now! Hang tight, we\'ll get you some tXTR the moment it is available.</string>
     <string name="first_testnet_utxo_tx_message">💸 Here’s some tXTR!</string>
     <string name="second_testnet_utxo_tx_message">Nice work! Here\'s more tXTR to fill your coffers. Be sure to hit the Store icon to see real, exclusive items you can redeem with your "hard-earned" tXTR.</string>
 
@@ -144,8 +158,6 @@
     <!-- auth -->
     <string name="proceed">Proceed</string>
     <string name="exit">Exit</string>
-    <string name="wallet_error_title">Wallet corrupted</string>
-    <string name="wallet_error_description">We are in process of developing an application and sometimes happening that we need to update our internal data. We updated the protocol version in this update and, unfortunately, need to ask you to do a hard reset. The wallet will be deleted. If you want to save your funds, download the older version and make a backup. Do you ready to delete your wallet?</string>
     <!-- begin :: dialog -->
     <string name="onboarding_auth_title">Secure your wallet</string>
     <string name="onboarding_auth_biometric_prompt">Please enter your biometrics. Tari Aurora will require it each time you open the app.</string>
@@ -180,6 +192,11 @@
     <string name="home_navigation_content_description_navigate_to_send_tari">Navigate to Tari send flow</string>
     <string name="home_pending_transactions_title">Pending Transactions</string>
     <string name="home_completed_transactions_title">Completed Transactions</string>
+    <string name="home_custom_base_node_title">Add custom base node</string>
+    <string name="home_custom_base_node_description">The QR code is a deep link request to assign your wallet to use this base node.</string>
+    <string name="home_custom_base_node_full_description"><![CDATA[<strong>Name: </strong>%s<br><br><strong>Peer:</strong><br>%s]]></string>
+    <string name="home_custom_base_node_yes_button">Yes! Let\'s do it!</string>
+    <string name="home_custom_base_node_no_button">Not this time</string>
     <!--home tari bot dialog-->
     <string name="home_tari_bot_you_got_tari_dlg_title">You just got some tXTR!</string>
     <string name="home_tari_bot_you_got_tari_dlg_title_bold_part">tXTR!</string>
@@ -226,6 +243,20 @@
     <string name="tx_list_now">Now</string>
     <string name="tx_list_loading_gif">Loading GIF</string>
     <string name="tx_list_retry_loading_gif">Retry loading GIF</string>
+    <string name="tx_list_emoji_one_side_payment_placeholder">➡️</string>
+    <string name="tx_list_someone">Someone</string>
+    <string name="tx_list_you_received_one_side_payment">You received a one side payment</string>
+
+    <!-- send tari -->
+    <string name="send_tari_title">Send Tari</string>
+    <string name="request_tari_title">Request Tari</string>
+    <string name="send_tari_subtitle">Send</string>
+    <string name="request_tari_subtitle">Request</string>
+
+    <!-- request tari -->
+    <string name="request_tari_generate_qr_code">Generate QR Code</string>
+    <string name="request_tari_share">Share</string>
+    <string name="request_tari_share_text">Hi! Please send me %s Tari(s) using this link: %s</string>
 
     <!-- send tari - add recipient -->
     <string name="add_recipient_title">Send To</string>
@@ -245,6 +276,8 @@
     <string name="add_amount_funds_pending">Sorry, you can’t send this much tXTR. Please wait for at least one transaction to complete and then try again.</string>
     <string name="add_amount_tx_fee">Transaction Fee</string>
     <string name="add_amount_wallet_balance">Wallet Balance</string>
+    <string name="add_amount_one_side_payment_switcher">One Sided Payment</string>
+    <string name="add_amount_one_side_payment_question_mark">One-sided payments are broadcast instantly and do not require the recipient to be online. But they are less private. Use them if you know the recipient is offline for long periods, or for things like \'tip-jars\'.</string>
 
     <!-- send tari - note -->
     <string name="add_note_prompt">Transaction Note</string>
@@ -266,6 +299,8 @@
     <!-- wallet info -->
     <string name="wallet_info_my_profile">My Profile</string>
     <string name="wallet_info_qr_code_desc">Transacting in person? Others can scan this QR code from the Tari Aurora App to send you tXTR.</string>
+    <string name="wallet_info_yat_disconnected_description">You\'ve previously connected this Yat.\n Do you want to re-connect it to your wallet?</string>
+    <string name="wallet_info_yat_disconnected_reconnect">Reconnect Yat</string>
 
     <!-- tx failed dialog -->
     <string name="tx_failed_title">Sorry, you can\'t send tXTR to offline users</string>
@@ -277,6 +312,8 @@
     <string name="tx_detail_payment_sent">Payment Sent</string>
     <string name="tx_detail_pending_payment_received">Payment In Progress</string>
     <string name="tx_detail_contact_name">Contact Name</string>
+    <string name="tx_detail_explorer_title">Information</string>
+    <string name="tx_detail_explorer_button">View on the Block Explorer</string>
     <string name="tx_detail_create_contact_hint">Add Contact Name</string>
     <string name="tx_detail_note">Note</string>
     <string name="tx_detail_edit">Edit</string>
@@ -295,6 +332,15 @@
     <string name="tx_details_cancel_dialog_not_cancel">Not now</string>
     <string name="tx_details_error_tx_not_found_title">Requested transaction was not found</string>
     <string name="tx_details_error_tx_not_found_desc">Please try again later</string>
+
+    <string name="tx_details_cancellation_reason_unknown">The transaction failed for an unknown reason.</string>
+    <string name="tx_details_cancellation_reason_user_cancelled">The transaction was canceled by the sender.</string>
+    <string name="tx_details_cancellation_reason_timeout">The transaction failed due to timeout.</string>
+    <string name="tx_details_cancellation_reason_double_spend">The transaction was cancelled as it is spending funds that have already been spent.</string>
+    <string name="tx_details_cancellation_reason_orphan">The transaction was cancelled due to some funds being spent no longer being present in the chain.</string>
+    <string name="tx_details_cancellation_reason_time_locked">This transaction was cancelled due to the funds not having reached their time-lock period yet.</string>
+    <string name="tx_details_cancellation_reason_invalid_transaction">The transaction failed to the invalid input data. This situation shouldn\'t happen. Please send a bug report or contact us directly.</string>
+    <string name="tx_details_cancellation_reason_abandoned_coinbase">The coinbase was abandoned.</string>
 
     <!-- Fee tooltip -->
     <string name="tx_detail_fee_tooltip_transaction_fee">Transaction Fee</string>
@@ -351,7 +397,9 @@
     <string name="all_settings_user_agreement">User Agreement</string>
     <string name="all_settings_privacy_policy">Privacy Policy</string>
     <string name="all_settings_disclaimer">Disclaimer</string>
+    <string name="all_settings_explorer">Block Explorer</string>
     <string name="all_settings_background_service">Background Service</string>
+    <string name="all_settings_bridge_configuration">Bridge Configuration</string>
     <string name="all_settings_manage_yats">Manage Yats</string>
     <string name="all_settings_connect_yats">Connect Yats</string>
     <string name="all_settings_select_base_node">Select Base Node</string>
@@ -360,6 +408,8 @@
     <string name="all_settings_select_network_description">Please select the network to which you want to connect</string>
     <string name="all_settings_select_network_confirm_title">One thing before you go</string>
     <string name="all_settings_select_network_confirm_description">You will be logged out and switched to a different network. Do you want to continue?</string>
+    <string name="all_settings_version_text_copy_title">Tari Wallet Version</string>
+    <string name="all_settings_version_text_copy_toast_message">Tari version was copied</string>
 
     <!-- Background service -->
     <string name="background_service_title">Background service</string>
@@ -437,10 +487,12 @@
     <string name="restore_wallet_error_file_not_found">Wallet could not be restored. Backup does not exist.</string>
     <string name="restore_wallet_restore_cta">Restore Wallet</string>
     <string name="restore_wallet_password_match_error">@string/enter_backup_password_password_match_error</string>
+    <string name="restore_wallet_output_message">You recovered some funds</string>
 
     <!-- Wallet recovery with seed phrase -->
     <string name="restore_from_seed_words_title">Restore With Seed Phrase</string>
     <string name="restore_from_seed_words_description">Enter your seed phrase to restore your wallet</string>
+    <string name="restore_from_seed_words_select_node">Select base node</string>
     <string name="restore_from_seed_words_submit_title">Restore Wallet</string>
 
     <string name="restore_from_seed_words_error_invalid_seed_word">At least one of the entered seed words is invalid. Please review them and try again</string>
@@ -488,12 +540,32 @@
     <!-- Network status indicator-->
     <string name="connection_status_ok">Everything ok. Move along, nothing to see here</string>
     <string name="connection_status_warning_sync_in_progress">Syncing with base node</string>
-    <string name="connection_status_warning_sync_failed">Unable to sync with base node</string>
     <string name="connection_status_error_no_network_connection">Unable to connect with internet</string>
     <string name="connection_status_error_unknown_network_connection_status">Unknown internet connection status</string>
     <string name="connection_status_error_disconnected_from_tor">Failed to connect with Tor</string>
     <string name="connection_status_error_connecting_with_tor">Connecting with Tor</string>
     <string name="connection_status_error_unknown_tor_connection_status">Unknown connection status with Tor</string>
     <string name="connection_status_error_disconnected_from_base_node">Disconnected from the base node</string>
+
+    <string name="tor_bridges_title">Bridges Configuration</string>
+    <string name="tor_bridges_connect">Connect</string>
+    <string name="tor_bridges_no_bridges">No Bridges</string>
+    <string name="tor_bridges_custom_bridges">Custom Bridges</string>
+    <string name="tor_bridges_description">If you are in a country or using a connection that censor Tor, you might need to use bridges</string>
+    <string name="tor_bridges_paste_bridges">Paste Bridges</string>
+    <string name="tor_bridges_hint" formatted="false">Available formates:\n• obfs4 &lt;IP ADDRESS>:&lt;PORT> &lt;FINGERPRINT> cert=&lt;CERTIFICATE> iat-mode=&lt;value>\nexample:\nobfs4 192.95.36.142:443 CDF2E852BF539B82BD10E27E9115A31734E378C2 cert=qUVQ0srL1JI/vO6V6m/24anYXiJD3QP2HgzUKQtQ7GRqqUvs7P+tG43RtAqdhLOALP7DJQ iat-mode=1\n\n • &lt;IP ADDRESS>:&lt;PORT> &lt;FINGERPRINT>\nexample:\n78.156.103.189:9301 2BD90810282F8B331FC7D47705167166253E1442"</string>
+    <string name="tor_bridges_request">Request Bridges from torproject.org</string>
+    <string name="tor_bridges_scan_qr">Scan QR Code</string>
+    <string name="tor_bridges_upload_qr_code">Upload QR Code</string>
+    <string name="tor_bridges_incorrect_format">Incorrect tor bridge format</string>
+    <string name="tor_bridges_connecting_error_title">Connection error</string>
+    <string name="tor_bridges_connecting_error_description">Can\'t connect to the bridge because: %s</string>
+    <string name="tor_bridges_connection_progress_title">Connecting to the TOR</string>
+    <string name="tor_bridges_connection_progress_description">Trying to connect to the TOR</string>
+    <string name="tor_bridges_connection_progress_description_full">"Trying to connect to the TOR:\n%s\nProgress: %s%%"</string>
+    <string name="tor_bridges_connection_progress_successful_title">Connection to the TOR</string>
+    <string name="tor_bridges_connection_progress_successful_description">Connecting to TOR connection was established successfully\n</string>
+    <string name="tor_bridges_connection_progress_successful_no_bridges">No used bridges</string>
+    <string name="tor_bridges_connection_progress_successful_used_bridges">Used bridges\n</string>
 
 </resources>

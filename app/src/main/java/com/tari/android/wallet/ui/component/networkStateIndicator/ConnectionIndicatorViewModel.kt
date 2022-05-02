@@ -5,7 +5,6 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import com.tari.android.wallet.R
 import com.tari.android.wallet.event.EventBus
-import com.tari.android.wallet.model.BaseNodeValidationResult
 import com.tari.android.wallet.network.NetworkConnectionState
 import com.tari.android.wallet.service.baseNode.BaseNodeState
 import com.tari.android.wallet.tor.TorProxyState
@@ -42,20 +41,13 @@ internal class ConnectionIndicatorViewModel : CommonViewModel() {
             NetworkConnectionState.DISCONNECTED -> ConnectionIndicatorState.Disconnected(R.string.connection_status_error_no_network_connection)
             NetworkConnectionState.CONNECTED -> {
                 when (_torProxyState.value) {
-                    TorProxyState.Failed -> ConnectionIndicatorState.Disconnected(R.string.connection_status_error_disconnected_from_tor)
+                    is TorProxyState.Failed -> ConnectionIndicatorState.Disconnected(R.string.connection_status_error_disconnected_from_tor)
                     TorProxyState.Initializing -> ConnectionIndicatorState.Disconnected(R.string.connection_status_error_unknown_network_connection_status)
                     TorProxyState.NotReady -> ConnectionIndicatorState.Disconnected(R.string.connection_status_error_connecting_with_tor)
                     is TorProxyState.Running -> {
-                        when (val validationResult = _baseNodeState.value) {
-                            is BaseNodeState.SyncCompleted -> {
-                                when (validationResult.result) {
-                                    BaseNodeValidationResult.SUCCESS -> ConnectionIndicatorState.Connected(R.string.connection_status_ok)
-                                    BaseNodeValidationResult.FAILURE,
-                                    BaseNodeValidationResult.BASE_NODE_NOT_IN_SYNC,
-                                    BaseNodeValidationResult.ABORTED -> ConnectionIndicatorState.ConnectedWithIssues(R.string.connection_status_warning_sync_failed)
-                                }
-                            }
+                        when (_baseNodeState.value) {
                             is BaseNodeState.SyncStarted -> ConnectionIndicatorState.ConnectedWithIssues(R.string.connection_status_warning_sync_in_progress)
+                            is BaseNodeState.Online -> ConnectionIndicatorState.Connected(R.string.connection_status_ok)
                             else -> ConnectionIndicatorState.Disconnected(R.string.connection_status_error_disconnected_from_base_node)
                         }
                     }

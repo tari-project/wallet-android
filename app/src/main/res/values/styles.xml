@@ -10,6 +10,7 @@
         <!--item name="android:windowDrawsSystemBarBackgrounds">true</item-->
         <item name="android:statusBarColor">@android:color/black</item>
         <item name="android:navigationBarColor">@android:color/black</item>
+        <item name="alertDialogTheme">@style/AlertDialogTheme</item>
     </style>
 
     <!-- splash screen theme -->
@@ -30,6 +31,20 @@
       Style that makes a dialog placed to the bottom slide from bottom on show and to bottom on hide.
       Simply put - like on iOS.
     -->
+
+    <style name="AlertDialogTheme" parent="ThemeOverlay.AppCompat.Dialog.Alert">
+        <item name="buttonBarNegativeButtonStyle">@style/NegativeButtonStyle</item>
+        <item name="buttonBarPositiveButtonStyle">@style/PositiveButtonStyle</item>
+    </style>
+
+    <style name="NegativeButtonStyle" parent="Widget.AppCompat.Button.ButtonBar.AlertDialog">
+        <item name="android:textColor">@color/common_error</item>
+    </style>
+
+    <style name="PositiveButtonStyle" parent="Widget.AppCompat.Button.ButtonBar.AlertDialog">
+        <item name="android:textColor">@color/accent</item>
+    </style>
+
     <style name="BottomSlideDialog" parent="Theme.AppCompat.Dialog">
         <item name="android:windowAnimationStyle">@style/BottomSlideDialogAnimation</item>
     </style>
@@ -53,22 +68,20 @@
         <item name="colorAccent">@color/seed_phrase_checkbox</item>
     </style>
 
-    <style name="SelectedSeedPhraseWord" parent="android:Widget.TextView">
-        <item name="android:textSize">12sp</item>
-        <item name="android:textColor">@color/dark_gray</item>
-    </style>
-
-    <style name="SelectableSeedPhraseWord" parent="android:Widget.TextView">
-        <item name="android:textSize">14sp</item>
-        <item name="android:textColor">@color/dark_gray</item>
-        <item name="android:background">@drawable/selectable_seed_phrase_word_background</item>
-    </style>
 
     <!-- Google sign in activity transition overrides -->
     <style name="GoogleSignInActivity" parent="android:Theme.Translucent.NoTitleBar">
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:navigationBarColor">@android:color/transparent</item>
         <item name="android:windowDrawsSystemBarBackgrounds">true</item>
+    </style>
+
+    <style name="TabLayoutTextAppearance" parent="TextAppearance.Design.Tab">
+        <item name="textAllCaps">false</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:fontFamily">@string/font_heavy</item>
+        <item name="android:textColor">@color/black</item>
     </style>
 
 </resources>

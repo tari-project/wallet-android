@@ -37,57 +37,53 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.os.Parcelable
-import android.view.View
 import androidx.activity.viewModels
-import androidx.core.view.postDelayed
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.Navigation
+import androidx.navigation.ui.AppBarConfiguration
+import androidx.navigation.ui.NavigationUI
 import com.tari.android.wallet.R
-import com.tari.android.wallet.application.DeepLink
-import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepository
+import com.tari.android.wallet.application.deeplinks.DeepLink
+import com.tari.android.wallet.application.deeplinks.DeeplinkHandler
+import com.tari.android.wallet.application.deeplinks.DeeplinkViewModel
 import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
+import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepository
 import com.tari.android.wallet.databinding.ActivityHomeBinding
 import com.tari.android.wallet.di.DiContainer.appComponent
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.extension.addTo
 import com.tari.android.wallet.extension.applyFontStyle
-import com.tari.android.wallet.model.*
+import com.tari.android.wallet.model.Tx
+import com.tari.android.wallet.model.TxId
+import com.tari.android.wallet.model.User
+import com.tari.android.wallet.model.WalletError
 import com.tari.android.wallet.network.NetworkConnectionState
 import com.tari.android.wallet.service.TariWalletService
 import com.tari.android.wallet.service.WalletServiceLauncher
 import com.tari.android.wallet.service.connection.TariWalletServiceConnection
 import com.tari.android.wallet.service.connection.TariWalletServiceConnection.ServiceConnectionStatus.CONNECTED
 import com.tari.android.wallet.ui.activity.SplashActivity
-import com.tari.android.wallet.ui.activity.onboarding.OnboardingFlowActivity
-import com.tari.android.wallet.ui.activity.settings.BackupSettingsActivity
-import com.tari.android.wallet.ui.activity.settings.DeleteWalletActivity
-import com.tari.android.wallet.ui.activity.tx.TxDetailsActivity
 import com.tari.android.wallet.ui.common.CommonActivity
+import com.tari.android.wallet.ui.common.domain.ResourceManager
 import com.tari.android.wallet.ui.common.gyphy.GiphyEcosystem
 import com.tari.android.wallet.ui.component.CustomFont
-import com.tari.android.wallet.ui.component.CustomFontTextView
-import com.tari.android.wallet.ui.dialog.BottomSlideDialog
-import com.tari.android.wallet.ui.extension.*
-import com.tari.android.wallet.ui.fragment.debug.baseNodeConfig.BaseNodeConfigRouter
-import com.tari.android.wallet.ui.fragment.debug.baseNodeConfig.addBaseNode.AddCustomBaseNodeFragment
-import com.tari.android.wallet.ui.fragment.debug.baseNodeConfig.changeBaseNode.ChangeBaseNodeFragment
+import com.tari.android.wallet.ui.dialog.modular.DialogArgs
+import com.tari.android.wallet.ui.dialog.modular.ModularDialog
+import com.tari.android.wallet.ui.dialog.modular.ModularDialogArgs
+import com.tari.android.wallet.ui.dialog.modular.modules.body.BodyModule
+import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonModule
+import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonStyle
+import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
+import com.tari.android.wallet.ui.extension.showInternetConnectionErrorDialog
+import com.tari.android.wallet.ui.extension.string
+import com.tari.android.wallet.ui.fragment.onboarding.activity.OnboardingFlowActivity
 import com.tari.android.wallet.ui.fragment.send.activity.SendTariActivity
-import com.tari.android.wallet.ui.fragment.settings.allSettings.AllSettingsRouter
-import com.tari.android.wallet.ui.fragment.settings.backgroundService.BackgroundServiceSettingsActivity
-import com.tari.android.wallet.ui.fragment.settings.networkSelection.NetworkSelectionFragment
 import com.tari.android.wallet.ui.fragment.tx.TxListRouter
 import com.tari.android.wallet.util.Constants
-import io.reactivex.disposables.CompositeDisposable
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-import androidx.navigation.ui.NavigationUI
-import com.google.android.material.bottomnavigation.BottomNavigationView
-import androidx.navigation.Navigation
-import androidx.navigation.findNavController
-import androidx.navigation.ui.AppBarConfiguration
-import androidx.navigation.ui.NavigationUI.setupActionBarWithNavController
 
 
 internal class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>(), TxListRouter {
@@ -102,14 +98,21 @@ internal class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>
     lateinit var networkRepository: NetworkRepository
 
     @Inject
+    lateinit var deeplinkHandler: DeeplinkHandler
+
+    @Inject
+    lateinit var resourceManager: ResourceManager
+
+    @Inject
     lateinit var giphy: GiphyEcosystem
+
+    private val deeplinkViewModel: DeeplinkViewModel by viewModels()
 
     private val navController by lazy { Navigation.findNavController(this, R.id.nav_host_fragment) }
 
     private var appBarConfiguration = AppBarConfiguration(setOf(R.id.txListFragment, R.id.ttlStoreFragment, R.id.profileFragment, R.id.settingsFragment))
 
     private lateinit var serviceConnection: TariWalletServiceConnection
-    private var compositeDisposable: CompositeDisposable = CompositeDisposable()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -134,11 +137,11 @@ internal class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>
             giphy.enable()
             serviceConnection.connection.subscribe {
                 if (it.status == CONNECTED) {
-                    ui.root.postDelayed(Constants.UI.mediumDurationMs) {
+                    ui.root.postDelayed({
                         processIntentDeepLink(it.service!!, intent)
-                    }
+                    }, Constants.UI.mediumDurationMs)
                 }
-            }.addTo(compositeDisposable)
+            }.addTo(viewModel.compositeDisposable)
         }
 
         NavigationUI.setupWithNavController(ui.bottomNavigationView, navController)
@@ -153,6 +156,7 @@ internal class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         // onNewIntent might get called before onCreate, so we anticipate that here
+        checkScreensDeeplink(intent)
         if (::serviceConnection.isInitialized && serviceConnection.currentState.status == CONNECTED) {
             processIntentDeepLink(serviceConnection.currentState.service!!, intent)
         } else {
@@ -187,29 +191,34 @@ internal class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>
         }
     }
 
+
     private fun displayIncompatibleNetworkDialog() {
         if (this.isFinishing) return
-        BottomSlideDialog(
-            this,
-            R.layout.dialog_incompatible_network,
-            canceledOnTouchOutside = false
-        ).apply {
-            findViewById<CustomFontTextView>(R.id.incompatible_network_description_text_view).text = string(R.string.incompatible_network_description)
-                .applyFontStyle(
-                    this@HomeActivity,
-                    CustomFont.AVENIR_LT_STD_MEDIUM,
-                    listOf(
-                        string(R.string.incompatible_network_description_bold_part_1),
-                        string(R.string.incompatible_network_description_bold_part_2)
-                    ),
-                    CustomFont.AVENIR_LT_STD_BLACK
-                )
-            findViewById<View>(R.id.incompatible_network_reset_now_button).setOnThrottledClickListener {
-                deleteWallet()
-                dismiss()
-            }
-            findViewById<View>(R.id.incompatible_network_reset_later_button).setOnThrottledClickListener { dismiss() }
-        }.show()
+
+        val description = string(R.string.incompatible_network_description)
+            .applyFontStyle(
+                this@HomeActivity,
+                CustomFont.AVENIR_LT_STD_MEDIUM,
+                listOf(
+                    string(R.string.incompatible_network_description_bold_part_1),
+                    string(R.string.incompatible_network_description_bold_part_2)
+                ),
+                CustomFont.AVENIR_LT_STD_BLACK
+            )
+        val dialog = ModularDialog(this)
+        val args = ModularDialogArgs(
+            DialogArgs(true, canceledOnTouchOutside = false), modules = listOf(
+                HeadModule(string(R.string.incompatible_network_title)),
+                BodyModule(null, description),
+                ButtonModule(string(R.string.incompatible_network_reset_now), ButtonStyle.Normal) {
+                    deleteWallet()
+                    dialog.dismiss()
+                },
+                ButtonModule(string(R.string.incompatible_network_reset_later), ButtonStyle.Close)
+            )
+        )
+        dialog.applyArgs(args)
+        dialog.show()
     }
 
     private fun deleteWallet() {
@@ -227,11 +236,36 @@ internal class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>
         finishAffinity()
     }
 
-    override fun toTxDetails(tx: Tx) = startActivity(TxDetailsActivity.createIntent(this, tx))
+    private fun checkScreensDeeplink(intent: Intent) {
+        val screen = intent.getStringExtra(HomeDeeplinkScreens.Key)
+        if (screen.orEmpty().isNotEmpty()) {
+            when (HomeDeeplinkScreens.parse(screen)) {
+                HomeDeeplinkScreens.TxDetails -> {
+                    (intent.getParcelableExtra<TxId>(HomeDeeplinkScreens.KeyTxDetailsArgs))?.let { toTxDetails(null, it) }
+                }
+            }
+        }
+    }
 
     override fun toTTLStore() {
         ui.bottomNavigationView.selectedItemId = R.id.ttlStoreFragment
     }
+
+    override fun toTxDetails(tx: Tx?, txId: TxId?) {
+//        val action = TxListFragmentDirections.ActionTxListFragmentToTxDetlsFragment(tx, txId)
+//        navController.navigate(action)
+//        Bundle().apply {
+//            putParcelable(TX_EXTRA_KEY, tx)
+//            putParcelable(TX_ID_EXTRA_KEY, txId)
+//        }
+    }
+
+//    override fun toTxDetails(tx: Tx?, txId: TxId?) = loadFragment(TxDetailsFragment().apply {
+//        arguments = Bundle().apply {
+//            putParcelable(TX_EXTRA_KEY, tx)
+//            putParcelable(TX_ID_EXTRA_KEY, txId)
+//        }
+//    })
 
     override fun toAllSettings() {
         ui.bottomNavigationView.selectedItemId = R.id.settingsFragment
@@ -240,32 +274,25 @@ internal class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>
     fun willNotifyAboutNewTx(): Boolean = ui.bottomNavigationView.selectedItemId == R.id.txListFragment
 
     private fun processIntentDeepLink(service: TariWalletService, intent: Intent) {
-        DeepLink.from(networkRepository, intent.data?.toString().orEmpty())?.let { deepLink ->
-            val pubkey = when (deepLink.type) {
-                DeepLink.Type.EMOJI_ID -> service.getPublicKeyFromEmojiId(deepLink.identifier)
-                DeepLink.Type.PUBLIC_KEY_HEX -> service.getPublicKeyFromHexString(deepLink.identifier)
-            }
-            pubkey?.let { publicKey -> sendTariToUser(service, publicKey, deepLink.parameters) }
+        deeplinkHandler.handle(intent.data?.toString().orEmpty())?.let { deepLink ->
+            (deepLink as? DeepLink.Send)?.let { sendTariToUser(service, it) }
+
+            (deepLink as? DeepLink.AddBaseNode)?.let { deeplinkViewModel.executeAction(this, it) }
         }
     }
 
-    private fun sendTariToUser(
-        service: TariWalletService,
-        recipientPublicKey: PublicKey,
-        parameters: Map<String, String>
-    ) {
+    private fun sendTariToUser(service: TariWalletService, sendDeeplink: DeepLink.Send) {
         val error = WalletError()
         val contacts = service.getContacts(error)
-        val recipientUser = when (error.code) {
-            WalletErrorCode.NO_ERROR -> contacts
-                .firstOrNull { it.publicKey == recipientPublicKey } ?: User(recipientPublicKey)
-            else -> User(recipientPublicKey)
+        val pubKey = service.getPublicKeyFromHexString(sendDeeplink.publicKeyHex)
+        val recipientUser = when (error) {
+            WalletError.NoError -> contacts.firstOrNull { it.publicKey == pubKey } ?: User(pubKey)
+            else -> User(pubKey)
         }
         val intent = Intent(this, SendTariActivity::class.java)
         intent.putExtra("recipientUser", recipientUser as Parcelable)
-        parameters[DeepLink.PARAMETER_NOTE]?.let { intent.putExtra(DeepLink.PARAMETER_NOTE, it) }
-        parameters[DeepLink.PARAMETER_AMOUNT]?.toDoubleOrNull()
-            ?.let { intent.putExtra(DeepLink.PARAMETER_AMOUNT, it) }
+        sendDeeplink.note.let { intent.putExtra(SendTariActivity.PARAMETER_NOTE, it) }
+        sendDeeplink.amount?.let { intent.putExtra(SendTariActivity.PARAMETER_AMOUNT, it.tariValue) }
         startActivity(intent)
         overridePendingTransition(R.anim.enter_from_right, R.anim.exit_to_left)
     }
@@ -273,10 +300,5 @@ internal class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>
     override fun onDestroy() {
         super.onDestroy()
         viewModelStore.clear()
-        compositeDisposable.dispose()
-    }
-
-    companion object {
-        private const val NO_SMOOTH_SCROLL = false
     }
 }

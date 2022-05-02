@@ -66,9 +66,12 @@ internal class ChangeBaseNodeFragment : CommonFragment<FragmentBaseNodeChangeBin
         observeUI()
     }
 
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        inflater.inflate(R.menu.change_base_node_menu, menu)
+    override fun onResume() {
+        super.onResume()
+        viewModel.refresh()
     }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) = inflater.inflate(R.menu.change_base_node_menu, menu)
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when(item.itemId) {

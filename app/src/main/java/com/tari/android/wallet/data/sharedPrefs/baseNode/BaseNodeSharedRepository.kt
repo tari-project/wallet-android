@@ -33,17 +33,14 @@
 package com.tari.android.wallet.data.sharedPrefs.baseNode
 
 import android.content.SharedPreferences
-import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepository
 import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodeSharedRepository.Key.baseNodeLastSyncResultField
 import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodeSharedRepository.Key.currentBaseNodeField
 import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodeSharedRepository.Key.userBaseNodeListField
+import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefBooleanNullableDelegate
 import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefGsonDelegate
-import com.tari.android.wallet.model.BaseNodeValidationResult
+import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepository
 
-class BaseNodeSharedRepository(
-    sharedPrefs: SharedPreferences,
-    val networkRepository: NetworkRepository
-) {
+class BaseNodeSharedRepository(sharedPrefs: SharedPreferences, val networkRepository: NetworkRepository) {
 
     private object Key {
         const val currentBaseNodeField = "tari_wallet_current_base_node"
@@ -56,10 +53,7 @@ class BaseNodeSharedRepository(
 
     var userBaseNodes: BaseNodeList? by SharedPrefGsonDelegate(sharedPrefs, formatKey(userBaseNodeListField), BaseNodeList::class.java)
 
-    var baseNodeLastSyncResult: BaseNodeValidationResult? by SharedPrefGsonDelegate(
-        sharedPrefs, baseNodeLastSyncResultField, BaseNodeValidationResult::class.java
-    )
-
+    var baseNodeLastSyncResult: Boolean? by SharedPrefBooleanNullableDelegate(sharedPrefs, baseNodeLastSyncResultField)
 
     fun deleteUserBaseNode(baseNodeDto: BaseNodeDto) {
         userBaseNodes.orEmpty().apply {

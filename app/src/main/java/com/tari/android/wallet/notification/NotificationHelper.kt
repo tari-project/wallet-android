@@ -50,7 +50,7 @@ import com.tari.android.wallet.model.CancelledTx
 import com.tari.android.wallet.model.Tx
 import com.tari.android.wallet.model.TxId
 import com.tari.android.wallet.ui.activity.home.HomeActivity
-import com.tari.android.wallet.ui.activity.tx.TxDetailsActivity
+import com.tari.android.wallet.ui.activity.home.HomeDeeplinkScreens
 import com.tari.android.wallet.ui.notification.CustomTxNotificationViewHolder
 import com.tari.android.wallet.ui.notification.TxCanceledViewHolder
 import com.tari.android.wallet.util.WalletUtil
@@ -142,12 +142,14 @@ internal class NotificationHelper(private val context: Context) {
             if (tx.amount.tariValue.toDouble() % 1 == 0.toDouble())
                 tx.amount.tariValue.toBigInteger().toString()
             else WalletUtil.amountFormatter.format(tx.amount.tariValue)
-        val notificationBody =
-            context.getString(R.string.notification_tx_received_description_format, formattedAmount)
+        val notificationBody = context.getString(R.string.notification_tx_received_description_format, formattedAmount)
         val layout = CustomTxNotificationViewHolder(context, tx)
         val intents = arrayOf(
-            Intent(context, HomeActivity::class.java).apply { flags = FLAG_ACTIVITY_CLEAR_TOP },
-            TxDetailsActivity.createIntent(context, TxId(tx.id))
+            Intent(context, HomeActivity::class.java).apply {
+                flags = FLAG_ACTIVITY_CLEAR_TOP
+                putExtra(HomeDeeplinkScreens.Key, HomeDeeplinkScreens.TxDetails.name)
+                putExtra(HomeDeeplinkScreens.KeyTxDetailsArgs, TxId(tx.id))
+            },
         )
         val pendingIntent = PendingIntent.getActivities(context, 0, intents, PendingIntent.FLAG_IMMUTABLE)
 
@@ -173,37 +175,34 @@ internal class NotificationHelper(private val context: Context) {
         }
 
         // send group notification
-        notificationManager.notify(
-            APP_NOTIFICATION_GROUP_ID,
-            txGroupNotification
-        )
+        notificationManager.notify(APP_NOTIFICATION_GROUP_ID, txGroupNotification)
         // send actual notification
-        notificationManager.notify(
-            tx.id.toInt(),
-            notification
-        )
+        notificationManager.notify(tx.id.toInt(), notification)
     }
 
     fun postTxCanceledNotification(tx: CancelledTx) {
         Logger.i("postTxCanceledNotification: $tx")
         val layout = TxCanceledViewHolder(context, tx)
         val intents = arrayOf(
-            Intent(context, HomeActivity::class.java).apply { flags = FLAG_ACTIVITY_CLEAR_TOP },
-            TxDetailsActivity.createIntent(context, TxId(tx.id))
+            Intent(context, HomeActivity::class.java).apply {
+                flags = FLAG_ACTIVITY_CLEAR_TOP
+                putExtra(HomeDeeplinkScreens.Key, HomeDeeplinkScreens.TxDetails.name)
+                putExtra(HomeDeeplinkScreens.KeyTxDetailsArgs, TxId(tx.id))
+            },
         )
         val pendingIntent = PendingIntent.getActivities(context, 0, intents, PendingIntent.FLAG_IMMUTABLE)
         val notification = NotificationCompat.Builder(context, APP_NOTIFICATION_CHANNEL_ID).run {
-                setSmallIcon(R.drawable.tx_notification_icon)
-                setDefaults(DEFAULT_ALL)
-                setContentIntent(pendingIntent)
-                setStyle(NotificationCompat.DecoratedCustomViewStyle())
-                setCustomContentView(layout)
-                setAutoCancel(true)
-                setGroup(APP_NOTIFICATION_GROUP_NAME)
-                setCategory(NotificationCompat.CATEGORY_EVENT)
-                priority = NotificationCompat.PRIORITY_MAX
-                build()
-            }
+            setSmallIcon(R.drawable.tx_notification_icon)
+            setDefaults(DEFAULT_ALL)
+            setContentIntent(pendingIntent)
+            setStyle(NotificationCompat.DecoratedCustomViewStyle())
+            setCustomContentView(layout)
+            setAutoCancel(true)
+            setGroup(APP_NOTIFICATION_GROUP_NAME)
+            setCategory(NotificationCompat.CATEGORY_EVENT)
+            priority = NotificationCompat.PRIORITY_MAX
+            build()
+        }
         // send group notification
         notificationManager.notify(APP_NOTIFICATION_GROUP_ID, txGroupNotification)
         // send actual notification
@@ -215,10 +214,7 @@ internal class NotificationHelper(private val context: Context) {
      */
     fun postNotification(title: String, body: String, intent: Intent? = null) {
         // prepare notification
-        val notification: Notification = NotificationCompat.Builder(
-            context,
-            APP_NOTIFICATION_CHANNEL_ID
-        ).run {
+        val notification: Notification = NotificationCompat.Builder(context, APP_NOTIFICATION_CHANNEL_ID).run {
             setContentTitle(title)
             setContentText(body)
             setSmallIcon(R.drawable.notification_icon)
@@ -238,16 +234,9 @@ internal class NotificationHelper(private val context: Context) {
             }
         }
 
-
         // send notification
-        notificationManager.notify(
-            APP_NOTIFICATION_GROUP_ID,
-            txGroupNotification
-        )
-        notificationManager.notify(
-            System.currentTimeMillis().toInt(),
-            notification
-        )
+        notificationManager.notify(APP_NOTIFICATION_GROUP_ID, txGroupNotification)
+        notificationManager.notify(System.currentTimeMillis().toInt(), notification)
     }
 
 }

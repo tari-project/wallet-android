@@ -36,7 +36,6 @@ import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.fragment.app.Fragment
 import com.tari.android.wallet.R
-import com.tari.android.wallet.application.DeepLink
 import com.tari.android.wallet.databinding.ActivitySendTariBinding
 import com.tari.android.wallet.di.DiContainer.appComponent
 import com.tari.android.wallet.event.Event
@@ -46,19 +45,24 @@ import com.tari.android.wallet.model.TxId
 import com.tari.android.wallet.model.User
 import com.tari.android.wallet.network.NetworkConnectionState
 import com.tari.android.wallet.ui.common.CommonActivity
-import com.tari.android.wallet.ui.dialog.BottomSlideDialog
-import com.tari.android.wallet.ui.extension.addEnterLeftAnimation
-import com.tari.android.wallet.ui.extension.color
-import com.tari.android.wallet.ui.extension.hideKeyboard
-import com.tari.android.wallet.ui.extension.showInternetConnectionErrorDialog
+import com.tari.android.wallet.ui.dialog.modular.DialogArgs
+import com.tari.android.wallet.ui.dialog.modular.ModularDialog
+import com.tari.android.wallet.ui.dialog.modular.ModularDialogArgs
+import com.tari.android.wallet.ui.dialog.modular.modules.body.BodyModule
+import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonModule
+import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonStyle
+import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
+import com.tari.android.wallet.ui.extension.*
 import com.tari.android.wallet.ui.fragment.send.addAmount.AddAmountFragment
+import com.tari.android.wallet.ui.fragment.send.addAmount.AddAmountListener
+import com.tari.android.wallet.ui.fragment.send.addNote.AddNodeListener
 import com.tari.android.wallet.ui.fragment.send.addNote.AddNoteFragment
-import com.tari.android.wallet.ui.fragment.send.addRecepient.AddRecipientFragment
 import com.tari.android.wallet.ui.fragment.send.addRecepient.AddRecipientListener
 import com.tari.android.wallet.ui.fragment.send.common.TransactionData
 import com.tari.android.wallet.ui.fragment.send.finalize.FinalizeSendTxFragment
 import com.tari.android.wallet.ui.fragment.send.finalize.FinalizeSendTxListener
 import com.tari.android.wallet.ui.fragment.send.finalize.TxFailureReason
+import com.tari.android.wallet.ui.fragment.send.makeTransaction.MakeTransactionFragment
 import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.yat.YatAdapter
 import com.tari.android.wallet.yat.YatUser
@@ -73,8 +77,8 @@ import javax.inject.Inject
  */
 internal class SendTariActivity : CommonActivity<ActivitySendTariBinding, SendTariViewModel>(),
     AddRecipientListener,
-    AddAmountFragment.Listener,
-    AddNoteFragment.Listener,
+    AddAmountListener,
+    AddNodeListener,
     FinalizeSendTxListener {
 
     @Inject
@@ -102,18 +106,16 @@ internal class SendTariActivity : CommonActivity<ActivitySendTariBinding, SendTa
         if (recipientUser != null) {
             val bundle = Bundle().apply {
                 putParcelable("recipientUser", recipientUser)
-                intent.getDoubleExtra(DeepLink.PARAMETER_AMOUNT, Double.MIN_VALUE)
-                    .takeIf { it > 0 }
-                    ?.let { putDouble(DeepLink.PARAMETER_AMOUNT, it) }
+                intent.getDoubleExtra(PARAMETER_AMOUNT, Double.MIN_VALUE).takeIf { it > 0 }?.let { putDouble(PARAMETER_AMOUNT, it) }
             }
             addFragment(AddAmountFragment(), bundle, true)
         } else {
-            addFragment(AddRecipientFragment(), null, true)
+            addFragment(MakeTransactionFragment(), null, true)
         }
         ui.rootView.postDelayed({ ui.rootView.setBackgroundColor(color(R.color.black)) }, 1000)
     }
 
-    override fun continueToAmount(sourceFragment: AddRecipientFragment, user: User) {
+    override fun continueToAmount(user: User) {
         if (EventBus.networkConnectionState.publishSubject.value != NetworkConnectionState.CONNECTED) {
             showInternetConnectionErrorDialog(this)
             return
@@ -124,14 +126,15 @@ internal class SendTariActivity : CommonActivity<ActivitySendTariBinding, SendTa
     }
 
     override fun onAmountExceedsActualAvailableBalance(fragment: AddAmountFragment) {
-        BottomSlideDialog(
-            context = this,
-            layoutId = R.layout.add_amount_dialog_actual_balance_exceeded,
-            dismissViewId = R.id.add_amount_dialog_btn_close
-        ).show()
+        val args = ModularDialogArgs(DialogArgs(), listOf(
+            HeadModule(string(R.string.error_balance_exceeded_title)),
+            BodyModule(string(R.string.error_balance_exceeded_description)),
+            ButtonModule(string(R.string.common_close), ButtonStyle.Close),
+        ))
+        ModularDialog(this, args).show()
     }
 
-    override fun continueToAddNote(sourceFragment: AddAmountFragment, recipientUser: User, amount: MicroTari) {
+    override fun continueToAddNote(recipientUser: User, amount: MicroTari, isOneSidePayment: Boolean) {
         if (EventBus.networkConnectionState.publishSubject.value != NetworkConnectionState.CONNECTED) {
             showInternetConnectionErrorDialog(this)
             return
@@ -139,12 +142,17 @@ internal class SendTariActivity : CommonActivity<ActivitySendTariBinding, SendTa
         val bundle = Bundle().apply {
             putParcelable("recipientUser", recipientUser)
             putParcelable("amount", amount)
-            intent.getStringExtra(DeepLink.PARAMETER_NOTE)?.let { putString(DeepLink.PARAMETER_NOTE, it) }
+            putBoolean("isOneSidePayment", isOneSidePayment)
+            intent.getStringExtra(PARAMETER_NOTE)?.let { putString(PARAMETER_NOTE, it) }
         }
         addFragment(AddNoteFragment(), bundle)
     }
 
-    override fun continueToFinalizeSendTx(sourceFragment: AddNoteFragment, transactionData: TransactionData) {
+    override fun continueToFinalizing(recipientUser: User, amount: MicroTari, isOneSidePayment: Boolean) {
+        continueToFinalizeSendTx(TransactionData(recipientUser, amount, "", isOneSidePayment))
+    }
+
+    override fun continueToFinalizeSendTx(transactionData: TransactionData) {
         if (transactionData.recipientUser is YatUser) {
             yatAdapter.showOutcomingFinalizeActivity(this, transactionData)
         } else {
@@ -183,6 +191,9 @@ internal class SendTariActivity : CommonActivity<ActivitySendTariBinding, SendTa
     }
 
     companion object {
+        const val PARAMETER_NOTE = "note"
+        const val PARAMETER_AMOUNT = "amount"
+
         var instance: WeakReference<SendTariActivity> = WeakReference(null)
             private set
     }

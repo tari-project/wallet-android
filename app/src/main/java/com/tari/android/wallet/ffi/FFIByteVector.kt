@@ -61,7 +61,12 @@ internal class FFIByteVector() : FFIBase() {
                         "${stringHex.length}\n$stringHex"
             )
         }
-        val byteArray = BigInteger(stringHex, 16).toByteArray()
+        val hexInteger = BigInteger(stringHex, 16)
+        var byteArray = hexInteger.toByteArray()
+        // toByteArray for some reason added one leading zero. Probably gets it from protocol
+        if (byteArray.size == 33 && byteArray[0] == 0.toByte()) {
+            byteArray = byteArray.drop(1).toByteArray()
+        }
         val error = FFIError()
         jniCreate(byteArray, error)
         throwIf(error)

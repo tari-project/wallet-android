@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/settings_background"
+    android:paddingHorizontal="25dp"
+    android:paddingTop="32dp"
+    android:paddingBottom="16dp">
+
+    <com.tari.android.wallet.ui.component.CustomFontTextView
+        android:id="@+id/title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal|start"
+        android:text="@string/all_settings_secondary_settings_label"
+        android:textColor="@color/black"
+        android:textSize="17sp"
+        app:customFont="@string/font_black" />
+
+</FrameLayout>

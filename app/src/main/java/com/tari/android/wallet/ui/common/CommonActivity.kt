@@ -8,9 +8,8 @@ import androidx.viewbinding.ViewBinding
 import com.tari.android.wallet.R
 import com.tari.android.wallet.extension.observe
 import com.tari.android.wallet.ui.dialog.TariDialog
-import com.tari.android.wallet.ui.dialog.confirm.ConfirmDialog
-import com.tari.android.wallet.ui.dialog.error.ErrorDialog
 import com.tari.android.wallet.ui.dialog.inProgress.TariProgressDialog
+import com.tari.android.wallet.ui.dialog.modular.ModularDialog
 import yat.android.lib.YatIntegration
 
 abstract class CommonActivity<Binding : ViewBinding, VM : CommonViewModel> : AppCompatActivity() {
@@ -28,9 +27,7 @@ abstract class CommonActivity<Binding : ViewBinding, VM : CommonViewModel> : App
 
         observe(openLink) { startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(it))) }
 
-        observe(confirmDialog) { replaceDialog(ConfirmDialog(this@CommonActivity, it)) }
-
-        observe(errorDialog) { replaceDialog(ErrorDialog(this@CommonActivity, it)) }
+        observe(modularDialog) { replaceDialog(ModularDialog(this@CommonActivity, it)) }
 
         observe(loadingDialog) { if (it.isShow) replaceDialog(TariProgressDialog(this@CommonActivity, it)) else currentDialog?.dismiss() }
     }

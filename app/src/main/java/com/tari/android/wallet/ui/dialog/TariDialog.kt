@@ -4,4 +4,6 @@ interface TariDialog {
     fun show()
 
     fun dismiss()
+
+    fun isShowing(): Boolean
 }

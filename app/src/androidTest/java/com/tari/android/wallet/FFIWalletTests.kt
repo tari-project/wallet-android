@@ -45,15 +45,18 @@ import com.tari.android.wallet.application.Network
 import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodeSharedRepository
 import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepositoryImpl
+import com.tari.android.wallet.data.sharedPrefs.tariSettings.TariSettingsSharedRepository
 import com.tari.android.wallet.data.sharedPrefs.testnetFaucet.TestnetFaucetRepository
+import com.tari.android.wallet.data.sharedPrefs.tor.TorSharedRepository
 import com.tari.android.wallet.di.ApplicationModule
 import com.tari.android.wallet.ffi.*
 import com.tari.android.wallet.model.*
 import com.tari.android.wallet.model.recovery.WalletRestorationResult
 import com.tari.android.wallet.service.seedPhrase.SeedPhraseRepository
 import com.tari.android.wallet.ui.common.domain.ResourceManager
-import com.tari.android.wallet.ui.dialog.backup.BackupSettingsRepository
+import com.tari.android.wallet.ui.fragment.settings.backup.BackupSettingsRepository
 import com.tari.android.wallet.util.Constants
+import com.tari.android.wallet.yat.YatSharedRepository
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.slot
@@ -70,7 +73,8 @@ import java.math.BigInteger
 class FFIWalletTests {
 
     private lateinit var wallet: FFIWallet
-    private lateinit var listener: TestAddRecipientListener
+    private lateinit var listener: TestAddRecipientAddNodeListener
+    private var network: Network = Network.DIBBLER
     private val context = getApplicationContext<Context>()
     private val prefs = context.getSharedPreferences(ApplicationModule.sharedPrefsFileName, Context.MODE_PRIVATE)
     private val resourseManager: ResourceManager = ResourceManager(context)
@@ -78,8 +82,21 @@ class FFIWalletTests {
     private val baseNodeSharedPrefsRepository = BaseNodeSharedRepository(prefs, networkRepository)
     private val backupSettingsRepository = BackupSettingsRepository(context, prefs, networkRepository)
     private val testnetFaucetRepository = TestnetFaucetRepository(prefs, networkRepository)
+    private val yatSharedPrefsRepository = YatSharedRepository(prefs, networkRepository)
+    private val tariSettingsRepository = TariSettingsSharedRepository(prefs, networkRepository)
+    private val torSharedRepository = TorSharedRepository(prefs, networkRepository)
     private val sharedPrefsRepository =
-        SharedPrefsRepository(context, prefs, networkRepository, backupSettingsRepository, baseNodeSharedPrefsRepository, testnetFaucetRepository)
+        SharedPrefsRepository(
+            context,
+            prefs,
+            networkRepository,
+            backupSettingsRepository,
+            baseNodeSharedPrefsRepository,
+            testnetFaucetRepository,
+            yatSharedPrefsRepository,
+            torSharedRepository,
+            tariSettingsRepository
+        )
     private val walletDirPath = context.filesDir.absolutePath
 
     private fun clean() {
@@ -104,13 +121,13 @@ class FFIWalletTests {
             walletDirPath,
             Constants.Wallet.discoveryTimeoutSec,
             Constants.Wallet.storeAndForwardMessageDurationSec,
-            Network.WEATHERWAX.uriComponent
+            network.uriComponent
         )
         val logFile = File(walletDirPath, "test_log.log")
         // create wallet instance
         wallet = FFIWallet(sharedPrefsRepository, SeedPhraseRepository(), commsConfig, logFile.absolutePath)
         // create listener
-        listener = TestAddRecipientListener()
+        listener = TestAddRecipientAddNodeListener()
         wallet.listener = listener
         commsConfig.destroy()
         transport.destroy()
@@ -344,11 +361,11 @@ class FFIWalletTests {
         assertNotNull(pendingInboundTxFFI)
         // cancel tx
         val cancelledTxSlot = slot<CancelledTx>()
-        every { mockListener.onTxCancelled(capture(cancelledTxSlot)) } answers { }
+        every { mockListener.onTxCancelled(capture(cancelledTxSlot), 1) } answers { }
         assertTrue(wallet.cancelPendingTx(pendingInboundTxFFI!!.getId()))
         pendingInboundTxFFI.destroy()
         Thread.sleep(1000)
-        verify { mockListener.onTxCancelled(any()) }
+        verify { mockListener.onTxCancelled(any(), 1) }
         val cancelledTx = cancelledTxSlot.captured
         val cancelledTxsFFI = wallet.getCancelledTxs()
         assertEquals(1, cancelledTxsFFI.getLength())
@@ -450,7 +467,7 @@ class FFIWalletTests {
         wallet.getKeyValue(key)
     }
 
-    private class TestAddRecipientListener : FFIWalletListener {
+    private class TestAddRecipientAddNodeListener : FFIWalletListener {
 
         val receivedTxs = mutableListOf<PendingInboundTx>()
         val finalizedTxs = mutableListOf<PendingInboundTx>()
@@ -491,21 +508,31 @@ class FFIWalletTests {
         }
 
         override fun onTxMinedUnconfirmed(completedTx: CompletedTx, confirmationCount: Int) {
-            Logger.i("Tx Mined :: completed tx id: %s", completedTx.id)
+            Logger.i("Tx Mined unconfirmed :: completed tx id: %s", completedTx.id)
             minedTxs.add(completedTx)
         }
 
-        override fun onTxCancelled(cancelledTx: CancelledTx) {
-            Logger.i("Tx Cancelled :: cancelled tx id: %s", cancelledTx.id)
+        override fun onTxFauxConfirmed(completedTx: CompletedTx) {
+            Logger.i("Tx Faux Mined :: completed tx id: %s", completedTx.id)
+            minedTxs.add(completedTx)
+        }
+
+        override fun onTxFauxUnconfirmed(completedTx: CompletedTx, confirmationCount: Int) {
+            Logger.i("Tx Faux Mined unconfirmed :: completed tx id: %s", completedTx.id)
+            minedTxs.add(completedTx)
+        }
+
+        override fun onTxCancelled(cancelledTx: CancelledTx, rejectionReason: Int) {
+            Logger.i("Tx Cancelled :: cancelled tx id: %s, reason code: %s", cancelledTx.id, rejectionReason.toString())
             cancelledTxs.add(cancelledTx)
         }
 
-        override fun onTXOValidationComplete(responseId: BigInteger, result: BaseNodeValidationResult) {
-            Logger.i("Invalid TXO validation complete :: response id %s result %s", responseId, result)
+        override fun onTXOValidationComplete(responseId: BigInteger, isSuccess: Boolean) {
+            Logger.i("Invalid TXO validation complete :: response id %s result %s", responseId, isSuccess)
         }
 
-        override fun onTxValidationComplete(responseId: BigInteger, result: BaseNodeValidationResult) {
-            Logger.i("TX validation complete :: response id %s result %s", responseId, result)
+        override fun onTxValidationComplete(responseId: BigInteger, isSuccess: Boolean) {
+            Logger.i("TX validation complete :: response id %s result %s", responseId, isSuccess)
         }
 
         override fun onWalletRestoration(result: WalletRestorationResult) {
@@ -517,11 +544,11 @@ class FFIWalletTests {
         }
 
         override fun onStoreAndForwardSendResult(txId: BigInteger, success: Boolean) {
-            Logger.i(
-                "Store and forward :: tx id %s success %s",
-                txId,
-                success
-            )
+            Logger.i("Store and forward :: tx id %s success %s", txId, success)
+        }
+
+        override fun onConnectivityStatus(status: Int) {
+            Logger.i("Connectivity status: %s", status)
         }
     }
 }

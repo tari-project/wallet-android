@@ -53,6 +53,10 @@ interface TariWalletServiceListener {
 
     oneway void onTxMinedUnconfirmed(in CompletedTx completed, in int confirmationCount);
 
+    oneway void onTxFauxConfirmed(in CompletedTx completed);
+
+    oneway void onTxFauxUnconfirmed(in CompletedTx completed, in int confirmationCount);
+
     oneway void onTxCancelled(in CancelledTx tx);
 
     oneway void onDirectSendResult(in TxId txId, in boolean success);

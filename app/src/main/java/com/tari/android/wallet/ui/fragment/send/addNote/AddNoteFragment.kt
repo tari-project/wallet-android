@@ -32,84 +32,58 @@
  */
 package com.tari.android.wallet.ui.fragment.send.addNote
 
-import android.animation.Animator
 import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
 import android.animation.ValueAnimator
 import android.annotation.SuppressLint
-import android.app.Activity
-import android.app.Dialog
 import android.content.Context
 import android.content.Intent
-import android.graphics.Color
-import android.graphics.Rect
 import android.net.Uri
 import android.os.Bundle
-import android.view.*
+import android.view.LayoutInflater
+import android.view.MotionEvent
+import android.view.View
+import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
-import android.widget.ImageView
 import android.widget.RelativeLayout
 import androidx.constraintlayout.widget.ConstraintSet
-import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.animation.addListener
-import androidx.core.view.doOnNextLayout
 import androidx.core.widget.addTextChangedListener
-import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.*
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import com.bumptech.glide.RequestManager
-import com.bumptech.glide.load.resource.bitmap.RoundedCorners
-import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
-import com.bumptech.glide.request.RequestOptions
 import com.daasuu.ei.Ease
 import com.daasuu.ei.EasingInterpolator
 import com.giphy.sdk.core.models.Media
-import com.giphy.sdk.core.models.enums.MediaType
-import com.giphy.sdk.ui.pagination.GPHContent
-import com.giphy.sdk.ui.views.GPHGridCallback
-import com.google.android.material.bottomsheet.BottomSheetBehavior
-import com.google.android.material.bottomsheet.BottomSheetBehavior.*
-import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.orhanobut.logger.Logger
 import com.tari.android.wallet.R
 import com.tari.android.wallet.R.color.*
 import com.tari.android.wallet.R.dimen.*
-import com.tari.android.wallet.application.DeepLink
-import com.tari.android.wallet.databinding.DialogChooseGifBinding
 import com.tari.android.wallet.databinding.FragmentAddNoteBinding
 import com.tari.android.wallet.di.DiContainer.appComponent
 import com.tari.android.wallet.event.EventBus
+import com.tari.android.wallet.extension.observe
 import com.tari.android.wallet.infrastructure.Tracker
 import com.tari.android.wallet.model.Contact
 import com.tari.android.wallet.model.MicroTari
 import com.tari.android.wallet.model.User
 import com.tari.android.wallet.network.NetworkConnectionState
-import com.tari.android.wallet.ui.common.CommonViewModel
-import com.tari.android.wallet.ui.common.gyphy.GiphyKeywordsRepository
-import com.tari.android.wallet.ui.common.gyphy.placeholder.GifPlaceholder
 import com.tari.android.wallet.ui.common.gyphy.repository.GIFItem
-import com.tari.android.wallet.ui.common.gyphy.repository.GIFRepository
 import com.tari.android.wallet.ui.component.EmojiIdSummaryViewController
 import com.tari.android.wallet.ui.component.FullEmojiIdViewController
 import com.tari.android.wallet.ui.extension.*
+import com.tari.android.wallet.ui.fragment.send.activity.SendTariActivity
+import com.tari.android.wallet.ui.fragment.send.addNote.gif.*
+import com.tari.android.wallet.ui.fragment.send.addNote.gif.ThumbnailGIFsViewModel.Companion.REQUEST_CODE_GIF
 import com.tari.android.wallet.ui.fragment.send.common.TransactionData
 import com.tari.android.wallet.ui.presentation.TxNote
 import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.Constants.UI.AddNoteAndSend
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.disposables.Disposable
-import io.reactivex.subjects.BehaviorSubject
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import java.lang.ref.WeakReference
-import java.util.concurrent.TimeUnit
 import javax.inject.Inject
-import io.reactivex.Observer as RxObserver
 
 /**
  * Add a note to the transaction & send it through this fragment.
@@ -121,7 +95,7 @@ class AddNoteFragment : Fragment(), View.OnTouchListener {
     @Inject
     lateinit var tracker: Tracker
 
-    private lateinit var listenerWR: WeakReference<Listener>
+    private lateinit var addNodeListenerWR: WeakReference<AddNodeListener>
 
     // slide button animation related variables
     private var slideButtonXDelta = 0
@@ -137,6 +111,7 @@ class AddNoteFragment : Fragment(), View.OnTouchListener {
     // Tx properties.
     private lateinit var recipientUser: User
     private lateinit var amount: MicroTari
+    private var isOneSidePayment: Boolean = false
 
     private lateinit var ui: FragmentAddNoteBinding
     private lateinit var viewModel: ThumbnailGIFsViewModel
@@ -146,7 +121,7 @@ class AddNoteFragment : Fragment(), View.OnTouchListener {
     override fun onAttach(context: Context) {
         super.onAttach(context)
         appComponent.inject(this)
-        listenerWR = WeakReference(context as Listener)
+        addNodeListenerWR = WeakReference(context as AddNodeListener)
     }
 
     override fun onCreateView(
@@ -169,7 +144,7 @@ class AddNoteFragment : Fragment(), View.OnTouchListener {
 
     private fun initializeGIFsViewModel() {
         viewModel = ViewModelProvider(this)[ThumbnailGIFsViewModel::class.java]
-        viewModel.state.observe(viewLifecycleOwner) {
+        observe(viewModel.state) {
             when {
                 it.isSuccessful -> adapter.repopulate(it.gifItems!!)
                 it.isError -> Logger.e("GIFs request had error")
@@ -269,8 +244,9 @@ class AddNoteFragment : Fragment(), View.OnTouchListener {
     private fun retrievePageArguments(savedInstanceState: Bundle?) {
         recipientUser = requireArguments().getParcelable("recipientUser")!!
         amount = requireArguments().getParcelable("amount")!!
+        isOneSidePayment = requireArguments().getBoolean("isOneSidePayment")
         if (savedInstanceState == null) {
-            requireArguments().getString(DeepLink.PARAMETER_NOTE)
+            requireArguments().getString(SendTariActivity.PARAMETER_NOTE)
                 ?.let { ui.noteEditText.setText(it) }
         }
     }
@@ -283,9 +259,7 @@ class AddNoteFragment : Fragment(), View.OnTouchListener {
             gifContainer.gifItem = null
             updateSliderState()
         }
-        ui.searchGiphyCtaView.setOnClickListener {
-            handleViewMoreGIFsIntent()
-        }
+        ui.searchGiphyCtaView.setOnClickListener { handleViewMoreGIFsIntent() }
     }
 
     private fun handleViewMoreGIFsIntent() {
@@ -341,10 +315,7 @@ class AddNoteFragment : Fragment(), View.OnTouchListener {
         val mActivity = activity ?: return
         ui.noteEditText.requestFocus()
         val imm = mActivity.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-        imm.toggleSoftInput(
-            InputMethodManager.SHOW_FORCED,
-            InputMethodManager.HIDE_IMPLICIT_ONLY
-        )
+        imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY)
     }
 
     @SuppressLint("ClickableViewAccessibility")
@@ -393,84 +364,67 @@ class AddNoteFragment : Fragment(), View.OnTouchListener {
     ): Boolean {
         val x = event.rawX.toInt()
         when (event.action and MotionEvent.ACTION_MASK) {
+            MotionEvent.ACTION_POINTER_DOWN, MotionEvent.ACTION_POINTER_UP -> Unit
             MotionEvent.ACTION_DOWN -> {
                 slideButtonContainerWidth = ui.slideButtonContainerView.width
                 val layoutParams = view.layoutParams as RelativeLayout.LayoutParams
                 slideButtonXDelta = x - layoutParams.marginStart
             }
-            MotionEvent.ACTION_POINTER_DOWN, MotionEvent.ACTION_POINTER_UP -> {
-            }
             MotionEvent.ACTION_MOVE -> {
                 val layoutParams = view.layoutParams as RelativeLayout.LayoutParams
                 val newLeftMargin = x - slideButtonXDelta
-                slideButtonLastMarginStart = if (newLeftMargin < dimenPx(
-                        add_note_slide_button_left_margin
-                    )
-                ) {
+                slideButtonLastMarginStart = if (newLeftMargin < dimenPx(add_note_slide_button_left_margin)) {
                     dimenPx(add_note_slide_button_left_margin)
                 } else {
-                    if (newLeftMargin + dimenPx(add_note_slide_button_width) + dimenPx(
-                            add_note_slide_button_left_margin
-                        ) >= slideButtonContainerWidth
-                    ) {
-                        slideButtonContainerWidth - dimenPx(add_note_slide_button_width) - dimenPx(
-                            add_note_slide_button_left_margin
-                        )
+                    if (newLeftMargin + dimenPx(add_note_slide_button_width) + dimenPx(add_note_slide_button_left_margin) >= slideButtonContainerWidth) {
+                        slideButtonContainerWidth - dimenPx(add_note_slide_button_width) - dimenPx(add_note_slide_button_left_margin)
                     } else {
                         x - slideButtonXDelta
                     }
                 }
                 layoutParams.marginStart = slideButtonLastMarginStart
-                val alpha =
-                    1f - slideButtonLastMarginStart.toFloat() /
-                            (slideButtonContainerWidth -
-                                    dimenPx(add_note_slide_button_left_margin) -
-                                    dimenPx(add_note_slide_button_width))
+                val alpha = 1f - slideButtonLastMarginStart.toFloat() / (slideButtonContainerWidth -
+                        dimenPx(add_note_slide_button_left_margin) -
+                        dimenPx(add_note_slide_button_width))
                 ui.slideToSendEnabledTextView.alpha = alpha
                 ui.slideToSendDisabledTextView.alpha = alpha
 
                 view.layoutParams = layoutParams
             }
             MotionEvent.ACTION_UP -> if (slideButtonLastMarginStart < slideButtonContainerWidth / 2) {
-                val anim = ValueAnimator.ofInt(
-                    slideButtonLastMarginStart,
-                    dimenPx(add_note_slide_button_left_margin)
-                )
-                anim.addUpdateListener { valueAnimator: ValueAnimator ->
-                    val margin = valueAnimator.animatedValue as Int
-                    ui.slideView.setStartMargin(margin)
-                    ui.slideToSendEnabledTextView.alpha =
-                        1f - margin.toFloat() / (slideButtonContainerWidth - dimenPx(
-                            add_note_slide_button_left_margin
-                        ) - dimenPx(add_note_slide_button_width))
+                ValueAnimator.ofInt(slideButtonLastMarginStart, dimenPx(add_note_slide_button_left_margin)).apply {
+                    addUpdateListener { valueAnimator: ValueAnimator ->
+                        val margin = valueAnimator.animatedValue as Int
+                        ui.slideView.setStartMargin(margin)
+                        ui.slideToSendEnabledTextView.alpha = 1f - margin.toFloat() / (slideButtonContainerWidth
+                                - dimenPx(add_note_slide_button_left_margin) - dimenPx(add_note_slide_button_width))
+                    }
+                    duration = Constants.UI.shortDurationMs
+                    interpolator = EasingInterpolator(Ease.QUART_IN_OUT)
+                    startDelay = 0
+                    start()
                 }
-                anim.duration = Constants.UI.shortDurationMs
-                anim.interpolator = EasingInterpolator(Ease.QUART_IN_OUT)
-                anim.startDelay = 0
-                anim.start()
             } else {
                 // disable input
                 ui.noteEditText.isEnabled = false
                 // complete slide animation
-                val anim = ValueAnimator.ofInt(
-                    slideButtonLastMarginStart,
-                    slideButtonContainerWidth - dimenPx(add_note_slide_button_left_margin) - dimenPx(
-                        add_note_slide_button_width
-                    )
-                )
-                anim.addUpdateListener { valueAnimator: ValueAnimator ->
-                    val margin = valueAnimator.animatedValue as Int
-                    ui.slideView.setStartMargin(margin)
-                    ui.slideToSendEnabledTextView.alpha =
-                        1f - margin.toFloat() / (slideButtonContainerWidth -
+                ValueAnimator.ofInt(
+                    slideButtonLastMarginStart, slideButtonContainerWidth - dimenPx(add_note_slide_button_left_margin)
+                            - dimenPx(add_note_slide_button_width)
+                ).apply {
+                    addUpdateListener { valueAnimator: ValueAnimator ->
+                        val margin = valueAnimator.animatedValue as Int
+                        ui.slideView.setStartMargin(margin)
+                        ui.slideToSendEnabledTextView.alpha = 1f - margin.toFloat() / (slideButtonContainerWidth -
                                 dimenPx(add_note_slide_button_left_margin) -
                                 dimenPx(add_note_slide_button_width))
+                    }
+                    duration = Constants.UI.shortDurationMs
+                    interpolator = EasingInterpolator(Ease.QUART_IN_OUT)
+                    startDelay = 0
+                    addListener(onEnd = { slideAnimationCompleted() })
+                    start()
                 }
-                anim.duration = Constants.UI.shortDurationMs
-                anim.interpolator = EasingInterpolator(Ease.QUART_IN_OUT)
-                anim.startDelay = 0
-                anim.addListener(onEnd = { slideAnimationCompleted() })
-                anim.start()
             }
         }
         return false
@@ -478,18 +432,19 @@ class AddNoteFragment : Fragment(), View.OnTouchListener {
 
     private fun slideAnimationCompleted() {
         // hide slide view
-        val anim = ValueAnimator.ofFloat(1F, 0F)
-        anim.addUpdateListener { valueAnimator: ValueAnimator ->
-            ui.slideView.alpha = valueAnimator.animatedValue as Float
+        ValueAnimator.ofFloat(1F, 0F).apply {
+            addUpdateListener { valueAnimator: ValueAnimator ->
+                ui.slideView.alpha = valueAnimator.animatedValue as Float
+            }
+            duration = Constants.UI.shortDurationMs
+            interpolator = EasingInterpolator(Ease.QUART_IN_OUT)
+            startDelay = 0
+            addListener(onEnd = {
+                onSlideAnimationEnd()
+                removeAllListeners()
+            })
+            start()
         }
-        anim.duration = Constants.UI.shortDurationMs
-        anim.interpolator = EasingInterpolator(Ease.QUART_IN_OUT)
-        anim.startDelay = 0
-        anim.addListener(onEnd = {
-            onSlideAnimationEnd()
-            anim.removeAllListeners()
-        })
-        anim.start()
     }
 
     private fun onSlideAnimationEnd() {
@@ -521,316 +476,26 @@ class AddNoteFragment : Fragment(), View.OnTouchListener {
         tracker.event(category = "Transaction", action = "Transaction Initiated")
         // notify listener (i.e. activity)
         val note = TxNote(ui.noteEditText.editableText.toString(), gifContainer.gifItem?.embedUri?.toString()).compose()
-        listenerWR.get()?.continueToFinalizeSendTx(this, TransactionData(recipientUser, amount, note))
+        addNodeListenerWR.get()?.continueToFinalizeSendTx(TransactionData(recipientUser, amount, note, isOneSidePayment))
     }
 
     private fun restoreSlider() {
         // hide slide view
         val slideViewInitialMargin = ui.slideView.getStartMargin()
-        val slideViewMarginDelta =
-            dimenPx(add_note_slide_button_left_margin) - slideViewInitialMargin
-        val anim = ValueAnimator.ofFloat(
-            1f,
-            0f
-        )
-        anim.addUpdateListener { valueAnimator: ValueAnimator ->
-            val value = valueAnimator.animatedValue as Float
-            ui.slideView.alpha = 1f - value
-            ui.slideToSendEnabledTextView.alpha = 1f - value
-            ui.slideView.setStartMargin(
-                (slideViewInitialMargin + slideViewMarginDelta * (1 - value)).toInt()
-            )
-        }
-        anim.duration = Constants.UI.shortDurationMs
-        anim.interpolator = EasingInterpolator(Ease.QUART_IN_OUT)
-        anim.start()
-    }
-
-    /**
-     * Listener interface - to be implemented by the host activity.
-     */
-    interface Listener {
-
-        fun continueToFinalizeSendTx(sourceFragment: AddNoteFragment, transactionData: TransactionData)
-
-    }
-
-    private inner class GIFContainer(
-        private val glide: RequestManager,
-        private val gifContainerView: View,
-        private val gifView: ImageView,
-        thumbnailsContainer: View,
-        state: Bundle?
-    ) {
-
-        private val transformation = RequestOptions().transform(RoundedCorners(10))
-        private var animation = GIFsPanelAnimation(thumbnailsContainer)
-
-        val isShown: Boolean
-            get() = animation.isViewShown
-
-        var gifItem: GIFItem? = null
-            set(value) {
-                field = value
-                if (value == null) {
-                    glide.clear(gifView)
-                    showContainer()
-                } else {
-                    showGIF()
-                    glide.asGif()
-                        .placeholder(GifPlaceholder.color(value).asDrawable())
-                        .apply(transformation)
-                        .load(value.uri)
-                        .transition(DrawableTransitionOptions.withCrossFade(250))
-                        .into(gifView)
-                }
-            }
-
-        init {
-            gifItem = state?.getParcelable(KEY_GIF)
-        }
-
-        private fun showContainer() {
-            animation.show()
-            gifContainerView.gone()
-        }
-
-        private fun showGIF() {
-            animation.hide()
-            gifContainerView.visible()
-        }
-
-        fun save(bundle: Bundle) {
-            gifItem?.run { bundle.putParcelable(KEY_GIF, this) }
-        }
-
-        fun dispose() {
-            animation.dispose()
-        }
-
-    }
-
-    private data class GIFsPanelAnimationState(
-        val direction: TranslationDirection,
-        val animator: Animator?
-    )
-
-    private enum class TranslationDirection { UP, DOWN }
-
-    private class GIFsPanelAnimation(private val view: View) {
-        private var state =
-            GIFsPanelAnimationState(TranslationDirection.UP, null)
-        val isViewShown
-            get() = state.direction == TranslationDirection.UP
-
-        fun show() {
-            state.animator?.cancel()
-            state = createState(TranslationDirection.UP, to = 0F)
-        }
-
-        fun hide() {
-            state.animator?.cancel()
-            state = createState(TranslationDirection.DOWN, to = view.height.toFloat())
-        }
-
-        private fun createState(direction: TranslationDirection, to: Float) =
-            GIFsPanelAnimationState(
-                direction,
-                ValueAnimator.ofFloat(view.translationY, to).apply {
-                    duration = TRANSLATION_DURATION
-                    addUpdateListener {
-                        view.translationY = it.animatedValue as Float
-                    }
-                    start()
-                })
-
-        fun dispose() {
-            this.state.animator?.cancel()
-        }
-
-        private companion object {
-            private const val TRANSLATION_DURATION = 300L
-        }
-    }
-
-    class ThumbnailGIFsViewModel() : CommonViewModel() {
-
-        init {
-            component?.inject(this)
-        }
-
-        @Inject
-        lateinit var gifsRepository: GIFRepository
-
-        @Inject
-        lateinit var giphyKeywordsRepository: GiphyKeywordsRepository
-
-
-        private val _state = MutableLiveData<GIFsState>()
-        val state: LiveData<GIFsState> get() = _state
-
-        init {
-            fetchGIFs()
-        }
-
-        private fun fetchGIFs() {
-            viewModelScope.launch(Dispatchers.Main) {
-                _state.value = GIFsState()
-                try {
-                    val gifs = withContext(Dispatchers.IO) {
-                        gifsRepository.getAll(
-                            giphyKeywordsRepository.getNext(),
-                            THUMBNAIL_REQUEST_LIMIT
-                        )
-                    }
-                    _state.value = GIFsState(gifs)
-                } catch (e: Exception) {
-                    Logger.e(e, "Error occurred while fetching gifs")
-                    _state.value = GIFsState(e)
-                }
-            }
-        }
-
-        class GIFsState private constructor(val gifItems: List<GIFItem>?, val error: Exception?) {
-            // Loading state
-            constructor() : this(null, null)
-            constructor(gifItems: List<GIFItem>) : this(gifItems, null)
-            constructor(e: Exception) : this(null, e)
-
-            val isError get() = error != null
-            val isSuccessful get() = gifItems != null
-        }
-    }
-
-    private class HorizontalInnerMarginDecoration(private val value: Int) :
-        RecyclerView.ItemDecoration() {
-
-        override fun getItemOffsets(
-            outRect: Rect,
-            view: View,
-            parent: RecyclerView,
-            state: RecyclerView.State
-        ) {
-            if (parent.getChildLayoutPosition(view) > 0) outRect.left = value
-        }
-    }
-
-    class ChooseGIFDialogFragment @Deprecated(
-        """Use newInstance() and supply all the necessary data via arguments instead, as fragment's 
-default no-op constructor is used by the framework for UI tree rebuild on configuration changes"""
-    ) constructor() : DialogFragment() {
-        private lateinit var ui: DialogChooseGifBinding
-        private lateinit var behavior: BottomSheetBehavior<View>
-        private lateinit var searchSubscription: Disposable
-
-        @Inject
-        lateinit var giphyKeywordsRepository: GiphyKeywordsRepository
-
-        override fun onAttach(context: Context) {
-            super.onAttach(context)
-            appComponent.inject(this)
-        }
-
-        override fun onCreateView(
-            inflater: LayoutInflater,
-            container: ViewGroup?,
-            savedInstanceState: Bundle?
-        ): View = DialogChooseGifBinding.inflate(inflater, container, false).also { ui = it }.root
-
-        override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-            super.onViewCreated(view, savedInstanceState)
-            val searchSubject = BehaviorSubject.create<String>()
-            searchSubscription = searchSubject
-                .debounce(500L, TimeUnit.MILLISECONDS)
-                .map { if (it.isEmpty()) giphyKeywordsRepository.getCurrent() else it }
-                .map { GPHContent.searchQuery(it, mediaType = MediaType.gif) }
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe { ui.giphyGridView.content = it }
-            setupUI(searchSubject)
-        }
-
-        override fun onDestroyView() {
-            searchSubscription.dispose()
-            super.onDestroyView()
-        }
-
-        private fun setupUI(observer: RxObserver<String>) {
-            ui.giphyGridView.content =
-                GPHContent.searchQuery(giphyKeywordsRepository.getCurrent(), MediaType.gif)
-            ui.giphyGridView.callback = object : GPHGridCallback {
-                override fun contentDidUpdate(resultCount: Int) {
-                    // No-op
-                }
-
-                override fun didSelectMedia(media: Media) {
-                    val intent = Intent().apply { putExtra(MEDIA_DELIVERY_KEY, media) }
-                    targetFragment!!.onActivityResult(targetRequestCode, Activity.RESULT_OK, intent)
-                    behavior.state = STATE_HIDDEN
-                }
-            }
-            ui.gifSearchEditText.addTextChangedListener(
-                afterTextChanged = afterChanged@{
-                    observer.onNext(it?.toString() ?: return@afterChanged)
-                }
-            )
-        }
-
-        override fun onCreateDialog(savedInstanceState: Bundle?): Dialog =
-            BottomSheetDialog(requireContext(), R.style.ChooseGIFDialog)
-                .apply { setOnShowListener { setupDialog(this) } }
-
-        private fun setupDialog(bottomSheetDialog: BottomSheetDialog) {
-            val bottomSheet: View = bottomSheetDialog.findViewById(R.id.design_bottom_sheet)!!
-            behavior = BottomSheetBehavior<View>()
-            behavior.isHideable = true
-            behavior.skipCollapsed = true
-            behavior.state = STATE_HIDDEN
-            val layoutParams = bottomSheet.layoutParams as CoordinatorLayout.LayoutParams
-            layoutParams.height = ViewGroup.LayoutParams.MATCH_PARENT
-            layoutParams.behavior = behavior
-            bottomSheetDialog.setOnKeyListener { _, keyCode, _ ->
-                (keyCode == KeyEvent.KEYCODE_BACK && behavior.state != STATE_HIDDEN &&
-                        behavior.state != STATE_COLLAPSED).also {
-                    if (it) behavior.state = STATE_HIDDEN
-                }
-            }
-            ui.root.doOnNextLayout {
-                behavior.state = STATE_EXPANDED
-                behavior.addCallback(
-                    onStateChange = { _, state ->
-                        if (state == STATE_HIDDEN || state == STATE_COLLAPSED) dismiss()
-                    },
-                    onSlided = { _, slideOffset ->
-                        val alpha = (slideOffset.coerceIn(0F, 1F) * 255).toInt()
-                        val color = Color.argb(alpha, 0, 0, 0)
-                        (bottomSheet.parent as View).setBackgroundColor(color)
-                    }
+        val slideViewMarginDelta = dimenPx(add_note_slide_button_left_margin) - slideViewInitialMargin
+        ValueAnimator.ofFloat(1f, 0f).apply {
+            addUpdateListener { valueAnimator: ValueAnimator ->
+                val value = valueAnimator.animatedValue as Float
+                ui.slideView.alpha = 1f - value
+                ui.slideToSendEnabledTextView.alpha = 1f - value
+                ui.slideView.setStartMargin(
+                    (slideViewInitialMargin + slideViewMarginDelta * (1 - value)).toInt()
                 )
             }
+            duration = Constants.UI.shortDurationMs
+            interpolator = EasingInterpolator(Ease.QUART_IN_OUT)
+            start()
         }
-
-        private fun BottomSheetBehavior<*>.addCallback(
-            onStateChange: (View, Int) -> Unit = { _, _ -> },
-            onSlided: (View, Float) -> Unit = { _, _ -> },
-        ) = addBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
-            override fun onStateChanged(bottomSheet: View, newState: Int) =
-                onStateChange(bottomSheet, newState)
-
-            override fun onSlide(bottomSheet: View, slideOffset: Float) =
-                onSlided(bottomSheet, slideOffset)
-        })
-
-        companion object {
-            @Suppress("DEPRECATION")
-            fun newInstance() = ChooseGIFDialogFragment()
-            const val MEDIA_DELIVERY_KEY = "key_media"
-        }
-    }
-
-    private companion object {
-        private const val KEY_GIF = "keygif"
-        private const val REQUEST_CODE_GIF = 1535
-        private const val THUMBNAIL_REQUEST_LIMIT = 20
     }
 }
 
