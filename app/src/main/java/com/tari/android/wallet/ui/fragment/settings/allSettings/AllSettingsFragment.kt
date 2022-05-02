@@ -32,7 +32,6 @@
  */
 package com.tari.android.wallet.ui.fragment.settings.allSettings
 
-import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -43,37 +42,19 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.tari.android.wallet.R.string.*
 import com.tari.android.wallet.databinding.FragmentAllSettingsBinding
-import com.tari.android.wallet.di.DiContainer.appComponent
 import com.tari.android.wallet.extension.observe
 import com.tari.android.wallet.infrastructure.BugReportingService
-import com.tari.android.wallet.infrastructure.security.biometric.BiometricAuthenticationService
 import com.tari.android.wallet.ui.common.CommonFragment
 import com.tari.android.wallet.ui.extension.string
 import com.tari.android.wallet.ui.fragment.settings.userAutorization.BiometricAuthenticationViewModel
-import com.tari.android.wallet.yat.YatAdapter
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 internal class AllSettingsFragment : CommonFragment<FragmentAllSettingsBinding, AllSettingsViewModel>() {
-
-    @Inject
-    lateinit var authService: BiometricAuthenticationService
-
-    @Inject
-    lateinit var bugReportingService: BugReportingService
-
-    @Inject
-    lateinit var yatAdapter: YatAdapter
 
     private val optionsAdapter = AllSettingsOptionAdapter()
 
     private val biometricAuthenticationViewModel: BiometricAuthenticationViewModel by viewModels()
-
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-        appComponent.inject(this)
-    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
         FragmentAllSettingsBinding.inflate(inflater, container, false).also { ui = it }.root
@@ -109,7 +90,7 @@ internal class AllSettingsFragment : CommonFragment<FragmentAllSettingsBinding, 
     private fun shareBugReport() {
         lifecycleScope.launch(Dispatchers.IO) {
             try {
-                bugReportingService.shareBugReport(requireActivity())
+                viewModel.bugReportingService.shareBugReport(requireActivity())
             } catch (e: BugReportingService.BugReportFileSizeLimitExceededException) {
                 showBugReportFileSizeExceededDialog()
             }

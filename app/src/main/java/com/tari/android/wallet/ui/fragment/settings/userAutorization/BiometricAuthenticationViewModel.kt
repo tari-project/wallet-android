@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.orhanobut.logger.Logger
 import com.tari.android.wallet.R
 import com.tari.android.wallet.extension.observe
+import com.tari.android.wallet.infrastructure.security.biometric.BiometricAuthenticationException
 import com.tari.android.wallet.infrastructure.security.biometric.BiometricAuthenticationService
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.common.SingleLiveEvent
@@ -45,7 +46,7 @@ class BiometricAuthenticationViewModel : CommonViewModel() {
     private fun handleSuccess() = onAuthorizedAction.invoke()
 
     private fun handleError(e: Exception) {
-        if (e is BiometricAuthenticationService.BiometricAuthenticationException) {
+        if (e is BiometricAuthenticationException) {
             if (e.code != BiometricPrompt.ERROR_USER_CANCELED && e.code != BiometricPrompt.ERROR_CANCELED)
                 Logger.e("Other biometric error. Code: ${e.code}")
             val args = AlertDialogArgs(
@@ -62,13 +63,9 @@ class BiometricAuthenticationViewModel : CommonViewModel() {
             fragment.observe(viewModel._startAuthenticate) {
                 viewModelScope.launch {
                     try {
-                        authService.authenticate(
-                            fragment,
-                            title = it.title,
-                            subtitle = it.subtitle
-                        )
+                        authService.authenticate(fragment, title = it.title, subtitle = it.subtitle)
                         handleSuccess()
-                    } catch (e: BiometricAuthenticationService.BiometricAuthenticationException) {
+                    } catch (e: BiometricAuthenticationException) {
                         handleError(e)
                     }
                 }

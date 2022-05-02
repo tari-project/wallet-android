@@ -59,7 +59,6 @@ import com.tari.android.wallet.databinding.FragmentAddAmountBinding
 import com.tari.android.wallet.di.DiContainer.appComponent
 import com.tari.android.wallet.extension.getWithError
 import com.tari.android.wallet.extension.observe
-import com.tari.android.wallet.infrastructure.Tracker
 import com.tari.android.wallet.model.*
 import com.tari.android.wallet.service.TariWalletService
 import com.tari.android.wallet.service.WalletService
@@ -76,12 +75,8 @@ import com.tari.android.wallet.util.WalletUtil
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.lang.ref.WeakReference
-import javax.inject.Inject
 
 class AddAmountFragment : CommonFragment<FragmentAddAmountBinding, AddAmountViewModel>(), ServiceConnection {
-
-    @Inject
-    lateinit var tracker: Tracker
 
     private lateinit var addAmountListenerWR: WeakReference<AddAmountListener>
 
@@ -110,15 +105,11 @@ class AddAmountFragment : CommonFragment<FragmentAddAmountBinding, AddAmountView
     private lateinit var balanceInfo: BalanceInfo
     private lateinit var availableBalance: MicroTari
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View = FragmentAddAmountBinding.inflate(inflater, container, false).also { ui = it }.root
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
+        FragmentAddAmountBinding.inflate(inflater, container, false).also { ui = it }.root
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        appComponent.inject(this)
 
         val viewModel: AddAmountViewModel by viewModels()
         bindViewModel(viewModel)
@@ -126,7 +117,7 @@ class AddAmountFragment : CommonFragment<FragmentAddAmountBinding, AddAmountView
 
         bindToWalletService()
         if (savedInstanceState == null) {
-            tracker.screen(path = "/home/send_tari/add_amount", title = "Send Tari - Add Amount")
+            viewModel.tracker.screen(path = "/home/send_tari/add_amount", title = "Send Tari - Add Amount")
         }
         isFirstLaunch = savedInstanceState == null
     }

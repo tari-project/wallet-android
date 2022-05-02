@@ -66,7 +66,6 @@ class FinalizeSendTxFragment : CommonFragment<FragmentFinalizeSendTxBinding, Fin
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        appComponent.inject(this)
 
         val viewModel: FinalizeSendTxViewModel by viewModels()
         bindViewModel(viewModel)

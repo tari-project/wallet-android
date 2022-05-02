@@ -31,8 +31,11 @@ internal class ChooseRestoreOptionViewModel : CommonViewModel() {
     @Inject
     lateinit var walletServiceLauncher: WalletServiceLauncher
 
+    @Inject
+    lateinit var backupManager: BackupManager
+
     init {
-        component?.inject(this)
+        component.inject(this)
     }
 
     private val _state = SingleLiveEvent<ChooseRestoreOptionState>()

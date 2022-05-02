@@ -30,16 +30,16 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.tari.android.wallet.ui.fragment.onboarding
+package com.tari.android.wallet.ui.fragment.onboarding.inroduction
 
 import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
 import android.animation.ValueAnimator
-import android.content.Context
 import android.media.AudioManager
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
+import android.os.Looper
 import android.text.SpannableString
 import android.text.method.LinkMovementMethod
 import android.view.LayoutInflater
@@ -47,26 +47,20 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.core.animation.addListener
-import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import com.daasuu.ei.Ease
 import com.daasuu.ei.EasingInterpolator
 import com.tari.android.wallet.R
 import com.tari.android.wallet.R.color.white
 import com.tari.android.wallet.R.string.*
-import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
-import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepository
 import com.tari.android.wallet.databinding.FragmentIntroductionBinding
-import com.tari.android.wallet.di.DiContainer.appComponent
-import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.extension.applyURLStyle
-import com.tari.android.wallet.infrastructure.Tracker
-import com.tari.android.wallet.service.WalletServiceLauncher
-import com.tari.android.wallet.ui.activity.onboarding.OnboardingFlowActivity
-import com.tari.android.wallet.ui.fragment.restore.restore.WalletRestoreActivity
+import com.tari.android.wallet.ui.common.CommonFragment
 import com.tari.android.wallet.ui.extension.*
+import com.tari.android.wallet.ui.fragment.onboarding.activity.OnboardingFlowActivity
+import com.tari.android.wallet.ui.fragment.restore.restore.WalletRestoreActivity
 import com.tari.android.wallet.ui.fragment.settings.allSettings.TariVersionModel
 import com.tari.android.wallet.util.Constants
-import javax.inject.Inject
 import kotlin.math.min
 
 /**
@@ -76,60 +70,29 @@ import kotlin.math.min
  *
  * @author The Tari Development Team
  */
-internal class IntroductionFragment : Fragment() {
 
-    @Inject
-    lateinit var sharedPrefsWrapper: SharedPrefsRepository
+class IntroductionFragment : CommonFragment<FragmentIntroductionBinding, IntroductionViewModel>() {
 
-    @Inject
-    lateinit var networkRepository: NetworkRepository
-
-    @Inject
-    lateinit var walletServiceLauncher: WalletServiceLauncher
-
-    @Inject
-    lateinit var tracker: Tracker
-
-    @Inject
-    lateinit var applicationContext: Context
-
-    private var listener: Listener? = null
-
-    private val handler = Handler()
+    private val handler = Handler(Looper.getMainLooper())
 
     private var videoViewHasBeenSetup = false
     private var videoViewLastPosition = 0
 
     private val createWalletArtificialDelay = Constants.UI.CreateWallet.tariTextAnimViewDurationMs
 
-    private lateinit var ui: FragmentIntroductionBinding
-
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View = FragmentIntroductionBinding.inflate(inflater, container, false).also { ui = it }.root
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
+        FragmentIntroductionBinding.inflate(inflater, container, false).also { ui = it }.root
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        appComponent.inject(this)
+
+        val viewModel: IntroductionViewModel by viewModels()
+        bindViewModel(viewModel)
+
         setupUi()
         if (savedInstanceState == null) {
-            tracker.screen(path = "/onboarding/introduction", title = "Onboarding - Introduction")
+            viewModel.tracker.screen(path = "/onboarding/introduction", title = "Onboarding - Introduction")
         }
-    }
-
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-        if (activity is Listener) {
-            listener = activity as Listener
-        }
-    }
-
-    override fun onDestroy() {
-        EventBus.walletState.unsubscribe(this)
-        listener = null
-        super.onDestroy()
     }
 
     override fun onStop() {
@@ -146,7 +109,7 @@ internal class IntroductionFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-        ui.selectNetworkButton.text = string(introduction_selected_wallet, networkRepository.currentNetwork!!.network.displayName)
+        ui.selectNetworkButton.text = string(introduction_selected_wallet, viewModel.networkRepository.currentNetwork!!.network.displayName)
     }
 
     override fun onPause() {
@@ -175,18 +138,12 @@ internal class IntroductionFragment : Fragment() {
                     it.overridePendingTransition(R.anim.enter_from_bottom, R.anim.exit_to_top)
                 }
             }
-            networkInfoTextView.text = TariVersionModel(networkRepository).versionInfo
+            networkInfoTextView.text = TariVersionModel(viewModel.networkRepository).versionInfo
             // highlight links
             userAgreementAndPrivacyPolicyTextView.text =
                 SpannableString(string(create_wallet_user_agreement_and_privacy_policy)).apply {
-                    applyURLStyle(
-                        string(create_wallet_user_agreement),
-                        string(user_agreement_url)
-                    )
-                    applyURLStyle(
-                        string(create_wallet_privacy_policy),
-                        string(privacy_policy_url)
-                    )
+                    applyURLStyle(string(create_wallet_user_agreement), string(user_agreement_url))
+                    applyURLStyle(string(create_wallet_privacy_policy), string(privacy_policy_url))
                 }
             // make the links clickable
             userAgreementAndPrivacyPolicyTextView.movementMethod = LinkMovementMethod.getInstance()
@@ -260,7 +217,7 @@ internal class IntroductionFragment : Fragment() {
         restoreWalletCtaView.setOnClickListener(null)
         createWalletButton.gone()
         createWalletProgressBar.visible()
-        walletServiceLauncher.start()
+        viewModel.walletServiceLauncher.start()
         createWalletContainerView.animateClick {
             selectNetworkContainerView.isEnabled = false
             rootView.postDelayed(createWalletArtificialDelay) { startTariWalletViewAnimation() }
@@ -270,48 +227,48 @@ internal class IntroductionFragment : Fragment() {
     private fun startTariWalletViewAnimation() {
         val metrics = resources.displayMetrics
         val offset = (metrics.heightPixels / 2 - ui.tariLogoLottieAnimationView.height / 2 - ui.tariLogoLottieAnimationView.top).toFloat()
-        val tariViewTranslateAnim = ObjectAnimator.ofFloat(
-            ui.tariLogoLottieAnimationView,
-            View.TRANSLATION_Y,
-            offset
-        )
-        tariViewTranslateAnim.interpolator = EasingInterpolator(Ease.CIRC_IN_OUT)
-        tariViewTranslateAnim.duration = Constants.UI.CreateWallet.tariTextAnimViewDurationMs
-
-        tariViewTranslateAnim.addListener(onEnd = { playTariWalletLottieAnimation() })
-        ui.tariLogoLottieAnimationView.addAnimatorListener(onEnd = { listener?.continueToCreateWallet() })
-
-        val tariViewScaleAnim = ValueAnimator.ofFloat(ui.tariLogoLottieAnimationView.scale, 1f)
-        tariViewScaleAnim.duration = Constants.UI.CreateWallet.tariTextAnimViewDurationMs
-        tariViewScaleAnim.addUpdateListener { valueAnimator: ValueAnimator ->
-            val scale = valueAnimator.animatedValue as Float
-            ui.tariLogoLottieAnimationView.scale = scale
+        val tariViewTranslateAnim = ObjectAnimator.ofFloat(ui.tariLogoLottieAnimationView, View.TRANSLATION_Y, offset).apply {
+            interpolator = EasingInterpolator(Ease.CIRC_IN_OUT)
+            duration = Constants.UI.CreateWallet.tariTextAnimViewDurationMs
+            addListener(onEnd = { playTariWalletLottieAnimation() })
         }
 
-        val fadeOutAnim = ValueAnimator.ofFloat(1f, 0f)
-        fadeOutAnim.duration = Constants.UI.CreateWallet.viewContainerFadeOutDurationMs
-        fadeOutAnim.addUpdateListener { valueAnimator: ValueAnimator ->
-            val alpha = valueAnimator.animatedValue as Float
-            ui.restoreWalletCtaView.alpha = alpha
-            ui.videoOuterContainerView.alpha = alpha
-            ui.headerLineTopTextView.alpha = alpha
-            ui.headerLineBottomTextView.alpha = alpha
-            ui.selectNetworkContainerView.alpha = alpha
-            ui.createWalletContainerView.alpha = alpha
-            ui.userAgreementAndPrivacyPolicyTextView.alpha = alpha
-        }
-        fadeOutAnim.addListener(onEnd = {
-            ui.videoOuterContainerView.invisible()
-            ui.headerLineTopTextView.invisible()
-            ui.headerLineBottomTextView.invisible()
-            ui.selectNetworkContainerView.invisible()
-            ui.createWalletContainerView.invisible()
-            ui.userAgreementAndPrivacyPolicyTextView.invisible()
-        })
+        ui.tariLogoLottieAnimationView.addAnimatorListener(onEnd = { (requireActivity() as? IntroductionListener)?.continueToCreateWallet() })
 
-        val animSet = AnimatorSet()
-        animSet.playTogether(tariViewTranslateAnim, tariViewScaleAnim, fadeOutAnim)
-        animSet.start()
+        val tariViewScaleAnim = ValueAnimator.ofFloat(ui.tariLogoLottieAnimationView.scale, 1f).apply {
+            duration = Constants.UI.CreateWallet.tariTextAnimViewDurationMs
+            addUpdateListener { valueAnimator: ValueAnimator ->
+                val scale = valueAnimator.animatedValue as Float
+                ui.tariLogoLottieAnimationView.scale = scale
+            }
+        }
+
+        val fadeOutAnim = ValueAnimator.ofFloat(1f, 0f).apply {
+            duration = Constants.UI.CreateWallet.viewContainerFadeOutDurationMs
+            addUpdateListener { valueAnimator: ValueAnimator ->
+                val alpha = valueAnimator.animatedValue as Float
+                ui.restoreWalletCtaView.alpha = alpha
+                ui.videoOuterContainerView.alpha = alpha
+                ui.headerLineTopTextView.alpha = alpha
+                ui.headerLineBottomTextView.alpha = alpha
+                ui.selectNetworkContainerView.alpha = alpha
+                ui.createWalletContainerView.alpha = alpha
+                ui.userAgreementAndPrivacyPolicyTextView.alpha = alpha
+            }
+            addListener(onEnd = {
+                ui.videoOuterContainerView.invisible()
+                ui.headerLineTopTextView.invisible()
+                ui.headerLineBottomTextView.invisible()
+                ui.selectNetworkContainerView.invisible()
+                ui.createWalletContainerView.invisible()
+                ui.userAgreementAndPrivacyPolicyTextView.invisible()
+            })
+        }
+
+        AnimatorSet().apply {
+            playTogether(tariViewTranslateAnim, tariViewScaleAnim, fadeOutAnim)
+            start()
+        }
     }
 
     private fun playTariWalletLottieAnimation() {
@@ -327,11 +284,5 @@ internal class IntroductionFragment : Fragment() {
             start()
         }
     }
-
-    interface Listener {
-
-        fun continueToCreateWallet()
-
-    }
-
 }
+

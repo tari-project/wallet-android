@@ -3,6 +3,7 @@ package com.tari.android.wallet.ui.fragment.send.addAmount
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.tari.android.wallet.data.sharedPrefs.tariSettings.TariSettingsSharedRepository
+import com.tari.android.wallet.infrastructure.Tracker
 import com.tari.android.wallet.ui.common.CommonViewModel
 import javax.inject.Inject
 
