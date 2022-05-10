@@ -26,9 +26,6 @@ class NetworkRepositoryImpl(private val resourceManager: ResourceManager, shared
     override var incompatibleNetworkShown by SharedPrefBooleanDelegate(sharedPrefs, formatKey(Keys.networkIncompatible), false)
 
     override fun getAllNetworks(): List<TariNetwork> = listOf(getDibbler(resourceManager))
-
-    private fun formatKey(key: String): String = key + "_" + currentNetwork!!.network.displayName
-
     object Keys {
         const val currentNetwork = "tari_current_network"
         const val ffiNetwork = "ffi_tari_current_network"
