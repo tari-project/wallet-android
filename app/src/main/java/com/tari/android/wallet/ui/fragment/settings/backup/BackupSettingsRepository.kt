@@ -3,17 +3,19 @@ package com.tari.android.wallet.ui.fragment.settings.backup
 import android.content.Context
 import android.content.SharedPreferences
 import android.net.Uri
-import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepository
+import com.tari.android.wallet.data.repository.CommonRepository
 import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefDateTimeDelegate
 import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefGsonDelegate
 import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefStringSecuredDelegate
+import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepository
+import com.tari.android.wallet.data.sharedPrefs.network.formatKey
 import org.joda.time.DateTime
 
 class BackupSettingsRepository(
     private val context: Context,
     private val sharedPrefs: SharedPreferences,
-    private val networkRepository: NetworkRepository
-) {
+    networkRepository: NetworkRepository
+) : CommonRepository(networkRepository) {
 
     var lastSuccessfulBackupDate: DateTime? by SharedPrefDateTimeDelegate(sharedPrefs, formatKey(Keys.lastSuccessfulBackupDate))
 
@@ -40,8 +42,6 @@ class BackupSettingsRepository(
         backupPassword = null
         localBackupFolderURI = null
     }
-
-    private fun formatKey(key: String): String = key + "_" + networkRepository.currentNetwork!!.network.displayName
 
     object Keys {
         const val lastSuccessfulBackupDate = "tari_wallet_last_successful_backup_date"

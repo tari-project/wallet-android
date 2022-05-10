@@ -33,14 +33,16 @@
 package com.tari.android.wallet.data.sharedPrefs.baseNode
 
 import android.content.SharedPreferences
+import com.tari.android.wallet.data.repository.CommonRepository
 import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodeSharedRepository.Key.baseNodeLastSyncResultField
 import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodeSharedRepository.Key.currentBaseNodeField
 import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodeSharedRepository.Key.userBaseNodeListField
 import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefBooleanNullableDelegate
 import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefGsonDelegate
 import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepository
+import com.tari.android.wallet.data.sharedPrefs.network.formatKey
 
-class BaseNodeSharedRepository(sharedPrefs: SharedPreferences, val networkRepository: NetworkRepository) {
+class BaseNodeSharedRepository(sharedPrefs: SharedPreferences, networkRepository: NetworkRepository) : CommonRepository(networkRepository) {
 
     private object Key {
         const val currentBaseNodeField = "tari_wallet_current_base_node"
@@ -74,6 +76,4 @@ class BaseNodeSharedRepository(sharedPrefs: SharedPreferences, val networkReposi
         currentBaseNode = null
         userBaseNodes = null
     }
-
-    private fun formatKey(key: String): String = key + "_" + networkRepository.currentNetwork!!.network.displayName
 }

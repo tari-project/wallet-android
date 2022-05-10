@@ -34,11 +34,13 @@ package com.tari.android.wallet.data.sharedPrefs
 
 import android.content.Context
 import android.content.SharedPreferences
+import com.tari.android.wallet.data.repository.CommonRepository
 import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodeSharedRepository
 import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefBooleanDelegate
 import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefStringDelegate
 import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefStringSecuredDelegate
 import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepository
+import com.tari.android.wallet.data.sharedPrefs.network.formatKey
 import com.tari.android.wallet.data.sharedPrefs.tariSettings.TariSettingsSharedRepository
 import com.tari.android.wallet.data.sharedPrefs.testnetFaucet.TestnetFaucetRepository
 import com.tari.android.wallet.data.sharedPrefs.tor.TorSharedRepository
@@ -56,14 +58,14 @@ import kotlin.random.Random
 class SharedPrefsRepository(
     context: Context,
     sharedPrefs: SharedPreferences,
-    private val networkRepository: NetworkRepository,
+    networkRepository: NetworkRepository,
     private val backupSettingsRepository: BackupSettingsRepository,
     private val baseNodeSharedRepository: BaseNodeSharedRepository,
     private val testnetFaucetRepository: TestnetFaucetRepository,
     private val yatSharedRepository: YatSharedRepository,
     private val torSharedRepository: TorSharedRepository,
     private var tariSettingsSharedRepository: TariSettingsSharedRepository
-) {
+) : CommonRepository(networkRepository) {
 
     private object Key {
         const val publicKeyHexString = "tari_wallet_public_key_hex_string"
@@ -148,6 +150,4 @@ class SharedPrefsRepository(
         }
         return isCleared
     }
-
-    private fun formatKey(key: String): String = key + "_" + networkRepository.currentNetwork!!.network.displayName
 }
