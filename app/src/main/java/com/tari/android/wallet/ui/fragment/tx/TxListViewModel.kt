@@ -392,10 +392,7 @@ internal class TxListViewModel() : CommonViewModel() {
 
         // import second testnet UTXO if it hasn't been imported yet
         if (testnetRepository.testnetTariUTXOKeyList.orEmpty().isNotEmpty()) {
-            viewModelScope.launch(Dispatchers.IO) {
-                delay(SECOND_UTXO_IMPORT_DELAY)
-                importSecondUTXO()
-            }
+            importSecondUTXO()
         }
     }
 
@@ -575,7 +572,6 @@ internal class TxListViewModel() : CommonViewModel() {
 
     companion object {
         private const val LIST_UPDATE_DEBOUNCE = 500L
-        private const val SECOND_UTXO_IMPORT_DELAY = 2500L
         private const val SECOND_UTXO_STORE_OPEN_DELAY = 3000L
     }
 }

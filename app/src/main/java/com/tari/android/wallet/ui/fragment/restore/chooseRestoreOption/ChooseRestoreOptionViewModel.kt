@@ -66,7 +66,7 @@ internal class ChooseRestoreOptionViewModel : CommonViewModel() {
                 when (it) {
                     WalletState.Initializing,
                     WalletState.NotReady -> Unit
-                    WalletState.Running -> _navigation.postValue(ChooseRestoreOptionNavigation.ToRestoreInProgress)
+                    WalletState.Running -> _navigation.postValue(ChooseRestoreOptionNavigation.OnRestoreCompleted)
                     is WalletState.Failed -> viewModelScope.launch(Dispatchers.IO) {
                         handleException(WalletStartFailedException(it.exception))
                     }
