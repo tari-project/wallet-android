@@ -93,7 +93,6 @@ internal class ChooseRestoreOptionFragment : CommonFragment<FragmentChooseRestor
     private fun processNavigation(navigation: ChooseRestoreOptionNavigation) {
         val router = requireActivity() as WalletRestoreRouter
         when (navigation) {
-            ChooseRestoreOptionNavigation.ToRestoreInProgress -> router.toRestoreInProgress()
             ChooseRestoreOptionNavigation.ToEnterRestorePassword -> router.toEnterRestorePassword()
             ChooseRestoreOptionNavigation.OnRestoreCompleted -> router.onRestoreCompleted()
             ChooseRestoreOptionNavigation.ToRestoreWithRecoveryPhrase -> router.toRestoreWithRecoveryPhrase()

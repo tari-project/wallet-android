@@ -53,7 +53,7 @@ internal class WalletRestoringFromSeedWordsViewModel() : CommonViewModel() {
     val recoveryState: LiveData<RecoveryState> = _recoveryState
 
     init {
-        component?.inject(this)
+        component.inject(this)
     }
 
     fun startRestoring() = viewModelScope.launch(Dispatchers.IO) {

@@ -66,7 +66,6 @@ import com.tari.android.wallet.service.WalletServiceLauncher
 import com.tari.android.wallet.service.connection.TariWalletServiceConnection
 import com.tari.android.wallet.service.connection.TariWalletServiceConnection.ServiceConnectionStatus.CONNECTED
 import com.tari.android.wallet.ui.activity.SplashActivity
-import com.tari.android.wallet.ui.fragment.onboarding.activity.OnboardingFlowActivity
 import com.tari.android.wallet.ui.activity.settings.BackupSettingsActivity
 import com.tari.android.wallet.ui.activity.settings.DeleteWalletActivity
 import com.tari.android.wallet.ui.common.CommonActivity
@@ -86,6 +85,7 @@ import com.tari.android.wallet.ui.extension.string
 import com.tari.android.wallet.ui.fragment.debug.baseNodeConfig.BaseNodeConfigRouter
 import com.tari.android.wallet.ui.fragment.debug.baseNodeConfig.addBaseNode.AddCustomBaseNodeFragment
 import com.tari.android.wallet.ui.fragment.debug.baseNodeConfig.changeBaseNode.ChangeBaseNodeFragment
+import com.tari.android.wallet.ui.fragment.onboarding.activity.OnboardingFlowActivity
 import com.tari.android.wallet.ui.fragment.profile.WalletInfoFragment
 import com.tari.android.wallet.ui.fragment.send.activity.SendTariActivity
 import com.tari.android.wallet.ui.fragment.settings.allSettings.AllSettingsFragment
@@ -383,7 +383,7 @@ internal class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>
         }
         val intent = Intent(this, SendTariActivity::class.java)
         intent.putExtra("recipientUser", recipientUser as Parcelable)
-        sendDeeplink.note?.let { intent.putExtra(SendTariActivity.PARAMETER_NOTE, it) }
+        sendDeeplink.note.let { intent.putExtra(SendTariActivity.PARAMETER_NOTE, it) }
         sendDeeplink.amount?.let { intent.putExtra(SendTariActivity.PARAMETER_AMOUNT, it.tariValue) }
         startActivity(intent)
         overridePendingTransition(R.anim.enter_from_right, R.anim.exit_to_left)

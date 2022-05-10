@@ -48,7 +48,6 @@ import com.tari.android.wallet.ui.fragment.debug.baseNodeConfig.changeBaseNode.C
 import com.tari.android.wallet.ui.fragment.restore.chooseRestoreOption.ChooseRestoreOptionFragment
 import com.tari.android.wallet.ui.fragment.restore.enterRestorationPassword.EnterRestorationPasswordFragment
 import com.tari.android.wallet.ui.fragment.restore.inputSeedWords.InputSeedWordsFragment
-import com.tari.android.wallet.ui.fragment.restore.walletRestoring.WalletRestoringFragment
 import com.tari.android.wallet.ui.fragment.restore.walletRestoringFromSeedWords.WalletRestoringFromSeedWordsFragment
 import javax.inject.Inject
 
@@ -86,10 +85,6 @@ class WalletRestoreActivity : AppCompatActivity(), WalletRestoreRouter, BaseNode
 
     override fun toRestoreWithRecoveryPhrase() {
         loadFragment(InputSeedWordsFragment.newInstance())
-    }
-
-    override fun toRestoreInProgress() {
-        loadFragment(WalletRestoringFragment.newInstance())
     }
 
     override fun toRestoreFromSeedWordsInProgress() {

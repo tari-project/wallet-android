@@ -27,11 +27,8 @@ internal class InputSeedWordsFragment : CommonFragment<FragmentWalletInputSeedWo
 
     private val suggestionsAdapter = SuggestionsAdapter()
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View = FragmentWalletInputSeedWordsBinding.inflate(inflater, container, false).also { ui = it }.root
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
+        FragmentWalletInputSeedWordsBinding.inflate(inflater, container, false).also { ui = it }.root
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -100,7 +97,7 @@ internal class InputSeedWordsFragment : CommonFragment<FragmentWalletInputSeedWo
         }
     }
 
-    private fun showSuggestions(suggestions: SuggestionState) = when(suggestions) {
+    private fun showSuggestions(suggestions: SuggestionState) = when (suggestions) {
         SuggestionState.Empty -> {
             setSuggestionsState(false)
             ui.suggestionsLabel.setText(R.string.restore_from_seed_words_autocompletion_no_suggestions)
