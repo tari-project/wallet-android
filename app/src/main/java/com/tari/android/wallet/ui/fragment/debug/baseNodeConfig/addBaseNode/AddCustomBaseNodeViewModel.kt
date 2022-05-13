@@ -77,11 +77,11 @@ internal class AddCustomBaseNodeViewModel : CommonViewModel() {
     fun onAddressChanged(text: String) = _onionAddressText.postValue(text)
 
     private fun addBaseNodePeerFailed() {
-        _errorDialog.postValue(
+        _modularDialog.postValue(
             ErrorDialogArgs(
                 resourceManager.getString(R.string.common_error_title),
                 resourceManager.getString(R.string.debug_edit_base_node_failed)
-            )
+            ).getModular(resourceManager)
         )
     }
 }

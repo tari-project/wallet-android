@@ -32,7 +32,6 @@
  */
 package com.tari.android.wallet.ui.fragment.restore.chooseRestoreOption
 
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -41,36 +40,16 @@ import android.view.ViewGroup
 import androidx.fragment.app.viewModels
 import com.tari.android.wallet.R
 import com.tari.android.wallet.databinding.FragmentChooseRestoreOptionBinding
-import com.tari.android.wallet.di.DiContainer.appComponent
 import com.tari.android.wallet.extension.observe
-import com.tari.android.wallet.infrastructure.backup.BackupManager
 import com.tari.android.wallet.ui.common.CommonFragment
 import com.tari.android.wallet.ui.extension.setOnThrottledClickListener
 import com.tari.android.wallet.ui.fragment.restore.chooseRestoreOption.option.RecoveryOptionView
 import com.tari.android.wallet.ui.fragment.restore.restore.WalletRestoreRouter
 import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupOptions
-import javax.inject.Inject
 
 internal class ChooseRestoreOptionFragment : CommonFragment<FragmentChooseRestoreOptionBinding, ChooseRestoreOptionViewModel>() {
 
-    @Inject
-    internal lateinit var backupManager: BackupManager
-
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-        appComponent.inject(this)
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        viewModel.onActivityResult(requestCode, resultCode, data)
-    }
-
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View =
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?) =
         FragmentChooseRestoreOptionBinding.inflate(inflater, container, false).also { ui = it }.root
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -82,6 +61,11 @@ internal class ChooseRestoreOptionFragment : CommonFragment<FragmentChooseRestor
         setupUI()
 
         observeUI()
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        viewModel.onActivityResult(requestCode, resultCode, data)
     }
 
     private fun setupUI() = with(ui) {
@@ -97,7 +81,7 @@ internal class ChooseRestoreOptionFragment : CommonFragment<FragmentChooseRestor
 
     private fun startRecovery(options: BackupOptions) {
         viewModel.startRestore(options)
-        backupManager.setupStorage(options, this)
+        viewModel.backupManager.setupStorage(options, this)
     }
 
     private fun observeUI() = with(viewModel) {
@@ -116,7 +100,6 @@ internal class ChooseRestoreOptionFragment : CommonFragment<FragmentChooseRestor
     private fun processNavigation(navigation: ChooseRestoreOptionNavigation) {
         val router = requireActivity() as WalletRestoreRouter
         when (navigation) {
-            ChooseRestoreOptionNavigation.ToRestoreInProgress -> router.toRestoreInProgress()
             ChooseRestoreOptionNavigation.ToEnterRestorePassword -> router.toEnterRestorePassword()
             ChooseRestoreOptionNavigation.OnRestoreCompleted -> router.onRestoreCompleted()
             ChooseRestoreOptionNavigation.ToRestoreWithRecoveryPhrase -> router.toRestoreWithRecoveryPhrase()
@@ -134,10 +117,6 @@ internal class ChooseRestoreOptionFragment : CommonFragment<FragmentChooseRestor
             BackupOptions.Dropbox -> ui.dropboxRestoreOption
             BackupOptions.Local -> ui.localFileRestoreOption
         }
-    }
-
-    companion object {
-        fun newInstance() = ChooseRestoreOptionFragment()
     }
 }
 

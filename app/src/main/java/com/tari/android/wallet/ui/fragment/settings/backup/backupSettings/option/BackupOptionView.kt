@@ -10,8 +10,6 @@ import com.tari.android.wallet.R
 import com.tari.android.wallet.databinding.ViewBackupOptionBinding
 import com.tari.android.wallet.extension.observe
 import com.tari.android.wallet.ui.component.common.CommonView
-import com.tari.android.wallet.ui.dialog.BottomSlideDialog
-import com.tari.android.wallet.ui.extension.ThrottleClick
 import com.tari.android.wallet.ui.extension.color
 import com.tari.android.wallet.ui.extension.setColor
 import com.tari.android.wallet.ui.extension.setVisible
@@ -47,8 +45,6 @@ class BackupOptionView : CommonView<BackupOptionViewModel, ViewBackupOptionBindi
 
         observe(inProgress) { onChangeInProgress(it) }
 
-        observe(showBackupsWillBeDeletedDialog) { showBackupsWillBeDeletedDialog(it.onAccept, it.onDismiss) }
-
         observe(openFolderSelection) { backupManager.setupStorage(viewModel.option.value!!.type, fragment) }
     }
 
@@ -65,26 +61,6 @@ class BackupOptionView : CommonView<BackupOptionViewModel, ViewBackupOptionBindi
 
     private fun setPermissionSwitchListener() {
         ui.backupSwitch.setOnCheckedChangeListener { _, isChecked -> viewModel.onBackupSwitchChecked(isChecked) }
-    }
-
-    //todo refactor to nice state
-    private fun showBackupsWillBeDeletedDialog(onAccept: () -> Unit, onDismiss: () -> Unit) {
-        BottomSlideDialog(
-            context,
-            R.layout.dialog_turn_off_backups_will_be_deleted_warning,
-            canceledOnTouchOutside = false
-        ).apply {
-            findViewById<View>(R.id.backup_turn_off_confirm_button)
-                .setOnClickListener(ThrottleClick {
-                    onAccept()
-                    dismiss()
-                })
-            findViewById<View>(R.id.backup_turn_off_cancel_button)
-                .setOnClickListener(ThrottleClick {
-                    onDismiss()
-                    dismiss()
-                })
-        }.show()
     }
 
     override fun setup() = Unit

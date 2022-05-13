@@ -38,6 +38,14 @@ package com.tari.android.wallet.application
 enum class Network(val uriComponent: String, val displayName: String) {
     MAINNET("mainnet", "MAINNET"),
 
+    RINCEWIND("rincewind", "RINCEWIND"),
+
+    RIDCULLY("ridcully", "RIDCULLY"),
+
+    STIBBONS("stibbons", "STIBBONS"),
+
+    IGOR("igor", "IGOR"),
+
     DIBBLER("dibbler", "DIBBLER");
 
     companion object {

@@ -15,9 +15,8 @@ import com.tari.android.wallet.di.DiContainer
 import com.tari.android.wallet.extension.observe
 import com.tari.android.wallet.ui.component.MutedBackPressedCallback
 import com.tari.android.wallet.ui.dialog.TariDialog
-import com.tari.android.wallet.ui.dialog.confirm.ConfirmDialog
-import com.tari.android.wallet.ui.dialog.error.ErrorDialog
 import com.tari.android.wallet.ui.dialog.inProgress.TariProgressDialog
+import com.tari.android.wallet.ui.dialog.modular.ModularDialog
 
 abstract class CommonFragment<Binding : ViewBinding, VM : CommonViewModel> : Fragment() {
 
@@ -56,13 +55,7 @@ abstract class CommonFragment<Binding : ViewBinding, VM : CommonViewModel> : Fra
 
         observe(copyToClipboard) { copy(it) }
 
-        observe(confirmDialog) { replaceDialog(ConfirmDialog(requireContext(), it)) }
-
-        observe(errorDialog) { replaceDialog(ErrorDialog(requireContext(), it)) }
-
-        observe(walletErrorDialog) { replaceDialog(ErrorDialog(requireContext(), it)) }
-
-        observe(loadingDialog) { if (it.isShow) replaceDialog(TariProgressDialog(requireContext(), it)) else currentDialog?.dismiss() }
+        observe(modularDialog) { replaceDialog(ModularDialog(requireContext(), it)) }
 
         observe(loadingDialog) { if (it.isShow) replaceDialog(TariProgressDialog(requireContext(), it)) else currentDialog?.dismiss() }
 

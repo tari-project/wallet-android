@@ -12,7 +12,6 @@ import com.tari.android.wallet.infrastructure.backup.BackupStorageFullException
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.common.SingleLiveEvent
 import com.tari.android.wallet.ui.dialog.error.ErrorDialogArgs
-import com.tari.android.wallet.ui.fragment.settings.backup.backupSettings.BackupsWillBeDeletedDialogArgs
 import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupOptionDto
 import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupOptions
 import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupSettingsRepository
@@ -39,9 +38,6 @@ class BackupOptionViewModel() : CommonViewModel() {
 
     private val _openFolderSelection = SingleLiveEvent<Unit>()
     val openFolderSelection: LiveData<Unit> = _openFolderSelection
-
-    private val _showBackupsWillBeDeletedDialog = SingleLiveEvent<BackupsWillBeDeletedDialogArgs>()
-    val showBackupsWillBeDeletedDialog: LiveData<BackupsWillBeDeletedDialogArgs> = _showBackupsWillBeDeletedDialog
 
     init {
         component.inject(this)
@@ -85,20 +81,21 @@ class BackupOptionViewModel() : CommonViewModel() {
     }
 
     private fun tryToTurnOffBackup() {
-        val args = BackupsWillBeDeletedDialogArgs(
-            onAccept = {
-                viewModelScope.launch(Dispatchers.IO) {
-                    try {
-                        backupManager.turnOff(_option.value!!.type, deleteExistingBackups = true)
-                    } catch (exception: Exception) {
-                        Logger.i(exception.toString())
-                    }
-                }
-            }, onDismiss = {
-                _inProgress.postValue(false)
-                _switchChecked.postValue(true)
-            })
-        _showBackupsWillBeDeletedDialog.postValue(args)
+        //change to modular
+//        val args = BackupsWillBeDeletedDialogArgs(
+//            onAccept = {
+//                viewModelScope.launch(Dispatchers.IO) {
+//                    try {
+//                        backupManager.turnOff(_option.value!!.type, deleteExistingBackups = true)
+//                    } catch (exception: Exception) {
+//                        Logger.i(exception.toString())
+//                    }
+//                }
+//            }, onDismiss = {
+//                _inProgress.postValue(false)
+//                _switchChecked.postValue(true)
+//            })
+//        _showBackupsWillBeDeletedDialog.postValue(args)
     }
 
     private fun showBackupStorageSetupFailedDialog(exception: Exception? = null) {
@@ -110,10 +107,10 @@ class BackupOptionViewModel() : CommonViewModel() {
             is BackupStorageFullException -> resourceManager.getString(R.string.backup_wallet_storage_full_desc)
             else -> resourceManager.getString(R.string.back_up_wallet_storage_setup_error_desc)
         }
-        _errorDialog.postValue(ErrorDialogArgs(errorTitle, errorDescription) {
+        _modularDialog.postValue(ErrorDialogArgs(errorTitle, errorDescription) {
             _switchChecked.postValue(false)
             _inProgress.postValue(false)
-        })
+        }.getModular(resourceManager))
     }
 
     fun onBackupStateChanged(backupState: BackupState) {

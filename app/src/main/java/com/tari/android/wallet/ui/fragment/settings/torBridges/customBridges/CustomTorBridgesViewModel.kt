@@ -73,6 +73,6 @@ class CustomTorBridgesViewModel() : CommonViewModel() {
             resourceManager.getString(R.string.common_error_title),
             resourceManager.getString(R.string.tor_bridges_incorrect_format)
         )
-        _errorDialog.postValue(args)
+        _modularDialog.postValue(args.getModular(resourceManager))
     }
 }

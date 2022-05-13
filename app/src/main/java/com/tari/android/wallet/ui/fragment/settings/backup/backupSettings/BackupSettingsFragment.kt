@@ -34,7 +34,6 @@ package com.tari.android.wallet.ui.fragment.settings.backup.backupSettings
 
 import android.animation.Animator
 import android.animation.ValueAnimator
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -45,14 +44,10 @@ import androidx.core.animation.addListener
 import androidx.fragment.app.viewModels
 import com.tari.android.wallet.R.color.all_settings_back_up_status_processing
 import com.tari.android.wallet.R.string.*
-import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
-import com.tari.android.wallet.data.sharedPrefs.tariSettings.TariSettingsSharedRepository
 import com.tari.android.wallet.databinding.FragmentWalletBackupSettingsBinding
-import com.tari.android.wallet.di.DiContainer.appComponent
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.extension.observe
 import com.tari.android.wallet.extension.observeOnLoad
-import com.tari.android.wallet.infrastructure.backup.BackupManager
 import com.tari.android.wallet.infrastructure.backup.BackupState.BackupUpToDate
 import com.tari.android.wallet.ui.activity.settings.BackupSettingsRouter
 import com.tari.android.wallet.ui.common.CommonFragment
@@ -63,33 +58,15 @@ import com.tari.android.wallet.ui.fragment.settings.userAutorization.BiometricAu
 import org.joda.time.DateTime
 import org.joda.time.format.DateTimeFormat
 import java.util.*
-import javax.inject.Inject
 
 internal class BackupSettingsFragment : CommonFragment<FragmentWalletBackupSettingsBinding, BackupSettingsViewModel>() {
-
-    @Inject
-    lateinit var sharedPrefs: SharedPrefsRepository
-
-    @Inject
-    lateinit var tariSettingsSharedRepository: TariSettingsSharedRepository
-
-    @Inject
-    lateinit var backupManager: BackupManager
 
     private var optionsAnimation: Animator? = null
 
     private val biometricAuthenticationViewModel: BiometricAuthenticationViewModel by viewModels()
 
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-        appComponent.inject(this)
-    }
-
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View = FragmentWalletBackupSettingsBinding.inflate(inflater, container, false).also { ui = it }.root
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
+        FragmentWalletBackupSettingsBinding.inflate(inflater, container, false).also { ui = it }.root
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -214,7 +191,7 @@ internal class BackupSettingsFragment : CommonFragment<FragmentWalletBackupSetti
     }
 
     private fun setSeedWordVerificationStateIcon() = with(ui) {
-        val hasVerifiedSeedWords = tariSettingsSharedRepository.hasVerifiedSeedWords
+        val hasVerifiedSeedWords = viewModel.tariSettingsSharedRepository.hasVerifiedSeedWords
         backupWithRecoveryPhraseSuccessView.setVisible(hasVerifiedSeedWords)
         backupWithRecoveryPhraseWarningView.setVisible(!hasVerifiedSeedWords)
     }
@@ -262,10 +239,9 @@ internal class BackupSettingsFragment : CommonFragment<FragmentWalletBackupSetti
     }
 
     private fun animateBackupButtonAvailability() {
-        val animation = optionsAnimation
         if (viewModel.backupOptionsAreVisible.value == true &&
             ui.backupWalletToCloudCtaContainerView.visibility != View.VISIBLE &&
-            (animation == null || !animation.isRunning)
+            (optionsAnimation == null || !optionsAnimation!!.isRunning)
         ) {
             optionsAnimation = ValueAnimator.ofFloat(ALPHA_INVISIBLE, ALPHA_VISIBLE).apply {
                 duration = OPTIONS_ANIMATION_DURATION

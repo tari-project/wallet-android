@@ -60,7 +60,7 @@ internal class LogListAdapter(private val logLines: List<String>) :
         parent: ViewGroup,
         viewType: Int
     ): RecyclerView.ViewHolder {
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.log_item, parent, false)
+        val view = LayoutInflater.from(parent.context).inflate(R.layout.item_log, parent, false)
         return LogViewHolder(view)
     }
 

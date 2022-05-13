@@ -30,4 +30,6 @@ class WalletErrorArgs(val resourceManager: ResourceManager, val error: CoreError
             }
             return resourceManager.getString(id)
         }
+
+    fun getErrorArgs() : ErrorDialogArgs = ErrorDialogArgs(title, description, onClose = dismissAction)
 }

@@ -38,8 +38,6 @@ import androidx.biometric.BiometricPrompt
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import java.util.concurrent.Executor
-import java.util.concurrent.atomic.AtomicBoolean
-import kotlin.coroutines.Continuation
 import kotlin.coroutines.suspendCoroutine
 
 class BiometricAuthenticationService(
@@ -47,93 +45,42 @@ class BiometricAuthenticationService(
     private val manager: BiometricManager,
     private val keyguardManager: KeyguardManager?
 ) {
-
-    enum class BiometricAuthenticationType {
-        BIOMETRIC,
-        PIN,
-        NONE
-    }
-
-    class BiometricAuthenticationException(val code: Int, message: String?) :
-        RuntimeException(message)
-
     val isBiometricAuthAvailable: Boolean
         get() = manager.canAuthenticate() == BiometricManager.BIOMETRIC_SUCCESS
 
     val isDeviceSecured: Boolean
         get() = keyguardManager?.isDeviceSecure ?: false
 
-    suspend fun authenticate(
-        fragment: Fragment,
-        title: CharSequence,
-        subtitle: CharSequence,
-        deviceCredentialsAllowed: Boolean = true
-    ): Boolean = authenticate(
+    val authType: BiometricAuthenticationType
+        get() = when {
+            isBiometricAuthAvailable -> BiometricAuthenticationType.BIOMETRIC
+            isDeviceSecured -> BiometricAuthenticationType.PIN
+            else -> BiometricAuthenticationType.NONE
+        }
+
+    suspend fun authenticate(fragment: Fragment, title: CharSequence, subtitle: CharSequence): Boolean = authenticate(
         { BiometricPrompt(fragment, executor, it) },
         title,
-        subtitle,
-        deviceCredentialsAllowed
+        subtitle
     )
 
-    suspend fun authenticate(
-        activity: FragmentActivity,
-        title: CharSequence,
-        subtitle: CharSequence,
-        deviceCredentialsAllowed: Boolean = true
-    ): Boolean = authenticate(
+    suspend fun authenticate(activity: FragmentActivity, title: CharSequence, subtitle: CharSequence): Boolean = authenticate(
         { BiometricPrompt(activity, executor, it) },
         title,
-        subtitle,
-        deviceCredentialsAllowed
+        subtitle
     )
 
     private suspend fun authenticate(
         provider: (BiometricPrompt.AuthenticationCallback) -> BiometricPrompt,
         title: CharSequence,
-        subtitle: CharSequence,
-        deviceCredentialsAllowed: Boolean = true
+        subtitle: CharSequence
     ): Boolean = suspendCoroutine {
         provider(SingleSuccessOrErrorAdapterDecorator(ContinuationAdapter(it))).authenticate(
             BiometricPrompt.PromptInfo.Builder()
                 .setTitle(title)
                 .setSubtitle(subtitle)
-                .setDeviceCredentialAllowed(deviceCredentialsAllowed)
+                .setAllowedAuthenticators(BiometricManager.Authenticators.DEVICE_CREDENTIAL)
                 .build()
         )
     }
-
-    private class ContinuationAdapter(private val continuation: Continuation<Boolean>) :
-        BiometricPrompt.AuthenticationCallback() {
-        override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
-            continuation.resumeWith(Result.success(true))
-        }
-
-        override fun onAuthenticationError(errorCode: Int, errString: CharSequence) {
-            continuation.resumeWith(
-                Result.failure(BiometricAuthenticationException(errorCode, errString.toString()))
-            )
-        }
-    }
-
-    private class SingleSuccessOrErrorAdapterDecorator(
-        private val decorated: BiometricPrompt.AuthenticationCallback
-    ) : BiometricPrompt.AuthenticationCallback() {
-
-        private val isResumed = AtomicBoolean(false)
-
-        override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
-            if (!isResumed.get()) {
-                decorated.onAuthenticationSucceeded(result)
-                isResumed.set(true)
-            }
-        }
-
-        override fun onAuthenticationError(errorCode: Int, errString: CharSequence) {
-            if (!isResumed.get()) {
-                decorated.onAuthenticationError(errorCode, errString)
-                isResumed.set(true)
-            }
-        }
-    }
-
 }

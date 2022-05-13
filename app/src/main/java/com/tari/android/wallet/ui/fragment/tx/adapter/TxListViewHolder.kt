@@ -7,7 +7,7 @@ import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.bumptech.glide.request.RequestOptions
 import com.bumptech.glide.request.target.Target
 import com.tari.android.wallet.R
-import com.tari.android.wallet.databinding.HomeTxListItemBinding
+import com.tari.android.wallet.databinding.ItemHomeTxListBinding
 import com.tari.android.wallet.extension.applyFontStyle
 import com.tari.android.wallet.model.*
 import com.tari.android.wallet.ui.common.gyphy.presentation.GIFStateConsumer
@@ -27,7 +27,7 @@ import org.joda.time.LocalDate
 import org.joda.time.Minutes
 import java.util.*
 
-internal class TxListViewHolder(view: HomeTxListItemBinding) : CommonViewHolder<TransactionItem, HomeTxListItemBinding>(view), GIFStateConsumer {
+internal class TxListViewHolder(view: ItemHomeTxListBinding) : CommonViewHolder<TransactionItem, ItemHomeTxListBinding>(view), GIFStateConsumer {
 
     private val glide = Glide.with(itemView.context)
     private val emojiIdSummaryController = EmojiIdSummaryViewController(ui.participantEmojiIdView)
@@ -263,7 +263,7 @@ internal class TxListViewHolder(view: HomeTxListItemBinding) : CommonViewHolder<
 
     companion object {
         fun getBuilder(): ViewHolderBuilder =
-            ViewHolderBuilder(HomeTxListItemBinding::inflate, TransactionItem::class.java) { TxListViewHolder(it as HomeTxListItemBinding) }
+            ViewHolderBuilder(ItemHomeTxListBinding::inflate, TransactionItem::class.java) { TxListViewHolder(it as ItemHomeTxListBinding) }
 
         // e.g. Wed, Jun 2
         private const val dateFormat = "E, MMM d"

@@ -5,6 +5,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.tari.android.wallet.R
+import com.tari.android.wallet.data.sharedPrefs.tariSettings.TariSettingsSharedRepository
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.infrastructure.backup.*
 import com.tari.android.wallet.ui.common.CommonViewModel
@@ -27,6 +28,9 @@ internal class BackupSettingsViewModel : CommonViewModel() {
 
     @Inject
     lateinit var backupSettingsRepository: BackupSettingsRepository
+
+    @Inject
+    lateinit var tariSettingsSharedRepository: TariSettingsSharedRepository
 
     lateinit var biometricAuthenticationViewModel: BiometricAuthenticationViewModel
 
@@ -145,7 +149,7 @@ internal class BackupSettingsViewModel : CommonViewModel() {
             exception?.message == null -> resourceManager.getString(R.string.back_up_wallet_backing_up_unknown_error)
             else -> resourceManager.getString(R.string.back_up_wallet_backing_up_error_desc, exception.message!!)
         }
-        _errorDialog.postValue(ErrorDialogArgs(errorTitle, errorDescription))
+        _modularDialog.postValue(ErrorDialogArgs(errorTitle, errorDescription).getModular(resourceManager))
     }
 
     private fun onBackupStateChanged(backupState: BackupsState) {

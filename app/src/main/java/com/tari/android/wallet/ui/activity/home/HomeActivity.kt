@@ -37,7 +37,6 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.os.Parcelable
-import android.view.View
 import android.widget.ImageView
 import androidx.activity.viewModels
 import androidx.fragment.app.Fragment
@@ -67,22 +66,26 @@ import com.tari.android.wallet.service.WalletServiceLauncher
 import com.tari.android.wallet.service.connection.TariWalletServiceConnection
 import com.tari.android.wallet.service.connection.TariWalletServiceConnection.ServiceConnectionStatus.CONNECTED
 import com.tari.android.wallet.ui.activity.SplashActivity
-import com.tari.android.wallet.ui.activity.onboarding.OnboardingFlowActivity
 import com.tari.android.wallet.ui.activity.settings.BackupSettingsActivity
 import com.tari.android.wallet.ui.activity.settings.DeleteWalletActivity
 import com.tari.android.wallet.ui.common.CommonActivity
 import com.tari.android.wallet.ui.common.domain.ResourceManager
 import com.tari.android.wallet.ui.common.gyphy.GiphyEcosystem
 import com.tari.android.wallet.ui.component.CustomFont
-import com.tari.android.wallet.ui.component.CustomFontTextView
-import com.tari.android.wallet.ui.dialog.BottomSlideDialog
+import com.tari.android.wallet.ui.dialog.modular.DialogArgs
+import com.tari.android.wallet.ui.dialog.modular.ModularDialog
+import com.tari.android.wallet.ui.dialog.modular.ModularDialogArgs
+import com.tari.android.wallet.ui.dialog.modular.modules.body.BodyModule
+import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonModule
+import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonStyle
+import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
 import com.tari.android.wallet.ui.extension.color
-import com.tari.android.wallet.ui.extension.setOnThrottledClickListener
 import com.tari.android.wallet.ui.extension.showInternetConnectionErrorDialog
 import com.tari.android.wallet.ui.extension.string
 import com.tari.android.wallet.ui.fragment.debug.baseNodeConfig.BaseNodeConfigRouter
 import com.tari.android.wallet.ui.fragment.debug.baseNodeConfig.addBaseNode.AddCustomBaseNodeFragment
 import com.tari.android.wallet.ui.fragment.debug.baseNodeConfig.changeBaseNode.ChangeBaseNodeFragment
+import com.tari.android.wallet.ui.fragment.onboarding.activity.OnboardingFlowActivity
 import com.tari.android.wallet.ui.fragment.profile.WalletInfoFragment
 import com.tari.android.wallet.ui.fragment.send.activity.SendTariActivity
 import com.tari.android.wallet.ui.fragment.settings.allSettings.AllSettingsFragment
@@ -262,29 +265,34 @@ internal class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>
         }
     }
 
+
     private fun displayIncompatibleNetworkDialog() {
         if (this.isFinishing) return
-        BottomSlideDialog(
-            this,
-            R.layout.dialog_incompatible_network,
-            canceledOnTouchOutside = false
-        ).apply {
-            findViewById<CustomFontTextView>(R.id.incompatible_network_description_text_view).text = string(R.string.incompatible_network_description)
-                .applyFontStyle(
-                    this@HomeActivity,
-                    CustomFont.AVENIR_LT_STD_MEDIUM,
-                    listOf(
-                        string(R.string.incompatible_network_description_bold_part_1),
-                        string(R.string.incompatible_network_description_bold_part_2)
-                    ),
-                    CustomFont.AVENIR_LT_STD_BLACK
-                )
-            findViewById<View>(R.id.incompatible_network_reset_now_button).setOnThrottledClickListener {
-                deleteWallet()
-                dismiss()
-            }
-            findViewById<View>(R.id.incompatible_network_reset_later_button).setOnThrottledClickListener { dismiss() }
-        }.show()
+
+        val description = string(R.string.incompatible_network_description)
+            .applyFontStyle(
+                this@HomeActivity,
+                CustomFont.AVENIR_LT_STD_MEDIUM,
+                listOf(
+                    string(R.string.incompatible_network_description_bold_part_1),
+                    string(R.string.incompatible_network_description_bold_part_2)
+                ),
+                CustomFont.AVENIR_LT_STD_BLACK
+            )
+        val dialog = ModularDialog(this)
+        val args = ModularDialogArgs(
+            DialogArgs(true, canceledOnTouchOutside = false), modules = listOf(
+                HeadModule(string(R.string.incompatible_network_title)),
+                BodyModule(null, description),
+                ButtonModule(string(R.string.incompatible_network_reset_now), ButtonStyle.Normal) {
+                    deleteWallet()
+                    dialog.dismiss()
+                },
+                ButtonModule(string(R.string.incompatible_network_reset_later), ButtonStyle.Close)
+            )
+        )
+        dialog.applyArgs(args)
+        dialog.show()
     }
 
     private fun deleteWallet() {
@@ -375,7 +383,7 @@ internal class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>
         }
         val intent = Intent(this, SendTariActivity::class.java)
         intent.putExtra("recipientUser", recipientUser as Parcelable)
-        sendDeeplink.note?.let { intent.putExtra(SendTariActivity.PARAMETER_NOTE, it) }
+        sendDeeplink.note.let { intent.putExtra(SendTariActivity.PARAMETER_NOTE, it) }
         sendDeeplink.amount?.let { intent.putExtra(SendTariActivity.PARAMETER_AMOUNT, it.tariValue) }
         startActivity(intent)
         overridePendingTransition(R.anim.enter_from_right, R.anim.exit_to_left)

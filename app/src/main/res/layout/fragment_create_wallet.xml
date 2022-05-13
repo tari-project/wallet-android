@@ -78,7 +78,7 @@
 
             <include
                 android:id="@+id/emoji_id_summary_view"
-                layout="@layout/onboarding_emoji_id_summary"
+                layout="@layout/view_onboarding_emoji_id_summary"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:visibility="visible" />

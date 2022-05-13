@@ -59,16 +59,14 @@ import com.tari.android.wallet.databinding.FragmentAddAmountBinding
 import com.tari.android.wallet.di.DiContainer.appComponent
 import com.tari.android.wallet.extension.getWithError
 import com.tari.android.wallet.extension.observe
-import com.tari.android.wallet.infrastructure.Tracker
 import com.tari.android.wallet.model.*
 import com.tari.android.wallet.service.TariWalletService
 import com.tari.android.wallet.service.WalletService
 import com.tari.android.wallet.ui.common.CommonFragment
 import com.tari.android.wallet.ui.component.EmojiIdSummaryViewController
 import com.tari.android.wallet.ui.component.FullEmojiIdViewController
-import com.tari.android.wallet.ui.dialog.error.ErrorDialog
 import com.tari.android.wallet.ui.dialog.error.ErrorDialogArgs
-import com.tari.android.wallet.ui.dialog.tooltipDialog.TooltipDialog
+import com.tari.android.wallet.ui.dialog.modular.ModularDialog
 import com.tari.android.wallet.ui.dialog.tooltipDialog.TooltipDialogArgs
 import com.tari.android.wallet.ui.extension.*
 import com.tari.android.wallet.ui.fragment.send.activity.SendTariActivity
@@ -77,12 +75,8 @@ import com.tari.android.wallet.util.WalletUtil
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.lang.ref.WeakReference
-import javax.inject.Inject
 
 class AddAmountFragment : CommonFragment<FragmentAddAmountBinding, AddAmountViewModel>(), ServiceConnection {
-
-    @Inject
-    lateinit var tracker: Tracker
 
     private lateinit var addAmountListenerWR: WeakReference<AddAmountListener>
 
@@ -111,15 +105,11 @@ class AddAmountFragment : CommonFragment<FragmentAddAmountBinding, AddAmountView
     private lateinit var balanceInfo: BalanceInfo
     private lateinit var availableBalance: MicroTari
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View = FragmentAddAmountBinding.inflate(inflater, container, false).also { ui = it }.root
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
+        FragmentAddAmountBinding.inflate(inflater, container, false).also { ui = it }.root
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        appComponent.inject(this)
 
         val viewModel: AddAmountViewModel by viewModels()
         bindViewModel(viewModel)
@@ -127,7 +117,7 @@ class AddAmountFragment : CommonFragment<FragmentAddAmountBinding, AddAmountView
 
         bindToWalletService()
         if (savedInstanceState == null) {
-            tracker.screen(path = "/home/send_tari/add_amount", title = "Send Tari - Add Amount")
+            viewModel.tracker.screen(path = "/home/send_tari/add_amount", title = "Send Tari - Add Amount")
         }
         isFirstLaunch = savedInstanceState == null
     }
@@ -236,12 +226,17 @@ class AddAmountFragment : CommonFragment<FragmentAddAmountBinding, AddAmountView
     }
 
     private fun showTxFeeToolTip() {
-        TooltipDialog(requireContext(), TooltipDialogArgs(string(tx_detail_fee_tooltip_transaction_fee), string(tx_detail_fee_tooltip_desc))).show()
+        val args = TooltipDialogArgs(string(tx_detail_fee_tooltip_transaction_fee), string(tx_detail_fee_tooltip_desc))
+            .getModular(viewModel.resourceManager)
+        ModularDialog(requireContext(), args).show()
     }
 
     private fun showOneSidePaymentTooltip() {
-        val args = TooltipDialogArgs(string(add_amount_one_side_payment_switcher), string(add_amount_one_side_payment_question_mark))
-        TooltipDialog(requireContext(), args).show()
+        val args = TooltipDialogArgs(
+            string(add_amount_one_side_payment_switcher),
+            string(add_amount_one_side_payment_question_mark)
+        ).getModular(viewModel.resourceManager)
+        ModularDialog(requireContext(), args).show()
     }
 
     private fun continueButtonClicked() {
@@ -266,7 +261,7 @@ class AddAmountFragment : CommonFragment<FragmentAddAmountBinding, AddAmountView
                             string(R.string.error_fee_more_than_amount_title),
                             string(R.string.error_fee_more_than_amount_description)
                         )
-                        ErrorDialog(requireContext(), args).show()
+                        ModularDialog(requireContext(), args.getModular(viewModel.resourceManager)).show()
                         ui.continueButton.isClickable = true
                     } else {
                         continueToNote()

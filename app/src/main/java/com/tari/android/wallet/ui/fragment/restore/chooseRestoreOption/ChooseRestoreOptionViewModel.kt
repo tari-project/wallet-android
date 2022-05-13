@@ -71,7 +71,7 @@ internal class ChooseRestoreOptionViewModel : CommonViewModel() {
                 when (it) {
                     WalletState.Initializing,
                     WalletState.NotReady -> Unit
-                    WalletState.Running -> _navigation.postValue(ChooseRestoreOptionNavigation.ToRestoreInProgress)
+                    WalletState.Running -> _navigation.postValue(ChooseRestoreOptionNavigation.OnRestoreCompleted)
                     is WalletState.Failed -> viewModelScope.launch(Dispatchers.IO) {
                         handleException(WalletStartFailedException(it.exception))
                     }
@@ -110,7 +110,7 @@ internal class ChooseRestoreOptionViewModel : CommonViewModel() {
                 if (cause == WalletError.DatabaseDataError) {
                     showRestoreFailedDialog(resourceManager.getString(R.string.restore_wallet_error_file_not_supported))
                 } else if (cause != WalletError.NoError) {
-                    _walletErrorDialog.postValue(WalletErrorArgs(resourceManager, cause))
+                    _modularDialog.postValue(WalletErrorArgs(resourceManager, cause).getErrorArgs().getModular(resourceManager))
                 } else {
                     showRestoreFailedDialog(exception.cause?.message)
                 }
@@ -135,7 +135,7 @@ internal class ChooseRestoreOptionViewModel : CommonViewModel() {
             resourceManager.getString(R.string.restore_wallet_error_title),
             resourceManager.getString(R.string.restore_wallet_error_file_not_found),
             onClose = { _backPressed.call() })
-        _errorDialog.postValue(args)
+        _modularDialog.postValue(args.getModular(resourceManager))
     }
 
     private fun showRestoreFailedDialog(message: String? = null) {
@@ -143,7 +143,7 @@ internal class ChooseRestoreOptionViewModel : CommonViewModel() {
             resourceManager.getString(R.string.restore_wallet_error_title),
             message ?: resourceManager.getString(R.string.restore_wallet_error_desc)
         )
-        _errorDialog.postValue(args)
+        _modularDialog.postValue(args.getModular(resourceManager))
     }
 
     private fun showAuthFailedDialog() {
@@ -151,6 +151,6 @@ internal class ChooseRestoreOptionViewModel : CommonViewModel() {
             resourceManager.getString(R.string.restore_wallet_error_title),
             resourceManager.getString(R.string.back_up_wallet_storage_setup_error_desc)
         )
-        _errorDialog.postValue(args)
+        _modularDialog.postValue(args.getModular(resourceManager))
     }
 }

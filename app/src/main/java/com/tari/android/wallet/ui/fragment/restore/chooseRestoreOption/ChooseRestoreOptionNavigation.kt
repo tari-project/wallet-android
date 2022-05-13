@@ -6,7 +6,5 @@ sealed class ChooseRestoreOptionNavigation {
 
     object ToRestoreWithRecoveryPhrase : ChooseRestoreOptionNavigation()
 
-    object ToRestoreInProgress : ChooseRestoreOptionNavigation()
-
     object OnRestoreCompleted : ChooseRestoreOptionNavigation()
 }

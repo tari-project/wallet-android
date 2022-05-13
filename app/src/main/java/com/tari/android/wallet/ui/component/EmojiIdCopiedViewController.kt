@@ -39,7 +39,7 @@ import android.animation.ObjectAnimator
 import androidx.core.animation.addListener
 import com.daasuu.ei.Ease
 import com.daasuu.ei.EasingInterpolator
-import com.tari.android.wallet.databinding.EmojiIdCopiedAnimViewBinding
+import com.tari.android.wallet.databinding.ViewEmojiIdCopiedAnimBinding
 import com.tari.android.wallet.util.Constants
 
 /**
@@ -47,7 +47,7 @@ import com.tari.android.wallet.util.Constants
  *
  * @author The Tari Development Team
  */
-internal class EmojiIdCopiedViewController(private val ui: EmojiIdCopiedAnimViewBinding) {
+internal class EmojiIdCopiedViewController(private val ui: ViewEmojiIdCopiedAnimBinding) {
 
     init {
         whiteBgView.post {

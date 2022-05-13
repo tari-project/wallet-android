@@ -38,12 +38,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
-import android.widget.Button
 import android.widget.TextView
 import androidx.fragment.app.viewModels
 import com.bumptech.glide.Glide
 import com.orhanobut.logger.Logger
-import com.tari.android.wallet.R
 import com.tari.android.wallet.R.color.*
 import com.tari.android.wallet.R.dimen.add_amount_element_text_size
 import com.tari.android.wallet.R.dimen.add_amount_gem_size
@@ -52,7 +50,6 @@ import com.tari.android.wallet.databinding.FragmentTxDetailsBinding
 import com.tari.android.wallet.di.DiContainer.appComponent
 import com.tari.android.wallet.extension.observe
 import com.tari.android.wallet.extension.txFormattedDate
-import com.tari.android.wallet.infrastructure.Tracker
 import com.tari.android.wallet.model.*
 import com.tari.android.wallet.model.Tx.Direction.INBOUND
 import com.tari.android.wallet.model.Tx.Direction.OUTBOUND
@@ -61,8 +58,13 @@ import com.tari.android.wallet.ui.animation.collapseAndHideAnimation
 import com.tari.android.wallet.ui.common.CommonFragment
 import com.tari.android.wallet.ui.component.EmojiIdSummaryViewController
 import com.tari.android.wallet.ui.component.FullEmojiIdViewController
-import com.tari.android.wallet.ui.dialog.BottomSlideDialog
-import com.tari.android.wallet.ui.dialog.tooltipDialog.TooltipDialog
+import com.tari.android.wallet.ui.dialog.modular.DialogArgs
+import com.tari.android.wallet.ui.dialog.modular.ModularDialog
+import com.tari.android.wallet.ui.dialog.modular.ModularDialogArgs
+import com.tari.android.wallet.ui.dialog.modular.modules.body.BodyModule
+import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonModule
+import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonStyle
+import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
 import com.tari.android.wallet.ui.dialog.tooltipDialog.TooltipDialogArgs
 import com.tari.android.wallet.ui.extension.*
 import com.tari.android.wallet.ui.fragment.tx.details.gif.GIFView
@@ -71,7 +73,6 @@ import com.tari.android.wallet.ui.fragment.tx.details.gif.TxState
 import com.tari.android.wallet.ui.presentation.TxNote
 import com.tari.android.wallet.util.WalletUtil
 import java.util.*
-import javax.inject.Inject
 
 /**
  *  Activity class - Transaction detail.
@@ -79,9 +80,6 @@ import javax.inject.Inject
  * @author The Tari Development Team
  */
 internal class TxDetailsFragment : CommonFragment<FragmentTxDetailsBinding, TxDetailsViewModel>() {
-
-    @Inject
-    lateinit var tracker: Tracker
 
     /**
      * Values below are used for scaling up/down of the text size.
@@ -115,7 +113,7 @@ internal class TxDetailsFragment : CommonFragment<FragmentTxDetailsBinding, TxDe
         }
 
         if (savedInstanceState == null) {
-            tracker.screen(path = "/home/tx_details", title = "Transaction Details")
+            viewModel.tracker.screen(path = "/home/tx_details", title = "Transaction Details")
         }
 
         setupUI()
@@ -335,13 +333,18 @@ internal class TxDetailsFragment : CommonFragment<FragmentTxDetailsBinding, TxDe
     }
 
     private fun showTxCancelDialog() {
-        BottomSlideDialog(requireContext(), R.layout.dialog_cancel_tx, dismissViewId = R.id.cancel_tx_dialog_not_cancel_button).apply {
-            findViewById<Button>(R.id.cancel_tx_dialog_cancel_button)
-                .setOnClickListener {
-                    viewModel.cancelTransaction()
-                    dismiss()
-                }
-        }.show()
+        val dialog = ModularDialog(requireContext())
+        val args = ModularDialogArgs(DialogArgs(), listOf(
+            HeadModule(string(tx_details_cancel_dialog_title)),
+            BodyModule(string(tx_details_cancel_dialog_description)),
+            ButtonModule(string(tx_details_cancel_dialog_cancel), ButtonStyle.Normal) {
+                viewModel.cancelTransaction()
+                dialog.dismiss()
+            },
+            ButtonModule(string(tx_details_cancel_dialog_not_cancel), ButtonStyle.Close)
+        ))
+        dialog.applyArgs(args)
+        dialog.show()
     }
 
     private fun setUIAlias(alias: String) {
@@ -381,7 +384,9 @@ internal class TxDetailsFragment : CommonFragment<FragmentTxDetailsBinding, TxDe
     }
 
     private fun showTxFeeToolTip() {
-        TooltipDialog(requireContext(), TooltipDialogArgs(string(tx_detail_fee_tooltip_transaction_fee), string(tx_detail_fee_tooltip_desc))).show()
+        val args = TooltipDialogArgs(string(tx_detail_fee_tooltip_transaction_fee), string(tx_detail_fee_tooltip_desc))
+            .getModular(viewModel.resourceManager)
+        ModularDialog(requireContext(), args).show()
     }
 
     companion object {

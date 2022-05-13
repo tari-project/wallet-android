@@ -81,7 +81,6 @@ import com.tari.android.wallet.ui.fragment.send.addNote.gif.ThumbnailGIFsViewMod
 import com.tari.android.wallet.ui.fragment.send.common.TransactionData
 import com.tari.android.wallet.ui.presentation.TxNote
 import com.tari.android.wallet.util.Constants
-import com.tari.android.wallet.util.Constants.UI.AddNoteAndSend
 import java.lang.ref.WeakReference
 import javax.inject.Inject
 
@@ -178,13 +177,7 @@ class AddNoteFragment : Fragment(), View.OnTouchListener {
 
     @SuppressLint("ClickableViewAccessibility")
     private fun setupUI(state: Bundle?) {
-        gifContainer = GIFContainer(
-            Glide.with(this),
-            ui.gifContainerView,
-            ui.gifImageView,
-            ui.searchGiphyContainerView,
-            state
-        )
+        gifContainer = GIFContainer(Glide.with(this), ui.gifContainerView, ui.gifImageView, ui.searchGiphyContainerView, state)
         if (gifContainer.gifItem != null) changeScrollViewBottomConstraint(R.id.slide_button_container_view)
         adapter = GIFThumbnailAdapter(Glide.with(this), ::handleViewMoreGIFsIntent) {
             if (gifContainer.isShown) {
@@ -358,10 +351,7 @@ class AddNoteFragment : Fragment(), View.OnTouchListener {
      * Controls the slide button animation & behaviour on drag.
      */
     @SuppressLint("ClickableViewAccessibility")
-    override fun onTouch(
-        view: View,
-        event: MotionEvent
-    ): Boolean {
+    override fun onTouch(view: View, event: MotionEvent): Boolean {
         val x = event.rawX.toInt()
         when (event.action and MotionEvent.ACTION_MASK) {
             MotionEvent.ACTION_POINTER_DOWN, MotionEvent.ACTION_POINTER_UP -> Unit
@@ -448,9 +438,9 @@ class AddNoteFragment : Fragment(), View.OnTouchListener {
     }
 
     private fun onSlideAnimationEnd() {
+        hideKeyboard()
         if (EventBus.networkConnectionState.publishSubject.value != NetworkConnectionState.CONNECTED) {
-            ui.rootView.postDelayed(AddNoteAndSend.preKeyboardHideWaitMs) { hideKeyboard() }
-            ui.rootView.postDelayed(AddNoteAndSend.preKeyboardHideWaitMs + Constants.UI.keyboardHideWaitMs) {
+            ui.rootView.postDelayed(Constants.UI.keyboardHideWaitMs) {
                 restoreSlider()
                 ui.noteEditText.isEnabled = true
                 showInternetConnectionErrorDialog(requireActivity())
@@ -459,10 +449,7 @@ class AddNoteFragment : Fragment(), View.OnTouchListener {
             ui.removeGifCtaView.isEnabled = false
             ui.progressBar.visible()
             ui.slideView.gone()
-            ui.rootView.postDelayed(AddNoteAndSend.preKeyboardHideWaitMs) { hideKeyboard() }
-            val totalTime =
-                AddNoteAndSend.preKeyboardHideWaitMs + AddNoteAndSend.continueToFinalizeSendTxDelayMs
-            ui.rootView.postDelayed(totalTime) { continueToFinalizeSendTx() }
+            continueToFinalizeSendTx()
         }
     }
 
@@ -488,9 +475,7 @@ class AddNoteFragment : Fragment(), View.OnTouchListener {
                 val value = valueAnimator.animatedValue as Float
                 ui.slideView.alpha = 1f - value
                 ui.slideToSendEnabledTextView.alpha = 1f - value
-                ui.slideView.setStartMargin(
-                    (slideViewInitialMargin + slideViewMarginDelta * (1 - value)).toInt()
-                )
+                ui.slideView.setStartMargin((slideViewInitialMargin + slideViewMarginDelta * (1 - value)).toInt())
             }
             duration = Constants.UI.shortDurationMs
             interpolator = EasingInterpolator(Ease.QUART_IN_OUT)

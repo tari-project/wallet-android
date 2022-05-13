@@ -11,9 +11,14 @@ import com.tari.android.wallet.tor.TorProxyManager
 import com.tari.android.wallet.tor.TorProxyState
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.common.SingleLiveEvent
-import com.tari.android.wallet.ui.dialog.confirm.ConfirmDialogArgs
 import com.tari.android.wallet.ui.dialog.error.ErrorDialogArgs
 import com.tari.android.wallet.ui.dialog.inProgress.ProgressDialogArgs
+import com.tari.android.wallet.ui.dialog.modular.DialogArgs
+import com.tari.android.wallet.ui.dialog.modular.ModularDialogArgs
+import com.tari.android.wallet.ui.dialog.modular.modules.body.BodyModule
+import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonModule
+import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonStyle
+import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
 import com.tari.android.wallet.ui.fragment.settings.torBridges.torItem.TorBridgeViewHolderItem
 import javax.inject.Inject
 
@@ -120,7 +125,7 @@ class TorBridgesSelectionViewModel() : CommonViewModel() {
                         resourceManager.getString(R.string.tor_bridges_connecting_error_description, it.e.message.orEmpty()),
                         cancelable = true
                     ) { stopConnecting() }
-                    _errorDialog.postValue(errorArgs)
+                    _modularDialog.postValue(errorArgs.getModular(resourceManager))
                 }
                 is TorProxyState.Running -> {
                     if (it.bootstrapStatus.progress == 100) {
@@ -134,9 +139,14 @@ class TorBridgesSelectionViewModel() : CommonViewModel() {
                                 description += "${bridge.ip}:${bridge.port}\n"
                             }
                         }
-                        val title = resourceManager.getString(R.string.tor_bridges_connection_progress_successful_title)
-                        val confirmDialogArgs = ConfirmDialogArgs(title, description, cancelable = false) { _backPressed.postValue(Unit) }
-                        _confirmDialog.postValue(confirmDialogArgs)
+                        val args = ModularDialogArgs(
+                            DialogArgs(false, canceledOnTouchOutside = false), modules = listOf(
+                                HeadModule(resourceManager.getString(R.string.tor_bridges_connection_progress_successful_title)),
+                                BodyModule(description),
+                                ButtonModule(resourceManager.getString(R.string.common_confirm), ButtonStyle.Normal) { _backPressed.postValue(Unit) },
+                            )
+                        )
+                        _modularDialog.postValue(args)
                     } else {
                         val description = resourceManager.getString(
                             R.string.tor_bridges_connection_progress_description_full,

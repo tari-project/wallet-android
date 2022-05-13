@@ -39,9 +39,6 @@ class FinalizeSendTxViewModel : CommonViewModel() {
     val walletService: TariWalletService
         get() = connectionService.currentState.service!!
 
-    @Inject
-    lateinit var tracker: Tracker
-
     init {
         component.inject(this)
 
