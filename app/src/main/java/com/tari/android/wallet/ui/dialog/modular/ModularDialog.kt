@@ -18,6 +18,8 @@ import com.tari.android.wallet.ui.dialog.modular.modules.customBaseNodeBody.Cust
 import com.tari.android.wallet.ui.dialog.modular.modules.head.*
 import com.tari.android.wallet.ui.dialog.modular.modules.imageModule.ImageModule
 import com.tari.android.wallet.ui.dialog.modular.modules.imageModule.ImageModuleView
+import com.tari.android.wallet.ui.fragment.send.addAmount.feeModule.FeeModule
+import com.tari.android.wallet.ui.fragment.send.addAmount.feeModule.FeeModuleView
 import com.tari.android.wallet.ui.fragment.send.shareQr.ShareQRCodeModuleView
 import com.tari.android.wallet.ui.fragment.send.shareQr.ShareQrCodeModule
 
@@ -59,6 +61,7 @@ open class ModularDialog(val context: Context) : TariDialog {
                 is ButtonModule -> ButtonModuleView(context, module) { dialog.dismiss() }
                 is CustomBaseNodeBodyModule -> CustomBaseNodeBodyModuleView(context, module)
                 is ShareQrCodeModule -> ShareQRCodeModuleView(context, module)
+                is FeeModule -> FeeModuleView(context, module)
                 else -> View(context)
             }
             root.addView(view)

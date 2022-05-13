@@ -106,32 +106,12 @@
                     android:paddingBottom="@dimen/add_amount_balance_warning_container_bottom_padding"
                     tools:ignore="UselessParent">
 
-                    <LinearLayout
+                    <com.tari.android.wallet.ui.fragment.send.amountView.AmountView
                         android:id="@+id/available_balance_container_view"
-                        android:layout_width="match_parent"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:gravity="center"
-                        android:orientation="horizontal">
-
-                        <androidx.appcompat.widget.AppCompatImageView
-                            android:id="@+id/gem_not_enough_balance"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:contentDescription="@null"
-                            android:src="@drawable/gem_not_enough_balance" />
-
-                        <com.tari.android.wallet.ui.component.CustomFontTextView
-                            android:id="@+id/available_balance_text_view"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="4dp"
-                            android:ellipsize="middle"
-                            android:singleLine="true"
-                            android:textColor="@color/common_error"
-                            android:textSize="@dimen/add_amount_balance_text_size"
-                            app:customFont="@string/font_heavy"
-                            tools:text="124.56" />
-                    </LinearLayout>
+                        android:layout_gravity="center_horizontal"
+                        android:gravity="center_horizontal" />
 
                     <com.tari.android.wallet.ui.component.CustomFontTextView
                         android:id="@+id/not_enough_balance_description_text_view"
@@ -156,37 +136,60 @@
                 android:id="@+id/amount"
                 layout="@layout/view_input_amount" />
 
-            <LinearLayout
+            <RelativeLayout
                 android:id="@+id/tx_fee_container_view"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentBottom="true"
-                android:layout_centerHorizontal="true"
-                android:gravity="center"
-                android:orientation="vertical">
+                android:layout_marginBottom="12dp"
+                android:layout_centerHorizontal="true">
                 <!-- fee amount -->
-                <com.tari.android.wallet.ui.component.CustomFontTextView
-                    android:id="@+id/tx_fee_text_view"
+
+                <androidx.appcompat.widget.LinearLayoutCompat
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:textColor="@color/black"
-                    android:textSize="@dimen/add_amount_tx_fee_text_size"
-                    app:customFont="@string/font_heavy"
-                    tools:text="+63.75" />
-                <!-- description -->
-                <com.tari.android.wallet.ui.component.CustomFontTextView
-                    android:id="@+id/tx_fee_desc_text_view"
+                    android:layout_above="@+id/modifyButton"
+                    android:layout_centerHorizontal="true"
+                    android:layout_marginBottom="0dp"
+                    android:orientation="horizontal">
+
+                    <com.tari.android.wallet.ui.component.CustomFontTextView
+                        android:id="@+id/tx_fee_text_view"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="6dp"
+                        android:layout_toLeftOf="@+id/tx_fee_desc_text_view"
+                        android:textColor="#A9AFC4"
+                        android:textSize="@dimen/add_amount_tx_fee_text_size"
+                        app:customFont="@string/font_heavy"
+                        tools:text="+63.75" />
+
+                    <com.tari.android.wallet.ui.component.CustomFontTextView
+                        android:id="@+id/tx_fee_desc_text_view"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:drawableEnd="@drawable/help_icon_24dp"
+                        android:drawablePadding="4dp"
+                        android:text="@string/add_amount_tx_fee"
+                        android:textColor="#A9AFC4"
+                        android:textSize="@dimen/add_amount_tx_fee_text_size"
+                        app:customFont="@string/font_heavy" />
+                </androidx.appcompat.widget.LinearLayoutCompat>
+
+                <com.tari.android.wallet.ui.component.CustomFontButton
+                    android:id="@+id/modifyButton"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="2dp"
-                    android:drawableEnd="@drawable/help_icon_24dp"
-                    android:drawablePadding="4dp"
-                    android:text="@string/add_amount_tx_fee"
-                    android:textColor="#A9AFC4"
-                    android:textSize="@dimen/add_amount_tx_fee_text_size"
-                    app:customFont="@string/font_heavy" />
-            </LinearLayout>
+                    android:layout_height="21dp"
+                    android:layout_alignParentBottom="true"
+                    android:layout_centerHorizontal="true"
+                    android:background="@null"
+                    android:text="@string/add_amount_modify_fee_modify"
+                    android:textAllCaps="false"
+                    android:textColor="@color/purple"
+                    android:textSize="14sp"
+                    app:customFont="@string/font_medium" />
+            </RelativeLayout>
+
         </RelativeLayout>
 
         <!-- num pad -->
@@ -213,13 +216,12 @@
             <androidx.appcompat.widget.AppCompatImageView
                 android:id="@+id/one_side_payment_help"
                 android:layout_width="wrap_content"
-                android:layout_gravity="center_vertical"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
                 android:layout_marginStart="16dp"
-                android:src="@drawable/help_icon_24dp"/>
+                android:src="@drawable/help_icon_24dp" />
 
         </LinearLayout>
-
 
 
         <RelativeLayout

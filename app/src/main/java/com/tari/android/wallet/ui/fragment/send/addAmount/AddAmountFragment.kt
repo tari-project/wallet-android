@@ -39,7 +39,6 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
-import android.content.res.ColorStateList
 import android.os.Bundle
 import android.os.IBinder
 import android.view.LayoutInflater
@@ -52,11 +51,9 @@ import com.daasuu.ei.Ease
 import com.daasuu.ei.EasingInterpolator
 import com.orhanobut.logger.Logger
 import com.tari.android.wallet.R
-import com.tari.android.wallet.R.color.black
 import com.tari.android.wallet.R.string.*
 import com.tari.android.wallet.amountInputBinding.fragment.send.addAmount.keyboard.KeyboardController
 import com.tari.android.wallet.databinding.FragmentAddAmountBinding
-import com.tari.android.wallet.di.DiContainer.appComponent
 import com.tari.android.wallet.extension.getWithError
 import com.tari.android.wallet.extension.observe
 import com.tari.android.wallet.model.*
@@ -70,6 +67,7 @@ import com.tari.android.wallet.ui.dialog.modular.ModularDialog
 import com.tari.android.wallet.ui.dialog.tooltipDialog.TooltipDialogArgs
 import com.tari.android.wallet.ui.extension.*
 import com.tari.android.wallet.ui.fragment.send.activity.SendTariActivity
+import com.tari.android.wallet.ui.fragment.send.amountView.AmountStyle
 import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.WalletUtil
 import kotlinx.coroutines.Dispatchers
@@ -120,6 +118,7 @@ class AddAmountFragment : CommonFragment<FragmentAddAmountBinding, AddAmountView
             viewModel.tracker.screen(path = "/home/send_tari/add_amount", title = "Send Tari - Add Amount")
         }
         isFirstLaunch = savedInstanceState == null
+        ui.modifyButton.setOnClickListener { viewModel.showFeeDialog() }
     }
 
     private fun subscribeVM() = with(viewModel) {
@@ -258,8 +257,8 @@ class AddAmountFragment : CommonFragment<FragmentAddAmountBinding, AddAmountView
                 lifecycleScope.launch(Dispatchers.Main) {
                     if (fee > amount) {
                         val args = ErrorDialogArgs(
-                            string(R.string.error_fee_more_than_amount_title),
-                            string(R.string.error_fee_more_than_amount_description)
+                            string(error_fee_more_than_amount_title),
+                            string(error_fee_more_than_amount_description)
                         )
                         ModularDialog(requireContext(), args.getModular(viewModel.resourceManager)).show()
                         ui.continueButton.isClickable = true
@@ -279,7 +278,7 @@ class AddAmountFragment : CommonFragment<FragmentAddAmountBinding, AddAmountView
     private fun updateBalanceInfo() {
         balanceInfo = walletService.getWithError { error, wallet -> wallet.getBalanceInfo(error) }
         availableBalance = balanceInfo.availableBalance + balanceInfo.pendingIncomingBalance
-        ui.availableBalanceTextView.text = WalletUtil.balanceFormatter.format(availableBalance.tariValue)
+        ui.availableBalanceContainerView.setupArgs(availableBalance)
     }
 
     private fun actualBalanceExceeded() {
@@ -392,24 +391,13 @@ class AddAmountFragment : CommonFragment<FragmentAddAmountBinding, AddAmountView
         }
 
         private fun showAvailableBalanceError() = with(ui) {
-            notEnoughBalanceView.background = ContextCompat.getDrawable(
-                requireContext(),
-                R.drawable.validation_error_box_border_bg
-            )
-            gemNotEnoughBalance.imageTintList = null
-            availableBalanceTextView.setTextColor(
-                ContextCompat.getColor(
-                    requireContext(),
-                    R.color.common_error
-                )
-            )
+            notEnoughBalanceView.background = ContextCompat.getDrawable(requireContext(), R.drawable.validation_error_box_border_bg)
+            ui.availableBalanceContainerView.setupArgs(AmountStyle.Warning)
         }
 
         private fun showBalance() = with(ui) {
             notEnoughBalanceView.background = null
-            gemNotEnoughBalance.imageTintList =
-                ColorStateList.valueOf(ContextCompat.getColor(requireContext(), black))
-            availableBalanceTextView.setTextColor(ContextCompat.getColor(requireContext(), black))
+            ui.availableBalanceContainerView.setupArgs(AmountStyle.Normal)
         }
 
         private fun showContinueButtonAnimated() = with(ui) {
