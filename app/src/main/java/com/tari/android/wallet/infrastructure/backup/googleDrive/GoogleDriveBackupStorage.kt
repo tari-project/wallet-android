@@ -79,16 +79,13 @@ class GoogleDriveBackupStorage(
             .build()
     )
 
-    private lateinit var drive: Drive
+    private var drive: Drive? = null
 
     init {
         val googleAccount = GoogleSignIn.getLastSignedInAccount(context)
         if (googleAccount != null) {
-            val credential =
-                GoogleAccountCredential.usingOAuth2(
-                    context,
-                    listOf(DriveScopes.DRIVE_APPDATA)
-                ).apply { selectedAccount = googleAccount.account }
+            val credential = GoogleAccountCredential.usingOAuth2(context, listOf(DriveScopes.DRIVE_APPDATA))
+                .apply { selectedAccount = googleAccount.account }
             drive = Drive.Builder(NetHttpTransport(), GsonFactory(), credential)
                 .setApplicationName(context.resources.getString(R.string.app_name))
                 .build()
@@ -99,11 +96,7 @@ class GoogleDriveBackupStorage(
         hostFragment.startActivityForResult(googleClient.signInIntent, REQUEST_CODE_SIGN_IN)
     }
 
-    override suspend fun onSetupActivityResult(
-        requestCode: Int,
-        resultCode: Int,
-        intent: Intent?
-    ) {
+    override suspend fun onSetupActivityResult(requestCode: Int, resultCode: Int, intent: Intent?) {
         when (requestCode) {
             REQUEST_CODE_SIGN_IN -> when (resultCode) {
                 Activity.RESULT_OK -> drive = getDrive(intent)
@@ -117,29 +110,21 @@ class GoogleDriveBackupStorage(
         return suspendCoroutine { continuation ->
             GoogleSignIn.getSignedInAccountFromIntent(intent)
                 .addOnSuccessListener { googleAccount: GoogleSignInAccount ->
-                    val credential = GoogleAccountCredential.usingOAuth2(
-                        context,
-                        listOf(DriveScopes.DRIVE_APPDATA)
-                    ).apply { selectedAccount = googleAccount.account }
-                    val drive = Drive.Builder(NetHttpTransport(), GsonFactory(), credential)
+                    val credential = GoogleAccountCredential.usingOAuth2(context, listOf(DriveScopes.DRIVE_APPDATA))
+                        .apply { selectedAccount = googleAccount.account }
+                    drive = Drive.Builder(NetHttpTransport(), GsonFactory(), credential)
                         .setApplicationName(context.resources.getString(R.string.app_name))
                         .build()
-                    continuation.resumeWith(Result.success(drive))
+                    continuation.resumeWith(Result.success(drive!!))
                 }
                 .addOnFailureListener { continuation.resumeWith(Result.failure(it)) }
-                .addOnCanceledListener {
-                    continuation.resumeWith(
-                        Result.failure(BackupInterruptedException(""))
-                    )
-                }
+                .addOnCanceledListener { continuation.resumeWith(Result.failure(BackupInterruptedException(""))) }
         }
     }
 
     override suspend fun backup(newPassword: CharArray?): DateTime {
         return withContext(Dispatchers.IO) {
-            val (backupFile, backupDate, mimeType) = backupFileProcessor.generateBackupFile(
-                newPassword
-            )
+            val (backupFile, backupDate, mimeType) = backupFileProcessor.generateBackupFile(newPassword)
             // upload file
             try {
                 createBackupFile(backupFile, mimeType)
@@ -164,25 +149,19 @@ class GoogleDriveBackupStorage(
                 // delete older backups
                 deleteAllBackupFiles(excludeBackupWithDate = backupDate)
             } catch (e: Exception) {
-                Logger.e(
-                    e,
-                    "Ignorable backup error while clearing temporary and old files."
-                )
+                Logger.e(e, "Ignorable backup error while clearing temporary and old files.")
             }
             return@withContext backupDate
         }
     }
 
-    private fun createBackupFile(
-        file: File,
-        mimeType: String
-    ) {
+    private fun createBackupFile(file: File, mimeType: String) {
         val metadata: com.google.api.services.drive.model.File =
             com.google.api.services.drive.model.File()
                 .setParents(listOf(DRIVE_BACKUP_PARENT_FOLDER_NAME))
                 .setMimeType(mimeType)
                 .setName(file.getLastPathComponent()!!)
-        drive.files()
+        drive!!.files()
             .create(metadata, FileContent(mimeType, file))
             .setFields("id")
             .execute()
@@ -217,7 +196,7 @@ class GoogleDriveBackupStorage(
             if (!tempFile.exists()) {
                 tempFile.createNewFile()
                 FileOutputStream(tempFile).use { targetOutputStream ->
-                    drive.files().get(backupFileId).executeMediaAndDownloadTo(targetOutputStream)
+                    drive!!.files().get(backupFileId).executeMediaAndDownloadTo(targetOutputStream)
                 }
             }
             backupFileProcessor.restoreBackupFile(tempFile, password)
@@ -249,7 +228,7 @@ class GoogleDriveBackupStorage(
     }
 
     private fun searchForBackups(pageToken: String?): FileList =
-        drive.files().list()
+        drive!!.files().list()
             .setSpaces(DRIVE_BACKUP_PARENT_FOLDER_NAME)
             .setQ("'$DRIVE_BACKUP_PARENT_FOLDER_NAME' in parents")
             .setFields("nextPageToken, files(id, name)")
@@ -261,23 +240,18 @@ class GoogleDriveBackupStorage(
     }
 
     private fun deleteAllBackupFiles(excludeBackupWithDate: DateTime?) {
-        val driveFiles = drive.files()
+        val driveFiles = drive?.files() ?: return
         var pageToken: String? = null
         do {
-            val result: FileList = searchForBackups(pageToken)
-            result.files.forEach { file ->
-                val excludeName: String? = if (excludeBackupWithDate != null) {
-                    namingPolicy.getBackupFileName(excludeBackupWithDate)
-                } else {
-                    null
-                }
-                if (excludeName == null || !file.name.contains(excludeName)) {
-                    namingPolicy.getDateFromBackupFileName(file.name)?.let {
-                        driveFiles.delete(file.id).execute()
+            pageToken = searchForBackups(pageToken).let {
+                it.files.forEach { file ->
+                    val excludeName = if (excludeBackupWithDate != null) namingPolicy.getBackupFileName(excludeBackupWithDate) else null
+                    if (excludeName == null || !file.name.contains(excludeName)) {
+                        namingPolicy.getDateFromBackupFileName(file.name)?.let { driveFiles.delete(file.id).execute() }
                     }
                 }
+                it.nextPageToken
             }
-            pageToken = result.nextPageToken
         } while (pageToken != null)
     }
 
