@@ -63,6 +63,11 @@ internal class ChooseRestoreOptionFragment : CommonFragment<FragmentChooseRestor
         observeUI()
     }
 
+    override fun onResume() {
+        super.onResume()
+        onActivityResult(0, 0, null)
+    }
+
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         viewModel.onActivityResult(requestCode, resultCode, data)

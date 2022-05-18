@@ -10,6 +10,8 @@ import android.widget.LinearLayout
 import androidx.lifecycle.LifecycleOwner
 import androidx.viewbinding.ViewBinding
 import com.tari.android.wallet.ui.common.CommonViewModel
+import com.tari.android.wallet.ui.dialog.TariDialog
+import com.tari.android.wallet.ui.dialog.inProgress.TariProgressDialog
 import com.tari.android.wallet.ui.dialog.modular.ModularDialog
 
 abstract class CommonView<VM : CommonViewModel, VB : ViewBinding> : LinearLayout {
@@ -38,6 +40,8 @@ abstract class CommonView<VM : CommonViewModel, VB : ViewBinding> : LinearLayout
         init()
     }
 
+    private var currentDialog: TariDialog? = null
+
     private fun init() {
         ui = bindingInflate(LayoutInflater.from(context), this, true)
 
@@ -51,6 +55,18 @@ abstract class CommonView<VM : CommonViewModel, VB : ViewBinding> : LinearLayout
 
         viewModel.openLink.observe(viewLifecycle) { context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(it))) }
 
-        viewModel.modularDialog.observe(viewLifecycle) { ModularDialog(context, it).show() }
+        viewModel.modularDialog.observe(viewLifecycle) { replaceDialog(ModularDialog(context, it)) }
+
+        viewModel.dismissDialog.observe(viewLifecycle) { currentDialog?.dismiss() }
+    }
+
+    protected fun replaceDialog(dialog: TariDialog) {
+        val currentLoadingDialog = currentDialog as? TariProgressDialog
+        if (currentLoadingDialog != null && currentLoadingDialog.isShowing() && dialog is TariProgressDialog) {
+            (currentDialog as TariProgressDialog).applyArgs(dialog.progressDialogArgs)
+            return
+        }
+        currentDialog?.dismiss()
+        currentDialog = dialog.also { it.show() }
     }
 }

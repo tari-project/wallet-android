@@ -1,11 +1,11 @@
 package com.tari.android.wallet.ui.fragment.settings.backup.data
 
-import org.joda.time.DateTime
+import com.tari.android.wallet.data.sharedPrefs.delegates.SerializableTime
 import java.io.Serializable
 
 data class BackupOptionDto(
     val type: BackupOptions,
     val isEnable: Boolean = false,
-    val lastSuccessDate: DateTime? = null,
-    val lastFailureDate: DateTime? = null
+    val lastSuccessDate: SerializableTime? = null,
+    val lastFailureDate: SerializableTime? = null
 ) : Serializable

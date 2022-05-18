@@ -52,6 +52,7 @@ import com.google.api.services.drive.DriveScopes
 import com.google.api.services.drive.model.FileList
 import com.orhanobut.logger.Logger
 import com.tari.android.wallet.R
+import com.tari.android.wallet.data.sharedPrefs.delegates.SerializableTime
 import com.tari.android.wallet.extension.getLastPathComponent
 import com.tari.android.wallet.infrastructure.backup.*
 import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupSettingsRepository
@@ -96,7 +97,7 @@ class GoogleDriveBackupStorage(
         hostFragment.startActivityForResult(googleClient.signInIntent, REQUEST_CODE_SIGN_IN)
     }
 
-    override suspend fun onSetupActivityResult(requestCode: Int, resultCode: Int, intent: Intent?) {
+    override suspend fun onSetupActivityResult(requestCode: Int, resultCode: Int, intent: Intent?): Boolean {
         when (requestCode) {
             REQUEST_CODE_SIGN_IN -> when (resultCode) {
                 Activity.RESULT_OK -> drive = getDrive(intent)
@@ -104,6 +105,7 @@ class GoogleDriveBackupStorage(
                 else -> throw BackupStorageSetupException("Google Drive setup error.")
             }
         }
+        return true
     }
 
     private suspend fun getDrive(intent: Intent?): Drive {
@@ -189,21 +191,26 @@ class GoogleDriveBackupStorage(
         } ?: throw BackupStorageTamperedException("Backup file not found in folder.")
         withContext(Dispatchers.IO) {
             val tempFolder = File(walletTempDirPath)
-            if (!tempFolder.exists()) tempFolder.mkdir()
-            // copy file to temp location
             val tempFile = File(tempFolder, backupFileName)
-            // create file & fetch if it hasn't been fetched before
+            if (!tempFolder.parentFile.exists()) {
+                tempFolder.parentFile.mkdir()
+            }
+            if (!tempFolder.exists()) {
+                tempFolder.mkdir()
+            }
             if (!tempFile.exists()) {
                 tempFile.createNewFile()
-                FileOutputStream(tempFile).use { targetOutputStream ->
-                    drive!!.files().get(backupFileId).executeMediaAndDownloadTo(targetOutputStream)
-                }
+            }
+            FileOutputStream(tempFile).use { targetOutputStream ->
+                drive!!.files().get(backupFileId).executeMediaAndDownloadTo(targetOutputStream)
             }
             backupFileProcessor.restoreBackupFile(tempFile, password)
             backupFileProcessor.clearTempFolder()
             // restore successful, turn on automated backup
             val lastSuccessfulDate = namingPolicy.getDateFromBackupFileName(tempFile.name)
-            backupSettingsRepository.googleDriveOption = backupSettingsRepository.googleDriveOption!!.copy(lastSuccessDate = lastSuccessfulDate)
+            backupSettingsRepository.googleDriveOption = backupSettingsRepository.googleDriveOption!!.copy(lastSuccessDate = lastSuccessfulDate?.let {
+                SerializableTime(it)
+            })
             backupSettingsRepository.backupPassword = password
         }
     }

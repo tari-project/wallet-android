@@ -37,7 +37,7 @@ android {
         buildConfigField("String", "YAT_ORGANIZATION_RETURN_URL", "\"${yatProperties.getProperty('yat.returnUrl')}\"")
 
         def dropboxProperties = loadDropboxProps()
-        buildConfigField("String", "DROPBOX_ACCESS_TOKEN", "\"${dropboxProperties.getProperty('dropbox.access_token')}\"")
+        buildConfigField("String", "DROPBOX_ACCESS_TOKEN", "\"${dropboxProperties.getProperty('dropbox_key')}\"")
     }
 
     buildTypes {
@@ -75,8 +75,7 @@ android {
     productFlavors {
         regular {
             dimension "privacy-mode"
-            buildConfigField "String", "NOTIFICATIONS_API_KEY",
-                    "\"${loadSecretProps().getProperty('service.notifications.api_key')}\""
+            buildConfigField "String", "NOTIFICATIONS_API_KEY", "\"${loadSecretProps().getProperty('service.notifications.api_key')}\""
             proguardFile 'regular-proguard-rules.pro'
         }
         privacy {
@@ -85,12 +84,12 @@ android {
     }
 
     applicationVariants.all { variant ->
+        variant.mergedFlavor.manifestPlaceholders.dropboxApiKey = loadDropboxProps().getProperty('dropbox_key')
         if (variant.productFlavors.get(0).name == "regular") {
             if (variant.buildType.name == "debug") {
                 variant.mergedFlavor.manifestPlaceholders.sentryPublicDSN = ''
             } else {
-                variant.mergedFlavor.manifestPlaceholders.sentryPublicDSN =
-                        loadSecretProps().getProperty('sentry.public_dsn')
+                variant.mergedFlavor.manifestPlaceholders.sentryPublicDSN = loadSecretProps().getProperty('sentry.public_dsn')
             }
         }
     }

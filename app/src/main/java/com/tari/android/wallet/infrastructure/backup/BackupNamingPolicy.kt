@@ -43,7 +43,7 @@ class BackupNamingPolicy @Inject constructor(val networkRepository: NetworkRepos
     private val backupFileNamePrefix = "Tari-Aurora-Backup-${networkRepository.currentNetwork!!.network.displayName}-"
 
     // Tari-Aurora-Backup-network-yyyy-MM-dd_HH-mm-ss.*
-    private val regex =
+    val regex =
         Regex("$backupFileNamePrefix(\\d{4}-(((0)[1-9])|((1)[0-2]))-((0)[1-9]|[1-2][0-9]|(3)[0-1])_([0-1][0-9]|(2)[0-3])-([0-5][0-9])-([0-5][0-9]))\\..+")
     private val dateFormatter: DateTimeFormatter = DateTimeFormat.forPattern("yyyy-MM-dd_HH-mm-ss")
 

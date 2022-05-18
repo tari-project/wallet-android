@@ -38,6 +38,7 @@ import android.content.Intent
 import androidx.documentfile.provider.DocumentFile
 import androidx.fragment.app.Fragment
 import com.orhanobut.logger.Logger
+import com.tari.android.wallet.data.sharedPrefs.delegates.SerializableTime
 import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepository
 import com.tari.android.wallet.extension.getLastPathComponent
 import com.tari.android.wallet.infrastructure.backup.*
@@ -64,12 +65,8 @@ class LocalBackupStorage(
         )
     }
 
-    override suspend fun onSetupActivityResult(
-        requestCode: Int,
-        resultCode: Int,
-        intent: Intent?
-    ) {
-        if (requestCode != REQUEST_CODE_PICK_BACKUP_FOLDER) return
+    override suspend fun onSetupActivityResult(requestCode: Int, resultCode: Int, intent: Intent?): Boolean {
+        if (requestCode != REQUEST_CODE_PICK_BACKUP_FOLDER) return false
         when (resultCode) {
             Activity.RESULT_OK -> {
                 val uri = intent?.data
@@ -87,6 +84,7 @@ class LocalBackupStorage(
                 throw BackupStorageSetupCancelled()
             }
         }
+        return true
     }
 
     override suspend fun backup(newPassword: CharArray?): DateTime {
@@ -152,22 +150,26 @@ class LocalBackupStorage(
         backupFiles.sortedBy { it.name!! }
         withContext(Dispatchers.IO) {
             // copy file to temp location
-            val tempFile = File(walletTempDirPath, backupFiles.last().name!!)
-            // create file & fetch if it hasn't been fetched before
-            if (tempFile.parentFile?.exists() == false) {
-                tempFile.parentFile?.mkdirs()
+            val tempFolder = File(walletTempDirPath)
+            val tempFile = File(tempFolder, backupFiles.last().name!!)
+            if (!tempFolder.parentFile.exists()) {
+                tempFolder.parentFile.mkdir()
+            }
+            if (!tempFolder.exists()) {
+                tempFolder.mkdir()
             }
             if (!tempFile.exists()) {
                 tempFile.createNewFile()
-                context.contentResolver.openInputStream(backupFiles.last().uri).use { inputStream ->
-                    FileUtils.copyInputStreamToFile(inputStream, tempFile)
-                }
+            }
+            context.contentResolver.openInputStream(backupFiles.last().uri).use { inputStream ->
+                FileUtils.copyInputStreamToFile(inputStream, tempFile)
             }
             backupFileProcessor.restoreBackupFile(tempFile, password)
             backupFileProcessor.clearTempFolder()
             // restore successful, turn on automated backup
             val lastSuccessfulDate = namingPolicy.getDateFromBackupFileName(tempFile.name)
-            backupSettingsRepository.localFileOption = backupSettingsRepository.localFileOption!!.copy(lastSuccessDate = lastSuccessfulDate)
+            backupSettingsRepository.localFileOption =
+                backupSettingsRepository.localFileOption!!.copy(lastSuccessDate = lastSuccessfulDate?.let { SerializableTime(it) })
             backupSettingsRepository.backupPassword = password
         }
     }

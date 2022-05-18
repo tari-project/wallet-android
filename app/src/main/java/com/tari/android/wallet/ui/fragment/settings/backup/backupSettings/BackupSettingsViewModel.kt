@@ -8,6 +8,7 @@ import com.tari.android.wallet.R
 import com.tari.android.wallet.data.sharedPrefs.tariSettings.TariSettingsSharedRepository
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.infrastructure.backup.*
+import com.tari.android.wallet.infrastructure.backup.dropbox.DropboxBackupStorage
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.common.SingleLiveEvent
 import com.tari.android.wallet.ui.dialog.error.ErrorDialogArgs
@@ -31,6 +32,9 @@ internal class BackupSettingsViewModel : CommonViewModel() {
 
     @Inject
     lateinit var tariSettingsSharedRepository: TariSettingsSharedRepository
+
+    @Inject
+    lateinit var dropboxBackupStorage: DropboxBackupStorage
 
     lateinit var biometricAuthenticationViewModel: BiometricAuthenticationViewModel
 
@@ -83,21 +87,9 @@ internal class BackupSettingsViewModel : CommonViewModel() {
 
     fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         viewModelScope.launch(Dispatchers.IO) {
-            try {
+            kotlin.runCatching {
                 options.value.orEmpty().firstOrNull { it.option.value!!.type == backupManager.currentOption }
                     ?.onActivityResult(requestCode, resultCode, data)
-//                backupManager.onSetupActivityResult(requestCode, resultCode, data)
-//                folderSelectionWasSuccessful.postValue(true)
-//                _blockedBackPressed.postValue(true)
-//                backupManager.backup(isInitialBackup = true)
-            } catch (exception: Exception) {
-//                Logger.e("Backup storage setup failed: $exception")
-//                backupManager.turnOff(deleteExistingBackups = true)
-//                _inProgress.postValue(false)
-//                _googleDriveBackupPermissionSwitchChecked.postValue(false)
-//                showBackupStorageSetupFailedDialog(exception)
-            } finally {
-//                _blockedBackPressed.postValue(false)
             }
         }
     }
@@ -130,7 +122,8 @@ internal class BackupSettingsViewModel : CommonViewModel() {
 
     private fun refillSharedPrefsData() {
         _backupPassword.postValue(Optional.ofNullable(backupSettingsRepository.backupPassword))
-        _lastSuccessfulBackupDate.postValue(Optional.ofNullable(backupSettingsRepository.getOptionList.mapNotNull { it.lastSuccessDate }.minOrNull()))
+        _lastSuccessfulBackupDate.postValue(Optional.ofNullable(backupSettingsRepository.getOptionList.mapNotNull { it.lastSuccessDate?.date }
+            .minOrNull()))
     }
 
     private fun showBackupFailureDialog(exception: Exception?) {

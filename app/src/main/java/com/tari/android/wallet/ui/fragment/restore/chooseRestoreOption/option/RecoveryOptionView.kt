@@ -35,7 +35,7 @@ class RecoveryOptionView : CommonView<CommonViewModel, ViewRestoreOptionBinding>
     fun updateLoading(isLoading: Boolean) {
         ui.restoreWalletMenuItemProgressView.setVisible(isLoading)
         ui.restoreWalletMenuItemArrowImageView.setVisible(!isLoading)
-        ui.restoreWalletCtaView.isEnabled = false
+        ui.restoreWalletCtaView.isEnabled = !isLoading
     }
 
     override fun setup() {

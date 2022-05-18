@@ -6,12 +6,19 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.orhanobut.logger.Logger
 import com.tari.android.wallet.R
+import com.tari.android.wallet.infrastructure.backup.BackupException
 import com.tari.android.wallet.infrastructure.backup.BackupManager
 import com.tari.android.wallet.infrastructure.backup.BackupState
 import com.tari.android.wallet.infrastructure.backup.BackupStorageFullException
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.common.SingleLiveEvent
 import com.tari.android.wallet.ui.dialog.error.ErrorDialogArgs
+import com.tari.android.wallet.ui.dialog.modular.DialogArgs
+import com.tari.android.wallet.ui.dialog.modular.ModularDialogArgs
+import com.tari.android.wallet.ui.dialog.modular.modules.body.BodyModule
+import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonModule
+import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonStyle
+import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
 import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupOptionDto
 import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupOptions
 import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupSettingsRepository
@@ -52,16 +59,18 @@ class BackupOptionViewModel() : CommonViewModel() {
 
     fun setup(option: BackupOptions) {
         _option.value = backupSettingsRepository.getOptionList.firstOrNull { it.type == option }
+        _switchChecked.value = _option.value!!.isEnable
     }
 
     fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                backupManager.onSetupActivityResult(requestCode, resultCode, data)
-                backupManager.backup(_option.value!!.type, isInitialBackup = true)
+                if (backupManager.onSetupActivityResult(requestCode, resultCode, data)) {
+                    backupManager.backup(_option.value!!.type, isInitialBackup = true)
+                }
             } catch (exception: Exception) {
                 Logger.e("Backup storage setup failed: $exception")
-                backupManager.turnOff(_option.value!!.type, deleteExistingBackups = true)
+                backupManager.turnOff(_option.value!!.type)
                 _inProgress.postValue(false)
                 _switchChecked.postValue(false)
                 showBackupStorageSetupFailedDialog(exception)
@@ -81,21 +90,36 @@ class BackupOptionViewModel() : CommonViewModel() {
     }
 
     private fun tryToTurnOffBackup() {
-        //change to modular
-//        val args = BackupsWillBeDeletedDialogArgs(
-//            onAccept = {
-//                viewModelScope.launch(Dispatchers.IO) {
-//                    try {
-//                        backupManager.turnOff(_option.value!!.type, deleteExistingBackups = true)
-//                    } catch (exception: Exception) {
-//                        Logger.i(exception.toString())
-//                    }
-//                }
-//            }, onDismiss = {
-//                _inProgress.postValue(false)
-//                _switchChecked.postValue(true)
-//            })
-//        _showBackupsWillBeDeletedDialog.postValue(args)
+        val onAcceptAction = {
+            viewModelScope.launch(Dispatchers.IO) {
+                try {
+                    backupManager.turnOff(_option.value!!.type)
+                } catch (exception: Exception) {
+                    Logger.i(exception.toString())
+                }
+            }
+        }
+
+        val onDismissAction = {
+            _inProgress.postValue(false)
+            _switchChecked.postValue(true)
+        }
+
+        val args = ModularDialogArgs(
+            DialogArgs(true, canceledOnTouchOutside = false), listOf(
+                HeadModule(resourceManager.getString(R.string.back_up_wallet_turn_off_backup_warning_title)),
+                BodyModule(resourceManager.getString(R.string.back_up_wallet_turn_off_backup_warning_description)),
+                ButtonModule(resourceManager.getString(R.string.common_confirm), ButtonStyle.Warning) {
+                    onAcceptAction()
+                    _dissmissDialog.value = Unit
+                },
+                ButtonModule(resourceManager.getString(R.string.common_cancel), ButtonStyle.Close) {
+                    onDismissAction()
+                    _dissmissDialog.value = Unit
+                }
+            ))
+
+        _modularDialog.postValue(args)
     }
 
     private fun showBackupStorageSetupFailedDialog(exception: Exception? = null) {
@@ -105,6 +129,7 @@ class BackupOptionViewModel() : CommonViewModel() {
         }
         val errorDescription = when (exception) {
             is BackupStorageFullException -> resourceManager.getString(R.string.backup_wallet_storage_full_desc)
+            is BackupException -> exception.message.orEmpty()
             else -> resourceManager.getString(R.string.back_up_wallet_storage_setup_error_desc)
         }
         _modularDialog.postValue(ErrorDialogArgs(errorTitle, errorDescription) {

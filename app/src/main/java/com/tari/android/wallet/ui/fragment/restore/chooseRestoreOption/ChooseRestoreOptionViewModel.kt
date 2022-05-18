@@ -32,8 +32,6 @@ internal class ChooseRestoreOptionViewModel : CommonViewModel() {
     @Inject
     lateinit var walletServiceLauncher: WalletServiceLauncher
 
-    private var currentOption: BackupOptions? = null
-
     init {
         component.inject(this)
     }
@@ -45,19 +43,19 @@ internal class ChooseRestoreOptionViewModel : CommonViewModel() {
     val navigation: LiveData<ChooseRestoreOptionNavigation> = _navigation
 
     fun startRestore(options: BackupOptions) {
-        currentOption = options
         _state.postValue(ChooseRestoreOptionState.BeginProgress(options))
     }
 
     fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                backupManager.onSetupActivityResult(requestCode, resultCode, data)
-                restoreFromBackup()
+                if (backupManager.onSetupActivityResult(requestCode, resultCode, data)) {
+                    restoreFromBackup()
+                }
             } catch (exception: Exception) {
                 Logger.e("Backup storage setup failed: $exception")
                 backupManager.signOut()
-                _state.postValue(ChooseRestoreOptionState.EndProgress(currentOption!!))
+                _state.postValue(ChooseRestoreOptionState.EndProgress(backupManager.currentOption!!))
                 showAuthFailedDialog()
             }
         }
@@ -127,7 +125,7 @@ internal class ChooseRestoreOptionViewModel : CommonViewModel() {
             }
         }
 
-        _state.postValue(ChooseRestoreOptionState.EndProgress(currentOption!!))
+        _state.postValue(ChooseRestoreOptionState.EndProgress(backupManager.currentOption!!))
     }
 
     private fun showBackupFileNotFoundDialog() {

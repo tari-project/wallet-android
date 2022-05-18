@@ -236,7 +236,7 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
         // stop wallet manager on a separate thead & unsubscribe from events
         EventBus.walletState.unsubscribe(this)
         ProcessLifecycleOwner.get().lifecycle.removeObserver(this)
-        GlobalScope.launch { backupManager.turnOffAll(deleteExistingBackups = false) }
+        GlobalScope.launch { backupManager.turnOffAll() }
         Thread {
             walletManager.stop()
         }.start()

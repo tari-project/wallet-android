@@ -173,7 +173,7 @@ internal class AllSettingsViewModel : CommonViewModel() {
                 }
                 is BackupState.BackupStorageCheckFailed -> PresentationBackupState(InProgress, -1, all_settings_back_up_status_error)
                 is BackupState.BackupScheduled -> {
-                    val failureDate = backupSettingsRepository.getOptionList.mapNotNull { it.lastFailureDate }.firstOrNull()?.toLocalDateTime()
+                    val failureDate = backupSettingsRepository.getOptionList.mapNotNull { it.lastFailureDate }.firstOrNull()?.date?.toLocalDateTime()
                     if (failureDate == null) {
                         PresentationBackupState(Scheduled, back_up_wallet_backup_status_scheduled, all_settings_back_up_status_scheduled)
                     } else {
@@ -196,7 +196,7 @@ internal class AllSettingsViewModel : CommonViewModel() {
     }
 
     private fun updateLastSuccessfulBackupDate() {
-        val time = backupSettingsRepository.getOptionList.mapNotNull { it.lastSuccessDate }.firstOrNull()?.toLocalDateTime()
+        val time = backupSettingsRepository.getOptionList.mapNotNull { it.lastSuccessDate }.firstOrNull()?.date?.toLocalDateTime()
         val text = if (time == null) "" else {
             resourceManager.getString(back_up_wallet_last_successful_backup, BACKUP_DATE_FORMATTER.print(time), BACKUP_TIME_FORMATTER.print(time))
         }

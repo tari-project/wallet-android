@@ -37,6 +37,7 @@ import android.content.Intent
 import androidx.fragment.app.Fragment
 import com.orhanobut.logger.Logger
 import com.tari.android.wallet.R
+import com.tari.android.wallet.data.sharedPrefs.delegates.SerializableTime
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.infrastructure.backup.dropbox.DropboxBackupStorage
 import com.tari.android.wallet.infrastructure.backup.googleDrive.GoogleDriveBackupStorage
@@ -61,7 +62,7 @@ class BackupManager(
     private val context: Context,
     private val backupSettingsRepository: BackupSettingsRepository,
     private val localFileBackupStorage: LocalBackupStorage,
-    private val dropboxBackupStorage: DropboxBackupStorage,
+    val dropboxBackupStorage: DropboxBackupStorage,
     private val googleDriveBackupStorage: GoogleDriveBackupStorage,
     private val notificationHelper: NotificationHelper
 ) {
@@ -80,8 +81,8 @@ class BackupManager(
         getStorageByOption(option).setup(hostFragment)
     }
 
-    suspend fun onSetupActivityResult(requestCode: Int, resultCode: Int, intent: Intent?) =
-        getStorageByOption(currentOption!!).onSetupActivityResult(requestCode, resultCode, intent)
+    suspend fun onSetupActivityResult(requestCode: Int, resultCode: Int, intent: Intent?): Boolean =
+        currentOption?.let { getStorageByOption(it).onSetupActivityResult(requestCode, resultCode, intent) } ?: false
 
     suspend fun checkStorageStatus() {
         for (currentBackupOption in backupSettingsRepository.getOptionList) {
@@ -102,7 +103,7 @@ class BackupManager(
 
             updateState(BackupState.BackupCheckingStorage)
             try {
-                val backupDate = currentBackupOption.lastSuccessDate!!
+                val backupDate = currentBackupOption.lastSuccessDate!!.date
                 if (!getStorageByOption(currentBackupOption.type).hasBackupForDate(backupDate)) {
                     throw BackupStorageTamperedException("Backup storage is tampered.")
                 }
@@ -193,19 +194,24 @@ class BackupManager(
         updateState(BackupState.BackupInProgress)
         try {
             val backupDate = getStorageByOption(optionType).backup(newPassword)
-            //todo
-//            currentBackupOption = currentBackupOption.copy(lastSuccessDate = backupDate, lastFailureDate = null)
+            backupSettingsRepository.updateOption(
+                currentDto.copy(
+                    isEnable = true,
+                    lastSuccessDate = SerializableTime(backupDate),
+                    lastFailureDate = null
+                )
+            )
             backupSettingsRepository.scheduledBackupDate = null
             Logger.d("Backup successful.")
             updateState(BackupState.BackupUpToDate)
         } catch (exception: Exception) {
             if (isInitialBackup) {
-                turnOff(optionType, deleteExistingBackups = true)
+                turnOff(optionType)
                 retryCount = 0
                 throw exception
             }
             if (exception is BackupStorageAuthRevokedException) {
-                turnOff(optionType, deleteExistingBackups = true)
+                turnOff(optionType)
                 retryCount = 0
                 postBackupFailedNotification(exception)
                 throw exception
@@ -213,8 +219,7 @@ class BackupManager(
             if (userTriggered || retryCount > Constants.Wallet.maxBackupRetries) {
                 Logger.e(exception, "Error happened while backing up. It's a user-triggered backup or retry limit has been exceeded.")
                 updateState(BackupState.BackupOutOfDate(exception))
-                //todo
-//                currentBackupOption = currentBackupOption . copy (lastSuccessDate = null, lastFailureDate = DateTime.now()
+                backupSettingsRepository.updateOption(currentDto.copy(lastSuccessDate = null, lastFailureDate = SerializableTime(DateTime.now())))
                 retryCount = 0
                 if (!userTriggered) { // post notification
                     postBackupFailedNotification(exception)
@@ -228,11 +233,11 @@ class BackupManager(
         }
     }
 
-    suspend fun turnOffAll(deleteExistingBackups: Boolean) {
-        backupSettingsRepository.getOptionList.forEach { turnOff(it.type, deleteExistingBackups) }
+    suspend fun turnOffAll() {
+        backupSettingsRepository.getOptionList.forEach { turnOff(it.type) }
     }
 
-    suspend fun turnOff(optionType: BackupOptions, deleteExistingBackups: Boolean) {
+    suspend fun turnOff(optionType: BackupOptions) {
         val options = backupSettingsRepository.getOptionList.map {
             it.copy(type = it.type, isEnable = false, lastSuccessDate = null, lastFailureDate = null)
         }
@@ -245,9 +250,6 @@ class BackupManager(
             backupsState.copy(backupsStates = backupsState.backupsStates.toMutableMap().also { it[optionType] = BackupState.BackupDisabled })
         EventBus.backupState.post(newState)
         val backupStorage = getStorageByOption(optionType)
-        if (deleteExistingBackups) {
-            backupStorage.deleteAllBackupFiles()
-        }
         backupSettingsRepository.localBackupFolderURI = null
         backupStorage.signOut()
     }
@@ -275,7 +277,7 @@ class BackupManager(
         }
     }
 
-    private fun getStorageByOption(optionType: BackupOptions) : BackupStorage = when (optionType) {
+    private fun getStorageByOption(optionType: BackupOptions): BackupStorage = when (optionType) {
         BackupOptions.Google -> googleDriveBackupStorage
         BackupOptions.Dropbox -> dropboxBackupStorage
         BackupOptions.Local -> localFileBackupStorage

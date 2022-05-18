@@ -40,6 +40,9 @@ import com.tari.android.wallet.ffi.FFIWallet
 import com.tari.android.wallet.infrastructure.backup.compress.CompressionMethod
 import com.tari.android.wallet.infrastructure.security.encryption.SymmetricEncryptionAlgorithm
 import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupSettingsRepository
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import org.joda.time.DateTime
 import java.io.File
 
@@ -54,9 +57,12 @@ class BackupFileProcessor(
     private val namingPolicy: BackupNamingPolicy,
 ) {
 
-    fun generateBackupFile(newPassword: CharArray? = null): Triple<File, DateTime, String> {
+    private val mutex = Mutex()
+
+    suspend fun generateBackupFile(newPassword: CharArray? = null): Triple<File, DateTime, String> = mutex.withLock {
         // decrypt database
         FFIWallet.instance?.removeEncryption()
+        delay(200)
 
         // create partial backup in temp folder if password not set
         val databaseFile = File(walletConfig.walletDatabaseFilePath)
@@ -141,11 +147,7 @@ class BackupFileProcessor(
         try {
             File(walletConfig.getWalletTempDirPath()).listFiles()?.forEach { it.delete() }
         } catch (e: Exception) {
-            Logger.e(
-                e,
-                "Ignorable backup error while clearing temporary and old files."
-            )
+            Logger.e(e, "Ignorable backup error while clearing temporary and old files.")
         }
     }
-
 }
