@@ -9,6 +9,7 @@ import com.dropbox.core.http.OkHttp3Requestor
 import com.dropbox.core.v2.DbxClientV2
 import com.dropbox.core.v2.files.FileMetadata
 import com.dropbox.core.v2.files.SearchMatchV2
+import com.dropbox.core.v2.files.WriteMode
 import com.google.api.client.googleapis.extensions.android.gms.auth.UserRecoverableAuthIOException
 import com.orhanobut.logger.Logger
 import com.tari.android.wallet.BuildConfig
@@ -59,7 +60,7 @@ class DropboxBackupStorage(
         startAuth(hostFragment.requireActivity())
     }
 
-    override suspend fun onSetupActivityResult(requestCode: Int, resultCode: Int, intent: Intent?) : Boolean {
+    override suspend fun onSetupActivityResult(requestCode: Int, resultCode: Int, intent: Intent?): Boolean {
         if (!isAuthStarted) return false
         isAuthStarted = false
         //need time to dropbox UI to process deeplink intent from OAuth
@@ -88,8 +89,6 @@ class DropboxBackupStorage(
         }
         try {
             backupFileProcessor.clearTempFolder()
-            // delete older backups
-            deleteAllBackupFiles(excludeBackupWithDate = backupDate)
         } catch (e: Exception) {
             Logger.e(e, "Ignorable backup error while clearing temporary and old files.")
         }
@@ -97,13 +96,13 @@ class DropboxBackupStorage(
     }
 
     private fun uploadDropboxFile(client: DbxClientV2, path: String, inputStream: InputStream): FileMetadata =
-        client.files().uploadBuilder(path).uploadAndFinish(inputStream)
+        client.files().uploadBuilder(path).withMode(WriteMode.OVERWRITE).uploadAndFinish(inputStream)
 
-    override suspend fun hasBackupForDate(date: DateTime): Boolean {
+    override suspend fun hasBackup(): Boolean {
         try {
-            val dateStr = namingPolicy.getBackupFileName(date)
-            val latestBackupFileName = getLastBackupFilesAndDates().sortedBy { it.first }
-            return latestBackupFileName.any { it.second.metadata.metadataValue.name.contains(dateStr) }
+            val fileName = namingPolicy.getBackupFileName()
+            val latestBackupFileName = searchForBackups()
+            return latestBackupFileName.any { it.metadata.metadataValue.name.contains(fileName) }
         } catch (exception: UserRecoverableAuthIOException) {
             throw BackupStorageAuthRevokedException()
         } catch (exception: Exception) {
@@ -112,12 +111,11 @@ class DropboxBackupStorage(
     }
 
     override suspend fun restoreLatestBackup(password: String?) {
-        val backup = getLastBackupFilesAndDates().maxByOrNull { it.first }
-            ?: throw BackupStorageTamperedException("Backup file not found in folder.")
+        val backup = searchForBackups().firstOrNull() ?: throw BackupStorageTamperedException("Backup file not found in folder.")
 
         withContext(Dispatchers.IO) {
             val tempFolder = File(walletTempDirPath)
-            val tempFile = File(tempFolder, backup.second.metadata.metadataValue.name)
+            val tempFile = File(tempFolder, backup.metadata.metadataValue.name)
             if (!tempFolder.parentFile.exists()) {
                 tempFolder.parentFile.mkdir()
             }
@@ -128,35 +126,24 @@ class DropboxBackupStorage(
                 tempFile.createNewFile()
             }
             FileOutputStream(tempFile).use { targetOutputStream ->
-                DropboxClientFactory.client.files().download(backup.second.metadata.metadataValue.pathLower).download(targetOutputStream)
+                DropboxClientFactory.client.files().download(backup.metadata.metadataValue.pathLower).download(targetOutputStream)
             }
             backupFileProcessor.restoreBackupFile(tempFile, password)
             backupFileProcessor.clearTempFolder()
             // restore successful, turn on automated backup
-            val lastSuccessfulDate = namingPolicy.getDateFromBackupFileName(tempFile.name)
             backupSettingsRepository.dropboxOption =
-                backupSettingsRepository.dropboxOption!!.copy(lastSuccessDate = lastSuccessfulDate?.let { SerializableTime(it) })
+                backupSettingsRepository.dropboxOption!!.copy(lastSuccessDate = SerializableTime(DateTime.now()))
             backupSettingsRepository.backupPassword = password
         }
     }
 
-    private fun getLastBackupFilesAndDates(): List<Pair<DateTime, SearchMatchV2>> = searchForBackups(DropboxClientFactory.client).mapNotNull {
-        namingPolicy.getDateFromBackupFileName(it.metadata.metadataValue.name)?.let { file -> (file to it) }
-    }
-
-    private fun searchForBackups(client: DbxClientV2): List<SearchMatchV2> =
-        client.files().searchV2(namingPolicy.regex.pattern).matches.toList()
+    private fun searchForBackups(): List<SearchMatchV2> =
+        DropboxClientFactory.client.files().searchV2(namingPolicy.regex.pattern).matches.toList()
 
 
     override suspend fun deleteAllBackupFiles() {
-        deleteAllBackupFiles(excludeBackupWithDate = null)
-    }
-
-    private fun deleteAllBackupFiles(excludeBackupWithDate: DateTime?) {
-        val backups = getLastBackupFilesAndDates()
-        val excludeName: String? = if (excludeBackupWithDate != null) namingPolicy.getBackupFileName(excludeBackupWithDate) else null
-        backups.filter { excludeName == null || it.second.metadata.metadataValue.name.contains(excludeName) }.forEach {
-            DropboxClientFactory.client.files().deleteV2(it.second.metadata.metadataValue.pathLower)
+        searchForBackups().forEach {
+            DropboxClientFactory.client.files().deleteV2(it.metadata.metadataValue.pathLower)
         }
     }
 
@@ -165,6 +152,6 @@ class DropboxBackupStorage(
     }
 
     private companion object {
-        private const val DRIVE_BACKUP_PARENT_FOLDER_NAME = "/appDataFolder/"
+        private const val DRIVE_BACKUP_PARENT_FOLDER_NAME = "/backup/"
     }
 }

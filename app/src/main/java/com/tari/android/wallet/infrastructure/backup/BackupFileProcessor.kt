@@ -40,7 +40,6 @@ import com.tari.android.wallet.ffi.FFIWallet
 import com.tari.android.wallet.infrastructure.backup.compress.CompressionMethod
 import com.tari.android.wallet.infrastructure.security.encryption.SymmetricEncryptionAlgorithm
 import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupSettingsRepository
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import org.joda.time.DateTime
@@ -61,8 +60,8 @@ class BackupFileProcessor(
 
     suspend fun generateBackupFile(newPassword: CharArray? = null): Triple<File, DateTime, String> = mutex.withLock {
         // decrypt database
-        FFIWallet.instance?.removeEncryption()
-        delay(200)
+        //todo
+//        FFIWallet.instance?.removeEncryption()
 
         // create partial backup in temp folder if password not set
         val databaseFile = File(walletConfig.walletDatabaseFilePath)
@@ -71,27 +70,20 @@ class BackupFileProcessor(
         // zip the file
         val compressionMethod = CompressionMethod.zip()
         var mimeType = compressionMethod.mimeType
-        val backupFileName = namingPolicy.getBackupFileName(backupDate)
-        val compressedFile = File(
-            walletConfig.getWalletTempDirPath(),
-            "$backupFileName.${compressionMethod.extension}"
-        )
-        var fileToBackup = listOf(databaseFile).compress(
-            CompressionMethod.zip(),
-            compressedFile.absolutePath
-        )
+        val backupFileName = namingPolicy.getBackupFileName()
+        val compressedFile = File(walletConfig.getWalletTempDirPath(), "$backupFileName.${compressionMethod.extension}")
+        var fileToBackup = listOf(databaseFile).compress(CompressionMethod.zip(), compressedFile.absolutePath)
         // encrypt the file if password is set
         val encryptionAlgorithm = SymmetricEncryptionAlgorithm.aes()
         if (backupPassword != null) {
-            val targetFileName = "$backupFileName.${encryptionAlgorithm.extension}"
             fileToBackup = fileToBackup.encrypt(
                 encryptionAlgorithm,
                 backupPassword,
-                File(walletConfig.getWalletTempDirPath(), targetFileName).absolutePath
+                File(walletConfig.getWalletTempDirPath(), backupFileName).absolutePath
             )
             mimeType = encryptionAlgorithm.mimeType
         }
-        // encrypt after finish backup
+        //todo
         FFIWallet.instance?.enableEncryption()
 
         return Triple(fileToBackup, backupDate, mimeType)

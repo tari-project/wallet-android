@@ -30,42 +30,11 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.tari.android.wallet.service;
 
-// import model classes
-import com.tari.android.wallet.model.Model;
-
-// Declare any non-default types here with import statements
-
-interface TariWalletServiceListener {
-
-    oneway void onTxReceived(in PendingInboundTx pendingInboundTx);
-
-    oneway void onTxReplyReceived(in PendingOutboundTx pendingOutboundTx);
-
-    oneway void onTxFinalized(in PendingInboundTx pendingInboundTx);
-
-    oneway void onInboundTxBroadcast(in PendingInboundTx pendingInboundTx);
-
-    oneway void onOutboundTxBroadcast(in PendingOutboundTx pendingOutboundTx);
-
-    oneway void onTxMined(in CompletedTx completed);
-
-    oneway void onTxMinedUnconfirmed(in CompletedTx completed, in int confirmationCount);
-
-    oneway void onTxFauxConfirmed(in CompletedTx completed);
-
-    oneway void onTxFauxUnconfirmed(in CompletedTx completed, in int confirmationCount);
-
-    oneway void onTxCancelled(in CancelledTx tx);
-
-    oneway void onDirectSendResult(in TxId txId);
-
-    oneway void onStoreAndForwardSendResult(in TxId txId, in boolean success);
-
-    oneway void onBaseNodeSyncComplete(in boolean success);
-
-    oneway void onTestnetTariRequestSuccess();
-
-    oneway void onTestnetTariRequestError(in String error);
-}
+#include <jni.h>
+#include <android/log.h>
+#include <wallet.h>
+#include <string>
+#include <cmath>
+#include <android/log.h>
+#include "jniCommon.cpp"

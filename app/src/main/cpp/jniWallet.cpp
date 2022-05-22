@@ -211,7 +211,7 @@ void txFinalizedCallback(struct TariCompletedTransaction *pCompletedTransaction)
     g_vm->DetachCurrentThread();
 }
 
-void txDirectSendResultCallback(unsigned long long txId, bool success) {
+void txDirectSendResultCallback(unsigned long long txId, struct TariTransactionSendStatus *status) {
     auto *jniEnv = getJNIEnv();
     if (jniEnv == nullptr || callbackHandler == nullptr) {
         return;
@@ -221,7 +221,7 @@ void txDirectSendResultCallback(unsigned long long txId, bool success) {
             callbackHandler,
             directSendResultCallbackMethodId,
             bytes,
-            success);
+            status);
     g_vm->DetachCurrentThread();
 }
 
@@ -361,6 +361,7 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniCreate(
         jint maxNumberOfRollingLogFiles,
         jint rollingLogFileMaxSizeBytes,
         jstring jPassphrase,
+        jstring jNetwork,
         jobject jSeed_words,
         jstring txReceivedCallbackMethodName,
         jstring txReceivedCallbackMethodSignature,
@@ -563,6 +564,11 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniCreate(
         pPassphrase = jEnv->GetStringUTFChars(jPassphrase, JNI_FALSE);
     }
 
+    const char *pNetwork = nullptr;
+    if (jNetwork != nullptr) {
+        pNetwork = jEnv->GetStringUTFChars(jNetwork, JNI_FALSE);
+    }
+
     bool jRecoveryInProgress = false;
     bool *pRecovery = &jRecoveryInProgress;
 
@@ -579,6 +585,7 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniCreate(
             static_cast<unsigned int>(rollingLogFileMaxSizeBytes),
             pPassphrase,
             pSeedWords,
+            pNetwork,
             txReceivedCallback,
             txReplyReceivedCallback,
             txFinalizedCallback,
@@ -588,7 +595,6 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniCreate(
             txFauxConfirmedCallback,
             txFauxUnconfirmedCallback,
             txDirectSendResultCallback,
-            txStoreAndForwardSendResultCallback,
             txCancellationCallback,
             txoValidationCompleteCallback,
             contactsLivenessDataUpdatedCallback,

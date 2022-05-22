@@ -103,8 +103,7 @@ class BackupManager(
 
             updateState(BackupState.BackupCheckingStorage)
             try {
-                val backupDate = currentBackupOption.lastSuccessDate!!.date
-                if (!getStorageByOption(currentBackupOption.type).hasBackupForDate(backupDate)) {
+                if (!getStorageByOption(currentBackupOption.type).hasBackup()) {
                     throw BackupStorageTamperedException("Backup storage is tampered.")
                 }
                 when {

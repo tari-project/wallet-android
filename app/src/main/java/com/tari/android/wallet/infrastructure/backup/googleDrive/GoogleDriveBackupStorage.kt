@@ -148,8 +148,6 @@ class GoogleDriveBackupStorage(
             }
             try {
                 backupFileProcessor.clearTempFolder()
-                // delete older backups
-                deleteAllBackupFiles(excludeBackupWithDate = backupDate)
             } catch (e: Exception) {
                 Logger.e(e, "Ignorable backup error while clearing temporary and old files.")
             }
@@ -170,10 +168,10 @@ class GoogleDriveBackupStorage(
             ?: throw IOException("Null result when requesting file creation.")
     }
 
-    override suspend fun hasBackupForDate(date: DateTime): Boolean {
+    override suspend fun hasBackup(): Boolean {
         try {
             val latestBackupFileName = getLastBackupFileIdAndName()?.second ?: return false
-            return latestBackupFileName.contains(namingPolicy.getBackupFileName(date))
+            return latestBackupFileName.contains(namingPolicy.getBackupFileName())
         } catch (exception: UserRecoverableAuthIOException) {
             throw BackupStorageAuthRevokedException()
         } catch (exception: Exception) {
@@ -207,31 +205,29 @@ class GoogleDriveBackupStorage(
             backupFileProcessor.restoreBackupFile(tempFile, password)
             backupFileProcessor.clearTempFolder()
             // restore successful, turn on automated backup
-            val lastSuccessfulDate = namingPolicy.getDateFromBackupFileName(tempFile.name)
-            backupSettingsRepository.googleDriveOption = backupSettingsRepository.googleDriveOption!!.copy(lastSuccessDate = lastSuccessfulDate?.let {
-                SerializableTime(it)
-            })
+            backupSettingsRepository.googleDriveOption =
+                backupSettingsRepository.googleDriveOption!!.copy(lastSuccessDate = SerializableTime(DateTime.now()))
             backupSettingsRepository.backupPassword = password
         }
     }
 
     private fun getLastBackupFileIdAndName(): Pair<String, String>? {
         val backups = mutableListOf<Pair<DateTime, com.google.api.services.drive.model.File>>()
-        var pageToken: String? = null
-        do {
-            val result: FileList = searchForBackups(pageToken)
-            result.files.forEach {
-                namingPolicy.getDateFromBackupFileName(it.name)
-                    ?.let { time -> backups.add(time to it) }
-            }
-            pageToken = result.nextPageToken
-        } while (pageToken != null)
-        val latestBackupFile = backups.maxByOrNull { it.first }?.second
-        return if (latestBackupFile != null) {
-            (latestBackupFile.id to latestBackupFile.name)
-        } else {
-            null
-        }
+        return "" to ""
+        //        var pageToken: String? = null
+//        do {
+//            val result: FileList = searchForBackups(pageToken)
+//            result.files.forEach {
+//                namingPolicy.getDateFromBackupFileName(it.name)?.let { time -> backups.add(time to it) }
+//            }
+//            pageToken = result.nextPageToken
+//        } while (pageToken != null)
+//        val latestBackupFile = backups.maxByOrNull { it.first }?.second
+//        return if (latestBackupFile != null) {
+//            (latestBackupFile.id to latestBackupFile.name)
+//        } else {
+//            null
+//        }
     }
 
     private fun searchForBackups(pageToken: String?): FileList =
@@ -243,18 +239,13 @@ class GoogleDriveBackupStorage(
             .execute()
 
     override suspend fun deleteAllBackupFiles() {
-        deleteAllBackupFiles(excludeBackupWithDate = null)
-    }
-
-    private fun deleteAllBackupFiles(excludeBackupWithDate: DateTime?) {
         val driveFiles = drive?.files() ?: return
         var pageToken: String? = null
         do {
             pageToken = searchForBackups(pageToken).let {
                 it.files.forEach { file ->
-                    val excludeName = if (excludeBackupWithDate != null) namingPolicy.getBackupFileName(excludeBackupWithDate) else null
-                    if (excludeName == null || !file.name.contains(excludeName)) {
-                        namingPolicy.getDateFromBackupFileName(file.name)?.let { driveFiles.delete(file.id).execute() }
+                    if (file.name == namingPolicy.getBackupFileName()) {
+                        driveFiles.delete(file.id).execute()
                     }
                 }
                 it.nextPageToken

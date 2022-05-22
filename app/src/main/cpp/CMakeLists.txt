@@ -60,7 +60,7 @@ add_library(
         jniCommon.cpp
         jniBalance.cpp
         jniByteVector.cpp
-        jniTransportType.cpp
+        jniTransportConfig.cpp
         jniTariCommitmentSignature.cpp
         jniPrivateKey.cpp
         jniPublicKey.cpp

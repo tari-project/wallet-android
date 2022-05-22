@@ -447,21 +447,21 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
         backupManager.scheduleBackupAll(resetRetryCount = true)
     }
 
-    override fun onDirectSendResult(txId: BigInteger, success: Boolean) {
-        Logger.d("Tx $txId direct send completed. Success: $success")
+    override fun onDirectSendResult(txId: BigInteger) {
+        Logger.d("Tx $txId direct send completed")
         // post event to bus
-        EventBus.post(Event.Transaction.DirectSendResult(TxId(txId), success))
-        if (success) {
-            outboundTxIdsToBePushNotified.firstOrNull { it.first == txId }?.let {
-                outboundTxIdsToBePushNotified.remove(it)
-                sendPushNotificationToTxRecipient(it.second)
-            }
-            // schedule a backup
-            backupManager.scheduleBackupAll(resetRetryCount = true)
-        }
+        EventBus.post(Event.Transaction.DirectSendResult(TxId(txId)))
+//        if (success) {
+//            outboundTxIdsToBePushNotified.firstOrNull { it.first == txId }?.let {
+//                outboundTxIdsToBePushNotified.remove(it)
+//                sendPushNotificationToTxRecipient(it.second)
+//            }
+//            // schedule a backup
+//            backupManager.scheduleBackupAll(resetRetryCount = true)
+//        }
         // notify external listeners
         listeners.iterator().forEach {
-            it.onDirectSendResult(TxId(txId), success)
+            it.onDirectSendResult(TxId(txId))
         }
     }
 

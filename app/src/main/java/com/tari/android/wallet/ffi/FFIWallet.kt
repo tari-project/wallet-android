@@ -34,6 +34,7 @@ package com.tari.android.wallet.ffi
 
 import com.orhanobut.logger.Logger
 import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
+import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepository
 import com.tari.android.wallet.model.*
 import com.tari.android.wallet.model.recovery.WalletRestorationResult
 import com.tari.android.wallet.service.seedPhrase.SeedPhraseRepository
@@ -53,6 +54,7 @@ import java.util.concurrent.atomic.AtomicReference
 internal class FFIWallet(
     val sharedPrefsRepository: SharedPrefsRepository,
     val seedPhraseRepository: SeedPhraseRepository,
+    val networkRepository: NetworkRepository,
     commsConfig: FFICommsConfig,
     logPath: String
 ) : FFIBase() {
@@ -74,6 +76,7 @@ internal class FFIWallet(
         maxNumberOfRollingLogFiles: Int,
         rollingLogFileMaxSizeBytes: Int,
         passphrase: String?,
+        network: String?,
         seedWords: FFISeedWords?,
         callbackReceivedTx: String,
         callbackReceivedTxSig: String,
@@ -231,6 +234,7 @@ internal class FFIWallet(
                     Constants.Wallet.maxNumberOfRollingLogFiles,
                     Constants.Wallet.rollingLogFileMaxSizeBytes,
                     sharedPrefsRepository.databasePassphrase,
+                    networkRepository.currentNetwork?.network?.uriComponent,
                     seedPhraseRepository.getPhrase()?.ffiSeedWords,
                     this::onTxReceived.name, "(J)V",
                     this::onTxReplyReceived.name, "(J)V",
@@ -240,7 +244,7 @@ internal class FFIWallet(
                     this::onTxMinedUnconfirmed.name, "(J[B)V",
                     this::onTxFauxConfirmed.name, "(J)V",
                     this::onTxFauxUnconfirmed.name, "(J[B)V",
-                    this::onDirectSendResult.name, "([BZ)V",
+                    this::onDirectSendResult.name, "([BJ)V",
                     this::onStoreAndForwardSendResult.name, "([BZ)V",
                     this::onTxCancelled.name, "(J[B)V",
                     this::onTXOValidationComplete.name, "([BZ)V",
@@ -259,7 +263,8 @@ internal class FFIWallet(
             Logger.i("Post jniCreate with code: %d.", error.code)
             throwIf(error)
 
-            enableEncryption()
+            //todo
+//            enableEncryption()
         }
     }
 
@@ -482,10 +487,9 @@ internal class FFIWallet(
      * This callback function cannot be private due to JNI behaviour.
      */
     @Suppress("MemberVisibilityCanBePrivate")
-    fun onDirectSendResult(bytes: ByteArray, success: Boolean) {
-        Logger.i("Direct send result received. Success: $success")
+    fun onDirectSendResult(bytes: ByteArray, status: FFIPointer) {
         val txId = BigInteger(1, bytes)
-        GlobalScope.launch { listener?.onDirectSendResult(txId, success) }
+        GlobalScope.launch { listener?.onDirectSendResult(txId) }
     }
 
     /**

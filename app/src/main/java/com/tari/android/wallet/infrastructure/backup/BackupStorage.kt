@@ -49,7 +49,7 @@ interface BackupStorage {
 
     suspend fun backup(newPassword: CharArray? = null): DateTime
 
-    suspend fun hasBackupForDate(date: DateTime): Boolean
+    suspend fun hasBackup(): Boolean
 
     suspend fun restoreLatestBackup(password: String? = null)
 

@@ -143,15 +143,11 @@ class LocalBackupStorage(
 
     override suspend fun restoreLatestBackup(password: String?) {
         val backupFolder = getBackupFolder()
-        val backupFiles = backupFolder.listFiles().filter { file -> namingPolicy.getDateFromBackupFileName(file.name ?: "") != null }
-        if (backupFiles.isEmpty()) {
-            throw BackupStorageTamperedException("Backup file not found in folder.")
-        }
-        backupFiles.sortedBy { it.name!! }
+        val backupFiles = backupFolder.listFiles().firstOrNull() ?: throw BackupStorageTamperedException("Backup file not found in folder.")
         withContext(Dispatchers.IO) {
             // copy file to temp location
             val tempFolder = File(walletTempDirPath)
-            val tempFile = File(tempFolder, backupFiles.last().name!!)
+            val tempFile = File(tempFolder, backupFiles.name!!)
             if (!tempFolder.parentFile.exists()) {
                 tempFolder.parentFile.mkdir()
             }
@@ -161,31 +157,26 @@ class LocalBackupStorage(
             if (!tempFile.exists()) {
                 tempFile.createNewFile()
             }
-            context.contentResolver.openInputStream(backupFiles.last().uri).use { inputStream ->
+            context.contentResolver.openInputStream(backupFiles.uri).use { inputStream ->
                 FileUtils.copyInputStreamToFile(inputStream, tempFile)
             }
             backupFileProcessor.restoreBackupFile(tempFile, password)
             backupFileProcessor.clearTempFolder()
             // restore successful, turn on automated backup
-            val lastSuccessfulDate = namingPolicy.getDateFromBackupFileName(tempFile.name)
             backupSettingsRepository.localFileOption =
-                backupSettingsRepository.localFileOption!!.copy(lastSuccessDate = lastSuccessfulDate?.let { SerializableTime(it) })
+                backupSettingsRepository.localFileOption!!.copy(lastSuccessDate = SerializableTime(DateTime.now()))
             backupSettingsRepository.backupPassword = password
         }
     }
 
-    override suspend fun hasBackupForDate(date: DateTime): Boolean {
-        val backupFolderURI = backupSettingsRepository.localBackupFolderURI
-            ?: return false
-        val backupFolder = DocumentFile.fromTreeUri(context, backupFolderURI)
-            ?: throw BackupStorageAuthRevokedException()
+    override suspend fun hasBackup(): Boolean {
+        val backupFolderURI = backupSettingsRepository.localBackupFolderURI ?: return false
+        val backupFolder = DocumentFile.fromTreeUri(context, backupFolderURI) ?: throw BackupStorageAuthRevokedException()
         if (!backupFolder.exists()) {
             throw BackupStorageAuthRevokedException()
         }
-        val expectedBackupFileName = namingPolicy.getBackupFileName(date)
-        return backupFolder.listFiles().firstOrNull {
-            it.isFile && it.name?.contains(expectedBackupFileName) == true
-        } != null
+        val expectedBackupFileName = namingPolicy.getBackupFileName()
+        return backupFolder.listFiles().firstOrNull { it.isFile && it.name?.contains(expectedBackupFileName) == true } != null
     }
 
     private fun getBackupFolder(): DocumentFile {
