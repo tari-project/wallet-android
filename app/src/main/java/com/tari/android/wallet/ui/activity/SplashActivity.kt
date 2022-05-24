@@ -69,7 +69,12 @@ internal class SplashActivity : AppCompatActivity() {
             walletServiceLauncher.stopAndDelete()
         }
 
-        val exists = WalletUtil.walletExists(walletConfig)  && sharedPrefsRepository.onboardingAuthSetupCompleted
+        val exists = WalletUtil.walletExists(walletConfig) && sharedPrefsRepository.onboardingAuthSetupCompleted
+        if (WalletUtil.walletExists(walletConfig) && !sharedPrefsRepository.onboardingAuthSetupCompleted) {
+            // in cases interrupted restoration
+            WalletUtil.clearWalletFiles(walletConfig.getWalletFilesDirPath())
+            sharedPrefsRepository.clear()
+        }
         launch(if (exists) AuthActivity::class.java else OnboardingFlowActivity::class.java)
     }
 
