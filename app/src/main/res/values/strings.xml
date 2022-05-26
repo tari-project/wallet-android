@@ -568,4 +568,35 @@
     <string name="tor_bridges_connection_progress_successful_no_bridges">No used bridges</string>
     <string name="tor_bridges_connection_progress_successful_used_bridges">Used bridges\n</string>
 
+    <string name="tari_about_title">About</string>
+    <string name="tari_about_description"><![CDATA[The following icons are licensed under<br><font color=#8931FF>Creative Commons 3.0:</font>]]></string>
+    <string name="tari_about_license_url">https://creativecommons.org/licenses/by/3.0/</string>
+    <string name="tari_about_icon_url_locked">https://thenounproject.com/icon/locked-lock-3734872/</string>
+    <string name="tari_about_icon_url_about">https://thenounproject.com/icon/about-4860865/</string>
+    <string name="tari_about_icon_url_speach_bublles">https://thenounproject.com/icon/speech-bubbles-4213155/</string>
+    <string name="tari_about_icon_url_keyboard">https://thenounproject.com/icon/keyboard-4213010/</string>
+    <string name="tari_about_icon_url_writing">https://thenounproject.com/icon/writing-4213261/</string>
+    <string name="tari_about_icon_url_privacy">https://thenounproject.com/icon/privacy-1381695/</string>
+    <string name="tari_about_icon_url_bullhorn">https://thenounproject.com/icon/bullhorn-4213159/</string>
+    <string name="tari_about_icon_url_refresh">https://thenounproject.com/icon/refresh-1043971/</string>
+    <string name="tari_about_icon_url_magnifier">https://thenounproject.com/icon/magnifier-4213152/</string>
+    <string name="tari_about_icon_url_repair">https://thenounproject.com/icon/repair-tools-4213156/</string>
+    <string name="tari_about_icon_url_server">https://thenounproject.com/icon/internet-server-4213144/</string>
+    <string name="tari_about_icon_url_networking">https://thenounproject.com/icon/networking-4213263/</string>
+    <string name="tari_about_icon_url_delete">https://thenounproject.com/icon/delete-4727971/</string>
+
+    <string name="tari_about_icon_text_locked">Locked Lock by BlackActurus from\nNounProject.com</string>
+    <string name="tari_about_icon_text_about">About by Anggara Putra from\nNounProject.com</string>
+    <string name="tari_about_icon_text_speach_bublles">Speech Bubbles by Design Circle from\nNounProject.com</string>
+    <string name="tari_about_icon_text_keyboard">Keyboard by Design Circle from\nNounProject.com</string>
+    <string name="tari_about_icon_text_writing">Writing by Design Circle from\nNounProject.com</string>
+    <string name="tari_about_icon_text_privacy">Privacy by Gregor Cresnar from\nNounProject.com</string>
+    <string name="tari_about_icon_text_bullhorn">Bullhorn by Design Circle from\nNounProject.com</string>
+    <string name="tari_about_icon_text_refresh">Magnifier by Design Circle from\nNounProject.com (Modified)</string>
+    <string name="tari_about_icon_text_magnifier">Refresh by Poombatta from\nNounProject.com</string>
+    <string name="tari_about_icon_text_repair">Repair Tools by Design Circle from\nNounProject.com</string>
+    <string name="tari_about_icon_text_server">Internet Server by Design Circle from\nNounProject.com</string>
+    <string name="tari_about_icon_text_networking">Networking by Design Circle from\nNounProject.com</string>
+    <string name="tari_about_icon_text_delete">Delete by Maya Nurhayati from\nNounProject.com</string>
+
 </resources>
