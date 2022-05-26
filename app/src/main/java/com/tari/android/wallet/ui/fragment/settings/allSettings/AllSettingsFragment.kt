@@ -111,6 +111,7 @@ internal class AllSettingsFragment : CommonFragment<FragmentAllSettingsBinding, 
         val router = requireActivity() as AllSettingsRouter
 
         when (navigation) {
+            AllSettingsNavigation.ToAbout -> router.toAbout()
             AllSettingsNavigation.ToBackgroundService -> router.toBackgroundService()
             AllSettingsNavigation.ToBackupSettings -> router.toBackupSettings()
             AllSettingsNavigation.ToBaseNodeSelection -> router.toBaseNodeSelection()
