@@ -41,50 +41,28 @@
 
 extern "C"
 JNIEXPORT void JNICALL
-Java_com_tari_android_wallet_ffi_FFICommsConfig_jniCreate(
+Java_com_tari_android_wallet_ffi_FFICovenant_jniCreateFromBytes(
         JNIEnv *jEnv,
         jobject jThis,
-        jstring jPublicAddress,
-        jobject jTransport,
-        jstring jDatabaseName,
-        jstring jDatastorePath,
-        jlong jDiscoveryTimeoutSec,
-        jlong jSafDurationSec,
+        jobject bytes,
         jobject error) {
-    const char *pControlServiceAddress = jEnv->GetStringUTFChars(
-            jPublicAddress,
-            JNI_FALSE);
-    const char *pDatabaseName = jEnv->GetStringUTFChars(jDatabaseName, JNI_FALSE);
-    const char *pDatastorePath = jEnv->GetStringUTFChars(jDatastorePath, JNI_FALSE);
-    jlong lTransport = GetPointerField(jEnv, jTransport);
-    auto *pTransport = reinterpret_cast<TariTransportConfig *>(lTransport);
     int errorCode = 0;
     int *errorCodePointer = &errorCode;
-    if (jDiscoveryTimeoutSec < 0) {
-        jDiscoveryTimeoutSec = abs(jDiscoveryTimeoutSec);
-    }
-    TariCommsConfig *pCommsConfig = comms_config_create(
-            pControlServiceAddress,
-            pTransport,
-            pDatabaseName,
-            pDatastorePath,
-            static_cast<unsigned long long int>(jDiscoveryTimeoutSec),
-            static_cast<unsigned long long int>(jSafDurationSec),
-            errorCodePointer
-    );
-    jEnv->ReleaseStringUTFChars(jPublicAddress, pControlServiceAddress);
-    jEnv->ReleaseStringUTFChars(jDatabaseName, pDatabaseName);
-    jEnv->ReleaseStringUTFChars(jDatastorePath, pDatastorePath);
+
+    jlong lBytes = GetPointerField(jEnv, bytes);
+    auto *pBytes = reinterpret_cast<ByteVector *>(lBytes);
+
+    TariCovenant *pTariCovenant = covenant_create_from_bytes(pBytes, errorCodePointer);
+    SetPointerField(jEnv, jThis, reinterpret_cast<jlong>(pTariCovenant));
     setErrorCode(jEnv, error, errorCode);
-    SetPointerField(jEnv, jThis, reinterpret_cast<jlong>(pCommsConfig));
 }
 
 extern "C"
 JNIEXPORT void JNICALL
-Java_com_tari_android_wallet_ffi_FFICommsConfig_jniDestroy(
+Java_com_tari_android_wallet_ffi_FFICovenant_jniDestroy(
         JNIEnv *jEnv,
         jobject jThis) {
-    jlong lCommsConfig = GetPointerField(jEnv, jThis);
-    comms_config_destroy(reinterpret_cast<TariCommsConfig *>(lCommsConfig));
+    jlong lCovenant = GetPointerField(jEnv, jThis);
+    covenant_destroy(reinterpret_cast<TariCovenant *>(lCovenant));
     SetPointerField(jEnv, jThis, reinterpret_cast<jlong>(nullptr));
 }

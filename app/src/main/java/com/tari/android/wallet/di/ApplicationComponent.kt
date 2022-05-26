@@ -70,6 +70,8 @@ import com.tari.android.wallet.ui.fragment.send.addRecepient.AddRecipientViewMod
 import com.tari.android.wallet.ui.fragment.send.finalize.FinalizeSendTxViewModel
 import com.tari.android.wallet.ui.fragment.send.requestTari.RequestTariViewModel
 import com.tari.android.wallet.ui.fragment.settings.allSettings.AllSettingsViewModel
+import com.tari.android.wallet.ui.fragment.settings.allSettings.about.TariAboutViewModel
+import com.tari.android.wallet.ui.fragment.settings.allSettings.about.list.TariIconViewHolder
 import com.tari.android.wallet.ui.fragment.settings.backgroundService.BackgroundServiceSettingsViewModel
 import com.tari.android.wallet.ui.fragment.settings.backup.ChangeSecurePasswordFragment
 import com.tari.android.wallet.ui.fragment.settings.backup.EnterCurrentPasswordFragment
@@ -174,6 +176,7 @@ internal interface ApplicationComponent {
     fun inject(viewModel: CreateWalletViewModel)
     fun inject(viewModel: IntroductionViewModel)
     fun inject(viewModel: AuthViewModel)
+    fun inject(viewModel: TariAboutViewModel)
     /**
      * Service(s).
      */

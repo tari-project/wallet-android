@@ -30,39 +30,20 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+
 package com.tari.android.wallet.ffi
 
-/**
- * Tari contact wrapper.
- *
- * @author The Tari Development Team
- */
-internal class FFIOutputFeatures : FFIBase {
+import java.io.Serializable
 
-    private external fun jniCreate(
-        version: Char,
-        flags: Char,
-        maturity: Long,
-        recovery_byte: Char,
-        metadata: FFIByteVector,
-        unique_id: FFIByteVector,
-        parent_public_key: FFIByteVector,
-        libError: FFIError
-    )
+class FFICovenant(bytes: FFIByteVector) : FFIBase(), Serializable {
+
+    private external fun jniCreateFromBytes(bytes: FFIByteVector, libError: FFIError)
 
     private external fun jniDestroy()
 
-    constructor(
-        version: Char,
-        flags: Char,
-        maturity: Long,
-        recovery_byte: Char,
-        metadata: FFIByteVector,
-        unique_id: FFIByteVector,
-        parent_public_key: FFIByteVector,
-    ) : super() {
+    init {
         val error = FFIError()
-        jniCreate(version, flags, maturity, recovery_byte, metadata, unique_id, parent_public_key, error)
+        jniCreateFromBytes(bytes, error)
         throwIf(error)
     }
 
