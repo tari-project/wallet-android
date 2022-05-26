@@ -39,7 +39,7 @@ import java.math.BigInteger
  *
  * @author The Tari Development Team
  */
-internal class FFIByteVector() : FFIBase() {
+class FFIByteVector() : FFIBase() {
 
     // region JNI
 

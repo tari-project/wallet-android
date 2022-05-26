@@ -30,7 +30,6 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-
 #include <jni.h>
 #include <android/log.h>
 #include <wallet.h>
@@ -40,51 +39,26 @@
 #include "jniCommon.cpp"
 
 extern "C"
-JNIEXPORT void JNICALL
-Java_com_tari_android_wallet_ffi_FFICommsConfig_jniCreate(
+JNIEXPORT int JNICALL
+Java_com_tari_android_wallet_ffi_FFITransactionSendStatus_jniTransactionSendStatusDecode(
         JNIEnv *jEnv,
         jobject jThis,
-        jstring jPublicAddress,
-        jobject jTransport,
-        jstring jDatabaseName,
-        jstring jDatastorePath,
-        jlong jDiscoveryTimeoutSec,
-        jlong jSafDurationSec,
-        jobject error) {
-    const char *pControlServiceAddress = jEnv->GetStringUTFChars(
-            jPublicAddress,
-            JNI_FALSE);
-    const char *pDatabaseName = jEnv->GetStringUTFChars(jDatabaseName, JNI_FALSE);
-    const char *pDatastorePath = jEnv->GetStringUTFChars(jDatastorePath, JNI_FALSE);
-    jlong lTransport = GetPointerField(jEnv, jTransport);
-    auto *pTransport = reinterpret_cast<TariTransportConfig *>(lTransport);
+        jobject error
+) {
     int errorCode = 0;
     int *errorCodePointer = &errorCode;
-    if (jDiscoveryTimeoutSec < 0) {
-        jDiscoveryTimeoutSec = abs(jDiscoveryTimeoutSec);
-    }
-    TariCommsConfig *pCommsConfig = comms_config_create(
-            pControlServiceAddress,
-            pTransport,
-            pDatabaseName,
-            pDatastorePath,
-            static_cast<unsigned long long int>(jDiscoveryTimeoutSec),
-            static_cast<unsigned long long int>(jSafDurationSec),
-            errorCodePointer
-    );
-    jEnv->ReleaseStringUTFChars(jPublicAddress, pControlServiceAddress);
-    jEnv->ReleaseStringUTFChars(jDatabaseName, pDatabaseName);
-    jEnv->ReleaseStringUTFChars(jDatastorePath, pDatastorePath);
+    jlong lTransactionSendStatus = GetPointerField(jEnv, jThis);
+    auto *pTransactionSendStatus = reinterpret_cast<TariTransactionSendStatus *>(lTransactionSendStatus);
+    unsigned int status = transaction_send_status_decode(pTransactionSendStatus, errorCodePointer);
     setErrorCode(jEnv, error, errorCode);
-    SetPointerField(jEnv, jThis, reinterpret_cast<jlong>(pCommsConfig));
+    return (int)status;
 }
 
 extern "C"
 JNIEXPORT void JNICALL
-Java_com_tari_android_wallet_ffi_FFICommsConfig_jniDestroy(
+Java_com_tari_android_wallet_ffi_FFITransactionSendStatus_jniDestroy(
         JNIEnv *jEnv,
         jobject jThis) {
-    jlong lCommsConfig = GetPointerField(jEnv, jThis);
-    comms_config_destroy(reinterpret_cast<TariCommsConfig *>(lCommsConfig));
-    SetPointerField(jEnv, jThis, reinterpret_cast<jlong>(nullptr));
+    jlong lSendStatus = GetPointerField(jEnv, jThis);
+    transaction_send_status_destroy(reinterpret_cast<TariTransactionSendStatus *>(lSendStatus));
 }
