@@ -7,7 +7,7 @@ import com.tari.android.wallet.R.string.*
 import com.tari.android.wallet.event.Event
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.extension.addTo
-import com.tari.android.wallet.infrastructure.Tracker
+import com.tari.android.wallet.model.TransactionSendStatus
 import com.tari.android.wallet.model.TxId
 import com.tari.android.wallet.model.WalletError
 import com.tari.android.wallet.network.NetworkConnectionState
@@ -23,7 +23,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.joda.time.DateTime
 import org.joda.time.Seconds
-import javax.inject.Inject
 
 class FinalizeSendTxViewModel : CommonViewModel() {
 
@@ -217,63 +216,28 @@ class FinalizeSendTxViewModel : CommonViewModel() {
             subscribeToEventBus()
         }
 
-        /**
-         * Both send methods have to fail to arrive at the judgement that the send has failed.
-         */
-        private var directSendHasFailed = false
-        private var storeAndForwardHasFailed = false
-
         override fun execute() = Unit
 
         private fun subscribeToEventBus() {
-            EventBus.subscribe<Event.Transaction.DirectSendResult>(this) { event -> onDirectSendResult(event.txId, event.success) }
-            EventBus.subscribe<Event.Transaction.StoreAndForwardSendResult>(this) { event -> onStoreAndForwardSendResult(event.txId, event.success) }
+            EventBus.subscribe<Event.Transaction.DirectSendResult>(this) { event -> onDirectSendResult(event.txId, event.status) }
         }
 
-        private fun onDirectSendResult(txId: TxId, success: Boolean) {
+        private fun onDirectSendResult(txId: TxId, status: TransactionSendStatus) {
             if (sentTxId.value != txId) {
                 Logger.d("Response received for another tx with id: ${txId.value}.")
                 return
             }
-            Logger.d("Direct Send completed with result: $success.")
-            if (success) {
+            if (status.isSuccess) {
                 // track event
                 tracker.event(category = "Transaction", action = "Transaction Accepted - Synchronous")
                 // progress state
                 finishSendingTx()
-            } else {
-                directSendHasFailed = true
-                checkForCombinedFailure()
-            }
-        }
-
-        private fun onStoreAndForwardSendResult(txId: TxId, success: Boolean) {
-            if (sentTxId.value != txId) {
-                Logger.d("Response received for another tx with id: ${txId.value}.")
-                return
-            }
-            Logger.d("Store and forward send completed with result: $success.")
-            if (success) {
-                // track event
-                tracker.event(category = "Transaction", action = "Transaction Stored")
-                // progress state
-                finishSendingTx()
-            } else {
-                storeAndForwardHasFailed = true
-                checkForCombinedFailure()
             }
         }
 
         private fun finishSendingTx() {
             EventBus.unsubscribe(this)
             isCompleted = true
-        }
-
-        private fun checkForCombinedFailure() {
-            if (directSendHasFailed && storeAndForwardHasFailed) { // both have failed
-                txFailureReason.value = TxFailureReason.SEND_ERROR
-                isCompleted = true
-            }
         }
     }
 

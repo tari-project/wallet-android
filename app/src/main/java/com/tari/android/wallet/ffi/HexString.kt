@@ -37,7 +37,7 @@ import java.math.BigInteger
 /**
  * @author The Tari Development Team
  */
-internal class HexString constructor(bytes: FFIByteVector) {
+class HexString constructor(bytes: FFIByteVector) {
 
     private val pattern = "\\p{XDigit}+".toRegex()
 

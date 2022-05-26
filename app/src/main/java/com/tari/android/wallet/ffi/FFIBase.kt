@@ -41,7 +41,7 @@ internal const val nullptr = 0L
  *
  * @author The Tari Development Team
  */
-internal abstract class FFIBase {
+abstract class FFIBase {
 
     var pointer = nullptr
         protected set

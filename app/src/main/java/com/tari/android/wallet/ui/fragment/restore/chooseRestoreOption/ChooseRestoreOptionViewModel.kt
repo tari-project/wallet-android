@@ -93,7 +93,6 @@ internal class ChooseRestoreOptionViewModel : CommonViewModel() {
                 showBackupFileNotFoundDialog()
             }
             is BackupFileIsEncryptedException -> {
-                //todo check for launch wallet after relaunch app
                 _navigation.postValue(ChooseRestoreOptionNavigation.ToEnterRestorePassword)
             }
             is WalletStartFailedException -> {

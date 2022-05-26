@@ -41,50 +41,48 @@
 
 extern "C"
 JNIEXPORT void JNICALL
-Java_com_tari_android_wallet_ffi_FFICommsConfig_jniCreate(
+Java_com_tari_android_wallet_ffi_FFIOutputFeatures_jniCreate(
         JNIEnv *jEnv,
         jobject jThis,
-        jstring jPublicAddress,
-        jobject jTransport,
-        jstring jDatabaseName,
-        jstring jDatastorePath,
-        jlong jDiscoveryTimeoutSec,
-        jlong jSafDurationSec,
+        unsigned char version,
+        unsigned char flags,
+        unsigned long long maturity,
+        unsigned char recovery_byte,
+        jobject metadata,
+        jobject unique_id,
+        jobject parent_public_key,
         jobject error) {
-    const char *pControlServiceAddress = jEnv->GetStringUTFChars(
-            jPublicAddress,
-            JNI_FALSE);
-    const char *pDatabaseName = jEnv->GetStringUTFChars(jDatabaseName, JNI_FALSE);
-    const char *pDatastorePath = jEnv->GetStringUTFChars(jDatastorePath, JNI_FALSE);
-    jlong lTransport = GetPointerField(jEnv, jTransport);
-    auto *pTransport = reinterpret_cast<TariTransportConfig *>(lTransport);
     int errorCode = 0;
     int *errorCodePointer = &errorCode;
-    if (jDiscoveryTimeoutSec < 0) {
-        jDiscoveryTimeoutSec = abs(jDiscoveryTimeoutSec);
-    }
-    TariCommsConfig *pCommsConfig = comms_config_create(
-            pControlServiceAddress,
-            pTransport,
-            pDatabaseName,
-            pDatastorePath,
-            static_cast<unsigned long long int>(jDiscoveryTimeoutSec),
-            static_cast<unsigned long long int>(jSafDurationSec),
-            errorCodePointer
-    );
-    jEnv->ReleaseStringUTFChars(jPublicAddress, pControlServiceAddress);
-    jEnv->ReleaseStringUTFChars(jDatabaseName, pDatabaseName);
-    jEnv->ReleaseStringUTFChars(jDatastorePath, pDatastorePath);
+
+    jlong lMetadata = GetPointerField(jEnv, metadata);
+    auto *pMetadata = reinterpret_cast<ByteVector *>(lMetadata);
+
+    jlong lUniqueId = GetPointerField(jEnv, unique_id);
+    auto *pUniqueId = reinterpret_cast<ByteVector *>(lUniqueId);
+
+    jlong lParentPublicKey = GetPointerField(jEnv, parent_public_key);
+    auto *pPublicKey = reinterpret_cast<ByteVector *>(lParentPublicKey);
+
+    TariOutputFeatures *pOutputFeatures = output_features_create_from_bytes(
+            version,
+            flags,
+            maturity,
+            recovery_byte,
+            pMetadata,
+            pUniqueId,
+            pPublicKey,
+            errorCodePointer);
+    SetPointerField(jEnv, jThis, reinterpret_cast<jlong>(pOutputFeatures));
     setErrorCode(jEnv, error, errorCode);
-    SetPointerField(jEnv, jThis, reinterpret_cast<jlong>(pCommsConfig));
 }
 
 extern "C"
 JNIEXPORT void JNICALL
-Java_com_tari_android_wallet_ffi_FFICommsConfig_jniDestroy(
+Java_com_tari_android_wallet_ffi_FFIOutputFeatures_jniDestroy(
         JNIEnv *jEnv,
         jobject jThis) {
-    jlong lCommsConfig = GetPointerField(jEnv, jThis);
-    comms_config_destroy(reinterpret_cast<TariCommsConfig *>(lCommsConfig));
+    jlong lCovenant = GetPointerField(jEnv, jThis);
+    output_features_destroy(reinterpret_cast<TariOutputFeatures *>(lCovenant));
     SetPointerField(jEnv, jThis, reinterpret_cast<jlong>(nullptr));
 }

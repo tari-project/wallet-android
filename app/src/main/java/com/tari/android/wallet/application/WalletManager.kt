@@ -126,11 +126,11 @@ internal class WalletManager(
     /**
      * Instantiates the Tor transport for the wallet.
      */
-    private fun getTorTransport(): FFITransportType {
+    private fun getTorTransport(): FFITariTransportConfig {
         val cookieFile = File(torConfig.cookieFilePath)
         val cookieString: ByteArray = cookieFile.readBytes()
         val torCookie = FFIByteVector(cookieString)
-        return FFITransportType(
+        return FFITariTransportConfig(
             NetAddressString(
                 torConfig.controlHost,
                 torConfig.controlPort
@@ -145,7 +145,7 @@ internal class WalletManager(
     /**
      * Instantiates the comms configuration for the wallet.
      */
-    private fun getCommsConfig(currentNetworkRepository: NetworkRepository, walletConfig: WalletConfig): FFICommsConfig {
+    private fun getCommsConfig(walletConfig: WalletConfig): FFICommsConfig {
         return FFICommsConfig(
             NetAddressString(
                 "127.0.0.1",
@@ -156,7 +156,6 @@ internal class WalletManager(
             walletConfig.getWalletFilesDirPath(),
             Constants.Wallet.discoveryTimeoutSec,
             Constants.Wallet.storeAndForwardMessageDurationSec,
-            currentNetworkRepository.currentNetwork!!.network.uriComponent,
         )
     }
 
@@ -194,7 +193,8 @@ internal class WalletManager(
             val wallet = FFIWallet(
                 sharedPrefsWrapper,
                 seedPhraseRepository,
-                getCommsConfig(networkRepository, walletConfig),
+                networkRepository,
+                getCommsConfig(walletConfig),
                 walletConfig.getWalletLogFilePath()
             )
             FFIWallet.instance = wallet
