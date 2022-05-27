@@ -36,13 +36,13 @@ class FeeModuleView(context: Context, private val feeModule: FeeModule) :
     private fun applySpeed(speed: NetworkSpeed) {
         this.networkSpeed = speed
         val views = listOf(ui.networkMedium, ui.networkFast, ui.networkSlow)
-        views.forEach { it.setColorFilter(ContextCompat.getColor(context, R.color.black)) }
+        views.forEach { it.background = null }
 
-        val currentSpeed = when(networkSpeed) {
+        val currentSpeed = when (networkSpeed) {
             NetworkSpeed.Fast -> ui.networkFast
             NetworkSpeed.Medium -> ui.networkMedium
             NetworkSpeed.Slow -> ui.networkSlow
         }
-        currentSpeed.setColorFilter(ContextCompat.getColor(context, R.color.purple))
+        currentSpeed.background = ContextCompat.getDrawable(context, R.drawable.network_segmented_picker_selected_bg)
     }
 }
