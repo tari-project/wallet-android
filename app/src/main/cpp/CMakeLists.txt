@@ -78,6 +78,8 @@ add_library(
         jniTransactionSendStatus.cpp
         jniCovenant.cpp
         jniOutputFeatures.cpp
+        jniTariFeePerGramStats.cpp
+        jniTariFeePerGramStat.cpp
 )
 
 find_library(

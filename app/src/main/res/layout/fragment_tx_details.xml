@@ -188,7 +188,7 @@
                         android:layout_marginEnd="6dp"
                         android:layout_toStartOf="@id/amount_text_view"
                         android:contentDescription="@null"
-                        android:src="@drawable/gem_amount" />
+                        android:src="@drawable/gem" />
 
                     <com.tari.android.wallet.ui.component.CustomFontTextView
                         android:id="@+id/amount_text_view"

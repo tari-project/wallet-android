@@ -214,6 +214,8 @@ internal class FFIWallet(
         libError: FFIError
     ): Boolean
 
+    private external fun jniWalletGetFeePerGramStats(count: Int, libError: FFIError): FFIPointer
+
     private external fun jniDestroy()
 
     // endregion
@@ -747,6 +749,13 @@ internal class FFIWallet(
     fun startRecovery(baseNodePublicKey: FFIPublicKey, recoveryOutputMessage: String): Boolean {
         val error = FFIError()
         val result = jniStartRecovery(baseNodePublicKey, this::onWalletRecovery.name, "(I[B[B)V", recoveryOutputMessage, error)
+        throwIf(error)
+        return result
+    }
+
+    fun getFeePerGramStats() : FFIFeePerGramStats {
+        val error = FFIError()
+        val result = FFIFeePerGramStats(jniWalletGetFeePerGramStats(3, error))
         throwIf(error)
         return result
     }
