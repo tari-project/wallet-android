@@ -21,7 +21,7 @@ class FeeModuleView(context: Context, private val feeModule: FeeModule) :
 
     override fun setup() = Unit
 
-    var networkSpeed: NetworkSpeed = NetworkSpeed.Medium
+    var networkSpeed: NetworkSpeed = feeModule.selectedSpeed
 
     init {
         ui.amount.setupArgs(context.dimenPx(R.dimen.add_amount_custom_fee_size).toFloat())
@@ -30,7 +30,7 @@ class FeeModuleView(context: Context, private val feeModule: FeeModule) :
         ui.networkSlow.setOnClickListener { applySpeed(NetworkSpeed.Slow) }
         ui.networkMedium.setOnClickListener { applySpeed(NetworkSpeed.Medium) }
         ui.networkFast.setOnClickListener { applySpeed(NetworkSpeed.Fast) }
-        applySpeed(feeModule.networkSpeed)
+        applySpeed(networkSpeed)
     }
 
     private fun applySpeed(speed: NetworkSpeed) {
@@ -44,5 +44,18 @@ class FeeModuleView(context: Context, private val feeModule: FeeModule) :
             NetworkSpeed.Slow -> ui.networkSlow
         }
         currentSpeed.background = ContextCompat.getDrawable(context, R.drawable.network_segmented_picker_selected_bg)
+        calculateFee()
+    }
+
+    private fun calculateFee() {
+        val feeIndex = when (networkSpeed) {
+            NetworkSpeed.Fast -> 0
+            NetworkSpeed.Medium -> 1
+            NetworkSpeed.Slow -> 2
+        }
+        val feeData = feeModule.feePerGramStats[feeIndex]
+        ui.amount.setupArgs(feeData.calculatedFee)
+        feeModule.feePerGram = feeData
+        feeModule.selectedSpeed = networkSpeed
     }
 }

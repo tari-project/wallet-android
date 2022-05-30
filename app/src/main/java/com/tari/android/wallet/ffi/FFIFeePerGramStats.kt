@@ -32,42 +32,30 @@
  */
 package com.tari.android.wallet.ffi
 
-/**
- * Wrapper for native private key type.
- *
- * @author The Tari Development Team
- */
-internal class FFIEmojiSet(): FFIBase() {
+class FFIFeePerGramStats(pointer: FFIPointer) : FFIBase() {
 
-    // region JNI
-
-    private external fun jniDestroy()
-    private external fun jniCreate()
-    private external fun jniGetLength(libError: FFIError): Int
+    private external fun jniFeePerGramStatsGetLength(libError: FFIError): Int
     private external fun jniGetAt(index: Int, libError: FFIError): FFIPointer
-
-    // endregion
+    private external fun jniDestroy()
 
     init {
-        jniCreate()
+        this.pointer = pointer
+    }
+
+    fun getAt(position: Int): FFIFeePerGramStat {
+        val libError = FFIError()
+        val pointer = jniGetAt(position, libError)
+        throwIf(libError)
+        return FFIFeePerGramStat(pointer)
     }
 
     fun getLength(): Int {
-        val error = FFIError()
-        val result = jniGetLength(error)
-        throwIf(error)
-        return result
+        val libError = FFIError()
+        val length = jniFeePerGramStatsGetLength(libError)
+        throwIf(libError)
+        return length
     }
 
-    fun getAt(index: Int): FFIByteVector {
-        val error = FFIError()
-        val result = FFIByteVector(jniGetAt(index, error))
-        throwIf(error)
-        return result
-    }
-
-    override fun destroy() {
-        jniDestroy()
-    }
-
+    override fun destroy() = jniDestroy()
 }
+

@@ -281,7 +281,8 @@
     <string name="add_amount_modify_fee_title">Modify Transaction Fee</string>
     <string name="add_amount_modify_fee_description">Choose how fast you would like to move your transaction to the blockchain.\n A higher fee will speed up the process.</string>
     <string name="add_amount_modify_fee_estimated">Estimated Fee:</string>
-    <string name="add_amount_modify_fee_modify">Modify Fee</string>
+    <string name="add_amount_modify_fee_speed_up_transaction">Speed Up Transaction</string>
+    <string name="add_amount_modify_fee_network_traffic">Network Traffic</string>
     <string name="add_amount_modify_fee_use">Use This Fee</string>
 
     <!-- send tari - note -->

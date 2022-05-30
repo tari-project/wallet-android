@@ -141,11 +141,41 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentBottom="true"
-                android:layout_marginBottom="12dp"
-                android:layout_centerHorizontal="true">
+                android:layout_centerHorizontal="true"
+                android:layout_marginBottom="12dp">
                 <!-- fee amount -->
 
                 <androidx.appcompat.widget.LinearLayoutCompat
+                    android:id="@+id/network_traffic_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="22dp"
+                    android:layout_above="@+id/fee_container"
+                    android:layout_centerHorizontal="true"
+                    android:orientation="horizontal"
+                    android:visibility="invisible">
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/network_traffic_icon"
+                        android:layout_width="16dp"
+                        android:layout_height="16dp"
+                        android:layout_gravity="center_vertical"
+                        android:layout_marginEnd="6dp"
+                        android:src="@drawable/ic_network_medium"
+                        android:tint="@color/dark_gray" />
+
+                    <com.tari.android.wallet.ui.component.CustomFontTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:text="@string/add_amount_modify_fee_network_traffic"
+                        android:textColor="#A9AFC4"
+                        android:textSize="@dimen/add_amount_tx_fee_text_size"
+                        app:customFont="@string/font_heavy" />
+
+                </androidx.appcompat.widget.LinearLayoutCompat>
+
+                <androidx.appcompat.widget.LinearLayoutCompat
+                    android:id="@+id/fee_container"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_above="@+id/modifyButton"
@@ -183,10 +213,11 @@
                     android:layout_alignParentBottom="true"
                     android:layout_centerHorizontal="true"
                     android:background="@null"
-                    android:text="@string/add_amount_modify_fee_modify"
+                    android:text="@string/add_amount_modify_fee_speed_up_transaction"
                     android:textAllCaps="false"
                     android:textColor="@color/purple"
                     android:textSize="14sp"
+                    android:visibility="invisible"
                     app:customFont="@string/font_medium" />
             </RelativeLayout>
 

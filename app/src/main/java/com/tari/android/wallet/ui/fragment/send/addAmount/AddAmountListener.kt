@@ -1,13 +1,12 @@
 package com.tari.android.wallet.ui.fragment.send.addAmount
 
-import com.tari.android.wallet.model.MicroTari
-import com.tari.android.wallet.model.User
+import com.tari.android.wallet.ui.fragment.send.common.TransactionData
 
 interface AddAmountListener {
 
     fun onAmountExceedsActualAvailableBalance(fragment: AddAmountFragment)
 
-    fun continueToAddNote(recipientUser: User, amount: MicroTari, isOneSidePayment: Boolean)
+    fun continueToAddNote(transactionData: TransactionData)
 
-    fun continueToFinalizing(recipientUser: User, amount: MicroTari, isOneSidePayment: Boolean)
+    fun continueToFinalizing(transactionData: TransactionData)
 }

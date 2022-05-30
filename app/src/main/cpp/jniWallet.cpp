@@ -1501,5 +1501,23 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniStartRecovery(
     return result;
 }
 
+extern "C"
+JNIEXPORT jlong JNICALL
+Java_com_tari_android_wallet_ffi_FFIWallet_jniWalletGetFeePerGramStats(
+        JNIEnv *jEnv,
+        jobject jThis,
+        jint count,
+        jobject error
+) {
+    int errorCode = 0;
+    int *errorCodePointer = &errorCode;
+
+    jlong lWallet = GetPointerField(jEnv, jThis);
+    auto *pWallet = reinterpret_cast<TariWallet *>(lWallet);
+
+    TariFeePerGramStats *result = wallet_get_fee_per_gram_stats(pWallet, count, errorCodePointer);
+    setErrorCode(jEnv, error, errorCode);
+    return reinterpret_cast<jlong>(result);
+}
 
 //endregion

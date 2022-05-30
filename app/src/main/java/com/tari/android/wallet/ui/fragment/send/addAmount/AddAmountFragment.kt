@@ -35,12 +35,8 @@ package com.tari.android.wallet.ui.fragment.send.addAmount
 import android.animation.ObjectAnimator
 import android.animation.ValueAnimator
 import android.annotation.SuppressLint
-import android.content.ComponentName
 import android.content.Context
-import android.content.Intent
-import android.content.ServiceConnection
 import android.os.Bundle
-import android.os.IBinder
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -49,7 +45,6 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.daasuu.ei.Ease
 import com.daasuu.ei.EasingInterpolator
-import com.orhanobut.logger.Logger
 import com.tari.android.wallet.R
 import com.tari.android.wallet.R.string.*
 import com.tari.android.wallet.amountInputBinding.fragment.send.addAmount.keyboard.KeyboardController
@@ -57,8 +52,6 @@ import com.tari.android.wallet.databinding.FragmentAddAmountBinding
 import com.tari.android.wallet.extension.getWithError
 import com.tari.android.wallet.extension.observe
 import com.tari.android.wallet.model.*
-import com.tari.android.wallet.service.TariWalletService
-import com.tari.android.wallet.service.WalletService
 import com.tari.android.wallet.ui.common.CommonFragment
 import com.tari.android.wallet.ui.component.EmojiIdSummaryViewController
 import com.tari.android.wallet.ui.component.FullEmojiIdViewController
@@ -67,14 +60,16 @@ import com.tari.android.wallet.ui.dialog.modular.ModularDialog
 import com.tari.android.wallet.ui.dialog.tooltipDialog.TooltipDialogArgs
 import com.tari.android.wallet.ui.extension.*
 import com.tari.android.wallet.ui.fragment.send.activity.SendTariActivity
+import com.tari.android.wallet.ui.fragment.send.addAmount.feeModule.NetworkSpeed
 import com.tari.android.wallet.ui.fragment.send.amountView.AmountStyle
+import com.tari.android.wallet.ui.fragment.send.common.TransactionData
 import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.WalletUtil
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.lang.ref.WeakReference
 
-class AddAmountFragment : CommonFragment<FragmentAddAmountBinding, AddAmountViewModel>(), ServiceConnection {
+class AddAmountFragment : CommonFragment<FragmentAddAmountBinding, AddAmountViewModel>() {
 
     private lateinit var addAmountListenerWR: WeakReference<AddAmountListener>
 
@@ -95,11 +90,8 @@ class AddAmountFragment : CommonFragment<FragmentAddAmountBinding, AddAmountView
 
     private var keyboardController: KeyboardController = KeyboardController()
 
-    private lateinit var walletService: TariWalletService
-
     private var isFirstLaunch: Boolean = false
 
-    private var estimatedFee: MicroTari? = null
     private lateinit var balanceInfo: BalanceInfo
     private lateinit var availableBalance: MicroTari
 
@@ -113,7 +105,6 @@ class AddAmountFragment : CommonFragment<FragmentAddAmountBinding, AddAmountView
         bindViewModel(viewModel)
         subscribeVM()
 
-        bindToWalletService()
         if (savedInstanceState == null) {
             viewModel.tracker.screen(path = "/home/send_tari/add_amount", title = "Send Tari - Add Amount")
         }
@@ -123,28 +114,10 @@ class AddAmountFragment : CommonFragment<FragmentAddAmountBinding, AddAmountView
 
     private fun subscribeVM() = with(viewModel) {
         observe(isOneSidePaymentEnabled) { ui.oneSidePaymentSwitchView.isChecked = it }
-    }
 
-    private fun bindToWalletService() {
-        val bindIntent = Intent(requireActivity(), WalletService::class.java)
-        requireActivity().bindService(bindIntent, this, Context.BIND_AUTO_CREATE)
-    }
+        observe(serviceConnected) { setupUI() }
 
-    override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
-        Logger.i("AddAmountFragment onServiceConnected")
-        walletService = TariWalletService.Stub.asInterface(service)
-        // Only binding UI if we have not passed `onDestroyView` line, which is a possibility
-        setupUI()
-    }
-
-    override fun onServiceDisconnected(name: ComponentName?) {
-        Logger.i("AddAmountFragment onServiceDisconnected")
-        // No-op for now
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        requireActivity().unbindService(this)
+        observe(feePerGrams) { showOrHideCustomFeeDialog(it) }
     }
 
     private fun setupUI() {
@@ -186,6 +159,17 @@ class AddAmountFragment : CommonFragment<FragmentAddAmountBinding, AddAmountView
         ui.oneSidePaymentHelp.setOnClickListener { showOneSidePaymentTooltip() }
         ui.continueButton.setOnClickListener { continueButtonClicked() }
         ui.oneSidePaymentSwitchView.setOnClickListener { viewModel.toggleOneSidePayment() }
+    }
+
+    private fun showOrHideCustomFeeDialog(feePerGram: FeePerGramOptions) {
+        ui.networkTrafficText.setVisible(true)
+        ui.modifyButton.setVisible(true)
+        val iconId = when (feePerGram.networkSpeed) {
+            NetworkSpeed.Fast -> R.drawable.ic_network_slow
+            NetworkSpeed.Medium -> R.drawable.ic_network_medium
+            NetworkSpeed.Slow -> R.drawable.ic_network_fast
+        }
+        ui.networkTrafficIcon.setImageDrawable(ContextCompat.getDrawable(requireContext(), iconId))
     }
 
     override fun onAttach(context: Context) {
@@ -245,8 +229,8 @@ class AddAmountFragment : CommonFragment<FragmentAddAmountBinding, AddAmountView
 
     private fun checkAmountAndFee() {
         val error = WalletError()
-        val balanceInfo = walletService.getBalanceInfo(error)
-        val fee = estimatedFee
+        val balanceInfo = viewModel.walletService.getBalanceInfo(error)
+        val fee = viewModel.selectedFeeData?.calculatedFee
         val amount = keyboardController.currentAmount
         if (error == WalletError.NoError && fee != null) {
             if (amount > balanceInfo.availableBalance) {
@@ -276,7 +260,7 @@ class AddAmountFragment : CommonFragment<FragmentAddAmountBinding, AddAmountView
     }
 
     private fun updateBalanceInfo() {
-        balanceInfo = walletService.getWithError { error, wallet -> wallet.getBalanceInfo(error) }
+        balanceInfo = viewModel.walletService.getWithError { error, wallet -> wallet.getBalanceInfo(error) }
         availableBalance = balanceInfo.availableBalance + balanceInfo.pendingIncomingBalance
         ui.availableBalanceContainerView.setupArgs(availableBalance)
     }
@@ -288,10 +272,12 @@ class AddAmountFragment : CommonFragment<FragmentAddAmountBinding, AddAmountView
 
     private fun continueToNote() {
         val isOneSidePayment = ui.oneSidePaymentSwitchView.isChecked
+        val transactionData =
+            TransactionData(recipientUser, keyboardController.currentAmount, null, viewModel.selectedFeeData!!.feePerGram, isOneSidePayment)
         if (isOneSidePayment) {
-            addAmountListenerWR.get()?.continueToFinalizing(recipientUser!!, keyboardController.currentAmount, isOneSidePayment)
+            addAmountListenerWR.get()?.continueToFinalizing(transactionData)
         } else {
-            addAmountListenerWR.get()?.continueToAddNote(recipientUser!!, keyboardController.currentAmount, isOneSidePayment)
+            addAmountListenerWR.get()?.continueToAddNote(transactionData)
         }
     }
 
@@ -301,17 +287,15 @@ class AddAmountFragment : CommonFragment<FragmentAddAmountBinding, AddAmountView
     private inner class AmountCheckRunnable : Runnable {
 
         override fun run() {
-            estimatedFee = walletService.getWithError({ showErrorState(it) }) { error, wallet ->
-                wallet.estimateTxFee(keyboardController.currentAmount, error)
-            }
-            estimatedFee ?: return
+            viewModel.calculateFee(keyboardController.currentAmount)
+            viewModel.selectedFeeData ?: return
 
             updateBalanceInfo()
 
-            if ((keyboardController.currentAmount + estimatedFee!!) > availableBalance) {
+            if ((keyboardController.currentAmount + viewModel.selectedFeeData?.calculatedFee!!) > availableBalance) {
                 showErrorState()
             } else {
-                showSuccessState(estimatedFee!!)
+                showSuccessState(viewModel.selectedFeeData?.calculatedFee!!)
             }
         }
 

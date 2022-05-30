@@ -188,7 +188,7 @@ class FinalizeSendTxViewModel : CommonViewModel() {
                 val txId = walletService.sendTari(
                     transactionData.recipientUser,
                     transactionData.amount,
-                    Constants.Wallet.defaultFeePerGram,
+                    transactionData.feePerGram ?: Constants.Wallet.defaultFeePerGram,
                     transactionData.note,
                     transactionData.isOneSidePayment,
                     error
