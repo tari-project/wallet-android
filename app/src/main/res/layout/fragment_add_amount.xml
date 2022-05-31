@@ -136,13 +136,41 @@
                 android:id="@+id/amount"
                 layout="@layout/view_input_amount" />
 
+            <androidx.appcompat.widget.LinearLayoutCompat
+                android:id="@+id/fee_calculating"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:layout_centerHorizontal="true"
+                android:layout_marginBottom="12dp"
+                android:orientation="vertical">
+
+                <ProgressBar
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginBottom="5dp" />
+
+                <com.tari.android.wallet.ui.component.CustomFontTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:text="@string/add_amount_modify_fee_calculating_fees"
+                    android:textColor="#A9AFC4"
+                    android:textSize="@dimen/add_amount_tx_fee_text_size"
+                    app:customFont="@string/font_heavy" />
+
+            </androidx.appcompat.widget.LinearLayoutCompat>
+
             <RelativeLayout
                 android:id="@+id/tx_fee_container_view"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentBottom="true"
                 android:layout_centerHorizontal="true"
-                android:layout_marginBottom="12dp">
+                android:layout_marginBottom="12dp"
+                android:visibility="invisible"
+                tools:visibility="visible">
                 <!-- fee amount -->
 
                 <androidx.appcompat.widget.LinearLayoutCompat
@@ -151,8 +179,7 @@
                     android:layout_height="22dp"
                     android:layout_above="@+id/fee_container"
                     android:layout_centerHorizontal="true"
-                    android:orientation="horizontal"
-                    android:visibility="invisible">
+                    android:orientation="horizontal">
 
                     <androidx.appcompat.widget.AppCompatImageView
                         android:id="@+id/network_traffic_icon"

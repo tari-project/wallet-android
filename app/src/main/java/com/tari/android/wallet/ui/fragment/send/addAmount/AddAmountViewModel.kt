@@ -124,21 +124,20 @@ class AddAmountViewModel() : CommonViewModel() {
         _modularDialog.postValue(args)
     }
 
-    fun calculateFee(amount: MicroTari) {
+    fun calculateFee(amount: MicroTari, walletError: WalletError) {
         try {
             val grams = feePerGrams.value
             if (grams == null) {
-                val calculatedFee = walletService.getWithError { error, wallet -> wallet.estimateTxFee(amount, error, null) }
-                selectedFeeData = FeeData(calculatedFee, Constants.Wallet.defaultFeePerGram)
+                calculateDefaultFees(amount, walletError)
                 return
             }
 
-            val slowFee = walletService.getWithError(this::showFeeError) { error, wallet -> wallet.estimateTxFee(amount, error, grams.slow) }
-            val mediumFee = walletService.getWithError(this::showFeeError) { error, wallet -> wallet.estimateTxFee(amount, error, grams.medium) }
-            val fastFee = walletService.getWithError(this::showFeeError) { error, wallet -> wallet.estimateTxFee(amount, error, grams.fast) }
+            val slowFee = walletService.getWithError(this::showFeeError) { _, wallet -> wallet.estimateTxFee(amount, walletError, grams.slow) }
+            val mediumFee = walletService.getWithError(this::showFeeError) { _, wallet -> wallet.estimateTxFee(amount, walletError, grams.medium) }
+            val fastFee = walletService.getWithError(this::showFeeError) { _, wallet -> wallet.estimateTxFee(amount, walletError, grams.fast) }
 
             if (slowFee == null || mediumFee == null || fastFee == null) {
-                showFeeError()
+                calculateDefaultFees(amount, walletError)
                 return
             }
 
@@ -147,6 +146,13 @@ class AddAmountViewModel() : CommonViewModel() {
         } catch (e: Throwable) {
             Sentry.captureException(e)
         }
+    }
+
+    private fun calculateDefaultFees(amount: MicroTari, walletError: WalletError) {
+        val calculatedFee = walletService.getWithError(this::showFeeError) { _, wallet ->
+            wallet.estimateTxFee(amount, walletError, Constants.Wallet.defaultFeePerGram)
+        } ?: return
+        selectedFeeData = FeeData(Constants.Wallet.defaultFeePerGram, calculatedFee)
     }
 
     private fun showFeeError(walletError: WalletError) {

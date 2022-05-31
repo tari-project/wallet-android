@@ -162,12 +162,13 @@ class AddAmountFragment : CommonFragment<FragmentAddAmountBinding, AddAmountView
     }
 
     private fun showOrHideCustomFeeDialog(feePerGram: FeePerGramOptions) {
+        ui.feeCalculating.setVisible(false)
         ui.networkTrafficText.setVisible(true)
-        ui.modifyButton.setVisible(true)
+        ui.modifyButton.setVisible(feePerGram.networkSpeed != NetworkSpeed.Slow, View.INVISIBLE)
         val iconId = when (feePerGram.networkSpeed) {
-            NetworkSpeed.Fast -> R.drawable.ic_network_slow
+            NetworkSpeed.Slow -> R.drawable.ic_network_slow
             NetworkSpeed.Medium -> R.drawable.ic_network_medium
-            NetworkSpeed.Slow -> R.drawable.ic_network_fast
+            NetworkSpeed.Fast -> R.drawable.ic_network_fast
         }
         ui.networkTrafficIcon.setImageDrawable(ContextCompat.getDrawable(requireContext(), iconId))
     }
@@ -287,7 +288,12 @@ class AddAmountFragment : CommonFragment<FragmentAddAmountBinding, AddAmountView
     private inner class AmountCheckRunnable : Runnable {
 
         override fun run() {
-            viewModel.calculateFee(keyboardController.currentAmount)
+            val error = WalletError()
+            viewModel.calculateFee(keyboardController.currentAmount, error)
+            if (error != WalletError.NoError) {
+                showErrorState(error)
+                return
+            }
             viewModel.selectedFeeData ?: return
 
             updateBalanceInfo()
