@@ -10,6 +10,7 @@ apply from: "../download-libwallet.gradle"
 apply plugin: 'io.sentry.android.gradle'
 
 android {
+    namespace "com.tari.android.wallet"
     compileSdkVersion 32
     buildToolsVersion "30.0.3"
 
@@ -122,8 +123,6 @@ android {
                          'META-INF/ASL2.0']
         }
     }
-
-
 }
 
 Properties loadSecretProps() {
