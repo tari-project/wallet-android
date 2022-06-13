@@ -168,7 +168,7 @@
     <string name="auth_not_available_or_canceled_title">Authentication Error</string>
     <string name="auth_not_available_or_canceled_desc">Tari Aurora was not able to authenticate you. Do you still want to proceed?</string>
     <string name="auth_failed_title">Authentication Failed</string>
-    <string name="auth_failed_desc">Tari Aurora was not able to authenticate you.</string>
+    <string name="auth_failed_desc">Tari Aurora was not able to authenticate you</string>
 
     <!-- home -->
     <string name="home_available_balance">Balance</string>
