@@ -52,59 +52,41 @@ class MicroTari() : Parcelable, Comparable<MicroTari>, Serializable {
     private val million = BigDecimal(1e6)
     val tariValue: BigDecimal
         // Note: BigDecimal keeps track of both precision and scale, 1e6 != 1_000_000 in this case (scale 6, scale 0)
-        get() = value.toBigDecimal().divide(million,6,RoundingMode.HALF_UP)
+        get() = value.toBigDecimal().divide(million, 6, RoundingMode.HALF_UP)
 
     val formattedTariValue: String
         get() = getFormattedValue(tariValue.toString())
 
     val formattedValue: String
-        get() = getFormattedValue(value.toString())
+        get() = getFormattedValue(value.toBigDecimal().setScale(6).toString())
 
     private fun getFormattedValue(value: String): String = value.trimEnd { it == '0' }.trimEnd { it == '.' }.trimEnd { it == ',' }
 
-    constructor(
-        value: BigInteger
-    ) : this() {
+    constructor(value: BigInteger) : this() {
         this.value = value
     }
-
-    // region operator overloadings
 
     operator fun plusAssign(increment: MicroTari) {
         this.value += increment.value
     }
 
-    operator fun plus(increment: MicroTari): MicroTari {
-        return MicroTari(this.value + increment.value)
-    }
+    operator fun plus(increment: MicroTari): MicroTari = MicroTari(this.value + increment.value)
 
-    operator fun plus(increment: Int): MicroTari {
-        return this + increment.toMicroTari()
-    }
+    operator fun plus(increment: Int): MicroTari = this + increment.toMicroTari()
 
-    operator fun plus(increment: Long): MicroTari {
-        return this + increment.toMicroTari()
-    }
+    operator fun plus(increment: Long): MicroTari = this + increment.toMicroTari()
 
     operator fun minusAssign(decrement: MicroTari) {
         this.value -= decrement.value
     }
 
-    operator fun minus(decrement: MicroTari): MicroTari {
-        return MicroTari(this.value - decrement.value)
-    }
+    operator fun minus(decrement: MicroTari): MicroTari = MicroTari(this.value - decrement.value)
 
-    operator fun minus(decrement: Int): MicroTari {
-        return this - decrement.toMicroTari()
-    }
+    operator fun minus(decrement: Int): MicroTari = this - decrement.toMicroTari()
 
-    operator fun minus(decrement: Long): MicroTari {
-        return this - decrement.toMicroTari()
-    }
+    operator fun minus(decrement: Long): MicroTari = this - decrement.toMicroTari()
 
-    // endregion
 
-    // region Parcelable
 
     constructor(parcel: Parcel) : this() {
         readFromParcel(parcel)
@@ -112,14 +94,9 @@ class MicroTari() : Parcelable, Comparable<MicroTari>, Serializable {
 
     companion object CREATOR : Parcelable.Creator<MicroTari> {
 
-        override fun createFromParcel(parcel: Parcel): MicroTari {
-            return MicroTari(parcel)
-        }
+        override fun createFromParcel(parcel: Parcel): MicroTari = MicroTari(parcel)
 
-        override fun newArray(size: Int): Array<MicroTari> {
-            return Array(size) { MicroTari() }
-        }
-
+        override fun newArray(size: Int): Array<MicroTari> = Array(size) { MicroTari() }
     }
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {
@@ -130,14 +107,7 @@ class MicroTari() : Parcelable, Comparable<MicroTari>, Serializable {
         value = inParcel.readSerializable() as BigInteger
     }
 
-    override fun describeContents(): Int {
-        return 0
-    }
+    override fun describeContents(): Int = 0
 
-    override fun compareTo(other: MicroTari): Int {
-        return this.value.compareTo(other.value)
-    }
-
-    // endregion
-
+    override fun compareTo(other: MicroTari): Int = this.value.compareTo(other.value)
 }
