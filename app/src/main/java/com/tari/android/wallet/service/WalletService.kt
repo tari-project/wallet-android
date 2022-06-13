@@ -448,39 +448,19 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
         backupManager.scheduleBackup(resetRetryCount = true)
     }
 
-    override fun onDirectSendResult(txId: BigInteger, success: Boolean) {
-        Logger.d("Tx $txId direct send completed. Success: $success")
+    override fun onDirectSendResult(txId: BigInteger, status: TransactionSendStatus) {
+        Logger.d("Tx $txId direct send completed. Status: ${status.status.value}")
         // post event to bus
-        EventBus.post(Event.Transaction.DirectSendResult(TxId(txId), success))
-        if (success) {
-            outboundTxIdsToBePushNotified.firstOrNull { it.first == txId }?.let {
-                outboundTxIdsToBePushNotified.remove(it)
-                sendPushNotificationToTxRecipient(it.second)
-            }
-            // schedule a backup
-            backupManager.scheduleBackup(resetRetryCount = true)
+        EventBus.post(Event.Transaction.DirectSendResult(TxId(txId), status))
+        outboundTxIdsToBePushNotified.firstOrNull { it.first == txId }?.let {
+            outboundTxIdsToBePushNotified.remove(it)
+            sendPushNotificationToTxRecipient(it.second)
         }
+        // schedule a backup
+        backupManager.scheduleBackup(resetRetryCount = true)
         // notify external listeners
         listeners.iterator().forEach {
-            it.onDirectSendResult(TxId(txId), success)
-        }
-    }
-
-    override fun onStoreAndForwardSendResult(txId: BigInteger, success: Boolean) {
-        Logger.d("Tx $txId store and forward send completed. Success: $success")
-        // post event to bus
-        EventBus.post(Event.Transaction.StoreAndForwardSendResult(TxId(txId), success))
-        if (success) {
-            outboundTxIdsToBePushNotified.firstOrNull { it.first == txId }?.let {
-                outboundTxIdsToBePushNotified.remove(it)
-                sendPushNotificationToTxRecipient(it.second)
-            }
-            // schedule a backup
-            backupManager.scheduleBackup(resetRetryCount = true)
-        }
-        // notify external listeners
-        listeners.iterator().forEach {
-            it.onStoreAndForwardSendResult(TxId(txId), success)
+            it.onDirectSendResult(TxId(txId), status)
         }
     }
 
@@ -715,13 +695,13 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
 
         override fun getBalanceInfo(error: WalletError): BalanceInfo? = executeWithMapping(error) { wallet.getBalance() }
 
-        override fun estimateTxFee(amount: MicroTari, error: WalletError): MicroTari? = executeWithMapping(error) {
+        override fun estimateTxFee(amount: MicroTari, error: WalletError, feePerGram: MicroTari?): MicroTari? = executeWithMapping(error) {
             val defaultKernelCount = BigInteger("1")
             val defaultOutputCount = BigInteger("2")
             MicroTari(
                 wallet.estimateTxFee(
                     amount.value,
-                    Constants.Wallet.defaultFeePerGram.value,
+                    feePerGram?.value ?: Constants.Wallet.defaultFeePerGram.value,
                     defaultKernelCount,
                     defaultOutputCount
                 )
@@ -916,12 +896,22 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
                     FFIByteVector(HexString(firstUTXOKey.output.metadataSignature.u)),
                     FFIByteVector(HexString(firstUTXOKey.output.metadataSignature.v))
                 )
+                val covenant = FFICovenant(FFIByteVector(HexString(firstUTXOKey.output.covenant)))
+                //todo need to update when faucet got fixed
+                val outputFeatures = FFIOutputFeatures(
+                    '0', '0', 0, '0',
+                    FFIByteVector(HexString(firstUTXOKey.output.metadataSignature.public_nonce)),
+                    FFIByteVector(HexString(firstUTXOKey.output.metadataSignature.u)),
+                    FFIByteVector(HexString(firstUTXOKey.output.metadataSignature.v))
+                )
                 val txId = wallet.importUTXO(
                     amount,
                     txMessage,
                     privateKey,
                     senderPublicKeyFFI,
+                    outputFeatures,
                     signature,
+                    covenant,
                     senderPublicKey,
                     scriptPrivateKey
                 )

@@ -41,6 +41,7 @@ class TxDetailsViewModel() : CommonViewModel() {
             if (it.status == TariWalletServiceConnection.ServiceConnectionStatus.CONNECTED) {
                 fetchRequiredConfirmationCount()
                 findTxAndUpdateUI()
+                _tx.value = _tx.value
             }
         }.addTo(compositeDisposable)
 

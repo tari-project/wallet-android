@@ -42,7 +42,7 @@ class EnterRestorationPasswordViewModel() : CommonViewModel() {
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 backupStorage.restoreLatestBackup(password)
-                _navigation.postValue(EnterRestorationPasswordNavigation.ToRestoreInProgress)
+                _navigation.postValue(EnterRestorationPasswordNavigation.OnRestore)
             } catch (exception: Exception) {
                 handleRestorationFailure(exception)
             }

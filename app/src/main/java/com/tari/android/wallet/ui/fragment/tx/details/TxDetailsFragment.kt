@@ -50,7 +50,6 @@ import com.tari.android.wallet.databinding.FragmentTxDetailsBinding
 import com.tari.android.wallet.di.DiContainer.appComponent
 import com.tari.android.wallet.extension.observe
 import com.tari.android.wallet.extension.txFormattedDate
-import com.tari.android.wallet.infrastructure.Tracker
 import com.tari.android.wallet.model.*
 import com.tari.android.wallet.model.Tx.Direction.INBOUND
 import com.tari.android.wallet.model.Tx.Direction.OUTBOUND
@@ -74,7 +73,6 @@ import com.tari.android.wallet.ui.fragment.tx.details.gif.TxState
 import com.tari.android.wallet.ui.presentation.TxNote
 import com.tari.android.wallet.util.WalletUtil
 import java.util.*
-import javax.inject.Inject
 
 /**
  *  Activity class - Transaction detail.
@@ -82,9 +80,6 @@ import javax.inject.Inject
  * @author The Tari Development Team
  */
 internal class TxDetailsFragment : CommonFragment<FragmentTxDetailsBinding, TxDetailsViewModel>() {
-
-    @Inject
-    lateinit var tracker: Tracker
 
     /**
      * Values below are used for scaling up/down of the text size.
@@ -118,7 +113,7 @@ internal class TxDetailsFragment : CommonFragment<FragmentTxDetailsBinding, TxDe
         }
 
         if (savedInstanceState == null) {
-            tracker.screen(path = "/home/tx_details", title = "Transaction Details")
+            viewModel.tracker.screen(path = "/home/tx_details", title = "Transaction Details")
         }
 
         setupUI()

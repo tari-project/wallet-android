@@ -34,6 +34,7 @@ package com.tari.android.wallet.ffi
 
 import com.orhanobut.logger.Logger
 import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
+import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepository
 import com.tari.android.wallet.model.*
 import com.tari.android.wallet.model.recovery.WalletRestorationResult
 import com.tari.android.wallet.service.seedPhrase.SeedPhraseRepository
@@ -53,6 +54,7 @@ import java.util.concurrent.atomic.AtomicReference
 internal class FFIWallet(
     val sharedPrefsRepository: SharedPrefsRepository,
     val seedPhraseRepository: SeedPhraseRepository,
+    val networkRepository: NetworkRepository,
     commsConfig: FFICommsConfig,
     logPath: String
 ) : FFIBase() {
@@ -74,6 +76,7 @@ internal class FFIWallet(
         maxNumberOfRollingLogFiles: Int,
         rollingLogFileMaxSizeBytes: Int,
         passphrase: String?,
+        network: String?,
         seedWords: FFISeedWords?,
         callbackReceivedTx: String,
         callbackReceivedTxSig: String,
@@ -93,8 +96,6 @@ internal class FFIWallet(
         callbackTxMinedUnconfirmedSig: String,
         callbackDirectSendResult: String,
         callbackDirectSendResultSig: String,
-        callbackStoreAndForwardSendResult: String,
-        callbackStoreAndForwardSendResultSig: String,
         callbackTxCancellation: String,
         callbackTxCancellationSig: String,
         callbackTXOValidationComplete: String,
@@ -168,6 +169,7 @@ internal class FFIWallet(
         sourcePublicKey: FFIPublicKey,
         outputFeatures: FFIOutputFeatures,
         tariCommitmentSignature: FFITariCommitmentSignature,
+        covenant: FFICovenant,
         sourceSenderPublicKey: FFIPublicKey,
         scriptPrivateKey: FFIPrivateKey,
         message: String,
@@ -212,6 +214,8 @@ internal class FFIWallet(
         libError: FFIError
     ): Boolean
 
+    private external fun jniWalletGetFeePerGramStats(count: Int, libError: FFIError): FFIPointer
+
     private external fun jniDestroy()
 
     // endregion
@@ -231,6 +235,7 @@ internal class FFIWallet(
                     Constants.Wallet.maxNumberOfRollingLogFiles,
                     Constants.Wallet.rollingLogFileMaxSizeBytes,
                     sharedPrefsRepository.databasePassphrase,
+                    networkRepository.currentNetwork?.network?.uriComponent,
                     seedPhraseRepository.getPhrase()?.ffiSeedWords,
                     this::onTxReceived.name, "(J)V",
                     this::onTxReplyReceived.name, "(J)V",
@@ -240,8 +245,7 @@ internal class FFIWallet(
                     this::onTxMinedUnconfirmed.name, "(J[B)V",
                     this::onTxFauxConfirmed.name, "(J)V",
                     this::onTxFauxUnconfirmed.name, "(J[B)V",
-                    this::onDirectSendResult.name, "([BZ)V",
-                    this::onStoreAndForwardSendResult.name, "([BZ)V",
+                    this::onDirectSendResult.name, "([BJ)V",
                     this::onTxCancelled.name, "(J[B)V",
                     this::onTXOValidationComplete.name, "([BZ)V",
                     this::onContactLivenessDataUpdated.name, "(J)V",
@@ -482,20 +486,9 @@ internal class FFIWallet(
      * This callback function cannot be private due to JNI behaviour.
      */
     @Suppress("MemberVisibilityCanBePrivate")
-    fun onDirectSendResult(bytes: ByteArray, success: Boolean) {
-        Logger.i("Direct send result received. Success: $success")
+    fun onDirectSendResult(bytes: ByteArray, pointer: FFIPointer) {
         val txId = BigInteger(1, bytes)
-        GlobalScope.launch { listener?.onDirectSendResult(txId, success) }
-    }
-
-    /**
-     * This callback function cannot be private due to JNI behaviour.
-     */
-    @Suppress("MemberVisibilityCanBePrivate")
-    fun onStoreAndForwardSendResult(bytes: ByteArray, success: Boolean) {
-        Logger.i("Store and forward send result received. Success: $success")
-        val txId = BigInteger(1, bytes)
-        GlobalScope.launch { listener?.onStoreAndForwardSendResult(txId, success) }
+        GlobalScope.launch { listener?.onDirectSendResult(txId, FFITransactionSendStatus(pointer).getStatus()) }
     }
 
     /**
@@ -621,7 +614,9 @@ internal class FFIWallet(
         message: String,
         spendingKey: FFIPrivateKey,
         sourcePublicKey: FFIPublicKey,
+        outputFeatures: FFIOutputFeatures,
         tariCommitmentSignature: FFITariCommitmentSignature,
+        covenant: FFICovenant,
         senderPublicKey: FFIPublicKey,
         scriptPrivateKey: FFIPrivateKey,
     ): BigInteger {
@@ -630,8 +625,9 @@ internal class FFIWallet(
             amount.toString(),
             spendingKey,
             sourcePublicKey,
-            FFIOutputFeatures(),
+            outputFeatures,
             tariCommitmentSignature,
+            covenant,
             senderPublicKey,
             scriptPrivateKey,
             message,
@@ -753,6 +749,13 @@ internal class FFIWallet(
     fun startRecovery(baseNodePublicKey: FFIPublicKey, recoveryOutputMessage: String): Boolean {
         val error = FFIError()
         val result = jniStartRecovery(baseNodePublicKey, this::onWalletRecovery.name, "(I[B[B)V", recoveryOutputMessage, error)
+        throwIf(error)
+        return result
+    }
+
+    fun getFeePerGramStats() : FFIFeePerGramStats {
+        val error = FFIError()
+        val result = FFIFeePerGramStats(jniWalletGetFeePerGramStats(3, error))
         throwIf(error)
         return result
     }

@@ -198,6 +198,7 @@ class AddRecipientFragment : CommonFragment<FragmentAddRecipientBinding, AddReci
     private fun showYatUser(yatUser: YatUser?) {
         val isExist = yatUser != null
         ui.yatEyeButton.setVisible(isExist)
+        ui.yatIcon.setVisible(isExist)
 
         if (isExist) {
             setYatState(true)

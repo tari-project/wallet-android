@@ -43,7 +43,6 @@ import android.content.Intent.FLAG_ACTIVITY_CLEAR_TOP
 import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
-import androidx.core.app.TaskStackBuilder
 import com.orhanobut.logger.Logger
 import com.tari.android.wallet.R
 import com.tari.android.wallet.model.CancelledTx
@@ -154,10 +153,7 @@ internal class NotificationHelper(private val context: Context) {
         val pendingIntent = PendingIntent.getActivities(context, 0, intents, PendingIntent.FLAG_IMMUTABLE)
 
         // prepare transaction notification
-        val notification: Notification = NotificationCompat.Builder(
-            context,
-            APP_NOTIFICATION_CHANNEL_ID
-        ).run {
+        val notification: Notification = NotificationCompat.Builder(context, APP_NOTIFICATION_CHANNEL_ID).run {
             setContentTitle(notificationTitle)
             setContentText(notificationBody)
             setSmallIcon(R.drawable.tx_notification_icon)
@@ -212,9 +208,9 @@ internal class NotificationHelper(private val context: Context) {
     /**
      * Posts standard Android heads-up notification.
      */
-    fun postNotification(title: String, body: String, intent: Intent? = null) {
+    fun postNotification(title: String, body: String) {
         // prepare notification
-        val notification: Notification = NotificationCompat.Builder(context, APP_NOTIFICATION_CHANNEL_ID).run {
+        val notification = NotificationCompat.Builder(context, APP_NOTIFICATION_CHANNEL_ID).run {
             setContentTitle(title)
             setContentText(body)
             setSmallIcon(R.drawable.notification_icon)
@@ -224,14 +220,6 @@ internal class NotificationHelper(private val context: Context) {
             setCategory(NotificationCompat.CATEGORY_EVENT)
             priority = NotificationCompat.PRIORITY_MAX
             build()
-        }
-        intent?.let {
-            notification.contentIntent = TaskStackBuilder.create(context).run {
-                // Add the intent, which inflates the back stack
-                addNextIntentWithParentStack(intent)
-                // Get the PendingIntent containing the entire back stack
-                getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT)
-            }
         }
 
         // send notification

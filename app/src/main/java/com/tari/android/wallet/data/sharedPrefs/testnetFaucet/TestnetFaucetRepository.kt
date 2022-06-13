@@ -1,13 +1,15 @@
 package com.tari.android.wallet.data.sharedPrefs.testnetFaucet
 
 import android.content.SharedPreferences
+import com.tari.android.wallet.data.repository.CommonRepository
 import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefBigIntegerDelegate
 import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefBooleanDelegate
 import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefGsonDelegate
 import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepository
+import com.tari.android.wallet.data.sharedPrefs.network.formatKey
 import java.math.BigInteger
 
-class TestnetFaucetRepository(private val sharedPrefs: SharedPreferences, private val networkRepository: NetworkRepository) {
+class TestnetFaucetRepository(private val sharedPrefs: SharedPreferences, networkRepository: NetworkRepository) : CommonRepository(networkRepository){
 
     var faucetTestnetTariRequestCompleted: Boolean by SharedPrefBooleanDelegate(sharedPrefs, formatKey(Keys.faucetTestnetTariRequestCompleted))
 
@@ -25,8 +27,6 @@ class TestnetFaucetRepository(private val sharedPrefs: SharedPreferences, privat
             faucetTestnetTariRequestCompleted = true
         }
     }
-
-    private fun formatKey(key: String): String = key + "_" + networkRepository.currentNetwork!!.network.displayName
 
     fun clear() {
         faucetTestnetTariRequestCompleted = false

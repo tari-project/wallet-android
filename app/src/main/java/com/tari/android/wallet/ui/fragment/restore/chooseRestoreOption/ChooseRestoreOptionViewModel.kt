@@ -31,8 +31,11 @@ internal class ChooseRestoreOptionViewModel : CommonViewModel() {
     @Inject
     lateinit var walletServiceLauncher: WalletServiceLauncher
 
+    @Inject
+    lateinit var backupManager: BackupManager
+
     init {
-        component?.inject(this)
+        component.inject(this)
     }
 
     private val _state = SingleLiveEvent<ChooseRestoreOptionState>()
@@ -63,7 +66,7 @@ internal class ChooseRestoreOptionViewModel : CommonViewModel() {
                 when (it) {
                     WalletState.Initializing,
                     WalletState.NotReady -> Unit
-                    WalletState.Running -> _navigation.postValue(ChooseRestoreOptionNavigation.ToRestoreInProgress)
+                    WalletState.Running -> _navigation.postValue(ChooseRestoreOptionNavigation.OnRestoreCompleted)
                     is WalletState.Failed -> viewModelScope.launch(Dispatchers.IO) {
                         handleException(WalletStartFailedException(it.exception))
                     }
@@ -90,7 +93,6 @@ internal class ChooseRestoreOptionViewModel : CommonViewModel() {
                 showBackupFileNotFoundDialog()
             }
             is BackupFileIsEncryptedException -> {
-                //todo check for launch wallet after relaunch app
                 _navigation.postValue(ChooseRestoreOptionNavigation.ToEnterRestorePassword)
             }
             is WalletStartFailedException -> {

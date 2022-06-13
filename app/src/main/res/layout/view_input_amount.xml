@@ -19,7 +19,7 @@
         android:layout_width="@dimen/add_amount_gem_size"
         android:layout_height="@dimen/add_amount_gem_size"
         android:contentDescription="@null"
-        android:src="@drawable/gem_amount" />
+        android:src="@drawable/gem" />
 
     <!-- first digit (never disappears) -->
     <com.tari.android.wallet.ui.component.CustomFontTextView

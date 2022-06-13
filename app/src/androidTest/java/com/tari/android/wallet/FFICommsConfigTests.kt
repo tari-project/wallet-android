@@ -45,7 +45,7 @@ import com.tari.android.wallet.di.ApplicationModule
 import com.tari.android.wallet.di.WalletModule
 import com.tari.android.wallet.ffi.FFICommsConfig
 import com.tari.android.wallet.ffi.FFIException
-import com.tari.android.wallet.ffi.FFITransportType
+import com.tari.android.wallet.ffi.FFITariTransportConfig
 import com.tari.android.wallet.ffi.nullptr
 import com.tari.android.wallet.ui.common.domain.ResourceManager
 import com.tari.android.wallet.util.Constants
@@ -85,7 +85,7 @@ class FFICommsConfigTests {
 
     @Test
     fun constructor_assertThatValidCommsConfigInstanceWasCreated() {
-        val transport = FFITransportType()
+        val transport = FFITariTransportConfig()
         val commsConfig = FFICommsConfig(
             transport.getAddress(),
             transport,
@@ -102,7 +102,7 @@ class FFICommsConfigTests {
 
     @Test(expected = FFIException::class)
     fun constructor_assertThatFFIExceptionWasThrown_ifGivenDirectoryDoesNotExist() {
-        val transport = FFITransportType()
+        val transport = FFITariTransportConfig()
         try {
             FFICommsConfig(
                 transport.getAddress(),

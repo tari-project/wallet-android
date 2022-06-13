@@ -49,19 +49,14 @@ import com.tari.android.wallet.R.string.enter_backup_password_page_desc_general_
 import com.tari.android.wallet.R.string.enter_backup_password_page_desc_highlighted_part
 import com.tari.android.wallet.databinding.FragmentEnterRestorePasswordBinding
 import com.tari.android.wallet.extension.observe
-import com.tari.android.wallet.ui.fragment.restore.restore.WalletRestoreRouter
 import com.tari.android.wallet.ui.common.CommonFragment
 import com.tari.android.wallet.ui.extension.*
+import com.tari.android.wallet.ui.fragment.restore.restore.WalletRestoreRouter
 
 class EnterRestorationPasswordFragment : CommonFragment<FragmentEnterRestorePasswordBinding, EnterRestorationPasswordViewModel>() {
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View =
-        FragmentEnterRestorePasswordBinding.inflate(inflater, container, false)
-            .also { ui = it }.root
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?) =
+        FragmentEnterRestorePasswordBinding.inflate(inflater, container, false).also { ui = it }.root
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -104,7 +99,7 @@ class EnterRestorationPasswordFragment : CommonFragment<FragmentEnterRestorePass
     private fun processNavigation(navigation: EnterRestorationPasswordNavigation) {
         val router = requireActivity() as WalletRestoreRouter
         when (navigation) {
-            EnterRestorationPasswordNavigation.ToRestoreInProgress -> router.toRestoreInProgress()
+            EnterRestorationPasswordNavigation.OnRestore -> router.onRestoreCompleted()
         }
     }
 

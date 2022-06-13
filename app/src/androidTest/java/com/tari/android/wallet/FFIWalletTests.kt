@@ -112,7 +112,7 @@ class FFIWalletTests {
         // clean any existing wallet data
         clean()
         // create memory transport
-        val transport = FFITransportType()
+        val transport = FFITariTransportConfig()
         // create comms config
         val commsConfig = FFICommsConfig(
             transport.getAddress(),

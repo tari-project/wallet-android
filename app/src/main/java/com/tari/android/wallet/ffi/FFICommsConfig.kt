@@ -46,12 +46,11 @@ internal class FFICommsConfig() : FFIBase() {
 
     private external fun jniCreate(
         publicAddress: String,
-        transport: FFITransportType,
+        transport: FFITariTransportConfig,
         databaseName: String,
         datastorePath: String,
         discoveryTimeoutSec: Long,
         jSafDurationSec: Long,
-        networkName: String,
         error: FFIError
     )
 
@@ -61,12 +60,11 @@ internal class FFICommsConfig() : FFIBase() {
 
     constructor(
         publicAddress: String,
-        transport: FFITransportType,
+        transport: FFITariTransportConfig,
         databaseName: String,
         datastorePath: String,
         discoveryTimeoutSec: Long,
         safMessageDurationSec: Long,
-        networkName: String
     ): this() {
         if (databaseName.isEmpty()) {
             throw FFIException(message = "databaseName may not be empty")
@@ -81,7 +79,6 @@ internal class FFICommsConfig() : FFIBase() {
                 datastorePath,
                 discoveryTimeoutSec,
                 safMessageDurationSec,
-                networkName,
                 error
             )
             throwIf(error)

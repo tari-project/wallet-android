@@ -35,16 +35,13 @@ package com.tari.android.wallet.ui.activity
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.os.postDelayed
 import com.tari.android.wallet.data.WalletConfig
 import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import com.tari.android.wallet.di.DiContainer.appComponent
 import com.tari.android.wallet.service.WalletServiceLauncher
-import com.tari.android.wallet.ui.activity.onboarding.OnboardingFlowActivity
-import com.tari.android.wallet.util.Constants.UI.Splash
+import com.tari.android.wallet.ui.fragment.auth.AuthActivity
+import com.tari.android.wallet.ui.fragment.onboarding.activity.OnboardingFlowActivity
 import com.tari.android.wallet.util.WalletUtil
 import javax.inject.Inject
 
@@ -72,10 +69,13 @@ internal class SplashActivity : AppCompatActivity() {
             walletServiceLauncher.stopAndDelete()
         }
 
-        Handler(Looper.getMainLooper()).postDelayed(Splash.createWalletStartUpDelayMs) {
-            val exists = WalletUtil.walletExists(walletConfig)  && sharedPrefsRepository.onboardingAuthSetupCompleted
-            launch(if (exists) AuthActivity::class.java else OnboardingFlowActivity::class.java)
+        val exists = WalletUtil.walletExists(walletConfig) && sharedPrefsRepository.onboardingAuthSetupCompleted
+        if (WalletUtil.walletExists(walletConfig) && !sharedPrefsRepository.onboardingAuthSetupCompleted) {
+            // in cases interrupted restoration
+            WalletUtil.clearWalletFiles(walletConfig.getWalletFilesDirPath())
+            sharedPrefsRepository.clear()
         }
+        launch(if (exists) AuthActivity::class.java else OnboardingFlowActivity::class.java)
     }
 
     private fun <T : Activity> launch(destination: Class<T>) {
@@ -86,8 +86,5 @@ internal class SplashActivity : AppCompatActivity() {
         finish()
     }
 
-    override fun onBackPressed() {
-        // no-op
-    }
-
+    override fun onBackPressed() = Unit
 }

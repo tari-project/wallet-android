@@ -52,11 +52,8 @@ import com.tari.android.wallet.ui.extension.setOnThrottledClickListener
  */
 internal class BaseNodeConfigFragment : CommonFragment<FragmentBaseNodeConfigBinding, BaseNodeConfigViewModel>() {
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View = FragmentBaseNodeConfigBinding.inflate(inflater, container, false).also { ui = it }.root
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
+        FragmentBaseNodeConfigBinding.inflate(inflater, container, false).also { ui = it }.root
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -85,7 +82,7 @@ internal class BaseNodeConfigFragment : CommonFragment<FragmentBaseNodeConfigBin
 
     private fun processNavigation(navigation: BaseNodeConfigNavigation) {
         val router = requireActivity() as BaseNodeConfigRouter
-        when(navigation) {
+        when (navigation) {
             BaseNodeConfigNavigation.ToAddCustomBaseNode -> router.toAddCustomBaseNode()
             BaseNodeConfigNavigation.ToChangeBaseNode -> router.toChangeBaseNode()
         }

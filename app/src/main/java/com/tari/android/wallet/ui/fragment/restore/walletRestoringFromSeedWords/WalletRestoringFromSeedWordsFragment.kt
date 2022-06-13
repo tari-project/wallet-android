@@ -39,17 +39,14 @@ import android.view.ViewGroup
 import androidx.fragment.app.viewModels
 import com.tari.android.wallet.databinding.FragmentWalletRestoringFromSeedWordsBinding
 import com.tari.android.wallet.extension.observe
-import com.tari.android.wallet.ui.fragment.restore.restore.WalletRestoreRouter
 import com.tari.android.wallet.ui.common.CommonFragment
+import com.tari.android.wallet.ui.fragment.restore.restore.WalletRestoreRouter
 
 internal class WalletRestoringFromSeedWordsFragment :
     CommonFragment<FragmentWalletRestoringFromSeedWordsBinding, WalletRestoringFromSeedWordsViewModel>() {
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View = FragmentWalletRestoringFromSeedWordsBinding.inflate(inflater, container, false).also { ui = it }.root
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
+        FragmentWalletRestoringFromSeedWordsBinding.inflate(inflater, container, false).also { ui = it }.root
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -86,7 +83,6 @@ internal class WalletRestoringFromSeedWordsFragment :
     }
 
     companion object {
-
         fun newInstance() = WalletRestoringFromSeedWordsFragment()
     }
 }

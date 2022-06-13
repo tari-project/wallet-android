@@ -60,7 +60,7 @@ add_library(
         jniCommon.cpp
         jniBalance.cpp
         jniByteVector.cpp
-        jniTransportType.cpp
+        jniTariTransportConfig.cpp
         jniTariCommitmentSignature.cpp
         jniPrivateKey.cpp
         jniPublicKey.cpp
@@ -75,6 +75,11 @@ add_library(
         jniSeedWords.cpp
         jniEmojiSet.cpp
         jniUtil.cpp
+        jniTransactionSendStatus.cpp
+        jniCovenant.cpp
+        jniOutputFeatures.cpp
+        jniTariFeePerGramStats.cpp
+        jniTariFeePerGramStat.cpp
 )
 
 find_library(

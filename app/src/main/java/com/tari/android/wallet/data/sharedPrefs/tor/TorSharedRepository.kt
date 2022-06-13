@@ -33,11 +33,13 @@
 package com.tari.android.wallet.data.sharedPrefs.tor
 
 import android.content.SharedPreferences
+import com.tari.android.wallet.data.repository.CommonRepository
 import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefGsonDelegate
 import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefStringDelegate
 import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepository
+import com.tari.android.wallet.data.sharedPrefs.network.formatKey
 
-class TorSharedRepository(sharedPrefs: SharedPreferences, val networkRepository: NetworkRepository) {
+class TorSharedRepository(sharedPrefs: SharedPreferences, networkRepository: NetworkRepository) : CommonRepository(networkRepository) {
 
     private object Key {
         const val currentTorBridge = "tari_current_tor_bridge"
@@ -88,7 +90,5 @@ class TorSharedRepository(sharedPrefs: SharedPreferences, val networkRepository:
             currentTorBridges = TorBridgeConfigurationList(this.distinct())
         }
     }
-
-    private fun formatKey(key: String): String = key + "_" + networkRepository.currentNetwork!!.network.displayName
 }
 
