@@ -30,23 +30,20 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.tari.android.wallet.ui.component.networkStateIndicator
+package com.tari.android.wallet.ui.component
 
 import android.content.Context
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import com.tari.android.wallet.databinding.ViewConnectionIndicatorBinding
-import com.tari.android.wallet.extension.observe
-import com.tari.android.wallet.ui.component.MainListTouchingView
-import com.tari.android.wallet.ui.component.tooltip.TooltipWindow
-import com.tari.android.wallet.ui.extension.string
+import com.tari.android.wallet.databinding.ViewMainListImageButtonBinding
+import com.tari.android.wallet.ui.common.CommonViewModel
 
 
-internal class ConnectionIndicatorView : MainListTouchingView<ConnectionIndicatorViewModel, ViewConnectionIndicatorBinding> {
+internal class MainListImageButton : MainListTouchingView<CommonViewModel, ViewMainListImageButtonBinding> {
 
     override fun bindingInflate(layoutInflater: LayoutInflater, parent: ViewGroup?, attachToRoot: Boolean):
-            ViewConnectionIndicatorBinding = ViewConnectionIndicatorBinding.inflate(layoutInflater, parent, attachToRoot)
+            ViewMainListImageButtonBinding = ViewMainListImageButtonBinding.inflate(layoutInflater, parent, attachToRoot)
 
     constructor(context: Context) : super(context)
 
@@ -54,31 +51,11 @@ internal class ConnectionIndicatorView : MainListTouchingView<ConnectionIndicato
 
     constructor(context: Context, attrs: AttributeSet, defStyleAttr: Int) : super(context, attrs, defStyleAttr)
 
-    private val tooltipWindow = TooltipWindow(context)
-
     override fun setup() = Unit
 
+    var touchListener: () -> Unit = {}
+
     override fun doTouch() {
-        showTooltip()
-    }
-
-    override fun bindViewModel(viewModel: ConnectionIndicatorViewModel) {
-        super.bindViewModel(viewModel)
-
-        with(viewModel) {
-            observe(state) {
-                ui.dot.setBackgroundResource(it.resId)
-
-                if (tooltipWindow.isTooltipShown) {
-                    tooltipWindow.dismissTooltip()
-                    showTooltip()
-                }
-            }
-        }
-    }
-
-    private fun showTooltip() {
-        val message = string(viewModel.state.value!!.messageId)
-        tooltipWindow.showToolTip(ui.root, message)
+        touchListener.invoke()
     }
 }

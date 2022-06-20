@@ -606,4 +606,8 @@
     <string name="tari_about_icon_text_networking">Networking by Design Circle from\nNounProject.com</string>
     <string name="tari_about_icon_text_delete">Delete by Maya Nurhayati from\nNounProject.com</string>
 
+    <string name="utxos_list_title">Wallet</string>
+    <string name="utxos_list_ordering_type_value">Size</string>
+    <string name="utxos_list_ordering_type_date">Date</string>
+
 </resources>
