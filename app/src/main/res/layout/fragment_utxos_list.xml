@@ -68,21 +68,23 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_marginTop="14dp"
-            android:background="@color/common_divider"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
-
     </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/common_divider" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="15dp"
+        android:paddingBottom="2dp"
+        android:background="@drawable/view_elevation_gradient_to_white"/>
 
     <androidx.appcompat.widget.LinearLayoutCompat
         android:layout_width="match_parent"
         android:layout_height="32dp"
-        android:layout_marginTop="27dp"
+        android:layout_marginTop="15dp"
         android:layout_marginBottom="5dp"
         android:paddingHorizontal="30dp">
 
@@ -144,7 +146,7 @@
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/utxos_text_list"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="match_parent" />
 
 </androidx.appcompat.widget.LinearLayoutCompat>
 
