@@ -23,14 +23,16 @@
         android:layout_marginTop="@dimen/home_top_content_container_view_top_margin">
 
         <!-- network state indicator -->
-        <com.tari.android.wallet.ui.component.networkStateIndicator.ConnectionIndicatorView
-            android:id="@+id/network_status_state_indicator_view"
+        <com.tari.android.wallet.ui.component.MainListImageButton
+            android:id="@+id/wallet_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:layout_marginBottom="8dp"
             android:layout_alignTop="@+id/balance_container"
-            android:layout_alignBottom="@+id/balance_container"/>
+            android:layout_alignParentEnd="true"
+            android:layout_marginEnd="11dp"
+            android:layout_marginBottom="8dp"
+            android:paddingHorizontal="16dp"
+            android:paddingVertical="6dp" />
 
         <!-- title -->
         <com.tari.android.wallet.ui.component.CustomFontTextView
@@ -118,13 +120,22 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@+id/available_balance_text_view"
-            android:text="0.00"
             android:layout_alignParentStart="true"
             android:layout_marginEnd="4dp"
             android:letterSpacing="-0.018"
+            android:text="0.00"
             android:textColor="@color/white"
             android:textSize="12sp"
             app:customFont="@string/font_heavy" />
+
+        <com.tari.android.wallet.ui.component.networkStateIndicator.ConnectionIndicatorView
+            android:id="@+id/network_status_state_indicator_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignTop="@+id/available_balance_text_view"
+            android:layout_alignBottom="@+id/available_balance"
+            android:layout_alignParentEnd="true"
+            android:layout_marginEnd="9dp" />
 
     </RelativeLayout>
 
