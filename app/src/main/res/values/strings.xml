@@ -609,5 +609,8 @@
     <string name="utxos_list_title">Wallet</string>
     <string name="utxos_list_ordering_type_value">Size</string>
     <string name="utxos_list_ordering_type_date">Date</string>
+    <string name="utxos_status_mined">Mined</string>
+    <string name="utxos_status_confirmed">Confirmed</string>
+    <string name="utxos_status_unconfirmed">Unconfirmed</string>
 
 </resources>

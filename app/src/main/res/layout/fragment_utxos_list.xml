@@ -78,8 +78,8 @@
     <View
         android:layout_width="match_parent"
         android:layout_height="15dp"
-        android:paddingBottom="2dp"
-        android:background="@drawable/view_elevation_gradient_to_white"/>
+        android:background="@drawable/view_elevation_gradient_to_white"
+        android:paddingBottom="2dp" />
 
     <androidx.appcompat.widget.LinearLayoutCompat
         android:layout_width="match_parent"
@@ -105,7 +105,7 @@
                 android:text="@string/utxos_list_ordering_type_value"
                 android:textColor="@color/black"
                 android:textSize="13sp"
-                app:customFont="@string/font_regular" />
+                app:customFont="@string/font_medium" />
 
             <com.tari.android.wallet.ui.component.CustomFontTextView
                 android:id="@+id/ordering_type_date"
@@ -117,7 +117,7 @@
                 android:text="@string/utxos_list_ordering_type_date"
                 android:textColor="@color/black"
                 android:textSize="13sp"
-                app:customFont="@string/font_regular" />
+                app:customFont="@string/font_medium" />
 
         </androidx.appcompat.widget.LinearLayoutCompat>
 
@@ -125,9 +125,9 @@
             android:id="@+id/ordering_direction"
             android:layout_width="30dp"
             android:layout_height="30dp"
-            android:padding="5dp"
             android:layout_gravity="center_vertical"
             android:layout_marginStart="5dp"
+            android:padding="5dp"
             android:src="@drawable/ic_wallet_sorting_asc" />
 
         <View
@@ -146,7 +146,34 @@
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/utxos_text_list"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        tools:visibility="gone" />
+
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:id="@+id/tile_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginHorizontal="20dp"
+        android:clipChildren="false"
+        android:orientation="horizontal">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/utxos_tile_left_list"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:clipChildren="false"
+            android:overScrollMode="never" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/utxos_tile_right_list"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:clipChildren="false"
+            android:overScrollMode="never" />
+
+    </androidx.appcompat.widget.LinearLayoutCompat>
 
 </androidx.appcompat.widget.LinearLayoutCompat>
 

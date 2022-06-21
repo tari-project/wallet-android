@@ -6,10 +6,15 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.tari.android.wallet.databinding.FragmentUtxosListBinding
 import com.tari.android.wallet.extension.observe
+import com.tari.android.wallet.extension.observeOnLoad
 import com.tari.android.wallet.ui.common.CommonFragment
+import com.tari.android.wallet.ui.extension.gone
+import com.tari.android.wallet.ui.extension.visible
 import com.tari.android.wallet.ui.fragment.utxos.list.adapters.UtxosListAdapter
+import com.tari.android.wallet.ui.fragment.utxos.list.adapters.UtxosListTileAdapter
 import com.tari.android.wallet.ui.fragment.utxos.list.controllers.CheckedController
 import com.tari.android.wallet.ui.fragment.utxos.list.controllers.listType.ListType
 import com.tari.android.wallet.ui.fragment.utxos.list.controllers.listType.ListTypeSwitchController
@@ -24,6 +29,8 @@ class UtxosListFragment : CommonFragment<FragmentUtxosListBinding, UtxosListView
     private lateinit var selectionController: CheckedController
 
     private val textListAdapter: UtxosListAdapter = UtxosListAdapter()
+    private val tileLeftAdapter: UtxosListTileAdapter = UtxosListTileAdapter()
+    private val tileRightAdapter: UtxosListTileAdapter = UtxosListTileAdapter()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
         FragmentUtxosListBinding.inflate(inflater, container, false).also { ui = it }.root
@@ -40,8 +47,22 @@ class UtxosListFragment : CommonFragment<FragmentUtxosListBinding, UtxosListView
     }
 
     private fun observeUI() = with(viewModel) {
-        observe(listType) { }
+        observeOnLoad(sortingMediator)
+        observe(listType) {
+            when(it!!) {
+                ListType.Text -> {
+                    ui.utxosTextList.visible()
+                    ui.tileContainer.gone()
+                }
+                ListType.Tile -> {
+                    ui.utxosTextList.gone()
+                    ui.tileContainer.visible()
+                }
+            }
+        }
         observe(textList) { textListAdapter.update(it) }
+        observe(leftTileList) { tileLeftAdapter.update(it) }
+        observe(rightTileList) { tileRightAdapter.update(it) }
     }
 
     private fun setupCTA() {
@@ -51,7 +72,7 @@ class UtxosListFragment : CommonFragment<FragmentUtxosListBinding, UtxosListView
     private fun setupUI() {
         listTypeSwitchController = ListTypeSwitchController(CheckedController(ui.groupSelectorGroups), CheckedController(ui.groupSelectorList))
         listTypeSwitchController.toggleCallback = { viewModel.setTypeList(it) }
-        listTypeSwitchController.toggle(ListType.Text)
+        listTypeSwitchController.toggle(ListType.Tile)
 
         orderingController = OrderingController(ui.orderingTypeValue, ui.orderingTypeDate, ui.orderingDirection)
         orderingController.toggleTypeCallback = { viewModel.setOrderingType(it) }
@@ -66,5 +87,38 @@ class UtxosListFragment : CommonFragment<FragmentUtxosListBinding, UtxosListView
 
         ui.utxosTextList.layoutManager = LinearLayoutManager(requireContext())
         ui.utxosTextList.adapter = textListAdapter
+
+        ui.utxosTileLeftList.layoutManager = LinearLayoutManager(requireContext())
+        ui.utxosTileLeftList.adapter = tileLeftAdapter
+
+        ui.utxosTileRightList.layoutManager = LinearLayoutManager(requireContext())
+        ui.utxosTileRightList.adapter = tileRightAdapter
+
+        syncroniseTileScrolling()
+    }
+
+    private fun syncroniseTileScrolling() {
+        val scrollListeners = mutableListOf<RecyclerView.OnScrollListener>()
+
+        val leftListener = object : RecyclerView.OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                super.onScrolled(recyclerView, dx, dy)
+                ui.utxosTileRightList.removeOnScrollListener(scrollListeners[1])
+                ui.utxosTileRightList.scrollBy(dx, dy)
+                ui.utxosTileRightList.addOnScrollListener(scrollListeners[1])
+            }
+        }
+        val rightListener = object : RecyclerView.OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                super.onScrolled(recyclerView, dx, dy)
+                ui.utxosTileLeftList.removeOnScrollListener(scrollListeners[0])
+                ui.utxosTileLeftList.scrollBy(dx, dy)
+                ui.utxosTileLeftList.addOnScrollListener(scrollListeners[0])
+            }
+        }
+        scrollListeners.add(leftListener)
+        scrollListeners.add(rightListener)
+        ui.utxosTileLeftList.addOnScrollListener(leftListener)
+        ui.utxosTileRightList.addOnScrollListener(rightListener)
     }
 }
