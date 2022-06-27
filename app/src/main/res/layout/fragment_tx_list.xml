@@ -27,7 +27,7 @@
             android:id="@+id/wallet_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignTop="@+id/balance_container"
+            android:layout_alignTop="@+id/amount_container"
             android:layout_alignParentEnd="true"
             android:layout_marginEnd="11dp"
             android:layout_marginBottom="8dp"
@@ -50,7 +50,7 @@
             app:customFont="@string/font_medium" />
 
         <LinearLayout
-            android:id="@+id/balance_container"
+            android:id="@+id/amount_container"
             android:layout_width="0dp"
             android:layout_height="@dimen/home_balance_digit_height"
             android:layout_below="@id/balance_text_view"
@@ -98,7 +98,7 @@
             android:id="@+id/available_balance_text_view"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/balance_container"
+            android:layout_below="@+id/amount_container"
             android:layout_alignParentStart="true"
             android:layout_marginEnd="4dp"
             android:letterSpacing="-0.018"

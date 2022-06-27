@@ -23,16 +23,15 @@ class UtxosTileListViewHolder(view: ItemUtxosTileBinding) : CommonViewHolder<Utx
 
         ui.amount.text = amount
         ui.amountDecimal.text = decimal
+        ui.dateTime.text = item.formattedDateTime
 
-        ui.status.text = itemView.context.getString(item.status.text)
-        val icon = ContextCompat.getDrawable(itemView.context, item.status.icon)
-        ui.status.setCompoundDrawablesRelativeWithIntrinsicBounds(icon, null, null, null)
+        ui.status.setImageResource(item.status.icon)
 
         ui.root.updateLayoutParams<ViewGroup.LayoutParams> { this.height = itemView.context.dpToPx(item.heigth.toFloat()).toInt() }
 
         val baseColor = Color.valueOf(ContextCompat.getColor(itemView.context, R.color.purple))
         val newColor = Color.valueOf(getNext(baseColor.red()), getNext(baseColor.green()), getNext(baseColor.blue()))
-        ui.root.setCardBackgroundColor(newColor.toArgb())
+        ui.rootCard.setCardBackgroundColor(newColor.toArgb())
     }
 
     private fun getNext(baseValue: Float): Float {

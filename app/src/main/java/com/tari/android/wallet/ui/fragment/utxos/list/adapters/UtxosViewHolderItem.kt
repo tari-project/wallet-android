@@ -10,6 +10,8 @@ class UtxosViewHolderItem(
     val hash: String,
     val checked: Boolean,
     val dateTime: DateTime,
+    val formattedDateTime: String,
+    val additionalTextData: String,
     val status: UtxosStatus,
     var heigth: Int = 0,
 ) : CommonViewHolderItem() {

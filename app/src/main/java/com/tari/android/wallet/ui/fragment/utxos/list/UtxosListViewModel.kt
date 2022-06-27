@@ -5,13 +5,19 @@ import androidx.lifecycle.MutableLiveData
 import com.tari.android.wallet.R
 import com.tari.android.wallet.model.MicroTari
 import com.tari.android.wallet.ui.common.CommonViewModel
+import com.tari.android.wallet.ui.dialog.modular.DialogArgs
+import com.tari.android.wallet.ui.dialog.modular.IDialogModule
+import com.tari.android.wallet.ui.dialog.modular.ModularDialogArgs
+import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonModule
+import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonStyle
+import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
 import com.tari.android.wallet.ui.fragment.utxos.list.adapters.UtxosStatus
 import com.tari.android.wallet.ui.fragment.utxos.list.adapters.UtxosViewHolderItem
 import com.tari.android.wallet.ui.fragment.utxos.list.adapters.UtxosViewHolderItem.Companion.maxTileHeight
 import com.tari.android.wallet.ui.fragment.utxos.list.adapters.UtxosViewHolderItem.Companion.minTileHeight
+import com.tari.android.wallet.ui.fragment.utxos.list.controllers.Ordering
 import com.tari.android.wallet.ui.fragment.utxos.list.controllers.listType.ListType
-import com.tari.android.wallet.ui.fragment.utxos.list.controllers.ordering.OrderDirection
-import com.tari.android.wallet.ui.fragment.utxos.list.controllers.ordering.OrderType
+import com.tari.android.wallet.ui.fragment.utxos.list.module.ListItemModule
 import org.joda.time.DateTime
 import java.math.BigInteger
 import java.math.RoundingMode
@@ -23,8 +29,7 @@ class UtxosListViewModel : CommonViewModel() {
 
     val listType: MutableLiveData<ListType> = MutableLiveData()
 
-    val orderingDirection = MutableLiveData<OrderDirection>()
-    val orderingType = MutableLiveData<OrderType>()
+    val ordering = MutableLiveData(Ordering.ValueDesc)
 
     val sortingMediator = MediatorLiveData<Unit>()
 
@@ -35,8 +40,7 @@ class UtxosListViewModel : CommonViewModel() {
 
     init {
         sortingMediator.addSource(sourceList) { generateFromScratch() }
-        sortingMediator.addSource(orderingType) { generateFromScratch() }
-        sortingMediator.addSource(orderingDirection) { generateFromScratch() }
+        sortingMediator.addSource(ordering) { generateFromScratch() }
 
         component.inject(this)
         setMocks(1000)
@@ -44,18 +48,13 @@ class UtxosListViewModel : CommonViewModel() {
 
     private fun generateFromScratch() {
         val sourceList = this.sourceList.value ?: return
-        val orderingType = this.orderingType.value ?: return
-        val orderDirection = this.orderingDirection.value ?: return
+        val ordering = this.ordering.value ?: return
 
-        val orderedList = when(orderDirection) {
-            OrderDirection.Desc -> when(orderingType) {
-                OrderType.ByValue -> sourceList.sortedByDescending { it.microTariAmount.tariValue }
-                OrderType.ByDate -> sourceList.sortedByDescending { it.dateTime }
-            }
-            OrderDirection.Anc -> when(orderingType) {
-                OrderType.ByValue -> sourceList.sortedBy { it.microTariAmount.tariValue }
-                OrderType.ByDate -> sourceList.sortedBy { it.dateTime }
-            }
+        val orderedList = when (ordering) {
+            Ordering.ValueDesc -> sourceList.sortedByDescending { it.microTariAmount.tariValue }
+            Ordering.ValueAnc -> sourceList.sortedBy { it.microTariAmount.tariValue }
+            Ordering.DateDesc -> sourceList.sortedByDescending { it.dateTime }
+            Ordering.DateAnc -> sourceList.sortedBy { it.dateTime }
         }.toMutableList()
 
         textList.postValue(orderedList)
@@ -64,11 +63,31 @@ class UtxosListViewModel : CommonViewModel() {
 
     fun setTypeList(listType: ListType) = this.listType.postValue(listType)
 
-    fun setOrderingDirection(ordering: OrderDirection) = this.orderingDirection.postValue(ordering)
-
-    fun setOrderingType(type: OrderType) = this.orderingType.postValue(type)
-
     fun setSelectionState(isSelecting: Boolean) = Unit
+
+    fun showOrderingSelectionDialog() {
+        val listOptions = Ordering.values().map { ListItemModule(it) }
+        listOptions.firstOrNull { it.ordering == ordering.value }?.isSelected = true
+        listOptions.forEach {
+            it.click = {
+                listOptions.forEach { it.isSelected = false }
+                it.isSelected = true
+            }
+        }
+        val modules = mutableListOf<IDialogModule>()
+        modules.add(HeadModule(resourceManager.getString(R.string.utxos_ordering_title)))
+        modules.addAll(listOptions)
+        modules.add(ButtonModule(resourceManager.getString(R.string.common_apply), ButtonStyle.Normal) {
+            ordering.postValue(listOptions.firstOrNull { it.isSelected }?.ordering)
+            _dissmissDialog.postValue(Unit)
+        })
+        modules.add(ButtonModule(resourceManager.getString(R.string.common_cancel), ButtonStyle.Close))
+        val modularDialogArgs = ModularDialogArgs(
+            DialogArgs(),
+            modules
+        )
+        _modularDialog.postValue(modularDialogArgs)
+    }
 
     fun setMocks(count: Int) {
         val list = (0..count).map {
@@ -84,9 +103,12 @@ class UtxosListViewModel : CommonViewModel() {
             val endDate = DateTime.now().plusWeeks(1).toDateTime().millis
             val date = Random.nextLong(startDate, endDate)
             val dateTime = DateTime.now().withMillis(date)
+            val formattedDate = dateTime.toString("dd/MM/yyyy")
+            val formattedTime = dateTime.toString("HH:mm")
             val guid = UUID.randomUUID().toString().lowercase()
-            val status = UtxosStatus.values()[Random.nextInt(0, 3)]
-            UtxosViewHolderItem(value, MicroTari(bigInteger), guid + guid, false, dateTime, status)
+            val status = UtxosStatus.values()[Random.nextInt(0, 2)]
+            val additionalTextData = resourceManager.getString(status.text) + " | " + formattedDate + " | " + formattedTime
+            UtxosViewHolderItem(value, MicroTari(bigInteger), guid + guid, false, dateTime, formattedDate, additionalTextData, status)
         }.toMutableList()
         calculateHeight(list)
 

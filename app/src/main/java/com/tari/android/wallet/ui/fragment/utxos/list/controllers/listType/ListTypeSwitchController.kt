@@ -1,32 +1,35 @@
 package com.tari.android.wallet.ui.fragment.utxos.list.controllers.listType
 
-import com.tari.android.wallet.ui.fragment.utxos.list.controllers.CheckedController
+import android.widget.ImageView
+import com.tari.android.wallet.R
 
-class ListTypeSwitchController(val tile: CheckedController, val text: CheckedController) {
+class ListTypeSwitchController(val icon: ImageView) {
 
-    private var allViews = listOf(tile, text)
     private var currentState: ListType? = null
 
     var toggleCallback: (ListType) -> Unit = {}
 
     init {
-        tile.view.setOnClickListener { toggle(ListType.Tile) }
-        text.view.setOnClickListener { toggle(ListType.Text) }
+        icon.setOnClickListener { toggle() }
     }
 
-    fun toggle(type: ListType) {
-        if (type != currentState) {
-            currentState = type
-            allViews.forEach { it.setChecked(false) }
-            getCurrentView().setChecked(true)
-            toggleCallback.invoke(currentState!!)
-        }
+    fun toggle() {
+        set(getOppositeListType())
     }
 
-    private fun getCurrentView(): CheckedController {
-        return when (currentState) {
-            ListType.Tile -> tile
-            else -> text
-        }
+    fun set(type: ListType) {
+        currentState = type
+        icon.setImageResource(getListTypeIcon())
+        toggleCallback.invoke(currentState!!)
+    }
+
+    private fun getOppositeListType() : ListType = when(currentState) {
+        ListType.Tile -> ListType.Text
+        else -> ListType.Tile
+    }
+
+    private fun getListTypeIcon() : Int = when(currentState) {
+        ListType.Text -> R.drawable.ic_wallet_group_cells
+        else -> R.drawable.ic_wallet_group_list
     }
 }

@@ -1,16 +1,63 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.appcompat.widget.LinearLayoutCompat xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/root_view"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/white"
+    android:clipChildren="false"
     android:orientation="vertical">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/utxos_text_list"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="match_parent"
+        android:layout_below="@+id/toolbar_container"
+        android:clipChildren="false"
+        android:clipToPadding="false"
+        android:paddingTop="66dp"
+        tools:visibility="gone" />
+
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:id="@+id/tile_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/toolbar_container"
+        android:background="@color/gray_background"
+        android:clipChildren="false"
+        android:clipToPadding="false"
+        android:orientation="horizontal"
+        android:paddingHorizontal="20dp">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/utxos_tile_left_list"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:clipChildren="false"
+            android:clipToPadding="false"
+            android:overScrollMode="never"
+            android:paddingTop="66dp" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/utxos_tile_right_list"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+
+            android:layout_weight="1"
+            android:clipChildren="false"
+            android:clipToPadding="false"
+            android:overScrollMode="never"
+            android:paddingTop="66dp" />
+
+    </androidx.appcompat.widget.LinearLayoutCompat>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/toolbar_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/white">
 
         <FrameLayout
             android:id="@+id/back_cta_view"
@@ -45,19 +92,7 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <androidx.appcompat.widget.AppCompatImageView
-            android:id="@+id/group_selector_list"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginEnd="6dp"
-            android:src="@drawable/ic_wallet_group_list"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintDimensionRatio="1:1"
-            app:layout_constraintEnd_toStartOf="@+id/group_selector_groups"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <androidx.appcompat.widget.AppCompatImageView
-            android:id="@+id/group_selector_groups"
+            android:id="@+id/type_list_selector"
             android:layout_width="30dp"
             android:layout_height="30dp"
             android:layout_marginTop="8dp"
@@ -73,107 +108,48 @@
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
+        android:layout_below="@+id/toolbar_container"
         android:background="@color/common_divider" />
 
-    <View
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="15dp"
-        android:background="@drawable/view_elevation_gradient_to_white"
-        android:paddingBottom="2dp" />
-
-    <androidx.appcompat.widget.LinearLayoutCompat
-        android:layout_width="match_parent"
-        android:layout_height="32dp"
-        android:layout_marginTop="15dp"
-        android:layout_marginBottom="5dp"
+        android:layout_height="66dp"
+        android:layout_below="@+id/toolbar_container"
+        android:alpha="0.9"
+        android:background="@color/gray_background"
         android:paddingHorizontal="30dp">
 
-        <androidx.appcompat.widget.LinearLayoutCompat
-            android:layout_width="180dp"
+        <com.tari.android.wallet.ui.component.CustomFontTextView
+            android:id="@+id/ordering_state"
+            android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:background="@drawable/background_utxos_list_sorting_selector"
-            android:orientation="horizontal">
+            android:layout_alignParentStart="true"
+            android:layout_gravity="start"
+            android:drawableStart="@drawable/ic_wallet_filtering"
+            android:drawablePadding="5dp"
+            android:gravity="center_vertical"
+            android:text="@string/utxos_ordering_option_size_desc"
+            android:textColor="@color/black"
+            android:textSize="14sp"
+            app:customFont="@string/font_medium" />
 
-            <com.tari.android.wallet.ui.component.CustomFontTextView
-                android:id="@+id/ordering_type_value"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_margin="1dp"
-                android:layout_weight="1"
-                android:background="@drawable/background_utxos_list_sorting_selector_checked"
-                android:gravity="center"
-                android:text="@string/utxos_list_ordering_type_value"
-                android:textColor="@color/black"
-                android:textSize="13sp"
-                app:customFont="@string/font_medium" />
-
-            <com.tari.android.wallet.ui.component.CustomFontTextView
-                android:id="@+id/ordering_type_date"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_margin="1dp"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:text="@string/utxos_list_ordering_type_date"
-                android:textColor="@color/black"
-                android:textSize="13sp"
-                app:customFont="@string/font_medium" />
-
-        </androidx.appcompat.widget.LinearLayoutCompat>
-
-        <androidx.appcompat.widget.AppCompatImageView
-            android:id="@+id/ordering_direction"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:layout_gravity="center_vertical"
-            android:layout_marginStart="5dp"
-            android:padding="5dp"
-            android:src="@drawable/ic_wallet_sorting_asc" />
-
-        <View
-            android:layout_width="match_parent"
+        <com.tari.android.wallet.ui.component.CustomFontTextView
+            android:id="@+id/selecting_state"
+            android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:layout_weight="1" />
+            android:layout_alignParentEnd="true"
+            android:layout_marginStart="1dp"
+            android:layout_marginTop="1dp"
+            android:layout_marginEnd="1dp"
+            android:layout_marginBottom="1dp"
+            android:drawablePadding="5dp"
+            android:gravity="center_vertical"
+            android:text="@string/utxos_selecting"
+            android:textColor="@color/black"
+            android:textSize="14sp"
+            app:customFont="@string/font_medium" />
 
-        <androidx.appcompat.widget.AppCompatImageView
-            android:id="@+id/start_selection_checker"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:src="@drawable/ic_wallet_checker" />
+    </RelativeLayout>
 
-    </androidx.appcompat.widget.LinearLayoutCompat>
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/utxos_text_list"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        tools:visibility="gone" />
-
-    <androidx.appcompat.widget.LinearLayoutCompat
-        android:id="@+id/tile_container"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginHorizontal="20dp"
-        android:clipChildren="false"
-        android:orientation="horizontal">
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/utxos_tile_left_list"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:clipChildren="false"
-            android:overScrollMode="never" />
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/utxos_tile_right_list"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:clipChildren="false"
-            android:overScrollMode="never" />
-
-    </androidx.appcompat.widget.LinearLayoutCompat>
-
-</androidx.appcompat.widget.LinearLayoutCompat>
+</RelativeLayout>
 

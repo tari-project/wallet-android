@@ -18,14 +18,10 @@ import com.tari.android.wallet.ui.fragment.utxos.list.adapters.UtxosListTileAdap
 import com.tari.android.wallet.ui.fragment.utxos.list.controllers.CheckedController
 import com.tari.android.wallet.ui.fragment.utxos.list.controllers.listType.ListType
 import com.tari.android.wallet.ui.fragment.utxos.list.controllers.listType.ListTypeSwitchController
-import com.tari.android.wallet.ui.fragment.utxos.list.controllers.ordering.OrderDirection
-import com.tari.android.wallet.ui.fragment.utxos.list.controllers.ordering.OrderType
-import com.tari.android.wallet.ui.fragment.utxos.list.controllers.ordering.OrderingController
 
 class UtxosListFragment : CommonFragment<FragmentUtxosListBinding, UtxosListViewModel>() {
 
     private lateinit var listTypeSwitchController: ListTypeSwitchController
-    private lateinit var orderingController: OrderingController
     private lateinit var selectionController: CheckedController
 
     private val textListAdapter: UtxosListAdapter = UtxosListAdapter()
@@ -49,7 +45,7 @@ class UtxosListFragment : CommonFragment<FragmentUtxosListBinding, UtxosListView
     private fun observeUI() = with(viewModel) {
         observeOnLoad(sortingMediator)
         observe(listType) {
-            when(it!!) {
+            when (it!!) {
                 ListType.Text -> {
                     ui.utxosTextList.visible()
                     ui.tileContainer.gone()
@@ -60,6 +56,7 @@ class UtxosListFragment : CommonFragment<FragmentUtxosListBinding, UtxosListView
                 }
             }
         }
+        observe(ordering) { ui.orderingState.setText(it.textId) }
         observe(textList) { textListAdapter.update(it) }
         observe(leftTileList) { tileLeftAdapter.update(it) }
         observe(rightTileList) { tileRightAdapter.update(it) }
@@ -67,22 +64,17 @@ class UtxosListFragment : CommonFragment<FragmentUtxosListBinding, UtxosListView
 
     private fun setupCTA() {
         ui.backCtaView.setOnClickListener { requireActivity().onBackPressed() }
+        ui.orderingState.setOnClickListener { viewModel.showOrderingSelectionDialog() }
     }
 
     private fun setupUI() {
-        listTypeSwitchController = ListTypeSwitchController(CheckedController(ui.groupSelectorGroups), CheckedController(ui.groupSelectorList))
+        listTypeSwitchController = ListTypeSwitchController(ui.typeListSelector)
         listTypeSwitchController.toggleCallback = { viewModel.setTypeList(it) }
-        listTypeSwitchController.toggle(ListType.Tile)
+        listTypeSwitchController.set(ListType.Tile)
 
-        orderingController = OrderingController(ui.orderingTypeValue, ui.orderingTypeDate, ui.orderingDirection)
-        orderingController.toggleTypeCallback = { viewModel.setOrderingType(it) }
-        orderingController.toggleDirectionCallback = { viewModel.setOrderingDirection(it) }
-        orderingController.toggleType(OrderType.ByValue)
-        orderingController.toggleDirection(OrderDirection.Anc)
-
-        selectionController = CheckedController(ui.startSelectionChecker)
+        selectionController = CheckedController(ui.selectingState)
         selectionController.toggleCallback = { viewModel.setSelectionState(it) }
-        ui.startSelectionChecker.setOnClickListener { selectionController.toggleChecked() }
+        ui.selectingState.setOnClickListener { selectionController.toggleChecked() }
         selectionController.setChecked(false)
 
         ui.utxosTextList.layoutManager = LinearLayoutManager(requireContext())
