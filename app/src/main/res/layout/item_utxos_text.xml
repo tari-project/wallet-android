@@ -1,53 +1,78 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.appcompat.widget.LinearLayoutCompat xmlns:android="http://schemas.android.com/apk/res/android"
+
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:paddingHorizontal="30dp"
-    android:clipChildren="false"
-    android:orientation="vertical">
+    android:animateLayoutChanges="true"
+    android:orientation="horizontal"
+    android:paddingHorizontal="30dp">
 
-    <com.tari.android.wallet.ui.component.CustomFontTextView
-        android:id="@+id/amount"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="15dp"
-        android:ellipsize="end"
-        android:lines="1"
-        android:singleLine="true"
-        android:textColor="@color/common_header_title"
-        android:textSize="15sp"
-        app:customFont="@string/font_heavy" />
+    <androidx.appcompat.widget.AppCompatCheckBox
+        android:id="@+id/checked_state"
+        android:layout_width="wrap_content"
+        android:layout_height="24dp"
+        android:layout_marginTop="12dp"
+        android:visibility="gone"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
-    <com.tari.android.wallet.ui.component.CustomFontTextView
-        android:id="@+id/additional_data"
-        android:layout_width="match_parent"
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:id="@+id/main_container"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="5dp"
-        android:drawablePadding="6dp"
-        android:ellipsize="end"
-        android:lines="1"
-        android:singleLine="true"
-        android:textColor="@color/dark_gray"
-        android:textSize="15sp"
-        app:customFont="@string/font_medium" />
+        android:clipChildren="false"
+        android:orientation="vertical"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/checked_state"
+        app:layout_constraintTop_toTopOf="parent">
 
-    <com.tari.android.wallet.ui.component.CustomFontTextView
-        android:id="@+id/hash"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="5dp"
-        android:ellipsize="end"
-        android:lines="1"
-        android:singleLine="true"
-        android:textColor="@color/dark_gray"
-        android:textSize="15sp"
-        app:customFont="@string/font_medium" />
+        <com.tari.android.wallet.ui.component.CustomFontTextView
+            android:id="@+id/amount"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="15dp"
+            android:ellipsize="end"
+            android:lines="1"
+            android:singleLine="true"
+            android:textColor="@color/common_header_title"
+            android:textSize="15sp"
+            app:customFont="@string/font_heavy" />
+
+        <com.tari.android.wallet.ui.component.CustomFontTextView
+            android:id="@+id/additional_data"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:drawablePadding="6dp"
+            android:ellipsize="end"
+            android:lines="1"
+            android:singleLine="true"
+            android:textColor="@color/dark_gray"
+            android:textSize="15sp"
+            app:customFont="@string/font_medium" />
+
+        <com.tari.android.wallet.ui.component.CustomFontTextView
+            android:id="@+id/hash"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:ellipsize="end"
+            android:lines="1"
+            android:singleLine="true"
+            android:textColor="@color/dark_gray"
+            android:textSize="15sp"
+            app:customFont="@string/font_medium" />
+
+    </androidx.appcompat.widget.LinearLayoutCompat>
 
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
+        android:layout_below="@+id/main_container"
         android:layout_marginTop="15dp"
-        android:background="@color/common_divider" />
+        android:background="@color/common_divider"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/main_container" />
 
-</androidx.appcompat.widget.LinearLayoutCompat>
+</androidx.constraintlayout.widget.ConstraintLayout>

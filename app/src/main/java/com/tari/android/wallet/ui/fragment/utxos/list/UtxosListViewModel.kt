@@ -33,6 +33,8 @@ class UtxosListViewModel : CommonViewModel() {
 
     val sortingMediator = MediatorLiveData<Unit>()
 
+    val selectionState = MutableLiveData<Boolean>()
+
     val sourceList: MutableLiveData<MutableList<UtxosViewHolderItem>> = MutableLiveData(mutableListOf())
     val textList: MutableLiveData<MutableList<UtxosViewHolderItem>> = MutableLiveData(mutableListOf())
     val leftTileList: MutableLiveData<MutableList<UtxosViewHolderItem>> = MutableLiveData(mutableListOf())
@@ -41,6 +43,7 @@ class UtxosListViewModel : CommonViewModel() {
     init {
         sortingMediator.addSource(sourceList) { generateFromScratch() }
         sortingMediator.addSource(ordering) { generateFromScratch() }
+        setSelectionState(false)
 
         component.inject(this)
         setMocks(1000)
@@ -63,7 +66,13 @@ class UtxosListViewModel : CommonViewModel() {
 
     fun setTypeList(listType: ListType) = this.listType.postValue(listType)
 
-    fun setSelectionState(isSelecting: Boolean) = Unit
+    fun setSelectionState(isSelecting: Boolean) {
+        selectionState.postValue(isSelecting)
+        sourceList.value?.forEach { it.selectionState.value = isSelecting }
+        if (!isSelecting) {
+            sourceList.value?.forEach { it.checked.value = false }
+        }
+    }
 
     fun showOrderingSelectionDialog() {
         val listOptions = Ordering.values().map { ListItemModule(it) }
@@ -108,7 +117,7 @@ class UtxosListViewModel : CommonViewModel() {
             val guid = UUID.randomUUID().toString().lowercase()
             val status = UtxosStatus.values()[Random.nextInt(0, 2)]
             val additionalTextData = resourceManager.getString(status.text) + " | " + formattedDate + " | " + formattedTime
-            UtxosViewHolderItem(value, MicroTari(bigInteger), guid + guid, false, dateTime, formattedDate, additionalTextData, status)
+            UtxosViewHolderItem(value, MicroTari(bigInteger), guid + guid, dateTime, formattedDate, additionalTextData, status)
         }.toMutableList()
         calculateHeight(list)
 

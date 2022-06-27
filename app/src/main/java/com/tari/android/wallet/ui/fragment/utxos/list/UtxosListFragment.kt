@@ -12,6 +12,7 @@ import com.tari.android.wallet.extension.observe
 import com.tari.android.wallet.extension.observeOnLoad
 import com.tari.android.wallet.ui.common.CommonFragment
 import com.tari.android.wallet.ui.extension.gone
+import com.tari.android.wallet.ui.extension.setVisible
 import com.tari.android.wallet.ui.extension.visible
 import com.tari.android.wallet.ui.fragment.utxos.list.adapters.UtxosListAdapter
 import com.tari.android.wallet.ui.fragment.utxos.list.adapters.UtxosListTileAdapter
@@ -49,13 +50,18 @@ class UtxosListFragment : CommonFragment<FragmentUtxosListBinding, UtxosListView
                 ListType.Text -> {
                     ui.utxosTextList.visible()
                     ui.tileContainer.gone()
+                    ui.utxosTileLeftList.gone()
+                    ui.utxosTileRightList.gone()
                 }
                 ListType.Tile -> {
                     ui.utxosTextList.gone()
                     ui.tileContainer.visible()
+                    ui.utxosTileLeftList.visible()
+                    ui.utxosTileRightList.visible()
                 }
             }
         }
+        observe(selectionState) { ui.splitJoinContainer.setVisible(it) }
         observe(ordering) { ui.orderingState.setText(it.textId) }
         observe(textList) { textListAdapter.update(it) }
         observe(leftTileList) { tileLeftAdapter.update(it) }
