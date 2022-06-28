@@ -158,7 +158,7 @@ internal class EmojiIdCopiedViewController(private val ui: ViewEmojiIdCopiedAnim
         animSet.playTogether(whiteBgFadeOutAnim, textViewFadeOutAnim)
         animSet.start()
         animSet.addListener(object : AnimatorListenerAdapter() {
-            override fun onAnimationEnd(animation: Animator?) {
+            override fun onAnimationEnd(animation: Animator) {
                 then?.let { it() }
             }
         })
