@@ -93,6 +93,7 @@
     <string name="common_cancel">Cancel</string>
     <string name="common_ok">OK</string>
     <string name="common_confirm">Confirm</string>
+    <string name="common_apply">Apply</string>
     <string name="common_share">Share</string>
     <string name="common_reset">Reset</string>
     <string name="common_error_title">Error</string>
@@ -607,10 +608,13 @@
     <string name="tari_about_icon_text_delete">Delete by Maya Nurhayati from\nNounProject.com</string>
 
     <string name="utxos_list_title">Wallet</string>
-    <string name="utxos_list_ordering_type_value">Size</string>
-    <string name="utxos_list_ordering_type_date">Date</string>
+    <string name="utxos_selecting">Select</string>
     <string name="utxos_status_mined">Mined</string>
     <string name="utxos_status_confirmed">Confirmed</string>
-    <string name="utxos_status_unconfirmed">Unconfirmed</string>
+    <string name="utxos_ordering_title">Sort by</string>
+    <string name="utxos_ordering_option_size_desc">Size, Descending</string>
+    <string name="utxos_ordering_option_size_asc">Size, Ascending</string>
+    <string name="utxos_ordering_option_date_desc">Date, Descending</string>
+    <string name="utxos_ordering_option_date_asc">Date, Ascending</string>
 
 </resources>
