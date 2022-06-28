@@ -319,6 +319,7 @@ internal class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>
                 HomeDeeplinkScreens.TxDetails -> {
                     (intent.getParcelableExtra<TxId>(HomeDeeplinkScreens.KeyTxDetailsArgs))?.let { toTxDetails(null, it) }
                 }
+                else -> { }
             }
         }
     }
