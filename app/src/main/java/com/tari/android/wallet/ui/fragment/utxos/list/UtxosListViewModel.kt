@@ -2,8 +2,14 @@ package com.tari.android.wallet.ui.fragment.utxos.list
 
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.viewModelScope
 import com.tari.android.wallet.R
-import com.tari.android.wallet.model.MicroTari
+import com.tari.android.wallet.extension.addTo
+import com.tari.android.wallet.extension.getWithError
+import com.tari.android.wallet.model.TariOutputs
+import com.tari.android.wallet.model.TariUtxo
+import com.tari.android.wallet.service.TariWalletService
+import com.tari.android.wallet.service.connection.TariWalletServiceConnection
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.dialog.modular.DialogArgs
 import com.tari.android.wallet.ui.dialog.modular.IDialogModule
@@ -11,19 +17,14 @@ import com.tari.android.wallet.ui.dialog.modular.ModularDialogArgs
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonModule
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonStyle
 import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
-import com.tari.android.wallet.ui.fragment.utxos.list.adapters.UtxosStatus
 import com.tari.android.wallet.ui.fragment.utxos.list.adapters.UtxosViewHolderItem
 import com.tari.android.wallet.ui.fragment.utxos.list.adapters.UtxosViewHolderItem.Companion.maxTileHeight
 import com.tari.android.wallet.ui.fragment.utxos.list.adapters.UtxosViewHolderItem.Companion.minTileHeight
 import com.tari.android.wallet.ui.fragment.utxos.list.controllers.Ordering
 import com.tari.android.wallet.ui.fragment.utxos.list.controllers.listType.ListType
 import com.tari.android.wallet.ui.fragment.utxos.list.module.ListItemModule
-import org.joda.time.DateTime
-import java.math.BigInteger
-import java.math.RoundingMode
-import java.text.DecimalFormat
-import java.util.*
-import kotlin.random.Random
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class UtxosListViewModel : CommonViewModel() {
 
@@ -35,46 +36,52 @@ class UtxosListViewModel : CommonViewModel() {
 
     val selectionState = MutableLiveData<Boolean>()
 
-    val sourceList: MutableLiveData<MutableList<UtxosViewHolderItem>> = MutableLiveData(mutableListOf())
+    val sourceList: MutableLiveData<Map<Ordering, MutableList<UtxosViewHolderItem>>> = MutableLiveData()
     val textList: MutableLiveData<MutableList<UtxosViewHolderItem>> = MutableLiveData(mutableListOf())
     val leftTileList: MutableLiveData<MutableList<UtxosViewHolderItem>> = MutableLiveData(mutableListOf())
     val rightTileList: MutableLiveData<MutableList<UtxosViewHolderItem>> = MutableLiveData(mutableListOf())
+
+    var serviceConnection = TariWalletServiceConnection()
+    val walletService: TariWalletService
+        get() = serviceConnection.currentState.service!!
 
     init {
         sortingMediator.addSource(sourceList) { generateFromScratch() }
         sortingMediator.addSource(ordering) { generateFromScratch() }
         setSelectionState(false)
 
+        serviceConnection.connection.subscribe {
+            if (it.status == TariWalletServiceConnection.ServiceConnectionStatus.CONNECTED) loadUtxosFromFFI()
+        }.addTo(compositeDisposable)
+
         component.inject(this)
-        setMocks(1000)
     }
 
-    private fun generateFromScratch() {
-        val sourceList = this.sourceList.value ?: return
-        val ordering = this.ordering.value ?: return
+    fun selectItem(item: UtxosViewHolderItem) {
+        if (item.selectionState.value) {
+            item.checked.value = !item.checked.value
+        }
+    }
 
-        val orderedList = when (ordering) {
-            Ordering.ValueDesc -> sourceList.sortedByDescending { it.microTariAmount.tariValue }
-            Ordering.ValueAnc -> sourceList.sortedBy { it.microTariAmount.tariValue }
-            Ordering.DateDesc -> sourceList.sortedByDescending { it.dateTime }
-            Ordering.DateAnc -> sourceList.sortedBy { it.dateTime }
-        }.toMutableList()
-
-        textList.postValue(orderedList)
-        orderTileLists(orderedList)
+    fun setSelectionStateTrue() : Boolean {
+        if (!selectionState.value!!) {
+            setSelectionState(true)
+        }
+        return true
     }
 
     fun setTypeList(listType: ListType) = this.listType.postValue(listType)
 
     fun setSelectionState(isSelecting: Boolean) {
         selectionState.postValue(isSelecting)
-        sourceList.value?.forEach { it.selectionState.value = isSelecting }
+        textList.value?.forEach { it.selectionState.value = isSelecting }
         if (!isSelecting) {
-            sourceList.value?.forEach { it.checked.value = false }
+            textList.value?.forEach { it.checked.value = false }
         }
     }
 
     fun showOrderingSelectionDialog() {
+        setSelectionState(false)
         val listOptions = Ordering.values().map { ListItemModule(it) }
         listOptions.firstOrNull { it.ordering == ordering.value }?.isSelected = true
         listOptions.forEach {
@@ -98,41 +105,55 @@ class UtxosListViewModel : CommonViewModel() {
         _modularDialog.postValue(modularDialogArgs)
     }
 
-    fun setMocks(count: Int) {
-        val list = (0..count).map {
-            val amount = Random.nextDouble(1.0, 1_000_000.0)
-            val bigInteger = BigInteger.valueOf((amount * 100_000L).toLong())
-            val doubleValue = MicroTari(bigInteger).tariValue.setScale(2, RoundingMode.HALF_UP)
-            val newDecimal = DecimalFormat("##.00")
-            newDecimal.decimalFormatSymbols.groupingSeparator = ','
-            newDecimal.isGroupingUsed = true
-            newDecimal.groupingSize = 3
-            val value = newDecimal.format(doubleValue)
-            val startDate = DateTime.now().minusWeeks(1).toDateTime().millis
-            val endDate = DateTime.now().plusWeeks(1).toDateTime().millis
-            val date = Random.nextLong(startDate, endDate)
-            val dateTime = DateTime.now().withMillis(date)
-            val formattedDate = dateTime.toString("dd/MM/yyyy")
-            val formattedTime = dateTime.toString("HH:mm")
-            val guid = UUID.randomUUID().toString().lowercase()
-            val status = UtxosStatus.values()[Random.nextInt(0, 2)]
-            val additionalTextData = resourceManager.getString(status.text) + " | " + formattedDate + " | " + formattedTime
-            UtxosViewHolderItem(value, MicroTari(bigInteger), guid + guid, dateTime, formattedDate, additionalTextData, status)
-        }.toMutableList()
-        calculateHeight(list)
+    private fun loadUtxosFromFFI() = viewModelScope.launch(Dispatchers.IO) {
+        val map = mapOf(
+            Pair(Ordering.ValueDesc, loadUtxosFromFFI(Ordering.ValueDesc)),
+            Pair(Ordering.ValueAnc, loadUtxosFromFFI(Ordering.ValueAnc)),
+            Pair(Ordering.DateDesc, loadUtxosFromFFI(Ordering.DateDesc)),
+            Pair(Ordering.DateAnc, loadUtxosFromFFI(Ordering.DateAnc)),
+        )
+        sourceList.postValue(map)
+    }
 
-        sourceList.postValue(list)
+    private fun loadUtxosFromFFI(sorting: Ordering): MutableList<UtxosViewHolderItem> {
+        val items = mutableListOf<TariUtxo>()
+        var newItems: TariOutputs
+        var pageNumber = 0
+        do {
+            newItems = walletService.getWithError { error, wallet -> wallet.getUtxos(pageNumber, pageSize, sorting.value, error) }
+            items.addAll(newItems.itemsList)
+            pageNumber++
+        } while (newItems.len == pageSize.toLong())
+        return items.map { UtxosViewHolderItem.fromUtxo(it, resourceManager) }.toMutableList()
+    }
+
+    private fun generateFromScratch() {
+        val sourceList = this.sourceList.value ?: return
+        val ordering = this.ordering.value ?: return
+
+        val orderedList = sourceList[ordering]!!.toMutableList()
+
+        calculateHeight(orderedList)
+        textList.postValue(orderedList)
+        orderTileLists(orderedList)
     }
 
     private fun calculateHeight(list: MutableList<UtxosViewHolderItem>) {
-        val min = list.minOf { it.microTariAmount.tariValue }
-        val max = list.maxOf { it.microTariAmount.tariValue }
+        if (list.isEmpty()) return
+        val min = list.minOf { it.source.value.tariValue }
+        val max = list.maxOf { it.source.value.tariValue }
 
-        val amountDiff = (max - min).toDouble()
+        var amountDiff = (max - min).toDouble()
+        if (amountDiff == 0.0) {
+            amountDiff = min.toDouble()
+        }
         val heightDiff = maxTileHeight - minTileHeight
         val scale = heightDiff / amountDiff
 
-        list.forEach { it.heigth = ((it.microTariAmount.tariValue - min).toDouble() * scale + minTileHeight).toInt() }
+        list.forEach {
+            val calculatedHeight = ((it.source.value.tariValue - min).toDouble() * scale + minTileHeight).toInt()
+            it.heigth = calculatedHeight
+        }
     }
 
     private fun orderTileLists(list: MutableList<UtxosViewHolderItem>) {
@@ -152,5 +173,9 @@ class UtxosListViewModel : CommonViewModel() {
         }
         leftTileList.postValue(leftList)
         rightTileList.postValue(rightList)
+    }
+
+    companion object {
+        const val pageSize = 1
     }
 }

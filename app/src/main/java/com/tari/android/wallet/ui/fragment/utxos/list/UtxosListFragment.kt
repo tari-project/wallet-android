@@ -11,6 +11,7 @@ import com.tari.android.wallet.databinding.FragmentUtxosListBinding
 import com.tari.android.wallet.extension.observe
 import com.tari.android.wallet.extension.observeOnLoad
 import com.tari.android.wallet.ui.common.CommonFragment
+import com.tari.android.wallet.ui.common.recyclerView.CommonAdapter
 import com.tari.android.wallet.ui.extension.gone
 import com.tari.android.wallet.ui.extension.setVisible
 import com.tari.android.wallet.ui.extension.visible
@@ -45,23 +46,11 @@ class UtxosListFragment : CommonFragment<FragmentUtxosListBinding, UtxosListView
 
     private fun observeUI() = with(viewModel) {
         observeOnLoad(sortingMediator)
-        observe(listType) {
-            when (it!!) {
-                ListType.Text -> {
-                    ui.utxosTextList.visible()
-                    ui.tileContainer.gone()
-                    ui.utxosTileLeftList.gone()
-                    ui.utxosTileRightList.gone()
-                }
-                ListType.Tile -> {
-                    ui.utxosTextList.gone()
-                    ui.tileContainer.visible()
-                    ui.utxosTileLeftList.visible()
-                    ui.utxosTileRightList.visible()
-                }
-            }
+        observe(listType) { updateListType(it) }
+        observe(selectionState) {
+            ui.splitJoinContainer.setVisible(it)
+            selectionController.setChecked(it)
         }
-        observe(selectionState) { ui.splitJoinContainer.setVisible(it) }
         observe(ordering) { ui.orderingState.setText(it.textId) }
         observe(textList) { textListAdapter.update(it) }
         observe(leftTileList) { tileLeftAdapter.update(it) }
@@ -81,21 +70,43 @@ class UtxosListFragment : CommonFragment<FragmentUtxosListBinding, UtxosListView
         selectionController = CheckedController(ui.selectingState)
         selectionController.toggleCallback = { viewModel.setSelectionState(it) }
         ui.selectingState.setOnClickListener { selectionController.toggleChecked() }
-        selectionController.setChecked(false)
 
         ui.utxosTextList.layoutManager = LinearLayoutManager(requireContext())
         ui.utxosTextList.adapter = textListAdapter
+        textListAdapter.setClickListener(CommonAdapter.ItemClickListener { viewModel.selectItem(it) })
+        textListAdapter.setLongClickListener(CommonAdapter.ItemLongClickListener { viewModel.setSelectionStateTrue() })
 
         ui.utxosTileLeftList.layoutManager = LinearLayoutManager(requireContext())
         ui.utxosTileLeftList.adapter = tileLeftAdapter
+        tileLeftAdapter.setClickListener(CommonAdapter.ItemClickListener { viewModel.selectItem(it) })
+        tileLeftAdapter.setLongClickListener(CommonAdapter.ItemLongClickListener { viewModel.setSelectionStateTrue() })
 
         ui.utxosTileRightList.layoutManager = LinearLayoutManager(requireContext())
         ui.utxosTileRightList.adapter = tileRightAdapter
+        tileRightAdapter.setClickListener(CommonAdapter.ItemClickListener { viewModel.selectItem(it) })
+        tileRightAdapter.setLongClickListener(CommonAdapter.ItemLongClickListener { viewModel.setSelectionStateTrue() })
 
-        syncroniseTileScrolling()
+        synchronizeTileScrolling()
     }
 
-    private fun syncroniseTileScrolling() {
+    private fun updateListType(listType: ListType) {
+        when (listType) {
+            ListType.Text -> {
+                ui.utxosTextList.visible()
+                ui.tileContainer.gone()
+                ui.utxosTileLeftList.gone()
+                ui.utxosTileRightList.gone()
+            }
+            ListType.Tile -> {
+                ui.utxosTextList.gone()
+                ui.tileContainer.visible()
+                ui.utxosTileLeftList.visible()
+                ui.utxosTileRightList.visible()
+            }
+        }
+    }
+
+    private fun synchronizeTileScrolling() {
         val scrollListeners = mutableListOf<RecyclerView.OnScrollListener>()
 
         val leftListener = object : RecyclerView.OnScrollListener() {

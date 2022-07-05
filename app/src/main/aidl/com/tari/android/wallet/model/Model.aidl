@@ -49,3 +49,4 @@ parcelable PendingOutboundTx;
 parcelable PublicKey;
 parcelable ValidationResult;
 parcelable TransactionSendStatus;
+parcelable TariOutputs;

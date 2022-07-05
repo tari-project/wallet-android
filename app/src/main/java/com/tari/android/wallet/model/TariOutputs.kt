@@ -30,69 +30,47 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.tari.android.wallet.ffi
+package com.tari.android.wallet.model
 
-import com.tari.android.wallet.model.MicroTari
-import java.math.BigInteger
+import android.os.Parcel
+import android.os.Parcelable
+import com.tari.android.wallet.ffi.FFITariOutputs
 
-/**
- * Wrapper for native byte vector type.
- *
- * @author The Tari Development Team
- */
-internal class FFIBalance() : FFIBase() {
+class TariOutputs() : Parcelable {
 
-    // region JNI
+    var len: Long = -1
+    var cap: Long = -1
+    var itemsList = mutableListOf<TariUtxo>()
 
-    private external fun jniGetAvailable(
-        libError: FFIError
-    ): ByteArray
-    private external fun jniGetIncoming(
-        libError: FFIError
-    ): ByteArray
-    private external fun jniGetOutgoing(
-        libError: FFIError
-    ): ByteArray
-    private external fun jniGetTimeLocked(
-        libError: FFIError
-    ): ByteArray
-    private external fun jniDestroy()
-
-    // endregion
-    constructor(pointer: FFIPointer): this() {
-        this.pointer = pointer
+    constructor(ffiOutputs: FFITariOutputs): this() {
+        len = ffiOutputs.len
+        cap = ffiOutputs.cap
+        itemsList = ffiOutputs.itemsList.map { TariUtxo(it) }.toMutableList()
     }
 
-    fun getAvailable(): MicroTari {
-        val error = FFIError()
-        val bytes = jniGetAvailable(error)
-        throwIf(error)
-        return MicroTari(BigInteger(1, bytes))
+    constructor(parcel: Parcel) : this() {
+        len = parcel.readLong()
+        cap = parcel.readLong()
+        itemsList = parcel.readParcelableList(itemsList, TariUtxo::class.java.classLoader)
     }
 
-    fun getIncoming(): MicroTari {
-        val error = FFIError()
-        val bytes = jniGetIncoming(error)
-        throwIf(error)
-        return MicroTari(BigInteger(1, bytes))
+    override fun writeToParcel(parcel: Parcel, flags: Int) {
+        parcel.writeLong(len)
+        parcel.writeLong(cap)
+        parcel.writeParcelableList(itemsList, flags)
     }
 
-    fun getOutgoing(): MicroTari {
-        val error = FFIError()
-        val bytes = jniGetOutgoing(error)
-        throwIf(error)
-        return MicroTari(BigInteger(1, bytes))
+    override fun describeContents(): Int {
+        return 0
     }
 
-    fun getTimeLocked(): MicroTari {
-        val error = FFIError()
-        val bytes = jniGetTimeLocked(error)
-        throwIf(error)
-        return MicroTari(BigInteger(1, bytes))
-    }
+    companion object CREATOR : Parcelable.Creator<TariOutputs> {
+        override fun createFromParcel(parcel: Parcel): TariOutputs {
+            return TariOutputs(parcel)
+        }
 
-    override fun destroy() {
-        jniDestroy()
+        override fun newArray(size: Int): Array<TariOutputs?> {
+            return arrayOfNulls(size)
+        }
     }
-
 }

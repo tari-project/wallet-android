@@ -80,6 +80,8 @@ add_library(
         jniOutputFeatures.cpp
         jniTariFeePerGramStats.cpp
         jniTariFeePerGramStat.cpp
+        jniTariOutputs.cpp
+        jniTariUtxo.cpp
 )
 
 find_library(

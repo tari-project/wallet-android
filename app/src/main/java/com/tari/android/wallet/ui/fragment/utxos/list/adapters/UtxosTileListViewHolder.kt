@@ -18,9 +18,10 @@ class UtxosTileListViewHolder(view: ItemUtxosTileBinding) : CommonViewHolder<Utx
     override fun bind(item: UtxosViewHolderItem) {
         super.bind(item)
 
-        val wholeBalance = WalletUtil.balanceFormatter.format(item.microTariAmount.tariValue)
-        val amount = wholeBalance.dropLast(3)
-        val decimal = wholeBalance.takeLast(3)
+        val wholeBalance = WalletUtil.amountFormatter.format(item.source.value.tariValue)
+        val indexOfSeparator = wholeBalance.indexOfAny(charArrayOf(',', '.'))
+        val amount = wholeBalance.take(indexOfSeparator)
+        val decimal = wholeBalance.drop(indexOfSeparator)
 
         ui.amount.text = amount
         ui.amountDecimal.text = decimal

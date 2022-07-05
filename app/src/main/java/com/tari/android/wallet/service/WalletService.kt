@@ -695,6 +695,9 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
 
         override fun getBalanceInfo(error: WalletError): BalanceInfo? = executeWithMapping(error) { wallet.getBalance() }
 
+        override fun getUtxos(page: Int, pageSize: Int, sorting: Int, error: WalletError): TariOutputs? =
+            executeWithMapping(error) { wallet.getUtxos(page, pageSize, sorting) }
+
         override fun estimateTxFee(amount: MicroTari, error: WalletError, feePerGram: MicroTari?): MicroTari? = executeWithMapping(error) {
             val defaultKernelCount = BigInteger("1")
             val defaultOutputCount = BigInteger("2")
