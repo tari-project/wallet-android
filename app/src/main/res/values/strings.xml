@@ -612,6 +612,9 @@
     <string name="utxos_status_mined">Mined</string>
     <string name="utxos_status_confirmed">Confirmed</string>
     <string name="utxos_ordering_title">Sort by</string>
+    <string name="utxos_empty_title">Your wallet is empty</string>
+    <string name="utxos_empty_description">Once you have some funds, you’ll be able to view your coins here.</string>
+    <string name="utxos_in_progress">Just a sec…</string>
     <string name="utxos_ordering_option_size_desc">Size, Descending</string>
     <string name="utxos_ordering_option_size_asc">Size, Ascending</string>
     <string name="utxos_ordering_option_date_desc">Date, Descending</string>

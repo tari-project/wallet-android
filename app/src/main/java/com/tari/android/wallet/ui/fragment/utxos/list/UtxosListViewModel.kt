@@ -21,12 +21,15 @@ import com.tari.android.wallet.ui.fragment.utxos.list.adapters.UtxosViewHolderIt
 import com.tari.android.wallet.ui.fragment.utxos.list.adapters.UtxosViewHolderItem.Companion.maxTileHeight
 import com.tari.android.wallet.ui.fragment.utxos.list.adapters.UtxosViewHolderItem.Companion.minTileHeight
 import com.tari.android.wallet.ui.fragment.utxos.list.controllers.Ordering
+import com.tari.android.wallet.ui.fragment.utxos.list.controllers.ScreenState
 import com.tari.android.wallet.ui.fragment.utxos.list.controllers.listType.ListType
 import com.tari.android.wallet.ui.fragment.utxos.list.module.ListItemModule
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class UtxosListViewModel : CommonViewModel() {
+
+    val screenState: MutableLiveData<ScreenState> = MutableLiveData(ScreenState.Loading)
 
     val listType: MutableLiveData<ListType> = MutableLiveData()
 
@@ -63,7 +66,7 @@ class UtxosListViewModel : CommonViewModel() {
         }
     }
 
-    fun setSelectionStateTrue() : Boolean {
+    fun setSelectionStateTrue(): Boolean {
         if (!selectionState.value!!) {
             setSelectionState(true)
         }
@@ -112,6 +115,8 @@ class UtxosListViewModel : CommonViewModel() {
             Pair(Ordering.DateDesc, loadUtxosFromFFI(Ordering.DateDesc)),
             Pair(Ordering.DateAnc, loadUtxosFromFFI(Ordering.DateAnc)),
         )
+        val state = if (map[Ordering.ValueAnc]!!.isEmpty()) ScreenState.Empty else ScreenState.Data
+        screenState.postValue(state)
         sourceList.postValue(map)
     }
 

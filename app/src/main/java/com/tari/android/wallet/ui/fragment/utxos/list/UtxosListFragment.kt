@@ -18,6 +18,7 @@ import com.tari.android.wallet.ui.extension.visible
 import com.tari.android.wallet.ui.fragment.utxos.list.adapters.UtxosListAdapter
 import com.tari.android.wallet.ui.fragment.utxos.list.adapters.UtxosListTileAdapter
 import com.tari.android.wallet.ui.fragment.utxos.list.controllers.CheckedController
+import com.tari.android.wallet.ui.fragment.utxos.list.controllers.ScreenState
 import com.tari.android.wallet.ui.fragment.utxos.list.controllers.listType.ListType
 import com.tari.android.wallet.ui.fragment.utxos.list.controllers.listType.ListTypeSwitchController
 
@@ -51,6 +52,7 @@ class UtxosListFragment : CommonFragment<FragmentUtxosListBinding, UtxosListView
             ui.splitJoinContainer.setVisible(it)
             selectionController.setChecked(it)
         }
+        observe(screenState) { updateState(it) }
         observe(ordering) { ui.orderingState.setText(it.textId) }
         observe(textList) { textListAdapter.update(it) }
         observe(leftTileList) { tileLeftAdapter.update(it) }
@@ -102,6 +104,26 @@ class UtxosListFragment : CommonFragment<FragmentUtxosListBinding, UtxosListView
                 ui.tileContainer.visible()
                 ui.utxosTileLeftList.visible()
                 ui.utxosTileRightList.visible()
+            }
+        }
+    }
+
+    private fun updateState(screenState: ScreenState) {
+        when(screenState) {
+            ScreenState.Loading -> {
+                ui.emptyContainer.setVisible(false)
+                ui.loadingContainer.setVisible(true)
+                ui.dataContainer.setVisible(false)
+            }
+            ScreenState.Empty -> {
+                ui.emptyContainer.setVisible(true)
+                ui.loadingContainer.setVisible(false)
+                ui.dataContainer.setVisible(false)
+            }
+            ScreenState.Data -> {
+                ui.emptyContainer.setVisible(false)
+                ui.loadingContainer.setVisible(false)
+                ui.dataContainer.setVisible(true)
             }
         }
     }

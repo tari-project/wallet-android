@@ -11,13 +11,13 @@ apply plugin: 'io.sentry.android.gradle'
 
 android {
     namespace "com.tari.android.wallet"
-    compileSdkVersion 33
+    compileSdkVersion 32
     buildToolsVersion "30.0.3"
 
     defaultConfig {
         applicationId "com.tari.android.wallet"
         minSdkVersion 24
-        targetSdkVersion 33
+        targetSdkVersion 32
         versionCode buildNumber
         versionName versionNumber + "-libwallet-" + libwalletVersion
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
