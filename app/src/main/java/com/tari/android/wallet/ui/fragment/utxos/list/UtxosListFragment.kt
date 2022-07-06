@@ -18,6 +18,7 @@ import com.tari.android.wallet.ui.extension.visible
 import com.tari.android.wallet.ui.fragment.utxos.list.adapters.UtxosListAdapter
 import com.tari.android.wallet.ui.fragment.utxos.list.adapters.UtxosListTileAdapter
 import com.tari.android.wallet.ui.fragment.utxos.list.controllers.CheckedController
+import com.tari.android.wallet.ui.fragment.utxos.list.controllers.JoinSplitButtonsState
 import com.tari.android.wallet.ui.fragment.utxos.list.controllers.ScreenState
 import com.tari.android.wallet.ui.fragment.utxos.list.controllers.listType.ListType
 import com.tari.android.wallet.ui.fragment.utxos.list.controllers.listType.ListTypeSwitchController
@@ -48,11 +49,9 @@ class UtxosListFragment : CommonFragment<FragmentUtxosListBinding, UtxosListView
     private fun observeUI() = with(viewModel) {
         observeOnLoad(sortingMediator)
         observe(listType) { updateListType(it) }
-        observe(selectionState) {
-            ui.splitJoinContainer.setVisible(it)
-            selectionController.setChecked(it)
-        }
+        observe(selectionState) { selectionController.setChecked(it) }
         observe(screenState) { updateState(it) }
+        observe(joinSplitButtonsState) { updateJoinSplitButtonsState(it) }
         observe(ordering) { ui.orderingState.setText(it.textId) }
         observe(textList) { textListAdapter.update(it) }
         observe(leftTileList) { tileLeftAdapter.update(it) }
@@ -62,6 +61,8 @@ class UtxosListFragment : CommonFragment<FragmentUtxosListBinding, UtxosListView
     private fun setupCTA() {
         ui.backCtaView.setOnClickListener { requireActivity().onBackPressed() }
         ui.orderingState.setOnClickListener { viewModel.showOrderingSelectionDialog() }
+        ui.joinButton.setOnClickListener { viewModel.join() }
+        ui.splitButton.setOnClickListener { viewModel.split() }
     }
 
     private fun setupUI() {
@@ -108,8 +109,24 @@ class UtxosListFragment : CommonFragment<FragmentUtxosListBinding, UtxosListView
         }
     }
 
+    private fun updateJoinSplitButtonsState(state: JoinSplitButtonsState) {
+        when (state) {
+            JoinSplitButtonsState.None -> ui.splitJoinContainer.setVisible(false)
+            JoinSplitButtonsState.Break -> {
+                ui.splitJoinContainer.setVisible(true)
+                ui.buttonsDivider.setVisible(false)
+                ui.joinButton.setVisible(false)
+            }
+            JoinSplitButtonsState.JoinAndBreak -> {
+                ui.splitJoinContainer.setVisible(true)
+                ui.buttonsDivider.setVisible(true)
+                ui.joinButton.setVisible(true)
+            }
+        }
+    }
+
     private fun updateState(screenState: ScreenState) {
-        when(screenState) {
+        when (screenState) {
             ScreenState.Loading -> {
                 ui.emptyContainer.setVisible(false)
                 ui.loadingContainer.setVisible(true)

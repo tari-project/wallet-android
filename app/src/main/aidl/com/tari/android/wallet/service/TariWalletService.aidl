@@ -135,4 +135,7 @@ interface TariWalletService {
     */
     List<String> getSeedWords(out WalletError error);
 
+    void joinUtxos(out WalletError error);
+
+    void splitUtxos(out WalletError error);
 }

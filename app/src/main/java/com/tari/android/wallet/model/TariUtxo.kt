@@ -10,23 +10,27 @@ class TariUtxo() : Parcelable {
     var commitment: String = ""
     var value: MicroTari = MicroTari(BigInteger.ZERO)
     var minedHeight: Long = -1
+    var status: UtxoStatus = UtxoStatus.Spent
 
     constructor(parcel: Parcel) : this() {
         commitment = parcel.readString()!!
         value = parcel.readParcelable(MicroTari::class.java.classLoader)!!
         minedHeight = parcel.readLong()
+        status = UtxoStatus.fromValue(parcel.readInt())
     }
 
     constructor(ffiUtxo: FFITariUtxo) : this() {
         commitment = ffiUtxo.commitment
         value = MicroTari(BigInteger.valueOf(ffiUtxo.value))
         minedHeight = ffiUtxo.minedHeight
+        status = UtxoStatus.fromValue(ffiUtxo.status.toInt())
     }
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {
         parcel.writeString(commitment)
         parcel.writeParcelable(value, flags)
         parcel.writeLong(minedHeight)
+        parcel.writeInt(status.value)
     }
 
     override fun describeContents(): Int {
@@ -43,5 +47,22 @@ class TariUtxo() : Parcelable {
         }
     }
 
+    enum class UtxoStatus(val value: Int) {
+        Unspent(0),
+        Spent(1),
+        EncumberedToBeReceived(2),
+        EncumberedToBeSpent(3),
+        Invalid(4),
+        CancelledInbound(5),
+        UnspentMinedUnconfirmed(6),
+        ShortTermEncumberedToBeReceived(7),
+        ShortTermEncumberedToBeSpent(8),
+        SpentMinedUnconfirmed(9),
+        AbandonedCoinbase(10),
+        NotStored(11);
 
+        companion object {
+            fun fromValue(value: Int): UtxoStatus = values().first { it.value == value }
+        }
+    }
 }

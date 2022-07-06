@@ -99,6 +99,8 @@
     <string name="common_error_title">Error</string>
     <string name="common_unknown_error">Unknown error</string>
     <string name="common_delete">Delete</string>
+    <string name="common_lets_do_it">Yes! Let\'s do it!</string>
+    <string name="common_are_you_sure">Are you sure?</string>
 
     <!-- emoji id copied view -->
     <string name="emoji_id_copied">COPIED</string>
@@ -196,7 +198,6 @@
     <string name="home_custom_base_node_title">Add custom base node</string>
     <string name="home_custom_base_node_description">The QR code is a deep link request to assign your wallet to use this base node.</string>
     <string name="home_custom_base_node_full_description"><![CDATA[<strong>Name: </strong>%s<br><br><strong>Peer:</strong><br>%s]]></string>
-    <string name="home_custom_base_node_yes_button">Yes! Let\'s do it!</string>
     <string name="home_custom_base_node_no_button">Not this time</string>
     <!--home tari bot dialog-->
     <string name="home_tari_bot_you_got_tari_dlg_title">You just got some tXTR!</string>
@@ -334,7 +335,6 @@
     <string name="tx_detail_cancel_tx">Cancel transaction</string>
     <string name="tx_detail_cancellation_error_title">Oops…</string>
     <string name="tx_detail_cancellation_error_description">Error occurred during TX cancellation.</string>
-    <string name="tx_details_cancel_dialog_title">Are you sure?</string>
     <string name="tx_details_cancel_dialog_description">You will have to start a new transaction if you change your mind.</string>
     <string name="tx_details_cancel_dialog_cancel">Yes, cancel</string>
     <string name="tx_details_cancel_dialog_not_cancel">Not now</string>
@@ -615,6 +615,14 @@
     <string name="utxos_empty_title">Your wallet is empty</string>
     <string name="utxos_empty_description">Once you have some funds, you’ll be able to view your coins here.</string>
     <string name="utxos_in_progress">Just a sec…</string>
+    <string name="utxos_combine_and_break_title">Combine &amp; Break Coins</string>
+    <string name="utxos_combine_and_break_description">Into how many parts would you like to break these coins?</string>
+    <string name="utxos_combine_and_break_button">Combine &amp; Break</string>
+    <string name="utxos_success_title">Success!</string>
+    <string name="utxos_success_description">Your coin will be broken soon.\nKeep an eye on the transactions screen to\nsee when it’s been mined.</string>
+    <string name="utxos_break_title">Break</string>
+    <string name="utxos_join_description">You are about to join these coins.</string>
+    <string name="utxos_break_description">You are about to break this coin.</string>
     <string name="utxos_ordering_option_size_desc">Size, Descending</string>
     <string name="utxos_ordering_option_size_asc">Size, Ascending</string>
     <string name="utxos_ordering_option_date_desc">Date, Descending</string>

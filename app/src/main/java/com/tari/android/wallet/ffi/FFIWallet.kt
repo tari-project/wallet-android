@@ -152,24 +152,6 @@ internal class FFIWallet(
         libError: FFIError
     ): ByteArray
 
-//    private external fun jniCoinSplit(
-//        amount: String,
-//        splitCount: String,
-//        fee: String,
-//        message: String,
-//        lockHeight: String,
-//        libError: FFIError
-//    ): ByteArray
-
-    //
-//uint64_t wallet_coin_split(struct TariWallet *wallet,
-//                           struct TariVector *commitments,
-//                           uint64_t amount_per_split,
-//                           uintptr_t number_of_splits,
-//                           uint64_t fee_per_gram,
-//                           int32_t *error_ptr);
-
-
     private external fun jniSignMessage(message: String, libError: FFIError): String
 
     private external fun jniVerifyMessageSignature(publicKeyPtr: FFIPublicKey, message: String, signature: String, libError: FFIError): Boolean
@@ -593,21 +575,13 @@ internal class FFIWallet(
         return BigInteger(1, bytes)
     }
 
-//    fun coinSplit(amount: BigInteger, count: BigInteger, height: BigInteger, fee: BigInteger, message: String): BigInteger {
-//        val minimumLibFee = 100L
-//        if (fee < BigInteger.valueOf(minimumLibFee)) {
-//            throw FFIException(message = "Fee is less than the minimum of $minimumLibFee taris.")
-//        }
-//        if (amount < BigInteger.valueOf(0L)) {
-//            throw FFIException(message = "Amount is less than 0.")
-//        }
-//
-//        val error = FFIError()
-//        val bytes = jniCoinSplit(amount.toString(), count.toString(), fee.toString(), message, height.toString(), error)
-//        Logger.d("Coin split code (0 means ok): %d", error.code)
-//        throwIf(error)
-//        return BigInteger(1, bytes)
-//    }
+    fun joinUtxos() {
+
+    }
+
+    fun splitUtxos() {
+
+    }
 
     fun signMessage(message: String): String {
         val error = FFIError()

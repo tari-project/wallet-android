@@ -1011,7 +1011,14 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
                 .also { seedWordsFFI.destroy() }
         }
 
-        // endregion
+        override fun joinUtxos(walletError: WalletError) = executeWithMapping(walletError) {
+            wallet.joinUtxos()
+            //todo
+        } ?: Unit
+
+        override fun splitUtxos(walletError: WalletError) = executeWithMapping(walletError) {
+            //todo
+        } ?: Unit
     }
 }
 
