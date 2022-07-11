@@ -56,6 +56,10 @@ Java_com_tari_android_wallet_ffi_FFITariUtxo_jniLoadData(
     auto minedHeight = (long) (outputs->mined_height);
     jEnv->SetLongField(jThis, minedHeightField, minedHeight);
 
+    jfieldID minedTimestampField = jEnv->GetFieldID(dataClass, "minedTimestamp", "J");
+    auto minedTimestamp = (long) (outputs->mined_timestamp);
+    jEnv->SetLongField(jThis, minedTimestampField, minedTimestamp);
+
     jfieldID statusField = jEnv->GetFieldID(dataClass, "status", "B");
     auto statusValue = (jbyte) (outputs->status);
     jEnv->SetByteField(jThis, statusField, statusValue);

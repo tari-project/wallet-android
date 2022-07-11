@@ -695,9 +695,6 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
 
         override fun getBalanceInfo(error: WalletError): BalanceInfo? = executeWithMapping(error) { wallet.getBalance() }
 
-        override fun getUtxos(page: Int, pageSize: Int, sorting: Int, error: WalletError): TariOutputs? =
-            executeWithMapping(error) { wallet.getUtxos(page, pageSize, sorting) }
-
         override fun estimateTxFee(amount: MicroTari, error: WalletError, feePerGram: MicroTari?): MicroTari? = executeWithMapping(error) {
             val defaultKernelCount = BigInteger("1")
             val defaultOutputCount = BigInteger("2")
@@ -1011,12 +1008,25 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
                 .also { seedWordsFFI.destroy() }
         }
 
-        override fun joinUtxos(walletError: WalletError) = executeWithMapping(walletError) {
-            wallet.joinUtxos()
+        override fun getUtxos(page: Int, pageSize: Int, sorting: Int, error: WalletError): TariVector? =
+            executeWithMapping(error) { wallet.getUtxos(page, pageSize, sorting) }
+
+        override fun getAllUtxos(error: WalletError): TariVector? =
+            executeWithMapping(error) { wallet.getAllUtxos() }
+
+        override fun joinUtxos(utxos: List<TariUtxo>, walletError: WalletError) = executeWithMapping(walletError) {
+            val commitments = FFITariVector(0L)
+            val ffiError = FFIError()
+            wallet.joinUtxos(commitments, Constants.Wallet.defaultFeePerGram.value, ffiError)
+            walletError.code = ffiError.code
             //todo
         } ?: Unit
 
-        override fun splitUtxos(walletError: WalletError) = executeWithMapping(walletError) {
+        override fun splitUtxos(utxos: List<TariUtxo>, splitCount: Int, walletError: WalletError) = executeWithMapping(walletError) {
+            val commitments = FFITariVector(0L)
+            val ffiError = FFIError()
+            wallet.splitUtxos(commitments, splitCount, Constants.Wallet.defaultFeePerGram.value, ffiError)
+            walletError.code = ffiError.code
             //todo
         } ?: Unit
     }

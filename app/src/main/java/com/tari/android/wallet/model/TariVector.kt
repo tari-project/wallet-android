@@ -30,42 +30,47 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+package com.tari.android.wallet.model
 
-#include <jni.h>
-#include <android/log.h>
-#include <wallet.h>
-#include <string>
-#include <cmath>
-#include <android/log.h>
-#include "jniCommon.cpp"
+import android.os.Parcel
+import android.os.Parcelable
+import com.tari.android.wallet.ffi.FFITariVector
 
-extern "C"
-JNIEXPORT void JNICALL
-Java_com_tari_android_wallet_ffi_FFITariOutputs_jniLoadData(
-        JNIEnv *jEnv,
-        jobject jThis) {
-    jclass dataClass = jEnv->GetObjectClass(jThis);
-    jlong lTariOutputs = GetPointerField(jEnv, jThis);
-    auto outputs = reinterpret_cast<TariOutputs*>(lTariOutputs);
+class TariVector() : Parcelable {
 
-    jfieldID sizeField = jEnv->GetFieldID(dataClass, "len", "J");
-    auto lenValue = (long)(outputs->len);
-    jEnv->SetLongField(jThis, sizeField, lenValue);
+    var len: Long = -1
+    var cap: Long = -1
+    var itemsList = mutableListOf<TariUtxo>()
 
-    jfieldID capField = jEnv->GetFieldID(dataClass, "cap", "J");
-    auto capValue = (long)(outputs->cap);
-    jEnv->SetLongField(jThis, capField, capValue);
-}
+    constructor(ffiOutputs: FFITariVector): this() {
+        len = ffiOutputs.len
+        cap = ffiOutputs.cap
+        itemsList = ffiOutputs.itemsList.map { TariUtxo(it) }.toMutableList()
+    }
 
-extern "C"
-JNIEXPORT jlong JNICALL
-Java_com_tari_android_wallet_ffi_FFITariOutputs_jniGetItemAt(
-        JNIEnv *jEnv,
-        jobject jThis,
-        jint index) {
-    jlong lTariOutputs = GetPointerField(jEnv, jThis);
-    auto outputs = reinterpret_cast<TariOutputs*>(lTariOutputs);
+    constructor(parcel: Parcel) : this() {
+        len = parcel.readLong()
+        cap = parcel.readLong()
+        itemsList = parcel.readParcelableList(itemsList, TariUtxo::class.java.classLoader)
+    }
 
-    auto pointerToItem = reinterpret_cast<jlong>(outputs->ptr);
-    return pointerToItem;
+    override fun writeToParcel(parcel: Parcel, flags: Int) {
+        parcel.writeLong(len)
+        parcel.writeLong(cap)
+        parcel.writeParcelableList(itemsList, flags)
+    }
+
+    override fun describeContents(): Int {
+        return 0
+    }
+
+    companion object CREATOR : Parcelable.Creator<TariVector> {
+        override fun createFromParcel(parcel: Parcel): TariVector {
+            return TariVector(parcel)
+        }
+
+        override fun newArray(size: Int): Array<TariVector?> {
+            return arrayOfNulls(size)
+        }
+    }
 }

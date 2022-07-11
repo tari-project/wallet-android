@@ -10,12 +10,14 @@ class TariUtxo() : Parcelable {
     var commitment: String = ""
     var value: MicroTari = MicroTari(BigInteger.ZERO)
     var minedHeight: Long = -1
+    var timestamp: Long = -1
     var status: UtxoStatus = UtxoStatus.Spent
 
     constructor(parcel: Parcel) : this() {
         commitment = parcel.readString()!!
         value = parcel.readParcelable(MicroTari::class.java.classLoader)!!
         minedHeight = parcel.readLong()
+        timestamp = parcel.readLong()
         status = UtxoStatus.fromValue(parcel.readInt())
     }
 
@@ -23,6 +25,7 @@ class TariUtxo() : Parcelable {
         commitment = ffiUtxo.commitment
         value = MicroTari(BigInteger.valueOf(ffiUtxo.value))
         minedHeight = ffiUtxo.minedHeight
+        timestamp = ffiUtxo.minedTimestamp
         status = UtxoStatus.fromValue(ffiUtxo.status.toInt())
     }
 
@@ -30,6 +33,7 @@ class TariUtxo() : Parcelable {
         parcel.writeString(commitment)
         parcel.writeParcelable(value, flags)
         parcel.writeLong(minedHeight)
+        parcel.writeLong(timestamp)
         parcel.writeInt(status.value)
     }
 

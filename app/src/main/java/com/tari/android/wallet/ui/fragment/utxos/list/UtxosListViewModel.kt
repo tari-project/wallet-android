@@ -2,12 +2,9 @@ package com.tari.android.wallet.ui.fragment.utxos.list
 
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.viewModelScope
 import com.tari.android.wallet.R
 import com.tari.android.wallet.extension.addTo
 import com.tari.android.wallet.extension.getWithError
-import com.tari.android.wallet.model.TariOutputs
-import com.tari.android.wallet.model.TariUtxo
 import com.tari.android.wallet.service.TariWalletService
 import com.tari.android.wallet.service.connection.TariWalletServiceConnection
 import com.tari.android.wallet.ui.common.CommonViewModel
@@ -26,9 +23,8 @@ import com.tari.android.wallet.ui.fragment.utxos.list.controllers.JoinSplitButto
 import com.tari.android.wallet.ui.fragment.utxos.list.controllers.Ordering
 import com.tari.android.wallet.ui.fragment.utxos.list.controllers.ScreenState
 import com.tari.android.wallet.ui.fragment.utxos.list.controllers.listType.ListType
+import com.tari.android.wallet.ui.fragment.utxos.list.module.DetailItemModule
 import com.tari.android.wallet.ui.fragment.utxos.list.module.ListItemModule
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 
 class UtxosListViewModel : CommonViewModel() {
 
@@ -43,7 +39,7 @@ class UtxosListViewModel : CommonViewModel() {
 
     val selectionState = MutableLiveData<Boolean>()
 
-    val sourceList: MutableLiveData<Map<Ordering, MutableList<UtxosViewHolderItem>>> = MutableLiveData()
+    val sourceList: MutableLiveData<List<UtxosViewHolderItem>> = MutableLiveData()
     val textList: MutableLiveData<MutableList<UtxosViewHolderItem>> = MutableLiveData(mutableListOf())
     val leftTileList: MutableLiveData<MutableList<UtxosViewHolderItem>> = MutableLiveData(mutableListOf())
     val rightTileList: MutableLiveData<MutableList<UtxosViewHolderItem>> = MutableLiveData(mutableListOf())
@@ -69,7 +65,9 @@ class UtxosListViewModel : CommonViewModel() {
             item.checked.value = !item.checked.value
             recountCheckedStates()
         } else {
-            showDetailedDialog()
+            if (selectionState.value != true) {
+                showDetailedDialog(item)
+            }
         }
     }
 
@@ -84,9 +82,10 @@ class UtxosListViewModel : CommonViewModel() {
 
     fun setSelectionState(isSelecting: Boolean) {
         selectionState.postValue(isSelecting)
-        textList.value?.forEach { it.selectionState.value = isSelecting }
+        val selectable = textList.value?.filter { it.isSelectable }.orEmpty()
+        selectable.forEach { it.selectionState.value = isSelecting }
         if (!isSelecting) {
-            textList.value?.forEach { it.checked.value = false }
+            selectable.forEach { it.checked.value = false }
         }
         recountCheckedStates()
     }
@@ -119,7 +118,8 @@ class UtxosListViewModel : CommonViewModel() {
     fun join() {
         showConfirmDialog(R.string.utxos_join_description) {
             walletService.getWithError { error, wallet ->
-                wallet.joinUtxos(error)
+                val selectedUtxos = textList.value.orEmpty().filter { it.checked.value }.map { it.source }.toList()
+                wallet.joinUtxos(selectedUtxos, error)
                 _dissmissDialog.postValue(Unit)
                 //todo success?
                 showSuccessDialog()
@@ -138,7 +138,8 @@ class UtxosListViewModel : CommonViewModel() {
                     _dissmissDialog.postValue(Unit)
                     showConfirmDialog(R.string.utxos_break_description) {
                         walletService.getWithError { error, wallet ->
-                            wallet.splitUtxos(error)
+                            val selectedUtxos = textList.value.orEmpty().filter { it.checked.value }.map { it.source }.toList()
+                            wallet.splitUtxos(selectedUtxos, 10, error)
                             _dissmissDialog.postValue(Unit)
                             //todo success?
                             showSuccessDialog()
@@ -152,42 +153,32 @@ class UtxosListViewModel : CommonViewModel() {
         _modularDialog.postValue(modularDialogArgs)
     }
 
-    private fun loadUtxosFromFFI() = viewModelScope.launch(Dispatchers.IO) {
-        val map = mapOf(
-            Pair(Ordering.ValueDesc, loadUtxosFromFFI(Ordering.ValueDesc)),
-            Pair(Ordering.ValueAnc, loadUtxosFromFFI(Ordering.ValueAnc)),
-            Pair(Ordering.DateDesc, loadUtxosFromFFI(Ordering.DateDesc)),
-            Pair(Ordering.DateAnc, loadUtxosFromFFI(Ordering.DateAnc)),
-        )
-        val state = if (map[Ordering.ValueAnc]!!.isEmpty()) ScreenState.Empty else ScreenState.Data
+    private fun loadUtxosFromFFI() {
+        val allItems = walletService.getWithError { error, wallet ->
+            wallet.getAllUtxos(error)
+        }.itemsList.map { UtxosViewHolderItem(it) }
+        val state = if (allItems.isEmpty()) ScreenState.Empty else ScreenState.Data
         screenState.postValue(state)
-        sourceList.postValue(map)
-    }
-
-    private fun loadUtxosFromFFI(sorting: Ordering): MutableList<UtxosViewHolderItem> {
-        val items = mutableListOf<TariUtxo>()
-        var newItems: TariOutputs
-        var pageNumber = 0
-        do {
-            newItems = walletService.getWithError { error, wallet -> wallet.getUtxos(pageNumber, pageSize, sorting.value, error) }
-            items.addAll(newItems.itemsList)
-            pageNumber++
-        } while (newItems.len == pageSize.toLong())
-        return items.map { UtxosViewHolderItem.fromUtxo(it, resourceManager) }.toMutableList()
+        sourceList.postValue(allItems)
     }
 
     private fun generateFromScratch() {
         val sourceList = this.sourceList.value ?: return
         val ordering = this.ordering.value ?: return
 
-        val orderedList = sourceList[ordering]!!.toMutableList()
+        val orderedList = when (ordering) {
+            Ordering.ValueAnc -> sourceList.sortedBy { it.source.value }
+            Ordering.ValueDesc -> sourceList.sortedByDescending { it.source.value }
+            Ordering.DateAnc -> sourceList.sortedBy { it.source.timestamp }
+            Ordering.DateDesc -> sourceList.sortedByDescending { it.source.timestamp }
+        }.toMutableList()
 
         calculateHeight(orderedList)
         textList.postValue(orderedList)
         orderTileLists(orderedList)
     }
 
-    private fun calculateHeight(list: MutableList<UtxosViewHolderItem>) {
+    private fun calculateHeight(list: List<UtxosViewHolderItem>) {
         if (list.isEmpty()) return
         val min = list.minOf { it.source.value.tariValue }
         val max = list.maxOf { it.source.value.tariValue }
@@ -201,7 +192,7 @@ class UtxosListViewModel : CommonViewModel() {
 
         list.forEach {
             val calculatedHeight = ((it.source.value.tariValue - min).toDouble() * scale + minTileHeight).toInt()
-            it.heigth = calculatedHeight
+            it.height = calculatedHeight
         }
     }
 
@@ -214,10 +205,10 @@ class UtxosListViewModel : CommonViewModel() {
         for (item in list) {
             if (leftHeight <= rightHeight) {
                 leftList.add(item)
-                leftHeight += item.heigth + marginSize
+                leftHeight += item.height + marginSize
             } else {
                 rightList.add(item)
-                rightHeight += item.heigth + marginSize
+                rightHeight += item.height + marginSize
             }
         }
         leftTileList.postValue(leftList)
@@ -249,16 +240,33 @@ class UtxosListViewModel : CommonViewModel() {
         _modularDialog.postValue(modularArgs)
     }
 
-    private fun showDetailedDialog() {
-        val modularArgs = ModularDialogArgs(
-            DialogArgs(), listOf(
+    private fun showDetailedDialog(utxoItem: UtxosViewHolderItem) {
+        val modules = mutableListOf<IDialogModule>()
+        modules.add(
+            DetailItemModule(
+                resourceManager.getString(R.string.utxos_detailed_status),
+                resourceManager.getString(utxoItem.status.text),
+                utxoItem.status.textIcon
+            )
+        )
+        modules.add(DetailItemModule(resourceManager.getString(R.string.utxos_detailed_commitment), utxoItem.source.commitment))
+        if (utxoItem.isShowMinedHeight) {
+            modules.add(DetailItemModule(resourceManager.getString(R.string.utxos_detailed_block_height), utxoItem.source.minedHeight.toString()))
+        }
+        if (utxoItem.isShowDate) {
+            val formattedDateTime = utxoItem.formatedTime + " " + utxoItem.formatedTime
+            modules.add(DetailItemModule(resourceManager.getString(R.string.utxos_detailed_date), formattedDateTime))
+        }
+        if (utxoItem.isSelectable) {
+            modules.add(
                 ButtonModule(resourceManager.getString(R.string.utxos_break_title), ButtonStyle.Normal) {
                     _dissmissDialog.postValue(Unit)
                     split()
                 },
-                ButtonModule(resourceManager.getString(R.string.common_cancel), ButtonStyle.Close)
             )
-        )
+        }
+        modules.add(ButtonModule(resourceManager.getString(R.string.common_cancel), ButtonStyle.Close))
+        val modularArgs = ModularDialogArgs(DialogArgs(), modules)
         _modularDialog.postValue(modularArgs)
     }
 
@@ -274,9 +282,5 @@ class UtxosListViewModel : CommonViewModel() {
             )
         )
         _modularDialog.postValue(modularArgs)
-    }
-
-    companion object {
-        const val pageSize = 1
     }
 }

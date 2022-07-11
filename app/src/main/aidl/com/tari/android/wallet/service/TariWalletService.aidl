@@ -53,8 +53,6 @@ interface TariWalletService {
 
     BalanceInfo getBalanceInfo(out WalletError error);
 
-    TariOutputs getUtxos(int page, int pageSize, int sorting, out WalletError error);
-
     MicroTari estimateTxFee(in MicroTari amount, out WalletError error, in MicroTari feePerGram);
 
     List<Contact> getContacts(out WalletError error);
@@ -135,7 +133,11 @@ interface TariWalletService {
     */
     List<String> getSeedWords(out WalletError error);
 
-    void joinUtxos(out WalletError error);
+    TariVector getUtxos(int page, int pageSize, int sorting, out WalletError error);
 
-    void splitUtxos(out WalletError error);
+    TariVector getAllUtxos(out WalletError error);
+
+    void joinUtxos(in List<TariUtxo> utxos, out WalletError error);
+
+    void splitUtxos(in List<TariUtxo> utxos, int splitCount, out WalletError error);
 }

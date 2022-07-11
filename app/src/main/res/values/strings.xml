@@ -627,5 +627,9 @@
     <string name="utxos_ordering_option_size_asc">Size, Ascending</string>
     <string name="utxos_ordering_option_date_desc">Date, Descending</string>
     <string name="utxos_ordering_option_date_asc">Date, Ascending</string>
+    <string name="utxos_detailed_status">Status:</string>
+    <string name="utxos_detailed_commitment">Commitment:</string>
+    <string name="utxos_detailed_block_height">Block Height:</string>
+    <string name="utxos_detailed_date">Date:</string>
 
 </resources>

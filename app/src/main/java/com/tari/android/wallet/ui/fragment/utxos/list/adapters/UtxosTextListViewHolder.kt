@@ -13,8 +13,9 @@ class UtxosTextListViewHolder(view: ItemUtxosTextBinding) : CommonViewHolder<Utx
         super.bind(item)
 
         ui.amount.text = item.amount + " XTR"
-        ui.additionalData.text = item.additionalTextData
-        ui.hash.text = item.hash
+        val dateStr = if (item.isShowDate) "| ${item.formattedDate} | ${item.formatedTime}" else ""
+        ui.additionalData.text = itemView.context.getString(item.status.text) + dateStr
+        ui.hash.text = item.source.commitment
 
         val drawable = ContextCompat.getDrawable(itemView.context, item.status.textIcon)
         ui.additionalData.setCompoundDrawablesRelativeWithIntrinsicBounds(drawable, null, null, null)

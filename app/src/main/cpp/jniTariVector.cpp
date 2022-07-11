@@ -30,47 +30,42 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.tari.android.wallet.model
 
-import android.os.Parcel
-import android.os.Parcelable
-import com.tari.android.wallet.ffi.FFITariOutputs
+#include <jni.h>
+#include <android/log.h>
+#include <wallet.h>
+#include <string>
+#include <cmath>
+#include <android/log.h>
+#include "jniCommon.cpp"
 
-class TariOutputs() : Parcelable {
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_tari_android_wallet_ffi_FFITariVector_jniLoadData(
+        JNIEnv *jEnv,
+        jobject jThis) {
+    jclass dataClass = jEnv->GetObjectClass(jThis);
+    jlong lTariOutputs = GetPointerField(jEnv, jThis);
+    auto outputs = reinterpret_cast<TariVector*>(lTariOutputs);
 
-    var len: Long = -1
-    var cap: Long = -1
-    var itemsList = mutableListOf<TariUtxo>()
+    jfieldID sizeField = jEnv->GetFieldID(dataClass, "len", "J");
+    auto lenValue = (long)(outputs->len);
+    jEnv->SetLongField(jThis, sizeField, lenValue);
 
-    constructor(ffiOutputs: FFITariOutputs): this() {
-        len = ffiOutputs.len
-        cap = ffiOutputs.cap
-        itemsList = ffiOutputs.itemsList.map { TariUtxo(it) }.toMutableList()
-    }
+    jfieldID capField = jEnv->GetFieldID(dataClass, "cap", "J");
+    auto capValue = (long)(outputs->cap);
+    jEnv->SetLongField(jThis, capField, capValue);
+}
 
-    constructor(parcel: Parcel) : this() {
-        len = parcel.readLong()
-        cap = parcel.readLong()
-        itemsList = parcel.readParcelableList(itemsList, TariUtxo::class.java.classLoader)
-    }
-
-    override fun writeToParcel(parcel: Parcel, flags: Int) {
-        parcel.writeLong(len)
-        parcel.writeLong(cap)
-        parcel.writeParcelableList(itemsList, flags)
-    }
-
-    override fun describeContents(): Int {
-        return 0
-    }
-
-    companion object CREATOR : Parcelable.Creator<TariOutputs> {
-        override fun createFromParcel(parcel: Parcel): TariOutputs {
-            return TariOutputs(parcel)
-        }
-
-        override fun newArray(size: Int): Array<TariOutputs?> {
-            return arrayOfNulls(size)
-        }
-    }
+extern "C"
+JNIEXPORT jlong JNICALL
+Java_com_tari_android_wallet_ffi_FFITariVector_jniGetItemAt(
+        JNIEnv *jEnv,
+        jobject jThis,
+        jint index) {
+    jlong lTariOutputs = GetPointerField(jEnv, jThis);
+    auto outputs = reinterpret_cast<TariVector*>(lTariOutputs);
+    auto item = (TariUtxo*)((unsigned char*)(outputs->ptr) + sizeof(TariUtxo) * index);
+    auto pointerToItem = reinterpret_cast<jlong>(item);
+    return pointerToItem;
 }

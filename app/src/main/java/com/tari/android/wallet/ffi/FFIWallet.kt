@@ -113,8 +113,6 @@ internal class FFIWallet(
 
     private external fun jniGetBalance(libError: FFIError): FFIPointer
 
-    private external fun jniGetUtxos(page: Int, pageSize: Int, sorting: Int, dustThreshold: Long, libError: FFIError): FFIPointer
-
     private external fun jniLogMessage(message: String, libError: FFIError)
 
     private external fun jniGetPublicKey(libError: FFIError): FFIPointer
@@ -209,6 +207,14 @@ internal class FFIWallet(
 
     private external fun jniWalletGetFeePerGramStats(count: Int, libError: FFIError): FFIPointer
 
+    private external fun jniGetUtxos(page: Int, pageSize: Int, sorting: Int, dustThreshold: Long, libError: FFIError): FFIPointer
+
+    private external fun jniGetAllUtxos(libError: FFIError): FFIPointer
+
+    private external fun jniJoinUtxos(commitments: FFITariVector, feePerGram: String, libError: FFIError): FFIPointer
+
+    private external fun jniSplitUtxos(commitments: FFITariVector, splitCount: String, feePerGram: String, libError: FFIError): FFIPointer
+
     private external fun jniDestroy()
 
     // endregion
@@ -287,10 +293,18 @@ internal class FFIWallet(
         return balance
     }
 
-    fun getUtxos(page: Int, pageSize: Int, sorting: Int) : TariOutputs {
+    fun getUtxos(page: Int, pageSize: Int, sorting: Int): TariVector {
         val error = FFIError()
         val result = jniGetUtxos(page, pageSize, sorting, 0, error)
-        val outputs = TariOutputs(FFITariOutputs(result))
+        val outputs = TariVector(FFITariVector(result))
+        throwIf(error)
+        return outputs
+    }
+
+    fun getAllUtxos(): TariVector {
+        val error = FFIError()
+        val result = jniGetAllUtxos(error)
+        val outputs = TariVector(FFITariVector(result))
         throwIf(error)
         return outputs
     }
@@ -575,12 +589,14 @@ internal class FFIWallet(
         return BigInteger(1, bytes)
     }
 
-    fun joinUtxos() {
-
+    fun joinUtxos(tariVector: FFITariVector, feePerGram: BigInteger, error: FFIError) {
+        //todo that's the pointer to transaction
+        val result = jniJoinUtxos(tariVector, feePerGram.toString(), error)
     }
 
-    fun splitUtxos() {
-
+    fun splitUtxos(tariVector: FFITariVector, count: Int, feePerGram: BigInteger, error: FFIError) {
+        //todo that's the pointer to transaction
+        val result = jniSplitUtxos(tariVector, count.toString(), feePerGram.toString(), error)
     }
 
     fun signMessage(message: String): String {
@@ -741,7 +757,7 @@ internal class FFIWallet(
         return result
     }
 
-    fun getFeePerGramStats() : FFIFeePerGramStats {
+    fun getFeePerGramStats(): FFIFeePerGramStats {
         val error = FFIError()
         val result = FFIFeePerGramStats(jniWalletGetFeePerGramStats(3, error))
         throwIf(error)
