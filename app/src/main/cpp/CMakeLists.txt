@@ -82,6 +82,7 @@ add_library(
         jniTariFeePerGramStat.cpp
         jniTariVector.cpp
         jniTariUtxo.cpp
+        jniTariCoinPreview.cpp
 )
 
 find_library(

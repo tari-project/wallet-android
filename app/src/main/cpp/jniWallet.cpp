@@ -614,7 +614,7 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniGetUtxos(
     int *errorCodePointer = &errorCode;
     jlong lWallet = GetPointerField(jEnv, jThis);
     auto *pWallet = reinterpret_cast<TariWallet *>(lWallet);
-    auto pSorting = (TariUtxoSort)jSorting;
+    auto pSorting = (TariUtxoSort) jSorting;
     //todo states
     auto outputs = wallet_get_utxos(pWallet, jPage, jPageSize, pSorting, nullptr, jDustThreshold, errorCodePointer);
     auto result = reinterpret_cast<jlong>(outputs);
@@ -944,20 +944,26 @@ JNIEXPORT jlong JNICALL
 Java_com_tari_android_wallet_ffi_FFIWallet_jniJoinUtxos(
         JNIEnv *jEnv,
         jobject jThis,
-        jobject jCommitments,
+        jobjectArray jCommitments,
         jstring jFeePerGram,
         jobject error) {
     int errorCode = 0;
     int *errorCodePointer = &errorCode;
     jlong lWallet = GetPointerField(jEnv, jThis);
     auto *pWallet = reinterpret_cast<TariWallet *>(lWallet);
-    jlong lCommitment = GetPointerField(jEnv, jCommitments);
-    auto *pCommitment = reinterpret_cast<TariVector *>(lCommitment);
+
+    int size = jEnv->GetArrayLength(jCommitments);
+    auto *pTariVector = create_tari_vector(Text);
+    for (int i = 0; i < size; ++i) {
+        auto commitmentItem = (jstring) jEnv->GetObjectArrayElement(jCommitments, i);
+        const char *commitmentRef = jEnv->GetStringUTFChars(commitmentItem, JNI_FALSE);
+        tari_vector_push_string(pTariVector, commitmentRef, errorCodePointer);
+    }
 
     const char *nativeGramFee = jEnv->GetStringUTFChars(jFeePerGram, JNI_FALSE);
     char *pGramFeeEnd;
     unsigned long feePerGram = strtoull(nativeGramFee, &pGramFeeEnd, 10);
-    auto result = (jlong) wallet_coin_join(pWallet, pCommitment, feePerGram, errorCodePointer);
+    auto result = (jlong) wallet_coin_join(pWallet, pTariVector, feePerGram, errorCodePointer);
     setErrorCode(jEnv, error, errorCode);
     return result;
 }
@@ -967,7 +973,7 @@ JNIEXPORT jlong JNICALL
 Java_com_tari_android_wallet_ffi_FFIWallet_jniSplitUtxos(
         JNIEnv *jEnv,
         jobject jThis,
-        jobject jCommitments,
+        jobjectArray jCommitments,
         jstring jSplitCount,
         jstring jFeePerGram,
         jobject error) {
@@ -975,8 +981,14 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniSplitUtxos(
     int *errorCodePointer = &errorCode;
     jlong lWallet = GetPointerField(jEnv, jThis);
     auto *pWallet = reinterpret_cast<TariWallet *>(lWallet);
-    jlong lCommitment = GetPointerField(jEnv, jCommitments);
-    auto *pCommitment = reinterpret_cast<TariVector *>(lCommitment);
+
+    int size = jEnv->GetArrayLength(jCommitments);
+    auto *pTariVector = create_tari_vector(Text);
+    for (int i = 0; i < size; ++i) {
+        auto commitmentItem = (jstring) jEnv->GetObjectArrayElement(jCommitments, i);
+        const char *commitmentRef = jEnv->GetStringUTFChars(commitmentItem, JNI_FALSE);
+        tari_vector_push_string(pTariVector, commitmentRef, errorCodePointer);
+    }
 
     const char *nativeSplitCount = jEnv->GetStringUTFChars(jSplitCount, JNI_FALSE);
     const char *nativeGramFee = jEnv->GetStringUTFChars(jFeePerGram, JNI_FALSE);
@@ -984,7 +996,69 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniSplitUtxos(
     char *pGramFeeEnd;
     unsigned int splitCount = strtoull(nativeSplitCount, &pSplitCount, 10);
     unsigned long feePerGram = strtoull(nativeGramFee, &pGramFeeEnd, 10);
-    auto result = (jlong) wallet_coin_split(pWallet, pCommitment, splitCount, feePerGram, errorCodePointer);
+    auto result = (jlong) wallet_coin_split(pWallet, pTariVector, splitCount, feePerGram, errorCodePointer);
+    setErrorCode(jEnv, error, errorCode);
+    return result;
+}
+
+extern "C"
+JNIEXPORT jlong JNICALL
+Java_com_tari_android_wallet_ffi_FFIWallet_jniPreviewJoinUtxos(
+        JNIEnv *jEnv,
+        jobject jThis,
+        jobjectArray jCommitments,
+        jstring jFeePerGram,
+        jobject error) {
+    int errorCode = 0;
+    int *errorCodePointer = &errorCode;
+    jlong lWallet = GetPointerField(jEnv, jThis);
+    auto *pWallet = reinterpret_cast<TariWallet *>(lWallet);
+
+    int size = jEnv->GetArrayLength(jCommitments);
+    auto *pTariVector = create_tari_vector(Text);
+    for (int i = 0; i < size; ++i) {
+        auto commitmentItem = (jstring) jEnv->GetObjectArrayElement(jCommitments, i);
+        const char *commitmentRef = jEnv->GetStringUTFChars(commitmentItem, JNI_FALSE);
+        tari_vector_push_string(pTariVector, commitmentRef, errorCodePointer);
+    }
+
+    const char *nativeGramFee = jEnv->GetStringUTFChars(jFeePerGram, JNI_FALSE);
+    char *pGramFeeEnd;
+    unsigned long feePerGram = strtoull(nativeGramFee, &pGramFeeEnd, 10);
+    auto result = (jlong) wallet_preview_coin_join(pWallet, pTariVector, feePerGram, errorCodePointer);
+    setErrorCode(jEnv, error, errorCode);
+    return result;
+}
+
+extern "C"
+JNIEXPORT jlong JNICALL
+Java_com_tari_android_wallet_ffi_FFIWallet_jniPreviewSplitUtxos(
+        JNIEnv *jEnv,
+        jobject jThis,
+        jobjectArray jCommitments,
+        jstring jSplitCount,
+        jstring jFeePerGram,
+        jobject error) {
+    int errorCode = 0;
+    int *errorCodePointer = &errorCode;
+    jlong lWallet = GetPointerField(jEnv, jThis);
+    auto *pWallet = reinterpret_cast<TariWallet *>(lWallet);
+
+    int size = jEnv->GetArrayLength(jCommitments);
+    auto *pTariVector = create_tari_vector(Text);
+    for (int i = 0; i < size; ++i) {
+        auto commitmentItem = (jstring) jEnv->GetObjectArrayElement(jCommitments, i);
+        const char *commitmentRef = jEnv->GetStringUTFChars(commitmentItem, JNI_FALSE);
+        tari_vector_push_string(pTariVector, commitmentRef, errorCodePointer);
+    }
+
+    const char *nativeSplitCount = jEnv->GetStringUTFChars(jSplitCount, JNI_FALSE);
+    const char *nativeGramFee = jEnv->GetStringUTFChars(jFeePerGram, JNI_FALSE);
+    char *pSplitCount;
+    char *pGramFeeEnd;
+    unsigned int splitCount = strtoull(nativeSplitCount, &pSplitCount, 10);
+    unsigned long feePerGram = strtoull(nativeGramFee, &pGramFeeEnd, 10);
+    auto result = (jlong) wallet_preview_coin_split(pWallet, pTariVector, splitCount, feePerGram, errorCodePointer);
     setErrorCode(jEnv, error, errorCode);
     return result;
 }

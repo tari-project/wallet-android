@@ -41,44 +41,18 @@
 
 extern "C"
 JNIEXPORT void JNICALL
-Java_com_tari_android_wallet_ffi_FFITariVector_jniLoadData(
+Java_com_tari_android_wallet_ffi_FFITariCoinPreview_jniLoadData(
         JNIEnv *jEnv,
         jobject jThis) {
     jclass dataClass = jEnv->GetObjectClass(jThis);
-    jlong lTariOutputs = GetPointerField(jEnv, jThis);
-    auto outputs = reinterpret_cast<TariVector*>(lTariOutputs);
+    jlong lTariCoinPreview = GetPointerField(jEnv, jThis);
+    auto outputs = reinterpret_cast<TariCoinPreview *>(lTariCoinPreview);
 
-    jfieldID sizeField = jEnv->GetFieldID(dataClass, "len", "J");
-    auto lenValue = (long)(outputs->len);
-    jEnv->SetLongField(jThis, sizeField, lenValue);
+    jfieldID vectorPointerField = jEnv->GetFieldID(dataClass, "vectorPointer", "J");
+    auto pointerToVector = (long) (outputs->expected_outputs);
+    jEnv->SetLongField(jThis, vectorPointerField, pointerToVector);
 
-    jfieldID capField = jEnv->GetFieldID(dataClass, "cap", "J");
-    auto capValue = (long)(outputs->cap);
-    jEnv->SetLongField(jThis, capField, capValue);
-
-    jfieldID tagField = jEnv->GetFieldID(dataClass, "tag", "I");
-    auto tagValue = (int)(outputs->tag);
-    jEnv->SetIntField(jThis, tagField, tagValue);
-}
-
-extern "C"
-JNIEXPORT jlong JNICALL
-Java_com_tari_android_wallet_ffi_FFITariVector_jniGetItemAt(
-        JNIEnv *jEnv,
-        jobject jThis,
-        jint index) {
-    jlong lTariOutputs = GetPointerField(jEnv, jThis);
-    auto outputs = reinterpret_cast<TariVector*>(lTariOutputs);
-
-    jlong pointerToItem = 0;
-    if (outputs->tag == Utxo) {
-        auto item = (TariUtxo*)((unsigned char*)(outputs->ptr) + sizeof(TariUtxo) * index);
-        pointerToItem = reinterpret_cast<jlong>(item);
-    }
-    if (outputs->tag == U64) {
-        auto item = *(long*)((unsigned char*)(outputs->ptr) + sizeof(long) * index);
-        pointerToItem = item;
-    }
-
-    return pointerToItem;
+    jfieldID feeField = jEnv->GetFieldID(dataClass, "feeValue", "J");
+    auto feeValue = (long) (outputs->fee);
+    jEnv->SetLongField(jThis, feeField, feeValue);
 }

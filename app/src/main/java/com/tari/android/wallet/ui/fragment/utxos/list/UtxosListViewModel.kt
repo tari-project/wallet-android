@@ -25,6 +25,8 @@ import com.tari.android.wallet.ui.fragment.utxos.list.controllers.ScreenState
 import com.tari.android.wallet.ui.fragment.utxos.list.controllers.listType.ListType
 import com.tari.android.wallet.ui.fragment.utxos.list.module.DetailItemModule
 import com.tari.android.wallet.ui.fragment.utxos.list.module.ListItemModule
+import com.tari.android.wallet.ui.fragment.utxos.list.module.UtxoAmountModule
+import com.tari.android.wallet.ui.fragment.utxos.list.module.UtxoSplitModule
 
 class UtxosListViewModel : CommonViewModel() {
 
@@ -121,30 +123,34 @@ class UtxosListViewModel : CommonViewModel() {
                 val selectedUtxos = textList.value.orEmpty().filter { it.checked.value }.map { it.source }.toList()
                 wallet.joinUtxos(selectedUtxos, error)
                 _dissmissDialog.postValue(Unit)
-                //todo success?
+                loadUtxosFromFFI()
                 showSuccessDialog()
             }
-            //todo do join
         }
     }
 
-    fun split() {
+    fun split(currentItem: UtxosViewHolderItem? = null) {
+        val selectedUtxos = textList.value.orEmpty().filter { it.checked.value }.map { it.source }.toMutableList()
+        currentItem?.let { selectedUtxos.add(it.source) }
+        val splitModule = UtxoSplitModule(selectedUtxos) { count, items ->
+            walletService.getWithError { error, wallet -> wallet.previewSplitUtxos(items, count, error) }
+        }
+        val title = if (selectedUtxos.count() > 1) R.string.utxos_combine_and_break_title else R.string.utxos_break_title
+        val buttonText = if (selectedUtxos.count() > 1) R.string.utxos_combine_and_break_button else R.string.utxos_break_button
         val modularDialogArgs = ModularDialogArgs(
             DialogArgs(), listOf(
-                HeadModule(resourceManager.getString(R.string.utxos_combine_and_break_title)),
+                HeadModule(resourceManager.getString(title)),
                 BodyModule(resourceManager.getString(R.string.utxos_combine_and_break_description)),
-                //todo one more module
-                ButtonModule(resourceManager.getString(R.string.utxos_combine_and_break_button), ButtonStyle.Normal) {
+                splitModule,
+                ButtonModule(resourceManager.getString(buttonText), ButtonStyle.Normal) {
                     _dissmissDialog.postValue(Unit)
                     showConfirmDialog(R.string.utxos_break_description) {
                         walletService.getWithError { error, wallet ->
-                            val selectedUtxos = textList.value.orEmpty().filter { it.checked.value }.map { it.source }.toList()
-                            wallet.splitUtxos(selectedUtxos, 10, error)
+                            wallet.splitUtxos(selectedUtxos, splitModule.count, error)
                             _dissmissDialog.postValue(Unit)
-                            //todo success?
+                            loadUtxosFromFFI()
                             showSuccessDialog()
                         }
-                        //todo do split
                     }
                 },
                 ButtonModule(resourceManager.getString(R.string.common_cancel), ButtonStyle.Close)
@@ -242,6 +248,7 @@ class UtxosListViewModel : CommonViewModel() {
 
     private fun showDetailedDialog(utxoItem: UtxosViewHolderItem) {
         val modules = mutableListOf<IDialogModule>()
+        modules.add(UtxoAmountModule(utxoItem.source.value))
         modules.add(
             DetailItemModule(
                 resourceManager.getString(R.string.utxos_detailed_status),
@@ -259,9 +266,9 @@ class UtxosListViewModel : CommonViewModel() {
         }
         if (utxoItem.isSelectable) {
             modules.add(
-                ButtonModule(resourceManager.getString(R.string.utxos_break_title), ButtonStyle.Normal) {
+                ButtonModule(resourceManager.getString(R.string.utxos_break_button), ButtonStyle.Normal) {
                     _dissmissDialog.postValue(Unit)
-                    split()
+                    split(utxoItem)
                 },
             )
         }

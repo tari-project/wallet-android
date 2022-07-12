@@ -41,23 +41,29 @@ class TariVector() : Parcelable {
     var len: Long = -1
     var cap: Long = -1
     var itemsList = mutableListOf<TariUtxo>()
+    var longs = mutableListOf<Long>()
 
-    constructor(ffiOutputs: FFITariVector): this() {
-        len = ffiOutputs.len
-        cap = ffiOutputs.cap
-        itemsList = ffiOutputs.itemsList.map { TariUtxo(it) }.toMutableList()
+    constructor(ffiTariVector: FFITariVector): this() {
+        len = ffiTariVector.len
+        cap = ffiTariVector.cap
+        itemsList = ffiTariVector.itemsList.map { TariUtxo(it) }.toMutableList()
+        longs = ffiTariVector.longs.toMutableList()
     }
 
     constructor(parcel: Parcel) : this() {
         len = parcel.readLong()
         cap = parcel.readLong()
         itemsList = parcel.readParcelableList(itemsList, TariUtxo::class.java.classLoader)
+        val longArray = longArrayOf()
+        parcel.readLongArray(longArray)
+        longs = longArray.toMutableList()
     }
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {
         parcel.writeLong(len)
         parcel.writeLong(cap)
         parcel.writeParcelableList(itemsList, flags)
+        parcel.writeLongArray(longs.toLongArray())
     }
 
     override fun describeContents(): Int {

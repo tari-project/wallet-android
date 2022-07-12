@@ -1015,20 +1015,31 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
             executeWithMapping(error) { wallet.getAllUtxos() }
 
         override fun joinUtxos(utxos: List<TariUtxo>, walletError: WalletError) = executeWithMapping(walletError) {
-            val commitments = FFITariVector(0L)
             val ffiError = FFIError()
-            wallet.joinUtxos(commitments, Constants.Wallet.defaultFeePerGram.value, ffiError)
+            wallet.joinUtxos(utxos.map { it.commitment }.toTypedArray(), Constants.Wallet.defaultFeePerGram.value, ffiError)
             walletError.code = ffiError.code
-            //todo
         } ?: Unit
 
         override fun splitUtxos(utxos: List<TariUtxo>, splitCount: Int, walletError: WalletError) = executeWithMapping(walletError) {
-            val commitments = FFITariVector(0L)
             val ffiError = FFIError()
-            wallet.splitUtxos(commitments, splitCount, Constants.Wallet.defaultFeePerGram.value, ffiError)
+            wallet.splitUtxos(utxos.map { it.commitment }.toTypedArray(), splitCount, Constants.Wallet.defaultFeePerGram.value, ffiError)
             walletError.code = ffiError.code
-            //todo
         } ?: Unit
+
+        override fun previewJoinUtxos(utxos: List<TariUtxo>, walletError: WalletError): TariCoinPreview? = executeWithMapping(walletError) {
+            val ffiError = FFIError()
+            val result = wallet.joinPreviewUtxos(utxos.map { it.commitment }.toTypedArray(), Constants.Wallet.defaultFeePerGram.value, ffiError)
+            walletError.code = ffiError.code
+            result
+        }
+
+        override fun previewSplitUtxos(utxos: List<TariUtxo>, splitCount: Int, walletError: WalletError): TariCoinPreview? =
+            executeWithMapping(walletError) {
+                val ffiError = FFIError()
+                val result = wallet.splitPreviewUtxos(utxos.map { it.commitment }.toTypedArray(), splitCount, Constants.Wallet.defaultFeePerGram.value, ffiError)
+                walletError.code = ffiError.code
+                result
+            }
     }
 }
 

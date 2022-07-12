@@ -620,7 +620,8 @@
     <string name="utxos_combine_and_break_button">Combine &amp; Break</string>
     <string name="utxos_success_title">Success!</string>
     <string name="utxos_success_description">Your coin will be broken soon.\nKeep an eye on the transactions screen to\nsee when it’s been mined.</string>
-    <string name="utxos_break_title">Break</string>
+    <string name="utxos_break_button">Break</string>
+    <string name="utxos_break_title">Break Coin</string>
     <string name="utxos_join_description">You are about to join these coins.</string>
     <string name="utxos_break_description">You are about to break this coin.</string>
     <string name="utxos_ordering_option_size_desc">Size, Descending</string>
@@ -631,5 +632,9 @@
     <string name="utxos_detailed_commitment">Commitment:</string>
     <string name="utxos_detailed_block_height">Block Height:</string>
     <string name="utxos_detailed_date">Date:</string>
+    <string name="utxos_split_preview_fee">Estimated Fee:</string>
+    <string name="utxos_split_preview_break">Break</string>
+    <string name="utxos_split_preview_into">into</string>
+    <string name="utxos_split_preview_coins">coins</string>
 
 </resources>
