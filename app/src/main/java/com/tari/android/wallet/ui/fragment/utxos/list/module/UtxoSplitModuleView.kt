@@ -54,6 +54,6 @@ class UtxoSplitModuleView(context: Context, val buttonModule: UtxoSplitModule) :
     companion object {
         const val seekBarMin = 2
         const val seekBarMax = 50
-        const val seekBarDefault = 5
+        const val seekBarDefault = 2
     }
 }

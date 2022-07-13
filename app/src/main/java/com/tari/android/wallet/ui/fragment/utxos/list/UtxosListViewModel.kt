@@ -263,7 +263,7 @@ class UtxosListViewModel : CommonViewModel() {
             modules.add(DetailItemModule(resourceManager.getString(R.string.utxos_detailed_block_height), utxoItem.source.minedHeight.toString()))
         }
         if (utxoItem.isShowDate) {
-            val formattedDateTime = utxoItem.formattedTime + " " + utxoItem.formattedTime
+            val formattedDateTime = utxoItem.formattedDate + " " + utxoItem.formattedTime
             modules.add(DetailItemModule(resourceManager.getString(R.string.utxos_detailed_date), formattedDateTime))
         }
         if (utxoItem.isSelectable) {
