@@ -22,7 +22,6 @@ class UtxosViewHolderItem(val source: TariUtxo, var height: Int = 0) : CommonVie
     val isShowingStatus: Boolean
 
     init {
-        //todo check for right conversion
         val dateTime = DateTime.now().withMillis(source.timestamp)
         val format = SimpleDateFormat()
         formattedDate = format.format(dateTime.toDate()).split(" ")[0]
