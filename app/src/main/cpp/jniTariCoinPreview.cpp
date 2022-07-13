@@ -30,69 +30,29 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.tari.android.wallet.ffi
 
-import com.tari.android.wallet.model.MicroTari
-import java.math.BigInteger
+#include <jni.h>
+#include <android/log.h>
+#include <wallet.h>
+#include <string>
+#include <cmath>
+#include <android/log.h>
+#include "jniCommon.cpp"
 
-/**
- * Wrapper for native byte vector type.
- *
- * @author The Tari Development Team
- */
-internal class FFIBalance() : FFIBase() {
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_tari_android_wallet_ffi_FFITariCoinPreview_jniLoadData(
+        JNIEnv *jEnv,
+        jobject jThis) {
+    jclass dataClass = jEnv->GetObjectClass(jThis);
+    jlong lTariCoinPreview = GetPointerField(jEnv, jThis);
+    auto outputs = reinterpret_cast<TariCoinPreview *>(lTariCoinPreview);
 
-    // region JNI
+    jfieldID vectorPointerField = jEnv->GetFieldID(dataClass, "vectorPointer", "J");
+    auto pointerToVector = (long) (outputs->expected_outputs);
+    jEnv->SetLongField(jThis, vectorPointerField, pointerToVector);
 
-    private external fun jniGetAvailable(
-        libError: FFIError
-    ): ByteArray
-    private external fun jniGetIncoming(
-        libError: FFIError
-    ): ByteArray
-    private external fun jniGetOutgoing(
-        libError: FFIError
-    ): ByteArray
-    private external fun jniGetTimeLocked(
-        libError: FFIError
-    ): ByteArray
-    private external fun jniDestroy()
-
-    // endregion
-    constructor(pointer: FFIPointer): this() {
-        this.pointer = pointer
-    }
-
-    fun getAvailable(): MicroTari {
-        val error = FFIError()
-        val bytes = jniGetAvailable(error)
-        throwIf(error)
-        return MicroTari(BigInteger(1, bytes))
-    }
-
-    fun getIncoming(): MicroTari {
-        val error = FFIError()
-        val bytes = jniGetIncoming(error)
-        throwIf(error)
-        return MicroTari(BigInteger(1, bytes))
-    }
-
-    fun getOutgoing(): MicroTari {
-        val error = FFIError()
-        val bytes = jniGetOutgoing(error)
-        throwIf(error)
-        return MicroTari(BigInteger(1, bytes))
-    }
-
-    fun getTimeLocked(): MicroTari {
-        val error = FFIError()
-        val bytes = jniGetTimeLocked(error)
-        throwIf(error)
-        return MicroTari(BigInteger(1, bytes))
-    }
-
-    override fun destroy() {
-        jniDestroy()
-    }
-
+    jfieldID feeField = jEnv->GetFieldID(dataClass, "feeValue", "J");
+    auto feeValue = (long) (outputs->fee);
+    jEnv->SetLongField(jThis, feeField, feeValue);
 }

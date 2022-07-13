@@ -18,17 +18,22 @@ class UtxosTileListViewHolder(view: ItemUtxosTileBinding) : CommonViewHolder<Utx
     override fun bind(item: UtxosViewHolderItem) {
         super.bind(item)
 
-        val wholeBalance = WalletUtil.balanceFormatter.format(item.microTariAmount.tariValue)
-        val amount = wholeBalance.dropLast(3)
-        val decimal = wholeBalance.takeLast(3)
+        val wholeBalance = WalletUtil.amountFormatter.format(item.source.value.tariValue)
+        val indexOfSeparator = wholeBalance.indexOfAny(charArrayOf(',', '.'))
+        val amount = wholeBalance.take(indexOfSeparator)
+        val decimal = wholeBalance.drop(indexOfSeparator)
 
         ui.amount.text = amount
         ui.amountDecimal.text = decimal
-        ui.dateTime.text = item.formattedDateTime
+        ui.dateTime.text = item.formattedDate
+        ui.dateTime.setVisible(item.isShowDate)
 
-        ui.status.setImageResource(item.status.icon)
+        ui.status.setVisible(item.isShowingStatus)
+        if (item.isShowingStatus) {
+            ui.status.setImageResource(item.status!!.icon)
+        }
 
-        ui.root.updateLayoutParams<ViewGroup.LayoutParams> { this.height = itemView.context.dpToPx(item.heigth.toFloat()).toInt() }
+        ui.root.updateLayoutParams<ViewGroup.LayoutParams> { this.height = itemView.context.dpToPx(item.height.toFloat()).toInt() }
 
         val baseColor = Color.valueOf(ContextCompat.getColor(itemView.context, R.color.purple))
         val newColor = Color.valueOf(getNext(baseColor.red()), getNext(baseColor.green()), getNext(baseColor.blue()))

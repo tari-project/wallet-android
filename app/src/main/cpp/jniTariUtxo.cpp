@@ -30,69 +30,41 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.tari.android.wallet.ffi
 
-import com.tari.android.wallet.model.MicroTari
-import java.math.BigInteger
+#include <jni.h>
+#include <android/log.h>
+#include <wallet.h>
+#include <string>
+#include <cmath>
+#include <android/log.h>
+#include "jniCommon.cpp"
 
-/**
- * Wrapper for native byte vector type.
- *
- * @author The Tari Development Team
- */
-internal class FFIBalance() : FFIBase() {
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_tari_android_wallet_ffi_FFITariUtxo_jniLoadData(
+        JNIEnv *jEnv,
+        jobject jThis) {
+    jclass dataClass = jEnv->GetObjectClass(jThis);
+    jlong lTariOutputs = GetPointerField(jEnv, jThis);
+    auto outputs = reinterpret_cast<TariUtxo *>(lTariOutputs);
 
-    // region JNI
+    jfieldID valueField = jEnv->GetFieldID(dataClass, "value", "J");
+    auto lenValue = (long) (outputs->value);
+    jEnv->SetLongField(jThis, valueField, lenValue);
 
-    private external fun jniGetAvailable(
-        libError: FFIError
-    ): ByteArray
-    private external fun jniGetIncoming(
-        libError: FFIError
-    ): ByteArray
-    private external fun jniGetOutgoing(
-        libError: FFIError
-    ): ByteArray
-    private external fun jniGetTimeLocked(
-        libError: FFIError
-    ): ByteArray
-    private external fun jniDestroy()
+    jfieldID minedHeightField = jEnv->GetFieldID(dataClass, "minedHeight", "J");
+    auto minedHeight = (long) (outputs->mined_height);
+    jEnv->SetLongField(jThis, minedHeightField, minedHeight);
 
-    // endregion
-    constructor(pointer: FFIPointer): this() {
-        this.pointer = pointer
-    }
+    jfieldID minedTimestampField = jEnv->GetFieldID(dataClass, "minedTimestamp", "J");
+    auto minedTimestamp = (long) (outputs->mined_timestamp);
+    jEnv->SetLongField(jThis, minedTimestampField, minedTimestamp);
 
-    fun getAvailable(): MicroTari {
-        val error = FFIError()
-        val bytes = jniGetAvailable(error)
-        throwIf(error)
-        return MicroTari(BigInteger(1, bytes))
-    }
+    jfieldID statusField = jEnv->GetFieldID(dataClass, "status", "B");
+    auto statusValue = (jbyte) (outputs->status);
+    jEnv->SetByteField(jThis, statusField, statusValue);
 
-    fun getIncoming(): MicroTari {
-        val error = FFIError()
-        val bytes = jniGetIncoming(error)
-        throwIf(error)
-        return MicroTari(BigInteger(1, bytes))
-    }
-
-    fun getOutgoing(): MicroTari {
-        val error = FFIError()
-        val bytes = jniGetOutgoing(error)
-        throwIf(error)
-        return MicroTari(BigInteger(1, bytes))
-    }
-
-    fun getTimeLocked(): MicroTari {
-        val error = FFIError()
-        val bytes = jniGetTimeLocked(error)
-        throwIf(error)
-        return MicroTari(BigInteger(1, bytes))
-    }
-
-    override fun destroy() {
-        jniDestroy()
-    }
-
+    jfieldID commitmentField = jEnv->GetFieldID(dataClass, "commitment", "Ljava/lang/String;");
+    jstring commitmentValue = jEnv->NewStringUTF(outputs->commitment);
+    jEnv->SetObjectField(jThis, commitmentField, commitmentValue);
 }

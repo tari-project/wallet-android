@@ -131,7 +131,7 @@ class CreateWalletFragment : CommonFragment<FragmentCreateWalletBinding, CreateW
             duration = CreateEmojiId.whiteBgAnimDurationMs
             interpolator = EasingInterpolator(Ease.CIRC_IN_OUT)
             addListener(object : AnimatorListenerAdapter() {
-                override fun onAnimationEnd(animation: Animator?) {
+                override fun onAnimationEnd(animation: Animator) {
                     super.onAnimationEnd(animation)
                     showBottomSpinner()
                     ui.justSecDescBackView.visible()
@@ -139,7 +139,7 @@ class CreateWalletFragment : CommonFragment<FragmentCreateWalletBinding, CreateW
                     showSecondViewByAnim()
                 }
 
-                override fun onAnimationStart(animation: Animator?) {
+                override fun onAnimationStart(animation: Animator) {
                     super.onAnimationStart(animation)
                     ui.smallGemImageView.visible()
                     ui.whiteBgView.visible()
@@ -172,13 +172,13 @@ class CreateWalletFragment : CommonFragment<FragmentCreateWalletBinding, CreateW
             duration = CreateEmojiId.helloTextAnimDurationMs
             interpolator = EasingInterpolator(Ease.QUART_OUT)
             addListener(object : AnimatorListenerAdapter() {
-                override fun onAnimationStart(animation: Animator?) {
+                override fun onAnimationStart(animation: Animator) {
                     super.onAnimationStart(animation)
                     ui.justSecDescTextView.visible()
                     ui.justSecTitleTextView.visible()
                 }
 
-                override fun onAnimationEnd(animation: Animator?) {
+                override fun onAnimationEnd(animation: Animator) {
                     super.onAnimationEnd(animation)
                     // if the wallet is not ready wait until it gets ready,
                     // otherwise display the checkmark anim & move on
@@ -198,7 +198,7 @@ class CreateWalletFragment : CommonFragment<FragmentCreateWalletBinding, CreateW
         ui.justSecTitleBackView.gone()
 
         ui.checkmarkLottieAnimationView.addAnimatorListener(object : AnimatorListenerAdapter() {
-            override fun onAnimationEnd(animation: Animator?) {
+            override fun onAnimationEnd(animation: Animator) {
                 super.onAnimationEnd(animation)
                 startCreateEmojiIdAnimation()
             }
@@ -218,7 +218,7 @@ class CreateWalletFragment : CommonFragment<FragmentCreateWalletBinding, CreateW
             }
 
             addListener(object : AnimatorListenerAdapter() {
-                override fun onAnimationEnd(animation: Animator?) {
+                override fun onAnimationEnd(animation: Animator) {
                     super.onAnimationEnd(animation)
                     val emojiId = viewModel.sharedPrefsWrapper.emojiId!!
                     ui.emojiIdTextView.text = EmojiUtil.getFullEmojiIdSpannable(
@@ -292,7 +292,7 @@ class CreateWalletFragment : CommonFragment<FragmentCreateWalletBinding, CreateW
             duration = CreateEmojiId.createEmojiViewAnimDurationMs
             interpolator = EasingInterpolator(Ease.QUINT_OUT)
             addListener(object : AnimatorListenerAdapter() {
-                override fun onAnimationStart(animation: Animator?) {
+                override fun onAnimationStart(animation: Animator) {
                     super.onAnimationStart(animation)
                     ui.createYourEmojiIdLine2BlockerView.visible()
                     ui.createYourEmojiIdLine1BlockerView.visible()
@@ -326,7 +326,7 @@ class CreateWalletFragment : CommonFragment<FragmentCreateWalletBinding, CreateW
                 ui.createEmojiIdButton.alpha = alpha
             }
             addListener(object : AnimatorListenerAdapter() {
-                override fun onAnimationEnd(animation: Animator?) {
+                override fun onAnimationEnd(animation: Animator) {
                     super.onAnimationEnd(animation)
                     ui.createEmojiIdButton.gone()
                     ui.createYourEmojiIdLine1BlockerView.gone()
@@ -373,7 +373,7 @@ class CreateWalletFragment : CommonFragment<FragmentCreateWalletBinding, CreateW
             startDelay = CreateEmojiId.yourEmojiIdTextAnimDelayMs
             duration = CreateEmojiId.yourEmojiIdTextAnimDurationMs
             addListener(object : AnimatorListenerAdapter() {
-                override fun onAnimationStart(animation: Animator?) {
+                override fun onAnimationStart(animation: Animator) {
                     super.onAnimationStart(animation)
                     ui.yourEmojiTitleBackView.visible()
                     ui.yourEmojiIdTitleContainerView.visible()
@@ -407,7 +407,7 @@ class CreateWalletFragment : CommonFragment<FragmentCreateWalletBinding, CreateW
             ui.emojiIdContainerView.visible()
             start()
             addListener(object : AnimatorListenerAdapter() {
-                override fun onAnimationEnd(animation: Animator?) {
+                override fun onAnimationEnd(animation: Animator) {
                     elevateEmojiIdContainerView()
                     ui.emojiIdScrollView.smoothScrollTo(0, 0)
                 }
@@ -425,7 +425,7 @@ class CreateWalletFragment : CommonFragment<FragmentCreateWalletBinding, CreateW
             duration = Constants.UI.mediumDurationMs
             interpolator = EasingInterpolator(Ease.BACK_OUT)
             addListener(object : AnimatorListenerAdapter() {
-                override fun onAnimationEnd(animation: Animator?) {
+                override fun onAnimationEnd(animation: Animator) {
                     ui.seeFullEmojiIdButton.isEnabled = true
                     uiHandler.postDelayed({
                         hideFullEmojiId()
@@ -487,7 +487,7 @@ class CreateWalletFragment : CommonFragment<FragmentCreateWalletBinding, CreateW
             duration = Constants.UI.shortDurationMs
             start()
             addListener(object : AnimatorListenerAdapter() {
-                override fun onAnimationEnd(animation: Animator?) {
+                override fun onAnimationEnd(animation: Animator) {
                     ui.seeFullEmojiIdContainerView.invisible()
                     ui.emojiIdTextView.isEnabled = true
                     ui.emojiIdSummaryContainerView.invisible()
@@ -524,7 +524,7 @@ class CreateWalletFragment : CommonFragment<FragmentCreateWalletBinding, CreateW
             }
             duration = Constants.UI.shortDurationMs
             addListener(object : AnimatorListenerAdapter() {
-                override fun onAnimationEnd(animation: Animator?) {
+                override fun onAnimationEnd(animation: Animator) {
                     ui.emojiIdContainerView.invisible()
                 }
             })

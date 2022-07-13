@@ -150,15 +150,6 @@ internal class FFIWallet(
         libError: FFIError
     ): ByteArray
 
-    private external fun jniCoinSplit(
-        amount: String,
-        splitCount: String,
-        fee: String,
-        message: String,
-        lockHeight: String,
-        libError: FFIError
-    ): ByteArray
-
     private external fun jniSignMessage(message: String, libError: FFIError): String
 
     private external fun jniVerifyMessageSignature(publicKeyPtr: FFIPublicKey, message: String, signature: String, libError: FFIError): Boolean
@@ -215,6 +206,18 @@ internal class FFIWallet(
     ): Boolean
 
     private external fun jniWalletGetFeePerGramStats(count: Int, libError: FFIError): FFIPointer
+
+    private external fun jniGetUtxos(page: Int, pageSize: Int, sorting: Int, dustThreshold: Long, libError: FFIError): FFIPointer
+
+    private external fun jniGetAllUtxos(libError: FFIError): FFIPointer
+
+    private external fun jniJoinUtxos(commitments: Array<String>, feePerGram: String, libError: FFIError): FFIPointer
+
+    private external fun jniSplitUtxos(commitments: Array<String>, splitCount: String, feePerGram: String, libError: FFIError): FFIPointer
+
+    private external fun jniPreviewJoinUtxos(commitments: Array<String>, feePerGram: String, libError: FFIError): FFIPointer
+
+    private external fun jniPreviewSplitUtxos(commitments: Array<String>, splitCount: String, feePerGram: String, libError: FFIError): FFIPointer
 
     private external fun jniDestroy()
 
@@ -286,17 +289,28 @@ internal class FFIWallet(
         val result = jniGetBalance(error)
         throwIf(error)
         val b = FFIBalance(result)
-        val bal = BalanceInfo(
-            b.getAvailable(),
-            b.getIncoming(),
-            b.getOutgoing(),
-            b.getTimeLocked(),
-        )
+        val bal = BalanceInfo(b.getAvailable(), b.getIncoming(), b.getOutgoing(), b.getTimeLocked())
         b.destroy()
         if (balance != bal) {
             balance = bal
         }
         return balance
+    }
+
+    fun getUtxos(page: Int, pageSize: Int, sorting: Int): TariVector {
+        val error = FFIError()
+        val result = jniGetUtxos(page, pageSize, sorting, 0, error)
+        val outputs = TariVector(FFITariVector(result))
+        throwIf(error)
+        return outputs
+    }
+
+    fun getAllUtxos(): TariVector {
+        val error = FFIError()
+        val result = jniGetAllUtxos(error)
+        val outputs = TariVector(FFITariVector(result))
+        throwIf(error)
+        return outputs
     }
 
     fun getPublicKey(): FFIPublicKey {
@@ -579,20 +593,22 @@ internal class FFIWallet(
         return BigInteger(1, bytes)
     }
 
-    fun coinSplit(amount: BigInteger, count: BigInteger, height: BigInteger, fee: BigInteger, message: String): BigInteger {
-        val minimumLibFee = 100L
-        if (fee < BigInteger.valueOf(minimumLibFee)) {
-            throw FFIException(message = "Fee is less than the minimum of $minimumLibFee taris.")
-        }
-        if (amount < BigInteger.valueOf(0L)) {
-            throw FFIException(message = "Amount is less than 0.")
-        }
+    fun joinUtxos(commitments: Array<String>, feePerGram: BigInteger, error: FFIError) {
+        jniJoinUtxos(commitments, feePerGram.toString(), error)
+    }
 
-        val error = FFIError()
-        val bytes = jniCoinSplit(amount.toString(), count.toString(), fee.toString(), message, height.toString(), error)
-        Logger.d("Coin split code (0 means ok): %d", error.code)
-        throwIf(error)
-        return BigInteger(1, bytes)
+    fun splitUtxos(commitments: Array<String>, count: Int, feePerGram: BigInteger, error: FFIError) {
+        jniSplitUtxos(commitments, count.toString(), feePerGram.toString(), error)
+    }
+
+    fun joinPreviewUtxos(commitments: Array<String>, feePerGram: BigInteger, error: FFIError): TariCoinPreview {
+        val result = jniPreviewJoinUtxos(commitments, feePerGram.toString(), error)
+        return TariCoinPreview(FFITariCoinPreview(result))
+    }
+
+    fun splitPreviewUtxos(commitments: Array<String>, count: Int, feePerGram: BigInteger, error: FFIError) : TariCoinPreview {
+        val result = jniPreviewSplitUtxos(commitments, count.toString(), feePerGram.toString(), error)
+        return TariCoinPreview(FFITariCoinPreview(result))
     }
 
     fun signMessage(message: String): String {
@@ -753,7 +769,7 @@ internal class FFIWallet(
         return result
     }
 
-    fun getFeePerGramStats() : FFIFeePerGramStats {
+    fun getFeePerGramStats(): FFIFeePerGramStats {
         val error = FFIError()
         val result = FFIFeePerGramStats(jniWalletGetFeePerGramStats(3, error))
         throwIf(error)

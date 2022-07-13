@@ -3,29 +3,35 @@ package com.tari.android.wallet.ui.fragment.utxos.list
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import com.tari.android.wallet.R
-import com.tari.android.wallet.model.MicroTari
+import com.tari.android.wallet.extension.addTo
+import com.tari.android.wallet.extension.getWithError
+import com.tari.android.wallet.service.TariWalletService
+import com.tari.android.wallet.service.connection.TariWalletServiceConnection
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.dialog.modular.DialogArgs
 import com.tari.android.wallet.ui.dialog.modular.IDialogModule
 import com.tari.android.wallet.ui.dialog.modular.ModularDialogArgs
+import com.tari.android.wallet.ui.dialog.modular.modules.body.BodyModule
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonModule
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonStyle
 import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
-import com.tari.android.wallet.ui.fragment.utxos.list.adapters.UtxosStatus
+import com.tari.android.wallet.ui.dialog.modular.modules.imageModule.ImageModule
 import com.tari.android.wallet.ui.fragment.utxos.list.adapters.UtxosViewHolderItem
 import com.tari.android.wallet.ui.fragment.utxos.list.adapters.UtxosViewHolderItem.Companion.maxTileHeight
 import com.tari.android.wallet.ui.fragment.utxos.list.adapters.UtxosViewHolderItem.Companion.minTileHeight
+import com.tari.android.wallet.ui.fragment.utxos.list.controllers.JoinSplitButtonsState
 import com.tari.android.wallet.ui.fragment.utxos.list.controllers.Ordering
+import com.tari.android.wallet.ui.fragment.utxos.list.controllers.ScreenState
 import com.tari.android.wallet.ui.fragment.utxos.list.controllers.listType.ListType
+import com.tari.android.wallet.ui.fragment.utxos.list.module.DetailItemModule
 import com.tari.android.wallet.ui.fragment.utxos.list.module.ListItemModule
-import org.joda.time.DateTime
-import java.math.BigInteger
-import java.math.RoundingMode
-import java.text.DecimalFormat
-import java.util.*
-import kotlin.random.Random
+import com.tari.android.wallet.ui.fragment.utxos.list.module.UtxoAmountModule
+import com.tari.android.wallet.ui.fragment.utxos.list.module.UtxoSplitModule
 
 class UtxosListViewModel : CommonViewModel() {
+
+    val screenState: MutableLiveData<ScreenState> = MutableLiveData(ScreenState.Loading)
+    val joinSplitButtonsState: MutableLiveData<JoinSplitButtonsState> = MutableLiveData(JoinSplitButtonsState.None)
 
     val listType: MutableLiveData<ListType> = MutableLiveData()
 
@@ -35,46 +41,59 @@ class UtxosListViewModel : CommonViewModel() {
 
     val selectionState = MutableLiveData<Boolean>()
 
-    val sourceList: MutableLiveData<MutableList<UtxosViewHolderItem>> = MutableLiveData(mutableListOf())
+    val sourceList: MutableLiveData<MutableList<UtxosViewHolderItem>> = MutableLiveData()
     val textList: MutableLiveData<MutableList<UtxosViewHolderItem>> = MutableLiveData(mutableListOf())
     val leftTileList: MutableLiveData<MutableList<UtxosViewHolderItem>> = MutableLiveData(mutableListOf())
     val rightTileList: MutableLiveData<MutableList<UtxosViewHolderItem>> = MutableLiveData(mutableListOf())
+
+    var serviceConnection = TariWalletServiceConnection()
+    val walletService: TariWalletService
+        get() = serviceConnection.currentState.service!!
 
     init {
         sortingMediator.addSource(sourceList) { generateFromScratch() }
         sortingMediator.addSource(ordering) { generateFromScratch() }
         setSelectionState(false)
 
+        serviceConnection.connection.subscribe {
+            if (it.status == TariWalletServiceConnection.ServiceConnectionStatus.CONNECTED) loadUtxosFromFFI()
+        }.addTo(compositeDisposable)
+
         component.inject(this)
-        setMocks(1000)
     }
 
-    private fun generateFromScratch() {
-        val sourceList = this.sourceList.value ?: return
-        val ordering = this.ordering.value ?: return
+    fun selectItem(item: UtxosViewHolderItem) {
+        if (item.selectionState.value) {
+            item.checked.value = !item.checked.value
+            recountCheckedStates()
+        } else {
+            if (selectionState.value != true) {
+                showDetailedDialog(item)
+            }
+        }
+    }
 
-        val orderedList = when (ordering) {
-            Ordering.ValueDesc -> sourceList.sortedByDescending { it.microTariAmount.tariValue }
-            Ordering.ValueAnc -> sourceList.sortedBy { it.microTariAmount.tariValue }
-            Ordering.DateDesc -> sourceList.sortedByDescending { it.dateTime }
-            Ordering.DateAnc -> sourceList.sortedBy { it.dateTime }
-        }.toMutableList()
-
-        textList.postValue(orderedList)
-        orderTileLists(orderedList)
+    fun setSelectionStateTrue(): Boolean {
+        if (!selectionState.value!!) {
+            setSelectionState(true)
+        }
+        return true
     }
 
     fun setTypeList(listType: ListType) = this.listType.postValue(listType)
 
     fun setSelectionState(isSelecting: Boolean) {
         selectionState.postValue(isSelecting)
-        sourceList.value?.forEach { it.selectionState.value = isSelecting }
+        val selectable = textList.value?.filter { it.isSelectable }.orEmpty()
+        selectable.forEach { it.selectionState.value = isSelecting }
         if (!isSelecting) {
-            sourceList.value?.forEach { it.checked.value = false }
+            selectable.forEach { it.checked.value = false }
         }
+        recountCheckedStates()
     }
 
     fun showOrderingSelectionDialog() {
+        setSelectionState(false)
         val listOptions = Ordering.values().map { ListItemModule(it) }
         listOptions.firstOrNull { it.ordering == ordering.value }?.isSelected = true
         listOptions.forEach {
@@ -98,41 +117,89 @@ class UtxosListViewModel : CommonViewModel() {
         _modularDialog.postValue(modularDialogArgs)
     }
 
-    fun setMocks(count: Int) {
-        val list = (0..count).map {
-            val amount = Random.nextDouble(1.0, 1_000_000.0)
-            val bigInteger = BigInteger.valueOf((amount * 100_000L).toLong())
-            val doubleValue = MicroTari(bigInteger).tariValue.setScale(2, RoundingMode.HALF_UP)
-            val newDecimal = DecimalFormat("##.00")
-            newDecimal.decimalFormatSymbols.groupingSeparator = ','
-            newDecimal.isGroupingUsed = true
-            newDecimal.groupingSize = 3
-            val value = newDecimal.format(doubleValue)
-            val startDate = DateTime.now().minusWeeks(1).toDateTime().millis
-            val endDate = DateTime.now().plusWeeks(1).toDateTime().millis
-            val date = Random.nextLong(startDate, endDate)
-            val dateTime = DateTime.now().withMillis(date)
-            val formattedDate = dateTime.toString("dd/MM/yyyy")
-            val formattedTime = dateTime.toString("HH:mm")
-            val guid = UUID.randomUUID().toString().lowercase()
-            val status = UtxosStatus.values()[Random.nextInt(0, 2)]
-            val additionalTextData = resourceManager.getString(status.text) + " | " + formattedDate + " | " + formattedTime
-            UtxosViewHolderItem(value, MicroTari(bigInteger), guid + guid, dateTime, formattedDate, additionalTextData, status)
-        }.toMutableList()
-        calculateHeight(list)
-
-        sourceList.postValue(list)
+    fun join() {
+        showConfirmDialog(R.string.utxos_join_description) {
+            walletService.getWithError { error, wallet ->
+                val selectedUtxos = textList.value.orEmpty().filter { it.checked.value }.map { it.source }.toList()
+                wallet.joinUtxos(selectedUtxos, error)
+                _dissmissDialog.postValue(Unit)
+                loadUtxosFromFFI()
+                showSuccessDialog()
+            }
+        }
     }
 
-    private fun calculateHeight(list: MutableList<UtxosViewHolderItem>) {
-        val min = list.minOf { it.microTariAmount.tariValue }
-        val max = list.maxOf { it.microTariAmount.tariValue }
+    fun split(currentItem: UtxosViewHolderItem? = null) {
+        val selectedUtxos = textList.value.orEmpty().filter { it.checked.value }.map { it.source }.toMutableList()
+        currentItem?.let { selectedUtxos.add(it.source) }
+        val splitModule = UtxoSplitModule(selectedUtxos) { count, items ->
+            walletService.getWithError { error, wallet -> wallet.previewSplitUtxos(items, count, error) }
+        }
+        val title = if (selectedUtxos.count() > 1) R.string.utxos_combine_and_break_title else R.string.utxos_break_title
+        val buttonText = if (selectedUtxos.count() > 1) R.string.utxos_combine_and_break_button else R.string.utxos_break_button
+        val modularDialogArgs = ModularDialogArgs(
+            DialogArgs(), listOf(
+                HeadModule(resourceManager.getString(title)),
+                BodyModule(resourceManager.getString(R.string.utxos_combine_and_break_description)),
+                splitModule,
+                ButtonModule(resourceManager.getString(buttonText), ButtonStyle.Normal) {
+                    _dissmissDialog.postValue(Unit)
+                    showConfirmDialog(R.string.utxos_break_description) {
+                        walletService.getWithError { error, wallet ->
+                            wallet.splitUtxos(selectedUtxos, splitModule.count, error)
+                            _dissmissDialog.postValue(Unit)
+                            loadUtxosFromFFI()
+                            showSuccessDialog()
+                        }
+                    }
+                },
+                ButtonModule(resourceManager.getString(R.string.common_cancel), ButtonStyle.Close)
+            )
+        )
+        _modularDialog.postValue(modularDialogArgs)
+    }
 
-        val amountDiff = (max - min).toDouble()
+    private fun loadUtxosFromFFI() {
+        val allItems = walletService.getWithError { error, wallet ->
+            wallet.getAllUtxos(error)
+        }.itemsList.map { UtxosViewHolderItem(it) }.filter { it.isShowingStatus }.toMutableList()
+        val state = if (allItems.isEmpty()) ScreenState.Empty else ScreenState.Data
+        screenState.postValue(state)
+        sourceList.postValue(allItems)
+    }
+
+    private fun generateFromScratch() {
+        val sourceList = this.sourceList.value ?: return
+        val ordering = this.ordering.value ?: return
+
+        val orderedList = when (ordering) {
+            Ordering.ValueAnc -> sourceList.sortedBy { it.source.value }
+            Ordering.ValueDesc -> sourceList.sortedByDescending { it.source.value }
+            Ordering.DateAnc -> sourceList.sortedBy { it.source.timestamp }
+            Ordering.DateDesc -> sourceList.sortedByDescending { it.source.timestamp }
+        }.toMutableList()
+
+        calculateHeight(orderedList)
+        textList.postValue(orderedList)
+        orderTileLists(orderedList)
+    }
+
+    private fun calculateHeight(list: List<UtxosViewHolderItem>) {
+        if (list.isEmpty()) return
+        val min = list.minOf { it.source.value.tariValue }
+        val max = list.maxOf { it.source.value.tariValue }
+
+        var amountDiff = (max - min).toDouble()
+        if (amountDiff == 0.0) {
+            amountDiff = min.toDouble()
+        }
         val heightDiff = maxTileHeight - minTileHeight
         val scale = heightDiff / amountDiff
 
-        list.forEach { it.heigth = ((it.microTariAmount.tariValue - min).toDouble() * scale + minTileHeight).toInt() }
+        list.forEach {
+            val calculatedHeight = ((it.source.value.tariValue - min).toDouble() * scale + minTileHeight).toInt()
+            it.height = calculatedHeight
+        }
     }
 
     private fun orderTileLists(list: MutableList<UtxosViewHolderItem>) {
@@ -144,13 +211,85 @@ class UtxosListViewModel : CommonViewModel() {
         for (item in list) {
             if (leftHeight <= rightHeight) {
                 leftList.add(item)
-                leftHeight += item.heigth + marginSize
+                leftHeight += item.height + marginSize
             } else {
                 rightList.add(item)
-                rightHeight += item.heigth + marginSize
+                rightHeight += item.height + marginSize
             }
         }
         leftTileList.postValue(leftList)
         rightTileList.postValue(rightList)
+    }
+
+    private fun recountCheckedStates() {
+        if (selectionState.value == true) {
+            val state = when (textList.value.orEmpty().count { it.checked.value }) {
+                0 -> JoinSplitButtonsState.None
+                1 -> JoinSplitButtonsState.Break
+                else -> JoinSplitButtonsState.JoinAndBreak
+            }
+            joinSplitButtonsState.postValue(state)
+        } else {
+            joinSplitButtonsState.postValue(JoinSplitButtonsState.None)
+        }
+    }
+
+    private fun showConfirmDialog(message: Int, action: () -> Unit) {
+        val modularArgs = ModularDialogArgs(
+            DialogArgs(), listOf(
+                HeadModule(resourceManager.getString(R.string.common_are_you_sure)),
+                BodyModule(resourceManager.getString(message)),
+                ButtonModule(resourceManager.getString(R.string.common_lets_do_it), ButtonStyle.Normal, action),
+                ButtonModule(resourceManager.getString(R.string.common_cancel), ButtonStyle.Close)
+            )
+        )
+        _modularDialog.postValue(modularArgs)
+    }
+
+    private fun showDetailedDialog(utxoItem: UtxosViewHolderItem) {
+        val modules = mutableListOf<IDialogModule>()
+        modules.add(UtxoAmountModule(utxoItem.source.value))
+        if (utxoItem.isShowingStatus) {
+            modules.add(
+                DetailItemModule(
+                    resourceManager.getString(R.string.utxos_detailed_status),
+                    resourceManager.getString(utxoItem.status!!.text),
+                    utxoItem.status.textIcon
+                )
+            )
+        }
+        modules.add(DetailItemModule(resourceManager.getString(R.string.utxos_detailed_commitment), utxoItem.source.commitment))
+        if (utxoItem.isShowMinedHeight) {
+            modules.add(DetailItemModule(resourceManager.getString(R.string.utxos_detailed_block_height), utxoItem.source.minedHeight.toString()))
+        }
+        if (utxoItem.isShowDate) {
+            val formattedDateTime = utxoItem.formattedTime + " " + utxoItem.formattedTime
+            modules.add(DetailItemModule(resourceManager.getString(R.string.utxos_detailed_date), formattedDateTime))
+        }
+        if (utxoItem.isSelectable) {
+            modules.add(
+                ButtonModule(resourceManager.getString(R.string.utxos_break_button), ButtonStyle.Normal) {
+                    _dissmissDialog.postValue(Unit)
+                    split(utxoItem)
+                },
+            )
+        }
+        modules.add(ButtonModule(resourceManager.getString(R.string.common_cancel), ButtonStyle.Close))
+        val modularArgs = ModularDialogArgs(DialogArgs(), modules)
+        _modularDialog.postValue(modularArgs)
+    }
+
+    private fun showSuccessDialog() {
+        val modularArgs = ModularDialogArgs(
+            DialogArgs() {
+                setSelectionState(false)
+            }, listOf(
+                ImageModule(R.drawable.ic_utxos_succes_popper),
+                HeadModule(resourceManager.getString(R.string.utxos_success_title)),
+                BodyModule(resourceManager.getString(R.string.utxos_success_description)),
+                ButtonModule(resourceManager.getString(R.string.common_close), ButtonStyle.Close)
+            )
+        )
+        _modularDialog.postValue(modularArgs)
     }
 }

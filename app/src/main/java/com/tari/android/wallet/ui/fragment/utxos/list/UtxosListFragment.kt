@@ -11,12 +11,15 @@ import com.tari.android.wallet.databinding.FragmentUtxosListBinding
 import com.tari.android.wallet.extension.observe
 import com.tari.android.wallet.extension.observeOnLoad
 import com.tari.android.wallet.ui.common.CommonFragment
+import com.tari.android.wallet.ui.common.recyclerView.CommonAdapter
 import com.tari.android.wallet.ui.extension.gone
 import com.tari.android.wallet.ui.extension.setVisible
 import com.tari.android.wallet.ui.extension.visible
 import com.tari.android.wallet.ui.fragment.utxos.list.adapters.UtxosListAdapter
 import com.tari.android.wallet.ui.fragment.utxos.list.adapters.UtxosListTileAdapter
 import com.tari.android.wallet.ui.fragment.utxos.list.controllers.CheckedController
+import com.tari.android.wallet.ui.fragment.utxos.list.controllers.JoinSplitButtonsState
+import com.tari.android.wallet.ui.fragment.utxos.list.controllers.ScreenState
 import com.tari.android.wallet.ui.fragment.utxos.list.controllers.listType.ListType
 import com.tari.android.wallet.ui.fragment.utxos.list.controllers.listType.ListTypeSwitchController
 
@@ -45,23 +48,10 @@ class UtxosListFragment : CommonFragment<FragmentUtxosListBinding, UtxosListView
 
     private fun observeUI() = with(viewModel) {
         observeOnLoad(sortingMediator)
-        observe(listType) {
-            when (it!!) {
-                ListType.Text -> {
-                    ui.utxosTextList.visible()
-                    ui.tileContainer.gone()
-                    ui.utxosTileLeftList.gone()
-                    ui.utxosTileRightList.gone()
-                }
-                ListType.Tile -> {
-                    ui.utxosTextList.gone()
-                    ui.tileContainer.visible()
-                    ui.utxosTileLeftList.visible()
-                    ui.utxosTileRightList.visible()
-                }
-            }
-        }
-        observe(selectionState) { ui.splitJoinContainer.setVisible(it) }
+        observe(listType) { updateListType(it) }
+        observe(selectionState) { selectionController.setChecked(it) }
+        observe(screenState) { updateState(it) }
+        observe(joinSplitButtonsState) { updateJoinSplitButtonsState(it) }
         observe(ordering) { ui.orderingState.setText(it.textId) }
         observe(textList) { textListAdapter.update(it) }
         observe(leftTileList) { tileLeftAdapter.update(it) }
@@ -71,6 +61,8 @@ class UtxosListFragment : CommonFragment<FragmentUtxosListBinding, UtxosListView
     private fun setupCTA() {
         ui.backCtaView.setOnClickListener { requireActivity().onBackPressed() }
         ui.orderingState.setOnClickListener { viewModel.showOrderingSelectionDialog() }
+        ui.joinButton.setOnClickListener { viewModel.join() }
+        ui.splitButton.setOnClickListener { viewModel.split() }
     }
 
     private fun setupUI() {
@@ -81,21 +73,79 @@ class UtxosListFragment : CommonFragment<FragmentUtxosListBinding, UtxosListView
         selectionController = CheckedController(ui.selectingState)
         selectionController.toggleCallback = { viewModel.setSelectionState(it) }
         ui.selectingState.setOnClickListener { selectionController.toggleChecked() }
-        selectionController.setChecked(false)
 
         ui.utxosTextList.layoutManager = LinearLayoutManager(requireContext())
         ui.utxosTextList.adapter = textListAdapter
+        textListAdapter.setClickListener(CommonAdapter.ItemClickListener { viewModel.selectItem(it) })
+        textListAdapter.setLongClickListener(CommonAdapter.ItemLongClickListener { viewModel.setSelectionStateTrue() })
 
         ui.utxosTileLeftList.layoutManager = LinearLayoutManager(requireContext())
         ui.utxosTileLeftList.adapter = tileLeftAdapter
+        tileLeftAdapter.setClickListener(CommonAdapter.ItemClickListener { viewModel.selectItem(it) })
+        tileLeftAdapter.setLongClickListener(CommonAdapter.ItemLongClickListener { viewModel.setSelectionStateTrue() })
 
         ui.utxosTileRightList.layoutManager = LinearLayoutManager(requireContext())
         ui.utxosTileRightList.adapter = tileRightAdapter
+        tileRightAdapter.setClickListener(CommonAdapter.ItemClickListener { viewModel.selectItem(it) })
+        tileRightAdapter.setLongClickListener(CommonAdapter.ItemLongClickListener { viewModel.setSelectionStateTrue() })
 
-        syncroniseTileScrolling()
+        synchronizeTileScrolling()
     }
 
-    private fun syncroniseTileScrolling() {
+    private fun updateListType(listType: ListType) {
+        when (listType) {
+            ListType.Text -> {
+                ui.utxosTextList.visible()
+                ui.tileContainer.gone()
+                ui.utxosTileLeftList.gone()
+                ui.utxosTileRightList.gone()
+            }
+            ListType.Tile -> {
+                ui.utxosTextList.gone()
+                ui.tileContainer.visible()
+                ui.utxosTileLeftList.visible()
+                ui.utxosTileRightList.visible()
+            }
+        }
+    }
+
+    private fun updateJoinSplitButtonsState(state: JoinSplitButtonsState) {
+        when (state) {
+            JoinSplitButtonsState.None -> ui.splitJoinContainer.setVisible(false)
+            JoinSplitButtonsState.Break -> {
+                ui.splitJoinContainer.setVisible(true)
+                ui.buttonsDivider.setVisible(false)
+                ui.joinButton.setVisible(false)
+            }
+            JoinSplitButtonsState.JoinAndBreak -> {
+                ui.splitJoinContainer.setVisible(true)
+                ui.buttonsDivider.setVisible(true)
+                ui.joinButton.setVisible(true)
+            }
+        }
+    }
+
+    private fun updateState(screenState: ScreenState) {
+        when (screenState) {
+            ScreenState.Loading -> {
+                ui.emptyContainer.setVisible(false)
+                ui.loadingContainer.setVisible(true)
+                ui.dataContainer.setVisible(false)
+            }
+            ScreenState.Empty -> {
+                ui.emptyContainer.setVisible(true)
+                ui.loadingContainer.setVisible(false)
+                ui.dataContainer.setVisible(false)
+            }
+            ScreenState.Data -> {
+                ui.emptyContainer.setVisible(false)
+                ui.loadingContainer.setVisible(false)
+                ui.dataContainer.setVisible(true)
+            }
+        }
+    }
+
+    private fun synchronizeTileScrolling() {
         val scrollListeners = mutableListOf<RecyclerView.OnScrollListener>()
 
         val leftListener = object : RecyclerView.OnScrollListener() {

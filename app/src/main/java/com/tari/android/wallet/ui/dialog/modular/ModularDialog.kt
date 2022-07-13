@@ -22,8 +22,7 @@ import com.tari.android.wallet.ui.fragment.send.addAmount.feeModule.FeeModule
 import com.tari.android.wallet.ui.fragment.send.addAmount.feeModule.FeeModuleView
 import com.tari.android.wallet.ui.fragment.send.shareQr.ShareQRCodeModuleView
 import com.tari.android.wallet.ui.fragment.send.shareQr.ShareQrCodeModule
-import com.tari.android.wallet.ui.fragment.utxos.list.module.ListItemModule
-import com.tari.android.wallet.ui.fragment.utxos.list.module.ListItemModuleView
+import com.tari.android.wallet.ui.fragment.utxos.list.module.*
 
 
 open class ModularDialog(val context: Context) : TariDialog {
@@ -65,6 +64,9 @@ open class ModularDialog(val context: Context) : TariDialog {
                 is ShareQrCodeModule -> ShareQRCodeModuleView(context, module)
                 is FeeModule -> FeeModuleView(context, module)
                 is ListItemModule -> ListItemModuleView(context, module)
+                is DetailItemModule -> DetailItemModuleView(context, module)
+                is UtxoAmountModule -> UtxoAmountModuleView(context, module)
+                is UtxoSplitModule -> UtxoSplitModuleView(context, module)
                 else -> View(context)
             }
             root.addView(view)
