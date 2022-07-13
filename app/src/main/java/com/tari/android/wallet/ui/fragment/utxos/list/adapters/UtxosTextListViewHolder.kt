@@ -13,8 +13,8 @@ class UtxosTextListViewHolder(view: ItemUtxosTextBinding) : CommonViewHolder<Utx
         super.bind(item)
 
         ui.amount.text = item.amount + " XTR"
-        val dateStr = if (item.isShowDate) "| ${item.formattedDate} | ${item.formattedTime}" else ""
         val statusStr = if (item.isShowingStatus) itemView.context.getString(item.status!!.text) else ""
+        val dateStr = if (item.isShowDate) " | ${item.formattedDate} | ${item.formattedTime}" else ""
         ui.additionalData.text = statusStr + dateStr
         ui.hash.text = item.source.commitment
 
