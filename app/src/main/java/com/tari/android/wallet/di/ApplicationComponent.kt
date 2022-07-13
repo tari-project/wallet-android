@@ -71,7 +71,6 @@ import com.tari.android.wallet.ui.fragment.send.finalize.FinalizeSendTxViewModel
 import com.tari.android.wallet.ui.fragment.send.requestTari.RequestTariViewModel
 import com.tari.android.wallet.ui.fragment.settings.allSettings.AllSettingsViewModel
 import com.tari.android.wallet.ui.fragment.settings.allSettings.about.TariAboutViewModel
-import com.tari.android.wallet.ui.fragment.settings.allSettings.about.list.TariIconViewHolder
 import com.tari.android.wallet.ui.fragment.settings.backgroundService.BackgroundServiceSettingsViewModel
 import com.tari.android.wallet.ui.fragment.settings.backup.ChangeSecurePasswordFragment
 import com.tari.android.wallet.ui.fragment.settings.backup.EnterCurrentPasswordFragment
@@ -84,6 +83,7 @@ import com.tari.android.wallet.ui.fragment.settings.userAutorization.BiometricAu
 import com.tari.android.wallet.ui.fragment.tx.TxListViewModel
 import com.tari.android.wallet.ui.fragment.tx.details.TxDetailsFragment
 import com.tari.android.wallet.ui.fragment.tx.details.gif.GIFViewModel
+import com.tari.android.wallet.ui.fragment.utxos.list.UtxosListViewModel
 import dagger.Component
 import javax.inject.Singleton
 
@@ -177,6 +177,7 @@ internal interface ApplicationComponent {
     fun inject(viewModel: IntroductionViewModel)
     fun inject(viewModel: AuthViewModel)
     fun inject(viewModel: TariAboutViewModel)
+    fun inject(viewModel: UtxosListViewModel)
     /**
      * Service(s).
      */

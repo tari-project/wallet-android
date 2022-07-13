@@ -100,7 +100,7 @@ jmethodID transactionValidationCompleteCallbackMethodId;
 jmethodID recoveringProcessCompleteCallbackMethodId;
 jmethodID balanceUpdatedCallbackMethodId;
 
-void txBroadcastCallback(struct TariCompletedTransaction *pCompletedTransaction) {
+void txBroadcastCallback(TariCompletedTransaction *pCompletedTransaction) {
     auto *jniEnv = getJNIEnv();
     if (jniEnv == nullptr || callbackHandler == nullptr) {
         return;
@@ -113,7 +113,7 @@ void txBroadcastCallback(struct TariCompletedTransaction *pCompletedTransaction)
     g_vm->DetachCurrentThread();
 }
 
-void txMinedCallback(struct TariCompletedTransaction *pCompletedTransaction) {
+void txMinedCallback(TariCompletedTransaction *pCompletedTransaction) {
     auto *jniEnv = getJNIEnv();
     if (jniEnv == nullptr || callbackHandler == nullptr) {
         return;
@@ -126,8 +126,8 @@ void txMinedCallback(struct TariCompletedTransaction *pCompletedTransaction) {
     g_vm->DetachCurrentThread();
 }
 
-void txMinedUnconfirmedCallback(struct TariCompletedTransaction *pCompletedTransaction,
-                                unsigned long long confirmationCount) {
+void txMinedUnconfirmedCallback(TariCompletedTransaction *pCompletedTransaction,
+                                uint64_t confirmationCount) {
     auto *jniEnv = getJNIEnv();
     if (jniEnv == nullptr || callbackHandler == nullptr) {
         return;
@@ -142,7 +142,7 @@ void txMinedUnconfirmedCallback(struct TariCompletedTransaction *pCompletedTrans
     g_vm->DetachCurrentThread();
 }
 
-void txFauxConfirmedCallback(struct TariCompletedTransaction *pCompletedTransaction) {
+void txFauxConfirmedCallback(TariCompletedTransaction *pCompletedTransaction) {
     auto *jniEnv = getJNIEnv();
     if (jniEnv == nullptr || callbackHandler == nullptr) {
         return;
@@ -155,8 +155,8 @@ void txFauxConfirmedCallback(struct TariCompletedTransaction *pCompletedTransact
     g_vm->DetachCurrentThread();
 }
 
-void txFauxUnconfirmedCallback(struct TariCompletedTransaction *pCompletedTransaction,
-                               unsigned long long confirmationCount) {
+void txFauxUnconfirmedCallback(TariCompletedTransaction *pCompletedTransaction,
+                               uint64_t confirmationCount) {
     auto *jniEnv = getJNIEnv();
     if (jniEnv == nullptr || callbackHandler == nullptr) {
         return;
@@ -171,7 +171,7 @@ void txFauxUnconfirmedCallback(struct TariCompletedTransaction *pCompletedTransa
     g_vm->DetachCurrentThread();
 }
 
-void txReceivedCallback(struct TariPendingInboundTransaction *pPendingInboundTransaction) {
+void txReceivedCallback(TariPendingInboundTransaction *pPendingInboundTransaction) {
     auto *jniEnv = getJNIEnv();
     if (jniEnv == nullptr || callbackHandler == nullptr) {
         return;
@@ -184,7 +184,7 @@ void txReceivedCallback(struct TariPendingInboundTransaction *pPendingInboundTra
     g_vm->DetachCurrentThread();
 }
 
-void txReplyReceivedCallback(struct TariCompletedTransaction *pCompletedTransaction) {
+void txReplyReceivedCallback(TariCompletedTransaction *pCompletedTransaction) {
     auto *jniEnv = getJNIEnv();
     if (jniEnv == nullptr || callbackHandler == nullptr) {
         return;
@@ -197,7 +197,7 @@ void txReplyReceivedCallback(struct TariCompletedTransaction *pCompletedTransact
     g_vm->DetachCurrentThread();
 }
 
-void txFinalizedCallback(struct TariCompletedTransaction *pCompletedTransaction) {
+void txFinalizedCallback(TariCompletedTransaction *pCompletedTransaction) {
     auto *jniEnv = getJNIEnv();
     if (jniEnv == nullptr || callbackHandler == nullptr) {
         return;
@@ -224,7 +224,7 @@ void txDirectSendResultCallback(unsigned long long txId, TariTransactionSendStat
     g_vm->DetachCurrentThread();
 }
 
-void txCancellationCallback(struct TariCompletedTransaction *pCompletedTransaction, unsigned long long rejectionReason) {
+void txCancellationCallback(TariCompletedTransaction *pCompletedTransaction, uint64_t rejectionReason) {
     auto *jniEnv = getJNIEnv();
     if (jniEnv == nullptr || callbackHandler == nullptr) {
         return;
@@ -239,7 +239,7 @@ void txCancellationCallback(struct TariCompletedTransaction *pCompletedTransacti
     g_vm->DetachCurrentThread();
 }
 
-void txoValidationCompleteCallback(unsigned long long requestId, bool success) {
+void txoValidationCompleteCallback(uint64_t requestId, bool success) {
     auto *jniEnv = getJNIEnv();
     if (jniEnv == nullptr || callbackHandler == nullptr) {
         return;
@@ -253,7 +253,7 @@ void txoValidationCompleteCallback(unsigned long long requestId, bool success) {
     g_vm->DetachCurrentThread();
 }
 
-void contactsLivenessDataUpdatedCallback(struct TariContactsLivenessData *pTariContactsLivenessData) {
+void contactsLivenessDataUpdatedCallback(TariContactsLivenessData *pTariContactsLivenessData) {
     auto *jniEnv = getJNIEnv();
     if (jniEnv == nullptr || callbackHandler == nullptr) {
         return;
@@ -266,7 +266,7 @@ void contactsLivenessDataUpdatedCallback(struct TariContactsLivenessData *pTariC
     g_vm->DetachCurrentThread();
 }
 
-void transactionValidationCompleteCallback(unsigned long long requestId, bool success) {
+void transactionValidationCompleteCallback(uint64_t requestId, bool success) {
     auto *jniEnv = getJNIEnv();
     if (jniEnv == nullptr || callbackHandler == nullptr) {
         return;
@@ -280,7 +280,7 @@ void transactionValidationCompleteCallback(unsigned long long requestId, bool su
     g_vm->DetachCurrentThread();
 }
 
-void connectivityStatusCallback(unsigned long long status) {
+void connectivityStatusCallback(uint64_t status) {
     auto *jniEnv = getJNIEnv();
     if (jniEnv == nullptr || callbackHandler == nullptr) {
         return;
@@ -293,7 +293,7 @@ void connectivityStatusCallback(unsigned long long status) {
     g_vm->DetachCurrentThread();
 }
 
-void balanceUpdatedCallback(struct TariBalance *pBalance) {
+void balanceUpdatedCallback(TariBalance *pBalance) {
     auto *jniEnv = getJNIEnv();
     if (jniEnv == nullptr || callbackHandler == nullptr) {
         return;
@@ -310,7 +310,8 @@ void storeAndForwardMessagesReceivedCallback() {
     // no-op
 }
 
-void recoveringProcessCompleteCallback(unsigned char first, unsigned long long second, unsigned long long third) {
+
+void recoveringProcessCompleteCallback(uint8_t first, uint64_t second, uint64_t third) {
     auto *jniEnv = getJNIEnv();
     if (jniEnv == nullptr || callbackHandler == nullptr) {
         return;
@@ -595,6 +596,44 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniGetBalance(
     jlong lWallet = GetPointerField(jEnv, jThis);
     auto *pWallet = reinterpret_cast<TariWallet *>(lWallet);
     auto result = reinterpret_cast<jlong>(wallet_get_balance(pWallet, errorCodePointer));
+    setErrorCode(jEnv, error, errorCode);
+    return result;
+}
+
+extern "C"
+JNIEXPORT jlong JNICALL
+Java_com_tari_android_wallet_ffi_FFIWallet_jniGetUtxos(
+        JNIEnv *jEnv,
+        jobject jThis,
+        jint jPage,
+        jint jPageSize,
+        jint jSorting,
+        jlong jDustThreshold,
+        jobject error) {
+    int errorCode = 0;
+    int *errorCodePointer = &errorCode;
+    jlong lWallet = GetPointerField(jEnv, jThis);
+    auto *pWallet = reinterpret_cast<TariWallet *>(lWallet);
+    auto pSorting = (TariUtxoSort) jSorting;
+    //todo states
+    auto outputs = wallet_get_utxos(pWallet, jPage, jPageSize, pSorting, nullptr, jDustThreshold, errorCodePointer);
+    auto result = reinterpret_cast<jlong>(outputs);
+    setErrorCode(jEnv, error, errorCode);
+    return result;
+}
+
+extern "C"
+JNIEXPORT jlong JNICALL
+Java_com_tari_android_wallet_ffi_FFIWallet_jniGetAllUtxos(
+        JNIEnv *jEnv,
+        jobject jThis,
+        jobject error) {
+    int errorCode = 0;
+    int *errorCodePointer = &errorCode;
+    jlong lWallet = GetPointerField(jEnv, jThis);
+    auto *pWallet = reinterpret_cast<TariWallet *>(lWallet);
+    auto outputs = wallet_get_all_utxos(pWallet, errorCodePointer);
+    auto result = reinterpret_cast<jlong>(outputs);
     setErrorCode(jEnv, error, errorCode);
     return result;
 }
@@ -901,42 +940,126 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniEstimateTxFee(
 }
 
 extern "C"
-JNIEXPORT jbyteArray JNICALL
-Java_com_tari_android_wallet_ffi_FFIWallet_jniCoinSplit(
+JNIEXPORT jlong JNICALL
+Java_com_tari_android_wallet_ffi_FFIWallet_jniJoinUtxos(
         JNIEnv *jEnv,
         jobject jThis,
-        jstring jamount,
-        jstring jsplitCount,
-        jstring jfee,
-        jstring jmessage,
-        jstring jlockHeight,
+        jobjectArray jCommitments,
+        jstring jFeePerGram,
         jobject error) {
     int errorCode = 0;
     int *errorCodePointer = &errorCode;
     jlong lWallet = GetPointerField(jEnv, jThis);
     auto *pWallet = reinterpret_cast<TariWallet *>(lWallet);
-    const char *nativeAmount = jEnv->GetStringUTFChars(jamount, JNI_FALSE);
-    const char *nativeFee = jEnv->GetStringUTFChars(jfee, JNI_FALSE);
-    const char *nativeHeight = jEnv->GetStringUTFChars(jlockHeight, JNI_FALSE);
-    const char *nativeCount = jEnv->GetStringUTFChars(jsplitCount, JNI_FALSE);
-    const char *pMessage = jEnv->GetStringUTFChars(jmessage, JNI_FALSE);
-    char *pAmountEnd;
-    char *pFeeEnd;
-    char *pLockHeightEnd;
-    char *pCountEnd;
-    unsigned long long fee = strtoull(nativeFee, &pFeeEnd, 10);
-    unsigned long long amount = strtoull(nativeAmount, &pAmountEnd, 10);
-    unsigned long long height = strtoull(nativeHeight, &pLockHeightEnd, 10);
-    unsigned long long count = strtoull(nativeCount, &pCountEnd, 10);
-    jbyteArray result = getBytesFromUnsignedLongLong(
-            jEnv,
-            wallet_coin_split(pWallet, amount, count, fee, pMessage, height, errorCodePointer));
+
+    int size = jEnv->GetArrayLength(jCommitments);
+    auto *pTariVector = create_tari_vector(Text);
+    for (int i = 0; i < size; ++i) {
+        auto commitmentItem = (jstring) jEnv->GetObjectArrayElement(jCommitments, i);
+        const char *commitmentRef = jEnv->GetStringUTFChars(commitmentItem, JNI_FALSE);
+        tari_vector_push_string(pTariVector, commitmentRef, errorCodePointer);
+    }
+
+    const char *nativeGramFee = jEnv->GetStringUTFChars(jFeePerGram, JNI_FALSE);
+    char *pGramFeeEnd;
+    unsigned long feePerGram = strtoull(nativeGramFee, &pGramFeeEnd, 10);
+    auto result = (jlong) wallet_coin_join(pWallet, pTariVector, feePerGram, errorCodePointer);
     setErrorCode(jEnv, error, errorCode);
-    jEnv->ReleaseStringUTFChars(jamount, nativeAmount);
-    jEnv->ReleaseStringUTFChars(jfee, nativeFee);
-    jEnv->ReleaseStringUTFChars(jlockHeight, nativeHeight);
-    jEnv->ReleaseStringUTFChars(jsplitCount, nativeCount);
-    jEnv->ReleaseStringUTFChars(jmessage, pMessage);
+    return result;
+}
+
+extern "C"
+JNIEXPORT jlong JNICALL
+Java_com_tari_android_wallet_ffi_FFIWallet_jniSplitUtxos(
+        JNIEnv *jEnv,
+        jobject jThis,
+        jobjectArray jCommitments,
+        jstring jSplitCount,
+        jstring jFeePerGram,
+        jobject error) {
+    int errorCode = 0;
+    int *errorCodePointer = &errorCode;
+    jlong lWallet = GetPointerField(jEnv, jThis);
+    auto *pWallet = reinterpret_cast<TariWallet *>(lWallet);
+
+    int size = jEnv->GetArrayLength(jCommitments);
+    auto *pTariVector = create_tari_vector(Text);
+    for (int i = 0; i < size; ++i) {
+        auto commitmentItem = (jstring) jEnv->GetObjectArrayElement(jCommitments, i);
+        const char *commitmentRef = jEnv->GetStringUTFChars(commitmentItem, JNI_FALSE);
+        tari_vector_push_string(pTariVector, commitmentRef, errorCodePointer);
+    }
+
+    const char *nativeSplitCount = jEnv->GetStringUTFChars(jSplitCount, JNI_FALSE);
+    const char *nativeGramFee = jEnv->GetStringUTFChars(jFeePerGram, JNI_FALSE);
+    char *pSplitCount;
+    char *pGramFeeEnd;
+    unsigned int splitCount = strtoull(nativeSplitCount, &pSplitCount, 10);
+    unsigned long feePerGram = strtoull(nativeGramFee, &pGramFeeEnd, 10);
+    auto result = (jlong) wallet_coin_split(pWallet, pTariVector, splitCount, feePerGram, errorCodePointer);
+    setErrorCode(jEnv, error, errorCode);
+    return result;
+}
+
+extern "C"
+JNIEXPORT jlong JNICALL
+Java_com_tari_android_wallet_ffi_FFIWallet_jniPreviewJoinUtxos(
+        JNIEnv *jEnv,
+        jobject jThis,
+        jobjectArray jCommitments,
+        jstring jFeePerGram,
+        jobject error) {
+    int errorCode = 0;
+    int *errorCodePointer = &errorCode;
+    jlong lWallet = GetPointerField(jEnv, jThis);
+    auto *pWallet = reinterpret_cast<TariWallet *>(lWallet);
+
+    int size = jEnv->GetArrayLength(jCommitments);
+    auto *pTariVector = create_tari_vector(Text);
+    for (int i = 0; i < size; ++i) {
+        auto commitmentItem = (jstring) jEnv->GetObjectArrayElement(jCommitments, i);
+        const char *commitmentRef = jEnv->GetStringUTFChars(commitmentItem, JNI_FALSE);
+        tari_vector_push_string(pTariVector, commitmentRef, errorCodePointer);
+    }
+
+    const char *nativeGramFee = jEnv->GetStringUTFChars(jFeePerGram, JNI_FALSE);
+    char *pGramFeeEnd;
+    unsigned long feePerGram = strtoull(nativeGramFee, &pGramFeeEnd, 10);
+    auto result = (jlong) wallet_preview_coin_join(pWallet, pTariVector, feePerGram, errorCodePointer);
+    setErrorCode(jEnv, error, errorCode);
+    return result;
+}
+
+extern "C"
+JNIEXPORT jlong JNICALL
+Java_com_tari_android_wallet_ffi_FFIWallet_jniPreviewSplitUtxos(
+        JNIEnv *jEnv,
+        jobject jThis,
+        jobjectArray jCommitments,
+        jstring jSplitCount,
+        jstring jFeePerGram,
+        jobject error) {
+    int errorCode = 0;
+    int *errorCodePointer = &errorCode;
+    jlong lWallet = GetPointerField(jEnv, jThis);
+    auto *pWallet = reinterpret_cast<TariWallet *>(lWallet);
+
+    int size = jEnv->GetArrayLength(jCommitments);
+    auto *pTariVector = create_tari_vector(Text);
+    for (int i = 0; i < size; ++i) {
+        auto commitmentItem = (jstring) jEnv->GetObjectArrayElement(jCommitments, i);
+        const char *commitmentRef = jEnv->GetStringUTFChars(commitmentItem, JNI_FALSE);
+        tari_vector_push_string(pTariVector, commitmentRef, errorCodePointer);
+    }
+
+    const char *nativeSplitCount = jEnv->GetStringUTFChars(jSplitCount, JNI_FALSE);
+    const char *nativeGramFee = jEnv->GetStringUTFChars(jFeePerGram, JNI_FALSE);
+    char *pSplitCount;
+    char *pGramFeeEnd;
+    unsigned int splitCount = strtoull(nativeSplitCount, &pSplitCount, 10);
+    unsigned long feePerGram = strtoull(nativeGramFee, &pGramFeeEnd, 10);
+    auto result = (jlong) wallet_preview_coin_split(pWallet, pTariVector, splitCount, feePerGram, errorCodePointer);
+    setErrorCode(jEnv, error, errorCode);
     return result;
 }
 

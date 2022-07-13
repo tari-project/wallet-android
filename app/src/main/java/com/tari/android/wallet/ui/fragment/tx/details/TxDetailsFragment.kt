@@ -335,7 +335,7 @@ internal class TxDetailsFragment : CommonFragment<FragmentTxDetailsBinding, TxDe
     private fun showTxCancelDialog() {
         val dialog = ModularDialog(requireContext())
         val args = ModularDialogArgs(DialogArgs(), listOf(
-            HeadModule(string(tx_details_cancel_dialog_title)),
+            HeadModule(string(common_are_you_sure)),
             BodyModule(string(tx_details_cancel_dialog_description)),
             ButtonModule(string(tx_details_cancel_dialog_cancel), ButtonStyle.Normal) {
                 viewModel.cancelTransaction()

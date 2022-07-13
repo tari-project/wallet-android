@@ -151,7 +151,7 @@ internal class BalanceViewController(
                     viewHolders[0].shrink(
                         Constants.UI.Home.digitAnimDurationMs + (-sizeDiff - 1) * delayByIndex,
                         object : AnimatorListenerAdapter() {
-                            override fun onAnimationEnd(animation: Animator?) {
+                            override fun onAnimationEnd(animation: Animator) {
                                 super.onAnimationEnd(animation)
                                 if (i == -sizeDiff - 1) {
                                     wr.get()?.digitContainerView?.removeViews(0, -sizeDiff)
