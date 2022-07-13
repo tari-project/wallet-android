@@ -28,7 +28,10 @@ class UtxosTileListViewHolder(view: ItemUtxosTileBinding) : CommonViewHolder<Utx
         ui.dateTime.text = item.formattedDate
         ui.dateTime.setVisible(item.isShowDate)
 
-        ui.status.setImageResource(item.status.icon)
+        ui.status.setVisible(item.isShowingStatus)
+        if (item.isShowingStatus) {
+            ui.status.setImageResource(item.status!!.icon)
+        }
 
         ui.root.updateLayoutParams<ViewGroup.LayoutParams> { this.height = itemView.context.dpToPx(item.height.toFloat()).toInt() }
 

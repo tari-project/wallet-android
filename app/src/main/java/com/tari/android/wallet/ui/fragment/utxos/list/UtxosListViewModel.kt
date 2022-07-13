@@ -41,7 +41,7 @@ class UtxosListViewModel : CommonViewModel() {
 
     val selectionState = MutableLiveData<Boolean>()
 
-    val sourceList: MutableLiveData<List<UtxosViewHolderItem>> = MutableLiveData()
+    val sourceList: MutableLiveData<MutableList<UtxosViewHolderItem>> = MutableLiveData()
     val textList: MutableLiveData<MutableList<UtxosViewHolderItem>> = MutableLiveData(mutableListOf())
     val leftTileList: MutableLiveData<MutableList<UtxosViewHolderItem>> = MutableLiveData(mutableListOf())
     val rightTileList: MutableLiveData<MutableList<UtxosViewHolderItem>> = MutableLiveData(mutableListOf())
@@ -162,7 +162,7 @@ class UtxosListViewModel : CommonViewModel() {
     private fun loadUtxosFromFFI() {
         val allItems = walletService.getWithError { error, wallet ->
             wallet.getAllUtxos(error)
-        }.itemsList.map { UtxosViewHolderItem(it) }
+        }.itemsList.map { UtxosViewHolderItem(it) }.filter { it.isShowingStatus }.toMutableList()
         val state = if (allItems.isEmpty()) ScreenState.Empty else ScreenState.Data
         screenState.postValue(state)
         sourceList.postValue(allItems)
@@ -249,19 +249,21 @@ class UtxosListViewModel : CommonViewModel() {
     private fun showDetailedDialog(utxoItem: UtxosViewHolderItem) {
         val modules = mutableListOf<IDialogModule>()
         modules.add(UtxoAmountModule(utxoItem.source.value))
-        modules.add(
-            DetailItemModule(
-                resourceManager.getString(R.string.utxos_detailed_status),
-                resourceManager.getString(utxoItem.status.text),
-                utxoItem.status.textIcon
+        if (utxoItem.isShowingStatus) {
+            modules.add(
+                DetailItemModule(
+                    resourceManager.getString(R.string.utxos_detailed_status),
+                    resourceManager.getString(utxoItem.status!!.text),
+                    utxoItem.status.textIcon
+                )
             )
-        )
+        }
         modules.add(DetailItemModule(resourceManager.getString(R.string.utxos_detailed_commitment), utxoItem.source.commitment))
         if (utxoItem.isShowMinedHeight) {
             modules.add(DetailItemModule(resourceManager.getString(R.string.utxos_detailed_block_height), utxoItem.source.minedHeight.toString()))
         }
         if (utxoItem.isShowDate) {
-            val formattedDateTime = utxoItem.formatedTime + " " + utxoItem.formatedTime
+            val formattedDateTime = utxoItem.formattedTime + " " + utxoItem.formattedTime
             modules.add(DetailItemModule(resourceManager.getString(R.string.utxos_detailed_date), formattedDateTime))
         }
         if (utxoItem.isSelectable) {
@@ -285,7 +287,7 @@ class UtxosListViewModel : CommonViewModel() {
                 ImageModule(R.drawable.ic_utxos_succes_popper),
                 HeadModule(resourceManager.getString(R.string.utxos_success_title)),
                 BodyModule(resourceManager.getString(R.string.utxos_success_description)),
-                ButtonModule(resourceManager.getString(R.string.common_cancel), ButtonStyle.Close)
+                ButtonModule(resourceManager.getString(R.string.common_close), ButtonStyle.Close)
             )
         )
         _modularDialog.postValue(modularArgs)

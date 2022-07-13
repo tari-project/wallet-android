@@ -13,11 +13,12 @@ class UtxosTextListViewHolder(view: ItemUtxosTextBinding) : CommonViewHolder<Utx
         super.bind(item)
 
         ui.amount.text = item.amount + " XTR"
-        val dateStr = if (item.isShowDate) "| ${item.formattedDate} | ${item.formatedTime}" else ""
-        ui.additionalData.text = itemView.context.getString(item.status.text) + dateStr
+        val dateStr = if (item.isShowDate) "| ${item.formattedDate} | ${item.formattedTime}" else ""
+        val statusStr = if (item.isShowingStatus) itemView.context.getString(item.status!!.text) else ""
+        ui.additionalData.text = statusStr + dateStr
         ui.hash.text = item.source.commitment
 
-        val drawable = ContextCompat.getDrawable(itemView.context, item.status.textIcon)
+        val drawable = if (item.isShowingStatus) ContextCompat.getDrawable(itemView.context, item.status!!.textIcon) else null
         ui.additionalData.setCompoundDrawablesRelativeWithIntrinsicBounds(drawable, null, null, null)
 
         setCheckedSilently(item)

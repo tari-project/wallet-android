@@ -16,23 +16,26 @@ class UtxosViewHolderItem(val source: TariUtxo, var height: Int = 0) : CommonVie
     val isShowMinedHeight: Boolean = source.minedHeight != 0L
     val amount = WalletUtil.amountFormatter.format(source.value.tariValue)!!
     val formattedDate: String
-    val formatedTime: String
-    val status: UtxosStatus
+    val formattedTime: String
+    val status: UtxosStatus?
     val isSelectable: Boolean
+    val isShowingStatus: Boolean
 
     init {
         //todo check for right conversion
         val dateTime = DateTime.now().withMillis(source.timestamp)
         val format = SimpleDateFormat()
         formattedDate = format.format(dateTime.toDate()).split(" ")[0]
-        formatedTime = dateTime.toString("HH:mm")
-        //todo align status
+        formattedTime = dateTime.toString("HH:mm")
+
         status = when (source.status) {
-            TariUtxo.UtxoStatus.Spent,
             TariUtxo.UtxoStatus.Unspent -> UtxosStatus.Mined
-            else -> UtxosStatus.Confirmed
+            TariUtxo.UtxoStatus.EncumberedToBeReceived,
+            TariUtxo.UtxoStatus.UnspentMinedUnconfirmed -> UtxosStatus.Confirmed
+            else -> null
         }
         isSelectable = status == UtxosStatus.Mined
+        isShowingStatus = status != null
     }
 
     companion object {
