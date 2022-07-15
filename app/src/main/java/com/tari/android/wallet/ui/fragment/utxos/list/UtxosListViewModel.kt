@@ -73,9 +73,10 @@ class UtxosListViewModel : CommonViewModel() {
         }
     }
 
-    fun setSelectionStateTrue(): Boolean {
+    fun setSelectionStateTrue(item: UtxosViewHolderItem): Boolean {
         if (!selectionState.value!!) {
             setSelectionState(true)
+            selectItem(item)
         }
         return true
     }
@@ -124,7 +125,7 @@ class UtxosListViewModel : CommonViewModel() {
                 wallet.joinUtxos(selectedUtxos, error)
                 _dissmissDialog.postValue(Unit)
                 loadUtxosFromFFI()
-                showSuccessDialog()
+                showSuccessJoinDialog()
             }
         }
     }
@@ -149,7 +150,7 @@ class UtxosListViewModel : CommonViewModel() {
                             wallet.splitUtxos(selectedUtxos, splitModule.count, error)
                             _dissmissDialog.postValue(Unit)
                             loadUtxosFromFFI()
-                            showSuccessDialog()
+                            showSuccessSplitDialog()
                         }
                     }
                 },
@@ -279,14 +280,18 @@ class UtxosListViewModel : CommonViewModel() {
         _modularDialog.postValue(modularArgs)
     }
 
-    private fun showSuccessDialog() {
+    private fun showSuccessSplitDialog() = showSuccessDialog(R.string.utxos_success_split_description)
+
+    private fun showSuccessJoinDialog() = showSuccessDialog(R.string.utxos_success_join_description)
+
+    private fun showSuccessDialog(descriptionId: Int) {
         val modularArgs = ModularDialogArgs(
             DialogArgs() {
                 setSelectionState(false)
             }, listOf(
                 ImageModule(R.drawable.ic_utxos_succes_popper),
                 HeadModule(resourceManager.getString(R.string.utxos_success_title)),
-                BodyModule(resourceManager.getString(R.string.utxos_success_description)),
+                BodyModule(resourceManager.getString(descriptionId)),
                 ButtonModule(resourceManager.getString(R.string.common_close), ButtonStyle.Close)
             )
         )

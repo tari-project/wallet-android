@@ -618,8 +618,10 @@
     <string name="utxos_combine_and_break_title">Combine &amp; Break Coins</string>
     <string name="utxos_combine_and_break_description">Into how many parts would you like to break these coins?</string>
     <string name="utxos_combine_and_break_button">Combine &amp; Break</string>
+    <string name="utxos_combine_button">Combine</string>
     <string name="utxos_success_title">Success!</string>
-    <string name="utxos_success_description">Your coin will be broken soon.\nKeep an eye on the transactions screen to\nsee when it’s been mined.</string>
+    <string name="utxos_success_join_description">Your coins will be combined soon.\nKeep an eye on the transactions screen to\nsee when it’s been mined.</string>
+    <string name="utxos_success_split_description">Your coin will be broken soon.\nKeep an eye on the transactions screen to\nsee when it’s been mined.</string>
     <string name="utxos_break_button">Break</string>
     <string name="utxos_break_title">Break Coin</string>
     <string name="utxos_join_description">You are about to join these coins.</string>

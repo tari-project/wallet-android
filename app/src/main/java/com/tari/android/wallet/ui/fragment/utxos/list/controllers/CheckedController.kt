@@ -16,6 +16,7 @@ class CheckedController(val view: TextView) {
     }
 
     fun setChecked(checked: Boolean) {
+        if(checked == this.checked.get()) return
         this.checked.set(checked)
         toggleCallback(checked)
         if (this.checked.get()) {
