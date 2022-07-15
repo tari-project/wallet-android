@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.tari.android.wallet.databinding.FragmentUtxosListBinding
@@ -17,8 +18,8 @@ import com.tari.android.wallet.ui.extension.setVisible
 import com.tari.android.wallet.ui.extension.visible
 import com.tari.android.wallet.ui.fragment.utxos.list.adapters.UtxosListAdapter
 import com.tari.android.wallet.ui.fragment.utxos.list.adapters.UtxosListTileAdapter
+import com.tari.android.wallet.ui.fragment.utxos.list.controllers.BottomButtonsController
 import com.tari.android.wallet.ui.fragment.utxos.list.controllers.CheckedController
-import com.tari.android.wallet.ui.fragment.utxos.list.controllers.JoinSplitButtonsState
 import com.tari.android.wallet.ui.fragment.utxos.list.controllers.ScreenState
 import com.tari.android.wallet.ui.fragment.utxos.list.controllers.listType.ListType
 import com.tari.android.wallet.ui.fragment.utxos.list.controllers.listType.ListTypeSwitchController
@@ -27,6 +28,7 @@ class UtxosListFragment : CommonFragment<FragmentUtxosListBinding, UtxosListView
 
     private lateinit var listTypeSwitchController: ListTypeSwitchController
     private lateinit var selectionController: CheckedController
+    private lateinit var bottomButtonsController: BottomButtonsController
 
     private val textListAdapter: UtxosListAdapter = UtxosListAdapter()
     private val tileLeftAdapter: UtxosListTileAdapter = UtxosListTileAdapter()
@@ -41,9 +43,9 @@ class UtxosListFragment : CommonFragment<FragmentUtxosListBinding, UtxosListView
         val viewModel: UtxosListViewModel by viewModels()
         bindViewModel(viewModel)
 
+        setupUI()
         observeUI()
         setupCTA()
-        setupUI()
     }
 
     private fun observeUI() = with(viewModel) {
@@ -51,7 +53,7 @@ class UtxosListFragment : CommonFragment<FragmentUtxosListBinding, UtxosListView
         observe(listType) { updateListType(it) }
         observe(selectionState) { selectionController.setChecked(it) }
         observe(screenState) { updateState(it) }
-        observe(joinSplitButtonsState) { updateJoinSplitButtonsState(it) }
+        observe(joinSplitButtonsState) { bottomButtonsController.setState(it) }
         observe(ordering) { ui.orderingState.setText(it.textId) }
         observe(textList) { textListAdapter.update(it) }
         observe(leftTileList) { tileLeftAdapter.update(it) }
@@ -77,17 +79,19 @@ class UtxosListFragment : CommonFragment<FragmentUtxosListBinding, UtxosListView
         ui.utxosTextList.layoutManager = LinearLayoutManager(requireContext())
         ui.utxosTextList.adapter = textListAdapter
         textListAdapter.setClickListener(CommonAdapter.ItemClickListener { viewModel.selectItem(it) })
-        textListAdapter.setLongClickListener(CommonAdapter.ItemLongClickListener { viewModel.setSelectionStateTrue() })
+        textListAdapter.setLongClickListener(CommonAdapter.ItemLongClickListener { viewModel.setSelectionStateTrue(it) })
 
         ui.utxosTileLeftList.layoutManager = LinearLayoutManager(requireContext())
         ui.utxosTileLeftList.adapter = tileLeftAdapter
         tileLeftAdapter.setClickListener(CommonAdapter.ItemClickListener { viewModel.selectItem(it) })
-        tileLeftAdapter.setLongClickListener(CommonAdapter.ItemLongClickListener { viewModel.setSelectionStateTrue() })
+        tileLeftAdapter.setLongClickListener(CommonAdapter.ItemLongClickListener { viewModel.setSelectionStateTrue(it) })
 
         ui.utxosTileRightList.layoutManager = LinearLayoutManager(requireContext())
         ui.utxosTileRightList.adapter = tileRightAdapter
         tileRightAdapter.setClickListener(CommonAdapter.ItemClickListener { viewModel.selectItem(it) })
-        tileRightAdapter.setLongClickListener(CommonAdapter.ItemLongClickListener { viewModel.setSelectionStateTrue() })
+        tileRightAdapter.setLongClickListener(CommonAdapter.ItemLongClickListener { viewModel.setSelectionStateTrue(it) })
+
+        bottomButtonsController = BottomButtonsController(ui, lifecycleScope)
 
         synchronizeTileScrolling()
     }
@@ -105,22 +109,6 @@ class UtxosListFragment : CommonFragment<FragmentUtxosListBinding, UtxosListView
                 ui.tileContainer.visible()
                 ui.utxosTileLeftList.visible()
                 ui.utxosTileRightList.visible()
-            }
-        }
-    }
-
-    private fun updateJoinSplitButtonsState(state: JoinSplitButtonsState) {
-        when (state) {
-            JoinSplitButtonsState.None -> ui.splitJoinContainer.setVisible(false)
-            JoinSplitButtonsState.Break -> {
-                ui.splitJoinContainer.setVisible(true)
-                ui.buttonsDivider.setVisible(false)
-                ui.joinButton.setVisible(false)
-            }
-            JoinSplitButtonsState.JoinAndBreak -> {
-                ui.splitJoinContainer.setVisible(true)
-                ui.buttonsDivider.setVisible(true)
-                ui.joinButton.setVisible(true)
             }
         }
     }
