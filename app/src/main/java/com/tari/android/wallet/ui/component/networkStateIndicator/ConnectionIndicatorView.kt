@@ -39,8 +39,6 @@ import android.view.ViewGroup
 import com.tari.android.wallet.databinding.ViewConnectionIndicatorBinding
 import com.tari.android.wallet.extension.observe
 import com.tari.android.wallet.ui.component.MainListTouchingView
-import com.tari.android.wallet.ui.component.tooltip.TooltipWindow
-import com.tari.android.wallet.ui.extension.string
 
 
 internal class ConnectionIndicatorView : MainListTouchingView<ConnectionIndicatorViewModel, ViewConnectionIndicatorBinding> {
@@ -54,31 +52,17 @@ internal class ConnectionIndicatorView : MainListTouchingView<ConnectionIndicato
 
     constructor(context: Context, attrs: AttributeSet, defStyleAttr: Int) : super(context, attrs, defStyleAttr)
 
-    private val tooltipWindow = TooltipWindow(context)
-
     override fun setup() = Unit
 
-    override fun doTouch() {
-        showTooltip()
-    }
+    override fun doTouch() = viewModel.showStatesDialog()
 
     override fun bindViewModel(viewModel: ConnectionIndicatorViewModel) {
         super.bindViewModel(viewModel)
 
         with(viewModel) {
             observe(state) {
-                ui.dot.setBackgroundResource(it.resId)
-
-                if (tooltipWindow.isTooltipShown) {
-                    tooltipWindow.dismissTooltip()
-                    showTooltip()
-                }
+                ui.image.setImageResource(it.resId)
             }
         }
-    }
-
-    private fun showTooltip() {
-        val message = string(viewModel.state.value!!.messageId)
-        tooltipWindow.showToolTip(ui.root, message)
     }
 }

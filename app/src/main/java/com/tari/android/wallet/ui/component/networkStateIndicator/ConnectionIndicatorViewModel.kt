@@ -3,7 +3,6 @@ package com.tari.android.wallet.ui.component.networkStateIndicator
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
-import com.tari.android.wallet.R
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.network.NetworkConnectionState
 import com.tari.android.wallet.service.baseNode.BaseNodeState
@@ -29,6 +28,10 @@ internal class ConnectionIndicatorViewModel : CommonViewModel() {
         subscribeOnEventBus()
     }
 
+    fun showStatesDialog() {
+        //todo
+    }
+
     private fun subscribeOnEventBus() {
         EventBus.torProxyState.subscribe(this) { _torProxyState.postValue(it) }
         EventBus.networkConnectionState.subscribe(this) { _networkState.postValue(it) }
@@ -37,24 +40,24 @@ internal class ConnectionIndicatorViewModel : CommonViewModel() {
 
     private fun updateConnectionState() {
         _state.value = when (_networkState.value) {
-            NetworkConnectionState.UNKNOWN -> ConnectionIndicatorState.Disconnected(R.string.connection_status_error_unknown_network_connection_status)
-            NetworkConnectionState.DISCONNECTED -> ConnectionIndicatorState.Disconnected(R.string.connection_status_error_no_network_connection)
+            NetworkConnectionState.UNKNOWN -> ConnectionIndicatorState.Disconnected
+            NetworkConnectionState.DISCONNECTED -> ConnectionIndicatorState.Disconnected
             NetworkConnectionState.CONNECTED -> {
                 when (_torProxyState.value) {
-                    is TorProxyState.Failed -> ConnectionIndicatorState.Disconnected(R.string.connection_status_error_disconnected_from_tor)
-                    TorProxyState.Initializing -> ConnectionIndicatorState.Disconnected(R.string.connection_status_error_unknown_network_connection_status)
-                    TorProxyState.NotReady -> ConnectionIndicatorState.Disconnected(R.string.connection_status_error_connecting_with_tor)
+                    is TorProxyState.Failed -> ConnectionIndicatorState.Disconnected
+                    TorProxyState.Initializing -> ConnectionIndicatorState.Disconnected
+                    TorProxyState.NotReady -> ConnectionIndicatorState.Disconnected
                     is TorProxyState.Running -> {
                         when (_baseNodeState.value) {
-                            is BaseNodeState.SyncStarted -> ConnectionIndicatorState.ConnectedWithIssues(R.string.connection_status_warning_sync_in_progress)
-                            is BaseNodeState.Online -> ConnectionIndicatorState.Connected(R.string.connection_status_ok)
-                            else -> ConnectionIndicatorState.Disconnected(R.string.connection_status_error_disconnected_from_base_node)
+                            is BaseNodeState.SyncStarted -> ConnectionIndicatorState.ConnectedWithIssues
+                            is BaseNodeState.Online -> ConnectionIndicatorState.Connected
+                            else -> ConnectionIndicatorState.Disconnected
                         }
                     }
-                    else -> ConnectionIndicatorState.Disconnected(R.string.connection_status_error_unknown_network_connection_status)
+                    else -> ConnectionIndicatorState.Disconnected
                 }
             }
-            else -> ConnectionIndicatorState.Disconnected(R.string.connection_status_error_unknown_network_connection_status)
+            else -> ConnectionIndicatorState.Disconnected
         }
     }
 }
