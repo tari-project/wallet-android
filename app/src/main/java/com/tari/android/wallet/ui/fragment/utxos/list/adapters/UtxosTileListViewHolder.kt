@@ -1,6 +1,7 @@
 package com.tari.android.wallet.ui.fragment.utxos.list.adapters
 
 import android.graphics.Color
+import android.graphics.drawable.GradientDrawable
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.core.view.updateLayoutParams
@@ -37,7 +38,12 @@ class UtxosTileListViewHolder(view: ItemUtxosTileBinding) : CommonViewHolder<Utx
 
         val baseColor = Color.valueOf(ContextCompat.getColor(itemView.context, R.color.purple))
         val newColor = Color.valueOf(getNext(baseColor.red()), getNext(baseColor.green()), getNext(baseColor.blue()))
-        ui.rootCard.setCardBackgroundColor(newColor.toArgb())
+
+        val shapeDrawable = ContextCompat.getDrawable(itemView.context, R.drawable.background_utxos_list_tile) as GradientDrawable
+        shapeDrawable.setColor(newColor.toArgb())
+        ui.colorContainer.background = shapeDrawable
+
+        ui.root.alpha = if (item.status == UtxosStatus.Mined) 1.0F else 0.4F
 
         setCheckedSilently(item)
         item.checked.afterTileChangeListener = { _, _ -> setCheckedSilently(item) }
@@ -50,6 +56,15 @@ class UtxosTileListViewHolder(view: ItemUtxosTileBinding) : CommonViewHolder<Utx
         ui.checkedState.setOnCheckedChangeListener { _, _ -> }
         ui.checkedState.isChecked = item.checked.value
         ui.checkedState.setOnCheckedChangeListener { _, isChecked -> item.checked.value = isChecked }
+
+        ui.rootCard.cardElevation = if (item.checked.value) 15F else 0F
+        if (item.checked.value) {
+            val outlineDrawable = ContextCompat.getDrawable(itemView.context, R.drawable.background_utxos_list_tile_outline)
+            ui.outlineContainer.background = outlineDrawable
+        } else {
+            val grayDrawable = ContextCompat.getColor(itemView.context, R.color.gray_background)
+            ui.outlineContainer.setBackgroundColor(grayDrawable)
+        }
     }
 
     private fun getNext(baseValue: Float): Float {
