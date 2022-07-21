@@ -284,7 +284,6 @@ internal class UpdateProgressViewController(
     }
 
     private fun onBaseNodeSyncCompleted(event: BaseNodeState) {
-        if (event is BaseNodeState.SyncStarted) return
         isWaitingOnBaseNodeSync = false
         baseNodeSyncTimeoutSubscription?.dispose()
         when (event) {
@@ -303,7 +302,6 @@ internal class UpdateProgressViewController(
                     startBaseNodeSync()
                 }
             }
-            else -> Unit
         }
     }
 

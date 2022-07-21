@@ -554,6 +554,20 @@
     <string name="connection_status_error_connecting_with_tor">Connecting with Tor</string>
     <string name="connection_status_error_unknown_tor_connection_status">Unknown connection status with Tor</string>
     <string name="connection_status_error_disconnected_from_base_node">Disconnected from the base node</string>
+    <string name="connection_status_dialog_title">Connection Status</string>
+    <string name="connection_status_dialog_network_status_disconnected">Disconnected from the Internet</string>
+    <string name="connection_status_dialog_network_status_connected">Connected to the Internet</string>
+    <string name="connection_status_dialog_tor_status_disconnected">Disconnected from Tor</string>
+    <string name="connection_status_dialog_tor_status_connecting">Connecting with Tor</string>
+    <string name="connection_status_dialog_tor_status_connected">Connected with Tor</string>
+    <string name="connection_status_dialog_tor_status_failed">Failed to connect with Tor</string>
+    <string name="connection_status_dialog_base_node_status_disconnected">Disconnected from Base Node</string>
+    <string name="connection_status_dialog_base_node_status_connecting">Connecting to Base Node</string>
+    <string name="connection_status_dialog_base_node_status_connected">Connected to Base Node</string>
+    <string name="connection_status_dialog_base_node_sync_idle">Waiting for Sync</string>
+    <string name="connection_status_dialog_base_node_sync_pending">Syncing with Base Node</string>
+    <string name="connection_status_dialog_base_node_sync_success">Synced with Base Node</string>
+    <string name="connection_status_dialog_base_node_sync_failure">Failed sync with Base Node</string>
 
     <string name="tor_bridges_title">Bridges Configuration</string>
     <string name="tor_bridges_connect">Connect</string>
