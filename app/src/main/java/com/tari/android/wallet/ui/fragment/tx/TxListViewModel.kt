@@ -10,6 +10,7 @@ import com.tari.android.wallet.data.sharedPrefs.testnetFaucet.TestnetFaucetRepos
 import com.tari.android.wallet.event.Event
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.extension.*
+import com.tari.android.wallet.ffi.FFIWallet
 import com.tari.android.wallet.model.*
 import com.tari.android.wallet.network.NetworkConnectionState
 import com.tari.android.wallet.service.TariWalletService

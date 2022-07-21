@@ -219,7 +219,7 @@ internal class CustomScrollView @JvmOverloads constructor(
         flingScroll(velocityY)
     }
 
-    override fun onNestedPreFling(target: View?, velocityX: Float, velocityY: Float): Boolean {
+    override fun onNestedPreFling(target: View, velocityX: Float, velocityY: Float): Boolean {
         if (swipeRefreshYOffset > 0 && !isUpdating) {
             return true
         }

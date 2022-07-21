@@ -72,10 +72,9 @@ internal class AllSettingsViewModel : CommonViewModel() {
 
     init {
         component.inject(this)
+        initOptions()
         EventBus.backupState.subscribe(this) { backupState -> onBackupStateChanged(backupState) }
         checkStorageStatus()
-
-        initOptions()
     }
 
     private fun initOptions() {
@@ -145,7 +144,7 @@ internal class AllSettingsViewModel : CommonViewModel() {
             DividerViewHolderItem(),
             SettingsVersionViewHolderItem(versionText) { _copyToClipboard.postValue(versionArgs) }
         )
-        _allSettingsOptions.postValue(allOptions)
+        _allSettingsOptions.value = allOptions
     }
 
     private fun checkStorageStatus() = viewModelScope.launch(Dispatchers.IO) {

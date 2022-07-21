@@ -173,4 +173,6 @@
     <dimen name="verify_seed_phrase_word_bottom_margin">14dp</dimen>
     <dimen name="seed_phrase_word_min_width">100dp</dimen>
 
+    <dimen name="utxos_list_tile_margin">12dp</dimen>
+
 </resources>

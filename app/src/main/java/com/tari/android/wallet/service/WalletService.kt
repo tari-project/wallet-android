@@ -1008,7 +1008,38 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
                 .also { seedWordsFFI.destroy() }
         }
 
-        // endregion
+        override fun getUtxos(page: Int, pageSize: Int, sorting: Int, error: WalletError): TariVector? =
+            executeWithMapping(error) { wallet.getUtxos(page, pageSize, sorting) }
+
+        override fun getAllUtxos(error: WalletError): TariVector? =
+            executeWithMapping(error) { wallet.getAllUtxos() }
+
+        override fun joinUtxos(utxos: List<TariUtxo>, walletError: WalletError) = executeWithMapping(walletError) {
+            val ffiError = FFIError()
+            wallet.joinUtxos(utxos.map { it.commitment }.toTypedArray(), Constants.Wallet.defaultFeePerGram.value, ffiError)
+            walletError.code = ffiError.code
+        } ?: Unit
+
+        override fun splitUtxos(utxos: List<TariUtxo>, splitCount: Int, walletError: WalletError) = executeWithMapping(walletError) {
+            val ffiError = FFIError()
+            wallet.splitUtxos(utxos.map { it.commitment }.toTypedArray(), splitCount, Constants.Wallet.defaultFeePerGram.value, ffiError)
+            walletError.code = ffiError.code
+        } ?: Unit
+
+        override fun previewJoinUtxos(utxos: List<TariUtxo>, walletError: WalletError): TariCoinPreview? = executeWithMapping(walletError) {
+            val ffiError = FFIError()
+            val result = wallet.joinPreviewUtxos(utxos.map { it.commitment }.toTypedArray(), Constants.Wallet.defaultFeePerGram.value, ffiError)
+            walletError.code = ffiError.code
+            result
+        }
+
+        override fun previewSplitUtxos(utxos: List<TariUtxo>, splitCount: Int, walletError: WalletError): TariCoinPreview? =
+            executeWithMapping(walletError) {
+                val ffiError = FFIError()
+                val result = wallet.splitPreviewUtxos(utxos.map { it.commitment }.toTypedArray(), splitCount, Constants.Wallet.defaultFeePerGram.value, ffiError)
+                walletError.code = ffiError.code
+                result
+            }
     }
 }
 
