@@ -21,6 +21,7 @@ import com.tari.android.wallet.ui.fragment.restore.inputSeedWords.suggestions.Su
 import com.tari.android.wallet.ui.fragment.restore.inputSeedWords.suggestions.SuggestionViewHolderItem
 import io.reactivex.disposables.CompositeDisposable
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -259,6 +260,14 @@ internal class InputSeedWordsViewModel() : CommonViewModel() {
 
     fun selectSuggestion(suggestionViewHolderItem: SuggestionViewHolderItem) {
         onCurrentWordChanges(_focusedIndex.value!!, suggestionViewHolderItem.suggestion + " ")
+        if (_words.value.orEmpty().size == SeedPhrase.SeedPhraseLength) {
+            viewModelScope.launch(Dispatchers.IO) {
+                delay(100)
+                viewModelScope.launch(Dispatchers.Main) {
+                    finishEntering()
+                }
+            }
+        }
     }
 
     fun setSuggestionState(isOpened: Boolean) {

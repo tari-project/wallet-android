@@ -101,6 +101,7 @@ import com.tari.android.wallet.ui.fragment.tx.TxListRouter
 import com.tari.android.wallet.ui.fragment.tx.details.TxDetailsFragment
 import com.tari.android.wallet.ui.fragment.tx.details.TxDetailsFragment.Companion.TX_EXTRA_KEY
 import com.tari.android.wallet.ui.fragment.tx.details.TxDetailsFragment.Companion.TX_ID_EXTRA_KEY
+import com.tari.android.wallet.ui.fragment.utxos.list.UtxosListFragment
 import com.tari.android.wallet.util.Constants
 import io.reactivex.disposables.CompositeDisposable
 import kotlinx.coroutines.Dispatchers
@@ -318,6 +319,7 @@ internal class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>
                 HomeDeeplinkScreens.TxDetails -> {
                     (intent.getParcelableExtra<TxId>(HomeDeeplinkScreens.KeyTxDetailsArgs))?.let { toTxDetails(null, it) }
                 }
+                else -> { }
             }
         }
     }
@@ -344,6 +346,8 @@ internal class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>
     override fun toBaseNodeSelection() = loadFragment(ChangeBaseNodeFragment())
 
     override fun toTorBridges() = loadFragment(TorBridgesSelectionFragment())
+
+    override fun toUtxos() = loadFragment(UtxosListFragment())
 
     override fun toCustomTorBridges() = loadFragment(CustomTorBridgesFragment())
 

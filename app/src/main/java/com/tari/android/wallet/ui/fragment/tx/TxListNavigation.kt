@@ -10,5 +10,7 @@ sealed class TxListNavigation {
 
     object ToAllSettings : TxListNavigation()
 
+    object ToUtxos : TxListNavigation()
+
     class ToSendTariToUser(val user: User) : TxListNavigation()
 }

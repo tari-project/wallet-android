@@ -158,10 +158,10 @@ internal fun LottieAnimationView.addAnimatorListener(
     onRepeat: (LegacyAnimator?) -> Unit = {}
 ) {
     addAnimatorListener(object : LegacyAnimatorListener {
-        override fun onAnimationRepeat(animation: LegacyAnimator?) = onRepeat(animation)
-        override fun onAnimationEnd(animation: LegacyAnimator?) = onEnd(animation)
-        override fun onAnimationCancel(animation: LegacyAnimator?) = onCancel(animation)
-        override fun onAnimationStart(animation: LegacyAnimator?) = onStart(animation)
+        override fun onAnimationRepeat(animation: LegacyAnimator) = onRepeat(animation)
+        override fun onAnimationEnd(animation: LegacyAnimator) = onEnd(animation)
+        override fun onAnimationCancel(animation: LegacyAnimator) = onCancel(animation)
+        override fun onAnimationStart(animation: LegacyAnimator) = onStart(animation)
     })
 }
 

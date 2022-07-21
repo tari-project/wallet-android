@@ -9,4 +9,6 @@ interface TxListRouter {
     fun toTTLStore()
 
     fun toAllSettings()
+
+    fun toUtxos()
 }
