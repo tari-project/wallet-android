@@ -68,7 +68,7 @@ internal class ConnectionIndicatorViewModel : CommonViewModel() {
             NetworkConnectionState.CONNECTED -> {
                 when (_torProxyState.value) {
                     is TorProxyState.Failed,
-                    TorProxyState.Initializing,
+                    is TorProxyState.Initializing,
                     TorProxyState.NotReady -> ConnectionIndicatorState.Disconnected
                     is TorProxyState.Running -> {
                         when (_baseNodeState.value) {

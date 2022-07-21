@@ -28,14 +28,14 @@ class ConnectionStatusesModule(
 
     val torText = when (torState) {
         TorProxyState.NotReady -> R.string.connection_status_dialog_tor_status_disconnected
-        TorProxyState.Initializing -> R.string.connection_status_dialog_tor_status_connecting
+        is TorProxyState.Initializing -> R.string.connection_status_dialog_tor_status_connecting
         is TorProxyState.Running -> R.string.connection_status_dialog_tor_status_connected
         is TorProxyState.Failed -> R.string.connection_status_dialog_tor_status_failed
     }
 
     val torIcon = when (torState) {
         TorProxyState.NotReady -> R.drawable.ic_network_status_dot_red
-        TorProxyState.Initializing -> R.drawable.ic_network_status_dot_yellow
+        is TorProxyState.Initializing -> R.drawable.ic_network_status_dot_yellow
         is TorProxyState.Running -> R.drawable.ic_network_status_dot_green
         is TorProxyState.Failed -> R.drawable.ic_network_status_dot_red
     }

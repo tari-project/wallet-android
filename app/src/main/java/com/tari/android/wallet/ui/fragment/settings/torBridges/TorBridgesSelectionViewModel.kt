@@ -143,7 +143,10 @@ class TorBridgesSelectionViewModel() : CommonViewModel() {
                             DialogArgs(false, canceledOnTouchOutside = false), modules = listOf(
                                 HeadModule(resourceManager.getString(R.string.tor_bridges_connection_progress_successful_title)),
                                 BodyModule(description),
-                                ButtonModule(resourceManager.getString(R.string.common_confirm), ButtonStyle.Normal) { _backPressed.postValue(Unit) },
+                                ButtonModule(resourceManager.getString(R.string.common_confirm), ButtonStyle.Normal) {
+                                    _dissmissDialog.postValue(Unit)
+                                    _backPressed.postValue(Unit)
+                                 },
                             )
                         )
                         _modularDialog.postValue(args)

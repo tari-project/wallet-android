@@ -68,7 +68,11 @@ class TorProxyControl(private val torConfig: TorConfig) {
         try {
             val bootstrapStatus = isTorRunning(controlConnection)
             if (bootstrapStatus != null) {
-                updateState(TorProxyState.Running(bootstrapStatus))
+                if (bootstrapStatus.progress == 100 && bootstrapStatus.summary == "Done") {
+                    updateState(TorProxyState.Running(bootstrapStatus))
+                } else {
+                    updateState(TorProxyState.Initializing(bootstrapStatus))
+                }
                 // schedule timer
                 timerSubscription = Observable.timer(statusCheckPeriodSecs, TimeUnit.SECONDS)
                     .subscribeOn(Schedulers.io())
