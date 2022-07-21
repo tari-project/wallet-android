@@ -8,6 +8,8 @@ import android.view.Gravity
 import android.view.View
 import android.widget.LinearLayout
 import com.tari.android.wallet.R
+import com.tari.android.wallet.ui.component.networkStateIndicator.module.ConnectionStatusesModule
+import com.tari.android.wallet.ui.component.networkStateIndicator.module.ConnectionStatusesModuleView
 import com.tari.android.wallet.ui.dialog.TariDialog
 import com.tari.android.wallet.ui.dialog.modular.modules.body.BodyModule
 import com.tari.android.wallet.ui.dialog.modular.modules.body.BodyModuleView
@@ -27,6 +29,8 @@ import com.tari.android.wallet.ui.fragment.utxos.list.module.*
 
 open class ModularDialog(val context: Context) : TariDialog {
 
+    lateinit var args: ModularDialogArgs
+
     constructor(context: Context, args: ModularDialogArgs) : this(context) {
         applyArgs(args)
     }
@@ -41,6 +45,7 @@ open class ModularDialog(val context: Context) : TariDialog {
     }
 
     fun applyArgs(args: ModularDialogArgs) {
+        this.args = args
         with(dialog) {
             setCancelable(args.dialogArgs.cancelable)
             setCanceledOnTouchOutside(args.dialogArgs.canceledOnTouchOutside)
@@ -51,6 +56,7 @@ open class ModularDialog(val context: Context) : TariDialog {
 
     private fun updateModules(modules: List<IDialogModule>) {
         val root = dialog.findViewById<LinearLayout>(R.id.dialog_root_view)
+        root.removeAllViews()
         for (module in modules) {
             module.dismissAction = dialog::dismiss
             val view = when(module) {
@@ -67,6 +73,7 @@ open class ModularDialog(val context: Context) : TariDialog {
                 is DetailItemModule -> DetailItemModuleView(context, module)
                 is UtxoAmountModule -> UtxoAmountModuleView(context, module)
                 is UtxoSplitModule -> UtxoSplitModuleView(context, module)
+                is ConnectionStatusesModule -> ConnectionStatusesModuleView(context, module)
                 else -> View(context)
             }
             root.addView(view)

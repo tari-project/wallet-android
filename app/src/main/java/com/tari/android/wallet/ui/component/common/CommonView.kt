@@ -10,6 +10,8 @@ import android.widget.LinearLayout
 import androidx.lifecycle.LifecycleOwner
 import androidx.viewbinding.ViewBinding
 import com.tari.android.wallet.ui.common.CommonViewModel
+import com.tari.android.wallet.ui.dialog.TariDialog
+import com.tari.android.wallet.ui.dialog.inProgress.TariProgressDialog
 import com.tari.android.wallet.ui.dialog.modular.ModularDialog
 
 abstract class CommonView<VM : CommonViewModel, VB : ViewBinding> : LinearLayout {
@@ -17,6 +19,8 @@ abstract class CommonView<VM : CommonViewModel, VB : ViewBinding> : LinearLayout
 
     lateinit var ui: VB
         private set
+
+    private var currentDialog: TariDialog? = null
 
     abstract fun bindingInflate(layoutInflater: LayoutInflater, parent: ViewGroup?, attachToRoot: Boolean): VB
 
@@ -51,6 +55,30 @@ abstract class CommonView<VM : CommonViewModel, VB : ViewBinding> : LinearLayout
 
         viewModel.openLink.observe(viewLifecycle) { context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(it))) }
 
-        viewModel.modularDialog.observe(viewLifecycle) { ModularDialog(context, it).show() }
+        viewModel.modularDialog.observe(viewLifecycle) { replaceDialog(ModularDialog(context, it)) }
+    }
+
+    //todo extract to DialogManager or something
+    protected fun replaceDialog(dialog: TariDialog) {
+        val currentLoadingDialog = currentDialog as? TariProgressDialog
+        if (currentLoadingDialog != null && currentLoadingDialog.isShowing() && dialog is TariProgressDialog) {
+            (currentDialog as TariProgressDialog).applyArgs(dialog.progressDialogArgs)
+            return
+        }
+        val currentModularDialog = currentDialog as? ModularDialog
+        val newModularDialog = dialog as? ModularDialog
+        if (currentModularDialog != null && newModularDialog != null && currentModularDialog.args::class.java == newModularDialog.args::class.java
+            && currentModularDialog.isShowing()
+        ) {
+            currentModularDialog.applyArgs(newModularDialog.args)
+            return
+        }
+
+        if (newModularDialog?.args?.dialogArgs?.isRefreshing == true) {
+            return
+        }
+
+        currentDialog?.dismiss()
+        currentDialog = dialog.also { it.show() }
     }
 }
