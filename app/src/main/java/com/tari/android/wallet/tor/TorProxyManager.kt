@@ -79,7 +79,7 @@ internal class TorProxyManager(
         // execute the command
         val process = Runtime.getRuntime().exec(command)
         Logger.d("Tor command executed: %s", command)
-        EventBus.torProxyState.post(TorProxyState.Initializing)
+        EventBus.torProxyState.post(TorProxyState.Initializing(null))
         val response = BufferedReader(InputStreamReader(process.inputStream)).use(BufferedReader::readText)
         Logger.d("Tor proxy response: %s", response)
         process.waitFor()
