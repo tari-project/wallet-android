@@ -37,7 +37,7 @@ import com.tari.android.wallet.infrastructure.backup.BackupState
 import com.tari.android.wallet.model.recovery.WalletRestorationResult
 import com.tari.android.wallet.network.NetworkConnectionState
 import com.tari.android.wallet.service.baseNode.BaseNodeState
-import com.tari.android.wallet.service.baseNode.SyncState
+import com.tari.android.wallet.service.baseNode.BaseNodeSyncState
 import com.tari.android.wallet.tor.TorProxyState
 
 /**
@@ -62,12 +62,12 @@ internal object EventBus : GeneralEventBus() {
 
     val baseNodeState = BehaviorEventBus<BaseNodeState>()
 
-    val syncState = BehaviorEventBus<SyncState>()
+    val baseNodeSyncState = BehaviorEventBus<BaseNodeSyncState>()
 
     val walletRestorationState = BehaviorEventBus<WalletRestorationResult>()
 
     init {
-        syncState.post(SyncState.Syncing)
+        baseNodeSyncState.post(BaseNodeSyncState.Syncing)
     }
 
     fun unsubscribeAll(subscriber: Any) {
@@ -77,7 +77,7 @@ internal object EventBus : GeneralEventBus() {
         networkConnectionState.unsubscribe(subscriber)
         backupState.unsubscribe(subscriber)
         baseNodeState.unsubscribe(subscriber)
-        syncState.unsubscribe(subscriber)
+        baseNodeSyncState.unsubscribe(subscriber)
         walletRestorationState.unsubscribe(subscriber)
     }
 
@@ -88,7 +88,7 @@ internal object EventBus : GeneralEventBus() {
         networkConnectionState.clear()
         backupState.clear()
         baseNodeState.clear()
-        syncState.clear()
+        baseNodeSyncState.clear()
         walletRestorationState.clear()
     }
 }

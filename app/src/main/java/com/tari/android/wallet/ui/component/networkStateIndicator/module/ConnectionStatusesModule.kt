@@ -3,7 +3,7 @@ package com.tari.android.wallet.ui.component.networkStateIndicator.module
 import com.tari.android.wallet.R
 import com.tari.android.wallet.network.NetworkConnectionState
 import com.tari.android.wallet.service.baseNode.BaseNodeState
-import com.tari.android.wallet.service.baseNode.SyncState
+import com.tari.android.wallet.service.baseNode.BaseNodeSyncState
 import com.tari.android.wallet.tor.TorProxyState
 import com.tari.android.wallet.ui.dialog.modular.IDialogModule
 
@@ -11,7 +11,7 @@ class ConnectionStatusesModule(
     val networkState: NetworkConnectionState,
     val torState: TorProxyState,
     val baseNodeState: BaseNodeState,
-    val syncState: SyncState
+    val baseNodeSyncState: BaseNodeSyncState
 ) : IDialogModule() {
 
     val networkText = when (networkState) {
@@ -52,17 +52,17 @@ class ConnectionStatusesModule(
         BaseNodeState.Online -> R.drawable.ic_network_status_dot_green
     }
 
-    val baseNodeSyncText = when (syncState) {
-        SyncState.NotStarted -> R.string.connection_status_dialog_base_node_sync_idle
-        SyncState.Syncing -> R.string.connection_status_dialog_base_node_sync_pending
-        SyncState.Online -> R.string.connection_status_dialog_base_node_sync_success
-        SyncState.Failed -> R.string.connection_status_dialog_base_node_sync_failure
+    val baseNodeSyncText = when (baseNodeSyncState) {
+        BaseNodeSyncState.NotStarted -> R.string.connection_status_dialog_base_node_sync_idle
+        BaseNodeSyncState.Syncing -> R.string.connection_status_dialog_base_node_sync_pending
+        BaseNodeSyncState.Online -> R.string.connection_status_dialog_base_node_sync_success
+        BaseNodeSyncState.Failed -> R.string.connection_status_dialog_base_node_sync_failure
     }
 
-    val baseNodeSyncIcon = when (syncState) {
-        SyncState.NotStarted -> R.drawable.ic_network_status_dot_red
-        SyncState.Syncing -> R.drawable.ic_network_status_dot_yellow
-        SyncState.Online -> R.drawable.ic_network_status_dot_green
-        SyncState.Failed -> R.drawable.ic_network_status_dot_red
+    val baseNodeSyncIcon = when (baseNodeSyncState) {
+        BaseNodeSyncState.NotStarted -> R.drawable.ic_network_status_dot_red
+        BaseNodeSyncState.Syncing -> R.drawable.ic_network_status_dot_yellow
+        BaseNodeSyncState.Online -> R.drawable.ic_network_status_dot_green
+        BaseNodeSyncState.Failed -> R.drawable.ic_network_status_dot_red
     }
 }
