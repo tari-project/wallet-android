@@ -7,7 +7,7 @@ import com.tari.android.wallet.R
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.network.NetworkConnectionState
 import com.tari.android.wallet.service.baseNode.BaseNodeState
-import com.tari.android.wallet.service.baseNode.SyncState
+import com.tari.android.wallet.service.baseNode.BaseNodeSyncState
 import com.tari.android.wallet.tor.TorProxyState
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.component.networkStateIndicator.module.ConnectionStatusesModule
@@ -22,7 +22,7 @@ internal class ConnectionIndicatorViewModel : CommonViewModel() {
     private val _networkState = MutableLiveData<NetworkConnectionState>()
     private val _torProxyState = MutableLiveData<TorProxyState>()
     private val _baseNodeState = MutableLiveData<BaseNodeState>()
-    private val _syncState = MutableLiveData<SyncState>()
+    private val _syncState = MutableLiveData<BaseNodeSyncState>()
 
     private val _state = MediatorLiveData<ConnectionIndicatorState>()
     val state = Transformations.map(_state) { it }
@@ -58,7 +58,7 @@ internal class ConnectionIndicatorViewModel : CommonViewModel() {
         EventBus.torProxyState.subscribe(this) { _torProxyState.postValue(it) }
         EventBus.networkConnectionState.subscribe(this) { _networkState.postValue(it) }
         EventBus.baseNodeState.subscribe(this) { _baseNodeState.postValue(it) }
-        EventBus.syncState.subscribe(this) { _syncState.postValue(it) }
+        EventBus.baseNodeSyncState.subscribe(this) { _syncState.postValue(it) }
     }
 
     private fun updateConnectionState() {
@@ -75,8 +75,8 @@ internal class ConnectionIndicatorViewModel : CommonViewModel() {
                             is BaseNodeState.Online,
                             is BaseNodeState.Syncing -> {
                                 when (_syncState.value) {
-                                    SyncState.Online,
-                                    SyncState.Syncing -> ConnectionIndicatorState.Connected
+                                    BaseNodeSyncState.Online,
+                                    BaseNodeSyncState.Syncing -> ConnectionIndicatorState.Connected
                                     else -> ConnectionIndicatorState.ConnectedWithIssues
                                 }
                             }

@@ -66,7 +66,7 @@ import com.tari.android.wallet.service.WalletServiceLauncher.Companion.startActi
 import com.tari.android.wallet.service.WalletServiceLauncher.Companion.stopAction
 import com.tari.android.wallet.service.WalletServiceLauncher.Companion.stopAndDeleteAction
 import com.tari.android.wallet.service.baseNode.BaseNodeState
-import com.tari.android.wallet.service.baseNode.SyncState
+import com.tari.android.wallet.service.baseNode.BaseNodeSyncState
 import com.tari.android.wallet.service.faucet.TestnetFaucetService
 import com.tari.android.wallet.service.faucet.TestnetTariRequestException
 import com.tari.android.wallet.service.notification.NotificationService
@@ -212,7 +212,7 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
             if (currentBaseNode == null || !currentBaseNode.isCustom) {
                 baseNodes.setNextBaseNode()
             }
-            EventBus.syncState.post(SyncState.Failed)
+            EventBus.baseNodeSyncState.post(BaseNodeSyncState.Failed)
             listeners.iterator().forEach { it.onBaseNodeSyncComplete(false) }
             return
         }
@@ -226,7 +226,7 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
         if (successful) {
             baseNodeValidationStatusMap.clear()
             baseNodeSharedPrefsRepository.baseNodeLastSyncResult = true
-            EventBus.syncState.post(SyncState.Online)
+            EventBus.baseNodeSyncState.post(BaseNodeSyncState.Online)
             listeners.iterator().forEach { it.onBaseNodeSyncComplete(true) }
         }
         // shouldn't ever reach here - no-op
@@ -557,16 +557,16 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
     override fun onConnectivityStatus(status: Int) {
         when (status) {
             1 -> {
-                baseNodeSharedPrefsRepository.baseNodeLastSyncResult = true
+                baseNodeSharedPrefsRepository.baseNodeState = BaseNodeState.Online.toInt()
                 EventBus.baseNodeState.post(BaseNodeState.Online)
                 listeners.iterator().forEach { it.onBaseNodeSyncComplete(true) }
             }
             2 -> {
-                baseNodeSharedPrefsRepository.baseNodeLastSyncResult = false
                 val currentBaseNode = baseNodeSharedPrefsRepository.currentBaseNode
                 if (currentBaseNode == null || !currentBaseNode.isCustom) {
                     baseNodes.setNextBaseNode()
                 }
+                baseNodeSharedPrefsRepository.baseNodeState = BaseNodeState.Offline.toInt()
                 EventBus.baseNodeState.post(BaseNodeState.Offline)
                 listeners.iterator().forEach { it.onBaseNodeSyncComplete(false) }
             }
@@ -852,7 +852,7 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
             publicKeyFFI.destroy()
             if (result) {
                 baseNodeValidationStatusMap.clear()
-                EventBus.syncState.post(SyncState.NotStarted)
+                EventBus.baseNodeSyncState.post(BaseNodeSyncState.NotStarted)
             }
             result
         } ?: false
@@ -861,13 +861,12 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
             Logger.e("Base node validation error: $it")
             baseNodeSharedPrefsRepository.baseNodeLastSyncResult = false
             baseNodeValidationStatusMap.clear()
-            EventBus.syncState.post(SyncState.Failed)
+            EventBus.baseNodeSyncState.post(BaseNodeSyncState.Failed)
         }) {
             baseNodeValidationStatusMap.clear()
             baseNodeValidationStatusMap[BaseNodeValidationType.TXO] = Pair(wallet.startTXOValidation(), null)
             baseNodeValidationStatusMap[BaseNodeValidationType.TX] = Pair(wallet.startTxValidation(), null)
             baseNodeSharedPrefsRepository.baseNodeLastSyncResult = null
-            EventBus.baseNodeState.post(BaseNodeState.Syncing)
             true
         } ?: false
 
