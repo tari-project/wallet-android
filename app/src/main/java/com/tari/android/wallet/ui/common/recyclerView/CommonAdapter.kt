@@ -5,7 +5,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewbinding.ViewBinding
 
-abstract class CommonAdapter<T : CommonViewHolderItem>() : RecyclerView.Adapter<CommonViewHolder<T, ViewBinding>>() {
+abstract class CommonAdapter<T : CommonViewHolderItem> : RecyclerView.Adapter<CommonViewHolder<T, ViewBinding>>() {
     private var items: MutableList<T> = mutableListOf()
     private var onClickListener: ItemClickListener<T> = ItemClickListener()
     private var onLongClickListener: ItemLongClickListener<T> = ItemLongClickListener()

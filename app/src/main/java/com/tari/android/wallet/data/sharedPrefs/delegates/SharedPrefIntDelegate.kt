@@ -10,7 +10,7 @@ class SharedPrefIntDelegate(
 ) {
     operator fun getValue(thisRef: Any?, property: KProperty<*>): Int = prefs.getInt(name, defValue)
 
-    operator fun setValue(thisRef: Any?, property: KProperty<*>, value: Int?) = prefs.edit().run {
+    operator fun setValue(thisRef: Any?, property: KProperty<*>, value: Int?): Unit = prefs.edit().run {
         if (value == null) {
             remove(name)
         } else {

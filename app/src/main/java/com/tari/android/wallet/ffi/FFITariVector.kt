@@ -21,6 +21,7 @@ class FFITariVector(pointer: FFIPointer) : FFIBase() {
             when(vectorTag) {
                 TariVectorTag.Utxo -> itemsList.add(FFITariUtxo(newItemPointer))
                 TariVectorTag.U64 -> longs.add(newItemPointer)
+                else -> Unit
             }
         }
     }

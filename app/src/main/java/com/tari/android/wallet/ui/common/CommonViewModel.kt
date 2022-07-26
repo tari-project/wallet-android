@@ -30,6 +30,7 @@ open class CommonViewModel : ViewModel() {
     lateinit var tracker: Tracker
 
     init {
+        @Suppress("LeakingThis")
         component.inject(this)
 
         EventBus.walletState.publishSubject.filter { it is WalletState.Failed }

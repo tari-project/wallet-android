@@ -82,7 +82,7 @@ internal class UpdateProgressViewController(private val view: View, listener: Li
         RECEIVING
     }
 
-    class UpdateProgressState() {
+    class UpdateProgressState {
         var state = State.IDLE
 
         var numberOfReceivedTxs = 0

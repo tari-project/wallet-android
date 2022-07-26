@@ -99,7 +99,7 @@ class UtxosListViewModel : CommonViewModel() {
         listOptions.firstOrNull { it.ordering == ordering.value }?.isSelected = true
         listOptions.forEach {
             it.click = {
-                listOptions.forEach { it.isSelected = false }
+                listOptions.forEach { option -> option.isSelected = false }
                 it.isSelected = true
             }
         }
@@ -286,7 +286,7 @@ class UtxosListViewModel : CommonViewModel() {
 
     private fun showSuccessDialog(descriptionId: Int) {
         val modularArgs = ModularDialogArgs(
-            DialogArgs() {
+            DialogArgs {
                 setSelectionState(false)
             }, listOf(
                 ImageModule(R.drawable.ic_utxos_succes_popper),

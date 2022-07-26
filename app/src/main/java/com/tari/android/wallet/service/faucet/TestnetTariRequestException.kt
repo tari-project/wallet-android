@@ -32,10 +32,4 @@
  */
 package com.tari.android.wallet.service.faucet
 
-class TestnetTariRequestException : RuntimeException {
-
-    constructor() : super()
-    constructor(message: String?) : super(message)
-    constructor(message: String?, cause: Throwable?) : super(message, cause)
-    constructor(cause: Throwable?) : super(cause)
-}
+class TestnetTariRequestException(message: String?) : RuntimeException(message)

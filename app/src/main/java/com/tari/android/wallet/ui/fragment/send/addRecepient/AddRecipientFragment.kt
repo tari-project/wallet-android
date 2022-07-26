@@ -221,7 +221,7 @@ class AddRecipientFragment : CommonFragment<FragmentAddRecipientBinding, AddReci
 
     private fun setupUI() {
         ui.contactsListRecyclerView.layoutManager = LinearLayoutManager(requireContext())
-        recyclerViewAdapter.setClickListener(CommonAdapter.ItemClickListener() {
+        recyclerViewAdapter.setClickListener(CommonAdapter.ItemClickListener {
             (it as? RecipientViewHolderItem)?.user?.let { user -> (activity as? AddRecipientListener)?.continueToAmount(user) }
         })
         ui.contactsListRecyclerView.adapter = recyclerViewAdapter

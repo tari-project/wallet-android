@@ -13,7 +13,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
-class ThumbnailGIFsViewModel() : CommonViewModel() {
+class ThumbnailGIFsViewModel : CommonViewModel() {
 
     init {
         component.inject(this)

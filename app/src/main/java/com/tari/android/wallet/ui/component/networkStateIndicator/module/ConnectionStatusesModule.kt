@@ -8,10 +8,10 @@ import com.tari.android.wallet.tor.TorProxyState
 import com.tari.android.wallet.ui.dialog.modular.IDialogModule
 
 class ConnectionStatusesModule(
-    val networkState: NetworkConnectionState,
-    val torState: TorProxyState,
-    val baseNodeState: BaseNodeState,
-    val baseNodeSyncState: BaseNodeSyncState
+    networkState: NetworkConnectionState,
+    torState: TorProxyState,
+    baseNodeState: BaseNodeState,
+    baseNodeSyncState: BaseNodeSyncState
 ) : IDialogModule() {
 
     val networkText = when (networkState) {

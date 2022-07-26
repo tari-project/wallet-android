@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg width="135px" height="40px" viewBox="0 0 135 40" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<svg width="135px" height="40px" viewBox="0 0 135 40" version="1.1" xmlns="http://www.w3.org/2000/svg">
     <!-- Generator: Sketch 63.1 (92452) - https://sketch.com -->
     <title>AppStoreButton_large</title>
     <desc>Created with Sketch.</desc>
     <defs>
         <linearGradient x1="49.9984472%" y1="100.265508%" x2="49.9984472%" y2="-260.382794%" id="linearGradient-1">
-            <stop stop-color="#1A1A1A" stop-opacity="0.1" offset="0%"></stop>
-            <stop stop-color="#212121" stop-opacity="0.151" offset="12.3%"></stop>
-            <stop stop-color="#353535" stop-opacity="0.227" offset="30.8%"></stop>
-            <stop stop-color="#575757" stop-opacity="0.318" offset="53.2%"></stop>
-            <stop stop-color="#858585" stop-opacity="0.421" offset="78.3%"></stop>
-            <stop stop-color="#B3B3B3" stop-opacity="0.51" offset="100%"></stop>
+            <stop stop-color="#1A1A1A" stop-opacity="0.1" offset="0%"/>
+            <stop stop-color="#212121" stop-opacity="0.151" offset="12.3%"/>
+            <stop stop-color="#353535" stop-opacity="0.227" offset="30.8%"/>
+            <stop stop-color="#575757" stop-opacity="0.318" offset="53.2%"/>
+            <stop stop-color="#858585" stop-opacity="0.421" offset="78.3%"/>
+            <stop stop-color="#B3B3B3" stop-opacity="0.51" offset="100%"/>
         </linearGradient>
     </defs>
     <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">

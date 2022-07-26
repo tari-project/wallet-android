@@ -10,7 +10,7 @@ import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.dialog.error.ErrorDialogArgs
 import javax.inject.Inject
 
-class CustomTorBridgesViewModel() : CommonViewModel() {
+class CustomTorBridgesViewModel : CommonViewModel() {
 
     @Inject
     lateinit var torSharedRepository: TorSharedRepository

@@ -22,7 +22,7 @@ import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
 import com.tari.android.wallet.ui.fragment.settings.torBridges.torItem.TorBridgeViewHolderItem
 import javax.inject.Inject
 
-class TorBridgesSelectionViewModel() : CommonViewModel() {
+class TorBridgesSelectionViewModel : CommonViewModel() {
 
     @Inject
     lateinit var torSharedRepository: TorSharedRepository

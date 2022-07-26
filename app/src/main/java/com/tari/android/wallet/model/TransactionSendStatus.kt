@@ -35,7 +35,7 @@ class TransactionSendStatus() : Parcelable {
         Invalid(4);
 
         companion object {
-            fun findByInt(int: Int): Status = Status.values().first { it.value == int }
+            fun findByInt(int: Int): Status = values().first { it.value == int }
         }
     }
 

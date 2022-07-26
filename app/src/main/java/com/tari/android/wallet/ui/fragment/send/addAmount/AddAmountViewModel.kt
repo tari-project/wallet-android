@@ -29,7 +29,7 @@ import java.math.BigInteger
 import javax.inject.Inject
 import kotlin.math.min
 
-class AddAmountViewModel() : CommonViewModel() {
+class AddAmountViewModel : CommonViewModel() {
 
     @Inject
     lateinit var tariSettingsSharedRepository: TariSettingsSharedRepository
