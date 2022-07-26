@@ -1,4 +1,4 @@
-package com.tari.android.wallet.amountInputBinding.fragment.send.addAmount.keyboard
+package com.tari.android.wallet.ui.fragment.send.addAmount.keyboard
 
 import android.animation.ValueAnimator
 import android.content.Context
@@ -175,7 +175,7 @@ internal class KeyboardController {
     }
 
     /**
-     * Calculates the current amount in microtaris.
+     * Calculates the current amount in micro tari.
      */
     val currentAmount: MicroTari
         get() {
@@ -523,7 +523,7 @@ internal class KeyboardController {
         }
     }
 
-    fun nudgeAmountView() = with(amountInputBinding) {
+    fun nudgeAmountView(): ValueAnimator = with(amountInputBinding) {
         // don't allow digit entry during this animation
         digitAnimIsRunning = true
         ValueAnimator.ofFloat(0f, 1f).apply {

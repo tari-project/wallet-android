@@ -1,12 +1,10 @@
 package com.tari.android.wallet.ui.fragment.restore.inputSeedWords
 
 import android.content.Context
-import android.content.res.ColorStateList
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.widget.FrameLayout
 import androidx.core.content.ContextCompat
-import androidx.core.view.isGone
 import com.tari.android.wallet.R
 import com.tari.android.wallet.databinding.ViewRecoveryWordBinding
 import com.tari.android.wallet.ui.extension.setVisible
@@ -36,7 +34,7 @@ class WordTextView : FrameLayout {
             text.background = null
             text.setPadding(0, 0, 0, 0)
         }
-        updateState(false, true)
+        updateState(isFocused = false, isValid = true)
         addView(ui.root)
     }
 

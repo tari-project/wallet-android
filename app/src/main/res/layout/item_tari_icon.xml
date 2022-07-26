@@ -26,6 +26,6 @@
         android:lineSpacingExtra="4dp"
         android:textSize="14sp"
         app:customFont="@string/font_medium"
-        tools:text="testt text\nsecond line"/>
+        tools:text="test text\n second line"/>
 
 </androidx.appcompat.widget.LinearLayoutCompat>

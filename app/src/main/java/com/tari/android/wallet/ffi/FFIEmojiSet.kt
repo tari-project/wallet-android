@@ -37,7 +37,7 @@ package com.tari.android.wallet.ffi
  *
  * @author The Tari Development Team
  */
-internal class FFIEmojiSet(): FFIBase() {
+internal class FFIEmojiSet : FFIBase() {
 
     // region JNI
 

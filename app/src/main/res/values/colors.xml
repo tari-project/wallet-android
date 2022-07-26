@@ -76,11 +76,11 @@
     <!-- send tari - add recipient -->
     <color name="add_recipient_hint">#B2B2B2</color>
     <color name="add_recipient_contact_list_section_header_title">#B2B2B2</color>
-    <color name="add_recipient_prog_bar">#CCCCCC</color>
+    <color name="add_recipient_progress_bar">#CCCCCC</color>
 
     <!-- send tari - add note -->
-    <color name="add_note_slide_btton_bg_gradient_start">#8931FF</color>
-    <color name="add_note_slide_btton_bg_gradient_end">#A72BE9</color>
+    <color name="add_note_slide_button_bg_gradient_start">#8931FF</color>
+    <color name="add_note_slide_button_bg_gradient_end">#A72BE9</color>
     <color name="add_note_prompt_passive_color">#B2B2B2</color>
     <color name="add_note_more_gifs_item_text">@color/wallet_info_qr_code_desc</color>
 

@@ -5,7 +5,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewbinding.ViewBinding
 
-abstract class CommonAdapter<T : CommonViewHolderItem>() : RecyclerView.Adapter<CommonViewHolder<T, ViewBinding>>() {
+abstract class CommonAdapter<T : CommonViewHolderItem> : RecyclerView.Adapter<CommonViewHolder<T, ViewBinding>>() {
     private var items: MutableList<T> = mutableListOf()
     private var onClickListener: ItemClickListener<T> = ItemClickListener()
     private var onLongClickListener: ItemLongClickListener<T> = ItemLongClickListener()
@@ -47,6 +47,7 @@ abstract class CommonAdapter<T : CommonViewHolderItem>() : RecyclerView.Adapter<
         return false
     }
 
+    @Suppress("UNCHECKED_CAST")
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CommonViewHolder<T, ViewBinding> {
 
         val builder = viewHolderBuilders[viewType]
@@ -58,10 +59,10 @@ abstract class CommonAdapter<T : CommonViewHolderItem>() : RecyclerView.Adapter<
 
         viewHolder ?: throw Exception("Не тот тип вью холдера текущий: ${generatedViewHolder.javaClass} нужный : ${viewHolder?.javaClass}")
 
-        (viewHolder.clickView ?: viewHolder.itemView).setOnClickListener { v ->
+        (viewHolder.clickView ?: viewHolder.itemView).setOnClickListener {
             viewHolder.item?.let { onClickListener.doOnClick.invoke(it) }
         }
-        (viewHolder.clickView ?: viewHolder.itemView).setOnLongClickListener { v ->
+        (viewHolder.clickView ?: viewHolder.itemView).setOnLongClickListener {
             viewHolder.item?.let { onLongClickListener.doOnLongClick.invoke(it) } ?: false
         }
         return viewHolder

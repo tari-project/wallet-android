@@ -69,14 +69,14 @@ inline jbyteArray getBytesFromUnsignedLongLong(JNIEnv *jEnv, unsigned long long 
     const size_t size = sizeof(unsigned long long int);
     jbyteArray result = jEnv->NewByteArray((jsize) size);
     if (result != nullptr) {
-        jbyte *cbytes = jEnv->GetByteArrayElements(result, nullptr);
-        if (cbytes != nullptr) {
+        jbyte *cBytes = jEnv->GetByteArrayElements(result, nullptr);
+        if (cBytes != nullptr) {
             int i;
             for (i = (int) (size - 1); i >= 0; i--) {
-                cbytes[i] = (jbyte) (value & 0xFF);
+                cBytes[i] = (jbyte) (value & 0xFF);
                 value >>= 8;
             }
-            jEnv->ReleaseByteArrayElements(result, cbytes, 0);
+            jEnv->ReleaseByteArrayElements(result, cBytes, 0);
         }
     }
     return result;

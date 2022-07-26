@@ -53,7 +53,7 @@ import com.tari.android.wallet.util.WalletUtil
 import java.io.File
 
 /**
- * Utilized to asynchoronously manage the sometimes-long-running task of instantiation and start-up
+ * Utilized to asynchronous manage the sometimes-long-running task of instantiation and start-up
  * of the Tor proxy and the FFI wallet.
  *
  * @author The Tari Development Team
@@ -88,7 +88,7 @@ internal class WalletManager(
     }
 
     /**
-     * Deinit the wallet and shutdown Tor.
+     * DeInit the wallet and shutdown Tor.
      */
     @Synchronized
     fun stop() {

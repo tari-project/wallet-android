@@ -2,7 +2,6 @@
 
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/balance_question_mark"
     android:layout_width="@dimen/home_question_mark_size"
     android:layout_height="@dimen/home_question_mark_size"

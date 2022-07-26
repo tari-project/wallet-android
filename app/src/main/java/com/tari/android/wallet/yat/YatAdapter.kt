@@ -32,7 +32,7 @@ class YatAdapter(
         YatIntegration.setup(application, config, YatIntegration.ColorMode.LIGHT, this)
     }
 
-    suspend fun searchYats(query: String): PaymentAddressResponse? =
+    fun searchYats(query: String): PaymentAddressResponse? =
         kotlin.runCatching { YatLibApi.emojiIDApi.lookupEmojiIDPayment(query, "0x0101") }.getOrNull()
 
     fun openOnboarding(context: Context) {

@@ -44,7 +44,11 @@ import java.util.zip.ZipInputStream
  *
  * @author The Tari Development Team
  */
-class TorResourceInstaller(private val context: Context, private val sharedTorSharedRepository: TorSharedRepository, private val torConfig: TorConfig) {
+class TorResourceInstaller(
+    private val context: Context,
+    private val sharedTorSharedRepository: TorSharedRepository,
+    private val torConfig: TorConfig
+) {
 
     var appFilesDir: File = context.filesDir
     var appDataDir: File = context.getDir(DIRECTORY_TOR_DATA, Context.MODE_PRIVATE)
@@ -80,10 +84,10 @@ class TorResourceInstaller(private val context: Context, private val sharedTorSh
     private fun streamToFile(inputStream: InputStream, outFile: File, append: Boolean = false, isZipped: Boolean = false) {
         FileOutputStream(outFile.absolutePath, append).use { outputStream ->
             (if (isZipped) ZipInputStream(inputStream).also { it.nextEntry } else inputStream).use { input ->
-                var bytecount: Int
+                var byteCount: Int
                 val buffer = ByteArray(FILE_WRITE_BUFFER_SIZE)
-                while (input.read(buffer).also { bytecount = it } > 0) {
-                    outputStream.write(buffer, 0, bytecount)
+                while (input.read(buffer).also { byteCount = it } > 0) {
+                    outputStream.write(buffer, 0, byteCount)
                 }
             }
         }
@@ -100,7 +104,11 @@ class TorResourceInstaller(private val context: Context, private val sharedTorSh
 
         installGeoIPResources()
 
-        fileTorrc = assetToFile(appFilesDir.absolutePath, COMMON_ASSET_KEY + TORRC_ASSET_KEY, TORRC_ASSET_KEY, false, false)
+        fileTorrc = assetToFile(
+            appFilesDir.absolutePath, COMMON_ASSET_KEY + TORRC_ASSET_KEY, TORRC_ASSET_KEY,
+            isZipped = false,
+            setExecutable = false
+        )
 
         updateTorrcCustomFile()?.let { fileTorrcCustom = it }
 

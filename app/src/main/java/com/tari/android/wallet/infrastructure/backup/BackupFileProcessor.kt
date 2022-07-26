@@ -130,7 +130,6 @@ internal class BackupFileProcessor(
                 }
                 // throw exception
                 throw BackupFileIsEncryptedException(
-                    file,
                     "Cannot uncompress. Restored file is encrypted."
                 )
             }

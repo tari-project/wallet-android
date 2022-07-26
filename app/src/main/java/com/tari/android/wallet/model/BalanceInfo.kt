@@ -46,18 +46,18 @@ class BalanceInfo() : Parcelable {
     var availableBalance = MicroTari(BigInteger("0"))
     var pendingIncomingBalance = MicroTari(BigInteger("0"))
     var pendingOutgoingBalance = MicroTari(BigInteger("0"))
-    var timelocked = MicroTari(BigInteger("0"))
+    var timeLocked = MicroTari(BigInteger("0"))
 
     constructor(
         availableBalance: MicroTari,
         pendingIncomingBalance: MicroTari,
         pendingOutgoingBalance: MicroTari,
-        timelocked: MicroTari,
+        timeLocked: MicroTari,
     ) : this() {
         this.availableBalance = availableBalance
         this.pendingIncomingBalance = pendingIncomingBalance
         this.pendingOutgoingBalance = pendingOutgoingBalance
-        this.timelocked = timelocked
+        this.timeLocked = timeLocked
     }
 
     // region Parcelable
@@ -82,14 +82,14 @@ class BalanceInfo() : Parcelable {
         parcel.writeParcelable(availableBalance, flags)
         parcel.writeParcelable(pendingIncomingBalance, flags)
         parcel.writeParcelable(pendingOutgoingBalance, flags)
-        parcel.writeParcelable(timelocked, flags)
+        parcel.writeParcelable(timeLocked, flags)
     }
 
     private fun readFromParcel(inParcel: Parcel) {
         availableBalance = inParcel.readParcelable(MicroTari::class.java.classLoader)!!
         pendingIncomingBalance = inParcel.readParcelable(MicroTari::class.java.classLoader)!!
         pendingOutgoingBalance = inParcel.readParcelable(MicroTari::class.java.classLoader)!!
-        timelocked = inParcel.readParcelable(MicroTari::class.java.classLoader)!!
+        timeLocked = inParcel.readParcelable(MicroTari::class.java.classLoader)!!
     }
 
     override fun describeContents(): Int {
