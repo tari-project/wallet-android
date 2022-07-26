@@ -25,7 +25,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-internal class InputSeedWordsViewModel() : CommonViewModel() {
+internal class InputSeedWordsViewModel : CommonViewModel() {
 
     private var mnemonicList = mutableListOf<String>()
 
@@ -219,7 +219,7 @@ internal class InputSeedWordsViewModel() : CommonViewModel() {
             _words.value = list
         }
 
-        val nextIndex = if (currentIndex == -1) list.size - 1 else Math.min(currentIndex + 1, list.size - 1)
+        val nextIndex = if (currentIndex == -1) list.size - 1 else (currentIndex + 1).coerceAtMost(list.size - 1)
         getFocus(nextIndex)
     }
 

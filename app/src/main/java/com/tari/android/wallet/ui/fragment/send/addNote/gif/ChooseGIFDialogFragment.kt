@@ -31,7 +31,7 @@ import io.reactivex.subjects.BehaviorSubject
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
-class ChooseGIFDialogFragment() : DialogFragment() {
+class ChooseGIFDialogFragment : DialogFragment() {
     private lateinit var ui: FragmentChooseGifBinding
     private lateinit var behavior: BottomSheetBehavior<View>
     private lateinit var searchSubscription: Disposable
@@ -52,7 +52,7 @@ class ChooseGIFDialogFragment() : DialogFragment() {
         val searchSubject = BehaviorSubject.create<String>()
         searchSubscription = searchSubject
             .debounce(500L, TimeUnit.MILLISECONDS)
-            .map { if (it.isEmpty()) giphyKeywordsRepository.getCurrent() else it }
+            .map { it.ifEmpty { giphyKeywordsRepository.getCurrent() } }
             .map { GPHContent.searchQuery(it, mediaType = MediaType.gif) }
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe { ui.giphyGridView.content = it }

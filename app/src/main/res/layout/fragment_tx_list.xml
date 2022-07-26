@@ -323,7 +323,7 @@
                     </LinearLayout>
 
                     <ProgressBar
-                        android:id="@+id/home_prog_bar_update"
+                        android:id="@+id/home_progress_bar_update"
                         android:layout_width="24dp"
                         android:layout_height="24dp"
                         android:layout_alignParentEnd="true"

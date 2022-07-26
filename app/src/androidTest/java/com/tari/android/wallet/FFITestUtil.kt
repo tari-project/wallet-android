@@ -45,14 +45,10 @@ class FFITestUtil {
 
     companion object {
         internal const val WALLET_DB_NAME: String = "tari_test_db"
-        internal const val WALLET_DB_NAME_WITH_EXTENSION: String = "tari_test_db.sqlite3"
         // Matching pair of keys.
-        internal const val PUBLIC_KEY_HEX_STRING =
-            "30E1DFA197794858BFDBF96CDCE5DC8637D4BD1202DC694991040DDECBF42D40"
-        internal const val PRIVATE_KEY_HEX_STRING =
-            "6259C39F75E27140A652A5EE8AEFB3CF6C1686EF21D27793338D899380E8C801"
-        internal const val PUBLIC_KEY_EMOJI_ID =
-            "🍬😂🔱👟👓🐛🎢🎷💯🔫🚨🐉🔬😍🔬🐰🍶🔔💩🌽🌈🔬🏭🎣🐽🌋🌵🔮📝🚗🍩🎃🎷"
+        internal const val PUBLIC_KEY_HEX_STRING = "30E1DFA197794858BFDBF96CDCE5DC8637D4BD1202DC694991040DDECBF42D40"
+        internal const val PRIVATE_KEY_HEX_STRING = "6259C39F75E27140A652A5EE8AEFB3CF6C1686EF21D27793338D899380E8C801"
+        internal const val PUBLIC_KEY_EMOJI_ID = "🍬😂🔱👟👓🐛🎢🎷💯🔫🚨🐉🔬😍🔬🐰🍶🔔💩🌽🌈🔬🏭🎣🐽🌋🌵🔮📝🚗🍩🎃🎷"
         internal val address = NetAddressString("127.0.0.1",80)
 
         fun generateRandomAlphanumericString(len: Int): String {

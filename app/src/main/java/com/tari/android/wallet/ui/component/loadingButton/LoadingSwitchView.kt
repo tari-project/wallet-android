@@ -61,7 +61,7 @@ class LoadingButtonView : FrameLayout {
     ) {
         init()
 
-        setState(LoadingButtonState("", true, false))
+        setState(LoadingButtonState("", isEnable = true, isLoading = false))
     }
 
     private fun init() {

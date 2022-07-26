@@ -40,7 +40,7 @@ import java.math.BigInteger
  *
  * @author The Tari Development Team
  */
-abstract class Tx() : Parcelable {
+abstract class Tx : Parcelable {
 
     enum class Direction {
         INBOUND,

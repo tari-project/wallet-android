@@ -48,7 +48,7 @@
             android:lineSpacingExtra="6sp"
             android:textColor="@color/dark_gray"
             app:customFont="@string/font_medium"
-            tools:text="Connected uoeuaoeuaoe uaoeuaoeu aoeuaoeuaoeuaoeto Internet" />
+            tools:text="Connected to Internet" />
 
         <View
             android:id="@+id/network_icon"
@@ -104,7 +104,7 @@
             android:lineSpacingExtra="6sp"
             android:textColor="@color/dark_gray"
             app:customFont="@string/font_medium"
-            tools:text="Connected uoeuaoeuaoe uaoeuaoeu aoeuaoeuaoeuaoeto Internet" />
+            tools:text="Connected Internet" />
 
         <View
             android:id="@+id/base_node_icon"
@@ -159,7 +159,7 @@
             android:lineSpacingExtra="6sp"
             android:textColor="@color/dark_gray"
             app:customFont="@string/font_medium"
-            tools:text="Connected uoeuaoeuaoe uaoeuaoeu Internet" />
+            tools:text="Connected Internet" />
 
         <View
             android:id="@+id/tor_icon"
@@ -210,12 +210,12 @@
             android:layout_below="@+id/syncing_state_card_view"
             android:layout_gravity="center_horizontal"
             android:layout_marginHorizontal="10dp"
-            android:layout_marginTop="5dp"
+            android:layout_marginTop="4dp"
             android:gravity="center_horizontal"
             android:lineSpacingExtra="6sp"
             android:textColor="@color/dark_gray"
             app:customFont="@string/font_medium"
-            tools:text="Connected uoeuaoeuaoe uaoeuaoeu aoeuaoeuaoeuaoeto Internet" />
+            tools:text="Connected Internet" />
 
         <View
             android:id="@+id/sync_icon"

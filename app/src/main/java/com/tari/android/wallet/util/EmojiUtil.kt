@@ -288,7 +288,7 @@ internal class EmojiUtil {
                 darkColor,
                 listOf(separator),
                 lightColor,
-                applyToOnlyFirstOccurence = false
+                applyToOnlyFirstOccurrence = false
             )
             spannable.applyLetterSpacingStyle(
                 separator,
@@ -297,7 +297,7 @@ internal class EmojiUtil {
             spannable.applyRelativeTextSizeStyle(
                 separator,
                 Constants.UI.emojiIdChunkSeparatorRelativeScale,
-                applyToOnlyFirstOccurence = false
+                applyToOnlyFirstOccurrence = false
             )
             return spannable
         }

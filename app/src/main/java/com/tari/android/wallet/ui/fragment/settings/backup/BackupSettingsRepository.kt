@@ -12,8 +12,8 @@ import com.tari.android.wallet.data.sharedPrefs.network.formatKey
 import org.joda.time.DateTime
 
 class BackupSettingsRepository(
-    private val context: Context,
-    private val sharedPrefs: SharedPreferences,
+    context: Context,
+    sharedPrefs: SharedPreferences,
     networkRepository: NetworkRepository
 ) : CommonRepository(networkRepository) {
 

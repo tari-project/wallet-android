@@ -22,7 +22,7 @@ import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
 import com.tari.android.wallet.ui.fragment.settings.torBridges.torItem.TorBridgeViewHolderItem
 import javax.inject.Inject
 
-class TorBridgesSelectionViewModel() : CommonViewModel() {
+class TorBridgesSelectionViewModel : CommonViewModel() {
 
     @Inject
     lateinit var torSharedRepository: TorSharedRepository
@@ -144,7 +144,7 @@ class TorBridgesSelectionViewModel() : CommonViewModel() {
                                 HeadModule(resourceManager.getString(R.string.tor_bridges_connection_progress_successful_title)),
                                 BodyModule(description),
                                 ButtonModule(resourceManager.getString(R.string.common_confirm), ButtonStyle.Normal) {
-                                    _dissmissDialog.postValue(Unit)
+                                    _dismissDialog.postValue(Unit)
                                     _backPressed.postValue(Unit)
                                  },
                             )
@@ -173,6 +173,6 @@ class TorBridgesSelectionViewModel() : CommonViewModel() {
     private fun stopConnecting() {
         EventBus.torProxyState.unsubscribe(this)
         torSharedRepository.currentTorBridges = TorBridgeConfigurationList()
-        _dissmissDialog.postValue(Unit)
+        _dismissDialog.postValue(Unit)
     }
 }
