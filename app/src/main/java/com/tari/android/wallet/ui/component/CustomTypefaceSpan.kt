@@ -38,7 +38,7 @@ import android.text.TextPaint
 import android.text.style.TypefaceSpan
 
 /**
- * This class is used when creating spannables (partial bold strings).
+ * This class is used when creating spannable (partial bold strings).
  *
  * @author The Tari Development Team
  */

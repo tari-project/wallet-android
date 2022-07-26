@@ -131,7 +131,7 @@
                 android:layout_height="@dimen/common_action_button_height"
                 android:layout_gravity="end"
                 android:layout_marginTop="32dp"
-                android:background="@drawable/disableable_gradient_button_bg"
+                android:background="@drawable/disable_able_gradient_button_bg"
                 android:text="@string/common_save"
                 android:textAllCaps="false"
                 android:textColor="@color/button_text_color_selector"

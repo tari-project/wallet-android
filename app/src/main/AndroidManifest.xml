@@ -16,6 +16,7 @@
         tools:node="remove" />
 
     <application
+        android:allowBackup="false"
         android:name=".application.TariWalletApplication"
         android:extractNativeLibs="true"
         android:hardwareAccelerated="true"

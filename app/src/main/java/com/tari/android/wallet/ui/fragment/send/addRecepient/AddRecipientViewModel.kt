@@ -37,7 +37,7 @@ class AddRecipientViewModel : CommonViewModel() {
 
     var emojiIdPublicKey: PublicKey? = null
 
-    private var seachingJob: Job? = null
+    private var searchingJob: Job? = null
     private var recentTxUsersLimit = 3
     private var allTxs = mutableListOf<Tx>()
     private var contacts = mutableListOf<Contact>()
@@ -113,7 +113,7 @@ class AddRecipientViewModel : CommonViewModel() {
     }
 
     fun searchAndDisplayRecipients(query: String) {
-        seachingJob?.cancel()
+        searchingJob?.cancel()
         _foundYatUser.value = Optional.ofNullable(null)
         // search transaction users
         val filteredTxUsers = allTxs.filter {
@@ -131,7 +131,7 @@ class AddRecipientViewModel : CommonViewModel() {
 
         displaySearchList(users)
 
-        seachingJob = viewModelScope.launch(Dispatchers.IO) {
+        searchingJob = viewModelScope.launch(Dispatchers.IO) {
             yatAdapter.searchYats(query)?.result?.entries?.firstOrNull()?.let { response ->
                 walletService.getPublicKeyFromHexString(response.value.address)?.let { pubKey ->
                     val yatUser = YatUser(pubKey).apply { yat = query }

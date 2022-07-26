@@ -3,8 +3,8 @@
     android:shape="rectangle">
     <gradient
         android:angle="315"
-        android:centerColor="@color/add_note_slide_btton_bg_gradient_start"
-        android:endColor="@color/add_note_slide_btton_bg_gradient_end"
-        android:startColor="@color/add_note_slide_btton_bg_gradient_start"
+        android:centerColor="@color/add_note_slide_button_bg_gradient_start"
+        android:endColor="@color/add_note_slide_button_bg_gradient_end"
+        android:startColor="@color/add_note_slide_button_bg_gradient_start"
         android:type="linear" />
 </shape>

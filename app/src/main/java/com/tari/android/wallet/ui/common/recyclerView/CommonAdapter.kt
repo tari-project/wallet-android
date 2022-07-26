@@ -47,6 +47,7 @@ abstract class CommonAdapter<T : CommonViewHolderItem> : RecyclerView.Adapter<Co
         return false
     }
 
+    @Suppress("UNCHECKED_CAST")
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CommonViewHolder<T, ViewBinding> {
 
         val builder = viewHolderBuilders[viewType]
@@ -58,10 +59,10 @@ abstract class CommonAdapter<T : CommonViewHolderItem> : RecyclerView.Adapter<Co
 
         viewHolder ?: throw Exception("Не тот тип вью холдера текущий: ${generatedViewHolder.javaClass} нужный : ${viewHolder?.javaClass}")
 
-        (viewHolder.clickView ?: viewHolder.itemView).setOnClickListener { v ->
+        (viewHolder.clickView ?: viewHolder.itemView).setOnClickListener {
             viewHolder.item?.let { onClickListener.doOnClick.invoke(it) }
         }
-        (viewHolder.clickView ?: viewHolder.itemView).setOnLongClickListener { v ->
+        (viewHolder.clickView ?: viewHolder.itemView).setOnLongClickListener {
             viewHolder.item?.let { onLongClickListener.doOnLongClick.invoke(it) } ?: false
         }
         return viewHolder

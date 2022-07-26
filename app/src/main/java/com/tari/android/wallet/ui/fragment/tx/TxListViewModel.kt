@@ -534,7 +534,7 @@ internal class TxListViewModel : CommonViewModel() {
                 HeadBoldSpannableModule(home_ttl_store_dlg_title, home_ttl_store_dlg_title_bold_part),
                 BodyModule(resourceManager.getString(home_ttl_store_dlg_desciption)),
                 ButtonModule(resourceManager.getString(home_ttl_store_positive_btn), ButtonStyle.Normal) {
-                    _dissmissDialog.value = Unit
+                    _dismissDialog.value = Unit
                     _navigation.postValue(TxListNavigation.ToTTLStore)
                 },
                 ButtonModule(resourceManager.getString(home_ttl_store_negative_btn), ButtonStyle.Close)

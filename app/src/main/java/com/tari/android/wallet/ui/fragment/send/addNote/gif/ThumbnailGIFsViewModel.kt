@@ -62,7 +62,7 @@ class ThumbnailGIFsViewModel : CommonViewModel() {
     }
 
     companion object {
-        const val KEY_GIF = "keygif"
+        const val KEY_GIF = "key_gif"
         const val REQUEST_CODE_GIF = 1535
         const val THUMBNAIL_REQUEST_LIMIT = 20
     }

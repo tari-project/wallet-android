@@ -48,23 +48,18 @@ import com.tari.android.wallet.ui.component.LetterSpacingSpan
  *
  * @param search substring to be marked as a link
  * @param url locator
- * @param applyToOnlyFirstOccurence whether the span should be applied only to the first occurence
+ * @param applyToOnlyFirstOccurrence whether the span should be applied only to the first occurrence
  */
 internal fun SpannableString.applyURLStyle(
     search: String,
     url: String,
-    applyToOnlyFirstOccurence: Boolean = false
+    applyToOnlyFirstOccurrence: Boolean = false
 ): SpannableString {
     var index = this.indexOf(search)
     val span = URLSpan(url)
     while (index >= 0) {
-        setSpan(
-            span,
-            index,
-            index + search.length,
-            Spanned.SPAN_EXCLUSIVE_INCLUSIVE
-        )
-        if (applyToOnlyFirstOccurence) {
+        setSpan(span, index, index + search.length, Spanned.SPAN_EXCLUSIVE_INCLUSIVE)
+        if (applyToOnlyFirstOccurrence) {
             break
         }
         index = this.indexOf(search, index + 1)
@@ -76,9 +71,9 @@ internal fun SpannableString.applyURLStyle(
  * Used to apply partial font styles to a string.
  *
  * @param defaultFont the font to be applied to the whole string
- * @param search the substring to whose occurences the custom font should be applied
- * @param customFont font to be applied to the occurences of the search string
- * @param applyToOnlyFirstOccurence whether customFont should be applied only to the first occurence
+ * @param search the substring to whose occurrences the custom font should be applied
+ * @param customFont font to be applied to the occurrences of the search string
+ * @param applyToOnlyFirstOccurrence whether customFont should be applied only to the first occurrence
  * @return spannable string
  */
 internal fun String.applyFontStyle(
@@ -86,23 +81,12 @@ internal fun String.applyFontStyle(
     defaultFont: CustomFont,
     search: List<String>,
     customFont: CustomFont,
-    applyToOnlyFirstOccurence: Boolean = false
+    applyToOnlyFirstOccurrence: Boolean = false
 ): SpannableString {
     val defaultTypeface = defaultFont.asTypeface(context)
     val spannableString = SpannableString(this)
-    spannableString.setSpan(
-        CustomTypefaceSpan("", defaultTypeface),
-        0,
-        length,
-        Spanned.SPAN_EXCLUSIVE_INCLUSIVE
-    )
-    search.forEach {
-        spannableString.applyTypefaceStyle(
-            it,
-            customFont.asTypeface(context),
-            applyToOnlyFirstOccurence
-        )
-    }
+    spannableString.setSpan(CustomTypefaceSpan("", defaultTypeface), 0, length, Spanned.SPAN_EXCLUSIVE_INCLUSIVE)
+    search.forEach { spannableString.applyTypefaceStyle(it, customFont.asTypeface(context), applyToOnlyFirstOccurrence) }
     return spannableString
 }
 
@@ -113,22 +97,11 @@ internal fun String.applyColorStyle(
     defaultColor: Int,
     search: List<String>,
     styleColor: Int,
-    applyToOnlyFirstOccurence: Boolean = false
+    applyToOnlyFirstOccurrence: Boolean = false
 ): SpannableString {
     val spannableString = SpannableString(this)
-    spannableString.setSpan(
-        ForegroundColorSpan(defaultColor),
-        0,
-        length,
-        Spanned.SPAN_INTERMEDIATE
-    )
-    search.forEach {
-        spannableString.applyColorStyle(
-            it,
-            styleColor,
-            applyToOnlyFirstOccurence
-        )
-    }
+    spannableString.setSpan(ForegroundColorSpan(defaultColor), 0, length, Spanned.SPAN_INTERMEDIATE)
+    search.forEach { spannableString.applyColorStyle(it, styleColor, applyToOnlyFirstOccurrence) }
     return spannableString
 }
 
@@ -138,17 +111,12 @@ internal fun String.applyColorStyle(
 private fun SpannableString.applyColorStyle(
     search: String,
     color: Int,
-    applyToOnlyFirstOccurence: Boolean = false
+    applyToOnlyFirstOccurrence: Boolean = false
 ) {
     var index = this.indexOf(search)
     while (index >= 0) {
-        setSpan(
-            ForegroundColorSpan(color),
-            index,
-            index + search.length,
-            Spanned.SPAN_INTERMEDIATE
-        )
-        if (applyToOnlyFirstOccurence) {
+        setSpan(ForegroundColorSpan(color), index, index + search.length, Spanned.SPAN_INTERMEDIATE)
+        if (applyToOnlyFirstOccurrence) {
             break
         }
         index = this.indexOf(search, index + 1)
@@ -161,17 +129,12 @@ private fun SpannableString.applyColorStyle(
 private fun SpannableString.applyTypefaceStyle(
     search: String,
     typeface: Typeface,
-    applyToOnlyFirstOccurence: Boolean = false
+    applyToOnlyFirstOccurrence: Boolean = false
 ) {
     var index = this.indexOf(search)
     while (index >= 0) {
-        setSpan(
-            CustomTypefaceSpan("", typeface),
-            index,
-            index + search.length,
-            Spanned.SPAN_INTERMEDIATE
-        )
-        if (applyToOnlyFirstOccurence) {
+        setSpan(CustomTypefaceSpan("", typeface), index, index + search.length, Spanned.SPAN_INTERMEDIATE)
+        if (applyToOnlyFirstOccurrence) {
             break
         }
         index = this.indexOf(search, index + 1)
@@ -184,17 +147,12 @@ private fun SpannableString.applyTypefaceStyle(
 internal fun SpannableString.applyRelativeTextSizeStyle(
     search: String,
     relativeTextSize: Float,
-    applyToOnlyFirstOccurence: Boolean = false
+    applyToOnlyFirstOccurrence: Boolean = false
 ) {
     var index = this.indexOf(search)
     while (index >= 0) {
-        setSpan(
-            RelativeSizeSpan(relativeTextSize),
-            index,
-            index + search.length,
-            Spanned.SPAN_INTERMEDIATE
-        )
-        if (applyToOnlyFirstOccurence) {
+        setSpan(RelativeSizeSpan(relativeTextSize), index, index + search.length, Spanned.SPAN_INTERMEDIATE)
+        if (applyToOnlyFirstOccurrence) {
             break
         }
         index = this.indexOf(search, index + 1)
@@ -207,17 +165,12 @@ internal fun SpannableString.applyRelativeTextSizeStyle(
 internal fun SpannableString.applyLetterSpacingStyle(
     search: String,
     letterSpacing: Float,
-    applyToOnlyFirstOccurence: Boolean = false
+    applyToOnlyFirstOccurrence: Boolean = false
 ) {
     var index = this.indexOf(search)
     while (index >= 0) {
-        setSpan(
-            LetterSpacingSpan(letterSpacing),
-            index,
-            index + search.length,
-            Spanned.SPAN_INTERMEDIATE
-        )
-        if (applyToOnlyFirstOccurence) {
+        setSpan(LetterSpacingSpan(letterSpacing), index, index + search.length, Spanned.SPAN_INTERMEDIATE)
+        if (applyToOnlyFirstOccurrence) {
             break
         }
         index = this.indexOf(search, index + 1)

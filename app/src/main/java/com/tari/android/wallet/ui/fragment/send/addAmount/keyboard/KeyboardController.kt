@@ -175,7 +175,7 @@ internal class KeyboardController {
     }
 
     /**
-     * Calculates the current amount in microtaris.
+     * Calculates the current amount in micro tari.
      */
     val currentAmount: MicroTari
         get() {

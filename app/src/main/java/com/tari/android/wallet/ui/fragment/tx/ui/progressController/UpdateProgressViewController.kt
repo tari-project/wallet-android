@@ -100,7 +100,7 @@ internal class UpdateProgressViewController(private val view: View, listener: Li
     private val completingTxsTextView: TextView = view.findViewById(R.id.home_txt_completing_txs)
     private val updatingTxsTextView: TextView = view.findViewById(R.id.home_txt_updating_txs)
     private val upToDateTextView: TextView = view.findViewById(R.id.home_txt_up_to_date)
-    private val progressBar: ProgressBar = view.findViewById(R.id.home_prog_bar_update)
+    private val progressBar: ProgressBar = view.findViewById(R.id.home_progress_bar_update)
 
     val state = UpdateProgressState()
 
@@ -283,6 +283,7 @@ internal class UpdateProgressViewController(private val view: View, listener: Li
                     startBaseNodeSync()
                 }
             }
+            else -> Unit
         }
     }
 

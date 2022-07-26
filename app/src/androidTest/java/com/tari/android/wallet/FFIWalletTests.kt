@@ -77,8 +77,8 @@ class FFIWalletTests {
     private var network: Network = Network.DIBBLER
     private val context = getApplicationContext<Context>()
     private val prefs = context.getSharedPreferences(ApplicationModule.sharedPrefsFileName, Context.MODE_PRIVATE)
-    private val resourseManager: ResourceManager = ResourceManager(context)
-    private val networkRepository = NetworkRepositoryImpl(resourseManager, prefs)
+    private val resourceManager: ResourceManager = ResourceManager(context)
+    private val networkRepository = NetworkRepositoryImpl(resourceManager, prefs)
     private val baseNodeSharedPrefsRepository = BaseNodeSharedRepository(prefs, networkRepository)
     private val backupSettingsRepository = BackupSettingsRepository(context, prefs, networkRepository)
     private val testnetFaucetRepository = TestnetFaucetRepository(prefs, networkRepository)
@@ -121,11 +121,10 @@ class FFIWalletTests {
             walletDirPath,
             Constants.Wallet.discoveryTimeoutSec,
             Constants.Wallet.storeAndForwardMessageDurationSec,
-            network.uriComponent
         )
         val logFile = File(walletDirPath, "test_log.log")
         // create wallet instance
-        wallet = FFIWallet(sharedPrefsRepository, SeedPhraseRepository(), commsConfig, logFile.absolutePath)
+        wallet = FFIWallet(sharedPrefsRepository, SeedPhraseRepository(), networkRepository, commsConfig, logFile.absolutePath)
         // create listener
         listener = TestAddRecipientAddNodeListener()
         wallet.listener = listener
@@ -539,12 +538,8 @@ class FFIWalletTests {
             Logger.i("TX validation complete :: response id %s result %s", result)
         }
 
-        override fun onDirectSendResult(txId: BigInteger, success: Boolean) {
-            Logger.i("Direct send :: tx id %s success %s", txId, success)
-        }
-
-        override fun onStoreAndForwardSendResult(txId: BigInteger, success: Boolean) {
-            Logger.i("Store and forward :: tx id %s success %s", txId, success)
+        override fun onDirectSendResult(txId: BigInteger, status: TransactionSendStatus) {
+            Logger.i("Direct send :: tx id %s status %s", txId, status)
         }
 
         override fun onConnectivityStatus(status: Int) {

@@ -270,7 +270,7 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
     private fun startService() {
         //todo total crutch. Service is auto-creating during the bind func. Need to refactor this first
         DiContainer.appComponent.inject(this)
-        // start wallet manager on a separate thead & listen to events
+        // start wallet manager on a separate thread & listen to events
         EventBus.walletState.subscribe(this, this::onWalletStateChanged)
         Thread {
             walletManager.start()
@@ -288,7 +288,7 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
         // stop service
         stopForeground(true)
         stopSelfResult(startId)
-        // stop wallet manager on a separate thead & unsubscribe from events
+        // stop wallet manager on a separate thread & unsubscribe from events
         EventBus.walletState.unsubscribe(this)
         ProcessLifecycleOwner.get().lifecycle.removeObserver(this)
         GlobalScope.launch { backupManager.turnOff(deleteExistingBackups = false) }

@@ -34,7 +34,7 @@ class WordTextView : FrameLayout {
             text.background = null
             text.setPadding(0, 0, 0, 0)
         }
-        updateState(false, true)
+        updateState(isFocused = false, isValid = true)
         addView(ui.root)
     }
 

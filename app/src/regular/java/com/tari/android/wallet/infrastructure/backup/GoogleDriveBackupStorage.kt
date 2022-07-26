@@ -172,15 +172,12 @@ internal class GoogleDriveBackupStorage(
         }
     }
 
-    private fun createBackupFile(
-        file: File,
-        mimeType: String
-    ) {
+    private fun createBackupFile(file: File, mimeType: String) {
         val metadata: com.google.api.services.drive.model.File =
             com.google.api.services.drive.model.File()
                 .setParents(listOf(DRIVE_BACKUP_PARENT_FOLDER_NAME))
                 .setMimeType(mimeType)
-                .setName(file.getLastPathComponent()!!)
+                .setName(file.getLastPathComponent())
         drive.files()
             .create(metadata, FileContent(mimeType, file))
             .setFields("id")

@@ -228,7 +228,7 @@ class AddRecipientFragment : CommonFragment<FragmentAddRecipientBinding, AddReci
         ui.contactsListRecyclerView.addOnScrollListener(scrollListener)
         ui.contactsListRecyclerView.addOnItemTouchListener(this)
         ui.scrollDepthGradientView.alpha = 0f
-        ui.progressBar.setColor(color(add_recipient_prog_bar))
+        ui.progressBar.setColor(color(add_recipient_progress_bar))
         ui.progressBar.visible()
         ui.continueButton.gone()
         ui.invalidEmojiIdTextView.gone()
@@ -579,15 +579,15 @@ class AddRecipientFragment : CommonFragment<FragmentAddRecipientBinding, AddReci
                 editable.insert(target, chunkSeparatorSpannable)
             }
             // check if valid emoji - don't search if not
-            val numberofEmojis = textWithoutSeparators.numberOfEmojis()
-            if (textWithoutSeparators.containsNonEmoji() || numberofEmojis > emojiIdLength) {
+            val emojisNumber = textWithoutSeparators.numberOfEmojis()
+            if (textWithoutSeparators.containsNonEmoji() || emojisNumber > emojiIdLength) {
                 viewModel.emojiIdPublicKey = null
                 ui.invalidEmojiIdTextView.text = string(add_recipient_invalid_emoji_id)
                 ui.invalidEmojiIdTextView.visible()
                 ui.qrCodeButton.visible()
                 clearSearchResult()
             } else {
-                if (numberofEmojis == emojiIdLength) {
+                if (emojisNumber == emojiIdLength) {
                     finishEntering(textWithoutSeparators)
                 } else {
                     viewModel.emojiIdPublicKey = null
