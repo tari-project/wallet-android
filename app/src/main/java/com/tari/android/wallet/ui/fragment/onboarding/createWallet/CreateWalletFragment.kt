@@ -41,6 +41,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.os.postDelayed
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import com.daasuu.ei.Ease
 import com.daasuu.ei.EasingInterpolator
 import com.tari.android.wallet.R.color.black
@@ -59,6 +60,8 @@ import com.tari.android.wallet.ui.extension.*
 import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.Constants.UI.CreateEmojiId
 import com.tari.android.wallet.util.EmojiUtil
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import me.everything.android.ui.overscroll.OverScrollDecoratorHelper
 
 /**
@@ -193,7 +196,7 @@ class CreateWalletFragment : CommonFragment<FragmentCreateWalletBinding, CreateW
         }
     }
 
-    private fun startCheckMarkAnimation() {
+    private fun startCheckMarkAnimation() = lifecycleScope.launch(Dispatchers.Main) {
         ui.justSecDescBackView.gone()
         ui.justSecTitleBackView.gone()
 
