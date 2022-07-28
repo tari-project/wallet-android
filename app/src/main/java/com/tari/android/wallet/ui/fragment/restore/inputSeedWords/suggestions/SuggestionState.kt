@@ -1,6 +1,6 @@
 package com.tari.android.wallet.ui.fragment.restore.inputSeedWords.suggestions
 
-sealed class SuggestionState() {
+sealed class SuggestionState {
     object Hidden : SuggestionState()
 
     object NotStarted : SuggestionState()

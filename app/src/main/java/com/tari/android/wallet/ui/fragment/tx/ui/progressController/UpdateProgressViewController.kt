@@ -30,7 +30,7 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.tari.android.wallet.ui.fragment.tx.ui
+package com.tari.android.wallet.ui.fragment.tx.ui.progressController
 
 import android.animation.ValueAnimator
 import android.annotation.SuppressLint
@@ -47,7 +47,7 @@ import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.model.WalletError
 import com.tari.android.wallet.network.NetworkConnectionState
 import com.tari.android.wallet.service.TariWalletService
-import com.tari.android.wallet.service.baseNode.BaseNodeState
+import com.tari.android.wallet.service.baseNode.BaseNodeSyncState
 import com.tari.android.wallet.tor.TorBootstrapStatus
 import com.tari.android.wallet.tor.TorProxyState
 import com.tari.android.wallet.ui.extension.*
@@ -65,10 +65,7 @@ import kotlin.coroutines.CoroutineContext
  *
  * @author The Tari Development Team
  */
-internal class UpdateProgressViewController(
-    private val view: View,
-    listener: Listener
-) : CoroutineScope {
+internal class UpdateProgressViewController(private val view: View, listener: Listener) : CoroutineScope {
 
     private val mJob = Job()
     override val coroutineContext: CoroutineContext
@@ -85,7 +82,7 @@ internal class UpdateProgressViewController(
         RECEIVING
     }
 
-    class UpdateProgressState() {
+    class UpdateProgressState {
         var state = State.IDLE
 
         var numberOfReceivedTxs = 0
@@ -103,7 +100,7 @@ internal class UpdateProgressViewController(
     private val completingTxsTextView: TextView = view.findViewById(R.id.home_txt_completing_txs)
     private val updatingTxsTextView: TextView = view.findViewById(R.id.home_txt_updating_txs)
     private val upToDateTextView: TextView = view.findViewById(R.id.home_txt_up_to_date)
-    private val progressBar: ProgressBar = view.findViewById(R.id.home_prog_bar_update)
+    private val progressBar: ProgressBar = view.findViewById(R.id.home_progress_bar_update)
 
     val state = UpdateProgressState()
 
@@ -122,7 +119,6 @@ internal class UpdateProgressViewController(
 
     private lateinit var walletService: TariWalletService
 
-    private var isWaitingOnBaseNodeSync = false
     private lateinit var currentTextView: TextView
 
     private var torBootstrapStatusSubscription: Disposable? = null
@@ -134,9 +130,7 @@ internal class UpdateProgressViewController(
     }
 
     fun reset() {
-        if (isReset) {
-            return
-        }
+        if (isReset) return
         baseNodeSyncCurrentRetryCount = 0
         // emojis
         hourglassIconTextView.setTopMargin(0)
@@ -157,10 +151,23 @@ internal class UpdateProgressViewController(
         isReset = true
     }
 
+    fun start(walletService: TariWalletService) {
+        this.walletService = walletService
+        Logger.d("Start update.")
+        progressBar.visible()
+        isReset = false
+        state.numberOfReceivedTxs = 0
+        state.numberOfCancelledTxs = 0
+        state.numberOfBroadcastTxs = 0
+        state.state = State.RUNNING
+        currentTextView = checkingForUpdatesTextView
+        connectionCheckStartTimeMs = System.currentTimeMillis()
+        checkNetworkConnectionStatus()
+    }
+
     private fun subscribeToEventBus() {
-        EventBus.baseNodeState.subscribeOnEvent<BaseNodeState>(this) { event ->
-            Logger.i("Received BaseNodeSyncComplete in state %s.", state)
-            if (state.state == State.RUNNING && isWaitingOnBaseNodeSync) {
+        EventBus.baseNodeSyncState.subscribe(this) { event ->
+            if (state.state == State.RUNNING) {
                 onBaseNodeSyncCompleted(event)
             }
         }
@@ -190,28 +197,12 @@ internal class UpdateProgressViewController(
         return System.currentTimeMillis() > (connectionCheckStartTimeMs + timeoutPeriodMs)
     }
 
-    fun start(walletService: TariWalletService) {
-        this.walletService = walletService
-        Logger.d("Start update.")
-        progressBar.visible()
-        isReset = false
-        state.numberOfReceivedTxs = 0
-        state.numberOfCancelledTxs = 0
-        state.numberOfBroadcastTxs = 0
-        state.state = State.RUNNING
-        currentTextView = checkingForUpdatesTextView
-        connectionCheckStartTimeMs = System.currentTimeMillis()
-        checkNetworkConnectionStatus()
-    }
-
     private fun checkNetworkConnectionStatus() {
         Logger.d("Start connection check.")
         val networkConnectionState = EventBus.networkConnectionState.publishSubject.value
         if (networkConnectionState != NetworkConnectionState.CONNECTED) {
             Logger.e("Update error: not connected to the internet.")
-            view.postDelayed({
-                fail(FailureReason.NETWORK_CONNECTION_ERROR)
-            }, minStateDisplayPeriodMs)
+            view.postDelayed({ fail(FailureReason.NETWORK_CONNECTION_ERROR) }, minStateDisplayPeriodMs)
             return
         }
         checkTorBootstrapStatus()
@@ -236,10 +227,7 @@ internal class UpdateProgressViewController(
         }
         // check Tor bootstrap status
         if (torProxyState.bootstrapStatus.progress < TorBootstrapStatus.maxProgress) {
-            Logger.d(
-                "Tor bootstrap not complete. Try again in %d seconds.",
-                minStateDisplayPeriodMs
-            )
+            Logger.d("Tor bootstrap not complete. Try again in %d seconds.", minStateDisplayPeriodMs)
             // check again after a wait period
             torBootstrapStatusSubscription = Observable
                 .timer(minStateDisplayPeriodMs, TimeUnit.MILLISECONDS)
@@ -259,10 +247,7 @@ internal class UpdateProgressViewController(
         }
         baseNodeSyncCurrentRetryCount++
         // sync base node
-        Logger.d(
-            "Try to sync with base node - retry count %d.",
-            baseNodeSyncCurrentRetryCount
-        )
+        Logger.d("Try to sync with base node - retry count %d.", baseNodeSyncCurrentRetryCount)
         val walletError = WalletError()
         // long running call
         launch(Dispatchers.IO) {
@@ -272,10 +257,8 @@ internal class UpdateProgressViewController(
                 fail(FailureReason.BASE_NODE_VALIDATION_ERROR)
             }
         }
-        isWaitingOnBaseNodeSync = true
         // setup expiration timer
-        val toTimeoutMs =
-            (connectionCheckStartTimeMs + timeoutPeriodMs) - System.currentTimeMillis()
+        val toTimeoutMs = (connectionCheckStartTimeMs + timeoutPeriodMs) - System.currentTimeMillis()
         baseNodeSyncTimeoutSubscription = Observable
             .timer(toTimeoutMs, TimeUnit.MILLISECONDS)
             .subscribeOn(Schedulers.io())
@@ -283,20 +266,17 @@ internal class UpdateProgressViewController(
             .subscribe { baseNodeSyncTimedOut() }
     }
 
-    private fun onBaseNodeSyncCompleted(event: BaseNodeState) {
-        if (event is BaseNodeState.SyncStarted) return
-        isWaitingOnBaseNodeSync = false
-        baseNodeSyncTimeoutSubscription?.dispose()
+    private fun onBaseNodeSyncCompleted(event: BaseNodeSyncState) {
         when (event) {
-            is BaseNodeState.Online -> {
+            is BaseNodeSyncState.Online -> {
+                baseNodeSyncTimeoutSubscription?.dispose()
                 // base node sync successful - start listening for events
                 Logger.d("Base node sync successful. Start listening for wallet events.")
                 state.state = State.RECEIVING
-                view.postDelayed({
-                    displayReceivingTxs()
-                }, minStateDisplayPeriodMs)
+                view.postDelayed({ displayReceivingTxs() }, minStateDisplayPeriodMs)
             }
-            is BaseNodeState.Offline -> {
+            is BaseNodeSyncState.Failed -> {
+                baseNodeSyncTimeoutSubscription?.dispose()
                 if (baseNodeSyncCurrentRetryCount >= baseNodeSyncMaxRetryCount) {
                     fail(FailureReason.BASE_NODE_VALIDATION_ERROR)
                 } else {
@@ -314,9 +294,7 @@ internal class UpdateProgressViewController(
             return
         }
         animateToTextView(receivingTxsTextView)
-        view.postDelayed({
-            displayCompletingTxs()
-        }, minStateDisplayPeriodMs)
+        view.postDelayed({ displayCompletingTxs() }, minStateDisplayPeriodMs)
     }
 
     private fun displayCompletingTxs() {
@@ -326,9 +304,7 @@ internal class UpdateProgressViewController(
             return
         }
         animateToTextView(completingTxsTextView)
-        view.postDelayed({
-            displayUpdatingTxs()
-        }, minStateDisplayPeriodMs)
+        view.postDelayed({ displayUpdatingTxs() }, minStateDisplayPeriodMs)
     }
 
     private fun displayUpdatingTxs() {
@@ -338,56 +314,18 @@ internal class UpdateProgressViewController(
             return
         }
         animateToTextView(updatingTxsTextView)
-        view.postDelayed({
-            displayUpToDate()
-        }, minStateDisplayPeriodMs)
+        view.postDelayed({ displayUpToDate() }, minStateDisplayPeriodMs)
     }
 
     private fun displayUpToDate() {
         animateToTextView(upToDateTextView)
         progressBar.invisible()
-        view.postDelayed({
-            complete()
-        }, Constants.UI.xLongDurationMs)
+        view.postDelayed({ complete() }, Constants.UI.xLongDurationMs)
     }
 
     private fun complete() {
         state.state = State.IDLE
-        listenerWeakReference.get()?.updateHasCompleted(
-            this,
-            state.numberOfReceivedTxs,
-            state.numberOfCancelledTxs
-        )
-    }
-
-    private fun animateToTextView(nextTextView: TextView, onComplete: (() -> Unit)? = null) {
-        // animate text view
-        val anim = ValueAnimator.ofFloat(0f, 1f)
-        anim.addUpdateListener {
-            val value = it.animatedValue as Float
-            currentTextView.setTopMargin(
-                (-currentTextView.height * value).toInt()
-            )
-            if (currentTextView == checkingForUpdatesTextView
-                && nextTextView != upToDateTextView
-            ) {
-                hourglassIconTextView.setTopMargin(
-                    (-hourglassIconTextView.height * value).toInt()
-                )
-            } else if (nextTextView == upToDateTextView) {
-                hourglassIconTextView.alpha = 1f - value
-                handshakeIconTextView.alpha = 1f - value
-            }
-        }
-        anim.duration = Constants.UI.mediumDurationMs
-        anim.interpolator = EasingInterpolator(Ease.QUART_IN_OUT)
-        anim.start()
-        anim.addListener(onEnd = {
-            anim.removeAllListeners()
-            currentTextView = nextTextView
-            onComplete?.let { callback -> callback() }
-        })
-        // animate emoji view if required
+        listenerWeakReference.get()?.updateHasCompleted(this, state.numberOfReceivedTxs, state.numberOfCancelledTxs)
     }
 
     private fun baseNodeSyncTimedOut() {
@@ -398,10 +336,7 @@ internal class UpdateProgressViewController(
     private fun fail(failureReason: FailureReason) {
         state.state = State.IDLE
         listenerWeakReference.get()?.updateHasFailed(this, failureReason)
-        isWaitingOnBaseNodeSync = false
-        view.post {
-            progressBar.invisible()
-        }
+        view.post { progressBar.invisible() }
     }
 
     fun destroy() {
@@ -411,19 +346,33 @@ internal class UpdateProgressViewController(
         cancel()
     }
 
-    interface Listener {
-
-        fun updateHasFailed(
-            source: UpdateProgressViewController,
-            failureReason: FailureReason,
-        )
-
-        fun updateHasCompleted(
-            source: UpdateProgressViewController,
-            receivedTxCount: Int,
-            cancelledTxCount: Int
-        )
-
+    private fun animateToTextView(nextTextView: TextView, onComplete: (() -> Unit)? = null) {
+        // animate text view
+        ValueAnimator.ofFloat(0f, 1f).apply {
+            addUpdateListener {
+                val value = it.animatedValue as Float
+                currentTextView.setTopMargin((-currentTextView.height * value).toInt())
+                if (currentTextView == checkingForUpdatesTextView && nextTextView != upToDateTextView) {
+                    hourglassIconTextView.setTopMargin((-hourglassIconTextView.height * value).toInt())
+                } else if (nextTextView == upToDateTextView) {
+                    hourglassIconTextView.alpha = 1f - value
+                    handshakeIconTextView.alpha = 1f - value
+                }
+            }
+            duration = Constants.UI.mediumDurationMs
+            interpolator = EasingInterpolator(Ease.QUART_IN_OUT)
+            addListener(onEnd = {
+                removeAllListeners()
+                currentTextView = nextTextView
+                onComplete?.let { callback -> callback() }
+            })
+            start()
+        }
     }
 
+    interface Listener {
+        fun updateHasFailed(source: UpdateProgressViewController, failureReason: FailureReason)
+
+        fun updateHasCompleted(source: UpdateProgressViewController, receivedTxCount: Int, cancelledTxCount: Int)
+    }
 }

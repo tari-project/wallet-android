@@ -47,7 +47,6 @@ import com.daasuu.ei.Ease
 import com.daasuu.ei.EasingInterpolator
 import com.tari.android.wallet.R
 import com.tari.android.wallet.R.string.*
-import com.tari.android.wallet.amountInputBinding.fragment.send.addAmount.keyboard.KeyboardController
 import com.tari.android.wallet.databinding.FragmentAddAmountBinding
 import com.tari.android.wallet.extension.getWithError
 import com.tari.android.wallet.extension.observe
@@ -61,6 +60,7 @@ import com.tari.android.wallet.ui.dialog.tooltipDialog.TooltipDialogArgs
 import com.tari.android.wallet.ui.extension.*
 import com.tari.android.wallet.ui.fragment.send.activity.SendTariActivity
 import com.tari.android.wallet.ui.fragment.send.addAmount.feeModule.NetworkSpeed
+import com.tari.android.wallet.ui.fragment.send.addAmount.keyboard.KeyboardController
 import com.tari.android.wallet.ui.fragment.send.amountView.AmountStyle
 import com.tari.android.wallet.ui.fragment.send.common.TransactionData
 import com.tari.android.wallet.util.Constants
@@ -310,15 +310,13 @@ class AddAmountFragment : CommonFragment<FragmentAddAmountBinding, AddAmountView
             notEnoughBalanceDescriptionTextView.text = string(add_amount_wallet_balance)
             availableBalanceContainerView.visible()
 
-            val showsTxFee: Boolean
             txFeeTextView.text = "+${WalletUtil.amountFormatter.format(fee.tariValue)}"
-            // show/hide continue button
-            if (keyboardController.currentAmount.value.toInt() == 0) {
+            val showsTxFee: Boolean = if (keyboardController.currentAmount.value.toInt() == 0) {
                 hideContinueButton()
-                showsTxFee = false
+                false
             } else {
                 showContinueButtonAnimated()
-                showsTxFee = true
+                true
             }
 
             showBalance()

@@ -66,6 +66,7 @@ import com.tari.android.wallet.service.WalletServiceLauncher.Companion.startActi
 import com.tari.android.wallet.service.WalletServiceLauncher.Companion.stopAction
 import com.tari.android.wallet.service.WalletServiceLauncher.Companion.stopAndDeleteAction
 import com.tari.android.wallet.service.baseNode.BaseNodeState
+import com.tari.android.wallet.service.baseNode.BaseNodeSyncState
 import com.tari.android.wallet.service.faucet.TestnetFaucetService
 import com.tari.android.wallet.service.faucet.TestnetTariRequestException
 import com.tari.android.wallet.service.notification.NotificationService
@@ -83,9 +84,7 @@ import org.joda.time.Hours
 import org.joda.time.Minutes
 import java.math.BigInteger
 import java.util.*
-import java.util.concurrent.CopyOnWriteArrayList
-import java.util.concurrent.CopyOnWriteArraySet
-import java.util.concurrent.TimeUnit
+import java.util.concurrent.*
 import javax.inject.Inject
 
 /**
@@ -181,6 +180,13 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
     }
 
     /**
+     * Maps the validation type to the request id and validation result. This map will be
+     * initialized at the beginning of each base node validation sequence.
+     * Validation results will all be null, and will be set as the result callbacks get called.
+     */
+    private var baseNodeValidationStatusMap: ConcurrentMap<BaseNodeValidationType, Pair<BigInteger, Boolean?>> = ConcurrentHashMap()
+
+    /**
      * Debounce for inbound transaction notification.
      */
     private var txReceivedNotificationDelayedAction: Disposable? = null
@@ -190,6 +196,55 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
     override fun onCreate() {
         super.onCreate()
         DiContainer.appComponent.inject(this)
+    }
+
+
+    private fun checkBaseNodeSyncCompletion() {
+        // make a copy of the status map for concurrency protection
+        val statusMapCopy = baseNodeValidationStatusMap.toMap()
+        // if base node not in sync, then switch to the next base node
+        // check if any has failed
+        val failed = statusMapCopy.any { it.value.second == false }
+        if (failed) {
+            baseNodeValidationStatusMap.clear()
+            baseNodeSharedPrefsRepository.baseNodeLastSyncResult = false
+            val currentBaseNode = baseNodeSharedPrefsRepository.currentBaseNode
+            if (currentBaseNode == null || !currentBaseNode.isCustom) {
+                baseNodes.setNextBaseNode()
+            }
+            EventBus.baseNodeSyncState.post(BaseNodeSyncState.Failed)
+            listeners.iterator().forEach { it.onBaseNodeSyncComplete(false) }
+            return
+        }
+        // if any of the results is null, we're still waiting for all callbacks to happen
+        val inProgress = statusMapCopy.any { it.value.second == null }
+        if (inProgress) {
+            return
+        }
+        // check if it's successful
+        val successful = statusMapCopy.all { it.value.second == true }
+        if (successful) {
+            baseNodeValidationStatusMap.clear()
+            baseNodeSharedPrefsRepository.baseNodeLastSyncResult = true
+            EventBus.baseNodeSyncState.post(BaseNodeSyncState.Online)
+            listeners.iterator().forEach { it.onBaseNodeSyncComplete(true) }
+        }
+        // shouldn't ever reach here - no-op
+    }
+
+    private fun checkValidationResult(type: BaseNodeValidationType, responseId: BigInteger, isSuccess: Boolean) {
+        val currentStatus = baseNodeValidationStatusMap[type]
+        if (currentStatus == null) {
+            Logger.d(type.name + " validation [$responseId] complete. Result: $isSuccess. Current status is null, means we're not expecting a callback. Ignoring.")
+            return
+        }
+        if (currentStatus.first != responseId) {
+            Logger.d(type.name + " Validation [$responseId] complete. Result: $isSuccess. Request id [${currentStatus.first}] mismatch. Ignoring.")
+            return
+        }
+        Logger.d(type.name + " Validation [$responseId] complete. Result: $isSuccess.")
+        baseNodeValidationStatusMap[type] = Pair(currentStatus.first, isSuccess)
+        checkBaseNodeSyncCompletion()
     }
 
     /**
@@ -215,7 +270,7 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
     private fun startService() {
         //todo total crutch. Service is auto-creating during the bind func. Need to refactor this first
         DiContainer.appComponent.inject(this)
-        // start wallet manager on a separate thead & listen to events
+        // start wallet manager on a separate thread & listen to events
         EventBus.walletState.subscribe(this, this::onWalletStateChanged)
         Thread {
             walletManager.start()
@@ -233,7 +288,7 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
         // stop service
         stopForeground(true)
         stopSelfResult(startId)
-        // stop wallet manager on a separate thead & unsubscribe from events
+        // stop wallet manager on a separate thread & unsubscribe from events
         EventBus.walletState.unsubscribe(this)
         ProcessLifecycleOwner.get().lifecycle.removeObserver(this)
         GlobalScope.launch { backupManager.turnOff(deleteExistingBackups = false) }
@@ -482,10 +537,12 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
     }
 
     override fun onTXOValidationComplete(responseId: BigInteger, isSuccess: Boolean) {
+        checkValidationResult(BaseNodeValidationType.TXO, responseId, isSuccess)
         Logger.i("onTXOValidationComplete responseId: $responseId, isSuccess: $isSuccess")
     }
 
     override fun onTxValidationComplete(responseId: BigInteger, isSuccess: Boolean) {
+        checkValidationResult(BaseNodeValidationType.TX, responseId, isSuccess)
         if (!txBroadcastRestarted && isSuccess) {
             try {
                 wallet.restartTxBroadcast()
@@ -500,16 +557,16 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
     override fun onConnectivityStatus(status: Int) {
         when (status) {
             1 -> {
-                baseNodeSharedPrefsRepository.baseNodeLastSyncResult = true
+                baseNodeSharedPrefsRepository.baseNodeState = BaseNodeState.Online.toInt()
                 EventBus.baseNodeState.post(BaseNodeState.Online)
                 listeners.iterator().forEach { it.onBaseNodeSyncComplete(true) }
             }
             2 -> {
-                baseNodeSharedPrefsRepository.baseNodeLastSyncResult = false
                 val currentBaseNode = baseNodeSharedPrefsRepository.currentBaseNode
                 if (currentBaseNode == null || !currentBaseNode.isCustom) {
                     baseNodes.setNextBaseNode()
                 }
+                baseNodeSharedPrefsRepository.baseNodeState = BaseNodeState.Offline.toInt()
                 EventBus.baseNodeState.post(BaseNodeState.Offline)
                 listeners.iterator().forEach { it.onBaseNodeSyncComplete(false) }
             }
@@ -793,18 +850,25 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
             val publicKeyFFI = FFIPublicKey(HexString(baseNodePublicKey))
             val result = wallet.addBaseNodePeer(publicKeyFFI, baseNodeAddress)
             publicKeyFFI.destroy()
+            if (result) {
+                baseNodeValidationStatusMap.clear()
+                EventBus.baseNodeSyncState.post(BaseNodeSyncState.NotStarted)
+            }
             result
         } ?: false
 
         override fun startBaseNodeSync(error: WalletError): Boolean = executeWithMapping(error, {
             Logger.e("Base node validation error: $it")
             baseNodeSharedPrefsRepository.baseNodeLastSyncResult = false
+            baseNodeValidationStatusMap.clear()
+            EventBus.baseNodeSyncState.post(BaseNodeSyncState.Failed)
         }) {
+            baseNodeValidationStatusMap.clear()
+            baseNodeValidationStatusMap[BaseNodeValidationType.TXO] = Pair(wallet.startTXOValidation(), null)
+            baseNodeValidationStatusMap[BaseNodeValidationType.TX] = Pair(wallet.startTxValidation(), null)
             baseNodeSharedPrefsRepository.baseNodeLastSyncResult = null
-            EventBus.baseNodeState.post(BaseNodeState.SyncStarted)
             true
         } ?: false
-
 
         override fun sendTari(
             user: User,
@@ -1036,7 +1100,12 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
         override fun previewSplitUtxos(utxos: List<TariUtxo>, splitCount: Int, walletError: WalletError): TariCoinPreview? =
             executeWithMapping(walletError) {
                 val ffiError = FFIError()
-                val result = wallet.splitPreviewUtxos(utxos.map { it.commitment }.toTypedArray(), splitCount, Constants.Wallet.defaultFeePerGram.value, ffiError)
+                val result = wallet.splitPreviewUtxos(
+                    utxos.map { it.commitment }.toTypedArray(),
+                    splitCount,
+                    Constants.Wallet.defaultFeePerGram.value,
+                    ffiError
+                )
                 walletError.code = ffiError.code
                 result
             }

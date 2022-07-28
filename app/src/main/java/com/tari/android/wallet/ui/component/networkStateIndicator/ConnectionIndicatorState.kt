@@ -1,13 +1,12 @@
 package com.tari.android.wallet.ui.component.networkStateIndicator
 
 import com.tari.android.wallet.R
-import com.tari.android.wallet.application.TariWalletApplication
 
-sealed class ConnectionIndicatorState(val resId: Int, val messageId: Int) {
+sealed class ConnectionIndicatorState(val resId: Int) {
 
-    class Connected(messageId: Int) : ConnectionIndicatorState(R.drawable.network_indicator_ok, messageId)
+    object Connected : ConnectionIndicatorState(R.drawable.ic_network_state_full)
 
-    class ConnectedWithIssues(messageId: Int) : ConnectionIndicatorState(R.drawable.network_indicator_warning, messageId)
+    object ConnectedWithIssues : ConnectionIndicatorState(R.drawable.ic_network_state_limited)
 
-    class Disconnected(messageId: Int) : ConnectionIndicatorState(R.drawable.network_indicator_error, messageId)
+    object Disconnected : ConnectionIndicatorState(R.drawable.ic_network_state_off)
 }

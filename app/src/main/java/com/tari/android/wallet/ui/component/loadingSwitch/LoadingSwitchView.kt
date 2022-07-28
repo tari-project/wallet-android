@@ -63,7 +63,7 @@ class LoadingSwitchView : FrameLayout {
     ) {
         init()
 
-        setState(LoadingSwitchState(false, false))
+        setState(LoadingSwitchState(isChecked = false, isLoading = false))
     }
 
     private fun init() {

@@ -44,15 +44,15 @@ JNIEXPORT void JNICALL
 Java_com_tari_android_wallet_ffi_FFITariCommitmentSignature_jniCommitmentSignatureCreateFromBytes(
         JNIEnv *jEnv,
         jobject jThis,
-        jobject jppublic_nonce_bytes,
+        jobject jp_public_nonce_bytes,
         jobject jpu_bytes,
         jobject jpv_bytes,
         jobject error) {
     int errorCode = 0;
     int *errorCodePointer = &errorCode;
 
-    jlong jpublicNonceBytes = GetPointerField(jEnv, jppublic_nonce_bytes);
-    auto *ppublicNonceBytes = reinterpret_cast<ByteVector *>(jpublicNonceBytes);
+    jlong jPublicNonceBytes = GetPointerField(jEnv, jp_public_nonce_bytes);
+    auto *pPublicNonceBytes = reinterpret_cast<ByteVector *>(jPublicNonceBytes);
 
     jlong juBytes = GetPointerField(jEnv, jpu_bytes);
     auto *puBytes = reinterpret_cast<ByteVector *>(juBytes);
@@ -60,7 +60,7 @@ Java_com_tari_android_wallet_ffi_FFITariCommitmentSignature_jniCommitmentSignatu
     jlong jvBytes = GetPointerField(jEnv, jpv_bytes);
     auto *pvBytes = reinterpret_cast<ByteVector *>(jvBytes);
 
-    auto result = reinterpret_cast<jlong>(commitment_signature_create_from_bytes(ppublicNonceBytes, puBytes, pvBytes, errorCodePointer));
+    auto result = reinterpret_cast<jlong>(commitment_signature_create_from_bytes(pPublicNonceBytes, puBytes, pvBytes, errorCodePointer));
 
     setErrorCode(jEnv, error, errorCode);
     SetPointerField(jEnv, jThis, reinterpret_cast<jlong>(result));

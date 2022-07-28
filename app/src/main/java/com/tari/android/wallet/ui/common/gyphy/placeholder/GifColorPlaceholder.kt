@@ -3,6 +3,7 @@ package com.tari.android.wallet.ui.common.gyphy.placeholder
 import android.graphics.drawable.Drawable
 import androidx.annotation.ColorInt
 import com.facebook.drawee.drawable.RoundedColorDrawable
+import kotlin.math.abs
 
 internal class GifColorPlaceholder private constructor(@field:ColorInt @param:ColorInt private val color: Int, private val cornerRadius: Float) :
     GifPlaceholder {
@@ -14,7 +15,7 @@ internal class GifColorPlaceholder private constructor(@field:ColorInt @param:Co
 
         @JvmOverloads
         fun generate(target: Any, cornerRadius: Float = DEFAULT_CORNER_RADIUS): GifColorPlaceholder {
-            return GifColorPlaceholder(BUILT_IN_COLORS[Math.abs(target.hashCode()) % BUILT_IN_COLORS.size], cornerRadius)
+            return GifColorPlaceholder(BUILT_IN_COLORS[abs(target.hashCode()) % BUILT_IN_COLORS.size], cornerRadius)
         }
     }
 }

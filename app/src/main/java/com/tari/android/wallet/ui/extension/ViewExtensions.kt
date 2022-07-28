@@ -271,8 +271,8 @@ fun AppCompatEditText.setTextSilently(newText: String) {
             var selectionStartPoint = selectionStart
             var selectionEndPoint = selectionEnd
             setText(newText)
-            selectionEndPoint = Math.min(selectionEnd, newText.length)
-            selectionStartPoint = Math.min(selectionStart, selectionEnd)
+            selectionEndPoint = selectionEnd.coerceAtMost(newText.length)
+            selectionStartPoint = selectionStart.coerceAtMost(selectionEnd)
             setSelection(selectionStartPoint, selectionEndPoint)
         } catch (e: Throwable) {
             Logger.i(e.toString())

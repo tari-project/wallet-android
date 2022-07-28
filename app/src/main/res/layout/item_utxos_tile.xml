@@ -16,92 +16,103 @@
         android:clipChildren="false"
         android:outlineAmbientShadowColor="@color/black"
         android:outlineSpotShadowColor="@color/black"
-        app:cardBackgroundColor="@color/purple"
-        app:cardCornerRadius="10dp"
-        app:cardElevation="6dp">
+        app:cardBackgroundColor="@color/gray_background"
+        app:cardCornerRadius="11dp"
+        app:cardElevation="0dp">
 
-        <androidx.constraintlayout.widget.ConstraintLayout
+        <FrameLayout
+            android:id="@+id/outline_container"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:minHeight="100dp">
+            android:layout_height="match_parent">
 
-            <androidx.appcompat.widget.AppCompatCheckBox
-                android:id="@+id/checked_state"
-                android:layout_width="wrap_content"
-                android:layout_height="24dp"
-                android:layout_marginTop="5dp"
-                android:buttonTint="@color/white"
-                android:visibility="gone"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/color_container"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_margin="2dp"
+                android:background="@color/purple"
+                android:minHeight="100dp">
 
-            <androidx.appcompat.widget.LinearLayoutCompat
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent">
+                <androidx.appcompat.widget.AppCompatCheckBox
+                    android:id="@+id/checked_state"
+                    android:layout_width="wrap_content"
+                    android:layout_height="24dp"
+                    android:layout_marginTop="5dp"
+                    android:buttonTint="@color/white"
+                    android:visibility="gone"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
 
-                <LinearLayout
-                    android:id="@+id/amount_container"
+                <androidx.appcompat.widget.LinearLayoutCompat
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal">
+                    android:orientation="vertical"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent">
 
-                    <androidx.appcompat.widget.AppCompatImageView
-                        android:id="@+id/balance_gem_image_view"
-                        android:layout_width="@dimen/home_balance_gem_width"
-                        android:layout_height="@dimen/home_balance_gem_height"
-                        android:layout_gravity="center_vertical"
-                        android:src="@drawable/home_gem_balance" />
-
-                    <com.tari.android.wallet.ui.component.CustomFontTextView
-                        android:id="@+id/amount"
+                    <LinearLayout
+                        android:id="@+id/amount_container"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="6dp"
-                        android:textColor="@color/white"
-                        android:textSize="30sp"
-                        app:customFont="@string/font_heavy"
-                        tools:text="3,200" />
+                        android:orientation="horizontal">
+
+                        <androidx.appcompat.widget.AppCompatImageView
+                            android:id="@+id/balance_gem_image_view"
+                            android:layout_width="@dimen/home_balance_gem_width"
+                            android:layout_height="@dimen/home_balance_gem_height"
+                            android:layout_gravity="center_vertical"
+                            android:src="@drawable/home_gem_balance" />
+
+                        <com.tari.android.wallet.ui.component.CustomFontTextView
+                            android:id="@+id/amount"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="6dp"
+                            android:textColor="@color/white"
+                            android:textSize="30sp"
+                            app:customFont="@string/font_heavy"
+                            tools:text="3,200" />
+
+                        <com.tari.android.wallet.ui.component.CustomFontTextView
+                            android:id="@+id/amount_decimal"
+                            android:layout_width="wrap_content"
+                            android:layout_height="@dimen/home_balance_digit_decimal_height"
+                            android:layout_gravity="center_vertical"
+                            android:layout_marginBottom="6dp"
+                            android:textColor="@color/white"
+                            android:textSize="12sp"
+                            app:customFont="@string/font_heavy"
+                            tools:text=".00" />
+
+                    </LinearLayout>
 
                     <com.tari.android.wallet.ui.component.CustomFontTextView
-                        android:id="@+id/amount_decimal"
+                        android:id="@+id/dateTime"
                         android:layout_width="wrap_content"
-                        android:layout_height="@dimen/home_balance_digit_decimal_height"
-                        android:layout_gravity="center_vertical"
-                        android:layout_marginBottom="6dp"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_horizontal"
                         android:textColor="@color/white"
                         android:textSize="12sp"
                         app:customFont="@string/font_heavy"
-                        tools:text=".00" />
+                        tools:text="08/08/2028" />
 
-                </LinearLayout>
+                </androidx.appcompat.widget.LinearLayoutCompat>
 
-                <com.tari.android.wallet.ui.component.CustomFontTextView
-                    android:id="@+id/dateTime"
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/status"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="center_horizontal"
-                    android:textColor="@color/white"
-                    android:textSize="12sp"
-                    app:customFont="@string/font_heavy"
-                    tools:text="08/08/2028" />
+                    android:src="@drawable/ic_utxos_status_confirmed"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent" />
 
-            </androidx.appcompat.widget.LinearLayoutCompat>
+            </androidx.constraintlayout.widget.ConstraintLayout>
 
 
-            <androidx.appcompat.widget.AppCompatImageView
-                android:id="@+id/status"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/ic_utxos_status_confirmed"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent" />
-
-        </androidx.constraintlayout.widget.ConstraintLayout>
+        </FrameLayout>
 
     </androidx.cardview.widget.CardView>
 

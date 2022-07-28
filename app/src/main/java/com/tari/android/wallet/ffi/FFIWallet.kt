@@ -568,8 +568,8 @@ internal class FFIWallet(
      * This callback function cannot be private due to JNI behaviour.
      */
     @Suppress("MemberVisibilityCanBePrivate")
-    fun onContactLivenessDataUpdated(livedessUpdate: FFIPointer) {
-        Logger.i("OnContactLivenessDataUpdated. Pointer: %s", livedessUpdate.toString())
+    fun onContactLivenessDataUpdated(livenessUpdate: FFIPointer) {
+        Logger.i("OnContactLivenessDataUpdated. Pointer: %s", livenessUpdate.toString())
     }
 
     fun estimateTxFee(amount: BigInteger, gramFee: BigInteger, kernelCount: BigInteger, outputCount: BigInteger): BigInteger {

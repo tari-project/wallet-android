@@ -7,6 +7,7 @@ import com.tari.android.wallet.application.baseNodes.BaseNodes
 import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodeDto
 import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodeSharedRepository
 import com.tari.android.wallet.event.EventBus
+import com.tari.android.wallet.service.baseNode.BaseNodeSyncState
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.common.SingleLiveEvent
 import javax.inject.Inject
@@ -31,17 +32,17 @@ internal class BaseNodeConfigViewModel : CommonViewModel() {
     init {
         component.inject(this)
 
-        EventBus.baseNodeState.subscribe(this) { updateCurrentBaseNode() }
+        EventBus.baseNodeSyncState.subscribe(this) { updateCurrentBaseNode(it) }
     }
 
     fun navigateToAdd() = _navigation.postValue(BaseNodeConfigNavigation.ToAddCustomBaseNode)
 
     fun navigateToChange() = _navigation.postValue(BaseNodeConfigNavigation.ToChangeBaseNode)
 
-    private fun updateCurrentBaseNode() {
-        val syncStatus = when (baseNodeSharedRepository.baseNodeLastSyncResult) {
-            null -> resourceManager.getString(R.string.debug_base_node_syncing)
-            true -> resourceManager.getString(R.string.debug_base_node_sync_successful)
+    private fun updateCurrentBaseNode(baseNodeSyncState: BaseNodeSyncState) {
+        val syncStatus = when (baseNodeSyncState) {
+            BaseNodeSyncState.Syncing -> resourceManager.getString(R.string.debug_base_node_syncing)
+            BaseNodeSyncState.Online -> resourceManager.getString(R.string.debug_base_node_sync_successful)
             else -> resourceManager.getString(R.string.debug_base_node_sync_failed)
         }
         _syncStatus.postValue(syncStatus)

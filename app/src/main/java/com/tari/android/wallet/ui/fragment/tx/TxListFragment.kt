@@ -74,9 +74,9 @@ import com.tari.android.wallet.ui.extension.*
 import com.tari.android.wallet.ui.fragment.send.activity.SendTariActivity
 import com.tari.android.wallet.ui.fragment.tx.adapter.TxListAdapter
 import com.tari.android.wallet.ui.fragment.tx.questionMark.QuestionMarkViewModel
-import com.tari.android.wallet.ui.fragment.tx.ui.BalanceViewController
 import com.tari.android.wallet.ui.fragment.tx.ui.CustomScrollView
-import com.tari.android.wallet.ui.fragment.tx.ui.UpdateProgressViewController
+import com.tari.android.wallet.ui.fragment.tx.ui.balanceController.BalanceViewController
+import com.tari.android.wallet.ui.fragment.tx.ui.progressController.UpdateProgressViewController
 import com.tari.android.wallet.ui.resource.AnimationResource
 import com.tari.android.wallet.ui.resource.ResourceContainer
 import com.tari.android.wallet.util.Constants
@@ -366,6 +366,8 @@ internal class TxListFragment : CommonFragment<FragmentTxListBinding, TxListView
                 UpdateProgressViewController.FailureReason.BASE_NODE_VALIDATION_ERROR -> viewModel.displayNetworkConnectionErrorDialog()
             }
         }
+
+        viewModel.refreshAllData()
     }
 
     override fun updateHasCompleted(source: UpdateProgressViewController, receivedTxCount: Int, cancelledTxCount: Int) {
@@ -453,8 +455,7 @@ internal class TxListFragment : CommonFragment<FragmentTxListBinding, TxListView
         )
     }
 
-    class RecyclerViewScrollListener(private val onScroll: (Int) -> Unit) :
-        RecyclerView.OnScrollListener() {
+    class RecyclerViewScrollListener(private val onScroll: (Int) -> Unit) : RecyclerView.OnScrollListener() {
 
         private var totalDeltaY = 0
 

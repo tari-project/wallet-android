@@ -140,7 +140,7 @@ framework for UI tree rebuild on configuration changes"""
             requireActivity().showKeyboard()
             ui.enterPasswordEditText
                 .postDelayed(KEYBOARD_ANIMATION_TIME) { ui.contentScrollView.scrollToBottom() }
-        }, KEYBOARD_SHOWUP_DELAY_AFTER_LOCAL_AUTH)
+        }, KEYBOARD_SHOW_UP_DELAY_AFTER_LOCAL_AUTH)
     }
 
     private fun setPageDescription() {
@@ -360,15 +360,13 @@ framework for UI tree rebuild on configuration changes"""
                 (requireActivity() as BackupSettingsRouter).onPasswordChanged(this)
             }
             is BackupOutOfDate -> { // backup failed
-                Logger.e(
-                    backupState.backupException,
-                    "Error during encrypted backup: ${backupState.backupException}"
-                )
+                Logger.e(backupState.backupException, "Error during encrypted backup: ${backupState.backupException}")
                 showBackupErrorDialog(deductBackupErrorMessage(backupState.backupException)) {
                     allowExitAndPasswordEditing()
                     setSecurePasswordCtaIdleState()
                 }
             }
+            else -> Unit
         }
     }
 
@@ -379,7 +377,12 @@ framework for UI tree rebuild on configuration changes"""
     }
 
     private fun showBackupErrorDialog(message: String, onClose: () -> Unit) {
-        val args = ErrorDialogArgs(string(back_up_wallet_backing_up_error_title), message, false, false, onClose)
+        val args = ErrorDialogArgs(
+            string(back_up_wallet_backing_up_error_title), message,
+            cancelable = false,
+            canceledOnTouchOutside = false,
+            onClose = onClose
+        )
         ModularDialog(requireContext(), args.getModular(resourceManager)).show()
     }
 
@@ -387,7 +390,7 @@ framework for UI tree rebuild on configuration changes"""
         @Suppress("DEPRECATION")
         fun newInstance() = ChangeSecurePasswordFragment()
 
-        private const val KEYBOARD_SHOWUP_DELAY_AFTER_LOCAL_AUTH = 500L
+        private const val KEYBOARD_SHOW_UP_DELAY_AFTER_LOCAL_AUTH = 500L
         private const val KEYBOARD_ANIMATION_TIME = 100L
     }
 

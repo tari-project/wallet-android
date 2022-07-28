@@ -104,7 +104,7 @@ class EnterRestorationPasswordFragment : CommonFragment<FragmentEnterRestorePass
     }
 
     private fun afterTextChanged(editable: Editable?) = with(ui) {
-        setRestoreWalletCTAState(editable?.length ?: 0 != 0)
+        setRestoreWalletCTAState((editable?.length ?: 0) != 0)
         enterPasswordLabelTextView.setTextColor(color(black))
         passwordEditText.setTextColor(color(black))
         wrongPasswordLabelView.gone()
