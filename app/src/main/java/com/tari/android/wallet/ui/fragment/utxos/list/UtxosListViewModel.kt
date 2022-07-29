@@ -99,7 +99,7 @@ class UtxosListViewModel : CommonViewModel() {
         listOptions.firstOrNull { it.ordering == ordering.value }?.isSelected = true
         listOptions.forEach {
             it.click = {
-                listOptions.forEach { it.isSelected = false }
+                listOptions.forEach { option -> option.isSelected = false }
                 it.isSelected = true
             }
         }
@@ -108,7 +108,7 @@ class UtxosListViewModel : CommonViewModel() {
         modules.addAll(listOptions)
         modules.add(ButtonModule(resourceManager.getString(R.string.common_apply), ButtonStyle.Normal) {
             ordering.postValue(listOptions.firstOrNull { it.isSelected }?.ordering)
-            _dissmissDialog.postValue(Unit)
+            _dismissDialog.postValue(Unit)
         })
         modules.add(ButtonModule(resourceManager.getString(R.string.common_cancel), ButtonStyle.Close))
         val modularDialogArgs = ModularDialogArgs(
@@ -123,7 +123,7 @@ class UtxosListViewModel : CommonViewModel() {
             walletService.getWithError { error, wallet ->
                 val selectedUtxos = textList.value.orEmpty().filter { it.checked.value }.map { it.source }.toList()
                 wallet.joinUtxos(selectedUtxos, error)
-                _dissmissDialog.postValue(Unit)
+                _dismissDialog.postValue(Unit)
                 loadUtxosFromFFI()
                 showSuccessJoinDialog()
             }
@@ -144,11 +144,11 @@ class UtxosListViewModel : CommonViewModel() {
                 BodyModule(resourceManager.getString(R.string.utxos_combine_and_break_description)),
                 splitModule,
                 ButtonModule(resourceManager.getString(buttonText), ButtonStyle.Normal) {
-                    _dissmissDialog.postValue(Unit)
+                    _dismissDialog.postValue(Unit)
                     showConfirmDialog(R.string.utxos_break_description) {
                         walletService.getWithError { error, wallet ->
                             wallet.splitUtxos(selectedUtxos, splitModule.count, error)
-                            _dissmissDialog.postValue(Unit)
+                            _dismissDialog.postValue(Unit)
                             loadUtxosFromFFI()
                             showSuccessSplitDialog()
                         }
@@ -270,7 +270,7 @@ class UtxosListViewModel : CommonViewModel() {
         if (utxoItem.isSelectable) {
             modules.add(
                 ButtonModule(resourceManager.getString(R.string.utxos_break_button), ButtonStyle.Normal) {
-                    _dissmissDialog.postValue(Unit)
+                    _dismissDialog.postValue(Unit)
                     split(utxoItem)
                 },
             )
@@ -286,7 +286,7 @@ class UtxosListViewModel : CommonViewModel() {
 
     private fun showSuccessDialog(descriptionId: Int) {
         val modularArgs = ModularDialogArgs(
-            DialogArgs() {
+            DialogArgs {
                 setSelectionState(false)
             }, listOf(
                 ImageModule(R.drawable.ic_utxos_succes_popper),

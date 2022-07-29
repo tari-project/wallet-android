@@ -26,6 +26,8 @@ class UtxosTextListViewHolder(view: ItemUtxosTextBinding) : CommonViewHolder<Utx
 
         ui.checkedState.setVisible(item.selectionState.value)
         item.selectionState.beforeTextChangeListener = { _, newValue -> ui.checkedState.setVisible(newValue) }
+
+        ui.root.alpha = if (item.status == UtxosStatus.Mined) 1.0F else 0.4F
     }
 
     private fun setCheckedSilently(item: UtxosViewHolderItem) {

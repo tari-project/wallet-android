@@ -9,7 +9,7 @@ import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepository
 import com.tari.android.wallet.data.sharedPrefs.network.formatKey
 import java.math.BigInteger
 
-class TestnetFaucetRepository(private val sharedPrefs: SharedPreferences, networkRepository: NetworkRepository) : CommonRepository(networkRepository){
+class TestnetFaucetRepository(sharedPrefs: SharedPreferences, networkRepository: NetworkRepository) : CommonRepository(networkRepository){
 
     var faucetTestnetTariRequestCompleted: Boolean by SharedPrefBooleanDelegate(sharedPrefs, formatKey(Keys.faucetTestnetTariRequestCompleted))
 

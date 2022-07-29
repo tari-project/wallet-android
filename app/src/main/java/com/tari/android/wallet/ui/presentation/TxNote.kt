@@ -72,7 +72,7 @@ internal class TxNote(val message: String?, val gifUrl: String?) {
             return if (Regex("$protocol$assetsDomain.*").matches(lines.last())) TxNote(
                 message = lines.take(lines.size - 1).filter(String::isNotEmpty)
                     .joinToString(separator = " ")
-                    .let { if (it.isEmpty()) null else it },
+                    .let { it.ifEmpty { null } },
                 gifUrl = lines.last()
             ) else TxNote(note, null)
         }

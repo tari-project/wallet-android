@@ -9,7 +9,7 @@ object DiContainer {
         appComponent = initDagger(app)
     }
 
-    internal fun reinitContainer() {
+    internal fun reInitContainer() {
         appComponent = initDagger(TariWalletApplication.INSTANCE.get()!!)
         TariWalletApplication.INSTANCE.get()!!.initApplication()
     }

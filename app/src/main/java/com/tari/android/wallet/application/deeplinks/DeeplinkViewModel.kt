@@ -10,7 +10,7 @@ import com.tari.android.wallet.ui.dialog.confirm.ConfirmDialogArgs
 import com.tari.android.wallet.ui.dialog.modular.ModularDialog
 import javax.inject.Inject
 
-class DeeplinkViewModel() : CommonViewModel() {
+class DeeplinkViewModel : CommonViewModel() {
 
     @Inject
     lateinit var baseNodes: BaseNodes

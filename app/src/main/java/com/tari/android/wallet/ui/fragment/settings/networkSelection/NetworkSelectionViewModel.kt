@@ -72,7 +72,7 @@ class NetworkSelectionViewModel : CommonViewModel() {
         EventBus.walletState.subscribe(this) {
             if (it == WalletState.NotReady) {
                 EventBus.clear()
-                DiContainer.reinitContainer()
+                DiContainer.reInitContainer()
                 _recreate.postValue(Unit)
             }
         }

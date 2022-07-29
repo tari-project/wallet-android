@@ -29,7 +29,7 @@ import java.math.BigInteger
 import javax.inject.Inject
 import kotlin.math.min
 
-class AddAmountViewModel() : CommonViewModel() {
+class AddAmountViewModel : CommonViewModel() {
 
     @Inject
     lateinit var tariSettingsSharedRepository: TariSettingsSharedRepository
@@ -50,7 +50,7 @@ class AddAmountViewModel() : CommonViewModel() {
     var selectedFeeData: FeeData? = null
     private var selectedSpeed: NetworkSpeed = NetworkSpeed.Medium
 
-    private var feeDatas: List<FeeData> = listOf()
+    private var feeData: List<FeeData> = listOf()
 
     init {
         component.inject(this)
@@ -106,7 +106,7 @@ class AddAmountViewModel() : CommonViewModel() {
     }
 
     fun showFeeDialog() {
-        val feeModule = FeeModule(MicroTari(), feeDatas, selectedSpeed)
+        val feeModule = FeeModule(MicroTari(), feeData, selectedSpeed)
         val args = ModularDialogArgs(
             DialogArgs(),
             listOf(
@@ -116,7 +116,7 @@ class AddAmountViewModel() : CommonViewModel() {
                 ButtonModule(resourceManager.getString(R.string.add_amount_modify_fee_use), ButtonStyle.Normal) {
                     selectedSpeed = feeModule.selectedSpeed
                     selectedFeeData = feeModule.feePerGram
-                    _dissmissDialog.postValue(Unit)
+                    _dismissDialog.postValue(Unit)
                 },
                 ButtonModule(resourceManager.getString(R.string.common_cancel), ButtonStyle.Close)
             )
@@ -141,8 +141,8 @@ class AddAmountViewModel() : CommonViewModel() {
                 return
             }
 
-            feeDatas = listOf(FeeData(grams.slow, slowFee), FeeData(grams.medium, mediumFee), FeeData(grams.fast, fastFee))
-            selectedFeeData = feeDatas[1]
+            feeData = listOf(FeeData(grams.slow, slowFee), FeeData(grams.medium, mediumFee), FeeData(grams.fast, fastFee))
+            selectedFeeData = feeData[1]
         } catch (e: Throwable) {
             Sentry.captureException(e)
         }

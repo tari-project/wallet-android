@@ -174,7 +174,7 @@ class VerifySeedPhraseFragment : CommonFragment<FragmentVerifySeedPhraseBinding,
                 it.arguments = Bundle().apply { putStringArrayList(SEED_WORDS_KEY, ArrayList(words)) }
             }
 
-        private const val SEED_WORDS_KEY = "wordz"
+        private const val SEED_WORDS_KEY = "seed_words"
     }
 }
 

@@ -70,6 +70,7 @@ internal class ChooseRestoreOptionViewModel : CommonViewModel() {
                     is WalletState.Failed -> viewModelScope.launch(Dispatchers.IO) {
                         handleException(WalletStartFailedException(it.exception))
                     }
+                    else -> Unit
                 }
             }
             viewModelScope.launch(Dispatchers.Main) {

@@ -32,10 +32,4 @@
  */
 package com.tari.android.wallet.service.notification
 
-class NotificationException : IllegalStateException {
-
-    constructor() : super()
-    constructor(s: String?) : super(s)
-    constructor(message: String?, cause: Throwable?) : super(message, cause)
-    constructor(cause: Throwable?) : super(cause)
-}
+class NotificationException(s: String?) : IllegalStateException(s)

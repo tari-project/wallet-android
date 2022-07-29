@@ -7,7 +7,7 @@ import java.math.BigInteger
 import java.net.URLDecoder
 
 @Deprecated("Delete after 01.10.2022")
-class OldDeeplinkFormatter() {
+class OldDeeplinkFormatter {
 
     private val regexPublicKeyHex = "pubkey" + "/([a-zA-Z0-9]{64})"
 
@@ -19,7 +19,7 @@ class OldDeeplinkFormatter() {
         if (publicKeyRegex.matches(deepLink)) {
             val matchResult = publicKeyRegex.find(deepLink)!!
             val (networkUriComponent, value, parameters) = matchResult.destructured
-            if (!networkRepository.currentNetwork!!.network.uriComponent.equals(networkUriComponent)) {
+            if (networkRepository.currentNetwork!!.network.uriComponent != networkUriComponent) {
                 return null
             }
             val parsedParameters = parseParameters(parameters)
