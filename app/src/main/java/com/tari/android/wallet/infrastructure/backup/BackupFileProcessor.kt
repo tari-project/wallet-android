@@ -57,6 +57,7 @@ internal class BackupFileProcessor(
     fun generateBackupFile(newPassword: CharArray? = null): Triple<File, DateTime, String> {
         // decrypt database
         FFIWallet.instance?.removeEncryption()
+        backupSettingsRepository.backupPassword = null
 
         // create partial backup in temp folder if password not set
         val databaseFile = File(walletConfig.walletDatabaseFilePath)
