@@ -41,6 +41,7 @@ import com.tari.android.wallet.R
 import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import com.tari.android.wallet.data.sharedPrefs.tariSettings.TariSettingsSharedRepository
 import com.tari.android.wallet.di.DiContainer.appComponent
+import com.tari.android.wallet.service.WalletServiceLauncher
 import com.tari.android.wallet.ui.fragment.auth.AuthActivity
 import com.tari.android.wallet.ui.fragment.debug.baseNodeConfig.BaseNodeConfigRouter
 import com.tari.android.wallet.ui.fragment.debug.baseNodeConfig.addBaseNode.AddCustomBaseNodeFragment
@@ -58,6 +59,9 @@ class WalletRestoreActivity : AppCompatActivity(), WalletRestoreRouter, BaseNode
 
     @Inject
     lateinit var tariSettingsSharedRepository: TariSettingsSharedRepository
+
+    @Inject
+    lateinit var walletServiceLauncher: WalletServiceLauncher
 
     override fun onCreate(savedInstanceState: Bundle?) {
         appComponent.inject(this)
@@ -102,6 +106,7 @@ class WalletRestoreActivity : AppCompatActivity(), WalletRestoreRouter, BaseNode
         prefs.onboardingDisplayedAtHome = true
         tariSettingsSharedRepository.isRestoredWallet = true
 
+        finish()
         startActivity(Intent(this, AuthActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         })
@@ -118,6 +123,13 @@ class WalletRestoreActivity : AppCompatActivity(), WalletRestoreRouter, BaseNode
             .replace(R.id.backup_fragment_container, fragment)
             .addToBackStack(null)
             .commit()
+    }
+
+    override fun onDestroy() {
+        if (!tariSettingsSharedRepository.isRestoredWallet) {
+            walletServiceLauncher.stop()
+        }
+        super.onDestroy()
     }
 
     companion object {

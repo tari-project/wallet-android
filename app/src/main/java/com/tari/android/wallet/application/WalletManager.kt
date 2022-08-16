@@ -58,7 +58,7 @@ import java.io.File
  *
  * @author The Tari Development Team
  */
-internal class WalletManager(
+class WalletManager(
     private val walletConfig: WalletConfig,
     private val torManager: TorProxyManager,
     private val sharedPrefsWrapper: SharedPrefsRepository,

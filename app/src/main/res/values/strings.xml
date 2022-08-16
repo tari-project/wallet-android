@@ -118,9 +118,9 @@
     <string name="internet_connection_error_dialog_description">Your phone is either offline or has a poor connection at the moment. We\'ll wait here until you find some stronger signal.</string>
 
     <!-- service -->
-    <string name="wallet_service_title">Tari Aurora wallet service is running.</string>
-    <string name="wallet_service_description">This service carries out wallet operations across applications.</string>
-    <string name="wallet_service_error_testnet_tari_request">Could not allocate free tXTR.</string>
+    <string name="wallet_service_title">Tari Aurora wallet service is running</string>
+    <string name="wallet_service_description">This service carries out wallet operations across applications</string>
+    <string name="wallet_service_error_testnet_tari_request">Could not allocate free tXTR</string>
     <string name="wallet_service_error_no_internet_connection">No internet connection!</string>
 
     <!-- testnet UTXO messages -->

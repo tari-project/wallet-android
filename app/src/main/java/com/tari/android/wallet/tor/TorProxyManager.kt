@@ -46,7 +46,7 @@ import java.io.InputStreamReader
  *
  * @author The Tari Development Team
  */
-internal class TorProxyManager(
+class TorProxyManager(
     private val context: Context,
     private val torSharedRepository: TorSharedRepository,
     private val torConfig: TorConfig

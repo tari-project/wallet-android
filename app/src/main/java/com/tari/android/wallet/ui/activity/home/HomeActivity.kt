@@ -135,6 +135,7 @@ internal class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        instance = this
 
         val viewModel: HomeViewModel by viewModels()
         bindViewModel(viewModel)
@@ -398,6 +399,7 @@ internal class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>
 
     override fun onDestroy() {
         super.onDestroy()
+        instance = null
         viewModelStore.clear()
         compositeDisposable.dispose()
     }
@@ -423,5 +425,8 @@ internal class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>
         private const val INDEX_PROFILE = 2
         private const val INDEX_SETTINGS = 3
         private const val NO_SMOOTH_SCROLL = false
+
+        var instance: HomeActivity? = null
+            private set
     }
 }

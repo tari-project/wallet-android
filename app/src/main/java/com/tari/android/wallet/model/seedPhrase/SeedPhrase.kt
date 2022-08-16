@@ -2,7 +2,7 @@ package com.tari.android.wallet.model.seedPhrase
 
 import com.tari.android.wallet.ffi.FFISeedWords
 
-internal class SeedPhrase {
+class SeedPhrase {
 
     var ffiSeedWords: FFISeedWords? = null
         private set
