@@ -34,9 +34,8 @@ package com.tari.android.wallet.application
 
 import android.app.Activity
 import android.app.Application
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleObserver
-import androidx.lifecycle.OnLifecycleEvent
+import androidx.lifecycle.DefaultLifecycleObserver
+import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ProcessLifecycleOwner
 import com.orhanobut.logger.AndroidLogAdapter
 import com.orhanobut.logger.Logger
@@ -58,7 +57,7 @@ import javax.inject.Inject
  *
  * @author The Tari Development Team
  */
-internal class TariWalletApplication : Application(), LifecycleObserver {
+internal class TariWalletApplication : Application() {
 
     @Inject
     lateinit var notificationHelper: NotificationHelper
@@ -79,6 +78,7 @@ internal class TariWalletApplication : Application(), LifecycleObserver {
     lateinit var yatAdapter: YatAdapter
 
     private val activityLifecycleCallbacks = ActivityLifecycleCallbacks()
+
     var isInForeground = false
         private set
 
@@ -100,7 +100,7 @@ internal class TariWalletApplication : Application(), LifecycleObserver {
         DiContainer.initContainer(this)
         initApplication()
 
-        ProcessLifecycleOwner.get().lifecycle.addObserver(this)
+        ProcessLifecycleOwner.get().lifecycle.addObserver(AppObserver())
     }
 
     fun initApplication() {
@@ -119,34 +119,36 @@ internal class TariWalletApplication : Application(), LifecycleObserver {
         yatAdapter.initYat(this)
     }
 
-    @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)
-    fun onAppDestroyed() {
-        Logger.d("App was destroyed.")
-        walletServiceLauncher.stopOnAppBackgrounded()
-    }
-
-    @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
-    fun onAppBackgrounded() {
-        Logger.d("App in background.")
-        isInForeground = false
-        //todo get back when the whole application will have ability to reconnect to wallet
-//        walletServiceLauncher.stopOnAppBackgrounded()
-        EventBus.post(Event.App.AppBackgrounded())
-    }
-
-    @OnLifecycleEvent(Lifecycle.Event.ON_START)
-    fun onAppForegrounded() {
-        Logger.d("App in foreground.")
-        isInForeground = true
-        walletServiceLauncher.startOnAppForegrounded()
-        EventBus.post(Event.App.AppForegrounded())
-    }
-
     companion object {
-
         @Volatile
         var INSTANCE: WeakReference<TariWalletApplication> = WeakReference(null)
             private set
+    }
+
+    inner class AppObserver : DefaultLifecycleObserver {
+
+        override fun onStart(owner: LifecycleOwner) {
+            super.onStart(owner)
+            Logger.d("App in foreground.")
+            isInForeground = true
+            walletServiceLauncher.startOnAppForegrounded()
+            EventBus.post(Event.App.AppForegrounded())
+        }
+
+        override fun onStop(owner: LifecycleOwner) {
+            super.onStop(owner)
+            Logger.d("App in background.")
+            isInForeground = false
+            //todo get back when the whole application will have ability to reconnect to wallet
+//        walletServiceLauncher.stopOnAppBackgrounded()
+            EventBus.post(Event.App.AppBackgrounded())
+        }
+
+        override fun onDestroy(owner: LifecycleOwner) {
+            super.onDestroy(owner)
+            Logger.d("App was destroyed.")
+            walletServiceLauncher.stopOnAppBackgrounded()
+        }
     }
 }
 

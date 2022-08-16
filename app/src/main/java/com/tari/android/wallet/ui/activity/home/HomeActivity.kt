@@ -41,9 +41,10 @@ import android.widget.ImageView
 import androidx.activity.viewModels
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
-import androidx.fragment.app.FragmentStatePagerAdapter
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.tari.android.wallet.R
 import com.tari.android.wallet.R.color.home_selected_nav_item
 import com.tari.android.wallet.application.deeplinks.DeepLink
@@ -106,6 +107,7 @@ import com.tari.android.wallet.util.Constants
 import io.reactivex.disposables.CompositeDisposable
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import java.lang.ref.WeakReference
 import javax.inject.Inject
 
 internal class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>(), AllSettingsRouter, TxListRouter, BaseNodeConfigRouter {
@@ -135,7 +137,7 @@ internal class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        instance = this
+        instance = WeakReference(this)
 
         val viewModel: HomeViewModel by viewModels()
         bindViewModel(viewModel)
@@ -224,7 +226,8 @@ internal class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>
 
     private fun setupBottomNavigation() {
         enableNavigationView(ui.homeImageView)
-        ui.viewPager.adapter = HomeAdapter(supportFragmentManager)
+        ui.viewPager.adapter = HomeAdapter(supportFragmentManager, this.lifecycle)
+        ui.viewPager.isUserInputEnabled = false
         ui.viewPager.offscreenPageLimit = 3
         ui.homeView.setOnClickListener {
             ui.viewPager.setCurrentItem(INDEX_HOME, NO_SMOOTH_SCROLL)
@@ -320,7 +323,7 @@ internal class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>
                 HomeDeeplinkScreens.TxDetails -> {
                     (intent.getParcelableExtra<TxId>(HomeDeeplinkScreens.KeyTxDetailsArgs))?.let { toTxDetails(null, it) }
                 }
-                else -> { }
+                else -> {}
             }
         }
     }
@@ -399,23 +402,22 @@ internal class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>
 
     override fun onDestroy() {
         super.onDestroy()
-        instance = null
+        instance = WeakReference(null)
         viewModelStore.clear()
         compositeDisposable.dispose()
     }
 
-    private class HomeAdapter(fm: FragmentManager) : FragmentStatePagerAdapter(fm, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
-        override fun getItem(position: Int): Fragment =
-            when (position) {
-                INDEX_HOME -> TxListFragment()
-                INDEX_STORE -> StoreFragment.newInstance()
-                INDEX_PROFILE -> WalletInfoFragment()
-                INDEX_SETTINGS -> AllSettingsFragment.newInstance()
-                else -> error("Unexpected position: $position")
-            }
+    class HomeAdapter(fm: FragmentManager, lifecycle: Lifecycle) : FragmentStateAdapter(fm, lifecycle) {
 
-        override fun getCount(): Int = 4
+        override fun createFragment(position: Int): Fragment = when (position) {
+            INDEX_HOME -> TxListFragment()
+            INDEX_STORE -> StoreFragment.newInstance()
+            INDEX_PROFILE -> WalletInfoFragment()
+            INDEX_SETTINGS -> AllSettingsFragment.newInstance()
+            else -> error("Unexpected position: $position")
+        }
 
+        override fun getItemCount(): Int = 4
     }
 
     companion object {
@@ -426,7 +428,8 @@ internal class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>
         private const val INDEX_SETTINGS = 3
         private const val NO_SMOOTH_SCROLL = false
 
-        var instance: HomeActivity? = null
+        @Volatile
+        var instance: WeakReference<HomeActivity> = WeakReference(null)
             private set
     }
 }
