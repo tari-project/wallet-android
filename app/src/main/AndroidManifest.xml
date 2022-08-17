@@ -49,6 +49,10 @@
             android:name=".service.ServiceRestartBroadcastReceiver"
             android:enabled="true"
             android:exported="false" /> <!-- splash -->
+        <receiver
+            android:name=".notification.NotificationBroadcastReceiver"
+            android:enabled="true"
+            android:exported="false" />
         <activity
             android:name=".ui.activity.SplashActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
@@ -153,8 +157,9 @@
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:parentActivityName=".ui.fragment.onboarding.activity.OnboardingFlowActivity"
             android:screenOrientation="portrait"
+            android:launchMode="singleTask"
             android:theme="@style/AppTheme"
-            android:windowSoftInputMode="adjustResize" /> <!-- This receiver is responsible for starting the service after boot finish. -->
+            android:windowSoftInputMode="adjustResize" />
         <receiver
             android:name=".service.BootDeviceReceiver"
             android:enabled="true"

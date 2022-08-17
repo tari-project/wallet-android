@@ -126,10 +126,10 @@ android {
                          'META-INF/ASL2.0']
         }
     }
-
-    lintOptions {
-        disable("NewApi")
+    lint {
+        disable 'NewApi'
     }
+
 }
 
 Properties loadSecretProps() {
