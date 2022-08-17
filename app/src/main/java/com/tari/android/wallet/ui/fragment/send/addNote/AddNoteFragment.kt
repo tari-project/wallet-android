@@ -307,7 +307,7 @@ class AddNoteFragment : Fragment(), View.OnTouchListener {
         val mActivity = activity ?: return
         ui.noteEditText.requestFocus()
         val imm = mActivity.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-        imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY)
+        imm.showSoftInput(ui.noteEditText, InputMethodManager.HIDE_IMPLICIT_ONLY)
     }
 
     @SuppressLint("ClickableViewAccessibility")

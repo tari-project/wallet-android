@@ -392,7 +392,7 @@ class AddRecipientFragment : CommonFragment<FragmentAddRecipientBinding, AddReci
         val mActivity = activity ?: return
         ui.searchEditText.requestFocus()
         val imm = mActivity.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-        imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY)
+        imm.showSoftInput(ui.searchEditText, InputMethodManager.HIDE_IMPLICIT_ONLY)
     }
 
     private fun onSearchTextChanged(query: String) {
