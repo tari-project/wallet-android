@@ -156,7 +156,8 @@ internal class BackupSettingsFragment : CommonFragment<FragmentWalletBackupSetti
         ui.localFileBackup.viewLifecycle = viewLifecycleOwner
 
         ui.googleDriveBackup.init(this, googleDriveViewModel.apply { setup(BackupOptions.Google) })
-        ui.dropboxBackup.init(this, dropboxViewModel.apply { setup(BackupOptions.Dropbox) })
+        ui.dropboxBackup.gone()
+//        ui.dropboxBackup.init(this, dropboxViewModel.apply { setup(BackupOptions.Dropbox) })
         ui.localFileBackup.init(this, localFileViewModel.apply { setup(BackupOptions.Local) })
 
         viewModel.setupWithOptions(listOf(googleDriveViewModel, dropboxViewModel, localFileViewModel))
