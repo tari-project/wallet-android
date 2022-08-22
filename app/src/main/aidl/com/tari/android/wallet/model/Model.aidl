@@ -48,3 +48,7 @@ parcelable PendingInboundTx;
 parcelable PendingOutboundTx;
 parcelable PublicKey;
 parcelable ValidationResult;
+parcelable TransactionSendStatus;
+parcelable TariVector;
+parcelable TariUtxo;
+parcelable TariCoinPreview;

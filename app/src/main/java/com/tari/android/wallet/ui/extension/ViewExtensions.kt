@@ -71,8 +71,7 @@ import android.animation.Animator.AnimatorListener as LegacyAnimatorListener
 internal fun RecyclerView.isScrolledToTop(): Boolean {
     val layoutManager = (layoutManager as? LinearLayoutManager) ?: return false
     if (layoutManager.childCount == 0) return true
-    return (layoutManager.findFirstVisibleItemPosition() == 0
-            && layoutManager.findViewByPosition(0)?.top == 0)
+    return (layoutManager.findFirstVisibleItemPosition() == 0 && layoutManager.findViewByPosition(0)?.top == 0)
 }
 
 internal fun View.visible() {
@@ -125,41 +124,22 @@ internal fun TextView.setWidthAndHeightToMeasured() {
 /**
  * Sets text size in pixel units.
  */
-internal fun TextView.setTextSizePx(sizePx: Float) {
-    setTextSize(
-        TypedValue.COMPLEX_UNIT_PX,
-        sizePx
-    )
-}
+internal fun TextView.setTextSizePx(sizePx: Float) = setTextSize(TypedValue.COMPLEX_UNIT_PX, sizePx)
 
 /**
  * @return first child of the view group, null if no children
  */
-internal fun ViewGroup.getFirstChild(): View? {
-    return if (childCount > 0) {
-        this.getChildAt(0)
-    } else {
-        null
-    }
-}
+internal fun ViewGroup.getFirstChild(): View? = if (childCount > 0) this.getChildAt(0) else null
 
 /**
  * @return last child of the view group, null if no children
  */
-internal fun ViewGroup.getLastChild(): View? {
-    return if (childCount > 0) {
-        this.getChildAt(childCount - 1)
-    } else {
-        null
-    }
-}
+internal fun ViewGroup.getLastChild(): View? = if (childCount > 0) this.getChildAt(childCount - 1) else null
 
 /**
  * Scroll to the top of the scroll view.
  */
-internal fun ScrollView.scrollToTop() {
-    scrollTo(0, 0)
-}
+internal fun ScrollView.scrollToTop() = scrollTo(0, 0)
 
 /**
  * Scroll to the bottom of the scroll view.
@@ -178,10 +158,10 @@ internal fun LottieAnimationView.addAnimatorListener(
     onRepeat: (LegacyAnimator?) -> Unit = {}
 ) {
     addAnimatorListener(object : LegacyAnimatorListener {
-        override fun onAnimationRepeat(animation: LegacyAnimator?) = onRepeat(animation)
-        override fun onAnimationEnd(animation: LegacyAnimator?) = onEnd(animation)
-        override fun onAnimationCancel(animation: LegacyAnimator?) = onCancel(animation)
-        override fun onAnimationStart(animation: LegacyAnimator?) = onStart(animation)
+        override fun onAnimationRepeat(animation: LegacyAnimator) = onRepeat(animation)
+        override fun onAnimationEnd(animation: LegacyAnimator) = onEnd(animation)
+        override fun onAnimationCancel(animation: LegacyAnimator) = onCancel(animation)
+        override fun onAnimationStart(animation: LegacyAnimator) = onStart(animation)
     })
 }
 
@@ -211,13 +191,11 @@ internal fun View.setBottomMargin(margin: Int) {
     }
 }
 
-internal fun View.postDelayed(timeMillis: Long, action: () -> Unit) =
-    this.postDelayed(action, timeMillis)
+internal fun View.postDelayed(timeMillis: Long, action: () -> Unit) = this.postDelayed(action, timeMillis)
 
 internal fun View.string(@StringRes id: Int): String = context.string(id)
 
-internal fun View.string(@StringRes id: Int, vararg formatArgs: Any): String =
-    context.string(id, *formatArgs)
+internal fun View.string(@StringRes id: Int, vararg formatArgs: Any): String = context.string(id, *formatArgs)
 
 internal fun View.color(@ColorRes id: Int): Int = context.color(id)
 
@@ -227,9 +205,7 @@ internal fun View.dimenPx(@DimenRes id: Int): Int = context.dimenPx(id)
 
 internal fun View.drawable(@DrawableRes id: Int): Drawable? = context.drawable(id)
 
-internal fun View.setOnThrottledClickListener(action: (View) -> Unit) {
-    this.setOnClickListener(ThrottleClick(action))
-}
+internal fun View.setOnThrottledClickListener(action: (View) -> Unit) = this.setOnClickListener(ThrottleClick(action))
 
 internal class ThrottleClick(private val delegate: (View) -> Unit) : View.OnClickListener {
     override fun onClick(v: View?) {
@@ -295,8 +271,8 @@ fun AppCompatEditText.setTextSilently(newText: String) {
             var selectionStartPoint = selectionStart
             var selectionEndPoint = selectionEnd
             setText(newText)
-            selectionEndPoint = Math.min(selectionEnd, newText.length)
-            selectionStartPoint = Math.min(selectionStart, selectionEnd)
+            selectionEndPoint = selectionEnd.coerceAtMost(newText.length)
+            selectionStartPoint = selectionStart.coerceAtMost(selectionEnd)
             setSelection(selectionStartPoint, selectionEndPoint)
         } catch (e: Throwable) {
             Logger.i(e.toString())
@@ -370,9 +346,6 @@ fun FragmentTransaction.addFadeInAnimation(): FragmentTransaction {
 }
 
 fun FragmentTransaction.addEnterLeftAnimation(): FragmentTransaction {
-    this.setCustomAnimations(
-        R.anim.enter_from_right, R.anim.exit_to_left,
-        R.anim.enter_from_left, R.anim.exit_to_right
-    )
+    this.setCustomAnimations(R.anim.enter_from_right, R.anim.exit_to_left, R.anim.enter_from_left, R.anim.exit_to_right)
     return this
 }

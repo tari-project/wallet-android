@@ -16,7 +16,7 @@ import com.tari.android.wallet.service.connection.TariWalletServiceConnection
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.dialog.error.ErrorDialogArgs
 
-class TxDetailsViewModel() : CommonViewModel() {
+class TxDetailsViewModel : CommonViewModel() {
 
     var requiredConfirmationCount: Long = 0
         private set
@@ -41,6 +41,7 @@ class TxDetailsViewModel() : CommonViewModel() {
             if (it.status == TariWalletServiceConnection.ServiceConnectionStatus.CONNECTED) {
                 fetchRequiredConfirmationCount()
                 findTxAndUpdateUI()
+                _tx.value = _tx.value
             }
         }.addTo(compositeDisposable)
 
@@ -48,7 +49,7 @@ class TxDetailsViewModel() : CommonViewModel() {
     }
 
     fun setTxArg(tx: Tx) {
-        _tx.value = tx
+        _tx.postValue(tx)
         _cancellationReason.postValue(getCancellationReason(tx))
         generateExplorerLink()
     }

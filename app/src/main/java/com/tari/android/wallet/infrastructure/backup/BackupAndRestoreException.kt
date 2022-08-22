@@ -32,8 +32,6 @@
  */
 package com.tari.android.wallet.infrastructure.backup
 
-import java.io.File
-
 // Storage & backup-related.
 class BackupStorageSetupCancelled : IllegalStateException()
 class BackupException(e: Throwable) : IllegalStateException(e)
@@ -44,5 +42,5 @@ class BackupInterruptedException(s: String?) : IllegalStateException(s)
 class BackupStorageTamperedException(s: String?) : IllegalStateException(s)
 
 // Restore-related.
-class BackupFileIsEncryptedException(encryptedFile: File, s: String?) : IllegalStateException(s)
+class BackupFileIsEncryptedException(s: String?) : IllegalStateException(s)
 class WalletStartFailedException(e: Throwable) : java.lang.IllegalStateException(e)

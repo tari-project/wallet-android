@@ -51,8 +51,8 @@ class BiometricAuthenticationViewModel : CommonViewModel() {
                 Logger.e("Other biometric error. Code: ${e.code}")
             val args = AlertDialogArgs(
                 resourceManager.getString(R.string.auth_failed_desc),
-                resourceManager.getString(R.string.exit),
-                resourceManager.getString(R.string.auth_failed_title)
+                resourceManager.getString(R.string.auth_failed_title),
+                resourceManager.getString(R.string.exit)
             )
             _showAlertDialog.postValue(args)
         }

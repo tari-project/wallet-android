@@ -102,7 +102,7 @@ private class AES(private val random: SecureRandom = SecureRandom()) :
         val secret: SecretKey =
             SecretKeyFactory.getInstance(SECRET_KEYGEN_ALGORITHM).generateSecret(spec)
         spec.clearPassword()
-        Arrays.fill(password, NULL_BYTE.toChar())
+        Arrays.fill(password, NULL_BYTE.toInt().toChar())
         return Pair(salt, SecretKeySpec(secret.encoded, ALGORITHM_AES))
     }
 

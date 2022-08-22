@@ -93,11 +93,14 @@
     <string name="common_cancel">Cancel</string>
     <string name="common_ok">OK</string>
     <string name="common_confirm">Confirm</string>
+    <string name="common_apply">Apply</string>
     <string name="common_share">Share</string>
     <string name="common_reset">Reset</string>
     <string name="common_error_title">Error</string>
     <string name="common_unknown_error">Unknown error</string>
     <string name="common_delete">Delete</string>
+    <string name="common_lets_do_it">Yes! Let\'s do it!</string>
+    <string name="common_are_you_sure">Are you sure?</string>
 
     <!-- emoji id copied view -->
     <string name="emoji_id_copied">COPIED</string>
@@ -115,9 +118,9 @@
     <string name="internet_connection_error_dialog_description">Your phone is either offline or has a poor connection at the moment. We\'ll wait here until you find some stronger signal.</string>
 
     <!-- service -->
-    <string name="wallet_service_title">Tari Aurora wallet service is running.</string>
-    <string name="wallet_service_description">This service carries out wallet operations across applications.</string>
-    <string name="wallet_service_error_testnet_tari_request">Could not allocate free tXTR.</string>
+    <string name="wallet_service_title">Tari Aurora wallet service is running</string>
+    <string name="wallet_service_description">This service carries out wallet operations across applications</string>
+    <string name="wallet_service_error_testnet_tari_request">Could not allocate free tXTR</string>
     <string name="wallet_service_error_no_internet_connection">No internet connection!</string>
 
     <!-- testnet UTXO messages -->
@@ -168,7 +171,7 @@
     <string name="auth_not_available_or_canceled_title">Authentication Error</string>
     <string name="auth_not_available_or_canceled_desc">Tari Aurora was not able to authenticate you. Do you still want to proceed?</string>
     <string name="auth_failed_title">Authentication Failed</string>
-    <string name="auth_failed_desc">Tari Aurora was not able to authenticate you.</string>
+    <string name="auth_failed_desc">Tari Aurora was not able to authenticate you</string>
 
     <!-- home -->
     <string name="home_available_balance">Balance</string>
@@ -195,7 +198,6 @@
     <string name="home_custom_base_node_title">Add custom base node</string>
     <string name="home_custom_base_node_description">The QR code is a deep link request to assign your wallet to use this base node.</string>
     <string name="home_custom_base_node_full_description"><![CDATA[<strong>Name: </strong>%s<br><br><strong>Peer:</strong><br>%s]]></string>
-    <string name="home_custom_base_node_yes_button">Yes! Let\'s do it!</string>
     <string name="home_custom_base_node_no_button">Not this time</string>
     <!--home tari bot dialog-->
     <string name="home_tari_bot_you_got_tari_dlg_title">You just got some tXTR!</string>
@@ -278,6 +280,13 @@
     <string name="add_amount_wallet_balance">Wallet Balance</string>
     <string name="add_amount_one_side_payment_switcher">One Sided Payment</string>
     <string name="add_amount_one_side_payment_question_mark">One-sided payments are broadcast instantly and do not require the recipient to be online. But they are less private. Use them if you know the recipient is offline for long periods, or for things like \'tip-jars\'.</string>
+    <string name="add_amount_modify_fee_title">Modify Transaction Fee</string>
+    <string name="add_amount_modify_fee_description">Choose how fast you would like to move your transaction to the blockchain.\n A higher fee will speed up the process.</string>
+    <string name="add_amount_modify_fee_estimated">Estimated Fee:</string>
+    <string name="add_amount_modify_fee_speed_up_transaction">Speed Up Transaction</string>
+    <string name="add_amount_modify_fee_network_traffic">Network Traffic</string>
+    <string name="add_amount_modify_fee_calculating_fees">Calculating transaction fee…</string>
+    <string name="add_amount_modify_fee_use">Use This Fee</string>
 
     <!-- send tari - note -->
     <string name="add_note_prompt">Transaction Note</string>
@@ -326,7 +335,6 @@
     <string name="tx_detail_cancel_tx">Cancel transaction</string>
     <string name="tx_detail_cancellation_error_title">Oops…</string>
     <string name="tx_detail_cancellation_error_description">Error occurred during TX cancellation.</string>
-    <string name="tx_details_cancel_dialog_title">Are you sure?</string>
     <string name="tx_details_cancel_dialog_description">You will have to start a new transaction if you change your mind.</string>
     <string name="tx_details_cancel_dialog_cancel">Yes, cancel</string>
     <string name="tx_details_cancel_dialog_not_cancel">Not now</string>
@@ -544,7 +552,7 @@
     <string name="search_gifs_dialog_hint">Search GIPHY</string>
 
     <!-- Network status indicator-->
-    <string name="connection_status_ok">Everything ok. Move along, nothing to see here</string>
+    <string name="connection_status_ok">Everything OK. Move along, nothing to see here</string>
     <string name="connection_status_warning_sync_in_progress">Syncing with base node</string>
     <string name="connection_status_error_no_network_connection">Unable to connect with internet</string>
     <string name="connection_status_error_unknown_network_connection_status">Unknown internet connection status</string>
@@ -552,6 +560,20 @@
     <string name="connection_status_error_connecting_with_tor">Connecting with Tor</string>
     <string name="connection_status_error_unknown_tor_connection_status">Unknown connection status with Tor</string>
     <string name="connection_status_error_disconnected_from_base_node">Disconnected from the base node</string>
+    <string name="connection_status_dialog_title">Connection Status</string>
+    <string name="connection_status_dialog_network_status_disconnected">Disconnected from the Internet</string>
+    <string name="connection_status_dialog_network_status_connected">Connected to the Internet</string>
+    <string name="connection_status_dialog_tor_status_disconnected">Disconnected from Tor</string>
+    <string name="connection_status_dialog_tor_status_connecting">Connecting with Tor</string>
+    <string name="connection_status_dialog_tor_status_connected">Connected with Tor</string>
+    <string name="connection_status_dialog_tor_status_failed">Failed to connect with Tor</string>
+    <string name="connection_status_dialog_base_node_status_disconnected">Disconnected from Base Node</string>
+    <string name="connection_status_dialog_base_node_status_connecting">Connecting to Base Node</string>
+    <string name="connection_status_dialog_base_node_status_connected">Connected to Base Node</string>
+    <string name="connection_status_dialog_base_node_sync_idle">Waiting for Sync</string>
+    <string name="connection_status_dialog_base_node_sync_pending">Syncing with Base Node</string>
+    <string name="connection_status_dialog_base_node_sync_success">Synced with Base Node</string>
+    <string name="connection_status_dialog_base_node_sync_failure">Failed sync with Base Node</string>
 
     <string name="tor_bridges_title">Bridges Configuration</string>
     <string name="tor_bridges_connect">Connect</string>
@@ -573,5 +595,68 @@
     <string name="tor_bridges_connection_progress_successful_description">Connecting to TOR connection was established successfully\n</string>
     <string name="tor_bridges_connection_progress_successful_no_bridges">No used bridges</string>
     <string name="tor_bridges_connection_progress_successful_used_bridges">Used bridges\n</string>
+
+    <string name="tari_about_title">About</string>
+    <string name="tari_about_description"><![CDATA[The following icons are licensed under<br><font color=#8931FF>Creative Commons 3.0:</font>]]></string>
+    <string name="tari_about_license_url">https://creativecommons.org/licenses/by/3.0/</string>
+    <string name="tari_about_icon_url_locked">https://thenounproject.com/icon/locked-lock-3734872/</string>
+    <string name="tari_about_icon_url_about">https://thenounproject.com/icon/about-4860865/</string>
+    <string name="tari_about_icon_url_speach_bublles">https://thenounproject.com/icon/speech-bubbles-4213155/</string>
+    <string name="tari_about_icon_url_keyboard">https://thenounproject.com/icon/keyboard-4213010/</string>
+    <string name="tari_about_icon_url_writing">https://thenounproject.com/icon/writing-4213261/</string>
+    <string name="tari_about_icon_url_privacy">https://thenounproject.com/icon/privacy-1381695/</string>
+    <string name="tari_about_icon_url_bullhorn">https://thenounproject.com/icon/bullhorn-4213159/</string>
+    <string name="tari_about_icon_url_refresh">https://thenounproject.com/icon/refresh-1043971/</string>
+    <string name="tari_about_icon_url_magnifier">https://thenounproject.com/icon/magnifier-4213152/</string>
+    <string name="tari_about_icon_url_repair">https://thenounproject.com/icon/repair-tools-4213156/</string>
+    <string name="tari_about_icon_url_server">https://thenounproject.com/icon/internet-server-4213144/</string>
+    <string name="tari_about_icon_url_networking">https://thenounproject.com/icon/networking-4213263/</string>
+    <string name="tari_about_icon_url_delete">https://thenounproject.com/icon/delete-4727971/</string>
+
+    <string name="tari_about_icon_text_locked">Locked Lock by BlackActurus from\nNounProject.com</string>
+    <string name="tari_about_icon_text_about">About by Anggara Putra from\nNounProject.com</string>
+    <string name="tari_about_icon_text_speach_bublles">Speech Bubbles by Design Circle from\nNounProject.com</string>
+    <string name="tari_about_icon_text_keyboard">Keyboard by Design Circle from\nNounProject.com</string>
+    <string name="tari_about_icon_text_writing">Writing by Design Circle from\nNounProject.com</string>
+    <string name="tari_about_icon_text_privacy">Privacy by Gregor Cresnar from\nNounProject.com</string>
+    <string name="tari_about_icon_text_bullhorn">Bullhorn by Design Circle from\nNounProject.com</string>
+    <string name="tari_about_icon_text_refresh">Magnifier by Design Circle from\nNounProject.com (Modified)</string>
+    <string name="tari_about_icon_text_magnifier">Refresh by Poombatta from\nNounProject.com</string>
+    <string name="tari_about_icon_text_repair">Repair Tools by Design Circle from\nNounProject.com</string>
+    <string name="tari_about_icon_text_server">Internet Server by Design Circle from\nNounProject.com</string>
+    <string name="tari_about_icon_text_networking">Networking by Design Circle from\nNounProject.com</string>
+    <string name="tari_about_icon_text_delete">Delete by Maya Nurhayati from\nNounProject.com</string>
+
+    <string name="utxos_list_title">Wallet</string>
+    <string name="utxos_selecting">Select</string>
+    <string name="utxos_status_mined">Mined</string>
+    <string name="utxos_status_confirmed">Confirmed</string>
+    <string name="utxos_ordering_title">Sort by</string>
+    <string name="utxos_empty_title">Your wallet is empty</string>
+    <string name="utxos_empty_description">Once you have some funds, you’ll be able to view your coins here.</string>
+    <string name="utxos_in_progress">Just a sec…</string>
+    <string name="utxos_combine_and_break_title">Combine &amp; Break Coins</string>
+    <string name="utxos_combine_and_break_description">Into how many parts would you like to break these coins?</string>
+    <string name="utxos_combine_and_break_button">Combine &amp; Break</string>
+    <string name="utxos_combine_button">Combine</string>
+    <string name="utxos_success_title">Success!</string>
+    <string name="utxos_success_join_description">Your coins will be combined soon.\nKeep an eye on the transactions screen to\nsee when it’s been mined.</string>
+    <string name="utxos_success_split_description">Your coin will be broken soon.\nKeep an eye on the transactions screen to\nsee when it’s been mined.</string>
+    <string name="utxos_break_button">Break</string>
+    <string name="utxos_break_title">Break Coin</string>
+    <string name="utxos_join_description">You are about to join these coins.</string>
+    <string name="utxos_break_description">You are about to break this coin.</string>
+    <string name="utxos_ordering_option_size_desc">Size, Descending</string>
+    <string name="utxos_ordering_option_size_asc">Size, Ascending</string>
+    <string name="utxos_ordering_option_date_desc">Date, Descending</string>
+    <string name="utxos_ordering_option_date_asc">Date, Ascending</string>
+    <string name="utxos_detailed_status">Status:</string>
+    <string name="utxos_detailed_commitment">Commitment:</string>
+    <string name="utxos_detailed_block_height">Block Height:</string>
+    <string name="utxos_detailed_date">Date:</string>
+    <string name="utxos_split_preview_fee">Estimated Fee:</string>
+    <string name="utxos_split_preview_break">Break</string>
+    <string name="utxos_split_preview_into">into</string>
+    <string name="utxos_split_preview_coins">coins</string>
 
 </resources>

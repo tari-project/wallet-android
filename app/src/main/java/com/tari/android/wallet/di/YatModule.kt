@@ -55,7 +55,6 @@ class YatModule {
         yatSharedRepository: YatSharedRepository,
         commonRepository: SharedPrefsRepository,
         networkRepository: NetworkRepository
-    ): YatAdapter =
-        YatAdapter(yatSharedRepository, networkRepository, commonRepository)
+    ): YatAdapter = YatAdapter(yatSharedRepository, networkRepository, commonRepository)
 
 }

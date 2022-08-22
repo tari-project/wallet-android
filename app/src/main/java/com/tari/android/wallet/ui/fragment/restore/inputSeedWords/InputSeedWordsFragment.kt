@@ -134,18 +134,18 @@ internal class InputSeedWordsFragment : CommonFragment<FragmentWalletInputSeedWo
             setOnClickListener { viewModel.getFocus(word.index.value!!) }
             ui.removeView.setOnClickListener { viewModel.removeWord(word.index.value!!) }
             ui.text.doAfterTextChanged { viewModel.onCurrentWordChanges(word.index.value!!, it?.toString().orEmpty()) }
-            ui.text.setOnKeyListener { v, keyCode, event ->
+            ui.text.setOnKeyListener { _, keyCode, _ ->
                 if (keyCode == KeyEvent.KEYCODE_DEL && ui.text.text.isNullOrEmpty() && word.index.value!! != 0) {
                     viewModel.removeWord(word.index.value!!)
                     return@setOnKeyListener true
                 }
                 false
             }
-            ui.text.setOnFocusChangeListener { v, hasFocus ->
+            ui.text.setOnFocusChangeListener { _, hasFocus ->
                 updateState(hasFocus, word.isValid())
                 if (hasFocus) viewModel.getFocus(word.index.value!!, true)
             }
-            ui.text.setOnEditorActionListener { v, actionId, _ ->
+            ui.text.setOnEditorActionListener { _, actionId, _ ->
                 if (actionId == EditorInfo.IME_ACTION_NEXT) {
                     viewModel.finishEntering(word.index.value!!, ui.text.text?.toString().orEmpty())
                     return@setOnEditorActionListener true

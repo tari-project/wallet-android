@@ -7,6 +7,7 @@ import com.tari.android.wallet.R.string.*
 import com.tari.android.wallet.event.Event
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.extension.addTo
+import com.tari.android.wallet.model.TransactionSendStatus
 import com.tari.android.wallet.model.TxId
 import com.tari.android.wallet.model.WalletError
 import com.tari.android.wallet.network.NetworkConnectionState
@@ -187,7 +188,7 @@ class FinalizeSendTxViewModel : CommonViewModel() {
                 val txId = walletService.sendTari(
                     transactionData.recipientUser,
                     transactionData.amount,
-                    Constants.Wallet.defaultFeePerGram,
+                    transactionData.feePerGram ?: Constants.Wallet.defaultFeePerGram,
                     transactionData.note,
                     transactionData.isOneSidePayment,
                     error
@@ -215,67 +216,28 @@ class FinalizeSendTxViewModel : CommonViewModel() {
             subscribeToEventBus()
         }
 
-        /**
-         * Both send methods have to fail to arrive at the judgement that the send has failed.
-         */
-        private var directSendHasFailed = false
-        private var storeAndForwardHasFailed = false
-
         override fun execute() = Unit
 
         private fun subscribeToEventBus() {
-            EventBus.subscribe<Event.Transaction.DirectSendResult>(this) { event -> onDirectSendResult(event.txId) }
-            EventBus.subscribe<Event.Transaction.StoreAndForwardSendResult>(this) { event -> onStoreAndForwardSendResult(event.txId, event.success) }
+            EventBus.subscribe<Event.Transaction.DirectSendResult>(this) { event -> onDirectSendResult(event.txId, event.status) }
         }
 
-        private fun onDirectSendResult(txId: TxId) {
+        private fun onDirectSendResult(txId: TxId, status: TransactionSendStatus) {
             if (sentTxId.value != txId) {
                 Logger.d("Response received for another tx with id: ${txId.value}.")
                 return
             }
-            // track event
-            tracker.event(category = "Transaction", action = "Transaction Accepted - Synchronous")
-            // progress state
-            finishSendingTx()
-
-//            if (success) {
-//                // track event
-//                tracker.event(category = "Transaction", action = "Transaction Accepted - Synchronous")
-//                // progress state
-//                finishSendingTx()
-//            } else {
-//                directSendHasFailed = true
-//                checkForCombinedFailure()
-//            }
-        }
-
-        private fun onStoreAndForwardSendResult(txId: TxId, success: Boolean) {
-            if (sentTxId.value != txId) {
-                Logger.d("Response received for another tx with id: ${txId.value}.")
-                return
-            }
-            Logger.d("Store and forward send completed with result: $success.")
-            if (success) {
+            if (status.isSuccess) {
                 // track event
-                tracker.event(category = "Transaction", action = "Transaction Stored")
+                tracker.event(category = "Transaction", action = "Transaction Accepted - Synchronous")
                 // progress state
                 finishSendingTx()
-            } else {
-                storeAndForwardHasFailed = true
-                checkForCombinedFailure()
             }
         }
 
         private fun finishSendingTx() {
             EventBus.unsubscribe(this)
             isCompleted = true
-        }
-
-        private fun checkForCombinedFailure() {
-            if (directSendHasFailed && storeAndForwardHasFailed) { // both have failed
-                txFailureReason.value = TxFailureReason.SEND_ERROR
-                isCompleted = true
-            }
         }
     }
 

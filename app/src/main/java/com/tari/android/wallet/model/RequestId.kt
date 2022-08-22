@@ -45,9 +45,7 @@ class RequestId() : Parcelable {
 
     var value = BigInteger("0")
 
-    constructor(
-        value: BigInteger
-    ) : this() {
+    constructor(value: BigInteger) : this() {
         this.value = value
     }
 

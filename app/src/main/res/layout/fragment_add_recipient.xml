@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/root_view"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -35,20 +36,44 @@
             android:background="@drawable/add_recipient_search_bg"
             android:elevation="@dimen/common_view_elevation">
 
+            <LinearLayout
+                android:id="@+id/left_icons"
+                android:layout_width="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_height="match_parent"
+                android:background="@null"
+                android:orientation="horizontal">
+
+                <!-- Yat eye -->
+                <androidx.appcompat.widget.AppCompatImageButton
+                    android:id="@+id/yat_icon"
+                    android:layout_width="50dp"
+                    android:layout_height="@dimen/add_recipient_search_text_view_height"
+                    android:background="@color/transparent"
+                    android:src="@drawable/tari_yat_open"
+                    android:tint="@color/purple"
+                    android:visibility="gone"
+                    tools:visibility="visible"/>
+
+            </LinearLayout>
             <!-- search -->
+
+            <!-- white fader for emoji-id input -->
             <HorizontalScrollView
                 android:id="@+id/search_edit_text_scroll_view"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:layout_marginEnd="-1dp"
                 android:layout_toStartOf="@+id/buttons_container"
+                android:layout_toRightOf="@id/left_icons"
                 android:fillViewport="true"
                 android:scrollbars="none">
 
                 <androidx.appcompat.widget.LinearLayoutCompat
                     android:id="@+id/search_edit_text_animate_container"
-                    android:animateLayoutChanges="true"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content">
+                    android:layout_height="wrap_content"
+                    android:animateLayoutChanges="true">
 
                     <com.tari.android.wallet.ui.component.CustomFontEditText
                         android:id="@+id/search_edit_text"
@@ -71,7 +96,6 @@
 
             </HorizontalScrollView>
 
-            <!-- white fader for emoji-id input -->
             <View
                 android:layout_width="32dp"
                 android:layout_toStartOf="@+id/buttons_container"
@@ -94,7 +118,8 @@
                     android:background="@color/transparent"
                     android:src="@drawable/opened_eye"
                     android:tint="@color/purple"
-                    android:visibility="gone" />
+                    android:visibility="gone"
+                    tools:visibility="visible"/>
 
                 <!-- QR code button -->
                 <androidx.appcompat.widget.AppCompatImageButton

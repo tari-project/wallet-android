@@ -20,6 +20,8 @@ abstract class CommonView<VM : CommonViewModel, VB : ViewBinding> : LinearLayout
     lateinit var ui: VB
         private set
 
+    private var currentDialog: TariDialog? = null
+
     abstract fun bindingInflate(layoutInflater: LayoutInflater, parent: ViewGroup?, attachToRoot: Boolean): VB
 
     lateinit var viewLifecycle: LifecycleOwner
@@ -40,8 +42,6 @@ abstract class CommonView<VM : CommonViewModel, VB : ViewBinding> : LinearLayout
         init()
     }
 
-    private var currentDialog: TariDialog? = null
-
     private fun init() {
         ui = bindingInflate(LayoutInflater.from(context), this, true)
 
@@ -56,16 +56,28 @@ abstract class CommonView<VM : CommonViewModel, VB : ViewBinding> : LinearLayout
         viewModel.openLink.observe(viewLifecycle) { context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(it))) }
 
         viewModel.modularDialog.observe(viewLifecycle) { replaceDialog(ModularDialog(context, it)) }
-
-        viewModel.dismissDialog.observe(viewLifecycle) { currentDialog?.dismiss() }
     }
 
+    //todo extract to DialogManager or something
     protected fun replaceDialog(dialog: TariDialog) {
         val currentLoadingDialog = currentDialog as? TariProgressDialog
         if (currentLoadingDialog != null && currentLoadingDialog.isShowing() && dialog is TariProgressDialog) {
             (currentDialog as TariProgressDialog).applyArgs(dialog.progressDialogArgs)
             return
         }
+        val currentModularDialog = currentDialog as? ModularDialog
+        val newModularDialog = dialog as? ModularDialog
+        if (currentModularDialog != null && newModularDialog != null && currentModularDialog.args::class.java == newModularDialog.args::class.java
+            && currentModularDialog.isShowing()
+        ) {
+            currentModularDialog.applyArgs(newModularDialog.args)
+            return
+        }
+
+        if (newModularDialog?.args?.dialogArgs?.isRefreshing == true) {
+            return
+        }
+
         currentDialog?.dismiss()
         currentDialog = dialog.also { it.show() }
     }

@@ -59,8 +59,7 @@ object Event {
         data class TxFauxConfirmed(val tx: CompletedTx)
         data class TxFauxMinedUnconfirmed(val tx: CompletedTx)
         data class TxCancelled(val tx: CancelledTx)
-        data class DirectSendResult(val txId: TxId)
-        data class StoreAndForwardSendResult(val txId: TxId, val success: Boolean)
+        data class DirectSendResult(val txId: TxId, val status: TransactionSendStatus)
         data class TxSendSuccessful(val txId: TxId)
         data class TxSendFailed(val failureReason: TxFailureReason)
     }

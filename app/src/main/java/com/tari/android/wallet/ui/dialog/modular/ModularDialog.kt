@@ -8,6 +8,8 @@ import android.view.Gravity
 import android.view.View
 import android.widget.LinearLayout
 import com.tari.android.wallet.R
+import com.tari.android.wallet.ui.component.networkStateIndicator.module.ConnectionStatusesModule
+import com.tari.android.wallet.ui.component.networkStateIndicator.module.ConnectionStatusesModuleView
 import com.tari.android.wallet.ui.dialog.TariDialog
 import com.tari.android.wallet.ui.dialog.modular.modules.body.BodyModule
 import com.tari.android.wallet.ui.dialog.modular.modules.body.BodyModuleView
@@ -18,11 +20,16 @@ import com.tari.android.wallet.ui.dialog.modular.modules.customBaseNodeBody.Cust
 import com.tari.android.wallet.ui.dialog.modular.modules.head.*
 import com.tari.android.wallet.ui.dialog.modular.modules.imageModule.ImageModule
 import com.tari.android.wallet.ui.dialog.modular.modules.imageModule.ImageModuleView
+import com.tari.android.wallet.ui.fragment.send.addAmount.feeModule.FeeModule
+import com.tari.android.wallet.ui.fragment.send.addAmount.feeModule.FeeModuleView
 import com.tari.android.wallet.ui.fragment.send.shareQr.ShareQRCodeModuleView
 import com.tari.android.wallet.ui.fragment.send.shareQr.ShareQrCodeModule
+import com.tari.android.wallet.ui.fragment.utxos.list.module.*
 
 
 open class ModularDialog(val context: Context) : TariDialog {
+
+    lateinit var args: ModularDialogArgs
 
     constructor(context: Context, args: ModularDialogArgs) : this(context) {
         applyArgs(args)
@@ -38,6 +45,7 @@ open class ModularDialog(val context: Context) : TariDialog {
     }
 
     fun applyArgs(args: ModularDialogArgs) {
+        this.args = args
         with(dialog) {
             setCancelable(args.dialogArgs.cancelable)
             setCanceledOnTouchOutside(args.dialogArgs.canceledOnTouchOutside)
@@ -48,6 +56,7 @@ open class ModularDialog(val context: Context) : TariDialog {
 
     private fun updateModules(modules: List<IDialogModule>) {
         val root = dialog.findViewById<LinearLayout>(R.id.dialog_root_view)
+        root.removeAllViews()
         for (module in modules) {
             module.dismissAction = dialog::dismiss
             val view = when(module) {
@@ -59,6 +68,12 @@ open class ModularDialog(val context: Context) : TariDialog {
                 is ButtonModule -> ButtonModuleView(context, module) { dialog.dismiss() }
                 is CustomBaseNodeBodyModule -> CustomBaseNodeBodyModuleView(context, module)
                 is ShareQrCodeModule -> ShareQRCodeModuleView(context, module)
+                is FeeModule -> FeeModuleView(context, module)
+                is ListItemModule -> ListItemModuleView(context, module)
+                is DetailItemModule -> DetailItemModuleView(context, module)
+                is UtxoAmountModule -> UtxoAmountModuleView(context, module)
+                is UtxoSplitModule -> UtxoSplitModuleView(context, module)
+                is ConnectionStatusesModule -> ConnectionStatusesModuleView(context, module)
                 else -> View(context)
             }
             root.addView(view)

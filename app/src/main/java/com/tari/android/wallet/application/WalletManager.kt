@@ -53,12 +53,12 @@ import com.tari.android.wallet.util.WalletUtil
 import java.io.File
 
 /**
- * Utilized to asynchoronously manage the sometimes-long-running task of instantiation and start-up
+ * Utilized to asynchronous manage the sometimes-long-running task of instantiation and start-up
  * of the Tor proxy and the FFI wallet.
  *
  * @author The Tari Development Team
  */
-internal class WalletManager(
+class WalletManager(
     private val walletConfig: WalletConfig,
     private val torManager: TorProxyManager,
     private val sharedPrefsWrapper: SharedPrefsRepository,
@@ -88,7 +88,7 @@ internal class WalletManager(
     }
 
     /**
-     * Deinit the wallet and shutdown Tor.
+     * DeInit the wallet and shutdown Tor.
      */
     @Synchronized
     fun stop() {
@@ -126,11 +126,11 @@ internal class WalletManager(
     /**
      * Instantiates the Tor transport for the wallet.
      */
-    private fun getTorTransport(): FFITransportType {
+    private fun getTorTransport(): FFITariTransportConfig {
         val cookieFile = File(torConfig.cookieFilePath)
         val cookieString: ByteArray = cookieFile.readBytes()
         val torCookie = FFIByteVector(cookieString)
-        return FFITransportType(
+        return FFITariTransportConfig(
             NetAddressString(
                 torConfig.controlHost,
                 torConfig.controlPort

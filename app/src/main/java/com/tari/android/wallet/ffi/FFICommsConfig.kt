@@ -46,7 +46,7 @@ internal class FFICommsConfig() : FFIBase() {
 
     private external fun jniCreate(
         publicAddress: String,
-        transport: FFITransportType,
+        transport: FFITariTransportConfig,
         databaseName: String,
         datastorePath: String,
         discoveryTimeoutSec: Long,
@@ -60,7 +60,7 @@ internal class FFICommsConfig() : FFIBase() {
 
     constructor(
         publicAddress: String,
-        transport: FFITransportType,
+        transport: FFITariTransportConfig,
         databaseName: String,
         datastorePath: String,
         discoveryTimeoutSec: Long,

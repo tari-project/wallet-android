@@ -101,7 +101,7 @@ framework for UI tree rebuild on configuration changes"""
         }
         ui.passwordEditText.addTextChangedListener(
             afterTextChanged = {
-                setChangePasswordCTAState(canEnableChangePasswordCTA && it?.length ?: 0 != 0)
+                setChangePasswordCTAState(canEnableChangePasswordCTA && (it?.length ?: 0) != 0)
                 ui.passwordsNotMatchLabelView.gone()
             }
         )

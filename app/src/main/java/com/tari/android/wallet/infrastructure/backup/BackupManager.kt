@@ -62,7 +62,7 @@ class BackupManager(
     private val context: Context,
     private val backupSettingsRepository: BackupSettingsRepository,
     private val localFileBackupStorage: LocalBackupStorage,
-    val dropboxBackupStorage: DropboxBackupStorage,
+    private val dropboxBackupStorage: DropboxBackupStorage,
     private val googleDriveBackupStorage: GoogleDriveBackupStorage,
     private val notificationHelper: NotificationHelper
 ) {

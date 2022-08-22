@@ -111,11 +111,11 @@ class BackupOptionViewModel() : CommonViewModel() {
                 BodyModule(resourceManager.getString(R.string.back_up_wallet_turn_off_backup_warning_description)),
                 ButtonModule(resourceManager.getString(R.string.common_confirm), ButtonStyle.Warning) {
                     onAcceptAction()
-                    _dissmissDialog.value = Unit
+                    _dismissDialog.value = Unit
                 },
                 ButtonModule(resourceManager.getString(R.string.common_cancel), ButtonStyle.Close) {
                     onDismissAction()
-                    _dissmissDialog.value = Unit
+                    _dismissDialog.value = Unit
                 }
             ))
 

@@ -30,6 +30,7 @@ open class CommonViewModel : ViewModel() {
     lateinit var tracker: Tracker
 
     init {
+        @Suppress("LeakingThis")
         component.inject(this)
 
         EventBus.walletState.publishSubject.filter { it is WalletState.Failed }
@@ -62,8 +63,8 @@ open class CommonViewModel : ViewModel() {
     protected val _loadingDialog = SingleLiveEvent<ProgressDialogArgs>()
     val loadingDialog: LiveData<ProgressDialogArgs> = _loadingDialog
 
-    protected val _dissmissDialog = SingleLiveEvent<Unit>()
-    val dismissDialog: LiveData<Unit> = _dissmissDialog
+    protected val _dismissDialog = SingleLiveEvent<Unit>()
+    val dismissDialog: LiveData<Unit> = _dismissDialog
 
     protected val _blockedBackPressed = SingleLiveEvent<Boolean>()
     val blockedBackPressed: LiveData<Boolean> = _blockedBackPressed

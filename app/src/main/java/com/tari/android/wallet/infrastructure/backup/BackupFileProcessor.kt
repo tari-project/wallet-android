@@ -60,8 +60,8 @@ class BackupFileProcessor(
 
     suspend fun generateBackupFile(newPassword: CharArray? = null): Triple<File, DateTime, String> = mutex.withLock {
         // decrypt database
-        //todo
-//        FFIWallet.instance?.removeEncryption()
+        FFIWallet.instance?.removeEncryption()
+        backupSettingsRepository.backupPassword = null
 
         // create partial backup in temp folder if password not set
         val databaseFile = File(walletConfig.walletDatabaseFilePath)
@@ -128,7 +128,6 @@ class BackupFileProcessor(
                 }
                 // throw exception
                 throw BackupFileIsEncryptedException(
-                    file,
                     "Cannot uncompress. Restored file is encrypted."
                 )
             }

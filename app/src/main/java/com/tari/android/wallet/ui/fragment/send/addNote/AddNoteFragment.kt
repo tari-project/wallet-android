@@ -108,6 +108,7 @@ class AddNoteFragment : Fragment(), View.OnTouchListener {
     private lateinit var fullEmojiIdViewController: FullEmojiIdViewController
 
     // Tx properties.
+    private lateinit var transactionData: TransactionData
     private lateinit var recipientUser: User
     private lateinit var amount: MicroTari
     private var isOneSidePayment: Boolean = false
@@ -123,11 +124,8 @@ class AddNoteFragment : Fragment(), View.OnTouchListener {
         addNodeListenerWR = WeakReference(context as AddNodeListener)
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View = FragmentAddNoteBinding.inflate(inflater, container, false).also { ui = it }.root
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?) =
+        FragmentAddNoteBinding.inflate(inflater, container, false).also { ui = it }.root
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -235,9 +233,10 @@ class AddNoteFragment : Fragment(), View.OnTouchListener {
     }
 
     private fun retrievePageArguments(savedInstanceState: Bundle?) {
-        recipientUser = requireArguments().getParcelable("recipientUser")!!
-        amount = requireArguments().getParcelable("amount")!!
-        isOneSidePayment = requireArguments().getBoolean("isOneSidePayment")
+        transactionData = requireArguments().getParcelable("transactionData")!!
+        recipientUser = transactionData.recipientUser!!
+        amount = transactionData.amount!!
+        isOneSidePayment = transactionData.isOneSidePayment
         if (savedInstanceState == null) {
             requireArguments().getString(SendTariActivity.PARAMETER_NOTE)
                 ?.let { ui.noteEditText.setText(it) }
@@ -308,7 +307,7 @@ class AddNoteFragment : Fragment(), View.OnTouchListener {
         val mActivity = activity ?: return
         ui.noteEditText.requestFocus()
         val imm = mActivity.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-        imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY)
+        imm.showSoftInput(ui.noteEditText, InputMethodManager.HIDE_IMPLICIT_ONLY)
     }
 
     @SuppressLint("ClickableViewAccessibility")
@@ -463,7 +462,8 @@ class AddNoteFragment : Fragment(), View.OnTouchListener {
         tracker.event(category = "Transaction", action = "Transaction Initiated")
         // notify listener (i.e. activity)
         val note = TxNote(ui.noteEditText.editableText.toString(), gifContainer.gifItem?.embedUri?.toString()).compose()
-        addNodeListenerWR.get()?.continueToFinalizeSendTx(TransactionData(recipientUser, amount, note, isOneSidePayment))
+        val newData = transactionData.copy(note = note)
+        addNodeListenerWR.get()?.continueToFinalizeSendTx(newData)
     }
 
     private fun restoreSlider() {

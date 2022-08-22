@@ -7,7 +7,7 @@ import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.common.SingleLiveEvent
 import javax.inject.Inject
 
-class VerifySeedPhraseViewModel() : CommonViewModel() {
+class VerifySeedPhraseViewModel : CommonViewModel() {
 
     @Inject
     lateinit var tariSettingsSharedRepository: TariSettingsSharedRepository

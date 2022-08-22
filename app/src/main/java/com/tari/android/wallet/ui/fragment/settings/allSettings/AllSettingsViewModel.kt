@@ -73,10 +73,9 @@ internal class AllSettingsViewModel : CommonViewModel() {
 
     init {
         component.inject(this)
+        initOptions()
         EventBus.backupState.subscribe(this) { backupState -> onBackupStateChanged(backupState) }
         checkStorageStatus()
-
-        initOptions()
     }
 
     private fun initOptions() {
@@ -90,6 +89,10 @@ internal class AllSettingsViewModel : CommonViewModel() {
             SettingsTitleDto(resourceManager.getString(all_settings_security_label)),
             backupOption,
             SettingsTitleDto(resourceManager.getString(all_settings_secondary_settings_label)),
+            ButtonViewDto(resourceManager.getString(tari_about_title), all_settings_about_icon) {
+                _navigation.postValue(AllSettingsNavigation.ToAbout)
+            },
+            DividerViewHolderItem(),
             ButtonViewDto(resourceManager.getString(all_settings_report_a_bug), all_settings_report_bug_icon) { _shareBugReport.postValue(Unit) },
             DividerViewHolderItem(),
             ButtonViewDto(resourceManager.getString(all_settings_visit_site), all_settings_visit_tari_icon) {
@@ -142,7 +145,7 @@ internal class AllSettingsViewModel : CommonViewModel() {
             DividerViewHolderItem(),
             SettingsVersionViewHolderItem(versionText) { _copyToClipboard.postValue(versionArgs) }
         )
-        _allSettingsOptions.postValue(allOptions)
+        _allSettingsOptions.value = allOptions
     }
 
     private fun checkStorageStatus() = viewModelScope.launch(Dispatchers.IO) {

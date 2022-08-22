@@ -40,7 +40,6 @@ import com.tari.android.wallet.ui.common.recyclerView.ViewHolderBuilder
 import com.tari.android.wallet.ui.component.EmojiIdSummaryViewController
 import com.tari.android.wallet.ui.extension.setVisible
 import com.tari.android.wallet.yat.YatUser
-import java.util.*
 
 class RecipientViewHolder(view: ItemAddRecipientListBinding) : CommonViewHolder<RecipientViewHolderItem, ItemAddRecipientListBinding>(view) {
 
@@ -57,7 +56,7 @@ class RecipientViewHolder(view: ItemAddRecipientListBinding) : CommonViewHolder<
 
         when (item.user) {
             is Contact -> {
-                ui.initialTextView.text = item.user.alias.take(1).toUpperCase(Locale.getDefault())
+                ui.initialTextView.text = item.user.alias.take(1).uppercase()
                 ui.aliasTextView.text = item.user.alias
             }
             is YatUser -> {

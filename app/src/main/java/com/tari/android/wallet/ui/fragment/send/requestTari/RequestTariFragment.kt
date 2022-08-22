@@ -7,7 +7,7 @@ import android.view.ViewGroup
 import androidx.core.app.ShareCompat
 import androidx.fragment.app.viewModels
 import com.tari.android.wallet.R
-import com.tari.android.wallet.amountInputBinding.fragment.send.addAmount.keyboard.KeyboardController
+import com.tari.android.wallet.ui.fragment.send.addAmount.keyboard.KeyboardController
 import com.tari.android.wallet.databinding.FragmentRequestTariBinding
 import com.tari.android.wallet.ui.common.CommonFragment
 import com.tari.android.wallet.ui.dialog.modular.DialogArgs

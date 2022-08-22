@@ -95,17 +95,12 @@ framework for UI tree rebuild on configuration changes"""
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        inputService =
-            requireActivity().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        inputService = requireActivity().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         appComponent.inject(this)
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View = FragmentChangeSecurePasswordBinding.inflate(inflater, container, false)
-        .also { ui = it }.root
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
+        FragmentChangeSecurePasswordBinding.inflate(inflater, container, false).also { ui = it }.root
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -138,15 +133,13 @@ framework for UI tree rebuild on configuration changes"""
         ui.enterPasswordEditText.postDelayed({
             ui.enterPasswordEditText.requestFocus()
             requireActivity().showKeyboard()
-            ui.enterPasswordEditText
-                .postDelayed(KEYBOARD_ANIMATION_TIME) { ui.contentScrollView.scrollToBottom() }
-        }, KEYBOARD_SHOWUP_DELAY_AFTER_LOCAL_AUTH)
+            ui.enterPasswordEditText.postDelayed(KEYBOARD_ANIMATION_TIME) { ui.contentScrollView.scrollToBottom() }
+        }, KEYBOARD_SHOW_UP_DELAY_AFTER_LOCAL_AUTH)
     }
 
     private fun setPageDescription() {
         val generalPart = string(change_password_page_description_general_part)
-        val highlightedPart =
-            SpannableString(string(change_password_page_description_highlight_part))
+        val highlightedPart = SpannableString(string(change_password_page_description_highlight_part))
         val spanColor = ForegroundColorSpan(color(black))
         highlightedPart.setSpan(spanColor, 0, highlightedPart.length, SPAN_EXCLUSIVE_EXCLUSIVE)
         ui.pageDescriptionTextView.text = SpannableStringBuilder().apply {
@@ -168,39 +161,21 @@ framework for UI tree rebuild on configuration changes"""
         ui.confirmPasswordEditText.addTextChangedListener(afterTextChanged = {
             updateVerifyButtonStateBasedOnEditTexts(
                 it,
-                !passwordIsLongEnough()
-                        || (!ui.confirmPasswordEditText.text.isNullOrEmpty() && !doPasswordsMatch())
+                !passwordIsLongEnough() || (!ui.confirmPasswordEditText.text.isNullOrEmpty() && !doPasswordsMatch())
             )
         })
         val passwordTextFieldListener = View.OnFocusChangeListener { _, _ ->
             // password
-            if (!ui.enterPasswordEditText.hasFocus()
-                && !passwordIsLongEnough()
-            ) {
+            if (!ui.enterPasswordEditText.hasFocus() && !passwordIsLongEnough()) {
                 setPasswordTooShortErrorState()
             } else {
-                setPlainInputState(
-                    ui.passwordTooShortLabelView,
-                    listOf(
-                        ui.enterPasswordEditText,
-                        ui.enterPasswordLabelTextView
-                    )
-                )
+                setPlainInputState(ui.passwordTooShortLabelView, listOf(ui.enterPasswordEditText, ui.enterPasswordLabelTextView))
             }
             // confirm
-            if (!ui.confirmPasswordEditText.hasFocus()
-                && passwordIsLongEnough()
-                && !doPasswordsMatch()
-            ) {
+            if (!ui.confirmPasswordEditText.hasFocus() && passwordIsLongEnough() && !doPasswordsMatch()) {
                 setPasswordMatchErrorState()
             } else {
-                setPlainInputState(
-                    ui.passwordsNotMatchLabelView,
-                    listOf(
-                        ui.confirmPasswordEditText,
-                        ui.confirmPasswordLabelTextView
-                    )
-                )
+                setPlainInputState(ui.passwordsNotMatchLabelView, listOf(ui.confirmPasswordEditText, ui.confirmPasswordLabelTextView))
             }
         }
         ui.enterPasswordEditText.onFocusChangeListener = passwordTextFieldListener
@@ -220,19 +195,8 @@ framework for UI tree rebuild on configuration changes"""
             val canChangePassword = areTextFieldsFilled() && passwordIsLongEnough && passwordsMatch
             setVerifyButtonState(isEnabled = canChangePassword)
             if (canChangePassword) {
-                setPlainInputState(
-                    ui.passwordTooShortLabelView, listOf(
-                        ui.enterPasswordEditText,
-                        ui.enterPasswordLabelTextView
-                    )
-                )
-                setPlainInputState(
-                    ui.passwordsNotMatchLabelView,
-                    listOf(
-                        ui.confirmPasswordEditText,
-                        ui.confirmPasswordLabelTextView
-                    )
-                )
+                setPlainInputState(ui.passwordTooShortLabelView, listOf(ui.enterPasswordEditText, ui.enterPasswordLabelTextView))
+                setPlainInputState(ui.passwordsNotMatchLabelView, listOf(ui.confirmPasswordEditText, ui.confirmPasswordLabelTextView))
             }
         } else if (errorCondition) {
             setVerifyButtonState(isEnabled = false)
@@ -343,13 +307,14 @@ framework for UI tree rebuild on configuration changes"""
                 allowExitAndPasswordEditing()
                 (requireActivity() as BackupSettingsRouter).onPasswordChanged(this)
             }
-            is BackupOutOfDate -> {
+            is BackupOutOfDate -> { // backup failed
                 Logger.e(backupState.backupException, "Error during encrypted backup: ${backupState.backupException}")
                 showBackupErrorDialog(deductBackupErrorMessage(backupState.backupException)) {
                     allowExitAndPasswordEditing()
                     setSecurePasswordCtaIdleState()
                 }
             }
+            else -> Unit
         }
     }
 
@@ -360,7 +325,12 @@ framework for UI tree rebuild on configuration changes"""
     }
 
     private fun showBackupErrorDialog(message: String, onClose: () -> Unit) {
-        val args = ErrorDialogArgs(string(back_up_wallet_backing_up_error_title), message, false, false, onClose)
+        val args = ErrorDialogArgs(
+            string(back_up_wallet_backing_up_error_title), message,
+            cancelable = false,
+            canceledOnTouchOutside = false,
+            onClose = onClose
+        )
         ModularDialog(requireContext(), args.getModular(resourceManager)).show()
     }
 
@@ -368,7 +338,7 @@ framework for UI tree rebuild on configuration changes"""
         @Suppress("DEPRECATION")
         fun newInstance() = ChangeSecurePasswordFragment()
 
-        private const val KEYBOARD_SHOWUP_DELAY_AFTER_LOCAL_AUTH = 500L
+        private const val KEYBOARD_SHOW_UP_DELAY_AFTER_LOCAL_AUTH = 500L
         private const val KEYBOARD_ANIMATION_TIME = 100L
     }
 

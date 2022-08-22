@@ -160,7 +160,7 @@ class GoogleDriveBackupStorage(
             com.google.api.services.drive.model.File()
                 .setParents(listOf(DRIVE_BACKUP_PARENT_FOLDER_NAME))
                 .setMimeType(mimeType)
-                .setName(file.getLastPathComponent()!!)
+                .setName(file.getLastPathComponent())
         drive!!.files()
             .create(metadata, FileContent(mimeType, file))
             .setFields("id")

@@ -3,7 +3,6 @@ package com.tari.android.wallet.ui.fragment.settings.backup.data
 import android.content.Context
 import android.content.SharedPreferences
 import android.net.Uri
-import com.dropbox.core.oauth.DbxCredential
 import com.tari.android.wallet.data.repository.CommonRepository
 import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefDateTimeDelegate
 import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefGsonDelegate
@@ -19,9 +18,9 @@ class BackupSettingsRepository(private val context: Context, private val sharedP
 
     var googleDriveOption: BackupOptionDto? by SharedPrefGsonDelegate(sharedPrefs, formatKey(Keys.googleDriveOptionKey), BackupOptionDto::class.java)
 
-    var dropboxOption: BackupOptionDto? by SharedPrefGsonDelegate(sharedPrefs, formatKey(Keys.dropBoxOptionKey), BackupOptionDto::class.java)
+//    var dropboxOption: BackupOptionDto? by SharedPrefGsonDelegate(sharedPrefs, formatKey(Keys.dropBoxOptionKey), BackupOptionDto::class.java)
 
-    var dropboxCredential: DbxCredential? by SharedPrefGsonDelegate(sharedPrefs, formatKey(Keys.dropboxCredentialKey), DbxCredential::class.java)
+//    var dropboxCredential: DbxCredential? by SharedPrefGsonDelegate(sharedPrefs, formatKey(Keys.dropboxCredentialKey), DbxCredential::class.java)
 
     var scheduledBackupDate: DateTime? by SharedPrefDateTimeDelegate(sharedPrefs, formatKey(Keys.scheduledBackupDate))
 
@@ -34,11 +33,11 @@ class BackupSettingsRepository(private val context: Context, private val sharedP
     init {
         localFileOption = localFileOption ?: BackupOptionDto(BackupOptions.Local)
         googleDriveOption = googleDriveOption ?: BackupOptionDto(BackupOptions.Google)
-        dropboxOption = dropboxOption ?: BackupOptionDto(BackupOptions.Dropbox)
+//        dropboxOption = dropboxOption ?: BackupOptionDto(BackupOptions.Dropbox)
     }
 
     val getOptionList: List<BackupOptionDto>
-        get() = listOfNotNull(localFileOption, googleDriveOption, dropboxOption).toList()
+        get() = listOfNotNull(localFileOption, googleDriveOption).toList()
 
     fun isShowHintDialog(): Boolean = with(lastBackupDialogShown) { this == null || !this.plusMinutes(delayTimeInMinutes).isAfterNow }
 
@@ -51,14 +50,14 @@ class BackupSettingsRepository(private val context: Context, private val sharedP
         googleDriveOption = null
         localFileOption = BackupOptionDto(BackupOptions.Local)
         googleDriveOption = BackupOptionDto(BackupOptions.Google)
-        dropboxOption = BackupOptionDto(BackupOptions.Dropbox)
+//        dropboxOption = BackupOptionDto(BackupOptions.Dropbox)
     }
 
     fun updateOptions(options: List<BackupOptionDto>) = options.forEach { option -> updateOption(option) }
 
     fun updateOption(option: BackupOptionDto) {
         when (option.type) {
-            BackupOptions.Dropbox -> dropboxOption = option
+//            BackupOptions.Dropbox -> dropboxOption = option
             BackupOptions.Google -> googleDriveOption = option
             BackupOptions.Local -> localFileOption = option
         }

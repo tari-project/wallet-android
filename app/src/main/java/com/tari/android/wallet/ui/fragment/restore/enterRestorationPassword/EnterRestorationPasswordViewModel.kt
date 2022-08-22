@@ -12,8 +12,7 @@ import kotlinx.coroutines.launch
 import java.security.GeneralSecurityException
 import javax.inject.Inject
 
-class EnterRestorationPasswordViewModel() : CommonViewModel() {
-
+class EnterRestorationPasswordViewModel : CommonViewModel() {
     @Inject
     lateinit var backupStorage: BackupManager
 
