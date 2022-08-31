@@ -30,61 +30,29 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.tari.android.wallet.ui.fragment.debug.adapter
+package com.tari.android.wallet.ui.fragment.debug.debugLog.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.tari.android.wallet.R
 
-/**
- * Log view list recycler view adapter.
- *
- * @author The Tari Development Team
- */
-internal class LogListAdapter(private val logLines: List<String>) :
-    RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+class LogListAdapter(val logLines: MutableList<String> = mutableListOf()) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
-    private val regex =
-        Regex("(\\d{4}-\\d{2}-\\d{2}\\s\\d{2}:\\d{2}:\\d{2}\\.\\d+)\\s(\\[[^]]+])\\s(\\[[^]]+]\\s)?([A-Z]+)\\s(.+)")
+    private val regex = Regex("(\\d{4}-\\d{2}-\\d{2}\\s\\d{2}:\\d{2}:\\d{2}\\.\\d+)\\s(\\[[^]]+])\\s(\\[[^]]+]\\s)?([A-Z]+)\\s(.+)")
 
-    /**
-     * Item count.
-     */
     override fun getItemCount() = logLines.size
 
-    /**
-     * Create the view holder instance.
-     */
-    override fun onCreateViewHolder(
-        parent: ViewGroup,
-        viewType: Int
-    ): RecyclerView.ViewHolder {
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.item_log, parent, false)
-        return LogViewHolder(view)
-    }
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder =
+        LogViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.item_log, parent, false))
 
-    /**
-     * Bind & display header or transaction.
-     */
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         if (regex.matches(logLines[position])) {
             val matchResult = regex.find(logLines[position])
             val (timestamp, source1, source2, level, log) = matchResult!!.destructured
-            (holder as LogViewHolder).bind(
-                timestamp,
-                source1,
-                source2,
-                level,
-                log,
-                position == (logLines.size - 1)
-            )
+            (holder as LogViewHolder).bind(timestamp, source1, source2, level, log)
         } else {
-            (holder as LogViewHolder).bind(
-                logLines[position],
-                position == (logLines.size - 1)
-            )
+            (holder as LogViewHolder).bind(logLines[position])
         }
     }
-
 }

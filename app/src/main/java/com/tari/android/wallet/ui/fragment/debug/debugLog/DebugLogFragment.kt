@@ -30,7 +30,7 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.tari.android.wallet.ui.fragment.debug
+package com.tari.android.wallet.ui.fragment.debug.debugLog
 
 import android.animation.ObjectAnimator
 import android.os.Bundle
@@ -39,89 +39,65 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
 import androidx.appcompat.app.AlertDialog
-import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.tari.android.wallet.R.string.*
-import com.tari.android.wallet.data.WalletConfig
-import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import com.tari.android.wallet.databinding.FragmentDebugLogBinding
-import com.tari.android.wallet.di.DiContainer.appComponent
+import com.tari.android.wallet.extension.observe
 import com.tari.android.wallet.infrastructure.BugReportingService
+import com.tari.android.wallet.ui.common.CommonFragment
 import com.tari.android.wallet.ui.extension.string
 import com.tari.android.wallet.ui.extension.temporarilyDisableClick
-import com.tari.android.wallet.ui.fragment.debug.adapter.LogFileSpinnerAdapter
-import com.tari.android.wallet.ui.fragment.debug.adapter.LogListAdapter
+import com.tari.android.wallet.ui.fragment.debug.debugLog.adapter.LogFileSpinnerAdapter
+import com.tari.android.wallet.ui.fragment.debug.debugLog.adapter.LogListAdapter
 import com.tari.android.wallet.util.Constants
-import com.tari.android.wallet.util.WalletUtil
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.io.File
-import java.io.InputStream
-import javax.inject.Inject
 
-/**
- * Debug: show logs from file.
- *
- * @author The Tari Development Team
- */
-internal class DebugLogFragment : Fragment(), AdapterView.OnItemSelectedListener {
+class DebugLogFragment : CommonFragment<FragmentDebugLogBinding, DebugLogViewModel>(), AdapterView.OnItemSelectedListener {
 
-    @Inject
-    lateinit var walletConfig: WalletConfig
-
-    @Inject
-    lateinit var sharedPrefsWrapper: SharedPrefsRepository
-
-    @Inject
-    lateinit var bugReportingService: BugReportingService
-
-    /**
-     * Log file related vars.
-     */
-    private lateinit var logFiles: List<File>
-    private lateinit var selectedLogFile: File
-    private val selectedLogFileLines = mutableListOf<String>()
-
-    /**
-     * List, adapter & layout manager.
-     */
-    private lateinit var spinnerAdapter: LogFileSpinnerAdapter
     private lateinit var recyclerViewAdapter: LogListAdapter
-    private lateinit var recyclerViewLayoutManager: RecyclerView.LayoutManager
 
-    private lateinit var ui: FragmentDebugLogBinding
-
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View = FragmentDebugLogBinding.inflate(inflater, container, false).also { ui = it }.root
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
+        FragmentDebugLogBinding.inflate(inflater, container, false).also { ui = it }.root
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        appComponent.inject(this)
+
+        val viewModel: DebugLogViewModel by viewModels()
+        bindViewModel(viewModel)
+
         setupUI()
+        observeUI()
     }
 
-    private fun setupUI() {
-        // read log files
-        logFiles = WalletUtil.getLogFilesFromDirectory(walletConfig.getWalletLogFilesDirPath())
+    private fun setupUI() = with(ui) {
+        recyclerViewAdapter = LogListAdapter()
+        recyclerView.layoutManager = LinearLayoutManager(requireContext())
+        recyclerView.adapter = recyclerViewAdapter
+        fileSpinner.onItemSelectedListener = this@DebugLogFragment
+        scrollToTopButton.setOnClickListener { onScrollToTopButtonClicked() }
+        scrollToBottomButton.setOnClickListener { onScrollToBottomButtonClicked() }
+        shareButton.setOnClickListener { showShareLogFilesDialog() }
+    }
 
-        // initialize recycler view
-        recyclerViewLayoutManager = LinearLayoutManager(activity)
-        recyclerViewAdapter = LogListAdapter(selectedLogFileLines)
-        spinnerAdapter = LogFileSpinnerAdapter(requireContext(), logFiles)
-        ui.apply {
-            recyclerView.layoutManager = recyclerViewLayoutManager
-            recyclerView.adapter = recyclerViewAdapter
-            fileSpinner.onItemSelectedListener = this@DebugLogFragment
-            fileSpinner.adapter = spinnerAdapter
-            scrollToTopButton.setOnClickListener { onScrollToTopButtonClicked() }
-            scrollToBottomButton.setOnClickListener { onScrollToBottomButtonClicked() }
-            shareButton.setOnClickListener { showShareLogFilesDialog() }
+    private fun observeUI() = with(viewModel) {
+        observe(selectedLogFileLines) { updateLogFileLines(it) }
+
+        observe(logFiles) { ui.fileSpinner.adapter = LogFileSpinnerAdapter(requireContext(), it) }
+    }
+
+    private fun updateLogFileLines(lines: MutableList<String>) {
+        ui.recyclerView.alpha = 0f
+        recyclerViewAdapter.logLines.clear()
+        recyclerViewAdapter.logLines.addAll(lines)
+        recyclerViewAdapter.notifyDataSetChanged()
+        ObjectAnimator.ofFloat(ui.recyclerView, "alpha", 0f, 1f).apply {
+            duration = Constants.UI.mediumDurationMs
+            startDelay = Constants.UI.shortDurationMs
+            start()
         }
     }
 
@@ -132,7 +108,7 @@ internal class DebugLogFragment : Fragment(), AdapterView.OnItemSelectedListener
 
     private fun onScrollToBottomButtonClicked() {
         ui.scrollToBottomButton.temporarilyDisableClick()
-        ui.recyclerView.scrollToPosition(selectedLogFileLines.lastIndex)
+        ui.recyclerView.scrollToPosition(recyclerViewAdapter.logLines.lastIndex)
     }
 
     private fun showShareLogFilesDialog() {
@@ -152,10 +128,10 @@ internal class DebugLogFragment : Fragment(), AdapterView.OnItemSelectedListener
     }
 
     private fun shareBugReport() {
-        val mContext = context ?: return
+        val mContext = requireContext()
         lifecycleScope.launch(Dispatchers.IO) {
             try {
-                bugReportingService.shareBugReport(mContext)
+                viewModel.bugReportingService.shareBugReport(mContext)
             } catch (e: BugReportingService.BugReportFileSizeLimitExceededException) {
                 withContext(Dispatchers.Main) {
                     showBugReportFileSizeExceededDialog()
@@ -164,41 +140,20 @@ internal class DebugLogFragment : Fragment(), AdapterView.OnItemSelectedListener
         }
     }
 
-    override fun onNothingSelected(parent: AdapterView<*>?) {
-        // no-op
-    }
+    override fun onNothingSelected(parent: AdapterView<*>?) = Unit
 
     override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
         ui.recyclerView.scrollToPosition(0)
-        selectedLogFile = logFiles[position]
-        updateLogLines()
-    }
-
-    private fun updateLogLines() {
-        ui.recyclerView.alpha = 0f
-        selectedLogFileLines.clear()
-        val inputStream: InputStream = selectedLogFile.inputStream()
-        inputStream.bufferedReader()
-            .useLines { lines -> lines.forEach { selectedLogFileLines.add(it) } }
-        recyclerViewAdapter.notifyDataSetChanged()
-        val anim = ObjectAnimator.ofFloat(ui.recyclerView, "alpha", 0f, 1f)
-        anim.duration = Constants.UI.mediumDurationMs
-        anim.startDelay = Constants.UI.shortDurationMs
-        anim.start()
+        viewModel.selectFile(position)
     }
 
     private fun showBugReportFileSizeExceededDialog() {
-        val dialogBuilder = AlertDialog.Builder(context ?: return)
-        val dialog = dialogBuilder.setMessage(
-            string(debug_log_file_size_limit_exceeded_dialog_content)
-        )
+        AlertDialog.Builder(requireContext())
+            .setMessage(string(debug_log_file_size_limit_exceeded_dialog_content))
             .setCancelable(false)
-            .setPositiveButton(string(common_ok)) { dialog, _ ->
-                dialog.cancel()
-            }
+            .setPositiveButton(string(common_ok)) { dialog, _ -> dialog.cancel() }
             .setTitle(string(debug_log_file_size_limit_exceeded_dialog_title))
             .create()
-        dialog.show()
+            .show()
     }
-
 }
