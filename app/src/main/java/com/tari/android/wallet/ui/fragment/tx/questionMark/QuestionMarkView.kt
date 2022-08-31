@@ -7,7 +7,7 @@ import android.view.ViewGroup
 import com.tari.android.wallet.databinding.ViewQuestionMarkBinding
 import com.tari.android.wallet.ui.component.MainListTouchingView
 
-internal class QuestionMarkView : MainListTouchingView<QuestionMarkViewModel, ViewQuestionMarkBinding> {
+class QuestionMarkView : MainListTouchingView<QuestionMarkViewModel, ViewQuestionMarkBinding> {
 
     override fun bindingInflate(layoutInflater: LayoutInflater, parent: ViewGroup?, attachToRoot: Boolean):
             ViewQuestionMarkBinding = ViewQuestionMarkBinding.inflate(layoutInflater, parent, attachToRoot)

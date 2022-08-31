@@ -49,7 +49,7 @@ import com.tari.android.wallet.event.EventBus
  *
  * @author The Tari Development Team
  */
-internal class NetworkConnectionStateReceiver : BroadcastReceiver() {
+class NetworkConnectionStateReceiver : BroadcastReceiver() {
 
     private val action = "android.net.conn.CONNECTIVITY_CHANGE"
     val intentFilter = IntentFilter(action)

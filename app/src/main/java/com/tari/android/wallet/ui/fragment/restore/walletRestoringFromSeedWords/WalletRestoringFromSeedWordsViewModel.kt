@@ -26,7 +26,7 @@ import kotlinx.coroutines.launch
 import java.text.DecimalFormat
 import javax.inject.Inject
 
-internal class WalletRestoringFromSeedWordsViewModel : CommonViewModel() {
+class WalletRestoringFromSeedWordsViewModel : CommonViewModel() {
 
 
     @Inject

@@ -74,7 +74,7 @@ import javax.inject.Inject
  *
  * @author The Tari Development Team
  */
-internal class SendTariActivity : CommonActivity<ActivitySendTariBinding, SendTariViewModel>(),
+class SendTariActivity : CommonActivity<ActivitySendTariBinding, SendTariViewModel>(),
     AddRecipientListener,
     AddAmountListener,
     AddNodeListener,

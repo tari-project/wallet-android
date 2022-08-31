@@ -50,6 +50,7 @@ import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepositoryImpl
 import com.tari.android.wallet.data.sharedPrefs.tariSettings.TariSettingsSharedRepository
 import com.tari.android.wallet.data.sharedPrefs.testnetFaucet.TestnetFaucetRepository
 import com.tari.android.wallet.data.sharedPrefs.tor.TorSharedRepository
+import com.tari.android.wallet.infrastructure.logging.LoggerAdapter
 import com.tari.android.wallet.infrastructure.security.biometric.BiometricAuthenticationService
 import com.tari.android.wallet.notification.NotificationHelper
 import com.tari.android.wallet.service.WalletServiceLauncher
@@ -68,9 +69,8 @@ import javax.inject.Singleton
  * @author The Tari Development Team
  */
 @Module
-internal class ApplicationModule(
-    private val app: TariWalletApplication
-) {
+class ApplicationModule(private val app: TariWalletApplication) {
+
     @Provides
     @Singleton
     fun provideApplication(): TariWalletApplication = app
@@ -147,8 +147,7 @@ internal class ApplicationModule(
         context: Context,
         tariSettingsSharedRepository: TariSettingsSharedRepository,
         walletConfig: WalletConfig
-    ): WalletServiceLauncher =
-        WalletServiceLauncher(context, walletConfig, tariSettingsSharedRepository)
+    ): WalletServiceLauncher = WalletServiceLauncher(context, walletConfig, tariSettingsSharedRepository)
 
     @Provides
     @Singleton
@@ -174,6 +173,10 @@ internal class ApplicationModule(
     @Provides
     @Singleton
     fun provideGiphyEcosystem(context: Context): GiphyEcosystem = GiphyEcosystem(context, BuildConfig.GIPHY_KEY)
+
+    @Provides
+    @Singleton
+    fun provideLoggerAdapter(): LoggerAdapter = LoggerAdapter()
 
     companion object {
         const val sharedPrefsFileName = "tari_wallet_shared_prefs"

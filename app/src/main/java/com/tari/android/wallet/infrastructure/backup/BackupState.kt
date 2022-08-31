@@ -39,7 +39,7 @@ import java.lang.Exception
  *
  * @author The Tari Development Team
  */
-internal sealed class BackupState {
+sealed class BackupState {
     object BackupDisabled : BackupState()
     object BackupCheckingStorage : BackupState()
     object BackupStorageCheckFailed : BackupState()

@@ -73,11 +73,7 @@ import kotlinx.coroutines.withContext
 import java.net.UnknownHostException
 import javax.inject.Inject
 
-internal class ChangeSecurePasswordFragment @Deprecated(
-    """Use newInstance() and supply all the 
-necessary data via arguments instead, as fragment's default no-op constructor is used by the 
-framework for UI tree rebuild on configuration changes"""
-) constructor() : Fragment() {
+class ChangeSecurePasswordFragment() : Fragment() {
 
     @Inject
     lateinit var sharedPrefs: SharedPrefsRepository
@@ -95,17 +91,12 @@ framework for UI tree rebuild on configuration changes"""
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        inputService =
-            requireActivity().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        inputService = requireActivity().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         appComponent.inject(this)
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View = FragmentChangeSecurePasswordBinding.inflate(inflater, container, false)
-        .also { ui = it }.root
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?) =
+        FragmentChangeSecurePasswordBinding.inflate(inflater, container, false).also { ui = it }.root
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)

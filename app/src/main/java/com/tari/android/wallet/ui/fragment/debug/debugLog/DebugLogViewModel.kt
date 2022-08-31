@@ -3,7 +3,7 @@ package com.tari.android.wallet.ui.fragment.debug.debugLog
 import androidx.lifecycle.MutableLiveData
 import com.tari.android.wallet.data.WalletConfig
 import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
-import com.tari.android.wallet.infrastructure.BugReportingService
+import com.tari.android.wallet.infrastructure.logging.BugReportingService
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.util.WalletUtil
 import java.io.File

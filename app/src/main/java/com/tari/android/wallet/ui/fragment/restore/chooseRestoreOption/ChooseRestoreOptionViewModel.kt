@@ -21,7 +21,7 @@ import kotlinx.coroutines.launch
 import java.io.IOException
 import javax.inject.Inject
 
-internal class ChooseRestoreOptionViewModel : CommonViewModel() {
+class ChooseRestoreOptionViewModel : CommonViewModel() {
 
     @Inject
     lateinit var backupStorage: BackupStorage

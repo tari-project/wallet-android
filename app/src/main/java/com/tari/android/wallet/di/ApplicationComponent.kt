@@ -99,14 +99,13 @@ import javax.inject.Singleton
         WalletModule::class,
         ServiceModule::class,
         TorModule::class,
-        TrackerModule::class,
         BackupAndRestoreModule::class,
         PresentationModule::class,
         YatModule::class
     ]
 )
 
-internal interface ApplicationComponent {
+interface ApplicationComponent {
 
     /**
      * Application.

@@ -59,7 +59,7 @@ import javax.inject.Inject
 class DeleteWalletActivity : AppCompatActivity() {
 
     @Inject
-    internal lateinit var walletServiceLauncher: WalletServiceLauncher
+    lateinit var walletServiceLauncher: WalletServiceLauncher
 
     private var ui: ActivityDeleteWalletBinding? = null
     private lateinit var serviceConnection: TariWalletServiceConnection

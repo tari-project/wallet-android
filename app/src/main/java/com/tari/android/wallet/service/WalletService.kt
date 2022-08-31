@@ -92,7 +92,7 @@ import javax.inject.Inject
  *
  * @author The Tari Development Team
  */
-internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
+class WalletService : Service(), FFIWalletListener, LifecycleObserver {
 
     companion object {
         // notification id
@@ -396,7 +396,7 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
         Logger.d("Tx received: $pendingInboundTx")
         pendingInboundTx.user = getUserByPublicKey(pendingInboundTx.user.publicKey)
         Logger.d("Received TX after contact update: $pendingInboundTx")
-        // post event to bus for the internal listeners
+        // post event to bus for the listeners
         EventBus.post(Event.Transaction.TxReceived(pendingInboundTx))
         // manage notifications
         postTxNotification(pendingInboundTx)
@@ -408,7 +408,7 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
     override fun onTxReplyReceived(pendingOutboundTx: PendingOutboundTx) {
         Logger.d("Tx ${pendingOutboundTx.id} reply received.")
         pendingOutboundTx.user = getUserByPublicKey(pendingOutboundTx.user.publicKey)
-        // post event to bus for the internal listeners
+        // post event to bus for the listeners
         EventBus.post(Event.Transaction.TxReplyReceived(pendingOutboundTx))
         // notify external listeners
         listeners.iterator().forEach {
@@ -421,7 +421,7 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
     override fun onTxFinalized(pendingInboundTx: PendingInboundTx) {
         Logger.d("Tx ${pendingInboundTx.id} finalized.")
         pendingInboundTx.user = getUserByPublicKey(pendingInboundTx.user.publicKey)
-        // post event to bus for the internal listeners
+        // post event to bus for the listeners
         EventBus.post(Event.Transaction.TxFinalized(pendingInboundTx))
         // notify external listeners
         listeners.iterator().forEach {
@@ -434,7 +434,7 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
     override fun onInboundTxBroadcast(pendingInboundTx: PendingInboundTx) {
         Logger.d("Inbound tx ${pendingInboundTx.id} broadcast.")
         pendingInboundTx.user = getUserByPublicKey(pendingInboundTx.user.publicKey)
-        // post event to bus for the internal listeners
+        // post event to bus for the listeners
         EventBus.post(Event.Transaction.InboundTxBroadcast(pendingInboundTx))
         // notify external listeners
         listeners.iterator().forEach {
@@ -447,7 +447,7 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
     override fun onOutboundTxBroadcast(pendingOutboundTx: PendingOutboundTx) {
         Logger.d("Outbound tx ${pendingOutboundTx.id} broadcast.")
         pendingOutboundTx.user = getUserByPublicKey(pendingOutboundTx.user.publicKey)
-        // post event to bus for the internal listeners
+        // post event to bus for the listeners
         EventBus.post(Event.Transaction.OutboundTxBroadcast(pendingOutboundTx))
         // notify external listeners
         listeners.iterator().forEach { it.onOutboundTxBroadcast(pendingOutboundTx) }
@@ -458,7 +458,7 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
     override fun onTxMined(completedTx: CompletedTx) {
         Logger.d("Tx ${completedTx.id} mined.")
         completedTx.user = getUserByPublicKey(completedTx.user.publicKey)
-        // post event to bus for the internal listeners
+        // post event to bus for the listeners
         EventBus.post(Event.Transaction.TxMined(completedTx))
         // notify external listeners
         listeners.iterator().forEach {
@@ -471,7 +471,7 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
     override fun onTxMinedUnconfirmed(completedTx: CompletedTx, confirmationCount: Int) {
         Logger.d("Tx ${completedTx.id} mined, yet unconfirmed. Confirmation count: $confirmationCount")
         completedTx.user = getUserByPublicKey(completedTx.user.publicKey)
-        // post event to bus for the internal listeners
+        // post event to bus for the listeners
         EventBus.post(Event.Transaction.TxMinedUnconfirmed(completedTx))
         // notify external listeners
         listeners.iterator().forEach {
@@ -484,7 +484,7 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
     override fun onTxFauxConfirmed(completedTx: CompletedTx) {
         Logger.d("Tx faux ${completedTx.id} confirmed.")
         completedTx.user = getUserByPublicKey(completedTx.user.publicKey)
-        // post event to bus for the internal listeners
+        // post event to bus for the listeners
         EventBus.post(Event.Transaction.TxFauxConfirmed(completedTx))
         // notify external listeners
         listeners.iterator().forEach { it.onTxFauxConfirmed(completedTx) }
@@ -495,7 +495,7 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
     override fun onTxFauxUnconfirmed(completedTx: CompletedTx, confirmationCount: Int) {
         Logger.d("Tx faux ${completedTx.id} yet unconfirmed. Confirmation count: $confirmationCount")
         completedTx.user = getUserByPublicKey(completedTx.user.publicKey)
-        // post event to bus for the internal listeners
+        // post event to bus for the listeners
         EventBus.post(Event.Transaction.TxFauxMinedUnconfirmed(completedTx))
         // notify external listeners
         listeners.iterator().forEach { it.onTxFauxUnconfirmed(completedTx, confirmationCount) }
@@ -924,7 +924,7 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
                     // store the UTXO keys
                     testnetFaucetRepository.testnetTariUTXOKeyList = TestnetUtxoList(result.keys)
 
-                    // post event to bus for the internal listeners
+                    // post event to bus for the listeners
                     EventBus.post(Event.Testnet.TestnetTariRequestSuccessful())
                     // notify external listeners
                     listeners.iterator().forEach { it.onTestnetTariRequestSuccess() }
@@ -1015,7 +1015,7 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
         } ?: false
 
         private fun notifyTestnetTariRequestFailed(error: String) {
-            // post event to bus for the internal listeners
+            // post event to bus for the listeners
             EventBus.post(Event.Testnet.TestnetTariRequestError(error))
             // notify external listeners
             listeners.iterator().forEach { listener -> listener.onTestnetTariRequestError(error) }

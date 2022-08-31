@@ -40,7 +40,7 @@ import com.tari.android.wallet.databinding.ViewMainListImageButtonBinding
 import com.tari.android.wallet.ui.common.CommonViewModel
 
 
-internal class MainListImageButton : MainListTouchingView<CommonViewModel, ViewMainListImageButtonBinding> {
+class MainListImageButton : MainListTouchingView<CommonViewModel, ViewMainListImageButtonBinding> {
 
     override fun bindingInflate(layoutInflater: LayoutInflater, parent: ViewGroup?, attachToRoot: Boolean):
             ViewMainListImageButtonBinding = ViewMainListImageButtonBinding.inflate(layoutInflater, parent, attachToRoot)

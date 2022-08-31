@@ -78,9 +78,6 @@ class AuthActivity : CommonActivity<ActivityAuthBinding, AuthViewModel>() {
 
         setupUi()
         viewModel.walletServiceLauncher.start()
-        if (savedInstanceState == null) {
-            viewModel.tracker.screen(path = "/local_auth", title = "Local Authentication")
-        }
     }
 
     private fun setupUi() {

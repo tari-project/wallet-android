@@ -32,8 +32,8 @@
  */
 package com.tari.android.wallet.ffi
 
-internal typealias FFIPointer = Long
-internal const val nullptr = 0L
+typealias FFIPointer = Long
+const val nullptr = 0L
 
 /**
  * Base class for FFI native peer entities.

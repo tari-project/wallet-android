@@ -58,7 +58,7 @@ import com.tari.android.wallet.ui.fragment.debug.baseNodeConfig.validator.Valida
  *
  * @author The Tari Development Team
  */
-internal class AddCustomBaseNodeFragment : CommonFragment<FragmentBaseNodeAddBinding, AddCustomBaseNodeViewModel>() {
+class AddCustomBaseNodeFragment : CommonFragment<FragmentBaseNodeAddBinding, AddCustomBaseNodeViewModel>() {
 
     override fun onCreateView(
         inflater: LayoutInflater,

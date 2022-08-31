@@ -50,7 +50,7 @@ import com.tari.android.wallet.ui.component.LetterSpacingSpan
  * @param url locator
  * @param applyToOnlyFirstOccurrence whether the span should be applied only to the first occurrence
  */
-internal fun SpannableString.applyURLStyle(
+fun SpannableString.applyURLStyle(
     search: String,
     url: String,
     applyToOnlyFirstOccurrence: Boolean = false
@@ -76,7 +76,7 @@ internal fun SpannableString.applyURLStyle(
  * @param applyToOnlyFirstOccurrence whether customFont should be applied only to the first occurrence
  * @return spannable string
  */
-internal fun String.applyFontStyle(
+fun String.applyFontStyle(
     context: Context,
     defaultFont: CustomFont,
     search: List<String>,
@@ -93,7 +93,7 @@ internal fun String.applyFontStyle(
 /**
  * Similar to applyFontStyle above, but applied to color instead.
  */
-internal fun String.applyColorStyle(
+fun String.applyColorStyle(
     defaultColor: Int,
     search: List<String>,
     styleColor: Int,
@@ -144,7 +144,7 @@ private fun SpannableString.applyTypefaceStyle(
 /**
  * Helper function to apply relative text size style to a spannable string.
  */
-internal fun SpannableString.applyRelativeTextSizeStyle(
+fun SpannableString.applyRelativeTextSizeStyle(
     search: String,
     relativeTextSize: Float,
     applyToOnlyFirstOccurrence: Boolean = false
@@ -162,7 +162,7 @@ internal fun SpannableString.applyRelativeTextSizeStyle(
 /**
  * Helper function to apply letter spacing to a spannable string.
  */
-internal fun SpannableString.applyLetterSpacingStyle(
+fun SpannableString.applyLetterSpacingStyle(
     search: String,
     letterSpacing: Float,
     applyToOnlyFirstOccurrence: Boolean = false

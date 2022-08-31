@@ -45,7 +45,7 @@ import javax.inject.Singleton
  * @author The Tari Development Team
  */
 @Module
-internal class TrackerModule {
+class TrackerModule {
     @Provides
     @Singleton
     // Do not delete this parameter - it is used in another flavors

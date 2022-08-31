@@ -53,7 +53,7 @@ import java.io.File
  * @author The Tari Development Team
  */
 // todo review
-internal class LocalBackupStorage(
+class LocalBackupStorage(
     private val context: Context,
     private val backupSettingsRepository: BackupSettingsRepository,
     private val namingPolicy: BackupNamingPolicy,

@@ -58,7 +58,7 @@ import com.tari.android.wallet.util.WalletUtil
  *
  * @author The Tari Development Team
  */
-internal class NotificationHelper(private val context: Context) {
+class NotificationHelper(private val context: Context) {
 
     companion object {
         // notification channel id

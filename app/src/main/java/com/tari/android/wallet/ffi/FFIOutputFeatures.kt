@@ -37,7 +37,7 @@ package com.tari.android.wallet.ffi
  *
  * @author The Tari Development Team
  */
-internal class FFIOutputFeatures : FFIBase {
+class FFIOutputFeatures : FFIBase {
 
     private external fun jniCreate(
         version: Char,

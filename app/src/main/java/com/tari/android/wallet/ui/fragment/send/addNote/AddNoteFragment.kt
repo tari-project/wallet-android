@@ -66,7 +66,6 @@ import com.tari.android.wallet.databinding.FragmentAddNoteBinding
 import com.tari.android.wallet.di.DiContainer.appComponent
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.extension.observe
-import com.tari.android.wallet.infrastructure.Tracker
 import com.tari.android.wallet.model.Contact
 import com.tari.android.wallet.model.MicroTari
 import com.tari.android.wallet.model.User
@@ -82,7 +81,6 @@ import com.tari.android.wallet.ui.fragment.send.common.TransactionData
 import com.tari.android.wallet.ui.presentation.TxNote
 import com.tari.android.wallet.util.Constants
 import java.lang.ref.WeakReference
-import javax.inject.Inject
 
 /**
  * Add a note to the transaction & send it through this fragment.
@@ -90,9 +88,6 @@ import javax.inject.Inject
  * @author The Tari Development Team
  */
 class AddNoteFragment : Fragment(), View.OnTouchListener {
-
-    @Inject
-    lateinit var tracker: Tracker
 
     private lateinit var addNodeListenerWR: WeakReference<AddNodeListener>
 
@@ -130,9 +125,6 @@ class AddNoteFragment : Fragment(), View.OnTouchListener {
     @SuppressLint("ClickableViewAccessibility")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        if (savedInstanceState == null) {
-            tracker.screen(path = "/home/send_tari/add_note", title = "Send Tari - Add Note")
-        }
         initializeGIFsViewModel()
         retrievePageArguments(savedInstanceState)
         setupUI(savedInstanceState)
@@ -458,8 +450,6 @@ class AddNoteFragment : Fragment(), View.OnTouchListener {
     }
 
     private fun continueToFinalizeSendTx() {
-        // track event
-        tracker.event(category = "Transaction", action = "Transaction Initiated")
         // notify listener (i.e. activity)
         val note = TxNote(ui.noteEditText.editableText.toString(), gifContainer.gifItem?.embedUri?.toString()).compose()
         val newData = transactionData.copy(note = note)

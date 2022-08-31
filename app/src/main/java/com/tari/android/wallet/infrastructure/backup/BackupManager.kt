@@ -52,7 +52,7 @@ import java.net.UnknownHostException
 import java.util.concurrent.TimeUnit
 import kotlin.math.max
 
-internal class BackupManager(
+class BackupManager(
     private val context: Context,
     private val backupSettingsRepository: BackupSettingsRepository,
     private val backupStorage: BackupStorage,

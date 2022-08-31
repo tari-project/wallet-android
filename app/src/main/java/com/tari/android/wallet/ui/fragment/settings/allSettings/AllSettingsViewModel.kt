@@ -9,10 +9,10 @@ import com.tari.android.wallet.R.drawable.*
 import com.tari.android.wallet.R.string.*
 import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepository
 import com.tari.android.wallet.event.EventBus
-import com.tari.android.wallet.infrastructure.BugReportingService
 import com.tari.android.wallet.infrastructure.backup.BackupManager
 import com.tari.android.wallet.infrastructure.backup.BackupState
 import com.tari.android.wallet.infrastructure.backup.BackupStorageAuthRevokedException
+import com.tari.android.wallet.infrastructure.logging.BugReportingService
 import com.tari.android.wallet.ui.common.ClipboardArgs
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.common.SingleLiveEvent
@@ -35,7 +35,7 @@ import java.io.IOException
 import java.util.*
 import javax.inject.Inject
 
-internal class AllSettingsViewModel : CommonViewModel() {
+class AllSettingsViewModel : CommonViewModel() {
 
     lateinit var authenticationViewModel: BiometricAuthenticationViewModel
 

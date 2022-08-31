@@ -42,7 +42,7 @@ import java.math.BigDecimal
 import java.util.concurrent.CopyOnWriteArrayList
 import javax.inject.Inject
 
-internal class TxListViewModel : CommonViewModel() {
+class TxListViewModel : CommonViewModel() {
 
     @Inject
     lateinit var repository: GIFRepository

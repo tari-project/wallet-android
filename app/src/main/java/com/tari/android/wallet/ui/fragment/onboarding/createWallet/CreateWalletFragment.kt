@@ -87,9 +87,6 @@ class CreateWalletFragment : CommonFragment<FragmentCreateWalletBinding, CreateW
         bindViewModel(viewModel)
 
         setupUi()
-        if (savedInstanceState == null) {
-            viewModel.tracker.screen(path = "/onboarding/create_wallet", title = "Onboarding - Create Wallet")
-        }
     }
 
     override fun onDestroyView() {
@@ -315,8 +312,6 @@ class CreateWalletFragment : CommonFragment<FragmentCreateWalletBinding, CreateW
     }
 
     private fun showEmojiWheelAnimation() {
-        viewModel.tracker.screen(path = "/onboarding/create_emoji_id", title = "Onboarding - Create Emoji Id")
-
         ui.emojiWheelLottieAnimationView.playAnimation()
 
         ValueAnimator.ofFloat(1f, 0f).apply {

@@ -75,9 +75,6 @@ class LocalAuthFragment : CommonFragment<FragmentLocalAuthBinding, LocalAuthView
         observeUi()
         setupUi()
         ui.rootView.doOnGlobalLayout(this::playStartUpAnim)
-        if (savedInstanceState == null) {
-            viewModel.tracker.screen("/onboarding/enable_local_auth", "Onboarding - Enable Local Authentication")
-        }
     }
 
     private fun observeUi() = with(viewModel) {

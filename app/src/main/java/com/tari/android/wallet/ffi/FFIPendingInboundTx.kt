@@ -40,7 +40,7 @@ import java.math.BigInteger
  * @author The Tari Development Team
  */
 
-internal class FFIPendingInboundTx() : FFITxBase() {
+class FFIPendingInboundTx() : FFITxBase() {
 
     // region JNI
 

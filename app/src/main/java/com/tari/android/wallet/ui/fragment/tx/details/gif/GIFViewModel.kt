@@ -11,7 +11,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
-internal class GIFViewModel : CommonViewModel() {
+class GIFViewModel : CommonViewModel() {
 
     init {
         component.inject(this)

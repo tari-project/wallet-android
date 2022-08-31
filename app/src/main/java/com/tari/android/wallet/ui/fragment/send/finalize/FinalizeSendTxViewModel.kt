@@ -40,8 +40,6 @@ class FinalizeSendTxViewModel : CommonViewModel() {
 
     init {
         component.inject(this)
-
-        tracker.screen(path = "/home/send_tari/finalize", title = "Send Tari - Finalize")
     }
 
     fun start() {
@@ -228,8 +226,6 @@ class FinalizeSendTxViewModel : CommonViewModel() {
                 return
             }
             if (status.isSuccess) {
-                // track event
-                tracker.event(category = "Transaction", action = "Transaction Accepted - Synchronous")
                 // progress state
                 finishSendingTx()
             }

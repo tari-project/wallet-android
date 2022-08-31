@@ -79,7 +79,7 @@ import java.util.*
  *
  * @author The Tari Development Team
  */
-internal class TxDetailsFragment : CommonFragment<FragmentTxDetailsBinding, TxDetailsViewModel>() {
+class TxDetailsFragment : CommonFragment<FragmentTxDetailsBinding, TxDetailsViewModel>() {
 
     /**
      * Values below are used for scaling up/down of the text size.
@@ -110,10 +110,6 @@ internal class TxDetailsFragment : CommonFragment<FragmentTxDetailsBinding, TxDe
         val txId = arguments?.getParcelable<TxId>(TX_ID_EXTRA_KEY)
         if (txId != null) {
             viewModel.loadTxById(txId)
-        }
-
-        if (savedInstanceState == null) {
-            viewModel.tracker.screen(path = "/home/tx_details", title = "Transaction Details")
         }
 
         setupUI()

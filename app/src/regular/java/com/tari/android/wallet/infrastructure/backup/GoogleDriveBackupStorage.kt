@@ -62,7 +62,7 @@ import java.io.FileOutputStream
 import java.io.IOException
 import kotlin.coroutines.suspendCoroutine
 
-internal class GoogleDriveBackupStorage(
+class GoogleDriveBackupStorage(
     private val context: Context,
     private val namingPolicy: BackupNamingPolicy,
     private val backupSettingsRepository: BackupSettingsRepository,

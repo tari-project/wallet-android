@@ -40,7 +40,7 @@ import java.io.File
  *
  * @author The Tari Development Team
  */
-internal class FFICommsConfig() : FFIBase() {
+class FFICommsConfig() : FFIBase() {
 
     // region JNI
 

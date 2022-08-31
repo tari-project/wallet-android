@@ -30,7 +30,7 @@ import java.net.UnknownHostException
 import java.util.*
 import javax.inject.Inject
 
-internal class BackupSettingsViewModel : CommonViewModel() {
+class BackupSettingsViewModel : CommonViewModel() {
 
     @Inject
     lateinit var backupManager: BackupManager

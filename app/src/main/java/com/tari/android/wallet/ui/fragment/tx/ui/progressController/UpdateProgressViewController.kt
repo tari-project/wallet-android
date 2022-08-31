@@ -65,7 +65,7 @@ import kotlin.coroutines.CoroutineContext
  *
  * @author The Tari Development Team
  */
-internal class UpdateProgressViewController(private val view: View, listener: Listener) : CoroutineScope {
+class UpdateProgressViewController(private val view: View, listener: Listener) : CoroutineScope {
 
     private val mJob = Job()
     override val coroutineContext: CoroutineContext

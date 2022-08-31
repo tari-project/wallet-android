@@ -44,7 +44,7 @@ import com.tari.android.wallet.ui.fragment.debug.debugLog.DebugLogFragment
  *
  * @author The Tari Development Team
  */
-internal class DebugViewPagerAdapter(activity: FragmentActivity) : FragmentStateAdapter(activity) {
+class DebugViewPagerAdapter(activity: FragmentActivity) : FragmentStateAdapter(activity) {
 
     /**
      * Logs and base node configuration.

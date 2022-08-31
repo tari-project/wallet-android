@@ -35,7 +35,7 @@ package com.tari.android.wallet.ffi
 /**
  * @author The Tari Development Team
  */
-internal class FFIError {
+class FFIError {
 
     var code: Int = -1
 
