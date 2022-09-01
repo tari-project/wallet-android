@@ -9,9 +9,9 @@ import com.tari.android.wallet.ui.common.domain.ResourceManager
 
 class NetworkRepositoryImpl(private val resourceManager: ResourceManager, sharedPrefs: SharedPreferences) : NetworkRepository {
 
-    override var supportedNetworks: List<Network> = listOf(Network.DIBBLER)
+    override var supportedNetworks: List<Network> = listOf(Network.ESMERALDA)
 
-    override var recommendedNetworks: List<Network> = listOf(Network.DIBBLER)
+    override var recommendedNetworks: List<Network> = listOf(Network.ESMERALDA)
 
     override var currentNetwork by SharedPrefGsonDelegate(sharedPrefs, Keys.currentNetwork, TariNetwork::class.java)
 

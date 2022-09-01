@@ -48,7 +48,7 @@ import org.junit.runners.model.Statement
 
 class TariBackupNameValidationPolicyTest {
 
-    private val network: Network = Network.DIBBLER
+    private val network: Network = Network.ESMERALDA
 
     @get:Rule
     val rule = JodaAndroidFixRule()
