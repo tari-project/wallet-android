@@ -1171,10 +1171,13 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniImportUTXO(
                     pSourceSenderPublicKey,
                     pScriptPrivateKey,
                     pCovenant,
+                    nullptr,
+                    0,
                     pMessage,
                     errorCodePointer
             )
     );
+
     setErrorCode(jEnv, error, errorCode);
     jEnv->ReleaseStringUTFChars(jAmount, nativeAmount);
     jEnv->ReleaseStringUTFChars(jMessage, pMessage);

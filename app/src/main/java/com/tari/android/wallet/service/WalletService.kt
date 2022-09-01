@@ -961,13 +961,7 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
                     FFIByteVector(HexString(firstUTXOKey.output.metadataSignature.v))
                 )
                 val covenant = FFICovenant(FFIByteVector(HexString(firstUTXOKey.output.covenant)))
-                //todo need to update when faucet got fixed
-                val outputFeatures = FFIOutputFeatures(
-                    '0', '0', 0, '0',
-                    FFIByteVector(HexString(firstUTXOKey.output.metadataSignature.public_nonce)),
-                    FFIByteVector(HexString(firstUTXOKey.output.metadataSignature.u)),
-                    FFIByteVector(HexString(firstUTXOKey.output.metadataSignature.v))
-                )
+                val outputFeatures = FFIOutputFeatures('0', 0, FFIByteVector(HexString(firstUTXOKey.output.metadataSignature.public_nonce)))
                 val txId = wallet.importUTXO(
                     amount,
                     txMessage,
