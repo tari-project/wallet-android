@@ -32,7 +32,6 @@
  */
 package com.tari.android.wallet
 
-import com.orhanobut.logger.Logger
 import com.tari.android.wallet.ffi.NetAddressString
 import java.io.File
 
@@ -72,15 +71,5 @@ class FFITestUtil {
             }
             return false
         }
-
-        fun printFFILogFile(path: String) {
-            var log = ""
-            File(path).forEachLine {
-                log += "\n" + it
-            }
-            Logger.d("FFI log file contents:\n$log")
-        }
-
     }
-
 }

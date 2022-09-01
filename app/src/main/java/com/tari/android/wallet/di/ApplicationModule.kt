@@ -176,7 +176,7 @@ class ApplicationModule(private val app: TariWalletApplication) {
 
     @Provides
     @Singleton
-    fun provideLoggerAdapter(): LoggerAdapter = LoggerAdapter()
+    fun provideLoggerAdapter(walletConfig: WalletConfig): LoggerAdapter = LoggerAdapter(walletConfig)
 
     companion object {
         const val sharedPrefsFileName = "tari_wallet_shared_prefs"

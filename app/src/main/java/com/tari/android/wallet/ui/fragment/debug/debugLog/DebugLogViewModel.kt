@@ -26,7 +26,9 @@ class DebugLogViewModel : CommonViewModel() {
     init {
         component.inject(this)
 
-        logFiles.postValue(WalletUtil.getLogFilesFromDirectory(walletConfig.getWalletLogFilesDirPath()))
+        val files = WalletUtil.getLogFilesFromDirectory(walletConfig.getWalletLogFilesDirPath()).toMutableList()
+        files.add(File(walletConfig.getApplicationLogsFilePath()))
+        logFiles.postValue(files)
     }
 
     fun selectFile(position: Int) {

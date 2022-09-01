@@ -5,7 +5,6 @@ import android.os.Looper
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 
-// позволяет тротлить liveData
 fun <T> LiveData<T>.debounce(duration: Long = 1000L) = MediatorLiveData<T>().also { mld ->
     val source = this
     val handler = Handler(Looper.getMainLooper())

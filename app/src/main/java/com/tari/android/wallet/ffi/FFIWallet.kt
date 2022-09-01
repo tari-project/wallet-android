@@ -230,7 +230,7 @@ class FFIWallet(
     init {
         if (pointer == nullptr) { // so it can only be assigned once for the singleton
             val error = FFIError()
-            Logger.i("Pre jniCreate.")
+            Logger.i("Pre jniCreate")
             try {
                 jniCreate(
                     commsConfig,
@@ -258,7 +258,7 @@ class FFIWallet(
                     error
                 )
             } catch (e: Throwable) {
-                logger.t("FFIWallet").e(e, "jniCreate")
+                logger.e(e, "jniCreate was failed")
                 throw e
             }
 
@@ -272,7 +272,7 @@ class FFIWallet(
     fun enableEncryption() {
         val passphrase = sharedPrefsRepository.databasePassphrase
         if (passphrase == null) {
-            logger.i("Database encryption enable")
+            logger.i("Database encryption enabled")
             sharedPrefsRepository.generateDatabasePassphrase()
             try {
                 setEncryption(sharedPrefsRepository.databasePassphrase.orEmpty())
@@ -409,8 +409,8 @@ class FFIWallet(
      */
     @Suppress("MemberVisibilityCanBePrivate")
     fun onTxReceived(pendingInboundTxPtr: FFIPointer) {
-        logger.i("Tx received. Pointer: %s", pendingInboundTxPtr.toString())
         val tx = FFIPendingInboundTx(pendingInboundTxPtr)
+        logger.i("Tx received ${tx.getId()}")
         val pendingTx = PendingInboundTx(tx)
         GlobalScope.launch { listener?.onTxReceived(pendingTx) }
     }
@@ -420,8 +420,8 @@ class FFIWallet(
      */
     @Suppress("MemberVisibilityCanBePrivate")
     fun onTxReplyReceived(txPointer: FFIPointer) {
-        logger.i("Tx reply received. Pointer: %s", txPointer.toString())
         val tx = FFICompletedTx(txPointer)
+        logger.i("Tx reply received ${tx.getId()}")
         val pendingOutboundTx = PendingOutboundTx(tx)
         GlobalScope.launch { listener?.onTxReplyReceived(pendingOutboundTx) }
     }

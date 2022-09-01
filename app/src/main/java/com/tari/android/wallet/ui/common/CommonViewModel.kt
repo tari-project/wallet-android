@@ -26,11 +26,13 @@ open class CommonViewModel : ViewModel() {
     @Inject
     lateinit var resourceManager: ResourceManager
 
-    val logger = Logger.t(this::class.simpleName)
+    val logger = Logger.t("screen").t(this::class.simpleName)
 
     init {
         @Suppress("LeakingThis")
         component.inject(this)
+
+        logger.i(this::class.simpleName + "was started")
 
         EventBus.walletState.publishSubject.filter { it is WalletState.Failed }
             .subscribe {
