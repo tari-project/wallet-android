@@ -4,8 +4,8 @@ buildscript {
     ext.kotlin_version = "1.6.21"
 
     // build & version
-    ext.buildNumber = 204
-    ext.versionNumber = "0.15.2"
+    ext.buildNumber = 205
+    ext.versionNumber = "0.16.0"
 
     // JNI libs
     ext.libwalletVersion = "0.38.0"
