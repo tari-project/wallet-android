@@ -53,6 +53,7 @@ class NetworkConnectionStateReceiver : BroadcastReceiver() {
 
     private val action = "android.net.conn.CONNECTIVITY_CHANGE"
     val intentFilter = IntentFilter(action)
+    val logger = Logger.t(NetworkConnectionStateReceiver::class.simpleName)
 
     init {
         EventBus.networkConnectionState.post(NetworkConnectionState.UNKNOWN)
