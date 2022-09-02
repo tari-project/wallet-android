@@ -139,8 +139,7 @@ internal class TariWalletApplication : Application() {
             super.onStop(owner)
             Logger.d("App in background.")
             isInForeground = false
-            //todo get back when the whole application will have ability to reconnect to wallet
-//        walletServiceLauncher.stopOnAppBackgrounded()
+            walletServiceLauncher.stopOnAppBackgrounded()
             EventBus.post(Event.App.AppBackgrounded())
         }
 
