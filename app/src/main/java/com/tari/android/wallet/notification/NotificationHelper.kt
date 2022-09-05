@@ -69,6 +69,7 @@ class NotificationHelper(private val context: Context) {
     }
 
     private var notificationManager = NotificationManagerCompat.from(context)
+    private val logger = Logger.t(NotificationHelper::class.simpleName)
 
     fun createNotificationChannels() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -95,6 +96,7 @@ class NotificationHelper(private val context: Context) {
                 importance = NotificationManager.IMPORTANCE_HIGH
             }
             notificationManager.createNotificationChannel(appNotificationChannel)
+            logger.i("Channels was created")
         }
     }
 
@@ -125,6 +127,7 @@ class NotificationHelper(private val context: Context) {
      * Posts custom-layout heads-up transaction notification.
      */
     fun postCustomLayoutTxNotification(tx: Tx) {
+        logger.i("postCustomLayoutTxNotification: ${tx.id}")
         val notificationTitle = context.getString(R.string.notification_tx_received_title)
         // format spannable string
         val formattedAmount = if (tx.amount.tariValue.toDouble() % 1 == 0.toDouble()) tx.amount.tariValue.toBigInteger().toString()
@@ -161,7 +164,7 @@ class NotificationHelper(private val context: Context) {
     }
 
     fun postTxCanceledNotification(tx: CancelledTx) {
-        Logger.i("postTxCanceledNotification: $tx")
+        logger.i("postTxCanceledNotification: ${tx.id}")
         val layout = TxCanceledViewHolder(context, tx)
         val intent = Intent(context, NotificationBroadcastReceiver::class.java).apply {
             flags = FLAG_ACTIVITY_CLEAR_TOP

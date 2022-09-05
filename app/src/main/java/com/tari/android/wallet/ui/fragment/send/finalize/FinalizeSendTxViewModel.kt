@@ -2,7 +2,6 @@ package com.tari.android.wallet.ui.fragment.send.finalize
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import com.orhanobut.logger.Logger
 import com.tari.android.wallet.R.string.*
 import com.tari.android.wallet.event.Event
 import com.tari.android.wallet.event.EventBus
@@ -141,7 +140,6 @@ class FinalizeSendTxViewModel : CommonViewModel() {
             val torProxyState = EventBus.torProxyState.publishSubject.value
             // check internet connection
             if (networkConnectionState != NetworkConnectionState.CONNECTED) {
-                Logger.w("Send error: not connected to the internet.")
                 // either not connected or Tor proxy is not running
                 txFailureReason.value = TxFailureReason.NETWORK_CONNECTION_ERROR
                 isCompleted = true
@@ -149,7 +147,6 @@ class FinalizeSendTxViewModel : CommonViewModel() {
             }
             // check whether Tor proxy is running
             if (torProxyState !is TorProxyState.Running) {
-                Logger.w("Send error: Tor proxy is not running.")
                 // either not connected or Tor proxy is not running
                 txFailureReason.value = TxFailureReason.NETWORK_CONNECTION_ERROR
                 isCompleted = true
@@ -157,7 +154,6 @@ class FinalizeSendTxViewModel : CommonViewModel() {
             }
             // check Tor bootstrap status
             if (torProxyState.bootstrapStatus.progress < TorBootstrapStatus.maxProgress) {
-                Logger.d("Tor proxy not ready - start waiting.")
                 // subscribe to Tor proxy state changes - start waiting on it
                 EventBus.torProxyState.publishSubject.subscribe { state -> onTorProxyStateChanged(state) }.addTo(compositeDisposable)
             } else {
@@ -222,7 +218,6 @@ class FinalizeSendTxViewModel : CommonViewModel() {
 
         private fun onDirectSendResult(txId: TxId, status: TransactionSendStatus) {
             if (sentTxId.value != txId) {
-                Logger.d("Response received for another tx with id: ${txId.value}.")
                 return
             }
             if (status.isSuccess) {

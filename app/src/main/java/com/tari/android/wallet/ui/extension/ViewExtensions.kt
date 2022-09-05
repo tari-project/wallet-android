@@ -54,7 +54,6 @@ import androidx.fragment.app.FragmentTransaction
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.airbnb.lottie.LottieAnimationView
-import com.orhanobut.logger.Logger
 import com.tari.android.wallet.R
 import com.tari.android.wallet.ui.dialog.modular.DialogArgs
 import com.tari.android.wallet.ui.dialog.modular.ModularDialog
@@ -94,11 +93,13 @@ fun View.setVisible(visible: Boolean, hideState: Int = View.GONE) {
  * Given the context, displays the standard "no internet connection" dialog.
  */
 fun showInternetConnectionErrorDialog(context: Context) {
-    val args = ModularDialogArgs(DialogArgs(), listOf(
-        HeadModule(context.string(R.string.internet_connection_error_dialog_title)),
-        BodyModule(context.string(R.string.internet_connection_error_dialog_description)),
-        ButtonModule(context.string(R.string.common_close), ButtonStyle.Close)
-    ))
+    val args = ModularDialogArgs(
+        DialogArgs(), listOf(
+            HeadModule(context.string(R.string.internet_connection_error_dialog_title)),
+            BodyModule(context.string(R.string.internet_connection_error_dialog_description)),
+            ButtonModule(context.string(R.string.common_close), ButtonStyle.Close)
+        )
+    )
     ModularDialog(context, args).show()
 }
 
@@ -267,25 +268,21 @@ fun View.temporarilyDisableClick() {
 
 fun AppCompatEditText.setTextSilently(newText: String) {
     if (text.toString() != newText) {
-        try {
+        runCatching {
             var selectionStartPoint = selectionStart
             var selectionEndPoint = selectionEnd
             setText(newText)
             selectionEndPoint = selectionEnd.coerceAtMost(newText.length)
             selectionStartPoint = selectionStart.coerceAtMost(selectionEnd)
             setSelection(selectionStartPoint, selectionEndPoint)
-        } catch (e: Throwable) {
-            Logger.i(e.toString())
         }
     }
 }
 
 fun AppCompatEditText.setSelectionToEnd() {
-    try {
+    runCatching {
         val selectionEndPoint = text.toString().length
         setSelection(selectionEndPoint, selectionEndPoint)
-    } catch (e: Throwable) {
-        Logger.i(e.toString())
     }
 }
 
@@ -298,10 +295,8 @@ private class ClickEnablingRunnable(@NonNull view: View) : Runnable {
 
     override fun run() {
         viewWR.get()?.run {
-            try {
+            runCatching {
                 isClickable = true
-            } catch (e: Throwable) {
-                // no-op
             }
         }
     }

@@ -41,7 +41,6 @@ import android.view.inputmethod.EditorInfo
 import android.widget.TextView
 import androidx.fragment.app.viewModels
 import com.bumptech.glide.Glide
-import com.orhanobut.logger.Logger
 import com.tari.android.wallet.R.color.*
 import com.tari.android.wallet.R.dimen.add_amount_element_text_size
 import com.tari.android.wallet.R.dimen.add_amount_gem_size
@@ -323,22 +322,23 @@ class TxDetailsFragment : CommonFragment<FragmentTxDetailsBinding, TxDetailsView
 
     private fun onTransactionCancel() {
         val tx = viewModel.tx.value!!
-        if (tx is PendingOutboundTx && tx.direction == OUTBOUND && tx.status == PENDING) showTxCancelDialog() else Logger.e(
-            "cancelTransaction was issued, but current transaction is not pending outbound, but rather $tx"
-        )
+        if (tx is PendingOutboundTx && tx.direction == OUTBOUND && tx.status == PENDING)
+            showTxCancelDialog()
     }
 
     private fun showTxCancelDialog() {
         val dialog = ModularDialog(requireContext())
-        val args = ModularDialogArgs(DialogArgs(), listOf(
-            HeadModule(string(common_are_you_sure)),
-            BodyModule(string(tx_details_cancel_dialog_description)),
-            ButtonModule(string(tx_details_cancel_dialog_cancel), ButtonStyle.Normal) {
-                viewModel.cancelTransaction()
-                dialog.dismiss()
-            },
-            ButtonModule(string(tx_details_cancel_dialog_not_cancel), ButtonStyle.Close)
-        ))
+        val args = ModularDialogArgs(
+            DialogArgs(), listOf(
+                HeadModule(string(common_are_you_sure)),
+                BodyModule(string(tx_details_cancel_dialog_description)),
+                ButtonModule(string(tx_details_cancel_dialog_cancel), ButtonStyle.Normal) {
+                    viewModel.cancelTransaction()
+                    dialog.dismiss()
+                },
+                ButtonModule(string(tx_details_cancel_dialog_not_cancel), ButtonStyle.Close)
+            )
+        )
         dialog.applyArgs(args)
         dialog.show()
     }

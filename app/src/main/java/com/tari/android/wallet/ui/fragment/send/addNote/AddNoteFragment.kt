@@ -58,7 +58,6 @@ import com.bumptech.glide.Glide
 import com.daasuu.ei.Ease
 import com.daasuu.ei.EasingInterpolator
 import com.giphy.sdk.core.models.Media
-import com.orhanobut.logger.Logger
 import com.tari.android.wallet.R
 import com.tari.android.wallet.R.color.*
 import com.tari.android.wallet.R.dimen.*
@@ -134,9 +133,8 @@ class AddNoteFragment : Fragment(), View.OnTouchListener {
     private fun initializeGIFsViewModel() {
         viewModel = ViewModelProvider(this)[ThumbnailGIFsViewModel::class.java]
         observe(viewModel.state) {
-            when {
-                it.isSuccessful -> adapter.repopulate(it.gifItems!!)
-                it.isError -> Logger.e("GIFs request had error")
+            if (it.isSuccessful) {
+                adapter.repopulate(it.gifItems!!)
             }
         }
     }

@@ -42,7 +42,6 @@ class GIFViewModel : CommonViewModel() {
             try {
                 _gif.postValue(GIFState(repository.getById(gifId)))
             } catch (e: Exception) {
-                Logger.e(e, "Exception was thrown during gif downloading")
                 _gif.postValue(GIFState(e))
             }
         }

@@ -50,7 +50,6 @@ import android.widget.TextView
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
-import com.orhanobut.logger.Logger
 import com.tari.android.wallet.R.color.*
 import com.tari.android.wallet.R.string.*
 import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
@@ -73,7 +72,7 @@ import kotlinx.coroutines.withContext
 import java.net.UnknownHostException
 import javax.inject.Inject
 
-class ChangeSecurePasswordFragment() : Fragment() {
+class ChangeSecurePasswordFragment : Fragment() {
 
     @Inject
     lateinit var sharedPrefs: SharedPrefsRepository
@@ -340,18 +339,15 @@ class ChangeSecurePasswordFragment() : Fragment() {
     private fun onBackupStateChanged(backupState: BackupState?) {
         if (!subscribedToBackupState) {
             // ignore first call
-            Logger.d("Ignore first state: $backupState")
             subscribedToBackupState = true
             return
         }
-        Logger.d("Backup state changed: $backupState")
         when (backupState) {
             is BackupUpToDate -> { // backup successful
                 allowExitAndPasswordEditing()
                 (requireActivity() as BackupSettingsRouter).onPasswordChanged(this)
             }
             is BackupOutOfDate -> { // backup failed
-                Logger.e(backupState.backupException, "Error during encrypted backup: ${backupState.backupException}")
                 showBackupErrorDialog(deductBackupErrorMessage(backupState.backupException)) {
                     allowExitAndPasswordEditing()
                     setSecurePasswordCtaIdleState()

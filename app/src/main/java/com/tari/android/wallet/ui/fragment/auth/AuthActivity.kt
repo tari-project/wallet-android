@@ -40,8 +40,6 @@ import android.os.Bundle
 import android.view.View
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
-import androidx.biometric.BiometricPrompt.ERROR_CANCELED
-import androidx.biometric.BiometricPrompt.ERROR_USER_CANCELED
 import androidx.core.animation.addListener
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -143,8 +141,6 @@ class AuthActivity : CommonActivity<ActivityAuthBinding, AuthViewModel>() {
                     )
                     authSuccessful()
                 } catch (e: BiometricAuthenticationException) {
-                    if (e.code != ERROR_USER_CANCELED && e.code != ERROR_CANCELED)
-                        Logger.e("Other biometric error. Code: ${e.code}")
                     authHasFailed()
                 }
             }
@@ -166,7 +162,6 @@ class AuthActivity : CommonActivity<ActivityAuthBinding, AuthViewModel>() {
      * Auth has failed.
      */
     private fun authHasFailed() {
-        Logger.e("Authentication other error.")
         displayAuthFailedDialog()
     }
 

@@ -4,7 +4,6 @@ import android.content.Intent
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import com.orhanobut.logger.Logger
 import com.tari.android.wallet.R
 import com.tari.android.wallet.data.sharedPrefs.tariSettings.TariSettingsSharedRepository
 import com.tari.android.wallet.event.EventBus
@@ -104,7 +103,7 @@ class BackupSettingsViewModel : CommonViewModel() {
                 _blockedBackPressed.postValue(true)
                 backupManager.backup(isInitialBackup = true)
             } catch (exception: Exception) {
-                Logger.e("Backup storage setup failed: $exception")
+                logger.e(exception, "Backup storage setup failed")
                 backupManager.turnOff(deleteExistingBackups = true)
                 _inProgress.postValue(false)
                 _backupPermissionSwitchChecked.postValue(false)
@@ -158,8 +157,8 @@ class BackupSettingsViewModel : CommonViewModel() {
                 try {
                     //todo looks not finished
                     backupManager.turnOff(deleteExistingBackups = true)
-                } catch (exception: Exception) {
-                    Logger.i(exception.toString())
+                } catch (exception: Throwable) {
+                    logger.e(exception, "Turning off was failed")
                 }
             }
         }

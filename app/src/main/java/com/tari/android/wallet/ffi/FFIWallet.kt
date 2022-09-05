@@ -32,7 +32,6 @@
  */
 package com.tari.android.wallet.ffi
 
-import com.orhanobut.logger.Logger
 import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepository
 import com.tari.android.wallet.model.*
@@ -59,7 +58,6 @@ class FFIWallet(
 ) : FFIBase() {
 
     private var balance: BalanceInfo = BalanceInfo()
-    private val logger = Logger.t(FFIWallet::class.simpleName)
 
     companion object {
         private var atomicInstance = AtomicReference<FFIWallet>()

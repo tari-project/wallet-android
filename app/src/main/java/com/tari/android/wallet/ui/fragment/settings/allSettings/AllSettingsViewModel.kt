@@ -3,7 +3,6 @@ package com.tari.android.wallet.ui.fragment.settings.allSettings
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import com.orhanobut.logger.Logger
 import com.tari.android.wallet.R.color.*
 import com.tari.android.wallet.R.drawable.*
 import com.tari.android.wallet.R.string.*
@@ -151,14 +150,14 @@ class AllSettingsViewModel : CommonViewModel() {
         try {
             backupManager.checkStorageStatus()
         } catch (e: BackupStorageAuthRevokedException) {
-            Logger.e("Backup storage auth error.")
+            logger.e(e, "Backup storage auth error")
             // show access revoked information
             showBackupStorageCheckFailedDialog(resourceManager.getString(check_backup_storage_status_auth_revoked_error_description))
         } catch (e: IOException) {
-            Logger.e("Backup storage I/O (access) error.")
+            logger.e(e, "Backup storage I/O (access) error")
             showBackupStorageCheckFailedDialog(resourceManager.getString(check_backup_storage_status_access_error_description))
         } catch (e: Exception) {
-            Logger.e("Backup storage tampered.")
+            logger.e(e, "Backup storage tampered")
             updateLastSuccessfulBackupDate()
         }
     }

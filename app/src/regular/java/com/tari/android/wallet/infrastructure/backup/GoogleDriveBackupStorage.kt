@@ -70,6 +70,7 @@ class GoogleDriveBackupStorage(
     private val backupFileProcessor: BackupFileProcessor
 ) : BackupStorage {
 
+    private val logger = Logger.t(GoogleDriveBackupStorage::class.simpleName)
     private val googleClient: GoogleSignInClient = GoogleSignIn.getClient(
         context,
         GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
@@ -163,10 +164,7 @@ class GoogleDriveBackupStorage(
                 // delete older backups
                 deleteAllBackupFiles(excludeBackupWithDate = backupDate)
             } catch (e: Exception) {
-                Logger.e(
-                    e,
-                    "Ignorable backup error while clearing temporary and old files."
-                )
+                logger.e(e, "Cleaning old files")
             }
             return@withContext backupDate
         }
