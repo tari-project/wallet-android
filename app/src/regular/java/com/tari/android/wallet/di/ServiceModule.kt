@@ -35,4 +35,4 @@ package com.tari.android.wallet.di
 import dagger.Module
 
 @Module(includes = [RESTModule::class])
-internal class ServiceModule
+class ServiceModule

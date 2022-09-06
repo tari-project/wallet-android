@@ -58,7 +58,7 @@ import org.joda.time.DateTime
 import org.joda.time.format.DateTimeFormat
 import java.util.*
 
-internal class BackupSettingsFragment : CommonFragment<FragmentWalletBackupSettingsBinding, BackupSettingsViewModel>() {
+class BackupSettingsFragment : CommonFragment<FragmentWalletBackupSettingsBinding, BackupSettingsViewModel>() {
 
     private var optionsAnimation: Animator? = null
 

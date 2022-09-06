@@ -37,7 +37,7 @@ package com.tari.android.wallet.ffi
  *
  * @author The Tari Development Team
  */
-internal class FFICompletedTxKernel() : FFIBase() {
+class FFICompletedTxKernel() : FFIBase() {
 
     private external fun jniGetExcess(libError: FFIError): String
     private external fun jniGetExcessPublicNonce(libError: FFIError): String

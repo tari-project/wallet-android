@@ -38,11 +38,11 @@ open class WalletError : CoreError {
             override fun newArray(size: Int): Array<CoreError?> = arrayOfNulls(size)
         }
 
-        internal fun createFromFFI(error: FFIError): WalletError = WalletError(error.code)
+        fun createFromFFI(error: FFIError): WalletError = WalletError(error.code)
 
-        internal fun createFromFFI(error: FFIException): WalletError = WalletError(error.error?.code ?: NoError.code)
+        fun createFromFFI(error: FFIException): WalletError = WalletError(error.error?.code ?: NoError.code)
 
-        internal fun createFromException(e: Throwable?): WalletError {
+        fun createFromException(e: Throwable?): WalletError {
             if (e is FFIException) {
                 return createFromFFI(e)
             } else if (e is WalletException) {
@@ -53,7 +53,7 @@ open class WalletError : CoreError {
     }
 }
 
-internal fun throwIf(error: CoreError?) {
+fun throwIf(error: CoreError?) {
     if (error != null && error.code != 0) {
         throw WalletException(error)
     }

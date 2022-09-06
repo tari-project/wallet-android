@@ -40,20 +40,20 @@ import java.math.BigInteger
  *
  * @return mapped float
  */
-internal fun Float.remap(from1: Float, to1: Float, from2: Float, to2: Float): Float {
+fun Float.remap(from1: Float, to1: Float, from2: Float, to2: Float): Float {
     return (this - from1) / (to1 - from1) * (to2 - from2) + from2
 }
 
 /**
  * Int to MicroTari.
  */
-internal fun Int.toMicroTari(): MicroTari {
+fun Int.toMicroTari(): MicroTari {
     return MicroTari(BigInteger.valueOf(this.toLong()))
 }
 
 /**
  * Long to MicroTari.
  */
-internal fun Long.toMicroTari(): MicroTari {
+fun Long.toMicroTari(): MicroTari {
     return MicroTari(BigInteger.valueOf(this))
 }

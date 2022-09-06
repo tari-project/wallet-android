@@ -43,7 +43,7 @@ import java.util.*
  *
  * @author The Tari Development Team
  */
-internal object WalletUtil {
+object WalletUtil {
 
     val balanceFormatter = DecimalFormat("#,##0.00").apply {
         roundingMode = RoundingMode.FLOOR

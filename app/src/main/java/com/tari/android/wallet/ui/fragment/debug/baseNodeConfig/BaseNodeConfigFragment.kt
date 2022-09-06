@@ -50,7 +50,7 @@ import com.tari.android.wallet.ui.extension.setOnThrottledClickListener
  *
  * @author The Tari Development Team
  */
-internal class BaseNodeConfigFragment : CommonFragment<FragmentBaseNodeConfigBinding, BaseNodeConfigViewModel>() {
+class BaseNodeConfigFragment : CommonFragment<FragmentBaseNodeConfigBinding, BaseNodeConfigViewModel>() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
         FragmentBaseNodeConfigBinding.inflate(inflater, container, false).also { ui = it }.root

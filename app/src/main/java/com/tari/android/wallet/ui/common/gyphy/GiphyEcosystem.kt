@@ -37,10 +37,7 @@ import com.giphy.sdk.core.models.Media
 import com.giphy.sdk.ui.Giphy
 import java.util.concurrent.ConcurrentHashMap
 
-internal class GiphyEcosystem(
-    private val context: Context,
-    private val key: String
-) {
+class GiphyEcosystem(private val context: Context, private val key: String) {
 
     companion object {
 

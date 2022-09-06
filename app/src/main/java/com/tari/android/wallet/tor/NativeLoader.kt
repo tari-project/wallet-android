@@ -1,7 +1,7 @@
 package com.tari.android.wallet.tor
 
 import android.os.Build
-import timber.log.Timber
+import com.orhanobut.logger.Logger
 import java.io.File
 import java.io.FileOutputStream
 import java.io.InputStream
@@ -10,7 +10,7 @@ import java.util.zip.ZipFile
 
 object NativeLoader {
 
-    private const val TAG = "TorNativeLoader"
+    private val logger = Logger.t("TorNativeLoader")
 
     private fun loadFromZip(appSourceDir: File, libName: String, destLocalFile: File, arch: String): Boolean {
 
@@ -46,13 +46,13 @@ object NativeLoader {
 
             return true
         } catch (e: Exception) {
-            Timber.e(e, TAG)
+            logger.e(e, "Load from zip")
         } finally {
             if (stream != null) {
                 try {
                     stream.close()
                 } catch (e: Exception) {
-                    Timber.e(e, TAG)
+                    logger.e(e, "Closing stream")
                 }
             }
 
@@ -60,7 +60,7 @@ object NativeLoader {
                 try {
                     zipFile.close()
                 } catch (e: Exception) {
-                    Timber.e(e, TAG)
+                    logger.e(e, "closing zip file")
                 }
             }
         }
@@ -94,7 +94,7 @@ object NativeLoader {
             }
 
         } catch (e: Throwable) {
-            Timber.e(e, TAG)
+            logger.e(e, "loading native binary")
         }
 
         return null

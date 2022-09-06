@@ -16,7 +16,7 @@ class CustomTorBridgesViewModel : CommonViewModel() {
     lateinit var torSharedRepository: TorSharedRepository
 
     @Inject
-    internal lateinit var walletManager: WalletManager
+    lateinit var walletManager: WalletManager
 
     init {
         component.inject(this)

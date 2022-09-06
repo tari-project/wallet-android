@@ -49,9 +49,11 @@ import com.tari.android.wallet.ui.common.domain.ResourceManager
  */
 class BootDeviceReceiver : BroadcastReceiver() {
 
+    private val logger = Logger.t(BootDeviceReceiver::class.simpleName)
+
     override fun onReceive(context: Context?, intent: Intent?) {
         if (context == null || intent == null) return
-        Logger.d("Boot device broadcast received.")
+        logger.i("Boot device broadcast received")
         if (Intent.ACTION_BOOT_COMPLETED == intent.action) {
             val resourceManager = ResourceManager(context)
             val sharedPreferences = context.getSharedPreferences(ApplicationModule.sharedPrefsFileName, Context.MODE_PRIVATE)

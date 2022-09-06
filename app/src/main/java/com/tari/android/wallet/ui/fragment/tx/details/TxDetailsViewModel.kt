@@ -2,7 +2,6 @@ package com.tari.android.wallet.ui.fragment.tx.details
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.orhanobut.logger.Logger
 import com.tari.android.wallet.R
 import com.tari.android.wallet.event.Event
 import com.tari.android.wallet.event.EventBus
@@ -124,7 +123,6 @@ class TxDetailsViewModel : CommonViewModel() {
 
     private fun updateTxData(tx: Tx) {
         if (tx.id == this.tx.value?.id) {
-            Logger.d("Updating TX\nOld: ${this.tx.value}\nNew: $tx")
             setTxArg(tx)
         }
     }

@@ -16,7 +16,9 @@ class NetworkRepositoryImpl(private val resourceManager: ResourceManager, shared
     override var currentNetwork by SharedPrefGsonDelegate(sharedPrefs, Keys.currentNetwork, TariNetwork::class.java)
 
     init {
-        if (currentNetwork == null) {
+        try {
+            currentNetwork!!.network.displayName
+        } catch (e: Throwable) {
             currentNetwork = getEsmeralda(resourceManager)
         }
     }

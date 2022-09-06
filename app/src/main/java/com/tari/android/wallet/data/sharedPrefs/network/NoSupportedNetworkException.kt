@@ -1,3 +1,3 @@
 package com.tari.android.wallet.data.sharedPrefs.network
 
-class NoSupportedNetworkException: Exception()
+class NoSupportedNetworkException(val network: String): Exception(network)

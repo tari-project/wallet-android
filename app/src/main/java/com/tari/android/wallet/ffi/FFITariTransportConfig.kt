@@ -38,7 +38,7 @@ package com.tari.android.wallet.ffi
  *
  * @author The Tari Development Team
  */
-internal class FFITariTransportConfig() : FFIBase() {
+class FFITariTransportConfig() : FFIBase() {
 
     // region JNI
     private external fun jniMemoryTransport()

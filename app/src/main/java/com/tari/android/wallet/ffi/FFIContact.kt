@@ -32,14 +32,14 @@
  */
 package com.tari.android.wallet.ffi
 
-internal typealias FFIContactPtr = Long
+typealias FFIContactPtr = Long
 
 /**
  * Tari contact wrapper.
  *
  * @author The Tari Development Team
  */
-internal class FFIContact() : FFIBase() {
+class FFIContact() : FFIBase() {
 
     // region JNI
 

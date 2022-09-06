@@ -43,19 +43,19 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.core.content.ContextCompat
 
-internal fun Context.string(@StringRes id: Int): String = resources.getString(id)
+fun Context.string(@StringRes id: Int): String = resources.getString(id)
 
-internal fun Context.string(@StringRes id: Int, vararg formatArgs: Any): String = resources.getString(id, *formatArgs)
+fun Context.string(@StringRes id: Int, vararg formatArgs: Any): String = resources.getString(id, *formatArgs)
 
-internal fun Context.color(@ColorRes id: Int): Int = ContextCompat.getColor(this, id)
+fun Context.color(@ColorRes id: Int): Int = ContextCompat.getColor(this, id)
 
-internal fun Context.dimenPx(@DimenRes id: Int): Int = resources.getDimensionPixelSize(id)
+fun Context.dimenPx(@DimenRes id: Int): Int = resources.getDimensionPixelSize(id)
 
-internal fun Context.dimen(@DimenRes id: Int): Float = resources.getDimension(id)
+fun Context.dimen(@DimenRes id: Int): Float = resources.getDimension(id)
 
-internal fun Context.dpToPx(dp: Float): Float = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, resources?.displayMetrics)
+fun Context.dpToPx(dp: Float): Float = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, resources?.displayMetrics)
 
-internal fun Context.drawable(@DrawableRes id: Int): Drawable? = ContextCompat.getDrawable(this, id)
+fun Context.drawable(@DrawableRes id: Int): Drawable? = ContextCompat.getDrawable(this, id)
 
 
 /**

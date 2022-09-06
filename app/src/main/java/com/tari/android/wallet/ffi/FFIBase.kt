@@ -32,8 +32,12 @@
  */
 package com.tari.android.wallet.ffi
 
-internal typealias FFIPointer = Long
-internal const val nullptr = 0L
+import com.orhanobut.logger.Logger
+import com.orhanobut.logger.Printer
+
+typealias FFIPointer = Long
+
+const val nullptr = 0L
 
 /**
  * Base class for FFI native peer entities.
@@ -45,6 +49,8 @@ abstract class FFIBase {
 
     var pointer = nullptr
         protected set
+
+    protected val logger: Printer = Logger.t(this::class.simpleName)
 
     abstract fun destroy()
 

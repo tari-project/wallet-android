@@ -37,7 +37,7 @@ package com.tari.android.wallet.ffi
  *
  * @author The Tari Development Team
  */
-internal class FFITariCommitmentSignature() : FFIBase() {
+class FFITariCommitmentSignature() : FFIBase() {
 
     // region JNI
 
