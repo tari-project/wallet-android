@@ -10,11 +10,12 @@ import java.io.File
  * @author The Tari Development Team
  */
 
-class WalletConfig(val context: Context, val networkRepository: NetworkRepository){
+class WalletConfig(val context: Context, val networkRepository: NetworkRepository) {
     val walletDBName: String = "tari_wallet_${networkRepository.currentNetwork!!.network.uriComponent}"
     val walletDBFullFileName: String = "$walletDBName.sqlite3"
 
     private val logFilePrefix = "tari_aurora"
+    private val applicationLogs = "tari_application"
     private val logFileExtension = "log"
     private val logFilesDirName = "tari_logs"
 
@@ -38,19 +39,19 @@ class WalletConfig(val context: Context, val networkRepository: NetworkRepositor
         return logFilesDir.absolutePath
     }
 
-    /**
-     * FFI log file path.
-     */
-    fun getWalletLogFilePath(): String {
-        val logFileName = "$logFilePrefix.$logFileExtension"
-        val logFile = File(getWalletLogFilesDirPath(), logFileName)
-        if (!logFile.exists()) {
-            logFile.createNewFile()
+    fun getWalletLogFilePath(): String = getOrCreateFilePath(getWalletLogFilesDirPath(), "$logFilePrefix.$logFileExtension")
+
+    fun getApplicationLogsFilePath(): String = getOrCreateFilePath(getWalletFilesDirPath(), "$applicationLogs.$logFileExtension")
+
+    private fun getOrCreateFilePath(dirPath: String, fileName: String): String {
+        val file = File(dirPath, fileName)
+        if (!file.exists()) {
+            file.createNewFile()
         }
-        return logFile.absolutePath
+        return file.absolutePath
     }
 
-    fun getWalletTempDirPath() : String {
+    fun getWalletTempDirPath(): String {
         val tempDir = File(getWalletFilesDirPath(), "temp")
         if (!tempDir.exists()) tempDir.mkdir()
         return tempDir.absolutePath

@@ -4,7 +4,7 @@ import com.tari.android.wallet.R
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.dialog.confirm.ConfirmDialogArgs
 
-internal class QuestionMarkViewModel : CommonViewModel() {
+class QuestionMarkViewModel : CommonViewModel() {
     fun showUniversityDialog() {
         val confirmDialogArgs = ConfirmDialogArgs(
             resourceManager.getString(R.string.home_balance_info_help_title),

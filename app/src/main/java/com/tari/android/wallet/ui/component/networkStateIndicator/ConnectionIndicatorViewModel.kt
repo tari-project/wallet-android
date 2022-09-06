@@ -17,7 +17,7 @@ import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonModule
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonStyle
 import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
 
-internal class ConnectionIndicatorViewModel : CommonViewModel() {
+class ConnectionIndicatorViewModel : CommonViewModel() {
 
     private val _networkState = MutableLiveData<NetworkConnectionState>()
     private val _torProxyState = MutableLiveData<TorProxyState>()

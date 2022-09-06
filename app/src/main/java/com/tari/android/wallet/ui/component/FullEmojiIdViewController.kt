@@ -57,7 +57,7 @@ import me.everything.android.ui.overscroll.OverScrollDecoratorHelper
  *
  * @author The Tari Development Team
  */
-internal class FullEmojiIdViewController(
+class FullEmojiIdViewController(
     private val ui: ViewFullEmojiIdBinding,
     summary: ViewEmojiIdSummaryBinding,
     private val context: Context,

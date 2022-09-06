@@ -57,7 +57,7 @@ import kotlin.math.min
  *
  * @author The Tari Development Team
  */
-internal class CustomScrollView @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0) :
+class CustomScrollView @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0) :
     ScrollView(context, attrs, defStyleAttr) {
 
     var flingIsRunning = false

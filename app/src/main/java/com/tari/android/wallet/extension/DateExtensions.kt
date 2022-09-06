@@ -41,7 +41,7 @@ import java.util.*
  * @author The Tari Development Team
  */
 
-internal fun Date.txFormattedDate(): String {
+fun Date.txFormattedDate(): String {
     val cal: Calendar = Calendar.getInstance()
     cal.time = this
     val day: Int = cal.get(Calendar.DATE)

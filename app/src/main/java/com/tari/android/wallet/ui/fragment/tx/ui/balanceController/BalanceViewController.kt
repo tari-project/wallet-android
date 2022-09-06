@@ -46,7 +46,7 @@ import java.lang.ref.WeakReference
  *
  * @author The Tari Development Team
  */
-internal class BalanceViewController(
+class BalanceViewController(
     private val context: Context,
     private val digitContainerView: ViewGroup,
     decimalDigitContainerView: ViewGroup,

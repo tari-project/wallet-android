@@ -16,7 +16,9 @@ class NetworkRepositoryImpl(private val resourceManager: ResourceManager, shared
     override var currentNetwork by SharedPrefGsonDelegate(sharedPrefs, Keys.currentNetwork, TariNetwork::class.java)
 
     init {
-        if (currentNetwork == null) {
+        try {
+            currentNetwork!!.network.displayName
+        } catch (e: Throwable) {
             currentNetwork = getDibbler(resourceManager)
         }
     }
@@ -26,6 +28,7 @@ class NetworkRepositoryImpl(private val resourceManager: ResourceManager, shared
     override var incompatibleNetworkShown by SharedPrefBooleanDelegate(sharedPrefs, formatKey(Keys.networkIncompatible), false)
 
     override fun getAllNetworks(): List<TariNetwork> = listOf(getDibbler(resourceManager))
+
     object Keys {
         const val currentNetwork = "tari_current_network"
         const val ffiNetwork = "ffi_tari_current_network"

@@ -68,7 +68,6 @@ import com.tari.android.wallet.databinding.FragmentAddRecipientBinding
 import com.tari.android.wallet.di.DiContainer.appComponent
 import com.tari.android.wallet.extension.observe
 import com.tari.android.wallet.extension.observeOnLoad
-import com.tari.android.wallet.infrastructure.Tracker
 import com.tari.android.wallet.model.PublicKey
 import com.tari.android.wallet.ui.common.CommonFragment
 import com.tari.android.wallet.ui.common.domain.ResourceManager
@@ -94,9 +93,6 @@ import kotlin.math.min
 class AddRecipientFragment : CommonFragment<FragmentAddRecipientBinding, AddRecipientViewModel>(),
     RecyclerView.OnItemTouchListener,
     TextWatcher {
-
-    @Inject
-    lateinit var tracker: Tracker
 
     @Inject
     lateinit var sharedPrefsWrapper: SharedPrefsRepository
@@ -154,9 +150,6 @@ class AddRecipientFragment : CommonFragment<FragmentAddRecipientBinding, AddReci
         ui.searchEditText.setRawInputType(InputType.TYPE_CLASS_TEXT)
         ui.searchEditText.addTextChangedListener(this@AddRecipientFragment)
 
-        if (savedInstanceState == null) {
-            tracker.screen(path = "/home/send_tari/add_recipient", title = "Send Tari - Add Recipient")
-        }
         subscribeViewModal()
     }
 

@@ -87,7 +87,7 @@ import java.lang.ref.WeakReference
 import kotlin.math.max
 import kotlin.math.min
 
-internal class TxListFragment : CommonFragment<FragmentTxListBinding, TxListViewModel>(),
+class TxListFragment : CommonFragment<FragmentTxListBinding, TxListViewModel>(),
     View.OnScrollChangeListener,
     View.OnTouchListener,
     CustomScrollView.Listener,
@@ -117,8 +117,6 @@ internal class TxListFragment : CommonFragment<FragmentTxListBinding, TxListView
 
         val viewModel: TxListViewModel by viewModels()
         bindViewModel(viewModel)
-
-        if (savedInstanceState == null) viewModel.tracker.screen("/home", "Home - Transaction List")
 
         setupUI()
         subscribeToEventBus()

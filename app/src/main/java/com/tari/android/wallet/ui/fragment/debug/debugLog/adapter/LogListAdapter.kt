@@ -30,41 +30,29 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.tari.android.wallet.di
+package com.tari.android.wallet.ui.fragment.debug.debugLog.adapter
 
-import android.content.Context
-import com.tari.android.wallet.BuildConfig
-import com.tari.android.wallet.infrastructure.ConsoleLogTracker
-import com.tari.android.wallet.infrastructure.MatomoTracker
-import com.tari.android.wallet.infrastructure.Tracker
-import dagger.Module
-import dagger.Provides
-import org.matomo.sdk.Matomo
-import org.matomo.sdk.TrackerBuilder
-import javax.inject.Singleton
+import android.view.LayoutInflater
+import android.view.ViewGroup
+import androidx.recyclerview.widget.RecyclerView
+import com.tari.android.wallet.R
 
-/**
- * Satisfies tracker dependencies.
- *
- * @author The Tari Development Team
- */
-@Module
-internal class TrackerModule {
+class LogListAdapter(val logLines: MutableList<String> = mutableListOf()) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
-    companion object {
+    private val regex = Regex("(\\d{4}-\\d{2}-\\d{2}\\s\\d{2}:\\d{2}:\\d{2}\\.\\d+)\\s(\\[[^]]+])\\s(\\[[^]]+]\\s)?([A-Z]+)\\s(.+)")
 
-        private const val matomoUrl = "https://matomo.tari.com/matomo.php"
-        private const val matomoSiteId = 2
+    override fun getItemCount() = logLines.size
 
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder =
+        LogViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.item_log, parent, false))
+
+    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+        if (regex.matches(logLines[position])) {
+            val matchResult = regex.find(logLines[position])
+            val (timestamp, source1, source2, level, log) = matchResult!!.destructured
+            (holder as LogViewHolder).bind(timestamp, source1, source2, level, log)
+        } else {
+            (holder as LogViewHolder).bind(logLines[position])
+        }
     }
-
-    @Provides
-    @Singleton
-    fun provideTracker(context: Context): Tracker =
-        if (BuildConfig.DEBUG) ConsoleLogTracker()
-        else MatomoTracker(
-            TrackerBuilder.createDefault(matomoUrl, matomoSiteId)
-                .build(Matomo.getInstance(context))
-                .apply { dispatchInterval = 0 }
-        )
 }

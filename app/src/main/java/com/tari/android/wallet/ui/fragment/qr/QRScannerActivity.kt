@@ -46,15 +46,13 @@ import com.google.zxing.BarcodeFormat
 import com.tari.android.wallet.R
 import com.tari.android.wallet.databinding.ActivityQrScannerBinding
 import com.tari.android.wallet.di.DiContainer.appComponent
-import com.tari.android.wallet.infrastructure.Tracker
-import javax.inject.Inject
 
 /**
  * QR code scanner activity - used to add a recipient by QR code.
  *
  * @author The Tari Development Team
  */
-internal class QRScannerActivity : AppCompatActivity() {
+class QRScannerActivity : AppCompatActivity() {
 
     companion object {
         /**
@@ -65,9 +63,6 @@ internal class QRScannerActivity : AppCompatActivity() {
         private const val REQUEST_CAMERA_PERMISSION = 102
         const val EXTRA_QR_DATA = "extra_qr_text"
     }
-
-    @Inject
-    lateinit var tracker: Tracker
 
     private lateinit var codeScanner: CodeScanner
 
@@ -82,9 +77,6 @@ internal class QRScannerActivity : AppCompatActivity() {
             ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.CAMERA), REQUEST_CAMERA_PERMISSION)
         } else {
             startScanning()
-            if (savedInstanceState == null) {
-                tracker.screen(path = "/home/send_tari/add_recipient/qr_scan", title = "Send Tari - Add Recipient - Scan QR Code")
-            }
         }
     }
 
@@ -120,11 +112,7 @@ internal class QRScannerActivity : AppCompatActivity() {
         ui.scannerView.setOnClickListener { codeScanner.startPreview() }
     }
 
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<String>,
-        grantResults: IntArray
-    ) {
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (requestCode == REQUEST_CAMERA_PERMISSION) {
             if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {

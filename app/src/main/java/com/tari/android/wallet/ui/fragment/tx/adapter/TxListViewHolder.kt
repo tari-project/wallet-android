@@ -27,7 +27,7 @@ import org.joda.time.LocalDate
 import org.joda.time.Minutes
 import java.util.*
 
-internal class TxListViewHolder(view: ItemHomeTxListBinding) : CommonViewHolder<TransactionItem, ItemHomeTxListBinding>(view), GIFStateConsumer {
+class TxListViewHolder(view: ItemHomeTxListBinding) : CommonViewHolder<TransactionItem, ItemHomeTxListBinding>(view), GIFStateConsumer {
 
     private val glide = Glide.with(itemView.context)
     private val emojiIdSummaryController = EmojiIdSummaryViewController(ui.participantEmojiIdView)

@@ -49,7 +49,7 @@ import com.tari.android.wallet.tor.TorProxyState
  *      // op.s
  * }
  */
-internal object EventBus : GeneralEventBus() {
+object EventBus : GeneralEventBus() {
 
     //todo looks like better to have it into appropriate classes than here
     val torProxyState = BehaviorEventBus<TorProxyState>()

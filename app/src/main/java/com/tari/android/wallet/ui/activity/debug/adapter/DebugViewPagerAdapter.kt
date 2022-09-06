@@ -37,14 +37,14 @@ import androidx.fragment.app.FragmentActivity
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.tari.android.wallet.ui.fragment.debug.AboutFragment
 import com.tari.android.wallet.ui.fragment.debug.baseNodeConfig.BaseNodeConfigFragment
-import com.tari.android.wallet.ui.fragment.debug.DebugLogFragment
+import com.tari.android.wallet.ui.fragment.debug.debugLog.DebugLogFragment
 
 /**
  * Fragment pager adapter for debug activity.
  *
  * @author The Tari Development Team
  */
-internal class DebugViewPagerAdapter(activity: FragmentActivity) : FragmentStateAdapter(activity) {
+class DebugViewPagerAdapter(activity: FragmentActivity) : FragmentStateAdapter(activity) {
 
     /**
      * Logs and base node configuration.

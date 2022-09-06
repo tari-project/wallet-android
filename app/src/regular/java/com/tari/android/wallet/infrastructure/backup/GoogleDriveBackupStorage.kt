@@ -62,7 +62,7 @@ import java.io.FileOutputStream
 import java.io.IOException
 import kotlin.coroutines.suspendCoroutine
 
-internal class GoogleDriveBackupStorage(
+class GoogleDriveBackupStorage(
     private val context: Context,
     private val namingPolicy: BackupNamingPolicy,
     private val backupSettingsRepository: BackupSettingsRepository,
@@ -70,6 +70,7 @@ internal class GoogleDriveBackupStorage(
     private val backupFileProcessor: BackupFileProcessor
 ) : BackupStorage {
 
+    private val logger = Logger.t(GoogleDriveBackupStorage::class.simpleName)
     private val googleClient: GoogleSignInClient = GoogleSignIn.getClient(
         context,
         GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
@@ -163,10 +164,7 @@ internal class GoogleDriveBackupStorage(
                 // delete older backups
                 deleteAllBackupFiles(excludeBackupWithDate = backupDate)
             } catch (e: Exception) {
-                Logger.e(
-                    e,
-                    "Ignorable backup error while clearing temporary and old files."
-                )
+                logger.e(e, "Cleaning old files")
             }
             return@withContext backupDate
         }

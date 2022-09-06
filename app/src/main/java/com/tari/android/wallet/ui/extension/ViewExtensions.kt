@@ -54,7 +54,6 @@ import androidx.fragment.app.FragmentTransaction
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.airbnb.lottie.LottieAnimationView
-import com.orhanobut.logger.Logger
 import com.tari.android.wallet.R
 import com.tari.android.wallet.ui.dialog.modular.DialogArgs
 import com.tari.android.wallet.ui.dialog.modular.ModularDialog
@@ -68,37 +67,39 @@ import java.lang.ref.WeakReference
 import android.animation.Animator as LegacyAnimator
 import android.animation.Animator.AnimatorListener as LegacyAnimatorListener
 
-internal fun RecyclerView.isScrolledToTop(): Boolean {
+fun RecyclerView.isScrolledToTop(): Boolean {
     val layoutManager = (layoutManager as? LinearLayoutManager) ?: return false
     if (layoutManager.childCount == 0) return true
     return (layoutManager.findFirstVisibleItemPosition() == 0 && layoutManager.findViewByPosition(0)?.top == 0)
 }
 
-internal fun View.visible() {
+fun View.visible() {
     this.visibility = View.VISIBLE
 }
 
-internal fun View.invisible() {
+fun View.invisible() {
     this.visibility = View.INVISIBLE
 }
 
-internal fun View.gone() {
+fun View.gone() {
     this.visibility = View.GONE
 }
 
-internal fun View.setVisible(visible: Boolean, hideState: Int = View.GONE) {
+fun View.setVisible(visible: Boolean, hideState: Int = View.GONE) {
     visibility = if (visible) View.VISIBLE else hideState
 }
 
 /**
  * Given the context, displays the standard "no internet connection" dialog.
  */
-internal fun showInternetConnectionErrorDialog(context: Context) {
-    val args = ModularDialogArgs(DialogArgs(), listOf(
-        HeadModule(context.string(R.string.internet_connection_error_dialog_title)),
-        BodyModule(context.string(R.string.internet_connection_error_dialog_description)),
-        ButtonModule(context.string(R.string.common_close), ButtonStyle.Close)
-    ))
+fun showInternetConnectionErrorDialog(context: Context) {
+    val args = ModularDialogArgs(
+        DialogArgs(), listOf(
+            HeadModule(context.string(R.string.internet_connection_error_dialog_title)),
+            BodyModule(context.string(R.string.internet_connection_error_dialog_description)),
+            ButtonModule(context.string(R.string.common_close), ButtonStyle.Close)
+        )
+    )
     ModularDialog(context, args).show()
 }
 
@@ -106,7 +107,7 @@ internal fun showInternetConnectionErrorDialog(context: Context) {
  * Sets the width of a TextView to the measured width of its contents
  * taking into account the text size and the typeface.
  */
-internal fun TextView.setWidthToMeasured() {
+fun TextView.setWidthToMeasured() {
     measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED)
     setLayoutWidth(measuredWidth)
 }
@@ -115,7 +116,7 @@ internal fun TextView.setWidthToMeasured() {
  * Sets the size of a TextView to the measured size of its contents
  * taking into account the text size and the typeface.
  */
-internal fun TextView.setWidthAndHeightToMeasured() {
+fun TextView.setWidthAndHeightToMeasured() {
     measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED)
     setLayoutWidth(measuredWidth)
     setLayoutHeight(measuredHeight)
@@ -124,34 +125,34 @@ internal fun TextView.setWidthAndHeightToMeasured() {
 /**
  * Sets text size in pixel units.
  */
-internal fun TextView.setTextSizePx(sizePx: Float) = setTextSize(TypedValue.COMPLEX_UNIT_PX, sizePx)
+fun TextView.setTextSizePx(sizePx: Float) = setTextSize(TypedValue.COMPLEX_UNIT_PX, sizePx)
 
 /**
  * @return first child of the view group, null if no children
  */
-internal fun ViewGroup.getFirstChild(): View? = if (childCount > 0) this.getChildAt(0) else null
+fun ViewGroup.getFirstChild(): View? = if (childCount > 0) this.getChildAt(0) else null
 
 /**
  * @return last child of the view group, null if no children
  */
-internal fun ViewGroup.getLastChild(): View? = if (childCount > 0) this.getChildAt(childCount - 1) else null
+fun ViewGroup.getLastChild(): View? = if (childCount > 0) this.getChildAt(childCount - 1) else null
 
 /**
  * Scroll to the top of the scroll view.
  */
-internal fun ScrollView.scrollToTop() = scrollTo(0, 0)
+fun ScrollView.scrollToTop() = scrollTo(0, 0)
 
 /**
  * Scroll to the bottom of the scroll view.
  */
-internal fun ScrollView.scrollToBottom() {
+fun ScrollView.scrollToBottom() {
     val lastChild = getChildAt(childCount - 1)
     val bottom = lastChild.bottom + paddingBottom
     val delta = bottom - (scrollY + height)
     smoothScrollBy(0, delta)
 }
 
-internal fun LottieAnimationView.addAnimatorListener(
+fun LottieAnimationView.addAnimatorListener(
     onStart: (LegacyAnimator?) -> Unit = {},
     onEnd: (LegacyAnimator?) -> Unit = {},
     onCancel: (LegacyAnimator?) -> Unit = {},
@@ -165,7 +166,7 @@ internal fun LottieAnimationView.addAnimatorListener(
     })
 }
 
-internal fun View.doOnGlobalLayout(block: () -> Unit) {
+fun View.doOnGlobalLayout(block: () -> Unit) {
     this.viewTreeObserver.addOnGlobalLayoutListener(
         object : ViewTreeObserver.OnGlobalLayoutListener {
             override fun onGlobalLayout() {
@@ -175,7 +176,7 @@ internal fun View.doOnGlobalLayout(block: () -> Unit) {
         })
 }
 
-internal fun View.setTopMargin(margin: Int) {
+fun View.setTopMargin(margin: Int) {
     if (layoutParams is ViewGroup.MarginLayoutParams) {
         val layoutParams = layoutParams as ViewGroup.MarginLayoutParams
         layoutParams.topMargin = margin
@@ -183,7 +184,7 @@ internal fun View.setTopMargin(margin: Int) {
     }
 }
 
-internal fun View.setBottomMargin(margin: Int) {
+fun View.setBottomMargin(margin: Int) {
     if (layoutParams is ViewGroup.MarginLayoutParams) {
         val layoutParams = layoutParams as ViewGroup.MarginLayoutParams
         layoutParams.bottomMargin = margin
@@ -191,23 +192,23 @@ internal fun View.setBottomMargin(margin: Int) {
     }
 }
 
-internal fun View.postDelayed(timeMillis: Long, action: () -> Unit) = this.postDelayed(action, timeMillis)
+fun View.postDelayed(timeMillis: Long, action: () -> Unit) = this.postDelayed(action, timeMillis)
 
-internal fun View.string(@StringRes id: Int): String = context.string(id)
+fun View.string(@StringRes id: Int): String = context.string(id)
 
-internal fun View.string(@StringRes id: Int, vararg formatArgs: Any): String = context.string(id, *formatArgs)
+fun View.string(@StringRes id: Int, vararg formatArgs: Any): String = context.string(id, *formatArgs)
 
-internal fun View.color(@ColorRes id: Int): Int = context.color(id)
+fun View.color(@ColorRes id: Int): Int = context.color(id)
 
-internal fun View.dimen(@DimenRes id: Int): Float = context.dimen(id)
+fun View.dimen(@DimenRes id: Int): Float = context.dimen(id)
 
-internal fun View.dimenPx(@DimenRes id: Int): Int = context.dimenPx(id)
+fun View.dimenPx(@DimenRes id: Int): Int = context.dimenPx(id)
 
-internal fun View.drawable(@DrawableRes id: Int): Drawable? = context.drawable(id)
+fun View.drawable(@DrawableRes id: Int): Drawable? = context.drawable(id)
 
-internal fun View.setOnThrottledClickListener(action: (View) -> Unit) = this.setOnClickListener(ThrottleClick(action))
+fun View.setOnThrottledClickListener(action: (View) -> Unit) = this.setOnClickListener(ThrottleClick(action))
 
-internal class ThrottleClick(private val delegate: (View) -> Unit) : View.OnClickListener {
+class ThrottleClick(private val delegate: (View) -> Unit) : View.OnClickListener {
     override fun onClick(v: View?) {
         v?.temporarilyDisableClick()
         v?.let(delegate)
@@ -267,25 +268,21 @@ fun View.temporarilyDisableClick() {
 
 fun AppCompatEditText.setTextSilently(newText: String) {
     if (text.toString() != newText) {
-        try {
+        runCatching {
             var selectionStartPoint = selectionStart
             var selectionEndPoint = selectionEnd
             setText(newText)
             selectionEndPoint = selectionEnd.coerceAtMost(newText.length)
             selectionStartPoint = selectionStart.coerceAtMost(selectionEnd)
             setSelection(selectionStartPoint, selectionEndPoint)
-        } catch (e: Throwable) {
-            Logger.i(e.toString())
         }
     }
 }
 
 fun AppCompatEditText.setSelectionToEnd() {
-    try {
+    runCatching {
         val selectionEndPoint = text.toString().length
         setSelection(selectionEndPoint, selectionEndPoint)
-    } catch (e: Throwable) {
-        Logger.i(e.toString())
     }
 }
 
@@ -298,10 +295,8 @@ private class ClickEnablingRunnable(@NonNull view: View) : Runnable {
 
     override fun run() {
         viewWR.get()?.run {
-            try {
+            runCatching {
                 isClickable = true
-            } catch (e: Throwable) {
-                // no-op
             }
         }
     }

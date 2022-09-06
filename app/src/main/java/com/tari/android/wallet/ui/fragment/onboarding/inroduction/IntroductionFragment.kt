@@ -90,9 +90,6 @@ class IntroductionFragment : CommonFragment<FragmentIntroductionBinding, Introdu
         bindViewModel(viewModel)
 
         setupUi()
-        if (savedInstanceState == null) {
-            viewModel.tracker.screen(path = "/onboarding/introduction", title = "Onboarding - Introduction")
-        }
     }
 
     override fun onStop() {

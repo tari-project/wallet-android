@@ -53,7 +53,7 @@ import java.io.File
  * @author The Tari Development Team
  */
 // todo review
-internal class LocalBackupStorage(
+class LocalBackupStorage(
     private val context: Context,
     private val backupSettingsRepository: BackupSettingsRepository,
     private val namingPolicy: BackupNamingPolicy,
@@ -62,6 +62,8 @@ internal class LocalBackupStorage(
     private val backupFileProcessor: BackupFileProcessor
 ) : BackupStorage {
 
+    private val logger = Logger.t(LocalBackupStorage::class.simpleName)
+
     override fun setup(hostFragment: Fragment) {
         hostFragment.startActivityForResult(
             Intent(Intent.ACTION_OPEN_DOCUMENT_TREE),
@@ -69,17 +71,13 @@ internal class LocalBackupStorage(
         )
     }
 
-    override suspend fun onSetupActivityResult(
-        requestCode: Int,
-        resultCode: Int,
-        intent: Intent?
-    ) {
+    override suspend fun onSetupActivityResult(requestCode: Int, resultCode: Int, intent: Intent?) {
         if (requestCode != REQUEST_CODE_PICK_BACKUP_FOLDER) return
         when (resultCode) {
             Activity.RESULT_OK -> {
                 val uri = intent?.data
                 if (uri != null) {
-                    Logger.d("Backup URI selected: $uri")
+                    logger.i("Backup URI selected: $uri")
                     backupSettingsRepository.localBackupFolderURI = uri
                     // persist permissions
                     val takeFlags: Int = Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
@@ -122,10 +120,7 @@ internal class LocalBackupStorage(
                     }
                 }
             } catch (e: Exception) {
-                Logger.e(
-                    e,
-                    "Ignorable backup error while clearing temporary and old files."
-                )
+                logger.e(e, "Ignorable backup error while clearing temporary and old files.")
             }
             return@withContext backupDate
         }

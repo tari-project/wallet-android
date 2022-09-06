@@ -3,7 +3,6 @@ package com.tari.android.wallet.ui.fragment.send.addNote.gif
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import com.orhanobut.logger.Logger
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.common.gyphy.GiphyKeywordsRepository
 import com.tari.android.wallet.ui.common.gyphy.repository.GIFItem
@@ -38,14 +37,10 @@ class ThumbnailGIFsViewModel : CommonViewModel() {
             _state.value = GIFsState()
             try {
                 val gifs = withContext(Dispatchers.IO) {
-                    gifsRepository.getAll(
-                        giphyKeywordsRepository.getNext(),
-                        THUMBNAIL_REQUEST_LIMIT
-                    )
+                    gifsRepository.getAll(giphyKeywordsRepository.getNext(), THUMBNAIL_REQUEST_LIMIT)
                 }
                 _state.value = GIFsState(gifs)
             } catch (e: Exception) {
-                Logger.e(e, "Error occurred while fetching gifs")
                 _state.value = GIFsState(e)
             }
         }

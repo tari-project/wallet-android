@@ -39,15 +39,15 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.fragment.app.Fragment
 
-internal fun Fragment.string(@StringRes id: Int): String = requireContext().string(id)
+fun Fragment.string(@StringRes id: Int): String = requireContext().string(id)
 
-internal fun Fragment.string(@StringRes id: Int, vararg formatArgs: Any): String =
+fun Fragment.string(@StringRes id: Int, vararg formatArgs: Any): String =
     requireContext().string(id, *formatArgs)
 
-internal fun Fragment.color(@ColorRes id: Int): Int = requireContext().color(id)
+fun Fragment.color(@ColorRes id: Int): Int = requireContext().color(id)
 
-internal fun Fragment.dimenPx(@DimenRes id: Int): Int = requireContext().dimenPx(id)
+fun Fragment.dimenPx(@DimenRes id: Int): Int = requireContext().dimenPx(id)
 
-internal fun Fragment.dimen(@DimenRes id: Int): Float = requireContext().dimen(id)
+fun Fragment.dimen(@DimenRes id: Int): Float = requireContext().dimen(id)
 
-internal fun Fragment.drawable(@DrawableRes id: Int): Drawable? = requireContext().drawable(id)
+fun Fragment.drawable(@DrawableRes id: Int): Drawable? = requireContext().drawable(id)

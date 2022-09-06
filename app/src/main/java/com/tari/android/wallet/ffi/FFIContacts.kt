@@ -38,7 +38,7 @@ package com.tari.android.wallet.ffi
  * @author The Tari Development Team
  */
 
-internal class FFIContacts() : FFIBase() {
+class FFIContacts() : FFIBase() {
 
     // region JNI
 
