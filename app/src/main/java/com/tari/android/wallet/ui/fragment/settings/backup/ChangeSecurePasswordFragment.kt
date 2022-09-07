@@ -61,7 +61,7 @@ import com.tari.android.wallet.infrastructure.backup.BackupState
 import com.tari.android.wallet.infrastructure.backup.BackupState.BackupOutOfDate
 import com.tari.android.wallet.infrastructure.backup.BackupState.BackupUpToDate
 import com.tari.android.wallet.infrastructure.backup.BackupStorageAuthRevokedException
-import com.tari.android.wallet.ui.activity.settings.BackupSettingsRouter
+import com.tari.android.wallet.ui.fragment.settings.backup.activity.BackupSettingsRouter
 import com.tari.android.wallet.ui.common.domain.ResourceManager
 import com.tari.android.wallet.ui.dialog.error.ErrorDialogArgs
 import com.tari.android.wallet.ui.dialog.modular.ModularDialog

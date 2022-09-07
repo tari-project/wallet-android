@@ -4,6 +4,4 @@
     android:id="@+id/backup_fragment_container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/black"
-    tools:context=".ui.fragment.restore.restore.WalletRestoreActivity"
-    tools:viewBindingIgnore="true" />
+    android:background="@color/black" />

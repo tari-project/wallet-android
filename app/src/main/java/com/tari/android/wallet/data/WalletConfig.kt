@@ -44,6 +44,10 @@ class WalletConfig(val context: Context, val networkRepository: NetworkRepositor
     fun getApplicationLogsFilePath(): String = getOrCreateFilePath(getWalletFilesDirPath(), "$applicationLogs.$logFileExtension")
 
     private fun getOrCreateFilePath(dirPath: String, fileName: String): String {
+        val folder = File(dirPath)
+        if (!folder.exists()) {
+            folder.mkdirs()
+        }
         val file = File(dirPath, fileName)
         if (!file.exists()) {
             file.createNewFile()
