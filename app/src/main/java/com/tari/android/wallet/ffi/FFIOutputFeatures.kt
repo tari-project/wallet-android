@@ -41,28 +41,16 @@ class FFIOutputFeatures : FFIBase {
 
     private external fun jniCreate(
         version: Char,
-        flags: Char,
         maturity: Long,
-        recovery_byte: Char,
         metadata: FFIByteVector,
-        unique_id: FFIByteVector,
-        parent_public_key: FFIByteVector,
         libError: FFIError
     )
 
     private external fun jniDestroy()
 
-    constructor(
-        version: Char,
-        flags: Char,
-        maturity: Long,
-        recovery_byte: Char,
-        metadata: FFIByteVector,
-        unique_id: FFIByteVector,
-        parent_public_key: FFIByteVector,
-    ) : super() {
+    constructor(version: Char, maturity: Long, metadata: FFIByteVector) : super() {
         val error = FFIError()
-        jniCreate(version, flags, maturity, recovery_byte, metadata, unique_id, parent_public_key, error)
+        jniCreate(version, maturity, metadata, error)
         throwIf(error)
     }
 

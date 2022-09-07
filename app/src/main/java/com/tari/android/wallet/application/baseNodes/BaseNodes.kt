@@ -88,6 +88,6 @@ class BaseNodes(
     }
 
     private fun getBaseNodeResource(network: Network): Int = when(network) {
-        else -> R.raw.dibbler_base_nodes
+        else -> R.raw.esmeralda_base_nodes
     }
 }

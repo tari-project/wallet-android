@@ -9,9 +9,9 @@ import com.tari.android.wallet.ui.common.domain.ResourceManager
 
 class NetworkRepositoryImpl(private val resourceManager: ResourceManager, sharedPrefs: SharedPreferences) : NetworkRepository {
 
-    override var supportedNetworks: List<Network> = listOf(Network.DIBBLER)
+    override var supportedNetworks: List<Network> = listOf(Network.ESMERALDA)
 
-    override var recommendedNetworks: List<Network> = listOf(Network.DIBBLER)
+    override var recommendedNetworks: List<Network> = listOf(Network.ESMERALDA)
 
     override var currentNetwork by SharedPrefGsonDelegate(sharedPrefs, Keys.currentNetwork, TariNetwork::class.java)
 
@@ -19,7 +19,7 @@ class NetworkRepositoryImpl(private val resourceManager: ResourceManager, shared
         try {
             currentNetwork!!.network.displayName
         } catch (e: Throwable) {
-            currentNetwork = getDibbler(resourceManager)
+            currentNetwork = getEsmeralda(resourceManager)
         }
     }
 
@@ -27,7 +27,7 @@ class NetworkRepositoryImpl(private val resourceManager: ResourceManager, shared
 
     override var incompatibleNetworkShown by SharedPrefBooleanDelegate(sharedPrefs, formatKey(Keys.networkIncompatible), false)
 
-    override fun getAllNetworks(): List<TariNetwork> = listOf(getDibbler(resourceManager))
+    override fun getAllNetworks(): List<TariNetwork> = listOf(getEsmeralda(resourceManager))
 
     object Keys {
         const val currentNetwork = "tari_current_network"
@@ -39,7 +39,7 @@ class NetworkRepositoryImpl(private val resourceManager: ResourceManager, shared
         private const val mainNetThicker = "XTR"
         private const val testNetThicker = "tXTR"
 
-        fun getDibbler(resourceManager: ResourceManager): TariNetwork =
-            TariNetwork(Network.DIBBLER, resourceManager.getString(R.string.dibbler_faucet_url), testNetThicker)
+        fun getEsmeralda(resourceManager: ResourceManager): TariNetwork =
+            TariNetwork(Network.ESMERALDA, resourceManager.getString(R.string.esmeralda_faucet_url), testNetThicker)
     }
 }

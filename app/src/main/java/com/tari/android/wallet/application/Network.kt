@@ -46,7 +46,9 @@ enum class Network(val uriComponent: String, val displayName: String) {
 
     IGOR("igor", "IGOR"),
 
-    DIBBLER("dibbler", "DIBBLER");
+    DIBBLER("dibbler", "DIBBLER"),
+
+    ESMERALDA("esmeralda", "ESMERALDA");
 
     companion object {
         fun from(uriComponent: String): Network {

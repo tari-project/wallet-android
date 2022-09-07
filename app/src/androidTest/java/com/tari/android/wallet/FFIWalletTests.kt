@@ -73,7 +73,6 @@ class FFIWalletTests {
 
     private lateinit var wallet: FFIWallet
     private lateinit var listener: TestAddRecipientAddNodeListener
-    private var network: Network = Network.DIBBLER
     private val context = getApplicationContext<Context>()
     private val prefs = context.getSharedPreferences(ApplicationModule.sharedPrefsFileName, Context.MODE_PRIVATE)
     private val resourceManager: ResourceManager = ResourceManager(context)
