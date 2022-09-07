@@ -28,10 +28,10 @@ class TorBridgesSelectionViewModel : CommonViewModel() {
     lateinit var torSharedRepository: TorSharedRepository
 
     @Inject
-    internal lateinit var torProxyManager: TorProxyManager
+    lateinit var torProxyManager: TorProxyManager
 
     @Inject
-    internal lateinit var baseNodes: BaseNodes
+    lateinit var baseNodes: BaseNodes
 
     init {
         component.inject(this)

@@ -51,7 +51,7 @@ import com.tari.android.wallet.ui.fragment.debug.baseNodeConfig.changeBaseNode.C
  *
  * @author The Tari Development Team
  */
-internal class DebugActivity : AppCompatActivity(), BaseNodeConfigRouter {
+class DebugActivity : AppCompatActivity(), BaseNodeConfigRouter {
 
     private lateinit var pagerAdapter: DebugViewPagerAdapter
 

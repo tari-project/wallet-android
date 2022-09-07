@@ -32,14 +32,12 @@
  */
 package com.tari.android.wallet.ffi
 
-import com.orhanobut.logger.Logger
 import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepository
 import com.tari.android.wallet.model.*
 import com.tari.android.wallet.model.recovery.WalletRestorationResult
 import com.tari.android.wallet.service.seedPhrase.SeedPhraseRepository
 import com.tari.android.wallet.util.Constants
-import io.sentry.Sentry
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import java.math.BigInteger
@@ -51,7 +49,7 @@ import java.util.concurrent.atomic.AtomicReference
  * @author The Tari Development Team
  */
 
-internal class FFIWallet(
+class FFIWallet(
     val sharedPrefsRepository: SharedPrefsRepository,
     val seedPhraseRepository: SeedPhraseRepository,
     val networkRepository: NetworkRepository,
@@ -230,7 +228,7 @@ internal class FFIWallet(
     init {
         if (pointer == nullptr) { // so it can only be assigned once for the singleton
             val error = FFIError()
-            Logger.i("Pre jniCreate.")
+            logger.i("Pre jniCreate")
             try {
                 jniCreate(
                     commsConfig,
@@ -258,12 +256,11 @@ internal class FFIWallet(
                     error
                 )
             } catch (e: Throwable) {
-                Sentry.captureException(e)
-                Logger.i("Post jniCreate with exception: %d.", e)
+                logger.e(e, "jniCreate was failed")
                 throw e
             }
 
-            Logger.i("Post jniCreate with code: %d.", error.code)
+            logger.i("Post jniCreate with code: %d.", error.code)
             throwIf(error)
 
             enableEncryption()
@@ -273,12 +270,11 @@ internal class FFIWallet(
     fun enableEncryption() {
         val passphrase = sharedPrefsRepository.databasePassphrase
         if (passphrase == null) {
-            Logger.i("Database encryption enable")
+            logger.i("Database encryption enabled")
             sharedPrefsRepository.generateDatabasePassphrase()
             try {
                 setEncryption(sharedPrefsRepository.databasePassphrase.orEmpty())
             } catch (e: Throwable) {
-                //Sentry.captureException(e)
                 sharedPrefsRepository.databasePassphrase = null
             }
         }
@@ -411,8 +407,8 @@ internal class FFIWallet(
      */
     @Suppress("MemberVisibilityCanBePrivate")
     fun onTxReceived(pendingInboundTxPtr: FFIPointer) {
-        Logger.i("Tx received. Pointer: %s", pendingInboundTxPtr.toString())
         val tx = FFIPendingInboundTx(pendingInboundTxPtr)
+        logger.i("Tx received ${tx.getId()}")
         val pendingTx = PendingInboundTx(tx)
         GlobalScope.launch { listener?.onTxReceived(pendingTx) }
     }
@@ -422,8 +418,8 @@ internal class FFIWallet(
      */
     @Suppress("MemberVisibilityCanBePrivate")
     fun onTxReplyReceived(txPointer: FFIPointer) {
-        Logger.i("Tx reply received. Pointer: %s", txPointer.toString())
         val tx = FFICompletedTx(txPointer)
+        logger.i("Tx reply received ${tx.getId()}")
         val pendingOutboundTx = PendingOutboundTx(tx)
         GlobalScope.launch { listener?.onTxReplyReceived(pendingOutboundTx) }
     }
@@ -433,8 +429,8 @@ internal class FFIWallet(
      */
     @Suppress("MemberVisibilityCanBePrivate")
     fun onTxFinalized(completedTx: FFIPointer) {
-        Logger.i("Tx finalized. Pointer: %s", completedTx.toString())
         val tx = FFICompletedTx(completedTx)
+        logger.i("Tx finalized ${tx.getId()}")
         val pendingInboundTx = PendingInboundTx(tx)
         GlobalScope.launch { listener?.onTxFinalized(pendingInboundTx) }
     }
@@ -444,8 +440,8 @@ internal class FFIWallet(
      */
     @Suppress("MemberVisibilityCanBePrivate")
     fun onTxBroadcast(completedTxPtr: FFIPointer) {
-        Logger.i("Tx completed. Pointer: %s", completedTxPtr.toString())
         val tx = FFICompletedTx(completedTxPtr)
+        logger.i("Tx broadcast ${tx.getId()}")
         when (tx.getDirection()) {
             Tx.Direction.INBOUND -> {
                 val pendingInboundTx = PendingInboundTx(tx)
@@ -463,8 +459,8 @@ internal class FFIWallet(
      */
     @Suppress("MemberVisibilityCanBePrivate")
     fun onTxMined(completedTxPtr: FFIPointer) {
-        Logger.i("Tx mined & confirmed. Pointer: %s", completedTxPtr.toString())
         val completed = CompletedTx(completedTxPtr)
+        logger.i("Tx mined & confirmed ${completed.id}")
         GlobalScope.launch { listener?.onTxMined(completed) }
     }
 
@@ -473,9 +469,9 @@ internal class FFIWallet(
      */
     @Suppress("MemberVisibilityCanBePrivate")
     fun onTxMinedUnconfirmed(completedTxPtr: FFIPointer, confirmationCountBytes: ByteArray) {
-        Logger.i("Tx mined & unconfirmed. Pointer: %s", completedTxPtr.toString())
         val confirmationCount = BigInteger(1, confirmationCountBytes).toInt()
         val completed = CompletedTx(completedTxPtr)
+        logger.i("Tx mined & unconfirmed ${completed.id} $confirmationCount")
         GlobalScope.launch { listener?.onTxMinedUnconfirmed(completed, confirmationCount) }
     }
 
@@ -484,15 +480,19 @@ internal class FFIWallet(
      */
     @Suppress("MemberVisibilityCanBePrivate")
     fun onTxFauxConfirmed(completedTxPtr: FFIPointer) {
-        Logger.i("Tx faux confirmed. Pointer: %s", completedTxPtr.toString())
         val completed = CompletedTx(completedTxPtr)
+        logger.i("Tx faux confirmed ${completed.id}")
         GlobalScope.launch { listener?.onTxMined(completed) }
     }
 
+    /**
+     * This callback function cannot be private due to JNI behaviour.
+     */
+    @Suppress("MemberVisibilityCanBePrivate")
     fun onTxFauxUnconfirmed(completedTxPtr: FFIPointer, confirmationCountBytes: ByteArray) {
-        Logger.i("Tx faux unconfirmed. Pointer: %s", completedTxPtr.toString())
         val confirmationCount = BigInteger(1, confirmationCountBytes).toInt()
         val completed = CompletedTx(completedTxPtr)
+        logger.i("Tx faux unconfirmed ${completed.id}")
         GlobalScope.launch { listener?.onTxMinedUnconfirmed(completed, confirmationCount) }
     }
 
@@ -502,6 +502,7 @@ internal class FFIWallet(
     @Suppress("MemberVisibilityCanBePrivate")
     fun onDirectSendResult(bytes: ByteArray, pointer: FFIPointer) {
         val txId = BigInteger(1, bytes)
+        logger.i("Tx direct send result $txId")
         GlobalScope.launch { listener?.onDirectSendResult(txId, FFITransactionSendStatus(pointer).getStatus()) }
     }
 
@@ -510,10 +511,10 @@ internal class FFIWallet(
      */
     @Suppress("MemberVisibilityCanBePrivate")
     fun onTxCancelled(completedTx: FFIPointer, rejectionReason: ByteArray) {
-        Logger.i("Tx cancelled. Pointer: %s", completedTx.toString())
         val rejectionReasonInt = BigInteger(1, rejectionReason).toInt()
-
         val tx = FFICompletedTx(completedTx)
+        logger.i("Tx cancelled ${tx.getId()}")
+
         when (tx.getDirection()) {
             Tx.Direction.OUTBOUND -> {
                 val cancelledTx = CancelledTx(tx)
@@ -529,7 +530,7 @@ internal class FFIWallet(
     fun onConnectivityStatus(bytes: ByteArray) {
         val connectivityStatus = BigInteger(1, bytes)
         GlobalScope.launch { listener?.onConnectivityStatus(connectivityStatus.toInt()) }
-        Logger.i("ConnectivityStatus is [$connectivityStatus]")
+        logger.i("ConnectivityStatus is [$connectivityStatus]")
     }
 
     /**
@@ -537,7 +538,7 @@ internal class FFIWallet(
      */
     @Suppress("MemberVisibilityCanBePrivate")
     fun onBalanceUpdated(ptr: FFIPointer) {
-        Logger.i("Balance Updated. Pointer: %s", ptr.toString())
+        logger.i("Balance Updated")
         val b = FFIBalance(ptr)
         val balance = BalanceInfo(b.getAvailable(), b.getIncoming(), b.getOutgoing(), b.getTimeLocked())
         b.destroy()
@@ -550,7 +551,7 @@ internal class FFIWallet(
     @Suppress("MemberVisibilityCanBePrivate")
     fun onTXOValidationComplete(bytes: ByteArray, isSuccess: Boolean) {
         val requestId = BigInteger(1, bytes)
-        Logger.i("Invalid TXO validation [$requestId] complete. Result: $isSuccess")
+        logger.i("TXO validation [$requestId] complete. Result: $isSuccess")
         GlobalScope.launch { listener?.onTXOValidationComplete(requestId, isSuccess) }
     }
 
@@ -560,7 +561,7 @@ internal class FFIWallet(
     @Suppress("MemberVisibilityCanBePrivate")
     fun onTxValidationComplete(bytes: ByteArray, isSuccess: Boolean) {
         val requestId = BigInteger(1, bytes)
-        Logger.i("Transaction validation [$requestId] complete. Result: $isSuccess")
+        logger.i("Tx validation [$requestId] complete. Result: $isSuccess")
         GlobalScope.launch { listener?.onTxValidationComplete(requestId, isSuccess) }
     }
 
@@ -569,13 +570,12 @@ internal class FFIWallet(
      */
     @Suppress("MemberVisibilityCanBePrivate")
     fun onContactLivenessDataUpdated(livenessUpdate: FFIPointer) {
-        Logger.i("OnContactLivenessDataUpdated. Pointer: %s", livenessUpdate.toString())
+        logger.i("OnContactLivenessDataUpdated")
     }
 
     fun estimateTxFee(amount: BigInteger, gramFee: BigInteger, kernelCount: BigInteger, outputCount: BigInteger): BigInteger {
         val error = FFIError()
         val bytes = jniEstimateTxFee(amount.toString(), gramFee.toString(), kernelCount.toString(), outputCount.toString(), error)
-        Logger.d("Tx fee estimate status code (0 means ok): %d", error.code)
         throwIf(error)
         return BigInteger(1, bytes)
     }
@@ -606,7 +606,7 @@ internal class FFIWallet(
         return TariCoinPreview(FFITariCoinPreview(result))
     }
 
-    fun splitPreviewUtxos(commitments: Array<String>, count: Int, feePerGram: BigInteger, error: FFIError) : TariCoinPreview {
+    fun splitPreviewUtxos(commitments: Array<String>, count: Int, feePerGram: BigInteger, error: FFIError): TariCoinPreview {
         val result = jniPreviewSplitUtxos(commitments, count.toString(), feePerGram.toString(), error)
         return TariCoinPreview(FFITariCoinPreview(result))
     }
@@ -782,7 +782,7 @@ internal class FFIWallet(
     @Suppress("MemberVisibilityCanBePrivate")
     fun onWalletRecovery(event: Int, firstArg: ByteArray, secondArg: ByteArray) {
         val result = WalletRestorationResult.create(event, firstArg, secondArg)
-        Logger.i("Wallet restoration. Result: $result")
+        logger.i("Wallet restored with $result")
         GlobalScope.launch { listener?.onWalletRestoration(result) }
     }
 
@@ -795,8 +795,6 @@ internal class FFIWallet(
     fun generateTestData(datastorePath: String): Boolean = false
 
     fun testBroadcastTx(tx: BigInteger): Boolean = false
-
-    fun testCompleteSentTx(tx: FFIPendingOutboundTx): Boolean = false
 
     fun testMineTx(tx: BigInteger): Boolean = false
 

@@ -44,7 +44,7 @@ import com.tari.android.wallet.ffi.FFIEmojiSet
 /**
  * Number of emojis from the Tari emoji set in a string.
  */
-internal fun String.numberOfEmojis(emojiSet: Set<String> = EmojiUtil.emojiSet): Int {
+fun String.numberOfEmojis(emojiSet: Set<String> = EmojiUtil.emojiSet): Int {
     val it: BreakIterator = BreakIterator.getCharacterInstance()
     it.setText(this)
     var emojiCount = 0
@@ -67,7 +67,7 @@ internal fun String.numberOfEmojis(emojiSet: Set<String> = EmojiUtil.emojiSet): 
 /**
  * @return true if there is at least 1 character that is not included in the Tari emoji set.
  */
-internal fun String.containsNonEmoji(emojiSet: Set<String> = EmojiUtil.emojiSet): Boolean {
+fun String.containsNonEmoji(emojiSet: Set<String> = EmojiUtil.emojiSet): Boolean {
     // iterate through the string
     val it: BreakIterator = BreakIterator.getCharacterInstance()
     it.setText(this)
@@ -91,7 +91,7 @@ internal fun String.containsNonEmoji(emojiSet: Set<String> = EmojiUtil.emojiSet)
 /**
  * @return emojis in the string that are from the Tari emoji set
  */
-internal fun String.extractEmojis(emojiSet: Set<String> = EmojiUtil.emojiSet): List<String> {
+fun String.extractEmojis(emojiSet: Set<String> = EmojiUtil.emojiSet): List<String> {
     // iterate through the codepoints
     val it: BreakIterator = BreakIterator.getCharacterInstance()
     it.setText(this)
@@ -116,7 +116,7 @@ internal fun String.extractEmojis(emojiSet: Set<String> = EmojiUtil.emojiSet): L
  * Checks whether a given number of first characters of the string are emojis from the Tari
  * emoji set.
  */
-internal fun String.firstNCharactersAreEmojis(n: Int, emojiSet: Set<String> = EmojiUtil.emojiSet): Boolean {
+fun String.firstNCharactersAreEmojis(n: Int, emojiSet: Set<String> = EmojiUtil.emojiSet): Boolean {
     // iterate through the string
     val it: BreakIterator = BreakIterator.getCharacterInstance()
     it.setText(this)
@@ -147,7 +147,7 @@ internal fun String.firstNCharactersAreEmojis(n: Int, emojiSet: Set<String> = Em
  *
  * @author The Tari Development Team
  */
-internal class EmojiUtil {
+class EmojiUtil {
 
     companion object {
 

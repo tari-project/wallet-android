@@ -38,7 +38,6 @@ import android.animation.ValueAnimator
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.graphics.drawable.GradientDrawable
-import android.hardware.SensorManager
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -47,7 +46,6 @@ import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.animation.addListener
 import androidx.core.os.postDelayed
 import androidx.fragment.app.viewModels
@@ -56,7 +54,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.daasuu.ei.Ease
 import com.daasuu.ei.EasingInterpolator
-import com.squareup.seismic.ShakeDetector
 import com.tari.android.wallet.R
 import com.tari.android.wallet.databinding.FragmentTxListBinding
 import com.tari.android.wallet.event.Event
@@ -65,7 +62,7 @@ import com.tari.android.wallet.extension.observe
 import com.tari.android.wallet.extension.observeOnLoad
 import com.tari.android.wallet.model.BalanceInfo
 import com.tari.android.wallet.model.User
-import com.tari.android.wallet.ui.activity.debug.DebugActivity
+import com.tari.android.wallet.ui.common.CommonActivity
 import com.tari.android.wallet.ui.common.CommonFragment
 import com.tari.android.wallet.ui.common.recyclerView.CommonAdapter
 import com.tari.android.wallet.ui.common.recyclerView.CommonViewHolderItem
@@ -87,12 +84,11 @@ import java.lang.ref.WeakReference
 import kotlin.math.max
 import kotlin.math.min
 
-internal class TxListFragment : CommonFragment<FragmentTxListBinding, TxListViewModel>(),
+class TxListFragment : CommonFragment<FragmentTxListBinding, TxListViewModel>(),
     View.OnScrollChangeListener,
     View.OnTouchListener,
     CustomScrollView.Listener,
-    UpdateProgressViewController.Listener,
-    ShakeDetector.Listener {
+    UpdateProgressViewController.Listener {
 
     private val networkIndicatorViewModel: ConnectionIndicatorViewModel by viewModels()
     private val questionMarkViewModel: QuestionMarkViewModel by viewModels()
@@ -101,7 +97,6 @@ internal class TxListFragment : CommonFragment<FragmentTxListBinding, TxListView
 
     // This listener is used only to animate the visibility of the scroll depth gradient view.
     private val recyclerViewScrollListener = RecyclerViewScrollListener(::onRecyclerViewScrolled)
-    private val shakeDetector = ShakeDetector(this)
     private var recyclerViewAdapter: TxListAdapter = TxListAdapter()
     private lateinit var balanceViewController: BalanceViewController
     private lateinit var updateProgressViewController: UpdateProgressViewController
@@ -117,8 +112,6 @@ internal class TxListFragment : CommonFragment<FragmentTxListBinding, TxListView
 
         val viewModel: TxListViewModel by viewModels()
         bindViewModel(viewModel)
-
-        if (savedInstanceState == null) viewModel.tracker.screen("/home", "Home - Transaction List")
 
         setupUI()
         subscribeToEventBus()
@@ -143,14 +136,8 @@ internal class TxListFragment : CommonFragment<FragmentTxListBinding, TxListView
         observeOnLoad(debouncedList)
     }
 
-    override fun onStart() {
-        (requireContext().getSystemService(AppCompatActivity.SENSOR_SERVICE) as? SensorManager)?.let(shakeDetector::start)
-        super.onStart()
-    }
-
     override fun onStop() {
         handler.removeCallbacksAndMessages(null)
-        shakeDetector.stop()
         super.onStop()
     }
 
@@ -339,19 +326,8 @@ internal class TxListFragment : CommonFragment<FragmentTxListBinding, TxListView
         ui.scrollView.smoothScrollTo(0, ui.scrollContentView.height - ui.scrollView.height)
     }
 
-    /**
-     * A shake will take the user to the debug screen.
-     */
-    override fun hearShake() {
-        val intent = Intent(requireContext(), DebugActivity::class.java)
-        startActivity(intent)
-        requireActivity().overridePendingTransition(R.anim.enter_from_right, R.anim.exit_to_left)
-    }
-
     private fun grabberContainerViewLongClicked() {
-        val intent = Intent(requireContext(), DebugActivity::class.java)
-        startActivity(intent)
-        requireActivity().overridePendingTransition(R.anim.enter_from_right, R.anim.exit_to_left)
+        (requireActivity() as CommonActivity<*, *>).openDebugActivity()
     }
 
     override fun onSwipeRefresh(source: CustomScrollView) {

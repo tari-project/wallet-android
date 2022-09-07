@@ -51,7 +51,7 @@ class TorModule {
 
     @Provides
     @Singleton
-    internal fun provideTorConfig(context: Context): TorConfig {
+    fun provideTorConfig(context: Context): TorConfig {
         val cookieFilePath = File(context.getDir(TorProxyManager.torDataDirectoryName, Context.MODE_PRIVATE), "control_auth_cookie").absolutePath
 
         return TorConfig(
@@ -67,6 +67,6 @@ class TorModule {
 
     @Provides
     @Singleton
-    internal fun provideTorProxyManager(context: Context, torSharedRepository: TorSharedRepository, torConfig: TorConfig): TorProxyManager =
+    fun provideTorProxyManager(context: Context, torSharedRepository: TorSharedRepository, torConfig: TorConfig): TorProxyManager =
         TorProxyManager(context, torSharedRepository, torConfig)
 }

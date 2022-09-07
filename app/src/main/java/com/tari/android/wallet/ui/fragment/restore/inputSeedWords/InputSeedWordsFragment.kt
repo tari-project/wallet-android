@@ -23,7 +23,7 @@ import com.tari.android.wallet.ui.fragment.restore.inputSeedWords.suggestions.Su
 import com.tari.android.wallet.ui.fragment.restore.restore.WalletRestoreRouter
 import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent
 
-internal class InputSeedWordsFragment : CommonFragment<FragmentWalletInputSeedWordsBinding, InputSeedWordsViewModel>() {
+class InputSeedWordsFragment : CommonFragment<FragmentWalletInputSeedWordsBinding, InputSeedWordsViewModel>() {
 
     private val suggestionsAdapter = SuggestionsAdapter()
 

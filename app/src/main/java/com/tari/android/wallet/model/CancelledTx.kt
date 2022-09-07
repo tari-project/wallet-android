@@ -48,7 +48,7 @@ class CancelledTx() : Tx(), Parcelable {
     var fee: MicroTari = MicroTari(BigInteger("0"))
     var cancellationReason: FFITxCancellationReason = FFITxCancellationReason.NotCancelled
 
-    internal constructor(tx: FFICompletedTx) : this() {
+    constructor(tx: FFICompletedTx) : this() {
         this.id = tx.getId()
         this.direction = tx.getDirection()
         this.user = tx.getUser()

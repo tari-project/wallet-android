@@ -42,7 +42,7 @@ import com.tari.android.wallet.extension.observe
 import com.tari.android.wallet.ui.common.CommonFragment
 import com.tari.android.wallet.ui.fragment.restore.restore.WalletRestoreRouter
 
-internal class WalletRestoringFromSeedWordsFragment :
+class WalletRestoringFromSeedWordsFragment :
     CommonFragment<FragmentWalletRestoringFromSeedWordsBinding, WalletRestoringFromSeedWordsViewModel>() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =

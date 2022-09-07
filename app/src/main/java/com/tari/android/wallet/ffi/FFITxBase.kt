@@ -4,7 +4,7 @@ import com.tari.android.wallet.model.PublicKey
 import com.tari.android.wallet.model.Tx
 import com.tari.android.wallet.model.User
 
-internal abstract class FFITxBase() : FFIBase() {
+abstract class FFITxBase() : FFIBase() {
 
     constructor(pointer: FFIPointer): this() {
         this.pointer = pointer

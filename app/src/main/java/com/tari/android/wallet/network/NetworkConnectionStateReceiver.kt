@@ -49,10 +49,11 @@ import com.tari.android.wallet.event.EventBus
  *
  * @author The Tari Development Team
  */
-internal class NetworkConnectionStateReceiver : BroadcastReceiver() {
+class NetworkConnectionStateReceiver : BroadcastReceiver() {
 
     private val action = "android.net.conn.CONNECTIVITY_CHANGE"
     val intentFilter = IntentFilter(action)
+    private val logger = Logger.t(NetworkConnectionStateReceiver::class.simpleName)
 
     init {
         EventBus.networkConnectionState.post(NetworkConnectionState.UNKNOWN)
@@ -64,10 +65,10 @@ internal class NetworkConnectionStateReceiver : BroadcastReceiver() {
         }
         val mContext = context ?: return
         if (isInternetAvailable(mContext)) {
-            Logger.d("Connected to the internet.")
+            logger.i("Connected to the internet")
             EventBus.networkConnectionState.post(NetworkConnectionState.CONNECTED)
         } else {
-            Logger.d("Disconnected from the internet.")
+            logger.i("Disconnected from the internet")
             EventBus.networkConnectionState.post(NetworkConnectionState.DISCONNECTED)
         }
     }

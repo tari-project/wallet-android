@@ -22,7 +22,6 @@ import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
 import com.tari.android.wallet.ui.fragment.send.addAmount.feeModule.FeeModule
 import com.tari.android.wallet.ui.fragment.send.addAmount.feeModule.NetworkSpeed
 import com.tari.android.wallet.util.Constants
-import io.sentry.Sentry
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.math.BigInteger
@@ -96,7 +95,7 @@ class AddAmountViewModel : CommonViewModel() {
             }
             _feePerGrams.postValue(FeePerGramOptions(networkSpeed, MicroTari(slowOption), MicroTari(mediumOption), MicroTari(fastOption)))
         } catch (e: Throwable) {
-            Sentry.captureException(e)
+            logger.e(e, "load fees")
         }
     }
 
@@ -144,7 +143,7 @@ class AddAmountViewModel : CommonViewModel() {
             feeData = listOf(FeeData(grams.slow, slowFee), FeeData(grams.medium, mediumFee), FeeData(grams.fast, fastFee))
             selectedFeeData = feeData[1]
         } catch (e: Throwable) {
-            Sentry.captureException(e)
+            logger.e(e, "calculate fees")
         }
     }
 

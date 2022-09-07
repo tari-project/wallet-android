@@ -30,21 +30,47 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.tari.android.wallet.infrastructure
+package com.tari.android.wallet.ui.fragment.debug.debugLog.adapter
 
-import android.content.Context
+import android.view.View
+import android.widget.TextView
+import androidx.recyclerview.widget.RecyclerView
+import com.tari.android.wallet.databinding.ItemLogBinding
+import com.tari.android.wallet.ffi.LogLevel
+import com.tari.android.wallet.ui.extension.gone
+import com.tari.android.wallet.ui.extension.visible
 
-/**
- * Interface for application events tracking
- *
- * @author The Tari Development Team
- */
-interface Tracker {
+class LogViewHolder(view: View) : RecyclerView.ViewHolder(view) {
 
-    fun screen(path: String, title: String)
+    private val ui = ItemLogBinding.bind(view)
 
-    fun download(context: Context)
+    fun bind(log: String) {
+        ui.timestampTextView.gone()
+        ui.source1TextView.gone()
+        ui.source2TextView.gone()
+        ui.levelTextView.gone()
+        ui.logTextView.text = log.trim()
+    }
 
-    fun event(category: String, action: String)
+    fun bind(timestamp: String?, source1: String?, source2: String?, level: String?, log: String?) {
+        putTextInView(timestamp, ui.timestampTextView)
+        putTextInView(source1, ui.source1TextView)
+        putTextInView(source2, ui.source2TextView)
 
+        putTextInView(level, ui.levelTextView)
+        if (level != null && level.isNotEmpty()) {
+            ui.levelTextView.setTextColor(LogLevel.from(level.trim()).color)
+        }
+
+        putTextInView(log, ui.logTextView)
+    }
+
+    private fun putTextInView(text: String?, view: TextView) {
+        if (!text.isNullOrEmpty()) {
+            view.visible()
+            view.text = text.trim()
+        } else {
+            view.gone()
+        }
+    }
 }

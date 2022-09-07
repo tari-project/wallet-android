@@ -92,7 +92,7 @@ import javax.inject.Inject
  *
  * @author The Tari Development Team
  */
-internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
+class WalletService : Service(), FFIWalletListener, LifecycleObserver {
 
     companion object {
         // notification id
@@ -141,6 +141,7 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
     private lateinit var wallet: FFIWallet
 
     private var txBroadcastRestarted = false
+    private val logger = Logger.t(WalletService::class.simpleName)
 
     /**
      * Pairs of <tx id, recipient public key hex>.
@@ -235,14 +236,11 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
     private fun checkValidationResult(type: BaseNodeValidationType, responseId: BigInteger, isSuccess: Boolean) {
         val currentStatus = baseNodeValidationStatusMap[type]
         if (currentStatus == null) {
-            Logger.d(type.name + " validation [$responseId] complete. Result: $isSuccess. Current status is null, means we're not expecting a callback. Ignoring.")
             return
         }
         if (currentStatus.first != responseId) {
-            Logger.d(type.name + " Validation [$responseId] complete. Result: $isSuccess. Request id [${currentStatus.first}] mismatch. Ignoring.")
             return
         }
-        Logger.d(type.name + " Validation [$responseId] complete. Result: $isSuccess.")
         baseNodeValidationStatusMap[type] = Pair(currentStatus.first, isSuccess)
         checkBaseNodeSyncCompletion()
     }
@@ -275,7 +273,7 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
         Thread {
             walletManager.start()
         }.start()
-        Logger.d("Wallet service started.")
+        logger.i("Wallet service started")
     }
 
     private fun startForeground() {
@@ -334,12 +332,12 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
      * Bound service.
      */
     override fun onBind(intent: Intent?): IBinder {
-        Logger.d("Wallet service bound.")
+        logger.i("Wallet service bound")
         return serviceImpl
     }
 
     override fun onUnbind(intent: Intent?): Boolean {
-        Logger.d("Wallet service unbound.")
+        logger.i("Wallet service unbound")
         return super.onUnbind(intent)
     }
 
@@ -347,7 +345,7 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
      * A broadcast is made on destroy to get the service running again.
      */
     override fun onDestroy() {
-        Logger.d("Wallet service destroyed.")
+        logger.i("Wallet service destroyed")
         txExpirationCheckSubscription?.dispose()
         sendBroadcast(
             Intent(this, ServiceRestartBroadcastReceiver::class.java)
@@ -374,29 +372,27 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
     }
 
     private fun switchToNormalPowerMode() {
-        Logger.d("Switch to normal power mode.")
+        logger.i("Switch to normal power mode")
         lowPowerModeSubscription?.dispose()
         try {
             wallet.setPowerModeNormal()
-        } catch (e: FFIException) { // silent fail
-            Logger.e("FFI error #${e.error?.code} while switching to normal power mode.")
+        } catch (e: FFIException) {
+            logger.e(e, "Switching to normal power mode failed")
         }
     }
 
     private fun switchToLowPowerMode() {
-        Logger.d("Switch to low power mode.")
+        logger.i("Switch to low power mode")
         try {
             wallet.setPowerModeLow()
-        } catch (e: FFIException) { // silent fail
-            Logger.e("FFI error #${e.error?.code} while switching to low power mode.")
+        } catch (e: FFIException) {
+            logger.e(e, "Switching to low power mode failed")
         }
     }
 
     override fun onTxReceived(pendingInboundTx: PendingInboundTx) {
-        Logger.d("Tx received: $pendingInboundTx")
         pendingInboundTx.user = getUserByPublicKey(pendingInboundTx.user.publicKey)
-        Logger.d("Received TX after contact update: $pendingInboundTx")
-        // post event to bus for the internal listeners
+        // post event to bus for the listeners
         EventBus.post(Event.Transaction.TxReceived(pendingInboundTx))
         // manage notifications
         postTxNotification(pendingInboundTx)
@@ -406,9 +402,8 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
     }
 
     override fun onTxReplyReceived(pendingOutboundTx: PendingOutboundTx) {
-        Logger.d("Tx ${pendingOutboundTx.id} reply received.")
         pendingOutboundTx.user = getUserByPublicKey(pendingOutboundTx.user.publicKey)
-        // post event to bus for the internal listeners
+        // post event to bus for the listeners
         EventBus.post(Event.Transaction.TxReplyReceived(pendingOutboundTx))
         // notify external listeners
         listeners.iterator().forEach {
@@ -419,9 +414,8 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
     }
 
     override fun onTxFinalized(pendingInboundTx: PendingInboundTx) {
-        Logger.d("Tx ${pendingInboundTx.id} finalized.")
         pendingInboundTx.user = getUserByPublicKey(pendingInboundTx.user.publicKey)
-        // post event to bus for the internal listeners
+        // post event to bus for the listeners
         EventBus.post(Event.Transaction.TxFinalized(pendingInboundTx))
         // notify external listeners
         listeners.iterator().forEach {
@@ -432,9 +426,8 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
     }
 
     override fun onInboundTxBroadcast(pendingInboundTx: PendingInboundTx) {
-        Logger.d("Inbound tx ${pendingInboundTx.id} broadcast.")
         pendingInboundTx.user = getUserByPublicKey(pendingInboundTx.user.publicKey)
-        // post event to bus for the internal listeners
+        // post event to bus for the listeners
         EventBus.post(Event.Transaction.InboundTxBroadcast(pendingInboundTx))
         // notify external listeners
         listeners.iterator().forEach {
@@ -445,9 +438,8 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
     }
 
     override fun onOutboundTxBroadcast(pendingOutboundTx: PendingOutboundTx) {
-        Logger.d("Outbound tx ${pendingOutboundTx.id} broadcast.")
         pendingOutboundTx.user = getUserByPublicKey(pendingOutboundTx.user.publicKey)
-        // post event to bus for the internal listeners
+        // post event to bus for the listeners
         EventBus.post(Event.Transaction.OutboundTxBroadcast(pendingOutboundTx))
         // notify external listeners
         listeners.iterator().forEach { it.onOutboundTxBroadcast(pendingOutboundTx) }
@@ -456,9 +448,8 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
     }
 
     override fun onTxMined(completedTx: CompletedTx) {
-        Logger.d("Tx ${completedTx.id} mined.")
         completedTx.user = getUserByPublicKey(completedTx.user.publicKey)
-        // post event to bus for the internal listeners
+        // post event to bus for the listeners
         EventBus.post(Event.Transaction.TxMined(completedTx))
         // notify external listeners
         listeners.iterator().forEach {
@@ -469,9 +460,8 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
     }
 
     override fun onTxMinedUnconfirmed(completedTx: CompletedTx, confirmationCount: Int) {
-        Logger.d("Tx ${completedTx.id} mined, yet unconfirmed. Confirmation count: $confirmationCount")
         completedTx.user = getUserByPublicKey(completedTx.user.publicKey)
-        // post event to bus for the internal listeners
+        // post event to bus for the listeners
         EventBus.post(Event.Transaction.TxMinedUnconfirmed(completedTx))
         // notify external listeners
         listeners.iterator().forEach {
@@ -482,9 +472,8 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
     }
 
     override fun onTxFauxConfirmed(completedTx: CompletedTx) {
-        Logger.d("Tx faux ${completedTx.id} confirmed.")
         completedTx.user = getUserByPublicKey(completedTx.user.publicKey)
-        // post event to bus for the internal listeners
+        // post event to bus for the listeners
         EventBus.post(Event.Transaction.TxFauxConfirmed(completedTx))
         // notify external listeners
         listeners.iterator().forEach { it.onTxFauxConfirmed(completedTx) }
@@ -493,9 +482,8 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
     }
 
     override fun onTxFauxUnconfirmed(completedTx: CompletedTx, confirmationCount: Int) {
-        Logger.d("Tx faux ${completedTx.id} yet unconfirmed. Confirmation count: $confirmationCount")
         completedTx.user = getUserByPublicKey(completedTx.user.publicKey)
-        // post event to bus for the internal listeners
+        // post event to bus for the listeners
         EventBus.post(Event.Transaction.TxFauxMinedUnconfirmed(completedTx))
         // notify external listeners
         listeners.iterator().forEach { it.onTxFauxUnconfirmed(completedTx, confirmationCount) }
@@ -504,7 +492,6 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
     }
 
     override fun onDirectSendResult(txId: BigInteger, status: TransactionSendStatus) {
-        Logger.d("Tx $txId direct send completed. Status: ${status.status.value}")
         // post event to bus
         EventBus.post(Event.Transaction.DirectSendResult(TxId(txId), status))
         outboundTxIdsToBePushNotified.firstOrNull { it.first == txId }?.let {
@@ -520,14 +507,12 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
     }
 
     override fun onTxCancelled(cancelledTx: CancelledTx, rejectionReason: Int) {
-        Logger.d("Tx cancelled: $cancelledTx")
         cancelledTx.user = getUserByPublicKey(cancelledTx.user.publicKey)
         // post event to bus
         EventBus.post(Event.Transaction.TxCancelled(cancelledTx))
         val currentActivity = app.currentActivity
         if (cancelledTx.direction == INBOUND && !(app.isInForeground && currentActivity is HomeActivity && currentActivity.willNotifyAboutNewTx())
         ) {
-            Logger.i("Posting cancellation notification")
             notificationHelper.postTxCanceledNotification(cancelledTx)
         }
         // notify external listeners
@@ -538,19 +523,13 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
 
     override fun onTXOValidationComplete(responseId: BigInteger, isSuccess: Boolean) {
         checkValidationResult(BaseNodeValidationType.TXO, responseId, isSuccess)
-        Logger.i("onTXOValidationComplete responseId: $responseId, isSuccess: $isSuccess")
     }
 
     override fun onTxValidationComplete(responseId: BigInteger, isSuccess: Boolean) {
         checkValidationResult(BaseNodeValidationType.TX, responseId, isSuccess)
         if (!txBroadcastRestarted && isSuccess) {
-            try {
-                wallet.restartTxBroadcast()
-                txBroadcastRestarted = true
-                Logger.i("Transaction broadcast restarted.")
-            } catch (e: Exception) {
-                Logger.e("Error while restarting tx broadcast: " + e.message)
-            }
+            wallet.restartTxBroadcast()
+            txBroadcastRestarted = true
         }
     }
 
@@ -590,8 +569,7 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
             val txDate = DateTime(tx.getTimestamp().toLong() * 1000L).toLocalDateTime()
             val hoursPassed = Hours.hoursBetween(txDate, now).hours
             if (hoursPassed >= Constants.Wallet.pendingTxExpirationPeriodHours) {
-                val success = wallet.cancelPendingTx(tx.getId())
-                Logger.d("Expired pending inbound tx ${tx.getId()}. Success: $success.")
+                wallet.cancelPendingTx(tx.getId())
             }
             tx.destroy()
         }
@@ -611,8 +589,7 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
             val txDate = DateTime(tx.getTimestamp().toLong() * 1000L).toLocalDateTime()
             val hoursPassed = Hours.hoursBetween(txDate, now).hours
             if (hoursPassed >= Constants.Wallet.pendingTxExpirationPeriodHours) {
-                val success = wallet.cancelPendingTx(tx.getId())
-                Logger.d("Expired pending outbound tx ${tx.getId()}. Success: $success")
+                wallet.cancelPendingTx(tx.getId())
             }
             tx.destroy()
         }
@@ -646,18 +623,7 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
     private fun sendPushNotificationToTxRecipient(recipientPublicKeyHex: String) {
         // the push notification server accepts lower-case hex strings as of now
         val fromPublicKeyHex = wallet.getPublicKey().toString().lowercase(Locale.ENGLISH)
-        Logger.d(
-            "Will send push notification to recipient %s from %s.",
-            recipientPublicKeyHex,
-            fromPublicKeyHex
-        )
-        notificationService.notifyRecipient(
-            recipientPublicKeyHex,
-            fromPublicKeyHex,
-            wallet::signMessage,
-            onSuccess = { Logger.i("Push notification successfully sent to recipient.") },
-            onFailure = { Logger.e(it, "Push notification failed with exception.") }
-        )
+        notificationService.notifyRecipient(recipientPublicKeyHex, fromPublicKeyHex, wallet::signMessage)
     }
 
     private fun getUserByPublicKey(key: PublicKey): User {
@@ -666,9 +632,7 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
             val contactFFI = contactsFFI.getAt(i)
             val publicKeyFFI = contactFFI.getPublicKey()
             val hex = publicKeyFFI.toString()
-            val contact =
-                if (hex == key.hexString) Contact(key, contactFFI.getAlias())
-                else null
+            val contact = if (hex == key.hexString) Contact(key, contactFFI.getAlias()) else null
             publicKeyFFI.destroy()
             contactFFI.destroy()
             if (contact != null) {
@@ -739,10 +703,7 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
 
         override fun registerListener(listener: TariWalletServiceListener): Boolean {
             listeners.add(listener)
-            listener.asBinder().linkToDeath({
-                val removeSuccessful = listeners.remove(listener)
-                Logger.i("Listener died. Remove successful: $removeSuccessful.")
-            }, 0)
+            listener.asBinder().linkToDeath({ listeners.remove(listener) }, 0)
             return true
         }
 
@@ -858,7 +819,7 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
         } ?: false
 
         override fun startBaseNodeSync(error: WalletError): Boolean = executeWithMapping(error, {
-            Logger.e("Base node validation error: $it")
+            logger.e(it, "Base node sync failed")
             baseNodeSharedPrefsRepository.baseNodeLastSyncResult = false
             baseNodeValidationStatusMap.clear()
             EventBus.baseNodeSyncState.post(BaseNodeSyncState.Failed)
@@ -911,7 +872,6 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
                 signature,
                 nonce,
                 { result ->
-                    Logger.i("requestMaxTestnetTari success")
                     val senderPublicKeyFFI = FFIPublicKey(HexString(result.walletId))
                     // add contact
                     FFIContact("TariBot", senderPublicKeyFFI).also {
@@ -924,13 +884,12 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
                     // store the UTXO keys
                     testnetFaucetRepository.testnetTariUTXOKeyList = TestnetUtxoList(result.keys)
 
-                    // post event to bus for the internal listeners
+                    // post event to bus for the listeners
                     EventBus.post(Event.Testnet.TestnetTariRequestSuccessful())
                     // notify external listeners
                     listeners.iterator().forEach { it.onTestnetTariRequestSuccess() }
                 },
                 {
-                    Logger.i("requestMaxTestnetTari error ${it.message}")
                     error.code = WalletError.UnknownError.code
                     val errorMessage = string(R.string.wallet_service_error_testnet_tari_request) + " " + it.message
                     // todo maybe needed
@@ -961,13 +920,7 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
                     FFIByteVector(HexString(firstUTXOKey.output.metadataSignature.v))
                 )
                 val covenant = FFICovenant(FFIByteVector(HexString(firstUTXOKey.output.covenant)))
-                //todo need to update when faucet got fixed
-                val outputFeatures = FFIOutputFeatures(
-                    '0', '0', 0, '0',
-                    FFIByteVector(HexString(firstUTXOKey.output.metadataSignature.public_nonce)),
-                    FFIByteVector(HexString(firstUTXOKey.output.metadataSignature.u)),
-                    FFIByteVector(HexString(firstUTXOKey.output.metadataSignature.v))
-                )
+                val outputFeatures = FFIOutputFeatures('0', 0, FFIByteVector(HexString(firstUTXOKey.output.metadataSignature.public_nonce)))
                 val txId = wallet.importUTXO(
                     amount,
                     txMessage,
@@ -1015,7 +968,7 @@ internal class WalletService : Service(), FFIWalletListener, LifecycleObserver {
         } ?: false
 
         private fun notifyTestnetTariRequestFailed(error: String) {
-            // post event to bus for the internal listeners
+            // post event to bus for the listeners
             EventBus.post(Event.Testnet.TestnetTariRequestError(error))
             // notify external listeners
             listeners.iterator().forEach { listener -> listener.onTestnetTariRequestError(error) }

@@ -40,12 +40,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AlertDialog
-import androidx.biometric.BiometricPrompt
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.daasuu.ei.Ease
 import com.daasuu.ei.EasingInterpolator
-import com.orhanobut.logger.Logger
 import com.tari.android.wallet.R
 import com.tari.android.wallet.R.dimen.auth_button_bottom_margin
 import com.tari.android.wallet.R.string.*
@@ -75,9 +73,6 @@ class LocalAuthFragment : CommonFragment<FragmentLocalAuthBinding, LocalAuthView
         observeUi()
         setupUi()
         ui.rootView.doOnGlobalLayout(this::playStartUpAnim)
-        if (savedInstanceState == null) {
-            viewModel.tracker.screen("/onboarding/enable_local_auth", "Onboarding - Enable Local Authentication")
-        }
     }
 
     private fun observeUi() = with(viewModel) {
@@ -146,15 +141,12 @@ class LocalAuthFragment : CommonFragment<FragmentLocalAuthBinding, LocalAuthView
                 if (viewModel.authService.authenticate(this@LocalAuthFragment, string(onboarding_auth_title), subtitle))
                     authSuccess() else authFailed()
             } catch (exception: BiometricAuthenticationException) {
-                if (exception.code != BiometricPrompt.ERROR_USER_CANCELED && exception.code != BiometricPrompt.ERROR_CANCELED)
-                    Logger.e("Other auth error. Code: ${exception.code}")
                 authFailed()
             }
         }
     }
 
     private fun authFailed() {
-        Logger.e("Authentication other error.")
         AlertDialog.Builder(requireContext())
             .setMessage(string(auth_failed_desc))
             .setCancelable(false)
@@ -193,6 +185,6 @@ class LocalAuthFragment : CommonFragment<FragmentLocalAuthBinding, LocalAuthView
                 viewModel.sharedPrefsWrapper.isAuthenticated = true
                 viewModel.sharedPrefsWrapper.onboardingAuthSetupCompleted = true
                 (requireActivity() as? LocalAuthListener)?.onAuthSuccess()
-        }.addTo(viewModel.compositeDisposable)
+            }.addTo(viewModel.compositeDisposable)
     }
 }

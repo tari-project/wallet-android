@@ -35,7 +35,7 @@ package com.tari.android.wallet.ffi
 /**
  * @author The Tari Development Team
  */
-internal class NetAddressString(address: String = "0.0.0.0", port: Int = 0) {
+class NetAddressString(address: String = "0.0.0.0", port: Int = 0) {
 
     private val address: String
     private val addressPort: Int

@@ -40,7 +40,6 @@ import android.widget.TextView
 import androidx.core.animation.addListener
 import com.daasuu.ei.Ease
 import com.daasuu.ei.EasingInterpolator
-import com.orhanobut.logger.Logger
 import com.tari.android.wallet.R
 import com.tari.android.wallet.event.Event
 import com.tari.android.wallet.event.EventBus
@@ -65,7 +64,7 @@ import kotlin.coroutines.CoroutineContext
  *
  * @author The Tari Development Team
  */
-internal class UpdateProgressViewController(private val view: View, listener: Listener) : CoroutineScope {
+class UpdateProgressViewController(private val view: View, listener: Listener) : CoroutineScope {
 
     private val mJob = Job()
     override val coroutineContext: CoroutineContext
@@ -153,7 +152,6 @@ internal class UpdateProgressViewController(private val view: View, listener: Li
 
     fun start(walletService: TariWalletService) {
         this.walletService = walletService
-        Logger.d("Start update.")
         progressBar.visible()
         isReset = false
         state.numberOfReceivedTxs = 0
@@ -198,10 +196,8 @@ internal class UpdateProgressViewController(private val view: View, listener: Li
     }
 
     private fun checkNetworkConnectionStatus() {
-        Logger.d("Start connection check.")
         val networkConnectionState = EventBus.networkConnectionState.publishSubject.value
         if (networkConnectionState != NetworkConnectionState.CONNECTED) {
-            Logger.e("Update error: not connected to the internet.")
             view.postDelayed({ fail(FailureReason.NETWORK_CONNECTION_ERROR) }, minStateDisplayPeriodMs)
             return
         }
@@ -210,7 +206,6 @@ internal class UpdateProgressViewController(private val view: View, listener: Li
 
     @SuppressLint("CheckResult")
     private fun checkTorBootstrapStatus() {
-        Logger.d("Check bootstrap status.")
         torBootstrapStatusSubscription?.dispose()
         // check for expiration
         if (connectionCheckHasTimedOut()) {
@@ -221,13 +216,11 @@ internal class UpdateProgressViewController(private val view: View, listener: Li
         // check whether Tor proxy is running
         if (torProxyState !is TorProxyState.Running) {
             // either not connected or Tor proxy is not running
-            Logger.e("Update error: Tor proxy is not running.")
             view.postDelayed({ fail(FailureReason.BASE_NODE_VALIDATION_ERROR) }, minStateDisplayPeriodMs)
             return
         }
         // check Tor bootstrap status
         if (torProxyState.bootstrapStatus.progress < TorBootstrapStatus.maxProgress) {
-            Logger.d("Tor bootstrap not complete. Try again in %d seconds.", minStateDisplayPeriodMs)
             // check again after a wait period
             torBootstrapStatusSubscription = Observable
                 .timer(minStateDisplayPeriodMs, TimeUnit.MILLISECONDS)
@@ -247,13 +240,11 @@ internal class UpdateProgressViewController(private val view: View, listener: Li
         }
         baseNodeSyncCurrentRetryCount++
         // sync base node
-        Logger.d("Try to sync with base node - retry count %d.", baseNodeSyncCurrentRetryCount)
         val walletError = WalletError()
         // long running call
         launch(Dispatchers.IO) {
             val success = walletService.startBaseNodeSync(walletError)
             if (isActive && (!success || walletError != WalletError.NoError)) {
-                Logger.e("Base node sync has failed.")
                 fail(FailureReason.BASE_NODE_VALIDATION_ERROR)
             }
         }
@@ -270,8 +261,6 @@ internal class UpdateProgressViewController(private val view: View, listener: Li
         when (event) {
             is BaseNodeSyncState.Online -> {
                 baseNodeSyncTimeoutSubscription?.dispose()
-                // base node sync successful - start listening for events
-                Logger.d("Base node sync successful. Start listening for wallet events.")
                 state.state = State.RECEIVING
                 view.postDelayed({ displayReceivingTxs() }, minStateDisplayPeriodMs)
             }
@@ -329,7 +318,6 @@ internal class UpdateProgressViewController(private val view: View, listener: Li
     }
 
     private fun baseNodeSyncTimedOut() {
-        Logger.e("Base node sync timed out.")
         fail(FailureReason.BASE_NODE_VALIDATION_ERROR)
     }
 

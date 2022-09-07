@@ -49,7 +49,7 @@ class CompletedTx() : Tx(), Parcelable {
     var confirmationCount = BigInteger("0")
     var txKernel: CompletedTransactionKernel? = null
 
-    internal constructor(tx: FFICompletedTx) : this() {
+    constructor(tx: FFICompletedTx) : this() {
         this.id = tx.getId()
         this.direction = tx.getDirection()
         this.user = tx.getUser()
@@ -66,7 +66,7 @@ class CompletedTx() : Tx(), Parcelable {
         tx.destroy()
     }
 
-    internal constructor(pointer: FFIPointer) : this(FFICompletedTx(pointer))
+    constructor(pointer: FFIPointer) : this(FFICompletedTx(pointer))
 
 
     // region Parcelable

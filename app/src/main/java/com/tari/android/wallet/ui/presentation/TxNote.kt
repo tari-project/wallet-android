@@ -32,7 +32,7 @@
  */
 package com.tari.android.wallet.ui.presentation
 
-internal class TxNote(val message: String?, val gifUrl: String?) {
+class TxNote(val message: String?, val gifUrl: String?) {
 
     init {
         if (message == null && gifUrl == null) {

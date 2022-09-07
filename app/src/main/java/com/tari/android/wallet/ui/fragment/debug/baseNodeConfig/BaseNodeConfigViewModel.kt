@@ -12,7 +12,7 @@ import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.common.SingleLiveEvent
 import javax.inject.Inject
 
-internal class BaseNodeConfigViewModel : CommonViewModel() {
+class BaseNodeConfigViewModel : CommonViewModel() {
 
     @Inject
     lateinit var baseNodeSharedRepository: BaseNodeSharedRepository

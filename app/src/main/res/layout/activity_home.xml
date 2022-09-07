@@ -20,8 +20,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            tools:ignore="FragmentTagUsage"
-            tools:viewBindingIgnore="true" />
+            tools:ignore="FragmentTagUsage" />
 
         <View
             android:id="@+id/bottom_elevation_view"

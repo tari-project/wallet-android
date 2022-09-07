@@ -25,6 +25,7 @@ class TorProxyControl(private val torConfig: TorConfig) {
      * Timer to check Tor status.
      */
     private var timerSubscription: Disposable? = null
+    private val logger = Logger.t(TorProxyControl::class.simpleName)
 
     private lateinit var socket: Socket
     private lateinit var controlConnection: TorControlConnection
@@ -40,6 +41,7 @@ class TorProxyControl(private val torConfig: TorConfig) {
         if (this::controlConnection.isInitialized) {
             runCatching { controlConnection.shutdownTor("SHUTDOWN") }
         }
+        logger.i("shutdownTor")
     }
 
     private fun connectToTor() {
@@ -52,10 +54,10 @@ class TorProxyControl(private val torConfig: TorConfig) {
         } catch (throwable: Throwable) {
             val initializationElapsedMs = System.currentTimeMillis() - monitoringStartTimeMs
             if (initializationElapsedMs > initializationCheckTimeoutMillis) {
-                Logger.e("Failed to connect to Tor proxy, timed out: %s", throwable.message)
+                logger.e(throwable, "Failed to connect to Tor proxy, timed out")
                 updateState(TorProxyState.Failed(throwable))
             } else {
-                Logger.e("Failed to connect to Tor proxy, will retry: %s", throwable.message)
+                logger.e(throwable, "Failed to connect to Tor proxy, will retry")
                 timerSubscription = Observable.timer(initializationCheckRetryPeriodMillis, TimeUnit.MILLISECONDS)
                     .subscribeOn(Schedulers.io())
                     .observeOn(Schedulers.io())
@@ -82,17 +84,16 @@ class TorProxyControl(private val torConfig: TorConfig) {
                 updateState(TorProxyState.Failed(Throwable("Tor not running")))
             }
         } catch (throwable: Throwable) {
-            Logger.e("Tor proxy has failed: %s", throwable.message)
+            logger.e(throwable, "Tor proxy has failed")
             updateState(TorProxyState.Failed(throwable))
         }
     }
 
     private fun isTorRunning(controlConnection: TorControlConnection?): TorBootstrapStatus? {
         val phaseLogLine = controlConnection?.getInfo("status/bootstrap-phase") ?: return null
+        logger.i("Tor connection status: $phaseLogLine")
         return TorBootstrapStatus.from(phaseLogLine)
     }
 
-    private fun updateState(newState: TorProxyState) {
-        EventBus.torProxyState.post(newState)
-    }
+    private fun updateState(newState: TorProxyState) = EventBus.torProxyState.post(newState)
 }

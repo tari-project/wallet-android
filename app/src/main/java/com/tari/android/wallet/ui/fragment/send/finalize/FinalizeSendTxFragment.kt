@@ -193,7 +193,6 @@ class FinalizeSendTxFragment : CommonFragment<FragmentFinalizeSendTxBinding, Fin
             TxFailureReason.BASE_NODE_CONNECTION_ERROR -> "Transaction Failed - Node Issue"
             TxFailureReason.SEND_ERROR -> "Transaction Failed - Node Issue"
         }
-        viewModel.tracker.event(category = "Transaction", action = trackerEvent)
 
         // fade out text and progress
         ValueAnimator.ofFloat(1f, 0f).apply {

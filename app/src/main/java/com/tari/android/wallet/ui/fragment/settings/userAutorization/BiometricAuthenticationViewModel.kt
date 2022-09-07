@@ -4,7 +4,6 @@ import androidx.appcompat.app.AlertDialog
 import androidx.biometric.BiometricPrompt
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.viewModelScope
-import com.orhanobut.logger.Logger
 import com.tari.android.wallet.R
 import com.tari.android.wallet.extension.observe
 import com.tari.android.wallet.infrastructure.security.biometric.BiometricAuthenticationException
@@ -48,7 +47,7 @@ class BiometricAuthenticationViewModel : CommonViewModel() {
     private fun handleError(e: Exception) {
         if (e is BiometricAuthenticationException) {
             if (e.code != BiometricPrompt.ERROR_USER_CANCELED && e.code != BiometricPrompt.ERROR_CANCELED)
-                Logger.e("Other biometric error. Code: ${e.code}")
+                logger.e(e, "Other biometric error. Code: ${e.code}")
             val args = AlertDialogArgs(
                 resourceManager.getString(R.string.auth_failed_desc),
                 resourceManager.getString(R.string.auth_failed_title),

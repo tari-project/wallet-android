@@ -30,26 +30,33 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.tari.android.wallet.ui.activity.settings
+package com.tari.android.wallet.ui.fragment.settings.backup.activity
 
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
+import androidx.activity.viewModels
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import com.tari.android.wallet.R
+import com.tari.android.wallet.databinding.ActivityBackupSettingsBinding
+import com.tari.android.wallet.ui.common.CommonActivity
 import com.tari.android.wallet.ui.fragment.settings.backup.ChangeSecurePasswordFragment
 import com.tari.android.wallet.ui.fragment.settings.backup.EnterCurrentPasswordFragment
 import com.tari.android.wallet.ui.fragment.settings.backup.backupSettings.BackupSettingsFragment
 import com.tari.android.wallet.ui.fragment.settings.backup.verifySeedPhrase.VerifySeedPhraseFragment
 import com.tari.android.wallet.ui.fragment.settings.backup.writeDownSeedWords.WriteDownSeedPhraseFragment
 
-class BackupSettingsActivity : AppCompatActivity(), BackupSettingsRouter {
+class BackupSettingsActivity : CommonActivity<ActivityBackupSettingsBinding, BackupSettingsViewModel>(), BackupSettingsRouter {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_settings)
+        ui = ActivityBackupSettingsBinding.inflate(layoutInflater).apply { setContentView(root) }
+
+        val viewModel: BackupSettingsViewModel by viewModels()
+        bindViewModel(viewModel)
+
+        setContentView(R.layout.activity_backup_settings)
         overridePendingTransition(R.anim.enter_from_right, R.anim.exit_to_left)
         if (savedInstanceState == null) {
             loadBackupSettingsFragment()
@@ -62,35 +69,19 @@ class BackupSettingsActivity : AppCompatActivity(), BackupSettingsRouter {
             .commit()
     }
 
+    override fun toWalletBackupWithRecoveryPhrase(sourceFragment: Fragment) = addFragment(sourceFragment, WriteDownSeedPhraseFragment.newInstance())
 
-    override fun toWalletBackupWithRecoveryPhrase(sourceFragment: Fragment) {
-        addFragment(sourceFragment, WriteDownSeedPhraseFragment.newInstance())
-    }
-
-    override fun toSeedPhraseVerification(sourceFragment: Fragment, seedWords: List<String>) {
+    override fun toSeedPhraseVerification(sourceFragment: Fragment, seedWords: List<String>) =
         addFragment(sourceFragment, VerifySeedPhraseFragment.newInstance(seedWords))
-    }
 
-    override fun toConfirmPassword(sourceFragment: Fragment) {
-        addFragment(
-            sourceFragment,
-            EnterCurrentPasswordFragment.newInstance(),
-            allowStateLoss = true
-        )
-    }
+    override fun toConfirmPassword(sourceFragment: Fragment) =
+        addFragment(sourceFragment, EnterCurrentPasswordFragment.newInstance(), allowStateLoss = true)
 
-    override fun toChangePassword(sourceFragment: Fragment) {
-        addFragment(
-            sourceFragment,
-            ChangeSecurePasswordFragment.newInstance(),
-            allowStateLoss = true
-        )
-    }
+    override fun toChangePassword(sourceFragment: Fragment) =
+        addFragment(sourceFragment, ChangeSecurePasswordFragment.newInstance(), allowStateLoss = true)
 
     override fun onPasswordChanged(sourceFragment: Fragment) {
-        if (supportFragmentManager
-                .findFragmentByTag(EnterCurrentPasswordFragment::class.java.simpleName) != null
-        ) {
+        if (supportFragmentManager.findFragmentByTag(EnterCurrentPasswordFragment::class.java.simpleName) != null) {
             supportFragmentManager.popBackStackImmediate(
                 EnterCurrentPasswordFragment::class.java.simpleName,
                 FragmentManager.POP_BACK_STACK_INCLUSIVE
@@ -101,10 +92,7 @@ class BackupSettingsActivity : AppCompatActivity(), BackupSettingsRouter {
     }
 
     override fun onSeedPhraseVerificationComplete(sourceFragment: Fragment) {
-        supportFragmentManager.popBackStackImmediate(
-            WriteDownSeedPhraseFragment::class.java.simpleName,
-            FragmentManager.POP_BACK_STACK_INCLUSIVE
-        )
+        supportFragmentManager.popBackStackImmediate(WriteDownSeedPhraseFragment::class.java.simpleName, FragmentManager.POP_BACK_STACK_INCLUSIVE)
     }
 
     override fun onBackPressed() {
@@ -117,19 +105,11 @@ class BackupSettingsActivity : AppCompatActivity(), BackupSettingsRouter {
     // for samsung devices with biometrics enabled, as after launching the biometric prompt
     // onSaveInstanceState is called, and commit()ing any stuff after onSaveInstanceState is called
     // results into IllegalStateException: Can not perform this action after onSaveInstanceState
-    private fun addFragment(
-        sourceFragment: Fragment,
-        fragment: Fragment,
-        allowStateLoss: Boolean = false
-    ) {
+    private fun addFragment(sourceFragment: Fragment, fragment: Fragment, allowStateLoss: Boolean = false) {
         supportFragmentManager
             .beginTransaction()
-            .setCustomAnimations(
-                R.anim.enter_from_right, R.anim.exit_to_left,
-                R.anim.enter_from_left, R.anim.exit_to_right
-            )
+            .setCustomAnimations(R.anim.enter_from_right, R.anim.exit_to_left, R.anim.enter_from_left, R.anim.exit_to_right)
             .hide(sourceFragment)
-            //  .apply { supportFragmentManager.fragments.forEach { hide(it) } }
             .add(R.id.settings_fragment_container, fragment, fragment.javaClass.simpleName)
             .addToBackStack(fragment.javaClass.simpleName)
             .apply { if (allowStateLoss) commitAllowingStateLoss() else commit() }

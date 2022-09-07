@@ -30,41 +30,22 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.tari.android.wallet.di
+package com.tari.android.wallet.ui.fragment.settings.backup.activity
 
-import android.content.Context
-import com.tari.android.wallet.BuildConfig
-import com.tari.android.wallet.infrastructure.ConsoleLogTracker
-import com.tari.android.wallet.infrastructure.MatomoTracker
-import com.tari.android.wallet.infrastructure.Tracker
-import dagger.Module
-import dagger.Provides
-import org.matomo.sdk.Matomo
-import org.matomo.sdk.TrackerBuilder
-import javax.inject.Singleton
+import androidx.fragment.app.Fragment
 
-/**
- * Satisfies tracker dependencies.
- *
- * @author The Tari Development Team
- */
-@Module
-internal class TrackerModule {
+interface BackupSettingsRouter {
 
-    companion object {
+    fun toWalletBackupWithRecoveryPhrase(sourceFragment: Fragment)
 
-        private const val matomoUrl = "https://matomo.tari.com/matomo.php"
-        private const val matomoSiteId = 2
+    fun toSeedPhraseVerification(sourceFragment: Fragment, seedWords: List<String>)
 
-    }
+    fun toConfirmPassword(sourceFragment: Fragment)
 
-    @Provides
-    @Singleton
-    fun provideTracker(context: Context): Tracker =
-        if (BuildConfig.DEBUG) ConsoleLogTracker()
-        else MatomoTracker(
-            TrackerBuilder.createDefault(matomoUrl, matomoSiteId)
-                .build(Matomo.getInstance(context))
-                .apply { dispatchInterval = 0 }
-        )
+    fun toChangePassword(sourceFragment: Fragment)
+
+    fun onPasswordChanged(sourceFragment: Fragment)
+
+    fun onSeedPhraseVerificationComplete(sourceFragment: Fragment)
+
 }

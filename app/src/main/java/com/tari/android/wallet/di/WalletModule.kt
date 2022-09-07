@@ -40,7 +40,7 @@ import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodeSharedRepository
 import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepository
 import com.tari.android.wallet.data.sharedPrefs.tariSettings.TariSettingsSharedRepository
-import com.tari.android.wallet.infrastructure.BugReportingService
+import com.tari.android.wallet.infrastructure.logging.BugReportingService
 import com.tari.android.wallet.network.NetworkConnectionStateReceiver
 import com.tari.android.wallet.service.seedPhrase.SeedPhraseRepository
 import com.tari.android.wallet.tor.TorConfig
@@ -51,7 +51,7 @@ import javax.inject.Singleton
 
 
 @Module
-internal class WalletModule {
+class WalletModule {
 
     @Provides
     @Singleton

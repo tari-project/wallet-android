@@ -47,7 +47,7 @@ import com.tari.android.wallet.util.Constants
  *
  * @author The Tari Development Team
  */
-internal class EmojiIdCopiedViewController(private val ui: ViewEmojiIdCopiedAnimBinding) {
+class EmojiIdCopiedViewController(private val ui: ViewEmojiIdCopiedAnimBinding) {
 
     init {
         whiteBgView.post {

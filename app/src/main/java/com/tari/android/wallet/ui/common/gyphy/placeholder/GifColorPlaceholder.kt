@@ -5,7 +5,7 @@ import androidx.annotation.ColorInt
 import com.facebook.drawee.drawable.RoundedColorDrawable
 import kotlin.math.abs
 
-internal class GifColorPlaceholder private constructor(@field:ColorInt @param:ColorInt private val color: Int, private val cornerRadius: Float) :
+class GifColorPlaceholder private constructor(@field:ColorInt @param:ColorInt private val color: Int, private val cornerRadius: Float) :
     GifPlaceholder {
     override fun asDrawable(): Drawable = RoundedColorDrawable(cornerRadius, color)
 
