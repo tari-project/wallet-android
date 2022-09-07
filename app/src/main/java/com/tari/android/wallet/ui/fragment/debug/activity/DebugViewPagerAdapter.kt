@@ -30,7 +30,7 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.tari.android.wallet.ui.activity.debug.adapter
+package com.tari.android.wallet.ui.fragment.debug.activity
 
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
@@ -46,14 +46,7 @@ import com.tari.android.wallet.ui.fragment.debug.debugLog.DebugLogFragment
  */
 class DebugViewPagerAdapter(activity: FragmentActivity) : FragmentStateAdapter(activity) {
 
-    /**
-     * Logs and base node configuration.
-     */
-    private val numberOfItems = 3
-
-    override fun getItemCount(): Int {
-        return numberOfItems
-    }
+    override fun getItemCount(): Int = 3
 
     override fun createFragment(position: Int): Fragment {
         return when (position) {
@@ -63,5 +56,4 @@ class DebugViewPagerAdapter(activity: FragmentActivity) : FragmentStateAdapter(a
             else -> throw RuntimeException("Unexpected page position: $position")
         }
     }
-
 }

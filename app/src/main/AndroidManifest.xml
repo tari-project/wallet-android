@@ -124,7 +124,7 @@
             android:theme="@style/YatLibTheme.TransparentCompat"
             android:windowSoftInputMode="stateAlwaysHidden" />
         <activity
-            android:name=".ui.activity.debug.DebugActivity"
+            android:name="com.tari.android.wallet.ui.fragment.debug.activity.DebugActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:launchMode="singleTask"
             android:parentActivityName=".ui.activity.home.HomeActivity"

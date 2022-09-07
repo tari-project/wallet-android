@@ -9,10 +9,10 @@ import androidx.viewbinding.ViewBinding
 import com.squareup.seismic.ShakeDetector
 import com.tari.android.wallet.R
 import com.tari.android.wallet.extension.observe
-import com.tari.android.wallet.ui.activity.debug.DebugActivity
 import com.tari.android.wallet.ui.dialog.TariDialog
 import com.tari.android.wallet.ui.dialog.inProgress.TariProgressDialog
 import com.tari.android.wallet.ui.dialog.modular.ModularDialog
+import com.tari.android.wallet.ui.fragment.debug.activity.DebugActivity
 import yat.android.lib.YatIntegration
 
 abstract class CommonActivity<Binding : ViewBinding, VM : CommonViewModel> : AppCompatActivity(), ShakeDetector.Listener {
@@ -33,6 +33,8 @@ abstract class CommonActivity<Binding : ViewBinding, VM : CommonViewModel> : App
         observe(openLink) { startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(it))) }
 
         observe(modularDialog) { replaceDialog(ModularDialog(this@CommonActivity, it)) }
+
+        observe(dismissDialog) { currentDialog?.dismiss() }
 
         observe(loadingDialog) { if (it.isShow) replaceDialog(TariProgressDialog(this@CommonActivity, it)) else currentDialog?.dismiss() }
     }
