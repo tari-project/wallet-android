@@ -30,11 +30,11 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.tari.android.wallet.ui.activity.settings
+package com.tari.android.wallet.ui.fragment.settings.deleteWallet
 
 import android.content.Intent
 import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
+import androidx.activity.viewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.tari.android.wallet.R
@@ -42,7 +42,7 @@ import com.tari.android.wallet.databinding.ActivityDeleteWalletBinding
 import com.tari.android.wallet.di.DiContainer.appComponent
 import com.tari.android.wallet.service.WalletServiceLauncher
 import com.tari.android.wallet.service.connection.TariWalletServiceConnection
-import com.tari.android.wallet.ui.fragment.onboarding.activity.OnboardingFlowActivity
+import com.tari.android.wallet.ui.common.CommonActivity
 import com.tari.android.wallet.ui.dialog.modular.DialogArgs
 import com.tari.android.wallet.ui.dialog.modular.ModularDialog
 import com.tari.android.wallet.ui.dialog.modular.ModularDialogArgs
@@ -51,23 +51,29 @@ import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonModule
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonStyle
 import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
 import com.tari.android.wallet.ui.extension.*
+import com.tari.android.wallet.ui.fragment.onboarding.activity.OnboardingFlowActivity
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
-class DeleteWalletActivity : AppCompatActivity() {
+// todo refactor to regular fragment
+class DeleteWalletActivity : CommonActivity<ActivityDeleteWalletBinding, DeleteWalletViewModel>() {
 
     @Inject
     lateinit var walletServiceLauncher: WalletServiceLauncher
 
-    private var ui: ActivityDeleteWalletBinding? = null
     private lateinit var serviceConnection: TariWalletServiceConnection
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        ui = ActivityDeleteWalletBinding.inflate(layoutInflater).apply { setContentView(root) }
         overridePendingTransition(R.anim.enter_from_right, R.anim.exit_to_left)
         appComponent.inject(this)
+
+        val viewModel: DeleteWalletViewModel by viewModels()
+        bindViewModel(viewModel)
+
         serviceConnection = ViewModelProvider(this)[TariWalletServiceConnection::class.java]
         setupUI()
     }
@@ -78,10 +84,9 @@ class DeleteWalletActivity : AppCompatActivity() {
     }
 
     private fun setupUI() {
-        ui = ActivityDeleteWalletBinding.inflate(layoutInflater).apply { setContentView(root) }
-        ui?.deleteWalletProgress?.setColor(color(R.color.common_error))
-        ui?.backCtaView?.setOnClickListener(ThrottleClick { onBackPressed() })
-        ui?.deleteWalletCtaView?.setOnClickListener(ThrottleClick { confirmDeleteWallet() })
+        ui.deleteWalletProgress.setColor(color(R.color.common_error))
+        ui.backCtaView.setOnClickListener(ThrottleClick { onBackPressed() })
+        ui.deleteWalletCtaView.setOnClickListener(ThrottleClick { confirmDeleteWallet() })
     }
 
     private fun confirmDeleteWallet() {
@@ -102,9 +107,9 @@ class DeleteWalletActivity : AppCompatActivity() {
 
     private fun deleteWallet() {
         // disable CTAs
-        ui?.backCtaView?.isEnabled = false
-        ui?.deleteWalletCtaView?.isEnabled = false
-        ui?.deleteWalletProgress?.visible()
+        ui.backCtaView.isEnabled = false
+        ui.deleteWalletCtaView.isEnabled = false
+        ui.deleteWalletProgress.visible()
         // delete wallet
         lifecycleScope.launch(Dispatchers.IO) {
             walletServiceLauncher.stopAndDelete()
@@ -120,5 +125,4 @@ class DeleteWalletActivity : AppCompatActivity() {
         startActivity(intent)
         finishAffinity()
     }
-
 }
