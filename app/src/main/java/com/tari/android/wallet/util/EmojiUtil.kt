@@ -154,18 +154,18 @@ class EmojiUtil {
         const val smallEmojiIdSize = 6
 
         val emojiSet by lazy {
-                val emojis = mutableSetOf<String>()
-                val emojiSetFFI = FFIEmojiSet()
-                for (i in 0 until emojiSetFFI.getLength()) {
-                    val emojiFFI = emojiSetFFI.getAt(i)
-                    val emojiBytes = emojiFFI.getBytes()
-                    val emoji = String(emojiBytes)
-                    emojis.add(emoji)
-                    emojiFFI.destroy()
-                }
-                emojiSetFFI.destroy()
-                emojis
+            val emojis = mutableSetOf<String>()
+            val emojiSetFFI = FFIEmojiSet()
+            for (i in 0 until emojiSetFFI.getLength()) {
+                val emojiFFI = emojiSetFFI.getAt(i)
+                val emojiBytes = emojiFFI.getBytes()
+                val emoji = String(emojiBytes)
+                emojis.add(emoji)
+                emojiFFI.destroy()
             }
+            emojiSetFFI.destroy()
+            emojis
+        }
 
         /**
          * Masking-related: get the indices of current chunk separators.
@@ -173,10 +173,7 @@ class EmojiUtil {
          * @param string possibly chunked string
          * @param emojiIdChunkSeparator chunk separator sequence
          */
-        fun getExistingChunkSeparatorIndices(
-            string: String,
-            emojiIdChunkSeparator: String
-        ): ArrayList<Int> {
+        fun getExistingChunkSeparatorIndices(string: String, emojiIdChunkSeparator: String): ArrayList<Int> {
             val existingIndices = ArrayList<Int>()
             var currentIndex = 0
             // prep the iterator
@@ -253,52 +250,23 @@ class EmojiUtil {
             return builder.toString()
         }
 
-        fun getChunkSeparatorSpannable(
-            separator: String,
-            color: Int
-        ): SpannableString {
+        fun getChunkSeparatorSpannable(separator: String, color: Int): SpannableString {
             val spannable = SpannableString(separator)
-            spannable.setSpan(
-                ForegroundColorSpan(color),
-                0,
-                separator.length,
-                Spanned.SPAN_INTERMEDIATE
-            )
-            spannable.applyRelativeTextSizeStyle(
-                separator,
-                Constants.UI.emojiIdChunkSeparatorRelativeScale
-            )
-            spannable.applyLetterSpacingStyle(
-                separator,
-                Constants.UI.emojiIdChunkSeparatorLetterSpacing
-            )
+            spannable.setSpan(ForegroundColorSpan(color), 0, separator.length, Spanned.SPAN_INTERMEDIATE)
+            spannable.applyRelativeTextSizeStyle(separator, Constants.UI.emojiIdChunkSeparatorRelativeScale)
+            spannable.applyLetterSpacingStyle(separator, Constants.UI.emojiIdChunkSeparatorLetterSpacing)
             return spannable
         }
 
-        fun getFullEmojiIdSpannable(
-            emojiId: String,
-            separator: String,
-            darkColor: Int,
-            lightColor: Int
-        ): SpannableString {
-            val spannable = getChunkedEmojiId(
-                emojiId,
-                separator
-            ).applyColorStyle(
+        fun getFullEmojiIdSpannable(emojiId: String, separator: String, darkColor: Int, lightColor: Int): SpannableString {
+            val spannable = getChunkedEmojiId(emojiId, separator).applyColorStyle(
                 darkColor,
                 listOf(separator),
                 lightColor,
                 applyToOnlyFirstOccurrence = false
             )
-            spannable.applyLetterSpacingStyle(
-                separator,
-                Constants.UI.emojiIdChunkSeparatorLetterSpacing
-            )
-            spannable.applyRelativeTextSizeStyle(
-                separator,
-                Constants.UI.emojiIdChunkSeparatorRelativeScale,
-                applyToOnlyFirstOccurrence = false
-            )
+            spannable.applyLetterSpacingStyle(separator, Constants.UI.emojiIdChunkSeparatorLetterSpacing)
+            spannable.applyRelativeTextSizeStyle(separator, Constants.UI.emojiIdChunkSeparatorRelativeScale, applyToOnlyFirstOccurrence = false)
             return spannable
         }
 
