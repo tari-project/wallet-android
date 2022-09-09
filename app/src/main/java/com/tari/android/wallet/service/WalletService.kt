@@ -141,7 +141,8 @@ class WalletService : Service(), FFIWalletListener, LifecycleObserver {
     private lateinit var wallet: FFIWallet
 
     private var txBroadcastRestarted = false
-    private val logger = Logger.t(WalletService::class.simpleName)
+    private val logger
+        get() = Logger.t(WalletService::class.simpleName)
 
     /**
      * Pairs of <tx id, recipient public key hex>.

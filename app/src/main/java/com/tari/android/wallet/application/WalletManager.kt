@@ -71,7 +71,8 @@ class WalletManager(
 ) {
 
     private var logFileObserver: LogFileObserver? = null
-    private var logger = Logger.t(WalletManager::class.simpleName)
+    private val logger
+        get() = Logger.t(WalletManager::class.simpleName)
 
     init {
         // post initial wallet state

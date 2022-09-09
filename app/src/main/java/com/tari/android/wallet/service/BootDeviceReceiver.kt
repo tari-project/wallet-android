@@ -49,7 +49,8 @@ import com.tari.android.wallet.ui.common.domain.ResourceManager
  */
 class BootDeviceReceiver : BroadcastReceiver() {
 
-    private val logger = Logger.t(BootDeviceReceiver::class.simpleName)
+    private val logger
+        get() = Logger.t(BootDeviceReceiver::class.simpleName)
 
     override fun onReceive(context: Context?, intent: Intent?) {
         if (context == null || intent == null) return

@@ -76,7 +76,8 @@ class TariWalletApplication : Application() {
     lateinit var yatAdapter: YatAdapter
 
     private val activityLifecycleCallbacks = ActivityLifecycleCallbacks()
-    private val logger = Logger.t(TariWalletApplication::class.simpleName)
+    private val logger
+        get() = Logger.t(TariWalletApplication::class.simpleName)
 
     var isInForeground = false
         private set

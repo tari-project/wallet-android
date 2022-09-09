@@ -62,7 +62,8 @@ class LocalBackupStorage(
     private val backupFileProcessor: BackupFileProcessor
 ) : BackupStorage {
 
-    private val logger = Logger.t(LocalBackupStorage::class.simpleName)
+    private val logger
+        get() = Logger.t(LocalBackupStorage::class.simpleName)
 
     override fun setup(hostFragment: Fragment) {
         hostFragment.startActivityForResult(

@@ -70,7 +70,9 @@ class GoogleDriveBackupStorage(
     private val backupFileProcessor: BackupFileProcessor
 ) : BackupStorage {
 
-    private val logger = Logger.t(GoogleDriveBackupStorage::class.simpleName)
+    private val logger
+        get() = Logger.t(GoogleDriveBackupStorage::class.simpleName)
+
     private val googleClient: GoogleSignInClient = GoogleSignIn.getClient(
         context,
         GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)

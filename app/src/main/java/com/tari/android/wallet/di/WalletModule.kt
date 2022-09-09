@@ -88,7 +88,7 @@ class WalletModule {
     @Provides
     @Singleton
     fun provideBugReportingService(sharedPrefsWrapper: SharedPrefsRepository, walletConfig: WalletConfig): BugReportingService =
-        BugReportingService(sharedPrefsWrapper, walletConfig.getWalletLogFilesDirPath())
+        BugReportingService(sharedPrefsWrapper, walletConfig)
 
     @Provides
     @Singleton

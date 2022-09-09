@@ -28,7 +28,8 @@ class YatAdapter(
     private val commonRepository: SharedPrefsRepository
 ) : YatIntegration.Delegate {
 
-    private val logger = Logger.t(YatAdapter::class.simpleName)
+    private val logger
+        get() = Logger.t(YatAdapter::class.simpleName)
 
     fun initYat(application: Application) {
         val config = YatConfiguration(BuildConfig.YAT_ORGANIZATION_RETURN_URL, BuildConfig.YAT_ORGANIZATION_NAME, BuildConfig.YAT_ORGANIZATION_KEY)

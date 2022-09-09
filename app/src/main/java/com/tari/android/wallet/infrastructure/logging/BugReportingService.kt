@@ -37,6 +37,7 @@ import android.content.Intent
 import android.net.Uri
 import androidx.core.content.FileProvider
 import com.tari.android.wallet.R
+import com.tari.android.wallet.data.WalletConfig
 import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import com.tari.android.wallet.util.WalletUtil
 import java.io.*
@@ -49,7 +50,7 @@ import java.util.zip.ZipOutputStream
  *
  * @author The Tari Development Team
  */
-class BugReportingService(private val sharedPrefsWrapper: SharedPrefsRepository, private val logFilesDirPath: String) {
+class BugReportingService(private val sharedPrefsWrapper: SharedPrefsRepository, private val walletConfig: WalletConfig) {
 
     class BugReportFileSizeLimitExceededException : Exception()
 
@@ -58,13 +59,15 @@ class BugReportingService(private val sharedPrefsWrapper: SharedPrefsRepository,
     fun shareBugReport(context: Context) {
         // delete if zipped file exists
         val publicKeyHex = sharedPrefsWrapper.publicKeyHexString
+        val logFilesDirPath = walletConfig.getWalletLogFilesDirPath()
         val zipFile = File(logFilesDirPath, "ffi_logs_${publicKeyHex}.zip")
         if (zipFile.exists()) {
             zipFile.delete()
         }
         val fileOutStream = FileOutputStream(zipFile)
         // zip!
-        val allLogFiles = WalletUtil.getLogFilesFromDirectory(logFilesDirPath)
+        val allLogFiles = WalletUtil.getLogFilesFromDirectory(logFilesDirPath).toMutableList()
+        allLogFiles.add(File(walletConfig.getApplicationLogsFilePath()))
         ZipOutputStream(BufferedOutputStream(fileOutStream)).use { out ->
             for (file in allLogFiles) {
                 FileInputStream(file).use { inputStream ->
