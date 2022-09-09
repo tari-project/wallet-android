@@ -44,7 +44,8 @@ import com.tari.android.wallet.ui.fragment.restore.restore.WalletRestoreActivity
 
 class NotificationBroadcastReceiver : BroadcastReceiver() {
 
-    private val logger = Logger.t(NotificationBroadcastReceiver::class.simpleName)
+    private val logger
+        get() = Logger.t(NotificationBroadcastReceiver::class.simpleName)
 
     override fun onReceive(context: Context, intent: Intent) {
         logger.d("NotificationBroadcastReceiver received")

@@ -39,6 +39,7 @@ class SharedPrefGsonDelegate<T>(
     }
 
     companion object {
-        private val logger = Logger.t(SharedPrefGsonDelegate::class.simpleName)
+        private val logger
+            get() = Logger.t(SharedPrefGsonDelegate::class.simpleName)
     }
 }

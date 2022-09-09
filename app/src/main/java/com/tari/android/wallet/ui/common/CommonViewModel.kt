@@ -3,6 +3,7 @@ package com.tari.android.wallet.ui.common
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import com.orhanobut.logger.Logger
+import com.orhanobut.logger.Printer
 import com.tari.android.wallet.application.WalletState
 import com.tari.android.wallet.di.ApplicationComponent
 import com.tari.android.wallet.di.DiContainer
@@ -26,7 +27,8 @@ open class CommonViewModel : ViewModel() {
     @Inject
     lateinit var resourceManager: ResourceManager
 
-    val logger = Logger.t("screen").t(this::class.simpleName)
+    val logger: Printer
+        get() = Logger.t("screen").t(this::class.simpleName)
 
     init {
         @Suppress("LeakingThis")

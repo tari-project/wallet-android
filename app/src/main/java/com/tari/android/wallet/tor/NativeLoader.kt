@@ -10,7 +10,8 @@ import java.util.zip.ZipFile
 
 object NativeLoader {
 
-    private val logger = Logger.t("TorNativeLoader")
+    private val logger
+        get() = Logger.t("TorNativeLoader")
 
     private fun loadFromZip(appSourceDir: File, libName: String, destLocalFile: File, arch: String): Boolean {
 

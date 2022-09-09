@@ -220,17 +220,19 @@ class CreateWalletFragment : CommonFragment<FragmentCreateWalletBinding, CreateW
             addListener(object : AnimatorListenerAdapter() {
                 override fun onAnimationEnd(animation: Animator) {
                     super.onAnimationEnd(animation)
-                    val emojiId = viewModel.sharedPrefsWrapper.emojiId!!
-                    ui.emojiIdTextView.text = EmojiUtil.getFullEmojiIdSpannable(
-                        emojiId,
-                        string(emoji_id_chunk_separator),
-                        color(black),
-                        color(light_gray)
-                    )
-                    emojiIdSummaryController.display(emojiId)
+                    runCatching {
+                        val emojiId = viewModel.sharedPrefsWrapper.emojiId!!
+                        ui.emojiIdTextView.text = EmojiUtil.getFullEmojiIdSpannable(
+                            emojiId,
+                            string(emoji_id_chunk_separator),
+                            color(black),
+                            color(light_gray)
+                        )
+                        emojiIdSummaryController.display(emojiId)
 
-                    ui.checkmarkLottieAnimationView.visible()
-                    ui.checkmarkLottieAnimationView.playAnimation()
+                        ui.checkmarkLottieAnimationView.visible()
+                        ui.checkmarkLottieAnimationView.playAnimation()
+                    }
                 }
             })
             start()

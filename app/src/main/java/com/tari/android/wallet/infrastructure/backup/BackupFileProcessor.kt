@@ -53,7 +53,8 @@ class BackupFileProcessor(
     private val walletConfig: WalletConfig,
     private val namingPolicy: BackupNamingPolicy,
 ) {
-    private val logger = Logger.t(BackupFileProcessor::class.simpleName)
+    private val logger
+        get() = Logger.t(BackupFileProcessor::class.simpleName)
 
     fun generateBackupFile(newPassword: CharArray? = null): Triple<File, DateTime, String> {
         // decrypt database

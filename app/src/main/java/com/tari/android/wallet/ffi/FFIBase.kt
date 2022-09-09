@@ -50,7 +50,8 @@ abstract class FFIBase {
     var pointer = nullptr
         protected set
 
-    protected val logger: Printer = Logger.t(this::class.simpleName)
+    protected val logger: Printer
+        get() = Logger.t(this::class.simpleName)
 
     abstract fun destroy()
 

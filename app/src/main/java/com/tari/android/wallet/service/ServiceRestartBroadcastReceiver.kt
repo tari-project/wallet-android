@@ -50,7 +50,8 @@ import com.tari.android.wallet.ui.common.domain.ResourceManager
  */
 class ServiceRestartBroadcastReceiver : BroadcastReceiver() {
 
-    private val logger = Logger.t(ServiceRestartBroadcastReceiver::class.simpleName)
+    private val logger
+        get() = Logger.t(ServiceRestartBroadcastReceiver::class.simpleName)
 
     override fun onReceive(context: Context, intent: Intent) {
         logger.i("Service restart broadcast received")

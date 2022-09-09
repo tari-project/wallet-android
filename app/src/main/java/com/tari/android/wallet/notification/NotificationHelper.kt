@@ -69,7 +69,8 @@ class NotificationHelper(private val context: Context) {
     }
 
     private var notificationManager = NotificationManagerCompat.from(context)
-    private val logger = Logger.t(NotificationHelper::class.simpleName)
+    private val logger
+        get() = Logger.t(NotificationHelper::class.simpleName)
 
     fun createNotificationChannels() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {

@@ -70,7 +70,9 @@ class GoogleDriveBackupStorage(
     private val backupFileProcessor: BackupFileProcessor
 ) : BackupStorage {
 
-    private val logger = Logger.t(GoogleDriveBackupStorage::class.simpleName)
+    private val logger
+        get() = Logger.t(GoogleDriveBackupStorage::class.simpleName)
+
     private val googleClient: GoogleSignInClient = GoogleSignIn.getClient(
         context,
         GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
@@ -276,10 +278,14 @@ class GoogleDriveBackupStorage(
 
     override suspend fun signOut() {
         suspendCoroutine<Unit> { continuation ->
-            backupFileProcessor.clearTempFolder()
-            googleClient.signOut()
-                .addOnFailureListener { continuation.resumeWith(Result.failure(it)) }
-                .addOnCompleteListener { continuation.resumeWith(Result.success(Unit)) }
+            try {
+                backupFileProcessor.clearTempFolder()
+                googleClient.signOut()
+                    .addOnFailureListener { continuation.resumeWith(Result.failure(it)) }
+                    .addOnCompleteListener { continuation.resumeWith(Result.success(Unit)) }
+            } catch (e: Throwable) {
+                logger.e(e, "Sentry failed with already resumed for no reason")
+            }
         }
     }
 

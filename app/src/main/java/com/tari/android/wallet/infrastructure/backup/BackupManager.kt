@@ -60,7 +60,8 @@ class BackupManager(
 ) {
 
     private var retryCount = 0
-    private val logger = Logger.t(BackupManager::class.simpleName)
+    private val logger
+        get() = Logger.t(BackupManager::class.simpleName)
 
     /**
      * Timer to trigger scheduled backups.

@@ -58,7 +58,8 @@ class TorProxyManager(
 
     private val appCacheHome = context.getDir(torDataDirectoryName, Service.MODE_PRIVATE)
     private val torProxyControl: TorProxyControl
-    private val logger = Logger.t(TorProxyManager::class.simpleName)
+    private val logger
+        get() = Logger.t(TorProxyManager::class.simpleName)
 
     init {
         EventBus.torProxyState.post(TorProxyState.NotReady)

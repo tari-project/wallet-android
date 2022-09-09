@@ -25,7 +25,8 @@ class TorProxyControl(private val torConfig: TorConfig) {
      * Timer to check Tor status.
      */
     private var timerSubscription: Disposable? = null
-    private val logger = Logger.t(TorProxyControl::class.simpleName)
+    private val logger
+        get() = Logger.t(TorProxyControl::class.simpleName)
 
     private lateinit var socket: Socket
     private lateinit var controlConnection: TorControlConnection

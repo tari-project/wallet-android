@@ -10,7 +10,8 @@ import retrofit2.Response
 
 class GiphyRESTRetrofitRepository(private val gateway: GiphyRESTGateway) : GIFRepository {
 
-    private val logger = Logger.t(GiphyRESTRetrofitRepository::class.simpleName)
+    private val logger
+        get() = Logger.t(GiphyRESTRetrofitRepository::class.simpleName)
 
     override fun getAll(query: String, limit: Int): List<GIFItem> {
         val response: Response<SearchGIFsResponse> = gateway.searchGIFs(query, limit).execute()
