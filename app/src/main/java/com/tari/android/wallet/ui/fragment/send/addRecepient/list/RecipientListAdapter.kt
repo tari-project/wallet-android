@@ -36,7 +36,7 @@ import com.tari.android.wallet.ui.common.recyclerView.CommonAdapter
 import com.tari.android.wallet.ui.common.recyclerView.CommonViewHolderItem
 import com.tari.android.wallet.ui.common.recyclerView.ViewHolderBuilder
 
-internal class RecipientListAdapter : CommonAdapter<CommonViewHolderItem>() {
+class RecipientListAdapter : CommonAdapter<CommonViewHolderItem>() {
     override var viewHolderBuilders: List<ViewHolderBuilder> = listOf(
         RecipientHeaderViewHolder.getBuilder(),
         RecipientViewHolder.getBuilder()

@@ -32,7 +32,7 @@
  */
 package com.tari.android.wallet.service.faucet
 
-internal interface TestnetFaucetService {
+interface TestnetFaucetService {
 
     fun requestMaxTestnetTari(
         publicKey: String,
@@ -41,5 +41,4 @@ internal interface TestnetFaucetService {
         onSuccess: (TestnetTariMaxAllocationResult) -> Unit,
         onError: (Throwable) -> Unit
     )
-
 }

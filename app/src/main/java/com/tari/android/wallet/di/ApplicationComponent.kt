@@ -38,17 +38,16 @@ import com.tari.android.wallet.application.deeplinks.DeeplinkViewModel
 import com.tari.android.wallet.service.BootDeviceReceiver
 import com.tari.android.wallet.service.WalletService
 import com.tari.android.wallet.ui.activity.SplashActivity
-import com.tari.android.wallet.ui.activity.debug.DebugActivity
 import com.tari.android.wallet.ui.activity.home.HomeActivity
-import com.tari.android.wallet.ui.activity.settings.DeleteWalletActivity
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.component.networkStateIndicator.ConnectionIndicatorViewModel
 import com.tari.android.wallet.ui.fragment.auth.AuthActivity
 import com.tari.android.wallet.ui.fragment.auth.AuthViewModel
-import com.tari.android.wallet.ui.fragment.debug.DebugLogFragment
+import com.tari.android.wallet.ui.fragment.debug.activity.DebugActivity
 import com.tari.android.wallet.ui.fragment.debug.baseNodeConfig.BaseNodeConfigViewModel
 import com.tari.android.wallet.ui.fragment.debug.baseNodeConfig.addBaseNode.AddCustomBaseNodeViewModel
 import com.tari.android.wallet.ui.fragment.debug.baseNodeConfig.changeBaseNode.ChangeBaseNodeViewModel
+import com.tari.android.wallet.ui.fragment.debug.debugLog.DebugLogViewModel
 import com.tari.android.wallet.ui.fragment.onboarding.activity.OnboardingFlowActivity
 import com.tari.android.wallet.ui.fragment.onboarding.createWallet.CreateWalletViewModel
 import com.tari.android.wallet.ui.fragment.onboarding.inroduction.IntroductionViewModel
@@ -70,11 +69,13 @@ import com.tari.android.wallet.ui.fragment.send.addRecepient.AddRecipientViewMod
 import com.tari.android.wallet.ui.fragment.send.finalize.FinalizeSendTxViewModel
 import com.tari.android.wallet.ui.fragment.send.requestTari.RequestTariViewModel
 import com.tari.android.wallet.ui.fragment.settings.allSettings.AllSettingsViewModel
+import com.tari.android.wallet.ui.fragment.settings.allSettings.about.TariAboutViewModel
 import com.tari.android.wallet.ui.fragment.settings.backgroundService.BackgroundServiceSettingsViewModel
 import com.tari.android.wallet.ui.fragment.settings.backup.ChangeSecurePasswordFragment
 import com.tari.android.wallet.ui.fragment.settings.backup.EnterCurrentPasswordFragment
 import com.tari.android.wallet.ui.fragment.settings.backup.backupSettings.BackupSettingsViewModel
 import com.tari.android.wallet.ui.fragment.settings.backup.verifySeedPhrase.VerifySeedPhraseViewModel
+import com.tari.android.wallet.ui.fragment.settings.deleteWallet.DeleteWalletActivity
 import com.tari.android.wallet.ui.fragment.settings.networkSelection.NetworkSelectionViewModel
 import com.tari.android.wallet.ui.fragment.settings.torBridges.TorBridgesSelectionViewModel
 import com.tari.android.wallet.ui.fragment.settings.torBridges.customBridges.CustomTorBridgesViewModel
@@ -82,6 +83,7 @@ import com.tari.android.wallet.ui.fragment.settings.userAutorization.BiometricAu
 import com.tari.android.wallet.ui.fragment.tx.TxListViewModel
 import com.tari.android.wallet.ui.fragment.tx.details.TxDetailsFragment
 import com.tari.android.wallet.ui.fragment.tx.details.gif.GIFViewModel
+import com.tari.android.wallet.ui.fragment.utxos.list.UtxosListViewModel
 import dagger.Component
 import javax.inject.Singleton
 
@@ -97,14 +99,13 @@ import javax.inject.Singleton
         WalletModule::class,
         ServiceModule::class,
         TorModule::class,
-        TrackerModule::class,
         BackupAndRestoreModule::class,
         PresentationModule::class,
         YatModule::class
     ]
 )
 
-internal interface ApplicationComponent {
+interface ApplicationComponent {
 
     /**
      * Application.
@@ -130,7 +131,6 @@ internal interface ApplicationComponent {
     fun inject(fragment: AddRecipientFragment)
     fun inject(fragment: AddNoteFragment)
     fun inject(fragment: ChooseGIFDialogFragment)
-    fun inject(fragment: DebugLogFragment)
     /**
      * Backup.
      */
@@ -174,6 +174,9 @@ internal interface ApplicationComponent {
     fun inject(viewModel: CreateWalletViewModel)
     fun inject(viewModel: IntroductionViewModel)
     fun inject(viewModel: AuthViewModel)
+    fun inject(viewModel: TariAboutViewModel)
+    fun inject(viewModel: UtxosListViewModel)
+    fun inject(viewModel: DebugLogViewModel)
     /**
      * Service(s).
      */

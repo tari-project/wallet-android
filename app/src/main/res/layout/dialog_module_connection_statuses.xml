@@ -1,0 +1,232 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/root"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingHorizontal="20dp"
+    android:paddingBottom="20dp">
+
+    <RelativeLayout
+        android:id="@+id/wifi_container"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintEnd_toStartOf="@+id/tor_container"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/wifi_status_card_view"
+            android:layout_width="46dp"
+            android:layout_height="46dp"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="20dp"
+            app:cardBackgroundColor="@color/white"
+            app:cardCornerRadius="23dp"
+            app:cardElevation="8dp">
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:src="@drawable/ic_network_state_wifi" />
+
+        </androidx.cardview.widget.CardView>
+
+        <com.tari.android.wallet.ui.component.CustomFontTextView
+            android:id="@+id/wifi_status_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/wifi_status_card_view"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginHorizontal="10dp"
+            android:layout_marginTop="5dp"
+            android:gravity="center_horizontal"
+            android:lineSpacingExtra="6sp"
+            android:textColor="@color/dark_gray"
+            app:customFont="@string/font_medium"
+            tools:text="Connected to Internet" />
+
+        <View
+            android:id="@+id/network_icon"
+            android:layout_width="14dp"
+            android:layout_height="14dp"
+            android:layout_alignTop="@+id/wifi_status_card_view"
+            android:layout_alignEnd="@+id/wifi_status_card_view"
+            android:layout_marginEnd="-2dp"
+            android:background="@drawable/ic_network_status_dot_green"
+            android:translationZ="20dp" />
+
+    </RelativeLayout>
+
+
+    <RelativeLayout
+        android:id="@+id/base_node_container"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/sync_status_container"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/wifi_container">
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/base_node_status_card_view"
+            android:layout_width="46dp"
+            android:layout_height="46dp"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="20dp"
+            app:cardBackgroundColor="@color/white"
+            app:cardCornerRadius="23dp"
+            app:cardElevation="8dp">
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:src="@drawable/ic_network_state_base_node" />
+
+        </androidx.cardview.widget.CardView>
+
+        <com.tari.android.wallet.ui.component.CustomFontTextView
+            android:id="@+id/base_node_status_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/base_node_status_card_view"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginHorizontal="10dp"
+            android:layout_marginTop="5dp"
+            android:gravity="center_horizontal"
+            android:lineSpacingExtra="6sp"
+            android:textColor="@color/dark_gray"
+            app:customFont="@string/font_medium"
+            tools:text="Connected Internet" />
+
+        <View
+            android:id="@+id/base_node_icon"
+            android:layout_width="14dp"
+            android:layout_height="14dp"
+            android:layout_alignTop="@+id/base_node_status_card_view"
+            android:layout_alignEnd="@+id/base_node_status_card_view"
+            android:layout_marginEnd="-2dp"
+            android:background="@drawable/ic_network_status_dot_green"
+            android:translationZ="20dp" />
+
+    </RelativeLayout>
+
+
+    <RelativeLayout
+        android:id="@+id/tor_container"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/wifi_container"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/tor_card_view"
+            android:layout_width="46dp"
+            android:layout_height="46dp"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="20dp"
+            app:cardBackgroundColor="@color/white"
+            app:cardCornerRadius="23dp"
+            app:cardElevation="8dp">
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:src="@drawable/ic_network_state_tor" />
+
+        </androidx.cardview.widget.CardView>
+
+        <com.tari.android.wallet.ui.component.CustomFontTextView
+            android:id="@+id/tor_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/tor_card_view"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginHorizontal="10dp"
+            android:layout_marginTop="5dp"
+            android:gravity="center_horizontal"
+            android:lineSpacingExtra="6sp"
+            android:textColor="@color/dark_gray"
+            app:customFont="@string/font_medium"
+            tools:text="Connected Internet" />
+
+        <View
+            android:id="@+id/tor_icon"
+            android:layout_width="14dp"
+            android:layout_height="14dp"
+            android:layout_alignTop="@+id/tor_card_view"
+            android:layout_alignEnd="@+id/tor_card_view"
+            android:layout_marginEnd="-2dp"
+            android:background="@drawable/ic_network_status_dot_green"
+            android:translationZ="20dp" />
+
+    </RelativeLayout>
+
+
+    <RelativeLayout
+        android:id="@+id/sync_status_container"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/base_node_container"
+        app:layout_constraintTop_toTopOf="@+id/base_node_container">
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/syncing_state_card_view"
+            android:layout_width="46dp"
+            android:layout_height="46dp"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="20dp"
+            app:cardBackgroundColor="@color/white"
+            app:cardCornerRadius="23dp"
+            app:cardElevation="8dp">
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:src="@drawable/ic_network_state_sync_status" />
+
+        </androidx.cardview.widget.CardView>
+
+        <com.tari.android.wallet.ui.component.CustomFontTextView
+            android:id="@+id/syncing_state_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/syncing_state_card_view"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginHorizontal="10dp"
+            android:layout_marginTop="4dp"
+            android:gravity="center_horizontal"
+            android:lineSpacingExtra="6sp"
+            android:textColor="@color/dark_gray"
+            app:customFont="@string/font_medium"
+            tools:text="Connected Internet" />
+
+        <View
+            android:id="@+id/sync_icon"
+            android:layout_width="14dp"
+            android:layout_height="14dp"
+            android:layout_alignTop="@+id/syncing_state_card_view"
+            android:layout_alignEnd="@+id/syncing_state_card_view"
+            android:layout_marginEnd="-2dp"
+            android:background="@drawable/ic_network_status_dot_green"
+            android:translationZ="20dp" />
+
+    </RelativeLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

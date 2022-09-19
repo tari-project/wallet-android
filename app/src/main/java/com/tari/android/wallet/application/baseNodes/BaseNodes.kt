@@ -1,6 +1,7 @@
 package com.tari.android.wallet.application.baseNodes
 
 import android.content.Context
+import com.google.firebase.crashlytics.buildtools.reloc.org.apache.commons.io.IOUtils
 import com.tari.android.wallet.R
 import com.tari.android.wallet.application.Network
 import com.tari.android.wallet.application.WalletState
@@ -15,7 +16,6 @@ import com.tari.android.wallet.ffi.FFIWallet
 import com.tari.android.wallet.ffi.HexString
 import com.tari.android.wallet.service.connection.TariWalletServiceConnection
 import io.reactivex.disposables.CompositeDisposable
-import org.apache.commons.io.IOUtils
 
 class BaseNodes(
     private val context: Context,
@@ -88,6 +88,6 @@ class BaseNodes(
     }
 
     private fun getBaseNodeResource(network: Network): Int = when(network) {
-        else -> R.raw.dibbler_base_nodes
+        else -> R.raw.esmeralda_base_nodes
     }
 }

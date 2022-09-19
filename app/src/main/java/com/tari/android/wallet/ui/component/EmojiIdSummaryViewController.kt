@@ -42,7 +42,7 @@ import com.tari.android.wallet.ui.extension.setVisible
  *
  * @author The Tari Development Team
  */
-internal class EmojiIdSummaryViewController(private val ui: ViewEmojiIdSummaryBinding) {
+class EmojiIdSummaryViewController(private val ui: ViewEmojiIdSummaryBinding) {
 
     constructor(view: View) : this(ViewEmojiIdSummaryBinding.bind(view))
 

@@ -68,7 +68,6 @@ import com.tari.android.wallet.databinding.FragmentAddRecipientBinding
 import com.tari.android.wallet.di.DiContainer.appComponent
 import com.tari.android.wallet.extension.observe
 import com.tari.android.wallet.extension.observeOnLoad
-import com.tari.android.wallet.infrastructure.Tracker
 import com.tari.android.wallet.model.PublicKey
 import com.tari.android.wallet.ui.common.CommonFragment
 import com.tari.android.wallet.ui.common.domain.ResourceManager
@@ -94,9 +93,6 @@ import kotlin.math.min
 class AddRecipientFragment : CommonFragment<FragmentAddRecipientBinding, AddRecipientViewModel>(),
     RecyclerView.OnItemTouchListener,
     TextWatcher {
-
-    @Inject
-    lateinit var tracker: Tracker
 
     @Inject
     lateinit var sharedPrefsWrapper: SharedPrefsRepository
@@ -154,9 +150,6 @@ class AddRecipientFragment : CommonFragment<FragmentAddRecipientBinding, AddReci
         ui.searchEditText.setRawInputType(InputType.TYPE_CLASS_TEXT)
         ui.searchEditText.addTextChangedListener(this@AddRecipientFragment)
 
-        if (savedInstanceState == null) {
-            tracker.screen(path = "/home/send_tari/add_recipient", title = "Send Tari - Add Recipient")
-        }
         subscribeViewModal()
     }
 
@@ -198,6 +191,7 @@ class AddRecipientFragment : CommonFragment<FragmentAddRecipientBinding, AddReci
     private fun showYatUser(yatUser: YatUser?) {
         val isExist = yatUser != null
         ui.yatEyeButton.setVisible(isExist)
+        ui.yatIcon.setVisible(isExist)
 
         if (isExist) {
             setYatState(true)
@@ -220,14 +214,14 @@ class AddRecipientFragment : CommonFragment<FragmentAddRecipientBinding, AddReci
 
     private fun setupUI() {
         ui.contactsListRecyclerView.layoutManager = LinearLayoutManager(requireContext())
-        recyclerViewAdapter.setClickListener(CommonAdapter.ItemClickListener() {
+        recyclerViewAdapter.setClickListener(CommonAdapter.ItemClickListener {
             (it as? RecipientViewHolderItem)?.user?.let { user -> (activity as? AddRecipientListener)?.continueToAmount(user) }
         })
         ui.contactsListRecyclerView.adapter = recyclerViewAdapter
         ui.contactsListRecyclerView.addOnScrollListener(scrollListener)
         ui.contactsListRecyclerView.addOnItemTouchListener(this)
         ui.scrollDepthGradientView.alpha = 0f
-        ui.progressBar.setColor(color(add_recipient_prog_bar))
+        ui.progressBar.setColor(color(add_recipient_progress_bar))
         ui.progressBar.visible()
         ui.continueButton.gone()
         ui.invalidEmojiIdTextView.gone()
@@ -391,7 +385,7 @@ class AddRecipientFragment : CommonFragment<FragmentAddRecipientBinding, AddReci
         val mActivity = activity ?: return
         ui.searchEditText.requestFocus()
         val imm = mActivity.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-        imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY)
+        imm.showSoftInput(ui.searchEditText, InputMethodManager.HIDE_IMPLICIT_ONLY)
     }
 
     private fun onSearchTextChanged(query: String) {
@@ -578,15 +572,15 @@ class AddRecipientFragment : CommonFragment<FragmentAddRecipientBinding, AddReci
                 editable.insert(target, chunkSeparatorSpannable)
             }
             // check if valid emoji - don't search if not
-            val numberofEmojis = textWithoutSeparators.numberOfEmojis()
-            if (textWithoutSeparators.containsNonEmoji() || numberofEmojis > emojiIdLength) {
+            val emojisNumber = textWithoutSeparators.numberOfEmojis()
+            if (textWithoutSeparators.containsNonEmoji() || emojisNumber > emojiIdLength) {
                 viewModel.emojiIdPublicKey = null
                 ui.invalidEmojiIdTextView.text = string(add_recipient_invalid_emoji_id)
                 ui.invalidEmojiIdTextView.visible()
                 ui.qrCodeButton.visible()
                 clearSearchResult()
             } else {
-                if (numberofEmojis == emojiIdLength) {
+                if (emojisNumber == emojiIdLength) {
                     finishEntering(textWithoutSeparators)
                 } else {
                     viewModel.emojiIdPublicKey = null

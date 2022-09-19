@@ -21,10 +21,11 @@ import com.tari.android.wallet.ui.fragment.restore.inputSeedWords.suggestions.Su
 import com.tari.android.wallet.ui.fragment.restore.inputSeedWords.suggestions.SuggestionViewHolderItem
 import io.reactivex.disposables.CompositeDisposable
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-internal class InputSeedWordsViewModel() : CommonViewModel() {
+class InputSeedWordsViewModel : CommonViewModel() {
 
     private var mnemonicList = mutableListOf<String>()
 
@@ -218,7 +219,7 @@ internal class InputSeedWordsViewModel() : CommonViewModel() {
             _words.value = list
         }
 
-        val nextIndex = if (currentIndex == -1) list.size - 1 else Math.min(currentIndex + 1, list.size - 1)
+        val nextIndex = if (currentIndex == -1) list.size - 1 else (currentIndex + 1).coerceAtMost(list.size - 1)
         getFocus(nextIndex)
     }
 
@@ -259,6 +260,14 @@ internal class InputSeedWordsViewModel() : CommonViewModel() {
 
     fun selectSuggestion(suggestionViewHolderItem: SuggestionViewHolderItem) {
         onCurrentWordChanges(_focusedIndex.value!!, suggestionViewHolderItem.suggestion + " ")
+        if (_words.value.orEmpty().size == SeedPhrase.SeedPhraseLength) {
+            viewModelScope.launch(Dispatchers.IO) {
+                delay(100)
+                viewModelScope.launch(Dispatchers.Main) {
+                    finishEntering()
+                }
+            }
+        }
     }
 
     fun setSuggestionState(isOpened: Boolean) {

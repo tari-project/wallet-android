@@ -53,12 +53,12 @@ import com.tari.android.wallet.util.WalletUtil
 import java.io.File
 
 /**
- * Utilized to asynchoronously manage the sometimes-long-running task of instantiation and start-up
+ * Utilized to asynchronous manage the sometimes-long-running task of instantiation and start-up
  * of the Tor proxy and the FFI wallet.
  *
  * @author The Tari Development Team
  */
-internal class WalletManager(
+class WalletManager(
     private val walletConfig: WalletConfig,
     private val torManager: TorProxyManager,
     private val sharedPrefsWrapper: SharedPrefsRepository,
@@ -71,6 +71,8 @@ internal class WalletManager(
 ) {
 
     private var logFileObserver: LogFileObserver? = null
+    private val logger
+        get() = Logger.t(WalletManager::class.simpleName)
 
     init {
         // post initial wallet state
@@ -88,7 +90,7 @@ internal class WalletManager(
     }
 
     /**
-     * Deinit the wallet and shutdown Tor.
+     * DeInit the wallet and shutdown Tor.
      */
     @Synchronized
     fun stop() {
@@ -104,19 +106,21 @@ internal class WalletManager(
 
     @SuppressLint("CheckResult")
     private fun onTorProxyStateChanged(torProxyState: TorProxyState) {
-        Logger.d("Tor proxy state has changed: $torProxyState.")
+        logger.i("Tor proxy state has changed: $torProxyState")
         if (torProxyState is TorProxyState.Running) {
             if (EventBus.walletState.publishSubject.value == WalletState.NotReady ||
                 EventBus.walletState.publishSubject.value is WalletState.Failed
             ) {
-                Logger.d("Initialize wallet.")
+                logger.i("Initialize wallet started")
                 EventBus.walletState.post(WalletState.Initializing)
                 Thread {
                     try {
                         initWallet()
                         EventBus.walletState.post(WalletState.Started)
+                        logger.i("Wallet was started")
                     } catch (e: Exception) {
                         EventBus.walletState.post(WalletState.Failed(e))
+                        logger.e(e, "Wallet was failed")
                     }
                 }.start()
             }
@@ -126,15 +130,12 @@ internal class WalletManager(
     /**
      * Instantiates the Tor transport for the wallet.
      */
-    private fun getTorTransport(): FFITransportType {
+    private fun getTorTransport(): FFITariTransportConfig {
         val cookieFile = File(torConfig.cookieFilePath)
         val cookieString: ByteArray = cookieFile.readBytes()
         val torCookie = FFIByteVector(cookieString)
-        return FFITransportType(
-            NetAddressString(
-                torConfig.controlHost,
-                torConfig.controlPort
-            ),
+        return FFITariTransportConfig(
+            NetAddressString(torConfig.controlHost, torConfig.controlPort),
             torCookie,
             torConfig.connectionPort,
             torConfig.sock5Username,
@@ -145,18 +146,14 @@ internal class WalletManager(
     /**
      * Instantiates the comms configuration for the wallet.
      */
-    private fun getCommsConfig(currentNetworkRepository: NetworkRepository, walletConfig: WalletConfig): FFICommsConfig {
+    private fun getCommsConfig(walletConfig: WalletConfig): FFICommsConfig {
         return FFICommsConfig(
-            NetAddressString(
-                "127.0.0.1",
-                39069
-            ).toString(),
+            NetAddressString("127.0.0.1", 39069).toString(),
             getTorTransport(),
             walletConfig.walletDBName,
             walletConfig.getWalletFilesDirPath(),
             Constants.Wallet.discoveryTimeoutSec,
             Constants.Wallet.storeAndForwardMessageDurationSec,
-            currentNetworkRepository.currentNetwork!!.network.uriComponent,
         )
     }
 
@@ -194,7 +191,8 @@ internal class WalletManager(
             val wallet = FFIWallet(
                 sharedPrefsWrapper,
                 seedPhraseRepository,
-                getCommsConfig(networkRepository, walletConfig),
+                networkRepository,
+                getCommsConfig(walletConfig),
                 walletConfig.getWalletLogFilePath()
             )
             FFIWallet.instance = wallet

@@ -47,7 +47,7 @@ import java.io.FileOutputStream
 val File.extension: String
     get() = name.substringAfterLast('.', "")
 
-fun File.getLastPathComponent(): String? {
+fun File.getLastPathComponent(): String {
     val segments = absolutePath.split("/".toRegex()).toTypedArray()
     return if (segments.isEmpty()) "" else segments[segments.size - 1]
 }

@@ -36,7 +36,6 @@ import android.content.Context
 import android.graphics.Typeface
 import android.util.AttributeSet
 import com.tari.android.wallet.ui.extension.string
-import java.util.*
 
 /**
  * Custom font enumeration - used in layout files.
@@ -62,7 +61,7 @@ enum class CustomFont(private val fileName: String) {
         private const val sAttribute = "customFont"
 
         fun fromString(fontName: String): CustomFont? {
-            return values().firstOrNull { it.name == fontName.toUpperCase(Locale.getDefault()) }
+            return values().firstOrNull { it.name == fontName.uppercase() }
         }
 
         fun getFromAttributeSet(context: Context, attr: AttributeSet): Typeface {

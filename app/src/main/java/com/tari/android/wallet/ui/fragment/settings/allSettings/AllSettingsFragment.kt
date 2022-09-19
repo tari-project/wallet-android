@@ -45,17 +45,17 @@ import com.tari.android.wallet.R
 import com.tari.android.wallet.R.string.*
 import com.tari.android.wallet.databinding.FragmentAllSettingsBinding
 import com.tari.android.wallet.extension.observe
-import com.tari.android.wallet.infrastructure.BugReportingService
-import com.tari.android.wallet.ui.activity.settings.BackupSettingsActivity
-import com.tari.android.wallet.ui.activity.settings.DeleteWalletActivity
+import com.tari.android.wallet.infrastructure.logging.BugReportingService
 import com.tari.android.wallet.ui.common.CommonFragment
 import com.tari.android.wallet.ui.extension.string
 import com.tari.android.wallet.ui.fragment.settings.backgroundService.BackgroundServiceSettingsActivity
+import com.tari.android.wallet.ui.fragment.settings.backup.activity.BackupSettingsActivity
+import com.tari.android.wallet.ui.fragment.settings.deleteWallet.DeleteWalletActivity
 import com.tari.android.wallet.ui.fragment.settings.userAutorization.BiometricAuthenticationViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-internal class AllSettingsFragment : CommonFragment<FragmentAllSettingsBinding, AllSettingsViewModel>() {
+class AllSettingsFragment : CommonFragment<FragmentAllSettingsBinding, AllSettingsViewModel>() {
 
     private val optionsAdapter = AllSettingsOptionAdapter()
 
@@ -119,6 +119,8 @@ internal class AllSettingsFragment : CommonFragment<FragmentAllSettingsBinding, 
             AllSettingsNavigation.ToBaseNodeSelection -> navigate(R.id.action_settingsFragment_to_changeBaseNodeFragment)
             AllSettingsNavigation.ToDeleteWallet -> toDeleteWallet()
             AllSettingsNavigation.ToNetworkSelection -> navigate(R.id.action_settingsFragment_to_networkSelectionFragment)
+            AllSettingsNavigation.ToTorBridges -> navigate(R.id.action_settingsFragment_to_tor_custom_tor_bridges)
+            AllSettingsNavigation.ToAbout -> navigate(R.id.action_settingsFragment_to_aboutFragment)
         }
     }
 

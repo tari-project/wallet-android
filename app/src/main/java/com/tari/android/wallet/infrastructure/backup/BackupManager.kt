@@ -52,7 +52,7 @@ import java.net.UnknownHostException
 import java.util.concurrent.TimeUnit
 import kotlin.math.max
 
-internal class BackupManager(
+class BackupManager(
     private val context: Context,
     private val backupSettingsRepository: BackupSettingsRepository,
     private val backupStorage: BackupStorage,
@@ -60,6 +60,8 @@ internal class BackupManager(
 ) {
 
     private var retryCount = 0
+    private val logger
+        get() = Logger.t(BackupManager::class.simpleName)
 
     /**
      * Timer to trigger scheduled backups.
@@ -67,38 +69,23 @@ internal class BackupManager(
     private var scheduledBackupSubscription: Disposable? = null
 
     fun initialize() {
-        Logger.d("Start backup manager.")
         val scheduledBackupDate = backupSettingsRepository.scheduledBackupDate
         when {
             !backupSettingsRepository.backupIsEnabled -> EventBus.backupState.post(BackupState.BackupDisabled)
             backupSettingsRepository.backupFailureDate != null -> EventBus.backupState.post(BackupState.BackupOutOfDate())
-            scheduledBackupDate != null -> {
-                val delayMs = scheduledBackupDate.millis - DateTime.now().millis
-                scheduleBackup(
-                    delayMs = max(0, delayMs),
-                    resetRetryCount = true
-                )
-            }
-            else -> {
-                EventBus.backupState.post(BackupState.BackupUpToDate)
-            }
+            scheduledBackupDate != null -> scheduleBackup(max(0, scheduledBackupDate.millis - DateTime.now().millis), true)
+            else -> EventBus.backupState.post(BackupState.BackupUpToDate)
         }
     }
 
     fun setupStorage(hostFragment: Fragment) {
+        logger.i("Setup storage")
         backupStorage.setup(hostFragment)
     }
 
-    suspend fun onSetupActivityResult(
-        requestCode: Int,
-        resultCode: Int,
-        intent: Intent?
-    ) {
-        backupStorage.onSetupActivityResult(
-            requestCode,
-            resultCode,
-            intent
-        )
+    suspend fun onSetupActivityResult(requestCode: Int, resultCode: Int, intent: Intent?) {
+        logger.i("Setup storage stage 2")
+        backupStorage.onSetupActivityResult(requestCode, resultCode, intent)
     }
 
     suspend fun checkStorageStatus() {
@@ -108,13 +95,13 @@ internal class BackupManager(
         if (EventBus.backupState.publishSubject.value is BackupState.BackupInProgress) {
             return
         }
-        Logger.d("Check backup storage status.")
+        logger.i("Check backup storage status")
         EventBus.backupState.post(BackupState.BackupCheckingStorage)
         // check storage
         try {
             val backupDate = backupSettingsRepository.lastSuccessfulBackupDate!!
             if (!backupStorage.hasBackupForDate(backupDate)) {
-                throw BackupStorageTamperedException("Backup storage is tampered.")
+                throw BackupStorageTamperedException("Backup storage is tampered")
             }
             when {
                 backupSettingsRepository.backupFailureDate != null -> EventBus.backupState.post(BackupState.BackupOutOfDate())
@@ -131,25 +118,18 @@ internal class BackupManager(
         } catch (e: BackupStorageTamperedException) {
             EventBus.backupState.post(BackupState.BackupOutOfDate(e))
         } catch (e: Exception) {
-            Logger.e(e, "Error while checking storage. %s", e.toString())
             EventBus.backupState.post(BackupState.BackupStorageCheckFailed)
             throw e
         }
     }
 
-    fun scheduleBackup(
-        delayMs: Long? = null,
-        resetRetryCount: Boolean = false
-    ) {
+    fun scheduleBackup(delayMs: Long? = null, resetRetryCount: Boolean = false) {
         if (!backupSettingsRepository.backupIsEnabled) {
-            Logger.i("Backup is not enabled - cannot schedule a backup.")
             return // if backup is disabled or there's a scheduled backup
         }
         if (scheduledBackupSubscription?.isDisposed == false) {
-            Logger.i("There is already a scheduled backup - cannot schedule a backup.")
             return // if backup is disabled or there's a scheduled backup
         }
-        Logger.d("Schedule backup.")
         if (resetRetryCount) {
             retryCount = 0
         }
@@ -159,35 +139,20 @@ internal class BackupManager(
                 .timer(delayMs ?: Constants.Wallet.backupDelayMs, TimeUnit.MILLISECONDS)
                 .subscribeOn(Schedulers.io())
                 .observeOn(Schedulers.io())
-                .subscribe {
-                    GlobalScope.launch(Dispatchers.IO) {
-                        try {
-                            backup()
-                        } catch (exception: Exception) {
-                            Logger.e(exception, "Error during scheduled backup: $exception")
-                        }
-                    }
-                }
+                .subscribe { GlobalScope.launch(Dispatchers.IO) { runCatching { backup() } } }
         backupSettingsRepository.scheduledBackupDate = DateTime.now().plusMillis(delayMs?.toInt() ?: Constants.Wallet.backupDelayMs.toInt())
         EventBus.backupState.post(BackupState.BackupScheduled)
-        Logger.i("Backup scheduled.")
     }
 
-    suspend fun backup(
-        isInitialBackup: Boolean = false,
-        userTriggered: Boolean = false,
-        newPassword: CharArray? = null
-    ) {
+    suspend fun backup(isInitialBackup: Boolean = false, userTriggered: Boolean = false, newPassword: CharArray? = null) {
         if (!isInitialBackup && !backupSettingsRepository.backupIsEnabled) {
-            Logger.d("Backup is disabled. Exit.")
             return
         }
         if (EventBus.backupState.publishSubject.value is BackupState.BackupInProgress) {
-            Logger.d("Backup is in progress. Exit.")
             return
         }
         // Do the work here--in this case, upload the images.
-        Logger.d("Do backup.")
+        logger.i("Backup started")
         // cancel any scheduled backup
         scheduledBackupSubscription?.dispose()
         scheduledBackupSubscription = null
@@ -198,9 +163,10 @@ internal class BackupManager(
             backupSettingsRepository.lastSuccessfulBackupDate = backupDate
             backupSettingsRepository.scheduledBackupDate = null
             backupSettingsRepository.backupFailureDate = null
-            Logger.d("Backup successful.")
+            logger.i("Backup successful")
             EventBus.backupState.post(BackupState.BackupUpToDate)
         } catch (exception: Exception) {
+            logger.e(exception, "Backup failed")
             if (isInitialBackup) {
                 turnOff(deleteExistingBackups = true)
                 retryCount = 0
@@ -213,10 +179,7 @@ internal class BackupManager(
                 throw exception
             }
             if (userTriggered || retryCount > Constants.Wallet.maxBackupRetries) {
-                Logger.e(
-                    exception,
-                    "Error happened while backing up. It's a user-triggered backup or retry limit has been exceeded."
-                )
+                logger.e(exception, "Error happened while backing up. It's a user-triggered backup or retry limit has been exceeded")
                 EventBus.backupState.post(BackupState.BackupOutOfDate(exception))
                 backupSettingsRepository.scheduledBackupDate = null
                 backupSettingsRepository.backupFailureDate = DateTime.now()
@@ -226,13 +189,10 @@ internal class BackupManager(
                 }
                 throw exception
             } else {
-                Logger.e(exception, "Backup failed: ${exception.message}. Will schedule.")
-                scheduleBackup(
-                    delayMs = Constants.Wallet.backupRetryPeriodMs,
-                    resetRetryCount = false
-                )
+                logger.e(exception, "Backup failed. Will schedule.")
+                scheduleBackup(delayMs = Constants.Wallet.backupRetryPeriodMs, resetRetryCount = false)
             }
-            Logger.e(exception, "Error happened while backing up. Will retry.")
+            logger.e(exception, "Error happened while backing up. Will retry")
         }
     }
 
@@ -252,10 +212,7 @@ internal class BackupManager(
             exception.message == null -> context.getString(R.string.back_up_wallet_backing_up_unknown_error)
             else -> context.getString(R.string.back_up_wallet_backing_up_error_desc, exception.message!!)
         }
-        notificationHelper.postNotification(
-            title = title,
-            body = body
-        )
+        notificationHelper.postNotification(title = title, body = body)
     }
 
     // TODO(nyarian): TBD - should side effects be separated from the direct flow?
@@ -268,27 +225,10 @@ internal class BackupManager(
         scheduledBackupSubscription = null
         EventBus.backupState.post(BackupState.BackupDisabled)
         if (deleteExistingBackups) {
-            try {
-                backupStorage.deleteAllBackupFiles()
-            } catch (exception: Exception) {
-                /* no-op */
-                Logger.e(
-                    exception,
-                    // TODO(nyarian): but why ignoring this?
-                    "Ignored exception while deleting all backup files: $exception"
-                )
-            }
+            runCatching { backupStorage.deleteAllBackupFiles() }
         }
         backupSettingsRepository.localBackupFolderURI = null
-        try {
-            backupStorage.signOut()
-        } catch (exception: Exception) {
-            /* no-op */
-            Logger.e(
-                exception,
-                "Ignored exception while turning off: $exception"
-            )
-        }
+        runCatching { backupStorage.signOut() }
     }
 
 }

@@ -133,6 +133,7 @@
     <dimen name="add_amount_leftmost_digit_margin_start">10dp</dimen>
     <dimen name="add_amount_available_balance_error_amount_nudge_distance">40dp</dimen>
     <dimen name="add_amount_balance_text_size">13sp</dimen>
+    <dimen name="add_amount_custom_fee_size">26sp</dimen>
     <dimen name="add_amount_tx_fee_text_size">12sp</dimen>
     <dimen name="add_amount_balance_warning_container_top_margin">2dp</dimen>
     <dimen name="add_amount_balance_warning_container_top_padding">8dp</dimen>
@@ -171,5 +172,7 @@
     <dimen name="verify_seed_phrase_selected_word_end_margin">25dp</dimen>
     <dimen name="verify_seed_phrase_word_bottom_margin">14dp</dimen>
     <dimen name="seed_phrase_word_min_width">100dp</dimen>
+
+    <dimen name="utxos_list_tile_margin">12dp</dimen>
 
 </resources>

@@ -4,7 +4,7 @@ import com.tari.android.wallet.model.WalletError
 import com.tari.android.wallet.model.throwIf
 import com.tari.android.wallet.service.TariWalletService
 
-internal fun TariWalletService.executeWithError(
+fun TariWalletService.executeWithError(
     onError: (error: WalletError) -> Unit = { throwIf(it) },
     action: (error: WalletError, wallet: TariWalletService) -> Unit
 ) {
@@ -13,7 +13,7 @@ internal fun TariWalletService.executeWithError(
     onError(walletError)
 }
 
-internal fun <T> TariWalletService.getWithError(
+fun <T> TariWalletService.getWithError(
     onError: (error: WalletError) -> Unit = { throwIf(it) },
     action: (error: WalletError, wallet: TariWalletService) -> T,
 ): T {

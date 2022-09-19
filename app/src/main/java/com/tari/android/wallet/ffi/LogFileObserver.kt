@@ -47,7 +47,7 @@ import java.nio.charset.StandardCharsets
  * @author The Tari Development Team
  */
 @Suppress("DEPRECATION")
-internal class LogFileObserver(logFilePath: String) : FileObserver(logFilePath) {
+class LogFileObserver(logFilePath: String) : FileObserver(logFilePath) {
 
     private val logTag = "FFI"
     private val logFile = File(logFilePath)

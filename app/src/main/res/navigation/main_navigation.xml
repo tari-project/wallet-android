@@ -54,6 +54,12 @@
         <action
             android:id="@+id/action_settingsFragment_to_changeBaseNodeFragment"
             app:destination="@id/changeBaseNodeFragment" />
+        <action
+            android:id="@+id/action_settingsFragment_to_tor_custom_tor_bridges"
+            app:destination="@id/tor_custom_tor_bridges" />
+        <action
+            android:id="@+id/action_settingsFragment_to_aboutFragment"
+            app:destination="@id/aboutFragment" />
     </fragment>
 
     <fragment
@@ -70,5 +76,15 @@
         android:id="@+id/addCustomBaseNodeFragment"
         android:name="com.tari.android.wallet.ui.fragment.debug.baseNodeConfig.addBaseNode.AddCustomBaseNodeFragment"
         tools:layout="@layout/fragment_base_node_add"/>
+
+    <fragment
+        android:id="@+id/aboutFragment"
+        android:name="com.tari.android.wallet.ui.fragment.debug.AboutFragment"
+        tools:layout="@layout/fragment_about"/>
+
+    <fragment
+        android:id="@+id/tor_custom_tor_bridges"
+        android:name="com.tari.android.wallet.ui.fragment.settings.torBridges.customBridges.CustomTorBridgesFragment"
+        tools:layout="@layout/fragment_custom_tor_bridges"/>
 
 </navigation>

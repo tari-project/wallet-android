@@ -48,15 +48,18 @@ import java.io.File
  *
  * @author The Tari Development Team
  */
-internal class BackupFileProcessor(
+class BackupFileProcessor(
     private val backupSettingsRepository: BackupSettingsRepository,
     private val walletConfig: WalletConfig,
     private val namingPolicy: BackupNamingPolicy,
 ) {
+    private val logger
+        get() = Logger.t(BackupFileProcessor::class.simpleName)
 
     fun generateBackupFile(newPassword: CharArray? = null): Triple<File, DateTime, String> {
         // decrypt database
         FFIWallet.instance?.removeEncryption()
+        backupSettingsRepository.backupPassword = null
 
         // create partial backup in temp folder if password not set
         val databaseFile = File(walletConfig.walletDatabaseFilePath)
@@ -87,6 +90,7 @@ internal class BackupFileProcessor(
         }
         // encrypt after finish backup
         FFIWallet.instance?.enableEncryption()
+        logger.i("Backup files was generated")
 
         return Triple(fileToBackup, backupDate, mimeType)
     }
@@ -115,24 +119,22 @@ internal class BackupFileProcessor(
                 walletFilesDir.deleteRecursively()
                 throw BackupStorageTamperedException("Invalid encrypted backup.")
             }
+            logger.i("Backup file was restored")
         } else {
-            CompressionMethod.zip().uncompress(
-                file,
-                walletFilesDir
-            )
+            CompressionMethod.zip().uncompress(file, walletFilesDir)
             // check if wallet database file exists
             if (!File(walletConfig.walletDatabaseFilePath).exists()) {
                 walletFilesDir.listFiles()?.let { files ->
                     // delete uncompressed files
                     for (extractedFile in files) {
-                        if (extractedFile.isFile) { extractedFile.delete() }
+                        if (extractedFile.isFile) {
+                            extractedFile.delete()
+                        }
                     }
                 }
+                logger.i("Backup file is encrypted")
                 // throw exception
-                throw BackupFileIsEncryptedException(
-                    file,
-                    "Cannot uncompress. Restored file is encrypted."
-                )
+                throw BackupFileIsEncryptedException("Cannot uncompress. Restored file is encrypted.")
             }
         }
     }
@@ -141,10 +143,7 @@ internal class BackupFileProcessor(
         try {
             File(walletConfig.getWalletTempDirPath()).listFiles()?.forEach { it.delete() }
         } catch (e: Exception) {
-            Logger.e(
-                e,
-                "Ignorable backup error while clearing temporary and old files."
-            )
+            logger.e(e, "Cleaning temp files")
         }
     }
 

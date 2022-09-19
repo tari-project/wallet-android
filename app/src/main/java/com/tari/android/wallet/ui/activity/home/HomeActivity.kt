@@ -83,10 +83,11 @@ import com.tari.android.wallet.ui.fragment.tx.TxListRouter
 import com.tari.android.wallet.util.Constants
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import java.lang.ref.WeakReference
 import javax.inject.Inject
 
 
-internal class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>(), TxListRouter {
+class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>(), TxListRouter {
 
     @Inject
     lateinit var sharedPrefsWrapper: SharedPrefsRepository
@@ -110,12 +111,14 @@ internal class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>
 
     private val navController by lazy { Navigation.findNavController(this, R.id.nav_host_fragment) }
 
-    private var appBarConfiguration = AppBarConfiguration(setOf(R.id.txListFragment, R.id.ttlStoreFragment, R.id.profileFragment, R.id.settingsFragment))
+    private var appBarConfiguration =
+        AppBarConfiguration(setOf(R.id.txListFragment, R.id.ttlStoreFragment, R.id.profileFragment, R.id.settingsFragment))
 
     private lateinit var serviceConnection: TariWalletServiceConnection
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        instance = WeakReference(this)
 
         val viewModel: HomeViewModel by viewModels()
         bindViewModel(viewModel)
@@ -243,12 +246,22 @@ internal class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>
                 HomeDeeplinkScreens.TxDetails -> {
                     (intent.getParcelableExtra<TxId>(HomeDeeplinkScreens.KeyTxDetailsArgs))?.let { toTxDetails(null, it) }
                 }
+                else -> {}
             }
         }
     }
 
     override fun toTTLStore() {
         ui.bottomNavigationView.selectedItemId = R.id.ttlStoreFragment
+    }
+
+    override fun toUtxos() {
+        //        val action = TxListFragmentDirections.ActionTxListFragmentToTxDetlsFragment(tx, txId)
+//        navController.navigate(action)
+//        Bundle().apply {
+//            putParcelable(TX_EXTRA_KEY, tx)
+//            putParcelable(TX_ID_EXTRA_KEY, txId)
+//        }
     }
 
     override fun toTxDetails(tx: Tx?, txId: TxId?) {
@@ -299,6 +312,12 @@ internal class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>
 
     override fun onDestroy() {
         super.onDestroy()
+        instance = WeakReference(null)
         viewModelStore.clear()
+    }
+
+    companion object {
+        var instance = WeakReference<HomeActivity>(null)
+            private set
     }
 }

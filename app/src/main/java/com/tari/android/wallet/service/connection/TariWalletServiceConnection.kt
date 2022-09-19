@@ -57,6 +57,10 @@ class TariWalletServiceConnection : ViewModel(), ServiceConnection {
         _connection.onNext(ServiceConnectionState(ServiceConnectionStatus.NOT_YET_CONNECTED, null))
         val bindIntent = Intent(context, WalletService::class.java)
         context.bindService(bindIntent, this, Context.BIND_AUTO_CREATE)
+
+        com.tari.android.wallet.event.EventBus.walletState.subscribe(this) {
+            1
+        }
     }
 
     override fun onServiceDisconnected(name: ComponentName?) {

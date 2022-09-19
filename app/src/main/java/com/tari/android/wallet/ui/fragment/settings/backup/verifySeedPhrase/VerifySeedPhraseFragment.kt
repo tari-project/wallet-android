@@ -44,7 +44,7 @@ import androidx.core.view.get
 import androidx.fragment.app.viewModels
 import com.tari.android.wallet.databinding.FragmentVerifySeedPhraseBinding
 import com.tari.android.wallet.extension.observe
-import com.tari.android.wallet.ui.activity.settings.BackupSettingsRouter
+import com.tari.android.wallet.ui.fragment.settings.backup.activity.BackupSettingsRouter
 import com.tari.android.wallet.ui.common.CommonFragment
 import com.tari.android.wallet.ui.extension.*
 
@@ -174,7 +174,7 @@ class VerifySeedPhraseFragment : CommonFragment<FragmentVerifySeedPhraseBinding,
                 it.arguments = Bundle().apply { putStringArrayList(SEED_WORDS_KEY, ArrayList(words)) }
             }
 
-        private const val SEED_WORDS_KEY = "wordz"
+        private const val SEED_WORDS_KEY = "seed_words"
     }
 }
 

@@ -39,7 +39,7 @@ package com.tari.android.wallet.network
  *
  * @author The Tari Development Team
  */
-internal enum class NetworkConnectionState {
+enum class NetworkConnectionState {
     UNKNOWN,
     CONNECTED,
     DISCONNECTED;

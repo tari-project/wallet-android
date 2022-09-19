@@ -11,7 +11,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
-internal class GIFViewModel() : CommonViewModel() {
+class GIFViewModel : CommonViewModel() {
 
     init {
         component.inject(this)
@@ -42,7 +42,6 @@ internal class GIFViewModel() : CommonViewModel() {
             try {
                 _gif.postValue(GIFState(repository.getById(gifId)))
             } catch (e: Exception) {
-                Logger.e(e, "Exception was thrown during gif downloading")
                 _gif.postValue(GIFState(e))
             }
         }

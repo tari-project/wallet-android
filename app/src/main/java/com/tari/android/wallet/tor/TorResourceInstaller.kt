@@ -33,7 +33,6 @@
 package com.tari.android.wallet.tor
 
 import android.content.Context
-import com.orhanobut.logger.Logger
 import com.tari.android.wallet.data.sharedPrefs.tor.TorSharedRepository
 import java.io.*
 import java.util.zip.ZipInputStream
@@ -44,50 +43,21 @@ import java.util.zip.ZipInputStream
  *
  * @author The Tari Development Team
  */
-class TorResourceInstaller(private val context: Context, private val sharedTorSharedRepository: TorSharedRepository, private val torConfig: TorConfig) {
+class TorResourceInstaller(
+    private val context: Context,
+    private val sharedTorSharedRepository: TorSharedRepository,
+    private val torConfig: TorConfig
+) {
 
-    var appFilesDir: File = context.filesDir
-    var appDataDir: File = context.getDir(DIRECTORY_TOR_DATA, Context.MODE_PRIVATE)
-    var appNativeDir: File = File(context.applicationInfo.nativeLibraryDir)
-    var appSourceDir: File = File(context.applicationInfo.sourceDir)
+    private val appFilesDir: File = context.filesDir
+    private val appDataDir: File = context.getDir(DIRECTORY_TOR_DATA, Context.MODE_PRIVATE)
+    private val appNativeDir: File = File(context.applicationInfo.nativeLibraryDir)
+    private val appSourceDir: File = File(context.applicationInfo.sourceDir)
 
     lateinit var fileTor: File
     lateinit var fileTorrcCustom: File
     lateinit var fileTorControlPort: File
     lateinit var fileTorrc: File
-
-
-    /**
-     * Install the Tor geo IP resources from assets to app files directory.
-     */
-    fun installGeoIPResources() {
-        assetToFile(appFilesDir.absolutePath, COMMON_ASSET_KEY + GEOIP_ASSET_KEY, GEOIP_ASSET_KEY)
-        assetToFile(appFilesDir.absolutePath, COMMON_ASSET_KEY + GEOIP6_ASSET_KEY, GEOIP6_ASSET_KEY)
-    }
-
-    fun assetToFile(filesPath: String, assetPath: String, assetKey: String, isZipped: Boolean = false, setExecutable: Boolean = false): File {
-        val inputStream = context.assets.open(assetPath)
-        val outFile = File(filesPath, assetKey)
-        if (!outFile.exists()) {
-            streamToFile(inputStream, outFile, isZipped = isZipped)
-            if (setExecutable) {
-                makeFileExecutable(outFile)
-            }
-        }
-        return outFile
-    }
-
-    private fun streamToFile(inputStream: InputStream, outFile: File, append: Boolean = false, isZipped: Boolean = false) {
-        FileOutputStream(outFile.absolutePath, append).use { outputStream ->
-            (if (isZipped) ZipInputStream(inputStream).also { it.nextEntry } else inputStream).use { input ->
-                var bytecount: Int
-                val buffer = ByteArray(FILE_WRITE_BUFFER_SIZE)
-                while (input.read(buffer).also { bytecount = it } > 0) {
-                    outputStream.write(buffer, 0, bytecount)
-                }
-            }
-        }
-    }
 
     fun installResources() {
         if (!appFilesDir.exists())
@@ -100,7 +70,11 @@ class TorResourceInstaller(private val context: Context, private val sharedTorSh
 
         installGeoIPResources()
 
-        fileTorrc = assetToFile(appFilesDir.absolutePath, COMMON_ASSET_KEY + TORRC_ASSET_KEY, TORRC_ASSET_KEY, false, false)
+        fileTorrc = assetToFile(
+            appFilesDir.absolutePath, COMMON_ASSET_KEY + TORRC_ASSET_KEY, TORRC_ASSET_KEY,
+            isZipped = false,
+            setExecutable = false
+        )
 
         updateTorrcCustomFile()?.let { fileTorrcCustom = it }
 
@@ -134,6 +108,38 @@ class TorResourceInstaller(private val context: Context, private val sharedTorSh
         }
     }
 
+    /**
+     * Install the Tor geo IP resources from assets to app files directory.
+     */
+    private fun installGeoIPResources() {
+        assetToFile(appFilesDir.absolutePath, COMMON_ASSET_KEY + GEOIP_ASSET_KEY, GEOIP_ASSET_KEY)
+        assetToFile(appFilesDir.absolutePath, COMMON_ASSET_KEY + GEOIP6_ASSET_KEY, GEOIP6_ASSET_KEY)
+    }
+
+    private fun assetToFile(filesPath: String, assetPath: String, assetKey: String, isZipped: Boolean = false, setExecutable: Boolean = false): File {
+        val inputStream = context.assets.open(assetPath)
+        val outFile = File(filesPath, assetKey)
+        if (!outFile.exists()) {
+            streamToFile(inputStream, outFile, isZipped = isZipped)
+            if (setExecutable) {
+                makeFileExecutable(outFile)
+            }
+        }
+        return outFile
+    }
+
+    private fun streamToFile(inputStream: InputStream, outFile: File, append: Boolean = false, isZipped: Boolean = false) {
+        FileOutputStream(outFile.absolutePath, append).use { outputStream ->
+            (if (isZipped) ZipInputStream(inputStream).also { it.nextEntry } else inputStream).use { input ->
+                var byteCount: Int
+                val buffer = ByteArray(FILE_WRITE_BUFFER_SIZE)
+                while (input.read(buffer).also { byteCount = it } > 0) {
+                    outputStream.write(buffer, 0, byteCount)
+                }
+            }
+        }
+    }
+
     private fun updateTorrcCustomFile(): File? {
 
         val extraLines = StringBuffer().apply {
@@ -155,8 +161,6 @@ class TorResourceInstaller(private val context: Context, private val sharedTorSh
                 append("UseBridges 1\n")
             }
         }
-
-        Logger.d("TorRC:\n %s", extraLines.toString())
 
         val fileTorRcCustom = File(fileTorrc.absolutePath + ".custom")
         val success = updateTorConfigCustom(fileTorRcCustom, extraLines.toString())

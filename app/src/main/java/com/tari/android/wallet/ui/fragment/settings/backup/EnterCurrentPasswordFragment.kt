@@ -45,8 +45,8 @@ import com.tari.android.wallet.R.color.change_password_cta_disabled
 import com.tari.android.wallet.R.color.white
 import com.tari.android.wallet.databinding.FragmentEnterBackupPasswordBinding
 import com.tari.android.wallet.di.DiContainer.appComponent
-import com.tari.android.wallet.ui.activity.settings.BackupSettingsRouter
 import com.tari.android.wallet.ui.extension.*
+import com.tari.android.wallet.ui.fragment.settings.backup.activity.BackupSettingsRouter
 import javax.inject.Inject
 
 class EnterCurrentPasswordFragment @Deprecated(
@@ -100,7 +100,7 @@ framework for UI tree rebuild on configuration changes"""
         }
         ui.passwordEditText.addTextChangedListener(
             afterTextChanged = {
-                setChangePasswordCTAState(canEnableChangePasswordCTA && it?.length ?: 0 != 0)
+                setChangePasswordCTAState(canEnableChangePasswordCTA && (it?.length ?: 0) != 0)
                 ui.passwordsNotMatchLabelView.gone()
             }
         )

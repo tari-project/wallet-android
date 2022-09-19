@@ -1,7 +1,6 @@
 package com.tari.android.wallet.ui.fragment.tx.details.gif
 
 import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.observe
 import com.bumptech.glide.RequestManager
 import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.GlideException
@@ -18,7 +17,7 @@ import com.tari.android.wallet.ui.extension.gone
 import com.tari.android.wallet.ui.extension.setTopMargin
 import com.tari.android.wallet.ui.extension.visible
 
-internal class GIFView(
+class GIFView(
     private val ui: ViewTxDetailsGifContainerBinding,
     private val glide: RequestManager,
     private val viewModel: GIFViewModel,
@@ -27,11 +26,10 @@ internal class GIFView(
 
     fun displayGIF() {
         viewModel.gif.observe(owner) {
-            val state = it ?: return@observe
             when {
-                state.isError -> onFailure()
-                state.isSuccessful -> downloadMedia(state.gifItem!!)
-                state.isProcessing -> showDownloadingState()
+                it.isError -> onFailure()
+                it.isSuccessful -> downloadMedia(it.gifItem!!)
+                it.isProcessing -> showDownloadingState()
                 else -> throw IllegalStateException()
             }
         }

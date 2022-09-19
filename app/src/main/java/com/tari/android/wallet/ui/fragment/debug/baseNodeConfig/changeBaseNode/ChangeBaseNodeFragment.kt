@@ -46,7 +46,7 @@ import com.tari.android.wallet.ui.fragment.debug.baseNodeConfig.BaseNodeConfigRo
 import com.tari.android.wallet.ui.fragment.debug.baseNodeConfig.changeBaseNode.adapter.BaseNodeViewHolderItem
 import com.tari.android.wallet.ui.fragment.debug.baseNodeConfig.changeBaseNode.adapter.ChangeBaseNodeAdapter
 
-internal class ChangeBaseNodeFragment : CommonFragment<FragmentBaseNodeChangeBinding, ChangeBaseNodeViewModel>() {
+class ChangeBaseNodeFragment : CommonFragment<FragmentBaseNodeChangeBinding, ChangeBaseNodeViewModel>() {
 
     private val adapter = ChangeBaseNodeAdapter()
 

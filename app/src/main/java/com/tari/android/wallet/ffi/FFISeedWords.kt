@@ -39,7 +39,7 @@ import com.tari.android.wallet.model.seedPhrase.SeedWordsWordPushResult
  *
  * @author The Tari Development Team
  */
-internal class FFISeedWords() : FFIBase() {
+class FFISeedWords() : FFIBase() {
 
     // region JNI
     private external fun jniCreate()

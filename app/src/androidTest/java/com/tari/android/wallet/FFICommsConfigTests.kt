@@ -45,7 +45,7 @@ import com.tari.android.wallet.di.ApplicationModule
 import com.tari.android.wallet.di.WalletModule
 import com.tari.android.wallet.ffi.FFICommsConfig
 import com.tari.android.wallet.ffi.FFIException
-import com.tari.android.wallet.ffi.FFITransportType
+import com.tari.android.wallet.ffi.FFITariTransportConfig
 import com.tari.android.wallet.ffi.nullptr
 import com.tari.android.wallet.ui.common.domain.ResourceManager
 import com.tari.android.wallet.util.Constants
@@ -64,7 +64,6 @@ class FFICommsConfigTests {
     private companion object {
         private const val DB_NAME = "tari_test_db"
         private var walletDir = ""
-        private var network: Network = Network.DIBBLER
         private val context = getApplicationContext<Context>()
         private val resourceManager = ResourceManager(context)
         private val prefs = context.getSharedPreferences(ApplicationModule.sharedPrefsFileName, Context.MODE_PRIVATE)
@@ -85,15 +84,14 @@ class FFICommsConfigTests {
 
     @Test
     fun constructor_assertThatValidCommsConfigInstanceWasCreated() {
-        val transport = FFITransportType()
+        val transport = FFITariTransportConfig()
         val commsConfig = FFICommsConfig(
             transport.getAddress(),
             transport,
             DB_NAME,
             walletDir,
             Constants.Wallet.discoveryTimeoutSec,
-            Constants.Wallet.storeAndForwardMessageDurationSec,
-            network.uriComponent
+            Constants.Wallet.storeAndForwardMessageDurationSec
         )
         assertNotEquals(nullptr, commsConfig.pointer)
         commsConfig.destroy()
@@ -102,7 +100,7 @@ class FFICommsConfigTests {
 
     @Test(expected = FFIException::class)
     fun constructor_assertThatFFIExceptionWasThrown_ifGivenDirectoryDoesNotExist() {
-        val transport = FFITransportType()
+        val transport = FFITariTransportConfig()
         try {
             FFICommsConfig(
                 transport.getAddress(),
@@ -110,8 +108,7 @@ class FFICommsConfigTests {
                 DB_NAME,
                 "${walletDir}_invalid_target",
                 Constants.Wallet.discoveryTimeoutSec,
-                Constants.Wallet.storeAndForwardMessageDurationSec,
-                network.uriComponent
+                Constants.Wallet.storeAndForwardMessageDurationSec
             )
         } catch (e: Throwable) {
             transport.destroy()

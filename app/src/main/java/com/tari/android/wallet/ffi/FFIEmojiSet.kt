@@ -37,17 +37,14 @@ package com.tari.android.wallet.ffi
  *
  * @author The Tari Development Team
  */
-internal class FFIEmojiSet(): FFIBase() {
+class FFIEmojiSet : FFIBase() {
 
     // region JNI
 
     private external fun jniDestroy()
     private external fun jniCreate()
     private external fun jniGetLength(libError: FFIError): Int
-    private external fun jniGetAt(
-        index: Int,
-        libError: FFIError
-    ): FFIPointer
+    private external fun jniGetAt(index: Int, libError: FFIError): FFIPointer
 
     // endregion
 

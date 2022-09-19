@@ -2,10 +2,9 @@ package com.tari.android.wallet.ui.common.gyphy.presentation
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.orhanobut.logger.Logger
 import com.tari.android.wallet.extension.addTo
-import com.tari.android.wallet.ui.common.gyphy.repository.GIFItem
 import com.tari.android.wallet.ui.common.gyphy.presentation.GIFState.*
+import com.tari.android.wallet.ui.common.gyphy.repository.GIFItem
 import com.tari.android.wallet.ui.common.gyphy.repository.GIFRepository
 import com.tari.android.wallet.ui.presentation.TxNote
 import io.reactivex.Observable
@@ -33,7 +32,7 @@ class GIFViewModel(private val repository: GIFRepository) {
                     .onErrorReturn { ErrorState }
                     .startWith(LoadingState)
                     .subscribeOn(Schedulers.io())
-                    .doOnError { e -> Logger.e(e, "Error occurred during gif loading") }
+                    .doOnError { }
             }
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe { _gifState.postValue(it) }

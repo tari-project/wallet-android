@@ -58,7 +58,6 @@ import com.bumptech.glide.Glide
 import com.daasuu.ei.Ease
 import com.daasuu.ei.EasingInterpolator
 import com.giphy.sdk.core.models.Media
-import com.orhanobut.logger.Logger
 import com.tari.android.wallet.R
 import com.tari.android.wallet.R.color.*
 import com.tari.android.wallet.R.dimen.*
@@ -66,7 +65,6 @@ import com.tari.android.wallet.databinding.FragmentAddNoteBinding
 import com.tari.android.wallet.di.DiContainer.appComponent
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.extension.observe
-import com.tari.android.wallet.infrastructure.Tracker
 import com.tari.android.wallet.model.Contact
 import com.tari.android.wallet.model.MicroTari
 import com.tari.android.wallet.model.User
@@ -81,9 +79,7 @@ import com.tari.android.wallet.ui.fragment.send.addNote.gif.ThumbnailGIFsViewMod
 import com.tari.android.wallet.ui.fragment.send.common.TransactionData
 import com.tari.android.wallet.ui.presentation.TxNote
 import com.tari.android.wallet.util.Constants
-import com.tari.android.wallet.util.Constants.UI.AddNoteAndSend
 import java.lang.ref.WeakReference
-import javax.inject.Inject
 
 /**
  * Add a note to the transaction & send it through this fragment.
@@ -91,9 +87,6 @@ import javax.inject.Inject
  * @author The Tari Development Team
  */
 class AddNoteFragment : Fragment(), View.OnTouchListener {
-
-    @Inject
-    lateinit var tracker: Tracker
 
     private lateinit var addNodeListenerWR: WeakReference<AddNodeListener>
 
@@ -109,6 +102,7 @@ class AddNoteFragment : Fragment(), View.OnTouchListener {
     private lateinit var fullEmojiIdViewController: FullEmojiIdViewController
 
     // Tx properties.
+    private lateinit var transactionData: TransactionData
     private lateinit var recipientUser: User
     private lateinit var amount: MicroTari
     private var isOneSidePayment: Boolean = false
@@ -124,18 +118,12 @@ class AddNoteFragment : Fragment(), View.OnTouchListener {
         addNodeListenerWR = WeakReference(context as AddNodeListener)
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View = FragmentAddNoteBinding.inflate(inflater, container, false).also { ui = it }.root
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?) =
+        FragmentAddNoteBinding.inflate(inflater, container, false).also { ui = it }.root
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        if (savedInstanceState == null) {
-            tracker.screen(path = "/home/send_tari/add_note", title = "Send Tari - Add Note")
-        }
         initializeGIFsViewModel()
         retrievePageArguments(savedInstanceState)
         setupUI(savedInstanceState)
@@ -145,9 +133,8 @@ class AddNoteFragment : Fragment(), View.OnTouchListener {
     private fun initializeGIFsViewModel() {
         viewModel = ViewModelProvider(this)[ThumbnailGIFsViewModel::class.java]
         observe(viewModel.state) {
-            when {
-                it.isSuccessful -> adapter.repopulate(it.gifItems!!)
-                it.isError -> Logger.e("GIFs request had error")
+            if (it.isSuccessful) {
+                adapter.repopulate(it.gifItems!!)
             }
         }
     }
@@ -178,13 +165,7 @@ class AddNoteFragment : Fragment(), View.OnTouchListener {
 
     @SuppressLint("ClickableViewAccessibility")
     private fun setupUI(state: Bundle?) {
-        gifContainer = GIFContainer(
-            Glide.with(this),
-            ui.gifContainerView,
-            ui.gifImageView,
-            ui.searchGiphyContainerView,
-            state
-        )
+        gifContainer = GIFContainer(Glide.with(this), ui.gifContainerView, ui.gifImageView, ui.searchGiphyContainerView, state)
         if (gifContainer.gifItem != null) changeScrollViewBottomConstraint(R.id.slide_button_container_view)
         adapter = GIFThumbnailAdapter(Glide.with(this), ::handleViewMoreGIFsIntent) {
             if (gifContainer.isShown) {
@@ -242,9 +223,10 @@ class AddNoteFragment : Fragment(), View.OnTouchListener {
     }
 
     private fun retrievePageArguments(savedInstanceState: Bundle?) {
-        recipientUser = requireArguments().getParcelable("recipientUser")!!
-        amount = requireArguments().getParcelable("amount")!!
-        isOneSidePayment = requireArguments().getBoolean("isOneSidePayment")
+        transactionData = requireArguments().getParcelable("transactionData")!!
+        recipientUser = transactionData.recipientUser!!
+        amount = transactionData.amount!!
+        isOneSidePayment = transactionData.isOneSidePayment
         if (savedInstanceState == null) {
             requireArguments().getString(SendTariActivity.PARAMETER_NOTE)
                 ?.let { ui.noteEditText.setText(it) }
@@ -315,7 +297,7 @@ class AddNoteFragment : Fragment(), View.OnTouchListener {
         val mActivity = activity ?: return
         ui.noteEditText.requestFocus()
         val imm = mActivity.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-        imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY)
+        imm.showSoftInput(ui.noteEditText, InputMethodManager.HIDE_IMPLICIT_ONLY)
     }
 
     @SuppressLint("ClickableViewAccessibility")
@@ -358,10 +340,7 @@ class AddNoteFragment : Fragment(), View.OnTouchListener {
      * Controls the slide button animation & behaviour on drag.
      */
     @SuppressLint("ClickableViewAccessibility")
-    override fun onTouch(
-        view: View,
-        event: MotionEvent
-    ): Boolean {
+    override fun onTouch(view: View, event: MotionEvent): Boolean {
         val x = event.rawX.toInt()
         when (event.action and MotionEvent.ACTION_MASK) {
             MotionEvent.ACTION_POINTER_DOWN, MotionEvent.ACTION_POINTER_UP -> Unit
@@ -448,9 +427,9 @@ class AddNoteFragment : Fragment(), View.OnTouchListener {
     }
 
     private fun onSlideAnimationEnd() {
+        hideKeyboard()
         if (EventBus.networkConnectionState.publishSubject.value != NetworkConnectionState.CONNECTED) {
-            ui.rootView.postDelayed(AddNoteAndSend.preKeyboardHideWaitMs) { hideKeyboard() }
-            ui.rootView.postDelayed(AddNoteAndSend.preKeyboardHideWaitMs + Constants.UI.keyboardHideWaitMs) {
+            ui.rootView.postDelayed(Constants.UI.keyboardHideWaitMs) {
                 restoreSlider()
                 ui.noteEditText.isEnabled = true
                 showInternetConnectionErrorDialog(requireActivity())
@@ -459,10 +438,7 @@ class AddNoteFragment : Fragment(), View.OnTouchListener {
             ui.removeGifCtaView.isEnabled = false
             ui.progressBar.visible()
             ui.slideView.gone()
-            ui.rootView.postDelayed(AddNoteAndSend.preKeyboardHideWaitMs) { hideKeyboard() }
-            val totalTime =
-                AddNoteAndSend.preKeyboardHideWaitMs + AddNoteAndSend.continueToFinalizeSendTxDelayMs
-            ui.rootView.postDelayed(totalTime) { continueToFinalizeSendTx() }
+            continueToFinalizeSendTx()
         }
     }
 
@@ -472,11 +448,10 @@ class AddNoteFragment : Fragment(), View.OnTouchListener {
     }
 
     private fun continueToFinalizeSendTx() {
-        // track event
-        tracker.event(category = "Transaction", action = "Transaction Initiated")
         // notify listener (i.e. activity)
         val note = TxNote(ui.noteEditText.editableText.toString(), gifContainer.gifItem?.embedUri?.toString()).compose()
-        addNodeListenerWR.get()?.continueToFinalizeSendTx(TransactionData(recipientUser, amount, note, isOneSidePayment))
+        val newData = transactionData.copy(note = note)
+        addNodeListenerWR.get()?.continueToFinalizeSendTx(newData)
     }
 
     private fun restoreSlider() {
@@ -488,9 +463,7 @@ class AddNoteFragment : Fragment(), View.OnTouchListener {
                 val value = valueAnimator.animatedValue as Float
                 ui.slideView.alpha = 1f - value
                 ui.slideToSendEnabledTextView.alpha = 1f - value
-                ui.slideView.setStartMargin(
-                    (slideViewInitialMargin + slideViewMarginDelta * (1 - value)).toInt()
-                )
+                ui.slideView.setStartMargin((slideViewInitialMargin + slideViewMarginDelta * (1 - value)).toInt())
             }
             duration = Constants.UI.shortDurationMs
             interpolator = EasingInterpolator(Ease.QUART_IN_OUT)

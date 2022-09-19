@@ -33,19 +33,25 @@
 package com.tari.android.wallet.data.sharedPrefs.baseNode
 
 import android.content.SharedPreferences
+import com.tari.android.wallet.data.repository.CommonRepository
 import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodeSharedRepository.Key.baseNodeLastSyncResultField
+import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodeSharedRepository.Key.baseNodeStateField
 import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodeSharedRepository.Key.currentBaseNodeField
 import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodeSharedRepository.Key.userBaseNodeListField
 import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefBooleanNullableDelegate
 import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefGsonDelegate
+import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefIntDelegate
 import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepository
+import com.tari.android.wallet.data.sharedPrefs.network.formatKey
+import com.tari.android.wallet.event.EventBus
+import com.tari.android.wallet.service.baseNode.BaseNodeState
 
-class BaseNodeSharedRepository(sharedPrefs: SharedPreferences, val networkRepository: NetworkRepository) {
+class BaseNodeSharedRepository(sharedPrefs: SharedPreferences, networkRepository: NetworkRepository) : CommonRepository(networkRepository) {
 
     private object Key {
         const val currentBaseNodeField = "tari_wallet_current_base_node"
         const val userBaseNodeListField = "tari_wallet_user_base_nodes"
-
+        const val baseNodeStateField = "tari_wallet_user_base_node_state"
         const val baseNodeLastSyncResultField = "tari_wallet_base_node_last_sync_result"
     }
 
@@ -54,6 +60,12 @@ class BaseNodeSharedRepository(sharedPrefs: SharedPreferences, val networkReposi
     var userBaseNodes: BaseNodeList? by SharedPrefGsonDelegate(sharedPrefs, formatKey(userBaseNodeListField), BaseNodeList::class.java)
 
     var baseNodeLastSyncResult: Boolean? by SharedPrefBooleanNullableDelegate(sharedPrefs, baseNodeLastSyncResultField)
+
+    var baseNodeState: Int by SharedPrefIntDelegate(sharedPrefs, baseNodeStateField, 0)
+
+    init {
+        EventBus.baseNodeState.post(BaseNodeState.parseInt(baseNodeState))
+    }
 
     fun deleteUserBaseNode(baseNodeDto: BaseNodeDto) {
         userBaseNodes.orEmpty().apply {
@@ -74,6 +86,4 @@ class BaseNodeSharedRepository(sharedPrefs: SharedPreferences, val networkReposi
         currentBaseNode = null
         userBaseNodes = null
     }
-
-    private fun formatKey(key: String): String = key + "_" + networkRepository.currentNetwork!!.network.displayName
 }

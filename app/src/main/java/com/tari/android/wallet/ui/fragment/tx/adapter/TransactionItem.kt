@@ -4,5 +4,5 @@ import com.tari.android.wallet.model.Tx
 import com.tari.android.wallet.ui.common.recyclerView.CommonViewHolderItem
 import com.tari.android.wallet.ui.common.gyphy.presentation.GIFViewModel
 
-internal class TransactionItem(val tx: Tx, val position: Int, val viewModel: GIFViewModel, val requiredConfirmationCount: Long) :
+class TransactionItem(val tx: Tx, val position: Int, val viewModel: GIFViewModel, val requiredConfirmationCount: Long) :
     CommonViewHolderItem()

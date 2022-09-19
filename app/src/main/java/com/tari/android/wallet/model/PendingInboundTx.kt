@@ -45,7 +45,7 @@ import java.math.BigInteger
  */
 class PendingInboundTx() : Tx(), Parcelable {
 
-    internal constructor(tx: FFICompletedTx) : this() {
+    constructor(tx: FFICompletedTx) : this() {
         this.id = tx.getId()
         this.direction = tx.getDirection()
         this.user = tx.getUser()
@@ -56,7 +56,7 @@ class PendingInboundTx() : Tx(), Parcelable {
         tx.destroy()
     }
 
-    internal constructor(tx: FFIPendingInboundTx) : this() {
+    constructor(tx: FFIPendingInboundTx) : this() {
         this.id = tx.getId()
         this.direction = tx.getDirection()
         this.user = tx.getUser()

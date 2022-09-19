@@ -45,7 +45,7 @@ import com.tari.android.wallet.ui.common.CommonFragment
 import com.tari.android.wallet.ui.extension.*
 import com.tari.android.wallet.ui.fragment.restore.restore.WalletRestoreRouter
 
-internal class ChooseRestoreOptionFragment : CommonFragment<FragmentChooseRestoreOptionBinding, ChooseRestoreOptionViewModel>() {
+class ChooseRestoreOptionFragment : CommonFragment<FragmentChooseRestoreOptionBinding, ChooseRestoreOptionViewModel>() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?) =
         FragmentChooseRestoreOptionBinding.inflate(inflater, container, false).also { ui = it }.root
@@ -93,7 +93,6 @@ internal class ChooseRestoreOptionFragment : CommonFragment<FragmentChooseRestor
     private fun processNavigation(navigation: ChooseRestoreOptionNavigation) {
         val router = requireActivity() as WalletRestoreRouter
         when (navigation) {
-            ChooseRestoreOptionNavigation.ToRestoreInProgress -> router.toRestoreInProgress()
             ChooseRestoreOptionNavigation.ToEnterRestorePassword -> router.toEnterRestorePassword()
             ChooseRestoreOptionNavigation.OnRestoreCompleted -> router.onRestoreCompleted()
             ChooseRestoreOptionNavigation.ToRestoreWithRecoveryPhrase -> router.toRestoreWithRecoveryPhrase()

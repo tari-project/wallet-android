@@ -23,15 +23,12 @@ import com.tari.android.wallet.ui.fragment.restore.inputSeedWords.suggestions.Su
 import com.tari.android.wallet.ui.fragment.restore.restore.WalletRestoreRouter
 import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent
 
-internal class InputSeedWordsFragment : CommonFragment<FragmentWalletInputSeedWordsBinding, InputSeedWordsViewModel>() {
+class InputSeedWordsFragment : CommonFragment<FragmentWalletInputSeedWordsBinding, InputSeedWordsViewModel>() {
 
     private val suggestionsAdapter = SuggestionsAdapter()
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View = FragmentWalletInputSeedWordsBinding.inflate(inflater, container, false).also { ui = it }.root
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
+        FragmentWalletInputSeedWordsBinding.inflate(inflater, container, false).also { ui = it }.root
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -100,7 +97,7 @@ internal class InputSeedWordsFragment : CommonFragment<FragmentWalletInputSeedWo
         }
     }
 
-    private fun showSuggestions(suggestions: SuggestionState) = when(suggestions) {
+    private fun showSuggestions(suggestions: SuggestionState) = when (suggestions) {
         SuggestionState.Empty -> {
             setSuggestionsState(false)
             ui.suggestionsLabel.setText(R.string.restore_from_seed_words_autocompletion_no_suggestions)
@@ -137,18 +134,18 @@ internal class InputSeedWordsFragment : CommonFragment<FragmentWalletInputSeedWo
             setOnClickListener { viewModel.getFocus(word.index.value!!) }
             ui.removeView.setOnClickListener { viewModel.removeWord(word.index.value!!) }
             ui.text.doAfterTextChanged { viewModel.onCurrentWordChanges(word.index.value!!, it?.toString().orEmpty()) }
-            ui.text.setOnKeyListener { v, keyCode, event ->
+            ui.text.setOnKeyListener { _, keyCode, _ ->
                 if (keyCode == KeyEvent.KEYCODE_DEL && ui.text.text.isNullOrEmpty() && word.index.value!! != 0) {
                     viewModel.removeWord(word.index.value!!)
                     return@setOnKeyListener true
                 }
                 false
             }
-            ui.text.setOnFocusChangeListener { v, hasFocus ->
+            ui.text.setOnFocusChangeListener { _, hasFocus ->
                 updateState(hasFocus, word.isValid())
                 if (hasFocus) viewModel.getFocus(word.index.value!!, true)
             }
-            ui.text.setOnEditorActionListener { v, actionId, _ ->
+            ui.text.setOnEditorActionListener { _, actionId, _ ->
                 if (actionId == EditorInfo.IME_ACTION_NEXT) {
                     viewModel.finishEntering(word.index.value!!, ui.text.text?.toString().orEmpty())
                     return@setOnEditorActionListener true

@@ -35,12 +35,15 @@ package com.tari.android.wallet.ui.fragment.restore.restore
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
+import androidx.activity.viewModels
 import androidx.fragment.app.Fragment
 import com.tari.android.wallet.R
 import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import com.tari.android.wallet.data.sharedPrefs.tariSettings.TariSettingsSharedRepository
+import com.tari.android.wallet.databinding.ActivityWalletBackupBinding
 import com.tari.android.wallet.di.DiContainer.appComponent
+import com.tari.android.wallet.service.WalletServiceLauncher
+import com.tari.android.wallet.ui.common.CommonActivity
 import com.tari.android.wallet.ui.fragment.auth.AuthActivity
 import com.tari.android.wallet.ui.fragment.debug.baseNodeConfig.BaseNodeConfigRouter
 import com.tari.android.wallet.ui.fragment.debug.baseNodeConfig.addBaseNode.AddCustomBaseNodeFragment
@@ -48,11 +51,10 @@ import com.tari.android.wallet.ui.fragment.debug.baseNodeConfig.changeBaseNode.C
 import com.tari.android.wallet.ui.fragment.restore.chooseRestoreOption.ChooseRestoreOptionFragment
 import com.tari.android.wallet.ui.fragment.restore.enterRestorationPassword.EnterRestorationPasswordFragment
 import com.tari.android.wallet.ui.fragment.restore.inputSeedWords.InputSeedWordsFragment
-import com.tari.android.wallet.ui.fragment.restore.walletRestoring.WalletRestoringFragment
 import com.tari.android.wallet.ui.fragment.restore.walletRestoringFromSeedWords.WalletRestoringFromSeedWordsFragment
 import javax.inject.Inject
 
-class WalletRestoreActivity : AppCompatActivity(), WalletRestoreRouter, BaseNodeConfigRouter {
+class WalletRestoreActivity : CommonActivity<ActivityWalletBackupBinding, WalletRestoreViewModel>(), WalletRestoreRouter, BaseNodeConfigRouter {
 
     @Inject
     lateinit var prefs: SharedPrefsRepository
@@ -60,10 +62,17 @@ class WalletRestoreActivity : AppCompatActivity(), WalletRestoreRouter, BaseNode
     @Inject
     lateinit var tariSettingsSharedRepository: TariSettingsSharedRepository
 
+    @Inject
+    lateinit var walletServiceLauncher: WalletServiceLauncher
+
     override fun onCreate(savedInstanceState: Bundle?) {
         appComponent.inject(this)
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_wallet_backup)
+        ui = ActivityWalletBackupBinding.inflate(layoutInflater).apply { setContentView(root) }
+
+        val viewModel : WalletRestoreViewModel by viewModels()
+        bindViewModel(viewModel)
+
         if (savedInstanceState == null) {
             loadChooseBackupOptionFragment()
         }
@@ -80,25 +89,13 @@ class WalletRestoreActivity : AppCompatActivity(), WalletRestoreRouter, BaseNode
             .commit()
     }
 
-    override fun toEnterRestorePassword() {
-        loadFragment(EnterRestorationPasswordFragment.newInstance())
-    }
+    override fun toEnterRestorePassword() = loadFragment(EnterRestorationPasswordFragment.newInstance())
 
-    override fun toRestoreWithRecoveryPhrase() {
-        loadFragment(InputSeedWordsFragment.newInstance())
-    }
+    override fun toRestoreWithRecoveryPhrase() = loadFragment(InputSeedWordsFragment.newInstance())
 
-    override fun toRestoreInProgress() {
-        loadFragment(WalletRestoringFragment.newInstance())
-    }
+    override fun toRestoreFromSeedWordsInProgress() = loadFragment(WalletRestoringFromSeedWordsFragment.newInstance())
 
-    override fun toRestoreFromSeedWordsInProgress() {
-        loadFragment(WalletRestoringFromSeedWordsFragment.newInstance())
-    }
-
-    override fun toBaseNodeSelection() {
-        loadFragment(ChangeBaseNodeFragment())
-    }
+    override fun toBaseNodeSelection() = loadFragment(ChangeBaseNodeFragment())
 
     override fun onRestoreCompleted() {
         // wallet restored, setup shared prefs accordingly
@@ -107,6 +104,7 @@ class WalletRestoreActivity : AppCompatActivity(), WalletRestoreRouter, BaseNode
         prefs.onboardingDisplayedAtHome = true
         tariSettingsSharedRepository.isRestoredWallet = true
 
+        finish()
         startActivity(Intent(this, AuthActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         })
@@ -123,6 +121,13 @@ class WalletRestoreActivity : AppCompatActivity(), WalletRestoreRouter, BaseNode
             .replace(R.id.backup_fragment_container, fragment)
             .addToBackStack(null)
             .commit()
+    }
+
+    override fun onDestroy() {
+        if (!tariSettingsSharedRepository.isRestoredWallet) {
+            walletServiceLauncher.stop()
+        }
+        super.onDestroy()
     }
 
     companion object {

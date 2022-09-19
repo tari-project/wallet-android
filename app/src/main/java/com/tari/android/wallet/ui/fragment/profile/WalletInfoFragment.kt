@@ -82,7 +82,11 @@ class WalletInfoFragment : CommonFragment<FragmentWalletInfoBinding, WalletInfoV
 
         observe(publicKeyHex) { fullEmojiIdViewController.emojiIdHex = it }
 
-        observe(qrDeepLink) { getQREncodedBitmap(it, dimenPx(R.dimen.wallet_info_img_qr_code_size))?.let { ui.qrImageView.setImageBitmap(it) } }
+        observe(qrDeepLink) {
+            getQREncodedBitmap(it, dimenPx(R.dimen.wallet_info_img_qr_code_size))?.let { bitmap ->
+                ui.qrImageView.setImageBitmap(bitmap)
+            }
+        }
 
         observe(yat) { ui.yatButton.setVisible(it.isNotEmpty()) }
 
@@ -132,7 +136,7 @@ class WalletInfoFragment : CommonFragment<FragmentWalletInfoBinding, WalletInfoV
             val barcodeEncoder = BarcodeEncoder()
             val map = barcodeEncoder.encode(content, BarcodeFormat.QR_CODE, size, size, hints)
             barcodeEncoder.createBitmap(map)
-        } catch (e: Exception) {
+        } catch (e: Throwable) {
             null
         }
     }

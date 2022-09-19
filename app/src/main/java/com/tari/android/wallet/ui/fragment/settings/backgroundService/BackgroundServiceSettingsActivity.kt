@@ -38,11 +38,10 @@ import android.os.Bundle
 import androidx.activity.viewModels
 import com.tari.android.wallet.databinding.ActivityBackgroundServiceSettingsBinding
 import com.tari.android.wallet.extension.observe
-import com.tari.android.wallet.ui.extension.ThrottleClick
 import com.tari.android.wallet.ui.common.CommonActivity
+import com.tari.android.wallet.ui.extension.ThrottleClick
 
-class BackgroundServiceSettingsActivity :
-    CommonActivity<ActivityBackgroundServiceSettingsBinding, BackgroundServiceSettingsViewModel>() {
+class BackgroundServiceSettingsActivity : CommonActivity<ActivityBackgroundServiceSettingsBinding, BackgroundServiceSettingsViewModel>() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

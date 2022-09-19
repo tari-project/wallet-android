@@ -26,7 +26,7 @@ import kotlinx.coroutines.launch
 import java.text.DecimalFormat
 import javax.inject.Inject
 
-internal class WalletRestoringFromSeedWordsViewModel() : CommonViewModel() {
+class WalletRestoringFromSeedWordsViewModel : CommonViewModel() {
 
 
     @Inject
@@ -53,7 +53,7 @@ internal class WalletRestoringFromSeedWordsViewModel() : CommonViewModel() {
     val recoveryState: LiveData<RecoveryState> = _recoveryState
 
     init {
-        component?.inject(this)
+        component.inject(this)
     }
 
     fun startRestoring() = viewModelScope.launch(Dispatchers.IO) {

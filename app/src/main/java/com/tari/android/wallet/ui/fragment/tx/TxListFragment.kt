@@ -38,7 +38,6 @@ import android.animation.ValueAnimator
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.graphics.drawable.GradientDrawable
-import android.hardware.SensorManager
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -47,7 +46,6 @@ import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.animation.addListener
 import androidx.core.os.postDelayed
 import androidx.fragment.app.viewModels
@@ -56,7 +54,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.daasuu.ei.Ease
 import com.daasuu.ei.EasingInterpolator
-import com.squareup.seismic.ShakeDetector
 import com.tari.android.wallet.R
 import com.tari.android.wallet.databinding.FragmentTxListBinding
 import com.tari.android.wallet.event.Event
@@ -65,7 +62,7 @@ import com.tari.android.wallet.extension.observe
 import com.tari.android.wallet.extension.observeOnLoad
 import com.tari.android.wallet.model.BalanceInfo
 import com.tari.android.wallet.model.User
-import com.tari.android.wallet.ui.activity.debug.DebugActivity
+import com.tari.android.wallet.ui.common.CommonActivity
 import com.tari.android.wallet.ui.common.CommonFragment
 import com.tari.android.wallet.ui.common.recyclerView.CommonAdapter
 import com.tari.android.wallet.ui.common.recyclerView.CommonViewHolderItem
@@ -74,9 +71,9 @@ import com.tari.android.wallet.ui.extension.*
 import com.tari.android.wallet.ui.fragment.send.activity.SendTariActivity
 import com.tari.android.wallet.ui.fragment.tx.adapter.TxListAdapter
 import com.tari.android.wallet.ui.fragment.tx.questionMark.QuestionMarkViewModel
-import com.tari.android.wallet.ui.fragment.tx.ui.BalanceViewController
 import com.tari.android.wallet.ui.fragment.tx.ui.CustomScrollView
-import com.tari.android.wallet.ui.fragment.tx.ui.UpdateProgressViewController
+import com.tari.android.wallet.ui.fragment.tx.ui.balanceController.BalanceViewController
+import com.tari.android.wallet.ui.fragment.tx.ui.progressController.UpdateProgressViewController
 import com.tari.android.wallet.ui.resource.AnimationResource
 import com.tari.android.wallet.ui.resource.ResourceContainer
 import com.tari.android.wallet.util.Constants
@@ -87,12 +84,11 @@ import java.lang.ref.WeakReference
 import kotlin.math.max
 import kotlin.math.min
 
-internal class TxListFragment : CommonFragment<FragmentTxListBinding, TxListViewModel>(),
+class TxListFragment : CommonFragment<FragmentTxListBinding, TxListViewModel>(),
     View.OnScrollChangeListener,
     View.OnTouchListener,
     CustomScrollView.Listener,
-    UpdateProgressViewController.Listener,
-    ShakeDetector.Listener {
+    UpdateProgressViewController.Listener {
 
     private val networkIndicatorViewModel: ConnectionIndicatorViewModel by viewModels()
     private val questionMarkViewModel: QuestionMarkViewModel by viewModels()
@@ -101,7 +97,6 @@ internal class TxListFragment : CommonFragment<FragmentTxListBinding, TxListView
 
     // This listener is used only to animate the visibility of the scroll depth gradient view.
     private val recyclerViewScrollListener = RecyclerViewScrollListener(::onRecyclerViewScrolled)
-    private val shakeDetector = ShakeDetector(this)
     private var recyclerViewAdapter: TxListAdapter = TxListAdapter()
     private lateinit var balanceViewController: BalanceViewController
     private lateinit var updateProgressViewController: UpdateProgressViewController
@@ -117,8 +112,6 @@ internal class TxListFragment : CommonFragment<FragmentTxListBinding, TxListView
 
         val viewModel: TxListViewModel by viewModels()
         bindViewModel(viewModel)
-
-        if (savedInstanceState == null) viewModel.tracker.screen("/home", "Home - Transaction List")
 
         setupUI()
         subscribeToEventBus()
@@ -143,14 +136,8 @@ internal class TxListFragment : CommonFragment<FragmentTxListBinding, TxListView
         observeOnLoad(debouncedList)
     }
 
-    override fun onStart() {
-        (requireContext().getSystemService(AppCompatActivity.SENSOR_SERVICE) as? SensorManager)?.let(shakeDetector::start)
-        super.onStart()
-    }
-
     override fun onStop() {
         handler.removeCallbacksAndMessages(null)
-        shakeDetector.stop()
         super.onStop()
     }
 
@@ -167,11 +154,7 @@ internal class TxListFragment : CommonFragment<FragmentTxListBinding, TxListView
     @SuppressLint("ClickableViewAccessibility")
     private fun setupUI() = with(ui) {
         txListHeaderView.setTopMargin(-dimenPx(R.dimen.common_header_height))
-        updateProgressViewController =
-            UpdateProgressViewController(
-                ui.updateProgressContentView,
-                this@TxListFragment
-            )
+        updateProgressViewController = UpdateProgressViewController(ui.updateProgressContentView, this@TxListFragment)
         viewModel.progressControllerState = updateProgressViewController.state
         scrollView.bindUI()
         scrollView.listenerWeakReference = WeakReference(this@TxListFragment)
@@ -180,6 +163,8 @@ internal class TxListFragment : CommonFragment<FragmentTxListBinding, TxListView
         scrollBgEnablerView.setOnTouchListener(this@TxListFragment)
         scrollView.setOnTouchListener(this@TxListFragment)
         txRecyclerView.setOnTouchListener(this@TxListFragment)
+        walletButton.ui.image.setImageResource(R.drawable.ic_wallet)
+        walletButton.touchListener = { processNavigation(TxListNavigation.ToUtxos) }
 
         headerElevationView.alpha = 0F
         balanceTextView.alpha = 0F
@@ -252,6 +237,7 @@ internal class TxListFragment : CommonFragment<FragmentTxListBinding, TxListView
             TxListNavigation.ToTTLStore -> router.toTTLStore()
             is TxListNavigation.ToTxDetails -> router.toTxDetails(navigation.tx)
             is TxListNavigation.ToSendTariToUser -> navigateToSendTari(navigation.user)
+            TxListNavigation.ToUtxos -> router.toUtxos()
             TxListNavigation.ToAllSettings -> router.toAllSettings()
         }
     }
@@ -340,29 +326,15 @@ internal class TxListFragment : CommonFragment<FragmentTxListBinding, TxListView
         ui.scrollView.smoothScrollTo(0, ui.scrollContentView.height - ui.scrollView.height)
     }
 
-    /**
-     * A shake will take the user to the debug screen.
-     */
-    override fun hearShake() {
-        val intent = Intent(requireContext(), DebugActivity::class.java)
-        startActivity(intent)
-        requireActivity().overridePendingTransition(R.anim.enter_from_right, R.anim.exit_to_left)
-    }
-
     private fun grabberContainerViewLongClicked() {
-        val intent = Intent(requireContext(), DebugActivity::class.java)
-        startActivity(intent)
-        requireActivity().overridePendingTransition(R.anim.enter_from_right, R.anim.exit_to_left)
+        (requireActivity() as CommonActivity<*, *>).openDebugActivity()
     }
 
     override fun onSwipeRefresh(source: CustomScrollView) {
         updateProgressViewController.start(viewModel.walletService)
     }
 
-    override fun updateHasFailed(
-        source: UpdateProgressViewController,
-        failureReason: UpdateProgressViewController.FailureReason
-    ) {
+    override fun updateHasFailed(source: UpdateProgressViewController, failureReason: UpdateProgressViewController.FailureReason) {
         lifecycleScope.launch(Dispatchers.Main) {
             ui.scrollView.finishUpdate()
             when (failureReason) {
@@ -370,13 +342,11 @@ internal class TxListFragment : CommonFragment<FragmentTxListBinding, TxListView
                 UpdateProgressViewController.FailureReason.BASE_NODE_VALIDATION_ERROR -> viewModel.displayNetworkConnectionErrorDialog()
             }
         }
+
+        viewModel.refreshAllData()
     }
 
-    override fun updateHasCompleted(
-        source: UpdateProgressViewController,
-        receivedTxCount: Int,
-        cancelledTxCount: Int
-    ) {
+    override fun updateHasCompleted(source: UpdateProgressViewController, receivedTxCount: Int, cancelledTxCount: Int) {
         lifecycleScope.launch(Dispatchers.Main) { ui.scrollView.finishUpdate() }
 
         viewModel.refreshAllData()
@@ -386,6 +356,7 @@ internal class TxListFragment : CommonFragment<FragmentTxListBinding, TxListView
     override fun onTouch(view: View?, event: MotionEvent?): Boolean {
         ui.networkStatusStateIndicatorView.dispatchTouchEvent(event)
         ui.balanceQuestionMark.dispatchTouchEvent(event)
+        ui.walletButton.dispatchTouchEvent(event)
 
         if (view != null && event != null && (view === ui.scrollView || view === ui.txRecyclerView)) {
             when (event.action) {
@@ -411,24 +382,14 @@ internal class TxListFragment : CommonFragment<FragmentTxListBinding, TxListView
     /**
      * Scroll-related UI changes.
      */
-    override fun onScrollChange(
-        view: View?,
-        scrollX: Int,
-        scrollY: Int,
-        oldScrollX: Int,
-        oldScrollY: Int
-    ) {
+    override fun onScrollChange(view: View?, scrollX: Int, scrollY: Int, oldScrollX: Int, oldScrollY: Int) {
         if (view is CustomScrollView) {
             ui.txRecyclerView.isVerticalScrollBarEnabled = (view.scrollY == view.maxScrollY)
             val ratio = ui.scrollView.scrollY.toFloat() / ui.scrollView.maxScrollY.toFloat()
             ui.onboardingContentView.alpha = ratio
             ui.txListOverlayView.alpha = ratio
-            val topContentMarginTopExtra =
-                (ratio * dimenPx(R.dimen.home_top_content_container_scroll_vertical_shift)).toInt()
-            ui.topContentContainerView.setTopMargin(
-                dimenPx(R.dimen.home_top_content_container_view_top_margin)
-                        + topContentMarginTopExtra
-            )
+            val topContentMarginTopExtra = (ratio * dimenPx(R.dimen.home_top_content_container_scroll_vertical_shift)).toInt()
+            ui.topContentContainerView.setTopMargin(dimenPx(R.dimen.home_top_content_container_view_top_margin) + topContentMarginTopExtra)
             ui.txListTitleTextView.alpha = ratio
             ui.closeTxListButton.alpha = ratio
 
@@ -438,10 +399,8 @@ internal class TxListFragment : CommonFragment<FragmentTxListBinding, TxListView
                 val width = (max(0F, 1F - ratio * GRABBER_WIDTH_SCROLL_COEFFICIENT) * dimenPx(R.dimen.home_grabber_width)).toInt()
                 ui.grabberView.setLayoutWidth(width)
                 val grabberBgDrawable = ui.grabberContainerView.background as GradientDrawable
-                grabberBgDrawable.cornerRadius = max(
-                    0F,
-                    1F - ratio * GRABBER_CORNER_RADIUS_SCROLL_COEFFICIENT
-                ) * dimenPx(R.dimen.home_grabber_corner_radius)
+                grabberBgDrawable.cornerRadius =
+                    max(0F, 1F - ratio * GRABBER_CORNER_RADIUS_SCROLL_COEFFICIENT) * dimenPx(R.dimen.home_grabber_corner_radius)
 
                 if (ratio == 0F && !isInDraggingSession) {
                     if (!ui.txRecyclerView.isScrolledToTop()) {
@@ -472,8 +431,7 @@ internal class TxListFragment : CommonFragment<FragmentTxListBinding, TxListView
         )
     }
 
-    class RecyclerViewScrollListener(private val onScroll: (Int) -> Unit) :
-        RecyclerView.OnScrollListener() {
+    class RecyclerViewScrollListener(private val onScroll: (Int) -> Unit) : RecyclerView.OnScrollListener() {
 
         private var totalDeltaY = 0
 

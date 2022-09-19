@@ -46,7 +46,6 @@ import com.daasuu.ei.Ease
 import com.daasuu.ei.EasingInterpolator
 import com.tari.android.wallet.R
 import com.tari.android.wallet.databinding.FragmentFinalizeSendTxBinding
-import com.tari.android.wallet.di.DiContainer.appComponent
 import com.tari.android.wallet.extension.observe
 import com.tari.android.wallet.extension.observeOnLoad
 import com.tari.android.wallet.ui.common.CommonFragment
@@ -194,7 +193,6 @@ class FinalizeSendTxFragment : CommonFragment<FragmentFinalizeSendTxBinding, Fin
             TxFailureReason.BASE_NODE_CONNECTION_ERROR -> "Transaction Failed - Node Issue"
             TxFailureReason.SEND_ERROR -> "Transaction Failed - Node Issue"
         }
-        viewModel.tracker.event(category = "Transaction", action = trackerEvent)
 
         // fade out text and progress
         ValueAnimator.ofFloat(1f, 0f).apply {

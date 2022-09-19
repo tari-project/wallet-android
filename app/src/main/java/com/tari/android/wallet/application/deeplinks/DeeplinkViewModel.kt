@@ -10,7 +10,7 @@ import com.tari.android.wallet.ui.dialog.confirm.ConfirmDialogArgs
 import com.tari.android.wallet.ui.dialog.modular.ModularDialog
 import javax.inject.Inject
 
-class DeeplinkViewModel() : CommonViewModel() {
+class DeeplinkViewModel : CommonViewModel() {
 
     @Inject
     lateinit var baseNodes: BaseNodes
@@ -28,7 +28,7 @@ class DeeplinkViewModel() : CommonViewModel() {
             resourceManager.getString(R.string.home_custom_base_node_title),
             resourceManager.getString(R.string.home_custom_base_node_description),
             resourceManager.getString(R.string.home_custom_base_node_no_button),
-            resourceManager.getString(R.string.home_custom_base_node_yes_button),
+            resourceManager.getString(R.string.common_lets_do_it),
             onConfirm = { addBaseNode(baseNode) }
         ).getModular(baseNode, resourceManager)
         ModularDialog(context, args).show()

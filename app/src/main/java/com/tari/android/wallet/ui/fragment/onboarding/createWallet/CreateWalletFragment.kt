@@ -41,6 +41,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.os.postDelayed
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import com.daasuu.ei.Ease
 import com.daasuu.ei.EasingInterpolator
 import com.tari.android.wallet.R.color.black
@@ -59,6 +60,8 @@ import com.tari.android.wallet.ui.extension.*
 import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.Constants.UI.CreateEmojiId
 import com.tari.android.wallet.util.EmojiUtil
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import me.everything.android.ui.overscroll.OverScrollDecoratorHelper
 
 /**
@@ -84,9 +87,6 @@ class CreateWalletFragment : CommonFragment<FragmentCreateWalletBinding, CreateW
         bindViewModel(viewModel)
 
         setupUi()
-        if (savedInstanceState == null) {
-            viewModel.tracker.screen(path = "/onboarding/create_wallet", title = "Onboarding - Create Wallet")
-        }
     }
 
     override fun onDestroyView() {
@@ -98,6 +98,10 @@ class CreateWalletFragment : CommonFragment<FragmentCreateWalletBinding, CreateW
         OverScrollDecoratorHelper.setUpOverScroll(ui.emojiIdScrollView)
         emojiIdSummaryController = EmojiIdSummaryViewController(ui.emojiIdSummaryView.root)
         ui.apply {
+            bottomSpinnerLottieAnimationView.scaleX = 0.5F
+            bottomSpinnerLottieAnimationView.scaleY = 0.5F
+            nerdFaceEmojiLottieAnimationView.scaleX = 0.9F
+            nerdFaceEmojiLottieAnimationView.scaleY = 0.9F
             yourEmojiIdTitleTextView.text = string(create_wallet_your_emoji_id_text_label).applyFontStyle(
                 requireActivity(),
                 CustomFont.AVENIR_LT_STD_LIGHT,
@@ -131,7 +135,7 @@ class CreateWalletFragment : CommonFragment<FragmentCreateWalletBinding, CreateW
             duration = CreateEmojiId.whiteBgAnimDurationMs
             interpolator = EasingInterpolator(Ease.CIRC_IN_OUT)
             addListener(object : AnimatorListenerAdapter() {
-                override fun onAnimationEnd(animation: Animator?) {
+                override fun onAnimationEnd(animation: Animator) {
                     super.onAnimationEnd(animation)
                     showBottomSpinner()
                     ui.justSecDescBackView.visible()
@@ -139,7 +143,7 @@ class CreateWalletFragment : CommonFragment<FragmentCreateWalletBinding, CreateW
                     showSecondViewByAnim()
                 }
 
-                override fun onAnimationStart(animation: Animator?) {
+                override fun onAnimationStart(animation: Animator) {
                     super.onAnimationStart(animation)
                     ui.smallGemImageView.visible()
                     ui.whiteBgView.visible()
@@ -172,13 +176,13 @@ class CreateWalletFragment : CommonFragment<FragmentCreateWalletBinding, CreateW
             duration = CreateEmojiId.helloTextAnimDurationMs
             interpolator = EasingInterpolator(Ease.QUART_OUT)
             addListener(object : AnimatorListenerAdapter() {
-                override fun onAnimationStart(animation: Animator?) {
+                override fun onAnimationStart(animation: Animator) {
                     super.onAnimationStart(animation)
                     ui.justSecDescTextView.visible()
                     ui.justSecTitleTextView.visible()
                 }
 
-                override fun onAnimationEnd(animation: Animator?) {
+                override fun onAnimationEnd(animation: Animator) {
                     super.onAnimationEnd(animation)
                     // if the wallet is not ready wait until it gets ready,
                     // otherwise display the checkmark anim & move on
@@ -193,12 +197,12 @@ class CreateWalletFragment : CommonFragment<FragmentCreateWalletBinding, CreateW
         }
     }
 
-    private fun startCheckMarkAnimation() {
+    private fun startCheckMarkAnimation() = lifecycleScope.launch(Dispatchers.Main) {
         ui.justSecDescBackView.gone()
         ui.justSecTitleBackView.gone()
 
         ui.checkmarkLottieAnimationView.addAnimatorListener(object : AnimatorListenerAdapter() {
-            override fun onAnimationEnd(animation: Animator?) {
+            override fun onAnimationEnd(animation: Animator) {
                 super.onAnimationEnd(animation)
                 startCreateEmojiIdAnimation()
             }
@@ -218,19 +222,21 @@ class CreateWalletFragment : CommonFragment<FragmentCreateWalletBinding, CreateW
             }
 
             addListener(object : AnimatorListenerAdapter() {
-                override fun onAnimationEnd(animation: Animator?) {
+                override fun onAnimationEnd(animation: Animator) {
                     super.onAnimationEnd(animation)
-                    val emojiId = viewModel.sharedPrefsWrapper.emojiId!!
-                    ui.emojiIdTextView.text = EmojiUtil.getFullEmojiIdSpannable(
-                        emojiId,
-                        string(emoji_id_chunk_separator),
-                        color(black),
-                        color(light_gray)
-                    )
-                    emojiIdSummaryController.display(emojiId)
+                    runCatching {
+                        val emojiId = viewModel.sharedPrefsWrapper.emojiId!!
+                        ui.emojiIdTextView.text = EmojiUtil.getFullEmojiIdSpannable(
+                            emojiId,
+                            string(emoji_id_chunk_separator),
+                            color(black),
+                            color(light_gray)
+                        )
+                        emojiIdSummaryController.display(emojiId)
 
-                    ui.checkmarkLottieAnimationView.visible()
-                    ui.checkmarkLottieAnimationView.playAnimation()
+                        ui.checkmarkLottieAnimationView.visible()
+                        ui.checkmarkLottieAnimationView.playAnimation()
+                    }
                 }
             })
             start()
@@ -292,7 +298,7 @@ class CreateWalletFragment : CommonFragment<FragmentCreateWalletBinding, CreateW
             duration = CreateEmojiId.createEmojiViewAnimDurationMs
             interpolator = EasingInterpolator(Ease.QUINT_OUT)
             addListener(object : AnimatorListenerAdapter() {
-                override fun onAnimationStart(animation: Animator?) {
+                override fun onAnimationStart(animation: Animator) {
                     super.onAnimationStart(animation)
                     ui.createYourEmojiIdLine2BlockerView.visible()
                     ui.createYourEmojiIdLine1BlockerView.visible()
@@ -312,8 +318,6 @@ class CreateWalletFragment : CommonFragment<FragmentCreateWalletBinding, CreateW
     }
 
     private fun showEmojiWheelAnimation() {
-        viewModel.tracker.screen(path = "/onboarding/create_emoji_id", title = "Onboarding - Create Emoji Id")
-
         ui.emojiWheelLottieAnimationView.playAnimation()
 
         ValueAnimator.ofFloat(1f, 0f).apply {
@@ -326,7 +330,7 @@ class CreateWalletFragment : CommonFragment<FragmentCreateWalletBinding, CreateW
                 ui.createEmojiIdButton.alpha = alpha
             }
             addListener(object : AnimatorListenerAdapter() {
-                override fun onAnimationEnd(animation: Animator?) {
+                override fun onAnimationEnd(animation: Animator) {
                     super.onAnimationEnd(animation)
                     ui.createEmojiIdButton.gone()
                     ui.createYourEmojiIdLine1BlockerView.gone()
@@ -373,7 +377,7 @@ class CreateWalletFragment : CommonFragment<FragmentCreateWalletBinding, CreateW
             startDelay = CreateEmojiId.yourEmojiIdTextAnimDelayMs
             duration = CreateEmojiId.yourEmojiIdTextAnimDurationMs
             addListener(object : AnimatorListenerAdapter() {
-                override fun onAnimationStart(animation: Animator?) {
+                override fun onAnimationStart(animation: Animator) {
                     super.onAnimationStart(animation)
                     ui.yourEmojiTitleBackView.visible()
                     ui.yourEmojiIdTitleContainerView.visible()
@@ -407,7 +411,7 @@ class CreateWalletFragment : CommonFragment<FragmentCreateWalletBinding, CreateW
             ui.emojiIdContainerView.visible()
             start()
             addListener(object : AnimatorListenerAdapter() {
-                override fun onAnimationEnd(animation: Animator?) {
+                override fun onAnimationEnd(animation: Animator) {
                     elevateEmojiIdContainerView()
                     ui.emojiIdScrollView.smoothScrollTo(0, 0)
                 }
@@ -425,7 +429,7 @@ class CreateWalletFragment : CommonFragment<FragmentCreateWalletBinding, CreateW
             duration = Constants.UI.mediumDurationMs
             interpolator = EasingInterpolator(Ease.BACK_OUT)
             addListener(object : AnimatorListenerAdapter() {
-                override fun onAnimationEnd(animation: Animator?) {
+                override fun onAnimationEnd(animation: Animator) {
                     ui.seeFullEmojiIdButton.isEnabled = true
                     uiHandler.postDelayed({
                         hideFullEmojiId()
@@ -487,7 +491,7 @@ class CreateWalletFragment : CommonFragment<FragmentCreateWalletBinding, CreateW
             duration = Constants.UI.shortDurationMs
             start()
             addListener(object : AnimatorListenerAdapter() {
-                override fun onAnimationEnd(animation: Animator?) {
+                override fun onAnimationEnd(animation: Animator) {
                     ui.seeFullEmojiIdContainerView.invisible()
                     ui.emojiIdTextView.isEnabled = true
                     ui.emojiIdSummaryContainerView.invisible()
@@ -524,7 +528,7 @@ class CreateWalletFragment : CommonFragment<FragmentCreateWalletBinding, CreateW
             }
             duration = Constants.UI.shortDurationMs
             addListener(object : AnimatorListenerAdapter() {
-                override fun onAnimationEnd(animation: Animator?) {
+                override fun onAnimationEnd(animation: Animator) {
                     ui.emojiIdContainerView.invisible()
                 }
             })

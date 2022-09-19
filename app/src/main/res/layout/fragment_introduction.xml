@@ -21,8 +21,7 @@
         app:lottie_enableMergePathsForKitKatAndAbove="true"
         app:lottie_loop="false"
         app:lottie_rawRes="@raw/aurora_splash_anim"
-        app:lottie_renderMode="automatic"
-        app:lottie_scale="0.84" />
+        app:lottie_renderMode="automatic" />
 
     <RelativeLayout
         android:id="@+id/video_outer_container_view"

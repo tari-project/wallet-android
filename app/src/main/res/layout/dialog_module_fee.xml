@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/root"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:paddingBottom="15dp">
+
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:id="@+id/speed_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:orientation="horizontal">
+
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="20dp"
+            android:background="@drawable/network_segmented_picker_bg"
+            android:orientation="horizontal"
+            android:paddingVertical="2dp"
+            android:paddingHorizontal="2dp">
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/network_slow"
+                android:layout_width="58dp"
+                android:layout_height="42dp"
+                android:paddingHorizontal="8dp"
+                android:paddingVertical="7dp"
+                android:src="@drawable/ic_network_slow" />
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/network_medium"
+                android:layout_width="58dp"
+                android:layout_height="42dp"
+                android:elevation="16dp"
+                android:background="@drawable/network_segmented_picker_selected_bg"
+                android:paddingHorizontal="8dp"
+                android:paddingVertical="7dp"
+                android:src="@drawable/ic_network_medium" />
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/network_fast"
+                android:layout_width="58dp"
+                android:layout_height="42dp"
+                android:paddingHorizontal="8dp"
+                android:paddingVertical="7dp"
+                android:src="@drawable/ic_network_fast" />
+
+        </androidx.appcompat.widget.LinearLayoutCompat>
+
+    </androidx.appcompat.widget.LinearLayoutCompat>
+
+    <com.tari.android.wallet.ui.component.CustomFontTextView
+        android:id="@+id/body"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="32dp"
+        android:gravity="center"
+        android:text="@string/add_amount_modify_fee_estimated"
+        android:textColor="#3B3740"
+        android:textSize="14sp"
+        app:customFont="@string/font_medium" />
+
+    <com.tari.android.wallet.ui.fragment.send.amountView.AmountView
+        android:id="@+id/amount"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal" />
+
+</LinearLayout>

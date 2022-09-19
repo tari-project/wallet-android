@@ -32,7 +32,7 @@ import com.tari.android.wallet.ui.dialog.modular.modules.imageModule.ImageModule
 import com.tari.android.wallet.ui.fragment.send.finalize.TxFailureReason
 import com.tari.android.wallet.ui.fragment.settings.backup.BackupSettingsRepository
 import com.tari.android.wallet.ui.fragment.tx.adapter.TransactionItem
-import com.tari.android.wallet.ui.fragment.tx.ui.UpdateProgressViewController
+import com.tari.android.wallet.ui.fragment.tx.ui.progressController.UpdateProgressViewController
 import com.tari.android.wallet.util.Constants
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -42,7 +42,7 @@ import java.math.BigDecimal
 import java.util.concurrent.CopyOnWriteArrayList
 import javax.inject.Inject
 
-internal class TxListViewModel() : CommonViewModel() {
+class TxListViewModel : CommonViewModel() {
 
     @Inject
     lateinit var repository: GIFRepository
@@ -392,10 +392,7 @@ internal class TxListViewModel() : CommonViewModel() {
 
         // import second testnet UTXO if it hasn't been imported yet
         if (testnetRepository.testnetTariUTXOKeyList.orEmpty().isNotEmpty()) {
-            viewModelScope.launch(Dispatchers.IO) {
-                delay(SECOND_UTXO_IMPORT_DELAY)
-                importSecondUTXO()
-            }
+            importSecondUTXO()
         }
     }
 
@@ -537,7 +534,7 @@ internal class TxListViewModel() : CommonViewModel() {
                 HeadBoldSpannableModule(home_ttl_store_dlg_title, home_ttl_store_dlg_title_bold_part),
                 BodyModule(resourceManager.getString(home_ttl_store_dlg_desciption)),
                 ButtonModule(resourceManager.getString(home_ttl_store_positive_btn), ButtonStyle.Normal) {
-                    _dissmissDialog.value = Unit
+                    _dismissDialog.value = Unit
                     _navigation.postValue(TxListNavigation.ToTTLStore)
                 },
                 ButtonModule(resourceManager.getString(home_ttl_store_negative_btn), ButtonStyle.Close)
@@ -575,7 +572,6 @@ internal class TxListViewModel() : CommonViewModel() {
 
     companion object {
         private const val LIST_UPDATE_DEBOUNCE = 500L
-        private const val SECOND_UTXO_IMPORT_DELAY = 2500L
         private const val SECOND_UTXO_STORE_OPEN_DELAY = 3000L
     }
 }

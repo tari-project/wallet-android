@@ -32,17 +32,14 @@
  */
 package com.tari.android.wallet.ffi
 
-import com.tari.android.wallet.model.CancelledTx
-import com.tari.android.wallet.model.CompletedTx
-import com.tari.android.wallet.model.PendingInboundTx
-import com.tari.android.wallet.model.PendingOutboundTx
+import com.tari.android.wallet.model.*
 import com.tari.android.wallet.model.recovery.WalletRestorationResult
 import java.math.BigInteger
 
 /**
  * @author The Tari Development Team
  */
-internal interface FFIWalletListener {
+interface FFIWalletListener {
 
     fun onTxReceived(pendingInboundTx: PendingInboundTx)
     fun onTxReplyReceived(pendingOutboundTx: PendingOutboundTx)
@@ -53,8 +50,7 @@ internal interface FFIWalletListener {
     fun onTxMinedUnconfirmed(completedTx: CompletedTx, confirmationCount: Int)
     fun onTxFauxConfirmed(completedTx: CompletedTx)
     fun onTxFauxUnconfirmed(completedTx: CompletedTx, confirmationCount: Int)
-    fun onDirectSendResult(txId: BigInteger, success: Boolean)
-    fun onStoreAndForwardSendResult(txId: BigInteger, success: Boolean)
+    fun onDirectSendResult(txId: BigInteger, status: TransactionSendStatus)
     fun onTxCancelled(cancelledTx: CancelledTx, rejectionReason: Int)
     fun onTXOValidationComplete(responseId: BigInteger, isSuccess: Boolean)
     fun onTxValidationComplete(responseId: BigInteger, isSuccess: Boolean)

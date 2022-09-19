@@ -40,7 +40,6 @@ import com.tari.android.wallet.databinding.ActivitySendTariBinding
 import com.tari.android.wallet.di.DiContainer.appComponent
 import com.tari.android.wallet.event.Event
 import com.tari.android.wallet.event.EventBus
-import com.tari.android.wallet.model.MicroTari
 import com.tari.android.wallet.model.TxId
 import com.tari.android.wallet.model.User
 import com.tari.android.wallet.network.NetworkConnectionState
@@ -75,7 +74,7 @@ import javax.inject.Inject
  *
  * @author The Tari Development Team
  */
-internal class SendTariActivity : CommonActivity<ActivitySendTariBinding, SendTariViewModel>(),
+class SendTariActivity : CommonActivity<ActivitySendTariBinding, SendTariViewModel>(),
     AddRecipientListener,
     AddAmountListener,
     AddNodeListener,
@@ -134,22 +133,20 @@ internal class SendTariActivity : CommonActivity<ActivitySendTariBinding, SendTa
         ModularDialog(this, args).show()
     }
 
-    override fun continueToAddNote(recipientUser: User, amount: MicroTari, isOneSidePayment: Boolean) {
+    override fun continueToAddNote(transactionData: TransactionData) {
         if (EventBus.networkConnectionState.publishSubject.value != NetworkConnectionState.CONNECTED) {
             showInternetConnectionErrorDialog(this)
             return
         }
         val bundle = Bundle().apply {
-            putParcelable("recipientUser", recipientUser)
-            putParcelable("amount", amount)
-            putBoolean("isOneSidePayment", isOneSidePayment)
+            putParcelable("transactionData", transactionData)
             intent.getStringExtra(PARAMETER_NOTE)?.let { putString(PARAMETER_NOTE, it) }
         }
         addFragment(AddNoteFragment(), bundle)
     }
 
-    override fun continueToFinalizing(recipientUser: User, amount: MicroTari, isOneSidePayment: Boolean) {
-        continueToFinalizeSendTx(TransactionData(recipientUser, amount, "", isOneSidePayment))
+    override fun continueToFinalizing(transactionData: TransactionData) {
+        continueToFinalizeSendTx(transactionData)
     }
 
     override fun continueToFinalizeSendTx(transactionData: TransactionData) {

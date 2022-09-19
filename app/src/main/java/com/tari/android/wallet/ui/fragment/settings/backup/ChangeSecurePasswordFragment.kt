@@ -50,7 +50,6 @@ import android.widget.TextView
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
-import com.orhanobut.logger.Logger
 import com.tari.android.wallet.R.color.*
 import com.tari.android.wallet.R.string.*
 import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
@@ -62,22 +61,18 @@ import com.tari.android.wallet.infrastructure.backup.BackupState
 import com.tari.android.wallet.infrastructure.backup.BackupState.BackupOutOfDate
 import com.tari.android.wallet.infrastructure.backup.BackupState.BackupUpToDate
 import com.tari.android.wallet.infrastructure.backup.BackupStorageAuthRevokedException
-import com.tari.android.wallet.ui.activity.settings.BackupSettingsRouter
 import com.tari.android.wallet.ui.common.domain.ResourceManager
 import com.tari.android.wallet.ui.dialog.error.ErrorDialogArgs
 import com.tari.android.wallet.ui.dialog.modular.ModularDialog
 import com.tari.android.wallet.ui.extension.*
+import com.tari.android.wallet.ui.fragment.settings.backup.activity.BackupSettingsRouter
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.net.UnknownHostException
 import javax.inject.Inject
 
-internal class ChangeSecurePasswordFragment @Deprecated(
-    """Use newInstance() and supply all the 
-necessary data via arguments instead, as fragment's default no-op constructor is used by the 
-framework for UI tree rebuild on configuration changes"""
-) constructor() : Fragment() {
+class ChangeSecurePasswordFragment : Fragment() {
 
     @Inject
     lateinit var sharedPrefs: SharedPrefsRepository
@@ -95,17 +90,12 @@ framework for UI tree rebuild on configuration changes"""
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        inputService =
-            requireActivity().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        inputService = requireActivity().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         appComponent.inject(this)
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View = FragmentChangeSecurePasswordBinding.inflate(inflater, container, false)
-        .also { ui = it }.root
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?) =
+        FragmentChangeSecurePasswordBinding.inflate(inflater, container, false).also { ui = it }.root
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -140,7 +130,7 @@ framework for UI tree rebuild on configuration changes"""
             requireActivity().showKeyboard()
             ui.enterPasswordEditText
                 .postDelayed(KEYBOARD_ANIMATION_TIME) { ui.contentScrollView.scrollToBottom() }
-        }, KEYBOARD_SHOWUP_DELAY_AFTER_LOCAL_AUTH)
+        }, KEYBOARD_SHOW_UP_DELAY_AFTER_LOCAL_AUTH)
     }
 
     private fun setPageDescription() {
@@ -349,26 +339,21 @@ framework for UI tree rebuild on configuration changes"""
     private fun onBackupStateChanged(backupState: BackupState?) {
         if (!subscribedToBackupState) {
             // ignore first call
-            Logger.d("Ignore first state: $backupState")
             subscribedToBackupState = true
             return
         }
-        Logger.d("Backup state changed: $backupState")
         when (backupState) {
             is BackupUpToDate -> { // backup successful
                 allowExitAndPasswordEditing()
                 (requireActivity() as BackupSettingsRouter).onPasswordChanged(this)
             }
             is BackupOutOfDate -> { // backup failed
-                Logger.e(
-                    backupState.backupException,
-                    "Error during encrypted backup: ${backupState.backupException}"
-                )
                 showBackupErrorDialog(deductBackupErrorMessage(backupState.backupException)) {
                     allowExitAndPasswordEditing()
                     setSecurePasswordCtaIdleState()
                 }
             }
+            else -> Unit
         }
     }
 
@@ -379,7 +364,12 @@ framework for UI tree rebuild on configuration changes"""
     }
 
     private fun showBackupErrorDialog(message: String, onClose: () -> Unit) {
-        val args = ErrorDialogArgs(string(back_up_wallet_backing_up_error_title), message, false, false, onClose)
+        val args = ErrorDialogArgs(
+            string(back_up_wallet_backing_up_error_title), message,
+            cancelable = false,
+            canceledOnTouchOutside = false,
+            onClose = onClose
+        )
         ModularDialog(requireContext(), args.getModular(resourceManager)).show()
     }
 
@@ -387,7 +377,7 @@ framework for UI tree rebuild on configuration changes"""
         @Suppress("DEPRECATION")
         fun newInstance() = ChangeSecurePasswordFragment()
 
-        private const val KEYBOARD_SHOWUP_DELAY_AFTER_LOCAL_AUTH = 500L
+        private const val KEYBOARD_SHOW_UP_DELAY_AFTER_LOCAL_AUTH = 500L
         private const val KEYBOARD_ANIMATION_TIME = 100L
     }
 

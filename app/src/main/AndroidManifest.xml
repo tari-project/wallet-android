@@ -1,10 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    package="com.tari.android.wallet">
+    xmlns:tools="http://schemas.android.com/tools">
 
-    <uses-permission android:name="android.permission.USE_BIOMETRIC" /> <!-- (pre-28) -->
-    <uses-permission android:name="android.permission.USE_FINGERPRINT" />
+    <uses-permission android:name="android.permission.USE_BIOMETRIC" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
@@ -18,9 +16,10 @@
         tools:node="remove" />
 
     <application
-        android:name=".application.TariWalletApplication"
         android:allowBackup="false"
+        android:name=".application.TariWalletApplication"
         android:extractNativeLibs="true"
+        android:hardwareAccelerated="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
@@ -50,6 +49,10 @@
             android:name=".service.ServiceRestartBroadcastReceiver"
             android:enabled="true"
             android:exported="false" /> <!-- splash -->
+        <receiver
+            android:name=".notification.NotificationBroadcastReceiver"
+            android:enabled="true"
+            android:exported="false" />
         <activity
             android:name=".ui.activity.SplashActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
@@ -114,14 +117,14 @@
             android:theme="@style/AppTheme"
             android:windowSoftInputMode="adjustResize|stateAlwaysHidden" /> <!-- wallet info -->
         <activity
-            android:exported="true"
             android:name=".ui.fragment.send.finalize.YatFinalizeSendTxActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
+            android:exported="true"
             android:screenOrientation="portrait"
             android:theme="@style/YatLibTheme.TransparentCompat"
             android:windowSoftInputMode="stateAlwaysHidden" />
         <activity
-            android:name=".ui.activity.debug.DebugActivity"
+            android:name="com.tari.android.wallet.ui.fragment.debug.activity.DebugActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:launchMode="singleTask"
             android:parentActivityName=".ui.activity.home.HomeActivity"
@@ -129,16 +132,16 @@
             android:theme="@style/AppTheme"
             android:windowSoftInputMode="adjustResize|stateAlwaysHidden" />
         <activity
-            android:name=".ui.activity.settings.BackupSettingsActivity"
+            android:name="com.tari.android.wallet.ui.fragment.settings.backup.activity.BackupSettingsActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:parentActivityName=".ui.activity.home.HomeActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme"
             android:windowSoftInputMode="adjustResize|stateAlwaysHidden" />
         <activity
-            android:name=".ui.activity.settings.DeleteWalletActivity"
+            android:name="com.tari.android.wallet.ui.fragment.settings.deleteWallet.DeleteWalletActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
-            android:parentActivityName=".ui.activity.settings.DeleteWalletActivity"
+            android:parentActivityName="com.tari.android.wallet.ui.fragment.settings.deleteWallet.DeleteWalletActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme"
             android:windowSoftInputMode="adjustResize|stateAlwaysHidden" />
@@ -154,8 +157,9 @@
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:parentActivityName=".ui.fragment.onboarding.activity.OnboardingFlowActivity"
             android:screenOrientation="portrait"
+            android:launchMode="singleTask"
             android:theme="@style/AppTheme"
-            android:windowSoftInputMode="adjustResize" /> <!-- This receiver is responsible for starting the service after boot finish. -->
+            android:windowSoftInputMode="adjustResize" />
         <receiver
             android:name=".service.BootDeviceReceiver"
             android:enabled="true"

@@ -46,6 +46,7 @@ import com.daasuu.ei.EasingInterpolator
 import com.tari.android.wallet.R
 import com.tari.android.wallet.R.dimen.*
 import com.tari.android.wallet.ui.extension.*
+import com.tari.android.wallet.ui.fragment.tx.ui.progressController.UpdateProgressViewController
 import com.tari.android.wallet.util.Constants
 import java.lang.ref.WeakReference
 import kotlin.math.max
@@ -56,11 +57,8 @@ import kotlin.math.min
  *
  * @author The Tari Development Team
  */
-internal class CustomScrollView @JvmOverloads constructor(
-    context: Context,
-    attrs: AttributeSet? = null,
-    defStyleAttr: Int = 0
-) : ScrollView(context, attrs, defStyleAttr) {
+class CustomScrollView @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0) :
+    ScrollView(context, attrs, defStyleAttr) {
 
     var flingIsRunning = false
     var isScrollable = true
@@ -98,23 +96,25 @@ internal class CustomScrollView @JvmOverloads constructor(
                 if (swipeRefreshYOffset >= dimenPx(home_swipe_refresh_progress_view_container_height))
                     dimenPx(home_swipe_refresh_progress_view_container_height)
                 else 0
-            val anim = ValueAnimator.ofInt(swipeRefreshYOffset, targetOffset)
-            anim.addUpdateListener {
-                swipeRefreshYOffset = it.animatedValue as Int
-                requestLayout()
-            }
-            anim.duration = Constants.UI.shortDurationMs
-            anim.interpolator = EasingInterpolator(Ease.CIRC_IN)
-            anim.addListener(onEnd = {
-                if (targetOffset > 0) {
-                    listenerWeakReference?.get()?.onSwipeRefresh(this@CustomScrollView)
-                    postDelayed({
-                        isUpdating = true
-                    }, Constants.UI.shortDurationMs)
+            ValueAnimator.ofInt(swipeRefreshYOffset, targetOffset).apply {
+                addUpdateListener {
+                    swipeRefreshYOffset = it.animatedValue as Int
+                    requestLayout()
                 }
-                anim.removeAllListeners()
-            })
-            anim.start()
+                duration = Constants.UI.shortDurationMs
+                interpolator = EasingInterpolator(Ease.CIRC_IN)
+                addListener(onEnd = {
+                    if (targetOffset > 0) {
+                        listenerWeakReference?.get()?.onSwipeRefresh(this@CustomScrollView)
+                        postDelayed({
+                            isUpdating = true
+                        }, Constants.UI.shortDurationMs)
+                    }
+                    removeAllListeners()
+                })
+                start()
+            }
+
             return
         }
 
@@ -129,12 +129,7 @@ internal class CustomScrollView @JvmOverloads constructor(
         }
     }
 
-    override fun onNestedPreScroll(
-        target: View,
-        deltaX: Int,
-        deltaY: Int,
-        consumed: IntArray
-    ) {
+    override fun onNestedPreScroll(target: View, deltaX: Int, deltaY: Int, consumed: IntArray) {
         if (!isScrollable) {
             consumed[1] = deltaY
             return
@@ -165,10 +160,7 @@ internal class CustomScrollView @JvmOverloads constructor(
                 consumed[1] = deltaY
             } else if (lastDeltaY < 0 && !isUpdating) { // enter the swipe-refresh zone
                 updateProgressViewController?.reset()
-                swipeRefreshYOffset = min(
-                    dimenPx(home_swipe_refresh_max_scroll_y),
-                    swipeRefreshYOffset - deltaY
-                )
+                swipeRefreshYOffset = min(dimenPx(home_swipe_refresh_max_scroll_y), swipeRefreshYOffset - deltaY)
                 consumed[1] = deltaY
                 requestLayout()
             }
@@ -187,8 +179,7 @@ internal class CustomScrollView @JvmOverloads constructor(
                             dimenPx(home_swipe_refresh_progress_view_content_invisible_top_margin)
                 val ratio = min(
                     swipeRefreshYOffset.toFloat() /
-                            dimenPx(home_swipe_refresh_progress_view_container_height),
-                    1F
+                            dimenPx(home_swipe_refresh_progress_view_container_height), 1F
                 )
                 progressView.setTopMargin(
                     dimenPx(home_swipe_refresh_progress_view_content_invisible_top_margin) +
@@ -219,7 +210,7 @@ internal class CustomScrollView @JvmOverloads constructor(
         flingScroll(velocityY)
     }
 
-    override fun onNestedPreFling(target: View?, velocityX: Float, velocityY: Float): Boolean {
+    override fun onNestedPreFling(target: View, velocityX: Float, velocityY: Float): Boolean {
         if (swipeRefreshYOffset > 0 && !isUpdating) {
             return true
         }
@@ -269,9 +260,6 @@ internal class CustomScrollView @JvmOverloads constructor(
     }
 
     interface Listener {
-
         fun onSwipeRefresh(source: CustomScrollView)
-
     }
-
 }

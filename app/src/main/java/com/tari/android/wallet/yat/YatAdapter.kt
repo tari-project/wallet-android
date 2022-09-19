@@ -27,12 +27,16 @@ class YatAdapter(
     private val networkRepository: NetworkRepository,
     private val commonRepository: SharedPrefsRepository
 ) : YatIntegration.Delegate {
+
+    private val logger
+        get() = Logger.t(YatAdapter::class.simpleName)
+
     fun initYat(application: Application) {
         val config = YatConfiguration(BuildConfig.YAT_ORGANIZATION_RETURN_URL, BuildConfig.YAT_ORGANIZATION_NAME, BuildConfig.YAT_ORGANIZATION_KEY)
         YatIntegration.setup(application, config, YatIntegration.ColorMode.LIGHT, this)
     }
 
-    suspend fun searchYats(query: String): PaymentAddressResponse? =
+    fun searchYats(query: String): PaymentAddressResponse? =
         kotlin.runCatching { YatLibApi.emojiIDApi.lookupEmojiIDPayment(query, "0x0101") }.getOrNull()
 
     fun openOnboarding(context: Context) {
@@ -54,11 +58,11 @@ class YatAdapter(
     }
 
     override fun onYatIntegrationComplete(yat: String) {
-        Logger.d("Yat integration completed.")
+        logger.d("Yat integration completed with $yat")
         yatSharedRepository.saveYat(yat)
     }
 
     override fun onYatIntegrationFailed(failureType: YatIntegration.FailureType) {
-        Logger.d("Yat integration failed.$failureType")
+        logger.d("Yat integration failed $failureType")
     }
 }

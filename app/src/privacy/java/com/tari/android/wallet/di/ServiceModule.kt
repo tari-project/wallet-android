@@ -41,7 +41,7 @@ import dagger.Provides
 import javax.inject.Singleton
 
 @Module
-internal class ServiceModule {
+class ServiceModule {
 
     @Provides
     @Singleton

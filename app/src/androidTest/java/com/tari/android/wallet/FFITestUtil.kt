@@ -32,7 +32,6 @@
  */
 package com.tari.android.wallet
 
-import com.orhanobut.logger.Logger
 import com.tari.android.wallet.ffi.NetAddressString
 import java.io.File
 
@@ -44,16 +43,12 @@ import java.io.File
 class FFITestUtil {
 
     companion object {
-        internal const val WALLET_DB_NAME: String = "tari_test_db"
-        internal const val WALLET_DB_NAME_WITH_EXTENSION: String = "tari_test_db.sqlite3"
+        const val WALLET_DB_NAME: String = "tari_test_db"
         // Matching pair of keys.
-        internal const val PUBLIC_KEY_HEX_STRING =
-            "30E1DFA197794858BFDBF96CDCE5DC8637D4BD1202DC694991040DDECBF42D40"
-        internal const val PRIVATE_KEY_HEX_STRING =
-            "6259C39F75E27140A652A5EE8AEFB3CF6C1686EF21D27793338D899380E8C801"
-        internal const val PUBLIC_KEY_EMOJI_ID =
-            "🍬😂🔱👟👓🐛🎢🎷💯🔫🚨🐉🔬😍🔬🐰🍶🔔💩🌽🌈🔬🏭🎣🐽🌋🌵🔮📝🚗🍩🎃🎷"
-        internal val address = NetAddressString("127.0.0.1",80)
+        const val PUBLIC_KEY_HEX_STRING = "30E1DFA197794858BFDBF96CDCE5DC8637D4BD1202DC694991040DDECBF42D40"
+        const val PRIVATE_KEY_HEX_STRING = "6259C39F75E27140A652A5EE8AEFB3CF6C1686EF21D27793338D899380E8C801"
+        const val PUBLIC_KEY_EMOJI_ID = "🍬😂🔱👟👓🐛🎢🎷💯🔫🚨🐉🔬😍🔬🐰🍶🔔💩🌽🌈🔬🏭🎣🐽🌋🌵🔮📝🚗🍩🎃🎷"
+        val address = NetAddressString("127.0.0.1",80)
 
         fun generateRandomAlphanumericString(len: Int): String {
             val characters = ('0'..'z').toList().toTypedArray()
@@ -76,15 +71,5 @@ class FFITestUtil {
             }
             return false
         }
-
-        fun printFFILogFile(path: String) {
-            var log = ""
-            File(path).forEachLine {
-                log += "\n" + it
-            }
-            Logger.d("FFI log file contents:\n$log")
-        }
-
     }
-
 }

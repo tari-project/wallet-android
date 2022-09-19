@@ -2,7 +2,7 @@ package com.tari.android.wallet.model.seedPhrase
 
 import com.tari.android.wallet.ffi.FFISeedWords
 
-internal class SeedPhrase {
+class SeedPhrase {
 
     var ffiSeedWords: FFISeedWords? = null
         private set
@@ -12,14 +12,14 @@ internal class SeedPhrase {
 
         try {
             for (seedWord in words) {
-                when (ffiSeedWords.pushWord(seedWord)) {
-                    SeedWordsWordPushResult.InvalidSeedWord -> return SeedPhraseCreationResult.InvalidSeedWord
+                return when (ffiSeedWords.pushWord(seedWord)) {
+                    SeedWordsWordPushResult.InvalidSeedWord -> SeedPhraseCreationResult.InvalidSeedWord
                     SeedWordsWordPushResult.SuccessfulPush -> continue
                     SeedWordsWordPushResult.SeedPhraseComplete -> {
                         this.ffiSeedWords = ffiSeedWords
-                        return SeedPhraseCreationResult.Success
+                        SeedPhraseCreationResult.Success
                     }
-                    SeedWordsWordPushResult.InvalidSeedPhrase -> return SeedPhraseCreationResult.InvalidSeedPhrase
+                    SeedWordsWordPushResult.InvalidSeedPhrase -> SeedPhraseCreationResult.InvalidSeedPhrase
                 }
             }
         } catch (e: Throwable) {
@@ -30,7 +30,7 @@ internal class SeedPhrase {
     }
 
 
-    sealed class SeedPhraseCreationResult() {
+    sealed class SeedPhraseCreationResult {
         object Success : SeedPhraseCreationResult()
         class Failed(val exception: Throwable) : SeedPhraseCreationResult()
         object InvalidSeedPhrase : SeedPhraseCreationResult()

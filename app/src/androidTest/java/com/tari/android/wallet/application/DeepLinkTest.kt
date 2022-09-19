@@ -43,7 +43,7 @@ class DeepLinkTest {
 
     private val networkRepository: NetworkRepository = NetworkRepositoryMock()
     private val deeplinkHandler: DeeplinkHandler = DeeplinkHandler(networkRepository)
-    private val currentNetwork = Network.DIBBLER
+    private val currentNetwork = Network.ESMERALDA
 
     // region old format
     @Test
@@ -162,7 +162,7 @@ class DeepLinkTest {
     }
 
     class NetworkRepositoryMock : NetworkRepository {
-        private val network: Network = Network.DIBBLER
+        private val network: Network = Network.ESMERALDA
 
         override var supportedNetworks: List<Network> = listOf(network)
         override var currentNetwork: TariNetwork? = TariNetwork(network, "", "")

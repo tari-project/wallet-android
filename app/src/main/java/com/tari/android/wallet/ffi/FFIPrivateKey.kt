@@ -37,7 +37,7 @@ package com.tari.android.wallet.ffi
  *
  * @author The Tari Development Team
  */
-internal class FFIPrivateKey private constructor() : FFIBase() {
+class FFIPrivateKey private constructor() : FFIBase() {
 
     // region JNI
 

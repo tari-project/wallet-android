@@ -95,6 +95,19 @@ abstract class CommonFragment<Binding : ViewBinding, VM : CommonViewModel> : Fra
             (currentDialog as TariProgressDialog).applyArgs(dialog.progressDialogArgs)
             return
         }
+        val currentModularDialog = currentDialog as? ModularDialog
+        val newModularDialog = dialog as? ModularDialog
+        if (currentModularDialog != null && newModularDialog != null && currentModularDialog.args::class.java == newModularDialog.args::class.java
+            && currentModularDialog.isShowing()
+        ) {
+            currentModularDialog.applyArgs(newModularDialog.args)
+            return
+        }
+
+        if (newModularDialog?.args?.dialogArgs?.isRefreshing == true) {
+            return
+        }
+
         currentDialog?.dismiss()
         currentDialog = dialog.also { it.show() }
     }

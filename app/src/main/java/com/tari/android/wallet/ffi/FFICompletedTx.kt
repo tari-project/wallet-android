@@ -35,7 +35,7 @@ package com.tari.android.wallet.ffi
 import java.math.BigInteger
 
 
-internal class FFICompletedTx() : FFITxBase() {
+class FFICompletedTx() : FFITxBase() {
 
     // region JNI
 

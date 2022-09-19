@@ -15,14 +15,14 @@ import java.nio.ByteBuffer
 //       attempt will be made
 //     - If a unrecoverable error occurs the `RecoveryFailed` event will be returned and the client will need to start
 //       a new process.
-sealed class WalletRestorationResult() {
-    class ConnectingToBaseNode() : WalletRestorationResult()
-    class ConnectedToBaseNode() : WalletRestorationResult()
+sealed class WalletRestorationResult {
+    class ConnectingToBaseNode : WalletRestorationResult()
+    class ConnectedToBaseNode : WalletRestorationResult()
     class ConnectionToBaseNodeFailed(val retryCount: Long, val retryLimit: Long) : WalletRestorationResult()
     class Progress(val currentBlock: Long, val numberOfBlocks: Long) : WalletRestorationResult()
     class Completed(val numberOfUTXO: Long, val microTari: ByteArray) : WalletRestorationResult()
     class ScanningRoundFailed(val retryCount: Long, val retryLimit: Long) : WalletRestorationResult()
-    class RecoveryFailed() : WalletRestorationResult()
+    class RecoveryFailed : WalletRestorationResult()
 
     companion object {
         fun create(event: Int, firstArg: ByteArray, secondArgs: ByteArray) : WalletRestorationResult {

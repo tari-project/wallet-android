@@ -1,29 +1,27 @@
-import org.gradle.api.tasks.testing.logging.TestLogEvent
-
 buildscript {
-    ext.kotlin_version = "1.6.21"
-    ext.nav_version = "2.4.2"
+    ext.kotlin_version = "1.7.10"
+    ext.nav_version = "2.5.2"
 
     // build & version
-    ext.buildNumber = 196
-    ext.versionNumber = "0.13.0"
+    ext.buildNumber = 206
+    ext.versionNumber = "0.16.0"
 
     // JNI libs
-    ext.libwalletVersion = "0.30.2"
+    ext.libwalletVersion = "0.38.0"
     ext.libwalletHostURL = "https://tari-binaries.s3.amazonaws.com/libwallet/"
     ext.supportedABIs = ["arm64-v8a", "x86_64"]
 
     repositories {
         google()
-        jcenter()
         mavenCentral()
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:7.2.0-rc01'
+        classpath "com.android.tools.build:gradle:7.3.0"
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-        classpath "io.sentry:sentry-android-gradle-plugin:2.1.5"
+        classpath "io.sentry:sentry-android-gradle-plugin:3.1.5"
         classpath "androidx.navigation:navigation-safe-args-gradle-plugin:$nav_version"
+        classpath "com.google.android.gms:strict-version-matcher-plugin:1.2.4"
     }
 }
 
@@ -33,32 +31,13 @@ plugins {
 
 allprojects {
     repositories {
+        // for yat
         google()
+        mavenCentral()
         jcenter()
-        maven { url 'https://jitpack.io' }
+        maven { url "https://jitpack.io" }
+        maven { url "https://giphy.bintray.com/giphy-sdk" }
         maven { url "https://raw.githubusercontent.com/guardianproject/gpmaven/master" }
-    }
-}
-
-afterEvaluate {
-    subprojects.each { subproject ->
-        subproject.tasks.withType(Test) {
-            testLogging {
-                showStandardStreams = true
-                showExceptions true
-                showCauses true
-                showStackTraces true
-                exceptionFormat 'short'
-                events TestLogEvent.FAILED, TestLogEvent.SKIPPED
-                debug {
-                    exceptionFormat 'full'
-                    events TestLogEvent.FAILED,
-                            TestLogEvent.PASSED,
-                            TestLogEvent.SKIPPED,
-                            TestLogEvent.STANDARD_OUT
-                }
-            }
-        }
     }
 }
 

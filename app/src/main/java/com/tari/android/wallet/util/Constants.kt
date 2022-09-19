@@ -40,7 +40,7 @@ import java.math.BigInteger
  *
  * @author The Tari Development Team
  */
-internal object Constants {
+object Constants {
 
     /**
      * UI constants.
@@ -107,20 +107,10 @@ internal object Constants {
             const val numPadDigitEnterAnimDurationMs = 90L
         }
 
-        object AddNoteAndSend {
-            const val preKeyboardHideWaitMs = 500L
-            const val continueToFinalizeSendTxDelayMs = 2000L
-
-        }
-
         object FinalizeSendTx {
             const val lottieAnimStartDelayMs = 400L
             const val textAppearAnimStartDelayMs = 200L
             const val successfulInfoFadeOutAnimStartDelayMs = 3130L
-        }
-
-        object Splash {
-            const val createWalletStartUpDelayMs = 3000L
         }
 
         object Auth {
