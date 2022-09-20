@@ -347,9 +347,6 @@ class FFIWallet(
     fun getCancelledTxs(): FFICompletedTxs {
         val error = FFIError()
         val result = FFICompletedTxs(jniGetCancelledTxs(error))
-        if (error.code != 0) {
-            1
-        }
         throwIf(error)
         return result
     }
