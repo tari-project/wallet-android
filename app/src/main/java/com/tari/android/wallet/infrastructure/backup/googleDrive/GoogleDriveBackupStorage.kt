@@ -209,31 +209,17 @@ class GoogleDriveBackupStorage(
             backupFileProcessor.clearTempFolder()
             // restore successful, turn on automated backup
             backupSettingsRepository.googleDriveOption =
-                backupSettingsRepository.googleDriveOption!!.copy(lastSuccessDate = SerializableTime(DateTime.now()))
+                backupSettingsRepository.googleDriveOption!!.copy(lastSuccessDate = SerializableTime(DateTime.now()), isEnable = true)
             backupSettingsRepository.backupPassword = password
         }
     }
 
     private fun getLastBackupFileIdAndName(): Pair<String, String>? {
-        val backups = mutableListOf<Pair<DateTime, com.google.api.services.drive.model.File>>()
-        return "" to ""
-        //        var pageToken: String? = null
-//        do {
-//            val result: FileList = searchForBackups(pageToken)
-//            result.files.forEach {
-//                namingPolicy.getDateFromBackupFileName(it.name)?.let { time -> backups.add(time to it) }
-//            }
-//            pageToken = result.nextPageToken
-//        } while (pageToken != null)
-//        val latestBackupFile = backups.maxByOrNull { it.first }?.second
-//        return if (latestBackupFile != null) {
-//            (latestBackupFile.id to latestBackupFile.name)
-//        } else {
-//            null
-//        }
+        val file = searchForBackups().files.firstOrNull() ?: return null
+        return file.id to file.name
     }
 
-    private fun searchForBackups(pageToken: String?): FileList =
+    private fun searchForBackups(pageToken: String? = null): FileList =
         drive!!.files().list()
             .setSpaces(DRIVE_BACKUP_PARENT_FOLDER_NAME)
             .setQ("'$DRIVE_BACKUP_PARENT_FOLDER_NAME' in parents")

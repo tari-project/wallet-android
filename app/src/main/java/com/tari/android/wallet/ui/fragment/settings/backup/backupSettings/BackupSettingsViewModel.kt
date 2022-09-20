@@ -8,7 +8,6 @@ import com.tari.android.wallet.R
 import com.tari.android.wallet.data.sharedPrefs.tariSettings.TariSettingsSharedRepository
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.infrastructure.backup.*
-import com.tari.android.wallet.infrastructure.backup.dropbox.DropboxBackupStorage
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.common.SingleLiveEvent
 import com.tari.android.wallet.ui.dialog.error.ErrorDialogArgs
@@ -32,9 +31,6 @@ class BackupSettingsViewModel : CommonViewModel() {
 
     @Inject
     lateinit var tariSettingsSharedRepository: TariSettingsSharedRepository
-
-    @Inject
-    lateinit var dropboxBackupStorage: DropboxBackupStorage
 
     lateinit var biometricAuthenticationViewModel: BiometricAuthenticationViewModel
 

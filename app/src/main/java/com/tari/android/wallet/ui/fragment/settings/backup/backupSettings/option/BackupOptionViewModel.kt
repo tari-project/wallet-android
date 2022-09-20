@@ -53,12 +53,11 @@ class BackupOptionViewModel() : CommonViewModel() {
     val title: Int
         get() = when (option.value!!.type) {
             BackupOptions.Google -> R.string.back_up_wallet_google_title
-            BackupOptions.Dropbox -> R.string.back_up_wallet_dropbox_title
             BackupOptions.Local -> R.string.back_up_wallet_local_file_title
         }
 
     fun setup(option: BackupOptions) {
-        _option.value = backupSettingsRepository.getOptionList.firstOrNull { it.type == option }
+        _option.value = backupSettingsRepository.getOptionList.first { it.type == option }
         _switchChecked.value = _option.value!!.isEnable
     }
 

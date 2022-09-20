@@ -164,7 +164,7 @@ class LocalBackupStorage(
             backupFileProcessor.clearTempFolder()
             // restore successful, turn on automated backup
             backupSettingsRepository.localFileOption =
-                backupSettingsRepository.localFileOption!!.copy(lastSuccessDate = SerializableTime(DateTime.now()))
+                backupSettingsRepository.localFileOption!!.copy(lastSuccessDate = SerializableTime(DateTime.now()), isEnable = true)
             backupSettingsRepository.backupPassword = password
         }
     }

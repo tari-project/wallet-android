@@ -58,7 +58,7 @@ import com.tari.android.wallet.extension.applyURLStyle
 import com.tari.android.wallet.ui.common.CommonFragment
 import com.tari.android.wallet.ui.extension.*
 import com.tari.android.wallet.ui.fragment.onboarding.activity.OnboardingFlowActivity
-import com.tari.android.wallet.ui.fragment.restore.restore.WalletRestoreActivity
+import com.tari.android.wallet.ui.fragment.restore.activity.WalletRestoreActivity
 import com.tari.android.wallet.ui.fragment.settings.allSettings.TariVersionModel
 import com.tari.android.wallet.util.Constants
 import kotlin.math.min

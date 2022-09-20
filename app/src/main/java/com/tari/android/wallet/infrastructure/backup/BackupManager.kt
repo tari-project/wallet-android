@@ -39,7 +39,6 @@ import com.orhanobut.logger.Logger
 import com.tari.android.wallet.R
 import com.tari.android.wallet.data.sharedPrefs.delegates.SerializableTime
 import com.tari.android.wallet.event.EventBus
-import com.tari.android.wallet.infrastructure.backup.dropbox.DropboxBackupStorage
 import com.tari.android.wallet.infrastructure.backup.googleDrive.GoogleDriveBackupStorage
 import com.tari.android.wallet.infrastructure.backup.local.LocalBackupStorage
 import com.tari.android.wallet.notification.NotificationHelper
@@ -62,7 +61,6 @@ class BackupManager(
     private val context: Context,
     private val backupSettingsRepository: BackupSettingsRepository,
     private val localFileBackupStorage: LocalBackupStorage,
-    private val dropboxBackupStorage: DropboxBackupStorage,
     private val googleDriveBackupStorage: GoogleDriveBackupStorage,
     private val notificationHelper: NotificationHelper
 ) {
@@ -279,7 +277,6 @@ class BackupManager(
 
     private fun getStorageByOption(optionType: BackupOptions): BackupStorage = when (optionType) {
         BackupOptions.Google -> googleDriveBackupStorage
-        BackupOptions.Dropbox -> dropboxBackupStorage
         BackupOptions.Local -> localFileBackupStorage
     }
 

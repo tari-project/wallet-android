@@ -43,8 +43,8 @@ import com.tari.android.wallet.databinding.FragmentChooseRestoreOptionBinding
 import com.tari.android.wallet.extension.observe
 import com.tari.android.wallet.ui.common.CommonFragment
 import com.tari.android.wallet.ui.extension.setOnThrottledClickListener
+import com.tari.android.wallet.ui.fragment.restore.activity.WalletRestoreRouter
 import com.tari.android.wallet.ui.fragment.restore.chooseRestoreOption.option.RecoveryOptionView
-import com.tari.android.wallet.ui.fragment.restore.restore.WalletRestoreRouter
 import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupOptions
 
 class ChooseRestoreOptionFragment : CommonFragment<FragmentChooseRestoreOptionBinding, ChooseRestoreOptionViewModel>() {
@@ -76,11 +76,9 @@ class ChooseRestoreOptionFragment : CommonFragment<FragmentChooseRestoreOptionBi
     private fun setupUI() = with(ui) {
         backCtaView.setOnThrottledClickListener { requireActivity().onBackPressed() }
         googleDriveRestoreOption.ui.restoreWalletCtaView.setOnClickListener { startRecovery(BackupOptions.Google) }
-        dropboxRestoreOption.ui.restoreWalletCtaView.setOnClickListener { startRecovery(BackupOptions.Dropbox) }
         localFileRestoreOption.ui.restoreWalletCtaView.setOnClickListener { startRecovery(BackupOptions.Local) }
         restoreWithRecoveryPhraseCtaView.setOnClickListener { processNavigation(ChooseRestoreOptionNavigation.ToRestoreWithRecoveryPhrase) }
         googleDriveRestoreOption.init(getString(R.string.back_up_wallet_restore_with_google_drive))
-        dropboxRestoreOption.init(getString(R.string.back_up_wallet_restore_with_dropbox))
         localFileRestoreOption.init(getString(R.string.back_up_wallet_restore_with_local_files))
     }
 
@@ -119,7 +117,6 @@ class ChooseRestoreOptionFragment : CommonFragment<FragmentChooseRestoreOptionBi
     private fun getBackupOptionView(backupOptions: BackupOptions): RecoveryOptionView? {
         return when (backupOptions) {
             BackupOptions.Google -> ui.googleDriveRestoreOption
-            BackupOptions.Dropbox -> ui.dropboxRestoreOption
             BackupOptions.Local -> ui.localFileRestoreOption
         }
     }

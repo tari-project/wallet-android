@@ -51,7 +51,7 @@ import com.tari.android.wallet.databinding.FragmentEnterRestorePasswordBinding
 import com.tari.android.wallet.extension.observe
 import com.tari.android.wallet.ui.common.CommonFragment
 import com.tari.android.wallet.ui.extension.*
-import com.tari.android.wallet.ui.fragment.restore.restore.WalletRestoreRouter
+import com.tari.android.wallet.ui.fragment.restore.activity.WalletRestoreRouter
 
 class EnterRestorationPasswordFragment : CommonFragment<FragmentEnterRestorePasswordBinding, EnterRestorationPasswordViewModel>() {
 

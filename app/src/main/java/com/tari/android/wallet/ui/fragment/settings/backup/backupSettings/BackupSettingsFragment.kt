@@ -148,19 +148,15 @@ class BackupSettingsFragment : CommonFragment<FragmentWalletBackupSettingsBindin
 
     private fun initBackupOptions() {
         val googleDriveViewModel = BackupOptionViewModel()
-        val dropboxViewModel = BackupOptionViewModel()
         val localFileViewModel = BackupOptionViewModel()
 
         ui.googleDriveBackup.viewLifecycle = viewLifecycleOwner
-        ui.dropboxBackup.viewLifecycle = viewLifecycleOwner
         ui.localFileBackup.viewLifecycle = viewLifecycleOwner
 
         ui.googleDriveBackup.init(this, googleDriveViewModel.apply { setup(BackupOptions.Google) })
-        ui.dropboxBackup.gone()
-//        ui.dropboxBackup.init(this, dropboxViewModel.apply { setup(BackupOptions.Dropbox) })
         ui.localFileBackup.init(this, localFileViewModel.apply { setup(BackupOptions.Local) })
 
-        viewModel.setupWithOptions(listOf(googleDriveViewModel, dropboxViewModel, localFileViewModel))
+        viewModel.setupWithOptions(listOf(googleDriveViewModel, localFileViewModel))
 
         if (viewModel.backupSettingsRepository.getOptionList.any { it.isEnable }) {
             if (EventBus.backupState.publishSubject.value?.backupsState is BackupUpToDate) {

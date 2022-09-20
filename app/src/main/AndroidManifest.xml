@@ -104,25 +104,6 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".infrastructure.backup.dropbox.DropboxAuthActivity"
-            android:configChanges="keyboardHidden|orientation|screenSize"
-            android:screenOrientation="portrait"
-            android:theme="@style/AppTheme"
-            android:windowSoftInputMode="stateAlwaysHidden" />
-        <activity
-            android:name="com.dropbox.core.android.AuthActivity"
-            android:exported="true"
-            android:configChanges="orientation|keyboard"
-            android:launchMode="singleTask">
-            <intent-filter>
-
-                <data android:scheme="db-${dropboxApiKey}" />
-                <action android:name="android.intent.action.VIEW" />
-                <category android:name="android.intent.category.BROWSABLE" />
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-        </activity>
-        <activity
             android:name="com.tari.android.wallet.ui.fragment.qr.QRScannerActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:screenOrientation="portrait"
@@ -172,7 +153,7 @@
             android:theme="@style/AppTheme"
             android:windowSoftInputMode="adjustResize|stateAlwaysHidden" />
         <activity
-            android:name="com.tari.android.wallet.ui.fragment.restore.restore.WalletRestoreActivity"
+            android:name="com.tari.android.wallet.ui.fragment.restore.activity.WalletRestoreActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:parentActivityName=".ui.fragment.onboarding.activity.OnboardingFlowActivity"
             android:screenOrientation="portrait"

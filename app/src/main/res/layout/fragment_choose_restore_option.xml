@@ -65,17 +65,6 @@
             android:background="@color/settings_background" />
 
         <com.tari.android.wallet.ui.fragment.restore.chooseRestoreOption.option.RecoveryOptionView
-            android:id="@+id/dropbox_restore_option"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_marginHorizontal="@dimen/common_horizontal_margin"
-            android:background="@color/settings_background" />
-
-        <com.tari.android.wallet.ui.fragment.restore.chooseRestoreOption.option.RecoveryOptionView
             android:id="@+id/local_file_restore_option"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"/>

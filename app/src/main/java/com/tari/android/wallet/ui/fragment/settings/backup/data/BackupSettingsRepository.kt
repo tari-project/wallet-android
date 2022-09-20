@@ -18,10 +18,6 @@ class BackupSettingsRepository(private val context: Context, private val sharedP
 
     var googleDriveOption: BackupOptionDto? by SharedPrefGsonDelegate(sharedPrefs, formatKey(Keys.googleDriveOptionKey), BackupOptionDto::class.java)
 
-//    var dropboxOption: BackupOptionDto? by SharedPrefGsonDelegate(sharedPrefs, formatKey(Keys.dropBoxOptionKey), BackupOptionDto::class.java)
-
-//    var dropboxCredential: DbxCredential? by SharedPrefGsonDelegate(sharedPrefs, formatKey(Keys.dropboxCredentialKey), DbxCredential::class.java)
-
     var scheduledBackupDate: DateTime? by SharedPrefDateTimeDelegate(sharedPrefs, formatKey(Keys.scheduledBackupDate))
 
     var backupPassword: String? by SharedPrefStringSecuredDelegate(context, sharedPrefs, formatKey(Keys.backupPassword))
@@ -33,7 +29,6 @@ class BackupSettingsRepository(private val context: Context, private val sharedP
     init {
         localFileOption = localFileOption ?: BackupOptionDto(BackupOptions.Local)
         googleDriveOption = googleDriveOption ?: BackupOptionDto(BackupOptions.Google)
-//        dropboxOption = dropboxOption ?: BackupOptionDto(BackupOptions.Dropbox)
     }
 
     val getOptionList: List<BackupOptionDto>
@@ -50,14 +45,12 @@ class BackupSettingsRepository(private val context: Context, private val sharedP
         googleDriveOption = null
         localFileOption = BackupOptionDto(BackupOptions.Local)
         googleDriveOption = BackupOptionDto(BackupOptions.Google)
-//        dropboxOption = BackupOptionDto(BackupOptions.Dropbox)
     }
 
     fun updateOptions(options: List<BackupOptionDto>) = options.forEach { option -> updateOption(option) }
 
     fun updateOption(option: BackupOptionDto) {
         when (option.type) {
-//            BackupOptions.Dropbox -> dropboxOption = option
             BackupOptions.Google -> googleDriveOption = option
             BackupOptions.Local -> localFileOption = option
         }
@@ -65,8 +58,6 @@ class BackupSettingsRepository(private val context: Context, private val sharedP
 
     object Keys {
         const val googleDriveOptionKey = "tari_wallet_google_drive_backup_options"
-        const val dropBoxOptionKey = "tari_wallet_dropbox_backup_options"
-        const val dropboxCredentialKey = "tari_wallet_dropbox_credential"
         const val localFileOptionsKey = "tari_wallet_local_file_backup_options"
         const val scheduledBackupDate = "tari_wallet_scheduled_backup_date"
         const val backupPassword = "tari_wallet_last_next_alarm_time"
