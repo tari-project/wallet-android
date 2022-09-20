@@ -14,8 +14,7 @@ class GifColorPlaceholder private constructor(@field:ColorInt @param:ColorInt pr
         private val BUILT_IN_COLORS = intArrayOf(-0xff481b, -0x1a25ad, -0x76d11b, -0xff1a77, -0x1aa3a4)
 
         @JvmOverloads
-        fun generate(target: Any, cornerRadius: Float = DEFAULT_CORNER_RADIUS): GifColorPlaceholder {
-            return GifColorPlaceholder(BUILT_IN_COLORS[abs(target.hashCode()) % BUILT_IN_COLORS.size], cornerRadius)
-        }
+        fun generate(target: Any, cornerRadius: Float = DEFAULT_CORNER_RADIUS): GifColorPlaceholder =
+            GifColorPlaceholder(BUILT_IN_COLORS[abs(target.hashCode()) % BUILT_IN_COLORS.size], cornerRadius)
     }
 }

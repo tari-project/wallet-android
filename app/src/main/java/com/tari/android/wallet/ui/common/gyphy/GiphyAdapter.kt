@@ -33,29 +33,9 @@
 package com.tari.android.wallet.ui.common.gyphy
 
 import android.content.Context
-import com.giphy.sdk.core.models.Media
 import com.giphy.sdk.ui.Giphy
-import java.util.concurrent.ConcurrentHashMap
 
-class GiphyEcosystem(private val context: Context, private val key: String) {
+class GiphyAdapter(private val context: Context, private val key: String) {
 
-    companion object {
-
-        private const val cacheCountLimit = 50
-
-        private val mediaCache = ConcurrentHashMap<String,Media>()
-
-        fun cacheMedia(id: String, media: Media) {
-            if (mediaCache.size == cacheCountLimit) {
-                mediaCache.remove(mediaCache.keys.random())
-            }
-            mediaCache[id] = media
-        }
-
-        fun getCachedMedia(id: String): Media? = mediaCache[id]
-
-    }
-
-    fun enable() = Giphy.configure(context, key)
-
+    fun init() = Giphy.configure(context, key)
 }

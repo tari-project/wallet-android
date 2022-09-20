@@ -6,7 +6,8 @@ import com.bumptech.glide.load.resource.gif.GifDrawable
 import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
 
-class GlideGIFListener(val consumer: GIFStateConsumer) : RequestListener<GifDrawable> {
+class GlideGIFListener(private val consumer: GIFStateConsumer) : RequestListener<GifDrawable> {
+
     override fun onLoadFailed(
         e: GlideException?,
         model: Any?,
@@ -27,5 +28,4 @@ class GlideGIFListener(val consumer: GIFStateConsumer) : RequestListener<GifDraw
         consumer.onResourceReady()
         return false
     }
-
 }

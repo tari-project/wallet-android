@@ -348,9 +348,6 @@ class FFIWallet(
     fun getCancelledTxs(): FFICompletedTxs {
         val error = FFIError()
         val result = FFICompletedTxs(jniGetCancelledTxs(error))
-        if (error.code != 0) {
-            1
-        }
         throwIf(error)
         return result
     }
@@ -378,8 +375,7 @@ class FFIWallet(
 
     fun getPendingOutboundTxById(id: BigInteger): FFIPendingOutboundTx {
         val error = FFIError()
-        val result =
-            FFIPendingOutboundTx(jniGetPendingOutboundTxById(id.toString(), error))
+        val result = FFIPendingOutboundTx(jniGetPendingOutboundTxById(id.toString(), error))
         throwIf(error)
         return result
     }
@@ -393,8 +389,7 @@ class FFIWallet(
 
     fun getPendingInboundTxById(id: BigInteger): FFIPendingInboundTx {
         val error = FFIError()
-        val result =
-            FFIPendingInboundTx(jniGetPendingInboundTxById(id.toString(), error))
+        val result = FFIPendingInboundTx(jniGetPendingInboundTxById(id.toString(), error))
         throwIf(error)
         return result
     }
