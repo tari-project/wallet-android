@@ -87,7 +87,9 @@ class TxListViewModel : CommonViewModel() {
     private val _navigation = SingleLiveEvent<TxListNavigation>()
     val navigation: LiveData<TxListNavigation> = _navigation
 
-    private val _connected = MutableLiveData<Unit>()
+    val restored = MutableLiveData<Boolean>(false)
+
+    private val _connected = SingleLiveEvent<Unit>()
     val connected: LiveData<Unit> = _connected
 
     private val _balanceInfo = MutableLiveData<BalanceInfo>()

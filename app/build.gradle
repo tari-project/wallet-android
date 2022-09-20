@@ -216,7 +216,7 @@ dependencies {
     implementation "androidx.lifecycle:lifecycle-runtime-ktx:2.5.1"
     implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:2.5.1"
     implementation "androidx.lifecycle:lifecycle-livedata-ktx:2.5.1"
-    implementation "androidx.fragment:fragment-ktx:1.5.2"
+    implementation "androidx.fragment:fragment-ktx:1.5.3"
 
     // kotlin extensions
     implementation "androidx.core:core-ktx:1.9.0"
@@ -329,7 +329,7 @@ dependencies {
     // overscroll
     implementation "io.github.everythingme:overscroll-decor-android:1.1.1"
 
-    // giphy
+    // giphy, don't update to 2.2.0 because of not compatible yet
     implementation "com.giphy.sdk:ui:2.1.18"
     // spring animation
     implementation "androidx.dynamicanimation:dynamicanimation:1.0.0"

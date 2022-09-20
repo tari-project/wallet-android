@@ -5,6 +5,7 @@ import android.hardware.SensorManager
 import android.net.Uri
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.navigation.Navigation
 import androidx.viewbinding.ViewBinding
 import com.squareup.seismic.ShakeDetector
 import com.tari.android.wallet.R
@@ -24,6 +25,8 @@ abstract class CommonActivity<Binding : ViewBinding, VM : CommonViewModel> : App
     protected lateinit var viewModel: VM
 
     private val shakeDetector by lazy { ShakeDetector(this) }
+
+    protected val navigator by lazy { Navigator(Navigation.findNavController(this, R.id.nav_host_fragment)) }
 
     fun bindViewModel(viewModel: VM) = with(viewModel) {
         this@CommonActivity.viewModel = viewModel

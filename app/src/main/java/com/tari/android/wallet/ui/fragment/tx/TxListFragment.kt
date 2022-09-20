@@ -113,10 +113,18 @@ class TxListFragment : CommonFragment<FragmentTxListBinding, TxListViewModel>(),
         val viewModel: TxListViewModel by viewModels()
         bindViewModel(viewModel)
 
+        if (viewModel.restored.value == true) {
+            setInitState()
+            viewModel.restored.postValue(true)
+        } else {
+            setInitedState()
+        }
+
         setupUI()
         subscribeToEventBus()
         subscribeToViewModel()
         observeUI()
+        setupCTAs()
     }
 
     private fun observeUI() = with(viewModel) {
@@ -153,7 +161,6 @@ class TxListFragment : CommonFragment<FragmentTxListBinding, TxListViewModel>(),
 
     @SuppressLint("ClickableViewAccessibility")
     private fun setupUI() = with(ui) {
-        txListHeaderView.setTopMargin(-dimenPx(R.dimen.common_header_height))
         updateProgressViewController = UpdateProgressViewController(ui.updateProgressContentView, this@TxListFragment)
         viewModel.progressControllerState = updateProgressViewController.state
         scrollView.bindUI()
@@ -165,7 +172,10 @@ class TxListFragment : CommonFragment<FragmentTxListBinding, TxListViewModel>(),
         txRecyclerView.setOnTouchListener(this@TxListFragment)
         walletButton.ui.image.setImageResource(R.drawable.ic_wallet)
         walletButton.touchListener = { processNavigation(TxListNavigation.ToUtxos) }
+    }
 
+    private fun setInitState() = with(ui) {
+        txListHeaderView.setTopMargin(-dimenPx(R.dimen.common_header_height))
         headerElevationView.alpha = 0F
         balanceTextView.alpha = 0F
         availableBalanceTextView.alpha = 0F
@@ -177,7 +187,20 @@ class TxListFragment : CommonFragment<FragmentTxListBinding, TxListViewModel>(),
         noTxsInfoTextView.gone()
         onboardingContentView.gone()
         topContentContainerView.invisible()
-        setupCTAs()
+    }
+
+    private fun setInitedState() = with(ui) {
+        onboardingContentView.visible()
+        txListOverlayView.alpha = 1F
+        scrollContentView.alpha = 1F
+        topContentContainerView.visible()
+        balanceTextView.alpha = 1F
+        availableBalanceTextView.alpha = 1F
+        balanceQuestionMark.alpha = 1F
+        availableBalance.alpha = 1F
+        networkStatusStateIndicatorView.alpha = 1F
+        balanceGemImageView.alpha = 1F
+        blockerView.gone()
     }
 
     private fun setupCTAs() = with(ui) {
@@ -235,9 +258,9 @@ class TxListFragment : CommonFragment<FragmentTxListBinding, TxListViewModel>(),
         val router = requireActivity() as TxListRouter
         when (navigation) {
             TxListNavigation.ToTTLStore -> router.toTTLStore()
-            is TxListNavigation.ToTxDetails -> router.toTxDetails(navigation.tx)
+            is TxListNavigation.ToTxDetails -> navigator.navigate(TxListFragmentDirections.toTxDetailsFragment().setTx(navigation.tx))
             is TxListNavigation.ToSendTariToUser -> navigateToSendTari(navigation.user)
-            TxListNavigation.ToUtxos -> router.toUtxos()
+            TxListNavigation.ToUtxos -> navigator.navigate(R.id.action_txListFragment_to_utxos_list)
             TxListNavigation.ToAllSettings -> router.toAllSettings()
         }
     }

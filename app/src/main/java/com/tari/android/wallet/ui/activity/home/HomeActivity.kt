@@ -54,7 +54,6 @@ import com.tari.android.wallet.di.DiContainer.appComponent
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.extension.addTo
 import com.tari.android.wallet.extension.applyFontStyle
-import com.tari.android.wallet.model.Tx
 import com.tari.android.wallet.model.TxId
 import com.tari.android.wallet.model.User
 import com.tari.android.wallet.model.WalletError
@@ -79,6 +78,7 @@ import com.tari.android.wallet.ui.extension.showInternetConnectionErrorDialog
 import com.tari.android.wallet.ui.extension.string
 import com.tari.android.wallet.ui.fragment.onboarding.activity.OnboardingFlowActivity
 import com.tari.android.wallet.ui.fragment.send.activity.SendTariActivity
+import com.tari.android.wallet.ui.fragment.tx.TxListFragmentDirections
 import com.tari.android.wallet.ui.fragment.tx.TxListRouter
 import com.tari.android.wallet.util.Constants
 import kotlinx.coroutines.Dispatchers
@@ -169,9 +169,17 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>(), TxLis
 
     override fun onSupportNavigateUp(): Boolean = NavigationUI.navigateUp(navController, appBarConfiguration)
 
-    private fun setupUi() {
-        setupCTAs()
+    override fun toTTLStore() {
+        ui.bottomNavigationView.selectedItemId = R.id.ttlStoreFragment
     }
+
+    override fun toAllSettings() {
+        ui.bottomNavigationView.selectedItemId = R.id.settingsFragment
+    }
+
+    fun willNotifyAboutNewTx(): Boolean = ui.bottomNavigationView.selectedItemId == R.id.txListFragment
+
+    private fun setupUi() = setupCTAs()
 
     private fun setupCTAs() {
         ui.sendTariCtaView.setOnClickListener {
@@ -193,7 +201,6 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>(), TxLis
             displayIncompatibleNetworkDialog()
         }
     }
-
 
     private fun displayIncompatibleNetworkDialog() {
         if (this.isFinishing) return
@@ -244,47 +251,14 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>(), TxLis
         if (screen.orEmpty().isNotEmpty()) {
             when (HomeDeeplinkScreens.parse(screen)) {
                 HomeDeeplinkScreens.TxDetails -> {
-                    (intent.getParcelableExtra<TxId>(HomeDeeplinkScreens.KeyTxDetailsArgs))?.let { toTxDetails(null, it) }
+                    (intent.getParcelableExtra<TxId>(HomeDeeplinkScreens.KeyTxDetailsArgs))?.let { toTxDetails(it) }
                 }
                 else -> {}
             }
         }
     }
 
-    override fun toTTLStore() {
-        ui.bottomNavigationView.selectedItemId = R.id.ttlStoreFragment
-    }
-
-    override fun toUtxos() {
-        //        val action = TxListFragmentDirections.ActionTxListFragmentToTxDetlsFragment(tx, txId)
-//        navController.navigate(action)
-//        Bundle().apply {
-//            putParcelable(TX_EXTRA_KEY, tx)
-//            putParcelable(TX_ID_EXTRA_KEY, txId)
-//        }
-    }
-
-    override fun toTxDetails(tx: Tx?, txId: TxId?) {
-//        val action = TxListFragmentDirections.ActionTxListFragmentToTxDetlsFragment(tx, txId)
-//        navController.navigate(action)
-//        Bundle().apply {
-//            putParcelable(TX_EXTRA_KEY, tx)
-//            putParcelable(TX_ID_EXTRA_KEY, txId)
-//        }
-    }
-
-//    override fun toTxDetails(tx: Tx?, txId: TxId?) = loadFragment(TxDetailsFragment().apply {
-//        arguments = Bundle().apply {
-//            putParcelable(TX_EXTRA_KEY, tx)
-//            putParcelable(TX_ID_EXTRA_KEY, txId)
-//        }
-//    })
-
-    override fun toAllSettings() {
-        ui.bottomNavigationView.selectedItemId = R.id.settingsFragment
-    }
-
-    fun willNotifyAboutNewTx(): Boolean = ui.bottomNavigationView.selectedItemId == R.id.txListFragment
+    private fun toTxDetails(txId: TxId?) = navigator.navigate(TxListFragmentDirections.toTxDetailsFragment().setTxId(txId))
 
     private fun processIntentDeepLink(service: TariWalletService, intent: Intent) {
         deeplinkHandler.handle(intent.data?.toString().orEmpty())?.let { deepLink ->

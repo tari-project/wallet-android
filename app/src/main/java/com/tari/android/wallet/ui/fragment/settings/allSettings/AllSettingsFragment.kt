@@ -116,11 +116,11 @@ class AllSettingsFragment : CommonFragment<FragmentAllSettingsBinding, AllSettin
         when (navigation) {
             AllSettingsNavigation.ToBackgroundService -> toBackgroundService()
             AllSettingsNavigation.ToBackupSettings -> toBackupSettings()
-            AllSettingsNavigation.ToBaseNodeSelection -> navigate(R.id.action_settingsFragment_to_changeBaseNodeFragment)
+            AllSettingsNavigation.ToBaseNodeSelection -> navigator.navigate(R.id.action_settingsFragment_to_changeBaseNodeFragment)
             AllSettingsNavigation.ToDeleteWallet -> toDeleteWallet()
-            AllSettingsNavigation.ToNetworkSelection -> navigate(R.id.action_settingsFragment_to_networkSelectionFragment)
-            AllSettingsNavigation.ToTorBridges -> navigate(R.id.action_settingsFragment_to_tor_custom_tor_bridges)
-            AllSettingsNavigation.ToAbout -> navigate(R.id.action_settingsFragment_to_aboutFragment)
+            AllSettingsNavigation.ToNetworkSelection -> navigator.navigate(R.id.action_settingsFragment_to_networkSelectionFragment)
+            AllSettingsNavigation.ToTorBridges -> navigator.navigate(R.id.action_settingsFragment_to_tor_custom_tor_bridges)
+            AllSettingsNavigation.ToAbout -> navigator.navigate(R.id.action_settingsFragment_to_aboutFragment)
         }
     }
 

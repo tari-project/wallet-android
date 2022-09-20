@@ -9,15 +9,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.annotation.AnimRes
-import androidx.annotation.AnimatorRes
-import androidx.annotation.IdRes
 import androidx.fragment.app.Fragment
-import androidx.navigation.NavOptions
-import androidx.navigation.fragment.findNavController
+import androidx.navigation.Navigation
 import androidx.viewbinding.ViewBinding
-import com.tari.android.wallet.di.DiContainer
 import com.tari.android.wallet.R
+import com.tari.android.wallet.di.DiContainer
 import com.tari.android.wallet.extension.observe
 import com.tari.android.wallet.ui.component.MutedBackPressedCallback
 import com.tari.android.wallet.ui.dialog.TariDialog
@@ -35,6 +31,8 @@ abstract class CommonFragment<Binding : ViewBinding, VM : CommonViewModel> : Fra
     protected lateinit var ui: Binding
 
     protected lateinit var viewModel: VM
+
+    protected val navigator by lazy { Navigator(Navigation.findNavController(requireActivity(), R.id.nav_host_fragment)) }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -70,17 +68,6 @@ abstract class CommonFragment<Binding : ViewBinding, VM : CommonViewModel> : Fra
         observe(blockedBackPressed) {
             blockingBackPressDispatcher.isEnabled = it
         }
-    }
-
-    protected fun navigate(@IdRes id: Int, bundle: Bundle? = null) {
-        val navOptions = NavOptions.Builder()
-            .setEnterAnim(R.anim.enter_from_right)
-            .setExitAnim(R.anim.exit_to_left)
-            .setPopEnterAnim( R.anim.enter_from_left)
-            .setPopExitAnim(R.anim.exit_to_right)
-            .build()
-
-        findNavController().navigate(id, bundle, navOptions)
     }
 
     protected fun changeOnBackPressed(isBlocked: Boolean) {

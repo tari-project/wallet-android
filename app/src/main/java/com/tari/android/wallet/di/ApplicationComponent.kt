@@ -80,6 +80,7 @@ import com.tari.android.wallet.ui.fragment.settings.networkSelection.NetworkSele
 import com.tari.android.wallet.ui.fragment.settings.torBridges.TorBridgesSelectionViewModel
 import com.tari.android.wallet.ui.fragment.settings.torBridges.customBridges.CustomTorBridgesViewModel
 import com.tari.android.wallet.ui.fragment.settings.userAutorization.BiometricAuthenticationViewModel
+import com.tari.android.wallet.ui.fragment.store.StoreViewModel
 import com.tari.android.wallet.ui.fragment.tx.TxListViewModel
 import com.tari.android.wallet.ui.fragment.tx.details.TxDetailsFragment
 import com.tari.android.wallet.ui.fragment.tx.details.gif.GIFViewModel
@@ -177,6 +178,7 @@ interface ApplicationComponent {
     fun inject(viewModel: TariAboutViewModel)
     fun inject(viewModel: UtxosListViewModel)
     fun inject(viewModel: DebugLogViewModel)
+    fun inject(viewModel: StoreViewModel)
     /**
      * Service(s).
      */

@@ -12,6 +12,9 @@
         <action
             android:id="@+id/to_txDetailsFragment"
             app:destination="@id/txDetailsFragment" />
+        <action
+            android:id="@+id/action_txListFragment_to_utxos_list"
+            app:destination="@id/utxos_list" />
     </fragment>
 
     <fragment
@@ -30,6 +33,10 @@
             android:defaultValue="@null" />
     </fragment>
 
+    <fragment
+        android:id="@+id/utxos_list"
+        android:name="com.tari.android.wallet.ui.fragment.utxos.list.UtxosListFragment"
+        tools:layout="@layout/fragment_utxos_list" />
 
     <fragment
         android:id="@+id/ttlStoreFragment"
