@@ -50,16 +50,16 @@ import javax.inject.Inject
  *
  * @author The Tari Development Team
  */
-internal class SplashActivity : AppCompatActivity() {
+class SplashActivity : AppCompatActivity() {
 
     @Inject
-    internal lateinit var walletConfig: WalletConfig
+    lateinit var walletConfig: WalletConfig
 
     @Inject
-    internal lateinit var sharedPrefsRepository: SharedPrefsRepository
+    lateinit var sharedPrefsRepository: SharedPrefsRepository
 
     @Inject
-    internal lateinit var walletServiceLauncher: WalletServiceLauncher
+    lateinit var walletServiceLauncher: WalletServiceLauncher
 
     override fun onCreate(savedInstanceState: Bundle?) {
         appComponent.inject(this)

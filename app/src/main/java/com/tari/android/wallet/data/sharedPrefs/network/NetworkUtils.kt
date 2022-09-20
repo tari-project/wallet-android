@@ -1,5 +1,6 @@
 package com.tari.android.wallet.data.sharedPrefs.network
 
+import com.google.gson.Gson
 import com.tari.android.wallet.data.repository.CommonRepository
 
 fun NetworkRepository.formatKey(key: String): String {
@@ -7,7 +8,12 @@ fun NetworkRepository.formatKey(key: String): String {
     if (catching.isSuccess) {
         return catching.getOrNull().orEmpty()
     } else {
-        throw NoSupportedNetworkException()
+        try {
+            val networkGson = Gson().toJson(this.currentNetwork, TariNetwork::class.java)
+            throw NoSupportedNetworkException(key + networkGson)
+        } catch (e: Throwable) {
+            throw NoSupportedNetworkException(key + e.message)
+        }
     }
 }
 

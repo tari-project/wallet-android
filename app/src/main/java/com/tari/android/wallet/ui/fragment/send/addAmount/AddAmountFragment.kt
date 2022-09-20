@@ -105,9 +105,6 @@ class AddAmountFragment : CommonFragment<FragmentAddAmountBinding, AddAmountView
         bindViewModel(viewModel)
         subscribeVM()
 
-        if (savedInstanceState == null) {
-            viewModel.tracker.screen(path = "/home/send_tari/add_amount", title = "Send Tari - Add Amount")
-        }
         isFirstLaunch = savedInstanceState == null
         ui.modifyButton.setOnClickListener { viewModel.showFeeDialog() }
     }

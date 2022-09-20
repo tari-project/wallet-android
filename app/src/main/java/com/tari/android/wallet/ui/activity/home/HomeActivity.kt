@@ -67,8 +67,8 @@ import com.tari.android.wallet.service.WalletServiceLauncher
 import com.tari.android.wallet.service.connection.TariWalletServiceConnection
 import com.tari.android.wallet.service.connection.TariWalletServiceConnection.ServiceConnectionStatus.CONNECTED
 import com.tari.android.wallet.ui.activity.SplashActivity
-import com.tari.android.wallet.ui.activity.settings.BackupSettingsActivity
-import com.tari.android.wallet.ui.activity.settings.DeleteWalletActivity
+import com.tari.android.wallet.ui.fragment.settings.backup.activity.BackupSettingsActivity
+import com.tari.android.wallet.ui.fragment.settings.deleteWallet.DeleteWalletActivity
 import com.tari.android.wallet.ui.common.CommonActivity
 import com.tari.android.wallet.ui.common.domain.ResourceManager
 import com.tari.android.wallet.ui.common.gyphy.GiphyEcosystem
@@ -110,7 +110,7 @@ import kotlinx.coroutines.launch
 import java.lang.ref.WeakReference
 import javax.inject.Inject
 
-internal class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>(), AllSettingsRouter, TxListRouter, BaseNodeConfigRouter {
+class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>(), AllSettingsRouter, TxListRouter, BaseNodeConfigRouter {
 
     @Inject
     lateinit var sharedPrefsWrapper: SharedPrefsRepository

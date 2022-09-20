@@ -48,7 +48,7 @@ import dagger.Provides
 import javax.inject.Singleton
 
 @Module
-internal class BackupAndRestoreModule {
+class BackupAndRestoreModule {
 
     @Provides
     @Singleton

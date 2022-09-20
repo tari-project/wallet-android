@@ -39,7 +39,7 @@ import java.math.BigInteger
 /**
  * @author The Tari Development Team
  */
-internal interface FFIWalletListener {
+interface FFIWalletListener {
 
     fun onTxReceived(pendingInboundTx: PendingInboundTx)
     fun onTxReplyReceived(pendingOutboundTx: PendingOutboundTx)

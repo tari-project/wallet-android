@@ -30,7 +30,7 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.tari.android.wallet.ui.activity.debug
+package com.tari.android.wallet.ui.fragment.debug.activity
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
@@ -39,7 +39,6 @@ import com.google.android.material.tabs.TabLayoutMediator
 import com.tari.android.wallet.R
 import com.tari.android.wallet.databinding.ActivityDebugBinding
 import com.tari.android.wallet.di.DiContainer.appComponent
-import com.tari.android.wallet.ui.activity.debug.adapter.DebugViewPagerAdapter
 import com.tari.android.wallet.ui.extension.addEnterLeftAnimation
 import com.tari.android.wallet.ui.extension.string
 import com.tari.android.wallet.ui.fragment.debug.baseNodeConfig.BaseNodeConfigRouter
@@ -51,7 +50,7 @@ import com.tari.android.wallet.ui.fragment.debug.baseNodeConfig.changeBaseNode.C
  *
  * @author The Tari Development Team
  */
-internal class DebugActivity : AppCompatActivity(), BaseNodeConfigRouter {
+class DebugActivity : AppCompatActivity(), BaseNodeConfigRouter {
 
     private lateinit var pagerAdapter: DebugViewPagerAdapter
 

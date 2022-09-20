@@ -47,7 +47,7 @@ import com.tari.android.wallet.ui.fragment.restore.chooseRestoreOption.option.Re
 import com.tari.android.wallet.ui.fragment.restore.restore.WalletRestoreRouter
 import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupOptions
 
-internal class ChooseRestoreOptionFragment : CommonFragment<FragmentChooseRestoreOptionBinding, ChooseRestoreOptionViewModel>() {
+class ChooseRestoreOptionFragment : CommonFragment<FragmentChooseRestoreOptionBinding, ChooseRestoreOptionViewModel>() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?) =
         FragmentChooseRestoreOptionBinding.inflate(inflater, container, false).also { ui = it }.root

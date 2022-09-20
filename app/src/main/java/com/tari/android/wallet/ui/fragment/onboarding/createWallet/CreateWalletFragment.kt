@@ -87,9 +87,6 @@ class CreateWalletFragment : CommonFragment<FragmentCreateWalletBinding, CreateW
         bindViewModel(viewModel)
 
         setupUi()
-        if (savedInstanceState == null) {
-            viewModel.tracker.screen(path = "/onboarding/create_wallet", title = "Onboarding - Create Wallet")
-        }
     }
 
     override fun onDestroyView() {
@@ -223,17 +220,19 @@ class CreateWalletFragment : CommonFragment<FragmentCreateWalletBinding, CreateW
             addListener(object : AnimatorListenerAdapter() {
                 override fun onAnimationEnd(animation: Animator) {
                     super.onAnimationEnd(animation)
-                    val emojiId = viewModel.sharedPrefsWrapper.emojiId!!
-                    ui.emojiIdTextView.text = EmojiUtil.getFullEmojiIdSpannable(
-                        emojiId,
-                        string(emoji_id_chunk_separator),
-                        color(black),
-                        color(light_gray)
-                    )
-                    emojiIdSummaryController.display(emojiId)
+                    runCatching {
+                        val emojiId = viewModel.sharedPrefsWrapper.emojiId!!
+                        ui.emojiIdTextView.text = EmojiUtil.getFullEmojiIdSpannable(
+                            emojiId,
+                            string(emoji_id_chunk_separator),
+                            color(black),
+                            color(light_gray)
+                        )
+                        emojiIdSummaryController.display(emojiId)
 
-                    ui.checkmarkLottieAnimationView.visible()
-                    ui.checkmarkLottieAnimationView.playAnimation()
+                        ui.checkmarkLottieAnimationView.visible()
+                        ui.checkmarkLottieAnimationView.playAnimation()
+                    }
                 }
             })
             start()
@@ -315,8 +314,6 @@ class CreateWalletFragment : CommonFragment<FragmentCreateWalletBinding, CreateW
     }
 
     private fun showEmojiWheelAnimation() {
-        viewModel.tracker.screen(path = "/onboarding/create_emoji_id", title = "Onboarding - Create Emoji Id")
-
         ui.emojiWheelLottieAnimationView.playAnimation()
 
         ValueAnimator.ofFloat(1f, 0f).apply {

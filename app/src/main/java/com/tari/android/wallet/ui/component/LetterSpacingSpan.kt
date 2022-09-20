@@ -40,7 +40,7 @@ import android.text.style.MetricAffectingSpan
  *
  * @author The Tari Development Team
  */
-internal class LetterSpacingSpan(private val letterSpacing: Float): MetricAffectingSpan() {
+class LetterSpacingSpan(private val letterSpacing: Float): MetricAffectingSpan() {
 
     override fun updateMeasureState(drawState: TextPaint) {
         apply(drawState)

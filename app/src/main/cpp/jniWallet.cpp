@@ -930,7 +930,7 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniEstimateTxFee(
 
     jbyteArray result = getBytesFromUnsignedLongLong(
             jEnv,
-            wallet_get_fee_estimate(pWallet, amount, gramFee, kernels, outputs, errorCodePointer));
+            wallet_get_fee_estimate(pWallet, amount, nullptr, gramFee, kernels, outputs, errorCodePointer));
     setErrorCode(jEnv, error, errorCode);
     jEnv->ReleaseStringUTFChars(jAmount, nativeAmount);
     jEnv->ReleaseStringUTFChars(jGramFee, nativeGramFee);
@@ -1171,10 +1171,13 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniImportUTXO(
                     pSourceSenderPublicKey,
                     pScriptPrivateKey,
                     pCovenant,
+                    nullptr,
+                    0,
                     pMessage,
                     errorCodePointer
             )
     );
+
     setErrorCode(jEnv, error, errorCode);
     jEnv->ReleaseStringUTFChars(jAmount, nativeAmount);
     jEnv->ReleaseStringUTFChars(jMessage, pMessage);
@@ -1424,7 +1427,7 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniSendTx(
 
     jbyteArray result = getBytesFromUnsignedLongLong(
             jEnv,
-            wallet_send_transaction(pWallet, pDestination, amount, feePerGram, pMessage, jOneSided, errorCodePointer));
+            wallet_send_transaction(pWallet, pDestination, amount, nullptr, feePerGram, pMessage, jOneSided, errorCodePointer));
     setErrorCode(jEnv, error, errorCode);
     jEnv->ReleaseStringUTFChars(jAmount, nativeAmount);
     jEnv->ReleaseStringUTFChars(jFeePerGram, nativeFeePerGram);

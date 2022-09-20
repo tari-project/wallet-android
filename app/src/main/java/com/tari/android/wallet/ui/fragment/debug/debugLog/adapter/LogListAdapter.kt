@@ -30,30 +30,29 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.tari.android.wallet.infrastructure
+package com.tari.android.wallet.ui.fragment.debug.debugLog.adapter
 
-import android.content.Context
-import android.util.Log
+import android.view.LayoutInflater
+import android.view.ViewGroup
+import androidx.recyclerview.widget.RecyclerView
+import com.tari.android.wallet.R
 
-/**
- * Tracker implementation that logs invocations to the console.
- *
- * @author The Tari Development Team
- */
-class ConsoleLogTracker : Tracker {
-    override fun screen(path: String, title: String) {
-        Log.i(TRACK_TAG, "Screen track issued with path \"$path\" and title \"$title\"")
-    }
+class LogListAdapter(val logLines: MutableList<String> = mutableListOf()) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
-    override fun download(context: Context) {
-        Log.i(TRACK_TAG, "Download track issued with $context")
-    }
+    private val regex = Regex("(\\d{4}-\\d{2}-\\d{2}\\s\\d{2}:\\d{2}:\\d{2}\\.\\d+)\\s(\\[[^]]+])\\s(\\[[^]]+]\\s)?([A-Z]+)\\s(.+)")
 
-    override fun event(category: String, action: String) {
-        Log.i(TRACK_TAG, "Event track issued with category \"$category\" and action \"$action\"")
-    }
+    override fun getItemCount() = logLines.size
 
-    private companion object {
-        private const val TRACK_TAG = "Debug_Tracker"
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder =
+        LogViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.item_log, parent, false))
+
+    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+        if (regex.matches(logLines[position])) {
+            val matchResult = regex.find(logLines[position])
+            val (timestamp, source1, source2, level, log) = matchResult!!.destructured
+            (holder as LogViewHolder).bind(timestamp, source1, source2, level, log)
+        } else {
+            (holder as LogViewHolder).bind(logLines[position])
+        }
     }
 }

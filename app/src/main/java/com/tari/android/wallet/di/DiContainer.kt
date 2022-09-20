@@ -3,13 +3,13 @@ package com.tari.android.wallet.di
 import com.tari.android.wallet.application.TariWalletApplication
 
 object DiContainer {
-    internal lateinit var appComponent: ApplicationComponent
+    lateinit var appComponent: ApplicationComponent
 
-    internal fun initContainer(app: TariWalletApplication) {
+    fun initContainer(app: TariWalletApplication) {
         appComponent = initDagger(app)
     }
 
-    internal fun reInitContainer() {
+    fun reInitContainer() {
         appComponent = initDagger(TariWalletApplication.INSTANCE.get()!!)
         TariWalletApplication.INSTANCE.get()!!.initApplication()
     }

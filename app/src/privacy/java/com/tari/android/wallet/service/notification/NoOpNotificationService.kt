@@ -32,8 +32,6 @@
  */
 package com.tari.android.wallet.service.notification
 
-import com.orhanobut.logger.Logger
-
 class NoOpNotificationService : NotificationService {
     override fun notifyRecipient(
         recipientPublicKeyHex: String,
@@ -41,11 +39,5 @@ class NoOpNotificationService : NotificationService {
         signer: (String) -> String,
         onSuccess: () -> Unit,
         onFailure: (Throwable) -> Unit
-    ) {
-        Logger.i(
-            "notifyRecipient called with" +
-                    "\nrecipientPublicKeyHex = $recipientPublicKeyHex" +
-                    "\nsenderPublicKeyHex = $senderPublicKeyHex"
-        )
-    }
+    ) = Unit
 }

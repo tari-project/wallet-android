@@ -58,6 +58,8 @@ class TorProxyManager(
 
     private val appCacheHome = context.getDir(torDataDirectoryName, Service.MODE_PRIVATE)
     private val torProxyControl: TorProxyControl
+    private val logger
+        get() = Logger.t(TorProxyManager::class.simpleName)
 
     init {
         EventBus.torProxyState.post(TorProxyState.NotReady)
@@ -76,14 +78,13 @@ class TorProxyManager(
      * Executes shell command.
      */
     private fun exec(command: String) {
-        // execute the command
         val process = Runtime.getRuntime().exec(command)
-        Logger.d("Tor command executed: %s", command)
+        logger.i("Tor process started")
         EventBus.torProxyState.post(TorProxyState.Initializing(null))
         val response = BufferedReader(InputStreamReader(process.inputStream)).use(BufferedReader::readText)
-        Logger.d("Tor proxy response: %s", response)
+        logger.i("Tor proxy response: $response")
         process.waitFor()
-        Logger.d("Tor proxy stopped")
+        logger.i("Tor proxy stopped")
     }
 
     @Synchronized
@@ -100,7 +101,7 @@ class TorProxyManager(
 
                 exec(torCmdString)
             } catch (throwable: Throwable) {
-                Logger.e(throwable.message.orEmpty())
+                logger.e(throwable, "Tor process launch failed")
                 EventBus.torProxyState.post(TorProxyState.Failed(throwable))
             }
         }.start()

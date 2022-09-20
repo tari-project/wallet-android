@@ -45,7 +45,7 @@ import com.tari.android.wallet.databinding.FragmentAboutBinding
  *
  * @author The Tari Development Team
  */
-internal class AboutFragment : Fragment() {
+class AboutFragment : Fragment() {
 
     private lateinit var ui: FragmentAboutBinding
 

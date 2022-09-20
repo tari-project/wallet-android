@@ -40,7 +40,6 @@ package com.tari.android.wallet
 import android.content.Context
 import androidx.test.core.app.ApplicationProvider.getApplicationContext
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.orhanobut.logger.Logger
 import com.tari.android.wallet.application.Network
 import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodeSharedRepository
@@ -74,7 +73,6 @@ class FFIWalletTests {
 
     private lateinit var wallet: FFIWallet
     private lateinit var listener: TestAddRecipientAddNodeListener
-    private var network: Network = Network.DIBBLER
     private val context = getApplicationContext<Context>()
     private val prefs = context.getSharedPreferences(ApplicationModule.sharedPrefsFileName, Context.MODE_PRIVATE)
     private val resourceManager: ResourceManager = ResourceManager(context)
@@ -338,9 +336,7 @@ class FFIWalletTests {
     //@Test
     //todo implement transactions testing
     fun testCancelCompleteAndBroadcastAndGetByIds() {
-        Logger.i("Will generate test data.")
         assertTrue(wallet.generateTestData(walletDirPath))
-        Logger.i("Test data generation completed.")
         val mockListener = mockk<FFIWalletListener>(relaxed = true, relaxUnitFun = true)
         wallet.listener = mockListener
 
@@ -477,73 +473,58 @@ class FFIWalletTests {
         val outboundBroadcastTxs = mutableListOf<PendingOutboundTx>()
 
         override fun onTxReceived(pendingInboundTx: PendingInboundTx) {
-            Logger.i("Tx Received :: pending inbound tx id %s", pendingInboundTx.id)
             receivedTxs.add(pendingInboundTx)
         }
 
         override fun onTxReplyReceived(pendingOutboundTx: PendingOutboundTx) {
-            Logger.i("Tx Reply Received :: pending outbound tx id %s", pendingOutboundTx.id)
             replyReceivedTxs.add(pendingOutboundTx)
         }
 
         override fun onTxFinalized(pendingInboundTx: PendingInboundTx) {
-            Logger.i("Tx Finalized :: pending inbound tx id: %s", pendingInboundTx.id)
             finalizedTxs.add(pendingInboundTx)
         }
 
         override fun onInboundTxBroadcast(pendingInboundTx: PendingInboundTx) {
-            Logger.i("Inbound tx Broadcast :: pending inbound tx id %s", pendingInboundTx.id)
             inboundBroadcastTxs.add(pendingInboundTx)
         }
 
         override fun onOutboundTxBroadcast(pendingOutboundTx: PendingOutboundTx) {
-            Logger.i("Outbound tx Broadcast :: pending outbound tx id %s", pendingOutboundTx.id)
             outboundBroadcastTxs.add(pendingOutboundTx)
         }
 
         override fun onTxMined(completedTx: CompletedTx) {
-            Logger.i("Tx Mined :: completed tx id: %s", completedTx.id)
             minedTxs.add(completedTx)
         }
 
         override fun onTxMinedUnconfirmed(completedTx: CompletedTx, confirmationCount: Int) {
-            Logger.i("Tx Mined unconfirmed :: completed tx id: %s", completedTx.id)
             minedTxs.add(completedTx)
         }
 
         override fun onTxFauxConfirmed(completedTx: CompletedTx) {
-            Logger.i("Tx Faux Mined :: completed tx id: %s", completedTx.id)
             minedTxs.add(completedTx)
         }
 
         override fun onTxFauxUnconfirmed(completedTx: CompletedTx, confirmationCount: Int) {
-            Logger.i("Tx Faux Mined unconfirmed :: completed tx id: %s", completedTx.id)
             minedTxs.add(completedTx)
         }
 
         override fun onTxCancelled(cancelledTx: CancelledTx, rejectionReason: Int) {
-            Logger.i("Tx Cancelled :: cancelled tx id: %s, reason code: %s", cancelledTx.id, rejectionReason.toString())
             cancelledTxs.add(cancelledTx)
         }
 
         override fun onTXOValidationComplete(responseId: BigInteger, isSuccess: Boolean) {
-            Logger.i("Invalid TXO validation complete :: response id %s result %s", responseId, isSuccess)
         }
 
         override fun onTxValidationComplete(responseId: BigInteger, isSuccess: Boolean) {
-            Logger.i("TX validation complete :: response id %s result %s", responseId, isSuccess)
         }
 
         override fun onWalletRestoration(result: WalletRestorationResult) {
-            Logger.i("TX validation complete :: response id %s result %s", result)
         }
 
         override fun onDirectSendResult(txId: BigInteger, status: TransactionSendStatus) {
-            Logger.i("Direct send :: tx id %s status %s", txId, status)
         }
 
         override fun onConnectivityStatus(status: Int) {
-            Logger.i("Connectivity status: %s", status)
         }
     }
 }

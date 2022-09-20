@@ -143,7 +143,7 @@
             android:theme="@style/YatLibTheme.TransparentCompat"
             android:windowSoftInputMode="stateAlwaysHidden" />
         <activity
-            android:name=".ui.activity.debug.DebugActivity"
+            android:name="com.tari.android.wallet.ui.fragment.debug.activity.DebugActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:launchMode="singleTask"
             android:parentActivityName=".ui.activity.home.HomeActivity"
@@ -151,16 +151,16 @@
             android:theme="@style/AppTheme"
             android:windowSoftInputMode="adjustResize|stateAlwaysHidden" />
         <activity
-            android:name=".ui.activity.settings.BackupSettingsActivity"
+            android:name="com.tari.android.wallet.ui.fragment.settings.backup.activity.BackupSettingsActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:parentActivityName=".ui.activity.home.HomeActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme"
             android:windowSoftInputMode="adjustResize|stateAlwaysHidden" />
         <activity
-            android:name=".ui.activity.settings.DeleteWalletActivity"
+            android:name="com.tari.android.wallet.ui.fragment.settings.deleteWallet.DeleteWalletActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
-            android:parentActivityName=".ui.activity.settings.DeleteWalletActivity"
+            android:parentActivityName="com.tari.android.wallet.ui.fragment.settings.deleteWallet.DeleteWalletActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme"
             android:windowSoftInputMode="adjustResize|stateAlwaysHidden" />

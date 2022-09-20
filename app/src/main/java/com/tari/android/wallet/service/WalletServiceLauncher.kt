@@ -16,9 +16,9 @@ class WalletServiceLauncher(
 
     companion object {
         // intent actions
-        internal const val startAction = "START_SERVICE"
-        internal const val stopAction = "STOP_SERVICE"
-        internal const val stopAndDeleteAction = "STOP_SERVICE_AND_DELETE_WALLET"
+        const val startAction = "START_SERVICE"
+        const val stopAction = "STOP_SERVICE"
+        const val stopAndDeleteAction = "STOP_SERVICE_AND_DELETE_WALLET"
     }
 
     fun startIfExist() {

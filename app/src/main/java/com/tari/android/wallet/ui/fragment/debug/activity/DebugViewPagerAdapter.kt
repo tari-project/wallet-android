@@ -30,22 +30,30 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.tari.android.wallet.ui.activity.settings
+package com.tari.android.wallet.ui.fragment.debug.activity
 
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentActivity
+import androidx.viewpager2.adapter.FragmentStateAdapter
+import com.tari.android.wallet.ui.fragment.debug.AboutFragment
+import com.tari.android.wallet.ui.fragment.debug.baseNodeConfig.BaseNodeConfigFragment
+import com.tari.android.wallet.ui.fragment.debug.debugLog.DebugLogFragment
 
-interface BackupSettingsRouter {
+/**
+ * Fragment pager adapter for debug activity.
+ *
+ * @author The Tari Development Team
+ */
+class DebugViewPagerAdapter(activity: FragmentActivity) : FragmentStateAdapter(activity) {
 
-    fun toWalletBackupWithRecoveryPhrase(sourceFragment: Fragment)
+    override fun getItemCount(): Int = 3
 
-    fun toSeedPhraseVerification(sourceFragment: Fragment, seedWords: List<String>)
-
-    fun toConfirmPassword(sourceFragment: Fragment)
-
-    fun toChangePassword(sourceFragment: Fragment)
-
-    fun onPasswordChanged(sourceFragment: Fragment)
-
-    fun onSeedPhraseVerificationComplete(sourceFragment: Fragment)
-
+    override fun createFragment(position: Int): Fragment {
+        return when (position) {
+            0 -> DebugLogFragment()
+            1 -> BaseNodeConfigFragment()
+            2 -> AboutFragment()
+            else -> throw RuntimeException("Unexpected page position: $position")
+        }
+    }
 }

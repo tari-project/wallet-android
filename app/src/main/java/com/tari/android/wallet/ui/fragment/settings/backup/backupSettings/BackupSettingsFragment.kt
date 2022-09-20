@@ -49,9 +49,9 @@ import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.extension.observe
 import com.tari.android.wallet.extension.observeOnLoad
 import com.tari.android.wallet.infrastructure.backup.BackupState.BackupUpToDate
-import com.tari.android.wallet.ui.activity.settings.BackupSettingsRouter
 import com.tari.android.wallet.ui.common.CommonFragment
 import com.tari.android.wallet.ui.extension.*
+import com.tari.android.wallet.ui.fragment.settings.backup.activity.BackupSettingsRouter
 import com.tari.android.wallet.ui.fragment.settings.backup.backupSettings.option.BackupOptionViewModel
 import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupOptions
 import com.tari.android.wallet.ui.fragment.settings.userAutorization.BiometricAuthenticationViewModel
@@ -59,7 +59,7 @@ import org.joda.time.DateTime
 import org.joda.time.format.DateTimeFormat
 import java.util.*
 
-internal class BackupSettingsFragment : CommonFragment<FragmentWalletBackupSettingsBinding, BackupSettingsViewModel>() {
+class BackupSettingsFragment : CommonFragment<FragmentWalletBackupSettingsBinding, BackupSettingsViewModel>() {
 
     private var optionsAnimation: Animator? = null
 

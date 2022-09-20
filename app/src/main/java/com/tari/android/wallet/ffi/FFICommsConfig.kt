@@ -32,7 +32,6 @@
  */
 package com.tari.android.wallet.ffi
 
-import com.orhanobut.logger.Logger
 import java.io.File
 
 /**
@@ -40,9 +39,7 @@ import java.io.File
  *
  * @author The Tari Development Team
  */
-internal class FFICommsConfig() : FFIBase() {
-
-    // region JNI
+class FFICommsConfig() : FFIBase() {
 
     private external fun jniCreate(
         publicAddress: String,
@@ -56,7 +53,6 @@ internal class FFICommsConfig() : FFIBase() {
 
     private external fun jniDestroy()
 
-    // endregion
 
     constructor(
         publicAddress: String,
@@ -65,7 +61,7 @@ internal class FFICommsConfig() : FFIBase() {
         datastorePath: String,
         discoveryTimeoutSec: Long,
         safMessageDurationSec: Long,
-    ): this() {
+    ) : this() {
         if (databaseName.isEmpty()) {
             throw FFIException(message = "databaseName may not be empty")
         }
@@ -91,13 +87,10 @@ internal class FFICommsConfig() : FFIBase() {
             } else {
                 messageBuilder.append("Permission problem.")
             }
-            Logger.e(messageBuilder.toString())
+            logger.e(Throwable(), messageBuilder.toString())
             throw FFIException(message = messageBuilder.toString())
         }
     }
 
-    override fun destroy() {
-        jniDestroy()
-    }
-
+    override fun destroy() = jniDestroy()
 }

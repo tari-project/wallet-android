@@ -50,11 +50,7 @@ import com.tari.android.wallet.ui.component.LetterSpacingSpan
  * @param url locator
  * @param applyToOnlyFirstOccurrence whether the span should be applied only to the first occurrence
  */
-internal fun SpannableString.applyURLStyle(
-    search: String,
-    url: String,
-    applyToOnlyFirstOccurrence: Boolean = false
-): SpannableString {
+fun SpannableString.applyURLStyle(search: String, url: String, applyToOnlyFirstOccurrence: Boolean = false): SpannableString {
     var index = this.indexOf(search)
     val span = URLSpan(url)
     while (index >= 0) {
@@ -76,7 +72,7 @@ internal fun SpannableString.applyURLStyle(
  * @param applyToOnlyFirstOccurrence whether customFont should be applied only to the first occurrence
  * @return spannable string
  */
-internal fun String.applyFontStyle(
+fun String.applyFontStyle(
     context: Context,
     defaultFont: CustomFont,
     search: List<String>,
@@ -93,12 +89,7 @@ internal fun String.applyFontStyle(
 /**
  * Similar to applyFontStyle above, but applied to color instead.
  */
-internal fun String.applyColorStyle(
-    defaultColor: Int,
-    search: List<String>,
-    styleColor: Int,
-    applyToOnlyFirstOccurrence: Boolean = false
-): SpannableString {
+fun String.applyColorStyle(defaultColor: Int, search: List<String>, styleColor: Int, applyToOnlyFirstOccurrence: Boolean = false): SpannableString {
     val spannableString = SpannableString(this)
     spannableString.setSpan(ForegroundColorSpan(defaultColor), 0, length, Spanned.SPAN_INTERMEDIATE)
     search.forEach { spannableString.applyColorStyle(it, styleColor, applyToOnlyFirstOccurrence) }
@@ -108,11 +99,7 @@ internal fun String.applyColorStyle(
 /**
  * Helper function to apply color style to a spannable string.
  */
-private fun SpannableString.applyColorStyle(
-    search: String,
-    color: Int,
-    applyToOnlyFirstOccurrence: Boolean = false
-) {
+private fun SpannableString.applyColorStyle(search: String, color: Int, applyToOnlyFirstOccurrence: Boolean = false) {
     var index = this.indexOf(search)
     while (index >= 0) {
         setSpan(ForegroundColorSpan(color), index, index + search.length, Spanned.SPAN_INTERMEDIATE)
@@ -126,11 +113,7 @@ private fun SpannableString.applyColorStyle(
 /**
  * Helper function to apply typeface style to a spannable string.
  */
-private fun SpannableString.applyTypefaceStyle(
-    search: String,
-    typeface: Typeface,
-    applyToOnlyFirstOccurrence: Boolean = false
-) {
+private fun SpannableString.applyTypefaceStyle(search: String, typeface: Typeface, applyToOnlyFirstOccurrence: Boolean = false) {
     var index = this.indexOf(search)
     while (index >= 0) {
         setSpan(CustomTypefaceSpan("", typeface), index, index + search.length, Spanned.SPAN_INTERMEDIATE)
@@ -144,11 +127,7 @@ private fun SpannableString.applyTypefaceStyle(
 /**
  * Helper function to apply relative text size style to a spannable string.
  */
-internal fun SpannableString.applyRelativeTextSizeStyle(
-    search: String,
-    relativeTextSize: Float,
-    applyToOnlyFirstOccurrence: Boolean = false
-) {
+fun SpannableString.applyRelativeTextSizeStyle(search: String, relativeTextSize: Float, applyToOnlyFirstOccurrence: Boolean = false) {
     var index = this.indexOf(search)
     while (index >= 0) {
         setSpan(RelativeSizeSpan(relativeTextSize), index, index + search.length, Spanned.SPAN_INTERMEDIATE)
@@ -162,11 +141,7 @@ internal fun SpannableString.applyRelativeTextSizeStyle(
 /**
  * Helper function to apply letter spacing to a spannable string.
  */
-internal fun SpannableString.applyLetterSpacingStyle(
-    search: String,
-    letterSpacing: Float,
-    applyToOnlyFirstOccurrence: Boolean = false
-) {
+fun SpannableString.applyLetterSpacingStyle(search: String, letterSpacing: Float, applyToOnlyFirstOccurrence: Boolean = false) {
     var index = this.indexOf(search)
     while (index >= 0) {
         setSpan(LetterSpacingSpan(letterSpacing), index, index + search.length, Spanned.SPAN_INTERMEDIATE)

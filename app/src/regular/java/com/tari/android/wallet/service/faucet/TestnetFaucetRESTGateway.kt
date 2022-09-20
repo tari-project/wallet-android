@@ -42,7 +42,7 @@ import retrofit2.http.Path
  *
  *  @author The Tari Development Team
  */
-internal interface TestnetFaucetRESTGateway {
+interface TestnetFaucetRESTGateway {
 
     @POST("/free_tari/allocate/{publicKeyHex}")
     fun requestTestnetTari(

@@ -30,9 +30,8 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.tari.android.wallet.ui.fragment.debug.adapter
+package com.tari.android.wallet.ui.fragment.debug.debugLog.adapter
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
@@ -44,34 +43,20 @@ import com.tari.android.wallet.R
 import com.tari.android.wallet.ui.extension.gone
 import java.io.File
 
-/**
- * Log file selector adapter - used in the debug log fragment.
- *
- * @author The Tari Development Team
- */
-internal class LogFileSpinnerAdapter(context: Context, files: List<File>) :
-    BaseAdapter(), SpinnerAdapter {
+class LogFileSpinnerAdapter(context: Context, files: List<File>) : BaseAdapter(), SpinnerAdapter {
 
     private val inflater: LayoutInflater = LayoutInflater.from(context)
     private val fileNames = files.map { it.name }
 
-    override fun getCount(): Int {
-        return fileNames.size
-    }
+    override fun getCount(): Int = fileNames.size
 
-    override fun getItem(position: Int): Any {
-        return fileNames[position]
-    }
+    override fun getItem(position: Int): Any = fileNames[position]
 
-    override fun getItemId(position: Int): Long {
-        return position.toLong()
-    }
+    override fun getItemId(position: Int): Long = position.toLong()
 
-    @SuppressLint("InflateParams")
     override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
-        val view: View = convertView ?: inflater.inflate(R.layout.item_log_file_spinner, null)
-        val textView = view.findViewById<TextView>(R.id.log_file_spinner_item_txt_file_name)
-        textView.text = fileNames[position]
+        val view = convertView ?: inflater.inflate(R.layout.item_log_file_spinner, null)
+        view.findViewById<TextView>(R.id.log_file_spinner_item_txt_file_name).text = fileNames[position]
         view.findViewById<View>(R.id.log_file_spinner_item_vw_gray_bg).gone()
         return view
     }
@@ -85,5 +70,4 @@ internal class LogFileSpinnerAdapter(context: Context, files: List<File>) :
         }
         return view
     }
-
 }

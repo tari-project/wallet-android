@@ -2,7 +2,7 @@ package com.tari.android.wallet.ui.fragment.tx.details.gif
 
 import com.tari.android.wallet.ui.common.gyphy.repository.GIFItem
 
-internal data class GIFState(val gifItem: GIFItem?, val error: Exception?) {
+data class GIFState(val gifItem: GIFItem?, val error: Exception?) {
 
     init {
         require(gifItem == null || error == null) { "Both gif and error can't be nonnull" }

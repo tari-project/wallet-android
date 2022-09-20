@@ -3,7 +3,6 @@ package com.tari.android.wallet.ui.fragment.restore.chooseRestoreOption
 import android.content.Intent
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.viewModelScope
-import com.orhanobut.logger.Logger
 import com.tari.android.wallet.R
 import com.tari.android.wallet.application.WalletManager
 import com.tari.android.wallet.application.WalletState
@@ -22,7 +21,7 @@ import kotlinx.coroutines.launch
 import java.io.IOException
 import javax.inject.Inject
 
-internal class ChooseRestoreOptionViewModel : CommonViewModel() {
+class ChooseRestoreOptionViewModel : CommonViewModel() {
 
     @Inject
     lateinit var backupManager: BackupManager
@@ -57,7 +56,7 @@ internal class ChooseRestoreOptionViewModel : CommonViewModel() {
                     restoreFromBackup()
                 }
             } catch (exception: Exception) {
-                Logger.e("Backup storage setup failed: $exception")
+                logger.e(exception, "Backup storage setup failed")
                 backupManager.signOut()
                 _state.postValue(ChooseRestoreOptionState.EndProgress(backupManager.currentOption!!))
                 showAuthFailedDialog()
@@ -91,12 +90,12 @@ internal class ChooseRestoreOptionViewModel : CommonViewModel() {
     private suspend fun handleException(exception: java.lang.Exception) {
         when (exception) {
             is BackupStorageAuthRevokedException -> {
-                Logger.e(exception, "Auth revoked.")
+                logger.e(exception, "Auth revoked")
                 backupManager.signOut()
                 showAuthFailedDialog()
             }
             is BackupStorageTamperedException -> { // backup file not found
-                Logger.e(exception, "Backup file not found.")
+                logger.e(exception, "Backup file not found")
                 backupManager.signOut()
                 showBackupFileNotFoundDialog()
             }
@@ -104,7 +103,7 @@ internal class ChooseRestoreOptionViewModel : CommonViewModel() {
                 _navigation.postValue(ChooseRestoreOptionNavigation.ToEnterRestorePassword)
             }
             is WalletStartFailedException -> {
-                Logger.e(exception, "Restore failed: wallet start failed")
+                logger.e(exception, "Restore failed: wallet start failed")
                 viewModelScope.launch(Dispatchers.Main) {
                     walletServiceLauncher.stopAndDelete()
                 }
@@ -118,12 +117,12 @@ internal class ChooseRestoreOptionViewModel : CommonViewModel() {
                 }
             }
             is IOException -> {
-                Logger.e(exception, "Restore failed: network connection.")
+                logger.e(exception, "Restore failed: network connection")
                 backupManager.signOut()
                 showRestoreFailedDialog(resourceManager.getString(R.string.error_no_connection_title))
             }
             else -> {
-                Logger.e(exception, "Restore failed: $exception")
+                logger.e(exception, "Restore failed")
                 backupManager.signOut()
                 showRestoreFailedDialog(exception.message)
             }

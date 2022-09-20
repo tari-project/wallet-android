@@ -71,6 +71,8 @@ class WalletManager(
 ) {
 
     private var logFileObserver: LogFileObserver? = null
+    private val logger
+        get() = Logger.t(WalletManager::class.simpleName)
 
     init {
         // post initial wallet state
@@ -104,19 +106,21 @@ class WalletManager(
 
     @SuppressLint("CheckResult")
     private fun onTorProxyStateChanged(torProxyState: TorProxyState) {
-        Logger.d("Tor proxy state has changed: $torProxyState.")
+        logger.i("Tor proxy state has changed: $torProxyState")
         if (torProxyState is TorProxyState.Running) {
             if (EventBus.walletState.publishSubject.value == WalletState.NotReady ||
                 EventBus.walletState.publishSubject.value is WalletState.Failed
             ) {
-                Logger.d("Initialize wallet.")
+                logger.i("Initialize wallet started")
                 EventBus.walletState.post(WalletState.Initializing)
                 Thread {
                     try {
                         initWallet()
                         EventBus.walletState.post(WalletState.Started)
+                        logger.i("Wallet was started")
                     } catch (e: Exception) {
                         EventBus.walletState.post(WalletState.Failed(e))
+                        logger.e(e, "Wallet was failed")
                     }
                 }.start()
             }
@@ -131,10 +135,7 @@ class WalletManager(
         val cookieString: ByteArray = cookieFile.readBytes()
         val torCookie = FFIByteVector(cookieString)
         return FFITariTransportConfig(
-            NetAddressString(
-                torConfig.controlHost,
-                torConfig.controlPort
-            ),
+            NetAddressString(torConfig.controlHost, torConfig.controlPort),
             torCookie,
             torConfig.connectionPort,
             torConfig.sock5Username,
@@ -147,10 +148,7 @@ class WalletManager(
      */
     private fun getCommsConfig(walletConfig: WalletConfig): FFICommsConfig {
         return FFICommsConfig(
-            NetAddressString(
-                "127.0.0.1",
-                39069
-            ).toString(),
+            NetAddressString("127.0.0.1", 39069).toString(),
             getTorTransport(),
             walletConfig.walletDBName,
             walletConfig.getWalletFilesDirPath(),

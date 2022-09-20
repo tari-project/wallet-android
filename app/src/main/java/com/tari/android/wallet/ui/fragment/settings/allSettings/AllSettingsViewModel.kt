@@ -3,17 +3,16 @@ package com.tari.android.wallet.ui.fragment.settings.allSettings
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import com.orhanobut.logger.Logger
 import com.tari.android.wallet.R.color.*
 import com.tari.android.wallet.R.drawable.*
 import com.tari.android.wallet.R.string.*
 import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepository
 import com.tari.android.wallet.event.EventBus
-import com.tari.android.wallet.infrastructure.BugReportingService
 import com.tari.android.wallet.infrastructure.backup.BackupManager
 import com.tari.android.wallet.infrastructure.backup.BackupState
 import com.tari.android.wallet.infrastructure.backup.BackupStorageAuthRevokedException
 import com.tari.android.wallet.infrastructure.backup.BackupsState
+import com.tari.android.wallet.infrastructure.logging.BugReportingService
 import com.tari.android.wallet.ui.common.ClipboardArgs
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.common.SingleLiveEvent
@@ -36,7 +35,7 @@ import java.io.IOException
 import java.util.*
 import javax.inject.Inject
 
-internal class AllSettingsViewModel : CommonViewModel() {
+class AllSettingsViewModel : CommonViewModel() {
 
     lateinit var authenticationViewModel: BiometricAuthenticationViewModel
 
@@ -152,14 +151,14 @@ internal class AllSettingsViewModel : CommonViewModel() {
         try {
             backupManager.checkStorageStatus()
         } catch (e: BackupStorageAuthRevokedException) {
-            Logger.e("Backup storage auth error.")
+            logger.e(e, "Backup storage auth error")
             // show access revoked information
             showBackupStorageCheckFailedDialog(resourceManager.getString(check_backup_storage_status_auth_revoked_error_description))
         } catch (e: IOException) {
-            Logger.e("Backup storage I/O (access) error.")
+            logger.e(e, "Backup storage I/O (access) error")
             showBackupStorageCheckFailedDialog(resourceManager.getString(check_backup_storage_status_access_error_description))
         } catch (e: Exception) {
-            Logger.e("Backup storage tampered.")
+            logger.e(e, "Backup storage tampered")
             updateLastSuccessfulBackupDate()
         }
     }

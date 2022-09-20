@@ -2,12 +2,13 @@ package com.tari.android.wallet.ui.common
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
+import com.orhanobut.logger.Logger
+import com.orhanobut.logger.Printer
 import com.tari.android.wallet.application.WalletState
 import com.tari.android.wallet.di.ApplicationComponent
 import com.tari.android.wallet.di.DiContainer
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.extension.addTo
-import com.tari.android.wallet.infrastructure.Tracker
 import com.tari.android.wallet.ui.common.domain.ResourceManager
 import com.tari.android.wallet.ui.dialog.error.WalletErrorArgs
 import com.tari.android.wallet.ui.dialog.inProgress.ProgressDialogArgs
@@ -19,19 +20,21 @@ open class CommonViewModel : ViewModel() {
 
     var compositeDisposable: CompositeDisposable = CompositeDisposable()
 
-    internal val component: ApplicationComponent
+    val component: ApplicationComponent
         get() = DiContainer.appComponent
 
 
     @Inject
     lateinit var resourceManager: ResourceManager
 
-    @Inject
-    lateinit var tracker: Tracker
+    val logger: Printer
+        get() = Logger.t("screen").t(this::class.simpleName)
 
     init {
         @Suppress("LeakingThis")
         component.inject(this)
+
+        logger.i(this::class.simpleName + "was started")
 
         EventBus.walletState.publishSubject.filter { it is WalletState.Failed }
             .subscribe {
