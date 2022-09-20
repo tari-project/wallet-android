@@ -55,7 +55,7 @@ import com.tari.android.wallet.infrastructure.security.biometric.BiometricAuthen
 import com.tari.android.wallet.notification.NotificationHelper
 import com.tari.android.wallet.service.WalletServiceLauncher
 import com.tari.android.wallet.ui.common.domain.ResourceManager
-import com.tari.android.wallet.ui.common.gyphy.GiphyEcosystem
+import com.tari.android.wallet.ui.common.gyphy.GiphyAdapter
 import com.tari.android.wallet.ui.fragment.settings.backup.BackupSettingsRepository
 import com.tari.android.wallet.yat.YatSharedRepository
 import dagger.Module
@@ -172,11 +172,11 @@ class ApplicationModule(private val app: TariWalletApplication) {
 
     @Provides
     @Singleton
-    fun provideGiphyEcosystem(context: Context): GiphyEcosystem = GiphyEcosystem(context, BuildConfig.GIPHY_KEY)
+    fun provideLoggerAdapter(walletConfig: WalletConfig): LoggerAdapter = LoggerAdapter(walletConfig)
 
     @Provides
     @Singleton
-    fun provideLoggerAdapter(walletConfig: WalletConfig): LoggerAdapter = LoggerAdapter(walletConfig)
+    fun provideGiphyAdapter(context: Context): GiphyAdapter = GiphyAdapter(context, BuildConfig.GIPHY_KEY)
 
     companion object {
         const val sharedPrefsFileName = "tari_wallet_shared_prefs"
