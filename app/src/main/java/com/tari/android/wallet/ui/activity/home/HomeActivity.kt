@@ -67,11 +67,8 @@ import com.tari.android.wallet.service.WalletServiceLauncher
 import com.tari.android.wallet.service.connection.TariWalletServiceConnection
 import com.tari.android.wallet.service.connection.TariWalletServiceConnection.ServiceConnectionStatus.CONNECTED
 import com.tari.android.wallet.ui.activity.SplashActivity
-import com.tari.android.wallet.ui.fragment.settings.backup.activity.BackupSettingsActivity
-import com.tari.android.wallet.ui.fragment.settings.deleteWallet.DeleteWalletActivity
 import com.tari.android.wallet.ui.common.CommonActivity
 import com.tari.android.wallet.ui.common.domain.ResourceManager
-import com.tari.android.wallet.ui.common.gyphy.GiphyEcosystem
 import com.tari.android.wallet.ui.component.CustomFont
 import com.tari.android.wallet.ui.dialog.modular.DialogArgs
 import com.tari.android.wallet.ui.dialog.modular.ModularDialog
@@ -93,6 +90,8 @@ import com.tari.android.wallet.ui.fragment.settings.allSettings.AllSettingsFragm
 import com.tari.android.wallet.ui.fragment.settings.allSettings.AllSettingsRouter
 import com.tari.android.wallet.ui.fragment.settings.allSettings.about.TariAboutFragment
 import com.tari.android.wallet.ui.fragment.settings.backgroundService.BackgroundServiceSettingsActivity
+import com.tari.android.wallet.ui.fragment.settings.backup.activity.BackupSettingsActivity
+import com.tari.android.wallet.ui.fragment.settings.deleteWallet.DeleteWalletActivity
 import com.tari.android.wallet.ui.fragment.settings.networkSelection.NetworkSelectionFragment
 import com.tari.android.wallet.ui.fragment.settings.torBridges.TorBridgesSelectionFragment
 import com.tari.android.wallet.ui.fragment.settings.torBridges.customBridges.CustomTorBridgesFragment
@@ -127,9 +126,6 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>(), AllSe
     @Inject
     lateinit var resourceManager: ResourceManager
 
-    @Inject
-    lateinit var giphy: GiphyEcosystem
-
     private val deeplinkViewModel: DeeplinkViewModel by viewModels()
 
     private lateinit var serviceConnection: TariWalletServiceConnection
@@ -155,7 +151,6 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>(), AllSe
         serviceConnection = ViewModelProvider(this)[TariWalletServiceConnection::class.java]
         ui = ActivityHomeBinding.inflate(layoutInflater).also { setContentView(it.root) }
         if (savedInstanceState == null) {
-            giphy.enable()
             enableNavigationView(ui.homeImageView)
             serviceConnection.connection.subscribe {
                 if (it.status == CONNECTED) {

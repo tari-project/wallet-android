@@ -46,6 +46,7 @@ import com.tari.android.wallet.infrastructure.logging.LoggerAdapter
 import com.tari.android.wallet.network.NetworkConnectionStateReceiver
 import com.tari.android.wallet.notification.NotificationHelper
 import com.tari.android.wallet.service.WalletServiceLauncher
+import com.tari.android.wallet.ui.common.gyphy.GiphyAdapter
 import com.tari.android.wallet.yat.YatAdapter
 import java.lang.ref.WeakReference
 import javax.inject.Inject
@@ -74,6 +75,9 @@ class TariWalletApplication : Application() {
 
     @Inject
     lateinit var yatAdapter: YatAdapter
+
+    @Inject
+    lateinit var giphyAdapter: GiphyAdapter
 
     private val activityLifecycleCallbacks = ActivityLifecycleCallbacks()
     private val logger
@@ -113,6 +117,8 @@ class TariWalletApplication : Application() {
         registerReceiver(connectionStateReceiver, connectionStateReceiver.intentFilter)
 
         yatAdapter.initYat(this)
+
+        giphyAdapter.init()
 
         loggerAdapter.init()
     }

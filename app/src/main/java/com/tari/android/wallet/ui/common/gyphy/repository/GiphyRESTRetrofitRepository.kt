@@ -17,10 +17,7 @@ class GiphyRESTRetrofitRepository(private val gateway: GiphyRESTGateway) : GIFRe
         val response: Response<SearchGIFsResponse> = gateway.searchGIFs(query, limit).execute()
         val body = response.body()
         return if (response.isSuccessful && body != null && body.meta.status in 200..299)
-            body.data.map {
-                // TODO GIF OPTIMIZATION: change it.images.*variant* here to check other variants
-                GIFItem(it.id, Uri.parse(it.embedUrl), Uri.parse(it.images.fixedWidth.url))
-            }
+            body.data.map { GIFItem(it.id, Uri.parse(it.embedUrl), Uri.parse(it.images.fixedWidth.url)) }
         else {
             val exception = GIFSearchException(body?.meta?.message ?: response.message() ?: response.errorBody()?.string())
             logger.e(exception, "Get all was failed")
@@ -32,7 +29,6 @@ class GiphyRESTRetrofitRepository(private val gateway: GiphyRESTGateway) : GIFRe
         val response: Response<SearchGIFResponse> = gateway.getGIFByID(id).execute()
         val body = response.body()
         return if (response.isSuccessful && body != null && body.meta.status in 200..299)
-        // TODO GIF OPTIMIZATION: change it.images.*variant* here to check other variants
             body.data.let { GIFItem(it.id, Uri.parse(it.embedUrl), Uri.parse(it.images.fixedWidth.url)) }
         else {
             val exception = GIFSearchException(body?.meta?.message ?: response.message() ?: response.errorBody()?.string())
