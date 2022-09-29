@@ -42,57 +42,23 @@ import java.math.BigInteger
  */
 class FFIBalance() : FFIBase() {
 
-    // region JNI
-
-    private external fun jniGetAvailable(
-        libError: FFIError
-    ): ByteArray
-    private external fun jniGetIncoming(
-        libError: FFIError
-    ): ByteArray
-    private external fun jniGetOutgoing(
-        libError: FFIError
-    ): ByteArray
-    private external fun jniGetTimeLocked(
-        libError: FFIError
-    ): ByteArray
+    private external fun jniGetAvailable(libError: FFIError): ByteArray
+    private external fun jniGetIncoming(libError: FFIError): ByteArray
+    private external fun jniGetOutgoing(libError: FFIError): ByteArray
+    private external fun jniGetTimeLocked(libError: FFIError): ByteArray
     private external fun jniDestroy()
 
-    // endregion
-    constructor(pointer: FFIPointer): this() {
+    constructor(pointer: FFIPointer) : this() {
         this.pointer = pointer
     }
 
-    fun getAvailable(): MicroTari {
-        val error = FFIError()
-        val bytes = jniGetAvailable(error)
-        throwIf(error)
-        return MicroTari(BigInteger(1, bytes))
-    }
+    fun getAvailable(): MicroTari = runWithError { MicroTari(BigInteger(1, jniGetAvailable(it))) }
 
-    fun getIncoming(): MicroTari {
-        val error = FFIError()
-        val bytes = jniGetIncoming(error)
-        throwIf(error)
-        return MicroTari(BigInteger(1, bytes))
-    }
+    fun getIncoming(): MicroTari = runWithError { MicroTari(BigInteger(1, jniGetIncoming(it))) }
 
-    fun getOutgoing(): MicroTari {
-        val error = FFIError()
-        val bytes = jniGetOutgoing(error)
-        throwIf(error)
-        return MicroTari(BigInteger(1, bytes))
-    }
+    fun getOutgoing(): MicroTari = runWithError { MicroTari(BigInteger(1, jniGetOutgoing(it))) }
 
-    fun getTimeLocked(): MicroTari {
-        val error = FFIError()
-        val bytes = jniGetTimeLocked(error)
-        throwIf(error)
-        return MicroTari(BigInteger(1, bytes))
-    }
+    fun getTimeLocked(): MicroTari = runWithError { MicroTari(BigInteger(1, jniGetTimeLocked(it))) }
 
-    override fun destroy() {
-        jniDestroy()
-    }
-
+    override fun destroy() = jniDestroy()
 }

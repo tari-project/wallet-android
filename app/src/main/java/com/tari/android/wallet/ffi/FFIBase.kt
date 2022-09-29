@@ -60,5 +60,4 @@ abstract class FFIBase {
             destroy()
         }
     }
-
 }

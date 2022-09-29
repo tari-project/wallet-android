@@ -39,65 +39,31 @@ package com.tari.android.wallet.ffi
  */
 class FFIPrivateKey private constructor() : FFIBase() {
 
-    // region JNI
-
-    private external fun jniGetBytes(
-        libError: FFIError
-    ): FFIPointer
-
+    private external fun jniGetBytes(libError: FFIError): FFIPointer
     private external fun jniDestroy()
-    private external fun jniCreate(
-        byteVectorPtr: FFIByteVector,
-        libError: FFIError
-    )
-
+    private external fun jniCreate(byteVectorPtr: FFIByteVector, libError: FFIError)
     private external fun jniGenerate()
     private external fun jniFromHex(hexStr: String, libError: FFIError)
 
-    // endregion
-
-    companion object {
-
-        fun generate(): FFIPrivateKey {
-            return FFIPrivateKey().apply {
-                jniGenerate()
-            }
-        }
-
-    }
-
     constructor(byteVector: FFIByteVector) : this() {
-        val error = FFIError()
-        jniCreate(byteVector, error)
-        throwIf(error)
+        runWithError { jniCreate(byteVector, it) }
     }
 
     constructor(hexString: HexString) : this() {
         if (hexString.toString().length == 64) {
-            val error = FFIError()
-            jniFromHex(hexString.hex, error)
-            throwIf(error)
+            runWithError { jniFromHex(hexString.hex, it) }
         } else {
             throw FFIException(message = "HexString is not a valid PrivateKey")
         }
     }
 
-    fun getBytes(): FFIByteVector {
-        val error = FFIError()
-        val result = FFIByteVector(jniGetBytes(error))
-        throwIf(error)
-        return result
-    }
+    fun getBytes(): FFIByteVector = runWithError { FFIByteVector(jniGetBytes(it)) }
 
-    override fun toString(): String {
-        val error = FFIError()
-        val result = FFIByteVector(jniGetBytes(error)).toString()
-        throwIf(error)
-        return result
-    }
+    override fun toString(): String = runWithError { FFIByteVector(jniGetBytes(it)).toString() }
 
-    override fun destroy() {
-        jniDestroy()
-    }
+    override fun destroy() = jniDestroy()
 
+    companion object {
+        fun generate(): FFIPrivateKey = FFIPrivateKey().apply { jniGenerate() }
+    }
 }

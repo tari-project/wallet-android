@@ -41,31 +41,22 @@ class HexString constructor(bytes: FFIByteVector) {
 
     private val pattern = "\\p{XDigit}+".toRegex()
 
-    var hex: String = String()
+    var hex = String()
 
     init {
         if (bytes.pointer != nullptr) {
-            val byteArray = ByteArray(bytes.getLength())
             if (bytes.getLength() > 0) {
-                for (i in 0 until bytes.getLength()) {
-                    val m = bytes.getAt(i)
-                    byteArray[i] = m.toByte()
+                val byteArray = ByteArray(bytes.getLength())
+                for (i in byteArray.indices) {
+                    byteArray[i] = bytes.getAt(i).toByte()
                 }
                 hex = String.format("%064X", BigInteger(1, byteArray))
-            } else {
-                hex = String()
             }
-        } else {
-            hex = String()
         }
     }
 
     constructor(string: String) : this(FFIByteVector(nullptr)) {
-        if (pattern.matches(string)) {
-            hex = string
-        } else {
-            throw FFIException(message = "$string is not valid Hex.")
-        }
+        if (pattern.matches(string)) hex = string else throw FFIException(message = "$string is not valid Hex.")
     }
 
     override fun toString(): String = hex
