@@ -6,7 +6,7 @@ import com.tari.android.wallet.extension.addTo
 import com.tari.android.wallet.ui.common.gyphy.presentation.GIFState.*
 import com.tari.android.wallet.ui.common.gyphy.repository.GIFItem
 import com.tari.android.wallet.ui.common.gyphy.repository.GIFRepository
-import com.tari.android.wallet.ui.presentation.TxNote
+import com.tari.android.wallet.model.TxNote
 import io.reactivex.Observable
 import io.reactivex.ObservableEmitter
 import io.reactivex.android.schedulers.AndroidSchedulers

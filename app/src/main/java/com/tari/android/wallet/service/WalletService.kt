@@ -70,7 +70,7 @@ import com.tari.android.wallet.service.baseNode.BaseNodeSyncState
 import com.tari.android.wallet.service.faucet.TestnetFaucetService
 import com.tari.android.wallet.service.faucet.TestnetTariRequestException
 import com.tari.android.wallet.service.notification.NotificationService
-import com.tari.android.wallet.ui.activity.home.HomeActivity
+import com.tari.android.wallet.ui.fragment.home.HomeActivity
 import com.tari.android.wallet.ui.extension.string
 import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.WalletUtil

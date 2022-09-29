@@ -74,8 +74,6 @@ import com.tari.android.wallet.ui.fragment.tx.questionMark.QuestionMarkViewModel
 import com.tari.android.wallet.ui.fragment.tx.ui.CustomScrollView
 import com.tari.android.wallet.ui.fragment.tx.ui.balanceController.BalanceViewController
 import com.tari.android.wallet.ui.fragment.tx.ui.progressController.UpdateProgressViewController
-import com.tari.android.wallet.ui.resource.AnimationResource
-import com.tari.android.wallet.ui.resource.ResourceContainer
 import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.WalletUtil
 import kotlinx.coroutines.Dispatchers
@@ -100,7 +98,6 @@ class TxListFragment : CommonFragment<FragmentTxListBinding, TxListViewModel>(),
     private var recyclerViewAdapter: TxListAdapter = TxListAdapter()
     private lateinit var balanceViewController: BalanceViewController
     private lateinit var updateProgressViewController: UpdateProgressViewController
-    private val container = ResourceContainer()
     private var isOnboarding = false
     private var isInDraggingSession = false
 
@@ -147,7 +144,6 @@ class TxListFragment : CommonFragment<FragmentTxListBinding, TxListViewModel>(),
         if (::updateProgressViewController.isInitialized) {
             updateProgressViewController.destroy()
         }
-        container.dispose()
         super.onDestroyView()
     }
 
@@ -486,8 +482,7 @@ class TxListFragment : CommonFragment<FragmentTxListBinding, TxListViewModel>(),
                 ui.networkStatusStateIndicatorView.alpha = 1F
                 ui.balanceGemImageView.alpha = 1F
             }
-        }.also { AnimationResource(it).attachAndCutoffOnFinish(container) }
-            .start()
+        }.start()
     }
 
     /**

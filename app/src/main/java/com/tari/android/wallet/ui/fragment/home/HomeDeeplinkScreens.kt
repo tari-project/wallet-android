@@ -1,4 +1,4 @@
-package com.tari.android.wallet.ui.activity.home
+package com.tari.android.wallet.ui.fragment.home
 
 enum class HomeDeeplinkScreens {
     TxDetails;

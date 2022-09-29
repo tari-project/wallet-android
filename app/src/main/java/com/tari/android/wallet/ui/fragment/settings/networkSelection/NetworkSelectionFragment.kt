@@ -41,7 +41,7 @@ import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.tari.android.wallet.databinding.FragmentNetworkSelectionBinding
 import com.tari.android.wallet.extension.observe
-import com.tari.android.wallet.ui.activity.SplashActivity
+import com.tari.android.wallet.ui.fragment.splash.SplashActivity
 import com.tari.android.wallet.ui.common.CommonFragment
 import com.tari.android.wallet.ui.common.recyclerView.CommonAdapter
 import com.tari.android.wallet.ui.extension.setOnThrottledClickListener

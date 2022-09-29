@@ -30,10 +30,48 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.tari.android.wallet.ui.resource
+package com.tari.android.wallet.model
 
-interface Resource {
+class TxNote(val message: String?, val gifUrl: String?) {
 
-    fun dispose()
+    init {
+        if (message == null && gifUrl == null) {
+            throw IllegalStateException("Both message and gifUrl can't ge null at the same time")
+        }
+    }
+
+    val gifId: String?
+        get() = gifUrl?.split(Regex("/"))?.last()
+
+    fun compose(): String = "${message ?: ""}${gifUrl?.run { " $this" } ?: ""}"
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+        other as TxNote
+        if (message != other.message) return false
+        if (gifUrl != other.gifUrl) return false
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = message?.hashCode() ?: 0
+        result = 31 * result + (gifUrl?.hashCode() ?: 0)
+        return result
+    }
+
+    override fun toString(): String = "TransactionNote(message=$message, gifUrl=$gifUrl)"
+
+    companion object {
+        fun fromNote(note: String, assetsDomain: String = "giphy.com", protocol: String = "https://"): TxNote {
+            val lines = note.split(Regex(" "))
+            return if (Regex("$protocol$assetsDomain.*").matches(lines.last())) TxNote(
+                message = lines.take(lines.size - 1).filter(String::isNotEmpty)
+                    .joinToString(separator = " ")
+                    .let { it.ifEmpty { null } },
+                gifUrl = lines.last()
+            ) else TxNote(note, null)
+        }
+    }
 
 }
