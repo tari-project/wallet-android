@@ -38,13 +38,10 @@ import java.io.Serializable
 class FFICovenant(bytes: FFIByteVector) : FFIBase(), Serializable {
 
     private external fun jniCreateFromBytes(bytes: FFIByteVector, libError: FFIError)
-
     private external fun jniDestroy()
 
     init {
-        val error = FFIError()
-        jniCreateFromBytes(bytes, error)
-        throwIf(error)
+        runWithError { jniCreateFromBytes(bytes, it) }
     }
 
     override fun destroy() = jniDestroy()

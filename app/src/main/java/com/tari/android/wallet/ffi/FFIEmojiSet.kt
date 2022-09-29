@@ -39,35 +39,18 @@ package com.tari.android.wallet.ffi
  */
 class FFIEmojiSet : FFIBase() {
 
-    // region JNI
-
     private external fun jniDestroy()
     private external fun jniCreate()
     private external fun jniGetLength(libError: FFIError): Int
     private external fun jniGetAt(index: Int, libError: FFIError): FFIPointer
 
-    // endregion
-
     init {
         jniCreate()
     }
 
-    fun getLength(): Int {
-        val error = FFIError()
-        val result = jniGetLength(error)
-        throwIf(error)
-        return result
-    }
+    fun getLength(): Int = runWithError { jniGetLength(it) }
 
-    fun getAt(index: Int): FFIByteVector {
-        val error = FFIError()
-        val result = FFIByteVector(jniGetAt(index, error))
-        throwIf(error)
-        return result
-    }
+    fun getAt(index: Int): FFIByteVector = runWithError { FFIByteVector(jniGetAt(index, it)) }
 
-    override fun destroy() {
-        jniDestroy()
-    }
-
+    override fun destroy() = jniDestroy()
 }

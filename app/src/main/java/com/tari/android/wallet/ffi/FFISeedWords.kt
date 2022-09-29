@@ -41,7 +41,6 @@ import com.tari.android.wallet.model.seedPhrase.SeedWordsWordPushResult
  */
 class FFISeedWords() : FFIBase() {
 
-    // region JNI
     private external fun jniCreate()
     private external fun jniPushWord(word: String, libError: FFIError): Int
     private external fun jniGetLength(libError: FFIError): Int
@@ -49,8 +48,6 @@ class FFISeedWords() : FFIBase() {
     private external fun jniDestroy()
 
     external fun jniGetMnemonicWordListForLanguage(language: String)
-
-    // endregion
 
     init {
         jniCreate()
@@ -60,33 +57,16 @@ class FFISeedWords() : FFIBase() {
         this.pointer = pointer
     }
 
-    fun getLength(): Int {
-        val error = FFIError()
-        val result = jniGetLength(error)
-        throwIf(error)
-        return result
-    }
+    fun getLength(): Int = runWithError { jniGetLength(it) }
 
-    fun getAt(index: Int): String {
-        val error = FFIError()
-        val result = jniGetAt(index, error)
-        throwIf(error)
-        return result
-    }
+    fun getAt(index: Int): String = runWithError { jniGetAt(index, it) }
 
-    fun pushWord(word: String) : SeedWordsWordPushResult {
-        val error = FFIError()
-        val result = jniPushWord(word, error)
-        throwIf(error)
-        return SeedWordsWordPushResult.fromInt(result)
-    }
+    fun pushWord(word: String): SeedWordsWordPushResult = runWithError { SeedWordsWordPushResult.fromInt(jniPushWord(word, it)) }
 
-    override fun destroy() {
-        jniDestroy()
-    }
+    override fun destroy() = jniDestroy()
 
     companion object {
-        fun getMnemomicWordList(language: Language) : FFISeedWords = FFISeedWords().apply {
+        fun getMnemomicWordList(language: Language): FFISeedWords = FFISeedWords().apply {
             jniGetMnemonicWordListForLanguage(language.name)
         }
     }

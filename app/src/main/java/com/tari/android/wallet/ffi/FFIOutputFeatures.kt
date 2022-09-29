@@ -37,21 +37,13 @@ package com.tari.android.wallet.ffi
  *
  * @author The Tari Development Team
  */
-class FFIOutputFeatures : FFIBase {
+class FFIOutputFeatures() : FFIBase() {
 
-    private external fun jniCreate(
-        version: Char,
-        maturity: Long,
-        metadata: FFIByteVector,
-        libError: FFIError
-    )
-
+    private external fun jniCreate(version: Char, maturity: Long, metadata: FFIByteVector, libError: FFIError)
     private external fun jniDestroy()
 
-    constructor(version: Char, maturity: Long, metadata: FFIByteVector) : super() {
-        val error = FFIError()
-        jniCreate(version, maturity, metadata, error)
-        throwIf(error)
+    constructor(version: Char, maturity: Long, metadata: FFIByteVector) : this() {
+        runWithError { jniCreate(version, maturity, metadata, it) }
     }
 
     override fun destroy() = jniDestroy()
