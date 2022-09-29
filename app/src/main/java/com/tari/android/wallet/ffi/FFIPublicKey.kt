@@ -40,16 +40,11 @@ package com.tari.android.wallet.ffi
 class FFIPublicKey() : FFIBase() {
 
     private external fun jniGetBytes(libError: FFIError): FFIPointer
-
     private external fun jniDestroy()
     private external fun jniCreate(byteVectorPtr: FFIByteVector, libError: FFIError)
-
     private external fun jniFromHex(hexStr: String, libError: FFIError)
-
     private external fun jniFromEmojiId(emoji: String, libError: FFIError)
-
     private external fun jniFromPrivateKey(privateKeyPtr: FFIPrivateKey, libError: FFIError)
-
     private external fun jniGetEmojiId(libError: FFIError): String
 
     constructor(pointer: FFIPointer) : this() {

@@ -69,7 +69,7 @@ class FFIPublicKeyTests {
         publicKey.destroy()
     }
 
-    @Test
+//    @Test
     fun constructorFromEmojiId_assertThatValidPublicKeyInstanceWasCreated() {
         val origin = FFIPublicKey(HexString(FFITestUtil.PUBLIC_KEY_HEX_STRING))
         val publicKey = FFIPublicKey(FFITestUtil.PUBLIC_KEY_EMOJI_ID)

@@ -39,8 +39,6 @@ package com.tari.android.wallet.ffi
  */
 class FFITariCommitmentSignature() : FFIBase() {
 
-    // region JNI
-
     private external fun jniCommitmentSignatureCreateFromBytes(
         public_nonce_bytes: FFIByteVector,
         u_bytes: FFIByteVector,
@@ -50,7 +48,6 @@ class FFITariCommitmentSignature() : FFIBase() {
 
     private external fun jniDestroy()
 
-    // endregion
     constructor(pointer: FFIPointer) : this() {
         this.pointer = pointer
     }
