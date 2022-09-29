@@ -48,9 +48,7 @@ import com.tari.android.wallet.R
 import com.tari.android.wallet.model.CancelledTx
 import com.tari.android.wallet.model.Tx
 import com.tari.android.wallet.model.TxId
-import com.tari.android.wallet.ui.activity.home.HomeDeeplinkScreens
-import com.tari.android.wallet.ui.notification.CustomTxNotificationViewHolder
-import com.tari.android.wallet.ui.notification.TxCanceledViewHolder
+import com.tari.android.wallet.ui.fragment.home.HomeDeeplinkScreens
 import com.tari.android.wallet.util.WalletUtil
 
 /**

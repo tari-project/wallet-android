@@ -30,7 +30,7 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.tari.android.wallet.ui.activity.home
+package com.tari.android.wallet.ui.fragment.home
 
 import android.content.Intent
 import android.os.Bundle
@@ -66,7 +66,7 @@ import com.tari.android.wallet.service.TariWalletService
 import com.tari.android.wallet.service.WalletServiceLauncher
 import com.tari.android.wallet.service.connection.TariWalletServiceConnection
 import com.tari.android.wallet.service.connection.TariWalletServiceConnection.ServiceConnectionStatus.CONNECTED
-import com.tari.android.wallet.ui.activity.SplashActivity
+import com.tari.android.wallet.ui.fragment.splash.SplashActivity
 import com.tari.android.wallet.ui.common.CommonActivity
 import com.tari.android.wallet.ui.common.domain.ResourceManager
 import com.tari.android.wallet.ui.component.CustomFont

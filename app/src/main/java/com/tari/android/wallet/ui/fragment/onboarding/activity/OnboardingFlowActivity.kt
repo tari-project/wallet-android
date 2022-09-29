@@ -43,7 +43,7 @@ import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import com.tari.android.wallet.databinding.ActivityOnboardingFlowBinding
 import com.tari.android.wallet.di.DiContainer.appComponent
 import com.tari.android.wallet.service.WalletServiceLauncher
-import com.tari.android.wallet.ui.activity.home.HomeActivity
+import com.tari.android.wallet.ui.fragment.home.HomeActivity
 import com.tari.android.wallet.ui.common.CommonActivity
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.fragment.onboarding.createWallet.CreateWalletFragment

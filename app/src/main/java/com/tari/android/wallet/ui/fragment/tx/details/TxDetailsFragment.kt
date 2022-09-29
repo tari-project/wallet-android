@@ -69,7 +69,7 @@ import com.tari.android.wallet.ui.extension.*
 import com.tari.android.wallet.ui.fragment.tx.details.gif.GIFView
 import com.tari.android.wallet.ui.fragment.tx.details.gif.GIFViewModel
 import com.tari.android.wallet.ui.fragment.tx.details.gif.TxState
-import com.tari.android.wallet.ui.presentation.TxNote
+import com.tari.android.wallet.model.TxNote
 import com.tari.android.wallet.util.WalletUtil
 import java.util.*
 

@@ -18,7 +18,7 @@ import com.tari.android.wallet.ui.common.recyclerView.ViewHolderBuilder
 import com.tari.android.wallet.ui.component.CustomFont
 import com.tari.android.wallet.ui.component.EmojiIdSummaryViewController
 import com.tari.android.wallet.ui.extension.*
-import com.tari.android.wallet.ui.presentation.TxNote
+import com.tari.android.wallet.model.TxNote
 import com.tari.android.wallet.util.WalletUtil
 import com.tari.android.wallet.util.extractEmojis
 import org.joda.time.DateTime

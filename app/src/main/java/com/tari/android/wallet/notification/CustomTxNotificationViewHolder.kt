@@ -30,7 +30,7 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.tari.android.wallet.ui.notification
+package com.tari.android.wallet.notification
 
 import android.app.KeyguardManager
 import android.content.Context
@@ -72,25 +72,13 @@ class CustomTxNotificationViewHolder(val context: Context, tx: Tx) :
     }
 
     private fun displayTxContactAlias(contact: Contact) {
-        setTextViewText(
-            R.id.notification_tx_received_txt_contact_alias,
-            contact.alias
-        )
-        setViewVisibility(
-            R.id.notification_tx_received_vw_emoji_summary,
-            View.INVISIBLE
-        )
+        setTextViewText(R.id.notification_tx_received_txt_contact_alias, contact.alias)
+        setViewVisibility(R.id.notification_tx_received_vw_emoji_summary, View.INVISIBLE)
     }
 
     private fun displayTxUserEmojiId(user: User) {
-        setTextViewText(
-            R.id.notification_tx_received_txt_contact_alias,
-            ""
-        )
-        setViewVisibility(
-            R.id.notification_tx_received_txt_contact_alias,
-            View.INVISIBLE
-        )
+        setTextViewText(R.id.notification_tx_received_txt_contact_alias, "")
+        setViewVisibility(R.id.notification_tx_received_txt_contact_alias, View.INVISIBLE)
         val emojis = ArrayList<String>()
         val it: BreakIterator = BreakIterator.getCharacterInstance()
         it.setText(user.publicKey.emojiId)
@@ -103,82 +91,37 @@ class CustomTxNotificationViewHolder(val context: Context, tx: Tx) :
             emojis.add(builder.toString())
             previous = it.current()
         }
-        setTextViewText(
-            R.id.emoji_id_summary_emoji_1_text_view,
-            emojis[0]
-        )
-        setTextViewText(
-            R.id.emoji_id_summary_emoji_2_text_view,
-            emojis[1]
-        )
-        setTextViewText(
-            R.id.emoji_id_summary_emoji_3_text_view,
-            emojis[2]
-        )
-        setTextViewText(
-            R.id.emoji_id_summary_emoji_4_text_view,
-            emojis.takeLast(3)[0]
-        )
-        setTextViewText(
-            R.id.emoji_id_summary_emoji_5_text_view,
-            emojis.takeLast(2)[0]
-        )
-        setTextViewText(
-            R.id.emoji_id_summary_emoji_6_text_view,
-            emojis.takeLast(1)[0]
-        )
+        setTextViewText(R.id.emoji_id_summary_emoji_1_text_view, emojis[0])
+        setTextViewText(R.id.emoji_id_summary_emoji_2_text_view, emojis[1])
+        setTextViewText(R.id.emoji_id_summary_emoji_3_text_view, emojis[2])
+        setTextViewText(R.id.emoji_id_summary_emoji_4_text_view, emojis.takeLast(3)[0])
+        setTextViewText(R.id.emoji_id_summary_emoji_5_text_view, emojis.takeLast(2)[0])
+        setTextViewText(R.id.emoji_id_summary_emoji_6_text_view, emojis.takeLast(1)[0])
     }
 
     private fun displayTxMessage(message: String) {
-        setTextViewText(
-            R.id.notification_tx_received_txt_message,
-            message
-        )
+        setTextViewText(R.id.notification_tx_received_txt_message, message)
     }
 
     private fun displayIncomingTxValue(amount: MicroTari, deviceIsLocked: Boolean) {
         if (deviceIsLocked) {
-            setTextViewText(
-                R.id.notification_tx_received_txt_positive_amount,
-                context.getString(R.string.common_new_uppercase)
-            )
+            setTextViewText(R.id.notification_tx_received_txt_positive_amount, context.getString(R.string.common_new_uppercase))
         } else {
             val formattedValue = "+" + WalletUtil.amountFormatter.format(amount.tariValue)
-            setTextViewText(
-                R.id.notification_tx_received_txt_positive_amount,
-                formattedValue
-            )
+            setTextViewText(R.id.notification_tx_received_txt_positive_amount, formattedValue)
         }
-        setViewVisibility(
-            R.id.notification_tx_received_txt_positive_amount,
-            View.VISIBLE
-        )
-        setViewVisibility(
-            R.id.notification_tx_received_txt_negative_amount,
-            View.GONE
-        )
+        setViewVisibility(R.id.notification_tx_received_txt_positive_amount, View.VISIBLE)
+        setViewVisibility(R.id.notification_tx_received_txt_negative_amount, View.GONE)
     }
 
     private fun displayOutgoingTxValue(amount: MicroTari, deviceIsLocked: Boolean) {
         if (deviceIsLocked) {
-            setTextViewText(
-                R.id.notification_tx_received_txt_negative_amount,
-                context.getString(R.string.common_new_uppercase)
-            )
+            setTextViewText(R.id.notification_tx_received_txt_negative_amount, context.getString(R.string.common_new_uppercase))
         } else {
             val formattedValue = "-" + WalletUtil.amountFormatter.format(amount.tariValue)
-            setTextViewText(
-                R.id.notification_tx_received_txt_negative_amount,
-                formattedValue
-            )
+            setTextViewText(R.id.notification_tx_received_txt_negative_amount, formattedValue)
         }
-        setViewVisibility(
-            R.id.notification_tx_received_txt_negative_amount,
-            View.VISIBLE
-        )
-        setViewVisibility(
-            R.id.notification_tx_received_txt_positive_amount,
-            View.GONE
-        )
+        setViewVisibility(R.id.notification_tx_received_txt_negative_amount, View.VISIBLE)
+        setViewVisibility(R.id.notification_tx_received_txt_positive_amount, View.GONE)
     }
 }

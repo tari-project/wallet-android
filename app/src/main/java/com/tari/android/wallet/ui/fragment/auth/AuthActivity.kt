@@ -53,7 +53,7 @@ import com.tari.android.wallet.databinding.ActivityAuthBinding
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.extension.addTo
 import com.tari.android.wallet.infrastructure.security.biometric.BiometricAuthenticationException
-import com.tari.android.wallet.ui.activity.home.HomeActivity
+import com.tari.android.wallet.ui.fragment.home.HomeActivity
 import com.tari.android.wallet.ui.common.CommonActivity
 import com.tari.android.wallet.ui.extension.*
 import com.tari.android.wallet.ui.fragment.settings.allSettings.TariVersionModel
