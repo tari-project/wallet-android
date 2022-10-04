@@ -239,17 +239,18 @@ void txCancellationCallback(TariCompletedTransaction *pCompletedTransaction, uin
     g_vm->DetachCurrentThread();
 }
 
-void txoValidationCompleteCallback(uint64_t requestId, bool success) {
+void txoValidationCompleteCallback(uint64_t requestId, uint64_t status) {
     auto *jniEnv = getJNIEnv();
     if (jniEnv == nullptr || callbackHandler == nullptr) {
         return;
     }
     jbyteArray requestIdBytes = getBytesFromUnsignedLongLong(jniEnv, requestId);
+    jbyteArray statusBytes = getBytesFromUnsignedLongLong(jniEnv, status);
     jniEnv->CallVoidMethod(
             callbackHandler,
             txoValidationCompleteCallbackMethodId,
             requestIdBytes,
-            success);
+            statusBytes);
     g_vm->DetachCurrentThread();
 }
 

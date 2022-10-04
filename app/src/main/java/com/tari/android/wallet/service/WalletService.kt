@@ -70,8 +70,8 @@ import com.tari.android.wallet.service.baseNode.BaseNodeSyncState
 import com.tari.android.wallet.service.faucet.TestnetFaucetService
 import com.tari.android.wallet.service.faucet.TestnetTariRequestException
 import com.tari.android.wallet.service.notification.NotificationService
-import com.tari.android.wallet.ui.fragment.home.HomeActivity
 import com.tari.android.wallet.ui.extension.string
+import com.tari.android.wallet.ui.fragment.home.HomeActivity
 import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.WalletUtil
 import io.reactivex.Observable
@@ -522,8 +522,8 @@ class WalletService : Service(), FFIWalletListener, LifecycleObserver {
         backupManager.scheduleBackup(resetRetryCount = true)
     }
 
-    override fun onTXOValidationComplete(responseId: BigInteger, isSuccess: Boolean) {
-        checkValidationResult(BaseNodeValidationType.TXO, responseId, isSuccess)
+    override fun onTXOValidationComplete(responseId: BigInteger, status: TXOValidationStatus) {
+        checkValidationResult(BaseNodeValidationType.TXO, responseId, status == TXOValidationStatus.TxoValidationSuccess)
     }
 
     override fun onTxValidationComplete(responseId: BigInteger, isSuccess: Boolean) {
