@@ -52,7 +52,7 @@ interface FFIWalletListener {
     fun onTxFauxUnconfirmed(completedTx: CompletedTx, confirmationCount: Int)
     fun onDirectSendResult(txId: BigInteger, status: TransactionSendStatus)
     fun onTxCancelled(cancelledTx: CancelledTx, rejectionReason: Int)
-    fun onTXOValidationComplete(responseId: BigInteger, isSuccess: Boolean)
+    fun onTXOValidationComplete(responseId: BigInteger, status: TXOValidationStatus)
     fun onTxValidationComplete(responseId: BigInteger, isSuccess: Boolean)
     fun onConnectivityStatus(status: Int)
     fun onWalletRestoration(result: WalletRestorationResult)

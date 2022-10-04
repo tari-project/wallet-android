@@ -11,12 +11,11 @@
     <string name="user_agreement_url">https://www.tari.com/user_agreement/</string>
     <string name="privacy_policy_url">https://www.tari.com/privacy_policy/</string>
     <string name="disclaimer_url">https://www.tari.com/disclaimer/</string>
-    <string name="explorer_url">https://explore.tari.com</string>
-    <string name="explorer_kernel_url">https://explore.tari.com/kernel/</string>
+    <string name="explorer_url">https://explore-esme.tari.com/</string>
+    <string name="explorer_kernel_url">https://explore-esme.tari.com/kernel/</string>
     <string name="tor_bridges_url">https://bridges.torproject.org/bridges</string>
     <string name="ffi_admin_email_address" translatable="false">bug_reports@tari.com</string>
     <string name="tari_lab_university_url" translatable="false">https://tlu.tarilabs.com/</string>
-    <string name="network_faucet_url" translatable="false">https://faucet.tari.com</string>
     <string name="esmeralda_faucet_url" translatable="false">https://esmeralda-faucet.tari.com</string>
 
     <!-- digits -->

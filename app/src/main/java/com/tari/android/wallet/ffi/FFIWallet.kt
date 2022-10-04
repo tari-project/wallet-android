@@ -248,7 +248,7 @@ class FFIWallet(
                     this::onTxFauxUnconfirmed.name, "(J[B)V",
                     this::onDirectSendResult.name, "([BJ)V",
                     this::onTxCancelled.name, "(J[B)V",
-                    this::onTXOValidationComplete.name, "([BZ)V",
+                    this::onTXOValidationComplete.name, "([B[B)V",
                     this::onContactLivenessDataUpdated.name, "(J)V",
                     this::onBalanceUpdated.name, "(J)V",
                     this::onTxValidationComplete.name, "([BZ)V",
@@ -461,10 +461,11 @@ class FFIWallet(
      * This callback function cannot be private due to JNI behaviour.
      */
     @Suppress("MemberVisibilityCanBePrivate")
-    fun onTXOValidationComplete(bytes: ByteArray, isSuccess: Boolean) {
+    fun onTXOValidationComplete(bytes: ByteArray, bytesStatus: ByteArray) {
         val requestId = BigInteger(1, bytes)
-        logger.i("TXO validation [$requestId] complete. Result: $isSuccess")
-        localScope.launch { listener?.onTXOValidationComplete(requestId, isSuccess) }
+        val status = TXOValidationStatus.values().first { it.value == BigInteger(1, bytesStatus).toInt() }
+        logger.i("TXO validation [$requestId] complete. Result: $status")
+        localScope.launch { listener?.onTXOValidationComplete(requestId, status) }
     }
 
     /**
@@ -597,3 +598,4 @@ class FFIWallet(
         jniDestroy()
     }
 }
+
