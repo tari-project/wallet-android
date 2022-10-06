@@ -39,7 +39,6 @@ import java.io.Serializable
 class FFITransactionSendStatus(pointer: FFIPointer) : FFIBase(), Serializable {
 
     private external fun jniTransactionSendStatusDecode(libError: FFIError): Int
-
     private external fun jniDestroy()
 
     init {

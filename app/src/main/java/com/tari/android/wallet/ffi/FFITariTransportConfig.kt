@@ -41,11 +41,8 @@ package com.tari.android.wallet.ffi
 class FFITariTransportConfig() : FFIBase() {
 
     private external fun jniMemoryTransport()
-
     private external fun jniGetMemoryAddress(libError: FFIError): String
-
     private external fun jniTCPTransport(listenerAddress: String, libError: FFIError)
-
     private external fun jniTorTransport(
         control_server_address: String,
         torCookie: FFIByteVector,
@@ -54,7 +51,6 @@ class FFITariTransportConfig() : FFIBase() {
         socksPassword: String,
         libError: FFIError
     )
-
     private external fun jniDestroy()
 
     /**
