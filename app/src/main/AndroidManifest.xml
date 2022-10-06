@@ -27,7 +27,7 @@
         tools:replace="android:supportsRtl,android:allowBackup">
         <!-- Tari foreground service -->
         <service
-            android:name=".service.WalletService"
+            android:name=".service.service.WalletService"
             android:description="@string/wallet_service_desc"
             android:enabled="true"
             android:exported="false">

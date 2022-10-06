@@ -36,7 +36,7 @@ import android.content.ClipboardManager
 import com.tari.android.wallet.application.TariWalletApplication
 import com.tari.android.wallet.application.deeplinks.DeeplinkViewModel
 import com.tari.android.wallet.service.BootDeviceReceiver
-import com.tari.android.wallet.service.WalletService
+import com.tari.android.wallet.service.service.WalletService
 import com.tari.android.wallet.ui.fragment.splash.SplashActivity
 import com.tari.android.wallet.ui.fragment.debug.activity.DebugActivity
 import com.tari.android.wallet.ui.fragment.home.HomeActivity

@@ -428,11 +428,9 @@ class TxListViewModel : CommonViewModel() {
 
     private fun testnetTariRequestError() {
         testnetTariRequestIsInProgress = false
-        if (!networkRepository.currentNetwork?.faucetUrl.isNullOrEmpty()) {
-            val description = resourceManager.getString(faucet_error_common)
-            val errorDialogArgs = ErrorDialogArgs(resourceManager.getString(faucet_error_title), description)
-            _modularDialog.postValue(errorDialogArgs.getModular(resourceManager))
-        }
+        val description = resourceManager.getString(faucet_error_common)
+        val errorDialogArgs = ErrorDialogArgs(resourceManager.getString(faucet_error_title), description)
+        _modularDialog.postValue(errorDialogArgs.getModular(resourceManager))
     }
 
 
