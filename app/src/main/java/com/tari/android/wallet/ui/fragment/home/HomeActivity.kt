@@ -63,10 +63,9 @@ import com.tari.android.wallet.model.User
 import com.tari.android.wallet.model.WalletError
 import com.tari.android.wallet.network.NetworkConnectionState
 import com.tari.android.wallet.service.TariWalletService
-import com.tari.android.wallet.service.WalletServiceLauncher
+import com.tari.android.wallet.service.connection.ServiceConnectionStatus
 import com.tari.android.wallet.service.connection.TariWalletServiceConnection
-import com.tari.android.wallet.service.connection.TariWalletServiceConnection.ServiceConnectionStatus.CONNECTED
-import com.tari.android.wallet.ui.fragment.splash.SplashActivity
+import com.tari.android.wallet.service.service.WalletServiceLauncher
 import com.tari.android.wallet.ui.common.CommonActivity
 import com.tari.android.wallet.ui.common.domain.ResourceManager
 import com.tari.android.wallet.ui.component.CustomFont
@@ -95,6 +94,7 @@ import com.tari.android.wallet.ui.fragment.settings.deleteWallet.DeleteWalletAct
 import com.tari.android.wallet.ui.fragment.settings.networkSelection.NetworkSelectionFragment
 import com.tari.android.wallet.ui.fragment.settings.torBridges.TorBridgesSelectionFragment
 import com.tari.android.wallet.ui.fragment.settings.torBridges.customBridges.CustomTorBridgesFragment
+import com.tari.android.wallet.ui.fragment.splash.SplashActivity
 import com.tari.android.wallet.ui.fragment.store.StoreFragment
 import com.tari.android.wallet.ui.fragment.tx.TxListFragment
 import com.tari.android.wallet.ui.fragment.tx.TxListRouter
@@ -153,7 +153,7 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>(), AllSe
         if (savedInstanceState == null) {
             enableNavigationView(ui.homeImageView)
             serviceConnection.connection.subscribe {
-                if (it.status == CONNECTED) {
+                if (it.status == ServiceConnectionStatus.CONNECTED) {
                     ui.root.postDelayed({
                         processIntentDeepLink(it.service!!, intent)
                     }, Constants.UI.mediumDurationMs)
@@ -175,7 +175,7 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>(), AllSe
         super.onNewIntent(intent)
         // onNewIntent might get called before onCreate, so we anticipate that here
         checkScreensDeeplink(intent)
-        if (::serviceConnection.isInitialized && serviceConnection.currentState.status == CONNECTED) {
+        if (::serviceConnection.isInitialized && serviceConnection.currentState.status == ServiceConnectionStatus.CONNECTED) {
             processIntentDeepLink(serviceConnection.currentState.service!!, intent)
         } else {
             setIntent(intent)

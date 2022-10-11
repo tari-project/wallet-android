@@ -14,7 +14,7 @@ import com.tari.android.wallet.ffi.FFIPublicKey
 import com.tari.android.wallet.ffi.FFIWallet
 import com.tari.android.wallet.ffi.HexString
 import com.tari.android.wallet.model.recovery.WalletRestorationResult
-import com.tari.android.wallet.service.WalletServiceLauncher
+import com.tari.android.wallet.service.service.WalletServiceLauncher
 import com.tari.android.wallet.service.seedPhrase.SeedPhraseRepository
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.common.SingleLiveEvent

@@ -13,6 +13,7 @@ import com.tari.android.wallet.extension.*
 import com.tari.android.wallet.model.*
 import com.tari.android.wallet.network.NetworkConnectionState
 import com.tari.android.wallet.service.TariWalletService
+import com.tari.android.wallet.service.connection.ServiceConnectionStatus
 import com.tari.android.wallet.service.connection.TariWalletServiceConnection
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.common.SingleLiveEvent
@@ -144,7 +145,7 @@ class TxListViewModel : CommonViewModel() {
     private fun bindToWalletService() {
         serviceConnection = TariWalletServiceConnection()
         serviceConnection.connection.subscribe {
-            if (it.status == TariWalletServiceConnection.ServiceConnectionStatus.CONNECTED) onServiceConnected()
+            if (it.status == ServiceConnectionStatus.CONNECTED) onServiceConnected()
         }.addTo(compositeDisposable)
     }
 
@@ -428,11 +429,9 @@ class TxListViewModel : CommonViewModel() {
 
     private fun testnetTariRequestError() {
         testnetTariRequestIsInProgress = false
-        if (!networkRepository.currentNetwork?.faucetUrl.isNullOrEmpty()) {
-            val description = resourceManager.getString(faucet_error_common)
-            val errorDialogArgs = ErrorDialogArgs(resourceManager.getString(faucet_error_title), description)
-            _modularDialog.postValue(errorDialogArgs.getModular(resourceManager))
-        }
+        val description = resourceManager.getString(faucet_error_common)
+        val errorDialogArgs = ErrorDialogArgs(resourceManager.getString(faucet_error_title), description)
+        _modularDialog.postValue(errorDialogArgs.getModular(resourceManager))
     }
 
 

@@ -11,6 +11,7 @@ import com.tari.android.wallet.ffi.FFIWallet
 import com.tari.android.wallet.model.MicroTari
 import com.tari.android.wallet.model.WalletError
 import com.tari.android.wallet.service.TariWalletService
+import com.tari.android.wallet.service.connection.ServiceConnectionStatus
 import com.tari.android.wallet.service.connection.TariWalletServiceConnection
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.dialog.modular.DialogArgs
@@ -54,7 +55,7 @@ class AddAmountViewModel : CommonViewModel() {
     init {
         component.inject(this)
 
-        connectionService.connection.filter { it.status == TariWalletServiceConnection.ServiceConnectionStatus.CONNECTED }.subscribe {
+        connectionService.connection.filter { it.status == ServiceConnectionStatus.CONNECTED }.subscribe {
             _serviceConnected.postValue(Unit)
         }.addTo(compositeDisposable)
         loadFees()

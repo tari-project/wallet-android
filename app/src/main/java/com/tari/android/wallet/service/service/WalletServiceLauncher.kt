@@ -1,4 +1,4 @@
-package com.tari.android.wallet.service
+package com.tari.android.wallet.service.service
 
 import android.content.Context
 import android.content.Intent
@@ -13,14 +13,6 @@ class WalletServiceLauncher(
     val walletConfig: WalletConfig,
     val tariSettingsSharedRepository: TariSettingsSharedRepository
 ) {
-
-    companion object {
-        // intent actions
-        const val startAction = "START_SERVICE"
-        const val stopAction = "STOP_SERVICE"
-        const val stopAndDeleteAction = "STOP_SERVICE_AND_DELETE_WALLET"
-    }
-
     fun startIfExist() {
         if (WalletUtil.walletExists(walletConfig)) {
             startService()
@@ -53,15 +45,18 @@ class WalletServiceLauncher(
         }
     }
 
-    private fun getStartIntent(context: Context) = Intent(context, WalletService::class.java).also {
-        it.action = startAction
+    private fun getStartIntent(context: Context) = Intent(context, WalletService::class.java).also { it.action = startAction }
+
+    private fun getStopIntent(context: Context) = Intent(context, WalletService::class.java).also { it.action = stopAction }
+
+    private fun getStopAndDeleteIntent(context: Context) = Intent(context, WalletService::class.java).also { it.action = stopAndDeleteAction }
+
+
+    companion object {
+        // intent actions
+        const val startAction = "START_SERVICE"
+        const val stopAction = "STOP_SERVICE"
+        const val stopAndDeleteAction = "STOP_SERVICE_AND_DELETE_WALLET"
     }
 
-    private fun getStopIntent(context: Context) = Intent(context, WalletService::class.java).also {
-        it.action = stopAction
-    }
-
-    private fun getStopAndDeleteIntent(context: Context) = Intent(context, WalletService::class.java).also {
-        it.action = stopAndDeleteAction
-    }
 }

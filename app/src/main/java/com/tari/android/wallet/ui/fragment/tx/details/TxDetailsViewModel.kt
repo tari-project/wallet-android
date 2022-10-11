@@ -11,6 +11,7 @@ import com.tari.android.wallet.extension.getWithError
 import com.tari.android.wallet.ffi.FFITxCancellationReason
 import com.tari.android.wallet.model.*
 import com.tari.android.wallet.service.TariWalletService
+import com.tari.android.wallet.service.connection.ServiceConnectionStatus
 import com.tari.android.wallet.service.connection.TariWalletServiceConnection
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.dialog.error.ErrorDialogArgs
@@ -37,7 +38,7 @@ class TxDetailsViewModel : CommonViewModel() {
 
     init {
         serviceConnection.connection.subscribe {
-            if (it.status == TariWalletServiceConnection.ServiceConnectionStatus.CONNECTED) {
+            if (it.status == ServiceConnectionStatus.CONNECTED) {
                 fetchRequiredConfirmationCount()
                 findTxAndUpdateUI()
                 _tx.value = _tx.value
