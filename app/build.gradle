@@ -79,17 +79,16 @@ android {
         }
         privacy {
             dimension "privacy-mode"
+            buildConfigField "String", "NOTIFICATIONS_API_KEY",
+                    "\"${loadSecretProps().getProperty('service.notifications.api_key')}\""
         }
     }
 
     applicationVariants.all { variant ->
-        if (variant.productFlavors.get(0).name == "regular") {
-            if (variant.buildType.name == "debug") {
-                variant.mergedFlavor.manifestPlaceholders.sentryPublicDSN = ''
-            } else {
-                variant.mergedFlavor.manifestPlaceholders.sentryPublicDSN =
-                        loadSecretProps().getProperty('sentry.public_dsn')
-            }
+        if (variant.buildType.name == "debug") {
+            variant.mergedFlavor.manifestPlaceholders.sentryPublicDSN = ''
+        } else {
+            variant.mergedFlavor.manifestPlaceholders.sentryPublicDSN = loadSecretProps().getProperty('sentry.public_dsn')
         }
     }
 
@@ -265,16 +264,16 @@ dependencies {
     implementation 'com.squareup.okhttp3:logging-interceptor:4.9.0'
 
     // Google services & Google drive
-    regularImplementation 'com.google.android.gms:play-services-auth:20.2.0'
-    regularImplementation 'com.google.http-client:google-http-client-gson:1.39.0'
-    regularImplementation('com.google.api-client:google-api-client-android:1.31.3') {
+    implementation 'com.google.android.gms:play-services-auth:20.2.0'
+    implementation 'com.google.http-client:google-http-client-gson:1.39.0'
+    implementation('com.google.api-client:google-api-client-android:1.31.3') {
         exclude group: 'org.apache.httpcomponents'
     }
-    regularImplementation('com.google.apis:google-api-services-drive:v3-rev197-1.25.0') {
+    implementation('com.google.apis:google-api-services-drive:v3-rev197-1.25.0') {
         exclude group: 'org.apache.httpcomponents'
     }
     // sentry - crash analytics
-    regularImplementation 'io.sentry:sentry-android:5.0.1'
+    implementation 'io.sentry:sentry-android:5.0.1'
 
     implementation 'net.yslibrary.keyboardvisibilityevent:keyboardvisibilityevent:2.2.0'
 

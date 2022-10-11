@@ -65,6 +65,24 @@ abstract class CommonActivity<Binding : ViewBinding, VM : CommonViewModel> : App
     }
 
     private fun replaceDialog(dialog: TariDialog) {
+        val currentLoadingDialog = currentDialog as? TariProgressDialog
+        if (currentLoadingDialog != null && currentLoadingDialog.isShowing() && dialog is TariProgressDialog) {
+            (currentDialog as TariProgressDialog).applyArgs(dialog.progressDialogArgs)
+            return
+        }
+        val currentModularDialog = currentDialog as? ModularDialog
+        val newModularDialog = dialog as? ModularDialog
+        if (currentModularDialog != null && newModularDialog != null && currentModularDialog.args::class.java == newModularDialog.args::class.java
+            && currentModularDialog.isShowing()
+        ) {
+            currentModularDialog.applyArgs(newModularDialog.args)
+            return
+        }
+
+        if (newModularDialog?.args?.dialogArgs?.isRefreshing == true) {
+            return
+        }
+
         currentDialog?.dismiss()
         currentDialog = dialog.also { it.show() }
     }

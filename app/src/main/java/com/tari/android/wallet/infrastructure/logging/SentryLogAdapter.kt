@@ -7,7 +7,7 @@ import io.sentry.SentryEvent
 import io.sentry.SentryLevel
 import io.sentry.protocol.Message
 
-class SentryLogAdapter() : LogAdapter {
+class SentryLogAdapter : LogAdapter {
 
     override fun isLoggable(priority: Int, tag: String?): Boolean = true
 

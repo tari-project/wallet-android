@@ -38,7 +38,8 @@ open class CommonViewModel : ViewModel() {
 
         EventBus.walletState.publishSubject.filter { it is WalletState.Failed }
             .subscribe {
-                val errorArgs = WalletErrorArgs(resourceManager, (it as WalletState.Failed).exception).getErrorArgs().getModular(resourceManager)
+                val exception = (it as WalletState.Failed).exception
+                val errorArgs = WalletErrorArgs(resourceManager, exception).getErrorArgs().getModular(resourceManager)
                 _modularDialog.postValue(errorArgs)
             }.addTo(compositeDisposable)
     }
