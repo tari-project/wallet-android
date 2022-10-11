@@ -70,9 +70,13 @@ class LogFileObserver(logFilePath: String) : FileObserver(logFilePath) {
             val line = reversedFileReader.readLine()
             lineList.add(line)
         }
-        // log them in reverse order
-        lineList.reversed().forEach { logLine -> Logger.d(logTag, logLine) }
-        lastNumberOfLines = lineNumberReader.lineNumber
+        val stringBuilder = StringBuilder()
+        if (lineList.isNotEmpty()) {
+            // log them in reverse order
+            lineList.reversed().forEach { logLine -> stringBuilder.appendLine(logLine) }
+            Logger.t(logTag).d(stringBuilder.toString())
+            lastNumberOfLines = lineNumberReader.lineNumber
+        }
         // close resources
         fileReader.close()
         lineNumberReader.close()

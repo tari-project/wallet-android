@@ -37,9 +37,6 @@ import android.content.Intent
 import android.os.Handler
 import android.os.IBinder
 import android.os.Looper
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleObserver
-import androidx.lifecycle.OnLifecycleEvent
 import androidx.lifecycle.ProcessLifecycleOwner
 import com.orhanobut.logger.Logger
 import com.tari.android.wallet.application.TariWalletApplication
@@ -52,7 +49,6 @@ import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodeSharedRepositor
 import com.tari.android.wallet.data.sharedPrefs.testnetFaucet.TestnetFaucetRepository
 import com.tari.android.wallet.di.DiContainer
 import com.tari.android.wallet.event.EventBus
-import com.tari.android.wallet.ffi.FFIException
 import com.tari.android.wallet.ffi.FFIWallet
 import com.tari.android.wallet.infrastructure.backup.BackupManager
 import com.tari.android.wallet.notification.NotificationHelper
@@ -81,7 +77,7 @@ import javax.inject.Inject
  *
  * @author The Tari Development Team
  */
-class WalletService : Service(), LifecycleObserver {
+class WalletService : Service() {
 
     @Inject
     lateinit var walletConfig: WalletConfig
@@ -119,8 +115,9 @@ class WalletService : Service(), LifecycleObserver {
     @Inject
     lateinit var testnetFaucetRepository: TestnetFaucetRepository
 
+    private var lifecycleObserver: ServiceLifecycleCallbacks? = null
+    private val stubProxy = TariWalletServiceStubProxy()
     private lateinit var wallet: FFIWallet
-    private lateinit var serviceStub: TariWalletServiceStub
 
     private val logger
         get() = Logger.t(WalletService::class.simpleName)
@@ -131,16 +128,9 @@ class WalletService : Service(), LifecycleObserver {
     private val expirationCheckPeriodMinutes = Minutes.minutes(30)
 
     /**
-     * Switch to low power mode 3 minutes after the app gets backgrounded.
-     */
-    private val backgroundLowPowerModeSwitchMinutes = Minutes.minutes(3)
-
-    /**
      * Timer to trigger the expiration checks.
      */
     private var txExpirationCheckSubscription: Disposable? = null
-
-    private var lowPowerModeSubscription: Disposable? = null
 
     override fun onCreate() {
         super.onCreate()
@@ -177,8 +167,7 @@ class WalletService : Service(), LifecycleObserver {
 
     private fun startForeground() {
         // start service & post foreground service notification
-        val notification = notificationHelper.buildForegroundServiceNotification()
-        startForeground(NOTIFICATION_ID, notification)
+        startForeground(NOTIFICATION_ID, notificationHelper.buildForegroundServiceNotification())
     }
 
     private fun stopService(startId: Int) {
@@ -187,11 +176,9 @@ class WalletService : Service(), LifecycleObserver {
         stopSelfResult(startId)
         // stop wallet manager on a separate thread & unsubscribe from events
         EventBus.walletState.unsubscribe(this)
-        ProcessLifecycleOwner.get().lifecycle.removeObserver(this)
+        lifecycleObserver?.let { ProcessLifecycleOwner.get().lifecycle.removeObserver(it) }
         GlobalScope.launch { backupManager.turnOff(deleteExistingBackups = false) }
-        Thread {
-            walletManager.stop()
-        }.start()
+        Thread(walletManager::stop).start()
     }
 
     private fun deleteWallet() {
@@ -202,14 +189,14 @@ class WalletService : Service(), LifecycleObserver {
     private fun onWalletStateChanged(walletState: WalletState) {
         if (walletState == WalletState.Started) {
             wallet = FFIWallet.instance!!
+            lifecycleObserver = ServiceLifecycleCallbacks(wallet)
             val impl = FFIWalletListenerImpl(wallet, backupManager, notificationHelper, notificationService, app, baseNodeSharedPrefsRepository, baseNodes)
-            serviceStub = TariWalletServiceStub(wallet, testnetFaucetRepository, testnetFaucetService, baseNodeSharedPrefsRepository, resourceManager, impl)
+            stubProxy.stub = TariWalletServiceStubImpl(wallet, testnetFaucetRepository, testnetFaucetService, baseNodeSharedPrefsRepository, resourceManager, impl)
             wallet.listener = impl
             EventBus.walletState.unsubscribe(this)
             scheduleExpirationCheck()
             backupManager.initialize()
-            val handler = Handler(Looper.getMainLooper())
-            handler.post { ProcessLifecycleOwner.get().lifecycle.addObserver(this) }
+            Handler(Looper.getMainLooper()).post { ProcessLifecycleOwner.get().lifecycle.addObserver(lifecycleObserver!!) }
             EventBus.walletState.post(WalletState.Running)
         }
     }
@@ -229,7 +216,7 @@ class WalletService : Service(), LifecycleObserver {
 
     override fun onBind(intent: Intent?): IBinder {
         logger.i("Wallet service bound")
-        return serviceStub
+        return stubProxy
     }
 
     override fun onUnbind(intent: Intent?): Boolean {
@@ -243,44 +230,8 @@ class WalletService : Service(), LifecycleObserver {
     override fun onDestroy() {
         logger.i("Wallet service destroyed")
         txExpirationCheckSubscription?.dispose()
-        sendBroadcast(
-            Intent(this, ServiceRestartBroadcastReceiver::class.java)
-        )
+        sendBroadcast(Intent(this, ServiceRestartBroadcastReceiver::class.java))
         super.onDestroy()
-    }
-
-    @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
-    fun onAppBackgrounded() {
-        // schedule low power mode
-        lowPowerModeSubscription = Observable
-            .timer(backgroundLowPowerModeSwitchMinutes.minutes.toLong(), TimeUnit.MINUTES)
-            .subscribeOn(Schedulers.io())
-            .observeOn(Schedulers.io())
-            .subscribe { switchToLowPowerMode() }
-    }
-
-    @OnLifecycleEvent(Lifecycle.Event.ON_START)
-    fun onAppForegrounded() {
-        switchToNormalPowerMode()
-    }
-
-    private fun switchToNormalPowerMode() {
-        logger.i("Switch to normal power mode")
-        lowPowerModeSubscription?.dispose()
-        try {
-            wallet.setPowerModeNormal()
-        } catch (e: FFIException) {
-            logger.e(e, "Switching to normal power mode failed")
-        }
-    }
-
-    private fun switchToLowPowerMode() {
-        logger.i("Switch to low power mode")
-        try {
-            wallet.setPowerModeLow()
-        } catch (e: FFIException) {
-            logger.e(e, "Switching to low power mode failed")
-        }
     }
 
     /**
@@ -332,4 +283,3 @@ class WalletService : Service(), LifecycleObserver {
         }
     }
 }
-

@@ -19,7 +19,7 @@ import com.tari.android.wallet.util.Constants
 import java.math.BigInteger
 import java.util.*
 
-class TariWalletServiceStub(
+class TariWalletServiceStubImpl(
     private val wallet: FFIWallet,
     private val testnetFaucetRepository: TestnetFaucetRepository,
     private val testnetFaucetService: TestnetFaucetService,
@@ -40,12 +40,7 @@ class TariWalletServiceStub(
             for (i in 0 until contactsFFI.getLength()) {
                 val contactFFI = contactsFFI.getAt(i)
                 val publicKeyFFI = contactFFI.getPublicKey()
-                contacts.add(
-                    Contact(
-                        publicKeyFromFFI(publicKeyFFI),
-                        contactFFI.getAlias()
-                    )
-                )
+                contacts.add(Contact(publicKeyFromFFI(publicKeyFFI), contactFFI.getAlias()))
                 // destroy native objects
                 publicKeyFFI.destroy()
                 contactFFI.destroy()
@@ -54,29 +49,6 @@ class TariWalletServiceStub(
             contactsFFI.destroy()
             return contacts.sortedWith(compareBy { it.alias }).also { _cachedContacts = it }
         }
-
-
-    private fun mapThrowableIntoError(walletError: WalletError, throwable: Throwable) {
-        if (throwable is FFIException) {
-            if (throwable.error != null) {
-                walletError.code = throwable.error.code
-                return
-            }
-        }
-        walletError.code = WalletError.UnknownError.code
-    }
-
-    private fun <T> runMapping(walletError: WalletError, onError: (Throwable) -> (Unit) = {}, action: () -> T?): T? {
-        return try {
-            action()
-        } catch (throwable: Throwable) {
-            onError(throwable)
-            mapThrowableIntoError(walletError, throwable)
-            null
-        }
-    }
-
-    private fun getContactByPublicKeyHexString(hexString: String): Contact? = cachedContacts.firstOrNull { it.publicKey.hexString == hexString }
 
     override fun registerListener(listener: TariWalletServiceListener): Boolean {
         walletServiceListener.listeners.add(listener)
@@ -107,10 +79,7 @@ class TariWalletServiceStub(
      * Client-facing function.
      */
     override fun getCompletedTxs(error: WalletError): List<CompletedTx>? = runMapping(error) {
-        val completedTxsFFI = wallet.getCompletedTxs()
-        (0 until completedTxsFFI.getLength())
-            .map { CompletedTx(completedTxsFFI.getAt(it)) }
-            .also { completedTxsFFI.destroy() }
+        wallet.getCompletedTxs().runWithDestroy { txs -> (0 until txs.getLength()).map { CompletedTx(txs.getAt(it)) } }
     }
 
     /**
@@ -118,37 +87,29 @@ class TariWalletServiceStub(
      * Client-facing function.
      */
     override fun getCancelledTxs(error: WalletError): List<CancelledTx>? = runMapping(error) {
-        val canceledTxsFFI = wallet.getCancelledTxs()
-        (0 until canceledTxsFFI.getLength())
-            .map { CancelledTx(canceledTxsFFI.getAt(it)) }
-            .also { canceledTxsFFI.destroy() }
+        wallet.getCancelledTxs().runWithDestroy { txs -> (0 until txs.getLength()).map { CancelledTx(txs.getAt(it)) } }
     }
 
     /**
      * Get completed transaction by id.
      * Client-facing function.
      */
-    override fun getCancelledTxById(id: TxId, error: WalletError): CancelledTx? = runMapping(error) {
-        CancelledTx(wallet.getCancelledTxById(id.value))
-    }
+    override fun getCancelledTxById(id: TxId, error: WalletError): CancelledTx? =
+        runMapping(error) { CancelledTx(wallet.getCancelledTxById(id.value)) }
 
     /**
      * Get completed transaction by id.
      * Client-facing function.
      */
-    override fun getCompletedTxById(id: TxId, error: WalletError): CompletedTx? = runMapping(error) {
-        CompletedTx(wallet.getCompletedTxById(id.value))
-    }
+    override fun getCompletedTxById(id: TxId, error: WalletError): CompletedTx? =
+        runMapping(error) { CompletedTx(wallet.getCompletedTxById(id.value)) }
 
     /**
      * Get all pending inbound transactions.
      * Client-facing function.
      */
     override fun getPendingInboundTxs(error: WalletError): List<PendingInboundTx>? = runMapping(error) {
-        val pendingInboundTxsFFI = wallet.getPendingInboundTxs()
-        (0 until pendingInboundTxsFFI.getLength())
-            .map { PendingInboundTx(pendingInboundTxsFFI.getAt(it)) }
-            .also { pendingInboundTxsFFI.destroy() }
+        wallet.getPendingInboundTxs().runWithDestroy { txs -> (0 until txs.getLength()).map { PendingInboundTx(txs.getAt(it)) } }
     }
 
     /**
@@ -164,10 +125,7 @@ class TariWalletServiceStub(
      * Client-facing function.
      */
     override fun getPendingOutboundTxs(error: WalletError): List<PendingOutboundTx>? = runMapping(error) {
-        val pendingOutboundTxsFFI = wallet.getPendingOutboundTxs()
-        (0 until pendingOutboundTxsFFI.getLength())
-            .map { PendingOutboundTx(pendingOutboundTxsFFI.getAt(it)) }
-            .also { pendingOutboundTxsFFI.destroy() }
+        wallet.getPendingOutboundTxs().runWithDestroy { txs -> (0 until txs.getLength()).map { PendingOutboundTx(txs.getAt(it)) } }
     }
 
     /**
@@ -181,9 +139,7 @@ class TariWalletServiceStub(
     override fun cancelPendingTx(id: TxId, error: WalletError): Boolean = runMapping(error) { wallet.cancelPendingTx(id.value) } ?: false
 
     override fun addBaseNodePeer(baseNodePublicKey: String, baseNodeAddress: String, error: WalletError): Boolean = runMapping(error) {
-        val publicKeyFFI = FFIPublicKey(HexString(baseNodePublicKey))
-        val result = wallet.addBaseNodePeer(publicKeyFFI, baseNodeAddress)
-        publicKeyFFI.destroy()
+        val result = FFIPublicKey(HexString(baseNodePublicKey)).runWithDestroy { wallet.addBaseNodePeer(it, baseNodeAddress) }
         if (result) {
             walletServiceListener.baseNodeValidationStatusMap.clear()
             EventBus.baseNodeSyncState.post(BaseNodeSyncState.NotStarted)
@@ -213,16 +169,11 @@ class TariWalletServiceStub(
         error: WalletError
     ): TxId? = runMapping(error) {
         val recipientPublicKeyHex = user.publicKey.hexString
-        val publicKeyFFI = FFIPublicKey(HexString(recipientPublicKeyHex))
-        val txId = wallet.sendTx(publicKeyFFI, amount.value, feePerGram.value, message, isOneSidePayment)
-        publicKeyFFI.destroy()
+        val txId = FFIPublicKey(HexString(recipientPublicKeyHex)).runWithDestroy {
+            wallet.sendTx(it, amount.value, feePerGram.value, message, isOneSidePayment)
+        }
         walletServiceListener.outboundTxIdsToBePushNotified.add(Pair(txId, recipientPublicKeyHex.lowercase(Locale.ENGLISH)))
         TxId(txId)
-    }
-
-    // region FFI to model extraction functions
-    private fun publicKeyFromFFI(publicKeyFFI: FFIPublicKey): PublicKey {
-        return PublicKey(publicKeyFFI.toString(), publicKeyFFI.getEmojiId())
     }
 
     override fun requestTestnetTari(error: WalletError) {
@@ -245,13 +196,9 @@ class TariWalletServiceStub(
             signature,
             nonce,
             { result ->
-                val senderPublicKeyFFI = FFIPublicKey(HexString(result.walletId))
-                // add contact
-                FFIContact("TariBot", senderPublicKeyFFI).also {
-                    wallet.addUpdateContact(it)
-                    it.destroy()
+                FFIPublicKey(HexString(result.walletId)).runWithDestroy {
+                    FFIContact("TariBot", it).runWithDestroy { contact -> wallet.addUpdateContact(contact) }
                 }
-                senderPublicKeyFFI.destroy()
                 // update the keys with sender public key hex
                 result.keys.forEach { key -> key.senderPublicKeyHex = result.walletId }
                 // store the UTXO keys
@@ -338,13 +285,6 @@ class TariWalletServiceStub(
         false
     } ?: false
 
-    private fun notifyTestnetTariRequestFailed(error: String) {
-        // post event to bus for the listeners
-        EventBus.post(Event.Testnet.TestnetTariRequestError(error))
-        // notify external listeners
-        walletServiceListener.listeners.iterator().forEach { listener -> listener.onTestnetTariRequestError(error) }
-    }
-
     override fun updateContactAlias(publicKey: PublicKey, alias: String, error: WalletError): Boolean = runMapping(error) {
         val publicKeyFFI = FFIPublicKey(HexString(publicKey.hexString))
         val contact = FFIContact(alias, publicKeyFFI)
@@ -360,14 +300,14 @@ class TariWalletServiceStub(
      * or it does not correspond to a public key.
      */
     override fun getPublicKeyFromEmojiId(emojiId: String?): PublicKey? =
-        runCatching { FFIPublicKey(emojiId.orEmpty()).run { publicKeyFromFFI(this).also { destroy() } } }.getOrNull()
+        runCatching { FFIPublicKey(emojiId.orEmpty()).runWithDestroy { publicKeyFromFFI(it) } }.getOrNull()
 
     /**
      * @return public key constructed from input public key hex string id. Null if the emoji id
      * is invalid or it does not correspond to a public key.
      */
     override fun getPublicKeyFromHexString(publicKeyHex: String?): PublicKey? = runCatching {
-        FFIPublicKey(HexString(publicKeyHex ?: "")).run { publicKeyFromFFI(this).also { destroy() } }
+        FFIPublicKey(HexString(publicKeyHex ?: "")).runWithDestroy { publicKeyFromFFI(it) }
     }.getOrNull()
 
     override fun setKeyValue(key: String, value: String, error: WalletError): Boolean = runMapping(error) { wallet.setKeyValue(key, value) } ?: false
@@ -383,10 +323,7 @@ class TariWalletServiceStub(
     }
 
     override fun getSeedWords(error: WalletError): List<String>? = runMapping(error) {
-        val seedWordsFFI = wallet.getSeedWords()
-        (0 until seedWordsFFI.getLength())
-            .map { seedWordsFFI.getAt(it) }
-            .also { seedWordsFFI.destroy() }
+        wallet.getSeedWords().runWithDestroy { seedWords -> (0 until seedWords.getLength()).map { seedWords.getAt(it) } }
     }
 
     override fun getUtxos(page: Int, pageSize: Int, sorting: Int, error: WalletError): TariVector? =
@@ -427,6 +364,35 @@ class TariWalletServiceStub(
             result
         }
 
+
+    private fun mapThrowableIntoError(walletError: WalletError, throwable: Throwable) {
+        if (throwable is FFIException) {
+            if (throwable.error != null) {
+                walletError.code = throwable.error.code
+                return
+            }
+        }
+        walletError.code = WalletError.UnknownError.code
+    }
+
+    private fun publicKeyFromFFI(publicKeyFFI: FFIPublicKey): PublicKey = PublicKey(publicKeyFFI.toString(), publicKeyFFI.getEmojiId())
+
+    private fun <T> runMapping(walletError: WalletError, onError: (Throwable) -> (Unit) = {}, action: () -> T?): T? {
+        return try {
+            action()
+        } catch (throwable: Throwable) {
+            onError(throwable)
+            mapThrowableIntoError(walletError, throwable)
+            null
+        }
+    }
+
+    private fun notifyTestnetTariRequestFailed(error: String) {
+        // post event to bus for the listeners
+        EventBus.post(Event.Testnet.TestnetTariRequestError(error))
+        // notify external listeners
+        walletServiceListener.listeners.iterator().forEach { listener -> listener.onTestnetTariRequestError(error) }
+    }
 
     companion object {
         private const val MESSAGE_PREFIX = "Hello Tari from"

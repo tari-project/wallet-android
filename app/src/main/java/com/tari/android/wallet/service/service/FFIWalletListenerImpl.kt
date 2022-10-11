@@ -7,6 +7,7 @@ import com.tari.android.wallet.event.Event
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.ffi.FFIWallet
 import com.tari.android.wallet.ffi.FFIWalletListener
+import com.tari.android.wallet.ffi.TXOValidationStatus
 import com.tari.android.wallet.infrastructure.backup.BackupManager
 import com.tari.android.wallet.model.*
 import com.tari.android.wallet.model.recovery.WalletRestorationResult
@@ -71,9 +72,7 @@ class FFIWalletListenerImpl(
         // post event to bus for the listeners
         EventBus.post(Event.Transaction.TxReplyReceived(pendingOutboundTx))
         // notify external listeners
-        listeners.iterator().forEach {
-            it.onTxReplyReceived(pendingOutboundTx)
-        }
+        listeners.iterator().forEach { it.onTxReplyReceived(pendingOutboundTx) }
         // schedule a backup
         backupManager.scheduleBackup(resetRetryCount = true)
     }
@@ -83,9 +82,7 @@ class FFIWalletListenerImpl(
         // post event to bus for the listeners
         EventBus.post(Event.Transaction.TxFinalized(pendingInboundTx))
         // notify external listeners
-        listeners.iterator().forEach {
-            it.onTxFinalized(pendingInboundTx)
-        }
+        listeners.iterator().forEach { it.onTxFinalized(pendingInboundTx) }
         // schedule a backup
         backupManager.scheduleBackup(resetRetryCount = true)
     }
@@ -95,9 +92,7 @@ class FFIWalletListenerImpl(
         // post event to bus for the listeners
         EventBus.post(Event.Transaction.InboundTxBroadcast(pendingInboundTx))
         // notify external listeners
-        listeners.iterator().forEach {
-            it.onInboundTxBroadcast(pendingInboundTx)
-        }
+        listeners.iterator().forEach { it.onInboundTxBroadcast(pendingInboundTx) }
         // schedule a backup
         backupManager.scheduleBackup(resetRetryCount = true)
     }
@@ -117,9 +112,7 @@ class FFIWalletListenerImpl(
         // post event to bus for the listeners
         EventBus.post(Event.Transaction.TxMined(completedTx))
         // notify external listeners
-        listeners.iterator().forEach {
-            it.onTxMined(completedTx)
-        }
+        listeners.iterator().forEach { it.onTxMined(completedTx) }
         // schedule a backup
         backupManager.scheduleBackup(resetRetryCount = true)
     }
@@ -129,9 +122,7 @@ class FFIWalletListenerImpl(
         // post event to bus for the listeners
         EventBus.post(Event.Transaction.TxMinedUnconfirmed(completedTx))
         // notify external listeners
-        listeners.iterator().forEach {
-            it.onTxMinedUnconfirmed(completedTx, confirmationCount)
-        }
+        listeners.iterator().forEach { it.onTxMinedUnconfirmed(completedTx, confirmationCount) }
         // schedule a backup
         backupManager.scheduleBackup(resetRetryCount = true)
     }
@@ -166,9 +157,7 @@ class FFIWalletListenerImpl(
         // schedule a backup
         backupManager.scheduleBackup(resetRetryCount = true)
         // notify external listeners
-        listeners.iterator().forEach {
-            it.onDirectSendResult(TxId(txId), status)
-        }
+        listeners.iterator().forEach { it.onDirectSendResult(TxId(txId), status) }
     }
 
     override fun onTxCancelled(cancelledTx: CancelledTx, rejectionReason: Int) {
@@ -186,8 +175,8 @@ class FFIWalletListenerImpl(
         backupManager.scheduleBackup(resetRetryCount = true)
     }
 
-    override fun onTXOValidationComplete(responseId: BigInteger, isSuccess: Boolean) {
-        checkValidationResult(BaseNodeValidationType.TXO, responseId, isSuccess)
+    override fun onTXOValidationComplete(responseId: BigInteger, status: TXOValidationStatus) {
+        checkValidationResult(BaseNodeValidationType.TXO, responseId, status == TXOValidationStatus.TxoValidationSuccess)
     }
 
     override fun onTxValidationComplete(responseId: BigInteger, isSuccess: Boolean) {
@@ -250,9 +239,7 @@ class FFIWalletListenerImpl(
                         || currentActivity !is HomeActivity
                         || !currentActivity.willNotifyAboutNewTx()
                     ) {
-                        notificationHelper.postCustomLayoutTxNotification(
-                            inboundTxEventNotificationTxs.last()
-                        )
+                        notificationHelper.postCustomLayoutTxNotification(inboundTxEventNotificationTxs.last())
                     }
                     inboundTxEventNotificationTxs.clear()
                 }
@@ -299,9 +286,7 @@ class FFIWalletListenerImpl(
 
     private fun checkValidationResult(type: BaseNodeValidationType, responseId: BigInteger, isSuccess: Boolean) {
         val currentStatus = baseNodeValidationStatusMap[type] ?: return
-        if (currentStatus.first != responseId) {
-            return
-        }
+        if (currentStatus.first != responseId) return
         baseNodeValidationStatusMap[type] = Pair(currentStatus.first, isSuccess)
         checkBaseNodeSyncCompletion()
     }

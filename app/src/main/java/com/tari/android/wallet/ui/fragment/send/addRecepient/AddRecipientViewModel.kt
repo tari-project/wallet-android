@@ -16,6 +16,7 @@ import com.tari.android.wallet.model.Contact
 import com.tari.android.wallet.model.PublicKey
 import com.tari.android.wallet.model.Tx
 import com.tari.android.wallet.model.User
+import com.tari.android.wallet.service.connection.ServiceConnectionStatus
 import com.tari.android.wallet.service.connection.TariWalletServiceConnection
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.common.SingleLiveEvent
@@ -82,7 +83,7 @@ class AddRecipientViewModel : CommonViewModel() {
         clipboardChecker.addSource(serviceIsReady) { if (readyToInteract.value!! && serviceIsReady.value!!) checkClipboardForValidEmojiId() }
 
         serviceConnection.connection.subscribe {
-            if (it.status == TariWalletServiceConnection.ServiceConnectionStatus.CONNECTED) {
+            if (it.status == ServiceConnectionStatus.CONNECTED) {
                 serviceIsReady.postValue(true)
                 viewModelScope.launch(Dispatchers.IO) {
                     fetchAllData()

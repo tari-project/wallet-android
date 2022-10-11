@@ -11,6 +11,7 @@ import com.tari.android.wallet.model.TxId
 import com.tari.android.wallet.model.WalletError
 import com.tari.android.wallet.network.NetworkConnectionState
 import com.tari.android.wallet.service.TariWalletService
+import com.tari.android.wallet.service.connection.ServiceConnectionStatus
 import com.tari.android.wallet.service.connection.TariWalletServiceConnection
 import com.tari.android.wallet.tor.TorBootstrapStatus
 import com.tari.android.wallet.tor.TorProxyState
@@ -116,7 +117,7 @@ class FinalizeSendTxViewModel : CommonViewModel() {
 
         override fun execute() {
             connectionService.connection.subscribe {
-                if (it.status == TariWalletServiceConnection.ServiceConnectionStatus.CONNECTED) onServiceConnected()
+                if (it.status == ServiceConnectionStatus.CONNECTED) onServiceConnected()
             }.addTo(compositeDisposable)
         }
 

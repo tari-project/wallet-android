@@ -64,25 +64,8 @@ class TariWalletServiceConnection : ViewModel(), ServiceConnection {
     }
 
     override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
-        _connection.onNext(
-            ServiceConnectionState(
-                ServiceConnectionStatus.CONNECTED,
-                TariWalletService.Stub.asInterface(service)
-            )
-        )
+        _connection.onNext(ServiceConnectionState(ServiceConnectionStatus.CONNECTED, TariWalletService.Stub.asInterface(service)))
     }
 
     override fun onCleared() = context.unbindService(this)
-
-    enum class ServiceConnectionStatus {
-        NOT_YET_CONNECTED,
-        CONNECTED,
-        DISCONNECTED
-    }
-
-    data class ServiceConnectionState(
-        val status: ServiceConnectionStatus,
-        val service: TariWalletService?
-    )
 }
-

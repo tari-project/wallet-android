@@ -6,6 +6,7 @@ import com.tari.android.wallet.R
 import com.tari.android.wallet.extension.addTo
 import com.tari.android.wallet.extension.getWithError
 import com.tari.android.wallet.model.WalletError
+import com.tari.android.wallet.service.connection.ServiceConnectionStatus
 import com.tari.android.wallet.service.connection.TariWalletServiceConnection
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.dialog.error.ErrorDialogArgs
@@ -21,7 +22,7 @@ class WriteDownSeedPhraseViewModel : CommonViewModel() {
 
     init {
         serviceConnection.connection.subscribe {
-            if (it.status == TariWalletServiceConnection.ServiceConnectionStatus.CONNECTED) {
+            if (it.status == ServiceConnectionStatus.CONNECTED) {
                 getSeedWords()
             }
         }.addTo(compositeDisposable)
