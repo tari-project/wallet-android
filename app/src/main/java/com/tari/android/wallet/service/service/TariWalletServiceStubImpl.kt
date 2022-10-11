@@ -161,12 +161,7 @@ class TariWalletServiceStubImpl(
     } ?: false
 
     override fun sendTari(
-        user: User,
-        amount: MicroTari,
-        feePerGram: MicroTari,
-        message: String,
-        isOneSidePayment: Boolean,
-        error: WalletError
+        user: User, amount: MicroTari, feePerGram: MicroTari, message: String, isOneSidePayment: Boolean, error: WalletError
     ): TxId? = runMapping(error) {
         val recipientPublicKeyHex = user.publicKey.hexString
         val txId = FFIPublicKey(HexString(recipientPublicKeyHex)).runWithDestroy {
@@ -191,34 +186,28 @@ class TariWalletServiceStubImpl(
         val signature = signing[0]
         val nonce = signing[1]
 
-        testnetFaucetService.requestMaxTestnetTari(
-            publicKeyHexString,
-            signature,
-            nonce,
-            { result ->
-                FFIPublicKey(HexString(result.walletId)).runWithDestroy {
-                    FFIContact("TariBot", it).runWithDestroy { contact -> wallet.addUpdateContact(contact) }
-                }
-                // update the keys with sender public key hex
-                result.keys.forEach { key -> key.senderPublicKeyHex = result.walletId }
-                // store the UTXO keys
-                testnetFaucetRepository.testnetTariUTXOKeyList = TestnetUtxoList(result.keys)
-
-                // post event to bus for the listeners
-                EventBus.post(Event.Testnet.TestnetTariRequestSuccessful())
-                // notify external listeners
-                walletServiceListener.listeners.iterator().forEach { it.onTestnetTariRequestSuccess() }
-            },
-            {
-                val errorMessage = resourceManager.getString(R.string.wallet_service_error_testnet_tari_request) + " " + it.message
-                logger.e(errorMessage + "failed on requesting faucet")
-                if (it is TestnetTariRequestException) {
-                    notifyTestnetTariRequestFailed(errorMessage)
-                } else {
-                    notifyTestnetTariRequestFailed(resourceManager.getString((R.string.wallet_service_error_no_internet_connection)))
-                }
+        testnetFaucetService.requestMaxTestnetTari(publicKeyHexString, signature, nonce, { result ->
+            FFIPublicKey(HexString(result.walletId)).runWithDestroy {
+                FFIContact("TariBot", it).runWithDestroy { contact -> wallet.addUpdateContact(contact) }
             }
-        )
+            // update the keys with sender public key hex
+            result.keys.forEach { key -> key.senderPublicKeyHex = result.walletId }
+            // store the UTXO keys
+            testnetFaucetRepository.testnetTariUTXOKeyList = TestnetUtxoList(result.keys)
+
+            // post event to bus for the listeners
+            EventBus.post(Event.Testnet.TestnetTariRequestSuccessful())
+            // notify external listeners
+            walletServiceListener.listeners.iterator().forEach { it.onTestnetTariRequestSuccess() }
+        }, {
+            val errorMessage = resourceManager.getString(R.string.wallet_service_error_testnet_tari_request) + " " + it.message
+            logger.e(errorMessage + "failed on requesting faucet")
+            if (it is TestnetTariRequestException) {
+                notifyTestnetTariRequestFailed(errorMessage)
+            } else {
+                notifyTestnetTariRequestFailed(resourceManager.getString((R.string.wallet_service_error_no_internet_connection)))
+            }
+        })
     }
 
     override fun importTestnetUTXO(txMessage: String, error: WalletError): CompletedTx? {
@@ -237,19 +226,7 @@ class TariWalletServiceStubImpl(
                 FFIByteVector(HexString(firstUTXOKey.output.metadataSignature.u)),
                 FFIByteVector(HexString(firstUTXOKey.output.metadataSignature.v))
             )
-            val covenant = FFICovenant(FFIByteVector(HexString(firstUTXOKey.output.covenant)))
-            val outputFeatures = FFIOutputFeatures('0', 0, FFIByteVector(HexString(firstUTXOKey.output.metadataSignature.public_nonce)))
-            val txId = wallet.importUTXO(
-                amount,
-                txMessage,
-                privateKey,
-                senderPublicKeyFFI,
-                outputFeatures,
-                signature,
-                covenant,
-                senderPublicKey,
-                scriptPrivateKey
-            )
+            val txId = wallet.importUTXO(amount, txMessage, privateKey, senderPublicKeyFFI, signature, senderPublicKey, scriptPrivateKey)
             privateKey.destroy()
             senderPublicKeyFFI.destroy()
             signature.destroy()
@@ -329,8 +306,7 @@ class TariWalletServiceStubImpl(
     override fun getUtxos(page: Int, pageSize: Int, sorting: Int, error: WalletError): TariVector? =
         runMapping(error) { wallet.getUtxos(page, pageSize, sorting) }
 
-    override fun getAllUtxos(error: WalletError): TariVector? =
-        runMapping(error) { wallet.getAllUtxos() }
+    override fun getAllUtxos(error: WalletError): TariVector? = runMapping(error) { wallet.getAllUtxos() }
 
     override fun joinUtxos(utxos: List<TariUtxo>, walletError: WalletError) = runMapping(walletError) {
         val ffiError = FFIError()
@@ -351,18 +327,14 @@ class TariWalletServiceStubImpl(
         result
     }
 
-    override fun previewSplitUtxos(utxos: List<TariUtxo>, splitCount: Int, walletError: WalletError): TariCoinPreview? =
-        runMapping(walletError) {
-            val ffiError = FFIError()
-            val result = wallet.splitPreviewUtxos(
-                utxos.map { it.commitment }.toTypedArray(),
-                splitCount,
-                Constants.Wallet.defaultFeePerGram.value,
-                ffiError
-            )
-            walletError.code = ffiError.code
-            result
-        }
+    override fun previewSplitUtxos(utxos: List<TariUtxo>, splitCount: Int, walletError: WalletError): TariCoinPreview? = runMapping(walletError) {
+        val ffiError = FFIError()
+        val result = wallet.splitPreviewUtxos(
+            utxos.map { it.commitment }.toTypedArray(), splitCount, Constants.Wallet.defaultFeePerGram.value, ffiError
+        )
+        walletError.code = ffiError.code
+        result
+    }
 
 
     private fun mapThrowableIntoError(walletError: WalletError, throwable: Throwable) {

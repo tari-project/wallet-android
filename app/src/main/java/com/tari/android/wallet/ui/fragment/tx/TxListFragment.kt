@@ -331,14 +331,7 @@ class TxListFragment : CommonFragment<FragmentTxListBinding, TxListViewModel>(),
     }
 
     override fun updateHasFailed(source: UpdateProgressViewController, failureReason: UpdateProgressViewController.FailureReason) {
-        lifecycleScope.launch(Dispatchers.Main) {
-            ui.scrollView.finishUpdate()
-            when (failureReason) {
-                UpdateProgressViewController.FailureReason.NETWORK_CONNECTION_ERROR,
-                UpdateProgressViewController.FailureReason.BASE_NODE_VALIDATION_ERROR -> viewModel.displayNetworkConnectionErrorDialog()
-            }
-        }
-
+        lifecycleScope.launch(Dispatchers.Main) { ui.scrollView.finishUpdate() }
         viewModel.refreshAllData()
     }
 
