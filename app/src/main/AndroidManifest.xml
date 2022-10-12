@@ -102,6 +102,18 @@
 
             </intent-filter>
         </activity>
+        <!-- sentry -->
+        <meta-data
+            android:name="io.sentry.dsn"
+            android:value="${sentryPublicDSN}" />
+
+        <!-- Google sign in activity -->
+        <activity
+            android:name="com.google.android.gms.auth.api.signin.internal.SignInHubActivity"
+            android:excludeFromRecents="true"
+            android:exported="false"
+            android:theme="@style/GoogleSignInActivity"
+            tools:replace="android:theme" />
         <activity
             android:name="com.tari.android.wallet.ui.fragment.qr.QRScannerActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"

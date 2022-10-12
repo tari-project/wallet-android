@@ -39,8 +39,6 @@ import java.math.BigInteger
  */
 class HexString constructor(bytes: FFIByteVector) {
 
-    private val pattern = "\\p{XDigit}+".toRegex()
-
     var hex = String()
 
     init {
@@ -55,8 +53,8 @@ class HexString constructor(bytes: FFIByteVector) {
         }
     }
 
-    constructor(string: String) : this(FFIByteVector(nullptr)) {
-        if (pattern.matches(string)) hex = string else throw FFIException(message = "$string is not valid Hex.")
+    constructor(hex: String) : this(FFIByteVector(nullptr)) {
+        this.hex = hex
     }
 
     override fun toString(): String = hex

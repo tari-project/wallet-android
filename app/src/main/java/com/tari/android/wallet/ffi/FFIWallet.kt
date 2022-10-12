@@ -54,8 +54,8 @@ class FFIWallet(
     val sharedPrefsRepository: SharedPrefsRepository,
     val seedPhraseRepository: SeedPhraseRepository,
     val networkRepository: NetworkRepository,
-    commsConfig: FFICommsConfig,
-    logPath: String
+    val commsConfig: FFICommsConfig,
+    val logPath: String
 ) : FFIBase() {
 
     private var balance: BalanceInfo = BalanceInfo()
@@ -157,9 +157,7 @@ class FFIWallet(
         amount: String,
         spendingKey: FFIPrivateKey,
         sourcePublicKey: FFIPublicKey,
-        outputFeatures: FFIOutputFeatures,
         tariCommitmentSignature: FFITariCommitmentSignature,
-        covenant: FFICovenant,
         sourceSenderPublicKey: FFIPublicKey,
         scriptPrivateKey: FFIPrivateKey,
         message: String,
@@ -227,55 +225,61 @@ class FFIWallet(
     // singletons
     init {
         if (pointer == nullptr) { // so it can only be assigned once for the singleton
-            val error = FFIError()
-            logger.i("Pre jniCreate")
-            try {
-                jniCreate(
-                    commsConfig,
-                    logPath,
-                    Constants.Wallet.maxNumberOfRollingLogFiles,
-                    Constants.Wallet.rollingLogFileMaxSizeBytes,
-                    sharedPrefsRepository.databasePassphrase,
-                    networkRepository.currentNetwork?.network?.uriComponent,
-                    seedPhraseRepository.getPhrase()?.ffiSeedWords,
-                    this::onTxReceived.name, "(J)V",
-                    this::onTxReplyReceived.name, "(J)V",
-                    this::onTxFinalized.name, "(J)V",
-                    this::onTxBroadcast.name, "(J)V",
-                    this::onTxMined.name, "(J)V",
-                    this::onTxMinedUnconfirmed.name, "(J[B)V",
-                    this::onTxFauxConfirmed.name, "(J)V",
-                    this::onTxFauxUnconfirmed.name, "(J[B)V",
-                    this::onDirectSendResult.name, "([BJ)V",
-                    this::onTxCancelled.name, "(J[B)V",
-                    this::onTXOValidationComplete.name, "([B[B)V",
-                    this::onContactLivenessDataUpdated.name, "(J)V",
-                    this::onBalanceUpdated.name, "(J)V",
-                    this::onTxValidationComplete.name, "([BZ)V",
-                    this::onConnectivityStatus.name, "([B)V",
-                    error
-                )
-            } catch (e: Throwable) {
-                logger.e(e, "jniCreate was failed")
-                throw e
-            }
-
-            logger.i("Post jniCreate with code: %d.", error.code)
-            throwIf(error)
-
-            enableEncryption()
+            init()
         }
     }
 
+    private fun init() {
+        val error = FFIError()
+        logger.i("Pre jniCreate")
+        try {
+            jniCreate(
+                commsConfig,
+                logPath,
+                Constants.Wallet.maxNumberOfRollingLogFiles,
+                Constants.Wallet.rollingLogFileMaxSizeBytes,
+                sharedPrefsRepository.databasePassphrase,
+                networkRepository.currentNetwork?.network?.uriComponent,
+                seedPhraseRepository.getPhrase()?.ffiSeedWords,
+                this::onTxReceived.name, "(J)V",
+                this::onTxReplyReceived.name, "(J)V",
+                this::onTxFinalized.name, "(J)V",
+                this::onTxBroadcast.name, "(J)V",
+                this::onTxMined.name, "(J)V",
+                this::onTxMinedUnconfirmed.name, "(J[B)V",
+                this::onTxFauxConfirmed.name, "(J)V",
+                this::onTxFauxUnconfirmed.name, "(J[B)V",
+                this::onDirectSendResult.name, "([BJ)V",
+                this::onTxCancelled.name, "(J[B)V",
+                this::onTXOValidationComplete.name, "([B[B)V",
+                this::onContactLivenessDataUpdated.name, "(J)V",
+                this::onBalanceUpdated.name, "(J)V",
+                this::onTxValidationComplete.name, "([BZ)V",
+                this::onConnectivityStatus.name, "([B)V",
+                error
+            )
+        } catch (e: Throwable) {
+            logger.e(e, "jniCreate was failed")
+            throw e
+        }
+
+        logger.i("Post jniCreate with code: %d.", error.code)
+        throwIf(error)
+
+        enableEncryption()
+    }
+
+    @Synchronized
     fun enableEncryption() {
-        val passphrase = sharedPrefsRepository.databasePassphrase
-        if (passphrase == null) {
-            logger.i("Database encryption enabled")
-            sharedPrefsRepository.generateDatabasePassphrase()
+        if (sharedPrefsRepository.databasePassphrase == null) {
             try {
-                setEncryption(sharedPrefsRepository.databasePassphrase.orEmpty())
+                val databasePassphrase = sharedPrefsRepository.generateDatabasePassphrase()
+                setEncryption(databasePassphrase)
+                sharedPrefsRepository.databasePassphrase = databasePassphrase
+                logger.i("Database encryption enabled")
             } catch (e: Throwable) {
                 sharedPrefsRepository.databasePassphrase = null
+                logger.i("Database encryption failed")
             }
         }
     }
@@ -525,9 +529,7 @@ class FFIWallet(
         message: String,
         spendingKey: FFIPrivateKey,
         sourcePublicKey: FFIPublicKey,
-        outputFeatures: FFIOutputFeatures,
         tariCommitmentSignature: FFITariCommitmentSignature,
-        covenant: FFICovenant,
         senderPublicKey: FFIPublicKey,
         scriptPrivateKey: FFIPrivateKey,
     ): BigInteger = runWithError {
@@ -536,9 +538,7 @@ class FFIWallet(
                 amount.toString(),
                 spendingKey,
                 sourcePublicKey,
-                outputFeatures,
                 tariCommitmentSignature,
-                covenant,
                 senderPublicKey,
                 scriptPrivateKey,
                 message,

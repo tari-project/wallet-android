@@ -1120,9 +1120,7 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniImportUTXO(
         jstring jAmount,
         jobject jpSpendingKey,
         jobject jpSourcePublicKey,
-        jobject jpFeatures,
         jobject jpTariCommitmentSignature,
-        jobject jpCovenant,
         jobject jpSourceSenderPublicKey,
         jobject jpScriptPrivateKey,
         jstring jMessage,
@@ -1140,17 +1138,11 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniImportUTXO(
     jlong lSourcePublicKey = GetPointerField(jEnv, jpSourcePublicKey);
     auto *pSourcePublicKey = reinterpret_cast<TariPublicKey *>(lSourcePublicKey);
 
-    jlong lFeatures = GetPointerField(jEnv, jpFeatures);
-    auto *pFeatures = reinterpret_cast<TariOutputFeatures *>(lFeatures);
-
     jlong lSourceSenderPublicKey = GetPointerField(jEnv, jpSourceSenderPublicKey);
     auto *pSourceSenderPublicKey = reinterpret_cast<TariPublicKey *>(lSourceSenderPublicKey);
 
     jlong jTariCommitmentSignature = GetPointerField(jEnv, jpTariCommitmentSignature);
     auto *pTariCommitmentSignature = reinterpret_cast<TariCommitmentSignature *>(jTariCommitmentSignature);
-
-    jlong jCovenant = GetPointerField(jEnv, jpCovenant);
-    auto *pCovenant = reinterpret_cast<TariCovenant *>(jCovenant);
 
     jlong jScriptPrivateKey = GetPointerField(jEnv, jpScriptPrivateKey);
     auto *pScriptPrivateKey = reinterpret_cast<TariPrivateKey *>(jScriptPrivateKey);
@@ -1167,11 +1159,11 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniImportUTXO(
                     amount,
                     pSpendingKey,
                     pSourcePublicKey,
-                    pFeatures,
+                    nullptr,
                     pTariCommitmentSignature,
                     pSourceSenderPublicKey,
                     pScriptPrivateKey,
-                    pCovenant,
+                    nullptr,
                     nullptr,
                     0,
                     pMessage,

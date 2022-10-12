@@ -52,9 +52,6 @@ class FFIByteVector() : FFIBase() {
 
     constructor(hex: HexString) : this() {
         val stringHex = hex.toString()
-        if (stringHex.length < 64) {
-            throw FFIException(message = "Argument's length is invalid - should be 64 but got " + "${stringHex.length}\n$stringHex")
-        }
         val hexInteger = BigInteger(stringHex, 16)
         var byteArray = hexInteger.toByteArray()
         // toByteArray for some reason added one leading zero. Probably gets it from protocol
