@@ -517,7 +517,7 @@ class TxListViewModel : CommonViewModel() {
             DialogArgs(true, canceledOnTouchOutside = false), listOf(
                 HeadModule(resourceManager.getString(home_tari_bot_you_got_tari_dlg_title)),
                 BodyModule(resourceManager.getString(home_tari_bot_dialog_desc)),
-                ButtonModule(resourceManager.getString(home_tari_bot_try_later), ButtonStyle.Normal) {
+                ButtonModule(resourceManager.getString(send_tari_title), ButtonStyle.Normal) {
                     sendTariToUser(testnetSenderPublicKey)
                 },
                 ButtonModule(resourceManager.getString(home_tari_bot_try_later), ButtonStyle.Close)
