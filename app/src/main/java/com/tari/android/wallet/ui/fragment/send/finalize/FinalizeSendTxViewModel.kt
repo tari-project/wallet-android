@@ -184,7 +184,7 @@ class FinalizeSendTxViewModel : CommonViewModel() {
                     transactionData.recipientUser,
                     transactionData.amount,
                     transactionData.feePerGram ?: Constants.Wallet.defaultFeePerGram,
-                    transactionData.note,
+                    transactionData.note.orEmpty(),
                     transactionData.isOneSidePayment,
                     error
                 )

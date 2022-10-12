@@ -279,7 +279,7 @@ class FFIWallet(
                 logger.i("Database encryption enabled")
             } catch (e: Throwable) {
                 sharedPrefsRepository.databasePassphrase = null
-                logger.i("Database encryption failed")
+                logger.e(e, "Database encryption failed")
             }
         }
     }
