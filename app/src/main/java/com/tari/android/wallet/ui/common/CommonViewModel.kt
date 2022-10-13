@@ -37,11 +37,12 @@ open class CommonViewModel : ViewModel() {
         logger.i(this::class.simpleName + "was started")
 
         EventBus.walletState.publishSubject.filter { it is WalletState.Failed }
-            .subscribe {
+            .subscribe({
                 val exception = (it as WalletState.Failed).exception
                 val errorArgs = WalletErrorArgs(resourceManager, exception).getErrorArgs().getModular(resourceManager)
                 _modularDialog.postValue(errorArgs)
-            }.addTo(compositeDisposable)
+            }, { logger.e(it, "on showing error dialog from wallet") })
+            .addTo(compositeDisposable)
     }
 
     override fun onCleared() {
