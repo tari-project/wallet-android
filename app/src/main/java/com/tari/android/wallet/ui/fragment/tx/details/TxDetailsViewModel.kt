@@ -49,7 +49,7 @@ class TxDetailsViewModel : CommonViewModel() {
     }
 
     fun setTxArg(tx: Tx) {
-        _tx.postValue(tx)
+        _tx.value = tx
         _cancellationReason.postValue(getCancellationReason(tx))
         generateExplorerLink()
     }

@@ -316,5 +316,8 @@ class FFIWalletTests {
 
         override fun onConnectivityStatus(status: Int) {
         }
+
+        override fun onBalanceUpdated(balanceInfo: BalanceInfo) {
+        }
     }
 }

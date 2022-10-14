@@ -187,6 +187,12 @@ class FFIWalletListenerImpl(
         }
     }
 
+    override fun onBalanceUpdated(balanceInfo: BalanceInfo) {
+        EventBus.balanceState.post(balanceInfo)
+        // notify external listeners
+        listeners.iterator().forEach { it.onBalanceUpdated(balanceInfo) }
+    }
+
     override fun onConnectivityStatus(status: Int) {
         when (status) {
             1 -> {

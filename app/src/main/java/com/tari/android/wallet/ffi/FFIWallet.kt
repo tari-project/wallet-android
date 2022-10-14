@@ -58,7 +58,6 @@ class FFIWallet(
     val logPath: String
 ) : FFIBase() {
 
-    private var balance: BalanceInfo = BalanceInfo()
     private val coroutineContext = Job()
     private var localScope = CoroutineScope(coroutineContext)
 
@@ -284,13 +283,8 @@ class FFIWallet(
         }
     }
 
-    fun getBalance(): BalanceInfo {
-        val result = runWithError { jniGetBalance(it) }
-        val newBalance = FFIBalance(result).runWithDestroy { BalanceInfo(it.getAvailable(), it.getIncoming(), it.getOutgoing(), it.getTimeLocked()) }
-        if (balance != newBalance) {
-            balance = newBalance
-        }
-        return balance
+    fun getBalance(): BalanceInfo = FFIBalance(runWithError { jniGetBalance(it) }).runWithDestroy {
+        BalanceInfo(it.getAvailable(), it.getIncoming(), it.getOutgoing(), it.getTimeLocked())
     }
 
     fun getUtxos(page: Int, pageSize: Int, sorting: Int): TariVector =
@@ -457,8 +451,8 @@ class FFIWallet(
     @Suppress("MemberVisibilityCanBePrivate")
     fun onBalanceUpdated(ptr: FFIPointer) {
         logger.i("Balance Updated")
-        val newBalance = FFIBalance(ptr).runWithDestroy { BalanceInfo(it.getAvailable(), it.getIncoming(), it.getOutgoing(), it.getTimeLocked()) }
-        this.balance = newBalance
+        val balance = FFIBalance(ptr).runWithDestroy { BalanceInfo(it.getAvailable(), it.getIncoming(), it.getOutgoing(), it.getTimeLocked()) }
+        localScope.launch { listener?.onBalanceUpdated(balance) }
     }
 
     /**
