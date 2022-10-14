@@ -6,7 +6,6 @@ import androidx.lifecycle.viewModelScope
 import com.tari.android.wallet.R.color.*
 import com.tari.android.wallet.R.drawable.*
 import com.tari.android.wallet.R.string.*
-import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepository
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.infrastructure.backup.BackupManager
 import com.tari.android.wallet.infrastructure.backup.BackupState
@@ -53,9 +52,6 @@ class AllSettingsViewModel : CommonViewModel() {
 
     @Inject
     lateinit var backupManager: BackupManager
-
-    @Inject
-    lateinit var networkRepository: NetworkRepository
 
     private val _navigation: SingleLiveEvent<AllSettingsNavigation> = SingleLiveEvent()
     val navigation: LiveData<AllSettingsNavigation> = _navigation

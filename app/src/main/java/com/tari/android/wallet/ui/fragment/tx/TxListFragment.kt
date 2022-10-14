@@ -323,7 +323,7 @@ class TxListFragment : CommonFragment<FragmentTxListBinding, TxListViewModel>(),
     }
 
     private fun grabberContainerViewLongClicked() {
-        (requireActivity() as CommonActivity<*, *>).openDebugActivity()
+        (requireActivity() as CommonActivity<*, *>).showDebugDialog()
     }
 
     override fun onSwipeRefresh(source: CustomScrollView) {

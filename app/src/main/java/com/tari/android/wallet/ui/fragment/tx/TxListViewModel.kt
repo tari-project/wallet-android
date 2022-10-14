@@ -52,9 +52,6 @@ class TxListViewModel : CommonViewModel() {
     lateinit var gifRepository: GIFRepository
 
     @Inject
-    lateinit var networkRepository: NetworkRepository
-
-    @Inject
     lateinit var backupSettingsRepository: BackupSettingsRepository
 
     @Inject

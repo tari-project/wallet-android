@@ -303,7 +303,6 @@
     <string name="finalize_send_tx_sending_step_3_desc_line_1">Good to go!</string>
     <string name="finalize_send_tx_sending_step_3_desc_line_2" tools:ignore="TypographyEllipsis">Your transaction is on its way...</string>
 
-    <!-- debug log - title -->
     <!-- wallet info -->
     <string name="wallet_info_my_profile">My Profile</string>
     <string name="wallet_info_qr_code_desc">Transacting in person? Others can scan this QR code from the Tari Aurora App to send you tXTR.</string>
@@ -356,6 +355,10 @@
 
     <!-- debug screens -->
     <!-- logs -->
+    <string name="debug_dialog_title">Debug Menu</string>
+    <string name="debug_dialog_logs">View logs</string>
+    <string name="debug_dialog_report">Report a bug</string>
+    <string name="debug_dialog_connection_status">View connection status</string>
     <string name="debug_log_files_title">Logs</string>
     <string name="debug_log_share_dialog_title">Share</string>
     <string name="debug_log_share_dialog_content">Please confirm to compress and e-mail your wallet log files.</string>

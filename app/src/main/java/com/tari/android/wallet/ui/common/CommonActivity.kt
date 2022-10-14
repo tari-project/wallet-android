@@ -11,8 +11,15 @@ import com.tari.android.wallet.R
 import com.tari.android.wallet.extension.observe
 import com.tari.android.wallet.ui.dialog.TariDialog
 import com.tari.android.wallet.ui.dialog.inProgress.TariProgressDialog
+import com.tari.android.wallet.ui.dialog.modular.DialogArgs
 import com.tari.android.wallet.ui.dialog.modular.ModularDialog
-import com.tari.android.wallet.ui.fragment.debug.activity.DebugActivity
+import com.tari.android.wallet.ui.dialog.modular.ModularDialogArgs
+import com.tari.android.wallet.ui.dialog.modular.modules.body.BodyModule
+import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonModule
+import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonStyle
+import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
+import com.tari.android.wallet.ui.dialog.modular.modules.option.OptionModule
+import com.tari.android.wallet.ui.fragment.settings.allSettings.TariVersionModel
 import yat.android.lib.YatIntegration
 
 abstract class CommonActivity<Binding : ViewBinding, VM : CommonViewModel> : AppCompatActivity(), ShakeDetector.Listener {
@@ -87,12 +94,22 @@ abstract class CommonActivity<Binding : ViewBinding, VM : CommonViewModel> : App
         currentDialog = dialog.also { it.show() }
     }
 
-    override fun hearShake() = openDebugActivity()
+    override fun hearShake() = showDebugDialog()
 
-    fun openDebugActivity() {
-        val intent = Intent(this, DebugActivity::class.java)
-        startActivity(intent)
-        overridePendingTransition(R.anim.enter_from_right, R.anim.exit_to_left)
+    fun showDebugDialog() {
+        val versionInfo = TariVersionModel(viewModel.networkRepository).versionInfo
+
+        val modularDialogArgs = ModularDialogArgs(
+            DialogArgs(), listOf(
+                HeadModule(getString(R.string.debug_dialog_title)),
+                OptionModule(getString(R.string.debug_dialog_logs)),
+                OptionModule(getString(R.string.debug_dialog_report)),
+                OptionModule(getString(R.string.debug_dialog_connection_status)),
+                BodyModule(versionInfo),
+                ButtonModule(getString(R.string.common_close), ButtonStyle.Close),
+            )
+        )
+        replaceDialog(ModularDialog(this, modularDialogArgs))
     }
 }
 
