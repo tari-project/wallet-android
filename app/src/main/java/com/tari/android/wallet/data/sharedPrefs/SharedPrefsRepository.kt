@@ -134,7 +134,6 @@ class SharedPrefsRepository(
             val str = String(ByteArray(1) { nextByte }, charset)
             if (str.first() != utfErrorCode) {
                 generatedString += str
-                break
             }
         }
         return generatedString

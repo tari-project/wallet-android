@@ -64,8 +64,6 @@ import com.tari.android.wallet.util.WalletUtil
 import io.reactivex.Observable
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 import org.joda.time.DateTime
 import org.joda.time.Hours
 import org.joda.time.Minutes
@@ -177,8 +175,6 @@ class WalletService : Service() {
         // stop wallet manager on a separate thread & unsubscribe from events
         EventBus.walletState.unsubscribe(this)
         lifecycleObserver?.let { ProcessLifecycleOwner.get().lifecycle.removeObserver(it) }
-        GlobalScope.launch { backupManager.turnOff(deleteExistingBackups = false) }
-        Thread(walletManager::stop).start()
     }
 
     private fun deleteWallet() {

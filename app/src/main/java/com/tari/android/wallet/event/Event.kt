@@ -49,6 +49,7 @@ object Event {
      * Wallet events.
      */
     object Transaction {
+        object Updated
         data class TxReceived(val tx: PendingInboundTx)
         data class TxReplyReceived(val tx: PendingOutboundTx)
         data class TxFinalized(val tx: PendingInboundTx)
