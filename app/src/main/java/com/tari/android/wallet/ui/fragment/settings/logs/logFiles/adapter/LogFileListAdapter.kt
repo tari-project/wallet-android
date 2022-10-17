@@ -30,29 +30,13 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.tari.android.wallet.ui.fragment.settings.logs.debugLog.adapter
+package com.tari.android.wallet.ui.fragment.settings.logs.logFiles.adapter
 
-import android.view.LayoutInflater
-import android.view.ViewGroup
-import androidx.recyclerview.widget.RecyclerView
-import com.tari.android.wallet.R
+import com.tari.android.wallet.ui.common.recyclerView.CommonAdapter
+import com.tari.android.wallet.ui.common.recyclerView.CommonViewHolderItem
+import com.tari.android.wallet.ui.common.recyclerView.ViewHolderBuilder
+import com.tari.android.wallet.ui.fragment.settings.allSettings.divider.SettingsDividerViewHolder
 
-class LogListAdapter(val logLines: MutableList<String> = mutableListOf()) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
-
-    private val regex = Regex("(\\d{4}-\\d{2}-\\d{2}\\s\\d{2}:\\d{2}:\\d{2}\\.\\d+)\\s(\\[[^]]+])\\s(\\[[^]]+]\\s)?([A-Z]+)\\s(.+)")
-
-    override fun getItemCount() = logLines.size
-
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder =
-        LogViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.item_log, parent, false))
-
-    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-        if (regex.matches(logLines[position])) {
-            val matchResult = regex.find(logLines[position])
-            val (timestamp, source1, source2, level, log) = matchResult!!.destructured
-            (holder as LogViewHolder).bind(timestamp, source1, source2, level, log)
-        } else {
-            (holder as LogViewHolder).bind(logLines[position])
-        }
-    }
+class LogFileListAdapter : CommonAdapter<CommonViewHolderItem>() {
+    override var viewHolderBuilders: List<ViewHolderBuilder> = listOf(LogFileViewHolder.getBuilder(), SettingsDividerViewHolder.getBuilder())
 }

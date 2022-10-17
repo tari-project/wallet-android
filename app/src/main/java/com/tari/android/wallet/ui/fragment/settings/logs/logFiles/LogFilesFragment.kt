@@ -30,62 +30,53 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.tari.android.wallet.ui.fragment.settings.baseNodeConfig.changeBaseNode
+package com.tari.android.wallet.ui.fragment.settings.logs.logFiles
 
 import android.os.Bundle
-import android.view.*
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.tari.android.wallet.R
-import com.tari.android.wallet.databinding.FragmentBaseNodeChangeBinding
+import com.tari.android.wallet.databinding.FragmentLogFilesBinding
 import com.tari.android.wallet.extension.observe
 import com.tari.android.wallet.ui.common.CommonFragment
-import com.tari.android.wallet.ui.common.recyclerView.CommonAdapter
-import com.tari.android.wallet.ui.extension.setOnThrottledClickListener
-import com.tari.android.wallet.ui.fragment.settings.baseNodeConfig.BaseNodeRouter
-import com.tari.android.wallet.ui.fragment.settings.baseNodeConfig.changeBaseNode.adapter.BaseNodeViewHolderItem
-import com.tari.android.wallet.ui.fragment.settings.baseNodeConfig.changeBaseNode.adapter.ChangeBaseNodeAdapter
+import com.tari.android.wallet.ui.fragment.settings.logs.activity.DebugActivity
+import com.tari.android.wallet.ui.fragment.settings.logs.activity.DebugNavigation
+import com.tari.android.wallet.ui.fragment.settings.logs.logFiles.adapter.LogFileListAdapter
+import java.io.File
 
-class ChangeBaseNodeFragment : CommonFragment<FragmentBaseNodeChangeBinding, ChangeBaseNodeViewModel>() {
+class LogFilesFragment : CommonFragment<FragmentLogFilesBinding, LogFilesViewModel>() {
 
-    private val adapter = ChangeBaseNodeAdapter()
+    private lateinit var recyclerViewAdapter: LogFileListAdapter
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
-        FragmentBaseNodeChangeBinding.inflate(inflater, container, false).also { ui = it }.root
+        FragmentLogFilesBinding.inflate(inflater, container, false).also { ui = it }.root
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val viewModel: ChangeBaseNodeViewModel by viewModels()
-        setHasOptionsMenu(true)
-        ui.rootView
+
+        val viewModel: LogFilesViewModel by viewModels()
         bindViewModel(viewModel)
+
         setupUI()
         observeUI()
     }
 
-    override fun onResume() {
-        super.onResume()
-        viewModel.refresh()
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) = inflater.inflate(R.menu.change_base_node_menu, menu)
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            R.id.add_base_node_action -> (requireActivity() as BaseNodeRouter).toAddCustomBaseNode()
-        }
-        return super.onOptionsItemSelected(item)
-    }
-
     private fun setupUI() = with(ui) {
-        backCtaView.setOnThrottledClickListener { requireActivity().onBackPressed() }
-        addBaseNodeButton.setOnThrottledClickListener { (requireActivity() as BaseNodeRouter).toAddCustomBaseNode() }
-        baseNodesList.adapter = adapter
-        baseNodesList.layoutManager = LinearLayoutManager(requireContext())
-        adapter.setClickListener(CommonAdapter.ItemClickListener { viewModel.selectBaseNode((it as BaseNodeViewHolderItem).baseNodeDto) })
+        backCtaView.setOnClickListener { requireActivity().onBackPressed() }
+        recyclerViewAdapter = LogFileListAdapter()
+        recyclerView.layoutManager = LinearLayoutManager(requireContext())
+        recyclerView.adapter = recyclerViewAdapter
     }
 
     private fun observeUI() = with(viewModel) {
-        observe(baseNodeList) { adapter.update(it) }
+        observe(logFiles) { recyclerViewAdapter.update(it) }
+
+        observe(goNext) { navigateToLogs(it) }
+    }
+
+    private fun navigateToLogs(file: File) {
+        (requireActivity() as? DebugActivity)?.navigate(DebugNavigation.LogDetail, file)
     }
 }

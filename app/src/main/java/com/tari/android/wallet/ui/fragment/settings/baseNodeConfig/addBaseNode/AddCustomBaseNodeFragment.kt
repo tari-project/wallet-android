@@ -127,8 +127,4 @@ class AddCustomBaseNodeFragment : CommonFragment<FragmentBaseNodeAddBinding, Add
             ui.addressEditText.setText(input[1])
         }
     }
-
-    companion object {
-        fun getNewInstance() = AddCustomBaseNodeFragment()
-    }
 }

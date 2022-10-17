@@ -18,5 +18,6 @@ class OptionModuleView(context: Context, buttonModule: OptionModule) : CommonVie
 
     init {
         ui.body.text = buttonModule.text
+        ui.root.setOnClickListener { buttonModule.action.invoke() }
     }
 }

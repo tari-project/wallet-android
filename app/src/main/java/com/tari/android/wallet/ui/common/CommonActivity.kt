@@ -20,6 +20,8 @@ import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonStyle
 import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
 import com.tari.android.wallet.ui.dialog.modular.modules.option.OptionModule
 import com.tari.android.wallet.ui.fragment.settings.allSettings.TariVersionModel
+import com.tari.android.wallet.ui.fragment.settings.logs.activity.DebugActivity
+import com.tari.android.wallet.ui.fragment.settings.logs.activity.DebugNavigation
 import yat.android.lib.YatIntegration
 
 abstract class CommonActivity<Binding : ViewBinding, VM : CommonViewModel> : AppCompatActivity(), ShakeDetector.Listener {
@@ -102,14 +104,19 @@ abstract class CommonActivity<Binding : ViewBinding, VM : CommonViewModel> : App
         val modularDialogArgs = ModularDialogArgs(
             DialogArgs(), listOf(
                 HeadModule(getString(R.string.debug_dialog_title)),
-                OptionModule(getString(R.string.debug_dialog_logs)),
-                OptionModule(getString(R.string.debug_dialog_report)),
-                OptionModule(getString(R.string.debug_dialog_connection_status)),
+                OptionModule(getString(R.string.debug_dialog_logs)) { openActivity(DebugNavigation.Logs) },
+                OptionModule(getString(R.string.debug_dialog_report)) { openActivity(DebugNavigation.BugReport) },
+                OptionModule(getString(R.string.debug_dialog_connection_status)) { openActivity(DebugNavigation.ConnectionStatus) },
                 BodyModule(versionInfo),
                 ButtonModule(getString(R.string.common_close), ButtonStyle.Close),
             )
         )
         replaceDialog(ModularDialog(this, modularDialogArgs))
+    }
+
+    private fun openActivity(navigation: DebugNavigation) {
+        currentDialog?.dismiss()
+        DebugActivity.launch(this, navigation)
     }
 }
 

@@ -48,6 +48,7 @@
     <string name="dummy_contact_alias">Sarah_D</string>
     <string name="dummy_contact_initial">S</string>
     <string name="dummy_message">Thanks again for helping with my move</string>
+    <string name="long_dummy_message">Thanks again for helping with my move. Thanks again for helping with my move. Thanks again for helping with my move. Thanks again for helping with my move</string>
     <string name="dummy_emoji">🍀</string>
 
     <!-- notifications -->
@@ -359,6 +360,7 @@
     <string name="debug_dialog_logs">View logs</string>
     <string name="debug_dialog_report">Report a bug</string>
     <string name="debug_dialog_connection_status">View connection status</string>
+    <string name="debug_logs_title">Debug Logs</string>
     <string name="debug_log_files_title">Logs</string>
     <string name="debug_log_share_dialog_title">Share</string>
     <string name="debug_log_share_dialog_content">Please confirm to compress and e-mail your wallet log files.</string>

@@ -30,62 +30,68 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.tari.android.wallet.ui.fragment.settings.baseNodeConfig.changeBaseNode
+package com.tari.android.wallet.ui.fragment.settings.logs.logs
 
 import android.os.Bundle
-import android.view.*
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.tari.android.wallet.R
-import com.tari.android.wallet.databinding.FragmentBaseNodeChangeBinding
+import com.tari.android.wallet.databinding.FragmentLogsBinding
 import com.tari.android.wallet.extension.observe
 import com.tari.android.wallet.ui.common.CommonFragment
-import com.tari.android.wallet.ui.common.recyclerView.CommonAdapter
-import com.tari.android.wallet.ui.extension.setOnThrottledClickListener
-import com.tari.android.wallet.ui.fragment.settings.baseNodeConfig.BaseNodeRouter
-import com.tari.android.wallet.ui.fragment.settings.baseNodeConfig.changeBaseNode.adapter.BaseNodeViewHolderItem
-import com.tari.android.wallet.ui.fragment.settings.baseNodeConfig.changeBaseNode.adapter.ChangeBaseNodeAdapter
+import com.tari.android.wallet.ui.extension.setVisible
+import com.tari.android.wallet.ui.fragment.settings.logs.activity.DebugActivity
+import com.tari.android.wallet.ui.fragment.settings.logs.logs.adapter.LogListAdapter
+import com.tari.android.wallet.ui.fragment.settings.logs.logs.adapter.LogViewHolderItem
+import java.io.File
 
-class ChangeBaseNodeFragment : CommonFragment<FragmentBaseNodeChangeBinding, ChangeBaseNodeViewModel>() {
+class LogsFragment : CommonFragment<FragmentLogsBinding, LogsViewModel>() {
 
-    private val adapter = ChangeBaseNodeAdapter()
+    private lateinit var recyclerViewAdapter: LogListAdapter
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
-        FragmentBaseNodeChangeBinding.inflate(inflater, container, false).also { ui = it }.root
+        FragmentLogsBinding.inflate(inflater, container, false).also { ui = it }.root
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val viewModel: ChangeBaseNodeViewModel by viewModels()
-        setHasOptionsMenu(true)
-        ui.rootView
+
+        val viewModel: LogsViewModel by viewModels()
         bindViewModel(viewModel)
+
+        (arguments?.getSerializable(DebugActivity.log_file) as? File)?.let {
+            this.ui.title.text = it.name
+            viewModel.initWithFile(it)
+        }
+
         setupUI()
         observeUI()
     }
 
-    override fun onResume() {
-        super.onResume()
-        viewModel.refresh()
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) = inflater.inflate(R.menu.change_base_node_menu, menu)
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            R.id.add_base_node_action -> (requireActivity() as BaseNodeRouter).toAddCustomBaseNode()
-        }
-        return super.onOptionsItemSelected(item)
-    }
-
     private fun setupUI() = with(ui) {
-        backCtaView.setOnThrottledClickListener { requireActivity().onBackPressed() }
-        addBaseNodeButton.setOnThrottledClickListener { (requireActivity() as BaseNodeRouter).toAddCustomBaseNode() }
-        baseNodesList.adapter = adapter
-        baseNodesList.layoutManager = LinearLayoutManager(requireContext())
-        adapter.setClickListener(CommonAdapter.ItemClickListener { viewModel.selectBaseNode((it as BaseNodeViewHolderItem).baseNodeDto) })
+        backCtaView.setOnClickListener { requireActivity().onBackPressed() }
+        recyclerViewAdapter = LogListAdapter()
+        recyclerView.layoutManager = LinearLayoutManager(requireContext())
+        recyclerView.adapter = recyclerViewAdapter
     }
 
     private fun observeUI() = with(viewModel) {
-        observe(baseNodeList) { adapter.update(it) }
+        observe(logs) { updateData(it) }
+    }
+
+    private fun updateData(list: MutableList<LogViewHolderItem>) {
+        ui.loadingState.setVisible(false)
+        recyclerViewAdapter.update(list)
+        //todo add scroll to bottom
+//        ui.recyclerView.layoutManager.scrollver
+    }
+
+    companion object {
+        fun getInstance(file: File): LogsFragment = LogsFragment().apply {
+            arguments = Bundle().apply {
+                putSerializable(DebugActivity.log_file, file)
+            }
+        }
     }
 }
