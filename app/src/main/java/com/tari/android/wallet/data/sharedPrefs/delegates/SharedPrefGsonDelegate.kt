@@ -23,7 +23,7 @@ class SharedPrefGsonDelegate<T>(
             try {
                 gson.fromJson(savedValue, type) as T
             } catch (e: Throwable) {
-                Logger.i(e.toString())
+                logger.e(e.toString())
                 defValue
             }
         } else {
@@ -36,5 +36,10 @@ class SharedPrefGsonDelegate<T>(
             putString(name, gson.toJson(value, type))
             apply()
         }
+    }
+
+    companion object {
+        private val logger
+            get() = Logger.t(SharedPrefGsonDelegate::class.simpleName)
     }
 }

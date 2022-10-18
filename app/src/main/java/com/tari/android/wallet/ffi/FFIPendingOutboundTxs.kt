@@ -37,37 +37,19 @@ package com.tari.android.wallet.ffi
  *
  * @author The Tari Development Team
  */
-internal class FFIPendingOutboundTxs() : FFIBase() {
-
-    // region JNI
+class FFIPendingOutboundTxs() : FFIBase() {
 
     private external fun jniGetLength(libError: FFIError): Int
     private external fun jniGetAt(index: Int, libError: FFIError): FFIPointer
-
     private external fun jniDestroy()
 
-    // endregion
-
-    constructor(pointer: FFIPointer): this() {
+    constructor(pointer: FFIPointer) : this() {
         this.pointer = pointer
     }
 
-    fun getLength(): Int {
-        val error = FFIError()
-        val result = jniGetLength(error)
-        throwIf(error)
-        return result
-    }
+    fun getLength(): Int = runWithError { jniGetLength(it) }
 
-    fun getAt(index: Int): FFIPendingOutboundTx {
-        val error = FFIError()
-        val result = FFIPendingOutboundTx(jniGetAt(index, error))
-        throwIf(error)
-        return result
-    }
+    fun getAt(index: Int): FFIPendingOutboundTx = runWithError { FFIPendingOutboundTx(jniGetAt(index, it)) }
 
-    override fun destroy() {
-        jniDestroy()
-    }
-
+    override fun destroy() = jniDestroy()
 }

@@ -11,13 +11,12 @@
     <string name="user_agreement_url">https://www.tari.com/user_agreement/</string>
     <string name="privacy_policy_url">https://www.tari.com/privacy_policy/</string>
     <string name="disclaimer_url">https://www.tari.com/disclaimer/</string>
-    <string name="explorer_url">https://explore.tari.com</string>
-    <string name="explorer_kernel_url">https://explore.tari.com/kernel/</string>
+    <string name="explorer_url">https://explore-esme.tari.com/</string>
+    <string name="explorer_kernel_url">https://explore-esme.tari.com/kernel/</string>
     <string name="tor_bridges_url">https://bridges.torproject.org/bridges</string>
     <string name="ffi_admin_email_address" translatable="false">bug_reports@tari.com</string>
     <string name="tari_lab_university_url" translatable="false">https://tlu.tarilabs.com/</string>
-    <string name="network_faucet_url" translatable="false">https://faucet.tari.com</string>
-    <string name="dibbler_faucet_url" translatable="false">https://dibbler-faucet.tari.com</string>
+    <string name="esmeralda_faucet_url" translatable="false">https://esmeralda-faucet.tari.com</string>
 
     <!-- digits -->
     <string name="digit_0">0</string>
@@ -118,9 +117,9 @@
     <string name="internet_connection_error_dialog_description">Your phone is either offline or has a poor connection at the moment. We\'ll wait here until you find some stronger signal.</string>
 
     <!-- service -->
-    <string name="wallet_service_title">Tari Aurora wallet service is running.</string>
-    <string name="wallet_service_description">This service carries out wallet operations across applications.</string>
-    <string name="wallet_service_error_testnet_tari_request">Could not allocate free tXTR.</string>
+    <string name="wallet_service_title">Tari Aurora wallet service is running</string>
+    <string name="wallet_service_description">This service carries out wallet operations across applications</string>
+    <string name="wallet_service_error_testnet_tari_request">Could not allocate free tXTR</string>
     <string name="wallet_service_error_no_internet_connection">No internet connection!</string>
 
     <!-- testnet UTXO messages -->
@@ -519,7 +518,7 @@
 
     <string name="restore_from_seed_words_overlay_error_title">Recovery Failed</string>
     <string name="restore_from_seed_words_overlay_error_description_connection_failed">Unable to connect with base node. Please try again later</string>
-    <string name="restore_from_seed_words_overlay_error_description_internal_error">Unable to recover your wallet due to the internal error</string>
+    <string name="restore_from_seed_words_overlay_error_description_internal_error">Unable to recover your wallet due to the error</string>
 
     <string name="restore_from_seed_words_autocompletion_start_typing">Start typing to see suggestions</string>
     <string name="restore_from_seed_words_autocompletion_no_suggestions">here are no suggestions for the phrase</string>

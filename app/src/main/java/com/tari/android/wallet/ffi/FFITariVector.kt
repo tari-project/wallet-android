@@ -9,7 +9,6 @@ class FFITariVector(pointer: FFIPointer) : FFIBase() {
     var longs = mutableListOf<Long>()
 
     private external fun jniLoadData()
-
     private external fun jniGetItemAt(index: Int): FFIPointer
 
     init {

@@ -34,10 +34,13 @@ package com.tari.android.wallet.network
 
 import android.content.BroadcastReceiver
 import android.content.Context
+import android.content.Context.CONNECTIVITY_SERVICE
 import android.content.Intent
 import android.content.IntentFilter
 import android.net.ConnectivityManager
-import android.net.NetworkInfo
+import android.net.NetworkCapabilities.NET_CAPABILITY_INTERNET
+import android.os.Build
+import androidx.annotation.RequiresApi
 import com.orhanobut.logger.Logger
 import com.tari.android.wallet.event.EventBus
 
@@ -46,10 +49,12 @@ import com.tari.android.wallet.event.EventBus
  *
  * @author The Tari Development Team
  */
-internal class NetworkConnectionStateReceiver : BroadcastReceiver() {
+class NetworkConnectionStateReceiver : BroadcastReceiver() {
 
     private val action = "android.net.conn.CONNECTIVITY_CHANGE"
     val intentFilter = IntentFilter(action)
+    private val logger
+        get() = Logger.t(NetworkConnectionStateReceiver::class.simpleName)
 
     init {
         EventBus.networkConnectionState.post(NetworkConnectionState.UNKNOWN)
@@ -60,20 +65,33 @@ internal class NetworkConnectionStateReceiver : BroadcastReceiver() {
             return
         }
         val mContext = context ?: return
-        if (checkConnection(mContext)) {
-            Logger.d("Connected to the internet.")
+        if (isInternetAvailable(mContext)) {
+            logger.i("Connected to the internet")
             EventBus.networkConnectionState.post(NetworkConnectionState.CONNECTED)
         } else {
-            Logger.d("Disconnected from the internet.")
+            logger.i("Disconnected from the internet")
             EventBus.networkConnectionState.post(NetworkConnectionState.DISCONNECTED)
         }
     }
 
-    private fun checkConnection(context: Context): Boolean {
-        // check network connection status
-        val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-        val activeNetwork: NetworkInfo? = connectivityManager.activeNetworkInfo
-        return activeNetwork?.isConnected ?: false
+    private fun isInternetAvailable(context: Context): Boolean = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+        isConnectedNewApi(context)
+    } else {
+        isConnectedOld(context)
     }
 
+    @Suppress("DEPRECATION")
+    fun isConnectedOld(context: Context): Boolean {
+        val connManager = context.getSystemService(CONNECTIVITY_SERVICE) as ConnectivityManager
+        val networkInfo = connManager.activeNetworkInfo
+        return networkInfo?.isConnected == true
+
+    }
+
+    @RequiresApi(Build.VERSION_CODES.M)
+    fun isConnectedNewApi(context: Context): Boolean {
+        val cm = context.getSystemService(CONNECTIVITY_SERVICE) as ConnectivityManager
+        val capabilities = cm.getNetworkCapabilities(cm.activeNetwork)
+        return capabilities?.hasCapability(NET_CAPABILITY_INTERNET) == true
+    }
 }

@@ -105,9 +105,6 @@ class AddAmountFragment : CommonFragment<FragmentAddAmountBinding, AddAmountView
         bindViewModel(viewModel)
         subscribeVM()
 
-        if (savedInstanceState == null) {
-            viewModel.tracker.screen(path = "/home/send_tari/add_amount", title = "Send Tari - Add Amount")
-        }
         isFirstLaunch = savedInstanceState == null
         ui.modifyButton.setOnClickListener { viewModel.showFeeDialog() }
     }
@@ -121,9 +118,9 @@ class AddAmountFragment : CommonFragment<FragmentAddAmountBinding, AddAmountView
     }
 
     private fun setupUI() {
-        val amount = arguments?.getDouble(SendTariActivity.PARAMETER_AMOUNT, Double.MIN_VALUE)
-        keyboardController.setup(requireContext(), AmountCheckRunnable(), ui.numpad, ui.amount, amount)
-        recipientUser = arguments?.getParcelable("recipientUser")
+        val amount = arguments?.getParcelable<MicroTari>(SendTariActivity.PARAMETER_AMOUNT)
+        keyboardController.setup(requireContext(), AmountCheckRunnable(), ui.numpad, ui.amount, amount?.tariValue?.toDouble() ?: Double.MIN_VALUE)
+        recipientUser = arguments?.getParcelable(SendTariActivity.PARAMETER_USER)
         // hide tx fee
         ui.txFeeContainerView.invisible()
         // hide/disable continue button

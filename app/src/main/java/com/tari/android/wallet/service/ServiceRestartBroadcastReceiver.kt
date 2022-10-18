@@ -40,6 +40,7 @@ import com.tari.android.wallet.data.WalletConfig
 import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepositoryImpl
 import com.tari.android.wallet.data.sharedPrefs.tariSettings.TariSettingsSharedRepository
 import com.tari.android.wallet.di.ApplicationModule
+import com.tari.android.wallet.service.service.WalletServiceLauncher
 import com.tari.android.wallet.ui.common.domain.ResourceManager
 
 /**
@@ -50,8 +51,11 @@ import com.tari.android.wallet.ui.common.domain.ResourceManager
  */
 class ServiceRestartBroadcastReceiver : BroadcastReceiver() {
 
+    private val logger
+        get() = Logger.t(ServiceRestartBroadcastReceiver::class.simpleName)
+
     override fun onReceive(context: Context, intent: Intent) {
-        Logger.d("Service restart broadcast received.")
+        logger.i("Service restart broadcast received")
         val resourceManager = ResourceManager(context)
         val sharedPreferences = context.getSharedPreferences(ApplicationModule.sharedPrefsFileName, Context.MODE_PRIVATE)
         val networkRepository = NetworkRepositoryImpl(resourceManager, sharedPreferences)

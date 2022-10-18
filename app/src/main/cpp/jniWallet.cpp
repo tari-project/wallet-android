@@ -239,17 +239,18 @@ void txCancellationCallback(TariCompletedTransaction *pCompletedTransaction, uin
     g_vm->DetachCurrentThread();
 }
 
-void txoValidationCompleteCallback(uint64_t requestId, bool success) {
+void txoValidationCompleteCallback(uint64_t requestId, uint64_t status) {
     auto *jniEnv = getJNIEnv();
     if (jniEnv == nullptr || callbackHandler == nullptr) {
         return;
     }
     jbyteArray requestIdBytes = getBytesFromUnsignedLongLong(jniEnv, requestId);
+    jbyteArray statusBytes = getBytesFromUnsignedLongLong(jniEnv, status);
     jniEnv->CallVoidMethod(
             callbackHandler,
             txoValidationCompleteCallbackMethodId,
             requestIdBytes,
-            success);
+            statusBytes);
     g_vm->DetachCurrentThread();
 }
 
@@ -930,7 +931,7 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniEstimateTxFee(
 
     jbyteArray result = getBytesFromUnsignedLongLong(
             jEnv,
-            wallet_get_fee_estimate(pWallet, amount, gramFee, kernels, outputs, errorCodePointer));
+            wallet_get_fee_estimate(pWallet, amount, nullptr, gramFee, kernels, outputs, errorCodePointer));
     setErrorCode(jEnv, error, errorCode);
     jEnv->ReleaseStringUTFChars(jAmount, nativeAmount);
     jEnv->ReleaseStringUTFChars(jGramFee, nativeGramFee);
@@ -1119,9 +1120,7 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniImportUTXO(
         jstring jAmount,
         jobject jpSpendingKey,
         jobject jpSourcePublicKey,
-        jobject jpFeatures,
         jobject jpTariCommitmentSignature,
-        jobject jpCovenant,
         jobject jpSourceSenderPublicKey,
         jobject jpScriptPrivateKey,
         jstring jMessage,
@@ -1139,17 +1138,11 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniImportUTXO(
     jlong lSourcePublicKey = GetPointerField(jEnv, jpSourcePublicKey);
     auto *pSourcePublicKey = reinterpret_cast<TariPublicKey *>(lSourcePublicKey);
 
-    jlong lFeatures = GetPointerField(jEnv, jpFeatures);
-    auto *pFeatures = reinterpret_cast<TariOutputFeatures *>(lFeatures);
-
     jlong lSourceSenderPublicKey = GetPointerField(jEnv, jpSourceSenderPublicKey);
     auto *pSourceSenderPublicKey = reinterpret_cast<TariPublicKey *>(lSourceSenderPublicKey);
 
     jlong jTariCommitmentSignature = GetPointerField(jEnv, jpTariCommitmentSignature);
     auto *pTariCommitmentSignature = reinterpret_cast<TariCommitmentSignature *>(jTariCommitmentSignature);
-
-    jlong jCovenant = GetPointerField(jEnv, jpCovenant);
-    auto *pCovenant = reinterpret_cast<TariCovenant *>(jCovenant);
 
     jlong jScriptPrivateKey = GetPointerField(jEnv, jpScriptPrivateKey);
     auto *pScriptPrivateKey = reinterpret_cast<TariPrivateKey *>(jScriptPrivateKey);
@@ -1166,15 +1159,18 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniImportUTXO(
                     amount,
                     pSpendingKey,
                     pSourcePublicKey,
-                    pFeatures,
+                    nullptr,
                     pTariCommitmentSignature,
                     pSourceSenderPublicKey,
                     pScriptPrivateKey,
-                    pCovenant,
+                    nullptr,
+                    nullptr,
+                    0,
                     pMessage,
                     errorCodePointer
             )
     );
+
     setErrorCode(jEnv, error, errorCode);
     jEnv->ReleaseStringUTFChars(jAmount, nativeAmount);
     jEnv->ReleaseStringUTFChars(jMessage, pMessage);
@@ -1424,7 +1420,7 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniSendTx(
 
     jbyteArray result = getBytesFromUnsignedLongLong(
             jEnv,
-            wallet_send_transaction(pWallet, pDestination, amount, feePerGram, pMessage, jOneSided, errorCodePointer));
+            wallet_send_transaction(pWallet, pDestination, amount, nullptr, feePerGram, pMessage, jOneSided, errorCodePointer));
     setErrorCode(jEnv, error, errorCode);
     jEnv->ReleaseStringUTFChars(jAmount, nativeAmount);
     jEnv->ReleaseStringUTFChars(jFeePerGram, nativeFeePerGram);

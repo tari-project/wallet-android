@@ -2,7 +2,6 @@ package com.tari.android.wallet.ui.fragment.send.finalize
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import com.orhanobut.logger.Logger
 import com.tari.android.wallet.R.string.*
 import com.tari.android.wallet.event.Event
 import com.tari.android.wallet.event.EventBus
@@ -12,6 +11,7 @@ import com.tari.android.wallet.model.TxId
 import com.tari.android.wallet.model.WalletError
 import com.tari.android.wallet.network.NetworkConnectionState
 import com.tari.android.wallet.service.TariWalletService
+import com.tari.android.wallet.service.connection.ServiceConnectionStatus
 import com.tari.android.wallet.service.connection.TariWalletServiceConnection
 import com.tari.android.wallet.tor.TorBootstrapStatus
 import com.tari.android.wallet.tor.TorProxyState
@@ -40,8 +40,6 @@ class FinalizeSendTxViewModel : CommonViewModel() {
 
     init {
         component.inject(this)
-
-        tracker.screen(path = "/home/send_tari/finalize", title = "Send Tari - Finalize")
     }
 
     fun start() {
@@ -119,7 +117,7 @@ class FinalizeSendTxViewModel : CommonViewModel() {
 
         override fun execute() {
             connectionService.connection.subscribe {
-                if (it.status == TariWalletServiceConnection.ServiceConnectionStatus.CONNECTED) onServiceConnected()
+                if (it.status == ServiceConnectionStatus.CONNECTED) onServiceConnected()
             }.addTo(compositeDisposable)
         }
 
@@ -143,7 +141,6 @@ class FinalizeSendTxViewModel : CommonViewModel() {
             val torProxyState = EventBus.torProxyState.publishSubject.value
             // check internet connection
             if (networkConnectionState != NetworkConnectionState.CONNECTED) {
-                Logger.w("Send error: not connected to the internet.")
                 // either not connected or Tor proxy is not running
                 txFailureReason.value = TxFailureReason.NETWORK_CONNECTION_ERROR
                 isCompleted = true
@@ -151,7 +148,6 @@ class FinalizeSendTxViewModel : CommonViewModel() {
             }
             // check whether Tor proxy is running
             if (torProxyState !is TorProxyState.Running) {
-                Logger.w("Send error: Tor proxy is not running.")
                 // either not connected or Tor proxy is not running
                 txFailureReason.value = TxFailureReason.NETWORK_CONNECTION_ERROR
                 isCompleted = true
@@ -159,7 +155,6 @@ class FinalizeSendTxViewModel : CommonViewModel() {
             }
             // check Tor bootstrap status
             if (torProxyState.bootstrapStatus.progress < TorBootstrapStatus.maxProgress) {
-                Logger.d("Tor proxy not ready - start waiting.")
                 // subscribe to Tor proxy state changes - start waiting on it
                 EventBus.torProxyState.publishSubject.subscribe { state -> onTorProxyStateChanged(state) }.addTo(compositeDisposable)
             } else {
@@ -189,7 +184,7 @@ class FinalizeSendTxViewModel : CommonViewModel() {
                     transactionData.recipientUser,
                     transactionData.amount,
                     transactionData.feePerGram ?: Constants.Wallet.defaultFeePerGram,
-                    transactionData.note,
+                    transactionData.note.orEmpty(),
                     transactionData.isOneSidePayment,
                     error
                 )
@@ -224,12 +219,9 @@ class FinalizeSendTxViewModel : CommonViewModel() {
 
         private fun onDirectSendResult(txId: TxId, status: TransactionSendStatus) {
             if (sentTxId.value != txId) {
-                Logger.d("Response received for another tx with id: ${txId.value}.")
                 return
             }
             if (status.isSuccess) {
-                // track event
-                tracker.event(category = "Transaction", action = "Transaction Accepted - Synchronous")
                 // progress state
                 finishSendingTx()
             }

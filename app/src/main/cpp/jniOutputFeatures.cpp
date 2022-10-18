@@ -45,12 +45,8 @@ Java_com_tari_android_wallet_ffi_FFIOutputFeatures_jniCreate(
         JNIEnv *jEnv,
         jobject jThis,
         jchar version,
-        jchar flags,
         jlong maturity,
-        jchar recovery_byte,
         jobject metadata,
-        jobject unique_id,
-        jobject parent_public_key,
         jobject error) {
     int errorCode = 0;
     int *errorCodePointer = &errorCode;
@@ -58,21 +54,14 @@ Java_com_tari_android_wallet_ffi_FFIOutputFeatures_jniCreate(
     jlong lMetadata = GetPointerField(jEnv, metadata);
     auto *pMetadata = reinterpret_cast<ByteVector *>(lMetadata);
 
-    jlong lUniqueId = GetPointerField(jEnv, unique_id);
-    auto *pUniqueId = reinterpret_cast<ByteVector *>(lUniqueId);
-
-    jlong lParentPublicKey = GetPointerField(jEnv, parent_public_key);
-    auto *pPublicKey = reinterpret_cast<ByteVector *>(lParentPublicKey);
-
     TariOutputFeatures *pOutputFeatures = output_features_create_from_bytes(
             version,
-            flags,
+            //todo
+            0,
             maturity,
-            recovery_byte,
             pMetadata,
-            pUniqueId,
-            pPublicKey,
             errorCodePointer);
+
     SetPointerField(jEnv, jThis, reinterpret_cast<jlong>(pOutputFeatures));
     setErrorCode(jEnv, error, errorCode);
 }

@@ -37,7 +37,7 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
-internal class TestnetFaucetRESTService(
+class TestnetFaucetRESTService(
     private val gateway: TestnetFaucetRESTGateway,
     private val networkRepository: NetworkRepository
 ) : TestnetFaucetService {

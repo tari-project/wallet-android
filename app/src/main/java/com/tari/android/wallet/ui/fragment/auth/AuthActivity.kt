@@ -40,8 +40,6 @@ import android.os.Bundle
 import android.view.View
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
-import androidx.biometric.BiometricPrompt.ERROR_CANCELED
-import androidx.biometric.BiometricPrompt.ERROR_USER_CANCELED
 import androidx.core.animation.addListener
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -55,7 +53,7 @@ import com.tari.android.wallet.databinding.ActivityAuthBinding
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.extension.addTo
 import com.tari.android.wallet.infrastructure.security.biometric.BiometricAuthenticationException
-import com.tari.android.wallet.ui.activity.home.HomeActivity
+import com.tari.android.wallet.ui.fragment.home.HomeActivity
 import com.tari.android.wallet.ui.common.CommonActivity
 import com.tari.android.wallet.ui.extension.*
 import com.tari.android.wallet.ui.fragment.settings.allSettings.TariVersionModel
@@ -78,9 +76,6 @@ class AuthActivity : CommonActivity<ActivityAuthBinding, AuthViewModel>() {
 
         setupUi()
         viewModel.walletServiceLauncher.start()
-        if (savedInstanceState == null) {
-            viewModel.tracker.screen(path = "/local_auth", title = "Local Authentication")
-        }
     }
 
     private fun setupUi() {
@@ -146,8 +141,6 @@ class AuthActivity : CommonActivity<ActivityAuthBinding, AuthViewModel>() {
                     )
                     authSuccessful()
                 } catch (e: BiometricAuthenticationException) {
-                    if (e.code != ERROR_USER_CANCELED && e.code != ERROR_CANCELED)
-                        Logger.e("Other biometric error. Code: ${e.code}")
                     authHasFailed()
                 }
             }
@@ -169,7 +162,6 @@ class AuthActivity : CommonActivity<ActivityAuthBinding, AuthViewModel>() {
      * Auth has failed.
      */
     private fun authHasFailed() {
-        Logger.e("Authentication other error.")
         displayAuthFailedDialog()
     }
 

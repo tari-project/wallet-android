@@ -41,73 +41,44 @@ import java.math.BigInteger
  */
 class FFIByteVector() : FFIBase() {
 
-    // region JNI
-
     private external fun jniGetLength(error: FFIError): Int
     private external fun jniGetAt(index: Int, error: FFIError): Int
     private external fun jniDestroy()
     private external fun jniCreate(byteArray: ByteArray, error: FFIError)
 
-    // endregion
-    constructor(pointer: FFIPointer): this() {
+    constructor(pointer: FFIPointer) : this() {
         this.pointer = pointer
     }
 
-    constructor(hex: HexString): this() {
+    constructor(hex: HexString) : this() {
         val stringHex = hex.toString()
-        if (stringHex.length < 64) {
-            throw FFIException(
-                message = "Argument's length is invalid - should be 64 but got " +
-                        "${stringHex.length}\n$stringHex"
-            )
-        }
         val hexInteger = BigInteger(stringHex, 16)
         var byteArray = hexInteger.toByteArray()
         // toByteArray for some reason added one leading zero. Probably gets it from protocol
         if (byteArray.size == 33 && byteArray[0] == 0.toByte()) {
             byteArray = byteArray.drop(1).toByteArray()
         }
-        val error = FFIError()
-        jniCreate(byteArray, error)
-        throwIf(error)
+        runWithError { jniCreate(byteArray, it) }
     }
 
-    constructor(bytes: ByteArray): this() {
-        val error = FFIError()
-        jniCreate(bytes, error)
-        throwIf(error)
+    constructor(bytes: ByteArray) : this() {
+        runWithError { jniCreate(bytes, it) }
     }
 
-    fun getAt(index: Int): Int {
-        val error = FFIError()
-        val byte = jniGetAt(index, error)
-        throwIf(error)
-        return byte
-    }
+    fun getAt(index: Int): Int = runWithError { jniGetAt(index, it) }
 
-    fun getLength(): Int {
-        val error = FFIError()
-        val len = jniGetLength(error)
-        throwIf(error)
-        return len
-    }
+    fun getLength(): Int = runWithError { jniGetLength(it) }
 
     fun getBytes(): ByteArray {
         val length = getLength()
         val byteArray = ByteArray(length)
-        for (i in 0 until length) {
-            val m = getAt(i)
-            byteArray[i] = m.toByte()
+        for (i in byteArray.indices) {
+            byteArray[i] = getAt(i).toByte()
         }
         return byteArray
     }
 
-    override fun toString(): String {
-        return HexString(this).toString()
-    }
+    override fun toString(): String = HexString(this).toString()
 
-    override fun destroy() {
-        jniDestroy()
-    }
-
+    override fun destroy() = jniDestroy()
 }

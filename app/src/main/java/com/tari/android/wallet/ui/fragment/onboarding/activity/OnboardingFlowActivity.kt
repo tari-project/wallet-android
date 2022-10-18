@@ -34,15 +34,18 @@ package com.tari.android.wallet.ui.fragment.onboarding.activity
 
 import android.content.Intent
 import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
+import androidx.activity.viewModels
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import com.tari.android.wallet.R
 import com.tari.android.wallet.data.WalletConfig
 import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
+import com.tari.android.wallet.databinding.ActivityOnboardingFlowBinding
 import com.tari.android.wallet.di.DiContainer.appComponent
-import com.tari.android.wallet.service.WalletServiceLauncher
-import com.tari.android.wallet.ui.activity.home.HomeActivity
+import com.tari.android.wallet.service.service.WalletServiceLauncher
+import com.tari.android.wallet.ui.fragment.home.HomeActivity
+import com.tari.android.wallet.ui.common.CommonActivity
+import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.fragment.onboarding.createWallet.CreateWalletFragment
 import com.tari.android.wallet.ui.fragment.onboarding.createWallet.CreateWalletListener
 import com.tari.android.wallet.ui.fragment.onboarding.inroduction.IntroductionFragment
@@ -63,7 +66,7 @@ import javax.inject.Inject
  *
  * @author The Tari Development Team
  */
-class OnboardingFlowActivity : AppCompatActivity(), IntroductionListener, CreateWalletListener, LocalAuthListener {
+class OnboardingFlowActivity : CommonActivity<ActivityOnboardingFlowBinding, CommonViewModel>(), IntroductionListener, CreateWalletListener, LocalAuthListener {
 
     @Inject
     lateinit var walletConfig: WalletConfig
@@ -77,7 +80,11 @@ class OnboardingFlowActivity : AppCompatActivity(), IntroductionListener, Create
     override fun onCreate(savedInstanceState: Bundle?) {
         appComponent.inject(this)
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_onboarding_flow)
+        ui = ActivityOnboardingFlowBinding.inflate(layoutInflater).apply { setContentView(root) }
+
+        val viewModel: OnboardingFlowViewModel by viewModels()
+        bindViewModel(viewModel)
+
         when {
             sharedPrefsWrapper.onboardingAuthWasInterrupted -> {
                 walletServiceLauncher.start()

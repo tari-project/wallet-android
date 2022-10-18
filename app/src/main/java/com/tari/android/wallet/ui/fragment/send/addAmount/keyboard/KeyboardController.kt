@@ -20,7 +20,7 @@ import com.tari.android.wallet.util.WalletUtil
 import java.math.BigInteger
 import kotlin.math.min
 
-internal class KeyboardController {
+class KeyboardController {
 
     /**
      * Maps all the elements (digits & separators) displayed in the amount text to their

@@ -22,10 +22,12 @@ import com.tari.android.wallet.ui.fragment.restore.inputSeedWords.suggestions.Su
 import com.tari.android.wallet.ui.fragment.restore.inputSeedWords.suggestions.SuggestionsAdapter
 import com.tari.android.wallet.ui.fragment.restore.restore.WalletRestoreRouter
 import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent
+import net.yslibrary.android.keyboardvisibilityevent.Unregistrar
 
-internal class InputSeedWordsFragment : CommonFragment<FragmentWalletInputSeedWordsBinding, InputSeedWordsViewModel>() {
+class InputSeedWordsFragment : CommonFragment<FragmentWalletInputSeedWordsBinding, InputSeedWordsViewModel>() {
 
     private val suggestionsAdapter = SuggestionsAdapter()
+    private var keyboardRegistrar: Unregistrar? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
         FragmentWalletInputSeedWordsBinding.inflate(inflater, container, false).also { ui = it }.root
@@ -41,6 +43,16 @@ internal class InputSeedWordsFragment : CommonFragment<FragmentWalletInputSeedWo
         subscribeUI()
 
         viewModel.getFocusToNextElement(-1)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        keyboardRegistrar?.unregister()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        keyboardRegistrar = KeyboardVisibilityEvent.registerEventListener(requireActivity()) { viewModel.setSuggestionState(it) }
     }
 
     private fun setupUI() = with(ui) {
@@ -64,12 +76,14 @@ internal class InputSeedWordsFragment : CommonFragment<FragmentWalletInputSeedWo
         suggestionsAdapter.setClickListener(CommonAdapter.ItemClickListener { viewModel.selectSuggestion(it) })
         suggestions.adapter = suggestionsAdapter
         suggestions.layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
-
-        KeyboardVisibilityEvent.setEventListener(requireActivity()) { viewModel.setSuggestionState(it) }
     }
 
     private fun subscribeUI() = with(viewModel) {
-        observeOnLoad(words)
+        observe(words) {
+            if (ui.seedWordsFlexboxLayout.getChildAt(0) == null) {
+                it.forEach { word -> addWord(word) }
+            }
+        }
 
         observe(addedWord) { addWord(it) }
 
@@ -145,6 +159,7 @@ internal class InputSeedWordsFragment : CommonFragment<FragmentWalletInputSeedWo
                 updateState(hasFocus, word.isValid())
                 if (hasFocus) viewModel.getFocus(word.index.value!!, true)
             }
+            updateState(false, word.isValid())
             ui.text.setOnEditorActionListener { _, actionId, _ ->
                 if (actionId == EditorInfo.IME_ACTION_NEXT) {
                     viewModel.finishEntering(word.index.value!!, ui.text.text?.toString().orEmpty())

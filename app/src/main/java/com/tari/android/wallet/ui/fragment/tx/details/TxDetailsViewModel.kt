@@ -2,7 +2,6 @@ package com.tari.android.wallet.ui.fragment.tx.details
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.orhanobut.logger.Logger
 import com.tari.android.wallet.R
 import com.tari.android.wallet.event.Event
 import com.tari.android.wallet.event.EventBus
@@ -12,6 +11,7 @@ import com.tari.android.wallet.extension.getWithError
 import com.tari.android.wallet.ffi.FFITxCancellationReason
 import com.tari.android.wallet.model.*
 import com.tari.android.wallet.service.TariWalletService
+import com.tari.android.wallet.service.connection.ServiceConnectionStatus
 import com.tari.android.wallet.service.connection.TariWalletServiceConnection
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.dialog.error.ErrorDialogArgs
@@ -38,7 +38,7 @@ class TxDetailsViewModel : CommonViewModel() {
 
     init {
         serviceConnection.connection.subscribe {
-            if (it.status == TariWalletServiceConnection.ServiceConnectionStatus.CONNECTED) {
+            if (it.status == ServiceConnectionStatus.CONNECTED) {
                 fetchRequiredConfirmationCount()
                 findTxAndUpdateUI()
                 _tx.value = _tx.value
@@ -49,7 +49,7 @@ class TxDetailsViewModel : CommonViewModel() {
     }
 
     fun setTxArg(tx: Tx) {
-        _tx.postValue(tx)
+        _tx.value = tx
         _cancellationReason.postValue(getCancellationReason(tx))
         generateExplorerLink()
     }
@@ -124,7 +124,6 @@ class TxDetailsViewModel : CommonViewModel() {
 
     private fun updateTxData(tx: Tx) {
         if (tx.id == this.tx.value?.id) {
-            Logger.d("Updating TX\nOld: ${this.tx.value}\nNew: $tx")
             setTxArg(tx)
         }
     }

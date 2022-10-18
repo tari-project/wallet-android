@@ -13,7 +13,7 @@ import com.tari.android.wallet.ui.fragment.debug.baseNodeConfig.validator.Public
 import com.tari.android.wallet.ui.fragment.debug.baseNodeConfig.validator.Validator
 import javax.inject.Inject
 
-internal class AddCustomBaseNodeViewModel : CommonViewModel() {
+class AddCustomBaseNodeViewModel : CommonViewModel() {
     @Inject
     lateinit var baseNodeSharedRepository: BaseNodeSharedRepository
 

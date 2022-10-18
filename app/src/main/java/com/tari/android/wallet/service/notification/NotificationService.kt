@@ -38,8 +38,7 @@ interface NotificationService {
         recipientPublicKeyHex: String,
         senderPublicKeyHex: String,
         signer: (String) -> String,
-        onSuccess: () -> Unit,
-        onFailure: (Throwable) -> Unit
+        onSuccess: () -> Unit = {},
+        onFailure: (Throwable) -> Unit = {}
     )
-
 }

@@ -136,7 +136,7 @@ class WalletInfoFragment : CommonFragment<FragmentWalletInfoBinding, WalletInfoV
             val barcodeEncoder = BarcodeEncoder()
             val map = barcodeEncoder.encode(content, BarcodeFormat.QR_CODE, size, size, hints)
             barcodeEncoder.createBitmap(map)
-        } catch (e: Exception) {
+        } catch (e: Throwable) {
             null
         }
     }
