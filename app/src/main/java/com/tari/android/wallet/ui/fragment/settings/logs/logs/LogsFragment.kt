@@ -71,6 +71,7 @@ class LogsFragment : CommonFragment<FragmentLogsBinding, LogsViewModel>() {
 
     private fun setupUI() = with(ui) {
         backCtaView.setOnClickListener { requireActivity().onBackPressed() }
+        filterButton.setOnClickListener { viewModel.showFilters() }
         recyclerViewAdapter = LogListAdapter()
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
         recyclerView.adapter = recyclerViewAdapter

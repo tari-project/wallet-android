@@ -6,6 +6,8 @@ import com.tari.android.wallet.data.WalletConfig
 import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import com.tari.android.wallet.infrastructure.logging.BugReportingService
 import com.tari.android.wallet.ui.common.CommonViewModel
+import com.tari.android.wallet.ui.dialog.modular.DialogArgs
+import com.tari.android.wallet.ui.dialog.modular.ModularDialogArgs
 import com.tari.android.wallet.ui.fragment.settings.logs.logs.adapter.LogViewHolderItem
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -32,5 +34,12 @@ class LogsViewModel : CommonViewModel() {
     fun initWithFile(file: File?) = viewModelScope.launch(Dispatchers.IO) {
         val lines = file?.inputStream()?.bufferedReader()?.readLines()?.toMutableList() ?: return@launch
         logs.postValue(lines.map { LogViewHolderItem(it) }.toMutableList())
+    }
+
+    fun showFilters() {
+        val modularDialogArgs = ModularDialogArgs(DialogArgs(), listOf(
+
+        ))
+        _modularDialog.postValue(modularDialogArgs)
     }
 }

@@ -36,13 +36,10 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.viewModels
-import androidx.fragment.app.Fragment
-import com.tari.android.wallet.R
 import com.tari.android.wallet.databinding.ActivityDebugBinding
 import com.tari.android.wallet.ui.common.CommonActivity
 import com.tari.android.wallet.ui.fragment.settings.baseNodeConfig.BaseNodeRouter
 import com.tari.android.wallet.ui.fragment.settings.baseNodeConfig.addBaseNode.AddCustomBaseNodeFragment
-import com.tari.android.wallet.ui.fragment.settings.baseNodeConfig.changeBaseNode.ChangeBaseNodeFragment
 import com.tari.android.wallet.ui.fragment.settings.logs.logFiles.LogFilesFragment
 import com.tari.android.wallet.ui.fragment.settings.logs.logs.LogsFragment
 import java.io.File
@@ -58,41 +55,21 @@ class DebugActivity : CommonActivity<ActivityDebugBinding, DebugViewModel>(), Ba
         val viewModel: DebugViewModel by viewModels()
         bindViewModel(viewModel)
 
+        setContainerId(ui.navContainer.id)
+
         val navigationStr = intent.getStringExtra(navigation_key)
         navigate(DebugNavigation.values().firstOrNull { it.toString() == navigationStr })
     }
 
     fun navigate(navigation: DebugNavigation?, file: File? = null) {
-        val fragment = when (navigation) {
-            DebugNavigation.Logs -> LogFilesFragment()
-            DebugNavigation.LogDetail -> LogsFragment.getInstance(file!!)
-            DebugNavigation.ConnectionStatus -> ChangeBaseNodeFragment()
-            DebugNavigation.BugReport -> LogFilesFragment()
-            else -> throw Throwable()
-        }
-        loadFragment(fragment)
-    }
-
-    override fun onBackPressed() {
-        if (supportFragmentManager.backStackEntryCount <= 1) {
-            super.onBackPressed()
-            super.onBackPressed()
-        } else {
-            super.onBackPressed()
+        when (navigation) {
+            DebugNavigation.Logs -> addFragment(LogFilesFragment(), null, true)
+            DebugNavigation.LogDetail -> addFragment(LogsFragment.getInstance(file!!))
+            DebugNavigation.BugReport -> addFragment(LogFilesFragment(), null, true)
         }
     }
 
-    override fun toAddCustomBaseNode() = loadFragment(AddCustomBaseNodeFragment())
-
-    private fun loadFragment(fragment: Fragment) {
-        supportFragmentManager
-            .beginTransaction()
-            .setCustomAnimations(R.anim.enter_from_right, R.anim.exit_to_left, R.anim.enter_from_left, R.anim.exit_to_right)
-            .apply { supportFragmentManager.fragments.forEach { hide(it) } }
-            .replace(R.id.nav_container, fragment)
-            .addToBackStack(null)
-            .commit()
-    }
+    override fun toAddCustomBaseNode() = addFragment(AddCustomBaseNodeFragment())
 
     companion object {
         const val navigation_key = "Debug_navigation"
