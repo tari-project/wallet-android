@@ -12,9 +12,6 @@ import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.extension.*
 import com.tari.android.wallet.model.*
 import com.tari.android.wallet.network.NetworkConnectionState
-import com.tari.android.wallet.service.TariWalletService
-import com.tari.android.wallet.service.connection.ServiceConnectionStatus
-import com.tari.android.wallet.service.connection.TariWalletServiceConnection
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.common.SingleLiveEvent
 import com.tari.android.wallet.ui.common.gyphy.presentation.GIFViewModel
@@ -66,10 +63,6 @@ class TxListViewModel : CommonViewModel() {
     @Inject
     lateinit var tariSettingsSharedRepository: TariSettingsSharedRepository
 
-    lateinit var serviceConnection: TariWalletServiceConnection
-    val walletService: TariWalletService
-        get() = serviceConnection.currentState.service!!
-
     lateinit var progressControllerState: UpdateProgressViewController.UpdateProgressState
 
     var testnetTariRequestIsInProgress = false
@@ -114,7 +107,7 @@ class TxListViewModel : CommonViewModel() {
     init {
         component.inject(this)
 
-        bindToWalletService()
+        doOnConnected { onServiceConnected() }
     }
 
     val txListIsEmpty: Boolean
@@ -140,11 +133,6 @@ class TxListViewModel : CommonViewModel() {
                 walletService.executeWithError { error, wallet -> wallet.requestTestnetTari(error) }
             }
         }
-    }
-
-    private fun bindToWalletService() {
-        serviceConnection = TariWalletServiceConnection()
-        serviceConnection.connection.subscribe { if (it.status == ServiceConnectionStatus.CONNECTED) onServiceConnected() }.addTo(compositeDisposable)
     }
 
     private fun onServiceConnected() {

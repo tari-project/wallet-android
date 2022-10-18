@@ -110,6 +110,8 @@ class TxListFragment : CommonFragment<FragmentTxListBinding, TxListViewModel>(),
         val viewModel: TxListViewModel by viewModels()
         bindViewModel(viewModel)
 
+        viewModel.serviceConnection.reconnectToService()
+
         setupUI()
         subscribeToEventBus()
         subscribeToViewModel()
@@ -211,10 +213,12 @@ class TxListFragment : CommonFragment<FragmentTxListBinding, TxListViewModel>(),
         EventBus.subscribe<Event.App.AppForegrounded>(this) {
             if (viewModel.serviceConnection.currentState.service != null && updateProgressViewController.state.state == UpdateProgressViewController.State.IDLE
             ) {
-                lifecycleScope.launch(Dispatchers.Main) {
-                    updateProgressViewController.reset()
-                    updateProgressViewController.start(viewModel.walletService)
-                    ui.scrollView.beginUpdate()
+                viewModel.doOnConnected {
+                    lifecycleScope.launch(Dispatchers.Main) {
+                        updateProgressViewController.reset()
+                        updateProgressViewController.start(it)
+                        ui.scrollView.beginUpdate()
+                    }
                 }
             }
         }

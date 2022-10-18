@@ -9,12 +9,9 @@ import com.tari.android.wallet.R
 import com.tari.android.wallet.application.deeplinks.DeepLink
 import com.tari.android.wallet.application.deeplinks.DeeplinkHandler
 import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
-import com.tari.android.wallet.extension.addTo
 import com.tari.android.wallet.extension.executeWithError
 import com.tari.android.wallet.extension.getWithError
 import com.tari.android.wallet.model.*
-import com.tari.android.wallet.service.connection.ServiceConnectionStatus
-import com.tari.android.wallet.service.connection.TariWalletServiceConnection
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.common.SingleLiveEvent
 import com.tari.android.wallet.ui.common.recyclerView.CommonViewHolderItem
@@ -71,24 +68,18 @@ class AddRecipientViewModel : CommonViewModel() {
     @Inject
     lateinit var deeplinkHandler: DeeplinkHandler
 
-    private val serviceConnection = TariWalletServiceConnection()
-    private val walletService
-        get() = serviceConnection.currentState.service!!
-
     init {
         component.inject(this)
 
         clipboardChecker.addSource(serviceIsReady) { if (readyToInteract.value!! && serviceIsReady.value!!) checkClipboardForValidEmojiId() }
 
-        serviceConnection.connection.subscribe {
-            if (it.status == ServiceConnectionStatus.CONNECTED) {
-                serviceIsReady.postValue(true)
-                viewModelScope.launch(Dispatchers.IO) {
-                    fetchAllData()
-                    displayList()
-                }
+        doOnConnected {
+            serviceIsReady.postValue(true)
+            viewModelScope.launch(Dispatchers.IO) {
+                fetchAllData()
+                displayList()
             }
-        }.addTo(compositeDisposable)
+        }
     }
 
     fun displayList() {
@@ -217,7 +208,8 @@ class AddRecipientViewModel : CommonViewModel() {
         return false
     }
 
-    fun getPublicKeyFromHexString(publicKeyHex: String): PublicKey? = walletService.getWithError { _, wallet -> wallet.getPublicKeyFromHexString(publicKeyHex) }
+    fun getPublicKeyFromHexString(publicKeyHex: String): PublicKey? =
+        walletService.getWithError { _, wallet -> wallet.getPublicKeyFromHexString(publicKeyHex) }
 
     fun getPublicKeyFromEmojiId(emojiId: String): PublicKey? = walletService.getWithError { _, wallet -> wallet.getPublicKeyFromEmojiId(emojiId) }
 }

@@ -5,11 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import com.tari.android.wallet.R
 import com.tari.android.wallet.event.Event
 import com.tari.android.wallet.event.EventBus
-import com.tari.android.wallet.extension.addTo
 import com.tari.android.wallet.extension.getWithError
-import com.tari.android.wallet.service.TariWalletService
-import com.tari.android.wallet.service.connection.ServiceConnectionStatus
-import com.tari.android.wallet.service.connection.TariWalletServiceConnection
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.dialog.modular.DialogArgs
 import com.tari.android.wallet.ui.dialog.modular.IDialogModule
@@ -49,18 +45,12 @@ class UtxosListViewModel : CommonViewModel() {
     val leftTileList: MutableLiveData<MutableList<UtxosViewHolderItem>> = MutableLiveData(mutableListOf())
     val rightTileList: MutableLiveData<MutableList<UtxosViewHolderItem>> = MutableLiveData(mutableListOf())
 
-    var serviceConnection = TariWalletServiceConnection()
-    val walletService: TariWalletService
-        get() = serviceConnection.currentState.service!!
-
     init {
         sortingMediator.addSource(sourceList) { generateFromScratch() }
         sortingMediator.addSource(ordering) { generateFromScratch() }
         setSelectionState(false)
 
-        serviceConnection.connection.subscribe {
-            if (it.status == ServiceConnectionStatus.CONNECTED) loadUtxosFromFFI()
-        }.addTo(compositeDisposable)
+        doOnConnected { loadUtxosFromFFI() }
 
         component.inject(this)
     }
