@@ -9,6 +9,9 @@ import com.tari.android.wallet.di.ApplicationComponent
 import com.tari.android.wallet.di.DiContainer
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.extension.addTo
+import com.tari.android.wallet.service.TariWalletService
+import com.tari.android.wallet.service.connection.ServiceConnectionStatus
+import com.tari.android.wallet.service.connection.TariWalletServiceConnection
 import com.tari.android.wallet.ui.common.domain.ResourceManager
 import com.tari.android.wallet.ui.dialog.error.WalletErrorArgs
 import com.tari.android.wallet.ui.dialog.inProgress.ProgressDialogArgs
@@ -23,6 +26,9 @@ open class CommonViewModel : ViewModel() {
     val component: ApplicationComponent
         get() = DiContainer.appComponent
 
+    val serviceConnection: TariWalletServiceConnection = TariWalletServiceConnection()
+    val walletService: TariWalletService
+        get() = serviceConnection.currentState.service!!
 
     @Inject
     lateinit var resourceManager: ResourceManager
@@ -73,4 +79,8 @@ open class CommonViewModel : ViewModel() {
 
     protected val _blockedBackPressed = SingleLiveEvent<Boolean>()
     val blockedBackPressed: LiveData<Boolean> = _blockedBackPressed
+
+    fun doOnConnected(action: (walletService: TariWalletService) -> Unit) {
+        serviceConnection.connection.subscribe { if (it.status == ServiceConnectionStatus.CONNECTED) action(it.service!!) }.addTo(compositeDisposable)
+    }
 }
