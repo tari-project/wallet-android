@@ -2,16 +2,19 @@ package com.tari.android.wallet.infrastructure.logging
 
 import com.orhanobut.logger.LogAdapter
 import com.orhanobut.logger.Logger
-import org.joda.time.DateTime
 import java.io.BufferedWriter
 import java.io.File
 import java.io.FileOutputStream
 import java.io.OutputStreamWriter
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 
 class LocalFileAdapter(private val filePath: String) : LogAdapter {
 
     override fun isLoggable(priority: Int, tag: String?): Boolean = true
+
+    private val dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS")
 
     override fun log(priority: Int, tag: String?, message: String) {
         runCatching {
@@ -24,8 +27,9 @@ class LocalFileAdapter(private val filePath: String) : LogAdapter {
                     6 -> Logger::ERROR.name
                     else -> Logger::ASSERT.name
                 }
-                val dateTimeNow = DateTime.now().toString()
-                it.appendLine("$priorityName | $dateTimeNow | ${tag ?: ""} | ${message.replace("\n", " ")}")
+                val dateTimeNow = dateTimeFormatter.format(LocalDateTime.now())
+                val debugLine = "$dateTimeNow [${tag ?: ""}] $priorityName ${message.replace("\n", " ")}"
+                it.appendLine(debugLine)
             }
         }
     }

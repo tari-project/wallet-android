@@ -22,6 +22,7 @@ import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonModule
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonStyle
 import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
 import com.tari.android.wallet.ui.dialog.modular.modules.option.OptionModule
+import com.tari.android.wallet.ui.dialog.modular.modules.space.SpaceModule
 import com.tari.android.wallet.ui.extension.addEnterLeftAnimation
 import com.tari.android.wallet.ui.fragment.settings.allSettings.TariVersionModel
 import com.tari.android.wallet.ui.fragment.settings.logs.activity.DebugActivity
@@ -132,6 +133,7 @@ abstract class CommonActivity<Binding : ViewBinding, VM : CommonViewModel> : App
         val modularDialogArgs = ModularDialogArgs(
             DialogArgs(), listOf(
                 HeadModule(getString(R.string.debug_dialog_title)),
+                SpaceModule(8),
                 OptionModule(getString(R.string.debug_dialog_logs)) { openActivity(DebugNavigation.Logs) },
                 OptionModule(getString(R.string.debug_dialog_report)) { openActivity(DebugNavigation.BugReport) },
                 OptionModule(getString(R.string.debug_dialog_connection_status)) {

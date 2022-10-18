@@ -41,6 +41,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.tari.android.wallet.databinding.FragmentLogsBinding
 import com.tari.android.wallet.extension.observe
 import com.tari.android.wallet.ui.common.CommonFragment
+import com.tari.android.wallet.ui.common.recyclerView.CommonAdapter
 import com.tari.android.wallet.ui.extension.setVisible
 import com.tari.android.wallet.ui.fragment.settings.logs.activity.DebugActivity
 import com.tari.android.wallet.ui.fragment.settings.logs.logs.adapter.LogListAdapter
@@ -70,22 +71,26 @@ class LogsFragment : CommonFragment<FragmentLogsBinding, LogsViewModel>() {
     }
 
     private fun setupUI() = with(ui) {
+        filterButton.setVisible(false)
         backCtaView.setOnClickListener { requireActivity().onBackPressed() }
         filterButton.setOnClickListener { viewModel.showFilters() }
         recyclerViewAdapter = LogListAdapter()
+        recyclerViewAdapter.setLongClickListener(CommonAdapter.ItemLongClickListener {
+            viewModel.copyToClipboard(it)
+            true
+        })
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
         recyclerView.adapter = recyclerViewAdapter
     }
 
     private fun observeUI() = with(viewModel) {
-        observe(logs) { updateData(it) }
+        observe(filteredLogs) { updateData(it) }
     }
 
     private fun updateData(list: MutableList<LogViewHolderItem>) {
         ui.loadingState.setVisible(false)
+        ui.filterButton.setVisible(true)
         recyclerViewAdapter.update(list)
-        //todo add scroll to bottom
-//        ui.recyclerView.layoutManager.scrollver
     }
 
     companion object {
