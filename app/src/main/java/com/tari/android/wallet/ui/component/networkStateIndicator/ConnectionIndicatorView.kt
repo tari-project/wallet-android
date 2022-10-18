@@ -41,7 +41,7 @@ import com.tari.android.wallet.extension.observe
 import com.tari.android.wallet.ui.component.MainListTouchingView
 
 
-internal class ConnectionIndicatorView : MainListTouchingView<ConnectionIndicatorViewModel, ViewConnectionIndicatorBinding> {
+class ConnectionIndicatorView : MainListTouchingView<ConnectionIndicatorViewModel, ViewConnectionIndicatorBinding> {
 
     override fun bindingInflate(layoutInflater: LayoutInflater, parent: ViewGroup?, attachToRoot: Boolean):
             ViewConnectionIndicatorBinding = ViewConnectionIndicatorBinding.inflate(layoutInflater, parent, attachToRoot)

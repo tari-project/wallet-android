@@ -124,7 +124,7 @@ class SharedPrefsRepository(
         databasePassphrase = null
     }
 
-    fun generateDatabasePassphrase() {
+    fun generateDatabasePassphrase(): String {
         var generatedString = ""
         val charset = Charsets.UTF_8
         val utfErrorCode = Char(65533)
@@ -134,11 +134,9 @@ class SharedPrefsRepository(
             val str = String(ByteArray(1) { nextByte }, charset)
             if (str.first() != utfErrorCode) {
                 generatedString += str
-                break
             }
         }
-
-        databasePassphrase = generatedString
+        return generatedString
     }
 
     // Runs when user manually clear the application data

@@ -12,10 +12,8 @@ import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import com.tari.android.wallet.extension.addTo
 import com.tari.android.wallet.extension.executeWithError
 import com.tari.android.wallet.extension.getWithError
-import com.tari.android.wallet.model.Contact
-import com.tari.android.wallet.model.PublicKey
-import com.tari.android.wallet.model.Tx
-import com.tari.android.wallet.model.User
+import com.tari.android.wallet.model.*
+import com.tari.android.wallet.service.connection.ServiceConnectionStatus
 import com.tari.android.wallet.service.connection.TariWalletServiceConnection
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.common.SingleLiveEvent
@@ -36,6 +34,7 @@ import javax.inject.Inject
 class AddRecipientViewModel : CommonViewModel() {
 
     var emojiIdPublicKey: PublicKey? = null
+    var amountFromDeeplink: MicroTari? = null
 
     private var searchingJob: Job? = null
     private var recentTxUsersLimit = 3
@@ -82,7 +81,7 @@ class AddRecipientViewModel : CommonViewModel() {
         clipboardChecker.addSource(serviceIsReady) { if (readyToInteract.value!! && serviceIsReady.value!!) checkClipboardForValidEmojiId() }
 
         serviceConnection.connection.subscribe {
-            if (it.status == TariWalletServiceConnection.ServiceConnectionStatus.CONNECTED) {
+            if (it.status == ServiceConnectionStatus.CONNECTED) {
                 serviceIsReady.postValue(true)
                 viewModelScope.launch(Dispatchers.IO) {
                     fetchAllData()
@@ -141,6 +140,10 @@ class AddRecipientViewModel : CommonViewModel() {
         }
     }
 
+    fun setAmount(amount: MicroTari) {
+        amountFromDeeplink = amount
+    }
+
     private fun fetchAllData() {
         walletService.executeWithError { error, wallet ->
             contacts = wallet.getContacts(error).orEmpty().toMutableList()
@@ -157,7 +160,7 @@ class AddRecipientViewModel : CommonViewModel() {
             val yatUserOptional = _foundYatUser.value
             val yatUser = if (yatUserOptional?.isPresent == true) yatUserOptional.get() else null
             val user = yatUser ?: contacts.firstOrNull { it.publicKey == emojiIdPublicKey } ?: User(emojiIdPublicKey!!)
-            _navigation.postValue(AddRecipientNavigation.ToAmount(user))
+            _navigation.postValue(AddRecipientNavigation.ToAmount(user, amountFromDeeplink))
         }
     }
 
@@ -214,8 +217,8 @@ class AddRecipientViewModel : CommonViewModel() {
         return false
     }
 
-    fun getPublicKeyFromHexString(publicKeyHex: String): PublicKey = walletService.getWithError { _, wallet -> wallet.getPublicKeyFromHexString(publicKeyHex) }
+    fun getPublicKeyFromHexString(publicKeyHex: String): PublicKey? = walletService.getWithError { _, wallet -> wallet.getPublicKeyFromHexString(publicKeyHex) }
 
-    fun getPublicKeyFromEmojiId(emojiId: String): PublicKey = walletService.getWithError { _, wallet -> wallet.getPublicKeyFromEmojiId(emojiId) }
+    fun getPublicKeyFromEmojiId(emojiId: String): PublicKey? = walletService.getWithError { _, wallet -> wallet.getPublicKeyFromEmojiId(emojiId) }
 }
 

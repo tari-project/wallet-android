@@ -37,19 +37,20 @@ import com.tari.android.wallet.model.WalletError
 /**
  * Throws FFIException if error code indicates a problem.
  */
-internal fun throwIf(error: FFIError) {
+fun throwIf(error: FFIError) {
     if (error.code != WalletError.NoError.code) {
         throw FFIException(error)
     }
 }
 
-/**
- * @author The Tari Development Team
- */
-internal class FFIException(
-    val error: FFIError? = null,
-    override val message: String? = "Error code: $error"
-) : RuntimeException() {
+fun <T> runWithError(action: (error: FFIError) -> T): T {
+    val error = FFIError()
+    val result = action(error)
+    throwIf(error)
+    return result
+}
+
+class FFIException(val error: FFIError? = null, override val message: String? = "Error code: $error") : RuntimeException() {
 
     override fun toString(): String = "FFIException(error=$error, message=$message)"
 }

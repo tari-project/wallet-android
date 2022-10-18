@@ -47,7 +47,7 @@ class PendingOutboundTx() : Tx(), Parcelable {
 
     var fee = MicroTari(BigInteger("0"))
 
-    internal constructor(tx: FFICompletedTx) : this() {
+    constructor(tx: FFICompletedTx) : this() {
         this.id = tx.getId()
         this.direction = tx.getDirection()
         this.user = tx.getUser()
@@ -59,7 +59,7 @@ class PendingOutboundTx() : Tx(), Parcelable {
         tx.destroy()
     }
 
-    internal constructor(tx: FFIPendingOutboundTx) : this() {
+    constructor(tx: FFIPendingOutboundTx) : this() {
         this.id = tx.getId()
         this.direction = tx.getDirection()
         this.user = tx.getUser()

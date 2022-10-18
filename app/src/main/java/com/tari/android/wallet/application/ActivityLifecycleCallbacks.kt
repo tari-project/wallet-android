@@ -61,16 +61,10 @@ class ActivityLifecycleCallbacks: Application.ActivityLifecycleCallbacks {
         currentActivity = activity
     }
 
-    override fun onActivityDestroyed(activity: Activity) {
+    override fun onActivityDestroyed(activity: Activity) = Unit
 
-    }
+    override fun onActivitySaveInstanceState(activity: Activity, outState: Bundle) = Unit
 
-    override fun onActivitySaveInstanceState(activity: Activity, outState: Bundle) {
-
-    }
-
-    override fun onActivityStopped(activity: Activity) {
-
-    }
+    override fun onActivityStopped(activity: Activity) = Unit
 
 }

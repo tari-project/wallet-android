@@ -4,33 +4,32 @@ import com.tari.android.wallet.model.PublicKey
 import com.tari.android.wallet.model.Tx
 import com.tari.android.wallet.model.User
 
-internal abstract class FFITxBase() : FFIBase() {
+abstract class FFITxBase() : FFIBase() {
 
-    constructor(pointer: FFIPointer): this() {
+    constructor(pointer: FFIPointer) : this() {
         this.pointer = pointer
     }
 
-    abstract fun getSourcePublicKey() : FFIPublicKey
-    abstract fun getDestinationPublicKey() : FFIPublicKey
-    abstract fun isOutbound() : Boolean
+    abstract fun getSourcePublicKey(): FFIPublicKey
+    abstract fun getDestinationPublicKey(): FFIPublicKey
+    abstract fun isOutbound(): Boolean
 
     fun getUser(): User {
-        val publicKey: PublicKey
-        if (isOutbound()) {
-            val destination = getDestinationPublicKey()
-            val destinationHex = destination.toString()
-            val destinationEmoji = destination.getEmojiId()
-            publicKey = PublicKey(destinationHex, destinationEmoji)
-            destination.destroy()
+        val publicKey = if (isOutbound()) {
+            getDestinationPublicKey().runWithDestroy {
+                val destinationHex = it.toString()
+                val destinationEmoji = it.getEmojiId()
+                PublicKey(destinationHex, destinationEmoji)
+            }
         } else {
-            val source = getSourcePublicKey()
-            val sourceHex = source.toString()
-            val sourceEmoji = source.getEmojiId()
-            publicKey = PublicKey(sourceHex, sourceEmoji)
-            source.destroy()
+            getSourcePublicKey().runWithDestroy {
+                val sourceHex = it.toString()
+                val sourceEmoji = it.getEmojiId()
+                PublicKey(sourceHex, sourceEmoji)
+            }
         }
         return User(publicKey)
     }
 
-    fun getDirection() : Tx.Direction = if (isOutbound()) Tx.Direction.OUTBOUND else Tx.Direction.INBOUND
+    fun getDirection(): Tx.Direction = if (isOutbound()) Tx.Direction.OUTBOUND else Tx.Direction.INBOUND
 }

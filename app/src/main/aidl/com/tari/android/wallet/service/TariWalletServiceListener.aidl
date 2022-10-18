@@ -61,6 +61,8 @@ interface TariWalletServiceListener {
 
     oneway void onDirectSendResult(in TxId txId, in TransactionSendStatus status);
 
+    oneway void onBalanceUpdated(in BalanceInfo balanceInfo);
+
     oneway void onBaseNodeSyncComplete(in boolean success);
 
     oneway void onTestnetTariRequestSuccess();

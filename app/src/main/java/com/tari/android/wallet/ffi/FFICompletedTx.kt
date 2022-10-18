@@ -35,9 +35,7 @@ package com.tari.android.wallet.ffi
 import java.math.BigInteger
 
 
-internal class FFICompletedTx() : FFITxBase() {
-
-    // region JNI
+class FFICompletedTx() : FFITxBase() {
 
     private external fun jniGetId(libError: FFIError): ByteArray
     private external fun jniGetDestinationPublicKey(libError: FFIError): FFIPointer
@@ -53,97 +51,33 @@ internal class FFICompletedTx() : FFITxBase() {
     private external fun jniGetCancellationReason(libError: FFIError): Int
     private external fun jniDestroy()
 
-    // endregion
-
     constructor(pointer: FFIPointer) : this() {
         this.pointer = pointer
     }
 
-    override fun destroy() {
-        jniDestroy()
-    }
+    override fun destroy() = jniDestroy()
 
-    fun getId(): BigInteger {
-        val error = FFIError()
-        val bytes = jniGetId(error)
-        throwIf(error)
-        return BigInteger(1, bytes)
-    }
+    fun getId(): BigInteger = runWithError { BigInteger(1, jniGetId(it)) }
 
-    override fun getDestinationPublicKey(): FFIPublicKey {
-        val error = FFIError()
-        val result = FFIPublicKey(jniGetDestinationPublicKey(error))
-        throwIf(error)
-        return result
-    }
+    override fun getDestinationPublicKey(): FFIPublicKey = runWithError { FFIPublicKey(jniGetDestinationPublicKey(it)) }
 
-    override fun getSourcePublicKey(): FFIPublicKey {
-        val error = FFIError()
-        val result = FFIPublicKey(jniGetSourcePublicKey(error))
-        throwIf(error)
-        return result
-    }
+    override fun getSourcePublicKey(): FFIPublicKey = runWithError { FFIPublicKey(jniGetSourcePublicKey(it)) }
 
-    fun getAmount(): BigInteger {
-        val error = FFIError()
-        val bytes = jniGetAmount(error)
-        throwIf(error)
-        return BigInteger(1, bytes)
-    }
+    fun getAmount(): BigInteger = runWithError { BigInteger(1, jniGetAmount(it)) }
 
-    fun getFee(): BigInteger {
-        val error = FFIError()
-        val bytes = jniGetFee(error)
-        throwIf(error)
-        return BigInteger(1, bytes)
-    }
+    fun getFee(): BigInteger = runWithError { BigInteger(1, jniGetFee(it)) }
 
-    fun getTimestamp(): BigInteger {
-        val error = FFIError()
-        val bytes = jniGetTimestamp(error)
-        throwIf(error)
-        return BigInteger(1, bytes)
-    }
+    fun getTimestamp(): BigInteger = runWithError { BigInteger(1, jniGetTimestamp(it)) }
 
-    fun getMessage(): String {
-        val error = FFIError()
-        val result = jniGetMessage(error)
-        throwIf(error)
-        return result
-    }
+    fun getMessage(): String = runWithError { jniGetMessage(it) }
 
-    fun getStatus(): FFITxStatus {
-        val error = FFIError()
-        val status = jniGetStatus(error)
-        throwIf(error)
-        return FFITxStatus.map(status)
-    }
+    fun getStatus(): FFITxStatus = runWithError { FFITxStatus.map(jniGetStatus(it)) }
 
-    fun getConfirmationCount(): BigInteger {
-        val error = FFIError()
-        val bytes = jniGetConfirmationCount(error)
-        throwIf(error)
-        return BigInteger(1, bytes)
-    }
+    fun getConfirmationCount(): BigInteger = runWithError { BigInteger(1, jniGetConfirmationCount(it)) }
 
-    override fun isOutbound(): Boolean {
-        val error = FFIError()
-        val result = jniIsOutbound(error)
-        throwIf(error)
-        return result
-    }
+    override fun isOutbound(): Boolean = runWithError { jniIsOutbound(it) }
 
-    fun getCancellationReason(): FFITxCancellationReason {
-        val error = FFIError()
-        val result = FFITxCancellationReason.map(jniGetCancellationReason(error))
-        throwIf(error)
-        return result
-    }
+    fun getCancellationReason(): FFITxCancellationReason = runWithError { FFITxCancellationReason.map(jniGetCancellationReason(it)) }
 
-    fun getTransactionKernel(): FFICompletedTxKernel {
-        val error = FFIError()
-        val result = FFICompletedTxKernel(jniGetTransactionKernel(error))
-        throwIf(error)
-        return result
-    }
+    fun getTransactionKernel(): FFICompletedTxKernel = runWithError { FFICompletedTxKernel(jniGetTransactionKernel(it)) }
 }

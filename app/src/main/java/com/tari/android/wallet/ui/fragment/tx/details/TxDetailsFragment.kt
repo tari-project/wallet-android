@@ -41,7 +41,6 @@ import android.view.inputmethod.EditorInfo
 import android.widget.TextView
 import androidx.fragment.app.viewModels
 import com.bumptech.glide.Glide
-import com.orhanobut.logger.Logger
 import com.tari.android.wallet.R.color.*
 import com.tari.android.wallet.R.dimen.add_amount_element_text_size
 import com.tari.android.wallet.R.dimen.add_amount_gem_size
@@ -70,7 +69,6 @@ import com.tari.android.wallet.ui.extension.*
 import com.tari.android.wallet.ui.fragment.tx.details.gif.GIFView
 import com.tari.android.wallet.ui.fragment.tx.details.gif.GIFViewModel
 import com.tari.android.wallet.ui.fragment.tx.details.gif.TxState
-import com.tari.android.wallet.ui.presentation.TxNote
 import com.tari.android.wallet.util.WalletUtil
 import java.util.*
 
@@ -79,7 +77,7 @@ import java.util.*
  *
  * @author The Tari Development Team
  */
-internal class TxDetailsFragment : CommonFragment<FragmentTxDetailsBinding, TxDetailsViewModel>() {
+class TxDetailsFragment : CommonFragment<FragmentTxDetailsBinding, TxDetailsViewModel>() {
 
     /**
      * Values below are used for scaling up/down of the text size.
@@ -110,10 +108,6 @@ internal class TxDetailsFragment : CommonFragment<FragmentTxDetailsBinding, TxDe
         val txId = arguments?.getParcelable<TxId>(TX_ID_EXTRA_KEY)
         if (txId != null) {
             viewModel.loadTxById(txId)
-        }
-
-        if (savedInstanceState == null) {
-            viewModel.tracker.screen(path = "/home/tx_details", title = "Transaction Details")
         }
 
         setupUI()
@@ -263,7 +257,8 @@ internal class TxDetailsFragment : CommonFragment<FragmentTxDetailsBinding, TxDe
             tx is CancelledTx -> ""
             state == TxState(INBOUND, PENDING) -> string(tx_detail_waiting_for_sender_to_complete)
             state == TxState(OUTBOUND, PENDING) -> string(tx_detail_waiting_for_recipient)
-            state.status != MINED_CONFIRMED -> string(
+            state == TxState(INBOUND, FAUX_UNCONFIRMED) -> ""
+            state.status != MINED_CONFIRMED && state.status != COINBASE -> string(
                 tx_detail_completing_final_processing,
                 if (tx is CompletedTx) tx.confirmationCount.toInt() + 1 else 1,
                 viewModel.requiredConfirmationCount + 1
@@ -327,22 +322,23 @@ internal class TxDetailsFragment : CommonFragment<FragmentTxDetailsBinding, TxDe
 
     private fun onTransactionCancel() {
         val tx = viewModel.tx.value!!
-        if (tx is PendingOutboundTx && tx.direction == OUTBOUND && tx.status == PENDING) showTxCancelDialog() else Logger.e(
-            "cancelTransaction was issued, but current transaction is not pending outbound, but rather $tx"
-        )
+        if (tx is PendingOutboundTx && tx.direction == OUTBOUND && tx.status == PENDING)
+            showTxCancelDialog()
     }
 
     private fun showTxCancelDialog() {
         val dialog = ModularDialog(requireContext())
-        val args = ModularDialogArgs(DialogArgs(), listOf(
-            HeadModule(string(common_are_you_sure)),
-            BodyModule(string(tx_details_cancel_dialog_description)),
-            ButtonModule(string(tx_details_cancel_dialog_cancel), ButtonStyle.Normal) {
-                viewModel.cancelTransaction()
-                dialog.dismiss()
-            },
-            ButtonModule(string(tx_details_cancel_dialog_not_cancel), ButtonStyle.Close)
-        ))
+        val args = ModularDialogArgs(
+            DialogArgs(), listOf(
+                HeadModule(string(common_are_you_sure)),
+                BodyModule(string(tx_details_cancel_dialog_description)),
+                ButtonModule(string(tx_details_cancel_dialog_cancel), ButtonStyle.Normal) {
+                    viewModel.cancelTransaction()
+                    dialog.dismiss()
+                },
+                ButtonModule(string(tx_details_cancel_dialog_not_cancel), ButtonStyle.Close)
+            )
+        )
         dialog.applyArgs(args)
         dialog.show()
     }

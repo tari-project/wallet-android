@@ -39,12 +39,12 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 
-internal fun ViewHolder.dimen(@DimenRes id: Int): Int = itemView.dimenPx(id)
+fun ViewHolder.dimen(@DimenRes id: Int): Int = itemView.dimenPx(id)
 
-internal fun ViewHolder.string(@StringRes id: Int): String = itemView.string(id)
+fun ViewHolder.string(@StringRes id: Int): String = itemView.string(id)
 
-internal fun ViewHolder.string(@StringRes id: Int, vararg formatArgs: Any): String = itemView.string(id, *formatArgs)
+fun ViewHolder.string(@StringRes id: Int, vararg formatArgs: Any): String = itemView.string(id, *formatArgs)
 
-internal fun ViewHolder.color(@ColorRes id: Int): Int = itemView.color(id)
+fun ViewHolder.color(@ColorRes id: Int): Int = itemView.color(id)
 
-internal fun ViewHolder.drawable(@DrawableRes id: Int): Drawable? = itemView.drawable(id)
+fun ViewHolder.drawable(@DrawableRes id: Int): Drawable? = itemView.drawable(id)

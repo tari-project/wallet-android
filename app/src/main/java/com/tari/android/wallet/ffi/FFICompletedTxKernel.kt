@@ -37,40 +37,22 @@ package com.tari.android.wallet.ffi
  *
  * @author The Tari Development Team
  */
-internal class FFICompletedTxKernel() : FFIBase() {
+class FFICompletedTxKernel() : FFIBase() {
 
     private external fun jniGetExcess(libError: FFIError): String
     private external fun jniGetExcessPublicNonce(libError: FFIError): String
     private external fun jniGetExcessSignature(libError: FFIError): String
     private external fun jniDestroy()
 
-    // endregion
-    constructor(pointer: FFIPointer): this() {
+    constructor(pointer: FFIPointer) : this() {
         this.pointer = pointer
     }
 
-    fun getExcess(): String {
-        val error = FFIError()
-        val result = jniGetExcess(error)
-        throwIf(error)
-        return result
-    }
+    fun getExcess(): String = runWithError { jniGetExcess(it) }
 
-    fun getExcessPublicNonce(): String {
-        val error = FFIError()
-        val result = jniGetExcessPublicNonce(error)
-        throwIf(error)
-        return result
-    }
+    fun getExcessPublicNonce(): String = runWithError { jniGetExcessPublicNonce(it) }
 
-    fun getExcessSignature(): String {
-        val error = FFIError()
-        val result = jniGetExcessSignature(error)
-        throwIf(error)
-        return result
-    }
+    fun getExcessSignature(): String = runWithError { jniGetExcessSignature(it) }
 
-    override fun destroy() {
-        jniDestroy()
-    }
+    override fun destroy() = jniDestroy()
 }

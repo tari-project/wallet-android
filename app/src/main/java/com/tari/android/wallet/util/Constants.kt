@@ -40,7 +40,7 @@ import java.math.BigInteger
  *
  * @author The Tari Development Team
  */
-internal object Constants {
+object Constants {
 
     /**
      * UI constants.

@@ -33,7 +33,7 @@
 package com.tari.android.wallet.ffi
 
 import android.os.FileObserver
-import android.util.Log
+import com.orhanobut.logger.Logger
 import org.apache.commons.io.input.ReversedLinesFileReader
 import java.io.File
 import java.io.FileReader
@@ -46,8 +46,7 @@ import java.nio.charset.StandardCharsets
  *
  * @author The Tari Development Team
  */
-@Suppress("DEPRECATION")
-internal class LogFileObserver(logFilePath: String) : FileObserver(logFilePath) {
+class LogFileObserver(logFilePath: String) : FileObserver(logFilePath) {
 
     private val logTag = "FFI"
     private val logFile = File(logFilePath)
@@ -71,11 +70,13 @@ internal class LogFileObserver(logFilePath: String) : FileObserver(logFilePath) 
             val line = reversedFileReader.readLine()
             lineList.add(line)
         }
-        // log them in reverse order
-        lineList.reversed().forEach { logLine ->
-            Log.d(logTag, logLine)
+        val stringBuilder = StringBuilder()
+        if (lineList.isNotEmpty()) {
+            // log them in reverse order
+            lineList.reversed().forEach { logLine -> stringBuilder.appendLine(logLine) }
+            Logger.t(logTag).d(stringBuilder.toString())
+            lastNumberOfLines = lineNumberReader.lineNumber
         }
-        lastNumberOfLines = lineNumberReader.lineNumber
         // close resources
         fileReader.close()
         lineNumberReader.close()
@@ -83,8 +84,6 @@ internal class LogFileObserver(logFilePath: String) : FileObserver(logFilePath) 
     }
 
     override fun onEvent(event: Int, path: String?) {
-        try { logNewLines() } catch (ignored: Exception) {  }
-
+        runCatching { logNewLines() }
     }
-
 }

@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.tari.android.wallet.R
 import com.tari.android.wallet.data.sharedPrefs.tariSettings.TariSettingsSharedRepository
+import com.tari.android.wallet.service.service.WalletServiceLauncher
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.component.loadingSwitch.LoadingSwitchState
 import com.tari.android.wallet.ui.dialog.confirm.ConfirmDialogArgs
@@ -13,6 +14,9 @@ class BackgroundServiceSettingsViewModel : CommonViewModel() {
 
     @Inject
     lateinit var tariSettingsSharedRepository: TariSettingsSharedRepository
+
+    @Inject
+    lateinit var serviceLauncher: WalletServiceLauncher
 
     private val _switchState = MutableLiveData<LoadingSwitchState>()
     val switchState: LiveData<LoadingSwitchState> = _switchState
@@ -42,5 +46,7 @@ class BackgroundServiceSettingsViewModel : CommonViewModel() {
     private fun turnSwitcher(isTurnedOn: Boolean) {
         tariSettingsSharedRepository.backgroundServiceTurnedOn = isTurnedOn
         _switchState.value = LoadingSwitchState(isTurnedOn, false)
+        _dismissDialog.postValue(Unit)
+        serviceLauncher.startIfExist()
     }
 }

@@ -8,7 +8,7 @@ import com.tari.android.wallet.extension.addTo
 import com.tari.android.wallet.ffi.FFISeedWords
 import com.tari.android.wallet.model.WalletError
 import com.tari.android.wallet.model.seedPhrase.SeedPhrase
-import com.tari.android.wallet.service.WalletServiceLauncher
+import com.tari.android.wallet.service.service.WalletServiceLauncher
 import com.tari.android.wallet.service.seedPhrase.SeedPhraseRepository
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.common.SingleLiveEvent
@@ -25,7 +25,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-internal class InputSeedWordsViewModel : CommonViewModel() {
+class InputSeedWordsViewModel : CommonViewModel() {
 
     private var mnemonicList = mutableListOf<String>()
 

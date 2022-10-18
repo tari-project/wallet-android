@@ -56,7 +56,7 @@ import javax.inject.Singleton
  * @author The Tari Development Team
  */
 @Module
-internal class RESTModule {
+class RESTModule {
 
     object FieldName {
         const val faucetHttpClient = "faucet_http_client"

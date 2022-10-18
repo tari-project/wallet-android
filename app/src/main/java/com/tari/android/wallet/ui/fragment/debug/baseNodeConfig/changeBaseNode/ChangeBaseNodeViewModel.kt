@@ -11,7 +11,7 @@ import com.tari.android.wallet.ui.common.recyclerView.CommonViewHolderItem
 import com.tari.android.wallet.ui.fragment.debug.baseNodeConfig.changeBaseNode.adapter.BaseNodeViewHolderItem
 import javax.inject.Inject
 
-internal class ChangeBaseNodeViewModel : CommonViewModel() {
+class ChangeBaseNodeViewModel : CommonViewModel() {
 
     @Inject
     lateinit var baseNodeSharedRepository: BaseNodeSharedRepository

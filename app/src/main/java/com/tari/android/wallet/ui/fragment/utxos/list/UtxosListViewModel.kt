@@ -3,9 +3,12 @@ package com.tari.android.wallet.ui.fragment.utxos.list
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import com.tari.android.wallet.R
+import com.tari.android.wallet.event.Event
+import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.extension.addTo
 import com.tari.android.wallet.extension.getWithError
 import com.tari.android.wallet.service.TariWalletService
+import com.tari.android.wallet.service.connection.ServiceConnectionStatus
 import com.tari.android.wallet.service.connection.TariWalletServiceConnection
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.dialog.modular.DialogArgs
@@ -56,7 +59,7 @@ class UtxosListViewModel : CommonViewModel() {
         setSelectionState(false)
 
         serviceConnection.connection.subscribe {
-            if (it.status == TariWalletServiceConnection.ServiceConnectionStatus.CONNECTED) loadUtxosFromFFI()
+            if (it.status == ServiceConnectionStatus.CONNECTED) loadUtxosFromFFI()
         }.addTo(compositeDisposable)
 
         component.inject(this)
@@ -125,6 +128,7 @@ class UtxosListViewModel : CommonViewModel() {
                 wallet.joinUtxos(selectedUtxos, error)
                 _dismissDialog.postValue(Unit)
                 loadUtxosFromFFI()
+                EventBus.post(Event.Transaction.Updated)
                 showSuccessJoinDialog()
             }
         }
@@ -150,6 +154,7 @@ class UtxosListViewModel : CommonViewModel() {
                             wallet.splitUtxos(selectedUtxos, splitModule.count, error)
                             _dismissDialog.postValue(Unit)
                             loadUtxosFromFFI()
+                            EventBus.post(Event.Transaction.Updated)
                             showSuccessSplitDialog()
                         }
                     }

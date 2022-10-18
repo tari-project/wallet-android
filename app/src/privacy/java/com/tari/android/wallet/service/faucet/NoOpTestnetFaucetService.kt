@@ -32,8 +32,6 @@
  */
 package com.tari.android.wallet.service.faucet
 
-import com.orhanobut.logger.Logger
-
 class NoOpTestnetFaucetService : TestnetFaucetService {
     override fun requestMaxTestnetTari(
         publicKey: String,
@@ -41,12 +39,5 @@ class NoOpTestnetFaucetService : TestnetFaucetService {
         publicNonce: String,
         onSuccess: (TestnetTariMaxAllocationResult) -> Unit,
         onError: (Throwable) -> Unit
-    ) {
-        Logger.i(
-            "requestMaxTestnetTari called with " +
-                    "\npublicKey = $publicKey" +
-                    "\nsignature = $signature" +
-                    "\npublicNonce = $publicNonce"
-        )
-    }
+    ) = Unit
 }

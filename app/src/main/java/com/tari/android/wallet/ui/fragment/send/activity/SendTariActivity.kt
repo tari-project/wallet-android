@@ -40,6 +40,7 @@ import com.tari.android.wallet.databinding.ActivitySendTariBinding
 import com.tari.android.wallet.di.DiContainer.appComponent
 import com.tari.android.wallet.event.Event
 import com.tari.android.wallet.event.EventBus
+import com.tari.android.wallet.model.MicroTari
 import com.tari.android.wallet.model.TxId
 import com.tari.android.wallet.model.User
 import com.tari.android.wallet.network.NetworkConnectionState
@@ -74,7 +75,7 @@ import javax.inject.Inject
  *
  * @author The Tari Development Team
  */
-internal class SendTariActivity : CommonActivity<ActivitySendTariBinding, SendTariViewModel>(),
+class SendTariActivity : CommonActivity<ActivitySendTariBinding, SendTariViewModel>(),
     AddRecipientListener,
     AddAmountListener,
     AddNodeListener,
@@ -114,13 +115,16 @@ internal class SendTariActivity : CommonActivity<ActivitySendTariBinding, SendTa
         ui.rootView.postDelayed({ ui.rootView.setBackgroundColor(color(R.color.black)) }, 1000)
     }
 
-    override fun continueToAmount(user: User) {
+    override fun continueToAmount(user: User, amount: MicroTari?) {
         if (EventBus.networkConnectionState.publishSubject.value != NetworkConnectionState.CONNECTED) {
             showInternetConnectionErrorDialog(this)
             return
         }
         hideKeyboard()
-        val bundle = Bundle().apply { putParcelable("recipientUser", user) }
+        val bundle = Bundle().apply {
+            putParcelable(PARAMETER_USER, user)
+            putParcelable(PARAMETER_AMOUNT, amount)
+        }
         ui.rootView.postDelayed({ addFragment(AddAmountFragment(), bundle) }, Constants.UI.keyboardHideWaitMs)
     }
 
@@ -190,6 +194,7 @@ internal class SendTariActivity : CommonActivity<ActivitySendTariBinding, SendTa
     companion object {
         const val PARAMETER_NOTE = "note"
         const val PARAMETER_AMOUNT = "amount"
+        const val PARAMETER_USER = "recipientUser"
 
         var instance: WeakReference<SendTariActivity> = WeakReference(null)
             private set

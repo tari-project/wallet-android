@@ -34,6 +34,7 @@ package com.tari.android.wallet.event
 
 import com.tari.android.wallet.application.WalletState
 import com.tari.android.wallet.infrastructure.backup.BackupState
+import com.tari.android.wallet.model.BalanceInfo
 import com.tari.android.wallet.model.recovery.WalletRestorationResult
 import com.tari.android.wallet.network.NetworkConnectionState
 import com.tari.android.wallet.service.baseNode.BaseNodeState
@@ -49,10 +50,12 @@ import com.tari.android.wallet.tor.TorProxyState
  *      // op.s
  * }
  */
-internal object EventBus : GeneralEventBus() {
+object EventBus : GeneralEventBus() {
 
     //todo looks like better to have it into appropriate classes than here
     val torProxyState = BehaviorEventBus<TorProxyState>()
+
+    val balanceState = BehaviorEventBus<BalanceInfo>()
 
     val walletState = BehaviorEventBus<WalletState>()
 

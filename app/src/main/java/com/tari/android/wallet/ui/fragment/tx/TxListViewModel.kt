@@ -13,6 +13,7 @@ import com.tari.android.wallet.extension.*
 import com.tari.android.wallet.model.*
 import com.tari.android.wallet.network.NetworkConnectionState
 import com.tari.android.wallet.service.TariWalletService
+import com.tari.android.wallet.service.connection.ServiceConnectionStatus
 import com.tari.android.wallet.service.connection.TariWalletServiceConnection
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.common.SingleLiveEvent
@@ -42,7 +43,7 @@ import java.math.BigDecimal
 import java.util.concurrent.CopyOnWriteArrayList
 import javax.inject.Inject
 
-internal class TxListViewModel : CommonViewModel() {
+class TxListViewModel : CommonViewModel() {
 
     @Inject
     lateinit var repository: GIFRepository
@@ -105,7 +106,10 @@ internal class TxListViewModel : CommonViewModel() {
     private val _listUpdateTrigger = MediatorLiveData<Unit>()
     val listUpdateTrigger: LiveData<Unit> = _listUpdateTrigger
 
-    val debouncedList = Transformations.map(listUpdateTrigger.debounce(LIST_UPDATE_DEBOUNCE)) { updateList() }
+    val debouncedList = Transformations.map(listUpdateTrigger.debounce(LIST_UPDATE_DEBOUNCE)) {
+        updateList()
+        refreshBalance()
+    }
 
     private val _txSendSuccessful = SingleLiveEvent<Unit>()
     val txSendSuccessful: MutableLiveData<Unit> = _txSendSuccessful
@@ -143,9 +147,7 @@ internal class TxListViewModel : CommonViewModel() {
 
     private fun bindToWalletService() {
         serviceConnection = TariWalletServiceConnection()
-        serviceConnection.connection.subscribe {
-            if (it.status == TariWalletServiceConnection.ServiceConnectionStatus.CONNECTED) onServiceConnected()
-        }.addTo(compositeDisposable)
+        serviceConnection.connection.subscribe { if (it.status == ServiceConnectionStatus.CONNECTED) onServiceConnected() }.addTo(compositeDisposable)
     }
 
     private fun onServiceConnected() {
@@ -188,7 +190,7 @@ internal class TxListViewModel : CommonViewModel() {
         }
     }
 
-    private fun refreshBalance(isRestarted: Boolean) {
+    private fun refreshBalance(isRestarted: Boolean = false) {
         viewModelScope.launch(Dispatchers.IO) {
             fetchBalanceInfoData()
             _refreshBalanceInfo.postValue(isRestarted)
@@ -224,6 +226,7 @@ internal class TxListViewModel : CommonViewModel() {
     }
 
     private fun subscribeToEventBus() {
+        EventBus.subscribe<Event.Transaction.Updated>(this) { refreshAllData() }
         EventBus.subscribe<Event.Transaction.TxReceived>(this) {
             if (progressControllerState.state != UpdateProgressViewController.State.RECEIVING) {
                 onTxReceived(it.tx)
@@ -233,7 +236,6 @@ internal class TxListViewModel : CommonViewModel() {
         EventBus.subscribe<Event.Transaction.TxFinalized>(this) { onTxFinalized(it.tx) }
         EventBus.subscribe<Event.Transaction.InboundTxBroadcast>(this) { onInboundTxBroadcast(it.tx) }
         EventBus.subscribe<Event.Transaction.OutboundTxBroadcast>(this) { onOutboundTxBroadcast(it.tx) }
-        EventBus.subscribe<Event.Transaction.TxMinedUnconfirmed>(this) { onTxMinedUnconfirmed(it.tx) }
         EventBus.subscribe<Event.Transaction.TxMinedUnconfirmed>(this) { onTxMinedUnconfirmed(it.tx) }
         EventBus.subscribe<Event.Transaction.TxMined>(this) { onTxMined(it.tx) }
         EventBus.subscribe<Event.Transaction.TxFauxMinedUnconfirmed>(this) { onTxFauxMinedUnconfirmed(it.tx) }
@@ -249,6 +251,8 @@ internal class TxListViewModel : CommonViewModel() {
 
         EventBus.subscribe<Event.Transaction.TxSendSuccessful>(this) { onTxSendSuccessful(it.txId) }
         EventBus.subscribe<Event.Transaction.TxSendFailed>(this) { onTxSendFailed(it.failureReason) }
+
+        EventBus.balanceState.publishSubject.subscribe { _balanceInfo.postValue(it) }.addTo(compositeDisposable)
 
         EventBus.subscribe<Event.Contact.ContactAddedOrUpdated>(this) { onContactAddedOrUpdated(it.contactPublicKey, it.contactAlias) }
         EventBus.subscribe<Event.Contact.ContactRemoved>(this) { onContactRemoved(it.contactPublicKey) }
@@ -413,9 +417,7 @@ internal class TxListViewModel : CommonViewModel() {
 
             testnetRepository.faucetTestnetTariRequestCompleted = true
             testnetRepository.firstTestnetUTXOTxId = importedTx.id
-            completedTxs.add(importedTx)
-            refreshBalance(false)
-            updateList()
+            refreshAllData()
 
             viewModelScope.launch(Dispatchers.IO) {
                 delay(Constants.UI.Home.showTariBotDialogDelayMs)
@@ -428,11 +430,9 @@ internal class TxListViewModel : CommonViewModel() {
 
     private fun testnetTariRequestError() {
         testnetTariRequestIsInProgress = false
-        if (!networkRepository.currentNetwork?.faucetUrl.isNullOrEmpty()) {
-            val description = resourceManager.getString(faucet_error_common)
-            val errorDialogArgs = ErrorDialogArgs(resourceManager.getString(faucet_error_title), description)
-            _modularDialog.postValue(errorDialogArgs.getModular(resourceManager))
-        }
+        val description = resourceManager.getString(faucet_error_common)
+        val errorDialogArgs = ErrorDialogArgs(resourceManager.getString(faucet_error_title), description)
+        _modularDialog.postValue(errorDialogArgs.getModular(resourceManager))
     }
 
 
@@ -518,7 +518,8 @@ internal class TxListViewModel : CommonViewModel() {
             DialogArgs(true, canceledOnTouchOutside = false), listOf(
                 HeadModule(resourceManager.getString(home_tari_bot_you_got_tari_dlg_title)),
                 BodyModule(resourceManager.getString(home_tari_bot_dialog_desc)),
-                ButtonModule(resourceManager.getString(home_tari_bot_try_later), ButtonStyle.Normal) {
+                ButtonModule(resourceManager.getString(send_tari_title), ButtonStyle.Normal) {
+                    _dismissDialog.value = Unit
                     sendTariToUser(testnetSenderPublicKey)
                 },
                 ButtonModule(resourceManager.getString(home_tari_bot_try_later), ButtonStyle.Close)
@@ -562,9 +563,7 @@ internal class TxListViewModel : CommonViewModel() {
             }
             importedTx ?: return@launch
             testnetRepository.secondTestnetUTXOTxId = importedTx.id
-            completedTxs.add(importedTx)
-            refreshBalance(false)
-            updateList()
+            refreshAllData()
             delay(SECOND_UTXO_STORE_OPEN_DELAY)
             showTTLStoreDialog()
         }

@@ -17,7 +17,7 @@ import com.tari.android.wallet.ui.extension.gone
 import com.tari.android.wallet.ui.extension.setTopMargin
 import com.tari.android.wallet.ui.extension.visible
 
-internal class GIFView(
+class GIFView(
     private val ui: ViewTxDetailsGifContainerBinding,
     private val glide: RequestManager,
     private val viewModel: GIFViewModel,

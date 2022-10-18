@@ -43,7 +43,7 @@ import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepository
 import com.tari.android.wallet.data.sharedPrefs.tariSettings.TariSettingsSharedRepository
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.ffi.*
-import com.tari.android.wallet.service.WalletService
+import com.tari.android.wallet.service.service.WalletService
 import com.tari.android.wallet.service.seedPhrase.SeedPhraseRepository
 import com.tari.android.wallet.tor.TorConfig
 import com.tari.android.wallet.tor.TorProxyManager
@@ -58,7 +58,7 @@ import java.io.File
  *
  * @author The Tari Development Team
  */
-internal class WalletManager(
+class WalletManager(
     private val walletConfig: WalletConfig,
     private val torManager: TorProxyManager,
     private val sharedPrefsWrapper: SharedPrefsRepository,
@@ -71,6 +71,8 @@ internal class WalletManager(
 ) {
 
     private var logFileObserver: LogFileObserver? = null
+    private val logger
+        get() = Logger.t(WalletManager::class.simpleName)
 
     init {
         // post initial wallet state
@@ -104,19 +106,21 @@ internal class WalletManager(
 
     @SuppressLint("CheckResult")
     private fun onTorProxyStateChanged(torProxyState: TorProxyState) {
-        Logger.d("Tor proxy state has changed: $torProxyState.")
+        logger.i("Tor proxy state has changed: $torProxyState")
         if (torProxyState is TorProxyState.Running) {
             if (EventBus.walletState.publishSubject.value == WalletState.NotReady ||
                 EventBus.walletState.publishSubject.value is WalletState.Failed
             ) {
-                Logger.d("Initialize wallet.")
+                logger.i("Initialize wallet started")
                 EventBus.walletState.post(WalletState.Initializing)
                 Thread {
                     try {
                         initWallet()
                         EventBus.walletState.post(WalletState.Started)
+                        logger.i("Wallet was started")
                     } catch (e: Exception) {
                         EventBus.walletState.post(WalletState.Failed(e))
+                        logger.e(e, "Wallet was failed")
                     }
                 }.start()
             }
@@ -131,10 +135,7 @@ internal class WalletManager(
         val cookieString: ByteArray = cookieFile.readBytes()
         val torCookie = FFIByteVector(cookieString)
         return FFITariTransportConfig(
-            NetAddressString(
-                torConfig.controlHost,
-                torConfig.controlPort
-            ),
+            NetAddressString(torConfig.controlHost, torConfig.controlPort),
             torCookie,
             torConfig.connectionPort,
             torConfig.sock5Username,
@@ -147,10 +148,7 @@ internal class WalletManager(
      */
     private fun getCommsConfig(walletConfig: WalletConfig): FFICommsConfig {
         return FFICommsConfig(
-            NetAddressString(
-                "127.0.0.1",
-                39069
-            ).toString(),
+            NetAddressString("127.0.0.1", 39069).toString(),
             getTorTransport(),
             walletConfig.walletDBName,
             walletConfig.getWalletFilesDirPath(),

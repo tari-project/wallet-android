@@ -62,13 +62,16 @@ import java.io.FileOutputStream
 import java.io.IOException
 import kotlin.coroutines.suspendCoroutine
 
-internal class GoogleDriveBackupStorage(
+class GoogleDriveBackupStorage(
     private val context: Context,
     private val namingPolicy: BackupNamingPolicy,
     private val backupSettingsRepository: BackupSettingsRepository,
     private val walletTempDirPath: String,
     private val backupFileProcessor: BackupFileProcessor
 ) : BackupStorage {
+
+    private val logger
+        get() = Logger.t(GoogleDriveBackupStorage::class.simpleName)
 
     private val googleClient: GoogleSignInClient = GoogleSignIn.getClient(
         context,
@@ -163,10 +166,7 @@ internal class GoogleDriveBackupStorage(
                 // delete older backups
                 deleteAllBackupFiles(excludeBackupWithDate = backupDate)
             } catch (e: Exception) {
-                Logger.e(
-                    e,
-                    "Ignorable backup error while clearing temporary and old files."
-                )
+                logger.e(e, "Cleaning old files")
             }
             return@withContext backupDate
         }
@@ -278,10 +278,14 @@ internal class GoogleDriveBackupStorage(
 
     override suspend fun signOut() {
         suspendCoroutine<Unit> { continuation ->
-            backupFileProcessor.clearTempFolder()
-            googleClient.signOut()
-                .addOnFailureListener { continuation.resumeWith(Result.failure(it)) }
-                .addOnCompleteListener { continuation.resumeWith(Result.success(Unit)) }
+            try {
+                backupFileProcessor.clearTempFolder()
+                googleClient.signOut()
+                    .addOnFailureListener { continuation.resumeWith(Result.failure(it)) }
+                    .addOnCompleteListener { continuation.resumeWith(Result.success(Unit)) }
+            } catch (e: Throwable) {
+                logger.e(e, "Sentry failed with already resumed for no reason")
+            }
         }
     }
 
