@@ -9,7 +9,6 @@
     <dimen name="common_action_button_close_height">25dp</dimen>
     <dimen name="common_view_elevation">4dp</dimen>
     <dimen name="common_dialog_horizontal_margin">14dp</dimen>
-    <dimen name="common_dialog_bottom_margin">24dp</dimen>
     <dimen name="common_copy_emoji_id_button_visible_bottom_margin">-56dp</dimen>
     <dimen name="common_network_and_version_info_text_size">8sp</dimen>
     <dimen name="common_zero">0dp</dimen>
@@ -17,8 +16,6 @@
     <!-- UI components -->
     <dimen name="menu_item_height">63dp</dimen>
     <dimen name="header_height">64dp</dimen>
-    <dimen name="network_state_indicator_state">6dp</dimen>
-    <dimen name="tooltip_offset">14dp</dimen>
 
     <!-- onboarding -->
     <dimen name="onboarding_bottom_progress_bar_bottom_margin">10dp</dimen>
@@ -31,11 +28,8 @@
     <dimen name="emoji_id_summary_letter_spacing">3dp</dimen>
 
     <!-- bottom dialog -->
-    <dimen name="bottom_dialog_margin">15dp</dimen>
-    <dimen name="bottom_dialog_horizontal_padding">10dp</dimen>
 
     <!-- debug -->
-    <dimen name="log_item_height">42dp</dimen>
 
     <!-- onboarding -->
     <dimen name="onboarding_see_full_emoji_id_button_visible_top_margin">-56dp</dimen>
@@ -51,7 +45,6 @@
 
     <!-- home -->
     <dimen name="home_top_content_container_view_top_margin">16dp</dimen>
-    <dimen name="home_top_content_container_view_bottom_margin">16dp</dimen>
     <dimen name="home_top_content_container_scroll_vertical_shift">20dp</dimen>
     <dimen name="home_grabber_container_height">40dp</dimen>
     <dimen name="home_grabber_corner_radius">15dp</dimen>
@@ -66,26 +59,16 @@
     <dimen name="home_balance_digit_decimal_text_size">12sp</dimen>
     <dimen name="home_balance_digit_decimal_height">14dp</dimen>
     <dimen name="home_balance_decimal_container_top_margin">2dp</dimen>
-    <dimen name="home_send_tari_button_width">159dp</dimen>
-    <dimen name="home_send_tari_button_visible_bottom_margin">25dp</dimen>
-    <dimen name="home_send_tari_button_hidden_bottom_margin">-100dp</dimen>
-    <dimen name="home_send_tari_button_initial_bottom_margin">-150dp</dimen>
     <dimen name="home_main_content_top_margin">6dp</dimen>
     <dimen name="home_dialog_testnet_tari_dialog_margin">14dp</dimen>
     <dimen name="home_wallet_info_button_initial_top_margin">45dp</dimen>
-    <dimen name="home_backup_prompt_cta_width">209dp</dimen>
-    <dimen name="home_backup_prompt_cta_height">53dp</dimen>
     <dimen name="home_question_mark_size">15dp</dimen>
 
     <!-- tx list -->
-    <dimen name="tx_list_top_offset">100dp</dimen>
     <dimen name="tx_list_item_gif_container_top_margin">8dp</dimen>
     <dimen name="tx_list_item_emoji_text_view_normal_top_margin">32dp</dimen>
     <dimen name="tx_list_item_emoji_text_view_shadow_normal_top_margin">18dp</dimen>
     <dimen name="tx_list_item_content_container_view_normal_top_margin">36dp</dimen>
-    <dimen name="tx_list_item_emoji_text_view_first_item_top_margin">14dp</dimen>
-    <dimen name="tx_list_item_emoji_text_view_shadow_first_item_top_margin">0dp</dimen>
-    <dimen name="tx_list_item_content_container_view_first_item_top_margin">18dp</dimen>
     <dimen name="home_header_top_margin">40dp</dimen>
 
     <!-- home swipe refresh -->
@@ -96,25 +79,15 @@
     <dimen name="home_swipe_refresh_progress_view_content_visible_top_margin">12dp</dimen>
     
     <!-- home TTL store dialog -->
-    <dimen name="home_ttl_store_dialog_desc_top_margin">16dp</dimen>
-    <dimen name="home_ttl_store_dialog_visit_button_top_margin">24dp</dimen>
-    <dimen name="home_ttl_store_dialog_cancel_button_top_margin">8dp</dimen>
-    <dimen name="home_ttl_store_dialog_padding_bottom">12dp</dimen>
 
     <!-- incompatible network dialog -->
-    <dimen name="incompatible_network_dialog_button_text_size">13sp</dimen>
 
     <dimen name="create_wallet_button_bottom_margin">25dp</dimen>
     <dimen name="home_tx_list_item_height">74dp</dimen>
 
     <!-- tx details -->
-    <dimen name="tx_details_header_bottom_padding">13dp</dimen>
-    <dimen name="tx_details_tx_id_bottom_margin">12dp</dimen>
     <dimen name="tx_details_amount_section_vertical_padding">20dp</dimen>
-    <dimen name="tx_details_contact_name_top_margin">24dp</dimen>
-    <dimen name="tx_details_contact_name_underline_top_margin">8dp</dimen>
     <dimen name="tx_details_note_top_margin">20dp</dimen>
-    <dimen name="tx_details_tx_id_text_size">9sp</dimen>
 
     <!-- send tari - common -->
     <dimen name="header_top_inset">12dp</dimen>
@@ -165,13 +138,6 @@
     <dimen name="write_down_seed_expand_button_bottom_margin">5dp</dimen>
     <dimen name="write_down_seed_phrase_list_collapsed_decoration">4dp</dimen>
     <dimen name="write_down_seed_phrase_list_expanded_decoration">9dp</dimen>
-    <dimen name="verify_seed_phrase_selectable_word_horizontal_padding">13dp</dimen>
-    <dimen name="verify_seed_phrase_selectable_word_vertical_padding">5dp</dimen>
-    <dimen name="verify_seed_phrase_selectable_word_end_margin">8dp</dimen>
-    <dimen name="verify_seed_phrase_word_end_margin">5dp</dimen>
-    <dimen name="verify_seed_phrase_selected_word_end_margin">25dp</dimen>
-    <dimen name="verify_seed_phrase_word_bottom_margin">14dp</dimen>
-    <dimen name="seed_phrase_word_min_width">100dp</dimen>
 
     <dimen name="utxos_list_tile_margin">12dp</dimen>
 
