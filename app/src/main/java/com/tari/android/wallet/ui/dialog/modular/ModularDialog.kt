@@ -15,15 +15,23 @@ import com.tari.android.wallet.ui.dialog.modular.modules.body.BodyModule
 import com.tari.android.wallet.ui.dialog.modular.modules.body.BodyModuleView
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonModule
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonModuleView
+import com.tari.android.wallet.ui.dialog.modular.modules.checked.CheckedModule
+import com.tari.android.wallet.ui.dialog.modular.modules.checked.CheckedModuleView
 import com.tari.android.wallet.ui.dialog.modular.modules.customBaseNodeBody.CustomBaseNodeBodyModule
 import com.tari.android.wallet.ui.dialog.modular.modules.customBaseNodeBody.CustomBaseNodeBodyModuleView
 import com.tari.android.wallet.ui.dialog.modular.modules.head.*
 import com.tari.android.wallet.ui.dialog.modular.modules.imageModule.ImageModule
 import com.tari.android.wallet.ui.dialog.modular.modules.imageModule.ImageModuleView
+import com.tari.android.wallet.ui.dialog.modular.modules.option.OptionModule
+import com.tari.android.wallet.ui.dialog.modular.modules.option.OptionModuleView
+import com.tari.android.wallet.ui.dialog.modular.modules.space.SpaceModule
+import com.tari.android.wallet.ui.dialog.modular.modules.space.SpaceModuleView
 import com.tari.android.wallet.ui.fragment.send.addAmount.feeModule.FeeModule
 import com.tari.android.wallet.ui.fragment.send.addAmount.feeModule.FeeModuleView
 import com.tari.android.wallet.ui.fragment.send.shareQr.ShareQRCodeModuleView
 import com.tari.android.wallet.ui.fragment.send.shareQr.ShareQrCodeModule
+import com.tari.android.wallet.ui.fragment.settings.logs.logs.LogLevelCheckedModule
+import com.tari.android.wallet.ui.fragment.settings.logs.logs.LogSourceCheckedModule
 import com.tari.android.wallet.ui.fragment.utxos.list.module.*
 
 
@@ -59,13 +67,18 @@ open class ModularDialog(val context: Context) : TariDialog {
         root.removeAllViews()
         for (module in modules) {
             module.dismissAction = dialog::dismiss
-            val view = when(module) {
+            val view = when (module) {
+                is SpaceModule -> SpaceModuleView(context, module)
                 is HeadModule -> HeadModuleView(context, module)
                 is HeadSpannableModule -> HeadSpannableModuleView(context, module)
                 is HeadBoldSpannableModule -> HeadBoldSpannableModuleView(context, module)
                 is ImageModule -> ImageModuleView(context, module)
                 is BodyModule -> BodyModuleView(context, module)
+                is OptionModule -> OptionModuleView(context, module)
                 is ButtonModule -> ButtonModuleView(context, module) { dialog.dismiss() }
+                is CheckedModule -> CheckedModuleView(context, module)
+                is LogSourceCheckedModule -> CheckedModuleView(context, module.checkedModule)
+                is LogLevelCheckedModule -> CheckedModuleView(context, module.checkedModule)
                 is CustomBaseNodeBodyModule -> CustomBaseNodeBodyModuleView(context, module)
                 is ShareQrCodeModule -> ShareQRCodeModuleView(context, module)
                 is FeeModule -> FeeModuleView(context, module)
@@ -84,5 +97,5 @@ open class ModularDialog(val context: Context) : TariDialog {
 
     override fun dismiss() = dialog.dismiss()
 
-    override fun isShowing() : Boolean = dialog.isShowing
+    override fun isShowing(): Boolean = dialog.isShowing
 }

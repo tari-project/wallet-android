@@ -36,25 +36,24 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.viewModels
-import androidx.fragment.app.Fragment
 import com.tari.android.wallet.R
 import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import com.tari.android.wallet.data.sharedPrefs.tariSettings.TariSettingsSharedRepository
 import com.tari.android.wallet.databinding.ActivityWalletBackupBinding
 import com.tari.android.wallet.di.DiContainer.appComponent
-import com.tari.android.wallet.service.WalletServiceLauncher
+import com.tari.android.wallet.service.service.WalletServiceLauncher
 import com.tari.android.wallet.ui.common.CommonActivity
 import com.tari.android.wallet.ui.fragment.auth.AuthActivity
-import com.tari.android.wallet.ui.fragment.debug.baseNodeConfig.BaseNodeConfigRouter
-import com.tari.android.wallet.ui.fragment.debug.baseNodeConfig.addBaseNode.AddCustomBaseNodeFragment
-import com.tari.android.wallet.ui.fragment.debug.baseNodeConfig.changeBaseNode.ChangeBaseNodeFragment
 import com.tari.android.wallet.ui.fragment.restore.chooseRestoreOption.ChooseRestoreOptionFragment
 import com.tari.android.wallet.ui.fragment.restore.enterRestorationPassword.EnterRestorationPasswordFragment
 import com.tari.android.wallet.ui.fragment.restore.inputSeedWords.InputSeedWordsFragment
 import com.tari.android.wallet.ui.fragment.restore.walletRestoringFromSeedWords.WalletRestoringFromSeedWordsFragment
+import com.tari.android.wallet.ui.fragment.settings.baseNodeConfig.BaseNodeRouter
+import com.tari.android.wallet.ui.fragment.settings.baseNodeConfig.addBaseNode.AddCustomBaseNodeFragment
+import com.tari.android.wallet.ui.fragment.settings.baseNodeConfig.changeBaseNode.ChangeBaseNodeFragment
 import javax.inject.Inject
 
-class WalletRestoreActivity : CommonActivity<ActivityWalletBackupBinding, WalletRestoreViewModel>(), WalletRestoreRouter, BaseNodeConfigRouter {
+class WalletRestoreActivity : CommonActivity<ActivityWalletBackupBinding, WalletRestoreViewModel>(), WalletRestoreRouter, BaseNodeRouter {
 
     @Inject
     lateinit var prefs: SharedPrefsRepository
@@ -72,9 +71,11 @@ class WalletRestoreActivity : CommonActivity<ActivityWalletBackupBinding, Wallet
 
         val viewModel : WalletRestoreViewModel by viewModels()
         bindViewModel(viewModel)
+        
+        setContainerId(R.id.backup_fragment_container)
 
         if (savedInstanceState == null) {
-            loadChooseBackupOptionFragment()
+            addFragment(ChooseRestoreOptionFragment(), isRoot = true)
         }
     }
 
@@ -83,19 +84,13 @@ class WalletRestoreActivity : CommonActivity<ActivityWalletBackupBinding, Wallet
         overridePendingTransition(R.anim.enter_from_top, R.anim.exit_to_bottom)
     }
 
-    private fun loadChooseBackupOptionFragment() {
-        supportFragmentManager.beginTransaction()
-            .add(R.id.backup_fragment_container, ChooseRestoreOptionFragment())
-            .commit()
-    }
+    override fun toEnterRestorePassword() = addFragment(EnterRestorationPasswordFragment.newInstance())
 
-    override fun toEnterRestorePassword() = loadFragment(EnterRestorationPasswordFragment.newInstance())
+    override fun toRestoreWithRecoveryPhrase() = addFragment(InputSeedWordsFragment.newInstance())
 
-    override fun toRestoreWithRecoveryPhrase() = loadFragment(InputSeedWordsFragment.newInstance())
+    override fun toRestoreFromSeedWordsInProgress() = addFragment(WalletRestoringFromSeedWordsFragment.newInstance())
 
-    override fun toRestoreFromSeedWordsInProgress() = loadFragment(WalletRestoringFromSeedWordsFragment.newInstance())
-
-    override fun toBaseNodeSelection() = loadFragment(ChangeBaseNodeFragment())
+    override fun toBaseNodeSelection() = addFragment(ChangeBaseNodeFragment())
 
     override fun onRestoreCompleted() {
         // wallet restored, setup shared prefs accordingly
@@ -110,18 +105,7 @@ class WalletRestoreActivity : CommonActivity<ActivityWalletBackupBinding, Wallet
         })
     }
 
-    override fun toChangeBaseNode() = Unit
-
-    override fun toAddCustomBaseNode() = loadFragment(AddCustomBaseNodeFragment())
-
-    private fun loadFragment(fragment: Fragment) {
-        supportFragmentManager
-            .beginTransaction()
-            .setCustomAnimations(R.anim.enter_from_right, R.anim.exit_to_left, R.anim.enter_from_left, R.anim.exit_to_right)
-            .replace(R.id.backup_fragment_container, fragment)
-            .addToBackStack(null)
-            .commit()
-    }
+    override fun toAddCustomBaseNode() = addFragment(AddCustomBaseNodeFragment())
 
     override fun onDestroy() {
         if (!tariSettingsSharedRepository.isRestoredWallet) {

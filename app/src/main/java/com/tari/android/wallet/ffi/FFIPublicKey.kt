@@ -39,88 +39,43 @@ package com.tari.android.wallet.ffi
  */
 class FFIPublicKey() : FFIBase() {
 
-    // region JNI
-
-    private external fun jniGetBytes(
-        libError: FFIError
-    ): FFIPointer
-
+    private external fun jniGetBytes(libError: FFIError): FFIPointer
     private external fun jniDestroy()
-    private external fun jniCreate(
-        byteVectorPtr: FFIByteVector,
-        libError: FFIError
-    )
-
+    private external fun jniCreate(byteVectorPtr: FFIByteVector, libError: FFIError)
     private external fun jniFromHex(hexStr: String, libError: FFIError)
-
     private external fun jniFromEmojiId(emoji: String, libError: FFIError)
+    private external fun jniFromPrivateKey(privateKeyPtr: FFIPrivateKey, libError: FFIError)
+    private external fun jniGetEmojiId(libError: FFIError): String
 
-    private external fun jniFromPrivateKey(
-        privateKeyPtr: FFIPrivateKey,
-        libError: FFIError
-    )
-
-    private external fun jniGetEmojiId(
-        libError: FFIError
-    ): String
-
-    // endregion
-
-    constructor(pointer: FFIPointer): this() {
+    constructor(pointer: FFIPointer) : this() {
         this.pointer = pointer
     }
 
     constructor(byteVector: FFIByteVector) : this() {
-        val error = FFIError()
-        jniCreate(byteVector, error)
-        throwIf(error)
+        runWithError { jniCreate(byteVector, it) }
     }
 
     constructor(hex: HexString) : this() {
         if (hex.toString().length == 64) {
-            val error = FFIError()
-            jniFromHex(hex.hex, error)
-            throwIf(error)
+            runWithError { jniFromHex(hex.hex, it) }
         } else {
             throw FFIException(message = "HexString is not a valid PublicKey")
         }
     }
 
     constructor(emojiId: String) : this() {
-        val error = FFIError()
-        jniFromEmojiId(emojiId, error)
-        throwIf(error)
+        runWithError { jniFromEmojiId(emojiId, it) }
     }
 
     constructor(privateKey: FFIPrivateKey) : this() {
-        val error = FFIError()
-        jniFromPrivateKey(privateKey, error)
-        throwIf(error)
+        runWithError { jniFromPrivateKey(privateKey, it) }
     }
 
-    fun getBytes(): FFIByteVector {
-        val error = FFIError()
-        val result = FFIByteVector(jniGetBytes(error))
-        throwIf(error)
-        return result
-    }
+    fun getBytes(): FFIByteVector = runWithError { FFIByteVector(jniGetBytes(it)) }
 
-    fun getEmojiId(): String {
-        val error = FFIError()
-        val result = jniGetEmojiId(error)
-        throwIf(error)
-        return result
-    }
+    fun getEmojiId(): String = runWithError { jniGetEmojiId(it) }
 
-    override fun toString(): String {
-        val error = FFIError()
-        val result = FFIByteVector(jniGetBytes(error)).toString()
-        throwIf(error)
-        return result
-    }
+    override fun toString(): String = runWithError { FFIByteVector(jniGetBytes(it)).toString() }
 
-    override fun destroy() {
-        jniDestroy()
-    }
-
+    override fun destroy() = jniDestroy()
 }

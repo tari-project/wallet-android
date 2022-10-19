@@ -40,17 +40,9 @@ package com.tari.android.wallet.ffi
  */
 class FFITariTransportConfig() : FFIBase() {
 
-    // region JNI
     private external fun jniMemoryTransport()
-
-    private external fun jniGetMemoryAddress(
-        libError: FFIError
-    ): String
-
-    private external fun jniTCPTransport(
-        listenerAddress: String, libError: FFIError
-    )
-
+    private external fun jniGetMemoryAddress(libError: FFIError): String
+    private external fun jniTCPTransport(listenerAddress: String, libError: FFIError)
     private external fun jniTorTransport(
         control_server_address: String,
         torCookie: FFIByteVector,
@@ -59,9 +51,7 @@ class FFITariTransportConfig() : FFIBase() {
         socksPassword: String,
         libError: FFIError
     )
-
     private external fun jniDestroy()
-    // endregion
 
     /**
      * Default constructor creates memory transport.
@@ -74,42 +64,18 @@ class FFITariTransportConfig() : FFIBase() {
      * TCP transport.
      */
     constructor(listenerAddress: NetAddressString) : this() {
-        val error = FFIError()
-        jniTCPTransport(listenerAddress.toString(), error)
-        throwIf(error)
+        runWithError { jniTCPTransport(listenerAddress.toString(), it) }
     }
 
     /**
      * Tor transport.
      */
-    constructor(
-        controlAddress: NetAddressString,
-        torCookie: FFIByteVector,
-        torPort: Int,
-        socksUsername: String,
-        socksPassword: String
-    ) : this() {
-        val error = FFIError()
-        jniTorTransport(
-            controlAddress.toString(),
-            torCookie,
-            torPort,
-            socksUsername,
-            socksPassword,
-            error
-        )
-        throwIf(error)
+    constructor(controlAddress: NetAddressString, torCookie: FFIByteVector, torPort: Int, socksUsername: String, socksPassword: String) : this() {
+        runWithError { jniTorTransport(controlAddress.toString(), torCookie, torPort, socksUsername, socksPassword, it) }
     }
 
-    fun getAddress(): String {
-        val error = FFIError()
-        val result = jniGetMemoryAddress(error)
-        throwIf(error)
-        return result
-    }
+    fun getAddress(): String = runWithError { jniGetMemoryAddress(it) }
 
-    override fun destroy() {
-        jniDestroy()
-    }
+    override fun destroy() = jniDestroy()
 
 }

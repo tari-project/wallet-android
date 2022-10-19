@@ -5,13 +5,10 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.tari.android.wallet.R
 import com.tari.android.wallet.data.sharedPrefs.tariSettings.TariSettingsSharedRepository
-import com.tari.android.wallet.extension.addTo
 import com.tari.android.wallet.extension.getWithError
 import com.tari.android.wallet.ffi.FFIWallet
 import com.tari.android.wallet.model.MicroTari
 import com.tari.android.wallet.model.WalletError
-import com.tari.android.wallet.service.TariWalletService
-import com.tari.android.wallet.service.connection.TariWalletServiceConnection
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.dialog.modular.DialogArgs
 import com.tari.android.wallet.ui.dialog.modular.ModularDialogArgs
@@ -33,10 +30,6 @@ class AddAmountViewModel : CommonViewModel() {
     @Inject
     lateinit var tariSettingsSharedRepository: TariSettingsSharedRepository
 
-    private val connectionService: TariWalletServiceConnection = TariWalletServiceConnection()
-    val walletService: TariWalletService
-        get() = connectionService.currentState.service!!
-
     private val _isOneSidePaymentEnabled: MutableLiveData<Boolean> = MutableLiveData()
     val isOneSidePaymentEnabled: LiveData<Boolean> = _isOneSidePaymentEnabled
 
@@ -54,9 +47,8 @@ class AddAmountViewModel : CommonViewModel() {
     init {
         component.inject(this)
 
-        connectionService.connection.filter { it.status == TariWalletServiceConnection.ServiceConnectionStatus.CONNECTED }.subscribe {
-            _serviceConnected.postValue(Unit)
-        }.addTo(compositeDisposable)
+        doOnConnected { _serviceConnected.postValue(Unit) }
+
         loadFees()
         _isOneSidePaymentEnabled.postValue(tariSettingsSharedRepository.isOneSidePaymentEnabled)
     }

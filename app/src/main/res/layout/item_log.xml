@@ -4,68 +4,20 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginVertical="4dp"
-    android:background="@drawable/log_item_bg"
+    android:layout_marginVertical="3dp"
+    android:background="@color/white"
     android:orientation="vertical"
     android:paddingHorizontal="10dp"
     android:paddingVertical="12dp">
 
     <com.tari.android.wallet.ui.component.CustomFontTextView
-        android:id="@+id/timestamp_text_view"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:ellipsize="middle"
-        android:singleLine="true"
-        android:text="@string/dummy_message"
-        android:textColor="@color/black"
-        android:textSize="13sp"
-        app:customFont="@string/font_regular" />
-
-    <com.tari.android.wallet.ui.component.CustomFontTextView
-        android:id="@+id/source_1_text_view"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:ellipsize="middle"
-        android:singleLine="true"
-        android:text="@string/dummy_message"
-        android:textColor="@color/black"
-        android:textSize="13sp"
-        app:customFont="@string/font_regular" />
-
-    <com.tari.android.wallet.ui.component.CustomFontTextView
-        android:id="@+id/source_2_text_view"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:ellipsize="middle"
-        android:singleLine="true"
-        android:text="@string/dummy_message"
-        android:textColor="@color/black"
-        android:textSize="13sp"
-        app:customFont="@string/font_regular" />
-
-    <com.tari.android.wallet.ui.component.CustomFontTextView
-        android:id="@+id/level_text_view"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:ellipsize="middle"
-        android:singleLine="true"
-        android:text="@string/dummy_message"
-        android:textColor="@color/black"
-        android:textSize="13sp"
-        app:customFont="@string/font_regular" />
-
-    <TextView
         android:id="@+id/log_text_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:singleLine="false"
-        android:text="@string/dummy_message"
-        android:textColor="@color/black"
-        android:textSize="13sp"
-        android:typeface="monospace" />
+        android:text="@string/long_dummy_message"
+        android:lineSpacingExtra="4dp"
+        android:textColor="@color/dark_gray"
+        android:textSize="14sp"
+        app:customFont="@string/font_medium" />
 
 </LinearLayout>

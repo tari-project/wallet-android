@@ -14,6 +14,7 @@ import com.tari.android.wallet.extension.getWithError
 import com.tari.android.wallet.ffi.FFIPublicKey
 import com.tari.android.wallet.ffi.FFIWallet
 import com.tari.android.wallet.ffi.HexString
+import com.tari.android.wallet.service.connection.ServiceConnectionStatus
 import com.tari.android.wallet.service.connection.TariWalletServiceConnection
 import io.reactivex.disposables.CompositeDisposable
 
@@ -32,7 +33,7 @@ class BaseNodes(
 
     init {
         serviceConnection.connection.subscribe {
-            if (it.status == TariWalletServiceConnection.ServiceConnectionStatus.CONNECTED) {
+            if (it.status == ServiceConnectionStatus.CONNECTED) {
                 startSync()
             }
         }.addTo(compositeDisposable)

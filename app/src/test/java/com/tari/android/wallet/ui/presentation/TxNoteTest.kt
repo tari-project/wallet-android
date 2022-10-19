@@ -32,6 +32,7 @@
  */
 package com.tari.android.wallet.ui.presentation
 
+import com.tari.android.wallet.model.TxNote
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test

@@ -41,59 +41,32 @@ typealias FFIContactPtr = Long
  */
 class FFIContact() : FFIBase() {
 
-    // region JNI
-
     private external fun jniGetAlias(libError: FFIError): String
-    private external fun jniGetPublicKey(
-        libError: FFIError
-    ): FFIPointer
-
+    private external fun jniGetPublicKey(libError: FFIError): FFIPointer
     private external fun jniDestroy()
-    private external fun jniCreate(
-        alias: String,
-        publicKeyPtr: FFIPublicKey,
-        libError: FFIError
-    )
+    private external fun jniCreate(alias: String, publicKeyPtr: FFIPublicKey, libError: FFIError)
 
-    // endregion
-    constructor(pointer: FFIPointer): this() {
+    constructor(pointer: FFIPointer) : this() {
         this.pointer = pointer
     }
 
-    constructor(alias: String, FFIPublicKey: FFIPublicKey): this() {
+    constructor(alias: String, FFIPublicKey: FFIPublicKey) : this() {
         if (alias.isNotEmpty()) {
-            val error = FFIError()
-            jniCreate(alias, FFIPublicKey, error)
-            throwIf(error)
+            runWithError { jniCreate(alias, FFIPublicKey, it) }
         } else {
             throw FFIException(message = "Alias is an empty String.")
         }
     }
 
-    fun getAlias(): String {
-        val error = FFIError()
-        val result = jniGetAlias(error)
-        throwIf(error)
-        return result
-    }
+    fun getAlias(): String = runWithError { jniGetAlias(it) }
 
-    fun getPublicKey(): FFIPublicKey {
-        val error = FFIError()
-        val result = FFIPublicKey(jniGetPublicKey(error))
-        throwIf(error)
-        return result
-    }
+    fun getPublicKey(): FFIPublicKey = runWithError { FFIPublicKey(jniGetPublicKey(it)) }
 
-    override fun toString(): String {
-        val result = StringBuilder()
-            .append(getAlias())
-            .append("|")
-            .append(getPublicKey().toString())
-        return result.toString()
-    }
+    override fun toString(): String = StringBuilder()
+        .append(getAlias())
+        .append("|")
+        .append(getPublicKey().toString())
+        .toString()
 
-    override fun destroy() {
-        jniDestroy()
-    }
-
+    override fun destroy() = jniDestroy()
 }

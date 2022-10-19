@@ -77,7 +77,7 @@ import com.tari.android.wallet.ui.fragment.send.activity.SendTariActivity
 import com.tari.android.wallet.ui.fragment.send.addNote.gif.*
 import com.tari.android.wallet.ui.fragment.send.addNote.gif.ThumbnailGIFsViewModel.Companion.REQUEST_CODE_GIF
 import com.tari.android.wallet.ui.fragment.send.common.TransactionData
-import com.tari.android.wallet.ui.presentation.TxNote
+import com.tari.android.wallet.model.TxNote
 import com.tari.android.wallet.util.Constants
 import java.lang.ref.WeakReference
 
