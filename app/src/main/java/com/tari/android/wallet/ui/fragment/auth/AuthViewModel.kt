@@ -13,9 +13,6 @@ class AuthViewModel : CommonViewModel() {
     lateinit var sharedPrefsWrapper: SharedPrefsRepository
 
     @Inject
-    lateinit var networkRepository: NetworkRepository
-
-    @Inject
     lateinit var authService: BiometricAuthenticationService
 
     @Inject

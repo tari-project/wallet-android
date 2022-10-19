@@ -33,8 +33,8 @@
 package com.tari.android.wallet.ffi
 
 import android.os.FileObserver
-import com.orhanobut.logger.Logger
 import org.apache.commons.io.input.ReversedLinesFileReader
+import timber.log.Timber
 import java.io.File
 import java.io.FileReader
 import java.io.LineNumberReader
@@ -74,7 +74,7 @@ class LogFileObserver(logFilePath: String) : FileObserver(logFilePath) {
         if (lineList.isNotEmpty()) {
             // log them in reverse order
             lineList.reversed().forEach { logLine -> stringBuilder.appendLine(logLine) }
-            Logger.t(logTag).d(stringBuilder.toString())
+            Timber.tag(logTag).d(stringBuilder.toString())
             lastNumberOfLines = lineNumberReader.lineNumber
         }
         // close resources

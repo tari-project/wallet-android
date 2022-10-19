@@ -48,6 +48,7 @@
     <string name="dummy_contact_alias">Sarah_D</string>
     <string name="dummy_contact_initial">S</string>
     <string name="dummy_message">Thanks again for helping with my move</string>
+    <string name="long_dummy_message">Thanks again for helping with my move. Thanks again for helping with my move. Thanks again for helping with my move. Thanks again for helping with my move</string>
     <string name="dummy_emoji">🍀</string>
 
     <!-- notifications -->
@@ -303,7 +304,6 @@
     <string name="finalize_send_tx_sending_step_3_desc_line_1">Good to go!</string>
     <string name="finalize_send_tx_sending_step_3_desc_line_2" tools:ignore="TypographyEllipsis">Your transaction is on its way...</string>
 
-    <!-- debug log - title -->
     <!-- wallet info -->
     <string name="wallet_info_my_profile">My Profile</string>
     <string name="wallet_info_qr_code_desc">Transacting in person? Others can scan this QR code from the Tari Aurora App to send you tXTR.</string>
@@ -356,7 +356,26 @@
 
     <!-- debug screens -->
     <!-- logs -->
+    <string name="debug_dialog_title">Debug Menu</string>
+    <string name="debug_dialog_logs">View logs</string>
+    <string name="debug_dialog_report">Report a bug</string>
+    <string name="debug_dialog_connection_status">View connection status</string>
+    <string name="debug_logs_title">Debug Logs</string>
+    <string name="debug_logs_cant_open_file">Unable to open file. Please try again later</string>
+    <string name="debug_logs_clipboard_text">Logs was copied to clipboard</string>
     <string name="debug_log_files_title">Logs</string>
+    <string name="debug_log_filter_title">Filter</string>
+    <string name="debug_log_filter_apply">Apply Filter</string>
+    <string name="debug_log_filter_info">Info</string>
+    <string name="debug_log_filter_warning">Warning</string>
+    <string name="debug_log_filter_error">Error</string>
+    <string name="debug_log_filter_ffi">FFI</string>
+    <string name="debug_log_filter_aurora_general">Aurora - General</string>
+    <string name="debug_log_filter_aurora_connection">Aurora - Connection</string>
+    <string name="debug_log_filter_aurora_ui">Aurora - UI</string>
+    <string name="debug_log_filter_aurora_navigation">Aurora - Navigation</string>
+
+    <string name="debug_log_filter_debug">Debug</string>
     <string name="debug_log_share_dialog_title">Share</string>
     <string name="debug_log_share_dialog_content">Please confirm to compress and e-mail your wallet log files.</string>
     <string name="debug_log_file_size_limit_exceeded_dialog_title">File Size Error</string>

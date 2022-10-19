@@ -76,9 +76,6 @@ import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
 import com.tari.android.wallet.ui.extension.color
 import com.tari.android.wallet.ui.extension.showInternetConnectionErrorDialog
 import com.tari.android.wallet.ui.extension.string
-import com.tari.android.wallet.ui.fragment.debug.baseNodeConfig.BaseNodeConfigRouter
-import com.tari.android.wallet.ui.fragment.debug.baseNodeConfig.addBaseNode.AddCustomBaseNodeFragment
-import com.tari.android.wallet.ui.fragment.debug.baseNodeConfig.changeBaseNode.ChangeBaseNodeFragment
 import com.tari.android.wallet.ui.fragment.onboarding.activity.OnboardingFlowActivity
 import com.tari.android.wallet.ui.fragment.profile.WalletInfoFragment
 import com.tari.android.wallet.ui.fragment.send.activity.SendTariActivity
@@ -87,6 +84,9 @@ import com.tari.android.wallet.ui.fragment.settings.allSettings.AllSettingsRoute
 import com.tari.android.wallet.ui.fragment.settings.allSettings.about.TariAboutFragment
 import com.tari.android.wallet.ui.fragment.settings.backgroundService.BackgroundServiceSettingsActivity
 import com.tari.android.wallet.ui.fragment.settings.backup.activity.BackupSettingsActivity
+import com.tari.android.wallet.ui.fragment.settings.baseNodeConfig.BaseNodeRouter
+import com.tari.android.wallet.ui.fragment.settings.baseNodeConfig.addBaseNode.AddCustomBaseNodeFragment
+import com.tari.android.wallet.ui.fragment.settings.baseNodeConfig.changeBaseNode.ChangeBaseNodeFragment
 import com.tari.android.wallet.ui.fragment.settings.deleteWallet.DeleteWalletActivity
 import com.tari.android.wallet.ui.fragment.settings.networkSelection.NetworkSelectionFragment
 import com.tari.android.wallet.ui.fragment.settings.torBridges.TorBridgesSelectionFragment
@@ -105,7 +105,7 @@ import kotlinx.coroutines.launch
 import java.lang.ref.WeakReference
 import javax.inject.Inject
 
-class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>(), AllSettingsRouter, TxListRouter, BaseNodeConfigRouter {
+class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>(), AllSettingsRouter, TxListRouter, BaseNodeRouter {
 
     @Inject
     lateinit var sharedPrefsWrapper: SharedPrefsRepository
@@ -130,6 +130,8 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>(), AllSe
 
         val viewModel: HomeViewModel by viewModels()
         bindViewModel(viewModel)
+        
+        setContainerId(R.id.nav_container)
 
         overridePendingTransition(0, 0)
         appComponent.inject(this)
@@ -313,7 +315,7 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>(), AllSe
         }
     }
 
-    override fun toTxDetails(tx: Tx?, txId: TxId?) = loadFragment(TxDetailsFragment().apply {
+    override fun toTxDetails(tx: Tx?, txId: TxId?) = addFragment(TxDetailsFragment().apply {
         arguments = Bundle().apply {
             putParcelable(TX_EXTRA_KEY, tx)
             putParcelable(TX_ID_EXTRA_KEY, txId)
@@ -330,34 +332,19 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>(), AllSe
 
     override fun toBackgroundService() = startActivity(Intent(this, BackgroundServiceSettingsActivity::class.java))
 
-    override fun toAbout() = loadFragment(TariAboutFragment())
+    override fun toAbout() = addFragment(TariAboutFragment())
 
-    override fun toBaseNodeSelection() = loadFragment(ChangeBaseNodeFragment())
+    override fun toBaseNodeSelection() = addFragment(ChangeBaseNodeFragment())
 
-    override fun toTorBridges() = loadFragment(TorBridgesSelectionFragment())
+    override fun toTorBridges() = addFragment(TorBridgesSelectionFragment())
 
-    override fun toUtxos() = loadFragment(UtxosListFragment())
+    override fun toUtxos() = addFragment(UtxosListFragment())
 
-    override fun toCustomTorBridges() = loadFragment(CustomTorBridgesFragment())
+    override fun toCustomTorBridges() = addFragment(CustomTorBridgesFragment())
 
-    override fun toNetworkSelection() = loadFragment(NetworkSelectionFragment())
+    override fun toNetworkSelection() = addFragment(NetworkSelectionFragment())
 
-    override fun toAddCustomBaseNode() = loadFragment(AddCustomBaseNodeFragment())
-
-    override fun toChangeBaseNode() = loadFragment(ChangeBaseNodeFragment())
-
-    private fun loadFragment(fragment: Fragment) {
-        supportFragmentManager
-            .beginTransaction()
-            .setCustomAnimations(
-                R.anim.enter_from_right, R.anim.exit_to_left,
-                R.anim.enter_from_left, R.anim.exit_to_right
-            )
-            .apply { supportFragmentManager.fragments.forEach { hide(it) } }
-            .replace(R.id.nav_container, fragment)
-            .addToBackStack(null)
-            .commit()
-    }
+    override fun toAddCustomBaseNode() = addFragment(AddCustomBaseNodeFragment())
 
     fun willNotifyAboutNewTx(): Boolean = ui.viewPager.currentItem == INDEX_HOME
 
