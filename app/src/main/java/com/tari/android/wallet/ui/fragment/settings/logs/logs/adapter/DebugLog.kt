@@ -25,8 +25,8 @@ class DebugLog(var line: String) {
             val matchResult = ffiRegex.find(line)
             val (timestamp, source1, source2, level, log) = matchResult!!.destructured
             this.timestamp = timestamp
-            this.source1 = source1
-            this.source2 = source2
+            this.source1 = source1.replace("[", "").replace("]", "")
+            this.source2 = source1.replace("[", "").replace("]", "")
             this.level = level
             this.log = log
 

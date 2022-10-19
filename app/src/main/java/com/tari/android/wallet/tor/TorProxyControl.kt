@@ -2,6 +2,7 @@ package com.tari.android.wallet.tor
 
 import com.orhanobut.logger.Logger
 import com.tari.android.wallet.event.EventBus
+import com.tari.android.wallet.infrastructure.logging.LoggerTags
 import io.reactivex.Observable
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
@@ -26,7 +27,7 @@ class TorProxyControl(private val torConfig: TorConfig) {
      */
     private var timerSubscription: Disposable? = null
     private val logger
-        get() = Logger.t(TorProxyControl::class.simpleName)
+        get() = Logger.t(LoggerTags.Connection.name)
 
     private lateinit var socket: Socket
     private lateinit var controlConnection: TorControlConnection

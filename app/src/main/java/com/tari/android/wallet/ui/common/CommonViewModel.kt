@@ -10,6 +10,7 @@ import com.tari.android.wallet.di.ApplicationComponent
 import com.tari.android.wallet.di.DiContainer
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.extension.addTo
+import com.tari.android.wallet.infrastructure.logging.LoggerTags
 import com.tari.android.wallet.service.TariWalletService
 import com.tari.android.wallet.service.connection.ServiceConnectionStatus
 import com.tari.android.wallet.service.connection.TariWalletServiceConnection
@@ -38,13 +39,13 @@ open class CommonViewModel : ViewModel() {
     lateinit var networkRepository: NetworkRepository
 
     val logger: Printer
-        get() = Logger.t("screen").t(this::class.simpleName)
+        get() = Logger.t(this::class.simpleName).t(LoggerTags.UI.name)
 
     init {
         @Suppress("LeakingThis")
         component.inject(this)
 
-        logger.i(this::class.simpleName + "was started")
+        logger.t(LoggerTags.Navigation.name).i(this::class.simpleName + " was started")
 
         EventBus.walletState.publishSubject.filter { it is WalletState.Failed }
             .subscribe({

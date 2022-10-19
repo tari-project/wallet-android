@@ -370,7 +370,11 @@
     <string name="debug_log_filter_warning">Warning</string>
     <string name="debug_log_filter_error">Error</string>
     <string name="debug_log_filter_ffi">FFI</string>
-    <string name="debug_log_filter_aurora">Aurora</string>
+    <string name="debug_log_filter_aurora_general">Aurora - General</string>
+    <string name="debug_log_filter_aurora_connection">Aurora - Connection</string>
+    <string name="debug_log_filter_aurora_ui">Aurora - UI</string>
+    <string name="debug_log_filter_aurora_navigation">Aurora - Navigation</string>
+
     <string name="debug_log_filter_debug">Debug</string>
     <string name="debug_log_share_dialog_title">Share</string>
     <string name="debug_log_share_dialog_content">Please confirm to compress and e-mail your wallet log files.</string>
