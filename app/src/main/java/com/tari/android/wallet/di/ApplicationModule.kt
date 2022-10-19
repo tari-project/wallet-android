@@ -172,7 +172,7 @@ class ApplicationModule(private val app: TariWalletApplication) {
 
     @Provides
     @Singleton
-    fun provideLoggerAdapter(walletConfig: WalletConfig): LoggerAdapter = LoggerAdapter(walletConfig)
+    fun provideLoggerAdapter(walletConfig: WalletConfig): LoggerAdapter = LoggerAdapter()
 
     @Provides
     @Singleton

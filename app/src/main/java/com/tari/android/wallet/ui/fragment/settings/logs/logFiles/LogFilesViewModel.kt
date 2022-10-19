@@ -35,10 +35,9 @@ class LogFilesViewModel : CommonViewModel() {
         component.inject(this)
 
         val files = WalletUtil.getLogFilesFromDirectory(walletConfig.getWalletLogFilesDirPath()).toMutableList()
-        files.add(File(walletConfig.getApplicationLogsFilePath()))
-        val wholeList =
-            files.map { listOf(LogFileViewHolderItem(getFileName(it), it) { goNext.postValue(it.file) }, DividerViewHolderItem()) }.flatten()
-                .toMutableList()
+        val wholeList = files.map { listOf(LogFileViewHolderItem(getFileName(it), it) { goNext.postValue(it.file) }, DividerViewHolderItem()) }
+            .flatten()
+            .toMutableList()
         logFiles.postValue(wholeList)
     }
 

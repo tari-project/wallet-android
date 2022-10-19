@@ -9,6 +9,7 @@ import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import com.tari.android.wallet.infrastructure.logging.BugReportingService
 import com.tari.android.wallet.ui.common.ClipboardArgs
 import com.tari.android.wallet.ui.common.CommonViewModel
+import com.tari.android.wallet.ui.dialog.error.ErrorDialogArgs
 import com.tari.android.wallet.ui.dialog.modular.DialogArgs
 import com.tari.android.wallet.ui.dialog.modular.IDialogModule
 import com.tari.android.wallet.ui.dialog.modular.ModularDialogArgs
@@ -53,13 +54,21 @@ class LogsViewModel : CommonViewModel() {
             val lines = file?.inputStream()?.bufferedReader()?.readLines()?.toMutableList() ?: return@launch
             logs.postValue(lines.map { LogViewHolderItem(DebugLog(it)) }.reversed().toMutableList())
         } catch (e: Throwable) {
+            val errorArgs = ErrorDialogArgs(
+                resourceManager.getString(R.string.common_error_title),
+                resourceManager.getString(R.string.debug_logs_cant_open_file),
+            ) {
+                _backPressed.postValue(Unit)
+            }
+            _modularDialog.postValue(errorArgs.getModular(resourceManager))
             logger.e(e, "Out of memory on reading big log file")
         }
     }
 
     fun showFilters() {
         val currentFilters = filters.value!!
-        val filterModules = LogFilters.values().map { LogCheckedModule(it, CheckedModule(it.name, currentFilters.contains(it))) }
+        val filterModules =
+            LogFilters.values().map { LogCheckedModule(it, CheckedModule(resourceManager.getString(it.title), currentFilters.contains(it))) }
         val modules = mutableListOf<IDialogModule>()
         modules.add(HeadModule(resourceManager.getString(R.string.debug_log_filter_title)))
         modules.add(SpaceModule(8))

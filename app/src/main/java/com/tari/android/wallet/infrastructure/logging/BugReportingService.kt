@@ -67,7 +67,6 @@ class BugReportingService(private val sharedPrefsWrapper: SharedPrefsRepository,
         val fileOutStream = FileOutputStream(zipFile)
         // zip!
         val allLogFiles = WalletUtil.getLogFilesFromDirectory(logFilesDirPath).toMutableList()
-        allLogFiles.add(File(walletConfig.getApplicationLogsFilePath()))
         ZipOutputStream(BufferedOutputStream(fileOutStream)).use { out ->
             for (file in allLogFiles) {
                 FileInputStream(file).use { inputStream ->

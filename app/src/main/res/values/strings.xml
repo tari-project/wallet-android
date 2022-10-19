@@ -361,10 +361,15 @@
     <string name="debug_dialog_report">Report a bug</string>
     <string name="debug_dialog_connection_status">View connection status</string>
     <string name="debug_logs_title">Debug Logs</string>
+    <string name="debug_logs_cant_open_file">Unable to open file. Please try again later</string>
     <string name="debug_logs_clipboard_text">Logs was copied to clipboard</string>
     <string name="debug_log_files_title">Logs</string>
     <string name="debug_log_filter_title">Filter</string>
     <string name="debug_log_filter_apply">Apply Filter</string>
+    <string name="debug_log_filter_info">Info</string>
+    <string name="debug_log_filter_warning">Warning</string>
+    <string name="debug_log_filter_error">Error</string>
+    <string name="debug_log_filter_debug">Debug</string>
     <string name="debug_log_share_dialog_title">Share</string>
     <string name="debug_log_share_dialog_content">Please confirm to compress and e-mail your wallet log files.</string>
     <string name="debug_log_file_size_limit_exceeded_dialog_title">File Size Error</string>
