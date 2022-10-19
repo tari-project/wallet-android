@@ -369,6 +369,8 @@
     <string name="debug_log_filter_info">Info</string>
     <string name="debug_log_filter_warning">Warning</string>
     <string name="debug_log_filter_error">Error</string>
+    <string name="debug_log_filter_ffi">FFI</string>
+    <string name="debug_log_filter_aurora">Aurora</string>
     <string name="debug_log_filter_debug">Debug</string>
     <string name="debug_log_share_dialog_title">Share</string>
     <string name="debug_log_share_dialog_content">Please confirm to compress and e-mail your wallet log files.</string>

@@ -30,7 +30,8 @@ import com.tari.android.wallet.ui.fragment.send.addAmount.feeModule.FeeModule
 import com.tari.android.wallet.ui.fragment.send.addAmount.feeModule.FeeModuleView
 import com.tari.android.wallet.ui.fragment.send.shareQr.ShareQRCodeModuleView
 import com.tari.android.wallet.ui.fragment.send.shareQr.ShareQrCodeModule
-import com.tari.android.wallet.ui.fragment.settings.logs.logs.LogCheckedModule
+import com.tari.android.wallet.ui.fragment.settings.logs.logs.LogLevelCheckedModule
+import com.tari.android.wallet.ui.fragment.settings.logs.logs.LogSourceCheckedModule
 import com.tari.android.wallet.ui.fragment.utxos.list.module.*
 
 
@@ -76,7 +77,8 @@ open class ModularDialog(val context: Context) : TariDialog {
                 is OptionModule -> OptionModuleView(context, module)
                 is ButtonModule -> ButtonModuleView(context, module) { dialog.dismiss() }
                 is CheckedModule -> CheckedModuleView(context, module)
-                is LogCheckedModule -> CheckedModuleView(context, module.checkedModule)
+                is LogSourceCheckedModule -> CheckedModuleView(context, module.checkedModule)
+                is LogLevelCheckedModule -> CheckedModuleView(context, module.checkedModule)
                 is CustomBaseNodeBodyModule -> CustomBaseNodeBodyModuleView(context, module)
                 is ShareQrCodeModule -> ShareQRCodeModuleView(context, module)
                 is FeeModule -> FeeModuleView(context, module)

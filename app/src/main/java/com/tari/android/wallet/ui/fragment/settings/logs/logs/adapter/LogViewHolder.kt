@@ -41,7 +41,7 @@ class LogViewHolder(view: ItemLogBinding) : CommonViewHolder<LogViewHolderItem, 
     override fun bind(item: LogViewHolderItem) {
         super.bind(item)
 
-        ui.logTextView.text = item.log.line.trim()
+        ui.logTextView.text = (item.log.auroraDebugLog?.line ?: item.log.line).trim()
     }
 
     companion object {

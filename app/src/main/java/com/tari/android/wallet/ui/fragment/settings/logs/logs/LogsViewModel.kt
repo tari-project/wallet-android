@@ -36,16 +36,17 @@ class LogsViewModel : CommonViewModel() {
     @Inject
     lateinit var bugReportingService: BugReportingService
 
-    val filters = MutableLiveData<MutableList<LogFilters>>(mutableListOf())
-
-    val logs = MutableLiveData<MutableList<LogViewHolderItem>>()
+    private val logLevelFilters = MutableLiveData<MutableList<LogLevelFilters>>(mutableListOf())
+    private val logSourceFilters = MutableLiveData<MutableList<LogSourceFilters>>(mutableListOf())
+    private val logs = MutableLiveData<MutableList<LogViewHolderItem>>()
 
     val filteredLogs = MediatorLiveData<MutableList<LogViewHolderItem>>()
 
     init {
         component.inject(this)
 
-        filteredLogs.addSource(filters) { filter() }
+        filteredLogs.addSource(logLevelFilters) { filter() }
+        filteredLogs.addSource(logSourceFilters) { filter() }
         filteredLogs.addSource(logs) { filter() }
     }
 
@@ -66,17 +67,22 @@ class LogsViewModel : CommonViewModel() {
     }
 
     fun showFilters() {
-        val currentFilters = filters.value!!
-        val filterModules =
-            LogFilters.values().map { LogCheckedModule(it, CheckedModule(resourceManager.getString(it.title), currentFilters.contains(it))) }
+        val currentLevelFilters = logLevelFilters.value!!
+        val currentSourceFilters = logSourceFilters.value!!
+        val levelFilterModules = LogLevelFilters.values()
+            .map { LogLevelCheckedModule(it, CheckedModule(resourceManager.getString(it.title), currentLevelFilters.contains(it))) }
+        val sourceFiltersModules = LogSourceFilters.values()
+            .map { LogSourceCheckedModule(it, CheckedModule(resourceManager.getString(it.title), currentSourceFilters.contains(it))) }
         val modules = mutableListOf<IDialogModule>()
         modules.add(HeadModule(resourceManager.getString(R.string.debug_log_filter_title)))
         modules.add(SpaceModule(8))
-        modules.addAll(filterModules)
+        modules.addAll(levelFilterModules)
+        modules.addAll(sourceFiltersModules)
         modules.add(SpaceModule(12))
         modules.add(ButtonModule(resourceManager.getString(R.string.debug_log_filter_apply), ButtonStyle.Normal) {
             _dismissDialog.postValue(Unit)
-            filters.postValue(filterModules.filter { it.checkedModule.isChecked }.map { it.logFilter }.toMutableList())
+            logLevelFilters.postValue(levelFilterModules.filter { it.checkedModule.isChecked }.map { it.logFilter }.toMutableList())
+            logSourceFilters.postValue(sourceFiltersModules.filter { it.checkedModule.isChecked }.map { it.logFilter }.toMutableList())
         })
         modules.add(ButtonModule(resourceManager.getString(R.string.common_close), ButtonStyle.Close))
 
@@ -96,11 +102,16 @@ class LogsViewModel : CommonViewModel() {
 
     private fun filter() {
         val logs = logs.value ?: return
-        val filters = filters.value ?: return
+        val logLevelFilters = logLevelFilters.value ?: return
+        val sourceLevelFilters = logSourceFilters.value ?: return
 
         var filteredLogs = logs
-        if (filters.isNotEmpty()) {
-            filteredLogs = logs.filter { item -> filters.any { it.isMatch(item.log) } }.toMutableList()
+        if (logLevelFilters.isNotEmpty()) {
+            filteredLogs = filteredLogs.filter { item -> logLevelFilters.any { it.isMatch(item.log.auroraDebugLog ?: item.log) } }.toMutableList()
+        }
+
+        if (sourceLevelFilters.isNotEmpty()) {
+            filteredLogs = filteredLogs.filter { item -> sourceLevelFilters.any { it.isMatch(item.log) } }.toMutableList()
         }
 
         this.filteredLogs.postValue(filteredLogs)

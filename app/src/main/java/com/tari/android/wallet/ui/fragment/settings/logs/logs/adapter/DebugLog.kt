@@ -17,6 +17,9 @@ class DebugLog(var line: String) {
     var log: String = ""
         private set
 
+    var auroraDebugLog: DebugLog? = null
+        private set
+
     init {
         if (ffiRegex.matches(line)) {
             val matchResult = ffiRegex.find(line)
@@ -26,6 +29,10 @@ class DebugLog(var line: String) {
             this.source2 = source2
             this.level = level
             this.log = log
+
+            if (ffiRegex.matches(log)) {
+                auroraDebugLog = DebugLog(log)
+            }
         }
     }
 
