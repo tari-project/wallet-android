@@ -269,10 +269,10 @@ class FFIWallet(
     }
 
     @Synchronized
-    fun enableEncryption() {
+    fun enableEncryption(databasePhrase: String? = null) {
         if (sharedPrefsRepository.databasePassphrase == null) {
             try {
-                val databasePassphrase = sharedPrefsRepository.generateDatabasePassphrase()
+                val databasePassphrase = databasePhrase ?: sharedPrefsRepository.generateDatabasePassphrase()
                 setEncryption(databasePassphrase)
                 sharedPrefsRepository.databasePassphrase = databasePassphrase
                 logger.i("Database encryption enabled")

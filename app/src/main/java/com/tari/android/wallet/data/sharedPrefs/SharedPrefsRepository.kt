@@ -125,18 +125,14 @@ class SharedPrefsRepository(
     }
 
     fun generateDatabasePassphrase(): String {
-        var generatedString = ""
-        val charset = Charsets.UTF_8
-        val utfErrorCode = Char(65533)
+        val generatedString = java.lang.StringBuilder()
 
         while (generatedString.length < 32) {
-            val nextByte = Random.nextBytes(1).first()
-            val str = String(ByteArray(1) { nextByte }, charset)
-            if (str.first() != utfErrorCode) {
-                generatedString += str
-            }
+            val nextChar = Char(Random.nextInt(Char.MIN_VALUE.code, Char.MAX_VALUE.code))
+            if (isBrokenCharForPassphrase(nextChar)) continue
+            generatedString.append(nextChar)
         }
-        return generatedString
+        return generatedString.toString()
     }
 
     // Runs when user manually clear the application data
@@ -147,5 +143,9 @@ class SharedPrefsRepository(
             isDataCleared = false
         }
         return isCleared
+    }
+
+    companion object {
+        fun isBrokenCharForPassphrase(char: Char): Boolean = char.code == 0 || char.code in (55296..57343)
     }
 }
