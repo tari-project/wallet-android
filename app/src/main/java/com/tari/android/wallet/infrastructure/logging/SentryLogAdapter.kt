@@ -2,9 +2,7 @@ package com.tari.android.wallet.infrastructure.logging
 
 import com.orhanobut.logger.LogAdapter
 import com.orhanobut.logger.Logger
-import io.sentry.Breadcrumb
-import io.sentry.Sentry
-import io.sentry.SentryLevel
+import io.sentry.*
 
 class SentryLogAdapter : LogAdapter {
 
@@ -12,7 +10,7 @@ class SentryLogAdapter : LogAdapter {
 
     override fun log(priority: Int, tag: String?, message: String) {
         if (priority == Logger.ERROR) {
-            Sentry.captureException(SentryException(message), tag)
+            Sentry.captureException(SentryException(message), Hint.withAttachment(Attachment("tag", tag.orEmpty())))
         } else {
             val level = when (priority) {
                 Logger.ERROR -> SentryLevel.ERROR
