@@ -17,7 +17,6 @@
     <dimen name="onboarding_small_gem_top_margin">46dp</dimen>
 
     <!-- home -->
-    <dimen name="home_send_tari_button_visible_bottom_margin">30dp</dimen>
 
     <!-- home swipe refresh -->
     <dimen name="home_swipe_refresh_max_scroll_y">180dp</dimen>
@@ -27,19 +26,10 @@
     <dimen name="home_swipe_refresh_progress_view_content_visible_top_margin">20dp</dimen>
 
     <!-- home TTL store dialog -->
-    <dimen name="home_ttl_store_dialog_desc_top_margin">22dp</dimen>
-    <dimen name="home_ttl_store_dialog_visit_button_top_margin">30dp</dimen>
-    <dimen name="home_ttl_store_dialog_cancel_button_top_margin">14dp</dimen>
-    <dimen name="home_ttl_store_dialog_padding_bottom">24dp</dimen>
 
     <!-- tx details -->
-    <dimen name="tx_details_header_bottom_padding">25dp</dimen>
-    <dimen name="tx_details_tx_id_bottom_margin">24dp</dimen>
     <dimen name="tx_details_amount_section_vertical_padding">36dp</dimen>
-    <dimen name="tx_details_contact_name_top_margin">36dp</dimen>
-    <dimen name="tx_details_contact_name_underline_top_margin">16dp</dimen>
     <dimen name="tx_details_note_top_margin">24dp</dimen>
-    <dimen name="tx_details_tx_id_text_size">12sp</dimen>
 
     <!-- send tari - common -->
     <dimen name="header_top_inset">24dp</dimen>
