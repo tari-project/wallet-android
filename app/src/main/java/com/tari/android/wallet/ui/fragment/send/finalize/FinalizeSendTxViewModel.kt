@@ -10,9 +10,6 @@ import com.tari.android.wallet.model.TransactionSendStatus
 import com.tari.android.wallet.model.TxId
 import com.tari.android.wallet.model.WalletError
 import com.tari.android.wallet.network.NetworkConnectionState
-import com.tari.android.wallet.service.TariWalletService
-import com.tari.android.wallet.service.connection.ServiceConnectionStatus
-import com.tari.android.wallet.service.connection.TariWalletServiceConnection
 import com.tari.android.wallet.tor.TorBootstrapStatus
 import com.tari.android.wallet.tor.TorProxyState
 import com.tari.android.wallet.ui.common.CommonViewModel
@@ -33,10 +30,6 @@ class FinalizeSendTxViewModel : CommonViewModel() {
     val txFailureReason: MutableLiveData<TxFailureReason> = MutableLiveData()
     val isSuccess = MutableLiveData<Boolean>()
     val nextStep = MutableLiveData<FinalizingStep>()
-
-    private val connectionService: TariWalletServiceConnection = TariWalletServiceConnection()
-    val walletService: TariWalletService
-        get() = connectionService.currentState.service!!
 
     init {
         component.inject(this)
@@ -115,11 +108,7 @@ class FinalizeSendTxViewModel : CommonViewModel() {
             }
         }
 
-        override fun execute() {
-            connectionService.connection.subscribe {
-                if (it.status == ServiceConnectionStatus.CONNECTED) onServiceConnected()
-            }.addTo(compositeDisposable)
-        }
+        override fun execute() = doOnConnected { onServiceConnected() }
 
         private fun onServiceConnected() {
             // start checking network connection

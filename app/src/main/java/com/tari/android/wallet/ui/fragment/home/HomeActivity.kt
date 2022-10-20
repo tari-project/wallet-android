@@ -42,7 +42,6 @@ import androidx.activity.viewModels
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.tari.android.wallet.R
@@ -55,7 +54,6 @@ import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepository
 import com.tari.android.wallet.databinding.ActivityHomeBinding
 import com.tari.android.wallet.di.DiContainer.appComponent
 import com.tari.android.wallet.event.EventBus
-import com.tari.android.wallet.extension.addTo
 import com.tari.android.wallet.extension.applyFontStyle
 import com.tari.android.wallet.model.Tx
 import com.tari.android.wallet.model.TxId
@@ -64,7 +62,6 @@ import com.tari.android.wallet.model.WalletError
 import com.tari.android.wallet.network.NetworkConnectionState
 import com.tari.android.wallet.service.TariWalletService
 import com.tari.android.wallet.service.connection.ServiceConnectionStatus
-import com.tari.android.wallet.service.connection.TariWalletServiceConnection
 import com.tari.android.wallet.service.service.WalletServiceLauncher
 import com.tari.android.wallet.ui.common.CommonActivity
 import com.tari.android.wallet.ui.common.domain.ResourceManager
@@ -103,7 +100,6 @@ import com.tari.android.wallet.ui.fragment.tx.details.TxDetailsFragment.Companio
 import com.tari.android.wallet.ui.fragment.tx.details.TxDetailsFragment.Companion.TX_ID_EXTRA_KEY
 import com.tari.android.wallet.ui.fragment.utxos.list.UtxosListFragment
 import com.tari.android.wallet.util.Constants
-import io.reactivex.disposables.CompositeDisposable
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.lang.ref.WeakReference
@@ -128,9 +124,6 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>(), AllSe
 
     private val deeplinkViewModel: DeeplinkViewModel by viewModels()
 
-    private lateinit var serviceConnection: TariWalletServiceConnection
-    private var compositeDisposable: CompositeDisposable = CompositeDisposable()
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         instance = WeakReference(this)
@@ -148,17 +141,14 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>(), AllSe
             finish()
             return
         }
-        serviceConnection = ViewModelProvider(this)[TariWalletServiceConnection::class.java]
         ui = ActivityHomeBinding.inflate(layoutInflater).also { setContentView(it.root) }
         if (savedInstanceState == null) {
             enableNavigationView(ui.homeImageView)
-            serviceConnection.connection.subscribe {
-                if (it.status == ServiceConnectionStatus.CONNECTED) {
-                    ui.root.postDelayed({
-                        processIntentDeepLink(it.service!!, intent)
-                    }, Constants.UI.mediumDurationMs)
-                }
-            }.addTo(compositeDisposable)
+            viewModel.doOnConnected {
+                ui.root.postDelayed({
+                    processIntentDeepLink(it, intent)
+                }, Constants.UI.mediumDurationMs)
+            }
         } else {
             val index = savedInstanceState.getInt(KEY_PAGE)
             ui.viewPager.setCurrentItem(index, false)
@@ -175,8 +165,8 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>(), AllSe
         super.onNewIntent(intent)
         // onNewIntent might get called before onCreate, so we anticipate that here
         checkScreensDeeplink(intent)
-        if (::serviceConnection.isInitialized && serviceConnection.currentState.status == ServiceConnectionStatus.CONNECTED) {
-            processIntentDeepLink(serviceConnection.currentState.service!!, intent)
+        if (viewModel.serviceConnection.currentState.status == ServiceConnectionStatus.CONNECTED) {
+            processIntentDeepLink(viewModel.serviceConnection.currentState.service!!, intent)
         } else {
             setIntent(intent)
         }
@@ -399,7 +389,6 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>(), AllSe
         super.onDestroy()
         instance = WeakReference(null)
         viewModelStore.clear()
-        compositeDisposable.dispose()
     }
 
     class HomeAdapter(fm: FragmentManager, lifecycle: Lifecycle) : FragmentStateAdapter(fm, lifecycle) {

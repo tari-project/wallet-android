@@ -54,6 +54,10 @@ class TariWalletServiceConnection : ViewModel(), ServiceConnection {
         get() = TariWalletApplication.INSTANCE.get() ?: throw Throwable("Application is not launched")
 
     init {
+        reconnectToService()
+    }
+
+    fun reconnectToService() {
         _connection.onNext(ServiceConnectionState(ServiceConnectionStatus.NOT_YET_CONNECTED, null))
         val bindIntent = Intent(context, WalletService::class.java)
         context.bindService(bindIntent, this, Context.BIND_AUTO_CREATE)
