@@ -13,7 +13,7 @@ class LoggerAdapter(private val walletConfig: WalletConfig) {
         Logger.addLogAdapter(LocalFileAdapter(walletConfig.getApplicationLogsFilePath()))
         @Suppress("KotlinConstantConditions")
         if (BuildConfig.FLAVOR != "privacy") {
-            Logger.addLogAdapter(SentryLogAdapter())
+            Logger.addLogAdapter(SentryLogAdapter(walletConfig))
         }
     }
 }
