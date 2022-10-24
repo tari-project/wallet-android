@@ -97,5 +97,9 @@ class TorProxyControl(private val torConfig: TorConfig) {
         return TorBootstrapStatus.from(phaseLogLine)
     }
 
-    private fun updateState(newState: TorProxyState) = EventBus.torProxyState.post(newState)
+    private fun updateState(newState: TorProxyState) {
+        if (newState != EventBus.torProxyState.publishSubject.value) {
+            EventBus.torProxyState.post(newState)
+        }
+    }
 }
