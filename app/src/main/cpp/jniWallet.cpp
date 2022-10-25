@@ -267,17 +267,18 @@ void contactsLivenessDataUpdatedCallback(TariContactsLivenessData *pTariContacts
     g_vm->DetachCurrentThread();
 }
 
-void transactionValidationCompleteCallback(uint64_t requestId, bool success) {
+void transactionValidationCompleteCallback(uint64_t requestId, uint64_t status) {
     auto *jniEnv = getJNIEnv();
     if (jniEnv == nullptr || callbackHandler == nullptr) {
         return;
     }
     jbyteArray requestIdBytes = getBytesFromUnsignedLongLong(jniEnv, requestId);
+    jbyteArray statusBytes = getBytesFromUnsignedLongLong(jniEnv, status);
     jniEnv->CallVoidMethod(
             callbackHandler,
             transactionValidationCompleteCallbackMethodId,
             requestIdBytes,
-            success);
+            statusBytes);
     g_vm->DetachCurrentThread();
 }
 
