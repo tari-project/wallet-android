@@ -30,3 +30,5 @@
 -keep class com.tari.android.wallet.data.sharedPrefs.testnetFaucet.TestnetTariUTXOKey { *; }
 
 -keep class net.danlew.android.joda.R$raw { *; }
+
+-keep enum yat.android.data.YatRecordType { *; }
