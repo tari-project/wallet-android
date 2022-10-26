@@ -253,7 +253,7 @@ class FFIWallet(
                 this::onTXOValidationComplete.name, "([B[B)V",
                 this::onContactLivenessDataUpdated.name, "(J)V",
                 this::onBalanceUpdated.name, "(J)V",
-                this::onTxValidationComplete.name, "([BZ)V",
+                this::onTxValidationComplete.name, "([B[B)V",
                 this::onConnectivityStatus.name, "([B)V",
                 error
             )
@@ -459,9 +459,10 @@ class FFIWallet(
      * This callback function cannot be private due to JNI behaviour.
      */
     @Suppress("MemberVisibilityCanBePrivate")
-    fun onTXOValidationComplete(bytes: ByteArray, bytesStatus: ByteArray) {
+    fun onTXOValidationComplete(bytes: ByteArray, statusBytes: ByteArray) {
         val requestId = BigInteger(1, bytes)
-        val status = TXOValidationStatus.values().first { it.value == BigInteger(1, bytesStatus).toInt() }
+        val statusInteger = BigInteger(1, statusBytes).toInt()
+        val status = TransactionValidationStatus.values().firstOrNull { it.value == statusInteger } ?: return
         logger.i("TXO validation [$requestId] complete. Result: $status")
         localScope.launch { listener?.onTXOValidationComplete(requestId, status) }
     }
@@ -470,10 +471,12 @@ class FFIWallet(
      * This callback function cannot be private due to JNI behaviour.
      */
     @Suppress("MemberVisibilityCanBePrivate")
-    fun onTxValidationComplete(bytes: ByteArray, isSuccess: Boolean) {
-        val requestId = BigInteger(1, bytes)
-        logger.i("Tx validation [$requestId] complete. Result: $isSuccess")
-        localScope.launch { listener?.onTxValidationComplete(requestId, isSuccess) }
+    fun onTxValidationComplete(requestIdBytes: ByteArray, statusBytes: ByteArray) {
+        val requestId = BigInteger(1, requestIdBytes)
+        val statusInteger = BigInteger(1, statusBytes).toInt()
+        val status = TransactionValidationStatus.values().firstOrNull { it.value == statusInteger } ?: return
+        logger.i("Tx validation [$requestId] complete. Result: $status")
+        localScope.launch { listener?.onTxValidationComplete(requestId, status) }
     }
 
     /**

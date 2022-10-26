@@ -343,10 +343,10 @@ class FFIWalletTests {
             cancelledTxs.add(cancelledTx)
         }
 
-        override fun onTXOValidationComplete(responseId: BigInteger, status: TXOValidationStatus) {
+        override fun onTXOValidationComplete(responseId: BigInteger, status: TransactionValidationStatus) {
         }
 
-        override fun onTxValidationComplete(responseId: BigInteger, isSuccess: Boolean) {
+        override fun onTxValidationComplete(responseId: BigInteger, status: Boolean) {
         }
 
         override fun onWalletRestoration(result: WalletRestorationResult) {

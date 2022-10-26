@@ -7,7 +7,7 @@ import com.tari.android.wallet.event.Event
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.ffi.FFIWallet
 import com.tari.android.wallet.ffi.FFIWalletListener
-import com.tari.android.wallet.ffi.TXOValidationStatus
+import com.tari.android.wallet.ffi.TransactionValidationStatus
 import com.tari.android.wallet.infrastructure.backup.BackupManager
 import com.tari.android.wallet.model.*
 import com.tari.android.wallet.model.recovery.WalletRestorationResult
@@ -175,13 +175,13 @@ class FFIWalletListenerImpl(
         backupManager.scheduleBackup(resetRetryCount = true)
     }
 
-    override fun onTXOValidationComplete(responseId: BigInteger, status: TXOValidationStatus) {
-        checkValidationResult(BaseNodeValidationType.TXO, responseId, status == TXOValidationStatus.TxoValidationSuccess)
+    override fun onTXOValidationComplete(responseId: BigInteger, status: TransactionValidationStatus) {
+        checkValidationResult(BaseNodeValidationType.TXO, responseId, status == TransactionValidationStatus.Success)
     }
 
-    override fun onTxValidationComplete(responseId: BigInteger, isSuccess: Boolean) {
-        checkValidationResult(BaseNodeValidationType.TX, responseId, isSuccess)
-        if (!txBroadcastRestarted && isSuccess) {
+    override fun onTxValidationComplete(responseId: BigInteger, status: TransactionValidationStatus) {
+        checkValidationResult(BaseNodeValidationType.TX, responseId, status == TransactionValidationStatus.Success)
+        if (!txBroadcastRestarted && status == TransactionValidationStatus.Success) {
             wallet.restartTxBroadcast()
             txBroadcastRestarted = true
         }
