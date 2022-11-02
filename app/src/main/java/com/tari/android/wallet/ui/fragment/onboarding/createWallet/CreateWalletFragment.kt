@@ -105,6 +105,10 @@ class CreateWalletFragment : CommonFragment<FragmentCreateWalletBinding, CreateW
                 CustomFont.AVENIR_LT_STD_BLACK
             )
             bottomSpinnerLottieAnimationView.alpha = 0f
+            bottomSpinnerLottieAnimationView.scaleX = 0.5F
+            bottomSpinnerLottieAnimationView.scaleY = 0.5F
+            nerdFaceEmojiLottieAnimationView.scaleX = 0.9F
+            nerdFaceEmojiLottieAnimationView.scaleY = 0.9F
             seeFullEmojiIdContainerView.invisible()
             emojiIdSummaryContainerView.invisible()
             emojiIdContainerView.invisible()
@@ -251,7 +255,6 @@ class CreateWalletFragment : CommonFragment<FragmentCreateWalletBinding, CreateW
                 val alpha = valueAnimator.animatedValue as Float
                 ui.walletAddressDescTextView.alpha = alpha
                 ui.createEmojiIdButton.alpha = alpha
-                ui.nerdFaceEmojiLottieAnimationView.alpha = alpha
                 ui.nerdFaceEmojiLottieAnimationView.alpha = alpha
             }
         }
