@@ -59,7 +59,8 @@ class TorProxyControl(private val torConfig: TorConfig) {
                 logger.e(throwable, "Failed to connect to Tor proxy, timed out")
                 updateState(TorProxyState.Failed(throwable))
             } else {
-                logger.e(throwable, "Failed to connect to Tor proxy, will retry")
+                logger.i("Failed to connect to Tor proxy, will retry $initializationElapsedMs ms")
+                logger.i(throwable.toString())
                 timerSubscription = Observable.timer(initializationCheckRetryPeriodMillis, TimeUnit.MILLISECONDS)
                     .subscribeOn(Schedulers.io())
                     .observeOn(Schedulers.io())
@@ -97,5 +98,9 @@ class TorProxyControl(private val torConfig: TorConfig) {
         return TorBootstrapStatus.from(phaseLogLine)
     }
 
-    private fun updateState(newState: TorProxyState) = EventBus.torProxyState.post(newState)
+    private fun updateState(newState: TorProxyState) {
+        if (newState != EventBus.torProxyState.publishSubject.value) {
+            EventBus.torProxyState.post(newState)
+        }
+    }
 }

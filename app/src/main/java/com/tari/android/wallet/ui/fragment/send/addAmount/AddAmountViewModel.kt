@@ -53,41 +53,43 @@ class AddAmountViewModel : CommonViewModel() {
         _isOneSidePaymentEnabled.postValue(tariSettingsSharedRepository.isOneSidePaymentEnabled)
     }
 
-    private fun loadFees() = viewModelScope.launch(Dispatchers.IO) {
-        try {
-            val stats = FFIWallet.instance!!.getFeePerGramStats()
-            val elements = (0 until stats.getLength()).map { stats.getAt(it) }.toList()
+    private fun loadFees() = doOnConnected {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                val stats = FFIWallet.instance!!.getFeePerGramStats()
+                val elements = (0 until stats.getLength()).map { stats.getAt(it) }.toList()
 
-            val elementsCount = min(stats.getLength(), 3)
-            val slowOption: BigInteger
-            val mediumOption: BigInteger
-            val fastOption: BigInteger
-            val networkSpeed: NetworkSpeed
+                val elementsCount = min(stats.getLength(), 3)
+                val slowOption: BigInteger
+                val mediumOption: BigInteger
+                val fastOption: BigInteger
+                val networkSpeed: NetworkSpeed
 
-            when (elementsCount) {
-                1 -> {
-                    networkSpeed = NetworkSpeed.Slow
-                    slowOption = elements[0].getMin()
-                    mediumOption = elements[0].getAverage()
-                    fastOption = elements[0].getMax()
+                when (elementsCount) {
+                    1 -> {
+                        networkSpeed = NetworkSpeed.Slow
+                        slowOption = elements[0].getMin()
+                        mediumOption = elements[0].getAverage()
+                        fastOption = elements[0].getMax()
+                    }
+                    2 -> {
+                        networkSpeed = NetworkSpeed.Medium
+                        slowOption = elements[1].getAverage()
+                        mediumOption = elements[0].getMin()
+                        fastOption = elements[0].getMax()
+                    }
+                    3 -> {
+                        networkSpeed = NetworkSpeed.Fast
+                        slowOption = elements[2].getAverage()
+                        mediumOption = elements[1].getAverage()
+                        fastOption = elements[0].getMax()
+                    }
+                    else -> throw Exception("Unexpected block count")
                 }
-                2 -> {
-                    networkSpeed = NetworkSpeed.Medium
-                    slowOption = elements[1].getAverage()
-                    mediumOption = elements[0].getMin()
-                    fastOption = elements[0].getMax()
-                }
-                3 -> {
-                    networkSpeed = NetworkSpeed.Fast
-                    slowOption = elements[2].getAverage()
-                    mediumOption = elements[1].getAverage()
-                    fastOption = elements[0].getMax()
-                }
-                else -> throw Exception("Unexpected block count")
+                _feePerGrams.postValue(FeePerGramOptions(networkSpeed, MicroTari(slowOption), MicroTari(mediumOption), MicroTari(fastOption)))
+            } catch (e: Throwable) {
+                logger.e(e, "load fees")
             }
-            _feePerGrams.postValue(FeePerGramOptions(networkSpeed, MicroTari(slowOption), MicroTari(mediumOption), MicroTari(fastOption)))
-        } catch (e: Throwable) {
-            logger.e(e, "load fees")
         }
     }
 
@@ -124,7 +126,8 @@ class AddAmountViewModel : CommonViewModel() {
             }
 
             val slowFee = walletService.getWithError(this::showFeeError) { _, wallet -> wallet.estimateTxFee(amount, walletError, grams.slow) }
-            val mediumFee = walletService.getWithError(this::showFeeError) { _, wallet -> wallet.estimateTxFee(amount, walletError, grams.medium) }
+            val mediumFee =
+                walletService.getWithError(this::showFeeError) { _, wallet -> wallet.estimateTxFee(amount, walletError, grams.medium) }
             val fastFee = walletService.getWithError(this::showFeeError) { _, wallet -> wallet.estimateTxFee(amount, walletError, grams.fast) }
 
             if (slowFee == null || mediumFee == null || fastFee == null) {

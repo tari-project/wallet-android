@@ -52,7 +52,10 @@ open class CommonViewModel : ViewModel() {
                 val exception = (it as WalletState.Failed).exception
                 val errorArgs = WalletErrorArgs(resourceManager, exception).getErrorArgs().getModular(resourceManager)
                 _modularDialog.postValue(errorArgs)
-            }, { logger.e(it, "on showing error dialog from wallet") })
+            }, {
+                logger.i(it.toString())
+                logger.i("on showing error dialog from wallet")
+            })
             .addTo(compositeDisposable)
     }
 

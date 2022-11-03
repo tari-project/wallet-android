@@ -10,7 +10,7 @@ class LoggerAdapter {
         Logger.addLogAdapter(FFIFileAdapter())
         @Suppress("KotlinConstantConditions")
         if (BuildConfig.FLAVOR != "privacy") {
-            Logger.addLogAdapter(SentryLogAdapter())
+            Logger.addLogAdapter(SentryLogAdapter(walletConfig))
         }
     }
 }

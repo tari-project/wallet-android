@@ -33,16 +33,16 @@ class TxDetailsViewModel : CommonViewModel() {
         doOnConnected {
             fetchRequiredConfirmationCount()
             findTxAndUpdateUI()
-            _tx.value = _tx.value
+            _tx.postValue(_tx.value)
         }
 
         observeTxUpdates()
     }
 
     fun setTxArg(tx: Tx) {
-        _tx.value = tx
+        _tx.postValue(tx)
         _cancellationReason.postValue(getCancellationReason(tx))
-        generateExplorerLink()
+        generateExplorerLink(tx)
     }
 
     fun loadTxById(txId: TxId) {
@@ -69,7 +69,7 @@ class TxDetailsViewModel : CommonViewModel() {
         currentTx.user = User(contact.publicKey)
         EventBus.post(Event.Contact.ContactRemoved(contact.publicKey))
 
-        _tx.value = currentTx
+        _tx.postValue(currentTx)
     }
 
 
@@ -80,7 +80,7 @@ class TxDetailsViewModel : CommonViewModel() {
 
         tx.user = Contact(tx.user.publicKey, newAlias)
         EventBus.post(Event.Contact.ContactAddedOrUpdated(tx.user.publicKey, newAlias))
-        _tx.value = tx
+        _tx.postValue(tx)
     }
 
     fun openInBlockExplorer() {
@@ -132,12 +132,12 @@ class TxDetailsViewModel : CommonViewModel() {
             _modularDialog.postValue(errorArgs.getModular(resourceManager))
         } else {
             foundTx.let { _tx.value = it }
-            generateExplorerLink()
+            generateExplorerLink(foundTx)
         }
     }
 
-    private fun generateExplorerLink() {
-        (tx.value as? CompletedTx)?.txKernel?.let {
+    private fun generateExplorerLink(tx: Tx) {
+        (tx as? CompletedTx)?.txKernel?.let {
             val fullLink = resourceManager.getString(R.string.explorer_kernel_url) + it.publicNonce + "/" + it.signature
             _explorerLink.postValue(fullLink)
         }

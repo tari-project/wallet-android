@@ -87,12 +87,12 @@ class ChooseRestoreOptionViewModel : CommonViewModel() {
     private suspend fun handleException(exception: java.lang.Exception) {
         when (exception) {
             is BackupStorageAuthRevokedException -> {
-                logger.e(exception, "Auth revoked")
+                logger.i("Auth revoked")
                 backupStorage.signOut()
                 showAuthFailedDialog()
             }
             is BackupStorageTamperedException -> { // backup file not found
-                logger.e(exception, "Backup file not found")
+                logger.i("Backup file not found")
                 backupStorage.signOut()
                 showBackupFileNotFoundDialog()
             }
@@ -100,7 +100,7 @@ class ChooseRestoreOptionViewModel : CommonViewModel() {
                 _navigation.postValue(ChooseRestoreOptionNavigation.ToEnterRestorePassword)
             }
             is WalletStartFailedException -> {
-                logger.e(exception, "Restore failed: wallet start failed")
+                logger.i("Restore failed: wallet start failed")
                 viewModelScope.launch(Dispatchers.Main) {
                     walletServiceLauncher.stopAndDelete()
                 }
@@ -114,12 +114,12 @@ class ChooseRestoreOptionViewModel : CommonViewModel() {
                 }
             }
             is IOException -> {
-                logger.e(exception, "Restore failed: network connection")
+                logger.i("Restore failed: network connection")
                 backupStorage.signOut()
                 showRestoreFailedDialog(resourceManager.getString(R.string.error_no_connection_title))
             }
             else -> {
-                logger.e(exception, "Restore failed")
+                logger.i("Restore failed")
                 backupStorage.signOut()
                 showRestoreFailedDialog(exception.message)
             }
