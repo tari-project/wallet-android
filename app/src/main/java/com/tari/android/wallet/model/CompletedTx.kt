@@ -59,8 +59,10 @@ class CompletedTx() : Tx(), Parcelable {
         this.message = tx.getMessage()
         this.status = TxStatus.map(tx.getStatus())
         this.confirmationCount = tx.getConfirmationCount()
-        runCatching { tx.getTransactionKernel() }.getOrNull()?.let {
-            this.txKernel = CompletedTransactionKernel(it.getExcess(), it.getExcessPublicNonce(), it.getExcessSignature())
+        if (this.status != TxStatus.IMPORTED && this.status != TxStatus.PENDING) {
+            runCatching { tx.getTransactionKernel() }.getOrNull()?.let {
+                this.txKernel = CompletedTransactionKernel(it.getExcess(), it.getExcessPublicNonce(), it.getExcessSignature())
+            }
         }
 
         tx.destroy()

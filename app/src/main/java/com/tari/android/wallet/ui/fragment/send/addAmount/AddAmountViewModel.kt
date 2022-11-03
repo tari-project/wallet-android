@@ -5,14 +5,10 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.tari.android.wallet.R
 import com.tari.android.wallet.data.sharedPrefs.tariSettings.TariSettingsSharedRepository
-import com.tari.android.wallet.extension.addTo
 import com.tari.android.wallet.extension.getWithError
 import com.tari.android.wallet.ffi.FFIWallet
 import com.tari.android.wallet.model.MicroTari
 import com.tari.android.wallet.model.WalletError
-import com.tari.android.wallet.service.TariWalletService
-import com.tari.android.wallet.service.connection.ServiceConnectionStatus
-import com.tari.android.wallet.service.connection.TariWalletServiceConnection
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.dialog.modular.DialogArgs
 import com.tari.android.wallet.ui.dialog.modular.ModularDialogArgs
@@ -34,10 +30,6 @@ class AddAmountViewModel : CommonViewModel() {
     @Inject
     lateinit var tariSettingsSharedRepository: TariSettingsSharedRepository
 
-    private val connectionService: TariWalletServiceConnection = TariWalletServiceConnection()
-    val walletService: TariWalletService
-        get() = connectionService.currentState.service!!
-
     private val _isOneSidePaymentEnabled: MutableLiveData<Boolean> = MutableLiveData()
     val isOneSidePaymentEnabled: LiveData<Boolean> = _isOneSidePaymentEnabled
 
@@ -55,48 +47,49 @@ class AddAmountViewModel : CommonViewModel() {
     init {
         component.inject(this)
 
-        connectionService.connection.filter { it.status == ServiceConnectionStatus.CONNECTED }.subscribe {
-            _serviceConnected.postValue(Unit)
-        }.addTo(compositeDisposable)
+        doOnConnected { _serviceConnected.postValue(Unit) }
+
         loadFees()
         _isOneSidePaymentEnabled.postValue(tariSettingsSharedRepository.isOneSidePaymentEnabled)
     }
 
-    private fun loadFees() = viewModelScope.launch(Dispatchers.IO) {
-        try {
-            val stats = FFIWallet.instance!!.getFeePerGramStats()
-            val elements = (0 until stats.getLength()).map { stats.getAt(it) }.toList()
+    private fun loadFees() = doOnConnected {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                val stats = FFIWallet.instance!!.getFeePerGramStats()
+                val elements = (0 until stats.getLength()).map { stats.getAt(it) }.toList()
 
-            val elementsCount = min(stats.getLength(), 3)
-            val slowOption: BigInteger
-            val mediumOption: BigInteger
-            val fastOption: BigInteger
-            val networkSpeed: NetworkSpeed
+                val elementsCount = min(stats.getLength(), 3)
+                val slowOption: BigInteger
+                val mediumOption: BigInteger
+                val fastOption: BigInteger
+                val networkSpeed: NetworkSpeed
 
-            when (elementsCount) {
-                1 -> {
-                    networkSpeed = NetworkSpeed.Slow
-                    slowOption = elements[0].getMin()
-                    mediumOption = elements[0].getAverage()
-                    fastOption = elements[0].getMax()
+                when (elementsCount) {
+                    1 -> {
+                        networkSpeed = NetworkSpeed.Slow
+                        slowOption = elements[0].getMin()
+                        mediumOption = elements[0].getAverage()
+                        fastOption = elements[0].getMax()
+                    }
+                    2 -> {
+                        networkSpeed = NetworkSpeed.Medium
+                        slowOption = elements[1].getAverage()
+                        mediumOption = elements[0].getMin()
+                        fastOption = elements[0].getMax()
+                    }
+                    3 -> {
+                        networkSpeed = NetworkSpeed.Fast
+                        slowOption = elements[2].getAverage()
+                        mediumOption = elements[1].getAverage()
+                        fastOption = elements[0].getMax()
+                    }
+                    else -> throw Exception("Unexpected block count")
                 }
-                2 -> {
-                    networkSpeed = NetworkSpeed.Medium
-                    slowOption = elements[1].getAverage()
-                    mediumOption = elements[0].getMin()
-                    fastOption = elements[0].getMax()
-                }
-                3 -> {
-                    networkSpeed = NetworkSpeed.Fast
-                    slowOption = elements[2].getAverage()
-                    mediumOption = elements[1].getAverage()
-                    fastOption = elements[0].getMax()
-                }
-                else -> throw Exception("Unexpected block count")
+                _feePerGrams.postValue(FeePerGramOptions(networkSpeed, MicroTari(slowOption), MicroTari(mediumOption), MicroTari(fastOption)))
+            } catch (e: Throwable) {
+                logger.e(e, "load fees")
             }
-            _feePerGrams.postValue(FeePerGramOptions(networkSpeed, MicroTari(slowOption), MicroTari(mediumOption), MicroTari(fastOption)))
-        } catch (e: Throwable) {
-            logger.e(e, "load fees")
         }
     }
 
@@ -133,7 +126,8 @@ class AddAmountViewModel : CommonViewModel() {
             }
 
             val slowFee = walletService.getWithError(this::showFeeError) { _, wallet -> wallet.estimateTxFee(amount, walletError, grams.slow) }
-            val mediumFee = walletService.getWithError(this::showFeeError) { _, wallet -> wallet.estimateTxFee(amount, walletError, grams.medium) }
+            val mediumFee =
+                walletService.getWithError(this::showFeeError) { _, wallet -> wallet.estimateTxFee(amount, walletError, grams.medium) }
             val fastFee = walletService.getWithError(this::showFeeError) { _, wallet -> wallet.estimateTxFee(amount, walletError, grams.fast) }
 
             if (slowFee == null || mediumFee == null || fastFee == null) {

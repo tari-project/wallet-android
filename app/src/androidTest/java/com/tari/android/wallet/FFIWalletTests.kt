@@ -252,6 +252,47 @@ class FFIWalletTests {
         wallet.getKeyValue(key)
     }
 
+    // test for finding broken symbols for encryption password
+//    @Test
+    fun testEncryptionEnablingWithBrokenBytes() {
+        // for finding broken chars
+//        for (char in Char(65000)..Char.MAX_VALUE) {
+//            Log.i("code", char.code.toString())
+//            Log.i("char", char.toString())
+//            val str = char.toString()
+//            Log.i("whole str", str)
+//            if (skippingBytes.contains(char)) continue
+//
+//            sharedPrefsRepository.databasePassphrase = null
+//            wallet.removeEncryption()
+//            wallet.enableEncryption(str)
+//        }
+
+        // for speed up the process
+        for (char in Char.MIN_VALUE..Char.MAX_VALUE step 50) {
+            val strBuilder = StringBuilder()
+            for (i in char..(char + 51)) {
+                if (SharedPrefsRepository.isBrokenCharForPassphrase(i)) continue
+                strBuilder.append(i)
+            }
+            val str = strBuilder.toString()
+
+            sharedPrefsRepository.databasePassphrase = null
+            wallet.removeEncryption()
+            wallet.enableEncryption(str)
+        }
+    }
+
+    @Test
+    fun testGeneratingPasswordForEncryptionEnabling() {
+        for (i in 0 until 100) {
+            sharedPrefsRepository.databasePassphrase = null
+            wallet.removeEncryption()
+            val password = sharedPrefsRepository.generateDatabasePassphrase()
+            wallet.enableEncryption(password)
+        }
+    }
+
     private class TestAddRecipientAddNodeListener : FFIWalletListener {
 
         val receivedTxs = mutableListOf<PendingInboundTx>()
@@ -302,10 +343,10 @@ class FFIWalletTests {
             cancelledTxs.add(cancelledTx)
         }
 
-        override fun onTXOValidationComplete(responseId: BigInteger, status: TXOValidationStatus) {
+        override fun onTXOValidationComplete(responseId: BigInteger, status: TransactionValidationStatus) {
         }
 
-        override fun onTxValidationComplete(responseId: BigInteger, isSuccess: Boolean) {
+        override fun onTxValidationComplete(responseId: BigInteger, status: Boolean) {
         }
 
         override fun onWalletRestoration(result: WalletRestorationResult) {

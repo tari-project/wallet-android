@@ -273,7 +273,7 @@ dependencies {
         exclude group: 'org.apache.httpcomponents'
     }
     // sentry - crash analytics
-    implementation 'io.sentry:sentry-android:5.0.1'
+    implementation 'io.sentry:sentry-android:6.4.2'
 
     implementation 'net.yslibrary.keyboardvisibilityevent:keyboardvisibilityevent:2.2.0'
 
