@@ -67,6 +67,8 @@ class LoadingButtonView : FrameLayout {
     private fun init() {
         ui = ViewProgressButtonBinding.inflate(LayoutInflater.from(context), this, false)
         ui.progressBar.setColor(context.color(R.color.common_progress_bar))
+        ui.progressBar.scaleX = 0.5F
+        ui.progressBar.scaleY = 0.5F
         addView(ui.root)
     }
 
