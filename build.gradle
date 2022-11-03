@@ -1,7 +1,7 @@
 import org.gradle.api.tasks.testing.logging.TestLogEvent
 
 buildscript {
-    ext.kotlin_version = "1.6.21"
+    ext.kotlin_version = "1.7.20"
 
     // build & version
     ext.buildNumber = 221
@@ -31,32 +31,13 @@ plugins {
 
 allprojects {
     repositories {
+        // for yat
         google()
+        mavenCentral()
         jcenter()
-        maven { url 'https://jitpack.io' }
+        maven { url "https://jitpack.io" }
+        maven { url "https://giphy.bintray.com/giphy-sdk" }
         maven { url "https://raw.githubusercontent.com/guardianproject/gpmaven/master" }
-    }
-}
-
-afterEvaluate {
-    subprojects.each { subproject ->
-        subproject.tasks.withType(Test) {
-            testLogging {
-                showStandardStreams = true
-                showExceptions true
-                showCauses true
-                showStackTraces true
-                exceptionFormat 'short'
-                events TestLogEvent.FAILED, TestLogEvent.SKIPPED
-                debug {
-                    exceptionFormat 'full'
-                    events TestLogEvent.FAILED,
-                            TestLogEvent.PASSED,
-                            TestLogEvent.SKIPPED,
-                            TestLogEvent.STANDARD_OUT
-                }
-            }
-        }
     }
 }
 

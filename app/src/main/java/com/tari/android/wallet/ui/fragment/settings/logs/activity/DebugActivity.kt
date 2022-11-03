@@ -66,6 +66,7 @@ class DebugActivity : CommonActivity<ActivityDebugBinding, DebugViewModel>(), Ba
             DebugNavigation.Logs -> addFragment(LogFilesFragment(), null, true)
             DebugNavigation.LogDetail -> addFragment(LogsFragment.getInstance(file!!))
             DebugNavigation.BugReport -> addFragment(LogFilesFragment(), null, true)
+            else -> Unit
         }
     }
 

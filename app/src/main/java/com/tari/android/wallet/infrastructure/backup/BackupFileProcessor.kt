@@ -58,8 +58,6 @@ class BackupFileProcessor(
     private val logger
         get() = Logger.t(BackupFileProcessor::class.simpleName)
 
-
-    @Synchronized
     private val mutex = Mutex()
 
     suspend fun generateBackupFile(newPassword: CharArray? = null): Triple<File, DateTime, String> = mutex.withLock {
