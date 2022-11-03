@@ -9,6 +9,7 @@ import com.tari.android.wallet.R
 import com.tari.android.wallet.databinding.ViewButtonBinding
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.component.common.CommonView
+import com.tari.android.wallet.ui.extension.setVisible
 
 class ButtonView : CommonView<CommonViewModel, ViewButtonBinding> {
 
@@ -24,7 +25,8 @@ class ButtonView : CommonView<CommonViewModel, ViewButtonBinding> {
     override fun setup() = Unit
 
     fun initDto(dto: ButtonViewDto) {
-        ui.leftIcon.setImageResource(dto.leftIconId)
+        ui.leftIcon.setVisible(dto.leftIconId != null)
+        dto.leftIconId?.let { ui.leftIcon.setImageResource(it) }
         ui.title.text = dto.title
         ui.icon.setImageResource(R.drawable.icon_apply_setting)
         dto.iconId?.let { ui.icon.setImageResource(it) }
