@@ -2,6 +2,7 @@ package com.tari.android.wallet.ui.common
 
 import android.content.ClipData
 import android.content.ClipboardManager
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -14,15 +15,13 @@ import androidx.viewbinding.ViewBinding
 import com.tari.android.wallet.di.DiContainer
 import com.tari.android.wallet.extension.observe
 import com.tari.android.wallet.ui.component.MutedBackPressedCallback
-import com.tari.android.wallet.ui.dialog.TariDialog
-import com.tari.android.wallet.ui.dialog.inProgress.TariProgressDialog
 import com.tari.android.wallet.ui.dialog.modular.ModularDialog
 
 abstract class CommonFragment<Binding : ViewBinding, VM : CommonViewModel> : Fragment() {
 
     lateinit var clipboardManager: ClipboardManager
 
-    private var currentDialog: TariDialog? = null
+    private val dialogManager = DialogManager()
 
     protected var blockingBackPressDispatcher = MutedBackPressedCallback(false)
 
@@ -34,6 +33,11 @@ abstract class CommonFragment<Binding : ViewBinding, VM : CommonViewModel> : Fra
         super.onViewCreated(view, savedInstanceState)
 
         clipboardManager = DiContainer.appComponent.getClipboardManager()
+    }
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        dialogManager.context = context
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -55,11 +59,11 @@ abstract class CommonFragment<Binding : ViewBinding, VM : CommonViewModel> : Fra
 
         observe(copyToClipboard) { copy(it) }
 
-        observe(modularDialog) { replaceDialog(ModularDialog(requireContext(), it)) }
+        observe(modularDialog) { dialogManager.replace(ModularDialog(requireContext(), it)) }
 
-        observe(loadingDialog) { if (it.isShow) replaceDialog(TariProgressDialog(requireContext(), it)) else currentDialog?.dismiss() }
+        observe(loadingDialog) { dialogManager.handleProgress(it) }
 
-        observe(dismissDialog) { currentDialog?.dismiss() }
+        observe(dismissDialog) { dialogManager.dismiss() }
 
         observe(blockedBackPressed) {
             blockingBackPressDispatcher.isEnabled = it
@@ -70,29 +74,6 @@ abstract class CommonFragment<Binding : ViewBinding, VM : CommonViewModel> : Fra
         blockingBackPressDispatcher.isEnabled = false
         blockingBackPressDispatcher = MutedBackPressedCallback(isBlocked)
         requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, blockingBackPressDispatcher)
-    }
-
-    protected fun replaceDialog(dialog: TariDialog) {
-        val currentLoadingDialog = currentDialog as? TariProgressDialog
-        if (currentLoadingDialog != null && currentLoadingDialog.isShowing() && dialog is TariProgressDialog) {
-            (currentDialog as TariProgressDialog).applyArgs(dialog.progressDialogArgs)
-            return
-        }
-        val currentModularDialog = currentDialog as? ModularDialog
-        val newModularDialog = dialog as? ModularDialog
-        if (currentModularDialog != null && newModularDialog != null && currentModularDialog.args::class.java == newModularDialog.args::class.java
-            && currentModularDialog.isShowing()
-        ) {
-            currentModularDialog.applyArgs(newModularDialog.args)
-            return
-        }
-
-        if (newModularDialog?.args?.dialogArgs?.isRefreshing == true) {
-            return
-        }
-
-        currentDialog?.dismiss()
-        currentDialog = dialog.also { it.show() }
     }
 
     private fun copy(clipboardArgs: ClipboardArgs) {

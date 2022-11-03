@@ -4,7 +4,6 @@ import android.content.Intent
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import com.orhanobut.logger.Logger
 import com.tari.android.wallet.R
 import com.tari.android.wallet.infrastructure.backup.BackupException
 import com.tari.android.wallet.infrastructure.backup.BackupManager
@@ -68,7 +67,7 @@ class BackupOptionViewModel() : CommonViewModel() {
                     backupManager.backup(_option.value!!.type, isInitialBackup = true)
                 }
             } catch (exception: Exception) {
-                Logger.e("Backup storage setup failed: $exception")
+                logger.e("Backup storage setup failed: $exception")
                 backupManager.turnOff(_option.value!!.type)
                 _inProgress.postValue(false)
                 _switchChecked.postValue(false)
@@ -93,8 +92,9 @@ class BackupOptionViewModel() : CommonViewModel() {
             viewModelScope.launch(Dispatchers.IO) {
                 try {
                     backupManager.turnOff(_option.value!!.type)
+                    _dismissDialog.postValue(Unit)
                 } catch (exception: Exception) {
-                    Logger.i(exception.toString())
+                    logger.i(exception.toString())
                 }
             }
         }
@@ -110,7 +110,6 @@ class BackupOptionViewModel() : CommonViewModel() {
                 BodyModule(resourceManager.getString(R.string.back_up_wallet_turn_off_backup_warning_description)),
                 ButtonModule(resourceManager.getString(R.string.common_confirm), ButtonStyle.Warning) {
                     onAcceptAction()
-                    _dismissDialog.value = Unit
                 },
                 ButtonModule(resourceManager.getString(R.string.common_cancel), ButtonStyle.Close) {
                     onDismissAction()
