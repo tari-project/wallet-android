@@ -71,6 +71,7 @@ import com.tari.android.wallet.ui.fragment.settings.backup.backupSettings.Backup
 import com.tari.android.wallet.ui.fragment.settings.backup.verifySeedPhrase.VerifySeedPhraseViewModel
 import com.tari.android.wallet.ui.fragment.settings.baseNodeConfig.addBaseNode.AddCustomBaseNodeViewModel
 import com.tari.android.wallet.ui.fragment.settings.baseNodeConfig.changeBaseNode.ChangeBaseNodeViewModel
+import com.tari.android.wallet.ui.fragment.settings.bugReporting.BugsReportingViewModel
 import com.tari.android.wallet.ui.fragment.settings.deleteWallet.DeleteWalletActivity
 import com.tari.android.wallet.ui.fragment.settings.logs.logFiles.LogFilesViewModel
 import com.tari.android.wallet.ui.fragment.settings.networkSelection.NetworkSelectionViewModel
@@ -172,6 +173,7 @@ interface ApplicationComponent {
     fun inject(viewModel: AuthViewModel)
     fun inject(viewModel: TariAboutViewModel)
     fun inject(viewModel: UtxosListViewModel)
+    fun inject(viewModel: BugsReportingViewModel)
     fun inject(viewModel: LogFilesViewModel)
     /**
      * Service(s).

@@ -4,9 +4,6 @@ import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.tari.android.wallet.R
-import com.tari.android.wallet.data.WalletConfig
-import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
-import com.tari.android.wallet.infrastructure.logging.BugReportingService
 import com.tari.android.wallet.ui.common.ClipboardArgs
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.dialog.error.ErrorDialogArgs
@@ -23,18 +20,8 @@ import com.tari.android.wallet.ui.fragment.settings.logs.logs.adapter.LogViewHol
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.io.File
-import javax.inject.Inject
 
 class LogsViewModel : CommonViewModel() {
-
-    @Inject
-    lateinit var walletConfig: WalletConfig
-
-    @Inject
-    lateinit var sharedPrefsWrapper: SharedPrefsRepository
-
-    @Inject
-    lateinit var bugReportingService: BugReportingService
 
     private val logLevelFilters = MutableLiveData<MutableList<LogLevelFilters>>(mutableListOf())
     private val logSourceFilters = MutableLiveData<MutableList<LogSourceFilters>>(mutableListOf())
