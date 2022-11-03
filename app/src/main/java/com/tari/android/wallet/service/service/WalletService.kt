@@ -204,6 +204,7 @@ class WalletService : Service() {
                 .repeat()
                 .subscribeOn(Schedulers.io())
                 .observeOn(Schedulers.io())
+                .doOnError { logger.i("error during sheduled expiration check $it") }
                 .subscribe {
                     cancelExpiredPendingInboundTxs()
                     cancelExpiredPendingOutboundTxs()
