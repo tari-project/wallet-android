@@ -2,6 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.USE_BIOMETRIC" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
@@ -11,9 +12,7 @@
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
     <uses-permission android:name="android.permission.HIGH_SAMPLING_RATE_SENSORS" />
     <uses-permission android:name="android.permission.MANAGE_ACCOUNTS" /> <!-- remove billing support in case it gets included by a 3rd party lib -->
-    <uses-permission
-        android:name="com.android.vending.BILLING"
-        tools:node="remove" />
+    <uses-permission android:name="com.android.vending.BILLING" tools:node="remove" />
 
     <application
         android:allowBackup="false"
@@ -28,7 +27,7 @@
         tools:replace="android:supportsRtl,android:allowBackup">
         <!-- Tari foreground service -->
         <service
-            android:name=".service.WalletService"
+            android:name=".service.service.WalletService"
             android:description="@string/wallet_service_desc"
             android:enabled="true"
             android:exported="false">
@@ -54,7 +53,7 @@
             android:enabled="true"
             android:exported="false" />
         <activity
-            android:name=".ui.activity.SplashActivity"
+            android:name=".ui.fragment.splash.SplashActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:exported="true"
             android:screenOrientation="portrait"
@@ -80,7 +79,7 @@
             android:theme="@style/AppTheme.Auth"
             android:windowSoftInputMode="stateAlwaysHidden" /> <!-- home (transaction list) -->
         <activity
-            android:name=".ui.activity.home.HomeActivity"
+            android:name=".ui.fragment.home.HomeActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:exported="true"
             android:launchMode="singleTask"
@@ -103,6 +102,18 @@
 
             </intent-filter>
         </activity>
+        <!-- sentry -->
+        <meta-data
+            android:name="io.sentry.dsn"
+            android:value="${sentryPublicDSN}" />
+
+        <!-- Google sign in activity -->
+        <activity
+            android:name="com.google.android.gms.auth.api.signin.internal.SignInHubActivity"
+            android:excludeFromRecents="true"
+            android:exported="false"
+            android:theme="@style/GoogleSignInActivity"
+            tools:replace="android:theme" />
         <activity
             android:name="com.tari.android.wallet.ui.fragment.qr.QRScannerActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
@@ -112,7 +123,7 @@
         <activity
             android:name=".ui.fragment.send.activity.SendTariActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
-            android:parentActivityName=".ui.activity.home.HomeActivity"
+            android:parentActivityName=".ui.fragment.home.HomeActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme"
             android:windowSoftInputMode="adjustResize|stateAlwaysHidden" /> <!-- wallet info -->
@@ -124,17 +135,17 @@
             android:theme="@style/YatLibTheme.TransparentCompat"
             android:windowSoftInputMode="stateAlwaysHidden" />
         <activity
-            android:name="com.tari.android.wallet.ui.fragment.debug.activity.DebugActivity"
+            android:name="com.tari.android.wallet.ui.fragment.settings.logs.activity.DebugActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:launchMode="singleTask"
-            android:parentActivityName=".ui.activity.home.HomeActivity"
+            android:parentActivityName=".ui.fragment.home.HomeActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme"
             android:windowSoftInputMode="adjustResize|stateAlwaysHidden" />
         <activity
             android:name="com.tari.android.wallet.ui.fragment.settings.backup.activity.BackupSettingsActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
-            android:parentActivityName=".ui.activity.home.HomeActivity"
+            android:parentActivityName=".ui.fragment.home.HomeActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme"
             android:windowSoftInputMode="adjustResize|stateAlwaysHidden" />

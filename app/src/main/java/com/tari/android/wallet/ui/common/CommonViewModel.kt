@@ -5,10 +5,15 @@ import androidx.lifecycle.ViewModel
 import com.orhanobut.logger.Logger
 import com.orhanobut.logger.Printer
 import com.tari.android.wallet.application.WalletState
+import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepository
 import com.tari.android.wallet.di.ApplicationComponent
 import com.tari.android.wallet.di.DiContainer
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.extension.addTo
+import com.tari.android.wallet.infrastructure.logging.LoggerTags
+import com.tari.android.wallet.service.TariWalletService
+import com.tari.android.wallet.service.connection.ServiceConnectionStatus
+import com.tari.android.wallet.service.connection.TariWalletServiceConnection
 import com.tari.android.wallet.ui.common.domain.ResourceManager
 import com.tari.android.wallet.ui.dialog.error.WalletErrorArgs
 import com.tari.android.wallet.ui.dialog.inProgress.ProgressDialogArgs
@@ -23,24 +28,35 @@ open class CommonViewModel : ViewModel() {
     val component: ApplicationComponent
         get() = DiContainer.appComponent
 
+    val serviceConnection: TariWalletServiceConnection = TariWalletServiceConnection()
+    val walletService: TariWalletService
+        get() = serviceConnection.currentState.service!!
 
     @Inject
     lateinit var resourceManager: ResourceManager
 
+    @Inject
+    lateinit var networkRepository: NetworkRepository
+
     val logger: Printer
-        get() = Logger.t("screen").t(this::class.simpleName)
+        get() = Logger.t(this::class.simpleName).t(LoggerTags.UI.name)
 
     init {
         @Suppress("LeakingThis")
         component.inject(this)
 
-        logger.i(this::class.simpleName + "was started")
+        logger.t(LoggerTags.Navigation.name).i(this::class.simpleName + " was started")
 
         EventBus.walletState.publishSubject.filter { it is WalletState.Failed }
-            .subscribe {
-                val errorArgs = WalletErrorArgs(resourceManager, (it as WalletState.Failed).exception).getErrorArgs().getModular(resourceManager)
+            .subscribe({
+                val exception = (it as WalletState.Failed).exception
+                val errorArgs = WalletErrorArgs(resourceManager, exception).getErrorArgs().getModular(resourceManager)
                 _modularDialog.postValue(errorArgs)
-            }.addTo(compositeDisposable)
+            }, {
+                logger.i(it.toString())
+                logger.i("on showing error dialog from wallet")
+            })
+            .addTo(compositeDisposable)
     }
 
     override fun onCleared() {
@@ -71,4 +87,8 @@ open class CommonViewModel : ViewModel() {
 
     protected val _blockedBackPressed = SingleLiveEvent<Boolean>()
     val blockedBackPressed: LiveData<Boolean> = _blockedBackPressed
+
+    fun doOnConnected(action: (walletService: TariWalletService) -> Unit) {
+        serviceConnection.connection.subscribe { if (it.status == ServiceConnectionStatus.CONNECTED) action(it.service!!) }.addTo(compositeDisposable)
+    }
 }

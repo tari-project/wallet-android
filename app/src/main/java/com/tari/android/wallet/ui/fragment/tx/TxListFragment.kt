@@ -74,8 +74,6 @@ import com.tari.android.wallet.ui.fragment.tx.questionMark.QuestionMarkViewModel
 import com.tari.android.wallet.ui.fragment.tx.ui.CustomScrollView
 import com.tari.android.wallet.ui.fragment.tx.ui.balanceController.BalanceViewController
 import com.tari.android.wallet.ui.fragment.tx.ui.progressController.UpdateProgressViewController
-import com.tari.android.wallet.ui.resource.AnimationResource
-import com.tari.android.wallet.ui.resource.ResourceContainer
 import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.WalletUtil
 import kotlinx.coroutines.Dispatchers
@@ -100,7 +98,6 @@ class TxListFragment : CommonFragment<FragmentTxListBinding, TxListViewModel>(),
     private var recyclerViewAdapter: TxListAdapter = TxListAdapter()
     private lateinit var balanceViewController: BalanceViewController
     private lateinit var updateProgressViewController: UpdateProgressViewController
-    private val container = ResourceContainer()
     private var isOnboarding = false
     private var isInDraggingSession = false
 
@@ -112,6 +109,8 @@ class TxListFragment : CommonFragment<FragmentTxListBinding, TxListViewModel>(),
 
         val viewModel: TxListViewModel by viewModels()
         bindViewModel(viewModel)
+
+        viewModel.serviceConnection.reconnectToService()
 
         setupUI()
         subscribeToEventBus()
@@ -147,7 +146,6 @@ class TxListFragment : CommonFragment<FragmentTxListBinding, TxListViewModel>(),
         if (::updateProgressViewController.isInitialized) {
             updateProgressViewController.destroy()
         }
-        container.dispose()
         super.onDestroyView()
     }
 
@@ -215,10 +213,12 @@ class TxListFragment : CommonFragment<FragmentTxListBinding, TxListViewModel>(),
         EventBus.subscribe<Event.App.AppForegrounded>(this) {
             if (viewModel.serviceConnection.currentState.service != null && updateProgressViewController.state.state == UpdateProgressViewController.State.IDLE
             ) {
-                lifecycleScope.launch(Dispatchers.Main) {
-                    updateProgressViewController.reset()
-                    updateProgressViewController.start(viewModel.walletService)
-                    ui.scrollView.beginUpdate()
+                viewModel.doOnConnected {
+                    lifecycleScope.launch(Dispatchers.Main) {
+                        updateProgressViewController.reset()
+                        updateProgressViewController.start(it)
+                        ui.scrollView.beginUpdate()
+                    }
                 }
             }
         }
@@ -327,7 +327,7 @@ class TxListFragment : CommonFragment<FragmentTxListBinding, TxListViewModel>(),
     }
 
     private fun grabberContainerViewLongClicked() {
-        (requireActivity() as CommonActivity<*, *>).openDebugActivity()
+        (requireActivity() as CommonActivity<*, *>).showDebugDialog()
     }
 
     override fun onSwipeRefresh(source: CustomScrollView) {
@@ -335,14 +335,7 @@ class TxListFragment : CommonFragment<FragmentTxListBinding, TxListViewModel>(),
     }
 
     override fun updateHasFailed(source: UpdateProgressViewController, failureReason: UpdateProgressViewController.FailureReason) {
-        lifecycleScope.launch(Dispatchers.Main) {
-            ui.scrollView.finishUpdate()
-            when (failureReason) {
-                UpdateProgressViewController.FailureReason.NETWORK_CONNECTION_ERROR,
-                UpdateProgressViewController.FailureReason.BASE_NODE_VALIDATION_ERROR -> viewModel.displayNetworkConnectionErrorDialog()
-            }
-        }
-
+        lifecycleScope.launch(Dispatchers.Main) { ui.scrollView.finishUpdate() }
         viewModel.refreshAllData()
     }
 
@@ -486,8 +479,7 @@ class TxListFragment : CommonFragment<FragmentTxListBinding, TxListViewModel>(),
                 ui.networkStatusStateIndicatorView.alpha = 1F
                 ui.balanceGemImageView.alpha = 1F
             }
-        }.also { AnimationResource(it).attachAndCutoffOnFinish(container) }
-            .start()
+        }.start()
     }
 
     /**

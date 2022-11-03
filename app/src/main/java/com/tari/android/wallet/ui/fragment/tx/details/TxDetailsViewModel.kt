@@ -5,13 +5,11 @@ import androidx.lifecycle.MutableLiveData
 import com.tari.android.wallet.R
 import com.tari.android.wallet.event.Event
 import com.tari.android.wallet.event.EventBus
-import com.tari.android.wallet.extension.addTo
 import com.tari.android.wallet.extension.executeWithError
 import com.tari.android.wallet.extension.getWithError
 import com.tari.android.wallet.ffi.FFITxCancellationReason
 import com.tari.android.wallet.model.*
 import com.tari.android.wallet.service.TariWalletService
-import com.tari.android.wallet.service.connection.TariWalletServiceConnection
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.dialog.error.ErrorDialogArgs
 
@@ -31,18 +29,12 @@ class TxDetailsViewModel : CommonViewModel() {
     private val _explorerLink = MutableLiveData("")
     val explorerLink: LiveData<String> = _explorerLink
 
-    private val serviceConnection = TariWalletServiceConnection()
-    private val walletService
-        get() = serviceConnection.currentState.service!!
-
     init {
-        serviceConnection.connection.subscribe {
-            if (it.status == TariWalletServiceConnection.ServiceConnectionStatus.CONNECTED) {
-                fetchRequiredConfirmationCount()
-                findTxAndUpdateUI()
-                _tx.value = _tx.value
-            }
-        }.addTo(compositeDisposable)
+        doOnConnected {
+            fetchRequiredConfirmationCount()
+            findTxAndUpdateUI()
+            _tx.postValue(_tx.value)
+        }
 
         observeTxUpdates()
     }
@@ -50,7 +42,7 @@ class TxDetailsViewModel : CommonViewModel() {
     fun setTxArg(tx: Tx) {
         _tx.postValue(tx)
         _cancellationReason.postValue(getCancellationReason(tx))
-        generateExplorerLink()
+        generateExplorerLink(tx)
     }
 
     fun loadTxById(txId: TxId) {
@@ -77,7 +69,7 @@ class TxDetailsViewModel : CommonViewModel() {
         currentTx.user = User(contact.publicKey)
         EventBus.post(Event.Contact.ContactRemoved(contact.publicKey))
 
-        _tx.value = currentTx
+        _tx.postValue(currentTx)
     }
 
 
@@ -88,7 +80,7 @@ class TxDetailsViewModel : CommonViewModel() {
 
         tx.user = Contact(tx.user.publicKey, newAlias)
         EventBus.post(Event.Contact.ContactAddedOrUpdated(tx.user.publicKey, newAlias))
-        _tx.value = tx
+        _tx.postValue(tx)
     }
 
     fun openInBlockExplorer() {
@@ -140,12 +132,12 @@ class TxDetailsViewModel : CommonViewModel() {
             _modularDialog.postValue(errorArgs.getModular(resourceManager))
         } else {
             foundTx.let { _tx.value = it }
-            generateExplorerLink()
+            generateExplorerLink(foundTx)
         }
     }
 
-    private fun generateExplorerLink() {
-        (tx.value as? CompletedTx)?.txKernel?.let {
+    private fun generateExplorerLink(tx: Tx) {
+        (tx as? CompletedTx)?.txKernel?.let {
             val fullLink = resourceManager.getString(R.string.explorer_kernel_url) + it.publicNonce + "/" + it.signature
             _explorerLink.postValue(fullLink)
         }

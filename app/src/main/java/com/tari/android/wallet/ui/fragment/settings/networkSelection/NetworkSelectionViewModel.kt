@@ -9,7 +9,7 @@ import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepository
 import com.tari.android.wallet.data.sharedPrefs.network.TariNetwork
 import com.tari.android.wallet.di.DiContainer
 import com.tari.android.wallet.event.EventBus
-import com.tari.android.wallet.service.WalletServiceLauncher
+import com.tari.android.wallet.service.service.WalletServiceLauncher
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.common.SingleLiveEvent
 import com.tari.android.wallet.ui.common.recyclerView.CommonViewHolderItem
@@ -19,9 +19,6 @@ import com.tari.android.wallet.util.WalletUtil
 import javax.inject.Inject
 
 class NetworkSelectionViewModel : CommonViewModel() {
-
-    @Inject
-    lateinit var networkRepository: NetworkRepository
 
     @Inject
     lateinit var walletConfig: WalletConfig

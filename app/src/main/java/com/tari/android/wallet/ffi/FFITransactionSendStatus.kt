@@ -39,19 +39,13 @@ import java.io.Serializable
 class FFITransactionSendStatus(pointer: FFIPointer) : FFIBase(), Serializable {
 
     private external fun jniTransactionSendStatusDecode(libError: FFIError): Int
-
     private external fun jniDestroy()
 
     init {
         this.pointer = pointer
     }
 
-    fun getStatus(): TransactionSendStatus {
-        val error = FFIError()
-        val status = jniTransactionSendStatusDecode(error)
-        throwIf(error)
-        return TransactionSendStatus(status)
-    }
+    fun getStatus(): TransactionSendStatus = runWithError { TransactionSendStatus(jniTransactionSendStatusDecode(it)) }
 
     override fun destroy() = jniDestroy()
 }

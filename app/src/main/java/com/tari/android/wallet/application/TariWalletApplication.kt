@@ -45,7 +45,7 @@ import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.infrastructure.logging.LoggerAdapter
 import com.tari.android.wallet.network.NetworkConnectionStateReceiver
 import com.tari.android.wallet.notification.NotificationHelper
-import com.tari.android.wallet.service.WalletServiceLauncher
+import com.tari.android.wallet.service.service.WalletServiceLauncher
 import com.tari.android.wallet.ui.common.gyphy.GiphyAdapter
 import com.tari.android.wallet.yat.YatAdapter
 import java.lang.ref.WeakReference

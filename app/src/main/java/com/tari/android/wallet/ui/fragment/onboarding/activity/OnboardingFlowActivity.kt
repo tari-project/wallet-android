@@ -42,10 +42,10 @@ import com.tari.android.wallet.data.WalletConfig
 import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import com.tari.android.wallet.databinding.ActivityOnboardingFlowBinding
 import com.tari.android.wallet.di.DiContainer.appComponent
-import com.tari.android.wallet.service.WalletServiceLauncher
-import com.tari.android.wallet.ui.activity.home.HomeActivity
+import com.tari.android.wallet.service.service.WalletServiceLauncher
 import com.tari.android.wallet.ui.common.CommonActivity
 import com.tari.android.wallet.ui.common.CommonViewModel
+import com.tari.android.wallet.ui.fragment.home.HomeActivity
 import com.tari.android.wallet.ui.fragment.onboarding.createWallet.CreateWalletFragment
 import com.tari.android.wallet.ui.fragment.onboarding.createWallet.CreateWalletListener
 import com.tari.android.wallet.ui.fragment.onboarding.inroduction.IntroductionFragment
@@ -84,6 +84,8 @@ class OnboardingFlowActivity : CommonActivity<ActivityOnboardingFlowBinding, Com
 
         val viewModel: OnboardingFlowViewModel by viewModels()
         bindViewModel(viewModel)
+
+        setContainerId(R.id.onboarding_fragment_container_1)
 
         when {
             sharedPrefsWrapper.onboardingAuthWasInterrupted -> {

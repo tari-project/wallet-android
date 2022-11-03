@@ -132,11 +132,8 @@ class AddRecipientFragment : CommonFragment<FragmentAddRecipientBinding, AddReci
     private val dimmerViews
         get() = arrayOf(ui.middleDimmerView, ui.bottomDimmerView)
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View = FragmentAddRecipientBinding.inflate(inflater, container, false).also { ui = it }.root
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
+        FragmentAddRecipientBinding.inflate(inflater, container, false).also { ui = it }.root
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -184,7 +181,7 @@ class AddRecipientFragment : CommonFragment<FragmentAddRecipientBinding, AddReci
         val listener = requireActivity() as AddRecipientListener
 
         when (navigation) {
-            is AddRecipientNavigation.ToAmount -> listener.continueToAmount(navigation.user)
+            is AddRecipientNavigation.ToAmount -> listener.continueToAmount(navigation.user, navigation.amount)
         }
     }
 
@@ -215,7 +212,7 @@ class AddRecipientFragment : CommonFragment<FragmentAddRecipientBinding, AddReci
     private fun setupUI() {
         ui.contactsListRecyclerView.layoutManager = LinearLayoutManager(requireContext())
         recyclerViewAdapter.setClickListener(CommonAdapter.ItemClickListener {
-            (it as? RecipientViewHolderItem)?.user?.let { user -> (activity as? AddRecipientListener)?.continueToAmount(user) }
+            (it as? RecipientViewHolderItem)?.user?.let { user -> (activity as? AddRecipientListener)?.continueToAmount(user, null) }
         })
         ui.contactsListRecyclerView.adapter = recyclerViewAdapter
         ui.contactsListRecyclerView.addOnScrollListener(scrollListener)
@@ -424,6 +421,7 @@ class AddRecipientFragment : CommonFragment<FragmentAddRecipientBinding, AddReci
                     if (publicKey != null) {
                         ui.rootView.post { ui.searchEditText.setText(publicKey.emojiId, TextView.BufferType.EDITABLE) }
                         ui.searchEditText.postDelayed({ ui.searchEditTextScrollView.smoothScrollTo(0, 0) }, Constants.UI.mediumDurationMs)
+                        it.amount?.let { viewModel.setAmount(it) }
                     }
                 }
             }

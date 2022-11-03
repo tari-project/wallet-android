@@ -61,7 +61,6 @@
     <color name="home_tx_value_pending_bg">#FBE7C0</color>
     <color name="home_tx_value_pending">#EC9C00</color>
     <color name="home_tx_contact_alias">#40388A</color>
-    <color name="home_tx_message">#A9AFC4</color>
     <color name="home_tx_section_header_title">#B2B2B2</color>
     <color name="home_black_overlay">#FF000000</color>
     <color name="create_emoji_id_bg">#f6f6f6</color>
@@ -89,7 +88,6 @@
 
     <!-- transaction detail -->
     <color name="tx_detail_contact_name_label_text">#B2B2B2</color>
-    <color name="tx_detail_contact_view_divider">#f1f1f1</color>
     <color name="tx_detail_cancel_tx_cta">#D32C44</color>
 
     <!-- local auth -->
@@ -99,7 +97,6 @@
     <color name="finalize_send_progress_bar_active_bg">#888931FF</color>
 
     <!-- store -->
-    <color name="store_grabber">#87B2B2B2</color>
 
     <!-- settings -->
     <color name="settings_background">#F6F6F6</color>
@@ -111,13 +108,11 @@
     
     <!-- wallet back up with recovery phrase -->
     <color name="seed_phrase_word_text">#9330FF</color>
-    <color name="seed_phrase_word_background">#1A9330FF</color>
     <color name="seed_phrase_word_recovery_background">#FFFFFF</color>
     <color name="seed_phrase_checkbox">@color/seed_phrase_word_text</color>
     <color name="seed_phrase_button_disabled_background_color">#CCF3F4F5</color>
     <color name="seed_phrase_button_disabled_text_color">#B2B2B2</color>
     <color name="seed_phrase_word_index_text_color">#807F8599</color>
-    <color name="verify_seed_phrase_selectable_word_stroke">@color/seed_phrase_button_disabled_text_color</color>
     <color name="all_settings_back_up_status_processing">@color/wallet_restore_progress_bar</color>
     <color name="all_settings_back_up_status_scheduled">#4191DE</color>
     <color name="all_settings_back_up_status_error">@color/common_error</color>
@@ -130,12 +125,7 @@
     <color name="change_password_cta_disabled">@color/change_password_hint</color>
 
     <!-- network status indicator -->
-    <color name="connection_status_error">#D32C44</color>
-    <color name="connection_status_ok">#3DDC84</color>
-    <color name="connection_status_orange">#FFB340</color>
 
     <!-- tooltip -->
-    <color name="tooltip_background">#80000000</color>
-    <color name="tooltip_text_color">#FFFFFF</color>
 
 </resources>

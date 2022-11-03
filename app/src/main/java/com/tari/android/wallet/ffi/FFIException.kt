@@ -43,13 +43,14 @@ fun throwIf(error: FFIError) {
     }
 }
 
-/**
- * @author The Tari Development Team
- */
-class FFIException(
-    val error: FFIError? = null,
-    override val message: String? = "Error code: $error"
-) : RuntimeException() {
+fun <T> runWithError(action: (error: FFIError) -> T): T {
+    val error = FFIError()
+    val result = action(error)
+    throwIf(error)
+    return result
+}
+
+class FFIException(val error: FFIError? = null, override val message: String? = "Error code: $error") : RuntimeException() {
 
     override fun toString(): String = "FFIException(error=$error, message=$message)"
 }

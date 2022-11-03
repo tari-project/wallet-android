@@ -67,17 +67,7 @@ class FFICommsConfig() : FFIBase() {
         }
         val writeableDir = File(datastorePath)
         if (writeableDir.exists() && writeableDir.isDirectory && writeableDir.canWrite()) {
-            val error = FFIError()
-            jniCreate(
-                publicAddress,
-                transport,
-                databaseName,
-                datastorePath,
-                discoveryTimeoutSec,
-                safMessageDurationSec,
-                error
-            )
-            throwIf(error)
+            runWithError { jniCreate(publicAddress, transport, databaseName, datastorePath, discoveryTimeoutSec, safMessageDurationSec, it) }
         } else {
             val messageBuilder = StringBuilder()
             if (!writeableDir.exists()) {

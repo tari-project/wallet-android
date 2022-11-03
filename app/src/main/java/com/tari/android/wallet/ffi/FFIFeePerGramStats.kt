@@ -42,19 +42,9 @@ class FFIFeePerGramStats(pointer: FFIPointer) : FFIBase() {
         this.pointer = pointer
     }
 
-    fun getAt(position: Int): FFIFeePerGramStat {
-        val libError = FFIError()
-        val pointer = jniGetAt(position, libError)
-        throwIf(libError)
-        return FFIFeePerGramStat(pointer)
-    }
+    fun getAt(position: Int): FFIFeePerGramStat = runWithError { FFIFeePerGramStat(jniGetAt(position, it)) }
 
-    fun getLength(): Int {
-        val libError = FFIError()
-        val length = jniFeePerGramStatsGetLength(libError)
-        throwIf(libError)
-        return length
-    }
+    fun getLength(): Int = runWithError {  jniFeePerGramStatsGetLength(it) }
 
     override fun destroy() = jniDestroy()
 }

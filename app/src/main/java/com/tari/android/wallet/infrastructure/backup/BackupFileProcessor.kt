@@ -58,12 +58,16 @@ class BackupFileProcessor(
     private val logger
         get() = Logger.t(BackupFileProcessor::class.simpleName)
 
+
+    @Synchronized
     private val mutex = Mutex()
 
     suspend fun generateBackupFile(newPassword: CharArray? = null): Triple<File, DateTime, String> = mutex.withLock {
         // decrypt database
-        FFIWallet.instance?.removeEncryption()
-        backupSettingsRepository.backupPassword = null
+        FFIWallet.instance?.let {
+            it.removeEncryption()
+            backupSettingsRepository.backupPassword = null
+        }
 
         // create partial backup in temp folder if password not set
         val databaseFile = File(walletConfig.walletDatabaseFilePath)
@@ -88,7 +92,6 @@ class BackupFileProcessor(
         //todo
         FFIWallet.instance?.enableEncryption()
         logger.i("Backup files was generated")
-
         return Triple(fileToBackup, backupDate, mimeType)
     }
 
@@ -107,10 +110,7 @@ class BackupFileProcessor(
                 { file.inputStream() },
                 { unencryptedCompressedFile.outputStream() }
             )
-            CompressionMethod.zip().uncompress(
-                unencryptedCompressedFile,
-                walletFilesDir
-            )
+            CompressionMethod.zip().uncompress(unencryptedCompressedFile, walletFilesDir)
             if (!File(walletConfig.walletDatabaseFilePath).exists()) {
                 // delete uncompressed files
                 walletFilesDir.deleteRecursively()

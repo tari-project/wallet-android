@@ -34,12 +34,12 @@ package com.tari.android.wallet.ui.fragment.send.activity
 
 import android.os.Bundle
 import androidx.activity.viewModels
-import androidx.fragment.app.Fragment
 import com.tari.android.wallet.R
 import com.tari.android.wallet.databinding.ActivitySendTariBinding
 import com.tari.android.wallet.di.DiContainer.appComponent
 import com.tari.android.wallet.event.Event
 import com.tari.android.wallet.event.EventBus
+import com.tari.android.wallet.model.MicroTari
 import com.tari.android.wallet.model.TxId
 import com.tari.android.wallet.model.User
 import com.tari.android.wallet.network.NetworkConnectionState
@@ -51,7 +51,10 @@ import com.tari.android.wallet.ui.dialog.modular.modules.body.BodyModule
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonModule
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonStyle
 import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
-import com.tari.android.wallet.ui.extension.*
+import com.tari.android.wallet.ui.extension.color
+import com.tari.android.wallet.ui.extension.hideKeyboard
+import com.tari.android.wallet.ui.extension.showInternetConnectionErrorDialog
+import com.tari.android.wallet.ui.extension.string
 import com.tari.android.wallet.ui.fragment.send.addAmount.AddAmountFragment
 import com.tari.android.wallet.ui.fragment.send.addAmount.AddAmountListener
 import com.tari.android.wallet.ui.fragment.send.addNote.AddNodeListener
@@ -92,15 +95,17 @@ class SendTariActivity : CommonActivity<ActivitySendTariBinding, SendTariViewMod
         val viewModel: SendTariViewModel by viewModels()
         bindViewModel(viewModel)
 
+        setContainerId(R.id.send_tari_fragment_container_view)
+
         if (savedInstanceState == null) {
-            loadFragment()
+            loadRootFragment()
         }
     }
 
     /**
      * Loads initial fragment.
      */
-    private fun loadFragment() {
+    private fun loadRootFragment() {
         val recipientUser = intent.getParcelableExtra<User>("recipientUser")
         if (recipientUser != null) {
             val bundle = Bundle().apply {
@@ -114,22 +119,27 @@ class SendTariActivity : CommonActivity<ActivitySendTariBinding, SendTariViewMod
         ui.rootView.postDelayed({ ui.rootView.setBackgroundColor(color(R.color.black)) }, 1000)
     }
 
-    override fun continueToAmount(user: User) {
+    override fun continueToAmount(user: User, amount: MicroTari?) {
         if (EventBus.networkConnectionState.publishSubject.value != NetworkConnectionState.CONNECTED) {
             showInternetConnectionErrorDialog(this)
             return
         }
         hideKeyboard()
-        val bundle = Bundle().apply { putParcelable("recipientUser", user) }
+        val bundle = Bundle().apply {
+            putParcelable(PARAMETER_USER, user)
+            putParcelable(PARAMETER_AMOUNT, amount)
+        }
         ui.rootView.postDelayed({ addFragment(AddAmountFragment(), bundle) }, Constants.UI.keyboardHideWaitMs)
     }
 
     override fun onAmountExceedsActualAvailableBalance(fragment: AddAmountFragment) {
-        val args = ModularDialogArgs(DialogArgs(), listOf(
-            HeadModule(string(R.string.error_balance_exceeded_title)),
-            BodyModule(string(R.string.error_balance_exceeded_description)),
-            ButtonModule(string(R.string.common_close), ButtonStyle.Close),
-        ))
+        val args = ModularDialogArgs(
+            DialogArgs(), listOf(
+                HeadModule(string(R.string.error_balance_exceeded_title)),
+                BodyModule(string(R.string.error_balance_exceeded_description)),
+                ButtonModule(string(R.string.common_close), ButtonStyle.Close),
+            )
+        )
         ModularDialog(this, args).show()
     }
 
@@ -170,18 +180,6 @@ class SendTariActivity : CommonActivity<ActivitySendTariBinding, SendTariViewMod
         overridePendingTransition(R.anim.fade_in, R.anim.fade_out)
     }
 
-    private fun addFragment(fragment: Fragment, bundle: Bundle? = null, isRoot: Boolean = false) {
-        bundle?.let { fragment.arguments = it }
-        val transaction = supportFragmentManager.beginTransaction()
-            .addEnterLeftAnimation()
-            .apply { supportFragmentManager.fragments.forEach { hide(it) } }
-            .add(R.id.send_tari_fragment_container_view, fragment, fragment::class.java.simpleName)
-        if (!isRoot) {
-            transaction.addToBackStack(null)
-        }
-        transaction.commit()
-    }
-
     override fun onDestroy() {
         hideKeyboard()
         super.onDestroy()
@@ -190,6 +188,7 @@ class SendTariActivity : CommonActivity<ActivitySendTariBinding, SendTariViewMod
     companion object {
         const val PARAMETER_NOTE = "note"
         const val PARAMETER_AMOUNT = "amount"
+        const val PARAMETER_USER = "recipientUser"
 
         var instance: WeakReference<SendTariActivity> = WeakReference(null)
             private set

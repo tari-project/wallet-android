@@ -14,33 +14,13 @@ class FFIFeePerGramStat(pointer: FFIPointer) : FFIBase() {
         this.pointer = pointer
     }
 
-    fun getOrder(): BigInteger {
-        val error = FFIError()
-        val bytes = jniGetOrder(error)
-        throwIf(error)
-        return BigInteger(1, bytes)
-    }
+    fun getOrder(): BigInteger = runWithError { BigInteger(1, jniGetOrder(it)) }
 
-    fun getMin(): BigInteger {
-        val error = FFIError()
-        val bytes = jniGetMin(error)
-        throwIf(error)
-        return BigInteger(1, bytes)
-    }
+    fun getMin(): BigInteger = runWithError { BigInteger(1, jniGetMin(it)) }
 
-    fun getMax(): BigInteger {
-        val error = FFIError()
-        val bytes = jniGetMax(error)
-        throwIf(error)
-        return BigInteger(1, bytes)
-    }
+    fun getMax(): BigInteger = runWithError { BigInteger(1, jniGetMax(it)) }
 
-    fun getAverage(): BigInteger {
-        val error = FFIError()
-        val bytes = jniGetAverage(error)
-        throwIf(error)
-        return BigInteger(1, bytes)
-    }
+    fun getAverage(): BigInteger = runWithError { BigInteger(1, jniGetAverage(it)) }
 
     override fun destroy() = Unit
 }

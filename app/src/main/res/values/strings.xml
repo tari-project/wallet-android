@@ -11,12 +11,11 @@
     <string name="user_agreement_url">https://www.tari.com/user_agreement/</string>
     <string name="privacy_policy_url">https://www.tari.com/privacy_policy/</string>
     <string name="disclaimer_url">https://www.tari.com/disclaimer/</string>
-    <string name="explorer_url">https://explore.tari.com</string>
-    <string name="explorer_kernel_url">https://explore.tari.com/kernel/</string>
+    <string name="explorer_url">https://explore-esme.tari.com/</string>
+    <string name="explorer_kernel_url">https://explore-esme.tari.com/kernel/</string>
     <string name="tor_bridges_url">https://bridges.torproject.org/bridges</string>
     <string name="ffi_admin_email_address" translatable="false">bug_reports@tari.com</string>
     <string name="tari_lab_university_url" translatable="false">https://tlu.tarilabs.com/</string>
-    <string name="network_faucet_url" translatable="false">https://faucet.tari.com</string>
     <string name="esmeralda_faucet_url" translatable="false">https://esmeralda-faucet.tari.com</string>
 
     <!-- digits -->
@@ -49,6 +48,7 @@
     <string name="dummy_contact_alias">Sarah_D</string>
     <string name="dummy_contact_initial">S</string>
     <string name="dummy_message">Thanks again for helping with my move</string>
+    <string name="long_dummy_message">Thanks again for helping with my move. Thanks again for helping with my move. Thanks again for helping with my move. Thanks again for helping with my move</string>
     <string name="dummy_emoji">🍀</string>
 
     <!-- notifications -->
@@ -73,7 +73,6 @@
     <string name="error_fee_more_than_amount_title">Amount Error</string>
     <string name="error_fee_more_than_amount_description">Sorry, the amount cannot be less than the fee.</string>
 
-    <string name="error_code_prefix">Error Code:</string>
     <string name="error_wallet_message_generic">Something went wrong! Please try again later. Please send us a bug report if this problem persists.</string>
     <string name="error_wallet_message_114">Something went wrong processing output. Please try again later or contact the support.</string>
     <string name="error_wallet_message_204">Transaction not found. Please try again later. Please submit a bug report using the \"Report a Bug\" option from the settings menu if this problem appears again.</string>
@@ -95,7 +94,6 @@
     <string name="common_confirm">Confirm</string>
     <string name="common_apply">Apply</string>
     <string name="common_share">Share</string>
-    <string name="common_reset">Reset</string>
     <string name="common_error_title">Error</string>
     <string name="common_unknown_error">Unknown error</string>
     <string name="common_delete">Delete</string>
@@ -176,18 +174,11 @@
     <!-- home -->
     <string name="home_available_balance">Balance</string>
     <string name="home_available_to_spend_balance">Available to spend</string>
-    <string name="home_tx_list_header_today">Today</string>
     <string name="home_tx_list_header_yesterday">Yesterday</string>
-    <string name="home_send_tari">Send tXTR</string>
     <string name="home_txs">Transactions</string>
-    <string name="home_tx_list_header_pending_txs">In Progress</string>
     <string name="home_setup_is_complete">Your wallet setup is complete.</string>
     <string name="home_you_are_ready_to_explore">You’re ready to start exploring</string>
     <string name="home_empty_wallet">We don’t see any transactions yet.\nHopefully something happens soon…🤞</string>
-    <string name="home_navigation_label_fragment_tx_list">Home</string>
-    <string name="home_navigation_label_fragment_store">Store</string>
-    <string name="home_navigation_label_fragment_profile">Profile</string>
-    <string name="home_navigation_label_fragment_settings">Settings</string>
     <string name="home_navigation_content_description_navigate_to_settings">Navigate to settings</string>
     <string name="home_navigation_content_description_navigate_to_wallet_info">Navigate to wallet info</string>
     <string name="home_navigation_content_description_navigate_to_ttl_store">Navigate to TTL store</string>
@@ -201,7 +192,6 @@
     <string name="home_custom_base_node_no_button">Not this time</string>
     <!--home tari bot dialog-->
     <string name="home_tari_bot_you_got_tari_dlg_title">You just got some tXTR!</string>
-    <string name="home_tari_bot_you_got_tari_dlg_title_bold_part">tXTR!</string>
     <string name="home_tari_bot_dialog_desc">Try sending a bit of tXTR back to Tari Bot. It’s always better to give than to receive (and you’ll see how the wallet works too).</string>
     <string name="home_tari_bot_try_later">Try it later</string>
     <!-- home TTL store dialog -->
@@ -236,7 +226,6 @@
 
     <!-- tx list -->
     <string name="tx_list_sent_a_payment">%s sent a payment</string>
-    <string name="tx_list_sent_a_payment_bold_part">sent a payment</string>
     <string name="tx_list_you_paid">You paid</string>
     <string name="tx_list_you_paid_with_alias">You paid %s</string>
     <string name="tx_list_paid_you">paid you.</string>
@@ -261,7 +250,6 @@
     <string name="request_tari_share_text">Hi! Please send me %s Tari(s) using this link: %s</string>
 
     <!-- send tari - add recipient -->
-    <string name="add_recipient_title">Send To</string>
     <string name="add_recipient_hint">Enter Emoji ID, Contact Name or Yat</string>
     <string name="add_recipient_recent_tx_contacts">Recent</string>
     <string name="add_recipient_my_contacts">My Contacts</string>
@@ -304,7 +292,6 @@
     <string name="finalize_send_tx_sending_step_3_desc_line_1">Good to go!</string>
     <string name="finalize_send_tx_sending_step_3_desc_line_2" tools:ignore="TypographyEllipsis">Your transaction is on its way...</string>
 
-    <!-- debug log - title -->
     <!-- wallet info -->
     <string name="wallet_info_my_profile">My Profile</string>
     <string name="wallet_info_qr_code_desc">Transacting in person? Others can scan this QR code from the Tari Aurora App to send you tXTR.</string>
@@ -328,7 +315,6 @@
     <string name="tx_detail_edit">Edit</string>
     <string name="tx_detail_add_contact">Add Contact Name</string>
     <string name="tx_detail_transaction_fee">Transaction Fee</string>
-    <string name="tx_detail_transaction_id">Transaction ID:%s</string>
     <string name="tx_detail_waiting_for_recipient">Waiting for recipient to come online</string>
     <string name="tx_detail_waiting_for_sender_to_complete">Waiting for sender to complete transaction</string>
     <string name="tx_detail_completing_final_processing">Completing final processing (%s of %s)</string>
@@ -357,34 +343,39 @@
 
     <!-- debug screens -->
     <!-- logs -->
-    <string name="debug_log_files_title">Logs</string>
-    <string name="debug_log_share_dialog_title">Share</string>
-    <string name="debug_log_share_dialog_content">Please confirm to compress and e-mail your wallet log files.</string>
+    <string name="debug_dialog_title">Debug Menu</string>
+    <string name="debug_dialog_logs">View logs</string>
+    <string name="debug_dialog_report">Report a bug</string>
+    <string name="debug_dialog_connection_status">View connection status</string>
+    <string name="debug_logs_title">Debug Logs</string>
+    <string name="debug_logs_cant_open_file">Unable to open file. Please try again later</string>
+    <string name="debug_logs_clipboard_text">Logs was copied to clipboard</string>
+    <string name="debug_log_filter_title">Filter</string>
+    <string name="debug_log_filter_apply">Apply Filter</string>
+    <string name="debug_log_filter_info">Info</string>
+    <string name="debug_log_filter_warning">Warning</string>
+    <string name="debug_log_filter_error">Error</string>
+    <string name="debug_log_filter_ffi">FFI</string>
+    <string name="debug_log_filter_aurora_general">Aurora - General</string>
+    <string name="debug_log_filter_aurora_connection">Aurora - Connection</string>
+    <string name="debug_log_filter_aurora_ui">Aurora - UI</string>
+    <string name="debug_log_filter_aurora_navigation">Aurora - Navigation</string>
+
+    <string name="debug_log_filter_debug">Debug</string>
     <string name="debug_log_file_size_limit_exceeded_dialog_title">File Size Error</string>
     <string name="debug_log_file_size_limit_exceeded_dialog_content">Cannot send: zipped file is over 25MB.</string>
     <!-- base node config -->
-    <string name="debug_base_node_title">Base Node</string>
     <string name="debug_base_node_custom">Custom</string>
-    <string name="debug_base_node_syncing">⏳</string>
-    <string name="debug_base_node_sync_successful">✅</string>
-    <string name="debug_base_node_sync_failed">❌</string>
-    <string name="debug_current_base_node">Current Base Node</string>
-    <string name="debug_current_base_node_name">Name:</string>
-    <string name="debug_current_base_node_public_key">Public Key:</string>
-    <string name="debug_current_base_node_address">Address:</string>
     <string name="debug_change_base_node">Change base node</string>
     <string name="debug_add_base_node">Add base node</string>
-    <string name="debug_last_sync_status">Sync Status:</string>
     <string name="debug_custom_base_node">Custom Base Node</string>
     <string name="debug_edit_base_node_name_hint">Base Node Name</string>
     <string name="debug_edit_base_node_public_key_hint">Public Key HEX</string>
     <string name="debug_edit_base_node_address_hint">Address</string>
     <string name="debug_edit_base_node_invalid_public_key">Invalid public key hex.</string>
     <string name="debug_edit_base_node_invalid_address">Invalid address.</string>
-    <string name="debug_edit_base_node_successful">Base node peer added successfully.</string>
     <string name="debug_edit_base_node_failed">Couldn\'t add base node peer.</string>
     <!-- about -->
-    <string name="debug_about_title">About</string>
 
     <!-- In-app store -->
     <string name="store_title">Tari Testnet Store</string>
@@ -392,7 +383,6 @@
 
     <!-- Settings -->
     <string name="all_settings_page_title">Settings</string>
-    <string name="all_settings_close">Done</string>
     <string name="all_settings_security_label">Security</string>
     <string name="all_settings_advanced_settings_label">Advanced</string>
     <string name="all_settings_yat_settings_label">Yat</string>
@@ -408,7 +398,6 @@
     <string name="all_settings_explorer">Block Explorer</string>
     <string name="all_settings_background_service">Background Service</string>
     <string name="all_settings_bridge_configuration">Bridge Configuration</string>
-    <string name="all_settings_manage_yats">Manage Yats</string>
     <string name="all_settings_connect_yats">Connect Yats</string>
     <string name="all_settings_select_base_node">Select Base Node</string>
     <string name="all_settings_select_network">Select Network</string>
@@ -456,18 +445,9 @@
     <string name="back_up_wallet_restore_with_recovery_phrase">Restore with recovery phrase</string>
     <string name="back_up_wallet_restoring_wallet_label">Restoring your wallet</string>
     <string name="back_up_wallet_restoring_wallet_label_description">This could take between 1 to 3 minutes.\nPlease keep the app open</string>
-    <string name="back_up_wallet_auth_not_available_error">Local authentication not available, please enable it in your system\'s settings to enable the wallet backup</string>
-    <string name="back_up_wallet_enter_password_title">Set password for your backup</string>
-    <string name="back_up_wallet_enter_password_hint">Enter password here…</string>
-    <string name="back_up_wallet_backup_cta">Backup</string>
-    <string name="back_up_wallet_back_up_check_error_title">Failed to check current backup</string>
-    <string name="back_up_wallet_back_up_check_error_desc">Current backup state check failed: %s</string>
     <string name="back_up_wallet_backing_up_error_title">Wallet Backup Incomplete</string>
     <string name="back_up_wallet_backing_up_error_desc">Error occurred during backup: %s</string>
-    <string name="back_up_wallet_back_up_is_in_progress_error">Backup already in progress</string>
-    <string name="back_up_wallet_status_check_unknown_error">Unknown error</string>
     <string name="back_up_wallet_backing_up_unknown_error">Unknown error</string>
-    <string name="back_up_wallet_status_check_authentication_cancellation">Authentication was cancelled</string>
     <string name="back_up_wallet_last_successful_backup">Last successful backup: %s at %s</string>
     <string name="back_up_wallet_turn_off_backup_warning_title">Your backup will be deleted</string>
     <string name="back_up_wallet_turn_off_backup_warning_description">Are you sure you want to proceed?</string>
@@ -509,12 +489,9 @@
 
     <string name="restore_from_seed_words_error_invalid_seed_word">At least one of the entered seed words is invalid. Please review them and try again</string>
     <string name="restore_from_seed_words_error_phrase_too_short">You entered not enough seed words. Please add some more and try again</string>
-    <string name="restore_from_seed_words_error_phrase_too_long">You entered too much seed words. Please remove few and try again</string>
     <string name="restore_from_seed_words_error_unknown">Unable to generate key from seed words. Please check your seed words and try again</string>
 
-    <string name="restore_from_seed_words_overlay_title">Restoring your wallet</string>
     <string name="restore_from_seed_words_overlay_description">This could take between 1 to 3 minutes.\nPlease keep the app open</string>
-    <string name="restore_from_seed_words_overlay_success">Your wallet was restored. Welcome back!</string>
 
     <string name="restore_from_seed_words_overlay_status_connecting">Waiting for connection</string>
     <string name="restore_from_seed_words_overlay_status_connected">Connection established. The process will start soon</string>
@@ -546,18 +523,9 @@
     <string name="enter_backup_password_enter_password_label">Enter Password</string>
     <string name="enter_backup_password_password_match_error">That’s not it!</string>
     <string name="enter_backup_password_change_password_cta">Change Password</string>
-    <string name="enter_backup_password_wrong_password_error">Seems that the password is wrong.</string>
     <string name="search_gifs_dialog_hint">Search GIPHY</string>
 
     <!-- Network status indicator-->
-    <string name="connection_status_ok">Everything OK. Move along, nothing to see here</string>
-    <string name="connection_status_warning_sync_in_progress">Syncing with base node</string>
-    <string name="connection_status_error_no_network_connection">Unable to connect with internet</string>
-    <string name="connection_status_error_unknown_network_connection_status">Unknown internet connection status</string>
-    <string name="connection_status_error_disconnected_from_tor">Failed to connect with Tor</string>
-    <string name="connection_status_error_connecting_with_tor">Connecting with Tor</string>
-    <string name="connection_status_error_unknown_tor_connection_status">Unknown connection status with Tor</string>
-    <string name="connection_status_error_disconnected_from_base_node">Disconnected from the base node</string>
     <string name="connection_status_dialog_title">Connection Status</string>
     <string name="connection_status_dialog_network_status_disconnected">Disconnected from the Internet</string>
     <string name="connection_status_dialog_network_status_connected">Connected to the Internet</string>

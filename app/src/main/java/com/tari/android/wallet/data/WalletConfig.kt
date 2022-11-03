@@ -15,7 +15,6 @@ class WalletConfig(val context: Context, val networkRepository: NetworkRepositor
     val walletDBFullFileName: String = "$walletDBName.sqlite3"
 
     private val logFilePrefix = "tari_aurora"
-    private val applicationLogs = "tari_application"
     private val logFileExtension = "log"
     private val logFilesDirName = "tari_logs"
 
@@ -40,8 +39,6 @@ class WalletConfig(val context: Context, val networkRepository: NetworkRepositor
     }
 
     fun getWalletLogFilePath(): String = getOrCreateFilePath(getWalletLogFilesDirPath(), "$logFilePrefix.$logFileExtension")
-
-    fun getApplicationLogsFilePath(): String = getOrCreateFilePath(getWalletFilesDirPath(), "$applicationLogs.$logFileExtension")
 
     private fun getOrCreateFilePath(dirPath: String, fileName: String): String {
         val folder = File(dirPath)

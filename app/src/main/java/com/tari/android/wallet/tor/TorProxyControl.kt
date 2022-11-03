@@ -2,6 +2,7 @@ package com.tari.android.wallet.tor
 
 import com.orhanobut.logger.Logger
 import com.tari.android.wallet.event.EventBus
+import com.tari.android.wallet.infrastructure.logging.LoggerTags
 import io.reactivex.Observable
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
@@ -26,7 +27,7 @@ class TorProxyControl(private val torConfig: TorConfig) {
      */
     private var timerSubscription: Disposable? = null
     private val logger
-        get() = Logger.t(TorProxyControl::class.simpleName)
+        get() = Logger.t(LoggerTags.Connection.name)
 
     private lateinit var socket: Socket
     private lateinit var controlConnection: TorControlConnection
@@ -58,7 +59,8 @@ class TorProxyControl(private val torConfig: TorConfig) {
                 logger.e(throwable, "Failed to connect to Tor proxy, timed out")
                 updateState(TorProxyState.Failed(throwable))
             } else {
-                logger.e(throwable, "Failed to connect to Tor proxy, will retry")
+                logger.i("Failed to connect to Tor proxy, will retry $initializationElapsedMs ms")
+                logger.i(throwable.toString())
                 timerSubscription = Observable.timer(initializationCheckRetryPeriodMillis, TimeUnit.MILLISECONDS)
                     .subscribeOn(Schedulers.io())
                     .observeOn(Schedulers.io())
@@ -96,5 +98,9 @@ class TorProxyControl(private val torConfig: TorConfig) {
         return TorBootstrapStatus.from(phaseLogLine)
     }
 
-    private fun updateState(newState: TorProxyState) = EventBus.torProxyState.post(newState)
+    private fun updateState(newState: TorProxyState) {
+        if (newState != EventBus.torProxyState.publishSubject.value) {
+            EventBus.torProxyState.post(newState)
+        }
+    }
 }

@@ -89,7 +89,6 @@
         app:lottie_enableMergePathsForKitKatAndAbove="true"
         app:lottie_loop="true"
         app:lottie_rawRes="@raw/onboarding_bottom_spinner"
-        app:lottie_renderMode="automatic"
-        app:lottie_scale="0.5" />
+        app:lottie_renderMode="automatic" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

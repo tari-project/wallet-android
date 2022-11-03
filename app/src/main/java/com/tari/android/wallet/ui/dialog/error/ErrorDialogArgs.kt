@@ -16,8 +16,8 @@ class ErrorDialogArgs(
     val canceledOnTouchOutside: Boolean = true,
     val onClose: () -> Unit = {},
 ) {
-    fun getModular(resourceManager: ResourceManager): ModularDialogArgs = ModularDialogArgs(
-        DialogArgs(cancelable, canceledOnTouchOutside, false, onClose), modules = listOf(
+    fun getModular(resourceManager: ResourceManager, isRefreshing: Boolean = false): ModularDialogArgs = ModularDialogArgs(
+        DialogArgs(cancelable, canceledOnTouchOutside, isRefreshing, onClose), modules = listOf(
             HeadModule(title.toString()),
             BodyModule(description.toString()),
             ButtonModule(resourceManager.getString(R.string.common_close), ButtonStyle.Close, onClose)

@@ -36,19 +36,12 @@ import android.content.ClipboardManager
 import com.tari.android.wallet.application.TariWalletApplication
 import com.tari.android.wallet.application.deeplinks.DeeplinkViewModel
 import com.tari.android.wallet.service.BootDeviceReceiver
-import com.tari.android.wallet.service.WalletService
-import com.tari.android.wallet.ui.activity.SplashActivity
-import com.tari.android.wallet.ui.fragment.debug.activity.DebugActivity
-import com.tari.android.wallet.ui.activity.home.HomeActivity
-import com.tari.android.wallet.ui.fragment.settings.deleteWallet.DeleteWalletActivity
+import com.tari.android.wallet.service.service.WalletService
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.component.networkStateIndicator.ConnectionIndicatorViewModel
 import com.tari.android.wallet.ui.fragment.auth.AuthActivity
 import com.tari.android.wallet.ui.fragment.auth.AuthViewModel
-import com.tari.android.wallet.ui.fragment.debug.baseNodeConfig.BaseNodeConfigViewModel
-import com.tari.android.wallet.ui.fragment.debug.baseNodeConfig.addBaseNode.AddCustomBaseNodeViewModel
-import com.tari.android.wallet.ui.fragment.debug.baseNodeConfig.changeBaseNode.ChangeBaseNodeViewModel
-import com.tari.android.wallet.ui.fragment.debug.debugLog.DebugLogViewModel
+import com.tari.android.wallet.ui.fragment.home.HomeActivity
 import com.tari.android.wallet.ui.fragment.onboarding.activity.OnboardingFlowActivity
 import com.tari.android.wallet.ui.fragment.onboarding.createWallet.CreateWalletViewModel
 import com.tari.android.wallet.ui.fragment.onboarding.inroduction.IntroductionViewModel
@@ -77,10 +70,15 @@ import com.tari.android.wallet.ui.fragment.settings.backup.EnterCurrentPasswordF
 import com.tari.android.wallet.ui.fragment.settings.backup.backupSettings.BackupSettingsViewModel
 import com.tari.android.wallet.ui.fragment.settings.backup.backupSettings.option.BackupOptionViewModel
 import com.tari.android.wallet.ui.fragment.settings.backup.verifySeedPhrase.VerifySeedPhraseViewModel
+import com.tari.android.wallet.ui.fragment.settings.baseNodeConfig.addBaseNode.AddCustomBaseNodeViewModel
+import com.tari.android.wallet.ui.fragment.settings.baseNodeConfig.changeBaseNode.ChangeBaseNodeViewModel
+import com.tari.android.wallet.ui.fragment.settings.deleteWallet.DeleteWalletActivity
+import com.tari.android.wallet.ui.fragment.settings.logs.logFiles.LogFilesViewModel
 import com.tari.android.wallet.ui.fragment.settings.networkSelection.NetworkSelectionViewModel
 import com.tari.android.wallet.ui.fragment.settings.torBridges.TorBridgesSelectionViewModel
 import com.tari.android.wallet.ui.fragment.settings.torBridges.customBridges.CustomTorBridgesViewModel
 import com.tari.android.wallet.ui.fragment.settings.userAutorization.BiometricAuthenticationViewModel
+import com.tari.android.wallet.ui.fragment.splash.SplashActivity
 import com.tari.android.wallet.ui.fragment.tx.TxListViewModel
 import com.tari.android.wallet.ui.fragment.tx.details.TxDetailsFragment
 import com.tari.android.wallet.ui.fragment.tx.details.gif.GIFViewModel
@@ -123,7 +121,6 @@ interface ApplicationComponent {
     fun inject(activity: QRScannerActivity)
     fun inject(activity: SendTariActivity)
     fun inject(fragment: TxDetailsFragment)
-    fun inject(activity: DebugActivity)
     fun inject(activity: DeleteWalletActivity)
 
     /**
@@ -158,7 +155,6 @@ interface ApplicationComponent {
     fun inject(backupSettingsViewModel: BackupSettingsViewModel)
     fun inject(biometricAuthenticationViewModel: BiometricAuthenticationViewModel)
     fun inject(txListViewModel: TxListViewModel)
-    fun inject(baseNodeConfigViewModel: BaseNodeConfigViewModel)
     fun inject(changeBaseNodeViewModel: ChangeBaseNodeViewModel)
     fun inject(addCustomBaseNodeViewModel: AddCustomBaseNodeViewModel)
     fun inject(networkSelectionViewModel: NetworkSelectionViewModel)
@@ -177,6 +173,8 @@ interface ApplicationComponent {
     fun inject(viewModel: AuthViewModel)
     fun inject(viewModel: TariAboutViewModel)
     fun inject(viewModel: UtxosListViewModel)
+    fun inject(viewModel: DebugLogViewModel)
+    fun inject(viewModel: LogFilesViewModel)
     fun inject(viewModel: DebugLogViewModel)
     fun inject(backupOptionViewModel: BackupOptionViewModel)
     /**
