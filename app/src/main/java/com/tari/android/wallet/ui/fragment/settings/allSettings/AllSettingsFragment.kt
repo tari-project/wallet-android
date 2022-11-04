@@ -36,19 +36,14 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.tari.android.wallet.R.string.*
 import com.tari.android.wallet.databinding.FragmentAllSettingsBinding
 import com.tari.android.wallet.extension.observe
-import com.tari.android.wallet.infrastructure.logging.BugReportingService
 import com.tari.android.wallet.ui.common.CommonFragment
-import com.tari.android.wallet.ui.extension.string
+import com.tari.android.wallet.ui.fragment.settings.logs.activity.DebugActivity
+import com.tari.android.wallet.ui.fragment.settings.logs.activity.DebugNavigation
 import com.tari.android.wallet.ui.fragment.settings.userAutorization.BiometricAuthenticationViewModel
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 
 class AllSettingsFragment : CommonFragment<FragmentAllSettingsBinding, AllSettingsViewModel>() {
 
@@ -80,37 +75,16 @@ class AllSettingsFragment : CommonFragment<FragmentAllSettingsBinding, AllSettin
     private fun observeUI() = with(viewModel) {
         observe(navigation) { processNavigation(it) }
 
-        observe(shareBugReport) { this@AllSettingsFragment.shareBugReport() }
-
         observe(openYatOnboarding) { yatAdapter.openOnboarding(requireActivity()) }
 
         observe(allSettingsOptions) { optionsAdapter.update(it) }
-    }
-
-    private fun shareBugReport() {
-        lifecycleScope.launch(Dispatchers.IO) {
-            try {
-                viewModel.bugReportingService.shareBugReport(requireActivity())
-            } catch (e: BugReportingService.BugReportFileSizeLimitExceededException) {
-                showBugReportFileSizeExceededDialog()
-            }
-        }
-    }
-
-    private fun showBugReportFileSizeExceededDialog() {
-        val dialogBuilder = AlertDialog.Builder(context ?: return)
-        val dialog = dialogBuilder.setMessage(string(debug_log_file_size_limit_exceeded_dialog_content))
-            .setCancelable(false)
-            .setPositiveButton(string(common_ok)) { dialog, _ -> dialog.cancel() }
-            .setTitle(getString(debug_log_file_size_limit_exceeded_dialog_title))
-            .create()
-        dialog.show()
     }
 
     private fun processNavigation(navigation: AllSettingsNavigation) {
         val router = requireActivity() as AllSettingsRouter
 
         when (navigation) {
+            AllSettingsNavigation.ToBugReporting -> DebugActivity.launch(requireContext(), DebugNavigation.BugReport)
             AllSettingsNavigation.ToAbout -> router.toAbout()
             AllSettingsNavigation.ToBackgroundService -> router.toBackgroundService()
             AllSettingsNavigation.ToBackupSettings -> router.toBackupSettings()

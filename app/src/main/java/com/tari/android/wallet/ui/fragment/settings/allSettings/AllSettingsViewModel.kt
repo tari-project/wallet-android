@@ -10,7 +10,6 @@ import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.infrastructure.backup.BackupManager
 import com.tari.android.wallet.infrastructure.backup.BackupState
 import com.tari.android.wallet.infrastructure.backup.BackupStorageAuthRevokedException
-import com.tari.android.wallet.infrastructure.logging.BugReportingService
 import com.tari.android.wallet.ui.common.ClipboardArgs
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.common.SingleLiveEvent
@@ -42,9 +41,6 @@ class AllSettingsViewModel : CommonViewModel() {
     }
 
     @Inject
-    lateinit var bugReportingService: BugReportingService
-
-    @Inject
     lateinit var yatAdapter: YatAdapter
 
     @Inject
@@ -55,9 +51,6 @@ class AllSettingsViewModel : CommonViewModel() {
 
     private val _navigation: SingleLiveEvent<AllSettingsNavigation> = SingleLiveEvent()
     val navigation: LiveData<AllSettingsNavigation> = _navigation
-
-    private val _shareBugReport: SingleLiveEvent<Unit> = SingleLiveEvent()
-    val shareBugReport: LiveData<Unit> = _shareBugReport
 
     private val _openYatOnboarding = SingleLiveEvent<Unit>()
     val openYatOnboarding: LiveData<Unit> = _openYatOnboarding
@@ -87,7 +80,9 @@ class AllSettingsViewModel : CommonViewModel() {
                 _navigation.postValue(AllSettingsNavigation.ToAbout)
             },
             DividerViewHolderItem(),
-            ButtonViewDto(resourceManager.getString(all_settings_report_a_bug), all_settings_report_bug_icon) { _shareBugReport.postValue(Unit) },
+            ButtonViewDto(resourceManager.getString(all_settings_report_a_bug), all_settings_report_bug_icon) {
+                _navigation.postValue(AllSettingsNavigation.ToBugReporting)
+            },
             DividerViewHolderItem(),
             ButtonViewDto(resourceManager.getString(all_settings_visit_site), all_settings_visit_tari_icon) {
                 _openLink.postValue(resourceManager.getString(tari_url))
