@@ -3,7 +3,6 @@ package com.tari.android.wallet.ui.fragment.settings.logs.logFiles
 import androidx.lifecycle.MutableLiveData
 import com.tari.android.wallet.data.WalletConfig
 import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
-import com.tari.android.wallet.infrastructure.logging.BugReportingService
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.common.SingleLiveEvent
 import com.tari.android.wallet.ui.common.recyclerView.CommonViewHolderItem
@@ -20,12 +19,6 @@ class LogFilesViewModel : CommonViewModel() {
 
     @Inject
     lateinit var walletConfig: WalletConfig
-
-    @Inject
-    lateinit var sharedPrefsWrapper: SharedPrefsRepository
-
-    @Inject
-    lateinit var bugReportingService: BugReportingService
 
     val logFiles = MutableLiveData<MutableList<CommonViewHolderItem>>()
 

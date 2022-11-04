@@ -40,6 +40,7 @@ import com.tari.android.wallet.databinding.ActivityDebugBinding
 import com.tari.android.wallet.ui.common.CommonActivity
 import com.tari.android.wallet.ui.fragment.settings.baseNodeConfig.BaseNodeRouter
 import com.tari.android.wallet.ui.fragment.settings.baseNodeConfig.addBaseNode.AddCustomBaseNodeFragment
+import com.tari.android.wallet.ui.fragment.settings.bugReporting.BugsReportingFragment
 import com.tari.android.wallet.ui.fragment.settings.logs.logFiles.LogFilesFragment
 import com.tari.android.wallet.ui.fragment.settings.logs.logs.LogsFragment
 import java.io.File
@@ -61,11 +62,11 @@ class DebugActivity : CommonActivity<ActivityDebugBinding, DebugViewModel>(), Ba
         navigate(DebugNavigation.values().firstOrNull { it.toString() == navigationStr })
     }
 
-    fun navigate(navigation: DebugNavigation?, file: File? = null) {
+    fun navigate(navigation: DebugNavigation?, file: File? = null, rooted: Boolean = true) {
         when (navigation) {
-            DebugNavigation.Logs -> addFragment(LogFilesFragment(), null, true)
-            DebugNavigation.LogDetail -> addFragment(LogsFragment.getInstance(file!!))
-            DebugNavigation.BugReport -> addFragment(LogFilesFragment(), null, true)
+            DebugNavigation.Logs -> addFragment(LogFilesFragment(), null, rooted)
+            DebugNavigation.LogDetail -> addFragment(LogsFragment.getInstance(file!!), null, rooted)
+            DebugNavigation.BugReport -> addFragment(BugsReportingFragment(), null, rooted)
             else -> Unit
         }
     }

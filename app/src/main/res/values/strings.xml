@@ -361,6 +361,15 @@
     <string name="debug_log_filter_aurora_ui">Aurora - UI</string>
     <string name="debug_log_filter_aurora_navigation">Aurora - Navigation</string>
 
+    <string name="bugs_reporting_title">Report a Bug</string>
+    <string name="bugs_reporting_description">Has something gone wrong? Please let us know!</string>
+    <string name="bugs_reporting_name_placeholder">Name (Optional)</string>
+    <string name="bugs_reporting_email_placeholder">E-mail (Optional)</string>
+    <string name="bugs_reporting_what_happened">What happened? (Crash / Strange behavior)</string>
+    <string name="bugs_reporting_additional_info">With this bug report you will send us information about your device model, Andro version and recent logs</string>
+    <string name="bugs_reporting_send">Send</string>
+    <string name="bugs_reporting_view_logs">View logs</string>
+
     <string name="debug_log_filter_debug">Debug</string>
     <string name="debug_log_file_size_limit_exceeded_dialog_title">File Size Error</string>
     <string name="debug_log_file_size_limit_exceeded_dialog_content">Cannot send: zipped file is over 25MB.</string>

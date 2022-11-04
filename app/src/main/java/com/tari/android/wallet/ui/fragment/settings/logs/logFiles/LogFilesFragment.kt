@@ -77,6 +77,6 @@ class LogFilesFragment : CommonFragment<FragmentLogFilesBinding, LogFilesViewMod
     }
 
     private fun navigateToLogs(file: File) {
-        (requireActivity() as? DebugActivity)?.navigate(DebugNavigation.LogDetail, file)
+        (requireActivity() as? DebugActivity)?.navigate(DebugNavigation.LogDetail, file, false)
     }
 }
