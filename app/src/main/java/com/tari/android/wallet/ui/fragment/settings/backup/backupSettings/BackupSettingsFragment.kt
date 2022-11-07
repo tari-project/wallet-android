@@ -221,7 +221,6 @@ class BackupSettingsFragment : CommonFragment<FragmentWalletBackupSettingsBindin
         val view = when (status) {
             CloudBackupStatus.Success -> ui.cloudBackupStatusSuccessView
             is CloudBackupStatus.InProgress -> ui.cloudBackupStatusProgressView
-            CloudBackupStatus.Scheduled -> ui.cloudBackupStatusScheduledView
             is CloudBackupStatus.Warning -> ui.cloudBackupStatusWarningView
         }
         activateBackupStatusView(view, status.text, status.color)
@@ -233,7 +232,6 @@ class BackupSettingsFragment : CommonFragment<FragmentWalletBackupSettingsBindin
         cloudBackupStatusProgressView.setVisible(isVisible, View.INVISIBLE)
         cloudBackupStatusSuccessView.setVisible(isVisible, View.INVISIBLE)
         cloudBackupStatusWarningView.setVisible(isVisible, View.INVISIBLE)
-        cloudBackupStatusScheduledView.setVisible(isVisible, View.INVISIBLE)
         val hideText = textId == -1
         backupStatusTextView.text = if (hideText) "" else string(textId)
         backupStatusTextView.setVisible(!hideText)

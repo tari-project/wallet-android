@@ -34,6 +34,7 @@ package com.tari.android.wallet.di
 
 import android.content.Context
 import com.tari.android.wallet.data.WalletConfig
+import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepository
 import com.tari.android.wallet.infrastructure.backup.BackupFileProcessor
 import com.tari.android.wallet.infrastructure.backup.BackupManager
@@ -53,10 +54,11 @@ class BackupAndRestoreModule {
     @Singleton
     fun provideBackupFileProcessor(
         backupSettingsRepository: BackupSettingsRepository,
+        sharedPrefsRepository: SharedPrefsRepository,
         walletConfig: WalletConfig,
         namingPolicy: BackupNamingPolicy
     ): BackupFileProcessor =
-        BackupFileProcessor(backupSettingsRepository, walletConfig, namingPolicy)
+        BackupFileProcessor(backupSettingsRepository, sharedPrefsRepository, walletConfig, namingPolicy)
 
     @Provides
     @Singleton

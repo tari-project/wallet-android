@@ -29,7 +29,6 @@ class SettingsBackupOptionViewHolder(view: ItemSettingsBackupOptionBinding) :
             PresentationBackupState.BackupStateStatus.InProgress -> ui.cloudBackupStatusProgressView
             PresentationBackupState.BackupStateStatus.Success -> ui.cloudBackupStatusSuccessView
             PresentationBackupState.BackupStateStatus.Warning -> ui.cloudBackupStatusWarningView
-            PresentationBackupState.BackupStateStatus.Scheduled -> ui.cloudBackupStatusScheduledView
         }
 
         fun View.adjustVisibility() {
@@ -39,7 +38,6 @@ class SettingsBackupOptionViewHolder(view: ItemSettingsBackupOptionBinding) :
         ui.cloudBackupStatusProgressView.adjustVisibility()
         ui.cloudBackupStatusSuccessView.adjustVisibility()
         ui.cloudBackupStatusWarningView.adjustVisibility()
-        ui.cloudBackupStatusScheduledView.adjustVisibility()
         val hideText = backupState.textId == -1
         ui.backupStatusTextView.text = if (hideText) "" else string(backupState.textId)
         ui.backupStatusTextView.visibility = if (hideText) View.GONE else View.VISIBLE

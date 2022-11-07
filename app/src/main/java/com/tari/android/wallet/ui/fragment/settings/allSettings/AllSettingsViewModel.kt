@@ -11,7 +11,6 @@ import com.tari.android.wallet.infrastructure.backup.BackupManager
 import com.tari.android.wallet.infrastructure.backup.BackupState
 import com.tari.android.wallet.infrastructure.backup.BackupStorageAuthRevokedException
 import com.tari.android.wallet.infrastructure.backup.BackupsState
-import com.tari.android.wallet.infrastructure.logging.BugReportingService
 import com.tari.android.wallet.ui.common.ClipboardArgs
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.common.SingleLiveEvent
@@ -166,21 +165,13 @@ class AllSettingsViewModel : CommonViewModel() {
                     PresentationBackupState(InProgress, back_up_wallet_backup_status_checking_backup, all_settings_back_up_status_error)
                 }
                 is BackupState.BackupStorageCheckFailed -> PresentationBackupState(InProgress, -1, all_settings_back_up_status_error)
-                is BackupState.BackupScheduled -> {
-                    val failureDate = backupSettingsRepository.getOptionList.mapNotNull { it.lastFailureDate }.firstOrNull()?.date?.toLocalDateTime()
-                    if (failureDate == null) {
-                        PresentationBackupState(Scheduled, back_up_wallet_backup_status_scheduled, all_settings_back_up_status_scheduled)
-                    } else {
-                        PresentationBackupState(Warning, back_up_wallet_backup_status_scheduled, all_settings_back_up_status_processing)
-                    }
-                }
                 is BackupState.BackupInProgress -> {
                     PresentationBackupState(InProgress, back_up_wallet_backup_status_in_progress, all_settings_back_up_status_processing)
                 }
                 is BackupState.BackupUpToDate -> {
                     PresentationBackupState(Success, back_up_wallet_backup_status_up_to_date, all_settings_back_up_status_up_to_date)
                 }
-                is BackupState.BackupOutOfDate -> {
+                is BackupState.BackupFailed -> {
                     PresentationBackupState(Warning, back_up_wallet_backup_status_outdated, all_settings_back_up_status_error)
                 }
             }

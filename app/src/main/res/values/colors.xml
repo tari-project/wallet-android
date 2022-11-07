@@ -114,7 +114,6 @@
     <color name="seed_phrase_button_disabled_text_color">#B2B2B2</color>
     <color name="seed_phrase_word_index_text_color">#807F8599</color>
     <color name="all_settings_back_up_status_processing">@color/wallet_restore_progress_bar</color>
-    <color name="all_settings_back_up_status_scheduled">#4191DE</color>
     <color name="all_settings_back_up_status_error">@color/common_error</color>
     <color name="all_settings_back_up_status_up_to_date">@color/home_tx_value_positive</color>
     <color name="back_up_settings_permission_processing">@color/all_settings_back_up_status_processing</color>

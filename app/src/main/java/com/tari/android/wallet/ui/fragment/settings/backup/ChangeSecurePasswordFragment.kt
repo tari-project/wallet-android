@@ -58,17 +58,16 @@ import com.tari.android.wallet.di.DiContainer.appComponent
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.infrastructure.backup.BackupManager
 import com.tari.android.wallet.infrastructure.backup.BackupState
-import com.tari.android.wallet.infrastructure.backup.BackupState.BackupOutOfDate
+import com.tari.android.wallet.infrastructure.backup.BackupState.BackupFailed
 import com.tari.android.wallet.infrastructure.backup.BackupState.BackupUpToDate
-import com.tari.android.wallet.infrastructure.backup.BackupStorageAuthRevokedException
-import com.tari.android.wallet.ui.fragment.settings.backup.activity.BackupSettingsRouter
 import com.tari.android.wallet.ui.common.domain.ResourceManager
 import com.tari.android.wallet.ui.dialog.error.ErrorDialogArgs
 import com.tari.android.wallet.ui.dialog.modular.ModularDialog
 import com.tari.android.wallet.ui.extension.*
+import com.tari.android.wallet.ui.fragment.settings.backup.activity.BackupSettingsRouter
+import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupSettingsRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import java.net.UnknownHostException
 import javax.inject.Inject
 
@@ -83,10 +82,11 @@ class ChangeSecurePasswordFragment : Fragment() {
     @Inject
     lateinit var resourceManager: ResourceManager
 
+    @Inject
+    lateinit var backupSharedPrefsRepository: BackupSettingsRepository
+
     private lateinit var ui: FragmentChangeSecurePasswordBinding
     private lateinit var inputService: InputMethodManager
-
-    private var subscribedToBackupState = false
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -266,19 +266,10 @@ class ChangeSecurePasswordFragment : Fragment() {
     }
 
     private fun performBackupAndUpdatePassword() {
-        val password = (ui.enterPasswordEditText.text!!.toString()).toCharArray()
         // start listening to wallet events
         subscribeToBackupState()
-        lifecycleScope.launch(Dispatchers.IO) {
-            // backup
-            try {
-                backupManager.backupAll(newPassword = password)
-            } catch (exception: BackupStorageAuthRevokedException) {
-                withContext(Dispatchers.Main) {
-                    displayStorageAuthRevokedDialog()
-                }
-            }
-        }
+        backupSharedPrefsRepository.backupPassword = ui.enterPasswordEditText.text!!.toString()
+        backupManager.backupNow()
     }
 
     private fun displayStorageAuthRevokedDialog() {
@@ -301,7 +292,7 @@ class ChangeSecurePasswordFragment : Fragment() {
                 allowExitAndPasswordEditing()
                 (requireActivity() as BackupSettingsRouter).onPasswordChanged(this)
             }
-            is BackupOutOfDate -> { // backup failed
+            is BackupFailed -> { // backup failed
                 showBackupErrorDialog(deductBackupErrorMessage(backupState.backupException)) {
                     allowExitAndPasswordEditing()
                     setSecurePasswordCtaIdleState()

@@ -34,6 +34,7 @@ package com.tari.android.wallet.infrastructure.backup
 
 import com.orhanobut.logger.Logger
 import com.tari.android.wallet.data.WalletConfig
+import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import com.tari.android.wallet.extension.compress
 import com.tari.android.wallet.extension.encrypt
 import com.tari.android.wallet.ffi.FFIWallet
@@ -52,6 +53,7 @@ import java.io.File
  */
 class BackupFileProcessor(
     private val backupSettingsRepository: BackupSettingsRepository,
+    private val sharedPrefsRepository: SharedPrefsRepository,
     private val walletConfig: WalletConfig,
     private val namingPolicy: BackupNamingPolicy,
 ) {
@@ -60,16 +62,16 @@ class BackupFileProcessor(
 
     private val mutex = Mutex()
 
-    suspend fun generateBackupFile(newPassword: CharArray? = null): Triple<File, DateTime, String> = mutex.withLock {
+    suspend fun generateBackupFile(): Triple<File, DateTime, String> = mutex.withLock {
         // decrypt database
         FFIWallet.instance?.let {
             it.removeEncryption()
-            backupSettingsRepository.backupPassword = null
+            sharedPrefsRepository.databasePassphrase = null
         }
 
         // create partial backup in temp folder if password not set
         val databaseFile = File(walletConfig.walletDatabaseFilePath)
-        val backupPassword = newPassword ?: backupSettingsRepository.backupPassword?.toCharArray()
+        val backupPassword = backupSettingsRepository.backupPassword
         val backupDate = DateTime.now()
         // zip the file
         val compressionMethod = CompressionMethod.zip()
@@ -79,10 +81,10 @@ class BackupFileProcessor(
         var fileToBackup = listOf(databaseFile).compress(CompressionMethod.zip(), compressedFile.absolutePath)
         // encrypt the file if password is set
         val encryptionAlgorithm = SymmetricEncryptionAlgorithm.aes()
-        if (backupPassword != null) {
+        if (!backupPassword.isNullOrEmpty()) {
             fileToBackup = fileToBackup.encrypt(
                 encryptionAlgorithm,
-                backupPassword,
+                backupPassword.toCharArray(),
                 File(walletConfig.getWalletTempDirPath(), backupFileName).absolutePath
             )
             mimeType = encryptionAlgorithm.mimeType

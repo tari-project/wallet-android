@@ -7,7 +7,5 @@ sealed class CloudBackupStatus(val text: Int, val color: Int) {
 
     class InProgress(text: Int) : CloudBackupStatus(text, R.color.all_settings_back_up_status_processing)
 
-    object Scheduled : CloudBackupStatus(R.string.back_up_wallet_backup_status_scheduled, R.color.all_settings_back_up_status_scheduled)
-
     class Warning(text: Int = -1, color: Int = -1) : CloudBackupStatus(text, color)
 }

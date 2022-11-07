@@ -106,15 +106,7 @@ class BackupSettingsViewModel : CommonViewModel() {
         }
     }
 
-    fun onBackupToCloud() {
-        viewModelScope.launch(Dispatchers.IO) {
-            try {
-                backupManager.backupAll(isInitialBackup = false, userTriggered = true)
-            } catch (exception: Exception) {
-                showBackupFailureDialog(exception)
-            }
-        }
-    }
+    fun onBackupToCloud() = backupManager.backupNow()
 
     private fun refillSharedPrefsData() {
         _backupPassword.postValue(Optional.ofNullable(backupSettingsRepository.backupPassword))
@@ -152,14 +144,13 @@ class BackupSettingsViewModel : CommonViewModel() {
             BackupState.BackupDisabled -> handleDisabledState()
             BackupState.BackupCheckingStorage -> handleCheckingStorageState()
             BackupState.BackupStorageCheckFailed -> handleStorageCheckFailedState()
-            BackupState.BackupScheduled -> handleScheduledState()
             BackupState.BackupInProgress -> handleInProgressState()
             BackupState.BackupUpToDate -> handleUpToDateState()
-            is BackupState.BackupOutOfDate -> handleOutOfDateState(backupState.backupsState as BackupState.BackupOutOfDate)
+            is BackupState.BackupFailed -> handleFailedState()
         }
     }
 
-    private fun handleOutOfDateState(backupState: BackupState.BackupOutOfDate) {
+    private fun handleFailedState() {
         if (backupOptionsAreVisible.value!!) {
             _isBackupNowEnabled.postValue(true)
             _isBackupNowAvailabilityChanged.postValue(true)
@@ -186,23 +177,6 @@ class BackupSettingsViewModel : CommonViewModel() {
         _isBackupNowAvailable.postValue(false)
         _updatePasswordEnabled.postValue(false)
         _cloudBackupStatus.postValue(CloudBackupStatus.InProgress(R.string.back_up_wallet_backup_status_in_progress))
-    }
-
-    private fun handleScheduledState() {
-        _isBackupNowEnabled.postValue(true)
-        _isBackupNowAvailabilityChanged.postValue(true)
-        _isBackupNowAvailable.postValue(true)
-        _updatePasswordEnabled.postValue(true)
-        if (backupSettingsRepository.getOptionList.all { it.lastFailureDate == null }) {
-            _cloudBackupStatus.postValue(CloudBackupStatus.Scheduled)
-        } else {
-            _cloudBackupStatus.postValue(
-                CloudBackupStatus.Warning(
-                    R.string.back_up_wallet_backup_status_scheduled,
-                    R.color.all_settings_back_up_status_processing
-                )
-            )
-        }
     }
 
     private fun handleStorageCheckFailedState() {

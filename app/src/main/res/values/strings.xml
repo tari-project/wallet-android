@@ -449,7 +449,6 @@
     <string name="back_up_wallet_backup_status_checking_backup">Checking</string>
     <string name="back_up_wallet_backup_status_in_progress">In progress</string>
     <string name="back_up_wallet_backup_status_outdated">Out of date</string>
-    <string name="back_up_wallet_backup_status_scheduled">Scheduled</string>
     <string name="back_up_wallet_backup_status_up_to_date">Up to date</string>
     <string name="back_up_wallet_restore_with_recovery_phrase">Restore with recovery phrase</string>
     <string name="back_up_wallet_restoring_wallet_label">Restoring your wallet</string>

@@ -134,7 +134,6 @@ object Constants {
         const val pendingTxExpirationPeriodHours = 3 * 24
         const val backupDelayMs = 60 * 1000L
         const val backupRetryPeriodMs = 0L
-        const val maxBackupRetries = 2
         val defaultFeePerGram = MicroTari(BigInteger.valueOf(10))
     }
 

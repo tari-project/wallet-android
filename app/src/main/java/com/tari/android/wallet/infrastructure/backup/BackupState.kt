@@ -39,11 +39,9 @@ sealed class BackupState {
 
     object BackupStorageCheckFailed : BackupState()
 
-    object BackupScheduled : BackupState()
-
     object BackupInProgress : BackupState()
 
     object BackupUpToDate : BackupState()
 
-    data class BackupOutOfDate(val backupException: Exception? = null) : BackupState()
+    data class BackupFailed(val backupException: Exception? = null) : BackupState()
 }

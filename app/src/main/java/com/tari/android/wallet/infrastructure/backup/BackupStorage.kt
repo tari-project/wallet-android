@@ -47,7 +47,7 @@ interface BackupStorage {
 
     suspend fun onSetupActivityResult(requestCode: Int, resultCode: Int, intent: Intent?): Boolean
 
-    suspend fun backup(newPassword: CharArray? = null): DateTime
+    suspend fun backup(): DateTime
 
     suspend fun hasBackup(): Boolean
 

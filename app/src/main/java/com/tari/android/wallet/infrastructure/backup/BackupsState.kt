@@ -7,10 +7,9 @@ data class BackupsState(val backupsStates: Map<BackupOptions, BackupState>) {
     val backupsState: BackupState
         get() {
             val backupsStates = backupsStates.values.toList()
-            return backupsStates.firstOrNull { it is BackupState.BackupOutOfDate }
+            return backupsStates.firstOrNull { it is BackupState.BackupFailed }
                 ?: backupsStates.firstOrNull { it is BackupState.BackupUpToDate }
                 ?: backupsStates.firstOrNull { it is BackupState.BackupInProgress }
-                ?: backupsStates.firstOrNull { it is BackupState.BackupScheduled }
                 ?: backupsStates.firstOrNull { it is BackupState.BackupStorageCheckFailed }
                 ?: backupsStates.firstOrNull { it is BackupState.BackupCheckingStorage }
                 ?: BackupState.BackupDisabled

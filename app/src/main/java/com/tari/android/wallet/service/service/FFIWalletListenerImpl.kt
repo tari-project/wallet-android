@@ -64,7 +64,7 @@ class FFIWalletListenerImpl(
         postTxNotification(pendingInboundTx)
         listeners.forEach { it.onTxReceived(pendingInboundTx) }
         // schedule a backup
-        backupManager.scheduleBackupAll(resetRetryCount = true)
+        backupManager.backupNow()
     }
 
     override fun onTxReplyReceived(pendingOutboundTx: PendingOutboundTx) {
@@ -74,7 +74,7 @@ class FFIWalletListenerImpl(
         // notify external listeners
         listeners.iterator().forEach { it.onTxReplyReceived(pendingOutboundTx) }
         // schedule a backup
-        backupManager.scheduleBackupAll(resetRetryCount = true)
+        backupManager.backupNow()
     }
 
     override fun onTxFinalized(pendingInboundTx: PendingInboundTx) {
@@ -84,7 +84,7 @@ class FFIWalletListenerImpl(
         // notify external listeners
         listeners.iterator().forEach { it.onTxFinalized(pendingInboundTx) }
         // schedule a backup
-        backupManager.scheduleBackupAll(resetRetryCount = true)
+        backupManager.backupNow()
     }
 
     override fun onInboundTxBroadcast(pendingInboundTx: PendingInboundTx) {
@@ -94,7 +94,7 @@ class FFIWalletListenerImpl(
         // notify external listeners
         listeners.iterator().forEach { it.onInboundTxBroadcast(pendingInboundTx) }
         // schedule a backup
-        backupManager.scheduleBackupAll(resetRetryCount = true)
+        backupManager.backupNow()
     }
 
     override fun onOutboundTxBroadcast(pendingOutboundTx: PendingOutboundTx) {
@@ -104,7 +104,7 @@ class FFIWalletListenerImpl(
         // notify external listeners
         listeners.iterator().forEach { it.onOutboundTxBroadcast(pendingOutboundTx) }
         // schedule a backup
-        backupManager.scheduleBackupAll(resetRetryCount = true)
+        backupManager.backupNow()
     }
 
     override fun onTxMined(completedTx: CompletedTx) {
@@ -114,7 +114,7 @@ class FFIWalletListenerImpl(
         // notify external listeners
         listeners.iterator().forEach { it.onTxMined(completedTx) }
         // schedule a backup
-        backupManager.scheduleBackupAll(resetRetryCount = true)
+        backupManager.backupNow()
     }
 
     override fun onTxMinedUnconfirmed(completedTx: CompletedTx, confirmationCount: Int) {
@@ -124,7 +124,7 @@ class FFIWalletListenerImpl(
         // notify external listeners
         listeners.iterator().forEach { it.onTxMinedUnconfirmed(completedTx, confirmationCount) }
         // schedule a backup
-        backupManager.scheduleBackupAll(resetRetryCount = true)
+        backupManager.backupNow()
     }
 
     override fun onTxFauxConfirmed(completedTx: CompletedTx) {
@@ -134,7 +134,7 @@ class FFIWalletListenerImpl(
         // notify external listeners
         listeners.iterator().forEach { it.onTxFauxConfirmed(completedTx) }
         // schedule a backup
-        backupManager.scheduleBackupAll(resetRetryCount = true)
+        backupManager.backupNow()
     }
 
     override fun onTxFauxUnconfirmed(completedTx: CompletedTx, confirmationCount: Int) {
@@ -144,7 +144,7 @@ class FFIWalletListenerImpl(
         // notify external listeners
         listeners.iterator().forEach { it.onTxFauxUnconfirmed(completedTx, confirmationCount) }
         // schedule a backup
-        backupManager.scheduleBackupAll(resetRetryCount = true)
+        backupManager.backupNow()
     }
 
     override fun onDirectSendResult(txId: BigInteger, status: TransactionSendStatus) {
@@ -155,7 +155,7 @@ class FFIWalletListenerImpl(
             sendPushNotificationToTxRecipient(it.second)
         }
         // schedule a backup
-        backupManager.scheduleBackupAll(resetRetryCount = true)
+        backupManager.backupNow()
         // notify external listeners
         listeners.iterator().forEach { it.onDirectSendResult(TxId(txId), status) }
     }
@@ -172,7 +172,7 @@ class FFIWalletListenerImpl(
         // notify external listeners
         listeners.iterator().forEach { listener -> listener.onTxCancelled(cancelledTx) }
         // schedule a backup
-        backupManager.scheduleBackupAll(resetRetryCount = true)
+        backupManager.backupNow()
     }
 
     override fun onTXOValidationComplete(responseId: BigInteger, status: TransactionValidationStatus) {

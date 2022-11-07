@@ -127,9 +127,9 @@ class GoogleDriveBackupStorage(
         }
     }
 
-    override suspend fun backup(newPassword: CharArray?): DateTime {
+    override suspend fun backup(): DateTime {
         return withContext(Dispatchers.IO) {
-            val (backupFile, backupDate, mimeType) = backupFileProcessor.generateBackupFile(newPassword)
+            val (backupFile, backupDate, mimeType) = backupFileProcessor.generateBackupFile()
             // upload file
             try {
                 createBackupFile(backupFile, mimeType)
@@ -144,10 +144,6 @@ class GoogleDriveBackupStorage(
                 throw exception
             } catch (exception: Exception) {
                 throw exception
-            }
-            // update backup password
-            if (newPassword != null) {
-                backupSettingsRepository.backupPassword = newPassword.toString()
             }
             try {
                 backupFileProcessor.clearTempFolder()

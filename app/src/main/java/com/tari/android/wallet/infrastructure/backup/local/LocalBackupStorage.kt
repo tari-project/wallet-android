@@ -90,20 +90,16 @@ class LocalBackupStorage(
         return true
     }
 
-    override suspend fun backup(newPassword: CharArray?): DateTime {
+    override suspend fun backup(): DateTime {
         val backupFolder = getBackupFolder()
 
         return withContext(Dispatchers.IO) {
-            val (backupFile, backupDate, mimeType) = backupFileProcessor.generateBackupFile(newPassword)
-            val backupFileName = backupFile.getLastPathComponent()!!
+            val (backupFile, backupDate, mimeType) = backupFileProcessor.generateBackupFile()
+            val backupFileName = backupFile.getLastPathComponent()
             // create target file
             val targetBackupFile = backupFolder.createFile(mimeType, backupFileName) ?: throw BackupStorageAuthRevokedException()
             // write to target file
             context.contentResolver.openOutputStream(targetBackupFile.uri).use { outputStream -> FileUtils.copyFile(backupFile, outputStream) }
-            // update backup password
-            if (newPassword != null) {
-                backupSettingsRepository.backupPassword = newPassword.toString()
-            }
             try {
                 // clear temp folder
                 backupFileProcessor.clearTempFolder()

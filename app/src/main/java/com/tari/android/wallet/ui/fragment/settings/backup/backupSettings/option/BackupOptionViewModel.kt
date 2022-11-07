@@ -5,6 +5,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.tari.android.wallet.R
+import com.tari.android.wallet.extension.addTo
 import com.tari.android.wallet.infrastructure.backup.BackupException
 import com.tari.android.wallet.infrastructure.backup.BackupManager
 import com.tari.android.wallet.infrastructure.backup.BackupState
@@ -25,7 +26,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-class BackupOptionViewModel() : CommonViewModel() {
+class BackupOptionViewModel : CommonViewModel() {
 
     @Inject
     lateinit var backupSettingsRepository: BackupSettingsRepository
@@ -62,18 +63,31 @@ class BackupOptionViewModel() : CommonViewModel() {
 
     fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         viewModelScope.launch(Dispatchers.IO) {
+            val currentOption = _option.value!!.type
             try {
                 if (backupManager.onSetupActivityResult(requestCode, resultCode, data)) {
-                    backupManager.backup(_option.value!!.type, isInitialBackup = true)
+                    backupSettingsRepository.getOptionDto(currentOption)?.copy(isEnable = true)?.let { backupSettingsRepository.updateOption(it) }
+                    com.tari.android.wallet.event.EventBus.backupState.publishSubject
+                        .filter {
+                            it.backupsStates[currentOption] is BackupState.BackupUpToDate || it.backupsStates[currentOption] is BackupState.BackupFailed
+                        }.take(1)
+                        .subscribe {
+                            (it.backupsStates[currentOption] as? BackupState.BackupFailed)?.let { turnOff(currentOption, it.backupException) }
+                        }.addTo(compositeDisposable)
+                    backupManager.backupNow()
                 }
-            } catch (exception: Exception) {
-                logger.e("Backup storage setup failed: $exception")
-                backupManager.turnOff(_option.value!!.type)
-                _inProgress.postValue(false)
-                _switchChecked.postValue(false)
-                showBackupStorageSetupFailedDialog(exception)
+            } catch (e: Throwable) {
+                turnOff(currentOption, e)
             }
         }
+    }
+
+    private fun turnOff(backupOption: BackupOptions, throwable: Throwable?) {
+        logger.e("Backup storage setup failed: $throwable")
+        backupManager.turnOff(backupOption)
+        _inProgress.postValue(false)
+        _switchChecked.postValue(false)
+        showBackupStorageSetupFailedDialog(throwable)
     }
 
     fun onBackupSwitchChecked(isChecked: Boolean) {
@@ -120,7 +134,7 @@ class BackupOptionViewModel() : CommonViewModel() {
         _modularDialog.postValue(args)
     }
 
-    private fun showBackupStorageSetupFailedDialog(exception: Exception? = null) {
+    private fun showBackupStorageSetupFailedDialog(exception: Throwable? = null) {
         val errorTitle = when (exception) {
             is BackupStorageFullException -> resourceManager.getString(R.string.backup_wallet_storage_full_title)
             else -> resourceManager.getString(R.string.back_up_wallet_storage_setup_error_title)
@@ -141,14 +155,13 @@ class BackupOptionViewModel() : CommonViewModel() {
             BackupState.BackupDisabled -> handleDisabledState()
             BackupState.BackupCheckingStorage -> handleCheckingStorageState()
             BackupState.BackupStorageCheckFailed -> handleStorageCheckFailedState()
-            BackupState.BackupScheduled -> handleScheduledState()
             BackupState.BackupInProgress -> handleInProgressState()
             BackupState.BackupUpToDate -> handleUpToDateState()
-            is BackupState.BackupOutOfDate -> handleOutOfDateState(backupState)
+            is BackupState.BackupFailed -> handleFailedState()
         }
     }
 
-    private fun handleOutOfDateState(backupState: BackupState.BackupOutOfDate) {
+    private fun handleFailedState() {
         if (_inProgress.value!!) {
             _switchChecked.postValue(false)
         } else {
@@ -165,11 +178,6 @@ class BackupOptionViewModel() : CommonViewModel() {
 
     private fun handleInProgressState() {
         _inProgress.postValue(true)
-        _switchChecked.postValue(true)
-    }
-
-    private fun handleScheduledState() {
-        _inProgress.postValue(false)
         _switchChecked.postValue(true)
     }
 

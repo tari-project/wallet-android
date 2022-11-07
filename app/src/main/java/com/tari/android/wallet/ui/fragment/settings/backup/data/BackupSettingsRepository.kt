@@ -18,8 +18,6 @@ class BackupSettingsRepository(private val context: Context, private val sharedP
 
     var googleDriveOption: BackupOptionDto? by SharedPrefGsonDelegate(sharedPrefs, formatKey(Keys.googleDriveOptionKey), BackupOptionDto::class.java)
 
-    var scheduledBackupDate: DateTime? by SharedPrefDateTimeDelegate(sharedPrefs, formatKey(Keys.scheduledBackupDate))
-
     var backupPassword: String? by SharedPrefStringSecuredDelegate(context, sharedPrefs, formatKey(Keys.backupPassword))
 
     var localBackupFolderURI: Uri? by SharedPrefGsonDelegate(sharedPrefs, formatKey(Keys.localBackupFolderURI), Uri::class.java)
@@ -37,7 +35,6 @@ class BackupSettingsRepository(private val context: Context, private val sharedP
     fun isShowHintDialog(): Boolean = with(lastBackupDialogShown) { this == null || !this.plusMinutes(delayTimeInMinutes).isAfterNow }
 
     fun clear() {
-        scheduledBackupDate = null
         lastBackupDialogShown = null
         backupPassword = null
         localBackupFolderURI = null
@@ -56,10 +53,14 @@ class BackupSettingsRepository(private val context: Context, private val sharedP
         }
     }
 
+    fun getOptionDto(type: BackupOptions): BackupOptionDto? = when (type) {
+        BackupOptions.Google -> googleDriveOption
+        BackupOptions.Local -> localFileOption
+    }
+
     object Keys {
         const val googleDriveOptionKey = "tari_wallet_google_drive_backup_options"
         const val localFileOptionsKey = "tari_wallet_local_file_backup_options"
-        const val scheduledBackupDate = "tari_wallet_scheduled_backup_date"
         const val backupPassword = "tari_wallet_last_next_alarm_time"
         const val localBackupFolderURI = "tari_wallet_local_backup_folder_uri"
         const val lastBackupDialogShownTime = "last_shown_time_key"

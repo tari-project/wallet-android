@@ -5,6 +5,5 @@ class PresentationBackupState(val status: BackupStateStatus, val textId: Int = -
         InProgress,
         Success,
         Warning,
-        Scheduled
     }
 }
