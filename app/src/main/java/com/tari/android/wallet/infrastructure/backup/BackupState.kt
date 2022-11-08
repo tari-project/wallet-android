@@ -35,10 +35,6 @@ package com.tari.android.wallet.infrastructure.backup
 sealed class BackupState {
     object BackupDisabled : BackupState()
 
-    object BackupCheckingStorage : BackupState()
-
-    object BackupStorageCheckFailed : BackupState()
-
     object BackupInProgress : BackupState()
 
     object BackupUpToDate : BackupState()

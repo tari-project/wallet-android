@@ -61,7 +61,6 @@ class AllSettingsViewModel : CommonViewModel() {
         component.inject(this)
         initOptions()
         EventBus.backupState.subscribe(this) { backupState -> onBackupStateChanged(backupState) }
-        checkStorageStatus()
     }
 
     private fun initOptions() {
@@ -136,31 +135,12 @@ class AllSettingsViewModel : CommonViewModel() {
         _allSettingsOptions.value = allOptions
     }
 
-    private fun checkStorageStatus() = viewModelScope.launch(Dispatchers.IO) {
-        try {
-            backupManager.checkStorageStatus()
-        } catch (e: BackupStorageAuthRevokedException) {
-            logger.e(e, "Backup storage auth error")
-            // show access revoked information
-            showBackupStorageCheckFailedDialog(resourceManager.getString(check_backup_storage_status_auth_revoked_error_description))
-        } catch (e: IOException) {
-            logger.e(e, "Backup storage I/O (access) error")
-            showBackupStorageCheckFailedDialog(resourceManager.getString(check_backup_storage_status_access_error_description))
-        } catch (e: Exception) {
-            logger.e(e, "Backup storage tampered")
-        }
-    }
-
     private fun onBackupStateChanged(backupState: BackupsState?) {
         if (backupState == null) {
             backupOption.backupState = PresentationBackupState(Warning)
         } else {
             val presentationBackupState = when (backupState.backupsState) {
                 is BackupState.BackupDisabled -> PresentationBackupState(Warning)
-                is BackupState.BackupCheckingStorage -> {
-                    PresentationBackupState(InProgress, back_up_wallet_backup_status_checking_backup, all_settings_back_up_status_error)
-                }
-                is BackupState.BackupStorageCheckFailed -> PresentationBackupState(InProgress, -1, all_settings_back_up_status_error)
                 is BackupState.BackupInProgress -> {
                     PresentationBackupState(InProgress, back_up_wallet_backup_status_in_progress, all_settings_back_up_status_processing)
                 }

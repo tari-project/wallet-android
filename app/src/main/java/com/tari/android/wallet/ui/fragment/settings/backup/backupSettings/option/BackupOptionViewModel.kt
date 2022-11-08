@@ -161,8 +161,6 @@ class BackupOptionViewModel : CommonViewModel() {
         updateLastSuccessfulBackupDate(null)
         when (backupState) {
             BackupState.BackupDisabled -> handleDisabledState()
-            BackupState.BackupCheckingStorage -> handleCheckingStorageState()
-            BackupState.BackupStorageCheckFailed -> handleStorageCheckFailedState()
             BackupState.BackupInProgress -> handleInProgressState()
             BackupState.BackupUpToDate -> handleUpToDateState()
             is BackupState.BackupFailed -> handleFailedState()
@@ -188,16 +186,6 @@ class BackupOptionViewModel : CommonViewModel() {
     }
 
     private fun handleInProgressState() {
-        _inProgress.postValue(true)
-        _switchChecked.postValue(true)
-    }
-
-    private fun handleStorageCheckFailedState() {
-        _inProgress.postValue(false)
-        _switchChecked.postValue(true)
-    }
-
-    private fun handleCheckingStorageState() {
         _inProgress.postValue(true)
         _switchChecked.postValue(true)
     }

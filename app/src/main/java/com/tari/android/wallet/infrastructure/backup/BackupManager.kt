@@ -95,42 +95,6 @@ class BackupManager(
     suspend fun onSetupActivityResult(requestCode: Int, resultCode: Int, intent: Intent?): Boolean =
         currentOption?.let { getStorageByOption(it).onSetupActivityResult(requestCode, resultCode, intent) } ?: false
 
-    suspend fun checkStorageStatus() {
-        for (currentBackupOption in backupSettingsRepository.getOptionList) {
-            val backupsState = EventBus.backupState.publishSubject.value!!.copy()
-            if (!currentBackupOption.isEnable) {
-                return
-            }
-            if (backupsState.backupsStates[currentBackupOption.type] is BackupState.BackupInProgress) {
-                return
-            }
-            logger.d("Check backup storage status.")
-
-            fun updateState(state: BackupState) {
-                val newState = backupsState.copy(
-                    backupsStates = backupsState.backupsStates.toMutableMap().also { it[currentBackupOption.type] = state })
-                EventBus.backupState.post(newState)
-            }
-
-            updateState(BackupState.BackupCheckingStorage)
-            try {
-                if (!getStorageByOption(currentBackupOption.type).hasBackup()) {
-                    throw BackupStorageTamperedException("Backup storage is tampered.")
-                }
-                updateState(getBackupStateByOption(currentBackupOption))
-            } catch (e: BackupStorageAuthRevokedException) {
-                backupSettingsRepository.clear()
-                updateState(BackupState.BackupDisabled)
-            } catch (e: BackupStorageTamperedException) {
-                updateState(BackupState.BackupFailed(e))
-            } catch (e: Exception) {
-                logger.e(e, "Error while checking storage. %s", e.toString())
-                updateState(BackupState.BackupStorageCheckFailed)
-                throw e
-            }
-        }
-    }
-
     fun backupNow() = trigger.onNext(Unit)
 
     private suspend fun backupAll() = backupSettingsRepository.getOptionList.forEach { backup(it.type) }

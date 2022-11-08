@@ -239,7 +239,7 @@ class GoogleDriveBackupStorage(
     }
 
     override suspend fun signOut() {
-        suspendCoroutine<Unit> { continuation ->
+        suspendCoroutine { continuation ->
             try {
                 backupFileProcessor.clearTempFolder()
                 googleClient.signOut()

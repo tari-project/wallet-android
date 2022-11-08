@@ -272,12 +272,6 @@ class ChangeSecurePasswordFragment : Fragment() {
         backupManager.backupNow()
     }
 
-    private fun displayStorageAuthRevokedDialog() {
-        val message = string(check_backup_storage_status_auth_revoked_error_description)
-        val args = ErrorDialogArgs(string(back_up_wallet_backing_up_error_title), message) { requireActivity().onBackPressed() }
-        ModularDialog(requireContext(), args.getModular(resourceManager)).show()
-    }
-
     private fun subscribeToBackupState() {
         EventBus.backupState.subscribe(this) { backupState ->
             lifecycleScope.launch(Dispatchers.Main) {
