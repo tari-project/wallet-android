@@ -44,7 +44,7 @@ import com.tari.android.wallet.data.sharedPrefs.network.formatKey
 import com.tari.android.wallet.data.sharedPrefs.tariSettings.TariSettingsSharedRepository
 import com.tari.android.wallet.data.sharedPrefs.testnetFaucet.TestnetFaucetRepository
 import com.tari.android.wallet.data.sharedPrefs.tor.TorSharedRepository
-import com.tari.android.wallet.ui.fragment.settings.backup.BackupSettingsRepository
+import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupSettingsRepository
 import com.tari.android.wallet.yat.YatSharedRepository
 import kotlin.random.Random
 

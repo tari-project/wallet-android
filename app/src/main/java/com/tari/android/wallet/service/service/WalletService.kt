@@ -180,6 +180,7 @@ class WalletService : Service() {
     private fun deleteWallet() {
         WalletUtil.clearWalletFiles(walletConfig.getWalletFilesDirPath())
         sharedPrefsWrapper.clear()
+        backupManager.turnOffAll()
     }
 
     private fun onWalletStateChanged(walletState: WalletState) {
@@ -191,7 +192,6 @@ class WalletService : Service() {
             wallet.listener = impl
             EventBus.walletState.unsubscribe(this)
             scheduleExpirationCheck()
-            backupManager.initialize()
             Handler(Looper.getMainLooper()).post { ProcessLifecycleOwner.get().lifecycle.addObserver(lifecycleObserver!!) }
             EventBus.walletState.post(WalletState.Running)
         }

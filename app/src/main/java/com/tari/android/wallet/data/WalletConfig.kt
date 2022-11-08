@@ -11,7 +11,7 @@ import java.io.File
  */
 
 class WalletConfig(val context: Context, val networkRepository: NetworkRepository) {
-    val walletDBName: String = "tari_wallet_${networkRepository.currentNetwork!!.network.uriComponent}"
+    val walletDBName: String = "tari_wallet"
     val walletDBFullFileName: String = "$walletDBName.sqlite3"
 
     private val logFilePrefix = "tari_aurora"

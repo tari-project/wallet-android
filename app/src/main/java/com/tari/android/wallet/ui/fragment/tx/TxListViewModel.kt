@@ -28,7 +28,7 @@ import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadBoldSpannableM
 import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
 import com.tari.android.wallet.ui.dialog.modular.modules.imageModule.ImageModule
 import com.tari.android.wallet.ui.fragment.send.finalize.TxFailureReason
-import com.tari.android.wallet.ui.fragment.settings.backup.BackupSettingsRepository
+import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupSettingsRepository
 import com.tari.android.wallet.ui.fragment.tx.adapter.TransactionItem
 import com.tari.android.wallet.ui.fragment.tx.ui.progressController.UpdateProgressViewController
 import com.tari.android.wallet.util.Constants
@@ -202,7 +202,7 @@ class TxListViewModel : CommonViewModel() {
         val nonPendingTxs = (cancelledTxs + nonMinedUnconfirmedCompletedTxs).toMutableList()
         nonPendingTxs.sortWith(compareByDescending(Tx::timestamp).thenByDescending { it.id })
         if (nonPendingTxs.isNotEmpty()) {
-            items.add(TitleViewHolderItem(resourceManager.getString(home_completed_transactions_title), false))
+            items.add(TitleViewHolderItem(resourceManager.getString(R.string.home_completed_transactions_title), false))
             items.addAll(nonPendingTxs.mapIndexed { index, tx ->
                 TransactionItem(tx, index + pendingTxs.size, GIFViewModel(gifRepository), confirmationCount)
             })
@@ -440,25 +440,26 @@ class TxListViewModel : CommonViewModel() {
     private fun showWalletBackupPromptIfNecessary() {
         if (!backupSettingsRepository.isShowHintDialog()) return
 
-        if (!backupSettingsRepository.backupIsEnabled || backupSettingsRepository.backupPassword == null) {
+        val isAnyBackupEnabled = backupSettingsRepository.getOptionList.any { it.isEnable }
+        if (!isAnyBackupEnabled || backupSettingsRepository.backupPassword == null) {
             backupSettingsRepository.lastBackupDialogShown = DateTime.now()
             val inboundTransactionsCount = pendingInboundTxs.size + completedTxs.asSequence().filter { it.direction == Tx.Direction.INBOUND }.count()
             val tarisAmount = balanceInfo.value!!.availableBalance.tariValue + balanceInfo.value!!.pendingIncomingBalance.tariValue
             when {
                 inboundTransactionsCount >= 5
                         && tarisAmount >= BigDecimal("25000")
-                        && backupSettingsRepository.backupIsEnabled
+                        && isAnyBackupEnabled
                         && backupSettingsRepository.backupPassword == null -> showSecureYourBackupsDialog()
                 inboundTransactionsCount >= 4
                         && tarisAmount >= BigDecimal("8000")
-                        && !backupSettingsRepository.backupIsEnabled -> showRepeatedBackUpPrompt()
+                        && !isAnyBackupEnabled -> showRepeatedBackUpPrompt()
                 // Non-faucet transactions only here. Calculation is performed here to avoid
                 // unnecessary calculations as previous two cases have much greater chance to happen
                 pendingInboundTxs.size + completedTxs
                     .filter { it.direction == Tx.Direction.INBOUND }
                     .filterNot { it.status == TxStatus.IMPORTED }
                     .count() >= 1
-                        && !backupSettingsRepository.backupIsEnabled -> showInitialBackupPrompt()
+                        && !isAnyBackupEnabled -> showInitialBackupPrompt()
             }
         }
     }

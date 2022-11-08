@@ -48,10 +48,10 @@ import com.tari.android.wallet.ui.fragment.onboarding.inroduction.IntroductionVi
 import com.tari.android.wallet.ui.fragment.onboarding.localAuth.LocalAuthViewModel
 import com.tari.android.wallet.ui.fragment.profile.WalletInfoViewModel
 import com.tari.android.wallet.ui.fragment.qr.QRScannerActivity
+import com.tari.android.wallet.ui.fragment.restore.activity.WalletRestoreActivity
 import com.tari.android.wallet.ui.fragment.restore.chooseRestoreOption.ChooseRestoreOptionViewModel
 import com.tari.android.wallet.ui.fragment.restore.enterRestorationPassword.EnterRestorationPasswordViewModel
 import com.tari.android.wallet.ui.fragment.restore.inputSeedWords.InputSeedWordsViewModel
-import com.tari.android.wallet.ui.fragment.restore.restore.WalletRestoreActivity
 import com.tari.android.wallet.ui.fragment.restore.walletRestoringFromSeedWords.WalletRestoringFromSeedWordsViewModel
 import com.tari.android.wallet.ui.fragment.send.activity.SendTariActivity
 import com.tari.android.wallet.ui.fragment.send.addAmount.AddAmountViewModel
@@ -68,12 +68,14 @@ import com.tari.android.wallet.ui.fragment.settings.backgroundService.Background
 import com.tari.android.wallet.ui.fragment.settings.backup.ChangeSecurePasswordFragment
 import com.tari.android.wallet.ui.fragment.settings.backup.EnterCurrentPasswordFragment
 import com.tari.android.wallet.ui.fragment.settings.backup.backupSettings.BackupSettingsViewModel
+import com.tari.android.wallet.ui.fragment.settings.backup.backupSettings.option.BackupOptionViewModel
 import com.tari.android.wallet.ui.fragment.settings.backup.verifySeedPhrase.VerifySeedPhraseViewModel
 import com.tari.android.wallet.ui.fragment.settings.baseNodeConfig.addBaseNode.AddCustomBaseNodeViewModel
 import com.tari.android.wallet.ui.fragment.settings.baseNodeConfig.changeBaseNode.ChangeBaseNodeViewModel
 import com.tari.android.wallet.ui.fragment.settings.bugReporting.BugsReportingViewModel
 import com.tari.android.wallet.ui.fragment.settings.deleteWallet.DeleteWalletActivity
 import com.tari.android.wallet.ui.fragment.settings.logs.logFiles.LogFilesViewModel
+import com.tari.android.wallet.ui.fragment.settings.logs.logs.LogsViewModel
 import com.tari.android.wallet.ui.fragment.settings.networkSelection.NetworkSelectionViewModel
 import com.tari.android.wallet.ui.fragment.settings.torBridges.TorBridgesSelectionViewModel
 import com.tari.android.wallet.ui.fragment.settings.torBridges.customBridges.CustomTorBridgesViewModel
@@ -175,6 +177,8 @@ interface ApplicationComponent {
     fun inject(viewModel: UtxosListViewModel)
     fun inject(viewModel: BugsReportingViewModel)
     fun inject(viewModel: LogFilesViewModel)
+    fun inject(viewModel: LogsViewModel)
+    fun inject(backupOptionViewModel: BackupOptionViewModel)
     /**
      * Service(s).
      */

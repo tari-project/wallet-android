@@ -39,7 +39,7 @@ import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepository
 import com.tari.android.wallet.ui.common.gyphy.GiphyKeywordsRepository
 import com.tari.android.wallet.ui.common.gyphy.repository.GIFRepository
 import com.tari.android.wallet.ui.common.gyphy.repository.GiphyRESTRetrofitRepository
-import com.tari.android.wallet.ui.fragment.settings.backup.BackupSettingsRepository
+import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupSettingsRepository
 import dagger.Module
 import dagger.Provides
 import okhttp3.Interceptor

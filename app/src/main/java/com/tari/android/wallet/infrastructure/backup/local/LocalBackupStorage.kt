@@ -30,7 +30,7 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.tari.android.wallet.infrastructure.backup
+package com.tari.android.wallet.infrastructure.backup.local
 
 import android.app.Activity
 import android.content.Context
@@ -38,21 +38,17 @@ import android.content.Intent
 import androidx.documentfile.provider.DocumentFile
 import androidx.fragment.app.Fragment
 import com.orhanobut.logger.Logger
+import com.tari.android.wallet.data.sharedPrefs.delegates.SerializableTime
 import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepository
 import com.tari.android.wallet.extension.getLastPathComponent
-import com.tari.android.wallet.ui.fragment.settings.backup.BackupSettingsRepository
+import com.tari.android.wallet.infrastructure.backup.*
+import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupSettingsRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.apache.commons.io.FileUtils
 import org.joda.time.DateTime
 import java.io.File
 
-/**
- * Local external file storage.
- *
- * @author The Tari Development Team
- */
-// todo review
 class LocalBackupStorage(
     private val context: Context,
     private val backupSettingsRepository: BackupSettingsRepository,
@@ -72,8 +68,8 @@ class LocalBackupStorage(
         )
     }
 
-    override suspend fun onSetupActivityResult(requestCode: Int, resultCode: Int, intent: Intent?) {
-        if (requestCode != REQUEST_CODE_PICK_BACKUP_FOLDER) return
+    override suspend fun onSetupActivityResult(requestCode: Int, resultCode: Int, intent: Intent?): Boolean {
+        if (requestCode != REQUEST_CODE_PICK_BACKUP_FOLDER) return false
         when (resultCode) {
             Activity.RESULT_OK -> {
                 val uri = intent?.data
@@ -91,22 +87,19 @@ class LocalBackupStorage(
                 throw BackupStorageSetupCancelled()
             }
         }
+        return true
     }
 
-    override suspend fun backup(newPassword: CharArray?): DateTime {
+    override suspend fun backup(): DateTime {
         val backupFolder = getBackupFolder()
 
         return withContext(Dispatchers.IO) {
-            val (backupFile, backupDate, mimeType) = backupFileProcessor.generateBackupFile(newPassword)
-            val backupFileName = backupFile.getLastPathComponent()!!
+            val (backupFile, backupDate, mimeType) = backupFileProcessor.generateBackupFile()
+            val backupFileName = backupFile.getLastPathComponent()
             // create target file
             val targetBackupFile = backupFolder.createFile(mimeType, backupFileName) ?: throw BackupStorageAuthRevokedException()
             // write to target file
             context.contentResolver.openOutputStream(targetBackupFile.uri).use { outputStream -> FileUtils.copyFile(backupFile, outputStream) }
-            // update backup password
-            if (newPassword != null) {
-                backupSettingsRepository.backupPassword = newPassword.toString()
-            }
             try {
                 // clear temp folder
                 backupFileProcessor.clearTempFolder()
@@ -146,44 +139,40 @@ class LocalBackupStorage(
 
     override suspend fun restoreLatestBackup(password: String?) {
         val backupFolder = getBackupFolder()
-        val backupFiles = backupFolder.listFiles().filter { file -> namingPolicy.getDateFromBackupFileName(file.name ?: "") != null }
-        if (backupFiles.isEmpty()) {
-            throw BackupStorageTamperedException("Backup file not found in folder.")
-        }
-        backupFiles.sortedBy { it.name!! }
+        val backupFiles = backupFolder.listFiles().firstOrNull() ?: throw BackupStorageTamperedException("Backup file not found in folder.")
         withContext(Dispatchers.IO) {
             // copy file to temp location
-            val tempFile = File(walletTempDirPath, backupFiles.last().name!!)
-            // create file & fetch if it hasn't been fetched before
-            if (tempFile.parentFile?.exists() == false) {
-                tempFile.parentFile?.mkdirs()
+            val tempFolder = File(walletTempDirPath)
+            val tempFile = File(tempFolder, backupFiles.name!!)
+            if (!tempFolder.parentFile.exists()) {
+                tempFolder.parentFile.mkdir()
+            }
+            if (!tempFolder.exists()) {
+                tempFolder.mkdir()
             }
             if (!tempFile.exists()) {
                 tempFile.createNewFile()
-                context.contentResolver.openInputStream(backupFiles.last().uri).use { inputStream ->
-                    FileUtils.copyInputStreamToFile(inputStream, tempFile)
-                }
+            }
+            context.contentResolver.openInputStream(backupFiles.uri).use { inputStream ->
+                FileUtils.copyInputStreamToFile(inputStream, tempFile)
             }
             backupFileProcessor.restoreBackupFile(tempFile, password)
             backupFileProcessor.clearTempFolder()
             // restore successful, turn on automated backup
-            backupSettingsRepository.lastSuccessfulBackupDate = namingPolicy.getDateFromBackupFileName(tempFile.name)
+            backupSettingsRepository.localFileOption =
+                backupSettingsRepository.localFileOption!!.copy(lastSuccessDate = SerializableTime(DateTime.now()), isEnable = true)
             backupSettingsRepository.backupPassword = password
         }
     }
 
-    override suspend fun hasBackupForDate(date: DateTime): Boolean {
-        val backupFolderURI = backupSettingsRepository.localBackupFolderURI
-            ?: return false
-        val backupFolder = DocumentFile.fromTreeUri(context, backupFolderURI)
-            ?: throw BackupStorageAuthRevokedException()
+    override suspend fun hasBackup(): Boolean {
+        val backupFolderURI = backupSettingsRepository.localBackupFolderURI ?: return false
+        val backupFolder = DocumentFile.fromTreeUri(context, backupFolderURI) ?: throw BackupStorageAuthRevokedException()
         if (!backupFolder.exists()) {
             throw BackupStorageAuthRevokedException()
         }
-        val expectedBackupFileName = namingPolicy.getBackupFileName(date)
-        return backupFolder.listFiles().firstOrNull {
-            it.isFile && it.name?.contains(expectedBackupFileName) == true
-        } != null
+        val expectedBackupFileName = namingPolicy.getBackupFileName()
+        return backupFolder.listFiles().firstOrNull { it.isFile && it.name?.contains(expectedBackupFileName) == true } != null
     }
 
     private fun getBackupFolder(): DocumentFile {

@@ -30,17 +30,11 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.tari.android.wallet.ui.fragment.restore.restore
 
-interface WalletRestoreRouter {
-
-    fun toEnterRestorePassword()
-
-    fun toRestoreWithRecoveryPhrase()
-
-    fun toBaseNodeSelection()
-
-    fun toRestoreFromSeedWordsInProgress()
-
-    fun onRestoreCompleted()
-}
+#include <jni.h>
+#include <android/log.h>
+#include <wallet.h>
+#include <string>
+#include <cmath>
+#include <android/log.h>
+#include "jniCommon.cpp"

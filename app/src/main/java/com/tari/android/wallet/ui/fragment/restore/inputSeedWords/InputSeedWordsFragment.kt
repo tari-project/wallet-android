@@ -20,7 +20,7 @@ import com.tari.android.wallet.ui.extension.*
 import com.tari.android.wallet.ui.fragment.restore.inputSeedWords.suggestions.SuggestionState
 import com.tari.android.wallet.ui.fragment.restore.inputSeedWords.suggestions.SuggestionViewHolderItem
 import com.tari.android.wallet.ui.fragment.restore.inputSeedWords.suggestions.SuggestionsAdapter
-import com.tari.android.wallet.ui.fragment.restore.restore.WalletRestoreRouter
+import com.tari.android.wallet.ui.fragment.restore.activity.WalletRestoreRouter
 import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent
 import net.yslibrary.android.keyboardvisibilityevent.Unregistrar
 
