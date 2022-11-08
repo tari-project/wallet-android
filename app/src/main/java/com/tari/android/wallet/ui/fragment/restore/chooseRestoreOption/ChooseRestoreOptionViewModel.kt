@@ -7,7 +7,9 @@ import androidx.lifecycle.viewModelScope
 import com.tari.android.wallet.R
 import com.tari.android.wallet.application.WalletManager
 import com.tari.android.wallet.application.WalletState
+import com.tari.android.wallet.data.WalletConfig
 import com.tari.android.wallet.event.EventBus
+import com.tari.android.wallet.extension.addTo
 import com.tari.android.wallet.infrastructure.backup.*
 import com.tari.android.wallet.model.WalletError
 import com.tari.android.wallet.service.service.WalletServiceLauncher
@@ -18,9 +20,11 @@ import com.tari.android.wallet.ui.dialog.error.WalletErrorArgs
 import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupOptionDto
 import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupOptions
 import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupSettingsRepository
+import com.tari.android.wallet.util.WalletUtil
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.io.IOException
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 class ChooseRestoreOptionViewModel : CommonViewModel() {
@@ -37,6 +41,9 @@ class ChooseRestoreOptionViewModel : CommonViewModel() {
     @Inject
     lateinit var walletServiceLauncher: WalletServiceLauncher
 
+    @Inject
+    lateinit var walletConfig: WalletConfig
+
     private val _state = SingleLiveEvent<ChooseRestoreOptionState>()
     val state: LiveData<ChooseRestoreOptionState> = _state
 
@@ -49,6 +56,20 @@ class ChooseRestoreOptionViewModel : CommonViewModel() {
         component.inject(this)
 
         options.postValue(backupSettingsRepository.getOptionList)
+
+        EventBus.walletState.publishSubject.filter { it is WalletState.Running }.subscribe {
+            if (WalletUtil.walletExists(walletConfig)) {
+                _navigation.postValue(ChooseRestoreOptionNavigation.OnRestoreCompleted)
+            }
+        }.addTo(compositeDisposable)
+
+        EventBus.walletState.publishSubject.filter { it is WalletState.Failed }
+            .map { it as WalletState.Failed }
+            .debounce(300L, TimeUnit.MILLISECONDS).subscribe {
+                viewModelScope.launch(Dispatchers.IO) {
+                    handleException(WalletStartFailedException(it.exception))
+                }
+            }.addTo(compositeDisposable)
     }
 
     fun startRestore(options: BackupOptions) {
@@ -74,17 +95,6 @@ class ChooseRestoreOptionViewModel : CommonViewModel() {
         try {
             // try to restore with no password
             backupManager.restoreLatestBackup()
-            EventBus.walletState.subscribe(this) {
-                when (it) {
-                    WalletState.Initializing,
-                    WalletState.NotReady -> Unit
-                    WalletState.Running -> _navigation.postValue(ChooseRestoreOptionNavigation.OnRestoreCompleted)
-                    is WalletState.Failed -> viewModelScope.launch(Dispatchers.IO) {
-                        handleException(WalletStartFailedException(it.exception))
-                    }
-                    else -> Unit
-                }
-            }
             viewModelScope.launch(Dispatchers.Main) {
                 walletServiceLauncher.start()
             }

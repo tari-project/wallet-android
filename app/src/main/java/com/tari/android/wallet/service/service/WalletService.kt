@@ -180,6 +180,7 @@ class WalletService : Service() {
     private fun deleteWallet() {
         WalletUtil.clearWalletFiles(walletConfig.getWalletFilesDirPath())
         sharedPrefsWrapper.clear()
+        backupManager.turnOffAll()
     }
 
     private fun onWalletStateChanged(walletState: WalletState) {

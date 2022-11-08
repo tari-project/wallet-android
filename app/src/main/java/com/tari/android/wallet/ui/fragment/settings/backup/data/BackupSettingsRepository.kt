@@ -44,13 +44,9 @@ class BackupSettingsRepository(private val context: Context, private val sharedP
         lastBackupDialogShown = null
         backupPassword = null
         localBackupFolderURI = null
-        localFileOption = null
-        googleDriveOption = null
         localFileOption = BackupOptionDto(BackupOptions.Local)
         googleDriveOption = BackupOptionDto(BackupOptions.Google)
     }
-
-    fun updateOptions(options: List<BackupOptionDto>) = options.forEach { option -> updateOption(option) }
 
     fun updateOption(option: BackupOptionDto) {
         when (option.type) {

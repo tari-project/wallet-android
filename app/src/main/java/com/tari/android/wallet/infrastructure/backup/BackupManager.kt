@@ -143,22 +143,18 @@ class BackupManager(
         }
     }
 
-    suspend fun turnOffAll() {
+    fun turnOffAll() = localScope.launch {
         backupSettingsRepository.getOptionList.forEach { turnOff(it.type) }
     }
 
     fun turnOff(optionType: BackupOptions) = with(backupMutex) {
-        val options = backupSettingsRepository.getOptionList.map {
-            it.copy(type = it.type, isEnable = false, lastSuccessDate = null, lastFailureDate = null)
-        }
         val backupsState = EventBus.backupState.publishSubject.value!!.copy()
-        backupSettingsRepository.updateOptions(options)
+        backupSettingsRepository.updateOption(BackupOptionDto(optionType))
         backupSettingsRepository.backupPassword = null
         val newState =
             backupsState.copy(backupsStates = backupsState.backupsStates.toMutableMap().also { it[optionType] = BackupState.BackupDisabled })
         EventBus.backupState.post(newState)
         val backupStorage = getStorageByOption(optionType)
-        backupSettingsRepository.localBackupFolderURI = null
         localScope.launch { backupStorage.signOut() }
     }
 
