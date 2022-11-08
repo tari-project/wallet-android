@@ -206,7 +206,7 @@ class GoogleDriveBackupStorage(
     }
 
     private fun getLastBackupFileIdAndName(): Pair<String, String>? {
-        val file = searchForBackups().files.firstOrNull() ?: return null
+        val file = searchForBackups().files.firstOrNull { namingPolicy.isBackupFileName(it.name) } ?: return null
         return file.id to file.name
     }
 

@@ -39,7 +39,7 @@ class BackupNamingPolicy @Inject constructor(val networkRepository: NetworkRepos
 
     private val backupFileNamePrefix = "Tari-Aurora-Backup-${networkRepository.currentNetwork!!.network.uriComponent}"
 
-    val regex = Regex(backupFileNamePrefix)
+    val regex = Regex("$backupFileNamePrefix.*")
 
     fun getBackupFileName(): String = backupFileNamePrefix
 

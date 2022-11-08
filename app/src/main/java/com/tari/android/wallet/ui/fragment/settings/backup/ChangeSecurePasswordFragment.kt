@@ -296,7 +296,7 @@ class ChangeSecurePasswordFragment : Fragment() {
         }
     }
 
-    private fun deductBackupErrorMessage(e: Exception?): String = when {
+    private fun deductBackupErrorMessage(e: Throwable?): String = when {
         e is UnknownHostException -> string(error_no_connection_title)
         e?.message != null -> string(back_up_wallet_backing_up_error_desc, e.message!!)
         else -> string(back_up_wallet_backing_up_unknown_error)

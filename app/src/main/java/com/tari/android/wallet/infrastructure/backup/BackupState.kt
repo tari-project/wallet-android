@@ -39,5 +39,5 @@ sealed class BackupState {
 
     object BackupUpToDate : BackupState()
 
-    data class BackupFailed(val backupException: Exception? = null) : BackupState()
+    data class BackupFailed(val backupException: Throwable? = null) : BackupState()
 }

@@ -138,7 +138,9 @@ class LocalBackupStorage(
 
     override suspend fun restoreLatestBackup(password: String?) {
         val backupFolder = getBackupFolder()
-        val backupFiles = backupFolder.listFiles().firstOrNull() ?: throw BackupStorageTamperedException("Backup file not found in folder.")
+        val backupFiles = backupFolder.listFiles().firstOrNull { documentFile: DocumentFile? ->
+            namingPolicy.isBackupFileName(documentFile?.name.orEmpty())
+        } ?: throw BackupStorageTamperedException("Backup file not found in folder.")
         withContext(Dispatchers.IO) {
             // copy file to temp location
             val tempFolder = File(walletTempDirPath)

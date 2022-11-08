@@ -130,7 +130,7 @@ class BackupManager(
             )
             logger.i("Backup successful")
             updateState(BackupState.BackupUpToDate)
-        } catch (exception: Exception) {
+        } catch (exception: Throwable) {
             logger.i("Backup failed $exception")
             if (exception is BackupStorageAuthRevokedException) {
                 logger.i("Error happened on backup BackupStorageAuthRevokedException")
