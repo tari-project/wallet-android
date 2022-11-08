@@ -53,27 +53,11 @@
         android:background="@color/white"
         android:orientation="vertical">
 
-        <com.tari.android.wallet.ui.fragment.restore.chooseRestoreOption.option.RecoveryOptionView
-            android:id="@+id/google_drive_restore_option"
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:id="@+id/options_container"
             android:layout_width="match_parent"
+            android:orientation="vertical"
             android:layout_height="wrap_content"/>
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_marginHorizontal="@dimen/common_horizontal_margin"
-            android:background="@color/settings_background" />
-
-        <com.tari.android.wallet.ui.fragment.restore.chooseRestoreOption.option.RecoveryOptionView
-            android:id="@+id/local_file_restore_option"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_marginHorizontal="@dimen/common_horizontal_margin"
-            android:background="@color/settings_background" />
 
         <FrameLayout
             android:id="@+id/restore_with_recovery_phrase_cta_view"

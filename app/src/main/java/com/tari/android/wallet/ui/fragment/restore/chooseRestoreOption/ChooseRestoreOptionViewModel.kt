@@ -2,6 +2,7 @@ package com.tari.android.wallet.ui.fragment.restore.chooseRestoreOption
 
 import android.content.Intent
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.tari.android.wallet.R
 import com.tari.android.wallet.application.WalletManager
@@ -14,6 +15,7 @@ import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.common.SingleLiveEvent
 import com.tari.android.wallet.ui.dialog.error.ErrorDialogArgs
 import com.tari.android.wallet.ui.dialog.error.WalletErrorArgs
+import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupOptionDto
 import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupOptions
 import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupSettingsRepository
 import kotlinx.coroutines.Dispatchers
@@ -35,15 +37,19 @@ class ChooseRestoreOptionViewModel : CommonViewModel() {
     @Inject
     lateinit var walletServiceLauncher: WalletServiceLauncher
 
-    init {
-        component.inject(this)
-    }
-
     private val _state = SingleLiveEvent<ChooseRestoreOptionState>()
     val state: LiveData<ChooseRestoreOptionState> = _state
 
     private val _navigation = SingleLiveEvent<ChooseRestoreOptionNavigation>()
     val navigation: LiveData<ChooseRestoreOptionNavigation> = _navigation
+
+    val options = MutableLiveData<List<BackupOptionDto>>()
+
+    init {
+        component.inject(this)
+
+        options.postValue(backupSettingsRepository.getOptionList)
+    }
 
     fun startRestore(options: BackupOptions) {
         _state.postValue(ChooseRestoreOptionState.BeginProgress(options))
@@ -82,12 +88,12 @@ class ChooseRestoreOptionViewModel : CommonViewModel() {
             viewModelScope.launch(Dispatchers.Main) {
                 walletServiceLauncher.start()
             }
-        } catch (exception: Exception) {
+        } catch (exception: Throwable) {
             handleException(exception)
         }
     }
 
-    private suspend fun handleException(exception: java.lang.Exception) {
+    private suspend fun handleException(exception: Throwable) {
         when (exception) {
             is BackupStorageAuthRevokedException -> {
                 logger.i("Auth revoked")

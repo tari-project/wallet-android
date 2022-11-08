@@ -37,14 +37,15 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.children
 import androidx.fragment.app.viewModels
-import com.tari.android.wallet.R
 import com.tari.android.wallet.databinding.FragmentChooseRestoreOptionBinding
 import com.tari.android.wallet.extension.observe
 import com.tari.android.wallet.ui.common.CommonFragment
 import com.tari.android.wallet.ui.extension.setOnThrottledClickListener
 import com.tari.android.wallet.ui.fragment.restore.activity.WalletRestoreRouter
 import com.tari.android.wallet.ui.fragment.restore.chooseRestoreOption.option.RecoveryOptionView
+import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupOptionDto
 import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupOptions
 
 class ChooseRestoreOptionFragment : CommonFragment<FragmentChooseRestoreOptionBinding, ChooseRestoreOptionViewModel>() {
@@ -75,11 +76,7 @@ class ChooseRestoreOptionFragment : CommonFragment<FragmentChooseRestoreOptionBi
 
     private fun setupUI() = with(ui) {
         backCtaView.setOnThrottledClickListener { requireActivity().onBackPressed() }
-        googleDriveRestoreOption.ui.restoreWalletCtaView.setOnClickListener { startRecovery(BackupOptions.Google) }
-        localFileRestoreOption.ui.restoreWalletCtaView.setOnClickListener { startRecovery(BackupOptions.Local) }
         restoreWithRecoveryPhraseCtaView.setOnClickListener { processNavigation(ChooseRestoreOptionNavigation.ToRestoreWithRecoveryPhrase) }
-        googleDriveRestoreOption.init(getString(R.string.back_up_wallet_restore_with_google_drive))
-        localFileRestoreOption.init(getString(R.string.back_up_wallet_restore_with_local_files))
     }
 
     private fun startRecovery(options: BackupOptions) {
@@ -91,6 +88,19 @@ class ChooseRestoreOptionFragment : CommonFragment<FragmentChooseRestoreOptionBi
         observe(state) { processState(it) }
 
         observe(navigation) { processNavigation(it) }
+
+        observe(options) { initOptions(it) }
+    }
+
+    private fun initOptions(options: List<BackupOptionDto>) {
+        for (option in options) {
+            val view = RecoveryOptionView(requireContext()).apply {
+                viewLifecycle = viewLifecycleOwner
+                ui.restoreWalletCtaView.setOnClickListener { startRecovery(option.type) }
+                init(option.type)
+            }
+            ui.optionsContainer.addView(view)
+        }
     }
 
     private fun processState(state: ChooseRestoreOptionState) {
@@ -114,11 +124,7 @@ class ChooseRestoreOptionFragment : CommonFragment<FragmentChooseRestoreOptionBi
         getBackupOptionView(backupOptions)?.updateLoading(isStarted)
     }
 
-    private fun getBackupOptionView(backupOptions: BackupOptions): RecoveryOptionView? {
-        return when (backupOptions) {
-            BackupOptions.Google -> ui.googleDriveRestoreOption
-            BackupOptions.Local -> ui.localFileRestoreOption
-        }
-    }
+    private fun getBackupOptionView(backupOptions: BackupOptions): RecoveryOptionView? =
+        ui.optionsContainer.children.mapNotNull { it as? RecoveryOptionView }.firstOrNull { it.viewModel.option == backupOptions }
 }
 

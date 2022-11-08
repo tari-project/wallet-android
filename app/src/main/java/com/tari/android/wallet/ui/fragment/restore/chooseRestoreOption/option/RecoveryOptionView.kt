@@ -6,14 +6,14 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import com.tari.android.wallet.R
 import com.tari.android.wallet.databinding.ViewRestoreOptionBinding
-import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.component.common.CommonView
 import com.tari.android.wallet.ui.extension.color
 import com.tari.android.wallet.ui.extension.gone
 import com.tari.android.wallet.ui.extension.setColor
 import com.tari.android.wallet.ui.extension.setVisible
+import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupOptions
 
-class RecoveryOptionView : CommonView<CommonViewModel, ViewRestoreOptionBinding> {
+class RecoveryOptionView : CommonView<RecoveryOptionViewModel, ViewRestoreOptionBinding> {
 
     override fun bindingInflate(layoutInflater: LayoutInflater, parent: ViewGroup?, attachToRoot: Boolean):
             ViewRestoreOptionBinding = ViewRestoreOptionBinding.inflate(layoutInflater, parent, attachToRoot)
@@ -28,8 +28,13 @@ class RecoveryOptionView : CommonView<CommonViewModel, ViewRestoreOptionBinding>
         defStyleAttr
     )
 
-    fun init(title: String) {
-        ui.title.text = title
+    fun init(option: BackupOptions) {
+        val text = when(option) {
+            BackupOptions.Google -> R.string.back_up_wallet_restore_with_google_drive
+            BackupOptions.Local -> R.string.back_up_wallet_restore_with_local_files
+        }
+        ui.title.text = context.getString(text)
+        bindViewModel(RecoveryOptionViewModel().apply { this.option = option })
     }
 
     fun updateLoading(isLoading: Boolean) {
