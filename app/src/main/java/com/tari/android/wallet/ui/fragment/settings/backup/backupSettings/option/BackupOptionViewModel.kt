@@ -74,7 +74,7 @@ class BackupOptionViewModel : CommonViewModel() {
             try {
                 if (backupManager.onSetupActivityResult(requestCode, resultCode, data)) {
                     backupSettingsRepository.getOptionDto(currentOption)?.copy(isEnable = true)?.let { backupSettingsRepository.updateOption(it) }
-                    com.tari.android.wallet.event.EventBus.backupState.publishSubject
+                    EventBus.backupState.publishSubject
                         .filter {
                             it.backupsStates[currentOption] is BackupState.BackupUpToDate || it.backupsStates[currentOption] is BackupState.BackupFailed
                         }.take(1)

@@ -162,16 +162,14 @@ class BackupManager(
         getStorageByOption(currentOption!!).signOut()
     }
 
-    suspend fun restoreLatestBackup(password: String? = null) = with(backupMutex) {
+    suspend fun restoreLatestBackup(password: String? = null) = backupMutex.withLock {
         getStorageByOption(currentOption!!).restoreLatestBackup(password)
     }
 
-    private fun getBackupStateByOption(optionDto: BackupOptionDto): BackupState {
-        return when {
-            !optionDto.isEnable -> BackupState.BackupDisabled
-            optionDto.lastFailureDate != null -> BackupState.BackupFailed()
-            else -> BackupState.BackupUpToDate
-        }
+    private fun getBackupStateByOption(optionDto: BackupOptionDto): BackupState = when {
+        !optionDto.isEnable -> BackupState.BackupDisabled
+        optionDto.lastFailureDate != null -> BackupState.BackupFailed()
+        else -> BackupState.BackupUpToDate
     }
 
     private fun getStorageByOption(optionType: BackupOptions): BackupStorage = when (optionType) {

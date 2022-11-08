@@ -50,7 +50,7 @@ open class CommonViewModel : ViewModel() {
         EventBus.walletState.publishSubject.filter { it is WalletState.Failed }
             .subscribe({
                 val exception = (it as WalletState.Failed).exception
-                val errorArgs = WalletErrorArgs(resourceManager, exception).getErrorArgs().getModular(resourceManager)
+                val errorArgs = WalletErrorArgs(resourceManager, exception).getErrorArgs().getModular(resourceManager, true)
                 _modularDialog.postValue(errorArgs)
             }, {
                 logger.i(it.toString())

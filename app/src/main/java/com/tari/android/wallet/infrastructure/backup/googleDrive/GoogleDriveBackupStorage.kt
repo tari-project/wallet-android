@@ -52,7 +52,6 @@ import com.google.api.services.drive.DriveScopes
 import com.google.api.services.drive.model.FileList
 import com.orhanobut.logger.Logger
 import com.tari.android.wallet.R
-import com.tari.android.wallet.data.sharedPrefs.delegates.SerializableTime
 import com.tari.android.wallet.extension.getLastPathComponent
 import com.tari.android.wallet.infrastructure.backup.*
 import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupSettingsRepository
@@ -203,10 +202,6 @@ class GoogleDriveBackupStorage(
             }
             backupFileProcessor.restoreBackupFile(tempFile, password)
             backupFileProcessor.clearTempFolder()
-            // restore successful, turn on automated backup
-            backupSettingsRepository.googleDriveOption =
-                backupSettingsRepository.googleDriveOption!!.copy(lastSuccessDate = SerializableTime(DateTime.now()), isEnable = true)
-            backupSettingsRepository.backupPassword = password
         }
     }
 
