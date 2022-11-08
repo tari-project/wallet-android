@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/root"
     android:layout_width="match_parent"
-    android:layout_height="@dimen/menu_item_height"
+    android:layout_height="wrap_content"
     android:background="@drawable/setting_option_background"
     android:clickable="true"
     android:focusable="true"
@@ -26,7 +26,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical|end"
-            android:layout_marginEnd="22dp"/>
+            android:layout_marginEnd="22dp" />
 
         <com.tari.android.wallet.ui.component.CustomFontTextView
             android:id="@+id/back_up_wallet_label_view"
@@ -111,16 +111,5 @@
                 android:src="@drawable/icon_apply_setting" />
         </LinearLayout>
     </androidx.appcompat.widget.LinearLayoutCompat>
-
-    <com.tari.android.wallet.ui.component.CustomFontTextView
-        android:id="@+id/last_backup_time_text_view"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_vertical|start"
-        android:layout_marginHorizontal="27dp"
-        android:layout_marginTop="8dp"
-        android:textColor="@color/dark_gray"
-        app:customFont="@string/font_medium"
-        tools:text="Last successful backup: Jul 1 2020 at 11:32 PM" />
 
 </LinearLayout>

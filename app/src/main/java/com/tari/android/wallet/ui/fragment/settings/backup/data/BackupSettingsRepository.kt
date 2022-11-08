@@ -3,12 +3,14 @@ package com.tari.android.wallet.ui.fragment.settings.backup.data
 import android.content.Context
 import android.content.SharedPreferences
 import android.net.Uri
+import com.tari.android.wallet.BuildConfig
 import com.tari.android.wallet.data.repository.CommonRepository
 import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefDateTimeDelegate
 import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefGsonDelegate
 import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefStringSecuredDelegate
 import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepository
 import com.tari.android.wallet.data.sharedPrefs.network.formatKey
+import com.tari.android.wallet.util.Constants
 import org.joda.time.DateTime
 
 class BackupSettingsRepository(private val context: Context, private val sharedPrefs: SharedPreferences, networkRepository: NetworkRepository) :
@@ -30,7 +32,11 @@ class BackupSettingsRepository(private val context: Context, private val sharedP
     }
 
     val getOptionList: List<BackupOptionDto>
-        get() = listOfNotNull(localFileOption, googleDriveOption).toList()
+        get() = if (BuildConfig.FLAVOR == Constants.Build.privacyFlavor) {
+            listOfNotNull(localFileOption).toList()
+        } else {
+            listOfNotNull(googleDriveOption).toList()
+        }
 
     fun isShowHintDialog(): Boolean = with(lastBackupDialogShown) { this == null || !this.plusMinutes(delayTimeInMinutes).isAfterNow }
 

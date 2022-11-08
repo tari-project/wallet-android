@@ -5,6 +5,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.tari.android.wallet.R
+import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.extension.addTo
 import com.tari.android.wallet.infrastructure.backup.BackupException
 import com.tari.android.wallet.infrastructure.backup.BackupManager
@@ -24,6 +25,9 @@ import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupOptions
 import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupSettingsRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import org.joda.time.DateTime
+import org.joda.time.format.DateTimeFormat
+import java.util.*
 import javax.inject.Inject
 
 class BackupOptionViewModel : CommonViewModel() {
@@ -46,6 +50,8 @@ class BackupOptionViewModel : CommonViewModel() {
     private val _openFolderSelection = SingleLiveEvent<Unit>()
     val openFolderSelection: LiveData<Unit> = _openFolderSelection
 
+    val lastSuccessDate = MutableLiveData<String>()
+
     init {
         component.inject(this)
     }
@@ -59,6 +65,7 @@ class BackupOptionViewModel : CommonViewModel() {
     fun setup(option: BackupOptions) {
         _option.value = backupSettingsRepository.getOptionList.first { it.type == option }
         _switchChecked.value = _option.value!!.isEnable
+        onBackupStateChanged(EventBus.backupState.publishSubject.value?.backupsStates?.get(option))
     }
 
     fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -150,7 +157,8 @@ class BackupOptionViewModel : CommonViewModel() {
         }.getModular(resourceManager))
     }
 
-    fun onBackupStateChanged(backupState: BackupState) {
+    fun onBackupStateChanged(backupState: BackupState?) {
+        updateLastSuccessfulBackupDate(null)
         when (backupState) {
             BackupState.BackupDisabled -> handleDisabledState()
             BackupState.BackupCheckingStorage -> handleCheckingStorageState()
@@ -158,6 +166,7 @@ class BackupOptionViewModel : CommonViewModel() {
             BackupState.BackupInProgress -> handleInProgressState()
             BackupState.BackupUpToDate -> handleUpToDateState()
             is BackupState.BackupFailed -> handleFailedState()
+            else -> Unit
         }
     }
 
@@ -172,8 +181,10 @@ class BackupOptionViewModel : CommonViewModel() {
     }
 
     private fun handleUpToDateState() {
+        val currentState = backupSettingsRepository.getOptionDto(_option.value!!.type)
         _inProgress.postValue(false)
         _switchChecked.postValue(true)
+        updateLastSuccessfulBackupDate(currentState?.lastSuccessDate?.date)
     }
 
     private fun handleInProgressState() {
@@ -194,5 +205,22 @@ class BackupOptionViewModel : CommonViewModel() {
     private fun handleDisabledState() {
         _inProgress.postValue(false)
         _switchChecked.postValue(false)
+    }
+
+    private fun updateLastSuccessfulBackupDate(lastSuccessfulBackupDate: DateTime?) {
+        val date = lastSuccessfulBackupDate?.let {
+            val date = it.toLocalDateTime()
+            resourceManager.getString(
+                R.string.back_up_wallet_last_successful_backup,
+                BACKUP_DATE_FORMATTER.print(date),
+                BACKUP_TIME_FORMATTER.print(date)
+            )
+        } ?: ""
+        lastSuccessDate.postValue(date)
+    }
+
+    companion object {
+        private val BACKUP_DATE_FORMATTER = DateTimeFormat.forPattern("MMM dd yyyy").withLocale(Locale.ENGLISH)
+        private val BACKUP_TIME_FORMATTER = DateTimeFormat.forPattern("hh:mm a")
     }
 }

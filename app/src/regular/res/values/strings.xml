@@ -1,6 +1,6 @@
 <resources>
     <string name="back_up_wallet_backups_switch_label">Google Drive backups</string>
-    <string name="back_up_wallet_set_backup_password_cta">Secure your backups</string>
+    <string name="back_up_wallet_set_backup_password_cta">Set / change password</string>
     <string name="back_up_wallet_restore">Restore with Google Drive</string>
     <!-- Backup password entry -->
     <string name="change_password_page_title">Password-protect your backups</string>

@@ -28,9 +28,7 @@ import com.tari.android.wallet.ui.fragment.settings.userAutorization.BiometricAu
 import com.tari.android.wallet.yat.YatAdapter
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import org.joda.time.format.DateTimeFormat
 import java.io.IOException
-import java.util.*
 import javax.inject.Inject
 
 class AllSettingsViewModel : CommonViewModel() {
@@ -150,7 +148,6 @@ class AllSettingsViewModel : CommonViewModel() {
             showBackupStorageCheckFailedDialog(resourceManager.getString(check_backup_storage_status_access_error_description))
         } catch (e: Exception) {
             logger.e(e, "Backup storage tampered")
-            updateLastSuccessfulBackupDate()
         }
     }
 
@@ -158,7 +155,6 @@ class AllSettingsViewModel : CommonViewModel() {
         if (backupState == null) {
             backupOption.backupState = PresentationBackupState(Warning)
         } else {
-            updateLastSuccessfulBackupDate()
             val presentationBackupState = when (backupState.backupsState) {
                 is BackupState.BackupDisabled -> PresentationBackupState(Warning)
                 is BackupState.BackupCheckingStorage -> {
@@ -180,23 +176,9 @@ class AllSettingsViewModel : CommonViewModel() {
         _allSettingsOptions.postValue(_allSettingsOptions.value)
     }
 
-    private fun updateLastSuccessfulBackupDate() {
-        val time = backupSettingsRepository.getOptionList.mapNotNull { it.lastSuccessDate }.firstOrNull()?.date?.toLocalDateTime()
-        val text = if (time == null) "" else {
-            resourceManager.getString(back_up_wallet_last_successful_backup, BACKUP_DATE_FORMATTER.print(time), BACKUP_TIME_FORMATTER.print(time))
-        }
-        backupOption.lastBackupDate = text
-        _allSettingsOptions.postValue(_allSettingsOptions.value)
-    }
-
     private fun showBackupStorageCheckFailedDialog(message: String) {
         val errorArgs = ErrorDialogArgs(resourceManager.getString(check_backup_storage_status_error_title), message)
         _modularDialog.postValue(errorArgs.getModular(resourceManager))
-    }
-
-    companion object {
-        private val BACKUP_DATE_FORMATTER = DateTimeFormat.forPattern("MMM dd yyyy").withLocale(Locale.ENGLISH)
-        private val BACKUP_TIME_FORMATTER = DateTimeFormat.forPattern("hh:mm a")
     }
 }
 

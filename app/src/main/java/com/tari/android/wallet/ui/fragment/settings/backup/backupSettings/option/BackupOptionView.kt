@@ -46,6 +46,8 @@ class BackupOptionView : CommonView<BackupOptionViewModel, ViewBackupOptionBindi
         observe(inProgress) { onChangeInProgress(it) }
 
         observe(openFolderSelection) { backupManager.setupStorage(viewModel.option.value!!.type, fragment) }
+
+        observe(lastSuccessDate) { updateLastSuccessDate(it) }
     }
 
     private fun setSwitchCheck(isChecked: Boolean) = with(ui) {
@@ -61,6 +63,11 @@ class BackupOptionView : CommonView<BackupOptionViewModel, ViewBackupOptionBindi
 
     private fun setPermissionSwitchListener() {
         ui.backupSwitch.setOnCheckedChangeListener { _, isChecked -> viewModel.onBackupSwitchChecked(isChecked) }
+    }
+
+    private fun updateLastSuccessDate(date: String) {
+        ui.lastBackupTimeTextView.setVisible(date.isNotBlank(), View.GONE)
+        ui.lastBackupTimeTextView.text = date
     }
 
     override fun setup() = Unit

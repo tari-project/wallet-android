@@ -19,7 +19,6 @@ class SettingsBackupOptionViewHolder(view: ItemSettingsBackupOptionBinding) :
         ui.leftIcon.setImageResource(item.leftIconId)
         ui.cloudBackupStatusProgressView.setColor(color(R.color.all_settings_back_up_status_processing))
         ui.backUpWalletCtaView.setOnClickListener { item.action.invoke() }
-        ui.lastBackupTimeTextView.text = item.lastBackupDate
 
         item.backupState?.let { activateBackupStatusView(it) }
     }
