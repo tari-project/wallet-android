@@ -34,6 +34,8 @@ android {
         buildConfigField("String", "YAT_ORGANIZATION_NAME", "\"${yatProperties.getProperty("yat.name")}\"")
         buildConfigField("String", "YAT_ORGANIZATION_KEY", "\"${yatProperties.getProperty("yat.key")}\"")
         buildConfigField("String", "YAT_ORGANIZATION_RETURN_URL", "\"${yatProperties.getProperty("yat.returnUrl")}\"")
+        def dropboxProperties = loadDropboxProps()
+        buildConfigField("String", "DROPBOX_ACCESS_TOKEN", "\"${dropboxProperties.getProperty('dropbox_key')}\"")
     }
 
     buildTypes {
@@ -81,6 +83,7 @@ android {
     }
 
     applicationVariants.all { variant ->
+        variant.mergedFlavor.manifestPlaceholders.dropboxApiKey = loadDropboxProps().getProperty('dropbox_key')
         if (variant.buildType.name == "debug") {
             variant.mergedFlavor.manifestPlaceholders.sentryPublicDSN = ""
         } else {
@@ -206,6 +209,19 @@ Properties loadYatProps() {
     return properties
 }
 
+Properties loadDropboxProps() {
+    final File yatProps = project.rootProject.file("dropbox.properties")
+    if (!yatProps.exists()) {
+        Files.copy(
+                Paths.get(project.rootProject.file("dropbox-example.properties").absolutePath),
+                Paths.get(yatProps.absolutePath),
+        )
+    }
+    final Properties properties = new Properties()
+    properties.load(yatProps.newDataInputStream())
+    return properties
+}
+
 preBuild.dependsOn("downloadLibwallet")
 
 dependencies {
@@ -297,6 +313,8 @@ dependencies {
     }
     // sentry - crash analytics
     implementation "io.sentry:sentry-android:6.4.2"
+
+    implementation "com.dropbox.core:dropbox-core-sdk:5.4.4"
 
     implementation "com.github.yat-labs:yat-lib-android:0.1.38"
 

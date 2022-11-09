@@ -60,6 +60,7 @@ class BackupOptionViewModel : CommonViewModel() {
         get() = when (option.value!!.type) {
             BackupOptions.Google -> R.string.back_up_wallet_google_title
             BackupOptions.Local -> R.string.back_up_wallet_local_file_title
+            BackupOptions.Dropbox -> R.string.back_up_wallet_dropbox_backup_title
         }
 
     fun setup(option: BackupOptions) {
