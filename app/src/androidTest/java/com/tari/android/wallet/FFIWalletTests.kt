@@ -343,22 +343,16 @@ class FFIWalletTests {
             cancelledTxs.add(cancelledTx)
         }
 
-        override fun onTXOValidationComplete(responseId: BigInteger, status: TransactionValidationStatus) {
-        }
+        override fun onTXOValidationComplete(responseId: BigInteger, status: TransactionValidationStatus) = Unit
 
-        override fun onTxValidationComplete(responseId: BigInteger, status: Boolean) {
-        }
+        override fun onWalletRestoration(result: WalletRestorationResult) = Unit
 
-        override fun onWalletRestoration(result: WalletRestorationResult) {
-        }
+        override fun onDirectSendResult(txId: BigInteger, status: TransactionSendStatus) = Unit
 
-        override fun onDirectSendResult(txId: BigInteger, status: TransactionSendStatus) {
-        }
+        override fun onConnectivityStatus(status: Int) = Unit
 
-        override fun onConnectivityStatus(status: Int) {
-        }
+        override fun onBalanceUpdated(balanceInfo: BalanceInfo) = Unit
 
-        override fun onBalanceUpdated(balanceInfo: BalanceInfo) {
-        }
+        override fun onTxValidationComplete(responseId: BigInteger, status: TransactionValidationStatus) = Unit
     }
 }

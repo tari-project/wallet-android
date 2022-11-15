@@ -10,7 +10,7 @@ apply plugin: "io.sentry.android.gradle"
 android {
     namespace "com.tari.android.wallet"
     compileSdkVersion 33
-    buildToolsVersion "30.0.3"
+    buildToolsVersion '31.0.0'
 
     defaultConfig {
         applicationId "com.tari.android.wallet"
@@ -130,6 +130,7 @@ android {
                     "META-INF/LGPL2.1",
                     "META-INF/INDEX.LIST",
                     "META-INF/ASL2.0",
+                    "META-INF/LICENSE-notice.md",
                     "META-INF/io.netty.versions.properties",
                     "mozilla/public-suffix-list.txt",
                     "xsd/catalog.xml",
@@ -261,15 +262,15 @@ dependencies {
     implementation "androidx.biometric:biometric:1.1.0"
 
     // joda
-    implementation "net.danlew:android.joda:2.11.0.1"
+    implementation 'net.danlew:android.joda:2.12.1'
 
     // parceler
     implementation "org.parceler:parceler-api:1.1.13"
     kapt "org.parceler:parceler:1.1.13"
 
     // dagger - DI
-    implementation "com.google.dagger:dagger:2.44"
-    kapt "com.google.dagger:dagger-compiler:2.44"
+    implementation 'com.google.dagger:dagger:2.44.2'
+    kapt 'com.google.dagger:dagger-compiler:2.44.2'
 
     // rx
     implementation "io.reactivex.rxjava2:rxandroid:2.1.1"
@@ -294,7 +295,7 @@ dependencies {
     implementation "commons-io:commons-io:2.11.0"
 
     // JSON reflection-based (+de)serialization library
-    implementation "com.google.code.gson:gson:2.9.1"
+    implementation 'com.google.code.gson:gson:2.10'
 
     // Retrofit2 - Popular (2020) REST API wrapper with Java interface
     implementation "com.squareup.retrofit2:retrofit:2.9.0"
@@ -302,17 +303,19 @@ dependencies {
     implementation "com.squareup.okhttp3:logging-interceptor:5.0.0-alpha.10"
 
     // Google services & Google drive
+    implementation platform('com.google.firebase:firebase-bom:31.0.3')
+    implementation 'com.google.firebase:firebase-crashlytics'
+
     implementation "com.google.android.gms:play-services-auth:20.3.0"
-    implementation "com.google.firebase:firebase-crashlytics-buildtools:2.9.2"
-    implementation "com.google.http-client:google-http-client-gson:1.42.2"
-    implementation("com.google.api-client:google-api-client-android:2.0.0") {
+    implementation 'com.google.http-client:google-http-client-gson:1.42.3'
+    implementation('com.google.api-client:google-api-client-android:2.0.1') {
         exclude group: "org.apache.httpcomponents"
     }
-    implementation("com.google.apis:google-api-services-drive:v3-rev20220815-2.0.0") {
+    implementation('com.google.apis:google-api-services-drive:v3-rev20221023-2.0.0') {
         exclude group: "org.apache.httpcomponents"
     }
     // sentry - crash analytics
-    implementation "io.sentry:sentry-android:6.4.2"
+    implementation 'io.sentry:sentry-android:6.7.0'
 
     implementation "com.dropbox.core:dropbox-core-sdk:5.4.4"
 
@@ -336,7 +339,7 @@ dependencies {
 
     implementation "net.yslibrary.keyboardvisibilityevent:keyboardvisibilityevent:2.2.0"
 
-    implementation "com.itextpdf:itext7-core:7.2.3"
+    implementation 'com.itextpdf:itext7-core:7.2.4'
 
 
     // test
