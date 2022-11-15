@@ -48,7 +48,7 @@ Java_com_tari_android_wallet_ffi_FFIBalance_jniGetAvailable(
         jobject error) {
     return ExecuteWithError<jbyteArray>(jEnv, error, [&](int *errorPointer) {
         auto pBalance = GetPointerField<TariBalance *>(jEnv, jThis);
-        return getBytesFromUnsignedLongLong(jEnv,balance_get_available(pBalance, errorPointer));
+        return getBytesFromUnsignedLongLong(jEnv, balance_get_available(pBalance, errorPointer));
     });
 }
 
@@ -60,7 +60,7 @@ Java_com_tari_android_wallet_ffi_FFIBalance_jniGetIncoming(
         jobject error) {
     return ExecuteWithError<jbyteArray>(jEnv, error, [&](int *errorPointer) {
         auto pBalance = GetPointerField<TariBalance *>(jEnv, jThis);
-        return getBytesFromUnsignedLongLong(jEnv,balance_get_pending_incoming(pBalance, errorPointer));
+        return getBytesFromUnsignedLongLong(jEnv, balance_get_pending_incoming(pBalance, errorPointer));
     });
 }
 
@@ -72,7 +72,7 @@ Java_com_tari_android_wallet_ffi_FFIBalance_jniGetOutgoing(
         jobject error) {
     return ExecuteWithError<jbyteArray>(jEnv, error, [&](int *errorPointer) {
         auto pBalance = GetPointerField<TariBalance *>(jEnv, jThis);
-        return getBytesFromUnsignedLongLong(jEnv,balance_get_pending_outgoing(pBalance, errorPointer));
+        return getBytesFromUnsignedLongLong(jEnv, balance_get_pending_outgoing(pBalance, errorPointer));
     });
 }
 
@@ -84,7 +84,7 @@ Java_com_tari_android_wallet_ffi_FFIBalance_jniGetTimeLocked(
         jobject error) {
     return ExecuteWithError<jbyteArray>(jEnv, error, [&](int *errorPointer) {
         auto pBalance = GetPointerField<TariBalance *>(jEnv, jThis);
-        return getBytesFromUnsignedLongLong(jEnv,balance_get_time_locked(pBalance, errorPointer));
+        return getBytesFromUnsignedLongLong(jEnv, balance_get_time_locked(pBalance, errorPointer));
     });
 }
 

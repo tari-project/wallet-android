@@ -45,11 +45,10 @@ Java_com_tari_android_wallet_ffi_FFITransactionSendStatus_jniTransactionSendStat
         jobject jThis,
         jobject error
 ) {
-    int errorCode = 0;
-    auto pTransactionSendStatus = GetPointerField<TariTransactionSendStatus *>(jEnv, jThis);
-    unsigned int status = transaction_send_status_decode(pTransactionSendStatus, &errorCode);
-    setErrorCode(jEnv, error, errorCode);
-    return (int) status;
+    return ExecuteWithError<int>(jEnv, error, [&](int *errorPointer) {
+        auto pTransactionSendStatus = GetPointerField<TariTransactionSendStatus *>(jEnv, jThis);
+        return transaction_send_status_decode(pTransactionSendStatus, errorPointer);
+    });
 }
 
 extern "C"

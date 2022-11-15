@@ -46,16 +46,16 @@ Java_com_tari_android_wallet_ffi_FFIByteVector_jniCreate(
         jobject jThis,
         jbyteArray array,
         jobject error) {
-    auto *buffer = reinterpret_cast<unsigned char *>(jEnv->GetByteArrayElements(array, JNI_FALSE));
-    jsize size = jEnv->GetArrayLength(array);
-    for (int i = 0; i < size; i++) {
-        printf("%hhx", buffer[i]);
-    }
-    int errorCode = 0;
-    ByteVector *pByteVector = byte_vector_create(buffer, static_cast<unsigned int>(size), &errorCode);
-    setErrorCode(jEnv, error, errorCode);
-    jEnv->ReleaseByteArrayElements(array, reinterpret_cast<jbyte *>(buffer), JNI_ABORT);
-    SetNullPointerField(jEnv, jThis, pByteVector);
+    ExecuteWithError(jEnv, error, [&](int *errorPointer) {
+        auto *buffer = reinterpret_cast<unsigned char *>(jEnv->GetByteArrayElements(array, JNI_FALSE));
+        jsize size = jEnv->GetArrayLength(array);
+        for (int i = 0; i < size; i++) {
+            printf("%hhx", buffer[i]);
+        }
+        ByteVector *pByteVector = byte_vector_create(buffer, static_cast<unsigned int>(size), errorPointer);
+        jEnv->ReleaseByteArrayElements(array, reinterpret_cast<jbyte *>(buffer), JNI_ABORT);
+        SetNullPointerField(jEnv, jThis, pByteVector);
+    });
 }
 
 extern "C"
@@ -64,11 +64,10 @@ Java_com_tari_android_wallet_ffi_FFIByteVector_jniGetLength(
         JNIEnv *jEnv,
         jobject jThis,
         jobject error) {
-    int errorCode = 0;
-    auto pByteVector = GetPointerField<ByteVector *>(jEnv, jThis);
-    jint length = byte_vector_get_length(pByteVector, &errorCode);
-    setErrorCode(jEnv, error, errorCode);
-    return length;
+    return ExecuteWithError<jint>(jEnv, error, [&](int *errorPointer) {
+        auto pByteVector = GetPointerField<ByteVector *>(jEnv, jThis);
+        return byte_vector_get_length(pByteVector, errorPointer);
+    });
 }
 
 extern "C"
@@ -78,11 +77,10 @@ Java_com_tari_android_wallet_ffi_FFIByteVector_jniGetAt(
         jobject jThis,
         jint index,
         jobject error) {
-    int errorCode = 0;
-    auto pByteVector = GetPointerField<ByteVector *>(jEnv, jThis);
-    jint byte = byte_vector_get_at(pByteVector, static_cast<unsigned int>(index), &errorCode);
-    setErrorCode(jEnv, error, errorCode);
-    return byte;
+    return ExecuteWithError<jint>(jEnv, error, [&](int *errorPointer) {
+        auto pByteVector = GetPointerField<ByteVector *>(jEnv, jThis);
+        return byte_vector_get_at(pByteVector, static_cast<unsigned int>(index), errorPointer);
+    });
 }
 
 extern "C"

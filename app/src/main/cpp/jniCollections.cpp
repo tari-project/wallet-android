@@ -45,11 +45,10 @@ Java_com_tari_android_wallet_ffi_FFIContacts_jniGetLength(
         JNIEnv *jEnv,
         jobject jThis,
         jobject error) {
-    int errorCode = 0;
-    auto pContacts = GetPointerField<TariContacts *>(jEnv, jThis);
-    jint result = contacts_get_length(pContacts, &errorCode);
-    setErrorCode(jEnv, error, errorCode);
-    return result;
+    return ExecuteWithError<jint>(jEnv, error, [&](int *errorPointer) {
+        auto pContacts = GetPointerField<TariContacts *>(jEnv, jThis);
+        return contacts_get_length(pContacts, errorPointer);
+    });
 }
 
 extern "C"
@@ -59,11 +58,10 @@ Java_com_tari_android_wallet_ffi_FFIContacts_jniGetAt(
         jobject jThis,
         jint index,
         jobject error) {
-    int errorCode = 0;
-    auto pContacts = GetPointerField<TariContacts *>(jEnv, jThis);
-    auto result = reinterpret_cast<jlong>(contacts_get_at(pContacts, static_cast<unsigned int>(index), &errorCode));
-    setErrorCode(jEnv, error, errorCode);
-    return result;
+    return ExecuteWithErrorAndCast<TariContact *>(jEnv, error, [&](int *errorPointer) -> TariContact * {
+        auto pContacts = GetPointerField<TariContacts *>(jEnv, jThis);
+        return contacts_get_at(pContacts, static_cast<unsigned int>(index), errorPointer);
+    });
 }
 
 extern "C"
@@ -81,11 +79,10 @@ Java_com_tari_android_wallet_ffi_FFICompletedTxs_jniGetLength(
         JNIEnv *jEnv,
         jobject jThis,
         jobject error) {
-    int errorCode = 0;
-    auto pCompletedTransactions = GetPointerField<TariCompletedTransactions *>(jEnv, jThis);
-    jint result = completed_transactions_get_length(pCompletedTransactions, &errorCode);
-    setErrorCode(jEnv, error, errorCode);
-    return result;
+    return ExecuteWithError<jint>(jEnv, error, [&](int *errorPointer) {
+        auto pCompletedTransactions = GetPointerField<TariCompletedTransactions *>(jEnv, jThis);
+        return completed_transactions_get_length(pCompletedTransactions, errorPointer);
+    });
 }
 
 extern "C"
@@ -95,13 +92,10 @@ Java_com_tari_android_wallet_ffi_FFICompletedTxs_jniGetAt(
         jobject jThis,
         jint index,
         jobject error) {
-    int errorCode = 0;
-    auto pCompletedTransactions = GetPointerField<TariCompletedTransactions *>(jEnv, jThis);
-    auto result = reinterpret_cast<jlong>(completed_transactions_get_at(pCompletedTransactions,
-                                                                        static_cast<unsigned int>(index),
-                                                                        &errorCode));
-    setErrorCode(jEnv, error, errorCode);
-    return result;
+    return ExecuteWithErrorAndCast<TariCompletedTransaction *>(jEnv, error, [&](int *errorPointer) {
+        auto pCompletedTransactions = GetPointerField<TariCompletedTransactions *>(jEnv, jThis);
+        return completed_transactions_get_at(pCompletedTransactions, static_cast<unsigned int>(index), errorPointer);
+    });
 }
 
 extern "C"
@@ -119,11 +113,10 @@ Java_com_tari_android_wallet_ffi_FFIPendingInboundTxs_jniGetLength(
         JNIEnv *jEnv,
         jobject jThis,
         jobject error) {
-    int errorCode = 0;
-    auto pInboundTxs = GetPointerField<TariPendingInboundTransactions *>(jEnv, jThis);
-    jint result = pending_inbound_transactions_get_length(pInboundTxs, &errorCode);
-    setErrorCode(jEnv, error, errorCode);
-    return result;
+    return ExecuteWithError<jint>(jEnv, error, [&](int *errorPointer) {
+        auto pInboundTxs = GetPointerField<TariPendingInboundTransactions *>(jEnv, jThis);
+        return pending_inbound_transactions_get_length(pInboundTxs, errorPointer);
+    });
 }
 
 extern "C"
@@ -133,17 +126,10 @@ Java_com_tari_android_wallet_ffi_FFIPendingInboundTxs_jniGetAt(
         jobject jThis,
         jint index,
         jobject error) {
-    int errorCode = 0;
-    auto pInboundTxs = GetPointerField<TariPendingInboundTransactions *>(jEnv, jThis);
-    auto result = reinterpret_cast<jlong>(
-            pending_inbound_transactions_get_at(
-                    pInboundTxs,
-                    static_cast<unsigned int>(index),
-                    &errorCode
-            )
-    );
-    setErrorCode(jEnv, error, errorCode);
-    return result;
+    return ExecuteWithErrorAndCast<TariPendingInboundTransaction *>(jEnv, error, [&](int *errorPointer) {
+        auto pInboundTxs = GetPointerField<TariPendingInboundTransactions *>(jEnv, jThis);
+        return pending_inbound_transactions_get_at(pInboundTxs, static_cast<unsigned int>(index), errorPointer);
+    });
 }
 
 extern "C"
@@ -162,11 +148,10 @@ Java_com_tari_android_wallet_ffi_FFIPendingOutboundTxs_jniGetLength(
         JNIEnv *jEnv,
         jobject jThis,
         jobject error) {
-    int errorCode = 0;
-    auto pOutboundTxs = GetPointerField<TariPendingOutboundTransactions *>(jEnv, jThis);
-    jint result = pending_outbound_transactions_get_length(pOutboundTxs, &errorCode);
-    setErrorCode(jEnv, error, errorCode);
-    return result;
+    return ExecuteWithError<jint>(jEnv, error, [&](int *errorPointer) {
+        auto pOutboundTxs = GetPointerField<TariPendingOutboundTransactions *>(jEnv, jThis);
+        return pending_outbound_transactions_get_length(pOutboundTxs, errorPointer);
+    });
 }
 
 extern "C"
@@ -176,17 +161,10 @@ Java_com_tari_android_wallet_ffi_FFIPendingOutboundTxs_jniGetAt(
         jobject jThis,
         jint index,
         jobject error) {
-    int errorCode = 0;
-    auto pOutboundTxs = GetPointerField<TariPendingOutboundTransactions *>(jEnv, jThis);
-    auto result = reinterpret_cast<jlong>(
-            pending_outbound_transactions_get_at(
-                    pOutboundTxs,
-                    static_cast<unsigned int>(index),
-                    &errorCode
-            )
-    );
-    setErrorCode(jEnv, error, errorCode);
-    return result;
+    return ExecuteWithErrorAndCast<TariPendingOutboundTransaction *>(jEnv, error, [&](int *errorPointer) {
+        auto pOutboundTxs = GetPointerField<TariPendingOutboundTransactions *>(jEnv, jThis);
+        return pending_outbound_transactions_get_at(pOutboundTxs, static_cast<unsigned int>(index), errorPointer);
+    });
 }
 
 extern "C"

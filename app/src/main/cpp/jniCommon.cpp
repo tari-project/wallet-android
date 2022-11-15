@@ -78,7 +78,6 @@ inline void SetNullPointerField(JNIEnv *jEnv, jobject jThis, T pointer) {
     SetPointerField(jEnv, jThis, reinterpret_cast<jlong>(pointer));
 }
 
-
 // function included in multiple source files must be inline
 inline jbyteArray getBytesFromUnsignedLongLong(JNIEnv *jEnv, unsigned long long value) {
     const size_t size = sizeof(unsigned long long int);
@@ -114,4 +113,16 @@ inline G ExecuteWithError(JNIEnv *jEnv, jobject error, std::function<G(int*)> fu
     G result = fun(&errorCode);
     setErrorCode(jEnv, error, errorCode);
     return result;
+}
+
+inline void ExecuteWithError(JNIEnv *jEnv, jobject error, std::function<void(int*)> fun) {
+    int errorCode = 0;
+    fun(&errorCode);
+    setErrorCode(jEnv, error, errorCode);
+}
+
+template <typename G>
+inline jlong ExecuteWithErrorAndCast(JNIEnv *jEnv, jobject error, std::function<G(int*)> fun) {
+    G result = ExecuteWithError(jEnv, error, fun);
+    return reinterpret_cast<jlong>(result);
 }

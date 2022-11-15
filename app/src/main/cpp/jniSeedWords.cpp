@@ -53,11 +53,13 @@ JNIEXPORT void JNICALL
 Java_com_tari_android_wallet_ffi_FFISeedWords_jniGetMnemonicWordListForLanguage(
         JNIEnv *jEnv,
         jobject jThis,
-        jstring language) {
-    int errorCode = 0;
-    const char *pLanguage = jEnv->GetStringUTFChars(language, JNI_FALSE);
-    TariSeedWords *pSeedWords = seed_words_get_mnemonic_word_list_for_language(pLanguage, &errorCode);
-    SetPointerField(jEnv, jThis, reinterpret_cast<jlong>(pSeedWords));
+        jstring language,
+        jobject error) {
+    ExecuteWithError(jEnv, error, [&](int *errorPointer) {
+        const char *pLanguage = jEnv->GetStringUTFChars(language, JNI_FALSE);
+        TariSeedWords *pSeedWords = seed_words_get_mnemonic_word_list_for_language(pLanguage, errorPointer);
+        SetPointerField(jEnv, jThis, reinterpret_cast<jlong>(pSeedWords));
+    });
 }
 
 extern "C"
@@ -67,13 +69,13 @@ Java_com_tari_android_wallet_ffi_FFISeedWords_jniPushWord(
         jobject jThis,
         jstring jWord,
         jobject error) {
-    int errorCode = 0;
-    auto pSeedWords = GetPointerField<TariSeedWords *>(jEnv, jThis);
-    const char *pWord = jEnv->GetStringUTFChars(jWord, JNI_FALSE);
-    jint result = seed_words_push_word(pSeedWords, pWord, &errorCode);
-    jEnv->ReleaseStringUTFChars(jWord, pWord);
-    setErrorCode(jEnv, error, errorCode);
-    return result;
+    return ExecuteWithError<jint>(jEnv, error, [&](int *errorPointer) {
+        auto pSeedWords = GetPointerField<TariSeedWords *>(jEnv, jThis);
+        const char *pWord = jEnv->GetStringUTFChars(jWord, JNI_FALSE);
+        jint result = seed_words_push_word(pSeedWords, pWord, errorPointer);
+        jEnv->ReleaseStringUTFChars(jWord, pWord);
+        return result;
+    });
 }
 
 extern "C"
@@ -82,11 +84,10 @@ Java_com_tari_android_wallet_ffi_FFISeedWords_jniGetLength(
         JNIEnv *jEnv,
         jobject jThis,
         jobject error) {
-    int errorCode = 0;
-    auto pSeedWords = GetPointerField<TariSeedWords *>(jEnv, jThis);
-    jint result = seed_words_get_length(pSeedWords, &errorCode);
-    setErrorCode(jEnv, error, errorCode);
-    return result;
+    return ExecuteWithError<jint>(jEnv, error, [&](int *errorPointer) {
+        auto pSeedWords = GetPointerField<TariSeedWords *>(jEnv, jThis);
+        return seed_words_get_length(pSeedWords, errorPointer);
+    });
 }
 
 extern "C"
@@ -96,13 +97,13 @@ Java_com_tari_android_wallet_ffi_FFISeedWords_jniGetAt(
         jobject jThis,
         jint index,
         jobject error) {
-    int errorCode = 0;
-    auto pSeedWords = GetPointerField<TariSeedWords *>(jEnv, jThis);
-    const char *pWord = seed_words_get_at(pSeedWords, static_cast<unsigned int>(index), &errorCode);
-    setErrorCode(jEnv, error, errorCode);
-    jstring result = jEnv->NewStringUTF(pWord);
-    string_destroy(const_cast<char *>(pWord));
-    return result;
+    return ExecuteWithError<jstring>(jEnv, error, [&](int *errorPointer) {
+        auto pSeedWords = GetPointerField<TariSeedWords *>(jEnv, jThis);
+        const char *pWord = seed_words_get_at(pSeedWords, static_cast<unsigned int>(index), errorPointer);
+        jstring result = jEnv->NewStringUTF(pWord);
+        string_destroy(const_cast<char *>(pWord));
+        return result;
+    });
 }
 
 extern "C"

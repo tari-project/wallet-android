@@ -48,19 +48,19 @@ Java_com_tari_android_wallet_ffi_FFIOutputFeatures_jniCreate(
         jlong maturity,
         jobject metadata,
         jobject error) {
-    int errorCode = 0;
-    auto pMetadata = GetPointerField<ByteVector *>(jEnv, metadata);
+    ExecuteWithError(jEnv, error, [&](int *errorPointer) {
+        auto pMetadata = GetPointerField<ByteVector *>(jEnv, metadata);
 
-    TariOutputFeatures *pOutputFeatures = output_features_create_from_bytes(
-            version,
-            //todo
-            0,
-            maturity,
-            pMetadata,
-            &errorCode);
+        TariOutputFeatures *pOutputFeatures = output_features_create_from_bytes(
+                version,
+                //todo
+                0,
+                maturity,
+                pMetadata,
+                errorPointer);
 
-    SetPointerField(jEnv, jThis, reinterpret_cast<jlong>(pOutputFeatures));
-    setErrorCode(jEnv, error, errorCode);
+        SetPointerField(jEnv, jThis, reinterpret_cast<jlong>(pOutputFeatures));
+    });
 }
 
 extern "C"

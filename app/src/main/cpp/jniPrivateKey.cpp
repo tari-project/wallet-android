@@ -46,11 +46,11 @@ Java_com_tari_android_wallet_ffi_FFIPrivateKey_jniCreate(
         jobject jThis,
         jobject jByteVector,
         jobject error) {
-    int errorCode = 0;
-    auto pByteVector = GetPointerField<ByteVector *>(jEnv, jByteVector);
-    auto result = reinterpret_cast<jlong>(private_key_create(pByteVector, &errorCode));
-    setErrorCode(jEnv, error, errorCode);
-    SetPointerField(jEnv, jThis, result);
+    ExecuteWithError(jEnv, error, [&](int *errorPointer) {
+        auto pByteVector = GetPointerField<ByteVector *>(jEnv, jByteVector);
+        auto result = reinterpret_cast<jlong>(private_key_create(pByteVector, errorPointer));
+        SetPointerField(jEnv, jThis, result);
+    });
 }
 
 extern "C"
@@ -68,12 +68,12 @@ Java_com_tari_android_wallet_ffi_FFIPrivateKey_jniFromHex(
         jobject jThis,
         jstring jHexStr,
         jobject error) {
-    int errorCode = 0;
-    const char *pStr = jEnv->GetStringUTFChars(jHexStr, JNI_FALSE);
-    TariPrivateKey *pPrivateKey = private_key_from_hex(pStr, &errorCode);
-    setErrorCode(jEnv, error, errorCode);
-    jEnv->ReleaseStringUTFChars(jHexStr, pStr);
-    SetPointerField(jEnv, jThis, reinterpret_cast<jlong>(pPrivateKey));
+    ExecuteWithError(jEnv, error, [&](int *errorPointer) {
+        const char *pStr = jEnv->GetStringUTFChars(jHexStr, JNI_FALSE);
+        TariPrivateKey *pPrivateKey = private_key_from_hex(pStr, errorPointer);
+        jEnv->ReleaseStringUTFChars(jHexStr, pStr);
+        SetPointerField(jEnv, jThis, reinterpret_cast<jlong>(pPrivateKey));
+    });
 }
 
 extern "C"
@@ -82,11 +82,10 @@ Java_com_tari_android_wallet_ffi_FFIPrivateKey_jniGetBytes(
         JNIEnv *jEnv,
         jobject jThis,
         jobject error) {
-    int errorCode = 0;
-    auto pPrivateKey = GetPointerField<PrivateKey *>(jEnv, jThis);
-    auto result = reinterpret_cast<jlong>(private_key_get_bytes(pPrivateKey, &errorCode));
-    setErrorCode(jEnv, error, errorCode);
-    return result;
+    return ExecuteWithErrorAndCast<ByteVector *>(jEnv, error, [&](int *errorPointer) {
+        auto pPrivateKey = GetPointerField<PrivateKey *>(jEnv, jThis);
+        return private_key_get_bytes(pPrivateKey, errorPointer);
+    });
 }
 
 extern "C"

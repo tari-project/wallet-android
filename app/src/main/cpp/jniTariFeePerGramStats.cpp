@@ -45,12 +45,10 @@ Java_com_tari_android_wallet_ffi_FFIFeePerGramStats_jniFeePerGramStatsGetLength(
         jobject jThis,
         jobject error
 ) {
-    int errorCode = 0;
-    auto pTariFeePerGramStats = GetPointerField<TariFeePerGramStats *>(jEnv, jThis);
-
-    unsigned int length = fee_per_gram_stats_get_length(pTariFeePerGramStats, &errorCode);
-    setErrorCode(jEnv, error, errorCode);
-    return (int)length;
+    return ExecuteWithError<int>(jEnv, error, [&](int *errorPointer) {
+        auto pTariFeePerGramStats = GetPointerField<TariFeePerGramStats *>(jEnv, jThis);
+        return fee_per_gram_stats_get_length(pTariFeePerGramStats, errorPointer);
+    });
 }
 
 extern "C"
@@ -60,11 +58,10 @@ Java_com_tari_android_wallet_ffi_FFIFeePerGramStats_jniGetAt(
         jobject jThis,
         jint index,
         jobject error) {
-    int errorCode = 0;
-    auto pTariFeePerGramStats = GetPointerField<TariFeePerGramStats *>(jEnv, jThis);
-    auto result = reinterpret_cast<jlong>(fee_per_gram_stats_get_at(pTariFeePerGramStats, static_cast<unsigned int>(index), &errorCode));
-    setErrorCode(jEnv, error, errorCode);
-    return result;
+    return ExecuteWithErrorAndCast<TariFeePerGramStat *>(jEnv, error, [&](int *errorPointer) {
+        auto pTariFeePerGramStats = GetPointerField<TariFeePerGramStats *>(jEnv, jThis);
+        return fee_per_gram_stats_get_at(pTariFeePerGramStats, static_cast<unsigned int>(index), errorPointer);
+    });
 }
 
 extern "C"
