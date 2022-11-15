@@ -100,12 +100,12 @@ class TxDetailsFragment : CommonFragment<FragmentTxDetailsBinding, TxDetailsView
         val viewModel: TxDetailsViewModel by viewModels()
         bindViewModel(viewModel)
 
-        val tx = arguments?.getParcelable<Tx>(TX_EXTRA_KEY)
+        val tx = arguments?.parcelable<Tx>(TX_EXTRA_KEY)
         if (tx != null) {
             viewModel.setTxArg(tx)
         }
 
-        val txId = arguments?.getParcelable<TxId>(TX_ID_EXTRA_KEY)
+        val txId = arguments?.parcelable<TxId>(TX_ID_EXTRA_KEY)
         if (txId != null) {
             viewModel.loadTxById(txId)
         }
@@ -170,7 +170,7 @@ class TxDetailsFragment : CommonFragment<FragmentTxDetailsBinding, TxDetailsView
     }
 
     private fun setUICommands() {
-        ui.backView.setOnClickListener { requireActivity().onBackPressedDispatcher.onBackPressed() }
+        ui.backView.setOnClickListener { requireActivity().onBackPressed() }
         ui.emojiIdSummaryContainerView.setOnClickListener { onEmojiSummaryClicked(it) }
         ui.feeLabelTextView.setOnClickListener { showTxFeeToolTip() }
         ui.addContactButton.setOnClickListener { onAddContactClick() }

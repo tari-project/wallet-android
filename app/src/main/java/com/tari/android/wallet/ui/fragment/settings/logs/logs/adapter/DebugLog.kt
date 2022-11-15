@@ -23,7 +23,7 @@ class DebugLog(var line: String) {
     init {
         if (ffiRegex.matches(line)) {
             val matchResult = ffiRegex.find(line)
-            val (timestamp, source1, source2, level, log) = matchResult!!.destructured
+            val (timestamp, source1, _, level, log) = matchResult!!.destructured
             this.timestamp = timestamp
             this.source1 = source1.replace("[", "").replace("]", "")
             this.source2 = source1.replace("[", "").replace("]", "")

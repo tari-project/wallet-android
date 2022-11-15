@@ -10,6 +10,7 @@ import com.bumptech.glide.request.RequestOptions
 import com.tari.android.wallet.ui.common.gyphy.placeholder.GifPlaceholder
 import com.tari.android.wallet.ui.common.gyphy.repository.GIFItem
 import com.tari.android.wallet.ui.extension.gone
+import com.tari.android.wallet.ui.extension.parcelable
 import com.tari.android.wallet.ui.extension.visible
 
 class GIFContainer(
@@ -44,7 +45,7 @@ class GIFContainer(
         }
 
     init {
-        gifItem = state?.getParcelable(ThumbnailGIFsViewModel.KEY_GIF)
+        gifItem = state?.parcelable(ThumbnailGIFsViewModel.KEY_GIF)
     }
 
     private fun showContainer() {

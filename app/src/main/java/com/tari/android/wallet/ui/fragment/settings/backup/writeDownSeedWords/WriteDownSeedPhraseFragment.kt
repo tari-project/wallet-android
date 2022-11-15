@@ -74,7 +74,7 @@ class WriteDownSeedPhraseFragment : CommonFragment<FragmentWriteDownSeedPhraseBi
 
     private fun setupUI() {
         ui.warningCheckBox.setOnCheckedChangeListener { _, isChecked -> updateContinueButtonState(isChecked) }
-        ui.backCtaView.setOnClickListener { requireActivity().onBackPressedDispatcher.onBackPressed() }
+        ui.backCtaView.setOnClickListener { requireActivity().onBackPressed() }
         ui.continueCtaView.setOnClickListener(ThrottleClick {
             it.animateClick { (requireActivity() as BackupSettingsRouter).toSeedPhraseVerification(this, viewModel.seedWords.value!!) }
         })

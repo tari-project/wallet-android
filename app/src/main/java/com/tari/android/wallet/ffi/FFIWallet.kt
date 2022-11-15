@@ -482,7 +482,7 @@ class FFIWallet(
     /**
      * This callback function cannot be private due to JNI behaviour.
      */
-    @Suppress("MemberVisibilityCanBePrivate")
+    @Suppress("MemberVisibilityCanBePrivate", "UNUSED_PARAMETER")
     fun onContactLivenessDataUpdated(livenessUpdate: FFIPointer) {
         logger.i("OnContactLivenessDataUpdated")
     }

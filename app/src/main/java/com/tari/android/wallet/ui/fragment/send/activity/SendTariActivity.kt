@@ -51,10 +51,7 @@ import com.tari.android.wallet.ui.dialog.modular.modules.body.BodyModule
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonModule
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonStyle
 import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
-import com.tari.android.wallet.ui.extension.color
-import com.tari.android.wallet.ui.extension.hideKeyboard
-import com.tari.android.wallet.ui.extension.showInternetConnectionErrorDialog
-import com.tari.android.wallet.ui.extension.string
+import com.tari.android.wallet.ui.extension.*
 import com.tari.android.wallet.ui.fragment.send.addAmount.AddAmountFragment
 import com.tari.android.wallet.ui.fragment.send.addAmount.AddAmountListener
 import com.tari.android.wallet.ui.fragment.send.addNote.AddNodeListener
@@ -106,7 +103,7 @@ class SendTariActivity : CommonActivity<ActivitySendTariBinding, SendTariViewMod
      * Loads initial fragment.
      */
     private fun loadRootFragment() {
-        val recipientUser = intent.getParcelableExtra<User>("recipientUser")
+        val recipientUser = intent.parcelable<User>("recipientUser")
         if (recipientUser != null) {
             val bundle = Bundle().apply {
                 putParcelable("recipientUser", recipientUser)

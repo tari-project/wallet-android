@@ -36,6 +36,8 @@ import android.os.Parcel
 import android.os.Parcelable
 import com.tari.android.wallet.ffi.FFICompletedTx
 import com.tari.android.wallet.ffi.FFIPendingOutboundTx
+import com.tari.android.wallet.ui.extension.readP
+import com.tari.android.wallet.ui.extension.readS
 import java.math.BigInteger
 
 /**
@@ -105,19 +107,19 @@ class PendingOutboundTx() : Tx(), Parcelable {
     }
 
     private fun readFromParcel(inParcel: Parcel) {
-        id = inParcel.readSerializable() as BigInteger
-        direction = inParcel.readSerializable() as Direction
+        id = inParcel.readS(BigInteger::class.java)
+        direction = inParcel.readS(Direction::class.java)
         val userIsContact = inParcel.readSerializable() == Contact::class.java
         user = if (userIsContact) {
-            inParcel.readParcelable(Contact::class.java.classLoader)!!
+            inParcel.readP(Contact::class.java)
         } else {
-            inParcel.readParcelable(User::class.java.classLoader)!!
+            inParcel.readP(User::class.java)
         }
-        amount = inParcel.readParcelable(MicroTari::class.java.classLoader)!!
-        fee = inParcel.readParcelable(MicroTari::class.java.classLoader)!!
-        timestamp = inParcel.readSerializable() as BigInteger
-        message = inParcel.readString() ?: ""
-        status = inParcel.readSerializable() as TxStatus
+        amount = inParcel.readP(MicroTari::class.java)
+        fee = inParcel.readP(MicroTari::class.java)
+        timestamp = inParcel.readS(BigInteger::class.java)
+        message = inParcel.readString().orEmpty()
+        status = inParcel.readS(TxStatus::class.java)
     }
 
     override fun describeContents(): Int {

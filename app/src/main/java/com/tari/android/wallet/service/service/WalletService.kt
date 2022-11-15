@@ -170,7 +170,7 @@ class WalletService : Service() {
 
     private fun stopService(startId: Int) {
         // stop service
-        stopForeground(true)
+        stopForeground(STOP_FOREGROUND_REMOVE)
         stopSelfResult(startId)
         // stop wallet manager on a separate thread & unsubscribe from events
         EventBus.walletState.unsubscribe(this)
