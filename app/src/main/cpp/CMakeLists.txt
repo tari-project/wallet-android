@@ -83,6 +83,7 @@ add_library(
         jniTariVector.cpp
         jniTariUtxo.cpp
         jniTariCoinPreview.cpp
+        jniTariTransactionSendStatus.cpp
 )
 
 find_library(

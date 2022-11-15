@@ -1078,53 +1078,53 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniPreviewSplitUtxos(
     return result;
 }
 
-extern "C"
-JNIEXPORT jstring JNICALL
-Java_com_tari_android_wallet_ffi_FFIWallet_jniSignMessage(
-        JNIEnv *jEnv,
-        jobject jThis,
-        jstring jMessage,
-        jobject error) {
-    int errorCode = 0;
-    int *errorCodePointer = &errorCode;
-    jlong lWallet = GetPointerField(jEnv, jThis);
-    auto *pWallet = reinterpret_cast<TariWallet *>(lWallet);
-    const char *pMessage = jEnv->GetStringUTFChars(jMessage, JNI_FALSE);
-    char *pSignature = wallet_sign_message(pWallet, pMessage, errorCodePointer);
-    setErrorCode(jEnv, error, errorCode);
-    jEnv->ReleaseStringUTFChars(jMessage, pMessage);
-    jstring result = jEnv->NewStringUTF(pSignature);
-    string_destroy(pSignature);
-    return result;
-}
-
-extern "C"
-JNIEXPORT jboolean JNICALL
-Java_com_tari_android_wallet_ffi_FFIWallet_jniVerifyMessageSignature(
-        JNIEnv *jEnv,
-        jobject jThis,
-        jobject jpPublicKey,
-        jstring jMessage,
-        jstring jHexSignatureNonce,
-        jobject error) {
-    int errorCode = 0;
-    int *errorCodePointer = &errorCode;
-    jlong lWallet = GetPointerField(jEnv, jThis);
-    auto *pWallet = reinterpret_cast<TariWallet *>(lWallet);
-    jlong lPublicKey = GetPointerField(jEnv, jpPublicKey);
-    auto *pContactPublicKey = reinterpret_cast<TariPublicKey *>(lPublicKey);
-    const char *pHexSignatureNonce = jEnv->GetStringUTFChars(jHexSignatureNonce, JNI_FALSE);
-    const char *pMessage = jEnv->GetStringUTFChars(jMessage, JNI_FALSE);
-    auto result = static_cast<jboolean>(
-            wallet_verify_message_signature(
-                    pWallet, pContactPublicKey, pHexSignatureNonce, pMessage, errorCodePointer
-            ) != 0
-    );
-    setErrorCode(jEnv, error, errorCode);
-    jEnv->ReleaseStringUTFChars(jHexSignatureNonce, pHexSignatureNonce);
-    jEnv->ReleaseStringUTFChars(jMessage, pMessage);
-    return result;
-}
+//extern "C"
+//JNIEXPORT jstring JNICALL
+//Java_com_tari_android_wallet_ffi_FFIWallet_jniSignMessage(
+//        JNIEnv *jEnv,
+//        jobject jThis,
+//        jstring jMessage,
+//        jobject error) {
+//    int errorCode = 0;
+//    int *errorCodePointer = &errorCode;
+//    jlong lWallet = GetPointerField(jEnv, jThis);
+//    auto *pWallet = reinterpret_cast<TariWallet *>(lWallet);
+//    const char *pMessage = jEnv->GetStringUTFChars(jMessage, JNI_FALSE);
+//    char *pSignature = wallet_sign_message(pWallet, pMessage, errorCodePointer);
+//    setErrorCode(jEnv, error, errorCode);
+//    jEnv->ReleaseStringUTFChars(jMessage, pMessage);
+//    jstring result = jEnv->NewStringUTF(pSignature);
+//    string_destroy(pSignature);
+//    return result;
+//}
+//
+//extern "C"
+//JNIEXPORT jboolean JNICALL
+//Java_com_tari_android_wallet_ffi_FFIWallet_jniVerifyMessageSignature(
+//        JNIEnv *jEnv,
+//        jobject jThis,
+//        jobject jpPublicKey,
+//        jstring jMessage,
+//        jstring jHexSignatureNonce,
+//        jobject error) {
+//    int errorCode = 0;
+//    int *errorCodePointer = &errorCode;
+//    jlong lWallet = GetPointerField(jEnv, jThis);
+//    auto *pWallet = reinterpret_cast<TariWallet *>(lWallet);
+//    jlong lPublicKey = GetPointerField(jEnv, jpPublicKey);
+//    auto *pContactPublicKey = reinterpret_cast<TariPublicKey *>(lPublicKey);
+//    const char *pHexSignatureNonce = jEnv->GetStringUTFChars(jHexSignatureNonce, JNI_FALSE);
+//    const char *pMessage = jEnv->GetStringUTFChars(jMessage, JNI_FALSE);
+//    auto result = static_cast<jboolean>(
+//            wallet_verify_message_signature(
+//                    pWallet, pContactPublicKey, pHexSignatureNonce, pMessage, errorCodePointer
+//            ) != 0
+//    );
+//    setErrorCode(jEnv, error, errorCode);
+//    jEnv->ReleaseStringUTFChars(jHexSignatureNonce, pHexSignatureNonce);
+//    jEnv->ReleaseStringUTFChars(jMessage, pMessage);
+//    return result;
+//}
 
 extern "C"
 JNIEXPORT jbyteArray JNICALL

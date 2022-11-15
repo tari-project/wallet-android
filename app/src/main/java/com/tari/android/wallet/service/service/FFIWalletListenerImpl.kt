@@ -21,7 +21,6 @@ import io.reactivex.Observable
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import java.math.BigInteger
-import java.util.*
 import java.util.concurrent.*
 
 class FFIWalletListenerImpl(
@@ -253,8 +252,9 @@ class FFIWalletListenerImpl(
 
     private fun sendPushNotificationToTxRecipient(recipientPublicKeyHex: String) {
         // the push notification server accepts lower-case hex strings as of now
-        val fromPublicKeyHex = wallet.getPublicKey().toString().lowercase(Locale.ENGLISH)
-        notificationService.notifyRecipient(recipientPublicKeyHex, fromPublicKeyHex, wallet::signMessage)
+        //todo remove or get back after turning off faucet
+//        val fromPublicKeyHex = wallet.getPublicKey().toString().lowercase(Locale.ENGLISH)
+//        notificationService.notifyRecipient(recipientPublicKeyHex, fromPublicKeyHex, wallet::signMessage)
     }
 
     private fun checkBaseNodeSyncCompletion() {

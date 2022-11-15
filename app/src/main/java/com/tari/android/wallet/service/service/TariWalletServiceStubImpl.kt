@@ -1,7 +1,6 @@
 package com.tari.android.wallet.service.service
 
 import com.orhanobut.logger.Logger
-import com.tari.android.wallet.R
 import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodeSharedRepository
 import com.tari.android.wallet.data.sharedPrefs.testnetFaucet.TestnetFaucetRepository
 import com.tari.android.wallet.data.sharedPrefs.testnetFaucet.TestnetUtxoList
@@ -13,7 +12,6 @@ import com.tari.android.wallet.service.TariWalletService
 import com.tari.android.wallet.service.TariWalletServiceListener
 import com.tari.android.wallet.service.baseNode.BaseNodeSyncState
 import com.tari.android.wallet.service.faucet.TestnetFaucetService
-import com.tari.android.wallet.service.faucet.TestnetTariRequestException
 import com.tari.android.wallet.ui.common.domain.ResourceManager
 import com.tari.android.wallet.util.Constants
 import java.math.BigInteger
@@ -172,42 +170,43 @@ class TariWalletServiceStubImpl(
     }
 
     override fun requestTestnetTari(error: WalletError) {
-        // avoid multiple faucet requests
-        if (testnetFaucetRepository.faucetTestnetTariRequestCompleted) return
-        // get public key
-        val publicKeyHexString = getPublicKeyHexString(error)
-        if (error.code != WalletError.NoError.code || publicKeyHexString == null) {
-            notifyTestnetTariRequestFailed("Service error.")
-            return
-        }
-
-        val message = "$MESSAGE_PREFIX $publicKeyHexString"
-        val signing = wallet.signMessage(message).split("|")
-        val signature = signing[0]
-        val nonce = signing[1]
-
-        testnetFaucetService.requestMaxTestnetTari(publicKeyHexString, signature, nonce, { result ->
-            FFIPublicKey(HexString(result.walletId)).runWithDestroy {
-                FFIContact("TariBot", it).runWithDestroy { contact -> wallet.addUpdateContact(contact) }
-            }
-            // update the keys with sender public key hex
-            result.keys.forEach { key -> key.senderPublicKeyHex = result.walletId }
-            // store the UTXO keys
-            testnetFaucetRepository.testnetTariUTXOKeyList = TestnetUtxoList(result.keys)
-
-            // post event to bus for the listeners
-            EventBus.post(Event.Testnet.TestnetTariRequestSuccessful())
-            // notify external listeners
-            walletServiceListener.listeners.iterator().forEach { it.onTestnetTariRequestSuccess() }
-        }, {
-            val errorMessage = resourceManager.getString(R.string.wallet_service_error_testnet_tari_request) + " " + it.message
-            logger.e(errorMessage + "failed on requesting faucet")
-            if (it is TestnetTariRequestException) {
-                notifyTestnetTariRequestFailed(errorMessage)
-            } else {
-                notifyTestnetTariRequestFailed(resourceManager.getString((R.string.wallet_service_error_no_internet_connection)))
-            }
-        })
+        // todo remove or get back after turning on faucet
+//        // avoid multiple faucet requests
+//        if (testnetFaucetRepository.faucetTestnetTariRequestCompleted) return
+//        // get public key
+//        val publicKeyHexString = getPublicKeyHexString(error)
+//        if (error.code != WalletError.NoError.code || publicKeyHexString == null) {
+//            notifyTestnetTariRequestFailed("Service error.")
+//            return
+//        }
+//
+//        val message = "$MESSAGE_PREFIX $publicKeyHexString"
+//        val signing = wallet.signMessage(message).split("|")
+//        val signature = signing[0]
+//        val nonce = signing[1]
+//
+//        testnetFaucetService.requestMaxTestnetTari(publicKeyHexString, signature, nonce, { result ->
+//            FFIPublicKey(HexString(result.walletId)).runWithDestroy {
+//                FFIContact("TariBot", it).runWithDestroy { contact -> wallet.addUpdateContact(contact) }
+//            }
+//            // update the keys with sender public key hex
+//            result.keys.forEach { key -> key.senderPublicKeyHex = result.walletId }
+//            // store the UTXO keys
+//            testnetFaucetRepository.testnetTariUTXOKeyList = TestnetUtxoList(result.keys)
+//
+//            // post event to bus for the listeners
+//            EventBus.post(Event.Testnet.TestnetTariRequestSuccessful())
+//            // notify external listeners
+//            walletServiceListener.listeners.iterator().forEach { it.onTestnetTariRequestSuccess() }
+//        }, {
+//            val errorMessage = resourceManager.getString(R.string.wallet_service_error_testnet_tari_request) + " " + it.message
+//            logger.e(errorMessage + "failed on requesting faucet")
+//            if (it is TestnetTariRequestException) {
+//                notifyTestnetTariRequestFailed(errorMessage)
+//            } else {
+//                notifyTestnetTariRequestFailed(resourceManager.getString((R.string.wallet_service_error_no_internet_connection)))
+//            }
+//        })
     }
 
     override fun importTestnetUTXO(txMessage: String, error: WalletError): CompletedTx? {

@@ -145,12 +145,12 @@ class FFIWalletTests {
         )
     }
 
-    @Test
-    fun signedMessageVerificationWasSuccessful() {
-        val message = "Hello"
-        val signature = wallet.signMessage(message)
-        assertTrue(wallet.verifyMessageSignature(wallet.getPublicKey(), message, signature))
-    }
+//    @Test
+//    fun signedMessageVerificationWasSuccessful() {
+//        val message = "Hello"
+//        val signature = wallet.signMessage(message)
+//        assertTrue(wallet.verifyMessageSignature(wallet.getPublicKey(), message, signature))
+//    }
 
     @Test
     fun testContacts() {
