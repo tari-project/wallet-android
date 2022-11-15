@@ -45,7 +45,10 @@ import android.view.animation.DecelerateInterpolator
 import android.widget.ProgressBar
 import android.widget.ScrollView
 import android.widget.TextView
-import androidx.annotation.*
+import androidx.annotation.ColorRes
+import androidx.annotation.DimenRes
+import androidx.annotation.DrawableRes
+import androidx.annotation.StringRes
 import androidx.appcompat.widget.AppCompatEditText
 import androidx.core.animation.addListener
 import androidx.core.graphics.BlendModeColorFilterCompat
@@ -289,7 +292,7 @@ fun AppCompatEditText.setSelectionToEnd() {
 /**
  * Makes the given view clickable again.
  */
-private class ClickEnablingRunnable(@NonNull view: View) : Runnable {
+private class ClickEnablingRunnable(view: View) : Runnable {
 
     private val viewWR: WeakReference<View> = WeakReference(view)
 

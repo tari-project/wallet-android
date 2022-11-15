@@ -61,7 +61,7 @@ class UtxosListFragment : CommonFragment<FragmentUtxosListBinding, UtxosListView
     }
 
     private fun setupCTA() {
-        ui.backCtaView.setOnClickListener { requireActivity().onBackPressed() }
+        ui.backCtaView.setOnClickListener { requireActivity().onBackPressedDispatcher.onBackPressed() }
         ui.orderingState.setOnClickListener { viewModel.showOrderingSelectionDialog() }
         ui.joinButton.setOnClickListener { viewModel.join() }
         ui.splitButton.setOnClickListener { viewModel.split() }

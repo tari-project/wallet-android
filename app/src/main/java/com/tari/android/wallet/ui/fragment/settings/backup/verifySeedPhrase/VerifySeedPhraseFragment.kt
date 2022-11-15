@@ -44,9 +44,9 @@ import androidx.core.view.get
 import androidx.fragment.app.viewModels
 import com.tari.android.wallet.databinding.FragmentVerifySeedPhraseBinding
 import com.tari.android.wallet.extension.observe
-import com.tari.android.wallet.ui.fragment.settings.backup.activity.BackupSettingsRouter
 import com.tari.android.wallet.ui.common.CommonFragment
 import com.tari.android.wallet.ui.extension.*
+import com.tari.android.wallet.ui.fragment.settings.backup.activity.BackupSettingsRouter
 
 class VerifySeedPhraseFragment : CommonFragment<FragmentVerifySeedPhraseBinding, VerifySeedPhraseViewModel>() {
 
@@ -69,7 +69,7 @@ class VerifySeedPhraseFragment : CommonFragment<FragmentVerifySeedPhraseBinding,
     private fun setupUI() {
         fillSelectableWordsContainer()
         fillSelectedWordsContainer()
-        ui.backCtaView.setOnClickListener(ThrottleClick { requireActivity().onBackPressed() })
+        ui.backCtaView.setOnClickListener(ThrottleClick { requireActivity().onBackPressedDispatcher.onBackPressed() })
         ui.continueCtaView.setOnClickListener(ThrottleClick { it.animateClick { viewModel.verify() } })
     }
 

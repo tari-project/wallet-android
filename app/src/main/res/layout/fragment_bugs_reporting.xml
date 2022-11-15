@@ -59,7 +59,7 @@
                 android:singleLine="true"
                 android:text="@string/bugs_reporting_description"
                 android:textColor="@color/black"
-                android:textSize="13dp"
+                android:textSize="13sp"
                 app:customFont="@string/font_medium" />
 
             <com.tari.android.wallet.ui.component.CustomFontEditText
@@ -108,7 +108,7 @@
                 android:singleLine="true"
                 android:text="@string/bugs_reporting_description"
                 android:textColor="@color/black"
-                android:textSize="13dp"
+                android:textSize="13sp"
                 app:customFont="@string/font_medium" />
 
             <FrameLayout
@@ -140,7 +140,7 @@
                 android:layout_marginBottom="20dp"
                 android:text="@string/bugs_reporting_additional_info"
                 android:textColor="@color/dark_gray"
-                android:textSize="14dp"
+                android:textSize="14sp"
                 app:customFont="@string/font_medium" />
 
             <com.tari.android.wallet.ui.component.CustomFontButton

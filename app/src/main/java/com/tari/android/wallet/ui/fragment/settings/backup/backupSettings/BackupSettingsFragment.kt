@@ -84,7 +84,7 @@ class BackupSettingsFragment : CommonFragment<FragmentWalletBackupSettingsBindin
     }
 
     private fun setupCTAs() = with(ui) {
-        backCtaView.setOnClickListener(ThrottleClick { requireActivity().onBackPressed() })
+        backCtaView.setOnClickListener(ThrottleClick { requireActivity().onBackPressedDispatcher.onBackPressed() })
         backupWithRecoveryPhraseCtaView.setOnClickListener(ThrottleClick { viewModel.onBackupWithRecoveryPhrase() })
         backupWalletToCloudCtaView.setOnClickListener(ThrottleClick { viewModel.onBackupToCloud() })
         updatePasswordCtaView.setOnClickListener(ThrottleClick { viewModel.onUpdatePassword() })

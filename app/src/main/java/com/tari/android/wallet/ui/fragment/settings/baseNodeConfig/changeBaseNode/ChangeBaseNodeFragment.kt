@@ -78,7 +78,7 @@ class ChangeBaseNodeFragment : CommonFragment<FragmentBaseNodeChangeBinding, Cha
     }
 
     private fun setupUI() = with(ui) {
-        backCtaView.setOnThrottledClickListener { requireActivity().onBackPressed() }
+        backCtaView.setOnThrottledClickListener { requireActivity().onBackPressedDispatcher.onBackPressed() }
         addBaseNodeButton.setOnThrottledClickListener { (requireActivity() as BaseNodeRouter).toAddCustomBaseNode() }
         baseNodesList.adapter = adapter
         baseNodesList.layoutManager = LinearLayoutManager(requireContext())

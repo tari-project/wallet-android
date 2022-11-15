@@ -42,7 +42,7 @@ object NativeLoader {
             }
 
             out.close()
-            destLocalFile.setReadable(true, false)
+            destLocalFile.setReadable(true, true)
             destLocalFile.setExecutable(true, false)
             destLocalFile.setWritable(true)
 
@@ -82,7 +82,7 @@ object NativeLoader {
                         return fileNativeBin
                 }
             }
-            var folder = Build.CPU_ABI
+            var folder = Build.SUPPORTED_ABIS.first()
             val javaArch = System.getProperty("os.arch")
 
             if (javaArch != null && javaArch.contains("686")) {

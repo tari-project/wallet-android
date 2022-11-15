@@ -46,7 +46,7 @@ import java.nio.charset.StandardCharsets
  *
  * @author The Tari Development Team
  */
-class LogFileObserver(logFilePath: String) : FileObserver(logFilePath) {
+class LogFileObserver(logFilePath: String) : FileObserver(File(logFilePath)) {
 
     private val logTag = "FFI"
     private val logFile = File(logFilePath)
