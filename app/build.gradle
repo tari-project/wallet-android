@@ -157,7 +157,7 @@ android {
         }
     }
     lint {
-        disable "NewApi", "LogNotTimber", "StringFormatInTimber", "ThrowableNotAtBeginning", "BinaryOperationInTimber", "TimberArgCount", "TimberArgTypes", "TimberTagLength"
+        disable "NewApi", "TimberExceptionLogging", "LogNotTimber", "StringFormatInTimber", "ThrowableNotAtBeginning", "BinaryOperationInTimber", "TimberArgCount", "TimberArgTypes", "TimberTagLength"
     }
 
     configurations.all {
@@ -319,7 +319,6 @@ dependencies {
     implementation "com.github.yat-labs:yat-lib-android:0.1.38"
 
 
-
     // custom libraries region
     // flex layout
     implementation "com.google.android.flexbox:flexbox:3.0.0"
@@ -338,7 +337,6 @@ dependencies {
     implementation "net.yslibrary.keyboardvisibilityevent:keyboardvisibilityevent:2.2.0"
 
     implementation "com.itextpdf:itext7-core:7.2.3"
-
 
 
     // test
