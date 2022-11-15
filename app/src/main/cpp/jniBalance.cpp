@@ -46,15 +46,10 @@ Java_com_tari_android_wallet_ffi_FFIBalance_jniGetAvailable(
         JNIEnv *jEnv,
         jobject jThis,
         jobject error) {
-    int errorCode = 0;
-    int *errorCodePointer = &errorCode;
-    auto pBalance = GetPointerField<TariBalance *>(jEnv, jThis);
-    jbyteArray result = getBytesFromUnsignedLongLong(
-            jEnv,
-            balance_get_available(pBalance, errorCodePointer)
-    );
-    setErrorCode(jEnv, error, errorCode);
-    return result;
+    return ExecuteWithError<jbyteArray>(jEnv, error, [&](int *errorPointer) {
+        auto pBalance = GetPointerField<TariBalance *>(jEnv, jThis);
+        return getBytesFromUnsignedLongLong(jEnv,balance_get_available(pBalance, errorPointer));
+    });
 }
 
 extern "C"
@@ -64,11 +59,11 @@ Java_com_tari_android_wallet_ffi_FFIBalance_jniGetIncoming(
         jobject jThis,
         jobject error) {
     int errorCode = 0;
-    int *errorCodePointer = &errorCode;
+
     auto pBalance = GetPointerField<TariBalance *>(jEnv, jThis);
     jbyteArray result = getBytesFromUnsignedLongLong(
             jEnv,
-            balance_get_pending_incoming(pBalance, errorCodePointer)
+            balance_get_pending_incoming(pBalance, &errorCode)
     );
     setErrorCode(jEnv, error, errorCode);
     return result;
@@ -81,11 +76,10 @@ Java_com_tari_android_wallet_ffi_FFIBalance_jniGetOutgoing(
         jobject jThis,
         jobject error) {
     int errorCode = 0;
-    int *errorCodePointer = &errorCode;
     auto pBalance = GetPointerField<TariBalance *>(jEnv, jThis);
     jbyteArray result = getBytesFromUnsignedLongLong(
             jEnv,
-            balance_get_pending_outgoing(pBalance, errorCodePointer)
+            balance_get_pending_outgoing(pBalance, &errorCode)
     );
     setErrorCode(jEnv, error, errorCode);
     return result;
@@ -98,11 +92,10 @@ Java_com_tari_android_wallet_ffi_FFIBalance_jniGetTimeLocked(
         jobject jThis,
         jobject error) {
     int errorCode = 0;
-    int *errorCodePointer = &errorCode;
     auto pBalance = GetPointerField<TariBalance *>(jEnv, jThis);
     jbyteArray result = getBytesFromUnsignedLongLong(
             jEnv,
-            balance_get_time_locked(pBalance, errorCodePointer)
+            balance_get_time_locked(pBalance, &errorCode)
     );
     setErrorCode(jEnv, error, errorCode);
     return result;

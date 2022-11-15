@@ -46,11 +46,9 @@ Java_com_tari_android_wallet_ffi_FFIFeePerGramStats_jniFeePerGramStatsGetLength(
         jobject error
 ) {
     int errorCode = 0;
-    int *errorCodePointer = &errorCode;
-
     auto pTariFeePerGramStats = GetPointerField<TariFeePerGramStats *>(jEnv, jThis);
 
-    unsigned int length = fee_per_gram_stats_get_length(pTariFeePerGramStats, errorCodePointer);
+    unsigned int length = fee_per_gram_stats_get_length(pTariFeePerGramStats, &errorCode);
     setErrorCode(jEnv, error, errorCode);
     return (int)length;
 }
@@ -63,9 +61,8 @@ Java_com_tari_android_wallet_ffi_FFIFeePerGramStats_jniGetAt(
         jint index,
         jobject error) {
     int errorCode = 0;
-    int *errorCodePointer = &errorCode;
     auto pTariFeePerGramStats = GetPointerField<TariFeePerGramStats *>(jEnv, jThis);
-    auto result = reinterpret_cast<jlong>(fee_per_gram_stats_get_at(pTariFeePerGramStats, static_cast<unsigned int>(index), errorCodePointer));
+    auto result = reinterpret_cast<jlong>(fee_per_gram_stats_get_at(pTariFeePerGramStats, static_cast<unsigned int>(index), &errorCode));
     setErrorCode(jEnv, error, errorCode);
     return result;
 }

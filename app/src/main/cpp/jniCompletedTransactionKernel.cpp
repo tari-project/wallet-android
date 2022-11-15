@@ -46,9 +46,8 @@ Java_com_tari_android_wallet_ffi_FFICompletedTxKernel_jniGetExcess(
         jobject jThis,
         jobject error) {
     int errorCode = 0;
-    int *errorCodePointer = &errorCode;
     auto pKernel = GetPointerField<TariTransactionKernel *>(jEnv, jThis);
-    const char *pStr = transaction_kernel_get_excess_hex(pKernel, errorCodePointer);
+    const char *pStr = transaction_kernel_get_excess_hex(pKernel, &errorCode);
     setErrorCode(jEnv, error, errorCode);
     jstring result = jEnv->NewStringUTF(pStr);
     string_destroy(const_cast<char *>(pStr));
@@ -62,9 +61,8 @@ Java_com_tari_android_wallet_ffi_FFICompletedTxKernel_jniGetExcessPublicNonce(
         jobject jThis,
         jobject error) {
     int errorCode = 0;
-    int *errorCodePointer = &errorCode;
     auto pKernel = GetPointerField<TariTransactionKernel *>(jEnv, jThis);
-    const char *pStr = transaction_kernel_get_excess_public_nonce_hex(pKernel, errorCodePointer);
+    const char *pStr = transaction_kernel_get_excess_public_nonce_hex(pKernel, &errorCode);
     setErrorCode(jEnv, error, errorCode);
     jstring result = jEnv->NewStringUTF(pStr);
     string_destroy(const_cast<char *>(pStr));
@@ -78,9 +76,8 @@ Java_com_tari_android_wallet_ffi_FFICompletedTxKernel_jniGetExcessSignature(
         jobject jThis,
         jobject error) {
     int errorCode = 0;
-    int *errorCodePointer = &errorCode;
     auto pKernel = GetPointerField<TariTransactionKernel *>(jEnv, jThis);
-    const char *pStr = transaction_kernel_get_excess_signature_hex(pKernel, errorCodePointer);
+    const char *pStr = transaction_kernel_get_excess_signature_hex(pKernel, &errorCode);
     setErrorCode(jEnv, error, errorCode);
     jstring result = jEnv->NewStringUTF(pStr);
     string_destroy(const_cast<char *>(pStr));

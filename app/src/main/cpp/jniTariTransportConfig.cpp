@@ -55,10 +55,8 @@ Java_com_tari_android_wallet_ffi_FFITariTransportConfig_jniTCPTransport(
         jstring jpAddress,
         jobject error) {
     int errorCode = 0;
-    int *errorCodePointer = &errorCode;
-
     char *pAddress = const_cast<char *>(jEnv->GetStringUTFChars(jpAddress, JNI_FALSE));
-    TariTransportConfig *pTransport = transport_tcp_create(pAddress, errorCodePointer);
+    TariTransportConfig *pTransport = transport_tcp_create(pAddress, &errorCode);
     jEnv->ReleaseStringUTFChars(jpAddress, pAddress);
     setErrorCode(jEnv, error, errorCode);
     SetPointerField(jEnv, jThis, reinterpret_cast<jlong>(pTransport));
@@ -76,7 +74,6 @@ Java_com_tari_android_wallet_ffi_FFITariTransportConfig_jniTorTransport(
         jstring jpSocksPass,
         jobject error) {
     int errorCode = 0;
-    int *errorCodePointer = &errorCode;
     char *pControl = const_cast<char *>(jEnv->GetStringUTFChars(jpControl, JNI_FALSE));
     auto pTorCookie = GetPointerField<ByteVector *>(jEnv, jpTorCookie);
     char *pSocksUsername = const_cast<char *>(jEnv->GetStringUTFChars(jpSocksUser, JNI_FALSE));
@@ -84,7 +81,7 @@ Java_com_tari_android_wallet_ffi_FFITariTransportConfig_jniTorTransport(
     TariTransportConfig *transport = transport_tor_create(pControl, pTorCookie,
                                                           static_cast<unsigned short>(jPort),
                                                           false,
-                                                          pSocksUsername, pSocksPassword, errorCodePointer);
+                                                          pSocksUsername, pSocksPassword, &errorCode);
     jEnv->ReleaseStringUTFChars(jpControl, pControl);
     jEnv->ReleaseStringUTFChars(jpSocksUser, pSocksUsername);
     jEnv->ReleaseStringUTFChars(jpSocksPass, pSocksPassword);
@@ -99,9 +96,8 @@ Java_com_tari_android_wallet_ffi_FFITariTransportConfig_jniGetMemoryAddress(
         jobject jThis,
         jobject error) {
     int errorCode = 0;
-    int *errorCodePointer = &errorCode;
     auto pTransport = GetPointerField<TariTransportConfig *>(jEnv, jThis);
-    const char *pAddress = transport_memory_get_address(pTransport, errorCodePointer);
+    const char *pAddress = transport_memory_get_address(pTransport, &errorCode);
     setErrorCode(jEnv, error, errorCode);
     jstring result = jEnv->NewStringUTF(pAddress);
     string_destroy(const_cast<char *>(pAddress));

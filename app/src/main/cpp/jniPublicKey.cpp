@@ -47,9 +47,8 @@ Java_com_tari_android_wallet_ffi_FFIPublicKey_jniCreate(
         jobject jByteVector,
         jobject error) {
     int errorCode = 0;
-    int *errorCodePointer = &errorCode;
     auto pByteVector = GetPointerField<ByteVector *>(jEnv, jByteVector);
-    auto result = reinterpret_cast<jlong>(public_key_create(pByteVector, errorCodePointer));
+    auto result = reinterpret_cast<jlong>(public_key_create(pByteVector, &errorCode));
     setErrorCode(jEnv, error, errorCode);
     SetPointerField(jEnv, jThis, result);
 }
@@ -62,9 +61,8 @@ Java_com_tari_android_wallet_ffi_FFIPublicKey_jniFromHex(
         jstring jHexStr,
         jobject error) {
     int errorCode = 0;
-    int *errorCodePointer = &errorCode;
     const char *pStr = jEnv->GetStringUTFChars(jHexStr, JNI_FALSE);
-    TariPublicKey *pPublicKey = public_key_from_hex(pStr, errorCodePointer);
+    TariPublicKey *pPublicKey = public_key_from_hex(pStr, &errorCode);
     setErrorCode(jEnv, error, errorCode);
     jEnv->ReleaseStringUTFChars(jHexStr, pStr);
     SetPointerField(jEnv, jThis, reinterpret_cast<jlong>(pPublicKey));
@@ -78,9 +76,8 @@ Java_com_tari_android_wallet_ffi_FFIPublicKey_jniFromPrivateKey(
         jobject jPrivateKey,
         jobject error) {
     int errorCode = 0;
-    int *errorCodePointer = &errorCode;
     auto pPrivateKey = GetPointerField<TariPrivateKey *>(jEnv, jPrivateKey);
-    auto result = reinterpret_cast<jlong>(public_key_from_private_key(pPrivateKey, errorCodePointer));
+    auto result = reinterpret_cast<jlong>(public_key_from_private_key(pPrivateKey, &errorCode));
     setErrorCode(jEnv, error, errorCode);
     SetPointerField(jEnv, jThis, result);
 }
@@ -93,9 +90,8 @@ Java_com_tari_android_wallet_ffi_FFIPublicKey_jniFromEmojiId(
         jstring jpEmoji,
         jobject error) {
     int errorCode = 0;
-    int *errorCodePointer = &errorCode;
     const char *pStr = jEnv->GetStringUTFChars(jpEmoji, JNI_FALSE);
-    auto result = reinterpret_cast<jlong>(emoji_id_to_public_key(pStr, errorCodePointer));
+    auto result = reinterpret_cast<jlong>(emoji_id_to_public_key(pStr, &errorCode));
     jEnv->ReleaseStringUTFChars(jpEmoji, pStr);
     setErrorCode(jEnv, error, errorCode);
     SetPointerField(jEnv, jThis, result);
@@ -108,9 +104,8 @@ Java_com_tari_android_wallet_ffi_FFIPublicKey_jniGetEmojiId(
         jobject jThis,
         jobject error) {
     int errorCode = 0;
-    int *errorCodePointer = &errorCode;
     auto pPublicKey = GetPointerField<TariPublicKey *>(jEnv, jThis);
-    const char *pEmoji = public_key_to_emoji_id(pPublicKey, errorCodePointer);
+    const char *pEmoji = public_key_to_emoji_id(pPublicKey, &errorCode);
     setErrorCode(jEnv, error, errorCode);
     jstring result = jEnv->NewStringUTF(pEmoji);
     string_destroy(const_cast<char *>(pEmoji));
@@ -124,9 +119,8 @@ Java_com_tari_android_wallet_ffi_FFIPublicKey_jniGetBytes(
         jobject jThis,
         jobject error) {
     int errorCode = 0;
-    int *errorCodePointer = &errorCode;
     auto pPublicKey = GetPointerField<TariPublicKey *>(jEnv, jThis);
-    auto result = reinterpret_cast<jlong>(public_key_get_bytes(pPublicKey, errorCodePointer));
+    auto result = reinterpret_cast<jlong>(public_key_get_bytes(pPublicKey, &errorCode));
     setErrorCode(jEnv, error, errorCode);
     return result;
 }

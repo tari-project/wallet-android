@@ -49,7 +49,6 @@ Java_com_tari_android_wallet_ffi_FFITariCommitmentSignature_jniCommitmentSignatu
         jobject jpv_bytes,
         jobject error) {
     int errorCode = 0;
-    int *errorCodePointer = &errorCode;
 
     auto pPublicNonceBytes = GetPointerField<ByteVector *>(jEnv, jp_public_nonce_bytes);
 
@@ -57,7 +56,7 @@ Java_com_tari_android_wallet_ffi_FFITariCommitmentSignature_jniCommitmentSignatu
 
     auto pvBytes = GetPointerField<ByteVector *>(jEnv, jpv_bytes);
 
-    auto result = reinterpret_cast<jlong>(commitment_signature_create_from_bytes(pPublicNonceBytes, puBytes, pvBytes, errorCodePointer));
+    auto result = reinterpret_cast<jlong>(commitment_signature_create_from_bytes(pPublicNonceBytes, puBytes, pvBytes, &errorCode));
 
     setErrorCode(jEnv, error, errorCode);
     SetPointerField(jEnv, jThis, reinterpret_cast<jlong>(result));

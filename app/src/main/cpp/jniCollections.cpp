@@ -46,9 +46,8 @@ Java_com_tari_android_wallet_ffi_FFIContacts_jniGetLength(
         jobject jThis,
         jobject error) {
     int errorCode = 0;
-    int *errorCodePointer = &errorCode;
     auto pContacts = GetPointerField<TariContacts *>(jEnv, jThis);
-    jint result = contacts_get_length(pContacts, errorCodePointer);
+    jint result = contacts_get_length(pContacts, &errorCode);
     setErrorCode(jEnv, error, errorCode);
     return result;
 }
@@ -61,9 +60,8 @@ Java_com_tari_android_wallet_ffi_FFIContacts_jniGetAt(
         jint index,
         jobject error) {
     int errorCode = 0;
-    int *errorCodePointer = &errorCode;
     auto pContacts = GetPointerField<TariContacts *>(jEnv, jThis);
-    auto result = reinterpret_cast<jlong>(contacts_get_at(pContacts, static_cast<unsigned int>(index), errorCodePointer));
+    auto result = reinterpret_cast<jlong>(contacts_get_at(pContacts, static_cast<unsigned int>(index), &errorCode));
     setErrorCode(jEnv, error, errorCode);
     return result;
 }
@@ -84,9 +82,8 @@ Java_com_tari_android_wallet_ffi_FFICompletedTxs_jniGetLength(
         jobject jThis,
         jobject error) {
     int errorCode = 0;
-    int *errorCodePointer = &errorCode;
     auto pCompletedTransactions = GetPointerField<TariCompletedTransactions *>(jEnv, jThis);
-    jint result = completed_transactions_get_length(pCompletedTransactions, errorCodePointer);
+    jint result = completed_transactions_get_length(pCompletedTransactions, &errorCode);
     setErrorCode(jEnv, error, errorCode);
     return result;
 }
@@ -99,11 +96,10 @@ Java_com_tari_android_wallet_ffi_FFICompletedTxs_jniGetAt(
         jint index,
         jobject error) {
     int errorCode = 0;
-    int *errorCodePointer = &errorCode;
     auto pCompletedTransactions = GetPointerField<TariCompletedTransactions *>(jEnv, jThis);
     auto result = reinterpret_cast<jlong>(completed_transactions_get_at(pCompletedTransactions,
                                                                         static_cast<unsigned int>(index),
-                                                                        errorCodePointer));
+                                                                        &errorCode));
     setErrorCode(jEnv, error, errorCode);
     return result;
 }
@@ -124,9 +120,8 @@ Java_com_tari_android_wallet_ffi_FFIPendingInboundTxs_jniGetLength(
         jobject jThis,
         jobject error) {
     int errorCode = 0;
-    int *errorCodePointer = &errorCode;
     auto pInboundTxs = GetPointerField<TariPendingInboundTransactions *>(jEnv, jThis);
-    jint result = pending_inbound_transactions_get_length(pInboundTxs, errorCodePointer);
+    jint result = pending_inbound_transactions_get_length(pInboundTxs, &errorCode);
     setErrorCode(jEnv, error, errorCode);
     return result;
 }
@@ -139,13 +134,12 @@ Java_com_tari_android_wallet_ffi_FFIPendingInboundTxs_jniGetAt(
         jint index,
         jobject error) {
     int errorCode = 0;
-    int *errorCodePointer = &errorCode;
     auto pInboundTxs = GetPointerField<TariPendingInboundTransactions *>(jEnv, jThis);
     auto result = reinterpret_cast<jlong>(
             pending_inbound_transactions_get_at(
                     pInboundTxs,
                     static_cast<unsigned int>(index),
-                    errorCodePointer
+                    &errorCode
             )
     );
     setErrorCode(jEnv, error, errorCode);
@@ -169,9 +163,8 @@ Java_com_tari_android_wallet_ffi_FFIPendingOutboundTxs_jniGetLength(
         jobject jThis,
         jobject error) {
     int errorCode = 0;
-    int *errorCodePointer = &errorCode;
     auto pOutboundTxs = GetPointerField<TariPendingOutboundTransactions *>(jEnv, jThis);
-    jint result = pending_outbound_transactions_get_length(pOutboundTxs, errorCodePointer);
+    jint result = pending_outbound_transactions_get_length(pOutboundTxs, &errorCode);
     setErrorCode(jEnv, error, errorCode);
     return result;
 }
@@ -184,13 +177,12 @@ Java_com_tari_android_wallet_ffi_FFIPendingOutboundTxs_jniGetAt(
         jint index,
         jobject error) {
     int errorCode = 0;
-    int *errorCodePointer = &errorCode;
     auto pOutboundTxs = GetPointerField<TariPendingOutboundTransactions *>(jEnv, jThis);
     auto result = reinterpret_cast<jlong>(
             pending_outbound_transactions_get_at(
                     pOutboundTxs,
                     static_cast<unsigned int>(index),
-                    errorCodePointer
+                    &errorCode
             )
     );
     setErrorCode(jEnv, error, errorCode);

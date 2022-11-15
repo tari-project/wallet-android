@@ -46,11 +46,9 @@ Java_com_tari_android_wallet_ffi_FFIFeePerGramStat_jniGetOrder(
         jobject error
 ) {
     int errorCode = 0;
-    int *errorCodePointer = &errorCode;
-
     auto pTariFeePerGramStat = GetPointerField<TariFeePerGramStat *>(jEnv, jThis);
 
-    unsigned long long order = fee_per_gram_stat_get_order(pTariFeePerGramStat, errorCodePointer);
+    unsigned long long order = fee_per_gram_stat_get_order(pTariFeePerGramStat, &errorCode);
     setErrorCode(jEnv, error, errorCode);
     return getBytesFromUnsignedLongLong(jEnv, order);
 }
@@ -64,11 +62,9 @@ Java_com_tari_android_wallet_ffi_FFIFeePerGramStat_jniGetMin(
         jobject error
 ) {
     int errorCode = 0;
-    int *errorCodePointer = &errorCode;
-
     auto pTariFeePerGramStat = GetPointerField<TariFeePerGramStat *>(jEnv, jThis);
 
-    unsigned long long order = fee_per_gram_stat_get_min_fee_per_gram(pTariFeePerGramStat, errorCodePointer);
+    unsigned long long order = fee_per_gram_stat_get_min_fee_per_gram(pTariFeePerGramStat, &errorCode);
     setErrorCode(jEnv, error, errorCode);
     return getBytesFromUnsignedLongLong(jEnv, order);
 }
@@ -82,11 +78,9 @@ Java_com_tari_android_wallet_ffi_FFIFeePerGramStat_jniGetMax(
         jobject error
 ) {
     int errorCode = 0;
-    int *errorCodePointer = &errorCode;
-
     auto pTariFeePerGramStat = GetPointerField<TariFeePerGramStat *>(jEnv, jThis);
 
-    unsigned long long order = fee_per_gram_stat_get_max_fee_per_gram(pTariFeePerGramStat, errorCodePointer);
+    unsigned long long order = fee_per_gram_stat_get_max_fee_per_gram(pTariFeePerGramStat, &errorCode);
     setErrorCode(jEnv, error, errorCode);
     return getBytesFromUnsignedLongLong(jEnv, order);
 }
@@ -100,11 +94,9 @@ Java_com_tari_android_wallet_ffi_FFIFeePerGramStat_jniGetAverage(
         jobject error
 ) {
     int errorCode = 0;
-    int *errorCodePointer = &errorCode;
-
     auto pTariFeePerGramStat = GetPointerField<TariFeePerGramStat *>(jEnv, jThis);
 
-    unsigned long long order = fee_per_gram_stat_get_avg_fee_per_gram(pTariFeePerGramStat, errorCodePointer);
+    unsigned long long order = fee_per_gram_stat_get_avg_fee_per_gram(pTariFeePerGramStat, &errorCode);
     setErrorCode(jEnv, error, errorCode);
     return getBytesFromUnsignedLongLong(jEnv, order);
 }

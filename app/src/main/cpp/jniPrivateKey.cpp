@@ -47,9 +47,8 @@ Java_com_tari_android_wallet_ffi_FFIPrivateKey_jniCreate(
         jobject jByteVector,
         jobject error) {
     int errorCode = 0;
-    int *errorCodePointer = &errorCode;
     auto pByteVector = GetPointerField<ByteVector *>(jEnv, jByteVector);
-    auto result = reinterpret_cast<jlong>(private_key_create(pByteVector, errorCodePointer));
+    auto result = reinterpret_cast<jlong>(private_key_create(pByteVector, &errorCode));
     setErrorCode(jEnv, error, errorCode);
     SetPointerField(jEnv, jThis, result);
 }
@@ -70,9 +69,8 @@ Java_com_tari_android_wallet_ffi_FFIPrivateKey_jniFromHex(
         jstring jHexStr,
         jobject error) {
     int errorCode = 0;
-    int *errorCodePointer = &errorCode;
     const char *pStr = jEnv->GetStringUTFChars(jHexStr, JNI_FALSE);
-    TariPrivateKey *pPrivateKey = private_key_from_hex(pStr, errorCodePointer);
+    TariPrivateKey *pPrivateKey = private_key_from_hex(pStr, &errorCode);
     setErrorCode(jEnv, error, errorCode);
     jEnv->ReleaseStringUTFChars(jHexStr, pStr);
     SetPointerField(jEnv, jThis, reinterpret_cast<jlong>(pPrivateKey));
@@ -85,9 +83,8 @@ Java_com_tari_android_wallet_ffi_FFIPrivateKey_jniGetBytes(
         jobject jThis,
         jobject error) {
     int errorCode = 0;
-    int *errorCodePointer = &errorCode;
     auto pPrivateKey = GetPointerField<PrivateKey *>(jEnv, jThis);
-    auto result = reinterpret_cast<jlong>(private_key_get_bytes(pPrivateKey, errorCodePointer));
+    auto result = reinterpret_cast<jlong>(private_key_get_bytes(pPrivateKey, &errorCode));
     setErrorCode(jEnv, error, errorCode);
     return result;
 }

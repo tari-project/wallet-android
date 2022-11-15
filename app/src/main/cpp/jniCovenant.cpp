@@ -47,11 +47,9 @@ Java_com_tari_android_wallet_ffi_FFICovenant_jniCreateFromBytes(
         jobject bytes,
         jobject error) {
     int errorCode = 0;
-    int *errorCodePointer = &errorCode;
-
     auto pBytes = GetPointerField<ByteVector *>(jEnv, bytes);
 
-    TariCovenant *pTariCovenant = covenant_create_from_bytes(pBytes, errorCodePointer);
+    TariCovenant *pTariCovenant = covenant_create_from_bytes(pBytes, &errorCode);
     SetPointerField(jEnv, jThis, reinterpret_cast<jlong>(pTariCovenant));
     setErrorCode(jEnv, error, errorCode);
 }

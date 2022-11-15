@@ -46,10 +46,9 @@ Java_com_tari_android_wallet_ffi_FFICompletedTx_jniGetId(
         jobject jThis,
         jobject error) {
     int errorCode = 0;
-    int *errorCodePointer = &errorCode;
     auto pCompletedTx = GetPointerField<TariCompletedTransaction *>(jEnv, jThis);
     jbyteArray result = getBytesFromUnsignedLongLong(
-            jEnv, completed_transaction_get_transaction_id(pCompletedTx, errorCodePointer));
+            jEnv, completed_transaction_get_transaction_id(pCompletedTx, &errorCode));
     setErrorCode(jEnv, error, errorCode);
     return result;
 }
@@ -61,10 +60,9 @@ Java_com_tari_android_wallet_ffi_FFICompletedTx_jniGetDestinationPublicKey(
         jobject jThis,
         jobject error) {
     int errorCode = 0;
-    int *errorCodePointer = &errorCode;
     auto pCompletedTx = GetPointerField<TariCompletedTransaction *>(jEnv, jThis);
     auto result = reinterpret_cast<jlong>(
-            completed_transaction_get_destination_public_key(pCompletedTx, errorCodePointer)
+            completed_transaction_get_destination_public_key(pCompletedTx, &errorCode)
     );
     setErrorCode(jEnv, error, errorCode);
     return result;
@@ -77,12 +75,11 @@ Java_com_tari_android_wallet_ffi_FFICompletedTx_jniGetSourcePublicKey(
         jobject jThis,
         jobject error) {
     int errorCode = 0;
-    int *errorCodePointer = &errorCode;
     auto pCompletedTx = GetPointerField<TariCompletedTransaction *>(jEnv, jThis);
     auto result = reinterpret_cast<jlong>(
             completed_transaction_get_source_public_key(
                     pCompletedTx,
-                    errorCodePointer
+                    &errorCode
             )
     );
     setErrorCode(jEnv, error, errorCode);
@@ -96,12 +93,11 @@ Java_com_tari_android_wallet_ffi_FFICompletedTx_jniGetTransactionKernel(
         jobject jThis,
         jobject error) {
     int errorCode = 0;
-    int *errorCodePointer = &errorCode;
     auto pCompletedTx = GetPointerField<TariCompletedTransaction *>(jEnv, jThis);
     auto result = reinterpret_cast<jlong>(
             completed_transaction_get_transaction_kernel(
                     pCompletedTx,
-                    errorCodePointer
+                    &errorCode
             )
     );
     setErrorCode(jEnv, error, errorCode);
@@ -115,11 +111,10 @@ Java_com_tari_android_wallet_ffi_FFICompletedTx_jniGetAmount(
         jobject jThis,
         jobject error) {
     int errorCode = 0;
-    int *errorCodePointer = &errorCode;
     auto pCompletedTx = GetPointerField<TariCompletedTransaction *>(jEnv, jThis);
     jbyteArray result = getBytesFromUnsignedLongLong(
             jEnv,
-            completed_transaction_get_amount(pCompletedTx, errorCodePointer)
+            completed_transaction_get_amount(pCompletedTx, &errorCode)
     );
     setErrorCode(jEnv, error, errorCode);
     return result;
@@ -132,11 +127,10 @@ Java_com_tari_android_wallet_ffi_FFICompletedTx_jniGetFee(
         jobject jThis,
         jobject error) {
     int errorCode = 0;
-    int *errorCodePointer = &errorCode;
     auto pCompletedTx = GetPointerField<TariCompletedTransaction *>(jEnv, jThis);
     jbyteArray result = getBytesFromUnsignedLongLong(
             jEnv,
-            completed_transaction_get_fee(pCompletedTx, errorCodePointer)
+            completed_transaction_get_fee(pCompletedTx, &errorCode)
     );
     setErrorCode(jEnv, error, errorCode);
     return result;
@@ -149,11 +143,10 @@ Java_com_tari_android_wallet_ffi_FFICompletedTx_jniGetTimestamp(
         jobject jThis,
         jobject error) {
     int errorCode = 0;
-    int *errorCodePointer = &errorCode;
     auto pCompletedTx = GetPointerField<TariCompletedTransaction *>(jEnv, jThis);
     jbyteArray result = getBytesFromUnsignedLongLong(
             jEnv,
-            completed_transaction_get_timestamp(pCompletedTx, errorCodePointer)
+            completed_transaction_get_timestamp(pCompletedTx, &errorCode)
     );
     setErrorCode(jEnv, error, errorCode);
     return result;
@@ -166,9 +159,8 @@ Java_com_tari_android_wallet_ffi_FFICompletedTx_jniGetMessage(
         jobject jThis,
         jobject error) {
     int errorCode = 0;
-    int *errorCodePointer = &errorCode;
     auto pCompletedTx = GetPointerField<TariCompletedTransaction *>(jEnv, jThis);
-    const char *pMessage = completed_transaction_get_message(pCompletedTx, errorCodePointer);
+    const char *pMessage = completed_transaction_get_message(pCompletedTx, &errorCode);
     setErrorCode(jEnv, error, errorCode);
     jstring result = jEnv->NewStringUTF(pMessage);
     string_destroy(const_cast<char *>(pMessage));
@@ -182,9 +174,8 @@ Java_com_tari_android_wallet_ffi_FFICompletedTx_jniGetStatus(
         jobject jThis,
         jobject error) {
     int errorCode = 0;
-    int *errorCodePointer = &errorCode;
     auto pCompletedTx = GetPointerField<TariCompletedTransaction *>(jEnv, jThis);
-    jint result = reinterpret_cast<jint>(completed_transaction_get_status(pCompletedTx, errorCodePointer));
+    jint result = reinterpret_cast<jint>(completed_transaction_get_status(pCompletedTx, &errorCode));
     setErrorCode(jEnv, error, errorCode);
     return result;
 }
@@ -196,11 +187,10 @@ Java_com_tari_android_wallet_ffi_FFICompletedTx_jniGetConfirmationCount(
         jobject jThis,
         jobject error) {
     int errorCode = 0;
-    int *errorCodePointer = &errorCode;
     auto pCompletedTx = GetPointerField<TariCompletedTransaction *>(jEnv, jThis);
     jbyteArray result = getBytesFromUnsignedLongLong(
             jEnv,
-            completed_transaction_get_confirmations(pCompletedTx, errorCodePointer)
+            completed_transaction_get_confirmations(pCompletedTx, &errorCode)
     );
     setErrorCode(jEnv, error, errorCode);
     return result;
@@ -213,9 +203,8 @@ Java_com_tari_android_wallet_ffi_FFICompletedTx_jniIsOutbound(
         jobject jThis,
         jobject error) {
     int errorCode = 0;
-    int *errorCodePointer = &errorCode;
     auto pCompletedTx = GetPointerField<TariCompletedTransaction *>(jEnv, jThis);
-    auto result = static_cast<jboolean>(completed_transaction_is_outbound(pCompletedTx, errorCodePointer) != 0);
+    auto result = static_cast<jboolean>(completed_transaction_is_outbound(pCompletedTx, &errorCode) != 0);
     setErrorCode(jEnv, error, errorCode);
     return result;
 }
@@ -236,9 +225,8 @@ Java_com_tari_android_wallet_ffi_FFICompletedTx_jniGetCancellationReason(
         jobject jThis,
         jobject error) {
     int errorCode = 0;
-    int *errorCodePointer = &errorCode;
     auto pCompletedTx = GetPointerField<TariCompletedTransaction *>(jEnv, jThis);
-    jint result = reinterpret_cast<jint>(completed_transaction_get_cancellation_reason(pCompletedTx, errorCodePointer));
+    jint result = reinterpret_cast<jint>(completed_transaction_get_cancellation_reason(pCompletedTx, &errorCode));
     setErrorCode(jEnv, error, errorCode);
     return result;
 }

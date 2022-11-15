@@ -107,3 +107,11 @@ inline jboolean setErrorCode(JNIEnv *jEnv, jobject error, jint value) {
     jEnv->SetIntField(error, errorField, value);
     return static_cast<jboolean>(true);
 }
+
+template <typename G>
+inline G ExecuteWithError(JNIEnv *jEnv, jobject error, std::function<G(int*)> fun) {
+    int errorCode = 0;
+    G result = fun(&errorCode);
+    setErrorCode(jEnv, error, errorCode);
+    return result;
+}

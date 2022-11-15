@@ -49,8 +49,6 @@ Java_com_tari_android_wallet_ffi_FFIOutputFeatures_jniCreate(
         jobject metadata,
         jobject error) {
     int errorCode = 0;
-    int *errorCodePointer = &errorCode;
-
     auto pMetadata = GetPointerField<ByteVector *>(jEnv, metadata);
 
     TariOutputFeatures *pOutputFeatures = output_features_create_from_bytes(
@@ -59,7 +57,7 @@ Java_com_tari_android_wallet_ffi_FFIOutputFeatures_jniCreate(
             0,
             maturity,
             pMetadata,
-            errorCodePointer);
+            &errorCode);
 
     SetPointerField(jEnv, jThis, reinterpret_cast<jlong>(pOutputFeatures));
     setErrorCode(jEnv, error, errorCode);

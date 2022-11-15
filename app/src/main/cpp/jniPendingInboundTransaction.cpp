@@ -46,11 +46,10 @@ Java_com_tari_android_wallet_ffi_FFIPendingInboundTx_jniGetId(
         jobject jThis,
         jobject error) {
     int errorCode = 0;
-    int *errorCodePointer = &errorCode;
     auto pInboundTx = GetPointerField<TariPendingInboundTransaction *>(jEnv, jThis);
     jbyteArray result = getBytesFromUnsignedLongLong(
             jEnv,
-            pending_inbound_transaction_get_transaction_id(pInboundTx, errorCodePointer)
+            pending_inbound_transaction_get_transaction_id(pInboundTx, &errorCode)
     );
     setErrorCode(jEnv, error, errorCode);
     return result;
@@ -63,10 +62,9 @@ Java_com_tari_android_wallet_ffi_FFIPendingInboundTx_jniGetSourcePublicKey(
         jobject jThis,
         jobject error) {
     int errorCode = 0;
-    int *errorCodePointer = &errorCode;
     auto pInboundTx = GetPointerField<TariPendingInboundTransaction *>(jEnv, jThis);
     auto result = reinterpret_cast<jlong>(
-            pending_inbound_transaction_get_source_public_key(pInboundTx, errorCodePointer)
+            pending_inbound_transaction_get_source_public_key(pInboundTx, &errorCode)
     );
     setErrorCode(jEnv, error, errorCode);
     return result;
@@ -79,11 +77,10 @@ Java_com_tari_android_wallet_ffi_FFIPendingInboundTx_jniGetAmount(
         jobject jThis,
         jobject error) {
     int errorCode = 0;
-    int *errorCodePointer = &errorCode;
     auto pInboundTx = GetPointerField<TariPendingInboundTransaction *>(jEnv, jThis);
     jbyteArray result = getBytesFromUnsignedLongLong(
             jEnv,
-            pending_inbound_transaction_get_amount(pInboundTx, errorCodePointer)
+            pending_inbound_transaction_get_amount(pInboundTx, &errorCode)
     );
     setErrorCode(jEnv, error, errorCode);
     return result;
@@ -96,9 +93,8 @@ Java_com_tari_android_wallet_ffi_FFIPendingInboundTx_jniGetMessage(
         jobject jThis,
         jobject error) {
     int errorCode = 0;
-    int *errorCodePointer = &errorCode;
     auto pInboundTx = GetPointerField<TariPendingInboundTransaction *>(jEnv, jThis);
-    const char *pMessage = pending_inbound_transaction_get_message(pInboundTx, errorCodePointer);
+    const char *pMessage = pending_inbound_transaction_get_message(pInboundTx, &errorCode);
     setErrorCode(jEnv, error, errorCode);
     jstring result = jEnv->NewStringUTF(pMessage);
     string_destroy(const_cast<char *>(pMessage));
@@ -112,11 +108,10 @@ Java_com_tari_android_wallet_ffi_FFIPendingInboundTx_jniGetTimestamp(
         jobject jThis,
         jobject error) {
     int errorCode = 0;
-    int *errorCodePointer = &errorCode;
     auto pInboundTx = GetPointerField<TariPendingInboundTransaction *>(jEnv, jThis);
     jbyteArray result = getBytesFromUnsignedLongLong(
             jEnv,
-            pending_inbound_transaction_get_timestamp(pInboundTx, errorCodePointer)
+            pending_inbound_transaction_get_timestamp(pInboundTx, &errorCode)
     );
     setErrorCode(jEnv, error, errorCode);
     return result;
@@ -129,9 +124,8 @@ Java_com_tari_android_wallet_ffi_FFIPendingInboundTx_jniGetStatus(
         jobject jThis,
         jobject error) {
     int errorCode = 0;
-    int *errorCodePointer = &errorCode;
     auto pInboundTx = GetPointerField<TariPendingInboundTransaction *>(jEnv, jThis);
-    jint result = reinterpret_cast<jint>(pending_inbound_transaction_get_status(pInboundTx, errorCodePointer));
+    jint result = reinterpret_cast<jint>(pending_inbound_transaction_get_status(pInboundTx, &errorCode));
     setErrorCode(jEnv, error, errorCode);
     return result;
 }

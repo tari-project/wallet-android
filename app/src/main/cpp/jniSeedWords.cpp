@@ -55,9 +55,8 @@ Java_com_tari_android_wallet_ffi_FFISeedWords_jniGetMnemonicWordListForLanguage(
         jobject jThis,
         jstring language) {
     int errorCode = 0;
-    int *errorCodePointer = &errorCode;
     const char *pLanguage = jEnv->GetStringUTFChars(language, JNI_FALSE);
-    TariSeedWords *pSeedWords = seed_words_get_mnemonic_word_list_for_language(pLanguage, errorCodePointer);
+    TariSeedWords *pSeedWords = seed_words_get_mnemonic_word_list_for_language(pLanguage, &errorCode);
     SetPointerField(jEnv, jThis, reinterpret_cast<jlong>(pSeedWords));
 }
 
@@ -69,10 +68,9 @@ Java_com_tari_android_wallet_ffi_FFISeedWords_jniPushWord(
         jstring jWord,
         jobject error) {
     int errorCode = 0;
-    int *errorCodePointer = &errorCode;
     auto pSeedWords = GetPointerField<TariSeedWords *>(jEnv, jThis);
     const char *pWord = jEnv->GetStringUTFChars(jWord, JNI_FALSE);
-    jint result = seed_words_push_word(pSeedWords, pWord, errorCodePointer);
+    jint result = seed_words_push_word(pSeedWords, pWord, &errorCode);
     jEnv->ReleaseStringUTFChars(jWord, pWord);
     setErrorCode(jEnv, error, errorCode);
     return result;
@@ -85,9 +83,8 @@ Java_com_tari_android_wallet_ffi_FFISeedWords_jniGetLength(
         jobject jThis,
         jobject error) {
     int errorCode = 0;
-    int *errorCodePointer = &errorCode;
     auto pSeedWords = GetPointerField<TariSeedWords *>(jEnv, jThis);
-    jint result = seed_words_get_length(pSeedWords, errorCodePointer);
+    jint result = seed_words_get_length(pSeedWords, &errorCode);
     setErrorCode(jEnv, error, errorCode);
     return result;
 }
@@ -100,9 +97,8 @@ Java_com_tari_android_wallet_ffi_FFISeedWords_jniGetAt(
         jint index,
         jobject error) {
     int errorCode = 0;
-    int *errorCodePointer = &errorCode;
     auto pSeedWords = GetPointerField<TariSeedWords *>(jEnv, jThis);
-    const char *pWord = seed_words_get_at(pSeedWords, static_cast<unsigned int>(index), errorCodePointer);
+    const char *pWord = seed_words_get_at(pSeedWords, static_cast<unsigned int>(index), &errorCode);
     setErrorCode(jEnv, error, errorCode);
     jstring result = jEnv->NewStringUTF(pWord);
     string_destroy(const_cast<char *>(pWord));
