@@ -49,8 +49,7 @@ Java_com_tari_android_wallet_ffi_FFICovenant_jniCreateFromBytes(
     int errorCode = 0;
     int *errorCodePointer = &errorCode;
 
-    jlong lBytes = GetPointerField(jEnv, bytes);
-    auto *pBytes = reinterpret_cast<ByteVector *>(lBytes);
+    auto pBytes = GetPointerField<ByteVector *>(jEnv, bytes);
 
     TariCovenant *pTariCovenant = covenant_create_from_bytes(pBytes, errorCodePointer);
     SetPointerField(jEnv, jThis, reinterpret_cast<jlong>(pTariCovenant));
@@ -62,7 +61,6 @@ JNIEXPORT void JNICALL
 Java_com_tari_android_wallet_ffi_FFICovenant_jniDestroy(
         JNIEnv *jEnv,
         jobject jThis) {
-    jlong lCovenant = GetPointerField(jEnv, jThis);
-    covenant_destroy(reinterpret_cast<TariCovenant *>(lCovenant));
-    SetPointerField(jEnv, jThis, reinterpret_cast<jlong>(nullptr));
+    covenant_destroy(GetPointerField<TariCovenant *>(jEnv, jThis));
+    SetNullPointerField(jEnv, jThis);
 }

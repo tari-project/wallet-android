@@ -50,8 +50,7 @@ Java_com_tari_android_wallet_ffi_FFIContact_jniCreate(
     int errorCode = 0;
     int *errorCodePointer = &errorCode;
     const char *pAlias = jEnv->GetStringUTFChars(jAlias, JNI_FALSE);
-    jlong lPublicKey = GetPointerField(jEnv, jPublicKey);
-    auto *pPublicKey = reinterpret_cast<TariPublicKey *>(lPublicKey);
+    auto pPublicKey = GetPointerField<TariPublicKey *>(jEnv, jPublicKey);
     TariContact *pContact = contact_create(pAlias, pPublicKey, errorCodePointer);
     setErrorCode(jEnv, error, errorCode);
     jEnv->ReleaseStringUTFChars(jAlias, pAlias);
@@ -66,8 +65,7 @@ Java_com_tari_android_wallet_ffi_FFIContact_jniGetAlias(
         jobject error) {
     int errorCode = 0;
     int *errorCodePointer = &errorCode;
-    jlong lContact = GetPointerField(jEnv, jThis);
-    auto *pContact = reinterpret_cast<TariContact *>(lContact);
+    auto pContact = GetPointerField<TariContact *>(jEnv, jThis);
     const char *pAlias = contact_get_alias(pContact, errorCodePointer);
     setErrorCode(jEnv, error, errorCode);
     jstring result = jEnv->NewStringUTF(pAlias);
@@ -83,8 +81,7 @@ Java_com_tari_android_wallet_ffi_FFIContact_jniGetPublicKey(
         jobject error) {
     int errorCode = 0;
     int *errorCodePointer = &errorCode;
-    jlong lContact = GetPointerField(jEnv, jThis);
-    auto *pContact = reinterpret_cast<TariContact *>(lContact);
+    auto pContact = GetPointerField<TariContact *>(jEnv, jThis);
     auto result = reinterpret_cast<jlong>(contact_get_public_key(pContact, errorCodePointer));
     setErrorCode(jEnv, error, errorCode);
     return result;
@@ -95,7 +92,6 @@ JNIEXPORT void JNICALL
 Java_com_tari_android_wallet_ffi_FFIContact_jniDestroy(
         JNIEnv *jEnv,
         jobject jThis) {
-    jlong lContact = GetPointerField(jEnv, jThis);
-    contact_destroy(reinterpret_cast<TariContact *>(lContact));
-    SetPointerField(jEnv, jThis, reinterpret_cast<jlong>(nullptr));
+    contact_destroy(GetPointerField<TariContact *>(jEnv, jThis););
+    SetNullPointerField(jEnv, jThis);
 }

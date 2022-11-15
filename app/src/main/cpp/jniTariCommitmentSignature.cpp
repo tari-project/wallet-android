@@ -51,14 +51,11 @@ Java_com_tari_android_wallet_ffi_FFITariCommitmentSignature_jniCommitmentSignatu
     int errorCode = 0;
     int *errorCodePointer = &errorCode;
 
-    jlong jPublicNonceBytes = GetPointerField(jEnv, jp_public_nonce_bytes);
-    auto *pPublicNonceBytes = reinterpret_cast<ByteVector *>(jPublicNonceBytes);
+    auto pPublicNonceBytes = GetPointerField<ByteVector *>(jEnv, jp_public_nonce_bytes);
 
-    jlong juBytes = GetPointerField(jEnv, jpu_bytes);
-    auto *puBytes = reinterpret_cast<ByteVector *>(juBytes);
+    auto puBytes = GetPointerField<ByteVector *>(jEnv, jpu_bytes);
 
-    jlong jvBytes = GetPointerField(jEnv, jpv_bytes);
-    auto *pvBytes = reinterpret_cast<ByteVector *>(jvBytes);
+    auto pvBytes = GetPointerField<ByteVector *>(jEnv, jpv_bytes);
 
     auto result = reinterpret_cast<jlong>(commitment_signature_create_from_bytes(pPublicNonceBytes, puBytes, pvBytes, errorCodePointer));
 
@@ -71,7 +68,6 @@ JNIEXPORT void JNICALL
 Java_com_tari_android_wallet_ffi_FFITariCommitmentSignature_jniDestroy(
         JNIEnv *jEnv,
         jobject jThis) {
-        jlong lByteVector = GetPointerField(jEnv, jThis);
-        commitment_signature_destroy(reinterpret_cast<TariCommitmentSignature *>(lByteVector));
-        SetPointerField(jEnv, jThis, reinterpret_cast<jlong>(nullptr));
+    commitment_signature_destroy(GetPointerField<TariCommitmentSignature *>(jEnv, jThis));
+    SetNullPointerField(jEnv, jThis);
 }

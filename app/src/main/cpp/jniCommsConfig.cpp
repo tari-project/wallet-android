@@ -56,8 +56,7 @@ Java_com_tari_android_wallet_ffi_FFICommsConfig_jniCreate(
             JNI_FALSE);
     const char *pDatabaseName = jEnv->GetStringUTFChars(jDatabaseName, JNI_FALSE);
     const char *pDatastorePath = jEnv->GetStringUTFChars(jDatastorePath, JNI_FALSE);
-    jlong lTransport = GetPointerField(jEnv, jTransport);
-    auto *pTransport = reinterpret_cast<TariTransportConfig *>(lTransport);
+    auto pTransport = GetPointerField<TariTransportConfig *>(jEnv, jTransport);
     int errorCode = 0;
     int *errorCodePointer = &errorCode;
     if (jDiscoveryTimeoutSec < 0) {
@@ -84,7 +83,6 @@ JNIEXPORT void JNICALL
 Java_com_tari_android_wallet_ffi_FFICommsConfig_jniDestroy(
         JNIEnv *jEnv,
         jobject jThis) {
-    jlong lCommsConfig = GetPointerField(jEnv, jThis);
-    comms_config_destroy(reinterpret_cast<TariCommsConfig *>(lCommsConfig));
-    SetPointerField(jEnv, jThis, reinterpret_cast<jlong>(nullptr));
+    comms_config_destroy(GetPointerField<TariCommsConfig*>(jEnv, jThis));
+    SetNullPointerField(jEnv, jThis);
 }

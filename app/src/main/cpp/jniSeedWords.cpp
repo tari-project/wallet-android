@@ -70,8 +70,7 @@ Java_com_tari_android_wallet_ffi_FFISeedWords_jniPushWord(
         jobject error) {
     int errorCode = 0;
     int *errorCodePointer = &errorCode;
-    jlong lSeedWords = GetPointerField(jEnv, jThis);
-    auto *pSeedWords = reinterpret_cast<TariSeedWords *>(lSeedWords);
+    auto pSeedWords = GetPointerField<TariSeedWords *>(jEnv, jThis);
     const char *pWord = jEnv->GetStringUTFChars(jWord, JNI_FALSE);
     jint result = seed_words_push_word(pSeedWords, pWord, errorCodePointer);
     jEnv->ReleaseStringUTFChars(jWord, pWord);
@@ -87,8 +86,7 @@ Java_com_tari_android_wallet_ffi_FFISeedWords_jniGetLength(
         jobject error) {
     int errorCode = 0;
     int *errorCodePointer = &errorCode;
-    jlong lSeedWords = GetPointerField(jEnv, jThis);
-    auto *pSeedWords = reinterpret_cast<TariSeedWords *>(lSeedWords);
+    auto pSeedWords = GetPointerField<TariSeedWords *>(jEnv, jThis);
     jint result = seed_words_get_length(pSeedWords, errorCodePointer);
     setErrorCode(jEnv, error, errorCode);
     return result;
@@ -103,8 +101,7 @@ Java_com_tari_android_wallet_ffi_FFISeedWords_jniGetAt(
         jobject error) {
     int errorCode = 0;
     int *errorCodePointer = &errorCode;
-    jlong lSeedWords = GetPointerField(jEnv, jThis);
-    auto *pSeedWords = reinterpret_cast<TariSeedWords *>(lSeedWords);
+    auto pSeedWords = GetPointerField<TariSeedWords *>(jEnv, jThis);
     const char *pWord = seed_words_get_at(pSeedWords, static_cast<unsigned int>(index), errorCodePointer);
     setErrorCode(jEnv, error, errorCode);
     jstring result = jEnv->NewStringUTF(pWord);
@@ -117,7 +114,6 @@ JNIEXPORT void JNICALL
 Java_com_tari_android_wallet_ffi_FFISeedWords_jniDestroy(
         JNIEnv *jEnv,
         jobject jThis) {
-    jlong lSeedWords = GetPointerField(jEnv, jThis);
-    seed_words_destroy(reinterpret_cast<TariSeedWords *>(lSeedWords));
-    SetPointerField(jEnv, jThis, reinterpret_cast<jlong>(nullptr));
+    seed_words_destroy(GetPointerField<TariSeedWords *>(jEnv, jThis));
+    SetNullPointerField(jEnv, jThis);
 }

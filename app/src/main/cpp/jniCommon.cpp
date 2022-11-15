@@ -58,11 +58,26 @@ inline jlong GetPointerField(JNIEnv *jEnv, jobject jThis) {
     return lByteVector;
 }
 
+template <typename T>
+inline T GetPointerField(JNIEnv *jEnv, jobject jThis) {
+    return reinterpret_cast<T>(GetPointerField(jEnv, jThis));
+}
+
 inline void SetPointerField(JNIEnv *jEnv, jobject jThis, jlong jPointer) {
     jclass cls = jEnv->GetObjectClass(jThis);
     jfieldID fid = jEnv->GetFieldID(cls, "pointer", "J");
     jEnv->SetLongField(jThis, fid, jPointer);
 }
+
+inline void SetNullPointerField(JNIEnv *jEnv, jobject jThis) {
+    SetPointerField(jEnv, jThis, reinterpret_cast<jlong>(nullptr));
+}
+
+template <typename T>
+inline void SetNullPointerField(JNIEnv *jEnv, jobject jThis, T pointer) {
+    SetPointerField(jEnv, jThis, reinterpret_cast<jlong>(pointer));
+}
+
 
 // function included in multiple source files must be inline
 inline jbyteArray getBytesFromUnsignedLongLong(JNIEnv *jEnv, unsigned long long value) {

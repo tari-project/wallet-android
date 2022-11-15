@@ -56,8 +56,7 @@ Java_com_tari_android_wallet_ffi_FFIEmojiSet_jniGetLength(
         jobject error) {
     int errorCode = 0;
     int *errorCodePointer = &errorCode;
-    jlong lEmojiSet = GetPointerField(jEnv, jThis);
-    auto *pEmojiSet = reinterpret_cast<EmojiSet *>(lEmojiSet);
+    auto pEmojiSet = GetPointerField<EmojiSet *>(jEnv, jThis);
     jint result = emoji_set_get_length(pEmojiSet, errorCodePointer);
     setErrorCode(jEnv, error, errorCode);
     return result;
@@ -72,8 +71,7 @@ Java_com_tari_android_wallet_ffi_FFIEmojiSet_jniGetAt(
         jobject error) {
     int errorCode = 0;
     int *errorCodePointer = &errorCode;
-    jlong lEmojiSet = GetPointerField(jEnv, jThis);
-    auto *pEmojiSet = reinterpret_cast<EmojiSet *>(lEmojiSet);
+    auto pEmojiSet = GetPointerField<EmojiSet *>(jEnv, jThis);
     auto result = reinterpret_cast<jlong>(
             emoji_set_get_at(pEmojiSet, static_cast<unsigned int>(index), errorCodePointer)
     );
@@ -86,7 +84,6 @@ JNIEXPORT void JNICALL
 Java_com_tari_android_wallet_ffi_FFIEmojiSet_jniDestroy(
         JNIEnv *jEnv,
         jobject jThis) {
-    jlong lEmojiSet = GetPointerField(jEnv, jThis);
-    emoji_set_destroy(reinterpret_cast<EmojiSet *>(lEmojiSet));
-    SetPointerField(jEnv, jThis, reinterpret_cast<jlong>(nullptr));
+    emoji_set_destroy(GetPointerField<EmojiSet *>(jEnv, jThis));
+    SetNullPointerField(jEnv, jThis);
 }

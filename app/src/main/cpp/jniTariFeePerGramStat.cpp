@@ -48,8 +48,7 @@ Java_com_tari_android_wallet_ffi_FFIFeePerGramStat_jniGetOrder(
     int errorCode = 0;
     int *errorCodePointer = &errorCode;
 
-    jlong lFeePerGramStat = GetPointerField(jEnv, jThis);
-    auto *pTariFeePerGramStat = reinterpret_cast<TariFeePerGramStat *>(lFeePerGramStat);
+    auto pTariFeePerGramStat = GetPointerField<TariFeePerGramStat *>(jEnv, jThis);
 
     unsigned long long order = fee_per_gram_stat_get_order(pTariFeePerGramStat, errorCodePointer);
     setErrorCode(jEnv, error, errorCode);
@@ -67,8 +66,7 @@ Java_com_tari_android_wallet_ffi_FFIFeePerGramStat_jniGetMin(
     int errorCode = 0;
     int *errorCodePointer = &errorCode;
 
-    jlong lFeePerGramStat = GetPointerField(jEnv, jThis);
-    auto *pTariFeePerGramStat = reinterpret_cast<TariFeePerGramStat *>(lFeePerGramStat);
+    auto pTariFeePerGramStat = GetPointerField<TariFeePerGramStat *>(jEnv, jThis);
 
     unsigned long long order = fee_per_gram_stat_get_min_fee_per_gram(pTariFeePerGramStat, errorCodePointer);
     setErrorCode(jEnv, error, errorCode);
@@ -86,8 +84,7 @@ Java_com_tari_android_wallet_ffi_FFIFeePerGramStat_jniGetMax(
     int errorCode = 0;
     int *errorCodePointer = &errorCode;
 
-    jlong lFeePerGramStat = GetPointerField(jEnv, jThis);
-    auto *pTariFeePerGramStat = reinterpret_cast<TariFeePerGramStat *>(lFeePerGramStat);
+    auto pTariFeePerGramStat = GetPointerField<TariFeePerGramStat *>(jEnv, jThis);
 
     unsigned long long order = fee_per_gram_stat_get_max_fee_per_gram(pTariFeePerGramStat, errorCodePointer);
     setErrorCode(jEnv, error, errorCode);
@@ -105,8 +102,7 @@ Java_com_tari_android_wallet_ffi_FFIFeePerGramStat_jniGetAverage(
     int errorCode = 0;
     int *errorCodePointer = &errorCode;
 
-    jlong lFeePerGramStat = GetPointerField(jEnv, jThis);
-    auto *pTariFeePerGramStat = reinterpret_cast<TariFeePerGramStat *>(lFeePerGramStat);
+    auto pTariFeePerGramStat = GetPointerField<TariFeePerGramStat *>(jEnv, jThis);
 
     unsigned long long order = fee_per_gram_stat_get_avg_fee_per_gram(pTariFeePerGramStat, errorCodePointer);
     setErrorCode(jEnv, error, errorCode);

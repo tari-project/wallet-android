@@ -37,6 +37,7 @@
 #include <string>
 #include <cmath>
 #include <android/log.h>
+#include <random>
 #include "jniCommon.cpp"
 
 extern "C"
@@ -47,8 +48,7 @@ Java_com_tari_android_wallet_ffi_FFIBalance_jniGetAvailable(
         jobject error) {
     int errorCode = 0;
     int *errorCodePointer = &errorCode;
-    jlong lBalance = GetPointerField(jEnv, jThis);
-    auto *pBalance = reinterpret_cast<TariBalance *>(lBalance);
+    auto pBalance = GetPointerField<TariBalance *>(jEnv, jThis);
     jbyteArray result = getBytesFromUnsignedLongLong(
             jEnv,
             balance_get_available(pBalance, errorCodePointer)
@@ -65,8 +65,7 @@ Java_com_tari_android_wallet_ffi_FFIBalance_jniGetIncoming(
         jobject error) {
     int errorCode = 0;
     int *errorCodePointer = &errorCode;
-    jlong lBalance = GetPointerField(jEnv, jThis);
-    auto *pBalance = reinterpret_cast<TariBalance *>(lBalance);
+    auto pBalance = GetPointerField<TariBalance *>(jEnv, jThis);
     jbyteArray result = getBytesFromUnsignedLongLong(
             jEnv,
             balance_get_pending_incoming(pBalance, errorCodePointer)
@@ -83,8 +82,7 @@ Java_com_tari_android_wallet_ffi_FFIBalance_jniGetOutgoing(
         jobject error) {
     int errorCode = 0;
     int *errorCodePointer = &errorCode;
-    jlong lBalance = GetPointerField(jEnv, jThis);
-    auto *pBalance = reinterpret_cast<TariBalance *>(lBalance);
+    auto pBalance = GetPointerField<TariBalance *>(jEnv, jThis);
     jbyteArray result = getBytesFromUnsignedLongLong(
             jEnv,
             balance_get_pending_outgoing(pBalance, errorCodePointer)
@@ -101,8 +99,7 @@ Java_com_tari_android_wallet_ffi_FFIBalance_jniGetTimeLocked(
         jobject error) {
     int errorCode = 0;
     int *errorCodePointer = &errorCode;
-    jlong lBalance = GetPointerField(jEnv, jThis);
-    auto *pBalance = reinterpret_cast<TariBalance *>(lBalance);
+    auto pBalance = GetPointerField<TariBalance *>(jEnv, jThis);
     jbyteArray result = getBytesFromUnsignedLongLong(
             jEnv,
             balance_get_time_locked(pBalance, errorCodePointer)
@@ -113,10 +110,7 @@ Java_com_tari_android_wallet_ffi_FFIBalance_jniGetTimeLocked(
 
 extern "C"
 JNIEXPORT void JNICALL
-Java_com_tari_android_wallet_ffi_FFIBalance_jniDestroy(
-        JNIEnv *jEnv,
-jobject jThis) {
-jlong lByteVector = GetPointerField(jEnv, jThis);
-balance_destroy(reinterpret_cast<TariBalance *>(lByteVector));
-SetPointerField(jEnv, jThis, reinterpret_cast<jlong>(nullptr));
+Java_com_tari_android_wallet_ffi_FFIBalance_jniDestroy(JNIEnv *jEnv, jobject jThis) {
+    balance_destroy(GetPointerField<TariBalance *>(jEnv, jThis));
+    SetNullPointerField(jEnv, jThis);
 }

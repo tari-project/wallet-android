@@ -47,11 +47,10 @@ Java_com_tari_android_wallet_ffi_FFITransactionSendStatus_jniTransactionSendStat
 ) {
     int errorCode = 0;
     int *errorCodePointer = &errorCode;
-    jlong lTransactionSendStatus = GetPointerField(jEnv, jThis);
-    auto *pTransactionSendStatus = reinterpret_cast<TariTransactionSendStatus *>(lTransactionSendStatus);
+    auto pTransactionSendStatus = GetPointerField<TariTransactionSendStatus *>(jEnv, jThis);
     unsigned int status = transaction_send_status_decode(pTransactionSendStatus, errorCodePointer);
     setErrorCode(jEnv, error, errorCode);
-    return (int)status;
+    return (int) status;
 }
 
 extern "C"
@@ -59,6 +58,6 @@ JNIEXPORT void JNICALL
 Java_com_tari_android_wallet_ffi_FFITransactionSendStatus_jniDestroy(
         JNIEnv *jEnv,
         jobject jThis) {
-    jlong lSendStatus = GetPointerField(jEnv, jThis);
-    transaction_send_status_destroy(reinterpret_cast<TariTransactionSendStatus *>(lSendStatus));
+    transaction_send_status_destroy(GetPointerField<TariTransactionSendStatus *>(jEnv, jThis));
+    SetNullPointerField(jEnv, jThis);
 }

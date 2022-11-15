@@ -391,7 +391,7 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniCreate(
     }
     jclass jClass = jEnv->GetObjectClass(jThis);
     if (jClass == nullptr) {
-        SetPointerField(jEnv, jThis, reinterpret_cast<jlong>(nullptr));
+        SetNullPointerField(jEnv, jThis);
     }
 
     txReceivedCallbackMethodId = getMethodId(
@@ -400,7 +400,7 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniCreate(
             txReceivedCallbackMethodName,
             txReceivedCallbackMethodSignature);
     if (txReceivedCallbackMethodId == nullptr) {
-        SetPointerField(jEnv, jThis, reinterpret_cast<jlong>(nullptr));
+        SetNullPointerField(jEnv, jThis);
     }
 
     txReplyReceivedCallbackMethodId = getMethodId(
@@ -409,7 +409,7 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniCreate(
             callback_received_tx_reply,
             callback_received_tx_reply_sig);
     if (txReplyReceivedCallbackMethodId == nullptr) {
-        SetPointerField(jEnv, jThis, reinterpret_cast<jlong>(nullptr));
+        SetNullPointerField(jEnv, jThis);
     }
 
     txFinalizedCallbackMethodId = getMethodId(
@@ -418,7 +418,7 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniCreate(
             callback_received_finalized_tx,
             callback_received_finalized_tx_sig);
     if (txFinalizedCallbackMethodId == nullptr) {
-        SetPointerField(jEnv, jThis, reinterpret_cast<jlong>(nullptr));
+        SetNullPointerField(jEnv, jThis);
     }
 
     txBroadcastCallbackMethodId = getMethodId(
@@ -427,7 +427,7 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniCreate(
             callback_tx_broadcast,
             callback_tx_broadcast_sig);
     if (txBroadcastCallbackMethodId == nullptr) {
-        SetPointerField(jEnv, jThis, reinterpret_cast<jlong>(nullptr));
+        SetNullPointerField(jEnv, jThis);
     }
 
     txMinedCallbackMethodId = getMethodId(
@@ -436,7 +436,7 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniCreate(
             callback_tx_mined,
             callback_tx_mined_sig);
     if (txMinedCallbackMethodId == nullptr) {
-        SetPointerField(jEnv, jThis, reinterpret_cast<jlong>(nullptr));
+        SetNullPointerField(jEnv, jThis);
     }
 
     txMinedUnconfirmedCallbackMethodId = getMethodId(
@@ -445,7 +445,7 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniCreate(
             callback_tx_mined_unconfirmed,
             callback_tx_mined_unconfirmed_sig);
     if (txMinedUnconfirmedCallbackMethodId == nullptr) {
-        SetPointerField(jEnv, jThis, reinterpret_cast<jlong>(nullptr));
+        SetNullPointerField(jEnv, jThis);
     }
 
     txFauxConfirmedCallbackMethodId = getMethodId(
@@ -454,7 +454,7 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniCreate(
             callback_tx_faux_confirmed,
             callback_tx_faux_confirmed_sig);
     if (txFauxConfirmedCallbackMethodId == nullptr) {
-        SetPointerField(jEnv, jThis, reinterpret_cast<jlong>(nullptr));
+        SetNullPointerField(jEnv, jThis);
     }
 
     txFauxUnconfirmedCallbackMethodId = getMethodId(
@@ -463,7 +463,7 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniCreate(
             callback_tx_faux_unconfirmed,
             callback_tx_faux_unconfirmed_sig);
     if (txFauxUnconfirmedCallbackMethodId == nullptr) {
-        SetPointerField(jEnv, jThis, reinterpret_cast<jlong>(nullptr));
+        SetNullPointerField(jEnv, jThis);
     }
 
     directSendResultCallbackMethodId = getMethodId(
@@ -472,7 +472,7 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniCreate(
             callback_direct_send_result,
             callback_direct_send_result_sig);
     if (directSendResultCallbackMethodId == nullptr) {
-        SetPointerField(jEnv, jThis, reinterpret_cast<jlong>(nullptr));
+        SetNullPointerField(jEnv, jThis);
     }
 
     txCancellationCallbackMethodId = getMethodId(
@@ -481,7 +481,7 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniCreate(
             callback_tx_cancellation,
             callback_tx_cancellation_sig);
     if (txCancellationCallbackMethodId == nullptr) {
-        SetPointerField(jEnv, jThis, reinterpret_cast<jlong>(nullptr));
+        SetNullPointerField(jEnv, jThis);
     }
 
     connectivityStatusCallbackId = getMethodId(
@@ -490,7 +490,7 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniCreate(
             callback_connectivity_status,
             callback_connectivity_status_sig);
     if (connectivityStatusCallbackId == nullptr) {
-        SetPointerField(jEnv, jThis, reinterpret_cast<jlong>(nullptr));
+        SetNullPointerField(jEnv, jThis);
     }
 
     txoValidationCompleteCallbackMethodId = getMethodId(
@@ -499,7 +499,7 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniCreate(
             callback_txo_validation_complete,
             callback_txo_validation_complete_sig);
     if (txoValidationCompleteCallbackMethodId == nullptr) {
-        SetPointerField(jEnv, jThis, reinterpret_cast<jlong>(nullptr));
+        SetNullPointerField(jEnv, jThis);
     }
 
     transactionValidationCompleteCallbackMethodId = getMethodId(
@@ -508,7 +508,7 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniCreate(
             callback_transaction_validation_complete,
             callback_transaction_validation_complete_sig);
     if (transactionValidationCompleteCallbackMethodId == nullptr) {
-        SetPointerField(jEnv, jThis, reinterpret_cast<jlong>(nullptr));
+        SetNullPointerField(jEnv, jThis);
     }
 
     contactsLivenessDataUpdatedCallbackMethodId = getMethodId(
@@ -517,7 +517,7 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniCreate(
             callback_contacts_liveness_data_updated,
             callback_contacts_liveness_data_updated_sig);
     if (contactsLivenessDataUpdatedCallbackMethodId == nullptr) {
-        SetPointerField(jEnv, jThis, reinterpret_cast<jlong>(nullptr));
+        SetNullPointerField(jEnv, jThis);
     }
 
     balanceUpdatedCallbackMethodId = getMethodId(
@@ -526,11 +526,10 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniCreate(
             callback_balance_updated,
             callback_balance_updated_sig);
     if (balanceUpdatedCallbackMethodId == nullptr) {
-        SetPointerField(jEnv, jThis, reinterpret_cast<jlong>(nullptr));
+        SetNullPointerField(jEnv, jThis);
     }
 
-    jlong lWalletConfig = GetPointerField(jEnv, jpWalletConfig);
-    auto *pWalletConfig = reinterpret_cast<TariCommsConfig *>(lWalletConfig);
+    auto pWalletConfig = GetPointerField<TariCommsConfig *>(jEnv, jpWalletConfig);
 
     const char *pLogPath = jEnv->GetStringUTFChars(jLogPath, JNI_FALSE);
     if (strlen(pLogPath) == 0) {
@@ -552,8 +551,7 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniCreate(
 
     TariSeedWords *pSeedWords = nullptr;
     if (jSeed_words != nullptr) {
-        jlong lSeedWords = GetPointerField(jEnv, jSeed_words);
-        pSeedWords = reinterpret_cast<TariSeedWords *>(lSeedWords);
+        pSeedWords = GetPointerField<TariSeedWords *>(jEnv, jSeed_words);
     }
 
     TariWallet *pWallet = wallet_create(
@@ -596,8 +594,7 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniGetBalance(
         jobject error) {
     int errorCode = 0;
     int *errorCodePointer = &errorCode;
-    jlong lWallet = GetPointerField(jEnv, jThis);
-    auto *pWallet = reinterpret_cast<TariWallet *>(lWallet);
+    auto pWallet = GetPointerField<TariWallet *>(jEnv, jThis);
     auto result = reinterpret_cast<jlong>(wallet_get_balance(pWallet, errorCodePointer));
     setErrorCode(jEnv, error, errorCode);
     return result;
@@ -615,8 +612,7 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniGetUtxos(
         jobject error) {
     int errorCode = 0;
     int *errorCodePointer = &errorCode;
-    jlong lWallet = GetPointerField(jEnv, jThis);
-    auto *pWallet = reinterpret_cast<TariWallet *>(lWallet);
+    auto pWallet = GetPointerField<TariWallet *>(jEnv, jThis);
     auto pSorting = (TariUtxoSort) jSorting;
     //todo states
     auto outputs = wallet_get_utxos(pWallet, jPage, jPageSize, pSorting, nullptr, jDustThreshold,
@@ -634,8 +630,7 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniGetAllUtxos(
         jobject error) {
     int errorCode = 0;
     int *errorCodePointer = &errorCode;
-    jlong lWallet = GetPointerField(jEnv, jThis);
-    auto *pWallet = reinterpret_cast<TariWallet *>(lWallet);
+    auto pWallet = GetPointerField<TariWallet *>(jEnv, jThis);
     auto outputs = wallet_get_all_utxos(pWallet, errorCodePointer);
     auto result = reinterpret_cast<jlong>(outputs);
     setErrorCode(jEnv, error, errorCode);
@@ -665,8 +660,7 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniGetPublicKey(
         jobject error) {
     int errorCode = 0;
     int *errorCodePointer = &errorCode;
-    jlong lWallet = GetPointerField(jEnv, jThis);
-    auto *pWallet = reinterpret_cast<TariWallet *>(lWallet);
+    auto pWallet = GetPointerField<TariWallet *>(jEnv, jThis);
     auto result = reinterpret_cast<jlong>(wallet_get_public_key(pWallet, errorCodePointer));
     setErrorCode(jEnv, error, errorCode);
     return result;
@@ -680,8 +674,7 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniGetContacts(
         jobject error) {
     int errorCode = 0;
     int *errorCodePointer = &errorCode;
-    jlong lWallet = GetPointerField(jEnv, jThis);
-    auto *pWallet = reinterpret_cast<TariWallet *>(lWallet);
+    auto pWallet = GetPointerField<TariWallet *>(jEnv, jThis);
     auto result = reinterpret_cast<jlong>(wallet_get_contacts(pWallet, errorCodePointer));
     setErrorCode(jEnv, error, errorCode);
     return result;
@@ -696,10 +689,8 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniAddUpdateContact(
         jobject error) {
     int errorCode = 0;
     int *errorCodePointer = &errorCode;
-    jlong lWallet = GetPointerField(jEnv, jThis);
-    auto *pWallet = reinterpret_cast<TariWallet *>(lWallet);
-    jlong lContact = GetPointerField(jEnv, jpContact);
-    auto *pContact = reinterpret_cast<TariContact *>(lContact);
+    auto pWallet = GetPointerField<TariWallet *>(jEnv, jThis);
+    auto pContact = GetPointerField<TariContact *>(jEnv, jpContact);
     auto result = static_cast<jboolean>(
             wallet_upsert_contact(pWallet, pContact, errorCodePointer) != 0
     ); //this is indirectly a cast from unsigned char to jboolean
@@ -716,10 +707,8 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniRemoveContact(
         jobject error) {
     int errorCode = 0;
     int *errorCodePointer = &errorCode;
-    jlong lWallet = GetPointerField(jEnv, jThis);
-    auto *pWallet = reinterpret_cast<TariWallet *>(lWallet);
-    jlong lContact = GetPointerField(jEnv, jpContact);
-    auto *pContact = reinterpret_cast<TariContact *>(lContact);
+    auto pWallet = GetPointerField<TariWallet *>(jEnv, jThis);
+    auto pContact = GetPointerField<TariContact *>(jEnv, jpContact);
     auto result = static_cast<jboolean>(
             wallet_remove_contact(pWallet, pContact, errorCodePointer) != 0);
     setErrorCode(jEnv, error, errorCode);
@@ -734,8 +723,7 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniGetCompletedTxs(
         jobject error) {
     int errorCode = 0;
     int *errorCodePointer = &errorCode;
-    jlong lWallet = GetPointerField(jEnv, jThis);
-    auto *pWallet = reinterpret_cast<TariWallet *>(lWallet);
+    auto pWallet = GetPointerField<TariWallet *>(jEnv, jThis);
     TariCompletedTransactions *pCompletedTxs = wallet_get_completed_transactions(pWallet,
                                                                                  errorCodePointer);
     setErrorCode(jEnv, error, errorCode);
@@ -750,8 +738,7 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniGetCancelledTxs(
         jobject error) {
     int errorCode = 0;
     int *errorCodePointer = &errorCode;
-    jlong lWallet = GetPointerField(jEnv, jThis);
-    auto *pWallet = reinterpret_cast<TariWallet *>(lWallet);
+    auto pWallet = GetPointerField<TariWallet *>(jEnv, jThis);
     TariCompletedTransactions *pCanceledTxs = wallet_get_cancelled_transactions(pWallet,
                                                                                 errorCodePointer);
     setErrorCode(jEnv, error, errorCode);
@@ -767,8 +754,7 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniGetCompletedTxById(
         jobject error) {
     int errorCode = 0;
     int *errorCodePointer = &errorCode;
-    jlong lWallet = GetPointerField(jEnv, jThis);
-    auto *pWallet = reinterpret_cast<TariWallet *>(lWallet);
+    auto pWallet = GetPointerField<TariWallet *>(jEnv, jThis);
     const char *nativeString = jEnv->GetStringUTFChars(jTxId, JNI_FALSE);
     char *pEnd;
     unsigned long long id = strtoull(nativeString, &pEnd, 10);
@@ -788,8 +774,7 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniGetCancelledTxById(
         jobject error) {
     int errorCode = 0;
     int *errorCodePointer = &errorCode;
-    jlong lWallet = GetPointerField(jEnv, jThis);
-    auto *pWallet = reinterpret_cast<TariWallet *>(lWallet);
+    auto pWallet = GetPointerField<TariWallet *>(jEnv, jThis);
     const char *nativeString = jEnv->GetStringUTFChars(jTxId, JNI_FALSE);
     char *pEnd;
     unsigned long long id = strtoull(nativeString, &pEnd, 10);
@@ -808,8 +793,7 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniGetPendingOutboundTxs(
         jobject error) {
     int errorCode = 0;
     int *errorCodePointer = &errorCode;
-    jlong lWallet = GetPointerField(jEnv, jThis);
-    auto *pWallet = reinterpret_cast<TariWallet *>(lWallet);
+    auto pWallet = GetPointerField<TariWallet *>(jEnv, jThis);
     TariPendingOutboundTransactions *pPendingOutboundTransactions =
             wallet_get_pending_outbound_transactions(pWallet, errorCodePointer);
     setErrorCode(jEnv, error, errorCode);
@@ -825,8 +809,7 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniGetPendingOutboundTxById(
         jobject error) {
     int errorCode = 0;
     int *errorCodePointer = &errorCode;
-    jlong lWallet = GetPointerField(jEnv, jThis);
-    auto *pWallet = reinterpret_cast<TariWallet *>(lWallet);
+    auto pWallet = GetPointerField<TariWallet *>(jEnv, jThis);
     const char *nativeString = jEnv->GetStringUTFChars(jTxId, JNI_FALSE);
     char *pEnd;
     unsigned long long id = strtoull(nativeString, &pEnd, 10);
@@ -846,8 +829,7 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniGetPendingInboundTxs(
         jobject error) {
     int errorCode = 0;
     int *errorCodePointer = &errorCode;
-    jlong lWallet = GetPointerField(jEnv, jThis);
-    auto *pWallet = reinterpret_cast<TariWallet *>(lWallet);
+    auto pWallet = GetPointerField<TariWallet *>(jEnv, jThis);
     auto result = reinterpret_cast<jlong>(wallet_get_pending_inbound_transactions(pWallet,
                                                                                   errorCodePointer));
     setErrorCode(jEnv, error, errorCode);
@@ -863,8 +845,7 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniGetPendingInboundTxById(
         jobject error) {
     int errorCode = 0;
     int *errorCodePointer = &errorCode;
-    jlong lWallet = GetPointerField(jEnv, jThis);
-    auto *pWallet = reinterpret_cast<TariWallet *>(lWallet);
+    auto pWallet = GetPointerField<TariWallet *>(jEnv, jThis);
     const char *nativeString = jEnv->GetStringUTFChars(jTxId, JNI_FALSE);
     char *pEnd;
     unsigned long long id = strtoull(nativeString, &pEnd, 10);
@@ -885,8 +866,7 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniCancelPendingTx(
         jobject error) {
     int errorCode = 0;
     int *errorCodePointer = &errorCode;
-    jlong lWallet = GetPointerField(jEnv, jThis);
-    auto *pWallet = reinterpret_cast<TariWallet *>(lWallet);
+    auto pWallet = GetPointerField<TariWallet *>(jEnv, jThis);
     const char *nativeString = jEnv->GetStringUTFChars(jTxId, JNI_FALSE);
     char *pEnd;
     unsigned long long id = strtoull(nativeString, &pEnd, 10);
@@ -902,11 +882,11 @@ JNIEXPORT void JNICALL
 Java_com_tari_android_wallet_ffi_FFIWallet_jniDestroy(
         JNIEnv *jEnv,
         jobject jThis) {
-    jlong lWallet = GetPointerField(jEnv, jThis);
+    auto pWallet = GetPointerField<TariWallet *>(jEnv, jThis);
     jEnv->DeleteGlobalRef(callbackHandler);
     callbackHandler = nullptr;
-    wallet_destroy(reinterpret_cast<TariWallet *>(lWallet));
-    SetPointerField(jEnv, jThis, reinterpret_cast<jlong>(nullptr));
+    wallet_destroy(pWallet);
+    SetNullPointerField(jEnv, jThis);
 }
 
 //endregion
@@ -923,8 +903,7 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniEstimateTxFee(
         jobject error) {
     int errorCode = 0;
     int *errorCodePointer = &errorCode;
-    jlong lWallet = GetPointerField(jEnv, jThis);
-    auto *pWallet = reinterpret_cast<TariWallet *>(lWallet);
+    auto pWallet = GetPointerField<TariWallet *>(jEnv, jThis);
     const char *nativeAmount = jEnv->GetStringUTFChars(jAmount, JNI_FALSE);
     const char *nativeGramFee = jEnv->GetStringUTFChars(jGramFee, JNI_FALSE);
     const char *nativeKernels = jEnv->GetStringUTFChars(jKernelCount, JNI_FALSE);
@@ -961,8 +940,7 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniJoinUtxos(
         jobject error) {
     int errorCode = 0;
     int *errorCodePointer = &errorCode;
-    jlong lWallet = GetPointerField(jEnv, jThis);
-    auto *pWallet = reinterpret_cast<TariWallet *>(lWallet);
+    auto pWallet = GetPointerField<TariWallet *>(jEnv, jThis);
 
     int size = jEnv->GetArrayLength(jCommitments);
     auto *pTariVector = create_tari_vector(Text);
@@ -991,8 +969,7 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniSplitUtxos(
         jobject error) {
     int errorCode = 0;
     int *errorCodePointer = &errorCode;
-    jlong lWallet = GetPointerField(jEnv, jThis);
-    auto *pWallet = reinterpret_cast<TariWallet *>(lWallet);
+    auto pWallet = GetPointerField<TariWallet *>(jEnv, jThis);
 
     int size = jEnv->GetArrayLength(jCommitments);
     auto *pTariVector = create_tari_vector(Text);
@@ -1024,8 +1001,7 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniPreviewJoinUtxos(
         jobject error) {
     int errorCode = 0;
     int *errorCodePointer = &errorCode;
-    jlong lWallet = GetPointerField(jEnv, jThis);
-    auto *pWallet = reinterpret_cast<TariWallet *>(lWallet);
+    auto pWallet = GetPointerField<TariWallet *>(jEnv, jThis);
 
     int size = jEnv->GetArrayLength(jCommitments);
     auto *pTariVector = create_tari_vector(Text);
@@ -1055,8 +1031,7 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniPreviewSplitUtxos(
         jobject error) {
     int errorCode = 0;
     int *errorCodePointer = &errorCode;
-    jlong lWallet = GetPointerField(jEnv, jThis);
-    auto *pWallet = reinterpret_cast<TariWallet *>(lWallet);
+    auto pWallet = GetPointerField<TariWallet *>(jEnv, jThis);
 
     int size = jEnv->GetArrayLength(jCommitments);
     auto *pTariVector = create_tari_vector(Text);
@@ -1078,54 +1053,6 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniPreviewSplitUtxos(
     return result;
 }
 
-//extern "C"
-//JNIEXPORT jstring JNICALL
-//Java_com_tari_android_wallet_ffi_FFIWallet_jniSignMessage(
-//        JNIEnv *jEnv,
-//        jobject jThis,
-//        jstring jMessage,
-//        jobject error) {
-//    int errorCode = 0;
-//    int *errorCodePointer = &errorCode;
-//    jlong lWallet = GetPointerField(jEnv, jThis);
-//    auto *pWallet = reinterpret_cast<TariWallet *>(lWallet);
-//    const char *pMessage = jEnv->GetStringUTFChars(jMessage, JNI_FALSE);
-//    char *pSignature = wallet_sign_message(pWallet, pMessage, errorCodePointer);
-//    setErrorCode(jEnv, error, errorCode);
-//    jEnv->ReleaseStringUTFChars(jMessage, pMessage);
-//    jstring result = jEnv->NewStringUTF(pSignature);
-//    string_destroy(pSignature);
-//    return result;
-//}
-//
-//extern "C"
-//JNIEXPORT jboolean JNICALL
-//Java_com_tari_android_wallet_ffi_FFIWallet_jniVerifyMessageSignature(
-//        JNIEnv *jEnv,
-//        jobject jThis,
-//        jobject jpPublicKey,
-//        jstring jMessage,
-//        jstring jHexSignatureNonce,
-//        jobject error) {
-//    int errorCode = 0;
-//    int *errorCodePointer = &errorCode;
-//    jlong lWallet = GetPointerField(jEnv, jThis);
-//    auto *pWallet = reinterpret_cast<TariWallet *>(lWallet);
-//    jlong lPublicKey = GetPointerField(jEnv, jpPublicKey);
-//    auto *pContactPublicKey = reinterpret_cast<TariPublicKey *>(lPublicKey);
-//    const char *pHexSignatureNonce = jEnv->GetStringUTFChars(jHexSignatureNonce, JNI_FALSE);
-//    const char *pMessage = jEnv->GetStringUTFChars(jMessage, JNI_FALSE);
-//    auto result = static_cast<jboolean>(
-//            wallet_verify_message_signature(
-//                    pWallet, pContactPublicKey, pHexSignatureNonce, pMessage, errorCodePointer
-//            ) != 0
-//    );
-//    setErrorCode(jEnv, error, errorCode);
-//    jEnv->ReleaseStringUTFChars(jHexSignatureNonce, pHexSignatureNonce);
-//    jEnv->ReleaseStringUTFChars(jMessage, pMessage);
-//    return result;
-//}
-
 extern "C"
 JNIEXPORT jbyteArray JNICALL
 Java_com_tari_android_wallet_ffi_FFIWallet_jniImportUTXO(
@@ -1143,23 +1070,17 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniImportUTXO(
     int errorCode = 0;
     int *errorCodePointer = &errorCode;
 
-    jlong lWallet = GetPointerField(jEnv, jThis);
-    auto *pWallet = reinterpret_cast<TariWallet *>(lWallet);
+    auto pWallet = GetPointerField<TariWallet *>(jEnv, jThis);
 
-    jlong lSpendingKey = GetPointerField(jEnv, jpSpendingKey);
-    auto *pSpendingKey = reinterpret_cast<TariPrivateKey *>(lSpendingKey);
+    auto pSpendingKey = GetPointerField<TariPrivateKey *>(jEnv, jpSpendingKey);
 
-    jlong lSourcePublicKey = GetPointerField(jEnv, jpSourcePublicKey);
-    auto *pSourcePublicKey = reinterpret_cast<TariPublicKey *>(lSourcePublicKey);
+    auto pSourcePublicKey = GetPointerField<TariPublicKey *>(jEnv, jpSourcePublicKey);
 
-    jlong lSourceSenderPublicKey = GetPointerField(jEnv, jpSourceSenderPublicKey);
-    auto *pSourceSenderPublicKey = reinterpret_cast<TariPublicKey *>(lSourceSenderPublicKey);
+    auto pSourceSenderPublicKey = GetPointerField<TariPublicKey *>(jEnv, jpSourceSenderPublicKey);
 
-    jlong jTariCommitmentSignature = GetPointerField(jEnv, jpTariCommitmentSignature);
-    auto *pTariCommitmentSignature = reinterpret_cast<TariCommitmentSignature *>(jTariCommitmentSignature);
+    auto pTariCommitmentSignature = GetPointerField<TariCommitmentSignature *>(jEnv, jpTariCommitmentSignature);
 
-    jlong jScriptPrivateKey = GetPointerField(jEnv, jpScriptPrivateKey);
-    auto *pScriptPrivateKey = reinterpret_cast<TariPrivateKey *>(jScriptPrivateKey);
+    auto pScriptPrivateKey = GetPointerField<TariPrivateKey *>(jEnv, jpScriptPrivateKey);
 
     char *pAmountEnd;
     const char *nativeAmount = jEnv->GetStringUTFChars(jAmount, JNI_FALSE);
@@ -1201,10 +1122,8 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniAddBaseNodePeer(
         jobject error) {
     int errorCode = 0;
     int *errorCodePointer = &errorCode;
-    jlong lWallet = GetPointerField(jEnv, jThis);
-    auto *pWallet = reinterpret_cast<TariWallet *>(lWallet);
-    jlong lPublicKey = GetPointerField(jEnv, jPublicKey);
-    auto *pPublicKey = reinterpret_cast<TariPublicKey *>(lPublicKey);
+    auto pWallet = GetPointerField<TariWallet *>(jEnv, jThis);
+    auto pPublicKey = GetPointerField<TariPublicKey *>(jEnv, jPublicKey);
     char *pAddress = const_cast<char *>(jEnv->GetStringUTFChars(jAddress, JNI_FALSE));
     auto result = static_cast<jboolean>(
             wallet_add_base_node_peer(pWallet, pPublicKey, pAddress, errorCodePointer) != 0
@@ -1222,8 +1141,7 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniStartTxValidation(
         jobject error) {
     int errorCode = 0;
     int *errorCodePointer = &errorCode;
-    jlong lWallet = GetPointerField(jEnv, jThis);
-    auto *pWallet = reinterpret_cast<TariWallet *>(lWallet);
+    auto pWallet = GetPointerField<TariWallet *>(jEnv, jThis);
     jbyteArray result = getBytesFromUnsignedLongLong(
             jEnv,
             wallet_start_transaction_validation(pWallet, errorCodePointer)
@@ -1240,8 +1158,7 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniRestartTxBroadcast(
         jobject error) {
     int errorCode = 0;
     int *errorCodePointer = &errorCode;
-    jlong lWallet = GetPointerField(jEnv, jThis);
-    auto *pWallet = reinterpret_cast<TariWallet *>(lWallet);
+    auto pWallet = GetPointerField<TariWallet *>(jEnv, jThis);
     jbyteArray result = getBytesFromUnsignedLongLong(
             jEnv,
             wallet_restart_transaction_broadcast(pWallet, errorCodePointer)
@@ -1258,8 +1175,7 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniPowerModeNormal(
         jobject error) {
     int errorCode = 0;
     int *errorCodePointer = &errorCode;
-    jlong lWallet = GetPointerField(jEnv, jThis);
-    auto *pWallet = reinterpret_cast<TariWallet *>(lWallet);
+    auto pWallet = GetPointerField<TariWallet *>(jEnv, jThis);
     wallet_set_normal_power_mode(pWallet, errorCodePointer);
     setErrorCode(jEnv, error, errorCode);
 }
@@ -1272,8 +1188,7 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniPowerModeLow(
         jobject error) {
     int errorCode = 0;
     int *errorCodePointer = &errorCode;
-    jlong lWallet = GetPointerField(jEnv, jThis);
-    auto *pWallet = reinterpret_cast<TariWallet *>(lWallet);
+    auto pWallet = GetPointerField<TariWallet *>(jEnv, jThis);
     wallet_set_low_power_mode(pWallet, errorCodePointer);
     setErrorCode(jEnv, error, errorCode);
 }
@@ -1286,8 +1201,7 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniGetSeedWords(
         jobject error) {
     int errorCode = 0;
     int *errorCodePointer = &errorCode;
-    jlong lWallet = GetPointerField(jEnv, jThis);
-    auto *pWallet = reinterpret_cast<TariWallet *>(lWallet);
+    auto pWallet = GetPointerField<TariWallet *>(jEnv, jThis);
     TariSeedWords *pSeedWords = wallet_get_seed_words(pWallet, errorCodePointer);
     setErrorCode(jEnv, error, errorCode);
     return reinterpret_cast<jlong>(pSeedWords);
@@ -1303,8 +1217,7 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniSetKeyValue(
         jobject error) {
     int errorCode = 0;
     int *errorCodePointer = &errorCode;
-    jlong lWallet = GetPointerField(jEnv, jThis);
-    auto *pWallet = reinterpret_cast<TariWallet *>(lWallet);
+    auto pWallet = GetPointerField<TariWallet *>(jEnv, jThis);
     const char *pKey = jEnv->GetStringUTFChars(jKey, JNI_FALSE);
     const char *pValue = jEnv->GetStringUTFChars(jValue, JNI_FALSE);
     auto result = static_cast<jboolean>(wallet_set_key_value(pWallet, pKey, pValue,
@@ -1323,8 +1236,7 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniStartTXOValidation(
         jobject error) {
     int errorCode = 0;
     int *errorCodePointer = &errorCode;
-    jlong lWallet = GetPointerField(jEnv, jThis);
-    auto *pWallet = reinterpret_cast<TariWallet *>(lWallet);
+    auto pWallet = GetPointerField<TariWallet *>(jEnv, jThis);
     jbyteArray result = getBytesFromUnsignedLongLong(
             jEnv,
             wallet_start_txo_validation(pWallet, errorCodePointer)
@@ -1342,8 +1254,7 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniGetKeyValue(
         jobject error) {
     int errorCode = 0;
     int *errorCodePointer = &errorCode;
-    jlong lWallet = GetPointerField(jEnv, jThis);
-    auto *pWallet = reinterpret_cast<TariWallet *>(lWallet);
+    auto pWallet = GetPointerField<TariWallet *>(jEnv, jThis);
     const char *pKey = jEnv->GetStringUTFChars(jKey, JNI_FALSE);
     const char *pValue = wallet_get_value(pWallet, pKey, errorCodePointer);
     setErrorCode(jEnv, error, errorCode);
@@ -1362,8 +1273,7 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniRemoveKeyValue(
         jobject error) {
     int errorCode = 0;
     int *errorCodePointer = &errorCode;
-    jlong lWallet = GetPointerField(jEnv, jThis);
-    auto *pWallet = reinterpret_cast<TariWallet *>(lWallet);
+    auto pWallet = GetPointerField<TariWallet *>(jEnv, jThis);
     const char *pKey = jEnv->GetStringUTFChars(jKey, JNI_FALSE);
     auto result = static_cast<jboolean>(wallet_clear_value(pWallet, pKey, errorCodePointer));
     setErrorCode(jEnv, error, errorCode);
@@ -1379,8 +1289,7 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniGetConfirmations(
         jobject error) {
     int errorCode = 0;
     int *errorCodePointer = &errorCode;
-    jlong lWallet = GetPointerField(jEnv, jThis);
-    auto *pWallet = reinterpret_cast<TariWallet *>(lWallet);
+    auto pWallet = GetPointerField<TariWallet *>(jEnv, jThis);
     jbyteArray result = getBytesFromUnsignedLongLong(
             jEnv,
             wallet_get_num_confirmations_required(pWallet, errorCodePointer)
@@ -1398,8 +1307,7 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniSetConfirmations(
         jobject error) {
     int errorCode = 0;
     int *errorCodePointer = &errorCode;
-    jlong lWallet = GetPointerField(jEnv, jThis);
-    auto *pWallet = reinterpret_cast<TariWallet *>(lWallet);
+    auto pWallet = GetPointerField<TariWallet *>(jEnv, jThis);
     const char *nativeString = jEnv->GetStringUTFChars(jNumber, JNI_FALSE);
     char *pEnd;
     unsigned long long number = strtoull(nativeString, &pEnd, 10);
@@ -1421,10 +1329,8 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniSendTx(
         jobject error) {
     int errorCode = 0;
     int *errorCodePointer = &errorCode;
-    jlong lWallet = GetPointerField(jEnv, jThis);
-    auto *pWallet = reinterpret_cast<TariWallet *>(lWallet);
-    jlong lDestination = GetPointerField(jEnv, jDestination);
-    auto *pDestination = reinterpret_cast<TariPublicKey *>(lDestination);
+    auto pWallet = GetPointerField<TariWallet *>(jEnv, jThis);
+    auto pDestination = GetPointerField<TariPublicKey *>(jEnv, jDestination);
     const char *nativeAmount = jEnv->GetStringUTFChars(jAmount, JNI_FALSE);
     const char *nativeFeePerGram = jEnv->GetStringUTFChars(jFeePerGram, JNI_FALSE);
     const char *pMessage = jEnv->GetStringUTFChars(jMessage, JNI_FALSE);
@@ -1453,8 +1359,7 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniApplyEncryption(
         jobject error) {
     int errorCode = 0;
     int *errorCodePointer = &errorCode;
-    jlong lWallet = GetPointerField(jEnv, jThis);
-    auto *pWallet = reinterpret_cast<TariWallet *>(lWallet);
+    auto pWallet = GetPointerField<TariWallet *>(jEnv, jThis);
     const char *pKey = jEnv->GetStringUTFChars(jPassphrase, JNI_FALSE);
     wallet_apply_encryption(pWallet, pKey, errorCodePointer);
     setErrorCode(jEnv, error, errorCode);
@@ -1468,8 +1373,7 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniRemoveEncryption(
         jobject error) {
     int errorCode = 0;
     int *errorCodePointer = &errorCode;
-    jlong lWallet = GetPointerField(jEnv, jThis);
-    auto *pWallet = reinterpret_cast<TariWallet *>(lWallet);
+    auto pWallet = GetPointerField<TariWallet *>(jEnv, jThis);
     wallet_remove_encryption(pWallet, errorCodePointer);
     setErrorCode(jEnv, error, errorCode);
 }
@@ -1486,10 +1390,9 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniStartRecovery(
         jobject error) {
     int errorCode = 0;
     int *errorCodePointer = &errorCode;
-    jlong lWallet = GetPointerField(jEnv, jThis);
+    auto pWallet = GetPointerField<TariWallet *>(jEnv, jThis);
 
-    jlong l_base_node_public_key = GetPointerField(jEnv, base_node_public_key);
-    auto *pTariPublicKey = reinterpret_cast<TariPublicKey *>(l_base_node_public_key);
+    auto pTariPublicKey = GetPointerField<TariPublicKey *>(jEnv, base_node_public_key);
 
     recoveringProcessCompleteCallbackMethodId = getMethodId(
             jEnv,
@@ -1497,10 +1400,9 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniStartRecovery(
             callback,
             callback_sig);
     if (recoveringProcessCompleteCallbackMethodId == nullptr) {
-        SetPointerField(jEnv, jThis, reinterpret_cast<jlong>(nullptr));
+        SetNullPointerField(jEnv, jThis);
     }
 
-    auto *pWallet = reinterpret_cast<TariWallet *>(lWallet);
     const char *pRecoveryOutputMessage = jEnv->GetStringUTFChars(recovery_output_message,
                                                                  JNI_FALSE);
 
@@ -1522,8 +1424,7 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniWalletGetFeePerGramStats(
     int errorCode = 0;
     int *errorCodePointer = &errorCode;
 
-    jlong lWallet = GetPointerField(jEnv, jThis);
-    auto *pWallet = reinterpret_cast<TariWallet *>(lWallet);
+    auto pWallet = GetPointerField<TariWallet *>(jEnv, jThis);
 
     TariFeePerGramStats *result = wallet_get_fee_per_gram_stats(pWallet, count, errorCodePointer);
     setErrorCode(jEnv, error, errorCode);
