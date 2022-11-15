@@ -65,7 +65,7 @@ abstract class CommonFragment<Binding : ViewBinding, VM : CommonViewModel> : Fra
     }
 
     fun <VM : CommonViewModel> subscribeVM(viewModel: VM) = with(viewModel) {
-        observe(backPressed) { requireActivity().onBackPressedDispatcher.onBackPressed() }
+        observe(backPressed) { requireActivity().onBackPressed() }
 
         observe(openLink) { startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(it))) }
 

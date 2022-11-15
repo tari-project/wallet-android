@@ -88,6 +88,7 @@ class BaseNodes(
         walletService.getWithError { error, wallet -> wallet.startBaseNodeSync(error) }
     }
 
+    @Suppress("UNUSED_EXPRESSION")
     private fun getBaseNodeResource(network: Network): Int = when(network) {
         else -> R.raw.esmeralda_base_nodes
     }

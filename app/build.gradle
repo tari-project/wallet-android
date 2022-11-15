@@ -35,7 +35,7 @@ android {
         buildConfigField("String", "YAT_ORGANIZATION_KEY", "\"${yatProperties.getProperty("yat.key")}\"")
         buildConfigField("String", "YAT_ORGANIZATION_RETURN_URL", "\"${yatProperties.getProperty("yat.returnUrl")}\"")
         def dropboxProperties = loadDropboxProps()
-        buildConfigField("String", "DROPBOX_ACCESS_TOKEN", "\"${dropboxProperties.getProperty('dropbox_key')}\"")
+        buildConfigField("String", "DROPBOX_ACCESS_TOKEN", "\"${dropboxProperties.getProperty("dropbox_key")}\"")
     }
 
     buildTypes {
@@ -83,7 +83,7 @@ android {
     }
 
     applicationVariants.all { variant ->
-        variant.mergedFlavor.manifestPlaceholders.dropboxApiKey = loadDropboxProps().getProperty('dropbox_key')
+        variant.mergedFlavor.manifestPlaceholders.dropboxApiKey = loadDropboxProps().getProperty("dropbox_key")
         if (variant.buildType.name == "debug") {
             variant.mergedFlavor.manifestPlaceholders.sentryPublicDSN = ""
         } else {
@@ -157,7 +157,7 @@ android {
         }
     }
     lint {
-        disable "NewApi"
+        disable "NewApi", "LogNotTimber", "StringFormatInTimber", "ThrowableNotAtBeginning", "BinaryOperationInTimber", "TimberArgCount", "TimberArgTypes", "TimberTagLength"
     }
 
     configurations.all {
@@ -326,8 +326,8 @@ dependencies {
     // overscroll
     implementation "io.github.everythingme:overscroll-decor-android:1.1.1"
 
-    // giphy, don't update to 2.2.0 because of not compatible yet
-    implementation 'com.giphy.sdk:ui:2.1.18'
+    // giphy, don"t update to 2.2.0 because of not compatible yet
+    implementation "com.giphy.sdk:ui:2.1.18"
     // spring animation
     implementation "androidx.dynamicanimation:dynamicanimation:1.0.0"
     implementation "com.github.MasayukiSuda:EasingInterpolator:v1.3.2"
@@ -337,7 +337,7 @@ dependencies {
 
     implementation "net.yslibrary.keyboardvisibilityevent:keyboardvisibilityevent:2.2.0"
 
-    implementation 'com.itextpdf:itext7-core:7.2.3'
+    implementation "com.itextpdf:itext7-core:7.2.3"
 
 
 
@@ -345,7 +345,7 @@ dependencies {
     testImplementation "junit:junit:4.13.2"
     testImplementation "io.mockk:mockk:1.13.2"
     androidTestImplementation "io.mockk:mockk-android:1.13.2"
-    androidTestImplementation "androidx.test:core:1.4.0"
-    androidTestImplementation "androidx.test.ext:junit:1.1.3"
-    androidTestImplementation "androidx.test.espresso:espresso-core:3.4.0"
+    androidTestImplementation "androidx.test:core:1.5.0"
+    androidTestImplementation "androidx.test.ext:junit:1.1.4"
+    androidTestImplementation "androidx.test.espresso:espresso-core:3.5.0"
 }

@@ -80,13 +80,13 @@ abstract class CommonActivity<Binding : ViewBinding, VM : CommonViewModel> : App
         subscribeToCommon(connectionStateViewModel)
     }
 
+    protected fun setContainerId(id: Int) {
+        containerId = id
+    }
+
     override fun onBackPressed() {
         super.onBackPressed()
         overridePendingTransition(R.anim.enter_from_left, R.anim.exit_to_right)
-    }
-
-    protected fun setContainerId(id: Int) {
-        containerId = id
     }
 
     protected fun addFragment(fragment: Fragment, bundle: Bundle? = null, isRoot: Boolean = false) {
@@ -126,6 +126,14 @@ abstract class CommonActivity<Binding : ViewBinding, VM : CommonViewModel> : App
     private fun openActivity(navigation: DebugNavigation) {
         dialogManager.dismiss()
         DebugActivity.launch(this, navigation)
+    }
+
+    companion object {
+        enum class Priority(val value: Int) {
+            PRIORITY_SYSTEM(-1),
+            PRIORITY_DEFAULT(0),
+            PRIORITY_OVERLAY(1000000),
+        }
     }
 }
 

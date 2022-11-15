@@ -34,6 +34,7 @@ package com.tari.android.wallet.model
 
 import android.os.Parcel
 import android.os.Parcelable
+import com.tari.android.wallet.ui.extension.readP
 import java.math.BigInteger
 
 /**
@@ -86,10 +87,10 @@ class BalanceInfo() : Parcelable {
     }
 
     private fun readFromParcel(inParcel: Parcel) {
-        availableBalance = inParcel.readParcelable(MicroTari::class.java.classLoader)!!
-        pendingIncomingBalance = inParcel.readParcelable(MicroTari::class.java.classLoader)!!
-        pendingOutgoingBalance = inParcel.readParcelable(MicroTari::class.java.classLoader)!!
-        timeLocked = inParcel.readParcelable(MicroTari::class.java.classLoader)!!
+        availableBalance = inParcel.readP(MicroTari::class.java)
+        pendingIncomingBalance = inParcel.readP(MicroTari::class.java)
+        pendingOutgoingBalance = inParcel.readP(MicroTari::class.java)
+        timeLocked = inParcel.readP(MicroTari::class.java)
     }
 
     override fun describeContents(): Int {

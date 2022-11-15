@@ -269,6 +269,7 @@ fun View.temporarilyDisableClick() {
     )
 }
 
+@Suppress("VARIABLE_WITH_REDUNDANT_INITIALIZER")
 fun AppCompatEditText.setTextSilently(newText: String) {
     if (text.toString() != newText) {
         runCatching {

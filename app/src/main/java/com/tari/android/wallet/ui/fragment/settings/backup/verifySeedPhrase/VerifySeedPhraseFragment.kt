@@ -69,7 +69,7 @@ class VerifySeedPhraseFragment : CommonFragment<FragmentVerifySeedPhraseBinding,
     private fun setupUI() {
         fillSelectableWordsContainer()
         fillSelectedWordsContainer()
-        ui.backCtaView.setOnClickListener(ThrottleClick { requireActivity().onBackPressedDispatcher.onBackPressed() })
+        ui.backCtaView.setOnClickListener(ThrottleClick { requireActivity().onBackPressed() })
         ui.continueCtaView.setOnClickListener(ThrottleClick { it.animateClick { viewModel.verify() } })
     }
 

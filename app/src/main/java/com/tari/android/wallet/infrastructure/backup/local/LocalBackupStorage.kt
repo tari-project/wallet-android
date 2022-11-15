@@ -145,8 +145,8 @@ class LocalBackupStorage(
             // copy file to temp location
             val tempFolder = File(walletTempDirPath)
             val tempFile = File(tempFolder, backupFiles.name!!)
-            if (!tempFolder.parentFile.exists()) {
-                tempFolder.parentFile.mkdir()
+            if (tempFolder.parentFile?.exists() != true) {
+                tempFolder.parentFile?.mkdir()
             }
             if (!tempFolder.exists()) {
                 tempFolder.mkdir()

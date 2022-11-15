@@ -30,70 +30,26 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.tari.android.wallet.model
+package com.tari.android.wallet.ui.extension
 
+import android.content.Intent
+import android.os.Build.VERSION.SDK_INT
+import android.os.Bundle
 import android.os.Parcel
 import android.os.Parcelable
 
-/**
- * This wrapper is needed for id parameters in AIDL methods.
- *
- * @author The Tari Development Team
- */
-class PublicKey() : Parcelable {
+fun <T> Parcel.readS(clas: Class<T>): T = readSerializable(clas.classLoader, clas)!!
 
-    var hexString = ""
-    var emojiId = ""
+fun <T> Parcel.readP(clas: Class<T>): T = readParcelable(clas.classLoader, clas)!!
 
-    constructor(
-        hexString: String,
-        emojiId: String
-    ) : this() {
-        this.hexString = hexString
-        this.emojiId = emojiId
-    }
+fun <T> Parcel.readList(list: List<T>, clas: Class<T>): List<T> = readParcelableList(list, clas.classLoader, clas)
 
-    override fun equals(other: Any?): Boolean = (other is PublicKey)
-            && hexString == other.hexString
+inline fun <reified T : Parcelable> Intent.parcelable(key: String): T? = when {
+    SDK_INT >= 33 -> getParcelableExtra(key, T::class.java)
+    else -> @Suppress("DEPRECATION") getParcelableExtra(key) as? T
+}
 
-    override fun hashCode(): Int {
-        return hexString.hashCode()
-    }
-
-    override fun toString(): String = "PublicKey(hexString='$hexString', emojiId='$emojiId')"
-
-    // region Parcelable
-
-    constructor(parcel: Parcel) : this() {
-        readFromParcel(parcel)
-    }
-
-    companion object CREATOR : Parcelable.Creator<PublicKey> {
-
-        override fun createFromParcel(parcel: Parcel): PublicKey {
-            return PublicKey(parcel)
-        }
-
-        override fun newArray(size: Int): Array<PublicKey> {
-            return Array(size) { PublicKey() }
-        }
-
-    }
-
-    override fun writeToParcel(parcel: Parcel, flags: Int) {
-        parcel.writeString(hexString)
-        parcel.writeString(emojiId)
-    }
-
-    private fun readFromParcel(inParcel: Parcel) {
-        hexString = inParcel.readString().orEmpty()
-        emojiId = inParcel.readString().orEmpty()
-    }
-
-    override fun describeContents(): Int {
-        return 0
-    }
-
-    // endregion
-
+inline fun <reified T : Parcelable> Bundle.parcelable(key: String): T? = when {
+    SDK_INT >= 33 -> getParcelable(key, T::class.java)
+    else -> @Suppress("DEPRECATION") getParcelable(key) as? T
 }

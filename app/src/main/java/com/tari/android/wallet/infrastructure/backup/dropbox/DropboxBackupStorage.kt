@@ -113,7 +113,7 @@ class DropboxBackupStorage(
     }
 
     override suspend fun backup(): DateTime = withContext(Dispatchers.IO) {
-        val (backupFile, backupDate, mimeType) = backupFileProcessor.generateBackupFile()
+        val (backupFile, backupDate, _) = backupFileProcessor.generateBackupFile()
         try {
             uploadDropboxFile(DropboxClientFactory.client, DRIVE_BACKUP_PARENT_FOLDER_NAME + backupFile.name, backupFile.inputStream())
         } catch (e: Throwable) {
@@ -149,8 +149,8 @@ class DropboxBackupStorage(
         withContext(Dispatchers.IO) {
             val tempFolder = File(walletTempDirPath)
             val tempFile = File(tempFolder, backup.metadata.metadataValue.name)
-            if (!tempFolder.parentFile.exists()) {
-                tempFolder.parentFile.mkdir()
+            if (tempFolder.parentFile?.exists() != true) {
+                tempFolder.parentFile?.mkdir()
             }
             if (!tempFolder.exists()) {
                 tempFolder.mkdir()

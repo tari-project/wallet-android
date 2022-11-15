@@ -61,7 +61,7 @@ class LogsFragment : CommonFragment<FragmentLogsBinding, LogsViewModel>() {
         val viewModel: LogsViewModel by viewModels()
         bindViewModel(viewModel)
 
-        (arguments?.getSerializable(DebugActivity.log_file) as? File)?.let {
+        arguments?.getSerializable(DebugActivity.log_file, File::class.java)?.let {
             this.ui.title.text = it.name
             viewModel.initWithFile(it)
         }
@@ -72,7 +72,7 @@ class LogsFragment : CommonFragment<FragmentLogsBinding, LogsViewModel>() {
 
     private fun setupUI() = with(ui) {
         filterButton.setVisible(false)
-        backCtaView.setOnClickListener { requireActivity().onBackPressedDispatcher.onBackPressed() }
+        backCtaView.setOnClickListener { requireActivity().onBackPressed() }
         filterButton.setOnClickListener { viewModel.showFilters() }
         recyclerViewAdapter = LogListAdapter()
         recyclerViewAdapter.setLongClickListener(CommonAdapter.ItemLongClickListener {

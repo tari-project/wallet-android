@@ -34,6 +34,7 @@ package com.tari.android.wallet.model
 
 import android.os.Parcel
 import android.os.Parcelable
+import com.tari.android.wallet.ui.extension.readP
 
 /**
  * User with a wallet.
@@ -77,7 +78,7 @@ open class User() : Parcelable {
     }
 
     private fun readFromParcel(inParcel: Parcel) {
-        publicKey = inParcel.readParcelable(PublicKey::class.java.classLoader)!!
+        publicKey = inParcel.readP(PublicKey::class.java)
     }
 
     override fun describeContents(): Int {

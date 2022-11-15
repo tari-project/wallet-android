@@ -32,7 +32,7 @@ class CustomTorBridgesFragment : CommonFragment<FragmentCustomTorBridgesBinding,
     }
 
     private fun setupViews() = with(ui) {
-        backCtaView.setOnThrottledClickListener { requireActivity().onBackPressedDispatcher.onBackPressed() }
+        backCtaView.setOnThrottledClickListener { requireActivity().onBackPressed() }
         requestBridgesCta.setOnThrottledClickListener { viewModel.openRequestPage() }
         scanQrCta.setOnThrottledClickListener { viewModel.navigateToScanQr() }
         uploadQrCta.setOnThrottledClickListener { viewModel.navigateToUploadQr() }

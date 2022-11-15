@@ -72,7 +72,7 @@ class WalletRestoringFromSeedWordsFragment :
             WalletRestoringFromSeedWordsNavigation.OnRestoreCompleted -> router.onRestoreCompleted()
             WalletRestoringFromSeedWordsNavigation.OnRestoreFailed -> {
                 changeOnBackPressed(false)
-                requireActivity().onBackPressedDispatcher.onBackPressed()
+                requireActivity().onBackPressed()
             }
         }
     }
