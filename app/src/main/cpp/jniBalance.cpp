@@ -58,15 +58,10 @@ Java_com_tari_android_wallet_ffi_FFIBalance_jniGetIncoming(
         JNIEnv *jEnv,
         jobject jThis,
         jobject error) {
-    int errorCode = 0;
-
-    auto pBalance = GetPointerField<TariBalance *>(jEnv, jThis);
-    jbyteArray result = getBytesFromUnsignedLongLong(
-            jEnv,
-            balance_get_pending_incoming(pBalance, &errorCode)
-    );
-    setErrorCode(jEnv, error, errorCode);
-    return result;
+    return ExecuteWithError<jbyteArray>(jEnv, error, [&](int *errorPointer) {
+        auto pBalance = GetPointerField<TariBalance *>(jEnv, jThis);
+        return getBytesFromUnsignedLongLong(jEnv,balance_get_pending_incoming(pBalance, errorPointer));
+    });
 }
 
 extern "C"
@@ -75,14 +70,10 @@ Java_com_tari_android_wallet_ffi_FFIBalance_jniGetOutgoing(
         JNIEnv *jEnv,
         jobject jThis,
         jobject error) {
-    int errorCode = 0;
-    auto pBalance = GetPointerField<TariBalance *>(jEnv, jThis);
-    jbyteArray result = getBytesFromUnsignedLongLong(
-            jEnv,
-            balance_get_pending_outgoing(pBalance, &errorCode)
-    );
-    setErrorCode(jEnv, error, errorCode);
-    return result;
+    return ExecuteWithError<jbyteArray>(jEnv, error, [&](int *errorPointer) {
+        auto pBalance = GetPointerField<TariBalance *>(jEnv, jThis);
+        return getBytesFromUnsignedLongLong(jEnv,balance_get_pending_outgoing(pBalance, errorPointer));
+    });
 }
 
 extern "C"
@@ -91,14 +82,10 @@ Java_com_tari_android_wallet_ffi_FFIBalance_jniGetTimeLocked(
         JNIEnv *jEnv,
         jobject jThis,
         jobject error) {
-    int errorCode = 0;
-    auto pBalance = GetPointerField<TariBalance *>(jEnv, jThis);
-    jbyteArray result = getBytesFromUnsignedLongLong(
-            jEnv,
-            balance_get_time_locked(pBalance, &errorCode)
-    );
-    setErrorCode(jEnv, error, errorCode);
-    return result;
+    return ExecuteWithError<jbyteArray>(jEnv, error, [&](int *errorPointer) {
+        auto pBalance = GetPointerField<TariBalance *>(jEnv, jThis);
+        return getBytesFromUnsignedLongLong(jEnv,balance_get_time_locked(pBalance, errorPointer));
+    });
 }
 
 extern "C"
