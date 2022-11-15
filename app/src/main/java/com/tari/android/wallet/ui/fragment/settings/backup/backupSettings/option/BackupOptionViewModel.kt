@@ -60,6 +60,7 @@ class BackupOptionViewModel : CommonViewModel() {
         get() = when (option.value!!.type) {
             BackupOptions.Google -> R.string.back_up_wallet_google_title
             BackupOptions.Local -> R.string.back_up_wallet_local_file_title
+            BackupOptions.Dropbox -> R.string.back_up_wallet_dropbox_backup_title
         }
 
     fun setup(option: BackupOptions) {
@@ -74,7 +75,7 @@ class BackupOptionViewModel : CommonViewModel() {
             try {
                 if (backupManager.onSetupActivityResult(requestCode, resultCode, data)) {
                     backupSettingsRepository.getOptionDto(currentOption)?.copy(isEnable = true)?.let { backupSettingsRepository.updateOption(it) }
-                    com.tari.android.wallet.event.EventBus.backupState.publishSubject
+                    EventBus.backupState.publishSubject
                         .filter {
                             it.backupsStates[currentOption] is BackupState.BackupUpToDate || it.backupsStates[currentOption] is BackupState.BackupFailed
                         }.take(1)

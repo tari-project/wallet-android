@@ -40,6 +40,7 @@ import com.tari.android.wallet.R
 import com.tari.android.wallet.data.sharedPrefs.delegates.SerializableTime
 import com.tari.android.wallet.event.Event
 import com.tari.android.wallet.event.EventBus
+import com.tari.android.wallet.infrastructure.backup.dropbox.DropboxBackupStorage
 import com.tari.android.wallet.infrastructure.backup.googleDrive.GoogleDriveBackupStorage
 import com.tari.android.wallet.infrastructure.backup.local.LocalBackupStorage
 import com.tari.android.wallet.notification.NotificationHelper
@@ -61,6 +62,7 @@ class BackupManager(
     private val backupSettingsRepository: BackupSettingsRepository,
     private val localFileBackupStorage: LocalBackupStorage,
     private val googleDriveBackupStorage: GoogleDriveBackupStorage,
+    private val dropboxBackupStorage: DropboxBackupStorage,
     private val notificationHelper: NotificationHelper
 ) {
 
@@ -130,7 +132,7 @@ class BackupManager(
             )
             logger.i("Backup successful")
             updateState(BackupState.BackupUpToDate)
-        } catch (exception: Exception) {
+        } catch (exception: Throwable) {
             logger.i("Backup failed $exception")
             if (exception is BackupStorageAuthRevokedException) {
                 logger.i("Error happened on backup BackupStorageAuthRevokedException")
@@ -162,21 +164,20 @@ class BackupManager(
         getStorageByOption(currentOption!!).signOut()
     }
 
-    suspend fun restoreLatestBackup(password: String? = null) = with(backupMutex) {
+    suspend fun restoreLatestBackup(password: String? = null) = backupMutex.withLock {
         getStorageByOption(currentOption!!).restoreLatestBackup(password)
     }
 
-    private fun getBackupStateByOption(optionDto: BackupOptionDto): BackupState {
-        return when {
-            !optionDto.isEnable -> BackupState.BackupDisabled
-            optionDto.lastFailureDate != null -> BackupState.BackupFailed()
-            else -> BackupState.BackupUpToDate
-        }
+    private fun getBackupStateByOption(optionDto: BackupOptionDto): BackupState = when {
+        !optionDto.isEnable -> BackupState.BackupDisabled
+        optionDto.lastFailureDate != null -> BackupState.BackupFailed()
+        else -> BackupState.BackupUpToDate
     }
 
     private fun getStorageByOption(optionType: BackupOptions): BackupStorage = when (optionType) {
         BackupOptions.Google -> googleDriveBackupStorage
         BackupOptions.Local -> localFileBackupStorage
+        BackupOptions.Dropbox -> dropboxBackupStorage
     }
 
     private fun postBackupFailedNotification(exception: Exception) {

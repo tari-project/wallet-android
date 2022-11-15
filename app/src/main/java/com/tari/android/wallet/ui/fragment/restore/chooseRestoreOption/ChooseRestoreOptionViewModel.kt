@@ -59,6 +59,10 @@ class ChooseRestoreOptionViewModel : CommonViewModel() {
 
         EventBus.walletState.publishSubject.filter { it is WalletState.Running }.subscribe {
             if (WalletUtil.walletExists(walletConfig)) {
+                val dto = backupSettingsRepository.getOptionDto(state.value!!.backupOptions)!!.copy(isEnable = true)
+                backupSettingsRepository.updateOption(dto)
+                backupManager.backupNow()
+
                 _navigation.postValue(ChooseRestoreOptionNavigation.OnRestoreCompleted)
             }
         }.addTo(compositeDisposable)

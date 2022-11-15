@@ -38,7 +38,6 @@ import android.content.Intent
 import androidx.documentfile.provider.DocumentFile
 import androidx.fragment.app.Fragment
 import com.orhanobut.logger.Logger
-import com.tari.android.wallet.data.sharedPrefs.delegates.SerializableTime
 import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepository
 import com.tari.android.wallet.extension.getLastPathComponent
 import com.tari.android.wallet.infrastructure.backup.*
@@ -139,7 +138,9 @@ class LocalBackupStorage(
 
     override suspend fun restoreLatestBackup(password: String?) {
         val backupFolder = getBackupFolder()
-        val backupFiles = backupFolder.listFiles().firstOrNull() ?: throw BackupStorageTamperedException("Backup file not found in folder.")
+        val backupFiles = backupFolder.listFiles().firstOrNull { documentFile: DocumentFile? ->
+            namingPolicy.isBackupFileName(documentFile?.name.orEmpty())
+        } ?: throw BackupStorageTamperedException("Backup file not found in folder.")
         withContext(Dispatchers.IO) {
             // copy file to temp location
             val tempFolder = File(walletTempDirPath)
@@ -158,10 +159,6 @@ class LocalBackupStorage(
             }
             backupFileProcessor.restoreBackupFile(tempFile, password)
             backupFileProcessor.clearTempFolder()
-            // restore successful, turn on automated backup
-            backupSettingsRepository.localFileOption =
-                backupSettingsRepository.localFileOption!!.copy(lastSuccessDate = SerializableTime(DateTime.now()), isEnable = true)
-            backupSettingsRepository.backupPassword = password
         }
     }
 

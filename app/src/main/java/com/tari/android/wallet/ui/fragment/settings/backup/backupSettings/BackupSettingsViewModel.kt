@@ -104,7 +104,7 @@ class BackupSettingsViewModel : CommonViewModel() {
                 backupState.backupsStates.all { it.value !is BackupState.BackupInProgress })
     }
 
-    private fun showBackupFailureDialog(exception: Exception?) {
+    private fun showBackupFailureDialog(exception: Throwable?) {
         val errorTitle = when (exception) {
             is BackupStorageFullException -> resourceManager.getString(R.string.backup_wallet_storage_full_title)
             else -> resourceManager.getString(R.string.back_up_wallet_backing_up_error_title)

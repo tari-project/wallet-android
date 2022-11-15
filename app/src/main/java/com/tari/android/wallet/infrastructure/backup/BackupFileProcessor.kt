@@ -77,19 +77,20 @@ class BackupFileProcessor(
         val compressionMethod = CompressionMethod.zip()
         var mimeType = compressionMethod.mimeType
         val backupFileName = namingPolicy.getBackupFileName()
-        val compressedFile = File(walletConfig.getWalletTempDirPath(), "$backupFileName.${compressionMethod.extension}")
+        val compressedFile = File(walletConfig.getWalletTempDirPath(), backupFileName)
         var fileToBackup = listOf(databaseFile).compress(CompressionMethod.zip(), compressedFile.absolutePath)
         // encrypt the file if password is set
         val encryptionAlgorithm = SymmetricEncryptionAlgorithm.aes()
         if (!backupPassword.isNullOrEmpty()) {
-            fileToBackup = fileToBackup.encrypt(
+            val copiedFile = fileToBackup.copyTo(File(fileToBackup.absolutePath + "_temp"))
+            fileToBackup = copiedFile.encrypt(
                 encryptionAlgorithm,
                 backupPassword.toCharArray(),
                 File(walletConfig.getWalletTempDirPath(), backupFileName).absolutePath
             )
+            copiedFile.delete()
             mimeType = encryptionAlgorithm.mimeType
         }
-        //todo
         FFIWallet.instance?.enableEncryption()
         logger.i("Backup files was generated")
         return Triple(fileToBackup, backupDate, mimeType)

@@ -39,6 +39,7 @@ import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepository
 import com.tari.android.wallet.infrastructure.backup.BackupFileProcessor
 import com.tari.android.wallet.infrastructure.backup.BackupManager
 import com.tari.android.wallet.infrastructure.backup.BackupNamingPolicy
+import com.tari.android.wallet.infrastructure.backup.dropbox.DropboxBackupStorage
 import com.tari.android.wallet.infrastructure.backup.googleDrive.GoogleDriveBackupStorage
 import com.tari.android.wallet.infrastructure.backup.local.LocalBackupStorage
 import com.tari.android.wallet.notification.NotificationHelper
@@ -96,17 +97,35 @@ class BackupAndRestoreModule {
 
     @Provides
     @Singleton
+    fun provideDropboxBackupStorage(
+        context: Context,
+        backupSettingsRepository: BackupSettingsRepository,
+        walletConfig: WalletConfig,
+        backupFileProcessor: BackupFileProcessor,
+        namingPolicy: BackupNamingPolicy,
+    ): DropboxBackupStorage = DropboxBackupStorage(
+        context,
+        namingPolicy,
+        backupSettingsRepository,
+        walletConfig.getWalletTempDirPath(),
+        backupFileProcessor
+    )
+
+    @Provides
+    @Singleton
     fun provideBackupManager(
         context: Context,
         backupSettingsRepository: BackupSettingsRepository,
         localFileBackupStorage: LocalBackupStorage,
         googleDriveBackupStorage: GoogleDriveBackupStorage,
+        dropboxBackupStorage: DropboxBackupStorage,
         notificationHelper: NotificationHelper
     ): BackupManager = BackupManager(
         context,
         backupSettingsRepository,
         localFileBackupStorage,
         googleDriveBackupStorage,
+        dropboxBackupStorage,
         notificationHelper
     )
 
