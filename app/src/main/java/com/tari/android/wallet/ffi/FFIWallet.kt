@@ -148,9 +148,9 @@ class FFIWallet(
         libError: FFIError
     ): ByteArray
 
-    private external fun jniSignMessage(message: String, libError: FFIError): String
-
-    private external fun jniVerifyMessageSignature(publicKeyPtr: FFIPublicKey, message: String, signature: String, libError: FFIError): Boolean
+//    private external fun jniSignMessage(message: String, libError: FFIError): String
+//
+//    private external fun jniVerifyMessageSignature(publicKeyPtr: FFIPublicKey, message: String, signature: String, libError: FFIError): Boolean
 
     private external fun jniImportUTXO(
         amount: String,
@@ -516,10 +516,10 @@ class FFIWallet(
     fun splitPreviewUtxos(commitments: Array<String>, count: Int, feePerGram: BigInteger, error: FFIError): TariCoinPreview =
         TariCoinPreview(FFITariCoinPreview(jniPreviewSplitUtxos(commitments, count.toString(), feePerGram.toString(), error)))
 
-    fun signMessage(message: String): String = runWithError { jniSignMessage(message, it) }
+//    fun signMessage(message: String): String = runWithError { jniSignMessage(message, it) }
 
-    fun verifyMessageSignature(contactPublicKey: FFIPublicKey, message: String, signature: String): Boolean =
-        runWithError { jniVerifyMessageSignature(contactPublicKey, message, signature, it) }
+//    fun verifyMessageSignature(contactPublicKey: FFIPublicKey, message: String, signature: String): Boolean =
+//        runWithError { jniVerifyMessageSignature(contactPublicKey, message, signature, it) }
 
     fun importUTXO(
         amount: BigInteger,
