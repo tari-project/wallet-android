@@ -118,9 +118,9 @@ class AddAmountFragment : CommonFragment<FragmentAddAmountBinding, AddAmountView
     }
 
     private fun setupUI() {
-        val amount = arguments?.getParcelable<MicroTari>(SendTariActivity.PARAMETER_AMOUNT)
+        val amount = arguments?.getParcelable<MicroTari>(SendTariActivity.PARAMETER_AMOUNT, MicroTari::class.java)
         keyboardController.setup(requireContext(), AmountCheckRunnable(), ui.numpad, ui.amount, amount?.tariValue?.toDouble() ?: Double.MIN_VALUE)
-        recipientUser = arguments?.getParcelable(SendTariActivity.PARAMETER_USER)
+        recipientUser = arguments?.getParcelable(SendTariActivity.PARAMETER_USER, User::class.java)
         // hide tx fee
         ui.txFeeContainerView.invisible()
         // hide/disable continue button
@@ -196,7 +196,7 @@ class AddAmountFragment : CommonFragment<FragmentAddAmountBinding, AddAmountView
     private fun onBackButtonClicked(view: View) {
         view.temporarilyDisableClick()
         val mActivity = activity ?: return
-        mActivity.onBackPressed()
+        mActivity.onBackPressedDispatcher.onBackPressed()
     }
 
     /**

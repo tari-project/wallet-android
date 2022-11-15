@@ -41,12 +41,12 @@ import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.tari.android.wallet.databinding.FragmentNetworkSelectionBinding
 import com.tari.android.wallet.extension.observe
-import com.tari.android.wallet.ui.fragment.splash.SplashActivity
 import com.tari.android.wallet.ui.common.CommonFragment
 import com.tari.android.wallet.ui.common.recyclerView.CommonAdapter
 import com.tari.android.wallet.ui.extension.setOnThrottledClickListener
 import com.tari.android.wallet.ui.fragment.settings.networkSelection.networkItem.NetworkAdapter
 import com.tari.android.wallet.ui.fragment.settings.networkSelection.networkItem.NetworkViewHolderItem
+import com.tari.android.wallet.ui.fragment.splash.SplashActivity
 
 class NetworkSelectionFragment : CommonFragment<FragmentNetworkSelectionBinding, NetworkSelectionViewModel>() {
 
@@ -69,7 +69,7 @@ class NetworkSelectionFragment : CommonFragment<FragmentNetworkSelectionBinding,
     }
 
     private fun setupViews() = with(ui) {
-        backCtaView.setOnThrottledClickListener { requireActivity().onBackPressed() }
+        backCtaView.setOnThrottledClickListener { requireActivity().onBackPressedDispatcher.onBackPressed() }
         networkList.layoutManager = LinearLayoutManager(requireContext())
         networkList.adapter = adapter
         adapter.setClickListener(CommonAdapter.ItemClickListener { viewModel.selectNetwork(it as NetworkViewHolderItem) })

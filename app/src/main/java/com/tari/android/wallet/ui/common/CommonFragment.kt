@@ -10,6 +10,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import androidx.viewbinding.ViewBinding
 import com.tari.android.wallet.di.DiContainer
@@ -28,6 +29,17 @@ abstract class CommonFragment<Binding : ViewBinding, VM : CommonViewModel> : Fra
     protected lateinit var ui: Binding
 
     protected lateinit var viewModel: VM
+
+    var grantedAction: () -> Unit = {}
+    var notGrantedAction: () -> Unit = {}
+
+    val launcher = registerForActivityResult(ActivityResultContracts.RequestPermission()) {
+        if (it) {
+            grantedAction()
+        } else {
+            notGrantedAction()
+        }
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -53,7 +65,7 @@ abstract class CommonFragment<Binding : ViewBinding, VM : CommonViewModel> : Fra
     }
 
     fun <VM : CommonViewModel> subscribeVM(viewModel: VM) = with(viewModel) {
-        observe(backPressed) { requireActivity().onBackPressed() }
+        observe(backPressed) { requireActivity().onBackPressedDispatcher.onBackPressed() }
 
         observe(openLink) { startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(it))) }
 

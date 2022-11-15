@@ -17,10 +17,10 @@ import com.tari.android.wallet.model.seedPhrase.SeedPhrase
 import com.tari.android.wallet.ui.common.CommonFragment
 import com.tari.android.wallet.ui.common.recyclerView.CommonAdapter
 import com.tari.android.wallet.ui.extension.*
+import com.tari.android.wallet.ui.fragment.restore.activity.WalletRestoreRouter
 import com.tari.android.wallet.ui.fragment.restore.inputSeedWords.suggestions.SuggestionState
 import com.tari.android.wallet.ui.fragment.restore.inputSeedWords.suggestions.SuggestionViewHolderItem
 import com.tari.android.wallet.ui.fragment.restore.inputSeedWords.suggestions.SuggestionsAdapter
-import com.tari.android.wallet.ui.fragment.restore.activity.WalletRestoreRouter
 import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent
 import net.yslibrary.android.keyboardvisibilityevent.Unregistrar
 
@@ -57,7 +57,7 @@ class InputSeedWordsFragment : CommonFragment<FragmentWalletInputSeedWordsBindin
 
     private fun setupUI() = with(ui) {
         seedWordsContainer.setOnThrottledClickListener { viewModel.getFocusToNextElement(-1) }
-        backCtaView.setOnThrottledClickListener { requireActivity().onBackPressed() }
+        backCtaView.setOnThrottledClickListener { requireActivity().onBackPressedDispatcher.onBackPressed() }
         continueCtaView.setOnThrottledClickListener {
             onFinishEntering()
             viewModel.startRestoringWallet()

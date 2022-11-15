@@ -26,7 +26,7 @@ class BugsReportingFragment : CommonFragment<FragmentBugsReportingBinding, BugsR
     }
 
     private fun setupUI() = with(ui) {
-        backCtaView.setOnClickListener { requireActivity().onBackPressed() }
+        backCtaView.setOnClickListener { requireActivity().onBackPressedDispatcher.onBackPressed() }
         sendButton.setOnClickListener {
             viewModel.send(
                 nameEditText.text?.toString().orEmpty(),
