@@ -33,7 +33,6 @@
 package com.tari.android.wallet
 
 import com.tari.android.wallet.ffi.FFIByteVector
-import com.tari.android.wallet.ffi.FFIException
 import com.tari.android.wallet.ffi.HexString
 import com.tari.android.wallet.ffi.nullptr
 import org.junit.Assert.*
@@ -63,11 +62,4 @@ class FFIByteVectorTests {
         assertArrayEquals(byteArray, byteVector.getBytes())
         byteVector.destroy()
     }
-
-    @Test(expected = FFIException::class)
-    fun constructor_expectFFIExceptionThrow_ifHexLengthIs59() {
-        val givenHex = FFITestUtil.PUBLIC_KEY_HEX_STRING
-        FFIByteVector(HexString(givenHex.slice(0..givenHex.length - 5)))
-    }
-
 }
