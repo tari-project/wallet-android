@@ -47,15 +47,13 @@ Java_com_tari_android_wallet_ffi_FFIContact_jniCreate(
         jstring jAlias,
         jobject jPublicKey,
         jobject error) {
-    int errorCode = 0;
-    int *errorCodePointer = &errorCode;
-    const char *pAlias = jEnv->GetStringUTFChars(jAlias, JNI_FALSE);
-    jlong lPublicKey = GetPointerField(jEnv, jPublicKey);
-    auto *pPublicKey = reinterpret_cast<TariPublicKey *>(lPublicKey);
-    TariContact *pContact = contact_create(pAlias, pPublicKey, errorCodePointer);
-    setErrorCode(jEnv, error, errorCode);
-    jEnv->ReleaseStringUTFChars(jAlias, pAlias);
-    SetPointerField(jEnv, jThis, reinterpret_cast<jlong>(pContact));
+    ExecuteWithError(jEnv, error, [&](int *errorPointer) {
+        const char *pAlias = jEnv->GetStringUTFChars(jAlias, JNI_FALSE);
+        auto pPublicKey = GetPointerField<TariPublicKey *>(jEnv, jPublicKey);
+        TariContact *pContact = contact_create(pAlias, pPublicKey, errorPointer);
+        jEnv->ReleaseStringUTFChars(jAlias, pAlias);
+        SetPointerField(jEnv, jThis, reinterpret_cast<jlong>(pContact));
+    });
 }
 
 extern "C"
@@ -64,15 +62,13 @@ Java_com_tari_android_wallet_ffi_FFIContact_jniGetAlias(
         JNIEnv *jEnv,
         jobject jThis,
         jobject error) {
-    int errorCode = 0;
-    int *errorCodePointer = &errorCode;
-    jlong lContact = GetPointerField(jEnv, jThis);
-    auto *pContact = reinterpret_cast<TariContact *>(lContact);
-    const char *pAlias = contact_get_alias(pContact, errorCodePointer);
-    setErrorCode(jEnv, error, errorCode);
-    jstring result = jEnv->NewStringUTF(pAlias);
-    string_destroy(const_cast<char *>(pAlias));
-    return result;
+    return ExecuteWithError<jstring>(jEnv, error, [&](int *errorPointer) {
+        auto pContact = GetPointerField<TariContact *>(jEnv, jThis);
+        const char *pAlias = contact_get_alias(pContact, errorPointer);
+        jstring result = jEnv->NewStringUTF(pAlias);
+        string_destroy(const_cast<char *>(pAlias));
+        return result;
+    });
 }
 
 extern "C"
@@ -81,13 +77,10 @@ Java_com_tari_android_wallet_ffi_FFIContact_jniGetPublicKey(
         JNIEnv *jEnv,
         jobject jThis,
         jobject error) {
-    int errorCode = 0;
-    int *errorCodePointer = &errorCode;
-    jlong lContact = GetPointerField(jEnv, jThis);
-    auto *pContact = reinterpret_cast<TariContact *>(lContact);
-    auto result = reinterpret_cast<jlong>(contact_get_public_key(pContact, errorCodePointer));
-    setErrorCode(jEnv, error, errorCode);
-    return result;
+    return ExecuteWithErrorAndCast<TariPublicKey *>(jEnv, error, [&](int *errorPointer) {
+        auto pContact = GetPointerField<TariContact *>(jEnv, jThis);
+        return contact_get_public_key(pContact, errorPointer);
+    });
 }
 
 extern "C"
@@ -95,7 +88,6 @@ JNIEXPORT void JNICALL
 Java_com_tari_android_wallet_ffi_FFIContact_jniDestroy(
         JNIEnv *jEnv,
         jobject jThis) {
-    jlong lContact = GetPointerField(jEnv, jThis);
-    contact_destroy(reinterpret_cast<TariContact *>(lContact));
-    SetPointerField(jEnv, jThis, reinterpret_cast<jlong>(nullptr));
+    contact_destroy(GetPointerField<TariContact *>(jEnv, jThis));
+    SetNullPointerField(jEnv, jThis);
 }

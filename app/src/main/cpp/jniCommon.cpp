@@ -58,10 +58,24 @@ inline jlong GetPointerField(JNIEnv *jEnv, jobject jThis) {
     return lByteVector;
 }
 
+template <typename T>
+inline T GetPointerField(JNIEnv *jEnv, jobject jThis) {
+    return reinterpret_cast<T>(GetPointerField(jEnv, jThis));
+}
+
 inline void SetPointerField(JNIEnv *jEnv, jobject jThis, jlong jPointer) {
     jclass cls = jEnv->GetObjectClass(jThis);
     jfieldID fid = jEnv->GetFieldID(cls, "pointer", "J");
     jEnv->SetLongField(jThis, fid, jPointer);
+}
+
+inline void SetNullPointerField(JNIEnv *jEnv, jobject jThis) {
+    SetPointerField(jEnv, jThis, reinterpret_cast<jlong>(nullptr));
+}
+
+template <typename T>
+inline void SetNullPointerField(JNIEnv *jEnv, jobject jThis, T pointer) {
+    SetPointerField(jEnv, jThis, reinterpret_cast<jlong>(pointer));
 }
 
 // function included in multiple source files must be inline
@@ -91,4 +105,24 @@ inline jboolean setErrorCode(JNIEnv *jEnv, jobject error, jint value) {
         return static_cast<jboolean>(false);
     jEnv->SetIntField(error, errorField, value);
     return static_cast<jboolean>(true);
+}
+
+template <typename G>
+inline G ExecuteWithError(JNIEnv *jEnv, jobject error, std::function<G(int*)> fun) {
+    int errorCode = 0;
+    G result = fun(&errorCode);
+    setErrorCode(jEnv, error, errorCode);
+    return result;
+}
+
+inline void ExecuteWithError(JNIEnv *jEnv, jobject error, std::function<void(int*)> fun) {
+    int errorCode = 0;
+    fun(&errorCode);
+    setErrorCode(jEnv, error, errorCode);
+}
+
+template <typename G>
+inline jlong ExecuteWithErrorAndCast(JNIEnv *jEnv, jobject error, std::function<G(int*)> fun) {
+    G result = ExecuteWithError(jEnv, error, fun);
+    return reinterpret_cast<jlong>(result);
 }

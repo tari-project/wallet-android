@@ -45,16 +45,10 @@ Java_com_tari_android_wallet_ffi_FFIPendingOutboundTx_jniGetId(
         JNIEnv *jEnv,
         jobject jThis,
         jobject error) {
-    int errorCode = 0;
-    int *errorCodePointer = &errorCode;
-    jlong lOutboundTx = GetPointerField(jEnv, jThis);
-    auto *pOutboundTx = reinterpret_cast<TariPendingOutboundTransaction *>(lOutboundTx);
-    jbyteArray result = getBytesFromUnsignedLongLong(
-            jEnv,
-            pending_outbound_transaction_get_transaction_id(pOutboundTx, errorCodePointer)
-    );
-    setErrorCode(jEnv, error, errorCode);
-    return result;
+    return ExecuteWithError<jbyteArray>(jEnv, error, [&](int *errorPointer) {
+        auto pOutboundTx = GetPointerField<TariPendingOutboundTransaction *>(jEnv, jThis);
+        return getBytesFromUnsignedLongLong(jEnv, pending_outbound_transaction_get_transaction_id(pOutboundTx, errorPointer));
+    });
 }
 
 extern "C"
@@ -63,15 +57,10 @@ Java_com_tari_android_wallet_ffi_FFIPendingOutboundTx_jniGetDestinationPublicKey
         JNIEnv *jEnv,
         jobject jThis,
         jobject error) {
-    int errorCode = 0;
-    int *errorCodePointer = &errorCode;
-    jlong lOutboundTx = GetPointerField(jEnv, jThis);
-    auto *pOutboundTx = reinterpret_cast<TariPendingOutboundTransaction *>(lOutboundTx);
-    auto result = reinterpret_cast<jlong>(
-            pending_outbound_transaction_get_destination_public_key(pOutboundTx, errorCodePointer)
-    );
-    setErrorCode(jEnv, error, errorCode);
-    return result;
+    return ExecuteWithErrorAndCast<TariPublicKey *>(jEnv, error, [&](int *errorPointer) {
+        auto pOutboundTx = GetPointerField<TariPendingOutboundTransaction *>(jEnv, jThis);
+        return pending_outbound_transaction_get_destination_public_key(pOutboundTx, errorPointer);
+    });
 }
 
 extern "C"
@@ -80,16 +69,10 @@ Java_com_tari_android_wallet_ffi_FFIPendingOutboundTx_jniGetAmount(
         JNIEnv *jEnv,
         jobject jThis,
         jobject error) {
-    int errorCode = 0;
-    int *errorCodePointer = &errorCode;
-    jlong lOutboundTx = GetPointerField(jEnv, jThis);
-    auto *pOutboundTx = reinterpret_cast<TariPendingOutboundTransaction *>(lOutboundTx);
-    jbyteArray result = getBytesFromUnsignedLongLong(
-            jEnv,
-            pending_outbound_transaction_get_amount(pOutboundTx, errorCodePointer)
-    );
-    setErrorCode(jEnv, error, errorCode);
-    return result;
+    return ExecuteWithError<jbyteArray>(jEnv, error, [&](int *errorPointer) {
+        auto pOutboundTx = GetPointerField<TariPendingOutboundTransaction *>(jEnv, jThis);
+        return getBytesFromUnsignedLongLong(jEnv, pending_outbound_transaction_get_amount(pOutboundTx, errorPointer));
+    });
 }
 
 
@@ -99,16 +82,10 @@ Java_com_tari_android_wallet_ffi_FFIPendingOutboundTx_jniGetFee(
         JNIEnv *jEnv,
         jobject jThis,
         jobject error) {
-    int errorCode = 0;
-    int *errorCodePointer = &errorCode;
-    jlong lOutboundTx = GetPointerField(jEnv, jThis);
-    auto *pOutboundTx = reinterpret_cast<TariPendingOutboundTransaction *>(lOutboundTx);
-    jbyteArray result = getBytesFromUnsignedLongLong(
-            jEnv,
-            pending_outbound_transaction_get_fee(pOutboundTx, errorCodePointer)
-    );
-    setErrorCode(jEnv, error, errorCode);
-    return result;
+    return ExecuteWithError<jbyteArray>(jEnv, error, [&](int *errorPointer) {
+        auto pOutboundTx = GetPointerField<TariPendingOutboundTransaction *>(jEnv, jThis);
+        return getBytesFromUnsignedLongLong(jEnv, pending_outbound_transaction_get_fee(pOutboundTx, errorPointer));
+    });
 }
 
 extern "C"
@@ -117,15 +94,13 @@ Java_com_tari_android_wallet_ffi_FFIPendingOutboundTx_jniGetMessage(
         JNIEnv *jEnv,
         jobject jThis,
         jobject error) {
-    int errorCode = 0;
-    int *errorCodePointer = &errorCode;
-    jlong lOutboundTx = GetPointerField(jEnv, jThis);
-    auto *pOutboundTx = reinterpret_cast<TariPendingOutboundTransaction *>(lOutboundTx);
-    const char *pMessage = pending_outbound_transaction_get_message(pOutboundTx, errorCodePointer);
-    setErrorCode(jEnv, error, errorCode);
-    jstring result = jEnv->NewStringUTF(pMessage);
-    string_destroy(const_cast<char *>(pMessage));
-    return result;
+    return ExecuteWithError<jstring>(jEnv, error, [&](int *errorPointer) {
+        auto pOutboundTx = GetPointerField<TariPendingOutboundTransaction *>(jEnv, jThis);
+        const char *pMessage = pending_outbound_transaction_get_message(pOutboundTx, errorPointer);
+        jstring result = jEnv->NewStringUTF(pMessage);
+        string_destroy(const_cast<char *>(pMessage));
+        return result;
+    });
 }
 
 extern "C"
@@ -134,16 +109,10 @@ Java_com_tari_android_wallet_ffi_FFIPendingOutboundTx_jniGetTimestamp(
         JNIEnv *jEnv,
         jobject jThis,
         jobject error) {
-    int errorCode = 0;
-    int *errorCodePointer = &errorCode;
-    jlong lOutboundTx = GetPointerField(jEnv, jThis);
-    auto *pOutboundTx = reinterpret_cast<TariPendingOutboundTransaction *>(lOutboundTx);
-    jbyteArray result = getBytesFromUnsignedLongLong(
-            jEnv,
-            pending_outbound_transaction_get_timestamp(pOutboundTx, errorCodePointer)
-    );
-    setErrorCode(jEnv, error, errorCode);
-    return result;
+    return ExecuteWithError<jbyteArray>(jEnv, error, [&](int *errorPointer) {
+        auto pOutboundTx = GetPointerField<TariPendingOutboundTransaction *>(jEnv, jThis);
+        return getBytesFromUnsignedLongLong(jEnv, pending_outbound_transaction_get_timestamp(pOutboundTx, errorPointer));
+    });
 }
 
 extern "C"
@@ -152,13 +121,10 @@ Java_com_tari_android_wallet_ffi_FFIPendingOutboundTx_jniGetStatus(
         JNIEnv *jEnv,
         jobject jThis,
         jobject error) {
-    int errorCode = 0;
-    int *errorCodePointer = &errorCode;
-    jlong lOutboundTx = GetPointerField(jEnv, jThis);
-    auto *pOutboundTx = reinterpret_cast<TariPendingOutboundTransaction *>(lOutboundTx);
-    jint result = reinterpret_cast<jint>(pending_outbound_transaction_get_status(pOutboundTx, errorCodePointer));
-    setErrorCode(jEnv, error, errorCode);
-    return result;
+    return ExecuteWithError<jint>(jEnv, error, [&](int *errorPointer) {
+        auto pOutboundTx = GetPointerField<TariPendingOutboundTransaction *>(jEnv, jThis);
+        return reinterpret_cast<jint>(pending_outbound_transaction_get_status(pOutboundTx, errorPointer));
+    });
 }
 
 extern "C"
@@ -166,8 +132,6 @@ JNIEXPORT void JNICALL
 Java_com_tari_android_wallet_ffi_FFIPendingOutboundTx_jniDestroy(
         JNIEnv *jEnv,
         jobject jThis) {
-    jlong lOutboundTx = GetPointerField(jEnv, jThis);
-    pending_outbound_transaction_destroy(
-            reinterpret_cast<TariPendingOutboundTransaction *>(lOutboundTx));
-    SetPointerField(jEnv, jThis, reinterpret_cast<jlong>(nullptr));
+    pending_outbound_transaction_destroy(GetPointerField<TariPendingOutboundTransaction *>(jEnv, jThis));
+    SetNullPointerField(jEnv, jThis);
 }

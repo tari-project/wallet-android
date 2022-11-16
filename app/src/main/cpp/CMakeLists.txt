@@ -74,7 +74,6 @@ add_library(
         jniWallet.cpp
         jniSeedWords.cpp
         jniEmojiSet.cpp
-        jniUtil.cpp
         jniTransactionSendStatus.cpp
         jniCovenant.cpp
         jniOutputFeatures.cpp
@@ -83,7 +82,6 @@ add_library(
         jniTariVector.cpp
         jniTariUtxo.cpp
         jniTariCoinPreview.cpp
-        jniTariTransactionSendStatus.cpp
 )
 
 find_library(

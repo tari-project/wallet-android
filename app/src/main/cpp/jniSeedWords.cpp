@@ -53,12 +53,13 @@ JNIEXPORT void JNICALL
 Java_com_tari_android_wallet_ffi_FFISeedWords_jniGetMnemonicWordListForLanguage(
         JNIEnv *jEnv,
         jobject jThis,
-        jstring language) {
-    int errorCode = 0;
-    int *errorCodePointer = &errorCode;
-    const char *pLanguage = jEnv->GetStringUTFChars(language, JNI_FALSE);
-    TariSeedWords *pSeedWords = seed_words_get_mnemonic_word_list_for_language(pLanguage, errorCodePointer);
-    SetPointerField(jEnv, jThis, reinterpret_cast<jlong>(pSeedWords));
+        jstring language,
+        jobject error) {
+    ExecuteWithError(jEnv, error, [&](int *errorPointer) {
+        const char *pLanguage = jEnv->GetStringUTFChars(language, JNI_FALSE);
+        TariSeedWords *pSeedWords = seed_words_get_mnemonic_word_list_for_language(pLanguage, errorPointer);
+        SetPointerField(jEnv, jThis, reinterpret_cast<jlong>(pSeedWords));
+    });
 }
 
 extern "C"
@@ -68,15 +69,13 @@ Java_com_tari_android_wallet_ffi_FFISeedWords_jniPushWord(
         jobject jThis,
         jstring jWord,
         jobject error) {
-    int errorCode = 0;
-    int *errorCodePointer = &errorCode;
-    jlong lSeedWords = GetPointerField(jEnv, jThis);
-    auto *pSeedWords = reinterpret_cast<TariSeedWords *>(lSeedWords);
-    const char *pWord = jEnv->GetStringUTFChars(jWord, JNI_FALSE);
-    jint result = seed_words_push_word(pSeedWords, pWord, errorCodePointer);
-    jEnv->ReleaseStringUTFChars(jWord, pWord);
-    setErrorCode(jEnv, error, errorCode);
-    return result;
+    return ExecuteWithError<jint>(jEnv, error, [&](int *errorPointer) {
+        auto pSeedWords = GetPointerField<TariSeedWords *>(jEnv, jThis);
+        const char *pWord = jEnv->GetStringUTFChars(jWord, JNI_FALSE);
+        jint result = seed_words_push_word(pSeedWords, pWord, errorPointer);
+        jEnv->ReleaseStringUTFChars(jWord, pWord);
+        return result;
+    });
 }
 
 extern "C"
@@ -85,13 +84,10 @@ Java_com_tari_android_wallet_ffi_FFISeedWords_jniGetLength(
         JNIEnv *jEnv,
         jobject jThis,
         jobject error) {
-    int errorCode = 0;
-    int *errorCodePointer = &errorCode;
-    jlong lSeedWords = GetPointerField(jEnv, jThis);
-    auto *pSeedWords = reinterpret_cast<TariSeedWords *>(lSeedWords);
-    jint result = seed_words_get_length(pSeedWords, errorCodePointer);
-    setErrorCode(jEnv, error, errorCode);
-    return result;
+    return ExecuteWithError<jint>(jEnv, error, [&](int *errorPointer) {
+        auto pSeedWords = GetPointerField<TariSeedWords *>(jEnv, jThis);
+        return seed_words_get_length(pSeedWords, errorPointer);
+    });
 }
 
 extern "C"
@@ -101,15 +97,13 @@ Java_com_tari_android_wallet_ffi_FFISeedWords_jniGetAt(
         jobject jThis,
         jint index,
         jobject error) {
-    int errorCode = 0;
-    int *errorCodePointer = &errorCode;
-    jlong lSeedWords = GetPointerField(jEnv, jThis);
-    auto *pSeedWords = reinterpret_cast<TariSeedWords *>(lSeedWords);
-    const char *pWord = seed_words_get_at(pSeedWords, static_cast<unsigned int>(index), errorCodePointer);
-    setErrorCode(jEnv, error, errorCode);
-    jstring result = jEnv->NewStringUTF(pWord);
-    string_destroy(const_cast<char *>(pWord));
-    return result;
+    return ExecuteWithError<jstring>(jEnv, error, [&](int *errorPointer) {
+        auto pSeedWords = GetPointerField<TariSeedWords *>(jEnv, jThis);
+        const char *pWord = seed_words_get_at(pSeedWords, static_cast<unsigned int>(index), errorPointer);
+        jstring result = jEnv->NewStringUTF(pWord);
+        string_destroy(const_cast<char *>(pWord));
+        return result;
+    });
 }
 
 extern "C"
@@ -117,7 +111,6 @@ JNIEXPORT void JNICALL
 Java_com_tari_android_wallet_ffi_FFISeedWords_jniDestroy(
         JNIEnv *jEnv,
         jobject jThis) {
-    jlong lSeedWords = GetPointerField(jEnv, jThis);
-    seed_words_destroy(reinterpret_cast<TariSeedWords *>(lSeedWords));
-    SetPointerField(jEnv, jThis, reinterpret_cast<jlong>(nullptr));
+    seed_words_destroy(GetPointerField<TariSeedWords *>(jEnv, jThis));
+    SetNullPointerField(jEnv, jThis);
 }

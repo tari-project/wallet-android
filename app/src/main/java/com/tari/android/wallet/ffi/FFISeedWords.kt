@@ -47,7 +47,7 @@ class FFISeedWords() : FFIBase() {
     private external fun jniGetAt(index: Int, libError: FFIError): String
     private external fun jniDestroy()
 
-    external fun jniGetMnemonicWordListForLanguage(language: String)
+    external fun jniGetMnemonicWordListForLanguage(language: String, libError: FFIError)
 
     init {
         jniCreate()
@@ -67,7 +67,7 @@ class FFISeedWords() : FFIBase() {
 
     companion object {
         fun getMnemomicWordList(language: Language): FFISeedWords = FFISeedWords().apply {
-            jniGetMnemonicWordListForLanguage(language.name)
+            jniGetMnemonicWordListForLanguage(language.name, FFIError())
         }
     }
 
