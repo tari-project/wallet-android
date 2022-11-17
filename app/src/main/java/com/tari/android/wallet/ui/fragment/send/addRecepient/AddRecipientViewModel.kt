@@ -30,7 +30,7 @@ import javax.inject.Inject
 //todo needed to refactor input methods
 class AddRecipientViewModel : CommonViewModel() {
 
-    var emojiIdPublicKey: PublicKey? = null
+    var tariWalletAddress: TariWalletAddress? = null
     var amountFromDeeplink: MicroTari? = null
 
     private var searchingJob: Job? = null
@@ -44,8 +44,8 @@ class AddRecipientViewModel : CommonViewModel() {
     private val _navigation: SingleLiveEvent<AddRecipientNavigation> = SingleLiveEvent()
     val navigation: LiveData<AddRecipientNavigation> = _navigation
 
-    private val _showClipboardData: MutableLiveData<PublicKey> = MutableLiveData()
-    val showClipboardData: LiveData<PublicKey> = _showClipboardData
+    private val _showClipboardData: MutableLiveData<TariWalletAddress> = MutableLiveData()
+    val showClipboardData: LiveData<TariWalletAddress> = _showClipboardData
 
     private val _foundYatUser: SingleLiveEvent<Optional<YatUser>> = SingleLiveEvent()
     val foundYatUser: LiveData<Optional<YatUser>> = _foundYatUser
@@ -107,15 +107,15 @@ class AddRecipientViewModel : CommonViewModel() {
         _foundYatUser.value = Optional.ofNullable(null)
         // search transaction users
         val filteredTxUsers = allTxs.filter {
-            it.user.publicKey.emojiId.contains(query) || (it.user as? Contact)?.alias?.contains(query, ignoreCase = true) ?: false
+            it.user.walletAddress.emojiId.contains(query) || (it.user as? Contact)?.alias?.contains(query, ignoreCase = true) ?: false
         }.map { it.user }.distinct()
 
         // search contacts (we don't have non-transaction contacts at the moment, but we probably
         // will have them in the future - so this is a safety measure)
-        val filteredContacts = contacts.filter { it.publicKey.emojiId.contains(query) || it.alias.contains(query, ignoreCase = true) }
+        val filteredContacts = contacts.filter { it.walletAddress.emojiId.contains(query) || it.alias.contains(query, ignoreCase = true) }
         val users = (filteredTxUsers + filteredContacts).distinct().sortedWith { o1, o2 ->
-            val value1 = ((o1 as? Contact)?.alias) ?: o1.publicKey.emojiId
-            val value2 = ((o2 as? Contact)?.alias) ?: o2.publicKey.emojiId
+            val value1 = ((o1 as? Contact)?.alias) ?: o1.walletAddress.emojiId
+            val value2 = ((o2 as? Contact)?.alias) ?: o2.walletAddress.emojiId
             value1.compareTo(value2)
         }
 
@@ -123,7 +123,7 @@ class AddRecipientViewModel : CommonViewModel() {
 
         searchingJob = viewModelScope.launch(Dispatchers.IO) {
             yatAdapter.searchYats(query)?.result?.entries?.firstOrNull()?.let { response ->
-                walletService.getPublicKeyFromHexString(response.value.address)?.let { pubKey ->
+                walletService.getWalletAddressFromHexString(response.value.address)?.let { pubKey ->
                     val yatUser = YatUser(pubKey).apply { yat = query }
                     _foundYatUser.postValue(Optional.ofNullable(yatUser))
                 }
@@ -150,7 +150,7 @@ class AddRecipientViewModel : CommonViewModel() {
         viewModelScope.launch(Dispatchers.IO) {
             val yatUserOptional = _foundYatUser.value
             val yatUser = if (yatUserOptional?.isPresent == true) yatUserOptional.get() else null
-            val user = yatUser ?: contacts.firstOrNull { it.publicKey == emojiIdPublicKey } ?: User(emojiIdPublicKey!!)
+            val user = yatUser ?: contacts.firstOrNull { it.walletAddress == tariWalletAddress } ?: User(tariWalletAddress!!)
             _navigation.postValue(AddRecipientNavigation.ToAmount(user, amountFromDeeplink))
         }
     }
@@ -163,7 +163,7 @@ class AddRecipientViewModel : CommonViewModel() {
 
         val deepLink = deeplinkHandler.handle(clipboardString) as? DeepLink.Send
         if (deepLink != null) { // there is a deep link in the clipboard
-            emojiIdPublicKey = walletService.getPublicKeyFromHexString(deepLink.publicKeyHex)
+            tariWalletAddress = walletService.getWalletAddressFromHexString(deepLink.walletAddressHex)
         } else { // try to extract a valid emoji id
             val emojis = clipboardString.trim().extractEmojis()
             // search in windows of length = emoji id length
@@ -174,17 +174,17 @@ class AddRecipientViewModel : CommonViewModel() {
                         .subList(currentIndex, currentIndex + Constants.Wallet.emojiIdLength)
                         .joinToString(separator = "")
                 // there is a chunked emoji id in the clipboard
-                emojiIdPublicKey = walletService.getPublicKeyFromEmojiId(emojiWindow)
-                if (emojiIdPublicKey != null) {
+                tariWalletAddress = walletService.getWalletAddressFromEmojiId(emojiWindow)
+                if (tariWalletAddress != null) {
                     break
                 }
                 --currentIndex
             }
         }
-        if (emojiIdPublicKey == null) {
+        if (tariWalletAddress == null) {
             checkForPublicKeyHex(clipboardString)
         }
-        emojiIdPublicKey?.let {
+        tariWalletAddress?.let {
             if (it.emojiId != sharedPrefsWrapper.emojiId!!) {
                 _showClipboardData.postValue(it)
             }
@@ -199,8 +199,8 @@ class AddRecipientViewModel : CommonViewModel() {
         var result = hexStringRegex.find(input)
         while (result != null) {
             val hexString = result.value
-            emojiIdPublicKey = walletService.getPublicKeyFromHexString(hexString)
-            if (emojiIdPublicKey != null) {
+            tariWalletAddress = walletService.getWalletAddressFromHexString(hexString)
+            if (tariWalletAddress != null) {
                 return true
             }
             result = result.next()
@@ -208,9 +208,9 @@ class AddRecipientViewModel : CommonViewModel() {
         return false
     }
 
-    fun getPublicKeyFromHexString(publicKeyHex: String): PublicKey? =
-        walletService.getWithError { _, wallet -> wallet.getPublicKeyFromHexString(publicKeyHex) }
+    fun getPublicKeyFromHexString(publicKeyHex: String): TariWalletAddress? =
+        walletService.getWithError { _, wallet -> wallet.getWalletAddressFromHexString(publicKeyHex) }
 
-    fun getPublicKeyFromEmojiId(emojiId: String): PublicKey? = walletService.getWithError { _, wallet -> wallet.getPublicKeyFromEmojiId(emojiId) }
+    fun getPublicKeyFromEmojiId(emojiId: String): TariWalletAddress? = walletService.getWithError { _, wallet -> wallet.getWalletAddressFromEmojiId(emojiId) }
 }
 

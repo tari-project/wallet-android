@@ -60,7 +60,7 @@ abstract class Tx : Parcelable {
     var user = User()
 
     val isOneSided
-        get() = user.publicKey.hexString.all{ it == '0' }
+        get() = user.walletAddress.hexString.all{ it == '0' }
 
     override fun toString(): String = "Tx(id=$id, direction=$direction, amount=$amount, timestamp=$timestamp, message='$message', user=$user)"
 

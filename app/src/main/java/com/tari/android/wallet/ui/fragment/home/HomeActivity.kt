@@ -360,10 +360,10 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>(), AllSe
     private fun sendTariToUser(service: TariWalletService, sendDeeplink: DeepLink.Send) {
         val error = WalletError()
         val contacts = service.getContacts(error)
-        val pubKey = service.getPublicKeyFromHexString(sendDeeplink.publicKeyHex)
+        val walletAddress = service.getWalletAddressFromHexString(sendDeeplink.walletAddressHex)
         val recipientUser = when (error) {
-            WalletError.NoError -> contacts.firstOrNull { it.publicKey == pubKey } ?: User(pubKey)
-            else -> User(pubKey)
+            WalletError.NoError -> contacts.firstOrNull { it.walletAddress == walletAddress } ?: User(walletAddress)
+            else -> User(walletAddress)
         }
         val intent = Intent(this, SendTariActivity::class.java)
         intent.putExtra("recipientUser", recipientUser as Parcelable)

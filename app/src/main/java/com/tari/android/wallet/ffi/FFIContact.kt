@@ -60,12 +60,12 @@ class FFIContact() : FFIBase() {
 
     fun getAlias(): String = runWithError { jniGetAlias(it) }
 
-    fun getPublicKey(): FFIPublicKey = runWithError { FFIPublicKey(jniGetTariWalletAddress(it)) }
+    fun getWalletAddress(): FFITariWalletAddress = runWithError { FFITariWalletAddress(jniGetTariWalletAddress(it)) }
 
     override fun toString(): String = StringBuilder()
         .append(getAlias())
         .append("|")
-        .append(getPublicKey().toString())
+        .append(getWalletAddress().toString())
         .toString()
 
     override fun destroy() = jniDestroy()

@@ -137,12 +137,9 @@ class FFIWalletTests {
     @Test
     fun validInstanceWithValidPublicKeyWasCreated() {
         assertNotEquals(nullptr, wallet.pointer)
-        val publicKey = wallet.getPublicKey()
-        assertNotEquals(nullptr, publicKey.pointer)
-        assertEquals(
-            FFITestUtil.PUBLIC_KEY_HEX_STRING.length,
-            publicKey.toString().length
-        )
+        val ffiTariWalletAddress = wallet.getWalletAddress()
+        assertNotEquals(nullptr, ffiTariWalletAddress.pointer)
+        assertEquals(FFITestUtil.PUBLIC_KEY_HEX_STRING.length, ffiTariWalletAddress.toString().length)
     }
 
 //    @Test
@@ -158,14 +155,14 @@ class FFIWalletTests {
         // add contacts
         repeat(contactCount) {
             val contactPrivateKey = FFIPrivateKey.generate()
-            val contactPublicKey = FFIPublicKey(contactPrivateKey)
+            val contactWalletAddress = FFITariWalletAddress(contactPrivateKey)
             val contact = FFIContact(
                 FFITestUtil.generateRandomAlphanumericString(16),
-                contactPublicKey
+                contactWalletAddress
             )
             wallet.addUpdateContact(contact)
             contactPrivateKey.destroy()
-            contactPublicKey.destroy()
+            contactWalletAddress.destroy()
             contact.destroy()
         }
         // test get contacts
@@ -173,13 +170,13 @@ class FFIWalletTests {
         assertEquals(contactCount, contacts.getLength())
         // test update alias
         val lastContactOld = contacts.getAt(contactCount - 1)
-        val lastContactOldPublicKey = lastContactOld.getPublicKey()
+        val lastContactOldWalletAddress = lastContactOld.getWalletAddress()
         val newAlias = FFITestUtil.generateRandomAlphanumericString(7)
         val lastContactNew = FFIContact(
             newAlias,
-            lastContactOldPublicKey
+            lastContactOldWalletAddress
         )
-        lastContactOldPublicKey.destroy()
+        lastContactOldWalletAddress.destroy()
         wallet.addUpdateContact(lastContactNew)
         lastContactOld.destroy()
         lastContactNew.destroy()

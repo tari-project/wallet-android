@@ -75,7 +75,7 @@ class FFITariWalletAddress() : FFIBase() {
 
     fun getEmojiId(): String = runWithError { jniGetEmojiId(it) }
 
-    override fun toString(): String = runWithError { FFIByteVector(jniGetBytes(it)).toString() }
+    override fun toString(): String = getBytes().toString()
 
     override fun destroy() = jniDestroy()
 }

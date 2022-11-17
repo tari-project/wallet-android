@@ -190,8 +190,8 @@ class AddNoteFragment : Fragment(), View.OnTouchListener {
             requireContext(),
             fullEmojiIdListener
         )
-        fullEmojiIdViewController.fullEmojiId = recipientUser.publicKey.emojiId
-        fullEmojiIdViewController.emojiIdHex = recipientUser.publicKey.hexString
+        fullEmojiIdViewController.fullEmojiId = recipientUser.walletAddress.emojiId
+        fullEmojiIdViewController.emojiIdHex = recipientUser.walletAddress.hexString
 
         displayAliasOrEmojiId()
         ui.progressBar.setColor(color(white))
@@ -264,7 +264,7 @@ class AddNoteFragment : Fragment(), View.OnTouchListener {
             ui.titleTextView.visible()
             ui.titleTextView.text = (recipientUser as Contact).alias
         } else {
-            displayEmojiId(recipientUser.publicKey.emojiId)
+            displayEmojiId(recipientUser.walletAddress.emojiId)
         }
     }
 

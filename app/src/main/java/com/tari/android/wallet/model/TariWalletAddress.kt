@@ -30,51 +30,70 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.tari.android.wallet.event
+package com.tari.android.wallet.model
 
-import com.tari.android.wallet.model.*
-import com.tari.android.wallet.ui.fragment.send.finalize.TxFailureReason
+import android.os.Parcel
+import android.os.Parcelable
 
 /**
- * App-wide events.
+ * This wrapper is needed for id parameters in AIDL methods.
+ *
+ * @author The Tari Development Team
  */
-object Event {
+class TariWalletAddress() : Parcelable {
 
-    object App {
-        class AppBackgrounded
-        class AppForegrounded
+    var hexString = ""
+    var emojiId = ""
+
+    constructor(
+        hexString: String,
+        emojiId: String
+    ) : this() {
+        this.hexString = hexString
+        this.emojiId = emojiId
     }
 
-    /**
-     * Wallet events.
-     */
-    object Transaction {
-        object Updated
-        data class TxReceived(val tx: PendingInboundTx)
-        data class TxReplyReceived(val tx: PendingOutboundTx)
-        data class TxFinalized(val tx: PendingInboundTx)
-        data class InboundTxBroadcast(val tx: PendingInboundTx)
-        data class OutboundTxBroadcast(val tx: PendingOutboundTx)
-        data class TxMined(val tx: CompletedTx)
-        data class TxMinedUnconfirmed(val tx: CompletedTx)
-        data class TxFauxConfirmed(val tx: CompletedTx)
-        data class TxFauxMinedUnconfirmed(val tx: CompletedTx)
-        data class TxCancelled(val tx: CancelledTx)
-        data class DirectSendResult(val txId: TxId, val status: TransactionSendStatus)
-        data class TxSendSuccessful(val txId: TxId)
-        data class TxSendFailed(val failureReason: TxFailureReason)
+    override fun equals(other: Any?): Boolean = (other is TariWalletAddress)
+            && hexString == other.hexString
+
+    override fun hashCode(): Int {
+        return hexString.hashCode()
     }
 
-    /**
-     * Contact events.
-     */
-    object Contact {
-        data class ContactAddedOrUpdated(val contactAddress: TariWalletAddress, val contactAlias: String)
-        data class ContactRemoved(val contactAddress: TariWalletAddress)
+    override fun toString(): String = "TariWalletAddress(hexString='$hexString', emojiId='$emojiId')"
+
+    // region Parcelable
+
+    constructor(parcel: Parcel) : this() {
+        readFromParcel(parcel)
     }
 
-    object Testnet {
-        class TestnetTariRequestSuccessful
-        data class TestnetTariRequestError(val errorMessage: String)
+    companion object CREATOR : Parcelable.Creator<TariWalletAddress> {
+
+        override fun createFromParcel(parcel: Parcel): TariWalletAddress {
+            return TariWalletAddress(parcel)
+        }
+
+        override fun newArray(size: Int): Array<TariWalletAddress> {
+            return Array(size) { TariWalletAddress() }
+        }
+
     }
+
+    override fun writeToParcel(parcel: Parcel, flags: Int) {
+        parcel.writeString(hexString)
+        parcel.writeString(emojiId)
+    }
+
+    private fun readFromParcel(inParcel: Parcel) {
+        hexString = inParcel.readString().orEmpty()
+        emojiId = inParcel.readString().orEmpty()
+    }
+
+    override fun describeContents(): Int {
+        return 0
+    }
+
+    // endregion
+
 }

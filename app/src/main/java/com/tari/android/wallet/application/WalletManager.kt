@@ -179,10 +179,10 @@ class WalletManager(
      */
     private fun saveWalletPublicKeyHexToSharedPrefs() {
         // set shared preferences values after instantiation
-        FFIWallet.instance?.getPublicKey()?.let { publicKeyFFI ->
-            sharedPrefsWrapper.publicKeyHexString = publicKeyFFI.toString()
-            sharedPrefsWrapper.emojiId = publicKeyFFI.getEmojiId()
-            publicKeyFFI.destroy()
+        FFIWallet.instance?.getWalletAddress()?.let { ffiTariWalletAddress ->
+            sharedPrefsWrapper.publicKeyHexString = ffiTariWalletAddress.toString()
+            sharedPrefsWrapper.emojiId = ffiTariWalletAddress.getEmojiId()
+            ffiTariWalletAddress.destroy()
         }
     }
 

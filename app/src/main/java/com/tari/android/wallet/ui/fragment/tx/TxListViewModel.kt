@@ -4,7 +4,6 @@ import androidx.lifecycle.*
 import com.tari.android.wallet.R
 import com.tari.android.wallet.R.string.*
 import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
-import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepository
 import com.tari.android.wallet.data.sharedPrefs.tariSettings.TariSettingsSharedRepository
 import com.tari.android.wallet.data.sharedPrefs.testnetFaucet.TestnetFaucetRepository
 import com.tari.android.wallet.event.Event
@@ -239,8 +238,8 @@ class TxListViewModel : CommonViewModel() {
 
         EventBus.balanceState.publishSubject.subscribe { _balanceInfo.postValue(it) }.addTo(compositeDisposable)
 
-        EventBus.subscribe<Event.Contact.ContactAddedOrUpdated>(this) { onContactAddedOrUpdated(it.contactPublicKey, it.contactAlias) }
-        EventBus.subscribe<Event.Contact.ContactRemoved>(this) { onContactRemoved(it.contactPublicKey) }
+        EventBus.subscribe<Event.Contact.ContactAddedOrUpdated>(this) { onContactAddedOrUpdated(it.contactAddress, it.contactAlias) }
+        EventBus.subscribe<Event.Contact.ContactRemoved>(this) { onContactRemoved(it.contactAddress) }
 
         EventBus.networkConnectionState.subscribe(this) { networkConnectionState ->
             if (testnetTariRequestIsWaitingOnConnection && networkConnectionState == NetworkConnectionState.CONNECTED
@@ -347,18 +346,18 @@ class TxListViewModel : CommonViewModel() {
         _listUpdateTrigger.postValue(Unit)
     }
 
-    private fun onContactAddedOrUpdated(publicKey: PublicKey, alias: String) {
-        val contact = Contact(publicKey, alias)
+    private fun onContactAddedOrUpdated(tariWalletAddress: TariWalletAddress, alias: String) {
+        val contact = Contact(tariWalletAddress, alias)
         (cancelledTxs.asSequence() + pendingInboundTxs + pendingOutboundTxs + completedTxs)
-            .filter { it.user.publicKey == publicKey }
+            .filter { it.user.walletAddress == tariWalletAddress }
             .forEach { it.user = contact }
         _listUpdateTrigger.postValue(Unit)
     }
 
-    private fun onContactRemoved(publicKey: PublicKey) {
-        val user = User(publicKey)
+    private fun onContactRemoved(tariWalletAddress: TariWalletAddress) {
+        val user = User(tariWalletAddress)
         (cancelledTxs.asSequence() + pendingInboundTxs + pendingOutboundTxs + completedTxs)
-            .filter { it.user.publicKey == publicKey }
+            .filter { it.user.walletAddress == tariWalletAddress }
             .forEach { it.user = user }
         _listUpdateTrigger.postValue(Unit)
     }
@@ -406,7 +405,7 @@ class TxListViewModel : CommonViewModel() {
 
             viewModelScope.launch(Dispatchers.IO) {
                 delay(Constants.UI.Home.showTariBotDialogDelayMs)
-                showTestnetTariReceivedDialog(importedTx.user.publicKey)
+                showTestnetTariReceivedDialog(importedTx.user.walletAddress)
             }
 
             testnetTariRequestIsInProgress = false
@@ -499,14 +498,14 @@ class TxListViewModel : CommonViewModel() {
         _modularDialog.postValue(args.getModular(resourceManager))
     }
 
-    private fun showTestnetTariReceivedDialog(testnetSenderPublicKey: PublicKey) {
+    private fun showTestnetTariReceivedDialog(testnetSenderWalletAddress: TariWalletAddress) {
         val args = ModularDialogArgs(
             DialogArgs(true, canceledOnTouchOutside = false), listOf(
                 HeadModule(resourceManager.getString(home_tari_bot_you_got_tari_dlg_title)),
                 BodyModule(resourceManager.getString(home_tari_bot_dialog_desc)),
                 ButtonModule(resourceManager.getString(send_tari_title), ButtonStyle.Normal) {
                     _dismissDialog.value = Unit
-                    sendTariToUser(testnetSenderPublicKey)
+                    sendTariToUser(testnetSenderWalletAddress)
                 },
                 ButtonModule(resourceManager.getString(home_tari_bot_try_later), ButtonStyle.Close)
             )
@@ -531,12 +530,12 @@ class TxListViewModel : CommonViewModel() {
         _modularDialog.postValue(args)
     }
 
-    private fun sendTariToUser(recipientPublicKey: PublicKey) {
+    private fun sendTariToUser(tariWalletAddress: TariWalletAddress) {
         val error = WalletError()
         val contacts = walletService.getContacts(error)
         val recipientUser = when (error) {
-            WalletError.NoError -> contacts.firstOrNull { it.publicKey == recipientPublicKey } ?: User(recipientPublicKey)
-            else -> User(recipientPublicKey)
+            WalletError.NoError -> contacts.firstOrNull { it.walletAddress == tariWalletAddress } ?: User(tariWalletAddress)
+            else -> User(tariWalletAddress)
         }
 
         _navigation.postValue(TxListNavigation.ToSendTariToUser(recipientUser))

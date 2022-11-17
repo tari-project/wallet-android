@@ -61,11 +61,11 @@ class RecipientViewHolder(view: ItemAddRecipientListBinding) : CommonViewHolder<
             }
             is YatUser -> {
                 ui.profileIconImageView.setImageResource(R.drawable.yat_logo)
-                emojiIdSummaryController.display(item.user.publicKey.emojiId)
+                emojiIdSummaryController.display(item.user.walletAddress.emojiId)
             }
             else -> {
                 ui.profileIconImageView.setImageResource(R.drawable.recipient_profile_icon)
-                emojiIdSummaryController.display(item.user.publicKey.emojiId)
+                emojiIdSummaryController.display(item.user.walletAddress.emojiId)
             }
         }
     }

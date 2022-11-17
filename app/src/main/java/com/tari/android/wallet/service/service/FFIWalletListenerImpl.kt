@@ -56,7 +56,7 @@ class FFIWalletListenerImpl(
     val outboundTxIdsToBePushNotified = CopyOnWriteArraySet<Pair<BigInteger, String>>()
 
     override fun onTxReceived(pendingInboundTx: PendingInboundTx) {
-        pendingInboundTx.user = getUserByPublicKey(pendingInboundTx.user.publicKey)
+        pendingInboundTx.user = getUserByWalletAddress(pendingInboundTx.user.walletAddress)
         // post event to bus for the listeners
         EventBus.post(Event.Transaction.TxReceived(pendingInboundTx))
         // manage notifications
@@ -67,7 +67,7 @@ class FFIWalletListenerImpl(
     }
 
     override fun onTxReplyReceived(pendingOutboundTx: PendingOutboundTx) {
-        pendingOutboundTx.user = getUserByPublicKey(pendingOutboundTx.user.publicKey)
+        pendingOutboundTx.user = getUserByWalletAddress(pendingOutboundTx.user.walletAddress)
         // post event to bus for the listeners
         EventBus.post(Event.Transaction.TxReplyReceived(pendingOutboundTx))
         // notify external listeners
@@ -77,7 +77,7 @@ class FFIWalletListenerImpl(
     }
 
     override fun onTxFinalized(pendingInboundTx: PendingInboundTx) {
-        pendingInboundTx.user = getUserByPublicKey(pendingInboundTx.user.publicKey)
+        pendingInboundTx.user = getUserByWalletAddress(pendingInboundTx.user.walletAddress)
         // post event to bus for the listeners
         EventBus.post(Event.Transaction.TxFinalized(pendingInboundTx))
         // notify external listeners
@@ -87,7 +87,7 @@ class FFIWalletListenerImpl(
     }
 
     override fun onInboundTxBroadcast(pendingInboundTx: PendingInboundTx) {
-        pendingInboundTx.user = getUserByPublicKey(pendingInboundTx.user.publicKey)
+        pendingInboundTx.user = getUserByWalletAddress(pendingInboundTx.user.walletAddress)
         // post event to bus for the listeners
         EventBus.post(Event.Transaction.InboundTxBroadcast(pendingInboundTx))
         // notify external listeners
@@ -97,7 +97,7 @@ class FFIWalletListenerImpl(
     }
 
     override fun onOutboundTxBroadcast(pendingOutboundTx: PendingOutboundTx) {
-        pendingOutboundTx.user = getUserByPublicKey(pendingOutboundTx.user.publicKey)
+        pendingOutboundTx.user = getUserByWalletAddress(pendingOutboundTx.user.walletAddress)
         // post event to bus for the listeners
         EventBus.post(Event.Transaction.OutboundTxBroadcast(pendingOutboundTx))
         // notify external listeners
@@ -107,7 +107,7 @@ class FFIWalletListenerImpl(
     }
 
     override fun onTxMined(completedTx: CompletedTx) {
-        completedTx.user = getUserByPublicKey(completedTx.user.publicKey)
+        completedTx.user = getUserByWalletAddress(completedTx.user.walletAddress)
         // post event to bus for the listeners
         EventBus.post(Event.Transaction.TxMined(completedTx))
         // notify external listeners
@@ -117,7 +117,7 @@ class FFIWalletListenerImpl(
     }
 
     override fun onTxMinedUnconfirmed(completedTx: CompletedTx, confirmationCount: Int) {
-        completedTx.user = getUserByPublicKey(completedTx.user.publicKey)
+        completedTx.user = getUserByWalletAddress(completedTx.user.walletAddress)
         // post event to bus for the listeners
         EventBus.post(Event.Transaction.TxMinedUnconfirmed(completedTx))
         // notify external listeners
@@ -127,7 +127,7 @@ class FFIWalletListenerImpl(
     }
 
     override fun onTxFauxConfirmed(completedTx: CompletedTx) {
-        completedTx.user = getUserByPublicKey(completedTx.user.publicKey)
+        completedTx.user = getUserByWalletAddress(completedTx.user.walletAddress)
         // post event to bus for the listeners
         EventBus.post(Event.Transaction.TxFauxConfirmed(completedTx))
         // notify external listeners
@@ -137,7 +137,7 @@ class FFIWalletListenerImpl(
     }
 
     override fun onTxFauxUnconfirmed(completedTx: CompletedTx, confirmationCount: Int) {
-        completedTx.user = getUserByPublicKey(completedTx.user.publicKey)
+        completedTx.user = getUserByWalletAddress(completedTx.user.walletAddress)
         // post event to bus for the listeners
         EventBus.post(Event.Transaction.TxFauxMinedUnconfirmed(completedTx))
         // notify external listeners
@@ -160,7 +160,7 @@ class FFIWalletListenerImpl(
     }
 
     override fun onTxCancelled(cancelledTx: CancelledTx, rejectionReason: Int) {
-        cancelledTx.user = getUserByPublicKey(cancelledTx.user.publicKey)
+        cancelledTx.user = getUserByWalletAddress(cancelledTx.user.walletAddress)
         // post event to bus
         EventBus.post(Event.Transaction.TxCancelled(cancelledTx))
         val currentActivity = app.currentActivity
@@ -211,13 +211,13 @@ class FFIWalletListenerImpl(
         }
     }
 
-    private fun getUserByPublicKey(key: PublicKey): User {
+    private fun getUserByWalletAddress(address: TariWalletAddress): User {
         val contactsFFI = wallet.getContacts()
         for (i in 0 until contactsFFI.getLength()) {
             val contactFFI = contactsFFI.getAt(i)
-            val publicKeyFFI = contactFFI.getPublicKey()
+            val publicKeyFFI = contactFFI.getWalletAddress()
             val hex = publicKeyFFI.toString()
-            val contact = if (hex == key.hexString) Contact(key, contactFFI.getAlias()) else null
+            val contact = if (hex == address.hexString) Contact(address, contactFFI.getAlias()) else null
             publicKeyFFI.destroy()
             contactFFI.destroy()
             if (contact != null) {
@@ -227,7 +227,7 @@ class FFIWalletListenerImpl(
         }
         // destroy native collection
         contactsFFI.destroy()
-        return User(key)
+        return User(address)
     }
 
     fun postTxNotification(tx: Tx) {

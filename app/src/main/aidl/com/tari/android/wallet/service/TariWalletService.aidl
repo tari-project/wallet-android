@@ -49,7 +49,7 @@ interface TariWalletService {
     */
     boolean unregisterListener(TariWalletServiceListener listener);
 
-    String getPublicKeyHexString(out WalletError error);
+    String getWalletAddressHexString(out WalletError error);
 
     BalanceInfo getBalanceInfo(out WalletError error);
 
@@ -103,7 +103,7 @@ interface TariWalletService {
     */
     CompletedTx importTestnetUTXO(in String txMessage, out WalletError error);
 
-    boolean updateContactAlias(in PublicKey contactPublicKey, in String alias, out WalletError error);
+    boolean updateContactAlias(in TariWalletAddress address, in String alias, out WalletError error);
 
     boolean removeContact(in Contact contact, out WalletError error);
 
@@ -112,8 +112,8 @@ interface TariWalletService {
     * do not accept out error parameters - they will just return null if a public key
     * cannot be constructed from input parameters.
     */
-    PublicKey getPublicKeyFromEmojiId(in String emojiId);
-    PublicKey getPublicKeyFromHexString(in String publicKeyHex);
+    TariWalletAddress getWalletAddressFromEmojiId(in String emojiId);
+    TariWalletAddress getWalletAddressFromHexString(in String hex);
 
     /**
     * Key-value storage functions.

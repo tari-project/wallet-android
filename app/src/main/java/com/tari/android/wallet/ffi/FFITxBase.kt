@@ -1,6 +1,6 @@
 package com.tari.android.wallet.ffi
 
-import com.tari.android.wallet.model.PublicKey
+import com.tari.android.wallet.model.TariWalletAddress
 import com.tari.android.wallet.model.Tx
 import com.tari.android.wallet.model.User
 
@@ -19,13 +19,13 @@ abstract class FFITxBase() : FFIBase() {
             getDestinationPublicKey().runWithDestroy {
                 val destinationHex = it.toString()
                 val destinationEmoji = it.getEmojiId()
-                PublicKey(destinationHex, destinationEmoji)
+                TariWalletAddress(destinationHex, destinationEmoji)
             }
         } else {
             getSourcePublicKey().runWithDestroy {
                 val sourceHex = it.toString()
                 val sourceEmoji = it.getEmojiId()
-                PublicKey(sourceHex, sourceEmoji)
+                TariWalletAddress(sourceHex, sourceEmoji)
             }
         }
         return User(publicKey)

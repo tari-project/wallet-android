@@ -45,7 +45,7 @@ sealed class DeepLink {
     open fun getParams(): Map<String, String> = emptyMap()
     open fun getCommand(): String = ""
 
-    class Send(val publicKeyHex: String = "", val amount: MicroTari? = null, val note: String = "") : DeepLink() {
+    class Send(val walletAddressHex: String = "", val amount: MicroTari? = null, val note: String = "") : DeepLink() {
 
         constructor(params: Map<String, String>) : this(
             params[publicKeyKey].orEmpty(),
@@ -54,7 +54,7 @@ sealed class DeepLink {
         )
 
         override fun getParams(): Map<String, String> = hashMapOf<String, String>().apply {
-            put(publicKeyKey, publicKeyHex)
+            put(publicKeyKey, walletAddressHex)
             put(amountKey, amount?.formattedValue.orEmpty())
             put(noteKey, note)
         }

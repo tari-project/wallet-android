@@ -292,7 +292,7 @@ class FFIWallet(
 
     fun getAllUtxos(): TariVector = TariVector(FFITariVector(runWithError { jniGetAllUtxos(it) }))
 
-    fun getPublicKey(): FFITariWalletAddress = runWithError { FFITariWalletAddress(jniGetWalletAddress(it)) }
+    fun getWalletAddress(): FFITariWalletAddress = runWithError { FFITariWalletAddress(jniGetWalletAddress(it)) }
 
     fun getContacts(): FFIContacts = runWithError { FFIContacts(jniGetContacts(it)) }
 
@@ -495,7 +495,7 @@ class FFIWallet(
         if (amount < BigInteger.valueOf(0L)) {
             throw FFIException(message = "Amount is less than 0.")
         }
-        if (destination == getPublicKey()) {
+        if (destination == getWalletAddress()) {
             throw FFIException(message = "Tx source and destination are the same.")
         }
         val bytes = runWithError { jniSendTx(destination, amount.toString(), feePerGram.toString(), message, isOneSided, it) }
