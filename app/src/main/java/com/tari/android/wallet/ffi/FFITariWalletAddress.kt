@@ -32,45 +32,50 @@
  */
 package com.tari.android.wallet.ffi
 
-import java.math.BigInteger
-
 /**
- * Pending outbound transaction wrapper.
+ * Wrapper for native private key type.
  *
  * @author The Tari Development Team
  */
-class FFIPendingOutboundTx() : FFITxBase() {
+class FFITariWalletAddress() : FFIBase() {
 
-    private external fun jniGetId(libError: FFIError): ByteArray
-    private external fun jniGetDestinationPublicKey(libError: FFIError): FFIPointer
-    private external fun jniGetAmount(libError: FFIError): ByteArray
-    private external fun jniGetFee(libError: FFIError): ByteArray
-    private external fun jniGetTimestamp(libError: FFIError): ByteArray
-    private external fun jniGetMessage(libError: FFIError): String
-    private external fun jniGetStatus(libError: FFIError): Int
+    private external fun jniGetBytes(libError: FFIError): FFIPointer
     private external fun jniDestroy()
+    private external fun jniCreate(byteVectorPtr: FFIByteVector, libError: FFIError)
+    private external fun jniFromHex(hexStr: String, libError: FFIError)
+    private external fun jniFromEmojiId(emoji: String, libError: FFIError)
+    private external fun jniFromPrivateKey(privateKeyPtr: FFIPrivateKey, libError: FFIError)
+    private external fun jniGetEmojiId(libError: FFIError): String
 
     constructor(pointer: FFIPointer) : this() {
         this.pointer = pointer
     }
 
-    fun getId(): BigInteger = runWithError { BigInteger(1, jniGetId(it)) }
+    constructor(byteVector: FFIByteVector) : this() {
+        runWithError { jniCreate(byteVector, it) }
+    }
 
-    override fun getDestinationPublicKey(): FFITariWalletAddress = runWithError { FFITariWalletAddress(jniGetDestinationPublicKey(it)) }
+    constructor(hex: HexString) : this() {
+        if (hex.toString().length == 64) {
+            runWithError { jniFromHex(hex.hex, it) }
+        } else {
+            throw FFIException(message = "HexString is not a valid PublicKey")
+        }
+    }
 
-    override fun getSourcePublicKey(): FFITariWalletAddress = TODO()
+    constructor(emojiId: String) : this() {
+        runWithError { jniFromEmojiId(emojiId, it) }
+    }
 
-    override fun isOutbound(): Boolean = true
+    constructor(privateKey: FFIPrivateKey) : this() {
+        runWithError { jniFromPrivateKey(privateKey, it) }
+    }
 
-    fun getAmount(): BigInteger = runWithError { BigInteger(1, jniGetAmount(it)) }
+    fun getBytes(): FFIByteVector = runWithError { FFIByteVector(jniGetBytes(it)) }
 
-    fun getFee(): BigInteger = runWithError { BigInteger(1, jniGetFee(it)) }
+    fun getEmojiId(): String = runWithError { jniGetEmojiId(it) }
 
-    fun getTimestamp(): BigInteger = runWithError { BigInteger(1, jniGetTimestamp(it)) }
-
-    fun getMessage(): String = runWithError { jniGetMessage(it) }
-
-    fun getStatus(): FFITxStatus = runWithError { FFITxStatus.map(jniGetStatus(it)) }
+    override fun toString(): String = runWithError { FFIByteVector(jniGetBytes(it)).toString() }
 
     override fun destroy() = jniDestroy()
 }

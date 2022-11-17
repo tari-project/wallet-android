@@ -162,11 +162,11 @@ class TariWalletServiceStubImpl(
         user: User, amount: MicroTari, feePerGram: MicroTari, message: String, isOneSidePayment: Boolean, error: WalletError
     ): TxId? = runMapping(error) {
         val recipientPublicKeyHex = user.publicKey.hexString
-        val txId = FFIPublicKey(HexString(recipientPublicKeyHex)).runWithDestroy {
+        val recipientAddress = FFITariWalletAddress(HexString(recipientPublicKeyHex)).runWithDestroy {
             wallet.sendTx(it, amount.value, feePerGram.value, message, isOneSidePayment)
         }
-        walletServiceListener.outboundTxIdsToBePushNotified.add(Pair(txId, recipientPublicKeyHex.lowercase(Locale.ENGLISH)))
-        TxId(txId)
+        walletServiceListener.outboundTxIdsToBePushNotified.add(Pair(recipientAddress, recipientPublicKeyHex.lowercase(Locale.ENGLISH)))
+        TxId(recipientAddress)
     }
 
     override fun requestTestnetTari(error: WalletError) {
@@ -215,7 +215,7 @@ class TariWalletServiceStubImpl(
 
         return runCatching {
             val firstUTXOKey = keys.first()
-            val senderPublicKeyFFI = FFIPublicKey(HexString(firstUTXOKey.senderPublicKeyHex!!))
+            val senderPublicKeyFFI = FFITariWalletAddress(HexString(firstUTXOKey.senderPublicKeyHex!!))
             val privateKey = FFIPrivateKey(HexString(firstUTXOKey.key))
             val scriptPrivateKey = FFIPrivateKey(HexString(firstUTXOKey.key))
             val amount = BigInteger(firstUTXOKey.value)
@@ -262,7 +262,7 @@ class TariWalletServiceStubImpl(
     } ?: false
 
     override fun updateContactAlias(publicKey: PublicKey, alias: String, error: WalletError): Boolean = runMapping(error) {
-        val publicKeyFFI = FFIPublicKey(HexString(publicKey.hexString))
+        val publicKeyFFI = FFITariWalletAddress(HexString(publicKey.hexString))
         val contact = FFIContact(alias, publicKeyFFI)
         wallet.addUpdateContact(contact).also {
             publicKeyFFI.destroy()

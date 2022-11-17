@@ -10,8 +10,8 @@ abstract class FFITxBase() : FFIBase() {
         this.pointer = pointer
     }
 
-    abstract fun getSourcePublicKey(): FFIPublicKey
-    abstract fun getDestinationPublicKey(): FFIPublicKey
+    abstract fun getSourcePublicKey(): FFITariWalletAddress
+    abstract fun getDestinationPublicKey(): FFITariWalletAddress
     abstract fun isOutbound(): Boolean
 
     fun getUser(): User {

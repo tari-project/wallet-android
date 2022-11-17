@@ -113,7 +113,7 @@ class FFIWallet(
 
     private external fun jniLogMessage(message: String, libError: FFIError)
 
-    private external fun jniGetPublicKey(libError: FFIError): FFIPointer
+    private external fun jniGetWalletAddress(libError: FFIError): FFIPointer
 
     private external fun jniGetContacts(libError: FFIError): FFIPointer
 
@@ -140,7 +140,7 @@ class FFIWallet(
     private external fun jniCancelPendingTx(id: String, libError: FFIError): Boolean
 
     private external fun jniSendTx(
-        publicKeyPtr: FFIPublicKey,
+        publicKeyPtr: FFITariWalletAddress,
         amount: String,
         feePerGram: String,
         message: String,
@@ -155,7 +155,7 @@ class FFIWallet(
     private external fun jniImportUTXO(
         amount: String,
         spendingKey: FFIPrivateKey,
-        sourcePublicKey: FFIPublicKey,
+        sourceAddress: FFITariWalletAddress,
         tariCommitmentSignature: FFITariCommitmentSignature,
         sourceSenderPublicKey: FFIPublicKey,
         scriptPrivateKey: FFIPrivateKey,
@@ -292,7 +292,7 @@ class FFIWallet(
 
     fun getAllUtxos(): TariVector = TariVector(FFITariVector(runWithError { jniGetAllUtxos(it) }))
 
-    fun getPublicKey(): FFIPublicKey = runWithError { FFIPublicKey(jniGetPublicKey(it)) }
+    fun getPublicKey(): FFITariWalletAddress = runWithError { FFITariWalletAddress(jniGetWalletAddress(it)) }
 
     fun getContacts(): FFIContacts = runWithError { FFIContacts(jniGetContacts(it)) }
 
@@ -491,7 +491,7 @@ class FFIWallet(
         BigInteger(1, jniEstimateTxFee(amount.toString(), gramFee.toString(), kernelCount.toString(), outputCount.toString(), it))
     }
 
-    fun sendTx(destination: FFIPublicKey, amount: BigInteger, feePerGram: BigInteger, message: String, isOneSided: Boolean): BigInteger {
+    fun sendTx(destination: FFITariWalletAddress, amount: BigInteger, feePerGram: BigInteger, message: String, isOneSided: Boolean): BigInteger {
         if (amount < BigInteger.valueOf(0L)) {
             throw FFIException(message = "Amount is less than 0.")
         }
@@ -525,7 +525,7 @@ class FFIWallet(
         amount: BigInteger,
         message: String,
         spendingKey: FFIPrivateKey,
-        sourcePublicKey: FFIPublicKey,
+        sourcePublicKey: FFITariWalletAddress,
         tariCommitmentSignature: FFITariCommitmentSignature,
         senderPublicKey: FFIPublicKey,
         scriptPrivateKey: FFIPrivateKey,

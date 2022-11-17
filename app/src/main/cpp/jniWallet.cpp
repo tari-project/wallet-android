@@ -526,13 +526,13 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniLogMessage(
 
 extern "C"
 JNIEXPORT jlong JNICALL
-Java_com_tari_android_wallet_ffi_FFIWallet_jniGetPublicKey(
+Java_com_tari_android_wallet_ffi_FFIWallet_jniGetWalletAddress(
         JNIEnv *jEnv,
         jobject jThis,
         jobject error) {
-    return ExecuteWithErrorAndCast<TariPublicKey *>(jEnv, error, [&](int *errorPointer) {
+    return ExecuteWithErrorAndCast<TariWalletAddress *>(jEnv, error, [&](int *errorPointer) {
         auto pWallet = GetPointerField<TariWallet *>(jEnv, jThis);
-        return wallet_get_public_key(pWallet, errorPointer);
+        return wallet_get_tari_address(pWallet, errorPointer);
     });
 }
 
@@ -891,7 +891,7 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniImportUTXO(
 
     auto pSpendingKey = GetPointerField<TariPrivateKey *>(jEnv, jpSpendingKey);
 
-    auto pSourcePublicKey = GetPointerField<TariPublicKey *>(jEnv, jpSourcePublicKey);
+    auto pSourcePublicKey = GetPointerField<TariWalletAddress *>(jEnv, jpSourcePublicKey);
 
     auto pSourceSenderPublicKey = GetPointerField<TariPublicKey *>(jEnv, jpSourceSenderPublicKey);
 
@@ -1115,7 +1115,7 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniSendTx(
         jobject error) {
     return ExecuteWithError<jbyteArray>(jEnv, error, [&](int *errorPointer) {
         auto pWallet = GetPointerField<TariWallet *>(jEnv, jThis);
-        auto pDestination = GetPointerField<TariPublicKey *>(jEnv, jDestination);
+        auto pDestination = GetPointerField<TariWalletAddress *>(jEnv, jDestination);
         const char *nativeAmount = jEnv->GetStringUTFChars(jAmount, JNI_FALSE);
         const char *nativeFeePerGram = jEnv->GetStringUTFChars(jFeePerGram, JNI_FALSE);
         const char *pMessage = jEnv->GetStringUTFChars(jMessage, JNI_FALSE);

@@ -49,8 +49,8 @@ Java_com_tari_android_wallet_ffi_FFIContact_jniCreate(
         jobject error) {
     ExecuteWithError(jEnv, error, [&](int *errorPointer) {
         const char *pAlias = jEnv->GetStringUTFChars(jAlias, JNI_FALSE);
-        auto pPublicKey = GetPointerField<TariPublicKey *>(jEnv, jPublicKey);
-        TariContact *pContact = contact_create(pAlias, pPublicKey, errorPointer);
+        auto pTariWalletAddress = GetPointerField<TariWalletAddress *>(jEnv, jPublicKey);
+        TariContact *pContact = contact_create(pAlias, pTariWalletAddress, errorPointer);
         jEnv->ReleaseStringUTFChars(jAlias, pAlias);
         SetPointerField(jEnv, jThis, reinterpret_cast<jlong>(pContact));
     });
@@ -73,13 +73,13 @@ Java_com_tari_android_wallet_ffi_FFIContact_jniGetAlias(
 
 extern "C"
 JNIEXPORT jlong JNICALL
-Java_com_tari_android_wallet_ffi_FFIContact_jniGetPublicKey(
+Java_com_tari_android_wallet_ffi_FFIContact_jniGetTariWalletAddress(
         JNIEnv *jEnv,
         jobject jThis,
         jobject error) {
-    return ExecuteWithErrorAndCast<TariPublicKey *>(jEnv, error, [&](int *errorPointer) {
+    return ExecuteWithErrorAndCast<TariWalletAddress *>(jEnv, error, [&](int *errorPointer) {
         auto pContact = GetPointerField<TariContact *>(jEnv, jThis);
-        return contact_get_public_key(pContact, errorPointer);
+        return contact_get_tari_address(pContact, errorPointer);
     });
 }
 
