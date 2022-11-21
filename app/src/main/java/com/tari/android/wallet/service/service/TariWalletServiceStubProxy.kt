@@ -58,10 +58,6 @@ class TariWalletServiceStubProxy : TariWalletService.Stub() {
         error: WalletError
     ): TxId? = stub.sendTari(contact, amount, feePerGram, message, isOneSidePayment, error)
 
-    override fun requestTestnetTari(error: WalletError) = stub.requestTestnetTari(error)
-
-    override fun importTestnetUTXO(txMessage: String, error: WalletError): CompletedTx? = stub.importTestnetUTXO(txMessage, error)
-
     override fun updateContactAlias(contactPublicKey: TariWalletAddress, alias: String, error: WalletError): Boolean =
         stub.updateContactAlias(contactPublicKey, alias, error)
 

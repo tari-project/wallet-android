@@ -5,7 +5,6 @@ import com.tari.android.wallet.R
 import com.tari.android.wallet.R.string.*
 import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import com.tari.android.wallet.data.sharedPrefs.tariSettings.TariSettingsSharedRepository
-import com.tari.android.wallet.data.sharedPrefs.testnetFaucet.TestnetFaucetRepository
 import com.tari.android.wallet.event.Event
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.extension.*
@@ -23,16 +22,12 @@ import com.tari.android.wallet.ui.dialog.modular.ModularDialogArgs
 import com.tari.android.wallet.ui.dialog.modular.modules.body.BodyModule
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonModule
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonStyle
-import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadBoldSpannableModule
 import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
-import com.tari.android.wallet.ui.dialog.modular.modules.imageModule.ImageModule
 import com.tari.android.wallet.ui.fragment.send.finalize.TxFailureReason
 import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupSettingsRepository
 import com.tari.android.wallet.ui.fragment.tx.adapter.TransactionItem
 import com.tari.android.wallet.ui.fragment.tx.ui.progressController.UpdateProgressViewController
-import com.tari.android.wallet.util.Constants
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.joda.time.DateTime
 import java.math.BigDecimal
@@ -51,23 +46,12 @@ class TxListViewModel : CommonViewModel() {
     lateinit var backupSettingsRepository: BackupSettingsRepository
 
     @Inject
-    lateinit var testnetRepository: TestnetFaucetRepository
-
-    @Inject
     lateinit var sharedPrefsWrapper: SharedPrefsRepository
-
-    @Inject
-    lateinit var testnetFaucetRepository: TestnetFaucetRepository
 
     @Inject
     lateinit var tariSettingsSharedRepository: TariSettingsSharedRepository
 
     lateinit var progressControllerState: UpdateProgressViewController.UpdateProgressState
-
-    var testnetTariRequestIsInProgress = false
-
-    // TODO(nyarian): remove
-    private var testnetTariRequestIsWaitingOnConnection = false
 
     private val cancelledTxs = CopyOnWriteArrayList<CancelledTx>()
     private val completedTxs = CopyOnWriteArrayList<CompletedTx>()
@@ -118,19 +102,6 @@ class TxListViewModel : CommonViewModel() {
     fun processItemClick(item: CommonViewHolderItem) {
         if (item is TransactionItem) {
             _navigation.postValue(TxListNavigation.ToTxDetails(item.tx))
-        }
-    }
-
-    fun requestTestnetTari() {
-        if (testnetTariRequestIsInProgress) return
-        if (EventBus.networkConnectionState.publishSubject.value != NetworkConnectionState.CONNECTED) {
-            testnetTariRequestIsWaitingOnConnection = true
-        } else {
-            testnetTariRequestIsWaitingOnConnection = false
-            testnetTariRequestIsInProgress = true
-            viewModelScope.launch(Dispatchers.IO) {
-                walletService.executeWithError { error, wallet -> wallet.requestTestnetTari(error) }
-            }
         }
     }
 
@@ -230,9 +201,6 @@ class TxListViewModel : CommonViewModel() {
             }
         }
 
-        EventBus.subscribe<Event.Testnet.TestnetTariRequestSuccessful>(this) { testnetTariRequestSuccessful() }
-        EventBus.subscribe<Event.Testnet.TestnetTariRequestError>(this) { testnetTariRequestError() }
-
         EventBus.subscribe<Event.Transaction.TxSendSuccessful>(this) { onTxSendSuccessful(it.txId) }
         EventBus.subscribe<Event.Transaction.TxSendFailed>(this) { onTxSendFailed(it.failureReason) }
 
@@ -240,13 +208,6 @@ class TxListViewModel : CommonViewModel() {
 
         EventBus.subscribe<Event.Contact.ContactAddedOrUpdated>(this) { onContactAddedOrUpdated(it.contactAddress, it.contactAlias) }
         EventBus.subscribe<Event.Contact.ContactRemoved>(this) { onContactRemoved(it.contactAddress) }
-
-        EventBus.networkConnectionState.subscribe(this) { networkConnectionState ->
-            if (testnetTariRequestIsWaitingOnConnection && networkConnectionState == NetworkConnectionState.CONNECTED
-            ) {
-                requestTestnetTari()
-            }
-        }
     }
 
     private fun onTxReceived(tx: PendingInboundTx) {
@@ -377,11 +338,6 @@ class TxListViewModel : CommonViewModel() {
         }
 
         refreshBalance(true)
-
-        // import second testnet UTXO if it hasn't been imported yet
-        if (testnetRepository.testnetTariUTXOKeyList.orEmpty().isNotEmpty()) {
-            importSecondUTXO()
-        }
     }
 
     /**
@@ -391,34 +347,6 @@ class TxListViewModel : CommonViewModel() {
         TxFailureReason.NETWORK_CONNECTION_ERROR -> displayNetworkConnectionErrorDialog()
         TxFailureReason.BASE_NODE_CONNECTION_ERROR, TxFailureReason.SEND_ERROR -> displayBaseNodeConnectionErrorDialog()
     }
-
-    private fun testnetTariRequestSuccessful() {
-        viewModelScope.launch(Dispatchers.IO) {
-            val importedTx = walletService.getWithError { error, wallet ->
-                wallet.importTestnetUTXO(resourceManager.getString(first_testnet_utxo_tx_message), error)
-            }
-            importedTx ?: return@launch
-
-            testnetRepository.faucetTestnetTariRequestCompleted = true
-            testnetRepository.firstTestnetUTXOTxId = importedTx.id
-            refreshAllData()
-
-            viewModelScope.launch(Dispatchers.IO) {
-                delay(Constants.UI.Home.showTariBotDialogDelayMs)
-                showTestnetTariReceivedDialog(importedTx.user.walletAddress)
-            }
-
-            testnetTariRequestIsInProgress = false
-        }
-    }
-
-    private fun testnetTariRequestError() {
-        testnetTariRequestIsInProgress = false
-        val description = resourceManager.getString(faucet_error_common)
-        val errorDialogArgs = ErrorDialogArgs(resourceManager.getString(faucet_error_title), description)
-        _modularDialog.postValue(errorDialogArgs.getModular(resourceManager))
-    }
-
 
     fun displayNetworkConnectionErrorDialog() {
         val errorDialogArgs = ErrorDialogArgs(
@@ -498,38 +426,6 @@ class TxListViewModel : CommonViewModel() {
         _modularDialog.postValue(args.getModular(resourceManager))
     }
 
-    private fun showTestnetTariReceivedDialog(testnetSenderWalletAddress: TariWalletAddress) {
-        val args = ModularDialogArgs(
-            DialogArgs(true, canceledOnTouchOutside = false), listOf(
-                HeadModule(resourceManager.getString(home_tari_bot_you_got_tari_dlg_title)),
-                BodyModule(resourceManager.getString(home_tari_bot_dialog_desc)),
-                ButtonModule(resourceManager.getString(send_tari_title), ButtonStyle.Normal) {
-                    _dismissDialog.value = Unit
-                    sendTariToUser(testnetSenderWalletAddress)
-                },
-                ButtonModule(resourceManager.getString(home_tari_bot_try_later), ButtonStyle.Close)
-            )
-        )
-        _modularDialog.postValue(args)
-    }
-
-    private fun showTTLStoreDialog() {
-        val args = ModularDialogArgs(
-            DialogArgs(), listOf(
-                ImageModule(R.drawable.store_modal),
-                HeadBoldSpannableModule(home_ttl_store_dlg_title, home_ttl_store_dlg_title_bold_part),
-                BodyModule(resourceManager.getString(home_ttl_store_dlg_desciption)),
-                ButtonModule(resourceManager.getString(home_ttl_store_positive_btn), ButtonStyle.Normal) {
-                    _dismissDialog.value = Unit
-                    _navigation.postValue(TxListNavigation.ToTTLStore)
-                },
-                ButtonModule(resourceManager.getString(home_ttl_store_negative_btn), ButtonStyle.Close)
-            )
-        )
-
-        _modularDialog.postValue(args)
-    }
-
     private fun sendTariToUser(tariWalletAddress: TariWalletAddress) {
         val error = WalletError()
         val contacts = walletService.getContacts(error)
@@ -539,19 +435,6 @@ class TxListViewModel : CommonViewModel() {
         }
 
         _navigation.postValue(TxListNavigation.ToSendTariToUser(recipientUser))
-    }
-
-    private fun importSecondUTXO() {
-        viewModelScope.launch(Dispatchers.IO) {
-            val importedTx = walletService.getWithError { error, wallet ->
-                wallet.importTestnetUTXO(resourceManager.getString(second_testnet_utxo_tx_message), error)
-            }
-            importedTx ?: return@launch
-            testnetRepository.secondTestnetUTXOTxId = importedTx.id
-            refreshAllData()
-            delay(SECOND_UTXO_STORE_OPEN_DELAY)
-            showTTLStoreDialog()
-        }
     }
 
     companion object {

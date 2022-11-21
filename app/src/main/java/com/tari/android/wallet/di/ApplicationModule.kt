@@ -48,7 +48,6 @@ import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodeSharedRepositor
 import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepository
 import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepositoryImpl
 import com.tari.android.wallet.data.sharedPrefs.tariSettings.TariSettingsSharedRepository
-import com.tari.android.wallet.data.sharedPrefs.testnetFaucet.TestnetFaucetRepository
 import com.tari.android.wallet.data.sharedPrefs.tor.TorSharedRepository
 import com.tari.android.wallet.infrastructure.logging.LoggerAdapter
 import com.tari.android.wallet.infrastructure.security.biometric.BiometricAuthenticationService
@@ -99,13 +98,7 @@ class ApplicationModule(private val app: TariWalletApplication) {
 
     @Provides
     @Singleton
-    fun provideNetworkRepository(resourceManager: ResourceManager, prefs: SharedPreferences): NetworkRepository =
-        NetworkRepositoryImpl(resourceManager, prefs)
-
-    @Provides
-    @Singleton
-    fun provideTestnetFaucetRepository(prefs: SharedPreferences, networkRepository: NetworkRepository): TestnetFaucetRepository =
-        TestnetFaucetRepository(prefs, networkRepository)
+    fun provideNetworkRepository(prefs: SharedPreferences): NetworkRepository = NetworkRepositoryImpl(prefs)
 
     @Provides
     @Singleton
@@ -120,7 +113,6 @@ class ApplicationModule(private val app: TariWalletApplication) {
         backupSettingsRepository: BackupSettingsRepository,
         baseNodeSharedRepository: BaseNodeSharedRepository,
         networkRepository: NetworkRepository,
-        testnetFaucetRepository: TestnetFaucetRepository,
         yatSharedRepository: YatSharedRepository,
         torSharedRepository: TorSharedRepository,
         tariSettingsSharedRepository: TariSettingsSharedRepository
@@ -131,7 +123,6 @@ class ApplicationModule(private val app: TariWalletApplication) {
             networkRepository,
             backupSettingsRepository,
             baseNodeSharedRepository,
-            testnetFaucetRepository,
             yatSharedRepository,
             torSharedRepository,
             tariSettingsSharedRepository

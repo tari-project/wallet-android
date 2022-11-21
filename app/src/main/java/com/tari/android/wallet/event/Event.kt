@@ -72,9 +72,4 @@ object Event {
         data class ContactAddedOrUpdated(val contactAddress: TariWalletAddress, val contactAlias: String)
         data class ContactRemoved(val contactAddress: TariWalletAddress)
     }
-
-    object Testnet {
-        class TestnetTariRequestSuccessful
-        data class TestnetTariRequestError(val errorMessage: String)
-    }
 }

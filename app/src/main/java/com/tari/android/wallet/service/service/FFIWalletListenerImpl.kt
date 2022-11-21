@@ -15,7 +15,6 @@ import com.tari.android.wallet.notification.NotificationHelper
 import com.tari.android.wallet.service.TariWalletServiceListener
 import com.tari.android.wallet.service.baseNode.BaseNodeState
 import com.tari.android.wallet.service.baseNode.BaseNodeSyncState
-import com.tari.android.wallet.service.notification.NotificationService
 import com.tari.android.wallet.ui.fragment.home.HomeActivity
 import io.reactivex.Observable
 import io.reactivex.disposables.Disposable
@@ -27,7 +26,6 @@ class FFIWalletListenerImpl(
     private val wallet: FFIWallet,
     private val backupManager: BackupManager,
     private val notificationHelper: NotificationHelper,
-    private val notificationService: NotificationService,
     private val app: TariWalletApplication,
     private val baseNodeSharedPrefsRepository: BaseNodeSharedRepository,
     private val baseNodes: BaseNodes

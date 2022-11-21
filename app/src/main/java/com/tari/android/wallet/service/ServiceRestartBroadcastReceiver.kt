@@ -56,9 +56,8 @@ class ServiceRestartBroadcastReceiver : BroadcastReceiver() {
 
     override fun onReceive(context: Context, intent: Intent) {
         logger.i("Service restart broadcast received")
-        val resourceManager = ResourceManager(context)
         val sharedPreferences = context.getSharedPreferences(ApplicationModule.sharedPrefsFileName, Context.MODE_PRIVATE)
-        val networkRepository = NetworkRepositoryImpl(resourceManager, sharedPreferences)
+        val networkRepository = NetworkRepositoryImpl(sharedPreferences)
         val tariSettingsSharedRepository = TariSettingsSharedRepository(sharedPreferences, networkRepository)
         WalletServiceLauncher(context, WalletConfig(context, networkRepository), tariSettingsSharedRepository).startIfExist()
     }
