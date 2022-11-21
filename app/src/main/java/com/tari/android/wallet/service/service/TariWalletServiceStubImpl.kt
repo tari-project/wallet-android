@@ -220,11 +220,7 @@ class TariWalletServiceStubImpl(
             val scriptPrivateKey = FFIPrivateKey(HexString(firstUTXOKey.key))
             val amount = BigInteger(firstUTXOKey.value)
             val senderPublicKey = FFIPublicKey(HexString(firstUTXOKey.output.senderOffsetPublicKey))
-            val signature = FFITariCommitmentSignature(
-                FFIByteVector(HexString(firstUTXOKey.output.metadataSignature.public_nonce)),
-                FFIByteVector(HexString(firstUTXOKey.output.metadataSignature.u)),
-                FFIByteVector(HexString(firstUTXOKey.output.metadataSignature.v))
-            )
+            val signature = FFITariCommitmentSignature()
             val txId = wallet.importUTXO(amount, txMessage, privateKey, senderPublicKeyFFI, signature, senderPublicKey, scriptPrivateKey)
             privateKey.destroy()
             senderPublicKeyFFI.destroy()

@@ -59,7 +59,7 @@ Java_com_tari_android_wallet_ffi_FFICompletedTx_jniGetDestinationPublicKey(
         jobject error) {
     return ExecuteWithErrorAndCast<TariWalletAddress *>(jEnv, error, [&](int *errorPointer) {
         auto pCompletedTx = GetPointerField<TariCompletedTransaction *>(jEnv, jThis);
-        return completed_transaction_get_destination_public_key(pCompletedTx, errorPointer);
+        return completed_transaction_get_destination_tari_address(pCompletedTx, errorPointer);
     });
 }
 
@@ -71,7 +71,7 @@ Java_com_tari_android_wallet_ffi_FFICompletedTx_jniGetSourcePublicKey(
         jobject error) {
     return ExecuteWithErrorAndCast<TariWalletAddress *>(jEnv, error, [&](int *errorPointer) {
         auto pCompletedTx = GetPointerField<TariCompletedTransaction *>(jEnv, jThis);
-        return completed_transaction_get_source_public_key(pCompletedTx, errorPointer);
+        return completed_transaction_get_source_tari_address(pCompletedTx, errorPointer);
     });
 }
 

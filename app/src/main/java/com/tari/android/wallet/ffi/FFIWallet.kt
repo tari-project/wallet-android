@@ -152,16 +152,16 @@ class FFIWallet(
 //
 //    private external fun jniVerifyMessageSignature(publicKeyPtr: FFIPublicKey, message: String, signature: String, libError: FFIError): Boolean
 
-    private external fun jniImportUTXO(
-        amount: String,
-        spendingKey: FFIPrivateKey,
-        sourceAddress: FFITariWalletAddress,
-        tariCommitmentSignature: FFITariCommitmentSignature,
-        sourceSenderPublicKey: FFIPublicKey,
-        scriptPrivateKey: FFIPrivateKey,
-        message: String,
-        libError: FFIError
-    ): ByteArray
+//    private external fun jniImportUTXO(
+//        amount: String,
+//        spendingKey: FFIPrivateKey,
+//        sourceAddress: FFITariWalletAddress,
+//        tariCommitmentSignature: FFITariCommitmentSignature,
+//        sourceSenderPublicKey: FFIPublicKey,
+//        scriptPrivateKey: FFIPrivateKey,
+//        message: String,
+//        libError: FFIError
+//    ): ByteArray
 
     private external fun jniAddBaseNodePeer(publicKey: FFIPublicKey, address: String, libError: FFIError): Boolean
 
@@ -521,6 +521,28 @@ class FFIWallet(
 //    fun verifyMessageSignature(contactPublicKey: FFIPublicKey, message: String, signature: String): Boolean =
 //        runWithError { jniVerifyMessageSignature(contactPublicKey, message, signature, it) }
 
+    //    fun importUTXO(
+//        amount: BigInteger,
+//        message: String,
+//        spendingKey: FFIPrivateKey,
+//        sourcePublicKey: FFITariWalletAddress,
+//        tariCommitmentSignature: FFITariCommitmentSignature,
+//        senderPublicKey: FFIPublicKey,
+//        scriptPrivateKey: FFIPrivateKey,
+//    ): BigInteger = runWithError {
+//        BigInteger(
+//            jniImportUTXO(
+//                amount.toString(),
+//                spendingKey,
+//                sourcePublicKey,
+//                tariCommitmentSignature,
+//                senderPublicKey,
+//                scriptPrivateKey,
+//                message,
+//                it
+//            )
+//        )
+//    }
     fun importUTXO(
         amount: BigInteger,
         message: String,
@@ -529,20 +551,7 @@ class FFIWallet(
         tariCommitmentSignature: FFITariCommitmentSignature,
         senderPublicKey: FFIPublicKey,
         scriptPrivateKey: FFIPrivateKey,
-    ): BigInteger = runWithError {
-        BigInteger(
-            jniImportUTXO(
-                amount.toString(),
-                spendingKey,
-                sourcePublicKey,
-                tariCommitmentSignature,
-                senderPublicKey,
-                scriptPrivateKey,
-                message,
-                it
-            )
-        )
-    }
+    ): BigInteger = BigInteger.ZERO
 
     fun startTXOValidation(): BigInteger = runWithError { BigInteger(1, jniStartTXOValidation(it)) }
 

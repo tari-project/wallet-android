@@ -41,24 +41,6 @@
 
 extern "C"
 JNIEXPORT void JNICALL
-Java_com_tari_android_wallet_ffi_FFITariCommitmentSignature_jniCommitmentSignatureCreateFromBytes(
-        JNIEnv *jEnv,
-        jobject jThis,
-        jobject jp_public_nonce_bytes,
-        jobject jpu_bytes,
-        jobject jpv_bytes,
-        jobject error) {
-    ExecuteWithError(jEnv, error, [&](int *errorPointer) {
-        auto pPublicNonceBytes = GetPointerField<ByteVector *>(jEnv, jp_public_nonce_bytes);
-        auto puBytes = GetPointerField<ByteVector *>(jEnv, jpu_bytes);
-        auto pvBytes = GetPointerField<ByteVector *>(jEnv, jpv_bytes);
-        auto result = reinterpret_cast<jlong>(commitment_signature_create_from_bytes(pPublicNonceBytes, puBytes, pvBytes, errorPointer));
-        SetPointerField(jEnv, jThis, reinterpret_cast<jlong>(result));
-    });
-}
-
-extern "C"
-JNIEXPORT void JNICALL
 Java_com_tari_android_wallet_ffi_FFITariCommitmentSignature_jniDestroy(
         JNIEnv *jEnv,
         jobject jThis) {

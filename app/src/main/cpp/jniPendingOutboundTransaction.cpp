@@ -59,7 +59,7 @@ Java_com_tari_android_wallet_ffi_FFIPendingOutboundTx_jniGetDestinationPublicKey
         jobject error) {
     return ExecuteWithErrorAndCast<TariWalletAddress *>(jEnv, error, [&](int *errorPointer) {
         auto pOutboundTx = GetPointerField<TariPendingOutboundTransaction *>(jEnv, jThis);
-        return pending_outbound_transaction_get_destination_public_key(pOutboundTx, errorPointer);
+        return pending_outbound_transaction_get_destination_tari_address(pOutboundTx, errorPointer);
     });
 }
 

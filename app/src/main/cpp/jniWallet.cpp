@@ -872,63 +872,63 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniPreviewSplitUtxos(
         return wallet_preview_coin_split(pWallet, pTariVector, splitCount, feePerGram, errorPointer);
     });
 }
-
-extern "C"
-JNIEXPORT jbyteArray JNICALL
-Java_com_tari_android_wallet_ffi_FFIWallet_jniImportUTXO(
-        JNIEnv *jEnv,
-        jobject jThis,
-        jstring jAmount,
-        jobject jpSpendingKey,
-        jobject jpSourcePublicKey,
-        jobject jpTariCommitmentSignature,
-        jobject jpSourceSenderPublicKey,
-        jobject jpScriptPrivateKey,
-        jstring jMessage,
-        jobject error) {
-
-    auto pWallet = GetPointerField<TariWallet *>(jEnv, jThis);
-
-    auto pSpendingKey = GetPointerField<TariPrivateKey *>(jEnv, jpSpendingKey);
-
-    auto pSourcePublicKey = GetPointerField<TariWalletAddress *>(jEnv, jpSourcePublicKey);
-
-    auto pSourceSenderPublicKey = GetPointerField<TariPublicKey *>(jEnv, jpSourceSenderPublicKey);
-
-    auto pTariCommitmentSignature = GetPointerField<TariCommitmentSignature *>(jEnv, jpTariCommitmentSignature);
-
-    auto pScriptPrivateKey = GetPointerField<TariPrivateKey *>(jEnv, jpScriptPrivateKey);
-
-    char *pAmountEnd;
-    const char *nativeAmount = jEnv->GetStringUTFChars(jAmount, JNI_FALSE);
-    const char *pMessage = jEnv->GetStringUTFChars(jMessage, JNI_FALSE);
-    unsigned long long amount = strtoull(nativeAmount, &pAmountEnd, 10);
-
-    return ExecuteWithError<jbyteArray>(jEnv, error, [&](int *errorPointer) {
-        jbyteArray result = getBytesFromUnsignedLongLong(
-                jEnv,
-                wallet_import_external_utxo_as_non_rewindable(
-                        pWallet,
-                        amount,
-                        pSpendingKey,
-                        pSourcePublicKey,
-                        nullptr,
-                        pTariCommitmentSignature,
-                        pSourceSenderPublicKey,
-                        pScriptPrivateKey,
-                        nullptr,
-                        nullptr,
-                        0,
-                        pMessage,
-                        errorPointer
-                )
-        );
-
-        jEnv->ReleaseStringUTFChars(jAmount, nativeAmount);
-        jEnv->ReleaseStringUTFChars(jMessage, pMessage);
-        return result;
-    });
-}
+//
+//extern "C"
+//JNIEXPORT jbyteArray JNICALL
+//Java_com_tari_android_wallet_ffi_FFIWallet_jniImportUTXO(
+//        JNIEnv *jEnv,
+//        jobject jThis,
+//        jstring jAmount,
+//        jobject jpSpendingKey,
+//        jobject jpSourcePublicKey,
+//        jobject jpTariCommitmentSignature,
+//        jobject jpSourceSenderPublicKey,
+//        jobject jpScriptPrivateKey,
+//        jstring jMessage,
+//        jobject error) {
+//
+//    auto pWallet = GetPointerField<TariWallet *>(jEnv, jThis);
+//
+//    auto pSpendingKey = GetPointerField<TariPrivateKey *>(jEnv, jpSpendingKey);
+//
+//    auto pSourcePublicKey = GetPointerField<TariWalletAddress *>(jEnv, jpSourcePublicKey);
+//
+//    auto pSourceSenderPublicKey = GetPointerField<TariPublicKey *>(jEnv, jpSourceSenderPublicKey);
+//
+//    auto pTariCommitmentSignature = GetPointerField<TariCommitmentSignature *>(jEnv, jpTariCommitmentSignature);
+//
+//    auto pScriptPrivateKey = GetPointerField<TariPrivateKey *>(jEnv, jpScriptPrivateKey);
+//
+//    char *pAmountEnd;
+//    const char *nativeAmount = jEnv->GetStringUTFChars(jAmount, JNI_FALSE);
+//    const char *pMessage = jEnv->GetStringUTFChars(jMessage, JNI_FALSE);
+//    unsigned long long amount = strtoull(nativeAmount, &pAmountEnd, 10);
+//
+//    return ExecuteWithError<jbyteArray>(jEnv, error, [&](int *errorPointer) {
+//        jbyteArray result = getBytesFromUnsignedLongLong(
+//                jEnv,
+//                wallet_import_external_utxo_as_non_rewindable(
+//                        pWallet,
+//                        amount,
+//                        pSpendingKey,
+//                        pSourcePublicKey,
+//                        nullptr,
+//                        pTariCommitmentSignature,
+//                        pSourceSenderPublicKey,
+//                        pScriptPrivateKey,
+//                        nullptr,
+//                        nullptr,
+//                        0,
+//                        pMessage,
+//                        errorPointer
+//                )
+//        );
+//
+//        jEnv->ReleaseStringUTFChars(jAmount, nativeAmount);
+//        jEnv->ReleaseStringUTFChars(jMessage, pMessage);
+//        return result;
+//    });
+//}
 
 extern "C"
 JNIEXPORT jboolean JNICALL
