@@ -45,8 +45,7 @@ Java_com_tari_android_wallet_ffi_FFITariCoinPreview_jniLoadData(
         JNIEnv *jEnv,
         jobject jThis) {
     jclass dataClass = jEnv->GetObjectClass(jThis);
-    jlong lTariCoinPreview = GetPointerField(jEnv, jThis);
-    auto outputs = reinterpret_cast<TariCoinPreview *>(lTariCoinPreview);
+    auto outputs = GetPointerField<TariCoinPreview *>(jEnv, jThis);
 
     jfieldID vectorPointerField = jEnv->GetFieldID(dataClass, "vectorPointer", "J");
     auto pointerToVector = (long) (outputs->expected_outputs);

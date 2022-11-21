@@ -44,14 +44,12 @@ import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodeSharedRepository
 import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepositoryImpl
 import com.tari.android.wallet.data.sharedPrefs.tariSettings.TariSettingsSharedRepository
-import com.tari.android.wallet.data.sharedPrefs.testnetFaucet.TestnetFaucetRepository
 import com.tari.android.wallet.data.sharedPrefs.tor.TorSharedRepository
 import com.tari.android.wallet.di.ApplicationModule
 import com.tari.android.wallet.ffi.*
 import com.tari.android.wallet.model.*
 import com.tari.android.wallet.model.recovery.WalletRestorationResult
 import com.tari.android.wallet.service.seedPhrase.SeedPhraseRepository
-import com.tari.android.wallet.ui.common.domain.ResourceManager
 import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupSettingsRepository
 import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.yat.YatSharedRepository
@@ -70,11 +68,9 @@ class FFIWalletTests {
     private lateinit var listener: TestAddRecipientAddNodeListener
     private val context = getApplicationContext<Context>()
     private val prefs = context.getSharedPreferences(ApplicationModule.sharedPrefsFileName, Context.MODE_PRIVATE)
-    private val resourceManager: ResourceManager = ResourceManager(context)
-    private val networkRepository = NetworkRepositoryImpl(resourceManager, prefs)
+    private val networkRepository = NetworkRepositoryImpl(prefs)
     private val baseNodeSharedPrefsRepository = BaseNodeSharedRepository(prefs, networkRepository)
     private val backupSettingsRepository = BackupSettingsRepository(context, prefs, networkRepository)
-    private val testnetFaucetRepository = TestnetFaucetRepository(prefs, networkRepository)
     private val yatSharedPrefsRepository = YatSharedRepository(prefs, networkRepository)
     private val tariSettingsRepository = TariSettingsSharedRepository(prefs, networkRepository)
     private val torSharedRepository = TorSharedRepository(prefs, networkRepository)
@@ -85,7 +81,6 @@ class FFIWalletTests {
             networkRepository,
             backupSettingsRepository,
             baseNodeSharedPrefsRepository,
-            testnetFaucetRepository,
             yatSharedPrefsRepository,
             torSharedRepository,
             tariSettingsRepository
@@ -137,12 +132,9 @@ class FFIWalletTests {
     @Test
     fun validInstanceWithValidPublicKeyWasCreated() {
         assertNotEquals(nullptr, wallet.pointer)
-        val publicKey = wallet.getPublicKey()
-        assertNotEquals(nullptr, publicKey.pointer)
-        assertEquals(
-            FFITestUtil.PUBLIC_KEY_HEX_STRING.length,
-            publicKey.toString().length
-        )
+        val ffiTariWalletAddress = wallet.getWalletAddress()
+        assertNotEquals(nullptr, ffiTariWalletAddress.pointer)
+        assertEquals(FFITestUtil.PUBLIC_KEY_HEX_STRING.length, ffiTariWalletAddress.toString().length)
     }
 
 //    @Test
@@ -158,14 +150,14 @@ class FFIWalletTests {
         // add contacts
         repeat(contactCount) {
             val contactPrivateKey = FFIPrivateKey.generate()
-            val contactPublicKey = FFIPublicKey(contactPrivateKey)
+            val contactWalletAddress = FFITariWalletAddress(contactPrivateKey)
             val contact = FFIContact(
                 FFITestUtil.generateRandomAlphanumericString(16),
-                contactPublicKey
+                contactWalletAddress
             )
             wallet.addUpdateContact(contact)
             contactPrivateKey.destroy()
-            contactPublicKey.destroy()
+            contactWalletAddress.destroy()
             contact.destroy()
         }
         // test get contacts
@@ -173,13 +165,13 @@ class FFIWalletTests {
         assertEquals(contactCount, contacts.getLength())
         // test update alias
         val lastContactOld = contacts.getAt(contactCount - 1)
-        val lastContactOldPublicKey = lastContactOld.getPublicKey()
+        val lastContactOldWalletAddress = lastContactOld.getWalletAddress()
         val newAlias = FFITestUtil.generateRandomAlphanumericString(7)
         val lastContactNew = FFIContact(
             newAlias,
-            lastContactOldPublicKey
+            lastContactOldWalletAddress
         )
-        lastContactOldPublicKey.destroy()
+        lastContactOldWalletAddress.destroy()
         wallet.addUpdateContact(lastContactNew)
         lastContactOld.destroy()
         lastContactNew.destroy()

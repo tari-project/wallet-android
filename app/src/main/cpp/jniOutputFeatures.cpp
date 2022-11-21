@@ -48,22 +48,19 @@ Java_com_tari_android_wallet_ffi_FFIOutputFeatures_jniCreate(
         jlong maturity,
         jobject metadata,
         jobject error) {
-    int errorCode = 0;
-    int *errorCodePointer = &errorCode;
+    ExecuteWithError(jEnv, error, [&](int *errorPointer) {
+        auto pMetadata = GetPointerField<ByteVector *>(jEnv, metadata);
 
-    jlong lMetadata = GetPointerField(jEnv, metadata);
-    auto *pMetadata = reinterpret_cast<ByteVector *>(lMetadata);
+        TariOutputFeatures *pOutputFeatures = output_features_create_from_bytes(
+                version,
+                //todo
+                0,
+                maturity,
+                pMetadata,
+                errorPointer);
 
-    TariOutputFeatures *pOutputFeatures = output_features_create_from_bytes(
-            version,
-            //todo
-            0,
-            maturity,
-            pMetadata,
-            errorCodePointer);
-
-    SetPointerField(jEnv, jThis, reinterpret_cast<jlong>(pOutputFeatures));
-    setErrorCode(jEnv, error, errorCode);
+        SetPointerField(jEnv, jThis, reinterpret_cast<jlong>(pOutputFeatures));
+    });
 }
 
 extern "C"
@@ -71,7 +68,6 @@ JNIEXPORT void JNICALL
 Java_com_tari_android_wallet_ffi_FFIOutputFeatures_jniDestroy(
         JNIEnv *jEnv,
         jobject jThis) {
-    jlong lCovenant = GetPointerField(jEnv, jThis);
-    output_features_destroy(reinterpret_cast<TariOutputFeatures *>(lCovenant));
-    SetPointerField(jEnv, jThis, reinterpret_cast<jlong>(nullptr));
+    output_features_destroy(GetPointerField<TariOutputFeatures *>(jEnv, jThis));
+    SetNullPointerField(jEnv, jThis);
 }

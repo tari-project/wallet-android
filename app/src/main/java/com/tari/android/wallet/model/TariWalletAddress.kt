@@ -30,23 +30,70 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.tari.android.wallet.service.faucet
+package com.tari.android.wallet.model
 
-import com.google.gson.annotations.SerializedName
+import android.os.Parcel
+import android.os.Parcelable
 
 /**
- * Allocate testnet tari request and response class.
+ * This wrapper is needed for id parameters in AIDL methods.
  *
  * @author The Tari Development Team
  */
+class TariWalletAddress() : Parcelable {
 
-data class TestnetTariAllocateResponse constructor(
-    @SerializedName("return_wallet_id")
-    val returnWalletId: String,
+    var hexString = ""
+    var emojiId = ""
 
-    @SerializedName("key")
-    val key: String,
+    constructor(
+        hexString: String,
+        emojiId: String
+    ) : this() {
+        this.hexString = hexString
+        this.emojiId = emojiId
+    }
 
-    @SerializedName("value")
-    val value: String
-)
+    override fun equals(other: Any?): Boolean = (other is TariWalletAddress)
+            && hexString == other.hexString
+
+    override fun hashCode(): Int {
+        return hexString.hashCode()
+    }
+
+    override fun toString(): String = "TariWalletAddress(hexString='$hexString', emojiId='$emojiId')"
+
+    // region Parcelable
+
+    constructor(parcel: Parcel) : this() {
+        readFromParcel(parcel)
+    }
+
+    companion object CREATOR : Parcelable.Creator<TariWalletAddress> {
+
+        override fun createFromParcel(parcel: Parcel): TariWalletAddress {
+            return TariWalletAddress(parcel)
+        }
+
+        override fun newArray(size: Int): Array<TariWalletAddress> {
+            return Array(size) { TariWalletAddress() }
+        }
+
+    }
+
+    override fun writeToParcel(parcel: Parcel, flags: Int) {
+        parcel.writeString(hexString)
+        parcel.writeString(emojiId)
+    }
+
+    private fun readFromParcel(inParcel: Parcel) {
+        hexString = inParcel.readString().orEmpty()
+        emojiId = inParcel.readString().orEmpty()
+    }
+
+    override fun describeContents(): Int {
+        return 0
+    }
+
+    // endregion
+
+}

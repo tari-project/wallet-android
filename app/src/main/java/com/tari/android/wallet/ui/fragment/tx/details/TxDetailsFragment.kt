@@ -213,8 +213,8 @@ class TxDetailsFragment : CommonFragment<FragmentTxDetailsBinding, TxDetailsView
     }
 
     private fun setFullEmojiId(tx: Tx) {
-        fullEmojiIdViewController.fullEmojiId = tx.user.publicKey.emojiId
-        fullEmojiIdViewController.emojiIdHex = tx.user.publicKey.hexString
+        fullEmojiIdViewController.fullEmojiId = tx.user.walletAddress.emojiId
+        fullEmojiIdViewController.emojiIdHex = tx.user.walletAddress.hexString
     }
 
     private fun setFeeData(fee: MicroTari) {
@@ -247,7 +247,7 @@ class TxDetailsFragment : CommonFragment<FragmentTxDetailsBinding, TxDetailsView
         val state = TxState.from(tx)
         ui.fromTextView.text =
             if (state.direction == INBOUND) string(common_from) else string(common_to)
-        emojiIdSummaryController.display(tx.user.publicKey.emojiId)
+        emojiIdSummaryController.display(tx.user.walletAddress.emojiId)
     }
 
     private fun setTxStatusData(tx: Tx) {

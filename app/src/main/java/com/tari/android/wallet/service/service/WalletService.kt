@@ -46,14 +46,12 @@ import com.tari.android.wallet.application.baseNodes.BaseNodes
 import com.tari.android.wallet.data.WalletConfig
 import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodeSharedRepository
-import com.tari.android.wallet.data.sharedPrefs.testnetFaucet.TestnetFaucetRepository
 import com.tari.android.wallet.di.DiContainer
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.ffi.FFIWallet
 import com.tari.android.wallet.infrastructure.backup.BackupManager
 import com.tari.android.wallet.notification.NotificationHelper
 import com.tari.android.wallet.service.ServiceRestartBroadcastReceiver
-import com.tari.android.wallet.service.faucet.TestnetFaucetService
 import com.tari.android.wallet.service.notification.NotificationService
 import com.tari.android.wallet.service.service.WalletServiceLauncher.Companion.startAction
 import com.tari.android.wallet.service.service.WalletServiceLauncher.Companion.stopAction
@@ -87,9 +85,6 @@ class WalletService : Service() {
     lateinit var resourceManager: ResourceManager
 
     @Inject
-    lateinit var testnetFaucetService: TestnetFaucetService
-
-    @Inject
     lateinit var notificationService: NotificationService
 
     @Inject
@@ -109,9 +104,6 @@ class WalletService : Service() {
 
     @Inject
     lateinit var baseNodes: BaseNodes
-
-    @Inject
-    lateinit var testnetFaucetRepository: TestnetFaucetRepository
 
     private var lifecycleObserver: ServiceLifecycleCallbacks? = null
     private val stubProxy = TariWalletServiceStubProxy()
@@ -187,8 +179,8 @@ class WalletService : Service() {
         if (walletState == WalletState.Started) {
             wallet = FFIWallet.instance!!
             lifecycleObserver = ServiceLifecycleCallbacks(wallet)
-            val impl = FFIWalletListenerImpl(wallet, backupManager, notificationHelper, notificationService, app, baseNodeSharedPrefsRepository, baseNodes)
-            stubProxy.stub = TariWalletServiceStubImpl(wallet, testnetFaucetRepository, testnetFaucetService, baseNodeSharedPrefsRepository, resourceManager, impl)
+            val impl = FFIWalletListenerImpl(wallet, backupManager, notificationHelper, app, baseNodeSharedPrefsRepository, baseNodes)
+            stubProxy.stub = TariWalletServiceStubImpl(wallet, baseNodeSharedPrefsRepository, impl)
             wallet.listener = impl
             EventBus.walletState.unsubscribe(this)
             scheduleExpirationCheck()

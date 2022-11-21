@@ -143,8 +143,8 @@ class AddAmountFragment : CommonFragment<FragmentAddAmountBinding, AddAmountView
             requireContext(),
             fullEmojiIdListener
         )
-        fullEmojiIdViewController.fullEmojiId = recipientUser?.publicKey?.emojiId.orEmpty()
-        fullEmojiIdViewController.emojiIdHex = recipientUser?.publicKey?.hexString.orEmpty()
+        fullEmojiIdViewController.fullEmojiId = recipientUser?.walletAddress?.emojiId.orEmpty()
+        fullEmojiIdViewController.emojiIdHex = recipientUser?.walletAddress?.hexString.orEmpty()
         displayAliasOrEmojiId()
         setActionBindings()
     }
@@ -181,7 +181,7 @@ class AddAmountFragment : CommonFragment<FragmentAddAmountBinding, AddAmountView
             ui.titleTextView.visible()
             ui.titleTextView.text = (recipientUser as Contact).alias
         } else {
-            recipientUser?.publicKey?.emojiId?.let {
+            recipientUser?.walletAddress?.emojiId?.let {
                 displayEmojiId(it)
             }
         }

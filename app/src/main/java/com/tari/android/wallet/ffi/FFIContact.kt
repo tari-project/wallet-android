@@ -42,17 +42,17 @@ typealias FFIContactPtr = Long
 class FFIContact() : FFIBase() {
 
     private external fun jniGetAlias(libError: FFIError): String
-    private external fun jniGetPublicKey(libError: FFIError): FFIPointer
+    private external fun jniGetTariWalletAddress(libError: FFIError): FFIPointer
     private external fun jniDestroy()
-    private external fun jniCreate(alias: String, publicKeyPtr: FFIPublicKey, libError: FFIError)
+    private external fun jniCreate(alias: String, publicKeyPtr: FFITariWalletAddress, libError: FFIError)
 
     constructor(pointer: FFIPointer) : this() {
         this.pointer = pointer
     }
 
-    constructor(alias: String, FFIPublicKey: FFIPublicKey) : this() {
+    constructor(alias: String, ffiTariWalletAddress: FFITariWalletAddress) : this() {
         if (alias.isNotEmpty()) {
-            runWithError { jniCreate(alias, FFIPublicKey, it) }
+            runWithError { jniCreate(alias, ffiTariWalletAddress, it) }
         } else {
             throw FFIException(message = "Alias is an empty String.")
         }
@@ -60,12 +60,12 @@ class FFIContact() : FFIBase() {
 
     fun getAlias(): String = runWithError { jniGetAlias(it) }
 
-    fun getPublicKey(): FFIPublicKey = runWithError { FFIPublicKey(jniGetPublicKey(it)) }
+    fun getWalletAddress(): FFITariWalletAddress = runWithError { FFITariWalletAddress(jniGetTariWalletAddress(it)) }
 
     override fun toString(): String = StringBuilder()
         .append(getAlias())
         .append("|")
-        .append(getPublicKey().toString())
+        .append(getWalletAddress().toString())
         .toString()
 
     override fun destroy() = jniDestroy()

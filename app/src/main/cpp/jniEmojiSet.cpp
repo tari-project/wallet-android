@@ -54,13 +54,10 @@ Java_com_tari_android_wallet_ffi_FFIEmojiSet_jniGetLength(
         JNIEnv *jEnv,
         jobject jThis,
         jobject error) {
-    int errorCode = 0;
-    int *errorCodePointer = &errorCode;
-    jlong lEmojiSet = GetPointerField(jEnv, jThis);
-    auto *pEmojiSet = reinterpret_cast<EmojiSet *>(lEmojiSet);
-    jint result = emoji_set_get_length(pEmojiSet, errorCodePointer);
-    setErrorCode(jEnv, error, errorCode);
-    return result;
+    return ExecuteWithError<jint>(jEnv, error, [&](int *errorPointer) {
+        auto pEmojiSet = GetPointerField<EmojiSet *>(jEnv, jThis);
+        return emoji_set_get_length(pEmojiSet, errorPointer);
+    });
 }
 
 extern "C"
@@ -70,15 +67,10 @@ Java_com_tari_android_wallet_ffi_FFIEmojiSet_jniGetAt(
         jobject jThis,
         jint index,
         jobject error) {
-    int errorCode = 0;
-    int *errorCodePointer = &errorCode;
-    jlong lEmojiSet = GetPointerField(jEnv, jThis);
-    auto *pEmojiSet = reinterpret_cast<EmojiSet *>(lEmojiSet);
-    auto result = reinterpret_cast<jlong>(
-            emoji_set_get_at(pEmojiSet, static_cast<unsigned int>(index), errorCodePointer)
-    );
-    setErrorCode(jEnv, error, errorCode);
-    return result;
+    return ExecuteWithErrorAndCast<ByteVector *>(jEnv, error, [&](int *errorPointer) {
+        auto pEmojiSet = GetPointerField<EmojiSet *>(jEnv, jThis);
+        return emoji_set_get_at(pEmojiSet, static_cast<unsigned int>(index), errorPointer);
+    });
 }
 
 extern "C"
@@ -86,7 +78,6 @@ JNIEXPORT void JNICALL
 Java_com_tari_android_wallet_ffi_FFIEmojiSet_jniDestroy(
         JNIEnv *jEnv,
         jobject jThis) {
-    jlong lEmojiSet = GetPointerField(jEnv, jThis);
-    emoji_set_destroy(reinterpret_cast<EmojiSet *>(lEmojiSet));
-    SetPointerField(jEnv, jThis, reinterpret_cast<jlong>(nullptr));
+    emoji_set_destroy(GetPointerField<EmojiSet *>(jEnv, jThis));
+    SetNullPointerField(jEnv, jThis);
 }

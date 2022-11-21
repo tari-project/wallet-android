@@ -69,12 +69,7 @@ object Event {
      * Contact events.
      */
     object Contact {
-        data class ContactAddedOrUpdated(val contactPublicKey: PublicKey, val contactAlias: String)
-        data class ContactRemoved(val contactPublicKey: PublicKey)
-    }
-
-    object Testnet {
-        class TestnetTariRequestSuccessful
-        data class TestnetTariRequestError(val errorMessage: String)
+        data class ContactAddedOrUpdated(val contactAddress: TariWalletAddress, val contactAlias: String)
+        data class ContactRemoved(val contactAddress: TariWalletAddress)
     }
 }

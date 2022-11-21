@@ -43,17 +43,17 @@ import com.tari.android.wallet.ui.extension.readP
  */
 open class User() : Parcelable {
 
-    var publicKey = PublicKey()
+    var walletAddress = TariWalletAddress()
 
-    constructor(publicKey: PublicKey) : this() {
-        this.publicKey = publicKey
+    constructor(publicKey: TariWalletAddress) : this() {
+        this.walletAddress = publicKey
     }
 
-    override fun toString(): String = "User(publicKey=$publicKey)"
+    override fun toString(): String = "User(publicKey=$walletAddress)"
 
-    override fun equals(other: Any?): Boolean = (other is User) && publicKey == other.publicKey
+    override fun equals(other: Any?): Boolean = (other is User) && walletAddress == other.walletAddress
 
-    override fun hashCode(): Int = publicKey.hashCode()
+    override fun hashCode(): Int = walletAddress.hashCode()
 
     // region Parcelable
 
@@ -74,11 +74,11 @@ open class User() : Parcelable {
     }
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {
-        parcel.writeParcelable(publicKey, flags)
+        parcel.writeParcelable(walletAddress, flags)
     }
 
     private fun readFromParcel(inParcel: Parcel) {
-        publicKey = inParcel.readP(PublicKey::class.java)
+        walletAddress = inParcel.readP(TariWalletAddress::class.java)
     }
 
     override fun describeContents(): Int {

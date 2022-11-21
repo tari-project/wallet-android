@@ -39,21 +39,10 @@ package com.tari.android.wallet.ffi
  */
 class FFITariCommitmentSignature() : FFIBase() {
 
-    private external fun jniCommitmentSignatureCreateFromBytes(
-        public_nonce_bytes: FFIByteVector,
-        u_bytes: FFIByteVector,
-        v_bytes: FFIByteVector,
-        libError: FFIError
-    )
-
     private external fun jniDestroy()
 
     constructor(pointer: FFIPointer) : this() {
         this.pointer = pointer
-    }
-
-    constructor(public_nonce_bytes: FFIByteVector, u_bytes: FFIByteVector, v_bytes: FFIByteVector) : this() {
-        runWithError { jniCommitmentSignatureCreateFromBytes(public_nonce_bytes, u_bytes, v_bytes, it) }
     }
 
     override fun destroy() = jniDestroy()

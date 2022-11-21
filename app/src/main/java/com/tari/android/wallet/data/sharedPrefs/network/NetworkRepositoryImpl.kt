@@ -1,13 +1,11 @@
 package com.tari.android.wallet.data.sharedPrefs.network
 
 import android.content.SharedPreferences
-import com.tari.android.wallet.R
 import com.tari.android.wallet.application.Network
 import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefBooleanDelegate
 import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefGsonDelegate
-import com.tari.android.wallet.ui.common.domain.ResourceManager
 
-class NetworkRepositoryImpl(private val resourceManager: ResourceManager, sharedPrefs: SharedPreferences) : NetworkRepository {
+class NetworkRepositoryImpl(sharedPrefs: SharedPreferences) : NetworkRepository {
 
     override var supportedNetworks: List<Network> = listOf(Network.ESMERALDA)
 
@@ -19,7 +17,7 @@ class NetworkRepositoryImpl(private val resourceManager: ResourceManager, shared
         try {
             currentNetwork!!.network.displayName
         } catch (e: Throwable) {
-            currentNetwork = getEsmeralda(resourceManager)
+            currentNetwork = getEsmeralda()
         }
     }
 
@@ -27,7 +25,7 @@ class NetworkRepositoryImpl(private val resourceManager: ResourceManager, shared
 
     override var incompatibleNetworkShown by SharedPrefBooleanDelegate(sharedPrefs, formatKey(Keys.networkIncompatible), false)
 
-    override fun getAllNetworks(): List<TariNetwork> = listOf(getEsmeralda(resourceManager))
+    override fun getAllNetworks(): List<TariNetwork> = listOf(getEsmeralda())
 
     object Keys {
         const val currentNetwork = "tari_current_network"
@@ -39,7 +37,6 @@ class NetworkRepositoryImpl(private val resourceManager: ResourceManager, shared
         private const val mainNetThicker = "XTR"
         private const val testNetThicker = "tXTR"
 
-        fun getEsmeralda(resourceManager: ResourceManager): TariNetwork =
-            TariNetwork(Network.ESMERALDA, resourceManager.getString(R.string.esmeralda_faucet_url), testNetThicker)
+        fun getEsmeralda(): TariNetwork = TariNetwork(Network.ESMERALDA, testNetThicker)
     }
 }

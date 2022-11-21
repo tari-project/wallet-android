@@ -41,58 +41,95 @@
 
 extern "C"
 JNIEXPORT void JNICALL
-Java_com_tari_android_wallet_ffi_FFIPrivateKey_jniCreate(
+Java_com_tari_android_wallet_ffi_FFITariWalletAddress_jniCreate(
         JNIEnv *jEnv,
         jobject jThis,
         jobject jByteVector,
         jobject error) {
     ExecuteWithError(jEnv, error, [&](int *errorPointer) {
         auto pByteVector = GetPointerField<ByteVector *>(jEnv, jByteVector);
-        auto result = reinterpret_cast<jlong>(private_key_create(pByteVector, errorPointer));
+        auto result = reinterpret_cast<jlong>(tari_address_create(pByteVector, errorPointer));
         SetPointerField(jEnv, jThis, result);
     });
 }
 
 extern "C"
 JNIEXPORT void JNICALL
-Java_com_tari_android_wallet_ffi_FFIPrivateKey_jniGenerate(
-        JNIEnv *jEnv,
-        jobject jThis) {
-    SetPointerField(jEnv, jThis, reinterpret_cast<jlong>(private_key_generate()));
-}
-
-extern "C"
-JNIEXPORT void JNICALL
-Java_com_tari_android_wallet_ffi_FFIPrivateKey_jniFromHex(
+Java_com_tari_android_wallet_ffi_FFITariWalletAddress_jniFromHex(
         JNIEnv *jEnv,
         jobject jThis,
         jstring jHexStr,
         jobject error) {
     ExecuteWithError(jEnv, error, [&](int *errorPointer) {
         const char *pStr = jEnv->GetStringUTFChars(jHexStr, JNI_FALSE);
-        TariPrivateKey *pPrivateKey = private_key_from_hex(pStr, errorPointer);
+        auto pTariWalletAddress = tari_address_from_hex(pStr, errorPointer);
         jEnv->ReleaseStringUTFChars(jHexStr, pStr);
-        SetPointerField(jEnv, jThis, reinterpret_cast<jlong>(pPrivateKey));
-    });
-}
-
-extern "C"
-JNIEXPORT jlong JNICALL
-Java_com_tari_android_wallet_ffi_FFIPrivateKey_jniGetBytes(
-        JNIEnv *jEnv,
-        jobject jThis,
-        jobject error) {
-    return ExecuteWithErrorAndCast<ByteVector *>(jEnv, error, [&](int *errorPointer) {
-        auto pPrivateKey = GetPointerField<PrivateKey *>(jEnv, jThis);
-        return private_key_get_bytes(pPrivateKey, errorPointer);
+        SetPointerField(jEnv, jThis, reinterpret_cast<jlong>(pTariWalletAddress));
     });
 }
 
 extern "C"
 JNIEXPORT void JNICALL
-Java_com_tari_android_wallet_ffi_FFIPrivateKey_jniDestroy(
+Java_com_tari_android_wallet_ffi_FFITariWalletAddress_jniFromPrivateKey(
+        JNIEnv *jEnv,
+        jobject jThis,
+        jobject jPrivateKey,
+        jobject error) {
+    ExecuteWithError(jEnv, error, [&](int *errorPointer) {
+        auto pPrivateKey = GetPointerField<TariPrivateKey *>(jEnv, jPrivateKey);
+        //todo
+        auto result = reinterpret_cast<jlong>(tari_address_from_private_key(pPrivateKey, 0, errorPointer));
+        SetPointerField(jEnv, jThis, result);
+    });
+}
+
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_tari_android_wallet_ffi_FFITariWalletAddress_jniFromEmojiId(
+        JNIEnv *jEnv,
+        jobject jThis,
+        jstring jpEmoji,
+        jobject error) {
+    ExecuteWithError(jEnv, error, [&](int *errorPointer) {
+        const char *pStr = jEnv->GetStringUTFChars(jpEmoji, JNI_FALSE);
+        auto result = reinterpret_cast<jlong>(emoji_id_to_tari_address(pStr, errorPointer));
+        jEnv->ReleaseStringUTFChars(jpEmoji, pStr);
+        SetPointerField(jEnv, jThis, result);
+    });
+}
+
+extern "C"
+JNIEXPORT jstring JNICALL
+Java_com_tari_android_wallet_ffi_FFITariWalletAddress_jniGetEmojiId(
+        JNIEnv *jEnv,
+        jobject jThis,
+        jobject error) {
+    return ExecuteWithError<jstring>(jEnv, error, [&](int *errorPointer) {
+        auto pWalletAddress = GetPointerField<TariWalletAddress *>(jEnv, jThis);
+        const char *pEmoji = tari_address_to_emoji_id(pWalletAddress, errorPointer);
+        jstring result = jEnv->NewStringUTF(pEmoji);
+        string_destroy(const_cast<char *>(pEmoji));
+        return result;
+    });
+}
+
+extern "C"
+JNIEXPORT jlong JNICALL
+Java_com_tari_android_wallet_ffi_FFITariWalletAddress_jniGetBytes(
+        JNIEnv *jEnv,
+        jobject jThis,
+        jobject error) {
+    return ExecuteWithErrorAndCast<ByteVector *>(jEnv, error, [&](int *errorPointer) {
+        auto pTariWalletAddress = GetPointerField<TariWalletAddress *>(jEnv, jThis);
+        return tari_address_get_bytes(pTariWalletAddress, errorPointer);
+    });
+}
+
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_tari_android_wallet_ffi_FFITariWalletAddress_jniDestroy(
         JNIEnv *jEnv,
         jobject jThis) {
-    private_key_destroy(GetPointerField<PrivateKey *>(jEnv, jThis));
+    tari_address_destroy(GetPointerField<TariWalletAddress *>(jEnv, jThis));
     SetNullPointerField(jEnv, jThis);
 }

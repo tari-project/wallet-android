@@ -68,7 +68,7 @@ import com.tari.android.wallet.databinding.FragmentAddRecipientBinding
 import com.tari.android.wallet.di.DiContainer.appComponent
 import com.tari.android.wallet.extension.observe
 import com.tari.android.wallet.extension.observeOnLoad
-import com.tari.android.wallet.model.PublicKey
+import com.tari.android.wallet.model.TariWalletAddress
 import com.tari.android.wallet.ui.common.CommonFragment
 import com.tari.android.wallet.ui.common.domain.ResourceManager
 import com.tari.android.wallet.ui.common.recyclerView.CommonAdapter
@@ -169,7 +169,7 @@ class AddRecipientFragment : CommonFragment<FragmentAddRecipientBinding, AddReci
         observeOnLoad(clipboardChecker)
     }
 
-    private fun showClipboardData(data: PublicKey) {
+    private fun showClipboardData(data: TariWalletAddress) {
         ui.rootView.postDelayed({
             hidePasteEmojiIdViewsOnTextChanged = true
             showPasteEmojiIdViews(data)
@@ -242,7 +242,7 @@ class AddRecipientFragment : CommonFragment<FragmentAddRecipientBinding, AddReci
         if (!isOpen) {
             ui.searchEditText.removeTextChangedListener(this)
             ui.searchEditText.isEnabled = false
-            ui.searchEditText.setText(viewModel.foundYatUser.value!!.get().publicKey.hexString)
+            ui.searchEditText.setText(viewModel.foundYatUser.value!!.get().walletAddress.hexString)
             ui.yatEyeButton.setImageDrawable(ContextCompat.getDrawable(requireContext(), R.drawable.closed_eye))
         } else {
             ui.searchEditText.isEnabled = true
@@ -274,9 +274,9 @@ class AddRecipientFragment : CommonFragment<FragmentAddRecipientBinding, AddReci
     /**
      * Displays paste-emoji-id-related views.
      */
-    private fun showPasteEmojiIdViews(publicKey: PublicKey) {
+    private fun showPasteEmojiIdViews(tariWalletAddress: TariWalletAddress) {
         ui.emojiIdTextView.text = EmojiUtil.getFullEmojiIdSpannable(
-            publicKey.emojiId,
+            tariWalletAddress.emojiId,
             string(emoji_id_chunk_separator),
             color(black),
             color(light_gray)
@@ -417,9 +417,9 @@ class AddRecipientFragment : CommonFragment<FragmentAddRecipientBinding, AddReci
             val qrData = data.getStringExtra(EXTRA_QR_DATA) ?: return
             (deeplinkHandler.handle(qrData) as? DeepLink.Send)?.let {
                 lifecycleScope.launch(Dispatchers.IO) {
-                    val publicKey = viewModel.getPublicKeyFromHexString(it.publicKeyHex)
-                    if (publicKey != null) {
-                        ui.rootView.post { ui.searchEditText.setText(publicKey.emojiId, TextView.BufferType.EDITABLE) }
+                    val tariWalletAddress = viewModel.getPublicKeyFromHexString(it.walletAddressHex)
+                    if (tariWalletAddress != null) {
+                        ui.rootView.post { ui.searchEditText.setText(tariWalletAddress.emojiId, TextView.BufferType.EDITABLE) }
                         ui.searchEditText.postDelayed({ ui.searchEditTextScrollView.smoothScrollTo(0, 0) }, Constants.UI.mediumDurationMs)
                         it.amount?.let { viewModel.setAmount(it) }
                     }
@@ -454,7 +454,7 @@ class AddRecipientFragment : CommonFragment<FragmentAddRecipientBinding, AddReci
             ui.searchEditText.scaleX = 0f
             ui.searchEditText.scaleY = 0f
             ui.searchEditText.setText(
-                viewModel.emojiIdPublicKey!!.emojiId,
+                viewModel.tariWalletAddress!!.emojiId,
                 TextView.BufferType.EDITABLE
             )
             ui.searchEditText.setSelection(ui.searchEditText.text?.length ?: 0)
@@ -572,7 +572,7 @@ class AddRecipientFragment : CommonFragment<FragmentAddRecipientBinding, AddReci
             // check if valid emoji - don't search if not
             val emojisNumber = textWithoutSeparators.numberOfEmojis()
             if (textWithoutSeparators.containsNonEmoji() || emojisNumber > emojiIdLength) {
-                viewModel.emojiIdPublicKey = null
+                viewModel.tariWalletAddress = null
                 ui.invalidEmojiIdTextView.text = string(add_recipient_invalid_emoji_id)
                 ui.invalidEmojiIdTextView.visible()
                 ui.qrCodeButton.visible()
@@ -581,15 +581,15 @@ class AddRecipientFragment : CommonFragment<FragmentAddRecipientBinding, AddReci
                 if (emojisNumber == emojiIdLength) {
                     finishEntering(textWithoutSeparators)
                 } else {
-                    viewModel.emojiIdPublicKey = null
+                    viewModel.tariWalletAddress = null
                     ui.qrCodeButton.visible()
                     onSearchTextChanged(textWithoutSeparators)
                 }
             }
         } else if (viewModel.checkForPublicKeyHex(text)) {
-            finishEntering(viewModel.emojiIdPublicKey!!.emojiId)
+            finishEntering(viewModel.tariWalletAddress!!.emojiId)
         } else {
-            viewModel.emojiIdPublicKey = null
+            viewModel.tariWalletAddress = null
             ui.qrCodeButton.visible()
             ui.searchEditText.textAlignment = View.TEXT_ALIGNMENT_TEXT_START
             ui.searchEditText.letterSpacing = inputNormalLetterSpacing
@@ -600,7 +600,7 @@ class AddRecipientFragment : CommonFragment<FragmentAddRecipientBinding, AddReci
 
     private fun finishEntering(text: String) {
         if (text == sharedPrefsWrapper.emojiId!!) {
-            viewModel.emojiIdPublicKey = null
+            viewModel.tariWalletAddress = null
             ui.invalidEmojiIdTextView.text = string(add_recipient_own_emoji_id)
             ui.invalidEmojiIdTextView.visible()
             ui.qrCodeButton.visible()
@@ -609,9 +609,9 @@ class AddRecipientFragment : CommonFragment<FragmentAddRecipientBinding, AddReci
             ui.qrCodeButton.gone()
             // valid emoji id length - clear list, no search, display continue button
             lifecycleScope.launch(Dispatchers.IO) {
-                viewModel.emojiIdPublicKey = viewModel.getPublicKeyFromEmojiId(text)
+                viewModel.tariWalletAddress = viewModel.getPublicKeyFromEmojiId(text)
                 lifecycleScope.launch(Dispatchers.Main) {
-                    if (viewModel.emojiIdPublicKey == null) {
+                    if (viewModel.tariWalletAddress == null) {
                         ui.invalidEmojiIdTextView.text = string(add_recipient_invalid_emoji_id)
                         ui.invalidEmojiIdTextView.visible()
                         clearSearchResult()

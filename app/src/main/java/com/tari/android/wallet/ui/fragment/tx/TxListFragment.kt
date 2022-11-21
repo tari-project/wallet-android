@@ -297,10 +297,6 @@ class TxListFragment : CommonFragment<FragmentTxListBinding, TxListViewModel>(),
             if (viewModel.txListIsEmpty) {
                 showNoTxsTextView()
             }
-            if (!viewModel.testnetFaucetRepository.faucetTestnetTariRequestCompleted && !viewModel.tariSettingsSharedRepository.isRestoredWallet
-            ) {
-                viewModel.requestTestnetTari()
-            }
             updateProgressViewController.reset()
             ui.scrollView.beginUpdate()
             updateProgressViewController.start(viewModel.walletService)
@@ -546,10 +542,6 @@ class TxListFragment : CommonFragment<FragmentTxListBinding, TxListViewModel>(),
         ui.onboardingContentView.gone()
         ui.txListHeaderView.visible()
         viewModel.refreshAllData()
-        // request Testnet Tari if no txs
-        if (viewModel.txListIsEmpty) {
-            handler.postDelayed(Constants.UI.xxLongDurationMs, action = viewModel::requestTestnetTari)
-        }
     }
 
     companion object {

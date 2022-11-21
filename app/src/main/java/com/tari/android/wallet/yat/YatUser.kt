@@ -2,15 +2,15 @@ package com.tari.android.wallet.yat
 
 import android.os.Parcel
 import android.os.Parcelable
-import com.tari.android.wallet.model.PublicKey
+import com.tari.android.wallet.model.TariWalletAddress
 import com.tari.android.wallet.model.User
 
 class YatUser() : User(), Parcelable {
 
     var yat: String = ""
 
-    constructor(publicKey: PublicKey) : this() {
-        this.publicKey = publicKey
+    constructor(tariWalletAddress: TariWalletAddress) : this() {
+        this.walletAddress = tariWalletAddress
     }
 
     // region Parcelable

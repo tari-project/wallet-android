@@ -46,10 +46,10 @@ class Contact() : User(), Parcelable {
     var alias: String = ""
 
     constructor(
-        publicKey: PublicKey,
+        tariWalletAddress: TariWalletAddress,
         alias: String
     ) : this() {
-        this.publicKey = publicKey
+        this.walletAddress = tariWalletAddress
         this.alias = alias
     }
 
@@ -74,12 +74,12 @@ class Contact() : User(), Parcelable {
     }
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {
-        parcel.writeParcelable(publicKey, flags)
+        parcel.writeParcelable(walletAddress, flags)
         parcel.writeString(alias)
     }
 
     private fun readFromParcel(inParcel: Parcel) {
-        publicKey = inParcel.readP(PublicKey::class.java)
+        walletAddress = inParcel.readP(TariWalletAddress::class.java)
         alias = inParcel.readString().orEmpty()
     }
 

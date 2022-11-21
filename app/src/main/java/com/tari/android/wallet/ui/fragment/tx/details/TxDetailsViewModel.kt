@@ -66,8 +66,8 @@ class TxDetailsViewModel : CommonViewModel() {
         val contact = currentTx.user as? Contact ?: return
 
         walletService.executeWithError { error, wallet -> wallet.removeContact(contact, error) }
-        currentTx.user = User(contact.publicKey)
-        EventBus.post(Event.Contact.ContactRemoved(contact.publicKey))
+        currentTx.user = User(contact.walletAddress)
+        EventBus.post(Event.Contact.ContactRemoved(contact.walletAddress))
 
         _tx.postValue(currentTx)
     }
@@ -76,10 +76,10 @@ class TxDetailsViewModel : CommonViewModel() {
     fun updateContactAlias(newAlias: String) {
         val tx = tx.value!!
 
-        walletService.executeWithError { error, wallet -> wallet.updateContactAlias(tx.user.publicKey, newAlias, error) }
+        walletService.executeWithError { error, wallet -> wallet.updateContactAlias(tx.user.walletAddress, newAlias, error) }
 
-        tx.user = Contact(tx.user.publicKey, newAlias)
-        EventBus.post(Event.Contact.ContactAddedOrUpdated(tx.user.publicKey, newAlias))
+        tx.user = Contact(tx.user.walletAddress, newAlias)
+        EventBus.post(Event.Contact.ContactAddedOrUpdated(tx.user.walletAddress, newAlias))
         _tx.postValue(tx)
     }
 

@@ -30,35 +30,52 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.tari.android.wallet.service
-
-import android.content.BroadcastReceiver
-import android.content.Context
-import android.content.Intent
-import com.orhanobut.logger.Logger
-import com.tari.android.wallet.data.WalletConfig
-import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepositoryImpl
-import com.tari.android.wallet.data.sharedPrefs.tariSettings.TariSettingsSharedRepository
-import com.tari.android.wallet.di.ApplicationModule
-import com.tari.android.wallet.service.service.WalletServiceLauncher
-import com.tari.android.wallet.ui.common.domain.ResourceManager
+package com.tari.android.wallet.ffi
 
 /**
- * This receiver is responsible for restarting the service when it gets destroyed - i.e. when
- * the app gets terminated.
+ * Wrapper for native private key type.
  *
  * @author The Tari Development Team
  */
-class ServiceRestartBroadcastReceiver : BroadcastReceiver() {
+class FFITariWalletAddress() : FFIBase() {
 
-    private val logger
-        get() = Logger.t(ServiceRestartBroadcastReceiver::class.simpleName)
+    private external fun jniGetBytes(libError: FFIError): FFIPointer
+    private external fun jniDestroy()
+    private external fun jniCreate(byteVectorPtr: FFIByteVector, libError: FFIError)
+    private external fun jniFromHex(hexStr: String, libError: FFIError)
+    private external fun jniFromEmojiId(emoji: String, libError: FFIError)
+    private external fun jniFromPrivateKey(privateKeyPtr: FFIPrivateKey, libError: FFIError)
+    private external fun jniGetEmojiId(libError: FFIError): String
 
-    override fun onReceive(context: Context, intent: Intent) {
-        logger.i("Service restart broadcast received")
-        val sharedPreferences = context.getSharedPreferences(ApplicationModule.sharedPrefsFileName, Context.MODE_PRIVATE)
-        val networkRepository = NetworkRepositoryImpl(sharedPreferences)
-        val tariSettingsSharedRepository = TariSettingsSharedRepository(sharedPreferences, networkRepository)
-        WalletServiceLauncher(context, WalletConfig(context, networkRepository), tariSettingsSharedRepository).startIfExist()
+    constructor(pointer: FFIPointer) : this() {
+        this.pointer = pointer
     }
+
+    constructor(byteVector: FFIByteVector) : this() {
+        runWithError { jniCreate(byteVector, it) }
+    }
+
+    constructor(hex: HexString) : this() {
+        if (hex.toString().length == 64) {
+            runWithError { jniFromHex(hex.hex, it) }
+        } else {
+            throw FFIException(message = "HexString is not a valid PublicKey")
+        }
+    }
+
+    constructor(emojiId: String) : this() {
+        runWithError { jniFromEmojiId(emojiId, it) }
+    }
+
+    constructor(privateKey: FFIPrivateKey) : this() {
+        runWithError { jniFromPrivateKey(privateKey, it) }
+    }
+
+    fun getBytes(): FFIByteVector = runWithError { FFIByteVector(jniGetBytes(it)) }
+
+    fun getEmojiId(): String = runWithError { jniGetEmojiId(it) }
+
+    override fun toString(): String = getBytes().toString()
+
+    override fun destroy() = jniDestroy()
 }

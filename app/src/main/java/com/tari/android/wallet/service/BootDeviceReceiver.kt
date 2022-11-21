@@ -57,9 +57,8 @@ class BootDeviceReceiver : BroadcastReceiver() {
         if (context == null || intent == null) return
         logger.i("Boot device broadcast received")
         if (Intent.ACTION_BOOT_COMPLETED == intent.action) {
-            val resourceManager = ResourceManager(context)
             val sharedPreferences = context.getSharedPreferences(ApplicationModule.sharedPrefsFileName, Context.MODE_PRIVATE)
-            val networkRepository = NetworkRepositoryImpl(resourceManager, sharedPreferences)
+            val networkRepository = NetworkRepositoryImpl(sharedPreferences)
             val tariSettingsSharedRepository = TariSettingsSharedRepository(sharedPreferences, networkRepository)
             WalletServiceLauncher(context, WalletConfig(context, networkRepository), tariSettingsSharedRepository).startIfExist()
         }

@@ -113,7 +113,7 @@ class FFIWallet(
 
     private external fun jniLogMessage(message: String, libError: FFIError)
 
-    private external fun jniGetPublicKey(libError: FFIError): FFIPointer
+    private external fun jniGetWalletAddress(libError: FFIError): FFIPointer
 
     private external fun jniGetContacts(libError: FFIError): FFIPointer
 
@@ -140,7 +140,7 @@ class FFIWallet(
     private external fun jniCancelPendingTx(id: String, libError: FFIError): Boolean
 
     private external fun jniSendTx(
-        publicKeyPtr: FFIPublicKey,
+        publicKeyPtr: FFITariWalletAddress,
         amount: String,
         feePerGram: String,
         message: String,
@@ -151,17 +151,6 @@ class FFIWallet(
 //    private external fun jniSignMessage(message: String, libError: FFIError): String
 //
 //    private external fun jniVerifyMessageSignature(publicKeyPtr: FFIPublicKey, message: String, signature: String, libError: FFIError): Boolean
-
-    private external fun jniImportUTXO(
-        amount: String,
-        spendingKey: FFIPrivateKey,
-        sourcePublicKey: FFIPublicKey,
-        tariCommitmentSignature: FFITariCommitmentSignature,
-        sourceSenderPublicKey: FFIPublicKey,
-        scriptPrivateKey: FFIPrivateKey,
-        message: String,
-        libError: FFIError
-    ): ByteArray
 
     private external fun jniAddBaseNodePeer(publicKey: FFIPublicKey, address: String, libError: FFIError): Boolean
 
@@ -292,7 +281,7 @@ class FFIWallet(
 
     fun getAllUtxos(): TariVector = TariVector(FFITariVector(runWithError { jniGetAllUtxos(it) }))
 
-    fun getPublicKey(): FFIPublicKey = runWithError { FFIPublicKey(jniGetPublicKey(it)) }
+    fun getWalletAddress(): FFITariWalletAddress = runWithError { FFITariWalletAddress(jniGetWalletAddress(it)) }
 
     fun getContacts(): FFIContacts = runWithError { FFIContacts(jniGetContacts(it)) }
 
@@ -491,11 +480,11 @@ class FFIWallet(
         BigInteger(1, jniEstimateTxFee(amount.toString(), gramFee.toString(), kernelCount.toString(), outputCount.toString(), it))
     }
 
-    fun sendTx(destination: FFIPublicKey, amount: BigInteger, feePerGram: BigInteger, message: String, isOneSided: Boolean): BigInteger {
+    fun sendTx(destination: FFITariWalletAddress, amount: BigInteger, feePerGram: BigInteger, message: String, isOneSided: Boolean): BigInteger {
         if (amount < BigInteger.valueOf(0L)) {
             throw FFIException(message = "Amount is less than 0.")
         }
-        if (destination == getPublicKey()) {
+        if (destination == getWalletAddress()) {
             throw FFIException(message = "Tx source and destination are the same.")
         }
         val bytes = runWithError { jniSendTx(destination, amount.toString(), feePerGram.toString(), message, isOneSided, it) }
@@ -520,29 +509,6 @@ class FFIWallet(
 
 //    fun verifyMessageSignature(contactPublicKey: FFIPublicKey, message: String, signature: String): Boolean =
 //        runWithError { jniVerifyMessageSignature(contactPublicKey, message, signature, it) }
-
-    fun importUTXO(
-        amount: BigInteger,
-        message: String,
-        spendingKey: FFIPrivateKey,
-        sourcePublicKey: FFIPublicKey,
-        tariCommitmentSignature: FFITariCommitmentSignature,
-        senderPublicKey: FFIPublicKey,
-        scriptPrivateKey: FFIPrivateKey,
-    ): BigInteger = runWithError {
-        BigInteger(
-            jniImportUTXO(
-                amount.toString(),
-                spendingKey,
-                sourcePublicKey,
-                tariCommitmentSignature,
-                senderPublicKey,
-                scriptPrivateKey,
-                message,
-                it
-            )
-        )
-    }
 
     fun startTXOValidation(): BigInteger = runWithError { BigInteger(1, jniStartTXOValidation(it)) }
 
