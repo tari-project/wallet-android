@@ -120,7 +120,7 @@ class DeepLinkTest {
         private val network: Network = Network.ESMERALDA
 
         override var supportedNetworks: List<Network> = listOf(network)
-        override var currentNetwork: TariNetwork? = TariNetwork(network, "", "")
+        override var currentNetwork: TariNetwork? = TariNetwork(network, "")
         override var ffiNetwork: Network? = network
         override var incompatibleNetworkShown: Boolean = false
         override var recommendedNetworks: List<Network> = listOf(network)
