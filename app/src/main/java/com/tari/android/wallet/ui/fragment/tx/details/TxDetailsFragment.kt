@@ -257,7 +257,7 @@ class TxDetailsFragment : CommonFragment<FragmentTxDetailsBinding, TxDetailsView
             tx is CancelledTx -> ""
             state == TxState(INBOUND, PENDING) -> string(tx_detail_waiting_for_sender_to_complete)
             state == TxState(OUTBOUND, PENDING) -> string(tx_detail_waiting_for_recipient)
-            state == TxState(INBOUND, FAUX_UNCONFIRMED) -> ""
+            state == TxState(INBOUND, FAUX_UNCONFIRMED) || state == TxState(INBOUND, FAUX_CONFIRMED) -> ""
             state.status != MINED_CONFIRMED && state.status != COINBASE -> string(
                 tx_detail_completing_final_processing,
                 if (tx is CompletedTx) tx.confirmationCount.toInt() + 1 else 1,

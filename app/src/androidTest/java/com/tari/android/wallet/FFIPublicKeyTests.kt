@@ -32,8 +32,9 @@
  */
 package com.tari.android.wallet
 
-import com.tari.android.wallet.ffi.*
-import org.junit.Assert.assertEquals
+import com.tari.android.wallet.ffi.FFIPrivateKey
+import com.tari.android.wallet.ffi.FFIPublicKey
+import com.tari.android.wallet.ffi.nullptr
 import org.junit.Assert.assertNotEquals
 import org.junit.Test
 
@@ -52,35 +53,4 @@ class FFIPublicKeyTests {
         publicKey.destroy()
         privateKey.destroy()
     }
-
-    @Test
-    fun constructorFromByteVector_assertThatValidPublicKeyInstanceWasCreated() {
-        val publicKey = FFIPublicKey(FFIByteVector(HexString(FFITestUtil.PUBLIC_KEY_HEX_STRING)))
-        assertNotEquals(nullptr, publicKey.pointer)
-        assertEquals(FFITestUtil.PUBLIC_KEY_HEX_STRING, publicKey.toString())
-        publicKey.destroy()
-    }
-
-    @Test
-    fun constructorFromHexString_assertThatValidPublicKeyInstanceWasCreated() {
-        val publicKey = FFIPublicKey(HexString(FFITestUtil.PUBLIC_KEY_HEX_STRING))
-        assertNotEquals(nullptr, publicKey.pointer)
-        assertEquals(FFITestUtil.PUBLIC_KEY_HEX_STRING, publicKey.toString())
-        publicKey.destroy()
-    }
-
-//    @Test
-    fun constructorFromEmojiId_assertThatValidPublicKeyInstanceWasCreated() {
-        val origin = FFIPublicKey(HexString(FFITestUtil.PUBLIC_KEY_HEX_STRING))
-        val publicKey = FFIPublicKey(FFITestUtil.PUBLIC_KEY_EMOJI_ID)
-        assertEquals(origin.toString(), publicKey.toString())
-        publicKey.destroy()
-        origin.destroy()
-    }
-
-    @Test(expected = FFIException::class)
-    fun constructor_assertThatFFIExceptionWasThrown_if6CharsLengthStringWasGiven() {
-        FFIPublicKey(FFIByteVector(HexString("A03DB4")))
-    }
-
 }

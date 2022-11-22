@@ -7,9 +7,11 @@ import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import com.tari.android.wallet.data.sharedPrefs.tariSettings.TariSettingsSharedRepository
 import com.tari.android.wallet.event.Event
 import com.tari.android.wallet.event.EventBus
-import com.tari.android.wallet.extension.*
+import com.tari.android.wallet.extension.addTo
+import com.tari.android.wallet.extension.debounce
+import com.tari.android.wallet.extension.getWithError
+import com.tari.android.wallet.extension.repopulate
 import com.tari.android.wallet.model.*
-import com.tari.android.wallet.network.NetworkConnectionState
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.common.SingleLiveEvent
 import com.tari.android.wallet.ui.common.gyphy.presentation.GIFViewModel
@@ -17,12 +19,6 @@ import com.tari.android.wallet.ui.common.gyphy.repository.GIFRepository
 import com.tari.android.wallet.ui.common.recyclerView.CommonViewHolderItem
 import com.tari.android.wallet.ui.common.recyclerView.items.TitleViewHolderItem
 import com.tari.android.wallet.ui.dialog.error.ErrorDialogArgs
-import com.tari.android.wallet.ui.dialog.modular.DialogArgs
-import com.tari.android.wallet.ui.dialog.modular.ModularDialogArgs
-import com.tari.android.wallet.ui.dialog.modular.modules.body.BodyModule
-import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonModule
-import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonStyle
-import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
 import com.tari.android.wallet.ui.fragment.send.finalize.TxFailureReason
 import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupSettingsRepository
 import com.tari.android.wallet.ui.fragment.tx.adapter.TransactionItem

@@ -12,6 +12,9 @@ import com.tari.android.wallet.model.*
 import com.tari.android.wallet.service.TariWalletService
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.dialog.error.ErrorDialogArgs
+import com.tari.android.wallet.ui.extension.toLiveData
+import io.reactivex.BackpressureStrategy
+import io.reactivex.subjects.BehaviorSubject
 
 class TxDetailsViewModel : CommonViewModel() {
 
@@ -20,8 +23,9 @@ class TxDetailsViewModel : CommonViewModel() {
 
     private var txId: TxId? = null
 
-    private val _tx = MutableLiveData<Tx>()
-    val tx: LiveData<Tx> = _tx
+    private val _txObject = BehaviorSubject.create<Tx>()
+
+    val tx: LiveData<Tx> = _txObject.toLiveData(BackpressureStrategy.LATEST)
 
     private val _cancellationReason = MutableLiveData<String>()
     val cancellationReason: LiveData<String> = _cancellationReason
@@ -33,14 +37,14 @@ class TxDetailsViewModel : CommonViewModel() {
         doOnConnected {
             fetchRequiredConfirmationCount()
             findTxAndUpdateUI()
-            _tx.postValue(_tx.value)
+            _txObject.onNext(_txObject.value!!)
         }
 
         observeTxUpdates()
     }
 
     fun setTxArg(tx: Tx) {
-        _tx.postValue(tx)
+        _txObject.onNext(tx)
         _cancellationReason.postValue(getCancellationReason(tx))
         generateExplorerLink(tx)
     }
@@ -69,7 +73,7 @@ class TxDetailsViewModel : CommonViewModel() {
         currentTx.user = User(contact.walletAddress)
         EventBus.post(Event.Contact.ContactRemoved(contact.walletAddress))
 
-        _tx.postValue(currentTx)
+        _txObject.onNext(currentTx)
     }
 
 
@@ -80,7 +84,7 @@ class TxDetailsViewModel : CommonViewModel() {
 
         tx.user = Contact(tx.user.walletAddress, newAlias)
         EventBus.post(Event.Contact.ContactAddedOrUpdated(tx.user.walletAddress, newAlias))
-        _tx.postValue(tx)
+        _txObject.onNext(tx)
     }
 
     fun openInBlockExplorer() {
@@ -131,7 +135,7 @@ class TxDetailsViewModel : CommonViewModel() {
             ) { _backPressed.call() }
             _modularDialog.postValue(errorArgs.getModular(resourceManager))
         } else {
-            foundTx.let { _tx.value = it }
+            foundTx.let { _txObject.onNext(it) }
             generateExplorerLink(foundTx)
         }
     }

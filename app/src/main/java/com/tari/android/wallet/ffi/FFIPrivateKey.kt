@@ -50,11 +50,7 @@ class FFIPrivateKey private constructor() : FFIBase() {
     }
 
     constructor(hexString: HexString) : this() {
-        if (hexString.toString().length == 64) {
-            runWithError { jniFromHex(hexString.hex, it) }
-        } else {
-            throw FFIException(message = "HexString is not a valid PrivateKey")
-        }
+        runWithError { jniFromHex(hexString.hex, it) }
     }
 
     fun getBytes(): FFIByteVector = runWithError { FFIByteVector(jniGetBytes(it)) }

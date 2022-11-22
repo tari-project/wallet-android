@@ -417,7 +417,7 @@ class AddRecipientFragment : CommonFragment<FragmentAddRecipientBinding, AddReci
             val qrData = data.getStringExtra(EXTRA_QR_DATA) ?: return
             (deeplinkHandler.handle(qrData) as? DeepLink.Send)?.let {
                 lifecycleScope.launch(Dispatchers.IO) {
-                    val tariWalletAddress = viewModel.getPublicKeyFromHexString(it.walletAddressHex)
+                    val tariWalletAddress = viewModel.getWalletAddressFromHexString(it.walletAddressHex)
                     if (tariWalletAddress != null) {
                         ui.rootView.post { ui.searchEditText.setText(tariWalletAddress.emojiId, TextView.BufferType.EDITABLE) }
                         ui.searchEditText.postDelayed({ ui.searchEditTextScrollView.smoothScrollTo(0, 0) }, Constants.UI.mediumDurationMs)
@@ -586,7 +586,7 @@ class AddRecipientFragment : CommonFragment<FragmentAddRecipientBinding, AddReci
                     onSearchTextChanged(textWithoutSeparators)
                 }
             }
-        } else if (viewModel.checkForPublicKeyHex(text)) {
+        } else if (viewModel.checkForWalletAddressHex(text)) {
             finishEntering(viewModel.tariWalletAddress!!.emojiId)
         } else {
             viewModel.tariWalletAddress = null
@@ -609,7 +609,7 @@ class AddRecipientFragment : CommonFragment<FragmentAddRecipientBinding, AddReci
             ui.qrCodeButton.gone()
             // valid emoji id length - clear list, no search, display continue button
             lifecycleScope.launch(Dispatchers.IO) {
-                viewModel.tariWalletAddress = viewModel.getPublicKeyFromEmojiId(text)
+                viewModel.tariWalletAddress = viewModel.getWalletAddressFromEmojiId(text)
                 lifecycleScope.launch(Dispatchers.Main) {
                     if (viewModel.tariWalletAddress == null) {
                         ui.invalidEmojiIdTextView.text = string(add_recipient_invalid_emoji_id)

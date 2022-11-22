@@ -48,7 +48,6 @@ import com.tari.android.wallet.BuildConfig
 import com.tari.android.wallet.R
 import com.tari.android.wallet.data.sharedPrefs.delegates.SerializableTime
 import com.tari.android.wallet.infrastructure.backup.*
-import com.tari.android.wallet.infrastructure.backup.googleDrive.GoogleDriveBackupStorage
 import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupSettingsRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -67,7 +66,7 @@ class DropboxBackupStorage(
 ) : BackupStorage {
 
     private val logger
-        get() = Logger.t(GoogleDriveBackupStorage::class.simpleName)
+        get() = Logger.t(DropboxBackupStorage::class.simpleName)
 
     private var isAuthStarted = false
 
@@ -123,7 +122,7 @@ class DropboxBackupStorage(
         try {
             backupFileProcessor.clearTempFolder()
         } catch (e: Exception) {
-            Logger.e(e, "Ignorable backup error while clearing temporary and old files.")
+            logger.e(e, "Ignorable backup error while clearing temporary and old files.")
         }
         return@withContext backupDate
     }

@@ -182,7 +182,7 @@ class AddRecipientViewModel : CommonViewModel() {
             }
         }
         if (tariWalletAddress == null) {
-            checkForPublicKeyHex(clipboardString)
+            checkForWalletAddressHex(clipboardString)
         }
         tariWalletAddress?.let {
             if (it.emojiId != sharedPrefsWrapper.emojiId!!) {
@@ -194,7 +194,7 @@ class AddRecipientViewModel : CommonViewModel() {
     /**
      * Checks clipboard data for a public key hex string.
      */
-    fun checkForPublicKeyHex(input: String): Boolean {
+    fun checkForWalletAddressHex(input: String): Boolean {
         val hexStringRegex = Regex("([A-Za-z0-9]{64})")
         var result = hexStringRegex.find(input)
         while (result != null) {
@@ -208,9 +208,9 @@ class AddRecipientViewModel : CommonViewModel() {
         return false
     }
 
-    fun getPublicKeyFromHexString(publicKeyHex: String): TariWalletAddress? =
+    fun getWalletAddressFromHexString(publicKeyHex: String): TariWalletAddress? =
         walletService.getWithError { _, wallet -> wallet.getWalletAddressFromHexString(publicKeyHex) }
 
-    fun getPublicKeyFromEmojiId(emojiId: String): TariWalletAddress? = walletService.getWithError { _, wallet -> wallet.getWalletAddressFromEmojiId(emojiId) }
+    fun getWalletAddressFromEmojiId(emojiId: String): TariWalletAddress? = walletService.getWithError { _, wallet -> wallet.getWalletAddressFromEmojiId(emojiId) }
 }
 
