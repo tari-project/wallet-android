@@ -8,7 +8,6 @@ import com.tari.android.wallet.model.*
 import com.tari.android.wallet.service.TariWalletService
 import com.tari.android.wallet.service.TariWalletServiceListener
 import com.tari.android.wallet.service.baseNode.BaseNodeSyncState
-import com.tari.android.wallet.ui.common.domain.ResourceManager
 import com.tari.android.wallet.util.Constants
 import java.math.BigInteger
 import java.util.*
@@ -183,28 +182,20 @@ class TariWalletServiceStubImpl(
     } ?: false
 
     override fun updateContactAlias(walletAddress: TariWalletAddress, alias: String, error: WalletError): Boolean = runMapping(error) {
-        val publicKeyFFI = FFITariWalletAddress(HexString(walletAddress.hexString))
-        val contact = FFIContact(alias, publicKeyFFI)
+        val ffiTariWalletAddress = FFITariWalletAddress(HexString(walletAddress.hexString))
+        val contact = FFIContact(alias, ffiTariWalletAddress)
         wallet.addUpdateContact(contact).also {
-            publicKeyFFI.destroy()
+            ffiTariWalletAddress.destroy()
             contact.destroy()
             _cachedContacts = null
         }
     } ?: false
 
-    /**
-     * @return public key constructed from input emoji id. Null if the emoji id is invalid
-     * or it does not correspond to a public key.
-     */
     override fun getWalletAddressFromEmojiId(emojiId: String?): TariWalletAddress? =
         runCatching { FFITariWalletAddress(emojiId.orEmpty()).runWithDestroy { walletAddressFromFFI(it) } }.getOrNull()
 
-    /**
-     * @return public key constructed from input public key hex string id. Null if the emoji id
-     * is invalid or it does not correspond to a public key.
-     */
-    override fun getWalletAddressFromHexString(publicKeyHex: String?): TariWalletAddress? =
-        runCatching { FFITariWalletAddress(HexString(publicKeyHex ?: "")).runWithDestroy { walletAddressFromFFI(it) } }.getOrNull()
+    override fun getWalletAddressFromHexString(walletAddressHex: String?): TariWalletAddress? =
+        runCatching { FFITariWalletAddress(HexString(walletAddressHex ?: "")).runWithDestroy { walletAddressFromFFI(it) } }.getOrNull()
 
     override fun setKeyValue(key: String, value: String, error: WalletError): Boolean = runMapping(error) { wallet.setKeyValue(key, value) } ?: false
 
@@ -265,8 +256,6 @@ class TariWalletServiceStubImpl(
         }
         walletError.code = WalletError.UnknownError.code
     }
-
-    private fun publicKeyFromFFI(publicKeyFFI: FFIPublicKey): PublicKey = PublicKey(publicKeyFFI.toString(), publicKeyFFI.getEmojiId())
 
     private fun walletAddressFromFFI(ffiTariWalletAddress: FFITariWalletAddress): TariWalletAddress =
         TariWalletAddress(ffiTariWalletAddress.toString(), ffiTariWalletAddress.getEmojiId())

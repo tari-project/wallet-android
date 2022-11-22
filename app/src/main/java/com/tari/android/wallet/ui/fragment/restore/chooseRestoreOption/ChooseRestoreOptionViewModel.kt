@@ -58,7 +58,7 @@ class ChooseRestoreOptionViewModel : CommonViewModel() {
         options.postValue(backupSettingsRepository.getOptionList)
 
         EventBus.walletState.publishSubject.filter { it is WalletState.Running }.subscribe {
-            if (WalletUtil.walletExists(walletConfig)) {
+            if (WalletUtil.walletExists(walletConfig) && state.value != null) {
                 val dto = backupSettingsRepository.getOptionDto(state.value!!.backupOptions)!!.copy(isEnable = true)
                 backupSettingsRepository.updateOption(dto)
                 backupManager.backupNow()

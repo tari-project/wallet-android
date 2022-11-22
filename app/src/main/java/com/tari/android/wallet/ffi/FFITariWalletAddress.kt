@@ -56,11 +56,7 @@ class FFITariWalletAddress() : FFIBase() {
     }
 
     constructor(hex: HexString) : this() {
-        if (hex.toString().length == 64) {
-            runWithError { jniFromHex(hex.hex, it) }
-        } else {
-            throw FFIException(message = "HexString is not a valid PublicKey")
-        }
+        runWithError { jniFromHex(hex.hex, it) }
     }
 
     constructor(emojiId: String) : this() {

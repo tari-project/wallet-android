@@ -45,20 +45,14 @@ class TariWalletAddress() : Parcelable {
     var hexString = ""
     var emojiId = ""
 
-    constructor(
-        hexString: String,
-        emojiId: String
-    ) : this() {
+    constructor(hexString: String, emojiId: String) : this() {
         this.hexString = hexString
         this.emojiId = emojiId
     }
 
-    override fun equals(other: Any?): Boolean = (other is TariWalletAddress)
-            && hexString == other.hexString
+    override fun equals(other: Any?): Boolean = (other is TariWalletAddress) && hexString == other.hexString
 
-    override fun hashCode(): Int {
-        return hexString.hashCode()
-    }
+    override fun hashCode(): Int = hexString.hashCode()
 
     override fun toString(): String = "TariWalletAddress(hexString='$hexString', emojiId='$emojiId')"
 

@@ -259,7 +259,7 @@ class AddAmountFragment : CommonFragment<FragmentAddAmountBinding, AddAmountView
 
     private fun updateBalanceInfo() {
         balanceInfo = viewModel.walletService.getWithError { error, wallet -> wallet.getBalanceInfo(error) }
-        availableBalance = balanceInfo.availableBalance + balanceInfo.pendingIncomingBalance
+        availableBalance = balanceInfo.availableBalance
         ui.availableBalanceContainerView.setupArgs(availableBalance)
     }
 
