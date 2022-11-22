@@ -134,7 +134,7 @@ class FFIWalletTests {
         assertNotEquals(nullptr, wallet.pointer)
         val ffiTariWalletAddress = wallet.getWalletAddress()
         assertNotEquals(nullptr, ffiTariWalletAddress.pointer)
-        assertEquals(FFITestUtil.PUBLIC_KEY_HEX_STRING.length, ffiTariWalletAddress.toString().length)
+        assertEquals(FFITestUtil.WALLET_ADDRESS_HEX_STRING.length, ffiTariWalletAddress.toString().length)
     }
 
 //    @Test

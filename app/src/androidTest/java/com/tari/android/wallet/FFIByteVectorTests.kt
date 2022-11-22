@@ -47,7 +47,7 @@ class FFIByteVectorTests {
 
     @Test
     fun constructor_assertThatValidObjectWasCreated() {
-        val hexString = FFITestUtil.PUBLIC_KEY_HEX_STRING
+        val hexString = FFITestUtil.WALLET_ADDRESS_HEX_STRING
         val byteVector = FFIByteVector(HexString(hexString))
         assertNotEquals(nullptr, byteVector.pointer)
         assertEquals(hexString.length, byteVector.getLength() * 2)

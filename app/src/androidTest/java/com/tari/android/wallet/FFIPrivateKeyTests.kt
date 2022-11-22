@@ -32,7 +32,10 @@
  */
 package com.tari.android.wallet
 
-import com.tari.android.wallet.ffi.*
+import com.tari.android.wallet.ffi.FFIByteVector
+import com.tari.android.wallet.ffi.FFIPrivateKey
+import com.tari.android.wallet.ffi.HexString
+import com.tari.android.wallet.ffi.nullptr
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotEquals
 import org.junit.Test
@@ -64,10 +67,5 @@ class FFIPrivateKeyTests {
         assertNotEquals(nullptr, privateKey.pointer)
         assertEquals(FFITestUtil.PRIVATE_KEY_HEX_STRING, privateKey.toString())
         privateKey.destroy()
-    }
-
-    @Test(expected = FFIException::class)
-    fun constructor_assertThatFFIExceptionWasThrown_ifGivenHexStringHas6CharsInsteadOf64() {
-        FFIPrivateKey(FFIByteVector(HexString("A03DB4")))
     }
 }

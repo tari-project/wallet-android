@@ -46,7 +46,7 @@ class FFIContactTests {
 
     @Test
     fun constructor_assertThatConstructedContactIsValid() {
-        val ffiTariWalletAddress = FFITariWalletAddress(HexString(FFITestUtil.PUBLIC_KEY_HEX_STRING))
+        val ffiTariWalletAddress = FFITariWalletAddress(HexString(FFITestUtil.WALLET_ADDRESS_HEX_STRING))
         val alias = FFITestUtil.generateRandomAlphanumericString(16)
         val contact = FFIContact(alias, ffiTariWalletAddress)
         assertTrue(contact.pointer != nullptr)
@@ -57,15 +57,15 @@ class FFIContactTests {
 
     @Test
     fun getPublicKey_assertThatContactPublicKeyIsEqualToTheGivenPublicKeyHexString() {
-        val ffiTariWalletAddress = FFITariWalletAddress(HexString(FFITestUtil.PUBLIC_KEY_HEX_STRING))
+        val ffiTariWalletAddress = FFITariWalletAddress(HexString(FFITestUtil.WALLET_ADDRESS_HEX_STRING))
         val contact = FFIContact(FFITestUtil.generateRandomAlphanumericString(16), ffiTariWalletAddress)
-        assertEquals(FFITestUtil.PUBLIC_KEY_HEX_STRING, contact.getWalletAddress().toString())
+        assertEquals(FFITestUtil.WALLET_ADDRESS_HEX_STRING, contact.getWalletAddress().toString())
         contact.destroy()
         ffiTariWalletAddress.destroy()
     }
 
     @Test(expected = FFIException::class)
     fun constructor_assertThat() {
-        FFIContact("", FFITariWalletAddress(HexString(FFITestUtil.PUBLIC_KEY_HEX_STRING)))
+        FFIContact("", FFITariWalletAddress(HexString(FFITestUtil.WALLET_ADDRESS_HEX_STRING)))
     }
 }

@@ -32,24 +32,46 @@
  */
 package com.tari.android.wallet
 
-import org.junit.runner.RunWith
-import org.junit.runners.Suite
+import com.tari.android.wallet.ffi.*
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotEquals
+import org.junit.Test
 
 /**
- * Suite of all instrumented tests.
+ * FFI private key tests.
  *
  * @author The Tari Development Team
  */
-@RunWith(Suite::class)
-@Suite.SuiteClasses(
-    FFIByteVectorTests::class,
-    FFICommsConfigTests::class,
-    FFIContactTests::class,
-    FFIPrivateKeyTests::class,
-    FFIWalletAddressTests::class,
-    FFITransportTypeTest::class,
-    HexStringTests::class,
-    NetAddressStringTests::class,
-    FFIWalletTests::class
-)
-class FFITestSuite
+class FFIWalletAddressTests {
+
+    @Test
+    fun constructorFromByteVector_assertThatValidPublicKeyInstanceWasCreated() {
+        val ffiTariWalletAddress = FFITariWalletAddress(FFIByteVector(HexString(FFITestUtil.WALLET_ADDRESS_HEX_STRING)))
+        assertNotEquals(nullptr, ffiTariWalletAddress.pointer)
+        assertEquals(FFITestUtil.WALLET_ADDRESS_HEX_STRING, ffiTariWalletAddress.toString())
+        ffiTariWalletAddress.destroy()
+    }
+
+    @Test
+    fun constructorFromHexString_assertThatValidPublicKeyInstanceWasCreated() {
+        val ffiTariWalletAddress = FFITariWalletAddress(HexString(FFITestUtil.WALLET_ADDRESS_HEX_STRING))
+        assertNotEquals(nullptr, ffiTariWalletAddress.pointer)
+        assertEquals(FFITestUtil.WALLET_ADDRESS_HEX_STRING, ffiTariWalletAddress.toString())
+        ffiTariWalletAddress.destroy()
+    }
+
+    @Test
+    fun constructorFromEmojiId_assertThatValidPublicKeyInstanceWasCreated() {
+        val origin = FFITariWalletAddress(HexString(FFITestUtil.WALLET_ADDRESS_HEX_STRING))
+        val ffiTariWalletAddress = FFITariWalletAddress(FFITestUtil.WALLET_EMOJI_ID)
+        assertEquals(origin.toString(), ffiTariWalletAddress.toString())
+        ffiTariWalletAddress.destroy()
+        origin.destroy()
+    }
+
+    @Test(expected = FFIException::class)
+    fun constructor_assertThatFFIExceptionWasThrown_if6CharsLengthStringWasGiven() {
+        FFIPublicKey(FFIByteVector(HexString("A03DB4")))
+    }
+
+}
