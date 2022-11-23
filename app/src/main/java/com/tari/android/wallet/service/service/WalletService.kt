@@ -269,6 +269,7 @@ class WalletService : Service() {
 
         object KeyValueStorageKeys {
             const val NETWORK = "SU7FM2O6Q3BU4XVN7HDD"
+            const val version = "version"
         }
     }
 }
