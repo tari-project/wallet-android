@@ -168,8 +168,7 @@ class LocalBackupStorage(
         if (!backupFolder.exists()) {
             throw BackupStorageAuthRevokedException()
         }
-        val expectedBackupFileName = namingPolicy.getBackupFileName()
-        return backupFolder.listFiles().firstOrNull { it.isFile && it.name?.contains(expectedBackupFileName) == true } != null
+        return backupFolder.listFiles().firstOrNull { it.isFile && namingPolicy.isBackupFileName(it.name.orEmpty()) } != null
     }
 
     private fun getBackupFolder(): DocumentFile {
