@@ -168,8 +168,7 @@ class GoogleDriveBackupStorage(
 
     override suspend fun hasBackup(): Boolean {
         try {
-            val latestBackupFileName = getLastBackupFileIdAndName()?.second ?: return false
-            return latestBackupFileName.contains(namingPolicy.getBackupFileName())
+             return getLastBackupFileIdAndName()?.second != null
         } catch (exception: UserRecoverableAuthIOException) {
             throw BackupStorageAuthRevokedException()
         } catch (exception: Exception) {
@@ -224,7 +223,7 @@ class GoogleDriveBackupStorage(
         do {
             pageToken = searchForBackups(pageToken).let {
                 it.files.forEach { file ->
-                    if (file.name == namingPolicy.getBackupFileName()) {
+                    if (namingPolicy.isBackupFileName(file.name)) {
                         driveFiles.delete(file.id).execute()
                     }
                 }

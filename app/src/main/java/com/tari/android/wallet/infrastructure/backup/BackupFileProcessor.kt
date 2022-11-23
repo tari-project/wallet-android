@@ -76,7 +76,7 @@ class BackupFileProcessor(
         // zip the file
         val compressionMethod = CompressionMethod.zip()
         var mimeType = compressionMethod.mimeType
-        val backupFileName = namingPolicy.getBackupFileName()
+        val backupFileName = namingPolicy.getBackupFileName(backupPassword.orEmpty().isNotEmpty())
         val compressedFile = File(walletConfig.getWalletTempDirPath(), backupFileName)
         var fileToBackup = listOf(databaseFile).compress(CompressionMethod.zip(), compressedFile.absolutePath)
         // encrypt the file if password is set

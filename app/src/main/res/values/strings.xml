@@ -648,4 +648,10 @@
     <string name="back_up_wallet_storage_setup_error_desc">Storage setup was interrupt</string>
     <string name="backup_wallet_storage_full_desc">Your storage is full</string>
 
+    <!--    FFI Validation-->
+    <string name="ffi_validation_error_title">Incompatible version detected</string>
+    <string name="ffi_validation_error_message">The data stored locally is incompatible with the current version of the App or with the network itself. We strongly recommend removing the wallet and creating a new one</string>
+    <string name="ffi_validation_error_delete">Delete the wallet</string>
+    <string name="ffi_validation_error_cancel">I still want to use the wallet</string>
+
 </resources>

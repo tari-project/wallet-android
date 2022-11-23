@@ -342,6 +342,7 @@ dependencies {
 
     implementation 'com.itextpdf:itext7-core:7.2.4'
 
+    implementation("org.apache.maven:maven-artifact:3.0.3")
 
     // test
     testImplementation "junit:junit:4.13.2"

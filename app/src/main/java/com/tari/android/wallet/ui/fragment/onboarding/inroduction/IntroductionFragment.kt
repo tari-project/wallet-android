@@ -131,9 +131,7 @@ class IntroductionFragment : CommonFragment<FragmentIntroductionBinding, Introdu
             restoreWalletCtaView.alpha = 0f
             ui.restoreWalletCtaView.setOnClickListener {
                 activity?.let {
-                    it.startActivity(
-                        WalletRestoreActivity.navigationIntent(it)
-                    )
+                    it.startActivity(WalletRestoreActivity.navigationIntent(it))
                     it.overridePendingTransition(R.anim.enter_from_bottom, R.anim.exit_to_top)
                 }
             }

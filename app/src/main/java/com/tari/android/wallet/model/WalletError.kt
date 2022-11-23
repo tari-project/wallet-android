@@ -18,6 +18,7 @@ open class WalletError : CoreError {
     object ContactNotFoundError : WalletError(401)
     object InvalidPassphraseEncryptionCypherError : WalletError(420)
     object InvalidPassphraseError : WalletError(428)
+    object ValuesNotFound : WalletError(424)
     object SeedWordsInvalidDataError : WalletError(429)
     object SeedWordsVersionMismatchError : WalletError(430)
     object UnknownError : WalletError(-1)

@@ -112,29 +112,36 @@ class DropboxBackupStorage(
     }
 
     override suspend fun backup(): DateTime = withContext(Dispatchers.IO) {
-        val (backupFile, backupDate, _) = backupFileProcessor.generateBackupFile()
         try {
-            uploadDropboxFile(DropboxClientFactory.client, DRIVE_BACKUP_PARENT_FOLDER_NAME + backupFile.name, backupFile.inputStream())
+            val (backupFile, backupDate, _) = backupFileProcessor.generateBackupFile()
+            cleanDropbox(DropboxClientFactory.client)
+            uploadDropboxFile(DropboxClientFactory.client, DRIVE_BACKUP_PARENT_FOLDER_NAME + "/" + backupFile.name, backupFile.inputStream())
+
+            try {
+                backupFileProcessor.clearTempFolder()
+            } catch (e: Exception) {
+                logger.e(e, "Ignorable backup error while clearing temporary and old files.")
+            }
+
+            return@withContext backupDate
         } catch (e: Throwable) {
             throw BackupException(e)
         }
-
-        try {
-            backupFileProcessor.clearTempFolder()
-        } catch (e: Exception) {
-            logger.e(e, "Ignorable backup error while clearing temporary and old files.")
-        }
-        return@withContext backupDate
     }
 
     private fun uploadDropboxFile(client: DbxClientV2, path: String, inputStream: InputStream): FileMetadata =
         client.files().uploadBuilder(path).withMode(WriteMode.OVERWRITE).uploadAndFinish(inputStream)
 
+    private fun cleanDropbox(client: DbxClientV2) {
+        client.files().listFolder(DRIVE_BACKUP_PARENT_FOLDER_NAME).entries.filter { namingPolicy.isBackupFileName(it.name) }.forEach {
+            client.files().deleteV2(it.pathDisplay)
+        }
+    }
+
     override suspend fun hasBackup(): Boolean {
         try {
-            val fileName = namingPolicy.getBackupFileName()
             val latestBackupFileName = searchForBackups()
-            return latestBackupFileName.any { it.metadata.metadataValue.name.contains(fileName) }
+            return latestBackupFileName.any { namingPolicy.isBackupFileName(it.metadata.metadataValue.name) }
         } catch (exception: UserRecoverableAuthIOException) {
             throw BackupStorageAuthRevokedException()
         } catch (exception: Exception) {
@@ -184,6 +191,6 @@ class DropboxBackupStorage(
     }
 
     private companion object {
-        private const val DRIVE_BACKUP_PARENT_FOLDER_NAME = "/backup/"
+        private const val DRIVE_BACKUP_PARENT_FOLDER_NAME = "/backup"
     }
 }
