@@ -12,7 +12,7 @@ import org.apache.maven.artifact.versioning.DefaultArtifactVersion
 
 class MigrationManager : CommonViewModel() {
 
-    private val minValidVersion = DefaultArtifactVersion("0.40.2")
+    private val minValidVersion = DefaultArtifactVersion("0.41.0")
 
     fun validateVersion(onValid: () -> Unit, onError: () -> Unit) {
         doOnConnectedToWallet {
