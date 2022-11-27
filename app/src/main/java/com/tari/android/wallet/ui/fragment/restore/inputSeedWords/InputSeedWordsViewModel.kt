@@ -8,8 +8,8 @@ import com.tari.android.wallet.extension.addTo
 import com.tari.android.wallet.ffi.FFISeedWords
 import com.tari.android.wallet.model.WalletError
 import com.tari.android.wallet.model.seedPhrase.SeedPhrase
-import com.tari.android.wallet.service.service.WalletServiceLauncher
 import com.tari.android.wallet.service.seedPhrase.SeedPhraseRepository
+import com.tari.android.wallet.service.service.WalletServiceLauncher
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.common.SingleLiveEvent
 import com.tari.android.wallet.ui.common.debounce
@@ -162,6 +162,7 @@ class InputSeedWordsViewModel : CommonViewModel() {
 
     fun removeWord(index: Int) {
         val list = _words.value!!
+        if (index !in list.indices) return
         val removedWord = list[index]
         val focusedIndex = _focusedIndex.value!!
         list.removeAt(index)
