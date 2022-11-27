@@ -168,7 +168,7 @@ class GoogleDriveBackupStorage(
 
     override suspend fun hasBackup(): Boolean {
         try {
-             return getLastBackupFileIdAndName()?.second != null
+            return getLastBackupFileIdAndName()?.second != null
         } catch (exception: UserRecoverableAuthIOException) {
             throw BackupStorageAuthRevokedException()
         } catch (exception: Exception) {
@@ -233,14 +233,24 @@ class GoogleDriveBackupStorage(
     }
 
     override suspend fun signOut() {
-        suspendCoroutine { continuation ->
-            try {
-                backupFileProcessor.clearTempFolder()
-                googleClient.signOut()
-                    .addOnFailureListener { continuation.resumeWith(Result.failure(it)) }
-                    .addOnCompleteListener { continuation.resumeWith(Result.success(Unit)) }
-            } catch (e: Throwable) {
-                logger.e(e, "Sentry failed with already resumed for no reason")
+        if (GoogleSignIn.getLastSignedInAccount(context) != null) {
+            suspendCoroutine { continuation ->
+                try {
+                    var isFailed = false
+                    backupFileProcessor.clearTempFolder()
+                    googleClient.signOut()
+                        .addOnFailureListener {
+                            isFailed = true
+                            continuation.resumeWith(Result.failure(it))
+                        }
+                        .addOnCompleteListener {
+                            if (!isFailed) {
+                                continuation.resumeWith(Result.success(Unit))
+                            }
+                        }
+                } catch (e: Throwable) {
+                    logger.e(e, "Sentry failed with already resumed for no reason")
+                }
             }
         }
     }
