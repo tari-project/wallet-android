@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.tari.android.wallet.R
+import com.tari.android.wallet.application.MigrationManager
 import com.tari.android.wallet.application.baseNodes.BaseNodes
 import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodeDto
@@ -14,8 +15,8 @@ import com.tari.android.wallet.ffi.FFIPublicKey
 import com.tari.android.wallet.ffi.FFIWallet
 import com.tari.android.wallet.ffi.HexString
 import com.tari.android.wallet.model.recovery.WalletRestorationResult
-import com.tari.android.wallet.service.service.WalletServiceLauncher
 import com.tari.android.wallet.service.seedPhrase.SeedPhraseRepository
+import com.tari.android.wallet.service.service.WalletServiceLauncher
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.common.SingleLiveEvent
 import com.tari.android.wallet.ui.common.domain.ResourceManager
@@ -44,6 +45,8 @@ class WalletRestoringFromSeedWordsViewModel : CommonViewModel() {
     @Inject
     lateinit var baseNodes: BaseNodes
 
+    val migrationManager = MigrationManager()
+
     private lateinit var baseNodeIterator: Iterator<BaseNodeDto>
 
     private val _navigation = SingleLiveEvent<WalletRestoringFromSeedWordsNavigation>()
@@ -62,6 +65,7 @@ class WalletRestoringFromSeedWordsViewModel : CommonViewModel() {
     }
 
     private fun tryNextBaseNode() = viewModelScope.launch(Dispatchers.IO) {
+        logger.i("set next base node ${baseNodeIterator.hasNext()}")
         if (baseNodeIterator.hasNext()) {
             startRestoringOnNode(baseNodeIterator.next())
         } else {
@@ -86,28 +90,33 @@ class WalletRestoringFromSeedWordsViewModel : CommonViewModel() {
     }
 
     private fun subscribeOnRestorationState() {
-        EventBus.walletRestorationState.publishSubject.skip(1).subscribe {
+        EventBus.walletRestorationState.publishSubject.subscribe {
+            logger.i(it.toString())
             when (it) {
                 is WalletRestorationResult.ConnectingToBaseNode -> onProgress(RecoveryState.ConnectingToBaseNode(resourceManager))
                 is WalletRestorationResult.ConnectedToBaseNode -> onProgress(RecoveryState.ConnectedToBaseNode(resourceManager))
-                is WalletRestorationResult.ScanningRoundFailed ->
-                    onProgress(RecoveryState.ConnectionFailed(resourceManager, it.retryCount, it.retryLimit))
-                is WalletRestorationResult.ConnectionToBaseNodeFailed -> {
-                    if (it.retryCount == it.retryLimit) {
-                        compositeDisposable.dispose()
-                        compositeDisposable = CompositeDisposable()
-                        tryNextBaseNode()
-                    } else {
-                        onProgress(RecoveryState.ConnectionFailed(resourceManager, it.retryCount, it.retryLimit))
-                    }
-                }
+                is WalletRestorationResult.ScanningRoundFailed -> onConnectionFailed(it.retryCount, it.retryLimit)
+                is WalletRestorationResult.ConnectionToBaseNodeFailed -> onConnectionFailed(it.retryCount, it.retryLimit)
                 is WalletRestorationResult.Progress -> onProgress(RecoveryState.Recovery(resourceManager, it.currentBlock, it.numberOfBlocks))
-                is WalletRestorationResult.RecoveryFailed -> if (!baseNodeIterator.hasNext()) {
-                    onError(RestorationError.RecoveryInternalError(resourceManager, this@WalletRestoringFromSeedWordsViewModel::onErrorClosed))
+                is WalletRestorationResult.RecoveryFailed -> {
+                    logger.i("recovery failed ${baseNodeIterator.hasNext()}")
+                    if (!baseNodeIterator.hasNext()) {
+                        onError(RestorationError.RecoveryInternalError(resourceManager, this@WalletRestoringFromSeedWordsViewModel::onErrorClosed))
+                    }
                 }
                 is WalletRestorationResult.Completed -> onSuccessRestoration()
             }
         }.addTo(compositeDisposable)
+    }
+
+    private fun onConnectionFailed(retryCount: Long, retryLimit: Long) {
+        if (retryCount == retryLimit) {
+            compositeDisposable.dispose()
+            compositeDisposable = CompositeDisposable()
+            tryNextBaseNode()
+        } else {
+            onProgress(RecoveryState.ConnectionFailed(resourceManager, retryCount, retryLimit))
+        }
     }
 
     private fun onError(restorationError: RestorationError) {
@@ -117,6 +126,7 @@ class WalletRestoringFromSeedWordsViewModel : CommonViewModel() {
 
     private fun onSuccessRestoration() {
         tariSettingsSharedRepository.hasVerifiedSeedWords = true
+        migrationManager.updateWalletVersion()
         _navigation.postValue(WalletRestoringFromSeedWordsNavigation.OnRestoreCompleted)
     }
 
