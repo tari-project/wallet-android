@@ -50,7 +50,6 @@ import com.tari.android.wallet.data.sharedPrefs.delegates.SerializableTime
 import com.tari.android.wallet.infrastructure.backup.*
 import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupSettingsRepository
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 import org.joda.time.DateTime
 import java.io.File
@@ -98,8 +97,6 @@ class DropboxBackupStorage(
     override suspend fun onSetupActivityResult(requestCode: Int, resultCode: Int, intent: Intent?): Boolean {
         if (!isAuthStarted) return false
         isAuthStarted = false
-        //need time to dropbox UI to process deeplink intent from OAuth
-        delay(500)
 
         val dbxCredential = Auth.getDbxCredential()
         backupSettingsRepository.dropboxCredential = dbxCredential
@@ -120,7 +117,7 @@ class DropboxBackupStorage(
             try {
                 backupFileProcessor.clearTempFolder()
             } catch (e: Exception) {
-                logger.e(e, "Ignorable backup error while clearing temporary and old files.")
+                logger.i("Ignorable backup error while clearing temporary and old files $e")
             }
 
             return@withContext backupDate
@@ -133,8 +130,12 @@ class DropboxBackupStorage(
         client.files().uploadBuilder(path).withMode(WriteMode.OVERWRITE).uploadAndFinish(inputStream)
 
     private fun cleanDropbox(client: DbxClientV2) {
-        client.files().listFolder(DRIVE_BACKUP_PARENT_FOLDER_NAME).entries.filter { namingPolicy.isBackupFileName(it.name) }.forEach {
-            client.files().deleteV2(it.pathDisplay)
+        try {
+            client.files().listFolder(DRIVE_BACKUP_PARENT_FOLDER_NAME).entries.filter { namingPolicy.isBackupFileName(it.name) }.forEach {
+                client.files().deleteV2(it.pathDisplay)
+            }
+        } catch (e: Throwable) {
+            logger.i("Ignorable backup error when old backup not cleaned $e")
         }
     }
 

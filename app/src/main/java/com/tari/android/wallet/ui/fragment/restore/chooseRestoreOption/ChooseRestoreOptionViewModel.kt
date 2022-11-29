@@ -144,7 +144,7 @@ class ChooseRestoreOptionViewModel : CommonViewModel() {
             else -> {
                 logger.i("Restore failed")
                 backupManager.signOut()
-                showRestoreFailedDialog(exception.message)
+                showRestoreFailedDialog(exception.message ?: exception.toString())
             }
         }
 
@@ -162,7 +162,7 @@ class ChooseRestoreOptionViewModel : CommonViewModel() {
     private fun showRestoreFailedDialog(message: String? = null) {
         val args = ErrorDialogArgs(
             resourceManager.getString(R.string.restore_wallet_error_title),
-            message ?: resourceManager.getString(R.string.restore_wallet_error_desc)
+            resourceManager.getString(R.string.restore_wallet_error_desc, message.orEmpty())
         )
         _modularDialog.postValue(args.getModular(resourceManager))
     }

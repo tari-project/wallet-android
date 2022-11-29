@@ -37,7 +37,6 @@ import android.content.Context
 import android.content.Intent
 import androidx.fragment.app.Fragment
 import com.google.android.gms.auth.api.signin.GoogleSignIn
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.Scope
@@ -61,7 +60,6 @@ import org.joda.time.DateTime
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
-import kotlin.coroutines.suspendCoroutine
 
 class GoogleDriveBackupStorage(
     private val context: Context,
@@ -102,28 +100,18 @@ class GoogleDriveBackupStorage(
     override suspend fun onSetupActivityResult(requestCode: Int, resultCode: Int, intent: Intent?): Boolean {
         when (requestCode) {
             REQUEST_CODE_SIGN_IN -> when (resultCode) {
-                Activity.RESULT_OK -> drive = getDrive(intent)
-                Activity.RESULT_CANCELED -> throw BackupStorageSetupCancelled()
-                else -> throw BackupStorageSetupException("Google Drive setup error.")
+                Activity.RESULT_OK -> saveDrive(intent)
             }
         }
         return true
     }
 
-    private suspend fun getDrive(intent: Intent?): Drive {
-        return suspendCoroutine { continuation ->
-            GoogleSignIn.getSignedInAccountFromIntent(intent)
-                .addOnSuccessListener { googleAccount: GoogleSignInAccount ->
-                    val credential = GoogleAccountCredential.usingOAuth2(context, listOf(DriveScopes.DRIVE_APPDATA))
-                        .apply { selectedAccount = googleAccount.account }
-                    drive = Drive.Builder(NetHttpTransport(), GsonFactory(), credential)
-                        .setApplicationName(context.resources.getString(R.string.app_name))
-                        .build()
-                    continuation.resumeWith(Result.success(drive!!))
-                }
-                .addOnFailureListener { continuation.resumeWith(Result.failure(it)) }
-                .addOnCanceledListener { continuation.resumeWith(Result.failure(BackupInterruptedException(""))) }
-        }
+    private fun saveDrive(intent: Intent?) {
+        val result = GoogleSignIn.getSignedInAccountFromIntent(intent).result
+        val credential = GoogleAccountCredential.usingOAuth2(context, listOf(DriveScopes.DRIVE_APPDATA)).apply { selectedAccount = result.account }
+        drive = Drive.Builder(NetHttpTransport(), GsonFactory(), credential)
+            .setApplicationName(context.resources.getString(R.string.app_name))
+            .build()
     }
 
     override suspend fun backup(): DateTime {
@@ -147,7 +135,7 @@ class GoogleDriveBackupStorage(
             try {
                 backupFileProcessor.clearTempFolder()
             } catch (e: Exception) {
-                Logger.e(e, "Ignorable backup error while clearing temporary and old files.")
+                logger.i("Ignorable backup error while clearing temporary and old files $e")
             }
             return@withContext backupDate
         }
@@ -234,24 +222,8 @@ class GoogleDriveBackupStorage(
 
     override suspend fun signOut() {
         if (GoogleSignIn.getLastSignedInAccount(context) != null) {
-            suspendCoroutine { continuation ->
-                try {
-                    var isFailed = false
-                    backupFileProcessor.clearTempFolder()
-                    googleClient.signOut()
-                        .addOnFailureListener {
-                            isFailed = true
-                            continuation.resumeWith(Result.failure(it))
-                        }
-                        .addOnCompleteListener {
-                            if (!isFailed) {
-                                continuation.resumeWith(Result.success(Unit))
-                            }
-                        }
-                } catch (e: Throwable) {
-                    logger.e(e, "Sentry failed with already resumed for no reason")
-                }
-            }
+            backupFileProcessor.clearTempFolder()
+            googleClient.signOut()
         }
     }
 

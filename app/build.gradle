@@ -39,7 +39,7 @@ android {
     }
 
     buildTypes {
-        copySentryProps()
+        loadSentryProps()
         def secretProperties = loadSecretProps()
 
         debug {
@@ -175,51 +175,31 @@ android {
 }
 
 Properties loadSecretProps() {
-    final File secretProps = project.rootProject.file("secret.properties")
-    if (!secretProps.exists()) {
-        Files.copy(
-                Paths.get(project.rootProject.file("secret-example.properties").absolutePath),
-                Paths.get(secretProps.absolutePath),
-        )
-    }
-    final Properties properties = new Properties()
-    properties.load(secretProps.newDataInputStream())
-    return properties
+    return loadProps("secret")
 }
 
-void copySentryProps() {
-    final File sentryProps = project.rootProject.file("sentry.properties")
-    if (!sentryProps.exists()) {
-        Files.copy(
-                Paths.get(project.rootProject.file("sentry-example.properties").absolutePath),
-                Paths.get(sentryProps.absolutePath),
-        )
-    }
+Properties loadSentryProps() {
+    return loadProps("sentry")
 }
 
 Properties loadYatProps() {
-    final File yatProps = project.rootProject.file("yat.properties")
-    if (!yatProps.exists()) {
-        Files.copy(
-                Paths.get(project.rootProject.file("yat-example.properties").absolutePath),
-                Paths.get(yatProps.absolutePath),
-        )
-    }
-    final Properties properties = new Properties()
-    properties.load(yatProps.newDataInputStream())
-    return properties
+    return loadProps("yat")
 }
 
 Properties loadDropboxProps() {
-    final File yatProps = project.rootProject.file("dropbox.properties")
-    if (!yatProps.exists()) {
+    return loadProps("dropbox")
+}
+
+Properties loadProps(fileName) {
+    final File props = project.rootProject.file(fileName + ".properties")
+    if (!props.exists()) {
         Files.copy(
-                Paths.get(project.rootProject.file("dropbox-example.properties").absolutePath),
-                Paths.get(yatProps.absolutePath),
+                Paths.get(project.rootProject.file(fileName + "-example.properties").absolutePath),
+                Paths.get(props.absolutePath),
         )
     }
     final Properties properties = new Properties()
-    properties.load(yatProps.newDataInputStream())
+    properties.load(props.newDataInputStream())
     return properties
 }
 
@@ -307,7 +287,7 @@ dependencies {
     implementation platform('com.google.firebase:firebase-bom:31.0.3')
     implementation 'com.google.firebase:firebase-crashlytics'
 
-    implementation "com.google.android.gms:play-services-auth:20.3.0"
+    implementation "com.google.android.gms:play-services-auth:20.4.0"
     implementation 'com.google.http-client:google-http-client-gson:1.42.3'
     implementation('com.google.api-client:google-api-client-android:2.0.1') {
         exclude group: "org.apache.httpcomponents"
