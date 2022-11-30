@@ -42,6 +42,7 @@ import com.tari.android.wallet.databinding.FragmentLogsBinding
 import com.tari.android.wallet.extension.observe
 import com.tari.android.wallet.ui.common.CommonFragment
 import com.tari.android.wallet.ui.common.recyclerView.CommonAdapter
+import com.tari.android.wallet.ui.extension.serializable
 import com.tari.android.wallet.ui.extension.setVisible
 import com.tari.android.wallet.ui.fragment.settings.logs.activity.DebugActivity
 import com.tari.android.wallet.ui.fragment.settings.logs.logs.adapter.LogListAdapter
@@ -61,7 +62,7 @@ class LogsFragment : CommonFragment<FragmentLogsBinding, LogsViewModel>() {
         val viewModel: LogsViewModel by viewModels()
         bindViewModel(viewModel)
 
-        arguments?.getSerializable(DebugActivity.log_file, File::class.java)?.let {
+        arguments?.serializable<File>(DebugActivity.log_file)?.let {
             this.ui.title.text = it.name
             viewModel.initWithFile(it)
         }
