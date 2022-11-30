@@ -127,13 +127,5 @@ abstract class CommonActivity<Binding : ViewBinding, VM : CommonViewModel> : App
         dialogManager.dismiss()
         DebugActivity.launch(this, navigation)
     }
-
-    companion object {
-        enum class Priority(val value: Int) {
-            PRIORITY_SYSTEM(-1),
-            PRIORITY_DEFAULT(0),
-            PRIORITY_OVERLAY(1000000),
-        }
-    }
 }
 

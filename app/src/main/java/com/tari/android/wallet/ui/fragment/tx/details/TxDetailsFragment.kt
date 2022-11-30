@@ -46,7 +46,6 @@ import com.tari.android.wallet.R.dimen.add_amount_element_text_size
 import com.tari.android.wallet.R.dimen.add_amount_gem_size
 import com.tari.android.wallet.R.string.*
 import com.tari.android.wallet.databinding.FragmentTxDetailsBinding
-import com.tari.android.wallet.di.DiContainer.appComponent
 import com.tari.android.wallet.extension.observe
 import com.tari.android.wallet.extension.txFormattedDate
 import com.tari.android.wallet.model.*
@@ -88,14 +87,11 @@ class TxDetailsFragment : CommonFragment<FragmentTxDetailsBinding, TxDetailsView
     private lateinit var emojiIdSummaryController: EmojiIdSummaryViewController
     private lateinit var fullEmojiIdViewController: FullEmojiIdViewController
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        return FragmentTxDetailsBinding.inflate(layoutInflater, container, false).also { ui = it }.root
-    }
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
+        FragmentTxDetailsBinding.inflate(layoutInflater, container, false).also { ui = it }.root
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        appComponent.inject(this)
 
         val viewModel: TxDetailsViewModel by viewModels()
         bindViewModel(viewModel)
