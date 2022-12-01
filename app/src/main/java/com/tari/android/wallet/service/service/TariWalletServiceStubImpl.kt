@@ -269,8 +269,4 @@ class TariWalletServiceStubImpl(
             null
         }
     }
-
-    companion object {
-        private const val MESSAGE_PREFIX = "Hello Tari from"
-    }
 }

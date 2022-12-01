@@ -46,8 +46,14 @@ class TariWalletAddress() : Parcelable {
     var emojiId = ""
 
     constructor(hexString: String, emojiId: String) : this() {
-        this.hexString = hexString
-        this.emojiId = emojiId
+        // crunch fix for not crashing on action related to wallet address
+        if (hexString == "0000000000000000000000000000000000000000000000000000000000000026") {
+            this.hexString = "000000000000000000000000000000000000000000000000000000000000000026"
+            this.emojiId = "\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF57"
+        } else {
+            this.hexString = hexString
+            this.emojiId = emojiId
+        }
     }
 
     override fun equals(other: Any?): Boolean = (other is TariWalletAddress) && hexString == other.hexString
