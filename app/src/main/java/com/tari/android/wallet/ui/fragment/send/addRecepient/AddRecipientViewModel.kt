@@ -195,7 +195,7 @@ class AddRecipientViewModel : CommonViewModel() {
      * Checks clipboard data for a public key hex string.
      */
     fun checkForWalletAddressHex(input: String): Boolean {
-        val hexStringRegex = Regex("([A-Za-z0-9]{64})")
+        val hexStringRegex = Regex("([A-Za-z0-9]{66})")
         var result = hexStringRegex.find(input)
         while (result != null) {
             val hexString = result.value
