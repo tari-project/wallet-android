@@ -33,24 +33,19 @@
 package com.tari.android.wallet.infrastructure.backup
 
 import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepository
-import org.joda.time.DateTime
-import org.joda.time.format.DateTimeFormat
-import org.joda.time.format.DateTimeFormatter
 import javax.inject.Inject
 
 class BackupNamingPolicy @Inject constructor(val networkRepository: NetworkRepository) {
 
-    private val backupFileNamePrefix = "Tari-Aurora-Backup-${networkRepository.currentNetwork!!.network.displayName}-"
+    private val backupFileNamePrefix = "Tari-Aurora-Backup-${networkRepository.currentNetwork!!.network.uriComponent}"
 
-    // Tari-Aurora-Backup-network-yyyy-MM-dd_HH-mm-ss.*
-    private val regex =
-        Regex("$backupFileNamePrefix(\\d{4}-(((0)[1-9])|((1)[0-2]))-((0)[1-9]|[1-2][0-9]|(3)[0-1])_([0-1][0-9]|(2)[0-3])-([0-5][0-9])-([0-5][0-9]))\\..+")
-    private val dateFormatter: DateTimeFormatter = DateTimeFormat.forPattern("yyyy-MM-dd_HH-mm-ss")
+    val regex = Regex("$backupFileNamePrefix.*")
 
-    fun getBackupFileName(backupDate: DateTime = DateTime.now()): String = backupFileNamePrefix + dateFormatter.print(backupDate)
+    fun getBackupFileName(isEncrypted: Boolean):String = if (isEncrypted) getBackupFileNameEncrypted() else getBackupFileName()
 
     fun isBackupFileName(fileName: String): Boolean = regex.matches(fileName)
 
-    fun getDateFromBackupFileName(name: String): DateTime? = regex.find(name)?.let { it.groups[1]!!.value }?.let { dateFormatter.parseDateTime(it) }
+    private fun getBackupFileName(): String = "$backupFileNamePrefix.zip"
 
+    private fun getBackupFileNameEncrypted() : String = backupFileNamePrefix
 }

@@ -21,9 +21,6 @@ import javax.inject.Inject
 class NetworkSelectionViewModel : CommonViewModel() {
 
     @Inject
-    lateinit var networkRepository: NetworkRepository
-
-    @Inject
     lateinit var walletConfig: WalletConfig
 
     @Inject

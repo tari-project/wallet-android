@@ -34,6 +34,7 @@ package com.tari.android.wallet.infrastructure.backup
 
 // Storage & backup-related.
 class BackupStorageSetupCancelled : IllegalStateException()
+class BackupException(e: Throwable) : IllegalStateException(e)
 class BackupStorageSetupException(s: String?) : IllegalStateException(s)
 class BackupStorageAuthRevokedException: IllegalStateException()
 class BackupStorageFullException: IllegalStateException()

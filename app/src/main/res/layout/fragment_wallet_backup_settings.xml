@@ -68,202 +68,8 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:animateLayoutChanges="true"
         android:orientation="vertical">
-
-        <FrameLayout
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/menu_item_height"
-            android:background="@color/white"
-            android:clickable="true"
-            android:focusable="true"
-            android:paddingHorizontal="@dimen/common_horizontal_margin">
-
-            <com.tari.android.wallet.ui.component.CustomFontTextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical|start"
-                android:text="@string/back_up_wallet_backups_switch_label"
-                android:textColor="@color/black"
-                android:textSize="15sp"
-                app:customFont="@string/font_medium" />
-
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical|end">
-
-                <androidx.appcompat.widget.SwitchCompat
-                    android:id="@+id/backup_permission_switch"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
-
-                <ProgressBar
-                    android:id="@+id/backup_permission_progress_bar"
-                    android:layout_width="0dp"
-                    android:layout_height="0dp"
-                    android:layout_marginEnd="4dp"
-                    android:visibility="gone"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintDimensionRatio="1:1"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
-            </androidx.constraintlayout.widget.ConstraintLayout>
-
-        </FrameLayout>
-
-        <View
-            android:id="@+id/backups_separator_view"
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_marginHorizontal="25dp"
-            android:background="@color/settings_background" />
-
-        <FrameLayout
-            android:id="@+id/update_password_cta_view"
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/menu_item_height"
-            android:background="@drawable/setting_option_background"
-            android:clickable="true"
-            android:focusable="true"
-            android:paddingHorizontal="@dimen/common_horizontal_margin">
-
-            <com.tari.android.wallet.ui.component.CustomFontTextView
-                android:id="@+id/update_password_label_text_view"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical|start"
-                android:textColor="@color/black"
-                android:textSize="15sp"
-                app:customFont="@string/font_medium" />
-
-            <ImageView
-                android:id="@+id/update_password_arrow_image_view"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical|end"
-                android:src="@drawable/icon_apply_setting"
-                tools:ignore="ContentDescription" />
-        </FrameLayout>
-
-        <LinearLayout
-            android:id="@+id/backup_wallet_to_cloud_cta_container_view"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="20dp"
-                android:background="@color/settings_background" />
-
-            <FrameLayout
-                android:id="@+id/backup_wallet_to_cloud_cta_view"
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/menu_item_height"
-                android:background="@drawable/setting_option_background"
-                android:clickable="true"
-                android:focusable="true"
-                android:paddingHorizontal="@dimen/common_horizontal_margin">
-
-                <com.tari.android.wallet.ui.component.CustomFontTextView
-                    android:id="@+id/backup_now_text_view"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical|start"
-                    android:text="@string/back_up_wallet_to_cloud_cta"
-                    android:textColor="@color/black"
-                    android:textSize="15sp"
-                    app:customFont="@string/font_medium" />
-
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical|end"
-                    android:orientation="horizontal">
-
-                    <com.tari.android.wallet.ui.component.CustomFontTextView
-                        android:id="@+id/backup_status_text_view"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center_vertical"
-                        android:visibility="gone"
-                        app:customFont="@string/font_medium"
-                        tools:text="@string/back_up_wallet_backup_status_checking_backup"
-                        tools:textColor="@color/all_settings_back_up_status_processing"
-                        tools:visibility="visible" />
-
-                    <androidx.constraintlayout.widget.ConstraintLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center_vertical"
-                        android:layout_marginStart="8dp">
-
-                        <ImageView
-                            android:id="@+id/cloud_backup_status_warning_view"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center"
-                            android:src="@drawable/icon_wallet_not_backed_up"
-                            android:visibility="invisible"
-                            app:layout_constraintBottom_toBottomOf="parent"
-                            app:layout_constraintEnd_toEndOf="parent"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toTopOf="parent"
-                            tools:ignore="ContentDescription" />
-
-                        <ImageView
-                            android:id="@+id/cloud_backup_status_success_view"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center"
-                            android:src="@drawable/ic_positive_check"
-                            android:visibility="invisible"
-                            app:layout_constraintBottom_toBottomOf="parent"
-                            app:layout_constraintEnd_toEndOf="parent"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toTopOf="parent"
-                            tools:ignore="ContentDescription" />
-
-                        <ImageView
-                            android:id="@+id/cloud_backup_status_scheduled_view"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center"
-                            android:src="@drawable/icon_wallet_backup_scheduled"
-                            android:visibility="invisible"
-                            app:layout_constraintBottom_toBottomOf="parent"
-                            app:layout_constraintEnd_toEndOf="parent"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toTopOf="parent"
-                            tools:ignore="ContentDescription" />
-
-                        <ProgressBar
-                            android:id="@+id/cloud_backup_status_progress_view"
-                            android:layout_width="0dp"
-                            android:layout_height="0dp"
-                            android:layout_gravity="center"
-                            android:visibility="invisible"
-                            app:layout_constraintBottom_toBottomOf="@id/cloud_backup_status_success_view"
-                            app:layout_constraintEnd_toEndOf="@id/cloud_backup_status_success_view"
-                            app:layout_constraintStart_toStartOf="@id/cloud_backup_status_success_view"
-                            app:layout_constraintTop_toTopOf="@id/cloud_backup_status_success_view"
-                            tools:visibility="visible" />
-                    </androidx.constraintlayout.widget.ConstraintLayout>
-                </LinearLayout>
-            </FrameLayout>
-
-        </LinearLayout>
-
-        <View
-            android:id="@+id/seed_phrase_separator_view"
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_marginHorizontal="25dp"
-            android:background="@color/settings_background" />
 
         <FrameLayout
             android:id="@+id/backup_with_recovery_phrase_cta_view"
@@ -316,19 +122,83 @@
                     tools:ignore="ContentDescription" />
 
             </LinearLayout>
+
         </FrameLayout>
 
-    </LinearLayout>
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/common_divider"/>
 
-    <com.tari.android.wallet.ui.component.CustomFontTextView
-        android:id="@+id/last_backup_time_text_view"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_vertical|start"
-        android:layout_marginHorizontal="27dp"
-        android:layout_marginTop="8dp"
-        android:textColor="@color/dark_gray"
-        app:customFont="@string/font_medium"
-        tools:text="Last successful backup: Jul 1 2020 at 11:32 PM" />
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:id="@+id/options_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"/>
+
+        <FrameLayout
+            android:id="@+id/update_password_cta_view"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/menu_item_height"
+            android:background="@drawable/setting_option_background"
+            android:clickable="true"
+            android:focusable="true"
+            android:paddingHorizontal="@dimen/common_horizontal_margin">
+
+            <com.tari.android.wallet.ui.component.CustomFontTextView
+                android:id="@+id/update_password_label_text_view"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical|start"
+                android:textColor="@color/black"
+                android:text="@string/back_up_wallet_set_backup_password_cta"
+                android:textSize="15sp"
+                app:customFont="@string/font_medium" />
+
+            <ImageView
+                android:id="@+id/update_password_arrow_image_view"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical|end"
+                android:src="@drawable/icon_apply_setting"
+                tools:ignore="ContentDescription" />
+
+        </FrameLayout>
+
+        <LinearLayout
+            android:id="@+id/backup_wallet_to_cloud_cta_container_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/common_divider"/>
+
+            <FrameLayout
+                android:id="@+id/backup_wallet_to_cloud_cta_view"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/menu_item_height"
+                android:background="@drawable/setting_option_background"
+                android:clickable="true"
+                android:focusable="true"
+                android:paddingHorizontal="@dimen/common_horizontal_margin">
+
+                <com.tari.android.wallet.ui.component.CustomFontTextView
+                    android:id="@+id/backup_now_text_view"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical|start"
+                    android:text="@string/back_up_wallet_to_cloud_cta"
+                    android:textColor="@color/black"
+                    android:textSize="15sp"
+                    app:customFont="@string/font_medium" />
+
+            </FrameLayout>
+
+        </LinearLayout>
+
+    </LinearLayout>
 
 </LinearLayout>

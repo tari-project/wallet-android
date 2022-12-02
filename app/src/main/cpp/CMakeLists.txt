@@ -61,7 +61,6 @@ add_library(
         jniBalance.cpp
         jniByteVector.cpp
         jniTariTransportConfig.cpp
-        jniTariCommitmentSignature.cpp
         jniPrivateKey.cpp
         jniPublicKey.cpp
         jniContact.cpp
@@ -74,7 +73,6 @@ add_library(
         jniWallet.cpp
         jniSeedWords.cpp
         jniEmojiSet.cpp
-        jniUtil.cpp
         jniTransactionSendStatus.cpp
         jniCovenant.cpp
         jniOutputFeatures.cpp
@@ -83,6 +81,7 @@ add_library(
         jniTariVector.cpp
         jniTariUtxo.cpp
         jniTariCoinPreview.cpp
+        jniTariWalletAddress.cpp
 )
 
 find_library(

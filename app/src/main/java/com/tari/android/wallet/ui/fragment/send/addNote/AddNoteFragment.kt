@@ -67,6 +67,7 @@ import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.extension.observe
 import com.tari.android.wallet.model.Contact
 import com.tari.android.wallet.model.MicroTari
+import com.tari.android.wallet.model.TxNote
 import com.tari.android.wallet.model.User
 import com.tari.android.wallet.network.NetworkConnectionState
 import com.tari.android.wallet.ui.common.gyphy.repository.GIFItem
@@ -77,7 +78,6 @@ import com.tari.android.wallet.ui.fragment.send.activity.SendTariActivity
 import com.tari.android.wallet.ui.fragment.send.addNote.gif.*
 import com.tari.android.wallet.ui.fragment.send.addNote.gif.ThumbnailGIFsViewModel.Companion.REQUEST_CODE_GIF
 import com.tari.android.wallet.ui.fragment.send.common.TransactionData
-import com.tari.android.wallet.model.TxNote
 import com.tari.android.wallet.util.Constants
 import java.lang.ref.WeakReference
 
@@ -143,9 +143,7 @@ class AddNoteFragment : Fragment(), View.OnTouchListener {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == REQUEST_CODE_GIF) {
             changeScrollViewBottomConstraint(R.id.slide_button_container_view)
-            val media =
-                data?.getParcelableExtra<Media>(ChooseGIFDialogFragment.MEDIA_DELIVERY_KEY)
-                    ?: return
+            val media = data?.parcelable<Media>(ChooseGIFDialogFragment.MEDIA_DELIVERY_KEY) ?: return
             gifContainer.gifItem = media.let {
                 GIFItem(it.id, Uri.parse(it.embedUrl), Uri.parse(it.images.original!!.gifUrl))
             }
@@ -192,8 +190,8 @@ class AddNoteFragment : Fragment(), View.OnTouchListener {
             requireContext(),
             fullEmojiIdListener
         )
-        fullEmojiIdViewController.fullEmojiId = recipientUser.publicKey.emojiId
-        fullEmojiIdViewController.emojiIdHex = recipientUser.publicKey.hexString
+        fullEmojiIdViewController.fullEmojiId = recipientUser.walletAddress.emojiId
+        fullEmojiIdViewController.emojiIdHex = recipientUser.walletAddress.hexString
 
         displayAliasOrEmojiId()
         ui.progressBar.setColor(color(white))
@@ -223,7 +221,7 @@ class AddNoteFragment : Fragment(), View.OnTouchListener {
     }
 
     private fun retrievePageArguments(savedInstanceState: Bundle?) {
-        transactionData = requireArguments().getParcelable("transactionData")!!
+        transactionData = requireArguments().parcelable("transactionData")!!
         recipientUser = transactionData.recipientUser!!
         amount = transactionData.amount!!
         isOneSidePayment = transactionData.isOneSidePayment
@@ -266,7 +264,7 @@ class AddNoteFragment : Fragment(), View.OnTouchListener {
             ui.titleTextView.visible()
             ui.titleTextView.text = (recipientUser as Contact).alias
         } else {
-            displayEmojiId(recipientUser.publicKey.emojiId)
+            displayEmojiId(recipientUser.walletAddress.emojiId)
         }
     }
 
@@ -282,7 +280,7 @@ class AddNoteFragment : Fragment(), View.OnTouchListener {
         // wait a while, then forward the back action to the host activity
         activity?.let {
             it.hideKeyboard()
-            ui.rootView.postDelayed(Constants.UI.shortDurationMs, it::onBackPressed)
+            ui.rootView.postDelayed(Constants.UI.shortDurationMs, it.onBackPressedDispatcher::onBackPressed)
         }
     }
 

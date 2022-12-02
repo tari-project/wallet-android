@@ -3,21 +3,58 @@ package com.tari.android.wallet.ui.fragment.restore.enterRestorationPassword
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.viewModelScope
 import com.tari.android.wallet.R
-import com.tari.android.wallet.infrastructure.backup.BackupStorage
+import com.tari.android.wallet.application.WalletState
+import com.tari.android.wallet.data.WalletConfig
+import com.tari.android.wallet.event.EventBus
+import com.tari.android.wallet.extension.addTo
+import com.tari.android.wallet.infrastructure.backup.BackupManager
+import com.tari.android.wallet.infrastructure.backup.WalletStartFailedException
+import com.tari.android.wallet.service.service.WalletServiceLauncher
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.common.SingleLiveEvent
 import com.tari.android.wallet.ui.dialog.error.ErrorDialogArgs
+import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupSettingsRepository
+import com.tari.android.wallet.util.WalletUtil
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.security.GeneralSecurityException
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 class EnterRestorationPasswordViewModel : CommonViewModel() {
+
     @Inject
-    lateinit var backupStorage: BackupStorage
+    lateinit var backupManager: BackupManager
+
+    @Inject
+    lateinit var walletConfig: WalletConfig
+
+    @Inject
+    lateinit var backupSettingsRepository: BackupSettingsRepository
+
+    @Inject
+    lateinit var walletServiceLauncher: WalletServiceLauncher
 
     init {
         component.inject(this)
+
+        EventBus.walletState.publishSubject.filter { it is WalletState.Running }.subscribe {
+            if (WalletUtil.walletExists(walletConfig)) {
+                val dto = backupSettingsRepository.getOptionDto(backupManager.currentOption!!)!!.copy(isEnable = true)
+                backupSettingsRepository.updateOption(dto)
+                backupManager.backupNow()
+
+                _navigation.postValue(EnterRestorationPasswordNavigation.OnRestore)
+            }
+        }.addTo(compositeDisposable)
+
+        EventBus.walletState.publishSubject.filter { it is WalletState.Failed }
+            .map { it as WalletState.Failed }
+            .debounce(300L, TimeUnit.MILLISECONDS).subscribe {
+                viewModelScope.launch(Dispatchers.IO) {
+                    handleRestorationFailure(WalletStartFailedException(it.exception))
+                }
+            }.addTo(compositeDisposable)
     }
 
     private val _state = SingleLiveEvent<EnterRestorationPasswordState>()
@@ -29,7 +66,7 @@ class EnterRestorationPasswordViewModel : CommonViewModel() {
     fun onBack() {
         _backPressed.postValue(Unit)
         viewModelScope.launch(Dispatchers.IO) {
-            backupStorage.signOut()
+            backupManager.signOut()
         }
     }
 
@@ -41,15 +78,18 @@ class EnterRestorationPasswordViewModel : CommonViewModel() {
     private fun performRestoration(password: String) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                backupStorage.restoreLatestBackup(password)
-                _navigation.postValue(EnterRestorationPasswordNavigation.OnRestore)
-            } catch (exception: Exception) {
+                backupManager.restoreLatestBackup(password)
+                backupSettingsRepository.backupPassword = password
+                viewModelScope.launch(Dispatchers.Main) {
+                    walletServiceLauncher.start()
+                }
+            } catch (exception: Throwable) {
                 handleRestorationFailure(exception)
             }
         }
     }
 
-    private fun handleRestorationFailure(exception: Exception) {
+    private fun handleRestorationFailure(exception: Throwable) {
         exception.cause?.let {
             if (it is GeneralSecurityException) {
                 _state.postValue(EnterRestorationPasswordState.WrongPasswordErrorState)

@@ -45,8 +45,7 @@ Java_com_tari_android_wallet_ffi_FFITariVector_jniLoadData(
         JNIEnv *jEnv,
         jobject jThis) {
     jclass dataClass = jEnv->GetObjectClass(jThis);
-    jlong lTariOutputs = GetPointerField(jEnv, jThis);
-    auto outputs = reinterpret_cast<TariVector*>(lTariOutputs);
+    auto outputs = GetPointerField<TariVector *>(jEnv, jThis);
 
     jfieldID sizeField = jEnv->GetFieldID(dataClass, "len", "J");
     auto lenValue = (long)(outputs->len);
@@ -67,8 +66,7 @@ Java_com_tari_android_wallet_ffi_FFITariVector_jniGetItemAt(
         JNIEnv *jEnv,
         jobject jThis,
         jint index) {
-    jlong lTariOutputs = GetPointerField(jEnv, jThis);
-    auto outputs = reinterpret_cast<TariVector*>(lTariOutputs);
+    auto outputs = GetPointerField<TariVector *>(jEnv, jThis);
 
     jlong pointerToItem = 0;
     if (outputs->tag == Utxo) {

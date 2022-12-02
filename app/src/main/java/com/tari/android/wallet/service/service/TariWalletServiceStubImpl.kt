@@ -1,30 +1,20 @@
 package com.tari.android.wallet.service.service
 
 import com.orhanobut.logger.Logger
-import com.tari.android.wallet.R
 import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodeSharedRepository
-import com.tari.android.wallet.data.sharedPrefs.testnetFaucet.TestnetFaucetRepository
-import com.tari.android.wallet.data.sharedPrefs.testnetFaucet.TestnetUtxoList
-import com.tari.android.wallet.event.Event
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.ffi.*
 import com.tari.android.wallet.model.*
 import com.tari.android.wallet.service.TariWalletService
 import com.tari.android.wallet.service.TariWalletServiceListener
 import com.tari.android.wallet.service.baseNode.BaseNodeSyncState
-import com.tari.android.wallet.service.faucet.TestnetFaucetService
-import com.tari.android.wallet.service.faucet.TestnetTariRequestException
-import com.tari.android.wallet.ui.common.domain.ResourceManager
 import com.tari.android.wallet.util.Constants
 import java.math.BigInteger
 import java.util.*
 
 class TariWalletServiceStubImpl(
     private val wallet: FFIWallet,
-    private val testnetFaucetRepository: TestnetFaucetRepository,
-    private val testnetFaucetService: TestnetFaucetService,
     private val baseNodeSharedPrefsRepository: BaseNodeSharedRepository,
-    private val resourceManager: ResourceManager,
     private val walletServiceListener: FFIWalletListenerImpl
 ) : TariWalletService.Stub() {
 
@@ -39,10 +29,10 @@ class TariWalletServiceStubImpl(
             val contacts = mutableListOf<Contact>()
             for (i in 0 until contactsFFI.getLength()) {
                 val contactFFI = contactsFFI.getAt(i)
-                val publicKeyFFI = contactFFI.getPublicKey()
-                contacts.add(Contact(publicKeyFromFFI(publicKeyFFI), contactFFI.getAlias()))
+                val ffiTariWalletAddress = contactFFI.getWalletAddress()
+                contacts.add(Contact(walletAddressFromFFI(ffiTariWalletAddress), contactFFI.getAlias()))
                 // destroy native objects
-                publicKeyFFI.destroy()
+                ffiTariWalletAddress.destroy()
                 contactFFI.destroy()
             }
             // destroy native collection
@@ -58,7 +48,7 @@ class TariWalletServiceStubImpl(
 
     override fun unregisterListener(listener: TariWalletServiceListener): Boolean = walletServiceListener.listeners.remove(listener)
 
-    override fun getPublicKeyHexString(error: WalletError): String? = runMapping(error) { wallet.getPublicKey().toString() }
+    override fun getWalletAddressHexString(error: WalletError): String? = runMapping(error) { wallet.getWalletAddress().toString() }
 
     override fun getBalanceInfo(error: WalletError): BalanceInfo? = runMapping(error) { wallet.getBalance() }
 
@@ -163,129 +153,49 @@ class TariWalletServiceStubImpl(
     override fun sendTari(
         user: User, amount: MicroTari, feePerGram: MicroTari, message: String, isOneSidePayment: Boolean, error: WalletError
     ): TxId? = runMapping(error) {
-        val recipientPublicKeyHex = user.publicKey.hexString
-        val txId = FFIPublicKey(HexString(recipientPublicKeyHex)).runWithDestroy {
+        val recipientAddressHex = user.walletAddress.hexString
+        val recipientAddress = FFITariWalletAddress(HexString(recipientAddressHex)).runWithDestroy {
             wallet.sendTx(it, amount.value, feePerGram.value, message, isOneSidePayment)
         }
-        walletServiceListener.outboundTxIdsToBePushNotified.add(Pair(txId, recipientPublicKeyHex.lowercase(Locale.ENGLISH)))
-        TxId(txId)
-    }
-
-    override fun requestTestnetTari(error: WalletError) {
-        // avoid multiple faucet requests
-        if (testnetFaucetRepository.faucetTestnetTariRequestCompleted) return
-        // get public key
-        val publicKeyHexString = getPublicKeyHexString(error)
-        if (error.code != WalletError.NoError.code || publicKeyHexString == null) {
-            notifyTestnetTariRequestFailed("Service error.")
-            return
-        }
-
-        val message = "$MESSAGE_PREFIX $publicKeyHexString"
-        val signing = wallet.signMessage(message).split("|")
-        val signature = signing[0]
-        val nonce = signing[1]
-
-        testnetFaucetService.requestMaxTestnetTari(publicKeyHexString, signature, nonce, { result ->
-            FFIPublicKey(HexString(result.walletId)).runWithDestroy {
-                FFIContact("TariBot", it).runWithDestroy { contact -> wallet.addUpdateContact(contact) }
-            }
-            // update the keys with sender public key hex
-            result.keys.forEach { key -> key.senderPublicKeyHex = result.walletId }
-            // store the UTXO keys
-            testnetFaucetRepository.testnetTariUTXOKeyList = TestnetUtxoList(result.keys)
-
-            // post event to bus for the listeners
-            EventBus.post(Event.Testnet.TestnetTariRequestSuccessful())
-            // notify external listeners
-            walletServiceListener.listeners.iterator().forEach { it.onTestnetTariRequestSuccess() }
-        }, {
-            val errorMessage = resourceManager.getString(R.string.wallet_service_error_testnet_tari_request) + " " + it.message
-            logger.e(errorMessage + "failed on requesting faucet")
-            if (it is TestnetTariRequestException) {
-                notifyTestnetTariRequestFailed(errorMessage)
-            } else {
-                notifyTestnetTariRequestFailed(resourceManager.getString((R.string.wallet_service_error_no_internet_connection)))
-            }
-        })
-    }
-
-    override fun importTestnetUTXO(txMessage: String, error: WalletError): CompletedTx? {
-        val keys = testnetFaucetRepository.testnetTariUTXOKeyList.orEmpty().toMutableList()
-        if (keys.isEmpty()) return null
-
-        return runCatching {
-            val firstUTXOKey = keys.first()
-            val senderPublicKeyFFI = FFIPublicKey(HexString(firstUTXOKey.senderPublicKeyHex!!))
-            val privateKey = FFIPrivateKey(HexString(firstUTXOKey.key))
-            val scriptPrivateKey = FFIPrivateKey(HexString(firstUTXOKey.key))
-            val amount = BigInteger(firstUTXOKey.value)
-            val senderPublicKey = FFIPublicKey(HexString(firstUTXOKey.output.senderOffsetPublicKey))
-            val signature = FFITariCommitmentSignature(
-                FFIByteVector(HexString(firstUTXOKey.output.metadataSignature.public_nonce)),
-                FFIByteVector(HexString(firstUTXOKey.output.metadataSignature.u)),
-                FFIByteVector(HexString(firstUTXOKey.output.metadataSignature.v))
-            )
-            val txId = wallet.importUTXO(amount, txMessage, privateKey, senderPublicKeyFFI, signature, senderPublicKey, scriptPrivateKey)
-            privateKey.destroy()
-            senderPublicKeyFFI.destroy()
-            signature.destroy()
-            // remove the used key
-            keys.remove(firstUTXOKey)
-            testnetFaucetRepository.testnetTariUTXOKeyList = TestnetUtxoList(keys)
-            // get transaction and post notification
-            val tx = getCompletedTxById(TxId(txId), error)
-            if (error != WalletError.NoError || tx == null) return null
-
-            walletServiceListener.postTxNotification(tx)
-            tx
-        }.getOrNull()
+        walletServiceListener.outboundTxIdsToBePushNotified.add(Pair(recipientAddress, recipientAddressHex.lowercase(Locale.ENGLISH)))
+        TxId(recipientAddress)
     }
 
     override fun removeContact(contact: Contact, error: WalletError): Boolean = runMapping(error) {
         val contactsFFI = wallet.getContacts()
         for (i in 0 until contactsFFI.getLength()) {
             val contactFFI = contactsFFI.getAt(i)
-            val publicKeyFFI = contactFFI.getPublicKey()
-            if (publicKeyFFI.toString() == contact.publicKey.hexString) {
+            val ffiTariWalletAddress = contactFFI.getWalletAddress()
+            if (ffiTariWalletAddress.toString() == contact.walletAddress.hexString) {
                 return@runMapping wallet.removeContact(contactFFI).also {
-                    publicKeyFFI.destroy()
+                    ffiTariWalletAddress.destroy()
                     contactFFI.destroy()
                     contactsFFI.destroy()
                     _cachedContacts = null
                 }
             }
-            publicKeyFFI.destroy()
+            ffiTariWalletAddress.destroy()
             contactFFI.destroy()
         }
         contactsFFI.destroy()
         false
     } ?: false
 
-    override fun updateContactAlias(publicKey: PublicKey, alias: String, error: WalletError): Boolean = runMapping(error) {
-        val publicKeyFFI = FFIPublicKey(HexString(publicKey.hexString))
-        val contact = FFIContact(alias, publicKeyFFI)
+    override fun updateContactAlias(walletAddress: TariWalletAddress, alias: String, error: WalletError): Boolean = runMapping(error) {
+        val ffiTariWalletAddress = FFITariWalletAddress(HexString(walletAddress.hexString))
+        val contact = FFIContact(alias, ffiTariWalletAddress)
         wallet.addUpdateContact(contact).also {
-            publicKeyFFI.destroy()
+            ffiTariWalletAddress.destroy()
             contact.destroy()
             _cachedContacts = null
         }
     } ?: false
 
-    /**
-     * @return public key constructed from input emoji id. Null if the emoji id is invalid
-     * or it does not correspond to a public key.
-     */
-    override fun getPublicKeyFromEmojiId(emojiId: String?): PublicKey? =
-        runCatching { FFIPublicKey(emojiId.orEmpty()).runWithDestroy { publicKeyFromFFI(it) } }.getOrNull()
+    override fun getWalletAddressFromEmojiId(emojiId: String?): TariWalletAddress? =
+        runCatching { FFITariWalletAddress(emojiId.orEmpty()).runWithDestroy { walletAddressFromFFI(it) } }.getOrNull()
 
-    /**
-     * @return public key constructed from input public key hex string id. Null if the emoji id
-     * is invalid or it does not correspond to a public key.
-     */
-    override fun getPublicKeyFromHexString(publicKeyHex: String?): PublicKey? = runCatching {
-        FFIPublicKey(HexString(publicKeyHex ?: "")).runWithDestroy { publicKeyFromFFI(it) }
-    }.getOrNull()
+    override fun getWalletAddressFromHexString(walletAddressHex: String?): TariWalletAddress? =
+        runCatching { FFITariWalletAddress(HexString(walletAddressHex ?: "")).runWithDestroy { walletAddressFromFFI(it) } }.getOrNull()
 
     override fun setKeyValue(key: String, value: String, error: WalletError): Boolean = runMapping(error) { wallet.setKeyValue(key, value) } ?: false
 
@@ -347,7 +257,8 @@ class TariWalletServiceStubImpl(
         walletError.code = WalletError.UnknownError.code
     }
 
-    private fun publicKeyFromFFI(publicKeyFFI: FFIPublicKey): PublicKey = PublicKey(publicKeyFFI.toString(), publicKeyFFI.getEmojiId())
+    private fun walletAddressFromFFI(ffiTariWalletAddress: FFITariWalletAddress): TariWalletAddress =
+        TariWalletAddress(ffiTariWalletAddress.toString(), ffiTariWalletAddress.getEmojiId())
 
     private fun <T> runMapping(walletError: WalletError, onError: (Throwable) -> (Unit) = {}, action: () -> T?): T? {
         return try {
@@ -357,16 +268,5 @@ class TariWalletServiceStubImpl(
             mapThrowableIntoError(walletError, throwable)
             null
         }
-    }
-
-    private fun notifyTestnetTariRequestFailed(error: String) {
-        // post event to bus for the listeners
-        EventBus.post(Event.Testnet.TestnetTariRequestError(error))
-        // notify external listeners
-        walletServiceListener.listeners.iterator().forEach { listener -> listener.onTestnetTariRequestError(error) }
-    }
-
-    companion object {
-        private const val MESSAGE_PREFIX = "Hello Tari from"
     }
 }

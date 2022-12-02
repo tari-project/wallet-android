@@ -118,9 +118,9 @@ class AddAmountFragment : CommonFragment<FragmentAddAmountBinding, AddAmountView
     }
 
     private fun setupUI() {
-        val amount = arguments?.getParcelable<MicroTari>(SendTariActivity.PARAMETER_AMOUNT)
+        val amount = arguments?.parcelable<MicroTari>(SendTariActivity.PARAMETER_AMOUNT)
         keyboardController.setup(requireContext(), AmountCheckRunnable(), ui.numpad, ui.amount, amount?.tariValue?.toDouble() ?: Double.MIN_VALUE)
-        recipientUser = arguments?.getParcelable(SendTariActivity.PARAMETER_USER)
+        recipientUser = arguments?.parcelable(SendTariActivity.PARAMETER_USER)
         // hide tx fee
         ui.txFeeContainerView.invisible()
         // hide/disable continue button
@@ -143,8 +143,8 @@ class AddAmountFragment : CommonFragment<FragmentAddAmountBinding, AddAmountView
             requireContext(),
             fullEmojiIdListener
         )
-        fullEmojiIdViewController.fullEmojiId = recipientUser?.publicKey?.emojiId.orEmpty()
-        fullEmojiIdViewController.emojiIdHex = recipientUser?.publicKey?.hexString.orEmpty()
+        fullEmojiIdViewController.fullEmojiId = recipientUser?.walletAddress?.emojiId.orEmpty()
+        fullEmojiIdViewController.emojiIdHex = recipientUser?.walletAddress?.hexString.orEmpty()
         displayAliasOrEmojiId()
         setActionBindings()
     }
@@ -181,7 +181,7 @@ class AddAmountFragment : CommonFragment<FragmentAddAmountBinding, AddAmountView
             ui.titleTextView.visible()
             ui.titleTextView.text = (recipientUser as Contact).alias
         } else {
-            recipientUser?.publicKey?.emojiId?.let {
+            recipientUser?.walletAddress?.emojiId?.let {
                 displayEmojiId(it)
             }
         }
@@ -259,7 +259,7 @@ class AddAmountFragment : CommonFragment<FragmentAddAmountBinding, AddAmountView
 
     private fun updateBalanceInfo() {
         balanceInfo = viewModel.walletService.getWithError { error, wallet -> wallet.getBalanceInfo(error) }
-        availableBalance = balanceInfo.availableBalance + balanceInfo.pendingIncomingBalance
+        availableBalance = balanceInfo.availableBalance
         ui.availableBalanceContainerView.setupArgs(availableBalance)
     }
 

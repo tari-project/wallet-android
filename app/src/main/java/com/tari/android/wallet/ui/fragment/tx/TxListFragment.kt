@@ -38,10 +38,7 @@ import android.animation.ValueAnimator
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.graphics.drawable.GradientDrawable
-import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
-import android.os.Parcelable
+import android.os.*
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
@@ -68,6 +65,7 @@ import com.tari.android.wallet.ui.common.recyclerView.CommonAdapter
 import com.tari.android.wallet.ui.common.recyclerView.CommonViewHolderItem
 import com.tari.android.wallet.ui.component.networkStateIndicator.ConnectionIndicatorViewModel
 import com.tari.android.wallet.ui.extension.*
+import com.tari.android.wallet.ui.extension.PermissionExtensions.runWithPermission
 import com.tari.android.wallet.ui.fragment.send.activity.SendTariActivity
 import com.tari.android.wallet.ui.fragment.tx.adapter.TxListAdapter
 import com.tari.android.wallet.ui.fragment.tx.questionMark.QuestionMarkViewModel
@@ -112,6 +110,7 @@ class TxListFragment : CommonFragment<FragmentTxListBinding, TxListViewModel>(),
 
         viewModel.serviceConnection.reconnectToService()
 
+        checkPermission()
         setupUI()
         subscribeToEventBus()
         subscribeToViewModel()
@@ -147,6 +146,14 @@ class TxListFragment : CommonFragment<FragmentTxListBinding, TxListViewModel>(),
             updateProgressViewController.destroy()
         }
         super.onDestroyView()
+    }
+
+    private fun checkPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            runWithPermission(android.Manifest.permission.POST_NOTIFICATIONS) {
+                viewModel.logger.i("notification permission checked successfully")
+            }
+        }
     }
 
     @SuppressLint("ClickableViewAccessibility")
@@ -290,10 +297,6 @@ class TxListFragment : CommonFragment<FragmentTxListBinding, TxListViewModel>(),
             if (viewModel.txListIsEmpty) {
                 showNoTxsTextView()
             }
-            if (!viewModel.testnetFaucetRepository.faucetTestnetTariRequestCompleted && !viewModel.tariSettingsSharedRepository.isRestoredWallet
-            ) {
-                viewModel.requestTestnetTari()
-            }
             updateProgressViewController.reset()
             ui.scrollView.beginUpdate()
             updateProgressViewController.start(viewModel.walletService)
@@ -327,7 +330,7 @@ class TxListFragment : CommonFragment<FragmentTxListBinding, TxListViewModel>(),
     }
 
     private fun grabberContainerViewLongClicked() {
-        (requireActivity() as CommonActivity<*, *>).openDebugActivity()
+        (requireActivity() as CommonActivity<*, *>).showDebugDialog()
     }
 
     override fun onSwipeRefresh(source: CustomScrollView) {
@@ -539,10 +542,6 @@ class TxListFragment : CommonFragment<FragmentTxListBinding, TxListViewModel>(),
         ui.onboardingContentView.gone()
         ui.txListHeaderView.visible()
         viewModel.refreshAllData()
-        // request Testnet Tari if no txs
-        if (viewModel.txListIsEmpty) {
-            handler.postDelayed(Constants.UI.xxLongDurationMs, action = viewModel::requestTestnetTari)
-        }
     }
 
     companion object {

@@ -45,11 +45,11 @@ interface BackupStorage {
 
     fun setup(hostFragment: Fragment)
 
-    suspend fun onSetupActivityResult(requestCode: Int, resultCode: Int, intent: Intent?)
+    suspend fun onSetupActivityResult(requestCode: Int, resultCode: Int, intent: Intent?): Boolean
 
-    suspend fun backup(newPassword: CharArray? = null): DateTime
+    suspend fun backup(): DateTime
 
-    suspend fun hasBackupForDate(date: DateTime): Boolean
+    suspend fun hasBackup(): Boolean
 
     suspend fun restoreLatestBackup(password: String? = null)
 

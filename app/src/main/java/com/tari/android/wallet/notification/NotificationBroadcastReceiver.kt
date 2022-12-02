@@ -40,7 +40,7 @@ import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.model.recovery.WalletRestorationResult
 import com.tari.android.wallet.ui.fragment.splash.SplashActivity
 import com.tari.android.wallet.ui.fragment.home.HomeActivity
-import com.tari.android.wallet.ui.fragment.restore.restore.WalletRestoreActivity
+import com.tari.android.wallet.ui.fragment.restore.activity.WalletRestoreActivity
 
 class NotificationBroadcastReceiver : BroadcastReceiver() {
 

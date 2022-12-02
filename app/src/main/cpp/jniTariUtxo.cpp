@@ -45,8 +45,7 @@ Java_com_tari_android_wallet_ffi_FFITariUtxo_jniLoadData(
         JNIEnv *jEnv,
         jobject jThis) {
     jclass dataClass = jEnv->GetObjectClass(jThis);
-    jlong lTariOutputs = GetPointerField(jEnv, jThis);
-    auto outputs = reinterpret_cast<TariUtxo *>(lTariOutputs);
+    auto outputs = GetPointerField<TariUtxo *>(jEnv, jThis);
 
     jfieldID valueField = jEnv->GetFieldID(dataClass, "value", "J");
     auto lenValue = (long) (outputs->value);

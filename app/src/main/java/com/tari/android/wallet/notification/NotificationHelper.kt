@@ -48,6 +48,7 @@ import com.tari.android.wallet.R
 import com.tari.android.wallet.model.CancelledTx
 import com.tari.android.wallet.model.Tx
 import com.tari.android.wallet.model.TxId
+import com.tari.android.wallet.ui.extension.PermissionExtensions.isPermissionGranted
 import com.tari.android.wallet.ui.fragment.home.HomeDeeplinkScreens
 import com.tari.android.wallet.util.WalletUtil
 
@@ -126,6 +127,8 @@ class NotificationHelper(private val context: Context) {
      * Posts custom-layout heads-up transaction notification.
      */
     fun postCustomLayoutTxNotification(tx: Tx) {
+        if (!context.isPermissionGranted(android.Manifest.permission.POST_NOTIFICATIONS)) return
+
         logger.i("postCustomLayoutTxNotification: ${tx.id}")
         val notificationTitle = context.getString(R.string.notification_tx_received_title)
         // format spannable string
@@ -163,6 +166,8 @@ class NotificationHelper(private val context: Context) {
     }
 
     fun postTxCanceledNotification(tx: CancelledTx) {
+        if (!context.isPermissionGranted(android.Manifest.permission.POST_NOTIFICATIONS)) return
+
         logger.i("postTxCanceledNotification: ${tx.id}")
         val layout = TxCanceledViewHolder(context, tx)
         val intent = Intent(context, NotificationBroadcastReceiver::class.java).apply {
@@ -194,6 +199,8 @@ class NotificationHelper(private val context: Context) {
      * Posts standard Android heads-up notification.
      */
     fun postNotification(title: String, body: String) {
+        if (!context.isPermissionGranted(android.Manifest.permission.POST_NOTIFICATIONS)) return
+
         // prepare notification
         val notification = NotificationCompat.Builder(context, APP_NOTIFICATION_CHANNEL_ID).run {
             setContentTitle(title)

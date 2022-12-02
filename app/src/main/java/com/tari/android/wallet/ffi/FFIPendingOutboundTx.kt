@@ -56,9 +56,9 @@ class FFIPendingOutboundTx() : FFITxBase() {
 
     fun getId(): BigInteger = runWithError { BigInteger(1, jniGetId(it)) }
 
-    override fun getDestinationPublicKey(): FFIPublicKey = runWithError { FFIPublicKey(jniGetDestinationPublicKey(it)) }
+    override fun getDestinationPublicKey(): FFITariWalletAddress = runWithError { FFITariWalletAddress(jniGetDestinationPublicKey(it)) }
 
-    override fun getSourcePublicKey(): FFIPublicKey = TODO()
+    override fun getSourcePublicKey(): FFITariWalletAddress = TODO()
 
     override fun isOutbound(): Boolean = true
 

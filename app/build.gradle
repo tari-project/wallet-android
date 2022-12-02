@@ -1,23 +1,21 @@
 import java.nio.file.Files
 import java.nio.file.Paths
 
-apply plugin: 'com.android.application'
-apply plugin: 'kotlin-android'
-apply plugin: 'kotlin-kapt'
+apply plugin: "com.android.application"
+apply plugin: "kotlin-android"
+apply plugin: "kotlin-kapt"
 apply from: "../download-libwallet.gradle"
-// PRIVATE BUILD: comment (add two slashes at the start) the following line for private release
-// builds support
-apply plugin: 'io.sentry.android.gradle'
+apply plugin: "io.sentry.android.gradle"
 
 android {
     namespace "com.tari.android.wallet"
-    compileSdkVersion 32
-    buildToolsVersion "30.0.3"
+    compileSdkVersion 33
+    buildToolsVersion '31.0.0'
 
     defaultConfig {
         applicationId "com.tari.android.wallet"
-        minSdkVersion 24
-        targetSdkVersion 32
+        minSdkVersion 26
+        targetSdkVersion 33
         versionCode buildNumber
         versionName versionNumber + "-libwallet-" + libwalletVersion
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
@@ -28,31 +26,33 @@ android {
         }
         externalNativeBuild {
             cmake {
-                arguments '-DANDROID_STL=c++_static'
+                arguments "-DANDROID_STL=c++_static"
             }
         }
 
         def yatProperties = loadYatProps()
-        buildConfigField("String", "YAT_ORGANIZATION_NAME", "\"${yatProperties.getProperty('yat.name')}\"")
-        buildConfigField("String", "YAT_ORGANIZATION_KEY", "\"${yatProperties.getProperty('yat.key')}\"")
-        buildConfigField("String", "YAT_ORGANIZATION_RETURN_URL", "\"${yatProperties.getProperty('yat.returnUrl')}\"")
+        buildConfigField("String", "YAT_ORGANIZATION_NAME", "\"${yatProperties.getProperty("yat.name")}\"")
+        buildConfigField("String", "YAT_ORGANIZATION_KEY", "\"${yatProperties.getProperty("yat.key")}\"")
+        buildConfigField("String", "YAT_ORGANIZATION_RETURN_URL", "\"${yatProperties.getProperty("yat.returnUrl")}\"")
+        def dropboxProperties = loadDropboxProps()
+        buildConfigField("String", "DROPBOX_ACCESS_TOKEN", "\"${dropboxProperties.getProperty("dropbox_key")}\"")
     }
 
     buildTypes {
-        copySentryProps()
+        loadSentryProps()
         def secretProperties = loadSecretProps()
 
         debug {
             jniDebuggable true
-            buildConfigField("String", "GIPHY_KEY", "\"${secretProperties.getProperty('giphy.key')}\"")
+            buildConfigField("String", "GIPHY_KEY", "\"${secretProperties.getProperty("giphy.key")}\"")
         }
         release {
-            buildConfigField("String", "GIPHY_KEY", "\"${secretProperties.getProperty('giphy.key')}\"")
+            buildConfigField("String", "GIPHY_KEY", "\"${secretProperties.getProperty("giphy.key")}\"")
             minifyEnabled true
             shrinkResources true
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            proguardFiles getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"
             ndk {
-                debugSymbolLevel 'FULL'
+                debugSymbolLevel "FULL"
             }
 //            PRIVATE BUILD: uncomment (remove two slashes at the start) the following line for
 //            private release builds support
@@ -73,22 +73,21 @@ android {
     productFlavors {
         regular {
             dimension "privacy-mode"
-            buildConfigField "String", "NOTIFICATIONS_API_KEY",
-                    "\"${loadSecretProps().getProperty('service.notifications.api_key')}\""
-            proguardFile 'regular-proguard-rules.pro'
+            buildConfigField "String", "NOTIFICATIONS_API_KEY", "\"${loadSecretProps().getProperty("service.notifications.api_key")}\""
+            proguardFile "regular-proguard-rules.pro"
         }
         privacy {
             dimension "privacy-mode"
-            buildConfigField "String", "NOTIFICATIONS_API_KEY",
-                    "\"${loadSecretProps().getProperty('service.notifications.api_key')}\""
+            buildConfigField "String", "NOTIFICATIONS_API_KEY", "\"${loadSecretProps().getProperty("service.notifications.api_key")}\""
         }
     }
 
     applicationVariants.all { variant ->
+        variant.mergedFlavor.manifestPlaceholders.dropboxApiKey = loadDropboxProps().getProperty("dropbox_key")
         if (variant.buildType.name == "debug") {
-            variant.mergedFlavor.manifestPlaceholders.sentryPublicDSN = ''
+            variant.mergedFlavor.manifestPlaceholders.sentryPublicDSN = ""
         } else {
-            variant.mergedFlavor.manifestPlaceholders.sentryPublicDSN = loadSecretProps().getProperty('sentry.public_dsn')
+            variant.mergedFlavor.manifestPlaceholders.sentryPublicDSN = loadSecretProps().getProperty("sentry.public_dsn")
         }
     }
 
@@ -110,90 +109,121 @@ android {
     buildFeatures {
         viewBinding true
     }
+
     packagingOptions {
         jniLibs {
             useLegacyPackaging = true
         }
         resources {
-            excludes += ['META-INF/DEPENDENCIES',
-                         'META-INF/LICENSE',
-                         'META-INF/LICENSE.txt',
-                         'META-INF/license.txt',
-                         'META-INF/NOTICE',
-                         'META-INF/NOTICE.txt',
-                         'META-INF/notice.txt',
-                         'META-INF/ASL2.0']
+            excludes += [
+                    //added for exclude resources duplication
+                    "META-INF/DEPENDENCIES",
+                    "META-INF/LICENSE",
+                    "META-INF/LICENSE.txt",
+                    "META-INF/LICENSE.md",
+                    "META-INF/license.txt",
+                    "META-INF/NOTICE",
+                    "META-INF/NOTICE.txt",
+                    "META-INF/NOTICE.md",
+                    "META-INF/notice.txt",
+                    "META-INF/AL2.0",
+                    "META-INF/LGPL2.1",
+                    "META-INF/INDEX.LIST",
+                    "META-INF/ASL2.0",
+                    "META-INF/LICENSE-notice.md",
+                    "META-INF/io.netty.versions.properties",
+                    "mozilla/public-suffix-list.txt",
+                    "xsd/catalog.xml",
+                    "kotlin/internal/internal.kotlin_builtins",
+                    "kotlin/ranges/ranges.kotlin_builtins",
+                    "kotlin/coroutines/coroutines.kotlin_builtins",
+                    "kotlin/kotlin.kotlin_builtins",
+                    "kotlin/reflect/reflect.kotlin_builtins",
+                    "kotlin/collections/collections.kotlin_builtins",
+                    "kotlin/annotation/annotation.kotlin_builtins",
+                    "com/itextpdf/io/font/cmap/HYSMyeongJoStd-Medium.properties",
+                    "com/itextpdf/io/font/cmap/HYGoThic-Medium.properties",
+                    "com/itextpdf/io/font/cmap/HYSMyeongJo-Medium.properties",
+                    "com/itextpdf/io/font/cmap/KozMinPro-Regular.properties",
+                    "com/itextpdf/io/font/cmap/MSungStd-Light.properties",
+                    "com/itextpdf/io/font/cmap_info.txt",
+                    "com/itextpdf/io/font/cmap/STSong-Light.properties",
+                    "com/itextpdf/io/font/cmap/STSongStd-Light.properties",
+                    "com/itextpdf/io/font/cmap/HeiseiKakuGo-W5.properties",
+                    "com/itextpdf/io/font/cmap/MSung-Light.properties",
+                    "com/itextpdf/io/font/cmap/MHei-Medium.properties",
+                    "com/itextpdf/io/font/cmap/HeiseiMin-W3.properties",
+                    "com/itextpdf/io/font/cmap/cjk_registry.properties"
+            ]
         }
     }
     lint {
-        disable 'NewApi'
+        disable "NewApi", "TimberExceptionLogging", "LogNotTimber", "StringFormatInTimber", "ThrowableNotAtBeginning", "BinaryOperationInTimber", "TimberArgCount", "TimberArgTypes", "TimberTagLength"
     }
 
+    configurations.all {
+        resolutionStrategy.dependencySubstitution {
+            // Substitute one module dependency for another for excluding libs duplication
+            substitute module("com.sun.activation:javax.activation:1.2.0") using module("jakarta.activation:jakarta.activation-api:1.2.1")
+            substitute module("org.jetbrains.kotlin:kotlin-android-extensions-runtime:1.4.20") using module("org.jetbrains.kotlin:kotlin-android-extensions:1.6.21")
+            substitute module("xpp3:xpp3:1.1.4c") using module("xml-apis:xml-apis:1.4.01")
+            substitute module("xmlpull:xmlpull:1.1.3.1") using module("net.sf.kxml:kxml2:2.3.0")
+            substitute module("org.jetbrains.kotlin:kotlin-build-common:1.6.21") using module("org.jetbrains.kotlin:kotlin-compiler-embeddable:1.6.21")
+            substitute module("org.jetbrains.kotlin:kotlin-gradle-plugin:1.6.21") using module("org.jetbrains.kotlin:kotlin-compiler-embeddable:1.6.21")
+        }
+    }
 }
 
 Properties loadSecretProps() {
-    final File secretProps = project.rootProject.file("secret.properties")
-    if (!secretProps.exists()) {
-        Files.copy(
-                Paths.get(project.rootProject.file("secret-example.properties").absolutePath),
-                Paths.get(secretProps.absolutePath),
-        )
-    }
-    final Properties properties = new Properties()
-    properties.load(secretProps.newDataInputStream())
-    return properties
+    return loadProps("secret")
 }
 
-void copySentryProps() {
-    final File sentryProps = project.rootProject.file("sentry.properties")
-    if (!sentryProps.exists()) {
-        Files.copy(
-                Paths.get(project.rootProject.file("sentry-example.properties").absolutePath),
-                Paths.get(sentryProps.absolutePath),
-        )
-    }
+Properties loadSentryProps() {
+    return loadProps("sentry")
 }
 
 Properties loadYatProps() {
-    final File yatProps = project.rootProject.file("yat.properties")
-    if (!yatProps.exists()) {
+    return loadProps("yat")
+}
+
+Properties loadDropboxProps() {
+    return loadProps("dropbox")
+}
+
+Properties loadProps(fileName) {
+    final File props = project.rootProject.file(fileName + ".properties")
+    if (!props.exists()) {
         Files.copy(
-                Paths.get(project.rootProject.file("yat-example.properties").absolutePath),
-                Paths.get(yatProps.absolutePath),
+                Paths.get(project.rootProject.file(fileName + "-example.properties").absolutePath),
+                Paths.get(props.absolutePath),
         )
     }
     final Properties properties = new Properties()
-    properties.load(yatProps.newDataInputStream())
+    properties.load(props.newDataInputStream())
     return properties
 }
 
 preBuild.dependsOn("downloadLibwallet")
-
-repositories {
-    maven {
-        url "https://giphy.bintray.com/giphy-sdk"
-    }
-}
 
 dependencies {
     // kotlin
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
     implementation "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
     // coroutines
-    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.0"
-    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.0"
-    implementation "androidx.lifecycle:lifecycle-runtime-ktx:2.4.1"
-    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.4.1'
-    implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.4.1'
-    implementation 'androidx.fragment:fragment-ktx:1.4.1'
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4"
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4"
+    implementation "androidx.lifecycle:lifecycle-runtime-ktx:2.5.1"
+    implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:2.5.1"
+    implementation "androidx.lifecycle:lifecycle-livedata-ktx:2.5.1"
+    implementation "androidx.fragment:fragment-ktx:1.5.4"
 
     // kotlin extensions
-    implementation 'androidx.core:core-ktx:1.8.0'
+    implementation "androidx.core:core-ktx:1.9.0"
     // android
-    implementation 'androidx.appcompat:appcompat:1.4.2'
+    implementation "androidx.appcompat:appcompat:1.5.1"
     // support lib
-    implementation 'androidx.legacy:legacy-support-v13:1.0.0'
-    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
+    implementation "androidx.legacy:legacy-support-v13:1.0.0"
+    implementation "androidx.constraintlayout:constraintlayout:2.1.4"
     // android jetpack
     implementation "androidx.lifecycle:lifecycle-extensions:2.2.0"
     // recycler view
@@ -201,89 +231,104 @@ dependencies {
     // the new view pager
     implementation "androidx.viewpager2:viewpager2:1.0.0"
     // for tab layout
-    implementation 'com.google.android.material:material:1.6.1'
-    // flex layout
-    implementation 'com.google.android:flexbox:2.0.1'
-    // overscroll
-    implementation 'me.everything:overscroll-decor-android:1.0.4'
+    implementation "com.google.android.material:material:1.7.0"
     // lottie
-    implementation 'com.airbnb.android:lottie:4.2.0'
+    implementation "com.airbnb.android:lottie:5.2.0"
     // Glide - image processing & caching library
-    implementation 'com.github.bumptech.glide:glide:4.12.0'
-    kapt 'com.github.bumptech.glide:compiler:4.12.0'
-    // giphy
-    implementation 'com.giphy.sdk:ui:2.1.17'
-    // spring animation
-    implementation 'androidx.dynamicanimation:dynamicanimation:1.0.0'
-    implementation 'com.daasuu:EasingInterpolator:1.3.0'
-    // seismic - device shake detector
-    implementation 'com.squareup:seismic:1.0.2'
+    implementation "com.github.bumptech.glide:glide:4.14.2"
+    kapt "com.github.bumptech.glide:compiler:4.14.2"
 
     // biometric
-    implementation 'androidx.biometric:biometric:1.1.0'
+    implementation "androidx.biometric:biometric:1.1.0"
 
     // joda
-    implementation 'net.danlew:android.joda:2.10.9'
+    implementation 'net.danlew:android.joda:2.12.1'
 
     // parceler
-    implementation 'org.parceler:parceler-api:1.1.13'
-    kapt 'org.parceler:parceler:1.1.13'
+    implementation "org.parceler:parceler-api:1.1.13"
+    kapt "org.parceler:parceler:1.1.13"
 
     // dagger - DI
-    implementation 'com.google.dagger:dagger:2.38'
-    kapt 'com.google.dagger:dagger-compiler:2.38'
+    implementation 'com.google.dagger:dagger:2.44.2'
+    kapt 'com.google.dagger:dagger-compiler:2.44.2'
 
     // rx
-    implementation 'io.reactivex.rxjava2:rxandroid:2.1.1'
-    implementation 'io.reactivex.rxjava2:rxjava:2.2.19'
+    implementation "io.reactivex.rxjava2:rxandroid:2.1.1"
+    implementation "io.reactivex.rxjava2:rxjava:2.2.21"
+    implementation 'androidx.lifecycle:lifecycle-reactivestreams-ktx:2.5.1'
 
     // logger
-    implementation 'com.orhanobut:logger:2.2.0'
+    implementation "com.orhanobut:logger:2.2.0"
 
     // QR scanner
-    implementation 'com.budiyev.android:code-scanner:2.1.0'
-    implementation 'com.journeyapps:zxing-android-embedded:4.1.0'
+    implementation "com.github.yuriy-budiyev:code-scanner:2.3.2"
+    implementation "com.journeyapps:zxing-android-embedded:4.3.0"
 
     // encryption
     implementation "de.adorsys.android:securestoragelibrary:1.2.4"
 
     // Tor control
-    implementation 'info.guardianproject:tor-android:0.4.6.10'
-    implementation 'info.guardianproject:jtorctl:0.4.5.7'
+    implementation "info.guardianproject:tor-android:0.4.7.8"
+    implementation "info.guardianproject:jtorctl:0.4.5.7"
 
     // used to read log files
     //noinspection GradleDependency
-    implementation 'commons-io:commons-io:2.6'
+    implementation "commons-io:commons-io:2.11.0"
 
     // JSON reflection-based (+de)serialization library
-    implementation 'com.google.code.gson:gson:2.9.0'
+    implementation 'com.google.code.gson:gson:2.10'
 
     // Retrofit2 - Popular (2020) REST API wrapper with Java interface
-    implementation 'com.squareup.retrofit2:retrofit:2.9.0'
-    implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
-    implementation 'com.squareup.okhttp3:logging-interceptor:4.9.0'
+    implementation "com.squareup.retrofit2:retrofit:2.9.0"
+    implementation "com.squareup.retrofit2:converter-gson:2.9.0"
+    implementation "com.squareup.okhttp3:logging-interceptor:5.0.0-alpha.10"
 
     // Google services & Google drive
-    implementation 'com.google.android.gms:play-services-auth:20.2.0'
-    implementation 'com.google.http-client:google-http-client-gson:1.39.0'
-    implementation('com.google.api-client:google-api-client-android:1.31.3') {
-        exclude group: 'org.apache.httpcomponents'
+    implementation platform('com.google.firebase:firebase-bom:31.0.3')
+    implementation 'com.google.firebase:firebase-crashlytics'
+
+    implementation "com.google.android.gms:play-services-auth:20.4.0"
+    implementation 'com.google.http-client:google-http-client-gson:1.42.3'
+    implementation('com.google.api-client:google-api-client-android:2.0.1') {
+        exclude group: "org.apache.httpcomponents"
     }
-    implementation('com.google.apis:google-api-services-drive:v3-rev197-1.25.0') {
-        exclude group: 'org.apache.httpcomponents'
+    implementation('com.google.apis:google-api-services-drive:v3-rev20221023-2.0.0') {
+        exclude group: "org.apache.httpcomponents"
     }
     // sentry - crash analytics
-    implementation 'io.sentry:sentry-android:6.4.2'
+    implementation 'io.sentry:sentry-android:6.7.0'
 
-    implementation 'net.yslibrary.keyboardvisibilityevent:keyboardvisibilityevent:2.2.0'
+    implementation "com.dropbox.core:dropbox-core-sdk:5.4.4"
 
     implementation "com.github.yat-labs:yat-lib-android:0.1.38"
 
+
+    // custom libraries region
+    // flex layout
+    implementation "com.google.android.flexbox:flexbox:3.0.0"
+    // overscroll
+    implementation "io.github.everythingme:overscroll-decor-android:1.1.1"
+
+    // giphy, don"t update to 2.2.0 because of not compatible yet
+    implementation "com.giphy.sdk:ui:2.1.18"
+    // spring animation
+    implementation "androidx.dynamicanimation:dynamicanimation:1.0.0"
+    implementation "com.github.MasayukiSuda:EasingInterpolator:v1.3.2"
+
+    // seismic - device shake detector
+    implementation "com.squareup:seismic:1.0.3"
+
+    implementation "net.yslibrary.keyboardvisibilityevent:keyboardvisibilityevent:2.2.0"
+
+    implementation 'com.itextpdf:itext7-core:7.2.4'
+
+    implementation("org.apache.maven:maven-artifact:3.0.3")
+
     // test
-    testImplementation 'junit:junit:4.13.2'
-    testImplementation 'io.mockk:mockk:1.10.6'
-    androidTestImplementation 'io.mockk:mockk-android:1.10.6'
-    androidTestImplementation 'androidx.test:core:1.4.0'
-    androidTestImplementation 'androidx.test.ext:junit:1.1.3'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
+    testImplementation "junit:junit:4.13.2"
+    testImplementation "io.mockk:mockk:1.13.2"
+    androidTestImplementation "io.mockk:mockk-android:1.13.2"
+    androidTestImplementation "androidx.test:core:1.5.0"
+    androidTestImplementation "androidx.test.ext:junit:1.1.4"
+    androidTestImplementation "androidx.test.espresso:espresso-core:3.5.0"
 }

@@ -58,7 +58,7 @@ import com.tari.android.wallet.extension.applyURLStyle
 import com.tari.android.wallet.ui.common.CommonFragment
 import com.tari.android.wallet.ui.extension.*
 import com.tari.android.wallet.ui.fragment.onboarding.activity.OnboardingFlowActivity
-import com.tari.android.wallet.ui.fragment.restore.restore.WalletRestoreActivity
+import com.tari.android.wallet.ui.fragment.restore.activity.WalletRestoreActivity
 import com.tari.android.wallet.ui.fragment.settings.allSettings.TariVersionModel
 import com.tari.android.wallet.util.Constants
 import kotlin.math.min
@@ -119,6 +119,8 @@ class IntroductionFragment : CommonFragment<FragmentIntroductionBinding, Introdu
         ui.createWalletProgressBar.setColor(color(white))
         ui.apply {
             tariLogoLottieAnimationView.alpha = 0f
+            tariLogoLottieAnimationView.scaleX = 0.84f
+            tariLogoLottieAnimationView.scaleY = 0.84f
             networkInfoTextView.alpha = 0f
             smallGemImageView.alpha = 0f
             createWalletContainerView.alpha = 0f
@@ -129,9 +131,7 @@ class IntroductionFragment : CommonFragment<FragmentIntroductionBinding, Introdu
             restoreWalletCtaView.alpha = 0f
             ui.restoreWalletCtaView.setOnClickListener {
                 activity?.let {
-                    it.startActivity(
-                        WalletRestoreActivity.navigationIntent(it)
-                    )
+                    it.startActivity(WalletRestoreActivity.navigationIntent(it))
                     it.overridePendingTransition(R.anim.enter_from_bottom, R.anim.exit_to_top)
                 }
             }
@@ -232,11 +232,12 @@ class IntroductionFragment : CommonFragment<FragmentIntroductionBinding, Introdu
 
         ui.tariLogoLottieAnimationView.addAnimatorListener(onEnd = { (requireActivity() as? IntroductionListener)?.continueToCreateWallet() })
 
-        val tariViewScaleAnim = ValueAnimator.ofFloat(ui.tariLogoLottieAnimationView.scale, 1f).apply {
+        val tariViewScaleAnim = ValueAnimator.ofFloat(ui.tariLogoLottieAnimationView.scaleX, 1f).apply {
             duration = Constants.UI.CreateWallet.tariTextAnimViewDurationMs
             addUpdateListener { valueAnimator: ValueAnimator ->
                 val scale = valueAnimator.animatedValue as Float
-                ui.tariLogoLottieAnimationView.scale = scale
+                ui.tariLogoLottieAnimationView.scaleY = scale
+                ui.tariLogoLottieAnimationView.scaleX = scale
             }
         }
 

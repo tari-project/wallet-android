@@ -4,6 +4,7 @@ import android.os.Parcel
 import android.os.Parcelable
 import com.tari.android.wallet.ffi.FFITariCoinPreview
 import com.tari.android.wallet.ffi.FFITariVector
+import com.tari.android.wallet.ui.extension.readP
 import java.math.BigInteger
 
 class TariCoinPreview() : Parcelable {
@@ -12,8 +13,8 @@ class TariCoinPreview() : Parcelable {
     var feeValue: MicroTari = MicroTari(BigInteger.ZERO)
 
     constructor(parcel: Parcel) : this() {
-        vector = parcel.readParcelable(TariVector::class.java.classLoader)!!
-        feeValue = parcel.readParcelable(MicroTari::class.java.classLoader)!!
+        vector = parcel.readP(TariVector::class.java)
+        feeValue = parcel.readP(MicroTari::class.java)
     }
 
     constructor(ffiTariCoinPreview: FFITariCoinPreview) : this() {

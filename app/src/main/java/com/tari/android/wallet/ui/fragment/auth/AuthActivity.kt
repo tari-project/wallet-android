@@ -45,17 +45,15 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import com.daasuu.ei.Ease
 import com.daasuu.ei.EasingInterpolator
-import com.orhanobut.logger.Logger
 import com.tari.android.wallet.R.color.white
 import com.tari.android.wallet.R.string.*
-import com.tari.android.wallet.application.WalletState
 import com.tari.android.wallet.databinding.ActivityAuthBinding
-import com.tari.android.wallet.event.EventBus
-import com.tari.android.wallet.extension.addTo
+import com.tari.android.wallet.extension.observe
 import com.tari.android.wallet.infrastructure.security.biometric.BiometricAuthenticationException
-import com.tari.android.wallet.ui.fragment.home.HomeActivity
 import com.tari.android.wallet.ui.common.CommonActivity
 import com.tari.android.wallet.ui.extension.*
+import com.tari.android.wallet.ui.fragment.home.HomeActivity
+import com.tari.android.wallet.ui.fragment.onboarding.activity.OnboardingFlowActivity
 import com.tari.android.wallet.ui.fragment.settings.allSettings.TariVersionModel
 import com.tari.android.wallet.util.Constants
 import kotlinx.coroutines.launch
@@ -75,6 +73,7 @@ class AuthActivity : CommonActivity<ActivityAuthBinding, AuthViewModel>() {
         bindViewModel(viewModel)
 
         setupUi()
+        subscribeUI()
         viewModel.walletServiceLauncher.start()
     }
 
@@ -84,6 +83,21 @@ class AuthActivity : CommonActivity<ActivityAuthBinding, AuthViewModel>() {
         // call the animations
         showTariText()
         ui.networkInfoTextView.text = TariVersionModel(viewModel.networkRepository).versionInfo
+    }
+
+    private fun subscribeUI() = with(viewModel) {
+        observe(navigation) { processNavigation(it) }
+    }
+
+    private fun processNavigation(navigation: AuthNavigation) {
+        when (navigation) {
+            AuthNavigation.ToSplashScreen -> {
+                val intent = Intent(this, OnboardingFlowActivity::class.java)
+                intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
+                startActivity(intent)
+                finishAffinity()
+            }
+        }
     }
 
     override fun onBackPressed() = Unit
@@ -122,10 +136,6 @@ class AuthActivity : CommonActivity<ActivityAuthBinding, AuthViewModel>() {
         }
     }
 
-    /**
-     * Calls Android authentication helper - does biometric if exists, falls back
-     * on passcode if not.
-     */
     private fun doAuth() {
         // check whether there's at least screen lock
         if (viewModel.authService.isDeviceSecured) {
@@ -210,10 +220,9 @@ class AuthActivity : CommonActivity<ActivityAuthBinding, AuthViewModel>() {
                 start()
             }
 
-            EventBus.walletState.publishSubject.filter { it == WalletState.Running }
-                .subscribe {
-                    ui.rootView.post(this::continueToHomeActivity)
-                }.addTo(viewModel.compositeDisposable)
+            viewModel.migrationManager.validateVersion({
+                proceedLogin()
+            }, { viewModel.showIncompatibleVersionDialog(this::proceedLogin) })
         })
         ui.authAnimLottieAnimationView.playAnimation()
 
@@ -227,6 +236,10 @@ class AuthActivity : CommonActivity<ActivityAuthBinding, AuthViewModel>() {
             startDelay = Constants.UI.CreateWallet.introductionBottomViewsFadeOutDelay
             start()
         }
+    }
+
+    private fun proceedLogin() {
+        viewModel.doOnConnectedToWallet { ui.rootView.post(this::continueToHomeActivity) }
     }
 
     private fun continueToHomeActivity() {

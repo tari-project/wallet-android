@@ -4,14 +4,15 @@ import android.os.Parcel
 import android.os.Parcelable
 import com.tari.android.wallet.model.MicroTari
 import com.tari.android.wallet.model.User
+import com.tari.android.wallet.ui.extension.readP
 
 data class TransactionData(val recipientUser: User?, val amount: MicroTari?, val note: String?, val feePerGram: MicroTari?, val isOneSidePayment: Boolean) : Parcelable {
 
     constructor(parcel: Parcel) : this(
-        parcel.readParcelable(User::class.java.classLoader),
-        parcel.readParcelable(MicroTari::class.java.classLoader),
+        parcel.readP(User::class.java),
+        parcel.readP(MicroTari::class.java),
         parcel.readString(),
-        parcel.readParcelable(MicroTari::class.java.classLoader) as? MicroTari,
+        parcel.readP(MicroTari::class.java),
         parcel.readInt() == 1
     )
 

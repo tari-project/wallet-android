@@ -46,7 +46,7 @@ import org.junit.runners.Suite
     FFICommsConfigTests::class,
     FFIContactTests::class,
     FFIPrivateKeyTests::class,
-    FFIPublicKeyTests::class,
+    FFIWalletAddressTests::class,
     FFITransportTypeTest::class,
     HexStringTests::class,
     NetAddressStringTests::class,

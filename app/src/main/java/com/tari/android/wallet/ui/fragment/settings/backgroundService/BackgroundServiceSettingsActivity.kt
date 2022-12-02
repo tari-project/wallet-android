@@ -58,7 +58,7 @@ class BackgroundServiceSettingsActivity : CommonActivity<ActivityBackgroundServi
     }
 
     private fun setupViews() = with(ui) {
-        backCtaView.setOnClickListener(ThrottleClick { onBackPressed() })
+        backCtaView.setOnClickListener(ThrottleClick { onBackPressedDispatcher.onBackPressed() })
         loadingSwitchView.setOnCheckedChangeListener { viewModel.toggleBackgroundServiceEnable(it) }
     }
 

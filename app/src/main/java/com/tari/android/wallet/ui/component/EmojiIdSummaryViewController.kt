@@ -92,7 +92,7 @@ class EmojiIdSummaryViewController(private val ui: ViewEmojiIdSummaryBinding) {
             }
 
             for (i in 0 until showEmojisFromEachEnd) {
-                textViews[showEmojisFromEachEnd + i].text = emojis[emojis.size - i - 1]
+                textViews[showEmojisFromEachEnd + i].text = emojis[emojis.size - showEmojisFromEachEnd + i]
                 textViews[showEmojisFromEachEnd + i].setVisible(true)
             }
         }

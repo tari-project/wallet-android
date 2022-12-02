@@ -35,6 +35,7 @@ package com.tari.android.wallet.model
 import android.os.Parcel
 import android.os.Parcelable
 import com.tari.android.wallet.extension.toMicroTari
+import com.tari.android.wallet.ui.extension.readS
 import java.io.Serializable
 import java.math.BigDecimal
 import java.math.BigInteger
@@ -87,7 +88,6 @@ class MicroTari() : Parcelable, Comparable<MicroTari>, Serializable {
     operator fun minus(decrement: Long): MicroTari = this - decrement.toMicroTari()
 
 
-
     constructor(parcel: Parcel) : this() {
         readFromParcel(parcel)
     }
@@ -104,7 +104,7 @@ class MicroTari() : Parcelable, Comparable<MicroTari>, Serializable {
     }
 
     private fun readFromParcel(inParcel: Parcel) {
-        value = inParcel.readSerializable() as BigInteger
+        value = inParcel.readS(BigInteger::class.java)
     }
 
     override fun describeContents(): Int = 0

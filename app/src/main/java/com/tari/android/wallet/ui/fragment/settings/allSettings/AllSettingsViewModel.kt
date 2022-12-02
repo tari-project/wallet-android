@@ -6,12 +6,11 @@ import androidx.lifecycle.viewModelScope
 import com.tari.android.wallet.R.color.*
 import com.tari.android.wallet.R.drawable.*
 import com.tari.android.wallet.R.string.*
-import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepository
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.infrastructure.backup.BackupManager
 import com.tari.android.wallet.infrastructure.backup.BackupState
 import com.tari.android.wallet.infrastructure.backup.BackupStorageAuthRevokedException
-import com.tari.android.wallet.infrastructure.logging.BugReportingService
+import com.tari.android.wallet.infrastructure.backup.BackupsState
 import com.tari.android.wallet.ui.common.ClipboardArgs
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.common.SingleLiveEvent
@@ -24,14 +23,12 @@ import com.tari.android.wallet.ui.fragment.settings.allSettings.button.ButtonSty
 import com.tari.android.wallet.ui.fragment.settings.allSettings.button.ButtonViewDto
 import com.tari.android.wallet.ui.fragment.settings.allSettings.title.SettingsTitleDto
 import com.tari.android.wallet.ui.fragment.settings.allSettings.version.SettingsVersionViewHolderItem
-import com.tari.android.wallet.ui.fragment.settings.backup.BackupSettingsRepository
+import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupSettingsRepository
 import com.tari.android.wallet.ui.fragment.settings.userAutorization.BiometricAuthenticationViewModel
 import com.tari.android.wallet.yat.YatAdapter
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import org.joda.time.format.DateTimeFormat
 import java.io.IOException
-import java.util.*
 import javax.inject.Inject
 
 class AllSettingsViewModel : CommonViewModel() {
@@ -43,9 +40,6 @@ class AllSettingsViewModel : CommonViewModel() {
     }
 
     @Inject
-    lateinit var bugReportingService: BugReportingService
-
-    @Inject
     lateinit var yatAdapter: YatAdapter
 
     @Inject
@@ -54,14 +48,8 @@ class AllSettingsViewModel : CommonViewModel() {
     @Inject
     lateinit var backupManager: BackupManager
 
-    @Inject
-    lateinit var networkRepository: NetworkRepository
-
     private val _navigation: SingleLiveEvent<AllSettingsNavigation> = SingleLiveEvent()
     val navigation: LiveData<AllSettingsNavigation> = _navigation
-
-    private val _shareBugReport: SingleLiveEvent<Unit> = SingleLiveEvent()
-    val shareBugReport: LiveData<Unit> = _shareBugReport
 
     private val _openYatOnboarding = SingleLiveEvent<Unit>()
     val openYatOnboarding: LiveData<Unit> = _openYatOnboarding
@@ -73,7 +61,6 @@ class AllSettingsViewModel : CommonViewModel() {
         component.inject(this)
         initOptions()
         EventBus.backupState.subscribe(this) { backupState -> onBackupStateChanged(backupState) }
-        checkStorageStatus()
     }
 
     private fun initOptions() {
@@ -91,7 +78,9 @@ class AllSettingsViewModel : CommonViewModel() {
                 _navigation.postValue(AllSettingsNavigation.ToAbout)
             },
             DividerViewHolderItem(),
-            ButtonViewDto(resourceManager.getString(all_settings_report_a_bug), all_settings_report_bug_icon) { _shareBugReport.postValue(Unit) },
+            ButtonViewDto(resourceManager.getString(all_settings_report_a_bug), all_settings_report_bug_icon) {
+                _navigation.postValue(AllSettingsNavigation.ToBugReporting)
+            },
             DividerViewHolderItem(),
             ButtonViewDto(resourceManager.getString(all_settings_visit_site), all_settings_visit_tari_icon) {
                 _openLink.postValue(resourceManager.getString(tari_url))
@@ -146,47 +135,19 @@ class AllSettingsViewModel : CommonViewModel() {
         _allSettingsOptions.value = allOptions
     }
 
-    private fun checkStorageStatus() = viewModelScope.launch(Dispatchers.IO) {
-        try {
-            backupManager.checkStorageStatus()
-        } catch (e: BackupStorageAuthRevokedException) {
-            logger.e(e, "Backup storage auth error")
-            // show access revoked information
-            showBackupStorageCheckFailedDialog(resourceManager.getString(check_backup_storage_status_auth_revoked_error_description))
-        } catch (e: IOException) {
-            logger.e(e, "Backup storage I/O (access) error")
-            showBackupStorageCheckFailedDialog(resourceManager.getString(check_backup_storage_status_access_error_description))
-        } catch (e: Exception) {
-            logger.e(e, "Backup storage tampered")
-            updateLastSuccessfulBackupDate()
-        }
-    }
-
-    private fun onBackupStateChanged(backupState: BackupState?) {
+    private fun onBackupStateChanged(backupState: BackupsState?) {
         if (backupState == null) {
             backupOption.backupState = PresentationBackupState(Warning)
         } else {
-            updateLastSuccessfulBackupDate()
-            val presentationBackupState = when (backupState) {
+            val presentationBackupState = when (backupState.backupsState) {
                 is BackupState.BackupDisabled -> PresentationBackupState(Warning)
-                is BackupState.BackupCheckingStorage -> {
-                    PresentationBackupState(InProgress, back_up_wallet_backup_status_checking_backup, all_settings_back_up_status_error)
-                }
-                is BackupState.BackupStorageCheckFailed -> PresentationBackupState(InProgress, -1, all_settings_back_up_status_error)
-                is BackupState.BackupScheduled -> {
-                    if (backupSettingsRepository.backupFailureDate == null) {
-                        PresentationBackupState(Scheduled, back_up_wallet_backup_status_scheduled, all_settings_back_up_status_scheduled)
-                    } else {
-                        PresentationBackupState(Warning, back_up_wallet_backup_status_scheduled, all_settings_back_up_status_processing)
-                    }
-                }
                 is BackupState.BackupInProgress -> {
                     PresentationBackupState(InProgress, back_up_wallet_backup_status_in_progress, all_settings_back_up_status_processing)
                 }
                 is BackupState.BackupUpToDate -> {
                     PresentationBackupState(Success, back_up_wallet_backup_status_up_to_date, all_settings_back_up_status_up_to_date)
                 }
-                is BackupState.BackupOutOfDate -> {
+                is BackupState.BackupFailed -> {
                     PresentationBackupState(Warning, back_up_wallet_backup_status_outdated, all_settings_back_up_status_error)
                 }
             }
@@ -195,23 +156,9 @@ class AllSettingsViewModel : CommonViewModel() {
         _allSettingsOptions.postValue(_allSettingsOptions.value)
     }
 
-    private fun updateLastSuccessfulBackupDate() {
-        val time = backupSettingsRepository.lastSuccessfulBackupDate?.toLocalDateTime()
-        val text = if (time == null) "" else {
-            resourceManager.getString(back_up_wallet_last_successful_backup, BACKUP_DATE_FORMATTER.print(time), BACKUP_TIME_FORMATTER.print(time))
-        }
-        backupOption.lastBackupDate = text
-        _allSettingsOptions.postValue(_allSettingsOptions.value)
-    }
-
     private fun showBackupStorageCheckFailedDialog(message: String) {
         val errorArgs = ErrorDialogArgs(resourceManager.getString(check_backup_storage_status_error_title), message)
         _modularDialog.postValue(errorArgs.getModular(resourceManager))
-    }
-
-    companion object {
-        private val BACKUP_DATE_FORMATTER = DateTimeFormat.forPattern("MMM dd yyyy").withLocale(Locale.ENGLISH)
-        private val BACKUP_TIME_FORMATTER = DateTimeFormat.forPattern("hh:mm a")
     }
 }
 
