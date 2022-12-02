@@ -45,8 +45,9 @@ import com.tari.android.wallet.R.color.change_password_cta_disabled
 import com.tari.android.wallet.R.color.white
 import com.tari.android.wallet.databinding.FragmentEnterBackupPasswordBinding
 import com.tari.android.wallet.di.DiContainer.appComponent
-import com.tari.android.wallet.ui.fragment.settings.backup.activity.BackupSettingsRouter
 import com.tari.android.wallet.ui.extension.*
+import com.tari.android.wallet.ui.fragment.settings.backup.activity.BackupSettingsRouter
+import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupSettingsRepository
 import javax.inject.Inject
 
 class EnterCurrentPasswordFragment @Deprecated(

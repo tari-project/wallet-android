@@ -37,6 +37,7 @@ import android.content.Context
 import com.orhanobut.logger.Logger
 import com.tari.android.wallet.data.sharedPrefs.tor.TorSharedRepository
 import com.tari.android.wallet.event.EventBus
+import com.tari.android.wallet.infrastructure.logging.LoggerTags
 import java.io.BufferedReader
 import java.io.InputStreamReader
 
@@ -59,7 +60,7 @@ class TorProxyManager(
     private val appCacheHome = context.getDir(torDataDirectoryName, Service.MODE_PRIVATE)
     private val torProxyControl: TorProxyControl
     private val logger
-        get() = Logger.t(TorProxyManager::class.simpleName)
+        get() = Logger.t(LoggerTags.Connection.name)
 
     init {
         EventBus.torProxyState.post(TorProxyState.NotReady)

@@ -43,9 +43,7 @@ class FFIPublicKey() : FFIBase() {
     private external fun jniDestroy()
     private external fun jniCreate(byteVectorPtr: FFIByteVector, libError: FFIError)
     private external fun jniFromHex(hexStr: String, libError: FFIError)
-    private external fun jniFromEmojiId(emoji: String, libError: FFIError)
     private external fun jniFromPrivateKey(privateKeyPtr: FFIPrivateKey, libError: FFIError)
-    private external fun jniGetEmojiId(libError: FFIError): String
 
     constructor(pointer: FFIPointer) : this() {
         this.pointer = pointer
@@ -63,17 +61,11 @@ class FFIPublicKey() : FFIBase() {
         }
     }
 
-    constructor(emojiId: String) : this() {
-        runWithError { jniFromEmojiId(emojiId, it) }
-    }
-
     constructor(privateKey: FFIPrivateKey) : this() {
         runWithError { jniFromPrivateKey(privateKey, it) }
     }
 
     fun getBytes(): FFIByteVector = runWithError { FFIByteVector(jniGetBytes(it)) }
-
-    fun getEmojiId(): String = runWithError { jniGetEmojiId(it) }
 
     override fun toString(): String = runWithError { FFIByteVector(jniGetBytes(it)).toString() }
 

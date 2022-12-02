@@ -45,51 +45,6 @@ class DeepLinkTest {
     private val deeplinkHandler: DeeplinkHandler = DeeplinkHandler(networkRepository)
     private val currentNetwork = Network.ESMERALDA
 
-    // region old format
-    @Test
-    fun fromAssertThatPublicKeyForTestnetIsDeserializedCorrectly() {
-        val givenLink = "tari://${currentNetwork.uriComponent}/pubkey/$PUBLIC_KEY"
-        val result = deeplinkHandler.handle(givenLink) as? DeepLink.Send
-        assertEquals(result!!.publicKeyHex, PUBLIC_KEY)
-    }
-
-    @Test
-    fun fromAssertThatPublicKeyForTestnetIsNotDeserializedCorrectlyIfTtConsistsOf_63_symbols() {
-        val givenLink = "tari://${currentNetwork.uriComponent}/pubkey/$PUBLIC_KEY"
-        val result = deeplinkHandler.handle(givenLink.substring(0, givenLink.length - 1))
-        assertNull(result)
-    }
-
-    @Test
-    fun assert_that_test_public_key_contains_exactly_64_code_points() {
-        assertEquals(64, PUBLIC_KEY.codePointCount(0, PUBLIC_KEY.length))
-    }
-
-    @Test
-    fun assert_that_default_note_parameter_was_parsed_correctly() {
-        // %D0%BF%D1%80%D0%B8%D0%B2%D0%B5%D1%82 == привет
-        val givenLink = "tari://${currentNetwork.uriComponent}/pubkey/$PUBLIC_KEY?note=%D0%BF%D1%80%D0%B8%D0%B2%D0%B5%D1%82"
-        val actual = deeplinkHandler.handle(givenLink) as DeepLink.Send
-        assertEquals("привет", actual.note)
-    }
-
-    @Test
-    fun assert_that_default_amount_parameter_was_parsed_correctly() {
-        val givenLink = "tari://${currentNetwork.uriComponent}/pubkey/$PUBLIC_KEY?amount=5553634"
-        val actual = deeplinkHandler.handle(givenLink) as DeepLink.Send
-        assertEquals(5.553634, actual.amount!!.tariValue.toDouble(), 0.01)
-    }
-
-    @Test
-    fun assert_that_default_amount_and_note_parameters_were_parsed_correctly_for_mainnet_pubkey_link() {
-        // %D0%BF%D1%80%D0%B8%D0%B2%D0%B5%D1%82 == привет
-        val givenLink = "tari://${currentNetwork.uriComponent}/pubkey/$PUBLIC_KEY?amount=5553634&note=%D0%BF%D1%80%D0%B8%D0%B2%D0%B5%D1%82"
-        val actual = deeplinkHandler.handle(givenLink) as DeepLink.Send
-        assertEquals(5.553634, actual.amount!!.tariValue.toDouble(), 0.01)
-        assertEquals("привет", actual.note)
-    }
-    // endregion
-
     @Test
     fun assertNetwork() {
         val nullLink = "tari://mainnet/${DeepLink.Send.sendCommand}?${DeepLink.Send.publicKeyKey}=$PUBLIC_KEY"
@@ -116,7 +71,7 @@ class DeepLinkTest {
     fun assertPubkey() {
         val deeplink = "tari://${currentNetwork.uriComponent}/${DeepLink.Send.sendCommand}?${DeepLink.Send.publicKeyKey}=$PUBLIC_KEY"
         val result = deeplinkHandler.handle(deeplink) as? DeepLink.Send
-        assertEquals(result!!.publicKeyHex, PUBLIC_KEY)
+        assertEquals(result!!.walletAddressHex, PUBLIC_KEY)
     }
 
     @Test
@@ -145,7 +100,7 @@ class DeepLinkTest {
         val sendDeeplink = "tari://${currentNetwork.uriComponent}/${DeepLink.Send.sendCommand}?${DeepLink.Send.amountKey}=12345678&${DeepLink.Send.noteKey}=hey&${DeepLink.Send.publicKeyKey}=$PUBLIC_KEY"
         val result = deeplinkHandler.handle(sendDeeplink) as? DeepLink.Send
         assertEquals(result!!.note, "hey")
-        assertEquals(result.publicKeyHex, PUBLIC_KEY)
+        assertEquals(result.walletAddressHex, PUBLIC_KEY)
         assertEquals(result.amount!!.tariValue.toDouble(), 12.345678, 0.1)
 
         val baseNodeDeeplink = "tari://${currentNetwork.uriComponent}/${DeepLink.AddBaseNode.addNodeCommand}?${DeepLink.AddBaseNode.peerKey}=${PEER}&${DeepLink.AddBaseNode.nameKey}=actual_name"
@@ -165,7 +120,7 @@ class DeepLinkTest {
         private val network: Network = Network.ESMERALDA
 
         override var supportedNetworks: List<Network> = listOf(network)
-        override var currentNetwork: TariNetwork? = TariNetwork(network, "", "")
+        override var currentNetwork: TariNetwork? = TariNetwork(network, "")
         override var ffiNetwork: Network? = network
         override var incompatibleNetworkShown: Boolean = false
         override var recommendedNetworks: List<Network> = listOf(network)

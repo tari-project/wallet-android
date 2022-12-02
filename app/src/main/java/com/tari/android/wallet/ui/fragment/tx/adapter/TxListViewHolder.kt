@@ -65,7 +65,7 @@ class TxListViewHolder(view: ItemHomeTxListBinding) : CommonViewHolder<Transacti
     private fun displayFirstEmoji(tx: Tx) {
         // display first emoji of emoji id
         val firstEmoji =
-            if (tx.isOneSided) string(R.string.tx_list_emoji_one_side_payment_placeholder) else tx.user.publicKey.emojiId.extractEmojis()[0]
+            if (tx.isOneSided) string(R.string.tx_list_emoji_one_side_payment_placeholder) else tx.user.walletAddress.emojiId.extractEmojis()[0]
         ui.firstEmojiTextView.text = firstEmoji
     }
 
@@ -97,7 +97,7 @@ class TxListViewHolder(view: ItemHomeTxListBinding) : CommonViewHolder<Transacti
             }
             else -> { // display emoji id
                 ui.participantEmojiIdView.root.visible()
-                emojiIdSummaryController.display(txUser.publicKey.emojiId, showEmojisFromEachEnd = 2)
+                emojiIdSummaryController.display(txUser.walletAddress.emojiId, showEmojisFromEachEnd = 2)
                 when (tx.direction) {
                     Tx.Direction.INBOUND -> {
                         ui.participantTextView1.gone()

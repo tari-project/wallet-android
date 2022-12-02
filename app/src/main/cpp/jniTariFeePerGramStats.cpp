@@ -45,15 +45,10 @@ Java_com_tari_android_wallet_ffi_FFIFeePerGramStats_jniFeePerGramStatsGetLength(
         jobject jThis,
         jobject error
 ) {
-    int errorCode = 0;
-    int *errorCodePointer = &errorCode;
-
-    jlong lFeePerGramStats = GetPointerField(jEnv, jThis);
-    auto *pTariFeePerGramStats = reinterpret_cast<TariFeePerGramStats *>(lFeePerGramStats);
-
-    unsigned int length = fee_per_gram_stats_get_length(pTariFeePerGramStats, errorCodePointer);
-    setErrorCode(jEnv, error, errorCode);
-    return (int)length;
+    return ExecuteWithError<int>(jEnv, error, [&](int *errorPointer) {
+        auto pTariFeePerGramStats = GetPointerField<TariFeePerGramStats *>(jEnv, jThis);
+        return fee_per_gram_stats_get_length(pTariFeePerGramStats, errorPointer);
+    });
 }
 
 extern "C"
@@ -63,13 +58,10 @@ Java_com_tari_android_wallet_ffi_FFIFeePerGramStats_jniGetAt(
         jobject jThis,
         jint index,
         jobject error) {
-    int errorCode = 0;
-    int *errorCodePointer = &errorCode;
-    jlong lFeePerGram = GetPointerField(jEnv, jThis);
-    auto *pTariFeePerGramStats = reinterpret_cast<TariFeePerGramStats *>(lFeePerGram);
-    auto result = reinterpret_cast<jlong>(fee_per_gram_stats_get_at(pTariFeePerGramStats, static_cast<unsigned int>(index), errorCodePointer));
-    setErrorCode(jEnv, error, errorCode);
-    return result;
+    return ExecuteWithErrorAndCast<TariFeePerGramStat *>(jEnv, error, [&](int *errorPointer) {
+        auto pTariFeePerGramStats = GetPointerField<TariFeePerGramStats *>(jEnv, jThis);
+        return fee_per_gram_stats_get_at(pTariFeePerGramStats, static_cast<unsigned int>(index), errorPointer);
+    });
 }
 
 extern "C"
@@ -77,7 +69,6 @@ JNIEXPORT void JNICALL
 Java_com_tari_android_wallet_ffi_FFIFeePerGramStats_jniDestroy(
         JNIEnv *jEnv,
         jobject jThis) {
-    jlong lFeePerGram = GetPointerField(jEnv, jThis);
-    fee_per_gram_stats_destroy(reinterpret_cast<TariFeePerGramStats *>(lFeePerGram));
-    SetPointerField(jEnv, jThis, reinterpret_cast<jlong>(nullptr));
+    fee_per_gram_stats_destroy(GetPointerField<TariFeePerGramStats *>(jEnv, jThis));
+    SetNullPointerField(jEnv, jThis);
 }

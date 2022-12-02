@@ -184,6 +184,7 @@ class LocalAuthFragment : CommonFragment<FragmentLocalAuthBinding, LocalAuthView
             .subscribe {
                 viewModel.sharedPrefsWrapper.isAuthenticated = true
                 viewModel.sharedPrefsWrapper.onboardingAuthSetupCompleted = true
+                viewModel.backupManager.backupNow()
                 (requireActivity() as? LocalAuthListener)?.onAuthSuccess()
             }.addTo(viewModel.compositeDisposable)
     }

@@ -2,6 +2,7 @@ package com.tari.android.wallet.tor
 
 import android.os.Build
 import com.orhanobut.logger.Logger
+import com.tari.android.wallet.infrastructure.logging.LoggerTags
 import java.io.File
 import java.io.FileOutputStream
 import java.io.InputStream
@@ -11,7 +12,7 @@ import java.util.zip.ZipFile
 object NativeLoader {
 
     private val logger
-        get() = Logger.t("TorNativeLoader")
+        get() = Logger.t(LoggerTags.Connection.name)
 
     private fun loadFromZip(appSourceDir: File, libName: String, destLocalFile: File, arch: String): Boolean {
 
@@ -41,7 +42,7 @@ object NativeLoader {
             }
 
             out.close()
-            destLocalFile.setReadable(true, false)
+            destLocalFile.setReadable(true, true)
             destLocalFile.setExecutable(true, false)
             destLocalFile.setWritable(true)
 
@@ -81,7 +82,7 @@ object NativeLoader {
                         return fileNativeBin
                 }
             }
-            var folder = Build.CPU_ABI
+            var folder = Build.SUPPORTED_ABIS.first()
             val javaArch = System.getProperty("os.arch")
 
             if (javaArch != null && javaArch.contains("686")) {

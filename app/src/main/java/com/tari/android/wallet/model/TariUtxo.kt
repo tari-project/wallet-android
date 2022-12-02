@@ -3,6 +3,7 @@ package com.tari.android.wallet.model
 import android.os.Parcel
 import android.os.Parcelable
 import com.tari.android.wallet.ffi.FFITariUtxo
+import com.tari.android.wallet.ui.extension.readP
 import java.math.BigInteger
 
 class TariUtxo() : Parcelable {
@@ -15,7 +16,7 @@ class TariUtxo() : Parcelable {
 
     constructor(parcel: Parcel) : this() {
         commitment = parcel.readString()!!
-        value = parcel.readParcelable(MicroTari::class.java.classLoader)!!
+        value = parcel.readP(MicroTari::class.java)
         minedHeight = parcel.readLong()
         timestamp = parcel.readLong()
         status = UtxoStatus.fromValue(parcel.readInt())

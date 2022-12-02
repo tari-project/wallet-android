@@ -6,6 +6,7 @@ import com.tari.android.wallet.ui.dialog.ChangedPropertyDelegate
 import com.tari.android.wallet.util.WalletUtil
 import org.joda.time.DateTime
 import java.text.SimpleDateFormat
+import java.util.*
 
 class UtxosViewHolderItem(val source: TariUtxo, var height: Int = 0) : CommonViewHolderItem() {
 
@@ -23,9 +24,9 @@ class UtxosViewHolderItem(val source: TariUtxo, var height: Int = 0) : CommonVie
 
     init {
         val dateTime = DateTime.now().withMillis(source.timestamp)
-        val format = SimpleDateFormat()
+        val format = SimpleDateFormat("HH:mm", Locale.getDefault())
         formattedDate = format.format(dateTime.toDate()).split(" ")[0]
-        formattedTime = dateTime.toString("HH:mm")
+        formattedTime = dateTime.toString()
 
         status = when (source.status) {
             TariUtxo.UtxoStatus.Unspent -> UtxosStatus.Mined

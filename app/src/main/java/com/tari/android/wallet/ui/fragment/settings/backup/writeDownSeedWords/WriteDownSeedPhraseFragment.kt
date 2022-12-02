@@ -47,9 +47,9 @@ import com.tari.android.wallet.R
 import com.tari.android.wallet.R.color.seed_phrase_button_disabled_text_color
 import com.tari.android.wallet.databinding.FragmentWriteDownSeedPhraseBinding
 import com.tari.android.wallet.extension.observe
-import com.tari.android.wallet.ui.fragment.settings.backup.activity.BackupSettingsRouter
 import com.tari.android.wallet.ui.common.CommonFragment
 import com.tari.android.wallet.ui.extension.*
+import com.tari.android.wallet.ui.fragment.settings.backup.activity.BackupSettingsRouter
 import com.tari.android.wallet.ui.fragment.settings.backup.writeDownSeedWords.adapter.PhraseWordsAdapter
 import com.tari.android.wallet.util.Constants
 

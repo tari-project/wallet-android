@@ -34,6 +34,7 @@ package com.tari.android.wallet.model
 
 import android.os.Parcel
 import android.os.Parcelable
+import com.tari.android.wallet.ui.extension.readP
 
 /**
  * Contact is a user with an alias.
@@ -45,10 +46,10 @@ class Contact() : User(), Parcelable {
     var alias: String = ""
 
     constructor(
-        publicKey: PublicKey,
+        tariWalletAddress: TariWalletAddress,
         alias: String
     ) : this() {
-        this.publicKey = publicKey
+        this.walletAddress = tariWalletAddress
         this.alias = alias
     }
 
@@ -73,13 +74,13 @@ class Contact() : User(), Parcelable {
     }
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {
-        parcel.writeParcelable(publicKey, flags)
+        parcel.writeParcelable(walletAddress, flags)
         parcel.writeString(alias)
     }
 
     private fun readFromParcel(inParcel: Parcel) {
-        publicKey = inParcel.readParcelable(PublicKey::class.java.classLoader)!!
-        alias = inParcel.readString() ?: ""
+        walletAddress = inParcel.readP(TariWalletAddress::class.java)
+        alias = inParcel.readString().orEmpty()
     }
 
     override fun describeContents(): Int {

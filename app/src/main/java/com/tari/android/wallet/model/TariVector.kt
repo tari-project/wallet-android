@@ -35,6 +35,7 @@ package com.tari.android.wallet.model
 import android.os.Parcel
 import android.os.Parcelable
 import com.tari.android.wallet.ffi.FFITariVector
+import com.tari.android.wallet.ui.extension.readList
 
 class TariVector() : Parcelable {
 
@@ -43,7 +44,7 @@ class TariVector() : Parcelable {
     var itemsList = mutableListOf<TariUtxo>()
     var longs = mutableListOf<Long>()
 
-    constructor(ffiTariVector: FFITariVector): this() {
+    constructor(ffiTariVector: FFITariVector) : this() {
         len = ffiTariVector.len
         cap = ffiTariVector.cap
         itemsList = ffiTariVector.itemsList.map { TariUtxo(it) }.toMutableList()
@@ -53,7 +54,7 @@ class TariVector() : Parcelable {
     constructor(parcel: Parcel) : this() {
         len = parcel.readLong()
         cap = parcel.readLong()
-        itemsList = parcel.readParcelableList(itemsList, TariUtxo::class.java.classLoader)
+        itemsList = parcel.readList(itemsList, TariUtxo::class.java).toMutableList()
         val longArray = longArrayOf()
         parcel.readLongArray(longArray)
         longs = longArray.toMutableList()

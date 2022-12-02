@@ -86,8 +86,8 @@ class PublicKey() : Parcelable {
     }
 
     private fun readFromParcel(inParcel: Parcel) {
-        hexString = inParcel.readString() ?: ""
-        emojiId = inParcel.readString() ?: ""
+        hexString = inParcel.readString().orEmpty()
+        emojiId = inParcel.readString().orEmpty()
     }
 
     override fun describeContents(): Int {

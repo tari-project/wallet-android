@@ -74,11 +74,9 @@ import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonModule
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonStyle
 import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
 import com.tari.android.wallet.ui.extension.color
+import com.tari.android.wallet.ui.extension.parcelable
 import com.tari.android.wallet.ui.extension.showInternetConnectionErrorDialog
 import com.tari.android.wallet.ui.extension.string
-import com.tari.android.wallet.ui.fragment.debug.baseNodeConfig.BaseNodeConfigRouter
-import com.tari.android.wallet.ui.fragment.debug.baseNodeConfig.addBaseNode.AddCustomBaseNodeFragment
-import com.tari.android.wallet.ui.fragment.debug.baseNodeConfig.changeBaseNode.ChangeBaseNodeFragment
 import com.tari.android.wallet.ui.fragment.onboarding.activity.OnboardingFlowActivity
 import com.tari.android.wallet.ui.fragment.profile.WalletInfoFragment
 import com.tari.android.wallet.ui.fragment.send.activity.SendTariActivity
@@ -87,6 +85,9 @@ import com.tari.android.wallet.ui.fragment.settings.allSettings.AllSettingsRoute
 import com.tari.android.wallet.ui.fragment.settings.allSettings.about.TariAboutFragment
 import com.tari.android.wallet.ui.fragment.settings.backgroundService.BackgroundServiceSettingsActivity
 import com.tari.android.wallet.ui.fragment.settings.backup.activity.BackupSettingsActivity
+import com.tari.android.wallet.ui.fragment.settings.baseNodeConfig.BaseNodeRouter
+import com.tari.android.wallet.ui.fragment.settings.baseNodeConfig.addBaseNode.AddCustomBaseNodeFragment
+import com.tari.android.wallet.ui.fragment.settings.baseNodeConfig.changeBaseNode.ChangeBaseNodeFragment
 import com.tari.android.wallet.ui.fragment.settings.deleteWallet.DeleteWalletActivity
 import com.tari.android.wallet.ui.fragment.settings.networkSelection.NetworkSelectionFragment
 import com.tari.android.wallet.ui.fragment.settings.torBridges.TorBridgesSelectionFragment
@@ -105,7 +106,7 @@ import kotlinx.coroutines.launch
 import java.lang.ref.WeakReference
 import javax.inject.Inject
 
-class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>(), AllSettingsRouter, TxListRouter, BaseNodeConfigRouter {
+class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>(), AllSettingsRouter, TxListRouter, BaseNodeRouter {
 
     @Inject
     lateinit var sharedPrefsWrapper: SharedPrefsRepository
@@ -130,6 +131,8 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>(), AllSe
 
         val viewModel: HomeViewModel by viewModels()
         bindViewModel(viewModel)
+        
+        setContainerId(R.id.nav_container)
 
         overridePendingTransition(0, 0)
         appComponent.inject(this)
@@ -306,14 +309,14 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>(), AllSe
         if (screen.orEmpty().isNotEmpty()) {
             when (HomeDeeplinkScreens.parse(screen)) {
                 HomeDeeplinkScreens.TxDetails -> {
-                    (intent.getParcelableExtra<TxId>(HomeDeeplinkScreens.KeyTxDetailsArgs))?.let { toTxDetails(null, it) }
+                    (intent.parcelable<TxId>(HomeDeeplinkScreens.KeyTxDetailsArgs))?.let { toTxDetails(null, it) }
                 }
                 else -> {}
             }
         }
     }
 
-    override fun toTxDetails(tx: Tx?, txId: TxId?) = loadFragment(TxDetailsFragment().apply {
+    override fun toTxDetails(tx: Tx?, txId: TxId?) = addFragment(TxDetailsFragment().apply {
         arguments = Bundle().apply {
             putParcelable(TX_EXTRA_KEY, tx)
             putParcelable(TX_ID_EXTRA_KEY, txId)
@@ -330,34 +333,19 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>(), AllSe
 
     override fun toBackgroundService() = startActivity(Intent(this, BackgroundServiceSettingsActivity::class.java))
 
-    override fun toAbout() = loadFragment(TariAboutFragment())
+    override fun toAbout() = addFragment(TariAboutFragment())
 
-    override fun toBaseNodeSelection() = loadFragment(ChangeBaseNodeFragment())
+    override fun toBaseNodeSelection() = addFragment(ChangeBaseNodeFragment())
 
-    override fun toTorBridges() = loadFragment(TorBridgesSelectionFragment())
+    override fun toTorBridges() = addFragment(TorBridgesSelectionFragment())
 
-    override fun toUtxos() = loadFragment(UtxosListFragment())
+    override fun toUtxos() = addFragment(UtxosListFragment())
 
-    override fun toCustomTorBridges() = loadFragment(CustomTorBridgesFragment())
+    override fun toCustomTorBridges() = addFragment(CustomTorBridgesFragment())
 
-    override fun toNetworkSelection() = loadFragment(NetworkSelectionFragment())
+    override fun toNetworkSelection() = addFragment(NetworkSelectionFragment())
 
-    override fun toAddCustomBaseNode() = loadFragment(AddCustomBaseNodeFragment())
-
-    override fun toChangeBaseNode() = loadFragment(ChangeBaseNodeFragment())
-
-    private fun loadFragment(fragment: Fragment) {
-        supportFragmentManager
-            .beginTransaction()
-            .setCustomAnimations(
-                R.anim.enter_from_right, R.anim.exit_to_left,
-                R.anim.enter_from_left, R.anim.exit_to_right
-            )
-            .apply { supportFragmentManager.fragments.forEach { hide(it) } }
-            .replace(R.id.nav_container, fragment)
-            .addToBackStack(null)
-            .commit()
-    }
+    override fun toAddCustomBaseNode() = addFragment(AddCustomBaseNodeFragment())
 
     fun willNotifyAboutNewTx(): Boolean = ui.viewPager.currentItem == INDEX_HOME
 
@@ -372,10 +360,10 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>(), AllSe
     private fun sendTariToUser(service: TariWalletService, sendDeeplink: DeepLink.Send) {
         val error = WalletError()
         val contacts = service.getContacts(error)
-        val pubKey = service.getPublicKeyFromHexString(sendDeeplink.publicKeyHex)
+        val walletAddress = service.getWalletAddressFromHexString(sendDeeplink.walletAddressHex)
         val recipientUser = when (error) {
-            WalletError.NoError -> contacts.firstOrNull { it.publicKey == pubKey } ?: User(pubKey)
-            else -> User(pubKey)
+            WalletError.NoError -> contacts.firstOrNull { it.walletAddress == walletAddress } ?: User(walletAddress)
+            else -> User(walletAddress)
         }
         val intent = Intent(this, SendTariActivity::class.java)
         intent.putExtra("recipientUser", recipientUser as Parcelable)

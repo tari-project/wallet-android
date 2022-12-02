@@ -34,12 +34,15 @@ package com.tari.android.wallet.infrastructure.backup
 
 import com.orhanobut.logger.Logger
 import com.tari.android.wallet.data.WalletConfig
+import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import com.tari.android.wallet.extension.compress
 import com.tari.android.wallet.extension.encrypt
 import com.tari.android.wallet.ffi.FFIWallet
 import com.tari.android.wallet.infrastructure.backup.compress.CompressionMethod
 import com.tari.android.wallet.infrastructure.security.encryption.SymmetricEncryptionAlgorithm
-import com.tari.android.wallet.ui.fragment.settings.backup.BackupSettingsRepository
+import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupSettingsRepository
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import org.joda.time.DateTime
 import java.io.File
 
@@ -50,43 +53,44 @@ import java.io.File
  */
 class BackupFileProcessor(
     private val backupSettingsRepository: BackupSettingsRepository,
+    private val sharedPrefsRepository: SharedPrefsRepository,
     private val walletConfig: WalletConfig,
     private val namingPolicy: BackupNamingPolicy,
 ) {
     private val logger
         get() = Logger.t(BackupFileProcessor::class.simpleName)
 
+    private val mutex = Mutex()
 
-    @Synchronized
-    fun generateBackupFile(newPassword: CharArray? = null): Triple<File, DateTime, String> {
+    suspend fun generateBackupFile(): Triple<File, DateTime, String> = mutex.withLock {
         // decrypt database
         FFIWallet.instance?.let {
             it.removeEncryption()
-            backupSettingsRepository.backupPassword = null
+            sharedPrefsRepository.databasePassphrase = null
         }
 
         // create partial backup in temp folder if password not set
         val databaseFile = File(walletConfig.walletDatabaseFilePath)
-        val backupPassword = newPassword ?: backupSettingsRepository.backupPassword?.toCharArray()
+        val backupPassword = backupSettingsRepository.backupPassword
         val backupDate = DateTime.now()
         // zip the file
         val compressionMethod = CompressionMethod.zip()
         var mimeType = compressionMethod.mimeType
-        val backupFileName = namingPolicy.getBackupFileName(backupDate)
-        val compressedFile = File(walletConfig.getWalletTempDirPath(), "$backupFileName.${compressionMethod.extension}")
+        val backupFileName = namingPolicy.getBackupFileName(backupPassword.orEmpty().isNotEmpty())
+        val compressedFile = File(walletConfig.getWalletTempDirPath(), backupFileName)
         var fileToBackup = listOf(databaseFile).compress(CompressionMethod.zip(), compressedFile.absolutePath)
         // encrypt the file if password is set
         val encryptionAlgorithm = SymmetricEncryptionAlgorithm.aes()
-        if (backupPassword != null) {
-            val targetFileName = "$backupFileName.${encryptionAlgorithm.extension}"
-            fileToBackup = fileToBackup.encrypt(
+        if (!backupPassword.isNullOrEmpty()) {
+            val copiedFile = fileToBackup.copyTo(File(fileToBackup.absolutePath + "_temp"))
+            fileToBackup = copiedFile.encrypt(
                 encryptionAlgorithm,
-                backupPassword,
-                File(walletConfig.getWalletTempDirPath(), targetFileName).absolutePath
+                backupPassword.toCharArray(),
+                File(walletConfig.getWalletTempDirPath(), backupFileName).absolutePath
             )
+            copiedFile.delete()
             mimeType = encryptionAlgorithm.mimeType
         }
-        // encrypt after finish backup
         FFIWallet.instance?.enableEncryption()
         logger.i("Backup files was generated")
         return Triple(fileToBackup, backupDate, mimeType)
@@ -137,7 +141,7 @@ class BackupFileProcessor(
         try {
             File(walletConfig.getWalletTempDirPath()).listFiles()?.forEach { it.delete() }
         } catch (e: Exception) {
-            logger.e(e, "Cleaning temp files")
+            Logger.e(e, "Ignorable backup error while clearing temporary and old files.")
         }
     }
 }

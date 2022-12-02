@@ -32,35 +32,23 @@
  */
 package com.tari.android.wallet.ui.fragment.settings.backup.backupSettings
 
-import android.animation.Animator
-import android.animation.ValueAnimator
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.animation.LinearInterpolator
-import androidx.core.animation.addListener
 import androidx.fragment.app.viewModels
-import com.tari.android.wallet.R.color.all_settings_back_up_status_processing
-import com.tari.android.wallet.R.color.back_up_settings_permission_processing
-import com.tari.android.wallet.R.string.*
 import com.tari.android.wallet.databinding.FragmentWalletBackupSettingsBinding
-import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.extension.observe
-import com.tari.android.wallet.extension.observeOnLoad
-import com.tari.android.wallet.infrastructure.backup.BackupState.BackupUpToDate
 import com.tari.android.wallet.ui.common.CommonFragment
-import com.tari.android.wallet.ui.extension.*
+import com.tari.android.wallet.ui.extension.ThrottleClick
+import com.tari.android.wallet.ui.extension.setVisible
 import com.tari.android.wallet.ui.fragment.settings.backup.activity.BackupSettingsRouter
+import com.tari.android.wallet.ui.fragment.settings.backup.backupSettings.option.BackupOptionView
+import com.tari.android.wallet.ui.fragment.settings.backup.backupSettings.option.BackupOptionViewModel
 import com.tari.android.wallet.ui.fragment.settings.userAutorization.BiometricAuthenticationViewModel
-import org.joda.time.DateTime
-import org.joda.time.format.DateTimeFormat
-import java.util.*
 
 class BackupSettingsFragment : CommonFragment<FragmentWalletBackupSettingsBinding, BackupSettingsViewModel>() {
-
-    private var optionsAnimation: Animator? = null
 
     private val biometricAuthenticationViewModel: BiometricAuthenticationViewModel by viewModels()
 
@@ -76,8 +64,13 @@ class BackupSettingsFragment : CommonFragment<FragmentWalletBackupSettingsBindin
         BiometricAuthenticationViewModel.bindToFragment(biometricAuthenticationViewModel, this)
         viewModel.biometricAuthenticationViewModel = biometricAuthenticationViewModel
 
-        setupUI()
+        setupCTAs()
         subscribeUI()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        onActivityResult(0, 0, null)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -90,59 +83,23 @@ class BackupSettingsFragment : CommonFragment<FragmentWalletBackupSettingsBindin
         setSeedWordVerificationStateIcon()
     }
 
-    private fun setupUI() {
-        setupViews()
-        setupCTAs()
-    }
-
-    private fun setupViews() = with(ui) {
-        backupPermissionProgressBar.setColor(color(back_up_settings_permission_processing))
-        cloudBackupStatusProgressView.setColor(color(all_settings_back_up_status_processing))
-        initBackupOptions()
-    }
-
     private fun setupCTAs() = with(ui) {
         backCtaView.setOnClickListener(ThrottleClick { requireActivity().onBackPressed() })
         backupWithRecoveryPhraseCtaView.setOnClickListener(ThrottleClick { viewModel.onBackupWithRecoveryPhrase() })
         backupWalletToCloudCtaView.setOnClickListener(ThrottleClick { viewModel.onBackupToCloud() })
         updatePasswordCtaView.setOnClickListener(ThrottleClick { viewModel.onUpdatePassword() })
-        setPermissionSwitchListener()
-    }
-
-    private fun setPermissionSwitchListener() {
-        ui.backupPermissionSwitch.setOnCheckedChangeListener { _, isChecked -> viewModel.onBackupPermissionSwitch(isChecked) }
     }
 
     private fun subscribeUI() = with(viewModel) {
         observe(navigation) { processNavigation(it) }
 
-        observe(cloudBackupStatus) { processCloudBackupStatus(it) }
-
-        observe(openFolderSelection) { backupManager.setupStorage(this@BackupSettingsFragment) }
-
         observe(backupStateChanged) { resetStatusIcons() }
 
-        observe(isBackupAvailable) { onChangeIsBackupAvailable(it) }
+        observe(isBackupNowAvailable) { ui.backupWalletToCloudCtaContainerView.setVisible(it) }
 
-        observe(backupWalletToCloudEnabled) { ui.backupWalletToCloudCtaView.isEnabled = it }
+        observe(setPasswordVisible) { ui.updatePasswordCtaView.setVisible(it) }
 
-        observe(inProgress) { onChangeInProgress(it) }
-
-        observe(backupPermissionSwitch) { setSwitchCheck(it) }
-
-        observe(isBackupNowEnabled) { ui.backupNowTextView.alpha = if (it) ALPHA_VISIBLE else ALPHA_DISABLED }
-
-        observe(backupPassword) { updatePasswordChangeLabel(if (it.isPresent) it.get() else null) }
-
-        observe(updatePasswordEnabled) { onChangeUpdatePasswordEnabled(it) }
-
-        observe(lastSuccessfulBackupDate) { updateLastSuccessfulBackupDate(if (it.isPresent) it.get() else null) }
-
-        observe(backupOptionsVisibility) { if (it) showBackupOptionsWithAnimation() else hideAllBackupOptionsWithAnimation() }
-
-        observeOnLoad(backupOptionsAreVisible)
-
-        observeOnLoad(folderSelectionWasSuccessful)
+        observe(options) { initBackupOptions(it) }
     }
 
     private fun processNavigation(navigation: BackupSettingsNavigation) {
@@ -154,54 +111,16 @@ class BackupSettingsFragment : CommonFragment<FragmentWalletBackupSettingsBindin
         }
     }
 
-    private fun initBackupOptions() {
-        if (viewModel.backupSettingsRepository.backupIsEnabled) {
-            if (EventBus.backupState.publishSubject.value is BackupUpToDate) {
-                ui.backupWalletToCloudCtaContainerView.gone()
-            }
-        } else {
-            hideAllBackupOptions()
-            ui.lastBackupTimeTextView.gone()
+    private fun initBackupOptions(options: List<BackupOptionViewModel>) {
+        for (option in options) {
+            val backupOptionView = BackupOptionView(requireContext())
+            backupOptionView.viewLifecycle = viewLifecycleOwner
+            backupOptionView.init(this, option)
+            ui.optionsContainer.addView(backupOptionView)
         }
     }
 
-    private fun hideAllBackupOptions() {
-        if (viewModel.backupOptionsAreVisible.value!!) {
-            arrayOf(
-                ui.backupsSeparatorView,
-                ui.updatePasswordCtaView,
-                ui.backupWalletToCloudCtaContainerView,
-                ui.lastBackupTimeTextView
-            ).forEach(View::gone)
-            viewModel.backupOptionsAreVisible.postValue(false)
-        }
-    }
-
-    private fun onChangeIsBackupAvailable(isAvailable: Boolean) {
-        if (isAvailable) animateBackupButtonAvailability() else animateBackupButtonUnavailability()
-    }
-
-    private fun onChangeInProgress(inProgress: Boolean) = with(ui) {
-        backupPermissionSwitch.setVisible(!inProgress, View.INVISIBLE)
-        backupPermissionProgressBar.setVisible(inProgress, View.INVISIBLE)
-    }
-
-    private fun onChangeUpdatePasswordEnabled(isEnabled: Boolean) = with(ui) {
-        updatePasswordCtaView.isEnabled = isEnabled
-        updatePasswordLabelTextView.alpha = if (isEnabled) ALPHA_VISIBLE else ALPHA_DISABLED
-        updatePasswordArrowImageView.alpha = if (isEnabled) ALPHA_VISIBLE else ALPHA_DISABLED
-    }
-
-    private fun setSwitchCheck(isChecked: Boolean) = with(ui) {
-        backupPermissionSwitch.setOnCheckedChangeListener(null)
-        backupPermissionSwitch.isChecked = isChecked
-        setPermissionSwitchListener()
-    }
-
-    private fun resetStatusIcons() = with(ui) {
-        cloudBackupStatusProgressView.invisible()
-        cloudBackupStatusSuccessView.invisible()
-        cloudBackupStatusWarningView.invisible()
+    private fun resetStatusIcons() {
         setSeedWordVerificationStateIcon()
     }
 
@@ -211,180 +130,7 @@ class BackupSettingsFragment : CommonFragment<FragmentWalletBackupSettingsBindin
         backupWithRecoveryPhraseWarningView.setVisible(!hasVerifiedSeedWords)
     }
 
-    private fun updatePasswordChangeLabel(password: String?) {
-        val textId = if (password == null) back_up_wallet_set_backup_password_cta else back_up_wallet_change_backup_password_cta
-        ui.updatePasswordLabelTextView.text = string(textId)
-    }
-
-    private fun updateLastSuccessfulBackupDate(lastSuccessfulBackupDate: DateTime?) {
-        ui.lastBackupTimeTextView.visible()
-        if (lastSuccessfulBackupDate == null) {
-            ui.lastBackupTimeTextView.text = ""
-        } else {
-            val date = lastSuccessfulBackupDate.toLocalDateTime()
-            ui.lastBackupTimeTextView.text = string(
-                back_up_wallet_last_successful_backup,
-                BACKUP_DATE_FORMATTER.print(date),
-                BACKUP_TIME_FORMATTER.print(date)
-            )
-        }
-    }
-
-    private fun processCloudBackupStatus(status: CloudBackupStatus) {
-        val view = when (status) {
-            CloudBackupStatus.Success -> ui.cloudBackupStatusSuccessView
-            is CloudBackupStatus.InProgress -> ui.cloudBackupStatusProgressView
-            CloudBackupStatus.Scheduled -> ui.cloudBackupStatusScheduledView
-            is CloudBackupStatus.Warning -> ui.cloudBackupStatusWarningView
-        }
-        activateBackupStatusView(view, status.text, status.color)
-    }
-
-
-    private fun activateBackupStatusView(icon: View?, textId: Int = -1, textColor: Int = -1) = with(ui) {
-        val isVisible = icon == null
-        cloudBackupStatusProgressView.setVisible(isVisible, View.INVISIBLE)
-        cloudBackupStatusSuccessView.setVisible(isVisible, View.INVISIBLE)
-        cloudBackupStatusWarningView.setVisible(isVisible, View.INVISIBLE)
-        cloudBackupStatusScheduledView.setVisible(isVisible, View.INVISIBLE)
-        val hideText = textId == -1
-        backupStatusTextView.text = if (hideText) "" else string(textId)
-        backupStatusTextView.setVisible(!hideText)
-        if (textColor != -1) backupStatusTextView.setTextColor(color(textColor))
-    }
-
-    // region Backup button animations
-    private fun animateBackupButtonAvailability() {
-        if (viewModel.backupOptionsAreVisible.value == true &&
-            ui.backupWalletToCloudCtaContainerView.visibility != View.VISIBLE &&
-            (optionsAnimation == null || !optionsAnimation!!.isRunning)
-        ) {
-            optionsAnimation = ValueAnimator.ofFloat(ALPHA_INVISIBLE, ALPHA_VISIBLE).apply {
-                duration = OPTIONS_ANIMATION_DURATION
-                interpolator = LinearInterpolator()
-                addUpdateListener { ui.backupWalletToCloudCtaContainerView.alpha = it.animatedValue as Float }
-                addListener(
-                    onStart = {
-                        ui.backupWalletToCloudCtaContainerView.alpha = ALPHA_INVISIBLE
-                        ui.backupWalletToCloudCtaContainerView.visible()
-                    }
-                )
-                start()
-            }
-        }
-    }
-
-    private fun animateBackupButtonUnavailability() {
-        val animation = optionsAnimation
-        if (ui.backupWalletToCloudCtaContainerView.visibility != View.GONE && (animation == null || !animation.isRunning)) {
-            optionsAnimation = ValueAnimator.ofFloat(ALPHA_VISIBLE, ALPHA_INVISIBLE).apply {
-                duration = OPTIONS_ANIMATION_DURATION
-                interpolator = LinearInterpolator()
-                addUpdateListener { ui.backupWalletToCloudCtaContainerView.alpha = it.animatedValue as Float }
-                addListener(
-                    onStart = { ui.backupWalletToCloudCtaContainerView.alpha = ALPHA_VISIBLE },
-                    onEnd = { ui.backupWalletToCloudCtaContainerView.gone() },
-                    onCancel = { ui.backupWalletToCloudCtaContainerView.gone() }
-                )
-                start()
-            }
-        }
-    }
-    // endRegion
-
-
-    // region Backup options animations
-
-    private fun showBackupOptionsWithAnimation() {
-        if (viewModel.backupOptionsAreVisible.value!!) return
-        val views = arrayOf(
-            ui.backupsSeparatorView,
-            ui.updatePasswordCtaView,
-            ui.lastBackupTimeTextView,
-            ui.backupWalletToCloudCtaContainerView
-        )
-        optionsAnimation?.cancel()
-        optionsAnimation = ValueAnimator.ofFloat(ALPHA_INVISIBLE, ALPHA_VISIBLE).apply {
-            duration = OPTIONS_ANIMATION_DURATION
-            interpolator = LinearInterpolator()
-            addUpdateListener {
-                val alpha = it.animatedValue as Float
-                views.forEach { v -> v.alpha = alpha }
-            }
-            addListener(
-                onStart = {
-                    views.forEach { v ->
-                        v.visible()
-                        v.alpha = ALPHA_INVISIBLE
-                    }
-                },
-                onCancel = {
-                    views.forEach { v -> v.alpha = ALPHA_VISIBLE }
-                    if (EventBus.backupState.publishSubject.value is BackupUpToDate) {
-                        animateBackupButtonUnavailability()
-                    }
-                },
-                onEnd = {
-                    if (EventBus.backupState.publishSubject.value is BackupUpToDate) {
-                        animateBackupButtonUnavailability()
-                    }
-                }
-            )
-            start()
-        }
-        viewModel.backupOptionsAreVisible.postValue(true)
-    }
-
-    private fun hideAllBackupOptionsWithAnimation() {
-        if (!viewModel.backupOptionsAreVisible.value!!) return
-        val views = arrayOf(
-            ui.backupsSeparatorView,
-            ui.updatePasswordCtaView,
-            ui.backupWalletToCloudCtaContainerView,
-            ui.lastBackupTimeTextView
-        )
-        val wasClickable = views.map { it.isClickable }
-        optionsAnimation?.cancel()
-        optionsAnimation = ValueAnimator.ofFloat(ALPHA_VISIBLE, ALPHA_INVISIBLE).apply {
-            duration = OPTIONS_ANIMATION_DURATION
-            interpolator = LinearInterpolator()
-            addUpdateListener {
-                val alpha = it.animatedValue as Float
-                views.forEach { v -> v.alpha = alpha }
-            }
-            val finalizeAnimation: (Animator?) -> Unit = {
-                views.zip(wasClickable).forEach { (view, wasClickable) ->
-                    view.isClickable = wasClickable
-                    view.gone()
-                    view.alpha = ALPHA_VISIBLE
-                }
-            }
-            addListener(
-                onStart = {
-                    views.forEach { v ->
-                        v.isClickable = false
-                        v.alpha = ALPHA_VISIBLE
-                    }
-                },
-                onEnd = finalizeAnimation,
-                onCancel = finalizeAnimation
-            )
-            start()
-        }
-        viewModel.backupOptionsAreVisible.postValue(false)
-    }
-    // endRegion
-
     companion object {
         fun newInstance() = BackupSettingsFragment()
-
-        private val BACKUP_DATE_FORMATTER = DateTimeFormat.forPattern("MMM dd yyyy").withLocale(Locale.ENGLISH)
-        private val BACKUP_TIME_FORMATTER = DateTimeFormat.forPattern("hh:mm a")
-        private const val OPTIONS_ANIMATION_DURATION = 500L
-        private const val ALPHA_INVISIBLE = 0F
-        private const val ALPHA_VISIBLE = 1F
-        private const val ALPHA_DISABLED = 0.15F
     }
 }
-
-

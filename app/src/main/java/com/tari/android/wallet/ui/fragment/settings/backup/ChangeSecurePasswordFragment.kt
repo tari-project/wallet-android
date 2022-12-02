@@ -58,17 +58,16 @@ import com.tari.android.wallet.di.DiContainer.appComponent
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.infrastructure.backup.BackupManager
 import com.tari.android.wallet.infrastructure.backup.BackupState
-import com.tari.android.wallet.infrastructure.backup.BackupState.BackupOutOfDate
+import com.tari.android.wallet.infrastructure.backup.BackupState.BackupFailed
 import com.tari.android.wallet.infrastructure.backup.BackupState.BackupUpToDate
-import com.tari.android.wallet.infrastructure.backup.BackupStorageAuthRevokedException
-import com.tari.android.wallet.ui.fragment.settings.backup.activity.BackupSettingsRouter
 import com.tari.android.wallet.ui.common.domain.ResourceManager
 import com.tari.android.wallet.ui.dialog.error.ErrorDialogArgs
 import com.tari.android.wallet.ui.dialog.modular.ModularDialog
 import com.tari.android.wallet.ui.extension.*
+import com.tari.android.wallet.ui.fragment.settings.backup.activity.BackupSettingsRouter
+import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupSettingsRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import java.net.UnknownHostException
 import javax.inject.Inject
 
@@ -83,10 +82,11 @@ class ChangeSecurePasswordFragment : Fragment() {
     @Inject
     lateinit var resourceManager: ResourceManager
 
+    @Inject
+    lateinit var backupSharedPrefsRepository: BackupSettingsRepository
+
     private lateinit var ui: FragmentChangeSecurePasswordBinding
     private lateinit var inputService: InputMethodManager
-
-    private var subscribedToBackupState = false
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -94,7 +94,7 @@ class ChangeSecurePasswordFragment : Fragment() {
         appComponent.inject(this)
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?) =
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
         FragmentChangeSecurePasswordBinding.inflate(inflater, container, false).also { ui = it }.root
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -128,15 +128,13 @@ class ChangeSecurePasswordFragment : Fragment() {
         ui.enterPasswordEditText.postDelayed({
             ui.enterPasswordEditText.requestFocus()
             requireActivity().showKeyboard()
-            ui.enterPasswordEditText
-                .postDelayed(KEYBOARD_ANIMATION_TIME) { ui.contentScrollView.scrollToBottom() }
+            ui.enterPasswordEditText.postDelayed(KEYBOARD_ANIMATION_TIME) { ui.contentScrollView.scrollToBottom() }
         }, KEYBOARD_SHOW_UP_DELAY_AFTER_LOCAL_AUTH)
     }
 
     private fun setPageDescription() {
         val generalPart = string(change_password_page_description_general_part)
-        val highlightedPart =
-            SpannableString(string(change_password_page_description_highlight_part))
+        val highlightedPart = SpannableString(string(change_password_page_description_highlight_part))
         val spanColor = ForegroundColorSpan(color(black))
         highlightedPart.setSpan(spanColor, 0, highlightedPart.length, SPAN_EXCLUSIVE_EXCLUSIVE)
         ui.pageDescriptionTextView.text = SpannableStringBuilder().apply {
@@ -151,47 +149,28 @@ class ChangeSecurePasswordFragment : Fragment() {
         ui.enterPasswordEditText.addTextChangedListener(afterTextChanged = {
             updateVerifyButtonStateBasedOnEditTexts(
                 it,
-                !passwordIsLongEnough()
-                        || (!ui.confirmPasswordEditText.text.isNullOrEmpty() && !doPasswordsMatch())
+                !passwordIsLongEnough() || (!ui.confirmPasswordEditText.text.isNullOrEmpty() && !doPasswordsMatch())
             )
         }
         )
         ui.confirmPasswordEditText.addTextChangedListener(afterTextChanged = {
             updateVerifyButtonStateBasedOnEditTexts(
                 it,
-                !passwordIsLongEnough()
-                        || (!ui.confirmPasswordEditText.text.isNullOrEmpty() && !doPasswordsMatch())
+                !passwordIsLongEnough() || (!ui.confirmPasswordEditText.text.isNullOrEmpty() && !doPasswordsMatch())
             )
         })
         val passwordTextFieldListener = View.OnFocusChangeListener { _, _ ->
             // password
-            if (!ui.enterPasswordEditText.hasFocus()
-                && !passwordIsLongEnough()
-            ) {
+            if (!ui.enterPasswordEditText.hasFocus() && !passwordIsLongEnough()) {
                 setPasswordTooShortErrorState()
             } else {
-                setPlainInputState(
-                    ui.passwordTooShortLabelView,
-                    listOf(
-                        ui.enterPasswordEditText,
-                        ui.enterPasswordLabelTextView
-                    )
-                )
+                setPlainInputState(ui.passwordTooShortLabelView, listOf(ui.enterPasswordEditText, ui.enterPasswordLabelTextView))
             }
             // confirm
-            if (!ui.confirmPasswordEditText.hasFocus()
-                && passwordIsLongEnough()
-                && !doPasswordsMatch()
-            ) {
+            if (!ui.confirmPasswordEditText.hasFocus() && passwordIsLongEnough() && !doPasswordsMatch()) {
                 setPasswordMatchErrorState()
             } else {
-                setPlainInputState(
-                    ui.passwordsNotMatchLabelView,
-                    listOf(
-                        ui.confirmPasswordEditText,
-                        ui.confirmPasswordLabelTextView
-                    )
-                )
+                setPlainInputState(ui.passwordsNotMatchLabelView, listOf(ui.confirmPasswordEditText, ui.confirmPasswordLabelTextView))
             }
         }
         ui.enterPasswordEditText.onFocusChangeListener = passwordTextFieldListener
@@ -204,44 +183,26 @@ class ChangeSecurePasswordFragment : Fragment() {
         }
     }
 
-    private fun updateVerifyButtonStateBasedOnEditTexts(
-        trigger: Editable?,
-        errorCondition: Boolean
-    ) {
+    private fun updateVerifyButtonStateBasedOnEditTexts(trigger: Editable?, errorCondition: Boolean) {
         val passwordIsLongEnough = passwordIsLongEnough()
         val passwordsMatch = doPasswordsMatch()
         if (passwordsMatch || trigger.isNullOrEmpty()) {
             val canChangePassword = areTextFieldsFilled() && passwordIsLongEnough && passwordsMatch
             setVerifyButtonState(isEnabled = canChangePassword)
             if (canChangePassword) {
-                setPlainInputState(
-                    ui.passwordTooShortLabelView,
-                    listOf(
-                        ui.enterPasswordEditText,
-                        ui.enterPasswordLabelTextView
-                    )
-                )
-                setPlainInputState(
-                    ui.passwordsNotMatchLabelView,
-                    listOf(
-                        ui.confirmPasswordEditText,
-                        ui.confirmPasswordLabelTextView
-                    )
-                )
+                setPlainInputState(ui.passwordTooShortLabelView, listOf(ui.enterPasswordEditText, ui.enterPasswordLabelTextView))
+                setPlainInputState(ui.passwordsNotMatchLabelView, listOf(ui.confirmPasswordEditText, ui.confirmPasswordLabelTextView))
             }
         } else if (errorCondition) {
             setVerifyButtonState(isEnabled = false)
         }
     }
 
-    private fun areTextFieldsFilled() = ui.enterPasswordEditText.text!!.isNotEmpty() &&
-            ui.confirmPasswordEditText.text!!.isNotEmpty()
+    private fun areTextFieldsFilled() = ui.enterPasswordEditText.text!!.isNotEmpty() && ui.confirmPasswordEditText.text!!.isNotEmpty()
 
-    private fun passwordIsLongEnough() =
-        (ui.enterPasswordEditText.text?.toString() ?: "").length >= 6
+    private fun passwordIsLongEnough() = (ui.enterPasswordEditText.text?.toString() ?: "").length >= 6
 
-    private fun doPasswordsMatch() =
-        ui.confirmPasswordEditText.text?.toString() == ui.enterPasswordEditText.text?.toString()
+    private fun doPasswordsMatch() = ui.confirmPasswordEditText.text?.toString() == ui.enterPasswordEditText.text?.toString()
 
     private fun setPlainInputState(errorLabel: TextView, inputTextViews: Iterable<TextView>) {
         errorLabel.gone()
@@ -270,9 +231,7 @@ class ChangeSecurePasswordFragment : Fragment() {
     }
 
     private fun setCTAs() {
-        ui.backCtaView.setOnClickListener(
-            ThrottleClick { requireActivity().onBackPressed() }
-        )
+        ui.backCtaView.setOnClickListener(ThrottleClick { requireActivity().onBackPressed() })
         ui.setPasswordCtaTextView.setOnClickListener {
             ui.setPasswordCtaContainerView.animateClick()
             requireActivity().hideKeyboard()
@@ -307,47 +266,27 @@ class ChangeSecurePasswordFragment : Fragment() {
     }
 
     private fun performBackupAndUpdatePassword() {
-        val password = (ui.enterPasswordEditText.text!!.toString()).toCharArray()
         // start listening to wallet events
         subscribeToBackupState()
-        lifecycleScope.launch(Dispatchers.IO) {
-            // backup
-            try {
-                backupManager.backup(newPassword = password)
-            } catch (exception: BackupStorageAuthRevokedException) {
-                withContext(Dispatchers.Main) {
-                    displayStorageAuthRevokedDialog()
-                }
-            }
-        }
-    }
-
-    private fun displayStorageAuthRevokedDialog() {
-        val message = string(check_backup_storage_status_auth_revoked_error_description)
-        val args = ErrorDialogArgs(string(back_up_wallet_backing_up_error_title), message) { requireActivity().onBackPressed() }
-        ModularDialog(requireContext(), args.getModular(resourceManager)).show()
+        backupSharedPrefsRepository.backupPassword = ui.enterPasswordEditText.text!!.toString()
+        backupManager.backupNow()
     }
 
     private fun subscribeToBackupState() {
         EventBus.backupState.subscribe(this) { backupState ->
             lifecycleScope.launch(Dispatchers.Main) {
-                onBackupStateChanged(backupState)
+                onBackupStateChanged(backupState.backupsState)
             }
         }
     }
 
     private fun onBackupStateChanged(backupState: BackupState?) {
-        if (!subscribedToBackupState) {
-            // ignore first call
-            subscribedToBackupState = true
-            return
-        }
         when (backupState) {
-            is BackupUpToDate -> { // backup successful
+            is BackupUpToDate -> {
                 allowExitAndPasswordEditing()
                 (requireActivity() as BackupSettingsRouter).onPasswordChanged(this)
             }
-            is BackupOutOfDate -> { // backup failed
+            is BackupFailed -> { // backup failed
                 showBackupErrorDialog(deductBackupErrorMessage(backupState.backupException)) {
                     allowExitAndPasswordEditing()
                     setSecurePasswordCtaIdleState()
@@ -357,7 +296,7 @@ class ChangeSecurePasswordFragment : Fragment() {
         }
     }
 
-    private fun deductBackupErrorMessage(e: Exception?): String = when {
+    private fun deductBackupErrorMessage(e: Throwable?): String = when {
         e is UnknownHostException -> string(error_no_connection_title)
         e?.message != null -> string(back_up_wallet_backing_up_error_desc, e.message!!)
         else -> string(back_up_wallet_backing_up_unknown_error)

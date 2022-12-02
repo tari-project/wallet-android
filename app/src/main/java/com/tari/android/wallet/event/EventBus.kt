@@ -33,8 +33,8 @@
 package com.tari.android.wallet.event
 
 import com.tari.android.wallet.application.WalletState
-import com.tari.android.wallet.infrastructure.backup.BackupState
 import com.tari.android.wallet.model.BalanceInfo
+import com.tari.android.wallet.infrastructure.backup.BackupsState
 import com.tari.android.wallet.model.recovery.WalletRestorationResult
 import com.tari.android.wallet.network.NetworkConnectionState
 import com.tari.android.wallet.service.baseNode.BaseNodeState
@@ -61,7 +61,7 @@ object EventBus : GeneralEventBus() {
 
     val networkConnectionState = BehaviorEventBus<NetworkConnectionState>()
 
-    val backupState = BehaviorEventBus<BackupState>()
+    val backupState = BehaviorEventBus<BackupsState>()
 
     val baseNodeState = BehaviorEventBus<BaseNodeState>()
 

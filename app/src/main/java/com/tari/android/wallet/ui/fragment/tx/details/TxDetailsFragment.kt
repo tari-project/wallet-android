@@ -100,12 +100,12 @@ class TxDetailsFragment : CommonFragment<FragmentTxDetailsBinding, TxDetailsView
         val viewModel: TxDetailsViewModel by viewModels()
         bindViewModel(viewModel)
 
-        val tx = arguments?.getParcelable<Tx>(TX_EXTRA_KEY)
+        val tx = arguments?.parcelable<Tx>(TX_EXTRA_KEY)
         if (tx != null) {
             viewModel.setTxArg(tx)
         }
 
-        val txId = arguments?.getParcelable<TxId>(TX_ID_EXTRA_KEY)
+        val txId = arguments?.parcelable<TxId>(TX_ID_EXTRA_KEY)
         if (txId != null) {
             viewModel.loadTxById(txId)
         }
@@ -213,8 +213,8 @@ class TxDetailsFragment : CommonFragment<FragmentTxDetailsBinding, TxDetailsView
     }
 
     private fun setFullEmojiId(tx: Tx) {
-        fullEmojiIdViewController.fullEmojiId = tx.user.publicKey.emojiId
-        fullEmojiIdViewController.emojiIdHex = tx.user.publicKey.hexString
+        fullEmojiIdViewController.fullEmojiId = tx.user.walletAddress.emojiId
+        fullEmojiIdViewController.emojiIdHex = tx.user.walletAddress.hexString
     }
 
     private fun setFeeData(fee: MicroTari) {
@@ -247,7 +247,7 @@ class TxDetailsFragment : CommonFragment<FragmentTxDetailsBinding, TxDetailsView
         val state = TxState.from(tx)
         ui.fromTextView.text =
             if (state.direction == INBOUND) string(common_from) else string(common_to)
-        emojiIdSummaryController.display(tx.user.publicKey.emojiId)
+        emojiIdSummaryController.display(tx.user.walletAddress.emojiId)
     }
 
     private fun setTxStatusData(tx: Tx) {
@@ -257,7 +257,7 @@ class TxDetailsFragment : CommonFragment<FragmentTxDetailsBinding, TxDetailsView
             tx is CancelledTx -> ""
             state == TxState(INBOUND, PENDING) -> string(tx_detail_waiting_for_sender_to_complete)
             state == TxState(OUTBOUND, PENDING) -> string(tx_detail_waiting_for_recipient)
-            state == TxState(INBOUND, FAUX_UNCONFIRMED) -> ""
+            state == TxState(INBOUND, FAUX_UNCONFIRMED) || state == TxState(INBOUND, FAUX_CONFIRMED) -> ""
             state.status != MINED_CONFIRMED && state.status != COINBASE -> string(
                 tx_detail_completing_final_processing,
                 if (tx is CompletedTx) tx.confirmationCount.toInt() + 1 else 1,

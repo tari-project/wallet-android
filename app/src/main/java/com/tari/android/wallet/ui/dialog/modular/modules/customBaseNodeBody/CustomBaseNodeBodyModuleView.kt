@@ -1,5 +1,6 @@
 package com.tari.android.wallet.ui.dialog.modular.modules.customBaseNodeBody
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -10,6 +11,7 @@ import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.component.common.CommonView
 import yat.android.ui.extension.HtmlHelper
 
+@SuppressLint("ViewConstructor")
 class CustomBaseNodeBodyModuleView(context: Context, module: CustomBaseNodeBodyModule) : CommonView<CommonViewModel, DialogModuleHeadBinding>(context) {
 
     override fun bindingInflate(layoutInflater: LayoutInflater, parent: ViewGroup?, attachToRoot: Boolean): DialogModuleHeadBinding =

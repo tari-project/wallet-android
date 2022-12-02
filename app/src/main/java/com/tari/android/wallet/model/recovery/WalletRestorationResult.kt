@@ -1,5 +1,6 @@
 package com.tari.android.wallet.model.recovery
 
+import com.orhanobut.logger.Logger
 import java.nio.ByteBuffer
 
 // If connection to a base node is successful the flow of callbacks should be:
@@ -18,16 +19,21 @@ import java.nio.ByteBuffer
 sealed class WalletRestorationResult {
     class ConnectingToBaseNode : WalletRestorationResult()
     class ConnectedToBaseNode : WalletRestorationResult()
-    class ConnectionToBaseNodeFailed(val retryCount: Long, val retryLimit: Long) : WalletRestorationResult()
+    class ConnectionToBaseNodeFailed(val retryCount: Long, val retryLimit: Long) : WalletRestorationResult() {
+        override fun toString(): String = "${this.javaClass.simpleName} $retryCount / $retryLimit"
+    }
     class Progress(val currentBlock: Long, val numberOfBlocks: Long) : WalletRestorationResult()
     class Completed(val numberOfUTXO: Long, val microTari: ByteArray) : WalletRestorationResult()
-    class ScanningRoundFailed(val retryCount: Long, val retryLimit: Long) : WalletRestorationResult()
+    class ScanningRoundFailed(val retryCount: Long, val retryLimit: Long) : WalletRestorationResult() {
+        override fun toString(): String = "${this.javaClass.simpleName} $retryCount / $retryLimit"
+    }
     class RecoveryFailed : WalletRestorationResult()
 
     companion object {
         fun create(event: Int, firstArg: ByteArray, secondArgs: ByteArray) : WalletRestorationResult {
             val first = bytesToLong(firstArg)
             val second = bytesToLong(secondArgs)
+            Logger.t("WalletRestorationResult $event $first $second")
             return when(event) {
                 0 -> ConnectingToBaseNode()
                 1 -> ConnectedToBaseNode()

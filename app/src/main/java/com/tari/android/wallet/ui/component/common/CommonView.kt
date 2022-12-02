@@ -10,8 +10,7 @@ import android.widget.LinearLayout
 import androidx.lifecycle.LifecycleOwner
 import androidx.viewbinding.ViewBinding
 import com.tari.android.wallet.ui.common.CommonViewModel
-import com.tari.android.wallet.ui.dialog.TariDialog
-import com.tari.android.wallet.ui.dialog.inProgress.TariProgressDialog
+import com.tari.android.wallet.ui.common.DialogManager
 import com.tari.android.wallet.ui.dialog.modular.ModularDialog
 
 abstract class CommonView<VM : CommonViewModel, VB : ViewBinding> : LinearLayout {
@@ -20,7 +19,7 @@ abstract class CommonView<VM : CommonViewModel, VB : ViewBinding> : LinearLayout
     lateinit var ui: VB
         private set
 
-    private var currentDialog: TariDialog? = null
+    private val dialogManager = DialogManager()
 
     abstract fun bindingInflate(layoutInflater: LayoutInflater, parent: ViewGroup?, attachToRoot: Boolean): VB
 
@@ -45,6 +44,7 @@ abstract class CommonView<VM : CommonViewModel, VB : ViewBinding> : LinearLayout
     private fun init() {
         ui = bindingInflate(LayoutInflater.from(context), this, true)
 
+        dialogManager.context = context
         setup()
     }
 
@@ -55,30 +55,10 @@ abstract class CommonView<VM : CommonViewModel, VB : ViewBinding> : LinearLayout
 
         viewModel.openLink.observe(viewLifecycle) { context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(it))) }
 
-        viewModel.modularDialog.observe(viewLifecycle) { replaceDialog(ModularDialog(context, it)) }
-    }
+        viewModel.modularDialog.observe(viewLifecycle) { dialogManager.replace(ModularDialog(context, it)) }
 
-    //todo extract to DialogManager or something
-    protected fun replaceDialog(dialog: TariDialog) {
-        val currentLoadingDialog = currentDialog as? TariProgressDialog
-        if (currentLoadingDialog != null && currentLoadingDialog.isShowing() && dialog is TariProgressDialog) {
-            (currentDialog as TariProgressDialog).applyArgs(dialog.progressDialogArgs)
-            return
-        }
-        val currentModularDialog = currentDialog as? ModularDialog
-        val newModularDialog = dialog as? ModularDialog
-        if (currentModularDialog != null && newModularDialog != null && currentModularDialog.args::class.java == newModularDialog.args::class.java
-            && currentModularDialog.isShowing()
-        ) {
-            currentModularDialog.applyArgs(newModularDialog.args)
-            return
-        }
+        viewModel.dismissDialog.observe(viewLifecycle) { dialogManager.dismiss() }
 
-        if (newModularDialog?.args?.dialogArgs?.isRefreshing == true) {
-            return
-        }
-
-        currentDialog?.dismiss()
-        currentDialog = dialog.also { it.show() }
+        viewModel.loadingDialog.observe(viewLifecycle) { dialogManager.handleProgress(it) }
     }
 }

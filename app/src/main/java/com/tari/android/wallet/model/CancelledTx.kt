@@ -36,6 +36,8 @@ import android.os.Parcel
 import android.os.Parcelable
 import com.tari.android.wallet.ffi.FFICompletedTx
 import com.tari.android.wallet.ffi.FFITxCancellationReason
+import com.tari.android.wallet.ui.extension.readP
+import com.tari.android.wallet.ui.extension.readS
 import java.math.BigInteger
 
 /**
@@ -64,17 +66,17 @@ class CancelledTx() : Tx(), Parcelable {
     // region Parcelable
 
     constructor(parcel: Parcel) : this() {
-        id = parcel.readSerializable() as BigInteger
-        direction = parcel.readSerializable() as Direction
+        id = parcel.readS(BigInteger::class.java)
+        direction = parcel.readS(Direction::class.java)
         val userIsContact = parcel.readSerializable() == Contact::class.java
         user =
-            if (userIsContact) parcel.readParcelable(Contact::class.java.classLoader)!!
-            else parcel.readParcelable(User::class.java.classLoader)!!
-        amount = parcel.readParcelable(MicroTari::class.java.classLoader)!!
-        fee = parcel.readParcelable(MicroTari::class.java.classLoader)!!
-        timestamp = parcel.readSerializable() as BigInteger
-        message = parcel.readString() ?: ""
-        status = parcel.readSerializable() as TxStatus
+            if (userIsContact) parcel.readP(Contact::class.java)
+            else parcel.readP(User::class.java)
+        amount = parcel.readP(MicroTari::class.java)
+        fee = parcel.readP(MicroTari::class.java)
+        timestamp = parcel.readS(BigInteger::class.java)
+        message = parcel.readString().orEmpty()
+        status = parcel.readP(TxStatus::class.java)
     }
 
     override fun toString(): String = "CanceledTx(fee=$fee, status=$status) ${super.toString()}"

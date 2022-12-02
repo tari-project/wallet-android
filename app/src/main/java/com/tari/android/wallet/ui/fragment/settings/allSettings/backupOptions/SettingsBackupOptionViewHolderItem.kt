@@ -5,7 +5,6 @@ import com.tari.android.wallet.ui.fragment.settings.allSettings.PresentationBack
 
 class SettingsBackupOptionViewHolderItem(
     var backupState: PresentationBackupState? = null,
-    var lastBackupDate: String = "",
     val leftIconId: Int,
     val action: () -> Unit
 ) : CommonViewHolderItem()

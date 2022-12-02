@@ -39,7 +39,6 @@ package com.tari.android.wallet
 
 import android.content.Context
 import androidx.test.core.app.ApplicationProvider.getApplicationContext
-import com.tari.android.wallet.application.Network
 import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepositoryImpl
 import com.tari.android.wallet.di.ApplicationModule
 import com.tari.android.wallet.di.WalletModule
@@ -65,9 +64,8 @@ class FFICommsConfigTests {
         private const val DB_NAME = "tari_test_db"
         private var walletDir = ""
         private val context = getApplicationContext<Context>()
-        private val resourceManager = ResourceManager(context)
         private val prefs = context.getSharedPreferences(ApplicationModule.sharedPrefsFileName, Context.MODE_PRIVATE)
-        private val networkRepository = NetworkRepositoryImpl(resourceManager, prefs)
+        private val networkRepository = NetworkRepositoryImpl(prefs)
 
         @BeforeClass
         @JvmStatic

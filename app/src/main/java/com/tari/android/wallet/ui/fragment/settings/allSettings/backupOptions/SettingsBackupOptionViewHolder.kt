@@ -19,7 +19,6 @@ class SettingsBackupOptionViewHolder(view: ItemSettingsBackupOptionBinding) :
         ui.leftIcon.setImageResource(item.leftIconId)
         ui.cloudBackupStatusProgressView.setColor(color(R.color.all_settings_back_up_status_processing))
         ui.backUpWalletCtaView.setOnClickListener { item.action.invoke() }
-        ui.lastBackupTimeTextView.text = item.lastBackupDate
 
         item.backupState?.let { activateBackupStatusView(it) }
     }
@@ -29,7 +28,6 @@ class SettingsBackupOptionViewHolder(view: ItemSettingsBackupOptionBinding) :
             PresentationBackupState.BackupStateStatus.InProgress -> ui.cloudBackupStatusProgressView
             PresentationBackupState.BackupStateStatus.Success -> ui.cloudBackupStatusSuccessView
             PresentationBackupState.BackupStateStatus.Warning -> ui.cloudBackupStatusWarningView
-            PresentationBackupState.BackupStateStatus.Scheduled -> ui.cloudBackupStatusScheduledView
         }
 
         fun View.adjustVisibility() {
@@ -39,7 +37,6 @@ class SettingsBackupOptionViewHolder(view: ItemSettingsBackupOptionBinding) :
         ui.cloudBackupStatusProgressView.adjustVisibility()
         ui.cloudBackupStatusSuccessView.adjustVisibility()
         ui.cloudBackupStatusWarningView.adjustVisibility()
-        ui.cloudBackupStatusScheduledView.adjustVisibility()
         val hideText = backupState.textId == -1
         ui.backupStatusTextView.text = if (hideText) "" else string(backupState.textId)
         ui.backupStatusTextView.visibility = if (hideText) View.GONE else View.VISIBLE

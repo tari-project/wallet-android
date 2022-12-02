@@ -51,32 +51,29 @@ Java_com_tari_android_wallet_ffi_FFICommsConfig_jniCreate(
         jlong jDiscoveryTimeoutSec,
         jlong jSafDurationSec,
         jobject error) {
-    const char *pControlServiceAddress = jEnv->GetStringUTFChars(
-            jPublicAddress,
-            JNI_FALSE);
+    const char *pControlServiceAddress = jEnv->GetStringUTFChars(jPublicAddress, JNI_FALSE);
     const char *pDatabaseName = jEnv->GetStringUTFChars(jDatabaseName, JNI_FALSE);
     const char *pDatastorePath = jEnv->GetStringUTFChars(jDatastorePath, JNI_FALSE);
-    jlong lTransport = GetPointerField(jEnv, jTransport);
-    auto *pTransport = reinterpret_cast<TariTransportConfig *>(lTransport);
-    int errorCode = 0;
-    int *errorCodePointer = &errorCode;
+    auto pTransport = GetPointerField<TariTransportConfig *>(jEnv, jTransport);
     if (jDiscoveryTimeoutSec < 0) {
         jDiscoveryTimeoutSec = abs(jDiscoveryTimeoutSec);
     }
-    TariCommsConfig *pCommsConfig = comms_config_create(
-            pControlServiceAddress,
-            pTransport,
-            pDatabaseName,
-            pDatastorePath,
-            static_cast<unsigned long long int>(jDiscoveryTimeoutSec),
-            static_cast<unsigned long long int>(jSafDurationSec),
-            errorCodePointer
-    );
-    jEnv->ReleaseStringUTFChars(jPublicAddress, pControlServiceAddress);
-    jEnv->ReleaseStringUTFChars(jDatabaseName, pDatabaseName);
-    jEnv->ReleaseStringUTFChars(jDatastorePath, pDatastorePath);
-    setErrorCode(jEnv, error, errorCode);
-    SetPointerField(jEnv, jThis, reinterpret_cast<jlong>(pCommsConfig));
+
+    ExecuteWithError(jEnv, error, [&](int *errorPointer) {
+        TariCommsConfig *pCommsConfig = comms_config_create(
+                pControlServiceAddress,
+                pTransport,
+                pDatabaseName,
+                pDatastorePath,
+                static_cast<unsigned long long int>(jDiscoveryTimeoutSec),
+                static_cast<unsigned long long int>(jSafDurationSec),
+                errorPointer
+        );
+        jEnv->ReleaseStringUTFChars(jPublicAddress, pControlServiceAddress);
+        jEnv->ReleaseStringUTFChars(jDatabaseName, pDatabaseName);
+        jEnv->ReleaseStringUTFChars(jDatastorePath, pDatastorePath);
+        SetPointerField(jEnv, jThis, reinterpret_cast<jlong>(pCommsConfig));
+    });
 }
 
 extern "C"
@@ -84,7 +81,6 @@ JNIEXPORT void JNICALL
 Java_com_tari_android_wallet_ffi_FFICommsConfig_jniDestroy(
         JNIEnv *jEnv,
         jobject jThis) {
-    jlong lCommsConfig = GetPointerField(jEnv, jThis);
-    comms_config_destroy(reinterpret_cast<TariCommsConfig *>(lCommsConfig));
-    SetPointerField(jEnv, jThis, reinterpret_cast<jlong>(nullptr));
+    comms_config_destroy(GetPointerField<TariCommsConfig*>(jEnv, jThis));
+    SetNullPointerField(jEnv, jThis);
 }

@@ -33,10 +33,6 @@
 package com.tari.android.wallet.di
 
 import com.tari.android.wallet.BuildConfig
-import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepository
-import com.tari.android.wallet.service.faucet.TestnetFaucetRESTGateway
-import com.tari.android.wallet.service.faucet.TestnetFaucetRESTService
-import com.tari.android.wallet.service.faucet.TestnetFaucetService
 import com.tari.android.wallet.service.notification.NotificationService
 import com.tari.android.wallet.service.notification.PushNotificationRESTGateway
 import com.tari.android.wallet.service.notification.PushNotificationRESTService
@@ -59,43 +55,12 @@ import javax.inject.Singleton
 class RESTModule {
 
     object FieldName {
-        const val faucetHttpClient = "faucet_http_client"
-        const val faucetRetrofit = "faucet_retrofit"
-
         const val pushNotificationHttpClient = "push_notification_http_client"
         const val pushNotificationRetrofit = "push_notification_retrofit"
     }
 
     private val interceptor = HttpLoggingInterceptor()
 
-    @Provides
-    @Named(FieldName.faucetHttpClient)
-    @Singleton
-    fun provideFaucetHttpClient(): OkHttpClient = OkHttpClient.Builder().build()
-
-    @Provides
-    @Named(FieldName.faucetRetrofit)
-    @Singleton
-    fun provideTestnetFaucetRetrofit(
-        networkRepository: NetworkRepository,
-        @Named(FieldName.faucetHttpClient) okHttpClient: OkHttpClient
-    ): Retrofit = Retrofit.Builder()
-        //cant live without empty base url
-        .baseUrl(networkRepository.currentNetwork?.faucetUrl ?: "https://localhost/")
-        .client(okHttpClient)
-        .addConverterFactory(GsonConverterFactory.create())
-        .build()
-
-    @Provides
-    @Singleton
-    fun provideTestnetFaucetRESTGateway(
-        @Named(FieldName.faucetRetrofit) retrofit: Retrofit
-    ): TestnetFaucetRESTGateway = retrofit.create(TestnetFaucetRESTGateway::class.java)
-
-    @Provides
-    @Singleton
-    fun provideTestnetFaucetService(gateway: TestnetFaucetRESTGateway, networkRepository: NetworkRepository): TestnetFaucetService =
-        TestnetFaucetRESTService(gateway, networkRepository)
 
     @Provides
     @Named(FieldName.pushNotificationHttpClient)

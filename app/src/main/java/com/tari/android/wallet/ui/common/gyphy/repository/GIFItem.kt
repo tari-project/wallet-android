@@ -35,6 +35,7 @@ package com.tari.android.wallet.ui.common.gyphy.repository
 import android.net.Uri
 import android.os.Parcel
 import android.os.Parcelable
+import com.tari.android.wallet.ui.extension.readP
 
 data class GIFItem(val id: String, val embedUri: Uri, val uri: Uri) : Parcelable {
     override fun writeToParcel(dest: Parcel, flags: Int) {
@@ -48,8 +49,8 @@ data class GIFItem(val id: String, val embedUri: Uri, val uri: Uri) : Parcelable
     companion object CREATOR : Parcelable.Creator<GIFItem> {
         override fun createFromParcel(parcel: Parcel): GIFItem = GIFItem(
             parcel.readString()!!,
-            parcel.readParcelable(Uri::class.java.classLoader)!!,
-            parcel.readParcelable(Uri::class.java.classLoader)!!
+            parcel.readP(Uri::class.java),
+            parcel.readP(Uri::class.java)
         )
 
         override fun newArray(size: Int): Array<GIFItem?> = arrayOfNulls(size)
