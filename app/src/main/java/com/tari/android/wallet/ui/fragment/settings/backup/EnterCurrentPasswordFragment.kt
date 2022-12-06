@@ -50,11 +50,7 @@ import com.tari.android.wallet.ui.fragment.settings.backup.activity.BackupSettin
 import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupSettingsRepository
 import javax.inject.Inject
 
-class EnterCurrentPasswordFragment @Deprecated(
-    """Use newInstance() and supply all the 
-necessary data via arguments instead, as fragment's default no-op constructor is used by the 
-framework for UI tree rebuild on configuration changes"""
-) constructor() : Fragment() {
+class EnterCurrentPasswordFragment : Fragment() {
 
     @Inject
     lateinit var backupSettingsRepository: BackupSettingsRepository
@@ -67,11 +63,7 @@ framework for UI tree rebuild on configuration changes"""
         appComponent.inject(this)
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View =
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
         FragmentEnterBackupPasswordBinding.inflate(inflater, container, false).also { ui = it }.root
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -120,7 +112,6 @@ framework for UI tree rebuild on configuration changes"""
     }
 
     companion object {
-        @Suppress("DEPRECATION")
         fun newInstance() = EnterCurrentPasswordFragment()
 
         private const val DISABLE_BUTTON_TIME = 1000L

@@ -40,8 +40,8 @@ import androidx.lifecycle.lifecycleScope
 import com.tari.android.wallet.R
 import com.tari.android.wallet.databinding.ActivityDeleteWalletBinding
 import com.tari.android.wallet.di.DiContainer.appComponent
-import com.tari.android.wallet.service.service.WalletServiceLauncher
 import com.tari.android.wallet.service.connection.TariWalletServiceConnection
+import com.tari.android.wallet.service.service.WalletServiceLauncher
 import com.tari.android.wallet.ui.common.CommonActivity
 import com.tari.android.wallet.ui.dialog.modular.DialogArgs
 import com.tari.android.wallet.ui.dialog.modular.ModularDialog
@@ -76,11 +76,6 @@ class DeleteWalletActivity : CommonActivity<ActivityDeleteWalletBinding, DeleteW
 
         serviceConnection = ViewModelProvider(this)[TariWalletServiceConnection::class.java]
         setupUI()
-    }
-
-    override fun onBackPressed() {
-        super.onBackPressed()
-        overridePendingTransition(R.anim.enter_from_left, R.anim.exit_to_right)
     }
 
     private fun setupUI() {
