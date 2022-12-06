@@ -63,10 +63,8 @@ import com.tari.android.wallet.ui.fragment.send.finalize.FinalizeSendTxListener
 import com.tari.android.wallet.ui.fragment.send.finalize.TxFailureReason
 import com.tari.android.wallet.ui.fragment.send.makeTransaction.MakeTransactionFragment
 import com.tari.android.wallet.util.Constants
-import com.tari.android.wallet.yat.YatAdapter
 import com.tari.android.wallet.yat.YatUser
 import java.lang.ref.WeakReference
-import javax.inject.Inject
 
 
 /**
@@ -80,12 +78,8 @@ class SendTariActivity : CommonActivity<ActivitySendTariBinding, SendTariViewMod
     AddNodeListener,
     FinalizeSendTxListener {
 
-    @Inject
-    lateinit var yatAdapter: YatAdapter
-
     override fun onCreate(savedInstanceState: Bundle?) {
         instance = WeakReference(this)
-        appComponent.inject(this)
         super.onCreate(savedInstanceState)
         ui = ActivitySendTariBinding.inflate(layoutInflater).apply { setContentView(root) }
 
@@ -158,7 +152,7 @@ class SendTariActivity : CommonActivity<ActivitySendTariBinding, SendTariViewMod
 
     override fun continueToFinalizeSendTx(transactionData: TransactionData) {
         if (transactionData.recipientUser is YatUser) {
-            yatAdapter.showOutcomingFinalizeActivity(this, transactionData)
+            viewModel.yatAdapter.showOutcomingFinalizeActivity(this, transactionData)
         } else {
             addFragment(FinalizeSendTxFragment.create(transactionData))
             ui.rootView.post { ui.rootView.setBackgroundColor(color(R.color.white)) }

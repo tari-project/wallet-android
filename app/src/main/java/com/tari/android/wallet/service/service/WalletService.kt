@@ -57,6 +57,7 @@ import com.tari.android.wallet.service.service.WalletServiceLauncher.Companion.s
 import com.tari.android.wallet.service.service.WalletServiceLauncher.Companion.stopAction
 import com.tari.android.wallet.service.service.WalletServiceLauncher.Companion.stopAndDeleteAction
 import com.tari.android.wallet.ui.common.domain.ResourceManager
+import com.tari.android.wallet.ui.fragment.settings.logs.LogFilesManager
 import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.WalletUtil
 import io.reactivex.Observable
@@ -107,6 +108,8 @@ class WalletService : Service() {
 
     private var lifecycleObserver: ServiceLifecycleCallbacks? = null
     private val stubProxy = TariWalletServiceStubProxy()
+    @Suppress("unused")
+    private val logFilesManager = LogFilesManager()
     private lateinit var wallet: FFIWallet
 
     private val logger
