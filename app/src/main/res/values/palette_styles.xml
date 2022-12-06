@@ -1,0 +1,172 @@
+<resources>
+
+    <style name="AppTheme.Base" parent="Theme.AppCompat.Light.NoActionBar">
+
+    </style>
+
+    <style name="AppTheme.Light" parent="AppTheme.Base">
+        <!--Neutral-->
+        <item name="palette_neutral_primary">@color/palette_light_neutral_primary</item>
+        <item name="palette_neutral_secondary">@color/palette_light_neutral_secondary</item>
+        <item name="palette_neutral_tertiary">@color/palette_light_neutral_tertiary</item>
+        <item name="palette_neutral_inactive">@color/palette_light_neutral_inactive</item>
+
+        <!--Brand-->
+        <item name="palette_brand_purple">@color/palette_light_brand_purple</item>
+        <item name="palette_brand_pink">@color/palette_light_brand_pink</item>
+        <item name="palette_brand_dark_blue">@color/palette_light_brand_dark_blue</item>
+
+        <!--Buttons-->
+        <item name="palette_button_primary_start">@color/palette_light_button_primary_start</item>
+        <item name="palette_button_primary_end">@color/palette_light_button_primary_end</item>
+        <item name="palette_button_disable">@color/palette_light_button_disable</item>
+        <item name="palette_button_primary_text">@color/palette_light_button_primary_text</item>
+        <item name="palette_button_disabled_text">@color/palette_light_button_disabled_text</item>
+
+        <!--Text-->
+        <item name="palette_text_heading">@color/palette_light_text_heading</item>
+        <item name="palette_text_body">@color/palette_light_text_body</item>
+        <item name="palette_text_light">@color/palette_light_text_light</item>
+        <item name="palette_text_links">@color/palette_light_text_links</item>
+
+        <!--Icons-->
+        <item name="palette_icons_default">@color/palette_light_icons_default</item>
+        <item name="palette_icons_active">@color/palette_light_icons_active</item>
+        <item name="palette_icons_inactive">@color/palette_light_icons_inactive</item>
+
+        <!--Components-->
+        <item name="palette_qr_background">@color/palette_light_qr_background</item>
+        <item name="palette_overlay">@color/palette_light_overlay</item>
+        <item name="palette_overlay_text">@color/palette_light_overlay_text</item>
+
+        <!--System-->
+        <item name="palette_system_red">@color/palette_light_system_red</item>
+        <item name="palette_system_orange">@color/palette_light_system_orange</item>
+        <item name="palette_system_yellow">@color/palette_light_system_yellow</item>
+        <item name="palette_system_green">@color/palette_light_system_green</item>
+        <item name="palette_system_blue">@color/palette_light_system_blue</item>
+        <item name="palette_system_secondary_red">@color/palette_light_system_secondary_red</item>
+        <item name="palette_system_secondary_orange">@color/palette_light_system_secondary_orange</item>
+        <item name="palette_system_secondary_yellow">@color/palette_light_system_secondary_yellow</item>
+        <item name="palette_system_secondary_green">@color/palette_light_system_secondary_green</item>
+        <item name="palette_system_secondary_blue">@color/palette_light_system_secondary_blue</item>
+
+        <!--Backgrounds-->
+        <item name="palette_background_primary">@color/palette_light_background_primary</item>
+        <item name="palette_background_secondary">@color/palette_light_background_secondary</item>
+
+        <!--Shadows-->
+        <item name="palette_shadow_box">@color/palette_light_shadow_box</item>
+    </style>
+
+    <style name="AppTheme.Dark" parent="AppTheme.Base">
+        <!--Neutral-->
+        <item name="palette_neutral_primary">@color/palette_dark_neutral_primary</item>
+        <item name="palette_neutral_secondary">@color/palette_dark_neutral_secondary</item>
+        <item name="palette_neutral_tertiary">@color/palette_dark_neutral_tertiary</item>
+        <item name="palette_neutral_inactive">@color/palette_dark_neutral_inactive</item>
+
+        <!--Brand-->
+        <item name="palette_brand_purple">@color/palette_dark_brand_purple</item>
+        <item name="palette_brand_pink">@color/palette_dark_brand_pink</item>
+        <item name="palette_brand_dark_blue">@color/palette_dark_brand_dark_blue</item>
+
+        <!--Buttons-->
+        <item name="palette_button_primary_start">@color/palette_dark_button_primary_start</item>
+        <item name="palette_button_primary_end">@color/palette_dark_button_primary_end</item>
+        <item name="palette_button_disable">@color/palette_dark_button_disable</item>
+        <item name="palette_button_primary_text">@color/palette_dark_button_primary_text</item>
+        <item name="palette_button_disabled_text">@color/palette_dark_button_disabled_text</item>
+
+        <!--Text-->
+        <item name="palette_text_heading">@color/palette_dark_text_heading</item>
+        <item name="palette_text_body">@color/palette_dark_text_body</item>
+        <item name="palette_text_light">@color/palette_dark_text_light</item>
+        <item name="palette_text_links">@color/palette_dark_text_links</item>
+
+        <!--Icons-->
+        <item name="palette_icons_default">@color/palette_dark_icons_default</item>
+        <item name="palette_icons_active">@color/palette_dark_icons_active</item>
+        <item name="palette_icons_inactive">@color/palette_dark_icons_inactive</item>
+
+        <!--Components-->
+        <item name="palette_qr_background">@color/palette_dark_qr_background</item>
+        <item name="palette_overlay">@color/palette_dark_overlay</item>
+        <item name="palette_overlay_text">@color/palette_dark_overlay_text</item>
+
+        <!--System-->
+        <item name="palette_system_red">@color/palette_dark_system_red</item>
+        <item name="palette_system_orange">@color/palette_dark_system_orange</item>
+        <item name="palette_system_yellow">@color/palette_dark_system_yellow</item>
+        <item name="palette_system_green">@color/palette_dark_system_green</item>
+        <item name="palette_system_blue">@color/palette_dark_system_blue</item>
+        <item name="palette_system_secondary_red">@color/palette_dark_system_secondary_red</item>
+        <item name="palette_system_secondary_orange">@color/palette_dark_system_secondary_orange</item>
+        <item name="palette_system_secondary_yellow">@color/palette_dark_system_secondary_yellow</item>
+        <item name="palette_system_secondary_green">@color/palette_dark_system_secondary_green</item>
+        <item name="palette_system_secondary_blue">@color/palette_dark_system_secondary_blue</item>
+
+        <!--Backgrounds-->
+        <item name="palette_background_primary">@color/palette_dark_background_primary</item>
+        <item name="palette_background_secondary">@color/palette_dark_background_secondary</item>
+
+        <!--Shadows-->
+        <item name="palette_shadow_box">@color/palette_dark_shadow_box</item>
+    </style>
+
+    <style name="AppTheme.Purple" parent="AppTheme.Base">
+        <!--Neutral-->
+        <item name="palette_neutral_primary">@color/palette_purple_neutral_primary</item>
+        <item name="palette_neutral_secondary">@color/palette_purple_neutral_secondary</item>
+        <item name="palette_neutral_tertiary">@color/palette_purple_neutral_tertiary</item>
+        <item name="palette_neutral_inactive">@color/palette_purple_neutral_inactive</item>
+
+        <!--Brand-->
+        <item name="palette_brand_purple">@color/palette_purple_brand_purple</item>
+        <item name="palette_brand_pink">@color/palette_purple_brand_pink</item>
+        <item name="palette_brand_dark_blue">@color/palette_purple_brand_dark_blue</item>
+
+        <!--Buttons-->
+        <item name="palette_button_primary_start">@color/palette_purple_button_primary_start</item>
+        <item name="palette_button_primary_end">@color/palette_purple_button_primary_end</item>
+        <item name="palette_button_disable">@color/palette_purple_button_disable</item>
+        <item name="palette_button_primary_text">@color/palette_purple_button_primary_text</item>
+        <item name="palette_button_disabled_text">@color/palette_purple_button_disabled_text</item>
+
+        <!--Text-->
+        <item name="palette_text_heading">@color/palette_purple_text_heading</item>
+        <item name="palette_text_body">@color/palette_purple_text_body</item>
+        <item name="palette_text_light">@color/palette_purple_text_light</item>
+        <item name="palette_text_links">@color/palette_purple_text_links</item>
+
+        <!--Icons-->
+        <item name="palette_icons_default">@color/palette_purple_icons_default</item>
+        <item name="palette_icons_active">@color/palette_purple_icons_active</item>
+        <item name="palette_icons_inactive">@color/palette_purple_icons_inactive</item>
+
+        <!--Components-->
+        <item name="palette_qr_background">@color/palette_purple_qr_background</item>
+        <item name="palette_overlay">@color/palette_purple_overlay</item>
+        <item name="palette_overlay_text">@color/palette_purple_overlay_text</item>
+
+        <!--System-->
+        <item name="palette_system_red">@color/palette_purple_system_red</item>
+        <item name="palette_system_orange">@color/palette_purple_system_orange</item>
+        <item name="palette_system_yellow">@color/palette_purple_system_yellow</item>
+        <item name="palette_system_green">@color/palette_purple_system_green</item>
+        <item name="palette_system_blue">@color/palette_purple_system_blue</item>
+        <item name="palette_system_secondary_red">@color/palette_purple_system_secondary_red</item>
+        <item name="palette_system_secondary_orange">@color/palette_purple_system_secondary_orange</item>
+        <item name="palette_system_secondary_yellow">@color/palette_purple_system_secondary_yellow</item>
+        <item name="palette_system_secondary_green">@color/palette_purple_system_secondary_green</item>
+        <item name="palette_system_secondary_blue">@color/palette_purple_system_secondary_blue</item>
+
+        <!--Backgrounds-->
+        <item name="palette_background_primary">@color/palette_purple_background_primary</item>
+        <item name="palette_background_secondary">@color/palette_purple_background_secondary</item>
+
+        <!--Shadows-->
+        <item name="palette_shadow_box">@color/palette_purple_shadow_box</item>
+    </style>
+
+</resources>

@@ -422,17 +422,6 @@ class TxListViewModel : CommonViewModel() {
         _modularDialog.postValue(args.getModular(resourceManager))
     }
 
-    private fun sendTariToUser(tariWalletAddress: TariWalletAddress) {
-        val error = WalletError()
-        val contacts = walletService.getContacts(error)
-        val recipientUser = when (error) {
-            WalletError.NoError -> contacts.firstOrNull { it.walletAddress == tariWalletAddress } ?: User(tariWalletAddress)
-            else -> User(tariWalletAddress)
-        }
-
-        _navigation.postValue(TxListNavigation.ToSendTariToUser(recipientUser))
-    }
-
     companion object {
         private const val LIST_UPDATE_DEBOUNCE = 500L
         private const val SECOND_UTXO_STORE_OPEN_DELAY = 3000L
