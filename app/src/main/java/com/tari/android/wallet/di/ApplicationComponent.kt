@@ -35,7 +35,6 @@ package com.tari.android.wallet.di
 import android.content.ClipboardManager
 import com.tari.android.wallet.application.TariWalletApplication
 import com.tari.android.wallet.application.deeplinks.DeeplinkViewModel
-import com.tari.android.wallet.service.BootDeviceReceiver
 import com.tari.android.wallet.service.service.WalletService
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.component.networkStateIndicator.ConnectionIndicatorViewModel
@@ -53,7 +52,7 @@ import com.tari.android.wallet.ui.fragment.restore.chooseRestoreOption.ChooseRes
 import com.tari.android.wallet.ui.fragment.restore.enterRestorationPassword.EnterRestorationPasswordViewModel
 import com.tari.android.wallet.ui.fragment.restore.inputSeedWords.InputSeedWordsViewModel
 import com.tari.android.wallet.ui.fragment.restore.walletRestoringFromSeedWords.WalletRestoringFromSeedWordsViewModel
-import com.tari.android.wallet.ui.fragment.send.activity.SendTariActivity
+import com.tari.android.wallet.ui.fragment.send.activity.SendTariViewModel
 import com.tari.android.wallet.ui.fragment.send.addAmount.AddAmountViewModel
 import com.tari.android.wallet.ui.fragment.send.addNote.AddNoteFragment
 import com.tari.android.wallet.ui.fragment.send.addNote.gif.ChooseGIFDialogFragment
@@ -74,6 +73,7 @@ import com.tari.android.wallet.ui.fragment.settings.baseNodeConfig.addBaseNode.A
 import com.tari.android.wallet.ui.fragment.settings.baseNodeConfig.changeBaseNode.ChangeBaseNodeViewModel
 import com.tari.android.wallet.ui.fragment.settings.bugReporting.BugsReportingViewModel
 import com.tari.android.wallet.ui.fragment.settings.deleteWallet.DeleteWalletActivity
+import com.tari.android.wallet.ui.fragment.settings.logs.LogFilesManager
 import com.tari.android.wallet.ui.fragment.settings.logs.logFiles.LogFilesViewModel
 import com.tari.android.wallet.ui.fragment.settings.logs.logs.LogsViewModel
 import com.tari.android.wallet.ui.fragment.settings.networkSelection.NetworkSelectionViewModel
@@ -83,7 +83,6 @@ import com.tari.android.wallet.ui.fragment.settings.torBridges.customBridges.Cus
 import com.tari.android.wallet.ui.fragment.settings.userAutorization.BiometricAuthenticationViewModel
 import com.tari.android.wallet.ui.fragment.splash.SplashActivity
 import com.tari.android.wallet.ui.fragment.tx.TxListViewModel
-import com.tari.android.wallet.ui.fragment.tx.details.TxDetailsFragment
 import com.tari.android.wallet.ui.fragment.tx.details.gif.GIFViewModel
 import com.tari.android.wallet.ui.fragment.utxos.list.UtxosListViewModel
 import dagger.Component
@@ -109,70 +108,51 @@ import javax.inject.Singleton
 
 interface ApplicationComponent {
 
-    /**
-     * Application.
-     */
     fun inject(application: TariWalletApplication)
 
-    /**
-     * Activities.
-     */
+    fun inject(service: WalletService)
+
     fun inject(activity: SplashActivity)
     fun inject(activity: OnboardingFlowActivity)
     fun inject(activity: AuthActivity)
     fun inject(activity: HomeActivity)
     fun inject(activity: QRScannerActivity)
-    fun inject(activity: SendTariActivity)
-    fun inject(fragment: TxDetailsFragment)
     fun inject(activity: DeleteWalletActivity)
+    fun inject(activity: WalletRestoreActivity)
 
-    /**
-     * Fragments.
-     */
     fun inject(fragment: AddRecipientFragment)
     fun inject(fragment: AddNoteFragment)
     fun inject(fragment: ChooseGIFDialogFragment)
-
-    /**
-     * Backup.
-     */
     fun inject(fragment: ChangeSecurePasswordFragment)
     fun inject(fragment: EnterCurrentPasswordFragment)
 
-    /**
-     * Restore.
-     */
-    fun inject(activity: WalletRestoreActivity)
 
-    /**
-     * ViewModels.
-     */
     fun inject(commonViewModel: CommonViewModel)
-    fun inject(thumbnailGIFsViewModel: ThumbnailGIFsViewModel)
-    fun inject(gifViewModel: GIFViewModel)
-    fun inject(backgroundServiceSettingsViewModel: BackgroundServiceSettingsViewModel)
-    fun inject(connectionIndicatorViewModel: ConnectionIndicatorViewModel)
-    fun inject(chooseRestoreOptionViewModel: ChooseRestoreOptionViewModel)
-    fun inject(enterRestorationPasswordViewModel: EnterRestorationPasswordViewModel)
-    fun inject(walletRestoringFromSeedWordsViewModel: WalletRestoringFromSeedWordsViewModel)
-    fun inject(inputSeedWordsViewModel: InputSeedWordsViewModel)
-    fun inject(verifySeedPhraseViewModel: VerifySeedPhraseViewModel)
-    fun inject(backupSettingsViewModel: BackupSettingsViewModel)
-    fun inject(biometricAuthenticationViewModel: BiometricAuthenticationViewModel)
-    fun inject(txListViewModel: TxListViewModel)
-    fun inject(changeBaseNodeViewModel: ChangeBaseNodeViewModel)
-    fun inject(addCustomBaseNodeViewModel: AddCustomBaseNodeViewModel)
-    fun inject(networkSelectionViewModel: NetworkSelectionViewModel)
-    fun inject(allSettingsViewModel: AllSettingsViewModel)
-    fun inject(addRecipientViewModel: AddRecipientViewModel)
-    fun inject(finalizeSentTxListViewModel: FinalizeSendTxViewModel)
-    fun inject(walletInfoViewModel: WalletInfoViewModel)
-    fun inject(requestTariViewModel: RequestTariViewModel)
-    fun inject(addAmountViewModel: AddAmountViewModel)
-    fun inject(torBridgesSelectionViewModel: TorBridgesSelectionViewModel)
-    fun inject(customTorBridgeViewModel: CustomTorBridgesViewModel)
-    fun inject(deeplinkViewModel: DeeplinkViewModel)
-    fun inject(localAuthViewModel: LocalAuthViewModel)
+    fun inject(viewModel: ThumbnailGIFsViewModel)
+    fun inject(viewModel: GIFViewModel)
+    fun inject(viewModel: BackgroundServiceSettingsViewModel)
+    fun inject(viewModel: ConnectionIndicatorViewModel)
+    fun inject(viewModel: ChooseRestoreOptionViewModel)
+    fun inject(viewModel: EnterRestorationPasswordViewModel)
+    fun inject(viewModel: WalletRestoringFromSeedWordsViewModel)
+    fun inject(viewModel: InputSeedWordsViewModel)
+    fun inject(viewModel: VerifySeedPhraseViewModel)
+    fun inject(viewModel: BackupSettingsViewModel)
+    fun inject(viewModel: BiometricAuthenticationViewModel)
+    fun inject(viewModel: TxListViewModel)
+    fun inject(viewModel: ChangeBaseNodeViewModel)
+    fun inject(viewModel: AddCustomBaseNodeViewModel)
+    fun inject(viewModel: NetworkSelectionViewModel)
+    fun inject(viewModel: AllSettingsViewModel)
+    fun inject(viewModel: AddRecipientViewModel)
+    fun inject(viewModel: FinalizeSendTxViewModel)
+    fun inject(viewModel: WalletInfoViewModel)
+    fun inject(viewModel: RequestTariViewModel)
+    fun inject(viewModel: AddAmountViewModel)
+    fun inject(viewModel: TorBridgesSelectionViewModel)
+    fun inject(viewModel: CustomTorBridgesViewModel)
+    fun inject(viewModel: DeeplinkViewModel)
+    fun inject(viewModel: LocalAuthViewModel)
     fun inject(viewModel: CreateWalletViewModel)
     fun inject(viewModel: IntroductionViewModel)
     fun inject(viewModel: AuthViewModel)
@@ -181,18 +161,10 @@ interface ApplicationComponent {
     fun inject(viewModel: BugsReportingViewModel)
     fun inject(viewModel: LogFilesViewModel)
     fun inject(viewModel: LogsViewModel)
-    fun inject(backupOptionViewModel: BackupOptionViewModel)
+    fun inject(viewModel: BackupOptionViewModel)
+    fun inject(viewModel: LogFilesManager)
+    fun inject(viewModel: SendTariViewModel)
     fun inject(viewModel: ThemeSelectorViewModel)
-
-    /**
-     * Service(s).
-     */
-    fun inject(service: WalletService)
-
-    /**
-     * Broadcast receiver
-     */
-    fun inject(receiver: BootDeviceReceiver)
 
     fun getClipboardManager(): ClipboardManager
 }
