@@ -77,6 +77,7 @@ import com.tari.android.wallet.ui.fragment.settings.deleteWallet.DeleteWalletAct
 import com.tari.android.wallet.ui.fragment.settings.logs.logFiles.LogFilesViewModel
 import com.tari.android.wallet.ui.fragment.settings.logs.logs.LogsViewModel
 import com.tari.android.wallet.ui.fragment.settings.networkSelection.NetworkSelectionViewModel
+import com.tari.android.wallet.ui.fragment.settings.themeSelector.ThemeSelectorViewModel
 import com.tari.android.wallet.ui.fragment.settings.torBridges.TorBridgesSelectionViewModel
 import com.tari.android.wallet.ui.fragment.settings.torBridges.customBridges.CustomTorBridgesViewModel
 import com.tari.android.wallet.ui.fragment.settings.userAutorization.BiometricAuthenticationViewModel
@@ -131,11 +132,13 @@ interface ApplicationComponent {
     fun inject(fragment: AddRecipientFragment)
     fun inject(fragment: AddNoteFragment)
     fun inject(fragment: ChooseGIFDialogFragment)
+
     /**
      * Backup.
      */
     fun inject(fragment: ChangeSecurePasswordFragment)
     fun inject(fragment: EnterCurrentPasswordFragment)
+
     /**
      * Restore.
      */
@@ -179,14 +182,16 @@ interface ApplicationComponent {
     fun inject(viewModel: LogFilesViewModel)
     fun inject(viewModel: LogsViewModel)
     fun inject(backupOptionViewModel: BackupOptionViewModel)
+    fun inject(viewModel: ThemeSelectorViewModel)
+
     /**
      * Service(s).
      */
     fun inject(service: WalletService)
 
     /**
-    * Broadcast receiver
-    */
+     * Broadcast receiver
+     */
     fun inject(receiver: BootDeviceReceiver)
 
     fun getClipboardManager(): ClipboardManager

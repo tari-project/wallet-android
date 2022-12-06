@@ -11,6 +11,8 @@ interface AllSettingsRouter {
 
     fun toNetworkSelection()
 
+    fun toThemeSelection()
+
     fun toTorBridges()
 
     fun toCustomTorBridges()

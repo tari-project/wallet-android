@@ -13,9 +13,6 @@ import javax.inject.Inject
 class BackgroundServiceSettingsViewModel : CommonViewModel() {
 
     @Inject
-    lateinit var tariSettingsSharedRepository: TariSettingsSharedRepository
-
-    @Inject
     lateinit var serviceLauncher: WalletServiceLauncher
 
     private val _switchState = MutableLiveData<LoadingSwitchState>()

@@ -4,7 +4,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.tari.android.wallet.R
-import com.tari.android.wallet.data.sharedPrefs.tariSettings.TariSettingsSharedRepository
 import com.tari.android.wallet.extension.getWithError
 import com.tari.android.wallet.ffi.FFIWallet
 import com.tari.android.wallet.model.MicroTari
@@ -22,13 +21,9 @@ import com.tari.android.wallet.util.Constants
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.math.BigInteger
-import javax.inject.Inject
 import kotlin.math.min
 
 class AddAmountViewModel : CommonViewModel() {
-
-    @Inject
-    lateinit var tariSettingsSharedRepository: TariSettingsSharedRepository
 
     private val _isOneSidePaymentEnabled: MutableLiveData<Boolean> = MutableLiveData()
     val isOneSidePaymentEnabled: LiveData<Boolean> = _isOneSidePaymentEnabled

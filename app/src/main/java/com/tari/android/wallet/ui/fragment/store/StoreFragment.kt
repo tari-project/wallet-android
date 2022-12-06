@@ -43,9 +43,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.webkit.WebResourceError
 import android.widget.Toast
-import androidx.appcompat.view.ContextThemeWrapper
 import androidx.fragment.app.Fragment
-import com.tari.android.wallet.R
 import com.tari.android.wallet.R.color.purple
 import com.tari.android.wallet.R.drawable.*
 import com.tari.android.wallet.R.string.store_no_application_to_open_the_link_error
@@ -61,26 +59,15 @@ import io.reactivex.disposables.Disposable
 import io.reactivex.functions.BiFunction
 import io.reactivex.subjects.PublishSubject
 
-class StoreFragment @Deprecated(
-    """Use newInstance() and supply all the 
-necessary data via arguments instead, as fragment's default no-op constructor is used by the 
-framework for UI tree rebuild on configuration changes"""
-) constructor() : Fragment() {
+class StoreFragment : Fragment() {
 
     private val webViewStatePublisher = PublishSubject.create<WebViewState>()
     private lateinit var ui: FragmentStoreBinding
     private lateinit var animation: NavigationPanelAnimation
     private var subscription: Disposable? = null
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View = FragmentStoreBinding.inflate(
-        LayoutInflater.from(ContextThemeWrapper(requireContext(), R.style.AppTheme)),
-        container,
-        false
-    ).also { ui = it }.root
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
+        FragmentStoreBinding.inflate(LayoutInflater.from(context), container, false).also { ui = it }.root
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -99,12 +86,8 @@ framework for UI tree rebuild on configuration changes"""
         animation = NavigationPanelAnimation(ui.controlsView)
         configureWebView()
         ui.progressBar.setColor(color(purple))
-        ui.browserBackCtaView.setOnClickListener {
-            ui.webView.apply { if (canGoBack()) goBack() }
-        }
-        ui.browserForwardCtaView.setOnClickListener {
-            ui.webView.apply { if (canGoForward()) goForward() }
-        }
+        ui.browserBackCtaView.setOnClickListener { ui.webView.apply { if (canGoBack()) goBack() } }
+        ui.browserForwardCtaView.setOnClickListener { ui.webView.apply { if (canGoForward()) goForward() } }
         ui.shareCtaView.setOnClickListener { shareStoreLink() }
     }
 
@@ -112,9 +95,7 @@ framework for UI tree rebuild on configuration changes"""
         subscription = Observable.combineLatest(
             EventBus.networkConnectionState.publishSubject.distinctUntilChanged(),
             webViewStatePublisher.distinctUntilChanged(),
-            BiFunction<NetworkConnectionState, WebViewState, Pair<NetworkConnectionState, WebViewState>>(
-                ::Pair
-            )
+            BiFunction<NetworkConnectionState, WebViewState, Pair<NetworkConnectionState, WebViewState>>(::Pair)
         )
             .filter { it.first == NetworkConnectionState.CONNECTED && it.second.hasError }
             .observeOn(AndroidSchedulers.mainThread())

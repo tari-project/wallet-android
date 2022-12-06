@@ -5,7 +5,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.tari.android.wallet.R
-import com.tari.android.wallet.data.sharedPrefs.tariSettings.TariSettingsSharedRepository
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.infrastructure.backup.*
 import com.tari.android.wallet.ui.common.CommonViewModel
@@ -26,9 +25,6 @@ class BackupSettingsViewModel : CommonViewModel() {
 
     @Inject
     lateinit var backupSettingsRepository: BackupSettingsRepository
-
-    @Inject
-    lateinit var tariSettingsSharedRepository: TariSettingsSharedRepository
 
     lateinit var biometricAuthenticationViewModel: BiometricAuthenticationViewModel
 

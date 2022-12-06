@@ -25,6 +25,7 @@ import com.tari.android.wallet.ui.extension.addEnterLeftAnimation
 import com.tari.android.wallet.ui.fragment.settings.allSettings.TariVersionModel
 import com.tari.android.wallet.ui.fragment.settings.logs.activity.DebugActivity
 import com.tari.android.wallet.ui.fragment.settings.logs.activity.DebugNavigation
+import com.tari.android.wallet.ui.fragment.settings.themeSelector.TariTheme
 import yat.android.lib.YatIntegration
 
 abstract class CommonActivity<Binding : ViewBinding, VM : CommonViewModel> : AppCompatActivity(), ShakeDetector.Listener {
@@ -56,11 +57,30 @@ abstract class CommonActivity<Binding : ViewBinding, VM : CommonViewModel> : App
         observe(dismissDialog) { dialogManager.dismiss() }
 
         observe(loadingDialog) { dialogManager.handleProgress(it) }
+
+        observe(currentTheme) { setTariTheme(it) }
+    }
+
+    private fun setTariTheme(theme: TariTheme) {
+        val themeStyle = when (theme) {
+            TariTheme.AppBased -> R.style.AppTheme_Light
+            TariTheme.Light -> R.style.AppTheme_Light
+            TariTheme.Dark -> R.style.AppTheme_Dark
+            TariTheme.Purple -> R.style.AppTheme_Purple
+        }
+        setTheme(themeStyle)
     }
 
     override fun onStart() {
         (getSystemService(SENSOR_SERVICE) as? SensorManager)?.let(shakeDetector::start)
         super.onStart()
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        if (viewModel.tariSettingsSharedRepository.currentTheme != viewModel.currentTheme.value)
+            recreate()
     }
 
     override fun onStop() {

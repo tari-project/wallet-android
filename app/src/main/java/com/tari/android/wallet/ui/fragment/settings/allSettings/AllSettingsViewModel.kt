@@ -2,14 +2,12 @@ package com.tari.android.wallet.ui.fragment.settings.allSettings
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.viewModelScope
 import com.tari.android.wallet.R.color.*
 import com.tari.android.wallet.R.drawable.*
 import com.tari.android.wallet.R.string.*
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.infrastructure.backup.BackupManager
 import com.tari.android.wallet.infrastructure.backup.BackupState
-import com.tari.android.wallet.infrastructure.backup.BackupStorageAuthRevokedException
 import com.tari.android.wallet.infrastructure.backup.BackupsState
 import com.tari.android.wallet.ui.common.ClipboardArgs
 import com.tari.android.wallet.ui.common.CommonViewModel
@@ -26,9 +24,6 @@ import com.tari.android.wallet.ui.fragment.settings.allSettings.version.Settings
 import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupSettingsRepository
 import com.tari.android.wallet.ui.fragment.settings.userAutorization.BiometricAuthenticationViewModel
 import com.tari.android.wallet.yat.YatAdapter
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import java.io.IOException
 import javax.inject.Inject
 
 class AllSettingsViewModel : CommonViewModel() {
@@ -110,6 +105,10 @@ class AllSettingsViewModel : CommonViewModel() {
                 _openYatOnboarding.postValue(Unit)
             },
             SettingsTitleDto(resourceManager.getString(all_settings_advanced_settings_label)),
+            ButtonViewDto(resourceManager.getString(all_settings_select_theme), all_settings_background_service_icon) {
+                _navigation.postValue(AllSettingsNavigation.ToThemeSelection)
+            },
+            DividerViewHolderItem(),
             ButtonViewDto(resourceManager.getString(all_settings_background_service), all_settings_background_service_icon) {
                 _navigation.postValue(AllSettingsNavigation.ToBackgroundService)
             },

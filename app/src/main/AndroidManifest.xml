@@ -23,7 +23,7 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="false"
-        android:theme="@style/AppTheme"
+        android:theme="@style/AppTheme.Light"
         tools:replace="android:supportsRtl,android:allowBackup">
         <!-- Tari foreground service -->
         <service
@@ -68,7 +68,7 @@
         <activity
             android:name=".ui.fragment.onboarding.activity.OnboardingFlowActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
-            android:theme="@style/AppTheme"
+            android:theme="@style/AppTheme.Light"
             android:windowSoftInputMode="stateAlwaysHidden" /> <!-- local authentication -->
         <activity
             android:name=".ui.fragment.auth.AuthActivity"
@@ -80,7 +80,7 @@
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:exported="true"
             android:launchMode="singleTask"
-            android:theme="@style/AppTheme"
+            android:theme="@style/AppTheme.Light"
             android:windowSoftInputMode="stateAlwaysHidden|adjustResize">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
@@ -126,13 +126,13 @@
         <activity
             android:name="com.tari.android.wallet.ui.fragment.qr.QRScannerActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
-            android:theme="@style/AppTheme"
+            android:theme="@style/AppTheme.Light"
             android:windowSoftInputMode="stateAlwaysHidden" /> <!-- send tari -->
         <activity
             android:name=".ui.fragment.send.activity.SendTariActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:parentActivityName=".ui.fragment.home.HomeActivity"
-            android:theme="@style/AppTheme"
+            android:theme="@style/AppTheme.Light"
             android:windowSoftInputMode="adjustResize|stateAlwaysHidden" /> <!-- wallet info -->
         <activity
             android:name=".ui.fragment.send.finalize.YatFinalizeSendTxActivity"
@@ -145,32 +145,32 @@
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:launchMode="singleTask"
             android:parentActivityName=".ui.fragment.home.HomeActivity"
-            android:theme="@style/AppTheme"
+            android:theme="@style/AppTheme.Light"
             android:windowSoftInputMode="adjustResize|stateAlwaysHidden" />
         <activity
             android:name="com.tari.android.wallet.ui.fragment.settings.backup.activity.BackupSettingsActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:parentActivityName=".ui.fragment.home.HomeActivity"
-            android:theme="@style/AppTheme"
+            android:theme="@style/AppTheme.Light"
             android:windowSoftInputMode="adjustResize|stateAlwaysHidden" />
         <activity
             android:name="com.tari.android.wallet.ui.fragment.settings.deleteWallet.DeleteWalletActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:parentActivityName="com.tari.android.wallet.ui.fragment.settings.deleteWallet.DeleteWalletActivity"
-            android:theme="@style/AppTheme"
+            android:theme="@style/AppTheme.Light"
             android:windowSoftInputMode="adjustResize|stateAlwaysHidden" />
         <activity
             android:name=".ui.fragment.settings.backgroundService.BackgroundServiceSettingsActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:parentActivityName=".ui.fragment.settings.backgroundService.BackgroundServiceSettingsActivity"
-            android:theme="@style/AppTheme"
+            android:theme="@style/AppTheme.Light"
             android:windowSoftInputMode="adjustResize|stateAlwaysHidden" />
         <activity
             android:name="com.tari.android.wallet.ui.fragment.restore.activity.WalletRestoreActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:parentActivityName=".ui.fragment.onboarding.activity.OnboardingFlowActivity"
             android:launchMode="singleTask"
-            android:theme="@style/AppTheme"
+            android:theme="@style/AppTheme.Light"
             android:windowSoftInputMode="adjustResize" />
         <receiver
             android:name=".service.BootDeviceReceiver"

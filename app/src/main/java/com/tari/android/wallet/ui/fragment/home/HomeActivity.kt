@@ -90,6 +90,7 @@ import com.tari.android.wallet.ui.fragment.settings.baseNodeConfig.addBaseNode.A
 import com.tari.android.wallet.ui.fragment.settings.baseNodeConfig.changeBaseNode.ChangeBaseNodeFragment
 import com.tari.android.wallet.ui.fragment.settings.deleteWallet.DeleteWalletActivity
 import com.tari.android.wallet.ui.fragment.settings.networkSelection.NetworkSelectionFragment
+import com.tari.android.wallet.ui.fragment.settings.themeSelector.ThemeSelectorFragment
 import com.tari.android.wallet.ui.fragment.settings.torBridges.TorBridgesSelectionFragment
 import com.tari.android.wallet.ui.fragment.settings.torBridges.customBridges.CustomTorBridgesFragment
 import com.tari.android.wallet.ui.fragment.splash.SplashActivity
@@ -338,6 +339,8 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>(), AllSe
     override fun toBaseNodeSelection() = addFragment(ChangeBaseNodeFragment())
 
     override fun toTorBridges() = addFragment(TorBridgesSelectionFragment())
+
+    override fun toThemeSelection() = addFragment(ThemeSelectorFragment())
 
     override fun toUtxos() = addFragment(UtxosListFragment())
 

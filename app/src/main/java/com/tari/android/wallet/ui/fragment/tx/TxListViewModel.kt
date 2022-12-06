@@ -44,9 +44,6 @@ class TxListViewModel : CommonViewModel() {
     @Inject
     lateinit var sharedPrefsWrapper: SharedPrefsRepository
 
-    @Inject
-    lateinit var tariSettingsSharedRepository: TariSettingsSharedRepository
-
     lateinit var progressControllerState: UpdateProgressViewController.UpdateProgressState
 
     private val cancelledTxs = CopyOnWriteArrayList<CancelledTx>()

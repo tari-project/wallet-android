@@ -30,33 +30,31 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.tari.android.wallet.ui.fragment.settings.baseNodeConfig.changeBaseNode
+package com.tari.android.wallet.ui.fragment.settings.themeSelector
 
 import android.os.Bundle
-import android.view.*
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.tari.android.wallet.R
-import com.tari.android.wallet.databinding.FragmentBaseNodeChangeBinding
+import com.tari.android.wallet.databinding.FragmentThemeChangeBinding
 import com.tari.android.wallet.extension.observe
 import com.tari.android.wallet.ui.common.CommonFragment
 import com.tari.android.wallet.ui.common.recyclerView.CommonAdapter
 import com.tari.android.wallet.ui.extension.setOnThrottledClickListener
-import com.tari.android.wallet.ui.fragment.settings.baseNodeConfig.BaseNodeRouter
-import com.tari.android.wallet.ui.fragment.settings.baseNodeConfig.changeBaseNode.adapter.BaseNodeViewHolderItem
-import com.tari.android.wallet.ui.fragment.settings.baseNodeConfig.changeBaseNode.adapter.ChangeBaseNodeAdapter
+import com.tari.android.wallet.ui.fragment.settings.themeSelector.adapter.ThemesAdapter
 
-class ChangeBaseNodeFragment : CommonFragment<FragmentBaseNodeChangeBinding, ChangeBaseNodeViewModel>() {
+class ThemeSelectorFragment : CommonFragment<FragmentThemeChangeBinding, ThemeSelectorViewModel>() {
 
-    private val adapter = ChangeBaseNodeAdapter()
+    private val adapter = ThemesAdapter()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
-        FragmentBaseNodeChangeBinding.inflate(inflater, container, false).also { ui = it }.root
+        FragmentThemeChangeBinding.inflate(inflater, container, false).also { ui = it }.root
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val viewModel: ChangeBaseNodeViewModel by viewModels()
-        setHasOptionsMenu(true)
+        val viewModel: ThemeSelectorViewModel by viewModels()
         ui.rootView
         bindViewModel(viewModel)
         setupUI()
@@ -68,24 +66,20 @@ class ChangeBaseNodeFragment : CommonFragment<FragmentBaseNodeChangeBinding, Cha
         viewModel.refresh()
     }
 
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) = inflater.inflate(R.menu.change_base_node_menu, menu)
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            R.id.add_base_node_action -> (requireActivity() as BaseNodeRouter).toAddCustomBaseNode()
-        }
-        return super.onOptionsItemSelected(item)
-    }
-
     private fun setupUI() = with(ui) {
         backCtaView.setOnThrottledClickListener { requireActivity().onBackPressed() }
-        addBaseNodeButton.setOnThrottledClickListener { (requireActivity() as BaseNodeRouter).toAddCustomBaseNode() }
-        baseNodeList.adapter = adapter
-        baseNodeList.layoutManager = LinearLayoutManager(requireContext())
-        adapter.setClickListener(CommonAdapter.ItemClickListener { viewModel.selectBaseNode((it as BaseNodeViewHolderItem).baseNodeDto) })
+        themesList.adapter = adapter
+        themesList.layoutManager = LinearLayoutManager(requireContext())
+        adapter.setClickListener(CommonAdapter.ItemClickListener { viewModel.selectTheme(it) })
     }
 
     private fun observeUI() = with(viewModel) {
-        observe(baseNodeList) { adapter.update(it) }
+        observe(themes) { adapter.update(it) }
+
+        observe(newTheme) { changeThemeOnUI() }
+    }
+
+    private fun changeThemeOnUI() {
+        requireActivity().recreate()
     }
 }

@@ -383,6 +383,14 @@
     <string name="debug_edit_base_node_invalid_public_key">Invalid public key hex.</string>
     <string name="debug_edit_base_node_invalid_address">Invalid address.</string>
     <string name="debug_edit_base_node_failed">Couldn\'t add base node peer.</string>
+
+    <string name="select_theme_title">Select theme</string>
+    <string name="select_theme_description">Select a theme below to change the color scheme</string>
+    <string name="select_theme_dark">Dark</string>
+    <string name="select_theme_light">Light</string>
+    <string name="select_theme_purple">Purple</string>
+    <string name="select_theme_app_based">App based</string>
+
     <!-- about -->
 
     <!-- In-app store -->
@@ -408,6 +416,7 @@
     <string name="all_settings_bridge_configuration">Bridge Configuration</string>
     <string name="all_settings_connect_yats">Connect Yats</string>
     <string name="all_settings_select_base_node">Select Base Node</string>
+    <string name="all_settings_select_theme">Select Theme</string>
     <string name="all_settings_select_network">Select Network</string>
     <string name="all_settings_select_network_recommended">(Recommended)</string>
     <string name="all_settings_select_network_description">Please select the network to which you want to connect</string>
