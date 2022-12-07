@@ -129,12 +129,6 @@
             android:theme="@style/AppTheme.Light"
             android:windowSoftInputMode="stateAlwaysHidden" /> <!-- send tari -->
         <activity
-            android:name=".ui.fragment.send.activity.SendTariActivity"
-            android:configChanges="keyboardHidden|orientation|screenSize"
-            android:parentActivityName=".ui.fragment.home.HomeActivity"
-            android:theme="@style/AppTheme.Light"
-            android:windowSoftInputMode="adjustResize|stateAlwaysHidden" /> <!-- wallet info -->
-        <activity
             android:name=".ui.fragment.send.finalize.YatFinalizeSendTxActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:exported="true"

@@ -74,7 +74,7 @@ import com.tari.android.wallet.ui.common.gyphy.repository.GIFItem
 import com.tari.android.wallet.ui.component.EmojiIdSummaryViewController
 import com.tari.android.wallet.ui.component.FullEmojiIdViewController
 import com.tari.android.wallet.ui.extension.*
-import com.tari.android.wallet.ui.fragment.send.activity.SendTariActivity
+import com.tari.android.wallet.ui.fragment.home.HomeActivity
 import com.tari.android.wallet.ui.fragment.send.addNote.gif.*
 import com.tari.android.wallet.ui.fragment.send.addNote.gif.ThumbnailGIFsViewModel.Companion.REQUEST_CODE_GIF
 import com.tari.android.wallet.ui.fragment.send.common.TransactionData
@@ -226,7 +226,7 @@ class AddNoteFragment : Fragment(), View.OnTouchListener {
         amount = transactionData.amount!!
         isOneSidePayment = transactionData.isOneSidePayment
         if (savedInstanceState == null) {
-            requireArguments().getString(SendTariActivity.PARAMETER_NOTE)
+            requireArguments().getString(HomeActivity.PARAMETER_NOTE)
                 ?.let { ui.noteEditText.setText(it) }
         }
     }

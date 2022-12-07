@@ -41,6 +41,7 @@ import com.tari.android.wallet.ui.component.networkStateIndicator.ConnectionIndi
 import com.tari.android.wallet.ui.fragment.auth.AuthActivity
 import com.tari.android.wallet.ui.fragment.auth.AuthViewModel
 import com.tari.android.wallet.ui.fragment.home.HomeActivity
+import com.tari.android.wallet.ui.fragment.home.HomeViewModel
 import com.tari.android.wallet.ui.fragment.onboarding.activity.OnboardingFlowActivity
 import com.tari.android.wallet.ui.fragment.onboarding.createWallet.CreateWalletViewModel
 import com.tari.android.wallet.ui.fragment.onboarding.inroduction.IntroductionViewModel
@@ -52,7 +53,6 @@ import com.tari.android.wallet.ui.fragment.restore.chooseRestoreOption.ChooseRes
 import com.tari.android.wallet.ui.fragment.restore.enterRestorationPassword.EnterRestorationPasswordViewModel
 import com.tari.android.wallet.ui.fragment.restore.inputSeedWords.InputSeedWordsViewModel
 import com.tari.android.wallet.ui.fragment.restore.walletRestoringFromSeedWords.WalletRestoringFromSeedWordsViewModel
-import com.tari.android.wallet.ui.fragment.send.activity.SendTariViewModel
 import com.tari.android.wallet.ui.fragment.send.addAmount.AddAmountViewModel
 import com.tari.android.wallet.ui.fragment.send.addNote.AddNoteFragment
 import com.tari.android.wallet.ui.fragment.send.addNote.gif.ChooseGIFDialogFragment
@@ -162,9 +162,9 @@ interface ApplicationComponent {
     fun inject(viewModel: LogsViewModel)
     fun inject(viewModel: BackupOptionViewModel)
     fun inject(viewModel: LogFilesManager)
-    fun inject(viewModel: SendTariViewModel)
     fun inject(viewModel: ThemeSelectorViewModel)
     fun inject(viewModel: DeleteWalletViewModel)
+    fun inject(viewModel: HomeViewModel)
 
     fun getClipboardManager(): ClipboardManager
 }

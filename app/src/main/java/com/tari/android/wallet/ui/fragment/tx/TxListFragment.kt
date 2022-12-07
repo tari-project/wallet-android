@@ -36,7 +36,6 @@ import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
 import android.animation.ValueAnimator
 import android.annotation.SuppressLint
-import android.content.Intent
 import android.graphics.drawable.GradientDrawable
 import android.os.*
 import android.view.LayoutInflater
@@ -58,7 +57,6 @@ import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.extension.observe
 import com.tari.android.wallet.extension.observeOnLoad
 import com.tari.android.wallet.model.BalanceInfo
-import com.tari.android.wallet.model.User
 import com.tari.android.wallet.ui.common.CommonActivity
 import com.tari.android.wallet.ui.common.CommonFragment
 import com.tari.android.wallet.ui.common.recyclerView.CommonAdapter
@@ -66,7 +64,6 @@ import com.tari.android.wallet.ui.common.recyclerView.CommonViewHolderItem
 import com.tari.android.wallet.ui.component.networkStateIndicator.ConnectionIndicatorViewModel
 import com.tari.android.wallet.ui.extension.*
 import com.tari.android.wallet.ui.extension.PermissionExtensions.runWithPermission
-import com.tari.android.wallet.ui.fragment.send.activity.SendTariActivity
 import com.tari.android.wallet.ui.fragment.tx.adapter.TxListAdapter
 import com.tari.android.wallet.ui.fragment.tx.questionMark.QuestionMarkViewModel
 import com.tari.android.wallet.ui.fragment.tx.ui.CustomScrollView
@@ -243,16 +240,10 @@ class TxListFragment : CommonFragment<FragmentTxListBinding, TxListViewModel>(),
         when (navigation) {
             TxListNavigation.ToTTLStore -> router.toTTLStore()
             is TxListNavigation.ToTxDetails -> router.toTxDetails(navigation.tx)
-            is TxListNavigation.ToSendTariToUser -> navigateToSendTari(navigation.user)
+            is TxListNavigation.ToSendTariToUser -> router.toSendTari(navigation.user)
             TxListNavigation.ToUtxos -> router.toUtxos()
             TxListNavigation.ToAllSettings -> router.toAllSettings()
         }
-    }
-
-    private fun navigateToSendTari(user: User) {
-        val intent = Intent(requireContext(), SendTariActivity::class.java).apply { putExtra("recipientUser", user as Parcelable) }
-        startActivity(intent)
-        requireActivity().overridePendingTransition(R.anim.enter_from_right, R.anim.exit_to_left)
     }
 
     private fun updateTxListUI(list: MutableList<CommonViewHolderItem>) {

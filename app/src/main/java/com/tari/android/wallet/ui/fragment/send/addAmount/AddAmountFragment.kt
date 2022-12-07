@@ -58,7 +58,7 @@ import com.tari.android.wallet.ui.dialog.error.ErrorDialogArgs
 import com.tari.android.wallet.ui.dialog.modular.ModularDialog
 import com.tari.android.wallet.ui.dialog.tooltipDialog.TooltipDialogArgs
 import com.tari.android.wallet.ui.extension.*
-import com.tari.android.wallet.ui.fragment.send.activity.SendTariActivity
+import com.tari.android.wallet.ui.fragment.home.HomeActivity
 import com.tari.android.wallet.ui.fragment.send.addAmount.feeModule.NetworkSpeed
 import com.tari.android.wallet.ui.fragment.send.addAmount.keyboard.KeyboardController
 import com.tari.android.wallet.ui.fragment.send.amountView.AmountStyle
@@ -118,9 +118,9 @@ class AddAmountFragment : CommonFragment<FragmentAddAmountBinding, AddAmountView
     }
 
     private fun setupUI() {
-        val amount = arguments?.parcelable<MicroTari>(SendTariActivity.PARAMETER_AMOUNT)
+        val amount = arguments?.parcelable<MicroTari>(HomeActivity.PARAMETER_AMOUNT)
         keyboardController.setup(requireContext(), AmountCheckRunnable(), ui.numpad, ui.amount, amount?.tariValue?.toDouble() ?: Double.MIN_VALUE)
-        recipientUser = arguments?.parcelable(SendTariActivity.PARAMETER_USER)
+        recipientUser = arguments?.parcelable(HomeActivity.PARAMETER_USER)
         // hide tx fee
         ui.txFeeContainerView.invisible()
         // hide/disable continue button
