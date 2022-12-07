@@ -84,7 +84,12 @@ import com.tari.android.wallet.ui.fragment.settings.allSettings.AllSettingsFragm
 import com.tari.android.wallet.ui.fragment.settings.allSettings.AllSettingsRouter
 import com.tari.android.wallet.ui.fragment.settings.allSettings.about.TariAboutFragment
 import com.tari.android.wallet.ui.fragment.settings.backgroundService.BackgroundServiceSettingsFragment
-import com.tari.android.wallet.ui.fragment.settings.backup.activity.BackupSettingsActivity
+import com.tari.android.wallet.ui.fragment.settings.backup.BackupSettingsRouter
+import com.tari.android.wallet.ui.fragment.settings.backup.ChangeSecurePasswordFragment
+import com.tari.android.wallet.ui.fragment.settings.backup.EnterCurrentPasswordFragment
+import com.tari.android.wallet.ui.fragment.settings.backup.backupSettings.BackupSettingsFragment
+import com.tari.android.wallet.ui.fragment.settings.backup.verifySeedPhrase.VerifySeedPhraseFragment
+import com.tari.android.wallet.ui.fragment.settings.backup.writeDownSeedWords.WriteDownSeedPhraseFragment
 import com.tari.android.wallet.ui.fragment.settings.baseNodeConfig.BaseNodeRouter
 import com.tari.android.wallet.ui.fragment.settings.baseNodeConfig.addBaseNode.AddCustomBaseNodeFragment
 import com.tari.android.wallet.ui.fragment.settings.baseNodeConfig.changeBaseNode.ChangeBaseNodeFragment
@@ -107,7 +112,7 @@ import kotlinx.coroutines.launch
 import java.lang.ref.WeakReference
 import javax.inject.Inject
 
-class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>(), AllSettingsRouter, TxListRouter, BaseNodeRouter {
+class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>(), AllSettingsRouter, TxListRouter, BaseNodeRouter, BackupSettingsRouter {
 
     @Inject
     lateinit var sharedPrefsWrapper: SharedPrefsRepository
@@ -328,7 +333,7 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>(), AllSe
 
     override fun toAllSettings() = ui.viewPager.setCurrentItem(INDEX_SETTINGS, NO_SMOOTH_SCROLL)
 
-    override fun toBackupSettings() = startActivity(Intent(this, BackupSettingsActivity::class.java))
+    override fun toBackupSettings() = addFragment(BackupSettingsFragment())
 
     override fun toDeleteWallet() = addFragment(DeleteWalletFragment())
 
@@ -349,6 +354,29 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>(), AllSe
     override fun toNetworkSelection() = addFragment(NetworkSelectionFragment())
 
     override fun toAddCustomBaseNode() = addFragment(AddCustomBaseNodeFragment())
+
+    override fun toWalletBackupWithRecoveryPhrase() = addFragment(WriteDownSeedPhraseFragment())
+
+    override fun toSeedPhraseVerification(seedWords: List<String>) = addFragment(VerifySeedPhraseFragment.newInstance(seedWords))
+
+    override fun toConfirmPassword() = addFragment(EnterCurrentPasswordFragment())
+
+    override fun toChangePassword() = addFragment(ChangeSecurePasswordFragment())
+
+    override fun onPasswordChanged() {
+        if (supportFragmentManager.findFragmentByTag(EnterCurrentPasswordFragment::class.java.simpleName) != null) {
+            supportFragmentManager.popBackStackImmediate(
+                EnterCurrentPasswordFragment::class.java.simpleName,
+                FragmentManager.POP_BACK_STACK_INCLUSIVE
+            )
+        } else {
+            onBackPressed()
+        }
+    }
+
+    override fun onSeedPhraseVerificationComplete() {
+        supportFragmentManager.popBackStackImmediate(WriteDownSeedPhraseFragment::class.java.simpleName, FragmentManager.POP_BACK_STACK_INCLUSIVE)
+    }
 
     fun willNotifyAboutNewTx(): Boolean = ui.viewPager.currentItem == INDEX_HOME
 

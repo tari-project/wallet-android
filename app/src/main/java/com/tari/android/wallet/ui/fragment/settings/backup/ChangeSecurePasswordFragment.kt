@@ -64,7 +64,6 @@ import com.tari.android.wallet.ui.common.domain.ResourceManager
 import com.tari.android.wallet.ui.dialog.error.ErrorDialogArgs
 import com.tari.android.wallet.ui.dialog.modular.ModularDialog
 import com.tari.android.wallet.ui.extension.*
-import com.tari.android.wallet.ui.fragment.settings.backup.activity.BackupSettingsRouter
 import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupSettingsRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -281,7 +280,7 @@ class ChangeSecurePasswordFragment : Fragment() {
         when (backupState) {
             is BackupUpToDate -> {
                 allowExitAndPasswordEditing()
-                (requireActivity() as BackupSettingsRouter).onPasswordChanged(this)
+                (requireActivity() as BackupSettingsRouter).onPasswordChanged()
             }
             is BackupFailed -> { // backup failed
                 showBackupErrorDialog(deductBackupErrorMessage(backupState.backupException)) {
@@ -310,9 +309,6 @@ class ChangeSecurePasswordFragment : Fragment() {
     }
 
     companion object {
-        @Suppress("DEPRECATION")
-        fun newInstance() = ChangeSecurePasswordFragment()
-
         private const val KEYBOARD_SHOW_UP_DELAY_AFTER_LOCAL_AUTH = 500L
         private const val KEYBOARD_ANIMATION_TIME = 100L
     }

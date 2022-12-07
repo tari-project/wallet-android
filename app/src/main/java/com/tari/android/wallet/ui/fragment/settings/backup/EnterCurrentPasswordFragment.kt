@@ -46,7 +46,6 @@ import com.tari.android.wallet.R.color.white
 import com.tari.android.wallet.databinding.FragmentEnterBackupPasswordBinding
 import com.tari.android.wallet.di.DiContainer.appComponent
 import com.tari.android.wallet.ui.extension.*
-import com.tari.android.wallet.ui.fragment.settings.backup.activity.BackupSettingsRouter
 import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupSettingsRepository
 import javax.inject.Inject
 
@@ -75,7 +74,7 @@ class EnterCurrentPasswordFragment : Fragment() {
             val input = (ui.passwordEditText.text?.toString() ?: "").toCharArray()
             val backupPassword = backupSettingsRepository.backupPassword?.toCharArray() ?: charArrayOf()
             if (input.contentEquals(backupPassword)) {
-                (requireActivity() as BackupSettingsRouter).toChangePassword(this)
+                (requireActivity() as BackupSettingsRouter).toChangePassword()
             } else {
                 ui.changePasswordCtaTextView.isEnabled = false
                 ui.changePasswordCtaTextView.setTextColor(color(change_password_cta_disabled))
@@ -111,8 +110,6 @@ class EnterCurrentPasswordFragment : Fragment() {
     }
 
     companion object {
-        fun newInstance() = EnterCurrentPasswordFragment()
-
         private const val DISABLE_BUTTON_TIME = 1000L
         private const val LOCAL_AUTH_DELAY_TIME = 500L
     }

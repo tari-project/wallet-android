@@ -30,22 +30,22 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.tari.android.wallet.ui.fragment.settings.backup.activity
+package com.tari.android.wallet.ui.fragment.settings.backup
 
 import androidx.fragment.app.Fragment
 
 interface BackupSettingsRouter {
 
-    fun toWalletBackupWithRecoveryPhrase(sourceFragment: Fragment)
+    fun toWalletBackupWithRecoveryPhrase()
 
-    fun toSeedPhraseVerification(sourceFragment: Fragment, seedWords: List<String>)
+    fun toSeedPhraseVerification(seedWords: List<String>)
 
-    fun toConfirmPassword(sourceFragment: Fragment)
+    fun toConfirmPassword()
 
-    fun toChangePassword(sourceFragment: Fragment)
+    fun toChangePassword()
 
-    fun onPasswordChanged(sourceFragment: Fragment)
+    fun onPasswordChanged()
 
-    fun onSeedPhraseVerificationComplete(sourceFragment: Fragment)
+    fun onSeedPhraseVerificationComplete()
 
 }

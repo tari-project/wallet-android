@@ -49,7 +49,7 @@ import com.tari.android.wallet.databinding.FragmentWriteDownSeedPhraseBinding
 import com.tari.android.wallet.extension.observe
 import com.tari.android.wallet.ui.common.CommonFragment
 import com.tari.android.wallet.ui.extension.*
-import com.tari.android.wallet.ui.fragment.settings.backup.activity.BackupSettingsRouter
+import com.tari.android.wallet.ui.fragment.settings.backup.BackupSettingsRouter
 import com.tari.android.wallet.ui.fragment.settings.backup.writeDownSeedWords.adapter.PhraseWordsAdapter
 import com.tari.android.wallet.util.Constants
 
@@ -75,7 +75,7 @@ class WriteDownSeedPhraseFragment : CommonFragment<FragmentWriteDownSeedPhraseBi
     private fun setupUI() {
         ui.warningCheckBox.setOnCheckedChangeListener { _, isChecked -> updateContinueButtonState(isChecked) }
         ui.continueCtaView.setOnClickListener(ThrottleClick {
-            it.animateClick { (requireActivity() as BackupSettingsRouter).toSeedPhraseVerification(this, viewModel.seedWords.value!!) }
+            it.animateClick { (requireActivity() as BackupSettingsRouter).toSeedPhraseVerification(viewModel.seedWords.value!!) }
         })
         ui.phraseWordsRecyclerView.layoutManager = GridLayoutManager(requireContext(), WORD_COLUMNS_COUNT)
         ui.phraseWordsRecyclerView.adapter = adapter
@@ -186,8 +186,6 @@ class WriteDownSeedPhraseFragment : CommonFragment<FragmentWriteDownSeedPhraseBi
 
     companion object {
         private const val WORD_COLUMNS_COUNT = 2
-
-        fun newInstance() = WriteDownSeedPhraseFragment()
     }
 }
 
