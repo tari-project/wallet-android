@@ -72,7 +72,7 @@ import com.tari.android.wallet.ui.fragment.settings.backup.verifySeedPhrase.Veri
 import com.tari.android.wallet.ui.fragment.settings.baseNodeConfig.addBaseNode.AddCustomBaseNodeViewModel
 import com.tari.android.wallet.ui.fragment.settings.baseNodeConfig.changeBaseNode.ChangeBaseNodeViewModel
 import com.tari.android.wallet.ui.fragment.settings.bugReporting.BugsReportingViewModel
-import com.tari.android.wallet.ui.fragment.settings.deleteWallet.DeleteWalletActivity
+import com.tari.android.wallet.ui.fragment.settings.deleteWallet.DeleteWalletViewModel
 import com.tari.android.wallet.ui.fragment.settings.logs.LogFilesManager
 import com.tari.android.wallet.ui.fragment.settings.logs.logFiles.LogFilesViewModel
 import com.tari.android.wallet.ui.fragment.settings.logs.logs.LogsViewModel
@@ -117,7 +117,6 @@ interface ApplicationComponent {
     fun inject(activity: AuthActivity)
     fun inject(activity: HomeActivity)
     fun inject(activity: QRScannerActivity)
-    fun inject(activity: DeleteWalletActivity)
     fun inject(activity: WalletRestoreActivity)
 
     fun inject(fragment: AddRecipientFragment)
@@ -165,6 +164,7 @@ interface ApplicationComponent {
     fun inject(viewModel: LogFilesManager)
     fun inject(viewModel: SendTariViewModel)
     fun inject(viewModel: ThemeSelectorViewModel)
+    fun inject(viewModel: DeleteWalletViewModel)
 
     fun getClipboardManager(): ClipboardManager
 }

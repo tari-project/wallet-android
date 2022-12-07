@@ -88,7 +88,7 @@ import com.tari.android.wallet.ui.fragment.settings.backup.activity.BackupSettin
 import com.tari.android.wallet.ui.fragment.settings.baseNodeConfig.BaseNodeRouter
 import com.tari.android.wallet.ui.fragment.settings.baseNodeConfig.addBaseNode.AddCustomBaseNodeFragment
 import com.tari.android.wallet.ui.fragment.settings.baseNodeConfig.changeBaseNode.ChangeBaseNodeFragment
-import com.tari.android.wallet.ui.fragment.settings.deleteWallet.DeleteWalletActivity
+import com.tari.android.wallet.ui.fragment.settings.deleteWallet.DeleteWalletFragment
 import com.tari.android.wallet.ui.fragment.settings.networkSelection.NetworkSelectionFragment
 import com.tari.android.wallet.ui.fragment.settings.themeSelector.ThemeSelectorFragment
 import com.tari.android.wallet.ui.fragment.settings.torBridges.TorBridgesSelectionFragment
@@ -132,7 +132,7 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>(), AllSe
 
         val viewModel: HomeViewModel by viewModels()
         bindViewModel(viewModel)
-        
+
         setContainerId(R.id.nav_container)
 
         overridePendingTransition(0, 0)
@@ -330,7 +330,7 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>(), AllSe
 
     override fun toBackupSettings() = startActivity(Intent(this, BackupSettingsActivity::class.java))
 
-    override fun toDeleteWallet() = startActivity(Intent(this, DeleteWalletActivity::class.java))
+    override fun toDeleteWallet() = addFragment(DeleteWalletFragment())
 
     override fun toBackgroundService() = startActivity(Intent(this, BackgroundServiceSettingsActivity::class.java))
 

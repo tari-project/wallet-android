@@ -44,6 +44,8 @@ abstract class CommonActivity<Binding : ViewBinding, VM : CommonViewModel> : App
     fun bindViewModel(viewModel: VM) = with(viewModel) {
         this@CommonActivity.viewModel = viewModel
 
+        setTariTheme(viewModel.tariSettingsSharedRepository.currentTheme!!)
+
         subscribeToCommon(viewModel)
     }
 
@@ -57,8 +59,6 @@ abstract class CommonActivity<Binding : ViewBinding, VM : CommonViewModel> : App
         observe(dismissDialog) { dialogManager.dismiss() }
 
         observe(loadingDialog) { dialogManager.handleProgress(it) }
-
-        observe(currentTheme) { setTariTheme(it) }
     }
 
     private fun setTariTheme(theme: TariTheme) {

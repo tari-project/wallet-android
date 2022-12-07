@@ -154,12 +154,6 @@
             android:theme="@style/AppTheme.Light"
             android:windowSoftInputMode="adjustResize|stateAlwaysHidden" />
         <activity
-            android:name="com.tari.android.wallet.ui.fragment.settings.deleteWallet.DeleteWalletActivity"
-            android:configChanges="keyboardHidden|orientation|screenSize"
-            android:parentActivityName="com.tari.android.wallet.ui.fragment.settings.deleteWallet.DeleteWalletActivity"
-            android:theme="@style/AppTheme.Light"
-            android:windowSoftInputMode="adjustResize|stateAlwaysHidden" />
-        <activity
             android:name=".ui.fragment.settings.backgroundService.BackgroundServiceSettingsActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:parentActivityName=".ui.fragment.settings.backgroundService.BackgroundServiceSettingsActivity"
