@@ -32,22 +32,22 @@
  */
 package com.tari.android.wallet.ui.fragment.settings.backgroundService
 
-import android.content.Context
-import android.content.Intent
 import android.os.Bundle
-import androidx.activity.viewModels
-import com.tari.android.wallet.databinding.ActivityBackgroundServiceSettingsBinding
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import androidx.fragment.app.viewModels
+import com.tari.android.wallet.databinding.FragmentBackgroundServiceSettingsBinding
 import com.tari.android.wallet.extension.observe
-import com.tari.android.wallet.ui.common.CommonActivity
-import com.tari.android.wallet.ui.extension.ThrottleClick
+import com.tari.android.wallet.ui.common.CommonFragment
 
-class BackgroundServiceSettingsActivity : CommonActivity<ActivityBackgroundServiceSettingsBinding, BackgroundServiceSettingsViewModel>() {
+class BackgroundServiceSettingsFragment : CommonFragment<FragmentBackgroundServiceSettingsBinding, BackgroundServiceSettingsViewModel>() {
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
+        FragmentBackgroundServiceSettingsBinding.inflate(inflater, container, false).also { ui = it }.root
 
-        ui = ActivityBackgroundServiceSettingsBinding.inflate(layoutInflater)
-        setContentView(ui.root)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
         val viewModel: BackgroundServiceSettingsViewModel by viewModels()
         bindViewModel(viewModel)
@@ -63,12 +63,6 @@ class BackgroundServiceSettingsActivity : CommonActivity<ActivityBackgroundServi
 
     private fun observeUI() = with(viewModel) {
         observe(switchState) { ui.loadingSwitchView.setState(it) }
-    }
-
-    companion object {
-        fun launch(context: Context) {
-            context.startActivity(Intent(context, BackgroundServiceSettingsActivity::class.java))
-        }
     }
 }
 

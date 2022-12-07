@@ -154,12 +154,6 @@
             android:theme="@style/AppTheme.Light"
             android:windowSoftInputMode="adjustResize|stateAlwaysHidden" />
         <activity
-            android:name=".ui.fragment.settings.backgroundService.BackgroundServiceSettingsActivity"
-            android:configChanges="keyboardHidden|orientation|screenSize"
-            android:parentActivityName=".ui.fragment.settings.backgroundService.BackgroundServiceSettingsActivity"
-            android:theme="@style/AppTheme.Light"
-            android:windowSoftInputMode="adjustResize|stateAlwaysHidden" />
-        <activity
             android:name="com.tari.android.wallet.ui.fragment.restore.activity.WalletRestoreActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:parentActivityName=".ui.fragment.onboarding.activity.OnboardingFlowActivity"

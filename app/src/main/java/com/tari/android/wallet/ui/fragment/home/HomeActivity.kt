@@ -83,7 +83,7 @@ import com.tari.android.wallet.ui.fragment.send.activity.SendTariActivity
 import com.tari.android.wallet.ui.fragment.settings.allSettings.AllSettingsFragment
 import com.tari.android.wallet.ui.fragment.settings.allSettings.AllSettingsRouter
 import com.tari.android.wallet.ui.fragment.settings.allSettings.about.TariAboutFragment
-import com.tari.android.wallet.ui.fragment.settings.backgroundService.BackgroundServiceSettingsActivity
+import com.tari.android.wallet.ui.fragment.settings.backgroundService.BackgroundServiceSettingsFragment
 import com.tari.android.wallet.ui.fragment.settings.backup.activity.BackupSettingsActivity
 import com.tari.android.wallet.ui.fragment.settings.baseNodeConfig.BaseNodeRouter
 import com.tari.android.wallet.ui.fragment.settings.baseNodeConfig.addBaseNode.AddCustomBaseNodeFragment
@@ -332,7 +332,7 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>(), AllSe
 
     override fun toDeleteWallet() = addFragment(DeleteWalletFragment())
 
-    override fun toBackgroundService() = startActivity(Intent(this, BackgroundServiceSettingsActivity::class.java))
+    override fun toBackgroundService() = addFragment(BackgroundServiceSettingsFragment())
 
     override fun toAbout() = addFragment(TariAboutFragment())
 

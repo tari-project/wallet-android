@@ -95,11 +95,6 @@ class BackupSettingsActivity : CommonActivity<ActivityBackupSettingsBinding, Bac
         supportFragmentManager.popBackStackImmediate(WriteDownSeedPhraseFragment::class.java.simpleName, FragmentManager.POP_BACK_STACK_INCLUSIVE)
     }
 
-    override fun onBackPressed() {
-        super.onBackPressed()
-        overridePendingTransition(R.anim.enter_from_left, R.anim.exit_to_right)
-    }
-
     // nyarian:
     // allowStateLoss parameter is necessary to resolve device-specific issues like one
     // for samsung devices with biometrics enabled, as after launching the biometric prompt
