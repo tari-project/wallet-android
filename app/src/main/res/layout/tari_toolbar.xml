@@ -2,8 +2,8 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:background="?attr/palette_background_primary"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:background="?attr/palette_background_primary">
 
     <FrameLayout
         android:id="@+id/back_cta_view"
@@ -19,8 +19,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:tint="?attr/palette_text_heading"
-            android:src="@drawable/back_button_vector" />
+            android:src="@drawable/back_button_vector"
+            android:tint="?attr/palette_text_heading" />
 
     </FrameLayout>
 
@@ -37,6 +37,37 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/toolbar_right_icon"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_gravity="center"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="16dp"
+        android:src="@drawable/ic_plus"
+        android:tint="?attr/palette_text_heading"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintDimensionRatio="1:1"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <com.tari.android.wallet.ui.component.CustomFontTextView
+        android:id="@+id/toolbar_right_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="16dp"
+        android:text="@string/dummy_text"
+        android:textColor="?attr/palette_text_links"
+        android:tint="?attr/palette_text_heading"
+        android:visibility="gone"
+        app:customFont="@string/font_heavy"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <View

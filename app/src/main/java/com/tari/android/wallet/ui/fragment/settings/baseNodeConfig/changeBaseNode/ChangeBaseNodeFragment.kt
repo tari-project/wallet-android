@@ -33,15 +33,15 @@
 package com.tari.android.wallet.ui.fragment.settings.baseNodeConfig.changeBaseNode
 
 import android.os.Bundle
-import android.view.*
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.tari.android.wallet.R
 import com.tari.android.wallet.databinding.FragmentBaseNodeChangeBinding
 import com.tari.android.wallet.extension.observe
 import com.tari.android.wallet.ui.common.CommonFragment
 import com.tari.android.wallet.ui.common.recyclerView.CommonAdapter
-import com.tari.android.wallet.ui.extension.setOnThrottledClickListener
 import com.tari.android.wallet.ui.fragment.settings.baseNodeConfig.BaseNodeRouter
 import com.tari.android.wallet.ui.fragment.settings.baseNodeConfig.changeBaseNode.adapter.BaseNodeViewHolderItem
 import com.tari.android.wallet.ui.fragment.settings.baseNodeConfig.changeBaseNode.adapter.ChangeBaseNodeAdapter
@@ -56,7 +56,6 @@ class ChangeBaseNodeFragment : CommonFragment<FragmentBaseNodeChangeBinding, Cha
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val viewModel: ChangeBaseNodeViewModel by viewModels()
-        setHasOptionsMenu(true)
         ui.rootView
         bindViewModel(viewModel)
         setupUI()
@@ -68,18 +67,8 @@ class ChangeBaseNodeFragment : CommonFragment<FragmentBaseNodeChangeBinding, Cha
         viewModel.refresh()
     }
 
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) = inflater.inflate(R.menu.change_base_node_menu, menu)
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            R.id.add_base_node_action -> (requireActivity() as BaseNodeRouter).toAddCustomBaseNode()
-        }
-        return super.onOptionsItemSelected(item)
-    }
-
     private fun setupUI() = with(ui) {
-        backCtaView.setOnThrottledClickListener { requireActivity().onBackPressed() }
-        addBaseNodeButton.setOnThrottledClickListener { (requireActivity() as BaseNodeRouter).toAddCustomBaseNode() }
+        toolbar.rightAction = { (requireActivity() as BaseNodeRouter).toAddCustomBaseNode() }
         baseNodeList.adapter = adapter
         baseNodeList.layoutManager = LinearLayoutManager(requireContext())
         adapter.setClickListener(CommonAdapter.ItemClickListener { viewModel.selectBaseNode((it as BaseNodeViewHolderItem).baseNodeDto) })
