@@ -231,7 +231,6 @@ class ChangeSecurePasswordFragment : Fragment() {
     }
 
     private fun setCTAs() {
-        ui.backCtaView.setOnClickListener(ThrottleClick { requireActivity().onBackPressed() })
         ui.setPasswordCtaTextView.setOnClickListener {
             ui.setPasswordCtaContainerView.animateClick()
             requireActivity().hideKeyboard()
@@ -242,13 +241,11 @@ class ChangeSecurePasswordFragment : Fragment() {
     }
 
     private fun preventExitAndPasswordEditing() {
-        ui.backCtaView.isEnabled = false
         ui.enterPasswordEditText.isEnabled = false
         ui.confirmPasswordEditText.isEnabled = false
     }
 
     private fun allowExitAndPasswordEditing() {
-        ui.backCtaView.isEnabled = true
         ui.enterPasswordEditText.isEnabled = true
         ui.confirmPasswordEditText.isEnabled = true
     }

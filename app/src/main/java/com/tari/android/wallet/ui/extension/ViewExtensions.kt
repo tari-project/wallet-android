@@ -35,7 +35,9 @@ package com.tari.android.wallet.ui.extension
 import android.animation.AnimatorSet
 import android.animation.ValueAnimator
 import android.content.Context
+import android.content.res.TypedArray
 import android.graphics.drawable.Drawable
+import android.util.AttributeSet
 import android.util.TypedValue
 import android.view.View
 import android.view.ViewGroup
@@ -347,4 +349,14 @@ fun FragmentTransaction.addFadeInAnimation(): FragmentTransaction {
 fun FragmentTransaction.addEnterLeftAnimation(): FragmentTransaction {
     this.setCustomAnimations(R.anim.enter_from_right, R.anim.exit_to_left, R.anim.enter_from_left, R.anim.exit_to_right)
     return this
+}
+
+fun View.obtain(attrs: AttributeSet, styleable: IntArray): TypedArray = context.theme.obtainStyledAttributes(attrs, styleable, 0, 0)
+
+fun TypedArray.runRecycle(action: TypedArray.() -> Unit) {
+    try {
+        action.invoke(this)
+    } finally {
+        recycle()
+    }
 }

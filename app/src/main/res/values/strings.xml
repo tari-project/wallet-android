@@ -49,6 +49,7 @@
     <string name="dummy_message">Thanks again for helping with my move</string>
     <string name="long_dummy_message">Thanks again for helping with my move. Thanks again for helping with my move. Thanks again for helping with my move. Thanks again for helping with my move</string>
     <string name="dummy_emoji">🍀</string>
+    <string name="dummy_text">Test text</string>
 
     <!-- notifications -->
     <string name="wallet_service_notification_channel_name">Tari Aurora Service Notification Channel</string>

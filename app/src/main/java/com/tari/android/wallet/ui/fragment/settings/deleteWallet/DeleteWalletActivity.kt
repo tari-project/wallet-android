@@ -80,7 +80,6 @@ class DeleteWalletActivity : CommonActivity<ActivityDeleteWalletBinding, DeleteW
 
     private fun setupUI() {
         ui.deleteWalletProgress.setColor(color(R.color.common_error))
-        ui.backCtaView.setOnClickListener(ThrottleClick { onBackPressed() })
         ui.deleteWalletCtaView.setOnClickListener(ThrottleClick { confirmDeleteWallet() })
     }
 
@@ -102,7 +101,6 @@ class DeleteWalletActivity : CommonActivity<ActivityDeleteWalletBinding, DeleteW
 
     private fun deleteWallet() {
         // disable CTAs
-        ui.backCtaView.isEnabled = false
         ui.deleteWalletCtaView.isEnabled = false
         ui.deleteWalletProgress.visible()
         // delete wallet

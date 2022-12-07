@@ -75,7 +75,6 @@ class ChooseRestoreOptionFragment : CommonFragment<FragmentChooseRestoreOptionBi
     }
 
     private fun setupUI() = with(ui) {
-        backCtaView.setOnThrottledClickListener { requireActivity().onBackPressed() }
         restoreWithRecoveryPhraseCtaView.setOnClickListener { processNavigation(ChooseRestoreOptionNavigation.ToRestoreWithRecoveryPhrase) }
     }
 

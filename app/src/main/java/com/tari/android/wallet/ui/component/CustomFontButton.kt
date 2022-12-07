@@ -41,8 +41,7 @@ import androidx.appcompat.widget.AppCompatButton
  *
  * @author The Tari Development Team
  */
-class CustomFontButton(context: Context, attrs: AttributeSet) :
-    AppCompatButton(context, attrs) {
+class CustomFontButton(context: Context, attrs: AttributeSet) : AppCompatButton(context, attrs) {
 
     init {
         if (!isInEditMode) {

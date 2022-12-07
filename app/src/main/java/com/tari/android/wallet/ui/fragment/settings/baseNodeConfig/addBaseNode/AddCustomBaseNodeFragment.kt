@@ -85,7 +85,6 @@ class AddCustomBaseNodeFragment : CommonFragment<FragmentBaseNodeAddBinding, Add
     }
 
     private fun setupUI() = with(ui) {
-        backCtaView.setOnThrottledClickListener { requireActivity().onBackPressed() }
         saveButton.setOnThrottledClickListener { viewModel.saveCustomNode() }
         nameEditText.addTextChangedListener(onTextChanged = { text, _, _, _ -> viewModel.onNameChanged(text?.toString().orEmpty()) })
         publicKeyHexEditText.addTextChangedListener(onTextChanged = { text, _, _, _ -> viewModel.onPublicKeyHexChanged(text?.toString().orEmpty()) })

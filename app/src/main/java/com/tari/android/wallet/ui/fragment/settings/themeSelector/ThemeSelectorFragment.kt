@@ -67,7 +67,6 @@ class ThemeSelectorFragment : CommonFragment<FragmentThemeChangeBinding, ThemeSe
     }
 
     private fun setupUI() = with(ui) {
-        backCtaView.setOnThrottledClickListener { requireActivity().onBackPressed() }
         themesList.adapter = adapter
         themesList.layoutManager = LinearLayoutManager(requireContext())
         adapter.setClickListener(CommonAdapter.ItemClickListener { viewModel.selectTheme(it) })
