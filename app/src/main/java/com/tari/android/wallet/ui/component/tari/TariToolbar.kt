@@ -18,26 +18,32 @@ class TariToolbar(context: Context, attrs: AttributeSet) : FrameLayout(context, 
     var backPressedAction: () -> Unit = { (context as? Activity)?.onBackPressed() }
     var rightAction: () -> Unit = { }
 
+    val ui: TariToolbarBinding
+
     init {
-        val ui = TariToolbarBinding.inflate(LayoutInflater.from(context), this, false)
+        ui = TariToolbarBinding.inflate(LayoutInflater.from(context), this, false)
         addView(ui.root)
 
         ui.backCtaView.setOnThrottledClickListener { backPressedAction.invoke() }
 
         obtain(attrs, R.styleable.TariToolbar).runRecycle {
-            ui.toolbarTitle.text = getString(R.styleable.TariToolbar_text)
-            getString(R.styleable.TariToolbar_rightText)?.let { setupRightButton(ui, it) }
-            getDrawable(R.styleable.TariToolbar_rightIcon)?.let { setupRightIcon(ui, it) }
+            setText(getString(R.styleable.TariToolbar_text))
+            getString(R.styleable.TariToolbar_rightText)?.let { setupRightButton(it) }
+            getDrawable(R.styleable.TariToolbar_rightIcon)?.let { setupRightIcon(it) }
         }
     }
 
-    private fun setupRightButton(ui: TariToolbarBinding, newText: String) = with(ui.toolbarRightText) {
+    fun setText(text: String?) {
+        ui.toolbarTitle.text = text
+    }
+
+    fun setupRightButton(newText: String) = with(ui.toolbarRightText) {
         visible()
         text = newText
         setOnThrottledClickListener { rightAction() }
     }
 
-    private fun setupRightIcon(ui: TariToolbarBinding, icon: Drawable) = with(ui.toolbarRightIcon) {
+    fun setupRightIcon(icon: Drawable) = with(ui.toolbarRightIcon) {
         visible()
         setImageDrawable(icon)
         setOnThrottledClickListener { rightAction() }
