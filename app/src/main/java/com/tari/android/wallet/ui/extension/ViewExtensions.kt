@@ -360,3 +360,10 @@ fun TypedArray.runRecycle(action: TypedArray.() -> Unit) {
         recycle()
     }
 }
+
+fun Context.colorFromAttribute(attribute: Int): Int {
+    val attributes = obtainStyledAttributes(intArrayOf(attribute))
+    val dimension = attributes.getColor(0, 0)
+    attributes.recycle()
+    return dimension
+}

@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<com.tari.android.wallet.ui.component.tari.TariPrimaryBackground xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:background="?attr/palette_background_primary">
+    android:layout_height="wrap_content">
 
     <com.tari.android.wallet.ui.component.tari.TariBackButton
         android:id="@+id/back_cta_view"
@@ -13,7 +12,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintDimensionRatio="1:1"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"/>
+        app:layout_constraintTop_toTopOf="parent" />
 
     <com.tari.android.wallet.ui.component.CustomFontTextView
         android:id="@+id/toolbar_title"
@@ -53,8 +52,7 @@
         android:layout_marginTop="8dp"
         android:layout_marginEnd="16dp"
         android:text="@string/dummy_text"
-        android:textColor="?attr/palette_text_links"
-        android:tint="?attr/palette_text_heading"
+        android:textColor="?attr/palette_text_heading"
         android:visibility="gone"
         app:customFont="@string/font_heavy"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -70,4 +68,4 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+</com.tari.android.wallet.ui.component.tari.TariPrimaryBackground>

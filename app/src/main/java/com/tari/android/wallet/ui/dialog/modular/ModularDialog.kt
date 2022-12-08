@@ -7,6 +7,7 @@ import android.graphics.drawable.ColorDrawable
 import android.view.Gravity
 import android.view.View
 import android.widget.LinearLayout
+import androidx.appcompat.widget.LinearLayoutCompat
 import com.tari.android.wallet.R
 import com.tari.android.wallet.ui.component.networkStateIndicator.module.ConnectionStatusesModule
 import com.tari.android.wallet.ui.component.networkStateIndicator.module.ConnectionStatusesModuleView
@@ -63,7 +64,7 @@ open class ModularDialog(val context: Context) : TariDialog {
     }
 
     private fun updateModules(modules: List<IDialogModule>) {
-        val root = dialog.findViewById<LinearLayout>(R.id.dialog_root_view)
+        val root = dialog.findViewById<LinearLayoutCompat>(R.id.dialog_root_view)
         root.removeAllViews()
         for (module in modules) {
             module.dismissAction = dialog::dismiss

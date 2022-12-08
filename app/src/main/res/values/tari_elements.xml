@@ -4,4 +4,9 @@
         <attr name="rightIcon" format="reference" />
         <attr name="rightText" format="string" />
     </declare-styleable>
+
+    <declare-styleable name="TariPrimaryBackground">
+        <attr name="cornerRadius" format="dimension" />
+    </declare-styleable>
+
 </resources>

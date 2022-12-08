@@ -36,6 +36,5 @@ class BugsReportingFragment : CommonFragment<FragmentBugsReportingBinding, BugsR
         viewLogsButton.setOnClickListener { (requireActivity() as? DebugActivity)?.navigate(DebugNavigation.Logs, rooted = false) }
     }
 
-    private fun observeUI() = with(viewModel) {
-    }
+    private fun observeUI() = with(viewModel) { }
 }
