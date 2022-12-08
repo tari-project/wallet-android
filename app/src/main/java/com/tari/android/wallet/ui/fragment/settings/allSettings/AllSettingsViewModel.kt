@@ -105,7 +105,7 @@ class AllSettingsViewModel : CommonViewModel() {
                 _openYatOnboarding.postValue(Unit)
             },
             SettingsTitleDto(resourceManager.getString(all_settings_advanced_settings_label)),
-            ButtonViewDto(resourceManager.getString(all_settings_select_theme), all_settings_background_service_icon) {
+            ButtonViewDto(resourceManager.getString(all_settings_select_theme), all_settings_select_theme_icon) {
                 _navigation.postValue(AllSettingsNavigation.ToThemeSelection)
             },
             DividerViewHolderItem(),

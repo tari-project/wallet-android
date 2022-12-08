@@ -26,6 +26,7 @@ class TariAboutViewModel : CommonViewModel() {
             TariIconViewHolderItem(R.drawable.all_settings_user_agreement_icon, tari_about_icon_text_writing, tari_about_icon_url_writing),
             TariIconViewHolderItem(R.drawable.all_settings_privacy_policy_icon, tari_about_icon_text_privacy, tari_about_icon_url_privacy),
             TariIconViewHolderItem(R.drawable.all_settings_disclaimer_icon, tari_about_icon_text_bullhorn, tari_about_icon_url_bullhorn),
+            TariIconViewHolderItem(R.drawable.all_settings_select_theme_icon, tari_about_icon_text_select_theme, tari_about_icon_url_select_theme),
             TariIconViewHolderItem(R.drawable.all_settings_background_service_icon, tari_about_icon_text_refresh, tari_about_icon_url_refresh),
             TariIconViewHolderItem(R.drawable.all_settings_block_explorer_icon, tari_about_icon_text_magnifier, tari_about_icon_url_magnifier),
             TariIconViewHolderItem(R.drawable.all_settings_bridge_configuration_icon, tari_about_icon_text_repair, tari_about_icon_url_repair),

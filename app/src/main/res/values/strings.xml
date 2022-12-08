@@ -592,6 +592,7 @@
     <string name="tari_about_icon_url_privacy">https://thenounproject.com/icon/privacy-1381695/</string>
     <string name="tari_about_icon_url_bullhorn">https://thenounproject.com/icon/bullhorn-4213159/</string>
     <string name="tari_about_icon_url_refresh">https://thenounproject.com/icon/refresh-1043971/</string>
+    <string name="tari_about_icon_url_select_theme">https://thenounproject.com/icon/theme-396505/</string>
     <string name="tari_about_icon_url_magnifier">https://thenounproject.com/icon/magnifier-4213152/</string>
     <string name="tari_about_icon_url_repair">https://thenounproject.com/icon/repair-tools-4213156/</string>
     <string name="tari_about_icon_url_server">https://thenounproject.com/icon/internet-server-4213144/</string>
@@ -606,6 +607,7 @@
     <string name="tari_about_icon_text_privacy">Privacy by Gregor Cresnar from\nNounProject.com</string>
     <string name="tari_about_icon_text_bullhorn">Bullhorn by Design Circle from\nNounProject.com</string>
     <string name="tari_about_icon_text_refresh">Magnifier by Design Circle from\nNounProject.com (Modified)</string>
+    <string name="tari_about_icon_text_select_theme">Theme by icon 54 from\nNounProject.com (Modified)</string>
     <string name="tari_about_icon_text_magnifier">Refresh by Poombatta from\nNounProject.com</string>
     <string name="tari_about_icon_text_repair">Repair Tools by Design Circle from\nNounProject.com</string>
     <string name="tari_about_icon_text_server">Internet Server by Design Circle from\nNounProject.com</string>
