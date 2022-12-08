@@ -28,16 +28,13 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
-                <ImageButton
-                    android:id="@+id/back_view"
-                    android:layout_width="50dp"
-                    android:layout_height="50dp"
-                    android:layout_marginTop="@dimen/header_top_inset"
-                    android:background="@color/transparent"
-                    android:contentDescription="@null"
-                    android:src="@drawable/back_icon"
+                <com.tari.android.wallet.ui.component.tari.TariBackButton
+                    android:id="@+id/back_cta_view"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
+                    app:layout_constraintTop_toTopOf="parent"
+                    android:layout_width="@dimen/back_button_size"
+                    android:layout_height="@dimen/back_button_size"
+                    android:layout_marginTop="@dimen/header_top_inset"/>
 
                 <com.tari.android.wallet.ui.component.CustomFontTextView
                     android:id="@+id/payment_state_text_view"
@@ -49,10 +46,10 @@
                     android:textColor="@color/black"
                     android:textSize="16sp"
                     app:customFont="@string/font_heavy"
-                    app:layout_constraintBottom_toBottomOf="@id/back_view"
+                    app:layout_constraintBottom_toBottomOf="@id/back_cta_view"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="@id/back_view" />
+                    app:layout_constraintTop_toTopOf="@id/back_cta_view" />
 
                 <androidx.appcompat.widget.LinearLayoutCompat
                     android:layout_width="match_parent"

@@ -36,7 +36,6 @@ class MakeTransactionFragment : CommonFragment<FragmentMakeTransactionBinding, M
     private fun subscribeUI() = Unit
 
     private fun setupUI() {
-        ui.backButton.setOnThrottledClickListener { requireActivity().onBackPressed() }
         ui.viewPager.adapter = MakeTransactionAdapter(requireActivity())
         ui.viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
             override fun onPageSelected(position: Int) {

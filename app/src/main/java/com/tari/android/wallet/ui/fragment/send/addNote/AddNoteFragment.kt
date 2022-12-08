@@ -176,11 +176,11 @@ class AddNoteFragment : Fragment(), View.OnTouchListener {
 
         val fullEmojiIdListener = object : FullEmojiIdViewController.Listener {
             override fun animationHide(value: Float) {
-                ui.backButton.alpha = 1 - value
+                ui.backCtaView.alpha = 1 - value
             }
 
             override fun animationShow(value: Float) {
-                ui.backButton.alpha = 1 - value
+                ui.backCtaView.alpha = 1 - value
             }
         }
 
@@ -232,7 +232,7 @@ class AddNoteFragment : Fragment(), View.OnTouchListener {
     }
 
     private fun setupCTAs() {
-        ui.backButton.setOnClickListener { onBackButtonClicked(it) }
+        ui.backCtaView.backPressedAction = { onBackButtonClicked() }
         ui.emojiIdSummaryContainerView.setOnClickListener { emojiIdClicked() }
         ui.removeGifCtaView.setOnClickListener {
             changeScrollViewBottomConstraint(R.id.search_giphy_container_view)
@@ -274,8 +274,8 @@ class AddNoteFragment : Fragment(), View.OnTouchListener {
         ui.titleTextView.gone()
     }
 
-    private fun onBackButtonClicked(view: View) {
-        view.temporarilyDisableClick()
+    private fun onBackButtonClicked() {
+        ui.backCtaView.temporarilyDisableClick()
         // going back before hiding keyboard causes a blank white area on the screen
         // wait a while, then forward the back action to the host activity
         activity?.let {

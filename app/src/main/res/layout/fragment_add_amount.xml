@@ -7,17 +7,13 @@
     android:layout_height="match_parent"
     android:background="@color/white">
 
-    <!-- back -->
-    <ImageButton
-        android:id="@+id/back_button"
-        android:layout_width="@dimen/back_button_size"
-        android:layout_height="@dimen/back_button_size"
-        android:layout_marginTop="@dimen/header_top_inset"
-        android:background="@color/white"
-        android:contentDescription="@null"
-        android:src="@drawable/back_icon"
+    <com.tari.android.wallet.ui.component.tari.TariBackButton
+        android:id="@+id/back_cta_view"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/header_top_inset"/>
 
     <!-- contact alias -->
     <com.tari.android.wallet.ui.component.CustomFontTextView
@@ -33,10 +29,10 @@
         android:textColor="@color/black"
         android:textSize="16sp"
         app:customFont="@string/font_heavy"
-        app:layout_constraintBottom_toBottomOf="@id/back_button"
+        app:layout_constraintBottom_toBottomOf="@id/back_cta_view"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@id/back_button" />
+        app:layout_constraintTop_toTopOf="@id/back_cta_view" />
 
     <FrameLayout
         android:id="@+id/emoji_id_summary_container_view"
@@ -50,10 +46,10 @@
         android:paddingTop="@dimen/emoji_id_container_vertical_padding"
         android:paddingEnd="@dimen/emoji_id_container_horizontal_padding"
         android:paddingBottom="@dimen/emoji_id_container_vertical_padding"
-        app:layout_constraintBottom_toBottomOf="@id/back_button"
+        app:layout_constraintBottom_toBottomOf="@id/back_cta_view"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@id/back_button">
+        app:layout_constraintTop_toTopOf="@id/back_cta_view">
 
         <include
             android:id="@+id/emoji_id_summary_view"
@@ -68,7 +64,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:barrierDirection="bottom"
-        app:constraint_referenced_ids="back_button,title_text_view,emoji_id_summary_container_view" />
+        app:constraint_referenced_ids="back_cta_view,title_text_view,emoji_id_summary_container_view" />
 
     <LinearLayout
         android:layout_width="0dp"

@@ -5,7 +5,7 @@
     android:layout_height="wrap_content"
     android:background="?attr/palette_background_primary">
 
-    <FrameLayout
+    <com.tari.android.wallet.ui.component.tari.TariBackButton
         android:id="@+id/back_cta_view"
         android:layout_width="0dp"
         android:layout_height="0dp"
@@ -13,16 +13,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintDimensionRatio="1:1"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
-
-        <androidx.appcompat.widget.AppCompatImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:src="@drawable/back_button_vector"
-            android:tint="?attr/palette_text_heading" />
-
-    </FrameLayout>
+        app:layout_constraintTop_toTopOf="parent"/>
 
     <com.tari.android.wallet.ui.component.CustomFontTextView
         android:id="@+id/toolbar_title"

@@ -1,6 +1,5 @@
 package com.tari.android.wallet.ui.component.tari
 
-import android.app.Activity
 import android.content.Context
 import android.graphics.drawable.Drawable
 import android.util.AttributeSet
@@ -15,7 +14,12 @@ import com.tari.android.wallet.ui.extension.visible
 
 class TariToolbar(context: Context, attrs: AttributeSet) : FrameLayout(context, attrs) {
 
-    var backPressedAction: () -> Unit = { (context as? Activity)?.onBackPressed() }
+    var backPressedAction: () -> Unit
+        get() = ui.backCtaView.backPressedAction
+        set(value) {
+            ui.backCtaView.backPressedAction = value
+        }
+
     var rightAction: () -> Unit = { }
 
     val ui: TariToolbarBinding

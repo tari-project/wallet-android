@@ -129,11 +129,11 @@ class AddAmountFragment : CommonFragment<FragmentAddAmountBinding, AddAmountView
         // add first digit to the element list
         val fullEmojiIdListener = object : FullEmojiIdViewController.Listener {
             override fun animationHide(value: Float) {
-                ui.backButton.alpha = 1 - value
+                ui.backCtaView.alpha = 1 - value
             }
 
             override fun animationShow(value: Float) {
-                ui.backButton.alpha = 1 - value
+                ui.backCtaView.alpha = 1 - value
             }
         }
         emojiIdSummaryController = EmojiIdSummaryViewController(ui.emojiIdSummaryView)
@@ -150,7 +150,7 @@ class AddAmountFragment : CommonFragment<FragmentAddAmountBinding, AddAmountView
     }
 
     private fun setActionBindings() {
-        ui.backButton.setOnClickListener { onBackButtonClicked(it) }
+        ui.backCtaView.setOnClickListener { onBackButtonClicked(it) }
         ui.emojiIdSummaryContainerView.setOnClickListener { emojiIdClicked() }
         ui.txFeeDescTextView.setOnClickListener { showTxFeeToolTip() }
         ui.oneSidePaymentHelp.setOnClickListener { showOneSidePaymentTooltip() }
