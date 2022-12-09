@@ -15,22 +15,35 @@
             android:layout_height="wrap_content"
             app:text="@string/select_theme_title" />
 
-        <com.tari.android.wallet.ui.component.CustomFontTextView
+        <com.tari.android.wallet.ui.component.tari.TariSecondaryBackground
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="@dimen/common_horizontal_margin"
-            android:layout_marginTop="25dp"
-            android:layout_marginBottom="20dp"
-            android:lineSpacingMultiplier="1.5"
-            android:text="@string/select_theme_description"
-            android:textColor="@color/dark_gray"
-            android:textSize="14sp"
-            app:customFont="@string/font_medium" />
+            android:layout_height="match_parent">
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/themes_list"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            <androidx.appcompat.widget.LinearLayoutCompat
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <com.tari.android.wallet.ui.component.CustomFontTextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="@dimen/common_horizontal_margin"
+                    android:layout_marginTop="25dp"
+                    android:layout_marginBottom="20dp"
+                    android:lineSpacingMultiplier="1.5"
+                    android:text="@string/select_theme_description"
+                    android:textColor="@color/dark_gray"
+                    android:textSize="14sp"
+                    app:customFont="@string/font_medium" />
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/themes_list"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" />
+
+            </androidx.appcompat.widget.LinearLayoutCompat>
+
+        </com.tari.android.wallet.ui.component.tari.TariSecondaryBackground>
 
     </androidx.appcompat.widget.LinearLayoutCompat>
 

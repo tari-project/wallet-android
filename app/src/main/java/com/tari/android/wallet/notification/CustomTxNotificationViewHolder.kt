@@ -50,7 +50,7 @@ import com.tari.android.wallet.util.WalletUtil
  * @author The Tari Development Team
  */
 class CustomTxNotificationViewHolder(val context: Context, tx: Tx) :
-    RemoteViews(context.packageName, R.layout.remote_tx_notification) {
+    RemoteViews(context.packageName, R.layout.notification_remote_tx) {
 
     init {
         val user = tx.user

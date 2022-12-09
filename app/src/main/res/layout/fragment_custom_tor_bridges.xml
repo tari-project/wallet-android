@@ -1,147 +1,158 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.appcompat.widget.LinearLayoutCompat xmlns:android="http://schemas.android.com/apk/res/android"
+
+<com.tari.android.wallet.ui.component.tari.TariPrimaryBackground xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/root_view"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white"
     android:orientation="vertical">
 
-    <com.tari.android.wallet.ui.component.tari.TariToolbar
-        android:id="@+id/toolbar"
+    <androidx.appcompat.widget.LinearLayoutCompat
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:text="@string/tor_bridges_custom_bridges"
-        app:rightText="@string/tor_bridges_connect"/>
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
-    <ScrollView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:fillViewport="true">
-
-        <androidx.appcompat.widget.LinearLayoutCompat
+        <com.tari.android.wallet.ui.component.tari.TariToolbar
+            android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/gray_background"
-            android:orientation="vertical">
+            app:rightText="@string/tor_bridges_connect"
+            app:text="@string/tor_bridges_custom_bridges" />
 
-            <com.tari.android.wallet.ui.component.CustomFontTextView
-                android:layout_width="match_parent"
-                android:layout_height="56dp"
-                android:layout_marginHorizontal="@dimen/common_horizontal_margin"
-                android:gravity="center_vertical"
-                android:text="@string/tor_bridges_paste_bridges"
-                android:textColor="@color/black"
-                android:textSize="14sp"
-                app:customFont="@string/font_heavy" />
+        <com.tari.android.wallet.ui.component.tari.TariSecondaryBackground
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
 
-            <androidx.appcompat.widget.LinearLayoutCompat
+            <ScrollView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="26dp"
-                android:background="@color/white"
-                android:minHeight="100dp">
+                android:layout_weight="1"
+                android:fillViewport="true">
 
-                <com.tari.android.wallet.ui.component.CustomFontEditText
-                    android:id="@+id/tor_bridge_configuration"
+                <androidx.appcompat.widget.LinearLayoutCompat
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_marginHorizontal="@dimen/common_horizontal_margin"
-                    android:background="@null"
-                    android:hint="@string/tor_bridges_hint"
-                    android:textSize="14sp"
-                    app:customFont="@string/font_regular" />
-
-            </androidx.appcompat.widget.LinearLayoutCompat>
-
-
-            <FrameLayout
-                android:id="@+id/request_bridges_cta"
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/menu_item_height"
-                android:layout_marginBottom="46dp"
-                android:background="@drawable/setting_option_background"
-                android:clickable="true"
-                android:focusable="true"
-                android:paddingHorizontal="@dimen/common_horizontal_margin">
-
-                <com.tari.android.wallet.ui.component.CustomFontTextView
-                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical|start"
-                    android:text="@string/tor_bridges_request"
-                    android:textColor="@color/black"
-                    android:textSize="15sp"
-                    app:customFont="@string/font_medium" />
+                    android:orientation="vertical">
 
-                <androidx.appcompat.widget.AppCompatImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical|end"
-                    android:src="@drawable/icon_apply_setting" />
-            </FrameLayout>
+                    <com.tari.android.wallet.ui.component.CustomFontTextView
+                        android:layout_width="match_parent"
+                        android:layout_height="56dp"
+                        android:layout_marginHorizontal="@dimen/common_horizontal_margin"
+                        android:gravity="center_vertical"
+                        android:text="@string/tor_bridges_paste_bridges"
+                        android:textColor="@color/black"
+                        android:textSize="14sp"
+                        app:customFont="@string/font_heavy" />
 
-            <FrameLayout
-                android:id="@+id/scan_qr_cta"
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/menu_item_height"
-                android:background="@drawable/setting_option_background"
-                android:clickable="true"
-                android:focusable="true"
-                android:paddingHorizontal="@dimen/common_horizontal_margin">
+                    <androidx.appcompat.widget.LinearLayoutCompat
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="26dp"
+                        android:background="@color/white"
+                        android:minHeight="100dp">
 
-                <com.tari.android.wallet.ui.component.CustomFontTextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical|start"
-                    android:text="@string/tor_bridges_scan_qr"
-                    android:textColor="@color/black"
-                    android:textSize="15sp"
-                    app:customFont="@string/font_medium" />
+                        <com.tari.android.wallet.ui.component.CustomFontEditText
+                            android:id="@+id/tor_bridge_configuration"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_marginHorizontal="@dimen/common_horizontal_margin"
+                            android:background="@null"
+                            android:hint="@string/tor_bridges_hint"
+                            android:textSize="14sp"
+                            app:customFont="@string/font_regular" />
 
-                <androidx.appcompat.widget.AppCompatImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical|end"
-                    android:src="@drawable/icon_apply_setting" />
-            </FrameLayout>
+                    </androidx.appcompat.widget.LinearLayoutCompat>
 
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:layout_marginHorizontal="25dp"
-                android:background="@color/settings_background" />
 
-            <FrameLayout
-                android:id="@+id/upload_qr_cta"
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/menu_item_height"
-                android:background="@drawable/setting_option_background"
-                android:clickable="true"
-                android:focusable="true"
-                android:paddingHorizontal="@dimen/common_horizontal_margin"
-                android:visibility="gone">
+                    <FrameLayout
+                        android:id="@+id/request_bridges_cta"
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/menu_item_height"
+                        android:layout_marginBottom="46dp"
+                        android:background="@drawable/setting_option_background"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:paddingHorizontal="@dimen/common_horizontal_margin">
 
-                <com.tari.android.wallet.ui.component.CustomFontTextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical|start"
-                    android:text="@string/tor_bridges_upload_qr_code"
-                    android:textColor="@color/black"
-                    android:textSize="15sp"
-                    app:customFont="@string/font_medium" />
+                        <com.tari.android.wallet.ui.component.CustomFontTextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_vertical|start"
+                            android:text="@string/tor_bridges_request"
+                            android:textColor="@color/black"
+                            android:textSize="15sp"
+                            app:customFont="@string/font_medium" />
 
-                <androidx.appcompat.widget.AppCompatImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical|end"
-                    android:src="@drawable/icon_apply_setting" />
-            </FrameLayout>
+                        <androidx.appcompat.widget.AppCompatImageView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_vertical|end"
+                            android:src="@drawable/icon_apply_setting" />
+                    </FrameLayout>
 
-        </androidx.appcompat.widget.LinearLayoutCompat>
+                    <FrameLayout
+                        android:id="@+id/scan_qr_cta"
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/menu_item_height"
+                        android:background="@drawable/setting_option_background"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:paddingHorizontal="@dimen/common_horizontal_margin">
 
-    </ScrollView>
+                        <com.tari.android.wallet.ui.component.CustomFontTextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_vertical|start"
+                            android:text="@string/tor_bridges_scan_qr"
+                            android:textColor="@color/black"
+                            android:textSize="15sp"
+                            app:customFont="@string/font_medium" />
 
-</androidx.appcompat.widget.LinearLayoutCompat>
+                        <androidx.appcompat.widget.AppCompatImageView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_vertical|end"
+                            android:src="@drawable/icon_apply_setting" />
+                    </FrameLayout>
 
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginHorizontal="25dp"
+                        android:background="@color/settings_background" />
+
+                    <FrameLayout
+                        android:id="@+id/upload_qr_cta"
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/menu_item_height"
+                        android:background="@drawable/setting_option_background"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:paddingHorizontal="@dimen/common_horizontal_margin"
+                        android:visibility="gone">
+
+                        <com.tari.android.wallet.ui.component.CustomFontTextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_vertical|start"
+                            android:text="@string/tor_bridges_upload_qr_code"
+                            android:textColor="@color/black"
+                            android:textSize="15sp"
+                            app:customFont="@string/font_medium" />
+
+                        <androidx.appcompat.widget.AppCompatImageView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_vertical|end"
+                            android:src="@drawable/icon_apply_setting" />
+                    </FrameLayout>
+
+                </androidx.appcompat.widget.LinearLayoutCompat>
+
+            </ScrollView>
+
+        </com.tari.android.wallet.ui.component.tari.TariSecondaryBackground>
+
+    </androidx.appcompat.widget.LinearLayoutCompat>
+
+</com.tari.android.wallet.ui.component.tari.TariPrimaryBackground>

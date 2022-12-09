@@ -103,7 +103,6 @@
     <color name="settings_version_label">#817E8A</color>
 
     <!-- wallet restore -->
-    <color name="wallet_restore_page_background">@color/settings_background</color>
     <color name="wallet_restore_progress_bar">#B2B2B2</color>
     
     <!-- wallet back up with recovery phrase -->
@@ -122,9 +121,5 @@
     <color name="change_password_edit_text_underline">#F1F1F1</color>
     <color name="change_password_hint">@color/home_tx_section_header_title</color>
     <color name="change_password_cta_disabled">@color/change_password_hint</color>
-
-    <!-- network status indicator -->
-
-    <!-- tooltip -->
 
 </resources>

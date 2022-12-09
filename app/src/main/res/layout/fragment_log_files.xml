@@ -1,28 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.appcompat.widget.LinearLayoutCompat xmlns:android="http://schemas.android.com/apk/res/android"
+
+<com.tari.android.wallet.ui.component.tari.TariPrimaryBackground xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@color/white"
-    android:orientation="vertical">
+    android:layout_height="match_parent">
 
-    <com.tari.android.wallet.ui.component.tari.TariToolbar
-        android:id="@+id/toolbar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:text="@string/debug_logs_title" />
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recycler_view"
+    <androidx.appcompat.widget.LinearLayoutCompat
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:clipChildren="false"
-        android:clipToPadding="false"
-        android:fadeScrollbars="false"
-        android:overScrollMode="always"
-        android:scrollbarAlwaysDrawVerticalTrack="true"
-        android:scrollbarSize="6dp"
-        android:scrollbarStyle="outsideInset"
-        android:scrollbars="vertical" />
+        android:orientation="vertical">
 
-</androidx.appcompat.widget.LinearLayoutCompat>
+        <com.tari.android.wallet.ui.component.tari.TariToolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:text="@string/debug_logs_title" />
+
+        <com.tari.android.wallet.ui.component.tari.TariSecondaryBackground
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recycler_view"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:clipChildren="false"
+                android:clipToPadding="false"
+                android:fadeScrollbars="false"
+                android:overScrollMode="always"
+                android:scrollbarAlwaysDrawVerticalTrack="true"
+                android:scrollbarSize="6dp"
+                android:scrollbarStyle="outsideInset"
+                android:scrollbars="vertical" />
+
+        </com.tari.android.wallet.ui.component.tari.TariSecondaryBackground>
+
+    </androidx.appcompat.widget.LinearLayoutCompat>
+
+</com.tari.android.wallet.ui.component.tari.TariPrimaryBackground>

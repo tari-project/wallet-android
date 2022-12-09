@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<com.tari.android.wallet.ui.component.tari.TariPrimaryBackground xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/root_view"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@color/white">
+    android:layout_height="match_parent">
 
     <RelativeLayout
         android:id="@+id/add_recipient_vw_search_container"
@@ -39,8 +38,8 @@
             <LinearLayout
                 android:id="@+id/left_icons"
                 android:layout_width="wrap_content"
-                android:layout_alignParentStart="true"
                 android:layout_height="match_parent"
+                android:layout_alignParentStart="true"
                 android:background="@null"
                 android:orientation="horizontal">
 
@@ -53,7 +52,7 @@
                     android:src="@drawable/tari_yat_open"
                     android:tint="@color/purple"
                     android:visibility="gone"
-                    tools:visibility="visible"/>
+                    tools:visibility="visible" />
 
             </LinearLayout>
             <!-- search -->
@@ -98,15 +97,15 @@
 
             <View
                 android:layout_width="32dp"
-                android:layout_toStartOf="@+id/buttons_container"
                 android:layout_height="@dimen/add_recipient_search_text_view_height"
+                android:layout_toStartOf="@+id/buttons_container"
                 android:background="@drawable/emoji_id_end_fader" />
 
             <LinearLayout
                 android:id="@+id/buttons_container"
                 android:layout_width="wrap_content"
-                android:layout_alignParentEnd="true"
                 android:layout_height="match_parent"
+                android:layout_alignParentEnd="true"
                 android:background="@null"
                 android:orientation="horizontal">
 
@@ -119,7 +118,7 @@
                     android:src="@drawable/opened_eye"
                     android:tint="@color/purple"
                     android:visibility="gone"
-                    tools:visibility="visible"/>
+                    tools:visibility="visible" />
 
                 <!-- QR code button -->
                 <androidx.appcompat.widget.AppCompatImageButton
@@ -294,4 +293,4 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+</com.tari.android.wallet.ui.component.tari.TariPrimaryBackground>
