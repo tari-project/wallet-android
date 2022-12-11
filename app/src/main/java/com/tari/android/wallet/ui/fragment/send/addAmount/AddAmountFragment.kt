@@ -52,8 +52,8 @@ import com.tari.android.wallet.extension.getWithError
 import com.tari.android.wallet.extension.observe
 import com.tari.android.wallet.model.*
 import com.tari.android.wallet.ui.common.CommonFragment
-import com.tari.android.wallet.ui.component.EmojiIdSummaryViewController
-import com.tari.android.wallet.ui.component.FullEmojiIdViewController
+import com.tari.android.wallet.ui.component.fullEmojiId.EmojiIdSummaryViewController
+import com.tari.android.wallet.ui.component.fullEmojiId.FullEmojiIdViewController
 import com.tari.android.wallet.ui.dialog.error.ErrorDialogArgs
 import com.tari.android.wallet.ui.dialog.modular.ModularDialog
 import com.tari.android.wallet.ui.dialog.tooltipDialog.TooltipDialogArgs

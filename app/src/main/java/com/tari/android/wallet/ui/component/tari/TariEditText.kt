@@ -30,28 +30,23 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.tari.android.wallet.ui.component
+package com.tari.android.wallet.ui.component.tari
 
-import android.text.TextPaint
-import android.text.style.MetricAffectingSpan
+import android.content.Context
+import android.util.AttributeSet
+import androidx.appcompat.widget.AppCompatEditText
+
 
 /**
- * Sets the letter spacing of a span in a spannable string. Used in the display of emoji ids.
+ * Custom font enabled text edit.
  *
  * @author The Tari Development Team
  */
-class LetterSpacingSpan(private val letterSpacing: Float): MetricAffectingSpan() {
+class TariEditText(context: Context, attrs: AttributeSet) : AppCompatEditText(context, attrs) {
 
-    override fun updateMeasureState(drawState: TextPaint) {
-        apply(drawState)
+    init {
+        if (!isInEditMode) {
+            typeface = TariFont.getFromAttributeSet(context, attrs)
+        }
     }
-
-    override fun updateDrawState(paint: TextPaint?) {
-        apply(paint ?: return)
-    }
-
-    private fun apply(paint: TextPaint) {
-        paint.letterSpacing = letterSpacing
-    }
-
 }

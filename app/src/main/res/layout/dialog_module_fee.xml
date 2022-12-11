@@ -53,16 +53,16 @@
 
     </androidx.appcompat.widget.LinearLayoutCompat>
 
-    <com.tari.android.wallet.ui.component.CustomFontTextView
+    <com.tari.android.wallet.ui.component.tari.TariTextView
         android:id="@+id/body"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="32dp"
         android:gravity="center"
         android:text="@string/add_amount_modify_fee_estimated"
-        android:textColor="#3B3740"
+        android:textColor="?attr/palette_text_heading"
         android:textSize="14sp"
-        app:customFont="@string/font_medium" />
+        app:customFont="medium" />
 
     <com.tari.android.wallet.ui.fragment.send.amountView.AmountView
         android:id="@+id/amount"

@@ -11,7 +11,7 @@
     android:paddingVertical="5dp"
     android:paddingStart="13dp">
 
-    <com.tari.android.wallet.ui.component.CustomFontEditText
+    <com.tari.android.wallet.ui.component.tari.TariEditText
         android:id="@+id/text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -22,7 +22,7 @@
         android:inputType="textVisiblePassword"
         android:singleLine="true"
         android:textSize="14sp"
-        app:customFont="@string/font_heavy"
+        app:customFont="heavy"
         tools:text="text" />
 
     <androidx.appcompat.widget.AppCompatImageView

@@ -74,7 +74,7 @@
                     android:layout_height="wrap_content"
                     android:animateLayoutChanges="true">
 
-                    <com.tari.android.wallet.ui.component.CustomFontEditText
+                    <com.tari.android.wallet.ui.component.tari.TariEditText
                         android:id="@+id/search_edit_text"
                         android:layout_width="match_parent"
                         android:layout_height="@dimen/add_recipient_search_text_view_height"
@@ -86,10 +86,10 @@
                         android:letterSpacing="0.02"
                         android:scrollHorizontally="false"
                         android:singleLine="true"
-                        android:textColor="@color/black"
+                        android:textColor="?attr/palette_text_heading"
                         android:textColorHint="@color/add_recipient_hint"
                         android:textSize="14sp"
-                        app:customFont="AVENIR_LT_STD_ROMAN" />
+                        app:customFont="roman" />
 
                 </androidx.appcompat.widget.LinearLayoutCompat>
 
@@ -184,7 +184,7 @@
             android:layout_centerHorizontal="true"
             android:layout_marginTop="0dp">
 
-            <com.tari.android.wallet.ui.component.CustomFontTextView
+            <com.tari.android.wallet.ui.component.tari.TariTextView
                 android:id="@+id/add_recipient_txt_paste_emoji_id"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -194,7 +194,7 @@
                 android:text="@string/paste_emoji_id"
                 android:textColor="#9834F6"
                 android:textSize="14sp"
-                app:customFont="@string/font_heavy" />
+                app:customFont="heavy" />
 
             <Button
                 android:id="@+id/paste_emoji_id_button"
@@ -247,14 +247,14 @@
                     android:letterSpacing="0.22"
                     android:paddingHorizontal="16dp"
                     android:singleLine="true"
-                    android:textColor="@color/black"
+                    android:textColor="?attr/palette_text_heading"
                     android:textSize="15sp" />
             </HorizontalScrollView>
         </RelativeLayout>
 
     </RelativeLayout>
 
-    <com.tari.android.wallet.ui.component.CustomFontTextView
+    <com.tari.android.wallet.ui.component.tari.TariTextView
         android:id="@+id/invalid_emoji_id_text_view"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -268,12 +268,12 @@
         android:text="@string/add_recipient_invalid_emoji_id"
         android:textColor="@color/common_error"
         android:textSize="14sp"
-        app:customFont="@string/font_heavy"
+        app:customFont="heavy"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/add_recipient_vw_search_container" />
 
-    <com.tari.android.wallet.ui.component.CustomFontButton
+    <com.tari.android.wallet.ui.component.tari.TariButton
         android:id="@+id/continue_button"
         android:layout_width="0dp"
         android:layout_height="@dimen/common_action_button_height"
@@ -288,7 +288,7 @@
         android:textAllCaps="false"
         android:textColor="@color/white"
         android:textSize="16sp"
-        app:customFont="@string/font_heavy"
+        app:customFont="heavy"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />

@@ -34,15 +34,15 @@
                     android:layout_height="wrap_content"
                     android:orientation="vertical">
 
-                    <com.tari.android.wallet.ui.component.CustomFontTextView
+                    <com.tari.android.wallet.ui.component.tari.TariTextView
                         android:layout_width="match_parent"
                         android:layout_height="56dp"
                         android:layout_marginHorizontal="@dimen/common_horizontal_margin"
                         android:gravity="center_vertical"
                         android:text="@string/tor_bridges_paste_bridges"
-                        android:textColor="@color/black"
+                        android:textColor="?attr/palette_text_heading"
                         android:textSize="14sp"
-                        app:customFont="@string/font_heavy" />
+                        app:customFont="heavy" />
 
                     <androidx.appcompat.widget.LinearLayoutCompat
                         android:layout_width="match_parent"
@@ -51,7 +51,7 @@
                         android:background="@color/white"
                         android:minHeight="100dp">
 
-                        <com.tari.android.wallet.ui.component.CustomFontEditText
+                        <com.tari.android.wallet.ui.component.tari.TariEditText
                             android:id="@+id/tor_bridge_configuration"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
@@ -59,7 +59,7 @@
                             android:background="@null"
                             android:hint="@string/tor_bridges_hint"
                             android:textSize="14sp"
-                            app:customFont="@string/font_regular" />
+                            app:customFont="regular" />
 
                     </androidx.appcompat.widget.LinearLayoutCompat>
 
@@ -74,14 +74,14 @@
                         android:focusable="true"
                         android:paddingHorizontal="@dimen/common_horizontal_margin">
 
-                        <com.tari.android.wallet.ui.component.CustomFontTextView
+                        <com.tari.android.wallet.ui.component.tari.TariTextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_gravity="center_vertical|start"
                             android:text="@string/tor_bridges_request"
-                            android:textColor="@color/black"
+                            android:textColor="?attr/palette_text_heading"
                             android:textSize="15sp"
-                            app:customFont="@string/font_medium" />
+                            app:customFont="medium" />
 
                         <androidx.appcompat.widget.AppCompatImageView
                             android:layout_width="wrap_content"
@@ -99,14 +99,14 @@
                         android:focusable="true"
                         android:paddingHorizontal="@dimen/common_horizontal_margin">
 
-                        <com.tari.android.wallet.ui.component.CustomFontTextView
+                        <com.tari.android.wallet.ui.component.tari.TariTextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_gravity="center_vertical|start"
                             android:text="@string/tor_bridges_scan_qr"
-                            android:textColor="@color/black"
+                            android:textColor="?attr/palette_text_heading"
                             android:textSize="15sp"
-                            app:customFont="@string/font_medium" />
+                            app:customFont="medium" />
 
                         <androidx.appcompat.widget.AppCompatImageView
                             android:layout_width="wrap_content"
@@ -131,14 +131,14 @@
                         android:paddingHorizontal="@dimen/common_horizontal_margin"
                         android:visibility="gone">
 
-                        <com.tari.android.wallet.ui.component.CustomFontTextView
+                        <com.tari.android.wallet.ui.component.tari.TariTextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_gravity="center_vertical|start"
                             android:text="@string/tor_bridges_upload_qr_code"
-                            android:textColor="@color/black"
+                            android:textColor="?attr/palette_text_heading"
                             android:textSize="15sp"
-                            app:customFont="@string/font_medium" />
+                            app:customFont="medium" />
 
                         <androidx.appcompat.widget.AppCompatImageView
                             android:layout_width="wrap_content"

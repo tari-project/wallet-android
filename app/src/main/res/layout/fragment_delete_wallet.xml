@@ -26,16 +26,16 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
 
-                <com.tari.android.wallet.ui.component.CustomFontTextView
+                <com.tari.android.wallet.ui.component.tari.TariTextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginHorizontal="@dimen/common_horizontal_margin"
                     android:layout_marginTop="35dp"
                     android:lineSpacingMultiplier="1.5"
                     android:text="@string/delete_wallet_warning_text"
-                    android:textColor="@color/dark_gray"
+                    android:textColor="?attr/palette_text_body"
                     android:textSize="14sp"
-                    app:customFont="@string/font_medium" />
+                    app:customFont="medium" />
 
                 <RelativeLayout
                     android:id="@+id/delete_wallet_cta_view"
@@ -47,14 +47,14 @@
                     android:focusable="true"
                     android:paddingHorizontal="@dimen/common_horizontal_margin">
 
-                    <com.tari.android.wallet.ui.component.CustomFontTextView
+                    <com.tari.android.wallet.ui.component.tari.TariTextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_centerVertical="true"
                         android:text="@string/all_settings_delete_wallet"
                         android:textColor="@color/common_error"
                         android:textSize="15sp"
-                        app:customFont="@string/font_medium" />
+                        app:customFont="medium" />
 
                     <ProgressBar
                         android:id="@+id/delete_wallet_progress"

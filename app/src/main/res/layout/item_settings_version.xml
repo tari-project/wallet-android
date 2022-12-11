@@ -10,7 +10,7 @@
     android:focusable="true"
     android:paddingHorizontal="@dimen/common_horizontal_margin">
 
-    <com.tari.android.wallet.ui.component.CustomFontTextView
+    <com.tari.android.wallet.ui.component.tari.TariTextView
         android:id="@+id/network_info_text_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -18,6 +18,6 @@
         android:letterSpacing="0.1"
         android:textColor="@color/settings_version_label"
         android:textSize="15sp"
-        app:customFont="@string/font_medium"
+        app:customFont="medium"
         tools:text="version text" />
 </FrameLayout>

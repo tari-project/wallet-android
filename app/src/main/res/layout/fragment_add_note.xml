@@ -16,7 +16,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <!-- contact alias -->
-    <com.tari.android.wallet.ui.component.CustomFontTextView
+    <com.tari.android.wallet.ui.component.tari.TariTextView
         android:id="@+id/title_text_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -26,9 +26,9 @@
         android:paddingEnd="@dimen/back_button_size"
         android:singleLine="true"
         android:text="@string/add_amount_under_construction"
-        android:textColor="@color/black"
+        android:textColor="?attr/palette_text_heading"
         android:textSize="16sp"
-        app:customFont="@string/font_heavy"
+        app:customFont="heavy"
         app:layout_constraintBottom_toBottomOf="@id/back_cta_view"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -84,17 +84,17 @@
             android:layout_marginHorizontal="@dimen/common_horizontal_margin"
             android:orientation="vertical">
 
-            <com.tari.android.wallet.ui.component.CustomFontTextView
+            <com.tari.android.wallet.ui.component.tari.TariTextView
                 android:id="@+id/prompt_text_view"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:singleLine="true"
                 android:text="@string/add_note_prompt"
-                android:textColor="@color/black"
+                android:textColor="?attr/palette_text_heading"
                 android:textSize="@dimen/add_note_prompt_text_size"
-                app:customFont="@string/font_heavy" />
+                app:customFont="heavy" />
 
-            <com.tari.android.wallet.ui.component.CustomFontEditText
+            <com.tari.android.wallet.ui.component.tari.TariEditText
                 android:id="@+id/note_edit_text"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -109,7 +109,7 @@
                 android:scrollHorizontally="false"
                 android:singleLine="false"
                 android:textSize="@dimen/add_note_note_text_size"
-                app:customFont="@string/font_medium"
+                app:customFont="medium"
                 tools:ignore="InefficientWeight" />
 
             <FrameLayout
@@ -174,14 +174,14 @@
                     android:src="@drawable/icon_giphy_search"
                     tools:ignore="ContentDescription" />
 
-                <com.tari.android.wallet.ui.component.CustomFontTextView
+                <com.tari.android.wallet.ui.component.tari.TariTextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="3dp"
                     android:text="@string/add_note_search_giphy_label"
                     android:textColor="@color/white"
                     android:textSize="9sp"
-                    app:customFont="@string/font_black"
+                    app:customFont="black"
                     tools:ignore="SmallSp" />
 
             </LinearLayout>
@@ -240,7 +240,7 @@
             android:indeterminate="true"
             android:visibility="invisible" />
 
-        <com.tari.android.wallet.ui.component.CustomFontTextView
+        <com.tari.android.wallet.ui.component.tari.TariTextView
             android:id="@+id/slide_to_send_disabled_text_view"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -248,9 +248,9 @@
             android:text="@string/add_note_slide_to_send"
             android:textColor="#B2B2B2"
             android:textSize="16sp"
-            app:customFont="@string/font_heavy" />
+            app:customFont="heavy" />
 
-        <com.tari.android.wallet.ui.component.CustomFontTextView
+        <com.tari.android.wallet.ui.component.tari.TariTextView
             android:id="@+id/slide_to_send_enabled_text_view"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -258,7 +258,7 @@
             android:text="@string/add_note_slide_to_send"
             android:textColor="@color/white"
             android:textSize="16sp"
-            app:customFont="@string/font_heavy" />
+            app:customFont="heavy" />
 
         <RelativeLayout
             android:id="@+id/slide_view"

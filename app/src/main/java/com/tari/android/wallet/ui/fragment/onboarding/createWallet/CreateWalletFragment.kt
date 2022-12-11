@@ -54,8 +54,8 @@ import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.extension.addTo
 import com.tari.android.wallet.extension.applyFontStyle
 import com.tari.android.wallet.ui.common.CommonFragment
-import com.tari.android.wallet.ui.component.CustomFont
-import com.tari.android.wallet.ui.component.EmojiIdSummaryViewController
+import com.tari.android.wallet.ui.component.tari.TariFont
+import com.tari.android.wallet.ui.component.fullEmojiId.EmojiIdSummaryViewController
 import com.tari.android.wallet.ui.extension.*
 import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.Constants.UI.CreateEmojiId
@@ -100,9 +100,9 @@ class CreateWalletFragment : CommonFragment<FragmentCreateWalletBinding, CreateW
         ui.apply {
             yourEmojiIdTitleTextView.text = string(create_wallet_your_emoji_id_text_label).applyFontStyle(
                 requireActivity(),
-                CustomFont.AVENIR_LT_STD_LIGHT,
+                TariFont.AVENIR_LT_STD_LIGHT,
                 listOf(string(create_wallet_your_emoji_id_text_label_bold_part)),
-                CustomFont.AVENIR_LT_STD_BLACK
+                TariFont.AVENIR_LT_STD_BLACK
             )
             bottomSpinnerLottieAnimationView.alpha = 0f
             bottomSpinnerLottieAnimationView.scaleX = 0.5F

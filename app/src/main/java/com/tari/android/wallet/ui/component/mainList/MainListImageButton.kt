@@ -30,23 +30,32 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.tari.android.wallet.ui.component
+package com.tari.android.wallet.ui.component.mainList
 
 import android.content.Context
 import android.util.AttributeSet
-import androidx.appcompat.widget.AppCompatTextView
+import android.view.LayoutInflater
+import android.view.ViewGroup
+import com.tari.android.wallet.databinding.ViewMainListImageButtonBinding
+import com.tari.android.wallet.ui.common.CommonViewModel
 
-/**
- * Custom font enabled text view.
- *
- * @author The Tari Development Team
- */
-class CustomFontTextView(context: Context, attrs: AttributeSet) :
-    AppCompatTextView(context, attrs) {
 
-    init {
-        if (!isInEditMode) {
-            typeface = CustomFont.getFromAttributeSet(context, attrs)
-        }
+class MainListImageButton : MainListTouchingView<CommonViewModel, ViewMainListImageButtonBinding> {
+
+    override fun bindingInflate(layoutInflater: LayoutInflater, parent: ViewGroup?, attachToRoot: Boolean):
+            ViewMainListImageButtonBinding = ViewMainListImageButtonBinding.inflate(layoutInflater, parent, attachToRoot)
+
+    constructor(context: Context) : super(context)
+
+    constructor(context: Context, attrs: AttributeSet) : super(context, attrs)
+
+    constructor(context: Context, attrs: AttributeSet, defStyleAttr: Int) : super(context, attrs, defStyleAttr)
+
+    override fun setup() = Unit
+
+    var touchListener: () -> Unit = {}
+
+    override fun doTouch() {
+        touchListener.invoke()
     }
 }

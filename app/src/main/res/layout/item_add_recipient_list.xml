@@ -15,7 +15,7 @@
         android:layout_height="44dp"
         android:background="@drawable/add_recipient_contact_list_item_initial_bg">
 
-        <com.tari.android.wallet.ui.component.CustomFontTextView
+        <com.tari.android.wallet.ui.component.tari.TariTextView
             android:id="@+id/initial_text_view"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -24,7 +24,7 @@
             android:layout_centerInParent="true"
             android:textColor="#B2B2B2"
             android:textSize="22sp"
-            app:customFont="AVENIR_LT_STD_ROMAN" />
+            app:customFont="roman" />
 
         <ImageView
             android:id="@+id/profile_icon_image_view"
@@ -42,7 +42,7 @@
         android:layout_marginStart="12dp">
 
         <!-- contact alias -->
-        <com.tari.android.wallet.ui.component.CustomFontTextView
+        <com.tari.android.wallet.ui.component.tari.TariTextView
             android:id="@+id/alias_text_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -51,7 +51,7 @@
             android:text="@string/dummy_contact_alias"
             android:textColor="#423986"
             android:textSize="15sp"
-            app:customFont="@string/font_heavy" />
+            app:customFont="heavy" />
 
         <!-- emoji id summary -->
         <include

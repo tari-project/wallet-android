@@ -7,7 +7,7 @@
     android:clipChildren="false"
     android:orientation="vertical">
 
-    <com.tari.android.wallet.ui.component.CustomFontTextView
+    <com.tari.android.wallet.ui.component.tari.TariTextView
         android:id="@+id/balance_top_decimal_digit_text_view"
         android:layout_width="wrap_content"
         android:layout_height="@dimen/home_balance_digit_decimal_height"
@@ -15,9 +15,9 @@
         android:text="@string/digit_5"
         android:textColor="@color/white"
         android:textSize="@dimen/home_balance_digit_decimal_text_size"
-        app:customFont="@string/font_black" />
+        app:customFont="black" />
 
-    <com.tari.android.wallet.ui.component.CustomFontTextView
+    <com.tari.android.wallet.ui.component.tari.TariTextView
         android:id="@+id/balance_bottom_decimal_digit_text_view"
         android:layout_width="wrap_content"
         android:layout_height="@dimen/home_balance_digit_decimal_height"
@@ -26,5 +26,5 @@
         android:text="@string/digit_6"
         android:textColor="@color/white"
         android:textSize="@dimen/home_balance_digit_decimal_text_size"
-        app:customFont="@string/font_black" />
+        app:customFont="black" />
 </LinearLayout>

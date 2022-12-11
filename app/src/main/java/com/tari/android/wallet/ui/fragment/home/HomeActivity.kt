@@ -62,7 +62,7 @@ import com.tari.android.wallet.service.connection.ServiceConnectionStatus
 import com.tari.android.wallet.service.service.WalletServiceLauncher
 import com.tari.android.wallet.ui.common.CommonActivity
 import com.tari.android.wallet.ui.common.domain.ResourceManager
-import com.tari.android.wallet.ui.component.CustomFont
+import com.tari.android.wallet.ui.component.tari.TariFont
 import com.tari.android.wallet.ui.dialog.modular.DialogArgs
 import com.tari.android.wallet.ui.dialog.modular.ModularDialog
 import com.tari.android.wallet.ui.dialog.modular.ModularDialogArgs
@@ -276,12 +276,12 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>(), AllSe
         val description = string(R.string.incompatible_network_description)
             .applyFontStyle(
                 this@HomeActivity,
-                CustomFont.AVENIR_LT_STD_MEDIUM,
+                TariFont.AVENIR_LT_STD_MEDIUM,
                 listOf(
                     string(R.string.incompatible_network_description_bold_part_1),
                     string(R.string.incompatible_network_description_bold_part_2)
                 ),
-                CustomFont.AVENIR_LT_STD_BLACK
+                TariFont.AVENIR_LT_STD_BLACK
             )
         val dialog = ModularDialog(this)
         val args = ModularDialogArgs(

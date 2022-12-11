@@ -33,7 +33,7 @@
                 android:layout_marginTop="0dp"
                 android:elevation="4dp">
 
-                <com.tari.android.wallet.ui.component.CustomFontTextView
+                <com.tari.android.wallet.ui.component.tari.TariTextView
                     android:id="@+id/see_full_emoji_id_text_view"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -43,7 +43,7 @@
                     android:text="@string/tap_to_see_full_emoji_id"
                     android:textColor="#9834F6"
                     android:textSize="14sp"
-                    app:customFont="@string/font_heavy" />
+                    app:customFont="heavy" />
 
                 <Button
                     android:id="@+id/see_full_emoji_id_button"
@@ -115,7 +115,7 @@
                         android:letterSpacing="0.22"
                         android:paddingHorizontal="@dimen/onboarding_emoji_id_container_horizontal_padding"
                         android:paddingVertical="@dimen/onboarding_emoji_id_container_vertical_padding"
-                        android:textColor="@color/black"
+                        android:textColor="?attr/palette_text_heading"
                         android:textSize="17sp" />
                 </HorizontalScrollView>
 
@@ -140,7 +140,7 @@
                 android:orientation="horizontal"
                 android:visibility="invisible">
 
-                <com.tari.android.wallet.ui.component.CustomFontTextView
+                <com.tari.android.wallet.ui.component.tari.TariTextView
                     android:id="@+id/your_emoji_id_title_text_view"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -149,9 +149,9 @@
                     android:gravity="center"
                     android:letterSpacing="0.01"
                     android:text="@string/create_wallet_your_emoji_id_text_label"
-                    android:textColor="@color/black"
+                    android:textColor="?attr/palette_text_heading"
                     android:textSize="18sp"
-                    app:customFont="@string/font_light" />
+                    app:customFont="light" />
             </LinearLayout>
 
             <View
@@ -163,7 +163,7 @@
                 android:background="@color/create_emoji_id_bg"
                 android:visibility="invisible" />
 
-            <com.tari.android.wallet.ui.component.CustomFontTextView
+            <com.tari.android.wallet.ui.component.tari.TariTextView
                 android:id="@+id/emoji_id_desc_text_view"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -175,9 +175,9 @@
                 android:letterSpacing="-0.02"
                 android:lineSpacingExtra="10dp"
                 android:text="@string/create_wallet_set_of_emoji_your_wallet_address_desc"
-                android:textColor="@color/dark_gray"
+                android:textColor="?attr/palette_text_body"
                 android:textSize="14sp"
-                app:customFont="@string/font_medium" />
+                app:customFont="medium" />
 
         </RelativeLayout>
 
@@ -220,7 +220,7 @@
                 android:gravity="center"
                 android:orientation="vertical">
 
-                <com.tari.android.wallet.ui.component.CustomFontTextView
+                <com.tari.android.wallet.ui.component.tari.TariTextView
                     android:id="@+id/just_sec_title_text_view"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -228,10 +228,10 @@
                     android:gravity="center"
                     android:letterSpacing="0.01"
                     android:text="@string/create_wallet_just_a_sec_label"
-                    android:textColor="@color/black"
+                    android:textColor="?attr/palette_text_heading"
                     android:textSize="18sp"
                     android:visibility="invisible"
-                    app:customFont="@string/font_black" />
+                    app:customFont="black" />
 
                 <View
                     android:id="@+id/just_sec_title_back_view"
@@ -242,7 +242,7 @@
                     android:background="@color/create_emoji_id_bg"
                     android:visibility="invisible" />
 
-                <com.tari.android.wallet.ui.component.CustomFontTextView
+                <com.tari.android.wallet.ui.component.tari.TariTextView
                     android:id="@+id/just_sec_desc_text_view"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -252,10 +252,10 @@
                     android:gravity="center"
                     android:letterSpacing="-0.03"
                     android:text="@string/create_wallet_just_sec_desc_text"
-                    android:textColor="@color/black"
+                    android:textColor="?attr/palette_text_heading"
                     android:textSize="18sp"
                     android:visibility="invisible"
-                    app:customFont="AVENIR_LT_STD_ROMAN" />
+                    app:customFont="roman" />
 
                 <View
                     android:id="@+id/just_sec_desc_back_view"
@@ -282,7 +282,7 @@
                     app:lottie_rawRes="@raw/check_mark"
                     app:lottie_renderMode="automatic" />
 
-                <com.tari.android.wallet.ui.component.CustomFontTextView
+                <com.tari.android.wallet.ui.component.tari.TariTextView
                     android:id="@+id/create_your_emoji_id_line_1_text_view"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -292,10 +292,10 @@
                     android:layout_marginBottom="24dp"
                     android:gravity="center"
                     android:text="@string/create_wallet_awesome"
-                    android:textColor="@color/black"
+                    android:textColor="?attr/palette_text_heading"
                     android:textSize="18sp"
                     android:visibility="invisible"
-                    app:customFont="@string/font_black" />
+                    app:customFont="black" />
 
                 <View
                     android:id="@+id/create_your_emoji_id_line_1_blocker_view"
@@ -307,7 +307,7 @@
                     android:background="@color/create_emoji_id_bg"
                     android:visibility="invisible" />
 
-                <com.tari.android.wallet.ui.component.CustomFontTextView
+                <com.tari.android.wallet.ui.component.tari.TariTextView
                     android:id="@+id/create_your_emoji_id_line_2_text_view"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -319,10 +319,10 @@
                     android:gravity="center"
                     android:letterSpacing="-0.02"
                     android:text="@string/create_wallet_now_text"
-                    android:textColor="@color/black"
+                    android:textColor="?attr/palette_text_heading"
                     android:textSize="18sp"
                     android:visibility="invisible"
-                    app:customFont="AVENIR_LT_STD_ROMAN" />
+                    app:customFont="roman" />
 
                 <View
                     android:id="@+id/create_your_emoji_id_line_2_blocker_view"
@@ -349,7 +349,7 @@
                     app:lottie_rawRes="@raw/nerd_emoji"
                     app:lottie_renderMode="automatic" />
 
-                <com.tari.android.wallet.ui.component.CustomFontTextView
+                <com.tari.android.wallet.ui.component.tari.TariTextView
                     android:id="@+id/wallet_address_desc_text_view"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -363,13 +363,13 @@
                     android:letterSpacing="-0.02"
                     android:lineSpacingExtra="10dp"
                     android:text="@string/create_wallet_address_desc"
-                    android:textColor="@color/dark_gray"
+                    android:textColor="?attr/palette_text_body"
                     android:textSize="14sp"
-                    app:customFont="@string/font_medium" />
+                    app:customFont="medium" />
 
             </RelativeLayout>
 
-            <com.tari.android.wallet.ui.component.CustomFontButton
+            <com.tari.android.wallet.ui.component.tari.TariButton
                 android:id="@+id/continue_button"
                 style="?android:attr/borderlessButtonStyle"
                 android:layout_width="match_parent"
@@ -385,9 +385,9 @@
                 android:textAllCaps="false"
                 android:textColor="@color/white"
                 android:textSize="16sp"
-                app:customFont="@string/font_heavy" />
+                app:customFont="heavy" />
 
-            <com.tari.android.wallet.ui.component.CustomFontButton
+            <com.tari.android.wallet.ui.component.tari.TariButton
                 android:id="@+id/create_emoji_id_button"
                 style="?android:attr/borderlessButtonStyle"
                 android:layout_width="match_parent"
@@ -402,7 +402,7 @@
                 android:textAllCaps="false"
                 android:textColor="@color/white"
                 android:textSize="16sp"
-                app:customFont="@string/font_heavy" />
+                app:customFont="heavy" />
 
         </RelativeLayout>
 

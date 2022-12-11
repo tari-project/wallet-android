@@ -10,14 +10,14 @@
     android:paddingHorizontal="10dp"
     android:paddingVertical="12dp">
 
-    <com.tari.android.wallet.ui.component.CustomFontTextView
+    <com.tari.android.wallet.ui.component.tari.TariTextView
         android:id="@+id/log_text_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/long_dummy_message"
         android:lineSpacingExtra="4dp"
-        android:textColor="@color/dark_gray"
+        android:textColor="?attr/palette_text_body"
         android:textSize="14sp"
-        app:customFont="@string/font_medium" />
+        app:customFont="medium" />
 
 </LinearLayout>

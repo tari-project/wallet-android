@@ -1,4 +1,4 @@
-package com.tari.android.wallet.ui.component
+package com.tari.android.wallet.ui.component.mainList
 
 import android.annotation.SuppressLint
 import android.content.Context

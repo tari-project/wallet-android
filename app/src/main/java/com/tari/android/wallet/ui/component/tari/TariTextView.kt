@@ -15,7 +15,7 @@
  * 3. Neither the name of the copyright holder nor the names of
  * its contributors may be used to endorse or promote products
  * derived from this software without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND
  * CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES,
  * INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
@@ -30,22 +30,22 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.tari.android.wallet.ui.component
+package com.tari.android.wallet.ui.component.tari
 
 import android.content.Context
 import android.util.AttributeSet
-import androidx.appcompat.widget.AppCompatButton
+import androidx.appcompat.widget.AppCompatTextView
 
 /**
- * Custom font enabled button.
+ * Custom font enabled text view.
  *
  * @author The Tari Development Team
  */
-class CustomFontButton(context: Context, attrs: AttributeSet) : AppCompatButton(context, attrs) {
+class TariTextView(context: Context, attrs: AttributeSet) : AppCompatTextView(context, attrs) {
 
     init {
         if (!isInEditMode) {
-            typeface = CustomFont.getFromAttributeSet(context, attrs)
+            typeface = TariFont.getFromAttributeSet(context, attrs)
         }
     }
 }

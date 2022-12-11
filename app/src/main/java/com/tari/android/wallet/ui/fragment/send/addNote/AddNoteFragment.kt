@@ -71,8 +71,8 @@ import com.tari.android.wallet.model.TxNote
 import com.tari.android.wallet.model.User
 import com.tari.android.wallet.network.NetworkConnectionState
 import com.tari.android.wallet.ui.common.gyphy.repository.GIFItem
-import com.tari.android.wallet.ui.component.EmojiIdSummaryViewController
-import com.tari.android.wallet.ui.component.FullEmojiIdViewController
+import com.tari.android.wallet.ui.component.fullEmojiId.EmojiIdSummaryViewController
+import com.tari.android.wallet.ui.component.fullEmojiId.FullEmojiIdViewController
 import com.tari.android.wallet.ui.extension.*
 import com.tari.android.wallet.ui.fragment.home.HomeActivity
 import com.tari.android.wallet.ui.fragment.send.addNote.gif.*

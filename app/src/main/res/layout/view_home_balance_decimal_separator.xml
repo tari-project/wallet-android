@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?><!-- decimal separator -->
-<com.tari.android.wallet.ui.component.CustomFontTextView xmlns:android="http://schemas.android.com/apk/res/android"
+<com.tari.android.wallet.ui.component.tari.TariTextView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/balance_decimal_separator_text_view"
     android:layout_width="wrap_content"
@@ -10,4 +10,4 @@
     android:text="@string/digit_decimal_separator"
     android:textColor="@color/white"
     android:textSize="@dimen/home_balance_digit_decimal_text_size"
-    app:customFont="@string/font_black" />
+    app:customFont="black" />

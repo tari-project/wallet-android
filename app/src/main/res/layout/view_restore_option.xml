@@ -11,14 +11,14 @@
     android:focusable="true"
     android:paddingHorizontal="@dimen/common_horizontal_margin">
 
-    <com.tari.android.wallet.ui.component.CustomFontTextView
+    <com.tari.android.wallet.ui.component.tari.TariTextView
         android:id="@+id/title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical|start"
-        android:textColor="@color/black"
+        android:textColor="?attr/palette_text_heading"
         android:textSize="15sp"
-        app:customFont="@string/font_medium" />
+        app:customFont="medium" />
 
     <ProgressBar
         android:id="@+id/restore_wallet_menu_item_progress_view"

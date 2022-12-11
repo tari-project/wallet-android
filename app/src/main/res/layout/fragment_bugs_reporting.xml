@@ -26,17 +26,17 @@
                 android:layout_marginHorizontal="25dp"
                 android:orientation="vertical">
 
-                <com.tari.android.wallet.ui.component.CustomFontTextView
+                <com.tari.android.wallet.ui.component.tari.TariTextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="30dp"
                     android:singleLine="true"
                     android:text="@string/bugs_reporting_description"
-                    android:textColor="@color/black"
+                    android:textColor="?attr/palette_text_heading"
                     android:textSize="13sp"
-                    app:customFont="@string/font_medium" />
+                    app:customFont="medium" />
 
-                <com.tari.android.wallet.ui.component.CustomFontEditText
+                <com.tari.android.wallet.ui.component.tari.TariEditText
                     android:id="@+id/name_edit_text"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -48,14 +48,14 @@
                     android:paddingVertical="20dp"
                     android:singleLine="true"
                     android:textSize="14sp"
-                    app:customFont="@string/font_medium" />
+                    app:customFont="medium" />
 
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
                     android:background="@color/common_divider" />
 
-                <com.tari.android.wallet.ui.component.CustomFontEditText
+                <com.tari.android.wallet.ui.component.tari.TariEditText
                     android:id="@+id/email_edit_text"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -67,23 +67,23 @@
                     android:paddingVertical="20dp"
                     android:singleLine="true"
                     android:textSize="14sp"
-                    app:customFont="@string/font_medium" />
+                    app:customFont="medium" />
 
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
                     android:background="@color/common_divider" />
 
-                <com.tari.android.wallet.ui.component.CustomFontTextView
+                <com.tari.android.wallet.ui.component.tari.TariTextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="20dp"
                     android:layout_marginBottom="10dp"
                     android:singleLine="true"
                     android:text="@string/bugs_reporting_description"
-                    android:textColor="@color/black"
+                    android:textColor="?attr/palette_text_heading"
                     android:textSize="13sp"
-                    app:customFont="@string/font_medium" />
+                    app:customFont="medium" />
 
                 <FrameLayout
                     android:layout_width="match_parent"
@@ -91,7 +91,7 @@
                     android:layout_marginBottom="20dp"
                     android:background="@drawable/background_gray_round">
 
-                    <com.tari.android.wallet.ui.component.CustomFontEditText
+                    <com.tari.android.wallet.ui.component.tari.TariEditText
                         android:id="@+id/bug_description"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
@@ -103,21 +103,21 @@
                         android:paddingVertical="16dp"
                         android:singleLine="false"
                         android:textSize="16sp"
-                        app:customFont="@string/font_medium"
+                        app:customFont="medium"
                         tools:text="@string/long_dummy_message" />
 
                 </FrameLayout>
 
-                <com.tari.android.wallet.ui.component.CustomFontTextView
+                <com.tari.android.wallet.ui.component.tari.TariTextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="20dp"
                     android:text="@string/bugs_reporting_additional_info"
-                    android:textColor="@color/dark_gray"
+                    android:textColor="?attr/palette_text_body"
                     android:textSize="14sp"
-                    app:customFont="@string/font_medium" />
+                    app:customFont="medium" />
 
-                <com.tari.android.wallet.ui.component.CustomFontButton
+                <com.tari.android.wallet.ui.component.tari.TariButton
                     android:id="@+id/send_button"
                     android:layout_width="match_parent"
                     android:layout_height="@dimen/common_action_button_height"
@@ -130,9 +130,9 @@
                     android:textAllCaps="false"
                     android:textColor="@color/white"
                     android:textSize="16sp"
-                    app:customFont="@string/font_heavy" />
+                    app:customFont="heavy" />
 
-                <com.tari.android.wallet.ui.component.CustomFontButton
+                <com.tari.android.wallet.ui.component.tari.TariButton
                     android:id="@+id/view_logs_button"
                     android:layout_width="match_parent"
                     android:layout_height="@dimen/common_action_button_height"
@@ -145,7 +145,7 @@
                     android:textAllCaps="false"
                     android:textColor="@color/purple"
                     android:textSize="16sp"
-                    app:customFont="@string/font_heavy" />
+                    app:customFont="heavy" />
 
             </androidx.appcompat.widget.LinearLayoutCompat>
 

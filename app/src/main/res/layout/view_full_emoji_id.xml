@@ -44,7 +44,7 @@
                 android:gravity="center"
                 android:letterSpacing="0.22"
                 android:paddingHorizontal="12dp"
-                android:textColor="@color/black"
+                android:textColor="?attr/palette_text_heading"
                 android:textSize="14sp" />
 
         </HorizontalScrollView>
@@ -90,7 +90,7 @@
             android:contentDescription="@null"
             android:src="@drawable/speech_notch_up" />
 
-        <com.tari.android.wallet.ui.component.CustomFontTextView
+        <com.tari.android.wallet.ui.component.tari.TariTextView
             android:id="@+id/copy_emoji_id_text_view"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -101,7 +101,7 @@
             android:text="@string/copy_emoji_id"
             android:textColor="#9834F6"
             android:textSize="14sp"
-            app:customFont="@string/font_heavy" />
+            app:customFont="heavy" />
 
         <Button
             android:id="@+id/copy_emoji_id_button"
@@ -128,7 +128,7 @@
         android:focusable="true"
         android:focusableInTouchMode="true">
 
-        <com.tari.android.wallet.ui.component.CustomFontTextView
+        <com.tari.android.wallet.ui.component.tari.TariTextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="start"
@@ -137,9 +137,9 @@
             android:paddingHorizontal="12dp"
             android:paddingVertical="12dp"
             android:text="@string/full_emoji_id_long_tap_hint"
-            android:textColor="@color/dark_gray"
+            android:textColor="?attr/palette_text_body"
             android:textSize="14sp"
-            app:customFont="@string/font_medium" />
+            app:customFont="medium" />
 
     </FrameLayout>
 

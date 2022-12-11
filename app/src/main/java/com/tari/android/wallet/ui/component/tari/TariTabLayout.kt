@@ -1,4 +1,4 @@
-package com.tari.android.wallet.ui.component
+package com.tari.android.wallet.ui.component.tari
 
 import android.content.Context
 import android.graphics.Typeface
@@ -8,7 +8,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import com.google.android.material.tabs.TabLayout
 
-class CustomFontTabLayout(context: Context, val attrs: AttributeSet) : TabLayout(context, attrs) {
+class TariTabLayout(context: Context, val attrs: AttributeSet) : TabLayout(context, attrs) {
 
     override fun addTab(tab: Tab) {
         super.addTab(tab)
@@ -31,7 +31,7 @@ class CustomFontTabLayout(context: Context, val attrs: AttributeSet) : TabLayout
     }
 
     private fun applyFont(tab: Tab) {
-        val font = CustomFont.AVENIR_LT_STD_HEAVY.asTypeface(context)
+        val font = TariFont.AVENIR_LT_STD_HEAVY.asTypeface(context)
         val mainView = getChildAt(0) as ViewGroup
         val tabView = mainView.getChildAt(tab.position) as ViewGroup
         val tabViewChild: View = tabView.getChildAt(1)

@@ -15,7 +15,7 @@
  * 3. Neither the name of the copyright holder nor the names of
  * its contributors may be used to endorse or promote products
  * derived from this software without specific prior written permission.
- *
+ * 
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND
  * CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES,
  * INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
@@ -30,46 +30,22 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.tari.android.wallet.ui.component
+package com.tari.android.wallet.ui.component.tari
 
 import android.content.Context
-import android.graphics.Typeface
 import android.util.AttributeSet
-import com.tari.android.wallet.ui.extension.string
+import androidx.appcompat.widget.AppCompatButton
 
 /**
- * Custom font enumeration - used in layout files.
+ * Custom font enabled button.
  *
  * @author The Tari Development Team
  */
-enum class CustomFont(private val fileName: String) {
+class TariButton(context: Context, attrs: AttributeSet) : AppCompatButton(context, attrs) {
 
-    // font files
-    AVENIR_LT_STD_BLACK("fonts/AvenirLTStd-Black.otf"),
-    AVENIR_LT_STD_HEAVY("fonts/AvenirLTStd-Heavy.otf"),
-    AVENIR_LT_STD_MEDIUM("fonts/AvenirLTStd-Medium.otf"),
-    AVENIR_LT_STD_ROMAN("fonts/AvenirLTStd-Roman.otf"),
-    AVENIR_NEXT_LT_PRO_REGULAR("fonts/AvenirNextLTPro-Regular.otf"),
-    AVENIR_LT_STD_LIGHT("fonts/AvenirLTStd-Light.otf");
-
-    fun asTypeface(context: Context): Typeface {
-        return Typeface.createFromAsset(context.assets, fileName)
-    }
-
-    companion object {
-        private const val sScheme = "http://schemas.android.com/apk/res-auto"
-        private const val sAttribute = "customFont"
-
-        fun fromString(fontName: String): CustomFont? {
-            return values().firstOrNull { it.name == fontName.uppercase() }
-        }
-
-        fun getFromAttributeSet(context: Context, attr: AttributeSet): Typeface {
-            val fontName = attr.getAttributeValue(sScheme, sAttribute)
-            val fontNameRes = attr.getAttributeResourceValue(sScheme, sAttribute, 0)
-            requireNotNull(fontName) { "You must provide \"$sAttribute\"" }
-            val customFont = fromString(fontName) ?: fromString(context.string(fontNameRes)) ?: throw Throwable("Font wasn't found")
-            return customFont.asTypeface(context)
+    init {
+        if (!isInEditMode) {
+            typeface = TariFont.getFromAttributeSet(context, attrs)
         }
     }
 }

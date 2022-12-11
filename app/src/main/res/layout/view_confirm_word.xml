@@ -14,16 +14,16 @@
     android:paddingVertical="5dp"
     android:paddingStart="13dp">
 
-    <com.tari.android.wallet.ui.component.CustomFontTextView
+    <com.tari.android.wallet.ui.component.tari.TariTextView
         android:id="@+id/text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
         android:clickable="false"
         android:layout_marginEnd="5dp"
-        android:textColor="@color/black"
+        android:textColor="?attr/palette_text_heading"
         android:textSize="14sp"
-        app:customFont="@string/font_heavy"
+        app:customFont="heavy"
         tools:text="text" />
 
     <androidx.appcompat.widget.AppCompatImageView

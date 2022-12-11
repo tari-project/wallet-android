@@ -36,7 +36,7 @@
 
         </androidx.cardview.widget.CardView>
 
-        <com.tari.android.wallet.ui.component.CustomFontTextView
+        <com.tari.android.wallet.ui.component.tari.TariTextView
             android:id="@+id/wifi_status_text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -46,8 +46,8 @@
             android:layout_marginTop="5dp"
             android:gravity="center_horizontal"
             android:lineSpacingExtra="6sp"
-            android:textColor="@color/dark_gray"
-            app:customFont="@string/font_medium"
+            android:textColor="?attr/palette_text_body"
+            app:customFont="medium"
             tools:text="Connected to Internet" />
 
         <View
@@ -92,7 +92,7 @@
 
         </androidx.cardview.widget.CardView>
 
-        <com.tari.android.wallet.ui.component.CustomFontTextView
+        <com.tari.android.wallet.ui.component.tari.TariTextView
             android:id="@+id/base_node_status_text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -102,8 +102,8 @@
             android:layout_marginTop="5dp"
             android:gravity="center_horizontal"
             android:lineSpacingExtra="6sp"
-            android:textColor="@color/dark_gray"
-            app:customFont="@string/font_medium"
+            android:textColor="?attr/palette_text_body"
+            app:customFont="medium"
             tools:text="Connected Internet" />
 
         <View
@@ -147,7 +147,7 @@
 
         </androidx.cardview.widget.CardView>
 
-        <com.tari.android.wallet.ui.component.CustomFontTextView
+        <com.tari.android.wallet.ui.component.tari.TariTextView
             android:id="@+id/tor_text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -157,8 +157,8 @@
             android:layout_marginTop="5dp"
             android:gravity="center_horizontal"
             android:lineSpacingExtra="6sp"
-            android:textColor="@color/dark_gray"
-            app:customFont="@string/font_medium"
+            android:textColor="?attr/palette_text_body"
+            app:customFont="medium"
             tools:text="Connected Internet" />
 
         <View
@@ -203,7 +203,7 @@
 
         </androidx.cardview.widget.CardView>
 
-        <com.tari.android.wallet.ui.component.CustomFontTextView
+        <com.tari.android.wallet.ui.component.tari.TariTextView
             android:id="@+id/syncing_state_text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -213,8 +213,8 @@
             android:layout_marginTop="4dp"
             android:gravity="center_horizontal"
             android:lineSpacingExtra="6sp"
-            android:textColor="@color/dark_gray"
-            app:customFont="@string/font_medium"
+            android:textColor="?attr/palette_text_body"
+            app:customFont="medium"
             tools:text="Connected Internet" />
 
         <View

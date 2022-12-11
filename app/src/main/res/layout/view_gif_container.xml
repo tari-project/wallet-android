@@ -14,7 +14,7 @@
         android:gravity="center_vertical"
         android:orientation="horizontal">
 
-        <com.tari.android.wallet.ui.component.CustomFontTextView
+        <com.tari.android.wallet.ui.component.tari.TariTextView
             android:id="@+id/loading_gif_text_view"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -22,9 +22,9 @@
             android:text="@string/tx_list_loading_gif"
             android:textColor="@color/tx_list_loading_gif_gray"
             android:textSize="13sp"
-            app:customFont="@string/font_heavy" />
+            app:customFont="heavy" />
 
-        <com.tari.android.wallet.ui.component.CustomFontTextView
+        <com.tari.android.wallet.ui.component.tari.TariTextView
             android:id="@+id/retry_loading_gif_text_view"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -35,7 +35,7 @@
             android:textColor="@color/purple"
             android:textSize="13sp"
             android:visibility="gone"
-            app:customFont="@string/font_heavy" />
+            app:customFont="heavy" />
 
         <ProgressBar
             android:id="@+id/loading_gif_progress_bar"

@@ -24,7 +24,7 @@
             android:padding="10dp"
             android:src="@drawable/ic_utxos_minus" />
 
-        <com.tari.android.wallet.ui.component.CustomFontTextView
+        <com.tari.android.wallet.ui.component.tari.TariTextView
             android:id="@+id/amount"
             android:layout_width="68dp"
             android:layout_height="wrap_content"
@@ -32,9 +32,9 @@
             android:background="@drawable/background_utxos_list_split_amount"
             android:gravity="center"
             android:paddingVertical="5dp"
-            android:textColor="@color/black"
+            android:textColor="?attr/palette_text_heading"
             android:textSize="22sp"
-            app:customFont="@string/font_black"
+            app:customFont="black"
             tools:text="10" />
 
         <androidx.appcompat.widget.AppCompatImageView
@@ -68,14 +68,14 @@
             android:layout_gravity="center_horizontal"
             android:orientation="horizontal">
 
-            <com.tari.android.wallet.ui.component.CustomFontTextView
+            <com.tari.android.wallet.ui.component.tari.TariTextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/utxos_split_preview_break"
-                android:textColor="@color/dark_gray"
+                android:textColor="?attr/palette_text_body"
                 android:textSize="14sp"
                 android:textStyle="italic"
-                app:customFont="@string/font_medium" />
+                app:customFont="medium" />
 
             <androidx.appcompat.widget.AppCompatImageView
                 android:layout_width="8dp"
@@ -86,14 +86,14 @@
                 android:src="@drawable/gem"
                 android:tint="@color/dark_gray" />
 
-            <com.tari.android.wallet.ui.component.CustomFontTextView
+            <com.tari.android.wallet.ui.component.tari.TariTextView
                 android:id="@+id/full_amount"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="@color/dark_gray"
+                android:textColor="?attr/palette_text_body"
                 android:textSize="14sp"
                 android:textStyle="italic"
-                app:customFont="@string/font_medium"
+                app:customFont="medium"
                 tools:text="3,200" />
 
         </LinearLayout>
@@ -104,14 +104,14 @@
             android:layout_gravity="center_horizontal"
             android:orientation="horizontal">
 
-            <com.tari.android.wallet.ui.component.CustomFontTextView
+            <com.tari.android.wallet.ui.component.tari.TariTextView
                 android:id="@+id/into_amount"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="@color/dark_gray"
+                android:textColor="?attr/palette_text_body"
                 android:textSize="14sp"
                 android:textStyle="italic"
-                app:customFont="@string/font_medium"
+                app:customFont="medium"
                 tools:text="3,200" />
 
             <androidx.appcompat.widget.AppCompatImageView
@@ -123,14 +123,14 @@
                 android:src="@drawable/gem"
                 android:tint="@color/dark_gray" />
 
-            <com.tari.android.wallet.ui.component.CustomFontTextView
+            <com.tari.android.wallet.ui.component.tari.TariTextView
                 android:id="@+id/count_coins"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="@color/dark_gray"
+                android:textColor="?attr/palette_text_body"
                 android:textSize="14sp"
                 android:textStyle="italic"
-                app:customFont="@string/font_medium"
+                app:customFont="medium"
                 tools:text="0.0018" />
 
         </LinearLayout>
@@ -141,14 +141,14 @@
             android:layout_gravity="center_horizontal"
             android:orientation="horizontal">
 
-            <com.tari.android.wallet.ui.component.CustomFontTextView
+            <com.tari.android.wallet.ui.component.tari.TariTextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/utxos_split_preview_fee"
-                android:textColor="@color/dark_gray"
+                android:textColor="?attr/palette_text_body"
                 android:textSize="14sp"
                 android:textStyle="italic"
-                app:customFont="@string/font_medium" />
+                app:customFont="medium" />
 
             <androidx.appcompat.widget.AppCompatImageView
                 android:layout_width="8dp"
@@ -159,14 +159,14 @@
                 android:src="@drawable/gem"
                 android:tint="@color/dark_gray" />
 
-            <com.tari.android.wallet.ui.component.CustomFontTextView
+            <com.tari.android.wallet.ui.component.tari.TariTextView
                 android:id="@+id/fee_amount"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="@color/dark_gray"
+                android:textColor="?attr/palette_text_body"
                 android:textSize="14sp"
                 android:textStyle="italic"
-                app:customFont="@string/font_medium"
+                app:customFont="medium"
                 tools:text="0.0018" />
 
         </LinearLayout>

@@ -6,7 +6,7 @@
     android:layout_height="wrap_content"
     android:orientation="vertical">
 
-    <com.tari.android.wallet.ui.component.CustomFontTextView
+    <com.tari.android.wallet.ui.component.tari.TariTextView
         android:id="@+id/body"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -14,9 +14,9 @@
         android:gravity="center"
         android:letterSpacing="0.01"
         android:lineSpacingExtra="8dp"
-        android:textColor="@color/black"
+        android:textColor="?attr/palette_text_heading"
         android:textSize="16sp"
-        app:customFont="@string/font_medium" />
+        app:customFont="medium" />
 
     <View
         android:layout_width="match_parent"

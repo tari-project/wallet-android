@@ -28,15 +28,15 @@
             android:layout_gravity="center_vertical|end"
             android:layout_marginEnd="22dp" />
 
-        <com.tari.android.wallet.ui.component.CustomFontTextView
+        <com.tari.android.wallet.ui.component.tari.TariTextView
             android:id="@+id/back_up_wallet_label_view"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="@string/all_settings_back_up_wallet_settings_entry"
-            android:textColor="@color/black"
+            android:textColor="?attr/palette_text_heading"
             android:textSize="15sp"
-            app:customFont="@string/font_medium"
+            app:customFont="medium"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
@@ -47,13 +47,13 @@
             android:layout_gravity="center_vertical"
             android:orientation="horizontal">
 
-            <com.tari.android.wallet.ui.component.CustomFontTextView
+            <com.tari.android.wallet.ui.component.tari.TariTextView
                 android:id="@+id/backup_status_text_view"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
                 android:visibility="gone"
-                app:customFont="@string/font_medium"
+                app:customFont="medium"
                 tools:text="@string/back_up_wallet_backup_status_checking_backup"
                 tools:textColor="@color/all_settings_back_up_status_processing"
                 tools:visibility="visible" />

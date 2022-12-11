@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
-    <com.tari.android.wallet.ui.component.CustomFontTextView
+    <com.tari.android.wallet.ui.component.tari.TariTextView
         android:id="@+id/tvName"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -15,12 +15,12 @@
         android:singleLine="true"
         android:textColor="@color/common_header_title"
         android:textSize="16sp"
-        app:customFont="@string/font_medium"
+        app:customFont="medium"
         app:layout_constraintEnd_toStartOf="@+id/status_container"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <com.tari.android.wallet.ui.component.CustomFontTextView
+    <com.tari.android.wallet.ui.component.tari.TariTextView
         android:id="@+id/tvHex"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -31,12 +31,12 @@
         android:singleLine="true"
         android:textColor="@color/secondary_text"
         android:textSize="14sp"
-        app:customFont="@string/font_regular"
+        app:customFont="regular"
         app:layout_constraintEnd_toStartOf="@+id/status_container"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tvName" />
 
-    <com.tari.android.wallet.ui.component.CustomFontTextView
+    <com.tari.android.wallet.ui.component.tari.TariTextView
         android:id="@+id/tvOnionAddress"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -47,7 +47,7 @@
         android:singleLine="true"
         android:textColor="@color/secondary_text"
         android:textSize="14sp"
-        app:customFont="@string/font_regular"
+        app:customFont="regular"
         app:layout_constraintEnd_toStartOf="@+id/status_container"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tvHex" />
@@ -60,7 +60,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <com.tari.android.wallet.ui.component.CustomFontButton
+        <com.tari.android.wallet.ui.component.tari.TariButton
             android:id="@+id/delete_button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -71,7 +71,7 @@
             android:textColor="@color/purple"
             android:textSize="14sp"
             android:visibility="gone"
-            app:customFont="@string/font_regular" />
+            app:customFont="regular" />
 
         <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/done"

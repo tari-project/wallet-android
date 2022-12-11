@@ -22,15 +22,15 @@
         android:src="@drawable/gem" />
 
     <!-- first digit (never disappears) -->
-    <com.tari.android.wallet.ui.component.CustomFontTextView
+    <com.tari.android.wallet.ui.component.tari.TariTextView
         android:id="@+id/amount_element_0_text_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/add_amount_leftmost_digit_margin_start"
         android:text="@string/digit_0"
-        android:textColor="@color/black"
+        android:textColor="?attr/palette_text_heading"
         android:textSize="@dimen/add_amount_element_text_size"
-        app:customFont="@string/font_black" />
+        app:customFont="black" />
 
     <View
         android:id="@+id/amount_center_correction_view"

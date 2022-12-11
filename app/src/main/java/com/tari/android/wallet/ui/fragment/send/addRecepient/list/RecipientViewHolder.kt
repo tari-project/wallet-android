@@ -37,7 +37,7 @@ import com.tari.android.wallet.databinding.ItemAddRecipientListBinding
 import com.tari.android.wallet.model.Contact
 import com.tari.android.wallet.ui.common.recyclerView.CommonViewHolder
 import com.tari.android.wallet.ui.common.recyclerView.ViewHolderBuilder
-import com.tari.android.wallet.ui.component.EmojiIdSummaryViewController
+import com.tari.android.wallet.ui.component.fullEmojiId.EmojiIdSummaryViewController
 import com.tari.android.wallet.ui.extension.setVisible
 import com.tari.android.wallet.yat.YatUser
 

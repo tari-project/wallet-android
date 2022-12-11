@@ -15,7 +15,7 @@ import androidx.fragment.app.Fragment
 import androidx.viewbinding.ViewBinding
 import com.tari.android.wallet.di.DiContainer
 import com.tari.android.wallet.extension.observe
-import com.tari.android.wallet.ui.component.MutedBackPressedCallback
+import com.tari.android.wallet.ui.component.mainList.MutedBackPressedCallback
 import com.tari.android.wallet.ui.dialog.modular.ModularDialog
 
 abstract class CommonFragment<Binding : ViewBinding, VM : CommonViewModel> : Fragment() {

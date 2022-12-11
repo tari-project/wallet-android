@@ -11,15 +11,15 @@
     android:clickable="true"
     android:focusable="true">
 
-    <com.tari.android.wallet.ui.component.CustomFontTextView
+    <com.tari.android.wallet.ui.component.tari.TariTextView
         android:id="@+id/title"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/common_horizontal_margin"
         android:gravity="start|center_vertical"
-        android:textColor="@color/black"
+        android:textColor="?attr/palette_text_heading"
         android:textSize="15sp"
-        app:customFont="@string/font_medium"
+        app:customFont="medium"
         app:layout_constraintBottom_toTopOf="@+id/last_backup_time_text_view"
         app:layout_constraintEnd_toStartOf="@+id/switcher"
         app:layout_constraintStart_toStartOf="parent"
@@ -57,13 +57,13 @@
             app:layout_constraintTop_toTopOf="parent" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <com.tari.android.wallet.ui.component.CustomFontTextView
+    <com.tari.android.wallet.ui.component.tari.TariTextView
         android:id="@+id/last_backup_time_text_view"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:gravity="start"
-        android:textColor="@color/dark_gray"
-        app:customFont="@string/font_medium"
+        android:textColor="?attr/palette_text_body"
+        app:customFont="medium"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/switcher"
         app:layout_constraintStart_toStartOf="@+id/title"

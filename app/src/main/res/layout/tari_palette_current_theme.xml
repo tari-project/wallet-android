@@ -21,7 +21,7 @@
                 android:layout_marginBottom="5dp"
                 android:gravity="center"
                 android:text="Neutral"
-                android:textColor="@color/black"
+                android:textColor="?attr/palette_text_heading"
                 android:textStyle="bold" />
 
             <LinearLayout
@@ -53,7 +53,7 @@
                         android:layout_height="wrap_content"
                         android:gravity="center"
                         android:text="primary"
-                        android:textColor="@color/black"
+                        android:textColor="?attr/palette_text_heading"
                         android:textSize="8dp" />
 
                 </androidx.appcompat.widget.LinearLayoutCompat>
@@ -81,7 +81,7 @@
                         android:layout_height="wrap_content"
                         android:gravity="center"
                         android:text="secondary"
-                        android:textColor="@color/black"
+                        android:textColor="?attr/palette_text_heading"
                         android:textSize="8dp" />
 
                 </androidx.appcompat.widget.LinearLayoutCompat>
@@ -109,7 +109,7 @@
                         android:layout_height="wrap_content"
                         android:gravity="center"
                         android:text="tertiary"
-                        android:textColor="@color/black"
+                        android:textColor="?attr/palette_text_heading"
                         android:textSize="8dp" />
 
                 </androidx.appcompat.widget.LinearLayoutCompat>
@@ -137,7 +137,7 @@
                         android:layout_height="wrap_content"
                         android:gravity="center"
                         android:text="inactive"
-                        android:textColor="@color/black"
+                        android:textColor="?attr/palette_text_heading"
                         android:textSize="8dp" />
 
                 </androidx.appcompat.widget.LinearLayoutCompat>
@@ -158,7 +158,7 @@
                 android:layout_marginBottom="5dp"
                 android:gravity="center"
                 android:text="Brand"
-                android:textColor="@color/black"
+                android:textColor="?attr/palette_text_heading"
                 android:textStyle="bold" />
 
             <LinearLayout
@@ -190,7 +190,7 @@
                         android:layout_height="wrap_content"
                         android:gravity="center"
                         android:text="purple"
-                        android:textColor="@color/black"
+                        android:textColor="?attr/palette_text_heading"
                         android:textSize="8dp" />
 
                 </androidx.appcompat.widget.LinearLayoutCompat>
@@ -218,7 +218,7 @@
                         android:layout_height="wrap_content"
                         android:gravity="center"
                         android:text="pink"
-                        android:textColor="@color/black"
+                        android:textColor="?attr/palette_text_heading"
                         android:textSize="8dp" />
 
                 </androidx.appcompat.widget.LinearLayoutCompat>
@@ -246,7 +246,7 @@
                         android:layout_height="wrap_content"
                         android:gravity="center"
                         android:text="dark blue"
-                        android:textColor="@color/black"
+                        android:textColor="?attr/palette_text_heading"
                         android:textSize="8dp" />
 
                 </androidx.appcompat.widget.LinearLayoutCompat>
@@ -267,7 +267,7 @@
                 android:layout_marginBottom="5dp"
                 android:gravity="center"
                 android:text="Buttons"
-                android:textColor="@color/black"
+                android:textColor="?attr/palette_text_heading"
                 android:textStyle="bold" />
 
             <LinearLayout
@@ -299,7 +299,7 @@
                         android:layout_height="wrap_content"
                         android:gravity="center"
                         android:text="primary start"
-                        android:textColor="@color/black"
+                        android:textColor="?attr/palette_text_heading"
                         android:textSize="8dp" />
 
                 </androidx.appcompat.widget.LinearLayoutCompat>
@@ -327,7 +327,7 @@
                         android:layout_height="wrap_content"
                         android:gravity="center"
                         android:text="primary end"
-                        android:textColor="@color/black"
+                        android:textColor="?attr/palette_text_heading"
                         android:textSize="8dp" />
 
                 </androidx.appcompat.widget.LinearLayoutCompat>
@@ -355,7 +355,7 @@
                         android:layout_height="wrap_content"
                         android:gravity="center"
                         android:text="disabled"
-                        android:textColor="@color/black"
+                        android:textColor="?attr/palette_text_heading"
                         android:textSize="8dp" />
 
                 </androidx.appcompat.widget.LinearLayoutCompat>
@@ -383,7 +383,7 @@
                         android:layout_height="wrap_content"
                         android:gravity="center"
                         android:text="primary text"
-                        android:textColor="@color/black"
+                        android:textColor="?attr/palette_text_heading"
                         android:textSize="8dp" />
 
                 </androidx.appcompat.widget.LinearLayoutCompat>
@@ -411,7 +411,7 @@
                         android:layout_height="wrap_content"
                         android:gravity="center"
                         android:text="disabled text"
-                        android:textColor="@color/black"
+                        android:textColor="?attr/palette_text_heading"
                         android:textSize="8dp" />
 
                 </androidx.appcompat.widget.LinearLayoutCompat>
@@ -432,7 +432,7 @@
                 android:layout_marginBottom="5dp"
                 android:gravity="center"
                 android:text="Text"
-                android:textColor="@color/black"
+                android:textColor="?attr/palette_text_heading"
                 android:textStyle="bold" />
 
             <LinearLayout
@@ -464,7 +464,7 @@
                         android:layout_height="wrap_content"
                         android:gravity="center"
                         android:text="heading"
-                        android:textColor="@color/black"
+                        android:textColor="?attr/palette_text_heading"
                         android:textSize="8dp" />
 
                 </androidx.appcompat.widget.LinearLayoutCompat>
@@ -492,7 +492,7 @@
                         android:layout_height="wrap_content"
                         android:gravity="center"
                         android:text="body"
-                        android:textColor="@color/black"
+                        android:textColor="?attr/palette_text_heading"
                         android:textSize="8dp" />
 
                 </androidx.appcompat.widget.LinearLayoutCompat>
@@ -520,7 +520,7 @@
                         android:layout_height="wrap_content"
                         android:gravity="center"
                         android:text="light text"
-                        android:textColor="@color/black"
+                        android:textColor="?attr/palette_text_heading"
                         android:textSize="8dp" />
 
                 </androidx.appcompat.widget.LinearLayoutCompat>
@@ -548,7 +548,7 @@
                         android:layout_height="wrap_content"
                         android:gravity="center"
                         android:text="links"
-                        android:textColor="@color/black"
+                        android:textColor="?attr/palette_text_heading"
                         android:textSize="8dp" />
 
                 </androidx.appcompat.widget.LinearLayoutCompat>
@@ -569,7 +569,7 @@
                 android:layout_marginBottom="5dp"
                 android:gravity="center"
                 android:text="Icons"
-                android:textColor="@color/black"
+                android:textColor="?attr/palette_text_heading"
                 android:textStyle="bold" />
 
             <LinearLayout
@@ -601,7 +601,7 @@
                         android:layout_height="wrap_content"
                         android:gravity="center"
                         android:text="default"
-                        android:textColor="@color/black"
+                        android:textColor="?attr/palette_text_heading"
                         android:textSize="8dp" />
 
                 </androidx.appcompat.widget.LinearLayoutCompat>
@@ -629,7 +629,7 @@
                         android:layout_height="wrap_content"
                         android:gravity="center"
                         android:text="active"
-                        android:textColor="@color/black"
+                        android:textColor="?attr/palette_text_heading"
                         android:textSize="8dp" />
 
                 </androidx.appcompat.widget.LinearLayoutCompat>
@@ -657,7 +657,7 @@
                         android:layout_height="wrap_content"
                         android:gravity="center"
                         android:text="inactive"
-                        android:textColor="@color/black"
+                        android:textColor="?attr/palette_text_heading"
                         android:textSize="8dp" />
 
                 </androidx.appcompat.widget.LinearLayoutCompat>
@@ -678,7 +678,7 @@
                 android:layout_marginBottom="5dp"
                 android:gravity="center"
                 android:text="Components"
-                android:textColor="@color/black"
+                android:textColor="?attr/palette_text_heading"
                 android:textStyle="bold" />
 
             <LinearLayout
@@ -710,7 +710,7 @@
                         android:layout_height="wrap_content"
                         android:gravity="center"
                         android:text="qr background"
-                        android:textColor="@color/black"
+                        android:textColor="?attr/palette_text_heading"
                         android:textSize="8dp" />
 
                 </androidx.appcompat.widget.LinearLayoutCompat>
@@ -738,7 +738,7 @@
                         android:layout_height="wrap_content"
                         android:gravity="center"
                         android:text="overlay"
-                        android:textColor="@color/black"
+                        android:textColor="?attr/palette_text_heading"
                         android:textSize="8dp" />
 
                 </androidx.appcompat.widget.LinearLayoutCompat>
@@ -766,7 +766,7 @@
                         android:layout_height="wrap_content"
                         android:gravity="center"
                         android:text="overlay text"
-                        android:textColor="@color/black"
+                        android:textColor="?attr/palette_text_heading"
                         android:textSize="8dp" />
 
                 </androidx.appcompat.widget.LinearLayoutCompat>
@@ -787,7 +787,7 @@
                 android:layout_marginBottom="5dp"
                 android:gravity="center"
                 android:text="System"
-                android:textColor="@color/black"
+                android:textColor="?attr/palette_text_heading"
                 android:textStyle="bold" />
 
             <LinearLayout
@@ -819,7 +819,7 @@
                         android:layout_height="wrap_content"
                         android:gravity="center"
                         android:text="red"
-                        android:textColor="@color/black"
+                        android:textColor="?attr/palette_text_heading"
                         android:textSize="8dp" />
 
                 </androidx.appcompat.widget.LinearLayoutCompat>
@@ -847,7 +847,7 @@
                         android:layout_height="wrap_content"
                         android:gravity="center"
                         android:text="orange"
-                        android:textColor="@color/black"
+                        android:textColor="?attr/palette_text_heading"
                         android:textSize="8dp" />
 
                 </androidx.appcompat.widget.LinearLayoutCompat>
@@ -875,7 +875,7 @@
                         android:layout_height="wrap_content"
                         android:gravity="center"
                         android:text="yellow"
-                        android:textColor="@color/black"
+                        android:textColor="?attr/palette_text_heading"
                         android:textSize="8dp" />
 
                 </androidx.appcompat.widget.LinearLayoutCompat>
@@ -903,7 +903,7 @@
                         android:layout_height="wrap_content"
                         android:gravity="center"
                         android:text="green"
-                        android:textColor="@color/black"
+                        android:textColor="?attr/palette_text_heading"
                         android:textSize="8dp" />
 
                 </androidx.appcompat.widget.LinearLayoutCompat>
@@ -931,7 +931,7 @@
                         android:layout_height="wrap_content"
                         android:gravity="center"
                         android:text="blue"
-                        android:textColor="@color/black"
+                        android:textColor="?attr/palette_text_heading"
                         android:textSize="8dp" />
 
                 </androidx.appcompat.widget.LinearLayoutCompat>
@@ -967,7 +967,7 @@
                         android:layout_height="wrap_content"
                         android:gravity="center"
                         android:text="secondary red"
-                        android:textColor="@color/black"
+                        android:textColor="?attr/palette_text_heading"
                         android:textSize="8dp" />
 
                 </androidx.appcompat.widget.LinearLayoutCompat>
@@ -995,7 +995,7 @@
                         android:layout_height="wrap_content"
                         android:gravity="center"
                         android:text="secondary orange"
-                        android:textColor="@color/black"
+                        android:textColor="?attr/palette_text_heading"
                         android:textSize="8dp" />
 
                 </androidx.appcompat.widget.LinearLayoutCompat>
@@ -1024,7 +1024,7 @@
                         android:gravity="center"
                         android:paddingHorizontal="5dp"
                         android:text="secondary yellow"
-                        android:textColor="@color/black"
+                        android:textColor="?attr/palette_text_heading"
                         android:textSize="8dp" />
 
                 </androidx.appcompat.widget.LinearLayoutCompat>
@@ -1052,7 +1052,7 @@
                         android:layout_height="wrap_content"
                         android:gravity="center"
                         android:text="secondary green"
-                        android:textColor="@color/black"
+                        android:textColor="?attr/palette_text_heading"
                         android:textSize="8dp" />
 
                 </androidx.appcompat.widget.LinearLayoutCompat>
@@ -1080,7 +1080,7 @@
                         android:layout_height="wrap_content"
                         android:gravity="center"
                         android:text="secondary blue"
-                        android:textColor="@color/black"
+                        android:textColor="?attr/palette_text_heading"
                         android:textSize="8dp" />
 
                 </androidx.appcompat.widget.LinearLayoutCompat>
@@ -1102,7 +1102,7 @@
                 android:layout_marginBottom="5dp"
                 android:gravity="center"
                 android:text="Background"
-                android:textColor="@color/black"
+                android:textColor="?attr/palette_text_heading"
                 android:textStyle="bold" />
 
             <LinearLayout
@@ -1134,7 +1134,7 @@
                         android:layout_height="wrap_content"
                         android:gravity="center"
                         android:text="primary"
-                        android:textColor="@color/black"
+                        android:textColor="?attr/palette_text_heading"
                         android:textSize="8dp" />
 
                 </androidx.appcompat.widget.LinearLayoutCompat>
@@ -1162,7 +1162,7 @@
                         android:layout_height="wrap_content"
                         android:gravity="center"
                         android:text="secondary"
-                        android:textColor="@color/black"
+                        android:textColor="?attr/palette_text_heading"
                         android:textSize="8dp" />
 
                 </androidx.appcompat.widget.LinearLayoutCompat>
@@ -1183,7 +1183,7 @@
                 android:layout_marginBottom="5dp"
                 android:gravity="center"
                 android:text="Shadow"
-                android:textColor="@color/black"
+                android:textColor="?attr/palette_text_heading"
                 android:textStyle="bold" />
 
             <LinearLayout
@@ -1215,7 +1215,7 @@
                         android:layout_height="wrap_content"
                         android:gravity="center"
                         android:text="box"
-                        android:textColor="@color/black"
+                        android:textColor="?attr/palette_text_heading"
                         android:textSize="8dp" />
 
                 </androidx.appcompat.widget.LinearLayoutCompat>

@@ -37,7 +37,7 @@
             android:layout_marginBottom="10dp"
             android:orientation="horizontal">
 
-            <com.tari.android.wallet.ui.component.CustomFontButton
+            <com.tari.android.wallet.ui.component.tari.TariButton
                 android:id="@+id/generate_button"
                 android:layout_width="0dp"
                 android:layout_height="@dimen/common_action_button_height"
@@ -51,7 +51,7 @@
                 android:textAllCaps="false"
                 android:textColor="@color/button_text_color_selector"
                 android:textSize="16sp"
-                app:customFont="@string/font_heavy" />
+                app:customFont="heavy" />
 
             <androidx.appcompat.widget.AppCompatImageButton
                 android:id="@+id/share_button"
@@ -64,7 +64,7 @@
                 android:background="@drawable/disable_able_gradient_button_bg"
                 android:elevation="0dp"
                 android:src="@drawable/ic_share"
-                app:customFont="@string/font_heavy" />
+                app:customFont="heavy" />
 
         </androidx.appcompat.widget.LinearLayoutCompat>
 

@@ -30,23 +30,39 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.tari.android.wallet.ui.component
+package com.tari.android.wallet.ui.component.tari
 
 import android.content.Context
+import android.graphics.Typeface
 import android.util.AttributeSet
-import androidx.appcompat.widget.AppCompatEditText
-
 
 /**
- * Custom font enabled text edit.
+ * Custom font enumeration - used in layout files.
  *
  * @author The Tari Development Team
  */
-class CustomFontEditText(context: Context, attrs: AttributeSet) : AppCompatEditText(context, attrs) {
+enum class TariFont(private val fileName: String) {
 
-    init {
-        if (!isInEditMode) {
-            typeface = CustomFont.getFromAttributeSet(context, attrs)
+    // font files
+    AVENIR_LT_STD_BLACK("fonts/AvenirLTStd-Black.otf"),
+    AVENIR_LT_STD_HEAVY("fonts/AvenirLTStd-Heavy.otf"),
+    AVENIR_LT_STD_MEDIUM("fonts/AvenirLTStd-Medium.otf"),
+    AVENIR_LT_STD_ROMAN("fonts/AvenirLTStd-Roman.otf"),
+    AVENIR_NEXT_LT_PRO_REGULAR("fonts/AvenirNextLTPro-Regular.otf"),
+    AVENIR_LT_STD_LIGHT("fonts/AvenirLTStd-Light.otf");
+
+    fun asTypeface(context: Context): Typeface {
+        return Typeface.createFromAsset(context.assets, fileName)
+    }
+
+    companion object {
+        private const val sScheme = "http://schemas.android.com/apk/res-auto"
+        private const val sAttribute = "customFont"
+
+        fun getFromAttributeSet(context: Context, attr: AttributeSet): Typeface {
+            val fontName = attr.getAttributeValue(sScheme, sAttribute).toInt()
+            val uiFont = UIFont.values()[fontName]
+            return uiFont.toTariFont().asTypeface(context)
         }
     }
 }

@@ -41,7 +41,7 @@
                 android:scaleY="1.9"
                 android:src="@drawable/fingerprint" />
 
-            <com.tari.android.wallet.ui.component.CustomFontTextView
+            <com.tari.android.wallet.ui.component.tari.TariTextView
                 android:id="@+id/prompt_text_view"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -53,9 +53,9 @@
                 android:letterSpacing="-0.014"
                 android:lineSpacingExtra="10dp"
                 android:text="@string/auth_prompt_title"
-                android:textColor="@color/black"
+                android:textColor="?attr/palette_text_heading"
                 android:textSize="18sp"
-                app:customFont="@string/font_light" />
+                app:customFont="light" />
 
             <View
                 android:layout_width="match_parent"
@@ -67,7 +67,7 @@
                 android:background="@color/create_emoji_id_bg"
                 android:visibility="visible" />
 
-            <com.tari.android.wallet.ui.component.CustomFontTextView
+            <com.tari.android.wallet.ui.component.tari.TariTextView
                 android:id="@+id/auth_desc_text_view"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -79,10 +79,10 @@
                 android:letterSpacing="-0.02"
                 android:lineSpacingExtra="10dp"
                 android:text="@string/auth_prompt_desc"
-                android:textColor="@color/dark_gray"
+                android:textColor="?attr/palette_text_body"
                 android:textSize="14sp"
                 android:visibility="visible"
-                app:customFont="@string/font_medium" />
+                app:customFont="medium" />
 
         </RelativeLayout>
 
@@ -108,7 +108,7 @@
                     android:layout_gravity="center" />
             </FrameLayout>
 
-            <com.tari.android.wallet.ui.component.CustomFontButton
+            <com.tari.android.wallet.ui.component.tari.TariButton
                 android:id="@+id/enable_auth_button"
                 style="?android:attr/borderlessButtonStyle"
                 android:layout_width="match_parent"
@@ -122,7 +122,7 @@
                 android:textAllCaps="false"
                 android:textColor="@color/white"
                 android:textSize="16sp"
-                app:customFont="@string/font_heavy" />
+                app:customFont="heavy" />
 
         </RelativeLayout>
     </RelativeLayout>

@@ -35,7 +35,7 @@
                 android:src="@drawable/ic_search"
                 tools:ignore="ContentDescription" />
 
-            <com.tari.android.wallet.ui.component.CustomFontEditText
+            <com.tari.android.wallet.ui.component.tari.TariEditText
                 android:id="@+id/gif_search_edit_text"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
@@ -47,7 +47,7 @@
                 android:inputType="text"
                 android:textColorHint="@color/add_recipient_hint"
                 android:textSize="14sp"
-                app:customFont="@string/font_medium" />
+                app:customFont="medium" />
         </LinearLayout>
 
         <com.giphy.sdk.ui.views.GiphyGridView

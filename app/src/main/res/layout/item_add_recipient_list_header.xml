@@ -21,7 +21,7 @@
         android:orientation="horizontal">
 
         <!-- title -->
-        <com.tari.android.wallet.ui.component.CustomFontTextView
+        <com.tari.android.wallet.ui.component.tari.TariTextView
             android:id="@+id/title_text_view"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -31,7 +31,7 @@
             android:text="@string/add_recipient_recent_tx_contacts"
             android:textColor="@color/add_recipient_contact_list_section_header_title"
             android:textSize="12sp"
-            app:customFont="@string/font_medium" />
+            app:customFont="medium" />
     </LinearLayout>
 
 
