@@ -6,6 +6,7 @@ import com.tari.android.wallet.databinding.ItemSettingsBackupOptionBinding
 import com.tari.android.wallet.ui.common.recyclerView.CommonViewHolder
 import com.tari.android.wallet.ui.common.recyclerView.ViewHolderBuilder
 import com.tari.android.wallet.ui.extension.color
+import com.tari.android.wallet.ui.extension.colorFromAttribute
 import com.tari.android.wallet.ui.extension.setColor
 import com.tari.android.wallet.ui.extension.string
 import com.tari.android.wallet.ui.fragment.settings.allSettings.PresentationBackupState
@@ -40,7 +41,7 @@ class SettingsBackupOptionViewHolder(view: ItemSettingsBackupOptionBinding) :
         val hideText = backupState.textId == -1
         ui.backupStatusTextView.text = if (hideText) "" else string(backupState.textId)
         ui.backupStatusTextView.visibility = if (hideText) View.GONE else View.VISIBLE
-        if (backupState.textColor != -1) ui.backupStatusTextView.setTextColor(color(backupState.textColor))
+        if (backupState.textColor != -1) ui.backupStatusTextView.setTextColor(itemView.context.colorFromAttribute(backupState.textColor))
     }
 
     companion object {

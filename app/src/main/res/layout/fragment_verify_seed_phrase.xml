@@ -104,7 +104,7 @@
                         android:layout_gravity="top|center_horizontal"
                         android:layout_marginTop="5dp"
                         android:contentDescription="@string/verify_seed_phrase_content_description_sequence_is_correct"
-                        android:src="@drawable/ic_positive_check"
+                        android:src="@drawable/vector_positive_check"
                         android:visibility="gone"
                         tools:visibility="visible" />
 

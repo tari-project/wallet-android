@@ -37,34 +37,39 @@
                     android:textSize="14sp"
                     app:customFont="medium" />
 
-                <RelativeLayout
+                <com.tari.android.wallet.ui.component.tari.TariPrimaryBackground
                     android:id="@+id/delete_wallet_cta_view"
                     android:layout_width="match_parent"
                     android:layout_height="@dimen/menu_item_height"
                     android:layout_marginTop="25dp"
-                    android:background="@drawable/setting_option_background"
                     android:clickable="true"
                     android:focusable="true"
                     android:paddingHorizontal="@dimen/common_horizontal_margin">
 
-                    <com.tari.android.wallet.ui.component.tari.TariTextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_centerVertical="true"
-                        android:text="@string/all_settings_delete_wallet"
-                        android:textColor="@color/common_error"
-                        android:textSize="15sp"
-                        app:customFont="medium" />
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent">
 
-                    <ProgressBar
-                        android:id="@+id/delete_wallet_progress"
-                        android:layout_width="20dp"
-                        android:layout_height="20dp"
-                        android:layout_alignParentEnd="true"
-                        android:layout_centerVertical="true"
-                        android:visibility="invisible"
-                        tools:visibility="visible" />
-                </RelativeLayout>
+                        <com.tari.android.wallet.ui.component.tari.TariTextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_centerVertical="true"
+                            android:text="@string/all_settings_delete_wallet"
+                            android:textColor="?attr/palette_system_red"
+                            android:textSize="15sp"
+                            app:customFont="medium" />
+
+                        <ProgressBar
+                            android:id="@+id/delete_wallet_progress"
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:layout_alignParentEnd="true"
+                            android:layout_centerVertical="true"
+                            android:visibility="invisible"
+                            tools:visibility="visible" />
+                    </RelativeLayout>
+
+                </com.tari.android.wallet.ui.component.tari.TariPrimaryBackground>
 
             </androidx.appcompat.widget.LinearLayoutCompat>
 

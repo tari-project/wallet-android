@@ -35,11 +35,11 @@
     </style>
 
     <style name="NegativeButtonStyle" parent="Widget.AppCompat.Button.ButtonBar.AlertDialog">
-        <item name="android:textColor">@color/common_error</item>
+        <item name="android:textColor">?attr/palette_system_red</item>
     </style>
 
     <style name="PositiveButtonStyle" parent="Widget.AppCompat.Button.ButtonBar.AlertDialog">
-        <item name="android:textColor">@color/accent</item>
+        <item name="android:textColor">?attr/palette_button_primary_start</item>
     </style>
 
     <style name="BottomSlideDialog" parent="Theme.AppCompat.Dialog">

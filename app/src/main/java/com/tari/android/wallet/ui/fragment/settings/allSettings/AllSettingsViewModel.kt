@@ -2,7 +2,7 @@ package com.tari.android.wallet.ui.fragment.settings.allSettings
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.tari.android.wallet.R.color.*
+import com.tari.android.wallet.R
 import com.tari.android.wallet.R.drawable.*
 import com.tari.android.wallet.R.string.*
 import com.tari.android.wallet.event.EventBus
@@ -141,13 +141,13 @@ class AllSettingsViewModel : CommonViewModel() {
             val presentationBackupState = when (backupState.backupsState) {
                 is BackupState.BackupDisabled -> PresentationBackupState(Warning)
                 is BackupState.BackupInProgress -> {
-                    PresentationBackupState(InProgress, back_up_wallet_backup_status_in_progress, all_settings_back_up_status_processing)
+                    PresentationBackupState(InProgress, back_up_wallet_backup_status_in_progress, R.attr.palette_text_body)
                 }
                 is BackupState.BackupUpToDate -> {
-                    PresentationBackupState(Success, back_up_wallet_backup_status_up_to_date, all_settings_back_up_status_up_to_date)
+                    PresentationBackupState(Success, back_up_wallet_backup_status_up_to_date, R.attr.palette_system_green)
                 }
                 is BackupState.BackupFailed -> {
-                    PresentationBackupState(Warning, back_up_wallet_backup_status_outdated, all_settings_back_up_status_error)
+                    PresentationBackupState(Warning, back_up_wallet_backup_status_outdated, R.attr.palette_system_red)
                 }
             }
             backupOption.backupState = presentationBackupState

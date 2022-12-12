@@ -1,6 +1,7 @@
 <resources>
 
     <style name="AppTheme.Base" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="alertDialogTheme">@style/AlertDialogTheme</item>
     </style>
 
     <style name="AppTheme.Light" parent="AppTheme.Base">
