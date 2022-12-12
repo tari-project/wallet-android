@@ -1,38 +1,45 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.appcompat.widget.LinearLayoutCompat xmlns:android="http://schemas.android.com/apk/res/android"
+
+<com.tari.android.wallet.ui.component.tari.TariPrimaryBackground xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/root"
     android:layout_width="match_parent"
     android:layout_height="@dimen/menu_item_height"
-    android:background="@drawable/setting_option_background"
     android:clickable="true"
     android:focusable="true"
     android:orientation="horizontal"
     android:paddingHorizontal="@dimen/common_horizontal_margin">
 
-    <androidx.appcompat.widget.AppCompatImageView
-        android:id="@+id/left_icon"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_vertical|end"
-        android:layout_marginEnd="22dp" />
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal">
 
-    <com.tari.android.wallet.ui.component.tari.TariTextView
-        android:id="@+id/title"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_vertical|start"
-        android:layout_weight="1"
-        android:text="@string/all_settings_report_a_bug"
-        android:textColor="?attr/palette_text_heading"
-        android:textSize="15sp"
-        app:customFont="medium" />
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/left_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical|end"
+            android:layout_marginEnd="22dp" />
 
-    <androidx.appcompat.widget.AppCompatImageView
-        android:id="@+id/icon"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_vertical|end"
-        android:src="@drawable/icon_apply_setting" />
+        <com.tari.android.wallet.ui.component.tari.TariTextView
+            android:id="@+id/title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical|start"
+            android:layout_weight="1"
+            android:text="@string/all_settings_report_a_bug"
+            android:textColor="?attr/palette_text_heading"
+            android:textSize="15sp"
+            app:customFont="medium" />
 
-</androidx.appcompat.widget.LinearLayoutCompat>
+        <com.tari.android.wallet.ui.component.tari.TariIconView
+            android:id="@+id/icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical|end"
+            android:src="@drawable/icon_apply_setting" />
+
+    </androidx.appcompat.widget.LinearLayoutCompat>
+
+</com.tari.android.wallet.ui.component.tari.TariPrimaryBackground>

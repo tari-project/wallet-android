@@ -2,10 +2,8 @@
 
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="64dp"
-    android:background="@drawable/setting_option_background"
     android:clickable="true"
     android:focusable="true"
     android:paddingHorizontal="@dimen/common_horizontal_margin">
@@ -19,19 +17,17 @@
         android:textSize="15sp"
         app:customFont="medium" />
 
-    <ImageView
+    <com.tari.android.wallet.ui.component.tari.TariIconView
         android:id="@+id/selected_image"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical|end"
-        android:src="@drawable/icon_apply_setting"
-        tools:ignore="ContentDescription" />
+        android:src="@drawable/icon_apply_setting"  />
 
-    <View
+    <com.tari.android.wallet.ui.component.tari.TariDivider
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:layout_gravity="bottom"
-        android:background="@color/settings_background" />
+        android:layout_gravity="bottom" />
 
 </FrameLayout>
 

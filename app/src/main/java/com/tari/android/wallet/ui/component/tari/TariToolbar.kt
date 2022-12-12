@@ -7,10 +7,7 @@ import android.view.LayoutInflater
 import android.widget.FrameLayout
 import com.tari.android.wallet.R
 import com.tari.android.wallet.databinding.TariToolbarBinding
-import com.tari.android.wallet.ui.extension.obtain
-import com.tari.android.wallet.ui.extension.runRecycle
-import com.tari.android.wallet.ui.extension.setOnThrottledClickListener
-import com.tari.android.wallet.ui.extension.visible
+import com.tari.android.wallet.ui.extension.*
 
 class TariToolbar(context: Context, attrs: AttributeSet) : FrameLayout(context, attrs) {
 
@@ -34,6 +31,7 @@ class TariToolbar(context: Context, attrs: AttributeSet) : FrameLayout(context, 
             setText(getString(R.styleable.TariToolbar_text))
             getString(R.styleable.TariToolbar_rightText)?.let { setupRightButton(it) }
             getDrawable(R.styleable.TariToolbar_rightIcon)?.let { setupRightIcon(it) }
+            getBoolean(R.styleable.TariToolbar_isRoot, false).let { ui.backCtaView.setVisible(!it) }
         }
     }
 

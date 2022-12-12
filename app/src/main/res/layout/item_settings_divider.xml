@@ -4,10 +4,9 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
-    <View
+    <com.tari.android.wallet.ui.component.tari.TariDivider
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:layout_marginHorizontal="25dp"
-        android:background="@color/common_divider" />
+        android:layout_marginHorizontal="25dp" />
 
 </FrameLayout>
