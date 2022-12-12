@@ -2,6 +2,7 @@
 
 <com.tari.android.wallet.ui.component.tari.TariPrimaryBackground xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/root_view"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -19,60 +20,55 @@
             app:rightText="@string/tor_bridges_connect"
             app:text="@string/tor_bridges_custom_bridges" />
 
-        <com.tari.android.wallet.ui.component.tari.TariSecondaryBackground
+        <ScrollView
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:fillViewport="true">
 
-            <ScrollView
+            <androidx.appcompat.widget.LinearLayoutCompat
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:fillViewport="true">
+                android:orientation="vertical">
 
-                <androidx.appcompat.widget.LinearLayoutCompat
+                <com.tari.android.wallet.ui.component.tari.TariTextView
+                    android:layout_width="match_parent"
+                    android:layout_height="56dp"
+                    android:layout_marginHorizontal="@dimen/common_horizontal_margin"
+                    android:gravity="center_vertical"
+                    android:text="@string/tor_bridges_paste_bridges"
+                    android:textColor="?attr/palette_text_heading"
+                    android:textSize="14sp"
+                    app:customFont="heavy" />
+
+                <com.tari.android.wallet.ui.component.tari.TariSecondaryBackground
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical">
+                    android:layout_marginBottom="26dp"
+                    android:minHeight="150dp">
 
-                    <com.tari.android.wallet.ui.component.tari.TariTextView
+                    <com.tari.android.wallet.ui.component.tari.TariInput
+                        android:id="@+id/tor_bridge_configuration"
                         android:layout_width="match_parent"
-                        android:layout_height="56dp"
+                        android:layout_height="match_parent"
                         android:layout_marginHorizontal="@dimen/common_horizontal_margin"
-                        android:gravity="center_vertical"
-                        android:text="@string/tor_bridges_paste_bridges"
-                        android:textColor="?attr/palette_text_heading"
-                        android:textSize="14sp"
-                        app:customFont="heavy" />
+                        app:hintText="@string/tor_bridges_hint"
+                        app:singleLine="false" />
 
-                    <androidx.appcompat.widget.LinearLayoutCompat
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="26dp"
-                        android:background="@color/white"
-                        android:minHeight="100dp">
+                </com.tari.android.wallet.ui.component.tari.TariSecondaryBackground>
 
-                        <com.tari.android.wallet.ui.component.tari.TariEditText
-                            android:id="@+id/tor_bridge_configuration"
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:layout_marginHorizontal="@dimen/common_horizontal_margin"
-                            android:background="@null"
-                            android:hint="@string/tor_bridges_hint"
-                            android:textSize="14sp"
-                            app:customFont="regular" />
-
-                    </androidx.appcompat.widget.LinearLayoutCompat>
-
+                <com.tari.android.wallet.ui.component.tari.TariSecondaryBackground
+                    android:id="@+id/request_bridges_cta"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/menu_item_height"
+                    android:layout_marginBottom="46dp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:paddingHorizontal="@dimen/common_horizontal_margin">
 
                     <FrameLayout
-                        android:id="@+id/request_bridges_cta"
                         android:layout_width="match_parent"
-                        android:layout_height="@dimen/menu_item_height"
-                        android:layout_marginBottom="46dp"
-                        android:background="@drawable/setting_option_background"
-                        android:clickable="true"
-                        android:focusable="true"
-                        android:paddingHorizontal="@dimen/common_horizontal_margin">
+                        android:layout_height="match_parent">
 
                         <com.tari.android.wallet.ui.component.tari.TariTextView
                             android:layout_width="wrap_content"
@@ -83,21 +79,28 @@
                             android:textSize="15sp"
                             app:customFont="medium" />
 
-                        <androidx.appcompat.widget.AppCompatImageView
+                        <com.tari.android.wallet.ui.component.tari.TariIconView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_gravity="center_vertical|end"
                             android:src="@drawable/icon_apply_setting" />
+
                     </FrameLayout>
 
+                </com.tari.android.wallet.ui.component.tari.TariSecondaryBackground>
+
+                <com.tari.android.wallet.ui.component.tari.TariSecondaryBackground
+                    android:id="@+id/scan_qr_cta"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/menu_item_height"
+                    android:background="@drawable/setting_option_background"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:paddingHorizontal="@dimen/common_horizontal_margin">
+
                     <FrameLayout
-                        android:id="@+id/scan_qr_cta"
                         android:layout_width="match_parent"
-                        android:layout_height="@dimen/menu_item_height"
-                        android:background="@drawable/setting_option_background"
-                        android:clickable="true"
-                        android:focusable="true"
-                        android:paddingHorizontal="@dimen/common_horizontal_margin">
+                        android:layout_height="match_parent">
 
                         <com.tari.android.wallet.ui.component.tari.TariTextView
                             android:layout_width="wrap_content"
@@ -108,28 +111,31 @@
                             android:textSize="15sp"
                             app:customFont="medium" />
 
-                        <androidx.appcompat.widget.AppCompatImageView
+                        <com.tari.android.wallet.ui.component.tari.TariIconView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_gravity="center_vertical|end"
                             android:src="@drawable/icon_apply_setting" />
+
                     </FrameLayout>
 
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:layout_marginHorizontal="25dp"
-                        android:background="@color/settings_background" />
+                </com.tari.android.wallet.ui.component.tari.TariSecondaryBackground>
+
+                <com.tari.android.wallet.ui.component.tari.TariSecondaryBackground
+                    android:id="@+id/upload_qr_cta"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/menu_item_height"
+                    android:layout_marginTop="1dp"
+                    android:background="@drawable/setting_option_background"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:paddingHorizontal="@dimen/common_horizontal_margin"
+                    android:visibility="gone"
+                    tools:visibility="visible">
 
                     <FrameLayout
-                        android:id="@+id/upload_qr_cta"
                         android:layout_width="match_parent"
-                        android:layout_height="@dimen/menu_item_height"
-                        android:background="@drawable/setting_option_background"
-                        android:clickable="true"
-                        android:focusable="true"
-                        android:paddingHorizontal="@dimen/common_horizontal_margin"
-                        android:visibility="gone">
+                        android:layout_height="match_parent">
 
                         <com.tari.android.wallet.ui.component.tari.TariTextView
                             android:layout_width="wrap_content"
@@ -140,18 +146,19 @@
                             android:textSize="15sp"
                             app:customFont="medium" />
 
-                        <androidx.appcompat.widget.AppCompatImageView
+                        <com.tari.android.wallet.ui.component.tari.TariIconView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_gravity="center_vertical|end"
                             android:src="@drawable/icon_apply_setting" />
+
                     </FrameLayout>
 
-                </androidx.appcompat.widget.LinearLayoutCompat>
+                </com.tari.android.wallet.ui.component.tari.TariSecondaryBackground>
 
-            </ScrollView>
+            </androidx.appcompat.widget.LinearLayoutCompat>
 
-        </com.tari.android.wallet.ui.component.tari.TariSecondaryBackground>
+        </ScrollView>
 
     </androidx.appcompat.widget.LinearLayoutCompat>
 

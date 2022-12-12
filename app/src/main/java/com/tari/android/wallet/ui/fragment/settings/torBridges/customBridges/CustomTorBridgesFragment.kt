@@ -35,7 +35,7 @@ class CustomTorBridgesFragment : CommonFragment<FragmentCustomTorBridgesBinding,
         requestBridgesCta.setOnThrottledClickListener { viewModel.openRequestPage() }
         scanQrCta.setOnThrottledClickListener { viewModel.navigateToScanQr() }
         uploadQrCta.setOnThrottledClickListener { viewModel.navigateToUploadQr() }
-        toolbar.rightAction = { viewModel.connect(torBridgeConfiguration.text.toString()) }
+        toolbar.rightAction = { viewModel.connect(torBridgeConfiguration.ui.editText.text.toString()) }
     }
 
     private fun observeUI() = with(viewModel) {

@@ -13,7 +13,6 @@
         android:imeOptions="actionNext"
         android:paddingHorizontal="6dp"
         android:paddingVertical="12dp"
-        android:singleLine="true"
         android:textColor="?attr/palette_text_heading"
         android:textColorHint="?attr/palette_text_light"
         android:textSize="15sp"

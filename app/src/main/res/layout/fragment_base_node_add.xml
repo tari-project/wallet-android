@@ -53,18 +53,12 @@
                     app:errorText="@string/debug_edit_base_node_invalid_address"
                     app:hintText="@string/debug_edit_base_node_address_hint" />
 
-                <com.tari.android.wallet.ui.component.tari.TariButton
+                <com.tari.android.wallet.ui.component.tari.TariGradientButton
                     android:id="@+id/save_button"
                     android:layout_width="match_parent"
-                    android:layout_height="@dimen/common_action_button_height"
-                    android:layout_gravity="end"
+                    android:layout_height="wrap_content"
                     android:layout_marginTop="32dp"
-                    android:background="@drawable/vector_disable_able_gradient_button_bg"
-                    android:text="@string/common_save"
-                    android:textAllCaps="false"
-                    android:textColor="@color/button_text_color_selector"
-                    android:textSize="16sp"
-                    app:customFont="heavy" />
+                    app:title="@string/common_save" />
 
             </LinearLayout>
 

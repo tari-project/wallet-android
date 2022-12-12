@@ -32,7 +32,13 @@
     <declare-styleable name="TariInput">
         <attr name="hintText" format="string" />
         <attr name="errorText" format="string" />
+        <attr name="android:singleLine" />
         <attr name="android:imeOptions" />
+    </declare-styleable>
+
+    <declare-styleable name="TariGradientButton">
+        <attr name="title" format="string" />
+        <attr name="disabled" format="boolean" />
     </declare-styleable>
 
 </resources>

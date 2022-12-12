@@ -36,46 +36,25 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.widget.FrameLayout
-import androidx.core.widget.addTextChangedListener
 import com.tari.android.wallet.R
-import com.tari.android.wallet.databinding.TariInputBinding
-import com.tari.android.wallet.ui.extension.colorFromAttribute
+import com.tari.android.wallet.databinding.TariGradientButtonBinding
 import com.tari.android.wallet.ui.extension.obtain
 import com.tari.android.wallet.ui.extension.runRecycle
-import com.tari.android.wallet.ui.extension.setVisible
 
-class TariInput(context: Context, attrs: AttributeSet) : FrameLayout(context, attrs) {
+class TariGradientButton(context: Context, attrs: AttributeSet) : FrameLayout(context, attrs) {
 
-    val ui: TariInputBinding
-
-    var textChangedListener: (text: CharSequence?, start: Int, before: Int, count: Int) -> Unit = { _, _, _, _ -> }
+    val ui: TariGradientButtonBinding
 
     init {
-        ui = TariInputBinding.inflate(LayoutInflater.from(context), this, false).also { addView(it.root) }
+        ui = TariGradientButtonBinding.inflate(LayoutInflater.from(context), this, false).also { addView(it.root) }
 
-        setErrorText(null)
-        setIsInvalid(false)
-        setText("")
-
-        obtain(attrs, R.styleable.TariInput).runRecycle {
-            getString(R.styleable.TariInput_hintText)?.let { ui.editText.hint = it }
-            setErrorText(getString(R.styleable.TariInput_errorText))
-            if (getBoolean(R.styleable.TariInput_android_singleLine, true)) ui.editText.setSingleLine()
-            ui.editText.imeOptions = getInt(R.styleable.TariInput_android_imeOptions, 0)
+        obtain(attrs, R.styleable.TariGradientButton).runRecycle {
+            getString(R.styleable.TariGradientButton_title)?.let { ui.button.text = it }
+            setDisabled(getBoolean(R.styleable.TariGradientButton_disabled, false))
         }
-
-        ui.editText.addTextChangedListener(onTextChanged = { text, start, before, count -> textChangedListener.invoke(text, start, before, count) })
     }
 
-    fun setText(text: String) = ui.editText.setText(text)
-
-    fun setIsInvalid(isInvalid: Boolean) {
-        ui.invalidMessage.setVisible(isInvalid)
-        val backColor = context.colorFromAttribute(if (isInvalid) R.attr.palette_system_red else R.attr.palette_neutral_secondary)
-        ui.divider.setBackgroundColor(backColor)
-    }
-
-    fun setErrorText(errorText: String?) {
-        ui.invalidMessage.text = errorText.orEmpty()
+    fun setDisabled(isDisabled: Boolean) {
+        ui.button.isEnabled = !isDisabled
     }
 }

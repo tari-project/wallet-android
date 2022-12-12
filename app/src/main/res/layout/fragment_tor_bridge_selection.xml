@@ -43,13 +43,15 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="20dp" />
 
-                        <TextView
+                        <com.tari.android.wallet.ui.component.tari.TariTextView
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginHorizontal="@dimen/common_dialog_horizontal_margin"
                             android:layout_marginTop="6dp"
+                            android:textColor="?attr/palette_text_body"
                             android:layout_marginBottom="20dp"
-                            android:text="@string/tor_bridges_description" />
+                            android:text="@string/tor_bridges_description"
+                            app:customFont="medium" />
 
                     </androidx.appcompat.widget.LinearLayoutCompat>
 
