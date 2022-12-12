@@ -82,7 +82,7 @@
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="0dp">
 
-        <ImageView
+        <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/copy_emoji_id_notch_image_view"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

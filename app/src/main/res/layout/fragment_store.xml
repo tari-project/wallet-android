@@ -35,7 +35,7 @@
                 app:layout_constraintStart_toEndOf="@id/title_left_anchor_view"
                 app:layout_constraintTop_toTopOf="@id/title_left_anchor_view" />
 
-            <ImageView
+            <androidx.appcompat.widget.AppCompatImageView
                 android:id="@+id/title_left_anchor_view"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -46,9 +46,9 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                tools:ignore="ContentDescription" />
+                 />
 
-            <ImageView
+            <androidx.appcompat.widget.AppCompatImageView
                 android:id="@+id/share_cta_view"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -58,7 +58,7 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                tools:ignore="ContentDescription" />
+                 />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -103,7 +103,7 @@
                 android:background="@color/white"
                 android:paddingVertical="20dp">
 
-                <ImageView
+                <androidx.appcompat.widget.AppCompatImageView
                     android:id="@+id/browser_back_cta_view"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -114,9 +114,9 @@
                     app:layout_constraintHorizontal_bias="0.6"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
-                    tools:ignore="ContentDescription" />
+                     />
 
-                <ImageView
+                <androidx.appcompat.widget.AppCompatImageView
                     android:id="@+id/browser_forward_cta_view"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -127,7 +127,7 @@
                     app:layout_constraintHorizontal_bias="0.4"
                     app:layout_constraintStart_toStartOf="@id/browser_back_cta_view"
                     app:layout_constraintTop_toTopOf="parent"
-                    tools:ignore="ContentDescription" />
+                     />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 

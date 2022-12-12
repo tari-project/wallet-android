@@ -13,12 +13,12 @@
         android:orientation="vertical"
         tools:ignore="UselessParent">
 
-        <ImageView
+        <androidx.appcompat.widget.AppCompatImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:src="@drawable/ic_search_giphy"
-            tools:ignore="ContentDescription" />
+             />
 
         <com.tari.android.wallet.ui.component.tari.TariTextView
             android:layout_width="wrap_content"

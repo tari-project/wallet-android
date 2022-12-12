@@ -9,7 +9,7 @@
     android:orientation="horizontal">
 
     <!-- icon -->
-    <ImageView
+    <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/notification_tx_received_img_icon"
         android:layout_width="38dp"
         android:layout_height="38dp"

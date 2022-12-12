@@ -9,7 +9,7 @@
     android:clickable="true"
     android:focusable="true">
 
-    <ImageView
+    <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/first_emoji_shadow_image_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

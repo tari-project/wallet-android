@@ -14,7 +14,7 @@
     android:translationY="@dimen/add_amount_element_container_translation_y">
 
     <!-- gem -->
-    <ImageView
+    <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/amount_gem_image_view"
         android:layout_width="@dimen/add_amount_gem_size"
         android:layout_height="@dimen/add_amount_gem_size"

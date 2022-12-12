@@ -175,7 +175,7 @@
                         android:orientation="horizontal"
                         android:paddingHorizontal="12dp">
 
-                        <ImageView
+                        <androidx.appcompat.widget.AppCompatImageView
                             android:id="@+id/amount_gem_image_view"
                             android:layout_width="@dimen/add_amount_gem_size"
                             android:layout_height="@dimen/add_amount_gem_size"

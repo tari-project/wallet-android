@@ -1,0 +1,40 @@
+<androidx.appcompat.widget.LinearLayoutCompat xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <com.tari.android.wallet.ui.component.tari.TariEditText
+        android:id="@+id/edit_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@null"
+        android:hint="@string/dummy_text"
+        android:imeOptions="actionNext"
+        android:paddingHorizontal="6dp"
+        android:paddingVertical="12dp"
+        android:singleLine="true"
+        android:textColor="?attr/palette_text_heading"
+        android:textColorHint="?attr/palette_text_light"
+        android:textSize="15sp"
+        app:customFont="regular" />
+
+    <com.tari.android.wallet.ui.component.tari.TariDivider
+        android:id="@+id/divider"
+        android:layout_width="match_parent"
+        android:layout_height="1dp" />
+
+    <com.tari.android.wallet.ui.component.tari.TariTextView
+        android:id="@+id/invalid_message"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="4dp"
+        android:ellipsize="end"
+        android:singleLine="true"
+        android:text="@string/dummy_text"
+        android:textColor="?attr/palette_system_red"
+        android:textSize="14sp"
+        app:customFont="light" />
+
+</androidx.appcompat.widget.LinearLayoutCompat>

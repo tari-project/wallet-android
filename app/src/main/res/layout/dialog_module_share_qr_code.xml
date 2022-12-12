@@ -15,7 +15,7 @@
         android:elevation="@dimen/common_view_elevation"
         android:padding="5dp">
 
-        <ImageView
+        <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/qr_image_view"
             android:layout_width="@dimen/wallet_info_container_qr_code_size"
             android:layout_height="@dimen/wallet_info_container_qr_code_size"

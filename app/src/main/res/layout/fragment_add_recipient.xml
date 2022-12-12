@@ -206,7 +206,7 @@
                 android:layout_alignBottom="@id/add_recipient_txt_paste_emoji_id"
                 android:background="@color/transparent" />
 
-            <ImageView
+            <androidx.appcompat.widget.AppCompatImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/paste_emoji_id_button"

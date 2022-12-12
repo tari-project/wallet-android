@@ -29,4 +29,10 @@
         <attr name="customFont" />
     </declare-styleable>
 
+    <declare-styleable name="TariInput">
+        <attr name="hintText" format="string" />
+        <attr name="errorText" format="string" />
+        <attr name="android:imeOptions" />
+    </declare-styleable>
+
 </resources>

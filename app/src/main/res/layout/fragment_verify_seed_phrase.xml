@@ -97,7 +97,7 @@
                         app:customFont="heavy"
                         tools:visibility="visible" />
 
-                    <ImageView
+                    <androidx.appcompat.widget.AppCompatImageView
                         android:id="@+id/sequence_correct_label_view"
                         android:layout_width="29dp"
                         android:layout_height="29dp"
@@ -128,7 +128,7 @@
         android:layout_height="@dimen/common_action_button_height"
         android:layout_marginHorizontal="25dp"
         android:layout_marginBottom="15dp"
-        android:background="@drawable/disable_able_gradient_button_bg"
+        android:background="@drawable/vector_disable_able_gradient_button_bg"
         android:gravity="center"
         android:text="@string/verify_seed_phrase_complete_verification_cta"
         android:textColor="@color/button_text_color_selector"

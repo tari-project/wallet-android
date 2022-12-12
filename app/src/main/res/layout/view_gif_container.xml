@@ -45,7 +45,7 @@
     </LinearLayout>
 
     <!-- GIF -->
-    <ImageView
+    <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/gif_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

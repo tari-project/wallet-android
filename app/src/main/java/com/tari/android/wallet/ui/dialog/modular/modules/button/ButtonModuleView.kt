@@ -27,7 +27,7 @@ class ButtonModuleView(context: Context, buttonModule: ButtonModule, dismissActi
         when (buttonModule.style) {
             ButtonStyle.Normal -> {
                 ui.button.setTextColor(context.colorFromAttribute(R.attr.palette_button_primary_text))
-                ui.button.background = ContextCompat.getDrawable(context, R.drawable.disable_able_gradient_button_bg)
+                ui.button.background = ContextCompat.getDrawable(context, R.drawable.vector_disable_able_gradient_button_bg)
             }
             ButtonStyle.Warning -> {
                 ui.button.setTextColor(context.colorFromAttribute(R.attr.palette_button_primary_text))
