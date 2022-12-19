@@ -32,7 +32,6 @@
  */
 package com.tari.android.wallet.ui.fragment.settings.backup.writeDownSeedWords
 
-import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -44,11 +43,13 @@ import androidx.transition.ChangeBounds
 import androidx.transition.Transition
 import androidx.transition.TransitionManager
 import com.tari.android.wallet.R
-import com.tari.android.wallet.R.color.seed_phrase_button_disabled_text_color
 import com.tari.android.wallet.databinding.FragmentWriteDownSeedPhraseBinding
 import com.tari.android.wallet.extension.observe
 import com.tari.android.wallet.ui.common.CommonFragment
-import com.tari.android.wallet.ui.extension.*
+import com.tari.android.wallet.ui.extension.ThrottleClick
+import com.tari.android.wallet.ui.extension.animateClick
+import com.tari.android.wallet.ui.extension.dimenPx
+import com.tari.android.wallet.ui.extension.setVisible
 import com.tari.android.wallet.ui.fragment.settings.backup.BackupSettingsRouter
 import com.tari.android.wallet.ui.fragment.settings.backup.writeDownSeedWords.adapter.PhraseWordsAdapter
 import com.tari.android.wallet.util.Constants
@@ -99,14 +100,11 @@ class WriteDownSeedPhraseFragment : CommonFragment<FragmentWriteDownSeedPhraseBi
         val contentHeight = ui.phraseWordsRecyclerView.measuredHeight
         val containerHeight = ui.listContainer.height
         val isOverlapped = contentHeight > containerHeight
-        ui.bottomShadow.setVisible(isOverlapped)
         ui.expandButtonView.setVisible(isOverlapped)
     }
 
     private fun updateContinueButtonState(isChecked: Boolean) {
         ui.continueCtaView.isEnabled = isChecked
-        val color = if (isChecked) Color.WHITE else color(seed_phrase_button_disabled_text_color)
-        ui.continueCtaView.setTextColor(color)
     }
 
     private fun expandList() {
@@ -115,7 +113,7 @@ class WriteDownSeedPhraseFragment : CommonFragment<FragmentWriteDownSeedPhraseBi
         for (i in adapter.seedWords.indices) {
             adapter.notifyItemChanged(i)
         }
-        val resDrawable = if (!isExpanded) R.drawable.recovery_expand_icon else R.drawable.recovery_collapse_button
+        val resDrawable = if (!isExpanded) R.drawable.vector_recovery_expand_icon else R.drawable.recovery_collapse_button
         ui.expandButtonView.setImageResource(resDrawable)
         animateExpanding(isExpanded)
     }

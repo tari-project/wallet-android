@@ -1,0 +1,12 @@
+<com.tari.android.wallet.ui.component.tari.TariButton xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/button"
+    android:layout_width="match_parent"
+    android:layout_height="@dimen/common_action_button_height"
+    android:layout_gravity="end"
+    android:background="@drawable/vector_disable_able_gradient_button_bg"
+    android:text="@string/dummy_text"
+    android:textAllCaps="false"
+    android:textColor="@color/button_text_color_selector"
+    android:textSize="16sp"
+    app:customFont="heavy" />

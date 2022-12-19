@@ -4,10 +4,10 @@
 
     <stroke
         android:width="1dp"
-        android:color="@color/seed_phrase_button_disabled_text_color" />
+        android:color="?attr/palette_neutral_tertiary" />
 
     <solid
-        android:color="@color/seed_phrase_word_recovery_background"/>
+        android:color="?attr/palette_background_primary"/>
 
     <corners android:radius="4dp" />
 

@@ -33,7 +33,6 @@
 package com.tari.android.wallet.ui.fragment.settings.backup
 
 import android.content.Context
-import android.graphics.Color
 import android.os.Bundle
 import android.text.Editable
 import android.text.SpannableString
@@ -50,7 +49,6 @@ import android.widget.TextView
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
-import com.tari.android.wallet.R.color.*
 import com.tari.android.wallet.R.string.*
 import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import com.tari.android.wallet.databinding.FragmentChangeSecurePasswordBinding
@@ -60,6 +58,7 @@ import com.tari.android.wallet.infrastructure.backup.BackupManager
 import com.tari.android.wallet.infrastructure.backup.BackupState
 import com.tari.android.wallet.infrastructure.backup.BackupState.BackupFailed
 import com.tari.android.wallet.infrastructure.backup.BackupState.BackupUpToDate
+import com.tari.android.wallet.ui.common.domain.PaletteManager
 import com.tari.android.wallet.ui.common.domain.ResourceManager
 import com.tari.android.wallet.ui.dialog.error.ErrorDialogArgs
 import com.tari.android.wallet.ui.dialog.modular.ModularDialog
@@ -83,9 +82,18 @@ class ChangeSecurePasswordFragment : Fragment() {
 
     @Inject
     lateinit var backupSharedPrefsRepository: BackupSettingsRepository
+    
+    @Inject
+    lateinit var paletteManager: PaletteManager
 
     private lateinit var ui: FragmentChangeSecurePasswordBinding
     private lateinit var inputService: InputMethodManager
+
+    private val passwordInput
+        get() = ui.enterPasswordEditText.ui.editText
+
+    private val confirmInput
+        get() = ui.confirmPasswordEditText.ui.editText
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -107,7 +115,7 @@ class ChangeSecurePasswordFragment : Fragment() {
     }
 
     private fun setupViews() {
-        ui.enterPasswordEditText.isFocusableInTouchMode = true
+        passwordInput.isFocusableInTouchMode = true
         ui.performingBackupProgressBar.setWhite()
         ui.contentContainerView.setOnClickListener { clearPasswordFieldsFocusAndHideKeyboard(it) }
         setPageDescription()
@@ -117,24 +125,24 @@ class ChangeSecurePasswordFragment : Fragment() {
     }
 
     private fun clearPasswordFieldsFocusAndHideKeyboard(focusedView: View) {
-        ui.enterPasswordEditText.clearFocus()
-        ui.confirmPasswordEditText.clearFocus()
+        passwordInput.clearFocus()
+        confirmInput.clearFocus()
         inputService.hideSoftInputFromWindow(focusedView.windowToken, 0)
         ui.contentScrollView.scrollToTop()
     }
 
     private fun promptPasswordEnter() {
-        ui.enterPasswordEditText.postDelayed({
-            ui.enterPasswordEditText.requestFocus()
+        passwordInput.postDelayed({
+            passwordInput.requestFocus()
             requireActivity().showKeyboard()
-            ui.enterPasswordEditText.postDelayed(KEYBOARD_ANIMATION_TIME) { ui.contentScrollView.scrollToBottom() }
+            passwordInput.postDelayed(KEYBOARD_ANIMATION_TIME) { ui.contentScrollView.scrollToBottom() }
         }, KEYBOARD_SHOW_UP_DELAY_AFTER_LOCAL_AUTH)
     }
 
     private fun setPageDescription() {
         val generalPart = string(change_password_page_description_general_part)
         val highlightedPart = SpannableString(string(change_password_page_description_highlight_part))
-        val spanColor = ForegroundColorSpan(color(black))
+        val spanColor = ForegroundColorSpan(paletteManager.getTextHeading())
         highlightedPart.setSpan(spanColor, 0, highlightedPart.length, SPAN_EXCLUSIVE_EXCLUSIVE)
         ui.pageDescriptionTextView.text = SpannableStringBuilder().apply {
             insert(0, generalPart)
@@ -145,36 +153,35 @@ class ChangeSecurePasswordFragment : Fragment() {
     }
 
     private fun setValidatingTextFieldsListeners() {
-        ui.enterPasswordEditText.addTextChangedListener(afterTextChanged = {
+        passwordInput.addTextChangedListener(afterTextChanged = {
             updateVerifyButtonStateBasedOnEditTexts(
                 it,
-                !passwordIsLongEnough() || (!ui.confirmPasswordEditText.text.isNullOrEmpty() && !doPasswordsMatch())
+                !passwordIsLongEnough() || (!confirmInput.text.isNullOrEmpty() && !doPasswordsMatch())
             )
-        }
-        )
-        ui.confirmPasswordEditText.addTextChangedListener(afterTextChanged = {
+        })
+        confirmInput.addTextChangedListener(afterTextChanged = {
             updateVerifyButtonStateBasedOnEditTexts(
                 it,
-                !passwordIsLongEnough() || (!ui.confirmPasswordEditText.text.isNullOrEmpty() && !doPasswordsMatch())
+                !passwordIsLongEnough() || (!passwordInput.text.isNullOrEmpty() && !doPasswordsMatch())
             )
         })
         val passwordTextFieldListener = View.OnFocusChangeListener { _, _ ->
             // password
-            if (!ui.enterPasswordEditText.hasFocus() && !passwordIsLongEnough()) {
+            if (!passwordInput.hasFocus() && !passwordIsLongEnough()) {
                 setPasswordTooShortErrorState()
             } else {
-                setPlainInputState(ui.passwordTooShortLabelView, listOf(ui.enterPasswordEditText, ui.enterPasswordLabelTextView))
+                setPlainInputState(ui.passwordTooShortLabelView, listOf(passwordInput, ui.enterPasswordLabelTextView))
             }
             // confirm
-            if (!ui.confirmPasswordEditText.hasFocus() && passwordIsLongEnough() && !doPasswordsMatch()) {
+            if (!confirmInput.hasFocus() && passwordIsLongEnough() && !doPasswordsMatch()) {
                 setPasswordMatchErrorState()
             } else {
-                setPlainInputState(ui.passwordsNotMatchLabelView, listOf(ui.confirmPasswordEditText, ui.confirmPasswordLabelTextView))
+                setPlainInputState(ui.passwordsNotMatchLabelView, listOf(confirmInput, ui.confirmPasswordLabelTextView))
             }
         }
-        ui.enterPasswordEditText.onFocusChangeListener = passwordTextFieldListener
-        ui.confirmPasswordEditText.onFocusChangeListener = passwordTextFieldListener
-        ui.confirmPasswordEditText.setOnEditorActionListener { v, actionId, event ->
+        passwordInput.onFocusChangeListener = passwordTextFieldListener
+        confirmInput.onFocusChangeListener = passwordTextFieldListener
+        confirmInput.setOnEditorActionListener { v, actionId, event ->
             if (event != null && event.keyCode == KeyEvent.KEYCODE_ENTER || actionId == EditorInfo.IME_ACTION_DONE) {
                 clearPasswordFieldsFocusAndHideKeyboard(v)
             }
@@ -189,44 +196,39 @@ class ChangeSecurePasswordFragment : Fragment() {
             val canChangePassword = areTextFieldsFilled() && passwordIsLongEnough && passwordsMatch
             setVerifyButtonState(isEnabled = canChangePassword)
             if (canChangePassword) {
-                setPlainInputState(ui.passwordTooShortLabelView, listOf(ui.enterPasswordEditText, ui.enterPasswordLabelTextView))
-                setPlainInputState(ui.passwordsNotMatchLabelView, listOf(ui.confirmPasswordEditText, ui.confirmPasswordLabelTextView))
+                setPlainInputState(ui.passwordTooShortLabelView, listOf(passwordInput, ui.enterPasswordLabelTextView))
+                setPlainInputState(ui.passwordsNotMatchLabelView, listOf(confirmInput, ui.confirmPasswordLabelTextView))
             }
         } else if (errorCondition) {
             setVerifyButtonState(isEnabled = false)
         }
     }
 
-    private fun areTextFieldsFilled() = ui.enterPasswordEditText.text!!.isNotEmpty() && ui.confirmPasswordEditText.text!!.isNotEmpty()
+    private fun areTextFieldsFilled() = passwordInput.text!!.isNotEmpty() && confirmInput.text!!.isNotEmpty()
 
-    private fun passwordIsLongEnough() = (ui.enterPasswordEditText.text?.toString() ?: "").length >= 6
+    private fun passwordIsLongEnough() = (passwordInput.text?.toString() ?: "").length >= 6
 
-    private fun doPasswordsMatch() = ui.confirmPasswordEditText.text?.toString() == ui.enterPasswordEditText.text?.toString()
+    private fun doPasswordsMatch() = confirmInput.text?.toString() == passwordInput.text?.toString()
 
     private fun setPlainInputState(errorLabel: TextView, inputTextViews: Iterable<TextView>) {
         errorLabel.gone()
-        inputTextViews.forEach { it.setTextColor(color(black)) }
+        inputTextViews.forEach { it.setTextColor(paletteManager.getTextHeading()) }
     }
 
     private fun setPasswordTooShortErrorState() {
         ui.passwordTooShortLabelView.visible()
-        ui.enterPasswordLabelTextView.setTextColor(color(common_error))
-        ui.enterPasswordEditText.setTextColor(color(common_error))
+        ui.enterPasswordLabelTextView.setTextColor(paletteManager.getRed())
+        passwordInput.setTextColor(paletteManager.getRed())
     }
 
     private fun setPasswordMatchErrorState() {
         ui.passwordsNotMatchLabelView.visible()
-        ui.confirmPasswordLabelTextView.setTextColor(color(common_error))
-        ui.confirmPasswordEditText.setTextColor(color(common_error))
+        ui.confirmPasswordLabelTextView.setTextColor(paletteManager.getRed())
+        confirmInput.setTextColor(paletteManager.getRed())
     }
 
     private fun setVerifyButtonState(isEnabled: Boolean) {
-        if (ui.setPasswordCtaTextView.isEnabled == isEnabled) return
         ui.setPasswordCtaTextView.isEnabled = isEnabled
-        ui.setPasswordCtaTextView.setTextColor(
-            if (isEnabled) Color.WHITE
-            else color(seed_phrase_button_disabled_text_color)
-        )
     }
 
     private fun setCTAs() {
@@ -240,13 +242,13 @@ class ChangeSecurePasswordFragment : Fragment() {
     }
 
     private fun preventExitAndPasswordEditing() {
-        ui.enterPasswordEditText.isEnabled = false
-        ui.confirmPasswordEditText.isEnabled = false
+        passwordInput.isEnabled = false
+        confirmInput.isEnabled = false
     }
 
     private fun allowExitAndPasswordEditing() {
-        ui.enterPasswordEditText.isEnabled = true
-        ui.confirmPasswordEditText.isEnabled = true
+        passwordInput.isEnabled = true
+        confirmInput.isEnabled = true
     }
 
     private fun setSecurePasswordCtaClickedState() {
@@ -264,7 +266,7 @@ class ChangeSecurePasswordFragment : Fragment() {
     private fun performBackupAndUpdatePassword() {
         // start listening to wallet events
         subscribeToBackupState()
-        backupSharedPrefsRepository.backupPassword = ui.enterPasswordEditText.text!!.toString()
+        backupSharedPrefsRepository.backupPassword = passwordInput.text!!.toString()
         backupManager.backupNow()
     }
 
