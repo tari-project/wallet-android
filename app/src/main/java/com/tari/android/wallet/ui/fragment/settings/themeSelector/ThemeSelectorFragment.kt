@@ -37,12 +37,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
-import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.GridLayoutManager
 import com.tari.android.wallet.databinding.FragmentThemeChangeBinding
 import com.tari.android.wallet.extension.observe
 import com.tari.android.wallet.ui.common.CommonFragment
 import com.tari.android.wallet.ui.common.recyclerView.CommonAdapter
-import com.tari.android.wallet.ui.extension.setOnThrottledClickListener
 import com.tari.android.wallet.ui.fragment.settings.themeSelector.adapter.ThemesAdapter
 
 class ThemeSelectorFragment : CommonFragment<FragmentThemeChangeBinding, ThemeSelectorViewModel>() {
@@ -68,8 +67,8 @@ class ThemeSelectorFragment : CommonFragment<FragmentThemeChangeBinding, ThemeSe
 
     private fun setupUI() = with(ui) {
         themesList.adapter = adapter
-        themesList.layoutManager = LinearLayoutManager(requireContext())
-        adapter.setClickListener(CommonAdapter.ItemClickListener { viewModel.selectTheme(it) })
+        themesList.layoutManager = GridLayoutManager(requireContext(), 2)
+        adapter.setClickListener(CommonAdapter.ItemClickListener { viewModel.selectTheme(it.theme) })
     }
 
     private fun observeUI() = with(viewModel) {

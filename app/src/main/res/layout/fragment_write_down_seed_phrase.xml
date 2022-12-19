@@ -41,7 +41,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent">
 
-        <CheckBox
+        <com.tari.android.wallet.ui.component.tari.TariCheckbox
             android:id="@+id/warning_check_box"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

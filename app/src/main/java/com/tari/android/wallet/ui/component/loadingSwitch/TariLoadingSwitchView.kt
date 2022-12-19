@@ -65,7 +65,7 @@ class TariLoadingSwitchView : FrameLayout {
     }
 
     private fun init() {
-        ui = ViewProgressSwitchBinding.inflate(LayoutInflater.from(context), this, false).also { addView(ui.root) }
+        ui = ViewProgressSwitchBinding.inflate(LayoutInflater.from(context), this, false).also { addView(it.root) }
     }
 
     fun setOnCheckedChangeListener(listener: (boolean: Boolean) -> Unit) {

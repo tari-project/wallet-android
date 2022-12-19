@@ -20,16 +20,17 @@ class ThemeSelectorViewModel : CommonViewModel() {
         loadList()
     }
 
-    fun selectTheme(theme: ThemeViewHolderItem) {
-        tariSettingsSharedRepository.currentTheme = theme.theme
-        newTheme.postValue(theme.theme)
+    fun selectTheme(theme: TariTheme) {
+        if (tariSettingsSharedRepository.currentTheme == theme) return
+        tariSettingsSharedRepository.currentTheme = theme
+        newTheme.postValue(theme)
     }
 
     fun refresh() = loadList()
 
     private fun loadList() {
         val currentTheme = tariSettingsSharedRepository.currentTheme!!
-        val list = TariTheme.values().map { ThemeViewHolderItem(it, currentTheme) }.toMutableList()
+        val list = TariTheme.values().map { ThemeViewHolderItem(it, currentTheme) { isChecked -> if (isChecked) selectTheme(it) } }.toMutableList()
         themes.postValue(list)
     }
 }

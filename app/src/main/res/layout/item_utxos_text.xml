@@ -10,7 +10,7 @@
     android:orientation="horizontal"
     android:paddingHorizontal="30dp">
 
-    <androidx.appcompat.widget.AppCompatCheckBox
+    <com.tari.android.wallet.ui.component.tari.TariCheckbox
         android:id="@+id/checked_state"
         android:layout_width="wrap_content"
         android:layout_height="24dp"

@@ -390,7 +390,7 @@
     <string name="select_theme_dark">Dark</string>
     <string name="select_theme_light">Light</string>
     <string name="select_theme_purple">Purple</string>
-    <string name="select_theme_app_based">App based</string>
+    <string name="select_theme_app_based">System</string>
 
     <!-- about -->
 

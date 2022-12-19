@@ -2,32 +2,46 @@
 
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="64dp"
+    android:layout_height="wrap_content"
     android:clickable="true"
     android:focusable="true"
     android:paddingHorizontal="@dimen/common_horizontal_margin">
 
-    <com.tari.android.wallet.ui.component.tari.TariTextView
-        android:id="@+id/title"
+    <androidx.appcompat.widget.LinearLayoutCompat
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_vertical|start"
-        android:textColor="?attr/palette_text_heading"
-        android:textSize="15sp"
-        app:customFont="medium" />
+        android:layout_marginVertical="16dp"
+        android:layout_gravity="center_horizontal"
+        android:orientation="vertical">
 
-    <com.tari.android.wallet.ui.component.tari.TariIconView
-        android:id="@+id/selected_image"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_vertical|end"
-        android:src="@drawable/icon_apply_setting"  />
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/image"
+            android:layout_width="wrap_content"
+            android:layout_height="150dp"
+            android:scaleType="fitCenter"
+            tools:src="@drawable/tari_theme_purple" />
 
-    <com.tari.android.wallet.ui.component.tari.TariDivider
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:layout_gravity="bottom" />
+        <com.tari.android.wallet.ui.component.tari.TariTextView
+            android:id="@+id/title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="10dp"
+            android:textColor="?attr/palette_text_heading"
+            android:textSize="15sp"
+            app:customFont="heavy"
+            tools:text="@string/dummy_text" />
+
+        <com.tari.android.wallet.ui.component.tari.TariCheckbox
+            android:id="@+id/checkbox"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="10dp" />
+
+    </androidx.appcompat.widget.LinearLayoutCompat>
 
 </FrameLayout>
 
