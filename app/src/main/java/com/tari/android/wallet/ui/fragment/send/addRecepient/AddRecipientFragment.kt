@@ -56,7 +56,8 @@ import androidx.transition.TransitionManager
 import com.daasuu.ei.Ease
 import com.daasuu.ei.EasingInterpolator
 import com.tari.android.wallet.R
-import com.tari.android.wallet.R.color.*
+import com.tari.android.wallet.R.color.black
+import com.tari.android.wallet.R.color.light_gray
 import com.tari.android.wallet.R.dimen.add_recipient_clipboard_emoji_id_container_height
 import com.tari.android.wallet.R.dimen.add_recipient_paste_emoji_id_button_visible_top_margin
 import com.tari.android.wallet.R.string.*
@@ -218,7 +219,7 @@ class AddRecipientFragment : CommonFragment<FragmentAddRecipientBinding, AddReci
         ui.contactsListRecyclerView.addOnScrollListener(scrollListener)
         ui.contactsListRecyclerView.addOnItemTouchListener(this)
         ui.scrollDepthGradientView.alpha = 0f
-        ui.progressBar.setColor(color(add_recipient_progress_bar))
+        ui.progressBar.setWhite()
         ui.progressBar.visible()
         ui.continueButton.gone()
         ui.invalidEmojiIdTextView.gone()

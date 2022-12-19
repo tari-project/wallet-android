@@ -102,7 +102,7 @@
             android:textSize="16sp"
             app:customFont="heavy" />
 
-        <ProgressBar
+        <com.tari.android.wallet.ui.component.tari.TariProgressBar
             android:id="@+id/create_wallet_progress_bar"
             android:layout_width="35dp"
             android:layout_height="35dp"

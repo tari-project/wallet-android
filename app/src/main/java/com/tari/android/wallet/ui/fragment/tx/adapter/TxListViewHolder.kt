@@ -33,10 +33,6 @@ class TxListViewHolder(view: ItemHomeTxListBinding) : CommonViewHolder<Transacti
     private val emojiIdSummaryController = EmojiIdSummaryViewController(ui.participantEmojiIdView)
     private lateinit var tx: Tx
 
-    init {
-        ui.gifContainer.loadingGifProgressBar.setColor(color(R.color.tx_list_loading_gif_gray))
-    }
-
     override fun bind(item: TransactionItem) {
         super.bind(item)
 

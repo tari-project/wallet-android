@@ -39,7 +39,7 @@
             app:customFont="heavy"
             tools:visibility="visible" />
 
-        <ProgressBar
+        <com.tari.android.wallet.ui.component.tari.TariProgressBar
             android:id="@+id/loading_gif_progress_bar"
             android:layout_width="16dp"
             android:layout_height="16dp" />

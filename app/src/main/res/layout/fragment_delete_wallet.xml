@@ -59,7 +59,7 @@
                             android:textSize="15sp"
                             app:customFont="medium" />
 
-                        <ProgressBar
+                        <com.tari.android.wallet.ui.component.tari.TariProgressBar
                             android:id="@+id/delete_wallet_progress"
                             android:layout_width="20dp"
                             android:layout_height="20dp"

@@ -34,6 +34,11 @@
         <item name="buttonBarPositiveButtonStyle">@style/PositiveButtonStyle</item>
     </style>
 
+    <style name="SwitchTheme" parent="Widget.AppCompat.CompoundButton.Switch">
+        <item name="android:thumb">@drawable/tari_switch_compat_selector_thumb</item>
+        <item name="track">@drawable/tari_switch_compat_selector_track</item>
+    </style>
+
     <style name="NegativeButtonStyle" parent="Widget.AppCompat.Button.ButtonBar.AlertDialog">
         <item name="android:textColor">?attr/palette_system_red</item>
     </style>

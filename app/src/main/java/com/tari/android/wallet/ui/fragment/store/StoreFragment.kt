@@ -51,6 +51,8 @@ import com.tari.android.wallet.R.string.ttl_store_url
 import com.tari.android.wallet.databinding.FragmentStoreBinding
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.network.NetworkConnectionState
+import com.tari.android.wallet.ui.component.tari.toast.TariToast
+import com.tari.android.wallet.ui.component.tari.toast.TariToastArgs
 import com.tari.android.wallet.ui.extension.*
 import com.tari.android.wallet.ui.fragment.store.EventsPropagatingWebViewClient.ExternalSiteOverride
 import io.reactivex.Observable
@@ -85,7 +87,6 @@ class StoreFragment : Fragment() {
     private fun setupUi() {
         animation = NavigationPanelAnimation(ui.controlsView)
         configureWebView()
-        ui.progressBar.setColor(color(purple))
         ui.browserBackCtaView.setOnClickListener { ui.webView.apply { if (canGoBack()) goBack() } }
         ui.browserForwardCtaView.setOnClickListener { ui.webView.apply { if (canGoForward()) goForward() } }
         ui.shareCtaView.setOnClickListener { shareStoreLink() }
@@ -141,11 +142,7 @@ class StoreFragment : Fragment() {
         if (shareIntent.resolveActivity(requireContext().packageManager) != null) {
             startActivity(Intent.createChooser(shareIntent, null))
         } else {
-            Toast.makeText(
-                requireActivity(),
-                string(store_no_application_to_open_the_link_error),
-                Toast.LENGTH_LONG
-            ).show()
+            TariToast(requireContext(), TariToastArgs(string(store_no_application_to_open_the_link_error), Toast.LENGTH_LONG))
         }
     }
 

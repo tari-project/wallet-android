@@ -37,36 +37,41 @@
                     android:textSize="14sp"
                     app:customFont="medium" />
 
-                <androidx.appcompat.widget.LinearLayoutCompat
+                <com.tari.android.wallet.ui.component.tari.TariPrimaryBackground
                     android:id="@+id/delete_wallet_cta_view"
                     android:layout_width="match_parent"
                     android:layout_height="@dimen/menu_item_height"
                     android:layout_marginTop="25dp"
-                    android:background="@drawable/setting_option_background"
                     android:clickable="true"
                     android:focusable="true"
                     android:orientation="horizontal"
                     android:paddingHorizontal="@dimen/common_horizontal_margin">
 
-                    <com.tari.android.wallet.ui.component.tari.TariTextView
+                    <androidx.appcompat.widget.LinearLayoutCompat
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center_vertical"
-                        android:layout_weight="1"
-                        android:lineSpacingMultiplier="1.2"
-                        android:paddingEnd="@dimen/common_horizontal_margin"
-                        android:text="@string/background_service_button_title"
-                        android:textColor="?attr/palette_text_heading"
-                        android:textSize="15sp"
-                        app:customFont="medium" />
+                        android:layout_height="match_parent">
 
-                    <com.tari.android.wallet.ui.component.loadingSwitch.LoadingSwitchView
-                        android:id="@+id/loading_switch_view"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="end|center_vertical" />
+                        <com.tari.android.wallet.ui.component.tari.TariTextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_vertical"
+                            android:layout_weight="1"
+                            android:lineSpacingMultiplier="1.2"
+                            android:paddingEnd="@dimen/common_horizontal_margin"
+                            android:text="@string/background_service_button_title"
+                            android:textColor="?attr/palette_text_heading"
+                            android:textSize="15sp"
+                            app:customFont="medium" />
 
-                </androidx.appcompat.widget.LinearLayoutCompat>
+                        <com.tari.android.wallet.ui.component.loadingSwitch.TariLoadingSwitchView
+                            android:id="@+id/loading_switch_view"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="end|center_vertical" />
+
+                    </androidx.appcompat.widget.LinearLayoutCompat>
+
+                </com.tari.android.wallet.ui.component.tari.TariPrimaryBackground>
 
             </androidx.appcompat.widget.LinearLayoutCompat>
 

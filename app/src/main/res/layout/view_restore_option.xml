@@ -20,7 +20,7 @@
         android:textSize="15sp"
         app:customFont="medium" />
 
-    <ProgressBar
+    <com.tari.android.wallet.ui.component.tari.TariProgressBar
         android:id="@+id/restore_wallet_menu_item_progress_view"
         tools:visibility="visible"
         android:layout_width="20dp"
@@ -30,7 +30,6 @@
 
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/restore_wallet_menu_item_arrow_image_view"
-
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical|end"

@@ -12,6 +12,7 @@ import com.squareup.seismic.ShakeDetector
 import com.tari.android.wallet.R
 import com.tari.android.wallet.extension.observe
 import com.tari.android.wallet.ui.component.networkStateIndicator.ConnectionIndicatorViewModel
+import com.tari.android.wallet.ui.component.tari.toast.TariToast
 import com.tari.android.wallet.ui.dialog.modular.DialogArgs
 import com.tari.android.wallet.ui.dialog.modular.ModularDialog
 import com.tari.android.wallet.ui.dialog.modular.ModularDialogArgs
@@ -59,6 +60,8 @@ abstract class CommonActivity<Binding : ViewBinding, VM : CommonViewModel> : App
         observe(dismissDialog) { dialogManager.dismiss() }
 
         observe(loadingDialog) { dialogManager.handleProgress(it) }
+
+        observe(showToast) { TariToast(this@CommonActivity, it) }
     }
 
     private fun setTariTheme(theme: TariTheme) {

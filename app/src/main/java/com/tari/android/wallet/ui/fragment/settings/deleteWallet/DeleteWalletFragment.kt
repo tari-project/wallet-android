@@ -39,13 +39,10 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
-import com.tari.android.wallet.R
 import com.tari.android.wallet.databinding.FragmentDeleteWalletBinding
 import com.tari.android.wallet.extension.observe
 import com.tari.android.wallet.ui.common.CommonFragment
 import com.tari.android.wallet.ui.extension.ThrottleClick
-import com.tari.android.wallet.ui.extension.colorFromAttribute
-import com.tari.android.wallet.ui.extension.setColor
 import com.tari.android.wallet.ui.extension.visible
 import com.tari.android.wallet.ui.fragment.onboarding.activity.OnboardingFlowActivity
 import kotlinx.coroutines.Dispatchers
@@ -69,7 +66,7 @@ class DeleteWalletFragment : CommonFragment<FragmentDeleteWalletBinding, DeleteW
     }
 
     private fun setupUI() = with(ui) {
-        deleteWalletProgress.setColor(requireContext().colorFromAttribute(R.attr.palette_system_red))
+        deleteWalletProgress.setError()
         deleteWalletCtaView.setOnClickListener(ThrottleClick { viewModel.confirmDeleteWallet() })
     }
 

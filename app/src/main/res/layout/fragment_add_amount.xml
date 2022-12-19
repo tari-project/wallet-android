@@ -140,7 +140,7 @@
                 android:layout_marginBottom="12dp"
                 android:orientation="vertical">
 
-                <ProgressBar
+                <com.tari.android.wallet.ui.component.tari.TariProgressBar
                     android:layout_width="24dp"
                     android:layout_height="24dp"
                     android:layout_gravity="center_horizontal"

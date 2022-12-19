@@ -17,6 +17,7 @@ import com.tari.android.wallet.service.TariWalletService
 import com.tari.android.wallet.service.connection.ServiceConnectionStatus
 import com.tari.android.wallet.service.connection.TariWalletServiceConnection
 import com.tari.android.wallet.ui.common.domain.ResourceManager
+import com.tari.android.wallet.ui.component.tari.toast.TariToastArgs
 import com.tari.android.wallet.ui.dialog.error.WalletErrorArgs
 import com.tari.android.wallet.ui.dialog.inProgress.ProgressDialogArgs
 import com.tari.android.wallet.ui.dialog.modular.ModularDialogArgs
@@ -54,6 +55,9 @@ open class CommonViewModel : ViewModel() {
 
     protected val _openLink = SingleLiveEvent<String>()
     val openLink: LiveData<String> = _openLink
+
+    protected val _showToast = SingleLiveEvent<TariToastArgs>()
+    val showToast: LiveData<TariToastArgs> = _showToast
 
     protected val _copyToClipboard = SingleLiveEvent<ClipboardArgs>()
     val copyToClipboard: LiveData<ClipboardArgs> = _copyToClipboard

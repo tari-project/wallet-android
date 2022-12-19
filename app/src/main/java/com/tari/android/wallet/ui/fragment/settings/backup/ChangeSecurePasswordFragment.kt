@@ -108,7 +108,7 @@ class ChangeSecurePasswordFragment : Fragment() {
 
     private fun setupViews() {
         ui.enterPasswordEditText.isFocusableInTouchMode = true
-        ui.performingBackupProgressBar.setColor(color(white))
+        ui.performingBackupProgressBar.setWhite()
         ui.contentContainerView.setOnClickListener { clearPasswordFieldsFocusAndHideKeyboard(it) }
         setPageDescription()
         setValidatingTextFieldsListeners()

@@ -148,7 +148,6 @@ class TxDetailsFragment : CommonFragment<FragmentTxDetailsBinding, TxDetailsView
         fullEmojiIdViewController = FullEmojiIdViewController(ui.emojiIdOuterContainer, ui.emojiIdSummaryView, requireContext())
         emojiIdSummaryController = EmojiIdSummaryViewController(ui.emojiIdSummaryView)
         ui.gifContainer.root.invisible()
-        ui.gifContainer.loadingGifProgressBar.setColor(color(tx_list_loading_gif_gray))
     }
 
     private fun disableCTAs() {

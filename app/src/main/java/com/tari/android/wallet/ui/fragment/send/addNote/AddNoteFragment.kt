@@ -194,7 +194,7 @@ class AddNoteFragment : Fragment(), View.OnTouchListener {
         fullEmojiIdViewController.emojiIdHex = recipientUser.walletAddress.hexString
 
         displayAliasOrEmojiId()
-        ui.progressBar.setColor(color(white))
+        ui.progressBar.setWhite()
         ui.noteEditText.addTextChangedListener(afterTextChanged = { updateSliderState() })
         ui.slideView.setOnTouchListener(this)
         // disable "send" slider

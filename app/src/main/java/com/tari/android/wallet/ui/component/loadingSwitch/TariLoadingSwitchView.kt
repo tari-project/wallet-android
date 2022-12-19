@@ -36,13 +36,11 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.widget.FrameLayout
-import com.tari.android.wallet.R
 import com.tari.android.wallet.databinding.ViewProgressSwitchBinding
-import com.tari.android.wallet.ui.extension.color
-import com.tari.android.wallet.ui.extension.setColor
 import com.tari.android.wallet.ui.extension.setVisible
 
-class LoadingSwitchView : FrameLayout {
+
+class TariLoadingSwitchView : FrameLayout {
 
     lateinit var ui: ViewProgressSwitchBinding
 
@@ -63,13 +61,11 @@ class LoadingSwitchView : FrameLayout {
     ) {
         init()
 
-        setState(LoadingSwitchState(isChecked = false, isLoading = false))
+        setState(TariLoadingSwitchState(isChecked = false, isLoading = false))
     }
 
     private fun init() {
-        ui = ViewProgressSwitchBinding.inflate(LayoutInflater.from(context), this, false)
-        ui.progressBar.setColor(context.color(R.color.common_progress_bar))
-        addView(ui.root)
+        ui = ViewProgressSwitchBinding.inflate(LayoutInflater.from(context), this, false).also { addView(ui.root) }
     }
 
     fun setOnCheckedChangeListener(listener: (boolean: Boolean) -> Unit) {
@@ -77,7 +73,7 @@ class LoadingSwitchView : FrameLayout {
         ui.switchView.setOnCheckedChangeListener { _, isChecked -> isCheckedChangeListener.invoke(isChecked) }
     }
 
-    fun setState(state: LoadingSwitchState) = with(ui) {
+    fun setState(state: TariLoadingSwitchState) = with(ui) {
         if (switchView.isChecked != state.isChecked) {
             switchView.setOnCheckedChangeListener(null)
             switchView.isChecked = state.isChecked
