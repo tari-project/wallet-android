@@ -16,6 +16,7 @@ import com.tari.android.wallet.infrastructure.logging.LoggerTags
 import com.tari.android.wallet.service.TariWalletService
 import com.tari.android.wallet.service.connection.ServiceConnectionStatus
 import com.tari.android.wallet.service.connection.TariWalletServiceConnection
+import com.tari.android.wallet.ui.common.domain.PaletteManager
 import com.tari.android.wallet.ui.common.domain.ResourceManager
 import com.tari.android.wallet.ui.component.tari.toast.TariToastArgs
 import com.tari.android.wallet.ui.dialog.error.WalletErrorArgs
@@ -44,6 +45,9 @@ open class CommonViewModel : ViewModel() {
 
     @Inject
     lateinit var tariSettingsSharedRepository: TariSettingsSharedRepository
+
+    @Inject
+    lateinit var paletteManager: PaletteManager
 
     val logger: Printer
         get() = Logger.t(this::class.simpleName).t(LoggerTags.UI.name)

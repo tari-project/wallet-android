@@ -94,7 +94,7 @@
                     android:layout_marginStart="25dp"
                     android:layout_marginTop="@dimen/add_amount_balance_warning_container_top_margin"
                     android:layout_marginEnd="25dp"
-                    android:background="@drawable/validation_error_box_border_bg"
+                    android:background="@drawable/vector_validation_error_box_border_bg"
                     android:gravity="center"
                     android:orientation="vertical"
                     android:paddingTop="@dimen/add_amount_balance_warning_container_top_padding"

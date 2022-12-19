@@ -33,95 +33,20 @@
 package com.tari.android.wallet.ui.component.tari
 
 import android.content.Context
-import android.graphics.Paint
-import android.graphics.Rect
-import android.graphics.drawable.Drawable
-import android.graphics.drawable.LayerDrawable
-import android.graphics.drawable.ShapeDrawable
-import android.graphics.drawable.shapes.RoundRectShape
 import android.util.AttributeSet
-import android.view.Gravity
-import android.view.View
-import androidx.appcompat.widget.LinearLayoutCompat
 import com.tari.android.wallet.R
-import com.tari.android.wallet.ui.extension.colorFromAttribute
 import com.tari.android.wallet.ui.extension.obtain
 import com.tari.android.wallet.ui.extension.runRecycle
 
-class TariLinearRound(context: Context, attrs: AttributeSet) : LinearLayoutCompat(context, attrs) {
+class TariRound(context: Context, attrs: AttributeSet) : TariBackground(context, attrs) {
 
     init {
-        obtain(attrs, R.styleable.TariLinearRound).runRecycle {
-            val r = getDimension(R.styleable.TariLinearRound_cornerRadius, 0.0F)
-            val elevation = getDimension(R.styleable.TariLinearRound_elevation, 0.0F)
-            val backColor = getColor(R.styleable.TariLinearRound_backgroundColor, 0)
-            val shadowColor = context.colorFromAttribute(R.attr.palette_shadow_box)
+        obtain(attrs, R.styleable.TariRound).runRecycle {
+            val r = getDimension(R.styleable.TariRound_cornerRadius, 0.0F)
+            val elevation = getDimension(R.styleable.TariRound_elevation, 0.0F)
+            val backColor = getColor(R.styleable.TariRound_backgroundColor, 0)
 
-            background = generateBackgroundWithShadow(this@TariLinearRound, backColor, r, shadowColor, elevation.toInt(), Gravity.BOTTOM)
-        }
-    }
-
-    companion object {
-
-        fun generateBackgroundWithShadow(
-            view: View,
-            backgroundColor: Int,
-            cornerRadius: Float,
-            shadowColor: Int,
-            elevation: Int,
-            shadowGravity: Int
-        ): Drawable {
-
-            val outerRadius = floatArrayOf(
-                cornerRadius, cornerRadius, cornerRadius,
-                cornerRadius, cornerRadius, cornerRadius, cornerRadius,
-                cornerRadius
-            )
-
-            val backgroundPaint = Paint().apply {
-                style = Paint.Style.FILL
-                setShadowLayer(cornerRadius, 0.0F, 0.0F, 0)
-            }
-
-            val shapeDrawablePadding = Rect().apply {
-                left = elevation
-                right = elevation
-            }
-
-            val dy: Float
-            when (shadowGravity) {
-                Gravity.CENTER -> {
-                    shapeDrawablePadding.top = elevation
-                    shapeDrawablePadding.bottom = elevation
-                    dy = 0.0F
-                }
-                Gravity.TOP -> {
-                    shapeDrawablePadding.top = elevation * 2
-                    shapeDrawablePadding.bottom = elevation
-                    dy = -1 * elevation.toFloat() / 3
-                }
-                else -> {
-                    shapeDrawablePadding.top = elevation
-                    shapeDrawablePadding.bottom = elevation * 2
-                    dy = elevation.toFloat() / 3
-                }
-            }
-
-            val shapeDrawable = ShapeDrawable().apply {
-                setPadding(shapeDrawablePadding)
-
-                paint.color = backgroundColor
-                paint.setShadowLayer(cornerRadius / 3, 0.0F, dy, shadowColor)
-
-                shape = RoundRectShape(outerRadius, null, null)
-            }
-
-            view.setLayerType(LAYER_TYPE_SOFTWARE, shapeDrawable.paint)
-
-            val drawable = LayerDrawable(arrayOf(shapeDrawable))
-            drawable.setLayerInset(0, elevation, elevation * 2, elevation, elevation * 2)
-
-            return drawable
+            setFullBack(r, elevation, backColor)
         }
     }
 }

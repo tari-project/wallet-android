@@ -64,10 +64,10 @@ import com.tari.android.wallet.ui.fragment.send.requestTari.RequestTariViewModel
 import com.tari.android.wallet.ui.fragment.settings.allSettings.AllSettingsViewModel
 import com.tari.android.wallet.ui.fragment.settings.allSettings.about.TariAboutViewModel
 import com.tari.android.wallet.ui.fragment.settings.backgroundService.BackgroundServiceSettingsViewModel
-import com.tari.android.wallet.ui.fragment.settings.backup.ChangeSecurePasswordFragment
-import com.tari.android.wallet.ui.fragment.settings.backup.EnterCurrentPasswordFragment
 import com.tari.android.wallet.ui.fragment.settings.backup.backupSettings.BackupSettingsViewModel
 import com.tari.android.wallet.ui.fragment.settings.backup.backupSettings.option.BackupOptionViewModel
+import com.tari.android.wallet.ui.fragment.settings.backup.changeSecurePassword.ChangeSecurePasswordViewModel
+import com.tari.android.wallet.ui.fragment.settings.backup.enterCurrentPassword.EnterCurrentPasswordViewModel
 import com.tari.android.wallet.ui.fragment.settings.backup.verifySeedPhrase.VerifySeedPhraseViewModel
 import com.tari.android.wallet.ui.fragment.settings.baseNodeConfig.addBaseNode.AddCustomBaseNodeViewModel
 import com.tari.android.wallet.ui.fragment.settings.baseNodeConfig.changeBaseNode.ChangeBaseNodeViewModel
@@ -122,9 +122,6 @@ interface ApplicationComponent {
     fun inject(fragment: AddRecipientFragment)
     fun inject(fragment: AddNoteFragment)
     fun inject(fragment: ChooseGIFDialogFragment)
-    fun inject(fragment: ChangeSecurePasswordFragment)
-    fun inject(fragment: EnterCurrentPasswordFragment)
-
 
     fun inject(commonViewModel: CommonViewModel)
     fun inject(viewModel: ThumbnailGIFsViewModel)
@@ -165,6 +162,8 @@ interface ApplicationComponent {
     fun inject(viewModel: ThemeSelectorViewModel)
     fun inject(viewModel: DeleteWalletViewModel)
     fun inject(viewModel: HomeViewModel)
+    fun inject(viewModel: EnterCurrentPasswordViewModel)
+    fun inject(viewModel: ChangeSecurePasswordViewModel)
 
     fun getClipboardManager(): ClipboardManager
 }

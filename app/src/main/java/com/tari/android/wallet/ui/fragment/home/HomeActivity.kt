@@ -88,9 +88,9 @@ import com.tari.android.wallet.ui.fragment.settings.allSettings.AllSettingsRoute
 import com.tari.android.wallet.ui.fragment.settings.allSettings.about.TariAboutFragment
 import com.tari.android.wallet.ui.fragment.settings.backgroundService.BackgroundServiceSettingsFragment
 import com.tari.android.wallet.ui.fragment.settings.backup.BackupSettingsRouter
-import com.tari.android.wallet.ui.fragment.settings.backup.ChangeSecurePasswordFragment
-import com.tari.android.wallet.ui.fragment.settings.backup.EnterCurrentPasswordFragment
 import com.tari.android.wallet.ui.fragment.settings.backup.backupSettings.BackupSettingsFragment
+import com.tari.android.wallet.ui.fragment.settings.backup.changeSecurePassword.ChangeSecurePasswordFragment
+import com.tari.android.wallet.ui.fragment.settings.backup.enterCurrentPassword.EnterCurrentPasswordFragment
 import com.tari.android.wallet.ui.fragment.settings.backup.verifySeedPhrase.VerifySeedPhraseFragment
 import com.tari.android.wallet.ui.fragment.settings.backup.writeDownSeedWords.WriteDownSeedPhraseFragment
 import com.tari.android.wallet.ui.fragment.settings.baseNodeConfig.BaseNodeRouter
@@ -431,18 +431,11 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>(), AllSe
     }
 
     override fun onPasswordChanged() {
-        if (supportFragmentManager.findFragmentByTag(EnterCurrentPasswordFragment::class.java.simpleName) != null) {
-            supportFragmentManager.popBackStackImmediate(
-                EnterCurrentPasswordFragment::class.java.simpleName,
-                FragmentManager.POP_BACK_STACK_INCLUSIVE
-            )
-        } else {
-            onBackPressed()
-        }
+        popUpTo(BackupSettingsFragment::class.java.simpleName)
     }
 
     override fun onSeedPhraseVerificationComplete() {
-        supportFragmentManager.popBackStackImmediate(WriteDownSeedPhraseFragment::class.java.simpleName, FragmentManager.POP_BACK_STACK_INCLUSIVE)
+        popUpTo(BackupSettingsFragment::class.java.simpleName)
     }
 
     fun willNotifyAboutNewTx(): Boolean = ui.viewPager.currentItem == INDEX_HOME

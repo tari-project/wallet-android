@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<com.tari.android.wallet.ui.component.tari.TariPrimaryBackground xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/backup_option"
     android:layout_width="match_parent"
     android:layout_height="64dp"
-    android:background="@color/white"
     android:animateLayoutChanges="true"
     android:clickable="true"
     android:focusable="true">
@@ -72,12 +71,11 @@
         tools:text="Last successful backup: Jul 1 2020 at 11:32 PM"
         tools:visibility="visible" />
 
-    <View
+    <com.tari.android.wallet.ui.component.tari.TariDivider
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:background="@color/common_divider"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+</com.tari.android.wallet.ui.component.tari.TariPrimaryBackground>

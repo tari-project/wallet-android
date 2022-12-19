@@ -11,7 +11,7 @@
         android:id="@+id/word_position_text_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textColor="@color/seed_phrase_word_index_text_color"
+        android:textColor="?attr/palette_text_light"
         android:textSize="14sp"
         app:customFont="medium"
         tools:text="1" />

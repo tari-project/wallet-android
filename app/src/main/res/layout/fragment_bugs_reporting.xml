@@ -36,43 +36,21 @@
                     android:textSize="13sp"
                     app:customFont="medium" />
 
-                <com.tari.android.wallet.ui.component.tari.TariEditText
+                <com.tari.android.wallet.ui.component.tari.TariInput
                     android:id="@+id/name_edit_text"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="@color/transparent"
-                    android:hint="@string/bugs_reporting_name_placeholder"
                     android:imeOptions="actionNext"
-                    android:inputType="text"
-                    android:lines="1"
                     android:paddingVertical="20dp"
-                    android:singleLine="true"
-                    android:textSize="14sp"
-                    app:customFont="medium" />
+                    app:hintText="@string/bugs_reporting_name_placeholder" />
 
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:background="@color/common_divider" />
-
-                <com.tari.android.wallet.ui.component.tari.TariEditText
+                <com.tari.android.wallet.ui.component.tari.TariInput
                     android:id="@+id/email_edit_text"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="@color/transparent"
-                    android:hint="@string/bugs_reporting_email_placeholder"
                     android:imeOptions="actionNext"
-                    android:inputType="text"
-                    android:lines="1"
                     android:paddingVertical="20dp"
-                    android:singleLine="true"
-                    android:textSize="14sp"
-                    app:customFont="medium" />
-
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:background="@color/common_divider" />
+                    app:hintText="@string/bugs_reporting_email_placeholder" />
 
                 <com.tari.android.wallet.ui.component.tari.TariTextView
                     android:layout_width="match_parent"
@@ -85,11 +63,11 @@
                     android:textSize="13sp"
                     app:customFont="medium" />
 
-                <FrameLayout
+                <com.tari.android.wallet.ui.component.tari.TariSecondaryBackground
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="20dp"
-                    android:background="@drawable/background_gray_round">
+                    app:cornerRadius="10dp">
 
                     <com.tari.android.wallet.ui.component.tari.TariEditText
                         android:id="@+id/bug_description"
@@ -102,11 +80,15 @@
                         android:paddingHorizontal="12dp"
                         android:paddingVertical="16dp"
                         android:singleLine="false"
+                        android:textColor="?attr/palette_text_heading"
+                        android:textColorHint="?attr/palette_text_light"
                         android:textSize="16sp"
                         app:customFont="medium"
+                        tools:layout_editor_absoluteX="0dp"
+                        tools:layout_editor_absoluteY="0dp"
                         tools:text="@string/long_dummy_message" />
 
-                </FrameLayout>
+                </com.tari.android.wallet.ui.component.tari.TariSecondaryBackground>
 
                 <com.tari.android.wallet.ui.component.tari.TariTextView
                     android:layout_width="match_parent"
@@ -117,35 +99,21 @@
                     android:textSize="14sp"
                     app:customFont="medium" />
 
-                <com.tari.android.wallet.ui.component.tari.TariButton
+                <com.tari.android.wallet.ui.component.tari.TariGradientButton
                     android:id="@+id/send_button"
                     android:layout_width="match_parent"
                     android:layout_height="@dimen/common_action_button_height"
                     android:layout_alignParentBottom="true"
                     android:layout_marginBottom="10dp"
-                    android:background="@drawable/gradient_button_bg"
-                    android:ellipsize="middle"
-                    android:singleLine="true"
-                    android:text="@string/bugs_reporting_send"
-                    android:textAllCaps="false"
-                    android:textColor="@color/white"
-                    android:textSize="16sp"
-                    app:customFont="heavy" />
+                    app:title="@string/bugs_reporting_send" />
 
-                <com.tari.android.wallet.ui.component.tari.TariButton
+                <com.tari.android.wallet.ui.component.tari.TariSecondaryButton
                     android:id="@+id/view_logs_button"
                     android:layout_width="match_parent"
                     android:layout_height="@dimen/common_action_button_height"
                     android:layout_alignParentBottom="true"
                     android:layout_marginBottom="50dp"
-                    android:background="@null"
-                    android:ellipsize="middle"
-                    android:singleLine="true"
-                    android:text="@string/bugs_reporting_view_logs"
-                    android:textAllCaps="false"
-                    android:textColor="@color/purple"
-                    android:textSize="16sp"
-                    app:customFont="heavy" />
+                    app:title="@string/bugs_reporting_view_logs" />
 
             </androidx.appcompat.widget.LinearLayoutCompat>
 

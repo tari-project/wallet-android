@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    
+
     <!--Neutral-->
     <color name="palette_dark_neutral_primary">#060606</color>
     <color name="palette_dark_neutral_secondary">#181818</color>
@@ -52,6 +52,6 @@
     <color name="palette_dark_background_secondary">#181818</color>
 
     <!--Shadows-->
-    <color name="palette_dark_shadow_box">#181818</color>
+    <color name="palette_dark_shadow_box">#571E95</color>
 
 </resources>

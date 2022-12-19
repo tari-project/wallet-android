@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<com.tari.android.wallet.ui.component.tari.TariPrimaryBackground xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/root"
@@ -18,23 +18,26 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <androidx.cardview.widget.CardView
+        <com.tari.android.wallet.ui.component.tari.TariPrimaryBackground
             android:id="@+id/wifi_status_card_view"
             android:layout_width="46dp"
             android:layout_height="46dp"
             android:layout_centerHorizontal="true"
             android:layout_marginTop="20dp"
-            app:cardBackgroundColor="@color/white"
-            app:cardCornerRadius="23dp"
-            app:cardElevation="8dp">
+            app:cornerRadius="23dp"
+            app:elevation="10dp">
 
-            <androidx.appcompat.widget.AppCompatImageView
+            <com.tari.android.wallet.ui.component.tari.TariIconView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:src="@drawable/ic_network_state_wifi" />
+                android:src="@drawable/ic_network_state_wifi"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"/>
 
-        </androidx.cardview.widget.CardView>
+        </com.tari.android.wallet.ui.component.tari.TariPrimaryBackground>
 
         <com.tari.android.wallet.ui.component.tari.TariTextView
             android:id="@+id/wifi_status_text"
@@ -74,23 +77,26 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/wifi_container">
 
-        <androidx.cardview.widget.CardView
+        <com.tari.android.wallet.ui.component.tari.TariPrimaryBackground
             android:id="@+id/base_node_status_card_view"
             android:layout_width="46dp"
             android:layout_height="46dp"
             android:layout_centerHorizontal="true"
             android:layout_marginTop="20dp"
-            app:cardBackgroundColor="@color/white"
-            app:cardCornerRadius="23dp"
-            app:cardElevation="8dp">
+            app:cornerRadius="23dp"
+            app:elevation="10dp">
 
-            <androidx.appcompat.widget.AppCompatImageView
+            <com.tari.android.wallet.ui.component.tari.TariIconView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:src="@drawable/ic_network_state_base_node" />
+                android:src="@drawable/ic_network_state_base_node"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"/>
 
-        </androidx.cardview.widget.CardView>
+        </com.tari.android.wallet.ui.component.tari.TariPrimaryBackground>
 
         <com.tari.android.wallet.ui.component.tari.TariTextView
             android:id="@+id/base_node_status_text"
@@ -129,23 +135,26 @@
         app:layout_constraintStart_toEndOf="@+id/wifi_container"
         app:layout_constraintTop_toTopOf="parent">
 
-        <androidx.cardview.widget.CardView
+        <com.tari.android.wallet.ui.component.tari.TariPrimaryBackground
             android:id="@+id/tor_card_view"
             android:layout_width="46dp"
             android:layout_height="46dp"
             android:layout_centerHorizontal="true"
             android:layout_marginTop="20dp"
-            app:cardBackgroundColor="@color/white"
-            app:cardCornerRadius="23dp"
-            app:cardElevation="8dp">
+            app:cornerRadius="23dp"
+            app:elevation="10dp">
 
-            <androidx.appcompat.widget.AppCompatImageView
+            <com.tari.android.wallet.ui.component.tari.TariIconView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:src="@drawable/ic_network_state_tor" />
+                android:src="@drawable/ic_network_state_tor"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"/>
 
-        </androidx.cardview.widget.CardView>
+        </com.tari.android.wallet.ui.component.tari.TariPrimaryBackground>
 
         <com.tari.android.wallet.ui.component.tari.TariTextView
             android:id="@+id/tor_text"
@@ -185,23 +194,26 @@
         app:layout_constraintStart_toEndOf="@+id/base_node_container"
         app:layout_constraintTop_toTopOf="@+id/base_node_container">
 
-        <androidx.cardview.widget.CardView
+        <com.tari.android.wallet.ui.component.tari.TariPrimaryBackground
             android:id="@+id/syncing_state_card_view"
             android:layout_width="46dp"
             android:layout_height="46dp"
             android:layout_centerHorizontal="true"
             android:layout_marginTop="20dp"
-            app:cardBackgroundColor="@color/white"
-            app:cardCornerRadius="23dp"
-            app:cardElevation="8dp">
+            app:cornerRadius="23dp"
+            app:elevation="10dp">
 
-            <androidx.appcompat.widget.AppCompatImageView
+            <com.tari.android.wallet.ui.component.tari.TariIconView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:src="@drawable/ic_network_state_sync_status" />
+                android:src="@drawable/ic_network_state_sync_status"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
-        </androidx.cardview.widget.CardView>
+        </com.tari.android.wallet.ui.component.tari.TariPrimaryBackground>
 
         <com.tari.android.wallet.ui.component.tari.TariTextView
             android:id="@+id/syncing_state_text"
@@ -229,4 +241,4 @@
 
     </RelativeLayout>
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+</com.tari.android.wallet.ui.component.tari.TariPrimaryBackground>

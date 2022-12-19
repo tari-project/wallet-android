@@ -45,16 +45,27 @@ class TariGradientButton(context: Context, attrs: AttributeSet) : FrameLayout(co
 
     val ui: TariGradientButtonBinding
 
+    var text: String
+        get() = ui.button.text.toString()
+        set(value) {
+            ui.button.text = value
+        }
+
     init {
         ui = TariGradientButtonBinding.inflate(LayoutInflater.from(context), this, false).also { addView(it.root) }
 
         obtain(attrs, R.styleable.TariGradientButton).runRecycle {
-            getString(R.styleable.TariGradientButton_title)?.let { ui.button.text = it }
-            setDisabled(getBoolean(R.styleable.TariGradientButton_disabled, false))
+            text = getString(R.styleable.TariGradientButton_title).orEmpty()
+            isEnabled = getBoolean(R.styleable.TariGradientButton_android_enabled, true)
         }
     }
 
-    fun setDisabled(isDisabled: Boolean) {
-        ui.button.isEnabled = !isDisabled
+    override fun isEnabled(): Boolean = ui.button.isEnabled
+    override fun setEnabled(enabled: Boolean) {
+        ui.button.isEnabled = enabled
     }
+
+    override fun setOnClickListener(l: OnClickListener?) = ui.button.setOnClickListener(l)
+
+    override fun setOnLongClickListener(l: OnLongClickListener?) = ui.button.setOnLongClickListener(l)
 }

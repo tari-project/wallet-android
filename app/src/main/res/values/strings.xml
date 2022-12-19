@@ -538,7 +538,7 @@
 
     <!--Enter backup password-->
     <string name="enter_backup_password_page_title">Enter your current backup password</string>
-    <string name="enter_backup_password_page_description">Enter your backup password in order to change it to something different.</string>
+    <string name="enter_backup_password_page_description">Enter your backup password in order to change it to something different</string>
     <string name="enter_backup_password_enter_password_label">Enter Password</string>
     <string name="enter_backup_password_password_match_error">That’s not it!</string>
     <string name="enter_backup_password_change_password_cta">Change Password</string>

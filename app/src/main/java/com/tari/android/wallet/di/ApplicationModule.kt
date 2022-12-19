@@ -53,6 +53,7 @@ import com.tari.android.wallet.infrastructure.logging.LoggerAdapter
 import com.tari.android.wallet.infrastructure.security.biometric.BiometricAuthenticationService
 import com.tari.android.wallet.notification.NotificationHelper
 import com.tari.android.wallet.service.service.WalletServiceLauncher
+import com.tari.android.wallet.ui.common.domain.PaletteManager
 import com.tari.android.wallet.ui.common.domain.ResourceManager
 import com.tari.android.wallet.ui.common.gyphy.GiphyAdapter
 import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupSettingsRepository
@@ -131,6 +132,10 @@ class ApplicationModule(private val app: TariWalletApplication) {
     @Provides
     @Singleton
     fun provideResourceManager(context: Context): ResourceManager = ResourceManager(context)
+
+    @Provides
+    @Singleton
+    fun providePaletteManager(): PaletteManager = PaletteManager()
 
     @Provides
     @Singleton

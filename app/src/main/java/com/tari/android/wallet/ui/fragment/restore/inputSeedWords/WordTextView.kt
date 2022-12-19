@@ -42,7 +42,7 @@ class WordTextView : FrameLayout {
         ui.removeView.setVisible(!isFocused)
         val background = when {
             isFocused -> null
-            isValid -> R.drawable.restoring_seed_phrase_word_background
+            isValid -> R.drawable.vector_restoring_seed_phrase_word_background
             else -> R.drawable.restoring_seed_phrase_word_background_error
         }
         ui.root.background = background?.let { ContextCompat.getDrawable(context, it) }
@@ -50,7 +50,7 @@ class WordTextView : FrameLayout {
         val textColor = ContextCompat.getColor(context, if (isFocused || isValid) R.color.black else R.color.common_error)
         ui.text.setTextColor(textColor)
 
-        val deleteTintColor = ContextCompat.getDrawable(context, if (isFocused || isValid) R.drawable.close else R.drawable.close_error)
+        val deleteTintColor = ContextCompat.getDrawable(context, if (isFocused || isValid) R.drawable.vector_close else R.drawable.close_error)
         ui.removeView.setImageDrawable(deleteTintColor)
     }
 }

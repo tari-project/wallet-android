@@ -22,7 +22,7 @@
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
         android:text="@string/emoji_id_copied"
-        android:textColor="?palette_text_heading"
+        android:textColor="?attr/palette_overlay_text"
         android:textSize="13sp"
         app:customFont="black" />
 </RelativeLayout>

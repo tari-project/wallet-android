@@ -18,11 +18,10 @@
         android:textSize="16sp"
         app:customFont="medium" />
 
-    <View
+    <com.tari.android.wallet.ui.component.tari.TariDivider
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:layout_marginVertical="22dp"
         android:layout_marginHorizontal="20dp"
-        android:background="@color/gray_background"/>
+        android:layout_marginVertical="22dp" />
 
 </LinearLayout>

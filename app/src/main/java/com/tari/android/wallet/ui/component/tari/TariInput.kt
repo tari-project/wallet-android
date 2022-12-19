@@ -62,9 +62,16 @@ class TariInput(context: Context, attrs: AttributeSet) : FrameLayout(context, at
             setErrorText(getString(R.styleable.TariInput_errorText))
             if (getBoolean(R.styleable.TariInput_android_singleLine, true)) ui.editText.setSingleLine()
             ui.editText.imeOptions = getInt(R.styleable.TariInput_android_imeOptions, 0)
+            ui.editText.inputType = getInt(R.styleable.TariInput_android_inputType, 0)
+            ui.editText.isEnabled = getBoolean(R.styleable.TariInput_android_enabled, true)
         }
 
         ui.editText.addTextChangedListener(onTextChanged = { text, start, before, count -> textChangedListener.invoke(text, start, before, count) })
+    }
+
+    override fun isEnabled(): Boolean = ui.editText.isEnabled
+    override fun setEnabled(enabled: Boolean) {
+        ui.editText.isEnabled = enabled
     }
 
     fun setText(text: String) = ui.editText.setText(text)

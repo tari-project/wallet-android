@@ -1,29 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<com.tari.android.wallet.ui.component.tari.TariPrimaryBackground xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/root"
     android:layout_width="match_parent"
-    android:layout_height="38dp"
+    android:layout_height="wrap_content"
     android:background="@color/white"
     android:clickable="true"
     android:focusable="true"
     android:paddingHorizontal="@dimen/common_horizontal_margin">
 
-    <com.tari.android.wallet.ui.component.tari.TariTextView
-        android:id="@+id/title"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_vertical|start"
-        android:text="@string/dummy_message"
-        android:textColor="?palette_text_heading"
-        android:textSize="15sp"
-        app:customFont="medium" />
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="38dp">
 
-    <androidx.appcompat.widget.SwitchCompat
-        android:id="@+id/switcher"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_vertical|end" />
+        <com.tari.android.wallet.ui.component.tari.TariTextView
+            android:id="@+id/title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical|start"
+            android:text="@string/dummy_message"
+            android:textColor="?palette_text_heading"
+            android:textSize="15sp"
+            app:customFont="medium" />
 
-</FrameLayout>
+        <androidx.appcompat.widget.SwitchCompat
+            android:id="@+id/switcher"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical|end" />
+
+    </FrameLayout>
+
+</com.tari.android.wallet.ui.component.tari.TariPrimaryBackground>

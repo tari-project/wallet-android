@@ -44,7 +44,6 @@ import android.view.ViewGroup
 import android.webkit.WebResourceError
 import android.widget.Toast
 import androidx.fragment.app.Fragment
-import com.tari.android.wallet.R.color.purple
 import com.tari.android.wallet.R.drawable.*
 import com.tari.android.wallet.R.string.store_no_application_to_open_the_link_error
 import com.tari.android.wallet.R.string.ttl_store_url
@@ -89,7 +88,7 @@ class StoreFragment : Fragment() {
         configureWebView()
         ui.browserBackCtaView.setOnClickListener { ui.webView.apply { if (canGoBack()) goBack() } }
         ui.browserForwardCtaView.setOnClickListener { ui.webView.apply { if (canGoForward()) goForward() } }
-        ui.shareCtaView.setOnClickListener { shareStoreLink() }
+        ui.toolbar.rightAction = { shareStoreLink() }
     }
 
     private fun reloadWebViewOnErrorAndConnectedState() {
@@ -119,7 +118,7 @@ class StoreFragment : Fragment() {
                     onPageCommitVisible = { _, _ -> ui.webView.scrollTo(0, 0) },
                     onPageFinished = { webView, _ ->
                         ui.progressBar.gone()
-                        ui.storeTitleTextView.text = webView.title
+                        ui.toolbar.ui.toolbarTitle.text = webView.title
                     },
                     onReceivedError = { _, _, error ->
                         webViewStatePublisher.onNext(WebViewState(PageLoadingException(error)))

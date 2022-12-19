@@ -124,6 +124,12 @@ abstract class CommonActivity<Binding : ViewBinding, VM : CommonViewModel> : App
         transaction.commit()
     }
 
+    protected fun popUpTo(tag: String) {
+        while (supportFragmentManager.fragments.last().tag != tag) {
+            supportFragmentManager.popBackStackImmediate()
+        }
+    }
+
     override fun hearShake() = showDebugDialog()
 
     fun showDebugDialog() {

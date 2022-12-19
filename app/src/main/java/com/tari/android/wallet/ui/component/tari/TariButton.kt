@@ -44,8 +44,6 @@ import androidx.appcompat.widget.AppCompatButton
 class TariButton(context: Context, attrs: AttributeSet) : AppCompatButton(context, attrs) {
 
     init {
-        if (!isInEditMode) {
-            typeface = TariFont.getFromAttributeSet(context, attrs)
-        }
+        typeface = TariFont.getFromAttributeSet(context, attrs)
     }
 }

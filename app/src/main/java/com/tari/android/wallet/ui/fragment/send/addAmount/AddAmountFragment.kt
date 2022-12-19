@@ -376,7 +376,7 @@ class AddAmountFragment : CommonFragment<FragmentAddAmountBinding, AddAmountView
         }
 
         private fun showAvailableBalanceError() = with(ui) {
-            notEnoughBalanceView.background = ContextCompat.getDrawable(requireContext(), R.drawable.validation_error_box_border_bg)
+            notEnoughBalanceView.background = ContextCompat.getDrawable(requireContext(), R.drawable.vector_validation_error_box_border_bg)
             ui.availableBalanceContainerView.setupArgs(AmountStyle.Warning)
         }
 

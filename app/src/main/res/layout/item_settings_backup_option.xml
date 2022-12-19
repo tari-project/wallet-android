@@ -71,8 +71,7 @@
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                     />
+                    app:layout_constraintTop_toTopOf="parent" />
 
                 <androidx.appcompat.widget.AppCompatImageView
                     android:id="@+id/cloud_backup_status_success_view"
@@ -84,8 +83,7 @@
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                     />
+                    app:layout_constraintTop_toTopOf="parent" />
 
                 <com.tari.android.wallet.ui.component.tari.TariProgressBar
                     android:id="@+id/cloud_backup_status_progress_view"
@@ -98,6 +96,7 @@
                     app:layout_constraintStart_toStartOf="@id/cloud_backup_status_success_view"
                     app:layout_constraintTop_toTopOf="@id/cloud_backup_status_success_view"
                     tools:visibility="visible" />
+
             </androidx.constraintlayout.widget.ConstraintLayout>
 
             <com.tari.android.wallet.ui.component.tari.TariIconView

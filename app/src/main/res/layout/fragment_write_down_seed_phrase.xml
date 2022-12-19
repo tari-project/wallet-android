@@ -62,25 +62,20 @@
             app:customFont="medium" />
     </LinearLayout>
 
-    <com.tari.android.wallet.ui.component.tari.TariTextView
+    <com.tari.android.wallet.ui.component.tari.TariGradientButton
         android:id="@+id/continue_cta_view"
         android:layout_width="match_parent"
         android:layout_height="@dimen/common_action_button_height"
         android:layout_marginHorizontal="25dp"
         android:layout_marginTop="25dp"
         android:layout_marginBottom="15dp"
-        android:background="@drawable/vector_disable_able_gradient_button_bg"
         android:enabled="false"
-        android:gravity="center"
-        android:text="@string/back_up_seed_phrase_verify_cta"
-        android:textColor="@color/seed_phrase_button_disabled_text_color"
-        android:textSize="16sp"
-        app:customFont="heavy"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:title="@string/back_up_seed_phrase_verify_cta" />
 
-    <FrameLayout
+    <com.tari.android.wallet.ui.component.tari.TariSecondaryBackground
         android:id="@+id/list_container"
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -88,28 +83,27 @@
         android:layout_marginVertical="@dimen/write_down_seed_phrase_list_vertical_margin"
         android:layout_weight="1"
         android:background="@drawable/back_up_with_seed_phrase_words_background"
+        app:cornerRadius="10dp"
         app:layout_constraintBottom_toTopOf="@+id/warning_view"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/description">
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/phrase_words_recycler_view"
+        <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:paddingHorizontal="35dp"
-            android:paddingVertical="8dp" />
+            android:layout_height="match_parent">
 
-        <View
-            android:id="@+id/bottom_shadow"
-            android:layout_width="match_parent"
-            android:layout_height="118dp"
-            android:layout_gravity="bottom"
-            android:background="@drawable/back_up_with_seed_phrase_words_bottom_dimmer"
-            android:visibility="gone" />
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/phrase_words_recycler_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:paddingHorizontal="35dp"
+                android:paddingVertical="8dp" />
 
-    </FrameLayout>
+        </FrameLayout>
+
+    </com.tari.android.wallet.ui.component.tari.TariSecondaryBackground>
 
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/expand_button_view"
@@ -118,7 +112,7 @@
         android:layout_marginTop="@dimen/write_down_seed_expand_button_top_margin"
         android:layout_marginEnd="@dimen/write_down_seed_expand_button_end_margin"
         android:layout_marginBottom="@dimen/write_down_seed_expand_button_bottom_margin"
-        android:src="@drawable/recovery_expand_icon"
+        android:src="@drawable/vector_recovery_expand_icon"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="@+id/list_container"
         app:layout_constraintEnd_toEndOf="@+id/list_container"

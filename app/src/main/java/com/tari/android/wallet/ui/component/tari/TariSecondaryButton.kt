@@ -37,24 +37,29 @@ import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.widget.FrameLayout
 import com.tari.android.wallet.R
-import com.tari.android.wallet.databinding.TariGradientButtonBinding
+import com.tari.android.wallet.databinding.TariSecondaryButtonBinding
 import com.tari.android.wallet.ui.extension.obtain
 import com.tari.android.wallet.ui.extension.runRecycle
 
-class TariGradientButton(context: Context, attrs: AttributeSet) : FrameLayout(context, attrs) {
+class TariSecondaryButton(context: Context, attrs: AttributeSet) : FrameLayout(context, attrs) {
 
-    val ui: TariGradientButtonBinding
+    val ui: TariSecondaryButtonBinding
 
     init {
-        ui = TariGradientButtonBinding.inflate(LayoutInflater.from(context), this, false).also { addView(it.root) }
+        ui = TariSecondaryButtonBinding.inflate(LayoutInflater.from(context), this, false).also { addView(it.root) }
 
-        obtain(attrs, R.styleable.TariGradientButton).runRecycle {
-            getString(R.styleable.TariGradientButton_title)?.let { ui.button.text = it }
-            setDisabled(getBoolean(R.styleable.TariGradientButton_disabled, false))
+        obtain(attrs, R.styleable.TariSecondaryButton).runRecycle {
+            getString(R.styleable.TariSecondaryButton_title)?.let { ui.button.text = it }
+            isEnabled = (getBoolean(R.styleable.TariSecondaryButton_android_enabled, true))
         }
     }
 
-    fun setDisabled(isDisabled: Boolean) {
-        ui.button.isEnabled = !isDisabled
+    override fun isEnabled(): Boolean = ui.button.isEnabled
+    override fun setEnabled(enabled: Boolean) {
+        ui.button.isEnabled = enabled
     }
+
+    override fun setOnClickListener(l: OnClickListener?) = ui.button.setOnClickListener(l)
+
+    override fun setOnLongClickListener(l: OnLongClickListener?) = ui.button.setOnLongClickListener(l)
 }

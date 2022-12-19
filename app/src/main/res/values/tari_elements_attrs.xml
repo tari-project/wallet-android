@@ -1,4 +1,8 @@
 <resources>
+    <attr name="cornerRadius" format="dimension" />
+    <attr name="title" format="string" />
+    <attr name="disabled" format="boolean" />
+
     <declare-styleable name="TariToolbar">
         <attr name="text" format="string" />
         <attr name="rightIcon" format="reference" />
@@ -7,7 +11,18 @@
     </declare-styleable>
 
     <declare-styleable name="TariPrimaryBackground">
-        <attr name="cornerRadius" format="dimension" />
+        <attr name="cornerRadius" />
+        <attr name="elevation" />
+    </declare-styleable>
+
+    <declare-styleable name="TariSecondaryBackground">
+        <attr name="cornerRadius" />
+        <attr name="elevation" />
+    </declare-styleable>
+
+    <declare-styleable name="TariQrBackground">
+        <attr name="cornerRadius" />
+        <attr name="elevation" />
     </declare-styleable>
 
     <attr name="customFont" format="enum">
@@ -33,12 +48,25 @@
         <attr name="hintText" format="string" />
         <attr name="errorText" format="string" />
         <attr name="android:singleLine" />
+        <attr name="android:inputType" />
         <attr name="android:imeOptions" />
+        <attr name="android:enabled" />
     </declare-styleable>
 
     <declare-styleable name="TariGradientButton">
-        <attr name="title" format="string" />
-        <attr name="disabled" format="boolean" />
+        <attr name="title" />
+        <attr name="android:enabled" />
+    </declare-styleable>
+
+    <declare-styleable name="TariSecondaryButton">
+        <attr name="title" />
+        <attr name="android:enabled" />
+    </declare-styleable>
+
+    <declare-styleable name="TariRound">
+        <attr name="cornerRadius" />
+        <attr name="elevation" />
+        <attr name="backgroundColor" />
     </declare-styleable>
 
 </resources>

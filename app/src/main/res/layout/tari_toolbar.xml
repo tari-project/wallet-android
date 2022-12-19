@@ -16,17 +16,19 @@
 
     <com.tari.android.wallet.ui.component.tari.TariTextView
         android:id="@+id/toolbar_title"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
         android:layout_marginTop="24dp"
         android:layout_marginBottom="16dp"
+        android:gravity="center_horizontal"
         android:text="@string/dummy_text"
         android:textColor="?attr/palette_text_heading"
         android:textSize="16sp"
         app:customFont="heavy"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="@id/toolbar_right_icon"
+        app:layout_constraintStart_toStartOf="@id/back_cta_view"
         app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.appcompat.widget.AppCompatImageView

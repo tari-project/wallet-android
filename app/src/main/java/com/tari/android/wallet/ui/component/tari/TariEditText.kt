@@ -45,8 +45,6 @@ import androidx.appcompat.widget.AppCompatEditText
 class TariEditText(context: Context, attrs: AttributeSet) : AppCompatEditText(context, attrs) {
 
     init {
-        if (!isInEditMode) {
-            typeface = TariFont.getFromAttributeSet(context, attrs)
-        }
+        typeface = TariFont.getFromAttributeSet(context, attrs)
     }
 }

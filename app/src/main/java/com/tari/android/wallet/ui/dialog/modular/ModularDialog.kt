@@ -31,8 +31,8 @@ import com.tari.android.wallet.ui.fragment.send.addAmount.feeModule.FeeModule
 import com.tari.android.wallet.ui.fragment.send.addAmount.feeModule.FeeModuleView
 import com.tari.android.wallet.ui.fragment.send.shareQr.ShareQRCodeModuleView
 import com.tari.android.wallet.ui.fragment.send.shareQr.ShareQrCodeModule
-import com.tari.android.wallet.ui.fragment.settings.logs.logs.LogLevelCheckedModule
-import com.tari.android.wallet.ui.fragment.settings.logs.logs.LogSourceCheckedModule
+import com.tari.android.wallet.ui.fragment.settings.logs.logs.module.LogLevelCheckedModule
+import com.tari.android.wallet.ui.fragment.settings.logs.logs.module.LogSourceCheckedModule
 import com.tari.android.wallet.ui.fragment.utxos.list.module.*
 
 

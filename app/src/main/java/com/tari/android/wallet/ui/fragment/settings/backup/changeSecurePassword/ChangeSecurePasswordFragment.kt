@@ -30,7 +30,7 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.tari.android.wallet.ui.fragment.settings.backup
+package com.tari.android.wallet.ui.fragment.settings.backup.changeSecurePassword
 
 import android.content.Context
 import android.os.Bundle
@@ -47,46 +47,26 @@ import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.TextView
 import androidx.core.widget.addTextChangedListener
-import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.tari.android.wallet.R.string.*
-import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import com.tari.android.wallet.databinding.FragmentChangeSecurePasswordBinding
-import com.tari.android.wallet.di.DiContainer.appComponent
 import com.tari.android.wallet.event.EventBus
-import com.tari.android.wallet.infrastructure.backup.BackupManager
 import com.tari.android.wallet.infrastructure.backup.BackupState
 import com.tari.android.wallet.infrastructure.backup.BackupState.BackupFailed
 import com.tari.android.wallet.infrastructure.backup.BackupState.BackupUpToDate
-import com.tari.android.wallet.ui.common.domain.PaletteManager
-import com.tari.android.wallet.ui.common.domain.ResourceManager
+import com.tari.android.wallet.ui.common.CommonFragment
 import com.tari.android.wallet.ui.dialog.error.ErrorDialogArgs
 import com.tari.android.wallet.ui.dialog.modular.ModularDialog
 import com.tari.android.wallet.ui.extension.*
-import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupSettingsRepository
+import com.tari.android.wallet.ui.fragment.settings.backup.BackupSettingsRouter
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.net.UnknownHostException
-import javax.inject.Inject
 
-class ChangeSecurePasswordFragment : Fragment() {
 
-    @Inject
-    lateinit var sharedPrefs: SharedPrefsRepository
+class ChangeSecurePasswordFragment : CommonFragment<FragmentChangeSecurePasswordBinding, ChangeSecurePasswordViewModel>() {
 
-    @Inject
-    lateinit var backupManager: BackupManager
-
-    @Inject
-    lateinit var resourceManager: ResourceManager
-
-    @Inject
-    lateinit var backupSharedPrefsRepository: BackupSettingsRepository
-    
-    @Inject
-    lateinit var paletteManager: PaletteManager
-
-    private lateinit var ui: FragmentChangeSecurePasswordBinding
     private lateinit var inputService: InputMethodManager
 
     private val passwordInput
@@ -95,17 +75,17 @@ class ChangeSecurePasswordFragment : Fragment() {
     private val confirmInput
         get() = ui.confirmPasswordEditText.ui.editText
 
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-        inputService = requireActivity().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-        appComponent.inject(this)
-    }
-
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
         FragmentChangeSecurePasswordBinding.inflate(inflater, container, false).also { ui = it }.root
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        val viewModel: ChangeSecurePasswordViewModel by viewModels()
+        bindViewModel(viewModel)
+
+        inputService = requireActivity().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+
         setupViews()
     }
 
@@ -142,7 +122,7 @@ class ChangeSecurePasswordFragment : Fragment() {
     private fun setPageDescription() {
         val generalPart = string(change_password_page_description_general_part)
         val highlightedPart = SpannableString(string(change_password_page_description_highlight_part))
-        val spanColor = ForegroundColorSpan(paletteManager.getTextHeading())
+        val spanColor = ForegroundColorSpan(viewModel.paletteManager.getTextHeading(requireContext()))
         highlightedPart.setSpan(spanColor, 0, highlightedPart.length, SPAN_EXCLUSIVE_EXCLUSIVE)
         ui.pageDescriptionTextView.text = SpannableStringBuilder().apply {
             insert(0, generalPart)
@@ -212,19 +192,19 @@ class ChangeSecurePasswordFragment : Fragment() {
 
     private fun setPlainInputState(errorLabel: TextView, inputTextViews: Iterable<TextView>) {
         errorLabel.gone()
-        inputTextViews.forEach { it.setTextColor(paletteManager.getTextHeading()) }
+        inputTextViews.forEach { it.setTextColor(viewModel.paletteManager.getTextHeading(requireContext())) }
     }
 
     private fun setPasswordTooShortErrorState() {
         ui.passwordTooShortLabelView.visible()
-        ui.enterPasswordLabelTextView.setTextColor(paletteManager.getRed())
-        passwordInput.setTextColor(paletteManager.getRed())
+        ui.enterPasswordLabelTextView.setTextColor(viewModel.paletteManager.getRed(requireContext()))
+        passwordInput.setTextColor(viewModel.paletteManager.getRed(requireContext()))
     }
 
     private fun setPasswordMatchErrorState() {
         ui.passwordsNotMatchLabelView.visible()
-        ui.confirmPasswordLabelTextView.setTextColor(paletteManager.getRed())
-        confirmInput.setTextColor(paletteManager.getRed())
+        ui.confirmPasswordLabelTextView.setTextColor(viewModel.paletteManager.getRed(requireContext()))
+        confirmInput.setTextColor(viewModel.paletteManager.getRed(requireContext()))
     }
 
     private fun setVerifyButtonState(isEnabled: Boolean) {
@@ -266,8 +246,8 @@ class ChangeSecurePasswordFragment : Fragment() {
     private fun performBackupAndUpdatePassword() {
         // start listening to wallet events
         subscribeToBackupState()
-        backupSharedPrefsRepository.backupPassword = passwordInput.text!!.toString()
-        backupManager.backupNow()
+        viewModel.backupSharedPrefsRepository.backupPassword = passwordInput.text!!.toString()
+        viewModel.backupManager.backupNow()
     }
 
     private fun subscribeToBackupState() {
@@ -307,7 +287,7 @@ class ChangeSecurePasswordFragment : Fragment() {
             canceledOnTouchOutside = false,
             onClose = onClose
         )
-        ModularDialog(requireContext(), args.getModular(resourceManager)).show()
+        ModularDialog(requireContext(), args.getModular(viewModel.resourceManager)).show()
     }
 
     companion object {

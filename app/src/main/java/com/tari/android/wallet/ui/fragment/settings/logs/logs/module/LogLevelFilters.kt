@@ -1,4 +1,4 @@
-package com.tari.android.wallet.ui.fragment.settings.logs.logs
+package com.tari.android.wallet.ui.fragment.settings.logs.logs.module
 
 import com.tari.android.wallet.R
 import com.tari.android.wallet.ui.fragment.settings.logs.logs.adapter.DebugLog

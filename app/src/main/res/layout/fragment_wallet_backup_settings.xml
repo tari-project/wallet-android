@@ -58,61 +58,64 @@
                     android:animateLayoutChanges="true"
                     android:orientation="vertical">
 
-                    <FrameLayout
+                    <com.tari.android.wallet.ui.component.tari.TariPrimaryBackground
                         android:id="@+id/backup_with_recovery_phrase_cta_view"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:background="@drawable/setting_option_background"
                         android:clickable="true"
                         android:focusable="true"
                         android:paddingHorizontal="26dp"
-                        android:paddingVertical="24dp"
-                        android:visibility="visible">
+                        android:paddingVertical="24dp">
 
-                        <com.tari.android.wallet.ui.component.tari.TariTextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center_vertical|start"
-                            android:text="@string/back_up_wallet_with_recovery_phrase_cta"
-                            android:textColor="?attr/palette_text_heading"
-                            android:textSize="15sp"
-                            app:customFont="medium" />
+                        <FrameLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content">
 
-                        <LinearLayout
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center_vertical|end"
-                            android:orientation="horizontal">
-
-                            <androidx.appcompat.widget.AppCompatImageView
-                                android:id="@+id/backup_with_recovery_phrase_warning_view"
+                            <com.tari.android.wallet.ui.component.tari.TariTextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_gravity="center_vertical"
-                                android:src="@drawable/vector_wallet_not_backed" />
+                                android:layout_gravity="center_vertical|start"
+                                android:text="@string/back_up_wallet_with_recovery_phrase_cta"
+                                android:textColor="?attr/palette_text_heading"
+                                android:textSize="15sp"
+                                app:customFont="medium" />
 
-                            <androidx.appcompat.widget.AppCompatImageView
-                                android:id="@+id/backup_with_recovery_phrase_success_view"
+                            <LinearLayout
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_gravity="center_vertical"
-                                android:src="@drawable/vector_positive_check" />
+                                android:layout_gravity="center_vertical|end"
+                                android:orientation="horizontal">
 
-                            <androidx.appcompat.widget.AppCompatImageView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_gravity="center_vertical"
-                                android:layout_marginStart="12dp"
-                                android:src="@drawable/icon_apply_setting" />
+                                <androidx.appcompat.widget.AppCompatImageView
+                                    android:id="@+id/backup_with_recovery_phrase_warning_view"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_gravity="center_vertical"
+                                    android:src="@drawable/vector_wallet_not_backed" />
 
-                        </LinearLayout>
+                                <androidx.appcompat.widget.AppCompatImageView
+                                    android:id="@+id/backup_with_recovery_phrase_success_view"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_gravity="center_vertical"
+                                    android:src="@drawable/vector_positive_check" />
 
-                    </FrameLayout>
+                                <com.tari.android.wallet.ui.component.tari.TariIconView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_gravity="center_vertical"
+                                    android:layout_marginStart="12dp"
+                                    android:src="@drawable/icon_apply_setting" />
 
-                    <View
+                            </LinearLayout>
+
+                        </FrameLayout>
+
+                    </com.tari.android.wallet.ui.component.tari.TariPrimaryBackground>
+
+                    <com.tari.android.wallet.ui.component.tari.TariDivider
                         android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:background="@color/common_divider" />
+                        android:layout_height="1dp" />
 
                     <androidx.appcompat.widget.LinearLayoutCompat
                         android:id="@+id/options_container"
@@ -120,33 +123,39 @@
                         android:layout_height="wrap_content"
                         android:orientation="vertical" />
 
-                    <FrameLayout
+                    <com.tari.android.wallet.ui.component.tari.TariPrimaryBackground
                         android:id="@+id/update_password_cta_view"
                         android:layout_width="match_parent"
-                        android:layout_height="@dimen/menu_item_height"
+                        android:layout_height="wrap_content"
                         android:background="@drawable/setting_option_background"
                         android:clickable="true"
                         android:focusable="true"
                         android:paddingHorizontal="@dimen/common_horizontal_margin">
 
-                        <com.tari.android.wallet.ui.component.tari.TariTextView
-                            android:id="@+id/update_password_label_text_view"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center_vertical|start"
-                            android:text="@string/back_up_wallet_set_backup_password_cta"
-                            android:textColor="?attr/palette_text_heading"
-                            android:textSize="15sp"
-                            app:customFont="medium" />
+                        <FrameLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="@dimen/menu_item_height">
 
-                        <androidx.appcompat.widget.AppCompatImageView
-                            android:id="@+id/update_password_arrow_image_view"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center_vertical|end"
-                            android:src="@drawable/icon_apply_setting" />
+                            <com.tari.android.wallet.ui.component.tari.TariTextView
+                                android:id="@+id/update_password_label_text_view"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center_vertical|start"
+                                android:text="@string/back_up_wallet_set_backup_password_cta"
+                                android:textColor="?attr/palette_text_heading"
+                                android:textSize="15sp"
+                                app:customFont="medium" />
 
-                    </FrameLayout>
+                            <com.tari.android.wallet.ui.component.tari.TariIconView
+                                android:id="@+id/update_password_arrow_image_view"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center_vertical|end"
+                                android:src="@drawable/icon_apply_setting" />
+
+                        </FrameLayout>
+
+                    </com.tari.android.wallet.ui.component.tari.TariPrimaryBackground>
 
                     <LinearLayout
                         android:id="@+id/backup_wallet_to_cloud_cta_container_view"
@@ -154,12 +163,11 @@
                         android:layout_height="wrap_content"
                         android:orientation="vertical">
 
-                        <View
+                        <com.tari.android.wallet.ui.component.tari.TariDivider
                             android:layout_width="match_parent"
-                            android:layout_height="1dp"
-                            android:background="@color/common_divider" />
+                            android:layout_height="1dp" />
 
-                        <FrameLayout
+                        <com.tari.android.wallet.ui.component.tari.TariPrimaryBackground
                             android:id="@+id/backup_wallet_to_cloud_cta_view"
                             android:layout_width="match_parent"
                             android:layout_height="@dimen/menu_item_height"
@@ -168,17 +176,23 @@
                             android:focusable="true"
                             android:paddingHorizontal="@dimen/common_horizontal_margin">
 
-                            <com.tari.android.wallet.ui.component.tari.TariTextView
-                                android:id="@+id/backup_now_text_view"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_gravity="center_vertical|start"
-                                android:text="@string/back_up_wallet_to_cloud_cta"
-                                android:textColor="?attr/palette_text_heading"
-                                android:textSize="15sp"
-                                app:customFont="medium" />
+                            <FrameLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="@dimen/menu_item_height">
 
-                        </FrameLayout>
+                                <com.tari.android.wallet.ui.component.tari.TariTextView
+                                    android:id="@+id/backup_now_text_view"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_gravity="center_vertical|start"
+                                    android:text="@string/back_up_wallet_to_cloud_cta"
+                                    android:textColor="?attr/palette_text_heading"
+                                    android:textSize="15sp"
+                                    app:customFont="medium" />
+
+                            </FrameLayout>
+
+                        </com.tari.android.wallet.ui.component.tari.TariPrimaryBackground>
 
                     </LinearLayout>
 

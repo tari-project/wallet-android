@@ -28,8 +28,8 @@ class BugsReportingFragment : CommonFragment<FragmentBugsReportingBinding, BugsR
     private fun setupUI() = with(ui) {
         sendButton.setOnClickListener {
             viewModel.send(
-                nameEditText.text?.toString().orEmpty(),
-                emailEditText.text?.toString().orEmpty(),
+                nameEditText.ui.editText.text?.toString().orEmpty(),
+                emailEditText.ui.editText.text?.toString().orEmpty(),
                 bugDescription.text?.toString().orEmpty()
             )
         }

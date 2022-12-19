@@ -9,7 +9,7 @@
     <com.tari.android.wallet.ui.component.tari.TariTextView
         android:layout_gravity="center"
         android:id="@+id/tvTitle"
-        android:background="@drawable/restoring_seed_phrase_word_background"
+        android:background="@drawable/vector_restoring_seed_phrase_word_background"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:paddingHorizontal="16dp"

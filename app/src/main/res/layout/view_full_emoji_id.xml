@@ -18,16 +18,17 @@
 
     <!-- height and width of this view will be set dynamically at runtime -->
 
-    <RelativeLayout
+    <com.tari.android.wallet.ui.component.tari.TariPrimaryBackground
         android:id="@+id/full_emoji_id_container_view"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:layout_centerInParent="true"
-        android:background="@drawable/emoji_id_bg"
         android:clickable="true"
         android:elevation="@dimen/common_view_elevation"
-        android:focusable="true">
+        android:focusable="true"
+        app:cornerRadius="10dp"
+        app:elevation="4dp">
 
         <HorizontalScrollView
             android:id="@+id/full_emoji_id_scroll_view"
@@ -49,16 +50,6 @@
 
         </HorizontalScrollView>
 
-        <!-- white fader for emoji-id -->
-        <View
-            android:id="@+id/full_emoji_id_fader_view"
-            android:layout_width="26dp"
-            android:layout_height="24dp"
-            android:layout_alignParentEnd="true"
-            android:layout_centerVertical="true"
-            android:background="@drawable/emoji_id_end_fader"
-            android:translationZ="6dp" />
-
         <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -70,8 +61,10 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:visibility="visible" />
+
         </FrameLayout>
-    </RelativeLayout>
+
+    </com.tari.android.wallet.ui.component.tari.TariPrimaryBackground>
 
     <!-- copy emoji id button -->
     <RelativeLayout
@@ -87,34 +80,44 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
-            android:contentDescription="@null"
-            android:src="@drawable/speech_notch_up" />
+            android:src="@drawable/speech_notch_up"
+            android:tint="?attr/palette_background_primary" />
 
-        <com.tari.android.wallet.ui.component.tari.TariTextView
-            android:id="@+id/copy_emoji_id_text_view"
+        <com.tari.android.wallet.ui.component.tari.TariPrimaryBackground
+            android:id="@+id/copy_emoji_id_text_view_container"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@id/copy_emoji_id_notch_image_view"
-            android:background="@drawable/copy_paste_emoji_id_button_bg"
-            android:paddingHorizontal="20dp"
-            android:paddingVertical="10dp"
-            android:text="@string/copy_emoji_id"
-            android:textColor="#9834F6"
-            android:textSize="14sp"
-            app:customFont="heavy" />
+            app:cornerRadius="10dp"
+            app:elevation="4dp">
 
-        <Button
+            <com.tari.android.wallet.ui.component.tari.TariTextView
+                android:id="@+id/copy_emoji_id_text_view"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingHorizontal="20dp"
+                android:paddingVertical="10dp"
+                android:text="@string/copy_emoji_id"
+                android:textColor="?attr/palette_text_heading"
+                android:textSize="14sp"
+                app:customFont="heavy" />
+
+        </com.tari.android.wallet.ui.component.tari.TariPrimaryBackground>
+
+        <com.tari.android.wallet.ui.component.tari.TariButton
             android:id="@+id/copy_emoji_id_button"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:layout_alignStart="@id/copy_emoji_id_text_view"
-            android:layout_alignTop="@id/copy_emoji_id_text_view"
-            android:layout_alignEnd="@id/copy_emoji_id_text_view"
-            android:layout_alignBottom="@id/copy_emoji_id_text_view"
-            android:background="@color/transparent" />
+            android:layout_alignStart="@id/copy_emoji_id_text_view_container"
+            android:layout_alignTop="@id/copy_emoji_id_text_view_container"
+            android:layout_alignEnd="@id/copy_emoji_id_text_view_container"
+            android:layout_alignBottom="@id/copy_emoji_id_text_view_container"
+            android:background="@color/transparent"
+            app:customFont="medium" />
+
     </RelativeLayout>
 
-    <FrameLayout
+    <com.tari.android.wallet.ui.component.tari.TariPrimaryBackground
         android:id="@+id/long_press_hint_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -122,11 +125,11 @@
         android:layout_centerHorizontal="true"
         android:layout_marginHorizontal="24dp"
         android:layout_marginBottom="32dp"
-        android:background="@drawable/emoji_id_long_press_hint_bg"
         android:clickable="true"
         android:elevation="@dimen/common_view_elevation"
         android:focusable="true"
-        android:focusableInTouchMode="true">
+        android:focusableInTouchMode="true"
+        app:cornerRadius="6dp">
 
         <com.tari.android.wallet.ui.component.tari.TariTextView
             android:layout_width="match_parent"
@@ -141,6 +144,6 @@
             android:textSize="14sp"
             app:customFont="medium" />
 
-    </FrameLayout>
+    </com.tari.android.wallet.ui.component.tari.TariPrimaryBackground>
 
 </RelativeLayout>
