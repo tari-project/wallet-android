@@ -6,10 +6,10 @@ import android.view.View
 import com.tari.android.wallet.R
 import com.tari.android.wallet.ui.extension.colorFromAttribute
 
-class TariDivider(context: Context, attrs: AttributeSet) : View(context, attrs) {
+class TariTertiaryDivider(context: Context, attrs: AttributeSet) : View(context, attrs) {
 
     init {
-        val backColor = context.colorFromAttribute(R.attr.palette_neutral_secondary)
+        val backColor = context.colorFromAttribute(R.attr.palette_neutral_tertiary)
         setBackgroundColor(backColor)
     }
 }

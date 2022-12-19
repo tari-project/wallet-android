@@ -2,10 +2,13 @@ package com.tari.android.wallet.ui.fragment.utxos.list
 
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
+import com.tari.android.wallet.BuildConfig
 import com.tari.android.wallet.R
 import com.tari.android.wallet.event.Event
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.extension.getWithError
+import com.tari.android.wallet.model.MicroTari
+import com.tari.android.wallet.model.TariUtxo
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.dialog.modular.DialogArgs
 import com.tari.android.wallet.ui.dialog.modular.IDialogModule
@@ -26,6 +29,8 @@ import com.tari.android.wallet.ui.fragment.utxos.list.module.DetailItemModule
 import com.tari.android.wallet.ui.fragment.utxos.list.module.ListItemModule
 import com.tari.android.wallet.ui.fragment.utxos.list.module.UtxoAmountModule
 import com.tari.android.wallet.ui.fragment.utxos.list.module.UtxoSplitModule
+import java.math.BigInteger
+import kotlin.random.Random
 
 class UtxosListViewModel : CommonViewModel() {
 
@@ -159,8 +164,22 @@ class UtxosListViewModel : CommonViewModel() {
         val allItems = walletService.getWithError { error, wallet ->
             wallet.getAllUtxos(error)
         }.itemsList.map { UtxosViewHolderItem(it) }.filter { it.isShowingStatus }.toMutableList()
+
+        if (BuildConfig.DEBUG && allItems.isEmpty()) {
+            for (i in 0 until 20) {
+                allItems.add(0, UtxosViewHolderItem(TariUtxo().apply {
+                    value = MicroTari(BigInteger.valueOf(Random.nextLong(1, 100000) * 10000))
+                    status = TariUtxo.UtxoStatus.values()[Random.nextInt(0, 3)]
+                    timestamp = org.joda.time.DateTime.now().toDate().time
+                    minedHeight = 12243
+                    commitment = "jouoeusoanhksnqathnoeua"
+                }))
+            }
+        }
+
         val state = if (allItems.isEmpty()) ScreenState.Empty else ScreenState.Data
         screenState.postValue(state)
+
         sourceList.postValue(allItems)
     }
 

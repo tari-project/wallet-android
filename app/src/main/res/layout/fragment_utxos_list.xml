@@ -35,7 +35,6 @@
                     android:id="@+id/tile_container"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:background="@color/gray_background"
                     android:clipChildren="false"
                     android:clipToPadding="false"
                     android:orientation="horizontal"
@@ -78,6 +77,7 @@
                         android:layout_gravity="start"
                         android:drawableStart="@drawable/ic_wallet_filtering"
                         android:drawablePadding="5dp"
+                        android:drawableTint="?attr/palette_text_heading"
                         android:gravity="center_vertical"
                         android:text="@string/utxos_ordering_option_size_desc"
                         android:textColor="?attr/palette_text_heading"
@@ -102,7 +102,7 @@
 
                 </RelativeLayout>
 
-                <androidx.appcompat.widget.LinearLayoutCompat
+                <com.tari.android.wallet.ui.component.tari.TariRound
                     android:id="@+id/split_join_container"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -112,85 +112,95 @@
                     android:layout_marginBottom="32dp"
                     android:alpha="0.9"
                     android:animateLayoutChanges="true"
-                    android:background="@drawable/background_utxos_list_split_join_buttons"
                     android:orientation="vertical"
                     android:visibility="gone"
+                    app:backgroundColor="?attr/palette_overlay"
+                    app:cornerRadius="10dp"
                     tools:visibility="visible">
 
                     <androidx.appcompat.widget.LinearLayoutCompat
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_gravity="end"
                         android:animateLayoutChanges="true"
-                        android:orientation="horizontal">
+                        android:orientation="vertical">
 
-                        <com.tari.android.wallet.ui.component.tari.TariTextView
-                            android:id="@+id/combine_button_text"
+                        <androidx.appcompat.widget.LinearLayoutCompat
                             android:layout_width="wrap_content"
-                            android:layout_height="44dp"
-                            android:layout_marginStart="15dp"
-                            android:gravity="center_vertical"
-                            android:text="@string/utxos_combine_button"
-                            android:textColor="?attr/palette_text_heading"
-                            android:textSize="17sp"
-                            app:customFont="medium" />
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="end"
+                            android:animateLayoutChanges="true"
+                            android:orientation="horizontal">
 
-                        <FrameLayout
-                            android:id="@+id/join_button"
-                            android:layout_width="41dp"
-                            android:layout_height="44dp"
-                            android:layout_weight="1">
-
-                            <androidx.appcompat.widget.AppCompatImageView
+                            <com.tari.android.wallet.ui.component.tari.TariTextView
+                                android:id="@+id/combine_button_text"
                                 android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_gravity="center"
-                                android:src="@drawable/ic_utxos_list_join" />
+                                android:layout_height="44dp"
+                                android:layout_marginStart="15dp"
+                                android:gravity="center_vertical"
+                                android:text="@string/utxos_combine_button"
+                                android:textColor="?attr/palette_overlay_text"
+                                android:textSize="17sp"
+                                app:customFont="medium" />
 
-                        </FrameLayout>
+                            <FrameLayout
+                                android:id="@+id/join_button"
+                                android:layout_width="41dp"
+                                android:layout_height="44dp"
+                                android:layout_weight="1">
+
+                                <androidx.appcompat.widget.AppCompatImageView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_gravity="center"
+                                    android:src="@drawable/ic_utxos_list_join"
+                                    android:tint="?attr/palette_overlay_text" />
+
+                            </FrameLayout>
+
+                        </androidx.appcompat.widget.LinearLayoutCompat>
+
+                        <com.tari.android.wallet.ui.component.tari.TariDivider
+                            android:id="@+id/buttons_divider"
+                            android:layout_width="match_parent"
+                            android:layout_height="1dp" />
+
+                        <androidx.appcompat.widget.LinearLayoutCompat
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:animateLayoutChanges="true"
+                            android:orientation="horizontal">
+
+                            <com.tari.android.wallet.ui.component.tari.TariTextView
+                                android:id="@+id/combine_and_break_button_text"
+                                android:layout_width="wrap_content"
+                                android:layout_height="44dp"
+                                android:layout_marginStart="15dp"
+                                android:gravity="center_vertical"
+                                android:text="@string/utxos_combine_and_break_button"
+                                android:textColor="?attr/palette_overlay_text"
+                                android:textSize="17sp"
+                                app:customFont="medium" />
+
+                            <FrameLayout
+                                android:id="@+id/split_button"
+                                android:layout_width="41dp"
+                                android:layout_height="44dp"
+                                android:layout_weight="1">
+
+                                <androidx.appcompat.widget.AppCompatImageView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_gravity="center"
+                                    android:src="@drawable/ic_utxos_list_split"
+                                    android:tint="?attr/palette_overlay_text" />
+
+                            </FrameLayout>
+
+                        </androidx.appcompat.widget.LinearLayoutCompat>
 
                     </androidx.appcompat.widget.LinearLayoutCompat>
 
-                    <View
-                        android:id="@+id/buttons_divider"
-                        android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:background="@color/dark_gray" />
-
-                    <androidx.appcompat.widget.LinearLayoutCompat
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:animateLayoutChanges="true"
-                        android:orientation="horizontal">
-
-                        <com.tari.android.wallet.ui.component.tari.TariTextView
-                            android:id="@+id/combine_and_break_button_text"
-                            android:layout_width="wrap_content"
-                            android:layout_height="44dp"
-                            android:layout_marginStart="15dp"
-                            android:gravity="center_vertical"
-                            android:text="@string/utxos_combine_and_break_button"
-                            android:textColor="?attr/palette_text_heading"
-                            android:textSize="17sp"
-                            app:customFont="medium" />
-
-                        <FrameLayout
-                            android:id="@+id/split_button"
-                            android:layout_width="41dp"
-                            android:layout_height="44dp"
-                            android:layout_weight="1">
-
-                            <androidx.appcompat.widget.AppCompatImageView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_gravity="center"
-                                android:src="@drawable/ic_utxos_list_split" />
-
-                        </FrameLayout>
-
-                    </androidx.appcompat.widget.LinearLayoutCompat>
-
-                </androidx.appcompat.widget.LinearLayoutCompat>
+                </com.tari.android.wallet.ui.component.tari.TariRound>
 
             </RelativeLayout>
 

@@ -32,7 +32,7 @@
 
     <!--Components-->
     <color name="palette_purple_qr_background">#FFFFFF</color>
-    <color name="palette_purple_overlay">#28292D</color>
+    <color name="palette_purple_overlay">#3A007B</color>
     <color name="palette_purple_overlay_text">#FFFFFF</color>
 
     <!--System-->
