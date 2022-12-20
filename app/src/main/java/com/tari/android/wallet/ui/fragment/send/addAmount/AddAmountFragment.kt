@@ -32,7 +32,6 @@
  */
 package com.tari.android.wallet.ui.fragment.send.addAmount
 
-import android.animation.ObjectAnimator
 import android.animation.ValueAnimator
 import android.annotation.SuppressLint
 import android.content.Context
@@ -124,8 +123,7 @@ class AddAmountFragment : CommonFragment<FragmentAddAmountBinding, AddAmountView
         // hide tx fee
         ui.txFeeContainerView.invisible()
         // hide/disable continue button
-        ui.continueButton.invisible()
-        ui.disabledContinueButton.visible()
+        ui.continueButton.isEnabled = false
         // add first digit to the element list
         val fullEmojiIdListener = object : FullEmojiIdViewController.Listener {
             override fun animationHide(value: Float) {
@@ -155,6 +153,7 @@ class AddAmountFragment : CommonFragment<FragmentAddAmountBinding, AddAmountView
         ui.txFeeDescTextView.setOnClickListener { showTxFeeToolTip() }
         ui.oneSidePaymentHelp.setOnClickListener { showOneSidePaymentTooltip() }
         ui.continueButton.setOnClickListener { continueButtonClicked() }
+        ui.oneSidePaymentSwitchViewTitle.setOnClickListener { ui.oneSidePaymentSwitchView.isChecked = !ui.oneSidePaymentSwitchView.isChecked }
         ui.oneSidePaymentSwitchView.setOnClickListener { viewModel.toggleOneSidePayment() }
     }
 
@@ -358,12 +357,10 @@ class AddAmountFragment : CommonFragment<FragmentAddAmountBinding, AddAmountView
         private fun showErrorState(error: WalletError? = null) = with(ui) {
             if (error?.code == 115) {
                 availableBalanceContainerView.gone()
-                notEnoughBalanceDescriptionTextView.text =
-                    string(add_amount_funds_pending)
+                notEnoughBalanceDescriptionTextView.text = string(add_amount_funds_pending)
             } else {
                 availableBalanceContainerView.visible()
-                notEnoughBalanceDescriptionTextView.text =
-                    string(add_amount_not_enough_available_balance)
+                notEnoughBalanceDescriptionTextView.text = string(add_amount_not_enough_available_balance)
             }
 
             hideContinueButton()
@@ -386,19 +383,11 @@ class AddAmountFragment : CommonFragment<FragmentAddAmountBinding, AddAmountView
         }
 
         private fun showContinueButtonAnimated() = with(ui) {
-            if (continueButton.visibility == View.VISIBLE) {
-                return@with
-            }
-            continueButton.alpha = 0f
-            continueButton.visible()
-            ObjectAnimator.ofFloat(continueButton, "alpha", 0f, 1f).apply {
-                duration = Constants.UI.shortDurationMs
-                start()
-            }
+            continueButton.isEnabled = true
         }
 
         private fun hideContinueButton() = with(ui) {
-            continueButton.invisible()
+            continueButton.isEnabled = false
         }
     }
 }

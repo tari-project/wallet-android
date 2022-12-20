@@ -211,7 +211,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="2dp"
-                        android:drawableEnd="@drawable/help_icon_24dp"
+                        android:drawableEnd="@drawable/vector_help_icon_24dp"
                         android:drawablePadding="4dp"
                         android:text="@string/tx_detail_transaction_fee"
                         android:textColor="#A9AFC4"
