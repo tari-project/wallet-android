@@ -114,7 +114,7 @@ class StoreFragment : Fragment() {
                 }
             ).apply {
                 addListener(
-                    onPageStarted = { _, _, _ -> updateNavigationState() },
+                    onPageStarted = { _, _, _ -> },
                     onPageCommitVisible = { _, _ -> ui.webView.scrollTo(0, 0) },
                     onPageFinished = { webView, _ ->
                         ui.progressBar.gone()
@@ -143,17 +143,6 @@ class StoreFragment : Fragment() {
         } else {
             TariToast(requireContext(), TariToastArgs(string(store_no_application_to_open_the_link_error), Toast.LENGTH_LONG))
         }
-    }
-
-    private fun updateNavigationState() {
-        ui.browserBackCtaView.setImageDrawable(
-            if (ui.webView.canGoBack()) drawable(store_back)
-            else drawable(store_back_disabled)
-        )
-        ui.browserForwardCtaView.setImageDrawable(
-            if (ui.webView.canGoForward()) drawable(store_forward)
-            else drawable(store_forward_disabled)
-        )
     }
 
     private class WebViewState(val error: Exception?) {

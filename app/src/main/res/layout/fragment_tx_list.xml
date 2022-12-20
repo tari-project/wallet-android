@@ -418,7 +418,7 @@
                 android:layout_height="@dimen/common_scroll_height_gradient_height"
                 android:layout_below="@id/update_progress_content_container_view"
                 android:alpha="0.8"
-                android:background="@drawable/view_elevation_gradient" />
+                android:background="@drawable/vector_view_elevation_gradient" />
         </RelativeLayout>
     </com.tari.android.wallet.ui.fragment.tx.ui.CustomScrollView>
 

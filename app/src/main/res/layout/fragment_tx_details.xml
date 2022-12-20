@@ -143,7 +143,7 @@
             android:layout_width="match_parent"
             android:layout_height="@dimen/common_scroll_height_gradient_height"
             android:layout_below="@id/payment_header_view"
-            android:background="@drawable/view_elevation_gradient" />
+            android:background="@drawable/vector_view_elevation_gradient" />
 
         <ScrollView
             android:id="@+id/detail_scroll_view"
@@ -183,7 +183,7 @@
                             android:layout_marginEnd="6dp"
                             android:layout_toStartOf="@id/amount_text_view"
                             android:contentDescription="@null"
-                            android:src="@drawable/gem" />
+                            android:src="@drawable/vector_gem" />
 
                         <com.tari.android.wallet.ui.component.tari.TariTextView
                             android:id="@+id/amount_text_view"
@@ -465,7 +465,8 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_gravity="center_vertical|end"
-                            android:src="@drawable/icon_apply_setting" />
+                            android:rotation="180"
+                            android:src="@drawable/vector_back_button" />
 
                     </androidx.appcompat.widget.LinearLayoutCompat>
 

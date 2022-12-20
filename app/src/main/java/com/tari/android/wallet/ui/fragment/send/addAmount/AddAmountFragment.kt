@@ -163,9 +163,9 @@ class AddAmountFragment : CommonFragment<FragmentAddAmountBinding, AddAmountView
         ui.networkTrafficText.setVisible(true)
         ui.modifyButton.setVisible(feePerGram.networkSpeed != NetworkSpeed.Slow, View.INVISIBLE)
         val iconId = when (feePerGram.networkSpeed) {
-            NetworkSpeed.Slow -> R.drawable.ic_network_slow
-            NetworkSpeed.Medium -> R.drawable.ic_network_medium
-            NetworkSpeed.Fast -> R.drawable.ic_network_fast
+            NetworkSpeed.Slow -> R.drawable.vector_network_slow
+            NetworkSpeed.Medium -> R.drawable.vector_network_medium
+            NetworkSpeed.Fast -> R.drawable.vector_network_fast
         }
         ui.networkTrafficIcon.setImageDrawable(ContextCompat.getDrawable(requireContext(), iconId))
     }

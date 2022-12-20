@@ -83,7 +83,8 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_gravity="center_vertical|end"
-                            android:src="@drawable/icon_apply_setting" />
+                            android:rotation="180"
+                            android:src="@drawable/vector_back_button" />
 
                     </FrameLayout>
 
@@ -115,7 +116,8 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_gravity="center_vertical|end"
-                            android:src="@drawable/icon_apply_setting" />
+                            android:rotation="180"
+                            android:src="@drawable/vector_back_button" />
 
                     </FrameLayout>
 
@@ -150,7 +152,8 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_gravity="center_vertical|end"
-                            android:src="@drawable/icon_apply_setting" />
+                            android:rotation="180"
+                            android:src="@drawable/vector_back_button" />
 
                     </FrameLayout>
 

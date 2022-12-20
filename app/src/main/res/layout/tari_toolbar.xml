@@ -38,7 +38,7 @@
         android:layout_gravity="center"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="16dp"
-        android:src="@drawable/ic_plus"
+        android:src="@drawable/vector_plus"
         android:tint="?attr/palette_text_heading"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"

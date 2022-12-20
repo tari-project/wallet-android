@@ -104,7 +104,8 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
                 android:layout_marginStart="10dp"
-                android:src="@drawable/icon_apply_setting" />
+                android:rotation="180"
+                android:src="@drawable/vector_back_button" />
 
         </LinearLayout>
 

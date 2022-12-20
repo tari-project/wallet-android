@@ -165,7 +165,7 @@ class TxListFragment : CommonFragment<FragmentTxListBinding, TxListViewModel>(),
         scrollBgEnablerView.setOnTouchListener(this@TxListFragment)
         scrollView.setOnTouchListener(this@TxListFragment)
         txRecyclerView.setOnTouchListener(this@TxListFragment)
-        walletButton.ui.image.setImageResource(R.drawable.ic_wallet)
+        walletButton.ui.image.setImageResource(R.drawable.vector_wallet)
         walletButton.touchListener = { processNavigation(TxListNavigation.ToUtxos) }
 
         headerElevationView.alpha = 0F

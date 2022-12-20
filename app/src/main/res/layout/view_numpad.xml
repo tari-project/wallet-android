@@ -155,13 +155,12 @@
             android:textSize="@dimen/add_amount_keypad_text_size"
             app:customFont="heavy" />
         <!-- delete -->
-        <ImageButton
+        <com.tari.android.wallet.ui.component.tari.TariIconView
             android:id="@+id/delete_button"
             android:layout_width="0dp"
-            android:layout_height="match_parent"
+            android:layout_height="16dp"
+            android:layout_gravity="center_vertical"
             android:layout_weight="1"
-            android:background="@color/transparent"
-            android:contentDescription="@null"
             android:src="@drawable/numpad_delete" />
     </LinearLayout>
 </LinearLayout>

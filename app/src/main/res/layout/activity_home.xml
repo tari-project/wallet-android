@@ -26,7 +26,7 @@
             android:layout_width="match_parent"
             android:layout_height="@dimen/common_scroll_height_gradient_height"
             android:alpha="0.7"
-            android:background="@drawable/view_elevation_bottom_gradient"
+            android:background="@drawable/vector_view_elevation_bottom_gradient"
             app:layout_constraintBottom_toTopOf="@id/bottom_navigation_view" />
 
         <com.tari.android.wallet.ui.component.tari.TariPrimaryBackground
@@ -54,7 +54,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
-                        android:src="@drawable/icon_home" />
+                        android:src="@drawable/vector_home_icon" />
                 </FrameLayout>
 
                 <FrameLayout
@@ -68,7 +68,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
-                        android:src="@drawable/icon_ttl_store" />
+                        android:src="@drawable/vector_ttl_store_icon" />
                 </FrameLayout>
 
                 <View
@@ -88,7 +88,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
-                        android:src="@drawable/icon_profile" />
+                        android:src="@drawable/vector_profile_icon" />
                 </FrameLayout>
 
                 <FrameLayout
@@ -102,7 +102,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
-                        android:src="@drawable/icon_settings" />
+                        android:src="@drawable/vector_settings_icon" />
                 </FrameLayout>
 
             </LinearLayout>

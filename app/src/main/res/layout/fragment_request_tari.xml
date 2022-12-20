@@ -37,7 +37,7 @@
             android:layout_marginBottom="10dp"
             android:orientation="horizontal">
 
-            <com.tari.android.wallet.ui.component.tari.TariButton
+            <com.tari.android.wallet.ui.component.tari.TariGradientButton
                 android:id="@+id/generate_button"
                 android:layout_width="0dp"
                 android:layout_height="@dimen/common_action_button_height"
@@ -45,13 +45,7 @@
                 android:layout_gravity="end"
                 android:layout_marginStart="@dimen/common_horizontal_margin"
                 android:layout_weight="1"
-                android:background="@drawable/vector_disable_able_gradient_button_bg"
-                android:elevation="0dp"
-                android:text="@string/request_tari_generate_qr_code"
-                android:textAllCaps="false"
-                android:textColor="@color/button_text_color_selector"
-                android:textSize="16sp"
-                app:customFont="heavy" />
+                app:title="@string/request_tari_generate_qr_code" />
 
             <androidx.appcompat.widget.AppCompatImageButton
                 android:id="@+id/share_button"
@@ -63,7 +57,7 @@
                 android:layout_marginHorizontal="@dimen/common_horizontal_margin"
                 android:background="@drawable/vector_disable_able_gradient_button_bg"
                 android:elevation="0dp"
-                android:src="@drawable/ic_share"
+                android:src="@drawable/vector_share"
                 app:customFont="heavy" />
 
         </androidx.appcompat.widget.LinearLayoutCompat>

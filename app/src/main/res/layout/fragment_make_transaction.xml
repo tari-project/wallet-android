@@ -5,33 +5,13 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <!-- back -->
-    <com.tari.android.wallet.ui.component.tari.TariBackButton
-        android:id="@+id/back_cta_view"
-        android:layout_width="@dimen/back_button_size"
-        android:layout_height="@dimen/back_button_size"
-        android:layout_marginTop="@dimen/header_top_inset"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <!-- contact alias -->
-    <com.tari.android.wallet.ui.component.tari.TariTextView
-        android:id="@+id/title_text_view"
-        android:layout_width="wrap_content"
+    <com.tari.android.wallet.ui.component.tari.TariToolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:ellipsize="middle"
-        android:gravity="center"
-        android:paddingStart="@dimen/back_button_size"
-        android:paddingEnd="@dimen/back_button_size"
-        android:singleLine="true"
-        android:text="@string/add_amount_under_construction"
-        android:textColor="?attr/palette_text_heading"
-        android:textSize="16sp"
-        app:customFont="heavy"
-        app:layout_constraintBottom_toBottomOf="@id/back_cta_view"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@id/back_cta_view" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.appcompat.widget.LinearLayoutCompat
         android:id="@+id/main_body"
@@ -41,24 +21,23 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/back_cta_view">
+        app:layout_constraintTop_toBottomOf="@id/toolbar">
 
         <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="28dp">
 
-            <View
+            <com.tari.android.wallet.ui.component.tari.TariDivider
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
-                android:layout_gravity="bottom"
-                android:background="@color/common_divider" />
+                android:layout_gravity="bottom" />
 
             <com.tari.android.wallet.ui.component.tari.TariTabLayout
                 android:id="@+id/view_pager_indicators"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:tabIndicatorColor="@color/purple"
+                app:tabIndicatorColor="?attr/palette_brand_purple"
                 app:tabTextAppearance="@style/TabLayoutTextAppearance" />
 
         </FrameLayout>

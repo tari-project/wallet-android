@@ -60,7 +60,7 @@ class RecipientViewHolder(view: ItemAddRecipientListBinding) : CommonViewHolder<
                 ui.aliasTextView.text = item.user.alias
             }
             is YatUser -> {
-                ui.profileIconImageView.setImageResource(R.drawable.yat_logo)
+                ui.profileIconImageView.setImageResource(R.drawable.vector_yat_logo)
                 emojiIdSummaryController.display(item.user.walletAddress.emojiId)
             }
             else -> {

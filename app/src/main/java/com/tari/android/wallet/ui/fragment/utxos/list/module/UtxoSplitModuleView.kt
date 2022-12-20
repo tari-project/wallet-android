@@ -7,9 +7,11 @@ import android.view.ViewGroup
 import android.widget.SeekBar
 import com.tari.android.wallet.R
 import com.tari.android.wallet.databinding.DialogModuleUtxoSplitBinding
+import com.tari.android.wallet.model.MicroTari
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.component.common.CommonView
 import com.tari.android.wallet.util.WalletUtil
+import java.math.BigInteger
 
 @SuppressLint("ViewConstructor")
 class UtxoSplitModuleView(context: Context, val buttonModule: UtxoSplitModule) :
@@ -36,19 +38,17 @@ class UtxoSplitModuleView(context: Context, val buttonModule: UtxoSplitModule) :
     private fun updateValue(newValue: Int) {
         ui.amount.text = newValue.toString()
         buttonModule.count = newValue
-//        val previewValues = buttonModule.previewMaker(newValue, buttonModule.items)
+        val previewValues = buttonModule.previewMaker(newValue, buttonModule.items)
         val fullAmountBigInteger = buttonModule.items.map { it.value.tariValue }.sumOf { it }
         val amountText = WalletUtil.amountFormatter.format(fullAmountBigInteger)!!
         val intoAmount = context.getString(R.string.utxos_split_preview_into) + " " + newValue + " x"
-//        val feeAmount = WalletUtil.amountFormatter.format(previewValues.feeValue.tariValue)!!
-//        val mostBestAmount = MicroTari(BigInteger.valueOf(previewValues.vector.longs[0]))
-//        val coinsValues = WalletUtil.amountFormatter.format(mostBestAmount.tariValue)!! + " " + context.getString(R.string.utxos_split_preview_coins)
+        val feeAmount = WalletUtil.amountFormatter.format(previewValues.feeValue.tariValue)!!
+        val mostBestAmount = MicroTari(BigInteger.valueOf(previewValues.vector.longs[0]))
+        val coinsValues = WalletUtil.amountFormatter.format(mostBestAmount.tariValue)!! + " " + context.getString(R.string.utxos_split_preview_coins)
         ui.fullAmount.text = amountText
         ui.intoAmount.text = intoAmount
-//        ui.feeAmount.text = feeAmount
-//        ui.countCoins.text = coinsValues
-        ui.feeAmount.text = "fee heere"
-        ui.intoAmount.text = "into here"
+        ui.feeAmount.text = feeAmount
+        ui.countCoins.text = coinsValues
     }
 
     companion object {

@@ -14,12 +14,11 @@
     android:translationY="@dimen/add_amount_element_container_translation_y">
 
     <!-- gem -->
-    <androidx.appcompat.widget.AppCompatImageView
+    <com.tari.android.wallet.ui.component.tari.TariIconView
         android:id="@+id/amount_gem_image_view"
         android:layout_width="@dimen/add_amount_gem_size"
         android:layout_height="@dimen/add_amount_gem_size"
-        android:contentDescription="@null"
-        android:src="@drawable/gem" />
+        android:src="@drawable/vector_gem" />
 
     <!-- first digit (never disappears) -->
     <com.tari.android.wallet.ui.component.tari.TariTextView

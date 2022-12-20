@@ -22,7 +22,7 @@
             android:layout_height="38dp"
             android:layout_gravity="center_vertical"
             android:padding="10dp"
-            android:src="@drawable/ic_utxos_minus" />
+            android:src="@drawable/vector_utxos_minus" />
 
         <com.tari.android.wallet.ui.component.tari.TariSecondaryBackground
             android:layout_width="wrap_content"
@@ -52,7 +52,7 @@
             android:layout_height="38dp"
             android:layout_gravity="center_vertical"
             android:padding="10dp"
-            android:src="@drawable/ic_utxos_plus" />
+            android:src="@drawable/vector_utxos_plus" />
 
     </LinearLayout>
 
@@ -96,7 +96,7 @@
                     android:layout_gravity="center_vertical"
                     android:layout_marginStart="5dp"
                     android:layout_marginEnd="2dp"
-                    android:src="@drawable/gem"
+                    android:src="@drawable/vector_gem"
                     android:tint="@color/dark_gray" />
 
                 <com.tari.android.wallet.ui.component.tari.TariTextView
@@ -133,7 +133,7 @@
                     android:layout_gravity="center_vertical"
                     android:layout_marginStart="5dp"
                     android:layout_marginEnd="2dp"
-                    android:src="@drawable/gem"
+                    android:src="@drawable/vector_gem"
                     android:tint="@color/dark_gray" />
 
                 <com.tari.android.wallet.ui.component.tari.TariTextView
@@ -169,7 +169,7 @@
                     android:layout_gravity="center_vertical"
                     android:layout_marginStart="5dp"
                     android:layout_marginEnd="2dp"
-                    android:src="@drawable/gem"
+                    android:src="@drawable/vector_gem"
                     android:tint="@color/dark_gray" />
 
                 <com.tari.android.wallet.ui.component.tari.TariTextView

@@ -22,18 +22,19 @@
 
     <com.tari.android.wallet.ui.component.tari.TariProgressBar
         android:id="@+id/restore_wallet_menu_item_progress_view"
-        tools:visibility="visible"
         android:layout_width="20dp"
         android:layout_height="20dp"
         android:layout_gravity="center_vertical|end"
-        android:visibility="invisible" />
+        android:visibility="invisible"
+        tools:visibility="visible" />
 
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/restore_wallet_menu_item_arrow_image_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical|end"
-        android:src="@drawable/icon_apply_setting" />
+        android:rotation="180"
+        android:src="@drawable/vector_back_button" />
 
     <View
         android:layout_width="match_parent"

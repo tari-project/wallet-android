@@ -28,8 +28,12 @@ class ButtonView : CommonView<CommonViewModel, ViewButtonBinding> {
         ui.leftIcon.setVisible(dto.leftIconId != null)
         dto.leftIconId?.let { ui.leftIcon.setImageResource(it) }
         ui.title.text = dto.title
-        ui.icon.setImageResource(R.drawable.icon_apply_setting)
-        dto.iconId?.let { ui.icon.setImageResource(it) }
+        ui.icon.setImageResource(R.drawable.vector_back_button)
+        ui.icon.rotation = 180.0F
+        dto.iconId?.let {
+            ui.icon.setImageResource(it)
+            ui.icon.rotation = 0.0F
+        }
 
         val color = context.colorFromAttribute(
             when (dto.style) {

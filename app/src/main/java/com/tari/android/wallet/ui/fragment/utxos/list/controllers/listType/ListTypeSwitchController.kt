@@ -29,7 +29,7 @@ class ListTypeSwitchController(val icon: ImageView) {
     }
 
     private fun getListTypeIcon() : Int = when(currentState) {
-        ListType.Text -> R.drawable.ic_wallet_group_cells
-        else -> R.drawable.ic_wallet_group_list
+        ListType.Text -> R.drawable.vector_wallet_group_cells
+        else -> R.drawable.vector_wallet_group_list
     }
 }

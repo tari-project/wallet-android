@@ -182,7 +182,7 @@
                         android:layout_height="16dp"
                         android:layout_gravity="center_vertical"
                         android:layout_marginEnd="6dp"
-                        android:src="@drawable/ic_network_medium"
+                        android:src="@drawable/vector_network_medium"
                         android:tint="@color/dark_gray" />
 
                     <com.tari.android.wallet.ui.component.tari.TariTextView
@@ -292,7 +292,6 @@
                 android:layout_height="@dimen/common_action_button_height"
                 android:layout_centerVertical="true"
                 android:layout_marginHorizontal="@dimen/common_horizontal_margin"
-                android:background="@drawable/disabled_button_bg"
                 android:clickable="false"
                 android:focusable="false"
                 android:singleLine="true"
@@ -301,6 +300,7 @@
                 android:textColor="#B2B2B2"
                 android:textSize="16sp"
                 app:customFont="heavy" />
+
             <!-- actual button -->
             <com.tari.android.wallet.ui.component.tari.TariButton
                 android:id="@+id/continue_button"

@@ -13,7 +13,6 @@ import com.google.android.material.tabs.TabLayoutMediator
 import com.tari.android.wallet.R
 import com.tari.android.wallet.databinding.FragmentMakeTransactionBinding
 import com.tari.android.wallet.ui.common.CommonFragment
-import com.tari.android.wallet.ui.extension.setOnThrottledClickListener
 import com.tari.android.wallet.ui.fragment.send.addRecepient.AddRecipientFragment
 import com.tari.android.wallet.ui.fragment.send.requestTari.RequestTariFragment
 
@@ -40,7 +39,7 @@ class MakeTransactionFragment : CommonFragment<FragmentMakeTransactionBinding, M
         ui.viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
             override fun onPageSelected(position: Int) {
                 super.onPageSelected(position)
-                ui.titleTextView.setText(
+                ui.toolbar.ui.toolbarTitle.setText(
                     when (position) {
                         0 -> R.string.send_tari_title
                         else -> R.string.request_tari_title

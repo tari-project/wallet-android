@@ -29,7 +29,7 @@
                 android:layout_height="42dp"
                 android:paddingHorizontal="8dp"
                 android:paddingVertical="7dp"
-                android:src="@drawable/ic_network_slow" />
+                android:src="@drawable/vector_network_slow" />
 
             <androidx.appcompat.widget.AppCompatImageView
                 android:id="@+id/network_medium"
@@ -39,7 +39,7 @@
                 android:background="@drawable/network_segmented_picker_selected_bg"
                 android:paddingHorizontal="8dp"
                 android:paddingVertical="7dp"
-                android:src="@drawable/ic_network_medium" />
+                android:src="@drawable/vector_network_medium" />
 
             <androidx.appcompat.widget.AppCompatImageView
                 android:id="@+id/network_fast"
@@ -47,7 +47,7 @@
                 android:layout_height="42dp"
                 android:paddingHorizontal="8dp"
                 android:paddingVertical="7dp"
-                android:src="@drawable/ic_network_fast" />
+                android:src="@drawable/vector_network_fast" />
 
         </androidx.appcompat.widget.LinearLayoutCompat>
 

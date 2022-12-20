@@ -30,7 +30,7 @@ class AllSettingsViewModel : CommonViewModel() {
 
     lateinit var authenticationViewModel: BiometricAuthenticationViewModel
 
-    private val backupOption = SettingsBackupOptionViewHolderItem(leftIconId = all_settings_backup_options_icon) {
+    private val backupOption = SettingsBackupOptionViewHolderItem(leftIconId = vector_all_settings_backup_options_icon) {
         authenticationViewModel.requireAuthorization { _navigation.postValue(AllSettingsNavigation.ToBackupSettings) }
     }
 
@@ -69,63 +69,63 @@ class AllSettingsViewModel : CommonViewModel() {
             SettingsTitleDto(resourceManager.getString(all_settings_security_label)),
             backupOption,
             SettingsTitleDto(resourceManager.getString(all_settings_secondary_settings_label)),
-            ButtonViewDto(resourceManager.getString(tari_about_title), all_settings_about_icon) {
+            ButtonViewDto(resourceManager.getString(tari_about_title), vector_all_settings_about_icon) {
                 _navigation.postValue(AllSettingsNavigation.ToAbout)
             },
             DividerViewHolderItem(),
-            ButtonViewDto(resourceManager.getString(all_settings_report_a_bug), all_settings_report_bug_icon) {
+            ButtonViewDto(resourceManager.getString(all_settings_report_a_bug), vector_all_settings_report_bug_icon) {
                 _navigation.postValue(AllSettingsNavigation.ToBugReporting)
             },
             DividerViewHolderItem(),
-            ButtonViewDto(resourceManager.getString(all_settings_visit_site), all_settings_visit_tari_icon) {
+            ButtonViewDto(resourceManager.getString(all_settings_visit_site), vector_all_settings_visit_tari_icon) {
                 _openLink.postValue(resourceManager.getString(tari_url))
             },
             DividerViewHolderItem(),
-            ButtonViewDto(resourceManager.getString(all_settings_contribute), all_settings_contribute_to_tari_icon) {
+            ButtonViewDto(resourceManager.getString(all_settings_contribute), vector_all_settings_contribute_to_tari_icon) {
                 _openLink.postValue(resourceManager.getString(github_repo_url))
             },
             DividerViewHolderItem(),
-            ButtonViewDto(resourceManager.getString(all_settings_user_agreement), all_settings_user_agreement_icon) {
+            ButtonViewDto(resourceManager.getString(all_settings_user_agreement), vector_all_settings_user_agreement_icon) {
                 _openLink.postValue(resourceManager.getString(user_agreement_url))
             },
             DividerViewHolderItem(),
-            ButtonViewDto(resourceManager.getString(all_settings_privacy_policy), all_settings_privacy_policy_icon) {
+            ButtonViewDto(resourceManager.getString(all_settings_privacy_policy), vector_all_settings_privacy_policy_icon) {
                 _openLink.postValue(resourceManager.getString(privacy_policy_url))
             },
             DividerViewHolderItem(),
-            ButtonViewDto(resourceManager.getString(all_settings_disclaimer), all_settings_disclaimer_icon) {
+            ButtonViewDto(resourceManager.getString(all_settings_disclaimer), vector_all_settings_disclaimer_icon) {
                 _openLink.postValue(resourceManager.getString(disclaimer_url))
             },
             DividerViewHolderItem(),
-            ButtonViewDto(resourceManager.getString(all_settings_explorer), all_settings_block_explorer_icon) {
+            ButtonViewDto(resourceManager.getString(all_settings_explorer), vector_all_settings_block_explorer_icon) {
                 _openLink.postValue(resourceManager.getString(explorer_url))
             },
             SettingsTitleDto(resourceManager.getString(all_settings_yat_settings_label)),
-            ButtonViewDto(resourceManager.getString(all_settings_connect_yats), all_settings_yat_icon, open_in_browser_icon) {
+            ButtonViewDto(resourceManager.getString(all_settings_connect_yats), vector_all_settings_yat_icon, open_in_browser_icon) {
                 _openYatOnboarding.postValue(Unit)
             },
             SettingsTitleDto(resourceManager.getString(all_settings_advanced_settings_label)),
-            ButtonViewDto(resourceManager.getString(all_settings_select_theme), all_settings_select_theme_icon) {
+            ButtonViewDto(resourceManager.getString(all_settings_select_theme), vector_all_settings_select_theme_icon) {
                 _navigation.postValue(AllSettingsNavigation.ToThemeSelection)
             },
             DividerViewHolderItem(),
-            ButtonViewDto(resourceManager.getString(all_settings_background_service), all_settings_background_service_icon) {
+            ButtonViewDto(resourceManager.getString(all_settings_background_service), vector_all_settings_background_service_icon) {
                 _navigation.postValue(AllSettingsNavigation.ToBackgroundService)
             },
             DividerViewHolderItem(),
-            ButtonViewDto(resourceManager.getString(all_settings_bridge_configuration), all_settings_bridge_configuration_icon) {
+            ButtonViewDto(resourceManager.getString(all_settings_bridge_configuration), vector_all_settings_bridge_configuration_icon) {
                 _navigation.postValue(AllSettingsNavigation.ToTorBridges)
             },
             DividerViewHolderItem(),
-            ButtonViewDto(resourceManager.getString(all_settings_select_network), all_settings_select_network_icon) {
+            ButtonViewDto(resourceManager.getString(all_settings_select_network), vector_all_settings_select_network_icon) {
                 _navigation.postValue(AllSettingsNavigation.ToNetworkSelection)
             },
             DividerViewHolderItem(),
-            ButtonViewDto(resourceManager.getString(all_settings_select_base_node), all_settings_select_base_node_icon) {
+            ButtonViewDto(resourceManager.getString(all_settings_select_base_node), vector_all_settings_select_base_node_icon) {
                 _navigation.postValue(AllSettingsNavigation.ToBaseNodeSelection)
             },
             DividerViewHolderItem(),
-            ButtonViewDto(resourceManager.getString(all_settings_delete_wallet), all_settings_delete_button_icon, null, ButtonStyle.Warning) {
+            ButtonViewDto(resourceManager.getString(all_settings_delete_wallet), vector_all_settings_delete_button_icon, null, ButtonStyle.Warning) {
                 _navigation.postValue(AllSettingsNavigation.ToDeleteWallet)
             },
             DividerViewHolderItem(),
