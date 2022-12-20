@@ -17,7 +17,7 @@
             android:layout_height="wrap_content"
             app:text="@string/store_title"
             app:isRoot="true"
-            app:rightIcon="@drawable/store_share"/>
+            app:rightIcon="@drawable/vector_store_share"/>
 
         <FrameLayout
             android:layout_width="match_parent"

@@ -5,18 +5,23 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
+import com.tari.android.wallet.BuildConfig
 import com.tari.android.wallet.R
 import com.tari.android.wallet.application.deeplinks.DeepLink
 import com.tari.android.wallet.application.deeplinks.DeeplinkHandler
 import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import com.tari.android.wallet.extension.executeWithError
 import com.tari.android.wallet.extension.getWithError
-import com.tari.android.wallet.model.*
+import com.tari.android.wallet.model.Contact
+import com.tari.android.wallet.model.MicroTari
+import com.tari.android.wallet.model.TariWalletAddress
+import com.tari.android.wallet.model.Tx
+import com.tari.android.wallet.model.User
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.common.SingleLiveEvent
 import com.tari.android.wallet.ui.common.recyclerView.CommonViewHolderItem
-import com.tari.android.wallet.ui.fragment.send.addRecepient.list.RecipientHeaderItem
-import com.tari.android.wallet.ui.fragment.send.addRecepient.list.RecipientViewHolderItem
+import com.tari.android.wallet.ui.fragment.send.addRecepient.recipientList.RecipientHeaderItem
+import com.tari.android.wallet.ui.fragment.send.addRecepient.recipientList.RecipientViewHolderItem
 import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.extractEmojis
 import com.tari.android.wallet.yat.YatAdapter
@@ -24,7 +29,7 @@ import com.tari.android.wallet.yat.YatUser
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
-import java.util.*
+import java.util.Optional
 import javax.inject.Inject
 
 //todo needed to refactor input methods
@@ -83,18 +88,45 @@ class AddRecipientViewModel : CommonViewModel() {
     }
 
     fun displayList() {
-        val recentTxUsers = allTxs.sortedByDescending { it.timestamp }.distinctBy { it.user }.take(recentTxUsersLimit).map { it.user }
+        val recentTxUsers =
+            allTxs.asSequence().sortedByDescending { it.timestamp }.distinctBy { it.user }.take(recentTxUsersLimit).map { it.user }.toMutableList()
         val formattedList = mutableListOf<CommonViewHolderItem>()
+
+        if (recentTxUsers.isEmpty() && BuildConfig.DEBUG) {
+            for (i in 0 until 10) {
+                recentTxUsers.add(0, User().apply {
+                    tariWalletAddress = TariWalletAddress().apply {
+                        hexString = "Hex string ttt"
+                        emojiId =
+                            "\uD83D\uDC7F\uD83C\uDF54\uD83C\uDF75\uD83C\uDFAD\uD83C\uDFC8\uD83D\uDD2E\uD83D\uDE91\uD83D\uDC1C\uD83C\uDF6F\uD83D\uDC7B\uD83C\uDFBC\uD83C\uDF77\uD83C\uDFAC\uD83D\uDC95\uD83D\uDC51\uD83D\uDDFD\uD83C\uDF5E\uD83C\uDFBC\uD83D\uDE91\uD83C\uDF08\uD83C\uDFBA\uD83D\uDD26\uD83D\uDCC9\uD83C\uDF60\uD83C\uDF4D\uD83C\uDF4A\uD83C\uDF4B\uD83D\uDCDA\uD83C\uDF30\uD83C\uDF6B\uD83D\uDEAB\uD83C\uDF49\uD83C\uDF47"
+                    }
+                })
+            }
+        }
 
         if (recentTxUsers.isNotEmpty()) {
             formattedList.add(RecipientHeaderItem(resourceManager.getString(R.string.add_recipient_recent_tx_contacts), 0))
             formattedList.addAll(recentTxUsers.map { user -> RecipientViewHolderItem(user) })
         }
 
+        if (contacts.isEmpty() && BuildConfig.DEBUG) {
+            for (i in 0 until 10) {
+                contacts.add(0, Contact().apply {
+                    alias = "Test user"
+                    tariWalletAddress = TariWalletAddress().apply {
+                        hexString = "Hex string ttt"
+                        emojiId =
+                            "\uD83D\uDC7F\uD83C\uDF54\uD83C\uDF75\uD83C\uDFAD\uD83C\uDFC8\uD83D\uDD2E\uD83D\uDE91\uD83D\uDC1C\uD83C\uDF6F\uD83D\uDC7B\uD83C\uDFBC\uD83C\uDF77\uD83C\uDFAC\uD83D\uDC95\uD83D\uDC51\uD83D\uDDFD\uD83C\uDF5E\uD83C\uDFBC\uD83D\uDE91\uD83C\uDF08\uD83C\uDFBA\uD83D\uDD26\uD83D\uDCC9\uD83C\uDF60\uD83C\uDF4D\uD83C\uDF4A\uD83C\uDF4B\uD83D\uDCDA\uD83C\uDF30\uD83C\uDF6B\uD83D\uDEAB\uD83C\uDF49\uD83C\uDF47"
+                    }
+                })
+            }
+        }
+
         if (contacts.isNotEmpty()) {
             formattedList.add(RecipientHeaderItem(resourceManager.getString(R.string.add_recipient_my_contacts), formattedList.size))
             formattedList.addAll(contacts.map { user -> RecipientViewHolderItem(user) })
         }
+
         _list.postValue(formattedList)
     }
 
@@ -211,6 +243,7 @@ class AddRecipientViewModel : CommonViewModel() {
     fun getWalletAddressFromHexString(publicKeyHex: String): TariWalletAddress? =
         walletService.getWithError { _, wallet -> wallet.getWalletAddressFromHexString(publicKeyHex) }
 
-    fun getWalletAddressFromEmojiId(emojiId: String): TariWalletAddress? = walletService.getWithError { _, wallet -> wallet.getWalletAddressFromEmojiId(emojiId) }
+    fun getWalletAddressFromEmojiId(emojiId: String): TariWalletAddress? =
+        walletService.getWithError { _, wallet -> wallet.getWalletAddressFromEmojiId(emojiId) }
 }
 

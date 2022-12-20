@@ -29,10 +29,9 @@
             android:ellipsize="end"
             android:singleLine="true"
             android:text="@string/add_recipient_recent_tx_contacts"
-            android:textColor="@color/add_recipient_contact_list_section_header_title"
+            android:textColor="?attr/palette_text_body"
             android:textSize="12sp"
             app:customFont="medium" />
     </LinearLayout>
-
 
 </LinearLayout>

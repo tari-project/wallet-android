@@ -30,7 +30,7 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.tari.android.wallet.ui.fragment.send.addRecepient.list
+package com.tari.android.wallet.ui.fragment.send.addRecepient.recipientList
 
 import com.tari.android.wallet.R
 import com.tari.android.wallet.databinding.ItemAddRecipientListBinding
@@ -64,7 +64,7 @@ class RecipientViewHolder(view: ItemAddRecipientListBinding) : CommonViewHolder<
                 emojiIdSummaryController.display(item.user.walletAddress.emojiId)
             }
             else -> {
-                ui.profileIconImageView.setImageResource(R.drawable.recipient_profile_icon)
+                ui.profileIconImageView.setImageResource(R.drawable.tari_recipient_profile_icon)
                 emojiIdSummaryController.display(item.user.walletAddress.emojiId)
             }
         }

@@ -32,7 +32,7 @@
             android:layout_marginStart="4dp"
             android:ellipsize="middle"
             android:singleLine="true"
-            android:textColor="@color/common_error"
+            android:textColor="?attr/palette_system_red"
             android:textSize="@dimen/add_amount_balance_text_size"
             app:customFont="heavy"
             tools:text="124.56" />

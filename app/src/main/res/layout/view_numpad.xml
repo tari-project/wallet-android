@@ -161,6 +161,6 @@
             android:layout_height="16dp"
             android:layout_gravity="center_vertical"
             android:layout_weight="1"
-            android:src="@drawable/numpad_delete" />
+            android:src="@drawable/vector_delete_button" />
     </LinearLayout>
 </LinearLayout>

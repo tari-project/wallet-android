@@ -30,7 +30,7 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.tari.android.wallet.ui.fragment.send.addRecepient.list
+package com.tari.android.wallet.ui.fragment.send.addRecepient.recipientList
 
 import android.view.View
 import com.tari.android.wallet.databinding.ItemAddRecipientListHeaderBinding
