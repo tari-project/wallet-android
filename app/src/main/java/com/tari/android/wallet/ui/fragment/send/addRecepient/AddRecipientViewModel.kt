@@ -5,7 +5,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import com.tari.android.wallet.BuildConfig
 import com.tari.android.wallet.R
 import com.tari.android.wallet.application.deeplinks.DeepLink
 import com.tari.android.wallet.application.deeplinks.DeeplinkHandler
@@ -22,6 +21,7 @@ import com.tari.android.wallet.ui.common.SingleLiveEvent
 import com.tari.android.wallet.ui.common.recyclerView.CommonViewHolderItem
 import com.tari.android.wallet.ui.fragment.send.addRecepient.recipientList.RecipientHeaderItem
 import com.tari.android.wallet.ui.fragment.send.addRecepient.recipientList.RecipientViewHolderItem
+import com.tari.android.wallet.util.Build
 import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.extractEmojis
 import com.tari.android.wallet.yat.YatAdapter
@@ -92,7 +92,7 @@ class AddRecipientViewModel : CommonViewModel() {
             allTxs.asSequence().sortedByDescending { it.timestamp }.distinctBy { it.user }.take(recentTxUsersLimit).map { it.user }.toMutableList()
         val formattedList = mutableListOf<CommonViewHolderItem>()
 
-        if (recentTxUsers.isEmpty() && BuildConfig.DEBUG) {
+        if (recentTxUsers.isEmpty() && Build.MOCKED) {
             for (i in 0 until 10) {
                 recentTxUsers.add(0, User().apply {
                     tariWalletAddress = TariWalletAddress().apply {
@@ -109,7 +109,7 @@ class AddRecipientViewModel : CommonViewModel() {
             formattedList.addAll(recentTxUsers.map { user -> RecipientViewHolderItem(user) })
         }
 
-        if (contacts.isEmpty() && BuildConfig.DEBUG) {
+        if (contacts.isEmpty() && Build.MOCKED) {
             for (i in 0 until 10) {
                 contacts.add(0, Contact().apply {
                     alias = "Test user"

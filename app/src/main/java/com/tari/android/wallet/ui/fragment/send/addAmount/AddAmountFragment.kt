@@ -44,6 +44,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.daasuu.ei.Ease
 import com.daasuu.ei.EasingInterpolator
+import com.tari.android.wallet.BuildConfig
 import com.tari.android.wallet.R
 import com.tari.android.wallet.R.string.*
 import com.tari.android.wallet.databinding.FragmentAddAmountBinding
@@ -62,11 +63,13 @@ import com.tari.android.wallet.ui.fragment.send.addAmount.feeModule.NetworkSpeed
 import com.tari.android.wallet.ui.fragment.send.addAmount.keyboard.KeyboardController
 import com.tari.android.wallet.ui.fragment.send.amountView.AmountStyle
 import com.tari.android.wallet.ui.fragment.send.common.TransactionData
+import com.tari.android.wallet.util.Build
 import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.WalletUtil
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.lang.ref.WeakReference
+import java.math.BigInteger
 
 class AddAmountFragment : CommonFragment<FragmentAddAmountBinding, AddAmountViewModel>() {
 
@@ -122,6 +125,7 @@ class AddAmountFragment : CommonFragment<FragmentAddAmountBinding, AddAmountView
         recipientUser = arguments?.parcelable(HomeActivity.PARAMETER_USER)
         // hide tx fee
         ui.txFeeContainerView.invisible()
+
         // hide/disable continue button
         ui.continueButton.isEnabled = false
         // add first digit to the element list
@@ -225,9 +229,18 @@ class AddAmountFragment : CommonFragment<FragmentAddAmountBinding, AddAmountView
     }
 
     private fun checkAmountAndFee() {
-        val error = WalletError()
-        val balanceInfo = viewModel.walletService.getBalanceInfo(error)
-        val fee = viewModel.selectedFeeData?.calculatedFee
+        var error = WalletError()
+        var balanceInfo = viewModel.walletService.getBalanceInfo(error)
+        var fee = viewModel.selectedFeeData?.calculatedFee
+
+        if (BuildConfig.DEBUG) {
+            balanceInfo = BalanceInfo().apply {
+                availableBalance = MicroTari(BigInteger("1000000"))
+            }
+            fee = MicroTari(BigInteger("10"))
+            error = WalletError.NoError
+        }
+
         val amount = keyboardController.currentAmount
         if (error == WalletError.NoError && fee != null) {
             if (amount > balanceInfo.availableBalance) {
@@ -294,20 +307,21 @@ class AddAmountFragment : CommonFragment<FragmentAddAmountBinding, AddAmountView
 
             updateBalanceInfo()
 
-            if ((keyboardController.currentAmount + viewModel.selectedFeeData?.calculatedFee!!) > availableBalance) {
+            if (!Build.MOCKED && (keyboardController.currentAmount + viewModel.selectedFeeData?.calculatedFee!!) > availableBalance) {
                 showErrorState()
             } else {
-                showSuccessState(viewModel.selectedFeeData?.calculatedFee!!)
+                showSuccessState()
             }
         }
 
         @SuppressLint("SetTextI18n")
-        private fun showSuccessState(fee: MicroTari) = with(ui) {
+        private fun showSuccessState() = with(ui) {
+            val fee = viewModel.selectedFeeData?.calculatedFee!!
             notEnoughBalanceDescriptionTextView.text = string(add_amount_wallet_balance)
             availableBalanceContainerView.visible()
 
             txFeeTextView.text = "+${WalletUtil.amountFormatter.format(fee.tariValue)}"
-            val showsTxFee: Boolean = if (keyboardController.currentAmount.value.toInt() == 0) {
+            val showsTxFee: Boolean = if (!Build.MOCKED || keyboardController.currentAmount.value.toInt() == 0) {
                 hideContinueButton()
                 false
             } else {
