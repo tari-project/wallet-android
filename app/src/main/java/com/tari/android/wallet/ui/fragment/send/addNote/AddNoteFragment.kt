@@ -50,7 +50,7 @@ import android.widget.RelativeLayout
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.animation.addListener
 import androidx.core.widget.addTextChangedListener
-import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -62,7 +62,6 @@ import com.tari.android.wallet.R
 import com.tari.android.wallet.R.color.*
 import com.tari.android.wallet.R.dimen.*
 import com.tari.android.wallet.databinding.FragmentAddNoteBinding
-import com.tari.android.wallet.di.DiContainer.appComponent
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.extension.observe
 import com.tari.android.wallet.model.Contact
@@ -70,6 +69,7 @@ import com.tari.android.wallet.model.MicroTari
 import com.tari.android.wallet.model.TxNote
 import com.tari.android.wallet.model.User
 import com.tari.android.wallet.network.NetworkConnectionState
+import com.tari.android.wallet.ui.common.CommonFragment
 import com.tari.android.wallet.ui.common.gyphy.repository.GIFItem
 import com.tari.android.wallet.ui.component.fullEmojiId.EmojiIdSummaryViewController
 import com.tari.android.wallet.ui.component.fullEmojiId.FullEmojiIdViewController
@@ -79,16 +79,8 @@ import com.tari.android.wallet.ui.fragment.send.addNote.gif.*
 import com.tari.android.wallet.ui.fragment.send.addNote.gif.ThumbnailGIFsViewModel.Companion.REQUEST_CODE_GIF
 import com.tari.android.wallet.ui.fragment.send.common.TransactionData
 import com.tari.android.wallet.util.Constants
-import java.lang.ref.WeakReference
 
-/**
- * Add a note to the transaction & send it through this fragment.
- *
- * @author The Tari Development Team
- */
-class AddNoteFragment : Fragment(), View.OnTouchListener {
-
-    private lateinit var addNodeListenerWR: WeakReference<AddNodeListener>
+class AddNoteFragment : CommonFragment<FragmentAddNoteBinding, AddNoteViewModel>(), View.OnTouchListener {
 
     // slide button animation related variables
     private var slideButtonXDelta = 0
@@ -107,16 +99,9 @@ class AddNoteFragment : Fragment(), View.OnTouchListener {
     private lateinit var amount: MicroTari
     private var isOneSidePayment: Boolean = false
 
-    private lateinit var ui: FragmentAddNoteBinding
-    private lateinit var viewModel: ThumbnailGIFsViewModel
+    private lateinit var gifViewModel: ThumbnailGIFsViewModel
     private lateinit var gifContainer: GIFContainer
     private lateinit var adapter: GIFThumbnailAdapter
-
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-        appComponent.inject(this)
-        addNodeListenerWR = WeakReference(context as AddNodeListener)
-    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?) =
         FragmentAddNoteBinding.inflate(inflater, container, false).also { ui = it }.root
@@ -124,6 +109,10 @@ class AddNoteFragment : Fragment(), View.OnTouchListener {
     @SuppressLint("ClickableViewAccessibility")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        val viewModel: AddNoteViewModel by viewModels()
+        bindViewModel(viewModel)
+
         initializeGIFsViewModel()
         retrievePageArguments(savedInstanceState)
         setupUI(savedInstanceState)
@@ -131,8 +120,8 @@ class AddNoteFragment : Fragment(), View.OnTouchListener {
     }
 
     private fun initializeGIFsViewModel() {
-        viewModel = ViewModelProvider(this)[ThumbnailGIFsViewModel::class.java]
-        observe(viewModel.state) {
+        gifViewModel = ViewModelProvider(this)[ThumbnailGIFsViewModel::class.java]
+        observe(gifViewModel.state) {
             if (it.isSuccessful) {
                 adapter.repopulate(it.gifItems!!)
             }
@@ -200,7 +189,7 @@ class AddNoteFragment : Fragment(), View.OnTouchListener {
         // disable "send" slider
         disableCallToAction()
         focusEditTextAndShowKeyboard()
-        ui.promptTextView.setTextColor(color(black))
+        ui.promptTextView.setTextColor(viewModel.paletteManager.getTextHeading(requireContext()))
         ui.noteEditText.imeOptions = EditorInfo.IME_ACTION_DONE
         ui.thumbnailGifsRecyclerView.also {
             val margin = dimen(add_note_gif_inner_margin).toInt()
@@ -212,10 +201,10 @@ class AddNoteFragment : Fragment(), View.OnTouchListener {
 
     private fun updateSliderState() {
         if (ui.noteEditText.text?.toString().isNullOrEmpty() && gifContainer.gifItem == null) {
-            ui.promptTextView.setTextColor(color(black))
+            ui.promptTextView.setTextColor(viewModel.paletteManager.getTextHeading(requireContext()))
             disableCallToAction()
         } else {
-            ui.promptTextView.setTextColor(color(add_note_prompt_passive_color))
+            ui.promptTextView.setTextColor(viewModel.paletteManager.getTextBody(requireContext()))
             enableCallToAction()
         }
     }
@@ -347,6 +336,7 @@ class AddNoteFragment : Fragment(), View.OnTouchListener {
                 val layoutParams = view.layoutParams as RelativeLayout.LayoutParams
                 slideButtonXDelta = x - layoutParams.marginStart
             }
+
             MotionEvent.ACTION_MOVE -> {
                 val layoutParams = view.layoutParams as RelativeLayout.LayoutParams
                 val newLeftMargin = x - slideButtonXDelta
@@ -368,6 +358,7 @@ class AddNoteFragment : Fragment(), View.OnTouchListener {
 
                 view.layoutParams = layoutParams
             }
+
             MotionEvent.ACTION_UP -> if (slideButtonLastMarginStart < slideButtonContainerWidth / 2) {
                 ValueAnimator.ofInt(slideButtonLastMarginStart, dimenPx(add_note_slide_button_left_margin)).apply {
                     addUpdateListener { valueAnimator: ValueAnimator ->
@@ -449,7 +440,7 @@ class AddNoteFragment : Fragment(), View.OnTouchListener {
         // notify listener (i.e. activity)
         val note = TxNote(ui.noteEditText.editableText.toString(), gifContainer.gifItem?.embedUri?.toString()).compose()
         val newData = transactionData.copy(note = note)
-        addNodeListenerWR.get()?.continueToFinalizeSendTx(newData)
+        (requireContext() as? AddNodeListener)?.continueToFinalizeSendTx(newData)
     }
 
     private fun restoreSlider() {

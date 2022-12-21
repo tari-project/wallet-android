@@ -55,6 +55,7 @@ import com.tari.android.wallet.ui.fragment.restore.inputSeedWords.InputSeedWords
 import com.tari.android.wallet.ui.fragment.restore.walletRestoringFromSeedWords.WalletRestoringFromSeedWordsViewModel
 import com.tari.android.wallet.ui.fragment.send.addAmount.AddAmountViewModel
 import com.tari.android.wallet.ui.fragment.send.addNote.AddNoteFragment
+import com.tari.android.wallet.ui.fragment.send.addNote.AddNoteViewModel
 import com.tari.android.wallet.ui.fragment.send.addNote.gif.ChooseGIFDialogFragment
 import com.tari.android.wallet.ui.fragment.send.addNote.gif.ThumbnailGIFsViewModel
 import com.tari.android.wallet.ui.fragment.send.addRecepient.AddRecipientFragment
@@ -164,6 +165,7 @@ interface ApplicationComponent {
     fun inject(viewModel: HomeViewModel)
     fun inject(viewModel: EnterCurrentPasswordViewModel)
     fun inject(viewModel: ChangeSecurePasswordViewModel)
+    fun inject(viewModel: AddNoteViewModel)
 
     fun getClipboardManager(): ClipboardManager
 }
