@@ -81,7 +81,7 @@ class LocalAuthFragment : CommonFragment<FragmentLocalAuthBinding, LocalAuthView
 
     private fun setupUi() = with(ui) {
         progressBarContainerView.invisible()
-        progressBar.setColor(color(R.color.white))
+        progressBar.setWhite()
         if (viewModel.authType.value == BiometricAuthenticationType.BIOMETRIC) {
             //setup ui for biometric auth
             authTypeImageView.setImageResource(R.drawable.fingerprint)

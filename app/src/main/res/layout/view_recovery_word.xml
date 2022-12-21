@@ -6,12 +6,12 @@
     android:layout_height="wrap_content"
     android:layout_marginHorizontal="5dp"
     android:layout_marginVertical="5dp"
-    android:background="@drawable/restoring_seed_phrase_word_background"
+    android:background="@drawable/vector_restoring_seed_phrase_word_background"
     android:orientation="horizontal"
     android:paddingVertical="5dp"
     android:paddingStart="13dp">
 
-    <com.tari.android.wallet.ui.component.CustomFontEditText
+    <com.tari.android.wallet.ui.component.tari.TariEditText
         android:id="@+id/text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -22,7 +22,7 @@
         android:inputType="textVisiblePassword"
         android:singleLine="true"
         android:textSize="14sp"
-        app:customFont="@string/font_heavy"
+        app:customFont="heavy"
         tools:text="text" />
 
     <androidx.appcompat.widget.AppCompatImageView
@@ -32,6 +32,6 @@
         android:layout_gravity="center_vertical"
         android:paddingStart="5dp"
         android:paddingEnd="7dp"
-        android:src="@drawable/close" />
+        android:src="@drawable/vector_close" />
 
 </LinearLayout>

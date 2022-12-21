@@ -61,14 +61,13 @@ class UtxosListFragment : CommonFragment<FragmentUtxosListBinding, UtxosListView
     }
 
     private fun setupCTA() {
-        ui.backCtaView.setOnClickListener { requireActivity().onBackPressed() }
         ui.orderingState.setOnClickListener { viewModel.showOrderingSelectionDialog() }
         ui.joinButton.setOnClickListener { viewModel.join() }
         ui.splitButton.setOnClickListener { viewModel.split() }
     }
 
     private fun setupUI() {
-        listTypeSwitchController = ListTypeSwitchController(ui.typeListSelector)
+        listTypeSwitchController = ListTypeSwitchController(ui.toolbarContainer.ui.toolbarRightIcon)
         listTypeSwitchController.toggleCallback = { viewModel.setTypeList(it) }
         listTypeSwitchController.set(ListType.Tile)
 

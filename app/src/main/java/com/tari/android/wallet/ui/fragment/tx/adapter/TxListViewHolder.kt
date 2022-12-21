@@ -15,8 +15,8 @@ import com.tari.android.wallet.ui.common.gyphy.presentation.GlideGIFListener
 import com.tari.android.wallet.ui.common.gyphy.repository.GIFItem
 import com.tari.android.wallet.ui.common.recyclerView.CommonViewHolder
 import com.tari.android.wallet.ui.common.recyclerView.ViewHolderBuilder
-import com.tari.android.wallet.ui.component.CustomFont
-import com.tari.android.wallet.ui.component.EmojiIdSummaryViewController
+import com.tari.android.wallet.ui.component.tari.TariFont
+import com.tari.android.wallet.ui.component.fullEmojiId.EmojiIdSummaryViewController
 import com.tari.android.wallet.ui.extension.*
 import com.tari.android.wallet.model.TxNote
 import com.tari.android.wallet.util.WalletUtil
@@ -32,10 +32,6 @@ class TxListViewHolder(view: ItemHomeTxListBinding) : CommonViewHolder<Transacti
     private val glide = Glide.with(itemView.context)
     private val emojiIdSummaryController = EmojiIdSummaryViewController(ui.participantEmojiIdView)
     private lateinit var tx: Tx
-
-    init {
-        ui.gifContainer.loadingGifProgressBar.setColor(color(R.color.tx_list_loading_gif_gray))
-    }
 
     override fun bind(item: TransactionItem) {
         super.bind(item)
@@ -88,9 +84,9 @@ class TxListViewHolder(view: ItemHomeTxListBinding) : CommonViewHolder<Transacti
                 ui.participantTextView1.visible()
                 ui.participantTextView1.text = fullText.applyFontStyle(
                     itemView.context,
-                    CustomFont.AVENIR_LT_STD_LIGHT,
+                    TariFont.AVENIR_LT_STD_LIGHT,
                     listOf(txUser.alias),
-                    CustomFont.AVENIR_LT_STD_HEAVY
+                    TariFont.AVENIR_LT_STD_HEAVY
                 )
                 ui.participantEmojiIdView.root.gone()
                 ui.participantTextView2.gone()

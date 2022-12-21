@@ -1,58 +1,65 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+
+<com.tari.android.wallet.ui.component.tari.TariPrimaryBackground xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/background_choose_gif_dialog"
-    android:orientation="vertical">
-
-    <View
-        android:layout_width="36dp"
-        android:layout_height="5dp"
-        android:layout_gravity="center"
-        android:layout_marginTop="8dp"
-        android:background="@drawable/grabber_choose_gif" />
+    app:cornerRadius="10dp">
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="38dp"
-        android:layout_marginHorizontal="25dp"
-        android:layout_marginTop="15dp"
-        android:background="@drawable/background_choose_gif_dialog_input"
-        android:orientation="horizontal">
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
-        <ImageView
-            android:layout_width="16dp"
-            android:layout_height="16dp"
+        <View
+            android:layout_width="36dp"
+            android:layout_height="5dp"
             android:layout_gravity="center"
-            android:layout_marginStart="16dp"
-            android:src="@drawable/ic_search"
-            tools:ignore="ContentDescription" />
+            android:layout_marginTop="8dp"
+            android:background="@drawable/grabber_choose_gif" />
 
-        <com.tari.android.wallet.ui.component.CustomFontEditText
-            android:id="@+id/gif_search_edit_text"
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="38dp"
+            android:layout_marginHorizontal="25dp"
+            android:layout_marginTop="15dp"
+            android:background="@drawable/background_choose_gif_dialog_input"
+            android:orientation="horizontal">
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:layout_gravity="center"
+                android:layout_marginStart="16dp"
+                android:src="@drawable/ic_search"
+                 />
+
+            <com.tari.android.wallet.ui.component.tari.TariEditText
+                android:id="@+id/gif_search_edit_text"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:layout_marginStart="16dp"
+                android:autofillHints="gif"
+                android:background="@null"
+                android:hint="@string/search_gifs_dialog_hint"
+                android:inputType="text"
+                android:textColorHint="@color/add_recipient_hint"
+                android:textSize="14sp"
+                app:customFont="medium" />
+        </LinearLayout>
+
+        <com.giphy.sdk.ui.views.GiphyGridView
+            android:id="@+id/giphy_grid_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_gravity="center"
-            android:layout_marginStart="16dp"
-            android:autofillHints="gif"
-            android:background="@null"
-            android:hint="@string/search_gifs_dialog_hint"
-            android:inputType="text"
-            android:textColorHint="@color/add_recipient_hint"
-            android:textSize="14sp"
-            app:customFont="@string/font_medium" />
+            android:layout_marginHorizontal="25dp"
+            android:layout_marginTop="15dp"
+            app:gphCellPadding="5dp"
+            app:gphDirection="vertical"
+            app:gphSpanCount="2" />
+
     </LinearLayout>
 
-    <com.giphy.sdk.ui.views.GiphyGridView
-        android:id="@+id/giphy_grid_view"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginHorizontal="25dp"
-        android:layout_marginTop="15dp"
-        app:gphCellPadding="5dp"
-        app:gphDirection="vertical"
-        app:gphSpanCount="2" />
-
-</LinearLayout>
+</com.tari.android.wallet.ui.component.tari.TariPrimaryBackground>

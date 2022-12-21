@@ -32,8 +32,6 @@
  */
 package com.tari.android.wallet.di
 
-import com.tari.android.wallet.service.faucet.NoOpTestnetFaucetService
-import com.tari.android.wallet.service.faucet.TestnetFaucetService
 import com.tari.android.wallet.service.notification.NoOpNotificationService
 import com.tari.android.wallet.service.notification.NotificationService
 import dagger.Module
@@ -46,9 +44,4 @@ class ServiceModule {
     @Provides
     @Singleton
     fun provideNotificationService(): NotificationService = NoOpNotificationService()
-
-    @Provides
-    @Singleton
-    fun provideTestnetFaucetService(): TestnetFaucetService = NoOpTestnetFaucetService()
-
 }

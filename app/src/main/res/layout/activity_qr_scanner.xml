@@ -40,7 +40,7 @@
         app:layout_constraintDimensionRatio="3:1"
         app:layout_constraintTop_toBottomOf="@id/qr_close_view">
 
-        <com.tari.android.wallet.ui.component.CustomFontTextView
+        <com.tari.android.wallet.ui.component.tari.TariTextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:gravity="center"
@@ -49,9 +49,9 @@
             android:paddingRight="32dp"
             android:text="@string/add_recipient_scan_qr_description"
             android:textAlignment="center"
-            android:textColor="@color/white"
+            android:textColor="?attr/palette_text_light"
             android:textSize="16sp"
-            app:customFont="@string/font_heavy" />
+            app:customFont="heavy" />
 
     </LinearLayout>
 

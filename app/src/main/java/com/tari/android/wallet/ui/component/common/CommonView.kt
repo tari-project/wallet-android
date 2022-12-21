@@ -11,6 +11,7 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.viewbinding.ViewBinding
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.common.DialogManager
+import com.tari.android.wallet.ui.component.tari.toast.TariToast
 import com.tari.android.wallet.ui.dialog.modular.ModularDialog
 
 abstract class CommonView<VM : CommonViewModel, VB : ViewBinding> : LinearLayout {
@@ -60,5 +61,7 @@ abstract class CommonView<VM : CommonViewModel, VB : ViewBinding> : LinearLayout
         viewModel.dismissDialog.observe(viewLifecycle) { dialogManager.dismiss() }
 
         viewModel.loadingDialog.observe(viewLifecycle) { dialogManager.handleProgress(it) }
+
+        viewModel.showToast.observe(viewLifecycle) { TariToast(context, it) }
     }
 }

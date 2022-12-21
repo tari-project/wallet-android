@@ -6,7 +6,7 @@
     android:layout_marginHorizontal="6dp"
     android:background="@color/finalize_send_progress_bar_passive_bg">
 
-    <ProgressBar
+    <com.tari.android.wallet.ui.component.tari.TariProgressBar
         android:id="@+id/step_progress_bar"
         style="?android:attr/progressBarStyleHorizontal"
         android:layout_width="match_parent"

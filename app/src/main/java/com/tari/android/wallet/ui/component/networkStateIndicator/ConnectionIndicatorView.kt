@@ -38,7 +38,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import com.tari.android.wallet.databinding.ViewConnectionIndicatorBinding
 import com.tari.android.wallet.extension.observe
-import com.tari.android.wallet.ui.component.MainListTouchingView
+import com.tari.android.wallet.ui.component.mainList.MainListTouchingView
 
 
 class ConnectionIndicatorView : MainListTouchingView<ConnectionIndicatorViewModel, ViewConnectionIndicatorBinding> {

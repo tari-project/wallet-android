@@ -43,7 +43,11 @@ import android.os.Looper
 import android.text.Editable
 import android.text.InputType
 import android.text.TextWatcher
-import android.view.*
+import android.view.Gravity
+import android.view.LayoutInflater
+import android.view.MotionEvent
+import android.view.View
+import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import android.widget.TextView
 import androidx.core.animation.addListener
@@ -56,10 +60,13 @@ import androidx.transition.TransitionManager
 import com.daasuu.ei.Ease
 import com.daasuu.ei.EasingInterpolator
 import com.tari.android.wallet.R
-import com.tari.android.wallet.R.color.*
+import com.tari.android.wallet.R.color.black
+import com.tari.android.wallet.R.color.light_gray
 import com.tari.android.wallet.R.dimen.add_recipient_clipboard_emoji_id_container_height
 import com.tari.android.wallet.R.dimen.add_recipient_paste_emoji_id_button_visible_top_margin
-import com.tari.android.wallet.R.string.*
+import com.tari.android.wallet.R.string.add_recipient_invalid_emoji_id
+import com.tari.android.wallet.R.string.add_recipient_own_emoji_id
+import com.tari.android.wallet.R.string.emoji_id_chunk_separator
 import com.tari.android.wallet.application.deeplinks.DeepLink
 import com.tari.android.wallet.application.deeplinks.DeeplinkHandler
 import com.tari.android.wallet.application.deeplinks.DeeplinkViewModel
@@ -72,14 +79,29 @@ import com.tari.android.wallet.model.TariWalletAddress
 import com.tari.android.wallet.ui.common.CommonFragment
 import com.tari.android.wallet.ui.common.domain.ResourceManager
 import com.tari.android.wallet.ui.common.recyclerView.CommonAdapter
-import com.tari.android.wallet.ui.extension.*
+import com.tari.android.wallet.ui.extension.color
+import com.tari.android.wallet.ui.extension.dimenPx
+import com.tari.android.wallet.ui.extension.gone
+import com.tari.android.wallet.ui.extension.hideKeyboard
+import com.tari.android.wallet.ui.extension.postDelayed
+import com.tari.android.wallet.ui.extension.setBottomMargin
+import com.tari.android.wallet.ui.extension.setSelectionToEnd
+import com.tari.android.wallet.ui.extension.setTopMargin
+import com.tari.android.wallet.ui.extension.setVisible
+import com.tari.android.wallet.ui.extension.string
+import com.tari.android.wallet.ui.extension.temporarilyDisableClick
+import com.tari.android.wallet.ui.extension.visible
 import com.tari.android.wallet.ui.fragment.qr.QRScannerActivity
 import com.tari.android.wallet.ui.fragment.qr.QRScannerActivity.Companion.EXTRA_QR_DATA
-import com.tari.android.wallet.ui.fragment.send.addRecepient.list.RecipientListAdapter
-import com.tari.android.wallet.ui.fragment.send.addRecepient.list.RecipientViewHolderItem
-import com.tari.android.wallet.util.*
+import com.tari.android.wallet.ui.fragment.send.addRecepient.recipientList.RecipientListAdapter
+import com.tari.android.wallet.ui.fragment.send.addRecepient.recipientList.RecipientViewHolderItem
+import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.Constants.Wallet.emojiFormatterChunkSize
 import com.tari.android.wallet.util.Constants.Wallet.emojiIdLength
+import com.tari.android.wallet.util.EmojiUtil
+import com.tari.android.wallet.util.containsNonEmoji
+import com.tari.android.wallet.util.firstNCharactersAreEmojis
+import com.tari.android.wallet.util.numberOfEmojis
 import com.tari.android.wallet.yat.YatUser
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -218,7 +240,7 @@ class AddRecipientFragment : CommonFragment<FragmentAddRecipientBinding, AddReci
         ui.contactsListRecyclerView.addOnScrollListener(scrollListener)
         ui.contactsListRecyclerView.addOnItemTouchListener(this)
         ui.scrollDepthGradientView.alpha = 0f
-        ui.progressBar.setColor(color(add_recipient_progress_bar))
+        ui.progressBar.setWhite()
         ui.progressBar.visible()
         ui.continueButton.gone()
         ui.invalidEmojiIdTextView.gone()

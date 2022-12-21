@@ -54,8 +54,8 @@ import com.tari.android.wallet.model.Tx.Direction.OUTBOUND
 import com.tari.android.wallet.model.TxStatus.*
 import com.tari.android.wallet.ui.animation.collapseAndHideAnimation
 import com.tari.android.wallet.ui.common.CommonFragment
-import com.tari.android.wallet.ui.component.EmojiIdSummaryViewController
-import com.tari.android.wallet.ui.component.FullEmojiIdViewController
+import com.tari.android.wallet.ui.component.fullEmojiId.EmojiIdSummaryViewController
+import com.tari.android.wallet.ui.component.fullEmojiId.FullEmojiIdViewController
 import com.tari.android.wallet.ui.dialog.modular.DialogArgs
 import com.tari.android.wallet.ui.dialog.modular.ModularDialog
 import com.tari.android.wallet.ui.dialog.modular.ModularDialogArgs
@@ -148,7 +148,6 @@ class TxDetailsFragment : CommonFragment<FragmentTxDetailsBinding, TxDetailsView
         fullEmojiIdViewController = FullEmojiIdViewController(ui.emojiIdOuterContainer, ui.emojiIdSummaryView, requireContext())
         emojiIdSummaryController = EmojiIdSummaryViewController(ui.emojiIdSummaryView)
         ui.gifContainer.root.invisible()
-        ui.gifContainer.loadingGifProgressBar.setColor(color(tx_list_loading_gif_gray))
     }
 
     private fun disableCTAs() {
@@ -166,7 +165,6 @@ class TxDetailsFragment : CommonFragment<FragmentTxDetailsBinding, TxDetailsView
     }
 
     private fun setUICommands() {
-        ui.backView.setOnClickListener { requireActivity().onBackPressed() }
         ui.emojiIdSummaryContainerView.setOnClickListener { onEmojiSummaryClicked(it) }
         ui.feeLabelTextView.setOnClickListener { showTxFeeToolTip() }
         ui.addContactButton.setOnClickListener { onAddContactClick() }

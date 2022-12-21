@@ -44,9 +44,6 @@ class TxListViewModel : CommonViewModel() {
     @Inject
     lateinit var sharedPrefsWrapper: SharedPrefsRepository
 
-    @Inject
-    lateinit var tariSettingsSharedRepository: TariSettingsSharedRepository
-
     lateinit var progressControllerState: UpdateProgressViewController.UpdateProgressState
 
     private val cancelledTxs = CopyOnWriteArrayList<CancelledTx>()
@@ -420,17 +417,6 @@ class TxListViewModel : CommonViewModel() {
             _navigation.postValue(TxListNavigation.ToTTLStore)
         }
         _modularDialog.postValue(args.getModular(resourceManager))
-    }
-
-    private fun sendTariToUser(tariWalletAddress: TariWalletAddress) {
-        val error = WalletError()
-        val contacts = walletService.getContacts(error)
-        val recipientUser = when (error) {
-            WalletError.NoError -> contacts.firstOrNull { it.walletAddress == tariWalletAddress } ?: User(tariWalletAddress)
-            else -> User(tariWalletAddress)
-        }
-
-        _navigation.postValue(TxListNavigation.ToSendTariToUser(recipientUser))
     }
 
     companion object {

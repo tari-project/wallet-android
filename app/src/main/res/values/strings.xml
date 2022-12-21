@@ -49,6 +49,7 @@
     <string name="dummy_message">Thanks again for helping with my move</string>
     <string name="long_dummy_message">Thanks again for helping with my move. Thanks again for helping with my move. Thanks again for helping with my move. Thanks again for helping with my move</string>
     <string name="dummy_emoji">🍀</string>
+    <string name="dummy_text">Test text</string>
 
     <!-- notifications -->
     <string name="wallet_service_notification_channel_name">Tari Aurora Service Notification Channel</string>
@@ -383,6 +384,14 @@
     <string name="debug_edit_base_node_invalid_public_key">Invalid public key hex.</string>
     <string name="debug_edit_base_node_invalid_address">Invalid address.</string>
     <string name="debug_edit_base_node_failed">Couldn\'t add base node peer.</string>
+
+    <string name="select_theme_title">Select theme</string>
+    <string name="select_theme_description">Select a theme below to change the color scheme</string>
+    <string name="select_theme_dark">Dark</string>
+    <string name="select_theme_light">Light</string>
+    <string name="select_theme_purple">Purple</string>
+    <string name="select_theme_app_based">System</string>
+
     <!-- about -->
 
     <!-- In-app store -->
@@ -408,6 +417,7 @@
     <string name="all_settings_bridge_configuration">Bridge Configuration</string>
     <string name="all_settings_connect_yats">Connect Yats</string>
     <string name="all_settings_select_base_node">Select Base Node</string>
+    <string name="all_settings_select_theme">Select Theme</string>
     <string name="all_settings_select_network">Select Network</string>
     <string name="all_settings_select_network_recommended">(Recommended)</string>
     <string name="all_settings_select_network_description">Please select the network to which you want to connect</string>
@@ -528,7 +538,7 @@
 
     <!--Enter backup password-->
     <string name="enter_backup_password_page_title">Enter your current backup password</string>
-    <string name="enter_backup_password_page_description">Enter your backup password in order to change it to something different.</string>
+    <string name="enter_backup_password_page_description">Enter your backup password in order to change it to something different</string>
     <string name="enter_backup_password_enter_password_label">Enter Password</string>
     <string name="enter_backup_password_password_match_error">That’s not it!</string>
     <string name="enter_backup_password_change_password_cta">Change Password</string>
@@ -582,6 +592,7 @@
     <string name="tari_about_icon_url_privacy">https://thenounproject.com/icon/privacy-1381695/</string>
     <string name="tari_about_icon_url_bullhorn">https://thenounproject.com/icon/bullhorn-4213159/</string>
     <string name="tari_about_icon_url_refresh">https://thenounproject.com/icon/refresh-1043971/</string>
+    <string name="tari_about_icon_url_select_theme">https://thenounproject.com/icon/theme-396505/</string>
     <string name="tari_about_icon_url_magnifier">https://thenounproject.com/icon/magnifier-4213152/</string>
     <string name="tari_about_icon_url_repair">https://thenounproject.com/icon/repair-tools-4213156/</string>
     <string name="tari_about_icon_url_server">https://thenounproject.com/icon/internet-server-4213144/</string>
@@ -596,6 +607,7 @@
     <string name="tari_about_icon_text_privacy">Privacy by Gregor Cresnar from\nNounProject.com</string>
     <string name="tari_about_icon_text_bullhorn">Bullhorn by Design Circle from\nNounProject.com</string>
     <string name="tari_about_icon_text_refresh">Magnifier by Design Circle from\nNounProject.com (Modified)</string>
+    <string name="tari_about_icon_text_select_theme">Theme by icon 54 from\nNounProject.com (Modified)</string>
     <string name="tari_about_icon_text_magnifier">Refresh by Poombatta from\nNounProject.com</string>
     <string name="tari_about_icon_text_repair">Repair Tools by Design Circle from\nNounProject.com</string>
     <string name="tari_about_icon_text_server">Internet Server by Design Circle from\nNounProject.com</string>

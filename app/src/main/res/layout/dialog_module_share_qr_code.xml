@@ -1,21 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/root"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical">
 
-    <FrameLayout
+    <com.tari.android.wallet.ui.component.tari.TariQrBackground
         android:id="@+id/qr_container_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:layout_marginVertical="35dp"
-        android:background="@drawable/wallet_info_bg_qr_code_image"
         android:elevation="@dimen/common_view_elevation"
-        android:padding="5dp">
+        android:padding="5dp"
+        app:cornerRadius="10dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/desc_text_view">
 
-        <ImageView
+        <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/qr_image_view"
             android:layout_width="@dimen/wallet_info_container_qr_code_size"
             android:layout_height="@dimen/wallet_info_container_qr_code_size"
@@ -24,6 +28,6 @@
             android:outlineProvider="paddedBounds"
             android:padding="2dp" />
 
-    </FrameLayout>
+    </com.tari.android.wallet.ui.component.tari.TariQrBackground>
 
 </LinearLayout>

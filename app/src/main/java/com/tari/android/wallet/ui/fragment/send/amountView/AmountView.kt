@@ -5,12 +5,12 @@ import android.util.AttributeSet
 import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.core.content.ContextCompat
 import com.tari.android.wallet.R
 import com.tari.android.wallet.databinding.ViewAmountBinding
 import com.tari.android.wallet.model.MicroTari
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.component.common.CommonView
+import com.tari.android.wallet.ui.extension.colorFromAttribute
 
 class AmountView : CommonView<CommonViewModel, ViewAmountBinding> {
     constructor(context: Context) : super(context, null)
@@ -34,10 +34,10 @@ class AmountView : CommonView<CommonViewModel, ViewAmountBinding> {
 
     fun setupArgs(style: AmountStyle) {
         val color = when(style) {
-            AmountStyle.Normal -> R.color.black
-            AmountStyle.Warning -> R.color.common_error
+            AmountStyle.Normal -> R.attr.palette_text_heading
+            AmountStyle.Warning -> R.attr.palette_system_red
         }
-        val intColor = ContextCompat.getColor(context, color)
+        val intColor = context.colorFromAttribute(color)
         ui.gem.setColorFilter(intColor)
         ui.balanceView.setTextColor(intColor)
     }

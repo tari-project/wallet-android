@@ -15,7 +15,9 @@ import androidx.fragment.app.Fragment
 import androidx.viewbinding.ViewBinding
 import com.tari.android.wallet.di.DiContainer
 import com.tari.android.wallet.extension.observe
-import com.tari.android.wallet.ui.component.MutedBackPressedCallback
+import com.tari.android.wallet.ui.component.mainList.MutedBackPressedCallback
+import com.tari.android.wallet.ui.component.tari.toast.TariToast
+import com.tari.android.wallet.ui.component.tari.toast.TariToastArgs
 import com.tari.android.wallet.ui.dialog.modular.ModularDialog
 
 abstract class CommonFragment<Binding : ViewBinding, VM : CommonViewModel> : Fragment() {
@@ -77,6 +79,8 @@ abstract class CommonFragment<Binding : ViewBinding, VM : CommonViewModel> : Fra
 
         observe(dismissDialog) { dialogManager.dismiss() }
 
+        observe(showToast) { TariToast(requireContext(), it) }
+
         observe(blockedBackPressed) {
             blockingBackPressDispatcher.isEnabled = it
         }
@@ -90,6 +94,6 @@ abstract class CommonFragment<Binding : ViewBinding, VM : CommonViewModel> : Fra
 
     private fun copy(clipboardArgs: ClipboardArgs) {
         clipboardManager.setPrimaryClip(ClipData.newPlainText(clipboardArgs.clipLabel, clipboardArgs.clipText))
-        Toast.makeText(requireActivity(), clipboardArgs.toastMessage, Toast.LENGTH_LONG).show()
+        TariToast(requireContext(), TariToastArgs(clipboardArgs.toastMessage, Toast.LENGTH_LONG))
     }
 }

@@ -17,6 +17,10 @@ import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
 import com.tari.android.wallet.ui.dialog.modular.modules.space.SpaceModule
 import com.tari.android.wallet.ui.fragment.settings.logs.logs.adapter.DebugLog
 import com.tari.android.wallet.ui.fragment.settings.logs.logs.adapter.LogViewHolderItem
+import com.tari.android.wallet.ui.fragment.settings.logs.logs.module.LogLevelCheckedModule
+import com.tari.android.wallet.ui.fragment.settings.logs.logs.module.LogLevelFilters
+import com.tari.android.wallet.ui.fragment.settings.logs.logs.module.LogSourceCheckedModule
+import com.tari.android.wallet.ui.fragment.settings.logs.logs.module.LogSourceFilters
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.io.File

@@ -36,10 +36,7 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.widget.FrameLayout
-import com.tari.android.wallet.R
 import com.tari.android.wallet.databinding.ViewProgressButtonBinding
-import com.tari.android.wallet.ui.extension.color
-import com.tari.android.wallet.ui.extension.setColor
 import com.tari.android.wallet.ui.extension.setVisible
 
 class LoadingButtonView : FrameLayout {
@@ -66,7 +63,6 @@ class LoadingButtonView : FrameLayout {
 
     private fun init() {
         ui = ViewProgressButtonBinding.inflate(LayoutInflater.from(context), this, false)
-        ui.progressBar.setColor(context.color(R.color.common_progress_bar))
         ui.progressBar.scaleX = 0.5F
         ui.progressBar.scaleY = 0.5F
         addView(ui.root)

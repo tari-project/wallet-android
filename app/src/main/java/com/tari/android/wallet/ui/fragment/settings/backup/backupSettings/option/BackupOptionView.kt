@@ -6,12 +6,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import com.tari.android.wallet.R
 import com.tari.android.wallet.databinding.ViewBackupOptionBinding
 import com.tari.android.wallet.extension.observe
 import com.tari.android.wallet.ui.component.common.CommonView
-import com.tari.android.wallet.ui.extension.color
-import com.tari.android.wallet.ui.extension.setColor
 import com.tari.android.wallet.ui.extension.setVisible
 
 class BackupOptionView : CommonView<BackupOptionViewModel, ViewBackupOptionBinding> {
@@ -34,7 +31,6 @@ class BackupOptionView : CommonView<BackupOptionViewModel, ViewBackupOptionBindi
     fun init(fragment: Fragment, backupOptionViewModel: BackupOptionViewModel) {
         this.fragment = fragment
         bindViewModel(backupOptionViewModel)
-        ui.backupPermissionProgressBar.setColor(color(R.color.back_up_settings_permission_processing))
         ui.title.text = context.getString(backupOptionViewModel.title)
         setPermissionSwitchListener()
         observeViewModel()

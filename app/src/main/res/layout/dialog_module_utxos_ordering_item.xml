@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/root"
     android:layout_width="match_parent"
@@ -11,16 +10,16 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal">
 
-        <com.tari.android.wallet.ui.component.CustomFontTextView
+        <com.tari.android.wallet.ui.component.tari.TariTextView
             android:id="@+id/item"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginVertical="22dp"
             android:layout_marginStart="30dp"
             android:layout_weight="1"
-            android:textColor="@color/black"
+            android:textColor="?attr/palette_text_heading"
             android:textSize="15sp"
-            app:customFont="@string/font_medium" />
+            app:customFont="medium" />
 
         <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/icon"
@@ -28,16 +27,15 @@
             android:layout_height="8dp"
             android:layout_gravity="center_vertical"
             android:layout_marginEnd="20dp"
-            android:src="@drawable/ic_utxos_list_selected" />
+            android:src="@drawable/vector_utxos_list_selected" />
 
     </LinearLayout>
 
-    <View
+    <com.tari.android.wallet.ui.component.tari.TariDivider
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:layout_gravity="bottom"
-        android:layout_marginHorizontal="28dp"
-        android:background="@color/gray_background"/>
+        android:layout_marginHorizontal="28dp" />
 
 </FrameLayout>
 

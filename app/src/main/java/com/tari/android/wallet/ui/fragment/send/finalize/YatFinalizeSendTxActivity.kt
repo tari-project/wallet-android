@@ -6,7 +6,7 @@ import androidx.lifecycle.lifecycleScope
 import com.google.gson.Gson
 import com.tari.android.wallet.extension.observe
 import com.tari.android.wallet.extension.observeOnLoad
-import com.tari.android.wallet.ui.fragment.send.activity.SendTariActivity
+import com.tari.android.wallet.ui.fragment.home.HomeActivity
 import com.tari.android.wallet.ui.fragment.send.common.TransactionData
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -50,12 +50,8 @@ class YatFinalizeSendTxActivity : YatLibOutcomingTransactionActivity() {
 
     override fun onStop() {
         super.onStop()
-        viewModel.sentTxId.value?.let {
-            SendTariActivity.instance.get()?.onSendTxSuccessful(it, viewModel.transactionData)
-        }
+        viewModel.sentTxId.value?.let { HomeActivity.instance.get()?.onSendTxSuccessful(it, viewModel.transactionData) }
 
-        viewModel.txFailureReason.value?.let {
-            SendTariActivity.instance.get()?.onSendTxFailure(viewModel.transactionData, it)
-        }
+        viewModel.txFailureReason.value?.let { HomeActivity.instance.get()?.onSendTxFailure(viewModel.transactionData, it) }
     }
 }

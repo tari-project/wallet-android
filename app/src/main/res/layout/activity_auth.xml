@@ -22,7 +22,7 @@
         app:lottie_renderMode="automatic" />
 
     <!-- the big gem to disappear -->
-    <ImageView
+    <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/big_gem_image_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -32,7 +32,7 @@
         android:src="@drawable/splash_gem_big" />
 
     <!-- subtitle -->
-    <com.tari.android.wallet.ui.component.CustomFontTextView
+    <com.tari.android.wallet.ui.component.tari.TariTextView
         android:id="@+id/network_info_text_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -43,11 +43,11 @@
         android:letterSpacing="0.1"
         android:textColor="#50FFFFFF"
         android:textSize="@dimen/common_network_and_version_info_text_size"
-        app:customFont="@string/font_heavy"
+        app:customFont="heavy"
         tools:ignore="SmallSp" />
 
     <!-- small gem -->
-    <ImageView
+    <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/small_gem_image_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -58,7 +58,7 @@
         android:contentDescription="@null"
         android:src="@drawable/splash_gem_small" />
 
-    <ProgressBar
+    <com.tari.android.wallet.ui.component.tari.TariProgressBar
         android:id="@+id/progress_bar"
         android:layout_width="60dp"
         android:layout_height="60dp"

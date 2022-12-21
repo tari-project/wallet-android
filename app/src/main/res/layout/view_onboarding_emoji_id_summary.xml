@@ -12,7 +12,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/dummy_emoji"
-        android:textColor="@color/black"
+        android:textColor="?attr/palette_text_heading"
         android:textSize="17sp" />
     <!-- emoji 2 -->
     <TextView
@@ -21,7 +21,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/emoji_id_summary_letter_spacing"
         android:text="@string/dummy_emoji"
-        android:textColor="@color/black"
+        android:textColor="?attr/palette_text_heading"
         android:textSize="17sp" />
     <!-- emoji 3 -->
     <TextView
@@ -30,7 +30,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/emoji_id_summary_letter_spacing"
         android:text="@string/dummy_emoji"
-        android:textColor="@color/black"
+        android:textColor="?attr/palette_text_heading"
         android:textSize="17sp" />
     <!-- separator -->
     <TextView
@@ -49,7 +49,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/emoji_id_summary_letter_spacing"
         android:text="@string/dummy_emoji"
-        android:textColor="@color/black"
+        android:textColor="?attr/palette_text_heading"
         android:textSize="17sp" />
     <!-- emoji 5 -->
     <TextView
@@ -58,7 +58,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/emoji_id_summary_letter_spacing"
         android:text="@string/dummy_emoji"
-        android:textColor="@color/black"
+        android:textColor="?attr/palette_text_heading"
         android:textSize="17sp" />
     <!-- emoji 6 -->
     <TextView
@@ -67,6 +67,6 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/emoji_id_summary_letter_spacing"
         android:text="@string/dummy_emoji"
-        android:textColor="@color/black"
+        android:textColor="?attr/palette_text_heading"
         android:textSize="17sp" />
 </LinearLayout>

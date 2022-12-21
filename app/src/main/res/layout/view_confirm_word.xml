@@ -6,32 +6,32 @@
     android:layout_height="wrap_content"
     android:layout_marginHorizontal="5dp"
     android:layout_marginVertical="5dp"
-    android:background="@drawable/restoring_seed_phrase_word_background"
+    android:background="@drawable/vector_restoring_seed_phrase_word_background"
     android:clickable="false"
-    android:orientation="horizontal"
     android:clipChildren="false"
-    android:paddingEnd="8dp"
+    android:orientation="horizontal"
     android:paddingVertical="5dp"
-    android:paddingStart="13dp">
+    android:paddingStart="13dp"
+    android:paddingEnd="8dp">
 
-    <com.tari.android.wallet.ui.component.CustomFontTextView
+    <com.tari.android.wallet.ui.component.tari.TariTextView
         android:id="@+id/text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
-        android:clickable="false"
         android:layout_marginEnd="5dp"
-        android:textColor="@color/black"
+        android:clickable="false"
+        android:textColor="?attr/palette_text_heading"
         android:textSize="14sp"
-        app:customFont="@string/font_heavy"
+        app:customFont="heavy"
         tools:text="text" />
 
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/removeView"
         android:layout_width="wrap_content"
-        android:adjustViewBounds="false"
         android:layout_height="match_parent"
         android:layout_gravity="center_vertical"
-        android:src="@drawable/close" />
+        android:adjustViewBounds="false"
+        android:src="@drawable/vector_close" />
 
 </LinearLayout>

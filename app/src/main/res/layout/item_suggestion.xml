@@ -6,10 +6,10 @@
     android:paddingHorizontal="6dp"
     android:orientation="vertical">
 
-    <com.tari.android.wallet.ui.component.CustomFontTextView
+    <com.tari.android.wallet.ui.component.tari.TariTextView
         android:layout_gravity="center"
         android:id="@+id/tvTitle"
-        android:background="@drawable/restoring_seed_phrase_word_background"
+        android:background="@drawable/vector_restoring_seed_phrase_word_background"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:paddingHorizontal="16dp"
@@ -17,6 +17,6 @@
         android:paddingVertical="5dp"
         android:textAllCaps="false"
         android:textSize="16sp"
-        app:customFont="@string/font_heavy" />
+        app:customFont="heavy" />
 
 </FrameLayout>

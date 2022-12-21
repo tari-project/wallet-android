@@ -47,8 +47,8 @@ import com.tari.android.wallet.databinding.FragmentWalletInfoBinding
 import com.tari.android.wallet.extension.observe
 import com.tari.android.wallet.extension.observeOnLoad
 import com.tari.android.wallet.ui.common.CommonFragment
-import com.tari.android.wallet.ui.component.EmojiIdSummaryViewController
-import com.tari.android.wallet.ui.component.FullEmojiIdViewController
+import com.tari.android.wallet.ui.component.fullEmojiId.EmojiIdSummaryViewController
+import com.tari.android.wallet.ui.component.fullEmojiId.FullEmojiIdViewController
 import com.tari.android.wallet.ui.extension.*
 import java.util.*
 
@@ -91,7 +91,7 @@ class WalletInfoFragment : CommonFragment<FragmentWalletInfoBinding, WalletInfoV
         observe(yat) { ui.yatButton.setVisible(it.isNotEmpty()) }
 
         observe(isYatForegrounded) {
-            val icon = if (it) R.drawable.tari_yat_open else R.drawable.tari_yat_close
+            val icon = if (it) R.drawable.vector_tari_yat_open else R.drawable.tari_yat_close
             val drawable = ContextCompat.getDrawable(requireContext(), icon)
             ui.yatButton.setImageDrawable(drawable)
         }

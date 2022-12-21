@@ -46,7 +46,7 @@ import com.tari.android.wallet.databinding.FragmentVerifySeedPhraseBinding
 import com.tari.android.wallet.extension.observe
 import com.tari.android.wallet.ui.common.CommonFragment
 import com.tari.android.wallet.ui.extension.*
-import com.tari.android.wallet.ui.fragment.settings.backup.activity.BackupSettingsRouter
+import com.tari.android.wallet.ui.fragment.settings.backup.BackupSettingsRouter
 
 class VerifySeedPhraseFragment : CommonFragment<FragmentVerifySeedPhraseBinding, VerifySeedPhraseViewModel>() {
 
@@ -69,7 +69,6 @@ class VerifySeedPhraseFragment : CommonFragment<FragmentVerifySeedPhraseBinding,
     private fun setupUI() {
         fillSelectableWordsContainer()
         fillSelectedWordsContainer()
-        ui.backCtaView.setOnClickListener(ThrottleClick { requireActivity().onBackPressed() })
         ui.continueCtaView.setOnClickListener(ThrottleClick { it.animateClick { viewModel.verify() } })
     }
 
@@ -86,7 +85,7 @@ class VerifySeedPhraseFragment : CommonFragment<FragmentVerifySeedPhraseBinding,
     private fun processNavigation(navigation: VerifySeedPhraseNavigation) {
         val router = requireActivity() as BackupSettingsRouter
         when (navigation) {
-            VerifySeedPhraseNavigation.ToSeedPhraseVerificationComplete -> router.onSeedPhraseVerificationComplete(this)
+            VerifySeedPhraseNavigation.ToSeedPhraseVerificationComplete -> router.onSeedPhraseVerificationComplete()
         }
     }
 

@@ -13,14 +13,14 @@
         android:orientation="vertical"
         tools:ignore="UselessParent">
 
-        <ImageView
+        <androidx.appcompat.widget.AppCompatImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:src="@drawable/ic_search_giphy"
-            tools:ignore="ContentDescription" />
+             />
 
-        <com.tari.android.wallet.ui.component.CustomFontTextView
+        <com.tari.android.wallet.ui.component.tari.TariTextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
@@ -31,7 +31,7 @@
             android:text="@string/add_note_search_giphy_carousel_item_label"
             android:textColor="@color/add_note_more_gifs_item_text"
             android:textSize="9sp"
-            app:customFont="@string/font_black"
+            app:customFont="black"
             tools:ignore="SmallSp" />
     </LinearLayout>
 
