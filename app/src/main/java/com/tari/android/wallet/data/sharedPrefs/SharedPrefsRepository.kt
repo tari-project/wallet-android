@@ -38,7 +38,6 @@ import com.tari.android.wallet.data.repository.CommonRepository
 import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodeSharedRepository
 import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefBooleanDelegate
 import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefStringDelegate
-import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefStringSecuredDelegate
 import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepository
 import com.tari.android.wallet.data.sharedPrefs.network.formatKey
 import com.tari.android.wallet.data.sharedPrefs.tariSettings.TariSettingsSharedRepository
@@ -100,8 +99,6 @@ class SharedPrefsRepository(
 
     var onboardingDisplayedAtHome: Boolean by SharedPrefBooleanDelegate(sharedPrefs, formatKey(Key.onboardingDisplayedAtHome))
 
-    var databasePassphrase: String? by SharedPrefStringSecuredDelegate(context, sharedPrefs, formatKey(Key.walletDatabasePassphrase))
-
     var isDataCleared: Boolean by SharedPrefBooleanDelegate(sharedPrefs, formatKey(Key.isDataCleared), true)
 
     fun clear() {
@@ -118,7 +115,6 @@ class SharedPrefsRepository(
         onboardingAuthSetupStarted = false
         onboardingAuthSetupCompleted = false
         onboardingDisplayedAtHome = false
-        databasePassphrase = null
     }
 
     fun generateDatabasePassphrase(): String {

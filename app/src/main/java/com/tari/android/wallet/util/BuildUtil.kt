@@ -32,7 +32,9 @@
  */
 package com.tari.android.wallet.util
 
+import com.tari.android.wallet.BuildConfig
+
 object Build {
 
-    const val MOCKED = true
+    val MOCKED = BuildConfig.BUILD_TYPE == "debug"
 }
