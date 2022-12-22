@@ -388,7 +388,6 @@
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
                         android:layout_marginTop="14dp"
-                        android:background="?attr/palette_text_heading"
                         android:gravity="center"
                         android:letterSpacing="-0.017"
                         android:paddingHorizontal="25dp"
