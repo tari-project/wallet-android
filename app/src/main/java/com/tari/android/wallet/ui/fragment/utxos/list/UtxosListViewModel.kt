@@ -303,7 +303,7 @@ class UtxosListViewModel : CommonViewModel() {
             DialogArgs {
                 setSelectionState(false)
             }, listOf(
-                ImageModule(R.drawable.ic_utxos_succes_popper),
+                ImageModule(R.drawable.tari_utxos_succes_popper),
                 HeadModule(resourceManager.getString(R.string.utxos_success_title)),
                 BodyModule(resourceManager.getString(descriptionId)),
                 ButtonModule(resourceManager.getString(R.string.common_close), ButtonStyle.Close)

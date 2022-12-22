@@ -462,16 +462,18 @@ class TxListFragment : CommonFragment<FragmentTxListBinding, TxListViewModel>(),
             duration = Constants.UI.Home.startupAnimDurationMs
             interpolator = EasingInterpolator(Ease.EASE_IN_OUT_EXPO)
             addUpdateListener { valueAnimator: ValueAnimator ->
-                val value = valueAnimator.animatedValue as Float
-                // animate the list (will move upwards)
-                ui.scrollContentView.y = dimenPx(R.dimen.home_scroll_view_startup_anim_height) * (1 - value)
-                ui.scrollContentView.alpha = value
-                ui.balanceTextView.alpha = 1F
-                ui.availableBalanceTextView.alpha = 1F
-                ui.balanceQuestionMark.alpha = 1F
-                ui.availableBalance.alpha = 1F
-                ui.networkStatusStateIndicatorView.alpha = 1F
-                ui.balanceGemImageView.alpha = 1F
+                runCatching {
+                    val value = valueAnimator.animatedValue as Float
+                    // animate the list (will move upwards)
+                    ui.scrollContentView.y = dimenPx(R.dimen.home_scroll_view_startup_anim_height) * (1 - value)
+                    ui.scrollContentView.alpha = value
+                    ui.balanceTextView.alpha = 1F
+                    ui.availableBalanceTextView.alpha = 1F
+                    ui.balanceQuestionMark.alpha = 1F
+                    ui.availableBalance.alpha = 1F
+                    ui.networkStatusStateIndicatorView.alpha = 1F
+                    ui.balanceGemImageView.alpha = 1F
+                }
             }
         }.start()
     }

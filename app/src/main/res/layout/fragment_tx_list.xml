@@ -5,14 +5,14 @@
     android:id="@+id/root_view"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white">
+    android:background="?attr/palette_background_primary">
 
     <View
         android:id="@+id/gradient_background_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:alpha="1"
-        android:background="@drawable/home_bg_gradient" />
+        android:background="@drawable/vector_home_gradient_bg" />
 
     <!-- top content -->
     <RelativeLayout
@@ -33,7 +33,7 @@
             android:layout_toStartOf="@+id/network_status_state_indicator_view"
             android:letterSpacing="-0.018"
             android:text="@string/home_available_balance"
-            android:textColor="@color/white"
+            android:textColor="?attr/palette_button_primary_text"
             android:textSize="12sp"
             app:customFont="medium" />
 
@@ -54,7 +54,8 @@
                 android:layout_width="@dimen/home_balance_gem_width"
                 android:layout_height="@dimen/home_balance_gem_height"
                 android:layout_marginTop="-4dp"
-                android:src="@drawable/home_gem_balance" />
+                android:src="@drawable/vector_gem"
+                android:tint="?attr/palette_button_primary_text" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -91,7 +92,7 @@
             android:layout_marginEnd="4dp"
             android:letterSpacing="-0.018"
             android:text="@string/home_available_to_spend_balance"
-            android:textColor="@color/white"
+            android:textColor="?attr/palette_button_primary_text"
             android:textSize="12sp"
             app:customFont="medium" />
 
@@ -111,7 +112,7 @@
             android:layout_alignParentStart="true"
             android:layout_marginEnd="4dp"
             android:letterSpacing="-0.018"
-            android:textColor="@color/white"
+            android:textColor="?attr/palette_button_primary_text"
             android:textSize="12sp"
             app:customFont="heavy" />
 
@@ -185,14 +186,14 @@
                 android:layout_height="50dp"
                 android:layout_below="@id/grabber_container_view"
                 android:layout_marginTop="-25dp"
-                android:background="@color/white" />
+                android:background="?attr/palette_background_primary" />
 
             <LinearLayout
                 android:id="@+id/grabber_container_view"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/home_grabber_container_height"
                 android:layout_below="@+id/scroll_bg_enabler_view"
-                android:background="@drawable/home_grabber_bg"
+                android:background="@drawable/vector_home_grabber_bg"
                 android:clickable="true"
                 android:focusable="true"
                 android:gravity="center">
@@ -201,7 +202,7 @@
                     android:id="@+id/grabber_view"
                     android:layout_width="@dimen/home_grabber_width"
                     android:layout_height="@dimen/home_grabber_height"
-                    android:background="@drawable/home_grabber" />
+                    android:background="@drawable/vector_home_grabber" />
             </LinearLayout>
 
             <View
@@ -209,16 +210,16 @@
                 android:layout_height="6dp"
                 android:layout_alignTop="@id/recycler_view_container_view"
                 android:layout_marginTop="-3dp"
-                android:background="@color/white" />
+                android:background="?attr/palette_background_primary" />
 
             <RelativeLayout
                 android:id="@+id/update_progress_content_container_view"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_below="@id/grabber_container_view"
-                android:background="@color/white">
+                android:background="?attr/palette_background_primary">
 
-                <View
+                <com.tari.android.wallet.ui.component.tari.TariPrimaryBackground
                     android:id="@+id/update_progress_content_view_bg"
                     android:layout_width="0dp"
                     android:layout_height="0dp"
@@ -226,25 +227,24 @@
                     android:layout_alignTop="@id/update_progress_content_view"
                     android:layout_alignEnd="@id/update_progress_content_view"
                     android:layout_alignBottom="@id/update_progress_content_view"
-                    android:background="@drawable/home_store_and_forward_progress_view_bg"
-                    android:elevation="@dimen/common_view_elevation" />
+                    android:background="@drawable/vector_home_store_and_forward_progress_view_bg"
+                    app:cornerRadius="28dp"
+                    app:elevation="4dp" />
 
-                <RelativeLayout
+                <com.tari.android.wallet.ui.component.tari.TariPrimaryBackground
                     android:id="@+id/update_progress_content_view"
                     android:layout_width="match_parent"
                     android:layout_height="@dimen/home_swipe_refresh_progress_view_height"
                     android:layout_marginHorizontal="@dimen/common_horizontal_margin"
                     android:layout_marginTop="@dimen/home_swipe_refresh_progress_view_content_invisible_top_margin"
-                    android:background="@drawable/home_store_and_forward_progress_view_bg"
                     android:baselineAligned="false"
-                    android:elevation="5dp"
-                    android:outlineProvider="none">
+                    app:cornerRadius="28dp">
 
                     <LinearLayout
                         android:layout_width="62dp"
                         android:layout_height="@dimen/home_swipe_refresh_progress_view_height"
-                        android:layout_alignParentStart="true"
-                        android:orientation="vertical">
+                        android:orientation="vertical"
+                        app:layout_constraintStart_toStartOf="parent">
 
                         <TextView
                             android:id="@+id/home_txt_update_hourglass_icon"
@@ -276,7 +276,7 @@
                             android:layout_height="@dimen/home_swipe_refresh_progress_view_height"
                             android:gravity="center"
                             android:text="@string/home_store_and_forward_progress_checking_for_updates"
-                            android:textColor="@color/purple"
+                            android:textColor="?attr/palette_brand_purple"
                             android:textSize="13sp"
                             app:customFont="heavy" />
 
@@ -286,7 +286,7 @@
                             android:layout_height="@dimen/home_swipe_refresh_progress_view_height"
                             android:gravity="center"
                             android:text="@string/home_store_and_forward_progress_receiving_txs"
-                            android:textColor="@color/purple"
+                            android:textColor="?attr/palette_brand_purple"
                             android:textSize="13sp"
                             app:customFont="heavy" />
 
@@ -296,7 +296,7 @@
                             android:layout_height="@dimen/home_swipe_refresh_progress_view_height"
                             android:gravity="center"
                             android:text="@string/home_store_and_forward_progress_completing_txs"
-                            android:textColor="@color/purple"
+                            android:textColor="?attr/palette_brand_purple"
                             android:textSize="13sp"
                             app:customFont="heavy" />
 
@@ -306,7 +306,7 @@
                             android:layout_height="@dimen/home_swipe_refresh_progress_view_height"
                             android:gravity="center"
                             android:text="@string/home_store_and_forward_progress_updating_txs"
-                            android:textColor="@color/purple"
+                            android:textColor="?attr/palette_brand_purple"
                             android:textSize="13sp"
                             app:customFont="heavy" />
 
@@ -316,7 +316,7 @@
                             android:layout_height="@dimen/home_swipe_refresh_progress_view_height"
                             android:gravity="center"
                             android:text="@string/home_store_and_forward_progress_up_to_date"
-                            android:textColor="#23BE90"
+                            android:textColor="?attr/palette_system_green"
                             android:textSize="13sp"
                             app:customFont="heavy" />
                     </LinearLayout>
@@ -325,11 +325,14 @@
                         android:id="@+id/home_progress_bar_update"
                         android:layout_width="24dp"
                         android:layout_height="24dp"
-                        android:layout_alignParentEnd="true"
-                        android:layout_centerVertical="true"
                         android:layout_marginEnd="20dp"
-                        android:alpha="0.9" />
-                </RelativeLayout>
+                        android:alpha="0.9"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                </com.tari.android.wallet.ui.component.tari.TariPrimaryBackground>
+
             </RelativeLayout>
 
             <RelativeLayout
@@ -342,7 +345,7 @@
                     android:id="@+id/tx_recycler_view"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:background="@color/white"
+                    android:background="?attr/palette_background_primary"
                     android:overScrollMode="never"
                     android:scrollbars="vertical" />
 
@@ -350,7 +353,7 @@
                     android:id="@+id/onboarding_content_view"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:background="@color/white"
+                    android:background="?attr/palette_background_primary"
                     android:gravity="center"
                     android:orientation="vertical">
 
@@ -385,7 +388,7 @@
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
                         android:layout_marginTop="14dp"
-                        android:background="@color/white"
+                        android:background="?attr/palette_text_heading"
                         android:gravity="center"
                         android:letterSpacing="-0.017"
                         android:paddingHorizontal="25dp"
@@ -427,16 +430,16 @@
         android:layout_width="match_parent"
         android:layout_height="@dimen/common_header_height"
         android:layout_marginTop="0dp"
-        android:background="@color/white"
+        android:background="?attr/palette_background_primary"
         tools:visibility="gone">
 
-        <ImageButton
+        <androidx.appcompat.widget.AppCompatImageButton
             android:id="@+id/close_tx_list_button"
             android:layout_width="50dp"
             android:layout_height="match_parent"
             android:background="@color/transparent"
-            android:contentDescription="@null"
-            android:src="@drawable/close_icon" />
+            android:src="@drawable/vector_close"
+            android:tint="?attr/palette_button_primary_text" />
 
         <com.tari.android.wallet.ui.component.tari.TariTextView
             android:id="@+id/tx_list_title_text_view"

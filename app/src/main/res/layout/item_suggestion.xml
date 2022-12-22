@@ -9,11 +9,12 @@
     <com.tari.android.wallet.ui.component.tari.TariTextView
         android:layout_gravity="center"
         android:id="@+id/tvTitle"
-        android:background="@drawable/vector_restoring_seed_phrase_word_background"
+        android:background="@drawable/vector_restoring_seed_phrase_word_bg"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:paddingHorizontal="16dp"
         android:gravity="center"
+        android:textColor="?attr/palette_text_heading"
         android:paddingVertical="5dp"
         android:textAllCaps="false"
         android:textSize="16sp"

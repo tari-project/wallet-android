@@ -128,7 +128,6 @@
                         android:id="@+id/update_password_cta_view"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:background="@drawable/setting_option_background"
                         android:clickable="true"
                         android:focusable="true"
                         android:paddingHorizontal="@dimen/common_horizontal_margin">
@@ -173,7 +172,6 @@
                             android:id="@+id/backup_wallet_to_cloud_cta_view"
                             android:layout_width="match_parent"
                             android:layout_height="@dimen/menu_item_height"
-                            android:background="@drawable/setting_option_background"
                             android:clickable="true"
                             android:focusable="true"
                             android:paddingHorizontal="@dimen/common_horizontal_margin">

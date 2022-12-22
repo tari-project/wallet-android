@@ -6,7 +6,7 @@
     android:layout_height="wrap_content"
     android:layout_marginHorizontal="5dp"
     android:layout_marginVertical="5dp"
-    android:background="@drawable/vector_restoring_seed_phrase_word_background"
+    android:background="@drawable/vector_restoring_seed_phrase_word_bg"
     android:clickable="false"
     android:clipChildren="false"
     android:orientation="horizontal"

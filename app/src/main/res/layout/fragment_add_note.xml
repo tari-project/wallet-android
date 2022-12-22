@@ -161,7 +161,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
-                android:background="@drawable/tari_search_giphy_cta_background"
+                android:background="@drawable/tari_search_giphy_cta_bg"
                 android:orientation="horizontal"
                 android:paddingHorizontal="9dp"
                 android:paddingVertical="4dp">
@@ -190,8 +190,8 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
                 android:layout_centerVertical="true"
-                android:background="@drawable/tari_search_giphy_cta_background"
-                android:src="@drawable/powered_by_giphy"
+                android:background="@drawable/tari_search_giphy_cta_bg"
+                android:src="@drawable/taripowered_by_giphy"
                 android:tint="@color/white" />
 
         </RelativeLayout>
@@ -269,7 +269,7 @@
             android:background="@drawable/vector_add_note_slide_button_bg"
             android:clickable="true"
             android:focusable="true"
-            android:textColor="@color/purple">
+            android:textColor="?attr/palette_brand_purple">
 
             <androidx.appcompat.widget.AppCompatImageView
                 android:id="@+id/add_note_img_slide_to_send_arrow_disabled"

@@ -16,13 +16,14 @@
         android:layout_marginEnd="10dp"
         android:layout_weight="1"
         android:orientation="vertical">
+
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
             android:background="@color/transparent"
             android:text="@string/notification_tx_canceled_title"
-            android:textColor="@color/notification_description_color"
+            android:textColor="?attr/palette_text_body"
             android:textSize="13sp" />
 
         <TextView
@@ -32,7 +33,7 @@
             android:background="@color/transparent"
             android:ellipsize="end"
             android:text="@string/notification_tx_canceled_description"
-            android:textColor="@color/notification_description_color"
+            android:textColor="?attr/palette_text_body"
             android:textSize="12sp" />
     </LinearLayout>
 
@@ -40,11 +41,11 @@
         android:id="@+id/notification_tx_canceled_amount_text_view"
         android:layout_width="wrap_content"
         android:layout_height="23dp"
-        android:background="@drawable/home_tx_value_canceled_bg"
+        android:background="@drawable/vector_tx_cancelled_bg"
         android:gravity="center"
         android:paddingStart="6dp"
         android:paddingEnd="6dp"
-        android:textColor="@color/home_tx_value_canceled"
+        android:textColor="?attr/palette_text_light"
         android:textSize="12sp"
         tools:text="50.5" />
 

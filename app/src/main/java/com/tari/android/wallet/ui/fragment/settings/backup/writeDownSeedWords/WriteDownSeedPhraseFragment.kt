@@ -113,7 +113,7 @@ class WriteDownSeedPhraseFragment : CommonFragment<FragmentWriteDownSeedPhraseBi
         for (i in adapter.seedWords.indices) {
             adapter.notifyItemChanged(i)
         }
-        val resDrawable = if (!isExpanded) R.drawable.vector_recovery_expand_icon else R.drawable.recovery_collapse_button
+        val resDrawable = if (!isExpanded) R.drawable.vector_recovery_expand_icon else R.drawable.vector_recovery_collapse_button
         ui.expandButtonView.setImageResource(resDrawable)
         animateExpanding(isExpanded)
     }

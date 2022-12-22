@@ -8,6 +8,6 @@
     android:paddingStart="2dp"
     android:paddingEnd="0dp"
     android:text="@string/digit_decimal_separator"
-    android:textColor="@color/white"
+    android:textColor="?attr/palette_button_primary_text"
     android:textSize="@dimen/home_balance_digit_decimal_text_size"
     app:customFont="black" />

@@ -46,7 +46,18 @@ import com.daasuu.ei.Ease
 import com.daasuu.ei.EasingInterpolator
 import com.tari.android.wallet.R
 import com.tari.android.wallet.R.dimen.auth_button_bottom_margin
-import com.tari.android.wallet.R.string.*
+import com.tari.android.wallet.R.string.auth_failed_desc
+import com.tari.android.wallet.R.string.auth_failed_title
+import com.tari.android.wallet.R.string.auth_not_available_or_canceled_desc
+import com.tari.android.wallet.R.string.auth_not_available_or_canceled_title
+import com.tari.android.wallet.R.string.auth_prompt_button_text
+import com.tari.android.wallet.R.string.auth_prompt_button_touch_id_text
+import com.tari.android.wallet.R.string.common_cancel
+import com.tari.android.wallet.R.string.common_ok
+import com.tari.android.wallet.R.string.onboarding_auth_biometric_prompt
+import com.tari.android.wallet.R.string.onboarding_auth_device_lock_code_prompt
+import com.tari.android.wallet.R.string.onboarding_auth_title
+import com.tari.android.wallet.R.string.proceed
 import com.tari.android.wallet.application.WalletState
 import com.tari.android.wallet.databinding.FragmentLocalAuthBinding
 import com.tari.android.wallet.event.EventBus
@@ -55,7 +66,13 @@ import com.tari.android.wallet.extension.observeOnLoad
 import com.tari.android.wallet.infrastructure.security.biometric.BiometricAuthenticationException
 import com.tari.android.wallet.infrastructure.security.biometric.BiometricAuthenticationType
 import com.tari.android.wallet.ui.common.CommonFragment
-import com.tari.android.wallet.ui.extension.*
+import com.tari.android.wallet.ui.extension.animateClick
+import com.tari.android.wallet.ui.extension.dimenPx
+import com.tari.android.wallet.ui.extension.doOnGlobalLayout
+import com.tari.android.wallet.ui.extension.invisible
+import com.tari.android.wallet.ui.extension.string
+import com.tari.android.wallet.ui.extension.temporarilyDisableClick
+import com.tari.android.wallet.ui.extension.visible
 import com.tari.android.wallet.util.Constants.UI.Auth
 import kotlinx.coroutines.launch
 
@@ -84,11 +101,11 @@ class LocalAuthFragment : CommonFragment<FragmentLocalAuthBinding, LocalAuthView
         progressBar.setWhite()
         if (viewModel.authType.value == BiometricAuthenticationType.BIOMETRIC) {
             //setup ui for biometric auth
-            authTypeImageView.setImageResource(R.drawable.fingerprint)
+            authTypeImageView.setImageResource(R.drawable.tari_fingerprint)
             enableAuthButton.text = string(auth_prompt_button_touch_id_text)
         } else {
             //setup ui for device lock code auth
-            authTypeImageView.setImageResource(R.drawable.numpad)
+            authTypeImageView.setImageResource(R.drawable.tari_numpad)
             enableAuthButton.text = string(auth_prompt_button_text)
         }
         enableAuthButton.setOnClickListener { onEnableAuthButtonClick(it) }

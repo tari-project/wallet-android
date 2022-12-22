@@ -45,7 +45,17 @@ import com.daasuu.ei.EasingInterpolator
 import com.tari.android.wallet.R
 import com.tari.android.wallet.databinding.ViewEmojiIdSummaryBinding
 import com.tari.android.wallet.databinding.ViewFullEmojiIdBinding
-import com.tari.android.wallet.ui.extension.*
+import com.tari.android.wallet.ui.common.domain.PaletteManager
+import com.tari.android.wallet.ui.extension.dimenPx
+import com.tari.android.wallet.ui.extension.doOnGlobalLayout
+import com.tari.android.wallet.ui.extension.gone
+import com.tari.android.wallet.ui.extension.invisible
+import com.tari.android.wallet.ui.extension.setBottomMargin
+import com.tari.android.wallet.ui.extension.setLayoutHeight
+import com.tari.android.wallet.ui.extension.setLayoutWidth
+import com.tari.android.wallet.ui.extension.setTopMargin
+import com.tari.android.wallet.ui.extension.string
+import com.tari.android.wallet.ui.extension.visible
 import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.EmojiUtil
 import com.tari.android.wallet.util.EmojiUtil.Companion.getGraphemeLength
@@ -64,6 +74,7 @@ class FullEmojiIdViewController(
     private val listener: Listener? = null
 ) {
     private val emojiIdCopiedViewController = EmojiIdCopiedViewController(ui.emojiIdCopiedView)
+    private val paletteManager = PaletteManager()
     private val summaryParent = summary.root.parent as View
     private var _fullEmojiId = ""
 
@@ -285,8 +296,8 @@ class FullEmojiIdViewController(
         ui.fullEmojiIdTextView.text = EmojiUtil.getFullEmojiIdSpannable(
             _fullEmojiId,
             string(R.string.emoji_id_chunk_separator),
-            color(R.color.black),
-            color(R.color.light_gray)
+            paletteManager.getBlack(context),
+            paletteManager.getLightGray(context)
         )
     }
 

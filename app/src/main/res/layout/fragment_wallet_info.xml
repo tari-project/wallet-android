@@ -127,8 +127,7 @@
                             android:id="@+id/qr_image_view"
                             android:layout_width="@dimen/wallet_info_container_qr_code_size"
                             android:layout_height="@dimen/wallet_info_container_qr_code_size"
-                            android:background="@color/white"
-                            android:contentDescription="@null"
+                            android:background="?attr/palette_qr_background"
                             android:outlineProvider="paddedBounds"
                             android:padding="2dp" />
 

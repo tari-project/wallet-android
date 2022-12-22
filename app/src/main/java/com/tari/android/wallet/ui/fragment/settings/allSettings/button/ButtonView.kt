@@ -8,7 +8,6 @@ import com.tari.android.wallet.R
 import com.tari.android.wallet.databinding.ViewButtonBinding
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.component.common.CommonView
-import com.tari.android.wallet.ui.extension.colorFromAttribute
 import com.tari.android.wallet.ui.extension.setVisible
 
 class ButtonView : CommonView<CommonViewModel, ViewButtonBinding> {
@@ -35,12 +34,10 @@ class ButtonView : CommonView<CommonViewModel, ViewButtonBinding> {
             ui.icon.rotation = 0.0F
         }
 
-        val color = context.colorFromAttribute(
-            when (dto.style) {
-                ButtonStyle.Normal -> R.attr.palette_text_heading
-                ButtonStyle.Warning -> R.attr.palette_system_red
-            }
-        )
+        val color = when (dto.style) {
+            ButtonStyle.Normal -> paletteManager.getTextHeading(context)
+            ButtonStyle.Warning -> paletteManager.getRed(context)
+        }
 
         ui.title.setTextColor(color)
         ui.icon.setColorFilter(color)

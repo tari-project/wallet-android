@@ -15,7 +15,7 @@
             android:id="@+id/white_bg_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="@color/create_emoji_id_bg"
+            android:background="?attr/palette_neutral_secondary"
             android:visibility="invisible" />
 
         <RelativeLayout
@@ -37,7 +37,7 @@
                     android:id="@+id/see_full_emoji_id_text_view"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:background="@drawable/copy_paste_emoji_id_button_bg"
+                    android:background="@drawable/vector_copy_paste_emoji_id_button_bg"
                     android:paddingHorizontal="20dp"
                     android:paddingVertical="10dp"
                     android:text="@string/tap_to_see_full_emoji_id"
@@ -61,8 +61,7 @@
                     android:layout_height="wrap_content"
                     android:layout_below="@id/see_full_emoji_id_button"
                     android:layout_centerHorizontal="true"
-                    android:contentDescription="@null"
-                    android:src="@drawable/speech_notch_down" />
+                    android:src="@drawable/tari_speech_notch_down" />
             </RelativeLayout>
 
             <RelativeLayout
@@ -74,7 +73,7 @@
                 android:layout_marginTop="-80dp"
                 android:layout_marginEnd="@dimen/common_horizontal_margin"
                 android:alpha="0"
-                android:background="@drawable/emoji_id_bg"
+                android:background="@drawable/vector_emoji_id_bg"
                 android:clickable="true"
                 android:focusable="true"
                 android:paddingHorizontal="@dimen/onboarding_emoji_id_container_horizontal_padding"
@@ -98,7 +97,7 @@
                 android:layout_marginEnd="@dimen/common_horizontal_margin"
                 android:layout_marginBottom="20dp"
                 android:alpha="0"
-                android:background="@drawable/emoji_id_bg"
+                android:background="@drawable/vector_emoji_id_bg"
                 android:visibility="invisible">
 
                 <HorizontalScrollView
@@ -119,14 +118,6 @@
                         android:textSize="17sp" />
                 </HorizontalScrollView>
 
-                <!-- white fader for emoji-id -->
-                <View
-                    android:layout_width="26dp"
-                    android:layout_height="24dp"
-                    android:layout_alignParentEnd="true"
-                    android:layout_centerVertical="true"
-                    android:background="@drawable/emoji_id_end_fader"
-                    android:translationZ="6dp" />
             </RelativeLayout>
 
             <!-- text :: This is your Emoji ID -->
@@ -160,7 +151,7 @@
                 android:layout_height="25dp"
                 android:layout_below="@id/emoji_id_container_view"
                 android:layout_marginTop="40dp"
-                android:background="@color/create_emoji_id_bg"
+                android:background="?attr/palette_neutral_secondary"
                 android:visibility="invisible" />
 
             <com.tari.android.wallet.ui.component.tari.TariTextView
@@ -193,8 +184,7 @@
                 android:layout_gravity="center_horizontal"
                 android:layout_marginTop="@dimen/onboarding_small_gem_top_margin"
                 android:layout_marginBottom="18dp"
-                android:contentDescription="@null"
-                android:src="@drawable/splash_gem_small"
+                android:src="@drawable/tari_splash_gem_small"
                 android:visibility="gone"
                 app:tint="@color/black" />
 
@@ -239,7 +229,7 @@
                     android:layout_height="25dp"
                     android:layout_gravity="center"
                     android:layout_marginTop="56dp"
-                    android:background="@color/create_emoji_id_bg"
+                    android:background="?attr/palette_neutral_secondary"
                     android:visibility="invisible" />
 
                 <com.tari.android.wallet.ui.component.tari.TariTextView
@@ -264,7 +254,7 @@
                     android:layout_below="@id/just_sec_title_text_view"
                     android:layout_gravity="center"
                     android:layout_marginTop="4dp"
-                    android:background="@color/create_emoji_id_bg"
+                    android:background="?attr/palette_neutral_secondary"
                     android:visibility="invisible" />
 
                 <com.airbnb.lottie.LottieAnimationView
@@ -304,7 +294,7 @@
                     android:layout_above="@id/wallet_address_desc_text_view"
                     android:layout_gravity="center"
                     android:layout_marginBottom="24dp"
-                    android:background="@color/create_emoji_id_bg"
+                    android:background="?attr/palette_neutral_secondary"
                     android:visibility="invisible" />
 
                 <com.tari.android.wallet.ui.component.tari.TariTextView
@@ -331,7 +321,7 @@
                     android:layout_above="@id/wallet_address_desc_text_view"
                     android:layout_gravity="center"
                     android:layout_marginTop="2dp"
-                    android:background="@color/create_emoji_id_bg"
+                    android:background="?attr/palette_neutral_secondary"
                     android:visibility="invisible" />
 
                 <com.airbnb.lottie.LottieAnimationView
@@ -378,7 +368,7 @@
                 android:layout_marginLeft="25dp"
                 android:layout_marginRight="25dp"
                 android:layout_marginBottom="@dimen/create_wallet_button_bottom_margin"
-                android:background="@drawable/gradient_button_bg"
+                android:background="@drawable/vector_gradient_button_bg"
                 android:ellipsize="middle"
                 android:singleLine="true"
                 android:text="@string/common_continue"
@@ -395,7 +385,7 @@
                 android:layout_alignParentBottom="true"
                 android:layout_marginLeft="25dp"
                 android:layout_marginRight="25dp"
-                android:background="@drawable/gradient_button_bg"
+                android:background="@drawable/vector_gradient_button_bg"
                 android:ellipsize="middle"
                 android:singleLine="true"
                 android:text="@string/create_wallet_continue_and_create_emoji_id"

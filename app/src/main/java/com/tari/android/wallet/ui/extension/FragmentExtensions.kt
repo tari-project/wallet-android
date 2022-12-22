@@ -33,6 +33,7 @@
 package com.tari.android.wallet.ui.extension
 
 import android.graphics.drawable.Drawable
+import androidx.annotation.AttrRes
 import androidx.annotation.ColorRes
 import androidx.annotation.DimenRes
 import androidx.annotation.DrawableRes
@@ -45,6 +46,8 @@ fun Fragment.string(@StringRes id: Int, vararg formatArgs: Any): String =
     requireContext().string(id, *formatArgs)
 
 fun Fragment.color(@ColorRes id: Int): Int = requireContext().color(id)
+
+fun Fragment.colorFromAttribute(@AttrRes id: Int): Int = requireContext().colorFromAttribute(id)
 
 fun Fragment.dimenPx(@DimenRes id: Int): Int = requireContext().dimenPx(id)
 

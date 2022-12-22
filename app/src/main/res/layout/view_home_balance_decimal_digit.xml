@@ -13,7 +13,7 @@
         android:layout_height="@dimen/home_balance_digit_decimal_height"
         android:gravity="center"
         android:text="@string/digit_5"
-        android:textColor="@color/white"
+        android:textColor="?attr/palette_button_primary_text"
         android:textSize="@dimen/home_balance_digit_decimal_text_size"
         app:customFont="black" />
 
@@ -24,7 +24,8 @@
         android:gravity="center"
         android:padding="0dp"
         android:text="@string/digit_6"
-        android:textColor="@color/white"
+        android:textColor="?attr/palette_button_primary_text"
         android:textSize="@dimen/home_balance_digit_decimal_text_size"
         app:customFont="black" />
+
 </LinearLayout>

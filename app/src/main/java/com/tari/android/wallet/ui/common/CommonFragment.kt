@@ -96,4 +96,9 @@ abstract class CommonFragment<Binding : ViewBinding, VM : CommonViewModel> : Fra
         clipboardManager.setPrimaryClip(ClipData.newPlainText(clipboardArgs.clipLabel, clipboardArgs.clipText))
         TariToast(requireContext(), TariToastArgs(clipboardArgs.toastMessage, Toast.LENGTH_LONG))
     }
+
+    override fun onDestroy() {
+        dialogManager.dismiss()
+        super.onDestroy()
+    }
 }
