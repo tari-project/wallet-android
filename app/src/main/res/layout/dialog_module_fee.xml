@@ -18,7 +18,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="20dp"
-            android:background="@drawable/network_segmented_picker_bg"
+            android:background="@drawable/vector_network_segmented_picker_bg"
             android:orientation="horizontal"
             android:paddingVertical="2dp"
             android:paddingHorizontal="2dp">
@@ -36,7 +36,7 @@
                 android:layout_width="58dp"
                 android:layout_height="42dp"
                 android:elevation="16dp"
-                android:background="@drawable/network_segmented_picker_selected_bg"
+                android:background="@drawable/vector_network_segmented_picker_selected_bg"
                 android:paddingHorizontal="8dp"
                 android:paddingVertical="7dp"
                 android:src="@drawable/vector_network_medium" />

@@ -54,7 +54,7 @@
             android:gravity="center"
             android:padding="10dp"
             android:text="@string/common_close"
-            android:textColor="@color/dialog_cancel_action"
+            android:textColor="?attr/palette_text_links"
             android:textSize="13sp"
             app:customFont="heavy" />
 

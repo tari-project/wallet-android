@@ -1,20 +1,8 @@
 <resources>
 
-    <!-- Base application theme. -->
-<!--    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">-->
-<!--        &lt;!&ndash; Customize your theme here. &ndash;&gt;-->
-<!--        <item name="colorPrimary">@color/primary</item>-->
-<!--        <item name="colorPrimaryDark">@color/primary_dark</item>-->
-<!--        <item name="colorAccent">@color/accent</item>-->
-
-<!--        <item name="android:statusBarColor">@android:color/black</item>-->
-<!--        <item name="android:navigationBarColor">@android:color/black</item>-->
-<!--        <item name="alertDialogTheme">@style/AlertDialogTheme</item>-->
-<!--    </style>-->
-
 <!--    &lt;!&ndash; splash screen theme &ndash;&gt;-->
     <style name="AppTheme.Splash" parent="AppTheme.Light">
-        <item name="android:background">@drawable/splash_screen</item>
+        <item name="android:background">@drawable/tari_splash_screen</item>
         <item name="android:windowTranslucentStatus">true</item>
         <item name="android:statusBarColor">@android:color/black</item>
         <item name="android:navigationBarColor">@android:color/black</item>
@@ -64,10 +52,6 @@
     <style name="ChooseGIFBottomSlideDialogAnimation">
         <item name="android:windowEnterAnimation">@null</item>
         <item name="android:windowExitAnimation">@null</item>
-    </style>
-
-    <style name="PurpleCheckbox" parent="AppTheme.Base">
-        <item name="colorAccent">@color/seed_phrase_checkbox</item>
     </style>
 
 

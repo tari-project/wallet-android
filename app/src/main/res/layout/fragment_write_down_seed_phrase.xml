@@ -45,10 +45,8 @@
             android:id="@+id/warning_check_box"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:buttonTint="@color/seed_phrase_checkbox"
             android:scaleX="1.15"
-            android:scaleY="1.15"
-            android:theme="@style/PurpleCheckbox" />
+            android:scaleY="1.15" />
 
         <com.tari.android.wallet.ui.component.tari.TariTextView
             android:layout_width="0dp"

@@ -53,7 +53,7 @@
                         android:layout_height="@dimen/add_recipient_search_text_view_height"
                         android:background="@color/transparent"
                         android:src="@drawable/vector_tari_yat_open"
-                        android:tint="@color/purple"
+                        android:tint="?attr/palette_brand_purple"
                         android:visibility="gone"
                         tools:visibility="visible" />
 
@@ -112,8 +112,8 @@
                         android:layout_width="40dp"
                         android:layout_height="@dimen/add_recipient_search_text_view_height"
                         android:background="@color/transparent"
-                        android:src="@drawable/opened_eye"
-                        android:tint="@color/purple"
+                        android:src="@drawable/vector_opened_eye"
+                        android:tint="?attr/palette_brand_purple"
                         android:visibility="gone"
                         tools:visibility="visible" />
 
@@ -217,8 +217,7 @@
                 android:layout_below="@id/paste_emoji_id_button"
                 android:layout_centerHorizontal="true"
                 android:tint="?attr/palette_overlay"
-                android:contentDescription="@null"
-                android:src="@drawable/speech_notch_down" />
+                android:src="@drawable/tari_speech_notch_down" />
 
         </RelativeLayout>
 

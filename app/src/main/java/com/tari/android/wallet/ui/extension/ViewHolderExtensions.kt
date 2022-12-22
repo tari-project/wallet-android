@@ -33,6 +33,7 @@
 package com.tari.android.wallet.ui.extension
 
 import android.graphics.drawable.Drawable
+import androidx.annotation.AttrRes
 import androidx.annotation.ColorRes
 import androidx.annotation.DimenRes
 import androidx.annotation.DrawableRes
@@ -46,5 +47,7 @@ fun ViewHolder.string(@StringRes id: Int): String = itemView.string(id)
 fun ViewHolder.string(@StringRes id: Int, vararg formatArgs: Any): String = itemView.string(id, *formatArgs)
 
 fun ViewHolder.color(@ColorRes id: Int): Int = itemView.color(id)
+
+fun ViewHolder.colorFromAttribute(@AttrRes id: Int): Int = itemView.context.colorFromAttribute(id)
 
 fun ViewHolder.drawable(@DrawableRes id: Int): Drawable? = itemView.drawable(id)

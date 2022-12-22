@@ -91,7 +91,7 @@ class WalletInfoFragment : CommonFragment<FragmentWalletInfoBinding, WalletInfoV
         observe(yat) { ui.yatButton.setVisible(it.isNotEmpty()) }
 
         observe(isYatForegrounded) {
-            val icon = if (it) R.drawable.vector_tari_yat_open else R.drawable.tari_yat_close
+            val icon = if (it) R.drawable.vector_tari_yat_open else R.drawable.vector_tari_yat_close
             val drawable = ContextCompat.getDrawable(requireContext(), icon)
             ui.yatButton.setImageDrawable(drawable)
         }

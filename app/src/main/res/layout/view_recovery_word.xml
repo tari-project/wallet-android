@@ -6,7 +6,7 @@
     android:layout_height="wrap_content"
     android:layout_marginHorizontal="5dp"
     android:layout_marginVertical="5dp"
-    android:background="@drawable/vector_restoring_seed_phrase_word_background"
+    android:background="@drawable/vector_restoring_seed_phrase_word_bg"
     android:orientation="horizontal"
     android:paddingVertical="5dp"
     android:paddingStart="13dp">
@@ -17,6 +17,8 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
         android:imeOptions="actionNext"
+        android:textColor="?attr/palette_text_heading"
+        android:textColorHint="?attr/palette_text_light"
         android:lines="1"
         android:minWidth="15dp"
         android:inputType="textVisiblePassword"

@@ -1,6 +1,8 @@
 package com.tari.android.wallet.ui.common
 
 import android.content.Intent
+import android.content.res.Configuration.UI_MODE_NIGHT_MASK
+import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import android.hardware.SensorManager
 import android.net.Uri
 import android.os.Bundle
@@ -66,7 +68,12 @@ abstract class CommonActivity<Binding : ViewBinding, VM : CommonViewModel> : App
 
     private fun setTariTheme(theme: TariTheme) {
         val themeStyle = when (theme) {
-            TariTheme.AppBased -> R.style.AppTheme_Light
+            TariTheme.AppBased -> {
+                when (resources.configuration.uiMode and UI_MODE_NIGHT_MASK) {
+                    UI_MODE_NIGHT_YES -> R.style.AppTheme_Dark
+                    else -> R.style.AppTheme_Light
+                }
+            }
             TariTheme.Light -> R.style.AppTheme_Light
             TariTheme.Dark -> R.style.AppTheme_Dark
             TariTheme.Purple -> R.style.AppTheme_Purple
@@ -88,6 +95,7 @@ abstract class CommonActivity<Binding : ViewBinding, VM : CommonViewModel> : App
 
     override fun onStop() {
         shakeDetector.stop()
+        dialogManager.dismiss()
         super.onStop()
     }
 
@@ -116,7 +124,6 @@ abstract class CommonActivity<Binding : ViewBinding, VM : CommonViewModel> : App
         bundle?.let { fragment.arguments = it }
         val transaction = supportFragmentManager.beginTransaction()
             .addEnterLeftAnimation()
-            .apply { supportFragmentManager.fragments.forEach { hide(it) } }
             .add(containerId!!, fragment, fragment::class.java.simpleName)
         if (!isRoot) {
             transaction.addToBackStack(null)

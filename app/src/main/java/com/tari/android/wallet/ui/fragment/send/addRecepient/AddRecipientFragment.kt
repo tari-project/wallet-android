@@ -60,8 +60,6 @@ import androidx.transition.TransitionManager
 import com.daasuu.ei.Ease
 import com.daasuu.ei.EasingInterpolator
 import com.tari.android.wallet.R
-import com.tari.android.wallet.R.color.black
-import com.tari.android.wallet.R.color.light_gray
 import com.tari.android.wallet.R.dimen.add_recipient_clipboard_emoji_id_container_height
 import com.tari.android.wallet.R.dimen.add_recipient_paste_emoji_id_button_visible_top_margin
 import com.tari.android.wallet.R.string.add_recipient_invalid_emoji_id
@@ -265,14 +263,14 @@ class AddRecipientFragment : CommonFragment<FragmentAddRecipientBinding, AddReci
             ui.searchEditText.removeTextChangedListener(this)
             ui.searchEditText.isEnabled = false
             ui.searchEditText.setText(viewModel.foundYatUser.value!!.get().walletAddress.hexString)
-            ui.yatEyeButton.setImageDrawable(ContextCompat.getDrawable(requireContext(), R.drawable.closed_eye))
+            ui.yatEyeButton.setImageDrawable(ContextCompat.getDrawable(requireContext(), R.drawable.vector_closed_eye))
         } else {
             ui.searchEditText.isEnabled = true
             ui.searchEditText.removeTextChangedListener(this)
             ui.searchEditText.setText(viewModel.foundYatUser.value!!.get().yat)
             ui.searchEditText.setSelectionToEnd()
             ui.searchEditText.addTextChangedListener(this)
-            ui.yatEyeButton.setImageDrawable(ContextCompat.getDrawable(requireContext(), R.drawable.opened_eye))
+            ui.yatEyeButton.setImageDrawable(ContextCompat.getDrawable(requireContext(), R.drawable.vector_opened_eye))
         }
         yatEyeState = isOpen
     }
@@ -300,8 +298,8 @@ class AddRecipientFragment : CommonFragment<FragmentAddRecipientBinding, AddReci
         ui.emojiIdTextView.text = EmojiUtil.getFullEmojiIdSpannable(
             tariWalletAddress.emojiId,
             string(emoji_id_chunk_separator),
-            color(black),
-            color(light_gray)
+            viewModel.paletteManager.getBlack(requireContext()),
+            viewModel.paletteManager.getLightGray(requireContext())
         )
         ui.emojiIdContainerView.setBottomMargin(-dimenPx(add_recipient_clipboard_emoji_id_container_height))
         ui.emojiIdContainerView.visible()
@@ -586,7 +584,7 @@ class AddRecipientFragment : CommonFragment<FragmentAddRecipientBinding, AddReci
                 .withIndex()) {
                 val chunkSeparatorSpannable = EmojiUtil.getChunkSeparatorSpannable(
                     separator,
-                    color(light_gray)
+                    viewModel.paletteManager.getLightGray(requireContext())
                 )
                 val target = index + (offset * separator.length)
                 editable.insert(target, chunkSeparatorSpannable)

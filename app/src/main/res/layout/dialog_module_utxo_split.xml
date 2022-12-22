@@ -97,7 +97,7 @@
                     android:layout_marginStart="5dp"
                     android:layout_marginEnd="2dp"
                     android:src="@drawable/vector_gem"
-                    android:tint="@color/dark_gray" />
+                    android:tint="?attr/palette_text_body" />
 
                 <com.tari.android.wallet.ui.component.tari.TariTextView
                     android:id="@+id/full_amount"
@@ -134,7 +134,7 @@
                     android:layout_marginStart="5dp"
                     android:layout_marginEnd="2dp"
                     android:src="@drawable/vector_gem"
-                    android:tint="@color/dark_gray" />
+                    android:tint="?attr/palette_text_body" />
 
                 <com.tari.android.wallet.ui.component.tari.TariTextView
                     android:id="@+id/count_coins"
@@ -170,7 +170,7 @@
                     android:layout_marginStart="5dp"
                     android:layout_marginEnd="2dp"
                     android:src="@drawable/vector_gem"
-                    android:tint="@color/dark_gray" />
+                    android:tint="?attr/palette_text_body" />
 
                 <com.tari.android.wallet.ui.component.tari.TariTextView
                     android:id="@+id/fee_amount"

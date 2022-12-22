@@ -13,7 +13,7 @@
         android:layout_height="match_parent"
         android:layout_margin="6dp"
         android:clipChildren="false"
-        app:cardBackgroundColor="@color/gray_background"
+        app:cardBackgroundColor="?attr/palette_neutral_secondary"
         app:cardCornerRadius="11dp"
         app:cardElevation="0dp">
 
@@ -26,7 +26,7 @@
                 android:id="@+id/color_container"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="@color/purple"
+                android:background="?attr/palette_brand_purple"
                 android:minHeight="100dp">
 
                 <androidx.appcompat.widget.AppCompatCheckBox
@@ -58,8 +58,9 @@
                             android:id="@+id/balance_gem_image_view"
                             android:layout_width="@dimen/home_balance_gem_width"
                             android:layout_height="@dimen/home_balance_gem_height"
+                            android:tint="@color/white"
                             android:layout_gravity="center_vertical"
-                            android:src="@drawable/home_gem_balance" />
+                            android:src="@drawable/vector_gem" />
 
                         <com.tari.android.wallet.ui.component.tari.TariTextView
                             android:id="@+id/amount"
@@ -96,7 +97,6 @@
 
                 </androidx.appcompat.widget.LinearLayoutCompat>
 
-
                 <androidx.appcompat.widget.AppCompatImageView
                     android:id="@+id/status"
                     android:layout_width="wrap_content"
@@ -106,7 +106,6 @@
                     app:layout_constraintEnd_toEndOf="parent" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
-
 
         </FrameLayout>
 

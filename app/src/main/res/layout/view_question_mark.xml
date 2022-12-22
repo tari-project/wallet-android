@@ -5,7 +5,7 @@
     android:id="@+id/balance_question_mark"
     android:layout_width="@dimen/home_question_mark_size"
     android:layout_height="@dimen/home_question_mark_size"
-    android:background="@drawable/circle_white">
+    android:background="@drawable/vector_round_white">
 
     <com.tari.android.wallet.ui.component.tari.TariTextView
         android:layout_width="wrap_content"
@@ -13,7 +13,7 @@
         android:layout_gravity="center"
         android:layout_marginBottom="1dp"
         android:text="@string/home_question_mark"
-        android:textColor="@color/white"
+        android:textColor="?attr/palette_button_primary_text"
         app:customFont="medium" />
 
 </FrameLayout>

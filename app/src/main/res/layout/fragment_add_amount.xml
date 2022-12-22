@@ -184,7 +184,7 @@
                         android:layout_gravity="center_vertical"
                         android:layout_marginEnd="6dp"
                         android:src="@drawable/vector_network_medium"
-                        android:tint="@color/dark_gray" />
+                        android:tint="?attr/palette_text_body" />
 
                     <com.tari.android.wallet.ui.component.tari.TariTextView
                         android:layout_width="wrap_content"

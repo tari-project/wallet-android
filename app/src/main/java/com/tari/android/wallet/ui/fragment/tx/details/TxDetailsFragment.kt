@@ -153,15 +153,15 @@ class TxDetailsFragment : CommonFragment<FragmentTxDetailsBinding, TxDetailsView
     private fun disableCTAs() {
         arrayOf<TextView>(ui.addContactButton, ui.cancelTxView, ui.editContactLabelTextView).forEach {
             it.isEnabled = false
-            it.setTextColor(color(disabled_cta))
+            it.setTextColor(viewModel.paletteManager.getButtonDisabled(requireContext()))
         }
     }
 
     private fun enableCTAs() {
         arrayOf<TextView>(ui.addContactButton, ui.cancelTxView, ui.editContactLabelTextView).forEach { it.isEnabled = true }
-        ui.addContactButton.setTextColor(color(purple))
-        ui.editContactLabelTextView.setTextColor(color(purple))
-        ui.cancelTxView.setTextColor(color(tx_detail_cancel_tx_cta))
+        ui.addContactButton.setTextColor(viewModel.paletteManager.getTextLinks(requireContext()))
+        ui.editContactLabelTextView.setTextColor(viewModel.paletteManager.getTextLinks(requireContext()))
+        ui.cancelTxView.setTextColor(viewModel.paletteManager.getRed(requireContext()))
     }
 
     private fun setUICommands() {
@@ -308,7 +308,7 @@ class TxDetailsFragment : CommonFragment<FragmentTxDetailsBinding, TxDetailsView
             } else {
                 viewModel.removeContact()
             }
-            ui.contactLabelTextView.setTextColor(color(tx_detail_contact_name_label_text))
+            ui.contactLabelTextView.setTextColor(viewModel.paletteManager.getTextBody(requireContext()))
             return false
         }
         return true
@@ -370,7 +370,7 @@ class TxDetailsFragment : CommonFragment<FragmentTxDetailsBinding, TxDetailsView
         ui.createContactEditText.requestFocus()
         ui.createContactEditText.setSelection(ui.createContactEditText.text?.length ?: 0)
         requireActivity().showKeyboard()
-        ui.contactLabelTextView.setTextColor(color(black))
+        ui.contactLabelTextView.setTextColor(viewModel.paletteManager.getTextHeading(requireContext()))
     }
 
     private fun showTxFeeToolTip() {

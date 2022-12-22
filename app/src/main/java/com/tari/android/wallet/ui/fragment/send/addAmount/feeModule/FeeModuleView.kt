@@ -43,7 +43,7 @@ class FeeModuleView(context: Context, private val feeModule: FeeModule) :
             NetworkSpeed.Medium -> ui.networkMedium
             NetworkSpeed.Slow -> ui.networkSlow
         }
-        currentSpeed.background = ContextCompat.getDrawable(context, R.drawable.network_segmented_picker_selected_bg)
+        currentSpeed.background = ContextCompat.getDrawable(context, R.drawable.vector_network_segmented_picker_selected_bg)
         calculateFee()
     }
 

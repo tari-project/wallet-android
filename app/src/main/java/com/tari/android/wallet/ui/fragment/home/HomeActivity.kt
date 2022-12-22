@@ -34,8 +34,6 @@ package com.tari.android.wallet.ui.fragment.home
 
 import android.content.Intent
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.widget.ImageView
 import androidx.activity.viewModels
 import androidx.fragment.app.Fragment
@@ -44,7 +42,6 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.tari.android.wallet.R
-import com.tari.android.wallet.R.color.home_selected_nav_item
 import com.tari.android.wallet.application.deeplinks.DeepLink
 import com.tari.android.wallet.application.deeplinks.DeeplinkHandler
 import com.tari.android.wallet.application.deeplinks.DeeplinkViewModel
@@ -55,7 +52,11 @@ import com.tari.android.wallet.di.DiContainer.appComponent
 import com.tari.android.wallet.event.Event
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.extension.applyFontStyle
-import com.tari.android.wallet.model.*
+import com.tari.android.wallet.model.MicroTari
+import com.tari.android.wallet.model.Tx
+import com.tari.android.wallet.model.TxId
+import com.tari.android.wallet.model.User
+import com.tari.android.wallet.model.WalletError
 import com.tari.android.wallet.network.NetworkConnectionState
 import com.tari.android.wallet.service.TariWalletService
 import com.tari.android.wallet.service.connection.ServiceConnectionStatus
@@ -70,7 +71,10 @@ import com.tari.android.wallet.ui.dialog.modular.modules.body.BodyModule
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonModule
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonStyle
 import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
-import com.tari.android.wallet.ui.extension.*
+import com.tari.android.wallet.ui.extension.hideKeyboard
+import com.tari.android.wallet.ui.extension.parcelable
+import com.tari.android.wallet.ui.extension.showInternetConnectionErrorDialog
+import com.tari.android.wallet.ui.extension.string
 import com.tari.android.wallet.ui.fragment.onboarding.activity.OnboardingFlowActivity
 import com.tari.android.wallet.ui.fragment.profile.WalletInfoFragment
 import com.tari.android.wallet.ui.fragment.send.addAmount.AddAmountFragment
@@ -112,6 +116,7 @@ import com.tari.android.wallet.ui.fragment.utxos.list.UtxosListFragment
 import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.yat.YatUser
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.lang.ref.WeakReference
 import javax.inject.Inject
@@ -172,10 +177,12 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>(), AllSe
             enableNavigationView(index)
         }
         setupUi()
-        Handler(Looper.getMainLooper()).postDelayed(
-            { checkNetworkCompatibility() },
-            3000
-        )
+        lifecycleScope.launch(Dispatchers.IO) {
+            delay(3000)
+            launch(Dispatchers.Main) {
+                checkNetworkCompatibility()
+            }
+        }
     }
 
     override fun onNewIntent(intent: Intent) {
@@ -257,9 +264,8 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>(), AllSe
     }
 
     private fun enableNavigationView(view: ImageView) {
-        arrayOf(ui.homeImageView, ui.storeImageView, ui.walletInfoImageView, ui.settingsImageView)
-            .forEach { it.clearColorFilter() }
-        view.setColorFilter(color(home_selected_nav_item))
+        arrayOf(ui.homeImageView, ui.storeImageView, ui.walletInfoImageView, ui.settingsImageView).forEach { it.clearColorFilter() }
+        view.setColorFilter(viewModel.paletteManager.getPurpleBrand(this))
     }
 
     private fun checkNetworkCompatibility() {
@@ -321,6 +327,7 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>(), AllSe
                 HomeDeeplinkScreens.TxDetails -> {
                     (intent.parcelable<TxId>(HomeDeeplinkScreens.KeyTxDetailsArgs))?.let { toTxDetails(null, it) }
                 }
+
                 else -> {}
             }
         }
@@ -414,7 +421,6 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>(), AllSe
             viewModel.yatAdapter.showOutcomingFinalizeActivity(this, transactionData)
         } else {
             addFragment(FinalizeSendTxFragment.create(transactionData))
-            ui.rootView.post { ui.rootView.setBackgroundColor(color(R.color.white)) }
         }
     }
 

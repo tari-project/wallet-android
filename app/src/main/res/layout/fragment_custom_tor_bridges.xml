@@ -94,7 +94,6 @@
                     android:id="@+id/scan_qr_cta"
                     android:layout_width="match_parent"
                     android:layout_height="@dimen/menu_item_height"
-                    android:background="@drawable/setting_option_background"
                     android:clickable="true"
                     android:focusable="true"
                     android:paddingHorizontal="@dimen/common_horizontal_margin">
@@ -128,7 +127,6 @@
                     android:layout_width="match_parent"
                     android:layout_height="@dimen/menu_item_height"
                     android:layout_marginTop="1dp"
-                    android:background="@drawable/setting_option_background"
                     android:clickable="true"
                     android:focusable="true"
                     android:paddingHorizontal="@dimen/common_horizontal_margin"

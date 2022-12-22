@@ -3,6 +3,14 @@
     <style name="AppTheme.Base" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="alertDialogTheme">@style/AlertDialogTheme</item>
         <item name="switchStyle">@style/SwitchTheme</item>
+
+        <item name="colorPrimary">?attr/palette_background_primary</item>
+        <item name="colorPrimaryDark">?attr/palette_background_secondary</item>
+        <item name="colorAccent">?attr/palette_brand_purple</item>
+
+        <item name="android:statusBarColor">@android:color/black</item>
+        <item name="android:navigationBarColor">@android:color/black</item>
+
     </style>
 
     <style name="AppTheme.Light" parent="AppTheme.Base">

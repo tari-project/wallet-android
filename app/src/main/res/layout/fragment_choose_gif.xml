@@ -2,7 +2,6 @@
 
 <com.tari.android.wallet.ui.component.tari.TariPrimaryBackground xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     app:cornerRadius="10dp">
@@ -17,14 +16,14 @@
             android:layout_height="5dp"
             android:layout_gravity="center"
             android:layout_marginTop="8dp"
-            android:background="@drawable/grabber_choose_gif" />
+            android:background="@drawable/vector_grabber_choose_gif" />
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="38dp"
             android:layout_marginHorizontal="25dp"
             android:layout_marginTop="15dp"
-            android:background="@drawable/background_choose_gif_dialog_input"
+            android:background="@drawable/vector_choose_gif_dialog_input_bg"
             android:orientation="horizontal">
 
             <androidx.appcompat.widget.AppCompatImageView
@@ -32,8 +31,7 @@
                 android:layout_height="16dp"
                 android:layout_gravity="center"
                 android:layout_marginStart="16dp"
-                android:src="@drawable/ic_search"
-                 />
+                android:src="@drawable/vector_search" />
 
             <com.tari.android.wallet.ui.component.tari.TariEditText
                 android:id="@+id/gif_search_edit_text"
@@ -45,7 +43,7 @@
                 android:background="@null"
                 android:hint="@string/search_gifs_dialog_hint"
                 android:inputType="text"
-                android:textColorHint="@color/add_recipient_hint"
+                android:textColorHint="?attr/palette_text_light"
                 android:textSize="14sp"
                 app:customFont="medium" />
         </LinearLayout>

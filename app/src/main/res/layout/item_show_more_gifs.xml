@@ -1,24 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<com.tari.android.wallet.ui.component.tari.TariPrimaryBackground xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="64dp"
     android:layout_height="64dp"
-    android:background="@drawable/background_more_gifs_item">
+    app:cornerRadius="12dp"
+    app:elevation="4dp">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:orientation="vertical"
-        tools:ignore="UselessParent">
+        android:orientation="vertical">
 
         <androidx.appcompat.widget.AppCompatImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:src="@drawable/ic_search_giphy"
-             />
+            android:src="@drawable/vector_search_giphy" />
 
         <com.tari.android.wallet.ui.component.tari.TariTextView
             android:layout_width="wrap_content"
@@ -26,13 +25,13 @@
             android:layout_gravity="center"
             android:layout_marginHorizontal="8dp"
             android:layout_marginTop="4dp"
-            android:lineSpacingExtra="2dp"
             android:gravity="center_horizontal"
+            android:lineSpacingExtra="2dp"
             android:text="@string/add_note_search_giphy_carousel_item_label"
-            android:textColor="@color/add_note_more_gifs_item_text"
+            android:textColor="?attr/palette_text_body"
             android:textSize="9sp"
             app:customFont="black"
             tools:ignore="SmallSp" />
     </LinearLayout>
 
-</FrameLayout>
+</com.tari.android.wallet.ui.component.tari.TariPrimaryBackground>

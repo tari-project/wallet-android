@@ -81,7 +81,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
-            android:src="@drawable/speech_notch_up"
+            android:src="@drawable/tari_speech_notch_up"
             android:tint="?attr/palette_background_primary" />
 
         <com.tari.android.wallet.ui.component.tari.TariPrimaryBackground

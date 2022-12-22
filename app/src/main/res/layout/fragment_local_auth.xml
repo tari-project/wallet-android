@@ -18,8 +18,7 @@
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="@dimen/onboarding_small_gem_top_margin"
             android:alpha="0"
-            android:contentDescription="@null"
-            android:src="@drawable/splash_gem_small"
+            android:src="@drawable/tari_splash_gem_small"
             android:tint="@color/black"
             android:visibility="visible" />
 
@@ -36,10 +35,9 @@
                 android:layout_centerHorizontal="true"
                 android:layout_marginTop="50dp"
                 android:alpha="0"
-                android:contentDescription="@null"
                 android:scaleX="1.9"
                 android:scaleY="1.9"
-                android:src="@drawable/fingerprint" />
+                android:src="@drawable/tari_fingerprint" />
 
             <com.tari.android.wallet.ui.component.tari.TariTextView
                 android:id="@+id/prompt_text_view"
@@ -56,16 +54,6 @@
                 android:textColor="?attr/palette_text_heading"
                 android:textSize="18sp"
                 app:customFont="light" />
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_below="@id/auth_type_image_view"
-                android:layout_alignTop="@id/prompt_text_view"
-                android:layout_alignBottom="@id/prompt_text_view"
-                android:layout_gravity="center"
-                android:background="@color/create_emoji_id_bg"
-                android:visibility="visible" />
 
             <com.tari.android.wallet.ui.component.tari.TariTextView
                 android:id="@+id/auth_desc_text_view"
@@ -99,7 +87,7 @@
                 android:layout_height="@dimen/common_action_button_height"
                 android:layout_centerInParent="true"
                 android:layout_marginHorizontal="@dimen/common_horizontal_margin"
-                android:background="@drawable/gradient_button_bg">
+                android:background="@drawable/vector_gradient_button_bg">
 
                 <com.tari.android.wallet.ui.component.tari.TariProgressBar
                     android:id="@+id/progress_bar"
@@ -115,7 +103,7 @@
                 android:layout_height="@dimen/common_action_button_height"
                 android:layout_centerInParent="true"
                 android:layout_marginHorizontal="@dimen/common_horizontal_margin"
-                android:background="@drawable/gradient_button_bg"
+                android:background="@drawable/vector_gradient_button_bg"
                 android:ellipsize="middle"
                 android:singleLine="true"
                 android:text="@string/auth_prompt_button_text"

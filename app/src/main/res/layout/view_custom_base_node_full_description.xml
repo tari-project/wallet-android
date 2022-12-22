@@ -7,24 +7,24 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
-    <FrameLayout
+    <com.tari.android.wallet.ui.component.tari.TariSecondaryBackground
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="16dp"
-        android:background="@drawable/background_gray_round"
-        android:padding="24dp">
+        android:padding="24dp"
+        app:cornerRadius="12dp">
 
         <com.tari.android.wallet.ui.component.tari.TariTextView
             android:id="@+id/description_text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:lineSpacingExtra="2sp"
             android:gravity="center"
+            android:lineSpacingExtra="2sp"
             android:textColor="?attr/palette_text_body"
-            tools:text="Full text description \n description"
-            app:customFont="medium" />
+            app:customFont="medium"
+            tools:text="Full text description \n description" />
 
-    </FrameLayout>
+    </com.tari.android.wallet.ui.component.tari.TariSecondaryBackground>
 
 </FrameLayout>

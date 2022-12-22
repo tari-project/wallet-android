@@ -33,7 +33,7 @@
             android:clickable="true"
             android:focusable="true"
             android:text="@string/tx_list_retry_loading_gif"
-            android:textColor="@color/purple"
+            android:textColor="?attr/palette_brand_purple"
             android:textSize="13sp"
             android:visibility="gone"
             app:customFont="heavy"
@@ -54,7 +54,6 @@
         android:layout_gravity="center"
         android:layout_marginTop="@dimen/tx_list_item_gif_container_top_margin"
         android:adjustViewBounds="true"
-        android:contentDescription="@string/add_note_content_description_chosen_gif"
         android:scaleType="fitCenter" />
 
 </LinearLayout>
