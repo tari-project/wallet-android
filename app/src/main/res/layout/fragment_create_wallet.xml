@@ -186,7 +186,7 @@
                 android:layout_marginBottom="18dp"
                 android:src="@drawable/tari_splash_gem_small"
                 android:visibility="gone"
-                app:tint="@color/black" />
+                app:tint="?attr/palette_text_heading" />
 
             <com.airbnb.lottie.LottieAnimationView
                 android:id="@+id/emoji_wheel_lottie_animation_view"
