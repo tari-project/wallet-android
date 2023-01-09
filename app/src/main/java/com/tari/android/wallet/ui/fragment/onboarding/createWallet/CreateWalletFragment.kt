@@ -32,7 +32,11 @@
  */
 package com.tari.android.wallet.ui.fragment.onboarding.createWallet
 
-import android.animation.*
+import android.animation.Animator
+import android.animation.AnimatorListenerAdapter
+import android.animation.AnimatorSet
+import android.animation.ObjectAnimator
+import android.animation.ValueAnimator
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -44,19 +48,34 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.daasuu.ei.Ease
 import com.daasuu.ei.EasingInterpolator
-import com.tari.android.wallet.R.color.black
-import com.tari.android.wallet.R.color.light_gray
-import com.tari.android.wallet.R.dimen.*
-import com.tari.android.wallet.R.string.*
+import com.tari.android.wallet.R.dimen.common_horizontal_margin
+import com.tari.android.wallet.R.dimen.common_view_elevation
+import com.tari.android.wallet.R.dimen.create_wallet_button_bottom_margin
+import com.tari.android.wallet.R.dimen.onboarding_see_full_emoji_id_button_visible_top_margin
+import com.tari.android.wallet.R.string.create_wallet_your_emoji_id_text_label
+import com.tari.android.wallet.R.string.create_wallet_your_emoji_id_text_label_bold_part
+import com.tari.android.wallet.R.string.emoji_id_chunk_separator
 import com.tari.android.wallet.application.WalletState
 import com.tari.android.wallet.databinding.FragmentCreateWalletBinding
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.extension.addTo
 import com.tari.android.wallet.extension.applyFontStyle
 import com.tari.android.wallet.ui.common.CommonFragment
-import com.tari.android.wallet.ui.component.CustomFont
-import com.tari.android.wallet.ui.component.EmojiIdSummaryViewController
-import com.tari.android.wallet.ui.extension.*
+import com.tari.android.wallet.ui.component.fullEmojiId.EmojiIdSummaryViewController
+import com.tari.android.wallet.ui.component.tari.TariFont
+import com.tari.android.wallet.ui.extension.animateClick
+import com.tari.android.wallet.ui.extension.dimen
+import com.tari.android.wallet.ui.extension.dimenPx
+import com.tari.android.wallet.ui.extension.doOnGlobalLayout
+import com.tari.android.wallet.ui.extension.getBottomMargin
+import com.tari.android.wallet.ui.extension.gone
+import com.tari.android.wallet.ui.extension.invisible
+import com.tari.android.wallet.ui.extension.setBottomMargin
+import com.tari.android.wallet.ui.extension.setLayoutWidth
+import com.tari.android.wallet.ui.extension.setTopMargin
+import com.tari.android.wallet.ui.extension.string
+import com.tari.android.wallet.ui.extension.temporarilyDisableClick
+import com.tari.android.wallet.ui.extension.visible
 import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.Constants.UI.CreateEmojiId
 import com.tari.android.wallet.util.EmojiUtil
@@ -100,9 +119,9 @@ class CreateWalletFragment : CommonFragment<FragmentCreateWalletBinding, CreateW
         ui.apply {
             yourEmojiIdTitleTextView.text = string(create_wallet_your_emoji_id_text_label).applyFontStyle(
                 requireActivity(),
-                CustomFont.AVENIR_LT_STD_LIGHT,
+                TariFont.AVENIR_LT_STD_LIGHT,
                 listOf(string(create_wallet_your_emoji_id_text_label_bold_part)),
-                CustomFont.AVENIR_LT_STD_BLACK
+                TariFont.AVENIR_LT_STD_BLACK
             )
             bottomSpinnerLottieAnimationView.alpha = 0f
             bottomSpinnerLottieAnimationView.scaleX = 0.5F
@@ -229,8 +248,8 @@ class CreateWalletFragment : CommonFragment<FragmentCreateWalletBinding, CreateW
                         ui.emojiIdTextView.text = EmojiUtil.getFullEmojiIdSpannable(
                             emojiId,
                             string(emoji_id_chunk_separator),
-                            color(black),
-                            color(light_gray)
+                            viewModel.paletteManager.getBlack(requireContext()),
+                            viewModel.paletteManager.getLightGray(requireContext())
                         )
                         emojiIdSummaryController.display(emojiId)
 

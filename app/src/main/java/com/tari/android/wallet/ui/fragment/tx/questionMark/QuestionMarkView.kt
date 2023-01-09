@@ -5,7 +5,7 @@ import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import com.tari.android.wallet.databinding.ViewQuestionMarkBinding
-import com.tari.android.wallet.ui.component.MainListTouchingView
+import com.tari.android.wallet.ui.component.mainList.MainListTouchingView
 
 class QuestionMarkView : MainListTouchingView<QuestionMarkViewModel, ViewQuestionMarkBinding> {
 

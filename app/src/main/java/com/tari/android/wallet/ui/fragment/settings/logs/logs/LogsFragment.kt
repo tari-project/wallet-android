@@ -63,7 +63,7 @@ class LogsFragment : CommonFragment<FragmentLogsBinding, LogsViewModel>() {
         bindViewModel(viewModel)
 
         arguments?.serializable<File>(DebugActivity.log_file)?.let {
-            this.ui.title.text = it.name
+            this.ui.toolbar.setText(it.name)
             viewModel.initWithFile(it)
         }
 
@@ -72,9 +72,8 @@ class LogsFragment : CommonFragment<FragmentLogsBinding, LogsViewModel>() {
     }
 
     private fun setupUI() = with(ui) {
-        filterButton.setVisible(false)
-        backCtaView.setOnClickListener { requireActivity().onBackPressed() }
-        filterButton.setOnClickListener { viewModel.showFilters() }
+        ui.toolbar.rightAction = { viewModel.showFilters() }
+        ui.toolbar.ui.toolbarRightIcon.setVisible(false)
         recyclerViewAdapter = LogListAdapter()
         recyclerViewAdapter.setLongClickListener(CommonAdapter.ItemLongClickListener {
             viewModel.copyToClipboard(it)
@@ -90,7 +89,7 @@ class LogsFragment : CommonFragment<FragmentLogsBinding, LogsViewModel>() {
 
     private fun updateData(list: MutableList<LogViewHolderItem>) {
         ui.loadingState.setVisible(false)
-        ui.filterButton.setVisible(true)
+        ui.toolbar.ui.toolbarRightIcon.setVisible(true)
         recyclerViewAdapter.update(list)
     }
 

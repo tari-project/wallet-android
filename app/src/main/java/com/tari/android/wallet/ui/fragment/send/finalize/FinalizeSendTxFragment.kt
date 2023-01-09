@@ -49,7 +49,7 @@ import com.tari.android.wallet.databinding.FragmentFinalizeSendTxBinding
 import com.tari.android.wallet.extension.observe
 import com.tari.android.wallet.extension.observeOnLoad
 import com.tari.android.wallet.ui.common.CommonFragment
-import com.tari.android.wallet.ui.component.CustomFontTextView
+import com.tari.android.wallet.ui.component.tari.TariTextView
 import com.tari.android.wallet.ui.extension.getResourceUri
 import com.tari.android.wallet.ui.extension.invisible
 import com.tari.android.wallet.ui.extension.parcelable
@@ -139,7 +139,7 @@ class FinalizeSendTxFragment : CommonFragment<FragmentFinalizeSendTxBinding, Fin
         playStepAppearAnimation(step.descriptionLine2, ui.infoLine2TextView, Constants.UI.xShortDurationMs)
     }
 
-    private fun playStepAppearAnimation(lineText: String, textView: CustomFontTextView, additionalDelay: Long = 0) = with(textView) {
+    private fun playStepAppearAnimation(lineText: String, textView: TariTextView, additionalDelay: Long = 0) = with(textView) {
         text = lineText
         measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED)
         invisible()

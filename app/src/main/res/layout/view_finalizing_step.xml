@@ -1,19 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<com.tari.android.wallet.ui.component.tari.TariSecondaryBackground xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/step_progress_bar_container_view"
     android:layout_width="55dp"
     android:layout_height="match_parent"
-    android:layout_marginHorizontal="6dp"
-    android:background="@color/finalize_send_progress_bar_passive_bg">
+    android:layout_marginHorizontal="6dp">
 
-    <ProgressBar
+    <com.tari.android.wallet.ui.component.tari.TariProgressBar
         android:id="@+id/step_progress_bar"
         style="?android:attr/progressBarStyleHorizontal"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:indeterminate="false"
-        android:progress="0"
-        android:progressBackgroundTint="@color/finalize_send_progress_bar_active_bg"
-        android:progressTint="@color/purple" />
-</FrameLayout>
+        android:progress="0" />
+
+</com.tari.android.wallet.ui.component.tari.TariSecondaryBackground>
 

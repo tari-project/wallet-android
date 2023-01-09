@@ -9,23 +9,33 @@ import com.bumptech.glide.request.target.Target
 import com.tari.android.wallet.R
 import com.tari.android.wallet.databinding.ItemHomeTxListBinding
 import com.tari.android.wallet.extension.applyFontStyle
-import com.tari.android.wallet.model.*
+import com.tari.android.wallet.model.CancelledTx
+import com.tari.android.wallet.model.CompletedTx
+import com.tari.android.wallet.model.Contact
+import com.tari.android.wallet.model.PendingInboundTx
+import com.tari.android.wallet.model.PendingOutboundTx
+import com.tari.android.wallet.model.Tx
+import com.tari.android.wallet.model.TxNote
+import com.tari.android.wallet.model.TxStatus
 import com.tari.android.wallet.ui.common.gyphy.presentation.GIFStateConsumer
 import com.tari.android.wallet.ui.common.gyphy.presentation.GlideGIFListener
 import com.tari.android.wallet.ui.common.gyphy.repository.GIFItem
 import com.tari.android.wallet.ui.common.recyclerView.CommonViewHolder
 import com.tari.android.wallet.ui.common.recyclerView.ViewHolderBuilder
-import com.tari.android.wallet.ui.component.CustomFont
-import com.tari.android.wallet.ui.component.EmojiIdSummaryViewController
-import com.tari.android.wallet.ui.extension.*
-import com.tari.android.wallet.model.TxNote
+import com.tari.android.wallet.ui.component.fullEmojiId.EmojiIdSummaryViewController
+import com.tari.android.wallet.ui.component.tari.TariFont
+import com.tari.android.wallet.ui.extension.dimen
+import com.tari.android.wallet.ui.extension.gone
+import com.tari.android.wallet.ui.extension.setTopMargin
+import com.tari.android.wallet.ui.extension.string
+import com.tari.android.wallet.ui.extension.visible
 import com.tari.android.wallet.util.WalletUtil
 import com.tari.android.wallet.util.extractEmojis
 import org.joda.time.DateTime
 import org.joda.time.Hours
 import org.joda.time.LocalDate
 import org.joda.time.Minutes
-import java.util.*
+import java.util.Locale
 
 class TxListViewHolder(view: ItemHomeTxListBinding) : CommonViewHolder<TransactionItem, ItemHomeTxListBinding>(view), GIFStateConsumer {
 
@@ -33,14 +43,9 @@ class TxListViewHolder(view: ItemHomeTxListBinding) : CommonViewHolder<Transacti
     private val emojiIdSummaryController = EmojiIdSummaryViewController(ui.participantEmojiIdView)
     private lateinit var tx: Tx
 
-    init {
-        ui.gifContainer.loadingGifProgressBar.setColor(color(R.color.tx_list_loading_gif_gray))
-    }
-
     override fun bind(item: TransactionItem) {
         super.bind(item)
 
-        setContentTopMargin()
         with(item.tx) {
             this@TxListViewHolder.tx = this
             displayFirstEmoji(this)
@@ -54,12 +59,6 @@ class TxListViewHolder(view: ItemHomeTxListBinding) : CommonViewHolder<Transacti
         item.viewModel.onNewTxNote(tx.message)
         ui.gifContainer.retryLoadingGifTextView.setOnClickListener { item.viewModel.retry() }
         item.viewModel.gifState.observeForever { it.handle(this) }
-    }
-
-    private fun setContentTopMargin() {
-        ui.firstEmojiShadowImageView.setTopMargin(dimen(R.dimen.tx_list_item_emoji_text_view_shadow_normal_top_margin))
-        ui.firstEmojiTextView.setTopMargin(dimen(R.dimen.tx_list_item_emoji_text_view_normal_top_margin))
-        ui.contentContainerView.setTopMargin(dimen(R.dimen.tx_list_item_content_container_view_normal_top_margin))
     }
 
     private fun displayFirstEmoji(tx: Tx) {
@@ -80,6 +79,7 @@ class TxListViewHolder(view: ItemHomeTxListBinding) : CommonViewHolder<Transacti
                 ui.participantEmojiIdView.root.gone()
                 ui.participantTextView1.text = title
             }
+
             txUser is Contact -> {
                 val fullText = when (tx.direction) {
                     Tx.Direction.INBOUND -> string(R.string.tx_list_sent_a_payment, txUser.alias)
@@ -88,13 +88,14 @@ class TxListViewHolder(view: ItemHomeTxListBinding) : CommonViewHolder<Transacti
                 ui.participantTextView1.visible()
                 ui.participantTextView1.text = fullText.applyFontStyle(
                     itemView.context,
-                    CustomFont.AVENIR_LT_STD_LIGHT,
+                    TariFont.AVENIR_LT_STD_LIGHT,
                     listOf(txUser.alias),
-                    CustomFont.AVENIR_LT_STD_HEAVY
+                    TariFont.AVENIR_LT_STD_HEAVY
                 )
                 ui.participantEmojiIdView.root.gone()
                 ui.participantTextView2.gone()
             }
+
             else -> { // display emoji id
                 ui.participantEmojiIdView.root.visible()
                 emojiIdSummaryController.display(txUser.walletAddress.emojiId, showEmojisFromEachEnd = 2)
@@ -105,6 +106,7 @@ class TxListViewHolder(view: ItemHomeTxListBinding) : CommonViewHolder<Transacti
                         ui.participantTextView2.text = string(R.string.tx_list_paid_you)
                         // paid you
                     }
+
                     Tx.Direction.OUTBOUND -> {
                         ui.participantTextView1.visible()
                         ui.participantTextView1.text = string(R.string.tx_list_you_paid)
@@ -117,44 +119,50 @@ class TxListViewHolder(view: ItemHomeTxListBinding) : CommonViewHolder<Transacti
 
     private fun displayAmount(tx: Tx) {
         val amount = WalletUtil.amountFormatter.format(tx.amount.tariValue)
-        val (amountText, textColor, background) = when {
+        val context = itemView.context
+        val (amountText, textColor, backgroundColor) = when {
             tx is CancelledTx -> Triple(
                 amount,
-                color(R.color.home_tx_value_canceled),
-                drawable(R.drawable.home_tx_value_canceled_bg)!!
+                paletteManager.getTextBody(context),
+                paletteManager.getBackgroundPrimary(context)
             )
+
             tx is PendingInboundTx -> Triple(
                 "+$amount",
-                color(R.color.home_tx_value_pending),
-                drawable(R.drawable.home_tx_value_pending_bg)!!
+                paletteManager.getYellow(context),
+                paletteManager.getSecondaryYellow(context)
             )
+
             tx is PendingOutboundTx -> Triple(
                 "-$amount",
-                color(R.color.home_tx_value_pending),
-                drawable(R.drawable.home_tx_value_pending_bg)!!
+                paletteManager.getYellow(context),
+                paletteManager.getSecondaryYellow(context)
             )
+
             tx is CompletedTx && tx.status == TxStatus.MINED_UNCONFIRMED -> Triple(
                 when (tx.direction) {
                     Tx.Direction.OUTBOUND -> "-$amount"
                     Tx.Direction.INBOUND -> "+$amount"
                 },
-                color(R.color.home_tx_value_pending),
-                drawable(R.drawable.home_tx_value_pending_bg)!!
+                paletteManager.getYellow(context),
+                paletteManager.getSecondaryYellow(context)
             )
+
             tx.direction == Tx.Direction.INBOUND -> Triple(
                 "+$amount",
-                color(R.color.home_tx_value_positive),
-                drawable(R.drawable.home_tx_value_positive_bg)!!
+                paletteManager.getGreen(context),
+                paletteManager.getSecondaryGreen(context)
             )
+
             else -> Triple(
                 "-$amount",
-                color(R.color.home_tx_value_negative),
-                drawable(R.drawable.home_tx_value_negative_bg)!!
+                paletteManager.getRed(context),
+                paletteManager.getSecondaryRed(context)
             )
         }
         ui.amountTextView.text = amountText
         ui.amountTextView.setTextColor(textColor)
-        ui.amountTextView.background = background
+        ui.amountTextViewRound.updateBack(backColor = backgroundColor)
         val measure = ui.amountTextView.paint.measureText("0".repeat(ui.amountTextView.text.length))
         val totalPadding = ui.amountTextView.paddingStart + ui.amountTextView.paddingEnd
         ui.amountTextView.width = totalPadding + measure.toInt()
@@ -174,6 +182,7 @@ class TxListViewHolder(view: ItemHomeTxListBinding) : CommonViewHolder<Transacti
                     else -> String.format(string(R.string.tx_list_hours_ago), Hours.hoursBetween(txDateTime, DateTime.now()).hours)
                 }
             }
+
             txDate.isEqual(yesterdayDate) -> string(R.string.home_tx_list_header_yesterday)
             else -> txDate.toString(dateFormat, Locale.ENGLISH)
         }
@@ -184,16 +193,19 @@ class TxListViewHolder(view: ItemHomeTxListBinding) : CommonViewHolder<Transacti
             TxStatus.PENDING -> showStatusTextView(R.string.tx_detail_waiting_for_sender_to_complete)
             else -> showStatusTextViewFinalProcessing()
         }
+
         is PendingOutboundTx -> when (tx.status) {
             TxStatus.PENDING -> showStatusTextView(R.string.tx_detail_waiting_for_recipient)
             else -> showStatusTextViewFinalProcessing()
         }
+
         is CompletedTx -> {
             when (tx.status) {
                 TxStatus.MINED_UNCONFIRMED -> showStatusTextViewFinalProcessing(tx.confirmationCount.toInt())
                 else -> ui.statusTextView.gone()
             }
         }
+
         is CancelledTx -> showStatusTextView(R.string.tx_detail_payment_cancelled)
         else -> ui.statusTextView.gone()
     }

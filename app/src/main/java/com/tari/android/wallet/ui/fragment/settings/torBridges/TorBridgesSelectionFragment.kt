@@ -10,7 +10,6 @@ import com.tari.android.wallet.databinding.FragmentTorBridgeSelectionBinding
 import com.tari.android.wallet.extension.observe
 import com.tari.android.wallet.ui.common.CommonFragment
 import com.tari.android.wallet.ui.common.recyclerView.CommonAdapter
-import com.tari.android.wallet.ui.extension.setOnThrottledClickListener
 import com.tari.android.wallet.ui.fragment.settings.allSettings.AllSettingsRouter
 import com.tari.android.wallet.ui.fragment.settings.torBridges.torItem.TorBridgesAdapter
 
@@ -38,11 +37,10 @@ class TorBridgesSelectionFragment : CommonFragment<FragmentTorBridgeSelectionBin
     }
 
     private fun setupViews() = with(ui) {
-        backCtaView.setOnThrottledClickListener { requireActivity().onBackPressed() }
         torBridgesList.layoutManager = LinearLayoutManager(requireContext())
         torBridgesList.adapter = adapter
         adapter.setClickListener(CommonAdapter.ItemClickListener { viewModel.preselect(it) })
-        connectButton.setOnClickListener { viewModel.connect() }
+        toolbar.rightAction = { viewModel.connect() }
     }
 
     private fun observeUI() = with(viewModel) {

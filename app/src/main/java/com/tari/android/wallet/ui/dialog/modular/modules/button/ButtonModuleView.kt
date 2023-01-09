@@ -25,15 +25,15 @@ class ButtonModuleView(context: Context, buttonModule: ButtonModule, dismissActi
         ui.button.text = buttonModule.text
         when (buttonModule.style) {
             ButtonStyle.Normal -> {
-                ui.button.setTextColor(ContextCompat.getColor(context, R.color.white))
-                ui.button.background = ContextCompat.getDrawable(context, R.drawable.disable_able_gradient_button_bg)
+                ui.button.setTextColor(paletteManager.getButtonPrimaryText(context))
+                ui.button.background = ContextCompat.getDrawable(context, R.drawable.vector_disable_able_gradient_button_bg)
             }
             ButtonStyle.Warning -> {
-                ui.button.setTextColor(ContextCompat.getColor(context, R.color.white))
-                ui.button.background = ContextCompat.getDrawable(context, R.drawable.destructive_action_button_bg)
+                ui.button.setTextColor(paletteManager.getButtonPrimaryText(context))
+                ui.button.background = ContextCompat.getDrawable(context, R.drawable.vector_destructive_action_button_bg)
             }
             ButtonStyle.Close -> {
-                ui.button.setTextColor(ContextCompat.getColor(context, R.color.purple))
+                ui.button.setTextColor(paletteManager.getOverlayText(context))
                 ui.button.background = null
             }
         }

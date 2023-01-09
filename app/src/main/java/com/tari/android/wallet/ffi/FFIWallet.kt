@@ -178,10 +178,6 @@ class FFIWallet(
 
     private external fun jniEstimateTxFee(amount: String, gramFee: String, kernelCount: String, outputCount: String, libError: FFIError): ByteArray
 
-    private external fun jniApplyEncryption(passphrase: String, libError: FFIError)
-
-    private external fun jniRemoveEncryption(libError: FFIError)
-
     private external fun jniStartRecovery(
         base_node_public_key: FFIPublicKey,
         callback: String,
@@ -226,7 +222,7 @@ class FFIWallet(
                 logPath,
                 Constants.Wallet.maxNumberOfRollingLogFiles,
                 Constants.Wallet.rollingLogFileMaxSizeBytes,
-                sharedPrefsRepository.databasePassphrase,
+                "",
                 networkRepository.currentNetwork?.network?.uriComponent,
                 seedPhraseRepository.getPhrase()?.ffiSeedWords,
                 this::onTxReceived.name, "(J)V",
@@ -253,23 +249,6 @@ class FFIWallet(
 
         logger.i("Post jniCreate with code: %d.", error.code)
         throwIf(error)
-
-        enableEncryption()
-    }
-
-    @Synchronized
-    fun enableEncryption(databasePhrase: String? = null) {
-        if (sharedPrefsRepository.databasePassphrase == null) {
-            try {
-                val databasePassphrase = databasePhrase ?: sharedPrefsRepository.generateDatabasePassphrase()
-                setEncryption(databasePassphrase)
-                sharedPrefsRepository.databasePassphrase = databasePassphrase
-                logger.i("Database encryption enabled")
-            } catch (e: Throwable) {
-                sharedPrefsRepository.databasePassphrase = null
-                logger.e(e, "Database encryption failed")
-            }
-        }
     }
 
     fun getBalance(): BalanceInfo = FFIBalance(runWithError { jniGetBalance(it) }).runWithDestroy {
@@ -536,10 +515,6 @@ class FFIWallet(
     fun getRequiredConfirmationCount(): BigInteger = runWithError { BigInteger(1, jniGetConfirmations(it)) }
 
     fun setRequiredConfirmationCount(number: BigInteger) = runWithError { jniSetConfirmations(number.toString(), it) }
-
-    fun setEncryption(passphrase: String) = runWithError { jniApplyEncryption(passphrase, it) }
-
-    fun removeEncryption() = runWithError { jniRemoveEncryption(it) }
 
     fun startRecovery(baseNodePublicKey: FFIPublicKey, recoveryOutputMessage: String): Boolean =
         runWithError { jniStartRecovery(baseNodePublicKey, this::onWalletRecovery.name, "(I[B[B)V", recoveryOutputMessage, it) }

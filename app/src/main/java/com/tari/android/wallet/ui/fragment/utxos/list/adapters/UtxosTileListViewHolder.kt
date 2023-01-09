@@ -36,10 +36,10 @@ class UtxosTileListViewHolder(view: ItemUtxosTileBinding) : CommonViewHolder<Utx
 
         ui.root.updateLayoutParams<ViewGroup.LayoutParams> { this.height = itemView.context.dpToPx(item.height.toFloat()).toInt() }
 
-        val baseColor = Color.valueOf(ContextCompat.getColor(itemView.context, R.color.purple))
+        val baseColor = Color.valueOf(paletteManager.getPurpleBrand(itemView.context))
         val newColor = Color.valueOf(getNext(baseColor.red()), getNext(baseColor.green()), getNext(baseColor.blue()))
 
-        val shapeDrawable = ContextCompat.getDrawable(itemView.context, R.drawable.background_utxos_list_tile) as GradientDrawable
+        val shapeDrawable = ContextCompat.getDrawable(itemView.context, R.drawable.vector_utxos_list_tile_bg) as GradientDrawable
         shapeDrawable.setColor(newColor.toArgb())
         ui.colorContainer.background = shapeDrawable
 
@@ -59,11 +59,10 @@ class UtxosTileListViewHolder(view: ItemUtxosTileBinding) : CommonViewHolder<Utx
 
         ui.rootCard.cardElevation = if (item.checked.value) 15F else 0F
         if (item.checked.value) {
-            val outlineDrawable = ContextCompat.getDrawable(itemView.context, R.drawable.background_utxos_list_tile_outline)
+            val outlineDrawable = ContextCompat.getDrawable(itemView.context, R.drawable.vector_utxos_list_tile_outline_bg)
             ui.outlineContainer.background = outlineDrawable
         } else {
-            val grayDrawable = ContextCompat.getColor(itemView.context, R.color.gray_background)
-            ui.outlineContainer.setBackgroundColor(grayDrawable)
+            ui.outlineContainer.setBackgroundColor(paletteManager.getNeutralSecondary(itemView.context))
         }
     }
 

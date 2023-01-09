@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!--Neutral-->
+    <color name="palette_purple_neutral_primary">#1D003E</color>
+    <color name="palette_purple_neutral_secondary">#280055</color>
+    <color name="palette_purple_neutral_tertiary">#3A007B</color>
+    <color name="palette_purple_neutral_inactive">#3A007B</color>
+
+    <!--Brand-->
+    <color name="palette_purple_brand_purple">#9330FF</color>
+    <color name="palette_purple_brand_pink">#E320BC</color>
+    <color name="palette_purple_brand_dark_blue">#40388A</color>
+
+    <!--Buttons-->
+    <color name="palette_purple_button_primary_start">#9330FF</color>
+    <color name="palette_purple_button_primary_end">#3A0470</color>
+    <color name="palette_purple_button_disable">#2B0557</color>
+    <color name="palette_purple_button_primary_text">#FFFFFF</color>
+    <color name="palette_purple_button_disabled_text">#4E257A</color>
+
+    <!--Text-->
+    <color name="palette_purple_text_heading">#FFFFFF</color>
+    <color name="palette_purple_text_body">#C3C7D7</color>
+    <color name="palette_purple_text_light">#646B84</color>
+    <color name="palette_purple_text_links">#9330FF</color>
+
+    <!--Icons-->
+    <color name="palette_purple_icons_default">#FFFFFF</color>
+    <color name="palette_purple_icons_active">#9330FF</color>
+    <color name="palette_purple_icons_inactive">#646B84</color>
+
+    <!--Components-->
+    <color name="palette_purple_qr_background">#FFFFFF</color>
+    <color name="palette_purple_overlay">#3A007B</color>
+    <color name="palette_purple_overlay_text">#FFFFFF</color>
+
+    <!--System-->
+    <color name="palette_purple_system_red">#D85240</color>
+    <color name="palette_purple_system_orange">#C36928</color>
+    <color name="palette_purple_system_yellow">#D18A18</color>
+    <color name="palette_purple_system_green">#5F9C91</color>
+    <color name="palette_purple_system_blue">#4D6FE8</color>
+    <color name="palette_purple_system_secondary_red">#310068</color>
+    <color name="palette_purple_system_secondary_orange">#310068</color>
+    <color name="palette_purple_system_secondary_yellow">#310068</color>
+    <color name="palette_purple_system_secondary_green">#310068</color>
+    <color name="palette_purple_system_secondary_blue">#310068</color>
+
+    <!--Backgrounds-->
+    <color name="palette_purple_background_primary">#1D003E</color>
+    <color name="palette_purple_background_secondary">#280055</color>
+
+    <!--Shadows-->
+    <color name="palette_purple_shadow_box">#543773</color>
+
+</resources>

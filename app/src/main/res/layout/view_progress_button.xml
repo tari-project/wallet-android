@@ -4,9 +4,9 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="@dimen/common_action_button_height"
-    android:background="@drawable/disable_able_gradient_button_bg">
+    android:background="@drawable/vector_disable_able_gradient_button_bg">
 
-    <com.tari.android.wallet.ui.component.CustomFontButton
+    <com.tari.android.wallet.ui.component.tari.TariButton
         android:id="@+id/button"
         android:layout_width="match_parent"
         android:layout_height="@dimen/common_action_button_height"
@@ -15,12 +15,13 @@
         android:textAllCaps="false"
         android:textColor="@color/button_text_color_selector"
         android:textSize="16sp"
-        app:customFont="@string/font_heavy" />
+        app:customFont="heavy" />
 
-    <ProgressBar
+    <com.tari.android.wallet.ui.component.tari.TariProgressBar
         android:id="@+id/progress_bar"
         android:layout_width="35dp"
         android:layout_height="35dp"
         android:layout_centerInParent="true"
         android:indeterminate="true" />
+
 </RelativeLayout>

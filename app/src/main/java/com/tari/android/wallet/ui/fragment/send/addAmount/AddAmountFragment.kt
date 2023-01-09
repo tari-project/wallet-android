@@ -32,7 +32,6 @@
  */
 package com.tari.android.wallet.ui.fragment.send.addAmount
 
-import android.animation.ObjectAnimator
 import android.animation.ValueAnimator
 import android.annotation.SuppressLint
 import android.content.Context
@@ -45,6 +44,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.daasuu.ei.Ease
 import com.daasuu.ei.EasingInterpolator
+import com.tari.android.wallet.BuildConfig
 import com.tari.android.wallet.R
 import com.tari.android.wallet.R.string.*
 import com.tari.android.wallet.databinding.FragmentAddAmountBinding
@@ -52,22 +52,24 @@ import com.tari.android.wallet.extension.getWithError
 import com.tari.android.wallet.extension.observe
 import com.tari.android.wallet.model.*
 import com.tari.android.wallet.ui.common.CommonFragment
-import com.tari.android.wallet.ui.component.EmojiIdSummaryViewController
-import com.tari.android.wallet.ui.component.FullEmojiIdViewController
+import com.tari.android.wallet.ui.component.fullEmojiId.EmojiIdSummaryViewController
+import com.tari.android.wallet.ui.component.fullEmojiId.FullEmojiIdViewController
 import com.tari.android.wallet.ui.dialog.error.ErrorDialogArgs
 import com.tari.android.wallet.ui.dialog.modular.ModularDialog
 import com.tari.android.wallet.ui.dialog.tooltipDialog.TooltipDialogArgs
 import com.tari.android.wallet.ui.extension.*
-import com.tari.android.wallet.ui.fragment.send.activity.SendTariActivity
+import com.tari.android.wallet.ui.fragment.home.HomeActivity
 import com.tari.android.wallet.ui.fragment.send.addAmount.feeModule.NetworkSpeed
 import com.tari.android.wallet.ui.fragment.send.addAmount.keyboard.KeyboardController
 import com.tari.android.wallet.ui.fragment.send.amountView.AmountStyle
 import com.tari.android.wallet.ui.fragment.send.common.TransactionData
+import com.tari.android.wallet.util.Build
 import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.WalletUtil
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.lang.ref.WeakReference
+import java.math.BigInteger
 
 class AddAmountFragment : CommonFragment<FragmentAddAmountBinding, AddAmountViewModel>() {
 
@@ -118,22 +120,22 @@ class AddAmountFragment : CommonFragment<FragmentAddAmountBinding, AddAmountView
     }
 
     private fun setupUI() {
-        val amount = arguments?.parcelable<MicroTari>(SendTariActivity.PARAMETER_AMOUNT)
+        val amount = arguments?.parcelable<MicroTari>(HomeActivity.PARAMETER_AMOUNT)
         keyboardController.setup(requireContext(), AmountCheckRunnable(), ui.numpad, ui.amount, amount?.tariValue?.toDouble() ?: Double.MIN_VALUE)
-        recipientUser = arguments?.parcelable(SendTariActivity.PARAMETER_USER)
+        recipientUser = arguments?.parcelable(HomeActivity.PARAMETER_USER)
         // hide tx fee
         ui.txFeeContainerView.invisible()
+
         // hide/disable continue button
-        ui.continueButton.invisible()
-        ui.disabledContinueButton.visible()
+        ui.continueButton.isEnabled = false
         // add first digit to the element list
         val fullEmojiIdListener = object : FullEmojiIdViewController.Listener {
             override fun animationHide(value: Float) {
-                ui.backButton.alpha = 1 - value
+                ui.backCtaView.alpha = 1 - value
             }
 
             override fun animationShow(value: Float) {
-                ui.backButton.alpha = 1 - value
+                ui.backCtaView.alpha = 1 - value
             }
         }
         emojiIdSummaryController = EmojiIdSummaryViewController(ui.emojiIdSummaryView)
@@ -150,11 +152,12 @@ class AddAmountFragment : CommonFragment<FragmentAddAmountBinding, AddAmountView
     }
 
     private fun setActionBindings() {
-        ui.backButton.setOnClickListener { onBackButtonClicked(it) }
+        ui.backCtaView.setOnClickListener { onBackButtonClicked(it) }
         ui.emojiIdSummaryContainerView.setOnClickListener { emojiIdClicked() }
         ui.txFeeDescTextView.setOnClickListener { showTxFeeToolTip() }
         ui.oneSidePaymentHelp.setOnClickListener { showOneSidePaymentTooltip() }
         ui.continueButton.setOnClickListener { continueButtonClicked() }
+        ui.oneSidePaymentSwitchViewTitle.setOnClickListener { ui.oneSidePaymentSwitchView.isChecked = !ui.oneSidePaymentSwitchView.isChecked }
         ui.oneSidePaymentSwitchView.setOnClickListener { viewModel.toggleOneSidePayment() }
     }
 
@@ -163,9 +166,9 @@ class AddAmountFragment : CommonFragment<FragmentAddAmountBinding, AddAmountView
         ui.networkTrafficText.setVisible(true)
         ui.modifyButton.setVisible(feePerGram.networkSpeed != NetworkSpeed.Slow, View.INVISIBLE)
         val iconId = when (feePerGram.networkSpeed) {
-            NetworkSpeed.Slow -> R.drawable.ic_network_slow
-            NetworkSpeed.Medium -> R.drawable.ic_network_medium
-            NetworkSpeed.Fast -> R.drawable.ic_network_fast
+            NetworkSpeed.Slow -> R.drawable.vector_network_slow
+            NetworkSpeed.Medium -> R.drawable.vector_network_medium
+            NetworkSpeed.Fast -> R.drawable.vector_network_fast
         }
         ui.networkTrafficIcon.setImageDrawable(ContextCompat.getDrawable(requireContext(), iconId))
     }
@@ -226,9 +229,18 @@ class AddAmountFragment : CommonFragment<FragmentAddAmountBinding, AddAmountView
     }
 
     private fun checkAmountAndFee() {
-        val error = WalletError()
-        val balanceInfo = viewModel.walletService.getBalanceInfo(error)
-        val fee = viewModel.selectedFeeData?.calculatedFee
+        var error = WalletError()
+        var balanceInfo = viewModel.walletService.getBalanceInfo(error)
+        var fee = viewModel.selectedFeeData?.calculatedFee
+
+        if (BuildConfig.DEBUG) {
+            balanceInfo = BalanceInfo().apply {
+                availableBalance = MicroTari(BigInteger("1000000"))
+            }
+            fee = MicroTari(BigInteger("10"))
+            error = WalletError.NoError
+        }
+
         val amount = keyboardController.currentAmount
         if (error == WalletError.NoError && fee != null) {
             if (amount > balanceInfo.availableBalance) {
@@ -295,20 +307,21 @@ class AddAmountFragment : CommonFragment<FragmentAddAmountBinding, AddAmountView
 
             updateBalanceInfo()
 
-            if ((keyboardController.currentAmount + viewModel.selectedFeeData?.calculatedFee!!) > availableBalance) {
+            if (!Build.MOCKED && (keyboardController.currentAmount + viewModel.selectedFeeData?.calculatedFee!!) > availableBalance) {
                 showErrorState()
             } else {
-                showSuccessState(viewModel.selectedFeeData?.calculatedFee!!)
+                showSuccessState()
             }
         }
 
         @SuppressLint("SetTextI18n")
-        private fun showSuccessState(fee: MicroTari) = with(ui) {
+        private fun showSuccessState() = with(ui) {
+            val fee = viewModel.selectedFeeData?.calculatedFee!!
             notEnoughBalanceDescriptionTextView.text = string(add_amount_wallet_balance)
             availableBalanceContainerView.visible()
 
             txFeeTextView.text = "+${WalletUtil.amountFormatter.format(fee.tariValue)}"
-            val showsTxFee: Boolean = if (keyboardController.currentAmount.value.toInt() == 0) {
+            val showsTxFee: Boolean = if (!Build.MOCKED || keyboardController.currentAmount.value.toInt() == 0) {
                 hideContinueButton()
                 false
             } else {
@@ -358,12 +371,10 @@ class AddAmountFragment : CommonFragment<FragmentAddAmountBinding, AddAmountView
         private fun showErrorState(error: WalletError? = null) = with(ui) {
             if (error?.code == 115) {
                 availableBalanceContainerView.gone()
-                notEnoughBalanceDescriptionTextView.text =
-                    string(add_amount_funds_pending)
+                notEnoughBalanceDescriptionTextView.text = string(add_amount_funds_pending)
             } else {
                 availableBalanceContainerView.visible()
-                notEnoughBalanceDescriptionTextView.text =
-                    string(add_amount_not_enough_available_balance)
+                notEnoughBalanceDescriptionTextView.text = string(add_amount_not_enough_available_balance)
             }
 
             hideContinueButton()
@@ -376,7 +387,7 @@ class AddAmountFragment : CommonFragment<FragmentAddAmountBinding, AddAmountView
         }
 
         private fun showAvailableBalanceError() = with(ui) {
-            notEnoughBalanceView.background = ContextCompat.getDrawable(requireContext(), R.drawable.validation_error_box_border_bg)
+            notEnoughBalanceView.background = ContextCompat.getDrawable(requireContext(), R.drawable.vector_validation_error_box_border_bg)
             ui.availableBalanceContainerView.setupArgs(AmountStyle.Warning)
         }
 
@@ -386,19 +397,11 @@ class AddAmountFragment : CommonFragment<FragmentAddAmountBinding, AddAmountView
         }
 
         private fun showContinueButtonAnimated() = with(ui) {
-            if (continueButton.visibility == View.VISIBLE) {
-                return@with
-            }
-            continueButton.alpha = 0f
-            continueButton.visible()
-            ObjectAnimator.ofFloat(continueButton, "alpha", 0f, 1f).apply {
-                duration = Constants.UI.shortDurationMs
-                start()
-            }
+            continueButton.isEnabled = true
         }
 
         private fun hideContinueButton() = with(ui) {
-            continueButton.invisible()
+            continueButton.isEnabled = false
         }
     }
 }

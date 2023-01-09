@@ -7,9 +7,12 @@ import android.widget.FrameLayout
 import androidx.core.content.ContextCompat
 import com.tari.android.wallet.R
 import com.tari.android.wallet.databinding.ViewRecoveryWordBinding
+import com.tari.android.wallet.ui.common.domain.PaletteManager
 import com.tari.android.wallet.ui.extension.setVisible
 
 class WordTextView : FrameLayout {
+
+    val paletteManager = PaletteManager()
 
     constructor(context: Context) : super(context, null) {
         init()
@@ -42,15 +45,15 @@ class WordTextView : FrameLayout {
         ui.removeView.setVisible(!isFocused)
         val background = when {
             isFocused -> null
-            isValid -> R.drawable.restoring_seed_phrase_word_background
-            else -> R.drawable.restoring_seed_phrase_word_background_error
+            isValid -> R.drawable.vector_restoring_seed_phrase_word_bg
+            else -> R.drawable.vector_restoring_seed_phrase_word_bg_error
         }
         ui.root.background = background?.let { ContextCompat.getDrawable(context, it) }
 
-        val textColor = ContextCompat.getColor(context, if (isFocused || isValid) R.color.black else R.color.common_error)
+        val textColor = if (isFocused || isValid) paletteManager.getTextHeading(context) else paletteManager.getRed(context)
         ui.text.setTextColor(textColor)
 
-        val deleteTintColor = ContextCompat.getDrawable(context, if (isFocused || isValid) R.drawable.close else R.drawable.close_error)
+        val deleteTintColor = ContextCompat.getDrawable(context, if (isFocused || isValid) R.drawable.vector_close else R.drawable.vector_close_error)
         ui.removeView.setImageDrawable(deleteTintColor)
     }
 }

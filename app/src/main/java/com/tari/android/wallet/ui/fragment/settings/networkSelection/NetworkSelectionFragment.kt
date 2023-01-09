@@ -69,7 +69,6 @@ class NetworkSelectionFragment : CommonFragment<FragmentNetworkSelectionBinding,
     }
 
     private fun setupViews() = with(ui) {
-        backCtaView.setOnThrottledClickListener { requireActivity().onBackPressed() }
         networkList.layoutManager = LinearLayoutManager(requireContext())
         networkList.adapter = adapter
         adapter.setClickListener(CommonAdapter.ItemClickListener { viewModel.selectNetwork(it as NetworkViewHolderItem) })

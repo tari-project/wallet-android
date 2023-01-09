@@ -1,8 +1,8 @@
 package com.tari.android.wallet.ui.fragment.utxos.list.controllers
 
 import android.widget.TextView
-import androidx.core.content.ContextCompat
 import com.tari.android.wallet.R
+import com.tari.android.wallet.ui.common.domain.PaletteManager
 import java.util.concurrent.atomic.AtomicBoolean
 
 class CheckedController(val view: TextView) {
@@ -10,6 +10,7 @@ class CheckedController(val view: TextView) {
     private var checked: AtomicBoolean = AtomicBoolean(false)
 
     var toggleCallback: (Boolean) -> Unit = {}
+    val paletteManager = PaletteManager()
 
     fun toggleChecked() {
         setChecked(!checked.get())
@@ -21,10 +22,10 @@ class CheckedController(val view: TextView) {
         toggleCallback(checked)
         if (this.checked.get()) {
             view.setText(R.string.common_cancel)
-            view.setTextColor(ContextCompat.getColor(view.context, R.color.purple))
+            view.setTextColor(paletteManager.getTextLinks(view.context))
         } else {
             view.setText(R.string.utxos_selecting)
-            view.setTextColor(ContextCompat.getColor(view.context, R.color.black))
+            view.setTextColor(paletteManager.getTextHeading(view.context))
         }
     }
 }

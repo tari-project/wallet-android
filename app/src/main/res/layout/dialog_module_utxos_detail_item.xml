@@ -8,24 +8,24 @@
     android:paddingHorizontal="30dp"
     android:paddingVertical="6dp">
 
-    <com.tari.android.wallet.ui.component.CustomFontTextView
+    <com.tari.android.wallet.ui.component.tari.TariTextView
         android:id="@+id/detail_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textColor="@color/black"
+        android:textColor="?attr/palette_text_heading"
         android:textSize="12sp"
-        app:customFont="@string/font_black" />
+        app:customFont="black" />
 
-    <com.tari.android.wallet.ui.component.CustomFontTextView
+    <com.tari.android.wallet.ui.component.tari.TariTextView
         android:id="@+id/detail_description"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="1dp"
         android:drawablePadding="4dp"
-        android:textColor="@color/dark_gray"
+        android:textColor="?attr/palette_text_body"
         android:lineSpacingExtra="4dp"
         android:textSize="12sp"
-        app:customFont="@string/font_medium" />
+        app:customFont="medium" />
 
 </LinearLayout>
 

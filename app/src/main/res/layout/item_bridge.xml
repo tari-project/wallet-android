@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<com.tari.android.wallet.ui.component.tari.TariPrimaryBackground xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:background="@color/white"
     android:layout_height="wrap_content">
 
-    <com.tari.android.wallet.ui.component.CustomFontTextView
+    <com.tari.android.wallet.ui.component.tari.TariTextView
         android:id="@+id/tvName"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -14,9 +13,9 @@
         android:ellipsize="end"
         android:lines="1"
         android:singleLine="true"
-        android:textColor="@color/common_header_title"
+        android:textColor="?attr/palette_text_heading"
         android:textSize="16sp"
-        app:customFont="@string/font_medium"
+        app:customFont="medium"
         app:layout_constraintEnd_toStartOf="@+id/status_container"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -34,27 +33,27 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:src="@drawable/circle_done"
+            android:src="@drawable/vector_circle_done"
             android:visibility="gone" />
 
-        <androidx.appcompat.widget.AppCompatImageView
+        <com.tari.android.wallet.ui.component.tari.TariIconView
             android:id="@+id/next"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:src="@drawable/icon_apply_setting"
+            android:src="@drawable/vector_back_button"
+android:rotation="180"
             android:visibility="gone" />
 
     </FrameLayout>
 
-    <View
+    <com.tari.android.wallet.ui.component.tari.TariDivider
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:layout_marginTop="20dp"
-        android:background="@color/common_divider"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tvName" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+</com.tari.android.wallet.ui.component.tari.TariPrimaryBackground>

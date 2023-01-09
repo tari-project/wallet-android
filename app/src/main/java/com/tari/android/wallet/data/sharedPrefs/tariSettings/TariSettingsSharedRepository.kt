@@ -35,8 +35,10 @@ package com.tari.android.wallet.data.sharedPrefs.tariSettings
 import android.content.SharedPreferences
 import com.tari.android.wallet.data.repository.CommonRepository
 import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefBooleanDelegate
+import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefGsonDelegate
 import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepository
 import com.tari.android.wallet.data.sharedPrefs.network.formatKey
+import com.tari.android.wallet.ui.fragment.settings.themeSelector.TariTheme
 
 class TariSettingsSharedRepository(sharedPrefs: SharedPreferences, networkRepository: NetworkRepository) : CommonRepository(networkRepository) {
 
@@ -45,6 +47,7 @@ class TariSettingsSharedRepository(sharedPrefs: SharedPreferences, networkReposi
         const val hasVerifiedSeedWords = "tari_has_verified_seed_words"
         const val backgroundServiceTurnedOnKey = "tari_background_service_turned_on"
         const val isOneSidePaymentEnabledKey = "is_one_side_payment_enabled"
+        const val themeKey = "tari_theme_key"
     }
 
     var isRestoredWallet: Boolean by SharedPrefBooleanDelegate(sharedPrefs, formatKey(Key.isRestoredWallet))
@@ -54,6 +57,8 @@ class TariSettingsSharedRepository(sharedPrefs: SharedPreferences, networkReposi
     var backgroundServiceTurnedOn: Boolean by SharedPrefBooleanDelegate(sharedPrefs, formatKey(Key.backgroundServiceTurnedOnKey), true)
 
     var isOneSidePaymentEnabled: Boolean by SharedPrefBooleanDelegate(sharedPrefs, formatKey(Key.isOneSidePaymentEnabledKey), false)
+
+    var currentTheme: TariTheme? by SharedPrefGsonDelegate(sharedPrefs, Key.themeKey, TariTheme::class.java, TariTheme.AppBased)
 
     fun clear() {
         isRestoredWallet = false

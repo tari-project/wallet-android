@@ -26,17 +26,15 @@ class BugsReportingFragment : CommonFragment<FragmentBugsReportingBinding, BugsR
     }
 
     private fun setupUI() = with(ui) {
-        backCtaView.setOnClickListener { requireActivity().onBackPressed() }
         sendButton.setOnClickListener {
             viewModel.send(
-                nameEditText.text?.toString().orEmpty(),
-                emailEditText.text?.toString().orEmpty(),
+                nameEditText.ui.editText.text?.toString().orEmpty(),
+                emailEditText.ui.editText.text?.toString().orEmpty(),
                 bugDescription.text?.toString().orEmpty()
             )
         }
         viewLogsButton.setOnClickListener { (requireActivity() as? DebugActivity)?.navigate(DebugNavigation.Logs, rooted = false) }
     }
 
-    private fun observeUI() = with(viewModel) {
-    }
+    private fun observeUI() = with(viewModel) { }
 }

@@ -1,6 +1,8 @@
 package com.tari.android.wallet.ui.common
 
 import android.content.Intent
+import android.content.res.Configuration.UI_MODE_NIGHT_MASK
+import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import android.hardware.SensorManager
 import android.net.Uri
 import android.os.Bundle
@@ -12,6 +14,7 @@ import com.squareup.seismic.ShakeDetector
 import com.tari.android.wallet.R
 import com.tari.android.wallet.extension.observe
 import com.tari.android.wallet.ui.component.networkStateIndicator.ConnectionIndicatorViewModel
+import com.tari.android.wallet.ui.component.tari.toast.TariToast
 import com.tari.android.wallet.ui.dialog.modular.DialogArgs
 import com.tari.android.wallet.ui.dialog.modular.ModularDialog
 import com.tari.android.wallet.ui.dialog.modular.ModularDialogArgs
@@ -25,6 +28,7 @@ import com.tari.android.wallet.ui.extension.addEnterLeftAnimation
 import com.tari.android.wallet.ui.fragment.settings.allSettings.TariVersionModel
 import com.tari.android.wallet.ui.fragment.settings.logs.activity.DebugActivity
 import com.tari.android.wallet.ui.fragment.settings.logs.activity.DebugNavigation
+import com.tari.android.wallet.ui.fragment.settings.themeSelector.TariTheme
 import yat.android.lib.YatIntegration
 
 abstract class CommonActivity<Binding : ViewBinding, VM : CommonViewModel> : AppCompatActivity(), ShakeDetector.Listener {
@@ -43,6 +47,8 @@ abstract class CommonActivity<Binding : ViewBinding, VM : CommonViewModel> : App
     fun bindViewModel(viewModel: VM) = with(viewModel) {
         this@CommonActivity.viewModel = viewModel
 
+        setTariTheme(viewModel.tariSettingsSharedRepository.currentTheme!!)
+
         subscribeToCommon(viewModel)
     }
 
@@ -56,6 +62,23 @@ abstract class CommonActivity<Binding : ViewBinding, VM : CommonViewModel> : App
         observe(dismissDialog) { dialogManager.dismiss() }
 
         observe(loadingDialog) { dialogManager.handleProgress(it) }
+
+        observe(showToast) { TariToast(this@CommonActivity, it) }
+    }
+
+    private fun setTariTheme(theme: TariTheme) {
+        val themeStyle = when (theme) {
+            TariTheme.AppBased -> {
+                when (resources.configuration.uiMode and UI_MODE_NIGHT_MASK) {
+                    UI_MODE_NIGHT_YES -> R.style.AppTheme_Dark
+                    else -> R.style.AppTheme_Light
+                }
+            }
+            TariTheme.Light -> R.style.AppTheme_Light
+            TariTheme.Dark -> R.style.AppTheme_Dark
+            TariTheme.Purple -> R.style.AppTheme_Purple
+        }
+        setTheme(themeStyle)
     }
 
     override fun onStart() {
@@ -63,8 +86,16 @@ abstract class CommonActivity<Binding : ViewBinding, VM : CommonViewModel> : App
         super.onStart()
     }
 
+    override fun onResume() {
+        super.onResume()
+
+        if (viewModel.tariSettingsSharedRepository.currentTheme != viewModel.currentTheme.value)
+            recreate()
+    }
+
     override fun onStop() {
         shakeDetector.stop()
+        dialogManager.dismiss()
         super.onStop()
     }
 
@@ -93,12 +124,17 @@ abstract class CommonActivity<Binding : ViewBinding, VM : CommonViewModel> : App
         bundle?.let { fragment.arguments = it }
         val transaction = supportFragmentManager.beginTransaction()
             .addEnterLeftAnimation()
-            .apply { supportFragmentManager.fragments.forEach { hide(it) } }
             .add(containerId!!, fragment, fragment::class.java.simpleName)
         if (!isRoot) {
             transaction.addToBackStack(null)
         }
         transaction.commit()
+    }
+
+    protected fun popUpTo(tag: String) {
+        while (supportFragmentManager.fragments.last().tag != tag) {
+            supportFragmentManager.popBackStackImmediate()
+        }
     }
 
     override fun hearShake() = showDebugDialog()
@@ -126,14 +162,6 @@ abstract class CommonActivity<Binding : ViewBinding, VM : CommonViewModel> : App
     private fun openActivity(navigation: DebugNavigation) {
         dialogManager.dismiss()
         DebugActivity.launch(this, navigation)
-    }
-
-    companion object {
-        enum class Priority(val value: Int) {
-            PRIORITY_SYSTEM(-1),
-            PRIORITY_DEFAULT(0),
-            PRIORITY_OVERLAY(1000000),
-        }
     }
 }
 

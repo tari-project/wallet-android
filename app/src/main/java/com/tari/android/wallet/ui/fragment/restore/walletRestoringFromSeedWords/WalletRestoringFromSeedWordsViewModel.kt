@@ -40,9 +40,6 @@ class WalletRestoringFromSeedWordsViewModel : CommonViewModel() {
     lateinit var walletServiceLauncher: WalletServiceLauncher
 
     @Inject
-    lateinit var tariSettingsSharedRepository: TariSettingsSharedRepository
-
-    @Inject
     lateinit var baseNodes: BaseNodes
 
     val migrationManager = MigrationManager()

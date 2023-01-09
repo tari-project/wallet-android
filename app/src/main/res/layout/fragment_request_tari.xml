@@ -1,68 +1,67 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<com.tari.android.wallet.ui.component.tari.TariPrimaryBackground xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@color/white"
-    android:orientation="vertical">
+    android:layout_height="match_parent">
 
-    <!-- amount container -->
-    <RelativeLayout
-        android:id="@+id/element_outer_container_view"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1">
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
-        <!-- amount -->
+        <!-- amount container -->
+        <RelativeLayout
+            android:id="@+id/element_outer_container_view"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1">
+
+            <!-- amount -->
+            <include
+                android:id="@+id/amount"
+                layout="@layout/view_input_amount" />
+
+        </RelativeLayout>
+
+        <!-- num pad -->
         <include
-            android:id="@+id/amount"
-            layout="@layout/view_input_amount" />
+            android:id="@+id/numpad"
+            layout="@layout/view_numpad" />
 
-    </RelativeLayout>
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:layout_width="match_parent"
+            android:layout_height="74dp"
+            android:layout_marginStart="0dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginEnd="0dp"
+            android:layout_marginBottom="10dp"
+            android:orientation="horizontal">
 
-    <!-- num pad -->
-    <include
-        android:id="@+id/numpad"
-        layout="@layout/view_numpad" />
+            <com.tari.android.wallet.ui.component.tari.TariGradientButton
+                android:id="@+id/generate_button"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/common_action_button_height"
+                android:layout_centerVertical="true"
+                android:layout_gravity="end"
+                android:layout_marginStart="@dimen/common_horizontal_margin"
+                android:layout_weight="1"
+                app:title="@string/request_tari_generate_qr_code" />
 
-    <androidx.appcompat.widget.LinearLayoutCompat
-        android:layout_width="match_parent"
-        android:layout_height="74dp"
-        android:layout_marginStart="0dp"
-        android:layout_marginTop="20dp"
-        android:layout_marginEnd="0dp"
-        android:layout_marginBottom="10dp"
-        android:orientation="horizontal">
+            <androidx.appcompat.widget.AppCompatImageButton
+                android:id="@+id/share_button"
+                android:layout_width="53dp"
+                android:layout_height="@dimen/common_action_button_height"
+                android:layout_alignRight="@+id/generate_button"
+                android:layout_centerVertical="true"
+                android:layout_gravity="end"
+                android:layout_marginHorizontal="@dimen/common_horizontal_margin"
+                android:background="@drawable/vector_disable_able_gradient_button_bg"
+                android:elevation="0dp"
+                android:src="@drawable/vector_share"
+                app:customFont="heavy" />
 
-        <com.tari.android.wallet.ui.component.CustomFontButton
-            android:id="@+id/generate_button"
-            android:layout_width="0dp"
-            android:layout_height="@dimen/common_action_button_height"
-            android:layout_centerVertical="true"
-            android:layout_gravity="end"
-            android:layout_marginStart="@dimen/common_horizontal_margin"
-            android:layout_weight="1"
-            android:background="@drawable/disable_able_gradient_button_bg"
-            android:elevation="0dp"
-            android:text="@string/request_tari_generate_qr_code"
-            android:textAllCaps="false"
-            android:textColor="@color/button_text_color_selector"
-            android:textSize="16sp"
-            app:customFont="@string/font_heavy" />
+        </androidx.appcompat.widget.LinearLayoutCompat>
 
-        <androidx.appcompat.widget.AppCompatImageButton
-            android:id="@+id/share_button"
-            android:layout_width="53dp"
-            android:layout_height="@dimen/common_action_button_height"
-            android:layout_alignRight="@+id/generate_button"
-            android:layout_centerVertical="true"
-            android:layout_gravity="end"
-            android:layout_marginHorizontal="@dimen/common_horizontal_margin"
-            android:background="@drawable/disable_able_gradient_button_bg"
-            android:elevation="0dp"
-            android:src="@drawable/ic_share"
-            app:customFont="@string/font_heavy" />
+    </LinearLayout>
 
-    </androidx.appcompat.widget.LinearLayoutCompat>
-
-</LinearLayout>
+</com.tari.android.wallet.ui.component.tari.TariPrimaryBackground>

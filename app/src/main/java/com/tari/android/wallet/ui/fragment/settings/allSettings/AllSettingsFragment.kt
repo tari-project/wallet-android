@@ -92,6 +92,7 @@ class AllSettingsFragment : CommonFragment<FragmentAllSettingsBinding, AllSettin
             AllSettingsNavigation.ToDeleteWallet -> router.toDeleteWallet()
             AllSettingsNavigation.ToNetworkSelection -> router.toNetworkSelection()
             AllSettingsNavigation.ToTorBridges -> router.toTorBridges()
+            AllSettingsNavigation.ToThemeSelection -> router.toThemeSelection()
         }
     }
 

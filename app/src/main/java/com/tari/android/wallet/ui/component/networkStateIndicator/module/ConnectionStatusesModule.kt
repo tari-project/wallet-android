@@ -21,9 +21,9 @@ class ConnectionStatusesModule(
     }
 
     val networkIcon = when (networkState) {
-        NetworkConnectionState.CONNECTED -> R.drawable.ic_network_status_dot_green
+        NetworkConnectionState.CONNECTED -> R.drawable.vector_network_status_dot_green
         NetworkConnectionState.DISCONNECTED,
-        NetworkConnectionState.UNKNOWN -> R.drawable.ic_network_status_dot_red
+        NetworkConnectionState.UNKNOWN -> R.drawable.vector_network_status_dot_red
     }
 
     val torText = when (torState) {
@@ -34,10 +34,10 @@ class ConnectionStatusesModule(
     }
 
     val torIcon = when (torState) {
-        TorProxyState.NotReady -> R.drawable.ic_network_status_dot_red
-        is TorProxyState.Initializing -> R.drawable.ic_network_status_dot_yellow
-        is TorProxyState.Running -> R.drawable.ic_network_status_dot_green
-        is TorProxyState.Failed -> R.drawable.ic_network_status_dot_red
+        TorProxyState.NotReady -> R.drawable.vector_network_status_dot_red
+        is TorProxyState.Initializing -> R.drawable.vector_network_status_dot_yellow
+        is TorProxyState.Running -> R.drawable.vector_network_status_dot_green
+        is TorProxyState.Failed -> R.drawable.vector_network_status_dot_red
     }
 
     val baseNodeStateText = when (baseNodeState) {
@@ -47,9 +47,9 @@ class ConnectionStatusesModule(
     }
 
     val baseNodeStateIcon = when (baseNodeState) {
-        BaseNodeState.Syncing -> R.drawable.ic_network_status_dot_yellow
-        BaseNodeState.Offline -> R.drawable.ic_network_status_dot_red
-        BaseNodeState.Online -> R.drawable.ic_network_status_dot_green
+        BaseNodeState.Syncing -> R.drawable.vector_network_status_dot_yellow
+        BaseNodeState.Offline -> R.drawable.vector_network_status_dot_red
+        BaseNodeState.Online -> R.drawable.vector_network_status_dot_green
     }
 
     val baseNodeSyncText = when (baseNodeSyncState) {
@@ -60,9 +60,9 @@ class ConnectionStatusesModule(
     }
 
     val baseNodeSyncIcon = when (baseNodeSyncState) {
-        BaseNodeSyncState.NotStarted -> R.drawable.ic_network_status_dot_red
-        BaseNodeSyncState.Syncing -> R.drawable.ic_network_status_dot_yellow
-        BaseNodeSyncState.Online -> R.drawable.ic_network_status_dot_green
-        BaseNodeSyncState.Failed -> R.drawable.ic_network_status_dot_red
+        BaseNodeSyncState.NotStarted -> R.drawable.vector_network_status_dot_red
+        BaseNodeSyncState.Syncing -> R.drawable.vector_network_status_dot_yellow
+        BaseNodeSyncState.Online -> R.drawable.vector_network_status_dot_green
+        BaseNodeSyncState.Failed -> R.drawable.vector_network_status_dot_red
     }
 }

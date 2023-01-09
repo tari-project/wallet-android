@@ -51,7 +51,6 @@ import androidx.fragment.app.viewModels
 import com.daasuu.ei.Ease
 import com.daasuu.ei.EasingInterpolator
 import com.tari.android.wallet.R
-import com.tari.android.wallet.R.color.white
 import com.tari.android.wallet.R.string.*
 import com.tari.android.wallet.databinding.FragmentIntroductionBinding
 import com.tari.android.wallet.extension.applyURLStyle
@@ -116,7 +115,7 @@ class IntroductionFragment : CommonFragment<FragmentIntroductionBinding, Introdu
     }
 
     private fun setupUi() {
-        ui.createWalletProgressBar.setColor(color(white))
+        ui.createWalletProgressBar.setWhite()
         ui.apply {
             tariLogoLottieAnimationView.alpha = 0f
             tariLogoLottieAnimationView.scaleX = 0.84f

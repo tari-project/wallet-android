@@ -63,7 +63,7 @@ class GIFThumbnailAdapter(
     ) :
         GIFThumbnailViewHolder(view) {
 
-        private val imageView = view.findViewById<ImageView>(R.id.image_view)
+        private val imageView = view.findViewById<androidx.appcompat.widget.AppCompatImageView>(R.id.image_view)
 
         override fun bind(position: Int, gifItems: List<GIFItem>) {
             val gif = gifItems[position]

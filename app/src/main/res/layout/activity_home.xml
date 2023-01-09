@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/root_view"
@@ -27,94 +26,96 @@
             android:layout_width="match_parent"
             android:layout_height="@dimen/common_scroll_height_gradient_height"
             android:alpha="0.7"
-            android:background="@drawable/view_elevation_bottom_gradient"
+            android:background="@drawable/vector_view_elevation_bottom_gradient"
             app:layout_constraintBottom_toTopOf="@id/bottom_navigation_view" />
 
-        <LinearLayout
+        <com.tari.android.wallet.ui.component.tari.TariPrimaryBackground
             android:id="@+id/bottom_navigation_view"
             android:layout_width="0dp"
             android:layout_height="64dp"
-            android:background="@color/white"
             android:orientation="horizontal"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent">
 
-            <FrameLayout
-                android:id="@+id/home_view"
-                android:layout_width="0dp"
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_weight="1">
+                android:orientation="horizontal">
 
-                <ImageView
-                    android:id="@+id/home_image_view"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:contentDescription="@string/home_navigation_content_description_navigate_to_transactions_list"
-                    android:src="@drawable/icon_home" />
-            </FrameLayout>
+                <FrameLayout
+                    android:id="@+id/home_view"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1">
 
-            <FrameLayout
-                android:id="@+id/store_view"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1">
+                    <com.tari.android.wallet.ui.component.tari.TariIconView
+                        android:id="@+id/home_image_view"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:src="@drawable/vector_home_icon" />
+                </FrameLayout>
 
-                <ImageView
-                    android:id="@+id/store_image_view"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:contentDescription="@string/home_navigation_content_description_navigate_to_ttl_store"
-                    android:src="@drawable/icon_ttl_store" />
-            </FrameLayout>
+                <FrameLayout
+                    android:id="@+id/store_view"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1">
 
-            <View
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:layout_weight="1"
-                android:background="@color/white" />
+                    <com.tari.android.wallet.ui.component.tari.TariIconView
+                        android:id="@+id/store_image_view"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:src="@drawable/vector_ttl_store_icon" />
+                </FrameLayout>
 
-            <FrameLayout
-                android:id="@+id/wallet_info_view"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1">
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_weight="1" />
 
-                <ImageView
-                    android:id="@+id/wallet_info_image_view"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:contentDescription="@string/home_navigation_content_description_navigate_to_wallet_info"
-                    android:src="@drawable/icon_profile" />
-            </FrameLayout>
+                <FrameLayout
+                    android:id="@+id/wallet_info_view"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1">
 
-            <FrameLayout
-                android:id="@+id/settings_view"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1">
+                    <com.tari.android.wallet.ui.component.tari.TariIconView
+                        android:id="@+id/wallet_info_image_view"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:src="@drawable/vector_profile_icon" />
+                </FrameLayout>
 
-                <ImageView
-                    android:id="@+id/settings_image_view"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:contentDescription="@string/home_navigation_content_description_navigate_to_settings"
-                    android:src="@drawable/icon_settings" />
-            </FrameLayout>
+                <FrameLayout
+                    android:id="@+id/settings_view"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1">
 
-        </LinearLayout>
+                    <com.tari.android.wallet.ui.component.tari.TariIconView
+                        android:id="@+id/settings_image_view"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:src="@drawable/vector_settings_icon" />
+                </FrameLayout>
 
-        <ImageView
+            </LinearLayout>
+
+        </com.tari.android.wallet.ui.component.tari.TariPrimaryBackground>
+
+        <androidx.appcompat.widget.AppCompatImageButton
             android:id="@+id/send_tari_cta_view"
-            android:layout_width="90dp"
-            android:layout_height="91dp"
-            android:contentDescription="@string/home_navigation_content_description_navigate_to_send_tari"
+            android:layout_width="52dp"
+            android:layout_height="52dp"
+            android:layout_marginBottom="38dp"
+            android:background="@drawable/vector_send_button_back"
             android:elevation="10dp"
-            android:src="@drawable/icon_send_tari"
+            android:src="@drawable/vector_icon_send_tari"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent" />
@@ -124,6 +125,6 @@
     <FrameLayout
         android:id="@+id/nav_container"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_height="match_parent" />
 
 </FrameLayout>

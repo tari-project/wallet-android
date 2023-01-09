@@ -6,19 +6,19 @@
     android:layout_height="wrap_content"
     android:orientation="vertical">
 
-    <com.tari.android.wallet.ui.component.CustomFontButton
+    <com.tari.android.wallet.ui.component.tari.TariButton
         android:id="@+id/button"
         android:layout_width="match_parent"
         android:layout_height="@dimen/common_action_button_height"
         android:layout_gravity="center_horizontal"
         android:layout_marginHorizontal="30dp"
         android:layout_marginBottom="13dp"
-        android:background="@drawable/disable_able_gradient_button_bg"
+        android:background="@drawable/vector_disable_able_gradient_button_bg"
         android:elevation="0dp"
         android:text="@string/request_tari_share"
         android:textAllCaps="false"
         android:textColor="@color/button_text_color_selector"
         android:textSize="16sp"
-        app:customFont="@string/font_heavy" />
+        app:customFont="heavy" />
 
 </LinearLayout>
