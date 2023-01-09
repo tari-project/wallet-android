@@ -57,7 +57,6 @@ class InputSeedWordsFragment : CommonFragment<FragmentWalletInputSeedWordsBindin
 
     private fun setupUI() = with(ui) {
         seedWordsContainer.setOnThrottledClickListener { viewModel.getFocusToNextElement(-1) }
-        backCtaView.setOnThrottledClickListener { requireActivity().onBackPressed() }
         continueCtaView.setOnThrottledClickListener {
             onFinishEntering()
             viewModel.startRestoringWallet()

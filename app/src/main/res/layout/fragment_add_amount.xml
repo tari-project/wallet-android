@@ -1,26 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<com.tari.android.wallet.ui.component.tari.TariPrimaryBackground xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/root_view"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@color/white">
+    android:layout_height="match_parent">
 
-    <!-- back -->
-    <ImageButton
-        android:id="@+id/back_button"
-        android:layout_width="@dimen/back_button_size"
-        android:layout_height="@dimen/back_button_size"
+    <com.tari.android.wallet.ui.component.tari.TariBackButton
+        android:id="@+id/back_cta_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/header_top_inset"
-        android:background="@color/white"
-        android:contentDescription="@null"
-        android:src="@drawable/back_icon"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <!-- contact alias -->
-    <com.tari.android.wallet.ui.component.CustomFontTextView
+    <com.tari.android.wallet.ui.component.tari.TariTextView
         android:id="@+id/title_text_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -30,30 +25,30 @@
         android:paddingEnd="@dimen/back_button_size"
         android:singleLine="true"
         android:text="@string/add_amount_under_construction"
-        android:textColor="@color/black"
+        android:textColor="?attr/palette_text_heading"
         android:textSize="16sp"
-        app:customFont="@string/font_heavy"
-        app:layout_constraintBottom_toBottomOf="@id/back_button"
+        app:customFont="heavy"
+        app:layout_constraintBottom_toBottomOf="@id/back_cta_view"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@id/back_button" />
+        app:layout_constraintTop_toTopOf="@id/back_cta_view" />
 
-    <FrameLayout
+    <com.tari.android.wallet.ui.component.tari.TariPrimaryBackground
         android:id="@+id/emoji_id_summary_container_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="@drawable/emoji_id_bg"
         android:clickable="true"
-        android:elevation="@dimen/common_view_elevation"
         android:focusable="true"
         android:paddingStart="@dimen/emoji_id_container_horizontal_padding"
         android:paddingTop="@dimen/emoji_id_container_vertical_padding"
         android:paddingEnd="@dimen/emoji_id_container_horizontal_padding"
         android:paddingBottom="@dimen/emoji_id_container_vertical_padding"
-        app:layout_constraintBottom_toBottomOf="@id/back_button"
+        app:cornerRadius="10dp"
+        app:elevation="8dp"
+        app:layout_constraintBottom_toBottomOf="@id/back_cta_view"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@id/back_button">
+        app:layout_constraintTop_toTopOf="@id/back_cta_view">
 
         <include
             android:id="@+id/emoji_id_summary_view"
@@ -61,14 +56,15 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:visibility="visible" />
-    </FrameLayout>
+
+    </com.tari.android.wallet.ui.component.tari.TariPrimaryBackground>
 
     <androidx.constraintlayout.widget.Barrier
         android:id="@+id/add_amount_header_barrier"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:barrierDirection="bottom"
-        app:constraint_referenced_ids="back_button,title_text_view,emoji_id_summary_container_view" />
+        app:constraint_referenced_ids="back_cta_view,title_text_view,emoji_id_summary_container_view" />
 
     <LinearLayout
         android:layout_width="0dp"
@@ -99,7 +95,7 @@
                     android:layout_marginStart="25dp"
                     android:layout_marginTop="@dimen/add_amount_balance_warning_container_top_margin"
                     android:layout_marginEnd="25dp"
-                    android:background="@drawable/validation_error_box_border_bg"
+                    android:background="@drawable/vector_validation_error_box_border_bg"
                     android:gravity="center"
                     android:orientation="vertical"
                     android:paddingTop="@dimen/add_amount_balance_warning_container_top_padding"
@@ -113,7 +109,7 @@
                         android:layout_gravity="center_horizontal"
                         android:gravity="center_horizontal" />
 
-                    <com.tari.android.wallet.ui.component.CustomFontTextView
+                    <com.tari.android.wallet.ui.component.tari.TariTextView
                         android:id="@+id/not_enough_balance_description_text_view"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -125,9 +121,9 @@
                         android:lineSpacingExtra="10dp"
                         android:singleLine="false"
                         android:text="@string/add_amount_not_enough_available_balance"
-                        android:textColor="#3C393D"
+                        android:textColor="?attr/palette_text_body"
                         android:textSize="@dimen/add_amount_tx_fee_text_size"
-                        app:customFont="AVENIR_LT_STD_ROMAN" />
+                        app:customFont="roman" />
                 </LinearLayout>
             </RelativeLayout>
 
@@ -145,20 +141,20 @@
                 android:layout_marginBottom="12dp"
                 android:orientation="vertical">
 
-                <ProgressBar
+                <com.tari.android.wallet.ui.component.tari.TariProgressBar
                     android:layout_width="24dp"
                     android:layout_height="24dp"
                     android:layout_gravity="center_horizontal"
                     android:layout_marginBottom="5dp" />
 
-                <com.tari.android.wallet.ui.component.CustomFontTextView
+                <com.tari.android.wallet.ui.component.tari.TariTextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
                     android:text="@string/add_amount_modify_fee_calculating_fees"
                     android:textColor="#A9AFC4"
                     android:textSize="@dimen/add_amount_tx_fee_text_size"
-                    app:customFont="@string/font_heavy" />
+                    app:customFont="heavy" />
 
             </androidx.appcompat.widget.LinearLayoutCompat>
 
@@ -187,17 +183,17 @@
                         android:layout_height="16dp"
                         android:layout_gravity="center_vertical"
                         android:layout_marginEnd="6dp"
-                        android:src="@drawable/ic_network_medium"
-                        android:tint="@color/dark_gray" />
+                        android:src="@drawable/vector_network_medium"
+                        android:tint="?attr/palette_text_body" />
 
-                    <com.tari.android.wallet.ui.component.CustomFontTextView
+                    <com.tari.android.wallet.ui.component.tari.TariTextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical"
                         android:text="@string/add_amount_modify_fee_network_traffic"
-                        android:textColor="#A9AFC4"
+                        android:textColor="?attr/palette_text_body"
                         android:textSize="@dimen/add_amount_tx_fee_text_size"
-                        app:customFont="@string/font_heavy" />
+                        app:customFont="heavy" />
 
                 </androidx.appcompat.widget.LinearLayoutCompat>
 
@@ -210,30 +206,31 @@
                     android:layout_marginBottom="0dp"
                     android:orientation="horizontal">
 
-                    <com.tari.android.wallet.ui.component.CustomFontTextView
+                    <com.tari.android.wallet.ui.component.tari.TariTextView
                         android:id="@+id/tx_fee_text_view"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginEnd="6dp"
                         android:layout_toLeftOf="@+id/tx_fee_desc_text_view"
-                        android:textColor="#A9AFC4"
+                        android:textColor="?attr/palette_text_body"
                         android:textSize="@dimen/add_amount_tx_fee_text_size"
-                        app:customFont="@string/font_heavy"
+                        app:customFont="heavy"
                         tools:text="+63.75" />
 
-                    <com.tari.android.wallet.ui.component.CustomFontTextView
+                    <com.tari.android.wallet.ui.component.tari.TariTextView
                         android:id="@+id/tx_fee_desc_text_view"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:drawableEnd="@drawable/help_icon_24dp"
+                        android:drawableEnd="@drawable/vector_help_icon_24dp"
                         android:drawablePadding="4dp"
                         android:text="@string/add_amount_tx_fee"
-                        android:textColor="#A9AFC4"
+                        android:textColor="?attr/palette_text_body"
                         android:textSize="@dimen/add_amount_tx_fee_text_size"
-                        app:customFont="@string/font_heavy" />
+                        app:customFont="heavy" />
+
                 </androidx.appcompat.widget.LinearLayoutCompat>
 
-                <com.tari.android.wallet.ui.component.CustomFontButton
+                <com.tari.android.wallet.ui.component.tari.TariButton
                     android:id="@+id/modifyButton"
                     android:layout_width="wrap_content"
                     android:layout_height="21dp"
@@ -242,10 +239,11 @@
                     android:background="@null"
                     android:text="@string/add_amount_modify_fee_speed_up_transaction"
                     android:textAllCaps="false"
-                    android:textColor="@color/purple"
+                    android:textColor="?attr/palette_brand_purple"
                     android:textSize="14sp"
                     android:visibility="invisible"
-                    app:customFont="@string/font_medium" />
+                    app:customFont="medium" />
+
             </RelativeLayout>
 
         </RelativeLayout>
@@ -262,25 +260,31 @@
             android:layout_marginTop="10dp"
             android:orientation="horizontal">
 
+            <com.tari.android.wallet.ui.component.tari.TariTextView
+                android:id="@+id/one_side_payment_switch_view_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="12dp"
+                android:text="@string/add_amount_one_side_payment_switcher"
+                android:textColor="?attr/palette_text_heading"
+                android:textSize="16sp"
+                app:customFont="medium" />
+
             <androidx.appcompat.widget.SwitchCompat
                 android:id="@+id/one_side_payment_switch_view"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:checked="true"
-                android:text="@string/add_amount_one_side_payment_switcher"
-                android:textColor="@color/black"
-                android:textSize="16sp" />
+                android:checked="true" />
 
             <androidx.appcompat.widget.AppCompatImageView
                 android:id="@+id/one_side_payment_help"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
                 android:layout_gravity="center_vertical"
                 android:layout_marginStart="16dp"
-                android:src="@drawable/help_icon_24dp" />
+                android:src="@drawable/vector_help_icon_24dp" />
 
         </LinearLayout>
-
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -290,39 +294,15 @@
             android:layout_marginEnd="0dp"
             android:layout_marginBottom="10dp">
 
-            <!-- disabled -->
-            <com.tari.android.wallet.ui.component.CustomFontButton
-                android:id="@+id/disabled_continue_button"
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/common_action_button_height"
-                android:layout_centerVertical="true"
-                android:layout_marginHorizontal="@dimen/common_horizontal_margin"
-                android:background="@drawable/disabled_button_bg"
-                android:clickable="false"
-                android:focusable="false"
-                android:singleLine="true"
-                android:text="@string/common_continue"
-                android:textAllCaps="false"
-                android:textColor="#B2B2B2"
-                android:textSize="16sp"
-                app:customFont="@string/font_heavy" />
-            <!-- actual button -->
-            <com.tari.android.wallet.ui.component.CustomFontButton
+            <com.tari.android.wallet.ui.component.tari.TariGradientButton
                 android:id="@+id/continue_button"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/common_action_button_height"
-                android:layout_centerVertical="true"
-                android:layout_marginStart="25dp"
-                android:layout_marginEnd="25dp"
-                android:background="@drawable/gradient_button_bg"
-                android:ellipsize="middle"
-                android:singleLine="true"
-                android:text="@string/common_continue"
-                android:textAllCaps="false"
-                android:textColor="@color/white"
-                android:textSize="16sp"
-                app:customFont="@string/font_heavy" />
+                android:layout_marginHorizontal="26dp"
+                app:title="@string/common_continue" />
+
         </RelativeLayout>
+
     </LinearLayout>
 
     <!-- full emoji id outer container -->
@@ -331,9 +311,10 @@
         layout="@layout/view_full_emoji_id"
         android:layout_width="0dp"
         android:layout_height="0dp"
+        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+</com.tari.android.wallet.ui.component.tari.TariPrimaryBackground>

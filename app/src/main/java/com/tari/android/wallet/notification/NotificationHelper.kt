@@ -109,14 +109,14 @@ class NotificationHelper(private val context: Context) {
             setContentText(context.getString(R.string.wallet_service_description))
             setContentIntent(pendingIntent)
             setSound(null)
-            setSmallIcon(R.drawable.notification_icon)
+            setSmallIcon(R.drawable.vector_notification_icon)
             build()
         }
     }
 
     private val txGroupNotification: Notification = NotificationCompat.Builder(context, APP_NOTIFICATION_CHANNEL_ID).run {
         setGroupSummary(true)
-        setSmallIcon(R.drawable.home_tx_icon)
+        setSmallIcon(R.drawable.vector_icon_send_tari)
         setGroup(APP_NOTIFICATION_GROUP_NAME)
         setAutoCancel(true)
         setGroupSummary(true)
@@ -205,7 +205,7 @@ class NotificationHelper(private val context: Context) {
         val notification = NotificationCompat.Builder(context, APP_NOTIFICATION_CHANNEL_ID).run {
             setContentTitle(title)
             setContentText(body)
-            setSmallIcon(R.drawable.notification_icon)
+            setSmallIcon(R.drawable.vector_notification_icon)
             setDefaults(DEFAULT_ALL)
             setGroup(APP_NOTIFICATION_GROUP_NAME)
             setCategory(NotificationCompat.CATEGORY_EVENT)

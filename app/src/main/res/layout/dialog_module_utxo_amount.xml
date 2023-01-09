@@ -15,23 +15,23 @@
         android:layout_gravity="center"
         android:orientation="horizontal">
 
-        <androidx.appcompat.widget.AppCompatImageView
+        <com.tari.android.wallet.ui.component.tari.TariIconView
             android:id="@+id/balance_gem_image_view"
             android:layout_width="@dimen/home_balance_gem_width"
             android:layout_height="@dimen/home_balance_gem_height"
             android:layout_gravity="center_vertical"
-            android:src="@drawable/gem" />
+            android:src="@drawable/vector_gem" />
 
-        <com.tari.android.wallet.ui.component.CustomFontTextView
+        <com.tari.android.wallet.ui.component.tari.TariTextView
             android:id="@+id/amount"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_marginStart="6dp"
             android:gravity="center"
-            android:textColor="@color/black"
+            android:textColor="?attr/palette_text_heading"
             android:textSize="26sp"
-            app:customFont="@string/font_black"
+            app:customFont="black"
             tools:text="3,200.00" />
 
     </LinearLayout>

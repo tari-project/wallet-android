@@ -22,19 +22,18 @@
             android:id="@+id/gem"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:contentDescription="@null"
-            android:src="@drawable/gem" />
+            android:src="@drawable/vector_gem" />
 
-        <com.tari.android.wallet.ui.component.CustomFontTextView
+        <com.tari.android.wallet.ui.component.tari.TariTextView
             android:id="@+id/balance_view"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="4dp"
             android:ellipsize="middle"
             android:singleLine="true"
-            android:textColor="@color/common_error"
+            android:textColor="?attr/palette_system_red"
             android:textSize="@dimen/add_amount_balance_text_size"
-            app:customFont="@string/font_heavy"
+            app:customFont="heavy"
             tools:text="124.56" />
     </LinearLayout>
 

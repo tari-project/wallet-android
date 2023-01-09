@@ -1,38 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<com.tari.android.wallet.ui.component.tari.TariPrimaryBackground xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@color/white">
+    android:layout_height="match_parent">
 
-    <ImageView
+    <androidx.appcompat.widget.AppCompatImageButton
         android:id="@+id/icon_view"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@drawable/icon_wallet_backing_up"
+        android:layout_width="52dp"
+        android:layout_height="52dp"
+        android:layout_marginBottom="38dp"
+        android:background="@drawable/vector_send_button_back"
+        android:elevation="10dp"
+        android:src="@drawable/tari_splash_gem_small"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.4"
-        tools:ignore="ContentDescription" />
+        app:layout_constraintVertical_bias="0.4"  />
 
-    <com.tari.android.wallet.ui.component.CustomFontTextView
+    <com.tari.android.wallet.ui.component.tari.TariTextView
         android:id="@+id/label_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="30dp"
         android:lineSpacingMultiplier="1.5"
         android:text="@string/back_up_wallet_restoring_wallet_label"
-        android:textColor="@color/black"
+        android:textColor="?attr/palette_text_heading"
         android:textSize="18sp"
-        app:customFont="@string/font_light"
+        app:customFont="light"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/icon_view" />
 
-    <com.tari.android.wallet.ui.component.CustomFontTextView
+    <com.tari.android.wallet.ui.component.tari.TariTextView
         android:id="@+id/description_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -40,13 +40,13 @@
         android:gravity="center"
         android:lineSpacingMultiplier="1.5"
         android:text="@string/back_up_wallet_restoring_wallet_label_description"
-        android:textColor="@color/dark_gray"
-        app:customFont="@string/font_medium"
+        android:textColor="?attr/palette_text_body"
+        app:customFont="medium"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/label_view" />
 
-    <com.tari.android.wallet.ui.component.CustomFontTextView
+    <com.tari.android.wallet.ui.component.tari.TariTextView
         android:id="@+id/status_label"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -55,13 +55,13 @@
         android:gravity="center"
         android:lineSpacingMultiplier="1.5"
         android:text="@string/restore_from_seed_words_overlay_description"
-        android:textColor="@color/dark_gray"
-        app:customFont="@string/font_medium"
+        android:textColor="?attr/palette_text_body"
+        app:customFont="medium"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/description_view" />
 
-    <com.tari.android.wallet.ui.component.CustomFontTextView
+    <com.tari.android.wallet.ui.component.tari.TariTextView
         android:id="@+id/progress_label"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -69,9 +69,9 @@
         android:layout_marginTop="5dp"
         android:gravity="center"
         android:text="@string/back_up_wallet_restoring_wallet_label_description"
-        android:textColor="@color/dark_gray"
+        android:textColor="?attr/palette_text_body"
         android:textSize="18sp"
-        app:customFont="@string/font_light"
+        app:customFont="light"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/status_label" />
@@ -91,4 +91,4 @@
         app:lottie_rawRes="@raw/onboarding_bottom_spinner"
         app:lottie_renderMode="automatic" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+</com.tari.android.wallet.ui.component.tari.TariPrimaryBackground>

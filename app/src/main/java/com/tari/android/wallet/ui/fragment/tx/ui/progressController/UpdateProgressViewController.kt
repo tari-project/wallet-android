@@ -123,7 +123,6 @@ class UpdateProgressViewController(private val view: View, listener: Listener) :
     private var torBootstrapStatusSubscription: Disposable? = null
 
     init {
-        progressBar.setColor(view.color(R.color.purple))
         progressBar.invisible()
         subscribeToEventBus()
     }

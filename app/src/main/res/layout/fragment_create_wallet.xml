@@ -1,420 +1,416 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+
+<com.tari.android.wallet.ui.component.tari.TariSecondaryBackground xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/root_view"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@color/transparent">
-
-    <View
-        android:id="@+id/white_bg_view"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@color/create_emoji_id_bg"
-        android:visibility="invisible" />
-
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:gravity="center">
-
-        <!-- tap to see full emoji id button -->
-        <RelativeLayout
-            android:id="@+id/see_full_emoji_id_container_view"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignTop="@id/emoji_id_summary_container_view"
-            android:layout_centerHorizontal="true"
-            android:layout_marginTop="0dp"
-            android:elevation="4dp">
-
-            <com.tari.android.wallet.ui.component.CustomFontTextView
-                android:id="@+id/see_full_emoji_id_text_view"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="@drawable/copy_paste_emoji_id_button_bg"
-                android:paddingHorizontal="20dp"
-                android:paddingVertical="10dp"
-                android:text="@string/tap_to_see_full_emoji_id"
-                android:textColor="#9834F6"
-                android:textSize="14sp"
-                app:customFont="@string/font_heavy" />
-
-            <Button
-                android:id="@+id/see_full_emoji_id_button"
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:layout_alignStart="@id/see_full_emoji_id_text_view"
-                android:layout_alignTop="@id/see_full_emoji_id_text_view"
-                android:layout_alignEnd="@id/see_full_emoji_id_text_view"
-                android:layout_alignBottom="@id/see_full_emoji_id_text_view"
-                android:background="@color/transparent" />
-
-            <ImageView
-                android:id="@+id/copy_emoji_id_notch_image_view"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/see_full_emoji_id_button"
-                android:layout_centerHorizontal="true"
-                android:contentDescription="@null"
-                android:src="@drawable/speech_notch_down" />
-        </RelativeLayout>
-
-        <RelativeLayout
-            android:id="@+id/emoji_id_summary_container_view"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true"
-            android:layout_marginStart="@dimen/common_horizontal_margin"
-            android:layout_marginTop="-80dp"
-            android:layout_marginEnd="@dimen/common_horizontal_margin"
-            android:alpha="0"
-            android:background="@drawable/emoji_id_bg"
-            android:clickable="true"
-            android:focusable="true"
-            android:paddingHorizontal="@dimen/onboarding_emoji_id_container_horizontal_padding"
-            android:paddingVertical="@dimen/onboarding_emoji_id_container_vertical_padding">
-
-            <include
-                android:id="@+id/emoji_id_summary_view"
-                layout="@layout/view_onboarding_emoji_id_summary"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:visibility="visible" />
-        </RelativeLayout>
-
-        <RelativeLayout
-            android:id="@+id/emoji_id_container_view"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true"
-            android:layout_marginStart="@dimen/common_horizontal_margin"
-            android:layout_marginTop="-80dp"
-            android:layout_marginEnd="@dimen/common_horizontal_margin"
-            android:layout_marginBottom="20dp"
-            android:alpha="0"
-            android:background="@drawable/emoji_id_bg"
-            android:visibility="invisible">
-
-            <HorizontalScrollView
-                android:id="@+id/emoji_id_scroll_view"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:scrollbars="none"
-                tools:ignore="UselessParent">
-
-                <TextView
-                    android:id="@+id/emoji_id_text_view"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:letterSpacing="0.22"
-                    android:paddingHorizontal="@dimen/onboarding_emoji_id_container_horizontal_padding"
-                    android:paddingVertical="@dimen/onboarding_emoji_id_container_vertical_padding"
-                    android:textColor="@color/black"
-                    android:textSize="17sp" />
-            </HorizontalScrollView>
-
-            <!-- white fader for emoji-id -->
-            <View
-                android:layout_width="26dp"
-                android:layout_height="24dp"
-                android:layout_alignParentEnd="true"
-                android:layout_centerVertical="true"
-                android:background="@drawable/emoji_id_end_fader"
-                android:translationZ="6dp" />
-        </RelativeLayout>
-
-        <!-- text :: This is your Emoji ID -->
-        <LinearLayout
-            android:id="@+id/your_emoji_id_title_container_view"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/emoji_id_container_view"
-            android:layout_marginTop="40dp"
-            android:gravity="center"
-            android:orientation="horizontal"
-            android:visibility="invisible">
-
-            <com.tari.android.wallet.ui.component.CustomFontTextView
-                android:id="@+id/your_emoji_id_title_text_view"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginEnd="4dp"
-                android:gravity="center"
-                android:letterSpacing="0.01"
-                android:text="@string/create_wallet_your_emoji_id_text_label"
-                android:textColor="@color/black"
-                android:textSize="18sp"
-                app:customFont="@string/font_light" />
-        </LinearLayout>
-
-        <View
-            android:id="@+id/your_emoji_title_back_view"
-            android:layout_width="match_parent"
-            android:layout_height="25dp"
-            android:layout_below="@id/emoji_id_container_view"
-            android:layout_marginTop="40dp"
-            android:background="@color/create_emoji_id_bg"
-            android:visibility="invisible" />
-
-        <com.tari.android.wallet.ui.component.CustomFontTextView
-            android:id="@+id/emoji_id_desc_text_view"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/your_emoji_id_title_container_view"
-            android:layout_gravity="center"
-            android:layout_marginHorizontal="@dimen/common_horizontal_margin"
-            android:alpha="0"
-            android:gravity="center"
-            android:letterSpacing="-0.02"
-            android:lineSpacingExtra="10dp"
-            android:text="@string/create_wallet_set_of_emoji_your_wallet_address_desc"
-            android:textColor="@color/dark_gray"
-            android:textSize="14sp"
-            app:customFont="@string/font_medium" />
-
-    </RelativeLayout>
+    android:layout_height="match_parent">
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <ImageView
-            android:id="@+id/small_gem_image_view"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginTop="@dimen/onboarding_small_gem_top_margin"
-            android:layout_marginBottom="18dp"
-            android:contentDescription="@null"
-            android:src="@drawable/splash_gem_small"
-            app:tint="@color/black"
-            android:visibility="gone" />
-
-        <com.airbnb.lottie.LottieAnimationView
-            android:id="@+id/emoji_wheel_lottie_animation_view"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true"
-            android:layout_marginTop="-48dp"
-            android:scaleX="1"
-            android:scaleY="1"
-            app:lottie_autoPlay="false"
-            app:lottie_enableMergePathsForKitKatAndAbove="true"
-            app:lottie_imageAssetsFolder="create_emoji_id/images/"
-            app:lottie_loop="false"
-            app:lottie_rawRes="@raw/emoji_wheel"
-            app:lottie_renderMode="automatic" />
-
-        <RelativeLayout
-            android:id="@+id/wallet_creation_container_view"
+        <View
+            android:id="@+id/white_bg_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:gravity="center"
-            android:orientation="vertical">
+            android:background="?attr/palette_neutral_secondary"
+            android:visibility="invisible" />
 
-            <com.tari.android.wallet.ui.component.CustomFontTextView
-                android:id="@+id/just_sec_title_text_view"
-                android:layout_width="match_parent"
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center">
+
+            <!-- tap to see full emoji id button -->
+            <RelativeLayout
+                android:id="@+id/see_full_emoji_id_container_view"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="56dp"
-                android:gravity="center"
-                android:letterSpacing="0.01"
-                android:text="@string/create_wallet_just_a_sec_label"
-                android:textColor="@color/black"
-                android:textSize="18sp"
-                android:visibility="invisible"
-                app:customFont="@string/font_black" />
+                android:layout_alignTop="@id/emoji_id_summary_container_view"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="0dp"
+                android:elevation="4dp">
 
-            <View
-                android:id="@+id/just_sec_title_back_view"
-                android:layout_width="match_parent"
-                android:layout_height="25dp"
-                android:layout_gravity="center"
-                android:layout_marginTop="56dp"
-                android:background="@color/create_emoji_id_bg"
-                android:visibility="invisible" />
+                <com.tari.android.wallet.ui.component.tari.TariTextView
+                    android:id="@+id/see_full_emoji_id_text_view"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/vector_copy_paste_emoji_id_button_bg"
+                    android:paddingHorizontal="20dp"
+                    android:paddingVertical="10dp"
+                    android:text="@string/tap_to_see_full_emoji_id"
+                    android:textColor="#9834F6"
+                    android:textSize="14sp"
+                    app:customFont="heavy" />
 
-            <com.tari.android.wallet.ui.component.CustomFontTextView
-                android:id="@+id/just_sec_desc_text_view"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/just_sec_title_text_view"
-                android:layout_gravity="center"
-                android:layout_marginTop="4dp"
-                android:gravity="center"
-                android:letterSpacing="-0.03"
-                android:text="@string/create_wallet_just_sec_desc_text"
-                android:textColor="@color/black"
-                android:textSize="18sp"
-                android:visibility="invisible"
-                app:customFont="AVENIR_LT_STD_ROMAN" />
+                <Button
+                    android:id="@+id/see_full_emoji_id_button"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_alignStart="@id/see_full_emoji_id_text_view"
+                    android:layout_alignTop="@id/see_full_emoji_id_text_view"
+                    android:layout_alignEnd="@id/see_full_emoji_id_text_view"
+                    android:layout_alignBottom="@id/see_full_emoji_id_text_view"
+                    android:background="@color/transparent" />
 
-            <View
-                android:id="@+id/just_sec_desc_back_view"
-                android:layout_width="match_parent"
-                android:layout_height="25dp"
-                android:layout_below="@id/just_sec_title_text_view"
-                android:layout_gravity="center"
-                android:layout_marginTop="4dp"
-                android:background="@color/create_emoji_id_bg"
-                android:visibility="invisible" />
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/copy_emoji_id_notch_image_view"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/see_full_emoji_id_button"
+                    android:layout_centerHorizontal="true"
+                    android:src="@drawable/tari_speech_notch_down" />
+            </RelativeLayout>
 
-            <com.airbnb.lottie.LottieAnimationView
-                android:id="@+id/checkmark_lottie_animation_view"
+            <RelativeLayout
+                android:id="@+id/emoji_id_summary_container_view"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerHorizontal="true"
-                android:layout_marginTop="26dp"
-                android:scaleX="0.5"
-                android:scaleY="0.5"
-                android:visibility="gone"
-                app:lottie_autoPlay="false"
-                app:lottie_enableMergePathsForKitKatAndAbove="true"
-                app:lottie_loop="false"
-                app:lottie_rawRes="@raw/check_mark"
-                app:lottie_renderMode="automatic" />
-
-            <com.tari.android.wallet.ui.component.CustomFontTextView
-                android:id="@+id/create_your_emoji_id_line_1_text_view"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_above="@id/wallet_address_desc_text_view"
-                android:layout_marginStart="@dimen/common_dialog_horizontal_margin"
-                android:layout_marginEnd="@dimen/common_dialog_horizontal_margin"
-                android:layout_marginBottom="24dp"
-                android:gravity="center"
-                android:text="@string/create_wallet_awesome"
-                android:textColor="@color/black"
-                android:textSize="18sp"
-                android:visibility="invisible"
-                app:customFont="@string/font_black" />
-
-            <View
-                android:id="@+id/create_your_emoji_id_line_1_blocker_view"
-                android:layout_width="match_parent"
-                android:layout_height="18dp"
-                android:layout_above="@id/wallet_address_desc_text_view"
-                android:layout_gravity="center"
-                android:layout_marginBottom="24dp"
-                android:background="@color/create_emoji_id_bg"
-                android:visibility="invisible" />
-
-            <com.tari.android.wallet.ui.component.CustomFontTextView
-                android:id="@+id/create_your_emoji_id_line_2_text_view"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_above="@id/wallet_address_desc_text_view"
-                android:layout_gravity="center"
-                android:layout_marginStart="@dimen/common_dialog_horizontal_margin"
-                android:layout_marginTop="2dp"
-                android:layout_marginEnd="@dimen/common_dialog_horizontal_margin"
-                android:gravity="center"
-                android:letterSpacing="-0.02"
-                android:text="@string/create_wallet_now_text"
-                android:textColor="@color/black"
-                android:textSize="18sp"
-                android:visibility="invisible"
-                app:customFont="AVENIR_LT_STD_ROMAN" />
-
-            <View
-                android:id="@+id/create_your_emoji_id_line_2_blocker_view"
-                android:layout_width="match_parent"
-                android:layout_height="20dp"
-                android:layout_above="@id/wallet_address_desc_text_view"
-                android:layout_gravity="center"
-                android:layout_marginTop="2dp"
-                android:background="@color/create_emoji_id_bg"
-                android:visibility="invisible" />
-
-            <com.airbnb.lottie.LottieAnimationView
-                android:id="@+id/nerd_face_emoji_lottie_animation_view"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerHorizontal="true"
-                android:layout_marginTop="42dp"
+                android:layout_marginStart="@dimen/common_horizontal_margin"
+                android:layout_marginTop="-80dp"
+                android:layout_marginEnd="@dimen/common_horizontal_margin"
                 android:alpha="0"
-                android:paddingBottom="6dp"
-                app:lottie_autoPlay="false"
-                app:lottie_enableMergePathsForKitKatAndAbove="true"
-                app:lottie_imageAssetsFolder="nerd_emoji/images/"
-                app:lottie_loop="true"
-                app:lottie_rawRes="@raw/nerd_emoji"
-                app:lottie_renderMode="automatic" />
+                android:background="@drawable/vector_emoji_id_bg"
+                android:clickable="true"
+                android:focusable="true"
+                android:paddingHorizontal="@dimen/onboarding_emoji_id_container_horizontal_padding"
+                android:paddingVertical="@dimen/onboarding_emoji_id_container_vertical_padding">
 
-            <com.tari.android.wallet.ui.component.CustomFontTextView
-                android:id="@+id/wallet_address_desc_text_view"
+                <include
+                    android:id="@+id/emoji_id_summary_view"
+                    layout="@layout/view_onboarding_emoji_id_summary"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:visibility="visible" />
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/emoji_id_container_view"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/nerd_face_emoji_lottie_animation_view"
+                android:layout_centerHorizontal="true"
+                android:layout_marginStart="@dimen/common_horizontal_margin"
+                android:layout_marginTop="-80dp"
+                android:layout_marginEnd="@dimen/common_horizontal_margin"
+                android:layout_marginBottom="20dp"
+                android:alpha="0"
+                android:background="@drawable/vector_emoji_id_bg"
+                android:visibility="invisible">
+
+                <HorizontalScrollView
+                    android:id="@+id/emoji_id_scroll_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:scrollbars="none"
+                    tools:ignore="UselessParent">
+
+                    <TextView
+                        android:id="@+id/emoji_id_text_view"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:letterSpacing="0.22"
+                        android:paddingHorizontal="@dimen/onboarding_emoji_id_container_horizontal_padding"
+                        android:paddingVertical="@dimen/onboarding_emoji_id_container_vertical_padding"
+                        android:textColor="?attr/palette_text_heading"
+                        android:textSize="17sp" />
+                </HorizontalScrollView>
+
+            </RelativeLayout>
+
+            <!-- text :: This is your Emoji ID -->
+            <LinearLayout
+                android:id="@+id/your_emoji_id_title_container_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/emoji_id_container_view"
+                android:layout_marginTop="40dp"
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:visibility="invisible">
+
+                <com.tari.android.wallet.ui.component.tari.TariTextView
+                    android:id="@+id/your_emoji_id_title_text_view"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginEnd="4dp"
+                    android:gravity="center"
+                    android:letterSpacing="0.01"
+                    android:text="@string/create_wallet_your_emoji_id_text_label"
+                    android:textColor="?attr/palette_text_heading"
+                    android:textSize="18sp"
+                    app:customFont="light" />
+            </LinearLayout>
+
+            <View
+                android:id="@+id/your_emoji_title_back_view"
+                android:layout_width="match_parent"
+                android:layout_height="25dp"
+                android:layout_below="@id/emoji_id_container_view"
+                android:layout_marginTop="40dp"
+                android:background="?attr/palette_neutral_secondary"
+                android:visibility="invisible" />
+
+            <com.tari.android.wallet.ui.component.tari.TariTextView
+                android:id="@+id/emoji_id_desc_text_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/your_emoji_id_title_container_view"
                 android:layout_gravity="center"
-                android:layout_marginStart="@dimen/common_dialog_horizontal_margin"
-                android:layout_marginTop="4dp"
-                android:layout_marginEnd="@dimen/common_dialog_horizontal_margin"
+                android:layout_marginHorizontal="@dimen/common_horizontal_margin"
                 android:alpha="0"
                 android:gravity="center"
                 android:letterSpacing="-0.02"
                 android:lineSpacingExtra="10dp"
-                android:text="@string/create_wallet_address_desc"
-                android:textColor="@color/dark_gray"
+                android:text="@string/create_wallet_set_of_emoji_your_wallet_address_desc"
+                android:textColor="?attr/palette_text_body"
                 android:textSize="14sp"
-                app:customFont="@string/font_medium" />
+                app:customFont="medium" />
 
         </RelativeLayout>
 
-        <com.tari.android.wallet.ui.component.CustomFontButton
-            android:id="@+id/continue_button"
-            style="?android:attr/borderlessButtonStyle"
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="@dimen/common_action_button_height"
-            android:layout_alignParentBottom="true"
-            android:layout_marginLeft="25dp"
-            android:layout_marginRight="25dp"
-            android:layout_marginBottom="@dimen/create_wallet_button_bottom_margin"
-            android:background="@drawable/gradient_button_bg"
-            android:ellipsize="middle"
-            android:singleLine="true"
-            android:text="@string/common_continue"
-            android:textAllCaps="false"
-            android:textColor="@color/white"
-            android:textSize="16sp"
-            app:customFont="@string/font_heavy" />
+            android:layout_height="match_parent">
 
-        <com.tari.android.wallet.ui.component.CustomFontButton
-            android:id="@+id/create_emoji_id_button"
-            style="?android:attr/borderlessButtonStyle"
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/common_action_button_height"
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/small_gem_image_view"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="@dimen/onboarding_small_gem_top_margin"
+                android:layout_marginBottom="18dp"
+                android:src="@drawable/tari_splash_gem_small"
+                android:visibility="gone"
+                app:tint="?attr/palette_text_heading" />
+
+            <com.airbnb.lottie.LottieAnimationView
+                android:id="@+id/emoji_wheel_lottie_animation_view"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="-48dp"
+                android:scaleX="1"
+                android:scaleY="1"
+                app:lottie_autoPlay="false"
+                app:lottie_enableMergePathsForKitKatAndAbove="true"
+                app:lottie_imageAssetsFolder="create_emoji_id/images/"
+                app:lottie_loop="false"
+                app:lottie_rawRes="@raw/emoji_wheel"
+                app:lottie_renderMode="automatic" />
+
+            <RelativeLayout
+                android:id="@+id/wallet_creation_container_view"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <com.tari.android.wallet.ui.component.tari.TariTextView
+                    android:id="@+id/just_sec_title_text_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="56dp"
+                    android:gravity="center"
+                    android:letterSpacing="0.01"
+                    android:text="@string/create_wallet_just_a_sec_label"
+                    android:textColor="?attr/palette_text_heading"
+                    android:textSize="18sp"
+                    android:visibility="invisible"
+                    app:customFont="black" />
+
+                <View
+                    android:id="@+id/just_sec_title_back_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="25dp"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="56dp"
+                    android:background="?attr/palette_neutral_secondary"
+                    android:visibility="invisible" />
+
+                <com.tari.android.wallet.ui.component.tari.TariTextView
+                    android:id="@+id/just_sec_desc_text_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/just_sec_title_text_view"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="4dp"
+                    android:gravity="center"
+                    android:letterSpacing="-0.03"
+                    android:text="@string/create_wallet_just_sec_desc_text"
+                    android:textColor="?attr/palette_text_heading"
+                    android:textSize="18sp"
+                    android:visibility="invisible"
+                    app:customFont="roman" />
+
+                <View
+                    android:id="@+id/just_sec_desc_back_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="25dp"
+                    android:layout_below="@id/just_sec_title_text_view"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="4dp"
+                    android:background="?attr/palette_neutral_secondary"
+                    android:visibility="invisible" />
+
+                <com.airbnb.lottie.LottieAnimationView
+                    android:id="@+id/checkmark_lottie_animation_view"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerHorizontal="true"
+                    android:layout_marginTop="26dp"
+                    android:scaleX="0.5"
+                    android:scaleY="0.5"
+                    android:visibility="gone"
+                    app:lottie_autoPlay="false"
+                    app:lottie_enableMergePathsForKitKatAndAbove="true"
+                    app:lottie_loop="false"
+                    app:lottie_rawRes="@raw/check_mark"
+                    app:lottie_renderMode="automatic" />
+
+                <com.tari.android.wallet.ui.component.tari.TariTextView
+                    android:id="@+id/create_your_emoji_id_line_1_text_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_above="@id/wallet_address_desc_text_view"
+                    android:layout_marginStart="@dimen/common_dialog_horizontal_margin"
+                    android:layout_marginEnd="@dimen/common_dialog_horizontal_margin"
+                    android:layout_marginBottom="24dp"
+                    android:gravity="center"
+                    android:text="@string/create_wallet_awesome"
+                    android:textColor="?attr/palette_text_heading"
+                    android:textSize="18sp"
+                    android:visibility="invisible"
+                    app:customFont="black" />
+
+                <View
+                    android:id="@+id/create_your_emoji_id_line_1_blocker_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="18dp"
+                    android:layout_above="@id/wallet_address_desc_text_view"
+                    android:layout_gravity="center"
+                    android:layout_marginBottom="24dp"
+                    android:background="?attr/palette_neutral_secondary"
+                    android:visibility="invisible" />
+
+                <com.tari.android.wallet.ui.component.tari.TariTextView
+                    android:id="@+id/create_your_emoji_id_line_2_text_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_above="@id/wallet_address_desc_text_view"
+                    android:layout_gravity="center"
+                    android:layout_marginStart="@dimen/common_dialog_horizontal_margin"
+                    android:layout_marginTop="2dp"
+                    android:layout_marginEnd="@dimen/common_dialog_horizontal_margin"
+                    android:gravity="center"
+                    android:letterSpacing="-0.02"
+                    android:text="@string/create_wallet_now_text"
+                    android:textColor="?attr/palette_text_heading"
+                    android:textSize="18sp"
+                    android:visibility="invisible"
+                    app:customFont="roman" />
+
+                <View
+                    android:id="@+id/create_your_emoji_id_line_2_blocker_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="20dp"
+                    android:layout_above="@id/wallet_address_desc_text_view"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="2dp"
+                    android:background="?attr/palette_neutral_secondary"
+                    android:visibility="invisible" />
+
+                <com.airbnb.lottie.LottieAnimationView
+                    android:id="@+id/nerd_face_emoji_lottie_animation_view"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerHorizontal="true"
+                    android:layout_marginTop="42dp"
+                    android:alpha="0"
+                    android:paddingBottom="6dp"
+                    app:lottie_autoPlay="false"
+                    app:lottie_enableMergePathsForKitKatAndAbove="true"
+                    app:lottie_imageAssetsFolder="nerd_emoji/images/"
+                    app:lottie_loop="true"
+                    app:lottie_rawRes="@raw/nerd_emoji"
+                    app:lottie_renderMode="automatic" />
+
+                <com.tari.android.wallet.ui.component.tari.TariTextView
+                    android:id="@+id/wallet_address_desc_text_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/nerd_face_emoji_lottie_animation_view"
+                    android:layout_gravity="center"
+                    android:layout_marginStart="@dimen/common_dialog_horizontal_margin"
+                    android:layout_marginTop="4dp"
+                    android:layout_marginEnd="@dimen/common_dialog_horizontal_margin"
+                    android:alpha="0"
+                    android:gravity="center"
+                    android:letterSpacing="-0.02"
+                    android:lineSpacingExtra="10dp"
+                    android:text="@string/create_wallet_address_desc"
+                    android:textColor="?attr/palette_text_body"
+                    android:textSize="14sp"
+                    app:customFont="medium" />
+
+            </RelativeLayout>
+
+            <com.tari.android.wallet.ui.component.tari.TariButton
+                android:id="@+id/continue_button"
+                style="?android:attr/borderlessButtonStyle"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/common_action_button_height"
+                android:layout_alignParentBottom="true"
+                android:layout_marginLeft="25dp"
+                android:layout_marginRight="25dp"
+                android:layout_marginBottom="@dimen/create_wallet_button_bottom_margin"
+                android:background="@drawable/vector_gradient_button_bg"
+                android:ellipsize="middle"
+                android:singleLine="true"
+                android:text="@string/common_continue"
+                android:textAllCaps="false"
+                android:textColor="@color/white"
+                android:textSize="16sp"
+                app:customFont="heavy" />
+
+            <com.tari.android.wallet.ui.component.tari.TariButton
+                android:id="@+id/create_emoji_id_button"
+                style="?android:attr/borderlessButtonStyle"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/common_action_button_height"
+                android:layout_alignParentBottom="true"
+                android:layout_marginLeft="25dp"
+                android:layout_marginRight="25dp"
+                android:background="@drawable/vector_gradient_button_bg"
+                android:ellipsize="middle"
+                android:singleLine="true"
+                android:text="@string/create_wallet_continue_and_create_emoji_id"
+                android:textAllCaps="false"
+                android:textColor="@color/white"
+                android:textSize="16sp"
+                app:customFont="heavy" />
+
+        </RelativeLayout>
+
+        <!-- Lottie animation for Tari Wallet text -->
+        <com.airbnb.lottie.LottieAnimationView
+            android:id="@+id/bottom_spinner_lottie_animation_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
-            android:layout_marginLeft="25dp"
-            android:layout_marginRight="25dp"
-            android:background="@drawable/gradient_button_bg"
-            android:ellipsize="middle"
-            android:singleLine="true"
-            android:text="@string/create_wallet_continue_and_create_emoji_id"
-            android:textAllCaps="false"
-            android:textColor="@color/white"
-            android:textSize="16sp"
-            app:customFont="@string/font_heavy" />
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="@dimen/onboarding_bottom_progress_bar_bottom_margin"
+            android:background="@color/transparent"
+            app:lottie_autoPlay="true"
+            app:lottie_enableMergePathsForKitKatAndAbove="true"
+            app:lottie_loop="true"
+            app:lottie_rawRes="@raw/onboarding_bottom_spinner"
+            app:lottie_renderMode="automatic" />
 
     </RelativeLayout>
 
-    <!-- Lottie animation for Tari Wallet text -->
-    <com.airbnb.lottie.LottieAnimationView
-        android:id="@+id/bottom_spinner_lottie_animation_view"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginBottom="@dimen/onboarding_bottom_progress_bar_bottom_margin"
-        android:background="@color/transparent"
-        app:lottie_autoPlay="true"
-        app:lottie_enableMergePathsForKitKatAndAbove="true"
-        app:lottie_loop="true"
-        app:lottie_rawRes="@raw/onboarding_bottom_spinner"
-        app:lottie_renderMode="automatic" />
-
-</RelativeLayout>
+</com.tari.android.wallet.ui.component.tari.TariSecondaryBackground>

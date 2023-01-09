@@ -1,17 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<com.tari.android.wallet.ui.component.tari.TariPrimaryBackground xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/root_view"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@color/white">
+    android:layout_height="match_parent">
 
     <RelativeLayout
         android:id="@+id/add_recipient_vw_search_container"
         android:layout_width="0dp"
         android:layout_height="@dimen/add_recipient_search_bar_container_height"
-        android:background="@color/white"
         android:gravity="center"
         android:orientation="horizontal"
         app:layout_constraintEnd_toEndOf="parent"
@@ -28,110 +26,110 @@
             android:focusable="true" />
 
         <!-- search container -->
-        <RelativeLayout
+        <com.tari.android.wallet.ui.component.tari.TariPrimaryBackground
             android:layout_width="match_parent"
-            android:layout_height="@dimen/add_recipient_search_text_view_height"
+            android:layout_height="wrap_content"
             android:layout_centerInParent="true"
             android:layout_marginHorizontal="@dimen/common_horizontal_margin"
-            android:background="@drawable/add_recipient_search_bg"
-            android:elevation="@dimen/common_view_elevation">
+            app:cornerRadius="6dp"
+            app:elevation="8dp">
 
-            <LinearLayout
-                android:id="@+id/left_icons"
-                android:layout_width="wrap_content"
-                android:layout_alignParentStart="true"
-                android:layout_height="match_parent"
-                android:background="@null"
-                android:orientation="horizontal">
-
-                <!-- Yat eye -->
-                <androidx.appcompat.widget.AppCompatImageButton
-                    android:id="@+id/yat_icon"
-                    android:layout_width="50dp"
-                    android:layout_height="@dimen/add_recipient_search_text_view_height"
-                    android:background="@color/transparent"
-                    android:src="@drawable/tari_yat_open"
-                    android:tint="@color/purple"
-                    android:visibility="gone"
-                    tools:visibility="visible"/>
-
-            </LinearLayout>
-            <!-- search -->
-
-            <!-- white fader for emoji-id input -->
-            <HorizontalScrollView
-                android:id="@+id/search_edit_text_scroll_view"
+            <RelativeLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_marginEnd="-1dp"
-                android:layout_toStartOf="@+id/buttons_container"
-                android:layout_toRightOf="@id/left_icons"
-                android:fillViewport="true"
-                android:scrollbars="none">
+                android:layout_height="@dimen/add_recipient_search_text_view_height">
 
-                <androidx.appcompat.widget.LinearLayoutCompat
-                    android:id="@+id/search_edit_text_animate_container"
+                <LinearLayout
+                    android:id="@+id/left_icons"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:animateLayoutChanges="true">
+                    android:layout_height="match_parent"
+                    android:layout_alignParentStart="true"
+                    android:background="@null"
+                    android:orientation="horizontal">
 
-                    <com.tari.android.wallet.ui.component.CustomFontEditText
-                        android:id="@+id/search_edit_text"
-                        android:layout_width="match_parent"
+                    <!-- Yat eye -->
+                    <androidx.appcompat.widget.AppCompatImageButton
+                        android:id="@+id/yat_icon"
+                        android:layout_width="50dp"
                         android:layout_height="@dimen/add_recipient_search_text_view_height"
-                        android:layout_marginHorizontal="16dp"
                         android:background="@color/transparent"
-                        android:hint="@string/add_recipient_hint"
-                        android:imeOptions="actionDone"
-                        android:inputType="textNoSuggestions"
-                        android:letterSpacing="0.02"
-                        android:scrollHorizontally="false"
-                        android:singleLine="true"
-                        android:textColor="@color/black"
-                        android:textColorHint="@color/add_recipient_hint"
-                        android:textSize="14sp"
-                        app:customFont="AVENIR_LT_STD_ROMAN" />
+                        android:src="@drawable/vector_tari_yat_open"
+                        android:tint="?attr/palette_brand_purple"
+                        android:visibility="gone"
+                        tools:visibility="visible" />
 
-                </androidx.appcompat.widget.LinearLayoutCompat>
+                </LinearLayout>
+                <!-- search -->
 
-            </HorizontalScrollView>
+                <!-- white fader for emoji-id input -->
+                <HorizontalScrollView
+                    android:id="@+id/search_edit_text_scroll_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginEnd="-1dp"
+                    android:layout_toStartOf="@+id/buttons_container"
+                    android:layout_toRightOf="@id/left_icons"
+                    android:fillViewport="true"
+                    android:scrollbars="none">
 
-            <View
-                android:layout_width="32dp"
-                android:layout_toStartOf="@+id/buttons_container"
-                android:layout_height="@dimen/add_recipient_search_text_view_height"
-                android:background="@drawable/emoji_id_end_fader" />
+                    <androidx.appcompat.widget.LinearLayoutCompat
+                        android:id="@+id/search_edit_text_animate_container"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:animateLayoutChanges="true">
 
-            <LinearLayout
-                android:id="@+id/buttons_container"
-                android:layout_width="wrap_content"
-                android:layout_alignParentEnd="true"
-                android:layout_height="match_parent"
-                android:background="@null"
-                android:orientation="horizontal">
+                        <com.tari.android.wallet.ui.component.tari.TariEditText
+                            android:id="@+id/search_edit_text"
+                            android:layout_width="match_parent"
+                            android:layout_height="@dimen/add_recipient_search_text_view_height"
+                            android:layout_marginHorizontal="16dp"
+                            android:background="@color/transparent"
+                            android:hint="@string/add_recipient_hint"
+                            android:imeOptions="actionDone"
+                            android:inputType="textNoSuggestions"
+                            android:letterSpacing="0.02"
+                            android:scrollHorizontally="false"
+                            android:singleLine="true"
+                            android:textColor="?attr/palette_text_heading"
+                            android:textColorHint="?attr/palette_text_light"
+                            android:textSize="14sp"
+                            app:customFont="roman" />
 
-                <!-- Yat eye -->
-                <androidx.appcompat.widget.AppCompatImageButton
-                    android:id="@+id/yat_eye_button"
-                    android:layout_width="40dp"
-                    android:layout_height="@dimen/add_recipient_search_text_view_height"
-                    android:background="@color/transparent"
-                    android:src="@drawable/opened_eye"
-                    android:tint="@color/purple"
-                    android:visibility="gone"
-                    tools:visibility="visible"/>
+                    </androidx.appcompat.widget.LinearLayoutCompat>
 
-                <!-- QR code button -->
-                <androidx.appcompat.widget.AppCompatImageButton
-                    android:id="@+id/qr_code_button"
-                    android:layout_width="@dimen/add_recipient_search_text_view_height"
-                    android:layout_height="@dimen/add_recipient_search_text_view_height"
-                    android:background="@color/transparent"
-                    android:src="@drawable/home_qr" />
+                </HorizontalScrollView>
 
-            </LinearLayout>
+                <LinearLayout
+                    android:id="@+id/buttons_container"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_alignParentEnd="true"
+                    android:background="@null"
+                    android:orientation="horizontal">
 
-        </RelativeLayout>
+                    <!-- Yat eye -->
+                    <androidx.appcompat.widget.AppCompatImageButton
+                        android:id="@+id/yat_eye_button"
+                        android:layout_width="40dp"
+                        android:layout_height="@dimen/add_recipient_search_text_view_height"
+                        android:background="@color/transparent"
+                        android:src="@drawable/vector_opened_eye"
+                        android:tint="?attr/palette_brand_purple"
+                        android:visibility="gone"
+                        tools:visibility="visible" />
+
+                    <!-- QR code button -->
+                    <androidx.appcompat.widget.AppCompatImageButton
+                        android:id="@+id/qr_code_button"
+                        android:layout_width="@dimen/add_recipient_search_text_view_height"
+                        android:layout_height="@dimen/add_recipient_search_text_view_height"
+                        android:background="@color/transparent"
+                        android:src="@drawable/tari_home_qr" />
+
+                </LinearLayout>
+
+            </RelativeLayout>
+
+        </com.tari.android.wallet.ui.component.tari.TariPrimaryBackground>
     </RelativeLayout>
 
     <RelativeLayout
@@ -147,7 +145,6 @@
             android:id="@+id/contacts_list_recycler_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="@color/white"
             android:overScrollMode="never"
             android:scrollbars="none" />
 
@@ -157,9 +154,9 @@
             android:layout_width="match_parent"
             android:layout_height="@dimen/common_scroll_height_gradient_height"
             android:alpha="0.5"
-            android:background="@drawable/view_elevation_gradient" />
+            android:background="@drawable/vector_view_elevation_gradient" />
 
-        <ProgressBar
+        <com.tari.android.wallet.ui.component.tari.TariProgressBar
             android:id="@+id/progress_bar"
             android:layout_width="40dp"
             android:layout_height="40dp"
@@ -185,17 +182,24 @@
             android:layout_centerHorizontal="true"
             android:layout_marginTop="0dp">
 
-            <com.tari.android.wallet.ui.component.CustomFontTextView
+            <com.tari.android.wallet.ui.component.tari.TariPrimaryBackground
                 android:id="@+id/add_recipient_txt_paste_emoji_id"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:background="@drawable/copy_paste_emoji_id_button_bg"
                 android:paddingHorizontal="20dp"
                 android:paddingVertical="10dp"
-                android:text="@string/paste_emoji_id"
-                android:textColor="#9834F6"
-                android:textSize="14sp"
-                app:customFont="@string/font_heavy" />
+                app:cornerRadius="8dp"
+                app:elevation="8dp">
+
+                <com.tari.android.wallet.ui.component.tari.TariTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/paste_emoji_id"
+                    android:textColor="?attr/palette_text_links"
+                    android:textSize="14sp"
+                    app:customFont="heavy" />
+
+            </com.tari.android.wallet.ui.component.tari.TariPrimaryBackground>
 
             <Button
                 android:id="@+id/paste_emoji_id_button"
@@ -207,13 +211,13 @@
                 android:layout_alignBottom="@id/add_recipient_txt_paste_emoji_id"
                 android:background="@color/transparent" />
 
-            <ImageView
+            <androidx.appcompat.widget.AppCompatImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/paste_emoji_id_button"
                 android:layout_centerHorizontal="true"
-                android:contentDescription="@null"
-                android:src="@drawable/speech_notch_down" />
+                android:tint="?attr/palette_overlay"
+                android:src="@drawable/tari_speech_notch_down" />
 
         </RelativeLayout>
 
@@ -222,12 +226,6 @@
             android:layout_width="match_parent"
             android:layout_height="@dimen/add_recipient_clipboard_emoji_id_container_height"
             android:layout_alignParentBottom="true">
-
-            <!-- white background -->
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="@color/white" />
 
             <!-- emoji id container -->
             <HorizontalScrollView
@@ -248,33 +246,34 @@
                     android:letterSpacing="0.22"
                     android:paddingHorizontal="16dp"
                     android:singleLine="true"
-                    android:textColor="@color/black"
+                    android:textColor="?attr/palette_text_heading"
                     android:textSize="15sp" />
             </HorizontalScrollView>
+
         </RelativeLayout>
 
     </RelativeLayout>
 
-    <com.tari.android.wallet.ui.component.CustomFontTextView
+    <com.tari.android.wallet.ui.component.tari.TariTextView
         android:id="@+id/invalid_emoji_id_text_view"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="25dp"
         android:layout_marginEnd="25dp"
-        android:background="@drawable/validation_error_box_border_bg"
+        android:background="@drawable/vector_validation_error_box_border_bg"
         android:gravity="center"
         android:lineSpacingExtra="8dp"
         android:paddingHorizontal="14dp"
         android:paddingVertical="14dp"
         android:text="@string/add_recipient_invalid_emoji_id"
-        android:textColor="@color/common_error"
+        android:textColor="?attr/palette_system_red"
         android:textSize="14sp"
-        app:customFont="@string/font_heavy"
+        app:customFont="heavy"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/add_recipient_vw_search_container" />
 
-    <com.tari.android.wallet.ui.component.CustomFontButton
+    <com.tari.android.wallet.ui.component.tari.TariGradientButton
         android:id="@+id/continue_button"
         android:layout_width="0dp"
         android:layout_height="@dimen/common_action_button_height"
@@ -282,16 +281,9 @@
         android:layout_centerHorizontal="true"
         android:layout_marginHorizontal="@dimen/common_horizontal_margin"
         android:layout_marginBottom="@dimen/common_horizontal_margin"
-        android:background="@drawable/gradient_button_bg"
-        android:ellipsize="middle"
-        android:singleLine="true"
-        android:text="@string/common_continue"
-        android:textAllCaps="false"
-        android:textColor="@color/white"
-        android:textSize="16sp"
-        app:customFont="@string/font_heavy"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:title="@string/common_continue" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+</com.tari.android.wallet.ui.component.tari.TariPrimaryBackground>

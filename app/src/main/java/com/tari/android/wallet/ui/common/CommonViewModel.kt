@@ -6,6 +6,7 @@ import com.orhanobut.logger.Logger
 import com.orhanobut.logger.Printer
 import com.tari.android.wallet.application.WalletState
 import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepository
+import com.tari.android.wallet.data.sharedPrefs.tariSettings.TariSettingsSharedRepository
 import com.tari.android.wallet.di.ApplicationComponent
 import com.tari.android.wallet.di.DiContainer
 import com.tari.android.wallet.event.EventBus
@@ -15,10 +16,13 @@ import com.tari.android.wallet.infrastructure.logging.LoggerTags
 import com.tari.android.wallet.service.TariWalletService
 import com.tari.android.wallet.service.connection.ServiceConnectionStatus
 import com.tari.android.wallet.service.connection.TariWalletServiceConnection
+import com.tari.android.wallet.ui.common.domain.PaletteManager
 import com.tari.android.wallet.ui.common.domain.ResourceManager
+import com.tari.android.wallet.ui.component.tari.toast.TariToastArgs
 import com.tari.android.wallet.ui.dialog.error.WalletErrorArgs
 import com.tari.android.wallet.ui.dialog.inProgress.ProgressDialogArgs
 import com.tari.android.wallet.ui.dialog.modular.ModularDialogArgs
+import com.tari.android.wallet.ui.fragment.settings.themeSelector.TariTheme
 import io.reactivex.disposables.CompositeDisposable
 import javax.inject.Inject
 
@@ -39,12 +43,46 @@ open class CommonViewModel : ViewModel() {
     @Inject
     lateinit var networkRepository: NetworkRepository
 
+    @Inject
+    lateinit var tariSettingsSharedRepository: TariSettingsSharedRepository
+
+    @Inject
+    lateinit var paletteManager: PaletteManager
+
     val logger: Printer
         get() = Logger.t(this::class.simpleName).t(LoggerTags.UI.name)
+
+    val currentTheme = SingleLiveEvent<TariTheme>()
+
+    protected val _backPressed = SingleLiveEvent<Unit>()
+    val backPressed: LiveData<Unit> = _backPressed
+
+    protected val _openLink = SingleLiveEvent<String>()
+    val openLink: LiveData<String> = _openLink
+
+    protected val _showToast = SingleLiveEvent<TariToastArgs>()
+    val showToast: LiveData<TariToastArgs> = _showToast
+
+    protected val _copyToClipboard = SingleLiveEvent<ClipboardArgs>()
+    val copyToClipboard: LiveData<ClipboardArgs> = _copyToClipboard
+
+    protected val _modularDialog = SingleLiveEvent<ModularDialogArgs>()
+    val modularDialog: LiveData<ModularDialogArgs> = _modularDialog
+
+    protected val _loadingDialog = SingleLiveEvent<ProgressDialogArgs>()
+    val loadingDialog: LiveData<ProgressDialogArgs> = _loadingDialog
+
+    protected val _dismissDialog = SingleLiveEvent<Unit>()
+    val dismissDialog: LiveData<Unit> = _dismissDialog
+
+    protected val _blockedBackPressed = SingleLiveEvent<Boolean>()
+    val blockedBackPressed: LiveData<Boolean> = _blockedBackPressed
 
     init {
         @Suppress("LeakingThis")
         component.inject(this)
+
+        currentTheme.value = tariSettingsSharedRepository.currentTheme!!
 
         logger.t(LoggerTags.Navigation.name).i(this::class.simpleName + " was started")
 
@@ -67,27 +105,6 @@ open class CommonViewModel : ViewModel() {
 
         EventBus.unsubscribeAll(this)
     }
-
-    protected val _backPressed = SingleLiveEvent<Unit>()
-    val backPressed: LiveData<Unit> = _backPressed
-
-    protected val _openLink = SingleLiveEvent<String>()
-    val openLink: LiveData<String> = _openLink
-
-    protected val _copyToClipboard = SingleLiveEvent<ClipboardArgs>()
-    val copyToClipboard: LiveData<ClipboardArgs> = _copyToClipboard
-
-    protected val _modularDialog = SingleLiveEvent<ModularDialogArgs>()
-    val modularDialog: LiveData<ModularDialogArgs> = _modularDialog
-
-    protected val _loadingDialog = SingleLiveEvent<ProgressDialogArgs>()
-    val loadingDialog: LiveData<ProgressDialogArgs> = _loadingDialog
-
-    protected val _dismissDialog = SingleLiveEvent<Unit>()
-    val dismissDialog: LiveData<Unit> = _dismissDialog
-
-    protected val _blockedBackPressed = SingleLiveEvent<Boolean>()
-    val blockedBackPressed: LiveData<Boolean> = _blockedBackPressed
 
     fun doOnConnected(action: (walletService: TariWalletService) -> Unit) {
         serviceConnection.connection.filter { it.status == ServiceConnectionStatus.CONNECTED }.take(1)

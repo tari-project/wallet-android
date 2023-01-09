@@ -1,66 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<com.tari.android.wallet.ui.component.tari.TariPrimaryBackground xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/root"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@color/white">
+    android:layout_height="match_parent">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <com.tari.android.wallet.ui.component.tari.TariToolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/white"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toTopOf="parent"
+        app:text="@string/back_up_seed_phrase_page_title" />
 
-        <FrameLayout
-            android:id="@+id/back_cta_view"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout_marginTop="8dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintDimensionRatio="1:1"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
-
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:src="@drawable/back_icon"
-                tools:ignore="ContentDescription" />
-
-        </FrameLayout>
-
-        <com.tari.android.wallet.ui.component.CustomFontTextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
-            android:layout_marginBottom="16dp"
-            android:text="@string/back_up_seed_phrase_page_title"
-            android:textColor="@color/black"
-            android:textSize="16sp"
-            app:customFont="@string/font_heavy"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
-
-    <View
-        android:id="@+id/divider"
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="@color/settings_background"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/toolbar" />
-
-    <com.tari.android.wallet.ui.component.CustomFontTextView
+    <com.tari.android.wallet.ui.component.tari.TariTextView
         android:id="@+id/description"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -68,12 +23,12 @@
         android:layout_marginTop="35dp"
         android:lineSpacingMultiplier="1.5"
         android:text="@string/back_up_seed_phrase_desc"
-        android:textColor="@color/dark_gray"
+        android:textColor="?attr/palette_text_body"
         android:textSize="14sp"
-        app:customFont="@string/font_medium"
+        app:customFont="medium"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/divider" />
+        app:layout_constraintTop_toBottomOf="@+id/toolbar" />
 
     <LinearLayout
         android:id="@+id/warning_view"
@@ -86,75 +41,66 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent">
 
-        <CheckBox
+        <com.tari.android.wallet.ui.component.tari.TariCheckbox
             android:id="@+id/warning_check_box"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:buttonTint="@color/seed_phrase_checkbox"
             android:scaleX="1.15"
-            android:scaleY="1.15"
-            android:theme="@style/PurpleCheckbox" />
+            android:scaleY="1.15" />
 
-        <com.tari.android.wallet.ui.component.CustomFontTextView
+        <com.tari.android.wallet.ui.component.tari.TariTextView
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_marginStart="12dp"
             android:layout_weight="1"
             android:lineSpacingMultiplier="1.5"
             android:text="@string/back_up_seep_phrase_losing_warning_label"
-            android:textColor="@color/dark_gray"
+            android:textColor="?attr/palette_text_body"
             android:textSize="12sp"
-            app:customFont="@string/font_medium" />
+            app:customFont="medium" />
     </LinearLayout>
 
-    <com.tari.android.wallet.ui.component.CustomFontTextView
+    <com.tari.android.wallet.ui.component.tari.TariGradientButton
         android:id="@+id/continue_cta_view"
         android:layout_width="match_parent"
         android:layout_height="@dimen/common_action_button_height"
         android:layout_marginHorizontal="25dp"
         android:layout_marginTop="25dp"
         android:layout_marginBottom="15dp"
-        android:background="@drawable/disable_able_gradient_button_bg"
         android:enabled="false"
-        android:gravity="center"
-        android:text="@string/back_up_seed_phrase_verify_cta"
-        android:textColor="@color/seed_phrase_button_disabled_text_color"
-        android:textSize="16sp"
-        app:customFont="@string/font_heavy"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:title="@string/back_up_seed_phrase_verify_cta" />
 
-    <FrameLayout
+    <com.tari.android.wallet.ui.component.tari.TariSecondaryBackground
         android:id="@+id/list_container"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_marginHorizontal="@dimen/write_down_seed_phrase_list_horizontal_margin"
         android:layout_marginVertical="@dimen/write_down_seed_phrase_list_vertical_margin"
         android:layout_weight="1"
-        android:background="@drawable/back_up_with_seed_phrase_words_background"
+        app:cornerRadius="10dp"
         app:layout_constraintBottom_toTopOf="@+id/warning_view"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/description">
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/phrase_words_recycler_view"
+        <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:paddingHorizontal="35dp"
-            android:paddingVertical="8dp" />
+            android:layout_height="match_parent">
 
-        <View
-            android:id="@+id/bottom_shadow"
-            android:layout_width="match_parent"
-            android:layout_height="118dp"
-            android:layout_gravity="bottom"
-            android:background="@drawable/back_up_with_seed_phrase_words_bottom_dimmer"
-            android:visibility="gone" />
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/phrase_words_recycler_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:paddingHorizontal="35dp"
+                android:paddingVertical="8dp" />
 
-    </FrameLayout>
+        </FrameLayout>
+
+    </com.tari.android.wallet.ui.component.tari.TariSecondaryBackground>
 
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/expand_button_view"
@@ -163,10 +109,10 @@
         android:layout_marginTop="@dimen/write_down_seed_expand_button_top_margin"
         android:layout_marginEnd="@dimen/write_down_seed_expand_button_end_margin"
         android:layout_marginBottom="@dimen/write_down_seed_expand_button_bottom_margin"
-        android:src="@drawable/recovery_expand_icon"
+        android:src="@drawable/vector_recovery_expand_icon"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="@+id/list_container"
         app:layout_constraintEnd_toEndOf="@+id/list_container"
         tools:visibility="visible" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+</com.tari.android.wallet.ui.component.tari.TariPrimaryBackground>

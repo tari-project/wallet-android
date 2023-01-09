@@ -1136,32 +1136,6 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniSendTx(
 }
 
 extern "C"
-JNIEXPORT void JNICALL
-Java_com_tari_android_wallet_ffi_FFIWallet_jniApplyEncryption(
-        JNIEnv *jEnv,
-        jobject jThis,
-        jstring jPassphrase,
-        jobject error) {
-    ExecuteWithError(jEnv, error, [&](int *errorPointer) {
-        auto pWallet = GetPointerField<TariWallet *>(jEnv, jThis);
-        const char *pKey = jEnv->GetStringUTFChars(jPassphrase, JNI_FALSE);
-        wallet_apply_encryption(pWallet, pKey, errorPointer);
-    });
-}
-
-extern "C"
-JNIEXPORT void JNICALL
-Java_com_tari_android_wallet_ffi_FFIWallet_jniRemoveEncryption(
-        JNIEnv *jEnv,
-        jobject jThis,
-        jobject error) {
-    ExecuteWithError(jEnv, error, [&](int *errorPointer) {
-        auto pWallet = GetPointerField<TariWallet *>(jEnv, jThis);
-        wallet_remove_encryption(pWallet, errorPointer);
-    });
-}
-
-extern "C"
 JNIEXPORT jboolean JNICALL
 Java_com_tari_android_wallet_ffi_FFIWallet_jniStartRecovery(
         JNIEnv *jEnv,

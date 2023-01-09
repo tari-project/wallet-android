@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+
+<com.tari.android.wallet.ui.component.tari.TariPrimaryBackground xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/root"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@drawable/setting_option_background"
     android:clickable="true"
     android:focusable="true"
     android:orientation="vertical">
@@ -14,29 +14,26 @@
         android:id="@+id/back_up_wallet_cta_view"
         android:layout_width="match_parent"
         android:layout_height="@dimen/menu_item_height"
-        android:background="@drawable/setting_option_background"
-        android:clickable="true"
-        android:focusable="true"
         android:gravity="center_vertical"
         android:orientation="horizontal"
         android:paddingHorizontal="@dimen/common_horizontal_margin">
 
-        <androidx.appcompat.widget.AppCompatImageView
+        <com.tari.android.wallet.ui.component.tari.TariIconView
             android:id="@+id/left_icon"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical|end"
             android:layout_marginEnd="22dp" />
 
-        <com.tari.android.wallet.ui.component.CustomFontTextView
+        <com.tari.android.wallet.ui.component.tari.TariTextView
             android:id="@+id/back_up_wallet_label_view"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="@string/all_settings_back_up_wallet_settings_entry"
-            android:textColor="@color/black"
+            android:textColor="?attr/palette_text_heading"
             android:textSize="15sp"
-            app:customFont="@string/font_medium"
+            app:customFont="medium"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
@@ -47,15 +44,15 @@
             android:layout_gravity="center_vertical"
             android:orientation="horizontal">
 
-            <com.tari.android.wallet.ui.component.CustomFontTextView
+            <com.tari.android.wallet.ui.component.tari.TariTextView
                 android:id="@+id/backup_status_text_view"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
                 android:visibility="gone"
-                app:customFont="@string/font_medium"
+                app:customFont="medium"
                 tools:text="@string/back_up_wallet_backup_status_checking_backup"
-                tools:textColor="@color/all_settings_back_up_status_processing"
+                tools:textColor="?attr/palette_text_light"
                 tools:visibility="visible" />
 
             <androidx.constraintlayout.widget.ConstraintLayout
@@ -69,28 +66,26 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
-                    android:src="@drawable/icon_wallet_not_backed_up"
+                    android:src="@drawable/vector_wallet_not_backed"
                     android:visibility="invisible"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    tools:ignore="ContentDescription" />
+                    app:layout_constraintTop_toTopOf="parent" />
 
                 <androidx.appcompat.widget.AppCompatImageView
                     android:id="@+id/cloud_backup_status_success_view"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
-                    android:src="@drawable/ic_positive_check"
+                    android:src="@drawable/vector_positive_check"
                     android:visibility="invisible"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    tools:ignore="ContentDescription" />
+                    app:layout_constraintTop_toTopOf="parent" />
 
-                <ProgressBar
+                <com.tari.android.wallet.ui.component.tari.TariProgressBar
                     android:id="@+id/cloud_backup_status_progress_view"
                     android:layout_width="0dp"
                     android:layout_height="0dp"
@@ -101,15 +96,19 @@
                     app:layout_constraintStart_toStartOf="@id/cloud_backup_status_success_view"
                     app:layout_constraintTop_toTopOf="@id/cloud_backup_status_success_view"
                     tools:visibility="visible" />
+
             </androidx.constraintlayout.widget.ConstraintLayout>
 
-            <androidx.appcompat.widget.AppCompatImageView
+            <com.tari.android.wallet.ui.component.tari.TariIconView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
                 android:layout_marginStart="10dp"
-                android:src="@drawable/icon_apply_setting" />
+                android:rotation="180"
+                android:src="@drawable/vector_back_button" />
+
         </LinearLayout>
+
     </androidx.appcompat.widget.LinearLayoutCompat>
 
-</LinearLayout>
+</com.tari.android.wallet.ui.component.tari.TariPrimaryBackground>

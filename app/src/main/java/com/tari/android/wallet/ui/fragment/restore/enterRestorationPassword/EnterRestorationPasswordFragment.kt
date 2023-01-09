@@ -32,7 +32,6 @@
  */
 package com.tari.android.wallet.ui.fragment.restore.enterRestorationPassword
 
-import android.graphics.Color
 import android.os.Bundle
 import android.text.Editable
 import android.text.SpannableString
@@ -44,13 +43,19 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.viewModels
-import com.tari.android.wallet.R.color.*
+import com.tari.android.wallet.R
 import com.tari.android.wallet.R.string.enter_backup_password_page_desc_general_part
 import com.tari.android.wallet.R.string.enter_backup_password_page_desc_highlighted_part
 import com.tari.android.wallet.databinding.FragmentEnterRestorePasswordBinding
 import com.tari.android.wallet.extension.observe
 import com.tari.android.wallet.ui.common.CommonFragment
-import com.tari.android.wallet.ui.extension.*
+import com.tari.android.wallet.ui.extension.colorFromAttribute
+import com.tari.android.wallet.ui.extension.gone
+import com.tari.android.wallet.ui.extension.hideKeyboard
+import com.tari.android.wallet.ui.extension.setOnThrottledClickListener
+import com.tari.android.wallet.ui.extension.showKeyboard
+import com.tari.android.wallet.ui.extension.string
+import com.tari.android.wallet.ui.extension.visible
 import com.tari.android.wallet.ui.fragment.restore.activity.WalletRestoreRouter
 
 class EnterRestorationPasswordFragment : CommonFragment<FragmentEnterRestorePasswordBinding, EnterRestorationPasswordViewModel>() {
@@ -73,8 +78,8 @@ class EnterRestorationPasswordFragment : CommonFragment<FragmentEnterRestorePass
         setPageDescription()
         passwordEditText.requestFocus()
         requireActivity().showKeyboard()
-        restoringProgressBar.setColor(color(white))
-        backCtaView.setOnThrottledClickListener { viewModel.onBack() }
+        restoringProgressBar.setWhite()
+        toolbar.backPressedAction = viewModel::onBack
         restoreWalletCtaView.setOnThrottledClickListener { viewModel.onRestore(passwordEditText.text?.toString().orEmpty()) }
         passwordEditText.addTextChangedListener(afterTextChanged = this@EnterRestorationPasswordFragment::afterTextChanged)
     }
@@ -105,18 +110,11 @@ class EnterRestorationPasswordFragment : CommonFragment<FragmentEnterRestorePass
 
     private fun afterTextChanged(editable: Editable?) = with(ui) {
         setRestoreWalletCTAState((editable?.length ?: 0) != 0)
-        enterPasswordLabelTextView.setTextColor(color(black))
-        passwordEditText.setTextColor(color(black))
         wrongPasswordLabelView.gone()
     }
 
     private fun setRestoreWalletCTAState(isEnabled: Boolean) = with(ui) {
-        if (restoreWalletCtaView.isEnabled == isEnabled) return
         restoreWalletCtaView.isEnabled = isEnabled
-        restoreWalletTextView.setTextColor(
-            if (isEnabled) Color.WHITE
-            else color(seed_phrase_button_disabled_text_color)
-        )
     }
 
     private fun showRestoringUI() = with(ui) {
@@ -137,15 +135,15 @@ class EnterRestorationPasswordFragment : CommonFragment<FragmentEnterRestorePass
     }
 
     private fun showWrongPasswordErrorLabels() = with(ui) {
-        enterPasswordLabelTextView.setTextColor(color(common_error))
-        passwordEditText.setTextColor(color(common_error))
+        enterPasswordLabelTextView.setTextColor(colorFromAttribute(R.attr.palette_system_red))
+        passwordEditText.setTextColor(colorFromAttribute(R.attr.palette_system_red))
         wrongPasswordLabelView.visible()
     }
 
     private fun setPageDescription() {
         val generalPart = string(enter_backup_password_page_desc_general_part)
         val highlightedPart = SpannableString(string(enter_backup_password_page_desc_highlighted_part))
-        val spanColor = ForegroundColorSpan(color(black))
+        val spanColor = ForegroundColorSpan(viewModel.paletteManager.getTextHeading(requireContext()))
         highlightedPart.setSpan(spanColor, 0, highlightedPart.length, SPAN_EXCLUSIVE_EXCLUSIVE)
         ui.pageDescriptionTextView.text = SpannableStringBuilder().apply {
             insert(0, generalPart)

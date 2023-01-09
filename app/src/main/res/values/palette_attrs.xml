@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--Neutral-->
+    <attr name="palette_neutral_primary" format="reference" />
+    <attr name="palette_neutral_secondary" format="reference" />
+    <attr name="palette_neutral_tertiary" format="reference" />
+    <attr name="palette_neutral_inactive" format="reference" />
+
+    <!--Brand-->
+    <attr name="palette_brand_purple" format="reference" />
+    <attr name="palette_brand_pink" format="reference" />
+    <attr name="palette_brand_dark_blue" format="reference" />
+
+    <!--Buttons-->
+    <attr name="palette_button_primary_start" format="reference" />
+    <attr name="palette_button_primary_end" format="reference" />
+    <attr name="palette_button_disable" format="reference" />
+    <attr name="palette_button_primary_text" format="reference" />
+    <attr name="palette_button_disabled_text" format="reference" />
+
+    <!--Text-->
+    <attr name="palette_text_heading" format="reference" />
+    <attr name="palette_text_body" format="reference" />
+    <attr name="palette_text_light" format="reference" />
+    <attr name="palette_text_links" format="reference" />
+
+    <!--Icons-->
+    <attr name="palette_icons_default" format="reference" />
+    <attr name="palette_icons_active" format="reference" />
+    <attr name="palette_icons_inactive" format="reference" />
+
+    <!--Components-->
+    <attr name="palette_qr_background" format="reference" />
+    <attr name="palette_overlay" format="reference" />
+    <attr name="palette_overlay_text" format="reference" />
+
+    <!--System-->
+    <attr name="palette_system_red" format="reference" />
+    <attr name="palette_system_orange" format="reference" />
+    <attr name="palette_system_yellow" format="reference" />
+    <attr name="palette_system_green" format="reference" />
+    <attr name="palette_system_blue" format="reference" />
+    <attr name="palette_system_secondary_red" format="reference" />
+    <attr name="palette_system_secondary_orange" format="reference" />
+    <attr name="palette_system_secondary_yellow" format="reference" />
+    <attr name="palette_system_secondary_green" format="reference" />
+    <attr name="palette_system_secondary_blue" format="reference" />
+
+    <!--Backgrounds-->
+    <attr name="palette_background_primary" format="reference" />
+    <attr name="palette_background_secondary" format="reference" />
+
+    <!--Shadows-->
+    <attr name="palette_shadow_box" format="reference" />
+</resources>

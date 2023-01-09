@@ -5,8 +5,6 @@ import android.util.AttributeSet
 import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.core.content.ContextCompat
-import com.tari.android.wallet.R
 import com.tari.android.wallet.databinding.ViewAmountBinding
 import com.tari.android.wallet.model.MicroTari
 import com.tari.android.wallet.ui.common.CommonViewModel
@@ -34,11 +32,10 @@ class AmountView : CommonView<CommonViewModel, ViewAmountBinding> {
 
     fun setupArgs(style: AmountStyle) {
         val color = when(style) {
-            AmountStyle.Normal -> R.color.black
-            AmountStyle.Warning -> R.color.common_error
+            AmountStyle.Normal -> paletteManager.getTextHeading(context)
+            AmountStyle.Warning -> paletteManager.getRed(context)
         }
-        val intColor = ContextCompat.getColor(context, color)
-        ui.gem.setColorFilter(intColor)
-        ui.balanceView.setTextColor(intColor)
+        ui.gem.setColorFilter(color)
+        ui.balanceView.setTextColor(color)
     }
 }

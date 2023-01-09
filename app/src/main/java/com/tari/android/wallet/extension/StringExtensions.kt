@@ -39,9 +39,9 @@ import android.text.Spanned
 import android.text.style.ForegroundColorSpan
 import android.text.style.RelativeSizeSpan
 import android.text.style.URLSpan
-import com.tari.android.wallet.ui.component.CustomFont
-import com.tari.android.wallet.ui.component.CustomTypefaceSpan
-import com.tari.android.wallet.ui.component.LetterSpacingSpan
+import com.tari.android.wallet.ui.component.tari.TariFont
+import com.tari.android.wallet.ui.component.tari.TariTypefaceSpan
+import com.tari.android.wallet.ui.component.tari.TariLetterSpacingSpan
 
 /**
  * Process the URLs in the given spannable string.
@@ -68,21 +68,21 @@ fun SpannableString.applyURLStyle(search: String, url: String, applyToOnlyFirstO
  *
  * @param defaultFont the font to be applied to the whole string
  * @param search the substring to whose occurrences the custom font should be applied
- * @param customFont font to be applied to the occurrences of the search string
+ * @param tariFont font to be applied to the occurrences of the search string
  * @param applyToOnlyFirstOccurrence whether customFont should be applied only to the first occurrence
  * @return spannable string
  */
 fun String.applyFontStyle(
     context: Context,
-    defaultFont: CustomFont,
+    defaultFont: TariFont,
     search: List<String>,
-    customFont: CustomFont,
+    tariFont: TariFont,
     applyToOnlyFirstOccurrence: Boolean = false
 ): SpannableString {
     val defaultTypeface = defaultFont.asTypeface(context)
     val spannableString = SpannableString(this)
-    spannableString.setSpan(CustomTypefaceSpan("", defaultTypeface), 0, length, Spanned.SPAN_EXCLUSIVE_INCLUSIVE)
-    search.forEach { spannableString.applyTypefaceStyle(it, customFont.asTypeface(context), applyToOnlyFirstOccurrence) }
+    spannableString.setSpan(TariTypefaceSpan("", defaultTypeface), 0, length, Spanned.SPAN_EXCLUSIVE_INCLUSIVE)
+    search.forEach { spannableString.applyTypefaceStyle(it, tariFont.asTypeface(context), applyToOnlyFirstOccurrence) }
     return spannableString
 }
 
@@ -116,7 +116,7 @@ private fun SpannableString.applyColorStyle(search: String, color: Int, applyToO
 private fun SpannableString.applyTypefaceStyle(search: String, typeface: Typeface, applyToOnlyFirstOccurrence: Boolean = false) {
     var index = this.indexOf(search)
     while (index >= 0) {
-        setSpan(CustomTypefaceSpan("", typeface), index, index + search.length, Spanned.SPAN_INTERMEDIATE)
+        setSpan(TariTypefaceSpan("", typeface), index, index + search.length, Spanned.SPAN_INTERMEDIATE)
         if (applyToOnlyFirstOccurrence) {
             break
         }
@@ -144,7 +144,7 @@ fun SpannableString.applyRelativeTextSizeStyle(search: String, relativeTextSize:
 fun SpannableString.applyLetterSpacingStyle(search: String, letterSpacing: Float, applyToOnlyFirstOccurrence: Boolean = false) {
     var index = this.indexOf(search)
     while (index >= 0) {
-        setSpan(LetterSpacingSpan(letterSpacing), index, index + search.length, Spanned.SPAN_INTERMEDIATE)
+        setSpan(TariLetterSpacingSpan(letterSpacing), index, index + search.length, Spanned.SPAN_INTERMEDIATE)
         if (applyToOnlyFirstOccurrence) {
             break
         }

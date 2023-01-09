@@ -5,7 +5,6 @@
     android:id="@+id/root"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@color/gray_background"
     android:clipChildren="false">
 
     <androidx.cardview.widget.CardView
@@ -14,9 +13,7 @@
         android:layout_height="match_parent"
         android:layout_margin="6dp"
         android:clipChildren="false"
-        android:outlineAmbientShadowColor="@color/black"
-        android:outlineSpotShadowColor="@color/black"
-        app:cardBackgroundColor="@color/gray_background"
+        app:cardBackgroundColor="?attr/palette_neutral_secondary"
         app:cardCornerRadius="11dp"
         app:cardElevation="0dp">
 
@@ -29,8 +26,7 @@
                 android:id="@+id/color_container"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_margin="2dp"
-                android:background="@color/purple"
+                android:background="?attr/palette_brand_purple"
                 android:minHeight="100dp">
 
                 <androidx.appcompat.widget.AppCompatCheckBox
@@ -62,20 +58,21 @@
                             android:id="@+id/balance_gem_image_view"
                             android:layout_width="@dimen/home_balance_gem_width"
                             android:layout_height="@dimen/home_balance_gem_height"
+                            android:tint="@color/white"
                             android:layout_gravity="center_vertical"
-                            android:src="@drawable/home_gem_balance" />
+                            android:src="@drawable/vector_gem" />
 
-                        <com.tari.android.wallet.ui.component.CustomFontTextView
+                        <com.tari.android.wallet.ui.component.tari.TariTextView
                             android:id="@+id/amount"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="6dp"
                             android:textColor="@color/white"
                             android:textSize="30sp"
-                            app:customFont="@string/font_heavy"
+                            app:customFont="heavy"
                             tools:text="3,200" />
 
-                        <com.tari.android.wallet.ui.component.CustomFontTextView
+                        <com.tari.android.wallet.ui.component.tari.TariTextView
                             android:id="@+id/amount_decimal"
                             android:layout_width="wrap_content"
                             android:layout_height="@dimen/home_balance_digit_decimal_height"
@@ -83,34 +80,32 @@
                             android:layout_marginBottom="6dp"
                             android:textColor="@color/white"
                             android:textSize="12sp"
-                            app:customFont="@string/font_heavy"
+                            app:customFont="heavy"
                             tools:text=".00" />
 
                     </LinearLayout>
 
-                    <com.tari.android.wallet.ui.component.CustomFontTextView
+                    <com.tari.android.wallet.ui.component.tari.TariTextView
                         android:id="@+id/dateTime"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_horizontal"
                         android:textColor="@color/white"
                         android:textSize="12sp"
-                        app:customFont="@string/font_heavy"
+                        app:customFont="heavy"
                         tools:text="08/08/2028" />
 
                 </androidx.appcompat.widget.LinearLayoutCompat>
-
 
                 <androidx.appcompat.widget.AppCompatImageView
                     android:id="@+id/status"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:src="@drawable/ic_utxos_status_confirmed"
+                    android:src="@drawable/vector_utxos_status_confirmed"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
-
 
         </FrameLayout>
 

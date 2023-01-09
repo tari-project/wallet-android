@@ -46,6 +46,8 @@ import com.google.zxing.BarcodeFormat
 import com.tari.android.wallet.R
 import com.tari.android.wallet.databinding.ActivityQrScannerBinding
 import com.tari.android.wallet.di.DiContainer.appComponent
+import com.tari.android.wallet.ui.component.tari.toast.TariToast
+import com.tari.android.wallet.ui.component.tari.toast.TariToastArgs
 
 /**
  * QR code scanner activity - used to add a recipient by QR code.
@@ -106,7 +108,7 @@ class QRScannerActivity : AppCompatActivity() {
         }
 
         codeScanner.errorCallback = ErrorCallback {
-            runOnUiThread { Toast.makeText(this, R.string.add_recipient_failed_init_camera_message, Toast.LENGTH_LONG).show() }
+            runOnUiThread { TariToast(this, TariToastArgs(getString(R.string.add_recipient_failed_init_camera_message), Toast.LENGTH_LONG)) }
         }
 
         ui.scannerView.setOnClickListener { codeScanner.startPreview() }
@@ -118,7 +120,7 @@ class QRScannerActivity : AppCompatActivity() {
             if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 startScanning()
             } else {
-                Toast.makeText(this, R.string.add_recipient_camera_permission_denied_message, Toast.LENGTH_LONG).show()
+                TariToast(this, TariToastArgs(getString(R.string.add_recipient_camera_permission_denied_message), Toast.LENGTH_LONG))
             }
         }
     }

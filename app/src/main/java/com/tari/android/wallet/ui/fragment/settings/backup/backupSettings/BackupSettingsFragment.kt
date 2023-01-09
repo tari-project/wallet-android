@@ -43,7 +43,7 @@ import com.tari.android.wallet.extension.observe
 import com.tari.android.wallet.ui.common.CommonFragment
 import com.tari.android.wallet.ui.extension.ThrottleClick
 import com.tari.android.wallet.ui.extension.setVisible
-import com.tari.android.wallet.ui.fragment.settings.backup.activity.BackupSettingsRouter
+import com.tari.android.wallet.ui.fragment.settings.backup.BackupSettingsRouter
 import com.tari.android.wallet.ui.fragment.settings.backup.backupSettings.option.BackupOptionView
 import com.tari.android.wallet.ui.fragment.settings.backup.backupSettings.option.BackupOptionViewModel
 import com.tari.android.wallet.ui.fragment.settings.userAutorization.BiometricAuthenticationViewModel
@@ -84,7 +84,6 @@ class BackupSettingsFragment : CommonFragment<FragmentWalletBackupSettingsBindin
     }
 
     private fun setupCTAs() = with(ui) {
-        backCtaView.setOnClickListener(ThrottleClick { requireActivity().onBackPressed() })
         backupWithRecoveryPhraseCtaView.setOnClickListener(ThrottleClick { viewModel.onBackupWithRecoveryPhrase() })
         backupWalletToCloudCtaView.setOnClickListener(ThrottleClick { viewModel.onBackupToCloud() })
         updatePasswordCtaView.setOnClickListener(ThrottleClick { viewModel.onUpdatePassword() })
@@ -105,9 +104,9 @@ class BackupSettingsFragment : CommonFragment<FragmentWalletBackupSettingsBindin
     private fun processNavigation(navigation: BackupSettingsNavigation) {
         val router = requireActivity() as BackupSettingsRouter
         when (navigation) {
-            BackupSettingsNavigation.ToChangePassword -> router.toChangePassword(this)
-            BackupSettingsNavigation.ToConfirmPassword -> router.toConfirmPassword(this)
-            BackupSettingsNavigation.ToWalletBackupWithRecoveryPhrase -> router.toWalletBackupWithRecoveryPhrase(this)
+            BackupSettingsNavigation.ToChangePassword -> router.toChangePassword()
+            BackupSettingsNavigation.ToConfirmPassword -> router.toConfirmPassword()
+            BackupSettingsNavigation.ToWalletBackupWithRecoveryPhrase -> router.toWalletBackupWithRecoveryPhrase()
         }
     }
 

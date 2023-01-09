@@ -46,7 +46,6 @@ import com.tari.android.wallet.R.dimen.add_amount_element_text_size
 import com.tari.android.wallet.R.dimen.add_amount_gem_size
 import com.tari.android.wallet.R.string.*
 import com.tari.android.wallet.databinding.FragmentTxDetailsBinding
-import com.tari.android.wallet.di.DiContainer.appComponent
 import com.tari.android.wallet.extension.observe
 import com.tari.android.wallet.extension.txFormattedDate
 import com.tari.android.wallet.model.*
@@ -55,8 +54,8 @@ import com.tari.android.wallet.model.Tx.Direction.OUTBOUND
 import com.tari.android.wallet.model.TxStatus.*
 import com.tari.android.wallet.ui.animation.collapseAndHideAnimation
 import com.tari.android.wallet.ui.common.CommonFragment
-import com.tari.android.wallet.ui.component.EmojiIdSummaryViewController
-import com.tari.android.wallet.ui.component.FullEmojiIdViewController
+import com.tari.android.wallet.ui.component.fullEmojiId.EmojiIdSummaryViewController
+import com.tari.android.wallet.ui.component.fullEmojiId.FullEmojiIdViewController
 import com.tari.android.wallet.ui.dialog.modular.DialogArgs
 import com.tari.android.wallet.ui.dialog.modular.ModularDialog
 import com.tari.android.wallet.ui.dialog.modular.ModularDialogArgs
@@ -88,14 +87,11 @@ class TxDetailsFragment : CommonFragment<FragmentTxDetailsBinding, TxDetailsView
     private lateinit var emojiIdSummaryController: EmojiIdSummaryViewController
     private lateinit var fullEmojiIdViewController: FullEmojiIdViewController
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        return FragmentTxDetailsBinding.inflate(layoutInflater, container, false).also { ui = it }.root
-    }
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
+        FragmentTxDetailsBinding.inflate(layoutInflater, container, false).also { ui = it }.root
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        appComponent.inject(this)
 
         val viewModel: TxDetailsViewModel by viewModels()
         bindViewModel(viewModel)
@@ -152,25 +148,23 @@ class TxDetailsFragment : CommonFragment<FragmentTxDetailsBinding, TxDetailsView
         fullEmojiIdViewController = FullEmojiIdViewController(ui.emojiIdOuterContainer, ui.emojiIdSummaryView, requireContext())
         emojiIdSummaryController = EmojiIdSummaryViewController(ui.emojiIdSummaryView)
         ui.gifContainer.root.invisible()
-        ui.gifContainer.loadingGifProgressBar.setColor(color(tx_list_loading_gif_gray))
     }
 
     private fun disableCTAs() {
         arrayOf<TextView>(ui.addContactButton, ui.cancelTxView, ui.editContactLabelTextView).forEach {
             it.isEnabled = false
-            it.setTextColor(color(disabled_cta))
+            it.setTextColor(viewModel.paletteManager.getButtonDisabled(requireContext()))
         }
     }
 
     private fun enableCTAs() {
         arrayOf<TextView>(ui.addContactButton, ui.cancelTxView, ui.editContactLabelTextView).forEach { it.isEnabled = true }
-        ui.addContactButton.setTextColor(color(purple))
-        ui.editContactLabelTextView.setTextColor(color(purple))
-        ui.cancelTxView.setTextColor(color(tx_detail_cancel_tx_cta))
+        ui.addContactButton.setTextColor(viewModel.paletteManager.getTextLinks(requireContext()))
+        ui.editContactLabelTextView.setTextColor(viewModel.paletteManager.getTextLinks(requireContext()))
+        ui.cancelTxView.setTextColor(viewModel.paletteManager.getRed(requireContext()))
     }
 
     private fun setUICommands() {
-        ui.backView.setOnClickListener { requireActivity().onBackPressed() }
         ui.emojiIdSummaryContainerView.setOnClickListener { onEmojiSummaryClicked(it) }
         ui.feeLabelTextView.setOnClickListener { showTxFeeToolTip() }
         ui.addContactButton.setOnClickListener { onAddContactClick() }
@@ -314,7 +308,7 @@ class TxDetailsFragment : CommonFragment<FragmentTxDetailsBinding, TxDetailsView
             } else {
                 viewModel.removeContact()
             }
-            ui.contactLabelTextView.setTextColor(color(tx_detail_contact_name_label_text))
+            ui.contactLabelTextView.setTextColor(viewModel.paletteManager.getTextBody(requireContext()))
             return false
         }
         return true
@@ -376,7 +370,7 @@ class TxDetailsFragment : CommonFragment<FragmentTxDetailsBinding, TxDetailsView
         ui.createContactEditText.requestFocus()
         ui.createContactEditText.setSelection(ui.createContactEditText.text?.length ?: 0)
         requireActivity().showKeyboard()
-        ui.contactLabelTextView.setTextColor(color(black))
+        ui.contactLabelTextView.setTextColor(viewModel.paletteManager.getTextHeading(requireContext()))
     }
 
     private fun showTxFeeToolTip() {

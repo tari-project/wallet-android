@@ -1,17 +1,47 @@
 package com.tari.android.wallet.ui.fragment.tx
 
-import androidx.lifecycle.*
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MediatorLiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Transformations
+import androidx.lifecycle.viewModelScope
 import com.tari.android.wallet.R
-import com.tari.android.wallet.R.string.*
+import com.tari.android.wallet.R.string.error_no_connection_description
+import com.tari.android.wallet.R.string.error_no_connection_title
+import com.tari.android.wallet.R.string.error_node_unreachable_description
+import com.tari.android.wallet.R.string.error_node_unreachable_title
+import com.tari.android.wallet.R.string.home_back_up_wallet_delay_encrypt_cta
+import com.tari.android.wallet.R.string.home_back_up_wallet_encrypt_cta
+import com.tari.android.wallet.R.string.home_back_up_wallet_encrypt_description
+import com.tari.android.wallet.R.string.home_back_up_wallet_encrypt_title
+import com.tari.android.wallet.R.string.home_back_up_wallet_initial_description
+import com.tari.android.wallet.R.string.home_back_up_wallet_initial_title_highlighted_part
+import com.tari.android.wallet.R.string.home_back_up_wallet_initial_title_regular_part
+import com.tari.android.wallet.R.string.home_back_up_wallet_repeated_description
+import com.tari.android.wallet.R.string.home_back_up_wallet_repeated_title_highlighted_part
+import com.tari.android.wallet.R.string.home_back_up_wallet_repeated_title_regular_part
+import com.tari.android.wallet.R.string.home_pending_transactions_title
 import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
-import com.tari.android.wallet.data.sharedPrefs.tariSettings.TariSettingsSharedRepository
 import com.tari.android.wallet.event.Event
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.extension.addTo
 import com.tari.android.wallet.extension.debounce
 import com.tari.android.wallet.extension.getWithError
 import com.tari.android.wallet.extension.repopulate
-import com.tari.android.wallet.model.*
+import com.tari.android.wallet.ffi.FFITxCancellationReason
+import com.tari.android.wallet.model.BalanceInfo
+import com.tari.android.wallet.model.CancelledTx
+import com.tari.android.wallet.model.CompletedTx
+import com.tari.android.wallet.model.Contact
+import com.tari.android.wallet.model.MicroTari
+import com.tari.android.wallet.model.PendingInboundTx
+import com.tari.android.wallet.model.PendingOutboundTx
+import com.tari.android.wallet.model.TariWalletAddress
+import com.tari.android.wallet.model.Tx
+import com.tari.android.wallet.model.TxId
+import com.tari.android.wallet.model.TxStatus
+import com.tari.android.wallet.model.User
+import com.tari.android.wallet.model.WalletError
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.common.SingleLiveEvent
 import com.tari.android.wallet.ui.common.gyphy.presentation.GIFViewModel
@@ -23,10 +53,12 @@ import com.tari.android.wallet.ui.fragment.send.finalize.TxFailureReason
 import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupSettingsRepository
 import com.tari.android.wallet.ui.fragment.tx.adapter.TransactionItem
 import com.tari.android.wallet.ui.fragment.tx.ui.progressController.UpdateProgressViewController
+import com.tari.android.wallet.util.Build
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.joda.time.DateTime
 import java.math.BigDecimal
+import java.math.BigInteger
 import java.util.concurrent.CopyOnWriteArrayList
 import javax.inject.Inject
 
@@ -43,9 +75,6 @@ class TxListViewModel : CommonViewModel() {
 
     @Inject
     lateinit var sharedPrefsWrapper: SharedPrefsRepository
-
-    @Inject
-    lateinit var tariSettingsSharedRepository: TariSettingsSharedRepository
 
     lateinit var progressControllerState: UpdateProgressViewController.UpdateProgressState
 
@@ -152,6 +181,85 @@ class TxListViewModel : CommonViewModel() {
         val confirmationCount = requiredConfirmationCount.value!!
 
         val items = mutableListOf<CommonViewHolderItem>()
+
+        if (Build.MOCKED) {
+            completedTxs.add(CompletedTx().apply {
+                fee = MicroTari(BigInteger("100"))
+                this.confirmationCount = BigInteger("4")
+                this.user = User().apply {
+                    walletAddress = TariWalletAddress().apply {
+                        hexString = "hex string"
+                        emojiId =
+                            "\uD83C\uDF6A\uD83C\uDF5E\uD83D\uDC8E\uD83C\uDFBD\uD83D\uDC28\uD83D\uDC2C\uD83C\uDF4C\uD83D\uDC89\uD83C\uDF79\uD83C\uDF4E\uD83D\uDD2C\uD83D\uDEBD\uD83C\uDF6F\uD83C\uDF54\uD83D\uDC54\uD83D\uDC11\uD83C\uDF1F\uD83C\uDFA5\uD83D\uDC51\uD83C\uDF4D\uD83D\uDC89\uD83D\uDC0A\uD83D\uDC94\uD83C\uDFBD\uD83D\uDCBB\uD83D\uDC5A\uD83D\uDD2D\uD83D\uDC38\uD83C\uDF5A\uD83D\uDCC8\uD83C\uDF40\uD83C\uDFB1\uD83C\uDF1F"
+                    }
+                }
+                this.amount = MicroTari(BigInteger("1000000000"))
+                this.direction = Tx.Direction.INBOUND
+                this.message = "message"
+                this.status = TxStatus.COMPLETED
+            })
+
+            completedTxs.add(CompletedTx().apply {
+                fee = MicroTari(BigInteger("100"))
+                this.confirmationCount = BigInteger("40")
+                this.user = User().apply {
+                    walletAddress = TariWalletAddress().apply {
+                        hexString = "hex string"
+                        emojiId =
+                            "\uD83C\uDF6A\uD83C\uDF5E\uD83D\uDC8E\uD83C\uDFBD\uD83D\uDC28\uD83D\uDC2C\uD83C\uDF4C\uD83D\uDC89\uD83C\uDF79\uD83C\uDF4E\uD83D\uDD2C\uD83D\uDEBD\uD83C\uDF6F\uD83C\uDF54\uD83D\uDC54\uD83D\uDC11\uD83C\uDF1F\uD83C\uDFA5\uD83D\uDC51\uD83C\uDF4D\uD83D\uDC89\uD83D\uDC0A\uD83D\uDC94\uD83C\uDFBD\uD83D\uDCBB\uD83D\uDC5A\uD83D\uDD2D\uD83D\uDC38\uD83C\uDF5A\uD83D\uDCC8\uD83C\uDF40\uD83C\uDFB1\uD83C\uDF1F"
+                    }
+                }
+                this.amount = MicroTari(BigInteger("1000000000"))
+                this.direction = Tx.Direction.OUTBOUND
+                this.message = "message"
+                this.status = TxStatus.COMPLETED
+            })
+
+            pendingInboundTxs.add(PendingInboundTx().apply {
+                this.user = User().apply {
+                    walletAddress = TariWalletAddress().apply {
+                        hexString = "hex string"
+                        emojiId =
+                            "\uD83C\uDF6A\uD83C\uDF5E\uD83D\uDC8E\uD83C\uDFBD\uD83D\uDC28\uD83D\uDC2C\uD83C\uDF4C\uD83D\uDC89\uD83C\uDF79\uD83C\uDF4E\uD83D\uDD2C\uD83D\uDEBD\uD83C\uDF6F\uD83C\uDF54\uD83D\uDC54\uD83D\uDC11\uD83C\uDF1F\uD83C\uDFA5\uD83D\uDC51\uD83C\uDF4D\uD83D\uDC89\uD83D\uDC0A\uD83D\uDC94\uD83C\uDFBD\uD83D\uDCBB\uD83D\uDC5A\uD83D\uDD2D\uD83D\uDC38\uD83C\uDF5A\uD83D\uDCC8\uD83C\uDF40\uD83C\uDFB1\uD83C\uDF1F"
+                    }
+                }
+                this.amount = MicroTari(BigInteger("1000000000"))
+                this.direction = Tx.Direction.INBOUND
+                this.message = "message"
+                this.status = TxStatus.PENDING
+            })
+
+            pendingOutboundTxs.add(PendingOutboundTx().apply {
+                fee = MicroTari(BigInteger("100"))
+                this.user = User().apply {
+                    walletAddress = TariWalletAddress().apply {
+                        hexString = "hex string"
+                        emojiId =
+                            "\uD83C\uDF6A\uD83C\uDF5E\uD83D\uDC8E\uD83C\uDFBD\uD83D\uDC28\uD83D\uDC2C\uD83C\uDF4C\uD83D\uDC89\uD83C\uDF79\uD83C\uDF4E\uD83D\uDD2C\uD83D\uDEBD\uD83C\uDF6F\uD83C\uDF54\uD83D\uDC54\uD83D\uDC11\uD83C\uDF1F\uD83C\uDFA5\uD83D\uDC51\uD83C\uDF4D\uD83D\uDC89\uD83D\uDC0A\uD83D\uDC94\uD83C\uDFBD\uD83D\uDCBB\uD83D\uDC5A\uD83D\uDD2D\uD83D\uDC38\uD83C\uDF5A\uD83D\uDCC8\uD83C\uDF40\uD83C\uDFB1\uD83C\uDF1F"
+                    }
+                }
+                this.amount = MicroTari(BigInteger("1000000000"))
+                this.direction = Tx.Direction.OUTBOUND
+                this.message = "message"
+                this.status = TxStatus.PENDING
+            })
+
+            cancelledTxs.add(CancelledTx().apply {
+                fee = MicroTari(BigInteger("100"))
+                cancellationReason = FFITxCancellationReason.UserCancelled
+                this.user = User().apply {
+                    walletAddress = TariWalletAddress().apply {
+                        hexString = "hex string"
+                        emojiId =
+                            "\uD83C\uDF6A\uD83C\uDF5E\uD83D\uDC8E\uD83C\uDFBD\uD83D\uDC28\uD83D\uDC2C\uD83C\uDF4C\uD83D\uDC89\uD83C\uDF79\uD83C\uDF4E\uD83D\uDD2C\uD83D\uDEBD\uD83C\uDF6F\uD83C\uDF54\uD83D\uDC54\uD83D\uDC11\uD83C\uDF1F\uD83C\uDFA5\uD83D\uDC51\uD83C\uDF4D\uD83D\uDC89\uD83D\uDC0A\uD83D\uDC94\uD83C\uDFBD\uD83D\uDCBB\uD83D\uDC5A\uD83D\uDD2D\uD83D\uDC38\uD83C\uDF5A\uD83D\uDCC8\uD83C\uDF40\uD83C\uDFB1\uD83C\uDF1F"
+                    }
+                }
+                this.amount = MicroTari(BigInteger("1000000000"))
+                this.direction = Tx.Direction.OUTBOUND
+                this.message = "message"
+                this.status = TxStatus.REJECTED
+            })
+        }
 
         val minedUnconfirmedTxs = completedTxs.filter { it.status == TxStatus.MINED_UNCONFIRMED }
         val nonMinedUnconfirmedCompletedTxs = completedTxs.filter { it.status != TxStatus.MINED_UNCONFIRMED }
@@ -373,6 +481,7 @@ class TxListViewModel : CommonViewModel() {
                         && tarisAmount >= BigDecimal("25000")
                         && isAnyBackupEnabled
                         && backupSettingsRepository.backupPassword == null -> showSecureYourBackupsDialog()
+
                 inboundTransactionsCount >= 4
                         && tarisAmount >= BigDecimal("8000")
                         && !isAnyBackupEnabled -> showRepeatedBackUpPrompt()
@@ -420,17 +529,6 @@ class TxListViewModel : CommonViewModel() {
             _navigation.postValue(TxListNavigation.ToTTLStore)
         }
         _modularDialog.postValue(args.getModular(resourceManager))
-    }
-
-    private fun sendTariToUser(tariWalletAddress: TariWalletAddress) {
-        val error = WalletError()
-        val contacts = walletService.getContacts(error)
-        val recipientUser = when (error) {
-            WalletError.NoError -> contacts.firstOrNull { it.walletAddress == tariWalletAddress } ?: User(tariWalletAddress)
-            else -> User(tariWalletAddress)
-        }
-
-        _navigation.postValue(TxListNavigation.ToSendTariToUser(recipientUser))
     }
 
     companion object {

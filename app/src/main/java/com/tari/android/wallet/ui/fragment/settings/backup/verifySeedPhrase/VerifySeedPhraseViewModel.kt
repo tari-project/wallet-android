@@ -9,9 +9,6 @@ import javax.inject.Inject
 
 class VerifySeedPhraseViewModel : CommonViewModel() {
 
-    @Inject
-    lateinit var tariSettingsSharedRepository: TariSettingsSharedRepository
-
     init {
         component.inject(this)
     }

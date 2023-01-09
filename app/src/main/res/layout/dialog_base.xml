@@ -1,14 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/dialog_root_view"
+
+<com.tari.android.wallet.ui.component.tari.TariPrimaryBackground xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/root"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginHorizontal="14dp"
     android:layout_marginBottom="23dp"
+    android:orientation="vertical"
     android:paddingTop="20dp"
     android:paddingBottom="13dp"
-    android:background="@drawable/bottom_dialog_bg"
-    android:orientation="vertical">
+    app:cornerRadius="26dp">
 
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:id="@+id/dialog_root_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical" />
 
-</LinearLayout>
+</com.tari.android.wallet.ui.component.tari.TariPrimaryBackground>

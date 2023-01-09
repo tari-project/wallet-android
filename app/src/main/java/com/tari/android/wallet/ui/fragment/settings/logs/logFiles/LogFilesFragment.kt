@@ -64,7 +64,6 @@ class LogFilesFragment : CommonFragment<FragmentLogFilesBinding, LogFilesViewMod
     }
 
     private fun setupUI() = with(ui) {
-        backCtaView.setOnClickListener { requireActivity().onBackPressed() }
         recyclerViewAdapter = LogFileListAdapter()
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
         recyclerView.adapter = recyclerViewAdapter
