@@ -1,25 +1,23 @@
 package com.tari.android.wallet.ui.fragment.restore.chooseRestoreOption
 
 import android.content.Intent
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import com.tari.android.wallet.R
 import com.tari.android.wallet.application.WalletManager
 import com.tari.android.wallet.application.WalletState
 import com.tari.android.wallet.data.WalletConfig
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.extension.addTo
+import com.tari.android.wallet.ffi.FFITariWalletAddress
+import com.tari.android.wallet.ffi.HexString
 import com.tari.android.wallet.infrastructure.backup.*
-import com.tari.android.wallet.model.WalletError
+import com.tari.android.wallet.model.*
 import com.tari.android.wallet.service.service.WalletServiceLauncher
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.common.SingleLiveEvent
 import com.tari.android.wallet.ui.dialog.error.ErrorDialogArgs
 import com.tari.android.wallet.ui.dialog.error.WalletErrorArgs
-import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupOptionDto
-import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupOptions
-import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupSettingsRepository
+import com.tari.android.wallet.ui.fragment.settings.backup.data.*
 import com.tari.android.wallet.util.WalletUtil
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -62,6 +60,15 @@ class ChooseRestoreOptionViewModel : CommonViewModel() {
                 val dto = backupSettingsRepository.getOptionDto(state.value!!.backupOptions)!!.copy(isEnable = true)
                 backupSettingsRepository.updateOption(dto)
                 backupManager.backupNow()
+
+                backupSettingsRepository.restoredTxs?.let {
+                    val sourceAddress = FFITariWalletAddress(HexString(it.source))
+                    val tariWalletAddress = TariWalletAddress(it.source, sourceAddress.getEmojiId())
+                    val message = resourceManager.getString(R.string.backup_restored_tx)
+                    val error = WalletError()
+                    walletService.restoreWithUnbindedOutputs(it.utxos, tariWalletAddress, message, error)
+                    throwIf(error)
+                }
 
                 _navigation.postValue(ChooseRestoreOptionNavigation.OnRestoreCompleted)
             }
@@ -114,14 +121,17 @@ class ChooseRestoreOptionViewModel : CommonViewModel() {
                 backupManager.signOut()
                 showAuthFailedDialog()
             }
+
             is BackupStorageTamperedException -> { // backup file not found
                 logger.i("Backup file not found")
                 backupManager.signOut()
                 showBackupFileNotFoundDialog()
             }
+
             is BackupFileIsEncryptedException -> {
                 _navigation.postValue(ChooseRestoreOptionNavigation.ToEnterRestorePassword)
             }
+
             is WalletStartFailedException -> {
                 logger.i("Restore failed: wallet start failed")
                 viewModelScope.launch(Dispatchers.Main) {
@@ -136,11 +146,13 @@ class ChooseRestoreOptionViewModel : CommonViewModel() {
                     showRestoreFailedDialog(exception.cause?.message)
                 }
             }
+
             is IOException -> {
                 logger.i("Restore failed: network connection")
                 backupManager.signOut()
                 showRestoreFailedDialog(resourceManager.getString(R.string.error_no_connection_title))
             }
+
             else -> {
                 logger.i("Restore failed")
                 backupManager.signOut()

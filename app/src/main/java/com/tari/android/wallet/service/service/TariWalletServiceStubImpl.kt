@@ -10,7 +10,7 @@ import com.tari.android.wallet.service.TariWalletServiceListener
 import com.tari.android.wallet.service.baseNode.BaseNodeSyncState
 import com.tari.android.wallet.util.Constants
 import java.math.BigInteger
-import java.util.*
+import java.util.Locale
 
 class TariWalletServiceStubImpl(
     private val wallet: FFIWallet,
@@ -246,6 +246,22 @@ class TariWalletServiceStubImpl(
         result
     }
 
+    override fun getUnbindedOutputs(error: WalletError): MutableList<TariUnblindedOutput> {
+        return runMapping(error) {
+            val ffiError = FFIError()
+            val outputs = wallet.getUnbindedOutputs(ffiError)
+            error.code = ffiError.code
+            outputs
+        }.orEmpty().toMutableList()
+    }
+
+    override fun restoreWithUnbindedOutputs(jsons: MutableList<String>, address: TariWalletAddress, message: String, error: WalletError) {
+        runMapping(error) {
+            val ffiError = FFIError()
+            wallet.restoreWithUnbindedOutputs(jsons, address, message, ffiError)
+            error.code = ffiError.code
+        }
+    }
 
     private fun mapThrowableIntoError(walletError: WalletError, throwable: Throwable) {
         if (throwable is FFIException) {

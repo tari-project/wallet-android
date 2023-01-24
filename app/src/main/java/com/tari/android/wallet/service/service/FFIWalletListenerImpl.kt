@@ -5,9 +5,7 @@ import com.tari.android.wallet.application.baseNodes.BaseNodes
 import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodeSharedRepository
 import com.tari.android.wallet.event.Event
 import com.tari.android.wallet.event.EventBus
-import com.tari.android.wallet.ffi.FFIWallet
-import com.tari.android.wallet.ffi.FFIWalletListener
-import com.tari.android.wallet.ffi.TransactionValidationStatus
+import com.tari.android.wallet.ffi.*
 import com.tari.android.wallet.infrastructure.backup.BackupManager
 import com.tari.android.wallet.model.*
 import com.tari.android.wallet.model.recovery.WalletRestorationResult
@@ -15,17 +13,20 @@ import com.tari.android.wallet.notification.NotificationHelper
 import com.tari.android.wallet.service.TariWalletServiceListener
 import com.tari.android.wallet.service.baseNode.BaseNodeState
 import com.tari.android.wallet.service.baseNode.BaseNodeSyncState
+import com.tari.android.wallet.service.notification.NotificationService
 import com.tari.android.wallet.ui.fragment.home.HomeActivity
 import io.reactivex.Observable
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import java.math.BigInteger
+import java.util.Locale
 import java.util.concurrent.*
 
 class FFIWalletListenerImpl(
     private val wallet: FFIWallet,
     private val backupManager: BackupManager,
     private val notificationHelper: NotificationHelper,
+    private val notificationService: NotificationService,
     private val app: TariWalletApplication,
     private val baseNodeSharedPrefsRepository: BaseNodeSharedRepository,
     private val baseNodes: BaseNodes
@@ -250,9 +251,8 @@ class FFIWalletListenerImpl(
 
     private fun sendPushNotificationToTxRecipient(recipientPublicKeyHex: String) {
         // the push notification server accepts lower-case hex strings as of now
-        //todo remove or get back after turning off faucet
-//        val fromPublicKeyHex = wallet.getPublicKey().toString().lowercase(Locale.ENGLISH)
-//        notificationService.notifyRecipient(recipientPublicKeyHex, fromPublicKeyHex, wallet::signMessage)
+        val fromPublicKeyHex = wallet.getWalletAddress().toString().lowercase(Locale.ENGLISH)
+        notificationService.notifyRecipient(recipientPublicKeyHex, fromPublicKeyHex, wallet::signMessage)
     }
 
     private fun checkBaseNodeSyncCompletion() {

@@ -30,21 +30,49 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.tari.android.wallet.ffi
+#include <jni.h>
+#include <android/log.h>
+#include <wallet.h>
+#include <string>
+#include <cmath>
+#include <android/log.h>
+#include "jniCommon.cpp"
 
-/**
- * Tari contact wrapper.
- *
- * @author The Tari Development Team
- */
-class FFIOutputFeatures() : FFIBase() {
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_tari_android_wallet_ffi_FFITariUnblindedOutput_jniFromJson(
+        JNIEnv *jEnv,
+        jobject jThis,
+        jstring jJson,
+        jobject error) {
+    ExecuteWithError(jEnv, error, [&](int *errorPointer) {
+        const char *pJson = jEnv->GetStringUTFChars(jJson, JNI_FALSE);
+        UnblindedOutput *pUnblindedOutput = create_tari_unblinded_output_from_json(pJson, errorPointer);
+        jEnv->ReleaseStringUTFChars(jJson, pJson);
+        SetPointerField(jEnv, jThis, reinterpret_cast<jlong>(pUnblindedOutput));
+    });
+}
 
-    private external fun jniCreate(version: Char, maturity: Long, metadata: FFIByteVector, libError: FFIError)
-    private external fun jniDestroy()
+extern "C"
+JNIEXPORT jstring JNICALL
+Java_com_tari_android_wallet_ffi_FFITariUnblindedOutput_jniToJson(
+        JNIEnv *jEnv,
+        jobject jThis,
+        jobject error) {
+    return ExecuteWithError<jstring>(jEnv, error, [&](int *errorPointer) {
+        auto pUnblindedOutput = GetPointerField<UnblindedOutput *>(jEnv, jThis);
+        const char *pJson = tari_unblinded_output_to_json(pUnblindedOutput, errorPointer);
+        jstring result = jEnv->NewStringUTF(pJson);
+        string_destroy(const_cast<char *>(pJson));
+        return result;
+    });
+}
 
-    constructor(version: Char, maturity: Long, metadata: FFIByteVector) : this() {
-        runWithError { jniCreate(version, maturity, metadata, it) }
-    }
-
-    override fun destroy() = jniDestroy()
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_tari_android_wallet_ffi_FFITariUnblindedOutput_jniDestroy(
+        JNIEnv *jEnv,
+        jobject jThis) {
+    tari_unblinded_output_destroy(GetPointerField<TariUnblindedOutput *>(jEnv, jThis));
+    SetNullPointerField(jEnv, jThis);
 }
