@@ -659,6 +659,7 @@
     <string name="check_backup_storage_status_auth_revoked_error_description">Storage is not accessible</string>
     <string name="back_up_wallet_storage_setup_error_desc">Storage setup was interrupt</string>
     <string name="backup_wallet_storage_full_desc">Your storage is full</string>
+    <string name="backup_restored_tx">Funds recovered from your previous wallet</string>
 
     <!--    FFI Validation-->
     <string name="ffi_validation_error_title">Incompatible version detected</string>

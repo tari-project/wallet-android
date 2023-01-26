@@ -36,8 +36,7 @@ import android.content.Context
 import android.content.SharedPreferences
 import com.tari.android.wallet.data.repository.CommonRepository
 import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodeSharedRepository
-import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefBooleanDelegate
-import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefStringDelegate
+import com.tari.android.wallet.data.sharedPrefs.delegates.*
 import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepository
 import com.tari.android.wallet.data.sharedPrefs.network.formatKey
 import com.tari.android.wallet.data.sharedPrefs.tariSettings.TariSettingsSharedRepository
@@ -83,6 +82,8 @@ class SharedPrefsRepository(
 
     var emojiId: String? by SharedPrefStringDelegate(sharedPrefs, formatKey(Key.emojiId))
 
+    var databasePassphrase: String? by SharedPrefStringSecuredDelegate(context, sharedPrefs, formatKey(Key.walletDatabasePassphrase))
+
     var onboardingStarted: Boolean by SharedPrefBooleanDelegate(sharedPrefs, formatKey(Key.onboardingStarted))
 
     var onboardingCompleted: Boolean by SharedPrefBooleanDelegate(sharedPrefs, formatKey(Key.onboardingCompleted))
@@ -110,6 +111,7 @@ class SharedPrefsRepository(
         publicKeyHexString = null
         isAuthenticated = false
         emojiId = null
+        databasePassphrase = null
         onboardingStarted = false
         onboardingCompleted = false
         onboardingAuthSetupStarted = false

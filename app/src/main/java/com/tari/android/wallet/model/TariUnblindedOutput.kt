@@ -30,27 +30,44 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.tari.android.wallet.model;
+package com.tari.android.wallet.model
 
-/**
- * Declare model classes in this file.
- */
-parcelable WalletError;
-parcelable TxId;
-parcelable RequestId;
-parcelable MicroTari;
-parcelable BalanceInfo;
-parcelable User;
-parcelable Contact;
-parcelable CompletedTx;
-parcelable CancelledTx;
-parcelable PendingInboundTx;
-parcelable PendingOutboundTx;
-parcelable PublicKey;
-parcelable ValidationResult;
-parcelable TransactionSendStatus;
-parcelable TariVector;
-parcelable TariUtxo;
-parcelable TariCoinPreview;
-parcelable TariWalletAddress;
-parcelable TariUnblindedOutput;
+import android.os.Parcel
+import android.os.Parcelable
+import com.tari.android.wallet.ffi.FFITariUnblindedOutput
+
+class TariUnblindedOutput() : Parcelable {
+
+    var json: String = ""
+
+    constructor(tx: FFITariUnblindedOutput) : this() {
+        json = tx.toJson()
+        tx.destroy()
+    }
+
+    constructor(json: String) : this() {
+        this.json = json
+    }
+
+    constructor(parcel: Parcel) : this() {
+        json = parcel.readString().orEmpty()
+    }
+
+    override fun writeToParcel(parcel: Parcel, flags: Int) {
+        parcel.writeString(json)
+    }
+
+    override fun describeContents(): Int {
+        return 0
+    }
+
+    companion object CREATOR : Parcelable.Creator<TariUnblindedOutput> {
+        override fun createFromParcel(parcel: Parcel): TariUnblindedOutput {
+            return TariUnblindedOutput(parcel)
+        }
+
+        override fun newArray(size: Int): Array<TariUnblindedOutput?> {
+            return arrayOfNulls(size)
+        }
+    }
+}

@@ -175,3 +175,37 @@ Java_com_tari_android_wallet_ffi_FFIPendingOutboundTxs_jniDestroy(
     pending_outbound_transactions_destroy(GetPointerField<TariPendingOutboundTransactions *>(jEnv, jThis));
     SetNullPointerField(jEnv, jThis);
 }
+
+extern "C"
+JNIEXPORT jint JNICALL
+Java_com_tari_android_wallet_ffi_FFITariUnblindedOutputs_jniGetLength(
+        JNIEnv *jEnv,
+        jobject jThis,
+        jobject error) {
+    return ExecuteWithError<jint>(jEnv, error, [&](int *errorPointer) {
+        auto pOutboundTxs = GetPointerField<TariUnblindedOutputs *>(jEnv, jThis);
+        return unblinded_outputs_get_length(pOutboundTxs, errorPointer);
+    });
+}
+
+extern "C"
+JNIEXPORT jlong JNICALL
+Java_com_tari_android_wallet_ffi_FFITariUnblindedOutputs_jniGetAt(
+        JNIEnv *jEnv,
+        jobject jThis,
+        jint index,
+        jobject error) {
+    return ExecuteWithErrorAndCast<TariUnblindedOutput *>(jEnv, error, [&](int *errorPointer) {
+        auto pOutboundTxs = GetPointerField<TariUnblindedOutputs *>(jEnv, jThis);
+        return unblinded_outputs_get_at(pOutboundTxs, static_cast<unsigned int>(index), errorPointer);
+    });
+}
+
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_tari_android_wallet_ffi_FFITariUnblindedOutputs_jniDestroy(
+        JNIEnv *jEnv,
+        jobject jThis) {
+    unblinded_outputs_destroy(GetPointerField<TariUnblindedOutputs *>(jEnv, jThis));
+    SetNullPointerField(jEnv, jThis);
+}

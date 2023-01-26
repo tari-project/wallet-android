@@ -872,63 +872,6 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniPreviewSplitUtxos(
         return wallet_preview_coin_split(pWallet, pTariVector, splitCount, feePerGram, errorPointer);
     });
 }
-//
-//extern "C"
-//JNIEXPORT jbyteArray JNICALL
-//Java_com_tari_android_wallet_ffi_FFIWallet_jniImportUTXO(
-//        JNIEnv *jEnv,
-//        jobject jThis,
-//        jstring jAmount,
-//        jobject jpSpendingKey,
-//        jobject jpSourcePublicKey,
-//        jobject jpTariCommitmentSignature,
-//        jobject jpSourceSenderPublicKey,
-//        jobject jpScriptPrivateKey,
-//        jstring jMessage,
-//        jobject error) {
-//
-//    auto pWallet = GetPointerField<TariWallet *>(jEnv, jThis);
-//
-//    auto pSpendingKey = GetPointerField<TariPrivateKey *>(jEnv, jpSpendingKey);
-//
-//    auto pSourcePublicKey = GetPointerField<TariWalletAddress *>(jEnv, jpSourcePublicKey);
-//
-//    auto pSourceSenderPublicKey = GetPointerField<TariPublicKey *>(jEnv, jpSourceSenderPublicKey);
-//
-//    auto pTariCommitmentSignature = GetPointerField<TariCommitmentSignature *>(jEnv, jpTariCommitmentSignature);
-//
-//    auto pScriptPrivateKey = GetPointerField<TariPrivateKey *>(jEnv, jpScriptPrivateKey);
-//
-//    char *pAmountEnd;
-//    const char *nativeAmount = jEnv->GetStringUTFChars(jAmount, JNI_FALSE);
-//    const char *pMessage = jEnv->GetStringUTFChars(jMessage, JNI_FALSE);
-//    unsigned long long amount = strtoull(nativeAmount, &pAmountEnd, 10);
-//
-//    return ExecuteWithError<jbyteArray>(jEnv, error, [&](int *errorPointer) {
-//        jbyteArray result = getBytesFromUnsignedLongLong(
-//                jEnv,
-//                wallet_import_external_utxo_as_non_rewindable(
-//                        pWallet,
-//                        amount,
-//                        pSpendingKey,
-//                        pSourcePublicKey,
-//                        nullptr,
-//                        pTariCommitmentSignature,
-//                        pSourceSenderPublicKey,
-//                        pScriptPrivateKey,
-//                        nullptr,
-//                        nullptr,
-//                        0,
-//                        pMessage,
-//                        errorPointer
-//                )
-//        );
-//
-//        jEnv->ReleaseStringUTFChars(jAmount, nativeAmount);
-//        jEnv->ReleaseStringUTFChars(jMessage, pMessage);
-//        return result;
-//    });
-//}
 
 extern "C"
 JNIEXPORT jboolean JNICALL
@@ -1159,6 +1102,56 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniStartRecovery(
     });
 }
 
+
+extern "C"
+JNIEXPORT jstring JNICALL
+Java_com_tari_android_wallet_ffi_FFIWallet_jniSignMessage(
+        JNIEnv *jEnv,
+        jobject jThis,
+        jstring jMessage,
+        jobject error) {
+    return ExecuteWithError<jstring>(jEnv, error, [&](int *errorPointer) {
+        auto pWallet = GetPointerField<TariWallet *>(jEnv, jThis);
+        const char *pMessage = jEnv->GetStringUTFChars(jMessage, JNI_FALSE);
+        char *pSignature = wallet_sign_message(pWallet, pMessage, errorPointer);
+
+        jEnv->ReleaseStringUTFChars(jMessage, pMessage);
+        jstring result = jEnv->NewStringUTF(pSignature);
+        string_destroy(pSignature);
+
+        return result;
+    });
+}
+
+extern "C"
+JNIEXPORT jboolean JNICALL
+Java_com_tari_android_wallet_ffi_FFIWallet_jniVerifyMessageSignature(
+        JNIEnv *jEnv,
+        jobject jThis,
+        jobject jpPublicKey,
+        jstring jMessage,
+        jstring jHexSignatureNonce,
+        jobject error) {
+
+    return ExecuteWithError<jboolean>(jEnv, error, [&](int *errorPointer) {
+        auto pWallet = GetPointerField<TariWallet *>(jEnv, jThis);
+        jlong lPublicKey = GetPointerField(jEnv, jpPublicKey);
+        auto *pContactPublicKey = reinterpret_cast<TariPublicKey *>(lPublicKey);
+        const char *pHexSignatureNonce = jEnv->GetStringUTFChars(jHexSignatureNonce, JNI_FALSE);
+        const char *pMessage = jEnv->GetStringUTFChars(jMessage, JNI_FALSE);
+        auto result = static_cast<jboolean>(
+                wallet_verify_message_signature(
+                        pWallet, pContactPublicKey, pHexSignatureNonce, pMessage, errorPointer
+                ) != 0
+        );
+
+        jEnv->ReleaseStringUTFChars(jHexSignatureNonce, pHexSignatureNonce);
+        jEnv->ReleaseStringUTFChars(jMessage, pMessage);
+
+        return result;
+    });
+}
+
 extern "C"
 JNIEXPORT jlong JNICALL
 Java_com_tari_android_wallet_ffi_FFIWallet_jniWalletGetFeePerGramStats(
@@ -1170,5 +1163,53 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniWalletGetFeePerGramStats(
     return ExecuteWithErrorAndCast<TariFeePerGramStats *>(jEnv, error, [&](int *errorPointer) {
         auto pWallet = GetPointerField<TariWallet *>(jEnv, jThis);
         return wallet_get_fee_per_gram_stats(pWallet, count, errorPointer);
+    });
+}
+
+extern "C"
+JNIEXPORT jlong JNICALL
+Java_com_tari_android_wallet_ffi_FFIWallet_jniWalletGetUnspentOutputs(
+        JNIEnv *jEnv,
+        jobject jThis,
+        jobject error
+) {
+    return ExecuteWithErrorAndCast<TariUnblindedOutputs *>(jEnv, error, [&](int *errorPointer) {
+        auto pWallet = GetPointerField<TariWallet *>(jEnv, jThis);
+        return wallet_get_unspent_outputs(pWallet, errorPointer);
+    });
+}
+
+extern "C"
+JNIEXPORT jbyteArray JNICALL
+Java_com_tari_android_wallet_ffi_FFIWallet_jniImportExternalUtxoAsNonRewindable(
+        JNIEnv *jEnv,
+        jobject jThis,
+        jobject jOutput,
+        jobject jSourceWalletAddress,
+        jstring jMessage,
+        jobject error) {
+
+    auto pWallet = GetPointerField<TariWallet *>(jEnv, jThis);
+
+    auto pSourceWalletAddress = GetPointerField<TariWalletAddress *>(jEnv, jSourceWalletAddress);
+
+    auto pOutputs = GetPointerField<TariUnblindedOutput *>(jEnv, jOutput);
+
+    const char *pMessage = jEnv->GetStringUTFChars(jMessage, JNI_FALSE);
+
+    return ExecuteWithError<jbyteArray>(jEnv, error, [&](int *errorPointer) {
+        jbyteArray result = getBytesFromUnsignedLongLong(
+                jEnv,
+                wallet_import_external_utxo_as_non_rewindable(
+                        pWallet,
+                        pOutputs,
+                        pSourceWalletAddress,
+                        pMessage,
+                        errorPointer
+                )
+        );
+
+        jEnv->ReleaseStringUTFChars(jMessage, pMessage);
+        return result;
     });
 }
