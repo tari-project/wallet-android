@@ -28,8 +28,6 @@ class BackupSettingsRepository(private val context: Context, private val sharedP
 
     var localBackupFolderURI: Uri? by SharedPrefGsonDelegate(sharedPrefs, formatKey(Keys.localBackupFolderURI), Uri::class.java)
 
-    var lastBackupDialogShown: DateTime? by SharedPrefDateTimeDelegate(sharedPrefs, formatKey(Keys.lastBackupDialogShownTime), null)
-
     var restoredTxs: BackupUtxos? by SharedPrefGsonDelegate(sharedPrefs, formatKey(Keys.lastRestoredTxs), BackupUtxos::class.java, null)
 
     init {
@@ -44,10 +42,7 @@ class BackupSettingsRepository(private val context: Context, private val sharedP
             listOfNotNull(googleDriveOption, dropboxOption).toList()
         }
 
-    fun isShowHintDialog(): Boolean = with(lastBackupDialogShown) { this == null || !this.plusMinutes(delayTimeInMinutes).isAfterNow }
-
     fun clear() {
-        lastBackupDialogShown = null
         backupPassword = null
         localBackupFolderURI = null
         localFileOption = BackupOptionDto(BackupOptions.Local)
