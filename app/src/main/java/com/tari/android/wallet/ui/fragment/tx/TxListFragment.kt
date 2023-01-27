@@ -32,16 +32,11 @@
  */
 package com.tari.android.wallet.ui.fragment.tx
 
-import android.animation.AnimatorSet
-import android.animation.ObjectAnimator
-import android.animation.ValueAnimator
+import android.animation.*
 import android.annotation.SuppressLint
 import android.graphics.drawable.GradientDrawable
 import android.os.*
-import android.view.LayoutInflater
-import android.view.MotionEvent
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import androidx.core.animation.addListener
 import androidx.core.os.postDelayed
 import androidx.fragment.app.viewModels
@@ -106,6 +101,8 @@ class TxListFragment : CommonFragment<FragmentTxListBinding, TxListViewModel>(),
         bindViewModel(viewModel)
 
         viewModel.serviceConnection.reconnectToService()
+
+        subscribeVM(viewModel.stagedWalletSecurityManager)
 
         checkPermission()
         setupUI()

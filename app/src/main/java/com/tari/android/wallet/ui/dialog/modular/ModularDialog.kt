@@ -9,6 +9,8 @@ import android.view.View
 import android.widget.LinearLayout
 import androidx.appcompat.widget.LinearLayoutCompat
 import com.tari.android.wallet.R
+import com.tari.android.wallet.data.sharedPrefs.securityStages.modules.SecurityStageHeadModule
+import com.tari.android.wallet.data.sharedPrefs.securityStages.modules.SecurityStageHeadModuleView
 import com.tari.android.wallet.ui.component.networkStateIndicator.module.ConnectionStatusesModule
 import com.tari.android.wallet.ui.component.networkStateIndicator.module.ConnectionStatusesModuleView
 import com.tari.android.wallet.ui.dialog.TariDialog
@@ -88,6 +90,7 @@ open class ModularDialog(val context: Context) : TariDialog {
                 is UtxoAmountModule -> UtxoAmountModuleView(context, module)
                 is UtxoSplitModule -> UtxoSplitModuleView(context, module)
                 is ConnectionStatusesModule -> ConnectionStatusesModuleView(context, module)
+                is SecurityStageHeadModule -> SecurityStageHeadModuleView(context, module)
                 else -> View(context)
             }
             root.addView(view)

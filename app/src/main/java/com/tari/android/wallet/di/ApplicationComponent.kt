@@ -35,6 +35,7 @@ package com.tari.android.wallet.di
 import android.content.ClipboardManager
 import com.tari.android.wallet.application.TariWalletApplication
 import com.tari.android.wallet.application.deeplinks.DeeplinkViewModel
+import com.tari.android.wallet.application.securityStage.StagedWalletSecurityManager
 import com.tari.android.wallet.service.service.WalletService
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.component.networkStateIndicator.ConnectionIndicatorViewModel
@@ -166,6 +167,7 @@ interface ApplicationComponent {
     fun inject(viewModel: EnterCurrentPasswordViewModel)
     fun inject(viewModel: ChangeSecurePasswordViewModel)
     fun inject(viewModel: AddNoteViewModel)
+    fun inject(viewModel: StagedWalletSecurityManager)
 
     fun getClipboardManager(): ClipboardManager
 }

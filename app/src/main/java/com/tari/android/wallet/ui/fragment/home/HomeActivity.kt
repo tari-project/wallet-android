@@ -42,9 +42,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.tari.android.wallet.R
-import com.tari.android.wallet.application.deeplinks.DeepLink
-import com.tari.android.wallet.application.deeplinks.DeeplinkHandler
-import com.tari.android.wallet.application.deeplinks.DeeplinkViewModel
+import com.tari.android.wallet.application.deeplinks.*
 import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepository
 import com.tari.android.wallet.databinding.ActivityHomeBinding
@@ -52,11 +50,7 @@ import com.tari.android.wallet.di.DiContainer.appComponent
 import com.tari.android.wallet.event.Event
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.extension.applyFontStyle
-import com.tari.android.wallet.model.MicroTari
-import com.tari.android.wallet.model.Tx
-import com.tari.android.wallet.model.TxId
-import com.tari.android.wallet.model.User
-import com.tari.android.wallet.model.WalletError
+import com.tari.android.wallet.model.*
 import com.tari.android.wallet.network.NetworkConnectionState
 import com.tari.android.wallet.service.TariWalletService
 import com.tari.android.wallet.service.connection.ServiceConnectionStatus
@@ -64,17 +58,12 @@ import com.tari.android.wallet.service.service.WalletServiceLauncher
 import com.tari.android.wallet.ui.common.CommonActivity
 import com.tari.android.wallet.ui.common.domain.ResourceManager
 import com.tari.android.wallet.ui.component.tari.TariFont
-import com.tari.android.wallet.ui.dialog.modular.DialogArgs
-import com.tari.android.wallet.ui.dialog.modular.ModularDialog
-import com.tari.android.wallet.ui.dialog.modular.ModularDialogArgs
+import com.tari.android.wallet.ui.dialog.modular.*
 import com.tari.android.wallet.ui.dialog.modular.modules.body.BodyModule
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonModule
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonStyle
 import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
-import com.tari.android.wallet.ui.extension.hideKeyboard
-import com.tari.android.wallet.ui.extension.parcelable
-import com.tari.android.wallet.ui.extension.showInternetConnectionErrorDialog
-import com.tari.android.wallet.ui.extension.string
+import com.tari.android.wallet.ui.extension.*
 import com.tari.android.wallet.ui.fragment.onboarding.activity.OnboardingFlowActivity
 import com.tari.android.wallet.ui.fragment.profile.WalletInfoFragment
 import com.tari.android.wallet.ui.fragment.send.addAmount.AddAmountFragment
@@ -83,9 +72,7 @@ import com.tari.android.wallet.ui.fragment.send.addNote.AddNodeListener
 import com.tari.android.wallet.ui.fragment.send.addNote.AddNoteFragment
 import com.tari.android.wallet.ui.fragment.send.addRecepient.AddRecipientListener
 import com.tari.android.wallet.ui.fragment.send.common.TransactionData
-import com.tari.android.wallet.ui.fragment.send.finalize.FinalizeSendTxFragment
-import com.tari.android.wallet.ui.fragment.send.finalize.FinalizeSendTxListener
-import com.tari.android.wallet.ui.fragment.send.finalize.TxFailureReason
+import com.tari.android.wallet.ui.fragment.send.finalize.*
 import com.tari.android.wallet.ui.fragment.send.makeTransaction.MakeTransactionFragment
 import com.tari.android.wallet.ui.fragment.settings.allSettings.AllSettingsFragment
 import com.tari.android.wallet.ui.fragment.settings.allSettings.AllSettingsRouter
@@ -115,9 +102,7 @@ import com.tari.android.wallet.ui.fragment.tx.details.TxDetailsFragment.Companio
 import com.tari.android.wallet.ui.fragment.utxos.list.UtxosListFragment
 import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.yat.YatUser
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import java.lang.ref.WeakReference
 import javax.inject.Inject
 
@@ -344,7 +329,7 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>(), AllSe
 
     override fun toAllSettings() = ui.viewPager.setCurrentItem(INDEX_SETTINGS, NO_SMOOTH_SCROLL)
 
-    override fun toBackupSettings() = addFragment(BackupSettingsFragment())
+    override fun toBackupSettings(withAnimation: Boolean) = addFragment(BackupSettingsFragment(), withAnimation = withAnimation)
 
     override fun toDeleteWallet() = addFragment(DeleteWalletFragment())
 

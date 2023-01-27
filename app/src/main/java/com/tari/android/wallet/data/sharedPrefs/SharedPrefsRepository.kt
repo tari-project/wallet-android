@@ -39,6 +39,7 @@ import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodeSharedRepositor
 import com.tari.android.wallet.data.sharedPrefs.delegates.*
 import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepository
 import com.tari.android.wallet.data.sharedPrefs.network.formatKey
+import com.tari.android.wallet.data.sharedPrefs.securityStages.SecurityStagesRepository
 import com.tari.android.wallet.data.sharedPrefs.tariSettings.TariSettingsSharedRepository
 import com.tari.android.wallet.data.sharedPrefs.tor.TorSharedRepository
 import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupSettingsRepository
@@ -60,7 +61,8 @@ class SharedPrefsRepository(
     private val baseNodeSharedRepository: BaseNodeSharedRepository,
     private val yatSharedRepository: YatSharedRepository,
     private val torSharedRepository: TorSharedRepository,
-    private var tariSettingsSharedRepository: TariSettingsSharedRepository
+    private val tariSettingsSharedRepository: TariSettingsSharedRepository,
+    private val securityStagesRepository: SecurityStagesRepository
 ) : CommonRepository(networkRepository) {
 
     private object Key {
@@ -108,6 +110,7 @@ class SharedPrefsRepository(
         yatSharedRepository.clear()
         torSharedRepository.clear()
         tariSettingsSharedRepository.clear()
+        securityStagesRepository.clear()
         publicKeyHexString = null
         isAuthenticated = false
         emojiId = null
