@@ -33,9 +33,7 @@
 package com.tari.android.wallet.ui.fragment.settings.allSettings
 
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.tari.android.wallet.databinding.FragmentAllSettingsBinding
@@ -85,6 +83,7 @@ class AllSettingsFragment : CommonFragment<FragmentAllSettingsBinding, AllSettin
 
         when (navigation) {
             AllSettingsNavigation.ToBugReporting -> DebugActivity.launch(requireContext(), DebugNavigation.BugReport)
+            AllSettingsNavigation.ToBackupOnboardingFlow -> router.toBackupOnboardingFlow()
             AllSettingsNavigation.ToAbout -> router.toAbout()
             AllSettingsNavigation.ToBackgroundService -> router.toBackgroundService()
             AllSettingsNavigation.ToBackupSettings -> router.toBackupSettings()

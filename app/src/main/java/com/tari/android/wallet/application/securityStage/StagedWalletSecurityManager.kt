@@ -168,7 +168,9 @@ class StagedWalletSecurityManager : CommonViewModel() {
     ) {
         val args = ModularDialogArgs(
             DialogArgs(), listOf(
-                SecurityStageHeadModule(titleEmoji, title),
+                SecurityStageHeadModule(titleEmoji, title) {
+                    HomeActivity.instance.get()?.let(HomeActivity::toBackupOnboardingFlow)
+                },
                 BodyModule(body, bodyHtml?.let { SpannableString(it) }),
                 ButtonModule(positiveButtonTitle, ButtonStyle.Normal) {
                     _dismissDialog.postValue(Unit)

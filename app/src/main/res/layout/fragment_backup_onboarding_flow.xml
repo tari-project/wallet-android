@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.tari.android.wallet.ui.component.tari.TariPrimaryBackground xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/root_view"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:id="@+id/main_body"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <androidx.viewpager2.widget.ViewPager2
+            android:id="@+id/view_pager"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="70dp"
+            android:layout_marginBottom="40dp">
+
+            <com.tari.android.wallet.ui.component.tari.TariDivider
+                android:layout_width="match_parent"
+                android:layout_height="5dp"
+                android:layout_gravity="bottom" />
+
+            <com.tari.android.wallet.ui.component.tari.TariTabLayout
+                android:id="@+id/view_pager_indicators"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:tabIndicatorColor="?attr/palette_brand_purple"
+                app:tabIndicatorHeight="5dp"
+                app:tabTextAppearance="@style/TabLayoutTextAppearance" />
+
+        </FrameLayout>
+
+    </androidx.appcompat.widget.LinearLayoutCompat>
+
+    <FrameLayout
+        android:id="@+id/close_button"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="15dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <com.tari.android.wallet.ui.component.tari.TariIconView
+            android:layout_width="wrap_content"
+            android:layout_height="15dp"
+            android:layout_gravity="center"
+            android:src="@drawable/vector_close_onboarding_flow" />
+
+    </FrameLayout>
+
+    <com.tari.android.wallet.ui.component.tari.TariSecondaryButton
+        android:id="@+id/next_button"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:layout_marginEnd="30dp"
+        app:layout_constraintBottom_toBottomOf="@+id/close_button"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/close_button"
+        app:title="@string/common_next" />
+
+</com.tari.android.wallet.ui.component.tari.TariPrimaryBackground>

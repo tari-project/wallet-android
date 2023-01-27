@@ -66,6 +66,8 @@ import com.tari.android.wallet.ui.fragment.send.requestTari.RequestTariViewModel
 import com.tari.android.wallet.ui.fragment.settings.allSettings.AllSettingsViewModel
 import com.tari.android.wallet.ui.fragment.settings.allSettings.about.TariAboutViewModel
 import com.tari.android.wallet.ui.fragment.settings.backgroundService.BackgroundServiceSettingsViewModel
+import com.tari.android.wallet.ui.fragment.settings.backup.backupOnboarding.BackupOnboardingFlowViewModel
+import com.tari.android.wallet.ui.fragment.settings.backup.backupOnboarding.item.BackupOnboardingFlowItemViewModel
 import com.tari.android.wallet.ui.fragment.settings.backup.backupSettings.BackupSettingsViewModel
 import com.tari.android.wallet.ui.fragment.settings.backup.backupSettings.option.BackupOptionViewModel
 import com.tari.android.wallet.ui.fragment.settings.backup.changeSecurePassword.ChangeSecurePasswordViewModel
@@ -168,6 +170,8 @@ interface ApplicationComponent {
     fun inject(viewModel: ChangeSecurePasswordViewModel)
     fun inject(viewModel: AddNoteViewModel)
     fun inject(viewModel: StagedWalletSecurityManager)
+    fun inject(viewModel: BackupOnboardingFlowViewModel)
+    fun inject(viewModel: BackupOnboardingFlowItemViewModel)
 
     fun getClipboardManager(): ClipboardManager
 }

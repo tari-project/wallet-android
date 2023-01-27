@@ -99,6 +99,7 @@
     <string name="common_delete">Delete</string>
     <string name="common_lets_do_it">Yes! Let\'s do it!</string>
     <string name="common_are_you_sure">Are you sure?</string>
+    <string name="common_next">Next</string>
 
     <!-- emoji id copied view -->
     <string name="emoji_id_copied">COPIED</string>
@@ -391,6 +392,7 @@
     <string name="all_settings_advanced_settings_label">Advanced</string>
     <string name="all_settings_yat_settings_label">Yat</string>
     <string name="all_settings_back_up_wallet_settings_entry">Wallet Backups</string>
+    <string name="all_settings_back_up_wallet_settings_safety">Why I need safety?</string>
     <string name="all_settings_secondary_settings_label">More</string>
     <string name="all_settings_report_a_bug">Report a Bug</string>
     <string name="all_settings_delete_wallet">Delete Your Wallet</string>
