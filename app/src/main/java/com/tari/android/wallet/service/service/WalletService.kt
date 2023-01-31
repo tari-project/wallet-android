@@ -150,7 +150,7 @@ class WalletService : Service() {
         DiContainer.appComponent.inject(this)
         // start wallet manager on a separate thread & listen to events
         EventBus.walletState.subscribe(this, this::onWalletStateChanged)
-        Thread { walletManager.start() }.start()
+        walletManager.start()
         logger.i("Wallet service started")
     }
 

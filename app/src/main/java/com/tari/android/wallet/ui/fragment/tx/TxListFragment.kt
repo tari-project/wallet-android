@@ -34,6 +34,7 @@ package com.tari.android.wallet.ui.fragment.tx
 
 import android.animation.*
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.graphics.drawable.GradientDrawable
 import android.os.*
 import android.view.*
@@ -59,6 +60,7 @@ import com.tari.android.wallet.ui.common.recyclerView.CommonViewHolderItem
 import com.tari.android.wallet.ui.component.networkStateIndicator.ConnectionIndicatorViewModel
 import com.tari.android.wallet.ui.extension.*
 import com.tari.android.wallet.ui.extension.PermissionExtensions.runWithPermission
+import com.tari.android.wallet.ui.fragment.onboarding.activity.OnboardingFlowActivity
 import com.tari.android.wallet.ui.fragment.tx.adapter.TxListAdapter
 import com.tari.android.wallet.ui.fragment.tx.questionMark.QuestionMarkViewModel
 import com.tari.android.wallet.ui.fragment.tx.ui.CustomScrollView
@@ -240,7 +242,15 @@ class TxListFragment : CommonFragment<FragmentTxListBinding, TxListViewModel>(),
             is TxListNavigation.ToSendTariToUser -> router.toSendTari(navigation.user)
             TxListNavigation.ToUtxos -> router.toUtxos()
             TxListNavigation.ToAllSettings -> router.toAllSettings()
+            TxListNavigation.ToSplashScreen -> toSplash()
         }
+    }
+
+    private fun toSplash() {
+        val intent = Intent(requireActivity(), OnboardingFlowActivity::class.java)
+        intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
+        startActivity(intent)
+        requireActivity().finishAffinity()
     }
 
     private fun updateTxListUI(list: MutableList<CommonViewHolderItem>) {
